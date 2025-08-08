@@ -217,14 +217,18 @@ def update_agent_role_permissions():
 def add_agent_manager_permissions():
     if not frappe.db.exists("Role", "Agent Manager"):
         return
-
-    ptype = ["create", "delete", "write"]
-    doctypes = ["Email Account", "File", "Contact", "Communication"]
-    for dt in doctypes:
+    doc_to_permissions = {
+        "Email Account": ["create", "delete", "write"],
+        "File": ["create", "delete", "write"],
+        "Contact": ["create", "delete", "write"],
+        "Communication": ["create", "delete", "write"],
+        "User Invitation": ["create", "write"],
+        "Role": [],
+    }
+    for dt in doc_to_permissions.keys():
         # this adds read permission to the role
         add_permission(dt, "Agent Manager")
-        for p in ptype:
-            # now we update the above role to have all permissions from the ptype
+        for p in doc_to_permissions[dt]:
             update_permission_property(dt, "Agent Manager", 0, p, 1)
 
 

@@ -41,6 +41,12 @@ website_route_rules = [
     },
 ]
 
+user_invitation = {
+    "only_for": ["Agent Manager", "System Manager"],
+    "allowed_roles": ["Agent", "Agent Manager", "System Manager"],
+    "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
+}
+
 doc_events = {
     "Contact": {
         "before_insert": "helpdesk.overrides.contact.before_insert",
@@ -74,3 +80,9 @@ ignore_links_on_delete = [
 # setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"
 # setup_wizard_stages = "helpdesk.setup.setup_wizard.get_setup_stages"
 setup_wizard_complete = "helpdesk.setup.setup_wizard.setup_complete"
+
+
+# Testing
+# ---------------
+
+before_tests = "helpdesk.test_utils.before_tests"

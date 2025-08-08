@@ -34,6 +34,7 @@ def get_boot():
             "favicon": get_favicon(),
             "setup_complete": cint(frappe.get_system_settings("setup_complete")),
             "is_fc_site": is_fc_site(),
+            "session_user": frappe.session.user,
         }
     )
 

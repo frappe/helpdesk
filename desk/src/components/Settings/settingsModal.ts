@@ -2,6 +2,7 @@ import { h, markRaw, ref } from "vue";
 import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
 import LucideUser from "~icons/lucide/user";
+import LucideUserPlus from "~icons/lucide/user-plus";
 import LucideUsers from "~icons/lucide/users";
 import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
@@ -13,6 +14,7 @@ import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
 import Sla from "./Sla/Sla.vue";
 import HolidayList from "./Holiday/Holiday.vue";
+import InviteAgents from "./InviteAgents.vue";
 
 export const tabs = [
   {
@@ -29,6 +31,12 @@ export const tabs = [
     label: "Agents",
     icon: markRaw(LucideUser),
     component: markRaw(Agents),
+  },
+  {
+    label: "Invite Agents",
+    icon: markRaw(LucideUserPlus),
+    component: markRaw(InviteAgents),
+
   },
   {
     label: "Teams",

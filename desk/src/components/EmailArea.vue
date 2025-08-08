@@ -3,7 +3,10 @@
     v-bind="$attrs"
     class="grow cursor-pointer border-transparent bg-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >
-    <div class="flex items-center justify-between gap-2">
+    <div
+      class="flex items-center justify-between gap-2"
+      :class="isMobileView && 'items-start'"
+    >
       <!-- email design for mobile -->
       <div v-if="isMobileView" class="flex items-center gap-2 text-sm">
         <div class="leading-tight">
@@ -27,6 +30,13 @@
       </div>
 
       <div class="flex gap-0.5 items-center">
+        <Badge
+          v-if="status.label"
+          :label="__(status.label)"
+          variant="subtle"
+          :theme="status.color"
+          class="mr-1.5"
+        />
         <Tooltip
           :text="dateFormat(creation, dateTooltipFormat)"
           v-if="!isMobileView"
@@ -53,7 +63,7 @@
           @click="
             emit('reply', {
               content: content,
-              to: sender?.name ?? to,
+              to: to ?? sender.name,
               cc: cc,
               bcc: bcc,
             })
@@ -118,7 +128,7 @@ import { AttachmentItem } from "@/components";
 import { useScreenSize } from "@/composables/screen";
 import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
 import { Dropdown } from "frappe-ui";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
 import { ReplyAllIcon, ReplyIcon } from "./icons";
 import TicketSplitModal from "./ticket/TicketSplitModal.vue";
@@ -133,14 +143,39 @@ const props = defineProps({
   },
 });
 
-const { sender, to, cc, bcc, creation, subject, attachments, content, name } =
-  props.activity;
-
+const {
+  sender,
+  to,
+  cc,
+  bcc,
+  creation,
+  subject,
+  attachments,
+  content,
+  name,
+  deliveryStatus,
+} = props.activity;
+console.log(deliveryStatus);
 const emit = defineEmits(["reply"]);
 
 const { isMobileView } = useScreenSize();
 
 const showSplitModal = ref(false);
+
+const status = computed(() => {
+  let _status = deliveryStatus;
+  let indicator_color = "red";
+  if (["Sent", "Clicked"].includes(_status)) {
+    indicator_color = "green";
+  } else if (["Sending", "Scheduled"].includes(_status)) {
+    indicator_color = "orange";
+  } else if (["Opened", "Read"].includes(_status)) {
+    indicator_color = "blue";
+  } else if (_status == "Error") {
+    indicator_color = "red";
+  }
+  return { label: _status, color: indicator_color };
+});
 
 // TODO: Implement reply functionality using this way instead of emit drillup
 // function reply(email, reply_all = false) {

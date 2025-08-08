@@ -407,10 +407,7 @@ const steps = [
     onClick: () => {
       minimize.value = true;
       showSettingsModal.value = true;
-      defaultSettingsTab.value = 2;
-      setTimeout(() => {
-        showNewAgentsDialog.value = true;
-      }, 300);
+      defaultSettingsTab.value = 3;
     },
   },
   {
