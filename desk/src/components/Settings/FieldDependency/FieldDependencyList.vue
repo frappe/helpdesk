@@ -2,9 +2,19 @@
   <div class="px-10 py-8">
     <SettingsLayoutHeader>
       <template #title>
-        <h1 class="text-lg font-semibold text-ink-gray-8">
-          Field Dependencies
-        </h1>
+        <div class="flex items-center gap-2">
+          <h1 class="text-lg font-semibold text-ink-gray-8">
+            Field Dependencies
+          </h1>
+          <Tooltip text="View documentation">
+            <a
+              href="https://docs.frappe.io/helpdesk/field-dependency"
+              target="_blank"
+            >
+              <lucide-info :class="`h-4 w-4 text-ink-gray-6`" />
+            </a>
+          </Tooltip>
+        </div>
       </template>
       <template #description>
         <p class="text-sm max-w-md leading-5 text-ink-gray-6">

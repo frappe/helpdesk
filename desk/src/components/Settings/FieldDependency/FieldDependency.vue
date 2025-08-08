@@ -117,7 +117,7 @@ const parentFields = computed(() => {
   }));
 });
 
-const state = reactive({
+let state = reactive({
   selectedParentField: "",
   selectedChildField: "",
   childFields: [],
@@ -135,7 +135,7 @@ const state = reactive({
   enabled: true,
 });
 
-const fieldCriteriaState = reactive({
+let fieldCriteriaState = reactive({
   display: {
     enabled: true,
     value: [{ label: "Any", value: "Any" }],
