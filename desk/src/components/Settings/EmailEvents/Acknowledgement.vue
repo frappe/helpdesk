@@ -14,7 +14,7 @@
             <LucideChevronLeft />
           </button>
           <h1 class="font-semibold text-ink-gray-7 text-xl">
-            {{ __("Share Feedback") }}
+            {{ __("Acknowledgement") }}
           </h1>
         </div>
         <Badge
@@ -43,7 +43,7 @@
           theme="gray"
           variant="solid"
           :disabled="!unsavedChanges"
-          :loading="setFeedbackSettings.loading"
+          :loading="setAcknowledgementSettings.loading"
         />
       </div>
     </div>
@@ -55,20 +55,6 @@
       }"
     >
       <template v-if="!getEmailEventData.loading">
-        <FormControl
-          type="select"
-          size="sm"
-          :label="__('On Ticket Status')"
-          :options="
-            ticketStatusOptions.map((option) => ({
-              label: __(option),
-              value: option,
-            }))
-          "
-          :required="true"
-          v-model="ticketStatus"
-          :onchange="setUnsavedChanges"
-        />
         <div class="flex flex-col gap-2">
           <FormControl
             type="textarea"
@@ -118,41 +104,34 @@ const enabled = ref(false);
 const content = ref("");
 const defaultContent = ref("");
 
-const ticketStatusOptions = ["Closed", "Resolved"] as const;
-type TicketStatus = typeof ticketStatusOptions[number];
-const ticketStatus = ref<TicketStatus>(ticketStatusOptions[0]);
-
 type EmailEventData = {
-  send_email_feedback_on_status: typeof ticketStatusOptions[number];
-  enable_email_ticket_feedback: boolean;
-  share_feedback_email_content: string;
+  send_acknowledgement_email: boolean;
+  acknowledgement_email_content: string;
 };
 
 const getEmailEventData = createResource({
   url: "helpdesk.api.email_event_settings.get_event_data",
   method: "GET",
   params: {
-    email_event: "share_feedback",
+    email_event: "acknowledgement",
   },
   auto: true,
   onSuccess(
-    data: EmailEventData & { default_share_feedback_email_content: string }
+    data: EmailEventData & { default_acknowledgement_email_content: string }
   ) {
-    ticketStatus.value = data.send_email_feedback_on_status;
-    enabled.value = data.enable_email_ticket_feedback;
-    content.value = data.share_feedback_email_content;
-    defaultContent.value = data.default_share_feedback_email_content;
+    enabled.value = data.send_acknowledgement_email;
+    content.value = data.acknowledgement_email_content;
+    defaultContent.value = data.default_acknowledgement_email_content;
   },
 });
 
-const setFeedbackSettings = createResource({
-  url: "helpdesk.api.email_event_settings.set_feedback_settings",
+const setAcknowledgementSettings = createResource({
+  url: "helpdesk.api.email_event_settings.set_acknowledgement_settings",
   method: "PUT",
   auto: false,
   onSuccess(data: EmailEventData) {
-    ticketStatus.value = data.send_email_feedback_on_status;
-    enabled.value = data.enable_email_ticket_feedback;
-    content.value = data.share_feedback_email_content;
+    enabled.value = data.send_acknowledgement_email;
+    content.value = data.acknowledgement_email_content;
     unsavedChanges.value = false;
   },
 });
@@ -162,10 +141,9 @@ function setUnsavedChanges() {
 }
 
 function onSubmit() {
-  return setFeedbackSettings.submit({
-    send_email_feedback_on_status: ticketStatus.value,
-    enable_email_ticket_feedback: enabled.value,
-    share_feedback_email_content: content.value,
+  return setAcknowledgementSettings.submit({
+    send_acknowledgement_email: enabled.value,
+    acknowledgement_email_content: content.value,
   });
 }
 

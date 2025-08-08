@@ -98,3 +98,19 @@ class HDSettings(Document):
 <a href="{{ url }}" class="btn btn-primary">Share Feedback</a>
 
 <p>Thank you!<br>Support Team</p>"""
+
+        if HDSettings.is_email_content_empty(
+            self.default_acknowledgement_email_content
+        ):
+            self.default_acknowledgement_email_content = """\
+<p>Hi,</p>
+<br />
+<p>Thank you for reaching out to us. We've received your request and created a support ticket.</p>
+<p>
+    <strong>Ticket ID:</strong> {{ doc.name }}<br />
+    <strong>Subject:</strong> {{ doc.subject }}<br />
+</p>
+<p>Our team is reviewing it and will get back to you shortly.</p>
+<br />
+<p>Best,<br />Support Team</p>
+"""

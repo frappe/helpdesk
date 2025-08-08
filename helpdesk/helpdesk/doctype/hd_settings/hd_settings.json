@@ -31,7 +31,6 @@
   "column_break_iarl",
   "auto_close_tickets",
   "auto_close_after_days",
-  "send_acknowledgement_email",
   "workflow_tab",
   "skip_email_workflow",
   "instantly_send_email",
@@ -56,7 +55,11 @@
   "enable_email_ticket_feedback",
   "send_email_feedback_on_status",
   "feedback_email_content",
-  "default_feedback_email_content"
+  "default_feedback_email_content",
+  "acknowledgement_section",
+  "send_acknowledgement_email",
+  "acknowledgement_email_content",
+  "default_acknowledgement_email_content"
  ],
  "fields": [
   {
@@ -293,12 +296,6 @@
    "mandatory_depends_on": "auto_close_tickets"
   },
   {
-   "default": "0",
-   "fieldname": "send_acknowledgement_email",
-   "fieldtype": "Check",
-   "label": "Send Acknowledgement Email"
-  },
-  {
    "fieldname": "feedback_section",
    "fieldtype": "Section Break",
    "label": "Feedback"
@@ -351,12 +348,35 @@
    "hidden": 1,
    "label": "Default Feedback Email Content",
    "read_only": 1
+  },
+  {
+   "fieldname": "acknowledgement_section",
+   "fieldtype": "Section Break",
+   "label": "Acknowledgement"
+  },
+  {
+   "fieldname": "acknowledgement_email_content",
+   "fieldtype": "Text",
+   "label": "Acknowledgement Email Content"
+  },
+  {
+   "fieldname": "default_acknowledgement_email_content",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "Default Acknowledgement Email Content",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "send_acknowledgement_email",
+   "fieldtype": "Check",
+   "label": "Send Acknowledgement Email"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-07 12:40:47.917123",
+ "modified": "2025-08-08 14:56:44.037067",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

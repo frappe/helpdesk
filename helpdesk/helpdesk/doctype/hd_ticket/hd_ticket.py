@@ -705,25 +705,26 @@ class HDTicket(Document):
 
     def send_acknowledgement_email(self):
 
-        message = f"""
-            <p>Hi,</p>
-            <br />
-            <p>Thank you for reaching out to us. We've received your request and created a support ticket.</p>
-            <p>
-            <strong>Ticket ID:</strong> {self.name}<br />
-            <strong>Subject:</strong> {self.subject}<br />
-            </p>
-            <p>
-            Our team is reviewing it and will get back to you shortly.
-            </p>
-            <br />
-            <p>Best,<br />Support Team</p>
-        """
+        default_acknowledgement_email_content = frappe.db.get_single_value(
+            "HD Settings", "default_acknowledgement_email_content"
+        )
+        acknowledgement_email_content = frappe.db.get_single_value(
+            "HD Settings", "acknowledgement_email_content"
+        )
+        rendered_template = frappe.render_template(
+            default_acknowledgement_email_content
+            if acknowledgement_email_content is None
+            or acknowledgement_email_content.strip() == ""
+            else acknowledgement_email_content,
+            {
+                "doc": self.as_dict(),
+            },
+        )
 
         frappe.sendmail(
             recipients=[self.raised_by],
             subject=f"Ticket #{self.name}: We've received your request",
-            message=message,
+            message=rendered_template,
             reference_doctype="HD Ticket",
             reference_name=self.name,
             now=True,

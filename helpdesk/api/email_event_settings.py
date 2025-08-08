@@ -30,44 +30,74 @@ def get_event_data(email_event: str):
             else share_feedback_email_content,
             "default_share_feedback_email_content": default_share_feedback_email_content,
         }
-    else:
-        frappe.throw(_("Invalid email event"))
+
+    if email_event == "acknowledgement":
+        send_acknowledgement_email = frappe.db.get_single_value(
+            "HD Settings", "send_acknowledgement_email"
+        )
+        acknowledgement_email_content = frappe.db.get_single_value(
+            "HD Settings", "acknowledgement_email_content"
+        )
+        default_acknowledgement_email_content = frappe.db.get_single_value(
+            "HD Settings", "default_acknowledgement_email_content"
+        )
+        return {
+            "send_acknowledgement_email": send_acknowledgement_email,
+            "acknowledgement_email_content": default_acknowledgement_email_content
+            if HDSettings.is_email_content_empty(acknowledgement_email_content)
+            else acknowledgement_email_content,
+            "default_acknowledgement_email_content": default_acknowledgement_email_content,
+        }
+
+    frappe.throw(_("Invalid email event"))
 
 
 @frappe.whitelist(methods=["PUT"])
-def set_event_data(
-    email_event: str,
+def set_feedback_settings(
     send_email_feedback_on_status: Literal["Closed", "Resolved"],
     enable_email_ticket_feedback: bool,
     share_feedback_email_content: str,
 ):
     frappe.only_for(["Agent Manager", "System Manager"])
-    if email_event == "share_feedback":
-        # rendered_template = frappe.render_template(share_feedback_email_content, {
-        #     "url": "www.google.com",
-        #     "doc": {
-        #         "name": "Elton"
-        #     }
-        # })
-        # todo: add input validation
-        frappe.db.set_single_value(
-            "HD Settings",
-            "send_email_feedback_on_status",
-            send_email_feedback_on_status,
-        )
-        frappe.db.set_single_value(
-            "HD Settings",
-            "enable_email_ticket_feedback",
-            int(enable_email_ticket_feedback),
-        )
-        frappe.db.set_single_value(
-            "HD Settings", "feedback_email_content", share_feedback_email_content
-        )
-        return {
-            "send_email_feedback_on_status": send_email_feedback_on_status,
-            "enable_email_ticket_feedback": enable_email_ticket_feedback,
-            "share_feedback_email_content": share_feedback_email_content,
-            # "rendered_template": rendered_template,
-        }
-    else:
-        frappe.throw(_("Invalid email event"))
+    # rendered_template = frappe.render_template(share_feedback_email_content, {
+    #     "url": "www.google.com",
+    #     "doc": {
+    #         "name": "Elton"
+    #     }
+    # })
+    # todo: add input validation
+    frappe.db.set_single_value(
+        "HD Settings",
+        "send_email_feedback_on_status",
+        send_email_feedback_on_status,
+    )
+    frappe.db.set_single_value(
+        "HD Settings",
+        "enable_email_ticket_feedback",
+        int(enable_email_ticket_feedback),
+    )
+    frappe.db.set_single_value(
+        "HD Settings", "feedback_email_content", share_feedback_email_content
+    )
+    return {
+        "send_email_feedback_on_status": send_email_feedback_on_status,
+        "enable_email_ticket_feedback": enable_email_ticket_feedback,
+        "share_feedback_email_content": share_feedback_email_content,
+        # "rendered_template": rendered_template,
+    }
+
+
+@frappe.whitelist(methods=["PUT"])
+def set_acknowledgement_settings(
+    send_acknowledgement_email: bool, acknowledgement_email_content: str
+):
+    frappe.db.set_single_value(
+        "HD Settings", "send_acknowledgement_email", int(send_acknowledgement_email)
+    )
+    frappe.db.set_single_value(
+        "HD Settings", "acknowledgement_email_content", acknowledgement_email_content
+    )
+    return {
+        "send_acknowledgement_email": send_acknowledgement_email,
+        "acknowledgement_email_content": acknowledgement_email_content,
+    }

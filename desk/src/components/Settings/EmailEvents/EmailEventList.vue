@@ -63,6 +63,12 @@ const emailEvents: AtLeastOneEmailEvent = [
     description:
       "Configure the settings or personalize the content of the email",
   },
+  {
+    name: "acknowledgement",
+    label: "Acknowledgement",
+    description:
+      "Configure the settings or personalize the content of the email",
+  },
   // {
   //   name: "test-name",
   //   label: "Test Name",
