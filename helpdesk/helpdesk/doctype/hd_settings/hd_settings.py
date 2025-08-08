@@ -66,6 +66,7 @@ class HDSettings(Document):
 
     def before_save(self):
         self.update_ticket_permissions()
+        self.set_default_email_content()
 
     def on_update(self):
         event = "helpdesk:settings-updated"
@@ -84,3 +85,16 @@ class HDSettings(Document):
         from helpdesk.api.article import search
 
         return search
+
+    @staticmethod
+    def is_email_content_empty(content: str | None) -> bool:
+        return content is None or content.strip() == ""
+
+    def set_default_email_content(self) -> None:
+        if HDSettings.is_email_content_empty(self.default_feedback_email_content):
+            self.default_feedback_email_content = """\
+<p>Hello,</p>
+<p>Thanks for reaching out to us. We’d love your feedback on your recent support experience with ticket #{{ doc.name }}.</p>
+<a href="{{ url }}" class="btn btn-primary">Share Feedback</a>
+
+<p>Thank you!<br>Support Team</p>"""

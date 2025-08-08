@@ -1,15 +1,17 @@
 import { createResource } from "frappe-ui";
 import type { App } from "vue";
 
-type Translate= (message: string) => string | {format: (...args: string[]) => string};
-
-const translate: Translate = function (message) {
+function getTranslatedMessage(message: string): string {
     const translatedMessages = (("translatedMessages" in window ? window["translatedMessages"] : null) ?? {}) as Record<string, string>;
-    const translatedMessage = translatedMessages[message] || message;
-    const hasPlaceholders = /{\d+}/.test(message);
-    if (!hasPlaceholders) {
-        return translatedMessage;
-    }
+    return translatedMessages[message] || message;
+}
+
+function translateWithoutArgs(message: string): string {
+    return getTranslatedMessage(message);
+}
+
+function translateWithArgs(message: string): { format: (...args: string[]) => string } {
+    const translatedMessage = getTranslatedMessage(message);
     return {
         format(...args) {
             return translatedMessage.replace(/{(\d+)}/g, function (match, index) {
@@ -17,7 +19,7 @@ const translate: Translate = function (message) {
             })
         }
     }
-}
+};
 
 function fetchTranslations() {
     createResource({
@@ -32,9 +34,11 @@ function fetchTranslations() {
 }
 
 export function translationPlugin(app: App<Element>) {
-    app.config.globalProperties.__ = translate;
+    app.config.globalProperties.__ = translateWithoutArgs;
+    app.config.globalProperties.__args = translateWithArgs;
     const windowObj = window as any;
-    windowObj.__ = translate;
+    windowObj.__ = translateWithoutArgs;
+    windowObj.__args = translateWithArgs;
     if (!windowObj.translatedMessages) {
         fetchTranslations();
     }
@@ -42,6 +46,7 @@ export function translationPlugin(app: App<Element>) {
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
-    __: Translate; 
+    __: typeof translateWithoutArgs; 
+    __args: typeof translateWithArgs;
   }
 }
