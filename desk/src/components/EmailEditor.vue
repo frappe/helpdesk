@@ -227,7 +227,7 @@ const label = computed(() => {
 const emit = defineEmits(["submit", "discard"]);
 const doc = defineModel();
 
-const newEmail = useStorage("emailBoxContent" + doc.value.name, "");
+const newEmail = useStorage("emailBoxContent" + doc.value.name, null);
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 
