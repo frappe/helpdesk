@@ -390,10 +390,10 @@ export const convertToConditions = ({
       }
 
       if (op === "like") {
-        return `${fieldAccess} and "${value}" in ${fieldAccess}`;
+        return `(${fieldAccess} and "${value}" in ${fieldAccess})`;
       }
       if (op === "not like") {
-        return `${fieldAccess} and "${value}" not in ${fieldAccess}`;
+        return `(${fieldAccess} and "${value}" not in ${fieldAccess})`;
       }
 
       if (
@@ -416,7 +416,7 @@ export const convertToConditions = ({
           items = [`"${String(value).trim()}"`];
         }
         valueStr = `[${items.join(", ")}]`;
-        return `${fieldAccess} and ${fieldAccess} ${op} ${valueStr}`;
+        return `(${fieldAccess} and ${fieldAccess} ${op} ${valueStr})`;
       }
 
       if (typeof value === "string") {

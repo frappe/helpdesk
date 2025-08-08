@@ -14,22 +14,7 @@ def get_assignment_rules_list():
 @frappe.whitelist()
 def get_assignment_rule(docname):
     doc = frappe.get_doc("Assignment Rule", docname)
-    ticket_counts = [
-        {
-            "user": d.user,
-            "count": frappe.db.count(
-                "ToDo",
-                {
-                    "reference_type": "HD Ticket",
-                    "allocated_to": d.user,
-                    "status": "Open",
-                },
-            ),
-        }
-        for d in doc.users
-    ]
-
-    return {**doc.as_dict(), "ticket_counts": ticket_counts}
+    return doc.as_dict()
 
 
 @frappe.whitelist()

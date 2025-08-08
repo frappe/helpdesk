@@ -257,6 +257,9 @@ import SlaHolidays from "./SlaHolidays.vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
 import SlaStatusList from "./SlaStatusList.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
+import { useOnboarding } from "frappe-ui/frappe";
+
+const { updateOnboardingStep } = useOnboarding("helpdesk");
 
 const showConfirmDialog = ref({
   show: false,
@@ -405,6 +408,7 @@ const createSla = () => {
         getSlaData.submit({
           docname: data.name,
         });
+        updateOnboardingStep("setup_sla", true);
       },
     }
   );
