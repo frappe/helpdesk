@@ -103,7 +103,7 @@ import { computed, onMounted, ref } from "vue";
 import { useOnboarding } from "frappe-ui/frappe";
 import SettingsLayoutHeader from "./SettingsLayoutHeader.vue";
 
-const authStore: Record<"isAdmin" | "isManager", boolean> = useAuthStore();
+const authStore = useAuthStore();
 const { isAdmin, isManager } = authStore;
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
