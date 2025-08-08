@@ -102,9 +102,13 @@ import { computed, onMounted, ref } from "vue";
 // @ts-expect-error: no declaration file
 import { useOnboarding } from "frappe-ui/frappe";
 import SettingsLayoutHeader from "./SettingsLayoutHeader.vue";
+import { useUserStore } from "@/stores/user";
 
 const authStore = useAuthStore();
 const { isAdmin, isManager } = authStore;
+
+const userStore = useUserStore();
+const { users } = userStore;
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 
@@ -162,12 +166,43 @@ const roleDescription = computed(
       .description
 );
 
-const onSubmit = () => {
-  if (emails.value.trim() === "") {
+const onSubmit = async () => {
+  const emailList: string[] = [];
+  const existingUsers: string[] = [];
+  type User = Record<"email" | "role", string>;
+  for (const email of emails.value.split(",")) {
+    const trimmedEmail = email.trim();
+    if (trimmedEmail === "") {
+      continue;
+    }
+    const user: User | undefined = users.data.find(
+      (user: User) => user.email === trimmedEmail
+    );
+    if (
+      user === undefined ||
+      (user.role !== "Agent" && user.role !== "Manager")
+    ) {
+      emailList.push(email);
+    } else {
+      existingUsers.push(trimmedEmail);
+    }
+  }
+  if (emailList.length === 0 && existingUsers.length === 0) {
     toast.error("At least one email required");
     return;
   }
-  inviteByEmailResource.submit();
+  if (emailList.length > 0) {
+    await inviteByEmailResource.submit({
+      emails: emailList.join(","),
+      roles: getInviteByEmailRoles(role.value),
+      redirect_to_path: "/helpdesk",
+      app_name: "helpdesk",
+    });
+  }
+  resetInputValues();
+  if (existingUsers.length > 0) {
+    toast.info(`${emailsToStr(existingUsers)} already present`);
+  }
 };
 
 const resetInputValues = () => {
@@ -179,12 +214,6 @@ const emailsToStr = (emails: readonly string[]) => emails.join(", ");
 
 const inviteByEmailResource = createResource({
   url: "frappe.core.api.user_invitation.invite_by_email",
-  makeParams: () => ({
-    emails: emails.value,
-    roles: getInviteByEmailRoles(role.value),
-    redirect_to_path: "/helpdesk",
-    app_name: "helpdesk",
-  }),
   onSuccess(
     data: Record<
       "accepted_invite_emails" | "pending_invite_emails" | "invited_emails",
