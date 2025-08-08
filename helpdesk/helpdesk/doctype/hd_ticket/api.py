@@ -135,6 +135,7 @@ def get_communications(ticket: str):
             QBCommunication.sender,
             QBCommunication.recipients,
             QBCommunication.subject,
+            QBCommunication.delivery_status,
         )
         .where(QBCommunication.reference_doctype == "HD Ticket")
         .where(QBCommunication.reference_name == ticket)
