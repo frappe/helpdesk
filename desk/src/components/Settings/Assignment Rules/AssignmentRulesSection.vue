@@ -29,14 +29,16 @@
         label="Add condition"
       />
     </Dropdown>
-    <div v-if="props.errors" class="text-red-500 text-xs mt-2">
-      {{ props.errors }}
-    </div>
+    <ErrorMessage
+      v-if="props.conditions.length > 0"
+      :message="props.errors"
+      class="mt-2"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { Button, Dropdown, FeatherIcon } from "frappe-ui";
+import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
 import { watchDebounced } from "@vueuse/core";
 import { validateAssignmentRule } from "../../../stores/assignmentRules";
 import CFConditions from "@/components/conditions-filter/CFConditions.vue";

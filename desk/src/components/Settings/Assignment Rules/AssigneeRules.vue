@@ -33,12 +33,12 @@
           </template>
           <template #body="{ togglePopover }">
             <div
-              class="p-1 text-ink-gray-6 top-1 absolute w-48 bg-white shadow-xl rounded"
+              class="p-1 text-ink-gray-7 mt-1 w-48 bg-white shadow-xl rounded"
             >
               <div
                 v-for="option in ticketRoutingOptions"
                 :key="option.value"
-                class="p-2 cursor-pointer hover:bg-gray-50 text-base flex items-center justify-between rounded"
+                class="p-2 cursor-pointer hover:bg-gray-50 text-sm flex items-center justify-between rounded"
                 @click="
                   () => {
                     assignmentRuleData.rule = option.value;
@@ -78,11 +78,6 @@
         <Avatar :image="user.user_image" :label="user.user" size="sm" />
         <div class="text-ink-gray-7">
           {{ user.user }}
-        </div>
-        <div
-          class="text-xs size-4 flex items-center justify-center rounded-full bg-white text-ink-gray-7"
-        >
-          {{ user.ticketCount || 0 }}
         </div>
         <Tooltip
           v-if="user.user == assignmentRuleData.last_user"

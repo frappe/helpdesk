@@ -10,7 +10,7 @@
     class="sticky top-0 z-10 bg-white pb-6 px-10 py-8"
   >
     <div class="flex items-center justify-between w-full">
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
         <Button
           variant="ghost"
           icon-left="chevron-left"
@@ -43,6 +43,7 @@
           theme="gray"
           variant="solid"
           @click="saveAssignmentRule()"
+          :loading="isLoading"
         />
       </div>
     </div>
@@ -66,7 +67,7 @@
         />
       </div>
       <div class="flex flex-col gap-1.5">
-        <FormLabel label="Default priority" required />
+        <FormLabel label="Priority" />
         <Popover>
           <template #target="{ togglePopover }">
             <div
@@ -128,7 +129,7 @@
     <div>
       <div class="flex flex-col gap-2">
         <span class="text-lg font-semibold text-ink-gray-7"
-          >Assignment rule</span
+          >Assignment condition</span
         >
         <div class="flex items-center justify-between gap-6">
           <span class="text-sm text-ink-gray-6">
@@ -196,7 +197,7 @@
     <div>
       <div class="flex flex-col gap-2">
         <span class="text-lg font-semibold text-ink-gray-7"
-          >Unassignment rule</span
+          >Unassignment condition</span
         >
         <div class="flex items-center justify-between gap-6">
           <span class="text-sm text-ink-gray-6">
@@ -319,6 +320,7 @@ import { disableSettingModalOutsideClick } from "../settingsModal";
 
 const isDirty = ref(false);
 const initialData = ref(null);
+const isLoading = ref(false);
 
 const showConfirmDialog = ref({
   show: false,
@@ -357,15 +359,6 @@ const getAssignmentRuleData = createResource({
       data.unassign_condition_json || "[]"
     );
     data.assignment_rule_name = data.name;
-    data.users = data.users.map((user) => {
-      return {
-        ...user,
-        ticketCount:
-          data.ticket_counts.find(
-            (ticketCount) => ticketCount.user == user.user
-          )?.count || 0,
-      };
-    });
     return data;
   },
   auto: false,
@@ -396,10 +389,14 @@ const goBack = () => {
     showConfirmDialog.value = confirmDialogInfo;
     return;
   }
-  assignmentRulesActiveScreen.value = {
-    screen: "list",
-    data: null,
-  };
+  // Workaround fix for settings modal not closing after going back
+  setTimeout(() => {
+    assignmentRulesActiveScreen.value = {
+      screen: "list",
+      data: null,
+    };
+  }, 250);
+  showConfirmDialog.value.show = false;
 };
 
 const saveAssignmentRule = () => {
@@ -433,6 +430,7 @@ const saveAssignmentRule = () => {
 };
 
 const createAssignmentRule = () => {
+  isLoading.value = true;
   createResource({
     url: "frappe.client.insert",
     params: {
@@ -457,14 +455,18 @@ const createAssignmentRule = () => {
     },
     auto: true,
     onSuccess(data) {
-      getAssignmentRuleData.submit({
-        docname: data.name,
-      });
+      getAssignmentRuleData
+        .submit({
+          docname: data.name,
+        })
+        .then(() => {
+          isLoading.value = false;
+          toast.success("Assignment rule created");
+        });
       assignmentRulesActiveScreen.value = {
         screen: "view",
         data: data,
       };
-      toast.success("Assignment rule created");
     },
   });
 };
@@ -478,6 +480,7 @@ const priorityOptions = [
 ];
 
 const updateAssignmentRule = async () => {
+  isLoading.value = true;
   createResource({
     url: "helpdesk.api.assignment_rule.save_assignment_rule",
     params: {
@@ -505,10 +508,14 @@ const updateAssignmentRule = async () => {
     },
     auto: true,
     onSuccess(data) {
-      getAssignmentRuleData.submit({
-        docname: data.name,
-      });
-      toast.success("Assignment rule updated");
+      getAssignmentRuleData
+        .submit({
+          docname: data.name,
+        })
+        .then(() => {
+          isLoading.value = false;
+          toast.success("Assignment rule updated");
+        });
     },
   });
 };
