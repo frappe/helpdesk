@@ -17,7 +17,18 @@ add_to_apps_screen = [
     }
 ]
 
+
+# Installation
+# ------------
+# before_install = "helpdesk.setup.install.before_install"
 after_install = "helpdesk.setup.install.after_install"
+
+# Uninstallation
+# ------------
+
+before_uninstall = "helpdesk.setup.uninstall.before_uninstall"
+# after_uninstall = "crm.uninstall.after_uninstall"
+
 after_migrate = [
     "helpdesk.search.build_index_in_background",
     "helpdesk.search.download_corpus",
