@@ -29,7 +29,7 @@ jobs:
 
       - name: Run script to update POT file
         run: |
-          bash ${GITHUB_WORKSPACE}/.github/helper/update_pot_file.sh
+          bash ${GITHUB_WORKSPACE}/.github/helpers/update_pot_file.sh
         env:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           BASE_BRANCH: ${{ matrix.branch }}
