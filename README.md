@@ -183,6 +183,7 @@ To setup the repository locally follow the steps mentioned below:
 
 
 ## Compatibility matrix 
+
 | Helpdesk Branch | Compatible Frappe Framework Version |
 |-----------------|-------------------------------------|
 | main            | version-15                          |
