@@ -16,6 +16,8 @@ class HDFormScript(Document):
         self.handle_enabled_change()
 
     def handle_enabled_change(self):
+        if self.is_new():
+            return
         if not self.is_standard:
             return
         if not self.has_value_changed("enabled"):
