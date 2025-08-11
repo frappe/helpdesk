@@ -169,14 +169,18 @@ const roleDescription = computed(
 const onSubmit = async () => {
   const emailList: string[] = [];
   const existingUsers: string[] = [];
-  type User = Record<"email" | "role", string>;
+  type User = {
+    email: string;
+    role: string;
+    enabled: number;
+  };
   for (const email of emails.value.split(",")) {
     const trimmedEmail = email.trim();
     if (trimmedEmail === "") {
       continue;
     }
     const user: User | undefined = users.data.find(
-      (user: User) => user.email === trimmedEmail
+      (user: User) => user.email === trimmedEmail && user.enabled === 1
     );
     if (
       user === undefined ||
@@ -216,7 +220,10 @@ const inviteByEmailResource = createResource({
   url: "frappe.core.api.user_invitation.invite_by_email",
   onSuccess(
     data: Record<
-      "accepted_invite_emails" | "pending_invite_emails" | "invited_emails",
+      | "disabled_user_emails"
+      | "accepted_invite_emails"
+      | "pending_invite_emails"
+      | "invited_emails",
       string[]
     >
   ) {
@@ -224,6 +231,10 @@ const inviteByEmailResource = createResource({
     let emailsStr = emailsToStr(data.invited_emails);
     if (emailsStr.trim() !== "") {
       toast.success(`${emailsStr} invited successfully`);
+    }
+    emailsStr = emailsToStr(data.disabled_user_emails);
+    if (emailsStr.trim() !== "") {
+      toast.info(`${emailsStr} already present and disabled`);
     }
     emailsStr = emailsToStr(data.pending_invite_emails);
     if (emailsStr.trim() !== "") {
