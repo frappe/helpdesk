@@ -13,7 +13,7 @@
         </div>
       </template>
       <template #description>
-        <p class="text-sm max-w-md leading-5 text-ink-gray-6">
+        <p class="text-p-sm max-w-md text-ink-gray-6">
           Create dependencies between fields to dynamically control options
           based on user selections.
         </p>

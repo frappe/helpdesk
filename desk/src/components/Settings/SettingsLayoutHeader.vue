@@ -7,7 +7,7 @@
         </h1>
       </slot>
       <slot name="description">
-        <p class="text-sm text-gray-700 max-w-md leading-5 text-ink-gray-6">
+        <p class="text-p-sm text-gray-700 max-w-md text-ink-gray-6">
           {{ description }}
         </p>
       </slot>
