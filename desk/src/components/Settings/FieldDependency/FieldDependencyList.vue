@@ -69,12 +69,12 @@
       <div>
         <!-- Each row -->
         <div
-          class="w-full flex flex-col items-center cursor-pointer group hover:rounded border-b transition hover:bg-surface-gray-2"
+          class="w-full flex flex-col items-center cursor-pointer group border-b transition"
           v-for="row in fieldDependenciesList.data"
           @click.stop="$emit('update:step', 'fd', row.name)"
           :key="row.name"
         >
-          <div class="w-full flex items-center p-2">
+          <div class="w-full flex items-center p-2 rounded">
             <!-- Parent to Child -->
             <div class="flex gap-2 w-7/12 text-base text-ink-gray-7 pr-3">
               <span>{{ getFieldDependencyLabel(row.name) }}</span>
@@ -112,11 +112,6 @@
               </Dropdown>
             </p>
           </div>
-          <!-- Separator -->
-          <!-- <div
-              class="mx-3 h-px border-t border-outline-gray-modals transition-opacity group-hover:opacity-0 w-full"
-              v-if="idx < fieldDependenciesList.data?.length - 1"
-            /> -->
         </div>
       </div>
     </div>
@@ -141,8 +136,6 @@ function getOptions(rowName: string) {
   return ConfirmDelete({
     isConfirmingDelete,
     onConfirmDelete: () => {
-      console.log(`Deleting dependency: ${rowName}`);
-
       fieldDependenciesList.delete.submit(rowName, {
         onSuccess: () => {
           toast.success("Field dependency deleted successfully");
