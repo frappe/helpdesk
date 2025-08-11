@@ -20,7 +20,6 @@ def after_install():
     update_agent_role_permissions()
     add_agent_manager_permissions()
     add_default_assignment_rule()
-    add_system_preset_filters()
     create_default_template()
     create_fallback_ticket_type()
     create_helpdesk_folder()
@@ -233,43 +232,6 @@ def add_agent_manager_permissions():
 def add_default_assignment_rule():
     support_settings = frappe.get_doc("HD Settings")
     support_settings.create_base_support_rotation()
-
-
-def add_system_preset_filters():
-    preset_filters = []
-    for status in ["Closed", "Resolved", "Replied", "Open"]:
-        preset_filters.append(
-            {
-                "doctype": "HD Preset Filter",
-                "title": f"My {status} Tickets",
-                "reference_doctype": "HD Ticket",
-                "filters": [
-                    {
-                        "label": "Assigned To",
-                        "fieldname": "_assign",
-                        "filter_type": "is",
-                        "value": "@me",
-                    },
-                    {
-                        "label": "Status",
-                        "fieldname": "status",
-                        "filter_type": "is",
-                        "value": status,
-                    },
-                ],
-            }
-        )
-    preset_filters.append(
-        {
-            "doctype": "HD Preset Filter",
-            "title": "All Tickets",
-            "reference_doctype": "HD Ticket",
-            "filters": [],
-        }
-    )
-    for preset in preset_filters:
-        preset_filter_doc = frappe.get_doc(preset)
-        preset_filter_doc.insert()
 
 
 def add_property_setter():
