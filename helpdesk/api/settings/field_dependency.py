@@ -88,7 +88,7 @@ def create_update_field_dependency(
         parent_field, child_field, fields_criteria, old_fields_criteria
     )
     # To avoid the message "HD Ticket updated" from showing up
-    frappe.local.message_log = []
+    # frappe.local.message_log = []
 
 
 def get_or_create_standard_form_script(parent_field, child_field):
