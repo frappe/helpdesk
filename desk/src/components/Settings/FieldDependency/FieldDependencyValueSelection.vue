@@ -60,7 +60,7 @@
       </div>
     </div>
     <!-- right box -->
-    <div class="flex-1 flex flex-col gap-1.5">
+    <div class="flex-1 flex flex-col gap-1.5 h-[420px] max-h-[420px]">
       <span class="block text-xs text-ink-gray-5 pl-1.5">
         Select child field value
       </span>

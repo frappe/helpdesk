@@ -308,6 +308,8 @@ watch(
   () => state.selectedChildField,
   async (newChildField) => {
     state.childFieldValues = await handleFieldValues(newChildField, false);
+    // Reset child selections when child field changes
+    state.childSelections = {};
   }
 );
 
