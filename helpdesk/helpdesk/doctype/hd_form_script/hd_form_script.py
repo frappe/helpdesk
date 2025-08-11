@@ -48,7 +48,8 @@ class HDFormScript(Document):
     def on_trash(self):
         if not self.is_standard:
             return
-        if child_field := self.get_child_field():
+        [_, child_field] = self.get_parent_child_field()
+        if not child_field:
             return
         handle_form_customization(child_field, None, None)
 
