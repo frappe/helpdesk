@@ -6,14 +6,10 @@
           <h1 class="text-lg font-semibold text-ink-gray-8">
             Field Dependencies
           </h1>
-          <Tooltip text="View documentation">
-            <a
-              href="https://docs.frappe.io/helpdesk/field-dependency"
-              target="_blank"
-            >
-              <lucide-info :class="`h-4 w-4 text-ink-gray-6`" />
-            </a>
-          </Tooltip>
+          <DocumentationButton
+            url="https://docs.frappe.io/helpdesk/field-dependency"
+            color="!text-ink-gray-6"
+          />
         </div>
       </template>
       <template #description>
@@ -133,6 +129,7 @@ import { getFieldDependencyLabel, ConfirmDelete } from "@/utils";
 import { onMounted, ref } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
+import DocumentationButton from "@/components/DocumentationButton.vue";
 
 onMounted(() => {
   fieldDependenciesList.reload();

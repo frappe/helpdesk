@@ -4,12 +4,19 @@
       >Set visibility and mandatory criteria for child field:</span
     >
     <div class="flex flex-col gap-4 w-full pb-2">
+      <!-- Display Criteria -->
       <div class="flex items-center gap-3 justify-between">
         <div class="flex gap-3 items-center">
           <Switch v-model="fieldCriteriaState.display.enabled" />
-          <span class="text-sm text-ink-gray-5">
-            Show child if parent field is set to
-          </span>
+          <div class="flex items-center gap-1">
+            <span class="text-sm text-ink-gray-5"
+              >Show child if parent field is set to</span
+            >
+            <DocumentationButton
+              url="https://docs.frappe.io/helpdesk/field-dependency#handling-visibility-of-child-field"
+              color="!text-ink-gray-6"
+            />
+          </div>
         </div>
         <MultiSelectCombobox
           :disabled="!fieldCriteriaState.display.enabled"
@@ -22,12 +29,19 @@
           placement="top"
         />
       </div>
+      <!-- Mandatory Criteria -->
       <div class="flex items-center gap-3 justify-between w-full">
         <div class="flex gap-3 items-center">
           <Switch v-model="fieldCriteriaState.mandatory.enabled" />
-          <span class="text-sm text-ink-gray-5"
-            >Make child mandatory if parent is set to</span
-          >
+          <div class="flex items-center gap-1">
+            <span class="text-sm text-ink-gray-5"
+              >Make child mandatory if parent field is set to</span
+            >
+            <DocumentationButton
+              url="https://docs.frappe.io/helpdesk/field-dependency#handling-if-the-child-field-is-mandatory"
+              color="!text-ink-gray-6"
+            />
+          </div>
         </div>
         <MultiSelectCombobox
           :disabled="!fieldCriteriaState.mandatory.enabled"
@@ -48,6 +62,7 @@
 import { computed } from "vue";
 import { Switch } from "frappe-ui";
 import MultiSelectCombobox from "@/components/frappe-ui/MultiSelectCombobox.vue";
+import DocumentationButton from "@/components/DocumentationButton.vue";
 
 const props = defineProps<{
   parentFieldValues: string[];
