@@ -6,6 +6,7 @@ import TeamsConfig from "./Teams/TeamsConfig.vue";
 import Sla from "./Sla/Sla.vue";
 import HolidayList from "./Holiday/Holiday.vue";
 import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
+import InviteAgents from "./InviteAgents.vue";
 import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
 import LucideUser from "~icons/lucide/user";
@@ -14,7 +15,6 @@ import LucideUsers from "~icons/lucide/users";
 import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
 import { FieldDependencyIcon } from "@/components/icons";
-import InviteAgents from "./InviteAgents.vue";
 
 export const tabs = [
   {
