@@ -1,6 +1,8 @@
 import frappe
 from frappe.utils import add_to_date, getdate
 
+from helpdesk.api.settings.field_dependency import create_update_field_dependency
+
 SLA_PRIORITY_NAME = "SLA Priority"
 
 
@@ -161,3 +163,15 @@ def remove_holidays():
     holiday_list = frappe.get_doc("HD Service Holiday List", "Default")
     holiday_list.holidays = []
     holiday_list.save()
+
+
+def create_field_dependency():
+    parent_field = "ticket_type"
+    child_field = "priority"
+    mapping = '{"Unspecified":["Urgent","High"],"Question":["Medium","High"],"Bug":["Medium"],"Incident":["Urgent","High","Medium","Low"]}'
+    enabled = 1
+    fields_criteria = '{"display":{"enabled":true,"value":[{"label":"Any","value":"Any"}]},"mandatory":{"enabled":true,"value":[{"label":"Question","value":"Question"},{"label":"Bug","value":"Bug"}]}}'
+
+    create_update_field_dependency(
+        parent_field, child_field, mapping, enabled, fields_criteria
+    )
