@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
-		"target": "es2021",
+		"target": "es2022",
 		"module": "esnext",
 		"moduleResolution":"node",
 		"jsx": "preserve",
