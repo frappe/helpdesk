@@ -69,6 +69,12 @@ const emailEvents: AtLeastOneEmailEvent = [
     description:
       "Configure the settings or personalize the content of the email",
   },
+  {
+    name: "reply-email-to-agents",
+    label: "Reply Email To Agents",
+    description:
+      "Configure the settings or personalize the content of the email",
+  },
   // {
   //   name: "test-name",
   //   label: "Test Name",

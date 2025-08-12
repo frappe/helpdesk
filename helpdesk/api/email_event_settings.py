@@ -49,6 +49,24 @@ def get_event_data(email_event: str):
             "default_acknowledgement_email_content": default_acknowledgement_email_content,
         }
 
+    if email_event == "reply_email_to_agent":
+        enable_reply_email_to_agent = frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_to_agent"
+        )
+        email_content = frappe.db.get_single_value(
+            "HD Settings", "reply_email_to_agent_content"
+        )
+        default_email_content = frappe.db.get_single_value(
+            "HD Settings", "default_reply_email_to_agent_content"
+        )
+        return {
+            "enabled": enable_reply_email_to_agent,
+            "email_content": default_email_content
+            if HDSettings.is_email_content_empty(email_content)
+            else email_content,
+            "default_email_content": default_email_content,
+        }
+
     frappe.throw(_("Invalid email event"))
 
 
@@ -100,4 +118,18 @@ def set_acknowledgement_settings(
     return {
         "send_acknowledgement_email": send_acknowledgement_email,
         "acknowledgement_email_content": acknowledgement_email_content,
+    }
+
+
+@frappe.whitelist(methods=["PUT"])
+def set_reply_email_to_agents_settings(enabled: bool, email_content: str):
+    frappe.db.set_single_value(
+        "HD Settings", "enable_reply_email_to_agent", int(enabled)
+    )
+    frappe.db.set_single_value(
+        "HD Settings", "reply_email_to_agent_content", email_content
+    )
+    return {
+        "enabled": enabled,
+        "email_content": email_content,
     }

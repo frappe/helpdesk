@@ -59,7 +59,11 @@
   "acknowledgement_section",
   "send_acknowledgement_email",
   "acknowledgement_email_content",
-  "default_acknowledgement_email_content"
+  "default_acknowledgement_email_content",
+  "reply_email_to_agent_section",
+  "enable_reply_email_to_agent",
+  "reply_email_to_agent_content",
+  "default_reply_email_to_agent_content"
  ],
  "fields": [
   {
@@ -371,12 +375,35 @@
    "fieldname": "send_acknowledgement_email",
    "fieldtype": "Check",
    "label": "Send Acknowledgement Email"
+  },
+  {
+   "fieldname": "reply_email_to_agent_section",
+   "fieldtype": "Section Break",
+   "label": "Reply Email To Agent"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_reply_email_to_agent",
+   "fieldtype": "Check",
+   "label": "Enable Reply Email"
+  },
+  {
+   "fieldname": "reply_email_to_agent_content",
+   "fieldtype": "Text",
+   "label": "Email Content"
+  },
+  {
+   "fieldname": "default_reply_email_to_agent_content",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "Default Email Content",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-08 14:56:44.037067",
+ "modified": "2025-08-11 13:00:22.025187",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

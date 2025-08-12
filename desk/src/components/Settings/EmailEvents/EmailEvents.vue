@@ -19,6 +19,7 @@ import type { EmailEvent, EmailEventName } from "./types";
 import EmailEventList from "./EmailEventList.vue";
 import ShareFeedback from "./ShareFeedback.vue";
 import Acknowledgement from "./Acknowledgement.vue";
+import ReplyEmailToAgent from "./ReplyEmailToAgent.vue";
 
 const selectedEmailEvent = ref<EmailEvent | null>(null);
 
@@ -28,6 +29,7 @@ const emailEventToComponent: Record<
 > = {
   "share-feedback": markRaw(ShareFeedback),
   acknowledgement: markRaw(Acknowledgement),
+  "reply-email-to-agents": markRaw(ReplyEmailToAgent),
 };
 
 function resetSelectedEmailEvent() {

@@ -1,4 +1,4 @@
-export type EmailEventName = "share-feedback" | "acknowledgement";
+export type EmailEventName = "share-feedback" | "acknowledgement" | "reply-email-to-agents";
 
 export type EmailEvent = {
     name: EmailEventName;
