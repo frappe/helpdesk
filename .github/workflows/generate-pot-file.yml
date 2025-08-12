@@ -9,6 +9,7 @@ jobs:
   regenerate-pot-file:
     name: Regenerate POT file
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -27,9 +28,37 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Run script to update POT file
         run: |
           bash ${GITHUB_WORKSPACE}/.github/helpers/update_pot_file.sh
         env:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           BASE_BRANCH: ${{ matrix.branch }}
+        timeout-minutes: 40
+
+      - name: Verify POT file creation
+        run: |
+          if [ -f "helpdesk/locale/main.pot" ]; then
+            echo "✅ POT file successfully created"
+            echo "File size: $(wc -c < helpdesk/locale/main.pot) bytes"
+            echo "String count: $(grep -c 'msgid' helpdesk/locale/main.pot)"
+          else
+            echo "❌ POT file was not created"
+            echo "Contents of helpdesk/locale directory:"
+            ls -la helpdesk/locale/ || echo "Directory does not exist"
+            exit 1
+          fi
