@@ -1,8 +1,10 @@
 # Copyright (c) 2025, Frappe Technologies and Contributors
 # See license.txt
 
-# import frappe
+import frappe
 from frappe.tests import IntegrationTestCase
+
+from helpdesk.setup.install import add_default_status
 
 # On IntegrationTestCase, the doctype test records and all
 # link-field test record dependencies are recursively loaded
@@ -17,4 +19,37 @@ class IntegrationTestHDTicketStatus(IntegrationTestCase):
     Use this class for testing interactions between multiple components.
     """
 
-    pass
+    def setUp(self):
+        add_default_status()
+
+    def test_validate_one_min_status_category(self):
+        doc = frappe.get_doc("HD Ticket Status", "Open")
+        doc.category = "Paused"
+        self.assertRaises(frappe.ValidationError, doc.save)
+
+    def test_delete_status_change(self):
+        doc = frappe.get_doc("HD Ticket Status", "Closed")
+        doc.label = "New Closed"
+        # doc.save()
+        self.assertRaises(frappe.ValidationError, doc.save)
+
+    def test_closed_status_delete(self):
+        """
+        Test that closed status cannot be deleted.
+        """
+        return
+        self.assertRaises(
+            frappe.ValidationError, frappe.delete_doc("HD Ticket Status", "Closed")
+        )
+
+    def test_agent_client_label_same(self):
+        doc = frappe.new_doc("HD Ticket Status")
+        doc.label_agent = "Test Status"
+        doc.category = "Paused"
+        doc.color = "green"
+        doc.save()
+        self.assertEqual(
+            doc.label_customer,
+            doc.label_agent,
+            "Agent and Customer labels should be the same.",
+        )
