@@ -242,7 +242,7 @@ const exotel = createDocumentResource({
 
 const telephonyAgent = createDocumentResource({
   doctype: "TF Telephony Agent",
-  name: getUser().name,
+  name: getUser().email,
   cache: ["tf_telephony_agent"],
   fields: ["*"],
   auto: false,
