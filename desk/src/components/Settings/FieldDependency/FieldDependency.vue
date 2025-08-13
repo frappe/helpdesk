@@ -318,6 +318,7 @@ watch(
     if (isNew.value) {
       state.childSelections = {};
     }
+    state.currentParentSelection = state.parentFieldValues[0] || "";
   }
 );
 
