@@ -15,6 +15,7 @@ from .welcome_ticket import create_welcome_ticket
 
 def after_install():
     create_custom_fields(get_custom_fields())
+    add_default_status()
     add_default_categories_and_articles()
     add_default_ticket_priorities()
     add_default_sla()
@@ -110,28 +111,9 @@ def add_default_sla():
     sla_doc.append("priorities", high_priority)
     sla_doc.append("priorities", urgent_priority)
 
-    sla_fullfilled_on_resolved = frappe.get_doc(
-        {
-            "doctype": "HD Service Level Agreement Fulfilled On Status",
-            "status": "Resolved",
-        }
-    )
+    sla_doc.append("sla_fulfilled_on", {"status": "Resolved"})
 
-    sla_fullfilled_on_closed = frappe.get_doc(
-        {
-            "doctype": "HD Service Level Agreement Fulfilled On Status",
-            "status": "Closed",
-        }
-    )
-
-    sla_doc.append("sla_fulfilled_on", sla_fullfilled_on_resolved)
-    sla_doc.append("sla_fulfilled_on", sla_fullfilled_on_closed)
-
-    sla_paused_on_replied = frappe.get_doc(
-        {"doctype": "HD Pause Service Level Agreement On Status", "status": "Replied"}
-    )
-
-    sla_doc.append("pause_sla_on", sla_paused_on_replied)
+    sla_doc.append("pause_sla_on", {"status": "Replied"})
 
     sla_doc.holiday_list = "Default"
 
@@ -317,3 +299,43 @@ def add_assignment_rule_property_setters():
             "value",
             "eval: !doc.unassign_condition_json",
         )
+
+def add_default_status():
+    statuses = [
+        {
+            "label_agent": "Open",
+            "color": "red",
+            "enabled": 1,
+            "category": "Open",
+            "label_customer": "Open",
+            "order": 1,
+        },
+        {
+            "label_agent": "Replied",
+            "color": "blue",
+            "enabled": 1,
+            "category": "Paused",
+            "different_view": 1,
+            "label_customer": "Awaiting Response",
+            "order": 2,
+        },
+        {
+            "label_agent": "Resolved",
+            "color": "green",
+            "enabled": 1,
+            "category": "Resolved",
+            "label_customer": "Resolved",
+            "order": 3,
+        },
+        {
+            "label_agent": "Closed",
+            "color": "gray",
+            "enabled": 1,
+            "category": "Resolved",
+            "label_customer": "Closed",
+            "order": 4,
+        },
+    ]
+    for status in statuses:
+        if not frappe.db.exists("HD Ticket Status", status["label_agent"]):
+            frappe.get_doc({"doctype": "HD Ticket Status", **status}).insert()
