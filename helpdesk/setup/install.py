@@ -20,7 +20,6 @@ def after_install():
     update_agent_role_permissions()
     add_agent_manager_permissions()
     add_default_assignment_rule()
-    add_system_preset_filters()
     create_default_template()
     create_fallback_ticket_type()
     create_helpdesk_folder()
@@ -215,57 +214,24 @@ def update_agent_role_permissions():
 def add_agent_manager_permissions():
     if not frappe.db.exists("Role", "Agent Manager"):
         return
-
-    ptype = ["create", "delete", "write"]
-    doctypes = ["Email Account", "File", "Contact", "Communication"]
-    for dt in doctypes:
+    doc_to_permissions = {
+        "Email Account": ["create", "delete", "write"],
+        "File": ["create", "delete", "write"],
+        "Contact": ["create", "delete", "write"],
+        "Communication": ["create", "delete", "write"],
+        "User Invitation": ["create", "write"],
+        "Role": [],
+    }
+    for dt in doc_to_permissions.keys():
         # this adds read permission to the role
         add_permission(dt, "Agent Manager")
-        for p in ptype:
-            # now we update the above role to have all permissions from the ptype
+        for p in doc_to_permissions[dt]:
             update_permission_property(dt, "Agent Manager", 0, p, 1)
 
 
 def add_default_assignment_rule():
     support_settings = frappe.get_doc("HD Settings")
     support_settings.create_base_support_rotation()
-
-
-def add_system_preset_filters():
-    preset_filters = []
-    for status in ["Closed", "Resolved", "Replied", "Open"]:
-        preset_filters.append(
-            {
-                "doctype": "HD Preset Filter",
-                "title": f"My {status} Tickets",
-                "reference_doctype": "HD Ticket",
-                "filters": [
-                    {
-                        "label": "Assigned To",
-                        "fieldname": "_assign",
-                        "filter_type": "is",
-                        "value": "@me",
-                    },
-                    {
-                        "label": "Status",
-                        "fieldname": "status",
-                        "filter_type": "is",
-                        "value": status,
-                    },
-                ],
-            }
-        )
-    preset_filters.append(
-        {
-            "doctype": "HD Preset Filter",
-            "title": "All Tickets",
-            "reference_doctype": "HD Ticket",
-            "filters": [],
-        }
-    )
-    for preset in preset_filters:
-        preset_filter_doc = frappe.get_doc(preset)
-        preset_filter_doc.insert()
 
 
 def add_property_setter():

@@ -1,16 +1,20 @@
 import { markRaw, ref } from "vue";
-import ImageUp from "~icons/lucide/image-up";
-import LucideMail from "~icons/lucide/mail";
-import LucideUser from "~icons/lucide/user";
-import LucideUsers from "~icons/lucide/users";
-import ShieldCheck from "~icons/lucide/shield-check";
-import Briefcase from "~icons/lucide/briefcase";
 import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
 import Sla from "./Sla/Sla.vue";
 import HolidayList from "./Holiday/Holiday.vue";
+import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
+import InviteAgents from "./InviteAgents.vue";
+import ImageUp from "~icons/lucide/image-up";
+import LucideMail from "~icons/lucide/mail";
+import LucideUser from "~icons/lucide/user";
+import LucideUserPlus from "~icons/lucide/user-plus";
+import LucideUsers from "~icons/lucide/users";
+import ShieldCheck from "~icons/lucide/shield-check";
+import Briefcase from "~icons/lucide/briefcase";
+import { FieldDependencyIcon } from "@/components/icons";
 
 export const tabs = [
   {
@@ -29,6 +33,11 @@ export const tabs = [
     component: markRaw(Agents),
   },
   {
+    label: "Invite Agents",
+    icon: markRaw(LucideUserPlus),
+    component: markRaw(InviteAgents),
+  },
+  {
     label: "Teams",
     icon: markRaw(LucideUsers),
     component: markRaw(TeamsConfig),
@@ -42,6 +51,11 @@ export const tabs = [
     label: "Business Holidays",
     icon: markRaw(Briefcase),
     component: markRaw(HolidayList),
+  },
+  {
+    label: "Field Dependencies",
+    icon: markRaw(FieldDependencyIcon),
+    component: markRaw(FieldDependencyConfig),
   },
 ];
 
