@@ -1,37 +1,24 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:label_agent",
  "creation": "2025-08-13 10:00:15.235225",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "label_agent",
   "label_customer",
-  "column_break_neks",
-  "active",
-  "different_view",
-  "sla_mapping_section",
   "category",
-  "column_break_tnih",
-  "color"
+  "color",
+  "column_break_neks",
+  "enabled",
+  "different_view",
+  "order"
  ],
  "fields": [
   {
-   "default": "0",
-   "fieldname": "active",
-   "fieldtype": "Check",
-   "label": "Active"
-  },
-  {
    "fieldname": "column_break_neks",
    "fieldtype": "Column Break"
-  },
-  {
-   "description": "Open: SLA continues.\nPaused: SLA is paused.\nResolved: SLA is resolved",
-   "fieldname": "category",
-   "fieldtype": "Select",
-   "label": "Category",
-   "options": "Open\nPaused\nResolved"
   },
   {
    "fieldname": "color",
@@ -42,7 +29,9 @@
   {
    "fieldname": "label_agent",
    "fieldtype": "Data",
-   "label": "Label"
+   "label": "Label",
+   "reqd": 1,
+   "unique": 1
   },
   {
    "default": "0",
@@ -55,25 +44,38 @@
    "description": "Name displayed on customer portal.\nFor.e.g., Replied in Agent side can translate to \"Awaiting Response\" on the customer side",
    "fieldname": "label_customer",
    "fieldtype": "Data",
-   "label": "Label (customer view)"
+   "label": "Label (customer view)",
+   "mandatory_depends_on": "eval:doc.different_view"
   },
   {
-   "fieldname": "sla_mapping_section",
-   "fieldtype": "Section Break",
-   "label": "SLA Mapping"
+   "description": "Open: SLA continues.\nPaused: SLA is paused.\nResolved: SLA is resolved",
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Open\nPaused\nResolved",
+   "reqd": 1
   },
   {
-   "fieldname": "column_break_tnih",
-   "fieldtype": "Column Break"
+   "fieldname": "order",
+   "fieldtype": "Int",
+   "label": "Order"
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-13 11:32:17.604330",
+ "modified": "2025-08-13 17:54:18.752988",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Status",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
