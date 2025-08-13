@@ -40,18 +40,22 @@
       </div>
     </div>
     <div class="grid grid-cols-2 gap-2 mt-4">
-      <div class="flex flex-col gap-1.5">
+      <div
+        class="flex flex-col gap-1.5"
+        v-if="telephonyAgent.doc && twilio.doc.enabled"
+      >
         <FormControl
-          v-if="telephonyAgent.doc && twilio.doc.enabled"
           label="Twilio number"
           required
           v-model="telephonyAgent.doc.twilio_number"
         />
         <ErrorMessage :message="twilioErrors.number" />
       </div>
-      <div class="flex flex-col gap-1.5">
+      <div
+        class="flex flex-col gap-1.5"
+        v-if="telephonyAgent.doc && exotel.doc.enabled"
+      >
         <FormControl
-          v-if="telephonyAgent.doc && exotel.doc.enabled"
           label="Exotel number"
           required
           v-model="telephonyAgent.doc.exotel_number"
