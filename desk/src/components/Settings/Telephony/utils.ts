@@ -18,6 +18,8 @@ export const validateTwilio = (twilio, telephonyAgent, twilioErrors) => {
   }
   if (!telephonyAgent.twilio_number) {
     twilioErrors.value.number = "Number is required";
+  } else if (!/^\+?[1-9]\d{1,14}$/.test(telephonyAgent.twilio_number)) {
+    twilioErrors.value.number = "Please enter a valid phone number";
   } else {
     twilioErrors.value.number = "";
   }
@@ -55,6 +57,8 @@ export const validateExotel = (exotel, telephonyAgent, exotelErrors) => {
   }
   if (!telephonyAgent.exotel_number) {
     exotelErrors.value.number = "Number is required";
+  } else if (!/^[1-9]\d{1,14}$/.test(telephonyAgent.exotel_number)) {
+    exotelErrors.value.number = "Please enter a valid phone number";
   } else {
     exotelErrors.value.number = "";
   }

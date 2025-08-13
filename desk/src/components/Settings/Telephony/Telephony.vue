@@ -204,10 +204,10 @@ import {
   createResource,
 } from "frappe-ui";
 import { ref } from "vue";
-import { useUserStore } from "@/stores/user";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
+import { useAuthStore } from "@/stores/auth";
 
-const { getUser } = useUserStore();
+const auth = useAuthStore();
 
 const twilioErrors = ref({
   account_sid: "",
@@ -242,7 +242,7 @@ const exotel = createDocumentResource({
 
 const telephonyAgent = createDocumentResource({
   doctype: "TF Telephony Agent",
-  name: getUser().email,
+  name: auth.user,
   cache: ["tf_telephony_agent"],
   fields: ["*"],
   auto: false,
