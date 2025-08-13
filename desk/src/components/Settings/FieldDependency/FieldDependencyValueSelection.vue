@@ -1,7 +1,9 @@
 <template>
-  <div class="flex w-full flex-1 justify-between h-full">
+  <div
+    class="flex w-full flex-1 justify-between h-full h-[420px] max-h-[420px] min-h-[420px]"
+  >
     <!-- left box -->
-    <div class="flex-1 flex flex-col gap-1.5 h-[420px] max-h-[420px]">
+    <div class="flex-1 flex flex-col gap-1.5">
       <span class="block text-xs text-ink-gray-5">
         Select parent field value
       </span>
@@ -60,7 +62,7 @@
       </div>
     </div>
     <!-- right box -->
-    <div class="flex-1 flex flex-col gap-1.5 h-[420px] max-h-[420px]">
+    <div class="flex-1 flex flex-col gap-1.5">
       <span class="block text-xs text-ink-gray-5 pl-1.5">
         Select child field value
       </span>
