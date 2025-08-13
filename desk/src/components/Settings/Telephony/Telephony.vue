@@ -124,7 +124,7 @@
         <div class="grid grid-cols-2 gap-2">
           <Checkbox label="Enabled" v-model="exotel.doc.enabled" />
           <Checkbox
-            label="Record Outgoing Calls"
+            label="Record Calls"
             v-model="exotel.doc.record_call"
             v-if="exotel.doc.enabled"
           />
