@@ -19,8 +19,8 @@ def get_event_data(email_event: str):
         share_feedback_email_content = frappe.db.get_single_value(
             "HD Settings", "feedback_email_content"
         )
-        default_share_feedback_email_content = frappe.db.get_single_value(
-            "HD Settings", "default_feedback_email_content"
+        default_share_feedback_email_content = HDSettings.get_default_email_content(
+            "share_feedback"
         )
         return {
             "send_email_feedback_on_status": send_email_feedback_on_status,
@@ -38,8 +38,8 @@ def get_event_data(email_event: str):
         acknowledgement_email_content = frappe.db.get_single_value(
             "HD Settings", "acknowledgement_email_content"
         )
-        default_acknowledgement_email_content = frappe.db.get_single_value(
-            "HD Settings", "default_acknowledgement_email_content"
+        default_acknowledgement_email_content = HDSettings.get_default_email_content(
+            "acknowledgement"
         )
         return {
             "send_acknowledgement_email": send_acknowledgement_email,
@@ -56,9 +56,7 @@ def get_event_data(email_event: str):
         email_content = frappe.db.get_single_value(
             "HD Settings", "reply_email_to_agent_content"
         )
-        default_email_content = frappe.db.get_single_value(
-            "HD Settings", "default_reply_email_to_agent_content"
-        )
+        default_email_content = HDSettings.get_default_email_content("reply_to_agents")
         return {
             "enabled": enable_reply_email_to_agent,
             "email_content": default_email_content
@@ -74,9 +72,7 @@ def get_event_data(email_event: str):
         email_content = frappe.db.get_single_value(
             "HD Settings", "reply_via_agent_email_content"
         )
-        default_email_content = frappe.db.get_single_value(
-            "HD Settings", "default_reply_via_agent_email_content"
-        )
+        default_email_content = HDSettings.get_default_email_content("reply_via_agent")
         return {
             "enabled": enable_reply_email_via_agent,
             "email_content": default_email_content

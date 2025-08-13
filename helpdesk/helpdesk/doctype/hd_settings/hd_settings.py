@@ -66,7 +66,6 @@ class HDSettings(Document):
 
     def before_save(self):
         self.update_ticket_permissions()
-        self.set_default_email_content()
 
     def on_update(self):
         event = "helpdesk:settings-updated"
@@ -90,19 +89,18 @@ class HDSettings(Document):
     def is_email_content_empty(content: str | None) -> bool:
         return content is None or content.strip() == ""
 
-    def set_default_email_content(self) -> None:
-        if HDSettings.is_email_content_empty(self.default_feedback_email_content):
-            self.default_feedback_email_content = """\
+    @staticmethod
+    def get_default_email_content(type: str) -> str:
+        if type == "share_feedback":
+            return """\
 <p>Hello,</p>
 <p>Thanks for reaching out to us. We’d love your feedback on your recent support experience with ticket #{{ doc.name }}.</p>
 <a href="{{ url }}" class="btn btn-primary">Share Feedback</a>
 
 <p>Thank you!<br>Support Team</p>"""
 
-        if HDSettings.is_email_content_empty(
-            self.default_acknowledgement_email_content
-        ):
-            self.default_acknowledgement_email_content = """\
+        if type == "acknowledgement":
+            return """\
 <p>Hi,</p>
 <br />
 <p>Thank you for reaching out to us. We've received your request and created a support ticket.</p>
@@ -115,8 +113,8 @@ class HDSettings(Document):
 <p>Best,<br />Support Team</p>
 """
 
-        if HDSettings.is_email_content_empty(self.default_reply_email_to_agent_content):
-            self.default_reply_email_to_agent_content = """\
+        if type == "reply_to_agents":
+            return """\
 <div>
   <p>Hello,</p>
   <p>You have a new reply on the ticket <strong>#{{ ticket_id }}</strong>.</p>
@@ -133,10 +131,8 @@ class HDSettings(Document):
 </div>
 """
 
-        if HDSettings.is_email_content_empty(
-            self.default_reply_via_agent_email_content
-        ):
-            self.default_reply_via_agent_email_content = """\
+        if type == "reply_via_agent":
+            return """\
 <div>
   <h2><strong>Ticket #{{ ticket_id }}</strong></h2>
   <h3>You have a new reply on this ticket</h3>

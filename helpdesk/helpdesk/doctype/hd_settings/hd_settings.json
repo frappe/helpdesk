@@ -55,19 +55,15 @@
   "enable_email_ticket_feedback",
   "send_email_feedback_on_status",
   "feedback_email_content",
-  "default_feedback_email_content",
   "acknowledgement_section",
   "send_acknowledgement_email",
   "acknowledgement_email_content",
-  "default_acknowledgement_email_content",
   "reply_email_to_agent_section",
   "enable_reply_email_to_agent",
   "reply_email_to_agent_content",
-  "default_reply_email_to_agent_content",
   "reply_email_via_agent_section",
   "enable_reply_email_via_agent",
-  "reply_via_agent_email_content",
-  "default_reply_via_agent_email_content"
+  "reply_via_agent_email_content"
  ],
  "fields": [
   {
@@ -351,13 +347,6 @@
    "label": "Feedback Email Content"
   },
   {
-   "fieldname": "default_feedback_email_content",
-   "fieldtype": "Text",
-   "hidden": 1,
-   "label": "Default Feedback Email Content",
-   "read_only": 1
-  },
-  {
    "fieldname": "acknowledgement_section",
    "fieldtype": "Section Break",
    "label": "Acknowledgement"
@@ -366,13 +355,6 @@
    "fieldname": "acknowledgement_email_content",
    "fieldtype": "Text",
    "label": "Acknowledgement Email Content"
-  },
-  {
-   "fieldname": "default_acknowledgement_email_content",
-   "fieldtype": "Text",
-   "hidden": 1,
-   "label": "Default Acknowledgement Email Content",
-   "read_only": 1
   },
   {
    "default": "0",
@@ -397,13 +379,6 @@
    "label": "Email Content"
   },
   {
-   "fieldname": "default_reply_email_to_agent_content",
-   "fieldtype": "Text",
-   "hidden": 1,
-   "label": "Default Email Content",
-   "read_only": 1
-  },
-  {
    "fieldname": "reply_email_via_agent_section",
    "fieldtype": "Section Break",
    "label": "Reply Email Via Agent"
@@ -418,19 +393,12 @@
    "fieldname": "reply_via_agent_email_content",
    "fieldtype": "Text",
    "label": "Email Content"
-  },
-  {
-   "fieldname": "default_reply_via_agent_email_content",
-   "fieldtype": "Text",
-   "hidden": 1,
-   "label": "Default Email Content",
-   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-13 15:32:52.215707",
+ "modified": "2025-08-13 17:04:46.150244",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
