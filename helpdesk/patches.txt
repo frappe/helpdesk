@@ -25,3 +25,4 @@ helpdesk.patches.communication_read_perm_agent
 helpdesk.patches.agent_manager_perms #v2
 helpdesk.patches.remove_agents_teams_default_views
 helpdesk.patches.add_fields_in_assignment_rule
+helpdesk.patches.update_ticket_statuses
