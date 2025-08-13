@@ -201,6 +201,7 @@ import {
   createDocumentResource,
   toast,
   ErrorMessage,
+  createResource,
 } from "frappe-ui";
 import { ref } from "vue";
 import { useUserStore } from "@/stores/user";
@@ -244,7 +245,7 @@ const telephonyAgent = createDocumentResource({
   name: getUser().name,
   cache: ["tf_telephony_agent"],
   fields: ["*"],
-  auto: true,
+  auto: false,
 });
 
 const telephonyProviders = [
@@ -281,4 +282,12 @@ async function save() {
   await Promise.all(promises);
   toast.success("Telephony settings updated!");
 }
+
+createResource({
+  url: "telephony.api.create_telephony_agent",
+  auto: true,
+  onSuccess() {
+    telephonyAgent.get.submit();
+  },
+});
 </script>

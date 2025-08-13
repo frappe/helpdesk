@@ -214,12 +214,12 @@ const resetCallLog = () => {
 };
 
 function updateCallLog() {
-  loading.value = true;
   validateCallLog();
   if (Object.values(errors.value).some((error) => error)) {
     toast.error("Please fill all required fields");
     return;
   }
+  loading.value = true;
   createResource({
     url: "frappe.client.set_value",
     params: {
