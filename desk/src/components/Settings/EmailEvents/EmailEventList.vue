@@ -75,11 +75,12 @@ const emailEvents: AtLeastOneEmailEvent = [
     description:
       "Configure the settings or personalize the content of the email",
   },
-  // {
-  //   name: "test-name",
-  //   label: "Test Name",
-  //   description: "Test description",
-  // },
+  {
+    name: "reply-via-agent",
+    label: "Reply Via Agent",
+    description:
+      "Configure the settings or personalize the content of the email",
+  },
 ];
 </script>
 

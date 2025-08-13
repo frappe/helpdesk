@@ -562,16 +562,28 @@ class HDTicket(Document):
         message = self.parse_content(message)
 
         reply_to_email = sender_email.email_id
-        template = (
-            "new_reply_on_customer_portal_notification"
-            if self.via_customer_portal
-            else None
+        send_email = frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
         )
-        args = {
-            "message": message,
-            "portal_link": self.portal_uri,
-            "ticket_id": self.name,
-        }
+        rendered_template: str | None = None
+        if self.via_customer_portal:
+            email_content = frappe.db.get_single_value(
+                "HD Settings", "reply_via_agent_email_content"
+            )
+            default_email_content = frappe.db.get_single_value(
+                "HD Settings", "default_reply_via_agent_email_content"
+            )
+            rendered_template = frappe.render_template(
+                default_email_content
+                if email_content is None or email_content.strip() == ""
+                else email_content,
+                {
+                    "message": message,
+                    "portal_link": self.portal_uri,
+                    "ticket_id": self.name,
+                },
+            )
+
         send_delayed = True
         send_now = False
 
@@ -579,16 +591,18 @@ class HDTicket(Document):
             send_delayed = False
             send_now = True
 
+        if not send_email:
+            return
+
         try:
             frappe.sendmail(
-                args=args,
                 attachments=_attachments,
                 bcc=bcc,
                 cc=cc,
                 communication=communication.name,
                 delayed=send_delayed,
                 expose_recipients="header",
-                message=message,
+                message=rendered_template if rendered_template is not None else message,
                 as_markdown=True,
                 now=send_now,
                 recipients=recipients,
@@ -597,7 +611,6 @@ class HDTicket(Document):
                 reply_to=reply_to_email,
                 sender=reply_to_email,
                 subject=subject,
-                template=template,
                 with_container=False,
                 in_reply_to=last_communication.name
                 if last_communication.name
@@ -680,7 +693,9 @@ class HDTicket(Document):
 
         recipients = [a.get("name") for a in self.get_assigned_agents()]
 
-        enable_reply_email_to_agent = frappe.db.get_single_value("HD Settings", "enable_reply_email_to_agent")
+        enable_reply_email_to_agent = frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_to_agent"
+        )
         email_content = frappe.db.get_single_value(
             "HD Settings", "reply_email_to_agent_content"
         )
@@ -689,16 +704,17 @@ class HDTicket(Document):
         )
         rendered_template = frappe.render_template(
             default_email_content
-            if email_content is None
-            or email_content.strip() == ""
+            if email_content is None or email_content.strip() == ""
             else email_content,
             {
                 "ticket_id": self.name,
                 "ticket_subject": self.subject,
                 "priority": self.priority,
                 "raised_by": self.raised_by,
-                "ticket_url": frappe.utils.get_url("/helpdesk/tickets/" + str(self.name)),
-            }
+                "ticket_url": frappe.utils.get_url(
+                    "/helpdesk/tickets/" + str(self.name)
+                ),
+            },
         )
         try:
             if enable_reply_email_to_agent:

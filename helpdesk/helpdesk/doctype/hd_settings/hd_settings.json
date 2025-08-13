@@ -63,7 +63,11 @@
   "reply_email_to_agent_section",
   "enable_reply_email_to_agent",
   "reply_email_to_agent_content",
-  "default_reply_email_to_agent_content"
+  "default_reply_email_to_agent_content",
+  "reply_email_via_agent_section",
+  "enable_reply_email_via_agent",
+  "reply_via_agent_email_content",
+  "default_reply_via_agent_email_content"
  ],
  "fields": [
   {
@@ -398,12 +402,35 @@
    "hidden": 1,
    "label": "Default Email Content",
    "read_only": 1
+  },
+  {
+   "fieldname": "reply_email_via_agent_section",
+   "fieldtype": "Section Break",
+   "label": "Reply Email Via Agent"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_reply_email_via_agent",
+   "fieldtype": "Check",
+   "label": "Enable Reply Email"
+  },
+  {
+   "fieldname": "reply_via_agent_email_content",
+   "fieldtype": "Text",
+   "label": "Email Content"
+  },
+  {
+   "fieldname": "default_reply_via_agent_email_content",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "Default Email Content",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-11 13:00:22.025187",
+ "modified": "2025-08-13 15:32:52.215707",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
