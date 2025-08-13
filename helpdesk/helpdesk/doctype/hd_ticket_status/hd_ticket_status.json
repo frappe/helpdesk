@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-13 10:00:15.235225",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "label_agent",
+  "label_customer",
+  "column_break_neks",
+  "active",
+  "different_view",
+  "sla_mapping_section",
+  "category",
+  "column_break_tnih",
+  "color"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "label": "Active"
+  },
+  {
+   "fieldname": "column_break_neks",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Open: SLA continues.\nPaused: SLA is paused.\nResolved: SLA is resolved",
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Category",
+   "options": "Open\nPaused\nResolved"
+  },
+  {
+   "fieldname": "color",
+   "fieldtype": "Select",
+   "label": "Color",
+   "options": "black\ngray\nblue\ngreen\nred\npink\norange\namber\nyellow\ncyan\nteal\nviolet\npurple"
+  },
+  {
+   "fieldname": "label_agent",
+   "fieldtype": "Data",
+   "label": "Label"
+  },
+  {
+   "default": "0",
+   "fieldname": "different_view",
+   "fieldtype": "Check",
+   "label": "Show end users a different view"
+  },
+  {
+   "depends_on": "eval:doc.different_view",
+   "description": "Name displayed on customer portal.\nFor.e.g., Replied in Agent side can translate to \"Awaiting Response\" on the customer side",
+   "fieldname": "label_customer",
+   "fieldtype": "Data",
+   "label": "Label (customer view)"
+  },
+  {
+   "fieldname": "sla_mapping_section",
+   "fieldtype": "Section Break",
+   "label": "SLA Mapping"
+  },
+  {
+   "fieldname": "column_break_tnih",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-08-13 11:32:17.604330",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Ticket Status",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

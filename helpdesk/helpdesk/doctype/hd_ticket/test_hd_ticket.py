@@ -351,6 +351,35 @@ class TestHDTicket(IntegrationTestCase):
         )
         self.assertEqual(new_expected_resolution_by, ticket.resolution_by)
 
+    def test_sla_status(self):
+        # breakpoint()
+        # sla = frappe.get_doc("HD Service Level Agreement", "SLA Priority")
+        # default
+        # fulfilled on Resolved / Closed
+        # paused on Replied
+        # ticket_creation = getdate(get_current_week_monday())
+        ticket = make_ticket(
+            priority="Urgent",
+        )
+        self.assertEqual(ticket.agreement_status, "First Response Due")
+
+        ticket.reload()
+        ticket.status = "Replied"
+        ticket.save()
+        self.assertEqual(ticket.agreement_status, "Paused")
+        # First response fulfilled
+        self.assertTrue(ticket.first_responded_on < ticket.response_by)
+
+        ticket.reload()
+        ticket.status = "Open"
+        ticket.save()
+        self.assertEqual(ticket.agreement_status, "Resolution Due")
+
+        ticket.reload()
+        ticket.status = "Resolved"
+        ticket.save()
+        self.assertEqual(ticket.agreement_status, "Fulfilled")
+
     def tearDown(self):
         # Clean up after tests
         remove_holidays()
