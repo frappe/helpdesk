@@ -96,6 +96,7 @@
               :key="link.label"
               :is-expanded="isExpanded"
               :is-active="isActiveTab(link.to)"
+              :hide="link?.hide"
               class="my-0.5 emoji"
               :onClick="link.onClick"
             />

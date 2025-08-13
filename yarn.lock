@@ -2002,6 +2002,21 @@
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.2.0.tgz#cccaab758af56761eb7bf37af6f03f326dd798ad"
   integrity sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==
 
+"@twilio/voice-errors@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@twilio/voice-errors/-/voice-errors-1.7.0.tgz#44c93f4bffad64d869fbdc70f0042b1e5566fa01"
+  integrity sha512-9TvniWpzU0iy6SYFAcDP+HG+/mNz2yAHSs7+m0DZk86lE+LoTB6J/ZONTPuxXrXWi4tso/DulSHuA0w7nIQtGg==
+
+"@twilio/voice-sdk@^2.15.0":
+  version "2.15.0"
+  resolved "https://registry.yarnpkg.com/@twilio/voice-sdk/-/voice-sdk-2.15.0.tgz#b98a2ef64d2e78a32159c1c859f4128a6d85fa70"
+  integrity sha512-4FhRrUVJrek/U85F29G3+r5hbh7Lg2aapUE8jh/DnG0SiIktbW+MvFw2PxOwW0xVCbPigT7NHNo8/uzc3EmXkg==
+  dependencies:
+    "@twilio/voice-errors" "1.7.0"
+    "@types/events" "^3.0.3"
+    events "3.3.0"
+    loglevel "1.6.7"
+
 "@types/cheerio@^0.22.31":
   version "0.22.35"
   resolved "https://registry.yarnpkg.com/@types/cheerio/-/cheerio-0.22.35.tgz#0d16dc1f24d426231c181b9c31847f673867595f"
@@ -2023,6 +2038,11 @@
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.8.tgz#958b91c991b1867ced318bedea0e215ee050726e"
   integrity sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==
+
+"@types/events@^3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@types/events/-/events-3.0.3.tgz#a8ef894305af28d1fc6d2dfdfc98e899591ea529"
+  integrity sha512-trOc4AAUThEz9hapPtSd7wf5tiQKvTtu5b371UxXdTuqzIh0ArcRspRP0i0Viu+LXstIQ1z96t1nsPxT9ol01g==
 
 "@types/flexsearch@^0.7.6":
   version "0.7.42"
@@ -2798,9 +2818,9 @@ chalk@^4.0.2, chalk@^4.1.0:
     supports-color "^7.1.0"
 
 chalk@^5.4.1:
-  version "5.4.1"
-  resolved "https://registry.yarnpkg.com/chalk/-/chalk-5.4.1.tgz#1b48bf0963ec158dce2aacf69c093ae2dd2092d8"
-  integrity sha512-zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-5.5.0.tgz#67ada1df5ca809dc84c9b819d76418ddcf128428"
+  integrity sha512-1tm8DTaJhPBG3bIkVeZt1iZM9GfSX2lzOeDVZH9R9ffRHpmHvxZ/QhgQH/aDTkswQVt+YHdXAdS/In/30OjCbg==
 
 change-case@^4.1.2:
   version "4.1.2"
@@ -3638,6 +3658,11 @@ eventemitter3@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
   integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
+
+events@3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
+  integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
 
 execa@^5.1.1:
   version "5.1.1"
@@ -4623,9 +4648,9 @@ kolorist@^1.8.0:
   integrity sha512-Y+60/zizpJ3HRH8DCss+q95yr6145JXZo46OTpFvDZWLfRCE4qChOyk1b26nMaNpfHHgxagk9dXT5OP0Tfe+dQ==
 
 launch-editor@^2.6.1:
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/launch-editor/-/launch-editor-2.11.0.tgz#1ec15b3ed249b04763453661a9785428b38d5b33"
-  integrity sha512-R/PIF14L6e2eHkhvQPu7jDRCr0msfCYCxbYiLgkkAGi0dVPWuM+RrsPu0a5dpuNe0KWGL3jpAkOlv53xGfPheQ==
+  version "2.11.1"
+  resolved "https://registry.yarnpkg.com/launch-editor/-/launch-editor-2.11.1.tgz#61a0b7314a42fd84a6cbb564573d9e9ffcf3d72b"
+  integrity sha512-SEET7oNfgSaB6Ym0jufAdCeo3meJVeCaaDyzRygy0xsp2BFKCprcfHljTq4QkzTLUxEKkFK6OK4811YM2oSrRg==
   dependencies:
     picocolors "^1.1.1"
     shell-quote "^1.8.3"
@@ -4665,25 +4690,25 @@ linkifyjs@^4.2.0:
   integrity sha512-NT1CJtq3hHIreOianA8aSXn6Cw0JzYOuDQbOrSPe7gqFnCpKP++MQe3ODgO3oh2GJFORkAAdqredOa60z63GbA==
 
 lint-staged@>=10:
-  version "16.1.2"
-  resolved "https://registry.yarnpkg.com/lint-staged/-/lint-staged-16.1.2.tgz#8cb84daa844f39c7a9790dd2c0caa327125ef059"
-  integrity sha512-sQKw2Si2g9KUZNY3XNvRuDq4UJqpHwF0/FQzZR2M7I5MvtpWvibikCjUVJzZdGE0ByurEl3KQNvsGetd1ty1/Q==
+  version "16.1.4"
+  resolved "https://registry.yarnpkg.com/lint-staged/-/lint-staged-16.1.4.tgz#f6ff3f23b87369da6184f165abc56553b70bb988"
+  integrity sha512-xy7rnzQrhTVGKMpv6+bmIA3C0yET31x8OhKBYfvGo0/byeZ6E0BjGARrir3Kg/RhhYHutpsi01+2J5IpfVoueA==
   dependencies:
     chalk "^5.4.1"
     commander "^14.0.0"
     debug "^4.4.1"
     lilconfig "^3.1.3"
-    listr2 "^8.3.3"
+    listr2 "^9.0.1"
     micromatch "^4.0.8"
     nano-spawn "^1.0.2"
     pidtree "^0.6.0"
     string-argv "^0.3.2"
     yaml "^2.8.0"
 
-listr2@^8.3.3:
-  version "8.3.3"
-  resolved "https://registry.yarnpkg.com/listr2/-/listr2-8.3.3.tgz#815fc8f738260ff220981bf9e866b3e11e8121bf"
-  integrity sha512-LWzX2KsqcB1wqQ4AHgYb4RsDXauQiqhjLk+6hjbaeHG4zpjjVAB6wC/gz6X0l+Du1cN3pUB5ZlrvTbhGSNnUQQ==
+listr2@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/listr2/-/listr2-9.0.1.tgz#3cad12d81d998f8024621d9b35c969dba5da4103"
+  integrity sha512-SL0JY3DaxylDuo/MecFeiC+7pedM0zia33zl0vcjgwcq1q1FWWF1To9EIauPbl8GbMCU0R2e0uJ8bZunhYKD2g==
   dependencies:
     cli-truncate "^4.0.0"
     colorette "^2.0.20"
@@ -4761,6 +4786,11 @@ log-update@^6.1.0:
     slice-ansi "^7.1.0"
     strip-ansi "^7.1.0"
     wrap-ansi "^9.0.0"
+
+loglevel@1.6.7:
+  version "1.6.7"
+  resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.6.7.tgz#b3e034233188c68b889f5b862415306f565e2c56"
+  integrity sha512-cY2eLFrQSAfVPhCgH1s7JI73tMbg9YC3v3+ZHVW67sBS7UxWzNEk/ZBbSfLykBWHp33dqqtOv82gjhKEi81T/A==
 
 loupe@^3.1.0, loupe@^3.1.2:
   version "3.2.0"
@@ -7466,10 +7496,15 @@ yallist@^4.0.0:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
-yaml@^2.3.4, yaml@^2.8.0:
+yaml@^2.3.4:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.8.0.tgz#15f8c9866211bdc2d3781a0890e44d4fa1a5fff6"
   integrity sha512-4lLa/EcQCB0cJkyts+FpIRx5G/llPxfP6VQU5KByHEhLxY3IJCH0f0Hy1MHI8sClTvsIb8qwRJ6R/ZdlDJ/leQ==
+
+yaml@^2.8.0:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.8.1.tgz#1870aa02b631f7e8328b93f8bc574fac5d6c4d79"
+  integrity sha512-lcYcMxX2PO9XMGvAJkJ3OsNMw+/7FKes7/hgerGUYWIoWu5j/+YQqcZr5JnPZWzOsEBgMbSbiSTn/dv/69Mkpw==
 
 yargs-parser@^21.1.1:
   version "21.1.1"

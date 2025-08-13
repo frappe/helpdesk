@@ -15,6 +15,8 @@ import LucideUsers from "~icons/lucide/users";
 import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
 import { FieldDependencyIcon } from "@/components/icons";
+import Telephony from "./Telephony/Telephony.vue";
+import LucidePhone from "~icons/lucide/phone";
 
 export const tabs = [
   {
@@ -56,6 +58,11 @@ export const tabs = [
     label: "Field Dependencies",
     icon: markRaw(FieldDependencyIcon),
     component: markRaw(FieldDependencyConfig),
+  },
+  {
+    label: "Telephony",
+    icon: markRaw(LucidePhone),
+    component: markRaw(Telephony),
   },
 ];
 

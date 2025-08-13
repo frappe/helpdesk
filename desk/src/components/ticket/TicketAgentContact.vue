@@ -3,11 +3,17 @@
     <Avatar size="3xl" :image="contact.image" :label="contact.name" />
     <div class="flex items-center justify-between flex-1">
       <Tooltip :text="contact.name">
-        <div class="w-[242px] truncate text-2xl font-medium">
+        <div class="w-full truncate text-2xl font-medium">
           {{ contact.name }}
         </div>
       </Tooltip>
       <div class="flex gap-1.5">
+        <Button
+          v-if="callEnabled"
+          class="h-7 w-7"
+          icon="phone"
+          @click="callContact"
+        />
         <Tooltip :text="contact.email_id">
           <Button class="h-7 w-7">
             <template #icon>
@@ -42,7 +48,10 @@
 
 <script setup lang="ts">
 import { EmailIcon } from "@/components/icons/";
-import { Avatar, Tooltip } from "frappe-ui";
+import { telephonyStore } from "@/stores/telephony";
+import { Avatar, toast, Tooltip, Button } from "frappe-ui";
+
+const { makeCall, callEnabled } = telephonyStore();
 
 const props = defineProps({
   contact: {
@@ -51,6 +60,13 @@ const props = defineProps({
   },
 });
 
+const callContact = () => {
+  if (!props.contact.phone && !props.contact.mobile_no) {
+    toast.error("Phone number not found for this contact");
+    return;
+  }
+  makeCall(props.contact.mobile_no || props.contact.phone);
+};
 const emit = defineEmits(["email:open"]);
 
 function openEmailBox() {
