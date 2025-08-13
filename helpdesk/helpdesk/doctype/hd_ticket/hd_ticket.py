@@ -614,7 +614,7 @@ class HDTicket(Document):
 
         if not new_ticket:
             # send email to assigned agents
-            self.send_reply_email_to_agent(message)
+            self.send_reply_email_to_agent()
 
         if self.status == "Replied":
             self.status = "Open"
