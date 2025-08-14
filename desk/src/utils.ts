@@ -5,6 +5,7 @@ import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
 import TicketIcon from "./components/icons/TicketIcon.vue";
+import { getMeta } from "./stores/meta";
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
@@ -309,13 +310,6 @@ export function uploadFunction(
   });
 }
 
-export async function removeAttachmentFromServer(attachment: string) {
-  await call("frappe.client.delete", {
-    doctype: "File",
-    name: attachment,
-  });
-}
-
 export const convertToConditions = ({
   conditions,
   fieldPrefix,
@@ -480,4 +474,66 @@ export function validateConditions(conditions: any[]): boolean {
   }
 
   return conditions.length > 0;
+}
+
+export async function removeAttachmentFromServer(attachment: string) {
+  await call("frappe.client.delete", {
+    doctype: "File",
+    name: attachment,
+  });
+}
+
+function getParentChildField(name: string) {
+  let [_, parent, child] = name.split("-");
+  return [parent, child];
+}
+
+export function getFieldDependencyLabel(name: string) {
+  const { getField } = getMeta("HD Ticket");
+  let [parent, child] = getParentChildField(name);
+  parent = getField(parent)?.label || parent;
+  child = getField(child)?.label || child;
+  return `${parent} → ${child}`;
+}
+
+/**
+ * @param {Object} config - Configuration object
+ * @param {Ref<boolean>} config.isConfirmingDelete - Ref to track confirmation state
+ * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
+ * @returns {Array} Array of option objects for use in dropdowns
+ */
+export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
+  return [
+    {
+      label: "Delete",
+      component: (props) =>
+        TemplateOption({
+          option: "Delete",
+          icon: "trash-2",
+          active: props.active,
+          variant: "grey",
+          onClick: (event) => {
+            event.preventDefault();
+            isConfirmingDelete.value = true;
+          },
+        }),
+      condition: () => !isConfirmingDelete.value,
+    },
+    {
+      label: "Confirm Delete",
+      component: (props) =>
+        TemplateOption({
+          option: "Confirm Delete",
+          icon: "trash-2",
+          active: props.active,
+          variant: "danger",
+          onClick: () => {
+            onConfirmDelete();
+            // Reset state after confirming
+            isConfirmingDelete.value = false;
+          },
+        }),
+      condition: () => isConfirmingDelete.value,
+    },
+  ];
 }

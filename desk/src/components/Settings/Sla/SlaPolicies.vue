@@ -7,7 +7,7 @@
         </h1>
       </template>
       <template #description>
-        <p class="text-sm max-w-md leading-5 text-ink-gray-6">
+        <p class="text-p-sm max-w-md text-ink-gray-6">
           SLAs align your team and customers with defined timelines for a
           reliable experience.
           <a

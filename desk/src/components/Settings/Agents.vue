@@ -17,7 +17,7 @@
         </Button>
       </template>
       <template #bottom-section>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 justify-between">
           <FormControl
             v-model="search"
             :placeholder="'Search'"

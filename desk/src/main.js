@@ -14,7 +14,7 @@ import {
   Tooltip,
 } from "frappe-ui";
 import { createPinia } from "pinia";
-import { createApp } from "vue";
+import { createApp, h } from "vue";
 import App from "./App.vue";
 import { createDialog } from "./components/dialogs";
 import "./index.css";
@@ -23,7 +23,7 @@ import { socket } from "./socket";
 import { posthogPlugin } from "./telemetry";
 import { isCustomerPortal } from "@/utils";
 import { translationPlugin } from "./translation";
-
+import CircleAlert from "~icons/lucide/circle-alert";
 const globalComponents = {
   Badge,
   Button,
@@ -47,7 +47,10 @@ setConfig("serverMessagesHandler", (msgs) => {
       toast.success(msg.message);
       return;
     }
-    toast.warning(msg.message);
+    toast.create({
+      message: msg.message,
+      icon: h(CircleAlert, { class: "text-blue-500" }),
+    });
   });
 });
 setConfig("fallbackErrorHandler", (error) => {
