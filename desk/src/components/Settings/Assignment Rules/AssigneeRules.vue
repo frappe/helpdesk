@@ -1,17 +1,26 @@
 <template>
   <div>
     <div class="flex flex-col gap-2">
-      <span class="text-lg font-semibold text-ink-gray-7">Assignee Rules</span>
+      <span class="text-lg font-semibold text-ink-gray-7">{{
+        __("Assignee Rules")
+      }}</span>
       <span class="text-sm text-ink-gray-6">
-        Define who receives the tickets and how they’re distributed among
-        agents.
+        {{
+          __(
+            "Define who receives the tickets and how they’re distributed among agents."
+          )
+        }}
       </span>
     </div>
     <div class="mt-10 flex items-center justify-between gap-2">
       <div>
-        <div class="text-base font-medium text-ink-gray-7">Ticket Routing</div>
+        <div class="text-base font-medium text-ink-gray-7">
+          {{ __("Ticket Routing") }}
+        </div>
         <div class="text-sm text-ink-gray-6 mt-2">
-          Choose how tickets are distributed among selected assignees.
+          {{
+            __("Choose how tickets are distributed among selected assignees.")
+          }}
         </div>
       </div>
       <div>
@@ -62,9 +71,11 @@
     </div>
     <div class="mt-10 flex items-center justify-between gap-2">
       <div>
-        <div class="text-base font-medium text-ink-gray-7">Assignees</div>
+        <div class="text-base font-medium text-ink-gray-7">
+          {{ __("Assignees") }}
+        </div>
         <div class="text-sm text-ink-gray-6 mt-2">
-          Choose who receives the tickets.
+          {{ __("Choose who receives the tickets.") }}
         </div>
       </div>
       <AssigneeSearch @addAssignee="validateAssignmentRule('users')" />
@@ -75,12 +86,12 @@
         :key="user.name"
         class="flex items-center gap-2 text-sm bg-surface-gray-2 rounded-md p-1 w-max px-2 select-none"
       >
-        <Avatar :image="user.user_image" :label="user.user" size="sm" />
+        <Avatar :image="user.user_image" :label="user.full_name" size="sm" />
         <div class="text-ink-gray-7">
-          {{ user.user }}
+          {{ user.full_name }}
         </div>
         <Tooltip
-          v-if="user.user == assignmentRuleData.last_user"
+          v-if="user.email == assignmentRuleData.lastUser"
           text="Last user assigned by this rule"
           :hover-delay="0.35"
           :placement="'top'"
@@ -88,7 +99,7 @@
           <div
             class="text-xs rounded-full select-none bg-blue-600 text-white p-0.5 px-2"
           >
-            Last
+            {{ __("Last") }}
           </div>
         </Tooltip>
         <Button variant="ghost" icon="x" @click="removeAssignedUser(user)" />

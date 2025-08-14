@@ -15,11 +15,11 @@
           variant="ghost"
           icon-left="chevron-left"
           :label="
-            assignmentRuleData.assignment_rule_name || 'New Assignment Rule'
+            assignmentRuleData.assignmentRuleName || 'New Assignment Rule'
           "
           size="md"
           @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-xl !pr-0"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-xl hover:opacity-70 !pr-0 !max-w-96 !justify-start"
         />
         <Badge
           :variant="'subtle'"
@@ -57,12 +57,12 @@
           variant="subtle"
           placeholder="Name"
           label="Name"
-          v-model="assignmentRuleData.assignment_rule_name"
+          v-model="assignmentRuleData.assignmentRuleName"
           required
-          @change="validateAssignmentRule('assignment_rule_name')"
+          @change="validateAssignmentRule('assignmentRuleName')"
         />
         <ErrorMessage
-          :message="assignmentRulesErrors.assignment_rule_name"
+          :message="assignmentRulesErrors.assignmentRuleName"
           class="mt-2"
         />
       </div>
@@ -155,7 +155,7 @@
                 <div
                   class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                 >
-                  <code>{{ assignmentRuleData.assign_condition }}</code>
+                  <code>{{ assignmentRuleData.assignCondition }}</code>
                 </div>
               </template>
             </Popover>
@@ -165,7 +165,7 @@
       <div class="mt-4">
         <div
           class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
-          v-if="!useNewUI && assignmentRuleData.assign_condition"
+          v-if="!useNewUI && assignmentRuleData.assignCondition"
         >
           <span>
             Conditions for this rule were created from
@@ -182,13 +182,13 @@
           />
         </div>
         <AssignmentRulesSection
-          :conditions="assignmentRuleData.assign_condition_json"
-          name="assign_condition"
-          :errors="assignmentRulesErrors.assign_condition_error"
+          :conditions="assignmentRuleData.assignConditionJson"
+          name="assignCondition"
+          :errors="assignmentRulesErrors.assignConditionError"
           v-else
         />
         <ErrorMessage
-          :message="assignmentRulesErrors.assign_condition"
+          :message="assignmentRulesErrors.assignCondition"
           class="mt-2"
         />
       </div>
@@ -213,7 +213,7 @@
             v-if="
               isOldSla &&
               assignmentRulesActiveScreen.data &&
-              assignmentRuleData.unassign_condition
+              assignmentRuleData.unassignCondition
             "
           >
             <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
@@ -229,7 +229,7 @@
                 <div
                   class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                 >
-                  <code>{{ assignmentRuleData.unassign_condition }}</code>
+                  <code>{{ assignmentRuleData.unassignCondition }}</code>
                 </div>
               </template>
             </Popover>
@@ -239,7 +239,7 @@
       <div class="mt-4">
         <div
           class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
-          v-if="!useNewUI && assignmentRuleData.unassign_condition"
+          v-if="!useNewUI && assignmentRuleData.unassignCondition"
         >
           <span>
             Conditions for this rule were created from
@@ -256,9 +256,9 @@
           />
         </div>
         <AssignmentRulesSection
-          :conditions="assignmentRuleData.unassign_condition_json"
-          name="unassign_condition"
-          :errors="assignmentRulesErrors.unassign_condition_error"
+          :conditions="assignmentRuleData.unassignConditionJson"
+          name="unassignCondition"
+          :errors="assignmentRulesErrors.unassignConditionError"
           v-else
         />
       </div>
@@ -273,7 +273,7 @@
           Choose the days of the week when this rule should be active.
         </span>
       </div>
-      <div class="mt-4">
+      <div class="mt-6">
         <AssignmentSchedule />
       </div>
     </div>
@@ -338,13 +338,33 @@ const getAssignmentRuleData = createResource({
     docname: assignmentRulesActiveScreen.value.data?.name,
   },
   onSuccess(data) {
-    assignmentRuleData.value = data;
-    assignmentRuleData.value.loading = false;
+    assignmentRuleData.value = {
+      loading: false,
+      assignCondition: data.assign_condition,
+      unassignCondition: data.unassign_condition,
+      assignConditionJson: JSON.parse(data.assign_condition_json || "[]"),
+      unassignConditionJson: JSON.parse(data.unassign_condition_json || "[]"),
+      rule: data.rule,
+      priority: data.priority,
+      users: data.users?.map((user) => ({
+        email: user.email,
+        user: user.email,
+        user_image: user.user_image,
+        full_name: user.full_name,
+      })),
+      disabled: data.disabled,
+      description: data.description,
+      name: data.name,
+      assignmentRuleName: data.name,
+      assignmentDays: data.assignment_days,
+    };
     initialData.value = JSON.stringify(assignmentRuleData.value);
+
     const conditionsAvailable =
-      assignmentRuleData.value.assign_condition?.length > 0;
+      assignmentRuleData.value.assignCondition?.length > 0;
     const conditionsJsonAvailable =
-      assignmentRuleData.value.assign_condition_json?.length > 0;
+      assignmentRuleData.value.assignConditionJson?.length > 0;
+
     if (conditionsAvailable && !conditionsJsonAvailable) {
       useNewUI.value = false;
       isOldSla.value = true;
@@ -353,14 +373,6 @@ const getAssignmentRuleData = createResource({
       isOldSla.value = false;
     }
   },
-  transform(data) {
-    data.assign_condition_json = JSON.parse(data.assign_condition_json || "[]");
-    data.unassign_condition_json = JSON.parse(
-      data.unassign_condition_json || "[]"
-    );
-    data.assignment_rule_name = data.name;
-    return data;
-  },
   auto: false,
 });
 
@@ -368,6 +380,7 @@ if (assignmentRulesActiveScreen.value.data) {
   assignmentRuleData.value.loading = true;
   getAssignmentRuleData.submit();
 } else {
+  assignmentRuleData.value.loading = false;
   disableSettingModalOutsideClick.value = true;
 }
 
@@ -435,21 +448,27 @@ const createAssignmentRule = () => {
     url: "frappe.client.insert",
     params: {
       doc: {
-        ...assignmentRuleData.value,
-        name: assignmentRuleData.value.assignment_rule_name,
         doctype: "Assignment Rule",
         document_type: "HD Ticket",
+        rule: assignmentRuleData.value.rule,
+        priority: assignmentRuleData.value.priority,
+        users: assignmentRuleData.value.users,
+        disabled: assignmentRuleData.value.disabled,
+        description: assignmentRuleData.value.description,
+        assignment_days: assignmentRuleData.value.assignmentDays,
+        name: assignmentRuleData.value.assignmentRuleName,
+        assignment_rule_name: assignmentRuleData.value.assignmentRuleName,
         assign_condition: convertToConditions({
-          conditions: assignmentRuleData.value.assign_condition_json,
+          conditions: assignmentRuleData.value.assignConditionJson,
         }),
         unassign_condition: convertToConditions({
-          conditions: assignmentRuleData.value.unassign_condition_json,
+          conditions: assignmentRuleData.value.unassignConditionJson,
         }),
         assign_condition_json: JSON.stringify(
-          assignmentRuleData.value.assign_condition_json
+          assignmentRuleData.value.assignConditionJson
         ),
         unassign_condition_json: JSON.stringify(
-          assignmentRuleData.value.unassign_condition_json
+          assignmentRuleData.value.unassignConditionJson
         ),
       },
     },
@@ -468,12 +487,15 @@ const createAssignmentRule = () => {
         data: data,
       };
     },
+    onError: () => {
+      isLoading.value = false;
+    },
   });
 };
 
 const priorityOptions = [
   { label: "Low", value: "0" },
-  { label: "Medium-Low", value: "1" },
+  { label: "Low-Medium", value: "1" },
   { label: "Medium", value: "2" },
   { label: "Medium-High", value: "3" },
   { label: "High", value: "4" },
@@ -485,24 +507,31 @@ const updateAssignmentRule = async () => {
     url: "helpdesk.api.assignment_rule.save_assignment_rule",
     params: {
       doc: {
-        ...assignmentRuleData.value,
         doctype: "Assignment Rule",
         document_type: "HD Ticket",
+        rule: assignmentRuleData.value.rule,
+        priority: assignmentRuleData.value.priority,
+        users: assignmentRuleData.value.users,
+        disabled: assignmentRuleData.value.disabled,
+        description: assignmentRuleData.value.description,
+        assignment_days: assignmentRuleData.value.assignmentDays,
+        name: assignmentRuleData.value.assignmentRuleName,
+        assignment_rule_name: assignmentRuleData.value.assignmentRuleName,
         assign_condition: useNewUI.value
           ? convertToConditions({
-              conditions: assignmentRuleData.value.assign_condition_json,
+              conditions: assignmentRuleData.value.assignConditionJson,
             })
-          : assignmentRuleData.value.assign_condition,
+          : assignmentRuleData.value.assignCondition,
         unassign_condition: useNewUI.value
           ? convertToConditions({
-              conditions: assignmentRuleData.value.unassign_condition_json,
+              conditions: assignmentRuleData.value.unassignConditionJson,
             })
-          : assignmentRuleData.value.unassign_condition,
+          : assignmentRuleData.value.unassignCondition,
         assign_condition_json: useNewUI.value
-          ? JSON.stringify(assignmentRuleData.value.assign_condition_json)
+          ? JSON.stringify(assignmentRuleData.value.assignConditionJson)
           : null,
         unassign_condition_json: useNewUI.value
-          ? JSON.stringify(assignmentRuleData.value.unassign_condition_json)
+          ? JSON.stringify(assignmentRuleData.value.unassignConditionJson)
           : null,
       },
     },
@@ -516,6 +545,9 @@ const updateAssignmentRule = async () => {
           isLoading.value = false;
           toast.success("Assignment rule updated");
         });
+    },
+    onError: () => {
+      isLoading.value = false;
     },
   });
 };

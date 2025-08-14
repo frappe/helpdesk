@@ -3,10 +3,10 @@
     <Popover placement="bottom-end">
       <template #target="{ togglePopover }">
         <Button
-          variant="solid"
+          variant="subtle"
           icon-left="plus"
           @click="togglePopover()"
-          label="Add Assignee"
+          :label="__('Add Assignee')"
         />
       </template>
       <template #body="{ togglePopover }">
@@ -23,7 +23,7 @@
               "
               :value="query"
               autocomplete="off"
-              placeholder="Search"
+              :placeholder="__('Search')"
             />
             <button
               class="absolute right-1.5 inline-flex h-7 w-7 items-center justify-center"
@@ -71,7 +71,7 @@
               v-if="users.length == 0"
               class="mt-1.5 rounded-md p-1.5 text-base text-gray-600"
             >
-              No results found
+              {{ __("No results found") }}
             </li>
           </ComboboxOptions>
           <div class="border-t p-1.5 pb-0.5">
@@ -79,7 +79,7 @@
               variant="ghost"
               class="w-full"
               icon-left="plus"
-              label="Invite agent"
+              :label="__('Invite agent')"
               @click="
                 () => {
                   showNewAgentsDialog = true;
@@ -94,7 +94,7 @@
   </Combobox>
 
   <AddNewAgentsDialog
-    title="Invite Agent"
+    :title="__('Add Agents')"
     @close="showNewAgentsDialog = false"
     :modelValue="showNewAgentsDialog"
     :show="showNewAgentsDialog"
@@ -143,7 +143,7 @@ watchDebounced(
 
 const usersList = createListResource({
   doctype: "User",
-  fields: ["*"],
+  fields: ["name", "email", "full_name", "user_image"],
   filters: {
     full_name: ["not in", ["Administrator", "Guest"]],
   },
@@ -180,7 +180,12 @@ const addAssignee = (user) => {
     (u) => u.user === user.user
   );
   if (!userExists) {
-    assignmentRuleData.value.users.push({ user: user.user });
+    assignmentRuleData.value.users.push({
+      full_name: user.full_name,
+      email: user.email,
+      user_image: user.user_image,
+      user: user.email,
+    });
     emit("addAssignee", user);
   }
 };
