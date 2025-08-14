@@ -11,7 +11,7 @@
     @click="props.conditions.push(['', '', ''])"
   >
     <FeatherIcon name="plus" class="h-4" />
-    Add a custom condition
+    {{ __("Add a custom condition") }}
   </div>
   <div class="flex items-center justify-between mt-2">
     <Dropdown
@@ -22,7 +22,7 @@
       <Button
         :disabled="slaDataErrors.condition != ''"
         :icon-right="open ? 'chevron-up' : 'chevron-down'"
-        label="Add condition"
+        :label="__('Add condition')"
       />
     </Dropdown>
     <ErrorMessage :message="slaDataErrors.condition" />

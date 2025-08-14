@@ -222,7 +222,7 @@ import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
 
-import { activeTab, tabs } from "../Settings/settingsModal";
+import { setActiveSettingsTab } from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
 
@@ -416,8 +416,7 @@ const steps = [
     completed: false,
     icon: markRaw(Timer),
     onClick: () => {
-      const slaTab = tabs.findIndex((tab) => tab.label === "SLA Policies");
-      activeTab.value = tabs[slaTab];
+      setActiveSettingsTab("SLA Policies");
       showSettingsModal.value = true;
       minimize.value = true;
     },

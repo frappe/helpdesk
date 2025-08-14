@@ -2,14 +2,19 @@
   <div class="px-10 py-8 sticky top-0">
     <div class="flex items-start justify-between">
       <div class="flex flex-col gap-2">
-        <h1 class="text-lg font-semibold text-ink-gray-8">Assignment rules</h1>
+        <h1 class="text-lg font-semibold text-ink-gray-8">
+          {{ __("Assignment rules") }}
+        </h1>
         <p class="text-sm text-ink-gray-6 max-w-md">
-          Assignment Rules automatically route tickets to the right team members
-          based on predefined conditions.
+          {{
+            __(
+              "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
+            )
+          }}
         </p>
       </div>
       <Button
-        label="Create new"
+        :label="__('Create new')"
         theme="gray"
         variant="solid"
         @click="goToNew()"
