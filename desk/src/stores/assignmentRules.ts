@@ -27,35 +27,35 @@ const defaultAssignmentDays = [
 
 export const assignmentRuleData = ref<Record<string, any> | null>({
   loading: false,
-  assign_condition: "",
-  unassign_condition: "",
-  assign_condition_json: [],
-  unassign_condition_json: [],
+  assignCondition: "",
+  unassignCondition: "",
+  assignConditionJson: [],
+  unassignConditionJson: [],
   rule: "Round Robin",
   priority: 1,
   users: [],
-  disabled: true,
+  disabled: false,
   description: "",
   name: "",
-  assignment_rule_name: "",
-  assignment_days: defaultAssignmentDays,
+  assignmentRuleName: "",
+  assignmentDays: defaultAssignmentDays,
 });
 
 export const resetAssignmentRuleData = () => {
   assignmentRuleData.value = {
     loading: false,
-    assign_condition: "",
-    unassign_condition: "",
-    assign_condition_json: [],
-    unassign_condition_json: [],
+    assignCondition: "",
+    unassignCondition: "",
+    assignConditionJson: [],
+    unassignConditionJson: [],
     rule: "Round Robin",
     priority: 1,
     users: [],
-    disabled: true,
+    disabled: false,
     description: "",
     name: "",
-    assignment_rule_name: "",
-    assignment_days: defaultAssignmentDays,
+    assignmentRuleName: "",
+    assignmentDays: defaultAssignmentDays,
   };
 };
 
@@ -72,11 +72,14 @@ export const validateAssignmentRule = (
     if (key && field !== key) return;
 
     switch (field) {
-      case "assignment_rule_name":
-        assignmentRulesErrors.value.assignment_rule_name =
-          assignmentRuleData.value.assignment_rule_name?.length > 0
-            ? ""
-            : "Name is required";
+      case "assignmentRuleName":
+        if (assignmentRuleData.value.assignmentRuleName?.length == 0) {
+          assignmentRulesErrors.value.assignmentRuleName = "Name is required";
+        } else if (assignmentRuleData.value.assignmentRuleName?.length > 50) {
+          assignmentRulesErrors.value.assignmentRuleName = "Name is too long";
+        } else {
+          assignmentRulesErrors.value.assignmentRuleName = "";
+        }
         break;
       case "description":
         assignmentRulesErrors.value.description =
@@ -84,37 +87,35 @@ export const validateAssignmentRule = (
             ? ""
             : "Description is required";
         break;
-      case "assign_condition":
+      case "assignCondition":
         if (skipConditionCheck) {
           break;
         }
-        assignmentRulesErrors.value.assign_condition =
-          assignmentRuleData.value.assign_condition_json?.length > 0
+        assignmentRulesErrors.value.assignCondition =
+          assignmentRuleData.value.assignConditionJson?.length > 0
             ? ""
             : "Assign condition is required";
 
-        if (
-          !validateConditions(assignmentRuleData.value.assign_condition_json)
-        ) {
-          assignmentRulesErrors.value.assign_condition_error =
+        if (!validateConditions(assignmentRuleData.value.assignConditionJson)) {
+          assignmentRulesErrors.value.assignConditionError =
             "Assign conditions are invalid";
         } else {
-          assignmentRulesErrors.value.assign_condition_error = "";
+          assignmentRulesErrors.value.assignConditionError = "";
         }
 
         break;
-      case "unassign_condition":
+      case "unassignCondition":
         if (skipConditionCheck) {
           break;
         }
         if (
-          assignmentRuleData.value.unassign_condition_json?.length > 0 &&
-          !validateConditions(assignmentRuleData.value.unassign_condition_json)
+          assignmentRuleData.value.unassignConditionJson?.length > 0 &&
+          !validateConditions(assignmentRuleData.value.unassignConditionJson)
         ) {
-          assignmentRulesErrors.value.unassign_condition_error =
+          assignmentRulesErrors.value.unassignConditionError =
             "Unassign conditions are invalid";
         } else {
-          assignmentRulesErrors.value.unassign_condition_error = "";
+          assignmentRulesErrors.value.unassignConditionError = "";
         }
         break;
       case "users":
@@ -123,9 +124,9 @@ export const validateAssignmentRule = (
             ? ""
             : "Users are required";
         break;
-      case "assignment_days":
-        assignmentRulesErrors.value.assignment_days =
-          assignmentRuleData.value.assignment_days?.length > 0
+      case "assignmentDays":
+        assignmentRulesErrors.value.assignmentDays =
+          assignmentRuleData.value.assignmentDays?.length > 0
             ? ""
             : "Assignment days are required";
         break;
@@ -146,13 +147,13 @@ export const validateAssignmentRule = (
 };
 
 export const assignmentRulesErrors = ref<Record<string, any> | null>({
-  assignment_rule_name: "",
-  assign_condition: "",
-  assign_condition_error: "",
-  unassign_condition_error: "",
+  assignmentRuleName: "",
+  assignCondition: "",
+  assignConditionError: "",
+  unassignConditionError: "",
   users: "",
   description: "",
-  assignment_days: "",
+  assignmentDays: "",
 });
 
 export const resetAssignmentRuleErrors = () => {

@@ -25,7 +25,10 @@
 <script setup lang="ts">
 import { Button, createResource } from "frappe-ui";
 import { provide } from "vue";
-import { assignmentRulesActiveScreen } from "../../../stores/assignmentRules";
+import {
+  assignmentRulesActiveScreen,
+  resetAssignmentRuleData,
+} from "../../../stores/assignmentRules";
 import AssignmentRulesListView from "./AssignmentRulesListView.vue";
 
 const assignmentRulesListData = createResource({
@@ -37,6 +40,7 @@ const assignmentRulesListData = createResource({
 provide("assignmentRulesList", assignmentRulesListData);
 
 const goToNew = () => {
+  resetAssignmentRuleData();
   assignmentRulesActiveScreen.value = {
     screen: "view",
     data: null,

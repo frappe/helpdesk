@@ -27,14 +27,14 @@ const props = defineProps({
 });
 
 const toggleDay = (isActive) => {
-  const dayIndex = assignmentRuleData.value.assignment_days.findIndex(
+  const dayIndex = assignmentRuleData.value.assignmentDays.findIndex(
     (d) => d.day === props.day.day
   );
 
   if (isActive && dayIndex === -1) {
-    assignmentRuleData.value.assignment_days.push({ day: props.day.day });
+    assignmentRuleData.value.assignmentDays.push({ day: props.day.day });
   } else {
-    assignmentRuleData.value.assignment_days.splice(dayIndex, 1);
+    assignmentRuleData.value.assignmentDays.splice(dayIndex, 1);
   }
 };
 </script>

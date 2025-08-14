@@ -17,7 +17,7 @@
       :isLast="index === days.length - 1"
     />
   </div>
-  <ErrorMessage :message="assignmentRulesErrors.assignment_days" class="mt-2" />
+  <ErrorMessage :message="assignmentRulesErrors.assignmentDays" class="mt-2" />
 </template>
 
 <script setup lang="ts">
@@ -72,7 +72,7 @@ const days = ref([
 ]);
 
 onMounted(() => {
-  assignmentRuleData.value.assignment_days.forEach((day) => {
+  assignmentRuleData.value.assignmentDays.forEach((day) => {
     const workDay = days.value.find((d) => d.day === day.day);
     if (workDay) {
       workDay.active = true;
