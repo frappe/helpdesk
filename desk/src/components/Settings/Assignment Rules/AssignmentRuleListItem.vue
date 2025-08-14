@@ -42,13 +42,13 @@
     </div>
   </div>
   <Dialog
-    :options="{ title: `Duplicate Assignment Rule` }"
+    :options="{ title: __('Duplicate Assignment Rule') }"
     v-model="duplicateDialog.show"
   >
     <template #body-content>
       <div class="flex flex-col gap-4">
         <FormControl
-          label="New Assignment Rule Name"
+          :label="__('New Assignment Rule Name')"
           type="text"
           v-model="duplicateDialog.name"
         />
@@ -58,10 +58,10 @@
       <div class="flex gap-2 justify-end">
         <Button
           variant="subtle"
-          label="Close"
+          :label="__('Close')"
           @click="duplicateDialog.show = false"
         />
-        <Button variant="solid" label="Duplicate" @click="duplicate()" />
+        <Button variant="solid" :label="__('Duplicate')" @click="duplicate()" />
       </div>
     </template>
   </Dialog>

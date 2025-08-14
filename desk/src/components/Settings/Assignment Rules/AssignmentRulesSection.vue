@@ -14,7 +14,7 @@
     "
   >
     <FeatherIcon name="plus" class="h-4" />
-    Add a condition
+    {{ __("Add a condition") }}
   </div>
   <div class="flex items-center justify-between">
     <Dropdown
@@ -26,7 +26,7 @@
       <Button
         :disabled="props.errors !== ''"
         :icon-right="open ? 'chevron-up' : 'chevron-down'"
-        label="Add condition"
+        :label="__('Add condition')"
       />
     </Dropdown>
     <ErrorMessage

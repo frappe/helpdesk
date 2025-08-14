@@ -92,7 +92,7 @@
         </div>
         <Tooltip
           v-if="user.email == assignmentRuleData.lastUser"
-          text="Last user assigned by this rule"
+          :text="__('Last user assigned by this rule')"
           :hover-delay="0.35"
           :placement="'top'"
         >

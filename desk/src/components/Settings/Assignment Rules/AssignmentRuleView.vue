@@ -25,7 +25,7 @@
           :variant="'subtle'"
           :theme="'orange'"
           size="sm"
-          label="Unsaved changes"
+          :label="__('Unsaved changes')"
           v-if="isDirty"
         />
       </div>
@@ -35,11 +35,11 @@
           @click="assignmentRuleData.disabled = !assignmentRuleData.disabled"
         >
           <Switch size="sm" :model-value="!assignmentRuleData.disabled" />
-          <span class="text-sm text-ink-gray-7">Enabled</span>
+          <span class="text-sm text-ink-gray-7">{{ __("Enabled") }}</span>
         </div>
         <Button
           :disabled="Boolean(!isDirty && assignmentRulesActiveScreen.data)"
-          label="Save"
+          :label="__('Save')"
           theme="gray"
           variant="solid"
           @click="saveAssignmentRule()"
@@ -128,17 +128,19 @@
     <hr class="my-6" />
     <div>
       <div class="flex flex-col gap-2">
-        <span class="text-lg font-semibold text-ink-gray-7"
-          >Assignment condition</span
-        >
+        <span class="text-lg font-semibold text-ink-gray-7">{{
+          __("Assignment condition")
+        }}</span>
         <div class="flex items-center justify-between gap-6">
           <span class="text-sm text-ink-gray-6">
-            Choose which tickets are affected by this assignment rule.
+            {{
+              __("Choose which tickets are affected by this assignment rule.")
+            }}
             <a
               class="font-medium underline"
               href="https://docs.frappe.io/helpdesk/assignment-rule"
               target="_blank"
-              >Learn about conditions</a
+              >{{ __("Learn about conditions") }}</a
             >
           </span>
           <div v-if="isOldSla && assignmentRulesActiveScreen.data">
@@ -147,7 +149,7 @@
                 <div
                   class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap"
                 >
-                  Old Conditions
+                  {{ __("Old Conditions") }}
                   <FeatherIcon name="info" class="size-4" />
                 </div>
               </template>
@@ -196,17 +198,21 @@
     <hr class="my-6" />
     <div>
       <div class="flex flex-col gap-2">
-        <span class="text-lg font-semibold text-ink-gray-7"
-          >Unassignment condition</span
-        >
+        <span class="text-lg font-semibold text-ink-gray-7">{{
+          __("Unassignment condition")
+        }}</span>
         <div class="flex items-center justify-between gap-6">
           <span class="text-sm text-ink-gray-6">
-            Choose which tickets are affected by this un-assignment rule.
+            {{
+              __(
+                "Choose which tickets are affected by this un-assignment rule."
+              )
+            }}
             <a
               class="font-medium underline"
               href="https://docs.frappe.io/helpdesk/assignment-rule"
               target="_blank"
-              >Learn about conditions</a
+              >{{ __("Learn about conditions") }}</a
             >
           </span>
           <div
@@ -221,7 +227,7 @@
                 <div
                   class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap"
                 >
-                  Old Conditions
+                  {{ __("Old Conditions") }}
                   <FeatherIcon name="info" class="size-4" />
                 </div>
               </template>
@@ -266,11 +272,13 @@
     <hr class="my-6" />
     <div>
       <div class="flex flex-col gap-2">
-        <span class="text-lg font-semibold text-ink-gray-7"
-          >Assignment Schedule</span
-        >
+        <span class="text-lg font-semibold text-ink-gray-7">{{
+          __("Assignment Schedule")
+        }}</span>
         <span class="text-sm text-ink-gray-6">
-          Choose the days of the week when this rule should be active.
+          {{
+            __("Choose the days of the week when this rule should be active.")
+          }}
         </span>
       </div>
       <div class="mt-6">
