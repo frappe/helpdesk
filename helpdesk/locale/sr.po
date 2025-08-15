@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-08-13 06:48+0000\n"
-"PO-Revision-Date: 2025-08-14 11:45\n"
+"PO-Revision-Date: 2025-08-15 11:45\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Cyrillic)\n"
 "MIME-Version: 1.0\n"
@@ -22,17 +22,17 @@ msgstr ""
 #. Feedback'
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "0 is no feedback, 1 is Like, 2 is Dislike"
-msgstr ""
+msgstr "0 без повратне информације, 1 је лајк, 2 је негативна оцена"
 
 #. Header text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Visit Helpdesk</a></span>"
-msgstr ""
+msgstr "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Посетите Helpdesk</a></span>"
 
 #. Paragraph text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "<span class=\"h4\">Helpdesk Configuration<br></span>"
-msgstr ""
+msgstr "<span class=\"h4\">Helpdesk конфигурација<br></span>"
 
 #. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
 #. Source'
@@ -44,7 +44,7 @@ msgstr "API"
 
 #: helpdesk/api/knowledge_base.py:15
 msgid "Access denied"
-msgstr ""
+msgstr "Приступ одбијен"
 
 #. Label of the action (Data) field in DocType 'HD Ticket Activity'
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
@@ -53,13 +53,13 @@ msgstr "Радња"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:22
 msgid "Action Required"
-msgstr ""
+msgstr "Неопходна радња"
 
 #. Description of the 'On click (Javascript)' (Code) field in DocType 'HD
 #. Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Action to perform when clicking the button. The doc will be available as `this`"
-msgstr ""
+msgstr "Радња која се извршава кликом на дугме. Документ ће бити доступан као `this`"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -75,7 +75,7 @@ msgstr "Додај у празнике"
 
 #: desk/src/components/Settings/Agents.vue:6
 msgid "Add, manage agents and assign roles to them."
-msgstr ""
+msgstr "Додајте и управљајте агентима и додељујте им улоге."
 
 #. Label of the about (Code) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -120,7 +120,7 @@ msgstr "Агент"
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Agent Configuration"
-msgstr ""
+msgstr "Конфигурација агента"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -128,12 +128,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Agent Manager"
-msgstr ""
+msgstr "Менаџер агената"
 
 #. Label of the agent_name (Data) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Agent Name"
-msgstr ""
+msgstr "Име агента"
 
 #: desk/src/components/Settings/Agents.vue:5
 msgid "Agents"
@@ -158,7 +158,7 @@ msgstr "Све"
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Allow anyone to create tickets"
-msgstr ""
+msgstr "Дозволи свима да креирају тикете"
 
 #. Label of the apply_sla_for_resolution (Check) field in DocType 'HD Service
 #. Level Agreement'
@@ -174,13 +174,13 @@ msgstr "Примени на"
 #. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply on new page"
-msgstr ""
+msgstr "Примени на нову страницу"
 
 #. Label of the apply_to_customer_portal (Check) field in DocType 'HD Form
 #. Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply to customer portal"
-msgstr ""
+msgstr "Примени на портал за клијенте"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -190,7 +190,7 @@ msgstr "Архивирано"
 #. Label of the article (Link) field in DocType 'HD Article Feedback'
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "Article"
-msgstr ""
+msgstr "Чланак"
 
 #. Label of the assign_to_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
@@ -229,7 +229,7 @@ msgstr "Правила доделе"
 
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:28
 msgid "At-least one of priority, team and ticket type is required"
-msgstr ""
+msgstr "Барем један од приоритета, тима и врсте тикета је обавезан"
 
 #. Label of the attachment (Attach) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -244,23 +244,23 @@ msgstr "Аутор"
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Auto update status"
-msgstr ""
+msgstr "Аутоматско ажурирање статуса"
 
 #. Label of the auto_close_after_days (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Auto-close after (Days)"
-msgstr ""
+msgstr "Аутоматски затвори након (дана)"
 
 #. Description of the 'Condition' (Code) field in DocType 'HD Service Level
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Auto-generated from the portal view — do not edit directly unless you know what you're doing! "
-msgstr ""
+msgstr "Аутоматски генерисано из приказа портала - не уређујте директно осим уколико нисте потпуно сигурни шта радите! "
 
 #. Label of the auto_close_tickets (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Automatically Close Replied Tickets"
-msgstr ""
+msgstr "Аутоматски затвори тикете са одговором"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -275,7 +275,7 @@ msgstr "Просечно време одговора"
 #. Label of the base_support_rotation (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Base Support Rotation"
-msgstr ""
+msgstr "Основна ротација подршке"
 
 #. Label of the base_url (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
@@ -307,15 +307,15 @@ msgstr "Дугме"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:537
 msgid "Can not send email. No sender email set up!"
-msgstr ""
+msgstr "Није могуће послати имејл. Није подешен имејл пошиљаоца!"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:491
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
-msgstr ""
+msgstr "Није могуће обрисати подразумевани споразум о нивоу услуге. Барем један споразум мора бити означен као подразумевани."
 
 #: helpdesk/api/knowledge_base.py:122
 msgid "Cannot merge General category"
-msgstr ""
+msgstr "Није могуће спојити општу категорију"
 
 #. Label of the category (Link) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -325,12 +325,12 @@ msgstr "Категорија"
 #: helpdesk/api/knowledge_base.py:72
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.py:59
 msgid "Category must have atleast one article"
-msgstr ""
+msgstr "Категорија мора имати барем један чланак"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Channels"
-msgstr ""
+msgstr "Канали"
 
 #. Label of the clear_table (Button) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -359,7 +359,7 @@ msgstr "Затворено"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:271
 msgid "Closed or rated tickets cannot be updated by non-agents"
-msgstr ""
+msgstr "Затворени или оцењени тикети не могу бити ажурирани од стране особа које нису агенти"
 
 #. Label of the color (Color) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -379,7 +379,7 @@ msgstr "Коментар"
 #. Label of the commented_by (Link) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "Commented By"
-msgstr ""
+msgstr "Коментарисано од стране"
 
 #. Label of the condition (Code) field in DocType 'HD Service Level Agreement'
 #. Label of the condition_json (Code) field in DocType 'HD Service Level
@@ -406,7 +406,7 @@ msgstr "HTML контакт"
 
 #: helpdesk/templates/components/contact_with_us.html:11
 msgid "Contact with us"
-msgstr ""
+msgstr "Контактирајте нас"
 
 #. Label of the contacts (Table) field in DocType 'HD Organization'
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
@@ -428,23 +428,23 @@ msgstr "Врста садржаја"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:121
 msgid "Could not send feedback email,due to: {0}"
-msgstr ""
+msgstr "Неуспешно слање имејла са повратном информацијом због: {0}"
 
 #. Label of the criterion_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Criterion"
-msgstr ""
+msgstr "Критеријум"
 
 #. Label of the customer (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Customer"
-msgstr "Купац"
+msgstr "Клијент"
 
 #. Label of the customer_name (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Customer Name"
-msgstr "Назив купца"
+msgstr "Назив клијента"
 
 #. Label of the holiday_date (Date) field in DocType 'HD Holiday'
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
@@ -454,7 +454,7 @@ msgstr "Датум"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:26
 msgid "Day count for auto closing tickets cannot be negative or zero"
-msgstr ""
+msgstr "Број дана за аутоматско затварање тикета не може бити негативан или нула"
 
 #. Label of the default_priority (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -469,21 +469,21 @@ msgstr "Подразумевани приоритет"
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Default SLA"
-msgstr ""
+msgstr "Подразумевани споразум о нивоу услуге"
 
 #. Label of the default_priority (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Default priority"
-msgstr ""
+msgstr "Подразумевани приоритет"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:59
 msgid "Default template can not be deleted"
-msgstr ""
+msgstr "Подразумевани шаблон не може бити обрисан"
 
 #. Label of the default_ticket_type (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Default ticket type"
-msgstr ""
+msgstr "Подразумевана врста тикета"
 
 #. Label of the description (Text) field in DocType 'HD Article Category'
 #. Label of the description (Text Editor) field in DocType 'HD Holiday'
@@ -507,12 +507,12 @@ msgstr "Опис"
 #. Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Description Template"
-msgstr ""
+msgstr "Шаблон описа"
 
 #. Label of the description_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Description Weight"
-msgstr ""
+msgstr "Пондер описа"
 
 #. Label of the details_section (Section Break) field in DocType 'HD
 #. Notification'
@@ -525,13 +525,13 @@ msgstr "Детаљи"
 #. Description of the 'Ignore Restrictions' (Check) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Do not apply filters and restrictions to agents of this team"
-msgstr ""
+msgstr "Не примењивати филтере и ограничења на агенте овог тима"
 
 #. Label of the do_not_restrict_tickets_without_an_agent_group (Check) field in
 #. DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Do not restrict tickets without a Team"
-msgstr ""
+msgstr "Не ограничавати тикете који немају додељен тим"
 
 #. Label of the dt (Link) field in DocType 'HD Form Script'
 #. Label of the dt (Link) field in DocType 'HD View'
@@ -565,13 +565,13 @@ msgstr "Имејл налог"
 #. Label of the is_feedback_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Enable feedback for Customer Portal"
-msgstr ""
+msgstr "Омогући повратну информацију за тикете путем портала за клијенте"
 
 #. Label of the enable_email_ticket_feedback (Check) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Enable feedback for Email Tickets"
-msgstr ""
+msgstr "Омогући повратну информацију за тикете путем имејла"
 
 #. Label of the is_enabled (Check) field in DocType 'HD Action'
 #. Label of the is_enabled (Check) field in DocType 'HD Escalation Rule'
@@ -598,11 +598,11 @@ msgstr "Време завршетка"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:22
 msgid "Enter a name for this HD Service Holiday List."
-msgstr ""
+msgstr "Унесите назив за ову HD листу празника за пружање услуга."
 
 #: helpdesk/api/knowledge_base.py:80
 msgid "Error moving article to category"
-msgstr ""
+msgstr "Грешка при премештању чланка у категорију"
 
 #: helpdesk/overrides/email_account.py:69
 msgid "Error while connecting to email account {0}"
@@ -610,12 +610,12 @@ msgstr "Грешка при повезивању са имејл налогом 
 
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:43
 msgid "Escalation rule already exists for this criteria"
-msgstr ""
+msgstr "Правило ескалације већ постоји за овај критеријум"
 
 #. Label of the is_external_link (Check) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "External link"
-msgstr ""
+msgstr "Спољашњи линк"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -640,38 +640,38 @@ msgstr "Повратна информација "
 #. Label of the feedback_extra (Long Text) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback (Extra)"
-msgstr ""
+msgstr "Повратна информација (додатно)"
 
 #. Label of the feedback (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback (Option)"
-msgstr ""
+msgstr "Повратна информација (опција)"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:30
 msgid "Feedback Already Exists"
-msgstr ""
+msgstr "Повратна информација већ постоји"
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Email Feedback'
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 msgid "Feedback Rating"
-msgstr ""
+msgstr "Оцена повратне информације"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:119
 msgid "Feedback email has been sent to the customer"
-msgstr ""
+msgstr "Имејл са повратном информацијом је послат клијенту"
 
 #. Label of the fieldname (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Field (fieldname)"
-msgstr ""
+msgstr "Поље (назив поља)"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:27
 msgid "Field `{0}` does not exist in Ticket"
-msgstr ""
+msgstr "Поље `{0}` не постоји у тикету"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:43
 msgid "Field `{0}` is not allowed in Ticket Template"
-msgstr ""
+msgstr "Поље `{0}` није дозвољено у шаблону тикета"
 
 #. Label of the fields (Table) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -700,12 +700,12 @@ msgstr "Рок за први одговор"
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Response Time"
-msgstr "Време за први одговора"
+msgstr "Време за први одговор"
 
 #. Name of a report
 #: helpdesk/helpdesk/report/first_response_time_for_tickets/first_response_time_for_tickets.json
 msgid "First Response Time for Tickets"
-msgstr ""
+msgstr "Време првог одговора за тикете"
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -746,11 +746,11 @@ msgstr "Општа подешавања"
 
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:24
 msgid "General category can't be deleted"
-msgstr ""
+msgstr "Општа категорија не може бити обрисана"
 
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:20
 msgid "General category name can't be changed"
-msgstr ""
+msgstr "Назив опште категорије не може бити измењен"
 
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -772,148 +772,148 @@ msgstr "Гост"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "HD Action"
-msgstr ""
+msgstr "HD радња"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "HD Agent"
-msgstr ""
+msgstr "HD агент"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "HD Article"
-msgstr ""
+msgstr "HD чланак"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 msgid "HD Article Category"
-msgstr ""
+msgstr "HD категорија чланка"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "HD Article Feedback"
-msgstr ""
+msgstr "HD повратна информација о чланку"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
 msgid "HD Canned Response"
-msgstr ""
+msgstr "HD припремљен одговор"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "HD Customer"
-msgstr ""
+msgstr "HD клијент"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "HD Desk Account Request"
-msgstr ""
+msgstr "HD захтев за налог на радној површини"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 msgid "HD Email Feedback"
-msgstr ""
+msgstr "HD повратна информација путем имејла"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "HD Escalation Rule"
-msgstr ""
+msgstr "HD правило ескалације"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "HD Form Script"
-msgstr ""
+msgstr "HD скрипта обрасца"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 msgid "HD Holiday"
-msgstr ""
+msgstr "HD празник"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "HD Notification"
-msgstr ""
+msgstr "HD обавештење"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 msgid "HD Organization"
-msgstr ""
+msgstr "HD организација"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_organization_contact_item/hd_organization_contact_item.json
 msgid "HD Organization Contact Item"
-msgstr ""
+msgstr "HD ставка контакта организације"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_pause_service_level_agreement_on_status/hd_pause_service_level_agreement_on_status.json
 msgid "HD Pause Service Level Agreement On Status"
-msgstr ""
+msgstr "HD паузирај споразум о нивоу услуге при одређеном статусу"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
 msgid "HD Portal Signup Request"
-msgstr ""
+msgstr "HD захтев за регистрацију на порталу"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "HD Service Day"
-msgstr ""
+msgstr "HD дан пружања услуге"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list_calendar.js:20
 msgid "HD Service Holiday List"
-msgstr ""
+msgstr "HD листа празника за пружање услуге"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "HD Service Level Agreement"
-msgstr ""
+msgstr "HD споразум о нивоу услуге"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement_fulfilled_on_status/hd_service_level_agreement_fulfilled_on_status.json
 msgid "HD Service Level Agreement Fulfilled On Status"
-msgstr ""
+msgstr "HD споразум о нивоу услуге при одређеном статусу"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 msgid "HD Service Level Priority"
-msgstr ""
+msgstr "HD приоритет нивоа услуге"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "HD Settings"
-msgstr ""
+msgstr "HD подешавања"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
 msgid "HD Stopword"
-msgstr ""
+msgstr "HD Stopword"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "HD Support Search Source"
-msgstr ""
+msgstr "HD извор претраге подршке"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json
 msgid "HD Synonym"
-msgstr ""
+msgstr "HD синоним"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
 msgid "HD Synonyms"
-msgstr ""
+msgstr "HD синоними"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "HD Team"
-msgstr ""
+msgstr "HD тим"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_team_member/hd_team_member.json
 msgid "HD Team Member"
-msgstr ""
+msgstr "HD члан тима"
 
 #. Name of a DocType
 #. Label of the ticket (Link) field in DocType 'HD Ticket Activity'
@@ -921,72 +921,72 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "HD Ticket"
-msgstr ""
+msgstr "HD тикет"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "HD Ticket Activity"
-msgstr ""
+msgstr "HD активност тикета"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "HD Ticket Comment"
-msgstr ""
+msgstr "HD коментар тикета"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "HD Ticket Feedback Option"
-msgstr ""
+msgstr "HD опција повратне информације за тикет"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 msgid "HD Ticket Priority"
-msgstr ""
+msgstr "HD приоритет тикета"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "HD Ticket Template"
-msgstr ""
+msgstr "HD шаблон тикета"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "HD Ticket Template Field"
-msgstr ""
+msgstr "HD поље шаблона тикета"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "HD Ticket Type"
-msgstr ""
+msgstr "HD врста тикета"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "HD View"
-msgstr ""
+msgstr "HD приказ"
 
 #. Label of the headings_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Headings Weight"
-msgstr ""
+msgstr "Пондер наслова"
 
 #: helpdesk/config/desktop.py:11
 msgid "HelpDesk"
-msgstr ""
+msgstr "HelpDesk"
 
 #. Name of a Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk"
-msgstr ""
+msgstr "Helpdesk"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Helpdesk Contact"
-msgstr ""
+msgstr "Helpdesk контакт"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk Reports"
-msgstr ""
+msgstr "Helpdesk извештаји"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:53
 msgid "Here, your weekly offs are pre-populated based on the previous selections. You can add more rows to also add public and national holidays individually."
@@ -995,13 +995,13 @@ msgstr "Овде су Ваши недељни одмори унапред поп
 #. Label of the cond_hidden (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Hide condition"
-msgstr ""
+msgstr "Сакриј услов"
 
 #. Label of the hide_from_customer (Check) field in DocType 'HD Ticket Template
 #. Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Hide from customer"
-msgstr ""
+msgstr "Сакриј од клијента"
 
 #. Label of the holiday_list (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -1040,24 +1040,24 @@ msgstr "Иконица"
 #. 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, anyone will be able to create tickets (without any permission). "
-msgstr ""
+msgstr "Уколико је омогућено, свако може креирати тикете (без било какве дозволе). "
 
 #. Description of the 'Enable feedback for Email Tickets' (Check) field in
 #. DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, feedback email will be sent to the customer when you mark a ticket as Resolved/Closed.\n"
-msgstr ""
+msgstr "Уколико је омогућено, имејл са повратном информацијом биће послат клијенту када означите тикет као решен/затворен.\n"
 
 #. Description of the 'Enable feedback for Customer Portal' (Check) field in
 #. DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \n"
-msgstr ""
+msgstr "Уколико је омогућено, дијалог за повратну информацију биће приказан када корисник покуша да затвори тикет. \n"
 
 #. Label of the ignore_restrictions (Check) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Ignore Restrictions"
-msgstr ""
+msgstr "Игнориши ограничења"
 
 #. Label of the user_image (Data) field in DocType 'HD Agent'
 #. Label of the image (Attach Image) field in DocType 'HD Customer'
@@ -1069,7 +1069,7 @@ msgstr "Слика"
 #. Description of the 'Logo' (Attach Image) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Image to be used in various places, including Login and Signup pages. An image with transparent background and 160 x 32 is preferred"
-msgstr ""
+msgstr "Слика која се користи на различитим местима, укључујући странице за пријаву и регистрацију. Препоручена је слика са провидном позадином, димензија 160 x 32"
 
 #. Label of the images_column (Column Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1079,7 +1079,7 @@ msgstr "Слике"
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Instantly send e-mail"
-msgstr ""
+msgstr "Слање имејла тренутно"
 
 #: helpdesk/utils.py:26
 msgid "Insufficient Permission for {0}"
@@ -1088,7 +1088,7 @@ msgstr "Недовољна овлашћена за {0}"
 #. Label of the integer_value (Int) field in DocType 'HD Ticket Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 msgid "Integer value"
-msgstr ""
+msgstr "Бројчана вредност"
 
 #. Label of the is_active (Check) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
@@ -1098,7 +1098,7 @@ msgstr "Активно"
 #. Label of the is_customer_portal (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Is Customer Portal"
-msgstr ""
+msgstr "Портал за клијенте"
 
 #. Label of the is_default (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1114,17 +1114,17 @@ msgstr "Стандардно"
 #. 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Is name setup skipped"
-msgstr ""
+msgstr "Поставке назива прескочене"
 
 #. Label of the is_pinned (Check) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "Is pinned"
-msgstr ""
+msgstr "Фиксирано"
 
 #. Label of the setup_complete (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Is setup complete"
-msgstr ""
+msgstr "Поставке завршене"
 
 #. Label of the key (Data) field in DocType 'HD Email Feedback'
 #. Label of the key (Data) field in DocType 'HD Ticket'
@@ -1181,7 +1181,7 @@ msgstr "Логотип"
 #. Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 msgid "Lower the Integer value, higher is the priority of the issue"
-msgstr ""
+msgstr "Што је мања бројчана вредност, већи је приоритет проблема"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -1191,7 +1191,7 @@ msgstr "Помињање"
 #. Label of the merged_with (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Merged With"
-msgstr ""
+msgstr "Спојено са"
 
 #. Label of the message (Text Editor) field in DocType 'HD Canned Response'
 #. Label of the message (Text) field in DocType 'HD Notification'
@@ -1208,7 +1208,7 @@ msgstr "Мета"
 #. Label of the misc_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Misc"
-msgstr ""
+msgstr "Разно"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -1234,7 +1234,7 @@ msgstr "Име"
 #. Label of the name_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Name Weight"
-msgstr ""
+msgstr "Пондер назива"
 
 #: helpdesk/utils.py:159
 msgid "Not Allowed"
@@ -1259,11 +1259,11 @@ msgstr "На чекању од"
 #. Label of the action (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "On click (Javascript)"
-msgstr ""
+msgstr "On click (Javascript)"
 
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.py:29
 msgid "Only one default view is allowed per user for {0}"
-msgstr ""
+msgstr "Дозвољен је само један подразумевани приказ по кориснику за {0}"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Pause Service Level
 #. Agreement On Status'
@@ -1297,7 +1297,7 @@ msgstr "Наруџбина од"
 
 #: helpdesk/api/settings/field_dependency.py:59
 msgid "Parent field, child field, and parent-child mapping are required."
-msgstr ""
+msgstr "Матично поље, зависно поље и мапирање матичног и зависног поља су обавезни."
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1316,11 +1316,11 @@ msgstr "Резервисани текст"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:19
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
-msgstr ""
+msgstr "Молимо Вас да додате овај приоритет у <a href='/app/hd-service-level-agreement'> обавезне документе споразума о нивоу услуге</a>"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:310
 msgid "Please add {0} priority in {1} SLA"
-msgstr ""
+msgstr "Молимо Вас да додате приоритет {0} у споразум о нивоу услуге {1}"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:41
 msgid "Please select weekly off day"
@@ -1352,7 +1352,7 @@ msgstr "Кључ назива путање уноса"
 #. Label of the prefer_knowledge_base (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Prefer knowledge base"
-msgstr ""
+msgstr "Пожељно коришћење базе знања"
 
 #. Label of the priorities (Table) field in DocType 'HD Service Level
 #. Agreement'
@@ -1376,7 +1376,7 @@ msgstr "Приоритет"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:82
 msgid "Priority <u>{0}</u> must be included in the SLA {1}."
-msgstr ""
+msgstr "Приоритет <u>{0}</u> мора бити укључен у споразум о нивоу услуге {1}."
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:73
 msgid "Priority {0} has been repeated."
@@ -1430,16 +1430,16 @@ msgstr "Оцењивање"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:22
 msgid "Rating must be between 0.2 and 1.0"
-msgstr ""
+msgstr "Оцена мора бити између 0,2 и 1,0"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:18
 msgid "Rating {0} is not allowed"
-msgstr ""
+msgstr "Оцена {0} није дозвољена"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Reaction"
-msgstr ""
+msgstr "Реакција"
 
 #. Label of the read (Check) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -1450,7 +1450,7 @@ msgstr "Прочитано"
 #. List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Recurring holidays"
-msgstr ""
+msgstr "Понављајући празници"
 
 #. Label of the reference_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1460,7 +1460,7 @@ msgstr "Референца"
 #. Label of the reference_ticket (Link) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "Reference Ticket"
-msgstr ""
+msgstr "Референтни тикет"
 
 #. Label of the references_tab (Tab Break) field in DocType 'HD Customer'
 #. Label of the references_section (Section Break) field in DocType 'HD
@@ -1472,7 +1472,7 @@ msgstr "Референце"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:6
 msgid "Regenerate Search Index"
-msgstr ""
+msgstr "Поново генериши индекс претраге"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Pause Service Level
 #. Agreement On Status'
@@ -1498,7 +1498,7 @@ msgstr "Захтев за кључ"
 #. Label of the required (Check) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Required"
-msgstr ""
+msgstr "Обавезно"
 
 #. Label of the resolution_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1508,7 +1508,7 @@ msgstr "Резолуција"
 #. Label of the resolution_by (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution By"
-msgstr "Резолуција од стране"
+msgstr "Решено од стране"
 
 #. Label of the resolution_date (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1531,7 +1531,7 @@ msgstr "Рок за резолуцију"
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Time"
-msgstr "Време резолуције"
+msgstr "Време решавања"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Pause Service Level
 #. Agreement On Status'
@@ -1573,24 +1573,24 @@ msgstr "Кључни пут резултата одговора"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:63
 msgid "Response Time for {0} priority in row {1} can't be greater than Resolution Time."
-msgstr "Време одговора за приоритет {0} у реду {1} не може бити веће од времена резолуције."
+msgstr "Време одговора за приоритет {0} у реду {1} не може бити веће од времена решавања."
 
 #. Label of the response_and_resolution_time_section (Section Break) field in
 #. DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Response and Resolution"
-msgstr "Одговор и резолуција"
+msgstr "Одговор и решење"
 
 #. Label of the assign_within_team (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Restrict agent assignment to selected Team"
-msgstr ""
+msgstr "Ограничи доделу агената на изабрани тим"
 
 #. Label of the restrict_tickets_by_agent_group (Check) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Restrict tickets by Team"
-msgstr ""
+msgstr "Ограничи тикете по тиму"
 
 #. Label of the result_preview_field (Data) field in DocType 'HD Support Search
 #. Source'
@@ -1669,11 +1669,11 @@ msgstr "Претрага"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:10
 msgid "Search Index Regenerated"
-msgstr ""
+msgstr "Индекс претраге је поновно генерисан"
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:40
 msgid "Search Score"
-msgstr ""
+msgstr "Оцена претраге"
 
 #. Label of the search_term_param_name (Data) field in DocType 'HD Support
 #. Search Source'
@@ -1693,13 +1693,13 @@ msgstr "Изаберите свој недељни слободан дан"
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Send Acknowledgement Email"
-msgstr ""
+msgstr "Пошаљи имејл потврде"
 
 #. Label of the send_email_feedback_on_status (Select) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Send feedback when"
-msgstr ""
+msgstr "Пошаљи повратну информацију када"
 
 #. Label of the service_level (Data) field in DocType 'HD Service Level
 #. Agreement'
@@ -1709,7 +1709,7 @@ msgstr "Назив нивоа услуге"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:54
 msgid "Set Resolution Time for Priority {0} in row {1}."
-msgstr ""
+msgstr "Поставите време решавања за приоритет {0} у реду {1}."
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:46
 msgid "Set Response Time for Priority {0} in row {1}."
@@ -1717,7 +1717,7 @@ msgstr "Постави време одговора за приоритет {0} �
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:122
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
-msgstr ""
+msgstr "Постављање <strong>{0}</strong> као подразумевани споразум о нивоу услуге уклања <strong>{1}</strong> као подразумевани споразум. Неопходно је да додате услов у <strong>{1}</strong> да би споразум о нивоу услуге могао да функционише."
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
@@ -1738,7 +1738,7 @@ msgstr "Једноставан python израз, пример: doc.status == 'O
 #. Label of the skip_email_workflow (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Skip e-mail workflow"
-msgstr ""
+msgstr "Прескочи радни ток имејла"
 
 #. Label of the source_doctype (Link) field in DocType 'HD Support Search
 #. Source'
@@ -1759,25 +1759,25 @@ msgstr "Врста извора"
 
 #: helpdesk/api/knowledge_base.py:119
 msgid "Source and target category cannot be same"
-msgstr ""
+msgstr "Изворна и циљана категорија не могу бити исте"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:249
 msgid "Source and target ticket cannot be same"
-msgstr ""
+msgstr "Изворни и циљани тикет не могу бити исти"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:245
 msgid "Source ticket does not exist"
-msgstr ""
+msgstr "Изворни тикет не постоји"
 
 #. Label of the split_and_merge_section (Section Break) field in DocType 'HD
 #. Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Split and Merge"
-msgstr ""
+msgstr "Раздели и споји"
 
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.js:9
 msgid "Standard Form Scripts can't be modified, duplicate the script instead."
-msgstr ""
+msgstr "Стандардне скрипте образаца није могуће мењати, уместо тога направите дупликат скрипте."
 
 #. Label of the start_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
@@ -1791,7 +1791,7 @@ msgstr "Време почетка"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:97
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
-msgstr ""
+msgstr "Време почетка не може бити веће или једнако времену завршетка у реду <u>{0}</u>."
 
 #. Label of the status (Select) field in DocType 'HD Article'
 #. Label of the status (Select) field in DocType 'HD Pause Service Level
@@ -1816,7 +1816,7 @@ msgstr "Детаљи статуса"
 
 #: helpdesk/templates/components/contact_with_us.html:7
 msgid "Still got questions? We're here to assist you."
-msgstr ""
+msgstr "Још увек имате питања? Ту смо да Вам помогнемо."
 
 #. Label of the subject (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1827,7 +1827,7 @@ msgstr "Наслов"
 #. Label of the subject_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Subject Weight"
-msgstr ""
+msgstr "Пондер наслова"
 
 #. Label of the summary (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1850,7 +1850,7 @@ msgstr "Расподела радних сати уложених у пружа�
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Support Policy"
-msgstr ""
+msgstr "Политика подршке"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -1861,7 +1861,7 @@ msgstr "Тим за подршку"
 #. Label of the synonyms (Table) field in DocType 'HD Synonyms'
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
 msgid "Synonyms"
-msgstr ""
+msgstr "Синоними"
 
 #. Label of the is_system (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
@@ -1902,15 +1902,15 @@ msgstr "Систем менаџер"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.py:12
 msgid "System types can not be deleted"
-msgstr ""
+msgstr "Врсте система није могуће обрисати"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:22
 msgid "Tampered Access"
-msgstr ""
+msgstr "Компромитован приступ"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:247
 msgid "Target ticket does not exist"
-msgstr ""
+msgstr "Циљани тикет не постоји"
 
 #. Label of the team (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_team (Link) field in DocType 'HD Escalation Rule'
@@ -1926,7 +1926,7 @@ msgstr "Тим"
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Team Restrictions"
-msgstr ""
+msgstr "Ограничења тима"
 
 #. Label of the template (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1949,19 +1949,19 @@ msgstr "Празник који пада на {0} није између дату
 #. Description of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "This doctype will be deprecated in the future"
-msgstr ""
+msgstr "Овај DocType неће бити подржан у будућности"
 
 #. Description of the 'Instantly send e-mail' (Check) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "This field is used to send an email instantly without adding it into the queue. If this field is checked, the email will be sent immediately after clicking the \"Send\" button, instead of being added to the email queue for later processing."
-msgstr ""
+msgstr "Ово поље се користи за тренутно слање имејла без стављања у ред чекања. Уколико је поље означено, имејл ће бити послат одмах након клика на дугме \"Пошаљи\", уместо да се дода у ред за касније слање."
 
 #. Description of the 'Skip e-mail workflow' (Check) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "This field is used to skip email-related workflows for tickets. If this field is checked, no emails will be sent related to tickets, such as new ticket creation, status updates, or notifications."
-msgstr ""
+msgstr "Ово поље се користи за прескакање радних токова везаних за имејл код тикета. Уколико је поље означено, ниједан имејл везан за тикете, као што су креирање новог тикета, ажурирање статуса или обавештења, неће бити послат."
 
 #: helpdesk/www/helpdesk/index.py:23
 msgid "This method is only meant for developer mode"
@@ -1969,11 +1969,11 @@ msgstr "Ова метода је намењена само за развојни
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:283
 msgid "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
-msgstr ""
+msgstr "Овај тикет (#{0}) је спојен са тикетом <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:425
 msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
-msgstr ""
+msgstr "Овај тикет је раздељен на нови тикет. Наставите праћење на тикету <a href={0}>#{1}</a>."
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -1990,47 +1990,47 @@ msgstr "Четвртак"
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Ticket"
-msgstr ""
+msgstr "Тикет"
 
 #. Name of a report
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Analytics"
-msgstr ""
+msgstr "Аналитика тикета"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Configuration"
-msgstr ""
+msgstr "Конфигурација тикета"
 
 #. Label of the is_merged (Check) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Ticket Merged"
-msgstr ""
+msgstr "Тикет је спојен"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:40
 msgid "Ticket Not Found"
-msgstr ""
+msgstr "Тикет није пронађен"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:56
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:77
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:43
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:69
 msgid "Ticket Priority"
-msgstr ""
+msgstr "Приоритет тикета"
 
 #. Label of the ticket_split_from (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Ticket Split From"
-msgstr ""
+msgstr "Тикет раздељен из"
 
 #. Name of a report
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Summary"
-msgstr ""
+msgstr "Резиме тикета"
 
 #. Label of the ticket_type_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -2042,44 +2042,44 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:58
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Type"
-msgstr ""
+msgstr "Врста тикета"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:21
 msgid "Ticket does not exist."
-msgstr ""
+msgstr "Тикет не постоји."
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:261
 msgid "Ticket must be resolved with a feedback"
-msgstr ""
+msgstr "Тикет мора бити решен са повратном информацијом"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:45
 msgid "Ticket not found"
-msgstr ""
+msgstr "Тикет није пронађен"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:40
 msgid "Ticket not found for the provided key."
-msgstr ""
+msgstr "Тикет није пронађен за дати кључ."
 
 #. Label of the ticket_type (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_ticket_type (Link) field in DocType 'HD Escalation Rule'
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Ticket type"
-msgstr ""
+msgstr "Врста тикета"
 
 #. Label of the is_ticket_type_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:250
 msgid "Ticket type is mandatory"
-msgstr ""
+msgstr "Врста тикета је обавезна"
 
 #. Name of a report
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
 msgid "Ticket-Search Analysis"
-msgstr ""
+msgstr "Анализа претраге тикета"
 
 #: helpdesk/api/ticket.py:18
 msgid "Tickets can only be assigned to agents"
-msgstr ""
+msgstr "Тикете могу додељивати искључиво агенти"
 
 #. Label of the title (Data) field in DocType 'HD Article'
 #. Label of the title (Data) field in DocType 'HD Canned Response'
@@ -2091,7 +2091,7 @@ msgstr "Наслов"
 #. Label of the title_slug (Data) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Title Slug"
-msgstr ""
+msgstr "Slug наслова"
 
 #. Label of the user_to (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -2113,7 +2113,7 @@ msgstr "Датум завршетка не може бити пре датум �
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:35
 msgid "Top Result"
-msgstr ""
+msgstr "Најбољи резултат"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:98
 msgid "Total"
@@ -2131,7 +2131,7 @@ msgstr "Укупан број празника"
 
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:90
 msgid "Total Ticket"
-msgstr ""
+msgstr "Укупан број тикета"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2151,15 +2151,15 @@ msgstr "Врста"
 #. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "URL/Method"
-msgstr ""
+msgstr "URL/Метод"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:16
 msgid "Unauthorized Access"
-msgstr ""
+msgstr "Неовлашћени приступ"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:16
 msgid "Unauthorized access."
-msgstr ""
+msgstr "Неовлашћени приступ."
 
 #. Label of the user (Link) field in DocType 'HD Agent'
 #. Label of the user (Link) field in DocType 'HD Article Feedback'
@@ -2180,7 +2180,7 @@ msgstr "Корисник"
 
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.py:127
 msgid "User Not found"
-msgstr ""
+msgstr "Корисник није пронађен"
 
 #. Label of the user_resolution_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2201,7 +2201,7 @@ msgstr "Важи од"
 #. Label of the via_customer_portal (Check) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Via Customer Portal"
-msgstr "Путем портала за кориснике"
+msgstr "Путем портала за клијенте"
 
 #. Label of the views (Int) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -2231,14 +2231,14 @@ msgstr "Недељни одмор"
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "When enabled, the ticket status will automatically change to \"Replied\" whenever the agent responds to a ticket.\n"
-msgstr ""
+msgstr "Када је омогућено, статус тикета ће се аутоматски променити у \"Одговорено\" сваки пут када агент одговори на тикет.\n"
 
 #. Label of the word (Data) field in DocType 'HD Stopword'
 #. Label of the word (Data) field in DocType 'HD Synonyms'
 #: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
 msgid "Word"
-msgstr ""
+msgstr "Реч"
 
 #. Label of the workday (Select) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
@@ -2268,7 +2268,7 @@ msgstr "Годишње"
 
 #: helpdesk/api/dashboard.py:18
 msgid "You are not allowed to view this dashboard data."
-msgstr ""
+msgstr "Није Вам дозвољено да видите податке са ове контролне табле."
 
 #: helpdesk/utils.py:158
 msgid "You are not permitted to access this resource."
@@ -2276,23 +2276,23 @@ msgstr "Немате дозволу да приступите овом ресу�
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:473
 msgid "You are not permitted to add a comment"
-msgstr ""
+msgstr "Није Вам дозвољено да додате коментар"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:135
 msgid "You cannot disable the default SLA."
-msgstr ""
+msgstr "Не можете онемогућити подразумевани споразум о нивоу услуге."
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:39
 msgid "You cannot set more than one Default Priority."
-msgstr ""
+msgstr "Не можете поставити више од једног подразумеваног приоритета."
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:29
 msgid "You have already provided feedback for this ticket."
-msgstr ""
+msgstr "Већ сте дали повратну информацију за овај тикет."
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:129
 msgid "You must set one SLA as Default. Please check the Default SLA option."
-msgstr ""
+msgstr "Морате поставити један споразум о нивоу услуге као подразумевани. Молимо Вас да означите опцију подразумевани споразум о нивоу услуге."
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2312,5 +2312,5 @@ msgstr "листа"
 #. Label of the synonym (Data) field in DocType 'HD Synonym'
 #: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json
 msgid "synonym"
-msgstr ""
+msgstr "синоним"
 
