@@ -17,6 +17,8 @@ from frappe.utils import (
 
 from helpdesk.utils import get_context, publish_event
 
+from .utils import convert_to_seconds
+
 
 class HDServiceLevelAgreement(Document):
     doctype_ticket = "HD Ticket"
@@ -195,7 +197,7 @@ class HDServiceLevelAgreement(Document):
         end_at = doc.resolution_date
         time_took = self.calc_elapsed_time(start_at, end_at)
         time_hold = doc.total_hold_time or 0
-        time_took_effective = time_took - time_hold
+        time_took_effective = max(time_took - time_hold, 0)
         doc.resolution_time = time_took_effective
 
     def set_hold_time(self, doc: Document):
@@ -217,9 +219,14 @@ class HDServiceLevelAgreement(Document):
         if is_paused or not paused_since:
             return
         doc.on_hold_since = None
-        curr_val = time_diff_in_seconds(now_datetime(), paused_since)
-        curr_val = max(curr_val, 0)  # Ensure non-negative hold time
+        # curr_val = time_diff_in_seconds(now_datetime(), paused_since)
+        curr_val = self.get_hold_time_diff(paused_since)
         doc.total_hold_time = (doc.total_hold_time or 0) + curr_val
+
+    def get_hold_time_diff(self, paused_since):
+        if not paused_since:
+            return 0
+        return self.calc_elapsed_time(paused_since, now_datetime())
 
     def handle_targets(self, doc: Document):
         self.set_response_by(doc)
@@ -384,38 +391,66 @@ class HDServiceLevelAgreement(Document):
         )
         return start_time <= date_time < end_time
 
-    def calc_elapsed_time(self, start_time, end_time) -> float:
+    def calc_elapsed_time(self, start_time, end_time):
         """
-        Get took from start to end, excluding non-working hours
+        Calculate working time between start_time and end_time, excluding holidays and non-working hours
 
-        :param start_at: Date at which calculation starts
-        :param end_at: Date at which calculation ends
-        :return: Number of seconds
+        :param start_time: Start datetime
+        :param end_time: End datetime
+        :return: Number of working seconds
         """
         start_time = get_datetime(start_time)
         end_time = get_datetime(end_time)
-        holiday_list = []
-        working_day_list = self.get_working_days()
-        working_hours = self.get_working_hours()
+
+        if start_time >= end_time:
+            return 0
+
+        holidays = set(self.get_holidays())
+        workdays = self.get_workdays()
 
         total_seconds = 0
-        current_time = start_time
+        current_date = start_time.date()
+        end_date = end_time.date()
 
-        while current_time < end_time:
-            in_holiday_list = current_time.date() in holiday_list
-            not_in_working_day_list = (
-                get_weekdays()[current_time.weekday()] not in working_day_list
-            )
-            if (
-                in_holiday_list
-                or not_in_working_day_list
-                or not self.is_working_time(current_time, working_hours)
-            ):
-                current_time += timedelta(minutes=1)
+        while current_date <= end_date:
+            # Skip holidays
+            if current_date in holidays:
+                current_date = add_to_date(current_date, days=1).date()
                 continue
-            total_seconds += 1
-            current_time += timedelta(minutes=1)
-        return total_seconds * 60
+
+            day_name = get_weekdays()[current_date.weekday()]
+
+            # Skip non-working days
+            if day_name not in workdays:
+                current_date = add_to_date(current_date, days=1).date()
+                continue
+
+            workday = workdays[day_name]
+            work_start_seconds = workday.start_time.total_seconds()
+            work_end_seconds = workday.end_time.total_seconds()
+
+            # Calculate day boundaries in seconds
+            if current_date == start_time.date():
+                # First day - convert start time to seconds since midnight
+                start_time_seconds = convert_to_seconds(start_time)
+                day_start_seconds = max(start_time_seconds, work_start_seconds)
+            else:
+                day_start_seconds = work_start_seconds
+
+            if current_date == end_time.date():
+                # Last day - convert end time to seconds since midnight
+                end_time_seconds = convert_to_seconds(end_time)
+                day_end_seconds = min(end_time_seconds, work_end_seconds)
+            else:
+                day_end_seconds = work_end_seconds
+
+            # adding to final total seconds by end - start
+            if day_start_seconds < day_end_seconds:
+                total_seconds += day_end_seconds - day_start_seconds
+
+            current_date = add_to_date(current_date, days=1).date()
+
+        return total_seconds
 
     def get_holidays(self):
         res = []
