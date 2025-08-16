@@ -28,6 +28,8 @@ class HDSettings(Document):
             )
 
     def validate_send_feedback_when_ticket_closed(self):
+        if not self.enable_email_ticket_feedback:
+            return
         status_category = frappe.db.get_value(
             "HD Ticket Status", self.send_email_feedback_on_status, "category"
         )

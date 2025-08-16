@@ -853,7 +853,7 @@ class HDTicket(Document):
                 self.first_responded_on or frappe.utils.now_datetime()
             )
 
-            # TODO: remove this features once we add automation feature
+            # TODO: remove this feature once we add automation feature
             if frappe.db.get_single_value("HD Settings", "auto_update_status"):
                 self.status = frappe.db.get_single_value(
                     "HD Settings", "update_status_to"
