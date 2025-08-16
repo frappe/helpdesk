@@ -1,14 +1,14 @@
 <template>
   <div
-    class="grid p-2 py-3 items-center"
+    class="grid py-3.5 px-4 items-center"
     style="grid-template-columns: 3fr 1fr"
   >
-    <div class="text-ink-gray-8">{{ day.day }}</div>
+    <div class="text-ink-gray-7 font-medium">{{ day.day }}</div>
     <div class="flex justify-start">
       <Switch v-model="day.active" @update:model-value="toggleDay" />
     </div>
   </div>
-  <hr class="my-0.5" v-if="!props.isLast" />
+  <hr v-if="!props.isLast" />
 </template>
 
 <script setup lang="ts">
