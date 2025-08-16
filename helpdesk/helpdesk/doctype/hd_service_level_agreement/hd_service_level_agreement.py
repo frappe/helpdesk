@@ -220,7 +220,7 @@ class HDServiceLevelAgreement(Document):
             return
         doc.on_hold_since = None
         # curr_val = time_diff_in_seconds(now_datetime(), paused_since)
-        curr_val = self.get_hold_time_diff(paused_since)
+        curr_val = max(self.get_hold_time_diff(paused_since), 0)
         doc.total_hold_time = (doc.total_hold_time or 0) + curr_val
 
     def get_hold_time_diff(self, paused_since):
@@ -415,14 +415,14 @@ class HDServiceLevelAgreement(Document):
         while current_date <= end_date:
             # Skip holidays
             if current_date in holidays:
-                current_date = add_to_date(current_date, days=1).date()
+                current_date = add_to_date(current_date, days=1)
                 continue
 
             day_name = get_weekdays()[current_date.weekday()]
 
             # Skip non-working days
             if day_name not in workdays:
-                current_date = add_to_date(current_date, days=1).date()
+                current_date = add_to_date(current_date, days=1)
                 continue
 
             workday = workdays[day_name]
@@ -448,7 +448,7 @@ class HDServiceLevelAgreement(Document):
             if day_start_seconds < day_end_seconds:
                 total_seconds += day_end_seconds - day_start_seconds
 
-            current_date = add_to_date(current_date, days=1).date()
+            current_date = add_to_date(current_date, days=1)
 
         return total_seconds
 
