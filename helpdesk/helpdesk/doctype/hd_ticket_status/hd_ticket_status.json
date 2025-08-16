@@ -9,11 +9,12 @@
   "label_agent",
   "label_customer",
   "category",
-  "color",
+  "fallback_status",
   "column_break_neks",
   "enabled",
   "different_view",
-  "order"
+  "order",
+  "color"
  ],
  "fields": [
   {
@@ -66,12 +67,19 @@
    "fieldname": "enabled",
    "fieldtype": "Check",
    "label": "Enabled"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.category===\"Open\"",
+   "fieldname": "fallback_status",
+   "fieldtype": "Check",
+   "label": "Fallback status"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-13 17:54:18.752988",
+ "modified": "2025-08-16 19:02:16.271715",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Status",

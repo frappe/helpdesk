@@ -19,11 +19,23 @@ from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
 class HDSettings(Document):
     def validate(self):
         self.validate_auto_close_days()
+        self.validate_send_feedback_when_ticket_closed()
 
     def validate_auto_close_days(self):
         if self.auto_close_tickets and self.auto_close_after_days <= 0:
             frappe.throw(
                 _("Day count for auto closing tickets cannot be negative or zero")
+            )
+
+    def validate_send_feedback_when_ticket_closed(self):
+        status_category = frappe.db.get_value(
+            "HD Ticket Status", self.send_email_feedback_on_status, "category"
+        )
+        if status_category != "Resolved":
+            frappe.throw(
+                _(
+                    "The status for sending feedback must be of <u>Resolved</u> category."
+                )
             )
 
     def get_base_support_rotation(self):
