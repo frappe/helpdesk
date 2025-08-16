@@ -312,6 +312,7 @@ def add_default_status():
             "enabled": 1,
             "category": "Open",
             "label_customer": "Open",
+            "fallback_status": 1,
             "order": 1,
         },
         {

@@ -10,6 +10,7 @@ class HDTicketStatus(Document):
     def validate(self):
         self.validate_closed_status_change()
         self.validate_required_categories()
+        self.validate_fallback_status()
 
     def validate_closed_status_change(self):
         if self.is_new():
@@ -44,6 +45,33 @@ class HDTicketStatus(Document):
                 frappe.throw(
                     _(
                         f"At least one ticket status with category '{old_category}' must exist in the system."
+                    )
+                )
+
+    def validate_fallback_status(self):
+        if not self.has_value_changed("fallback_status"):
+            return
+        if self.category != "Open":
+            return
+
+        if self.fallback_status:
+            existing_fallback = frappe.db.exists(
+                "HD Ticket Status",
+                {"category": "Open", "fallback_status": 1, "name": ["!=", self.name]},
+            )
+            if existing_fallback:
+                frappe.db.set_value(
+                    "HD Ticket Status", existing_fallback, "fallback_status", 0
+                )
+        else:
+            count = frappe.db.count(
+                "HD Ticket Status",
+                {"category": "Open", "fallback_status": 1, "name": ["!=", self.name]},
+            )
+            if count == 0:
+                frappe.throw(
+                    _(
+                        "At least one fallback status must be set for the 'Open' category."
                     )
                 )
 

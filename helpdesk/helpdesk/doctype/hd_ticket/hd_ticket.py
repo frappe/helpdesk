@@ -41,6 +41,14 @@ from ..hd_service_level_agreement.utils import get_sla
 
 
 class HDTicket(Document):
+    @property
+    def open_status_fallback(self):
+        return frappe.db.get_value(
+            "HD Ticket Status",
+            {"category": "Open", "fallback_status": 1},
+            "name",
+        )
+
     def publish_update(self):
         publish_event("helpdesk:ticket-update", self.name)
         capture_event("ticket_updated")
@@ -48,8 +56,9 @@ class HDTicket(Document):
     def autoname(self):
         return self.name
 
-    def get_feed(self):
-        return "{0}: {1}".format(_(self.status), self.subject)
+    # TODO: remove this method
+    # def get_feed(self):
+    #     return "{0}: {1}".format(_(self.status), self.subject)
 
     def before_validate(self):
         self.check_update_perms()
@@ -58,8 +67,8 @@ class HDTicket(Document):
         self.set_priority()
         self.set_first_responded_on()
         self.set_feedback_values()
-        # self.set_status_category()
-        self.apply_escalation_rule()
+        self.set_status_category()
+        # self.apply_escalation_rule()
         self.set_sla()
 
         self.set_contact()
@@ -151,10 +160,10 @@ class HDTicket(Document):
 
     def on_update(self):
         # flake8: noqa
-        if self.status == "Open":
+        if self.status_category == "Open":
             if (
                 self.get_doc_before_save()
-                and self.get_doc_before_save().status != "Open"
+                and self.get_doc_before_save().status_category != "Open"
             ):
 
                 agents = self.get_assigned_agents()
@@ -226,18 +235,22 @@ class HDTicket(Document):
         )
 
     def set_first_responded_on(self):
-        old_status = (
-            self.get_doc_before_save().status if self.get_doc_before_save() else None
-        )
-        is_closed_or_resolved = old_status == "Open" and self.status in [
-            "Resolved",
-            "Closed",
-        ]
+        if self.is_new():
+            return
+        if self.first_responded_on:
+            return
 
-        if self.status == "Replied" or is_closed_or_resolved:
-            self.first_responded_on = (
-                self.first_responded_on or frappe.utils.now_datetime()
-            )
+        old_status_category = (
+            self.get_doc_before_save().status_category
+            if self.get_doc_before_save()
+            else None
+        )
+        is_closed_or_resolved = (
+            old_status_category == "Open" and self.status_category == "Resolved"
+        )
+
+        if self.status_category == "Paused" or is_closed_or_resolved:
+            self.first_responded_on = frappe.utils.now_datetime()
 
     def set_feedback_values(self):
         if not self.feedback:
@@ -250,14 +263,26 @@ class HDTicket(Document):
         if settings.is_ticket_type_mandatory and not self.ticket_type:
             frappe.throw(_("Ticket type is mandatory"))
 
+    @property
+    def has_agent_replied(self):
+        return frappe.db.exists(
+            "Communication",
+            {
+                "reference_doctype": "HD Ticket",
+                "reference_name": self.name,
+                "sent_or_received": "Sent",
+            },
+        )
+
     def validate_feedback(self):
         if (
             self.feedback
-            or self.status != "Resolved"
-            or not self.has_value_changed("status")
+            or self.status_category != "Resolved"
             or is_agent()
+            or not self.has_agent_replied
         ):
             return
+
         frappe.throw(
             _("Ticket must be resolved with a feedback"), frappe.ValidationError
         )
@@ -308,7 +333,10 @@ class HDTicket(Document):
             return
         if not self.agent_group or (hasattr(self, "_assign") and not self._assign):
             return
-        if self.has_value_changed("agent_group") and self.status == "Open":
+        if (
+            self.has_value_changed("agent_group")
+            and self.status_category == self.open_status_fallback
+        ):
             current_assigned_agent = self.get_assigned_agent()
             if not current_assigned_agent:
                 return
@@ -605,8 +633,8 @@ class HDTicket(Document):
             # send email to assigned agents
             self.send_reply_email_to_agent(message)
 
-        if self.status == "Replied":
-            self.status = "Open"
+        if self.status_category == "Paused":
+            self.status = self.open_status_fallback
             self.save(ignore_permissions=True)
 
         c = frappe.new_doc("Communication")
@@ -776,7 +804,7 @@ class HDTicket(Document):
                 pass
 
     def apply_escalation_rule(self):
-        if not self.status == "Open" or self.is_new():
+        if not self.status_category == "Open" or self.is_new():
             return
         escalation_rule = self.get_escalation_rule()
         if not escalation_rule:
@@ -817,7 +845,7 @@ class HDTicket(Document):
         # If communication is incoming, then it is a reply from customer, and ticket must
         # be reopened.
         if c.sent_or_received == "Received":
-            self.status = "Open"
+            self.status = self.open_status_fallback
         # If communication is outgoing, it must be a reply from agent
         if c.sent_or_received == "Sent":
             # Set first response date if not set already
@@ -825,8 +853,11 @@ class HDTicket(Document):
                 self.first_responded_on or frappe.utils.now_datetime()
             )
 
+            # TODO: remove this features once we add automation feature
             if frappe.db.get_single_value("HD Settings", "auto_update_status"):
-                self.status = "Replied"
+                self.status = frappe.db.get_single_value(
+                    "HD Settings", "update_status_to"
+                )
 
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
@@ -1188,7 +1219,7 @@ def close_tickets_after_n_days():
                     WHERE reference_doctype = 'HD Ticket'
                     GROUP BY reference_name
                 ) latest_comm ON t.name = latest_comm.reference_name
-                WHERE t.status = 'Replied'
+                WHERE t.status_category = 'Paused'
                 AND latest_comm.last_communication_date < DATE_SUB(NOW(), INTERVAL %(days_threshold)s DAY)
             """,
             {"days_threshold": days_threshold},

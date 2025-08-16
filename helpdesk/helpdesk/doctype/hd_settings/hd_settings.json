@@ -30,6 +30,7 @@
   "ticket_restrictions_section",
   "allow_anyone_to_create_tickets",
   "auto_update_status",
+  "update_status_to",
   "column_break_iarl",
   "auto_close_tickets",
   "auto_close_after_days",
@@ -307,10 +308,11 @@
    "default": "Closed",
    "depends_on": "eval:doc.enable_email_ticket_feedback",
    "fieldname": "send_email_feedback_on_status",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "label": "Send feedback when",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Resolved\"]]",
    "mandatory_depends_on": "eval:doc.enable_email_ticket_feedback",
-   "options": "Resolved\nClosed"
+   "options": "HD Ticket Status"
   },
   {
    "default": "1",
@@ -325,12 +327,22 @@
    "fieldname": "assign_within_team",
    "fieldtype": "Check",
    "label": "Restrict agent assignment to selected Team"
+  },
+  {
+   "default": "Replied",
+   "depends_on": "eval:doc.auto_update_status",
+   "fieldname": "update_status_to",
+   "fieldtype": "Link",
+   "label": "Update status to",
+   "link_filters": "[]",
+   "mandatory_depends_on": "eval:doc.auto_update_status",
+   "options": "HD Ticket Status"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-07-30 21:45:58.873574",
+ "modified": "2025-08-16 22:20:09.198731",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
