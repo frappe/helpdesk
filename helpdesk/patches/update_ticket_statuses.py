@@ -15,3 +15,6 @@ def execute():
         "HD Pause Service Level Agreement On Status",
         {"status": ["in", ["Resolved", "Closed", "Open"]]},
     )
+
+    if frappe.db.get_single_value("HD Settings", "auto_update_status"):
+        frappe.db.set_single_value("HD Settings", "update_status_to", "Replied")

@@ -305,7 +305,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "Closed",
    "depends_on": "eval:doc.enable_email_ticket_feedback",
    "fieldname": "send_email_feedback_on_status",
    "fieldtype": "Link",
@@ -315,8 +314,8 @@
    "options": "HD Ticket Status"
   },
   {
-   "default": "1",
-   "description": "If enabled, feedback email will be sent to the customer when you mark a ticket as Resolved/Closed.\n",
+   "default": "0",
+   "description": "If enabled, feedback email will be sent to the customer when you mark a ticket as the status selected below.\n",
    "fieldname": "enable_email_ticket_feedback",
    "fieldtype": "Check",
    "label": "Enable feedback for Email Tickets"
@@ -329,7 +328,6 @@
    "label": "Restrict agent assignment to selected Team"
   },
   {
-   "default": "Replied",
    "depends_on": "eval:doc.auto_update_status",
    "fieldname": "update_status_to",
    "fieldtype": "Link",
@@ -342,7 +340,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-16 23:08:33.377124",
+ "modified": "2025-08-16 23:58:10.295427",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
