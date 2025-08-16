@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-08-13 06:48+0000\n"
-"PO-Revision-Date: 2025-08-14 11:45\n"
+"PO-Revision-Date: 2025-08-16 11:58\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -454,7 +454,7 @@ msgstr "Datum"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:26
 msgid "Day count for auto closing tickets cannot be negative or zero"
-msgstr "Antal dagar för automatisk ärende stängning kan inte vara negativt eller noll"
+msgstr "Daglig antal för automatisk ärende stängning kan inte vara negativt eller noll"
 
 #. Label of the default_priority (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -797,7 +797,7 @@ msgstr "Artikel Återkoppling"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
 msgid "HD Canned Response"
-msgstr "Avbruten Svar"
+msgstr "Standard Svar"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -1181,7 +1181,7 @@ msgstr "Logotyp"
 #. Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 msgid "Lower the Integer value, higher is the priority of the issue"
-msgstr "Lägre heltalsvärde, ger högre prioritet för frågan"
+msgstr "Lägre heltalsvärde, ger högre prioritet för ärende"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
