@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-1">
       <span class="text-lg font-semibold text-ink-gray-7">{{
         __("Assignee Rules")
       }}</span>
@@ -12,7 +12,7 @@
         }}
       </span>
     </div>
-    <div class="mt-10 flex items-center justify-between gap-2">
+    <div class="mt-9 flex items-center justify-between gap-2">
       <div>
         <div class="text-base font-medium text-ink-gray-7">
           {{ __("Ticket Routing") }}
@@ -69,7 +69,7 @@
         </Popover>
       </div>
     </div>
-    <div class="mt-10 flex items-center justify-between gap-2">
+    <div class="mt-5.5 flex items-center justify-between gap-2">
       <div>
         <div class="text-base font-medium text-ink-gray-7">
           {{ __("Assignees") }}

@@ -1,6 +1,9 @@
 <template>
-  <div class="rounded-md border p-1 border-gray-300 text-sm">
-    <div class="grid p-2 items-center" style="grid-template-columns: 3fr 1fr">
+  <div class="rounded-md border px-2 border-gray-300 text-sm">
+    <div
+      class="grid p-2 px-4 items-center"
+      style="grid-template-columns: 3fr 1fr"
+    >
       <div
         v-for="column in columns"
         :key="column.key"
@@ -9,7 +12,7 @@
         {{ column.label }}
       </div>
     </div>
-    <hr class="my-0.5" />
+    <hr />
     <AssignmentScheduleItem
       v-for="(day, index) in days"
       :key="day.day"

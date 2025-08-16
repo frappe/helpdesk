@@ -29,7 +29,7 @@
           v-if="isDirty"
         />
       </div>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
         <div
           class="flex items-center justify-between gap-2"
           @click="assignmentRuleData.disabled = !assignmentRuleData.disabled"
@@ -125,9 +125,9 @@
         />
       </div>
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <div>
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-1">
         <span class="text-lg font-semibold text-ink-gray-7">{{
           __("Assignment condition")
         }}</span>
@@ -149,7 +149,7 @@
                 <div
                   class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap"
                 >
-                  {{ __("Old Conditions") }}
+                  {{ __("Old Condition") }}
                   <FeatherIcon name="info" class="size-4" />
                 </div>
               </template>
@@ -164,7 +164,7 @@
           </div>
         </div>
       </div>
-      <div class="mt-4">
+      <div class="mt-5">
         <div
           class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
           v-if="!useNewUI && assignmentRuleData.assignCondition"
@@ -195,9 +195,9 @@
         />
       </div>
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <div>
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-1">
         <span class="text-lg font-semibold text-ink-gray-7">{{
           __("Unassignment condition")
         }}</span>
@@ -227,7 +227,7 @@
                 <div
                   class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap"
                 >
-                  {{ __("Old Conditions") }}
+                  {{ __("Old Condition") }}
                   <FeatherIcon name="info" class="size-4" />
                 </div>
               </template>
@@ -242,7 +242,7 @@
           </div>
         </div>
       </div>
-      <div class="mt-4">
+      <div class="mt-5">
         <div
           class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
           v-if="!useNewUI && assignmentRuleData.unassignCondition"
@@ -269,9 +269,9 @@
         />
       </div>
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <div>
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-1">
         <span class="text-lg font-semibold text-ink-gray-7">{{
           __("Assignment Schedule")
         }}</span>
@@ -285,7 +285,7 @@
         <AssignmentSchedule />
       </div>
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <AssigneeRules />
   </div>
   <ConfirmDialog
@@ -436,7 +436,7 @@ const saveAssignmentRule = () => {
         show: true,
         title: "Confirm overwrite",
         message:
-          "Your old conditions will be overwritten. Are you sure you want to save?",
+          "Your old condition will be overwritten. Are you sure you want to save?",
         onConfirm: () => {
           updateAssignmentRule();
           showConfirmDialog.value.show = false;
