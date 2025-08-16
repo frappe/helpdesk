@@ -58,6 +58,7 @@ class HDTicket(Document):
         self.set_priority()
         self.set_first_responded_on()
         self.set_feedback_values()
+        # self.set_status_category()
         self.apply_escalation_rule()
         self.set_sla()
 
@@ -800,6 +801,13 @@ class HDTicket(Document):
         """
         if sla := frappe.get_last_doc("HD Service Level Agreement", {"name": self.sla}):
             sla.apply(self)
+
+    def set_status_category(self):
+        self.status_category = self.status_category or frappe.get_value(
+            "HD Ticket Status",
+            self.status,
+            "category",
+        )
 
     # `on_communication_update` is a special method exposed from `Communication` doctype.
     # It is called when a communication is updated. Beware of changes as this effectively

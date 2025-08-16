@@ -13,6 +13,7 @@
   "raised_by",
   "status",
   "priority",
+  "status_category",
   "cb00",
   "ticket_type",
   "agent_group",
@@ -96,13 +97,13 @@
   {
    "default": "Open",
    "fieldname": "status",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Status",
    "no_copy": 1,
    "oldfieldname": "status",
    "oldfieldtype": "Select",
-   "options": "Open\nReplied\nResolved\nClosed",
+   "options": "HD Ticket Status",
    "search_index": 1
   },
   {
@@ -434,6 +435,13 @@
    "label": "Key",
    "read_only": 1,
    "set_only_once": 1
+  },
+  {
+   "fetch_from": "status.category",
+   "fieldname": "status_category",
+   "fieldtype": "Data",
+   "label": "Status Category",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
