@@ -259,7 +259,7 @@
   },
   {
    "default": "0",
-   "description": "When enabled, the ticket status will automatically change to \"Replied\" whenever the agent responds to a ticket.\n",
+   "description": "When enabled, the ticket status will automatically change to the status selected below whenever the agent responds to a ticket.\n",
    "fieldname": "auto_update_status",
    "fieldtype": "Check",
    "label": "Auto update status"
@@ -279,7 +279,7 @@
    "default": "0",
    "fieldname": "auto_close_tickets",
    "fieldtype": "Check",
-   "label": "Automatically Close Replied Tickets"
+   "label": "Automatically Close Paused Tickets"
   },
   {
    "default": "14",
@@ -342,7 +342,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-16 22:20:09.198731",
+ "modified": "2025-08-16 23:08:33.377124",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
