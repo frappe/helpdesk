@@ -29,7 +29,7 @@
           v-if="isDirty"
         />
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-4">
         <div
           class="flex items-center justify-between gap-2"
           @click="assignmentRuleData.disabled = !assignmentRuleData.disabled"
