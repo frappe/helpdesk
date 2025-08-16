@@ -224,6 +224,7 @@ class HDServiceLevelAgreement(Document):
         doc.total_hold_time = (doc.total_hold_time or 0) + curr_val
 
     def get_hold_time_diff(self, paused_since):
+        # return time in seconds
         if not paused_since:
             return 0
         return self.calc_elapsed_time(paused_since, now_datetime())
