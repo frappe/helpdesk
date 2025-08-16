@@ -95,7 +95,6 @@
    "options": "Email"
   },
   {
-   "default": "Open",
    "fieldname": "status",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -170,7 +169,7 @@
    "options": "HD Service Level Agreement"
   },
   {
-   "depends_on": "eval: doc.status != 'Replied' && doc.sla;",
+   "depends_on": "eval: doc.status_category != 'Paused' && doc.sla;",
    "fieldname": "response_by",
    "fieldtype": "Datetime",
    "label": "Response By",
@@ -192,7 +191,7 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval: doc.status != 'Replied' && doc.sla;",
+   "depends_on": "eval: doc.status_category != 'Paused' && doc.sla;",
    "fieldname": "resolution_by",
    "fieldtype": "Datetime",
    "label": "Resolution By",
