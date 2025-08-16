@@ -53,7 +53,7 @@
 import { Button, createResource, toast } from "frappe-ui";
 import { inject, ref } from "vue";
 import { holidayListActiveScreen } from "@/stores/holidayList";
-import { TemplateOption } from "@/utils";
+import { ConfirmDelete } from "@/utils";
 
 const props = defineProps({
   data: {
@@ -80,30 +80,10 @@ const dropdownOptions = [
     },
     icon: "copy",
   },
-  {
-    label: "Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "gray",
-        onClick: (event) => deleteHolidayList(event),
-      }),
-    condition: () => !isConfirmingDelete.value,
-  },
-  {
-    label: "Confirm Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Confirm Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "danger",
-        onClick: (event) => deleteHolidayList(event),
-      }),
-    condition: () => isConfirmingDelete.value,
-  },
+  ...ConfirmDelete({
+    onConfirmDelete: () => deleteHolidayList(),
+    isConfirmingDelete,
+  }),
 ];
 
 const duplicate = () => {
@@ -131,8 +111,7 @@ const duplicate = () => {
   });
 };
 
-const deleteHolidayList = (event) => {
-  event.preventDefault();
+const deleteHolidayList = () => {
   if (!isConfirmingDelete.value) {
     isConfirmingDelete.value = true;
     return;

@@ -74,7 +74,7 @@ import {
 } from "frappe-ui";
 import { ref, inject } from "vue";
 import { slaActiveScreen } from "@/stores/sla";
-import { TemplateOption } from "@/utils";
+import { ConfirmDelete } from "@/utils";
 
 const slaPolicyList = inject<any>("slaPolicyList");
 
@@ -103,30 +103,10 @@ const dropdownOptions = [
     },
     icon: "copy",
   },
-  {
-    label: "Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "gray",
-        onClick: (event) => deleteSla(event),
-      }),
-    condition: () => !isConfirmingDelete.value,
-  },
-  {
-    label: "Confirm Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Confirm Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "danger",
-        onClick: (event) => deleteSla(event),
-      }),
-    condition: () => isConfirmingDelete.value,
-  },
+  ...ConfirmDelete({
+    onConfirmDelete: () => deleteSla(),
+    isConfirmingDelete,
+  }),
 ];
 
 const duplicate = () => {
@@ -155,8 +135,7 @@ const duplicate = () => {
   });
 };
 
-const deleteSla = (event) => {
-  event.preventDefault();
+const deleteSla = () => {
   if (!isConfirmingDelete.value) {
     isConfirmingDelete.value = true;
     return;

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid gap-2 px-2 py-1 items-center"
+    class="grid gap-2 py-3.5 px-4 items-center"
     :style="{
       gridTemplateColumns: getGridTemplateColumnsForTable(props.columns),
     }"
@@ -8,7 +8,7 @@
     <div
       v-for="column in props.columns"
       :key="column.key"
-      class="w-full py-2 overflow-hidden whitespace-nowrap text-ellipsis"
+      class="w-full overflow-hidden whitespace-nowrap text-ellipsis"
     >
       <div v-if="column.key === 'start_time' || column.key === 'end_time'">
         {{ formatTime(props.row[column.key]) }}
@@ -31,7 +31,7 @@
       </Dropdown>
     </div>
   </div>
-  <hr class="my-0.5" v-if="!props.isLast" />
+  <hr v-if="!props.isLast" />
   <WorkDayModal
     v-model="dialog"
     :workDaysList="slaData.support_and_resolution"
@@ -42,7 +42,7 @@
 import { ref } from "vue";
 import { Button, Select } from "frappe-ui";
 import WorkDayModal from "./Modals/WorkDayModal.vue";
-import { getGridTemplateColumnsForTable, TemplateOption } from "@/utils";
+import { ConfirmDelete, getGridTemplateColumnsForTable } from "@/utils";
 import { slaData } from "@/stores/sla";
 
 interface Column {
@@ -88,34 +88,13 @@ const dropdownOptions = [
     onClick: () => editWorkDay(),
     icon: "edit",
   },
-  {
-    label: "Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "gray",
-        onClick: (event) => deleteWorkDay(event),
-      }),
-    condition: () => !isConfirmingDelete.value,
-  },
-  {
-    label: "Confirm Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Confirm Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "danger",
-        onClick: (event) => deleteWorkDay(event),
-      }),
-    condition: () => isConfirmingDelete.value,
-  },
+  ...ConfirmDelete({
+    onConfirmDelete: () => deleteWorkDay(),
+    isConfirmingDelete,
+  }),
 ];
 
-const deleteWorkDay = (event) => {
-  event.preventDefault();
+const deleteWorkDay = () => {
   if (!isConfirmingDelete.value) {
     isConfirmingDelete.value = true;
     return;

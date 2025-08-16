@@ -173,14 +173,14 @@ export function validateSlaData(
               );
             }
             if (Boolean(slaData.value.apply_sla_for_resolution)) {
-              if (priority.resolution_time == 0) {
-                console.log("Resolution time is required");
+              if (!priority.resolution_time || priority.resolution_time == 0) {
                 prioritiesError.push(
                   `Priority ${priorityNum}: Resolution time is required`
                 );
               }
             }
             if (
+              priority.resolution_time &&
               priority.response_time > priority.resolution_time &&
               Boolean(slaData.value.apply_sla_for_resolution)
             ) {
