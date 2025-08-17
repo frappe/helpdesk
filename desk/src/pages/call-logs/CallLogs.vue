@@ -43,10 +43,18 @@
 <script setup lang="ts">
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
-import { createResource, usePageMeta } from "frappe-ui";
-import { computed, ref } from "vue";
+import {
+  Avatar,
+  Badge,
+  Button,
+  createResource,
+  FeatherIcon,
+  usePageMeta,
+} from "frappe-ui";
+import { computed, h, ref } from "vue";
 import CallLogDetailModal from "./CallLogDetailModal.vue";
 import CallLogModal from "./CallLogModal.vue";
+import { statusColorMap } from "./utils";
 
 const showCallLogModal = ref(false);
 const showCallLogDetailModal = ref(false);
@@ -61,6 +69,64 @@ const options = computed(() => {
     showSelectBanner: true,
     emptyState: {
       title: "No Call Logs Found",
+    },
+    columnConfig: {
+      caller: {
+        prefix: ({ row }) => {
+          return h(Avatar, {
+            shape: "circle",
+            image: row.caller || "Unknown",
+            label: row.caller || "Unknown",
+            size: "sm",
+          });
+        },
+        custom: ({ row }) => {
+          return h("span", row.caller || "Unknown");
+        },
+      },
+      receiver: {
+        prefix: ({ row }) => {
+          return h(Avatar, {
+            shape: "circle",
+            image: row.receiver || "Unknown",
+            label: row.receiver || "Unknown",
+            size: "sm",
+          });
+        },
+        custom: ({ row }) => {
+          return h("span", row.receiver || "Unknown");
+        },
+      },
+      type: {
+        prefix: ({ row }) => {
+          let icon =
+            row.type === "Incoming" ? "phone-incoming" : "phone-outgoing";
+          return h(FeatherIcon, {
+            name: icon,
+            class: ["size-3 shrink-0"],
+          });
+        },
+      },
+      status: {
+        custom: ({ row }) => {
+          return h(Badge, {
+            label: row.status,
+            variant: "subtle",
+            theme: statusColorMap[row.status],
+          });
+        },
+      },
+      duration: {
+        prefix: () => {
+          return h(FeatherIcon, {
+            name: "clock",
+            class: ["size-3 shrink-0"],
+          });
+        },
+        custom: ({ row }) => {
+          return h("span", row.duration ? row.duration + "s" : "0s");
+        },
+      },
     },
   };
 });

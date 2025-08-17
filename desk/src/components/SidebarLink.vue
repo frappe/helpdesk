@@ -7,7 +7,6 @@
       'shadow-sm': isActive,
       [bgColor]: isActive,
       [hvColor]: !isActive,
-      hidden: hide,
     }"
     @click="handleNavigation"
   >
@@ -63,7 +62,6 @@ interface P {
   to?: string | object;
   bgColor?: string;
   hvColor?: string;
-  hide?: boolean;
 }
 
 const props = withDefaults(defineProps<P>(), {
@@ -72,7 +70,6 @@ const props = withDefaults(defineProps<P>(), {
   to: "",
   bgColor: "bg-white",
   hvColor: "hover:bg-gray-100",
-  hide: false,
 });
 const router = useRouter();
 const { isMobileView } = useScreenSize();

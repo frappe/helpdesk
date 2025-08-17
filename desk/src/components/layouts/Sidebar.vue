@@ -96,7 +96,6 @@
               :key="link.label"
               :is-expanded="isExpanded"
               :is-active="isActiveTab(link.to)"
-              :hide="link?.hide"
               class="my-0.5 emoji"
               :onClick="link.onClick"
             />
@@ -222,6 +221,7 @@ import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
+import { useTelephonyStore } from "@/stores/telephony";
 const { isMobileView } = useScreenSize();
 
 const route = useRoute();
@@ -231,6 +231,8 @@ const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const { $socket } = globalStore();
+const telephonyStore = useTelephonyStore();
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const showSettingsModal = ref(false);
 
@@ -243,9 +245,13 @@ declare global {
 const isFCSite = ref(window.is_fc_site);
 
 const allViews = computed(() => {
-  const items = isCustomerPortal.value
+  let items = isCustomerPortal.value
     ? customerPortalSidebarOptions
     : agentPortalSidebarOptions;
+
+  if (!isCallingEnabled.value) {
+    items = items.filter((item) => item.label !== "Call Logs");
+  }
 
   const options = [
     {
@@ -639,6 +645,7 @@ function setUpOnboarding() {
 
 onMounted(() => {
   setUpOnboarding();
+  telephonyStore.fetchCallIntegrationStatus();
 });
 
 onUnmounted(() => {

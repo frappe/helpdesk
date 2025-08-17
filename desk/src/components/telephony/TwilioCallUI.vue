@@ -182,7 +182,7 @@ const onCallEnded = inject<() => void>("onCallEnded");
 const onCallFailed = inject<() => void>("onCallFailed");
 
 let device: Device | null = null;
-let log = ref("Connecting...");
+let log = ref("");
 let _call = null;
 
 let showCallPopup = ref(false);

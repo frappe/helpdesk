@@ -9,7 +9,12 @@
             </h3>
           </div>
           <div class="flex items-center gap-1">
-            <Button variant="ghost" class="w-7" @click="openCallLogModal">
+            <Button
+              variant="ghost"
+              class="w-7"
+              @click="openCallLogModal"
+              v-if="isManager"
+            >
               <template #icon>
                 <EditIcon />
               </template>
@@ -90,39 +95,25 @@ import ContactsIcon from "@/components/icons/ContactsIcon.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 import { FeatherIcon, Avatar, Tooltip } from "frappe-ui";
-import { ref, computed, h, nextTick } from "vue";
+import { computed, h, nextTick } from "vue";
 import { formatDate } from "@vueuse/core";
 import dayjs from "dayjs";
 import { timeAgo } from "@/utils";
+import { statusColorMap, statusLabelMap } from "./utils";
+import { useAuthStore } from "@/stores/auth";
 
 const show = defineModel();
 const callLog = defineModel("callLog");
-
-const note = ref({
-  title: "",
-  content: "",
-});
-
-const task = ref({
-  title: "",
-  description: "",
-  assigned_to: "",
-  due_date: "",
-  status: "Backlog",
-  priority: "Low",
-});
+const { isManager } = useAuthStore();
 
 const detailFields = computed(() => {
   if (!callLog.value?.data) return [];
 
-  let data = JSON.parse(JSON.stringify(callLog.value?.data));
+  let data = JSON.parse(JSON.stringify(callLog.value.data));
 
   for (const key in data) {
     data[key] = getCallLogDetail(key, data);
   }
-
-  note.value = data._notes?.[0] ?? null;
-  task.value = data._tasks?.[0] ?? null;
 
   let details = [
     {
@@ -223,30 +214,6 @@ function getCallLogDetail(row, log, columns = []) {
 
   return log[row];
 }
-
-const statusLabelMap = {
-  Completed: "Completed",
-  Initiated: "Initiated",
-  Busy: "Declined",
-  Failed: "Failed",
-  Queued: "Queued",
-  Canceled: "Canceled",
-  Ringing: "Ringing",
-  "No Answer": "Missed Call",
-  "In Progress": "In Progress",
-};
-
-const statusColorMap = {
-  Completed: "green",
-  Busy: "orange",
-  Failed: "red",
-  Initiated: "gray",
-  Queued: "gray",
-  Canceled: "gray",
-  Ringing: "gray",
-  "No Answer": "red",
-  "In Progress": "blue",
-};
 </script>
 
 <style scoped>

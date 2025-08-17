@@ -43,10 +43,12 @@ import { FormControl, call, toast } from "frappe-ui";
 import { nextTick, ref, watch } from "vue";
 import TwilioCallUI from "./TwilioCallUI.vue";
 import ExotelCallUI from "./ExotelCallUI.vue";
-import { telephonyStore } from "@/stores/telephony";
+import { useTelephonyStore } from "@/stores/telephony";
+import { storeToRefs } from "pinia";
 
-const { defaultCallingMedium, exotelEnabled, setMakeCall, twilioEnabled } =
-  telephonyStore();
+const telephonyStore = useTelephonyStore();
+const { defaultCallingMedium, isExotelEnabled, isTwilioEnabled } =
+  storeToRefs(telephonyStore);
 
 const twilio = ref(null);
 const exotel = ref(null);
@@ -66,8 +68,8 @@ const props = defineProps({
 
 function makeCall(number) {
   if (
-    twilioEnabled.value &&
-    exotelEnabled.value &&
+    isTwilioEnabled.value &&
+    isExotelEnabled.value &&
     !defaultCallingMedium.value
   ) {
     mobileNumber.value = number;
@@ -75,7 +77,7 @@ function makeCall(number) {
     return;
   }
 
-  callMedium.value = twilioEnabled.value ? "Twilio" : "Exotel";
+  callMedium.value = isTwilioEnabled.value ? "Twilio" : "Exotel";
   if (defaultCallingMedium.value) {
     callMedium.value = defaultCallingMedium.value;
   }
@@ -86,7 +88,7 @@ function makeCall(number) {
 
 function makeCallUsing() {
   if (isDefaultMedium.value && callMedium.value) {
-    setDefaultCallingMedium();
+    setCallingMedium();
   }
 
   if (callMedium.value === "Twilio") {
@@ -99,19 +101,19 @@ function makeCallUsing() {
   show.value = false;
 }
 
-async function setDefaultCallingMedium() {
+async function setCallingMedium() {
   await call("telephony.api.set_default_calling_medium", {
     medium: callMedium.value,
   });
 
-  defaultCallingMedium.value = callMedium.value;
+  telephonyStore.setDefaultCallingMedium(callMedium.value);
   toast.success(
     `Default calling medium set successfully to ${callMedium.value}`
   );
 }
 
 watch(
-  [twilioEnabled, exotelEnabled],
+  [isTwilioEnabled.value, isExotelEnabled.value],
   ([twilioValue, exotelValue]) =>
     nextTick(() => {
       if (twilioValue) {
@@ -126,7 +128,7 @@ watch(
 
       if (twilioValue || exotelValue) {
         callMedium.value = "Twilio";
-        setMakeCall(makeCall);
+        telephonyStore.setMakeCall(makeCall);
       }
     }),
   { immediate: true }

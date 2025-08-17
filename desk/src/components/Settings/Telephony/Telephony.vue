@@ -39,7 +39,10 @@
         />
       </div>
     </div>
-    <div class="grid grid-cols-2 gap-2 mt-4">
+    <div
+      class="grid grid-cols-2 gap-2 mt-4"
+      v-if="twilio.doc.enabled || exotel.doc.enabled"
+    >
       <div
         class="flex flex-col gap-1.5"
         v-if="telephonyAgent.doc && twilio.doc.enabled"
@@ -206,8 +209,10 @@ import {
 import { ref } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
 import { useAuthStore } from "@/stores/auth";
+import { useTelephonyStore } from "@/stores/telephony";
 
 const auth = useAuthStore();
+const telephonyStore = useTelephonyStore();
 
 const twilioErrors = ref({
   account_sid: "",
@@ -280,7 +285,13 @@ async function save() {
   }
 
   await Promise.all(promises);
+  if (twilio.doc.enabled || exotel.doc.enabled) {
+    telephonyStore.setIsCallingEnabled(true);
+  } else {
+    telephonyStore.setIsCallingEnabled(false);
+  }
   toast.success("Telephony settings updated!");
+  twilio.reload();
 }
 
 createResource({

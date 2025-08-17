@@ -9,7 +9,7 @@
       </Tooltip>
       <div class="flex gap-1.5">
         <Button
-          v-if="callEnabled"
+          v-if="isCallingEnabled"
           class="h-7 w-7"
           icon="phone"
           @click="callContact"
@@ -48,10 +48,12 @@
 
 <script setup lang="ts">
 import { EmailIcon } from "@/components/icons/";
-import { telephonyStore } from "@/stores/telephony";
+import { useTelephonyStore } from "@/stores/telephony";
 import { Avatar, toast, Tooltip, Button } from "frappe-ui";
+import { storeToRefs } from "pinia";
 
-const { makeCall, callEnabled } = telephonyStore();
+const telephonyStore = useTelephonyStore();
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const props = defineProps({
   contact: {
@@ -65,7 +67,7 @@ const callContact = () => {
     toast.error("Phone number not found for this contact");
     return;
   }
-  makeCall(props.contact.mobile_no || props.contact.phone);
+  telephonyStore.makeCall(props.contact.mobile_no || props.contact.phone);
 };
 const emit = defineEmits(["email:open"]);
 
