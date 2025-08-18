@@ -542,7 +542,9 @@ class HDTicket(Document):
         communication.insert(ignore_permissions=True)
         capture_event("agent_replied")
 
-        if skip_email_workflow:
+        if skip_email_workflow or not frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        ):
             return
 
         if not sender_email:
@@ -562,9 +564,6 @@ class HDTicket(Document):
         message = self.parse_content(message)
 
         reply_to_email = sender_email.email_id
-        send_email = frappe.db.get_single_value(
-            "HD Settings", "enable_reply_email_via_agent"
-        )
         rendered_template: str | None = None
         if self.via_customer_portal:
             email_content = frappe.db.get_single_value(
@@ -590,9 +589,6 @@ class HDTicket(Document):
         if self.instantly_send_email():
             send_delayed = False
             send_now = True
-
-        if not send_email:
-            return
 
         try:
             frappe.sendmail(
@@ -625,7 +621,9 @@ class HDTicket(Document):
         self, message, attachments=[], new_ticket=False
     ):
 
-        if not new_ticket:
+        if not new_ticket and frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_to_agent"
+        ):
             # send email to assigned agents
             self.send_reply_email_to_agent()
 
@@ -693,9 +691,6 @@ class HDTicket(Document):
 
         recipients = [a.get("name") for a in self.get_assigned_agents()]
 
-        enable_reply_email_to_agent = frappe.db.get_single_value(
-            "HD Settings", "enable_reply_email_to_agent"
-        )
         email_content = frappe.db.get_single_value(
             "HD Settings", "reply_email_to_agent_content"
         )
@@ -717,15 +712,14 @@ class HDTicket(Document):
             },
         )
         try:
-            if enable_reply_email_to_agent:
-                frappe.sendmail(
-                    recipients=recipients,
-                    subject=f"Re: {self.subject} - #{self.name}",
-                    message=rendered_template,
-                    reference_doctype="HD Ticket",
-                    reference_name=self.name,
-                    now=True,
-                )
+            frappe.sendmail(
+                recipients=recipients,
+                subject=f"Re: {self.subject} - #{self.name}",
+                message=rendered_template,
+                reference_doctype="HD Ticket",
+                reference_name=self.name,
+                now=True,
+            )
         except Exception as e:
             frappe.throw(_(e))
 
