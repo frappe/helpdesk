@@ -149,9 +149,9 @@
             <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
               <template #target>
                 <div
-                  class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap"
+                  class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
                 >
-                  {{ __("Old Condition") }}
+                  <span>{{ __("Old Condition") }}</span>
                   <FeatherIcon name="info" class="size-4" />
                 </div>
               </template>
@@ -227,9 +227,9 @@
             <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
               <template #target>
                 <div
-                  class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap"
+                  class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
                 >
-                  {{ __("Old Condition") }}
+                  <span> {{ __("Old Condition") }} </span>
                   <FeatherIcon name="info" class="size-4" />
                 </div>
               </template>
