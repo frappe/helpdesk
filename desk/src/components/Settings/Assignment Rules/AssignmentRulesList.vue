@@ -1,11 +1,11 @@
 <template>
   <div class="px-10 py-8 sticky top-0">
     <div class="flex items-start justify-between">
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-1">
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("Assignment rules") }}
         </h1>
-        <p class="text-sm text-ink-gray-6 max-w-md">
+        <p class="text-p-sm text-ink-gray-6 max-w-md">
           {{
             __(
               "Assignment Rules automatically route tickets to the right team members based on predefined conditions."

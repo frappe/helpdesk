@@ -1,12 +1,12 @@
 <template>
   <div
-    v-if="assignmentRuleData.loading"
+    v-if="getAssignmentRuleData.loading"
     class="flex items-center h-full justify-center"
   >
     <LoadingIndicator class="w-4" />
   </div>
   <div
-    v-if="!assignmentRuleData.loading"
+    v-if="!getAssignmentRuleData.loading"
     class="sticky top-0 z-10 bg-white pb-6 px-10 py-8"
   >
     <div class="flex items-center justify-between w-full">
@@ -25,7 +25,7 @@
           :variant="'subtle'"
           :theme="'orange'"
           size="sm"
-          :label="__('Unsaved changes')"
+          :label="__('Unsaved')"
           v-if="isDirty"
         />
       </div>
@@ -43,12 +43,12 @@
           theme="gray"
           variant="solid"
           @click="saveAssignmentRule()"
-          :loading="isLoading"
+          :loading="isLoading || getAssignmentRuleData.loading"
         />
       </div>
     </div>
   </div>
-  <div v-if="!assignmentRuleData.loading" class="overflow-y-auto px-10 pb-8">
+  <div v-if="!getAssignmentRuleData.loading" class="overflow-y-auto px-10 pb-8">
     <div class="grid grid-cols-2 gap-5">
       <div>
         <FormControl
@@ -128,11 +128,11 @@
     <hr class="my-8" />
     <div>
       <div class="flex flex-col gap-1">
-        <span class="text-lg font-semibold text-ink-gray-7">{{
+        <span class="text-lg font-semibold text-ink-gray-8">{{
           __("Assignment condition")
         }}</span>
         <div class="flex items-center justify-between gap-6">
-          <span class="text-sm text-ink-gray-6">
+          <span class="text-p-sm text-ink-gray-6">
             {{
               __("Choose which tickets are affected by this assignment rule.")
             }}
@@ -198,11 +198,11 @@
     <hr class="my-8" />
     <div>
       <div class="flex flex-col gap-1">
-        <span class="text-lg font-semibold text-ink-gray-7">{{
+        <span class="text-lg font-semibold text-ink-gray-8">{{
           __("Unassignment condition")
         }}</span>
         <div class="flex items-center justify-between gap-6">
-          <span class="text-sm text-ink-gray-6">
+          <span class="text-p-sm text-ink-gray-6">
             {{
               __(
                 "Choose which tickets are affected by this un-assignment rule."
@@ -272,10 +272,10 @@
     <hr class="my-8" />
     <div>
       <div class="flex flex-col gap-1">
-        <span class="text-lg font-semibold text-ink-gray-7">{{
+        <span class="text-lg font-semibold text-ink-gray-8">{{
           __("Assignment Schedule")
         }}</span>
-        <span class="text-sm text-ink-gray-6">
+        <span class="text-p-sm text-ink-gray-6">
           {{
             __("Choose the days of the week when this rule should be active.")
           }}
@@ -302,6 +302,7 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
   Badge,
   Button,
+  call,
   createResource,
   ErrorMessage,
   FormControl,
@@ -341,10 +342,12 @@ const isOldSla = ref(false);
 const deskUrl = `${window.location.origin}/app/assignment-rule/${assignmentRulesActiveScreen.value.data?.name}`;
 
 const getAssignmentRuleData = createResource({
-  url: "helpdesk.api.assignment_rule.get_assignment_rule",
+  url: "frappe.client.get",
   params: {
-    docname: assignmentRulesActiveScreen.value.data?.name,
+    doctype: "Assignment Rule",
+    name: assignmentRulesActiveScreen.value.data?.name,
   },
+  auto: Boolean(assignmentRulesActiveScreen.value.data),
   onSuccess(data) {
     assignmentRuleData.value = {
       loading: false,
@@ -354,18 +357,14 @@ const getAssignmentRuleData = createResource({
       unassignConditionJson: JSON.parse(data.unassign_condition_json || "[]"),
       rule: data.rule,
       priority: data.priority,
-      users: data.users?.map((user) => ({
-        email: user.email,
-        user: user.email,
-        user_image: user.user_image,
-        full_name: user.full_name,
-      })),
+      users: data.users,
       disabled: data.disabled,
       description: data.description,
       name: data.name,
       assignmentRuleName: data.name,
       assignmentDays: data.assignment_days,
     };
+
     initialData.value = JSON.stringify(assignmentRuleData.value);
 
     const conditionsAvailable =
@@ -381,14 +380,9 @@ const getAssignmentRuleData = createResource({
       isOldSla.value = false;
     }
   },
-  auto: false,
 });
 
-if (assignmentRulesActiveScreen.value.data) {
-  assignmentRuleData.value.loading = true;
-  getAssignmentRuleData.submit();
-} else {
-  assignmentRuleData.value.loading = false;
+if (!assignmentRulesActiveScreen.value.data) {
   disableSettingModalOutsideClick.value = true;
 }
 
@@ -484,7 +478,8 @@ const createAssignmentRule = () => {
     onSuccess(data) {
       getAssignmentRuleData
         .submit({
-          docname: data.name,
+          doctype: "Assignment Rule",
+          name: data.name,
         })
         .then(() => {
           isLoading.value = false;
@@ -511,53 +506,56 @@ const priorityOptions = [
 
 const updateAssignmentRule = async () => {
   isLoading.value = true;
-  createResource({
-    url: "helpdesk.api.assignment_rule.save_assignment_rule",
-    params: {
-      doc: {
-        doctype: "Assignment Rule",
-        document_type: "HD Ticket",
-        rule: assignmentRuleData.value.rule,
-        priority: assignmentRuleData.value.priority,
-        users: assignmentRuleData.value.users,
-        disabled: assignmentRuleData.value.disabled,
-        description: assignmentRuleData.value.description,
-        assignment_days: assignmentRuleData.value.assignmentDays,
-        name: assignmentRuleData.value.assignmentRuleName,
-        assignment_rule_name: assignmentRuleData.value.assignmentRuleName,
-        assign_condition: useNewUI.value
-          ? convertToConditions({
-              conditions: assignmentRuleData.value.assignConditionJson,
-            })
-          : assignmentRuleData.value.assignCondition,
-        unassign_condition: useNewUI.value
-          ? convertToConditions({
-              conditions: assignmentRuleData.value.unassignConditionJson,
-            })
-          : assignmentRuleData.value.unassignCondition,
-        assign_condition_json: useNewUI.value
-          ? JSON.stringify(assignmentRuleData.value.assignConditionJson)
-          : null,
-        unassign_condition_json: useNewUI.value
-          ? JSON.stringify(assignmentRuleData.value.unassignConditionJson)
-          : null,
-      },
-    },
-    auto: true,
-    onSuccess(data) {
-      getAssignmentRuleData
-        .submit({
-          docname: data.name,
-        })
-        .then(() => {
-          isLoading.value = false;
-          toast.success("Assignment rule updated");
-        });
-    },
-    onError: () => {
-      isLoading.value = false;
+
+  await call("frappe.client.set_value", {
+    doctype: "Assignment Rule",
+    document_type: "HD Ticket",
+    name: assignmentRuleData.value.name,
+    fieldname: {
+      rule: assignmentRuleData.value.rule,
+      priority: assignmentRuleData.value.priority,
+      users: assignmentRuleData.value.users,
+      disabled: assignmentRuleData.value.disabled,
+      description: assignmentRuleData.value.description,
+      assignment_days: assignmentRuleData.value.assignmentDays,
+      assign_condition: useNewUI.value
+        ? convertToConditions({
+            conditions: assignmentRuleData.value.assignConditionJson,
+          })
+        : assignmentRuleData.value.assignCondition,
+      unassign_condition: useNewUI.value
+        ? convertToConditions({
+            conditions: assignmentRuleData.value.unassignConditionJson,
+          })
+        : assignmentRuleData.value.unassignCondition,
+      assign_condition_json: useNewUI.value
+        ? JSON.stringify(assignmentRuleData.value.assignConditionJson)
+        : null,
+      unassign_condition_json: useNewUI.value
+        ? JSON.stringify(assignmentRuleData.value.unassignConditionJson)
+        : null,
     },
   });
+
+  if (
+    assignmentRuleData.value.name !==
+    assignmentRuleData.value.assignmentRuleName
+  ) {
+    await call("frappe.client.rename_doc", {
+      doctype: "Assignment Rule",
+      old_name: assignmentRuleData.value.name,
+      new_name: assignmentRuleData.value.assignmentRuleName,
+    });
+    await getAssignmentRuleData.submit({
+      doctype: "Assignment Rule",
+      name: assignmentRuleData.value.assignmentRuleName,
+    });
+  } else {
+    getAssignmentRuleData.reload();
+  }
+
+  isLoading.value = false;
+  toast.success("Assignment rule updated");
 };
 
 watch(

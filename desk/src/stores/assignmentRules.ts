@@ -26,7 +26,6 @@ const defaultAssignmentDays = [
 ];
 
 export const assignmentRuleData = ref<Record<string, any> | null>({
-  loading: false,
   assignCondition: "",
   unassignCondition: "",
   assignConditionJson: [],
@@ -43,7 +42,6 @@ export const assignmentRuleData = ref<Record<string, any> | null>({
 
 export const resetAssignmentRuleData = () => {
   assignmentRuleData.value = {
-    loading: false,
     assignCondition: "",
     unassignCondition: "",
     assignConditionJson: [],
