@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { ErrorMessage } from "frappe-ui";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import {
   assignmentRuleData,
   assignmentRulesErrors,
@@ -74,12 +74,17 @@ const days = ref([
   },
 ]);
 
-onMounted(() => {
-  assignmentRuleData.value.assignmentDays.forEach((day) => {
-    const workDay = days.value.find((d) => d.day === day.day);
-    if (workDay) {
-      workDay.active = true;
-    }
-  });
-});
+watch(
+  () => assignmentRuleData.value.assignmentDays,
+  () => {
+    days.value.forEach((day) => {
+      const workDay = assignmentRuleData.value.assignmentDays.find(
+        (d) => d.day === day.day
+      );
+      if (workDay) {
+        day.active = true;
+      }
+    });
+  }
+);
 </script>

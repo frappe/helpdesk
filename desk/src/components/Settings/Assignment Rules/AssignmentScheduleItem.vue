@@ -32,7 +32,9 @@ const toggleDay = (isActive) => {
   );
 
   if (isActive && dayIndex === -1) {
-    assignmentRuleData.value.assignmentDays.push({ day: props.day.day });
+    assignmentRuleData.value.assignmentDays.push({
+      day: props.day.day,
+    });
   } else {
     assignmentRuleData.value.assignmentDays.splice(dayIndex, 1);
   }

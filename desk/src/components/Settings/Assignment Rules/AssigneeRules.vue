@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="flex flex-col gap-1">
-      <span class="text-lg font-semibold text-ink-gray-7">{{
+      <span class="text-lg font-semibold text-ink-gray-8">{{
         __("Assignee Rules")
       }}</span>
-      <span class="text-sm text-ink-gray-6">
+      <span class="text-p-sm text-ink-gray-6">
         {{
           __(
             "Define who receives the tickets and how they’re distributed among agents."
@@ -12,12 +12,12 @@
         }}
       </span>
     </div>
-    <div class="mt-9 flex items-center justify-between gap-2">
+    <div class="mt-8 flex items-end justify-between gap-2">
       <div>
         <div class="text-base font-medium text-ink-gray-7">
           {{ __("Ticket Routing") }}
         </div>
-        <div class="text-sm text-ink-gray-6 mt-2">
+        <div class="text-p-sm text-ink-gray-6 mt-1">
           {{
             __("Choose how tickets are distributed among selected assignees.")
           }}
@@ -69,12 +69,12 @@
         </Popover>
       </div>
     </div>
-    <div class="mt-5.5 flex items-center justify-between gap-2">
+    <div class="mt-7 flex items-end justify-between gap-2">
       <div>
         <div class="text-base font-medium text-ink-gray-7">
           {{ __("Assignees") }}
         </div>
-        <div class="text-sm text-ink-gray-6 mt-2">
+        <div class="text-p-sm text-ink-gray-6 mt-1">
           {{ __("Choose who receives the tickets.") }}
         </div>
       </div>
@@ -82,7 +82,7 @@
     </div>
     <div class="mt-4 flex flex-wrap gap-2">
       <div
-        v-for="user in assignmentRuleData.users"
+        v-for="user in users"
         :key="user.name"
         class="flex items-center gap-2 text-sm bg-surface-gray-2 rounded-md p-1 w-max px-2 select-none"
       >
@@ -117,6 +117,10 @@ import {
   validateAssignmentRule,
 } from "../../../stores/assignmentRules";
 import AssigneeSearch from "./AssigneeSearch.vue";
+import { computed } from "vue";
+import { useUserStore } from "@/stores/user";
+
+const { getUser } = useUserStore();
 
 const ticketRoutingOptions = [
   {
@@ -131,8 +135,16 @@ const ticketRoutingOptions = [
 
 const removeAssignedUser = (user) => {
   assignmentRuleData.value.users = assignmentRuleData.value.users.filter(
-    (u) => u.user !== user.user
+    (u) => u.user !== user.email
   );
   validateAssignmentRule("users");
 };
+
+const users = computed(() => {
+  const _users = [];
+  assignmentRuleData.value.users.forEach((user) => {
+    _users.push(getUser(user.user));
+  });
+  return _users;
+});
 </script>

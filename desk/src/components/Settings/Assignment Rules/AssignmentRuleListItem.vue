@@ -170,7 +170,7 @@ const onPriorityChange = () => {
 };
 
 const onToggle = () => {
-  if (props.data.users.length == 0 && props.data.disabled) {
+  if (!props.data.users_exists && props.data.disabled) {
     toast.error("Cannot enable rule without adding users in it");
     return;
   }
