@@ -25,10 +25,8 @@
     </SettingsLayoutHeader>
   </div>
   <div class="px-10 pb-8 overflow-y-auto">
-    <div class="text-base font-semibold text-ink-gray-8">
-      Logged in user settings
-    </div>
-    <div class="grid grid-cols-2 gap-2 mt-4">
+    <div class="text-base font-semibold text-ink-gray-8">User settings</div>
+    <div class="grid grid-cols-2 gap-4 mt-4">
       <div class="flex flex-col gap-1.5">
         <FormLabel label="Default medium" />
         <Select
@@ -38,17 +36,13 @@
           @update:modelValue="telephonyAgent.doc.default_medium = $event"
         />
       </div>
-    </div>
-    <div
-      class="grid grid-cols-2 gap-2 mt-4"
-      v-if="twilio.doc.enabled || exotel.doc.enabled"
-    >
       <div
         class="flex flex-col gap-1.5"
         v-if="telephonyAgent.doc && twilio.doc.enabled"
       >
         <FormControl
           label="Twilio number"
+          type="text"
           required
           v-model="telephonyAgent.doc.twilio_number"
         />
@@ -60,16 +54,30 @@
       >
         <FormControl
           label="Exotel number"
+          type="text"
           required
           v-model="telephonyAgent.doc.exotel_number"
         />
         <ErrorMessage :message="exotelErrors.number" />
       </div>
+      <div
+        class="flex flex-col gap-1.5"
+        v-if="telephonyAgent.doc && exotel.doc.enabled"
+      >
+        <FormControl
+          label="Personal mobile no"
+          type="text"
+          required
+          v-model="telephonyAgent.doc.mobile_no"
+          description="Required for exotel integration"
+        />
+        <ErrorMessage :message="exotelErrors.mobileNo" />
+      </div>
     </div>
     <div class="mt-6" v-if="twilio?.doc">
       <div class="text-base font-semibold text-ink-gray-8">Twilio</div>
       <div class="mt-4">
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 gap-4">
           <Checkbox label="Enabled" v-model="twilio.doc.enabled" />
           <Checkbox
             label="Record Calls"
@@ -77,8 +85,7 @@
             v-if="twilio.doc.enabled"
           />
         </div>
-
-        <div class="grid grid-cols-2 gap-2 mt-4" v-if="twilio.doc.enabled">
+        <div class="grid grid-cols-2 gap-4 mt-4" v-if="twilio.doc.enabled">
           <div class="flex flex-col gap-2">
             <FormControl
               label="Account SID"
@@ -86,7 +93,7 @@
               v-model="twilio.doc.account_sid"
               placeholder="Account SID"
             />
-            <ErrorMessage :message="twilioErrors.account_sid" />
+            <ErrorMessage :message="twilioErrors.accountSid" />
           </div>
           <div class="flex flex-col gap-2">
             <Password
@@ -95,10 +102,8 @@
               v-model="twilio.doc.auth_token"
               placeholder="Auth Token"
             />
-            <ErrorMessage :message="twilioErrors.auth_token" />
+            <ErrorMessage :message="twilioErrors.authToken" />
           </div>
-        </div>
-        <div class="grid grid-cols-2 gap-2 mt-4" v-if="twilio.doc.enabled">
           <div class="flex flex-col gap-2">
             <FormControl
               label="API Key"
@@ -113,8 +118,6 @@
               disabled
             />
           </div>
-        </div>
-        <div class="grid grid-cols-2 gap-2 mt-4" v-if="twilio.doc.enabled">
           <div class="flex flex-col gap-2">
             <FormControl
               label="TwiML SID"
@@ -128,7 +131,7 @@
     <div class="mt-6" v-if="exotel?.doc">
       <div class="text-base font-semibold text-ink-gray-8">Exotel</div>
       <div class="mt-4">
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 gap-4">
           <Checkbox label="Enabled" v-model="exotel.doc.enabled" />
           <Checkbox
             label="Record Calls"
@@ -136,7 +139,7 @@
             v-if="exotel.doc.enabled"
           />
         </div>
-        <div class="grid grid-cols-2 gap-2 mt-4" v-if="exotel.doc.enabled">
+        <div class="grid grid-cols-2 gap-4 mt-4" v-if="exotel.doc.enabled">
           <div class="flex flex-col gap-2">
             <FormControl
               label="Account SID"
@@ -144,7 +147,7 @@
               v-model="exotel.doc.account_sid"
               placeholder="Account SID"
             />
-            <ErrorMessage :message="exotelErrors.account_sid" />
+            <ErrorMessage :message="exotelErrors.accountSid" />
           </div>
           <div class="flex flex-col gap-2">
             <Password
@@ -153,21 +156,9 @@
               v-model="exotel.doc.webhook_verify_token"
               placeholder="Webhook Verify Token"
             />
-            <ErrorMessage :message="exotelErrors.webhook_verify_token" />
+            <ErrorMessage :message="exotelErrors.webhookVerifyToken" />
           </div>
-        </div>
-        <div class="grid grid-cols-2 gap-2 mt-4" v-if="exotel.doc.enabled">
-          <div class="flex flex-col gap-2">
-            <FormControl
-              label="Subdomain"
-              required
-              v-model="exotel.doc.subdomain"
-              placeholder="Subdomain"
-            />
-            <ErrorMessage :message="exotelErrors.subdomain" />
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-2 mt-4" v-if="exotel.doc.enabled">
+
           <div class="flex flex-col gap-2">
             <FormControl
               label="API Key"
@@ -175,7 +166,7 @@
               v-model="exotel.doc.api_key"
               placeholder="API Key"
             />
-            <ErrorMessage :message="exotelErrors.api_key" />
+            <ErrorMessage :message="exotelErrors.apiKey" />
           </div>
           <div class="flex flex-col gap-2">
             <Password
@@ -184,7 +175,16 @@
               v-model="exotel.doc.api_token"
               placeholder="API Token"
             />
-            <ErrorMessage :message="exotelErrors.api_token" />
+            <ErrorMessage :message="exotelErrors.apiToken" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <FormControl
+              label="Subdomain"
+              required
+              v-model="exotel.doc.subdomain"
+              placeholder="Subdomain"
+            />
+            <ErrorMessage :message="exotelErrors.subdomain" />
           </div>
         </div>
       </div>
@@ -215,18 +215,19 @@ const auth = useAuthStore();
 const telephonyStore = useTelephonyStore();
 
 const twilioErrors = ref({
-  account_sid: "",
-  auth_token: "",
+  accountSid: "",
+  authToken: "",
   number: "",
 });
 
 const exotelErrors = ref({
-  account_sid: "",
-  webhook_verify_token: "",
+  accountSid: "",
+  webhookVerifyToken: "",
   subdomain: "",
-  api_key: "",
-  api_token: "",
+  apiKey: "",
+  apiToken: "",
   number: "",
+  mobileNo: "",
 });
 
 const twilio = createDocumentResource({
@@ -281,17 +282,24 @@ async function save() {
     promises.push(exotel.save.submit());
   }
   if (isDocDirty(telephonyAgent)) {
+    if (telephonyAgent.doc.twilio_number) {
+      telephonyAgent.doc.twilio = true;
+    } else {
+      telephonyAgent.doc.twilio = false;
+    }
+
+    if (telephonyAgent.doc.exotel_number) {
+      telephonyAgent.doc.exotel = true;
+    } else {
+      telephonyAgent.doc.exotel = false;
+    }
     promises.push(telephonyAgent.save.submit());
   }
 
   await Promise.all(promises);
-  if (twilio.doc.enabled || exotel.doc.enabled) {
-    telephonyStore.setIsCallingEnabled(true);
-  } else {
-    telephonyStore.setIsCallingEnabled(false);
-  }
   toast.success("Telephony settings updated!");
   twilio.reload();
+  telephonyStore.fetchCallIntegrationStatus();
 }
 
 createResource({

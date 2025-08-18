@@ -113,7 +113,7 @@ async function setCallingMedium() {
 }
 
 watch(
-  [isTwilioEnabled.value, isExotelEnabled.value],
+  [isTwilioEnabled, isExotelEnabled],
   ([twilioValue, exotelValue]) =>
     nextTick(() => {
       if (twilioValue) {
