@@ -128,33 +128,38 @@ const addRow = () => {
   });
 };
 
-const columns = computed(() =>
-  [
-    {
-      label: "Priority",
-      key: "priority",
-      isRequired: true,
-    },
-    {
-      label: "Default priority",
-      key: "default_priority",
-      isRequired: true,
-    },
-    {
-      label: "First response time",
-      key: "response_time",
-      isRequired: true,
-    },
-    slaData.value.apply_sla_for_resolution && {
-      label: "Resolution time",
-      key: "resolution_time",
-      isRequired: Boolean(slaData.value.apply_sla_for_resolution),
-    },
-  ].filter((c) => c)
-);
+const columns = computed(() => [
+  {
+    label: "Priority",
+    key: "priority",
+    isRequired: true,
+  },
+  {
+    label: "Default priority",
+    key: "default_priority",
+    isRequired: true,
+  },
+  {
+    label: "First response time",
+    key: "response_time",
+    isRequired: true,
+  },
+  {
+    label: "Resolution time",
+    key: "resolution_time",
+    isRequired: true,
+  },
+  //   slaData.value.apply_sla_for_resolution && {
+  //     label: "Resolution time",
+  //     key: "resolution_time",
+  //     isRequired: Boolean(slaData.value.apply_sla_for_resolution),
+  //   },
+  // ].filter((c) => c)
+]);
 
 const gridTemplateColumns = computed(() => {
-  return getGridTemplateColumnsForTable(columns.value.filter((c) => c));
+  // return getGridTemplateColumnsForTable(columns.value.filter((c) => c));
+  return getGridTemplateColumnsForTable(columns.value);
 });
 
 provide("gridTemplateColumns", gridTemplateColumns);
