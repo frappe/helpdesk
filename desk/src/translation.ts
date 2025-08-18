@@ -6,20 +6,19 @@ function getTranslatedMessage(message: string): string {
     return translatedMessages[message] || message;
 }
 
-function translateWithoutArgs(message: string): string {
-    return getTranslatedMessage(message);
+function translate(message: string): string;
+function translate(message: string, ...args: string[]): string;
+function translate(message: string, ...args: string[]): string {
+    const translatedMessage = getTranslatedMessage(message)
+    if (args.length === 0) {
+        return translatedMessage;
+    }
+    return translatedMessage.replace(/{(\d+)}/g, function (match, index) {
+        return typeof args[index] != 'undefined' ? args[index] : match;
+    });
 }
 
-function translateWithArgs(message: string): { format: (...args: string[]) => string } {
-    const translatedMessage = getTranslatedMessage(message);
-    return {
-        format(...args) {
-            return translatedMessage.replace(/{(\d+)}/g, function (match, index) {
-                return typeof args[index] != 'undefined' ? args[index] : match;
-            })
-        }
-    }
-};
+export const __ = translate;
 
 function fetchTranslations() {
     createResource({
@@ -34,11 +33,9 @@ function fetchTranslations() {
 }
 
 export function translationPlugin(app: App<Element>) {
-    app.config.globalProperties.__ = translateWithoutArgs;
-    app.config.globalProperties.__args = translateWithArgs;
+    app.config.globalProperties.__ = translate;
     const windowObj = window as any;
-    windowObj.__ = translateWithoutArgs;
-    windowObj.__args = translateWithArgs;
+    windowObj.__ = translate;
     if (!windowObj.translatedMessages) {
         fetchTranslations();
     }
@@ -46,7 +43,6 @@ export function translationPlugin(app: App<Element>) {
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
-    __: typeof translateWithoutArgs; 
-    __args: typeof translateWithArgs;
+    __: typeof translate; 
   }
 }
