@@ -55,13 +55,13 @@ class HDTicketStatus(Document):
             return
 
         if self.default_status:
-            existing_fallback = frappe.db.exists(
+            default_fallback = frappe.db.exists(
                 "HD Ticket Status",
                 {"category": "Open", "default_status": 1, "name": ["!=", self.name]},
             )
-            if existing_fallback:
+            if default_fallback:
                 frappe.db.set_value(
-                    "HD Ticket Status", existing_fallback, "default_status", 0
+                    "HD Ticket Status", default_fallback, "default_status", 0
                 )
         else:
             count = frappe.db.count(
