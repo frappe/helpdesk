@@ -1,7 +1,7 @@
 <template>
-  <div class="rounded-md border p-1 border-gray-300 text-sm">
+  <div class="rounded-md border px-2 border-gray-300 text-sm">
     <div
-      class="grid p-2 items-center"
+      class="grid p-2 px-4 items-center"
       :style="{
         gridTemplateColumns: getGridTemplateColumnsForTable(columns),
       }"
@@ -16,7 +16,7 @@
         <span v-if="column.isRequired" class="text-red-500">*</span>
       </div>
     </div>
-    <hr class="my-0.5" v-if="statusList?.length !== 0" />
+    <hr v-if="statusList?.length !== 0" />
     <SlaStatusListItem
       v-for="(row, index) in statusList"
       :key="index + row.status + row.id"
@@ -29,14 +29,23 @@
       No status in the list
     </div>
   </div>
-  <div class="flex items-center justify-between mt-4">
-    <Button
-      v-if="slaData.statuses.length < 4"
-      variant="subtle"
-      label="Add row"
-      @click="addRow"
-      icon-left="plus"
-    />
+  <div
+    class="flex items-center justify-between mt-2.5"
+    v-if="
+      slaData.statuses.length < 4 ||
+      slaDataErrors.statuses ||
+      slaDataErrors.statuses_conflict
+    "
+  >
+    <div>
+      <Button
+        v-if="slaData.statuses.length < 4"
+        variant="subtle"
+        label="Add row"
+        @click="addRow"
+        icon-left="plus"
+      />
+    </div>
     <ErrorMessage
       :message="slaDataErrors.statuses || slaDataErrors.statuses_conflict"
     />
@@ -89,12 +98,12 @@ const addRow = () => {
 
 const columns = [
   {
-    label: "Status",
+    label: "When Status is",
     key: "status",
     isRequired: true,
   },
   {
-    label: "SLA behavior",
+    label: "SLA is",
     key: "sla_behavior",
     isRequired: true,
   },

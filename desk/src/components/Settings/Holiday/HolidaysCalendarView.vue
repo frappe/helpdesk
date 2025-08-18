@@ -1,7 +1,7 @@
 <template>
-  <div class="p-3 rounded-md border border-gray-300">
-    <div class="mb-6 flex justify-between items-center">
-      <div class="ml-2">
+  <div class="p-6.5 px-5 rounded-xl border border-gray-300">
+    <div class="mb-6.5 flex justify-between items-center">
+      <div class="ml-1">
         <Popover v-if="startYear !== endYear">
           <template #target="{ togglePopover }">
             <Button
