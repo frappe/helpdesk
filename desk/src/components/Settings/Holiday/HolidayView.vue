@@ -81,8 +81,8 @@
     <hr class="my-8" />
     <div>
       <div class="flex flex-col gap-1">
-        <span class="text-lg font-semibold text-ink-gray-7">Valid from</span>
-        <span class="text-sm text-ink-gray-6">
+        <span class="text-lg font-semibold text-ink-gray-8">Valid from</span>
+        <span class="text-p-sm text-ink-gray-6">
           Choose the duration of this holiday list.
         </span>
       </div>
@@ -132,10 +132,10 @@
     <hr class="my-8" />
     <div>
       <div class="flex flex-col gap-1">
-        <div class="text-lg font-semibold text-ink-gray-7">
+        <div class="text-lg font-semibold text-ink-gray-8">
           Recurring holidays
         </div>
-        <div class="text-sm text-ink-gray-6">
+        <div class="text-p-sm text-ink-gray-6">
           Add recurring holidays such as weekends.
         </div>
       </div>
@@ -150,8 +150,8 @@
     <div>
       <div class="flex justify-between items-center">
         <div class="flex justify-between flex-col gap-1">
-          <span class="text-lg font-semibold text-ink-gray-7">Holidays</span>
-          <div class="text-sm text-ink-gray-6">
+          <span class="text-lg font-semibold text-ink-gray-8">Holidays</span>
+          <div class="text-p-sm text-ink-gray-6">
             Add holidays here to make sure they’re excluded from SLA
             calculations.
           </div>

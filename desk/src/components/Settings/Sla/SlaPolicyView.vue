@@ -40,7 +40,7 @@
           variant="solid"
           @click="saveSla()"
           :disabled="Boolean(!isDirty && slaActiveScreen.data)"
-          :loading="slaData.loading || slaPolicyList.loading"
+          :loading="slaData.loading || slaPolicyList.setValue.loading"
         />
       </div>
     </div>
@@ -73,10 +73,10 @@
     <hr class="my-8" />
     <div>
       <div class="flex flex-col gap-1">
-        <span class="text-lg font-semibold text-ink-gray-7"
+        <span class="text-lg font-semibold text-ink-gray-8"
           >Assignment conditions</span
         >
-        <span class="text-sm text-ink-gray-6">
+        <span class="text-p-sm text-ink-gray-6">
           Choose which tickets are affected by this policy.
         </span>
       </div>
@@ -135,8 +135,8 @@
     <hr class="my-8" />
     <div>
       <div class="flex flex-col gap-1">
-        <span class="text-lg font-semibold text-ink-gray-7">Valid from</span>
-        <span class="text-sm text-ink-gray-6">
+        <span class="text-lg font-semibold text-ink-gray-8">Valid from</span>
+        <span class="text-p-sm text-ink-gray-6">
           Choose how long this SLA policy will be active.
         </span>
       </div>
@@ -180,16 +180,16 @@
     <hr class="my-8" />
     <div>
       <div class="flex flex-col gap-1">
-        <span class="text-lg font-semibold text-ink-gray-7"
+        <span class="text-lg font-semibold text-ink-gray-8"
           >Response and resolution</span
         >
-        <span class="text-sm text-ink-gray-6">
+        <span class="text-p-sm text-ink-gray-6">
           Add time targets around support milestones like first reply and
           resolution times
         </span>
       </div>
       <div class="mt-5">
-        <div class="flex gap-6">
+        <!-- <div class="flex gap-6">
           <div
             class="flex items-center gap-2"
             @click="onApplySlaForChange(false)"
@@ -216,7 +216,7 @@
               Apply SLA for response time and resolution time
             </div>
           </div>
-        </div>
+        </div> -->
         <div class="mt-5">
           <SlaPriorityList />
         </div>
@@ -225,10 +225,10 @@
     <hr class="my-8" />
     <div>
       <div class="flex flex-col gap-1">
-        <span class="text-lg font-semibold text-ink-gray-7"
+        <span class="text-lg font-semibold text-ink-gray-8"
           >Status details</span
         >
-        <span class="text-sm text-ink-gray-6">
+        <span class="text-p-sm text-ink-gray-6">
           The SLA status updates with ticket progress—fulfilled when conditions
           are met, paused when awaiting external action.
         </span>
@@ -327,6 +327,7 @@ const getSlaData = createResource({
       condition_json: condition_json,
     };
     slaData.value = newData;
+    slaData.value.apply_sla_for_resolution = true;
     initialData.value = JSON.stringify(newData);
     const conditionsAvailable = slaData.value.condition?.length > 0;
     const conditionsJsonAvailable = slaData.value.condition_json?.length > 0;

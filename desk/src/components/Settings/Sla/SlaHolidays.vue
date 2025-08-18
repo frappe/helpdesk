@@ -1,10 +1,10 @@
 <template>
   <div class="flex items-center justify-between">
     <div class="flex flex-col gap-1">
-      <div class="text-lg font-semibold text-ink-gray-7">
+      <div class="text-lg font-semibold text-ink-gray-8">
         Work schedule and holidays
       </div>
-      <div class="text-sm text-ink-gray-6 max-w-lg">
+      <div class="text-p-sm text-ink-gray-6 max-w-lg">
         Set working days, hours, and holidays by selecting a predefined schedule
         or creating a new one.
       </div>

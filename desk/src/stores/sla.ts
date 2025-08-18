@@ -56,7 +56,7 @@ export const slaData = ref({
   description: "",
   enabled: false,
   default_sla: false,
-  apply_sla_for_resolution: false,
+  apply_sla_for_resolution: true,
   priorities: [],
   statuses: defaultStatus,
   holiday_list: "Default",
@@ -76,7 +76,7 @@ export const resetSlaData = () => {
     description: "",
     enabled: false,
     default_sla: false,
-    apply_sla_for_resolution: false,
+    apply_sla_for_resolution: true,
     priorities: [],
     statuses: defaultStatus,
     holiday_list: "Default",
@@ -180,7 +180,6 @@ export function validateSlaData(
               }
             }
             if (
-              priority.resolution_time &&
               priority.response_time > priority.resolution_time &&
               Boolean(slaData.value.apply_sla_for_resolution)
             ) {
