@@ -14,6 +14,7 @@ from .welcome_ticket import create_welcome_ticket
 
 
 def after_install():
+    create_custom_fields(get_custom_fields())
     add_default_categories_and_articles()
     add_default_ticket_priorities()
     add_default_sla()
@@ -27,9 +28,7 @@ def after_install():
     create_ootb_ticket_types()
     create_welcome_ticket()
     create_ticket_feedback_options()
-    add_property_setter()
-    create_custom_fields(get_custom_fields())
-    add_assignment_rule_condition_property()
+    add_property_setters()
 
 
 def add_default_categories_and_articles():
@@ -236,7 +235,7 @@ def add_default_assignment_rule():
     support_settings.create_base_support_rotation()
 
 
-def add_property_setter():
+def add_property_setters():
     if not frappe.db.exists("Property Setter", {"name": "Contact-main-search_fields"}):
         doc = frappe.new_doc("Property Setter")
         doc.doctype_or_field = "DocType"
@@ -245,6 +244,8 @@ def add_property_setter():
         doc.property_type = "Data"
         doc.value = "email_id"
         doc.insert()
+
+    add_assignment_rule_property_setters()
 
 
 def get_custom_fields():
@@ -271,30 +272,52 @@ def get_custom_fields():
     }
 
 
-def add_assignment_rule_condition_property():
+def add_assignment_rule_property_setters():
+    """Add a property setter to the Assignment Rule DocType for assign_condition and unassign_condition."""
+
+    default_fields = {
+        "doctype": "Property Setter",
+        "doctype_or_field": "DocField",
+        "doc_type": "Assignment Rule",
+        "property_type": "Data",
+        "is_system_generated": 1,
+    }
+
     if not frappe.db.exists(
         "Property Setter", {"name": "Assignment Rule-assign_condition-depends_on"}
     ):
-        doc = frappe.new_doc("Property Setter")
-        doc.name = "Assignment Rule-assign_condition-depends_on"
-        doc.doctype_or_field = "DocField"
-        doc.doc_type = "Assignment Rule"
-        doc.field_name = "assign_condition"
-        doc.property = "depends_on"
-        doc.property_type = "Data"
-        doc.value = "eval: !doc.assign_condition_json"
-        doc.insert()
-
+        frappe.get_doc(
+            {
+                **default_fields,
+                "name": "Assignment Rule-assign_condition-depends_on",
+                "field_name": "assign_condition",
+                "property": "depends_on",
+                "value": "eval: !doc.assign_condition_json",
+            }
+        ).insert()
+    else:
+        frappe.db.set_value(
+            "Property Setter",
+            {"name": "Assignment Rule-assign_condition-depends_on"},
+            "value",
+            "eval: !doc.assign_condition_json",
+        )
     if not frappe.db.exists(
-        "Property Setter",
-        {"name": "Assignment Rule-unassign_condition-depends_on"},
+        "Property Setter", {"name": "Assignment Rule-unassign_condition-depends_on"}
     ):
-        doc = frappe.new_doc("Property Setter")
-        doc.name = "Assignment Rule-unassign_condition-depends_on"
-        doc.doctype_or_field = "DocField"
-        doc.doc_type = "Assignment Rule"
-        doc.field_name = "unassign_condition"
-        doc.property = "depends_on"
-        doc.property_type = "Data"
-        doc.value = "eval: !doc.unassign_condition_json"
-        doc.insert()
+        frappe.get_doc(
+            {
+                **default_fields,
+                "name": "Assignment Rule-unassign_condition-depends_on",
+                "field_name": "unassign_condition",
+                "property": "depends_on",
+                "value": "eval: !doc.unassign_condition_json",
+            }
+        ).insert()
+    else:
+        frappe.db.set_value(
+            "Property Setter",
+            {"name": "Assignment Rule-unassign_condition-depends_on"},
+            "value",
+            "eval: !doc.unassign_condition_json",
+        )
