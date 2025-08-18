@@ -111,7 +111,7 @@
             class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
             v-if="!useNewUI"
           >
-            <span>
+            <span class="text-p-sm">
               Conditions for this SLA were created from
               <a :href="deskUrl" target="_blank" class="underline">desk</a>
               which are not compatible with this UI, you will need to recreate
