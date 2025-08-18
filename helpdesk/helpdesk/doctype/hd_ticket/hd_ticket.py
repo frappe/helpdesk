@@ -45,7 +45,7 @@ class HDTicket(Document):
     def open_status_fallback(self):
         return frappe.db.get_value(
             "HD Ticket Status",
-            {"category": "Open", "fallback_status": 1},
+            {"category": "Open", "default_status": 1},
             "name",
         )
 
