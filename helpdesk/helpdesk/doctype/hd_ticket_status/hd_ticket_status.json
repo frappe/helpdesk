@@ -6,14 +6,16 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "enabled",
   "label_agent",
-  "label_customer",
-  "category",
+  "order",
   "default_status",
   "column_break_neks",
-  "enabled",
   "different_view",
-  "order",
+  "label_customer",
+  "sla_mapping_section",
+  "category",
+  "column_break_xcba",
   "color"
  ],
  "fields": [
@@ -74,12 +76,21 @@
    "fieldname": "default_status",
    "fieldtype": "Check",
    "label": "Default status"
+  },
+  {
+   "fieldname": "sla_mapping_section",
+   "fieldtype": "Section Break",
+   "label": "SLA Mapping"
+  },
+  {
+   "fieldname": "column_break_xcba",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-18 10:36:48.175246",
+ "modified": "2025-08-18 19:52:52.191504",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Status",
