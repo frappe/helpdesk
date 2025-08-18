@@ -92,6 +92,7 @@ import { createResource, Switch, LoadingIndicator } from "frappe-ui";
 
 const props = defineProps<{
   title: string;
+  description: string;
   defaultContent: string;
   onBack: () => void;
   onSubmit: (e: Event & { target: HTMLFormElement }) => void;

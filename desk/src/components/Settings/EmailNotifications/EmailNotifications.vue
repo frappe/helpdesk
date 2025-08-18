@@ -5,7 +5,7 @@
       v-else
       :is="notificationToComponent[curNotification.name]"
       :onBack="resetCurNotification"
-      :NotificationOption="curNotification"
+      :notification="curNotification"
     ></component>
   </div>
 </template>

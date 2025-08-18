@@ -4,7 +4,9 @@
     <SettingsLayoutHeader
       :title="__('Email Notifications')"
       :description="
-        __('Personalize email settings and content to suit your needs')
+        __(
+          'Customize your email notification preferences to stay informed about important updates and activities.'
+        )
       "
     />
   </div>
@@ -19,12 +21,12 @@
         <h2
           class="text-p-base font-medium text-ink-gray-7 relative z-10 pointer-events-none"
         >
-          {{ __(notification.label) }}
+          {{ notification.label }}
         </h2>
         <p
           class="text-p-sm text-ink-gray-5 truncate relative z-10 pointer-events-none"
         >
-          {{ __(notification.description) }}
+          {{ notification.description }}
         </p>
       </div>
       <FeatherIcon
@@ -41,7 +43,7 @@
         "
       >
         <span class="sr-only">{{
-          __args("customize {0}").format(notification.name)
+          __("customize {0}", notification.name)
         }}</span>
       </button>
     </li>
@@ -49,6 +51,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import type { AtLeastOneNotifcation, Notification } from "./types";
 
@@ -59,27 +62,29 @@ const props = defineProps<{
 const notifications: AtLeastOneNotifcation = [
   {
     name: "share_feedback",
-    label: "Share Feedback",
-    description:
-      "Configure the settings or personalize the content of the email",
+    label: __("Share Feedback"),
+    description: __(
+      "Sent to the creator of the ticket after the ticket is closed or resolved"
+    ),
   },
   {
     name: "acknowledgement",
-    label: "Acknowledgement",
-    description:
-      "Configure the settings or personalize the content of the email",
+    label: __("Acknowledgement"),
+    description: __("Sent to the user right after creating an email ticket"),
   },
   {
     name: "reply_to_agents",
-    label: "Reply To Agents",
-    description:
-      "Configure the settings or personalize the content of the email",
+    label: __("Reply To Agents"),
+    description: __(
+      "Sent to all of the assigned agents of a ticket after a reply from the customer"
+    ),
   },
   {
     name: "reply_via_agent",
-    label: "Reply Via Agent",
-    description:
-      "Configure the settings or personalize the content of the email",
+    label: __("Reply Via Agent"),
+    description: __(
+      "Sent to the creator of the ticket after a reply from one of the assigned agents"
+    ),
   },
 ];
 </script>

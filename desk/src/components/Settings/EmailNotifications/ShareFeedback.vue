@@ -2,7 +2,8 @@
   <Notification
     ref="compRef"
     name="share_feedback"
-    :title="__('Share Feedback')"
+    :title="props.notification.label"
+    :description="props.notification.description"
     v-model:content="content"
     :defaultContent="defaultContent"
     v-model:enabled="enabled"
@@ -34,15 +35,18 @@
 import { ref } from "vue";
 import Notification from "./Notification.vue";
 import { createResource } from "frappe-ui";
-import type { BaseSettings } from "./types";
+import type { BaseSettings, Notification as NotificationType } from "./types";
 
-const props = defineProps<{ onBack: () => void }>();
+const props = defineProps<{
+  onBack: () => void;
+  notification: NotificationType;
+}>();
 
 const content = ref("");
 const defaultContent = ref("");
 const enabled = ref(false);
 const ticketStatusOptions = ["Closed", "Resolved"] as const;
-type TicketStatus = typeof ticketStatusOptions[number];
+type TicketStatus = (typeof ticketStatusOptions)[number];
 const ticketStatus = ref<TicketStatus>(ticketStatusOptions[0]);
 const compRef = ref<InstanceType<typeof Notification>>();
 

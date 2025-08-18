@@ -5,7 +5,8 @@
     v-model:enabled="enabled"
     ref="compRef"
     name="reply_to_agents"
-    :title="__('Reply To Agents')"
+    :title="props.notification.label"
+    :description="props.notification.description"
     :submitting="updateSettings.loading"
     :onBack="props.onBack"
     :onSubmit="onSubmit"
@@ -17,9 +18,12 @@
 import { ref } from "vue";
 import Notification from "./Notification.vue";
 import { createResource } from "frappe-ui";
-import type { BaseSettings } from "./types";
+import type { BaseSettings, Notification as NotificationType } from "./types";
 
-const props = defineProps<{ onBack: () => void }>();
+const props = defineProps<{
+  onBack: () => void;
+  notification: NotificationType;
+}>();
 
 const content = ref("");
 const defaultContent = ref("");
