@@ -272,9 +272,10 @@ def add_assignment_rule_condition_property():
         "Property Setter", {"name": "Assignment Rule-assign_condition-depends_on"}
     ):
         doc = frappe.new_doc("Property Setter")
+        doc.name = "Assignment Rule-assign_condition-depends_on"
         doc.doctype_or_field = "DocField"
         doc.doc_type = "Assignment Rule"
-        doc.fieldname = "assign_condition"
+        doc.field_name = "assign_condition"
         doc.property = "depends_on"
         doc.property_type = "Data"
         doc.value = "eval: !doc.assign_condition_json"
@@ -285,9 +286,10 @@ def add_assignment_rule_condition_property():
         {"name": "Assignment Rule-unassign_condition-depends_on"},
     ):
         doc = frappe.new_doc("Property Setter")
+        doc.name = "Assignment Rule-unassign_condition-depends_on"
         doc.doctype_or_field = "DocField"
         doc.doc_type = "Assignment Rule"
-        doc.fieldname = "unassign_condition"
+        doc.field_name = "unassign_condition"
         doc.property = "depends_on"
         doc.property_type = "Data"
         doc.value = "eval: !doc.unassign_condition_json"
