@@ -12,9 +12,9 @@
         }}
       </span>
     </div>
-    <div class="mt-8 flex items-end justify-between gap-2">
+    <div class="mt-8 flex items-center justify-between gap-2">
       <div>
-        <div class="text-base font-medium text-ink-gray-7">
+        <div class="text-base font-medium text-ink-gray-8">
           {{ __("Ticket Routing") }}
         </div>
         <div class="text-p-sm text-ink-gray-6 mt-1">
@@ -69,9 +69,9 @@
         </Popover>
       </div>
     </div>
-    <div class="mt-7 flex items-end justify-between gap-2">
+    <div class="mt-7 flex items-center justify-between gap-2">
       <div>
-        <div class="text-base font-medium text-ink-gray-7">
+        <div class="text-base font-medium text-ink-gray-8">
           {{ __("Assignees") }}
         </div>
         <div class="text-p-sm text-ink-gray-6 mt-1">
