@@ -3,44 +3,51 @@
     v-if="props.conditions.length > 0"
     :conditions="props.conditions"
     :level="0"
-    :disableAddCondition="slaDataErrors.condition != ''"
+    :disableAddCondition="props.errors !== ''"
   />
   <div
     v-if="props.conditions.length == 0"
     class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-gray-300 text-gray-600 rounded-md"
-    @click="props.conditions.push(['', '', ''])"
+    @click="
+      props.conditions.push(['', '', '']);
+      validateAssignmentRule(props.name);
+    "
   >
     <FeatherIcon name="plus" class="h-4" />
-    {{ __("Add a custom condition") }}
+    {{ __("Add a condition") }}
   </div>
-  <div class="flex items-center justify-between mt-2">
+  <div class="flex items-center justify-between">
     <Dropdown
       v-if="props.conditions.length > 0"
+      class="mt-2"
       v-slot="{ open }"
       :options="dropdownOptions"
     >
       <Button
-        :disabled="slaDataErrors.condition != ''"
+        :disabled="props.errors !== ''"
         :icon-right="open ? 'chevron-up' : 'chevron-down'"
         :label="__('Add condition')"
       />
     </Dropdown>
-    <ErrorMessage :message="slaDataErrors.condition" />
+    <ErrorMessage
+      v-if="props.conditions.length > 0"
+      :message="props.errors"
+      class="mt-2"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
-import { slaDataErrors, validateSlaData } from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
+import { validateAssignmentRule } from "../../../stores/assignmentRules";
 import CFConditions from "@/components/conditions-filter/CFConditions.vue";
 import { validateConditions } from "@/utils";
 
 const props = defineProps({
-  conditions: {
-    type: Array<any>,
-    required: true,
-  },
+  conditions: Array<any>,
+  name: String,
+  errors: String,
 });
 
 const getConjunction = () => {
@@ -83,8 +90,8 @@ const addCondition = () => {
 watchDebounced(
   () => [...props.conditions],
   () => {
-    validateSlaData("condition");
+    validateAssignmentRule(props.name);
   },
-  { deep: true, debounce: 100 }
+  { deep: true, debounce: 300 }
 );
 </script>

@@ -89,7 +89,7 @@
             class="text-ink-gray-6 text-base font-medium"
           />
           <div v-if="isOldSla && slaActiveScreen.data">
-            <Popover trigger="hover" hoverDelay="0.25" placement="top-end">
+            <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
               <template #target>
                 <div class="text-sm text-ink-gray-6 flex gap-1 cursor-default">
                   Old Conditions
@@ -112,9 +112,11 @@
             v-if="!useNewUI"
           >
             <span>
-              Conditions for this SLA were created from desk which are not
-              compatible with this UI, you will need to recreate the conditions
-              here if you want to manage and add new conditions from this UI.
+              Conditions for this SLA were created from
+              <a :href="deskUrl" target="_blank" class="underline">desk</a>
+              which are not compatible with this UI, you will need to recreate
+              the conditions here if you want to manage and add new conditions
+              from this UI.
             </span>
             <Button
               label="I understand, add conditions"
@@ -255,6 +257,9 @@ import SlaHolidays from "./SlaHolidays.vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
 import SlaStatusList from "./SlaStatusList.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
+import { useOnboarding } from "frappe-ui/frappe";
+
+const { updateOnboardingStep } = useOnboarding("helpdesk");
 
 const showConfirmDialog = ref({
   show: false,
@@ -269,6 +274,7 @@ const useNewUI = ref(true);
 const isOldSla = ref(false);
 
 const slaPolicyList = inject<any>("slaPolicyList");
+const deskUrl = `${window.location.origin}/app/hd-service-level-agreement/${slaActiveScreen.value.data?.name}`;
 
 const getSlaData = createResource({
   url: "helpdesk.api.sla.get_sla",
@@ -347,10 +353,7 @@ const goBack = () => {
 };
 
 const saveSla = () => {
-  const validationErrors = validateSlaData(
-    undefined,
-    !(isOldSla.value && useNewUI.value)
-  );
+  const validationErrors = validateSlaData(undefined, !useNewUI.value);
 
   if (Object.values(validationErrors).some((error) => error)) {
     toast.error(
@@ -405,6 +408,7 @@ const createSla = () => {
         getSlaData.submit({
           docname: data.name,
         });
+        updateOnboardingStep("setup_sla", true);
       },
     }
   );

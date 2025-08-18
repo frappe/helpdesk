@@ -221,6 +221,9 @@ import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
+
+import { setActiveSettingsTab } from "../Settings/settingsModal";
+
 const { isMobileView } = useScreenSize();
 
 const route = useRoute();
@@ -413,9 +416,9 @@ const steps = [
     completed: false,
     icon: markRaw(Timer),
     onClick: () => {
-      console.log("clicked");
-      const url = "/app/hd-service-level-agreement";
-      window.open(url, "_blank");
+      setActiveSettingsTab("SLA Policies");
+      showSettingsModal.value = true;
+      minimize.value = true;
     },
   },
   {
@@ -630,17 +633,10 @@ async function getGeneralCategory() {
 
 function setUpOnboarding() {
   if (!authStore.isManager) return;
-  $socket.on("update_sla_status", () => {
-    updateOnboardingStep("setup_sla");
-  });
   setUp(steps);
 }
 
 onMounted(() => {
   setUpOnboarding();
-});
-
-onUnmounted(() => {
-  $socket.off("update_sla_status");
 });
 </script>

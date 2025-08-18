@@ -1,4 +1,4 @@
-import { markRaw, ref } from "vue";
+import { h, markRaw, ref } from "vue";
 import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
@@ -14,6 +14,8 @@ import LucideUserPlus from "~icons/lucide/user-plus";
 import LucideUsers from "~icons/lucide/users";
 import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
+import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
+import Settings from "~icons/lucide/settings-2";
 import { FieldDependencyIcon } from "@/components/icons";
 
 export const tabs = [
@@ -53,6 +55,11 @@ export const tabs = [
     component: markRaw(HolidayList),
   },
   {
+    label: "Assignment Rules",
+    icon: markRaw(h(Settings, { class: "rotate-90" })),
+    component: markRaw(AssignmentRules),
+  },
+  {
     label: "Field Dependencies",
     icon: markRaw(FieldDependencyIcon),
     component: markRaw(FieldDependencyConfig),
@@ -62,3 +69,7 @@ export const tabs = [
 export const activeTab = ref(tabs[0]);
 
 export const disableSettingModalOutsideClick = ref(false);
+
+export const setActiveSettingsTab = (tab: string) => {
+  activeTab.value = tabs.find((t) => t.label === tab);
+};
