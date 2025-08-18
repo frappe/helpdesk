@@ -144,19 +144,25 @@ watchDebounced(
 const usersList = createListResource({
   doctype: "User",
   fields: ["name", "email", "full_name", "user_image"],
-  filters: {
-    full_name: ["not in", ["Administrator", "Guest"]],
-  },
   start: 0,
   pageLength: 5,
   auto: true,
   transform: (data) => {
-    return data.map((user) => {
-      return {
-        ...user,
-        user: user.email,
-      };
-    });
+    return data
+      .map((user) => {
+        if (user.full_name == "Administrator") {
+          return {
+            ...user,
+            email: "Administrator",
+            user: "Administrator",
+          };
+        }
+        return {
+          ...user,
+          user: user.email,
+        };
+      })
+      .filter((user) => user.full_name != "Guest");
   },
 });
 

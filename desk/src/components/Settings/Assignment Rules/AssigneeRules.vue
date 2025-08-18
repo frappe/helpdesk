@@ -135,7 +135,7 @@ const ticketRoutingOptions = [
 
 const removeAssignedUser = (user) => {
   assignmentRuleData.value.users = assignmentRuleData.value.users.filter(
-    (u) => u.user !== user.email
+    (u) => u.user !== user.name
   );
   validateAssignmentRule("users");
 };

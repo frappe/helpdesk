@@ -16,7 +16,7 @@
     <AssignmentScheduleItem
       v-for="(day, index) in days"
       :key="day.day"
-      :day="day"
+      :data="day"
       :isLast="index === days.length - 1"
     />
   </div>
@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { ErrorMessage } from "frappe-ui";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import {
   assignmentRuleData,
   assignmentRulesErrors,
@@ -74,17 +74,12 @@ const days = ref([
   },
 ]);
 
-watch(
-  () => assignmentRuleData.value.assignmentDays,
-  () => {
-    days.value.forEach((day) => {
-      const workDay = assignmentRuleData.value.assignmentDays.find(
-        (d) => d.day === day.day
-      );
-      if (workDay) {
-        day.active = true;
-      }
-    });
-  }
-);
+onMounted(() => {
+  assignmentRuleData.value.assignmentDays.forEach((day) => {
+    const workDay = days.value.find((d) => d.day === day);
+    if (workDay) {
+      workDay.active = true;
+    }
+  });
+});
 </script>

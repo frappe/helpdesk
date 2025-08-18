@@ -3,12 +3,12 @@
     class="grid py-3.5 px-4 items-center"
     style="grid-template-columns: 3fr 1fr"
   >
-    <div class="text-ink-gray-7 font-medium">{{ day.day }}</div>
+    <div class="text-ink-gray-7 font-medium">{{ data.day }}</div>
     <div class="flex justify-start">
-      <Switch v-model="day.active" @update:model-value="toggleDay" />
+      <Switch v-model="data.active" @update:model-value="toggleDay" />
     </div>
   </div>
-  <hr v-if="!props.isLast" />
+  <hr v-if="!isLast" />
 </template>
 
 <script setup lang="ts">
@@ -16,7 +16,7 @@ import { assignmentRuleData } from "@/stores/assignmentRules";
 import { Switch } from "frappe-ui";
 
 const props = defineProps({
-  day: {
+  data: {
     type: Object,
     required: true,
   },
@@ -28,13 +28,11 @@ const props = defineProps({
 
 const toggleDay = (isActive) => {
   const dayIndex = assignmentRuleData.value.assignmentDays.findIndex(
-    (d) => d.day === props.day.day
+    (d) => d === props.data.day
   );
 
   if (isActive && dayIndex === -1) {
-    assignmentRuleData.value.assignmentDays.push({
-      day: props.day.day,
-    });
+    assignmentRuleData.value.assignmentDays.push(props.data.day);
   } else {
     assignmentRuleData.value.assignmentDays.splice(dayIndex, 1);
   }

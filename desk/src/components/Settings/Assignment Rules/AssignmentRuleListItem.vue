@@ -141,13 +141,10 @@ const dropdownOptions = [
 
 const duplicate = () => {
   createResource({
-    url: "frappe.client.insert",
+    url: "helpdesk.api.assignment_rule.duplicate_assignment_rule",
     params: {
-      doctype: "Assignment Rule",
-      doc: {
-        ...props.data,
-        name: duplicateDialog.value.name,
-      },
+      docname: props.data.name,
+      new_name: duplicateDialog.value.name,
     },
     onSuccess: (data) => {
       assignmentRulesList.reload();

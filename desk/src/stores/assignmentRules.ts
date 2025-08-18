@@ -2,27 +2,13 @@ import { validateConditions } from "@/utils";
 import { ref } from "vue";
 
 const defaultAssignmentDays = [
-  {
-    day: "Monday",
-  },
-  {
-    day: "Tuesday",
-  },
-  {
-    day: "Wednesday",
-  },
-  {
-    day: "Thursday",
-  },
-  {
-    day: "Friday",
-  },
-  {
-    day: "Saturday",
-  },
-  {
-    day: "Sunday",
-  },
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
 ];
 
 export const assignmentRuleData = ref<Record<string, any> | null>({
@@ -73,8 +59,6 @@ export const validateAssignmentRule = (
       case "assignmentRuleName":
         if (assignmentRuleData.value.assignmentRuleName?.length == 0) {
           assignmentRulesErrors.value.assignmentRuleName = "Name is required";
-        } else if (assignmentRuleData.value.assignmentRuleName?.length > 50) {
-          assignmentRulesErrors.value.assignmentRuleName = "Name is too long";
         } else {
           assignmentRulesErrors.value.assignmentRuleName = "";
         }
