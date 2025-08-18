@@ -334,12 +334,12 @@
   {
    "fieldname": "email_customisations_tab",
    "fieldtype": "Tab Break",
-   "label": "Email Events"
+   "label": "Email Notifications"
   },
   {
    "fieldname": "share_feedback_section",
    "fieldtype": "Section Break",
-   "label": "Feedback"
+   "label": "Share Feedback"
   },
   {
    "fieldname": "feedback_email_content",
@@ -398,7 +398,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-13 17:04:46.150244",
+ "modified": "2025-08-18 12:14:59.126488",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

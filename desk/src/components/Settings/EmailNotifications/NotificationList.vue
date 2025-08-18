@@ -2,7 +2,7 @@
   <!-- Header -->
   <div class="pt-8 pb-2 bg-white sticky top-0 z-10">
     <SettingsLayoutHeader
-      :title="__('Email Events')"
+      :title="__('Email Notifications')"
       :description="
         __('Personalize email settings and content to suit your needs')
       "
@@ -11,20 +11,20 @@
   <!-- Body -->
   <ul class="mt-4 pb-8 isolate">
     <li
-      v-for="emailEvent in emailEvents"
-      :key="emailEvent.name"
+      v-for="notification in notifications"
+      :key="notification.name"
       class="flex items-center justify-between p-3 rounded relative"
     >
       <div class="flex flex-col">
         <h2
           class="text-p-base font-medium text-ink-gray-7 relative z-10 pointer-events-none"
         >
-          {{ __(emailEvent.label) }}
+          {{ __(notification.label) }}
         </h2>
         <p
           class="text-p-sm text-ink-gray-5 truncate relative z-10 pointer-events-none"
         >
-          {{ __(emailEvent.description) }}
+          {{ __(notification.description) }}
         </p>
       </div>
       <FeatherIcon
@@ -36,12 +36,12 @@
         class="w-full h-full absolute top-0 left-0 hover:bg-surface-menu-bar rounded-[inherit]"
         @click="
           () => {
-            props.onEmailEventSelect(emailEvent);
+            props.onSelect(notification);
           }
         "
       >
         <span class="sr-only">{{
-          __args("customize {0}").format(emailEvent.name)
+          __args("customize {0}").format(notification.name)
         }}</span>
       </button>
     </li>
@@ -50,15 +50,15 @@
 
 <script setup lang="ts">
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
-import type { AtLeastOneEmailEvent, EmailEvent } from "./types";
+import type { AtLeastOneNotifcation, Notification } from "./types";
 
 const props = defineProps<{
-  onEmailEventSelect: (event: EmailEvent) => void;
+  onSelect: (notification: Notification) => void;
 }>();
 
-const emailEvents: AtLeastOneEmailEvent = [
+const notifications: AtLeastOneNotifcation = [
   {
-    name: "share-feedback",
+    name: "share_feedback",
     label: "Share Feedback",
     description:
       "Configure the settings or personalize the content of the email",
@@ -70,13 +70,13 @@ const emailEvents: AtLeastOneEmailEvent = [
       "Configure the settings or personalize the content of the email",
   },
   {
-    name: "reply-email-to-agents",
-    label: "Reply Email To Agents",
+    name: "reply_to_agents",
+    label: "Reply To Agents",
     description:
       "Configure the settings or personalize the content of the email",
   },
   {
-    name: "reply-via-agent",
+    name: "reply_via_agent",
     label: "Reply Via Agent",
     description:
       "Configure the settings or personalize the content of the email",

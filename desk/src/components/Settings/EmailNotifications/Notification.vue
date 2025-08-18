@@ -1,5 +1,8 @@
 <template>
-  <form @submit.prevent="onSubmit" class="flex-grow flex flex-col isolate">
+  <form
+    @submit.prevent="props.onSubmit"
+    class="flex-grow flex flex-col isolate"
+  >
     <!-- Header -->
     <div
       class="flex justify-between items-center gap-2 pb-8 sticky top-0 z-10 bg-white pt-8"
@@ -14,7 +17,7 @@
             <LucideChevronLeft />
           </button>
           <h1 class="font-semibold text-ink-gray-7 text-xl">
-            {{ __("Reply Via Agent") }}
+            {{ props.title }}
           </h1>
         </div>
         <Badge
@@ -26,9 +29,9 @@
         />
       </div>
       <div
-        :inert="getEmailEventData.loading"
+        :inert="notificationDataResource.loading"
         class="flex items-center gap-x-2"
-        :class="{ invisible: getEmailEventData.loading }"
+        :class="{ invisible: notificationDataResource.loading }"
       >
         <Switch
           size="sm"
@@ -43,7 +46,7 @@
           theme="gray"
           variant="solid"
           :disabled="!unsavedChanges"
-          :loading="setReplyViaAgentEmailSettings.loading"
+          :loading="props.submitting"
         />
       </div>
     </div>
@@ -51,10 +54,11 @@
     <div
       class="flex flex-col gap-8 flex-grow pb-8"
       :class="{
-        'items-center justify-center': getEmailEventData.loading,
+        'items-center justify-center': notificationDataResource.loading,
       }"
     >
-      <template v-if="!getEmailEventData.loading">
+      <template v-if="!notificationDataResource.loading">
+        <slot name="formFields"></slot>
         <div class="flex flex-col gap-2">
           <FormControl
             type="textarea"
@@ -82,76 +86,54 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Badge,
-  FormControl,
-  Button,
-  LoadingIndicator,
-  Switch,
-  createResource,
-} from "frappe-ui";
-import LucideChevronLeft from "~icons/lucide/chevron-left";
-import type { EmailEvent } from "./types";
 import { ref } from "vue";
+import type { NotificationName } from "./types";
+import { createResource, Switch, LoadingIndicator } from "frappe-ui";
 
 const props = defineProps<{
+  title: string;
+  defaultContent: string;
   onBack: () => void;
-  emailEvent: EmailEvent;
+  onSubmit: (e: Event & { target: HTMLFormElement }) => void;
+  onGetDataSuccess: (data: any) => void;
+  submitting: boolean;
+  name: NotificationName;
 }>();
 
+const content = defineModel<string>("content", { required: true });
+const enabled = defineModel<boolean>("enabled", { required: true });
+
 const unsavedChanges = ref(false);
-const enabled = ref(false);
-const content = ref("");
-const defaultContent = ref("");
 
-type EmailEventData = {
-  enabled: boolean;
-  email_content: string;
-};
-
-const getEmailEventData = createResource({
-  url: "helpdesk.api.email_event_settings.get_event_data",
+const notificationDataResource = createResource({
+  url: "helpdesk.api.settings.email_notifications.get_data",
   method: "GET",
   params: {
-    email_event: "reply_via_agent",
+    notification: props.name,
   },
   auto: true,
-  onSuccess(data: EmailEventData & { default_email_content: string }) {
-    enabled.value = data.enabled;
-    content.value = data.email_content;
-    defaultContent.value = data.default_email_content;
-  },
-});
-
-const setReplyViaAgentEmailSettings = createResource({
-  url: "helpdesk.api.email_event_settings.set_reply_via_agent_email_settings",
-  method: "PUT",
-  auto: false,
-  onSuccess(data: EmailEventData) {
-    enabled.value = data.enabled;
-    content.value = data.email_content;
-    unsavedChanges.value = false;
-  },
+  onSuccess: props.onGetDataSuccess,
 });
 
 function setUnsavedChanges() {
   unsavedChanges.value = true;
 }
 
-function onSubmit() {
-  return setReplyViaAgentEmailSettings.submit({
-    enabled: enabled.value,
-    email_content: content.value,
-  });
+function resetUnsavedChanges() {
+  unsavedChanges.value = false;
 }
 
 function resetContent() {
-  if (content.value === defaultContent.value) {
-    return;
+  if (content.value !== props.defaultContent) {
+    content.value = props.defaultContent;
+    setUnsavedChanges();
   }
-  content.value = defaultContent.value;
-  setUnsavedChanges();
 }
+
+defineExpose({
+  setUnsavedChanges,
+  resetUnsavedChanges,
+});
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

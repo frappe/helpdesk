@@ -1,0 +1,54 @@
+<template>
+  <Notification
+    v-model:content="content"
+    :defaultContent="defaultContent"
+    v-model:enabled="enabled"
+    ref="compRef"
+    name="acknowledgement"
+    :title="__('Acknowledgement')"
+    :submitting="updateSettings.loading"
+    :onBack="props.onBack"
+    :onSubmit="onSubmit"
+    :onGetDataSuccess="onGetDataSuccess"
+  />
+</template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import Notification from "./Notification.vue";
+import { createResource } from "frappe-ui";
+import type { BaseSettings } from "./types";
+
+const props = defineProps<{ onBack: () => void }>();
+
+const content = ref("");
+const defaultContent = ref("");
+const enabled = ref(false);
+const compRef = ref<InstanceType<typeof Notification>>();
+
+const updateSettings = createResource({
+  url: "helpdesk.api.settings.email_notifications.update_acknowledgement",
+  method: "PUT",
+  auto: false,
+  onSuccess(data: BaseSettings) {
+    enabled.value = data.enabled;
+    content.value = data.content;
+    compRef.value.resetUnsavedChanges();
+  },
+});
+
+function onSubmit() {
+  return updateSettings.submit({
+    enabled: enabled.value,
+    content: content.value,
+  });
+}
+
+function onGetDataSuccess(data: BaseSettings & { default_content: string }) {
+  enabled.value = data.enabled;
+  content.value = data.content;
+  defaultContent.value = data.default_content;
+}
+</script>
+
+<style scoped></style>
