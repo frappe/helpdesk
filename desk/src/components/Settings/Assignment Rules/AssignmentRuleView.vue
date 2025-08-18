@@ -59,6 +59,7 @@
           label="Name"
           v-model="assignmentRuleData.assignmentRuleName"
           required
+          maxlength="50"
           @change="validateAssignmentRule('assignmentRuleName')"
         />
         <ErrorMessage
@@ -116,6 +117,7 @@
           placeholder="Description"
           label="Description"
           required
+          maxlength="250"
           @change="validateAssignmentRule('description')"
           v-model="assignmentRuleData.description"
         />
@@ -169,7 +171,7 @@
           class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
           v-if="!useNewUI && assignmentRuleData.assignCondition"
         >
-          <span>
+          <span class="text-p-sm">
             Conditions for this rule were created from
             <a :href="deskUrl" target="_blank" class="underline">desk</a> which
             are not compatible with this UI, you will need to recreate the
@@ -247,7 +249,7 @@
           class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
           v-if="!useNewUI && assignmentRuleData.unassignCondition"
         >
-          <span>
+          <span class="text-p-sm">
             Conditions for this rule were created from
             <a :href="deskUrl" target="_blank" class="underline">desk</a> which
             are not compatible with this UI, you will need to recreate the
@@ -362,7 +364,7 @@ const getAssignmentRuleData = createResource({
       description: data.description,
       name: data.name,
       assignmentRuleName: data.name,
-      assignmentDays: data.assignment_days,
+      assignmentDays: data.assignment_days.map((day) => day.day),
     };
 
     initialData.value = JSON.stringify(assignmentRuleData.value);
@@ -457,7 +459,9 @@ const createAssignmentRule = () => {
         users: assignmentRuleData.value.users,
         disabled: assignmentRuleData.value.disabled,
         description: assignmentRuleData.value.description,
-        assignment_days: assignmentRuleData.value.assignmentDays,
+        assignment_days: assignmentRuleData.value.assignmentDays.map((day) => ({
+          day: day,
+        })),
         name: assignmentRuleData.value.assignmentRuleName,
         assignment_rule_name: assignmentRuleData.value.assignmentRuleName,
         assign_condition: convertToConditions({
@@ -517,7 +521,9 @@ const updateAssignmentRule = async () => {
       users: assignmentRuleData.value.users,
       disabled: assignmentRuleData.value.disabled,
       description: assignmentRuleData.value.description,
-      assignment_days: assignmentRuleData.value.assignmentDays,
+      assignment_days: assignmentRuleData.value.assignmentDays.map((day) => ({
+        day: day,
+      })),
       assign_condition: useNewUI.value
         ? convertToConditions({
             conditions: assignmentRuleData.value.assignConditionJson,
