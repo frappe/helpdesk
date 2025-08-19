@@ -21,7 +21,7 @@ try:
     from redis.commands.search.index_definition import IndexDefinition
 except ImportError:
     from redis.commands.search.indexDefinition import IndexDefinition
-
+   
 from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
 
