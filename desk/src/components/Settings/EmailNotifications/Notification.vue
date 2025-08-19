@@ -4,51 +4,57 @@
     class="flex-grow flex flex-col isolate"
   >
     <!-- Header -->
-    <div
-      class="flex justify-between items-center gap-2 pb-8 sticky top-0 z-10 bg-white pt-8"
-    >
-      <div class="flex items-center gap-x-1">
-        <div class="flex items-center gap-x-1">
-          <button
-            @click="props.onBack"
-            class="relative text-ink-gray-7 active:text-ink-gray-5 -ml-4"
+    <div class="sticky top-0 z-10 bg-white py-8">
+      <SettingsLayoutHeader :description="props.description">
+        <template #title>
+          <div class="flex items-center gap-x-1 -ml-6">
+            <div class="flex items-center gap-x-1">
+              <button
+                @click="props.onBack"
+                class="relative text-ink-gray-7 hover:text-black"
+              >
+                <span class="sr-only">{{
+                  __("back to email event list")
+                }}</span>
+                <LucideChevronLeft class="w-5 h-5" />
+              </button>
+              <h1 class="font-semibold text-ink-gray-7 text-xl">
+                {{ props.title }}
+              </h1>
+            </div>
+            <Badge
+              v-if="unsavedChanges"
+              :variant="'subtle'"
+              :theme="'red'"
+              size="sm"
+              :label="__('Not Saved')"
+            />
+          </div>
+        </template>
+        <template #actions>
+          <div
+            :inert="notificationDataResource.loading"
+            class="flex items-center gap-x-2"
+            :class="{ invisible: notificationDataResource.loading }"
           >
-            <span class="sr-only">{{ __("back to email event list") }}</span>
-            <LucideChevronLeft />
-          </button>
-          <h1 class="font-semibold text-ink-gray-7 text-xl">
-            {{ props.title }}
-          </h1>
-        </div>
-        <Badge
-          v-if="unsavedChanges"
-          :variant="'subtle'"
-          :theme="'red'"
-          size="sm"
-          :label="__('Not Saved')"
-        />
-      </div>
-      <div
-        :inert="notificationDataResource.loading"
-        class="flex items-center gap-x-2"
-        :class="{ invisible: notificationDataResource.loading }"
-      >
-        <Switch
-          size="sm"
-          :label="__('Enabled')"
-          v-model="enabled"
-          @update:model-value="setUnsavedChanges"
-          class="flex-row-reverse gap-x-2 text-sm text-ink-gray-7 font-medium pl-0 hover:bg-transparent active:bg-transparent"
-        />
-        <Button
-          type="submit"
-          :label="__('Save')"
-          theme="gray"
-          variant="solid"
-          :disabled="!unsavedChanges"
-          :loading="props.submitting"
-        />
-      </div>
+            <Switch
+              size="sm"
+              :label="__('Enabled')"
+              v-model="enabled"
+              @update:model-value="setUnsavedChanges"
+              class="flex-row-reverse gap-x-2 text-sm text-ink-gray-7 font-medium pl-0 hover:bg-transparent active:bg-transparent"
+            />
+            <Button
+              type="submit"
+              :label="__('Save')"
+              theme="gray"
+              variant="solid"
+              :disabled="!unsavedChanges"
+              :loading="props.submitting"
+            />
+          </div>
+        </template>
+      </SettingsLayoutHeader>
     </div>
     <!-- Body -->
     <div
@@ -89,6 +95,7 @@
 import { ref } from "vue";
 import type { NotificationName } from "./types";
 import { createResource, Switch, LoadingIndicator } from "frappe-ui";
+import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 
 const props = defineProps<{
   title: string;
