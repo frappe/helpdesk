@@ -137,6 +137,7 @@ export interface Field {
   filters?: string;
   display_via_depends_on?: string;
   mandatory_via_depends_on?: string;
+  disabled?: boolean;
 }
 
 export type FieldValue = string | number | boolean;
@@ -335,4 +336,18 @@ interface FileAttachment {
   name: string;
   file_name: string;
   file_url: string;
+}
+
+export interface FieldCriteriaState {
+  selectedParentField: string;
+  selectedChildField: string;
+  childFields: any[];
+  parentFieldValues: any[];
+  childFieldValues: any[];
+  currentParentSelection: string;
+  childSelections: any;
+  initialChildSelections: any;
+  parentSearch: string;
+  childSearch: string;
+  enabled: boolean;
 }

@@ -1,0 +1,2316 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: frappe\n"
+"Report-Msgid-Bugs-To: hello@frappe.io\n"
+"POT-Creation-Date: 2025-08-17 10:37+0000\n"
+"PO-Revision-Date: 2025-08-19 12:16\n"
+"Last-Translator: hello@frappe.io\n"
+"Language-Team: French\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Crowdin-Project: frappe\n"
+"X-Crowdin-Project-ID: 639578\n"
+"X-Crowdin-Language: fr\n"
+"X-Crowdin-File: /[frappe.helpdesk] develop/helpdesk/locale/main.pot\n"
+"X-Crowdin-File-ID: 118\n"
+"Language: fr_FR\n"
+
+#. Description of the 'Feedback' (Select) field in DocType 'HD Article
+#. Feedback'
+#: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
+msgid "0 is no feedback, 1 is Like, 2 is Dislike"
+msgstr ""
+
+#. Header text in the Helpdesk Workspace
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Visit Helpdesk</a></span>"
+msgstr ""
+
+#. Paragraph text in the Helpdesk Workspace
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "<span class=\"h4\">Helpdesk Configuration<br></span>"
+msgstr ""
+
+#. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
+#. Source'
+#. Label of the api_sb (Section Break) field in DocType 'HD Support Search
+#. Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "API"
+msgstr "API"
+
+#: helpdesk/api/knowledge_base.py:15
+msgid "Access denied"
+msgstr ""
+
+#. Label of the action (Data) field in DocType 'HD Ticket Activity'
+#: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
+msgid "Action"
+msgstr "Action"
+
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:22
+msgid "Action Required"
+msgstr ""
+
+#. Description of the 'On click (Javascript)' (Code) field in DocType 'HD
+#. Action'
+#: helpdesk/helpdesk/doctype/hd_action/hd_action.json
+msgid "Action to perform when clicking the button. The doc will be available as `this`"
+msgstr ""
+
+#. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
+#. Service Holiday List'
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Add Weekly Holidays"
+msgstr "Ajouter des vacances hebdomadaires"
+
+#. Label of the get_weekly_off_dates (Button) field in DocType 'HD Service
+#. Holiday List'
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Add to Holidays"
+msgstr "Ajouter aux vacances"
+
+#: desk/src/components/Settings/Agents.vue:6
+msgid "Add, manage agents and assign roles to them."
+msgstr ""
+
+#. Label of the about (Code) field in DocType 'HD Ticket Template'
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
+msgid "Additional Information"
+msgstr "Information additionnelle"
+
+#. Name of a role
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Administrator"
+msgstr "Administrateur"
+
+#. Name of a role
+#. Label of the to_agent (Link) field in DocType 'HD Escalation Rule'
+#. Label of a Link in the Helpdesk Workspace
+#: helpdesk/helpdesk/doctype/hd_action/hd_action.json
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+#: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
+#: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
+#: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Agent"
+msgstr "Représentant"
+
+#. Label of a Card Break in the Helpdesk Workspace
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Agent Configuration"
+msgstr ""
+
+#. Name of a role
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Agent Manager"
+msgstr ""
+
+#. Label of the agent_name (Data) field in DocType 'HD Agent'
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+msgid "Agent Name"
+msgstr ""
+
+#: desk/src/components/Settings/Agents.vue:5
+msgid "Agents"
+msgstr ""
+
+#. Name of a role
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+#: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
+#: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+msgid "All"
+msgstr "Tout"
+
+#. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Allow anyone to create tickets"
+msgstr ""
+
+#. Label of the apply_sla_for_resolution (Check) field in DocType 'HD Service
+#. Level Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Apply SLA for Resolution Time"
+msgstr "Appliquer l'accord de niveau de service (SLA) pour le délai de résolution"
+
+#. Label of the apply_to (Select) field in DocType 'HD Form Script'
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+msgid "Apply To"
+msgstr "Appliquer à"
+
+#. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+msgid "Apply on new page"
+msgstr ""
+
+#. Label of the apply_to_customer_portal (Check) field in DocType 'HD Form
+#. Script'
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+msgid "Apply to customer portal"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'HD Article'
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+msgid "Archived"
+msgstr "Archivé"
+
+#. Label of the article (Link) field in DocType 'HD Article Feedback'
+#: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
+msgid "Article"
+msgstr ""
+
+#. Label of the assign_to_section (Section Break) field in DocType 'HD
+#. Escalation Rule'
+#: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
+msgid "Assign to"
+msgstr ""
+
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:68
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:55
+msgid "Assigned To"
+msgstr "Assigné À"
+
+#. Option for the 'Type' (Select) field in DocType 'HD Notification'
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+msgid "Assignment"
+msgstr "Affectation"
+
+#. Label of the filters_section (Section Break) field in DocType 'HD Service
+#. Level Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Assignment Conditions"
+msgstr "Conditions d'affectation"
+
+#. Label of the assignment_rule (Link) field in DocType 'HD Team'
+#. Label of a Link in the Helpdesk Workspace
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Assignment Rule"
+msgstr "Règle d&#39;assignation"
+
+#. Label of the assignment_rules_section (Section Break) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Assignment Rules"
+msgstr "Règles d&#39;attribution"
+
+#: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:28
+msgid "At-least one of priority, team and ticket type is required"
+msgstr ""
+
+#. Label of the attachment (Attach) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Attachment"
+msgstr "Pièce jointe"
+
+#. Label of the author (Link) field in DocType 'HD Article'
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+msgid "Author"
+msgstr "Auteur"
+
+#. Label of the auto_update_status (Check) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Auto update status"
+msgstr ""
+
+#. Label of the auto_close_after_days (Int) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Auto-close after (Days)"
+msgstr ""
+
+#. Description of the 'Condition' (Code) field in DocType 'HD Service Level
+#. Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Auto-generated from the portal view — do not edit directly unless you know what you're doing! "
+msgstr ""
+
+#. Label of the auto_close_tickets (Check) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Automatically Close Replied Tickets"
+msgstr ""
+
+#. Label of a Card Break in the Helpdesk Workspace
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Automation"
+msgstr "Automatisation"
+
+#. Label of the avg_response_time (Duration) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Average Response Time"
+msgstr "Temps de réponse moyen"
+
+#. Label of the base_support_rotation (Link) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Base Support Rotation"
+msgstr ""
+
+#. Label of the base_url (Data) field in DocType 'HD Support Search Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Base URL"
+msgstr "URL de base"
+
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:9
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:9
+msgid "Based On"
+msgstr "Basé Sur"
+
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:34
+msgid "Based on your HR Policy, select your leave allocation period's end date"
+msgstr "En fonction de votre politique RH, sélectionnez la date de fin de la période d'attribution des congés"
+
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:27
+msgid "Based on your HR Policy, select your leave allocation period's start date"
+msgstr ""
+
+#. Label of the branding_tab (Tab Break) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Branding"
+msgstr ""
+
+#. Label of the button_section (Section Break) field in DocType 'HD Action'
+#: helpdesk/helpdesk/doctype/hd_action/hd_action.json
+msgid "Button"
+msgstr "Bouton"
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:537
+msgid "Can not send email. No sender email set up!"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:491
+msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
+msgstr ""
+
+#: helpdesk/api/knowledge_base.py:122
+msgid "Cannot merge General category"
+msgstr ""
+
+#. Label of the category (Link) field in DocType 'HD Article'
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+msgid "Category"
+msgstr "Catégorie"
+
+#: helpdesk/api/knowledge_base.py:72
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.py:59
+msgid "Category must have atleast one article"
+msgstr ""
+
+#. Label of a Card Break in the Helpdesk Workspace
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Channels"
+msgstr ""
+
+#. Label of the clear_table (Button) field in DocType 'HD Service Holiday List'
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Clear Table"
+msgstr "Effacer le tableau"
+
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:46
+msgid "Click on Add to Holidays. This will populate the holidays table with all the dates that fall on the selected weekly off. Repeat the process for populating the dates for all your weekly holidays"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'HD Pause Service Level
+#. Agreement On Status'
+#. Option for the 'Status' (Select) field in DocType 'HD Service Level
+#. Agreement Fulfilled On Status'
+#. Option for the 'Send feedback when' (Select) field in DocType 'HD Settings'
+#. Option for the 'Status' (Select) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_pause_service_level_agreement_on_status/hd_pause_service_level_agreement_on_status.json
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement_fulfilled_on_status/hd_service_level_agreement_fulfilled_on_status.json
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:51
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:38
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:421
+msgid "Closed"
+msgstr "Fermé"
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:271
+msgid "Closed or rated tickets cannot be updated by non-agents"
+msgstr ""
+
+#. Label of the color (Color) field in DocType 'HD Service Holiday List'
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Color"
+msgstr "Couleur"
+
+#. Label of the columns (Code) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Columns"
+msgstr "Colonnes"
+
+#. Label of the reference_comment (Link) field in DocType 'HD Notification'
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+msgid "Comment"
+msgstr "Commentaire"
+
+#. Label of the commented_by (Link) field in DocType 'HD Ticket Comment'
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
+msgid "Commented By"
+msgstr ""
+
+#. Label of the condition (Code) field in DocType 'HD Service Level Agreement'
+#. Label of the condition_json (Code) field in DocType 'HD Service Level
+#. Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Condition"
+msgstr "Conditions"
+
+#. Label of the contact (Link) field in DocType 'HD Organization Contact Item'
+#. Label of the contact (Link) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_organization_contact_item/hd_organization_contact_item.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:62
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:44
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:49
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:36
+msgid "Contact"
+msgstr "Contact"
+
+#. Label of the contact_html (HTML) field in DocType 'HD Customer'
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Contact HTML"
+msgstr "HTML du Contact"
+
+#: helpdesk/templates/components/contact_with_us.html:11
+msgid "Contact with us"
+msgstr ""
+
+#. Label of the contacts (Table) field in DocType 'HD Organization'
+#: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
+msgid "Contacts"
+msgstr "Contacts"
+
+#. Label of the content_section (Section Break) field in DocType 'HD Article'
+#. Label of the content (Text Editor) field in DocType 'HD Article'
+#. Label of the content (Text Editor) field in DocType 'HD Ticket Comment'
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
+msgid "Content"
+msgstr "Contenu"
+
+#. Label of the content_type (Data) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Content Type"
+msgstr "Type de Contenu"
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:121
+msgid "Could not send feedback email,due to: {0}"
+msgstr ""
+
+#. Label of the criterion_section (Section Break) field in DocType 'HD
+#. Escalation Rule'
+#: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
+msgid "Criterion"
+msgstr ""
+
+#. Label of the customer (Link) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Customer"
+msgstr "Client"
+
+#. Label of the customer_name (Data) field in DocType 'HD Customer'
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Customer Name"
+msgstr "Nom du client"
+
+#. Label of the holiday_date (Date) field in DocType 'HD Holiday'
+#: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
+#: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.py:77
+msgid "Date"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:26
+msgid "Day count for auto closing tickets cannot be negative or zero"
+msgstr ""
+
+#. Label of the default_priority (Link) field in DocType 'HD Service Level
+#. Agreement'
+#. Label of the default_priority (Check) field in DocType 'HD Service Level
+#. Priority'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+#: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
+msgid "Default Priority"
+msgstr "Priorité par défaut"
+
+#. Label of the default_sla (Check) field in DocType 'HD Service Level
+#. Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Default SLA"
+msgstr ""
+
+#. Label of the default_priority (Link) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Default priority"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:59
+msgid "Default template can not be deleted"
+msgstr ""
+
+#. Label of the default_ticket_type (Link) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Default ticket type"
+msgstr ""
+
+#. Label of the description (Text) field in DocType 'HD Article Category'
+#. Label of the description (Text Editor) field in DocType 'HD Holiday'
+#. Label of the description (Data) field in DocType 'HD Service Holiday List'
+#. Label of the description (Data) field in DocType 'HD Service Level
+#. Agreement'
+#. Label of the description (Text Editor) field in DocType 'HD Ticket'
+#. Label of the description (Small Text) field in DocType 'HD Ticket Priority'
+#. Label of the description (Small Text) field in DocType 'HD Ticket Type'
+#: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
+#: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+msgid "Description"
+msgstr "Description"
+
+#. Label of the description_template (Text Editor) field in DocType 'HD Ticket
+#. Template'
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
+msgid "Description Template"
+msgstr ""
+
+#. Label of the description_weight (Int) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Description Weight"
+msgstr ""
+
+#. Label of the details_section (Section Break) field in DocType 'HD
+#. Notification'
+#. Label of the sb_details (Section Break) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Details"
+msgstr "Détails"
+
+#. Description of the 'Ignore Restrictions' (Check) field in DocType 'HD Team'
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+msgid "Do not apply filters and restrictions to agents of this team"
+msgstr ""
+
+#. Label of the do_not_restrict_tickets_without_an_agent_group (Check) field in
+#. DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Do not restrict tickets without a Team"
+msgstr ""
+
+#. Label of the dt (Link) field in DocType 'HD Form Script'
+#. Label of the dt (Link) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "DocType"
+msgstr "Type de Document"
+
+#. Label of the domain (Data) field in DocType 'HD Customer'
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Domain"
+msgstr "Domaine"
+
+#. Option for the 'Status' (Select) field in DocType 'HD Article'
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+msgid "Draft"
+msgstr "Brouillon"
+
+#. Label of the email (Data) field in DocType 'HD Desk Account Request'
+#: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
+msgid "Email"
+msgstr "Courriel"
+
+#. Label of the email_account (Link) field in DocType 'HD Ticket'
+#. Label of a Link in the Helpdesk Workspace
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Email Account"
+msgstr "Compte Email"
+
+#. Label of the is_feedback_mandatory (Check) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Enable feedback for Customer Portal"
+msgstr ""
+
+#. Label of the enable_email_ticket_feedback (Check) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Enable feedback for Email Tickets"
+msgstr ""
+
+#. Label of the is_enabled (Check) field in DocType 'HD Action'
+#. Label of the is_enabled (Check) field in DocType 'HD Escalation Rule'
+#. Label of the enabled (Check) field in DocType 'HD Form Script'
+#. Label of the enabled (Check) field in DocType 'HD Service Level Agreement'
+#. Label of the enabled (Check) field in DocType 'HD Stopword'
+#: helpdesk/helpdesk/doctype/hd_action/hd_action.json
+#: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+#: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
+msgid "Enabled"
+msgstr "Activé"
+
+#. Label of the end_date (Date) field in DocType 'HD Service Level Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "End Date"
+msgstr "Date de Fin"
+
+#. Label of the end_time (Time) field in DocType 'HD Service Day'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
+msgid "End Time"
+msgstr "Heure de Fin"
+
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:22
+msgid "Enter a name for this HD Service Holiday List."
+msgstr ""
+
+#: helpdesk/api/knowledge_base.py:80
+msgid "Error moving article to category"
+msgstr ""
+
+#: helpdesk/overrides/email_account.py:69
+msgid "Error while connecting to email account {0}"
+msgstr "Erreur lors de la connexion au compte Email {0}"
+
+#: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:43
+msgid "Escalation rule already exists for this criteria"
+msgstr ""
+
+#. Label of the is_external_link (Check) field in DocType 'HD Action'
+#: helpdesk/helpdesk/doctype/hd_action/hd_action.json
+msgid "External link"
+msgstr ""
+
+#. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Failed"
+msgstr "Échoué"
+
+#. Label of the feedback (Select) field in DocType 'HD Article Feedback'
+#. Label of the feedback_section (Section Break) field in DocType 'HD Settings'
+#. Label of the feedback_tab (Tab Break) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Feedback"
+msgstr "Retour d’Expérience"
+
+#. Label of the feedback_extra (Small Text) field in DocType 'HD Email
+#. Feedback'
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
+msgid "Feedback "
+msgstr "Retour d’Expérience "
+
+#. Label of the feedback_extra (Long Text) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Feedback (Extra)"
+msgstr ""
+
+#. Label of the feedback (Link) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Feedback (Option)"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:30
+msgid "Feedback Already Exists"
+msgstr ""
+
+#. Label of the feedback_rating (Rating) field in DocType 'HD Email Feedback'
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
+msgid "Feedback Rating"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:119
+msgid "Feedback email has been sent to the customer"
+msgstr ""
+
+#. Label of the fieldname (Data) field in DocType 'HD Ticket Template Field'
+#: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
+msgid "Field (fieldname)"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:27
+msgid "Field `{0}` does not exist in Ticket"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:43
+msgid "Field `{0}` is not allowed in Ticket Template"
+msgstr ""
+
+#. Label of the fields (Table) field in DocType 'HD Ticket Template'
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
+msgid "Fields"
+msgstr "Champ"
+
+#. Label of the filters_tab (Tab Break) field in DocType 'HD View'
+#. Label of the filters (Code) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Filters"
+msgstr "Filtres"
+
+#. Label of the first_responded_on (Datetime) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "First Responded On"
+msgstr "Première Réponse Le"
+
+#. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "First Response Due"
+msgstr "Première Réponse due"
+
+#. Label of the response_time (Duration) field in DocType 'HD Service Level
+#. Priority'
+#. Label of the first_response_time (Duration) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "First Response Time"
+msgstr "Temps de première réponse"
+
+#. Name of a report
+#: helpdesk/helpdesk/report/first_response_time_for_tickets/first_response_time_for_tickets.json
+msgid "First Response Time for Tickets"
+msgstr ""
+
+#. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+msgid "Form"
+msgstr "Formulaire"
+
+#. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
+#. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
+#. List'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Friday"
+msgstr "Vendredi"
+
+#. Label of the user_from (Link) field in DocType 'HD Notification'
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+msgid "From"
+msgstr "À partir de"
+
+#. Label of the from_date (Date) field in DocType 'HD Service Holiday List'
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+#: helpdesk/helpdesk/report/first_response_time_for_tickets/first_response_time_for_tickets.js:9
+#: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.js:8
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:17
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:17
+msgid "From Date"
+msgstr "A partir du"
+
+#. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Fulfilled"
+msgstr "Complété"
+
+#. Label of a Link in the Helpdesk Workspace
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "General Settings"
+msgstr "Paramètres Généraux"
+
+#: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:24
+msgid "General category can't be deleted"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:20
+msgid "General category name can't be changed"
+msgstr ""
+
+#. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Group By"
+msgstr "Grouper par"
+
+#. Label of the group_by_field (Data) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Group By Field"
+msgstr ""
+
+#. Name of a role
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+#: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Guest"
+msgstr "Invité"
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_action/hd_action.json
+msgid "HD Action"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+msgid "HD Agent"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+msgid "HD Article"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
+msgid "HD Article Category"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
+msgid "HD Article Feedback"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
+msgid "HD Canned Response"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
+msgid "HD Customer"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
+msgid "HD Desk Account Request"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
+msgid "HD Email Feedback"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
+msgid "HD Escalation Rule"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+msgid "HD Form Script"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
+msgid "HD Holiday"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+msgid "HD Notification"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
+msgid "HD Organization"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_organization_contact_item/hd_organization_contact_item.json
+msgid "HD Organization Contact Item"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_pause_service_level_agreement_on_status/hd_pause_service_level_agreement_on_status.json
+msgid "HD Pause Service Level Agreement On Status"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
+msgid "HD Portal Signup Request"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
+msgid "HD Service Day"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list_calendar.js:20
+msgid "HD Service Holiday List"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "HD Service Level Agreement"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement_fulfilled_on_status/hd_service_level_agreement_fulfilled_on_status.json
+msgid "HD Service Level Agreement Fulfilled On Status"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
+msgid "HD Service Level Priority"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "HD Settings"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
+msgid "HD Stopword"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "HD Support Search Source"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json
+msgid "HD Synonym"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
+msgid "HD Synonyms"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+msgid "HD Team"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_team_member/hd_team_member.json
+msgid "HD Team Member"
+msgstr ""
+
+#. Name of a DocType
+#. Label of the ticket (Link) field in DocType 'HD Ticket Activity'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement_dashboard.py:7
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
+msgid "HD Ticket"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
+msgid "HD Ticket Activity"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
+msgid "HD Ticket Comment"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+msgid "HD Ticket Feedback Option"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
+msgid "HD Ticket Priority"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
+msgid "HD Ticket Template"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
+msgid "HD Ticket Template Field"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+msgid "HD Ticket Type"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "HD View"
+msgstr ""
+
+#. Label of the headings_weight (Int) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Headings Weight"
+msgstr ""
+
+#: helpdesk/config/desktop.py:11
+msgid "HelpDesk"
+msgstr ""
+
+#. Name of a Workspace
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Helpdesk"
+msgstr ""
+
+#. Name of a role
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+msgid "Helpdesk Contact"
+msgstr ""
+
+#. Label of a Card Break in the Helpdesk Workspace
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Helpdesk Reports"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:53
+msgid "Here, your weekly offs are pre-populated based on the previous selections. You can add more rows to also add public and national holidays individually."
+msgstr ""
+
+#. Label of the cond_hidden (Code) field in DocType 'HD Action'
+#: helpdesk/helpdesk/doctype/hd_action/hd_action.json
+msgid "Hide condition"
+msgstr ""
+
+#. Label of the hide_from_customer (Check) field in DocType 'HD Ticket Template
+#. Field'
+#: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
+msgid "Hide from customer"
+msgstr ""
+
+#. Label of the holiday_list (Link) field in DocType 'HD Service Level
+#. Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Holiday List"
+msgstr "Liste de vacances"
+
+#. Label of the holiday_list_name (Data) field in DocType 'HD Service Holiday
+#. List'
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Holiday List Name"
+msgstr "Nom de la Liste de Vacances"
+
+#. Label of the holidays_section (Section Break) field in DocType 'HD Service
+#. Holiday List'
+#. Label of the holidays (Table) field in DocType 'HD Service Holiday List'
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Holidays"
+msgstr "Jours Fériés"
+
+#. Label of the ip_address (Data) field in DocType 'HD Desk Account Request'
+#: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
+msgid "IP Address"
+msgstr "Adresse IP"
+
+#. Label of the button_icon (Data) field in DocType 'HD Action'
+#. Label of the icon (Data) field in DocType 'HD Article Category'
+#. Label of the icon (Data) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_action/hd_action.json
+#: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Icon"
+msgstr "Icône"
+
+#. Description of the 'Allow anyone to create tickets' (Check) field in DocType
+#. 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "If enabled, anyone will be able to create tickets (without any permission). "
+msgstr ""
+
+#. Description of the 'Enable feedback for Email Tickets' (Check) field in
+#. DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "If enabled, feedback email will be sent to the customer when you mark a ticket as Resolved/Closed.\n"
+msgstr ""
+
+#. Description of the 'Enable feedback for Customer Portal' (Check) field in
+#. DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \n"
+msgstr ""
+
+#. Label of the ignore_restrictions (Check) field in DocType 'HD Team'
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+msgid "Ignore Restrictions"
+msgstr ""
+
+#. Label of the user_image (Data) field in DocType 'HD Agent'
+#. Label of the image (Attach Image) field in DocType 'HD Customer'
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Image"
+msgstr "Image"
+
+#. Description of the 'Logo' (Attach Image) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Image to be used in various places, including Login and Signup pages. An image with transparent background and 160 x 32 is preferred"
+msgstr ""
+
+#. Label of the images_column (Column Break) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Images"
+msgstr ""
+
+#. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Instantly send e-mail"
+msgstr ""
+
+#: helpdesk/utils.py:26
+msgid "Insufficient Permission for {0}"
+msgstr "Autorisation Insuffisante Pour {0}"
+
+#. Label of the integer_value (Int) field in DocType 'HD Ticket Priority'
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
+msgid "Integer value"
+msgstr ""
+
+#. Label of the is_active (Check) field in DocType 'HD Agent'
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+msgid "Is Active"
+msgstr "Est Active"
+
+#. Label of the is_customer_portal (Check) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Is Customer Portal"
+msgstr ""
+
+#. Label of the is_default (Check) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Is Default"
+msgstr "Est Défaut"
+
+#. Label of the is_standard (Check) field in DocType 'HD Form Script'
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+msgid "Is Standard"
+msgstr "Est Standard"
+
+#. Label of the initial_helpdesk_name_setup_skipped (Check) field in DocType
+#. 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Is name setup skipped"
+msgstr ""
+
+#. Label of the is_pinned (Check) field in DocType 'HD Ticket Comment'
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
+msgid "Is pinned"
+msgstr ""
+
+#. Label of the setup_complete (Check) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Is setup complete"
+msgstr ""
+
+#. Label of the key (Data) field in DocType 'HD Email Feedback'
+#. Label of the key (Data) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Key"
+msgstr "Clé"
+
+#. Label of the knowledge_base_section (Section Break) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Knowledge Base"
+msgstr "Base de Connaissances"
+
+#. Label of the button_label (Data) field in DocType 'HD Action'
+#. Label of the label (Data) field in DocType 'HD Ticket Feedback Option'
+#. Label of the label (Data) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_action/hd_action.json
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Label"
+msgstr "Étiquette"
+
+#. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
+#. Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Link"
+msgstr "Lien"
+
+#. Label of the link_options_sb (Section Break) field in DocType 'HD Support
+#. Search Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Link Options"
+msgstr "Options du lien"
+
+#. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
+#. Label of the list_tab (Tab Break) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "List"
+msgstr "Liste"
+
+#. Label of the load_default_columns (Check) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Load Default Columns"
+msgstr ""
+
+#. Label of the brand_logo (Attach Image) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Logo"
+msgstr "Logo"
+
+#. Description of the 'Integer value' (Int) field in DocType 'HD Ticket
+#. Priority'
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
+msgid "Lower the Integer value, higher is the priority of the issue"
+msgstr ""
+
+#. Option for the 'Type' (Select) field in DocType 'HD Notification'
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+msgid "Mention"
+msgstr "Mentionner"
+
+#. Label of the merged_with (Link) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Merged With"
+msgstr ""
+
+#. Label of the message (Text Editor) field in DocType 'HD Canned Response'
+#. Label of the message (Text) field in DocType 'HD Notification'
+#: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+msgid "Message"
+msgstr "Message"
+
+#. Label of the meta_tab (Tab Break) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Meta"
+msgstr ""
+
+#. Label of the misc_tab (Tab Break) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Misc"
+msgstr ""
+
+#. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
+#. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
+#. List'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Monday"
+msgstr "Lundi"
+
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:35
+msgid "Monthly"
+msgstr "Mensuel"
+
+#. Label of the category_name (Data) field in DocType 'HD Article Category'
+#. Label of the organization_name (Data) field in DocType 'HD Organization'
+#. Label of the team_name (Data) field in DocType 'HD Team'
+#: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
+#: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+msgid "Name"
+msgstr "Nom"
+
+#. Label of the name_weight (Int) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Name Weight"
+msgstr ""
+
+#: helpdesk/utils.py:159
+msgid "Not Allowed"
+msgstr "Non Autorisé"
+
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:250
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:234
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:327
+msgid "Not Specified"
+msgstr "Non précisé"
+
+#. Label of a Link in the Helpdesk Workspace
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Notification Settings"
+msgstr "Paramètres de notification"
+
+#. Label of the on_hold_since (Datetime) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "On Hold Since"
+msgstr "En attente depuis"
+
+#. Label of the action (Code) field in DocType 'HD Action'
+#: helpdesk/helpdesk/doctype/hd_action/hd_action.json
+msgid "On click (Javascript)"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.py:29
+msgid "Only one default view is allowed per user for {0}"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'HD Pause Service Level
+#. Agreement On Status'
+#. Option for the 'Status' (Select) field in DocType 'HD Service Level
+#. Agreement Fulfilled On Status'
+#. Option for the 'Status' (Select) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_pause_service_level_agreement_on_status/hd_pause_service_level_agreement_on_status.json
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement_fulfilled_on_status/hd_service_level_agreement_fulfilled_on_status.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:48
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:35
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:403
+msgid "Open"
+msgstr "Ouvert"
+
+#. Label of the opening_date (Date) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Opening Date"
+msgstr "Date d'Ouverture"
+
+#. Label of the opening_time (Time) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Opening Time"
+msgstr "Horaire d'Ouverture"
+
+#. Label of the order_by_tab (Tab Break) field in DocType 'HD View'
+#. Label of the order_by (Code) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Order By"
+msgstr "Commandé par"
+
+#: helpdesk/api/settings/field_dependency.py:59
+msgid "Parent field, child field, and parent-child mapping are required."
+msgstr ""
+
+#. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Paused"
+msgstr ""
+
+#. Label of the pinned (Check) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Pinned"
+msgstr ""
+
+#. Label of the placeholder (Data) field in DocType 'HD Ticket Template Field'
+#: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
+msgid "Placeholder"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:19
+msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:310
+msgid "Please add {0} priority in {1} SLA"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:41
+msgid "Please select weekly off day"
+msgstr "Veuillez sélectionnez les jours de congé hebdomadaires"
+
+#. Label of the post_description_key (Data) field in DocType 'HD Support Search
+#. Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Post Description Key"
+msgstr "Clé de description du message"
+
+#. Label of the post_route_key_list (Data) field in DocType 'HD Support Search
+#. Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Post Route Key List"
+msgstr "Liste de clés du lien du message"
+
+#. Label of the post_route (Data) field in DocType 'HD Support Search Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Post Route String"
+msgstr "Chaîne de caractères du lien du message"
+
+#. Label of the post_title_key (Data) field in DocType 'HD Support Search
+#. Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Post Title Key"
+msgstr "Clé du titre du message"
+
+#. Label of the prefer_knowledge_base (Check) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Prefer knowledge base"
+msgstr ""
+
+#. Label of the priorities (Table) field in DocType 'HD Service Level
+#. Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Priorities"
+msgstr "Les priorités"
+
+#. Label of the priority (Link) field in DocType 'HD Escalation Rule'
+#. Label of the to_priority (Link) field in DocType 'HD Escalation Rule'
+#. Label of the priority (Link) field in DocType 'HD Service Level Priority'
+#. Label of the priority_section (Section Break) field in DocType 'HD Settings'
+#. Label of the priority (Link) field in DocType 'HD Ticket'
+#. Label of the priority (Link) field in DocType 'HD Ticket Type'
+#: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
+#: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+msgid "Priority"
+msgstr "Priorité"
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:82
+msgid "Priority <u>{0}</u> must be included in the SLA {1}."
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:73
+msgid "Priority {0} has been repeated."
+msgstr "La priorité {0} a été répétée."
+
+#. Label of the public (Check) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Public"
+msgstr "Publique"
+
+#. Option for the 'Status' (Select) field in DocType 'HD Article'
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+msgid "Published"
+msgstr "Publié"
+
+#. Label of the published_on (Datetime) field in DocType 'HD Article'
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+msgid "Published On"
+msgstr "Publié le"
+
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:36
+msgid "Quarterly"
+msgstr "Trimestriel"
+
+#. Label of the query_options_sb (Section Break) field in DocType 'HD Support
+#. Search Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Query Options"
+msgstr "Options de Requête"
+
+#. Label of the query_route (Data) field in DocType 'HD Support Search Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Query Route String"
+msgstr "Chaîne de caractères du lien de requête"
+
+#. Label of the raised_by (Data) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Raised By (Email)"
+msgstr "Créé par (Email)"
+
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:31
+msgid "Range"
+msgstr "Plage"
+
+#. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
+#. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+msgid "Rating"
+msgstr "Évaluation"
+
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:22
+msgid "Rating must be between 0.2 and 1.0"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:18
+msgid "Rating {0} is not allowed"
+msgstr ""
+
+#. Option for the 'Type' (Select) field in DocType 'HD Notification'
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+msgid "Reaction"
+msgstr ""
+
+#. Label of the read (Check) field in DocType 'HD Notification'
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+msgid "Read"
+msgstr "Lire"
+
+#. Label of the recurring_holidays (JSON) field in DocType 'HD Service Holiday
+#. List'
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Recurring holidays"
+msgstr ""
+
+#. Label of the reference_tab (Tab Break) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Reference"
+msgstr "Référence"
+
+#. Label of the reference_ticket (Link) field in DocType 'HD Ticket Comment'
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
+msgid "Reference Ticket"
+msgstr ""
+
+#. Label of the references_tab (Tab Break) field in DocType 'HD Customer'
+#. Label of the references_section (Section Break) field in DocType 'HD
+#. Notification'
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+msgid "References"
+msgstr "Références"
+
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:6
+msgid "Regenerate Search Index"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'HD Pause Service Level
+#. Agreement On Status'
+#. Option for the 'Status' (Select) field in DocType 'HD Service Level
+#. Agreement Fulfilled On Status'
+#. Option for the 'Status' (Select) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_pause_service_level_agreement_on_status/hd_pause_service_level_agreement_on_status.json
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement_fulfilled_on_status/hd_service_level_agreement_fulfilled_on_status.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:49
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:36
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:409
+msgid "Replied"
+msgstr "Répondu"
+
+#. Label of the request_key (Data) field in DocType 'HD Desk Account Request'
+#. Label of the request_key (Data) field in DocType 'HD Portal Signup Request'
+#: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
+#: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
+msgid "Request Key"
+msgstr ""
+
+#. Label of the required (Check) field in DocType 'HD Ticket Template Field'
+#: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
+msgid "Required"
+msgstr ""
+
+#. Label of the resolution_tab (Tab Break) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Resolution"
+msgstr "Résolution"
+
+#. Label of the resolution_by (Datetime) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Resolution By"
+msgstr "Résolution de"
+
+#. Label of the resolution_date (Datetime) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Resolution Date"
+msgstr "Date de Résolution"
+
+#. Label of the resolution_details (Text Editor) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Resolution Details"
+msgstr "Détails de la Résolution"
+
+#. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Resolution Due"
+msgstr ""
+
+#. Label of the resolution_time (Duration) field in DocType 'HD Service Level
+#. Priority'
+#. Label of the resolution_time (Duration) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Resolution Time"
+msgstr "Temps de résolution"
+
+#. Option for the 'Status' (Select) field in DocType 'HD Pause Service Level
+#. Agreement On Status'
+#. Option for the 'Status' (Select) field in DocType 'HD Service Level
+#. Agreement Fulfilled On Status'
+#. Option for the 'Send feedback when' (Select) field in DocType 'HD Settings'
+#. Option for the 'Status' (Select) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_pause_service_level_agreement_on_status/hd_pause_service_level_agreement_on_status.json
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement_fulfilled_on_status/hd_service_level_agreement_fulfilled_on_status.json
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:50
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:37
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:415
+msgid "Resolved"
+msgstr "Résolu"
+
+#. Label of the response_tab (Tab Break) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Response"
+msgstr "Réponse"
+
+#. Label of the response_by (Datetime) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Response By"
+msgstr "Réponse de"
+
+#. Label of the response_options_sb (Section Break) field in DocType 'HD
+#. Support Search Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Response Options"
+msgstr "Options de réponse"
+
+#. Label of the response_result_key_path (Data) field in DocType 'HD Support
+#. Search Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Response Result Key Path"
+msgstr "Chemin de la clé du résultat de réponse"
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:63
+msgid "Response Time for {0} priority in row {1} can't be greater than Resolution Time."
+msgstr "Le temps de réponse pour la {0} priorité dans la ligne {1} ne peut pas être supérieur au temps de résolution."
+
+#. Label of the response_and_resolution_time_section (Section Break) field in
+#. DocType 'HD Service Level Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Response and Resolution"
+msgstr ""
+
+#. Label of the assign_within_team (Check) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Restrict agent assignment to selected Team"
+msgstr ""
+
+#. Label of the restrict_tickets_by_agent_group (Check) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Restrict tickets by Team"
+msgstr ""
+
+#. Label of the result_preview_field (Data) field in DocType 'HD Support Search
+#. Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Result Preview Field"
+msgstr "Champ d'aperçu du résultat"
+
+#. Label of the result_route_field (Data) field in DocType 'HD Support Search
+#. Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Result Route Field"
+msgstr "Champ du lien du résultat"
+
+#. Label of the result_title_field (Data) field in DocType 'HD Support Search
+#. Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Result Title Field"
+msgstr "Champ du titre du résultat"
+
+#. Label of the route_name (Data) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Route Name"
+msgstr ""
+
+#. Label of the rows (Code) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Rows"
+msgstr ""
+
+#. Label of the sla (Link) field in DocType 'HD Ticket'
+#. Label of the sla_tab (Tab Break) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "SLA"
+msgstr ""
+
+#. Label of the service_level_agreement_creation (Datetime) field in DocType
+#. 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "SLA Creation"
+msgstr ""
+
+#. Label of the sla_fulfilled_on (Table) field in DocType 'HD Service Level
+#. Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "SLA Fulfilled On"
+msgstr ""
+
+#. Label of the pause_sla_on (Table) field in DocType 'HD Service Level
+#. Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "SLA Paused On"
+msgstr ""
+
+#. Label of the agreement_status (Select) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "SLA Status"
+msgstr ""
+
+#. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
+#. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
+#. List'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Saturday"
+msgstr "Samedi"
+
+#. Label of the script (Code) field in DocType 'HD Form Script'
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+msgid "Script"
+msgstr "Script"
+
+#. Label of the search_tab (Tab Break) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Search"
+msgstr "Rechercher"
+
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:10
+msgid "Search Index Regenerated"
+msgstr ""
+
+#: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:40
+msgid "Search Score"
+msgstr ""
+
+#. Label of the search_term_param_name (Data) field in DocType 'HD Support
+#. Search Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Search Term Param Name"
+msgstr "Nom du paramètre de recherche"
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:155
+msgid "Select a Default Priority."
+msgstr "Sélectionnez une priorité par défaut."
+
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:41
+msgid "Select your weekly off day"
+msgstr ""
+
+#. Label of the send_acknowledgement_email (Check) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Send Acknowledgement Email"
+msgstr ""
+
+#. Label of the send_email_feedback_on_status (Select) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Send feedback when"
+msgstr ""
+
+#. Label of the service_level (Data) field in DocType 'HD Service Level
+#. Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Service Level Name"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:54
+msgid "Set Resolution Time for Priority {0} in row {1}."
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:46
+msgid "Set Response Time for Priority {0} in row {1}."
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:122
+msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
+msgstr ""
+
+#. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+msgid "Settings"
+msgstr "Paramètres"
+
+#. Label of the setup_section (Section Break) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Setup"
+msgstr "Configuration"
+
+#. Description of the 'Condition' (Code) field in DocType 'HD Service Level
+#. Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Simple Python Expression, Example: doc.status == 'Open' and doc.ticket_type == 'Bug'"
+msgstr ""
+
+#. Label of the skip_email_workflow (Check) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Skip e-mail workflow"
+msgstr ""
+
+#. Label of the source_doctype (Link) field in DocType 'HD Support Search
+#. Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Source DocType"
+msgstr "DocType source"
+
+#. Label of the source_name (Data) field in DocType 'HD Support Search Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Source Name"
+msgstr "Nom de la Source"
+
+#. Label of the source_type (Select) field in DocType 'HD Support Search
+#. Source'
+#: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
+msgid "Source Type"
+msgstr "Type de source"
+
+#: helpdesk/api/knowledge_base.py:119
+msgid "Source and target category cannot be same"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:249
+msgid "Source and target ticket cannot be same"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:245
+msgid "Source ticket does not exist"
+msgstr ""
+
+#. Label of the split_and_merge_section (Section Break) field in DocType 'HD
+#. Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Split and Merge"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.js:9
+msgid "Standard Form Scripts can't be modified, duplicate the script instead."
+msgstr ""
+
+#. Label of the start_date (Date) field in DocType 'HD Service Level Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Start Date"
+msgstr "Date de Début"
+
+#. Label of the start_time (Time) field in DocType 'HD Service Day'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
+msgid "Start Time"
+msgstr "Heure de Début"
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:97
+msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
+msgstr ""
+
+#. Label of the status (Select) field in DocType 'HD Article'
+#. Label of the status (Select) field in DocType 'HD Pause Service Level
+#. Agreement On Status'
+#. Label of the status (Select) field in DocType 'HD Service Level Agreement
+#. Fulfilled On Status'
+#. Label of the status (Select) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+#: helpdesk/helpdesk/doctype/hd_pause_service_level_agreement_on_status/hd_pause_service_level_agreement_on_status.json
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement_fulfilled_on_status/hd_service_level_agreement_fulfilled_on_status.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:44
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:31
+msgid "Status"
+msgstr "Statut"
+
+#. Label of the status_details (Section Break) field in DocType 'HD Service
+#. Level Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Status Details"
+msgstr ""
+
+#: helpdesk/templates/components/contact_with_us.html:7
+msgid "Still got questions? We're here to assist you."
+msgstr ""
+
+#. Label of the subject (Data) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:30
+msgid "Subject"
+msgstr "Sujet"
+
+#. Label of the subject_weight (Int) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Subject Weight"
+msgstr ""
+
+#. Label of the summary (Text Editor) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Summary"
+msgstr "Résumé"
+
+#. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
+#. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
+#. List'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Sunday"
+msgstr "Dimanche"
+
+#. Name of a report
+#: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.json
+msgid "Support Hour Distribution"
+msgstr "Répartition des Heures de Support"
+
+#. Label of a Link in the Helpdesk Workspace
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Support Policy"
+msgstr ""
+
+#. Name of a role
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+msgid "Support Team"
+msgstr "Équipe de Support"
+
+#. Label of the synonyms (Table) field in DocType 'HD Synonyms'
+#: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
+msgid "Synonyms"
+msgstr ""
+
+#. Label of the is_system (Check) field in DocType 'HD Ticket Type'
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+msgid "System"
+msgstr "Système"
+
+#. Name of a role
+#: helpdesk/helpdesk/doctype/hd_action/hd_action.json
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+#: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
+#: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
+#: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
+#: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
+#: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
+#: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+#: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
+#: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+#: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
+#: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "System Manager"
+msgstr "Responsable Système"
+
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.py:12
+msgid "System types can not be deleted"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:22
+msgid "Tampered Access"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:247
+msgid "Target ticket does not exist"
+msgstr ""
+
+#. Label of the team (Link) field in DocType 'HD Escalation Rule'
+#. Label of the to_team (Link) field in DocType 'HD Escalation Rule'
+#. Label of the agent_group (Link) field in DocType 'HD Ticket'
+#. Label of a Link in the Helpdesk Workspace
+#: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Team"
+msgstr ""
+
+#. Label of the agent_groups_section (Section Break) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Team Restrictions"
+msgstr ""
+
+#. Label of the template (Link) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Template"
+msgstr "Modèle"
+
+#. Label of the template_name (Data) field in DocType 'HD Ticket Template'
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
+msgid "Template Name"
+msgstr "Nom du Modèle"
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:145
+msgid "The Condition '{0}' is invalid: {1}"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:54
+msgid "The holiday on {0} is not between From Date and To Date"
+msgstr "Le jour de vacances {0} n’est pas compris entre la Date Initiale et la Date Finale"
+
+#. Description of a DocType
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
+msgid "This doctype will be deprecated in the future"
+msgstr ""
+
+#. Description of the 'Instantly send e-mail' (Check) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "This field is used to send an email instantly without adding it into the queue. If this field is checked, the email will be sent immediately after clicking the \"Send\" button, instead of being added to the email queue for later processing."
+msgstr ""
+
+#. Description of the 'Skip e-mail workflow' (Check) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "This field is used to skip email-related workflows for tickets. If this field is checked, no emails will be sent related to tickets, such as new ticket creation, status updates, or notifications."
+msgstr ""
+
+#: helpdesk/www/helpdesk/index.py:23
+msgid "This method is only meant for developer mode"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:283
+msgid "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:425
+msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
+msgstr ""
+
+#. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
+#. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
+#. List'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Thursday"
+msgstr "Jeudi"
+
+#. Label of the ticket (Link) field in DocType 'HD Email Feedback'
+#. Label of the reference_ticket (Link) field in DocType 'HD Notification'
+#. Label of the ticket_tab (Tab Break) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Ticket"
+msgstr ""
+
+#. Name of a report
+#. Label of a Link in the Helpdesk Workspace
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.json
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Ticket Analytics"
+msgstr ""
+
+#. Label of a Card Break in the Helpdesk Workspace
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Ticket Configuration"
+msgstr ""
+
+#. Label of the is_merged (Check) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Ticket Merged"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:40
+msgid "Ticket Not Found"
+msgstr ""
+
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:56
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:77
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:43
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:69
+msgid "Ticket Priority"
+msgstr ""
+
+#. Label of the ticket_split_from (Link) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Ticket Split From"
+msgstr ""
+
+#. Name of a report
+#. Label of a Link in the Helpdesk Workspace
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.json
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Ticket Summary"
+msgstr ""
+
+#. Label of the ticket_type_section (Section Break) field in DocType 'HD
+#. Settings'
+#. Label of the ticket_type (Link) field in DocType 'HD Ticket'
+#. Label of a Link in the Helpdesk Workspace
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:66
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:58
+#: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
+msgid "Ticket Type"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:21
+msgid "Ticket does not exist."
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:261
+msgid "Ticket must be resolved with a feedback"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:45
+msgid "Ticket not found"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:40
+msgid "Ticket not found for the provided key."
+msgstr ""
+
+#. Label of the ticket_type (Link) field in DocType 'HD Escalation Rule'
+#. Label of the to_ticket_type (Link) field in DocType 'HD Escalation Rule'
+#: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
+msgid "Ticket type"
+msgstr ""
+
+#. Label of the is_ticket_type_mandatory (Check) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:250
+msgid "Ticket type is mandatory"
+msgstr ""
+
+#. Name of a report
+#: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
+msgid "Ticket-Search Analysis"
+msgstr ""
+
+#: helpdesk/api/ticket.py:18
+msgid "Tickets can only be assigned to agents"
+msgstr ""
+
+#. Label of the title (Data) field in DocType 'HD Article'
+#. Label of the title (Data) field in DocType 'HD Canned Response'
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+#: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
+msgid "Title"
+msgstr "Titre"
+
+#. Label of the title_slug (Data) field in DocType 'HD Article'
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+msgid "Title Slug"
+msgstr ""
+
+#. Label of the user_to (Link) field in DocType 'HD Notification'
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+msgid "To"
+msgstr "À"
+
+#. Label of the to_date (Date) field in DocType 'HD Service Holiday List'
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+#: helpdesk/helpdesk/report/first_response_time_for_tickets/first_response_time_for_tickets.js:16
+#: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.js:15
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:24
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:24
+msgid "To Date"
+msgstr "Jusqu'au"
+
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:45
+msgid "To Date cannot be before From Date"
+msgstr "La date de fin ne peut être antérieure à la date de début"
+
+#: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:35
+msgid "Top Result"
+msgstr ""
+
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:98
+msgid "Total"
+msgstr ""
+
+#. Label of the total_hold_time (Duration) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Total Hold Time"
+msgstr "Temps de maintien total"
+
+#. Label of the total_holidays (Int) field in DocType 'HD Service Holiday List'
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Total Holidays"
+msgstr "Total des vacances"
+
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:90
+msgid "Total Ticket"
+msgstr ""
+
+#. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
+#. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
+#. List'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Tuesday"
+msgstr "Mardi"
+
+#. Label of the notification_type (Select) field in DocType 'HD Notification'
+#. Label of the type (Select) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "Type"
+msgstr "Type"
+
+#. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
+#: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
+msgid "URL/Method"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:16
+msgid "Unauthorized Access"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:16
+msgid "Unauthorized access."
+msgstr ""
+
+#. Label of the user (Link) field in DocType 'HD Agent'
+#. Label of the user (Link) field in DocType 'HD Article Feedback'
+#. Label of the user (Link) field in DocType 'HD Desk Account Request'
+#. Label of the user (Link) field in DocType 'HD Portal Signup Request'
+#. Label of the user (Link) field in DocType 'HD Team Member'
+#. Label of the user (Link) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+#: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
+#: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
+#: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
+#: helpdesk/helpdesk/doctype/hd_team_member/hd_team_member.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:55
+#: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:47
+msgid "User"
+msgstr "Utilisateur"
+
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:127
+msgid "User Not found"
+msgstr ""
+
+#. Label of the user_resolution_time (Duration) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "User Resolution Time"
+msgstr "Temps de résolution utilisateur"
+
+#. Label of the users (Table MultiSelect) field in DocType 'HD Team'
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+msgid "Users"
+msgstr "Utilisateurs"
+
+#. Label of the agreement_details_section (Section Break) field in DocType 'HD
+#. Service Level Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Valid From"
+msgstr "Valide à partir de"
+
+#. Label of the via_customer_portal (Check) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Via Customer Portal"
+msgstr "Via le portail client"
+
+#. Label of the views (Int) field in DocType 'HD Article'
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+msgid "Views"
+msgstr ""
+
+#. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
+#. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
+#. List'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Wednesday"
+msgstr "Mercredi"
+
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:34
+msgid "Weekly"
+msgstr "Hebdomadaire"
+
+#. Label of the weekly_off (Check) field in DocType 'HD Holiday'
+#. Label of the weekly_off (Select) field in DocType 'HD Service Holiday List'
+#: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
+#: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
+msgid "Weekly Off"
+msgstr "Jours de Congé Hebdomadaire"
+
+#. Description of the 'Auto update status' (Check) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "When enabled, the ticket status will automatically change to \"Replied\" whenever the agent responds to a ticket.\n"
+msgstr ""
+
+#. Label of the word (Data) field in DocType 'HD Stopword'
+#. Label of the word (Data) field in DocType 'HD Synonyms'
+#: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
+#: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
+msgid "Word"
+msgstr ""
+
+#. Label of the workday (Select) field in DocType 'HD Service Day'
+#: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
+msgid "Workday"
+msgstr "Journée de travail"
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:108
+msgid "Workday {0} has been repeated."
+msgstr "La journée de travail {0} a été répétée."
+
+#. Label of the workflow_tab (Tab Break) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Workflow"
+msgstr "Flux de Travail"
+
+#. Label of the support_and_resolution_section_break (Section Break) field in
+#. DocType 'HD Service Level Agreement'
+#. Label of the support_and_resolution (Table) field in DocType 'HD Service
+#. Level Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Working Hours"
+msgstr "Heures de travail"
+
+#: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:37
+msgid "Yearly"
+msgstr "Annuel"
+
+#: helpdesk/api/dashboard.py:18
+msgid "You are not allowed to view this dashboard data."
+msgstr ""
+
+#: helpdesk/utils.py:158
+msgid "You are not permitted to access this resource."
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:473
+msgid "You are not permitted to add a comment"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:135
+msgid "You cannot disable the default SLA."
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:39
+msgid "You cannot set more than one Default Priority."
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:29
+msgid "You have already provided feedback for this ticket."
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:129
+msgid "You must set one SLA as Default. Please check the Default SLA option."
+msgstr ""
+
+#. Option for the 'Type' (Select) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "group_by"
+msgstr ""
+
+#. Option for the 'Type' (Select) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "kanban"
+msgstr "kanban"
+
+#. Option for the 'Type' (Select) field in DocType 'HD View'
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
+msgid "list"
+msgstr "liste"
+
+#. Label of the synonym (Data) field in DocType 'HD Synonym'
+#: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json
+msgid "synonym"
+msgstr ""
+

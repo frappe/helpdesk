@@ -156,7 +156,7 @@ class HDServiceLevelAgreement(Document):
 
     def apply(self, doc: Document):
         self.handle_new(doc)
-        self.handle_status(doc)
+        self.handle_doc_status(doc)
         self.handle_targets(doc)
         self.handle_agreement_status(doc)
         self.validate_all_priorities()
@@ -168,7 +168,7 @@ class HDServiceLevelAgreement(Document):
         doc.service_level_agreement_creation = creation
         doc.priority = doc.priority or self.default_priority
 
-    def handle_status(self, doc: Document):
+    def handle_doc_status(self, doc: Document):
         if doc.is_new() or not doc.has_value_changed("status"):
             return
         self.set_first_response_time(doc)
@@ -218,6 +218,7 @@ class HDServiceLevelAgreement(Document):
             return
         doc.on_hold_since = None
         curr_val = time_diff_in_seconds(now_datetime(), paused_since)
+        curr_val = max(curr_val, 0)  # Ensure non-negative hold time
         doc.total_hold_time = (doc.total_hold_time or 0) + curr_val
 
     def handle_targets(self, doc: Document):
@@ -442,33 +443,6 @@ class HDServiceLevelAgreement(Document):
         for row in self.support_and_resolution:
             res[row.workday] = row
         return res
-
-    # temporary, will remove once sla goes to frontend
-    def before_insert(self):
-        user = frappe.session.user
-        user_onboarding_status = frappe.get_value("User", user, "onboarding_status")
-        if not user_onboarding_status:
-            return
-
-        user_onboarding_status = frappe.parse_json(user_onboarding_status)
-        if not user_onboarding_status:
-            return
-        hd_onboarding_steps = user_onboarding_status.get("helpdesk_onboarding_status")
-        if not hd_onboarding_steps:
-            return
-
-        sla_onboarding_status = {}
-        for step in hd_onboarding_steps:
-            if step.get("name") == "setup_sla":
-                sla_onboarding_status = step
-                break
-
-        if not sla_onboarding_status:
-            return
-        if sla_onboarding_status.get("completed"):
-            return
-
-        frappe.publish_realtime("update_sla_status", user=frappe.session.user)
 
     def on_trash(self):
         self.handle_default_sla_deletion()
