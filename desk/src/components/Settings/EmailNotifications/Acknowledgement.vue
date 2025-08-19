@@ -3,6 +3,7 @@
     v-model:content="content"
     :defaultContent="defaultContent"
     v-model:enabled="enabled"
+    documentationLink="#"
     ref="compRef"
     name="acknowledgement"
     :title="props.notification.label"

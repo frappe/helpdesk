@@ -7,6 +7,7 @@
     v-model:content="content"
     :defaultContent="defaultContent"
     v-model:enabled="enabled"
+    documentationLink="#"
     :onBack="props.onBack"
     :onSubmit="onSubmit"
     :onGetDataSuccess="onGetDataSuccess"

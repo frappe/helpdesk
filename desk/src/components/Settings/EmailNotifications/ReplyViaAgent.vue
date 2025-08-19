@@ -3,6 +3,7 @@
     v-model:content="content"
     :defaultContent="defaultContent"
     v-model:enabled="enabled"
+    documentationLink="#"
     ref="compRef"
     name="reply_via_agent"
     :title="props.notification.label"

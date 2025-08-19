@@ -66,7 +66,7 @@
     >
       <template v-if="!notificationDataResource.loading">
         <slot name="formFields"></slot>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1">
           <FormControl
             type="textarea"
             size="sm"
@@ -76,6 +76,19 @@
             v-model="content"
             :oninput="setUnsavedChanges"
           />
+          <p class="text-sm text-gray-700 leading-5">
+            {{
+              __(
+                "Find out all of the identifiers that can be used in the content"
+              )
+            }}
+            <a
+              :href="props.documentationLink"
+              target="_blank"
+              class="underline font-semibold"
+              >{{ __("here") }}</a
+            >
+          </p>
           <Button
             type="button"
             size="sm"
@@ -101,6 +114,7 @@ import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 const props = defineProps<{
   title: string;
   description: string;
+  documentationLink: string;
   defaultContent: string;
   onBack: () => void;
   onSubmit: (e: Event & { target: HTMLFormElement }) => void;
