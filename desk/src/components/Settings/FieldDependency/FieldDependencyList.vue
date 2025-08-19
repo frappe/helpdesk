@@ -58,17 +58,18 @@
       "
     >
       <!-- table heading -->
-      <div class="flex w-full p-2 border-b">
+      <div class="flex w-full p-2">
         <p class="w-7/12 text-p-sm text-ink-gray-5">Name</p>
         <p class="w-3/12 text-p-sm text-ink-gray-5">Created By</p>
         <p class="w-1/12 text-p-sm text-ink-gray-5">Enabled</p>
         <p class="w-1/12 text-p-sm text-ink-gray-5"></p>
       </div>
+      <div class="h-px border-t mx-1 border-outline-gray-modals" />
 
       <!-- Table content -->
-      <div>
+      <ul>
         <!-- Each row -->
-        <div
+        <li
           class="w-full flex flex-col items-center cursor-pointer hover:bg-surface-menu-bar rounded"
           v-for="(row, idx) in fieldDependenciesList.data"
           @click.stop="$emit('update:step', 'fd', row.name)"
@@ -114,11 +115,11 @@
           </div>
           <!-- Separator -->
           <div
-            class="h-px border-b mx-2 border-outline-gray-modals w-full"
+            class="h-px border-b mx-1 border-outline-gray-modals w-[99%]"
             v-if="idx < fieldDependenciesList.data?.length - 1"
           />
-        </div>
-      </div>
+        </li>
+      </ul>
     </div>
   </div>
 </template>

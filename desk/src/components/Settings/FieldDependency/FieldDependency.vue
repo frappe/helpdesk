@@ -40,25 +40,28 @@
       </template>
     </SettingsLayoutHeader>
     <!-- Body -->
-    <div class="w-full flex-1 flex flex-col gap-8 overflow-y-scroll px-10">
+    <div class="w-full flex-1 flex flex-col gap-8 overflow-y-hidden px-10">
       <!-- Field Selection -->
       <FieldDependencyFieldsSelection
         v-model="state"
         :is-new="isNew"
         :parent-fields="parentFields"
       />
-      <!-- Value Selection -->
-      <FieldDependencyValueSelection
-        v-model="state"
-        :is-new="isNew"
-        :parent-fields="parentFields"
-      />
 
-      <!-- Criteria selection -->
-      <FieldDependencyCriteria
-        :parent-field-values="state.parentFieldValues"
-        v-model="fieldCriteriaState"
-      />
+      <div class="flex flex-col gap-8 overflow-y-scroll">
+        <!-- Value Selection -->
+        <FieldDependencyValueSelection
+          v-model="state"
+          :is-new="isNew"
+          :parent-fields="parentFields"
+        />
+
+        <!-- Criteria selection -->
+        <FieldDependencyCriteria
+          :parent-field-values="state.parentFieldValues"
+          v-model="fieldCriteriaState"
+        />
+      </div>
     </div>
   </div>
   <ConfirmDialog
@@ -106,8 +109,11 @@ const parentFields = computed(() => {
   if (!_fields || _fields.length === 0) {
     return [];
   }
+  const notAllowedFields = ["status", "agreement_status"];
   _fields = _fields.filter(
-    (f) => f.fieldtype === "Select" || f.fieldtype === "Link"
+    (f) =>
+      (f.fieldtype === "Select" || f.fieldtype === "Link") &&
+      !notAllowedFields.includes(f.fieldname)
   );
   return _fields.map((f) => ({
     label: f.label,
@@ -312,6 +318,7 @@ watch(
     if (isNew.value) {
       state.childSelections = {};
     }
+    state.currentParentSelection = state.parentFieldValues[0] || "";
   }
 );
 

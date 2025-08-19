@@ -88,23 +88,15 @@ function handleCriteriaSelection(
   stateKey: "display" | "mandatory"
 ) {
   const _values = values.map((v) => v.value);
-  debugger;
-
-  if (_values.length > 1) {
+  fieldCriteriaState.value[stateKey].value = values;
+  if (_values.length === 0) {
+    fieldCriteriaState.value[stateKey].value = [{ label: "Any", value: "Any" }];
+  } else if (_values[0] === "Any" && _values.length > 1) {
     fieldCriteriaState.value[stateKey].value = _values
-      .filter((v) => v !== "Any")
-      .map((value) => ({
-        label: value,
-        value,
-      }));
-  } else if (_values.length === 0) {
+      .filter((value) => value !== "Any")
+      .map((value) => ({ label: value, value }));
+  } else if (_values.at(-1) === "Any" && _values.length > 1) {
     fieldCriteriaState.value[stateKey].value = [{ label: "Any", value: "Any" }];
-  } else if (_values.includes("Any") && _values.length === 1) {
-    fieldCriteriaState.value[stateKey].value = [{ label: "Any", value: "Any" }];
-  } else if (_values.length === 1) {
-    fieldCriteriaState.value[stateKey].value = [
-      { label: _values[0], value: _values[0] },
-    ];
   }
 }
 </script>

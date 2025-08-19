@@ -180,7 +180,6 @@
                   v-if="multiple"
                   class="flex items-center justify-end gap-1"
                 >
-                  <Button label="Clear" @click.stop="clearAll" />
                   <Button
                     v-if="!areAllOptionsSelected"
                     label="Select All"
@@ -374,9 +373,6 @@ export default {
     },
     selectAll() {
       this.selectedValue = this.allOptions;
-    },
-    clearAll() {
-      this.selectedValue = [];
     },
     fuzzySearch(arr, { term, keys }) {
       // search for term in all keys of arr items and sort by relevance

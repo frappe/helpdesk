@@ -37,6 +37,7 @@ def get_one(name: str):
 def get_fields_meta(template: str):
     fields = get_fields(template, "DocField")
     fields.extend(get_fields(template, "Custom Field"))
+    fields = sorted(fields, key=lambda x: x.idx)
     return fields
 
 
@@ -68,6 +69,7 @@ def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
             fields.required,
             fields.url_method,
             fields.placeholder,
+            fields.idx,
         )
         .join(QBFetch, JoinType.inner)
         .on(QBFetch.fieldname == fields.fieldname)
