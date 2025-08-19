@@ -81,7 +81,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-12 12:28:23.328837",
+ "modified": "2025-08-16 15:45:27.146697",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Form Script",
@@ -119,7 +119,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Agent",
+   "role": "All",
    "share": 1
   }
  ],
