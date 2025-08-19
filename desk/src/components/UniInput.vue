@@ -25,8 +25,8 @@
 
 <script setup lang="ts">
 import { computed, h } from "vue";
-import { Autocomplete, Link } from "@/components";
-import { createResource, FormControl } from "frappe-ui";
+import { Link } from "@/components";
+import { createResource, FormControl, Autocomplete } from "frappe-ui";
 import { Field } from "@/types";
 
 type Value = string | number | boolean;

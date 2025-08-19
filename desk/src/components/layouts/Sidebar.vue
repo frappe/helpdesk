@@ -104,7 +104,7 @@
       </div>
     </div>
     <div class="grow" />
-    <div class="flex flex-col gap-1">
+    <div class="flex flex-col gap-2">
       <TrialBanner
         v-if="isFCSite && !isCustomerPortal"
         :isSidebarCollapsed="!isExpanded"
