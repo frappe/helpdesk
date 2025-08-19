@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.tests import IntegrationTestCase
-from frappe.utils import add_to_date, getdate
+from frappe.utils import add_to_date, get_datetime, getdate
 
 from helpdesk.test_utils import (
     add_holiday,
@@ -380,6 +380,104 @@ class TestHDTicket(IntegrationTestCase):
         ticket.save()
         self.assertEqual(ticket.agreement_status, "Fulfilled")
 
+    def test_hold_time_resolution_time(self):
+        # Keep the ticket in paused state for 30 minutes to test hold time, resolution_by should increase by 30 minutes
+        ticket = None
+        date = get_current_week_monday(hours=12)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="High")
+            self.assertEqual(ticket.agreement_status, "First Response Due")
+            self.assertEqual(ticket.response_by, add_to_date(date, hours=1))
+            self.assertEqual(ticket.resolution_by, add_to_date(date, hours=4))
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, minutes=30)):
+            ticket.status = "Replied"
+            ticket.save()
+            self.assertEqual(ticket.first_responded_on, get_datetime())
+            self.assertEqual(ticket.agreement_status, "Paused")
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, hours=1)):
+            ticket.status = "Open"
+            ticket.save()
+            ticket.reload()
+
+            self.assertEqual(ticket.agreement_status, "Resolution Due")
+            self.assertEqual(
+                ticket.resolution_by, add_to_date(date, hours=4, minutes=30)
+            )
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, hours=1, minutes=30)):
+            ticket.status = "Resolved"
+            ticket.save()
+            ticket = ticket.reload()
+
+            self.assertEqual(ticket.agreement_status, "Fulfilled")
+            # Resolution time should be 1 hour more than the original resolution time
+            self.assertEqual(ticket.resolution_time, 60 * 60)
+
+    def test_hold_time_resolution_time_with_holiday(self):
+        # create friday as holiday
+        # create ticket on thursday 5:30 PM with high priority
+        # change status to replied on 5:50 PM
+        # change status to open on 12:30 PM on Monday
+        # total_hold_time should be 1 hour 40 minutes
+        # change status to resolved on 13:00 PM on Monday
+        # resolution time should be 3 hours 30 minutes
+        add_holiday(
+            getdate(add_to_date(get_current_week_monday(), days=4)),
+            "Test Holiday",
+        )
+        ticket = None
+        date = add_to_date(
+            get_current_week_monday(hours=0), days=3, hours=17, minutes=30
+        )
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="High")
+            ticket.reload()
+
+        with self.freeze_time(add_to_date(date, minutes=20)):
+            ticket.status = "Replied"
+            ticket.save()
+            self.assertEqual(ticket.first_responded_on, get_datetime())
+            self.assertEqual(ticket.agreement_status, "Paused")
+
+        ticket.reload()
+        next_monday_date = add_to_date(
+            get_current_week_monday(hours=0), days=7, hours=12, minutes=30
+        )
+        with self.freeze_time(next_monday_date):
+            ticket.status = "Open"
+            ticket.save()
+            ticket = ticket.reload()
+
+            self.assertEqual(ticket.agreement_status, "Resolution Due")
+            # total hold time should be 10 minutes from 5:50 PM to 6:00 PM on Thursday
+            #  + 10 to 12:30 pm on monday
+            expected_hold_time = 10 * 60 + 150 * 60
+            self.assertEqual(ticket.total_hold_time, expected_hold_time)
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(next_monday_date, minutes=30)):
+
+            ticket.status = "Resolved"
+            ticket.save()
+            ticket = ticket.reload()
+
+            self.assertEqual(ticket.agreement_status, "Fulfilled")
+            # Resolution time should be 1 hour more than the original resolution time
+            expected_total_time_to_resolve = (60 * 60 * 3) + 30 * 60
+            expected_resolution_time = (
+                expected_total_time_to_resolve - ticket.total_hold_time
+            )
+            self.assertEqual(
+                ticket.resolution_time, expected_resolution_time
+            )  # 3 hours 30 minutes
+
+    def test_sla_status_with_custom_status(self):
+        pass
+
     def tearDown(self):
-        # Clean up after tests
         remove_holidays()
