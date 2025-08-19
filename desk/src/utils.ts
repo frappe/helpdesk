@@ -384,10 +384,10 @@ export const convertToConditions = ({
       }
 
       if (op === "like") {
-        return `${fieldAccess} and "${value}" in ${fieldAccess}`;
+        return `(${fieldAccess} and "${value}" in ${fieldAccess})`;
       }
       if (op === "not like") {
-        return `${fieldAccess} and "${value}" not in ${fieldAccess}`;
+        return `(${fieldAccess} and "${value}" not in ${fieldAccess})`;
       }
 
       if (
@@ -410,7 +410,7 @@ export const convertToConditions = ({
           items = [`"${String(value).trim()}"`];
         }
         valueStr = `[${items.join(", ")}]`;
-        return `${fieldAccess} and ${fieldAccess} ${op} ${valueStr}`;
+        return `(${fieldAccess} and ${fieldAccess} ${op} ${valueStr})`;
       }
 
       if (typeof value === "string") {
@@ -486,4 +486,66 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       condition: () => isConfirmingDelete.value,
     },
   ];
+}
+
+/**
+ * Format a date according to the user's system settings
+ * @param {Date|string} date - Date object or ISO date string
+ * @returns {string} Formatted date string in the user's locale and preferences
+ */
+export function getFormat(date) {
+  if (!date) return "";
+
+  const dateObj = date instanceof Date ? date : new Date(date);
+  if (isNaN(dateObj.getTime())) return "";
+
+  // Use the browser's default locale and options
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).format(dateObj);
+}
+
+export function validateConditions(conditions: any[]): boolean {
+  if (!Array.isArray(conditions)) return false;
+
+  // Handle simple condition [field, operator, value]
+  if (
+    conditions.length === 3 &&
+    typeof conditions[0] === "string" &&
+    typeof conditions[1] === "string"
+  ) {
+    return conditions[0] !== "" && conditions[1] !== "" && conditions[2] !== "";
+  }
+
+  // Iterate through conditions and logical operators
+  for (let i = 0; i < conditions.length; i++) {
+    const item = conditions[i];
+
+    // Skip logical operators (they will be validated by their position)
+    if (item === "and" || item === "or") {
+      // Ensure logical operators are not at start/end and not consecutive
+      if (
+        i === 0 ||
+        i === conditions.length - 1 ||
+        conditions[i - 1] === "and" ||
+        conditions[i - 1] === "or"
+      ) {
+        return false;
+      }
+      continue;
+    }
+
+    // Handle nested conditions (arrays)
+    if (Array.isArray(item)) {
+      if (!validateConditions(item)) {
+        return false;
+      }
+    } else if (item !== undefined && item !== null) {
+      return false;
+    }
+  }
+
+  return conditions.length > 0;
 }
