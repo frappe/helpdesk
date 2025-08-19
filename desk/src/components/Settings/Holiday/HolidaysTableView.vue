@@ -1,7 +1,7 @@
 <template>
-  <div class="rounded-md border p-1 border-gray-300 text-sm">
+  <div class="rounded-md border px-2 border-gray-300 text-sm">
     <div
-      class="grid p-2 items-center gap-2"
+      class="grid p-2 px-4 items-center gap-2"
       :style="{
         gridTemplateColumns: '1fr 4fr 22px',
       }"
@@ -14,16 +14,16 @@
         {{ column.label }}
       </div>
     </div>
-    <hr class="my-0.5" />
+    <hr />
     <div v-for="(holiday, index) in holidays" :key="holiday.name">
       <div
-        class="grid gap-2 px-2 items-center"
+        class="grid gap-2 py-3.5 px-4 items-center"
         :style="{ gridTemplateColumns: '1fr 4fr 22px' }"
       >
         <div
           v-for="column in columns"
           :key="column.key"
-          class="w-full py-2 overflow-hidden whitespace-nowrap text-ellipsis"
+          class="w-full overflow-hidden whitespace-nowrap text-ellipsis"
         >
           <input
             v-if="column.key === 'description'"
@@ -46,7 +46,7 @@
           </Dropdown>
         </div>
       </div>
-      <hr class="my-0.5" v-if="index !== holidays.length - 1" />
+      <hr v-if="index !== holidays.length - 1" />
     </div>
     <div v-if="holidays?.length === 0" class="text-center p-4 text-gray-600">
       No items in the list
@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import dayjs from "dayjs";
-import { getFormattedDate, TemplateOption } from "@/utils";
+import { ConfirmDelete, getFormattedDate } from "@/utils";
 import { holidayData } from "@/stores/holidayList";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 
@@ -76,30 +76,10 @@ const dropdownOptions = (holiday: Holiday) => [
     onClick: () => editHoliday(holiday),
     icon: "edit",
   },
-  {
-    label: "Confirm Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Confirm Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "danger",
-        onClick: (event) => deleteHoliday(event, holiday),
-      }),
-    condition: () => isConfirmingDelete.value,
-  },
-  {
-    label: "Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "grey",
-        onClick: (event) => deleteHoliday(event, holiday),
-      }),
-    condition: () => !isConfirmingDelete.value,
-  },
+  ...ConfirmDelete({
+    onConfirmDelete: () => deleteHoliday(holiday),
+    isConfirmingDelete,
+  }),
 ];
 
 const dialog = ref({
@@ -135,16 +115,14 @@ const editHoliday = (holiday: Holiday) => {
   };
 };
 
-const deleteHoliday = (event, holidayToDelete?: Holiday) => {
-  event.preventDefault();
-
+const deleteHoliday = (holidayToDelete?: Holiday) => {
   if (!isConfirmingDelete.value) {
     isConfirmingDelete.value = true;
     return;
   }
   const index = holidayData.value.holidays.findIndex((h: Holiday) => {
     const holidayDate = getFormattedDate(h.holiday_date);
-    const editDate = getFormattedDate(holidayToDelete.holiday_date);
+    const editDate = getFormattedDate(holidayToDelete?.holiday_date);
     return holidayDate === editDate;
   });
 

@@ -1,4 +1,5 @@
 import { SlaValidationErrors } from "@/components/Settings/Sla/types";
+import { validateConditions } from "@/utils";
 import { ref } from "vue";
 
 const defaultStatus = [
@@ -55,7 +56,7 @@ export const slaData = ref({
   description: "",
   enabled: false,
   default_sla: false,
-  apply_sla_for_resolution: false,
+  apply_sla_for_resolution: true,
   priorities: [],
   statuses: defaultStatus,
   holiday_list: "Default",
@@ -75,7 +76,7 @@ export const resetSlaData = () => {
     description: "",
     enabled: false,
     default_sla: false,
-    apply_sla_for_resolution: false,
+    apply_sla_for_resolution: true,
     priorities: [],
     statuses: defaultStatus,
     holiday_list: "Default",
@@ -131,50 +132,6 @@ export const resetSlaDataErrors = () => {
   };
 };
 
-export function validateConditions(conditions: any[]): boolean {
-  if (!Array.isArray(conditions)) return false;
-
-  // Handle simple condition [field, operator, value]
-  if (
-    conditions.length === 3 &&
-    typeof conditions[0] === "string" &&
-    typeof conditions[1] === "string"
-  ) {
-    return conditions[0] !== "" && conditions[1] !== "" && conditions[2] !== "";
-  }
-
-  // Iterate through conditions and logical operators
-  for (let i = 0; i < conditions.length; i++) {
-    const item = conditions[i];
-
-    // Skip logical operators (they will be validated by their position)
-    if (item === "and" || item === "or") {
-      // Ensure logical operators are not at start/end and not consecutive
-      if (
-        i === 0 ||
-        i === conditions.length - 1 ||
-        conditions[i - 1] === "and" ||
-        conditions[i - 1] === "or"
-      ) {
-        return false;
-      }
-      continue;
-    }
-
-    // Handle nested conditions (arrays)
-    if (Array.isArray(item)) {
-      if (!validateConditions(item)) {
-        return false;
-      }
-    } else if (item !== undefined && item !== null) {
-      // Invalid item in conditions array
-      return false;
-    }
-  }
-
-  return conditions.length > 0;
-}
-
 type SlaField = keyof SlaValidationErrors;
 
 export function validateSlaData(
@@ -216,8 +173,7 @@ export function validateSlaData(
               );
             }
             if (Boolean(slaData.value.apply_sla_for_resolution)) {
-              if (priority.resolution_time == 0) {
-                console.log("Resolution time is required");
+              if (!priority.resolution_time || priority.resolution_time == 0) {
                 prioritiesError.push(
                   `Priority ${priorityNum}: Resolution time is required`
                 );
@@ -366,13 +322,14 @@ export function validateSlaData(
         }
         break;
       case "condition":
-        if (!skipConditionCheck) {
-          if (
-            slaData.value.condition_json &&
-            !validateConditions(slaData.value.condition_json)
-          ) {
-            slaDataErrors.value.condition = "Valid conditions are required";
-          }
+        if (skipConditionCheck) {
+          break;
+        }
+        if (
+          slaData.value.condition_json.length > 0 &&
+          !validateConditions(slaData.value.condition_json)
+        ) {
+          slaDataErrors.value.condition = "Valid conditions are required";
         } else {
           slaDataErrors.value.condition = "";
         }

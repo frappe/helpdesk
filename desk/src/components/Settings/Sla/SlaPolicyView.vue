@@ -40,7 +40,7 @@
           variant="solid"
           @click="saveSla()"
           :disabled="Boolean(!isDirty && slaActiveScreen.data)"
-          :loading="slaData.loading || slaPolicyList.loading"
+          :loading="slaData.loading || slaPolicyList.setValue.loading"
         />
       </div>
     </div>
@@ -70,17 +70,17 @@
         v-model="slaData.description"
       />
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <div>
-      <div class="flex flex-col gap-2">
-        <span class="text-lg font-semibold text-ink-gray-7"
+      <div class="flex flex-col gap-1">
+        <span class="text-lg font-semibold text-ink-gray-8"
           >Assignment conditions</span
         >
-        <span class="text-sm text-ink-gray-6">
+        <span class="text-p-sm text-ink-gray-6">
           Choose which tickets are affected by this policy.
         </span>
       </div>
-      <div class="mt-4">
+      <div class="mt-3">
         <div class="flex items-center justify-between">
           <Checkbox
             label="Set as default SLA"
@@ -88,7 +88,7 @@
             @update:model-value="toggleDefaultSla"
             class="text-ink-gray-6 text-base font-medium"
           />
-          <div v-if="isOldSla && slaActiveScreen.data">
+          <div v-if="isOldSla && slaActiveScreen.data && !slaData.default_sla">
             <Popover trigger="hover" hoverDelay="0.25" placement="top-end">
               <template #target>
                 <div class="text-sm text-ink-gray-6 flex gap-1 cursor-default">
@@ -106,15 +106,17 @@
             </Popover>
           </div>
         </div>
-        <div class="mt-4" v-if="!slaData.default_sla">
+        <div class="mt-5" v-if="!slaData.default_sla">
           <div
             class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
             v-if="!useNewUI"
           >
-            <span>
-              Conditions for this SLA were created from desk which are not
-              compatible with this UI, you will need to recreate the conditions
-              here if you want to manage and add new conditions from this UI.
+            <span class="text-p-sm">
+              Conditions for this SLA were created from
+              <a :href="deskUrl" target="_blank" class="underline">desk</a>
+              which are not compatible with this UI, you will need to recreate
+              the conditions here if you want to manage and add new conditions
+              from this UI.
             </span>
             <Button
               label="I understand, add conditions"
@@ -130,17 +132,17 @@
         </div>
       </div>
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <div>
-      <div class="flex flex-col gap-3">
-        <span class="text-lg font-semibold text-ink-gray-7">Valid from</span>
-        <span class="text-sm text-ink-gray-6">
+      <div class="flex flex-col gap-1">
+        <span class="text-lg font-semibold text-ink-gray-8">Valid from</span>
+        <span class="text-p-sm text-ink-gray-6">
           Choose how long this SLA policy will be active.
         </span>
       </div>
-      <div class="mt-4 flex gap-5 flex-col md:flex-row">
+      <div class="mt-3.5 flex gap-5 flex-col md:flex-row">
         <div class="w-full space-y-1.5">
-          <label for="from_date" class="text-sm text-gray-600">From date</label>
+          <FormLabel label="From date" for="from_date" />
           <DatePicker
             v-model="slaData.start_date"
             variant="subtle"
@@ -157,7 +159,7 @@
           <ErrorMessage :message="slaDataErrors.start_date" />
         </div>
         <div class="w-full space-y-1.5">
-          <label for="to_date" class="text-sm text-gray-600">To date</label>
+          <FormLabel label="To date" for="to_date" />
           <DatePicker
             v-model="slaData.end_date"
             variant="subtle"
@@ -175,47 +177,67 @@
         </div>
       </div>
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <div>
-      <div class="flex flex-col gap-2">
-        <span class="text-lg font-semibold text-ink-gray-7"
+      <div class="flex flex-col gap-1">
+        <span class="text-lg font-semibold text-ink-gray-8"
           >Response and resolution</span
         >
-        <span class="text-sm text-ink-gray-6">
+        <span class="text-p-sm text-ink-gray-6">
           Add time targets around support milestones like first reply and
           resolution times
         </span>
       </div>
-      <div class="mt-4">
-        <Checkbox
-          label="Apply SLA for resolution time also"
-          v-model="slaData.apply_sla_for_resolution"
-          class="text-ink-gray-6 text-base font-medium"
-          @change="validateSlaData('priorities')"
-        />
-        <div class="mt-4">
+      <div class="mt-5">
+        <!-- <div class="flex gap-6">
+          <div
+            class="flex items-center gap-2"
+            @click="onApplySlaForChange(false)"
+          >
+            <input
+              name="apply_sla_for"
+              :checked="!slaData.apply_sla_for_resolution"
+              type="radio"
+            />
+            <div class="select-none text-ink-gray-6 text-sm font-medium">
+              Apply SLA for response time
+            </div>
+          </div>
+          <div
+            class="flex items-center gap-2"
+            @click="onApplySlaForChange(true)"
+          >
+            <input
+              name="apply_sla_for"
+              :checked="slaData.apply_sla_for_resolution"
+              type="radio"
+            />
+            <div class="select-none text-ink-gray-6 text-sm font-medium">
+              Apply SLA for response time and resolution time
+            </div>
+          </div>
+        </div> -->
+        <div class="mt-5">
           <SlaPriorityList />
         </div>
       </div>
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <div>
-      <div class="flex flex-col gap-2">
-        <span class="text-lg font-semibold text-ink-gray-7"
+      <div class="flex flex-col gap-1">
+        <span class="text-lg font-semibold text-ink-gray-8"
           >Status details</span
         >
-        <span class="text-sm text-ink-gray-6">
+        <span class="text-p-sm text-ink-gray-6">
           The SLA status updates with ticket progress—fulfilled when conditions
           are met, paused when awaiting external action.
         </span>
       </div>
-      <div class="mt-4">
-        <div class="mt-4">
-          <SlaStatusList :statusList="slaData.statuses" />
-        </div>
+      <div class="mt-5">
+        <SlaStatusList :statusList="slaData.statuses" />
       </div>
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <SlaHolidays />
   </div>
   <ConfirmDialog
@@ -244,17 +266,21 @@ import {
   createResource,
   DatePicker,
   ErrorMessage,
+  FormLabel,
   LoadingIndicator,
   Popover,
   Switch,
   toast,
 } from "frappe-ui";
-import { inject, onMounted, onUnmounted, ref, watch } from "vue";
+import { inject, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import SlaAssignmentConditions from "./SlaAssignmentConditions.vue";
 import SlaHolidays from "./SlaHolidays.vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
 import SlaStatusList from "./SlaStatusList.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
+import { useOnboarding } from "frappe-ui/frappe";
+
+const { updateOnboardingStep } = useOnboarding("helpdesk");
 
 const showConfirmDialog = ref({
   show: false,
@@ -269,6 +295,7 @@ const useNewUI = ref(true);
 const isOldSla = ref(false);
 
 const slaPolicyList = inject<any>("slaPolicyList");
+const deskUrl = `${window.location.origin}/app/hd-service-level-agreement/${slaActiveScreen.value.data?.name}`;
 
 const getSlaData = createResource({
   url: "helpdesk.api.sla.get_sla",
@@ -300,6 +327,7 @@ const getSlaData = createResource({
       condition_json: condition_json,
     };
     slaData.value = newData;
+    slaData.value.apply_sla_for_resolution = true;
     initialData.value = JSON.stringify(newData);
     const conditionsAvailable = slaData.value.condition?.length > 0;
     const conditionsJsonAvailable = slaData.value.condition_json?.length > 0;
@@ -347,10 +375,7 @@ const goBack = () => {
 };
 
 const saveSla = () => {
-  const validationErrors = validateSlaData(
-    undefined,
-    !(isOldSla.value && useNewUI.value)
-  );
+  const validationErrors = validateSlaData(undefined, !useNewUI.value);
 
   if (Object.values(validationErrors).some((error) => error)) {
     toast.error(
@@ -405,6 +430,7 @@ const createSla = () => {
         getSlaData.submit({
           docname: data.name,
         });
+        updateOnboardingStep("setup_sla", true);
       },
     }
   );
@@ -459,6 +485,13 @@ const toggleDefaultSla = () => {
   }
 };
 
+const onApplySlaForChange = (applyForResolution: boolean) => {
+  slaData.value.apply_sla_for_resolution = applyForResolution;
+  nextTick(() => {
+    validateSlaData("priorities");
+  });
+};
+
 watch(
   slaData,
   (newVal) => {
@@ -489,3 +522,31 @@ onUnmounted(() => {
   disableSettingModalOutsideClick.value = false;
 });
 </script>
+<style scoped>
+input[type="radio"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: 2px solid #c5c2c2;
+  border-radius: 50%;
+  outline: none;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+input[type="radio"]:checked {
+  background-color: black;
+  border: 2px solid #000;
+}
+
+input[type="radio"]:checked::after {
+  content: "";
+  background-color: #fff;
+}
+
+input[type="radio"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+</style>

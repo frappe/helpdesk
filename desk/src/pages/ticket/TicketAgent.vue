@@ -322,6 +322,7 @@ const activities = computed(() => {
       creation: email.communication_date || email.creation,
       attachments: email.attachments,
       name: email.name,
+      deliveryStatus: email.delivery_status,
       isFirstEmail: idx === 0,
     };
   });

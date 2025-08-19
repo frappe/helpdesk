@@ -43,6 +43,7 @@ class HDSettings(Document):
         )
         rule_doc.document_type = "HD Ticket"
         rule_doc.assign_condition = "status == 'Open'"
+        rule_doc.assign_condition_json = '[["status", "==", "Open"]]'
         rule_doc.priority = 0
         rule_doc.disabled = True  # Disable the rule by default, when agents are added to the group, the rule will be enabled
 

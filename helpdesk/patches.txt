@@ -3,6 +3,8 @@ helpdesk.patches.change_app_name_to_helpdesk
 helpdesk.patches.rename_doctypes_prefix_with_hd
 helpdesk.patches.rename_frappedesk_module_references
 helpdesk.patches.naming_autoincrement
+execute:frappe.delete_doc("DocType", "HD Preset Filter")
+execute:frappe.delete_doc("DocType", "HD Preset Filter Item")
 
 [post_model_sync]
 execute:frappe.delete_doc("Workspace", "Frappe Desk", force=True)
@@ -20,5 +22,6 @@ helpdesk.helpdesk.doctype.hd_ticket.patches.first_responded_on
 helpdesk.patches.update_hd_team_users
 helpdesk.patches.default_article_category #v2
 helpdesk.patches.communication_read_perm_agent
-helpdesk.patches.agent_manager_perms
-helpdesk.patches.remove_agents_teams_default_views 
+helpdesk.patches.agent_manager_perms #v2
+helpdesk.patches.remove_agents_teams_default_views
+helpdesk.patches.add_fields_in_assignment_rule

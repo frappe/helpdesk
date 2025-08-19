@@ -156,7 +156,7 @@ class HDServiceLevelAgreement(Document):
 
     def apply(self, doc: Document):
         self.handle_new(doc)
-        self.handle_status(doc)
+        self.handle_doc_status(doc)
         self.handle_targets(doc)
         self.handle_agreement_status(doc)
         self.validate_all_priorities()
@@ -168,7 +168,7 @@ class HDServiceLevelAgreement(Document):
         doc.service_level_agreement_creation = creation
         doc.priority = doc.priority or self.default_priority
 
-    def handle_status(self, doc: Document):
+    def handle_doc_status(self, doc: Document):
         if doc.is_new() or not doc.has_value_changed("status"):
             return
         self.set_first_response_time(doc)
@@ -218,6 +218,7 @@ class HDServiceLevelAgreement(Document):
             return
         doc.on_hold_since = None
         curr_val = time_diff_in_seconds(now_datetime(), paused_since)
+        curr_val = max(curr_val, 0)  # Ensure non-negative hold time
         doc.total_hold_time = (doc.total_hold_time or 0) + curr_val
 
     def handle_targets(self, doc: Document):
@@ -226,7 +227,9 @@ class HDServiceLevelAgreement(Document):
 
     def set_response_by(self, doc: Document):
         start = doc.service_level_agreement_creation
-        doc.response_by = self.calc_time(start, doc.priority, "response_time")
+        doc.response_by = self.calc_time(
+            doc.service_level_agreement_creation, doc.priority, "response_time"
+        )
 
     def set_resolution_by(self, doc: Document):
         total_hold_time = doc.total_hold_time or 0
@@ -235,7 +238,12 @@ class HDServiceLevelAgreement(Document):
             seconds=total_hold_time,
             as_datetime=True,
         )
-        doc.resolution_by = self.calc_time(start, doc.priority, "resolution_time")
+        doc.resolution_by = self.calc_time(
+            doc.service_level_agreement_creation,
+            doc.priority,
+            "resolution_time",
+            hold_time=total_hold_time,
+        )
 
     def reset_resolution_metrics(self, doc: Document):
         pause_on = [row.status for row in self.pause_sla_on]
@@ -283,43 +291,78 @@ class HDServiceLevelAgreement(Document):
         start_at: str,
         priority: str,
         target: Literal["response_time", "resolution_time"],
+        hold_time: float = 0,
     ):
-        res = get_datetime(start_at)
-        priorities = self.get_priorities()
+        """
+        Considerations:
+            - Holidays
+            - Workdays
+            - Working hours
+            - Hold time if target is resolution time (in seconds)
 
+        Returns:
+            - DateTime when the target is expected to be met
+        """
+        result = get_datetime(start_at)
+        priorities = self.get_priorities()
         if priority not in priorities:
             frappe.throw(
                 _("Please add {0} priority in {1} SLA").format(priority, self.name)
             )
         priority = priorities[priority]
+        remaining_target_time = priority.get(
+            target, 0
+        )  # time for response or resolution in seconds
+        holidays = (
+            self.get_holidays()
+        )  # From Holiday List, returns a list of holiday dates
+        days_list = get_weekdays()  # list of weekdays, ["Monday", "Tuesday", ...]
+        working_days = (
+            self.get_workdays()
+        )  # From Working hours table, returns a dict with weekday names as keys and workday objects as values
 
-        time_needed = priority.get(target, 0)
-        holidays = self.get_holidays()
-        weekdays = get_weekdays()
-        workdays = self.get_workdays()
-        while time_needed:
-            today = res
-            today_day = getdate(today)
-            today_weekday = weekdays[today.weekday()]
-            is_workday = today_weekday in workdays
-            is_holiday = today_day in holidays
-            if is_holiday or not is_workday:
-                res = add_to_date(res, days=1, as_datetime=True)
+        if target == "resolution_time":
+            # add hold time to remaining target time
+            remaining_target_time += hold_time
+
+        while remaining_target_time:
+            current_datetime = result
+            current_date = getdate(current_datetime)
+            current_day = days_list[
+                current_datetime.weekday()
+            ]  # Returns the current weekday name like Monday or Tuesday etc.
+
+            is_current_day_working = current_day in working_days
+            is_holiday = current_date in holidays
+
+            if is_holiday or not is_current_day_working:
+                next_date = getdate(add_to_date(result, days=1, as_datetime=True))
+                result = next_date
                 continue
-            today_workday = workdays[today_weekday]
-            now_in_seconds = time_diff_in_seconds(today, today_day)
-            start_time = max(today_workday.start_time.total_seconds(), now_in_seconds)
-            till_start_time = max(start_time - now_in_seconds, 0)
-            end_time = max(today_workday.end_time.total_seconds(), now_in_seconds)
+
+            current_workday_doc = working_days[
+                current_day
+            ]  # Get the workday object for the current day
+            current_time_in_seconds = time_diff_in_seconds(
+                current_datetime, current_date
+            )
+            start_time = max(
+                current_workday_doc.start_time.total_seconds(), current_time_in_seconds
+            )
+            till_start_time = max(start_time - current_time_in_seconds, 0)
+            end_time = max(
+                current_workday_doc.end_time.total_seconds(), current_time_in_seconds
+            )
             time_left = max(end_time - start_time, 0)
             if not time_left:
-                res = getdate(add_to_date(res, days=1, as_datetime=True))
+                next_date = getdate(add_to_date(result, days=1, as_datetime=True))
+                result = next_date
                 continue
-            time_taken = min(time_needed, time_left)
-            time_needed -= time_taken
+            time_taken = min(remaining_target_time, time_left)
+            remaining_target_time -= time_taken
             time_required = till_start_time + time_taken
-            res = add_to_date(res, seconds=time_required, as_datetime=True)
-        return res
+            result = add_to_date(result, seconds=time_required, as_datetime=True)
+        return result
 
     def get_working_days(self) -> dict[str, dict]:
         workdays = []
@@ -400,33 +443,6 @@ class HDServiceLevelAgreement(Document):
         for row in self.support_and_resolution:
             res[row.workday] = row
         return res
-
-    # temporary, will remove once sla goes to frontend
-    def before_insert(self):
-        user = frappe.session.user
-        user_onboarding_status = frappe.get_value("User", user, "onboarding_status")
-        if not user_onboarding_status:
-            return
-
-        user_onboarding_status = frappe.parse_json(user_onboarding_status)
-        if not user_onboarding_status:
-            return
-        hd_onboarding_steps = user_onboarding_status.get("helpdesk_onboarding_status")
-        if not hd_onboarding_steps:
-            return
-
-        sla_onboarding_status = {}
-        for step in hd_onboarding_steps:
-            if step.get("name") == "setup_sla":
-                sla_onboarding_status = step
-                break
-
-        if not sla_onboarding_status:
-            return
-        if sla_onboarding_status.get("completed"):
-            return
-
-        frappe.publish_realtime("update_sla_status", user=frappe.session.user)
 
     def on_trash(self):
         self.handle_default_sla_deletion()

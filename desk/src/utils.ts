@@ -5,6 +5,7 @@ import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
 import TicketIcon from "./components/icons/TicketIcon.vue";
+import { getMeta } from "./stores/meta";
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
@@ -309,13 +310,6 @@ export function uploadFunction(
   });
 }
 
-export async function removeAttachmentFromServer(attachment: string) {
-  await call("frappe.client.delete", {
-    doctype: "File",
-    name: attachment,
-  });
-}
-
 export const convertToConditions = ({
   conditions,
   fieldPrefix,
@@ -390,10 +384,10 @@ export const convertToConditions = ({
       }
 
       if (op === "like") {
-        return `${fieldAccess} and "${value}" in ${fieldAccess}`;
+        return `(${fieldAccess} and "${value}" in ${fieldAccess})`;
       }
       if (op === "not like") {
-        return `${fieldAccess} and "${value}" not in ${fieldAccess}`;
+        return `(${fieldAccess} and "${value}" not in ${fieldAccess})`;
       }
 
       if (
@@ -416,7 +410,7 @@ export const convertToConditions = ({
           items = [`"${String(value).trim()}"`];
         }
         valueStr = `[${items.join(", ")}]`;
-        return `${fieldAccess} and ${fieldAccess} ${op} ${valueStr}`;
+        return `(${fieldAccess} and ${fieldAccess} ${op} ${valueStr})`;
       }
 
       if (typeof value === "string") {
@@ -438,3 +432,108 @@ export const convertToConditions = ({
   const parts = conditions.map(processCondition);
   return parts.join(" ");
 };
+
+export function validateConditions(conditions: any[]): boolean {
+  if (!Array.isArray(conditions)) return false;
+
+  // Handle simple condition [field, operator, value]
+  if (
+    conditions.length === 3 &&
+    typeof conditions[0] === "string" &&
+    typeof conditions[1] === "string"
+  ) {
+    return conditions[0] !== "" && conditions[1] !== "" && conditions[2] !== "";
+  }
+
+  // Iterate through conditions and logical operators
+  for (let i = 0; i < conditions.length; i++) {
+    const item = conditions[i];
+
+    // Skip logical operators (they will be validated by their position)
+    if (item === "and" || item === "or") {
+      // Ensure logical operators are not at start/end and not consecutive
+      if (
+        i === 0 ||
+        i === conditions.length - 1 ||
+        conditions[i - 1] === "and" ||
+        conditions[i - 1] === "or"
+      ) {
+        return false;
+      }
+      continue;
+    }
+
+    // Handle nested conditions (arrays)
+    if (Array.isArray(item)) {
+      if (!validateConditions(item)) {
+        return false;
+      }
+    } else if (item !== undefined && item !== null) {
+      return false;
+    }
+  }
+
+  return conditions.length > 0;
+}
+
+export async function removeAttachmentFromServer(attachment: string) {
+  await call("frappe.client.delete", {
+    doctype: "File",
+    name: attachment,
+  });
+}
+
+function getParentChildField(name: string) {
+  let [_, parent, child] = name.split("-");
+  return [parent, child];
+}
+
+export function getFieldDependencyLabel(name: string) {
+  const { getField } = getMeta("HD Ticket");
+  let [parent, child] = getParentChildField(name);
+  parent = getField(parent)?.label || parent;
+  child = getField(child)?.label || child;
+  return `${parent} → ${child}`;
+}
+
+/**
+ * @param {Object} config - Configuration object
+ * @param {Ref<boolean>} config.isConfirmingDelete - Ref to track confirmation state
+ * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
+ * @returns {Array} Array of option objects for use in dropdowns
+ */
+export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
+  return [
+    {
+      label: "Delete",
+      component: (props) =>
+        TemplateOption({
+          option: "Delete",
+          icon: "trash-2",
+          active: props.active,
+          variant: "grey",
+          onClick: (event) => {
+            event.preventDefault();
+            isConfirmingDelete.value = true;
+          },
+        }),
+      condition: () => !isConfirmingDelete.value,
+    },
+    {
+      label: "Confirm Delete",
+      component: (props) =>
+        TemplateOption({
+          option: "Confirm Delete",
+          icon: "trash-2",
+          active: props.active,
+          variant: "danger",
+          onClick: () => {
+            onConfirmDelete();
+            // Reset state after confirming
+            isConfirmingDelete.value = false;
+          },
+        }),
+      condition: () => isConfirmingDelete.value,
+    },
+  ];
+}
