@@ -42,7 +42,8 @@
               :label="__('Enabled')"
               v-model="enabled"
               @update:model-value="setUnsavedChanges"
-              class="flex-row-reverse gap-x-2 text-sm text-ink-gray-7 font-medium pl-0 hover:bg-transparent active:bg-transparent"
+              :style="{ background: 'transparent' }"
+              class="flex-row-reverse gap-x-2 text-sm text-ink-gray-7 font-medium pl-0"
             />
             <Button
               type="submit"
