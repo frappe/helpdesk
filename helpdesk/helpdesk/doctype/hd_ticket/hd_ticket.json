@@ -440,7 +440,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-07-31 23:00:50.969299",
+ "modified": "2025-08-19 23:07:28.436326",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
@@ -496,6 +496,7 @@
   }
  ],
  "quick_entry": 1,
+ "recipient_account_field": "email_account",
  "row_format": "Dynamic",
  "search_fields": "status,subject,raised_by",
  "sender_field": "raised_by",
