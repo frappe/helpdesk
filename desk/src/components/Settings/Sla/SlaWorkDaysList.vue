@@ -1,7 +1,7 @@
 <template>
-  <div class="rounded-md border p-1 border-gray-300 text-sm">
+  <div class="rounded-md border px-2 border-gray-300 text-sm">
     <div
-      class="grid p-2 items-center"
+      class="grid p-2 px-4 items-center"
       :style="{
         gridTemplateColumns: getGridTemplateColumnsForTable(columns),
       }"
@@ -19,7 +19,7 @@
         <span v-if="column.isRequired" class="text-red-500">*</span>
       </div>
     </div>
-    <hr class="my-0.5" v-if="slaData.support_and_resolution?.length !== 0" />
+    <hr v-if="slaData.support_and_resolution?.length !== 0" />
     <SlaWorkDaysListItem
       v-for="(row, index) in slaData.support_and_resolution"
       :key="index + row.workday + row.id"
@@ -34,7 +34,7 @@
       No workdays in the list
     </div>
   </div>
-  <div class="flex items-center justify-between mt-4">
+  <div class="flex items-center justify-between mt-2.5">
     <Button
       v-if="slaData.support_and_resolution.length < 7"
       variant="subtle"

@@ -1,8 +1,9 @@
 <template>
-  <AssignmentConditions
+  <CFConditions
     v-if="props.conditions.length > 0"
     :conditions="props.conditions"
     :level="0"
+    :disableAddCondition="slaDataErrors.condition != ''"
   />
   <div
     v-if="props.conditions.length == 0"
@@ -10,7 +11,7 @@
     @click="props.conditions.push(['', '', ''])"
   >
     <FeatherIcon name="plus" class="h-4" />
-    Add a custom condition
+    {{ __("Add a custom condition") }}
   </div>
   <div class="flex items-center justify-between mt-2">
     <Dropdown
@@ -19,9 +20,9 @@
       :options="dropdownOptions"
     >
       <Button
-        :disabled="slaDataErrors.condition !== ''"
+        :disabled="slaDataErrors.condition != ''"
         :icon-right="open ? 'chevron-up' : 'chevron-down'"
-        label="Add condition"
+        :label="__('Add condition')"
       />
     </Dropdown>
     <ErrorMessage :message="slaDataErrors.condition" />
@@ -29,14 +30,11 @@
 </template>
 
 <script setup lang="ts">
-import AssignmentConditions from "./AssignmentConditions/AssignmentConditions.vue";
-import { Button, ErrorMessage, FeatherIcon } from "frappe-ui";
-import {
-  slaDataErrors,
-  validateConditions,
-  validateSlaData,
-} from "@/stores/sla";
+import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
+import { slaDataErrors, validateSlaData } from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
+import CFConditions from "@/components/conditions-filter/CFConditions.vue";
+import { validateConditions } from "@/utils";
 
 const props = defineProps({
   conditions: {

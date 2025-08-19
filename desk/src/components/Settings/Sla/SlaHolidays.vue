@@ -1,75 +1,74 @@
 <template>
-  <div class="flex flex-col gap-2">
-    <div class="text-lg font-semibold text-ink-gray-7">
-      Work schedule and holidays
-    </div>
-    <div class="flex justify-between">
-      <div class="text-sm text-ink-gray-6 max-w-lg">
+  <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-1">
+      <div class="text-lg font-semibold text-ink-gray-8">
+        Work schedule and holidays
+      </div>
+      <div class="text-p-sm text-ink-gray-6 max-w-lg">
         Set working days, hours, and holidays by selecting a predefined schedule
         or creating a new one.
       </div>
-      <NestedPopover>
-        <template #target="{ open }">
-          <Button
-            class="text-sm"
-            :icon-right="open ? 'chevron-up' : 'chevron-down'"
-            :label="slaData.holiday_list"
-          />
-        </template>
-        <template #body>
-          <div
-            class="my-2 p-1 min-w-40 rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
-          >
-            <div>
-              <div
-                v-for="holiday in holidayListData.data"
-                :key="holiday.name"
-                class="flex items-center justify-between gap-4 rounded px-2 py-1.5 text-base text-ink-gray-8 cursor-pointer hover:bg-surface-gray-2"
-                @click="slaData.holiday_list = holiday.name"
-              >
-                <div class="flex items-center gap-2 w-full">
-                  <input
-                    name="holiday_list"
-                    :checked="holiday.name === slaData.holiday_list"
-                    type="radio"
-                  />
-                  <div class="select-none">{{ holiday.holiday_list_name }}</div>
-                </div>
-                <div class="flex cursor-pointer items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    @click.stop="editHolidayList(holiday)"
-                    class="!h-5 w-5 !p-1"
-                    icon-left="edit"
-                  />
-                </div>
+    </div>
+    <NestedPopover>
+      <template #target="{ open }">
+        <Button
+          class="text-sm"
+          :icon-right="open ? 'chevron-up' : 'chevron-down'"
+          :label="slaData.holiday_list"
+        />
+      </template>
+      <template #body>
+        <div
+          class="my-2 p-1 min-w-40 rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+        >
+          <div>
+            <div
+              v-for="holiday in holidayListData.data"
+              :key="holiday.name"
+              class="flex items-center justify-between gap-4 rounded px-2 py-1.5 text-base text-ink-gray-8 cursor-pointer hover:bg-surface-gray-2"
+              @click="slaData.holiday_list = holiday.name"
+            >
+              <div class="flex items-center gap-2 w-full">
+                <input
+                  name="holiday_list"
+                  :checked="holiday.name === slaData.holiday_list"
+                  type="radio"
+                />
+                <div class="select-none">{{ holiday.holiday_list_name }}</div>
               </div>
-              <div
-                class="mt-1.5 flex flex-col gap-1 border-t border-outline-gray-modals pt-1.5"
-              >
+              <div class="flex cursor-pointer items-center gap-1">
                 <Button
-                  class="w-full !justify-start !text-ink-gray-5"
                   variant="ghost"
-                  label="Create new business holiday"
-                  @click="createNewHolidayList()"
-                  icon-left="plus"
+                  @click.stop="editHolidayList(holiday)"
+                  icon="edit"
                 />
               </div>
             </div>
+            <div
+              class="mt-1.5 flex flex-col gap-1 border-t border-outline-gray-modals pt-1.5"
+            >
+              <Button
+                class="w-full !justify-start !text-ink-gray-5"
+                variant="ghost"
+                label="Create new business holiday"
+                @click="createNewHolidayList()"
+                icon-left="plus"
+              />
+            </div>
           </div>
-        </template>
-      </NestedPopover>
-    </div>
-    <div class="mt-4">
-      <SlaWorkDaysList />
-    </div>
+        </div>
+      </template>
+    </NestedPopover>
+  </div>
+  <div class="mt-5">
+    <SlaWorkDaysList />
   </div>
 </template>
 
 <script setup lang="ts">
 import { NestedPopover, Button, createListResource } from "frappe-ui";
 import SlaWorkDaysList from "./SlaWorkDaysList.vue";
-import { activeTab, tabs } from "../settingsModal";
+import { setActiveSettingsTab } from "../settingsModal";
 import {
   holidayListActiveScreen,
   resetHolidayData,
@@ -78,7 +77,7 @@ import { watchDebounced } from "@vueuse/core";
 import { slaData, validateSlaData } from "@/stores/sla";
 
 const createNewHolidayList = () => {
-  activeTab.value = tabs[5];
+  setActiveSettingsTab("Business Holidays");
   holidayListActiveScreen.value = {
     screen: "view",
     data: null,
@@ -91,7 +90,7 @@ const createNewHolidayList = () => {
 };
 
 const editHolidayList = (data: any) => {
-  activeTab.value = tabs[5];
+  setActiveSettingsTab("Business Holidays");
   holidayListActiveScreen.value = {
     screen: "view",
     data: data,

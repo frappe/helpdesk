@@ -51,7 +51,7 @@
         this list</span
       >
     </div>
-    <hr class="mb-6 mt-3" />
+    <hr class="mb-8 mt-2" />
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       <div>
         <FormControl
@@ -78,15 +78,15 @@
         v-model="holidayData.description"
       />
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <div>
-      <div class="flex flex-col gap-2">
-        <span class="text-lg font-semibold text-ink-gray-7">Valid from</span>
-        <span class="text-sm text-ink-gray-6">
+      <div class="flex flex-col gap-1">
+        <span class="text-lg font-semibold text-ink-gray-8">Valid from</span>
+        <span class="text-p-sm text-ink-gray-6">
           Choose the duration of this holiday list.
         </span>
       </div>
-      <div class="mt-4 flex gap-5 flex-col md:flex-row">
+      <div class="mt-3.5 flex gap-5 flex-col md:flex-row">
         <div class="w-full space-y-1.5">
           <FormLabel label="From date" for="from_date" required />
           <DatePicker
@@ -129,52 +129,52 @@
         </div>
       </div>
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <div>
-      <div class="flex flex-col gap-2">
-        <div class="text-lg font-semibold text-ink-gray-7">
+      <div class="flex flex-col gap-1">
+        <div class="text-lg font-semibold text-ink-gray-8">
           Recurring holidays
         </div>
-        <div class="text-sm text-ink-gray-6">
+        <div class="text-p-sm text-ink-gray-6">
           Add recurring holidays such as weekends.
         </div>
       </div>
-      <div class="mt-6">
+      <div class="mt-5">
         <RecurringHolidaysList
           :holidayData="holidayData"
           :holidays="holidayData.recurring_holidays"
         />
       </div>
     </div>
-    <hr class="my-6" />
+    <hr class="my-8" />
     <div>
-      <div class="flex flex-col gap-1">
-        <span class="text-lg font-semibold text-ink-gray-7">Holidays</span>
-        <div class="flex items-center justify-between">
-          <div class="text-sm text-ink-gray-6">
+      <div class="flex justify-between items-center">
+        <div class="flex justify-between flex-col gap-1">
+          <span class="text-lg font-semibold text-ink-gray-8">Holidays</span>
+          <div class="text-p-sm text-ink-gray-6">
             Add holidays here to make sure they’re excluded from SLA
             calculations.
           </div>
-          <TabButtons
-            :buttons="[
-              {
-                value: 'calendar',
-                icon: 'calendar',
-              },
-              {
-                value: 'list',
-                icon: 'list',
-              },
-            ]"
-            v-model="holidayListView"
-          />
         </div>
+        <TabButtons
+          :buttons="[
+            {
+              value: 'calendar',
+              icon: 'calendar',
+            },
+            {
+              value: 'list',
+              icon: 'list',
+            },
+          ]"
+          v-model="holidayListView"
+        />
       </div>
-      <div class="mt-4">
+      <div class="mt-5">
         <HolidaysTableView v-if="holidayListView === 'list'" />
         <HolidaysCalendarView v-else />
       </div>
-      <div class="mt-4 flex justify-between items-center">
+      <div class="mt-2.5 flex justify-between items-center">
         <Button
           variant="subtle"
           label="Add Holiday"
@@ -182,13 +182,10 @@
           icon-left="plus"
         />
         <!-- Indicators -->
-        <div class="flex gap-4">
+        <div class="flex gap-4" v-if="holidayListView === 'calendar'">
           <div class="gap-1 flex items-center">
-            <!--  -->
             <span class="bg-yellow-100 size-4 rounded-sm" />
-            <span class="text-sm text-ink-gray-6"
-              >Manually created holidays</span
-            >
+            <span class="text-sm text-ink-gray-6">Holidays</span>
           </div>
           <div class="gap-1 flex items-center">
             <span class="bg-gray-100 size-4 rounded-sm" />
@@ -235,9 +232,8 @@ import { getFormattedDate, htmlToText } from "@/utils";
 import dayjs from "dayjs";
 import FormLabel from "frappe-ui/src/components/FormLabel.vue";
 import {
-  activeTab,
   disableSettingModalOutsideClick,
-  tabs,
+  setActiveSettingsTab,
 } from "../settingsModal";
 import HolidaysCalendarView from "./HolidaysCalendarView.vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
@@ -302,7 +298,7 @@ const goBack = () => {
     return;
   }
   if (holidayListActiveScreen.value.previousScreen) {
-    activeTab.value = tabs[4];
+    setActiveSettingsTab("SLA Policies");
 
     slaActiveScreen.value = {
       screen: "view",

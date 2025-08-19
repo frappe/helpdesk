@@ -384,10 +384,10 @@ export const convertToConditions = ({
       }
 
       if (op === "like") {
-        return `${fieldAccess} and "${value}" in ${fieldAccess}`;
+        return `(${fieldAccess} and "${value}" in ${fieldAccess})`;
       }
       if (op === "not like") {
-        return `${fieldAccess} and "${value}" not in ${fieldAccess}`;
+        return `(${fieldAccess} and "${value}" not in ${fieldAccess})`;
       }
 
       if (
@@ -410,7 +410,7 @@ export const convertToConditions = ({
           items = [`"${String(value).trim()}"`];
         }
         valueStr = `[${items.join(", ")}]`;
-        return `${fieldAccess} and ${fieldAccess} ${op} ${valueStr}`;
+        return `(${fieldAccess} and ${fieldAccess} ${op} ${valueStr})`;
       }
 
       if (typeof value === "string") {
@@ -432,6 +432,49 @@ export const convertToConditions = ({
   const parts = conditions.map(processCondition);
   return parts.join(" ");
 };
+
+export function validateConditions(conditions: any[]): boolean {
+  if (!Array.isArray(conditions)) return false;
+
+  // Handle simple condition [field, operator, value]
+  if (
+    conditions.length === 3 &&
+    typeof conditions[0] === "string" &&
+    typeof conditions[1] === "string"
+  ) {
+    return conditions[0] !== "" && conditions[1] !== "" && conditions[2] !== "";
+  }
+
+  // Iterate through conditions and logical operators
+  for (let i = 0; i < conditions.length; i++) {
+    const item = conditions[i];
+
+    // Skip logical operators (they will be validated by their position)
+    if (item === "and" || item === "or") {
+      // Ensure logical operators are not at start/end and not consecutive
+      if (
+        i === 0 ||
+        i === conditions.length - 1 ||
+        conditions[i - 1] === "and" ||
+        conditions[i - 1] === "or"
+      ) {
+        return false;
+      }
+      continue;
+    }
+
+    // Handle nested conditions (arrays)
+    if (Array.isArray(item)) {
+      if (!validateConditions(item)) {
+        return false;
+      }
+    } else if (item !== undefined && item !== null) {
+      return false;
+    }
+  }
+
+  return conditions.length > 0;
+}
 
 export async function removeAttachmentFromServer(attachment: string) {
   await call("frappe.client.delete", {

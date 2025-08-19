@@ -1,10 +1,9 @@
 <template>
   <div class="rounded-lg border border-gray-300 p-3 flex flex-col gap-4 w-full">
     <template v-for="(condition, i) in props.conditions" :key="condition.field">
-      <AssignmentCondition
+      <CFCondition
         v-if="Array.isArray(condition)"
         :condition="condition"
-        :doctype="'HD Ticket'"
         :isChild="props.isChild"
         :itemIndex="i"
         @remove="removeCondition(condition)"
@@ -14,12 +13,13 @@
         :isGroup="isGroupCondition(condition[0])"
         :conjunction="getConjunction()"
         @turnIntoGroup="turnIntoGroup(condition)"
+        :disableAddCondition="props.disableAddCondition"
       />
     </template>
     <div v-if="props.isChild" class="flex">
       <Dropdown v-slot="{ open }" :options="dropdownOptions">
         <Button
-          :disabled="slaDataErrors.condition !== ''"
+          :disabled="props.disableAddCondition"
           label="Add condition"
           icon-left="plus"
           :icon-right="open ? 'chevron-up' : 'chevron-down'"
@@ -30,11 +30,10 @@
 </template>
 
 <script setup lang="ts">
-import { slaDataErrors } from "@/stores/sla";
-import { Button } from "frappe-ui";
+import { Button, Dropdown } from "frappe-ui";
 import { computed, onMounted } from "vue";
-import { filterableFields } from "../utils";
-import AssignmentCondition from "./AssignmentCondition.vue";
+import CFCondition from "./CFCondition.vue";
+import { filterableFields } from "./filterableFields";
 
 const props = defineProps({
   conditions: {
@@ -48,6 +47,10 @@ const props = defineProps({
   level: {
     type: Number,
     default: 0,
+  },
+  disableAddCondition: {
+    type: Boolean,
+    default: false,
   },
 });
 

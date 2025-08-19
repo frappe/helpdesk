@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid gap-2 px-2 items-center"
+    class="grid gap-2 py-3.5 px-4 items-center"
     :style="{
       gridTemplateColumns: getGridTemplateColumnsForTable(props.columns),
     }"
@@ -8,7 +8,7 @@
     <div
       v-for="column in props.columns"
       :key="column.key"
-      class="w-full py-2 overflow-hidden whitespace-nowrap text-ellipsis"
+      class="w-full overflow-hidden whitespace-nowrap text-ellipsis"
     >
       <div v-if="column.key === 'status'">
         <Select
@@ -35,7 +35,7 @@
       </Dropdown>
     </div>
   </div>
-  <hr class="my-0.5" v-if="!props.isLast" />
+  <hr v-if="!props.isLast" />
   <Dialog
     v-model="dialog"
     @after-leave="isConfirmingDelete = false"
@@ -95,7 +95,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { Button, Select, Dialog, toast } from "frappe-ui";
-import { getGridTemplateColumnsForTable, TemplateOption } from "@/utils";
+import { ConfirmDelete, getGridTemplateColumnsForTable } from "@/utils";
 
 const props = defineProps({
   columns: {
@@ -159,34 +159,13 @@ const dropdownOptions = [
     onClick: () => editItem(),
     icon: "edit",
   },
-  {
-    label: "Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "gray",
-        onClick: (event) => deleteItem(event),
-      }),
-    condition: () => !isConfirmingDelete.value,
-  },
-  {
-    label: "Confirm Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Confirm Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "danger",
-        onClick: (event) => deleteItem(event),
-      }),
-    condition: () => isConfirmingDelete.value,
-  },
+  ...ConfirmDelete({
+    onConfirmDelete: () => deleteItem(),
+    isConfirmingDelete,
+  }),
 ];
 
-const deleteItem = (event) => {
-  event.preventDefault();
+const deleteItem = () => {
   if (!isConfirmingDelete.value) {
     isConfirmingDelete.value = true;
     return;
