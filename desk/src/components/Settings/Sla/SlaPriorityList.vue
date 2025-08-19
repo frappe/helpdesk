@@ -1,9 +1,9 @@
 <template>
-  <div class="rounded-md border p-1 border-gray-300 text-sm">
+  <div class="rounded-md border px-2 border-gray-300 text-sm">
     <div
-      class="grid p-2 items-center"
+      class="grid p-2 px-4 items-center"
       :style="{
-        gridTemplateColumns: getGridTemplateColumnsForTable(columns),
+        gridTemplateColumns,
       }"
       v-if="slaData.priorities?.length !== 0"
     >
@@ -22,7 +22,7 @@
         <span v-if="column.isRequired" class="text-red-500">*</span>
       </div>
     </div>
-    <hr class="my-0.5" v-if="slaData.priorities?.length !== 0" />
+    <hr v-if="slaData.priorities?.length !== 0" />
     <SlaPriorityListItem
       v-for="(row, index) in slaData.priorities"
       :key="row.priority"
@@ -37,7 +37,14 @@
       No priorities in the list
     </div>
   </div>
-  <div class="flex items-center justify-between mt-4">
+  <div
+    class="flex items-center justify-between mt-2.5"
+    v-if="
+      slaData.priorities.length !== priorityOptions.length ||
+      slaDataErrors.default_priority ||
+      slaDataErrors.priorities
+    "
+  >
     <div>
       <Button
         v-if="slaData.priorities.length !== priorityOptions.length"
@@ -47,11 +54,9 @@
         icon-left="plus"
       />
     </div>
-    <div class="mt-2">
-      <ErrorMessage
-        :message="slaDataErrors.default_priority || slaDataErrors.priorities"
-      />
-    </div>
+    <ErrorMessage
+      :message="slaDataErrors.default_priority || slaDataErrors.priorities"
+    />
   </div>
 </template>
 
@@ -142,9 +147,22 @@ const columns = computed(() => [
   {
     label: "Resolution time",
     key: "resolution_time",
-    isRequired: Boolean(slaData.value.apply_sla_for_resolution),
+    isRequired: true,
   },
+  //   slaData.value.apply_sla_for_resolution && {
+  //     label: "Resolution time",
+  //     key: "resolution_time",
+  //     isRequired: Boolean(slaData.value.apply_sla_for_resolution),
+  //   },
+  // ].filter((c) => c)
 ]);
+
+const gridTemplateColumns = computed(() => {
+  // return getGridTemplateColumnsForTable(columns.value.filter((c) => c));
+  return getGridTemplateColumnsForTable(columns.value);
+});
+
+provide("gridTemplateColumns", gridTemplateColumns);
 
 watchDebounced(
   () => [...slaData.value.priorities],

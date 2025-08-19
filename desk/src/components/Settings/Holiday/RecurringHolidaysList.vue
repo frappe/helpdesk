@@ -50,7 +50,7 @@
   <Button
     variant="subtle"
     @click="addHoliday"
-    class="mt-4"
+    class="mt-2.5"
     label="Add Recurring Holiday"
     icon-left="plus"
   />
@@ -137,7 +137,7 @@
 
 <script setup lang="ts">
 import { updateWeeklyOffDates } from "@/stores/holidayList";
-import { TemplateOption } from "@/utils";
+import { ConfirmDelete } from "@/utils";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import weekday from "dayjs/plugin/weekday";
@@ -224,30 +224,10 @@ const dropdownOptions = (holiday: any) => [
     onClick: () => editHoliday(holiday),
     icon: "edit",
   },
-  {
-    label: "Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "gray",
-        onClick: (event) => deleteHoliday(event, holiday),
-      }),
-    condition: () => !isConfirmingDelete.value,
-  },
-  {
-    label: "Confirm Delete",
-    component: (props) =>
-      TemplateOption({
-        option: "Confirm Delete",
-        icon: "trash-2",
-        active: props.active,
-        variant: "danger",
-        onClick: (event) => deleteHoliday(event, holiday),
-      }),
-    condition: () => isConfirmingDelete.value,
-  },
+  ...ConfirmDelete({
+    onConfirmDelete: () => deleteHoliday(holiday),
+    isConfirmingDelete,
+  }),
 ];
 
 const availableWorkDays = computed(() => {
@@ -342,9 +322,7 @@ const saveHoliday = () => {
   dialog.value = false;
 };
 
-const deleteHoliday = (event, holiday: any) => {
-  event.stopPropagation();
-  event.preventDefault();
+const deleteHoliday = (holiday: any) => {
   if (!isConfirmingDelete.value) {
     isConfirmingDelete.value = true;
     return;
