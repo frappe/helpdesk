@@ -47,7 +47,7 @@ const content = ref("");
 const defaultContent = ref("");
 const enabled = ref(false);
 const ticketStatusOptions = ["Closed", "Resolved"] as const;
-type TicketStatus = (typeof ticketStatusOptions)[number];
+type TicketStatus = typeof ticketStatusOptions[number];
 const ticketStatus = ref<TicketStatus>(ticketStatusOptions[0]);
 const compRef = ref<InstanceType<typeof Notification>>();
 
