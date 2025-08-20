@@ -25,8 +25,8 @@
 
 <script setup lang="ts">
 import { computed, h } from "vue";
-import { Autocomplete, Link } from "@/components";
-import { createResource, FormControl } from "frappe-ui";
+import { Link } from "@/components";
+import { createResource, FormControl, Autocomplete } from "frappe-ui";
 import { Field } from "@/types";
 
 type Value = string | number | boolean;
@@ -52,6 +52,7 @@ const component = computed(() => {
   if (props.field.url_method) {
     return h(Autocomplete, {
       options: apiOptions.data,
+      $slots: {},
     });
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     return h(Link, {
@@ -63,6 +64,7 @@ const component = computed(() => {
       options: props.field.options
         .split("\n")
         .map((o) => ({ label: o, value: o })),
+      $slots: {},
     });
   } else if (props.field.fieldtype === "Check") {
     return h(Autocomplete, {
@@ -76,6 +78,7 @@ const component = computed(() => {
           value: 0,
         },
       ],
+      $slots: {},
     });
   } else {
     return h(FormControl, {
