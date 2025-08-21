@@ -64,7 +64,7 @@ const notifications: AtLeastOneNotifcation = [
     name: "share_feedback",
     label: __("Share Feedback"),
     description: __(
-      "Sent to the creator of the ticket after the ticket is closed or resolved"
+      "Sent to the user who has raised the ticket after the ticket is closed or resolved"
     ),
   },
   {
@@ -74,16 +74,16 @@ const notifications: AtLeastOneNotifcation = [
   },
   {
     name: "reply_to_agents",
-    label: __("Reply To Agents"),
+    label: __("Reply From Contact"),
     description: __(
-      "Sent to all of the assigned agents of a ticket after a reply from the customer"
+      "Sent to all of the assigned agents after a reply from one of the contacts"
     ),
   },
   {
     name: "reply_via_agent",
-    label: __("Reply Via Agent"),
+    label: __("Reply From Agent"),
     description: __(
-      "Sent to the creator of the ticket after a reply from one of the assigned agents"
+      "Sent to all of the recipients associated with an agent reply"
     ),
   },
 ];
