@@ -118,10 +118,10 @@ class HDSettings(Document):
             return """\
 <div>
   <p>Hello,</p>
-  <p>You have a new reply on the ticket <strong>#{{ ticket_id }}</strong>.</p>
-  <p><strong>Subject:</strong> {{ ticket_subject }}</p>
-  <p><strong>Raised By:</strong> {{ raised_by }}</p>
-  <p><strong>Priority:</strong> {{ priority }}</p>
+  <p>You have a new reply on the ticket <strong>#{{ doc.name }}</strong>.</p>
+  <p><strong>Subject:</strong> {{ doc.subject }}</p>
+  <p><strong>Raised By:</strong> {{ doc.raised_by }}</p>
+  <p><strong>Priority:</strong> {{ doc.priority }}</p>
 
   <br />
   <p>
@@ -135,7 +135,7 @@ class HDSettings(Document):
         if type == "reply_via_agent":
             return """\
 <div>
-  <h2><strong>Ticket #{{ ticket_id }}</strong></h2>
+  <h2><strong>Ticket #{{ doc.name }}</strong></h2>
   <h3>You have a new reply on this ticket</h3>
   <br />
   <div style="margin-bottom: 10px">
@@ -154,7 +154,7 @@ class HDSettings(Document):
   <p>Please visit the customer portal to reply to this message</p>
   <a
     class="btn btn-primary"
-    href="{{ portal_link }}"
+    href="{{ doc.portal_uri }}"
     rel="noopener noreferrer"
     target="_blank"
   >View in Portal</a>

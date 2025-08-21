@@ -575,8 +575,7 @@ class HDTicket(Document):
                 else email_content,
                 {
                     "message": message,
-                    "portal_link": self.portal_uri,
-                    "ticket_id": self.name,
+                    "doc": self.as_dict(),
                 },
             )
 
@@ -699,13 +698,10 @@ class HDTicket(Document):
             if email_content is None or email_content.strip() == ""
             else email_content,
             {
-                "ticket_id": self.name,
-                "ticket_subject": self.subject,
-                "priority": self.priority,
-                "raised_by": self.raised_by,
                 "ticket_url": frappe.utils.get_url(
                     "/helpdesk/tickets/" + str(self.name)
                 ),
+                "doc": self.as_dict(),
             },
         )
         try:
