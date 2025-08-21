@@ -31,7 +31,7 @@
             class="flex gap-2 text-base text-ink-gray-8"
           >
             <div class="grid size-7 place-content-center">
-              <component :is="field.icon" />
+              <component :is="field.icon" class="size-4 text-ink-gray-8" />
             </div>
             <div class="flex min-h-7 w-full items-center gap-2">
               <div
