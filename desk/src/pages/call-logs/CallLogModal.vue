@@ -253,7 +253,7 @@ function createCallLog() {
       to_number: callLog.value.to,
       duration: callLog.value.duration,
       status: callLog.value.status,
-      type: callLog.value.type,
+      call_type: callLog.value.type,
       caller: callLog.value.caller,
       receiver: callLog.value.receiver,
     },
