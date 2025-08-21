@@ -10,11 +10,8 @@
           theme="gray"
           variant="solid"
           @click="newCallLog"
-        >
-          <template #prefix>
-            <LucidePlus class="h-4 w-4" />
-          </template>
-        </Button>
+          icon-left="plus"
+        />
       </template>
     </LayoutHeader>
     <ListViewBuilder

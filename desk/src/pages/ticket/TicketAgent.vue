@@ -305,8 +305,8 @@ const dropdownOptions = computed(() =>
 // );
 
 const tabIndex = ref(0);
-const tabs: TabObject[] = computed(() =>
-  [
+const tabs: TabObject[] = computed(() => {
+  const _tabs = [
     {
       name: "activity",
       label: "Activity",
@@ -322,13 +322,17 @@ const tabs: TabObject[] = computed(() =>
       label: "Comments",
       icon: CommentIcon,
     },
-    {
+  ];
+
+  if (isCallingEnabled.value) {
+    _tabs.push({
       name: "call",
       label: "Calls",
       icon: LucidePhone,
-    },
-  ].filter((tab) => tab.name !== "call" || isCallingEnabled.value)
-);
+    });
+  }
+  return _tabs;
+});
 
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email, idx: number) => {

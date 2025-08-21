@@ -5,25 +5,23 @@
         <div class="mb-5 flex items-center justify-between">
           <div>
             <h3 class="text-2xl font-semibold leading-6 text-ink-gray-9">
-              {{ "Call Details" }}
+              {{ __("Call Details") }}
             </h3>
           </div>
           <div class="flex items-center gap-1">
             <Button
+              v-if="isManager"
               variant="ghost"
               class="w-7"
               @click="openCallLogModal"
-              v-if="isManager"
-            >
-              <template #icon>
-                <EditIcon />
-              </template>
-            </Button>
-            <Button variant="ghost" class="w-7" @click="show = false">
-              <template #icon>
-                <FeatherIcon name="x" class="size-4" />
-              </template>
-            </Button>
+              icon="edit"
+            />
+            <Button
+              variant="ghost"
+              class="w-7"
+              @click="show = false"
+              icon="x"
+            />
           </div>
         </div>
         <div class="flex flex-col gap-3.5">

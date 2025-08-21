@@ -10,11 +10,12 @@
             <Badge v-if="isDirty" :label="'Not Saved'" theme="orange" />
           </div>
           <div class="flex items-center gap-1">
-            <Button variant="ghost" class="w-7" @click="show = false">
-              <template #icon>
-                <FeatherIcon name="x" class="size-4" />
-              </template>
-            </Button>
+            <Button
+              variant="ghost"
+              class="w-7"
+              @click="show = false"
+              icon="x"
+            />
           </div>
         </div>
         <div class="flex flex-col gap-4">

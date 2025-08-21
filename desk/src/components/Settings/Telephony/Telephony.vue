@@ -20,7 +20,9 @@
     </SettingsLayoutHeader>
   </div>
   <div class="px-10 pb-8 overflow-y-auto">
-    <div class="text-base font-semibold text-ink-gray-8">User settings</div>
+    <div class="text-base font-semibold text-ink-gray-8">
+      {{ __("User settings") }}
+    </div>
     <div class="grid grid-cols-2 gap-4 mt-4">
       <div class="flex flex-col gap-1.5">
         <FormLabel label="Default medium" />
@@ -64,7 +66,7 @@
           type="text"
           required
           v-model="telephonyAgent.doc.mobile_no"
-          description="Required for exotel integration"
+          :description="__('Required for exotel integration')"
         />
         <ErrorMessage :message="exotelErrors.mobileNo" />
       </div>

@@ -31,7 +31,9 @@
           />
 
           <div v-if="isDefaultMedium" class="text-sm text-ink-gray-4">
-            You can change the default calling medium from the settings
+            {{
+              __("You can change the default calling medium from the settings")
+            }}
           </div>
         </div>
       </div>
