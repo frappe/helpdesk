@@ -10,7 +10,8 @@
           <div class="flex items-center gap-x-1">
             <div class="pl-6 pr-2 relative">
               <button
-                @click="props.onBack"
+                type="button"
+                @click="internalOnBack"
                 class="absolute top-0 -left-1 w-full h-full text-ink-gray-7 hover:text-black peer"
               >
                 <span class="sr-only">{{
@@ -105,13 +106,26 @@
       <LoadingIndicator v-else class="w-4" />
     </div>
   </form>
+  <ConfirmDialog
+    v-model="showConfirmDialog"
+    title="Unsaved changes"
+    message="Are you sure you want to go back? Unsaved changes will be lost."
+    :onConfirm="
+      () => {
+        disableSettingModalOutsideClick = false;
+        props.onBack();
+      }
+    "
+  />
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import type { NotificationName } from "./types";
 import { createResource, Switch, LoadingIndicator } from "frappe-ui";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { disableSettingModalOutsideClick } from "../settingsModal";
 
 const props = defineProps<{
   title: string;
@@ -129,6 +143,7 @@ const content = defineModel<string>("content", { required: true });
 const enabled = defineModel<boolean>("enabled", { required: true });
 
 const unsavedChanges = ref(false);
+const showConfirmDialog = ref(false);
 
 const notificationDataResource = createResource({
   url: "helpdesk.api.settings.email_notifications.get_data",
@@ -154,6 +169,22 @@ function resetContent() {
     setUnsavedChanges();
   }
 }
+
+function internalOnBack() {
+  if (unsavedChanges.value) {
+    showConfirmDialog.value = true;
+    return;
+  }
+  disableSettingModalOutsideClick.value = false;
+  props.onBack();
+}
+
+watch(
+  () => unsavedChanges.value,
+  (val) => {
+    disableSettingModalOutsideClick.value = val;
+  }
+);
 
 defineExpose({
   setUnsavedChanges,

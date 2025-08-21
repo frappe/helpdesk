@@ -73,7 +73,11 @@ export const tabs = [
   },
 ];
 
-export const activeTab = ref(tabs[0]);
+export type Tab = typeof tabs[number];
+
+export const activeTab = ref<Tab>(tabs[0]);
+
+export const nextActiveTab = ref<Tab | null>(null);
 
 export const disableSettingModalOutsideClick = ref(false);
 

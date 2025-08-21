@@ -18,7 +18,7 @@
                   ? 'bg-white shadow-sm'
                   : 'hover:bg-gray-100',
               ]"
-              @click="activeTab = tab"
+              @click="() => onTabChange(tab)"
             >
               <component :is="tab.icon" class="h-4 w-4 text-gray-700" />
               <span class="text-base text-gray-800">
@@ -37,13 +37,36 @@
       </div>
     </template>
   </Dialog>
+  <ConfirmDialog
+    v-model="showConfirmDialog"
+    title="Unsaved changes"
+    message="Are you sure you want to change tabs? Unsaved changes will be lost."
+    :onConfirm="
+      () => {
+        if (nextActiveTab !== null) {
+          activeTab = nextActiveTab;
+        }
+        nextActiveTab = null;
+        showConfirmDialog = false;
+        disableSettingModalOutsideClick = false;
+      }
+    "
+    :onCancel="
+      () => {
+        nextActiveTab = null;
+      }
+    "
+  />
 </template>
 <script setup lang="ts">
 import { Dialog } from "frappe-ui";
-import { ModelRef, watch } from "vue";
+import { ModelRef, ref, watch, watchEffect } from "vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
   activeTab,
   disableSettingModalOutsideClick,
+  nextActiveTab,
+  type Tab,
   tabs,
 } from "./settingsModal";
 
@@ -57,6 +80,17 @@ const props = withDefaults(
 );
 
 const show: ModelRef<boolean> = defineModel();
+
+const showConfirmDialog = ref(false);
+
+function onTabChange(tab: Tab) {
+  if (!disableSettingModalOutsideClick.value) {
+    activeTab.value = tab;
+    return;
+  }
+  nextActiveTab.value = tab;
+  showConfirmDialog.value = true;
+}
 
 watch(
   () => props.defaultTab,
