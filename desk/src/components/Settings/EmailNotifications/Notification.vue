@@ -7,18 +7,20 @@
     <div class="sticky top-0 z-10 bg-white py-8">
       <SettingsLayoutHeader :description="props.description">
         <template #title>
-          <div class="flex items-center gap-x-1 -ml-6">
-            <div class="flex items-center gap-x-1">
+          <div class="flex items-center gap-x-1">
+            <div class="pl-6 pr-2 relative">
               <button
                 @click="props.onBack"
-                class="relative text-ink-gray-7 hover:text-black"
+                class="absolute top-0 -left-1 w-full h-full text-ink-gray-7 hover:text-black peer"
               >
                 <span class="sr-only">{{
                   __("back to email event list")
                 }}</span>
                 <LucideChevronLeft class="w-5 h-5" />
               </button>
-              <h1 class="font-semibold text-ink-gray-7 text-xl">
+              <h1
+                class="font-semibold text-ink-gray-7 text-xl peer-hover:text-black"
+              >
                 {{ props.title }}
               </h1>
             </div>
