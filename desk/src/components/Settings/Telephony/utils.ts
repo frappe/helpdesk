@@ -81,5 +81,5 @@ export const validateExotel = (exotel, telephonyAgent, exotelErrors) => {
 };
 
 const validatePhone = (number: string) => {
-  return /^([1-9]\d{1,14}|0[1-9]\d{7,14})$/.test(number);
+  return /^\+?\d{8,15}$/.test(number);
 };

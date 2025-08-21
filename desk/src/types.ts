@@ -215,7 +215,7 @@ export interface EmailAccount {
   default_incoming?: boolean;
 }
 
-export type TicketTab = "activity" | "email" | "comment" | "details";
+export type TicketTab = "activity" | "email" | "comment" | "details" | "call";
 
 export interface TabObject {
   name: TicketTab;
@@ -330,7 +330,20 @@ export interface CommentActivity extends BaseActivity {
   attachments: FileAttachment[];
 }
 
-export type TicketActivity = HistoryActivity | EmailActivity | CommentActivity;
+export interface CallActivity extends BaseActivity {
+  type: "call";
+  name: string;
+  caller: string;
+  calledBy: string;
+  attachments: FileAttachment[];
+  call_type: "Incoming" | "Outgoing";
+}
+
+export type TicketActivity =
+  | HistoryActivity
+  | EmailActivity
+  | CommentActivity
+  | CallActivity;
 
 interface FileAttachment {
   name: string;

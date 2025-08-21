@@ -9,7 +9,7 @@
           label="New Call Log"
           theme="gray"
           variant="solid"
-          @click="showCallLogModal = true"
+          @click="newCallLog"
         >
           <template #prefix>
             <LucidePlus class="h-4 w-4" />
@@ -75,26 +75,26 @@ const options = computed(() => {
         prefix: ({ row }) => {
           return h(Avatar, {
             shape: "circle",
-            image: row.caller || "Unknown",
-            label: row.caller || "Unknown",
+            image: row._caller?.image || "Unknown",
+            label: row._caller?.label || "Unknown",
             size: "sm",
           });
         },
         custom: ({ row }) => {
-          return h("span", row.caller || "Unknown");
+          return h("span", row._caller?.label || "Unknown");
         },
       },
       receiver: {
         prefix: ({ row }) => {
           return h(Avatar, {
             shape: "circle",
-            image: row.receiver || "Unknown",
-            label: row.receiver || "Unknown",
+            image: row._receiver?.image || "Unknown",
+            label: row._receiver?.label || "Unknown",
             size: "sm",
           });
         },
         custom: ({ row }) => {
-          return h("span", row.receiver || "Unknown");
+          return h("span", row._receiver?.label || "Unknown");
         },
       },
       type: {
@@ -130,6 +130,11 @@ const options = computed(() => {
     },
   };
 });
+
+const newCallLog = () => {
+  showCallLogModal.value = true;
+  callLog.value = null;
+};
 
 function openCallLog(id: string): void {
   showCallLogDetailModal.value = true;

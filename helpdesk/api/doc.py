@@ -104,6 +104,7 @@ def get_list_data(
         )
         or []
     )
+    data = parse_list_data(data, doctype)
 
     fields = frappe.get_meta(doctype).fields
     fields = [field for field in fields if field.fieldtype not in no_value_fields]
@@ -213,6 +214,13 @@ def get_list_data(
         "group_by_field": group_by_field,
         "view_type": view_type,
     }
+
+
+def parse_list_data(data, doctype):
+    _list = get_controller(doctype)
+    if hasattr(_list, "parse_list_data"):
+        data = _list.parse_list_data(data)
+    return data
 
 
 @frappe.whitelist()

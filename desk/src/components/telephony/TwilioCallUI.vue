@@ -340,6 +340,7 @@ async function makeOutgoingCall(number) {
 
   if (device) {
     log.value = `Attempting to call ${number} ...`;
+    onCallStarted && onCallStarted();
 
     try {
       _call = await device.connect({
@@ -368,10 +369,8 @@ async function makeOutgoingCall(number) {
         showCallPopup.value = true;
         calling.value = true;
         onCall.value = false;
-        onCallStarted && onCallStarted();
       });
       _call.on("disconnect", (conn) => {
-        console.log("disconnect conn", conn);
         log.value = `Call ended from makeOutgoing call disconnect.`;
         calling.value = false;
         onCall.value = false;
@@ -408,7 +407,6 @@ async function makeOutgoingCall(number) {
 function cancelCall() {
   _call.disconnect();
   showCallPopup.value = false;
-  onCallEnded && onCallEnded();
   if (showSmallCallWindow.value == undefined) {
     showSmallCallWindow.value = false;
   } else {

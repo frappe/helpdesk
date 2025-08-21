@@ -5,6 +5,7 @@ from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
+from helpdesk.api.doc import parse_list_data
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
@@ -66,6 +67,37 @@ def get_one(name, is_customer_portal=False):
             "name": ticket.raised_by.split("@")[0],
         }
     template = ticket.template or DEFAULT_TICKET_TEMPLATE
+
+    linked_calls = frappe.db.get_all(
+        "Dynamic Link",
+        filters={"link_name": contact["name"], "parenttype": "TF Call Log"},
+        pluck="parent",
+    )
+
+    calls = []
+
+    for call in linked_calls:
+        call = frappe.get_cached_doc(
+            "TF Call Log",
+            call,
+            fields=[
+                "name",
+                "caller",
+                "receiver",
+                "duration",
+                "type",
+                "status",
+                "from",
+                "to",
+                "recording_url",
+                "creation",
+            ],
+        ).as_dict()
+
+        calls.append(call)
+
+    call_logs = parse_list_data(calls, "TF Call Log")
+
     return {
         **ticket,
         "comments": get_comments(name),
@@ -79,6 +111,7 @@ def get_one(name, is_customer_portal=False):
             "HD Ticket", is_customer_portal=is_customer_portal
         ),
         "fields": get_meta(template),
+        "calls": call_logs,
     }
 
 
@@ -358,7 +391,6 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: int, cont
 @frappe.whitelist()
 @agent_only
 def split_ticket(subject: str, communication_id: str):
-
     communicaton_creation_time = frappe.db.get_value(
         "Communication", communication_id, "creation"
     )
