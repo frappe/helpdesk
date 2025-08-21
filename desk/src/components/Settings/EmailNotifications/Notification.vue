@@ -27,9 +27,9 @@
             <Badge
               v-if="unsavedChanges"
               :variant="'subtle'"
-              :theme="'red'"
+              :theme="'orange'"
               size="sm"
-              :label="__('Not Saved')"
+              :label="__('Unsaved')"
             />
           </div>
         </template>
