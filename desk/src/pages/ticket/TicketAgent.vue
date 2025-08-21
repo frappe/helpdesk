@@ -179,6 +179,7 @@ import { showAssignmentModal } from "./modalStates";
 import CallUI from "@/components/telephony/CallUI.vue";
 import LucidePhone from "~icons/lucide/phone";
 import { useTelephonyStore } from "@/stores/telephony";
+import { storeToRefs } from "pinia";
 
 const route = useRoute();
 const router = useRouter();
@@ -191,7 +192,7 @@ const communicationAreaRef = ref(null);
 const renameSubject = ref("");
 const isLoading = ref(false);
 const telephonyStore = useTelephonyStore();
-
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 const props = defineProps({
   ticketId: {
     type: String,
@@ -304,28 +305,30 @@ const dropdownOptions = computed(() =>
 // );
 
 const tabIndex = ref(0);
-const tabs: TabObject[] = [
-  {
-    name: "activity",
-    label: "Activity",
-    icon: ActivityIcon,
-  },
-  {
-    name: "email",
-    label: "Emails",
-    icon: EmailIcon,
-  },
-  {
-    name: "comment",
-    label: "Comments",
-    icon: CommentIcon,
-  },
-  {
-    name: "call",
-    label: "Calls",
-    icon: LucidePhone,
-  },
-];
+const tabs: TabObject[] = computed(() =>
+  [
+    {
+      name: "activity",
+      label: "Activity",
+      icon: ActivityIcon,
+    },
+    {
+      name: "email",
+      label: "Emails",
+      icon: EmailIcon,
+    },
+    {
+      name: "comment",
+      label: "Comments",
+      icon: CommentIcon,
+    },
+    {
+      name: "call",
+      label: "Calls",
+      icon: LucidePhone,
+    },
+  ].filter((tab) => tab.name !== "call" || isCallingEnabled.value)
+);
 
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email, idx: number) => {

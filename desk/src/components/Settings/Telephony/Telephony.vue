@@ -15,11 +15,6 @@
             exotel.save.loading ||
             telephonyAgent.save.loading
           "
-          :disabled="
-            twilio.save.loading ||
-            exotel.save.loading ||
-            telephonyAgent.save.loading
-          "
         />
       </template>
     </SettingsLayoutHeader>
@@ -298,7 +293,8 @@ async function save() {
 
   await Promise.all(promises);
   toast.success("Telephony settings updated!");
-  twilio.reload();
+  // Reload twilio to prevent "doc has been modified" error, as an application is created and doc is updated on save
+  await twilio.reload();
   telephonyStore.fetchCallIntegrationStatus();
 }
 

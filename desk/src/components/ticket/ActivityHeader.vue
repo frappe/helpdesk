@@ -64,7 +64,9 @@
 <script setup lang="ts">
 import { CommentIcon, EmailIcon, PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
+import { useTelephonyStore } from "@/stores/telephony";
 import { Dropdown } from "frappe-ui";
+import { storeToRefs } from "pinia";
 import { computed, h, inject, ref, Ref } from "vue";
 defineProps({
   title: {
@@ -77,6 +79,7 @@ const communicationAreaRef: Ref = inject("communicationArea");
 const makeCall = inject<() => void>("makeCall");
 const refreshTicket = inject<() => void>("refreshTicket");
 const showCallLogModal = ref(false);
+const { isCallingEnabled } = storeToRefs(useTelephonyStore());
 
 const defaultActions = computed(() => {
   let actions = [
@@ -90,19 +93,12 @@ const defaultActions = computed(() => {
       label: "Comment",
       onClick: () => communicationAreaRef.value.toggleCommentBox(),
     },
-    {
-      icon: h(PhoneIcon, { class: "h-4 w-4" }),
-      label: "Make a Call",
-      onClick: () => makeCall(),
-    },
-    {
-      icon: "edit-3",
-      label: "Log a Call",
-      onClick: () => {
-        showCallLogModal.value = true;
-      },
-    },
   ];
+
+  if (isCallingEnabled.value) {
+    actions.push(...callActions.value);
+  }
+
   return actions;
 });
 
