@@ -186,7 +186,7 @@ class HDServiceLevelAgreement(Document):
 
     def set_resolution_date(self, doc: Document):
         resolved_statuses = (
-            frappe.db.get_value(
+            frappe.db.get_all(
                 "HD Ticket Status", {"category": "Resolved"}, pluck="name"
             )
             or []
@@ -207,9 +207,7 @@ class HDServiceLevelAgreement(Document):
 
     def set_hold_time(self, doc: Document):
         paused_statuses = (
-            frappe.db.get_value(
-                "HD Ticket Status", {"category": "Paused"}, pluck="name"
-            )
+            frappe.db.get_all("HD Ticket Status", {"category": "Paused"}, pluck="name")
             or []
         )
         doc_old = doc.get_doc_before_save()
