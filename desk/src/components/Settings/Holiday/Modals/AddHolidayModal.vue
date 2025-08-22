@@ -75,7 +75,7 @@ import { holidayData } from "@/stores/holidayList";
 
 interface ModelType {
   show: boolean;
-  holiday_date: null | string;
+  holiday_date: null | string | Date;
   description: string;
   editing: null | any;
 }
@@ -88,7 +88,7 @@ const errors = ref({
 });
 
 const resetForm = () => {
-  dialog.value.holiday_date = null;
+  dialog.value.holiday_date = new Date();
   dialog.value.description = "";
   errors.value = {
     holiday_date: "",

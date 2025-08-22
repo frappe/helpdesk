@@ -240,7 +240,7 @@ import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 
 const dialog = ref({
   show: false,
-  holiday_date: null,
+  holiday_date: new Date(),
   description: "",
   editing: null,
 });
