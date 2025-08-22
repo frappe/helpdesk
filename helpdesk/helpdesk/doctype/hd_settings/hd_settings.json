@@ -58,10 +58,10 @@
   "acknowledgement_section",
   "send_acknowledgement_email",
   "acknowledgement_email_content",
-  "reply_email_to_agent_section",
+  "reply_from_contact_section",
   "enable_reply_email_to_agent",
   "reply_email_to_agent_content",
-  "reply_email_via_agent_section",
+  "reply_from_agent_section",
   "enable_reply_email_via_agent",
   "reply_via_agent_email_content"
  ],
@@ -312,7 +312,7 @@
    "default": "Closed",
    "fieldname": "send_email_feedback_on_status",
    "fieldtype": "Select",
-   "label": "Send Feedback On Status",
+   "label": "On Ticket Status",
    "length": 2,
    "mandatory_depends_on": "eval:doc.enable_email_ticket_feedback",
    "options": "Resolved\nClosed"
@@ -322,7 +322,7 @@
    "description": "If enabled, feedback email will be sent to the customer when you mark a ticket as Resolved/Closed.\n",
    "fieldname": "enable_email_ticket_feedback",
    "fieldtype": "Check",
-   "label": "Enable Feedback For Email Tickets"
+   "label": "Enabled"
   },
   {
    "default": "0",
@@ -344,7 +344,7 @@
   {
    "fieldname": "feedback_email_content",
    "fieldtype": "Text",
-   "label": "Feedback Email Content"
+   "label": "Email Content"
   },
   {
    "fieldname": "acknowledgement_section",
@@ -354,24 +354,21 @@
   {
    "fieldname": "acknowledgement_email_content",
    "fieldtype": "Text",
-   "label": "Acknowledgement Email Content"
+   "label": "Email Content"
   },
   {
    "default": "0",
+   "description": "If enabled, a ticket creation acknowledgement email will be sent to the user right after creating an email ticket",
    "fieldname": "send_acknowledgement_email",
    "fieldtype": "Check",
-   "label": "Send Acknowledgement Email"
+   "label": "Enabled"
   },
   {
-   "fieldname": "reply_email_to_agent_section",
-   "fieldtype": "Section Break",
-   "label": "Reply Email To Agent"
-  },
-  {
-   "default": "0",
+   "default": "1",
+   "description": "If enabled, an email will be sent to all of the assigned agents after a reply from one of the contacts",
    "fieldname": "enable_reply_email_to_agent",
    "fieldtype": "Check",
-   "label": "Enable Reply Email"
+   "label": "Enabled"
   },
   {
    "fieldname": "reply_email_to_agent_content",
@@ -379,26 +376,32 @@
    "label": "Email Content"
   },
   {
-   "fieldname": "reply_email_via_agent_section",
-   "fieldtype": "Section Break",
-   "label": "Reply Email Via Agent"
-  },
-  {
-   "default": "0",
+   "default": "1",
+   "description": "If enabled, an email is sent to all of the recipients associated with an agent reply",
    "fieldname": "enable_reply_email_via_agent",
    "fieldtype": "Check",
-   "label": "Enable Reply Email"
+   "label": "Enabled"
   },
   {
    "fieldname": "reply_via_agent_email_content",
    "fieldtype": "Text",
    "label": "Email Content"
+  },
+  {
+   "fieldname": "reply_from_contact_section",
+   "fieldtype": "Section Break",
+   "label": "Reply From Contact"
+  },
+  {
+   "fieldname": "reply_from_agent_section",
+   "fieldtype": "Section Break",
+   "label": "Reply From Agent"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-18 12:14:59.126488",
+ "modified": "2025-08-22 19:51:48.860715",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
