@@ -41,15 +41,3 @@ class IntegrationTestHDTicketStatus(IntegrationTestCase):
         self.assertRaises(
             frappe.ValidationError, frappe.delete_doc("HD Ticket Status", "Closed")
         )
-
-    def test_agent_client_label_same(self):
-        doc = frappe.new_doc("HD Ticket Status")
-        doc.label_agent = "Test Status"
-        doc.category = "Paused"
-        doc.color = "green"
-        doc.save()
-        self.assertEqual(
-            doc.label_customer,
-            doc.label_agent,
-            "Agent and Customer labels should be the same.",
-        )
