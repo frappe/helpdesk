@@ -6,15 +6,8 @@ from helpdesk.setup.install import add_default_status
 def execute():
     add_default_status()
 
-    frappe.db.delete(
-        "HD Service Level Agreement Fulfilled On Status",
-        {"status": ["in", ["Replied", "Closed", "Open"]]},
-    )
-
-    frappe.db.delete(
-        "HD Pause Service Level Agreement On Status",
-        {"status": ["in", ["Resolved", "Closed", "Open"]]},
-    )
-
     if frappe.db.get_single_value("HD Settings", "auto_update_status"):
         frappe.db.set_single_value("HD Settings", "update_status_to", "Replied")
+
+    frappe.db.sql("DELETE FROM `tabHD Pause Service Level Agreement On Status`")
+    frappe.db.sql("DELETE FROM `tabHD Service Level Agreement Fulfilled On Status`")
