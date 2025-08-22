@@ -24,7 +24,7 @@
   "apply_sla_for_resolution",
   "priorities",
   "status_details",
-  "new_ticket_status",
+  "default_ticket_status",
   "column_break_baqo",
   "ticket_reopen_status",
   "support_and_resolution_section_break",
@@ -158,14 +158,6 @@
    "max_height": "1rem"
   },
   {
-   "description": "If not selected, the value will be takes from HD Settings DocType",
-   "fieldname": "new_ticket_status",
-   "fieldtype": "Link",
-   "label": "New Ticket Status",
-   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
-   "options": "HD Ticket Status"
-  },
-  {
    "fieldname": "column_break_baqo",
    "fieldtype": "Column Break"
   },
@@ -173,13 +165,21 @@
    "description": "If not selected, the value will be takes from HD Settings DocType.",
    "fieldname": "ticket_reopen_status",
    "fieldtype": "Link",
-   "label": "Ticket Reopen Status",
+   "label": "Ticket Reopen status",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
+   "options": "HD Ticket Status"
+  },
+  {
+   "description": "If not selected, the value will be takes from HD Settings DocType",
+   "fieldname": "default_ticket_status",
+   "fieldtype": "Link",
+   "label": "Default Ticket Status",
    "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
    "options": "HD Ticket Status"
   }
  ],
  "links": [],
- "modified": "2025-08-22 21:35:11.939002",
+ "modified": "2025-08-22 23:09:26.211404",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Service Level Agreement",

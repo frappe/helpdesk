@@ -350,9 +350,11 @@
    "description": "Status of the ticket, when it is created in the system.",
    "fieldname": "default_ticket_status",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Default ticket status",
    "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
-   "options": "HD Ticket Status"
+   "options": "HD Ticket Status",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_yfbu",
@@ -363,15 +365,17 @@
    "description": "Status of the ticket, when a customer replies on the ticket.",
    "fieldname": "ticket_reopen_status",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Ticket Reopen status",
    "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
-   "options": "HD Ticket Status"
+   "options": "HD Ticket Status",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-22 22:07:25.015407",
+ "modified": "2025-08-22 23:22:04.663099",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
