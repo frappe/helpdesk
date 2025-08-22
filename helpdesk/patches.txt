@@ -30,5 +30,9 @@ helpdesk.patches.add_fields_in_assignment_rule
 helpdesk.patches.agent_manager_perms #v2
 helpdesk.patches.remove_agents_teams_default_views
 helpdesk.patches.add_fields_in_assignment_rule
+<<<<<<< HEAD
 helpdesk.patches.update_ticket_statuses
 >>>>>>> 5e442b9f (fix(patch): updating statuses)
+=======
+helpdesk.patches.update_ticket_statuses #v2
+>>>>>>> f994b739 (fix: add default status field in patch and installation)
