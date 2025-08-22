@@ -35,6 +35,10 @@
   "auto_close_tickets",
   "auto_close_after_days",
   "send_acknowledgement_email",
+  "status_section",
+  "default_ticket_status",
+  "column_break_yfbu",
+  "ticket_reopen_status",
   "workflow_tab",
   "skip_email_workflow",
   "instantly_send_email",
@@ -335,12 +339,39 @@
    "link_filters": "[]",
    "mandatory_depends_on": "eval:doc.auto_update_status",
    "options": "HD Ticket Status"
+  },
+  {
+   "fieldname": "status_section",
+   "fieldtype": "Section Break",
+   "label": "Status"
+  },
+  {
+   "default": "Open",
+   "description": "Status of the ticket, when it is created in the system.",
+   "fieldname": "default_ticket_status",
+   "fieldtype": "Link",
+   "label": "Default ticket status",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
+   "options": "HD Ticket Status"
+  },
+  {
+   "fieldname": "column_break_yfbu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Open",
+   "description": "Status of the ticket, when a customer replies on the ticket.",
+   "fieldname": "ticket_reopen_status",
+   "fieldtype": "Link",
+   "label": "Ticket Reopen status",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
+   "options": "HD Ticket Status"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-16 23:58:10.295427",
+ "modified": "2025-08-22 22:07:25.015407",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
