@@ -23,11 +23,11 @@
     <CallLogDetailModal
       v-model="showCallLogDetailModal"
       v-model:callLogModal="showCallLogModal"
-      v-model:callLog="callLog"
+      :callLogId="callLogId"
     />
     <CallLogModal
       v-model="showCallLogModal"
-      :data="callLog?.data"
+      :callLogId="callLogId"
       @after-insert="
         () => {
           listViewRef?.reload();
@@ -40,22 +40,15 @@
 <script setup lang="ts">
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
-import {
-  Avatar,
-  Badge,
-  Button,
-  createResource,
-  FeatherIcon,
-  usePageMeta,
-} from "frappe-ui";
+import { Avatar, Badge, Button, FeatherIcon, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CallLogDetailModal from "./CallLogDetailModal.vue";
 import CallLogModal from "./CallLogModal.vue";
-import { statusColorMap } from "./utils";
+import { statusColorMap, statusLabelMap } from "./utils";
 
 const showCallLogModal = ref(false);
 const showCallLogDetailModal = ref(false);
-const callLog = ref(null);
+const callLogId = ref("");
 
 const listViewRef = ref(null);
 
@@ -107,7 +100,7 @@ const options = computed(() => {
       status: {
         custom: ({ row }) => {
           return h(Badge, {
-            label: row.status,
+            label: statusLabelMap[row.status],
             variant: "subtle",
             theme: statusColorMap[row.status],
           });
@@ -129,18 +122,13 @@ const options = computed(() => {
 });
 
 const newCallLog = () => {
+  callLogId.value = "";
   showCallLogModal.value = true;
-  callLog.value = null;
 };
 
 function openCallLog(id: string): void {
+  callLogId.value = id;
   showCallLogDetailModal.value = true;
-  callLog.value = createResource({
-    url: "telephony.api.get_call_log",
-    params: { name: id },
-    cache: ["call_log", id],
-    auto: true,
-  });
 }
 
 usePageMeta(() => {

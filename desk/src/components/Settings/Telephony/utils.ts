@@ -1,8 +1,15 @@
-export const isDocDirty = (doc: any) => {
-  return JSON.stringify(doc.doc) !== JSON.stringify(doc.originalDoc);
+export const isDocDirty = (doc: any, originalDoc: any) => {
+  return JSON.stringify(doc) !== JSON.stringify(originalDoc);
 };
 
 export const validateTwilio = (twilio, telephonyAgent, twilioErrors) => {
+  if (telephonyAgent.default_medium === "Twilio" && !twilio.enabled) {
+    twilioErrors.value.default_medium =
+      "Enable Twilio to set it as default medium";
+  } else {
+    twilioErrors.value.default_medium = "";
+  }
+
   if (!twilio.enabled) {
     return;
   }
@@ -29,6 +36,13 @@ export const validateTwilio = (twilio, telephonyAgent, twilioErrors) => {
 };
 
 export const validateExotel = (exotel, telephonyAgent, exotelErrors) => {
+  if (telephonyAgent.default_medium === "Exotel" && !exotel.enabled) {
+    exotelErrors.value.default_medium =
+      "Enable Exotel to set it as default medium";
+  } else {
+    exotelErrors.value.default_medium = "";
+  }
+
   if (!exotel.enabled) {
     return;
   }

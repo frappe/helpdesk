@@ -149,10 +149,27 @@ const callLog = ref({
 });
 
 const props = defineProps({
-  data: {
-    type: Object,
-    default: () => ({}),
+  callLogId: {
+    type: String,
+    default: "",
   },
+});
+
+const callLogData = createResource({
+  url: "telephony.api.get_call_log",
+  onSuccess(data) {
+    callLog.value = {
+      receiver: data.receiver,
+      caller: data.caller,
+      type: data.type,
+      to: data.to,
+      from: data.from,
+      status: data.status,
+      duration: data.duration,
+    };
+    originalCallLog.value = JSON.stringify(callLog.value);
+  },
+  auto: false,
 });
 
 const callLogTypeOptions = [
@@ -225,7 +242,7 @@ function updateCallLog() {
     url: "frappe.client.set_value",
     params: {
       doctype: "TF Call Log",
-      name: props.data.name,
+      name: props.callLogId,
       fieldname: {
         ...callLog.value,
       },
@@ -318,24 +335,14 @@ watch(
   { deep: true }
 );
 
-watch(
-  () => props,
-  (newValue) => {
-    editMode.value = newValue?.data?.name ? true : false;
-
-    if (newValue?.data?.name) {
-      callLog.value = {
-        receiver: newValue.data.receiver,
-        caller: newValue.data.caller,
-        type: newValue.data.type,
-        to: newValue.data.to,
-        from: newValue.data.from,
-        status: newValue.data.status,
-        duration: newValue.data.duration,
-      };
-    }
-    originalCallLog.value = JSON.stringify(callLog.value);
-  },
-  { deep: true }
-);
+watch(show, (newValue) => {
+  if (newValue && props.callLogId) {
+    editMode.value = true;
+    callLogData.submit({
+      name: props.callLogId,
+    });
+  } else {
+    editMode.value = false;
+  }
+});
 </script>

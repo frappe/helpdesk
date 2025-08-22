@@ -92,8 +92,8 @@ import DurationIcon from "@/components/icons/DurationIcon.vue";
 import ContactsIcon from "@/components/icons/ContactsIcon.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
-import { FeatherIcon, Avatar, Tooltip } from "frappe-ui";
-import { computed, h, nextTick } from "vue";
+import { FeatherIcon, Avatar, Tooltip, createResource } from "frappe-ui";
+import { computed, h, nextTick, ref, watch } from "vue";
 import { formatDate } from "@vueuse/core";
 import dayjs from "dayjs";
 import { timeAgo } from "@/utils";
@@ -101,13 +101,28 @@ import { statusColorMap, statusLabelMap } from "./utils";
 import { useAuthStore } from "@/stores/auth";
 
 const show = defineModel();
-const callLog = defineModel("callLog");
+const callLog = ref(null);
 const { isManager } = useAuthStore();
 
-const detailFields = computed(() => {
-  if (!callLog.value?.data) return [];
+const props = defineProps({
+  callLogId: {
+    type: String,
+    default: "",
+  },
+});
 
-  let data = JSON.parse(JSON.stringify(callLog.value.data));
+const callLogData = createResource({
+  url: "telephony.api.get_call_log",
+  onSuccess(data) {
+    callLog.value = data;
+  },
+  auto: false,
+});
+
+const detailFields = computed(() => {
+  if (!callLog.value) return [];
+
+  let data = JSON.parse(JSON.stringify(callLog.value));
 
   for (const key in data) {
     data[key] = getCallLogDetail(key, data);
@@ -212,6 +227,14 @@ function getCallLogDetail(row, log, columns = []) {
 
   return log[row];
 }
+
+watch(show, (newValue) => {
+  if (newValue && props.callLogId) {
+    callLogData.submit({
+      name: props.callLogId,
+    });
+  }
+});
 </script>
 
 <style scoped>

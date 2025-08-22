@@ -5,17 +5,28 @@
       description="Configure your telephony settings."
     >
       <template #actions>
-        <Button
-          label="Save"
-          theme="gray"
-          variant="solid"
-          @click="save"
-          :loading="
-            twilio.save.loading ||
-            exotel.save.loading ||
-            telephonyAgent.save.loading
-          "
-        />
+        <div class="flex gap-2 items-center">
+          <Badge
+            v-if="isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent"
+            label="Unsaved"
+            theme="orange"
+            variant="subtle"
+          />
+          <Button
+            label="Save"
+            theme="gray"
+            variant="solid"
+            @click="save"
+            :disabled="
+              !isDirty.twilio && !isDirty.exotel && !isDirty.telephonyAgent
+            "
+            :loading="
+              twilio.save.loading ||
+              exotel.save.loading ||
+              telephonyAgent.save.loading
+            "
+          />
+        </div>
       </template>
     </SettingsLayoutHeader>
   </div>
@@ -31,6 +42,9 @@
           :options="telephonyProviders"
           :modelValue="telephonyAgent.doc?.default_medium"
           @update:modelValue="telephonyAgent.doc.default_medium = $event"
+        />
+        <ErrorMessage
+          :message="twilioErrors.default_medium || exotelErrors.default_medium"
         />
       </div>
       <div
@@ -75,11 +89,16 @@
       <div class="text-base font-semibold text-ink-gray-8">Twilio</div>
       <div class="mt-4">
         <div class="grid grid-cols-2 gap-4">
-          <Checkbox label="Enabled" v-model="twilio.doc.enabled" />
+          <Checkbox
+            label="Enabled"
+            v-model="twilio.doc.enabled"
+            @update:modelValue="twilio.doc.enabled = $event ? 1 : 0"
+          />
           <Checkbox
             label="Record Calls"
             v-model="twilio.doc.record_calls"
             v-if="twilio.doc.enabled"
+            @update:modelValue="twilio.doc.record_calls = $event ? 1 : 0"
           />
         </div>
         <div class="grid grid-cols-2 gap-4 mt-4" v-if="twilio.doc.enabled">
@@ -129,11 +148,16 @@
       <div class="text-base font-semibold text-ink-gray-8">Exotel</div>
       <div class="mt-4">
         <div class="grid grid-cols-2 gap-4">
-          <Checkbox label="Enabled" v-model="exotel.doc.enabled" />
+          <Checkbox
+            label="Enabled"
+            v-model="exotel.doc.enabled"
+            @update:modelValue="exotel.doc.enabled = $event ? 1 : 0"
+          />
           <Checkbox
             label="Record Calls"
             v-model="exotel.doc.record_call"
             v-if="exotel.doc.enabled"
+            @update:modelValue="exotel.doc.record_call = $event ? 1 : 0"
           />
         </div>
         <div class="grid grid-cols-2 gap-4 mt-4" v-if="exotel.doc.enabled">
@@ -202,19 +226,26 @@ import {
   toast,
   ErrorMessage,
   createResource,
+  Badge,
 } from "frappe-ui";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
 import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
 
 const auth = useAuthStore();
 const telephonyStore = useTelephonyStore();
+const isDirty = ref({
+  twilio: false,
+  exotel: false,
+  telephonyAgent: false,
+});
 
 const twilioErrors = ref({
   accountSid: "",
   authToken: "",
   number: "",
+  default_medium: "",
 });
 
 const exotelErrors = ref({
@@ -225,6 +256,7 @@ const exotelErrors = ref({
   apiToken: "",
   number: "",
   mobileNo: "",
+  default_medium: "",
 });
 
 const twilio = createDocumentResource({
@@ -272,13 +304,13 @@ async function save() {
   const promises = [];
 
   // Temporary fix, as createDocumentResource's dirty state has bug
-  if (isDocDirty(twilio)) {
+  if (isDirty.value.twilio) {
     promises.push(twilio.save.submit());
   }
-  if (isDocDirty(exotel)) {
+  if (isDirty.value.exotel) {
     promises.push(exotel.save.submit());
   }
-  if (isDocDirty(telephonyAgent)) {
+  if (isDirty.value.telephonyAgent) {
     if (telephonyAgent.doc.twilio_number) {
       telephonyAgent.doc.twilio = true;
     } else {
@@ -307,4 +339,31 @@ createResource({
     telephonyAgent.get.submit();
   },
 });
+
+watch(
+  () => telephonyAgent.doc,
+  (newVal) => {
+    isDirty.value.telephonyAgent = isDocDirty(
+      newVal,
+      telephonyAgent.originalDoc
+    );
+  },
+  { deep: true }
+);
+
+watch(
+  () => twilio.doc,
+  (newVal) => {
+    isDirty.value.twilio = isDocDirty(newVal, twilio.originalDoc);
+  },
+  { deep: true }
+);
+
+watch(
+  () => exotel.doc,
+  (newVal) => {
+    isDirty.value.exotel = isDocDirty(newVal, exotel.originalDoc);
+  },
+  { deep: true }
+);
 </script>

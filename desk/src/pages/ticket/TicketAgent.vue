@@ -250,6 +250,7 @@ const ticket = createResource({
 });
 
 provide("refreshTicket", () => ticket.reload());
+provide("onCallEnded", () => ticket.reload());
 
 function updateField(name: string, value: string, callback = () => {}) {
   updateTicket(name, value);

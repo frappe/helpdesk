@@ -85,18 +85,18 @@
     <CallLogDetailModal
       v-model="showCallLogDetailModal"
       v-model:callLogModal="showCallLogModal"
-      v-model:callLog="callLog"
+      :callLogId="props.activity.name"
     />
     <CallLogModal
       v-model="showCallLogModal"
-      :data="callLog?.data"
+      :callLogId="props.activity.name"
       @afterInsert="refreshTicket()"
     />
   </div>
 </template>
 <script setup lang="ts">
 import { getFormattedDate, timeAgo } from "@/utils";
-import { Avatar, Badge, Tooltip, createResource } from "frappe-ui";
+import { Avatar, Badge, Tooltip } from "frappe-ui";
 import { inject, ref } from "vue";
 import MultipleAvatar from "./MultipleAvatar.vue";
 import CalendarIcon from "./icons/CalendarIcon.vue";
@@ -114,11 +114,4 @@ const showCallLogDetailModal = ref(false);
 const showCallLogModal = ref(false);
 
 const refreshTicket = inject<() => void>("refreshTicket");
-
-const callLog = createResource({
-  url: "telephony.api.get_call_log",
-  params: { name: props.activity.name },
-  cache: ["call_log", props.activity.name],
-  auto: true,
-});
 </script>
