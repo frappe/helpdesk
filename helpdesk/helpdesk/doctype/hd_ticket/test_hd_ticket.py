@@ -9,6 +9,7 @@ from helpdesk.test_utils import (
     add_holiday,
     get_current_week_monday,
     get_priority_response_resolution_time,
+    make_status,
     make_ticket,
     remove_holidays,
 )
@@ -31,23 +32,25 @@ agent2 = "agent2@test.com"
 
 
 class TestHDTicket(IntegrationTestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
         frappe.db.delete("HD Ticket")
         frappe.get_doc(
             {"doctype": "User", "first_name": "Non Agent", "email": non_agent}
-        ).insert()
+        ).insert(ignore_if_duplicate=True)
 
         frappe.get_doc(
             {"doctype": "User", "first_name": "Agent", "email": agent}
-        ).insert()
-        frappe.get_doc({"doctype": "HD Agent", "user": agent}).insert()
+        ).insert(ignore_if_duplicate=True)
+        frappe.get_doc({"doctype": "HD Agent", "user": agent}).insert(
+            ignore_if_duplicate=True
+        )
 
         frappe.get_doc(
             {"doctype": "User", "first_name": "Agent2", "email": agent2}
-        ).insert()
-        frappe.get_doc({"doctype": "HD Agent", "user": agent2}).insert()
+        ).insert(ignore_if_duplicate=True)
+        frappe.get_doc({"doctype": "HD Agent", "user": agent2}).insert(
+            ignore_if_duplicate=True
+        )
 
     def test_ticket_creation(self):
         ticket = frappe.get_doc(get_ticket_obj())
@@ -352,12 +355,6 @@ class TestHDTicket(IntegrationTestCase):
         self.assertEqual(new_expected_resolution_by, ticket.resolution_by)
 
     def test_sla_status(self):
-        # breakpoint()
-        # sla = frappe.get_doc("HD Service Level Agreement", "SLA Priority")
-        # default
-        # fulfilled on Resolved / Closed
-        # paused on Replied
-        # ticket_creation = getdate(get_current_week_monday())
         ticket = make_ticket(
             priority="Urgent",
         )
@@ -476,8 +473,87 @@ class TestHDTicket(IntegrationTestCase):
                 ticket.resolution_time, expected_resolution_time
             )  # 3 hours 30 minutes
 
-    def test_sla_status_with_custom_status(self):
-        pass
+    def test_default_status(self):
+        # create a new status
+        # go to hd settings and set it as default
+        # create a new ticket, it should have the new status as default
+        ticket = make_ticket()
+        self.assertNotEqual(ticket.status, "New")
+
+        status = make_status(name="New")
+        frappe.db.set_single_value("HD Settings", "default_ticket_status", status.name)
+        ticket2 = make_ticket()
+        self.assertEqual(ticket2.status, status.name)
+
+        ticket2.reload()
+        ticket2.status = "Replied"
+        ticket2.save()
+        self.assertEqual(ticket2.status, "Replied")
+
+        ticket2.reload()
+
+        ticket2.create_communication_via_contact("<div>Testing</div>")
+        ticket2.reload()
+        # reopen the ticket
+        self.assertEqual(ticket2.status, "Open")
+
+    def test_hold_time_resolution_time_with_holiday_with_custom_status(self):
+        """
+        same test case as test_hold_time_resolution_time_with_holiday
+        but with custom statuses
+
+        """
+        add_holiday(
+            getdate(add_to_date(get_current_week_monday(), days=4)),
+            "Test Holiday",
+        )
+        paused_status = make_status(name="On Hold", category="Paused")
+        resolved_status = make_status(name="Completed", category="Resolved")
+        ticket = None
+        date = add_to_date(
+            get_current_week_monday(hours=0), days=3, hours=17, minutes=30
+        )
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="High")
+            ticket.reload()
+
+        with self.freeze_time(add_to_date(date, minutes=20)):
+            ticket.status = paused_status.name
+            ticket.save()
+            self.assertEqual(ticket.first_responded_on, get_datetime())
+            self.assertEqual(ticket.agreement_status, "Paused")
+
+        ticket.reload()
+
+        next_monday_date = add_to_date(
+            get_current_week_monday(hours=0), days=7, hours=12, minutes=30
+        )
+        with self.freeze_time(next_monday_date):
+            ticket.status = "Open"
+            ticket.save()
+            ticket = ticket.reload()
+
+            self.assertEqual(ticket.agreement_status, "Resolution Due")
+            # total hold time should be 10 minutes from 5:50 PM to 6:00 PM on Thursday
+            #  + 10 to 12:30 pm on monday
+            expected_hold_time = 10 * 60 + 150 * 60
+            self.assertEqual(ticket.total_hold_time, expected_hold_time)
+
+        ticket.reload()
+
+        with self.freeze_time(add_to_date(next_monday_date, minutes=30)):
+            ticket.status = resolved_status.name
+            ticket.save()
+            ticket = ticket.reload()
+
+            self.assertEqual(ticket.agreement_status, "Fulfilled")
+            # Resolution time should be 1 hour more than the original resolution time
+            expected_total_time_to_resolve = (60 * 60 * 3) + 30 * 60
+            expected_resolution_time = (
+                expected_total_time_to_resolve - ticket.total_hold_time
+            )
+            self.assertEqual(ticket.resolution_time, expected_resolution_time)
 
     def tearDown(self):
         remove_holidays()
+        frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
