@@ -75,6 +75,21 @@ class HDTicket(Document):
 
         self.handle_email_feedback()
 
+    def _get_rendered_template(
+        self, content: str, default_content: str, args: dict[str, str] | None = None
+    ):
+        if args is None:
+            args = dict()
+        template_args = {
+            "doc": self.as_dict(),
+        }
+        for key, value in args.items():
+            template_args[key] = value
+        return frappe.render_template(
+            default_content if content is None or content.strip() == "" else content,
+            template_args,
+        )
+
     def handle_email_feedback(self):
 
         if (
@@ -104,15 +119,10 @@ class HDTicket(Document):
         default_share_feedback_email_content = frappe.db.get_single_value(
             "HD Settings", "default_feedback_email_content"
         )
-        rendered_template = frappe.render_template(
-            default_share_feedback_email_content
-            if share_feedback_email_content is None
-            or share_feedback_email_content.strip() == ""
-            else share_feedback_email_content,
-            {
-                "url": url,
-                "doc": self.as_dict(),
-            },
+        rendered_template = self._get_rendered_template(
+            share_feedback_email_content,
+            default_share_feedback_email_content,
+            {"url": url},
         )
         try:
             frappe.sendmail(
@@ -569,14 +579,10 @@ class HDTicket(Document):
             default_email_content = frappe.db.get_single_value(
                 "HD Settings", "default_reply_via_agent_email_content"
             )
-            rendered_template = frappe.render_template(
-                default_email_content
-                if email_content is None or email_content.strip() == ""
-                else email_content,
-                {
-                    "message": message,
-                    "doc": self.as_dict(),
-                },
+            rendered_template = self._get_rendered_template(
+                email_content,
+                default_email_content,
+                {"message": message},
             )
 
         send_delayed = True
@@ -693,16 +699,10 @@ class HDTicket(Document):
         default_email_content = frappe.db.get_single_value(
             "HD Settings", "default_reply_email_to_agent_content"
         )
-        rendered_template = frappe.render_template(
-            default_email_content
-            if email_content is None or email_content.strip() == ""
-            else email_content,
-            {
-                "ticket_url": frappe.utils.get_url(
-                    "/helpdesk/tickets/" + str(self.name)
-                ),
-                "doc": self.as_dict(),
-            },
+        rendered_template = self._get_rendered_template(
+            email_content,
+            default_email_content,
+            {"ticket_url": frappe.utils.get_url("/helpdesk/tickets/" + str(self.name))},
         )
         try:
             frappe.sendmail(
@@ -724,14 +724,9 @@ class HDTicket(Document):
         acknowledgement_email_content = frappe.db.get_single_value(
             "HD Settings", "acknowledgement_email_content"
         )
-        rendered_template = frappe.render_template(
-            default_acknowledgement_email_content
-            if acknowledgement_email_content is None
-            or acknowledgement_email_content.strip() == ""
-            else acknowledgement_email_content,
-            {
-                "doc": self.as_dict(),
-            },
+        rendered_template = self._get_rendered_template(
+            acknowledgement_email_content,
+            default_acknowledgement_email_content,
         )
 
         frappe.sendmail(
