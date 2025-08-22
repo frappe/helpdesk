@@ -46,8 +46,8 @@ class HDTicket(Document):
         return frappe.db.get_value(
             "HD Service Level Agreement",
             self.sla,
-            "default_open_status",
-        ) or frappe.db.get_single_value("HD Settings", "default_open_status")
+            "default_ticket_status",
+        ) or frappe.db.get_single_value("HD Settings", "default_ticket_status")
 
     @property
     def ticket_reopen_status(self):
@@ -56,6 +56,7 @@ class HDTicket(Document):
             self.sla,
             "ticket_reopen_status",
         ) or frappe.db.get_single_value("HD Settings", "ticket_reopen_status")
+        pass
 
     def publish_update(self):
         publish_event("helpdesk:ticket-update", self.name)
@@ -75,6 +76,7 @@ class HDTicket(Document):
         self.set_priority()
         self.set_first_responded_on()
         self.set_feedback_values()
+        self.set_default_status()
         self.set_status_category()
         # self.apply_escalation_rule()
         self.set_sla()
@@ -341,10 +343,7 @@ class HDTicket(Document):
             return
         if not self.agent_group or (hasattr(self, "_assign") and not self._assign):
             return
-        if (
-            self.has_value_changed("agent_group")
-            and self.status_category == self.default_open_status
-        ):
+        if self.has_value_changed("agent_group") and self.status_category == "Open":
             current_assigned_agent = self.get_assigned_agent()
             if not current_assigned_agent:
                 return
@@ -641,6 +640,11 @@ class HDTicket(Document):
             # send email to assigned agents
             self.send_reply_email_to_agent(message)
 
+        # if self.status_category == "Paused" and not new_ticket:
+        if not new_ticket:
+            self.status = self.ticket_reopen_status
+            self.save(ignore_permissions=True)
+
         c = frappe.new_doc("Communication")
         c.communication_type = "Communication"
         c.communication_medium = "Email"
@@ -834,6 +838,10 @@ class HDTicket(Document):
         if sla := frappe.get_last_doc("HD Service Level Agreement", {"name": self.sla}):
             sla.apply(self)
 
+    def set_default_status(self):
+        if self.is_new():
+            self.status = self.default_open_status
+
     def set_status_category(self):
         self.status_category = self.status_category or frappe.get_value(
             "HD Ticket Status",
@@ -848,8 +856,8 @@ class HDTicket(Document):
     def on_communication_update(self, c):
         # If communication is incoming, then it is a reply from customer, and ticket must
         # be reopened.
-        if c.sent_or_received == "Received":
-            self.status = self.ticket_reopen_status or self.default_open_status
+        # if c.sent_or_received == "Received":
+        #     self.status = self.ticket_reopen_status if self.status_category == "Paused" else self.default_open_status
         # If communication is outgoing, it must be a reply from agent
         if c.sent_or_received == "Sent":
             # Set first response date if not set already
