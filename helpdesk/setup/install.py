@@ -304,6 +304,7 @@ def add_assignment_rule_property_setters():
             "eval: !doc.unassign_condition_json",
         )
 
+
 def add_default_status():
     statuses = [
         {
@@ -311,8 +312,7 @@ def add_default_status():
             "color": "red",
             "enabled": 1,
             "category": "Open",
-            "label_customer": "Open",
-            "fallback_status": 1,
+            "default_status": 1,
             "order": 1,
         },
         {
@@ -329,7 +329,6 @@ def add_default_status():
             "color": "green",
             "enabled": 1,
             "category": "Resolved",
-            "label_customer": "Resolved",
             "order": 3,
         },
         {
@@ -337,7 +336,6 @@ def add_default_status():
             "color": "gray",
             "enabled": 1,
             "category": "Resolved",
-            "label_customer": "Closed",
             "order": 4,
         },
     ]
