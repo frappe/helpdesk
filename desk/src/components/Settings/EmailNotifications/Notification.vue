@@ -8,20 +8,18 @@
       <SettingsLayoutHeader :description="props.description">
         <template #title>
           <div class="flex items-center gap-x-1">
-            <div class="pl-6 pr-2 relative">
+            <div class="pl-6 pr-2 relative text-ink-gray-7 hover:opacity-70">
               <button
                 type="button"
                 @click="internalOnBack"
-                class="absolute top-0 -left-1 w-full h-full text-ink-gray-7 hover:text-black peer"
+                class="absolute top-0 -left-1 w-full h-full"
               >
                 <span class="sr-only">{{
                   __("back to email event list")
                 }}</span>
                 <LucideChevronLeft class="w-5 h-5" />
               </button>
-              <h1
-                class="font-semibold text-ink-gray-7 text-xl peer-hover:text-black"
-              >
+              <h1 class="font-semibold text-xl">
                 {{ props.title }}
               </h1>
             </div>
