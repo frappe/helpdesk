@@ -42,12 +42,20 @@ from ..hd_service_level_agreement.utils import get_sla
 
 class HDTicket(Document):
     @property
-    def open_status_fallback(self):
+    def default_open_status(self):
         return frappe.db.get_value(
-            "HD Ticket Status",
-            {"category": "Open", "default_status": 1},
-            "name",
-        )
+            "HD Service Level Agreement",
+            self.sla,
+            "default_open_status",
+        ) or frappe.db.get_single_value("HD Settings", "default_open_status")
+
+    @property
+    def ticket_reopen_status(self):
+        return frappe.db.get_value(
+            "HD Service Level Agreement",
+            self.sla,
+            "ticket_reopen_status",
+        ) or frappe.db.get_single_value("HD Settings", "ticket_reopen_status")
 
     def publish_update(self):
         publish_event("helpdesk:ticket-update", self.name)
@@ -335,7 +343,7 @@ class HDTicket(Document):
             return
         if (
             self.has_value_changed("agent_group")
-            and self.status_category == self.open_status_fallback
+            and self.status_category == self.default_open_status
         ):
             current_assigned_agent = self.get_assigned_agent()
             if not current_assigned_agent:
@@ -633,10 +641,6 @@ class HDTicket(Document):
             # send email to assigned agents
             self.send_reply_email_to_agent(message)
 
-        if self.status_category == "Paused":
-            self.status = self.open_status_fallback
-            self.save(ignore_permissions=True)
-
         c = frappe.new_doc("Communication")
         c.communication_type = "Communication"
         c.communication_medium = "Email"
@@ -845,7 +849,7 @@ class HDTicket(Document):
         # If communication is incoming, then it is a reply from customer, and ticket must
         # be reopened.
         if c.sent_or_received == "Received":
-            self.status = self.open_status_fallback
+            self.status = self.ticket_reopen_status or self.default_open_status
         # If communication is outgoing, it must be a reply from agent
         if c.sent_or_received == "Sent":
             # Set first response date if not set already

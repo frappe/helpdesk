@@ -11,7 +11,7 @@
       >
         <QuickFilterField
           :filter="filter"
-          :value="getValue(filter, list.params.filters)"
+          :value="getValue(filter, list.params?.filters)"
           @applyQuickFilter="(f, v) => applyQuickFilter(f, v)"
         />
       </div>

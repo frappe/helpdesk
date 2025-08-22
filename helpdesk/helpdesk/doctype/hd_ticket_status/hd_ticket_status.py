@@ -10,7 +10,6 @@ class HDTicketStatus(Document):
     def validate(self):
         self.validate_closed_status_change()
         self.validate_required_categories()
-        self.validate_default_status()
 
     def validate_closed_status_change(self):
         if self.is_new():
@@ -47,38 +46,3 @@ class HDTicketStatus(Document):
                         f"At least one ticket status with category '{old_category}' must exist in the system."
                     )
                 )
-
-    def validate_default_status(self):
-        if not self.has_value_changed("default_status"):
-            return
-        if self.category != "Open":
-            return
-
-        if self.default_status:
-            default_fallback = frappe.db.exists(
-                "HD Ticket Status",
-                {"category": "Open", "default_status": 1, "name": ["!=", self.name]},
-            )
-            if default_fallback:
-                frappe.db.set_value(
-                    "HD Ticket Status", default_fallback, "default_status", 0
-                )
-        else:
-            count = frappe.db.count(
-                "HD Ticket Status",
-                {"category": "Open", "default_status": 1, "name": ["!=", self.name]},
-            )
-            if count == 0:
-                frappe.throw(
-                    _(
-                        "At least one fallback status must be set for the 'Open' category."
-                    )
-                )
-
-    def before_save(self):
-        self.update_customer_label()
-
-    def update_customer_label(self):
-        if self.different_view:
-            return
-        self.label_customer = self.label_agent
