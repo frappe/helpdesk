@@ -17,8 +17,23 @@ import Briefcase from "~icons/lucide/briefcase";
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
 import { FieldDependencyIcon } from "@/components/icons";
+import UserProfile from "./UserProfile.vue";
+import { useAuthStore } from "@/stores/auth";
+import { Avatar } from "frappe-ui";
 
 export const tabs = [
+	{
+		label: "User Profile",
+		icon: () => h(
+			Avatar,
+			{
+				size: 'xs',
+				label: useAuthStore().userFirstName || "",
+				image: useAuthStore().userImage || "",
+			}
+		),
+		component: markRaw(UserProfile),
+	  },
   {
     label: "Email Accounts",
     icon: markRaw(LucideMail),
