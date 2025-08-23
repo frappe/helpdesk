@@ -55,7 +55,7 @@
 
         <div class="break-words text-base text-gray-800">
           <Tooltip :text="dayjs(data.value).long()">
-            <Badge :label="data.label" :theme="data.theme" variant="outline" />
+            <Badge :label="data.label" :theme="data.theme" variant="subtle" />
           </Tooltip>
         </div>
       </div>
@@ -161,15 +161,10 @@ function resolutionData() {
       )}`,
       color: "orange",
     };
-  } else if (
-    dayjs(ticket.data.resolution_date).isBefore(ticket.data.resolution_by)
-  ) {
+  } else if (ticket.data.agreement_status === "Fulfilled") {
     resolution = {
       label: `Fulfilled in ${formatTime(
-        dayjs(ticket.data.resolution_date).diff(
-          dayjs(ticket.data.creation),
-          "s"
-        )
+        dayjs(ticket.data.resolution_time, "s")
       )}`,
       color: "green",
     };

@@ -95,7 +95,7 @@ const resolutionBadge = computed(() => {
     clearInterval(resolutionInterval);
   }
   if (
-    props.ticket.status === "Replied" &&
+    props.ticket.status_category === "Paused" &&
     props.ticket.on_hold_since &&
     dayjs(props.ticket.resolution_by).isAfter(dayjs(props.ticket.on_hold_since))
   ) {
@@ -117,15 +117,10 @@ const resolutionBadge = computed(() => {
       label: `Due in ${formatTime(resolutionSeconds.value)}`,
       color: "orange",
     };
-  } else if (
-    dayjs(props.ticket.resolution_date).isBefore(props.ticket.resolution_by)
-  ) {
+  } else if (props.ticket.agreement_status === "Fulfilled") {
     resolution = {
       label: `Fulfilled in ${formatTime(
-        dayjs(props.ticket.resolution_date).diff(
-          dayjs(props.ticket.creation),
-          "s"
-        )
+        dayjs(props.ticket.resolution_time, "s")
       )}`,
       color: "green",
     };
@@ -175,9 +170,9 @@ const sections = computed(() => [
 
 // Watch for status changes and clear intervals
 watch(
-  () => props.ticket.status,
-  (newStatus: string) => {
-    if (newStatus !== "Open") {
+  () => props.ticket,
+  (ticket: any) => {
+    if (ticket.status_category !== "Open") {
       if (firstResponseInterval) {
         clearInterval(firstResponseInterval);
         firstResponseInterval = null;
@@ -193,7 +188,7 @@ watch(
 
 function handleFirstResponseInterval(time: string) {
   if (!time) return;
-  if (props.ticket.status !== "Open") {
+  if (props.ticket.status_category !== "Open") {
     return;
   }
   firstResponseSeconds.value = getTimeInSeconds(time);
@@ -208,7 +203,7 @@ function handleFirstResponseInterval(time: string) {
 
 function handleResolutionInterval(time: string) {
   if (!time) return;
-  if (props.ticket.status !== "Open") {
+  if (props.ticket.status_category !== "Open") {
     return;
   }
 
