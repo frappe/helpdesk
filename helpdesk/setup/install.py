@@ -111,10 +111,6 @@ def add_default_sla():
     sla_doc.append("priorities", high_priority)
     sla_doc.append("priorities", urgent_priority)
 
-    sla_doc.append("sla_fulfilled_on", {"status": "Resolved"})
-
-    sla_doc.append("pause_sla_on", {"status": "Replied"})
-
     sla_doc.holiday_list = "Default"
 
     for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]:

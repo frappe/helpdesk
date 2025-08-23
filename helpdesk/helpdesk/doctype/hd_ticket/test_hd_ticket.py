@@ -492,7 +492,7 @@ class TestHDTicket(IntegrationTestCase):
 
         ticket2.reload()
 
-        ticket2.create_communication_via_contact("<div>Testing</div>")
+        ticket2.create_communication_via_contact("Testing reply")
         ticket2.reload()
         # reopen the ticket
         self.assertEqual(ticket2.status, "Open")
