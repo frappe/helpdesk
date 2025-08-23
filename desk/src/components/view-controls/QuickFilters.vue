@@ -51,6 +51,9 @@ function getDefaultValue(quickFilter) {
 }
 
 function getValue(quickFilter, filters) {
+  if (!filters || !(quickFilter && quickFilter.name)) {
+    return getDefaultValue(quickFilter);
+  }
   const filter = filters[quickFilter.name];
   if (filter === undefined) {
     // not a part of the customizable filters

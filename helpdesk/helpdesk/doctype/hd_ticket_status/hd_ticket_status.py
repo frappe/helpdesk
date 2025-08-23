@@ -17,9 +17,14 @@ class HDTicketStatus(Document):
         old_name = (
             self.get_doc_before_save().name if self.get_doc_before_save() else None
         )
-        if old_name == "Closed" and not self.has_value_changed("order"):
-            # Prevent modification or deletion of the 'Closed' status
-            frappe.throw(_("The 'Closed' status cannot be modified or deleted."))
+        if old_name == "Closed" and not (
+            self.has_value_changed("order") or self.has_value_changed("color")
+        ):
+            frappe.throw(
+                _(
+                    "Only the 'color' and 'order' fields of the 'Closed' status can be modified."
+                )
+            )
 
     def validate_required_categories(self):
         if self.is_new():
@@ -46,3 +51,6 @@ class HDTicketStatus(Document):
                         f"At least one ticket status with category '{old_category}' must exist in the system."
                     )
                 )
+
+    # TODO: if category is changed check if linked to HD Settings or HD SLA with reopen or default status
+    # if so throw error saying to change those first
