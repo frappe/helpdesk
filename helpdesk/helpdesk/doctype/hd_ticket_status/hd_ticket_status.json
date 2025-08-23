@@ -27,12 +27,13 @@
    "fieldname": "color",
    "fieldtype": "Select",
    "label": "Color",
-   "options": "black\ngray\nblue\ngreen\nred\npink\norange\namber\nyellow\ncyan\nteal\nviolet\npurple"
+   "options": "Black\nGray\nBlue\nGreen\nRed\nPink\nOrange\nAmber\nYellow\nCyan\nTeal\nviolet\npurple"
   },
   {
    "fieldname": "label_agent",
    "fieldtype": "Data",
    "label": "Label",
+   "read_only_depends_on": "eval:doc.name==\"Closed\";",
    "reqd": 1,
    "unique": 1
   },
@@ -40,7 +41,8 @@
    "default": "0",
    "fieldname": "different_view",
    "fieldtype": "Check",
-   "label": "Show end users a different view"
+   "label": "Show end users a different view",
+   "read_only_depends_on": "eval:doc.label_agent==\"Closed\";"
   },
   {
    "depends_on": "eval:doc.different_view",
@@ -57,6 +59,7 @@
    "in_list_view": 1,
    "label": "Category",
    "options": "Open\nPaused\nResolved",
+   "read_only_depends_on": "eval:doc.label_agent==\"Closed\";",
    "reqd": 1
   },
   {
@@ -68,7 +71,8 @@
    "default": "1",
    "fieldname": "enabled",
    "fieldtype": "Check",
-   "label": "Enabled"
+   "label": "Enabled",
+   "read_only_depends_on": "eval:doc.label_agent==\"Closed\";"
   },
   {
    "default": "0",
@@ -90,7 +94,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-18 19:52:52.191504",
+ "modified": "2025-08-23 17:18:03.782319",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Status",

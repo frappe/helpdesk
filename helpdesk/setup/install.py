@@ -305,7 +305,7 @@ def add_default_status():
     statuses = [
         {
             "label_agent": "Open",
-            "color": "red",
+            "color": "Red",
             "enabled": 1,
             "category": "Open",
             "default_status": 1,
@@ -313,7 +313,7 @@ def add_default_status():
         },
         {
             "label_agent": "Replied",
-            "color": "blue",
+            "color": "Blue",
             "enabled": 1,
             "category": "Paused",
             "different_view": 1,
@@ -322,14 +322,14 @@ def add_default_status():
         },
         {
             "label_agent": "Resolved",
-            "color": "green",
+            "color": "Green",
             "enabled": 1,
             "category": "Resolved",
             "order": 3,
         },
         {
             "label_agent": "Closed",
-            "color": "gray",
+            "color": "Gray",
             "enabled": 1,
             "category": "Resolved",
             "order": 4,

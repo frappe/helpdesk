@@ -164,6 +164,7 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import EmptyState from "./EmptyState.vue";
 import ListRows from "./ListRows.vue";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 
 interface P {
   options: {
@@ -198,6 +199,7 @@ const route = useRoute();
 const router = useRouter();
 const { isManager } = useAuthStore();
 const { $dialog } = globalStore();
+const { getStatus } = useTicketStatusStore();
 
 const listSelections = ref(new Set());
 const defaultOptions = reactive({
@@ -300,16 +302,6 @@ const list = createResource({
       handleFetchFromField(column);
       handleColumnConfig(column);
     });
-    if (options.value.doctype === "HD Ticket") {
-      data.data.forEach((row) => {
-        if (
-          defaultParams.show_customer_portal_fields &&
-          row.status === "Replied"
-        ) {
-          row.status = "Awaiting Response";
-        }
-      });
-    }
     return data;
   },
   onSuccess: (data) => {
@@ -495,8 +487,9 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
   }
   e.stopPropagation();
   e.preventDefault();
-  if (item == "Awaiting Response") {
-    item = "Replied";
+
+  if (column.label == "Status" && options.value.doctype === "HD Ticket") {
+    item = getStatus(item)?.label_agent;
   }
 
   if (column.type === "MultipleAvatar") {

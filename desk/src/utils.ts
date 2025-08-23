@@ -537,3 +537,15 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
     },
   ];
 }
+
+export function parseColor(color: string): string {
+  color = color.toLowerCase();
+  let textColor = `!text-${color}-600`;
+  if (color == "black") {
+    textColor = "!text-ink-gray-9";
+  } else if (["gray", "green"].includes(color)) {
+    textColor = `!text-${color}-700`;
+  }
+
+  return textColor;
+}
