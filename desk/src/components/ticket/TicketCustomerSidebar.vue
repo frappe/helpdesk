@@ -189,7 +189,7 @@ const ticketBasicInfo = computed(() => [
   },
   {
     label: "Status",
-    value: transformStatus(ticket.data.status),
+    value: ticket.data.status,
     bold: true,
   },
 ]);
@@ -222,14 +222,6 @@ const ticketAdditionalInfo = computed(() => {
 
   return [...fields, ...custom_fields];
 });
-function transformStatus(status: string) {
-  switch (status) {
-    case "Replied":
-      return "Awaiting reply";
-    default:
-      return status;
-  }
-}
 </script>
 
 <style scoped></style>

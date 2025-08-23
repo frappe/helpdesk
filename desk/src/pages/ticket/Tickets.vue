@@ -194,7 +194,8 @@ function handle_response_by_field(row: any, item: string) {
 }
 
 function handle_resolution_by_field(row: any, item: string) {
-  if (row.status === "Replied") {
+  const status = getStatus(row.status) || {};
+  if (status.category === "Paused") {
     return h(Badge, {
       label: "Paused",
       theme: "blue",
