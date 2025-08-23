@@ -80,7 +80,11 @@ export function formatTime(seconds) {
   }
 
   formattedTime += `${
-    remainingSeconds >= 10 ? remainingSeconds : "0" + remainingSeconds
+    remainingSeconds >= 10
+      ? remainingSeconds
+      : remainingSeconds > 1
+      ? "0" + remainingSeconds
+      : "0"
   }s`;
 
   return formattedTime.trim();
