@@ -87,7 +87,6 @@
         </div>
       </div>
     </div>
-    <!-- -------- -->
     <div class="flex justify-between items-center">
       <div>
         <ErrorMessage :message="error" />
