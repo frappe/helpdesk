@@ -308,7 +308,6 @@ def add_default_status():
             "color": "Red",
             "enabled": 1,
             "category": "Open",
-            "default_status": 1,
             "order": 1,
         },
         {

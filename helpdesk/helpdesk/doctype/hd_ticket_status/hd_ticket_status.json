@@ -9,7 +9,6 @@
   "enabled",
   "label_agent",
   "order",
-  "default_status",
   "column_break_neks",
   "different_view",
   "label_customer",
@@ -27,7 +26,7 @@
    "fieldname": "color",
    "fieldtype": "Select",
    "label": "Color",
-   "options": "Black\nGray\nBlue\nGreen\nRed\nPink\nOrange\nAmber\nYellow\nCyan\nTeal\nviolet\npurple"
+   "options": "Black\nGray\nBlue\nGreen\nRed\nPink\nOrange\nAmber\nYellow\nCyan\nTeal\nViolet\npurple"
   },
   {
    "fieldname": "label_agent",
@@ -75,13 +74,6 @@
    "read_only_depends_on": "eval:doc.label_agent==\"Closed\";"
   },
   {
-   "default": "0",
-   "depends_on": "eval:doc.category===\"Open\"",
-   "fieldname": "default_status",
-   "fieldtype": "Check",
-   "label": "Default status"
-  },
-  {
    "fieldname": "sla_mapping_section",
    "fieldtype": "Section Break",
    "label": "SLA Mapping"
@@ -94,7 +86,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-23 17:18:03.782319",
+ "modified": "2025-08-23 22:18:13.884738",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Status",

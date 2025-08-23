@@ -5,7 +5,6 @@ import { HDTicketStatus } from "@/types/doctypes";
 import { parseColor } from "@/utils";
 
 export const useTicketStatusStore = defineStore("ticketStatus", () => {
-  const options = ref(["Open", "Replied", "Resolved", "Closed"]);
   const statuses = createListResource({
     doctype: "HD Ticket Status",
     fields: [
@@ -30,19 +29,6 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
     },
   });
 
-  const colorMap = {
-    Open: "red",
-    Replied: "blue",
-    Resolved: "green",
-    Closed: "gray",
-  };
-  const textColorMap = {
-    Open: "!text-red-600",
-    Replied: "!text-blue-600",
-    "Awaiting Response": "!text-blue-600",
-    Resolved: "!text-green-700",
-    Closed: "!text-gray-700",
-  };
   function getStatus(label: string): HDTicketStatus | undefined {
     return statuses.data?.find(
       (s: HDTicketStatus) =>
@@ -51,10 +37,7 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
   }
 
   return {
-    colorMap,
     statuses,
-    options,
-    textColorMap,
     getStatus,
   };
 });
