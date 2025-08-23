@@ -334,3 +334,6 @@ def add_default_status():
     for status in statuses:
         if not frappe.db.exists("HD Ticket Status", status["label_agent"]):
             frappe.get_doc({"doctype": "HD Ticket Status", **status}).insert()
+
+    frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
+    frappe.db.set_single_value("HD Settings", "ticket_reopen_status", "Open")
