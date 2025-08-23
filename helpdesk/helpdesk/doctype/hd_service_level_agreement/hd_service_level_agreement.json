@@ -162,7 +162,7 @@
    "fieldtype": "Column Break"
   },
   {
-   "description": "If not selected, the value will be takes from HD Settings DocType.",
+   "description": "Status of the ticket, when a customer replies on the ticket with this SLA.\n\nIf not selected, the value will be takes from HD Settings DocType.",
    "fieldname": "ticket_reopen_status",
    "fieldtype": "Link",
    "label": "Ticket Reopen status",
@@ -170,7 +170,7 @@
    "options": "HD Ticket Status"
   },
   {
-   "description": "If not selected, the value will be takes from HD Settings DocType",
+   "description": "Status of the ticket, when it is created in the system with this SLA.\nIf not selected, the value will be taken from HD Settings DocType",
    "fieldname": "default_ticket_status",
    "fieldtype": "Link",
    "label": "Default Ticket Status",
@@ -179,7 +179,7 @@
   }
  ],
  "links": [],
- "modified": "2025-08-22 23:09:26.211404",
+ "modified": "2025-08-23 12:29:41.399804",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Service Level Agreement",
