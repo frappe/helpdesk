@@ -260,23 +260,23 @@ const exotelErrors = ref({
 });
 
 const twilio = createDocumentResource({
-  doctype: "TF Twilio Settings",
-  name: "TF Twilio Settings",
+  doctype: "TP Twilio Settings",
+  name: "TP Twilio Settings",
   cache: ["tf_twilio_settings"],
   fields: ["*"],
   auto: true,
 });
 
 const exotel = createDocumentResource({
-  doctype: "TF Exotel Settings",
-  name: "TF Exotel Settings",
+  doctype: "TP Exotel Settings",
+  name: "TP Exotel Settings",
   cache: ["tf_exotel_settings"],
   fields: ["*"],
   auto: true,
 });
 
 const telephonyAgent = createDocumentResource({
-  doctype: "TF Telephony Agent",
+  doctype: "TP Telephony Agent",
   name: auth.user,
   cache: ["tf_telephony_agent"],
   fields: ["*"],

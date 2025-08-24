@@ -54,7 +54,7 @@ const listViewRef = ref(null);
 
 const options = computed(() => {
   return {
-    doctype: "TF Call Log",
+    doctype: "TP Call Log",
     selectable: true,
     showSelectBanner: true,
     emptyState: {

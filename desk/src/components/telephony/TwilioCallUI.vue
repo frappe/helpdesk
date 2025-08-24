@@ -171,11 +171,14 @@
 <script setup lang="ts">
 import { Call, Device } from "@twilio/voice-sdk";
 import { useDraggable, useWindowSize } from "@vueuse/core";
-import { Avatar, call } from "frappe-ui";
+import { Avatar, call, toast } from "frappe-ui";
 import { inject, ref, watch } from "vue";
 import MinimizeIcon from "./Icons/MinimizeIcon.vue";
 import CountUpTimer from "./CountUpTimer.vue";
 import LucidePhone from "~icons/lucide/phone";
+import { useTelephonyStore } from "@/stores/telephony";
+
+const telephonyStore = useTelephonyStore();
 
 const onCallStarted = inject<() => void>("onCallStarted");
 const onCallEnded = inject<() => void>("onCallEnded");
@@ -344,7 +347,11 @@ async function makeOutgoingCall(number) {
 
     try {
       _call = await device.connect({
-        params: { To: number },
+        params: {
+          To: number,
+          link_doctype: telephonyStore.linkDoc.doctype,
+          link_docname: telephonyStore.linkDoc.docname,
+        },
       });
 
       showCallPopup.value = true;
@@ -397,10 +404,12 @@ async function makeOutgoingCall(number) {
     } catch (error) {
       onCallFailed && onCallFailed();
       log.value = `Could not connect call: ${error.message}`;
+      toast.error(error.message);
     }
   } else {
     onCallFailed && onCallFailed();
     log.value = "Unable to make call.";
+    toast.error("Unable to make call.");
   }
 }
 

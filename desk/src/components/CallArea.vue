@@ -17,7 +17,7 @@
         }}</span>
       </div>
       <div class="ml-auto whitespace-nowrap">
-        <Tooltip :text="getFormattedDate(activity.creation)">
+        <Tooltip :text="dateFormat(activity.creation, 'MMM D, dddd')">
           <div class="text-sm text-ink-gray-5">
             {{ __(timeAgo(activity.creation)) }}
           </div>
@@ -26,7 +26,7 @@
     </div>
     <div
       @click="showCallLogDetailModal = true"
-      class="flex flex-col gap-2 border cursor-pointer border-outline-gray-modals rounded-md bg-surface-cards px-3 py-2.5 text-ink-gray-9"
+      class="flex flex-col gap-2 cursor-pointer border-transparent shadow rounded-md bg-surface-cards px-3 py-2.5 text-ink-gray-9"
     >
       <div class="flex items-center justify-between">
         <div class="inline-flex gap-2 items-center text-base font-medium">
@@ -57,7 +57,7 @@
         </div>
       </div>
       <div class="flex items-center flex-wrap gap-2">
-        <Badge :label="getFormattedDate(activity.creation)">
+        <Badge :label="dateFormat(activity.creation, 'MMM D, dddd')">
           <template #prefix>
             <CalendarIcon class="size-3" />
           </template>
@@ -95,7 +95,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { getFormattedDate, timeAgo } from "@/utils";
+import { dateFormat, timeAgo } from "@/utils";
 import { Avatar, Badge, Tooltip } from "frappe-ui";
 import { inject, ref } from "vue";
 import MultipleAvatar from "./MultipleAvatar.vue";

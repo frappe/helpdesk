@@ -180,6 +180,7 @@ import CallUI from "@/components/telephony/CallUI.vue";
 import LucidePhone from "~icons/lucide/phone";
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
+import { useActiveTabManager } from "@/composables/useActiveTabManager";
 
 const route = useRoute();
 const router = useRouter();
@@ -210,9 +211,11 @@ const { findView } = useView("HD Ticket");
 
 provide("communicationArea", communicationAreaRef);
 provide("makeCall", () => {
-  telephonyStore.makeCall(
-    ticket.data?.contact?.phone || ticket.data?.contact?.mobile_no
-  );
+  telephonyStore.makeCall({
+    number: ticket.data?.contact?.phone || ticket.data?.contact?.mobile_no,
+    doctype: "HD Ticket",
+    docname: props.ticketId,
+  });
 });
 
 const showSubjectDialog = ref(false);
@@ -305,7 +308,6 @@ const dropdownOptions = computed(() =>
 //   { deep: true }
 // );
 
-const tabIndex = ref(0);
 const tabs: TabObject[] = computed(() => {
   const _tabs = [
     {
@@ -334,6 +336,8 @@ const tabs: TabObject[] = computed(() => {
   }
   return _tabs;
 });
+
+const { tabIndex } = useActiveTabManager(tabs, "lastTicketTab");
 
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email, idx: number) => {

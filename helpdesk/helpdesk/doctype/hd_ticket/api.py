@@ -5,12 +5,17 @@ from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
-from helpdesk.api.doc import parse_list_data
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
-from helpdesk.utils import agent_only, check_permissions, get_customer, is_agent
+from helpdesk.utils import (
+    agent_only,
+    check_permissions,
+    get_customer,
+    is_agent,
+    parse_call_logs,
+)
 
 
 @frappe.whitelist()
@@ -70,7 +75,7 @@ def get_one(name, is_customer_portal=False):
 
     linked_calls = frappe.db.get_all(
         "Dynamic Link",
-        filters={"link_name": contact["name"], "parenttype": "TF Call Log"},
+        filters={"link_name": ticket["name"], "parenttype": "TP Call Log"},
         pluck="parent",
     )
 
@@ -78,7 +83,7 @@ def get_one(name, is_customer_portal=False):
 
     for call in linked_calls:
         call = frappe.get_cached_doc(
-            "TF Call Log",
+            "TP Call Log",
             call,
             fields=[
                 "name",
@@ -96,7 +101,7 @@ def get_one(name, is_customer_portal=False):
 
         calls.append(call)
 
-    call_logs = parse_list_data(calls, "TF Call Log")
+    call_logs = parse_call_logs(calls)
 
     return {
         **ticket,

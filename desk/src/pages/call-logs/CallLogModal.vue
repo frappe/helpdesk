@@ -241,7 +241,7 @@ function updateCallLog() {
   createResource({
     url: "frappe.client.set_value",
     params: {
-      doctype: "TF Call Log",
+      doctype: "TP Call Log",
       name: props.callLogId,
       fieldname: {
         ...callLog.value,

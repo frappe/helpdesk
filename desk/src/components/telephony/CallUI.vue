@@ -68,7 +68,11 @@ const props = defineProps({
   },
 });
 
-function makeCall(number) {
+function makeCall({ number, doctype, docname }) {
+  telephonyStore.setLinkDoc({
+    docname,
+    doctype,
+  });
   if (
     isTwilioEnabled.value &&
     isExotelEnabled.value &&

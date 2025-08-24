@@ -89,9 +89,12 @@ import AvatarIcon from "./Icons/AvatarIcon.vue";
 import MinimizeIcon from "./Icons/MinimizeIcon.vue";
 import CountUpTimer from "./CountUpTimer.vue";
 import { useDraggable, useWindowSize } from "@vueuse/core";
-import { Avatar, Button, call } from "frappe-ui";
+import { Avatar, Button, call, toast } from "frappe-ui";
 import { ref, onBeforeUnmount, watch, inject } from "vue";
 import { globalStore } from "@/stores/globalStore";
+import { useTelephonyStore } from "@/stores/telephony";
+
+const telephonyStore = useTelephonyStore();
 
 const onCallStarted = inject<() => void>("onCallStarted");
 const onCallEnded = inject<() => void>("onCallEnded");
@@ -142,13 +145,21 @@ function makeOutgoingCall(number) {
 
   call("telephony.exotel.handler.make_a_call", {
     to_number: phoneNumber.value,
-  }).then((callDetails) => {
-    callData.value = callDetails;
-    callStatus.value = "Calling...";
-    showCallPopup.value = true;
-    showSmallCallPopup.value = false;
-    onCallStarted && onCallStarted();
-  });
+    link_doctype: telephonyStore.linkDoc.doctype,
+    link_docname: telephonyStore.linkDoc.docname,
+  })
+    .then((callDetails) => {
+      callData.value = callDetails;
+      callStatus.value = "Calling...";
+      showCallPopup.value = true;
+      showSmallCallPopup.value = false;
+      onCallStarted && onCallStarted();
+    })
+    .catch((err) => {
+      const error = err?.messages?.[0] || "Something went wrong";
+      toast.error(error);
+      onCallFailed && onCallFailed();
+    });
 }
 
 function setup(userEmail) {
