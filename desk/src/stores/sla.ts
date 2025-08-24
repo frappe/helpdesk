@@ -2,21 +2,6 @@ import { SlaValidationErrors } from "@/components/Settings/Sla/types";
 import { validateConditions } from "@/utils";
 import { ref } from "vue";
 
-const defaultStatus = [
-  {
-    status: "Replied",
-    sla_behavior: "Paused",
-  },
-  {
-    status: "Closed",
-    sla_behavior: "Fulfilled",
-  },
-  {
-    status: "Resolved",
-    sla_behavior: "Fulfilled",
-  },
-];
-
 const defaultSupportAndResolution = [
   {
     workday: "Monday",
@@ -54,17 +39,18 @@ export const slaData = ref({
   name: "",
   service_level: "",
   description: "",
-  enabled: false,
+  enabled: true,
   default_sla: false,
   apply_sla_for_resolution: true,
   priorities: [],
-  statuses: defaultStatus,
   holiday_list: "Default",
   default_priority: "",
   start_date: "",
   end_date: "",
   loading: false,
   support_and_resolution: defaultSupportAndResolution,
+  default_ticket_status: "",
+  reopen_ticket_status: "",
   condition: [],
   condition_json: [],
 });
@@ -74,17 +60,18 @@ export const resetSlaData = () => {
     name: "",
     service_level: "",
     description: "",
-    enabled: false,
+    enabled: true,
     default_sla: false,
     apply_sla_for_resolution: true,
     priorities: [],
-    statuses: defaultStatus,
     holiday_list: "Default",
     default_priority: "",
     start_date: "",
     end_date: "",
     loading: false,
     support_and_resolution: defaultSupportAndResolution,
+    default_ticket_status: "",
+    reopen_ticket_status: "",
     condition: [],
     condition_json: [],
   };
@@ -103,8 +90,6 @@ export const slaDataErrors = ref<SlaValidationErrors>({
   default_sla: "",
   apply_sla_for_resolution: "",
   priorities: "",
-  statuses: "",
-  statuses_conflict: "",
   holiday_list: "",
   default_priority: "",
   start_date: "",
@@ -121,8 +106,6 @@ export const resetSlaDataErrors = () => {
     default_sla: "",
     apply_sla_for_resolution: "",
     priorities: "",
-    statuses: "",
-    statuses_conflict: "",
     holiday_list: "",
     default_priority: "",
     start_date: "",
@@ -213,84 +196,6 @@ export function validateSlaData(
               "Default priority is required";
           } else {
             slaDataErrors.value.default_priority = "";
-          }
-        }
-        break;
-      case "statuses":
-        if (
-          !Array.isArray(slaData.value.statuses) ||
-          slaData.value.statuses.length === 0
-        ) {
-          slaDataErrors.value.statuses =
-            "At least one status for 'Fulfilled on' and 'Paused on' is required";
-        } else {
-          const hasFulfilled = slaData.value.statuses.some(
-            (s) => s.sla_behavior === "Fulfilled"
-          );
-          const hasPaused = slaData.value.statuses.some(
-            (s) => s.sla_behavior === "Paused"
-          );
-
-          if (!hasFulfilled) {
-            slaDataErrors.value.statuses =
-              "At least one 'Fulfilled on' status is required";
-          }
-          if (!hasPaused) {
-            slaDataErrors.value.statuses =
-              "At least one 'Paused on' status is required";
-          }
-          if (hasFulfilled && hasPaused) {
-            slaDataErrors.value.statuses = "";
-          }
-
-          // Check for duplicate statuses and ensure each status has only one behavior
-          const statusMap = new Map();
-          const duplicateStatuses = [];
-          const conflictingBehaviors = [];
-
-          for (const status of slaData.value.statuses) {
-            const statusKey = status.status?.trim().toLowerCase();
-            const behavior = status.sla_behavior;
-
-            if (!statusMap.has(statusKey)) {
-              statusMap.set(statusKey, new Set([behavior]));
-            } else {
-              // Check if this status already has this behavior
-              if (statusMap.get(statusKey).has(behavior)) {
-                duplicateStatuses.push(status.status);
-              } else {
-                // This status has a different behavior already
-                conflictingBehaviors.push({
-                  status: status.status,
-                  behaviors: [...statusMap.get(statusKey), behavior],
-                });
-                statusMap.get(statusKey).add(behavior);
-              }
-            }
-          }
-
-          const errorMessages = [];
-          if (duplicateStatuses.length > 0) {
-            errorMessages.push(
-              `Duplicate status behavior found for: ${[
-                ...new Set(duplicateStatuses),
-              ].join(", ")}`
-            );
-          }
-          if (conflictingBehaviors.length > 0) {
-            const conflictMessages = conflictingBehaviors.map(
-              ({ status, behaviors }) =>
-                `"${status}" cannot be both ${behaviors.join(" and ")}`
-            );
-            errorMessages.push(
-              `Conflicting behaviors: ${conflictMessages.join("; ")}`
-            );
-          }
-
-          if (errorMessages.length > 0) {
-            slaDataErrors.value.statuses_conflict = errorMessages.join(". ");
-          } else {
-            slaDataErrors.value.statuses_conflict = "";
           }
         }
         break;
@@ -406,6 +311,7 @@ export function validateSlaData(
           }
         }
         break;
+
       default:
         break;
     }
