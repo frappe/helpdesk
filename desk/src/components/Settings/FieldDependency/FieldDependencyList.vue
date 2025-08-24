@@ -142,8 +142,6 @@ function getOptions(rowName: string) {
   return ConfirmDelete({
     isConfirmingDelete,
     onConfirmDelete: () => {
-      console.log(`Deleting dependency: ${rowName}`);
-
       fieldDependenciesList.delete.submit(rowName, {
         onSuccess: () => {
           toast.success("Field dependency deleted successfully");
