@@ -23,7 +23,7 @@ import { Avatar } from "frappe-ui";
 
 export const tabs = [
 	{
-		label: "User Profile",
+		label: "Profile",
 		icon: () => h(
 			Avatar,
 			{
