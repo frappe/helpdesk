@@ -80,9 +80,27 @@ export function useActiveTabManager(tabs, storageKey) {
     }
   );
 
-  watch(tabs, () => {
-    tabIndex.value = getActiveTab();
-  });
+  watch(
+    tabs,
+    (tabsValue) => {
+      if (!tabsValue?.length) return;
+
+      const currentTab = getActiveTab();
+      tabIndex.value = currentTab;
+
+      const tab = tabsValue.find(
+        (t) => t.name.toLowerCase() === activeTab.value
+      );
+
+      if (tab) {
+        setActiveTabInUrl(tab.name);
+      } else if (tabsValue.length > 0) {
+        setActiveTabInUrl(tabsValue[0].name);
+        tabIndex.value = 0;
+      }
+    },
+    { immediate: true, deep: true }
+  );
 
   return { tabIndex, changeTabTo };
 }
