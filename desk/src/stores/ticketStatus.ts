@@ -7,6 +7,7 @@ import { parseColor } from "@/utils";
 export const useTicketStatusStore = defineStore("ticketStatus", () => {
   const statuses = createListResource({
     doctype: "HD Ticket Status",
+    cache: ["HD Ticket Status", "list"],
     fields: [
       "label_agent",
       "label_customer",
