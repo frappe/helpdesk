@@ -12,6 +12,7 @@
       </span>
       <Dropdown
         v-if="showMergeOption"
+        placement="right"
         :options="[
           {
             label: 'Merge Ticket',
