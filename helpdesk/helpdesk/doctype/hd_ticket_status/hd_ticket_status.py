@@ -87,9 +87,9 @@ class HDTicketStatus(Document):
                 "Cannot disable this status as it is linked in the following SLAs:<br><br>"
             )
             if sla_default_status:
-                message += _(" - {0} as Default Status<br>").format(sla_default_status)
+                message += _("- {0} as Default Status<br>").format(sla_default_status)
             if sla_reopen_status:
-                message += _(" - {0} as Reopen Status<br>").format(sla_reopen_status)
+                message += _("- {0} as Reopen Status<br>").format(sla_reopen_status)
             message += _(
                 "<br>Please update the SLA(s) to use a different status before disabling this status."
             )
@@ -109,9 +109,9 @@ class HDTicketStatus(Document):
                 "Cannot disable this status as it is linked in HD Settings:<br><br>"
             )
             if self.name == settings_default_status:
-                message += _(" - Default Ticket Status<br>")
+                message += _("- Default Ticket Status<br>")
             if self.name == settings_reopen_status:
-                message += _(" - Ticket Reopen Status<br>")
+                message += _("- Ticket Reopen Status<br>")
             message += _(
                 "<br>Please update HD Settings to use a different status before disabling this status."
             )
