@@ -39,8 +39,10 @@
   </Dialog>
   <ConfirmDialog
     v-model="showConfirmDialog"
-    title="Unsaved changes"
-    message="Are you sure you want to change tabs? Unsaved changes will be lost."
+    :title="__('Unsaved changes')"
+    :message="
+      __('Are you sure you want to change tabs? Unsaved changes will be lost.')
+    "
     :onConfirm="
       () => {
         if (nextActiveTab !== null) {
@@ -60,7 +62,7 @@
 </template>
 <script setup lang="ts">
 import { Dialog } from "frappe-ui";
-import { ModelRef, ref, watch, watchEffect } from "vue";
+import { ModelRef, ref, watch } from "vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
   activeTab,

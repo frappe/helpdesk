@@ -106,8 +106,10 @@
   </form>
   <ConfirmDialog
     v-model="showUnsavedConfirm"
-    title="Unsaved changes"
-    message="Are you sure you want to go back? Unsaved changes will be lost."
+    :title="__('Unsaved changes')"
+    :message="
+      __('Are you sure you want to go back? Unsaved changes will be lost.')
+    "
     :onConfirm="
       () => {
         disableSettingModalOutsideClick = false;
@@ -117,8 +119,8 @@
   />
   <ConfirmDialog
     v-model="showContentChangeConfirm"
-    title="Reset content"
-    message="Are you sure you want to reset content?"
+    :title="__('Reset content')"
+    :message="__('Are you sure you want to reset content?')"
     :onConfirm="
       () => {
         resetContent();
