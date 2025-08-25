@@ -1218,7 +1218,9 @@ def close_tickets_after_n_days():
     if frappe.db.get_single_value("HD Settings", "auto_close_tickets") == 0:
         return
 
-    days_threshold = frappe.db.get_single_value("HD Settings", "auto_close_after_days")
+    status, days_threshold = frappe.db.get_value(
+        "HD Settings", "HD Settings", ["auto_close_status", "auto_close_after_days"]
+    )
 
     tickets_to_close = (
         frappe.db.sql(
@@ -1231,10 +1233,10 @@ def close_tickets_after_n_days():
                     WHERE reference_doctype = 'HD Ticket'
                     GROUP BY reference_name
                 ) latest_comm ON t.name = latest_comm.reference_name
-                WHERE t.status_category = 'Paused'
+                WHERE t.status = %(status)s
                 AND latest_comm.last_communication_date < DATE_SUB(NOW(), INTERVAL %(days_threshold)s DAY)
             """,
-            {"days_threshold": days_threshold},
+            {"days_threshold": days_threshold, "status": status},
             pluck="name",
         )
         or []
