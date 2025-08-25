@@ -129,8 +129,8 @@ const userResource = createResource({
   makeParams() {
     return {
       doctype: "HD Agent",
-      name: authStore.user,
       fieldname: ["user_image", "agent_name", "user"],
+      filters: { name: authStore.user },
     };
   },
   async onSuccess(data) {
