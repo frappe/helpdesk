@@ -96,7 +96,7 @@ const { isManager } = useAuthStore();
 const listViewRef = ref(null);
 const showExportModal = ref(false);
 
-const { textColorMap } = useTicketStatusStore();
+const { getStatus } = useTicketStatusStore();
 
 const listSelections = ref(new Set());
 const selectBannerActions = [
@@ -114,10 +114,19 @@ const options = {
   doctype: "HD Ticket",
   columnConfig: {
     status: {
-      prefix: ({ row }) => {
-        return h(IndicatorIcon, {
-          class: textColorMap[row.status],
-        });
+      custom: ({ item }) => {
+        const status = getStatus(item);
+        const label = isCustomerPortal.value
+          ? status?.["label_customer"]
+          : status?.["label_agent"];
+        return h(
+          "div",
+          { class: "flex items-center space-x-2 justify-start" },
+          [
+            h(IndicatorIcon, { class: status?.["parsed_color"] }),
+            h("span", { class: "truncate flex-1" }, label),
+          ]
+        );
       },
     },
     agreement_status: {
@@ -185,7 +194,8 @@ function handle_response_by_field(row: any, item: string) {
 }
 
 function handle_resolution_by_field(row: any, item: string) {
-  if (row.status === "Replied") {
+  const status = getStatus(row.status) || {};
+  if (status.category === "Paused") {
     return h(Badge, {
       label: "Paused",
       theme: "blue",

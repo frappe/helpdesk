@@ -57,3 +57,16 @@ def get_default() -> Document:
             "default_sla": True,
         },
     )
+
+
+def convert_to_seconds(time):
+    """
+    Convert time string to seconds.
+
+    :param time: Time in datetime object
+    :return: Time in seconds
+    """
+    if not time:
+        return 0
+    time = time.hour * 3600 + time.minute * 60 + time.second
+    return time if time else 0

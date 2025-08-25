@@ -46,25 +46,12 @@ frappe.ui.form.on("HD Service Level Agreement", {
           (status) => !exclude_statuses.includes(status)
         );
 
-        frm.fields_dict.pause_sla_on.grid.update_docfield_property(
-          "status",
-          "options",
-          [""].concat(allow_statuses)
-        );
-
         exclude_statuses = ["Open"];
         allow_statuses = statuses.filter(
           (status) => !exclude_statuses.includes(status)
         );
-        frm.fields_dict.sla_fulfilled_on.grid.update_docfield_property(
-          "status",
-          "options",
-          [""].concat(allow_statuses)
-        );
       });
     }
-
-    frm.refresh_field("pause_sla_on");
   },
 
   apply_sla_for_resolution: function (frm) {

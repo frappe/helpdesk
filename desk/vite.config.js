@@ -18,7 +18,13 @@ export default defineConfig({
         emptyOutDir: true,
         indexHtmlPath: "../helpdesk/www/helpdesk/index.html",
       },
+      frappeTypes: {
+        input: {
+          helpdesk: ["hd_ticket_status"],
+        },
+      },
     }),
+
     vue(),
     vueJsx(),
     Components({
