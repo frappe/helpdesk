@@ -121,7 +121,7 @@ const options = {
           : status?.["label_agent"];
         return h(
           "div",
-          { class: "flex items-center space-x-2 justify-start" },
+          { class: "flex items-center space-x-2 justify-start w-full" },
           [
             h(IndicatorIcon, { class: status?.["parsed_color"] }),
             h("span", { class: "truncate flex-1" }, label),
