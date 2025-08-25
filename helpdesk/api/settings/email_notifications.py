@@ -4,7 +4,10 @@ import frappe
 from frappe import _
 from frappe.utils.jinja import validate_template
 
-from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
+from helpdesk.helpdesk.doctype.hd_settings.helpers import (
+    get_default_email_content,
+    is_email_content_empty,
+)
 
 
 def only_for_managers():
@@ -12,7 +15,7 @@ def only_for_managers():
 
 
 def get_email_content(content: str, default_content: str) -> str:
-    if HDSettings.is_email_content_empty(content):
+    if is_email_content_empty(content):
         return default_content
     return content
 
@@ -31,9 +34,7 @@ def get_data(notification: str):
         feedback_email_content = frappe.db.get_single_value(
             "HD Settings", "feedback_email_content"
         )
-        default_feedback_email_content = HDSettings.get_default_email_content(
-            notification
-        )
+        default_feedback_email_content = get_default_email_content(notification)
         return {
             "ticket_status": send_email_feedback_on_status,
             "enabled": enable_email_ticket_feedback,
@@ -50,9 +51,7 @@ def get_data(notification: str):
         acknowledgement_email_content = frappe.db.get_single_value(
             "HD Settings", "acknowledgement_email_content"
         )
-        default_acknowledgement_email_content = HDSettings.get_default_email_content(
-            notification
-        )
+        default_acknowledgement_email_content = get_default_email_content(notification)
         return {
             "enabled": send_acknowledgement_email,
             "content": get_email_content(
@@ -68,7 +67,7 @@ def get_data(notification: str):
         email_content = frappe.db.get_single_value(
             "HD Settings", "reply_email_to_agent_content"
         )
-        default_email_content = HDSettings.get_default_email_content(notification)
+        default_email_content = get_default_email_content(notification)
         return {
             "enabled": enable_reply_email_to_agent,
             "content": get_email_content(email_content, default_email_content),
@@ -82,7 +81,7 @@ def get_data(notification: str):
         email_content = frappe.db.get_single_value(
             "HD Settings", "reply_via_agent_email_content"
         )
-        default_email_content = HDSettings.get_default_email_content("reply_via_agent")
+        default_email_content = get_default_email_content("reply_via_agent")
         return {
             "enabled": enable_reply_email_via_agent,
             "content": get_email_content(email_content, default_email_content),
