@@ -11,6 +11,12 @@ def only_for_managers():
     frappe.only_for(["Agent Manager", "System Manager"])
 
 
+def get_email_content(content: str, default_content: str) -> str:
+    if HDSettings.is_email_content_empty(content):
+        return default_content
+    return content
+
+
 @frappe.whitelist(methods=["GET"])
 def get_data(notification: str):
     only_for_managers()
@@ -22,19 +28,19 @@ def get_data(notification: str):
         enable_email_ticket_feedback = bool(
             frappe.db.get_single_value("HD Settings", "enable_email_ticket_feedback")
         )
-        share_feedback_email_content = frappe.db.get_single_value(
+        feedback_email_content = frappe.db.get_single_value(
             "HD Settings", "feedback_email_content"
         )
-        default_share_feedback_email_content = HDSettings.get_default_email_content(
+        default_feedback_email_content = HDSettings.get_default_email_content(
             notification
         )
         return {
             "ticket_status": send_email_feedback_on_status,
             "enabled": enable_email_ticket_feedback,
-            "content": default_share_feedback_email_content
-            if HDSettings.is_email_content_empty(share_feedback_email_content)
-            else share_feedback_email_content,
-            "default_content": default_share_feedback_email_content,
+            "content": get_email_content(
+                feedback_email_content, default_feedback_email_content
+            ),
+            "default_content": default_feedback_email_content,
         }
 
     if notification == "acknowledgement":
@@ -49,9 +55,9 @@ def get_data(notification: str):
         )
         return {
             "enabled": send_acknowledgement_email,
-            "content": default_acknowledgement_email_content
-            if HDSettings.is_email_content_empty(acknowledgement_email_content)
-            else acknowledgement_email_content,
+            "content": get_email_content(
+                acknowledgement_email_content, default_acknowledgement_email_content
+            ),
             "default_content": default_acknowledgement_email_content,
         }
 
@@ -65,9 +71,7 @@ def get_data(notification: str):
         default_email_content = HDSettings.get_default_email_content(notification)
         return {
             "enabled": enable_reply_email_to_agent,
-            "content": default_email_content
-            if HDSettings.is_email_content_empty(email_content)
-            else email_content,
+            "content": get_email_content(email_content, default_email_content),
             "default_content": default_email_content,
         }
 
@@ -81,9 +85,7 @@ def get_data(notification: str):
         default_email_content = HDSettings.get_default_email_content("reply_via_agent")
         return {
             "enabled": enable_reply_email_via_agent,
-            "content": default_email_content
-            if HDSettings.is_email_content_empty(email_content)
-            else email_content,
+            "content": get_email_content(email_content, default_email_content),
             "default_content": default_email_content,
         }
 
