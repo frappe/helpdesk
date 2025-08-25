@@ -61,7 +61,6 @@ class TicketSummary:
             "Violet": "#8b5cf6",
             "Purple": "#a855f7",
         }
-        print("\n\n", color_name, color_map.get(color_name), "\n\n")
         return color_map.get(color_name, "#6b7280")  # Default to gray
 
     def get_columns(self):

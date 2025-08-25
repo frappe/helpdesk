@@ -554,6 +554,26 @@ class TestHDTicket(IntegrationTestCase):
             )
             self.assertEqual(ticket.resolution_time, expected_resolution_time)
 
+    def test_resolve_closed_resolution_time(self):
+        """
+        Ticket resolution time should not change if ticket goes from resolved to closed
+        """
+        date = get_current_week_monday(hours=12)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="High")
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, minutes=30)):
+            ticket.status = "Resolved"
+            ticket.save()
+            self.assertEqual(ticket.resolution_time, 30 * 60)
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, days=1)):
+            ticket.status = "Closed"
+            ticket.save()
+            self.assertEqual(ticket.resolution_time, 30 * 60)
+
     def tearDown(self):
         remove_holidays()
         frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
