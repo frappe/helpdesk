@@ -164,12 +164,6 @@ const userResource = createResource({
   },
 });
 
-computed(() => {
-  if (!profile.value.first_name && !profile.value.last_name) {
-    return userResource.submit() || {};
-  }
-});
-
 const dirty = computed(() => {
   return (
     profile.value.first_name !== initialProfile.value.first_name ||
@@ -193,10 +187,11 @@ const updateAgent = createResource({
     };
   },
   onSuccess(data) {
-    updateUser.submit();
-    error.value = "";
-    toast.success("Profile updated successfully");
-    authStore.reloadUser();
+    updateUser.submit().then(() => {
+      error.value = "";
+      toast.success("Profile updated successfully");
+      authStore.reloadUser();
+    });
   },
   onError(err) {
     error.value = err.message || "Failed to update profile";
@@ -220,7 +215,6 @@ const updateUser = createResource({
 
 function updateImage(fileUrl = "") {
   profile.value.user_image = fileUrl;
-  updateAgent.submit();
 }
 
 watch(
@@ -231,8 +225,12 @@ watch(
 );
 
 onMounted(async () => {
-  await userResource.submit();
-  initialProfile.value = { ...profile.value };
+  try {
+    await userResource.submit();
+    initialProfile.value = { ...profile.value };
+  } catch (err) {
+    error.value = err.message || "Failed to load profile";
+  }
 });
 </script>
 
