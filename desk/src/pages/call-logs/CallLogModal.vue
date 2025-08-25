@@ -70,11 +70,11 @@
               class="flex flex-col gap-1.5"
               v-if="callLog.type === 'Incoming'"
             >
-              <FormLabel label="Call Received By" :required="editMode" />
               <Link
                 :value="callLog.receiver"
                 :doctype="'User'"
                 :placeholder="'Call Received By'"
+                label="Call Received By"
                 @change="(data) => (callLog.receiver = data)"
               />
             </div>
@@ -82,12 +82,21 @@
               class="flex flex-col gap-1.5"
               v-if="callLog.type === 'Outgoing'"
             >
-              <FormLabel label="Caller" :required="editMode" />
               <Link
                 :value="callLog.caller"
                 :doctype="'User'"
                 :placeholder="'Caller'"
+                label="Caller"
                 @change="(data) => (callLog.caller = data)"
+              />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <Link
+                :value="callLog.ticket"
+                :doctype="'HD Ticket'"
+                :placeholder="'Ticket'"
+                label="Ticket"
+                @change="(data) => (callLog.ticket = String(data))"
               />
             </div>
           </div>
@@ -146,10 +155,15 @@ const callLog = ref({
   from: "",
   status: "",
   duration: 0,
+  ticket: "",
 });
 
 const props = defineProps({
   callLogId: {
+    type: String,
+    default: "",
+  },
+  ticketId: {
     type: String,
     default: "",
   },
@@ -158,6 +172,9 @@ const props = defineProps({
 const callLogData = createResource({
   url: "telephony.api.get_call_log",
   onSuccess(data) {
+    const linkedTicket = data.links.find(
+      (link) => link.link_doctype == "HD Ticket"
+    );
     callLog.value = {
       receiver: data.receiver,
       caller: data.caller,
@@ -165,7 +182,8 @@ const callLogData = createResource({
       to: data.to,
       from: data.from,
       status: data.status,
-      duration: data.duration,
+      duration: data.duration || 0,
+      ticket: String(linkedTicket?.link_name || ""),
     };
     originalCallLog.value = JSON.stringify(callLog.value);
   },
@@ -219,6 +237,7 @@ const resetCallLog = () => {
     from: "",
     status: "",
     duration: 0,
+    ticket: "",
   };
   originalCallLog.value = JSON.stringify(callLog.value);
   errors.value = {
@@ -238,6 +257,20 @@ function updateCallLog() {
     return;
   }
   loading.value = true;
+  const links = [];
+  if (callLog.value.ticket) {
+    links.push({
+      link_doctype: "HD Ticket",
+      link_name: callLog.value.ticket,
+    });
+  }
+  // Copy old links
+  callLogData.data.links.forEach((link) => {
+    if (link.link_doctype == "HD Ticket") {
+      return;
+    }
+    links.push(link);
+  });
   createResource({
     url: "frappe.client.set_value",
     params: {
@@ -245,6 +278,7 @@ function updateCallLog() {
       name: props.callLogId,
       fieldname: {
         ...callLog.value,
+        links,
       },
     },
     auto: true,
@@ -262,6 +296,13 @@ function createCallLog() {
     return;
   }
   loading.value = true;
+  const links = [];
+  if (callLog.value.ticket) {
+    links.push({
+      link_doctype: "HD Ticket",
+      link_name: callLog.value.ticket,
+    });
+  }
   createResource({
     url: "telephony.api.create_call_log",
     params: {
@@ -274,6 +315,8 @@ function createCallLog() {
       call_type: callLog.value.type,
       caller: callLog.value.caller,
       receiver: callLog.value.receiver,
+      ticket: callLog.value.ticket,
+      links,
     },
     auto: true,
     onSuccess(doc) {
@@ -343,6 +386,9 @@ watch(show, (newValue) => {
     });
   } else {
     editMode.value = false;
+  }
+  if (newValue && props.ticketId) {
+    callLog.value.ticket = String(props.ticketId);
   }
 });
 </script>

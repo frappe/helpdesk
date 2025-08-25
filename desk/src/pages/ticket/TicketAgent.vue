@@ -217,6 +217,7 @@ provide("makeCall", () => {
     docname: props.ticketId,
   });
 });
+provide("ticketId", props.ticketId);
 
 const showSubjectDialog = ref(false);
 

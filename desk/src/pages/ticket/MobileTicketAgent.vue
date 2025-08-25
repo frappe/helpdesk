@@ -252,6 +252,7 @@ provide("makeCall", () => {
     docname: props.ticketId,
   });
 });
+provide("ticketId", props.ticketId);
 
 const { isMobileView } = useScreenSize();
 const { $dialog } = globalStore();
@@ -290,6 +291,9 @@ const ticket = createResource({
     });
   },
 });
+
+provide("refreshTicket", () => ticket.reload());
+provide("onCallEnded", () => ticket.reload());
 
 function updateField(name: string, value: string, callback = () => {}) {
   updateTicket(name, value);
@@ -352,7 +356,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   return _tabs;
 });
 
-const { tabIndex } = useActiveTabManager(tabs, "lastTicketTabMobile");
+const { tabIndex } = useActiveTabManager(tabs, "lastTicketTab");
 
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email, idx: number) => {

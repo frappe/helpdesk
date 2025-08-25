@@ -1,32 +1,36 @@
 <template>
   <div class="px-10 py-8">
-    <SettingsLayoutHeader
-      title="Telephony"
-      description="Configure your telephony settings."
-    >
-      <template #actions>
-        <div class="flex gap-2 items-center">
+    <SettingsLayoutHeader description="Configure your telephony settings.">
+      <template #title>
+        <div class="flex items-center gap-2">
+          <h1 class="text-lg font-semibold text-ink-gray-8">Telephony</h1>
           <Badge
-            v-if="isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent"
+            :class="[
+              isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent
+                ? 'opacity-100'
+                : 'opacity-0',
+            ]"
             label="Unsaved"
             theme="orange"
             variant="subtle"
           />
-          <Button
-            label="Save"
-            theme="gray"
-            variant="solid"
-            @click="save"
-            :disabled="
-              !isDirty.twilio && !isDirty.exotel && !isDirty.telephonyAgent
-            "
-            :loading="
-              twilio.save.loading ||
-              exotel.save.loading ||
-              telephonyAgent.save.loading
-            "
-          />
         </div>
+      </template>
+      <template #actions>
+        <Button
+          label="Save"
+          theme="gray"
+          variant="solid"
+          @click="save"
+          :disabled="
+            !isDirty.twilio && !isDirty.exotel && !isDirty.telephonyAgent
+          "
+          :loading="
+            twilio.save.loading ||
+            exotel.save.loading ||
+            telephonyAgent.save.loading
+          "
+        />
       </template>
     </SettingsLayoutHeader>
   </div>

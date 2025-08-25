@@ -58,7 +58,11 @@
       </template>
     </Dropdown>
   </div>
-  <CallLogModal v-model="showCallLogModal" @after-insert="refreshTicket" />
+  <CallLogModal
+    v-model="showCallLogModal"
+    :ticketId="ticketId"
+    @after-insert="refreshTicket"
+  />
 </template>
 
 <script setup lang="ts">
@@ -80,6 +84,7 @@ const makeCall = inject<() => void>("makeCall");
 const refreshTicket = inject<() => void>("refreshTicket");
 const showCallLogModal = ref(false);
 const { isCallingEnabled } = storeToRefs(useTelephonyStore());
+const ticketId = inject<string>("ticketId");
 
 const defaultActions = computed(() => {
   let actions = [
