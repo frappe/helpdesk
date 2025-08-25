@@ -57,8 +57,6 @@ class HDTicketStatus(Document):
                     )
                 )
 
-    # TODO: if category is changed check if linked to HD Settings or HD SLA with reopen or default status
-    # if so throw error saying to change those first
     def validate_disabling_status(self):
         if self.is_new() or self.enabled:
             return

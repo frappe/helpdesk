@@ -65,10 +65,6 @@ class HDTicket(Document):
     def autoname(self):
         return self.name
 
-    # TODO: remove this method
-    # def get_feed(self):
-    #     return "{0}: {1}".format(_(self.status), self.subject)
-
     def before_validate(self):
         self.check_update_perms()
         self.set_ticket_type()
