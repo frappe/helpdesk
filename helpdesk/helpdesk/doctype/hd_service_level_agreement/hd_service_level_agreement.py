@@ -27,7 +27,7 @@ class HDServiceLevelAgreement(Document):
         self.validate_default_sla()
         self.validate_priorities()
         self.validate_support_and_resolution()
-        self.validate_condition()  # Looks okay but check again
+        self.validate_condition()
 
     def validate_priorities(self):
         self.validate_priority_defaults()
@@ -173,6 +173,14 @@ class HDServiceLevelAgreement(Document):
     def handle_doc_status(self, doc: Document):
         if doc.is_new() or not doc.has_value_changed("status"):
             return
+
+        was_resolved = (
+            doc.get_doc_before_save().get("status_category", None) == "Resolved"
+        )
+        is_closed = doc.get("status", None) == "Closed"
+        if was_resolved and is_closed:
+            return
+
         self.set_first_response_time(doc)
         self.set_resolution_date(doc)
         self.set_hold_time(doc)
