@@ -32,9 +32,10 @@
   "auto_update_status",
   "update_status_to",
   "column_break_iarl",
-  "auto_close_tickets",
-  "auto_close_after_days",
   "send_acknowledgement_email",
+  "auto_close_tickets",
+  "auto_close_status",
+  "auto_close_after_days",
   "status_section",
   "default_ticket_status",
   "column_break_yfbu",
@@ -283,7 +284,7 @@
    "default": "0",
    "fieldname": "auto_close_tickets",
    "fieldtype": "Check",
-   "label": "Automatically Close Paused Tickets"
+   "label": "Automatically Close Tickets when"
   },
   {
    "default": "14",
@@ -291,7 +292,7 @@
    "fieldname": "auto_close_after_days",
    "fieldtype": "Int",
    "label": "Auto-close after (Days)",
-   "mandatory_depends_on": "auto_close_tickets"
+   "mandatory_depends_on": "eval: doc.auto_close_tickets"
   },
   {
    "default": "0",
@@ -368,12 +369,21 @@
    "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
    "options": "HD Ticket Status",
    "reqd": 1
+  },
+  {
+   "depends_on": "auto_close_tickets",
+   "fieldname": "auto_close_status",
+   "fieldtype": "Link",
+   "label": "Status ",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"in\",[\"Paused\",\"Resolved\",null]]]",
+   "mandatory_depends_on": "eval: doc.auto_close_tickets",
+   "options": "HD Ticket Status"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-23 19:09:34.027130",
+ "modified": "2025-08-25 16:45:51.037716",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

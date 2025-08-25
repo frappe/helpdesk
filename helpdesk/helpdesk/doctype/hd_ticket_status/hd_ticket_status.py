@@ -7,6 +7,10 @@ from frappe.model.document import Document
 
 
 class HDTicketStatus(Document):
+    def before_rename(self, old, new, merge=False):
+        if old == "Closed":
+            frappe.throw(_("The 'Closed' status cannot be renamed."))
+
     def validate(self):
         self.validate_closed_status_change()
         self.validate_required_categories()
