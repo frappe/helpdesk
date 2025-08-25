@@ -9,6 +9,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
+from frappe.utils.jinja import validate_template
 
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     remove_guest_ticket_creation_permission,
@@ -68,6 +69,9 @@ class HDSettings(Document):
     def before_save(self):
         self.update_ticket_permissions()
 
+    def validate(self):
+        self._validate_email_contents()
+
     def on_update(self):
         event = "helpdesk:settings-updated"
         room = get_website_room()
@@ -79,6 +83,17 @@ class HDSettings(Document):
             set_guest_ticket_creation_permission()
         if not self.allow_anyone_to_create_tickets:
             remove_guest_ticket_creation_permission()
+
+    def _validate_email_contents(self):
+        for content_field_name in [
+            "feedback_email_content",
+            "acknowledgement_email_content",
+            "reply_email_to_agent_content",
+            "reply_via_agent_email_content",
+        ]:
+            if not self.has_value_changed(content_field_name):
+                continue
+            validate_template(getattr(self, content_field_name))
 
     @property
     def hd_search(self):
