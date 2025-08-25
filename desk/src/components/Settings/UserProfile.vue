@@ -95,8 +95,8 @@
         variant="solid"
         :label="__('Update')"
         :disabled="!dirty"
-        :loading="setUser.loading"
-        @click="setUser.submit()"
+        :loading="updateAgent.loading"
+        @click="updateAgent.submit()"
       />
     </div>
   </div>
@@ -104,8 +104,10 @@
 
 <script setup>
 import { useAuthStore } from "@/stores/auth";
-import { computed, onMounted, ref } from "vue";
+
+import { computed, onMounted, ref, watch } from "vue";
 import {
+  call,
   Dropdown,
   createResource,
   toast,
@@ -120,24 +122,44 @@ const authStore = useAuthStore();
 const profile = ref({});
 const error = ref("");
 const showChangePasswordModal = ref(false);
+const initialProfile = ref({});
 
 const userResource = createResource({
   url: "frappe.client.get_value",
   makeParams() {
     return {
-      doctype: "User",
+      doctype: "HD Agent",
       name: authStore.user,
-      fieldname: [
-        "first_name",
-        "last_name",
-        "user_image",
-        "full_name",
-        "email",
-      ],
+      fieldname: ["user_image", "agent_name", "user"],
     };
   },
-  onSuccess(data) {
-    profile.value = data || {};
+  async onSuccess(data) {
+    let agentData = data || {};
+    if (!agentData.agent_name) {
+      const userData = await call("frappe.client.get_value", {
+        doctype: "User",
+        name: authStore.user,
+        fieldname: [
+          "first_name",
+          "last_name",
+          "user_image",
+          "full_name",
+          "email",
+        ],
+      });
+      profile.value = {
+        ...userData,
+      };
+    } else {
+      const [first, ...rest] = agentData.agent_name.split(" ");
+      profile.value = {
+        user_image: agentData.user_image || "",
+        first_name: first || "",
+        last_name: rest.join(" ") || "",
+        full_name: agentData.agent_name || "",
+        email: agentData.user || "",
+      };
+    }
     error.value = "";
   },
 });
@@ -150,12 +172,38 @@ computed(() => {
 
 const dirty = computed(() => {
   return (
-    profile.value.first_name !== userResource.data?.first_name ||
-    profile.value.last_name !== userResource.data?.last_name
+    profile.value.first_name !== initialProfile.value.first_name ||
+    profile.value.last_name !== initialProfile.value.last_name ||
+    profile.value.user_image !== initialProfile.value.user_image
   );
 });
 
-const setUser = createResource({
+const updateAgent = createResource({
+  url: "frappe.client.set_value",
+  makeParams() {
+    return {
+      doctype: "HD Agent",
+      name: authStore.user,
+      fieldname: {
+        agent_name: `${profile.value.first_name || ""} ${
+          profile.value.last_name || ""
+        }`.trim(),
+        user_image: profile.value.user_image,
+      },
+    };
+  },
+  onSuccess(data) {
+    updateUser.submit();
+    error.value = "";
+    toast.success("Profile updated successfully");
+    authStore.reloadUser();
+  },
+  onError(err) {
+    error.value = err.message || "Failed to update profile";
+  },
+});
+
+const updateUser = createResource({
   url: "frappe.client.set_value",
   makeParams() {
     return {
@@ -168,25 +216,23 @@ const setUser = createResource({
       },
     };
   },
-  onSuccess(data) {
-    error.value = "";
-    profile.value = { ...profile.value, ...data };
-    toast.success("Profile updated successfully");
-    authStore.reloadUser();
-  },
-  onError(err) {
-    error.value = err.message || "Failed to update profile";
-  },
 });
 
 function updateImage(fileUrl = "") {
   profile.value.user_image = fileUrl;
-  setUser.submit();
+  updateAgent.submit();
 }
+
+watch(
+  () => [profile.value.first_name, profile.value.last_name],
+  ([newFirst, newLast]) => {
+    profile.value.full_name = `${newFirst || ""} ${newLast || ""}`.trim();
+  }
+);
 
 onMounted(async () => {
   await userResource.submit();
-  profile.value = { ...userResource.data };
+  initialProfile.value = { ...profile.value };
 });
 </script>
 
