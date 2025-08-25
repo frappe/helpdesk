@@ -7,17 +7,19 @@
     <div class="sticky top-0 z-10 bg-white py-8">
       <SettingsLayoutHeader :description="props.description">
         <template #title>
-          <div class="flex items-center gap-x-1">
-            <div class="pl-6 pr-2 relative text-ink-gray-7 hover:opacity-70">
+          <div class="flex items-center">
+            <div
+              class="pl-5 pr-2 relative text-ink-gray-7 hover:opacity-70 min-h-8 flex items-center"
+            >
               <button
                 type="button"
                 @click="internalOnBack"
-                class="absolute top-0 -left-1 w-full h-full"
+                class="absolute top-0 -left-[0.375rem] w-full h-full"
               >
                 <span class="sr-only">{{
                   __("back to email event list")
                 }}</span>
-                <LucideChevronLeft class="w-5 h-5" />
+                <LucideChevronLeft class="w-4.5 h-4.5" />
               </button>
               <h1 class="font-semibold text-xl">
                 {{ props.title }}
@@ -35,7 +37,7 @@
         <template #actions>
           <div
             :inert="notificationDataResource.loading"
-            class="flex items-center gap-x-2"
+            class="flex items-center gap-x-4 pt-[0.125rem]"
             :class="{ invisible: notificationDataResource.loading }"
           >
             <Switch
@@ -43,8 +45,8 @@
               :label="__('Enabled')"
               v-model="enabled"
               @update:model-value="setUnsavedChanges"
-              :style="{ background: 'transparent' }"
-              class="flex-row-reverse gap-x-2 text-sm text-ink-gray-7 font-medium pl-0"
+              :style="{ background: 'transparent', padding: '0px' }"
+              class="flex-row-reverse gap-x-2 pl-0"
             />
             <Button
               type="submit"
@@ -67,7 +69,7 @@
     >
       <template v-if="!notificationDataResource.loading">
         <slot name="formFields"></slot>
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-2">
           <FormControl
             type="textarea"
             size="sm"
@@ -77,28 +79,31 @@
             v-model="content"
             :oninput="setUnsavedChanges"
           />
-          <p class="text-sm text-gray-700 leading-5">
-            {{
-              __(
-                "Find out all of the variables that can be used in the content"
-              )
-            }}
-            <a
-              :href="props.documentationLink"
-              target="_blank"
-              class="underline font-semibold"
-              >{{ __("here") }}</a
+          <div class="flex gap-x-1 items-start justify-between">
+            <p class="text-sm text-gray-700 leading-5">
+              {{
+                __(
+                  "Find out all of the variables that can be used in the content"
+                )
+              }}
+              <a
+                :href="props.documentationLink"
+                target="_blank"
+                class="underline font-semibold"
+                >{{ __("here") }}</a
+              >
+            </p>
+            <Button
+              :disabled="content === defaultContent"
+              type="button"
+              size="sm"
+              variant="subtle"
+              @click="onResetContent"
+              class="w-fit"
             >
-          </p>
-          <Button
-            type="button"
-            size="sm"
-            variant="subtle"
-            @click="onResetContent"
-            class="w-fit"
-          >
-            {{ __("Reset Content") }}
-          </Button>
+              {{ __("Reset Content") }}
+            </Button>
+          </div>
         </div>
       </template>
       <LoadingIndicator v-else class="w-4" />
@@ -120,7 +125,11 @@
   <ConfirmDialog
     v-model="showContentChangeConfirm"
     :title="__('Reset content')"
-    :message="__('Are you sure you want to reset content?')"
+    :message="
+      __(
+        'Are you sure you want to reset the content? Current content will be overridden.'
+      )
+    "
     :onConfirm="
       () => {
         resetContent();
