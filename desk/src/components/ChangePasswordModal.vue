@@ -54,7 +54,7 @@
   </Dialog>
 </template>
 <script setup>
-import Password from "./Settings/Password.vue";
+import Password from "@/components/frappe-ui/Password.vue";
 import { useAuthStore } from "@/stores/auth";
 import { Dialog, toast, createResource } from "frappe-ui";
 import { ref, watch } from "vue";
