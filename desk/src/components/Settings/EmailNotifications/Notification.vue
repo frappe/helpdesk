@@ -80,7 +80,7 @@
           <p class="text-sm text-gray-700 leading-5">
             {{
               __(
-                "Find out all of the identifiers that can be used in the content"
+                "Find out all of the variables that can be used in the content"
               )
             }}
             <a
