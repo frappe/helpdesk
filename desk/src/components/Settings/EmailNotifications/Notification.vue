@@ -94,7 +94,7 @@
             type="button"
             size="sm"
             variant="subtle"
-            @click="resetContent"
+            @click="onResetContent"
             class="w-fit"
           >
             {{ __("Reset Content") }}
@@ -105,13 +105,24 @@
     </div>
   </form>
   <ConfirmDialog
-    v-model="showConfirmDialog"
+    v-model="showUnsavedConfirm"
     title="Unsaved changes"
     message="Are you sure you want to go back? Unsaved changes will be lost."
     :onConfirm="
       () => {
         disableSettingModalOutsideClick = false;
         props.onBack();
+      }
+    "
+  />
+  <ConfirmDialog
+    v-model="showContentChangeConfirm"
+    title="Reset content"
+    message="Are you sure you want to reset content?"
+    :onConfirm="
+      () => {
+        resetContent();
+        showContentChangeConfirm = false;
       }
     "
   />
@@ -141,7 +152,8 @@ const content = defineModel<string>("content", { required: true });
 const enabled = defineModel<boolean>("enabled", { required: true });
 
 const unsavedChanges = ref(false);
-const showConfirmDialog = ref(false);
+const showUnsavedConfirm = ref(false);
+const showContentChangeConfirm = ref(false);
 
 const notificationDataResource = createResource({
   url: "helpdesk.api.settings.email_notifications.get_data",
@@ -162,15 +174,19 @@ function resetUnsavedChanges() {
 }
 
 function resetContent() {
+  content.value = props.defaultContent;
+  setUnsavedChanges();
+}
+
+function onResetContent() {
   if (content.value !== props.defaultContent) {
-    content.value = props.defaultContent;
-    setUnsavedChanges();
+    showContentChangeConfirm.value = true;
   }
 }
 
 function internalOnBack() {
   if (unsavedChanges.value) {
-    showConfirmDialog.value = true;
+    showUnsavedConfirm.value = true;
     return;
   }
   disableSettingModalOutsideClick.value = false;
