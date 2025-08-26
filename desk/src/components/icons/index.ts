@@ -12,6 +12,7 @@ export { default as EmailAtIcon } from "./EmailAtIcon.vue";
 export { default as EmailIcon } from "./EmailIcon.vue";
 export { default as FrappeCloudIcon } from "./FrappeCloudIcon.vue";
 export { default as FieldDependencyIcon } from "./FieldDependencyIcon.vue";
+export { default as GlobeIcon } from "./GlobeIcon.vue";
 export { default as IndicatorIcon } from "./IndicatorIcon.vue";
 export { default as InviteCustomer } from "./InviteCustomer.vue";
 export { default as LinkIcon } from "./LinkIcon.vue";
