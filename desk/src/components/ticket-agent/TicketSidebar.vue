@@ -1,12 +1,13 @@
 <template>
-  <Resizer
-    class="flex flex-col justify-between border-l px-5 pt-3.5"
-    side="right"
-  >
-    <TabButtons :buttons="tabs" v-model="currentTab" class="tab-buttons mb-1" />
+  <Resizer class="flex flex-col justify-between border-l pt-3.5" side="right">
+    <TabButtons
+      :buttons="tabs"
+      v-model="currentTab"
+      class="tab-buttons mb-1 px-5"
+    />
     <div class="flex-1">
-      <TicketDetails v-if="currentTab === 'details'" :ticket-id="ticketId" />
-      <TicketContactInfo v-else />
+      <TicketDetailsTab v-if="currentTab === 'details'" :ticket-id="ticketId" />
+      <TicketContactTab v-else />
     </div>
   </Resizer>
 </template>
@@ -16,8 +17,8 @@ import { useTicket } from "@/composables/useTicket";
 import { TabButtons } from "frappe-ui";
 import { ref } from "vue";
 import Resizer from "../Resizer.vue";
-import TicketContactInfo from "./TicketContactInfo.vue";
-import TicketDetails from "./TicketDetails.vue";
+import TicketContactTab from "./TicketContactTab.vue";
+import TicketDetailsTab from "./TicketDetailsTab.vue";
 const props = defineProps({
   ticketId: {
     type: String,
