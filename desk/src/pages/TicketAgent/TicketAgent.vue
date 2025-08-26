@@ -2,15 +2,18 @@
   <div v-if="!ticket.get?.loading" class="">
     <LayoutHeader>
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
-          <template #prefix="{ item }">
-            <Icon
-              v-if="item.icon"
-              :icon="item.icon"
-              class="mr-1 h-4 flex items-center justify-center self-center"
-            />
-          </template>
-        </Breadcrumbs>
+        <div class="flex flex-col">
+          <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
+            <template #prefix="{ item }">
+              <Icon
+                v-if="item.icon"
+                :icon="item.icon"
+                class="mr-1 h-4 flex items-center justify-center self-center"
+              />
+            </template>
+          </Breadcrumbs>
+          <TicketAgentSLA :ticketId="ticketId" />
+        </div>
       </template>
       <template #right-header>
         <div class="flex gap-2 items-center">
@@ -71,12 +74,14 @@ import { ComputedRef } from "vue";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useRoute } from "vue-router";
-import { Avatar, Breadcrumbs, Dropdown, toast } from "frappe-ui";
+import { Avatar, Badge, Breadcrumbs, Dropdown, toast } from "frappe-ui";
 // import MultipleAvatar from "@/components/MultipleAvatar.vue";
 import { HDTicketStatus } from "@/types/doctypes";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { h } from "vue";
 import { IndicatorIcon } from "@/components/icons";
+import { GlobeIcon, EmailIcon } from "@/components/icons";
+import TicketAgentSLA from "./TicketAgentSLA.vue";
 
 const props = defineProps({
   ticketId: {
