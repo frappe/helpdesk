@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-08-24 10:36+0000\n"
-"PO-Revision-Date: 2025-08-25 14:02\n"
+"PO-Revision-Date: 2025-08-26 14:26\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Latin)\n"
 "MIME-Version: 1.0\n"
@@ -59,7 +59,7 @@ msgstr "Neophodna radnja"
 #. Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Action to perform when clicking the button. The doc will be available as `this`"
-msgstr "Radnja koja se izvršava klikom na dugme. Dokument će biti dostupak kao `this`"
+msgstr "Radnja koja se izvršava klikom na dugme. Dokument će biti dostupan kao `this`"
 
 #: desk/src/components/Settings/Agents.vue:139
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:97
@@ -1175,7 +1175,7 @@ msgstr "Slanje imejla trenutno"
 
 #: helpdesk/utils.py:26
 msgid "Insufficient Permission for {0}"
-msgstr "Nedovoljna ovlašćena za {0}"
+msgstr "Nedovoljna ovlašćenja za {0}"
 
 #. Label of the integer_value (Int) field in DocType 'HD Ticket Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
@@ -2245,7 +2245,7 @@ msgstr "Datum završetka"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:45
 msgid "To Date cannot be before From Date"
-msgstr "Datum završetka ne može biti pre datum početka"
+msgstr "Datum završetka ne može biti pre datuma početka"
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:35
 msgid "Top Result"
