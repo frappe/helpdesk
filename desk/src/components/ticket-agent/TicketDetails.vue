@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- User avatar with buttons -->
-    <div></div>
+    <TicketContact :contact="ticket?.doc.contact" />
 
     <!-- 
 	Core fields
@@ -22,6 +22,17 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useTicket } from "@/composables/useTicket";
+import TicketContact from "./TicketContact.vue";
+
+const props = defineProps({
+  ticketId: {
+    type: String,
+    required: true,
+  },
+});
+const ticket = useTicket(props.ticketId);
+</script>
 
 <style scoped></style>
