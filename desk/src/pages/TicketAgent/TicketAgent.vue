@@ -12,7 +12,7 @@
               />
             </template>
           </Breadcrumbs>
-          <TicketAgentSLA :ticketId="ticketId" />
+          <TicketSLA :ticket-id="ticketId" />
         </div>
       </template>
       <template #right-header>
@@ -61,27 +61,34 @@
         <!-- <MultipleAvatar :avatars="assignedAgents" size="sm" /> -->
       </template>
     </LayoutHeader>
+    <div class="h-full flex flex-1">
+      <div class="h-full">
+        <!-- Tabs -->
+        <TicketActivityPanel />
+        <!-- Comm Area -->
+      </div>
+
+      <!-- Sidebar with Resizer -->
+      <TicketSidebar :ticket-id="ticketId" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { IndicatorIcon } from "@/components/icons";
 import LayoutHeader from "@/components/LayoutHeader.vue";
+import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";
+import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
+import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import { useTicket } from "@/composables/useTicket";
 import { useView } from "@/composables/useView";
-import { View } from "@/types";
-import { getIcon } from "@/utils";
-import { ComputedRef } from "vue";
-import { computed } from "vue";
-import { useRouter } from "vue-router";
-import { useRoute } from "vue-router";
-import { Avatar, Badge, Breadcrumbs, Dropdown, toast } from "frappe-ui";
-// import MultipleAvatar from "@/components/MultipleAvatar.vue";
-import { HDTicketStatus } from "@/types/doctypes";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { h } from "vue";
-import { IndicatorIcon } from "@/components/icons";
-import { GlobeIcon, EmailIcon } from "@/components/icons";
-import TicketAgentSLA from "./TicketAgentSLA.vue";
+import { View } from "@/types";
+import { HDTicketStatus } from "@/types/doctypes";
+import { getIcon } from "@/utils";
+import { Avatar, Breadcrumbs, Dropdown, toast } from "frappe-ui";
+import { computed, ComputedRef, h } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const props = defineProps({
   ticketId: {
