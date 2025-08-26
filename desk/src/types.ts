@@ -354,3 +354,74 @@ export interface FieldCriteriaState {
   childSearch: string;
   enabled: boolean;
 }
+
+interface ResourceBase {
+  data: any;
+  error: any;
+  fetched: boolean;
+  loading: boolean;
+  params: any;
+  previousData: any;
+  promise: Promise<any> | null;
+  submit: (params?: any) => void;
+}
+
+interface DocumentResourceOptions<T = unknown> {
+  doctype: string;
+  name: string;
+  auto?: boolean;
+  whitelistedMethods?: Record<string, string>;
+  onError?: (error: any) => void;
+  onSuccess?: (data: T) => void;
+  transform?: (doc: T) => T;
+  delete?: {
+    onSuccess?: () => void;
+    onError?: (error: any) => void;
+  };
+  setValue?: {
+    onSuccess?: () => void;
+    onError?: (error: any) => void;
+  };
+}
+
+export interface DocumentResource<T = unknown> {
+  // Configuration
+  auto: boolean;
+  doctype: string;
+  name: string;
+  isDirty: boolean;
+
+  // Main document data
+  doc: T;
+  originalDoc: T;
+
+  // Core methods
+  reload(): void;
+  update(options: Partial<DocumentResourceOptions<T>>): void;
+
+  // Sub-resources
+  get: ResourceBase & {
+    data: T;
+    params: {
+      doctype: string;
+      name: string;
+    };
+  };
+
+  setValue: ResourceBase & {
+    submit: (
+      values: Partial<T>,
+      options?: { onSuccess?: () => void; onError?: (error: any) => void }
+    ) => void;
+  };
+
+  setValueDebounced: ResourceBase & {
+    submit: (values: Partial<T>) => void;
+  };
+
+  save: ResourceBase;
+  delete: ResourceBase;
+
+  // Dynamic whitelisted methods
+  [methodName: string]: any;
+}

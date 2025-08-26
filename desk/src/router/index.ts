@@ -40,6 +40,12 @@ const routes = [
     props: true,
   },
   {
+    path: "/tickets2/:ticketId",
+    name: "TicketAgent2",
+    component: () => import("@/pages/TicketAgent/TicketAgent.vue"),
+    props: true,
+  },
+  {
     path: "/tickets/new/:templateId?",
     name: "TicketAgentNew",
     component: () => import("@/pages/ticket/TicketNew.vue"),
