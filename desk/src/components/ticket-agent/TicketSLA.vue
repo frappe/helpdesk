@@ -50,7 +50,6 @@ const props = defineProps({
     required: true,
   },
 });
-
 const ticket = useTicket(props.ticketId);
 </script>
 
