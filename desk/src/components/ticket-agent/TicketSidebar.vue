@@ -5,7 +5,7 @@
   >
     <TabButtons :buttons="tabs" v-model="currentTab" class="tab-buttons mb-1" />
     <div class="flex-1">
-      <TicketDetails v-if="currentTab === 'details'" />
+      <TicketDetails v-if="currentTab === 'details'" :ticket-id="ticketId" />
       <TicketContactInfo v-else />
     </div>
   </Resizer>
