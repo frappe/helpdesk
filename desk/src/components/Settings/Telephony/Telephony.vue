@@ -266,7 +266,7 @@ const exotelErrors = ref({
 const twilio = createDocumentResource({
   doctype: "TP Twilio Settings",
   name: "TP Twilio Settings",
-  cache: ["tf_twilio_settings"],
+  cache: ["tp_twilio_settings"],
   fields: ["*"],
   auto: true,
 });
@@ -274,7 +274,7 @@ const twilio = createDocumentResource({
 const exotel = createDocumentResource({
   doctype: "TP Exotel Settings",
   name: "TP Exotel Settings",
-  cache: ["tf_exotel_settings"],
+  cache: ["tp_exotel_settings"],
   fields: ["*"],
   auto: true,
 });
@@ -282,7 +282,7 @@ const exotel = createDocumentResource({
 const telephonyAgent = createDocumentResource({
   doctype: "TP Telephony Agent",
   name: auth.user,
-  cache: ["tf_telephony_agent"],
+  cache: ["tp_telephony_agent"],
   fields: ["*"],
   auto: false,
 });
