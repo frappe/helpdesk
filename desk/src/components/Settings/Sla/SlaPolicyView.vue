@@ -31,7 +31,7 @@
           class="flex items-center justify-between gap-2 cursor-pointer"
           @click="toggleEnabled"
         >
-          <Switch size="sm" :model-value="slaData.enabled" />
+          <Switch size="sm" v-model="slaData.enabled" />
           <span class="text-sm text-ink-gray-7 font-medium">Enabled</span>
         </div>
         <Button
@@ -229,12 +229,13 @@
           >Status details</span
         >
         <span class="text-p-sm text-ink-gray-6">
-          The SLA status updates with ticket progress—fulfilled when conditions
-          are met, paused when awaiting external action.
+          Set the default status assigned when a ticket is created, and the
+          status to apply when a ticket is reopened. If not specified, the
+          default status from HD Settings will be used.
         </span>
       </div>
       <div class="mt-5">
-        <SlaStatusList :statusList="slaData.statuses" />
+        <SlaStatusList />
       </div>
     </div>
     <hr class="my-8" />
@@ -303,26 +304,10 @@ const getSlaData = createResource({
     docname: slaActiveScreen.value.data?.name,
   },
   onSuccess(data) {
-    const fulfilledOn =
-      data.sla_fulfilled_on?.map((item) => {
-        return {
-          ...item,
-          sla_behavior: "Fulfilled",
-        };
-      }) || [];
-    const pauseOn =
-      data.pause_sla_on?.map((item) => {
-        return {
-          ...item,
-          sla_behavior: "Paused",
-        };
-      }) || [];
-
     const condition_json = JSON.parse(data.condition_json || "[]");
 
     const newData = {
       ...data,
-      statuses: [...pauseOn, ...fulfilledOn],
       loading: false,
       condition_json: condition_json,
     };
@@ -405,17 +390,17 @@ const saveSla = () => {
 };
 
 const createSla = () => {
-  const fulfilledOn = slaData.value.statuses.filter(
-    (status) => status.sla_behavior === "Fulfilled"
-  );
-  const pauseOn = slaData.value.statuses.filter(
-    (status) => status.sla_behavior === "Paused"
-  );
+  const defaultTicketStatus = slaData.value.default_ticket_status
+    ? slaData.value.default_ticket_status?.value
+    : null;
+  const ticketReopenStatus = slaData.value.reopen_ticket_status
+    ? slaData.value.reopen_ticket_status?.value
+    : null;
   slaPolicyList.insert.submit(
     {
       ...slaData.value,
-      sla_fulfilled_on: fulfilledOn,
-      pause_sla_on: pauseOn,
+      default_ticket_status: defaultTicketStatus,
+      ticket_reopen_status: ticketReopenStatus,
       condition: convertToConditions({
         conditions: slaData.value.condition_json,
         fieldPrefix: "doc",
@@ -437,19 +422,18 @@ const createSla = () => {
 };
 
 const updateSla = () => {
-  const fulfilledOn = slaData.value.statuses.filter(
-    (status) => status.sla_behavior === "Fulfilled"
-  );
-  const pauseOn = slaData.value.statuses.filter(
-    (status) => status.sla_behavior === "Paused"
-  );
-
+  const defaultTicketStatus = slaData.value.default_ticket_status
+    ? slaData.value.default_ticket_status?.value
+    : null;
+  const ticketReopenStatus = slaData.value.reopen_ticket_status
+    ? slaData.value.reopen_ticket_status?.value
+    : null;
   slaPolicyList.setValue.submit(
     {
       ...slaData.value,
       name: slaActiveScreen.value.data.name,
-      sla_fulfilled_on: fulfilledOn,
-      pause_sla_on: pauseOn,
+      default_ticket_status: defaultTicketStatus,
+      ticket_reopen_status: ticketReopenStatus,
       condition: useNewUI.value
         ? convertToConditions({
             conditions: slaData.value.condition_json,
@@ -511,7 +495,6 @@ const beforeUnloadHandler = (event) => {
   event.preventDefault();
   event.returnValue = true;
 };
-
 onMounted(() => {
   addEventListener("beforeunload", beforeUnloadHandler);
 });

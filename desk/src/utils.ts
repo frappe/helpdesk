@@ -80,7 +80,11 @@ export function formatTime(seconds) {
   }
 
   formattedTime += `${
-    remainingSeconds >= 10 ? remainingSeconds : "0" + remainingSeconds
+    remainingSeconds >= 10
+      ? remainingSeconds
+      : remainingSeconds > 1
+      ? "0" + remainingSeconds
+      : "0"
   }s`;
 
   return formattedTime.trim();
@@ -536,4 +540,16 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       condition: () => isConfirmingDelete.value,
     },
   ];
+}
+
+export function parseColor(color: string): string {
+  color = color.toLowerCase();
+  let textColor = `!text-${color}-600`;
+  if (color == "black") {
+    textColor = "!text-ink-gray-9";
+  } else if (["gray", "green"].includes(color)) {
+    textColor = `!text-${color}-700`;
+  }
+
+  return textColor;
 }

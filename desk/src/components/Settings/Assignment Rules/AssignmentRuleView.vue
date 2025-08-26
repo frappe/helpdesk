@@ -541,6 +541,11 @@ const updateAssignmentRule = async () => {
         ? JSON.stringify(assignmentRuleData.value.unassignConditionJson)
         : null,
     },
+  }).catch((er) => {
+    const error =
+      er?.messages?.[0] || "Some error occurred while updating assignment rule";
+    toast.error(error);
+    isLoading.value = false;
   });
 
   if (
@@ -551,6 +556,14 @@ const updateAssignmentRule = async () => {
       doctype: "Assignment Rule",
       old_name: assignmentRuleData.value.name,
       new_name: assignmentRuleData.value.assignmentRuleName,
+    }).catch(async (er) => {
+      const error =
+        er?.messages?.[0] ||
+        "Some error occurred while renaming assignment rule";
+      toast.error(error);
+      // Reset assignment rule to previous state
+      await getAssignmentRuleData.reload();
+      isLoading.value = false;
     });
     await getAssignmentRuleData.submit({
       doctype: "Assignment Rule",

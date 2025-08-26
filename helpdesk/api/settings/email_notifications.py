@@ -35,8 +35,13 @@ def get_data(notification: str):
             "HD Settings", "feedback_email_content"
         )
         default_feedback_email_content = get_default_email_content(notification)
+        if send_email_feedback_on_status == "":
+            send_email_feedback_on_status = "Closed"
         return {
-            "ticket_status": send_email_feedback_on_status,
+            "ticket_status": {
+                "label": send_email_feedback_on_status,
+                "value": send_email_feedback_on_status,
+            },
             "enabled": enable_email_ticket_feedback,
             "content": get_email_content(
                 feedback_email_content, default_feedback_email_content
@@ -117,7 +122,7 @@ def merge(*mps: dict[str, Any]):
 
 @frappe.whitelist(methods=["PUT"])
 def update_share_feedback(
-    ticket_status: Literal["Closed", "Resolved"],
+    ticket_status: dict[Literal["label", "value"], str],
     enabled: bool,
     content: str,
 ):
@@ -131,7 +136,7 @@ def update_share_feedback(
     frappe.db.set_single_value(
         "HD Settings",
         "send_email_feedback_on_status",
-        ticket_status,
+        ticket_status["value"],
     )
     return merge(common_settings, {"ticket_status": ticket_status})
 

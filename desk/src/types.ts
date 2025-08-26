@@ -85,6 +85,7 @@ export interface Ticket {
   response_by: string;
   first_responded_on: string;
   resolution_date: string;
+  resolution_time: number;
   status: string;
   subject: string;
   ticket_type: string;
@@ -101,6 +102,7 @@ export interface Ticket {
   views: ViewLog[];
   _customActions: Function[];
   is_merged?: boolean;
+  status_category: "Open" | "Paused" | "Resolved";
 }
 
 export interface DocField {
@@ -138,6 +140,7 @@ export interface Field {
   display_via_depends_on?: string;
   mandatory_via_depends_on?: string;
   disabled?: boolean;
+  placeholder?: string | null;
 }
 
 export type FieldValue = string | number | boolean;

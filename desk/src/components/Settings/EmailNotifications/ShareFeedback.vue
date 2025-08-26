@@ -15,28 +15,24 @@
   >
     <template #formFields>
       <FormControl
-        type="select"
+        type="autocomplete"
         size="sm"
         :label="__('On Ticket Status')"
-        :options="
-          ticketStatusOptions.map((option) => ({
-            label: __(option),
-            value: option,
-          }))
-        "
+        :options="statusOptions"
         :required="true"
         v-model="ticketStatus"
-        :onchange="() => compRef.setUnsavedChanges()"
       />
     </template>
   </Notification>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import Notification from "./Notification.vue";
 import { createResource } from "frappe-ui";
 import type { BaseSettings, Notification as NotificationType } from "./types";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation";
 
 const props = defineProps<{
   onBack: () => void;
@@ -46,23 +42,37 @@ const props = defineProps<{
 const content = ref("");
 const defaultContent = ref("");
 const enabled = ref(false);
-const ticketStatusOptions = ["Closed", "Resolved"] as const;
-type TicketStatus = typeof ticketStatusOptions[number];
-const ticketStatus = ref<TicketStatus>(ticketStatusOptions[0]);
 const compRef = ref<InstanceType<typeof Notification>>();
+const { statuses } = useTicketStatusStore();
+const statusOptions = computed<Record<"label" | "value", string>[]>(() =>
+  statuses.data
+    .filter((s) => s.category === "Resolved")
+    .map((s) => ({
+      label: __(s.label_agent),
+      value: s.label_agent,
+    }))
+);
+const ticketStatus = ref<Record<"label" | "value", string> | null>(null);
+
+watch(
+  () => ticketStatus.value,
+  (_cur, prev) => {
+    if (prev === null) {
+      return;
+    }
+    compRef.value.setUnsavedChanges();
+  }
+);
 
 type Data = {
-  ticket_status: TicketStatus;
+  ticket_status: Record<"label" | "value", string>;
 } & BaseSettings;
 
 const updateSettings = createResource({
   url: "helpdesk.api.settings.email_notifications.update_share_feedback",
   method: "PUT",
   auto: false,
-  onSuccess(data: Data) {
-    ticketStatus.value = data.ticket_status;
-    enabled.value = data.enabled;
-    content.value = data.content;
+  onSuccess(_data: Data) {
     compRef.value.resetUnsavedChanges();
   },
 });
@@ -76,7 +86,10 @@ function onSubmit() {
 }
 
 function onGetDataSuccess(data: Data & { default_content: string }) {
-  ticketStatus.value = data.ticket_status;
+  ticketStatus.value = {
+    label: __(data.ticket_status.label),
+    value: data.ticket_status.value,
+  };
   enabled.value = data.enabled;
   content.value = data.content;
   defaultContent.value = data.default_content;

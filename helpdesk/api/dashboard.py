@@ -100,7 +100,7 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
                 THEN name
                 ELSE NULL
             END) as prev_month_tickets
-		FROM `tabHD Ticket`
+		FROM `tabHD Ticket` # noqa: W604
     """,
         {
             "from_date": from_date,
@@ -155,7 +155,7 @@ def get_sla_fulfilled_count(from_date, to_date, conds=""):
                 THEN name 
                 ELSE NULL
             END) as prev_month_fulfilled
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
     """,
         {
             "from_date": from_date,
@@ -169,7 +169,7 @@ def get_sla_fulfilled_count(from_date, to_date, conds=""):
     prev_month_fulfilled = result[0].prev_month_fulfilled or 0
 
     # Only these tickets should be counted
-    conds += " AND status in ('Resolved', 'Closed')"
+    conds += " AND status_category = 'Resolved'"
 
     ticket_count = (
         get_ticket_count(from_date, to_date, conds, True)[0] if len(result) > 0 else 1
@@ -213,16 +213,16 @@ def get_avg_first_response_time(from_date, to_date, conds=""):
             AVG(CASE 
                 WHEN creation >= %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY) AND first_responded_on IS NOT NULL
                 {conds}
-                THEN TIMESTAMPDIFF(SECOND, creation, first_responded_on)
+                THEN first_response_time / 3600
                 ELSE NULL
             END) as current_month_avg,
             AVG(CASE 
                 When creation >= %(prev_from_date)s AND creation < %(from_date)s AND first_responded_on IS NOT NULL
                 {conds}
-                THEN TIMESTAMPDIFF(SECOND, creation, first_responded_on)
+                THEN first_response_time / 3600
                 ELSE NULL
             END) as prev_month_avg
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
     """,
         {
             "from_date": from_date,
@@ -231,15 +231,9 @@ def get_avg_first_response_time(from_date, to_date, conds=""):
         },
         as_dict=1,
     )
-    seconds_to_hours = 3600
-    current_month_avg = (
-        result[0].current_month_avg / seconds_to_hours
-        if result[0].current_month_avg
-        else 0
-    )
-    prev_month_avg = (
-        result[0].prev_month_avg / seconds_to_hours if result[0].prev_month_avg else 0
-    )
+
+    current_month_avg = result[0].current_month_avg or 0
+    prev_month_avg = result[0].prev_month_avg or 0
 
     delta = current_month_avg - prev_month_avg if prev_month_avg else 0
 
@@ -266,18 +260,18 @@ def get_avg_resolution_time(from_date, to_date, conds=""):
         f"""
         SELECT 
             AVG(CASE 
-                WHEN status in ('Resolved', 'Closed') AND creation >= %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
+                WHEN status_category = 'Resolved' AND creation >= %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
                 {conds}
-                THEN TIMESTAMPDIFF(DAY, creation, resolution_date)
+                THEN CEIL(resolution_time / 86400)
                 ELSE NULL
             END) as current_month_avg,
             AVG(CASE 
-                When status in ('Resolved', 'Closed') AND creation >= %(prev_from_date)s AND creation < %(from_date)s
+                When status_category = 'Resolved' AND creation >= %(prev_from_date)s AND creation < %(from_date)s
                 {conds}
-                THEN TIMESTAMPDIFF(DAY, creation, resolution_date)
+                THEN CEIL(resolution_time / 86400)
                 ELSE NULL
             END) as prev_month_avg
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
     """,
         {
             "from_date": from_date,
@@ -324,7 +318,7 @@ def get_avg_feedback_score(from_date, to_date, conds=""):
                 THEN feedback_rating 
                 ELSE NULL
             END) as prev_month_avg
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
     """,
         {
             "from_date": from_date,
@@ -512,10 +506,10 @@ def get_ticket_trend_data(from_date, to_date, conds=""):
         f"""
             SELECT 
                 DATE(creation) as date,
-                COUNT(CASE WHEN status = 'Open' THEN name END) as open,
-                COUNT(CASE WHEN status IN ('Resolved', 'Closed') THEN name END) as closed,
+                COUNT(CASE WHEN status_category = 'Open' THEN name END) as open,
+                COUNT(CASE WHEN status_category = 'Resolved' THEN name END) as closed,
                 COUNT(CASE WHEN agreement_status = 'Fulfilled' THEN name END) as SLA_fulfilled
-            FROM `tabHD Ticket`
+            FROM `tabHD Ticket` # noqa: W604
             WHERE creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
             {conds}
             GROUP BY DATE(creation)
@@ -564,7 +558,7 @@ def get_feedback_trend_data(from_date, to_date, conds=""):
             DATE(creation) as date,
             AVG(CASE WHEN feedback_rating > 0 THEN feedback_rating END) * 5 as rating,
             COUNT(CASE WHEN feedback_rating > 0 THEN name END) as rated_tickets
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
         WHERE 
             creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
             {conds}
@@ -582,7 +576,7 @@ def get_feedback_trend_data(from_date, to_date, conds=""):
         f"""
         SELECT 
             AVG(feedback_rating) * 5 as avg_rating
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
         WHERE 
             creation BETWEEN %(from_date)s AND DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
             {conds}
@@ -673,7 +667,7 @@ def get_avg_tickets_per_day(from_date, to_date, conds=""):
             SELECT 
                 COUNT(name) as total_tickets,
                 DATEDIFF(DATE_ADD(%(to_date)s, INTERVAL 1 DAY), %(from_date)s) as days
-            FROM `tabHD Ticket`
+            FROM `tabHD Ticket` # noqa: W604
             WHERE creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
             {conds}
         """,

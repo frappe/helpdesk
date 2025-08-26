@@ -1,8 +1,5 @@
 <template>
-  <form
-    @submit.prevent="props.onSubmit"
-    class="flex-grow flex flex-col isolate"
-  >
+  <div class="flex-grow flex flex-col isolate">
     <!-- Header -->
     <div class="sticky top-0 z-10 bg-white py-8">
       <SettingsLayoutHeader :description="props.description">
@@ -49,12 +46,13 @@
               class="flex-row-reverse gap-x-2 pl-0"
             />
             <Button
-              type="submit"
+              type="button"
               :label="__('Save')"
               theme="gray"
               variant="solid"
               :disabled="!unsavedChanges"
               :loading="props.submitting"
+              @click="props.onSubmit"
             />
           </div>
         </template>
@@ -108,7 +106,7 @@
       </template>
       <LoadingIndicator v-else class="w-4" />
     </div>
-  </form>
+  </div>
   <ConfirmDialog
     v-model="showUnsavedConfirm"
     :title="__('Unsaved changes')"

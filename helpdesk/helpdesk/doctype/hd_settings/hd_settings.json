@@ -28,9 +28,16 @@
   "ticket_restrictions_section",
   "allow_anyone_to_create_tickets",
   "auto_update_status",
+  "update_status_to",
   "column_break_iarl",
+  "send_acknowledgement_email",
   "auto_close_tickets",
+  "auto_close_status",
   "auto_close_after_days",
+  "status_section",
+  "default_ticket_status",
+  "column_break_yfbu",
+  "ticket_reopen_status",
   "workflow_tab",
   "skip_email_workflow",
   "instantly_send_email",
@@ -269,7 +276,7 @@
   },
   {
    "default": "0",
-   "description": "When enabled, the ticket status will automatically change to \"Replied\" whenever the agent responds to a ticket.\n",
+   "description": "When enabled, the ticket status will automatically change to the status selected below whenever the agent responds to a ticket.\n",
    "fieldname": "auto_update_status",
    "fieldtype": "Check",
    "label": "Auto update status"
@@ -289,7 +296,7 @@
    "default": "0",
    "fieldname": "auto_close_tickets",
    "fieldtype": "Check",
-   "label": "Automatically Close Replied Tickets"
+   "label": "Automatically Close Tickets when"
   },
   {
    "default": "14",
@@ -297,7 +304,7 @@
    "fieldname": "auto_close_after_days",
    "fieldtype": "Int",
    "label": "Auto-close after (Days)",
-   "mandatory_depends_on": "auto_close_tickets"
+   "mandatory_depends_on": "eval: doc.auto_close_tickets"
   },
   {
    "fieldname": "feedback_section",
@@ -309,17 +316,17 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "Closed",
+   "depends_on": "eval:doc.enable_email_ticket_feedback",
    "fieldname": "send_email_feedback_on_status",
-   "fieldtype": "Select",
-   "label": "On Ticket Status",
-   "length": 2,
+   "fieldtype": "Link",
+   "label": "Send feedback when",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Resolved\"]]",
    "mandatory_depends_on": "eval:doc.enable_email_ticket_feedback",
-   "options": "Resolved\nClosed"
+   "options": "HD Ticket Status"
   },
   {
-   "default": "1",
-   "description": "If enabled, feedback email will be sent to the customer when you mark a ticket as Resolved/Closed.\n",
+   "default": "0",
+   "description": "If enabled, feedback email will be sent to the customer when you mark a ticket as the status selected below.\n",
    "fieldname": "enable_email_ticket_feedback",
    "fieldtype": "Check",
    "label": "Enabled"
@@ -396,6 +403,53 @@
    "fieldname": "reply_from_agent_section",
    "fieldtype": "Section Break",
    "label": "Reply From Agent"
+  },
+  {
+   "depends_on": "eval:doc.auto_update_status",
+   "fieldname": "update_status_to",
+   "fieldtype": "Link",
+   "label": "Update status to",
+   "link_filters": "[]",
+   "mandatory_depends_on": "eval:doc.auto_update_status",
+   "options": "HD Ticket Status"
+  },
+  {
+   "fieldname": "status_section",
+   "fieldtype": "Section Break",
+   "label": "Status"
+  },
+  {
+   "description": "Status of the ticket, when it is created in the system.",
+   "fieldname": "default_ticket_status",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Default ticket status",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
+   "options": "HD Ticket Status",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_yfbu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Status of the ticket, when a customer replies on the ticket.",
+   "fieldname": "ticket_reopen_status",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Ticket Reopen status",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
+   "options": "HD Ticket Status",
+   "reqd": 1
+  },
+  {
+   "depends_on": "auto_close_tickets",
+   "fieldname": "auto_close_status",
+   "fieldtype": "Link",
+   "label": "Status ",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"in\",[\"Paused\",\"Resolved\",null]]]",
+   "mandatory_depends_on": "eval: doc.auto_close_tickets",
+   "options": "HD Ticket Status"
   }
  ],
  "grid_page_length": 50,
