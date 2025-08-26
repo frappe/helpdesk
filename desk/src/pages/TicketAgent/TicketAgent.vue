@@ -62,7 +62,7 @@
       </template>
     </LayoutHeader>
     <div class="h-full flex flex-1">
-      <div class="h-full">
+      <div class="flex-1">
         <!-- Tabs -->
         <TicketActivityPanel />
         <!-- Comm Area -->
@@ -77,7 +77,6 @@
 <script setup lang="ts">
 import { IndicatorIcon } from "@/components/icons";
 import LayoutHeader from "@/components/LayoutHeader.vue";
-import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import { useTicket } from "@/composables/useTicket";
