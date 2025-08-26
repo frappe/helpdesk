@@ -22,7 +22,9 @@
           <div class="text-xl font-medium">
             {{ contact?.full_name ?? "Unknown" }}
           </div>
-          <div class="text-sm text-ink-gray-5">{{ contact?.mobile_no }}</div>
+          <div class="text-sm text-ink-gray-5">
+            {{ contact?.mobile_no || contact?.phone }}
+          </div>
         </div>
         <CountUpTimer ref="counterUp">
           <div v-if="onCall" class="my-1 text-base">
@@ -203,6 +205,7 @@ const contact = ref({
   full_name: "",
   image: "",
   mobile_no: "",
+  phone: "",
 });
 
 watch(phoneNumber, (value) => {
