@@ -14,11 +14,12 @@
       class="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-5 py-2.5"
     >
       <span class="text-lg font-medium">Notifications</span>
-      <span>
+      <div>
         <Button
           theme="blue"
           variant="ghost"
           @click="() => notificationStore.clear.submit()"
+          v-if="notificationStore.data.length"
         >
           <template #icon>
             <LucideCheckCheck class="h-4 w-4" />
@@ -33,9 +34,9 @@
             <LucideX class="h-4 w-4" />
           </template>
         </Button>
-      </span>
+      </div>
     </div>
-    <div class="divide-y text-base">
+    <div class="divide-y text-base" v-if="notificationStore.data.length">
       <RouterLink
         v-for="n in notificationStore.data"
         :key="n.name"
@@ -75,17 +76,24 @@
         </span>
       </RouterLink>
     </div>
+    <div
+      class="p-5 text-center text-gray-500 flex flex-col items-center justify-center gap-2 mt-20"
+      v-else
+    >
+      <LucideBell class="size-6" />
+      <p class="text-base text-ink-gray-8">You are all caught up!</p>
+    </div>
   </span>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { onClickOutside } from "@vueuse/core";
-import { dayjs } from "@/dayjs";
-import { Notification } from "@/types";
-import { useSidebarStore } from "@/stores/sidebar";
-import { useNotificationStore } from "@/stores/notification";
 import { UserAvatar } from "@/components";
+import { dayjs } from "@/dayjs";
+import { useNotificationStore } from "@/stores/notification";
+import { useSidebarStore } from "@/stores/sidebar";
+import { Notification } from "@/types";
+import { onClickOutside } from "@vueuse/core";
+import { ref } from "vue";
 
 const notificationStore = useNotificationStore();
 const sidebarStore = useSidebarStore();
