@@ -33,12 +33,12 @@
                     "
                   />
                 </template>
-                <template #suffix>
+                <!-- <template #suffix>
                   <FeatherIcon
                     :name="open ? 'chevron-up' : 'chevron-down'"
                     class="h-4"
                   />
-                </template>
+                </template> -->
               </Button>
             </template>
           </Dropdown>
@@ -61,11 +61,12 @@
         <!-- <MultipleAvatar :avatars="assignedAgents" size="sm" /> -->
       </template>
     </LayoutHeader>
-    <div class="h-full flex flex-1">
-      <div class="flex-1">
+    <div class="h-full flex overflow-hidden">
+      <div class="flex-1 flex flex-col">
         <!-- Tabs -->
-        <TicketActivityPanel />
+        <TicketActivityPanel v-model="ticket" />
         <!-- Comm Area -->
+        <CommunicationArea ref="communicationAreaRef" v-model="ticket.doc" />
       </div>
 
       <!-- Sidebar with Resizer -->
@@ -75,8 +76,10 @@
 </template>
 
 <script setup lang="ts">
+import CommunicationArea from "@/components/CommunicationArea.vue";
 import { IndicatorIcon } from "@/components/icons";
 import LayoutHeader from "@/components/LayoutHeader.vue";
+import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import { useTicket } from "@/composables/useTicket";
