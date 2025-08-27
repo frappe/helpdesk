@@ -547,7 +547,6 @@ def get_ticket_trend_data(
             "to_date": to_date,
         },
         as_dict=1,
-        debug=1,
     )
     avg_tickets = get_avg_tickets_per_day(from_date, to_date, conds)
     subtitle = f"Average tickets per day is around {avg_tickets:.0f}"
