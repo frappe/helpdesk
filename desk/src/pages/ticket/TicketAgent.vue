@@ -388,7 +388,6 @@ const activities = computed(() => {
 
 function filterActivities(eventType: TicketTab) {
   if (eventType === "activity") {
-    console.log(activities.value);
     return activities.value;
   }
   return activities.value.filter((activity) => activity.type === eventType);
