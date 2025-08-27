@@ -35,7 +35,7 @@
       <!-- Resolution by -->
       <div class="flex items-center gap-1">
         <span>Resolution </span>
-        <Badge label="Due in 3d 2h" class="text-[#4F3DA1] bg-[#EEE8FF]" />
+        <Badge label="Due in 3d 2h" class="!text-[#4F3DA1] !bg-[#EEE8FF]" />
       </div>
     </div>
   </teleport>

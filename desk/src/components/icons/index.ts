@@ -3,6 +3,7 @@ export { default as AscendingIcon } from "./AscendingIcon.vue";
 export { default as AttachmentIcon } from "./AttachmentIcon.vue";
 export { default as ColumnsIcon } from "./ColumnsIcon.vue";
 export { default as CommentIcon } from "./CommentIcon.vue";
+export { default as CopyIcon } from "./CopyIcon.vue";
 export { default as DescendingIcon } from "./DescendingIcon.vue";
 export { default as DetailsIcon } from "./DetailsIcon.vue";
 export { default as DotIcon } from "./DotIcon.vue";
