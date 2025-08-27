@@ -95,8 +95,8 @@
         variant="solid"
         :label="__('Update')"
         :disabled="!dirty"
-        :loading="updateAgent.loading"
-        @click="updateAgent.submit()"
+        :loading="updateAgent.loading || updateUser.loading"
+        @click="updateProfile()"
       />
     </div>
   </div>
@@ -138,7 +138,6 @@ const userResource = createResource({
     if (!agentData.agent_name) {
       const userData = await call("frappe.client.get_value", {
         doctype: "User",
-        name: authStore.user,
         fieldname: [
           "first_name",
           "last_name",
@@ -146,6 +145,7 @@ const userResource = createResource({
           "full_name",
           "email",
         ],
+        filters: { name: authStore.user },
       });
       profile.value = {
         ...userData,
@@ -215,6 +215,37 @@ const updateUser = createResource({
 
 function updateImage(fileUrl = "") {
   profile.value.user_image = fileUrl;
+}
+
+async function updateProfile() {
+  try {
+    const agentExists = await checkAgentExists();
+    if (agentExists) {
+      updateAgent.submit();
+    } else {
+      updateUser.submit().then(() => {
+        error.value = "";
+        toast.success("Profile updated successfully");
+        authStore.reloadUser();
+      });
+    }
+  } catch (err) {
+    error.value = err.message || "Failed to update profile";
+  }
+}
+
+async function checkAgentExists() {
+  try {
+    const res = await call("frappe.client.get_value", {
+      doctype: "HD Agent",
+      fieldname: "name",
+      filters: { name: authStore.user },
+    });
+    return res && res.name ? true : false;
+  } catch (err) {
+    console.log("Error checking agent existence:", err);
+    return false;
+  }
 }
 
 watch(
