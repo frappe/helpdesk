@@ -5,22 +5,35 @@
         <Breadcrumbs :items="breadcrumbs" class="-ml-0.5" />
       </template>
       <template #right-header>
-        <Button
-          label="Create"
-          theme="gray"
-          variant="solid"
-          @click="
-            () => {
-              title = null;
-              message = null;
-              showNewDialog = true;
-            }
-          "
-        >
-          <template #prefix>
-            <LucidePlus class="h-4 w-4" />
-          </template>
-        </Button>
+        <div class="flex items-center gap-2">
+          <TextInput
+            v-model="searchQuery"
+            type="text"
+            :placeholder="'Search responses by title...'"
+            class="input input-bordered h-8 px-2 text-sm"
+            style="min-width: 400px"
+          >
+            <template #prefix>
+              <FeatherIcon name="search" class="h-4 w-4 text-gray-500 ml-2" />
+            </template>
+          </TextInput>
+          <Button
+            label="Create"
+            theme="gray"
+            variant="solid"
+            @click="
+              () => {
+                title = null;
+                message = null;
+                showNewDialog = true;
+              }
+            "
+          >
+            <template #prefix>
+              <LucidePlus class="h-4 w-4" />
+            </template>
+          </Button>
+        </div>
       </template>
     </LayoutHeader>
     <div class="flex-1 overflow-y-auto">
@@ -126,7 +139,7 @@ import {
   createListResource,
   usePageMeta,
 } from "frappe-ui";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import EmptyState from "../components/EmptyState.vue";
 
@@ -142,12 +155,22 @@ const message = ref(null);
 const name = ref(null);
 const isNew = route.hash.split("#")[1] === "new";
 const showNewDialog = ref(isNew || false);
+const searchQuery = ref("");
 
 const cannedResponses = createListResource({
   doctype: "HD Canned Response",
   fields: ["name", "title", "message", "owner", "modified"],
   auto: true,
+  filters: {},
   orderBy: "modified desc",
+});
+
+// reload responses when search query changes
+watch(searchQuery, (newValue) => {
+  cannedResponses.update({
+    filters: newValue ? { title: ["like", `%${newValue}%`] } : {},
+  });
+  cannedResponses.reload();
 });
 
 function editItem(cannedResponse) {
