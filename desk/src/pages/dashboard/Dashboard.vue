@@ -13,21 +13,21 @@
         <Dropdown
           v-if="!showDatePicker"
           :options="options"
-          class="form-control !w-48"
+          class="!form-control !w-48"
           v-model="preset"
           placeholder="Select Range"
           @change="filters.period = preset"
-          :button="{
-            label: preset,
-            class:
-              '!w-full justify-start [&>span]:mr-auto [&>svg]:text-ink-gray-5 ',
-            variant: 'ghost',
-            iconRight: 'chevron-down',
-            iconLeft: 'calendar',
-          }"
         >
-          <template #prefix>
-            <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
+          <template #default>
+            <div
+              class="flex justify-between !w-48 items-center border border-outline-gray-2 rounded text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
+            >
+              <div class="flex items-center">
+                <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
+                <span class="text-base">{{ preset }}</span>
+              </div>
+              <LucideChevronDown class="size-4 text-ink-gray-5" />
+            </div>
           </template>
         </Dropdown>
         <DateRangePicker
