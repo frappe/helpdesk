@@ -7,7 +7,7 @@
     />
     <div class="flex-1">
       <TicketDetailsTab v-if="currentTab === 'details'" :ticket-id="ticketId" />
-      <TicketContactTab v-else />
+      <TicketContactTab v-else :ticket-id="ticketId" />
     </div>
   </Resizer>
 </template>
@@ -27,7 +27,7 @@ const props = defineProps({
 });
 const ticket = useTicket(props.ticketId);
 
-const currentTab = ref("details");
+const currentTab = ref("contact");
 const tabs = [
   {
     label: "Details",
