@@ -34,7 +34,10 @@
       >
         <template #header="{ opened, hide, toggle }">
           <div class="flex gap-2.5 items-center py-[13px] justify-between">
-            <span class="text-ink-gray-8 font-medium text-base">
+            <span
+              class="text-ink-gray-8 font-medium text-base cursor-pointer select-none"
+              @click="toggle"
+            >
               Recent Tickets
             </span>
             <LucideChevronDown
@@ -115,7 +118,7 @@ const recentTickets = [
   {
     name: "TCK-0003",
     subject: "Feature request for dark mode",
-    status: "Awaiting Approval",
+    status: "Open",
     created: "Jun 10, 2024",
   },
 ];
