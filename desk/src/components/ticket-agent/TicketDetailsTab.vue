@@ -61,16 +61,11 @@
 </template>
 
 <script setup lang="ts">
-import { useTicket } from "@/composables/useTicket";
+import { TicketSymbol } from "@/types";
+import { inject } from "vue";
 import TicketContact from "./TicketContact.vue";
 
-const props = defineProps({
-  ticketId: {
-    type: String,
-    required: true,
-  },
-});
-const ticket = useTicket(props.ticketId);
+const ticket = inject(TicketSymbol);
 </script>
 
 <style scoped>

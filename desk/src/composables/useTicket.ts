@@ -3,6 +3,7 @@ import { HDTicket } from "@/types/doctypes";
 import { createDocumentResource } from "frappe-ui";
 
 const ticketMap: Record<string, DocumentResource<HDTicket>> = {};
+const assigneeMap = {};
 
 export const useTicket = (ticketId: string): DocumentResource<HDTicket> => {
   if (!ticketMap[ticketId]) {
