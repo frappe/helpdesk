@@ -42,8 +42,10 @@ website_route_rules = [
 ]
 
 user_invitation = {
-    "only_for": ["Agent Manager", "System Manager"],
-    "allowed_roles": ["Agent", "Agent Manager", "System Manager"],
+    "allowed_roles": {
+        "Agent Manager": ["Agent", "Agent Manager"],
+        "System Manager": ["Agent", "Agent Manager", "System Manager"],
+    },
     "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
 }
 

@@ -527,8 +527,10 @@ def get_ticket_trend_data(
     from_date, to_date, conds="", open_statuses=None, resolved_statuses=None
 ):
     """
-    Trend data for tickets in the dashboard. Ticket treand +SLA fulfilled
+    Trend data for tickets in the dashboard. Ticket trend +SLA fulfilled
     """
+    if len(open_statuses) == 1:
+        open_statuses = f"('{open_statuses[0]}')"
     result = frappe.db.sql(
         f"""
             SELECT 

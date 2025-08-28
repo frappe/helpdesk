@@ -98,17 +98,12 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { FormControl, Button, Tooltip, createResource, toast } from "frappe-ui";
-import { computed, onMounted, ref } from "vue";
-// @ts-expect-error: no declaration file
+import { computed, ref } from "vue";
 import { useOnboarding } from "frappe-ui/frappe";
 import SettingsLayoutHeader from "./SettingsLayoutHeader.vue";
-import { useUserStore } from "@/stores/user";
 
 const authStore = useAuthStore();
 const { isAdmin, isManager } = authStore;
-
-const userStore = useUserStore();
-const { users } = userStore;
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 
@@ -167,42 +162,16 @@ const roleDescription = computed(
 );
 
 const onSubmit = async () => {
-  const emailList: string[] = [];
-  const existingUsers: string[] = [];
-  type User = Record<"email" | "role", string>;
-  for (const email of emails.value.split(",")) {
-    const trimmedEmail = email.trim();
-    if (trimmedEmail === "") {
-      continue;
-    }
-    const user: User | undefined = users.data.find(
-      (user: User) => user.email === trimmedEmail
-    );
-    if (
-      user === undefined ||
-      (user.role !== "Agent" && user.role !== "Manager")
-    ) {
-      emailList.push(email);
-    } else {
-      existingUsers.push(trimmedEmail);
-    }
-  }
-  if (emailList.length === 0 && existingUsers.length === 0) {
+  if (emails.value.trim() === "") {
     toast.error("At least one email required");
-    return;
   }
-  if (emailList.length > 0) {
-    await inviteByEmailResource.submit({
-      emails: emailList.join(","),
-      roles: getInviteByEmailRoles(role.value),
-      redirect_to_path: "/helpdesk",
-      app_name: "helpdesk",
-    });
-  }
+  await inviteByEmailResource.submit({
+    emails: emails.value,
+    roles: getInviteByEmailRoles(role.value),
+    redirect_to_path: "/helpdesk",
+    app_name: "helpdesk",
+  });
   resetInputValues();
-  if (existingUsers.length > 0) {
-    toast.info(`${emailsToStr(existingUsers)} already present`);
-  }
 };
 
 const resetInputValues = () => {
@@ -216,7 +185,10 @@ const inviteByEmailResource = createResource({
   url: "frappe.core.api.user_invitation.invite_by_email",
   onSuccess(
     data: Record<
-      "accepted_invite_emails" | "pending_invite_emails" | "invited_emails",
+      | "disabled_user_emails"
+      | "accepted_invite_emails"
+      | "pending_invite_emails"
+      | "invited_emails",
       string[]
     >
   ) {
@@ -224,6 +196,10 @@ const inviteByEmailResource = createResource({
     let emailsStr = emailsToStr(data.invited_emails);
     if (emailsStr.trim() !== "") {
       toast.success(`${emailsStr} invited successfully`);
+    }
+    emailsStr = emailsToStr(data.disabled_user_emails);
+    if (emailsStr.trim() !== "") {
+      toast.info(`${emailsStr} already present and disabled`);
     }
     emailsStr = emailsToStr(data.pending_invite_emails);
     if (emailsStr.trim() !== "") {
