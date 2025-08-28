@@ -96,6 +96,7 @@
                 :doctype="'HD Ticket'"
                 :placeholder="'Ticket'"
                 label="Ticket"
+                :show-description="true"
                 @change="(data) => (callLog.ticket = String(data))"
               />
             </div>
