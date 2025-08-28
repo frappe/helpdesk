@@ -17,6 +17,8 @@ import Briefcase from "~icons/lucide/briefcase";
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
 import { FieldDependencyIcon } from "@/components/icons";
+import Telephony from "./Telephony/Telephony.vue";
+import LucidePhone from "~icons/lucide/phone";
 
 export const tabs = [
   {
@@ -63,6 +65,11 @@ export const tabs = [
     label: "Field Dependencies",
     icon: markRaw(FieldDependencyIcon),
     component: markRaw(FieldDependencyConfig),
+  },
+  {
+    label: "Telephony",
+    icon: markRaw(LucidePhone),
+    component: markRaw(Telephony),
   },
 ];
 

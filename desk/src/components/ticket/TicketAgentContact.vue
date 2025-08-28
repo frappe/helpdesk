@@ -3,11 +3,18 @@
     <Avatar size="3xl" :image="contact.image" :label="contact.name" />
     <div class="flex items-center justify-between flex-1">
       <Tooltip :text="contact.name">
-        <div class="w-[242px] truncate text-2xl font-medium">
+        <div class="w-full truncate text-2xl font-medium">
           {{ contact.name }}
         </div>
       </Tooltip>
       <div class="flex gap-1.5">
+        <Tooltip :text="`Call ${contact.name}`" v-if="isCallingEnabled">
+          <Button class="h-7 w-7">
+            <template #icon>
+              <FeatherIcon name="phone" class="h-4 w-4" @click="callContact" />
+            </template>
+          </Button>
+        </Tooltip>
         <Tooltip :text="contact.email_id">
           <Button class="h-7 w-7">
             <template #icon>
@@ -42,15 +49,35 @@
 
 <script setup lang="ts">
 import { EmailIcon } from "@/components/icons/";
-import { Avatar, Tooltip } from "frappe-ui";
+import { useTelephonyStore } from "@/stores/telephony";
+import { Avatar, toast, Tooltip, Button, FeatherIcon } from "frappe-ui";
+import { storeToRefs } from "pinia";
+
+const telephonyStore = useTelephonyStore();
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const props = defineProps({
   contact: {
     type: Object,
     required: true,
   },
+  ticketId: {
+    type: String,
+    required: true,
+  },
 });
 
+const callContact = () => {
+  if (!props.contact.phone && !props.contact.mobile_no) {
+    toast.error("Phone number not found for this contact");
+    return;
+  }
+  telephonyStore.makeCall({
+    number: props.contact.mobile_no || props.contact.phone,
+    doctype: "HD Ticket",
+    docname: props.ticketId,
+  });
+};
 const emit = defineEmits(["email:open"]);
 
 function openEmailBox() {

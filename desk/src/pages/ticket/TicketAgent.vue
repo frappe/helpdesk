@@ -52,6 +52,7 @@
             </Button>
           </template>
         </Dropdown>
+        <CallUI :userEmail="getUser().email" />
       </template>
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-full overflow-hidden">
@@ -178,6 +179,12 @@ import { TabObject, TicketTab, View } from "@/types";
 import { getIcon } from "@/utils";
 import { ComputedRef } from "vue";
 import { showAssignmentModal } from "./modalStates";
+import CallUI from "@/components/telephony/CallUI.vue";
+import LucidePhone from "~icons/lucide/phone";
+import { useTelephonyStore } from "@/stores/telephony";
+import { storeToRefs } from "pinia";
+import { useActiveTabManager } from "@/composables/useActiveTabManager";
+
 import { HDTicketStatus } from "@/types/doctypes";
 const route = useRoute();
 const router = useRouter();
@@ -189,7 +196,8 @@ const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const renameSubject = ref("");
 const isLoading = ref(false);
-
+const telephonyStore = useTelephonyStore();
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 const props = defineProps({
   ticketId: {
     type: String,
@@ -206,6 +214,14 @@ watch(
 const { findView } = useView("HD Ticket");
 
 provide("communicationArea", communicationAreaRef);
+provide("makeCall", () => {
+  telephonyStore.makeCall({
+    number: ticket.data?.contact?.phone || ticket.data?.contact?.mobile_no,
+    doctype: "HD Ticket",
+    docname: props.ticketId,
+  });
+});
+provide("ticketId", props.ticketId);
 
 const showSubjectDialog = ref(false);
 
@@ -240,6 +256,10 @@ const ticket = createResource({
     });
   },
 });
+
+provide("refreshTicket", () => ticket.reload());
+provide("onCallEnded", () => ticket.reload());
+
 function updateField(name: string, value: string, callback = () => {}) {
   updateTicket(name, value);
   callback();
@@ -293,24 +313,36 @@ const dropdownOptions = computed(() =>
 //   { deep: true }
 // );
 
-const tabIndex = ref(0);
-const tabs: TabObject[] = [
-  {
-    name: "activity",
-    label: "Activity",
-    icon: ActivityIcon,
-  },
-  {
-    name: "email",
-    label: "Emails",
-    icon: EmailIcon,
-  },
-  {
-    name: "comment",
-    label: "Comments",
-    icon: CommentIcon,
-  },
-];
+const tabs: TabObject[] = computed(() => {
+  const _tabs = [
+    {
+      name: "activity",
+      label: "Activity",
+      icon: ActivityIcon,
+    },
+    {
+      name: "email",
+      label: "Emails",
+      icon: EmailIcon,
+    },
+    {
+      name: "comment",
+      label: "Comments",
+      icon: CommentIcon,
+    },
+  ];
+
+  if (isCallingEnabled.value) {
+    _tabs.push({
+      name: "call",
+      label: "Calls",
+      icon: LucidePhone,
+    });
+  }
+  return _tabs;
+});
+
+const { tabIndex } = useActiveTabManager(tabs, "lastTicketTab");
 
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email, idx: number) => {
@@ -356,9 +388,26 @@ const activities = computed(() => {
     }
   );
 
-  const sorted = [...emailProps, ...commentProps, ...historyProps].sort(
-    (a, b) => new Date(a.creation) - new Date(b.creation)
-  );
+  const callProps = ticket.data.calls.map((call) => {
+    return {
+      ...call,
+      type: "call",
+      name: call.name,
+      key: call.creation,
+      call_type: call.type,
+      content: `${call.caller || "Unknown"} made a call to ${
+        call.receiver || "Unknown"
+      }`,
+      duration: call.duration ? call.duration + "s" : "0s",
+    };
+  });
+
+  const sorted = [
+    ...emailProps,
+    ...commentProps,
+    ...historyProps,
+    ...callProps,
+  ].sort((a, b) => new Date(a.creation) - new Date(b.creation));
 
   const data = [];
   let i = 0;

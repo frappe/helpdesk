@@ -7,8 +7,10 @@
     </div>
     <header id="app-header" class="w-full"></header>
   </div>
+  <CallUI class="mr-3 mt-2" />
 </template>
 
 <script setup>
 import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
+import CallUI from "../telephony/CallUI.vue";
 </script>

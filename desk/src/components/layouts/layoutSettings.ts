@@ -1,6 +1,7 @@
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
+import LucidePhone from "~icons/lucide/phone";
 import LucideTicket from "~icons/lucide/ticket";
 import { OrganizationsIcon } from "../icons";
 
@@ -29,6 +30,11 @@ export const agentPortalSidebarOptions = [
     label: "Contacts",
     icon: LucideContact2,
     to: "ContactList",
+  },
+  {
+    label: "Call Logs",
+    icon: LucidePhone,
+    to: "CallLogs",
   },
 ];
 
