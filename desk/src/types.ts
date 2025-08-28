@@ -1,4 +1,5 @@
-import { Component } from "vue";
+import { Component, ComputedRef, InjectionKey } from "vue";
+import { useTicket } from "./composables/useTicket";
 
 export interface Resource<T = unknown> {
   auto: boolean;
@@ -425,3 +426,7 @@ export interface DocumentResource<T = unknown> {
   // Dynamic whitelisted methods
   [methodName: string]: any;
 }
+
+export const TicketSymbol: InjectionKey<
+  ComputedRef<ReturnType<typeof useTicket>>
+> = Symbol("ticket");

@@ -73,23 +73,19 @@
 </template>
 
 <script setup lang="ts">
-import { useTicket } from "@/composables/useTicket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
+import { TicketSymbol } from "@/types";
 import { Avatar } from "frappe-ui";
+import { inject } from "vue";
 import { CopyIcon } from "../icons";
 import EmailIcon from "../icons/EmailIcon.vue";
 import Section from "../Section.vue";
-const props = defineProps({
-  ticketId: {
-    type: String,
-    required: true,
-  },
-});
-const ticket = useTicket(props.ticketId);
+
+const ticket = inject(TicketSymbol);
 
 const { getUser } = useUserStore();
-const user = getUser(ticket?.doc.contact);
+const user = getUser(ticket.value.doc.contact);
 const { getStatus, colorMap } = useTicketStatusStore();
 
 function getStatusColor(status: string) {

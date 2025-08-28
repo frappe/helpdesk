@@ -97,13 +97,14 @@ import { CommentIcon, EmailIcon } from "@/components/icons/";
 import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
-import { ref, watch } from "vue";
+import { TicketSymbol } from "@/types";
+import { inject, ref, watch } from "vue";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
-const doc = defineModel();
 const { isMac } = useDevice();
 const { isMobileView } = useScreenSize();
+let doc = inject(TicketSymbol).value.doc;
 
 const emailEditorRef = ref(null);
 const commentTextEditorRef = ref(null);

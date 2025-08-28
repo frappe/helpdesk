@@ -12,15 +12,17 @@
               />
             </template>
           </Breadcrumbs>
-          <TicketSLA :ticket-id="ticketId" />
+          <TicketSLA />
         </div>
       </template>
       <template #right-header>
         <div class="flex gap-2 items-center">
-          <Avatar label="Ritvik Sardana" size="sm" />
+          <Avatar label="Ritvik Sardana" size="md" />
           <!--  -->
-          <LucideChevronLeft class="size-4 cursor-pointer" />
-          <LucideChevronRight class="size-4 cursor-pointer" />
+          <div class="flex gap-1">
+            <Button :icon="LucideChevronLeft" variant="ghost" />
+            <Button :icon="LucideChevronRight" variant="ghost" />
+          </div>
           <!--  -->
           <Dropdown :options="statusDropdown" placement="right">
             <template #default="{ open }">
@@ -33,12 +35,6 @@
                     "
                   />
                 </template>
-                <!-- <template #suffix>
-                  <FeatherIcon
-                    :name="open ? 'chevron-up' : 'chevron-down'"
-                    class="h-4"
-                  />
-                </template> -->
               </Button>
             </template>
           </Dropdown>
@@ -64,13 +60,13 @@
     <div class="h-full flex overflow-hidden">
       <div class="flex-1 flex flex-col">
         <!-- Tabs -->
-        <TicketActivityPanel v-model="ticket" />
+        <TicketActivityPanel />
         <!-- Comm Area -->
-        <CommunicationArea ref="communicationAreaRef" v-model="ticket.doc" />
+        <CommunicationArea ref="communicationAreaRef" />
       </div>
 
       <!-- Sidebar with Resizer -->
-      <TicketSidebar :ticket-id="ticketId" />
+      <TicketSidebar />
     </div>
   </div>
 </template>
@@ -85,12 +81,15 @@ import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import { useTicket } from "@/composables/useTicket";
 import { useView } from "@/composables/useView";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { View } from "@/types";
+import { TicketSymbol, View } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
 import { Avatar, Breadcrumbs, Dropdown, toast } from "frappe-ui";
-import { computed, ComputedRef, h } from "vue";
+import { computed, ComputedRef, h, provide } from "vue";
 import { useRoute, useRouter } from "vue-router";
+
+import LucideChevronLeft from "~icons/lucide/chevron-left";
+import LucideChevronRight from "~icons/lucide/chevron-right";
 
 const props = defineProps({
   ticketId: {
@@ -103,6 +102,11 @@ const route = useRoute();
 const router = useRouter();
 
 const ticket = useTicket(props.ticketId);
+provide(
+  TicketSymbol,
+  computed(() => ticket)
+);
+
 const ticketStatusStore = useTicketStatusStore();
 const { findView } = useView("HD Ticket");
 

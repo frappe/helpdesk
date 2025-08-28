@@ -13,12 +13,12 @@
 
 <script setup lang="ts">
 import { ActivityIcon, CommentIcon, EmailIcon } from "@/components/icons";
-import { TabObject } from "@/types";
+import { TabObject, TicketSymbol } from "@/types";
 import { TabList, TabPanel, Tabs } from "frappe-ui";
-import { ref } from "vue";
+import { inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
 
-const ticket = defineModel();
+const ticket = inject(TicketSymbol);
 
 const tabIndex = ref(0);
 const tabs: TabObject[] = [
