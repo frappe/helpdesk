@@ -230,7 +230,7 @@ class HDServiceLevelAgreement(Document):
             doc.resolution_by = None
             doc.resolution_time = None
             doc.on_hold_since = now_datetime()
-        else:
+        elif not is_paused and was_paused:
             doc.on_hold_since = None
         if is_paused or not paused_since:
             return

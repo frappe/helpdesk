@@ -32,7 +32,7 @@
         >
           Assign
         </button>
-        <Dropdown :options="dropdownOptions">
+        <Dropdown :options="dropdownOptions" placement="right">
           <template #default="{ open }">
             <Button :label="ticket.data.status">
               <template #prefix>
