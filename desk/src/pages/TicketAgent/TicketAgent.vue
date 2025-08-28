@@ -180,6 +180,11 @@ const statusDropdown = computed(() =>
 );
 
 const currentViewers = ref<string[]>([]);
+const handleBeforeUnload = () => {
+  // This will attempt to send the message, but may not always work
+  // due to browser limitations on beforeunload
+  $socket.emit("stop_view_ticket", props.ticketId);
+};
 onMounted(() => {
   // Listen for viewer updates
   $socket.on("ticket_viewers", (data) => {
@@ -190,6 +195,8 @@ onMounted(() => {
       );
       currentViewers.value = viewers.length ? viewers : [];
     }
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
   });
 
   // Start viewing the ticket
@@ -197,6 +204,7 @@ onMounted(() => {
 });
 onUnmounted(() => {
   // Stop viewing the ticket
+  window.removeEventListener("beforeunload", handleBeforeUnload);
   $socket.emit("stop_view_ticket", props.ticketId);
 });
 </script>
