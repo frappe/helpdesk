@@ -17,11 +17,19 @@
       </template>
       <template #right-header>
         <div class="flex gap-2 items-center">
-          <Avatar label="Ritvik Sardana" size="md" />
+          <MultipleAvatar
+            :avatars="JSON.stringify(currentViewers)"
+            size="md"
+            :hide-name="true"
+          />
           <!--  -->
           <div class="flex gap-1">
             <Button :icon="LucideChevronLeft" variant="ghost" />
-            <Button :icon="LucideChevronRight" variant="ghost" />
+            <Button
+              :icon="LucideChevronRight"
+              variant="ghost"
+              @click="$socket.emit('fire')"
+            />
           </div>
           <!--  -->
           <Dropdown :options="statusDropdown" placement="right">
@@ -62,7 +70,7 @@
         <!-- Tabs -->
         <TicketActivityPanel />
         <!-- Comm Area -->
-        <CommunicationArea ref="communicationAreaRef" />
+        <!-- <CommunicationArea ref="communicationAreaRef" /> -->
       </div>
 
       <!-- Sidebar with Resizer -->
@@ -72,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import CommunicationArea from "@/components/CommunicationArea.vue";
+import { MultipleAvatar } from "@/components";
 import { IndicatorIcon } from "@/components/icons";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";
@@ -80,12 +88,22 @@ import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import { useTicket } from "@/composables/useTicket";
 import { useView } from "@/composables/useView";
+import { useAuthStore } from "@/stores/auth";
+import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { TicketSymbol, View } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
-import { Avatar, Breadcrumbs, Dropdown, toast } from "frappe-ui";
-import { computed, ComputedRef, h, provide } from "vue";
+import { Breadcrumbs, Dropdown, toast } from "frappe-ui";
+import {
+  computed,
+  ComputedRef,
+  h,
+  onMounted,
+  onUnmounted,
+  provide,
+  ref,
+} from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import LucideChevronLeft from "~icons/lucide/chevron-left";
@@ -100,6 +118,8 @@ const props = defineProps({
 
 const route = useRoute();
 const router = useRouter();
+const { $socket } = globalStore();
+const { userId } = useAuthStore();
 
 const ticket = useTicket(props.ticketId);
 provide(
@@ -111,10 +131,11 @@ const ticketStatusStore = useTicketStatusStore();
 const { findView } = useView("HD Ticket");
 
 const assignedAgents = computed(() => {
-  if (ticket.doc?.assigned_to) {
-    return JSON.stringify([ticket.doc?.assigned_to]);
-  }
-  return JSON.stringify([]);
+  return [];
+  // if (ticket.doc?.assigned_to) {
+  //   return JSON.stringify([ticket.doc?.assigned_to]);
+  // }
+  // return JSON.stringify([]);
 });
 
 const breadcrumbs = computed(() => {
@@ -157,6 +178,27 @@ const statusDropdown = computed(() =>
       }),
   }))
 );
+
+const currentViewers = ref<string[]>([]);
+onMounted(() => {
+  // Listen for viewer updates
+  $socket.on("ticket_viewers", (data) => {
+    console.log("Received ticket viewers:", data);
+    if (data.ticket_id === props.ticketId) {
+      const viewers = JSON.parse(data.users).filter(
+        (u: string) => u !== userId
+      );
+      currentViewers.value = viewers.length ? viewers : [];
+    }
+  });
+
+  // Start viewing the ticket
+  $socket.emit("view_ticket", props.ticketId);
+});
+onUnmounted(() => {
+  // Stop viewing the ticket
+  $socket.emit("stop_view_ticket", props.ticketId);
+});
 </script>
 
 <style>
