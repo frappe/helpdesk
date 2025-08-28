@@ -11,7 +11,7 @@
     v-else-if="filter.type === 'Select'"
     class="form-control cursor-pointer [&_select]:cursor-pointer w-44"
     type="select"
-    :value="props.value"
+    :model-value="props.value"
     :options="filter.options"
     :placeholder="filter.label"
     @change.stop="updateFilter(filter, $event.target.value)"
