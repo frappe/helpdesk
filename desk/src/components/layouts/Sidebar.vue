@@ -492,7 +492,6 @@ const steps = [
     completed: false,
     icon: markRaw(InviteCustomer),
     onClick: () => {
-      console.log("clicked");
       minimize.value = true;
       currentStep.value = {
         title: "Create & invite a contact",

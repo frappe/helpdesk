@@ -138,6 +138,7 @@ export interface Field {
   display_via_depends_on?: string;
   mandatory_via_depends_on?: string;
   disabled?: boolean;
+  placeholder?: string | null;
 }
 
 export type FieldValue = string | number | boolean;
