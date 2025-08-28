@@ -24,9 +24,9 @@
   "apply_sla_for_resolution",
   "priorities",
   "status_details",
-  "sla_fulfilled_on",
-  "column_break_22",
-  "pause_sla_on",
+  "default_ticket_status",
+  "column_break_baqo",
+  "ticket_reopen_status",
   "support_and_resolution_section_break",
   "holiday_list",
   "support_and_resolution"
@@ -110,12 +110,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "pause_sla_on",
-   "fieldtype": "Table",
-   "label": "SLA Paused On",
-   "options": "HD Pause Service Level Agreement On Status"
-  },
-  {
    "default": "1",
    "fieldname": "enabled",
    "fieldtype": "Check",
@@ -125,13 +119,6 @@
    "fieldname": "status_details",
    "fieldtype": "Section Break",
    "label": "Status Details"
-  },
-  {
-   "fieldname": "sla_fulfilled_on",
-   "fieldtype": "Table",
-   "label": "SLA Fulfilled On",
-   "options": "HD Service Level Agreement Fulfilled On Status",
-   "reqd": 1
   },
   {
    "default": "1",
@@ -158,10 +145,6 @@
    "options": "PythonExpression"
   },
   {
-   "fieldname": "column_break_22",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "description",
    "fieldtype": "Data",
    "label": "Description"
@@ -173,10 +156,30 @@
    "fieldtype": "Code",
    "label": "Condition",
    "max_height": "1rem"
+  },
+  {
+   "fieldname": "column_break_baqo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Status of the ticket, when a customer replies on the ticket with this SLA.\n\nIf not selected, the value will be takes from HD Settings DocType.",
+   "fieldname": "ticket_reopen_status",
+   "fieldtype": "Link",
+   "label": "Ticket Reopen status",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
+   "options": "HD Ticket Status"
+  },
+  {
+   "description": "Status of the ticket, when it is created in the system with this SLA.\nIf not selected, the value will be taken from HD Settings DocType",
+   "fieldname": "default_ticket_status",
+   "fieldtype": "Link",
+   "label": "Default Ticket Status",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
+   "options": "HD Ticket Status"
   }
  ],
  "links": [],
- "modified": "2025-07-29 17:39:19.665610",
+ "modified": "2025-08-23 12:29:41.399804",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Service Level Agreement",

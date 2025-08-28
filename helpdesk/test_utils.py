@@ -175,3 +175,18 @@ def create_field_dependency():
     create_update_field_dependency(
         parent_field, child_field, mapping, enabled, fields_criteria
     )
+
+
+def make_status(name: str = "Test Status", category: str = "Open"):
+    if frappe.db.exists("HD Ticket Status", name):
+        return frappe.get_doc("HD Ticket Status", name)
+
+    doc = frappe.get_doc(
+        {
+            "doctype": "HD Ticket Status",
+            "label_agent": name,
+            "category": category,
+            "is_default": 0,
+        }
+    )
+    return doc.insert(ignore_if_duplicate=True)

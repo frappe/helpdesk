@@ -34,7 +34,7 @@
     <div class="mb-4" v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
-        class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400 left-1"
+        class="absolute size-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400 left-1"
         theme="gray"
         variant="solid"
       />
@@ -168,7 +168,6 @@ import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
 import Apps from "@/components/Apps.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
-import { showNewAgentsDialog } from "@/components/Settings/agents";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useDevice } from "@/composables";
@@ -199,7 +198,7 @@ import {
 
 import HelpIcon from "frappe-ui/frappe/Icons/HelpIcon.vue";
 import { storeToRefs } from "pinia";
-import { computed, h, markRaw, onMounted, onUnmounted, ref } from "vue";
+import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   agentPortalSidebarOptions,

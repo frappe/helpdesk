@@ -74,7 +74,6 @@ import {
   Button,
   createResource,
   Dialog,
-  Dropdown,
   FormControl,
   Select,
   Switch,
@@ -134,8 +133,8 @@ const dropdownOptions = [
     icon: "copy",
   },
   ...ConfirmDelete({
+    onConfirmDelete: () => deleteAssignmentRule(),
     isConfirmingDelete,
-    onConfirmDelete: deleteAssignmentRule,
   }),
 ];
 

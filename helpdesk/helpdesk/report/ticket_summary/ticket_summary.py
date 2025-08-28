@@ -18,6 +18,7 @@ def execute(filters=None):
 class TicketSummary:
     def __init__(self, filters=None):
         self.filters = frappe._dict(filters or {})
+        self.get_ticket_statuses()
 
     def run(self):
         self.get_columns()
@@ -26,6 +27,41 @@ class TicketSummary:
         self.get_report_summary()
 
         return self.columns, self.data, None, self.chart, self.report_summary
+
+    def get_ticket_statuses(self):
+        """Get all enabled ticket statuses from HD Ticket Status doctype"""
+        status_data = frappe.get_all(
+            "HD Ticket Status",
+            filters={"enabled": 1},
+            fields=["label_agent", "color"],
+            order_by="`order` asc, label_agent asc",
+        )
+
+        self.statuses = [status.label_agent for status in status_data]
+
+        # Create color mapping for statuses
+        self.status_colors = {}
+        for status in status_data:
+            self.status_colors[status.label_agent] = self.get_color_hex(status.color)
+
+    def get_color_hex(self, color_name):
+        """Convert color name to hex value"""
+        color_map = {
+            "Black": "#000000",
+            "Gray": "#6b7280",
+            "Blue": "#3b82f6",
+            "Green": "#22c55e",
+            "Red": "#ef4444",
+            "Pink": "#ec4899",
+            "Orange": "#f97316",
+            "Amber": "#f59e0b",
+            "Yellow": "#eab308",
+            "Cyan": "#06b6d4",
+            "Teal": "#14b8a6",
+            "Violet": "#8b5cf6",
+            "Purple": "#a855f7",
+        }
+        return color_map.get(color_name, "#6b7280")  # Default to gray
 
     def get_columns(self):
         self.columns = []
@@ -74,7 +110,7 @@ class TicketSummary:
                 }
             )
 
-        self.statuses = ["Open", "Replied", "Resolved", "Closed"]
+        # Get dynamic statuses from HD Ticket Status
         for status in self.statuses:
             self.columns.append(
                 {
@@ -351,10 +387,11 @@ class TicketSummary:
         self.chart = []
 
         labels = []
-        open_tickets = []
-        replied_tickets = []
-        resolved_tickets = []
-        closed_tickets = []
+        status_datasets = {}
+
+        # Initialize datasets for each status
+        for status in self.statuses:
+            status_datasets[scrub(status)] = []
 
         entity = self.filters.based_on
         entity_field = self.field_map.get(entity)
@@ -363,20 +400,25 @@ class TicketSummary:
 
         for entry in self.data:
             labels.append(entry.get(entity_field))
-            open_tickets.append(entry.get("open"))
-            replied_tickets.append(entry.get("replied"))
-            resolved_tickets.append(entry.get("resolved"))
-            closed_tickets.append(entry.get("closed"))
+            # Add data for each status
+            for status in self.statuses:
+                status_datasets[scrub(status)].append(entry.get(scrub(status), 0))
+
+        # Build datasets array with status colors
+        datasets = []
+        for status in self.statuses:
+            datasets.append(
+                {
+                    "name": status,
+                    "values": status_datasets[scrub(status)][:30],
+                    "color": self.status_colors.get(status, "#6b7280"),
+                }
+            )
 
         self.chart = {
             "data": {
                 "labels": labels[:30],
-                "datasets": [
-                    {"name": "Open", "values": open_tickets[:30]},
-                    {"name": "Replied", "values": replied_tickets[:30]},
-                    {"name": "Resolved", "values": resolved_tickets[:30]},
-                    {"name": "Closed", "values": closed_tickets[:30]},
-                ],
+                "datasets": datasets,
             },
             "type": "bar",
             "barOptions": {"stacked": True},
@@ -385,40 +427,43 @@ class TicketSummary:
     def get_report_summary(self):
         self.report_summary = []
 
-        open_tickets = 0
-        replied = 0
-        resolved = 0
-        closed = 0
+        # Initialize status counters dynamically
+        status_totals = {}
+        for status in self.statuses:
+            status_totals[scrub(status)] = 0
 
+        # Calculate totals for each status
         for entry in self.data:
-            open_tickets += entry.get("open")
-            replied += entry.get("replied")
-            resolved += entry.get("resolved")
-            closed += entry.get("closed")
+            for status in self.statuses:
+                status_totals[scrub(status)] += entry.get(scrub(status), 0)
 
-        self.report_summary = [
-            {
-                "value": open_tickets,
-                "indicator": "Red",
-                "label": _("Open"),
-                "datatype": "Int",
-            },
-            {
-                "value": replied,
-                "indicator": "Grey",
-                "label": _("Replied"),
-                "datatype": "Int",
-            },
-            {
-                "value": resolved,
-                "indicator": "Green",
-                "label": _("Resolved"),
-                "datatype": "Int",
-            },
-            {
-                "value": closed,
-                "indicator": "Green",
-                "label": _("Closed"),
-                "datatype": "Int",
-            },
-        ]
+        # Build report summary with dynamic statuses
+        for status in self.statuses:
+            # Determine indicator color based on status category
+            indicator = self.get_status_indicator(status)
+
+            self.report_summary.append(
+                {
+                    "value": status_totals[scrub(status)],
+                    "indicator": indicator,
+                    "label": _(status),
+                    "datatype": "Int",
+                }
+            )
+
+    def get_status_indicator(self, status):
+        """Get indicator color for status based on its category"""
+        try:
+            status_doc = frappe.get_doc("HD Ticket Status", status)
+            category = status_doc.category
+
+            # Map categories to indicator colors
+            color_map = {
+                "Open": "Red",
+                "Paused": "Orange",
+                "Resolved": "Green",
+            }
+            return color_map.get(category, "Grey")
+        except Exception:
+            # Fallback for unknown statuses
+            return "Grey"

@@ -32,12 +32,15 @@
         >
           Assign
         </button>
-        <Dropdown :options="dropdownOptions">
+        <Dropdown :options="dropdownOptions" placement="right">
           <template #default="{ open }">
             <Button :label="ticket.data.status">
               <template #prefix>
                 <IndicatorIcon
-                  :class="ticketStatusStore.textColorMap[ticket.data.status]"
+                  :class="
+                    ticketStatusStore.getStatus(ticket.data.status)
+                      ?.parsed_color
+                  "
                 />
               </template>
               <template #suffix>
@@ -182,6 +185,7 @@ import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 
+import { HDTicketStatus } from "@/types/doctypes";
 const route = useRoute();
 const router = useRouter();
 
@@ -289,13 +293,13 @@ const handleRename = () => {
 };
 
 const dropdownOptions = computed(() =>
-  ticketStatusStore.options.map((o) => ({
-    label: o,
-    value: o,
-    onClick: () => updateTicket("status", o),
+  ticketStatusStore.statuses.data?.map((o: HDTicketStatus) => ({
+    label: o.label_agent,
+    value: o.label_agent,
+    onClick: () => updateTicket("status", o.label_agent),
     icon: () =>
       h(IndicatorIcon, {
-        class: ticketStatusStore.textColorMap[o],
+        class: o.parsed_color,
       }),
   }))
 );

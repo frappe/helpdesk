@@ -11,7 +11,10 @@
               <Button :label="ticket.data.status">
                 <template #prefix>
                   <IndicatorIcon
-                    :class="ticketStatusStore.textColorMap[ticket.data.status]"
+                    :class="
+                      ticketStatusStore.getStatus(ticket.data.status)
+                        ?.parsed_color
+                    "
                   />
                 </template>
                 <template #suffix>
@@ -224,6 +227,7 @@ import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import LucidePhone from "~icons/lucide/phone";
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
+import { HDTicketStatus } from "@/types/doctypes";
 
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
@@ -310,13 +314,13 @@ const breadcrumbs = computed(() => {
 });
 
 const dropdownOptions = computed(() =>
-  ticketStatusStore.options.map((o) => ({
-    label: o,
-    value: o,
-    onClick: () => updateTicket("status", o),
+  ticketStatusStore.statuses.data?.map((o: HDTicketStatus) => ({
+    label: o.label_agent,
+    value: o.label_agent,
+    onClick: () => updateTicket("status", o.label_agent),
     icon: () =>
       h(IndicatorIcon, {
-        class: ticketStatusStore.textColorMap[o],
+        class: o.parsed_color,
       }),
   }))
 );

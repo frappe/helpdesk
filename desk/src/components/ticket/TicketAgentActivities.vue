@@ -16,7 +16,7 @@
             :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
           >
             <div
-              class="z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white"
+              class="z-1 flex h-7 w-7 items-center justify-center rounded-full bg-white"
               :class="[activity.type === 'email' && 'mt-2']"
             >
               <Avatar
