@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-08-24 10:36+0000\n"
-"PO-Revision-Date: 2025-08-27 15:41\n"
+"PO-Revision-Date: 2025-08-28 15:51\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Danish\n"
 "MIME-Version: 1.0\n"
@@ -40,16 +40,16 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: helpdesk/api/knowledge_base.py:15
 msgid "Access denied"
-msgstr ""
+msgstr "Adgang nægtet"
 
 #. Label of the action (Data) field in DocType 'HD Ticket Activity'
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "Action"
-msgstr ""
+msgstr "Handling"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:22
 msgid "Action Required"
@@ -136,12 +136,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Agent"
-msgstr ""
+msgstr "Agent"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Agent Configuration"
-msgstr ""
+msgstr "Agent Konfiguration"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -158,7 +158,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Agents.vue:5
 msgid "Agents"
-msgstr ""
+msgstr "Agenter"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
@@ -174,7 +174,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
@@ -191,7 +191,7 @@ msgstr ""
 #. Label of the apply_to (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply To"
-msgstr ""
+msgstr "Anvend Til"
 
 #. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -207,36 +207,36 @@ msgstr ""
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Archived"
-msgstr ""
+msgstr "Arkiveret"
 
 #. Label of the article (Link) field in DocType 'HD Article Feedback'
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "Article"
-msgstr ""
+msgstr "Artikel"
 
 #. Label of the assign_to_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Assign to"
-msgstr ""
+msgstr "Tildel til"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:68
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:55
 msgid "Assigned To"
-msgstr ""
+msgstr "Tildelt Til"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
 msgid "Assignee Rules"
-msgstr ""
+msgstr "Tildelte Regler"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:75
 msgid "Assignees"
-msgstr ""
+msgstr "Tildelte"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Assignment"
-msgstr ""
+msgstr "Tildeling"
 
 #. Label of the filters_section (Section Break) field in DocType 'HD Service
 #. Level Agreement'
@@ -271,7 +271,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:19
 msgid "Assignment rule"
-msgstr ""
+msgstr "Tildeling Regel"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:6
 msgid "Assignment rules"
@@ -289,7 +289,7 @@ msgstr ""
 #. Label of the author (Link) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Author"
-msgstr ""
+msgstr "Forfatter"
 
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -335,7 +335,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:9
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:9
 msgid "Based On"
-msgstr ""
+msgstr "Baseret På"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:34
 msgid "Based on your HR Policy, select your leave allocation period's end date"
@@ -348,12 +348,12 @@ msgstr ""
 #. Label of the branding_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Branding"
-msgstr ""
+msgstr "Branding"
 
 #. Label of the button_section (Section Break) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Button"
-msgstr ""
+msgstr "Knap"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:537
 msgid "Can not send email. No sender email set up!"
@@ -370,17 +370,17 @@ msgstr ""
 #. Label of the category (Link) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Category"
-msgstr ""
+msgstr "Kategori"
 
 #: helpdesk/api/knowledge_base.py:72
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.py:59
 msgid "Category must have atleast one article"
-msgstr ""
+msgstr "Kategori skal have mindst én artikel"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Channels"
-msgstr ""
+msgstr "Kanaler"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:22
 msgid "Choose how tickets are distributed among selected assignees."
@@ -517,7 +517,7 @@ msgstr ""
 #. Label of the customer (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Customer"
-msgstr ""
+msgstr "Kunde"
 
 #. Label of the customer_name (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -630,7 +630,7 @@ msgstr ""
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Draft"
-msgstr ""
+msgstr "Udkast"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:64
 msgid "Duplicate"
@@ -643,7 +643,7 @@ msgstr ""
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "Email"
-msgstr ""
+msgstr "E-mail"
 
 #. Label of the email_account (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
@@ -834,7 +834,7 @@ msgstr ""
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "General Settings"
-msgstr ""
+msgstr "Generelle Indstillinger"
 
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:24
 msgid "General category can't be deleted"
