@@ -1,10 +1,11 @@
 <template>
-  <NestedPopover>
-    <template #target>
+  <Popover placement="bottom-end">
+    <template #target="{ togglePopover, close }">
       <div class="flex items-center w-fit">
         <Button
           :label="'Filter'"
           :class="filters?.size ? 'rounded-r-none' : ''"
+          @click="togglePopover"
         >
           <template #prefix><FilterIcon class="h-4" /></template>
           <template v-if="filters?.size" #suffix>
@@ -20,7 +21,7 @@
             <Button
               class="rounded-l-none border-l"
               icon="x"
-              @click.stop="clearfilter(false)"
+              @click.stop="clearfilter(close)"
             />
           </div>
         </Tooltip>
@@ -49,10 +50,10 @@
                 />
               </div>
               <div id="fieldname" class="w-full">
-                <AutocompleteNew
-                  :value="f.field.fieldname"
+                <Autocomplete
+                  v-model="f.field.fieldname"
                   :options="filterableFields.data"
-                  @change="(e) => updateFilter(e, i)"
+                  @update:modelValue="(e) => updateFilter(e, i)"
                   :placeholder="'First Name'"
                 />
               </div>
@@ -80,10 +81,10 @@
                   {{ i == 0 ? "Where" : "And" }}
                 </div>
                 <div id="fieldname" class="!min-w-[140px]">
-                  <AutocompleteNew
-                    :value="f.field.fieldname"
+                  <Autocomplete
+                    v-model="f.field.fieldname"
                     :options="filterableFields.data"
-                    @change="(e) => updateFilter(e, i)"
+                    @update:modelValue="(e) => updateFilter(e, i)"
                     :placeholder="'First Name'"
                   />
                 </div>
@@ -122,10 +123,9 @@
             {{ "Empty - Choose a field to filter by" }}
           </div>
           <div class="flex items-center justify-between gap-2">
-            <AutocompleteNew
-              value=""
+            <Autocomplete
               :options="filterableFields.data"
-              @change="(e) => setfilter(e)"
+              @update:modelValue="(e) => setfilter(e)"
               :placeholder="'First name'"
             >
               <template #target="{ togglePopover }">
@@ -140,7 +140,7 @@
                   </template>
                 </Button>
               </template>
-            </AutocompleteNew>
+            </Autocomplete>
             <Button
               v-if="filters?.size"
               class="!text-gray-600"
@@ -152,18 +152,21 @@
         </div>
       </div>
     </template>
-  </NestedPopover>
+  </Popover>
 </template>
 <script setup>
-import { AutocompleteNew, Link, StarRating } from "@/components";
+import { Link, StarRating } from "@/components";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { useScreenSize } from "@/composables/screen";
 import {
+  Autocomplete,
+  Button,
   DatePicker,
   DateRangePicker,
   DateTimePicker,
+  FeatherIcon,
   FormControl,
-  NestedPopover,
+  Popover,
   Tooltip,
 } from "frappe-ui";
 import { computed, h, inject } from "vue";
