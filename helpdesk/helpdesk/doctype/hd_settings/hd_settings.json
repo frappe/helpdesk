@@ -383,7 +383,7 @@
   },
   {
    "default": "1",
-   "description": "If enabled, an email is sent to all of the recipients associated with an agent reply",
+   "description": "If enabled, an email is sent to all of the recipients associated with an agent's reply",
    "fieldname": "enable_reply_email_via_agent",
    "fieldtype": "Check",
    "label": "Enabled"
@@ -454,7 +454,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-29 13:33:15.908411",
+ "modified": "2025-08-29 13:34:17.018321",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

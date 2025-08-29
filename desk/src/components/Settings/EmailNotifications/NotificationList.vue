@@ -83,7 +83,7 @@ const notifications: AtLeastOneNotifcation = [
     name: "reply_via_agent",
     label: __("Reply From Agent"),
     description: __(
-      "Sent to all of the recipients associated with an agent reply"
+      "Sent to all of the recipients associated with an agent's reply"
     ),
   },
 ];
