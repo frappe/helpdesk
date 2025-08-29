@@ -1,6 +1,6 @@
 function helpdesk_handlers(socket) {
-  socket.on("fire", () => {
-    socket.emit("ice");
+  socket.on("ping", () => {
+    socket.emit("pong");
   });
 
   socket.on("view_ticket", (ticket_id) => {
@@ -34,6 +34,17 @@ function helpdesk_handlers(socket) {
       socket: socket,
       ticket_id: ticket_id,
       toUser: true, // saying that whenever we ask for viewers, send only to the user who asked
+    });
+  });
+
+  socket.on("notify_ticket_update", (ticket_id, field, value) => {
+    if (!(ticket_id && field)) return;
+    const ticket_room = open_doc_room("HD Ticket", ticket_id);
+    socket.to(ticket_room).emit("ticket_update", {
+      ticket_id,
+      user: socket.user,
+      field,
+      value,
     });
   });
 }
