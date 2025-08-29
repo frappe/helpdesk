@@ -50,8 +50,11 @@ class HDNotification(Document):
 
     def after_insert(self):
         if self.notification_type == "Mention":
-            settings = frappe.get_single("HD Settings")
-            if settings.skip_email_workflow:
+            skip_email_workflow = frappe.db.get_single_value(
+                "HD Settings", "skip_email_workflow"
+            )
+
+            if skip_email_workflow:
                 return
 
             frappe.sendmail(
