@@ -55,5 +55,3 @@ function onGetDataSuccess(data: BaseSettings & { default_content: string }) {
   defaultContent.value = data.default_content;
 }
 </script>
-
-<style scoped></style>

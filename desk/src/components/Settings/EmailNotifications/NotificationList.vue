@@ -88,5 +88,3 @@ const notifications: AtLeastOneNotifcation = [
   },
 ];
 </script>
-
-<style scoped></style>

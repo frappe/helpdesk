@@ -39,5 +39,3 @@ function onSelect(notification: Notification) {
   curNotification.value = notification;
 }
 </script>
-
-<style scoped></style>

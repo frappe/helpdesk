@@ -91,5 +91,3 @@ function onGetDataSuccess(data: Data & { default_content: string }) {
   defaultContent.value = data.default_content;
 }
 </script>
-
-<style scoped></style>

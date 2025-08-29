@@ -214,5 +214,3 @@ defineExpose({
   resetUnsavedChanges,
 });
 </script>
-
-<style scoped></style>
