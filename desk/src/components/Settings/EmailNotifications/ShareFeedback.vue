@@ -7,7 +7,7 @@
     v-model:content="content"
     :defaultContent="defaultContent"
     v-model:enabled="enabled"
-    documentationLink="#"
+    documentationLink="https://docs.frappe.io/helpdesk/email-notifications#available-variables-share-feedback"
     :onBack="props.onBack"
     :onSubmit="onSubmit"
     :onGetDataSuccess="onGetDataSuccess"
