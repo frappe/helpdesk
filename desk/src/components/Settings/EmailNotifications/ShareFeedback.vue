@@ -20,14 +20,20 @@
         :label="__('On Ticket Status')"
         :options="statusOptions"
         :required="true"
-        v-model="ticketStatus"
+        :model-value="ticketStatus"
+        @update:model-value="
+          (val) => {
+            ticketStatus = val;
+            compRef.setUnsavedChanges();
+          }
+        "
       />
     </template>
   </Notification>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import Notification from "./Notification.vue";
 import { createResource } from "frappe-ui";
 import type { BaseSettings, Notification as NotificationType } from "./types";
@@ -53,16 +59,6 @@ const statusOptions = computed<Record<"label" | "value", string>[]>(() =>
     }))
 );
 const ticketStatus = ref<Record<"label" | "value", string> | null>(null);
-
-watch(
-  () => ticketStatus.value,
-  (_cur, prev) => {
-    if (prev === null) {
-      return;
-    }
-    compRef.value.setUnsavedChanges();
-  }
-);
 
 type Data = {
   ticket_status: Record<"label" | "value", string>;
