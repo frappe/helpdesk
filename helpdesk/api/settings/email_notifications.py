@@ -20,78 +20,94 @@ def get_email_content(content: str, default_content: str) -> str:
     return content
 
 
+def get_share_feedback_data():
+    send_email_feedback_on_status = frappe.db.get_single_value(
+        "HD Settings", "send_email_feedback_on_status"
+    )
+    enable_email_ticket_feedback = bool(
+        frappe.db.get_single_value("HD Settings", "enable_email_ticket_feedback")
+    )
+    feedback_email_content = frappe.db.get_single_value(
+        "HD Settings", "feedback_email_content"
+    )
+    default_feedback_email_content = get_default_email_content("share_feedback")
+    if send_email_feedback_on_status == "":
+        send_email_feedback_on_status = "Closed"
+    return {
+        "ticket_status": {
+            "label": send_email_feedback_on_status,
+            "value": send_email_feedback_on_status,
+        },
+        "enabled": enable_email_ticket_feedback,
+        "content": get_email_content(
+            feedback_email_content, default_feedback_email_content
+        ),
+        "default_content": default_feedback_email_content,
+    }
+
+
+def get_acknowledgement_data():
+    send_acknowledgement_email = bool(
+        frappe.db.get_single_value("HD Settings", "send_acknowledgement_email")
+    )
+    acknowledgement_email_content = frappe.db.get_single_value(
+        "HD Settings", "acknowledgement_email_content"
+    )
+    default_acknowledgement_email_content = get_default_email_content("acknowledgement")
+    return {
+        "enabled": send_acknowledgement_email,
+        "content": get_email_content(
+            acknowledgement_email_content, default_acknowledgement_email_content
+        ),
+        "default_content": default_acknowledgement_email_content,
+    }
+
+
+def get_reply_to_agents_data():
+    enable_reply_email_to_agent = bool(
+        frappe.db.get_single_value("HD Settings", "enable_reply_email_to_agent")
+    )
+    email_content = frappe.db.get_single_value(
+        "HD Settings", "reply_email_to_agent_content"
+    )
+    default_email_content = get_default_email_content("reply_to_agents")
+    return {
+        "enabled": enable_reply_email_to_agent,
+        "content": get_email_content(email_content, default_email_content),
+        "default_content": default_email_content,
+    }
+
+
+def get_reply_via_agent_data():
+    enable_reply_email_via_agent = bool(
+        frappe.db.get_single_value("HD Settings", "enable_reply_email_via_agent")
+    )
+    email_content = frappe.db.get_single_value(
+        "HD Settings", "reply_via_agent_email_content"
+    )
+    default_email_content = get_default_email_content("reply_via_agent")
+    return {
+        "enabled": enable_reply_email_via_agent,
+        "content": get_email_content(email_content, default_email_content),
+        "default_content": default_email_content,
+    }
+
+
 @frappe.whitelist(methods=["GET"])
 def get_data(notification: str):
     only_for_managers()
 
     if notification == "share_feedback":
-        send_email_feedback_on_status = frappe.db.get_single_value(
-            "HD Settings", "send_email_feedback_on_status"
-        )
-        enable_email_ticket_feedback = bool(
-            frappe.db.get_single_value("HD Settings", "enable_email_ticket_feedback")
-        )
-        feedback_email_content = frappe.db.get_single_value(
-            "HD Settings", "feedback_email_content"
-        )
-        default_feedback_email_content = get_default_email_content(notification)
-        if send_email_feedback_on_status == "":
-            send_email_feedback_on_status = "Closed"
-        return {
-            "ticket_status": {
-                "label": send_email_feedback_on_status,
-                "value": send_email_feedback_on_status,
-            },
-            "enabled": enable_email_ticket_feedback,
-            "content": get_email_content(
-                feedback_email_content, default_feedback_email_content
-            ),
-            "default_content": default_feedback_email_content,
-        }
+        return get_share_feedback_data()
 
     if notification == "acknowledgement":
-        send_acknowledgement_email = bool(
-            frappe.db.get_single_value("HD Settings", "send_acknowledgement_email")
-        )
-        acknowledgement_email_content = frappe.db.get_single_value(
-            "HD Settings", "acknowledgement_email_content"
-        )
-        default_acknowledgement_email_content = get_default_email_content(notification)
-        return {
-            "enabled": send_acknowledgement_email,
-            "content": get_email_content(
-                acknowledgement_email_content, default_acknowledgement_email_content
-            ),
-            "default_content": default_acknowledgement_email_content,
-        }
+        return get_acknowledgement_data()
 
     if notification == "reply_to_agents":
-        enable_reply_email_to_agent = bool(
-            frappe.db.get_single_value("HD Settings", "enable_reply_email_to_agent")
-        )
-        email_content = frappe.db.get_single_value(
-            "HD Settings", "reply_email_to_agent_content"
-        )
-        default_email_content = get_default_email_content(notification)
-        return {
-            "enabled": enable_reply_email_to_agent,
-            "content": get_email_content(email_content, default_email_content),
-            "default_content": default_email_content,
-        }
+        return get_reply_to_agents_data()
 
     if notification == "reply_via_agent":
-        enable_reply_email_via_agent = bool(
-            frappe.db.get_single_value("HD Settings", "enable_reply_email_via_agent")
-        )
-        email_content = frappe.db.get_single_value(
-            "HD Settings", "reply_via_agent_email_content"
-        )
-        default_email_content = get_default_email_content("reply_via_agent")
-        return {
-            "enabled": enable_reply_email_via_agent,
-            "content": get_email_content(email_content, default_email_content),
-            "default_content": default_email_content,
-        }
+        return get_reply_via_agent_data()
 
     frappe.throw(_("Invalid notification"))
 
