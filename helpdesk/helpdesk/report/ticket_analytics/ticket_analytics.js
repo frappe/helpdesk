@@ -42,14 +42,8 @@ frappe.query_reports["Ticket Analytics"] = {
     {
       fieldname: "status",
       label: __("Status"),
-      fieldtype: "Select",
-      options: [
-        "",
-        { label: __("Open"), value: "Open" },
-        { label: __("Replied"), value: "Replied" },
-        { label: __("Resolved"), value: "Resolved" },
-        { label: __("Closed"), value: "Closed" },
-      ],
+      fieldtype: "Link",
+      options: "HD Ticket Status",
     },
     {
       fieldname: "priority",

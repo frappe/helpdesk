@@ -46,25 +46,46 @@ def get_dashboard_data(dashboard_type, filters=None):
     if _filters.agent:
         conds += f" AND JSON_SEARCH(_assign, 'one', '{_filters.agent}') IS NOT NULL"
 
+    open_statuses = tuple(
+        frappe.get_all(
+            "HD Ticket Status",
+            filters={"category": "Open"},
+            pluck="name",
+        )
+    )
+    resolved_statuses = tuple(
+        frappe.get_all(
+            "HD Ticket Status",
+            filters={"category": "Resolved"},
+            pluck="name",
+        )
+    )
+
     if dashboard_type == "number_card":
-        return get_number_card_data(from_date, to_date, conds)
+        return get_number_card_data(from_date, to_date, conds, resolved_statuses)
     elif dashboard_type == "master":
         return get_master_dashboard_data(
             from_date, to_date, _filters.team, _filters.agent
         )
     elif dashboard_type == "trend":
-        return get_trend_data(from_date, to_date, conds)
+        return get_trend_data(
+            from_date, to_date, conds, open_statuses, resolved_statuses
+        )
 
 
-def get_number_card_data(from_date, to_date, conds=""):
+def get_number_card_data(from_date, to_date, conds="", resolved_statuses=None):
     """
     Get number card data for the dashboard.
     """
 
     ticket_chart_data = get_ticket_count(from_date, to_date, conds)
-    sla_fulfilled_count = get_sla_fulfilled_count(from_date, to_date, conds)
+    sla_fulfilled_count = get_sla_fulfilled_count(
+        from_date, to_date, conds, resolved_statuses
+    )
     avg_first_response_time = get_avg_first_response_time(from_date, to_date, conds)
-    avg_resolution_time = get_avg_resolution_time(from_date, to_date, conds)
+    avg_resolution_time = get_avg_resolution_time(
+        from_date, to_date, conds, resolved_statuses
+    )
     avg_feedback_score = get_avg_feedback_score(from_date, to_date, conds)
 
     return [
@@ -100,7 +121,7 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
                 THEN name
                 ELSE NULL
             END) as prev_month_tickets
-		FROM `tabHD Ticket`
+		FROM `tabHD Ticket` # noqa: W604
     """,
         {
             "from_date": from_date,
@@ -132,7 +153,7 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
     }
 
 
-def get_sla_fulfilled_count(from_date, to_date, conds=""):
+def get_sla_fulfilled_count(from_date, to_date, conds="", resolved_statuses=None):
     """
     Get the percent of SLA tickets fulfilled for the dashboard.
     """
@@ -155,7 +176,7 @@ def get_sla_fulfilled_count(from_date, to_date, conds=""):
                 THEN name 
                 ELSE NULL
             END) as prev_month_fulfilled
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
     """,
         {
             "from_date": from_date,
@@ -169,7 +190,7 @@ def get_sla_fulfilled_count(from_date, to_date, conds=""):
     prev_month_fulfilled = result[0].prev_month_fulfilled or 0
 
     # Only these tickets should be counted
-    conds += " AND status in ('Resolved', 'Closed')"
+    conds += f" AND status in {resolved_statuses}"
 
     ticket_count = (
         get_ticket_count(from_date, to_date, conds, True)[0] if len(result) > 0 else 1
@@ -213,16 +234,16 @@ def get_avg_first_response_time(from_date, to_date, conds=""):
             AVG(CASE 
                 WHEN creation >= %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY) AND first_responded_on IS NOT NULL
                 {conds}
-                THEN TIMESTAMPDIFF(SECOND, creation, first_responded_on)
+                THEN first_response_time / 3600
                 ELSE NULL
             END) as current_month_avg,
             AVG(CASE 
                 When creation >= %(prev_from_date)s AND creation < %(from_date)s AND first_responded_on IS NOT NULL
                 {conds}
-                THEN TIMESTAMPDIFF(SECOND, creation, first_responded_on)
+                THEN first_response_time / 3600
                 ELSE NULL
             END) as prev_month_avg
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
     """,
         {
             "from_date": from_date,
@@ -231,15 +252,9 @@ def get_avg_first_response_time(from_date, to_date, conds=""):
         },
         as_dict=1,
     )
-    seconds_to_hours = 3600
-    current_month_avg = (
-        result[0].current_month_avg / seconds_to_hours
-        if result[0].current_month_avg
-        else 0
-    )
-    prev_month_avg = (
-        result[0].prev_month_avg / seconds_to_hours if result[0].prev_month_avg else 0
-    )
+
+    current_month_avg = result[0].current_month_avg or 0
+    prev_month_avg = result[0].prev_month_avg or 0
 
     delta = current_month_avg - prev_month_avg if prev_month_avg else 0
 
@@ -254,7 +269,7 @@ def get_avg_first_response_time(from_date, to_date, conds=""):
     }
 
 
-def get_avg_resolution_time(from_date, to_date, conds=""):
+def get_avg_resolution_time(from_date, to_date, conds="", resolved_statuses=None):
     """
     Get average resolution time for the dashboard.
     """
@@ -266,18 +281,18 @@ def get_avg_resolution_time(from_date, to_date, conds=""):
         f"""
         SELECT 
             AVG(CASE 
-                WHEN status in ('Resolved', 'Closed') AND creation >= %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
+                WHEN status in {resolved_statuses} AND creation >= %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
                 {conds}
-                THEN TIMESTAMPDIFF(DAY, creation, resolution_date)
+                THEN CEIL(resolution_time / 86400)
                 ELSE NULL
             END) as current_month_avg,
             AVG(CASE 
-                When status in ('Resolved', 'Closed') AND creation >= %(prev_from_date)s AND creation < %(from_date)s
+                When status in {resolved_statuses} AND creation >= %(prev_from_date)s AND creation < %(from_date)s
                 {conds}
-                THEN TIMESTAMPDIFF(DAY, creation, resolution_date)
+                THEN CEIL(resolution_time / 86400)
                 ELSE NULL
             END) as prev_month_avg
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
     """,
         {
             "from_date": from_date,
@@ -324,7 +339,7 @@ def get_avg_feedback_score(from_date, to_date, conds=""):
                 THEN feedback_rating 
                 ELSE NULL
             END) as prev_month_avg
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
     """,
         {
             "from_date": from_date,
@@ -490,12 +505,16 @@ def get_ticket_channel_chart_data(from_date, to_date, filters=None):
     )
 
 
-def get_trend_data(from_date, to_date, conds=""):
+def get_trend_data(
+    from_date, to_date, conds="", open_statuses=None, resolved_statuses=None
+):
     """
     Get trend data for the dashboard.
     """
 
-    ticket_trend_data = get_ticket_trend_data(from_date, to_date, conds)
+    ticket_trend_data = get_ticket_trend_data(
+        from_date, to_date, conds, open_statuses, resolved_statuses
+    )
     feedback_trend_data = get_feedback_trend_data(from_date, to_date, conds)
 
     return [
@@ -504,18 +523,22 @@ def get_trend_data(from_date, to_date, conds=""):
     ]
 
 
-def get_ticket_trend_data(from_date, to_date, conds=""):
+def get_ticket_trend_data(
+    from_date, to_date, conds="", open_statuses=None, resolved_statuses=None
+):
     """
-    Trend data for tickets in the dashboard. Ticket treand +SLA fulfilled
+    Trend data for tickets in the dashboard. Ticket trend +SLA fulfilled
     """
+    if len(open_statuses) == 1:
+        open_statuses = f"('{open_statuses[0]}')"
     result = frappe.db.sql(
         f"""
             SELECT 
                 DATE(creation) as date,
-                COUNT(CASE WHEN status = 'Open' THEN name END) as open,
-                COUNT(CASE WHEN status IN ('Resolved', 'Closed') THEN name END) as closed,
+                COUNT(CASE WHEN status in {open_statuses} THEN name END) as open,
+                COUNT(CASE WHEN status in {resolved_statuses} THEN name END) as closed,
                 COUNT(CASE WHEN agreement_status = 'Fulfilled' THEN name END) as SLA_fulfilled
-            FROM `tabHD Ticket`
+            FROM `tabHD Ticket` # noqa: W604
             WHERE creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
             {conds}
             GROUP BY DATE(creation)
@@ -564,7 +587,7 @@ def get_feedback_trend_data(from_date, to_date, conds=""):
             DATE(creation) as date,
             AVG(CASE WHEN feedback_rating > 0 THEN feedback_rating END) * 5 as rating,
             COUNT(CASE WHEN feedback_rating > 0 THEN name END) as rated_tickets
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
         WHERE 
             creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
             {conds}
@@ -582,7 +605,7 @@ def get_feedback_trend_data(from_date, to_date, conds=""):
         f"""
         SELECT 
             AVG(feedback_rating) * 5 as avg_rating
-        FROM `tabHD Ticket`
+        FROM `tabHD Ticket` # noqa: W604
         WHERE 
             creation BETWEEN %(from_date)s AND DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
             {conds}
@@ -673,7 +696,7 @@ def get_avg_tickets_per_day(from_date, to_date, conds=""):
             SELECT 
                 COUNT(name) as total_tickets,
                 DATEDIFF(DATE_ADD(%(to_date)s, INTERVAL 1 DAY), %(from_date)s) as days
-            FROM `tabHD Ticket`
+            FROM `tabHD Ticket` # noqa: W604
             WHERE creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
             {conds}
         """,

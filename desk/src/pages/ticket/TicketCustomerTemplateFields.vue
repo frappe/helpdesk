@@ -3,7 +3,7 @@
     <div class="space-y-1.5">
       <span class="block text-sm text-gray-700"> Status </span>
       <span class="block break-words text-base font-medium text-gray-900">
-        {{ transformStatus(ticket.data.status) }}
+        {{ ticket.data.status }}
       </span>
     </div>
     <div class="space-y-1.5">
@@ -106,13 +106,4 @@ const customFields = computed(() => {
     );
   return _custom_fields;
 });
-
-function transformStatus(status: string) {
-  switch (status) {
-    case "Replied":
-      return "Awaiting reply";
-    default:
-      return status;
-  }
-}
 </script>

@@ -102,6 +102,9 @@ const transValue = computed(() => {
 });
 
 const placeholder = computed(() => {
+  if (props.field.placeholder) {
+    return props.field.placeholder;
+  }
   if (props.field.fieldtype === "Data" && !props.field.url_method) {
     return "Type something";
   }

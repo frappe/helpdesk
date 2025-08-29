@@ -19,6 +19,10 @@ from pypika.queries import Query
 from pypika.terms import Criterion
 
 from helpdesk.consts import DEFAULT_TICKET_PRIORITY, DEFAULT_TICKET_TYPE
+from helpdesk.helpdesk.doctype.hd_settings.helpers import (
+    get_default_email_content,
+    is_email_content_empty,
+)
 from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
     log_ticket_activity,
 )
@@ -41,15 +45,29 @@ from ..hd_service_level_agreement.utils import get_sla
 
 
 class HDTicket(Document):
+    @property
+    def default_open_status(self):
+        return frappe.db.get_value(
+            "HD Service Level Agreement",
+            self.sla,
+            "default_ticket_status",
+        ) or frappe.db.get_single_value("HD Settings", "default_ticket_status")
+
+    @property
+    def ticket_reopen_status(self):
+        return frappe.db.get_value(
+            "HD Service Level Agreement",
+            self.sla,
+            "ticket_reopen_status",
+        ) or frappe.db.get_single_value("HD Settings", "ticket_reopen_status")
+        pass
+
     def publish_update(self):
         publish_event("helpdesk:ticket-update", self.name)
         capture_event("ticket_updated")
 
     def autoname(self):
         return self.name
-
-    def get_feed(self):
-        return "{0}: {1}".format(_(self.status), self.subject)
 
     def before_validate(self):
         self.check_update_perms()
@@ -58,7 +76,9 @@ class HDTicket(Document):
         self.set_priority()
         self.set_first_responded_on()
         self.set_feedback_values()
-        self.apply_escalation_rule()
+        self.set_default_status()
+        self.set_status_category()
+        # self.apply_escalation_rule()
         self.set_sla()
 
         self.set_contact()
@@ -74,6 +94,21 @@ class HDTicket(Document):
             self.handle_ticket_activity_update()
 
         self.handle_email_feedback()
+
+    def _get_rendered_template(
+        self, content: str, default_content: str, args: dict[str, str] | None = None
+    ):
+        if args is None:
+            args = dict()
+        template_args = {
+            "doc": self.as_dict(),
+        }
+        for key, value in args.items():
+            template_args[key] = value
+        return frappe.render_template(
+            default_content if is_email_content_empty(content) else content,
+            template_args,
+        )
 
     def handle_email_feedback(self):
 
@@ -92,24 +127,31 @@ class HDTicket(Document):
             ["enable_email_ticket_feedback", "send_email_feedback_on_status"],
         )
 
-        if not int(is_email_feedback_enabled) or email_feedback_status != self.status:
+        send_feedback_email = int(is_email_feedback_enabled) and (
+            email_feedback_status == self.status
+            or email_feedback_status == ""
+            and self.status == "Closed"
+        )
+
+        if not send_feedback_email:
             return
 
         last_communication = self.get_last_communication()
 
         url = f"{frappe.utils.get_url()}/ticket-feedback/new?key={self.key}"
-        template = f"""
-            <p>Hello,</p>
-            <p>Thanks for reaching out to us. We’d love your feedback on your recent support experience with ticket #{self.name}.</p>
-            <a href="{url}" class="btn btn-primary">Share Feedback</a>
-            
-            <p>Thank you!<br>Support Team</p>
-        """
+        feedback_email_content = frappe.db.get_single_value(
+            "HD Settings", "feedback_email_content"
+        )
+        default_feedback_email_content = get_default_email_content("share_feedback")
         try:
             frappe.sendmail(
                 recipients=[self.raised_by],
                 subject=f"Re: {self.subject}",
-                message=template,
+                message=self._get_rendered_template(
+                    feedback_email_content,
+                    default_feedback_email_content,
+                    {"url": url},
+                ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
                 now=True,
@@ -150,10 +192,10 @@ class HDTicket(Document):
 
     def on_update(self):
         # flake8: noqa
-        if self.status == "Open":
+        if self.status_category == "Open":
             if (
                 self.get_doc_before_save()
-                and self.get_doc_before_save().status != "Open"
+                and self.get_doc_before_save().status_category != "Open"
             ):
 
                 agents = self.get_assigned_agents()
@@ -225,18 +267,22 @@ class HDTicket(Document):
         )
 
     def set_first_responded_on(self):
-        old_status = (
-            self.get_doc_before_save().status if self.get_doc_before_save() else None
-        )
-        is_closed_or_resolved = old_status == "Open" and self.status in [
-            "Resolved",
-            "Closed",
-        ]
+        if self.is_new():
+            return
+        if self.first_responded_on:
+            return
 
-        if self.status == "Replied" or is_closed_or_resolved:
-            self.first_responded_on = (
-                self.first_responded_on or frappe.utils.now_datetime()
-            )
+        old_status_category = (
+            self.get_doc_before_save().status_category
+            if self.get_doc_before_save()
+            else None
+        )
+        is_closed_or_resolved = (
+            old_status_category == "Open" and self.status_category == "Resolved"
+        )
+
+        if self.status_category == "Paused" or is_closed_or_resolved:
+            self.first_responded_on = frappe.utils.now_datetime()
 
     def set_feedback_values(self):
         if not self.feedback:
@@ -249,14 +295,26 @@ class HDTicket(Document):
         if settings.is_ticket_type_mandatory and not self.ticket_type:
             frappe.throw(_("Ticket type is mandatory"))
 
+    @property
+    def has_agent_replied(self):
+        return frappe.db.exists(
+            "Communication",
+            {
+                "reference_doctype": "HD Ticket",
+                "reference_name": self.name,
+                "sent_or_received": "Sent",
+            },
+        )
+
     def validate_feedback(self):
         if (
             self.feedback
-            or self.status != "Resolved"
-            or not self.has_value_changed("status")
+            or self.status_category != "Resolved"
             or is_agent()
+            or not self.has_agent_replied
         ):
             return
+
         frappe.throw(
             _("Ticket must be resolved with a feedback"), frappe.ValidationError
         )
@@ -307,7 +365,7 @@ class HDTicket(Document):
             return
         if not self.agent_group or (hasattr(self, "_assign") and not self._assign):
             return
-        if self.has_value_changed("agent_group") and self.status == "Open":
+        if self.has_value_changed("agent_group") and self.status_category == "Open":
             current_assigned_agent = self.get_assigned_agent()
             if not current_assigned_agent:
                 return
@@ -530,7 +588,9 @@ class HDTicket(Document):
         communication.insert(ignore_permissions=True)
         capture_event("agent_replied")
 
-        if skip_email_workflow:
+        if skip_email_workflow or not frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        ):
             return
 
         if not sender_email:
@@ -550,16 +610,21 @@ class HDTicket(Document):
         message = self.parse_content(message)
 
         reply_to_email = sender_email.email_id
-        template = (
-            "new_reply_on_customer_portal_notification"
-            if self.via_customer_portal
-            else None
-        )
-        args = {
-            "message": message,
-            "portal_link": self.portal_uri,
-            "ticket_id": self.name,
-        }
+        rendered_template: str | None = None
+        if self.via_customer_portal:
+            email_content = frappe.db.get_single_value(
+                "HD Settings", "reply_via_agent_email_content"
+            )
+            default_email_content = get_default_email_content("reply_via_agent")
+            try:
+                rendered_template = self._get_rendered_template(
+                    email_content,
+                    default_email_content,
+                    {"message": message},
+                )
+            except Exception as e:
+                frappe.throw(_("Could not an email due to: {0}").format(e))
+
         send_delayed = True
         send_now = False
 
@@ -569,14 +634,13 @@ class HDTicket(Document):
 
         try:
             frappe.sendmail(
-                args=args,
                 attachments=_attachments,
                 bcc=bcc,
                 cc=cc,
                 communication=communication.name,
                 delayed=send_delayed,
                 expose_recipients="header",
-                message=message,
+                message=rendered_template if rendered_template is not None else message,
                 as_markdown=True,
                 now=send_now,
                 recipients=recipients,
@@ -585,7 +649,6 @@ class HDTicket(Document):
                 reply_to=reply_to_email,
                 sender=reply_to_email,
                 subject=subject,
-                template=template,
                 with_container=False,
                 in_reply_to=last_communication.name
                 if last_communication.name
@@ -600,12 +663,15 @@ class HDTicket(Document):
         self, message, attachments=[], new_ticket=False
     ):
 
-        if not new_ticket:
+        if not new_ticket and frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_to_agent"
+        ):
             # send email to assigned agents
-            self.send_reply_email_to_agent(message)
+            self.send_reply_email_to_agent()
 
-        if self.status == "Replied":
-            self.status = "Open"
+        # if self.status_category == "Paused" and not new_ticket:
+        if not new_ticket:
+            self.status = self.ticket_reopen_status
             self.save(ignore_permissions=True)
 
         c = frappe.new_doc("Communication")
@@ -661,31 +727,32 @@ class HDTicket(Document):
                 doc.attached_to_name = self.name
                 doc.save()
 
-    def send_reply_email_to_agent(self, message):
+    def send_reply_email_to_agent(self):
         assigned_agents = self.get_assigned_agents()
         if not assigned_agents:
             return
 
         recipients = [a.get("name") for a in self.get_assigned_agents()]
 
-        args = {
-            "ticket_id": self.name,
-            "ticket_subject": self.subject,
-            "message": message,
-            "priority": self.priority,
-            "raised_by": self.raised_by,
-            "ticket_url": frappe.utils.get_url("/helpdesk/tickets/" + str(self.name)),
-        }
-        last_communication = self.get_last_communication()
+        email_content = frappe.db.get_single_value(
+            "HD Settings", "reply_email_to_agent_content"
+        )
+        default_email_content = get_default_email_content("reply_to_agents")
         try:
             frappe.sendmail(
                 recipients=recipients,
                 subject=f"Re: {self.subject} - #{self.name}",
-                message=message,
+                message=self._get_rendered_template(
+                    email_content,
+                    default_email_content,
+                    {
+                        "ticket_url": frappe.utils.get_url(
+                            "/helpdesk/tickets/" + str(self.name)
+                        )
+                    },
+                ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                template="new_reply_to_agent",
-                args=args,
                 now=True,
             )
         except Exception as e:
@@ -693,31 +760,31 @@ class HDTicket(Document):
 
     def send_acknowledgement_email(self):
 
-        message = f"""
-            <p>Hi,</p>
-            <br />
-            <p>Thank you for reaching out to us. We've received your request and created a support ticket.</p>
-            <p>
-            <strong>Ticket ID:</strong> {self.name}<br />
-            <strong>Subject:</strong> {self.subject}<br />
-            </p>
-            <p>
-            Our team is reviewing it and will get back to you shortly.
-            </p>
-            <br />
-            <p>Best,<br />Support Team</p>
-        """
-
-        frappe.sendmail(
-            recipients=[self.raised_by],
-            subject=f"Ticket #{self.name}: We've received your request",
-            message=message,
-            reference_doctype="HD Ticket",
-            reference_name=self.name,
-            now=True,
-            expose_recipients="header",
-            email_headers={"X-Auto-Generated": "hd-acknowledgement"},
+        acknowledgement_email_content = frappe.db.get_single_value(
+            "HD Settings", "acknowledgement_email_content"
         )
+        default_acknowledgement_email_content = get_default_email_content(
+            "acknowledgement"
+        )
+
+        try:
+            frappe.sendmail(
+                recipients=[self.raised_by],
+                subject=f"Ticket #{self.name}: We've received your request",
+                message=self._get_rendered_template(
+                    acknowledgement_email_content,
+                    default_acknowledgement_email_content,
+                ),
+                reference_doctype="HD Ticket",
+                reference_name=self.name,
+                now=True,
+                expose_recipients="header",
+                email_headers={"X-Auto-Generated": "hd-acknowledgement"},
+            )
+        except Exception as e:
+            frappe.throw(
+                _("Could not send an acknowledgement email due to: {0}").format(e)
+            )
 
     @frappe.whitelist()
     def mark_seen(self):
@@ -775,7 +842,7 @@ class HDTicket(Document):
                 pass
 
     def apply_escalation_rule(self):
-        if not self.status == "Open" or self.is_new():
+        if not self.status_category == "Open" or self.is_new():
             return
         escalation_rule = self.get_escalation_rule()
         if not escalation_rule:
@@ -801,6 +868,17 @@ class HDTicket(Document):
         if sla := frappe.get_last_doc("HD Service Level Agreement", {"name": self.sla}):
             sla.apply(self)
 
+    def set_default_status(self):
+        if self.is_new():
+            self.status = self.default_open_status
+
+    def set_status_category(self):
+        self.status_category = self.status_category or frappe.get_value(
+            "HD Ticket Status",
+            self.status,
+            "category",
+        )
+
     # `on_communication_update` is a special method exposed from `Communication` doctype.
     # It is called when a communication is updated. Beware of changes as this effectively
     # is an external dependency. Refer `communication.py` of Frappe framework for more.
@@ -808,8 +886,8 @@ class HDTicket(Document):
     def on_communication_update(self, c):
         # If communication is incoming, then it is a reply from customer, and ticket must
         # be reopened.
-        if c.sent_or_received == "Received":
-            self.status = "Open"
+        # if c.sent_or_received == "Received":
+        #     self.status = self.ticket_reopen_status if self.status_category == "Paused" else self.default_open_status
         # If communication is outgoing, it must be a reply from agent
         if c.sent_or_received == "Sent":
             # Set first response date if not set already
@@ -817,8 +895,11 @@ class HDTicket(Document):
                 self.first_responded_on or frappe.utils.now_datetime()
             )
 
+            # TODO: remove this feature once we add automation feature
             if frappe.db.get_single_value("HD Settings", "auto_update_status"):
-                self.status = "Replied"
+                self.status = frappe.db.get_single_value(
+                    "HD Settings", "update_status_to"
+                )
 
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
@@ -1167,7 +1248,9 @@ def close_tickets_after_n_days():
     if frappe.db.get_single_value("HD Settings", "auto_close_tickets") == 0:
         return
 
-    days_threshold = frappe.db.get_single_value("HD Settings", "auto_close_after_days")
+    status, days_threshold = frappe.db.get_value(
+        "HD Settings", "HD Settings", ["auto_close_status", "auto_close_after_days"]
+    )
 
     tickets_to_close = (
         frappe.db.sql(
@@ -1180,10 +1263,10 @@ def close_tickets_after_n_days():
                     WHERE reference_doctype = 'HD Ticket'
                     GROUP BY reference_name
                 ) latest_comm ON t.name = latest_comm.reference_name
-                WHERE t.status = 'Replied'
+                WHERE t.status = %(status)s
                 AND latest_comm.last_communication_date < DATE_SUB(NOW(), INTERVAL %(days_threshold)s DAY)
             """,
-            {"days_threshold": days_threshold},
+            {"days_threshold": days_threshold, "status": status},
             pluck="name",
         )
         or []

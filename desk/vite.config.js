@@ -18,7 +18,13 @@ export default defineConfig({
         emptyOutDir: true,
         indexHtmlPath: "../helpdesk/www/helpdesk/index.html",
       },
+      frappeTypes: {
+        input: {
+          helpdesk: ["hd_ticket_status"],
+        },
+      },
     }),
+
     vue(),
     vueJsx(),
     Components({
@@ -81,7 +87,6 @@ export default defineConfig({
   optimizeDeps: {
     include: [
       "feather-icons",
-      "showdown",
       "tailwind.config.js",
       "prosemirror-state",
       "prosemirror-view",

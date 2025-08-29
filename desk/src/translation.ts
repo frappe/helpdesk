@@ -1,23 +1,24 @@
 import { createResource } from "frappe-ui";
 import type { App } from "vue";
 
-type Translate= (message: string) => string | {format: (...args: string[]) => string};
-
-const translate: Translate = function (message) {
+function getTranslatedMessage(message: string): string {
     const translatedMessages = (("translatedMessages" in window ? window["translatedMessages"] : null) ?? {}) as Record<string, string>;
-    const translatedMessage = translatedMessages[message] || message;
-    const hasPlaceholders = /{\d+}/.test(message);
-    if (!hasPlaceholders) {
+    return translatedMessages[message] || message;
+}
+
+function translate(message: string): string;
+function translate(message: string, ...args: string[]): string;
+function translate(message: string, ...args: string[]): string {
+    const translatedMessage = getTranslatedMessage(message)
+    if (args.length === 0) {
         return translatedMessage;
     }
-    return {
-        format(...args) {
-            return translatedMessage.replace(/{(\d+)}/g, function (match, index) {
-                return typeof args[index] != 'undefined' ? args[index] : match;
-            })
-        }
-    }
+    return translatedMessage.replace(/{(\d+)}/g, function (match, index) {
+        return typeof args[index] != 'undefined' ? args[index] : match;
+    });
 }
+
+export const __ = translate;
 
 function fetchTranslations() {
     createResource({
@@ -42,6 +43,6 @@ export function translationPlugin(app: App<Element>) {
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
-    __: Translate; 
+    __: typeof translate; 
   }
 }

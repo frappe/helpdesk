@@ -155,7 +155,7 @@ const {
   name,
   deliveryStatus,
 } = props.activity;
-console.log(deliveryStatus);
+
 const emit = defineEmits(["reply"]);
 
 const { isMobileView } = useScreenSize();

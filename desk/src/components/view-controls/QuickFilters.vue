@@ -11,7 +11,7 @@
       >
         <QuickFilterField
           :filter="filter"
-          :value="getValue(filter, list.params.filters)"
+          :value="getValue(filter, list.params?.filters)"
           @applyQuickFilter="(f, v) => applyQuickFilter(f, v)"
         />
       </div>
@@ -51,6 +51,9 @@ function getDefaultValue(quickFilter) {
 }
 
 function getValue(quickFilter, filters) {
+  if (!filters || !(quickFilter && quickFilter.name)) {
+    return getDefaultValue(quickFilter);
+  }
   const filter = filters[quickFilter.name];
   if (filter === undefined) {
     // not a part of the customizable filters
