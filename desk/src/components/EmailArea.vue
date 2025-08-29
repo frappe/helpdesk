@@ -75,10 +75,22 @@
           v-if="showSplitOption"
           :placement="'right'"
           :options="[
-            {
+            ...(showSplitOption ? [{
               label: 'Split Ticket',
               icon: LucideSplit,
               onClick: () => (showSplitModal = true),
+            }] : []),
+            {
+              label: 'Forward',
+              icon: ForwardIcon,
+              onClick: () => emit('forward', {
+                content: content,
+                attachments: attachments,
+                subject: subject,
+                to: sender?.name ?? to,
+                cc: cc,
+                bcc: bcc,
+              }),
             },
           ]"
         >
@@ -130,7 +142,7 @@ import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
 import { Dropdown } from "frappe-ui";
 import { computed, ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
-import { ReplyAllIcon, ReplyIcon } from "./icons";
+import { ReplyAllIcon, ReplyIcon, ForwardIcon } from "./icons";
 import TicketSplitModal from "./ticket/TicketSplitModal.vue";
 const props = defineProps({
   activity: {
@@ -156,7 +168,7 @@ const {
   deliveryStatus,
 } = props.activity;
 
-const emit = defineEmits(["reply"]);
+const emit = defineEmits(["reply","forward"]);
 
 const { isMobileView } = useScreenSize();
 
