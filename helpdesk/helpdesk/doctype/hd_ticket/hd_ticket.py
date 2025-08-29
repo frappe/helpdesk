@@ -19,6 +19,10 @@ from pypika.queries import Query
 from pypika.terms import Criterion
 
 from helpdesk.consts import DEFAULT_TICKET_PRIORITY, DEFAULT_TICKET_TYPE
+from helpdesk.helpdesk.doctype.hd_settings.helpers import (
+    get_default_email_content,
+    is_email_content_empty,
+)
 from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
     log_ticket_activity,
 )
@@ -91,6 +95,21 @@ class HDTicket(Document):
 
         self.handle_email_feedback()
 
+    def _get_rendered_template(
+        self, content: str, default_content: str, args: dict[str, str] | None = None
+    ):
+        if args is None:
+            args = dict()
+        template_args = {
+            "doc": self.as_dict(),
+        }
+        for key, value in args.items():
+            template_args[key] = value
+        return frappe.render_template(
+            default_content if is_email_content_empty(content) else content,
+            template_args,
+        )
+
     def handle_email_feedback(self):
 
         if (
@@ -108,24 +127,31 @@ class HDTicket(Document):
             ["enable_email_ticket_feedback", "send_email_feedback_on_status"],
         )
 
-        if not int(is_email_feedback_enabled) or email_feedback_status != self.status:
+        send_feedback_email = int(is_email_feedback_enabled) and (
+            email_feedback_status == self.status
+            or email_feedback_status == ""
+            and self.status == "Closed"
+        )
+
+        if not send_feedback_email:
             return
 
         last_communication = self.get_last_communication()
 
         url = f"{frappe.utils.get_url()}/ticket-feedback/new?key={self.key}"
-        template = f"""
-            <p>Hello,</p>
-            <p>Thanks for reaching out to us. We’d love your feedback on your recent support experience with ticket #{self.name}.</p>
-            <a href="{url}" class="btn btn-primary">Share Feedback</a>
-            
-            <p>Thank you!<br>Support Team</p>
-        """
+        feedback_email_content = frappe.db.get_single_value(
+            "HD Settings", "feedback_email_content"
+        )
+        default_feedback_email_content = get_default_email_content("share_feedback")
         try:
             frappe.sendmail(
                 recipients=[self.raised_by],
                 subject=f"Re: {self.subject}",
-                message=template,
+                message=self._get_rendered_template(
+                    feedback_email_content,
+                    default_feedback_email_content,
+                    {"url": url},
+                ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
                 now=True,
@@ -562,7 +588,9 @@ class HDTicket(Document):
         communication.insert(ignore_permissions=True)
         capture_event("agent_replied")
 
-        if skip_email_workflow:
+        if skip_email_workflow or not frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        ):
             return
 
         if not sender_email:
@@ -582,16 +610,21 @@ class HDTicket(Document):
         message = self.parse_content(message)
 
         reply_to_email = sender_email.email_id
-        template = (
-            "new_reply_on_customer_portal_notification"
-            if self.via_customer_portal
-            else None
-        )
-        args = {
-            "message": message,
-            "portal_link": self.portal_uri,
-            "ticket_id": self.name,
-        }
+        rendered_template: str | None = None
+        if self.via_customer_portal:
+            email_content = frappe.db.get_single_value(
+                "HD Settings", "reply_via_agent_email_content"
+            )
+            default_email_content = get_default_email_content("reply_via_agent")
+            try:
+                rendered_template = self._get_rendered_template(
+                    email_content,
+                    default_email_content,
+                    {"message": message},
+                )
+            except Exception as e:
+                frappe.throw(_("Could not an email due to: {0}").format(e))
+
         send_delayed = True
         send_now = False
 
@@ -601,14 +634,13 @@ class HDTicket(Document):
 
         try:
             frappe.sendmail(
-                args=args,
                 attachments=_attachments,
                 bcc=bcc,
                 cc=cc,
                 communication=communication.name,
                 delayed=send_delayed,
                 expose_recipients="header",
-                message=message,
+                message=rendered_template if rendered_template is not None else message,
                 as_markdown=True,
                 now=send_now,
                 recipients=recipients,
@@ -617,7 +649,6 @@ class HDTicket(Document):
                 reply_to=reply_to_email,
                 sender=reply_to_email,
                 subject=subject,
-                template=template,
                 with_container=False,
                 in_reply_to=last_communication.name
                 if last_communication.name
@@ -632,9 +663,11 @@ class HDTicket(Document):
         self, message, attachments=[], new_ticket=False
     ):
 
-        if not new_ticket:
+        if not new_ticket and frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_to_agent"
+        ):
             # send email to assigned agents
-            self.send_reply_email_to_agent(message)
+            self.send_reply_email_to_agent()
 
         # if self.status_category == "Paused" and not new_ticket:
         if not new_ticket:
@@ -694,31 +727,32 @@ class HDTicket(Document):
                 doc.attached_to_name = self.name
                 doc.save()
 
-    def send_reply_email_to_agent(self, message):
+    def send_reply_email_to_agent(self):
         assigned_agents = self.get_assigned_agents()
         if not assigned_agents:
             return
 
         recipients = [a.get("name") for a in self.get_assigned_agents()]
 
-        args = {
-            "ticket_id": self.name,
-            "ticket_subject": self.subject,
-            "message": message,
-            "priority": self.priority,
-            "raised_by": self.raised_by,
-            "ticket_url": frappe.utils.get_url("/helpdesk/tickets/" + str(self.name)),
-        }
-        last_communication = self.get_last_communication()
+        email_content = frappe.db.get_single_value(
+            "HD Settings", "reply_email_to_agent_content"
+        )
+        default_email_content = get_default_email_content("reply_to_agents")
         try:
             frappe.sendmail(
                 recipients=recipients,
                 subject=f"Re: {self.subject} - #{self.name}",
-                message=message,
+                message=self._get_rendered_template(
+                    email_content,
+                    default_email_content,
+                    {
+                        "ticket_url": frappe.utils.get_url(
+                            "/helpdesk/tickets/" + str(self.name)
+                        )
+                    },
+                ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                template="new_reply_to_agent",
-                args=args,
                 now=True,
             )
         except Exception as e:
@@ -726,31 +760,31 @@ class HDTicket(Document):
 
     def send_acknowledgement_email(self):
 
-        message = f"""
-            <p>Hi,</p>
-            <br />
-            <p>Thank you for reaching out to us. We've received your request and created a support ticket.</p>
-            <p>
-            <strong>Ticket ID:</strong> {self.name}<br />
-            <strong>Subject:</strong> {self.subject}<br />
-            </p>
-            <p>
-            Our team is reviewing it and will get back to you shortly.
-            </p>
-            <br />
-            <p>Best,<br />Support Team</p>
-        """
-
-        frappe.sendmail(
-            recipients=[self.raised_by],
-            subject=f"Ticket #{self.name}: We've received your request",
-            message=message,
-            reference_doctype="HD Ticket",
-            reference_name=self.name,
-            now=True,
-            expose_recipients="header",
-            email_headers={"X-Auto-Generated": "hd-acknowledgement"},
+        acknowledgement_email_content = frappe.db.get_single_value(
+            "HD Settings", "acknowledgement_email_content"
         )
+        default_acknowledgement_email_content = get_default_email_content(
+            "acknowledgement"
+        )
+
+        try:
+            frappe.sendmail(
+                recipients=[self.raised_by],
+                subject=f"Ticket #{self.name}: We've received your request",
+                message=self._get_rendered_template(
+                    acknowledgement_email_content,
+                    default_acknowledgement_email_content,
+                ),
+                reference_doctype="HD Ticket",
+                reference_name=self.name,
+                now=True,
+                expose_recipients="header",
+                email_headers={"X-Auto-Generated": "hd-acknowledgement"},
+            )
+        except Exception as e:
+            frappe.throw(
+                _("Could not send an acknowledgement email due to: {0}").format(e)
+            )
 
     @frappe.whitelist()
     def mark_seen(self):

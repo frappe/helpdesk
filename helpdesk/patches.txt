@@ -29,3 +29,4 @@ helpdesk.patches.remove_agents_teams_default_views
 helpdesk.patches.add_fields_in_assignment_rule
 helpdesk.patches.update_ticket_statuses
 helpdesk.patches.add_status_category_to_tickets
+helpdesk.patches.enable_new_email_notifications

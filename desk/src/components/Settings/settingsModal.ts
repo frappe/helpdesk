@@ -9,6 +9,7 @@ import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
 import InviteAgents from "./InviteAgents.vue";
 import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
+import LucideMailOpen from "~icons/lucide/mail-open";
 import LucideUser from "~icons/lucide/user";
 import LucideUserPlus from "~icons/lucide/user-plus";
 import LucideUsers from "~icons/lucide/users";
@@ -17,12 +18,18 @@ import Briefcase from "~icons/lucide/briefcase";
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
 import { FieldDependencyIcon } from "@/components/icons";
+import { EmailNotifications } from "./EmailNotifications";
 
 export const tabs = [
   {
     label: "Email Accounts",
     icon: markRaw(LucideMail),
     component: markRaw(EmailConfig),
+  },
+  {
+    label: "Email Notifications",
+    icon: markRaw(LucideMailOpen),
+    component: markRaw(EmailNotifications)
   },
   {
     label: "Branding",
@@ -66,7 +73,11 @@ export const tabs = [
   },
 ];
 
-export const activeTab = ref(tabs[0]);
+export type Tab = typeof tabs[number];
+
+export const activeTab = ref<Tab>(tabs[0]);
+
+export const nextActiveTab = ref<Tab | null>(null);
 
 export const disableSettingModalOutsideClick = ref(false);
 
