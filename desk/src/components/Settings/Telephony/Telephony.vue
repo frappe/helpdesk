@@ -124,27 +124,35 @@
             />
             <ErrorMessage :message="twilioErrors.authToken" />
           </div>
-          <div class="flex flex-col gap-2">
-            <FormControl
-              label="API Key"
-              v-model="twilio.doc.api_key"
-              disabled
-            />
-          </div>
-          <div class="flex flex-col gap-2">
-            <Password
-              label="API Secret"
-              v-model="twilio.doc.api_secret"
-              disabled
-            />
-          </div>
-          <div class="flex flex-col gap-2">
-            <FormControl
-              label="TwiML SID"
-              v-model="twilio.doc.twiml_sid"
-              disabled
-            />
-          </div>
+          <FormControl label="API Key" v-model="twilio.doc.api_key" disabled />
+          <Password
+            label="API Secret"
+            v-model="twilio.doc.api_secret"
+            disabled
+          />
+          <Autocomplete
+            label="TwiML App Name"
+            :model-value="twilio.doc.app_name"
+            @update:modelValue="twilio.doc.app_name = $event.value"
+            :options="twilioApps"
+          >
+            <template #footer>
+              <Button
+                label="Refresh Apps"
+                theme="gray"
+                variant="subtle"
+                class="w-full"
+                icon-left="refresh-cw"
+                @click="refreshApps"
+                :loading="twilioAppsResource.loading"
+              />
+            </template>
+          </Autocomplete>
+          <FormControl
+            label="TwiML SID"
+            v-model="twilio.doc.twiml_sid"
+            disabled
+          />
         </div>
       </div>
     </div>
@@ -231,6 +239,7 @@ import {
   ErrorMessage,
   createResource,
   Badge,
+  Autocomplete,
 } from "frappe-ui";
 import { ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
@@ -244,6 +253,7 @@ const isDirty = ref({
   exotel: false,
   telephonyAgent: false,
 });
+const twilioApps = ref([]);
 
 const twilioErrors = ref({
   accountSid: "",
@@ -285,6 +295,13 @@ const telephonyAgent = createDocumentResource({
   cache: ["tp_telephony_agent"],
   fields: ["*"],
   auto: false,
+});
+
+const twilioAppsResource = createResource({
+  url: "telephony.twilio.api.fetch_applications",
+  onSuccess() {
+    twilio.reload();
+  },
 });
 
 const telephonyProviders = [
@@ -336,6 +353,10 @@ async function save() {
   telephonyStore.fetchCallIntegrationStatus();
 }
 
+function refreshApps() {
+  twilioAppsResource.submit();
+}
+
 createResource({
   url: "telephony.api.create_telephony_agent",
   auto: true,
@@ -359,6 +380,10 @@ watch(
   () => twilio.doc,
   (newVal) => {
     isDirty.value.twilio = isDocDirty(newVal, twilio.originalDoc);
+    twilioApps.value = newVal.twilio_apps.split(",").map((app) => ({
+      label: app,
+      value: app,
+    }));
   },
   { deep: true }
 );
