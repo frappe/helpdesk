@@ -9,9 +9,9 @@
           <TextInput
             v-model="searchQuery"
             type="text"
-            :placeholder="'Search responses by title...'"
+            :placeholder="'Search canned responses'"
             class="input input-bordered h-8 px-2 text-sm"
-            style="min-width: 400px"
+            style="min-width: 290px"
           >
             <template #prefix>
               <FeatherIcon name="search" class="h-4 w-4 text-gray-500 ml-2" />
@@ -161,14 +161,16 @@ const cannedResponses = createListResource({
   doctype: "HD Canned Response",
   fields: ["name", "title", "message", "owner", "modified"],
   auto: true,
-  filters: {},
+  orFilters: {},
   orderBy: "modified desc",
 });
 
 // reload responses when search query changes
 watch(searchQuery, (newValue) => {
   cannedResponses.update({
-    filters: newValue ? { title: ["like", `%${newValue}%`] } : {},
+    orFilters: newValue
+      ? { message: ["like", `%${newValue}%`], title: ["like", `%${newValue}%`] }
+      : {},
   });
   cannedResponses.reload();
 });
