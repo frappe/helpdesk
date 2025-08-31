@@ -852,8 +852,21 @@ class HDTicket(Document):
     def on_communication_update(self, c):
         # If communication is incoming, then it is a reply from customer, and ticket must
         # be reopened.
-        # if c.sent_or_received == "Received":
-        #     self.status = self.ticket_reopen_status if self.status_category == "Paused" else self.default_open_status
+        # handle re opening tickets for email
+        if c.sent_or_received == "Received" and not self.via_customer_portal:
+            # check if agent has replied
+            has_agent_replied = frappe.db.exists(
+                "Communication",
+                {
+                    "reference_doctype": "HD Ticket",
+                    "reference_name": self.name,
+                    "sent_or_received": "Sent",
+                },
+            )
+            if has_agent_replied:
+                self.status = self.ticket_reopen_status
+            else:
+                self.status = self.default_open_status
         # If communication is outgoing, it must be a reply from agent
         if c.sent_or_received == "Sent":
             # Set first response date if not set already
