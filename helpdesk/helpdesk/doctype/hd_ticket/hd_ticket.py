@@ -60,7 +60,6 @@ class HDTicket(Document):
             self.sla,
             "ticket_reopen_status",
         ) or frappe.db.get_single_value("HD Settings", "ticket_reopen_status")
-        pass
 
     def publish_update(self):
         publish_event("helpdesk:ticket-update", self.name)
@@ -886,8 +885,14 @@ class HDTicket(Document):
     def on_communication_update(self, c):
         # If communication is incoming, then it is a reply from customer, and ticket must
         # be reopened.
-        # if c.sent_or_received == "Received":
-        #     self.status = self.ticket_reopen_status if self.status_category == "Paused" else self.default_open_status
+        # handle re opening tickets for email
+        if c.sent_or_received == "Received":
+            # check if agent has replied
+
+            if self.has_agent_replied:
+                self.status = self.ticket_reopen_status
+            else:
+                self.status = self.default_open_status
         # If communication is outgoing, it must be a reply from agent
         if c.sent_or_received == "Sent":
             # Set first response date if not set already

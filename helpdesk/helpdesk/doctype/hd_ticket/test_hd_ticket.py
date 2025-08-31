@@ -495,7 +495,9 @@ class TestHDTicket(IntegrationTestCase):
         ticket2.create_communication_via_contact("Testing reply")
         ticket2.reload()
         # reopen the ticket
-        self.assertEqual(ticket2.status, "Open")
+
+        # status remains default one unless agent replies
+        self.assertEqual(ticket2.status, "New")
 
     def test_hold_time_resolution_time_with_holiday_with_custom_status(self):
         """
@@ -577,3 +579,4 @@ class TestHDTicket(IntegrationTestCase):
     def tearDown(self):
         remove_holidays()
         frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
+        frappe.delete_doc("HD Ticket Status", "New", force=True)
