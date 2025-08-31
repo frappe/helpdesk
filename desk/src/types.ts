@@ -1,5 +1,5 @@
 import { Component, ComputedRef, InjectionKey } from "vue";
-import { useTicket } from "./composables/useTicket";
+import type { HDTicket } from "./types/doctypes";
 
 export interface Resource<T = unknown> {
   auto: boolean;
@@ -428,5 +428,5 @@ export interface DocumentResource<T = unknown> {
 }
 
 export const TicketSymbol: InjectionKey<
-  ComputedRef<ReturnType<typeof useTicket>>
+  ComputedRef<DocumentResource<HDTicket>>
 > = Symbol("ticket");
