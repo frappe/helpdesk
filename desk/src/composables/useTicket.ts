@@ -1,24 +1,46 @@
-import { DocumentResource } from "@/types";
+import type { DocumentResource, Resource } from "@/types";
 import { HDTicket } from "@/types/doctypes";
-import { createDocumentResource, toast } from "frappe-ui";
+import { createDocumentResource, createListResource, toast } from "frappe-ui";
+import { reactive } from "vue";
 
-const ticketMap: Record<string, DocumentResource<HDTicket>> = {};
-const assigneeMap = {};
+interface MapValue {
+  ticket: DocumentResource<HDTicket>;
+  assignees: Resource<string[]>;
+}
 
-export const useTicket = (ticketId: string): DocumentResource<HDTicket> => {
+const ticketMap: Record<string, MapValue> = reactive({});
+
+export const useTicket = (ticketId: string): MapValue => {
   if (!ticketMap[ticketId]) {
-    ticketMap[ticketId] = createDocumentResource<HDTicket>({
-      doctype: "HD Ticket",
-      name: ticketId,
-      whitelistedMethods: {
-        markSeen: "mark_seen",
-      },
-      setValue: {
-        onSuccess: () => {
-          toast.success(__("Ticket updated"));
+    ticketMap[ticketId] = {
+      ticket: createDocumentResource<HDTicket>({
+        doctype: "HD Ticket",
+        name: ticketId,
+        whitelistedMethods: {
+          markSeen: "mark_seen",
         },
-      },
-    });
+        setValue: {
+          onSuccess: () => {
+            toast.success(__("Ticket updated"));
+          },
+        },
+      }),
+      assignees: createListResource({
+        doctype: "ToDo",
+        auto: true,
+        filters: {
+          reference_type: "HD Ticket",
+          reference_name: ticketId,
+          status: ["not in", ["Cancelled", "Closed"]],
+        },
+        fields: ["allocated_to as assignedTo"],
+        transform: (data: Record<"assignedTo", string>[]) => {
+          const assignees = new Set(data.map((item) => item.assignedTo));
+          return Array.from(assignees);
+        },
+      }),
+    };
   }
+
   return ticketMap[ticketId];
 };

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!ticket.get?.loading" class="">
+  <div v-if="!ticket.get?.loading" class="flex-1">
     <LayoutHeader>
       <template #left-header>
         <div class="flex flex-col">
@@ -109,7 +109,7 @@ const props = defineProps({
 const route = useRoute();
 const router = useRouter();
 
-const ticket = useTicket(props.ticketId);
+const { ticket } = useTicket(props.ticketId);
 provide(
   TicketSymbol,
   computed(() => ticket)
@@ -140,7 +140,6 @@ const breadcrumbs = computed(() => {
 });
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(props.ticketId);
-
 const statusDropdown = computed(() =>
   ticketStatusStore.statuses.data?.map((o: HDTicketStatus) => ({
     label: o.label_agent,
