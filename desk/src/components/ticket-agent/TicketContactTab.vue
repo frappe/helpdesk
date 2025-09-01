@@ -7,7 +7,7 @@
         {{ user.name }}
       </p>
     </div>
-    <div class="border-b px-5 text-ink-gray-5">
+    <div class="border-b px-5 text-ink-gray-5 pb-2">
       <!-- Email Id -->
       <div class="flex gap-2 items-center p-1.5">
         <EmailIcon class="size-4" />

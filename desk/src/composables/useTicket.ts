@@ -47,6 +47,7 @@ export const useTicket = (ticketId: string): MapValue => {
       }),
       customizations: createResource({
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
+        cache: ["ticket_customizations", ticketId],
         auto: true,
       }),
     };

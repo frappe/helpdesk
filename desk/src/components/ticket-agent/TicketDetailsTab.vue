@@ -130,8 +130,8 @@ const customFields = computed(() => {
       placeholder: f.placeholder || `Enter ${fieldMeta?.label || f.fieldname}`,
       required: f.required || fieldMeta.reqd,
       url_method: f.url_method || "",
-      readonly: fieldMeta.read_only,
-      disabled: fieldMeta.read_only,
+      readonly: Boolean(fieldMeta.read_only),
+      disabled: Boolean(fieldMeta.read_only),
     };
   });
   return _customFields;
