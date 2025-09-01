@@ -21,8 +21,7 @@ import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import { useTicket } from "@/composables/useTicket";
 import { TicketSymbol } from "@/types";
-import { computed, provide, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { computed, provide } from "vue";
 
 const props = defineProps({
   ticketId: {
@@ -31,23 +30,11 @@ const props = defineProps({
   },
 });
 
-const route = useRoute();
-
-const currentTicketId = ref(props.ticketId);
-const ticketComposable = ref(useTicket(currentTicketId.value));
+const currentTicketId = computed(() => {
+  return props.ticketId;
+});
+const ticketComposable = computed(() => useTicket(currentTicketId.value));
 const ticket = computed(() => ticketComposable.value.ticket);
-
-// Watch for route parameter changes
-watch(
-  () => route.params.ticketId,
-  (newTicketId) => {
-    if (newTicketId && newTicketId !== currentTicketId.value) {
-      currentTicketId.value = newTicketId as string;
-      ticketComposable.value = useTicket(newTicketId as string);
-    }
-  },
-  { immediate: true }
-);
 
 provide(TicketSymbol, ticket);
 </script>
