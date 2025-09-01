@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-08-24 10:36+0000\n"
-"PO-Revision-Date: 2025-08-31 16:10\n"
+"PO-Revision-Date: 2025-09-01 16:20\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Norwegian Bokmal\n"
 "MIME-Version: 1.0\n"
@@ -625,7 +625,7 @@ msgstr "DocType"
 #. Label of the domain (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Domain"
-msgstr ""
+msgstr "Domene"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -650,7 +650,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Email Account"
-msgstr ""
+msgstr "E-postkonto"
 
 #. Label of the is_feedback_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
