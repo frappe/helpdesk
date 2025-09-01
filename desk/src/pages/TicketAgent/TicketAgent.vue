@@ -30,10 +30,7 @@ const props = defineProps({
   },
 });
 
-const currentTicketId = computed(() => {
-  return props.ticketId;
-});
-const ticketComposable = computed(() => useTicket(currentTicketId.value));
+const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
 
 provide(TicketSymbol, ticket);

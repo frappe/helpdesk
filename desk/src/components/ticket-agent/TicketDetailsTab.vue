@@ -24,6 +24,7 @@
             :placeholder="field.placeholder"
             :doctype="field.doctype"
             :modelValue="field.value"
+            :required="field.required"
             @update:model-value="
               (val:string) => handleFieldUpdate(field.fieldname, val)
             "
@@ -67,6 +68,7 @@ import { Link } from "@/components";
 import { useTicket } from "@/composables/useTicket";
 import { getMeta } from "@/stores/meta";
 import { FieldValue, TicketSymbol } from "@/types";
+import { toast } from "frappe-ui";
 import { computed, inject } from "vue";
 import TicketField from "../TicketField.vue";
 import TicketContact from "./TicketContact.vue";
@@ -95,9 +97,11 @@ const coreFields = computed(() => {
         doctype: f.options,
         placeholder: `Select ${f.label}`,
         fieldname: f.fieldname,
+        required: f.reqd,
       };
     });
   });
+  debugger;
   return _coreFields;
 });
 
@@ -141,7 +145,22 @@ const customFields = computed(() => {
 
 function handleFieldUpdate(fieldname: string, value: FieldValue) {
   if (ticket.value.doc[fieldname] === value) return;
-  ticket.value.setValue.submit({ [fieldname]: value });
+  ticket.value.setValue.submit(
+    { [fieldname]: value },
+    {
+      onSuccess: () => {
+        // TODO: emit the event for notification to listeners
+      },
+      onError: (error) => {
+        const msg = error.exc_type
+          ? (error.messages || error.message || []).join(", ")
+          : error.message;
+        toast.error(msg);
+      },
+    }
+
+    //show error toast
+  );
 }
 </script>
 
