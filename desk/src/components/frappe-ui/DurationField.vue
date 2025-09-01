@@ -6,7 +6,7 @@
         class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 rounded"
       >
         <div class="flex items-center justify-between">
-          <span :class="{ 'text-gray-500': !modelValue }">
+          <span :class="{ 'text-gray-600': !modelValue || disabled }">
             {{ formattedValue }}
           </span>
         </div>
@@ -158,7 +158,6 @@ const props = defineProps({
     default: false,
   },
 });
-console.log(props.showSeconds);
 
 const emit = defineEmits(["update:modelValue"]);
 

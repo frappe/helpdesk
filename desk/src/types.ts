@@ -9,6 +9,7 @@ export interface Resource<T = unknown> {
   pageLength: number;
   totalCount: number;
   hasNextPage: boolean;
+  promise: Promise<void> | null;
   list: {
     loading: boolean;
   };
@@ -393,6 +394,7 @@ export interface DocumentResource<T = unknown> {
   doctype: string;
   name: string;
   isDirty: boolean;
+  promise: Promise<void> | null;
 
   // Main document data
   doc: T;
@@ -441,6 +443,8 @@ export interface Customizations {
     url_method: string;
   }[];
   _form_script: string[];
+  _customActions?: any;
+  _customOnChange?: any;
 }
 
 // extend window object to add date_format &. time_format

@@ -44,14 +44,20 @@
     </div>
 
     <!-- Additional Fields -->
-    <div class="border-t flex flex-col overflow-y-scroll h-full flex-1">
-      <TicketField
-        v-for="field in customFields"
-        :key="field.fieldname"
-        :field="field"
-        :value="field.value"
-        @change="({ fieldname, value }) => handleFieldUpdate(fieldname, value)"
-      />
+    <div
+      class="border-t flex flex-col pb-5 flex-1 h-full overflow-hidden pb-12"
+    >
+      <div class="overflow-y-scroll">
+        <TicketField
+          v-for="field in customFields"
+          :key="field.fieldname"
+          :field="field"
+          :value="field.value"
+          @change="
+            ({ fieldname, value }) => handleFieldUpdate(fieldname, value)
+          "
+        />
+      </div>
     </div>
   </div>
 </template>

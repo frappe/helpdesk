@@ -1,7 +1,7 @@
 import { Field } from "@/types";
 
 export async function setupCustomizations(doc, obj) {
-  let data = doc?.data;
+  let data = doc;
   if (!data) return;
   if (!data._form_script) return [];
   let actions = [];
