@@ -465,3 +465,18 @@ def duplicate_ticket(ticket_doc, subject):
     new_ticket.insert(ignore_permissions=True)
 
     return new_ticket.name
+
+
+@frappe.whitelist()
+@agent_only
+def get_ticket_customizations():
+    # get form script
+    # get default ticket template
+    custom_fields = frappe.get_all(
+        "HD Ticket Template Field",
+        filters={"parent": "Default"},
+        fields=["fieldname", "required", "placeholder", "url_method"],
+        order_by="idx",
+    )
+    form_scripts = get_form_script("HD Ticket")
+    return {"custom_fields": custom_fields, "_form_script": form_scripts}

@@ -1,10 +1,12 @@
 <template>
-  <div class="h-full">
-    <div class="px-5 border-b pb-4">
+  <div
+    class="h-full overflow-y-hidden flex flex-1 flex-col justify-between overflow-hidden"
+  >
+    <div class="px-5 pb-4 flex flex-col">
       <!-- User avatar with buttons -->
       <TicketContact :contact="ticket?.doc.contact" />
       <!-- Core Fields -->
-      <div class="">
+      <div>
         <div
           v-for="(section, index) in coreFields"
           :key="index"
@@ -15,7 +17,7 @@
           <Link
             v-for="field in section.fields"
             :key="field.fieldname"
-            class="form-control"
+            class="form-control-core"
             :class="section.group ? 'flex-1' : 'w-full'"
             :page-length="10"
             :label="field.label"
@@ -23,26 +25,34 @@
             :doctype="field.doctype"
             :modelValue="field.value"
             @update:model-value="
-              (val:string) => handleFieldUpdate(val, field.fieldname)
+              (val:string) => handleFieldUpdate(field.fieldname, val)
             "
           />
         </div>
 
         <!-- Assignee component -->
         <Link
-          class="form-control w-full mb-2"
+          class="form-control-core w-full mb-2"
           doctype="HD Team"
           placeholder="Select Team"
           v-model="ticket.doc.raised_by"
           label="Assignee"
           :page-length="10"
         />
-        {{ assignees?.data }}
+        <!-- {{ assignees?.data }} -->
       </div>
     </div>
 
     <!-- Additional Fields -->
-    <div>asds</div>
+    <div class="border-t flex flex-col overflow-y-scroll h-full flex-1">
+      <TicketField
+        v-for="field in customFields"
+        :key="field.fieldname"
+        :field="field"
+        :value="field.value"
+        @change="({ fieldname, value }) => handleFieldUpdate(fieldname, value)"
+      />
+    </div>
   </div>
 </template>
 
@@ -50,26 +60,27 @@
 import { Link } from "@/components";
 import { useTicket } from "@/composables/useTicket";
 import { getMeta } from "@/stores/meta";
-import { TicketSymbol } from "@/types";
+import { FieldValue, TicketSymbol } from "@/types";
 import { computed, inject } from "vue";
+import TicketField from "../TicketField.vue";
 import TicketContact from "./TicketContact.vue";
 
 const ticket = inject(TicketSymbol);
-const { assignees } = useTicket(ticket.value.name);
+const { assignees, customizations } = useTicket(ticket.value.name);
 const { getFields, getField } = getMeta("HD Ticket");
 
+// ticket_type, priority, customer, agent_group
 const coreFields = computed(() => {
-  const fields = getFields();
-  if (!fields || fields.length === 0) {
+  const fieldsMeta = getFields();
+  if (!fieldsMeta || fieldsMeta.length === 0) {
     return [];
   }
-  // config driven core fields
   const _coreFields = [
     { group: true, fields: [getField("ticket_type"), getField("priority")] },
     { group: false, fields: [getField("customer")] },
     { group: true, fields: [getField("agent_group")] },
   ];
-  debugger;
+
   _coreFields.forEach((section) => {
     section.fields = section.fields.map((f) => {
       return {
@@ -84,23 +95,61 @@ const coreFields = computed(() => {
   return _coreFields;
 });
 
-function handleFieldUpdate(value: string, fieldname: string) {
+const customFields = computed(() => {
+  const fieldsMeta = getFields();
+  if (!fieldsMeta || fieldsMeta.length === 0) {
+    return [];
+  }
+
+  if (!customizations.data || customizations.loading) return [];
+  let customFields = customizations.data?.custom_fields || [];
+  const _coreFields = [
+    "ticket_type",
+    "priority",
+    "customer",
+    "agent_group",
+    "subject",
+    "status",
+  ];
+  customFields = customFields.filter((f) => !_coreFields.includes(f.fieldname));
+  let _customFields = customFields.map((f) => {
+    const fieldMeta = getField(f.fieldname);
+    return {
+      label: fieldMeta?.label || f.fieldname,
+      value: ticket.value.doc[f.fieldname],
+      fieldname: f.fieldname,
+      fieldtype: fieldMeta?.fieldtype,
+      doctype: fieldMeta?.options || "",
+      options: fieldMeta?.options || "",
+      placeholder: f.placeholder || `Enter ${fieldMeta?.label || f.fieldname}`,
+      required: f.required || fieldMeta.reqd,
+      url_method: f.url_method || "",
+      readonly: fieldMeta.read_only,
+      disabled: fieldMeta.read_only,
+    };
+  });
+  return _customFields;
+
+  // customFields
+});
+
+function handleFieldUpdate(fieldname: string, value: FieldValue) {
   if (ticket.value.doc[fieldname] === value) return;
   ticket.value.setValue.submit({ [fieldname]: value });
 }
 </script>
 
 <style scoped>
-:deep(.form-control button) {
+:deep(.form-control-core button) {
   @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
 }
-:deep(.form-control button > div) {
+:deep(.form-control-core button > div) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-:deep(.form-control div) {
+:deep(.form-control-core div) {
   width: 100%;
   display: flex;
 }

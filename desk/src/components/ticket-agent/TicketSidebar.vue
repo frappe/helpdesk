@@ -5,7 +5,7 @@
       v-model="currentTab"
       class="tab-buttons mb-1 px-5"
     />
-    <div class="flex-1">
+    <div class="flex-1 max-h-full">
       <TicketDetailsTab v-if="currentTab === 'details'" />
       <TicketContactTab v-else />
     </div>
@@ -19,7 +19,7 @@ import Resizer from "../Resizer.vue";
 import TicketContactTab from "./TicketContactTab.vue";
 import TicketDetailsTab from "./TicketDetailsTab.vue";
 
-const currentTab = ref("contact");
+const currentTab = ref("details");
 const tabs = [
   {
     label: "Details",

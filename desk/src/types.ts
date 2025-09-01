@@ -1,3 +1,4 @@
+import { Dayjs } from "dayjs";
 import { Component, ComputedRef, InjectionKey } from "vue";
 import type { HDTicket } from "./types/doctypes";
 
@@ -130,7 +131,7 @@ export interface AutoCompleteItem {
 export interface Field {
   fieldname: string;
   fieldtype: string;
-  hide_from_customer: 0 | 1;
+  hide_from_customer?: 0 | 1;
   label: string;
   options: string;
   required: 0 | 1;
@@ -142,9 +143,10 @@ export interface Field {
   mandatory_via_depends_on?: string;
   disabled?: boolean;
   placeholder?: string | null;
+  readonly?: boolean;
 }
 
-export type FieldValue = string | number | boolean;
+export type FieldValue = string | number | boolean | null | undefined | Dayjs;
 
 export interface Template {
   about: string;
@@ -430,3 +432,22 @@ export interface DocumentResource<T = unknown> {
 export const TicketSymbol: InjectionKey<
   ComputedRef<DocumentResource<HDTicket>>
 > = Symbol("ticket");
+
+export interface Customizations {
+  custom_fields: {
+    fieldname: string;
+    required: number;
+    placeholder: string;
+    url_method: string;
+  }[];
+  _form_script: string[];
+}
+
+// extend window object to add date_format &. time_format
+
+declare global {
+  interface Window {
+    date_format: string;
+    time_format: string;
+  }
+}
