@@ -480,3 +480,74 @@ def get_ticket_customizations():
     )
     form_scripts = get_form_script("HD Ticket")
     return {"custom_fields": custom_fields, "_form_script": form_scripts}
+
+
+@frappe.whitelist()
+def get_open_tickets(ticket: str, current_view: str = None):
+    """
+    Get a list of open tickets.
+    """
+    import json
+
+    filters = []
+
+    # Get filters from current view if provided
+    if current_view:
+        _filters = frappe.get_value("HD View", current_view, "filters")
+        if _filters:
+            try:
+                # Parse the filters string to list/dict
+                filters = (
+                    json.loads(_filters) if isinstance(_filters, str) else _filters
+                )
+            except (json.JSONDecodeError, TypeError):
+                filters = []
+
+    if not filters:
+        default_view = frappe.db.get_value(
+            "HD View",
+            {"dt": "HD Ticket", "is_default": 1, "owner": frappe.session.user},
+            "filters",
+        )
+
+        if default_view:
+            try:
+                filters = (
+                    json.loads(default_view)
+                    if isinstance(default_view, str)
+                    else default_view
+                )
+            except (json.JSONDecodeError, TypeError):
+                filters = []
+
+    # Base filters - exclude the current ticket and only get open tickets
+    base_filters = [
+        ["name", "!=", ticket],
+        ["status_category", "=", "Open"],
+        ["_assign", "like", f"%{frappe.session.user}%"],
+    ]
+
+    # Combine base filters with view filters
+    if filters and isinstance(filters, list):
+        final_filters = base_filters + filters
+    else:
+        final_filters = base_filters
+
+    try:
+        tickets = frappe.get_list(
+            "HD Ticket",
+            filters=final_filters,
+            fields=["name"],
+            order_by="creation desc",
+            limit=40,
+        )
+
+        # Extract just the ticket IDs
+        ticket_ids = [int(ticket)] + [t.name for t in tickets]
+        print("\n\n", ticket_ids, "\n\n")
+        return ticket_ids
+
+    except Exception as e:
+        frappe.log_error(f"Error in get_open_tickets: {str(e)}")
+        # Return empty list if there's an error
+        return []

@@ -22,10 +22,7 @@
           :hide-name="true"
         />
         <!-- Navigation -->
-        <div class="flex gap-1">
-          <Button :icon="LucideChevronLeft" variant="ghost" />
-          <Button :icon="LucideChevronRight" variant="ghost" />
-        </div>
+        <TicketNavigation />
         <!-- Custom Actions -->
         <div v-if="normalActions.length" class="flex gap-2">
           <Button
@@ -102,8 +99,6 @@ import {
   ref,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import LucideChevronLeft from "~icons/lucide/chevron-left";
-import LucideChevronRight from "~icons/lucide/chevron-right";
 import LucideMerge from "~icons/lucide/merge";
 import { IndicatorIcon } from "../icons";
 

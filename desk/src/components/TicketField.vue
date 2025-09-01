@@ -51,7 +51,6 @@ import {
 } from "frappe-ui";
 import DatePicker from "frappe-ui/src/components/DatePicker/DatePicker.vue";
 import { computed, h } from "vue";
-import DurationField from "./frappe-ui/DurationField.vue";
 
 interface P {
   field: Field;
@@ -69,6 +68,20 @@ interface E {
 
 const props = defineProps<P>();
 const emit = defineEmits<E>();
+
+const apiOptions = createResource({
+  url: props.field.url_method,
+  auto: !!props.field.url_method,
+  transform: (data) => {
+    if (!data?.length) return [];
+    return (
+      data?.map((o) => ({
+        label: o,
+        value: o,
+      })) || []
+    );
+  },
+});
 
 const textFields = ["Long Text", "Small Text", "Text", "Text Editor", "Data"];
 
@@ -104,11 +117,12 @@ const component = computed(() => {
   } else if (textFields.includes(props.field.fieldtype)) {
     return h(FormControl, {
       type: "textarea",
-      rows: "1",
+      rows: 1,
     });
   } else if (props.field.fieldtype === "Datetime") {
     return h(DateTimePicker, {
       formatter: (datetime: string) => {
+        if (!datetime) return datetime;
         return dayjs(datetime).format(
           `${window.date_format.toUpperCase()} ${window.time_format}`
         );
@@ -118,26 +132,14 @@ const component = computed(() => {
     return h(DatePicker, {
       id: props.field.fieldname,
     });
-  } else if (props.field.fieldtype === "Duration") {
-    // console.log("HERE TIME");
-    return h(DurationField, { showSeconds: false });
-  } else {
+  }
+  // else if (props.field.fieldtype === "Duration") {
+  //   // console.log("HERE TIME");
+  //   return h(DurationField, { showSeconds: false });
+  // }
+  else {
     return h(FormControl);
   }
-});
-
-const apiOptions = createResource({
-  url: props.field.url_method,
-  auto: !!props.field.url_method,
-  transform: (data) => {
-    if (!data?.length) return [];
-    return (
-      data?.map((o) => ({
-        label: o,
-        value: o,
-      })) || []
-    );
-  },
 });
 
 const transValue = computed(() => {
@@ -145,8 +147,12 @@ const transValue = computed(() => {
   if (fieldtype === "Check") {
     return props.value ? "Yes" : "No";
   } else if (fieldtype === "Date") {
+    if (!props.value) return props.value;
     return dayjs(props.value).format(window.date_format.toUpperCase());
   }
+  // else if (fieldtype === "Duration") {
+  //   if (!props.value) return null;
+  // }
   return props.value;
 });
 
