@@ -25,6 +25,7 @@ import {
   Customizations,
   CustomizationSymbol,
   Resource,
+  TicketContactSymbol,
   TicketSymbol,
 } from "@/types";
 import { createResource } from "frappe-ui";
@@ -39,6 +40,7 @@ const props = defineProps({
 
 const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
+const ticketContact = ticketComposable.value.contact;
 const customizations: Resource<Customizations> = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
   cache: ["HD Ticket", "customizations"],
@@ -49,6 +51,10 @@ provide(TicketSymbol, ticket);
 provide(
   AssigneeSymbol,
   computed(() => ticketComposable.value.assignees)
+);
+provide(
+  TicketContactSymbol,
+  computed(() => ticketContact)
 );
 provide(
   CustomizationSymbol,

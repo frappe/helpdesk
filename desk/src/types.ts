@@ -443,6 +443,14 @@ export interface Customizations {
   _customOnChange?: any;
 }
 
+export interface TicketContact {
+  name: string;
+  email_id: string;
+  phone: string;
+  mobile_no: string;
+  image: string;
+}
+
 // symbols
 export const TicketSymbol: InjectionKey<
   ComputedRef<DocumentResource<HDTicket>>
@@ -454,6 +462,10 @@ export const AssigneeSymbol: InjectionKey<
 export const CustomizationSymbol: InjectionKey<
   ComputedRef<Resource<Customizations>>
 > = Symbol("customizations");
+
+export const TicketContactSymbol: InjectionKey<
+  ComputedRef<Resource<TicketContact>>
+> = Symbol("ticketContact");
 
 declare global {
   interface Window {
