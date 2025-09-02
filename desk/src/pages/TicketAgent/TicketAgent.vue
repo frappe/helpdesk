@@ -20,7 +20,14 @@ import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.v
 import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import { useTicket } from "@/composables/useTicket";
-import { TicketSymbol } from "@/types";
+import {
+  AssigneeSymbol,
+  Customizations,
+  CustomizationSymbol,
+  Resource,
+  TicketSymbol,
+} from "@/types";
+import { createResource } from "frappe-ui";
 import { computed, provide } from "vue";
 
 const props = defineProps({
@@ -32,8 +39,21 @@ const props = defineProps({
 
 const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
+const customizations: Resource<Customizations> = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
+  cache: ["HD Ticket", "customizations"],
+  auto: true,
+});
 
 provide(TicketSymbol, ticket);
+provide(
+  AssigneeSymbol,
+  computed(() => ticketComposable.value.assignees)
+);
+provide(
+  CustomizationSymbol,
+  computed(() => customizations)
+);
 </script>
 
 <style>

@@ -57,9 +57,13 @@
 
 <script setup lang="ts">
 import { Link } from "@/components";
-import { useTicket } from "@/composables/useTicket";
 import { getMeta } from "@/stores/meta";
-import { FieldValue, TicketSymbol } from "@/types";
+import {
+  AssigneeSymbol,
+  CustomizationSymbol,
+  FieldValue,
+  TicketSymbol,
+} from "@/types";
 import { toast } from "frappe-ui";
 import { computed, inject } from "vue";
 import TicketField from "../TicketField.vue";
@@ -67,7 +71,8 @@ import AssigneeTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
 
 const ticket = inject(TicketSymbol);
-const { customizations, assignees } = useTicket(ticket.value.name);
+const assignees = inject(AssigneeSymbol);
+const customizations = inject(CustomizationSymbol);
 const { getFields, getField } = getMeta("HD Ticket");
 
 // ticket_type, priority, customer, agent_group
@@ -103,8 +108,8 @@ const customFields = computed(() => {
     return [];
   }
 
-  if (!customizations.data || customizations.loading) return [];
-  let customFields = customizations.data?.custom_fields || [];
+  if (!customizations.value.data || customizations.value.loading) return [];
+  let customFields = customizations.value.data?.custom_fields || [];
   const _coreFields = [
     "ticket_type",
     "priority",
@@ -143,7 +148,7 @@ function handleFieldUpdate(fieldname: string, value: FieldValue) {
       onSuccess: () => {
         // TODO: emit the event for notification to listeners
         if (fieldname === "agent_group") {
-          assignees.reload();
+          assignees.value.reload();
         }
       },
       onError: (error) => {

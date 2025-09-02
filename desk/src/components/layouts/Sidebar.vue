@@ -236,12 +236,7 @@ const { $socket } = globalStore();
 const showSettingsModal = ref(false);
 
 const { pinnedViews, publicViews } = useView();
-declare global {
-  interface Window {
-    is_fc_site: boolean;
-    site_name: string;
-  }
-}
+
 const isFCSite = ref(window.is_fc_site);
 
 const allViews = computed(() => {
