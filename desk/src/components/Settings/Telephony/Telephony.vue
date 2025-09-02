@@ -124,8 +124,14 @@
             />
             <ErrorMessage :message="twilioErrors.authToken" />
           </div>
-          <FormControl label="API Key" v-model="twilio.doc.api_key" disabled />
+          <FormControl
+            v-if="twilio.doc.api_key"
+            label="API Key"
+            v-model="twilio.doc.api_key"
+            disabled
+          />
           <Password
+            v-if="twilio.doc.api_secret"
             label="API Secret"
             v-model="twilio.doc.api_secret"
             disabled
@@ -150,6 +156,7 @@
             </template>
           </Autocomplete>
           <FormControl
+            v-if="twilio.doc.twiml_sid"
             label="TwiML SID"
             v-model="twilio.doc.twiml_sid"
             disabled
