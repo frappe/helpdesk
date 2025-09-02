@@ -101,7 +101,6 @@ const coreFields = computed(() => {
       };
     });
   });
-  debugger;
   return _coreFields;
 });
 

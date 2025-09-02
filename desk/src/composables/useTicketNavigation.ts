@@ -1,16 +1,17 @@
 import { createResource } from "frappe-ui";
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 export const currentTicketIndex = ref(0);
 
 export const ticketsToNavigate = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_open_tickets",
+  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_navigation_tickets",
   cache: ["ticketsToNavigate"],
 });
 
 export function useTicketNavigation() {
   const router = useRouter();
+  const route = useRoute();
 
   function goToNextTicket() {
     if (currentTicketIndex.value < ticketsToNavigate.data.length - 1) {
@@ -37,10 +38,15 @@ export function useTicketNavigation() {
   }
 
   function navigateToTicket(ticketId: string) {
-    router.push({
+    let view = route.query.view as string;
+    let routeToNavigate: any = {
       name: "TicketAgent2",
       params: { ticketId },
-    });
+    };
+    if (view) {
+      routeToNavigate["query"] = { view };
+    }
+    router.push(routeToNavigate);
   }
 
   // Remove the watcher that was causing conflicts
