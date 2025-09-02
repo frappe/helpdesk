@@ -131,6 +131,7 @@
             disabled
           />
           <Autocomplete
+            v-if="twilioApps.length > 0"
             label="TwiML App Name"
             :model-value="twilio.doc.app_name"
             @update:modelValue="twilio.doc.app_name = $event.value"
