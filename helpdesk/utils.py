@@ -3,19 +3,19 @@ import re
 from typing import List
 
 import frappe
+import phonenumbers
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import Document
+from frappe.query_builder import Order
 from frappe.realtime import get_website_room
+from frappe.utils import floor
 from frappe.utils.safe_exec import get_safe_globals
 from frappe.utils.telemetry import capture as _capture
-from pypika import Criterion
-import phonenumbers
-from frappe.utils import floor
 from phonenumbers import NumberParseException
 from phonenumbers import PhoneNumberFormat as PNF
+from pypika import Criterion
 from pypika.functions import Replace
-from frappe.query_builder import Order
 
 
 def check_permissions(doctype, parent, doc=None):
