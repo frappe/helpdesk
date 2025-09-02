@@ -1,17 +1,11 @@
-import type { Customizations, DocumentResource, Resource } from "@/types";
+import type { DocumentResource, Resource } from "@/types";
 import type { HDTicket } from "@/types/doctypes";
-import {
-  createDocumentResource,
-  createListResource,
-  createResource,
-  toast,
-} from "frappe-ui";
+import { createDocumentResource, createListResource, toast } from "frappe-ui";
 import { reactive } from "vue";
 
 interface MapValue {
   ticket: DocumentResource<HDTicket>;
   assignees: Resource<Record<"name", string>[]>;
-  customizations: Resource<Customizations>;
 }
 
 const ticketMap: Record<string, MapValue> = reactive({});
@@ -40,12 +34,6 @@ export const useTicket = (ticketId: string): MapValue => {
           status: ["not in", ["Cancelled", "Closed"]],
         },
         fields: ["allocated_to as name"],
-      }),
-      // TODO: Shouldnt be ideally per ticket
-      customizations: createResource({
-        url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
-        cache: ["ticket_customizations", ticketId],
-        auto: true,
       }),
     };
   }

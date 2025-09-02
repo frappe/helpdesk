@@ -81,11 +81,10 @@ import {
   useActiveViewers,
   useNotifyTicketUpdate,
 } from "@/composables/realtime";
-import { useTicket } from "@/composables/useTicket";
 import { useView } from "@/composables/useView";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { TicketSymbol, View } from "@/types";
+import { CustomizationSymbol, TicketSymbol, View } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
 import { Breadcrumbs, call, Dropdown, toast } from "frappe-ui";
@@ -108,7 +107,7 @@ const { findView } = useView("HD Ticket");
 const ticketStatusStore = useTicketStatusStore();
 
 const ticket = inject(TicketSymbol);
-const { customizations } = useTicket(ticket.value?.name);
+const customizations = inject(CustomizationSymbol);
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
 const statusDropdown = computed(() =>
@@ -235,11 +234,14 @@ const { currentViewers, startViewing, stopViewing } = useActiveViewers(
 onMounted(async () => {
   // Listen for viewer updates
   startViewing();
-  if (customizations.loading) {
-    await customizations.promise;
+  if (customizations.value.loading) {
+    await customizations.value.promise;
   }
-  await setupCustomizations(customizations.data, customizationCtx);
-  actions.value = [...defaultActions, ...customizations.data._customActions];
+  await setupCustomizations(customizations.value.data, customizationCtx);
+  actions.value = [
+    ...defaultActions,
+    ...customizations.value.data._customActions,
+  ];
 });
 
 onUnmounted(() => {

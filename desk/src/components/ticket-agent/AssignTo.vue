@@ -47,14 +47,13 @@
 </template>
 
 <script setup lang="ts">
-import { useTicket } from "@/composables/useTicket";
-import { TicketSymbol } from "@/types";
+import { AssigneeSymbol, TicketSymbol } from "@/types";
 import { Popover } from "frappe-ui";
 import { inject } from "vue";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import MultipleAvatar from "../MultipleAvatar.vue";
 const ticket = inject(TicketSymbol);
-const { assignees } = useTicket(ticket.value.name);
+const assignees = inject(AssigneeSymbol);
 
 async function saveAssignees(
   addedAssignees,

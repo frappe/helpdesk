@@ -431,10 +431,6 @@ export interface DocumentResource<T = unknown> {
   [methodName: string]: any;
 }
 
-export const TicketSymbol: InjectionKey<
-  ComputedRef<DocumentResource<HDTicket>>
-> = Symbol("ticket");
-
 export interface Customizations {
   custom_fields: {
     fieldname: string;
@@ -447,11 +443,23 @@ export interface Customizations {
   _customOnChange?: any;
 }
 
-// extend window object to add date_format &. time_format
+// symbols
+export const TicketSymbol: InjectionKey<
+  ComputedRef<DocumentResource<HDTicket>>
+> = Symbol("ticket");
+export const AssigneeSymbol: InjectionKey<
+  ComputedRef<Resource<Record<"name", string>[]>>
+> = Symbol("assignees");
+
+export const CustomizationSymbol: InjectionKey<
+  ComputedRef<Resource<Customizations>>
+> = Symbol("customizations");
 
 declare global {
   interface Window {
+    is_fc_site: boolean;
     date_format: string;
     time_format: string;
+    session_user: string;
   }
 }
