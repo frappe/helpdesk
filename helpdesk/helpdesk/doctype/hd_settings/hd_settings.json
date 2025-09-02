@@ -25,14 +25,11 @@
   "feedback_section",
   "is_feedback_mandatory",
   "column_break_kegb",
-  "enable_email_ticket_feedback",
-  "send_email_feedback_on_status",
   "ticket_restrictions_section",
   "allow_anyone_to_create_tickets",
   "auto_update_status",
   "update_status_to",
   "column_break_iarl",
-  "send_acknowledgement_email",
   "auto_close_tickets",
   "auto_close_status",
   "auto_close_after_days",
@@ -58,7 +55,21 @@
   "subject_weight",
   "column_break_qoxt",
   "description_weight",
-  "headings_weight"
+  "headings_weight",
+  "email_customisations_tab",
+  "share_feedback_section",
+  "enable_email_ticket_feedback",
+  "send_email_feedback_on_status",
+  "feedback_email_content",
+  "acknowledgement_section",
+  "send_acknowledgement_email",
+  "acknowledgement_email_content",
+  "reply_from_contact_section",
+  "enable_reply_email_to_agent",
+  "reply_email_to_agent_content",
+  "reply_from_agent_section",
+  "enable_reply_email_via_agent",
+  "reply_via_agent_email_content"
  ],
  "fields": [
   {
@@ -295,12 +306,6 @@
    "mandatory_depends_on": "eval: doc.auto_close_tickets"
   },
   {
-   "default": "0",
-   "fieldname": "send_acknowledgement_email",
-   "fieldtype": "Check",
-   "label": "Send Acknowledgement Email"
-  },
-  {
    "fieldname": "feedback_section",
    "fieldtype": "Section Break",
    "label": "Feedback"
@@ -323,7 +328,7 @@
    "description": "If enabled, feedback email will be sent to the customer when you mark a ticket as the status selected below.\n",
    "fieldname": "enable_email_ticket_feedback",
    "fieldtype": "Check",
-   "label": "Enable feedback for Email Tickets"
+   "label": "Enabled"
   },
   {
    "default": "0",
@@ -331,6 +336,72 @@
    "fieldname": "assign_within_team",
    "fieldtype": "Check",
    "label": "Restrict agent assignment to selected Team"
+  },
+  {
+   "fieldname": "email_customisations_tab",
+   "fieldtype": "Tab Break",
+   "label": "Email Notifications"
+  },
+  {
+   "fieldname": "share_feedback_section",
+   "fieldtype": "Section Break",
+   "label": "Share Feedback"
+  },
+  {
+   "fieldname": "feedback_email_content",
+   "fieldtype": "Text",
+   "label": "Email Content"
+  },
+  {
+   "fieldname": "acknowledgement_section",
+   "fieldtype": "Section Break",
+   "label": "Acknowledgement"
+  },
+  {
+   "fieldname": "acknowledgement_email_content",
+   "fieldtype": "Text",
+   "label": "Email Content"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, a ticket creation acknowledgement email will be sent to the user right after creating an email ticket",
+   "fieldname": "send_acknowledgement_email",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "default": "1",
+   "description": "If enabled, an email will be sent to all of the assigned agents after a reply from one of the contacts",
+   "fieldname": "enable_reply_email_to_agent",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "reply_email_to_agent_content",
+   "fieldtype": "Text",
+   "label": "Email Content"
+  },
+  {
+   "default": "1",
+   "description": "If enabled, an email is sent to all of the recipients associated with an agent's reply",
+   "fieldname": "enable_reply_email_via_agent",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "reply_via_agent_email_content",
+   "fieldtype": "Text",
+   "label": "Email Content"
+  },
+  {
+   "fieldname": "reply_from_contact_section",
+   "fieldtype": "Section Break",
+   "label": "Reply From Contact"
+  },
+  {
+   "fieldname": "reply_from_agent_section",
+   "fieldtype": "Section Break",
+   "label": "Reply From Agent"
   },
   {
    "depends_on": "eval:doc.auto_update_status",
@@ -383,7 +454,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-25 16:45:51.037716",
+ "modified": "2025-08-29 13:34:17.018321",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

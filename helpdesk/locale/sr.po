@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-08-17 10:37+0000\n"
-"PO-Revision-Date: 2025-08-19 12:16\n"
+"POT-Creation-Date: 2025-08-24 10:36+0000\n"
+"PO-Revision-Date: 2025-08-26 14:26\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Cyrillic)\n"
 "MIME-Version: 1.0\n"
@@ -61,11 +61,33 @@ msgstr "Неопходна радња"
 msgid "Action to perform when clicking the button. The doc will be available as `this`"
 msgstr "Радња која се извршава кликом на дугме. Документ ће бити доступан као `this`"
 
+#: desk/src/components/Settings/Agents.vue:139
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:97
+msgid "Add Agents"
+msgstr "Додај агенте"
+
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
+msgid "Add Assignee"
+msgstr "Додај извршиоца"
+
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add Weekly Holidays"
 msgstr "Додај недељне празнике"
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
+msgid "Add a condition"
+msgstr "Додај услов"
+
+#: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
+msgid "Add a custom condition"
+msgstr "Додај прилагођени услов"
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
+#: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
+msgid "Add condition"
+msgstr "Додај услов"
 
 #. Label of the get_weekly_off_dates (Button) field in DocType 'HD Service
 #. Holiday List'
@@ -203,6 +225,14 @@ msgstr "Додели"
 msgid "Assigned To"
 msgstr "Додељено"
 
+#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
+msgid "Assignee Rules"
+msgstr "Правило извршиоца"
+
+#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:75
+msgid "Assignees"
+msgstr "Извршиоци"
+
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Assignment"
@@ -226,6 +256,26 @@ msgstr "Правило доделе задатка"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Assignment Rules"
 msgstr "Правила доделе"
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:10
+msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
+msgstr "Правила додељивања аутоматски усмеравају тикете ка одговарајућим члановима тима на основу унапред дефинисаних услова."
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:278
+msgid "Assignment Schedule"
+msgstr "Распоред додељивања"
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:134
+msgid "Assignment condition"
+msgstr "Услов додељивања"
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:19
+msgid "Assignment rule"
+msgstr "Правило доделе задатка"
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:6
+msgid "Assignment rules"
+msgstr "Правила додељивања"
 
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:28
 msgid "At-least one of priority, team and ticket type is required"
@@ -309,7 +359,7 @@ msgstr "Дугме"
 msgid "Can not send email. No sender email set up!"
 msgstr "Није могуће послати имејл. Није подешен имејл пошиљаоца!"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:491
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:464
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr "Није могуће обрисати подразумевани споразум о нивоу услуге. Барем један споразум мора бити означен као подразумевани."
 
@@ -332,6 +382,26 @@ msgstr "Категорија мора имати барем један члан�
 msgid "Channels"
 msgstr "Канали"
 
+#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:22
+msgid "Choose how tickets are distributed among selected assignees."
+msgstr "Изаберите како се тикети распоређују међу изабраним извршиоцима."
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:282
+msgid "Choose the days of the week when this rule should be active."
+msgstr "Изаберите дане у недељи када ово правило треба да буде активно."
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:139
+msgid "Choose which tickets are affected by this assignment rule."
+msgstr "Изаберите који тикет подлеже овом правилу додељивања."
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:209
+msgid "Choose which tickets are affected by this un-assignment rule."
+msgstr "Изаберите који тикети подлежу правилу уклањања додељивања."
+
+#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:78
+msgid "Choose who receives the tickets."
+msgstr "Изаберите ко прима тикете."
+
 #. Label of the clear_table (Button) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Clear Table"
@@ -340,6 +410,10 @@ msgstr "Очисти табелу"
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:46
 msgid "Click on Add to Holidays. This will populate the holidays table with all the dates that fall on the selected weekly off. Repeat the process for populating the dates for all your weekly holidays"
 msgstr "Кликните на Додај у празнике. Ово ће попунити табелу празника са свим датумима који падају на изабране недељне слободне дане. Поновите процес за попуњавање датума свих недељних празника"
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:61
+msgid "Close"
+msgstr "Затвори"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Pause Service Level
 #. Agreement On Status'
@@ -430,6 +504,10 @@ msgstr "Врста садржаја"
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Неуспешно слање имејла са повратном информацијом због: {0}"
 
+#: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:17
+msgid "Create new"
+msgstr "Креирај ново"
+
 #. Label of the criterion_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
@@ -484,6 +562,10 @@ msgstr "Подразумевани шаблон не може бити обри�
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Default ticket type"
 msgstr "Подразумевана врста тикета"
+
+#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:9
+msgid "Define who receives the tickets and how they’re distributed among agents."
+msgstr "Дефинишите ко прима тикете и како се они распоређују између агената."
 
 #. Label of the description (Text) field in DocType 'HD Article Category'
 #. Label of the description (Text Editor) field in DocType 'HD Holiday'
@@ -550,6 +632,14 @@ msgstr "Домен"
 msgid "Draft"
 msgstr "Нацрт"
 
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:64
+msgid "Duplicate"
+msgstr "Дупликат"
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:45
+msgid "Duplicate Assignment Rule"
+msgstr "Дупликат правила додељивања"
+
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "Email"
@@ -578,6 +668,8 @@ msgstr "Омогући повратну информацију за тикете
 #. Label of the enabled (Check) field in DocType 'HD Form Script'
 #. Label of the enabled (Check) field in DocType 'HD Service Level Agreement'
 #. Label of the enabled (Check) field in DocType 'HD Stopword'
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:38
+#: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:21
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -1083,12 +1175,16 @@ msgstr "Слање имејла тренутно"
 
 #: helpdesk/utils.py:26
 msgid "Insufficient Permission for {0}"
-msgstr "Недовољна овлашћена за {0}"
+msgstr "Недовољна овлашћења за {0}"
 
 #. Label of the integer_value (Int) field in DocType 'HD Ticket Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 msgid "Integer value"
 msgstr "Бројчана вредност"
+
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:82
+msgid "Invite agent"
+msgstr "Позови агента"
 
 #. Label of the is_active (Check) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
@@ -1147,6 +1243,19 @@ msgstr "База знања"
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Label"
 msgstr "Ознака"
+
+#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
+msgid "Last"
+msgstr "Последње"
+
+#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
+msgid "Last user assigned by this rule"
+msgstr "Последњи корисник којем је тикет додељен по овом правилу"
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:145
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:217
+msgid "Learn about conditions"
+msgstr "Сазнајте више о условима"
 
 #. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
 #. Source'
@@ -1236,6 +1345,18 @@ msgstr "Име"
 msgid "Name Weight"
 msgstr "Пондер назива"
 
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:51
+msgid "New Assignment Rule Name"
+msgstr "Назив новог правила додељивања"
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:14
+msgid "No items in the list"
+msgstr "Нема ставки у листи"
+
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:74
+msgid "No results found"
+msgstr "Нема резултата"
+
 #: helpdesk/utils.py:159
 msgid "Not Allowed"
 msgstr "Није дозвољено"
@@ -1250,6 +1371,11 @@ msgstr "Није специфицирано"
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Notification Settings"
 msgstr "Подешавање обавештења"
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:232
+msgid "Old Condition"
+msgstr "Стари услов"
 
 #. Label of the on_hold_since (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1366,6 +1492,7 @@ msgstr "Приоритети"
 #. Label of the priority_section (Section Break) field in DocType 'HD Settings'
 #. Label of the priority (Link) field in DocType 'HD Ticket'
 #. Label of the priority (Link) field in DocType 'HD Ticket Type'
+#: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:20
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1657,12 +1784,17 @@ msgstr "Статус споразума о нивоу услуге"
 msgid "Saturday"
 msgstr "Субота"
 
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:42
+msgid "Save"
+msgstr "Сачувај"
+
 #. Label of the script (Code) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Script"
 msgstr "Скрипта"
 
 #. Label of the search_tab (Tab Break) field in DocType 'HD Settings'
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:26
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Search"
 msgstr "Претрага"
@@ -2020,6 +2152,10 @@ msgstr "Тикет није пронађен"
 msgid "Ticket Priority"
 msgstr "Приоритет тикета"
 
+#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:18
+msgid "Ticket Routing"
+msgstr "Преусмеравање тикета"
+
 #. Label of the ticket_split_from (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Ticket Split From"
@@ -2109,7 +2245,7 @@ msgstr "Датум завршетка"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:45
 msgid "To Date cannot be before From Date"
-msgstr "Датум завршетка не може бити пре датум почетка"
+msgstr "Датум завршетка не може бити пре датума почетка"
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:35
 msgid "Top Result"
@@ -2153,6 +2289,10 @@ msgstr "Врста"
 msgid "URL/Method"
 msgstr "URL/Метод"
 
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:204
+msgid "Unassignment condition"
+msgstr "Услов уклањања додељивања"
+
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:16
 msgid "Unauthorized Access"
 msgstr "Неовлашћени приступ"
@@ -2160,6 +2300,10 @@ msgstr "Неовлашћени приступ"
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:16
 msgid "Unauthorized access."
 msgstr "Неовлашћени приступ."
+
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:28
+msgid "Unsaved"
+msgstr "Несачувано"
 
 #. Label of the user (Link) field in DocType 'HD Agent'
 #. Label of the user (Link) field in DocType 'HD Article Feedback'
@@ -2178,7 +2322,7 @@ msgstr "Неовлашћени приступ."
 msgid "User"
 msgstr "Корисник"
 
-#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:127
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:133
 msgid "User Not found"
 msgstr "Корисник није пронађен"
 
