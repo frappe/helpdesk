@@ -1,3 +1,5 @@
+import json
+
 import frappe
 from frappe import _
 from frappe.model.document import get_controller
@@ -465,3 +467,130 @@ def duplicate_ticket(ticket_doc, subject):
     new_ticket.insert(ignore_permissions=True)
 
     return new_ticket.name
+
+
+@frappe.whitelist()
+@agent_only
+def get_ticket_customizations():
+    # get form script
+    # get default ticket template
+    custom_fields = frappe.get_all(
+        "HD Ticket Template Field",
+        filters={"parent": "Default"},
+        fields=["fieldname", "required", "placeholder", "url_method"],
+        order_by="idx",
+    )
+    form_scripts = get_form_script("HD Ticket")
+    return {"custom_fields": custom_fields, "_form_script": form_scripts}
+
+
+@frappe.whitelist()
+def get_navigation_tickets(ticket: str, current_view: str = None):
+    """
+    Get a list of tickets to navigate
+    """
+
+    filters = get_navigation_filters(ticket, current_view)
+    order_by = get_navigation_order_by(current_view)
+
+    try:
+        tickets = frappe.get_list(
+            "HD Ticket",
+            pluck="name",
+            filters=filters,
+            order_by=order_by,
+            limit=40,
+        )
+
+        # Extract just the ticket IDs
+        ticket_ids = [int(ticket), *tickets]
+        print("\n\n", ticket_ids, "\n\n")
+        return ticket_ids
+
+    except Exception as e:
+        frappe.log_error(f"Error in get_navigation_tickets: {str(e)}")
+        # Return empty list if there's an error
+        return []
+
+
+def get_navigation_filters(ticket: str, current_view: str = None):
+
+    filters = []
+    if current_view:
+        _filters = frappe.get_value("HD View", current_view, "filters")
+        if _filters:
+            try:
+                # Parse the filters string to list/dict
+                filters = (
+                    json.loads(_filters) if isinstance(_filters, str) else _filters
+                )
+            except (json.JSONDecodeError, TypeError):
+                filters = []
+
+    if not filters:
+        default_view = frappe.db.get_value(
+            "HD View",
+            {"dt": "HD Ticket", "is_default": 1, "user": frappe.session.user},
+            "filters",
+        )
+
+        if default_view:
+            try:
+                filters = (
+                    json.loads(default_view)
+                    if isinstance(default_view, str)
+                    else default_view
+                )
+            except (json.JSONDecodeError, TypeError):
+                filters = []
+
+    # Base filters - exclude the current ticket
+    base_filters = {"name": ["!=", ticket]}
+
+    # Combine base filters with view filters
+    # is instance of {}
+
+    if filters and isinstance(filters, object):
+        final_filters = {**filters, **base_filters}
+
+    else:
+        final_filters = base_filters
+    return final_filters
+
+
+def get_navigation_order_by(view):
+    if not view:
+        order_by = frappe.get_value(
+            "HD View",
+            {"dt": "HD Ticket", "is_default": 1, "user": frappe.session.user},
+            "order_by",
+        )
+    elif view:
+        order_by = frappe.get_value("HD View", view, "order_by")
+
+    if order_by:
+        return order_by
+    return "modified desc"
+
+
+@frappe.whitelist()
+def get_ticket_contact(ticket: str):
+    contact = frappe.db.get_value("HD Ticket", ticket, "contact")
+    print("\n\n", contact, "\n\n")
+    if not contact:
+        raised_by = frappe.db.get_value("HD Ticket", ticket, "raised_by")
+        return {
+            "email_id": raised_by,
+            "name": raised_by.split("@")[0],
+            "phone": "",
+            "mobile_no": "",
+        }
+
+    c = frappe.db.get_value(
+        "Contact",
+        contact,
+        ["name", "email_id", "phone", "mobile_no", "image"],
+        as_dict=1,
+    )
+    print("\n\n", c, "\n\n")
+    return c

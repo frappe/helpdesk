@@ -11,9 +11,6 @@
       </template>
     </Button>
   </div>
-  <Dropdown v-if="groupedActions.length" :options="groupedActions">
-    <Button icon="more-horizontal" />
-  </Dropdown>
   <div v-if="groupedWithLabelActions.length">
     <div v-for="g in groupedWithLabelActions" :key="g.label">
       <Dropdown v-slot="{ open }" :options="g.action">
@@ -28,11 +25,14 @@
       </Dropdown>
     </div>
   </div>
+  <Dropdown v-if="groupedActions.length" :options="groupedActions">
+    <Button icon="more-horizontal" variant="ghost" />
+  </Dropdown>
 </template>
 
 <script setup>
-import { computed, h } from "vue";
 import { Dropdown } from "frappe-ui";
+import { computed } from "vue";
 
 const props = defineProps({
   actions: {

@@ -151,7 +151,7 @@ defineExpose({
 });
 
 onMounted(() => {
-  scrollToLatestActivity();
+  // scrollToLatestActivity();
 });
 
 watch(

@@ -175,10 +175,10 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { TabObject, TicketTab, View } from "@/types";
+import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
 import { ComputedRef } from "vue";
 import { showAssignmentModal } from "./modalStates";
-import { HDTicketStatus } from "@/types/doctypes";
 const route = useRoute();
 const router = useRouter();
 
@@ -388,6 +388,7 @@ const activities = computed(() => {
 
 function filterActivities(eventType: TicketTab) {
   if (eventType === "activity") {
+    console.log(activities.value);
     return activities.value;
   }
   return activities.value.filter((activity) => activity.type === eventType);

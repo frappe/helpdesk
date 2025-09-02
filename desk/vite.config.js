@@ -20,7 +20,7 @@ export default defineConfig({
       },
       frappeTypes: {
         input: {
-          helpdesk: ["hd_ticket_status"],
+          helpdesk: ["hd_ticket_status", "hd_ticket"],
         },
       },
     }),
