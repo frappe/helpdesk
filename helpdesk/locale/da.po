@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-08-24 10:36+0000\n"
-"PO-Revision-Date: 2025-08-28 15:51\n"
+"PO-Revision-Date: 2025-09-02 16:23\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Danish\n"
 "MIME-Version: 1.0\n"
@@ -413,7 +413,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:61
 msgid "Close"
-msgstr ""
+msgstr "Luk"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Pause Service Level
 #. Agreement On Status'
@@ -429,7 +429,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:38
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:421
 msgid "Closed"
-msgstr ""
+msgstr "Lukket"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:271
 msgid "Closed or rated tickets cannot be updated by non-agents"
@@ -476,7 +476,7 @@ msgstr ""
 #. Label of the contact_html (HTML) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Contact HTML"
-msgstr ""
+msgstr "Kontakt HTML"
 
 #: helpdesk/templates/components/contact_with_us.html:11
 msgid "Contact with us"
@@ -485,7 +485,7 @@ msgstr ""
 #. Label of the contacts (Table) field in DocType 'HD Organization'
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 msgid "Contacts"
-msgstr ""
+msgstr "Kontakter"
 
 #. Label of the content_section (Section Break) field in DocType 'HD Article'
 #. Label of the content (Text Editor) field in DocType 'HD Article'
