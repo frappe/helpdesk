@@ -160,7 +160,10 @@ const groupByActions = [
       const { label, value } = group;
       const url = new URL(window.location.href);
       url.pathname = `/helpdesk/kb-public/${value}`;
-      await copyToClipboard();
+      await copyToClipboard(
+        url.toString(),
+        `Category <u>'${label}'</u> link copied to clipboard`
+      );
     },
   },
   {

@@ -6,7 +6,17 @@
     >
       <!-- Source -->
       <div class="flex items-center gap-1">
-        <p>#{{ ticket.doc.name }}</p>
+        <p
+          @click="
+            copyToClipboard(
+              ticket.doc.name,
+              `Ticket #${ticket.doc.name} copied to clipboard`
+            )
+          "
+          class="cursor-copy"
+        >
+          #{{ ticket.doc.name }}
+        </p>
         <!-- Via Email -->
         <div
           v-if="!ticket.doc.via_customer_portal"
@@ -43,6 +53,7 @@
 
 <script setup lang="ts">
 import { TicketSymbol } from "@/types";
+import { copyToClipboard } from "@/utils";
 import { inject } from "vue";
 
 const ticket = inject(TicketSymbol);

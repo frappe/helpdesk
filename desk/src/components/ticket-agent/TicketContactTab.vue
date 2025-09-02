@@ -20,7 +20,15 @@
           <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
             {{ contact.data.email_id }}
           </p>
-          <CopyIcon class="size-4 cursor-pointer" />
+          <CopyIcon
+            class="size-4 cursor-pointer"
+            @click="
+              copyToClipboard(
+                contact.data.email_id,
+                `'${contact.data.email_id}' copied to clipboard`
+              )
+            "
+          />
         </div>
         <!-- Mobile Number -->
         <div class="flex gap-2 items-center p-1.5">
@@ -28,7 +36,18 @@
           <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
             {{ contact.data.mobile_no || contact.data.phone || "N/A" }}
           </p>
-          <CopyIcon class="size-4 cursor-pointer" />
+          <CopyIcon
+            class="size-4 cursor-pointer"
+            v-if="contact.data.mobile_no || contact.data.phone"
+            @click="
+              copyToClipboard(
+                contact.data.mobile_no || contact.data.phone,
+                `'${
+                  contact.data.mobile_no || contact.data.phone
+                }' copied to clipboard`
+              )
+            "
+          />
         </div>
       </div>
     </div>
@@ -82,6 +101,7 @@
 <script setup lang="ts">
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { TicketContactSymbol } from "@/types";
+import { copyToClipboard } from "@/utils";
 import { Avatar } from "frappe-ui";
 import { inject } from "vue";
 import { CopyIcon } from "../icons";

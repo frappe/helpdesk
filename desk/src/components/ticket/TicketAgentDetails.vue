@@ -146,10 +146,7 @@ function getCalculatedResolution() {
 const sections = computed(() => [
   {
     label: "First Response",
-    tooltipValue: dateFormat(
-      props.ticket.first_responded_on || props.ticket.response_by,
-      dateTooltipFormat
-    ),
+    tooltipValue: dateFormat(props.ticket.response_by, dateTooltipFormat),
     badgeText: firstResponseBadge.value.label,
     badgeColor: firstResponseBadge.value.color,
   },
