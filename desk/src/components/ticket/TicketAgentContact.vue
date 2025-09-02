@@ -11,14 +11,18 @@
         <Tooltip :text="`Call ${contact.name}`" v-if="isCallingEnabled">
           <Button class="h-7 w-7">
             <template #icon>
-              <FeatherIcon name="phone" class="h-4 w-4" @click="callContact" />
+              <FeatherIcon
+                name="phone"
+                class="size-full p-1.5"
+                @click="callContact"
+              />
             </template>
           </Button>
         </Tooltip>
         <Tooltip :text="contact.email_id">
           <Button class="h-7 w-7">
             <template #icon>
-              <EmailIcon class="h-4 w-4" @click="openEmailBox()" />
+              <EmailIcon class="size-full p-1.5" @click="openEmailBox()" />
             </template>
           </Button>
         </Tooltip>
