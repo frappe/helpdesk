@@ -32,15 +32,7 @@
         </div>
 
         <!-- Assignee component -->
-        <Link
-          class="form-control-core w-full mb-2"
-          doctype="HD Team"
-          placeholder="Select Team"
-          v-model="ticket.doc.raised_by"
-          label="Assignee"
-          :page-length="10"
-        />
-        <!-- {{ assignees?.data }} -->
+        <AssigneeTo />
       </div>
     </div>
 
@@ -71,10 +63,11 @@ import { FieldValue, TicketSymbol } from "@/types";
 import { toast } from "frappe-ui";
 import { computed, inject } from "vue";
 import TicketField from "../TicketField.vue";
+import AssigneeTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
 
 const ticket = inject(TicketSymbol);
-const { assignees, customizations } = useTicket(ticket.value.name);
+const { customizations, assignees } = useTicket(ticket.value.name);
 const { getFields, getField } = getMeta("HD Ticket");
 
 // ticket_type, priority, customer, agent_group
@@ -149,6 +142,9 @@ function handleFieldUpdate(fieldname: string, value: FieldValue) {
     {
       onSuccess: () => {
         // TODO: emit the event for notification to listeners
+        if (fieldname === "agent_group") {
+          assignees.reload();
+        }
       },
       onError: (error) => {
         const msg = error.exc_type

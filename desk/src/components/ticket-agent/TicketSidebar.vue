@@ -1,9 +1,9 @@
 <template>
-  <Resizer class="flex flex-col justify-between border-l pt-3.5" side="right">
+  <Resizer class="flex flex-col justify-between border-l" side="right">
     <TabButtons
       :buttons="tabs"
       v-model="currentTab"
-      class="tab-buttons mb-1 px-5"
+      class="tab-buttons mb-1 px-5 mt-3.5"
     />
     <div class="flex-1 max-h-full">
       <TicketDetailsTab v-if="currentTab === 'details'" />

@@ -168,7 +168,6 @@ import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
 import Apps from "@/components/Apps.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
-import { showNewAgentsDialog } from "@/components/Settings/agents";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useDevice } from "@/composables";
@@ -199,7 +198,7 @@ import {
 
 import HelpIcon from "frappe-ui/frappe/Icons/HelpIcon.vue";
 import { storeToRefs } from "pinia";
-import { computed, h, markRaw, onMounted, onUnmounted, ref } from "vue";
+import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   agentPortalSidebarOptions,
@@ -240,6 +239,7 @@ const { pinnedViews, publicViews } = useView();
 declare global {
   interface Window {
     is_fc_site: boolean;
+    site_name: string;
   }
 }
 const isFCSite = ref(window.is_fc_site);
