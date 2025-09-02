@@ -288,10 +288,6 @@ function handleIncomingCall(call) {
   showCallPopup.value = true;
   _call = call;
 
-  _call.on("accept", (conn) => {
-    console.log("conn", conn);
-  });
-
   // add event listener to call object
   call.on("cancel", handleDisconnectedIncomingCall);
   call.on("disconnect", handleDisconnectedIncomingCall);

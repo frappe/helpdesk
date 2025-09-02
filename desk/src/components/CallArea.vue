@@ -86,6 +86,7 @@
       v-model="showCallLogDetailModal"
       v-model:callLogModal="showCallLogModal"
       :callLogId="props.activity.name"
+      :hideTicket="true"
     />
     <CallLogModal
       v-model="showCallLogModal"

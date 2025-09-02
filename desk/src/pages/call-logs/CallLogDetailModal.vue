@@ -74,7 +74,7 @@
                   class="flex items-center gap-1.5 cursor-pointer"
                   @click="() => field.link()"
                 >
-                  Ticket
+                  #{{ field.value }}
                   <ArrowUpRightIcon
                     class="h-4 w-4 shrink-0 cursor-pointer text-ink-gray-5 hover:text-ink-gray-8"
                   />
@@ -114,6 +114,10 @@ const props = defineProps({
   callLogId: {
     type: String,
     default: "",
+  },
+  hideTicket: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -182,7 +186,7 @@ const detailFields = computed(() => {
     (link) => link.link_doctype == "HD Ticket"
   );
 
-  if (ticketLink) {
+  if (ticketLink && !props.hideTicket) {
     details.push({
       icon: TicketIcon,
       name: "ticket",
