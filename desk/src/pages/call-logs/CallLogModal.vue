@@ -25,13 +25,17 @@
               <Select
                 v-model="callLog.type"
                 :options="callLogTypeOptions"
-                placeholder="Type"
+                placeholder="Select"
               />
               <ErrorMessage :message="errors.type" />
             </div>
             <div class="flex flex-col gap-1.5">
               <FormLabel label="To" required />
-              <FormControl v-model="callLog.to" type="text" placeholder="To" />
+              <FormControl
+                v-model="callLog.to"
+                type="text"
+                placeholder="+18596748596"
+              />
               <ErrorMessage :message="errors.to" />
             </div>
           </div>
@@ -41,7 +45,7 @@
               <FormControl
                 v-model="callLog.from"
                 type="text"
-                placeholder="From"
+                placeholder="+19138276548"
               />
               <ErrorMessage :message="errors.from" />
             </div>
@@ -50,7 +54,7 @@
               <Select
                 v-model="callLog.status"
                 :options="callLogStatusOptions"
-                placeholder="Status"
+                placeholder="Select"
               ></Select>
               <ErrorMessage :message="errors.status" />
             </div>
@@ -73,8 +77,9 @@
               <Link
                 :value="callLog.receiver"
                 :doctype="'User'"
-                :placeholder="'Call Received By'"
+                :placeholder="'Select'"
                 label="Call Received By"
+                :hideMe="true"
                 @change="(data) => (callLog.receiver = data)"
               />
             </div>
@@ -85,8 +90,9 @@
               <Link
                 :value="callLog.caller"
                 :doctype="'User'"
-                :placeholder="'Caller'"
+                :placeholder="'Select'"
                 label="Caller"
+                :hideMe="true"
                 @change="(data) => (callLog.caller = data)"
               />
             </div>
@@ -94,7 +100,7 @@
               <Link
                 :value="callLog.ticket"
                 :doctype="'HD Ticket'"
-                :placeholder="'Ticket'"
+                :placeholder="'Select'"
                 label="Ticket"
                 :show-description="true"
                 @change="(data) => (callLog.ticket = String(data))"

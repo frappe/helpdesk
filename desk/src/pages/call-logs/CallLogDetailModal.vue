@@ -69,14 +69,19 @@
                   :src="field.value"
                 ></audio>
               </div>
+              <div class="w-full" v-else-if="field.name == 'ticket'">
+                <div
+                  class="flex items-center gap-1.5 cursor-pointer"
+                  @click="() => field.link()"
+                >
+                  Ticket
+                  <ArrowUpRightIcon
+                    class="h-4 w-4 shrink-0 cursor-pointer text-ink-gray-5 hover:text-ink-gray-8"
+                  />
+                </div>
+              </div>
               <div v-else :class="field.color ? `text-${field.color}-600` : ''">
                 {{ field.value }}
-              </div>
-              <div v-if="field.link">
-                <ArrowUpRightIcon
-                  class="h-4 w-4 shrink-0 cursor-pointer text-ink-gray-5 hover:text-ink-gray-8"
-                  @click="() => field.link()"
-                />
               </div>
             </div>
           </div>
@@ -92,6 +97,7 @@ import DurationIcon from "@/components/icons/DurationIcon.vue";
 import ContactsIcon from "@/components/icons/ContactsIcon.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
+import TicketIcon from "@/components/icons/TicketIcon.vue";
 import { FeatherIcon, Avatar, Tooltip, createResource } from "frappe-ui";
 import { computed, h, nextTick, ref, watch } from "vue";
 import { formatDate } from "@vueuse/core";
@@ -171,6 +177,21 @@ const detailFields = computed(() => {
       value: data.recording_url,
     },
   ];
+
+  const ticketLink = data.links?.find(
+    (link) => link.link_doctype == "HD Ticket"
+  );
+
+  if (ticketLink) {
+    details.push({
+      icon: TicketIcon,
+      name: "ticket",
+      value: ticketLink.link_name,
+      link: () => {
+        window.open(`/helpdesk/tickets/${ticketLink.link_name}`);
+      },
+    });
+  }
 
   return details.filter((detail) => detail.value);
 });
