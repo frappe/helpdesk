@@ -4,7 +4,7 @@
   >
     <div class="px-5 pb-4 flex flex-col">
       <!-- User avatar with buttons -->
-      <TicketContact :contact="ticket?.doc.contact" />
+      <TicketContact />
       <!-- Core Fields -->
       <div>
         <div

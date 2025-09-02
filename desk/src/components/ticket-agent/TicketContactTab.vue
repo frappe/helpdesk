@@ -1,28 +1,35 @@
 <template>
   <!-- TODO: handle ellipsis -->
   <div>
-    <div class="flex gap-3 items-center px-5 py-2.5">
-      <Avatar :label="user.name" :image="user.user_image" size="2xl" />
-      <p class="text-ink-gray-8 font-medium text-xl">
-        {{ user.name }}
-      </p>
-    </div>
-    <div class="border-b px-5 text-ink-gray-5 pb-2">
-      <!-- Email Id -->
-      <div class="flex gap-2 items-center p-1.5">
-        <EmailIcon class="size-4" />
-        <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
-          {{ user.email }}
+    <!-- Contact -->
+    <div v-if="!contact.loading">
+      <div class="flex gap-3 items-center px-5 py-2.5">
+        <Avatar
+          :label="contact.data.name"
+          :image="contact.data.image"
+          size="2xl"
+        />
+        <p class="text-ink-gray-8 font-medium text-xl max-w-full truncate">
+          {{ contact.data.name }}
         </p>
-        <CopyIcon class="size-4 cursor-pointer" />
       </div>
-      <!-- Mobile Number -->
-      <div class="flex gap-2 items-center p-1.5">
-        <LucidePhone class="size-4" />
-        <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
-          9997772221
-        </p>
-        <CopyIcon class="size-4 cursor-pointer" />
+      <div class="border-b px-5 text-ink-gray-5 pb-2">
+        <!-- Email Id -->
+        <div class="flex gap-2 items-center p-1.5">
+          <EmailIcon class="size-4" />
+          <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
+            {{ contact.data.email_id }}
+          </p>
+          <CopyIcon class="size-4 cursor-pointer" />
+        </div>
+        <!-- Mobile Number -->
+        <div class="flex gap-2 items-center p-1.5">
+          <LucidePhone class="size-4" />
+          <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
+            {{ contact.data.mobile_no || contact.data.phone || "N/A" }}
+          </p>
+          <CopyIcon class="size-4 cursor-pointer" />
+        </div>
       </div>
     </div>
     <!-- Recent Tickets -->
@@ -74,18 +81,15 @@
 
 <script setup lang="ts">
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { useUserStore } from "@/stores/user";
-import { TicketSymbol } from "@/types";
+import { TicketContactSymbol } from "@/types";
 import { Avatar } from "frappe-ui";
 import { inject } from "vue";
 import { CopyIcon } from "../icons";
 import EmailIcon from "../icons/EmailIcon.vue";
 import Section from "../Section.vue";
 
-const ticket = inject(TicketSymbol);
+const contact = inject(TicketContactSymbol);
 
-const { getUser } = useUserStore();
-const user = getUser(ticket.value.doc.contact);
 const { getStatus, colorMap } = useTicketStatusStore();
 
 function getStatusColor(status: string) {

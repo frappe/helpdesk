@@ -571,3 +571,26 @@ def get_navigation_order_by(view):
     if order_by:
         return order_by
     return "modified desc"
+
+
+@frappe.whitelist()
+def get_ticket_contact(ticket: str):
+    contact = frappe.db.get_value("HD Ticket", ticket, "contact")
+    print("\n\n", contact, "\n\n")
+    if not contact:
+        raised_by = frappe.db.get_value("HD Ticket", ticket, "raised_by")
+        return {
+            "email_id": raised_by,
+            "name": raised_by.split("@")[0],
+            "phone": "",
+            "mobile_no": "",
+        }
+
+    c = frappe.db.get_value(
+        "Contact",
+        contact,
+        ["name", "email_id", "phone", "mobile_no", "image"],
+        as_dict=1,
+    )
+    print("\n\n", c, "\n\n")
+    return c

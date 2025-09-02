@@ -1,11 +1,17 @@
-import type { DocumentResource, Resource } from "@/types";
+import type { DocumentResource, Resource, TicketContact } from "@/types";
 import type { HDTicket } from "@/types/doctypes";
-import { createDocumentResource, createListResource, toast } from "frappe-ui";
+import {
+  createDocumentResource,
+  createListResource,
+  createResource,
+  toast,
+} from "frappe-ui";
 import { reactive } from "vue";
 
 interface MapValue {
   ticket: DocumentResource<HDTicket>;
   assignees: Resource<Record<"name", string>[]>;
+  contact: Resource<TicketContact>;
 }
 
 const ticketMap: Record<string, MapValue> = reactive({});
@@ -34,6 +40,11 @@ export const useTicket = (ticketId: string): MapValue => {
           status: ["not in", ["Cancelled", "Closed"]],
         },
         fields: ["allocated_to as name"],
+      }),
+      contact: createResource({
+        url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_contact",
+        params: { ticket: ticketId },
+        auto: true,
       }),
     };
   }
