@@ -380,10 +380,11 @@ watch(
   () => twilio.doc,
   (newVal) => {
     isDirty.value.twilio = isDocDirty(newVal, twilio.originalDoc);
-    twilioApps.value = newVal.twilio_apps.split(",").map((app) => ({
-      label: app,
-      value: app,
-    }));
+    twilioApps.value =
+      newVal.twilio_apps?.split(",").map((app) => ({
+        label: app,
+        value: app,
+      })) || [];
   },
   { deep: true }
 );
