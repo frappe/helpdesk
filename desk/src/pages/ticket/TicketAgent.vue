@@ -52,7 +52,6 @@
             </Button>
           </template>
         </Dropdown>
-        <CallUI :userEmail="getUser().email" />
       </template>
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-full overflow-hidden">
@@ -179,7 +178,6 @@ import { TabObject, TicketTab, View } from "@/types";
 import { getIcon } from "@/utils";
 import { ComputedRef } from "vue";
 import { showAssignmentModal } from "./modalStates";
-import CallUI from "@/components/telephony/CallUI.vue";
 import LucidePhone from "~icons/lucide/phone";
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";

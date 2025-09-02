@@ -2,7 +2,7 @@ import { getCachedListResource, getCachedResource } from "frappe-ui";
 import { io } from "socket.io-client";
 import { socketio_port } from "../../../../sites/common_site_config.json";
 
-function init() {
+export function initSocket() {
   let host = window.location.hostname;
   let siteName = window.site_name || host;
   let port = window.location.port ? `:${socketio_port}` : "";
@@ -27,4 +27,4 @@ function init() {
   return socket;
 }
 
-export const socket = init();
+export const socket = initSocket();

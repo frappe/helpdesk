@@ -191,7 +191,7 @@
             <ErrorMessage :message="exotelErrors.accountSid" />
           </div>
           <div class="flex flex-col gap-2">
-            <Password
+            <FormControl
               label="Webhook Verify Token"
               required
               v-model="exotel.doc.webhook_verify_token"

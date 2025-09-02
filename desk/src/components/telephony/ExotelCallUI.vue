@@ -119,9 +119,14 @@ function toggleCallPopup() {
 
 const { width, height } = useWindowSize();
 
-let { style } = useDraggable(callPopupHeader, {
-  initialValue: { x: width.value - 350, y: height.value - 250 },
+let { style, x, y } = useDraggable(callPopupHeader, {
+  initialValue: { x: width.value - 280, y: height.value - 310 },
   preventDefault: true,
+});
+
+watch([width, height], () => {
+  x.value = Math.max(0, width.value - 280);
+  y.value = Math.max(0, height.value - 310);
 });
 
 const callStatus = ref("");
@@ -249,6 +254,7 @@ function updateStatus(data) {
     data.Status == "busy"
   ) {
     phoneNumber.value = data.From || data.CallFrom;
+    counterUp.value.start();
     return "Incoming call";
   } else if (
     data.Direction == "incoming" &&
@@ -256,6 +262,7 @@ function updateStatus(data) {
     data.DialCallStatus == "no-answer"
   ) {
     onCallFailed && onCallFailed();
+    counterUp.value.stop();
     return "No answer";
   } else if (
     data.Direction == "incoming" &&
@@ -267,6 +274,7 @@ function updateStatus(data) {
       parseInt(data["Legs[0][OnCallDuration]"]) ||
         parseInt(data.DialCallDuration)
     );
+    counterUp.value.stop();
     return "Call ended";
   }
 }

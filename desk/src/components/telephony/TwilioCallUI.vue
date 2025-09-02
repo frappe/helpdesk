@@ -65,7 +65,6 @@
             :label="'Cancel'"
             @click="cancelCall"
             class="rounded-lg"
-            :disabled="callStatus == 'initiating'"
           >
             <template #prefix>
               <LucidePhone class="h-4 w-4 rotate-[135deg]" />
@@ -219,9 +218,14 @@ watch(phoneNumber, (value) => {
 
 const { width, height } = useWindowSize();
 
-let { style } = useDraggable(callPopup, {
+let { x, y, style } = useDraggable(callPopup, {
   initialValue: { x: width.value - 280, y: height.value - 310 },
   preventDefault: true,
+});
+
+watch([width, height], () => {
+  x.value = Math.max(0, width.value - 280);
+  y.value = Math.max(0, height.value - 310);
 });
 
 async function startupClient() {
