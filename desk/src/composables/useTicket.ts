@@ -10,7 +10,7 @@ import { reactive } from "vue";
 
 interface MapValue {
   ticket: DocumentResource<HDTicket>;
-  assignees: Resource<string[]>;
+  assignees: Resource<Record<"name", string>[]>;
   customizations: Resource<Customizations>;
 }
 
@@ -39,12 +39,9 @@ export const useTicket = (ticketId: string): MapValue => {
           reference_name: ticketId,
           status: ["not in", ["Cancelled", "Closed"]],
         },
-        fields: ["allocated_to as assignedTo"],
-        transform: (data: Record<"assignedTo", string>[]) => {
-          const assignees = new Set(data.map((item) => item.assignedTo));
-          return Array.from(assignees);
-        },
+        fields: ["allocated_to as name"],
       }),
+      // TODO: Shouldnt be ideally per ticket
       customizations: createResource({
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
         cache: ["ticket_customizations", ticketId],
