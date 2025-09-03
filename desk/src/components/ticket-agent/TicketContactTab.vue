@@ -13,7 +13,7 @@
           {{ contact.data.name }}
         </p>
       </div>
-      <div class="border-b px-5 text-ink-gray-5 pb-2">
+      <div class="px-5 text-ink-gray-5 pb-2">
         <!-- Email Id -->
         <div class="flex gap-2 items-center p-1.5">
           <EmailIcon class="size-4" />
@@ -37,7 +37,7 @@
             {{ contact.data.mobile_no || contact.data.phone || "N/A" }}
           </p>
           <CopyIcon
-            class="size-4 cursor-pointer"
+            class="size-4 cursor-pointer animate-bounce"
             v-if="contact.data.mobile_no || contact.data.phone"
             @click="
               copyToClipboard(
@@ -51,64 +51,79 @@
         </div>
       </div>
     </div>
-    <!-- Recent Tickets -->
-    <div class="px-5">
-      <Section
-        :label="section.label"
-        :hideLabel="section.hideLabel"
-        :opened="section.opened"
-      >
-        <template #header="{ opened, hide, toggle }">
-          <div class="flex gap-2.5 items-center py-[13px] justify-between">
-            <span
-              class="text-ink-gray-8 font-medium text-base cursor-pointer select-none"
-              @click="toggle"
-            >
-              Recent Tickets
-            </span>
-            <LucideChevronDown
-              class="size-4 text-ink-gray-6 cursor-pointer"
-              :class="{ 'rotate-180': opened }"
-              @click="toggle"
-            />
-          </div>
-        </template>
-        <ul>
-          <li
-            v-for="ticket in section.tickets"
-            :key="ticket.name"
-            class="py-2.5 border-b last:border-0"
-          >
-            <p class="text-base text-ink-gray-8">{{ ticket.subject }}</p>
-            <div class="flex items-center justify-between">
-              <p class="text-base text-ink-gray-5">
-                {{ ticket.created + " &#183; " + "#" + ticket.name }}
-              </p>
-              <p
-                class="px-1.5 py-[3px] text-sm rounded-sm max-w-[80px] text-center truncate h-5"
-                :class="getStatusColor(ticket.status)"
-              >
-                {{ ticket.status }}
-              </p>
+
+    <!-- Recent / Similar Tickets -->
+    <template v-if="!recentSimilarTickets.loading">
+      <div class="px-5 border-t" v-for="section in sections">
+        <Section
+          :key="section.label"
+          :label="section.label"
+          :hideLabel="section.hideLabel"
+          :opened="section.opened"
+        >
+          <template #header="{ opened, hide, toggle }">
+            <div class="flex gap-2.5 items-center py-[13px] justify-between">
+              <Tooltip :text="section.tooltipMessage">
+                <span
+                  class="text-ink-gray-8 font-medium text-base cursor-pointer select-none"
+                  @click="toggle"
+                >
+                  {{ section.label }}
+                </span>
+              </Tooltip>
+              <LucideChevronDown
+                class="size-4 text-ink-gray-6 cursor-pointer"
+                :class="{ 'rotate-180': opened }"
+                @click="toggle"
+              />
             </div>
-          </li>
-        </ul>
-      </Section>
-    </div>
+          </template>
+          <ul>
+            <li
+              v-for="ticket in section.tickets"
+              :key="ticket.name"
+              class="py-2.5 border-b last:border-0"
+            >
+              <p class="text-base text-ink-gray-8">{{ ticket.subject }}</p>
+              <div class="flex items-center justify-between">
+                <p class="text-base text-ink-gray-5">
+                  {{ formatDate(ticket.creation) + " &#183; " }}
+                  <span
+                    class="transition duration-400 hover:underline cursor-pointer"
+                    @click="openTicket(ticket.name)"
+                  >
+                    {{ "#" + ticket.name }}
+                  </span>
+                </p>
+                <p
+                  class="px-1.5 py-[3px] text-sm rounded-sm max-w-[80px] text-center truncate h-5"
+                  :class="getStatusColor(ticket.status)"
+                >
+                  {{ ticket.status }}
+                </p>
+              </div>
+            </li>
+          </ul>
+        </Section>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { TicketContactSymbol } from "@/types";
+import { RecentSimilarTicketsSymbol, TicketContactSymbol } from "@/types";
 import { copyToClipboard } from "@/utils";
-import { Avatar } from "frappe-ui";
-import { inject } from "vue";
+import dayjs from "dayjs";
+import { Avatar, Tooltip } from "frappe-ui";
+import { computed, inject } from "vue";
 import { CopyIcon } from "../icons";
 import EmailIcon from "../icons/EmailIcon.vue";
 import Section from "../Section.vue";
 
 const contact = inject(TicketContactSymbol);
+const recentSimilarTickets = inject(RecentSimilarTicketsSymbol);
+const dateFormat = window.date_format;
 
 const { getStatus, colorMap } = useTicketStatusStore();
 
@@ -122,33 +137,43 @@ function getStatusColor(status: string) {
   }
 }
 
-const recentTickets = [
-  {
-    name: "TCK-0001",
-    subject: "Unable to login to my account",
-    status: "Replied",
-    created: "Jun 02, 20225",
-  },
-  {
-    name: "TCK-0002",
-    subject: "Payment not reflecting",
-    status: "On Hold",
-    created: "Jun 05, 2024",
-  },
-  {
-    name: "TCK-0003",
-    subject: "Feature request for dark mode",
-    status: "Open",
-    created: "Jun 10, 2024",
-  },
-];
+const sections = computed(() => {
+  if (recentSimilarTickets.value.loading || !recentSimilarTickets.value.data) {
+    return [];
+  }
+  const recentTickets = recentSimilarTickets.value?.data?.recent_tickets || [];
+  const similarTickets =
+    recentSimilarTickets.value?.data?.similar_tickets || [];
+  const _sections = [];
+  if (recentTickets.length) {
+    _sections.push({
+      label: "Recent Tickets",
+      tooltipMessage: "Tickets recently raised by this contact/customer",
+      hideLabel: false,
+      opened: true,
+      tickets: recentTickets,
+    });
+  }
+  if (similarTickets.length) {
+    _sections.push({
+      label: "Similar Tickets",
+      tooltipMessage: "Tickets with similar queries",
+      hideLabel: false,
+      opened: false,
+      tickets: similarTickets,
+    });
+  }
+  return _sections;
+});
 
-const section = {
-  label: "Recent Tickets",
-  hideLabel: false,
-  opened: true,
-  tickets: recentTickets,
-};
+function formatDate(date: string) {
+  return dayjs(date).format(dateFormat.toUpperCase());
+}
+function openTicket(name: string) {
+  let url = window.location.origin + "/helpdesk/tickets2/" + name;
+
+  window.open(url, "_blank");
+}
 </script>
 
 <style scoped></style>

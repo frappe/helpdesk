@@ -76,7 +76,7 @@
     </template>
   </LayoutHeader>
   <TicketMergeModal
-    :ticket="ticket"
+    :ticket="ticket.doc"
     v-if="showMergeModal"
     v-model="showMergeModal"
     @update="ticket.reload()"

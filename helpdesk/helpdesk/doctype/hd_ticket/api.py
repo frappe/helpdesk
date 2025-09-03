@@ -1,6 +1,7 @@
 import json
 
 import frappe
+from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
 from frappe.utils import get_user_info_for_avatar, now_datetime
@@ -505,7 +506,7 @@ def get_navigation_tickets(ticket: str, current_view: str = None):
 
         # Extract just the ticket IDs
         ticket_ids = [int(ticket), *tickets]
-        print("\n\n", ticket_ids, "\n\n")
+        # print("\n\n", ticket_ids, "\n\n")
         return ticket_ids
 
     except Exception as e:
@@ -577,7 +578,6 @@ def get_navigation_order_by(view):
 @frappe.whitelist()
 def get_ticket_contact(ticket: str):
     contact = frappe.db.get_value("HD Ticket", ticket, "contact")
-    print("\n\n", contact, "\n\n")
     if not contact:
         raised_by = frappe.db.get_value("HD Ticket", ticket, "raised_by")
         return {
@@ -585,13 +585,107 @@ def get_ticket_contact(ticket: str):
             "name": raised_by.split("@")[0],
             "phone": "",
             "mobile_no": "",
+            "image": "",
         }
 
-    c = frappe.db.get_value(
+    return frappe.db.get_value(
         "Contact",
         contact,
         ["name", "email_id", "phone", "mobile_no", "image"],
         as_dict=1,
     )
-    print("\n\n", c, "\n\n")
-    return c
+
+
+@frappe.whitelist()
+def get_recent_similar_tickets(ticket: str):
+    recent_tickets = get_recent_tickets(ticket)
+    similar_tickets = get_similar_tickets(ticket)
+    # print('\n\n',recent_tickets,'\n\n')
+    return {"recent_tickets": recent_tickets, "similar_tickets": similar_tickets}
+
+
+def get_recent_tickets(ticket: str):
+    fields = ["subject", "creation", "name", "status"]
+    [raised_by, customer] = frappe.db.get_value(
+        "HD Ticket", ticket, ["raised_by", "customer"]
+    )
+    org_tickets = []
+    user_tickets = []
+    if customer:
+        org_tickets = (
+            frappe.get_list(
+                "HD Ticket",
+                filters={
+                    "name": ["!=", ticket],
+                    "customer": customer,
+                },
+                fields=fields,
+                order_by="creation desc",
+                limit=2,
+            )
+            or []
+        )
+    elif raised_by:
+        user_tickets = (
+            frappe.get_list(
+                "HD Ticket",
+                filters={
+                    "name": ["!=", ticket],
+                    "raised_by": raised_by,
+                },
+                fields=fields,
+                order_by="creation desc",
+                limit=4 - len(org_tickets),
+            )
+            or []
+        )
+    return org_tickets + user_tickets
+
+
+def get_similar_tickets(ticket: str):
+    doc = frappe.get_doc("HD Ticket", ticket)
+
+    # Separate search terms
+    subject_search = ""
+    desc_search = ""
+    relevance_threshold = 70  # Minimum relevance percentage to consider
+
+    if doc.subject:
+        subject_search = doc.subject.strip()
+
+    if doc.description:
+        soup = BeautifulSoup(doc.description, "html.parser")
+        text = soup.get_text()
+        if text:
+            desc_search = text.strip()
+
+    tickets = frappe.db.sql(
+        """
+        SELECT `name`, `subject`, `status`, `creation`,
+               (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION) * 3 +
+                MATCH(description) AGAINST(%(desc_search)s WITH QUERY EXPANSION) * 1) as `raw_relevance`
+        FROM `tabHD Ticket`
+        WHERE (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION) OR
+               MATCH(description) AGAINST(%(desc_search)s WITH QUERY EXPANSION))
+              AND name != %(ticket)s
+              AND creation > DATE_SUB(NOW(), INTERVAL 90 DAY)
+        ORDER BY `raw_relevance` DESC, creation DESC
+        LIMIT 4
+    """,
+        {
+            "subject_search": subject_search,
+            "desc_search": desc_search,
+            "ticket": ticket,
+        },
+        as_dict=1,
+    )
+
+    max_relevance = max((t["raw_relevance"] for t in tickets), default=0)
+    for t in tickets:
+        t["relevance"] = (
+            round((t["raw_relevance"] / max_relevance) * 100) if max_relevance else 0
+        )
+
+    tickets = [t for t in tickets if t["relevance"] > relevance_threshold]
+
+    return tickets

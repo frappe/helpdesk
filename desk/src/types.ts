@@ -451,6 +451,19 @@ export interface TicketContact {
   image: string;
 }
 
+export type RecentTicket = Record<
+  "subject" | "status" | "priority" | "name",
+  string | number
+>;
+export type SimilarTicket = Record<
+  "subject" | "status" | "priority" | "name",
+  string | number
+>;
+export interface RecentSimilarTicket {
+  recent_tickets: RecentTicket[];
+  similar_tickets: SimilarTicket[];
+}
+
 // symbols
 export const TicketSymbol: InjectionKey<
   ComputedRef<DocumentResource<HDTicket>>
@@ -466,6 +479,10 @@ export const CustomizationSymbol: InjectionKey<
 export const TicketContactSymbol: InjectionKey<
   ComputedRef<Resource<TicketContact>>
 > = Symbol("ticketContact");
+
+export const RecentSimilarTicketsSymbol: InjectionKey<
+  ComputedRef<Resource<RecentSimilarTicket>>
+> = Symbol("recentSimilarTickets");
 
 declare global {
   interface Window {
