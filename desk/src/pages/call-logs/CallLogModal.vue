@@ -79,7 +79,6 @@
                 :doctype="'User'"
                 :placeholder="'Select'"
                 label="Call Received By"
-                :hideMe="true"
                 @change="(data) => (callLog.receiver = data)"
               />
             </div>
@@ -92,7 +91,6 @@
                 :doctype="'User'"
                 :placeholder="'Select'"
                 label="Caller"
-                :hideMe="true"
                 @change="(data) => (callLog.caller = data)"
               />
             </div>
@@ -126,6 +124,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from "@/stores/auth";
 import { getRandom } from "@/utils";
 import {
   createResource,
@@ -145,6 +144,7 @@ const loading = ref(false);
 const isDirty = ref(false);
 const originalCallLog = ref("");
 const emit = defineEmits(["afterInsert"]);
+const { user } = useAuthStore();
 
 const errors = ref({
   type: "",
@@ -278,6 +278,13 @@ function updateCallLog() {
     }
     links.push(link);
   });
+
+  if (callLog.value.receiver == "@me") {
+    callLog.value.receiver = user;
+  }
+  if (callLog.value.caller == "@me") {
+    callLog.value.caller = user;
+  }
   createResource({
     url: "frappe.client.set_value",
     params: {
@@ -309,6 +316,12 @@ function createCallLog() {
       link_doctype: "HD Ticket",
       link_name: callLog.value.ticket,
     });
+  }
+  if (callLog.value.receiver == "@me") {
+    callLog.value.receiver = user;
+  }
+  if (callLog.value.caller == "@me") {
+    callLog.value.caller = user;
   }
   createResource({
     url: "telephony.api.create_call_log",
