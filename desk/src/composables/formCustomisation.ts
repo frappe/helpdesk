@@ -93,9 +93,13 @@ export function parseField(field, doc) {
         evaluateDependsOnValue(field.mandatory_depends_on, doc)),
     filters: field.link_filters && JSON.parse(field.link_filters),
     disabled: field.disabled,
+    readonly:
+      field.readonly ||
+      (field.read_only_depends_on &&
+        evaluateDependsOnValue(field.read_only_depends_on, doc)),
   };
 }
-function evaluateDependsOnValue(expression, doc) {
+export function evaluateDependsOnValue(expression, doc) {
   if (!expression) return true;
   let out = null;
   if (expression.substr(0, 5) == "eval:") {

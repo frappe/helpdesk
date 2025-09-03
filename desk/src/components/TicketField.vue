@@ -12,8 +12,8 @@
       <component
         :is="component"
         :key="field.fieldname"
-        :disabled="field.disabled"
         :readonly="field.readonly"
+        :disabled="field.disabled"
         class="form-control"
         :placeholder="field.placeholder || `Add ${field.label}`"
         :model-value="transValue"
