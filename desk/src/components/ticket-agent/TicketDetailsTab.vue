@@ -95,8 +95,10 @@ const coreFields = computed(() => {
 
   _coreFields.forEach((section) => {
     section.fields = section.fields.map((f) => {
-      f["required"] = f.reqd;
       f = parseField(f, ticket.value.doc);
+
+      // cant handle required depends on as we directly set the value in DB
+      f["required"] = f.reqd;
 
       let l = getFieldInFormat(f, f);
       return l;
@@ -124,7 +126,10 @@ const customFields = computed(() => {
   customFields = customFields.filter((f) => !_coreFields.includes(f.fieldname));
   let _customFields = customFields.map((f) => {
     let fieldMeta = getField(f.fieldname);
+
     fieldMeta = parseField(fieldMeta, ticket.value.doc);
+    // cant handle required depends on as we directly set the value in DB
+    fieldMeta["required"] = fieldMeta.reqd || f.required;
 
     return getFieldInFormat(f, fieldMeta);
   });
