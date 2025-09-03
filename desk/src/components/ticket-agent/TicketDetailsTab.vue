@@ -14,21 +14,23 @@
             section.group ? 'flex gap-2 items-center w-full mb-3' : 'mb-3'
           "
         >
-          <Link
-            v-for="field in section.fields"
-            :key="field.fieldname"
-            class="form-control-core"
-            :class="section.group ? 'flex-1' : 'w-full'"
-            :page-length="10"
-            :label="field.label"
-            :placeholder="field.placeholder"
-            :doctype="field.doctype"
-            :modelValue="field.value"
-            :required="field.required"
-            @update:model-value="
+          <template v-for="field in section.fields">
+            <Link
+              v-if="field.visible"
+              :key="field.fieldname"
+              class="form-control-core"
+              :class="section.group ? 'flex-1' : 'w-full'"
+              :page-length="10"
+              :label="field.label"
+              :placeholder="field.placeholder"
+              :doctype="field.doctype"
+              :modelValue="field.value"
+              :required="field.required"
+              @update:model-value="
               (val:string) => handleFieldUpdate(field.fieldname, val)
             "
-          />
+            />
+          </template>
         </div>
 
         <!-- Assignee component -->
@@ -41,15 +43,17 @@
       class="border-t flex flex-col pb-5 flex-1 h-full overflow-hidden pb-12"
     >
       <div class="overflow-y-scroll">
-        <TicketField
-          v-for="field in customFields"
-          :key="field.fieldname"
-          :field="field"
-          :value="field.value"
-          @change="
-            ({ fieldname, value }) => handleFieldUpdate(fieldname, value)
-          "
-        />
+        <template v-for="field in customFields">
+          <TicketField
+            v-if="field.visible"
+            :key="field.fieldname"
+            :field="field"
+            :value="field.value"
+            @change="
+              ({ fieldname, value }) => handleFieldUpdate(fieldname, value)
+            "
+          />
+        </template>
       </div>
     </div>
   </div>
@@ -57,6 +61,7 @@
 
 <script setup lang="ts">
 import { Link } from "@/components";
+import { parseField } from "@/composables/formCustomisation";
 import { getMeta } from "@/stores/meta";
 import {
   AssigneeSymbol,
@@ -77,6 +82,7 @@ const { getFields, getField } = getMeta("HD Ticket");
 
 // ticket_type, priority, customer, agent_group
 const coreFields = computed(() => {
+  // TODO: to confirm whether customizations should apply to core fields as well
   const fieldsMeta = getFields();
   if (!fieldsMeta || fieldsMeta.length === 0) {
     return [];
@@ -89,14 +95,11 @@ const coreFields = computed(() => {
 
   _coreFields.forEach((section) => {
     section.fields = section.fields.map((f) => {
-      return {
-        label: f.label,
-        value: ticket.value.doc[f.fieldname],
-        doctype: f.options,
-        placeholder: `Select ${f.label}`,
-        fieldname: f.fieldname,
-        required: f.reqd,
-      };
+      f["required"] = f.reqd;
+      f = parseField(f, ticket.value.doc);
+
+      let l = getFieldInFormat(f, f);
+      return l;
     });
   });
   return _coreFields;
@@ -120,25 +123,32 @@ const customFields = computed(() => {
   ];
   customFields = customFields.filter((f) => !_coreFields.includes(f.fieldname));
   let _customFields = customFields.map((f) => {
-    const fieldMeta = getField(f.fieldname);
-    return {
-      label: fieldMeta?.label || f.fieldname,
-      value: ticket.value.doc[f.fieldname],
-      fieldname: f.fieldname,
-      fieldtype: fieldMeta?.fieldtype,
-      doctype: fieldMeta?.options || "",
-      options: fieldMeta?.options || "",
-      placeholder: f.placeholder || `Enter ${fieldMeta?.label || f.fieldname}`,
-      required: f.required || fieldMeta.reqd,
-      url_method: f.url_method || "",
-      readonly: Boolean(fieldMeta.read_only),
-      disabled: Boolean(fieldMeta.read_only),
-    };
+    let fieldMeta = getField(f.fieldname);
+    fieldMeta = parseField(fieldMeta, ticket.value.doc);
+
+    return getFieldInFormat(f, fieldMeta);
   });
   return _customFields;
-
-  // customFields
 });
+
+function getFieldInFormat(fieldTemplate, fieldMeta) {
+  return {
+    label: fieldMeta?.label || fieldTemplate.fieldname,
+    value: ticket.value.doc[fieldTemplate.fieldname],
+    fieldtype: fieldMeta?.fieldtype,
+    doctype: fieldMeta?.options || "",
+    options: fieldMeta?.options || "",
+    placeholder:
+      fieldTemplate.placeholder ||
+      `Enter ${fieldMeta?.label || fieldTemplate.fieldname}`,
+    readonly: Boolean(fieldMeta.readonly),
+    disabled: Boolean(fieldMeta.readonly),
+    url_method: fieldTemplate.url_method || "",
+    fieldname: fieldTemplate.fieldname,
+    required: fieldTemplate.required || fieldMeta?.required || false,
+    visible: fieldMeta.display_via_depends_on && !fieldMeta.hidden,
+  };
+}
 
 function handleFieldUpdate(fieldname: string, value: FieldValue) {
   if (ticket.value.doc[fieldname] === value) return;
