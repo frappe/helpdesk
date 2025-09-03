@@ -9,7 +9,10 @@
         <p class="text-ink-gray-8 font-medium text-xl max-w-[170px] truncate">
           {{ contact.data.name || contact.data.email_id }}
         </p>
-        <ExternalLinkIcon class="size-4 text-ink-gray-6" />
+        <ExternalLinkIcon
+          class="size-4 text-ink-gray-6 cursor-pointer"
+          @click="openContact(contact.data.name)"
+        />
       </div>
       <div class="flex gap-1.5">
         <Tooltip :text="contact.data.email_id">
@@ -32,7 +35,6 @@
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
 import { Avatar, Tooltip, Button } from "frappe-ui";
 import EmailIcon from "../icons/EmailIcon.vue";
 import { ExternalLinkIcon } from "../icons";
@@ -40,6 +42,10 @@ import { inject } from "vue";
 import { TicketContactSymbol } from "@/types";
 
 const contact = inject(TicketContactSymbol);
+function openContact(name: string) {
+  let url = window.location.origin + "/app/contact/" + name;
+  window.open(url, "_blank");
+}
 </script>
 
 <style scoped></style>

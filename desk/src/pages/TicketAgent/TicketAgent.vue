@@ -24,6 +24,7 @@ import {
   AssigneeSymbol,
   Customizations,
   CustomizationSymbol,
+  RecentSimilarTicketsSymbol,
   Resource,
   TicketContactSymbol,
   TicketSymbol,
@@ -40,7 +41,6 @@ const props = defineProps({
 
 const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
-const ticketContact = ticketComposable.value.contact;
 const customizations: Resource<Customizations> = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
   cache: ["HD Ticket", "customizations"],
@@ -54,11 +54,16 @@ provide(
 );
 provide(
   TicketContactSymbol,
-  computed(() => ticketContact)
+  computed(() => ticketComposable.value.contact)
 );
 provide(
   CustomizationSymbol,
   computed(() => customizations)
+);
+
+provide(
+  RecentSimilarTicketsSymbol,
+  computed(() => ticketComposable.value.recentSimilarTickets)
 );
 </script>
 

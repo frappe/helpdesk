@@ -1,4 +1,9 @@
-import type { DocumentResource, Resource, TicketContact } from "@/types";
+import type {
+  DocumentResource,
+  RecentSimilarTicket,
+  Resource,
+  TicketContact,
+} from "@/types";
 import type { HDTicket } from "@/types/doctypes";
 import {
   createDocumentResource,
@@ -12,6 +17,7 @@ interface MapValue {
   ticket: DocumentResource<HDTicket>;
   assignees: Resource<Record<"name", string>[]>;
   contact: Resource<TicketContact>;
+  recentSimilarTickets: Resource<RecentSimilarTicket>;
 }
 
 const ticketMap: Record<string, MapValue> = reactive({});
@@ -43,6 +49,11 @@ export const useTicket = (ticketId: string): MapValue => {
       }),
       contact: createResource({
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_contact",
+        params: { ticket: ticketId },
+        auto: true,
+      }),
+      recentSimilarTickets: createResource({
+        url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_recent_similar_tickets",
         params: { ticket: ticketId },
         auto: true,
       }),

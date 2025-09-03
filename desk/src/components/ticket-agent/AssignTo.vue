@@ -1,5 +1,5 @@
 <template>
-  <Popover class="flex w-full" placement="bottom-end" v-if="!assignees.loading">
+  <Popover class="flex w-full" placement="bottom-end">
     <template #target="{ open, close, togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
         <span class="block text-xs text-gray-600">Assignee</span>
@@ -8,10 +8,12 @@
           class="!flex !justify-start w-full active:!bg-inherit"
           @click="togglePopover()"
         >
-          <p v-if="assignees.data?.length === 0">{{ __("No assignees") }}</p>
+          <p v-if="assignees.loading || assignees.data?.length === 0">
+            {{ __("No assignees") }}
+          </p>
           <div
             v-else-if="assignees.data?.length >= 1"
-            class="flex gap-2 items-center"
+            class="flex gap-1.5 items-center"
           >
             <MultipleAvatar
               :avatars="assignees.data.map((a) => a.name)"
