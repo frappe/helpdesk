@@ -65,17 +65,28 @@
           </template>
         </Dropdown>
         <!-- Core Actions + Custom Actions -->
-        <Dropdown v-if="groupedActions.length" :options="groupedActions">
-          <Button icon="more-horizontal" variant="ghost" />
+        <Dropdown
+          v-if="groupedActions.length"
+          :options="groupedActions"
+          placement="right"
+        >
+          <Button icon="more-horizontal" />
         </Dropdown>
       </div>
     </template>
   </LayoutHeader>
+  <TicketMergeModal
+    :ticket="ticket"
+    v-if="showMergeModal"
+    v-model="showMergeModal"
+    @update="ticket.reload()"
+  />
 </template>
 
 <script setup lang="ts">
 import { MultipleAvatar } from "@/components";
 import LayoutHeader from "@/components/LayoutHeader.vue";
+import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";
 import { setupCustomizations } from "@/composables/formCustomisation";
 import {
   useActiveViewers,
@@ -165,35 +176,32 @@ function updateField(fieldname: string, value: string, callback = () => {}) {
   callback();
 }
 
-const defaultActions = [
-  {
-    group: "Default actions",
-    hideLabel: true,
-    items: [
-      {
-        label: "Merge Ticket",
-        icon: LucideMerge,
-        condition: () => !ticket.value.doc.is_merged,
-        onClick: () => console.log("Merge"),
-      },
-    ],
-  },
-  {
-    buttonLabel: "Reports",
-    group: "Add",
-    hideLabel: true,
-    items: [
-      {
-        label: "Open Weekly Analysis",
-        onClick: () => {},
-      },
-      {
-        label: "Open Articles Analytics",
-        onClick: () => {},
-      },
-    ],
-  },
-];
+const showMergeModal = ref(false);
+const showMergeOption = computed(() => {
+  return (
+    !ticket.value.doc.is_merged &&
+    ["Open", "Paused"].includes(ticket.value.doc.status_category)
+  );
+});
+const defaultActions = computed(() => {
+  let items = [];
+
+  if (showMergeOption.value) {
+    items.push({
+      label: "Merge Ticket",
+      icon: LucideMerge,
+      condition: () => !ticket.value.doc.is_merged,
+      onClick: () => (showMergeModal.value = true),
+    });
+  }
+  return [
+    {
+      group: "Default actions",
+      hideLabel: true,
+      items,
+    },
+  ];
+});
 const actions = ref([]);
 const normalActions = computed(() => {
   return actions.value.filter((action) => !action.group);
@@ -239,7 +247,7 @@ onMounted(async () => {
   }
   await setupCustomizations(customizations.value.data, customizationCtx);
   actions.value = [
-    ...defaultActions,
+    ...defaultActions.value,
     ...customizations.value.data._customActions,
   ];
 });

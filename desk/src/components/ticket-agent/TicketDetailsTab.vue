@@ -32,7 +32,7 @@
         </div>
 
         <!-- Assignee component -->
-        <AssigneeTo />
+        <AssignTo />
       </div>
     </div>
 
@@ -67,7 +67,7 @@ import {
 import { toast } from "frappe-ui";
 import { computed, inject } from "vue";
 import TicketField from "../TicketField.vue";
-import AssigneeTo from "./AssignTo.vue";
+import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
 
 const ticket = inject(TicketSymbol);

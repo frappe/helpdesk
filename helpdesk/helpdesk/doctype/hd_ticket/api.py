@@ -485,6 +485,7 @@ def get_ticket_customizations():
 
 
 @frappe.whitelist()
+# TODO: make it bette, on mount fetch only once and cache it
 def get_navigation_tickets(ticket: str, current_view: str = None):
     """
     Get a list of tickets to navigate
