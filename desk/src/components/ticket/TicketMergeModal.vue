@@ -60,6 +60,7 @@
 </template>
 
 <script setup lang="ts">
+import { Link } from "@/components";
 import { Ticket } from "@/types";
 import { Dialog, createListResource, createResource, toast } from "frappe-ui";
 import { ref, watch } from "vue";
