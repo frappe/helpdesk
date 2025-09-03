@@ -32,6 +32,7 @@ import {
 } from "@/types";
 import { createResource } from "frappe-ui";
 import { computed, onMounted, provide } from "vue";
+import { useRoute } from "vue-router";
 
 const props = defineProps({
   ticketId: {
@@ -39,6 +40,7 @@ const props = defineProps({
     required: true,
   },
 });
+const route = useRoute();
 
 const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
@@ -71,6 +73,7 @@ onMounted(() => {
   ticketsToNavigate.update({
     params: {
       ticket: props.ticketId,
+      current_view: route.query.view as string,
     },
   });
   ticketsToNavigate.reload();

@@ -37,7 +37,7 @@
             {{ contact.data.mobile_no || contact.data.phone || "N/A" }}
           </p>
           <CopyIcon
-            class="size-4 cursor-pointer animate-bounce"
+            class="size-4 cursor-pointer"
             v-if="contact.data.mobile_no || contact.data.phone"
             @click="
               copyToClipboard(
