@@ -20,6 +20,7 @@ import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.v
 import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import { useTicket } from "@/composables/useTicket";
+import { ticketsToNavigate } from "@/composables/useTicketNavigation";
 import {
   AssigneeSymbol,
   Customizations,
@@ -30,7 +31,7 @@ import {
   TicketSymbol,
 } from "@/types";
 import { createResource } from "frappe-ui";
-import { computed, provide } from "vue";
+import { computed, onMounted, provide } from "vue";
 
 const props = defineProps({
   ticketId: {
@@ -65,6 +66,15 @@ provide(
   RecentSimilarTicketsSymbol,
   computed(() => ticketComposable.value.recentSimilarTickets)
 );
+
+onMounted(() => {
+  ticketsToNavigate.update({
+    params: {
+      ticket: props.ticketId,
+    },
+  });
+  ticketsToNavigate.reload();
+});
 </script>
 
 <style>
