@@ -89,7 +89,8 @@ watch(
 
     if (oldTicketId) stopViewing(oldTicketId as string);
     startViewing(newTicketId as string);
-  }
+  },
+  { immediate: true }
 );
 
 type TicketUpdateData = {
@@ -100,7 +101,7 @@ type TicketUpdateData = {
 };
 
 onMounted(() => {
-  startViewing(props.ticketId);
+  // startViewing(props.ticketId);
 
   ticketsToNavigate.update({
     params: {
