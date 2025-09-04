@@ -17,21 +17,21 @@ export function useActiveViewers(ticketId: string) {
     }
   });
 
-  const handleBeforeUnload = (ticketId: string) => {
-    $socket.emit("stop_view_ticket", ticketId);
+  const handleBeforeUnload = (_ticketId: string) => {
+    $socket.emit("stop_view_ticket", _ticketId);
   };
-  const startViewing = (ticketId: string) => {
-    $socket.emit("view_ticket", ticketId);
-    window.addEventListener("beforeunload", () => handleBeforeUnload(ticketId));
-  };
-  const stopViewing = (ticketId: string) => {
-    $socket.emit("stop_view_ticket", ticketId);
-    currentViewers[ticketId] = currentViewers[ticketId]?.filter(
-      (u) => u !== userId
+  const startViewing = (_ticketId: string) => {
+    $socket.emit("view_ticket", _ticketId);
+    window.addEventListener("beforeunload", () =>
+      handleBeforeUnload(_ticketId)
     );
+  };
+
+  const stopViewing = (_ticketId: string) => {
+    $socket.emit("stop_view_ticket", _ticketId);
 
     window.removeEventListener("beforeunload", () =>
-      handleBeforeUnload(ticketId)
+      handleBeforeUnload(_ticketId)
     );
   };
 

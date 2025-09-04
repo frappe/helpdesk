@@ -92,8 +92,16 @@ watch(
   }
 );
 
+type TicketUpdateData = {
+  ticket_id: string;
+  user: string;
+  field: string;
+  value: string;
+};
+
 onMounted(() => {
   startViewing(props.ticketId);
+
   ticketsToNavigate.update({
     params: {
       ticket: props.ticketId,
@@ -102,20 +110,13 @@ onMounted(() => {
   });
   ticketsToNavigate.reload();
   ticket.value.markSeen.reload();
-  $socket.on(
-    "ticket_update",
-    (data: {
-      ticket_id: string;
-      user: string;
-      field: string;
-      value: string;
-    }) => {
-      if (data.ticket_id === ticket.value?.name) {
-        // Notify the user about the update
-        toast.info(`User ${data.user} updated ${data.field} to ${data.value}`);
-      }
+
+  $socket.on("ticket_update", (data: TicketUpdateData) => {
+    if (data.ticket_id === ticket.value?.name) {
+      // Notify the user about the update
+      toast.info(`User ${data.user} updated ${data.field} to ${data.value}`);
     }
-  );
+  });
 });
 
 onBeforeUnmount(() => {
