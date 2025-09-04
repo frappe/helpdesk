@@ -36,7 +36,10 @@
   </div>
   <div class="px-10 pb-8 overflow-y-auto">
     <div class="text-base font-semibold text-ink-gray-8">
-      {{ __("User settings") }}
+      {{ __("Agent settings") }}
+    </div>
+    <div class="text-p-xs text-ink-gray-6 mt-1">
+      {{ __("Configure your agent settings.") }}
     </div>
     <div class="grid grid-cols-2 gap-4 mt-4">
       <div class="flex flex-col gap-1.5">
@@ -137,27 +140,27 @@
             disabled
           />
           <Autocomplete
-            v-if="twilioApps.length > 0"
+            v-if="twilio.originalDoc?.account_sid && twilioApps.length > 0"
             label="TwiML App Name"
             :model-value="twilio.doc.app_name"
             @update:modelValue="twilio.doc.app_name = $event.value"
             :options="twilioApps"
           >
-            <template #footer>
+            <template #footer="{ togglePopover }">
               <Button
                 label="Refresh Apps"
                 theme="gray"
                 variant="subtle"
                 class="w-full"
                 icon-left="refresh-cw"
-                @click="refreshApps"
+                @click="refreshApps(togglePopover)"
                 :loading="twilioAppsResource.loading"
               />
             </template>
           </Autocomplete>
           <FormControl
             v-if="twilio.doc.twiml_sid"
-            label="TwiML SID"
+            label="TwiML App SID"
             v-model="twilio.doc.twiml_sid"
             disabled
           />
@@ -249,7 +252,7 @@ import {
   Badge,
   Autocomplete,
 } from "frappe-ui";
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
 import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
@@ -334,10 +337,20 @@ async function save() {
 
   // Temporary fix, as createDocumentResource's dirty state has bug
   if (isDirty.value.twilio) {
-    promises.push(twilio.save.submit());
+    promises.push(
+      twilio.save.submit().catch((er) => {
+        const error = `Twilio error: ${er?.messages?.[0]}`;
+        toast.error(error || "Failed to save Twilio settings");
+      })
+    );
   }
   if (isDirty.value.exotel) {
-    promises.push(exotel.save.submit());
+    promises.push(
+      exotel.save.submit().catch((er) => {
+        const error = `Exotel error: ${er?.messages?.[0]}`;
+        toast.error(error || "Failed to save Exotel settings");
+      })
+    );
   }
   if (isDirty.value.telephonyAgent) {
     if (telephonyAgent.doc.twilio_number) {
@@ -354,15 +367,25 @@ async function save() {
     promises.push(telephonyAgent.save.submit());
   }
 
-  await Promise.all(promises);
-  toast.success("Telephony settings updated!");
+  const results = await Promise.all(promises);
+
+  if (!results.some((result) => result == undefined)) {
+    toast.success("Telephony settings updated!");
+  }
+
   // Reload twilio to prevent "doc has been modified" error, as an application is created and doc is updated on save
   await twilio.reload();
   telephonyStore.fetchCallIntegrationStatus();
 }
 
-function refreshApps() {
-  twilioAppsResource.submit();
+function refreshApps(togglePopover) {
+  twilioAppsResource.submit().then(() => {
+    // Close and reopen popover to fix bug where search does not work after refreshing list
+    togglePopover();
+    nextTick(() => {
+      togglePopover();
+    });
+  });
 }
 
 createResource({

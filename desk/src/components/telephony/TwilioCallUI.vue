@@ -48,12 +48,12 @@
             class="rounded-full"
             @click="toggleMute"
           />
-          <Button class="rounded-full bg-surface-red-5 hover:bg-surface-red-6">
+          <Button
+            class="rounded-full bg-surface-red-5 hover:bg-surface-red-6"
+            @click="hangUpCall"
+          >
             <template #icon>
-              <LucidePhone
-                class="h-4 w-4 rotate-[135deg] text-ink-white"
-                @click="hangUpCall"
-              />
+              <LucidePhone class="h-4 w-4 rotate-[135deg] text-ink-white" />
             </template>
           </Button>
         </div>
@@ -120,12 +120,14 @@
       <div class="my-1 min-w-[40px] text-center">
         {{ counterUp?.updatedTime }}
       </div>
-      <Button variant="solid" theme="red" class="!h-6 !w-6 rounded-full">
+      <Button
+        variant="solid"
+        theme="red"
+        class="!h-6 !w-6 rounded-full"
+        @click.stop="hangUpCall"
+      >
         <template #icon>
-          <LucidePhone
-            class="h-4 w-4 rotate-[135deg]"
-            @click.stop="hangUpCall"
-          />
+          <LucidePhone class="h-4 w-4 rotate-[135deg]" />
         </template>
       </Button>
     </div>
