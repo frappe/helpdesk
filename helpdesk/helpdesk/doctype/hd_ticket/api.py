@@ -8,6 +8,7 @@ from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
+from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
@@ -554,9 +555,10 @@ def get_navigation_filters(ticket: str, current_view: str = None):
 
     if filters and isinstance(filters, object):
         final_filters = {**filters, **base_filters}
-
     else:
         final_filters = base_filters
+    final_filters = handle_at_me_support(final_filters)
+
     return final_filters
 
 
