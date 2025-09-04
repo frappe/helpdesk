@@ -101,9 +101,9 @@ import {
   ComputedRef,
   h,
   inject,
-  onMounted,
   PropType,
   ref,
+  watchEffect,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
@@ -161,15 +161,6 @@ const breadcrumbs = computed(() => {
   return items;
 });
 
-const customizationCtx = {
-  doc: ticket?.value?.doc,
-  call,
-  router,
-  toast,
-  $dialog: globalStore().$dialog,
-  updateField,
-  createToast: toast.create,
-};
 function updateField(fieldname: string, value: string, callback = () => {}) {
   const doc = ticket.value;
   doc.setValue.submit({
@@ -238,16 +229,40 @@ const groupedActions = computed(() => {
   return _actions;
 });
 
-onMounted(async () => {
-  if (customizations.value.loading) {
-    await customizations.value.promise;
+const customizationCtx = computed(() => ({
+  doc: ticket?.value?.doc,
+  call,
+  router,
+  toast,
+  $dialog: globalStore().$dialog,
+  updateField,
+  createToast: toast.create,
+}));
+
+// to manage the correct  customization context for actions, happens because of navigation between tickets using buttons
+watchEffect(async () => {
+  if (customizations.value?.data) {
+    await setupCustomizations(
+      customizations.value.data,
+      customizationCtx.value
+    );
+    actions.value = [
+      ...defaultActions.value,
+      ...customizations.value.data._customActions,
+    ];
   }
-  await setupCustomizations(customizations.value.data, customizationCtx);
-  actions.value = [
-    ...defaultActions.value,
-    ...customizations.value.data._customActions,
-  ];
 });
+
+// onMounted(async () => {
+//   if (customizations.value.loading) {
+//     await customizations.value.promise;
+//   }
+//   await setupCustomizations(customizations.value.data, customizationCtx.value);
+//   actions.value = [
+//     ...defaultActions.value,
+//     ...customizations.value.data._customActions,
+//   ];
+// });
 </script>
 
 <style>
