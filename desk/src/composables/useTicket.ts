@@ -2,6 +2,7 @@ import type {
   DocumentResource,
   RecentSimilarTicket,
   Resource,
+  TicketActivities,
   TicketContact,
 } from "@/types";
 import type { HDTicket } from "@/types/doctypes";
@@ -18,6 +19,7 @@ interface MapValue {
   assignees: Resource<Record<"name", string>[]>;
   contact: Resource<TicketContact>;
   recentSimilarTickets: Resource<RecentSimilarTicket>;
+  activities: Resource<TicketActivities>;
 }
 
 const ticketMap: Record<string, MapValue> = reactive({});
@@ -54,6 +56,11 @@ export const useTicket = (ticketId: string): MapValue => {
       }),
       recentSimilarTickets: createResource({
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_recent_similar_tickets",
+        params: { ticket: ticketId },
+        auto: true,
+      }),
+      activities: createResource({
+        url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_activities",
         params: { ticket: ticketId },
         auto: true,
       }),

@@ -13,7 +13,7 @@
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
     :extensions="[PreserveVideoControls]"
-    :uploadFunction="(file:any)=>uploadFunction(file, doctype, modelValue?.name)"
+    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
@@ -97,7 +97,7 @@
             <FileUploader
               :upload-args="{
                 doctype: doctype,
-                docname: modelValue?.name,
+                docname: ticketId,
                 private: true,
               }"
               @success="
@@ -190,6 +190,10 @@ const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
 
 const props = defineProps({
+  ticketId: {
+    type: String,
+    default: null,
+  },
   placeholder: {
     type: String,
     default: null,
@@ -225,9 +229,8 @@ const label = computed(() => {
 });
 
 const emit = defineEmits(["submit", "discard"]);
-const doc = defineModel();
 
-const newEmail = useStorage("emailBoxContent" + doc.value.name, null);
+const newEmail = useStorage("emailBoxContent" + props.ticketId, null);
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 
@@ -255,7 +258,7 @@ const sendMail = createResource({
   url: "run_doc_method",
   makeParams: () => ({
     dt: props.doctype,
-    dn: doc.value.name,
+    dn: props.ticketId,
     method: "reply_via_agent",
     args: {
       attachments: attachments.value.map((x) => x.name),

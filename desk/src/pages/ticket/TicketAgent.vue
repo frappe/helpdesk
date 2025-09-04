@@ -82,7 +82,7 @@
         </div>
         <CommunicationArea
           ref="communicationAreaRef"
-          v-model="ticket.data"
+          :ticketId="ticket.data?.name"
           :to-emails="[ticket.data?.raised_by]"
           :cc-emails="[]"
           :bcc-emails="[]"

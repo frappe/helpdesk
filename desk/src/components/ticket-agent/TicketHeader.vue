@@ -17,7 +17,7 @@
     <template #right-header>
       <div class="flex gap-2 items-center">
         <MultipleAvatar
-          :avatars="JSON.stringify(currentViewers)"
+          :avatars="JSON.stringify(viewers)"
           size="md"
           :hide-name="true"
         />
@@ -88,10 +88,7 @@ import { MultipleAvatar } from "@/components";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";
 import { setupCustomizations } from "@/composables/formCustomisation";
-import {
-  useActiveViewers,
-  useNotifyTicketUpdate,
-} from "@/composables/realtime";
+import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useView } from "@/composables/useView";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
@@ -105,12 +102,19 @@ import {
   h,
   inject,
   onMounted,
-  onUnmounted,
+  PropType,
   ref,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 import { IndicatorIcon } from "../icons";
+
+defineProps({
+  viewers: {
+    type: Array as PropType<string[]>,
+    required: true,
+  },
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -128,9 +132,7 @@ const statusDropdown = computed(() =>
     onClick: () => {
       notifyTicketUpdate("Status", o.label_agent);
       if (ticket.value.doc.status === o.label_agent) return;
-      ticket.value.setValue.submit({
-        status: o.label_agent,
-      });
+      ticket.value.setValue.submit({ status: o.label_agent });
     },
     icon: () =>
       h(IndicatorIcon, {
@@ -236,12 +238,7 @@ const groupedActions = computed(() => {
   return _actions;
 });
 
-const { currentViewers, startViewing, stopViewing } = useActiveViewers(
-  ticket.value.name
-);
 onMounted(async () => {
-  // Listen for viewer updates
-  startViewing();
   if (customizations.value.loading) {
     await customizations.value.promise;
   }
@@ -250,10 +247,6 @@ onMounted(async () => {
     ...defaultActions.value,
     ...customizations.value.data._customActions,
   ];
-});
-
-onUnmounted(() => {
-  stopViewing();
 });
 </script>
 

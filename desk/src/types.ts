@@ -464,6 +464,13 @@ export interface RecentSimilarTicket {
   similar_tickets: SimilarTicket[];
 }
 
+export interface TicketActivities {
+  comments: Comment[];
+  communications: Communication[];
+  history: Activity[];
+  views: ViewLog[];
+}
+
 // symbols
 export const TicketSymbol: InjectionKey<
   ComputedRef<DocumentResource<HDTicket>>
@@ -483,6 +490,10 @@ export const TicketContactSymbol: InjectionKey<
 export const RecentSimilarTicketsSymbol: InjectionKey<
   ComputedRef<Resource<RecentSimilarTicket>>
 > = Symbol("recentSimilarTickets");
+
+export const ActivitiesSymbol: InjectionKey<
+  ComputedRef<Resource<TicketActivities>>
+> = Symbol("activities");
 
 declare global {
   interface Window {

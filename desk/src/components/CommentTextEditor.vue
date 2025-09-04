@@ -15,7 +15,7 @@
     :mentions="agents"
     @change="editable ? (newComment = $event) : null"
     :extensions="[PreserveVideoControls]"
-    :uploadFunction="(file:any)=>uploadFunction(file, doctype, modelValue?.name)"
+    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #bottom>
       <div v-if="editable" class="flex flex-col gap-2 px-6 md:pl-10 md:pr-9">
@@ -46,7 +46,7 @@
             <FileUploader
               :upload-args="{
                 doctype: doctype,
-                docname: modelValue.name,
+                docname: ticketId,
                 private: true,
               }"
               @success="(f) => attachments.push(f)"
@@ -138,6 +138,10 @@ onMounted(() => {
 });
 
 const props = defineProps({
+  ticketId: {
+    type: String,
+    default: null,
+  },
   placeholder: {
     type: String,
     default: null,
@@ -157,8 +161,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["submit", "discard"]);
-const doc = defineModel();
-const newComment = useStorage("commentBoxContent" + doc.value.name, null);
+
+const newComment = useStorage("commentBoxContent" + props.ticketId, null);
 const attachments = ref([]);
 const commentEmpty = computed(() => {
   return isContentEmpty(newComment.value);
@@ -191,7 +195,7 @@ async function submitComment() {
     url: "run_doc_method",
     makeParams: () => ({
       dt: props.doctype,
-      dn: doc.value.name,
+      dn: props.ticketId,
       method: "new_comment",
       args: {
         content: newComment.value,

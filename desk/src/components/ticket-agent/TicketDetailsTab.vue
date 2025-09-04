@@ -27,7 +27,7 @@
               :modelValue="field.value"
               :required="field.required"
               @update:model-value="
-              (val:string) => handleFieldUpdate(field.fieldname, val)
+              (val:string) => handleFieldUpdate(field.fieldname, val,true)
             "
             />
           </template>
@@ -62,6 +62,7 @@
 <script setup lang="ts">
 import { Link } from "@/components";
 import { parseField } from "@/composables/formCustomisation";
+import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { getMeta } from "@/stores/meta";
 import {
   AssigneeSymbol,
@@ -79,6 +80,7 @@ const ticket = inject(TicketSymbol);
 const assignees = inject(AssigneeSymbol);
 const customizations = inject(CustomizationSymbol);
 const { getFields, getField } = getMeta("HD Ticket");
+const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
 
 // ticket_type, priority, customer, agent_group
 const coreFields = computed(() => {
@@ -97,11 +99,12 @@ const coreFields = computed(() => {
     section.fields = section.fields.map((f) => {
       f = parseField(f, ticket.value.doc);
 
-      // cant handle required depends on as we directly set the value in DB
+      // cant handle required depends on as we directly set the value in DB on change
       f["required"] = f.reqd;
 
-      let l = getFieldInFormat(f, f);
-      return l;
+      f = getFieldInFormat(f, f);
+      f["visible"] = true;
+      return f;
     });
   });
   return _coreFields;
@@ -155,8 +158,16 @@ function getFieldInFormat(fieldTemplate, fieldMeta) {
   };
 }
 
-function handleFieldUpdate(fieldname: string, value: FieldValue) {
+function handleFieldUpdate(
+  fieldname: string,
+  value: FieldValue,
+  isCoreFieldUpdated = false
+) {
   if (ticket.value.doc[fieldname] === value) return;
+  if (isCoreFieldUpdated) {
+    const label = getField(fieldname)?.label || fieldname;
+    notifyTicketUpdate(label, value as string);
+  }
   ticket.value.setValue.submit(
     { [fieldname]: value },
     {

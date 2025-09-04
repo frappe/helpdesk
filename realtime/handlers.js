@@ -78,8 +78,6 @@ function notify_ticket_viewers(args) {
     users: JSON.stringify(Array.from(new Set(users))), // Remove duplicate users
     total_viewers: Array.from(new Set(users)).length,
   });
-
-  console.log(`Notified ticket ${ticket_id} viewers:`, users);
 }
 
 // Helper functions

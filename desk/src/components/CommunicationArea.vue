@@ -41,6 +41,7 @@
         v-model="doc"
         v-model:content="content"
         placeholder="Hi John, we are looking into this issue."
+        :ticketId="ticketId"
         :to-emails="toEmails"
         :cc-emails="ccEmails"
         :bcc-emails="bccEmails"
@@ -71,7 +72,7 @@
             ? 'Comment (⌘ + ⏎)'
             : 'Comment (Ctrl + ⏎)'
         "
-        v-model="doc"
+        :ticketId="ticketId"
         :editable="showCommentBox"
         :doctype="doctype"
         placeholder="@John could you please look into this?"
@@ -148,6 +149,10 @@ const props = defineProps({
   doctype: {
     type: String,
     default: "HD Ticket",
+  },
+  ticketId: {
+    type: String,
+    default: null,
   },
   toEmails: {
     type: Array,
