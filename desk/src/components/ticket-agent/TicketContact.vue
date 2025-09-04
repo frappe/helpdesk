@@ -17,9 +17,9 @@
       <div class="flex gap-1.5">
         <Tooltip :text="contact.data.email_id">
           <!-- Email Button -->
-          <Button size="sm">
+          <Button size="sm" @click="toggleEmailBox()">
             <template #icon>
-              <EmailIcon class="size-4" @click="" />
+              <EmailIcon class="size-4" />
             </template>
           </Button>
           <!-- Call Button -->
@@ -40,6 +40,7 @@ import EmailIcon from "../icons/EmailIcon.vue";
 import { ExternalLinkIcon } from "../icons";
 import { inject } from "vue";
 import { TicketContactSymbol } from "@/types";
+import { toggleEmailBox } from "@/pages/ticket/modalStates";
 
 const contact = inject(TicketContactSymbol);
 function openContact(name: string) {

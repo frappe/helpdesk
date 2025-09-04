@@ -74,11 +74,11 @@ def get_one(name, is_customer_portal=False):
         **ticket,
         "comments": get_comments(name),
         "communications": get_communications(name),
-        "contact": contact,
         "history": get_history(name),
+        "views": get_views(name),
+        "contact": contact,
         "tags": get_tags(name),
         "template": get_template(template),
-        "views": get_views(name),
         "_form_script": get_form_script(
             "HD Ticket", is_customer_portal=is_customer_portal
         ),
@@ -691,3 +691,14 @@ def get_similar_tickets(ticket: str):
     tickets = [t for t in tickets if t["relevance"] > relevance_threshold]
 
     return tickets
+
+
+@frappe.whitelist()
+def get_ticket_activities(ticket: str):
+    activities = {
+        "comments": get_comments(ticket),
+        "communications": get_communications(ticket),
+        "history": get_history(ticket),
+        "views": get_views(ticket),
+    }
+    return activities

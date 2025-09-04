@@ -82,10 +82,10 @@
             <li
               v-for="ticket in section.tickets"
               :key="ticket.name"
-              class="py-2.5 border-b last:border-0"
+              class="py-2.5"
             >
               <p class="text-base text-ink-gray-8">{{ ticket.subject }}</p>
-              <div class="flex items-center justify-between">
+              <div class="flex items-end justify-between">
                 <p class="text-base text-ink-gray-5">
                   {{ formatDate(ticket.creation) + " &#183; " }}
                   <span

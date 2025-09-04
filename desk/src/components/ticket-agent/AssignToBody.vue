@@ -73,7 +73,7 @@ import UserAvatar from "@/components/UserAvatar.vue";
 import Link from "@/components/frappe-ui/Link.vue";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
-import { Tooltip, Switch, createResource } from "frappe-ui";
+import { Tooltip, Switch, createResource, call } from "frappe-ui";
 import { ref, watch } from "vue";
 
 const props = defineProps({
@@ -82,7 +82,7 @@ const props = defineProps({
     default: "",
   },
   docname: {
-    type: Object,
+    type: String,
     default: null,
   },
   open: {
@@ -94,8 +94,6 @@ const props = defineProps({
     default: null,
   },
 });
-
-const emit = defineEmits(["reload"]);
 
 const assignees = defineModel();
 const oldAssignees = ref([]);
@@ -164,13 +162,26 @@ async function updateAssignees() {
       (assignee) => !assignees.value.find((a) => a.name === assignee.name)
     )
     .map((assignee) => assignee.name);
-  debugger;
+
   const addedAssignees = assignees.value
     .filter(
       (assignee) => !oldAssignees.value.find((a) => a.name === assignee.name)
     )
     .map((assignee) => assignee.name);
 
+  call("frappe.client.insert", {
+    doc: {
+      doctype: "HD Ticket Activity",
+      ticket: props.docname,
+      action: `${
+        addedAssignees.length ? `assigned ${addedAssignees.join(", ")}` : ""
+      } ${removeAssignees.length ? " & " : ""} ${
+        removedAssignees.length
+          ? `unassigned ${removedAssignees.join(", ")}`
+          : ""
+      }`,
+    },
+  });
   if (props.onUpdate) {
     props.onUpdate(
       addedAssignees,

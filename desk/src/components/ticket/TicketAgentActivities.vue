@@ -65,12 +65,12 @@
       <Button
         v-if="title == 'Emails'"
         label="New Email"
-        @click="communicationAreaRef.toggleEmailBox()"
+        @click="communicationAreaRef?.toggleEmailBox() ?? toggleEmailBox()"
       />
       <Button
         v-else-if="title == 'Comments'"
         label="New Comment"
-        @click="communicationAreaRef.toggleCommentBox()"
+        @click="communicationAreaRef?.toggleCommentBox() ?? toggleCommentBox()"
       />
     </div>
   </FadedScrollableDiv>
@@ -89,6 +89,7 @@ import {
   DotIcon,
   EmailIcon,
 } from "@/components/icons";
+import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
 import { useElementVisibility } from "@vueuse/core";
