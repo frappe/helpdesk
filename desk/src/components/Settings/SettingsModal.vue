@@ -28,6 +28,14 @@
           </div>
         </div>
         <div class="flex flex-1 flex-col bg-surface-modal">
+          <div class="flex justify-end p-2">
+            <Button
+              class="bg-white hover:bg-gray-4"
+              @click="show = false"
+              icon="x"
+              size="md"
+            />
+          </div>
           <component
             :is="activeTab.component"
             v-if="activeTab"
