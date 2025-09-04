@@ -38,7 +38,6 @@
         :label="
           isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
         "
-        v-model="doc"
         v-model:content="content"
         placeholder="Hi John, we are looking into this issue."
         :ticketId="ticketId"

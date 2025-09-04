@@ -252,17 +252,6 @@ watchEffect(async () => {
     ];
   }
 });
-
-// onMounted(async () => {
-//   if (customizations.value.loading) {
-//     await customizations.value.promise;
-//   }
-//   await setupCustomizations(customizations.value.data, customizationCtx.value);
-//   actions.value = [
-//     ...defaultActions.value,
-//     ...customizations.value.data._customActions,
-//   ];
-// });
 </script>
 
 <style>
