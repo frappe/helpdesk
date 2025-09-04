@@ -4,9 +4,12 @@
     <TabPanel v-slot="{ tab }" class="flex-1">
       <div
         v-if="activities.loading"
-        class="flex items-center justify-center flex-col mt-20"
+        class="flex items-center justify-center flex-col mt-20 relatitve"
       >
-        <LoadingIndicator :scale="10" />
+        <LoadingIndicator :scale="8" class="text-ink-gray-5" />
+        <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
+          Loading...
+        </p>
       </div>
 
       <TicketAgentActivities
@@ -49,6 +52,7 @@ import { computed, inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);
+
 const tabIndex = ref(0);
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
