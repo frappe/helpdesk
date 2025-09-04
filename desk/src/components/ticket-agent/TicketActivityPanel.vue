@@ -26,7 +26,7 @@
   <!-- Comm Area -->
   <CommunicationArea
     ref="communicationAreaRef"
-    :ticketId="ticket.doc?.name"
+    :ticketId="String(ticket.doc?.name)"
     :to-emails="[ticket.doc?.raised_by]"
     :cc-emails="[]"
     :bcc-emails="[]"

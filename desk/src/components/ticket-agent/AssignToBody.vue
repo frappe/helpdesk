@@ -154,8 +154,9 @@ watch(
 );
 
 async function updateAssignees() {
-  if (JSON.stringify(oldAssignees.value) === JSON.stringify(assignees.value))
-    return;
+  const _assignees = assignees.value.map((a) => a.name);
+  const _oldAssignees = oldAssignees.value.map((a) => a.name);
+  if (JSON.stringify(_oldAssignees) === JSON.stringify(_assignees)) return;
 
   const removedAssignees = oldAssignees.value
     .filter(
@@ -169,19 +170,20 @@ async function updateAssignees() {
     )
     .map((assignee) => assignee.name);
 
-  call("frappe.client.insert", {
-    doc: {
-      doctype: "HD Ticket Activity",
-      ticket: props.docname,
-      action: `${
-        addedAssignees.length ? `assigned ${addedAssignees.join(", ")}` : ""
-      } ${removeAssignees.length ? " & " : ""} ${
-        removedAssignees.length
-          ? `unassigned ${removedAssignees.join(", ")}`
-          : ""
-      }`,
-    },
-  });
+  if (addedAssignees.length || removedAssignees.length) {
+    let logMessage = `${
+      addedAssignees.length ? `assigned ${addedAssignees.join(", ")}` : ""
+    } ${removeAssignees.length ? " & " : ""} ${
+      removedAssignees.length ? `unassigned ${removedAssignees.join(", ")}` : ""
+    }`;
+    call("frappe.client.insert", {
+      doc: {
+        doctype: "HD Ticket Activity",
+        ticket: props.docname,
+        action: logMessage,
+      },
+    });
+  }
   if (props.onUpdate) {
     props.onUpdate(
       addedAssignees,

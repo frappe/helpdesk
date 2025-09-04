@@ -159,6 +159,7 @@ watch(
   () => props.title,
   () => {
     scrollToLatestActivity();
-  }
+  },
+  { immediate: true }
 );
 </script>
