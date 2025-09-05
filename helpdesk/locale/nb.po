@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-08-24 10:36+0000\n"
-"PO-Revision-Date: 2025-09-04 16:48\n"
+"PO-Revision-Date: 2025-09-05 17:00\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Norwegian Bokmal\n"
 "MIME-Version: 1.0\n"
@@ -1175,7 +1175,7 @@ msgstr ""
 
 #: helpdesk/utils.py:26
 msgid "Insufficient Permission for {0}"
-msgstr ""
+msgstr "Utilstrekkelige rettigheter for {0}"
 
 #. Label of the integer_value (Int) field in DocType 'HD Ticket Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
