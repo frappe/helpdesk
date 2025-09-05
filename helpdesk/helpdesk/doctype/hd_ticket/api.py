@@ -9,7 +9,13 @@ from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
-from helpdesk.utils import agent_only, check_permissions, get_customer, is_agent
+from helpdesk.utils import (
+    agent_only,
+    check_permissions,
+    get_customer,
+    is_agent,
+    parse_call_logs,
+)
 
 
 @frappe.whitelist()
@@ -66,6 +72,37 @@ def get_one(name, is_customer_portal=False):
             "name": ticket.raised_by.split("@")[0],
         }
     template = ticket.template or DEFAULT_TICKET_TEMPLATE
+
+    linked_calls = frappe.db.get_all(
+        "Dynamic Link",
+        filters={"link_name": ticket["name"], "parenttype": "TP Call Log"},
+        pluck="parent",
+    )
+
+    calls = []
+
+    for call in linked_calls:
+        call = frappe.get_cached_doc(
+            "TP Call Log",
+            call,
+            fields=[
+                "name",
+                "caller",
+                "receiver",
+                "duration",
+                "type",
+                "status",
+                "from",
+                "to",
+                "recording_url",
+                "creation",
+            ],
+        ).as_dict()
+
+        calls.append(call)
+
+    call_logs = parse_call_logs(calls)
+
     return {
         **ticket,
         "comments": get_comments(name),
@@ -79,6 +116,7 @@ def get_one(name, is_customer_portal=False):
             "HD Ticket", is_customer_portal=is_customer_portal
         ),
         "fields": get_meta(template),
+        "calls": call_logs,
     }
 
 
@@ -358,7 +396,6 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: int, cont
 @frappe.whitelist()
 @agent_only
 def split_ticket(subject: str, communication_id: str):
-
     communicaton_creation_time = frappe.db.get_value(
         "Communication", communication_id, "creation"
     )

@@ -542,6 +542,17 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   ];
 }
 
+export function getRandom(len = 4) {
+  let text = "";
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+  Array.from({ length: len }).forEach(() => {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  });
+
+  return text;
+}
+
 export function parseColor(color: string): string {
   color = color.toLowerCase();
   let textColor = `!text-${color}-600`;
