@@ -40,7 +40,7 @@ sed -i 's/schedule:/# schedule:/g' Procfile
 sed -i 's/socketio:/# socketio:/g' Procfile
 sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
 
-bench get-app telephony "${GITHUB_WORKSPACE}"
+bench get-app telephony
 bench get-app helpdesk "${GITHUB_WORKSPACE}"
 bench setup requirements --dev
 
