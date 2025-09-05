@@ -5,15 +5,17 @@
   >
     <Avatar :label="contact.data.name" :image="contact.data.image" size="2xl" />
     <div class="flex flex-col gap-1.5">
-      <div class="flex gap-2.5 items-center">
-        <p class="text-ink-gray-8 font-medium text-xl max-w-[170px] truncate">
-          {{ contact.data.name || contact.data.email_id }}
-        </p>
-        <ExternalLinkIcon
-          class="size-4 text-ink-gray-6 cursor-pointer"
-          @click="openContact(contact.data.name)"
-        />
-      </div>
+      <Tooltip :text="contact.data.name || contact.data.email_id">
+        <div class="flex gap-2.5 items-center">
+          <p class="text-ink-gray-8 font-medium text-xl max-w-[170px] truncate">
+            {{ contact.data.name || contact.data.email_id }}
+          </p>
+          <ExternalLinkIcon
+            class="size-4 text-ink-gray-6 cursor-pointer"
+            @click="openContact(contact.data.name)"
+          />
+        </div>
+      </Tooltip>
       <div class="flex gap-1.5">
         <Tooltip :text="contact.data.email_id">
           <!-- Email Button -->
