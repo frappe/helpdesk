@@ -45,6 +45,7 @@ import { computed, h, ref } from "vue";
 import CallLogDetailModal from "./CallLogDetailModal.vue";
 import CallLogModal from "./CallLogModal.vue";
 import { statusColorMap, statusLabelMap } from "./utils";
+import { PhoneIcon } from "@/components/icons";
 
 const showCallLogModal = ref(false);
 const showCallLogDetailModal = ref(false);
@@ -59,6 +60,7 @@ const options = computed(() => {
     showSelectBanner: true,
     emptyState: {
       title: "No Call Logs Found",
+      icon: h(PhoneIcon),
     },
     columnConfig: {
       caller: {
