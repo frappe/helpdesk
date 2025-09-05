@@ -17,77 +17,92 @@ import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
-import { FieldDependencyIcon } from "@/components/icons";
+import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
 import Telephony from "./Telephony/Telephony.vue";
-import LucidePhone from "~icons/lucide/phone";
 import { EmailNotifications } from "./EmailNotifications";
+import { __ } from "@/translation";
 
 export const tabs = [
   {
-    label: "Email Accounts",
-    icon: markRaw(LucideMail),
-    component: markRaw(EmailConfig),
+    label: __("Settings"),
+    hideLabel: true,
+    items: [
+      {
+        label: "Email Accounts",
+        icon: markRaw(LucideMail),
+        component: markRaw(EmailConfig),
+      },
+      {
+        label: "Email Notifications",
+        icon: markRaw(LucideMailOpen),
+        component: markRaw(EmailNotifications),
+      },
+      {
+        label: "Branding",
+        icon: markRaw(ImageUp),
+        component: markRaw(Branding),
+      },
+      {
+        label: "Agents",
+        icon: markRaw(LucideUser),
+        component: markRaw(Agents),
+      },
+      {
+        label: "Invite Agents",
+        icon: markRaw(LucideUserPlus),
+        component: markRaw(InviteAgents),
+      },
+      {
+        label: "Teams",
+        icon: markRaw(LucideUsers),
+        component: markRaw(TeamsConfig),
+      },
+      {
+        label: "SLA Policies",
+        icon: markRaw(ShieldCheck),
+        component: markRaw(Sla),
+      },
+      {
+        label: "Business Holidays",
+        icon: markRaw(Briefcase),
+        component: markRaw(HolidayList),
+      },
+      {
+        label: "Assignment Rules",
+        icon: markRaw(h(Settings, { class: "rotate-90" })),
+        component: markRaw(AssignmentRules),
+      },
+      {
+        label: "Field Dependencies",
+        icon: markRaw(FieldDependencyIcon),
+        component: markRaw(FieldDependencyConfig),
+      },
+    ],
   },
   {
-    label: "Email Notifications",
-    icon: markRaw(LucideMailOpen),
-    component: markRaw(EmailNotifications),
-  },
-  {
-    label: "Branding",
-    icon: markRaw(ImageUp),
-    component: markRaw(Branding),
-  },
-  {
-    label: "Agents",
-    icon: markRaw(LucideUser),
-    component: markRaw(Agents),
-  },
-  {
-    label: "Invite Agents",
-    icon: markRaw(LucideUserPlus),
-    component: markRaw(InviteAgents),
-  },
-  {
-    label: "Teams",
-    icon: markRaw(LucideUsers),
-    component: markRaw(TeamsConfig),
-  },
-  {
-    label: "SLA Policies",
-    icon: markRaw(ShieldCheck),
-    component: markRaw(Sla),
-  },
-  {
-    label: "Business Holidays",
-    icon: markRaw(Briefcase),
-    component: markRaw(HolidayList),
-  },
-  {
-    label: "Assignment Rules",
-    icon: markRaw(h(Settings, { class: "rotate-90" })),
-    component: markRaw(AssignmentRules),
-  },
-  {
-    label: "Field Dependencies",
-    icon: markRaw(FieldDependencyIcon),
-    component: markRaw(FieldDependencyConfig),
-  },
-  {
-    label: "Telephony",
-    icon: markRaw(LucidePhone),
-    component: markRaw(Telephony),
+    label: __("Integrations"),
+    items: [
+      {
+        label: "Telephony",
+        icon: markRaw(PhoneIcon),
+        component: markRaw(Telephony),
+      },
+    ],
   },
 ];
 
-export type Tab = (typeof tabs)[number];
+export const activeTab = ref(tabs[0].items[0]);
 
-export const activeTab = ref<Tab>(tabs[0]);
-
-export const nextActiveTab = ref<Tab | null>(null);
+export const nextActiveTab = ref(null);
 
 export const disableSettingModalOutsideClick = ref(false);
 
-export const setActiveSettingsTab = (tab: string) => {
-  activeTab.value = tabs.find((t) => t.label === tab);
+export const setActiveSettingsTab = (tabName: string) => {
+  activeTab.value =
+    (tabName &&
+      tabs
+        .map((tab) => tab.items)
+        .flat()
+        .find((tab) => tab.label == tabName)) ||
+    tabs[0].items[0];
 };

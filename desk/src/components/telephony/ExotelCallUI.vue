@@ -243,6 +243,7 @@ function updateStatus(data) {
       parseInt(data["Legs[0][OnCallDuration]"]) ||
         parseInt(data.DialCallDuration)
     );
+    closeCallPopup();
     onCallEnded && onCallEnded();
     return "Call ended";
   }
@@ -274,6 +275,7 @@ function updateStatus(data) {
       parseInt(data["Legs[0][OnCallDuration]"]) ||
         parseInt(data.DialCallDuration)
     );
+    closeCallPopup();
     counterUp.value.stop();
     return "Call ended";
   }

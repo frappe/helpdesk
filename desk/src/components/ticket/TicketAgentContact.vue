@@ -9,10 +9,14 @@
       </Tooltip>
       <div class="flex gap-1.5">
         <Tooltip :text="`Call ${contact.name}`" v-if="isCallingEnabled">
-          <Button class="h-7 w-7" @click="callContact" icon="phone" />
+          <Button @click="callContact">
+            <template #icon>
+              <PhoneIcon class="size-4" />
+            </template>
+          </Button>
         </Tooltip>
         <Tooltip :text="contact.email_id">
-          <Button class="h-7 w-7" @click="openEmailBox()" icon="mail">
+          <Button @click="openEmailBox()" icon="mail">
             <template #icon>
               <EmailIcon class="size-4" />
             </template>
@@ -44,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { EmailIcon } from "@/components/icons/";
+import { EmailIcon, PhoneIcon } from "@/components/icons/";
 import { useTelephonyStore } from "@/stores/telephony";
 import { Avatar, toast, Tooltip, Button } from "frappe-ui";
 import { storeToRefs } from "pinia";

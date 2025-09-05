@@ -139,10 +139,7 @@
       v-if="isFCSite && !isCustomerPortal"
       :isSidebarCollapsed="!isExpanded"
     />
-    <SettingsModal
-      v-model="showSettingsModal"
-      :default-tab="defaultSettingsTab"
-    />
+    <SettingsModal v-model="showSettingsModal" />
     <HelpModal
       v-if="showHelpModal"
       v-model="showHelpModal"
@@ -381,8 +378,6 @@ const logo = h(
   null
 );
 
-const defaultSettingsTab = ref(0);
-
 const showOnboardingBanner = computed(() => {
   return (
     !isCustomerPortal.value &&
@@ -400,7 +395,7 @@ const steps = [
     onClick: () => {
       minimize.value = true;
       showSettingsModal.value = true;
-      defaultSettingsTab.value = 0;
+      setActiveSettingsTab("Email Accounts");
     },
   },
   {
@@ -411,7 +406,7 @@ const steps = [
     onClick: () => {
       minimize.value = true;
       showSettingsModal.value = true;
-      defaultSettingsTab.value = 3;
+      setActiveSettingsTab("Invite Agents");
     },
   },
   {

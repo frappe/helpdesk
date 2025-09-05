@@ -166,6 +166,7 @@ import {
   CommentIcon,
   EmailIcon,
   IndicatorIcon,
+  PhoneIcon,
 } from "@/components/icons";
 import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
 import { setupCustomizations } from "@/composables/formCustomisation";
@@ -178,7 +179,6 @@ import { TabObject, TicketTab, View } from "@/types";
 import { getIcon } from "@/utils";
 import { ComputedRef } from "vue";
 import { showAssignmentModal } from "./modalStates";
-import LucidePhone from "~icons/lucide/phone";
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
@@ -334,7 +334,7 @@ const tabs: TabObject[] = computed(() => {
     _tabs.push({
       name: "call",
       label: "Calls",
-      icon: LucidePhone,
+      icon: PhoneIcon,
     });
   }
   return _tabs;
