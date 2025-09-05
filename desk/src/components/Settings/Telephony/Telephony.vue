@@ -39,7 +39,7 @@
       {{ __("Agent settings") }}
     </div>
     <div class="text-p-xs text-ink-gray-6 mt-1">
-      {{ __("Configure your agent settings.") }}
+      {{ __("Configure your agent’s telephony details.") }}
     </div>
     <div class="grid grid-cols-2 gap-4 mt-4">
       <div class="flex flex-col gap-1.5">
