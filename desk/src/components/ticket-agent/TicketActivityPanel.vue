@@ -2,18 +2,8 @@
   <Tabs v-model="tabIndex" :tabs="tabs">
     <TabList />
     <TabPanel v-slot="{ tab }" class="flex-1">
-      <div
-        v-if="activities.loading"
-        class="flex items-center justify-center flex-col mt-20 relatitve"
-      >
-        <LoadingIndicator :scale="8" class="text-ink-gray-5" />
-        <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
-          Loading...
-        </p>
-      </div>
-
       <TicketAgentActivities
-        v-else
+        v-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
         :activities="filterActivities(tab.name as TicketTab)"
         :title="tab.label"
@@ -24,6 +14,12 @@
           }
         "
       />
+      <div v-else class="flex items-center justify-center flex-col mt-20">
+        <LoadingIndicator :scale="8" class="text-ink-gray-5" />
+        <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
+          Loading...
+        </p>
+      </div>
     </TabPanel>
   </Tabs>
   <!-- Comm Area -->

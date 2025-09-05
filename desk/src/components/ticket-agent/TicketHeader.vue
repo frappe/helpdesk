@@ -92,7 +92,12 @@ import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useView } from "@/composables/useView";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { CustomizationSymbol, TicketSymbol, View } from "@/types";
+import {
+  ActivitiesSymbol,
+  CustomizationSymbol,
+  TicketSymbol,
+  View,
+} from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
 import { Breadcrumbs, call, Dropdown, toast } from "frappe-ui";
@@ -107,6 +112,7 @@ import {
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
+import LucideTicket from "~icons/lucide/ticket";
 import { IndicatorIcon } from "../icons";
 
 defineProps({
@@ -123,6 +129,7 @@ const ticketStatusStore = useTicketStatusStore();
 
 const ticket = inject(TicketSymbol);
 const customizations = inject(CustomizationSymbol);
+const activities = inject(ActivitiesSymbol);
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
 const statusDropdown = computed(() =>
@@ -132,7 +139,14 @@ const statusDropdown = computed(() =>
     onClick: () => {
       notifyTicketUpdate("Status", o.label_agent);
       if (ticket.value.doc.status === o.label_agent) return;
-      ticket.value.setValue.submit({ status: o.label_agent });
+      ticket.value.setValue.submit(
+        { status: o.label_agent },
+        {
+          onSuccess() {
+            activities.value.reload();
+          },
+        }
+      );
     },
     icon: () =>
       h(IndicatorIcon, {
@@ -187,6 +201,13 @@ const defaultActions = computed(() => {
       onClick: () => (showMergeModal.value = true),
     });
   }
+  items.push({
+    label: "Jump to ticket",
+    icon: LucideTicket,
+    onClick: () => {
+      console.log("HELLO");
+    },
+  });
   return [
     {
       group: "Default actions",
