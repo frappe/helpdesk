@@ -171,6 +171,10 @@ const _activities = computed(() => {
   // add feedback data at the last always
   // name is email
   // full_name is name
+
+  if (ticket.value.doc.feedback_rating === 0) {
+    return data;
+  }
   let feedbackActivity: FeedbackActivity[] = [
     {
       type: "feedback",
