@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-08-24 10:36+0000\n"
-"PO-Revision-Date: 2025-08-25 14:02\n"
+"PO-Revision-Date: 2025-09-07 17:11\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -74,7 +74,7 @@ msgstr "Lägg till Tilldelad"
 #. Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add Weekly Holidays"
-msgstr "Lägg till Helg Dagar"
+msgstr "Lägg till Veckovisa Helger"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
@@ -93,7 +93,7 @@ msgstr "Lägg till villkor"
 #. Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add to Holidays"
-msgstr "Lägg till Helg Dagar"
+msgstr "Lägg till Helger"
 
 #: desk/src/components/Settings/Agents.vue:6
 msgid "Add, manage agents and assign roles to them."
@@ -409,7 +409,7 @@ msgstr "Rensa Tabell"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:46
 msgid "Click on Add to Holidays. This will populate the holidays table with all the dates that fall on the selected weekly off. Repeat the process for populating the dates for all your weekly holidays"
-msgstr "Klicka på 'Lägg till Helgdagar'. Detta kommer att fylla helg tabell med alla datum som infaller på valda veckovis frånvaro. Upprepa processen för att fylla i datum för alla helgdagar"
+msgstr "Klicka på 'Lägg till Helger'. Detta kommer att fylla helg tabell med alla datum som infaller på valda veckovis frånvaro. Upprepa processen för att fylla i datum för alla helger"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:61
 msgid "Close"
