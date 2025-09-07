@@ -47,6 +47,29 @@ function helpdesk_handlers(socket) {
       value,
     });
   });
+
+  // Typing indicators
+  socket.on("helpdesk_ticket_typing", (ticket_id) => {
+    if (!ticket_id) return;
+    const ticket_room = open_doc_room("HD Ticket", ticket_id);
+
+    // Broadcast to all other users in the ticket room that this user is typing
+    socket.to(ticket_room).emit("helpdesk_ticket_typing", {
+      ticket_id,
+      user: socket.user,
+    });
+  });
+
+  socket.on("helpdesk_ticket_typing_stopped", (ticket_id) => {
+    if (!ticket_id) return;
+    const ticket_room = open_doc_room("HD Ticket", ticket_id);
+
+    // Broadcast to all other users in the ticket room that this user stopped typing
+    socket.to(ticket_room).emit("helpdesk_ticket_typing_stopped", {
+      ticket_id,
+      user: socket.user,
+    });
+  });
 }
 
 function notify_ticket_viewers(args) {
@@ -84,5 +107,6 @@ function notify_ticket_viewers(args) {
 const open_doc_room = (doctype, docname) =>
   "open_doc:" + doctype + "/" + docname;
 const user_room = (user) => "user:" + user;
+const ticket_response_room = (ticket_id) => "ticket_response:" + ticket_id;
 
 module.exports = helpdesk_handlers;

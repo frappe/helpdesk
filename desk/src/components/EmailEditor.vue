@@ -164,6 +164,7 @@ import {
   MultiSelectInput,
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
+import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
@@ -184,7 +185,7 @@ import {
   toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, nextTick, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
@@ -234,9 +235,23 @@ const newEmail = useStorage("emailBoxContent" + props.ticketId, null);
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 
+// Initialize typing composable
+const { onUserType, cleanup } = useTyping(props.ticketId);
+
 const attachments = ref([]);
 const emailEmpty = computed(() => {
   return isContentEmpty(newEmail.value);
+});
+
+// Watch for changes in email content to trigger typing events
+watch(newEmail, (newValue, oldValue) => {
+  if (newValue !== oldValue && newValue) {
+    onUserType();
+  }
+});
+
+onBeforeUnmount(() => {
+  cleanup();
 });
 
 const toEmailsClone = ref([...props.toEmails]);

@@ -69,7 +69,7 @@ const communications = computed(() => {
 function scroll(id: string) {
   const e = document.getElementById(id);
   if (!isElementInViewport(e)) {
-    e.scrollIntoView();
+    e.scrollIntoViewIfNeeded();
   }
 }
 

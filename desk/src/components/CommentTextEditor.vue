@@ -105,12 +105,12 @@ import {
   createResource,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import { AttachmentItem } from "@/components/";
 import { AttachmentIcon } from "@/components/icons/";
+import { useTyping } from "@/composables/realtime";
 import { useAgentStore } from "@/stores/agent";
-
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
@@ -163,11 +163,26 @@ const props = defineProps({
 const emit = defineEmits(["submit", "discard"]);
 
 const newComment = useStorage("commentBoxContent" + props.ticketId, null);
+
+// Initialize typing composable
+const { onUserType, cleanup } = useTyping(props.ticketId);
+
 const attachments = ref([]);
 const commentEmpty = computed(() => {
   return isContentEmpty(newComment.value);
 });
 const loading = ref(false);
+
+// Watch for changes in comment content to trigger typing events
+watch(newComment, (newValue, oldValue) => {
+  if (newValue !== oldValue && newValue) {
+    onUserType();
+  }
+});
+
+onBeforeUnmount(() => {
+  cleanup();
+});
 
 const label = computed(() => {
   return loading.value ? "Sending..." : props.label;

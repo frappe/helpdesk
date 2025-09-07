@@ -3,7 +3,7 @@
     <div
       class="flex justify-between gap-3 border-t px-6 md:px-10 py-4 md:py-2.5"
     >
-      <div class="flex gap-1.5">
+      <div class="flex gap-1.5 items-center">
         <Button
           ref="sendEmailRef"
           variant="ghost"
@@ -25,6 +25,7 @@
             <CommentIcon class="h-4" />
           </template>
         </Button>
+        <TypingIndicator :ticketId="ticketId" />
       </div>
     </div>
     <div
@@ -92,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { CommentTextEditor, EmailEditor } from "@/components";
+import { CommentTextEditor, EmailEditor, TypingIndicator } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
 import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";

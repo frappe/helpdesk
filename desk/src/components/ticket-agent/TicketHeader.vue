@@ -22,7 +22,7 @@
           :hide-name="true"
         />
         <!-- Navigation -->
-        <TicketNavigation />
+        <TicketNavigation :key="ticket.name" />
         <!-- Custom Actions -->
         <div v-if="normalActions.length" class="flex gap-2">
           <Button
@@ -114,6 +114,7 @@ import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 import LucideTicket from "~icons/lucide/ticket";
 import { IndicatorIcon } from "../icons";
+import TicketNavigation from "./TicketNavigation.vue";
 
 defineProps({
   viewers: {
