@@ -42,7 +42,13 @@
 <script setup lang="ts">
 import { CommunicationArea } from "@/components";
 import { ActivityIcon, CommentIcon, EmailIcon } from "@/components/icons";
-import { ActivitiesSymbol, TabObject, TicketSymbol, TicketTab } from "@/types";
+import {
+  ActivitiesSymbol,
+  FeedbackActivity,
+  TabObject,
+  TicketSymbol,
+  TicketTab,
+} from "@/types";
 import { LoadingIndicator, TabList, TabPanel, Tabs } from "frappe-ui";
 import { computed, inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
@@ -162,6 +168,23 @@ const _activities = computed(() => {
     }
     i++;
   }
+  // add feedback data at the last always
+  // name is email
+  // full_name is name
+  let feedbackActivity: FeedbackActivity[] = [
+    {
+      type: "feedback",
+      key: "feedback-activity",
+      feedback_rating: ticket.value?.doc.feedback_rating,
+      feedback_extra: ticket.value?.doc.feedback_extra,
+      feedback: ticket.value?.doc.feedback,
+      sender: {
+        name: ticket.value?.doc.raised_by,
+        full_name: ticket.value?.doc.contact,
+      },
+    },
+  ];
+  data.push(...feedbackActivity);
 
   return data;
 });

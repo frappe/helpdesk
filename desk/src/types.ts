@@ -337,7 +337,20 @@ export interface CommentActivity extends BaseActivity {
   attachments: FileAttachment[];
 }
 
-export type TicketActivity = HistoryActivity | EmailActivity | CommentActivity;
+export interface FeedbackActivity {
+  type: "feedback";
+  feedback_rating: number;
+  feedback: string; // option seletor
+  feedback_extra?: string; // free flow text
+  sender: { name: string; full_name: string };
+  key: string;
+}
+
+export type TicketActivity =
+  | HistoryActivity
+  | EmailActivity
+  | CommentActivity
+  | FeedbackActivity;
 
 interface FileAttachment {
   name: string;

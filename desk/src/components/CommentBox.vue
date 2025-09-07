@@ -11,11 +11,9 @@
           <span class="font-medium text-gray-800">
             {{ commenter }}
           </span>
-          <span> added a</span>
-          <span class="max-w-xs truncate font-medium text-gray-800">
-            comment
-          </span>
+          <span> commented</span>
         </p>
+        <!-- <span>{{ " &#183; " }}</span> -->
       </div>
       <div class="flex items-center gap-1">
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
@@ -49,7 +47,9 @@
         </div>
       </div>
     </div>
-    <div class="rounded bg-gray-50 px-4 py-3">
+    <div
+      class="rounded bg-surface-gray-2 px-4 py-0 w-fit max-w-[70%] flex items-center justify-center rounded-lg"
+    >
       <TextEditor
         ref="editorRef"
         :editor-class="[

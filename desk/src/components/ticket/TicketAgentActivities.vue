@@ -17,10 +17,10 @@
           >
             <div
               class="z-1 flex h-7 w-7 items-center justify-center rounded-full bg-white"
-              :class="[activity.type === 'email' && 'mt-2']"
+              :class="[['email', 'feedback'].includes(activity.type) && 'mt-2']"
             >
               <Avatar
-                v-if="activity.type === 'email'"
+                v-if="activity.type === 'email' || activity.type === 'feedback'"
                 size="lg"
                 :label="activity.sender?.full_name"
                 :image="getUser(activity.sender?.name).user_image"
@@ -50,6 +50,10 @@
               v-else-if="activity.type === 'comment'"
               :activity="activity"
               @update="() => emit('update')"
+            />
+            <FeedbackBox
+              :activity="activity"
+              v-else-if="activity.type === 'feedback'"
             />
             <HistoryBox v-else :activity="activity" />
           </div>
@@ -92,9 +96,10 @@ import {
 import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
-import { useElementVisibility } from "@vueuse/core";
+import { isElementInViewport } from "@/utils";
 import { Avatar } from "frappe-ui";
 import { PropType, Ref, computed, h, inject, onMounted, watch } from "vue";
+import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
 const props = defineProps({
   activities: {
     type: Array as PropType<TicketActivity[]>,
@@ -140,8 +145,8 @@ function scrollToLatestActivity() {
     let el;
     let e = document.getElementsByClassName("activity");
     el = e[e.length - 1];
-    if (el && !useElementVisibility(el).value) {
-      el.scrollIntoView();
+    if (el && !isElementInViewport(el)) {
+      el.scrollIntoViewIfNeeded();
       el.focus();
     }
   }, 500);
