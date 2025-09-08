@@ -60,7 +60,7 @@ const options = computed(() => {
     showSelectBanner: true,
     emptyState: {
       title: "No Call Logs Found",
-      icon: h(PhoneIcon),
+      icon: PhoneIcon,
     },
     columnConfig: {
       caller: {

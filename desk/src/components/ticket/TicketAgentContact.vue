@@ -45,16 +45,25 @@
       </div>
     </div>
   </div>
+  <SetContactPhoneModal
+    v-model="showPhoneModal"
+    :name="contact.name"
+    @onUpdate="refreshTicket()"
+  />
 </template>
 
 <script setup lang="ts">
 import { EmailIcon, PhoneIcon } from "@/components/icons/";
 import { useTelephonyStore } from "@/stores/telephony";
-import { Avatar, toast, Tooltip, Button } from "frappe-ui";
+import { Avatar, Tooltip, Button } from "frappe-ui";
 import { storeToRefs } from "pinia";
+import SetContactPhoneModal from "./SetContactPhoneModal.vue";
+import { inject, ref } from "vue";
 
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
+const showPhoneModal = ref(false);
+const refreshTicket = inject<() => void>("refreshTicket");
 
 const props = defineProps({
   contact: {
@@ -68,6 +77,10 @@ const props = defineProps({
 });
 
 const callContact = () => {
+  if (!props.contact.mobile_no && !props.contact.phone) {
+    showPhoneModal.value = true;
+    return;
+  }
   telephonyStore.makeCall({
     number: props.contact.mobile_no || props.contact.phone,
     doctype: "HD Ticket",

@@ -173,6 +173,11 @@
         <Button class="ml-2" @click="showSubjectDialog = false"> Close </Button>
       </template>
     </Dialog>
+    <SetContactPhoneModal
+      v-model="showPhoneModal"
+      :name="ticket.data?.contact?.name"
+      @onUpdate="ticket.reload"
+    />
   </div>
 </template>
 
@@ -228,6 +233,7 @@ import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 import { HDTicketStatus } from "@/types/doctypes";
+import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
@@ -240,6 +246,7 @@ const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const subjectInput = ref(null);
 const isLoading = ref(false);
+const showPhoneModal = ref(false);
 
 const props = defineProps({
   ticketId: {
@@ -250,6 +257,10 @@ const props = defineProps({
 
 provide("communicationArea", communicationAreaRef);
 provide("makeCall", () => {
+  if (!ticket.data?.contact?.mobile_no && !ticket.data?.contact?.phone) {
+    showPhoneModal.value = true;
+    return;
+  }
   telephonyStore.makeCall({
     number: ticket.data?.contact?.phone || ticket.data?.contact?.mobile_no,
     doctype: "HD Ticket",

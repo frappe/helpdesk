@@ -87,7 +87,7 @@
       />
       <Button
         v-else-if="title == 'Calls'"
-        label="New Call"
+        label="Make a Call"
         @click="makeCall()"
       />
     </div>
@@ -113,6 +113,7 @@ import { TicketActivity } from "@/types";
 import { useElementVisibility } from "@vueuse/core";
 import { Avatar, FeatherIcon } from "frappe-ui";
 import { PropType, Ref, computed, h, inject, onMounted, watch } from "vue";
+
 const props = defineProps({
   activities: {
     type: Array as PropType<TicketActivity[]>,

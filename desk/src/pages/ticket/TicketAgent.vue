@@ -135,6 +135,11 @@
         </div>
       </template>
     </Dialog>
+    <SetContactPhoneModal
+      v-model="showPhoneModal"
+      :name="ticket.data?.contact?.name"
+      @onUpdate="ticket.reload"
+    />
   </div>
 </template>
 
@@ -184,6 +189,7 @@ import { storeToRefs } from "pinia";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 
 import { HDTicketStatus } from "@/types/doctypes";
+import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 const route = useRoute();
 const router = useRouter();
 
@@ -202,6 +208,8 @@ const props = defineProps({
     required: true,
   },
 });
+const showPhoneModal = ref(false);
+
 watch(
   () => props.ticketId,
   () => {
@@ -213,6 +221,10 @@ const { findView } = useView("HD Ticket");
 
 provide("communicationArea", communicationAreaRef);
 provide("makeCall", () => {
+  if (!ticket.data?.contact?.mobile_no && !ticket.data?.contact?.phone) {
+    showPhoneModal.value = true;
+    return;
+  }
   telephonyStore.makeCall({
     number: ticket.data?.contact?.phone || ticket.data?.contact?.mobile_no,
     doctype: "HD Ticket",
