@@ -5,10 +5,10 @@
       :key="i"
       class="-all peer fill-gray-300"
       :class="{
-        'fill-yellow-400': i <= rating,
+        [themeMap[theme]]: i <= rating,
         'cursor-pointer': !static,
-        'hover:fill-yellow-300': i > rating && !static,
-        'peer-hover:fill-yellow-300': i > rating && !static,
+        'hover:fill-yellow-200': i > rating && !static,
+        'peer-hover:fill-yellow-200': i > rating && !static,
       }"
       height="16px"
       width="16px"
@@ -35,11 +35,17 @@
 interface P {
   rating: number;
   static?: boolean;
+  theme?: string;
 }
 
 const props = withDefaults(defineProps<P>(), {
   static: true,
 });
+
+const themeMap = {
+  red: "fill-red-500",
+  yellow: "fill-yellow-500",
+};
 
 const modelValue = defineModel();
 

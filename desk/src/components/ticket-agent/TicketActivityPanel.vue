@@ -80,11 +80,7 @@ const tabs: TabObject[] = [
 // TODO: refactor for pagination
 // can be done once we sort out the backend
 const _activities = computed(() => {
-  if (
-    activities.value?.loading ||
-    ticket.value?.loading ||
-    !activities.value?.data
-  ) {
+  if (!activities.value?.data) {
     return [];
   }
 

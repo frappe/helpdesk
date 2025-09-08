@@ -54,6 +54,7 @@ import { Popover } from "frappe-ui";
 import { inject } from "vue";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import MultipleAvatar from "../MultipleAvatar.vue";
+import AssignToBody from "./AssignToBody.vue";
 const ticket = inject(TicketSymbol);
 const assignees = inject(AssigneeSymbol);
 
