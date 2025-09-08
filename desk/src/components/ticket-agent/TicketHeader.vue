@@ -81,6 +81,7 @@
     v-model="showMergeModal"
     @update="ticket.reload()"
   />
+  <TicketSubjectModal v-if="showSubjectDialog" v-model="showSubjectDialog" />
 </template>
 
 <script setup lang="ts">
@@ -115,6 +116,7 @@ import LucideMerge from "~icons/lucide/merge";
 import LucideTicket from "~icons/lucide/ticket";
 import { IndicatorIcon } from "../icons";
 import TicketNavigation from "./TicketNavigation.vue";
+import TicketSubjectModal from "./TicketSubjectModal.vue";
 
 defineProps({
   viewers: {
@@ -131,6 +133,8 @@ const ticketStatusStore = useTicketStatusStore();
 const ticket = inject(TicketSymbol);
 const customizations = inject(CustomizationSymbol);
 const activities = inject(ActivitiesSymbol);
+
+const showSubjectDialog = ref(false);
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
 const statusDropdown = computed(() =>
@@ -169,9 +173,9 @@ const breadcrumbs = computed(() => {
   }
   items.push({
     label: ticket.value.doc?.subject,
-    //   onClick: () => {
-    //     showSubjectDialog.value = true;
-    //   },
+    onClick: () => {
+      showSubjectDialog.value = true;
+    },
   });
   return items;
 });

@@ -1,6 +1,9 @@
 <template>
   <ActivityHeader :title="title" />
-  <FadedScrollableDiv class="flex flex-col flex-1 overflow-y-scroll">
+  <FadedScrollableDiv
+    class="flex flex-col flex-1 overflow-y-scroll"
+    :mask-length="20"
+  >
     <div v-if="activities.length" class="activities flex-1 h-full mt-1">
       <div
         v-for="(activity, i) in activities"

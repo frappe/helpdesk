@@ -702,3 +702,10 @@ def get_ticket_activities(ticket: str):
         "views": get_views(ticket),
     }
     return activities
+
+
+@frappe.whitelist()
+def get_ticket_assignees(ticket: str):
+    assignees = frappe.db.get_value("HD Ticket", ticket, "_assign")
+    print("\n\n", assignees, ticket, "\n\n")
+    return assignees

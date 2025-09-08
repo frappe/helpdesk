@@ -5,7 +5,7 @@
         <span class="block text-xs text-gray-600">Assignee</span>
         <Button
           variant="outline"
-          class="!flex !justify-start w-full active:!bg-inherit"
+          class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm"
           @click="togglePopover()"
         >
           <p v-if="assignees.loading || assignees.data?.length === 0">

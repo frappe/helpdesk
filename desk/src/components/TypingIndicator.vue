@@ -1,13 +1,13 @@
 <template>
-  <div v-if="typingUsers.length > 0" class="px-4.5">
+  <div v-if="typingUsers.length > 0" class="pl-2">
     <div class="flex items-center gap-2 text-sm text-gray-600">
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-1.5">
+        <component :is="typingMessage" />
         <div class="typing-dots">
           <span></span>
           <span></span>
           <span></span>
         </div>
-        <component :is="typingMessage" />
       </div>
     </div>
   </div>
@@ -38,7 +38,7 @@ const typingMessage = computed(() => {
     return h("div", { class: "flex items-center gap-1" }, [
       h(UserAvatar, { name: firstUser, size: "sm" }),
       h("span", { class: "text-ink-gray-6 font-medium" }, firstUser),
-      h("span", { class: "text-ink-gray-5" }, " is typing..."),
+      h("span", { class: "text-ink-gray-5" }, " is typing"),
     ]);
   } else if (count === 2) {
     return h("div", { class: "flex items-center gap-1" }, [
@@ -49,7 +49,7 @@ const typingMessage = computed(() => {
         { class: "text-ink-gray-6 font-medium" },
         getUser(typingUsers[1])?.full_name
       ),
-      h("span", { class: "text-ink-gray-5" }, " are typing..."),
+      h("span", { class: "text-ink-gray-5" }, " are typing"),
     ]);
   } else {
     return h("div", { class: "flex items-center gap-1" }, [
@@ -60,7 +60,7 @@ const typingMessage = computed(() => {
         { class: "text-ink-gray-6 font-medium" },
         `${count - 1} others`
       ),
-      h("span", { class: "text-ink-gray-5" }, " are typing..."),
+      h("span", { class: "text-ink-gray-5" }, " are typing"),
     ]);
   }
 });

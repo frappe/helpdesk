@@ -31,7 +31,10 @@
           />
         </div>
         <!-- Mobile Number -->
-        <div class="flex gap-2 items-center p-1.5">
+        <div
+          class="flex gap-2 items-center p-1.5"
+          v-if="contact.data.mobile_no || contact.data.phone"
+        >
           <LucidePhone class="size-4" />
           <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
             {{ contact.data.mobile_no || contact.data.phone || "N/A" }}
@@ -54,7 +57,7 @@
 
     <!-- Recent / Similar Tickets -->
     <template v-if="!recentSimilarTickets.loading">
-      <div class="px-5 border-t" v-for="section in sections">
+      <div class="px-5 border-t pb-2.5" v-for="section in sections">
         <Section
           :key="section.label"
           :label="section.label"

@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="!contact.loading"
-    class="my-4 flex items-center justify-start gap-3"
+    class="my-4 flex items-center justify-start gap-5"
   >
     <Avatar :label="contact.data.name" :image="contact.data.image" size="2xl" />
     <div class="flex flex-col gap-1.5">
