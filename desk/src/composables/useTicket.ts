@@ -20,6 +20,7 @@ interface MapValue {
 const ticketMap: Record<string, MapValue> = reactive({});
 
 export const useTicket = (ticketId: string): MapValue => {
+  let err = false;
   if (!ticketMap[ticketId]) {
     ticketMap[ticketId] = {
       ticket: createDocumentResource<HDTicket>({
@@ -31,6 +32,15 @@ export const useTicket = (ticketId: string): MapValue => {
         setValue: {
           onSuccess: () => {
             toast.success(__("Ticket updated"));
+            err = false;
+          },
+          onError: (error) => {
+            if (err) return;
+            err = true;
+            const msg = error.exc_type
+              ? (error.messages || error.message || []).join(", ")
+              : error.message;
+            toast.error(msg);
           },
         },
       }),
@@ -39,7 +49,6 @@ export const useTicket = (ticketId: string): MapValue => {
         params: { ticket: ticketId },
         auto: true,
         transform: (data: string) => {
-          console.log(data);
           return JSON.parse(data).map((name: string) => ({ name })) as Record<
             "name",
             string

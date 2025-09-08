@@ -70,7 +70,6 @@ import {
   FieldValue,
   TicketSymbol,
 } from "@/types";
-import { toast } from "frappe-ui";
 import { computed, inject } from "vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
@@ -176,12 +175,6 @@ function handleFieldUpdate(
         if (fieldname === "agent_group") {
           assignees.value.reload();
         }
-      },
-      onError: (error) => {
-        const msg = error.exc_type
-          ? (error.messages || error.message || []).join(", ")
-          : error.message;
-        toast.error(msg);
       },
     }
 
