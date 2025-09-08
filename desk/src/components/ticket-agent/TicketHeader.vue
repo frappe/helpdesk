@@ -113,9 +113,9 @@ import {
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
-import LucideTicket from "~icons/lucide/ticket";
 import { IndicatorIcon } from "../icons";
 import TicketNavigation from "./TicketNavigation.vue";
+import TicketSLA from "./TicketSLA.vue";
 import TicketSubjectModal from "./TicketSubjectModal.vue";
 
 defineProps({
@@ -206,13 +206,13 @@ const defaultActions = computed(() => {
       onClick: () => (showMergeModal.value = true),
     });
   }
-  items.push({
-    label: "Jump to ticket",
-    icon: LucideTicket,
-    onClick: () => {
-      console.log("HELLO");
-    },
-  });
+  // items.push({
+  //   label: "Jump to ticket",
+  //   icon: LucideTicket,
+  //   onClick: () => {
+  //     console.log("HELLO");
+  //   },
+  // });
   return [
     {
       group: "Default actions",

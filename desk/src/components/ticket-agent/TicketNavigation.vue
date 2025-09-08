@@ -1,17 +1,35 @@
 <template>
   <div class="flex gap-1">
-    <Button
-      :icon="LucideChevronLeft"
-      variant="ghost"
+    <Tooltip
+      :text="
+        getPreviousTicket()
+          ? `Go to previous ticket: #${getPreviousTicket()}`
+          : 'No previous ticket'
+      "
       :disabled="disableLeftCondition"
-      @click="goToPreviousTicket()"
-    />
-    <Button
-      :icon="LucideChevronRight"
-      variant="ghost"
+    >
+      <Button
+        :icon="LucideChevronLeft"
+        variant="ghost"
+        :disabled="disableLeftCondition"
+        @click="goToPreviousTicket()"
+      />
+    </Tooltip>
+    <Tooltip
+      :text="
+        getNextTicket()
+          ? `Go to next ticket: #${getNextTicket()}`
+          : 'No next ticket'
+      "
       :disabled="disableRightCondition"
-      @click="goToNextTicket()"
-    />
+    >
+      <Button
+        :icon="LucideChevronRight"
+        variant="ghost"
+        :disabled="disableRightCondition"
+        @click="goToNextTicket()"
+      />
+    </Tooltip>
   </div>
 </template>
 
@@ -24,8 +42,13 @@ import { computed } from "vue";
 import LucideChevronLeft from "~icons/lucide/chevron-left";
 import LucideChevronRight from "~icons/lucide/chevron-right";
 
-const { currentTicketIndex, goToNextTicket, goToPreviousTicket } =
-  useTicketNavigation();
+const {
+  currentTicketIndex,
+  goToNextTicket,
+  goToPreviousTicket,
+  getNextTicket,
+  getPreviousTicket,
+} = useTicketNavigation();
 
 const disableLeftCondition = computed(() => {
   if (ticketsToNavigate.loading || !ticketsToNavigate.data?.length) return true;

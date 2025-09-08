@@ -1,6 +1,6 @@
 <template>
   <div
-    class="h-full overflow-y-hidden flex flex-1 flex-col justify-between overflow-hidden"
+    class="h-full overflow-y-hidden flex flex-1 flex-col justify-between overflow-hidden max-h-full"
   >
     <div class="px-5 pb-4 flex flex-col">
       <!-- User avatar with buttons -->
@@ -39,10 +39,9 @@
     </div>
 
     <!-- Additional Fields -->
-    <div
-      class="border-t flex flex-col pb-5 flex-1 h-full overflow-hidden pb-12"
-    >
-      <div class="overflow-y-scroll">
+    <div class="border-t flex flex-col flex-1 h-full pb-3 overflow-y-hidden">
+      <!-- TODO: Hack of 80 % for now, will refactor -->
+      <div class="overflow-y-scroll max-h-[80%]">
         <template v-for="field in customFields">
           <TicketField
             v-if="field.visible"

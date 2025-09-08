@@ -25,7 +25,7 @@
             </template>
           </Button>
           <!-- Call Button -->
-          <Button size="sm">
+          <Button size="sm" v-if="false">
             <template #icon>
               <LucidePhone class="size-4" @click="" />
             </template>

@@ -31,10 +31,7 @@
           />
         </div>
         <!-- Mobile Number -->
-        <div
-          class="flex gap-2 items-center p-1.5"
-          v-if="contact.data.mobile_no || contact.data.phone"
-        >
+        <div class="flex gap-2 items-center p-1.5" v-if="false">
           <LucidePhone class="size-4" />
           <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
             {{ contact.data.mobile_no || contact.data.phone || "N/A" }}
@@ -177,6 +174,7 @@ function openTicket(name: string) {
 
   window.open(url, "_blank");
 }
+// v-if="(false && contact.data.mobile_no) || contact.data.phone"
 </script>
 
 <style scoped></style>

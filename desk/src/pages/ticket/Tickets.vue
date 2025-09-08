@@ -156,7 +156,7 @@ const options = {
     }),
   },
   rowRoute: {
-    name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent2",
+    name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
     prop: "ticketId",
   },
   hideColumnSetting: false,

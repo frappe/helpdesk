@@ -5,7 +5,7 @@
       <p class="text-base text-ink-gray-8 font-medium">
         {{ activity.feedback }}
       </p>
-      <StarRating :rating="activity.feedback_rating" :theme="styles[1]" />
+      <StarRating :rating="activity.feedback_rating" />
     </div>
     <!-- Optional Text -->
     <div v-if="activity.feedback_extra">

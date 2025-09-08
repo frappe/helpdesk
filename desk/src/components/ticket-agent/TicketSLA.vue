@@ -169,7 +169,8 @@ const resolutionBy = computed(() => {
     };
   } else if (
     !ticket.value.doc?.resolution_date &&
-    dayjs().isAfter(dayjs(ticket.value.doc?.resolution_by))
+    dayjs().isAfter(dayjs(ticket.value.doc?.resolution_by)) &&
+    ticket.value.doc?.status_category === "Open"
   ) {
     let resolutionBy = formatTimeShort(
       String(new Date()),

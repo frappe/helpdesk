@@ -37,6 +37,20 @@ export function useTicketNavigation() {
     return ticketsToNavigate.data[currentTicketIndex.value];
   }
 
+  function getNextTicket() {
+    if (currentTicketIndex.value < ticketsToNavigate.data.length - 1) {
+      return ticketsToNavigate.data[currentTicketIndex.value + 1];
+    }
+    return null;
+  }
+
+  function getPreviousTicket() {
+    if (currentTicketIndex.value > 0) {
+      return ticketsToNavigate.data[currentTicketIndex.value - 1];
+    }
+    return null;
+  }
+
   function navigateToTicket(ticketId: string) {
     let view = route.query.view as string;
     let routeToNavigate: any = {
@@ -57,6 +71,8 @@ export function useTicketNavigation() {
     goToNextTicket,
     goToPreviousTicket,
     getCurrentTicket,
+    getNextTicket,
+    getPreviousTicket,
     navigateToTicket,
   };
 }
