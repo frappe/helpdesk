@@ -74,9 +74,10 @@ function makeCall({ number, doctype, docname }) {
     doctype,
   });
   if (
-    isTwilioEnabled.value &&
-    isExotelEnabled.value &&
-    !defaultCallingMedium.value
+    (isTwilioEnabled.value &&
+      isExotelEnabled.value &&
+      !defaultCallingMedium.value) ||
+    !number
   ) {
     mobileNumber.value = number;
     show.value = true;

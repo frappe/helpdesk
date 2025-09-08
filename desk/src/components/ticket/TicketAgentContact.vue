@@ -16,7 +16,7 @@
           </Button>
         </Tooltip>
         <Tooltip :text="contact.email_id">
-          <Button @click="openEmailBox()" icon="mail">
+          <Button @click="openEmailBox()">
             <template #icon>
               <EmailIcon class="size-4" />
             </template>
@@ -68,10 +68,6 @@ const props = defineProps({
 });
 
 const callContact = () => {
-  if (!props.contact.phone && !props.contact.mobile_no) {
-    toast.error("Phone number not found for this contact");
-    return;
-  }
   telephonyStore.makeCall({
     number: props.contact.mobile_no || props.contact.phone,
     doctype: "HD Ticket",

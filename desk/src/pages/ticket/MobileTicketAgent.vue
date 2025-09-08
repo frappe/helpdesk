@@ -250,10 +250,6 @@ const props = defineProps({
 
 provide("communicationArea", communicationAreaRef);
 provide("makeCall", () => {
-  if (!ticket.data?.contact?.phone && !ticket.data?.contact?.mobile_no) {
-    toast.error("Phone number not found for this contact");
-    return;
-  }
   telephonyStore.makeCall({
     number: ticket.data?.contact?.phone || ticket.data?.contact?.mobile_no,
     doctype: "HD Ticket",
