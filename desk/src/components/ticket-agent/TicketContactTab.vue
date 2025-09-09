@@ -169,8 +169,9 @@ const sections = computed(() => {
 function formatDate(date: string) {
   return dayjs(date).format(dateFormat.toUpperCase());
 }
+
 function openTicket(name: string) {
-  let url = window.location.origin + "/helpdesk/tickets2/" + name;
+  let url = window.location.origin + "/helpdesk/tickets/" + name;
 
   window.open(url, "_blank");
 }

@@ -114,20 +114,15 @@ const firstResponse = computed(() => {
       label: `Fulfilled in ${responseBy}`,
       color: "green",
     };
-  } else if (
-    !ticket.value.doc.first_responded_on &&
-    dayjs().isAfter(dayjs(ticket.value.doc.response_by))
-  ) {
+  } else {
     let responseBy = formatTimeShort(
       String(new Date()),
       ticket.value.doc.response_by
     );
     return {
-      label: `Overdue by ${responseBy}`,
+      label: `Failed by ${responseBy}`,
       color: "red",
     };
-  } else {
-    return { label: "Failed", color: "red" };
   }
 });
 
@@ -167,21 +162,15 @@ const resolutionBy = computed(() => {
       label: `Fulfilled in ${resolutionBy}`,
       color: "green",
     };
-  } else if (
-    !ticket.value.doc?.resolution_date &&
-    dayjs().isAfter(dayjs(ticket.value.doc?.resolution_by)) &&
-    ticket.value.doc?.status_category === "Open"
-  ) {
+  } else {
     let resolutionBy = formatTimeShort(
       String(new Date()),
       ticket.value.doc?.resolution_by
     );
     return {
-      label: `Overdue by ${resolutionBy}`,
+      label: `Failed by ${resolutionBy}`,
       color: "red",
     };
-  } else {
-    return { label: "Failed", color: "red" };
   }
 });
 
