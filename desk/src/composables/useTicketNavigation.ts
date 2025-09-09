@@ -54,7 +54,7 @@ export function useTicketNavigation() {
   function navigateToTicket(ticketId: string) {
     let view = route.query.view as string;
     let routeToNavigate: any = {
-      name: "TicketAgent2",
+      name: "TicketAgent",
       params: { ticketId },
     };
     if (view) {
