@@ -632,6 +632,5 @@ function setUpOnboarding() {
 
 onMounted(() => {
   setUpOnboarding();
-  telephonyStore.fetchCallIntegrationStatus();
 });
 </script>

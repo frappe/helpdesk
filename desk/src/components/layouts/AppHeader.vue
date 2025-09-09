@@ -10,6 +10,14 @@
 <script setup>
 import CallUI from "@/components/telephony/CallUI.vue";
 import { useAuthStore } from "@/stores/auth";
+import { useTelephonyStore } from "@/stores/telephony";
+import { onMounted } from "vue";
 
 const { user } = useAuthStore();
+
+const telephonyStore = useTelephonyStore();
+
+onMounted(() => {
+  telephonyStore.fetchCallIntegrationStatus();
+});
 </script>

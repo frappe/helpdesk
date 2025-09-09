@@ -492,7 +492,6 @@ function updateTicket(fieldname: string, value: string) {
 }
 onMounted(() => {
   document.title = props.ticketId;
-  telephonyStore.fetchCallIntegrationStatus();
 });
 
 onUnmounted(() => {

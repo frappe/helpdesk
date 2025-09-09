@@ -25,14 +25,19 @@
             </template>
           </Button>
           <!-- Call Button -->
-          <Button size="sm" v-if="false">
+          <Button size="sm" v-if="isCallingEnabled" @click="callContact">
             <template #icon>
-              <LucidePhone class="size-4" @click="" />
+              <PhoneIcon class="size-4" />
             </template>
           </Button>
         </Tooltip>
       </div>
     </div>
+    <SetContactPhoneModal
+      v-model="showPhoneModal"
+      :name="contact.data.name"
+      @onUpdate="contact.reload"
+    />
   </div>
 </template>
 
@@ -40,15 +45,38 @@
 import { Avatar, Tooltip, Button } from "frappe-ui";
 import EmailIcon from "../icons/EmailIcon.vue";
 import { ExternalLinkIcon } from "../icons";
-import { inject } from "vue";
-import { TicketContactSymbol } from "@/types";
+import { inject, ref } from "vue";
+import { TicketContactSymbol, TicketSymbol } from "@/types";
 import { toggleEmailBox } from "@/pages/ticket/modalStates";
+import { useTelephonyStore } from "@/stores/telephony";
+import { storeToRefs } from "pinia";
+import SetContactPhoneModal from "../ticket/SetContactPhoneModal.vue";
+import PhoneIcon from "../icons/PhoneIcon.vue";
+
+const telephonyStore = useTelephonyStore();
+const { isCallingEnabled } = storeToRefs(telephonyStore);
+const showPhoneModal = ref(false);
+
+const ticket = inject(TicketSymbol);
 
 const contact = inject(TicketContactSymbol);
+
 function openContact(name: string) {
   let url = window.location.origin + "/app/contact/" + name;
   window.open(url, "_blank");
 }
+
+const callContact = () => {
+  if (!contact.value.data.mobile_no && !contact.value.data.phone) {
+    showPhoneModal.value = true;
+    return;
+  }
+  telephonyStore.makeCall({
+    number: contact.value.data.mobile_no || contact.value.data.phone,
+    doctype: "HD Ticket",
+    docname: ticket.value.name,
+  });
+};
 </script>
 
 <style scoped></style>

@@ -266,6 +266,39 @@ def get_tags(ticket: str):
     return res
 
 
+def get_call_logs(ticket: str):
+    linked_calls = frappe.db.get_all(
+        "Dynamic Link",
+        filters={"link_name": ticket, "parenttype": "TP Call Log"},
+        pluck="parent",
+    )
+
+    calls = []
+
+    for call in linked_calls:
+        call = frappe.get_cached_doc(
+            "TP Call Log",
+            call,
+            fields=[
+                "name",
+                "caller",
+                "receiver",
+                "duration",
+                "type",
+                "status",
+                "from",
+                "to",
+                "recording_url",
+                "creation",
+            ],
+        ).as_dict()
+
+        calls.append(call)
+
+    call_logs = parse_call_logs(calls)
+    return call_logs
+
+
 @redis_cache()
 def get_attachments(doctype, name):
     QBFile = frappe.qb.DocType("File")
@@ -554,7 +587,6 @@ def get_navigation_tickets(ticket: str, current_view: str = None):
 
 
 def get_navigation_filters(ticket: str, current_view: str = None):
-
     filters = []
     if current_view:
         _filters = frappe.get_value("HD View", current_view, "filters")
@@ -737,6 +769,7 @@ def get_ticket_activities(ticket: str):
         "communications": get_communications(ticket),
         "history": get_history(ticket),
         "views": get_views(ticket),
+        "calls": get_call_logs(ticket),
     }
     return activities
 

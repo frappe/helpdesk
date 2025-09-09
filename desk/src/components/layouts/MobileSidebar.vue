@@ -246,10 +246,6 @@ function isActiveTab(to: string) {
   }
   return route.name === to;
 }
-
-onMounted(() => {
-  telephonyStore.fetchCallIntegrationStatus();
-});
 </script>
 
 <style scoped></style>
