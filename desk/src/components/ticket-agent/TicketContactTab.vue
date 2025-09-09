@@ -159,7 +159,7 @@ const sections = computed(() => {
       label: "Similar Tickets",
       tooltipMessage: "Tickets with similar queries",
       hideLabel: false,
-      opened: false,
+      opened: true,
       tickets: similarTickets,
     });
   }
