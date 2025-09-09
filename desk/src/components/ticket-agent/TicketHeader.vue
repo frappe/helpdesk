@@ -1,7 +1,7 @@
 <template>
   <LayoutHeader>
     <template #left-header>
-      <div class="flex flex-col">
+      <div class="flex flex-col max-w-[80%]">
         <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
           <template #prefix="{ item }">
             <Icon

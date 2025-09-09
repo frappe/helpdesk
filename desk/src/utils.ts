@@ -44,7 +44,7 @@ export function validateEmailWithZod(email: string) {
   return success;
 }
 
-export function dateFormat(date, format) {
+export function dateFormat(date, format?: string) {
   const _format = format || "DD-MM-YYYY HH:mm:ss";
   return useDateFormat(date, _format).value;
 }
