@@ -30,6 +30,8 @@ def after_install():
     create_welcome_ticket()
     create_ticket_feedback_options()
     add_property_setters()
+    # Always keep this at last, because sql_ddl makes the db commit
+    add_fts_index()
 
 
 def add_default_categories_and_articles():
@@ -340,3 +342,43 @@ def add_default_status():
 
     frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
     frappe.db.set_single_value("HD Settings", "ticket_reopen_status", "Open")
+
+
+def add_fts_index():
+    indexes = [
+        {"table": "tabHD Ticket", "column": "subject", "index_name": "ft_subject"},
+        {
+            "table": "tabHD Ticket",
+            "column": "description",
+            "index_name": "ft_description",
+        },
+    ]
+
+    for i in indexes:
+        add_index_if_not_exists(i["table"], i["column"], i["index_name"])
+
+
+def add_index_if_not_exists(table, column, index_name):
+    index_exists = frappe.db.sql(
+        """
+        SHOW INDEX FROM `{table}` 
+            WHERE Column_name = '{column}' 
+            AND Index_type = 'FULLTEXT'
+        """.format(
+            table=table, column=column
+        ),
+        as_dict=True,
+    )
+    print("\n\n", index_exists, "\n\n")
+    if index_exists:
+        frappe.db.sql_ddl(
+            "DROP INDEX `{index_name}` ON `{table}`".format(
+                index_name=index_exists[0].Key_name, table=table
+            )
+        )
+
+    frappe.db.sql_ddl(
+        "ALTER TABLE `{table}` ADD FULLTEXT INDEX `{index_name}` (`{column}`)".format(
+            table=table, index_name=index_name, column=column
+        )
+    )

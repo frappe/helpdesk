@@ -75,11 +75,10 @@
 </template>
 
 <script setup>
-import { useAttrs, computed, ref } from "vue";
-import { createResource } from "frappe-ui";
-import Autocomplete from "./Autocomplete.vue";
 import { watchDebounced } from "@vueuse/core";
-import { watch } from "vue";
+import { createResource } from "frappe-ui";
+import { computed, ref, useAttrs, watch } from "vue";
+import Autocomplete from "./Autocomplete.vue";
 
 const props = defineProps({
   doctype: {
@@ -227,6 +226,9 @@ const labelClasses = computed(() => {
       md: "text-base",
     }[attrs.size || "sm"],
     "text-gray-600",
+    ...(attrs.required
+      ? ["after:content-['*']", "after:ml-0.5", "after:text-red-500"]
+      : []),
   ];
 });
 </script>

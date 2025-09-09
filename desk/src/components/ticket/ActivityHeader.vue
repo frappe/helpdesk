@@ -8,7 +8,7 @@
     <Button
       v-if="title == 'Emails'"
       variant="solid"
-      @click="communicationAreaRef.toggleEmailBox()"
+      @click="communicationAreaRef?.toggleEmailBox() ?? toggleEmailBox()"
     >
       <template #prefix>
         <FeatherIcon name="plus" class="h-4 w-4" />
@@ -18,7 +18,7 @@
     <Button
       v-else-if="title == 'Comments'"
       variant="solid"
-      @click="communicationAreaRef.toggleCommentBox()"
+      @click="communicationAreaRef?.toggleCommentBox() ?? toggleCommentBox()"
     >
       <template #prefix>
         <FeatherIcon name="plus" class="h-4 w-4" />
@@ -69,6 +69,7 @@
 import { CommentIcon, EmailIcon, PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
 import { useTelephonyStore } from "@/stores/telephony";
+import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
 import { Dropdown } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, h, inject, ref, Ref } from "vue";
@@ -91,12 +92,14 @@ const defaultActions = computed(() => {
     {
       icon: h(EmailIcon, { class: "h-4 w-4" }),
       label: "Email",
-      onClick: () => communicationAreaRef.value.toggleEmailBox(),
+      onClick: () =>
+        communicationAreaRef?.value?.toggleEmailBox() ?? toggleEmailBox(),
     },
     {
       icon: h(CommentIcon, { class: "h-4 w-4" }),
       label: "Comment",
-      onClick: () => communicationAreaRef.value.toggleCommentBox(),
+      onClick: () =>
+        communicationAreaRef?.value?.toggleCommentBox() ?? toggleCommentBox(),
     },
   ];
 

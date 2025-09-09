@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
 from frappe.utils.caching import redis_cache
@@ -510,3 +511,21 @@ def handle_at_me_support(filters):
             filters[key] = frappe.session.user
 
     return filters
+
+
+@frappe.whitelist()
+def remove_assignments(doctype, name, assignees, ignore_permissions=False):
+    assignees = frappe.parse_json(assignees)
+
+    if not assignees:
+        return
+
+    for assign_to in assignees:
+        set_status(
+            doctype,
+            name,
+            todo=None,
+            assign_to=assign_to,
+            status="Cancelled",
+            ignore_permissions=ignore_permissions,
+        )

@@ -13,7 +13,7 @@
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
     :extensions="[PreserveVideoControls]"
-    :uploadFunction="(file:any)=>uploadFunction(file, doctype, modelValue?.name)"
+    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
@@ -97,7 +97,7 @@
             <FileUploader
               :upload-args="{
                 doctype: doctype,
-                docname: modelValue?.name,
+                docname: ticketId,
                 private: true,
               }"
               @success="
@@ -164,6 +164,7 @@ import {
   MultiSelectInput,
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
+import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
@@ -184,12 +185,16 @@ import {
   toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, nextTick, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
 
 const props = defineProps({
+  ticketId: {
+    type: String,
+    default: null,
+  },
   placeholder: {
     type: String,
     default: null,
@@ -225,15 +230,28 @@ const label = computed(() => {
 });
 
 const emit = defineEmits(["submit", "discard"]);
-const doc = defineModel();
 
-const newEmail = useStorage("emailBoxContent" + doc.value.name, null);
+const newEmail = useStorage("emailBoxContent" + props.ticketId, null);
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
+
+// Initialize typing composable
+const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
 const emailEmpty = computed(() => {
   return isContentEmpty(newEmail.value);
+});
+
+// Watch for changes in email content to trigger typing events
+watch(newEmail, (newValue, oldValue) => {
+  if (newValue !== oldValue && newValue) {
+    onUserType();
+  }
+});
+
+onBeforeUnmount(() => {
+  cleanup();
 });
 
 const toEmailsClone = ref([...props.toEmails]);
@@ -255,7 +273,7 @@ const sendMail = createResource({
   url: "run_doc_method",
   makeParams: () => ({
     dt: props.doctype,
-    dn: doc.value.name,
+    dn: props.ticketId,
     method: "reply_via_agent",
     args: {
       attachments: attachments.value.map((x) => x.name),

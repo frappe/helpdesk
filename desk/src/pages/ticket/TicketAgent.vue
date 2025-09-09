@@ -1,507 +1,127 @@
 <template>
-  <div class="flex flex-col">
-    <LayoutHeader v-if="ticket.data">
-      <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
-          <template #prefix="{ item }">
-            <Icon
-              v-if="item.icon"
-              :icon="item.icon"
-              class="mr-1 h-4 flex items-center justify-center self-center"
-            />
-          </template>
-        </Breadcrumbs>
-      </template>
-      <template #right-header>
-        <CustomActions
-          v-if="ticket.data._customActions"
-          :actions="ticket.data._customActions"
-        />
-        <div v-if="ticket.data.assignees?.length">
-          <component :is="ticket.data.assignees.length == 1 ? 'Button' : 'div'">
-            <MultipleAvatar
-              :avatars="ticket.data.assignees"
-              @click="showAssignmentModal = true"
-            />
-          </component>
-        </div>
-        <button
-          v-else
-          class="rounded bg-gray-100 px-2 py-1.5 text-base text-gray-800"
-          @click="showAssignmentModal = true"
-        >
-          Assign
-        </button>
-        <Dropdown :options="dropdownOptions" placement="right">
-          <template #default="{ open }">
-            <Button :label="ticket.data.status">
-              <template #prefix>
-                <IndicatorIcon
-                  :class="
-                    ticketStatusStore.getStatus(ticket.data.status)
-                      ?.parsed_color
-                  "
-                />
-              </template>
-              <template #suffix>
-                <FeatherIcon
-                  :name="open ? 'chevron-up' : 'chevron-down'"
-                  class="h-4"
-                />
-              </template>
-            </Button>
-          </template>
-        </Dropdown>
-      </template>
-    </LayoutHeader>
-    <div v-if="ticket.data" class="flex h-full overflow-hidden">
-      <div class="flex flex-1 flex-col max-w-[calc(100%-382px)]">
-        <!-- ticket activities -->
-        <div class="overflow-y-hidden flex flex-1 !h-full flex-col">
-          <Tabs v-model="tabIndex" :tabs="tabs">
-            <TabList />
-            <TabPanel v-slot="{ tab }" class="h-full">
-              <TicketAgentActivities
-                ref="ticketAgentActivitiesRef"
-                :activities="filterActivities(tab.name)"
-                :title="tab.label"
-                :ticket-status="ticket.data?.status"
-                @update="
-                  () => {
-                    ticket.reload();
-                  }
-                "
-                @email:reply="
-                  (e) => {
-                    communicationAreaRef.replyToEmail(e);
-                  }
-                "
-              />
-            </TabPanel>
-          </Tabs>
-        </div>
-        <CommunicationArea
-          ref="communicationAreaRef"
-          v-model="ticket.data"
-          :to-emails="[ticket.data?.raised_by]"
-          :cc-emails="[]"
-          :bcc-emails="[]"
-          :key="ticket.data?.name"
-          @update="
-            () => {
-              ticket.reload();
-              ticketAgentActivitiesRef.scrollToLatestActivity();
-            }
-          "
-        />
+  <div v-if="ticket.doc?.name" class="flex-1">
+    <TicketHeader :viewers="viewers" />
+    <div class="h-full flex overflow-hidden">
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Tabs & Communication Area -->
+        <TicketActivityPanel />
       </div>
-      <TicketAgentSidebar
-        :ticket="ticket.data"
-        @update="({ field, value }) => updateTicket(field, value)"
-        @email:open="(e) => communicationAreaRef.toggleEmailBox()"
-        @reload="ticket.reload()"
-      />
+
+      <!-- Sidepanel with Resizer -->
+      <TicketSidebar />
     </div>
-    <AssignmentModal
-      v-if="ticket.data && showAssignmentModal"
-      v-model="showAssignmentModal"
-      :assignees="ticket.data.assignees"
-      :docname="ticketId"
-      :team="ticket.data?.agent_group"
-      doctype="HD Ticket"
-      @update="
-        () => {
-          ticket.reload();
-        }
-      "
-    />
-    <!-- Rename Subject Dialog -->
-    <Dialog v-model="showSubjectDialog" :options="{ title: 'Rename Subject' }">
-      <template #body-content>
-        <div class="flex flex-col flex-1 gap-3">
-          <FormControl
-            v-model="renameSubject"
-            type="textarea"
-            size="sm"
-            variant="subtle"
-            :disabled="false"
-          />
-          <Button
-            variant="solid"
-            :loading="isLoading"
-            label="Rename"
-            @click="handleRename"
-          />
-        </div>
-      </template>
-    </Dialog>
-    <SetContactPhoneModal
-      v-model="showPhoneModal"
-      :name="ticket.data?.contact?.name"
-      @onUpdate="ticket.reload"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  Breadcrumbs,
-  Dialog,
-  Dropdown,
-  FormControl,
-  TabList,
-  TabPanel,
-  Tabs,
-  call,
-  createResource,
-  toast,
-} from "frappe-ui";
-import { computed, h, onMounted, onUnmounted, provide, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
-
-import {
-  AssignmentModal,
-  CommunicationArea,
-  Icon,
-  LayoutHeader,
-  MultipleAvatar,
-} from "@/components";
-import {
-  ActivityIcon,
-  CommentIcon,
-  EmailIcon,
-  IndicatorIcon,
-  PhoneIcon,
-} from "@/components/icons";
-import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
-import { setupCustomizations } from "@/composables/formCustomisation";
-import { useView } from "@/composables/useView";
-import { socket } from "@/socket";
+import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";
+import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
+import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
+import { useActiveViewers } from "@/composables/realtime";
+import { useTicket } from "@/composables/useTicket";
+import { ticketsToNavigate } from "@/composables/useTicketNavigation";
 import { globalStore } from "@/stores/globalStore";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { useUserStore } from "@/stores/user";
-import { TabObject, TicketTab, View } from "@/types";
-import { getIcon } from "@/utils";
-import { ComputedRef } from "vue";
-import { showAssignmentModal } from "./modalStates";
-import { useTelephonyStore } from "@/stores/telephony";
-import { storeToRefs } from "pinia";
-import { useActiveTabManager } from "@/composables/useActiveTabManager";
+import {
+  ActivitiesSymbol,
+  AssigneeSymbol,
+  Customizations,
+  CustomizationSymbol,
+  RecentSimilarTicketsSymbol,
+  Resource,
+  TicketContactSymbol,
+  TicketSymbol,
+} from "@/types";
+import { createResource, toast } from "frappe-ui";
+import { computed, onBeforeUnmount, onMounted, provide, watch } from "vue";
+import { useRoute } from "vue-router";
+const { $socket } = globalStore();
 
-import { HDTicketStatus } from "@/types/doctypes";
-import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
-const route = useRoute();
-const router = useRouter();
-
-const ticketStatusStore = useTicketStatusStore();
-const { getUser } = useUserStore();
-const { $dialog } = globalStore();
-const ticketAgentActivitiesRef = ref(null);
-const communicationAreaRef = ref(null);
-const renameSubject = ref("");
-const isLoading = ref(false);
-const telephonyStore = useTelephonyStore();
-const { isCallingEnabled } = storeToRefs(telephonyStore);
 const props = defineProps({
   ticketId: {
     type: String,
     required: true,
   },
 });
-const showPhoneModal = ref(false);
+const route = useRoute();
 
-watch(
-  () => props.ticketId,
-  () => {
-    ticket.reload();
-  }
+const ticketComposable = computed(() => useTicket(props.ticketId));
+const ticket = computed(() => ticketComposable.value.ticket);
+const customizations: Resource<Customizations> = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
+  cache: ["HD Ticket", "customizations"],
+  auto: true,
+});
+
+provide(TicketSymbol, ticket);
+
+provide(
+  AssigneeSymbol,
+  computed(() => ticketComposable.value.assignees)
+);
+provide(
+  TicketContactSymbol,
+  computed(() => ticketComposable.value.contact)
+);
+provide(
+  CustomizationSymbol,
+  computed(() => customizations)
+);
+provide(
+  RecentSimilarTicketsSymbol,
+  computed(() => ticketComposable.value.recentSimilarTickets)
+);
+provide(
+  ActivitiesSymbol,
+  computed(() => ticketComposable.value.activities)
 );
 
-const { findView } = useView("HD Ticket");
+const viewerComposable = computed(() => useActiveViewers(ticket.value.name));
+const viewers = computed(
+  () => viewerComposable.value.currentViewers[props.ticketId] || []
+);
+const { startViewing, stopViewing } = viewerComposable.value;
 
-provide("communicationArea", communicationAreaRef);
-provide("makeCall", () => {
-  if (!ticket.data?.contact?.mobile_no && !ticket.data?.contact?.phone) {
-    showPhoneModal.value = true;
-    return;
-  }
-  telephonyStore.makeCall({
-    number: ticket.data?.contact?.phone || ticket.data?.contact?.mobile_no,
-    doctype: "HD Ticket",
-    docname: props.ticketId,
-  });
-});
-provide("ticketId", props.ticketId);
+// handling for faster navigation between tickets
+watch(
+  () => route.params.ticketId,
+  (newTicketId, oldTicketId) => {
+    if (newTicketId === oldTicketId) return;
 
-const showSubjectDialog = ref(false);
-
-const ticket = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
-  auto: true,
-  makeParams: () => ({
-    name: props.ticketId,
-  }),
-  transform: (data) => {
-    if (data._assign) {
-      data.assignees = JSON.parse(data._assign).map((assignee) => {
-        return {
-          name: assignee,
-          image: getUser(assignee).user_image,
-          label: getUser(assignee).full_name,
-        };
-      });
-    }
-    renameSubject.value = data.subject;
+    if (oldTicketId) stopViewing(oldTicketId as string);
+    startViewing(newTicketId as string);
   },
-  onSuccess: (data) => {
-    document.title = data.subject;
-    setupCustomizations(ticket, {
-      doc: data,
-      call,
-      router,
-      toast,
-      $dialog,
-      updateField,
-      createToast: toast.create,
-    });
-  },
-});
+  { immediate: true }
+);
 
-provide("refreshTicket", () => ticket.reload());
-provide("onCallEnded", () => ticket.reload());
-
-function updateField(name: string, value: string, callback = () => {}) {
-  updateTicket(name, value);
-  callback();
-}
-
-const breadcrumbs = computed(() => {
-  let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
-  if (route.query.view) {
-    const currView: ComputedRef<View> = findView(route.query.view as string);
-    if (currView) {
-      items.push({
-        label: currView.value?.label,
-        icon: getIcon(currView.value?.icon),
-        route: { name: "TicketsAgent", query: { view: currView.value?.name } },
-      });
-    }
-  }
-  items.push({
-    label: ticket.data?.subject,
-    onClick: () => {
-      showSubjectDialog.value = true;
-    },
-  });
-  return items;
-});
-
-const handleRename = () => {
-  if (renameSubject.value === ticket.data?.subject) return;
-  updateTicket("subject", renameSubject.value);
-  showSubjectDialog.value = false;
+type TicketUpdateData = {
+  ticket_id: string;
+  user: string;
+  field: string;
+  value: string;
 };
 
-const dropdownOptions = computed(() =>
-  ticketStatusStore.statuses.data?.map((o: HDTicketStatus) => ({
-    label: o.label_agent,
-    value: o.label_agent,
-    onClick: () => updateTicket("status", o.label_agent),
-    icon: () =>
-      h(IndicatorIcon, {
-        class: o.parsed_color,
-      }),
-  }))
-);
-
-// watch(
-//   () => ticket.data,
-//   (val) => {
-//     console.log("CUSTOM ACTIONSSS");
-//     // console.log(val._customActions);
-//   },
-//   { deep: true }
-// );
-
-const tabs: TabObject[] = computed(() => {
-  const _tabs = [
-    {
-      name: "activity",
-      label: "Activity",
-      icon: ActivityIcon,
-    },
-    {
-      name: "email",
-      label: "Emails",
-      icon: EmailIcon,
-    },
-    {
-      name: "comment",
-      label: "Comments",
-      icon: CommentIcon,
-    },
-  ];
-
-  if (isCallingEnabled.value) {
-    _tabs.push({
-      name: "call",
-      label: "Calls",
-      icon: PhoneIcon,
-    });
-  }
-  return _tabs;
-});
-
-const { tabIndex } = useActiveTabManager(tabs, "lastTicketTab");
-
-const activities = computed(() => {
-  const emailProps = ticket.data.communications.map((email, idx: number) => {
-    return {
-      subject: email.subject,
-      content: email.content,
-      sender: { name: email.user.email, full_name: email.user.name },
-      to: email.recipients,
-      type: "email",
-      key: email.creation,
-      cc: email.cc,
-      bcc: email.bcc,
-      creation: email.communication_date || email.creation,
-      attachments: email.attachments,
-      name: email.name,
-      deliveryStatus: email.delivery_status,
-      isFirstEmail: idx === 0,
-    };
-  });
-
-  const commentProps = ticket.data.comments.map((comment) => {
-    return {
-      name: comment.name,
-      type: "comment",
-      key: comment.creation,
-      commentedBy: comment.commented_by,
-      commenter: comment.user.name,
-      creation: comment.creation,
-      content: comment.content,
-      attachments: comment.attachments,
-    };
-  });
-
-  const historyProps = [...ticket.data.history, ...ticket.data.views].map(
-    (h) => {
-      return {
-        type: "history",
-        key: h.creation,
-        content: h.action ? h.action : "viewed this",
-        creation: h.creation,
-        user: h.user.name + " ",
-      };
-    }
-  );
-
-  const callProps = ticket.data.calls.map((call) => {
-    return {
-      ...call,
-      type: "call",
-      name: call.name,
-      key: call.creation,
-      call_type: call.type,
-      content: `${call.caller || "Unknown"} made a call to ${
-        call.receiver || "Unknown"
-      }`,
-      duration: call.duration ? call.duration + "s" : "0s",
-    };
-  });
-
-  const sorted = [
-    ...emailProps,
-    ...commentProps,
-    ...historyProps,
-    ...callProps,
-  ].sort((a, b) => new Date(a.creation) - new Date(b.creation));
-
-  const data = [];
-  let i = 0;
-
-  while (i < sorted.length) {
-    const currentActivity = sorted[i];
-    if (currentActivity.type === "history") {
-      currentActivity.relatedActivities = [currentActivity];
-      for (let j = i + 1; j < sorted.length + 1; j++) {
-        const nextActivity = sorted[j];
-
-        if (nextActivity && nextActivity.user === currentActivity.user) {
-          currentActivity.relatedActivities.push(nextActivity);
-        } else {
-          data.push(currentActivity);
-          i = j - 1;
-          break;
-        }
-      }
-    } else {
-      data.push(currentActivity);
-    }
-    i++;
-  }
-  return data;
-});
-
-function filterActivities(eventType: TicketTab) {
-  if (eventType === "activity") {
-    return activities.value;
-  }
-  return activities.value.filter((activity) => activity.type === eventType);
-}
-const isErrorTriggered = ref(false);
-function updateTicket(fieldname: string, value: string) {
-  isErrorTriggered.value = false;
-  if (value === ticket.data[fieldname]) return;
-  updateOptimistic(fieldname, value);
-
-  createResource({
-    url: "frappe.client.set_value",
-    params: {
-      doctype: "HD Ticket",
-      name: props.ticketId,
-      fieldname,
-      value,
-    },
-    debounce: 500,
-    auto: true,
-    onSuccess: () => {
-      isLoading.value = false;
-      isErrorTriggered.value = false;
-      ticket.reload();
-    },
-    onError: (error) => {
-      if (isErrorTriggered.value) return;
-      isErrorTriggered.value = true;
-
-      const text = error.exc_type
-        ? (error.messages || error.message || []).join(", ")
-        : error.message;
-      toast.error(text);
-
-      ticket.reload();
-    },
-  });
-}
-
-function updateOptimistic(fieldname: string, value: string) {
-  ticket.data[fieldname] = value;
-  toast.success("Ticket updated");
-}
-
 onMounted(() => {
-  socket.on("helpdesk:ticket-update", (ticketID) => {
-    if (ticketID === Number(props.ticketId)) {
-      ticket.reload();
+  // startViewing(props.ticketId);
+
+  ticketsToNavigate.update({
+    params: {
+      ticket: props.ticketId,
+      current_view: route.query.view as string,
+    },
+  });
+  ticketsToNavigate.reload();
+  ticket.value.markSeen.reload();
+
+  $socket.on("ticket_update", (data: TicketUpdateData) => {
+    if (data.ticket_id === ticket.value?.name) {
+      // Notify the user about the update
+      toast.info(`User ${data.user} updated ${data.field} to ${data.value}`);
     }
   });
 });
 
-onUnmounted(() => {
-  document.title = "Helpdesk";
-  socket.off("helpdesk:ticket-update");
+onBeforeUnmount(() => {
+  stopViewing(props.ticketId);
 });
 </script>
 

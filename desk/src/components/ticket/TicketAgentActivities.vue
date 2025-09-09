@@ -1,6 +1,9 @@
 <template>
   <ActivityHeader :title="title" />
-  <FadedScrollableDiv class="flex flex-col flex-1 overflow-y-scroll">
+  <FadedScrollableDiv
+    class="flex flex-col flex-1 overflow-y-scroll"
+    :mask-length="20"
+  >
     <div v-if="activities.length" class="activities flex-1 h-full mt-1">
       <div
         v-for="(activity, i) in activities"
@@ -17,10 +20,10 @@
           >
             <div
               class="z-1 flex h-7 w-7 items-center justify-center rounded-full bg-white"
-              :class="[activity.type === 'email' && 'mt-2']"
+              :class="[['email', 'feedback'].includes(activity.type) && 'mt-2']"
             >
               <Avatar
-                v-if="activity.type === 'email'"
+                v-if="activity.type === 'email' || activity.type === 'feedback'"
                 size="lg"
                 :label="activity.sender?.full_name"
                 :image="getUser(activity.sender?.name).user_image"
@@ -64,6 +67,10 @@
               v-else-if="activity.type === 'call'"
               :activity="activity"
             />
+            <FeedbackBox
+              :activity="activity"
+              v-else-if="activity.type === 'feedback'"
+            />
             <HistoryBox v-else :activity="activity" />
           </div>
         </div>
@@ -78,12 +85,12 @@
       <Button
         v-if="title == 'Emails'"
         label="New Email"
-        @click="communicationAreaRef.toggleEmailBox()"
+        @click="communicationAreaRef?.toggleEmailBox() ?? toggleEmailBox()"
       />
       <Button
         v-else-if="title == 'Comments'"
         label="New Comment"
-        @click="communicationAreaRef.toggleCommentBox()"
+        @click="communicationAreaRef?.toggleCommentBox() ?? toggleCommentBox()"
       />
       <Button
         v-else-if="title == 'Calls'"
@@ -108,11 +115,13 @@ import {
   EmailIcon,
   PhoneIcon,
 } from "@/components/icons";
+import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
-import { useElementVisibility } from "@vueuse/core";
 import { Avatar, FeatherIcon } from "frappe-ui";
 import { PropType, Ref, computed, h, inject, onMounted, watch } from "vue";
+import { isElementInViewport } from "@/utils";
+import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
 
 const props = defineProps({
   activities: {
@@ -165,8 +174,8 @@ function scrollToLatestActivity() {
     let el;
     let e = document.getElementsByClassName("activity");
     el = e[e.length - 1];
-    if (el && !useElementVisibility(el).value) {
-      el.scrollIntoView();
+    if (el && !isElementInViewport(el)) {
+      el.scrollIntoViewIfNeeded();
       el.focus();
     }
   }, 500);
@@ -177,13 +186,14 @@ defineExpose({
 });
 
 onMounted(() => {
-  scrollToLatestActivity();
+  // scrollToLatestActivity();
 });
 
 watch(
   () => props.title,
   () => {
     scrollToLatestActivity();
-  }
+  },
+  { immediate: true }
 );
 </script>

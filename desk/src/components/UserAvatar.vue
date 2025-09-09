@@ -18,8 +18,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Avatar } from "frappe-ui";
 import { useUserStore } from "@/stores/user";
+import { Avatar } from "frappe-ui";
+import { computed } from "vue";
 const userStore = useUserStore();
 
 const props = defineProps({
@@ -40,5 +41,5 @@ const props = defineProps({
     default: false,
   },
 });
-const user = userStore.getUser(props.name);
+const user = computed(() => userStore.getUser(props.name));
 </script>

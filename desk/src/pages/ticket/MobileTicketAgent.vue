@@ -114,6 +114,7 @@
             class="sticky bottom-0 z-50 bg-white"
             ref="communicationAreaRef"
             v-model="ticket.data"
+            :ticketId="ticket.data?.name"
             :to-emails="[ticket.data.raised_by]"
             :cc-emails="[]"
             :bcc-emails="[]"

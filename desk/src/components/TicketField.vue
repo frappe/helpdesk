@@ -1,19 +1,21 @@
 <template>
-  <div class="flex gap-2 px-6 pb-1 leading-5 first:mt-3 items-baseline">
-    <Tooltip :text="field.label">
-      <div class="w-[106px] shrink-0 truncate text-sm text-gray-600">
-        {{ field.label }}
-        <span v-if="field.required" class="text-red-500"> * </span>
-      </div>
-    </Tooltip>
+  <div class="flex gap-2 px-5 pb-1 leading-5 first:mt-3 items-baseline">
+    <div class="w-[106px] shrink-0 truncate text-sm text-gray-600">
+      <Tooltip :text="field.label">
+        <span>{{ field.label }}</span>
+      </Tooltip>
+      <span v-if="field.required" class="text-red-500"> * </span>
+    </div>
     <div
       class="-m-0.5 min-h-[28px] flex-1 items-center overflow-hidden p-0.5 text-base"
     >
       <component
         :is="component"
         :key="field.fieldname"
+        :readonly="field.readonly"
+        :disabled="field.disabled"
         class="form-control"
-        :placeholder="`Add ${field.label}`"
+        :placeholder="field.placeholder || `Add ${field.label}`"
         :model-value="transValue"
         autocomplete="off"
         v-on="
@@ -40,7 +42,14 @@
 <script setup lang="ts">
 import { Autocomplete, Link } from "@/components";
 import { Field, FieldValue } from "@/types";
-import { createResource, FormControl, Tooltip } from "frappe-ui";
+import {
+  createResource,
+  DateTimePicker,
+  dayjs,
+  FormControl,
+  Tooltip,
+} from "frappe-ui";
+import DatePicker from "frappe-ui/src/components/DatePicker/DatePicker.vue";
 import { computed, h } from "vue";
 
 interface P {
@@ -59,6 +68,20 @@ interface E {
 
 const props = defineProps<P>();
 const emit = defineEmits<E>();
+
+const apiOptions = createResource({
+  url: props.field.url_method,
+  auto: !!props.field.url_method,
+  transform: (data) => {
+    if (!data?.length) return [];
+    return (
+      data?.map((o) => ({
+        label: o,
+        value: o,
+      })) || []
+    );
+  },
+});
 
 const textFields = ["Long Text", "Small Text", "Text", "Text Editor", "Data"];
 
@@ -94,30 +117,42 @@ const component = computed(() => {
   } else if (textFields.includes(props.field.fieldtype)) {
     return h(FormControl, {
       type: "textarea",
+      rows: 1,
     });
-  } else {
+  } else if (props.field.fieldtype === "Datetime") {
+    return h(DateTimePicker, {
+      formatter: (datetime: string) => {
+        if (!datetime) return datetime;
+        return dayjs(datetime).format(
+          `${window.date_format.toUpperCase()} ${window.time_format}`
+        );
+      },
+    });
+  } else if (props.field.fieldtype === "Date") {
+    return h(DatePicker, {
+      id: props.field.fieldname,
+    });
+  }
+  // else if (props.field.fieldtype === "Duration") {
+  //   // console.log("HERE TIME");
+  //   return h(DurationField, { showSeconds: false });
+  // }
+  else {
     return h(FormControl);
   }
 });
 
-const apiOptions = createResource({
-  url: props.field.url_method,
-  auto: !!props.field.url_method,
-  transform: (data) => {
-    if (!data?.length) return [];
-    return (
-      data?.map((o) => ({
-        label: o,
-        value: o,
-      })) || []
-    );
-  },
-});
-
 const transValue = computed(() => {
-  if (props.field.fieldtype === "Check") {
+  const fieldtype = props.field.fieldtype;
+  if (fieldtype === "Check") {
     return props.value ? "Yes" : "No";
+  } else if (fieldtype === "Date") {
+    if (!props.value) return props.value;
+    return dayjs(props.value).format(window.date_format.toUpperCase());
   }
+  // else if (fieldtype === "Duration") {
+  //   if (!props.value) return null;
+  // }
   return props.value;
 });
 

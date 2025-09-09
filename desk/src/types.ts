@@ -1,4 +1,6 @@
-import { Component } from "vue";
+import { Dayjs } from "dayjs";
+import { Component, ComputedRef, InjectionKey } from "vue";
+import type { HDTicket } from "./types/doctypes";
 
 export interface Resource<T = unknown> {
   auto: boolean;
@@ -7,6 +9,7 @@ export interface Resource<T = unknown> {
   pageLength: number;
   totalCount: number;
   hasNextPage: boolean;
+  promise: Promise<void> | null;
   list: {
     loading: boolean;
   };
@@ -129,7 +132,7 @@ export interface AutoCompleteItem {
 export interface Field {
   fieldname: string;
   fieldtype: string;
-  hide_from_customer: 0 | 1;
+  hide_from_customer?: 0 | 1;
   label: string;
   options: string;
   required: 0 | 1;
@@ -141,9 +144,10 @@ export interface Field {
   mandatory_via_depends_on?: string;
   disabled?: boolean;
   placeholder?: string | null;
+  readonly?: boolean;
 }
 
-export type FieldValue = string | number | boolean;
+export type FieldValue = string | number | boolean | null | undefined | Dayjs;
 
 export interface Template {
   about: string;
@@ -342,11 +346,21 @@ export interface CallActivity extends BaseActivity {
   call_type: "Incoming" | "Outgoing";
 }
 
+export interface FeedbackActivity {
+  type: "feedback";
+  feedback_rating: number;
+  feedback: string; // option seletor
+  feedback_extra?: string; // free flow text
+  sender: { name: string; full_name: string };
+  key: string;
+}
+
 export type TicketActivity =
   | HistoryActivity
   | EmailActivity
   | CommentActivity
-  | CallActivity;
+  | CallActivity
+  | FeedbackActivity;
 
 interface FileAttachment {
   name: string;
@@ -366,4 +380,149 @@ export interface FieldCriteriaState {
   parentSearch: string;
   childSearch: string;
   enabled: boolean;
+}
+
+interface ResourceBase {
+  data: any;
+  error: any;
+  fetched: boolean;
+  loading: boolean;
+  params: any;
+  previousData: any;
+  promise: Promise<any> | null;
+  submit: (params?: any) => void;
+}
+
+interface DocumentResourceOptions<T = unknown> {
+  doctype: string;
+  name: string;
+  auto?: boolean;
+  whitelistedMethods?: Record<string, string>;
+  onError?: (error: any) => void;
+  onSuccess?: (data: T) => void;
+  transform?: (doc: T) => T;
+  delete?: {
+    onSuccess?: () => void;
+    onError?: (error: any) => void;
+  };
+  setValue?: {
+    onSuccess?: () => void;
+    onError?: (error: any) => void;
+  };
+}
+
+export interface DocumentResource<T = unknown> {
+  // Configuration
+  auto: boolean;
+  doctype: string;
+  name: string;
+  isDirty: boolean;
+  promise: Promise<void> | null;
+
+  // Main document data
+  doc: T;
+  originalDoc: T;
+
+  // Core methods
+  reload(): void;
+  update(options: Partial<DocumentResourceOptions<T>>): void;
+
+  // Sub-resources
+  get: ResourceBase & {
+    data: T;
+    params: {
+      doctype: string;
+      name: string;
+    };
+  };
+
+  setValue: ResourceBase & {
+    submit: (
+      values: Partial<T>,
+      options?: { onSuccess?: () => void; onError?: (error: any) => void }
+    ) => void;
+  };
+
+  setValueDebounced: ResourceBase & {
+    submit: (values: Partial<T>) => void;
+  };
+
+  save: ResourceBase;
+  delete: ResourceBase;
+
+  // Dynamic whitelisted methods
+  [methodName: string]: any;
+}
+
+export interface Customizations {
+  custom_fields: {
+    fieldname: string;
+    required: number;
+    placeholder: string;
+    url_method: string;
+  }[];
+  _form_script: string[];
+  _customActions?: any;
+  _customOnChange?: any;
+}
+
+export interface TicketContact {
+  name: string;
+  email_id: string;
+  phone: string;
+  mobile_no: string;
+  image: string;
+}
+
+export type RecentTicket = Record<
+  "subject" | "status" | "priority" | "name",
+  string | number
+>;
+export type SimilarTicket = Record<
+  "subject" | "status" | "priority" | "name",
+  string | number
+>;
+export interface RecentSimilarTicket {
+  recent_tickets: RecentTicket[];
+  similar_tickets: SimilarTicket[];
+}
+
+export interface TicketActivities {
+  comments: Comment[];
+  communications: Communication[];
+  history: Activity[];
+  views: ViewLog[];
+}
+
+// symbols
+export const TicketSymbol: InjectionKey<
+  ComputedRef<DocumentResource<HDTicket>>
+> = Symbol("ticket");
+export const AssigneeSymbol: InjectionKey<
+  ComputedRef<Resource<Record<"name", string>[]>>
+> = Symbol("assignees");
+
+export const CustomizationSymbol: InjectionKey<
+  ComputedRef<Resource<Customizations>>
+> = Symbol("customizations");
+
+export const TicketContactSymbol: InjectionKey<
+  ComputedRef<Resource<TicketContact>>
+> = Symbol("ticketContact");
+
+export const RecentSimilarTicketsSymbol: InjectionKey<
+  ComputedRef<Resource<RecentSimilarTicket>>
+> = Symbol("recentSimilarTickets");
+
+export const ActivitiesSymbol: InjectionKey<
+  ComputedRef<Resource<TicketActivities>>
+> = Symbol("activities");
+
+declare global {
+  interface Window {
+    is_fc_site: boolean;
+    date_format: string;
+    time_format: string;
+    session_user: string;
+  }
 }
