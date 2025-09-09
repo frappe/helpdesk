@@ -85,7 +85,9 @@
               class="py-2.5 cursor-pointer"
               @click="openTicket(ticket.name)"
             >
-              <p class="text-base text-ink-gray-8">{{ ticket.subject }}</p>
+              <p class="text-base text-ink-gray-8 max-w-[60%] truncate">
+                {{ ticket.subject }}
+              </p>
               <div class="flex items-end justify-between">
                 <p class="text-base text-ink-gray-5">
                   {{ formatDate(ticket.creation) + " &#183; " }}
@@ -157,7 +159,7 @@ const sections = computed(() => {
       label: "Similar Tickets",
       tooltipMessage: "Tickets with similar queries",
       hideLabel: false,
-      opened: false,
+      opened: true,
       tickets: similarTickets,
     });
   }

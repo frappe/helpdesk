@@ -38,6 +38,7 @@ export function useTicketNavigation() {
   }
 
   function getNextTicket() {
+    if (!ticketsToNavigate.data) return null;
     if (currentTicketIndex.value < ticketsToNavigate.data.length - 1) {
       return ticketsToNavigate.data[currentTicketIndex.value + 1];
     }
@@ -45,6 +46,7 @@ export function useTicketNavigation() {
   }
 
   function getPreviousTicket() {
+    if (!ticketsToNavigate.data) return null;
     if (currentTicketIndex.value > 0) {
       return ticketsToNavigate.data[currentTicketIndex.value - 1];
     }

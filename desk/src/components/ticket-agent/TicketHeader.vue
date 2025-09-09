@@ -1,7 +1,7 @@
 <template>
   <LayoutHeader>
     <template #left-header>
-      <div class="flex flex-col max-w-[80%]">
+      <div class="flex flex-col truncate">
         <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
           <template #prefix="{ item }">
             <Icon
@@ -272,9 +272,10 @@ watchEffect(async () => {
       customizations.value.data,
       customizationCtx.value
     );
+
     actions.value = [
       ...defaultActions.value,
-      ...customizations.value.data._customActions,
+      ...(customizations.value?.data?._customActions || []),
     ];
   }
 });
