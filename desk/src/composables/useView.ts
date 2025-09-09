@@ -77,8 +77,9 @@ export function useView(dt: string = null) {
       },
       auto: true,
       onSuccess: (d) => {
-        views.reload();
-        successCB(d);
+        views.reload().then(() => {
+          successCB(d);
+        });
       },
       onError: (e) => {
         console.log("error", e);

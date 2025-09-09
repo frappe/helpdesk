@@ -137,6 +137,7 @@ import { View, ViewType } from "@/types";
 import { formatTimeShort, getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import {
   call,
   createResource,
@@ -164,7 +165,6 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import EmptyState from "./EmptyState.vue";
 import ListRows from "./ListRows.vue";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
 
 interface P {
   options: {
@@ -654,6 +654,7 @@ function findCurrentView() {
 watch(
   () => route.query.view,
   (val: string) => {
+    debugger;
     defaultParams.view.name = val;
     handleViewChanges();
     if (!val) {
