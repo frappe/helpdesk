@@ -2,7 +2,7 @@
   <div>
     <div
       v-show="showSmallCallPopup"
-      class="ml-2 flex cursor-pointer select-none items-center justify-between gap-1 rounded-full bg-surface-gray-7 px-2 py-[7px] text-base !text-ink-gray-2"
+      class="ml-2 flex cursor-pointer select-none items-center justify-between gap-1 rounded-full bg-surface-gray-7 px-2 py-1 mt-1 text-base !text-ink-gray-2"
       @click="toggleCallPopup"
     >
       <div
@@ -89,14 +89,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import AvatarIcon from "./Icons/AvatarIcon.vue";
-import MinimizeIcon from "./Icons/MinimizeIcon.vue";
-import CountUpTimer from "./CountUpTimer.vue";
-import { useDraggable, useWindowSize } from "@vueuse/core";
-import { Avatar, Button, call, toast } from "frappe-ui";
-import { ref, onBeforeUnmount, watch, inject } from "vue";
 import { globalStore } from "@/stores/globalStore";
 import { useTelephonyStore } from "@/stores/telephony";
+import { useDraggable, useWindowSize } from "@vueuse/core";
+import { Avatar, Button, call, toast } from "frappe-ui";
+import { inject, onBeforeUnmount, ref, watch } from "vue";
+import CountUpTimer from "./CountUpTimer.vue";
+import AvatarIcon from "./Icons/AvatarIcon.vue";
+import MinimizeIcon from "./Icons/MinimizeIcon.vue";
 
 const telephonyStore = useTelephonyStore();
 

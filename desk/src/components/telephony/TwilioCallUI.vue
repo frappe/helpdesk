@@ -102,7 +102,7 @@
   </div>
   <div
     v-show="showSmallCallWindow"
-    class="ml-2 flex cursor-pointer select-none items-center justify-between gap-3 rounded-lg bg-surface-gray-7 px-2 py-[7px] text-base !text-ink-gray-2"
+    class="ml-2 mt-1 flex cursor-pointer select-none items-center justify-between gap-3 rounded-lg bg-surface-gray-7 px-2 py-1 text-base !text-ink-gray-2"
     @click="toggleCallWindow"
     v-bind="$attrs"
   >
@@ -172,14 +172,14 @@
 </template>
 
 <script setup lang="ts">
+import { useTelephonyStore } from "@/stores/telephony";
 import { Call, Device } from "@twilio/voice-sdk";
 import { useDraggable, useWindowSize } from "@vueuse/core";
 import { Avatar, call, toast } from "frappe-ui";
 import { inject, ref, watch } from "vue";
-import MinimizeIcon from "./Icons/MinimizeIcon.vue";
-import CountUpTimer from "./CountUpTimer.vue";
 import LucidePhone from "~icons/lucide/phone";
-import { useTelephonyStore } from "@/stores/telephony";
+import CountUpTimer from "./CountUpTimer.vue";
+import MinimizeIcon from "./Icons/MinimizeIcon.vue";
 
 const telephonyStore = useTelephonyStore();
 
