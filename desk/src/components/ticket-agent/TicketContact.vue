@@ -3,7 +3,7 @@
     v-if="!contact.loading"
     class="my-4 flex items-center justify-start gap-5"
   >
-    <Avatar :label="contact.data.name" :image="contact.data.image" size="2xl" />
+    <Avatar :label="contact.data.name" :image="contactImage" size="2xl" />
     <div class="flex flex-col gap-1.5">
       <Tooltip :text="contact.data.name || contact.data.email_id">
         <div class="flex gap-2.5 items-center">
@@ -42,24 +42,33 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar, Tooltip, Button } from "frappe-ui";
-import EmailIcon from "../icons/EmailIcon.vue";
-import { ExternalLinkIcon } from "../icons";
-import { inject, ref } from "vue";
-import { TicketContactSymbol, TicketSymbol } from "@/types";
 import { toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useTelephonyStore } from "@/stores/telephony";
+import { useUserStore } from "@/stores/user";
+import { TicketContactSymbol, TicketSymbol } from "@/types";
+import { Avatar, Button, Tooltip } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import SetContactPhoneModal from "../ticket/SetContactPhoneModal.vue";
+import { computed, inject, ref } from "vue";
+import { ExternalLinkIcon } from "../icons";
+import EmailIcon from "../icons/EmailIcon.vue";
 import PhoneIcon from "../icons/PhoneIcon.vue";
+import SetContactPhoneModal from "../ticket/SetContactPhoneModal.vue";
 
 const telephonyStore = useTelephonyStore();
+const { getUser } = useUserStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 const showPhoneModal = ref(false);
 
 const ticket = inject(TicketSymbol);
 
 const contact = inject(TicketContactSymbol);
+const contactImage = computed(() => {
+  return (
+    contact.value?.data?.image ||
+    getUser(contact.value?.data?.email_id)?.user_image ||
+    null
+  );
+});
 
 function openContact(name: string) {
   let url = window.location.origin + "/app/contact/" + name;
