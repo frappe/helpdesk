@@ -60,14 +60,15 @@
 </template>
 
 <script setup lang="ts">
-import { Ticket } from "@/types";
+import { Link } from "@/components";
+import { HDTicket } from "@/types/doctypes";
 import { Dialog, createListResource, createResource, toast } from "frappe-ui";
 import { ref, watch } from "vue";
 import LucideMerge from "~icons/lucide/merge";
 import TriangleAlert from "~icons/lucide/triangle-alert";
 // interface P
 interface Props {
-  ticket: Ticket;
+  ticket: HDTicket;
 }
 
 interface E {

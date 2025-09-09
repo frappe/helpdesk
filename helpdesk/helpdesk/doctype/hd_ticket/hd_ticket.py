@@ -787,16 +787,10 @@ class HDTicket(Document):
 
     @frappe.whitelist()
     def mark_seen(self):
-        self.add_view()
-        self.add_seen()
+        self.add_viewed(
+            unique_views=True, force=True
+        )  # Document class method, no way to add unique_views via document settings, hence used force and unique_views=True
         clear_notifications(ticket=self.name)
-
-    def add_view(self):
-        d = frappe.new_doc("View Log")
-        d.reference_doctype = "HD Ticket"
-        d.reference_name = self.name
-        d.viewed_by = frappe.session.user
-        d.insert(ignore_permissions=True)
 
     def get_escalation_rule(self):
         filters = [
@@ -1196,7 +1190,7 @@ def permission_query(user):
     teams = get_agents_team()
 
     if show_tickets_without_team:
-        query += " OR (`tabHD Ticket`.agent_group is null)"
+        query += " OR (`tabHD Ticket`.agent_group is null OR `tabHD Ticket`.agent_group = '')"
 
     # If agent belongs to the team which has ignore_permission set to 1.
     # that means this team can see all the tickets without any restriction,

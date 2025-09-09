@@ -58,7 +58,6 @@ def get_form_script(
     dt,
     apply_to="Form",
     is_customer_portal=False,
-    new_page=False,
     apply_on_new_page=False,
 ):
     """Returns the form script for the given doctype"""
@@ -75,6 +74,7 @@ def get_form_script(
 
     doc = query.run(as_dict=True)
     if doc:
-        return [d.script for d in doc] if len(doc) > 1 else doc[0].script
+        return [d.script for d in doc]
+        # if len(doc) > 1 else doc[0].script
     else:
         return None

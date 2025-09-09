@@ -541,15 +541,13 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
     },
   ];
 }
-
-export function parseColor(color: string): string {
-  color = color.toLowerCase();
-  let textColor = `!text-${color}-600`;
-  if (color == "black") {
-    textColor = "!text-ink-gray-9";
-  } else if (["gray", "green"].includes(color)) {
-    textColor = `!text-${color}-700`;
-  }
-
-  return textColor;
+export function isElementInViewport(el: HTMLElement) {
+  if (!el) return false;
+  const rect = el.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= window.innerHeight &&
+    rect.right <= window.innerWidth
+  );
 }
