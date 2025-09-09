@@ -16,7 +16,7 @@
     <FeatherIcon name="plus" class="h-4" />
     {{ __("Add a condition") }}
   </div>
-  <div class="flex items-center justify-between">
+  <div class="flex items-center justify-between mt-2">
     <Dropdown
       v-if="props.conditions.length > 0"
       class="mt-2"
@@ -38,11 +38,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
-import { watchDebounced } from "@vueuse/core";
-import { validateAssignmentRule } from "../../../stores/assignmentRules";
 import CFConditions from "@/components/conditions-filter/CFConditions.vue";
 import { validateConditions } from "@/utils";
+import { watchDebounced } from "@vueuse/core";
+import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
+import { validateAssignmentRule } from "../../../stores/assignmentRules";
 
 const props = defineProps({
   conditions: Array<any>,
