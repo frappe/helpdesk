@@ -664,22 +664,20 @@ def get_similar_tickets(ticket: str):
     tickets = frappe.db.sql(
         """
         SELECT `name`, `subject`, `status`, `creation`,
-               (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION) * 3 +
-                MATCH(description) AGAINST(%(desc_search)s WITH QUERY EXPANSION) * 1) as `raw_relevance`
+            (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION)) as `raw_relevance`
         FROM `tabHD Ticket`
-        WHERE (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION) OR
-               MATCH(description) AGAINST(%(desc_search)s WITH QUERY EXPANSION))
-              AND name != %(ticket)s
-              AND creation > DATE_SUB(NOW(), INTERVAL 90 DAY)
+        WHERE (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION))
+            AND name != %(ticket)s
+            AND creation > DATE_SUB(NOW(), INTERVAL 90 DAY)
         ORDER BY `raw_relevance` DESC, creation DESC
         LIMIT 4
-    """,
+        """,
         {
             "subject_search": subject_search,
-            "desc_search": desc_search,
             "ticket": ticket,
         },
         as_dict=1,
+        debug=True,
     )
 
     max_relevance = max((t["raw_relevance"] for t in tickets), default=0)
