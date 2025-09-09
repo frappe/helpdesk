@@ -1,7 +1,8 @@
 <template>
   <div class="flex justify-between items-start flex-col gap-6">
     <span class="text-sm text-ink-gray-5 pt-4 w-full"
-      >Set visibility and mandatory criteria for child field:</span
+      >Set visibility and mandatory criteria for
+      {{ selections.childField || "child" }} field:</span
     >
     <div class="flex flex-col gap-4 w-full pb-2">
       <!-- Display Criteria -->
@@ -10,7 +11,8 @@
           <Switch v-model="fieldCriteriaState.display.enabled" />
           <div class="flex items-center gap-1">
             <span class="text-sm text-ink-gray-5"
-              >Show child if parent field is set to</span
+              >Show {{ selections.childField }} if
+              {{ selections.parentField }} is set to</span
             >
             <DocumentationButton
               url="https://docs.frappe.io/helpdesk/field-dependency#handling-visibility-of-child-field"
@@ -35,7 +37,8 @@
           <Switch v-model="fieldCriteriaState.mandatory.enabled" />
           <div class="flex items-center gap-1">
             <span class="text-sm text-ink-gray-5"
-              >Make child mandatory if parent field is set to</span
+              >Make {{ selections.childField }} mandatory if
+              {{ selections.parentField }} is set to</span
             >
             <DocumentationButton
               url="https://docs.frappe.io/helpdesk/field-dependency#handling-if-the-child-field-is-mandatory"
@@ -59,14 +62,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { Switch } from "frappe-ui";
-import MultiSelectCombobox from "@/components/frappe-ui/MultiSelectCombobox.vue";
 import DocumentationButton from "@/components/DocumentationButton.vue";
+import MultiSelectCombobox from "@/components/frappe-ui/MultiSelectCombobox.vue";
+import { getMeta } from "@/stores/meta";
+import { Switch } from "frappe-ui";
+import { computed } from "vue";
 
 const props = defineProps<{
   parentFieldValues: string[];
 }>();
+
+const fieldCriteriaState = defineModel<{
+  display: { enabled: boolean; value: Record<"label" | "value", string>[] };
+  mandatory: { enabled: boolean; value: Record<"label" | "value", string>[] };
+}>();
+const state = defineModel("selections") as any;
+
+const { getField } = getMeta("HD Ticket");
+
+const selections = computed(() => {
+  let childField = state.value.selectedChildField;
+  let parentField = state.value.selectedParentField;
+  childField = getField(childField)?.label;
+  parentField = getField(parentField)?.label;
+  return { childField, parentField };
+});
 
 const fieldCriteriaOptions = computed(() => {
   const _options = [{ label: "Any", value: "Any" }];
@@ -77,11 +97,6 @@ const fieldCriteriaOptions = computed(() => {
   });
   return _options;
 });
-
-const fieldCriteriaState = defineModel<{
-  display: { enabled: boolean; value: Record<"label" | "value", string>[] };
-  mandatory: { enabled: boolean; value: Record<"label" | "value", string>[] };
-}>();
 
 function handleCriteriaSelection(
   values: { label: string; value: string }[],

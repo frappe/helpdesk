@@ -60,6 +60,7 @@
         <FieldDependencyCriteria
           :parent-field-values="state.parentFieldValues"
           v-model="fieldCriteriaState"
+          v-model:selections="state"
         />
       </div>
     </div>
@@ -74,14 +75,14 @@
 </template>
 
 <script setup lang="ts">
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
-import { createResource, toast, Switch } from "frappe-ui";
-import { reactive, watch, computed, ref } from "vue";
-import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
+import { createResource, Switch, toast } from "frappe-ui";
+import { computed, reactive, ref, watch } from "vue";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
-import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
+import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
 import FieldDependencyCriteria from "./FieldDependencyCriteria.vue";
 import FieldDependencyFieldsSelection from "./FieldDependencyFieldsSelection.vue";
 import FieldDependencyValueSelection from "./FieldDependencyValueSelection.vue";
