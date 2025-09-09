@@ -369,10 +369,11 @@ def add_index_if_not_exists(table, column, index_name):
         ),
         as_dict=True,
     )
+    print("\n\n", index_exists, "\n\n")
     if index_exists:
         frappe.db.sql_ddl(
             "DROP INDEX `{index_name}` ON `{table}`".format(
-                index_name=index_name, table=table
+                index_name=index_exists[0].Key_name, table=table
             )
         )
 
