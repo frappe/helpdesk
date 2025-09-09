@@ -677,7 +677,6 @@ def get_similar_tickets(ticket: str):
             "ticket": ticket,
         },
         as_dict=1,
-        debug=True,
     )
 
     max_relevance = max((t["raw_relevance"] for t in tickets), default=0)
