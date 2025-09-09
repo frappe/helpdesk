@@ -31,4 +31,4 @@ helpdesk.patches.update_ticket_statuses
 helpdesk.patches.add_status_category_to_tickets
 helpdesk.patches.enable_new_email_notifications
 
-helpdesk.patches.add_fulltext_index
+helpdesk.patches.add_fulltext_index #v2
