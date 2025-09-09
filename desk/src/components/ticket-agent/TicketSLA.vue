@@ -38,44 +38,26 @@
       <!-- First Response -->
       <div class="flex items-center gap-1">
         <span>First Response</span>
-        <Tooltip
-          :text="
-            dateFormat(
-              ticket.doc.first_responded_on || ticket.doc.response_by,
-              dateTooltipFormat
-            )
-          "
-        >
-          <Badge
-            :label="firstResponse.label"
-            variant="subtle"
-            :theme="firstResponse.color"
-          />
-        </Tooltip>
+        <Badge
+          :label="firstResponse.label"
+          variant="subtle"
+          :theme="firstResponse.color"
+        />
       </div>
       <!-- divider -->
       <div class="border-l border-outline-gray-2 h-[13px]" />
       <!-- Resolution by -->
       <div class="flex items-center gap-1">
         <span>Resolution </span>
-        <Tooltip
-          :text="
-            dateFormat(
-              ticket.doc?.resolution_date || ticket.doc?.resolution_by,
-              dateTooltipFormat
-            )
+        <Badge
+          v-if="resolutionBy"
+          :label="resolutionBy.label"
+          variant="subtle"
+          :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
+          :class="
+            resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'
           "
-        >
-          <Badge
-            v-if="resolutionBy"
-            :label="resolutionBy.label"
-            variant="subtle"
-            :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
-            :class="
-              resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'
-            "
-          />
-        </Tooltip>
+        />
       </div>
     </div>
   </teleport>
@@ -83,7 +65,7 @@
 
 <script setup lang="ts">
 import { TicketSymbol } from "@/types";
-import { copyToClipboard, dateFormat, dateTooltipFormat } from "@/utils";
+import { copyToClipboard } from "@/utils";
 import { dayjs } from "frappe-ui";
 import Badge from "frappe-ui/src/components/Badge/Badge.vue";
 import { computed, inject } from "vue";
