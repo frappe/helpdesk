@@ -31,10 +31,15 @@
           />
         </div>
         <!-- Mobile Number -->
-        <div class="flex gap-2 items-center p-1.5" v-if="false">
-          <LucidePhone class="size-4" />
+        <div
+          class="flex gap-2 items-center p-1.5"
+          v-if="
+            isCallingEnabled && (contact.data.mobile_no || contact.data.phone)
+          "
+        >
+          <PhoneIcon class="size-4" />
           <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
-            {{ contact.data.mobile_no || contact.data.phone || "N/A" }}
+            {{ contact.data.mobile_no || contact.data.phone }}
           </p>
           <CopyIcon
             class="size-4 cursor-pointer"
@@ -109,15 +114,20 @@
 </template>
 
 <script setup lang="ts">
+import { useTelephonyStore } from "@/stores/telephony";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { RecentSimilarTicketsSymbol, TicketContactSymbol } from "@/types";
 import { copyToClipboard } from "@/utils";
 import dayjs from "dayjs";
 import { Avatar, Tooltip } from "frappe-ui";
+import { storeToRefs } from "pinia";
 import { computed, inject } from "vue";
 import { CopyIcon } from "../icons";
 import EmailIcon from "../icons/EmailIcon.vue";
+import PhoneIcon from "../icons/PhoneIcon.vue";
 import Section from "../Section.vue";
+const telephonyStore = useTelephonyStore();
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const contact = inject(TicketContactSymbol);
 const recentSimilarTickets = inject(RecentSimilarTicketsSymbol);
