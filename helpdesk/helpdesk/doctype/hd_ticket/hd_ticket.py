@@ -1190,7 +1190,7 @@ def permission_query(user):
     teams = get_agents_team()
 
     if show_tickets_without_team:
-        query += " OR (`tabHD Ticket`.agent_group is null)"
+        query += " OR (`tabHD Ticket`.agent_group is null OR `tabHD Ticket`.agent_group = '')"
 
     # If agent belongs to the team which has ignore_permission set to 1.
     # that means this team can see all the tickets without any restriction,
