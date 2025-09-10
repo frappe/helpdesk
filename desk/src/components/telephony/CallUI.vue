@@ -96,6 +96,7 @@ function makeCall({ number, doctype, docname }) {
 function makeCallUsing() {
   if (isDefaultMedium.value && callMedium.value) {
     setCallingMedium();
+    isDefaultMedium.value = false;
   }
 
   if (callMedium.value === "Twilio") {
@@ -114,6 +115,7 @@ async function setCallingMedium() {
   });
 
   telephonyStore.setDefaultCallingMedium(callMedium.value);
+  telephonyStore.fetchCallIntegrationStatus();
   toast.success(
     `Default calling medium set successfully to ${callMedium.value}`
   );
