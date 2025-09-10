@@ -1,11 +1,17 @@
 import frappe
 from frappe import _
+from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
 from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
-from helpdesk.utils import check_permissions, contact_default_columns
+from helpdesk.utils import (
+    call_log_default_columns,
+    check_permissions,
+    contact_default_columns,
+    parse_call_logs,
+)
 
 
 @frappe.whitelist()
@@ -68,6 +74,8 @@ def get_list_data(
         if not default_view:
             if doctype == "Contact":
                 columns = contact_default_columns
+            elif doctype == "TP Call Log":
+                columns = call_log_default_columns
             elif hasattr(_list, "default_list_data"):
                 columns = (
                     _list.default_list_data(show_customer_portal_fields).get("columns")
@@ -104,6 +112,9 @@ def get_list_data(
         )
         or []
     )
+
+    if doctype == "TP Call Log":
+        data = parse_call_logs(data)
 
     fields = frappe.get_meta(doctype).fields
     fields = [field for field in fields if field.fieldtype not in no_value_fields]
@@ -381,6 +392,9 @@ def get_quick_filters(doctype: str, show_customer_portal_fields=False):
     if doctype == "Contact":
         quick_filters.append(name_filter)
         return quick_filters
+    elif doctype == "TP Call Log":
+        quick_filters.append(name_filter)
+        return quick_filters
     name_filter_doctypes = ["HD Agent", "HD Customer", "HD Ticket"]
     if doctype in name_filter_doctypes:
         quick_filters.append(name_filter)
@@ -467,6 +481,9 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
         if doctype == "Contact":
             columns = contact_default_columns
             rows = ["name", "email_id", "creation"]
+        elif doctype == "TP Call Log":
+            columns = call_log_default_columns
+            rows = ["name", "caller", "receiver", "creation"]
         else:
             columns = (
                 _list.default_list_data(show_customer_portal_fields).get("columns")
@@ -494,3 +511,21 @@ def handle_at_me_support(filters):
             filters[key] = frappe.session.user
 
     return filters
+
+
+@frappe.whitelist()
+def remove_assignments(doctype, name, assignees, ignore_permissions=False):
+    assignees = frappe.parse_json(assignees)
+
+    if not assignees:
+        return
+
+    for assign_to in assignees:
+        set_status(
+            doctype,
+            name,
+            todo=None,
+            assign_to=assign_to,
+            status="Cancelled",
+            ignore_permissions=ignore_permissions,
+        )

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-08-24 10:36+0000\n"
-"PO-Revision-Date: 2025-08-25 14:02\n"
+"PO-Revision-Date: 2025-09-05 17:00\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Chinese Simplified\n"
 "MIME-Version: 1.0\n"
@@ -1620,7 +1620,7 @@ msgstr "已回复"
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 #: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
 msgid "Request Key"
-msgstr ""
+msgstr "请求密钥"
 
 #. Label of the required (Check) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json

@@ -64,8 +64,8 @@
             emit('reply', {
               content: content,
               to: to ?? sender.name,
-              cc: cc,
-              bcc: bcc,
+              cc: cc ? cc : [],
+              bcc: bcc ? bcc : [],
             })
           "
         >

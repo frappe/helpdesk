@@ -44,7 +44,7 @@ export function validateEmailWithZod(email: string) {
   return success;
 }
 
-export function dateFormat(date, format) {
+export function dateFormat(date, format?: string) {
   const _format = format || "DD-MM-YYYY HH:mm:ss";
   return useDateFormat(date, _format).value;
 }
@@ -542,6 +542,17 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   ];
 }
 
+export function getRandom(len = 4) {
+  let text = "";
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+  Array.from({ length: len }).forEach(() => {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  });
+
+  return text;
+}
+
 export function parseColor(color: string): string {
   color = color.toLowerCase();
   let textColor = `!text-${color}-600`;
@@ -552,4 +563,15 @@ export function parseColor(color: string): string {
   }
 
   return textColor;
+}
+
+export function isElementInViewport(el: HTMLElement) {
+  if (!el) return false;
+  const rect = el.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= window.innerHeight &&
+    rect.right <= window.innerWidth
+  );
 }

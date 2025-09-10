@@ -139,10 +139,7 @@
       v-if="isFCSite && !isCustomerPortal"
       :isSidebarCollapsed="!isExpanded"
     />
-    <SettingsModal
-      v-model="showSettingsModal"
-      :default-tab="defaultSettingsTab"
-    />
+    <SettingsModal v-model="showSettingsModal" />
     <HelpModal
       v-if="showHelpModal"
       v-model="showHelpModal"
@@ -220,7 +217,7 @@ import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
-
+import { useTelephonyStore } from "@/stores/telephony";
 import { setActiveSettingsTab } from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
@@ -231,22 +228,23 @@ const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
-const { $socket } = globalStore();
+const telephonyStore = useTelephonyStore();
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const showSettingsModal = ref(false);
 
 const { pinnedViews, publicViews } = useView();
-declare global {
-  interface Window {
-    is_fc_site: boolean;
-  }
-}
+
 const isFCSite = ref(window.is_fc_site);
 
 const allViews = computed(() => {
-  const items = isCustomerPortal.value
+  let items = isCustomerPortal.value
     ? customerPortalSidebarOptions
     : agentPortalSidebarOptions;
+
+  if (!isCallingEnabled.value) {
+    items = items.filter((item) => item.label !== "Call Logs");
+  }
 
   const options = [
     {
@@ -376,8 +374,6 @@ const logo = h(
   null
 );
 
-const defaultSettingsTab = ref(0);
-
 const showOnboardingBanner = computed(() => {
   return (
     !isCustomerPortal.value &&
@@ -395,7 +391,7 @@ const steps = [
     onClick: () => {
       minimize.value = true;
       showSettingsModal.value = true;
-      defaultSettingsTab.value = 0;
+      setActiveSettingsTab("Email Accounts");
     },
   },
   {
@@ -406,7 +402,7 @@ const steps = [
     onClick: () => {
       minimize.value = true;
       showSettingsModal.value = true;
-      defaultSettingsTab.value = 3;
+      setActiveSettingsTab("Invite Agents");
     },
   },
   {

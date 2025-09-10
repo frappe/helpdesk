@@ -31,7 +31,7 @@ export const useUserStore = defineStore("user", () => {
 
   function getUser(email) {
     if (!email || email === "sessionUser") {
-      email = auth.username;
+      email = window.session_user;
     }
     if (!usersByName[email]) {
       usersByName[email] = {

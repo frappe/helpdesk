@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-08-24 10:36+0000\n"
-"PO-Revision-Date: 2025-08-28 15:51\n"
+"PO-Revision-Date: 2025-09-08 17:21\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Norwegian Bokmal\n"
 "MIME-Version: 1.0\n"
@@ -249,7 +249,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Assignment Rule"
-msgstr ""
+msgstr "Tilordningsregel"
 
 #. Label of the assignment_rules_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -315,7 +315,7 @@ msgstr ""
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Automation"
-msgstr ""
+msgstr "Automatisering"
 
 #. Label of the avg_response_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -602,7 +602,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Details"
-msgstr ""
+msgstr "Detaljer"
 
 #. Description of the 'Ignore Restrictions' (Check) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
@@ -625,7 +625,7 @@ msgstr "DocType"
 #. Label of the domain (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Domain"
-msgstr ""
+msgstr "Domene"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -650,7 +650,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Email Account"
-msgstr ""
+msgstr "E-postkonto"
 
 #. Label of the is_feedback_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1166,7 +1166,7 @@ msgstr ""
 #. Label of the images_column (Column Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Images"
-msgstr ""
+msgstr "Bilder"
 
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1175,7 +1175,7 @@ msgstr ""
 
 #: helpdesk/utils.py:26
 msgid "Insufficient Permission for {0}"
-msgstr ""
+msgstr "Utilstrekkelige rettigheter for {0}"
 
 #. Label of the integer_value (Int) field in DocType 'HD Ticket Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
@@ -1199,7 +1199,7 @@ msgstr ""
 #. Label of the is_default (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Is Default"
-msgstr ""
+msgstr "Er standard"
 
 #. Label of the is_standard (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -1233,7 +1233,7 @@ msgstr ""
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Knowledge Base"
-msgstr ""
+msgstr "Kunnskapsbase"
 
 #. Label of the button_label (Data) field in DocType 'HD Action'
 #. Label of the label (Data) field in DocType 'HD Ticket Feedback Option'
@@ -1438,7 +1438,7 @@ msgstr ""
 #. Label of the placeholder (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Placeholder"
-msgstr ""
+msgstr "Plassholder"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:19
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
@@ -1517,7 +1517,7 @@ msgstr "Offentlig"
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Published"
-msgstr ""
+msgstr "Publisert"
 
 #. Label of the published_on (Datetime) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json

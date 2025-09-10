@@ -5,10 +5,10 @@
       :key="i"
       class="-all peer fill-gray-300"
       :class="{
-        'fill-yellow-400': i <= rating,
+        ['fill-yellow-500']: i <= rating,
         'cursor-pointer': !static,
-        'hover:fill-yellow-300': i > rating && !static,
-        'peer-hover:fill-yellow-300': i > rating && !static,
+        'hover:fill-yellow-200': i > rating && !static,
+        'peer-hover:fill-yellow-200': i > rating && !static,
       }"
       height="16px"
       width="16px"
