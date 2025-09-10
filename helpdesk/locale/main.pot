@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-08-31 10:35+0000\n"
-"PO-Revision-Date: 2025-08-31 10:35+0000\n"
+"POT-Creation-Date: 2025-09-07 10:34+0000\n"
+"PO-Revision-Date: 2025-09-07 10:34+0000\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -417,7 +417,7 @@ msgstr ""
 msgid "Button"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:597
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:596
 msgid "Can not send email. No sender email set up!"
 msgstr ""
 
@@ -487,7 +487,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:329
+
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr ""
 
@@ -558,6 +558,17 @@ msgstr ""
 msgid "Content Type"
 msgstr ""
 
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:625
+msgid "Could not an email due to: {0}"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:785
+msgid "Could not send an acknowledgement email due to: {0}"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:162
+
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:626
 msgid "Could not an email due to: {0}"
 msgstr ""
@@ -567,6 +578,7 @@ msgid "Could not send an acknowledgement email due to: {0}"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:163
+
 msgid "Could not send feedback email,due to: {0}"
 msgstr ""
 
@@ -859,7 +871,8 @@ msgstr ""
 msgid "Feedback Rating"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:161
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:160
 msgid "Feedback email has been sent to the customer"
 msgstr ""
 
@@ -2435,7 +2448,7 @@ msgstr ""
 msgid "Ticket does not exist."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:319
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:318
 msgid "Ticket must be resolved with a feedback"
 msgstr ""
 
@@ -2455,7 +2468,7 @@ msgstr ""
 
 #. Label of the is_ticket_type_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:296
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:295
 msgid "Ticket type is mandatory"
 msgstr ""
 
@@ -2690,7 +2703,7 @@ msgstr ""
 msgid "You are not permitted to access this resource."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:531
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:530
 msgid "You are not permitted to add a comment"
 msgstr ""
 
