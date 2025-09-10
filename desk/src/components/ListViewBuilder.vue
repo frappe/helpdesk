@@ -654,7 +654,6 @@ function findCurrentView() {
 watch(
   () => route.query.view,
   (val: string) => {
-    debugger;
     defaultParams.view.name = val;
     handleViewChanges();
     if (!val) {
