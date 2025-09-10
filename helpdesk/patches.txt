@@ -30,5 +30,5 @@ helpdesk.patches.add_fields_in_assignment_rule
 helpdesk.patches.update_ticket_statuses
 helpdesk.patches.add_status_category_to_tickets
 helpdesk.patches.enable_new_email_notifications
-
 helpdesk.patches.add_fulltext_index #v2
+helpdesk.patches.add_telephony_app

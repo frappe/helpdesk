@@ -541,6 +541,30 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
     },
   ];
 }
+
+export function getRandom(len = 4) {
+  let text = "";
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+  Array.from({ length: len }).forEach(() => {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  });
+
+  return text;
+}
+
+export function parseColor(color: string): string {
+  color = color.toLowerCase();
+  let textColor = `!text-${color}-600`;
+  if (color == "black") {
+    textColor = "!text-ink-gray-9";
+  } else if (["gray", "green"].includes(color)) {
+    textColor = `!text-${color}-700`;
+  }
+
+  return textColor;
+}
+
 export function isElementInViewport(el: HTMLElement) {
   if (!el) return false;
   const rect = el.getBoundingClientRect();

@@ -9,7 +9,7 @@ declare global {
   }
 }
 
-function init() {
+export function initSocket() {
   let host = window.location.hostname;
   let siteName = window.site_name || host;
   let port = window.location.port ? `:${socketio_port}` : "";
@@ -35,4 +35,4 @@ function init() {
   return socket;
 }
 
-export const socket = init();
+export const socket = initSocket();

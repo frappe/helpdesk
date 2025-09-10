@@ -33,10 +33,12 @@ const typingMessage = computed(() => {
   if (count === 0) return null;
   const { getUser } = useUserStore();
   let firstUser = getUser(typingUsers[0])?.full_name || typingUsers[0];
+  console.log(firstUser);
+  console.log(typingUsers);
 
   if (count === 1) {
     return h("div", { class: "flex items-center gap-1" }, [
-      h(UserAvatar, { name: firstUser, size: "sm" }),
+      h(UserAvatar, { name: typingUsers[0], size: "sm" }),
       h("span", { class: "text-ink-gray-6 font-medium" }, firstUser),
       h("span", { class: "text-ink-gray-5" }, " is typing"),
     ]);

@@ -17,6 +17,7 @@
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.9",
     "@tiptap/core": "^2.2.4",
+    "@twilio/voice-sdk": "^2.15.0",
     "@vee-validate/zod": "^4.8.2",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vueuse/core": "^10.0.2",

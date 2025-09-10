@@ -19,11 +19,12 @@ import App from "./App.vue";
 import { createDialog } from "./components/dialogs";
 import "./index.css";
 import { router } from "./router";
-import { socket } from "./socket";
 import { posthogPlugin } from "./telemetry";
 import { isCustomerPortal } from "@/utils";
 import { translationPlugin } from "./translation";
 import CircleAlert from "~icons/lucide/circle-alert";
+import { initSocket } from "./socket";
+
 const globalComponents = {
   Badge,
   Button,
@@ -73,9 +74,9 @@ for (const c in globalComponents) {
   app.component(c, globalComponents[c]);
 }
 
-app.config.globalProperties.$socket = socket;
 app.config.globalProperties.$dialog = createDialog;
 
+let socket;
 if (import.meta.env.DEV) {
   frappeRequest({
     url: "/api/method/helpdesk.www.helpdesk.index.get_context_for_dev",
@@ -83,8 +84,12 @@ if (import.meta.env.DEV) {
     for (let key in values) {
       window[key] = values[key];
     }
+    socket = initSocket();
+    app.config.globalProperties.$socket = socket;
     app.mount("#app");
   });
 } else {
+  socket = initSocket();
+  app.config.globalProperties.$socket = socket;
   app.mount("#app");
 }

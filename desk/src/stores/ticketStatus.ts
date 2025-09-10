@@ -14,6 +14,7 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
       "different_view",
       "category",
       "color",
+      "enabled",
     ],
     orderBy: "`tabHD Ticket Status`.order",
     pageLength: 1000,

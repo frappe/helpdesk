@@ -137,8 +137,10 @@ const activities = inject(ActivitiesSymbol);
 const showSubjectDialog = ref(false);
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
-const statusDropdown = computed(() =>
-  ticketStatusStore.statuses.data?.map((o: HDTicketStatus) => ({
+const statusDropdown = computed(() => {
+  const statuses =
+    ticketStatusStore.statuses.data?.filter((s) => s.enabled) || [];
+  return statuses.map((o: HDTicketStatus) => ({
     label: o.label_agent,
     value: o.label_agent,
     onClick: () => {
@@ -157,8 +159,8 @@ const statusDropdown = computed(() =>
       h(IndicatorIcon, {
         class: o.parsed_color,
       }),
-  }))
-);
+  }));
+});
 const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
   if (route.query.view) {

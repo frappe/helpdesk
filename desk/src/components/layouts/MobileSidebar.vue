@@ -111,7 +111,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
-import { computed, markRaw } from "vue";
+import { computed, markRaw, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { Section } from "@/components";
@@ -132,17 +132,25 @@ import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
 } from "./layoutSettings";
+import { useTelephonyStore } from "@/stores/telephony";
+import { storeToRefs } from "pinia";
 const { pinnedViews, publicViews } = useView();
 
 const notificationStore = useNotificationStore();
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const telephonyStore = useTelephonyStore();
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const allViews = computed(() => {
-  const items = isCustomerPortal.value
+  let items = isCustomerPortal.value
     ? customerPortalSidebarOptions
     : agentPortalSidebarOptions;
+
+  if (!isCallingEnabled.value) {
+    items = items.filter((item) => item.label !== "Call Logs");
+  }
 
   const options = [
     {

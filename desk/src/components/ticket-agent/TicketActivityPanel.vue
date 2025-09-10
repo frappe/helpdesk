@@ -41,7 +41,12 @@
 
 <script setup lang="ts">
 import { CommunicationArea } from "@/components";
-import { ActivityIcon, CommentIcon, EmailIcon } from "@/components/icons";
+import {
+  ActivityIcon,
+  CommentIcon,
+  EmailIcon,
+  PhoneIcon,
+} from "@/components/icons";
 import {
   ActivitiesSymbol,
   FeedbackActivity,
@@ -50,32 +55,48 @@ import {
   TicketTab,
 } from "@/types";
 import { LoadingIndicator, TabList, TabPanel, Tabs } from "frappe-ui";
-import { computed, inject, ref } from "vue";
+import { computed, ComputedRef, inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
+import { useTelephonyStore } from "@/stores/telephony";
+import { storeToRefs } from "pinia";
+
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);
 
 const tabIndex = ref(0);
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
+const telephonyStore = useTelephonyStore();
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 
-const tabs: TabObject[] = [
-  {
-    name: "activity",
-    label: "Activity",
-    icon: ActivityIcon,
-  },
-  {
-    name: "email",
-    label: "Emails",
-    icon: EmailIcon,
-  },
-  {
-    name: "comment",
-    label: "Comments",
-    icon: CommentIcon,
-  },
-];
+const tabs: ComputedRef<TabObject[]> = computed(() => {
+  const _tabs: TabObject[] = [
+    {
+      name: "activity",
+      label: "Activity",
+      icon: ActivityIcon,
+    },
+    {
+      name: "email",
+      label: "Emails",
+      icon: EmailIcon,
+    },
+    {
+      name: "comment",
+      label: "Comments",
+      icon: CommentIcon,
+    },
+  ];
+
+  if (isCallingEnabled.value) {
+    _tabs.push({
+      name: "call",
+      label: "Calls",
+      icon: PhoneIcon,
+    });
+  }
+  return _tabs;
+});
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend
@@ -129,11 +150,27 @@ const _activities = computed(() => {
       user: h.user.name + " ",
     };
   });
-  // console.log(historyProps);
 
-  const sorted = [...emailProps, ...commentProps, ...historyProps].sort(
-    (a, b) => new Date(a.creation) - new Date(b.creation)
-  );
+  const callProps = activities.value.data.calls.map((call) => {
+    return {
+      ...call,
+      type: "call",
+      name: call.name,
+      key: call.creation,
+      call_type: call.type,
+      content: `${call.caller || "Unknown"} made a call to ${
+        call.receiver || "Unknown"
+      }`,
+      duration: call.duration ? call.duration + "s" : "0s",
+    };
+  });
+
+  const sorted = [
+    ...emailProps,
+    ...commentProps,
+    ...historyProps,
+    ...callProps,
+  ].sort((a, b) => new Date(a.creation) - new Date(b.creation));
   const data = [];
   let i = 0;
 
