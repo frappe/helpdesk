@@ -53,6 +53,7 @@ import {
   EmailIcon,
   PhoneIcon,
 } from "@/components/icons";
+import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
   ActivitiesSymbol,
@@ -69,7 +70,6 @@ import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);
 
-const tabIndex = ref(0);
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const telephonyStore = useTelephonyStore();
@@ -103,6 +103,8 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   }
   return _tabs;
 });
+
+const { tabIndex } = useActiveTabManager(tabs, "lastTicketTab");
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend
