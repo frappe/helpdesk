@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-09-07 10:34+0000\n"
-"PO-Revision-Date: 2025-09-10 18:22\n"
+"PO-Revision-Date: 2025-09-11 18:19\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Croatian\n"
 "MIME-Version: 1.0\n"
@@ -20,19 +20,19 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
-msgstr ""
+msgstr "- Zadani Status Slučaja<br>"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:116
 msgid "- Ticket Reopen Status<br>"
-msgstr ""
+msgstr "- Status Ponovnog Otvaranja Slučaja<br>"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:92
 msgid "- {0} as Default Status<br>"
-msgstr ""
+msgstr "- {0} kao Zadani Status<br>"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:94
 msgid "- {0} as Reopen Status<br>"
-msgstr ""
+msgstr "- {0} kao Status Ponovnog Otvaranja<br>"
 
 #. Description of the 'Feedback' (Select) field in DocType 'HD Article
 #. Feedback'
@@ -42,11 +42,11 @@ msgstr "0 je bez povratnih informacija, 1 je sviđa mi se, 2 je ne sviđa mi se"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:117
 msgid "<br>Please update HD Settings to use a different status before disabling this status."
-msgstr ""
+msgstr "<br>Prije onemogućavanja ovog statusa, ažuriraj postavke kako biste koristili drugi status."
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:95
 msgid "<br>Please update the SLA(s) to use a different status before disabling this status."
-msgstr ""
+msgstr "<br>Molimo vas da ažurirate Standardni Nivo Ugovora kako biste koristili drugačiji status prije nego što onemogućite ovaj status."
 
 #. Header text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -75,7 +75,7 @@ msgstr "Pristup odbijen"
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:72
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Acknowledgement"
-msgstr ""
+msgstr "Potvrda"
 
 #. Label of the action (Data) field in DocType 'HD Ticket Activity'
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
@@ -249,7 +249,7 @@ msgstr "Arhivirano"
 
 #: desk/src/components/Settings/SettingsModal.vue:44
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
-msgstr ""
+msgstr "Jeste li sigurni da želite promijeniti kartice? Nespremljene promjene bit će izgubljene."
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:114
 msgid "Are you sure you want to go back? Unsaved changes will be lost."
@@ -257,7 +257,7 @@ msgstr "Jeste li sigurni da se želite vratiti? Nespremljene promjene bit će iz
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:127
 msgid "Are you sure you want to reset the content? Current content will be overridden."
-msgstr ""
+msgstr "Jeste li sigurni da želite resetirati sadržaj? Trenutni sadržaj bit će poništen."
 
 #. Label of the article (Link) field in DocType 'HD Article Feedback'
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
@@ -329,7 +329,7 @@ msgstr "Pravila dodjeljivanja"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:73
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
-msgstr ""
+msgstr "Barem jedan omogućeni status za kategoriju <u>{0}</u> mora biti omogućen."
 
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:28
 msgid "At-least one of priority, team and ticket type is required"
@@ -364,7 +364,7 @@ msgstr "Automatski generirano iz prikaza portala — nemojte izravno uređivati 
 #. Label of the auto_close_tickets (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Automatically Close Tickets when"
-msgstr ""
+msgstr "Automatski zatvori tikete kada"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -429,11 +429,11 @@ msgstr "Nije moguće obrisati zadani Sporazum o Nivou Usluge. Barem jedan sporaz
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:110
 msgid "Cannot disable this status as it is linked in HD Settings:<br><br>"
-msgstr ""
+msgstr "Nije moguće onemogućiti ovaj status jer je povezan u Postavkama:<br><br>"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:88
 msgid "Cannot disable this status as it is linked in the following SLAs:<br><br>"
-msgstr ""
+msgstr "Nije moguće onemogućiti ovaj status jer je povezan u sljedećim Standard Nivo Ugovorima:<br><br>"
 
 #: helpdesk/api/knowledge_base.py:122
 msgid "Cannot merge General category"
@@ -561,19 +561,19 @@ msgstr "Vrsta sadržaja"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:625
 msgid "Could not an email due to: {0}"
-msgstr ""
+msgstr "Nije moguće poslati e-poštu zbog: {0}"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:785
 msgid "Could not send an acknowledgement email due to: {0}"
-msgstr ""
+msgstr "Nije moguće poslati e-poštu s potvrdom zbog: {0}"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:626
 msgid "Could not an email due to: {0}"
-msgstr ""
+msgstr "Nije moguće poslati e-poštu zbog: {0}"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:786
 msgid "Could not send an acknowledgement email due to: {0}"
-msgstr ""
+msgstr "Nije moguće poslati e-poštu s potvrdom zbog: {0}"
 
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Nije moguće poslati e-poštu s povratnim informacijama zbog: {0}"
@@ -600,7 +600,7 @@ msgstr "Ime Klijenta"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:7
 msgid "Customize your email notification preferences to stay informed about important updates and activities."
-msgstr ""
+msgstr "Prilagodi postavke obavijesti e-poštom kako biste bili obaviješteni o važnim ažuriranjima i aktivnostima."
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -636,7 +636,7 @@ msgstr "Zadani Sporazum o Nivou Usluge"
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Default Ticket Status"
-msgstr ""
+msgstr "Zadani Status Slučaja"
 
 #. Label of the default_priority (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -650,7 +650,7 @@ msgstr "Zadani predložak ne može se izbrisati"
 #. Label of the default_ticket_status (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Default ticket status"
-msgstr ""
+msgstr "Zadani Status Slučaja"
 
 #. Label of the default_ticket_type (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -756,14 +756,14 @@ msgstr "Račun e-pošte"
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:74
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Email Content"
-msgstr ""
+msgstr "Sadržaj e-pošte"
 
 #. Label of the email_customisations_tab (Tab Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:5
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Email Notifications"
-msgstr ""
+msgstr "Obavijesti E-poštom"
 
 #. Label of the is_feedback_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -897,7 +897,7 @@ msgstr "Filteri"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:83
 msgid "Find out all of the variables that can be used in the content"
-msgstr ""
+msgstr "Saznajte sve varijable koje se mogu koristiti u sadržaju"
 
 #. Label of the first_responded_on (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1161,7 +1161,7 @@ msgstr "Prioritet Slučaja"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "HD Ticket Status"
-msgstr ""
+msgstr "Status Slučaja"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -1259,17 +1259,17 @@ msgstr "Ikona"
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, a ticket creation acknowledgement email will be sent to the user right after creating an email ticket"
-msgstr ""
+msgstr "Ako je omogućeno, korisniku će biti poslana e-pošta s potvrdom kreiranja slučaja odmah nakon kreiranja slučaja e-poštom"
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, an email is sent to all of the recipients associated with an agent's reply"
-msgstr ""
+msgstr "Ako je omogućeno, e-pošta se šalje svim primateljima povezanim s odgovorom agenta"
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, an email will be sent to all of the assigned agents after a reply from one of the contacts"
-msgstr ""
+msgstr "Ako je omogućeno, e-pošta će biti poslana svim dodijeljenim agentima nakon odgovora jednog od kontakata."
 
 #. Description of the 'Allow anyone to create tickets' (Check) field in DocType
 #. 'HD Settings'
@@ -1280,7 +1280,7 @@ msgstr "Ako je omogućeno, svatko će moći kreirati slučajeve (bez ikakvog dop
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, feedback email will be sent to the customer when you mark a ticket as the status selected below.\n"
-msgstr ""
+msgstr "Ako je omogućeno, e-pošta s povratnim informacijama bit će poslana klijentu kada označite zahtjev kao status odabran u nastavku.\n"
 
 #. Description of the 'Enable feedback for Customer Portal' (Check) field in
 #. DocType 'HD Settings'
@@ -1326,7 +1326,7 @@ msgstr "Cjelobrojna vrijednost"
 
 #: helpdesk/api/settings/email_notifications.py:112
 msgid "Invalid notification"
-msgstr ""
+msgstr "Nevažeća obavijest"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:82
 msgid "Invite agent"
@@ -1395,7 +1395,7 @@ msgstr "Oznaka"
 #. Label of the label_customer (Data) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Label (customer view)"
-msgstr ""
+msgstr "Naslov (pogled klijenta)"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
@@ -1502,7 +1502,7 @@ msgstr "Težina Naziva"
 #. Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Name shown on the customer portal<br> (e.g., Replied → Awaiting Response)."
-msgstr ""
+msgstr "Ime prikazano na korisničkom portalu<br> (npr. Odgovoreno → Čeka se odgovor)."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:51
 msgid "New Assignment Rule Name"
@@ -1543,7 +1543,7 @@ msgstr "Na čekanju od"
 
 #: desk/src/components/Settings/EmailNotifications/ShareFeedback.vue:20
 msgid "On Ticket Status"
-msgstr ""
+msgstr "Na Status Slučaja"
 
 #. Label of the action (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -1556,7 +1556,7 @@ msgstr "Samo jedan zadani prikaz dopušten je po korisniku za {0}"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:29
 msgid "Only the 'color' and 'order' fields of the 'Closed' status can be modified."
-msgstr ""
+msgstr "Samo polja 'boja' i 'redosljed' statusa 'Zatvoreno' mogu se mijenjati."
 
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1568,7 +1568,9 @@ msgstr "Otvori"
 msgid "Open: SLA continues. <br>\n"
 "Paused: SLA is paused. <br>\n"
 "Resolved: SLA timer stops."
-msgstr ""
+msgstr "Otvoreno: Standard Nivo Ugovora se nastavlja. <br>\n"
+"Pauzirano: Standard Nivo Ugovora je pauziran. <br>\n"
+"Riješeno: Standard Nivo Ugovora tajmer se zaustavlja."
 
 #. Label of the opening_date (Date) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1793,14 +1795,14 @@ msgstr "Obnovi Indeks Pretrage"
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:84
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Reply From Agent"
-msgstr ""
+msgstr "Odgovor od Agenta"
 
 #. Label of the reply_from_contact_section (Section Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:77
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Reply From Contact"
-msgstr ""
+msgstr "Odgovor od Kontakta"
 
 #. Label of the request_key (Data) field in DocType 'HD Desk Account Request'
 #. Label of the request_key (Data) field in DocType 'HD Portal Signup Request'
@@ -1816,11 +1818,11 @@ msgstr "Obavezno"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:102
 msgid "Reset Content"
-msgstr ""
+msgstr "Poništi sadržaj"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:125
 msgid "Reset content"
-msgstr ""
+msgstr "Poništi Sadržaj"
 
 #. Label of the resolution_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1947,7 +1949,7 @@ msgstr "Standard Nivo Ugovora Stvaranje"
 #. Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "SLA Mapping"
-msgstr ""
+msgstr "Mapiranje Standard Nivo Ugovora"
 
 #. Label of the agreement_status (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2008,19 +2010,19 @@ msgstr "Pošalji povratne informacije kada"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:78
 msgid "Sent to all of the assigned agents after a reply from one of the contacts"
-msgstr ""
+msgstr "Poslano svim dodijeljenim agentima nakon odgovora jednog od kontakata"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:85
 msgid "Sent to all of the recipients associated with an agent's reply"
-msgstr ""
+msgstr "Poslano svim primateljima povezanim s odgovorom agenta"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:73
 msgid "Sent to the user right after creating an email ticket"
-msgstr ""
+msgstr "Poslano korisniku odmah nakon kreiranja slučaja e-poštom"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:66
 msgid "Sent to the user who has raised the ticket after the ticket is closed or resolved"
-msgstr ""
+msgstr "Poslano korisniku koji je podnio slučaj nakon što je slučaj zatvoren ili riješen"
 
 #. Label of the service_level (Data) field in DocType 'HD Service Level
 #. Agreement'
@@ -2055,12 +2057,12 @@ msgstr "Postavljanja"
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:65
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Share Feedback"
-msgstr ""
+msgstr "Podijeli povratne informacije"
 
 #. Label of the different_view (Check) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Show end users a different view"
-msgstr ""
+msgstr "Prikaži krajnjim korisnicima drugačiji prikaz"
 
 #. Description of the 'Condition' (Code) field in DocType 'HD Service Level
 #. Agreement'
@@ -2145,7 +2147,7 @@ msgstr "Status "
 #. Label of the status_category (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Status Category"
-msgstr ""
+msgstr "Kategorija Statusa"
 
 #. Label of the status_details (Section Break) field in DocType 'HD Service
 #. Level Agreement'
@@ -2158,26 +2160,28 @@ msgstr "Detalji Statusa"
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status of the ticket, when a customer replies on the ticket with this SLA.\n\n"
 "If not selected, the value will be takes from HD Settings DocType."
-msgstr ""
+msgstr "Status slućaja, kada korisnik odgovori na slučaj ovim Standadrd Nivo Ugovorom.\n\n"
+"Ako nije odabrano, vrijednost će biti preuzeta iz DocType Postavki."
 
 #. Description of the 'Ticket Reopen status' (Link) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Status of the ticket, when a customer replies on the ticket."
-msgstr ""
+msgstr "Status slučaja, kada korisnik odgovori na slučaj."
 
 #. Description of the 'Default Ticket Status' (Link) field in DocType 'HD
 #. Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status of the ticket, when it is created in the system with this SLA.\n"
 "If not selected, the value will be taken from HD Settings DocType"
-msgstr ""
+msgstr "Status slučaja, kada je kreiran u sustavu s ovim Standard Nivo Ugovorom\n"
+"Ako nije odabrano, vrijednost će biti preuzeta iz DocType Postavki"
 
 #. Description of the 'Default ticket status' (Link) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Status of the ticket, when it is created in the system."
-msgstr ""
+msgstr "Status slučaja, kada je kreiran u sustavu."
 
 #: helpdesk/templates/components/contact_with_us.html:7
 msgid "Still got questions? We're here to assist you."
@@ -2311,7 +2315,7 @@ msgstr "Naziv Predloška"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:12
 msgid "The 'Closed' status cannot be renamed."
-msgstr ""
+msgstr "Status 'Zatvoreno' ne može se preimenovati."
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:147
 msgid "The Condition '{0}' is invalid: {1}"
@@ -2323,7 +2327,7 @@ msgstr "Praznik {0} nije između Od Datuma i Do Datuma"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:40
 msgid "The status for sending feedback must be of <u>Resolved</u> category."
-msgstr ""
+msgstr "Status za slanje povratnih informacija mora biti kategorije <u>Riješeno</u>."
 
 #. Description of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -2405,7 +2409,7 @@ msgstr "Prioritet Slučaja"
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Ticket Reopen status"
-msgstr ""
+msgstr "Status ponovnog otvaranja slučaja"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:18
 msgid "Ticket Routing"
@@ -2569,7 +2573,7 @@ msgstr "Nespremljene promjene"
 #. Label of the update_status_to (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Update status to"
-msgstr ""
+msgstr "Ažuriraj status na"
 
 #. Label of the user (Link) field in DocType 'HD Agent'
 #. Label of the user (Link) field in DocType 'HD Article Feedback'
@@ -2646,7 +2650,7 @@ msgstr "Neradni Dan"
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "When enabled, the ticket status will automatically change to the status selected below whenever the agent responds to a ticket.\n"
-msgstr ""
+msgstr "Kada je omogućeno, status slučaja će se automatski promijeniti u status odabran ispod kad god agent odgovori na slučaj.\n"
 
 #. Label of the word (Data) field in DocType 'HD Stopword'
 #. Label of the word (Data) field in DocType 'HD Synonyms'
@@ -2716,11 +2720,11 @@ msgstr "Morate postaviti jedan sporazum o nivou usluge kao zadani. Označi opcij
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:17
 msgid "back to email event list"
-msgstr ""
+msgstr "natrag na popis događaja putem e-pošte"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:46
 msgid "customize {0}"
-msgstr ""
+msgstr "prilagodi {0}"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
