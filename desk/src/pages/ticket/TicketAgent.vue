@@ -10,6 +10,11 @@
       <!-- Sidepanel with Resizer -->
       <TicketSidebar />
     </div>
+    <SetContactPhoneModal
+      v-model="showPhoneModal"
+      :name="ticket.data?.contact?.name"
+      @onUpdate="ticket.reload"
+    />
   </div>
 </template>
 
@@ -17,10 +22,12 @@
 import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";
 import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
+import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import { useActiveViewers } from "@/composables/realtime";
 import { useTicket } from "@/composables/useTicket";
 import { ticketsToNavigate } from "@/composables/useTicketNavigation";
 import { globalStore } from "@/stores/globalStore";
+import { useTelephonyStore } from "@/stores/telephony";
 import {
   ActivitiesSymbol,
   AssigneeSymbol,
@@ -32,8 +39,10 @@ import {
   TicketSymbol,
 } from "@/types";
 import { createResource, toast } from "frappe-ui";
-import { computed, onBeforeUnmount, onMounted, provide, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+const telephonyStore = useTelephonyStore();
+
 const { $socket } = globalStore();
 
 const props = defineProps({
@@ -43,6 +52,7 @@ const props = defineProps({
   },
 });
 const route = useRoute();
+const showPhoneModal = ref(false);
 
 const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
@@ -74,7 +84,22 @@ provide(
   ActivitiesSymbol,
   computed(() => ticketComposable.value.activities)
 );
-
+provide("makeCall", () => {
+  if (
+    !ticket.value.data?.contact?.mobile_no &&
+    !ticket.value.data?.contact?.phone
+  ) {
+    showPhoneModal.value = true;
+    return;
+  }
+  telephonyStore.makeCall({
+    number:
+      ticket.value.data?.contact?.phone ||
+      ticket.value.data?.contact?.mobile_no,
+    doctype: "HD Ticket",
+    docname: props.ticketId,
+  });
+});
 const viewerComposable = computed(() => useActiveViewers(ticket.value.name));
 const viewers = computed(
   () => viewerComposable.value.currentViewers[props.ticketId] || []
