@@ -87,16 +87,16 @@ provide(
 );
 provide("makeCall", () => {
   if (
-    !ticket.value.data?.contact?.mobile_no &&
-    !ticket.value.data?.contact?.phone
+    !ticketComposable.value.contact.data?.mobile_no &&
+    !ticketComposable.value.contact.data?.phone
   ) {
     showPhoneModal.value = true;
     return;
   }
   telephonyStore.makeCall({
     number:
-      ticket.value.data?.contact?.phone ||
-      ticket.value.data?.contact?.mobile_no,
+      ticketComposable.value.contact.data?.phone ||
+      ticketComposable.value.contact.data?.mobile_no,
     doctype: "HD Ticket",
     docname: props.ticketId,
   });
