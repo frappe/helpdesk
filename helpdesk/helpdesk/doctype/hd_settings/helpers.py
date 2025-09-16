@@ -65,7 +65,7 @@ def get_default_email_content(type: str) -> str:
   <p>Please visit the customer portal to reply to this message</p>
   <a
     class="btn btn-primary"
-    href="{{ doc.portal_uri }}"
+    href="{{ ticket_url }}"
     rel="noopener noreferrer"
     target="_blank"
   >View in Portal</a>
