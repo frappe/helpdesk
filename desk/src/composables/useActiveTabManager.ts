@@ -20,7 +20,7 @@ export function useActiveTabManager(tabs, storageKey) {
   function setActiveTabInUrl(tabName) {
     let hash = "#" + tabName?.toLowerCase();
     if (route.hash === hash) return;
-    router.push({ hash });
+    router.push({ hash, query: route.query });
   }
 
   function getActiveTabFromUrl() {
