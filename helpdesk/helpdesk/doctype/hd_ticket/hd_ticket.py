@@ -619,7 +619,7 @@ class HDTicket(Document):
                 rendered_template = self._get_rendered_template(
                     email_content,
                     default_email_content,
-                    {"message": message},
+                    {"message": message, "ticket_url": self.portal_uri},
                 )
             except Exception as e:
                 frappe.throw(_("Could not an email due to: {0}").format(e))
