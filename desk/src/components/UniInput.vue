@@ -49,8 +49,6 @@ const props = defineProps<P>();
 const emit = defineEmits<E>();
 
 const component = computed(() => {
-  console.log(props.field);
-
   if (props.field.url_method) {
     return h(Autocomplete, {
       options: apiOptions.data,

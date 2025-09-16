@@ -1,7 +1,8 @@
 import { Field } from "@/types";
 
 export async function setupCustomizations(doc, obj) {
-  let data = doc;
+  // Supporting old format, will have to refactor later
+  let data = doc.data ?? doc;
   if (!data) return;
   if (!data._form_script) return [];
   let actions = [];
