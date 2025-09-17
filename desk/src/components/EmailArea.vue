@@ -1,5 +1,6 @@
 <template>
   <div
+    :id="`communication-${name}`"
     v-bind="$attrs"
     class="grow cursor-pointer border-transparent bg-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >

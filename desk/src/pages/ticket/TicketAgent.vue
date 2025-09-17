@@ -32,7 +32,14 @@ import {
   TicketSymbol,
 } from "@/types";
 import { createResource, toast } from "frappe-ui";
-import { computed, onBeforeUnmount, onMounted, provide, watch } from "vue";
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  provide,
+  watch,
+  nextTick,
+} from "vue";
 import { useRoute } from "vue-router";
 const { $socket } = globalStore();
 
@@ -93,6 +100,51 @@ watch(
   { immediate: true }
 );
 
+// Handle scrolling to specific activity when hash is present
+function scrollToActivity() {
+  const hash = route.hash;
+  if (hash) {
+    // Remove the # symbol
+    const elementId = hash.substring(1);
+
+    nextTick(() => {
+      // Wait for activities to be rendered
+      setTimeout(() => {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.scrollIntoView({ block: "center" });
+
+          // Add highlight effect using Tailwind class
+          element.classList.add("bg-yellow-100");
+
+          // Remove highlight after 2 seconds
+          setTimeout(() => {
+            element.classList.remove("bg-yellow-100");
+          }, 2000);
+        }
+      }, 1000);
+    });
+  }
+}
+
+// Watch for hash changes in the route
+watch(
+  () => route.hash,
+  () => {
+    scrollToActivity();
+  }
+);
+
+// Watch for activities to load, then scroll if hash exists
+watch(
+  () => ticketComposable.value.activities.data,
+  (newData) => {
+    if (newData && route.hash) {
+      scrollToActivity();
+    }
+  }
+);
+
 type TicketUpdateData = {
   ticket_id: string;
   user: string;
@@ -118,6 +170,11 @@ onMounted(() => {
       toast.info(`User ${data.user} updated ${data.field} to ${data.value}`);
     }
   });
+
+  // Handle initial scroll if hash is present
+  if (route.hash) {
+    scrollToActivity();
+  }
 });
 
 onBeforeUnmount(() => {
