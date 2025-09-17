@@ -78,6 +78,9 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    allowedHosts: true,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
@@ -91,6 +94,7 @@ export default defineConfig({
       "prosemirror-state",
       "prosemirror-view",
       "lowlight",
+      "interactjs",
     ],
   },
 });
