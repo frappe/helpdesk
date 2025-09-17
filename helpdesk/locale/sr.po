@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-09-07 10:34+0000\n"
-"PO-Revision-Date: 2025-09-12 18:49\n"
+"POT-Creation-Date: 2025-09-14 10:34+0000\n"
+"PO-Revision-Date: 2025-09-17 19:27\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Cyrillic)\n"
 "MIME-Version: 1.0\n"
@@ -188,6 +188,10 @@ msgstr "Менаџер агената"
 msgid "Agent Name"
 msgstr "Име агента"
 
+#: desk/src/components/Settings/Telephony/Telephony.vue:39
+msgid "Agent settings"
+msgstr ""
+
 #: desk/src/components/Settings/Agents.vue:5
 msgid "Agents"
 msgstr "Агенти"
@@ -247,7 +251,7 @@ msgstr "Примени на портал за клијенте"
 msgid "Archived"
 msgstr "Архивирано"
 
-#: desk/src/components/Settings/SettingsModal.vue:44
+#: desk/src/components/Settings/SettingsModal.vue:52
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
 msgstr "Да ли сте сигурни да желите да промените картицу? Несачуване измене ће бити изгубљене."
 
@@ -266,9 +270,14 @@ msgstr "Чланак"
 
 #. Label of the assign_to_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
+#: desk/src/components/ticket-agent/AssignToBody.vue:5
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Assign to"
 msgstr "Додели"
+
+#: desk/src/components/ticket-agent/AssignToBody.vue:64
+msgid "Assign to me"
+msgstr "Додели себи"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:62
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:49
@@ -419,6 +428,10 @@ msgstr "Брендирање"
 msgid "Button"
 msgstr "Дугме"
 
+#: desk/src/pages/call-logs/CallLogDetailModal.vue:8
+msgid "Call Details"
+msgstr "Детаљи позива"
+
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:596
 msgid "Can not send email. No sender email set up!"
 msgstr "Није могуће послати имејл. Није подешен имејл пошиљаоца!"
@@ -489,6 +502,7 @@ msgstr "Кликните на Додај у празнике. Ово ће поп
 msgid "Close"
 msgstr "Затвори"
 
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Затворени или оцењени тикети не могу бити ажурирани од стране особа које нису агенти"
 
@@ -520,6 +534,10 @@ msgstr "Коментарисано од стране"
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Condition"
 msgstr "Услов"
+
+#: desk/src/components/Settings/Telephony/Telephony.vue:42
+msgid "Configure your agent’s telephony details."
+msgstr ""
 
 #. Label of the contact (Link) field in DocType 'HD Organization Contact Item'
 #. Label of the contact (Link) field in DocType 'HD Ticket'
@@ -567,14 +585,7 @@ msgstr "Није могуће послати имејл због: {0}"
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "Није могуће послати имејл потврду пријема због: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:626
-msgid "Could not an email due to: {0}"
-msgstr "Није могуће послати имејл због: {0}"
-
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:786
-msgid "Could not send an acknowledgement email due to: {0}"
-msgstr "Није могуће послати имејл потврду пријема због: {0}"
-
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:162
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Неуспешно слање имејла са повратном информацијом због: {0}"
 
@@ -1310,12 +1321,16 @@ msgstr "Слика која се користи на различитим мес
 msgid "Images"
 msgstr "Слике"
 
+#: desk/src/components/CallArea.vue:36
+msgid "Inbound Call"
+msgstr "Долазни позив"
+
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Instantly send e-mail"
 msgstr "Слање имејла тренутно"
 
-#: helpdesk/utils.py:26
+#: helpdesk/utils.py:32
 msgid "Insufficient Permission for {0}"
 msgstr "Недовољна овлашћења за {0}"
 
@@ -1367,6 +1382,10 @@ msgstr "Фиксирано"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Is setup complete"
 msgstr "Поставке завршене"
+
+#: desk/src/components/ticket-agent/AssignToBody.vue:11
+msgid "John Doe"
+msgstr "Петар Петровић"
 
 #. Label of the key (Data) field in DocType 'HD Email Feedback'
 #. Label of the key (Data) field in DocType 'HD Ticket'
@@ -1428,6 +1447,10 @@ msgstr "Опције повезивања"
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
 msgstr "Листа"
+
+#: desk/src/components/CallArea.vue:72
+msgid "Listen"
+msgstr "Слушај"
 
 #. Label of the load_default_columns (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1508,6 +1531,10 @@ msgstr "Назив приказан на порталу за клијента<br
 msgid "New Assignment Rule Name"
 msgstr "Назив новог правила додељивања"
 
+#: desk/src/components/ticket-agent/AssignTo.vue:12
+msgid "No assignees"
+msgstr ""
+
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:14
 msgid "No items in the list"
 msgstr "Нема ставки у листи"
@@ -1516,7 +1543,7 @@ msgstr "Нема ставки у листи"
 msgid "No results found"
 msgstr "Нема резултата"
 
-#: helpdesk/utils.py:159
+#: helpdesk/utils.py:165
 msgid "Not Allowed"
 msgstr "Није дозвољено"
 
@@ -1597,6 +1624,10 @@ msgstr "Редослед"
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Order By"
 msgstr "Сортирај према"
+
+#: desk/src/components/CallArea.vue:37
+msgid "Outbound Call"
+msgstr "Одлазни позив"
 
 #: helpdesk/api/settings/field_dependency.py:59
 msgid "Parent field, child field, and parent-child mapping are required."
@@ -1815,6 +1846,10 @@ msgstr "Захтев за кључ"
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Required"
 msgstr "Обавезно"
+
+#: desk/src/components/Settings/Telephony/Telephony.vue:90
+msgid "Required for exotel integration"
+msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:102
 msgid "Reset Content"
@@ -2096,11 +2131,11 @@ msgstr "Врста извора"
 msgid "Source and target category cannot be same"
 msgstr "Изворна и циљана категорија не могу бити исте"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:249
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:324
 msgid "Source and target ticket cannot be same"
 msgstr "Изворни и циљани тикет не могу бити исти"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:245
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:320
 msgid "Source ticket does not exist"
 msgstr "Изворни тикет не постоји"
 
@@ -2277,7 +2312,7 @@ msgstr "Врсте система није могуће обрисати"
 msgid "Tampered Access"
 msgstr "Компромитован приступ"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:247
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:322
 msgid "Target ticket does not exist"
 msgstr "Циљани тикет не постоји"
 
@@ -2349,11 +2384,11 @@ msgstr "Ово поље се користи за прескакање радни
 msgid "This method is only meant for developer mode"
 msgstr "Ова метода је намењена само за развојни режим"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:283
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:358
 msgid "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
 msgstr "Овај тикет (#{0}) је спојен са тикетом <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:425
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:499
 msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
 msgstr "Овај тикет је раздељен на нови тикет. Наставите праћење на тикету <a href={0}>#{1}</a>."
 
@@ -2446,7 +2481,7 @@ msgstr "Тикет не постоји."
 msgid "Ticket must be resolved with a feedback"
 msgstr "Тикет мора бити решен са повратном информацијом"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:45
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:55
 msgid "Ticket not found"
 msgstr "Тикет није пронађен"
 
@@ -2565,9 +2600,13 @@ msgid "Unsaved"
 msgstr "Несачувано"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:112
-#: desk/src/components/Settings/SettingsModal.vue:42
+#: desk/src/components/Settings/SettingsModal.vue:50
 msgid "Unsaved changes"
 msgstr "Несачуване измене"
+
+#: desk/src/pages/call-logs/CallLogModal.vue:8
+msgid "Untitled"
+msgstr "Без наслова"
 
 #. Label of the update_status_to (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2693,13 +2732,17 @@ msgstr "Жута"
 msgid "You are not allowed to view this dashboard data."
 msgstr "Није Вам дозвољено да видите податке са ове контролне табле."
 
-#: helpdesk/utils.py:158
+#: helpdesk/utils.py:164
 msgid "You are not permitted to access this resource."
 msgstr "Немате дозволу да приступите овом ресурсу."
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:530
 msgid "You are not permitted to add a comment"
 msgstr "Није Вам дозвољено да додате коментар"
+
+#: desk/src/components/telephony/CallUI.vue:35
+msgid "You can change the default calling medium from the settings"
+msgstr "Можете променити подразумевано средство за позивање у подешавањима"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:137
 msgid "You cannot disable the default SLA."
@@ -2729,6 +2772,14 @@ msgstr "прилагоди {0}"
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "group_by"
 msgstr "group_by"
+
+#: desk/src/components/CallArea.vue:16
+msgid "has made a call"
+msgstr "је обавио позив"
+
+#: desk/src/components/CallArea.vue:15
+msgid "has reached out"
+msgstr "је ступио у контакт"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:91
 msgid "here"
