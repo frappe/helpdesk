@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-17 19:27\n"
+"PO-Revision-Date: 2025-09-18 19:23\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Latin)\n"
 "MIME-Version: 1.0\n"
@@ -190,7 +190,7 @@ msgstr "Ime agenta"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:39
 msgid "Agent settings"
-msgstr ""
+msgstr "Podešavanje agenta"
 
 #: desk/src/components/Settings/Agents.vue:5
 msgid "Agents"
@@ -537,7 +537,7 @@ msgstr "Uslov"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:42
 msgid "Configure your agent’s telephony details."
-msgstr ""
+msgstr "Konfigurišite detalje telefonije za svog agenta."
 
 #. Label of the contact (Link) field in DocType 'HD Organization Contact Item'
 #. Label of the contact (Link) field in DocType 'HD Ticket'
@@ -1533,7 +1533,7 @@ msgstr "Naziv novog pravila dodeljivanja"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:12
 msgid "No assignees"
-msgstr ""
+msgstr "Nema izvršilaca"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:14
 msgid "No items in the list"
@@ -1849,7 +1849,7 @@ msgstr "Obavezno"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:90
 msgid "Required for exotel integration"
-msgstr ""
+msgstr "Neophodno za Exotel integraciju"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:102
 msgid "Reset Content"
