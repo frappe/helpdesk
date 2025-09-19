@@ -106,8 +106,11 @@
                 }
               "
             >
-              <template #default="{ openFileSelector }">
-                <Button variant="ghost" @click="openFileSelector()">
+              <template #default="{ openFileSelector, uploading }">
+                <Button variant="ghost" 
+                  @click="openFileSelector()"
+                  :disabled="uploading" 
+                  :loading="uploading">
                   <template #icon>
                     <AttachmentIcon
                       class="h-4"
