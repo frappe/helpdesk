@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-17 19:27\n"
+"PO-Revision-Date: 2025-09-19 19:40\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Norwegian Bokmal\n"
 "MIME-Version: 1.0\n"
@@ -133,7 +133,7 @@ msgstr ""
 #. Label of the about (Code) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Additional Information"
-msgstr ""
+msgstr "Tilleggsinformasjon"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -602,7 +602,7 @@ msgstr ""
 #. Label of the customer (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Customer"
-msgstr ""
+msgstr "Kunde"
 
 #. Label of the customer_name (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -1392,7 +1392,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Key"
-msgstr ""
+msgstr "Nøkkel"
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -1813,7 +1813,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "References"
-msgstr ""
+msgstr "Referanser"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:6
 msgid "Regenerate Search Index"
@@ -2000,7 +2000,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:42
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:50
 msgid "Save"
-msgstr ""
+msgstr "Lagre"
 
 #. Label of the script (Code) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -2011,7 +2011,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:26
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Search"
-msgstr ""
+msgstr "Søk"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:10
 msgid "Search Index Regenerated"
@@ -2299,7 +2299,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "System Manager"
-msgstr ""
+msgstr "Systemansvarlig"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.py:12
 msgid "System types can not be deleted"
