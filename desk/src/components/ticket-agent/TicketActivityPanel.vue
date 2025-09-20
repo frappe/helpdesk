@@ -59,11 +59,11 @@ import { computed, ComputedRef, inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
+import { useActiveTabManager } from "@/composables/useActiveTabManager";
 
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);
 
-const tabIndex = ref(0);
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const telephonyStore = useTelephonyStore();
@@ -97,6 +97,8 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   }
   return _tabs;
 });
+
+const { tabIndex } = useActiveTabManager(tabs, "lastTicketTab");
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend
