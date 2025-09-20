@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-09-07 10:34+0000\n"
-"PO-Revision-Date: 2025-09-10 18:22\n"
+"POT-Creation-Date: 2025-09-14 10:34+0000\n"
+"PO-Revision-Date: 2025-09-17 19:27\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Esperanto\n"
 "MIME-Version: 1.0\n"
@@ -188,6 +188,10 @@ msgstr "crwdns157534:0crwdne157534:0"
 msgid "Agent Name"
 msgstr "crwdns157536:0crwdne157536:0"
 
+#: desk/src/components/Settings/Telephony/Telephony.vue:39
+msgid "Agent settings"
+msgstr "crwdns159210:0crwdne159210:0"
+
 #: desk/src/components/Settings/Agents.vue:5
 msgid "Agents"
 msgstr "crwdns157538:0crwdne157538:0"
@@ -247,7 +251,7 @@ msgstr "crwdns157550:0crwdne157550:0"
 msgid "Archived"
 msgstr "crwdns157552:0crwdne157552:0"
 
-#: desk/src/components/Settings/SettingsModal.vue:44
+#: desk/src/components/Settings/SettingsModal.vue:52
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
 msgstr "crwdns159034:0crwdne159034:0"
 
@@ -266,9 +270,14 @@ msgstr "crwdns157554:0crwdne157554:0"
 
 #. Label of the assign_to_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
+#: desk/src/components/ticket-agent/AssignToBody.vue:5
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Assign to"
 msgstr "crwdns157556:0crwdne157556:0"
+
+#: desk/src/components/ticket-agent/AssignToBody.vue:64
+msgid "Assign to me"
+msgstr "crwdns159212:0crwdne159212:0"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:62
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:49
@@ -419,6 +428,10 @@ msgstr "crwdns157596:0crwdne157596:0"
 msgid "Button"
 msgstr "crwdns157598:0crwdne157598:0"
 
+#: desk/src/pages/call-logs/CallLogDetailModal.vue:8
+msgid "Call Details"
+msgstr "crwdns159214:0crwdne159214:0"
+
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:596
 msgid "Can not send email. No sender email set up!"
 msgstr "crwdns157600:0crwdne157600:0"
@@ -489,6 +502,7 @@ msgstr "crwdns157614:0crwdne157614:0"
 msgid "Close"
 msgstr "crwdns158448:0crwdne158448:0"
 
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "crwdns157618:0crwdne157618:0"
 
@@ -520,6 +534,10 @@ msgstr "crwdns157626:0crwdne157626:0"
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Condition"
 msgstr "crwdns157628:0crwdne157628:0"
+
+#: desk/src/components/Settings/Telephony/Telephony.vue:42
+msgid "Configure your agent’s telephony details."
+msgstr "crwdns159216:0crwdne159216:0"
 
 #. Label of the contact (Link) field in DocType 'HD Organization Contact Item'
 #. Label of the contact (Link) field in DocType 'HD Ticket'
@@ -567,14 +585,7 @@ msgstr "crwdns159052:0{0}crwdne159052:0"
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "crwdns159054:0{0}crwdne159054:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:626
-msgid "Could not an email due to: {0}"
-msgstr "crwdns159164:0{0}crwdne159164:0"
-
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:786
-msgid "Could not send an acknowledgement email due to: {0}"
-msgstr "crwdns159166:0{0}crwdne159166:0"
-
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:162
 msgid "Could not send feedback email,due to: {0}"
 msgstr "crwdns157642:0{0}crwdne157642:0"
 
@@ -1310,12 +1321,16 @@ msgstr "crwdns157874:0crwdne157874:0"
 msgid "Images"
 msgstr "crwdns157876:0crwdne157876:0"
 
+#: desk/src/components/CallArea.vue:36
+msgid "Inbound Call"
+msgstr "crwdns159218:0crwdne159218:0"
+
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Instantly send e-mail"
 msgstr "crwdns157878:0crwdne157878:0"
 
-#: helpdesk/utils.py:26
+#: helpdesk/utils.py:32
 msgid "Insufficient Permission for {0}"
 msgstr "crwdns157880:0{0}crwdne157880:0"
 
@@ -1367,6 +1382,10 @@ msgstr "crwdns157894:0crwdne157894:0"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Is setup complete"
 msgstr "crwdns157896:0crwdne157896:0"
+
+#: desk/src/components/ticket-agent/AssignToBody.vue:11
+msgid "John Doe"
+msgstr "crwdns159220:0crwdne159220:0"
 
 #. Label of the key (Data) field in DocType 'HD Email Feedback'
 #. Label of the key (Data) field in DocType 'HD Ticket'
@@ -1428,6 +1447,10 @@ msgstr "crwdns157906:0crwdne157906:0"
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
 msgstr "crwdns157908:0crwdne157908:0"
+
+#: desk/src/components/CallArea.vue:72
+msgid "Listen"
+msgstr "crwdns159222:0crwdne159222:0"
 
 #. Label of the load_default_columns (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1508,6 +1531,10 @@ msgstr "crwdns159088:0crwdne159088:0"
 msgid "New Assignment Rule Name"
 msgstr "crwdns158466:0crwdne158466:0"
 
+#: desk/src/components/ticket-agent/AssignTo.vue:12
+msgid "No assignees"
+msgstr "crwdns159224:0crwdne159224:0"
+
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:14
 msgid "No items in the list"
 msgstr "crwdns158468:0crwdne158468:0"
@@ -1516,7 +1543,7 @@ msgstr "crwdns158468:0crwdne158468:0"
 msgid "No results found"
 msgstr "crwdns158470:0crwdne158470:0"
 
-#: helpdesk/utils.py:159
+#: helpdesk/utils.py:165
 msgid "Not Allowed"
 msgstr "crwdns157934:0crwdne157934:0"
 
@@ -1595,6 +1622,10 @@ msgstr "crwdns159098:0crwdne159098:0"
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Order By"
 msgstr "crwdns157952:0crwdne157952:0"
+
+#: desk/src/components/CallArea.vue:37
+msgid "Outbound Call"
+msgstr "crwdns159226:0crwdne159226:0"
 
 #: helpdesk/api/settings/field_dependency.py:59
 msgid "Parent field, child field, and parent-child mapping are required."
@@ -1813,6 +1844,10 @@ msgstr "crwdns158024:0crwdne158024:0"
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Required"
 msgstr "crwdns158026:0crwdne158026:0"
+
+#: desk/src/components/Settings/Telephony/Telephony.vue:90
+msgid "Required for exotel integration"
+msgstr "crwdns159228:0crwdne159228:0"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:102
 msgid "Reset Content"
@@ -2094,11 +2129,11 @@ msgstr "crwdns158118:0crwdne158118:0"
 msgid "Source and target category cannot be same"
 msgstr "crwdns158120:0crwdne158120:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:249
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:324
 msgid "Source and target ticket cannot be same"
 msgstr "crwdns158122:0crwdne158122:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:245
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:320
 msgid "Source ticket does not exist"
 msgstr "crwdns158124:0crwdne158124:0"
 
@@ -2274,7 +2309,7 @@ msgstr "crwdns158162:0crwdne158162:0"
 msgid "Tampered Access"
 msgstr "crwdns158164:0crwdne158164:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:247
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:322
 msgid "Target ticket does not exist"
 msgstr "crwdns158166:0crwdne158166:0"
 
@@ -2346,11 +2381,11 @@ msgstr "crwdns158184:0crwdne158184:0"
 msgid "This method is only meant for developer mode"
 msgstr "crwdns158186:0crwdne158186:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:283
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:358
 msgid "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
 msgstr "crwdns158188:0#{0}crwdnd158188:0{1}crwdnd158188:0#{1}crwdne158188:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:425
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:499
 msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
 msgstr "crwdns158190:0{0}crwdnd158190:0#{1}crwdne158190:0"
 
@@ -2443,7 +2478,7 @@ msgstr "crwdns158212:0crwdne158212:0"
 msgid "Ticket must be resolved with a feedback"
 msgstr "crwdns158214:0crwdne158214:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:45
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:55
 msgid "Ticket not found"
 msgstr "crwdns158216:0crwdne158216:0"
 
@@ -2562,9 +2597,13 @@ msgid "Unsaved"
 msgstr "crwdns158480:0crwdne158480:0"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:112
-#: desk/src/components/Settings/SettingsModal.vue:42
+#: desk/src/components/Settings/SettingsModal.vue:50
 msgid "Unsaved changes"
 msgstr "crwdns159146:0crwdne159146:0"
+
+#: desk/src/pages/call-logs/CallLogModal.vue:8
+msgid "Untitled"
+msgstr "crwdns159230:0crwdne159230:0"
 
 #. Label of the update_status_to (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2690,13 +2729,17 @@ msgstr "crwdns159154:0crwdne159154:0"
 msgid "You are not allowed to view this dashboard data."
 msgstr "crwdns158292:0crwdne158292:0"
 
-#: helpdesk/utils.py:158
+#: helpdesk/utils.py:164
 msgid "You are not permitted to access this resource."
 msgstr "crwdns158294:0crwdne158294:0"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:530
 msgid "You are not permitted to add a comment"
 msgstr "crwdns158296:0crwdne158296:0"
+
+#: desk/src/components/telephony/CallUI.vue:35
+msgid "You can change the default calling medium from the settings"
+msgstr "crwdns159232:0crwdne159232:0"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:137
 msgid "You cannot disable the default SLA."
@@ -2726,6 +2769,14 @@ msgstr "crwdns159158:0{0}crwdne159158:0"
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "group_by"
 msgstr "crwdns158306:0crwdne158306:0"
+
+#: desk/src/components/CallArea.vue:16
+msgid "has made a call"
+msgstr "crwdns159234:0crwdne159234:0"
+
+#: desk/src/components/CallArea.vue:15
+msgid "has reached out"
+msgstr "crwdns159236:0crwdne159236:0"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:91
 msgid "here"
