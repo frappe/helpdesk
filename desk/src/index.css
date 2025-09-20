@@ -8,6 +8,13 @@
 	.prose-f {
 		@apply break-normal max-w-none prose prose-code:break-all prose-code:whitespace-pre-wrap prose-img:border prose-img:rounded-lg prose-sm prose-table:table-fixed prose-td:border prose-td:border-gray-300 prose-td:p-2 prose-td:relative prose-th:bg-gray-100 prose-th:border prose-th:border-gray-300 prose-th:p-2 prose-th:relative
 	}
+
+	/* Toast icon contrast fix for Issue #2581 */
+	.frappe-toast .icon,
+	.toast .icon,
+	.toast__icon {
+		color: var(--toast-icon-color, #111111);
+	}
 }
 
 html, body {
