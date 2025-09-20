@@ -1,9 +1,5 @@
 <template>
-  <Dialog
-    v-model="show"
-    :options="{ size: 'xl', position: 'top' }"
-    @after-leave="filteredOptions = []"
-  >
+  <Dialog v-model="show" :options="{ size: 'xl', position: 'top' }">
     <template #body>
       <div>
         <Combobox nullable @update:model-value="onSelection">
@@ -100,54 +96,7 @@ export default {
   data() {
     return {
       query: "",
-      filteredOptions: [],
     };
-  },
-  resources: {
-    search() {
-      return {
-        url: "helpdesk.search.search",
-        makeParams(query) {
-          return { query };
-        },
-        debounce: 300,
-        transform(groups) {
-          for (let group of groups) {
-            if (group.title === "Tickets") {
-              group.component = "CPGroupResult";
-              group.items = group.items.map((item) => {
-                item.showName = true;
-                item.route = {
-                  name: isCustomerPortal.value
-                    ? "TicketCustomer"
-                    : "TicketAgent",
-                  params: {
-                    ticketId: item.name,
-                  },
-                };
-                return item;
-              });
-            } else if (group.title === "Articles") {
-              group.component = "CPGroupResult";
-              group.items = group.items.map((item) => {
-                if (item.headings) {
-                  item.subject = item.subject + " / " + item.headings;
-                }
-                item.route = {
-                  name: "ArticlePublic",
-                  params: {
-                    articleId: item.name.split("#")[0],
-                  },
-                  hash: `#${item.name.split("#")[1]}`,
-                };
-                return item;
-              });
-            }
-          }
-          return groups;
-        },
-      };
-    },
   },
   computed: {
     navigationItems() {
@@ -188,38 +137,20 @@ export default {
           {
             title: `Search for "${this.query}"`,
             icon: () => h(LucideSearch),
-            route: { name: "Search", query: { q: this.query } },
+            route: { name: "SearchAgent", query: { q: this.query } },
           },
         ],
       };
     },
     groupedSearchResults() {
-      let groups = [{ title: "Tickets", component: "CPTicket" }];
-      let itemsByGroup = {};
-      for (const group of groups) {
-        itemsByGroup[group.title] = [];
-      }
-      for (const item of this.filteredOptions) {
-        itemsByGroup[item.group].push(item);
-      }
-      let localResults = groups
-        .map((group) => {
-          return {
-            ...group,
-            items: itemsByGroup[group.title],
-          };
-        })
-        .filter((group) => group.items.length > 0);
+      let results = [this.navigationItems];
 
-      let serverResults =
-        this.query.length > 2 && this.$resources.search.data
-          ? this.$resources.search.data
-          : [];
-      let results = [...localResults, ...serverResults];
-      return [
-        ...(results.length === 0 ? [this.navigationItems] : []),
-        ...results,
-      ];
+      // Add search option if there's a query and we're not in customer portal
+      if (this.query.length > 2 && !isCustomerPortal.value) {
+        results.push(this.fullSearchItem);
+      }
+
+      return results;
     },
   },
   watch: {
@@ -238,11 +169,6 @@ export default {
   methods: {
     onInput(e) {
       this.query = e.target.value;
-      if (this.query && this.query.length > 2) {
-        this.$resources.search.submit(this.query);
-      } else {
-        this.filteredOptions = [];
-      }
     },
     onSelection(value) {
       if (value) {

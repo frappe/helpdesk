@@ -60,6 +60,12 @@ const routes = [
     component: () => import("@/pages/knowledge-base/KnowledgeBaseAgent.vue"),
   },
   {
+    path: "/search",
+    name: "SearchAgent",
+    component: () => import("@/pages/SearchAgent.vue"),
+    meta: { auth: true },
+  },
+  {
     path: "/kb/articles/:articleId",
     name: "Article",
     component: () => import("@/pages/knowledge-base/Article.vue"),

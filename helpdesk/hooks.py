@@ -24,6 +24,11 @@ after_migrate = [
     "helpdesk.search.download_corpus",
 ]
 
+# Full Text Search
+# ------------------
+
+sqlite_search = ["helpdesk.search_sqlite.HelpdeskSearch"]
+
 scheduler_events = {
     "all": [
         "helpdesk.search.build_index_if_not_exists",
