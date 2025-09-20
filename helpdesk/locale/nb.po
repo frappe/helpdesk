@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-19 19:40\n"
+"PO-Revision-Date: 2025-09-20 19:49\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Norwegian Bokmal\n"
 "MIME-Version: 1.0\n"
@@ -257,7 +257,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:114
 msgid "Are you sure you want to go back? Unsaved changes will be lost."
-msgstr ""
+msgstr "Er du sikker på at du vil gå tilbake? Ikke-lagrede endringer vil gå tapt."
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:127
 msgid "Are you sure you want to reset the content? Current content will be overridden."
@@ -1838,7 +1838,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 #: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
 msgid "Request Key"
-msgstr ""
+msgstr "Forespørselsnøkkel"
 
 #. Label of the required (Check) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
@@ -2170,7 +2170,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:44
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:31
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #. Label of the auto_close_status (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2625,7 +2625,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:55
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:83
 msgid "User"
-msgstr ""
+msgstr "Bruker"
 
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.py:133
 msgid "User Not found"
