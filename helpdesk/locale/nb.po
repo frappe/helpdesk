@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-20 19:49\n"
+"PO-Revision-Date: 2025-09-21 20:17\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Norwegian Bokmal\n"
 "MIME-Version: 1.0\n"
@@ -1898,7 +1898,7 @@ msgstr ""
 #. Label of the response_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Response"
-msgstr ""
+msgstr "Respons"
 
 #. Label of the response_by (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
