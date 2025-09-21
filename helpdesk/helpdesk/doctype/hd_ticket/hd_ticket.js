@@ -3,6 +3,7 @@
 
 frappe.ui.form.on("HD Ticket", {
   onload(frm) {
+    if (frm.is_new()) return;
     frm.call("mark_seen");
   },
 });
