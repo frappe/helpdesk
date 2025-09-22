@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-21 20:17\n"
+"PO-Revision-Date: 2025-09-22 20:33\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Norwegian Bokmal\n"
 "MIME-Version: 1.0\n"
@@ -611,7 +611,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:7
 msgid "Customize your email notification preferences to stay informed about important updates and activities."
-msgstr ""
+msgstr "Tilpass dine e-postvarslingsinnstillinger for å holde deg informert om viktige oppdateringer og aktiviteter."
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -2112,7 +2112,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Source DocType"
-msgstr ""
+msgstr "Kilde-DocType"
 
 #. Label of the source_name (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
@@ -2193,7 +2193,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status of the ticket, when a customer replies on the ticket with this SLA.\n\n"
 "If not selected, the value will be takes from HD Settings DocType."
-msgstr ""
+msgstr "Status på saken når en kunde svarer på den med dette SLA-et. Hvis ikke valgt, hentes verdien fra HD-innstillinger (DocType)."
 
 #. Description of the 'Ticket Reopen status' (Link) field in DocType 'HD
 #. Settings'
@@ -2206,7 +2206,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status of the ticket, when it is created in the system with this SLA.\n"
 "If not selected, the value will be taken from HD Settings DocType"
-msgstr ""
+msgstr "Status på saken når den opprettes i systemet med dette SLA-et. Hvis ikke valgt, hentes verdien fra HD-innstillinger (DocType)."
 
 #. Description of the 'Default ticket status' (Link) field in DocType 'HD
 #. Settings'
@@ -2363,7 +2363,7 @@ msgstr ""
 #. Description of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "This doctype will be deprecated in the future"
-msgstr ""
+msgstr "Denne dokumenttypen (DocType) vil bli utfaset i fremtiden."
 
 #. Description of the 'Instantly send e-mail' (Check) field in DocType 'HD
 #. Settings'
