@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-22 20:33\n"
+"PO-Revision-Date: 2025-09-23 21:26\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Norwegian Bokmal\n"
 "MIME-Version: 1.0\n"
@@ -105,7 +105,7 @@ msgstr ""
 #. Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add Weekly Holidays"
-msgstr ""
+msgstr "Legg til ukentlige helligdager"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
@@ -475,7 +475,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:282
 msgid "Choose the days of the week when this rule should be active."
-msgstr ""
+msgstr "Velg hvilke ukedager denne regelen skal være aktiv."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:139
 msgid "Choose which tickets are affected by this assignment rule."
@@ -496,7 +496,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:46
 msgid "Click on Add to Holidays. This will populate the holidays table with all the dates that fall on the selected weekly off. Repeat the process for populating the dates for all your weekly holidays"
-msgstr ""
+msgstr "Klikk på Legg til i helligdager. Dette vil fylle ut helligdagstabellen med alle datoene som faller på den valgte ukentlige fridagen. Gjenta prosessen for å fylle ut datoene for alle de ukentlige fridagene dine"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:61
 msgid "Close"
@@ -1221,7 +1221,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:53
 msgid "Here, your weekly offs are pre-populated based on the previous selections. You can add more rows to also add public and national holidays individually."
-msgstr ""
+msgstr "Her er de ukentlige fridagene forhåndsutfylt basert på de tidligere valgene. Du kan legge til flere rader for å legge til offentlige og nasjonale helligdager individuelt."
 
 #. Label of the cond_hidden (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -1663,7 +1663,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:41
 msgid "Please select weekly off day"
-msgstr ""
+msgstr "Vennligst velg ukentlig fridag"
 
 #. Label of the post_description_key (Data) field in DocType 'HD Support Search
 #. Source'
@@ -2033,7 +2033,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:41
 msgid "Select your weekly off day"
-msgstr ""
+msgstr "Velg din ukentlige fridag"
 
 #. Label of the send_email_feedback_on_status (Link) field in DocType 'HD
 #. Settings'
@@ -2106,7 +2106,7 @@ msgstr ""
 #. Label of the skip_email_workflow (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Skip e-mail workflow"
-msgstr ""
+msgstr "Hopp over arbeidsflyt for e-post"
 
 #. Label of the source_doctype (Link) field in DocType 'HD Support Search
 #. Source'
@@ -2375,7 +2375,7 @@ msgstr ""
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "This field is used to skip email-related workflows for tickets. If this field is checked, no emails will be sent related to tickets, such as new ticket creation, status updates, or notifications."
-msgstr ""
+msgstr "Dette feltet brukes til å hoppe over e-postrelaterte arbeidsflyter for billetter. Hvis dette feltet er merket av, vil det ikke bli sendt e-postmeldinger knyttet til saker, for eksempel opprettelse av nye saker, statusoppdateringer eller varsler."
 
 #: helpdesk/www/helpdesk/index.py:23
 msgid "This method is only meant for developer mode"
@@ -2672,14 +2672,14 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:34
 msgid "Weekly"
-msgstr ""
+msgstr "Ukentlig"
 
 #. Label of the weekly_off (Check) field in DocType 'HD Holiday'
 #. Label of the weekly_off (Select) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Weekly Off"
-msgstr ""
+msgstr "Ukentlig fri"
 
 #. Description of the 'Auto update status' (Check) field in DocType 'HD
 #. Settings'
@@ -2706,7 +2706,7 @@ msgstr ""
 #. Label of the workflow_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Workflow"
-msgstr ""
+msgstr "Arbeidsflyt"
 
 #. Label of the support_and_resolution_section_break (Section Break) field in
 #. DocType 'HD Service Level Agreement'
