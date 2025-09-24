@@ -18,7 +18,10 @@
         </Button>
       </template>
       <template #bottom-section>
-        <div class="flex items-center gap-2 justify-between">
+        <div
+          v-if="Boolean(agents.data?.length)"
+          class="flex items-center gap-2 justify-between"
+        >
           <FormControl
             v-if="agents.data?.length > 10"
             v-model="search"
