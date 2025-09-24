@@ -22,14 +22,14 @@ onMounted(() => {
   window.addEventListener("online", () => {
     toast.create({
       message: "You are now online",
-      icon: h(Wifi),
+      icon: h(Wifi, { class: "text-white" }),
     });
   });
 
   window.addEventListener("offline", () => {
     toast.create({
       message: "You are now offline",
-      icon: h(WifiOff),
+      icon: h(WifiOff, { class: "text-white" }),
     });
   });
 });
