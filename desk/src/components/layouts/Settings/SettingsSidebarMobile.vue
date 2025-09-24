@@ -13,14 +13,15 @@
         <div
           class="relative z-10 flex h-full w-[230px] flex-col border-r bg-gray-50 transition-all duration-300 ease-in-out p-2"
         >
-          <Button
-            v-if="isExpanded"
-            label="Back"
-            class="!justify-start hover:!bg-transparent active:!bg-transparent hover:opacity-80 active:opacity-70 !px-0"
-            :icon-left="LucideChevronLeft"
-            @click="() => router.push({ name: 'TicketsAgent' })"
-            variant="ghost"
-          />
+          <div class="flex items-center gap-2">
+            <Button
+              icon="arrow-left"
+              @click="() => router.push({ name: 'TicketsAgent' })"
+              variant="ghost"
+              class="ml-0.5"
+            />
+            <div class="text-base text-ink-gray-8">Settings</div>
+          </div>
           <div v-for="section in links">
             <div v-if="isExpanded" class="text-base text-ink-gray-5 my-2.5">
               <span class="w-full overflow-clip text-nowrap">{{
@@ -29,7 +30,6 @@
             </div>
             <div v-for="item in section.items">
               <SidebarLink
-                v-if="item.show"
                 class="relative my-0.5 min-h-7"
                 :label="item.label"
                 :icon="item.icon"
@@ -102,103 +102,91 @@ function isActiveTab(to: any) {
 const links = [
   {
     label: "User Settings",
-    show: true,
+
     items: [
       {
         label: "Profile",
         icon: LucideUser,
         to: "Profile",
         isActive: isActiveTab("Profile"),
-        show: true,
       },
     ],
   },
   {
     label: "App Settings",
-    show: !isCustomerPortal.value,
+
     items: [
       {
         label: "Email Notifications",
         icon: MailOpen,
         to: "EmailNotificationsSettings",
         isActive: isActiveTab("EmailNotificationsSettings"),
-        show: !isCustomerPortal.value,
       },
       {
         label: "General",
         icon: SettingsGear,
         to: "GeneralSettings",
         isActive: isActiveTab("GeneralSettings"),
-        show: !isCustomerPortal.value,
       },
       {
         label: "Email Accounts",
         icon: LucideMail,
         to: "EmailAccounts",
         isActive: isActiveTab("EmailAccounts"),
-        show: !isCustomerPortal.value,
       },
       {
         label: "Agents",
         icon: LucideUser,
         to: "Agents",
         isActive: isActiveTab("Agents"),
-        show: !isCustomerPortal.value,
       },
       {
         label: "Invite Agent",
         icon: LucideUserPlus,
         to: "InviteAgent",
         isActive: isActiveTab("InviteAgent"),
-        show: !isCustomerPortal.value,
       },
       {
         label: "Teams",
         icon: LucideUsers,
         to: "SettingsTeams",
         isActive: isActiveTab("SettingsTeams"),
-        show: !isCustomerPortal.value,
       },
       {
         label: "SLA Policies",
         icon: ShieldCheck,
         to: "SLAPolicies",
         isActive: isActiveTab("SLAPolicies"),
-        show: !isCustomerPortal.value,
       },
       {
         label: "Business Holidays",
         icon: Briefcase,
         to: "BusinessHolidays",
         isActive: isActiveTab("BusinessHolidays"),
-        show: !isCustomerPortal.value,
       },
       {
         label: "Assignment Rules",
         icon: h(Settings, { class: "rotate-90" }),
         to: "AssignmentRules",
         isActive: isActiveTab("AssignmentRules"),
-        show: !isCustomerPortal.value,
       },
       {
         label: "Field Dependencies",
         icon: FieldDependencyIcon,
         to: "FieldDependencies",
         isActive: isActiveTab("FieldDependencies"),
-        show: !isCustomerPortal.value,
       },
     ],
   },
   {
     label: "Integrations",
-    show: !isCustomerPortal.value,
+
     items: [
       {
         label: "Telephony Settings",
         icon: PhoneIcon,
         to: "TelephonySettings",
         isActive: isActiveTab("TelephonySettings"),
-        show: !isCustomerPortal.value,
       },
     ],
   },

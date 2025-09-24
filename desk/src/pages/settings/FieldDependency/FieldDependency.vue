@@ -15,7 +15,7 @@
           </div>
         </template>
         <template #description>
-          <p class="text-p-base max-w-md text-ink-gray-6 mt-1">
+          <p class="text-p-base text-ink-gray-6 mt-1">
             Create dependencies between fields to dynamically control options
             based on user selections.
           </p>
@@ -46,11 +46,17 @@
           !fieldDependenciesList.loading &&
           fieldDependenciesList.data?.length === 0
         "
-        class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-7"
+        class="flex flex-col items-center justify-center gap-3 rounded-md border border-gray-200 p-4 mt-7 h-[500px]"
       >
-        <div class="text-sm text-ink-gray-7">
+        <div class="text-lg font-medium text-ink-gray-4">
           {{ __("No Field Dependencies found.") }}
         </div>
+        <Button
+          label="New"
+          variant="subtle"
+          icon-left="plus"
+          @click="router.push({ name: 'NewFieldDependency' })"
+        />
       </div>
 
       <div

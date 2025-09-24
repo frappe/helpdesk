@@ -15,7 +15,7 @@
   <slot name="description">
     <p
       v-if="description"
-      class="text-p-base text-gray-700 max-w-md text-ink-gray-6 mt-1"
+      class="text-p-base text-gray-700 text-ink-gray-6 mt-1"
     >
       {{ description }}
     </p>

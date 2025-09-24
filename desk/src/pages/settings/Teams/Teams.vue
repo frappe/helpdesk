@@ -16,7 +16,7 @@
             icon-left="plus"
           />
         </template>
-        <template #bottom-section>
+        <template #bottom-section v-if="teams.data?.length > 10">
           <FormControl
             v-model="search"
             :placeholder="'Search'"
@@ -70,9 +70,15 @@
       <!-- Empty State -->
       <div
         v-if="!teams.data?.length"
-        class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-7"
+        class="flex flex-col items-center justify-center gap-3 rounded-md border border-gray-200 p-4 mt-7 h-[500px]"
       >
-        <div class="text-sm text-ink-gray-7">No Teams found</div>
+        <div class="text-lg font-medium text-ink-gray-4">No Teams found</div>
+        <Button
+          label="Add Team"
+          variant="subtle"
+          icon-left="plus"
+          @click="showForm = true"
+        />
       </div>
     </div>
     <NewTeamModal

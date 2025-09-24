@@ -380,7 +380,7 @@ const routes = computed(() => [
   },
   {
     label: assignmentRuleData.value.assignmentRuleName,
-    route: `/settings/assignment-rules/${assignmentRuleData.value.name}`,
+    route: `/settings/assignment-rules/${assignmentRuleData.value.assignmentRuleName}`,
   },
 ]);
 
@@ -503,7 +503,13 @@ const updateAssignmentRule = async () => {
       doctype: "Assignment Rule",
       name: assignmentRuleData.value.assignmentRuleName,
     });
-    return;
+
+    router.push({
+      name: "EditAssignmentRule",
+      params: {
+        id: assignmentRuleData.value.assignmentRuleName,
+      },
+    });
   } else {
     getAssignmentRuleData.reload();
   }

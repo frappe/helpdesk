@@ -1,4 +1,5 @@
 <template>
+  <div ref="scrollToTopRef" />
   <SettingsHeader :routes="routes" />
   <div class="w-full max-w-3xl xl:max-w-4xl mx-auto p-4 lg:py-8">
     <div
@@ -33,7 +34,7 @@
       </div>
     </div>
 
-    <div v-if="!holidayData.loading" class="overflow-y-auto">
+    <div v-if="!holidayData.loading">
       <div class="flex items-center gap-2 mt-2">
         <span class="text-sm">
           There are in total <b>{{ holidayData.holidays.length }}</b> holidays
@@ -206,7 +207,7 @@ import {
   TabButtons,
   toast,
 } from "frappe-ui";
-import { computed, provide, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import HolidaysTableView from "./components/HolidaysTableView.vue";
 import RecurringHolidaysList from "./components/RecurringHolidaysList.vue";
 
@@ -232,6 +233,7 @@ const dialog = ref({
 const isDirty = ref(false);
 const initialData = ref(JSON.stringify(holidayData.value));
 const holidayListView = ref("calendar");
+const scrollToTopRef = ref(null);
 
 const goBack = () => {
   const previousPage = router.currentRoute.value.query.previousPage as string;
@@ -248,11 +250,11 @@ const goBack = () => {
 const routes = computed(() => [
   {
     label: "Business Holidays",
-    to: "/settings/holiday-list",
+    route: "/settings/holiday-list",
   },
   {
     label: holidayData.value?.holiday_list_name || "New Business Holidays",
-    to: "/settings/holiday-list/new",
+    route: "/settings/holiday-list/new",
   },
 ]);
 
@@ -363,5 +365,9 @@ onBeforeRouteLeave(async (to, from, next) => {
   } else {
     next();
   }
+});
+
+nextTick(() => {
+  scrollToTopRef.value?.scrollIntoView?.({ behavior: "smooth" });
 });
 </script>

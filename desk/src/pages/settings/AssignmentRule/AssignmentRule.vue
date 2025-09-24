@@ -11,7 +11,7 @@
     >
       <template #actions>
         <Button
-          :label="__('Create new')"
+          :label="__('New')"
           theme="gray"
           variant="solid"
           @click="goToNew()"
@@ -19,7 +19,7 @@
         />
       </template>
     </SettingsLayoutHeader>
-    <div class="overflow-y-auto mt-6">
+    <div class="mt-6">
       <div
         v-if="assignmentRulesList.loading && !assignmentRulesList.data"
         class="flex items-center justify-center mt-12"
@@ -29,11 +29,17 @@
       <div v-else>
         <div
           v-if="assignmentRulesList.data?.length === 0"
-          class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-1"
+          class="flex flex-col items-center justify-center gap-3 rounded-md border border-gray-200 p-4 mt-7 h-[500px]"
         >
-          <div class="text-sm text-ink-gray-7">
+          <div class="text-lg font-medium text-ink-gray-4">
             {{ __("No Assignment Rules found.") }}
           </div>
+          <Button
+            label="New"
+            variant="subtle"
+            icon-left="plus"
+            @click="goToNew()"
+          />
         </div>
         <div v-else>
           <div

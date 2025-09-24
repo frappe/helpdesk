@@ -1,4 +1,5 @@
 <template>
+  <div ref="scrollToTopRef" />
   <SettingsHeader :routes="routes" />
   <div class="w-full max-w-3xl xl:max-w-4xl mx-auto p-4 lg:py-8">
     <div
@@ -34,7 +35,7 @@
       </div>
     </div>
 
-    <div v-if="!holidayData.loading" class="overflow-y-auto">
+    <div v-if="!holidayData.loading">
       <div class="flex items-center gap-2 mt-2">
         <span class="text-sm">
           There are in total <b>{{ holidayData.holidays.length }}</b> holidays
@@ -207,7 +208,7 @@ import {
   TabButtons,
   toast,
 } from "frappe-ui";
-import { computed, provide, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import HolidaysTableView from "./components/HolidaysTableView.vue";
 import RecurringHolidaysList from "./components/RecurringHolidaysList.vue";
 
@@ -217,9 +218,9 @@ import FormLabel from "frappe-ui/src/components/FormLabel.vue";
 import HolidaysCalendarView from "./components/HolidaysCalendarView.vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
-import SettingsHeader from "../components/SettingsHeader.vue";
 import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
+import SettingsHeader from "../components/SettingsHeader.vue";
 
 const { $dialog } = globalStore();
 
@@ -233,6 +234,7 @@ const dialog = ref({
 const isDirty = ref(false);
 const initialData = ref(null);
 const holidayListView = ref("calendar");
+const scrollToTopRef = ref(null);
 
 const goBack = () => {
   const previousPage = router.currentRoute.value.query.previousPage as string;
@@ -267,12 +269,12 @@ const getHolidayData = createResource({
 
 const routes = computed(() => [
   {
-    label: "Holiday List",
-    to: "/settings/holiday-list",
+    label: "Business Holidays",
+    route: "/settings/holiday-list",
   },
   {
     label: holidayData.value?.holiday_list_name,
-    to: "/settings/holiday-list/:id",
+    route: `/settings/holiday-list/${holidayData.value?.holiday_list_name}`,
   },
 ]);
 
@@ -378,5 +380,9 @@ onBeforeRouteLeave(async (to, from, next) => {
   } else {
     next();
   }
+});
+
+nextTick(() => {
+  scrollToTopRef.value?.scrollIntoView?.({ behavior: "smooth" });
 });
 </script>

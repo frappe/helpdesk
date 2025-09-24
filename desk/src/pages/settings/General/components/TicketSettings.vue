@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="text-lg font-semibold text-gray-900">Ticket settings</div>
+    <div class="text-lg font-semibold text-gray-900">Ticket Settings</div>
     <div
-      v-if="ticketTypeList.data && ticketStatusList.data && settingsData.doc"
+      v-if="ticketTypeList.data && ticketStatusList && settingsData.doc"
       class="mt-6 flex flex-col gap-6"
     >
       <div class="flex items-center justify-between">
@@ -57,7 +57,7 @@
                 variant="ghost"
                 label="Reset"
                 icon-left="refresh-ccw"
-                class="w-full"
+                class="w-full focus-visible:ring-0"
                 @click="onChange({ default_ticket_type: null })"
               />
             </div>
@@ -100,10 +100,11 @@
           <span class="text-base font-medium text-ink-gray-8"
             >Auto update status</span
           >
-          <span class="text-p-sm text-ink-gray-6"
-            >The ticket status will automatically change to “Replied” whenever
-            the agent respond to a ticket.</span
-          >
+          <span class="text-p-sm text-ink-gray-6">{{
+            __(
+              "The ticket status will automatically change whenever the agentrespond to a ticket."
+            )
+          }}</span>
         </div>
         <Popover>
           <template #target="{ togglePopover }">
@@ -113,7 +114,7 @@
             >
               <div>
                 {{
-                  ticketStatusList.data?.find(
+                  ticketStatusList?.find(
                     (option) =>
                       option.value == settingsData.doc.update_status_to
                   )?.label || "Select"
@@ -127,7 +128,7 @@
               class="p-1 text-ink-gray-6 top-1 absolute min-w-28 bg-white shadow-2xl rounded"
             >
               <div
-                v-for="option in ticketStatusList.data"
+                v-for="option in ticketStatusList"
                 :key="option.value"
                 class="p-2 cursor-pointer hover:bg-gray-50 text-base flex items-center justify-between rounded"
                 @click="
@@ -152,7 +153,7 @@
                 variant="ghost"
                 label="Reset"
                 icon-left="refresh-ccw"
-                class="w-full"
+                class="w-full focus-visible:ring-0"
                 @click="
                   settingsData.doc.update_status_to = null;
                   settingsData.doc.auto_update_status = false;
@@ -171,8 +172,12 @@
 </template>
 
 <script setup lang="ts">
+import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { HDTicketStatus } from "@/types/doctypes";
 import { Button, createListResource, Popover, Switch } from "frappe-ui";
-import { inject } from "vue";
+import { computed, inject } from "vue";
+
+const { statuses } = useTicketStatusStore();
 
 const ticketTypeList = createListResource({
   doctype: "HD Ticket Type",
@@ -188,18 +193,19 @@ const ticketTypeList = createListResource({
   },
 });
 
-const ticketStatusList = createListResource({
-  doctype: "HD Ticket Status",
-  name: "HD Ticket Status",
-  auto: true,
-  transform: (data) => {
-    return data.map((item) => {
-      return {
-        label: item.name,
-        value: item.name,
-      };
-    });
-  },
+const ticketStatusList = computed(() => {
+  return (
+    statuses.data
+      ?.filter(
+        (s: HDTicketStatus) => s.category === "Open" || s.category === "Paused"
+      )
+      .map((s: HDTicketStatus) => {
+        return {
+          label: s.label_agent,
+          value: s.label_agent,
+        };
+      }) || []
+  );
 });
 
 const settingsData = inject<any>("settingsData");

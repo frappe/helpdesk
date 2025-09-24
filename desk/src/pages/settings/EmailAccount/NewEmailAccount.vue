@@ -123,10 +123,6 @@ const routes = computed(() => [
     label: "Email Accounts",
     route: "/settings/email-accounts",
   },
-  {
-    label: "New Email Account",
-    route: "/settings/email-accounts/new",
-  },
 ]);
 
 const router = useRouter();

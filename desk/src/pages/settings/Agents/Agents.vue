@@ -20,6 +20,7 @@
       <template #bottom-section>
         <div class="flex items-center gap-2 justify-between">
           <FormControl
+            v-if="agents.data?.length > 10"
             v-model="search"
             :placeholder="'Search'"
             type="text"
@@ -30,7 +31,7 @@
               <LucideSearch class="h-4 w-4 text-gray-500" />
             </template>
           </FormControl>
-          <Dropdown :options="dropdownOptions" placement="right">
+          <Dropdown :options="dropdownOptions">
             <template #default="{ open }">
               <Button
                 :label="activeFilter"
@@ -79,9 +80,15 @@
     <!-- Empty State -->
     <div
       v-if="!agents.loading && !agents.data?.length"
-      class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-7"
+      class="flex flex-col items-center justify-center gap-3 rounded-md border border-gray-200 p-4 mt-7 h-[500px]"
     >
-      <div class="text-sm text-ink-gray-7">No Agents found</div>
+      <div class="text-lg font-medium text-ink-gray-4">No Agents found</div>
+      <Button
+        label="Add Agent"
+        variant="subtle"
+        icon-left="plus"
+        @click="showNewAgentsDialog = true"
+      />
     </div>
     <!-- Agent List -->
     <div

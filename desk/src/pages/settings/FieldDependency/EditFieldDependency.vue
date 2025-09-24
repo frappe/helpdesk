@@ -1,7 +1,7 @@
 <template>
   <SettingsHeader :routes="routes" />
   <div class="max-w-3xl xl:max-w-4xl mx-auto w-full p-4 lg:py-8">
-    <div class="flex flex-col gap-6 overflow-y-hidden">
+    <div class="flex flex-col gap-6">
       <SettingsLayoutHeader>
         <template #title>
           <div class="flex items-center gap-2">
@@ -92,6 +92,10 @@ const routes = computed(() => [
   {
     label: "Field Dependencies",
     route: "/settings/field-dependencies",
+  },
+  {
+    label: dependencyLabel.value,
+    route: `/settings/field-dependencies/${router.currentRoute.value.params.id}`,
   },
 ]);
 

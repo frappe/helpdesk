@@ -2,7 +2,7 @@
   <SettingsHeader :routes="routes" />
   <div class="w-full max-w-3xl xl:max-w-4xl mx-auto p-4 lg:py-8">
     <SettingsLayoutHeader
-      :title="__('Holiday List')"
+      :title="__('Business Holidays')"
       :description="
         __(
           'Set your team’s working days, hours, and holidays using a template or custom schedule.'
@@ -28,9 +28,17 @@
     <div v-else>
       <div
         v-if="holidayList.list.data?.length === 0"
-        class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-7"
+        class="flex flex-col items-center justify-center gap-3 rounded-md border border-gray-200 p-4 mt-7 h-[500px]"
       >
-        <div class="text-sm text-ink-gray-7">No Holiday list found</div>
+        <div class="text-lg font-medium text-ink-gray-4">
+          {{ __("No Business Holiday list found") }}
+        </div>
+        <Button
+          label="Add Business Holiday"
+          variant="subtle"
+          icon-left="plus"
+          @click="goToNew()"
+        />
       </div>
       <div v-else>
         <div class="flex text-sm text-gray-600 mt-6">
@@ -53,7 +61,7 @@ import { computed, provide } from "vue";
 import SettingsHeader from "../components/SettingsHeader.vue";
 import { resetHolidayData } from "@/stores/holidayList";
 import { useRouter } from "vue-router";
-import { createListResource, LoadingIndicator } from "frappe-ui";
+import { Button, createListResource, LoadingIndicator } from "frappe-ui";
 import HolidayListItem from "./components/HolidayListItem.vue";
 import SettingsLayoutHeader from "@/pages/settings/components/SettingsLayoutHeader.vue";
 

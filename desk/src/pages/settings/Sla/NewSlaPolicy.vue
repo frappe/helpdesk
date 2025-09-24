@@ -42,7 +42,7 @@
         </div>
       </div>
     </div>
-    <div v-if="!slaData.loading" class="overflow-y-auto">
+    <div v-if="!slaData.loading">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
           <FormControl
@@ -211,7 +211,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, provide } from "vue";
 import SettingsHeader from "../components/SettingsHeader.vue";
 
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
@@ -258,7 +258,9 @@ const showConfirmDialog = ref({
 });
 const isDirty = ref(false);
 const initialData = ref(null);
+const isEditingHolidayList = ref(false);
 
+provide("isEditingHolidayList", isEditingHolidayList);
 const router = useRouter();
 
 const routes = computed(() => [

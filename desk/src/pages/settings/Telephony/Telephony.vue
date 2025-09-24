@@ -36,7 +36,7 @@
         </template>
       </SettingsLayoutHeader>
     </div>
-    <div class="overflow-y-auto mt-6">
+    <div class="mt-6">
       <div class="text-base font-semibold text-ink-gray-8">
         {{ __("Agent settings") }}
       </div>

@@ -2,68 +2,97 @@
   <SettingsHeader :routes="routes" />
   <div class="max-w-3xl xl:max-w-4xl mx-auto w-full p-4 lg:py-8">
     <div class="flex items-center justify-between gap-2">
-      <div class="flex items-center gap-2">
-        <Avatar size="3xl" :image="auth?.userImage" :label="auth?.userName" />
-        <div class="flex flex-col">
-          <span class="text-lg sm:text-xl !font-semibold text-ink-gray-8">{{
-            auth?.userName
-          }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{ auth?.user }}</span>
-        </div>
-      </div>
-      <div>
-        <FileUploader
-          v-if="!auth?.userImage"
-          :fileTypes="['image/*']"
-          @success="
-            (file) => {
-              updateImage(file.file_url);
-            }
-          "
-        >
-          <template #default="{ openFileSelector }">
-            <Button
-              @click="openFileSelector()"
-              iconLeft="upload"
-              label="Upload Image"
-              :loading="setUser.loading"
-            />
-          </template>
-        </FileUploader>
-
-        <div v-else>
-          <Button
-            label="Remove"
-            iconLeft="trash"
-            theme="red"
-            @click="updateImage(null)"
-            :loading="setUser.loading"
-          />
-        </div>
-      </div>
+      <FileUploader
+        :fileTypes="['image/*']"
+        @success="
+          (file) => {
+            updateImage(file.file_url);
+          }
+        "
+      >
+        <template #default="{ openFileSelector, error: _error }">
+          <div class="flex items-center justify-center gap-2">
+            <div class="group relative !size-14">
+              <Avatar
+                class="!size-14"
+                :image="profile.user_image"
+                :label="profile.full_name"
+              />
+              <component
+                :is="profile.user_image ? Dropdown : 'div'"
+                v-bind="
+                  profile.user_image
+                    ? {
+                        options: [
+                          {
+                            icon: 'upload',
+                            label: profile.user_image
+                              ? __('Change image')
+                              : __('Upload image'),
+                            onClick: openFileSelector,
+                          },
+                          {
+                            icon: 'trash-2',
+                            label: __('Remove image'),
+                            onClick: () => updateImage(null),
+                          },
+                        ],
+                      }
+                    : { onClick: openFileSelector }
+                "
+                class="!absolute bottom-0 left-0 right-0"
+              >
+                <div
+                  class="z-1 absolute bottom-0 left-0 right-0 flex h-9 cursor-pointer items-center justify-center rounded-b-full bg-black bg-opacity-40 pt-3 opacity-0 duration-300 ease-in-out group-hover:opacity-100"
+                  style="
+                    -webkit-clip-path: inset(12px 0 0 0);
+                    clip-path: inset(12px 0 0 0);
+                  "
+                >
+                  <CameraIcon class="size-4 cursor-pointer text-white" />
+                </div>
+              </component>
+            </div>
+            <div class="flex flex-col gap-1">
+              <div class="flex flex-col">
+                <span
+                  class="text-lg sm:text-xl !font-semibold text-ink-gray-8"
+                  >{{ auth?.userName }}</span
+                >
+                <span class="text-p-sm text-ink-gray-6">{{ auth?.user }}</span>
+              </div>
+              <ErrorMessage :message="__(_error)" />
+            </div>
+          </div>
+        </template>
+      </FileUploader>
+      <Button
+        icon-left="lock"
+        label="Change Password"
+        @click="showChangePasswordModal = true"
+      />
     </div>
     <hr class="my-6" />
     <div>
-      <div class="text-lg font-semibold text-ink-gray-9">
-        Account info & security
-      </div>
-      <div class="flex items-center justify-between gap-2 mt-6">
-        <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">Email</span>
-          <span class="text-p-sm text-ink-gray-6">{{ auth?.user }}</span>
-        </div>
-        <Button label="Change Email" @click="showChangeEmailModal = true" />
-      </div>
-      <div class="flex items-center justify-between gap-2 mt-6">
-        <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">Password</span>
-          <span class="text-p-sm text-ink-gray-6"
-            >Change your account password for security.</span
-          >
-        </div>
+      <div class="flex items-center justify-between">
+        <div class="text-lg font-semibold text-ink-gray-9">Account info</div>
         <Button
-          label="Change Password"
-          @click="showChangePasswordModal = true"
+          label="Save"
+          @click="setUser.submit()"
+          :loading="setUser.loading"
+          :disabled="!isAccountInfoDirty"
+        />
+      </div>
+      <div class="flex flex-col sm:flex-row items-center gap-2 mt-6">
+        <FormControl
+          class="w-full"
+          label="First Name"
+          v-model="profile.user_first_name"
+        />
+        <FormControl
+          class="w-full"
+          label="Last Name"
+          v-model="profile.user_last_name"
         />
       </div>
     </div>
@@ -72,27 +101,40 @@
     v-if="showChangePasswordModal"
     v-model="showChangePasswordModal"
   />
-  <ChangeEmailModal
-    v-if="showChangeEmailModal"
-    v-model="showChangeEmailModal"
-  />
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import SettingsHeader from "../components/SettingsHeader.vue";
-import { Avatar, Button, createResource, FileUploader, toast } from "frappe-ui";
+import {
+  Avatar,
+  Button,
+  createResource,
+  Dropdown,
+  FileUploader,
+  toast,
+} from "frappe-ui";
 import { __ } from "@/translation";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
-import ChangeEmailModal from "./components/ChangeEmailModal.vue";
 import { useAuthStore } from "@/stores/auth";
+import CameraIcon from "~icons/lucide/camera";
 
 const auth = useAuthStore();
 const profile = ref({
+  full_name: auth.userName,
   user_image: auth.userImage,
+  user_first_name: auth.userFirstName,
+  user_last_name: auth.userLastName,
+  email: auth.userId,
 });
 const showChangePasswordModal = ref(false);
-const showChangeEmailModal = ref(false);
+
+const isAccountInfoDirty = computed(() => {
+  return (
+    profile.value.user_first_name !== auth.userFirstName ||
+    profile.value.user_last_name !== auth.userLastName
+  );
+});
 
 const routes = computed(() => [
   {
@@ -109,6 +151,8 @@ const setUser = createResource({
       name: auth.user,
       fieldname: {
         user_image: profile.value.user_image,
+        first_name: profile.value.user_first_name,
+        last_name: profile.value.user_last_name,
       },
     };
   },
@@ -124,6 +168,12 @@ const updateImage = (file: string | null) => {
 };
 
 onMounted(() => {
-  profile.value.user_image = auth.userImage;
+  profile.value = {
+    full_name: auth.userName,
+    user_image: auth.userImage,
+    user_first_name: auth.userFirstName,
+    user_last_name: auth.userLastName,
+    email: auth.userId,
+  };
 });
 </script>

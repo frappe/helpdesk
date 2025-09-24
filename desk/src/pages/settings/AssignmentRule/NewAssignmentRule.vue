@@ -259,7 +259,8 @@ const routes = computed(() => [
     route: "/settings/assignment-rules",
   },
   {
-    label: "New Assignment Rule",
+    label:
+      assignmentRuleData.value?.assignmentRuleName || "New Assignment Rule",
     route: "/settings/assignment-rules/new",
   },
 ]);

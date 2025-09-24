@@ -9,7 +9,7 @@
       >
         <template #actions>
           <Button
-            label="Add Account"
+            label="New"
             theme="gray"
             variant="solid"
             icon-left="plus"
@@ -36,8 +36,19 @@
         </div>
       </div>
       <!-- fallback if no email accounts -->
-      <div v-else class="flex items-center justify-center h-64 text-gray-500">
-        Please add an email account to continue.
+      <div
+        v-else
+        class="flex flex-col items-center justify-center gap-3 rounded-md border border-gray-200 p-4 mt-7 h-[500px]"
+      >
+        <div class="text-lg font-medium text-ink-gray-4">
+          {{ __("No Email Accounts found.") }}
+        </div>
+        <Button
+          label="New"
+          variant="subtle"
+          icon-left="plus"
+          @click="addEmailAccount()"
+        />
       </div>
     </div>
   </div>

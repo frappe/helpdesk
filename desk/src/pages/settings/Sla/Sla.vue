@@ -4,7 +4,7 @@
     <div class="w-full max-w-3xl xl:max-w-4xl mx-auto p-4 lg:py-8">
       <SettingsLayoutHeader title="SLA Policies">
         <template #description>
-          <p class="text-p-base max-w-md text-ink-gray-6 mt-1">
+          <p class="text-p-base text-ink-gray-6 mt-1">
             SLAs align your team and customers with defined timelines for a
             reliable experience.
             <a
@@ -34,9 +34,17 @@
       <div v-else>
         <div
           v-if="slaPolicyList.list.data?.length === 0"
-          class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-7"
+          class="flex flex-col items-center justify-center gap-3 rounded-md border border-gray-200 p-4 mt-7 h-[500px]"
         >
-          <div class="text-sm text-ink-gray-7">No SLA Policies found</div>
+          <div class="text-lg font-medium text-ink-gray-4">
+            No SLA Policies found
+          </div>
+          <Button
+            label="Add SLA Policy"
+            variant="subtle"
+            icon-left="plus"
+            @click="goToNew()"
+          />
         </div>
         <div v-else>
           <div
@@ -57,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { createListResource, LoadingIndicator } from "frappe-ui";
+import { Button, createListResource, LoadingIndicator } from "frappe-ui";
 import SettingsHeader from "../components/SettingsHeader.vue";
 import { useRouter } from "vue-router";
 import { computed, provide } from "vue";

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="text-lg font-semibold text-gray-900">
-      Workflow & knowledgebase settings
+      Workflow & Knowledgebase Settings
     </div>
     <div class="mt-6 flex flex-col gap-6">
       <div class="flex items-center justify-between">

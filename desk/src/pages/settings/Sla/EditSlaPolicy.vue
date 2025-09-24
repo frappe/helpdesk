@@ -42,7 +42,7 @@
         </div>
       </div>
     </div>
-    <div v-if="!slaData.loading" class="overflow-y-auto">
+    <div v-if="!slaData.loading">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
           <FormControl
@@ -322,7 +322,7 @@ const getSlaData = createResource({
   },
 });
 
-if (Boolean(fetchData.value)) {
+if (Boolean(fetchData.value) || !slaData.value.name) {
   getSlaData.fetch();
 } else {
   // Clear fetchData query param
