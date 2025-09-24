@@ -51,7 +51,7 @@
     </template>
   </Dialog>
 </template>
-<script>
+<script setup>
 import { isCustomerPortal } from "@/utils";
 import {
   Combobox,
@@ -59,132 +59,122 @@ import {
   ComboboxOption,
   ComboboxOptions,
 } from "@headlessui/vue";
-import { h, ref } from "vue";
+import { Dialog } from "frappe-ui";
+import { computed, h, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideSearch from "~icons/lucide/file-search";
 import LucideTicket from "~icons/lucide/ticket";
 import CPGroup from "./CPGroup.vue";
-import CPGroupResult from "./CPGroupResult.vue";
+const router = useRouter();
 
-let show = ref(false);
+// Reactive data
+const show = ref(false);
+const query = ref("");
 
-export function showCommandPalette() {
-  show.value = true;
-}
+// Computed properties
+const navigationItems = computed(() => {
+  const items = [];
+  if (query.value.startsWith("#")) {
+    items.push({
+      title: `Go to Ticket #${query.value.slice(1)}`,
+      icon: () => h(LucideTicket),
+      route: {
+        name: "TicketAgent",
+        params: { ticketId: query.value.slice(1) },
+      },
+    });
+  } else {
+    items.push({
+      title: "Tickets",
+      icon: () => h(LucideTicket),
+      route: { name: "TicketsAgent" },
+    });
+  }
+  items.push({
+    title: "Knowledge Base",
+    icon: () => h(LucideBookOpen),
+    route: {
+      name: isCustomerPortal.value
+        ? "CustomerKnowledgeBase"
+        : "AgentKnowledgeBase",
+    },
+  });
 
-export function hideCommandPalette() {
-  debugger;
+  return {
+    title: "Jump to",
+    component: h(CPGroup),
+    items,
+  };
+});
+
+const fullSearchItem = computed(() => ({
+  title: "Search",
+  hideTitle: true,
+  component: h(CPGroup),
+  items: [
+    {
+      title: `Search for "${query.value}"`,
+      icon: () => h(LucideSearch),
+      route: { name: "SearchAgent", query: { q: query.value } },
+    },
+  ],
+}));
+
+const groupedSearchResults = computed(() => {
+  let results = [navigationItems.value];
+
+  // Add search option if there's a query and we're not in customer portal
+  if (query.value.length > 2 && !isCustomerPortal.value) {
+    results.push(fullSearchItem.value);
+  }
+
+  return results;
+});
+
+// Methods
+const onInput = (e) => {
+  query.value = e.target.value;
+};
+
+const onSelection = (value) => {
+  if (value) {
+    router.push(value.route);
+    hideCommandPalette();
+  }
+};
+
+const addKeyboardShortcut = () => {
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      toggleCommandPalette();
+    }
+  });
+};
+
+function hideCommandPalette() {
   show.value = false;
 }
 
-export function toggleCommandPalette() {
+function toggleCommandPalette() {
   show.value = !show.value;
 }
 
-export default {
-  name: "CommandPalette",
-  components: {
-    Combobox,
-    ComboboxInput,
-    ComboboxOptions,
-    ComboboxOption,
-    CPGroup,
-    CPGroupResult,
-  },
-  setup() {
-    return { show };
-  },
-  data() {
-    return {
-      query: "",
-    };
-  },
-  computed: {
-    navigationItems() {
-      return {
-        title: "Jump to",
-        component: "CPGroup",
-        items: [
-          {
-            title: "Tickets",
-            icon: () => h(LucideTicket),
-            route: { name: "TicketsAgent" },
-          },
-          // {
-          //   title: "Agents",
-          //   icon: () => h(LucideUser),
-          //   route: { name: "AgentList" },
-          //   condition: () => true,
-          // },
-          {
-            title: "Knowledge Base",
-            icon: () => h(LucideBookOpen),
-            route: {
-              name: isCustomerPortal.value
-                ? "CustomerKnowledgeBase"
-                : "AgentKnowledgeBase",
-            },
-            condition: () => true,
-          },
-        ].filter((item) => (item.condition ? item.condition() : true)),
-      };
-    },
-    fullSearchItem() {
-      return {
-        title: "Search",
-        hideTitle: true,
-        component: "CPGroup",
-        items: [
-          {
-            title: `Search for "${this.query}"`,
-            icon: () => h(LucideSearch),
-            route: { name: "SearchAgent", query: { q: this.query } },
-          },
-        ],
-      };
-    },
-    groupedSearchResults() {
-      let results = [this.navigationItems];
+// Watchers
+watch(show, (value) => {
+  if (value) {
+    query.value = "";
+  }
+});
 
-      // Add search option if there's a query and we're not in customer portal
-      if (this.query.length > 2 && !isCustomerPortal.value) {
-        results.push(this.fullSearchItem);
-      }
+// Lifecycle hooks
+onMounted(() => {
+  if (isCustomerPortal.value) return;
+  addKeyboardShortcut();
+});
 
-      return results;
-    },
-  },
-  watch: {
-    show(value) {
-      if (value) {
-        this.query = "";
-      }
-    },
-  },
-  mounted() {
-    this.addKeyboardShortcut();
-  },
-  beforeUnmount() {
-    hideCommandPalette();
-  },
-  methods: {
-    onInput(e) {
-      this.query = e.target.value;
-    },
-    onSelection(value) {
-      if (value) {
-        this.$router.push(value.route);
-        hideCommandPalette();
-      }
-    },
-    addKeyboardShortcut() {
-      window.addEventListener("keydown", (e) => {
-        if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
-          e.preventDefault();
-          toggleCommandPalette();
-        }
-      });
-    },
-  },
-};
+onBeforeUnmount(() => {
+  hideCommandPalette();
+});
 </script>
