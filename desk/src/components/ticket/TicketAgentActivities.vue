@@ -118,9 +118,10 @@ import {
 import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
-import { Avatar, FeatherIcon } from "frappe-ui";
-import { PropType, Ref, computed, h, inject, onMounted, watch } from "vue";
 import { isElementInViewport } from "@/utils";
+import { Avatar, FeatherIcon } from "frappe-ui";
+import { PropType, Ref, computed, h, inject, nextTick, watch } from "vue";
+import { useRoute } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
 
 const props = defineProps({
@@ -139,6 +140,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["email:reply", "update"]);
+
+const route = useRoute();
 
 const { getUser } = useUserStore();
 const communicationAreaRef: Ref = inject("communicationArea");
@@ -170,6 +173,10 @@ const emptyTextIcon = computed(() => {
 });
 
 function scrollToLatestActivity() {
+  if (route.hash) {
+    scrollToHash();
+    return;
+  }
   setTimeout(() => {
     let el;
     let e = document.getElementsByClassName("activity");
@@ -180,14 +187,38 @@ function scrollToLatestActivity() {
     }
   }, 500);
 }
+function scrollToHash() {
+  const hash = route.hash;
+  if (hash) {
+    // Remove the # symbol
+    const elementId = hash.substring(1);
 
-defineExpose({
-  scrollToLatestActivity,
-});
+    nextTick(() => {
+      // Wait for activities to be rendered
+      setTimeout(() => {
+        const element = document.getElementById(elementId);
+        if (element) {
+          (element as any).scrollIntoViewIfNeeded();
 
-onMounted(() => {
-  // scrollToLatestActivity();
-});
+          // Add highlight effect using Tailwind class
+          element.classList.add("bg-yellow-100");
+
+          // Remove highlight after 2 seconds
+          setTimeout(() => {
+            element.classList.remove("bg-yellow-100");
+          }, 2000);
+        }
+      }, 1000);
+    });
+  }
+}
+
+watch(
+  () => route.hash,
+  () => {
+    scrollToLatestActivity();
+  }
+);
 
 watch(
   () => props.title,
@@ -196,4 +227,8 @@ watch(
   },
   { immediate: true }
 );
+
+defineExpose({
+  scrollToLatestActivity,
+});
 </script>
