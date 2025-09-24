@@ -1,4 +1,4 @@
-import { SlaValidationErrors } from "@/components/Settings/Sla/types";
+import { SlaValidationErrors } from "@/pages/settings/Sla/types";
 import { validateConditions } from "@/utils";
 import { ref } from "vue";
 
@@ -35,6 +35,9 @@ const defaultSupportAndResolution = [
   },
 ];
 
+export const isSlaDataDirty = ref(false);
+export const slaInitialData = ref(null);
+
 export const slaData = ref({
   name: "",
   service_level: "",
@@ -50,7 +53,7 @@ export const slaData = ref({
   loading: false,
   support_and_resolution: defaultSupportAndResolution,
   default_ticket_status: "",
-  reopen_ticket_status: "",
+  ticket_reopen_status: "",
   condition: [],
   condition_json: [],
 });
@@ -71,7 +74,7 @@ export const resetSlaData = () => {
     loading: false,
     support_and_resolution: defaultSupportAndResolution,
     default_ticket_status: "",
-    reopen_ticket_status: "",
+    ticket_reopen_status: "",
     condition: [],
     condition_json: [],
   };

@@ -2,7 +2,7 @@ import {
   Holiday,
   HolidayErrors,
   RepetitionPattern,
-} from "@/components/Settings/Holiday/types";
+} from "@/pages/settings/Holiday/types";
 import dayjs, { Dayjs } from "dayjs";
 import { ref } from "vue";
 
