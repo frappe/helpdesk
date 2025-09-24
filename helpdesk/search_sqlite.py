@@ -21,7 +21,7 @@ class HelpdeskSearch(SQLiteSearch):
             "owner",
             "reference_doctype",
             "reference_name",
-            "reference_ticket"
+            "reference_ticket",
         ],
         "tokenizer": "unicode61 remove_diacritics 2 tokenchars '-_'",
     }
@@ -37,7 +37,7 @@ class HelpdeskSearch(SQLiteSearch):
                 "status",
                 "priority",
                 "raised_by",
-                "owner"
+                "owner",
             ],
         },
         "HD Ticket Comment": {
@@ -47,7 +47,7 @@ class HelpdeskSearch(SQLiteSearch):
                 "modified",
                 "reference_ticket",
                 "commented_by",
-                "owner"
+                "owner",
             ],
         },
         "Communication": {
@@ -59,7 +59,7 @@ class HelpdeskSearch(SQLiteSearch):
                 "reference_doctype",
                 "reference_name",
                 "sender",
-                "owner"
+                "owner",
             ],
             "filters": {"reference_doctype": "HD Ticket"},
         },
@@ -67,49 +67,12 @@ class HelpdeskSearch(SQLiteSearch):
 
     def get_search_filters(self):
         """Return permission filters based on accessible tickets."""
-
-        if "System Manager" in frappe.get_roles():
-            return {}
-
         accessible_tickets = self._get_accessible_tickets()
-
-        if not accessible_tickets:
-            return {"name": []}  # No accessible tickets
-
-        return {
-            "reference_ticket": accessible_tickets,
-            "reference_name": accessible_tickets,
-            "name": accessible_tickets
-        }
+        return {"reference_ticket": accessible_tickets}
 
     def _get_accessible_tickets(self):
         """Get tickets accessible to current user based on helpdesk permissions."""
-        from helpdesk.utils import is_agent
-
-        user = frappe.session.user
-
-        if user == "Administrator":
-            return frappe.get_all("HD Ticket", pluck="name")
-
-        if is_agent(user):
-            # Agent can see tickets in their teams + assigned tickets
-            agent_teams = frappe.get_all("HD Team Member",
-                filters={"user": user}, pluck="parent")
-
-            assigned_tickets = []
-            if frappe.db.exists("HD Ticket", {"_assign": ("like", f"%{user}%")}):
-                assigned_tickets = frappe.get_all("HD Ticket",
-                    filters={"_assign": ("like", f"%{user}%")}, pluck="name")
-
-            team_tickets = []
-            if agent_teams:
-                team_tickets = frappe.get_all("HD Ticket",
-                    filters={"agent_group": ("in", agent_teams)}, pluck="name")
-
-            return list(set(assigned_tickets + team_tickets))
-
-        # Non-agents have no search access
-        return []
+        return frappe.get_list("HD Ticket", pluck="name")
 
     def prepare_document(self, doc):
         """Prepare a document for indexing with helpdesk-specific handling."""
@@ -124,11 +87,13 @@ class HelpdeskSearch(SQLiteSearch):
         if doc.doctype == "Communication":
             # For communications, ensure reference fields are set
             document["reference_doctype"] = doc.reference_doctype
+            document["reference_ticket"] = doc.reference_name
             document["reference_name"] = doc.reference_name
 
         # Map raised_by to customer for HD Ticket
         if doc.doctype == "HD Ticket":
             document["customer"] = doc.raised_by
+            document["reference_ticket"] = doc.name
 
         # Map commented_by to owner for HD Ticket Comment
         if doc.doctype == "HD Ticket Comment":
@@ -148,7 +113,7 @@ class HelpdeskSearch(SQLiteSearch):
                 "statuses": {},
                 "priorities": {},
                 "customers": {},
-                "doctypes": {}
+                "doctypes": {},
             }
 
         # Get accessible tickets first
@@ -159,7 +124,7 @@ class HelpdeskSearch(SQLiteSearch):
                 "statuses": {},
                 "priorities": {},
                 "customers": {},
-                "doctypes": {}
+                "doctypes": {},
             }
 
         # Query the search index for available options
@@ -174,7 +139,9 @@ class HelpdeskSearch(SQLiteSearch):
             FROM search_fts
             WHERE (name IN ({placeholders}) OR reference_name IN ({placeholders}) OR reference_ticket IN ({placeholders}))
             GROUP BY agent_group, status, priority, customer, doctype
-        """.format(placeholders=",".join(["?" for _ in accessible_tickets]))
+        """.format(
+            placeholders=",".join(["?" for _ in accessible_tickets])
+        )
 
         params = accessible_tickets * 3
         results = self.sql(sql, params, read_only=True)
@@ -188,15 +155,23 @@ class HelpdeskSearch(SQLiteSearch):
 
         for row in results:
             if row["agent_group"]:
-                teams[row["agent_group"]] = teams.get(row["agent_group"], 0) + row["count"]
+                teams[row["agent_group"]] = (
+                    teams.get(row["agent_group"], 0) + row["count"]
+                )
             if row["status"]:
                 statuses[row["status"]] = statuses.get(row["status"], 0) + row["count"]
             if row["priority"]:
-                priorities[row["priority"]] = priorities.get(row["priority"], 0) + row["count"]
+                priorities[row["priority"]] = (
+                    priorities.get(row["priority"], 0) + row["count"]
+                )
             if row["customer"]:
-                customers[row["customer"]] = customers.get(row["customer"], 0) + row["count"]
+                customers[row["customer"]] = (
+                    customers.get(row["customer"], 0) + row["count"]
+                )
             if row["doctype"]:
-                doctypes[row["doctype"]] = doctypes.get(row["doctype"], 0) + row["count"]
+                doctypes[row["doctype"]] = (
+                    doctypes.get(row["doctype"], 0) + row["count"]
+                )
 
         return {
             "teams": teams,
@@ -272,12 +247,14 @@ def get_search_status():
     sqlite_status = {
         "enabled": search.is_search_enabled(),
         "exists": search.index_exists(),
-        "documents": 0
+        "documents": 0,
     }
 
     if sqlite_status["exists"]:
         try:
-            result = search.sql("SELECT COUNT(*) as count FROM search_fts", read_only=True)
+            result = search.sql(
+                "SELECT COUNT(*) as count FROM search_fts", read_only=True
+            )
             sqlite_status["documents"] = result[0]["count"] if result else 0
         except Exception:
             sqlite_status["documents"] = 0
@@ -286,6 +263,7 @@ def get_search_status():
     redis_status = {"exists": False, "documents": 0}
     try:
         from helpdesk.search import HelpdeskSearch as RedisSearch
+
         redis_search = RedisSearch()
         redis_status["exists"] = redis_search.index_exists()
         if redis_status["exists"]:
@@ -293,10 +271,7 @@ def get_search_status():
     except Exception:
         pass
 
-    return {
-        "sqlite": sqlite_status,
-        "redis": redis_status
-    }
+    return {"sqlite": sqlite_status, "redis": redis_status}
 
 
 @frappe.whitelist()
