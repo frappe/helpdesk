@@ -29,10 +29,10 @@
       <div v-else>
         <div
           v-if="assignmentRulesList.data?.length === 0"
-          class="flex items-center justify-center rounded-md border border-gray-200 p-4"
+          class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-1"
         >
           <div class="text-sm text-ink-gray-7">
-            {{ __("No items in the list") }}
+            {{ __("No Assignment Rules found.") }}
           </div>
         </div>
         <div v-else>

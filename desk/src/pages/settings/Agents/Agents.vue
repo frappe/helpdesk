@@ -79,11 +79,9 @@
     <!-- Empty State -->
     <div
       v-if="!agents.loading && !agents.data?.length"
-      class="flex mt-28 justify-between w-full h-full"
+      class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-7"
     >
-      <p class="text-sm text-gray-500 w-full flex justify-center">
-        No agents found
-      </p>
+      <div class="text-sm text-ink-gray-7">No Agents found</div>
     </div>
     <!-- Agent List -->
     <div

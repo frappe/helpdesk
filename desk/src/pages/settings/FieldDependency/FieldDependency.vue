@@ -46,11 +46,11 @@
           !fieldDependenciesList.loading &&
           fieldDependenciesList.data?.length === 0
         "
-        class="flex mt-28 justify-between w-full h-full"
+        class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-7"
       >
-        <p class="text-sm text-gray-500 w-full flex justify-center">
-          No field dependencies found.
-        </p>
+        <div class="text-sm text-ink-gray-7">
+          {{ __("No Field Dependencies found.") }}
+        </div>
       </div>
 
       <div

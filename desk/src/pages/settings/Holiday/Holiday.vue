@@ -28,9 +28,9 @@
     <div v-else>
       <div
         v-if="holidayList.list.data?.length === 0"
-        class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-6"
+        class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-7"
       >
-        <div class="text-sm text-ink-gray-7">No items in the list</div>
+        <div class="text-sm text-ink-gray-7">No Holiday list found</div>
       </div>
       <div v-else>
         <div class="flex text-sm text-gray-600 mt-6">
@@ -53,7 +53,7 @@ import { computed, provide } from "vue";
 import SettingsHeader from "../components/SettingsHeader.vue";
 import { resetHolidayData } from "@/stores/holidayList";
 import { useRouter } from "vue-router";
-import { createListResource } from "frappe-ui";
+import { createListResource, LoadingIndicator } from "frappe-ui";
 import HolidayListItem from "./components/HolidayListItem.vue";
 import SettingsLayoutHeader from "@/pages/settings/components/SettingsLayoutHeader.vue";
 

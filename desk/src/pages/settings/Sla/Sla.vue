@@ -34,9 +34,9 @@
       <div v-else>
         <div
           v-if="slaPolicyList.list.data?.length === 0"
-          class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-6"
+          class="flex items-center justify-center rounded-md border border-gray-200 p-4 mt-7"
         >
-          <div class="text-sm text-ink-gray-7">No items in the list</div>
+          <div class="text-sm text-ink-gray-7">No SLA Policies found</div>
         </div>
         <div v-else>
           <div

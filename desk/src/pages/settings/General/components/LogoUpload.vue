@@ -44,6 +44,7 @@
           label="Remove"
           @click="emit('onRemove')"
           iconLeft="trash"
+          theme="red"
           :loading="props.isLoading"
         />
       </div>

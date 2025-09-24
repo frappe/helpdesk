@@ -26,12 +26,19 @@
               @click="openFileSelector()"
               iconLeft="upload"
               label="Upload Image"
+              :loading="setUser.loading"
             />
           </template>
         </FileUploader>
 
         <div v-else>
-          <Button label="Remove" iconLeft="trash" @click="updateImage(null)" />
+          <Button
+            label="Remove"
+            iconLeft="trash"
+            theme="red"
+            @click="updateImage(null)"
+            :loading="setUser.loading"
+          />
         </div>
       </div>
     </div>
@@ -74,7 +81,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import SettingsHeader from "../components/SettingsHeader.vue";
-import { Avatar, createResource, FileUploader, toast } from "frappe-ui";
+import { Avatar, Button, createResource, FileUploader, toast } from "frappe-ui";
 import { __ } from "@/translation";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import ChangeEmailModal from "./components/ChangeEmailModal.vue";
