@@ -201,7 +201,7 @@ import {
   ErrorMessage,
   TextInput,
 } from "frappe-ui";
-import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
+import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 // import { vFocus } from "@/directives";
 
@@ -458,11 +458,24 @@ watch(
   }
 );
 
+function addFocusShortcut() {
+  nextTick(() => {
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "/") {
+        e.preventDefault();
+        searchInput.value.el.focus();
+      }
+    });
+  });
+}
+
 // Lifecycle
 onMounted(() => {
   if (route.query.q && typeof route.query.q === "string") {
     query.value = route.query.q;
     submit();
   }
+  // add a shortcut when presses "/" focus on this element
+  addFocusShortcut();
 });
 </script>
