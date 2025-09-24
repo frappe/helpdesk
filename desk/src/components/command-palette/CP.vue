@@ -52,19 +52,19 @@
   </Dialog>
 </template>
 <script>
-import { h, ref } from "vue";
+import { isCustomerPortal } from "@/utils";
 import {
   Combobox,
   ComboboxInput,
-  ComboboxOptions,
   ComboboxOption,
+  ComboboxOptions,
 } from "@headlessui/vue";
-import CPGroup from "./CPGroup.vue";
-import CPGroupResult from "./CPGroupResult.vue";
+import { h, ref } from "vue";
+import LucideBookOpen from "~icons/lucide/book-open";
 import LucideSearch from "~icons/lucide/file-search";
 import LucideTicket from "~icons/lucide/ticket";
-import LucideBookOpen from "~icons/lucide/book-open";
-import { isCustomerPortal } from "@/utils";
+import CPGroup from "./CPGroup.vue";
+import CPGroupResult from "./CPGroupResult.vue";
 
 let show = ref(false);
 
@@ -73,6 +73,7 @@ export function showCommandPalette() {
 }
 
 export function hideCommandPalette() {
+  debugger;
   show.value = false;
 }
 
@@ -178,13 +179,9 @@ export default {
     },
     addKeyboardShortcut() {
       window.addEventListener("keydown", (e) => {
-        if (
-          e.key === "k" &&
-          (e.ctrlKey || e.metaKey) &&
-          !e.target.classList?.contains("ProseMirror")
-        ) {
-          toggleCommandPalette();
+        if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
           e.preventDefault();
+          toggleCommandPalette();
         }
       });
     },
