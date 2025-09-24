@@ -648,6 +648,8 @@ def get_navigation_order_by(view):
 
 @frappe.whitelist()
 def get_ticket_contact(ticket: str):
+    if not frappe.db.exists("HD Ticket", ticket):
+        return None
     contact = frappe.db.get_value("HD Ticket", ticket, "contact")
     if not contact:
         raised_by = frappe.db.get_value("HD Ticket", ticket, "raised_by")
@@ -669,6 +671,9 @@ def get_ticket_contact(ticket: str):
 
 @frappe.whitelist()
 def get_recent_similar_tickets(ticket: str):
+    if not frappe.db.exists("HD Ticket", ticket):
+        return {"recent_tickets": [], "similar_tickets": []}
+
     recent_tickets = get_recent_tickets(ticket)
     similar_tickets = get_similar_tickets(ticket)
     # print('\n\n',recent_tickets,'\n\n')
