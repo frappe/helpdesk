@@ -2,6 +2,7 @@
 # MIT License. See license.txt
 
 import frappe
+from frappe import _
 from frappe.search.sqlite_search import SQLiteSearch, SQLiteSearchIndexMissingError
 
 
@@ -227,7 +228,7 @@ def delete_doc_index(doc, method=None):
 def migrate_to_sqlite_search():
     """Admin-only migration from Redis to SQLite search"""
     if not frappe.has_permission("HD Settings", "write"):
-        frappe.throw("Insufficient permissions")
+        frappe.throw(_("Insufficient permissions"))
 
     # Build SQLite index
     frappe.enqueue(build_index, queue="long")
@@ -275,7 +276,7 @@ def get_search_status():
 def rebuild_sqlite_index():
     """Rebuild SQLite search index - admin only"""
     if not frappe.has_permission("HD Settings", "write"):
-        frappe.throw("Insufficient permissions")
+        frappe.throw(_("Insufficient permissions"))
 
     frappe.enqueue(build_index, queue="long")
     return {"message": "SQLite search index rebuild started"}
