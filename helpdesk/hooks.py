@@ -22,6 +22,7 @@ after_install = "helpdesk.setup.install.after_install"
 after_migrate = [
     "helpdesk.search.build_index_in_background",
     "helpdesk.search.download_corpus",
+    "helpdesk.search_sqlite.build_index_if_not_exists",
 ]
 
 # Full Text Search
@@ -32,6 +33,7 @@ sqlite_search = ["helpdesk.search_sqlite.HelpdeskSearch"]
 scheduler_events = {
     "all": [
         "helpdesk.search.build_index_if_not_exists",
+        "helpdesk.search_sqlite.build_index_if_not_exists",
         "helpdesk.search.download_corpus",
     ],
     "daily": [
@@ -61,6 +63,28 @@ doc_events = {
     },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
+    },
+    "HD Ticket": {
+        "after_insert": [
+            "helpdesk.search_sqlite.update_doc_index",  # New SQLite search
+        ],
+        "on_update": [
+            "helpdesk.search_sqlite.update_doc_index",
+        ],
+        "on_trash": [
+            "helpdesk.search.remove_doc",
+            "helpdesk.search_sqlite.delete_doc_index",
+        ],
+    },
+    "HD Ticket Comment": {
+        "after_insert": ["helpdesk.search_sqlite.update_doc_index"],
+        "on_update": ["helpdesk.search_sqlite.update_doc_index"],
+        "on_trash": ["helpdesk.search_sqlite.delete_doc_index"],
+    },
+    "Communication": {
+        "after_insert": ["helpdesk.search_sqlite.update_doc_index"],
+        "on_update": ["helpdesk.search_sqlite.update_doc_index"],
+        "on_trash": ["helpdesk.search_sqlite.delete_doc_index"],
     },
 }
 
