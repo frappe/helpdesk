@@ -304,28 +304,28 @@ const filterOptions = createResource({
 // Filter Options Computed Properties
 const teamsFilterOptions = computed(() => {
   const options = filterOptions.data?.teams || {};
-  return Object.entries(options).map(([value, count]) => ({
+  return Object.entries(options).map(([value]) => ({
     value,
-    label: `${value} (${count})`,
-    count,
+    label: `${value}`,
+    // count,
   }));
 });
 
 const statusFilterOptions = computed(() => {
   const options = filterOptions.data?.statuses || {};
-  return Object.entries(options).map(([value, count]) => ({
+  return Object.entries(options).map(([value]) => ({
     value,
-    label: `${value} (${count})`,
-    count,
+    label: `${value}`,
+    // count,
   }));
 });
 
 const priorityFilterOptions = computed(() => {
   const options = filterOptions.data?.priorities || {};
-  return Object.entries(options).map(([value, count]) => ({
+  return Object.entries(options).map(([value]) => ({
     value,
-    label: `${value} (${count})`,
-    count,
+    label: `${value}`,
+    // count,
   }));
 });
 
@@ -333,7 +333,7 @@ const doctypesFilterOptions = computed(() => {
   return [
     { value: "HD Ticket", label: "Tickets", count: 0 },
     { value: "HD Ticket Comment", label: "Comments", count: 0 },
-    { value: "Communication", label: "Communications", count: 0 },
+    { value: "Communication", label: "Emails", count: 0 },
   ];
 });
 
