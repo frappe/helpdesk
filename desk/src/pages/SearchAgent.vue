@@ -373,7 +373,12 @@ function hasActiveFilters() {
 }
 
 function updateFilter(key: keyof SearchFilters, values: string[]) {
-  activeFilters.value[key] = values;
+  if (!values || values.length === 0) {
+    delete activeFilters.value[key];
+  } else {
+    activeFilters.value[key] = values;
+  }
+
   if (query.value.length > 2) {
     debouncedSubmit();
   }

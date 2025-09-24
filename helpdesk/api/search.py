@@ -2,6 +2,7 @@
 # MIT License. See license.txt
 
 import json
+
 import frappe
 from frappe import _
 
@@ -45,6 +46,12 @@ def get_filter_options():
     search = HelpdeskSearch()
 
     if not search.index_exists():
-        return {"teams": {}, "statuses": {}, "priorities": {}, "customers": {}, "doctypes": {}}
+        return {
+            "teams": {},
+            "statuses": {},
+            "priorities": {},
+            "customers": {},
+            "doctypes": {},
+        }
 
     return search.get_filter_options()

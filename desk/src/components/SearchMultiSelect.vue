@@ -31,7 +31,9 @@
             <!-- Count Text -->
             <span class="text-ink-gray-7">
               {{
-                selectedCount === 1 ? selectedOptions[0].label : `${selectedCount} ${selectionText}`
+                selectedCount === 1
+                  ? selectedOptions[0].label
+                  : `${selectedCount} ${selectionText}`
               }}
             </span>
           </template>
@@ -52,7 +54,9 @@
     >
       <!-- Header -->
       <div class="py-1.5 px-1.5">
-        <div class="flex h-7 items-center text-sm font-medium text-ink-gray-6 justify-between">
+        <div
+          class="flex h-7 items-center text-sm font-medium text-ink-gray-6 justify-between"
+        >
           <input
             ref="inputRef"
             v-model="filterText"
@@ -61,7 +65,12 @@
             @click.stop
             @keydown="handleInputKeydown"
           />
-          <Button variant="ghost" size="sm" v-if="selectedCount > 0" @click="clearAll">
+          <Button
+            variant="ghost"
+            size="sm"
+            v-if="selectedCount > 0"
+            @click="clearAll"
+          >
             <template #icon>
               <LucideX class="size-4" />
             </template>
@@ -99,7 +108,10 @@
               {{ option.label }}
             </span>
 
-            <span v-if="(option.count ?? 0) > 0" class="text-xs text-ink-gray-5 ml-auto">
+            <span
+              v-if="(option.count ?? 0) > 0"
+              class="text-xs text-ink-gray-5 ml-auto"
+            >
               {{ option.count }}
             </span>
           </button>
@@ -138,13 +150,19 @@
             />
 
             <!-- Spacer for alignment when other options have visual elements -->
-            <div v-else-if="hasAnyVisualElements" class="mr-2 w-6 h-6 flex-shrink-0"></div>
+            <div
+              v-else-if="hasAnyVisualElements"
+              class="mr-2 w-6 h-6 flex-shrink-0"
+            ></div>
 
             <span class="text-ink-gray-7 flex-1 text-left truncate">
               {{ option.label }}
             </span>
 
-            <span v-if="(option.count ?? 0) > 0" class="text-xs text-ink-gray-5 ml-auto">
+            <span
+              v-if="(option.count ?? 0) > 0"
+              class="text-xs text-ink-gray-5 ml-auto"
+            >
               {{ option.count }}
             </span>
           </button>
@@ -166,204 +184,226 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, useTemplateRef, watch, h, type Component } from 'vue'
-import { Button, Checkbox, Avatar } from 'frappe-ui'
-import LucideChevronDown from '~icons/lucide/chevron-down'
-import LucideX from '~icons/lucide/x'
+import { Avatar, Button, Checkbox } from "frappe-ui";
+import {
+  computed,
+  h,
+  nextTick,
+  ref,
+  useTemplateRef,
+  watch,
+  type Component,
+} from "vue";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideX from "~icons/lucide/x";
 
 // Type Definitions
 interface MultiSelectOption {
-  value: string
-  label: string
-  count?: number
-  image?: string
-  icon?: string | Component
+  value: string;
+  label: string;
+  count?: number;
+  image?: string;
+  icon?: string | Component;
 }
 
 interface MultiSelectGroup {
-  group: string
-  items: MultiSelectOption[]
+  group: string;
+  items: MultiSelectOption[];
 }
 
 // Support both flat options and grouped options in the same prop
-type MultiSelectData = MultiSelectOption[] | MultiSelectGroup[]
+type MultiSelectData = MultiSelectOption[] | MultiSelectGroup[];
 
 interface Props {
-  options: MultiSelectData
-  modelValue: string[]
-  placeholder?: string
-  label?: string
-  selectionText?: string
+  options: MultiSelectData;
+  modelValue: string[];
+  placeholder?: string;
+  label?: string;
+  selectionText?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: 'Select options...',
-  label: 'Options',
-  selectionText: 'items',
+  placeholder: "Select options...",
+  label: "Options",
+  selectionText: "items",
   options: () => [],
-})
+});
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string[]]
-}>()
+  "update:modelValue": [value: string[]];
+}>();
 
 // Reactive State
-const isOpen = ref(false)
-const filterText = ref('')
-const highlightedIndex = ref(0)
-const inputRef = useTemplateRef<HTMLInputElement>('inputRef')
+const isOpen = ref(false);
+const filterText = ref("");
+const highlightedIndex = ref(0);
+const inputRef = useTemplateRef<HTMLInputElement>("inputRef");
 
 // Core Computed Properties
-const selectedCount = computed(() => props.modelValue.length)
+const selectedCount = computed(() => props.modelValue.length);
 
 // Detect if the options are grouped or flat
 const isGrouped = computed(() => {
-  return props.options.length > 0 && 'group' in props.options[0] && 'items' in props.options[0]
-})
+  return (
+    props.options.length > 0 &&
+    "group" in props.options[0] &&
+    "items" in props.options[0]
+  );
+});
 
 // Extract individual options and groups from the unified options prop
 const individualOptions = computed(() => {
-  if (isGrouped.value) return []
-  return props.options as MultiSelectOption[]
-})
+  if (isGrouped.value) return [];
+  return props.options as MultiSelectOption[];
+});
 
 const groups = computed(() => {
-  if (!isGrouped.value) return []
-  return props.options as MultiSelectGroup[]
-})
+  if (!isGrouped.value) return [];
+  return props.options as MultiSelectGroup[];
+});
 
 // Flatten all options for easier processing
 const allOptions = computed(() => {
   if (isGrouped.value) {
-    return (props.options as MultiSelectGroup[]).flatMap((group) => group.items)
+    return (props.options as MultiSelectGroup[]).flatMap(
+      (group) => group.items
+    );
   }
-  return props.options as MultiSelectOption[]
-})
+  return props.options as MultiSelectOption[];
+});
 
 const selectedOptions = computed(() =>
-  allOptions.value.filter((option) => props.modelValue.includes(option.value)),
-)
+  allOptions.value.filter((option) => props.modelValue.includes(option.value))
+);
 
 // UI Helper Computed Properties
-const hasSelectedImages = computed(() => selectedOptions.value.some((option) => option.image))
+const hasSelectedImages = computed(() =>
+  selectedOptions.value.some((option) => option.image)
+);
 const hasAnyVisualElements = computed(() => {
-  return allOptions.value.some((option) => option.image || option.icon)
-})
+  return allOptions.value.some((option) => option.image || option.icon);
+});
 
 // Filtering Logic
 const filteredGroups = computed(() => {
-  if (!isGrouped.value) return []
+  if (!isGrouped.value) return [];
 
-  const searchText = filterText.value.toLowerCase()
+  const searchText = filterText.value.toLowerCase();
 
   return groups.value
     .map((group) => ({
       ...group,
       items: group.items.filter((option) => {
         // Show all items if group name matches the search
-        const groupMatches = group.group.toLowerCase().includes(searchText)
+        const groupMatches = group.group.toLowerCase().includes(searchText);
         // Show individual items if their label matches the search
-        const itemMatches = option.label.toLowerCase().includes(searchText)
+        const itemMatches = option.label.toLowerCase().includes(searchText);
 
-        return groupMatches || itemMatches
+        return groupMatches || itemMatches;
       }),
     }))
-    .filter((group) => group.items.length > 0)
-})
+    .filter((group) => group.items.length > 0);
+});
 
 const filteredIndividualOptions = computed(() =>
   individualOptions.value.filter((option) =>
-    option.label.toLowerCase().includes(filterText.value.toLowerCase()),
-  ),
-)
+    option.label.toLowerCase().includes(filterText.value.toLowerCase())
+  )
+);
 
 // All filtered options in a flat array for keyboard navigation
 const filteredOptions = computed(() => {
-  const individual = filteredIndividualOptions.value
-  const grouped = filteredGroups.value.flatMap((group) => group.items)
-  return [...individual, ...grouped]
-})
+  const individual = filteredIndividualOptions.value;
+  const grouped = filteredGroups.value.flatMap((group) => group.items);
+  return [...individual, ...grouped];
+});
 
-const highlightedOption = computed(() => filteredOptions.value[highlightedIndex.value] || null)
+const highlightedOption = computed(
+  () => filteredOptions.value[highlightedIndex.value] || null
+);
 
 // Main Interaction Methods
 function toggleDropdown() {
-  isOpen.value = !isOpen.value
+  isOpen.value = !isOpen.value;
   if (isOpen.value) {
-    highlightedIndex.value = 0 // Reset to first item when opening
+    highlightedIndex.value = 0; // Reset to first item when opening
     nextTick(() => {
-      inputRef.value?.focus()
-    })
+      inputRef.value?.focus();
+    });
   }
 }
 
 function closeDropdown() {
-  isOpen.value = false
+  isOpen.value = false;
 }
 
 function toggleOption(option: MultiSelectOption) {
-  const newValue = [...props.modelValue]
-  const index = newValue.indexOf(option.value)
+  const newValue = [...props.modelValue];
+  const index = newValue.indexOf(option.value);
 
   if (index > -1) {
-    newValue.splice(index, 1)
+    newValue.splice(index, 1);
   } else {
-    newValue.push(option.value)
+    newValue.push(option.value);
   }
 
-  emit('update:modelValue', newValue)
+  emit("update:modelValue", newValue);
 }
 
 function clearAll() {
-  filterText.value = ''
-  emit('update:modelValue', [])
+  filterText.value = "";
+  emit("update:modelValue", []);
 }
 
 // Keyboard Navigation
 function handleInputKeydown(event: KeyboardEvent) {
-  if (!isOpen.value) return
+  if (!isOpen.value) return;
 
-  if (event.key === 'Escape') {
-    event.preventDefault()
-    closeDropdown()
-  } else if (event.key === 'Enter' && highlightedOption.value) {
-    event.preventDefault()
-    event.stopPropagation()
-    toggleOption(highlightedOption.value)
-  } else if (event.key === 'ArrowDown') {
-    event.preventDefault()
-    highlightedIndex.value = Math.min(highlightedIndex.value + 1, filteredOptions.value.length - 1)
-  } else if (event.key === 'ArrowUp') {
-    event.preventDefault()
-    highlightedIndex.value = Math.max(highlightedIndex.value - 1, 0)
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeDropdown();
+  } else if (event.key === "Enter" && highlightedOption.value) {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleOption(highlightedOption.value);
+  } else if (event.key === "ArrowDown") {
+    event.preventDefault();
+    highlightedIndex.value = Math.min(
+      highlightedIndex.value + 1,
+      filteredOptions.value.length - 1
+    );
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    highlightedIndex.value = Math.max(highlightedIndex.value - 1, 0);
   }
 }
 
 // Utility Functions
 function renderIcon(icon: string | any) {
-  if (!icon) return null
+  if (!icon) return null;
 
   const iconContent =
-    typeof icon === 'string'
-      ? h('span', { class: 'text-base' }, icon)
-      : h(icon, { class: 'w-4 h-4' })
+    typeof icon === "string"
+      ? h("span", { class: "text-base" }, icon)
+      : h(icon, { class: "w-4 h-4" });
 
   return h(
-    'span',
+    "span",
     {
-      class: 'flex-shrink-0 w-4 h-4 inline-flex items-center justify-center mr-2',
+      class:
+        "flex-shrink-0 w-4 h-4 inline-flex items-center justify-center mr-2",
     },
-    [iconContent],
-  )
+    [iconContent]
+  );
 }
 
 function isHighlighted(option: MultiSelectOption) {
-  return highlightedOption.value?.value === option.value
+  return highlightedOption.value?.value === option.value;
 }
 
 // Watchers
 // Reset highlighted index when filter changes
 watch(filterText, () => {
-  highlightedIndex.value = 0
-})
+  highlightedIndex.value = 0;
+});
 </script>
