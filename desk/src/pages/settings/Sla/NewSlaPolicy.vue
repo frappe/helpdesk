@@ -20,7 +20,7 @@
             :theme="'orange'"
             size="sm"
             label="Unsaved changes"
-            v-if="isDirty"
+            v-if="isSlaDataDirty"
           />
         </div>
         <div class="flex gap-4 items-center justify-between">
@@ -36,7 +36,7 @@
             theme="gray"
             variant="solid"
             @click="saveSla()"
-            :disabled="Boolean(!isDirty)"
+            :disabled="Boolean(!isSlaDataDirty)"
             :loading="slaData.loading"
           />
         </div>
@@ -216,10 +216,12 @@ import SettingsHeader from "../components/SettingsHeader.vue";
 
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
+  isSlaDataDirty,
   resetSlaData,
   resetSlaDataErrors,
   slaData,
   slaDataErrors,
+  slaInitialData,
   validateSlaData,
 } from "@/stores/sla";
 import { convertToConditions, getFormattedDate } from "@/utils";
@@ -236,7 +238,7 @@ import {
   Switch,
   toast,
 } from "frappe-ui";
-import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import SlaAssignmentConditions from "./components/SlaAssignmentConditions.vue";
 import SlaHolidays from "./components/SlaHolidays.vue";
 import SlaPriorityList from "./components/SlaPriorityList.vue";
@@ -256,8 +258,7 @@ const showConfirmDialog = ref({
   message: "",
   onConfirm: () => {},
 });
-const isDirty = ref(false);
-const initialData = ref(null);
+
 const isEditingHolidayList = ref(false);
 
 provide("isEditingHolidayList", isEditingHolidayList);
@@ -275,7 +276,10 @@ const routes = computed(() => [
 ]);
 
 const goBack = () => {
-  router.push({ name: "SLAPolicies" });
+  router.push({ name: "SLAPolicies" }).then(() => {
+    resetSlaData();
+    resetSlaDataErrors();
+  });
 };
 
 const saveSla = () => {
@@ -317,7 +321,7 @@ const createSla = () => {
     },
     onSuccess(data) {
       toast.success("SLA policy created");
-      isDirty.value = false;
+      isSlaDataDirty.value = false;
       router.push({ name: "EditSLAPolicy", params: { id: data.name } });
       updateOnboardingStep("setup_sla", true);
     },
@@ -350,12 +354,12 @@ watch(
   slaData,
   (newVal) => {
     // Set initial data when all the state changes are done
-    if (!initialData.value && slaData.value.priorities.length > 0) {
-      initialData.value = JSON.stringify(newVal);
+    if (!slaInitialData.value && slaData.value.priorities.length > 0) {
+      slaInitialData.value = JSON.stringify(newVal);
       return;
     }
-    if (!initialData.value) return;
-    isDirty.value = JSON.stringify(newVal) != initialData.value;
+    if (!slaInitialData.value) return;
+    isSlaDataDirty.value = JSON.stringify(newVal) != slaInitialData.value;
   },
   { deep: true }
 );
@@ -390,7 +394,7 @@ const confirmLeave = () => {
 };
 
 onBeforeRouteLeave(async (to, from, next) => {
-  if (isDirty.value) {
+  if (isSlaDataDirty.value && !isEditingHolidayList.value) {
     const confirmed = await confirmLeave();
     if (confirmed) {
       next();
@@ -400,14 +404,6 @@ onBeforeRouteLeave(async (to, from, next) => {
   } else {
     next();
   }
-});
-
-onMounted(() => {
-  resetSlaData();
-});
-
-onUnmounted(() => {
-  resetSlaDataErrors();
 });
 </script>
 

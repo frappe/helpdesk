@@ -249,6 +249,7 @@ import { computed, provide } from "vue";
 import SettingsHeader from "../components/SettingsHeader.vue";
 import {
   isSlaDataDirty,
+  resetSlaData,
   resetSlaDataErrors,
   slaData,
   slaDataErrors,
@@ -347,7 +348,10 @@ const routes = computed(() => [
 ]);
 
 const goBack = () => {
-  router.push({ name: "SLAPolicies" });
+  router.push({ name: "SLAPolicies" }).then(() => {
+    resetSlaData();
+    resetSlaDataErrors();
+  });
 };
 
 const saveSla = () => {

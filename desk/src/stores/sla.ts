@@ -78,6 +78,8 @@ export const resetSlaData = () => {
     condition: [],
     condition_json: [],
   };
+  isSlaDataDirty.value = false;
+  slaInitialData.value = null;
 };
 
 export const slaActiveScreen = ref<{
