@@ -102,7 +102,7 @@
           >
           <span class="text-p-sm text-ink-gray-6">{{
             __(
-              "The ticket status will automatically change whenever the agentrespond to a ticket."
+              "The ticket status will automatically change whenever the agent respond to a ticket."
             )
           }}</span>
         </div>
