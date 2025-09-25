@@ -24,9 +24,15 @@ after_migrate = [
     "helpdesk.search.download_corpus",
 ]
 
+# Full Text Search
+# ------------------
+
+sqlite_search = ["helpdesk.search_sqlite.HelpdeskSearch"]
+
 scheduler_events = {
     "all": [
         "helpdesk.search.build_index_if_not_exists",
+        "helpdesk.search_sqlite.build_index_if_not_exists",
         "helpdesk.search.download_corpus",
     ],
     "daily": [
@@ -56,6 +62,12 @@ doc_events = {
     },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
+    },
+    "HD Ticket": {
+        "on_trash": [
+            "helpdesk.search.remove_doc",
+            "helpdesk.search_sqlite.delete_doc_index",
+        ],
     },
 }
 
