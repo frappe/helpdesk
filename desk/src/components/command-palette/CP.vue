@@ -8,7 +8,7 @@
               <LucideSearch class="h-4 w-4" />
             </div>
             <ComboboxInput
-              placeholder="Search"
+              placeholder="Search tickets, emails, comments, or #234 to navigate to ticket"
               class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-gray-800 placeholder:text-gray-500 focus:ring-0"
               autocomplete="off"
               @input="onInput"
@@ -63,7 +63,7 @@ import { Dialog } from "frappe-ui";
 import { computed, h, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import LucideBookOpen from "~icons/lucide/book-open";
-import LucideSearch from "~icons/lucide/file-search";
+
 import LucideTicket from "~icons/lucide/ticket";
 import CPGroup from "./CPGroup.vue";
 const router = useRouter();
@@ -115,7 +115,7 @@ const fullSearchItem = computed(() => ({
   items: [
     {
       title: `Search for "${query.value}"`,
-      icon: () => h(LucideSearch),
+      icon: () => h(LucideFileSearch),
       route: { name: "SearchAgent", query: { q: query.value } },
     },
   ],
