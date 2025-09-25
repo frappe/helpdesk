@@ -587,14 +587,6 @@ class HDTicket(Document):
         communication.insert(ignore_permissions=True)
         capture_event("agent_replied")
 
-        if skip_email_workflow or not frappe.db.get_single_value(
-            "HD Settings", "enable_reply_email_via_agent"
-        ):
-            return
-
-        if not sender_email:
-            frappe.throw(_("Can not send email. No sender email set up!"))
-
         _attachments = []
 
         for attachment in attachments:
@@ -605,6 +597,14 @@ class HDTicket(Document):
             self.attach_file_with_doc("HD Ticket", self.name, file_doc.file_url)
 
             _attachments.append({"file_url": file_doc.file_url})
+
+        if skip_email_workflow or not frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        ):
+            return
+
+        if not sender_email:
+            frappe.throw(_("Can not send email. No sender email set up!"))
 
         message = self.parse_content(message)
 
