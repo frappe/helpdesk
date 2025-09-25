@@ -32,7 +32,7 @@
             <span class="text-ink-gray-7">
               {{
                 selectedCount === 1
-                  ? selectedOptions[0].label
+                  ? selectedOptions[0]?.label
                   : `${selectedCount} ${selectionText}`
               }}
             </span>
