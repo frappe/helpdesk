@@ -341,8 +341,8 @@ const priorityFilterOptions = computed(() => {
 const doctypesFilterOptions = computed(() => {
   return [
     { value: "HD Ticket", label: "Tickets", count: 0 },
-    { value: "HD Ticket Comment", label: "Comments", count: 0 },
     { value: "Communication", label: "Emails", count: 0 },
+    { value: "HD Ticket Comment", label: "Comments", count: 0 },
   ];
 });
 
