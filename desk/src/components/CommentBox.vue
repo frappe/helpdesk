@@ -165,6 +165,7 @@ const deleteComment = createResource({
   }),
   onSuccess() {
     emit("update");
+    showDialog.value = false;
     toast.success("Comment deleted");
   },
 });
