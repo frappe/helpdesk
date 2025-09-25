@@ -130,6 +130,7 @@ import { CannedResponseModal } from "@/components/canned-response/";
 import { dayjs } from "@/dayjs";
 import { useUserStore } from "@/stores/user";
 import { dateFormat, dateTooltipFormat } from "@/utils";
+import { watchDebounced } from "@vueuse/core";
 import {
   Breadcrumbs,
   Dropdown,
@@ -139,7 +140,7 @@ import {
   createListResource,
   usePageMeta,
 } from "frappe-ui";
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { useRoute } from "vue-router";
 import EmptyState from "../components/EmptyState.vue";
 
@@ -166,14 +167,21 @@ const cannedResponses = createListResource({
 });
 
 // reload responses when search query changes
-watch(searchQuery, (newValue) => {
-  cannedResponses.update({
-    orFilters: newValue
-      ? { message: ["like", `%${newValue}%`], title: ["like", `%${newValue}%`] }
-      : {},
-  });
-  cannedResponses.reload();
-});
+watchDebounced(
+  searchQuery,
+  (newValue) => {
+    cannedResponses.update({
+      orFilters: newValue
+        ? {
+            message: ["like", `%${newValue}%`],
+            title: ["like", `%${newValue}%`],
+          }
+        : {},
+    });
+    cannedResponses.reload();
+  },
+  { debounce: 300 }
+);
 
 function editItem(cannedResponse) {
   title.value = cannedResponse.title;
