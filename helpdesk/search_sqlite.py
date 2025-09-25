@@ -2,7 +2,6 @@
 # MIT License. See license.txt
 
 import frappe
-from frappe import _
 from frappe.search.sqlite_search import SQLiteSearch, SQLiteSearchIndexMissingError
 
 
@@ -54,7 +53,6 @@ class HelpdeskSearch(SQLiteSearch):
         "Communication": {
             "fields": [
                 "name",
-                {"title": "subject"},
                 "content",
                 "modified",
                 "reference_doctype",
@@ -127,17 +125,17 @@ class HelpdeskSearch(SQLiteSearch):
 
         # Query the search index for available options
         sql = """
-            SELECT
-                agent_group,
-                status,
-                priority,
-                customer,
-                doctype,
-                COUNT(*) as count
-            FROM search_fts
-            WHERE (name IN ({placeholders}) OR reference_name IN ({placeholders}) OR reference_ticket IN ({placeholders}))
-            GROUP BY agent_group, status, priority, customer, doctype
-        """.format(
+			SELECT
+				agent_group,
+				status,
+				priority,
+				customer,
+				doctype,
+				COUNT(*) as count
+			FROM search_fts
+			WHERE (name IN ({placeholders}) OR reference_name IN ({placeholders}) OR reference_ticket IN ({placeholders}))
+			GROUP BY agent_group, status, priority, customer, doctype
+		""".format(
             placeholders=",".join(["?" for _ in accessible_tickets])
         )
 
@@ -184,99 +182,3 @@ def build_index():
     """Build search index - called by background job."""
     search = HelpdeskSearch()
     search.build_index()
-
-
-def build_index_in_background():
-    """Build index in background if not already in progress."""
-    if not frappe.cache().get_value("helpdesk_sqlite_search_indexing_in_progress"):
-        frappe.enqueue(build_index, queue="long")
-
-
-def build_index_if_not_exists():
-    """Build index if it doesn't exist."""
-    search = HelpdeskSearch()
-    if not search.index_exists():
-        build_index_in_background()
-
-
-def update_doc_index(doc, method=None):
-    """Update search index when document is created/updated."""
-    search = HelpdeskSearch()
-    if search.is_search_enabled() and search.index_exists():
-        document = search.prepare_document(doc)
-        if document:
-            search._index_documents([document])
-
-
-def delete_doc_index(doc, method=None):
-    """Remove document from search index when deleted."""
-    search = HelpdeskSearch()
-    if search.is_search_enabled() and search.index_exists():
-        doc_id = f"{doc.doctype}:{doc.name}"
-        try:
-            conn = search._get_connection()
-            cursor = conn.cursor()
-            cursor.execute("DELETE FROM search_fts WHERE doc_id = ?", (doc_id,))
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            frappe.log_error(f"Failed to delete document from search index: {e}")
-
-
-# Migration utilities
-@frappe.whitelist()
-def migrate_to_sqlite_search():
-    """Admin-only migration from Redis to SQLite search"""
-    if not frappe.has_permission("HD Settings", "write"):
-        frappe.throw(_("Insufficient permissions"))
-
-    # Build SQLite index
-    frappe.enqueue(build_index, queue="long")
-
-    return {"message": "SQLite search index build started"}
-
-
-@frappe.whitelist()
-def get_search_status():
-    """Get status of both search systems"""
-    search = HelpdeskSearch()
-
-    # Check SQLite search status
-    sqlite_status = {
-        "enabled": search.is_search_enabled(),
-        "exists": search.index_exists(),
-        "documents": 0,
-    }
-
-    if sqlite_status["exists"]:
-        try:
-            result = search.sql(
-                "SELECT COUNT(*) as count FROM search_fts", read_only=True
-            )
-            sqlite_status["documents"] = result[0]["count"] if result else 0
-        except Exception:
-            sqlite_status["documents"] = 0
-
-    # Check Redis search status
-    redis_status = {"exists": False, "documents": 0}
-    try:
-        from helpdesk.search import HelpdeskSearch as RedisSearch
-
-        redis_search = RedisSearch()
-        redis_status["exists"] = redis_search.index_exists()
-        if redis_status["exists"]:
-            redis_status["documents"] = redis_search.num_records()
-    except Exception:
-        pass
-
-    return {"sqlite": sqlite_status, "redis": redis_status}
-
-
-@frappe.whitelist()
-def rebuild_sqlite_index():
-    """Rebuild SQLite search index - admin only"""
-    if not frappe.has_permission("HD Settings", "write"):
-        frappe.throw(_("Insufficient permissions"))
-
-    frappe.enqueue(build_index, queue="long")
-    return {"message": "SQLite search index rebuild started"}

@@ -77,6 +77,14 @@
               placeholder="Type"
               label="Type"
             />
+            <Button
+              v-if="hasActiveFilters()"
+              size="sm"
+              class="ml-auto text-ink-gray-5"
+              variant="gray-ghost"
+              @click="clearFilters"
+              label="Clear all filters"
+            />
           </div>
         </div>
 
@@ -193,7 +201,9 @@
 </template>
 
 <script setup lang="ts">
+import { LayoutHeader } from "@/components";
 import SearchMultiSelect from "@/components/SearchMultiSelect.vue";
+import dayjs from "dayjs";
 import {
   Breadcrumbs,
   createResource,
@@ -203,15 +213,8 @@ import {
 } from "frappe-ui";
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-// import { vFocus } from "@/directives";
 
 // Icons
-import { LayoutHeader } from "@/components";
-import LucideMail from "~icons/lucide/mail";
-import LucideMessageSquare from "~icons/lucide/message-square";
-import LucideSearch from "~icons/lucide/search";
-import LucideTicket from "~icons/lucide/ticket";
-import LucideX from "~icons/lucide/x";
 
 // Type Definitions
 interface SearchSummary {
@@ -267,6 +270,9 @@ interface FilterOptions {
   doctypes: Record<string, number>;
 }
 
+// Constants and Configuration
+const STORAGE_KEY_PREFIX = "helpdesk_search:";
+
 // Reactive State
 const query = ref("");
 const searchResponse = ref<SearchResponse | null>(null);
@@ -293,6 +299,9 @@ const search = createResource({
   onSuccess(response) {
     searchResponse.value = response;
     newSearch.value = false;
+    if (query.value) {
+      saveSearchState(query.value, response);
+    }
   },
 });
 
@@ -362,8 +371,16 @@ function clearSearch() {
   query.value = "";
   searchResponse.value = null;
   newSearch.value = true;
+  clearStoredSearches();
   // Clear the URL query parameter
   router.replace({ name: "SearchAgent" });
+}
+
+function clearFilters() {
+  activeFilters.value = {};
+  if (query.value.length > 2) {
+    debouncedSubmit();
+  }
 }
 
 function hasActiveFilters() {
@@ -427,18 +444,59 @@ function getTicketNumber(item: SearchResultItem) {
 
 function formatDate(date: number | string) {
   if (!date) return "";
+  let FORMAT = "MMM D, YYYY hh:mm A";
   try {
-    const dateObj =
-      typeof date === "number" ? new Date(date * 1000) : new Date(date);
-    return dateObj.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    // Handle Unix timestamp (seconds) - use dayjs.unix()
+    if (typeof date === "number") {
+      return dayjs.unix(date).format(FORMAT);
+    }
+    // Handle string dates
+    return dayjs(date).format(FORMAT);
   } catch (error) {
     return "";
+  }
+}
+
+// Search State Persistence
+function getStorageKey(query: string) {
+  return `${STORAGE_KEY_PREFIX}${query}`;
+}
+
+function loadSearchState(searchQuery: string) {
+  const saved = localStorage.getItem(getStorageKey(searchQuery));
+  if (saved) {
+    const state = JSON.parse(saved);
+    // Check if stored result is less than 30 minutes old
+    if (Date.now() - state.timestamp < 30 * 60 * 1000) {
+      searchResponse.value = state.results;
+      // Restore active filters if they exist
+      if (state.filters) {
+        activeFilters.value = state.filters;
+      }
+      newSearch.value = false;
+      return true;
+    }
+    // Remove expired results
+    localStorage.removeItem(getStorageKey(searchQuery));
+  }
+  return false;
+}
+
+function saveSearchState(searchQuery: string, results: SearchResponse) {
+  const state = {
+    results,
+    filters: activeFilters.value,
+    timestamp: Date.now(),
+  };
+  localStorage.setItem(getStorageKey(searchQuery), JSON.stringify(state));
+}
+
+function clearStoredSearches() {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(STORAGE_KEY_PREFIX)) {
+      localStorage.removeItem(key);
+    }
   }
 }
 
@@ -471,9 +529,14 @@ function addFocusShortcut() {
 
 // Lifecycle
 onMounted(() => {
-  if (route.query.q && typeof route.query.q === "string") {
-    query.value = route.query.q;
-    submit();
+  const searchQuery = route.query.q as string;
+  if (searchQuery) {
+    query.value = searchQuery;
+    if (!loadSearchState(searchQuery)) {
+      submit();
+    }
+  } else {
+    clearStoredSearches();
   }
   // add a shortcut when presses "/" focus on this element
   addFocusShortcut();
