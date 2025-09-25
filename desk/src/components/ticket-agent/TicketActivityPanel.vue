@@ -13,6 +13,12 @@
             communicationAreaRef.replyToEmail(e);
           }
         "
+        @update="
+          () => {
+            activities.reload();
+            ticketAgentActivitiesRef.scrollToLatestActivity();
+          }
+        "
       />
       <div v-else class="flex items-center justify-center flex-col mt-20">
         <LoadingIndicator :scale="8" class="text-ink-gray-5" />
@@ -47,6 +53,7 @@ import {
   EmailIcon,
   PhoneIcon,
 } from "@/components/icons";
+import { useTelephonyStore } from "@/stores/telephony";
 import {
   ActivitiesSymbol,
   FeedbackActivity,
@@ -55,10 +62,9 @@ import {
   TicketTab,
 } from "@/types";
 import { LoadingIndicator, TabList, TabPanel, Tabs } from "frappe-ui";
+import { storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
-import { useTelephonyStore } from "@/stores/telephony";
-import { storeToRefs } from "pinia";
 
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);

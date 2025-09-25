@@ -121,7 +121,7 @@ import { TicketActivity } from "@/types";
 import { isElementInViewport } from "@/utils";
 import { Avatar, FeatherIcon } from "frappe-ui";
 import { PropType, Ref, computed, h, inject, nextTick, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
 
 const props = defineProps({
@@ -142,6 +142,7 @@ const props = defineProps({
 const emit = defineEmits(["email:reply", "update"]);
 
 const route = useRoute();
+const router = useRouter();
 
 const { getUser } = useUserStore();
 const communicationAreaRef: Ref = inject("communicationArea");
@@ -206,6 +207,7 @@ function scrollToHash() {
           // Remove highlight after 2 seconds
           setTimeout(() => {
             element.classList.remove("bg-yellow-100");
+            router.replace({ hash: "" });
           }, 2000);
         }
       }, 1000);
