@@ -101,8 +101,6 @@ type TicketUpdateData = {
 };
 
 onMounted(() => {
-  // startViewing(props.ticketId);
-
   ticketsToNavigate.update({
     params: {
       ticket: props.ticketId,
