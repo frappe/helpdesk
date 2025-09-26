@@ -2,17 +2,15 @@ import { useAuthStore } from "@/stores/auth";
 import { Notification, Resource } from "@/types";
 import { createListResource, createResource } from "frappe-ui";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 export const useNotificationStore = defineStore("notification", () => {
   const authStore = useAuthStore();
+
   const visible = ref(false);
   const resource: Resource<Array<Notification>> = createListResource({
     doctype: "HD Notification",
     cache: "Notifications",
-    filters: {
-      user_to: ["=", authStore.userId],
-    },
     fields: [
       "creation",
       "name",
@@ -24,7 +22,6 @@ export const useNotificationStore = defineStore("notification", () => {
       "user_to",
     ],
     orderBy: "creation desc",
-    auto: authStore.hasDeskAccess,
   });
   const clear = createResource({
     url: "helpdesk.helpdesk.doctype.hd_notification.utils.clear",
@@ -50,6 +47,18 @@ export const useNotificationStore = defineStore("notification", () => {
     visible.value = !visible.value;
   }
 
+  watch(
+    () => authStore.hasDeskAccess,
+    (newVal) => {
+      if (!newVal) return;
+      resource.filters = {
+        user_to: ["=", authStore.userId],
+      };
+      resource.reload();
+    },
+    { immediate: true }
+  );
+
   return {
     clear,
     data,
@@ -57,5 +66,6 @@ export const useNotificationStore = defineStore("notification", () => {
     read,
     unread,
     visible,
+    resource,
   };
 });
