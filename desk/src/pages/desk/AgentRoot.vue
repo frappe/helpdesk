@@ -22,10 +22,24 @@ const DesktopLayout = defineAsyncComponent(
   () => import("@/components/layouts/DesktopLayout.vue")
 );
 
+const SettingsLayoutDesktop = defineAsyncComponent(
+  () => import("@/components/layouts/Settings/SettingsLayoutDesktop.vue")
+);
+
+const SettingsLayoutMobile = defineAsyncComponent(
+  () => import("@/components/layouts/Settings/SettingsLayoutMobile.vue")
+);
+
 const Layout = computed(() => {
   if (isMobileView.value) {
+    if (router.currentRoute.value.path.includes("/settings")) {
+      return SettingsLayoutMobile;
+    }
     return MobileLayout;
   } else {
+    if (router.currentRoute.value.path.includes("/settings")) {
+      return SettingsLayoutDesktop;
+    }
     return DesktopLayout;
   }
 });

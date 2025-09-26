@@ -9,6 +9,7 @@ def get_user():
     filters = {"name": current_user}
     fields = [
         "first_name",
+        "last_name",
         "full_name",
         "name",
         "user_image",
@@ -27,6 +28,7 @@ def get_user():
     has_desk_access = is_agent or is_admin
     user_image = user.user_image
     user_first_name = user.first_name
+    user_last_name = user.last_name
     user_name = user.full_name
     user_id = user.name
     username = user.username
@@ -40,6 +42,7 @@ def get_user():
         "is_manager": is_manager,
         "user_image": user_image,
         "user_first_name": user_first_name,
+        "user_last_name": user_last_name,
         "user_name": user_name,
         "username": username,
         "time_zone": user.time_zone,

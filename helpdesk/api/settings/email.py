@@ -46,6 +46,7 @@ def create_email_account(data):
 
         # if correct credentials, save the email account
         email_doc.save()
+        return email_doc
     except Exception as e:
         frappe.throw(str(e))
 
