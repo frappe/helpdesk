@@ -889,6 +889,9 @@ class HDTicket(Document):
                 self.status = self.default_open_status
         # If communication is outgoing, it must be a reply from agent
         if c.sent_or_received == "Sent":
+            # Ignore system notifications
+            if c.communication_type and c.communication_type == "Automated Message":
+                return
             # Set first response date if not set already
             self.first_responded_on = (
                 self.first_responded_on or frappe.utils.now_datetime()
