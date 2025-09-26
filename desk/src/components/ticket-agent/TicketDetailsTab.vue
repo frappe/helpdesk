@@ -147,8 +147,8 @@ function getFieldInFormat(fieldTemplate, fieldMeta) {
     placeholder:
       fieldTemplate.placeholder ||
       `Enter ${fieldMeta?.label || fieldTemplate.fieldname}`,
-    readonly: Boolean(fieldMeta.readonly),
-    disabled: Boolean(fieldMeta.readonly),
+    readonly: Boolean(fieldMeta.read_only),
+    disabled: Boolean(fieldMeta.read_only),
     url_method: fieldTemplate.url_method || "",
     fieldname: fieldTemplate.fieldname,
     required: fieldTemplate.required || fieldMeta?.required || false,
