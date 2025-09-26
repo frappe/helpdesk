@@ -23,6 +23,8 @@ class HDTicketFeedbackOption(Document):
             frappe.throw(_("Rating must be between 0.2 and 1.0"))
 
     def validate_one_enabled_option(self):
+        if self.is_new():
+            return
         if not self.has_value_changed("disabled") and self.disabled == 1:
             return
 
