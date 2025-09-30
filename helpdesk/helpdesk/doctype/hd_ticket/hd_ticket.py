@@ -85,7 +85,6 @@ class HDTicket(Document):
 
     def validate(self):
         self.validate_feedback()
-        self.validate_ticket_type()
 
     def before_save(self):
         self.apply_sla()
@@ -110,7 +109,6 @@ class HDTicket(Document):
         )
 
     def handle_email_feedback(self):
-
         if (
             self.is_new()
             or self.via_customer_portal
@@ -196,7 +194,6 @@ class HDTicket(Document):
                 self.get_doc_before_save()
                 and self.get_doc_before_save().status_category != "Open"
             ):
-
                 agents = self.get_assigned_agents()
                 if agents:
                     for agent in agents:
@@ -288,11 +285,6 @@ class HDTicket(Document):
             return
         feedback_option = frappe.get_doc("HD Ticket Feedback Option", self.feedback)
         self.feedback_rating = feedback_option.rating
-
-    def validate_ticket_type(self):
-        settings = frappe.get_doc("HD Settings")
-        if settings.is_ticket_type_mandatory and not self.ticket_type:
-            frappe.throw(_("Ticket type is mandatory"))
 
     @property
     def has_agent_replied(self):
@@ -436,7 +428,6 @@ class HDTicket(Document):
         if hasattr(self, "_assign") and self._assign:
             assignees = json.loads(self._assign)
             if len(assignees) > 0:
-
                 # TODO: temporary fix, remove this when only agents can be assigned to ticket
                 exists = frappe.db.exists("HD Agent", assignees[0])
                 if exists:
@@ -661,7 +652,6 @@ class HDTicket(Document):
     def create_communication_via_contact(
         self, message, attachments=[], new_ticket=False
     ):
-
         if not new_ticket and frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_to_agent"
         ):
@@ -758,7 +748,6 @@ class HDTicket(Document):
             frappe.throw(_(e))
 
     def send_acknowledgement_email(self):
-
         acknowledgement_email_content = frappe.db.get_single_value(
             "HD Settings", "acknowledgement_email_content"
         )
@@ -1114,7 +1103,6 @@ class HDTicket(Document):
 # permission checks which is not possible with standard permission system. This function
 # is being called from hooks. `doc` is the ticket to check against
 def has_permission(doc, user=None):
-
     if not user:
         user = frappe.session.user
 
@@ -1158,7 +1146,6 @@ def has_permission(doc, user=None):
 # Custom perms for list query. Only the `WHERE` part
 # https://frappeframework.com/docs/user/en/python-api/hooks#modify-list-query
 def permission_query(user):
-
     if not user:
         user = frappe.session.user
     if is_admin(user):

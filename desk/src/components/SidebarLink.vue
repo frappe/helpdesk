@@ -33,18 +33,19 @@
       <Icon v-if="typeof icon === 'string'" :icon="icon" class="h-4 w-4" />
       <component :is="icon" v-else class="h-4 w-4" />
     </span>
-
-    <div
-      class="-all ml-2 flex shrink-0 grow items-center justify-between text-sm duration-300 ease-in-out"
-      :class="{
-        'opacity-100': isExpanded,
-        'opacity-0': !isExpanded,
-        '-z-50': !isExpanded,
-      }"
-    >
-      {{ label }}
-      <slot name="right" />
-    </div>
+    <slot name="label">
+      <div
+        class="-all ml-2 flex shrink-0 grow items-center justify-between text-sm duration-300 ease-in-out"
+        :class="{
+          'opacity-100': isExpanded,
+          'opacity-0': !isExpanded,
+          '-z-50': !isExpanded,
+        }"
+      >
+        {{ label }}
+        <slot name="right" />
+      </div>
+    </slot>
   </div>
 </template>
 

@@ -15,18 +15,18 @@
             <div class="group relative !size-14">
               <Avatar
                 class="!size-14"
-                :image="profile.user_image"
-                :label="profile.full_name"
+                :image="profile.userImage"
+                :label="profile.fullName"
               />
               <component
-                :is="profile.user_image ? Dropdown : 'div'"
+                :is="profile.userImage ? Dropdown : 'div'"
                 v-bind="
-                  profile.user_image
+                  profile.userImage
                     ? {
                         options: [
                           {
                             icon: 'upload',
-                            label: profile.user_image
+                            label: profile.userImage
                               ? __('Change image')
                               : __('Upload image'),
                             onClick: openFileSelector,
@@ -43,11 +43,7 @@
                 class="!absolute bottom-0 left-0 right-0"
               >
                 <div
-                  class="z-1 absolute bottom-0 left-0 right-0 flex h-9 cursor-pointer items-center justify-center rounded-b-full bg-black bg-opacity-40 pt-3 opacity-0 duration-300 ease-in-out group-hover:opacity-100"
-                  style="
-                    -webkit-clip-path: inset(12px 0 0 0);
-                    clip-path: inset(12px 0 0 0);
-                  "
+                  class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full bg-black bg-opacity-40 opacity-0 duration-300 ease-in-out group-hover:opacity-100 !size-14"
                 >
                   <CameraIcon class="size-4 cursor-pointer text-white" />
                 </div>
@@ -66,20 +62,18 @@
           </div>
         </template>
       </FileUploader>
-      <Button
-        icon-left="lock"
-        label="Change Password"
-        @click="showChangePasswordModal = true"
-      />
     </div>
+
     <hr class="my-6" />
     <div>
       <div class="flex items-center justify-between">
-        <div class="text-lg font-semibold text-ink-gray-9">Account info</div>
+        <div class="text-lg font-semibold text-ink-gray-9">
+          Account info & security
+        </div>
         <Button
           label="Save"
-          @click="setUser.submit()"
-          :loading="setUser.loading"
+          @click="setAgent.submit()"
+          :loading="setAgent.loading"
           :disabled="!isAccountInfoDirty"
         />
       </div>
@@ -87,12 +81,25 @@
         <FormControl
           class="w-full"
           label="First Name"
-          v-model="profile.user_first_name"
+          v-model="profile.firstName"
         />
         <FormControl
           class="w-full"
           label="Last Name"
-          v-model="profile.user_last_name"
+          v-model="profile.lastName"
+        />
+      </div>
+      <div class="flex items-center justify-between mt-6">
+        <div class="flex flex-col gap-1">
+          <span class="text-base font-medium text-ink-gray-8">Password</span>
+          <span class="text-p-sm text-ink-gray-6"
+            >Change your account password for security.</span
+          >
+        </div>
+        <Button
+          icon-left="lock"
+          label="Change Password"
+          @click="showChangePasswordModal = true"
         />
       </div>
     </div>
@@ -104,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import SettingsHeader from "../components/SettingsHeader.vue";
 import {
   Avatar,
@@ -121,18 +128,19 @@ import CameraIcon from "~icons/lucide/camera";
 
 const auth = useAuthStore();
 const profile = ref({
-  full_name: auth.userName,
-  user_image: auth.userImage,
-  user_first_name: auth.userFirstName,
-  user_last_name: auth.userLastName,
-  email: auth.userId,
+  fullName: auth.userName,
+  userImage: auth.userImage,
+  firstName: auth.userFirstName,
+  lastName: auth.userLastName,
 });
 const showChangePasswordModal = ref(false);
 
 const isAccountInfoDirty = computed(() => {
+  const agentName = agentData.data?.agent_name?.split(" ");
+  if (!agentName) return false;
   return (
-    profile.value.user_first_name !== auth.userFirstName ||
-    profile.value.user_last_name !== auth.userLastName
+    profile.value.firstName !== agentName[0] ||
+    profile.value.lastName !== agentName[1]
   );
 });
 
@@ -143,37 +151,41 @@ const routes = computed(() => [
   },
 ]);
 
-const setUser = createResource({
+const agentData = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_agent.hd_agent.get_agent",
+  auto: true,
+  onSuccess: (data) => {
+    const fullName = data.agent_name.split(" ");
+    profile.value = {
+      fullName: data.agent_name,
+      firstName: fullName[0],
+      lastName: fullName[1] || "",
+      userImage: data.user_image,
+    };
+  },
+});
+
+const setAgent = createResource({
   url: "frappe.client.set_value",
   makeParams() {
     return {
-      doctype: "User",
+      doctype: "HD Agent",
       name: auth.user,
       fieldname: {
-        user_image: profile.value.user_image,
-        first_name: profile.value.user_first_name,
-        last_name: profile.value.user_last_name,
+        agent_name: `${profile.value.firstName} ${profile.value.lastName}`,
+        user_image: profile.value.userImage,
       },
     };
   },
   onSuccess: () => {
     auth.reloadUser();
+    agentData.reload();
     toast.success(__("Profile updated"));
   },
 });
 
 const updateImage = (file: string | null) => {
-  profile.value.user_image = file;
-  setUser.submit();
+  profile.value.userImage = file;
+  setAgent.submit();
 };
-
-onMounted(() => {
-  profile.value = {
-    full_name: auth.userName,
-    user_image: auth.userImage,
-    user_first_name: auth.userFirstName,
-    user_last_name: auth.userLastName,
-    email: auth.userId,
-  };
-});
 </script>

@@ -1,7 +1,36 @@
 <template>
   <SettingsHeader :routes="routes" />
-  <div class="max-w-3xl xl:max-w-4xl mx-auto w-full p-4 lg:py-8">
+  <div
+    class="max-w-3xl xl:max-w-4xl mx-auto w-full px-4 relative flex flex-col-reverse pb-6"
+  >
     <div class="flex flex-col gap-6">
+      <!-- Body -->
+      <div class="w-full flex-1 flex flex-col gap-8">
+        <!-- Field Selection -->
+        <FieldDependencyFieldsSelection
+          v-model="state"
+          :is-new="isNew"
+          :parent-fields="parentFields"
+        />
+
+        <div class="flex flex-col gap-8 overflow-y-scroll">
+          <!-- Value Selection -->
+          <FieldDependencyValueSelection
+            v-model="state"
+            :is-new="isNew"
+            :parent-fields="parentFields"
+          />
+
+          <!-- Criteria selection -->
+          <FieldDependencyCriteria
+            :parent-field-values="state.parentFieldValues"
+            v-model="fieldCriteriaState"
+            v-model:selections="state"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="bg-white py-4 lg:py-8 sticky top-0">
       <SettingsLayoutHeader>
         <template #title>
           <div class="flex items-center gap-2">
@@ -41,31 +70,6 @@
           </div>
         </template>
       </SettingsLayoutHeader>
-      <!-- Body -->
-      <div class="w-full flex-1 flex flex-col gap-8">
-        <!-- Field Selection -->
-        <FieldDependencyFieldsSelection
-          v-model="state"
-          :is-new="isNew"
-          :parent-fields="parentFields"
-        />
-
-        <div class="flex flex-col gap-8 overflow-y-scroll">
-          <!-- Value Selection -->
-          <FieldDependencyValueSelection
-            v-model="state"
-            :is-new="isNew"
-            :parent-fields="parentFields"
-          />
-
-          <!-- Criteria selection -->
-          <FieldDependencyCriteria
-            :parent-field-values="state.parentFieldValues"
-            v-model="fieldCriteriaState"
-            v-model:selections="state"
-          />
-        </div>
-      </div>
     </div>
   </div>
 </template>

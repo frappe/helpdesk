@@ -19,7 +19,7 @@
     </div>
     <div class="flex justify-between items-center pr-2">
       <div>
-        <Dropdown placement="right" :options="dropdownOptions">
+        <Dropdown :options="dropdownOptions">
           <Button
             icon="more-horizontal"
             variant="ghost"

@@ -37,7 +37,7 @@
           </div>
         </div>
         <div class="flex justify-end">
-          <Dropdown placement="right" :options="dropdownOptions(holiday)">
+          <Dropdown :options="dropdownOptions(holiday)">
             <Button
               icon="more-horizontal"
               variant="ghost"

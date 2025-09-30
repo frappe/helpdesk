@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="flex justify-end">
-      <Dropdown placement="right" :options="dropdownOptions">
+      <Dropdown :options="dropdownOptions">
         <Button
           icon="more-horizontal"
           variant="ghost"

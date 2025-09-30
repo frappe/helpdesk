@@ -87,6 +87,7 @@
           theme="gray"
           variant="outline"
           :disabled="addEmailRes.loading"
+          @click="router.push({ name: 'EmailAccounts' })"
         />
         <Button
           label="Create"

@@ -1,41 +1,11 @@
 <template>
   <div ref="scrollToTopRef" />
   <SettingsHeader :routes="routes" />
-  <div class="w-full max-w-3xl xl:max-w-4xl mx-auto p-4 lg:py-8">
-    <div
-      v-if="!holidayData.loading"
-      class="flex items-center justify-between bg-white pb-6"
-    >
-      <div class="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="holidayData?.holiday_list_name || 'New Business Holiday'"
-          size="md"
-          @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70 !pr-0 max-w-48 md:max-w-60 lg:max-w-max overflow-ellipsis overflow-hidden"
-        />
-        <Badge
-          :variant="'subtle'"
-          :theme="'orange'"
-          size="sm"
-          label="Unsaved changes"
-          v-if="isDirty"
-        />
-      </div>
-      <div class="flex gap-2 items-center">
-        <Button
-          label="Save"
-          theme="gray"
-          variant="solid"
-          @click="saveHoliday()"
-          :disabled="Boolean(!isDirty)"
-        />
-      </div>
-    </div>
-
+  <div
+    class="max-w-3xl xl:max-w-4xl mx-auto w-full px-4 relative flex flex-col-reverse pb-6"
+  >
     <div v-if="!holidayData.loading">
-      <div class="flex items-center gap-2 mt-2">
+      <div class="flex items-center gap-2">
         <span class="text-sm">
           There are in total <b>{{ holidayData.holidays.length }}</b> holidays
           in this list</span
@@ -186,6 +156,37 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <div
+      v-if="!holidayData.loading"
+      class="flex items-center justify-between bg-white py-4 lg:py-8 sticky top-0"
+    >
+      <div class="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          icon-left="chevron-left"
+          :label="holidayData?.holiday_list_name || 'New Business Holiday'"
+          size="md"
+          @click="goBack()"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70 !pr-0 max-w-48 md:max-w-60 lg:max-w-max overflow-ellipsis overflow-hidden"
+        />
+        <Badge
+          :variant="'subtle'"
+          :theme="'orange'"
+          size="sm"
+          label="Unsaved changes"
+          v-if="isDirty"
+        />
+      </div>
+      <div class="flex gap-2 items-center">
+        <Button
+          label="Save"
+          theme="gray"
+          variant="solid"
+          @click="saveHoliday()"
+          :disabled="Boolean(!isDirty)"
+        />
       </div>
     </div>
     <AddHolidayModal v-model="dialog" />

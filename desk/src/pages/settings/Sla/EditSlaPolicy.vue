@@ -1,46 +1,10 @@
 <template>
   <SettingsHeader :routes="routes" />
-  <div class="max-w-3xl xl:max-w-4xl mx-auto w-full p-4 lg:py-8">
+  <div
+    class="max-w-3xl xl:max-w-4xl mx-auto w-full px-4 relative flex flex-col-reverse pb-6"
+  >
     <div v-if="slaData.loading" class="flex items-center h-full justify-center">
       <LoadingIndicator class="w-4" />
-    </div>
-    <div v-if="!slaData.loading" class="bg-white pb-6">
-      <div class="flex flex-col sm:flex-row justify-between w-full gap-2">
-        <div class="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            icon-left="chevron-left"
-            :label="slaData.service_level || 'New SLA Policy'"
-            size="md"
-            @click="goBack()"
-            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70 !pr-0 max-w-48 md:max-w-60 lg:max-w-max overflow-ellipsis overflow-hidden"
-          />
-          <Badge
-            :variant="'subtle'"
-            :theme="'orange'"
-            size="sm"
-            label="Unsaved changes"
-            v-if="isSlaDataDirty"
-          />
-        </div>
-        <div class="flex gap-4 items-center justify-between">
-          <div
-            class="flex items-center justify-between gap-2 cursor-pointer flex-row-reverse"
-            @click="toggleEnabled"
-          >
-            <Switch size="sm" v-model="slaData.enabled" />
-            <span class="text-sm text-ink-gray-7 font-medium">Enabled</span>
-          </div>
-          <Button
-            label="Save"
-            theme="gray"
-            variant="solid"
-            @click="saveSla()"
-            :disabled="Boolean(!isSlaDataDirty)"
-            :loading="slaData.loading"
-          />
-        </div>
-      </div>
     </div>
     <div v-if="!slaData.loading">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -240,6 +204,46 @@
       </div>
       <hr class="my-8" />
       <SlaHolidays />
+    </div>
+    <div v-if="!slaData.loading" class="bg-white py-4 lg:py-8 sticky top-0">
+      <div
+        class="flex flex-col-reverse sm:flex-row justify-between w-full gap-2"
+      >
+        <div class="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            icon-left="chevron-left"
+            :label="slaData.service_level || 'New SLA Policy'"
+            size="md"
+            @click="goBack()"
+            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70 !pr-0 max-w-48 md:max-w-60 lg:max-w-max overflow-ellipsis overflow-hidden"
+          />
+          <Badge
+            :variant="'subtle'"
+            :theme="'orange'"
+            size="sm"
+            label="Unsaved changes"
+            v-if="isSlaDataDirty"
+          />
+        </div>
+        <div class="flex gap-4 items-center justify-between">
+          <div
+            class="flex items-center justify-between gap-2 cursor-pointer flex-row-reverse"
+            @click="toggleEnabled"
+          >
+            <Switch size="sm" v-model="slaData.enabled" />
+            <span class="text-sm text-ink-gray-7 font-medium">Enabled</span>
+          </div>
+          <Button
+            label="Save"
+            theme="gray"
+            variant="solid"
+            @click="saveSla()"
+            :disabled="Boolean(!isSlaDataDirty)"
+            :loading="slaData.loading"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>

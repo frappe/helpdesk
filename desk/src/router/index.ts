@@ -194,6 +194,15 @@ const routes = [
     },
   },
   {
+    path: "/settings/teams/new",
+    name: "NewSettingsTeam",
+    component: () => import("@/pages/settings/Teams/NewTeam.vue"),
+    props: true,
+    meta: {
+      auth: true,
+    },
+  },
+  {
     path: "/settings/teams/:id",
     name: "EditSettingsTeam",
     component: () => import("@/pages/settings/Teams/EditTeam.vue"),

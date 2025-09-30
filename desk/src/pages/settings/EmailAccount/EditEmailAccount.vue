@@ -66,6 +66,7 @@
           theme="gray"
           variant="outline"
           :disabled="loading"
+          @click="router.push({ name: 'EmailAccounts' })"
         />
         <div class="flex gap-2">
           <Button

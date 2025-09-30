@@ -37,7 +37,15 @@
                 :is-active="isActiveTab(item.to)"
                 :is-expanded="isExpanded"
                 @click="sidebarOpened = false"
-              />
+              >
+                <template #label>
+                  <div
+                    class="-all ml-2 flex shrink-0 grow items-center justify-between text-base duration-300 ease-in-out opacity-100"
+                  >
+                    {{ item.label }}
+                  </div>
+                </template>
+              </SidebarLink>
             </div>
           </div>
         </div>
@@ -64,7 +72,7 @@ import {
   TransitionRoot,
 } from "@headlessui/vue";
 import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
-import { h } from "vue";
+import { computed, h } from "vue";
 
 import { useRoute, useRouter } from "vue-router";
 
@@ -85,12 +93,13 @@ import SettingsGear from "~icons/lucide/settings";
 
 import { storeToRefs } from "pinia";
 import { useSidebarStore } from "@/stores/sidebar";
-import { isCustomerPortal } from "@/utils";
-import { Button } from "frappe-ui";
+import { Avatar, Button } from "frappe-ui";
+import { useAuthStore } from "@/stores/auth";
 
 const { isExpanded } = storeToRefs(useSidebarStore());
 const route = useRoute();
 const router = useRouter();
+const auth = useAuthStore();
 
 function isActiveTab(to: any) {
   if (route.query.view) {
@@ -99,14 +108,18 @@ function isActiveTab(to: any) {
   return route.name === to;
 }
 
-const links = [
+const links = computed(() => [
   {
     label: "User Settings",
 
     items: [
       {
         label: "Profile",
-        icon: LucideUser,
+        icon: h(Avatar, {
+          image: auth.userImage,
+          label: auth.userName,
+          size: "xs",
+        }),
         to: "Profile",
         isActive: isActiveTab("Profile"),
       },
@@ -190,5 +203,5 @@ const links = [
       },
     ],
   },
-];
+]);
 </script>

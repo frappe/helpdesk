@@ -1,36 +1,8 @@
 <template>
   <SettingsHeader :routes="routes" />
-  <div class="max-w-3xl xl:max-w-4xl mx-auto w-full p-4 lg:py-8">
-    <div>
-      <SettingsLayoutHeader>
-        <template #title>
-          <div class="flex items-center gap-2">
-            <h1 class="text-xl font-semibold text-ink-gray-8">
-              Field Dependencies
-            </h1>
-            <DocumentationButton
-              url="https://docs.frappe.io/helpdesk/field-dependency"
-              color="!text-ink-gray-6"
-            />
-          </div>
-        </template>
-        <template #description>
-          <p class="text-p-base text-ink-gray-6 mt-1">
-            Create dependencies between fields to dynamically control options
-            based on user selections.
-          </p>
-        </template>
-        <template #actions>
-          <Button
-            label="New"
-            theme="gray"
-            variant="solid"
-            @click="router.push({ name: 'NewFieldDependency' })"
-            icon-left="plus"
-          />
-        </template>
-      </SettingsLayoutHeader>
-    </div>
+  <div
+    class="max-w-3xl xl:max-w-4xl mx-auto w-full px-4 relative flex flex-col-reverse pb-6"
+  >
     <div class="pb-8">
       <!-- Loading State -->
       <div
@@ -43,31 +15,39 @@
       <!-- Empty State -->
       <div
         v-if="
-          !fieldDependenciesList.loading &&
-          fieldDependenciesList.data?.length === 0
+          !fieldDependenciesList.loading && !fieldDependenciesList.data?.length
         "
-        class="flex flex-col items-center justify-center gap-3 rounded-md border border-gray-200 p-4 mt-7 h-[500px]"
+        class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
       >
-        <div class="text-lg font-medium text-ink-gray-4">
-          {{ __("No Field Dependencies found.") }}
+        <div class="p-4 size-16 rounded-full bg-surface-gray-1">
+          <FieldDependencyIcon class="size-8 text-ink-gray-6" />
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <div class="text-lg font-medium text-ink-gray-6">
+            No field dependency found
+          </div>
+          <div class="text-base text-ink-gray-5 max-w-60 text-center">
+            No field dependencies available. Add your first field dependency to
+            get started.
+          </div>
         </div>
         <Button
           label="New"
-          variant="subtle"
+          variant="outline"
           icon-left="plus"
           @click="router.push({ name: 'NewFieldDependency' })"
         />
       </div>
 
       <div
-        class="w-full mt-4"
+        class="w-full"
         v-if="
           !fieldDependenciesList.loading &&
           fieldDependenciesList.data?.length > 0
         "
       >
         <!-- table heading -->
-        <div class="grid grid-cols-8 sm:grid-cols-11 items-center p-2">
+        <div class="grid grid-cols-8 sm:grid-cols-11 items-center p-2 pt-0">
           <p class="col-span-3 sm:col-span-7 text-p-sm text-ink-gray-5">Name</p>
           <p class="col-span-3 sm:col-span-2 text-p-sm text-ink-gray-5">
             Created By
@@ -113,7 +93,7 @@
                   @update:modelValue="(e) => handleSwitchToggle(row.name, e)"
                   @click.stop
                 />
-                <Dropdown placement="right" :options="getOptions(row.name)">
+                <Dropdown :options="getOptions(row.name)">
                   <Button
                     variant="ghost"
                     @click.stop="
@@ -138,6 +118,36 @@
         </ul>
       </div>
     </div>
+    <div class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0">
+      <SettingsLayoutHeader>
+        <template #title>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-semibold text-ink-gray-8">
+              Field Dependencies
+            </h1>
+            <DocumentationButton
+              url="https://docs.frappe.io/helpdesk/field-dependency"
+              color="!text-ink-gray-6"
+            />
+          </div>
+        </template>
+        <template #description>
+          <p class="text-p-base text-ink-gray-6 mt-1">
+            Create dependencies between fields to dynamically control options
+            based on user selections.
+          </p>
+        </template>
+        <template #actions>
+          <Button
+            label="New"
+            theme="gray"
+            variant="solid"
+            @click="router.push({ name: 'NewFieldDependency' })"
+            icon-left="plus"
+          />
+        </template>
+      </SettingsLayoutHeader>
+    </div>
   </div>
 </template>
 
@@ -150,6 +160,7 @@ import { computed, onMounted, ref } from "vue";
 import DocumentationButton from "@/components/DocumentationButton.vue";
 import { fieldDependenciesList } from "./fieldDependency";
 import { useRouter } from "vue-router";
+import { FieldDependencyIcon } from "@/components/icons";
 
 const router = useRouter();
 const routes = computed(() => [

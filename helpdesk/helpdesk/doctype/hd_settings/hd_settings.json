@@ -20,7 +20,6 @@
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
-  "is_ticket_type_mandatory",
   "column_break_zxek",
   "feedback_section",
   "is_feedback_mandatory",
@@ -149,12 +148,6 @@
    "fieldtype": "Link",
    "label": "Default ticket type",
    "options": "HD Ticket Type"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_ticket_type_mandatory",
-   "fieldtype": "Check",
-   "label": "Ticket type is mandatory"
   },
   {
    "fieldname": "column_break_zxek",
@@ -454,7 +447,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-29 13:34:17.018321",
+ "modified": "2025-09-28 18:28:09.317673",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

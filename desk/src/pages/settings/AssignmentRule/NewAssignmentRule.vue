@@ -1,46 +1,8 @@
 <template>
   <SettingsHeader :routes="routes" />
-  <div class="max-w-3xl xl:max-w-4xl mx-auto w-full p-4 lg:py-8">
-    <div class="bg-white pb-6">
-      <div class="flex flex-col sm:flex-row justify-between w-full gap-2">
-        <div class="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            icon-left="chevron-left"
-            :label="
-              assignmentRuleData.assignmentRuleName || __('New Assignment Rule')
-            "
-            size="md"
-            @click="goBack()"
-            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-xl hover:opacity-70 !pr-0 !max-w-48 md:!max-w-60 lg:!max-w-max overflow-ellipsis overflow-hidden"
-          />
-          <Badge
-            :variant="'subtle'"
-            :theme="'orange'"
-            size="sm"
-            :label="__('Unsaved')"
-            v-if="isDirty"
-          />
-        </div>
-        <div class="flex items-center justify-between gap-4">
-          <div
-            class="flex items-center justify-between gap-2"
-            @click="assignmentRuleData.disabled = !assignmentRuleData.disabled"
-          >
-            <Switch size="sm" :model-value="!assignmentRuleData.disabled" />
-            <span class="text-sm text-ink-gray-7">{{ __("Enabled") }}</span>
-          </div>
-          <Button
-            :disabled="Boolean(!isDirty)"
-            :label="__('Save')"
-            theme="gray"
-            variant="solid"
-            @click="saveAssignmentRule()"
-            :loading="isLoading"
-          />
-        </div>
-      </div>
-    </div>
+  <div
+    class="max-w-3xl xl:max-w-4xl mx-auto w-full px-4 relative flex flex-col-reverse pb-6"
+  >
     <div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
@@ -219,6 +181,46 @@
       </div>
       <hr class="my-8" />
       <AssigneeRules />
+    </div>
+    <div class="bg-white py-4 lg:py-8 sticky top-0">
+      <div class="flex flex-col sm:flex-row justify-between w-full gap-2">
+        <div class="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            icon-left="chevron-left"
+            :label="
+              assignmentRuleData.assignmentRuleName || __('New Assignment Rule')
+            "
+            size="md"
+            @click="goBack()"
+            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-xl hover:opacity-70 !pr-0 !max-w-48 md:!max-w-60 lg:!max-w-max overflow-ellipsis overflow-hidden"
+          />
+          <Badge
+            :variant="'subtle'"
+            :theme="'orange'"
+            size="sm"
+            :label="__('Unsaved')"
+            v-if="isDirty"
+          />
+        </div>
+        <div class="flex items-center justify-between gap-4">
+          <div
+            class="flex items-center justify-between gap-2"
+            @click="assignmentRuleData.disabled = !assignmentRuleData.disabled"
+          >
+            <Switch size="sm" :model-value="!assignmentRuleData.disabled" />
+            <span class="text-sm text-ink-gray-7">{{ __("Enabled") }}</span>
+          </div>
+          <Button
+            :disabled="Boolean(!isDirty)"
+            :label="__('Save')"
+            theme="gray"
+            variant="solid"
+            @click="saveAssignmentRule()"
+            :loading="isLoading"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>

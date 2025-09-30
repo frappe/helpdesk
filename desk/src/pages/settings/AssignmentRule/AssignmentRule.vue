@@ -1,25 +1,9 @@
 <template>
   <SettingsHeader :routes="routes" />
-  <div class="max-w-3xl xl:max-w-4xl mx-auto w-full p-4 lg:py-8">
-    <SettingsLayoutHeader
-      :title="__('Assignment rules')"
-      :description="
-        __(
-          'Assignment Rules automatically route tickets to the right team members based on predefined conditions'
-        )
-      "
-    >
-      <template #actions>
-        <Button
-          :label="__('New')"
-          theme="gray"
-          variant="solid"
-          @click="goToNew()"
-          icon-left="plus"
-        />
-      </template>
-    </SettingsLayoutHeader>
-    <div class="mt-6">
+  <div
+    class="max-w-3xl xl:max-w-4xl mx-auto w-full px-4 relative flex flex-col-reverse pb-6"
+  >
+    <div>
       <div
         v-if="assignmentRulesList.loading && !assignmentRulesList.data"
         class="flex items-center justify-center mt-12"
@@ -28,15 +12,26 @@
       </div>
       <div v-else>
         <div
-          v-if="assignmentRulesList.data?.length === 0"
-          class="flex flex-col items-center justify-center gap-3 rounded-md border border-gray-200 p-4 mt-7 h-[500px]"
+          v-if="
+            !assignmentRulesList.loading && !assignmentRulesList.data?.length
+          "
+          class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
         >
-          <div class="text-lg font-medium text-ink-gray-4">
-            {{ __("No Assignment Rules found.") }}
+          <div class="p-4 size-16 rounded-full bg-surface-gray-1">
+            <Settings class="size-8 text-ink-gray-6 rotate-90" />
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <div class="text-lg font-medium text-ink-gray-6">
+              No assignment rule found
+            </div>
+            <div class="text-base text-ink-gray-5 max-w-60 text-center">
+              No assignment rules available. Add your first assignment rule to
+              get started.
+            </div>
           </div>
           <Button
             label="New"
-            variant="subtle"
+            variant="outline"
             icon-left="plus"
             @click="goToNew()"
           />
@@ -62,6 +57,26 @@
         </div>
       </div>
     </div>
+    <div class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0">
+      <SettingsLayoutHeader
+        :title="__('Assignment rules')"
+        :description="
+          __(
+            'Assignment Rules automatically route tickets to the right team members based on predefined conditions'
+          )
+        "
+      >
+        <template #actions>
+          <Button
+            :label="__('New')"
+            theme="gray"
+            variant="solid"
+            @click="goToNew()"
+            icon-left="plus"
+          />
+        </template>
+      </SettingsLayoutHeader>
+    </div>
   </div>
 </template>
 
@@ -73,6 +88,7 @@ import { Button, createResource, LoadingIndicator } from "frappe-ui";
 import AssignmentRuleListItem from "./components/AssignmentRuleListItem.vue";
 import { useRouter } from "vue-router";
 import SettingsLayoutHeader from "../components/SettingsLayoutHeader.vue";
+import Settings from "~icons/lucide/settings-2";
 
 const router = useRouter();
 

@@ -37,15 +37,23 @@
       </div>
       <!-- fallback if no email accounts -->
       <div
-        v-else
-        class="flex flex-col items-center justify-center gap-3 rounded-md border border-gray-200 p-4 mt-7 h-[500px]"
+        v-if="!emailAccounts.loading && !emailAccounts.data?.length"
+        class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
       >
-        <div class="text-lg font-medium text-ink-gray-4">
-          {{ __("No Email Accounts found.") }}
+        <div class="p-4 size-16 rounded-full bg-surface-gray-1">
+          <EmailIcon class="size-8 text-ink-gray-6" />
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <div class="text-lg font-medium text-ink-gray-6">
+            No email account found
+          </div>
+          <div class="text-base text-ink-gray-5 max-w-60 text-center">
+            No email accounts available. Add your first account to get started.
+          </div>
         </div>
         <Button
-          label="New"
-          variant="subtle"
+          label="Add Email Account"
+          variant="outline"
           icon-left="plus"
           @click="addEmailAccount()"
         />
@@ -62,6 +70,7 @@ import { EmailAccount } from "@/types";
 import { useRouter } from "vue-router";
 import EmailAccountCard from "./components/EmailAccountCard.vue";
 import SettingsLayoutHeader from "@/pages/settings/components/SettingsLayoutHeader.vue";
+import EmailIcon from "@/components/icons/EmailIcon.vue";
 
 const router = useRouter();
 

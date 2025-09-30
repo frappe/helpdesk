@@ -30,7 +30,7 @@
         />
       </div>
       <div>
-        <Dropdown placement="right" :options="dropdownOptions">
+        <Dropdown :options="dropdownOptions">
           <Button
             icon="more-horizontal"
             variant="ghost"
