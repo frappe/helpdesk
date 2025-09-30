@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-17 19:27\n"
+"PO-Revision-Date: 2025-09-30 23:02\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Polish\n"
 "MIME-Version: 1.0\n"
@@ -99,7 +99,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
-msgstr ""
+msgstr "Dodaj osobę przypisaną"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -109,7 +109,7 @@ msgstr "Dodaj cotygodniowe święta"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
-msgstr ""
+msgstr "Dodaj warunek"
 
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
 msgid "Add a custom condition"
@@ -118,7 +118,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
 msgid "Add condition"
-msgstr ""
+msgstr "Dodaj warunek"
 
 #. Label of the get_weekly_off_dates (Button) field in DocType 'HD Service
 #. Holiday List'
@@ -286,11 +286,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
 msgid "Assignee Rules"
-msgstr ""
+msgstr "Reguły przypisania"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:75
 msgid "Assignees"
-msgstr ""
+msgstr "Osoby przypisane"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -318,15 +318,15 @@ msgstr "Zasady przydziału"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:10
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
-msgstr ""
+msgstr "Reguły przydzielania zadań automatycznie kierują zgłoszenia do odpowiednich członków zespołu na podstawie zdefiniowanych wcześniej warunków."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:278
 msgid "Assignment Schedule"
-msgstr ""
+msgstr "Harmonogram Przypisania"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:134
 msgid "Assignment condition"
-msgstr ""
+msgstr "Warunek przypisania"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:19
 msgid "Assignment rule"
@@ -334,7 +334,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:6
 msgid "Assignment rules"
-msgstr ""
+msgstr "Zasady przydzielania"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:73
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
@@ -471,23 +471,23 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:22
 msgid "Choose how tickets are distributed among selected assignees."
-msgstr ""
+msgstr "Wybierz sposób dystrybucji biletów pomiędzy wybranymi osobami."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:282
 msgid "Choose the days of the week when this rule should be active."
-msgstr ""
+msgstr "Wybierz dni tygodnia, w które ta reguła ma być aktywna."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:139
 msgid "Choose which tickets are affected by this assignment rule."
-msgstr ""
+msgstr "Wybierz, które zgłoszenia mają wpływ na tę regułę przypisania."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:209
 msgid "Choose which tickets are affected by this un-assignment rule."
-msgstr ""
+msgstr "Wybierz, na które zgłoszenia mają wpływ ta reguła oddzielenia przypisania."
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:78
 msgid "Choose who receives the tickets."
-msgstr ""
+msgstr "Wybierz, kto otrzyma bilety."
 
 #. Label of the clear_table (Button) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -591,7 +591,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:17
 msgid "Create new"
-msgstr ""
+msgstr "Utwórz nowy"
 
 #. Label of the criterion_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
@@ -616,7 +616,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Cyan"
-msgstr ""
+msgstr "Cyjan"
 
 #. Label of the holiday_date (Date) field in DocType 'HD Holiday'
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
@@ -670,7 +670,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:9
 msgid "Define who receives the tickets and how they’re distributed among agents."
-msgstr ""
+msgstr "Zdefiniuj, kto otrzyma zgłoszenia i w jaki sposób będą one rozdzielane pomiędzy agentów."
 
 #. Label of the description (Text) field in DocType 'HD Article Category'
 #. Label of the description (Text Editor) field in DocType 'HD Holiday'
@@ -743,7 +743,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:45
 msgid "Duplicate Assignment Rule"
-msgstr ""
+msgstr "Duplikat reguły przypisania"
 
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
