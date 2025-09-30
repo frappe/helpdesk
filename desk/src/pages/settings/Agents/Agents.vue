@@ -23,7 +23,11 @@
       <div class="flex flex-col items-center gap-1">
         <div class="text-lg font-medium text-ink-gray-6">No agent found</div>
         <div class="text-base text-ink-gray-5 max-w-60 text-center">
-          Add your first agent to get started.
+          {{
+            activeFilter.length
+              ? "Change your search terms or filters"
+              : "Add your first agent to get started."
+          }}
         </div>
       </div>
       <Button
@@ -78,10 +82,7 @@
       </div>
     </div>
     <!-- Header -->
-    <div
-      v-if="agents.data?.length"
-      class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0"
-    >
+    <div class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0">
       <SettingsLayoutHeader
         :title="__('Agents')"
         :description="__('Add, manage agents and assign roles to them.')"
@@ -98,27 +99,31 @@
           </Button>
         </template>
         <template #bottom-section>
-          <div
-            v-if="Boolean(agents.data?.length)"
-            class="flex items-center gap-2 justify-between"
-          >
-            <FormControl
-              v-if="agents.data?.length > 10"
-              v-model="search"
-              :placeholder="'Search'"
-              type="text"
-              :debounce="300"
-              class="w-60"
-            >
-              <template #prefix>
-                <LucideSearch class="h-4 w-4 text-gray-500" />
-              </template>
-            </FormControl>
+          <div class="flex items-center gap-2 justify-between">
+            <div class="relative grow">
+              <Input
+                v-model="search"
+                @input="search = $event"
+                placeholder="Search"
+                type="text"
+                class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+                icon-left="search"
+                debounce="300"
+                inputClass="p-4 pr-12"
+              />
+              <Button
+                v-if="search"
+                icon="x"
+                variant="ghost"
+                @click="search = ''"
+                class="absolute right-1 top-1/2 -translate-y-1/2"
+              />
+            </div>
             <Dropdown :options="dropdownOptions">
               <template #default="{ open }">
                 <Button
                   :label="activeFilter"
-                  class="flex items-center justify-between w-[90px]"
+                  class="flex items-center justify-between w-[90px] p-4"
                 >
                   <template #suffix>
                     <FeatherIcon
@@ -158,13 +163,14 @@
     :modelValue="showNewAgentsDialog"
     :show="showNewAgentsDialog"
     @update:modelValue="showNewAgentsDialog = $event"
+    @onAgentsInvited="agentStore.agents.reload()"
   />
 </template>
 
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { call, FormControl, toast } from "frappe-ui";
+import { call, Input, toast } from "frappe-ui";
 import { computed, h } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";

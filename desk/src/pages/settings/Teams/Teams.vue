@@ -4,27 +4,27 @@
     class="max-w-3xl xl:max-w-4xl mx-auto w-full px-4 relative flex flex-col-reverse pb-6"
   >
     <div class="w-full h-full flex flex-col gap-6">
+      <div class="relative">
+        <Input
+          v-model="search"
+          @input="search = $event"
+          placeholder="Search"
+          type="text"
+          class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+          icon-left="search"
+          debounce="300"
+          inputClass="p-4 pr-12"
+        />
+        <Button
+          v-if="search"
+          icon="x"
+          variant="ghost"
+          @click="search = ''"
+          class="absolute right-1 top-1/2 -translate-y-1/2"
+        />
+      </div>
       <!-- List -->
       <div class="w-full" v-if="!teams.loading && teams.data?.length > 0">
-        <div class="relative mb-6">
-          <Input
-            v-model="search"
-            @input="search = $event"
-            placeholder="Search"
-            type="text"
-            class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
-            icon-left="search"
-            debounce="300"
-            inputClass="p-4 pr-12"
-          />
-          <Button
-            v-if="search"
-            icon="x"
-            variant="ghost"
-            @click="search = ''"
-            class="absolute right-1 top-1/2 -translate-y-1/2"
-          />
-        </div>
         <div
           class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600 ml-2"
         >
@@ -104,10 +104,7 @@
       </div>
     </div>
     <!-- Header -->
-    <div
-      v-if="teams.data?.length"
-      class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0"
-    >
+    <div class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0">
       <SettingsLayoutHeader
         title="Teams"
         description="Create and manage teams and assign agents to specific teams."

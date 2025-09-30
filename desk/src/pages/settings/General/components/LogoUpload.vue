@@ -41,7 +41,7 @@
 
       <div v-else>
         <Button
-          label="Remove"
+          :label="`Remove ${props.title}`"
           @click="emit('onRemove')"
           iconLeft="trash"
           theme="red"
