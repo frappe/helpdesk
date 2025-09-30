@@ -40,7 +40,6 @@
                       }
                     : { onClick: openFileSelector }
                 "
-                class="!absolute bottom-0 left-0 right-0"
               >
                 <div
                   class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full bg-black bg-opacity-40 opacity-0 duration-300 ease-in-out group-hover:opacity-100 !size-14"
