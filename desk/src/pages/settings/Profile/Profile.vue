@@ -166,6 +166,11 @@ const agentData = createResource({
 
 const setAgent = createResource({
   url: "frappe.client.set_value",
+  validate: () => {
+    if (!profile.value.firstName.trim()) {
+      return "Please enter first name at least";
+    }
+  },
   makeParams() {
     return {
       doctype: "HD Agent",
