@@ -205,7 +205,7 @@ class HDServiceLevelAgreement(Document):
             doc.resolution_date = None
             doc.resolution_time = None
             return
-        doc.resolution_date = now_datetime()
+        doc.resolution_date = frappe.utils.nowdate()
         start_at = doc.service_level_agreement_creation
         end_at = doc.resolution_date
         time_took = self.calc_elapsed_time(start_at, end_at)
@@ -355,11 +355,21 @@ class HDServiceLevelAgreement(Document):
                 current_datetime, current_date
             )
             start_time = max(
-                current_workday_doc.start_time.total_seconds(), current_time_in_seconds
+                timedelta(
+                    hours=current_workday_doc.start_time.hour,
+                    minutes=current_workday_doc.start_time.minute,
+                    seconds=current_workday_doc.start_time.second,
+                ).total_seconds(),
+                current_time_in_seconds,
             )
             till_start_time = max(start_time - current_time_in_seconds, 0)
             end_time = max(
-                current_workday_doc.end_time.total_seconds(), current_time_in_seconds
+                timedelta(
+                    hours=current_workday_doc.end_time.hour,
+                    minutes=current_workday_doc.end_time.minute,
+                    seconds=current_workday_doc.end_time.second,
+                ).total_seconds(),
+                current_time_in_seconds,
             )
             time_left = max(end_time - start_time, 0)
             if not time_left:

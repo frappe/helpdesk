@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
@@ -132,14 +132,14 @@ def add_default_sla():
 def add_default_holiday_list():
     if frappe.db.exists("HD Service Holiday List", "Default"):
         return
+
+    year = date.today().year
     frappe.get_doc(
         {
             "doctype": "HD Service Holiday List",
             "holiday_list_name": "Default",
-            "from_date": datetime.strptime(f"Jan 1 {datetime.now().year}", "%b %d %Y"),
-            "to_date": datetime.strptime(
-                f"Jan 1 {datetime.now().year + 1}", "%b %d %Y"
-            ),
+            "from_date": date(year, 1, 1),
+            "to_date": date(year + 1, 1, 1),
         }
     ).insert()
 
