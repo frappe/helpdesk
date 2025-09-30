@@ -21,7 +21,7 @@
           <div class="flex flex-col items-center gap-1">
             <div class="text-lg font-medium text-ink-gray-6">No SLA found</div>
             <div class="text-base text-ink-gray-5 max-w-60 text-center">
-              No SLA available. Add your first SLA to get started.
+              Add your first SLA to get started.
             </div>
           </div>
           <Button
@@ -45,7 +45,10 @@
           </div>
         </div>
       </div>
-      <div class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0">
+      <div
+        v-if="slaPolicyList.list.data?.length"
+        class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0"
+      >
         <SettingsLayoutHeader title="SLA Policies">
           <template #description>
             <p class="text-p-base text-ink-gray-6 mt-1">

@@ -27,8 +27,7 @@
             No field dependency found
           </div>
           <div class="text-base text-ink-gray-5 max-w-60 text-center">
-            No field dependencies available. Add your first field dependency to
-            get started.
+            Add your first field dependency to get started.
           </div>
         </div>
         <Button
@@ -118,7 +117,10 @@
         </ul>
       </div>
     </div>
-    <div class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0">
+    <div
+      v-if="fieldDependenciesList.data?.length"
+      class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0"
+    >
       <SettingsLayoutHeader>
         <template #title>
           <div class="flex items-center gap-2">

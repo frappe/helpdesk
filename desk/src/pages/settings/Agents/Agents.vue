@@ -23,7 +23,7 @@
       <div class="flex flex-col items-center gap-1">
         <div class="text-lg font-medium text-ink-gray-6">No agent found</div>
         <div class="text-base text-ink-gray-5 max-w-60 text-center">
-          No agents available. Add your first agent to get started.
+          Add your first agent to get started.
         </div>
       </div>
       <Button
@@ -78,7 +78,10 @@
       </div>
     </div>
     <!-- Header -->
-    <div class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0">
+    <div
+      v-if="agents.data?.length"
+      class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0"
+    >
       <SettingsLayoutHeader
         :title="__('Agents')"
         :description="__('Add, manage agents and assign roles to them.')"

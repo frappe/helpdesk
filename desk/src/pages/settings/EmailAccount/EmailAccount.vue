@@ -3,20 +3,22 @@
   <div class="w-full max-w-3xl xl:max-w-4xl mx-auto p-4 lg:py-8">
     <div>
       <!-- header -->
-      <SettingsLayoutHeader
-        title="Email Accounts"
-        description="Manage your email accounts and configure incoming and outgoing settings."
-      >
-        <template #actions>
-          <Button
-            label="New"
-            theme="gray"
-            variant="solid"
-            icon-left="plus"
-            @click="addEmailAccount"
-          />
-        </template>
-      </SettingsLayoutHeader>
+      <div v-if="emailAccounts.data?.length">
+        <SettingsLayoutHeader
+          title="Email Accounts"
+          description="Manage your email accounts and configure incoming and outgoing settings."
+        >
+          <template #actions>
+            <Button
+              label="New"
+              theme="gray"
+              variant="solid"
+              icon-left="plus"
+              @click="addEmailAccount"
+            />
+          </template>
+        </SettingsLayoutHeader>
+      </div>
       <!-- list accounts -->
       <div
         v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
@@ -48,7 +50,7 @@
             No email account found
           </div>
           <div class="text-base text-ink-gray-5 max-w-60 text-center">
-            No email accounts available. Add your first account to get started.
+            Add your first account to get started.
           </div>
         </div>
         <Button

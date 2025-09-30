@@ -22,8 +22,7 @@
             No Holiday list found
           </div>
           <div class="text-base text-ink-gray-5 max-w-60 text-center">
-            No Holiday list available. Add your first Holiday list to get
-            started.
+            Add your first Holiday list to get started.
           </div>
         </div>
         <Button
@@ -46,7 +45,10 @@
         </div>
       </div>
     </div>
-    <div class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0">
+    <div
+      v-if="holidayList.list.data?.length"
+      class="bg-white py-4 lg:py-8 lg:pb-6 sticky top-0"
+    >
       <SettingsLayoutHeader
         :title="__('Business Holidays')"
         :description="
