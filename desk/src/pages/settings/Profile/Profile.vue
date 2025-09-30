@@ -169,7 +169,7 @@ const setAgent = createResource({
   makeParams() {
     return {
       doctype: "HD Agent",
-      name: auth.user,
+      name: agentData.data?.name,
       fieldname: {
         agent_name: `${profile.value.firstName} ${profile.value.lastName}`,
         user_image: profile.value.userImage,
