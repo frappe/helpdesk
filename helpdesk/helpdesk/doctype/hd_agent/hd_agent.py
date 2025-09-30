@@ -43,8 +43,8 @@ def update_agent_role(user, new_role):
 
 @frappe.whitelist()
 def get_agent():
-    if frappe.db.exists("HD Agent", frappe.session.user):
-        return frappe.get_doc("HD Agent", frappe.session.user)
+    if frappe.db.exists("HD Agent", {"user": frappe.session.user}):
+        return frappe.get_doc("HD Agent", {"user": frappe.session.user})
     else:
         user = frappe.get_doc("User", frappe.session.user)
         agent = frappe.get_doc(
