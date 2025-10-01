@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-23 21:26\n"
+"PO-Revision-Date: 2025-09-27 21:34\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Norwegian Bokmal\n"
 "MIME-Version: 1.0\n"
@@ -64,7 +64,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: helpdesk/api/knowledge_base.py:15
 msgid "Access denied"
@@ -105,7 +105,7 @@ msgstr ""
 #. Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add Weekly Holidays"
-msgstr "Legg til ukentlige helligdager"
+msgstr "Legg til ukentlige fridager"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
@@ -124,7 +124,7 @@ msgstr ""
 #. Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add to Holidays"
-msgstr ""
+msgstr "Legg til i fridager"
 
 #: desk/src/components/Settings/Agents.vue:6
 msgid "Add, manage agents and assign roles to them."
@@ -295,20 +295,20 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Assignment"
-msgstr ""
+msgstr "Tildeling"
 
 #. Label of the filters_section (Section Break) field in DocType 'HD Service
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Assignment Conditions"
-msgstr ""
+msgstr "Tildelingsbetingelse"
 
 #. Label of the assignment_rule (Link) field in DocType 'HD Team'
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Assignment Rule"
-msgstr "Tilordningsregel"
+msgstr "Tildelingsregel"
 
 #. Label of the assignment_rules_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -548,7 +548,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:43
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:72
 msgid "Contact"
-msgstr ""
+msgstr "Kontakt"
 
 #. Label of the contact_html (HTML) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json

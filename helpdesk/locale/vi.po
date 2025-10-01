@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-17 19:27\n"
+"PO-Revision-Date: 2025-09-30 23:02\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Vietnamese\n"
 "MIME-Version: 1.0\n"
@@ -64,7 +64,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: helpdesk/api/knowledge_base.py:15
 msgid "Access denied"
@@ -233,7 +233,7 @@ msgstr ""
 #. Label of the apply_to (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply To"
-msgstr ""
+msgstr "Áp Dụng Cho"
 
 #. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -314,7 +314,7 @@ msgstr ""
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Assignment Rules"
-msgstr ""
+msgstr "Các Quy Tắc Gán"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:10
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
@@ -347,12 +347,12 @@ msgstr ""
 #. Label of the attachment (Attach) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Attachment"
-msgstr ""
+msgstr "Tệp Đính Kèm"
 
 #. Label of the author (Link) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Author"
-msgstr ""
+msgstr "Tác giả"
 
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -393,7 +393,7 @@ msgstr ""
 #. Label of the base_url (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Base URL"
-msgstr ""
+msgstr "URL cơ sở"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:9
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:9
@@ -426,7 +426,7 @@ msgstr ""
 #. Label of the button_section (Section Break) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Button"
-msgstr ""
+msgstr "Nút"
 
 #: desk/src/pages/call-logs/CallLogDetailModal.vue:8
 msgid "Call Details"
@@ -516,7 +516,7 @@ msgstr ""
 #. Label of the columns (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Columns"
-msgstr ""
+msgstr "Cột"
 
 #. Label of the reference_comment (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -575,7 +575,7 @@ msgstr ""
 #. Label of the content_type (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Content Type"
-msgstr ""
+msgstr "Loại Nội dung"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:625
 msgid "Could not an email due to: {0}"
@@ -616,7 +616,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Cyan"
-msgstr ""
+msgstr "Lam"
 
 #. Label of the holiday_date (Date) field in DocType 'HD Holiday'
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
@@ -1256,7 +1256,7 @@ msgstr ""
 #. Label of the ip_address (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "IP Address"
-msgstr ""
+msgstr "Địa Chỉ IP"
 
 #. Label of the button_icon (Data) field in DocType 'HD Action'
 #. Label of the icon (Data) field in DocType 'HD Article Category'
@@ -1309,7 +1309,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Image"
-msgstr ""
+msgstr "Hình ảnh"
 
 #. Description of the 'Logo' (Attach Image) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1365,7 +1365,7 @@ msgstr ""
 #. Label of the is_standard (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Is Standard"
-msgstr ""
+msgstr "Là Tiêu chuẩn"
 
 #. Label of the initial_helpdesk_name_setup_skipped (Check) field in DocType
 #. 'HD Settings'
@@ -1392,7 +1392,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Key"
-msgstr ""
+msgstr "Khóa"
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -1610,7 +1610,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Orange"
-msgstr ""
+msgstr "Cam"
 
 #. Label of the order (Int) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1641,7 +1641,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Pink"
-msgstr ""
+msgstr "Hồng"
 
 #. Label of the pinned (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1745,7 +1745,7 @@ msgstr ""
 #. Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Query Options"
-msgstr ""
+msgstr "Tùy chọn Truy vấn"
 
 #. Label of the query_route (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
@@ -2101,7 +2101,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Simple Python Expression, Example: doc.status == 'Open' and doc.ticket_type == 'Bug'"
-msgstr ""
+msgstr "Biểu thức Python đơn giản, Ví dụ: doc.status == 'Open' và doc.ticket_type == 'Bug'"
 
 #. Label of the skip_email_workflow (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2723,7 +2723,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Yellow"
-msgstr ""
+msgstr "Vàng"
 
 #: helpdesk/api/dashboard.py:18
 msgid "You are not allowed to view this dashboard data."
@@ -2795,7 +2795,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "purple"
-msgstr ""
+msgstr "tím"
 
 #. Label of the synonym (Data) field in DocType 'HD Synonym'
 #: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json
