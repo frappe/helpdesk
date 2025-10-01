@@ -64,6 +64,7 @@ import { computed, h, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import LucideBookOpen from "~icons/lucide/book-open";
 
+import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import LucideTicket from "~icons/lucide/ticket";
 import CPGroup from "./CPGroup.vue";
 const router = useRouter();
@@ -147,6 +148,7 @@ const onSelection = (value) => {
 const addKeyboardShortcut = () => {
   window.addEventListener("keydown", (e) => {
     if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
+      if (showEmailBox.value || showCommentBox.value) return;
       e.preventDefault();
       toggleCommandPalette();
     }
