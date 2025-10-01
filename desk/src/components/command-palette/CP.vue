@@ -1,9 +1,5 @@
 <template>
-  <Dialog
-    v-model="show"
-    :options="{ size: 'xl', position: 'top' }"
-    @after-leave="filteredOptions = []"
-  >
+  <Dialog v-model="show" :options="{ size: 'xl', position: 'top' }">
     <template #body>
       <div>
         <Combobox nullable @update:model-value="onSelection">
@@ -12,7 +8,7 @@
               <LucideSearch class="h-4 w-4" />
             </div>
             <ComboboxInput
-              placeholder="Search"
+              placeholder="Search tickets, emails, comments, or #234 to navigate to ticket"
               class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-gray-800 placeholder:text-gray-500 focus:ring-0"
               autocomplete="off"
               @input="onInput"
@@ -55,213 +51,130 @@
     </template>
   </Dialog>
 </template>
-<script>
-import { h, ref } from "vue";
+<script setup>
+import { isCustomerPortal } from "@/utils";
 import {
   Combobox,
   ComboboxInput,
-  ComboboxOptions,
   ComboboxOption,
+  ComboboxOptions,
 } from "@headlessui/vue";
-import CPGroup from "./CPGroup.vue";
-import CPGroupResult from "./CPGroupResult.vue";
-import LucideSearch from "~icons/lucide/file-search";
-import LucideTicket from "~icons/lucide/ticket";
+import { Dialog } from "frappe-ui";
+import { computed, h, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import LucideBookOpen from "~icons/lucide/book-open";
-import { isCustomerPortal } from "@/utils";
 
-let show = ref(false);
+import LucideTicket from "~icons/lucide/ticket";
+import CPGroup from "./CPGroup.vue";
+const router = useRouter();
 
-export function showCommandPalette() {
-  show.value = true;
-}
+// Reactive data
+const show = ref(false);
+const query = ref("");
 
-export function hideCommandPalette() {
+// Computed properties
+const navigationItems = computed(() => {
+  const items = [];
+  if (query.value.startsWith("#")) {
+    items.push({
+      title: `Go to Ticket #${query.value.slice(1)}`,
+      icon: () => h(LucideTicket),
+      route: {
+        name: "TicketAgent",
+        params: { ticketId: query.value.slice(1) },
+      },
+    });
+  } else {
+    items.push({
+      title: "Tickets",
+      icon: () => h(LucideTicket),
+      route: { name: "TicketsAgent" },
+    });
+  }
+  items.push({
+    title: "Knowledge Base",
+    icon: () => h(LucideBookOpen),
+    route: {
+      name: isCustomerPortal.value
+        ? "CustomerKnowledgeBase"
+        : "AgentKnowledgeBase",
+    },
+  });
+
+  return {
+    title: "Jump to",
+    component: h(CPGroup),
+    items,
+  };
+});
+
+const fullSearchItem = computed(() => ({
+  title: "Search",
+  hideTitle: true,
+  component: h(CPGroup),
+  items: [
+    {
+      title: `Search for "${query.value}"`,
+      icon: () => h(LucideFileSearch),
+      route: { name: "SearchAgent", query: { q: query.value } },
+    },
+  ],
+}));
+
+const groupedSearchResults = computed(() => {
+  let results = [navigationItems.value];
+
+  // Add search option if there's a query and we're not in customer portal
+  if (query.value.length > 2 && !isCustomerPortal.value) {
+    results.push(fullSearchItem.value);
+  }
+
+  return results;
+});
+
+// Methods
+const onInput = (e) => {
+  query.value = e.target.value;
+};
+
+const onSelection = (value) => {
+  if (value) {
+    router.push(value.route);
+    hideCommandPalette();
+  }
+};
+
+const addKeyboardShortcut = () => {
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      toggleCommandPalette();
+    }
+  });
+};
+
+function hideCommandPalette() {
   show.value = false;
 }
 
-export function toggleCommandPalette() {
+function toggleCommandPalette() {
   show.value = !show.value;
 }
 
-export default {
-  name: "CommandPalette",
-  components: {
-    Combobox,
-    ComboboxInput,
-    ComboboxOptions,
-    ComboboxOption,
-    CPGroup,
-    CPGroupResult,
-  },
-  setup() {
-    return { show };
-  },
-  data() {
-    return {
-      query: "",
-      filteredOptions: [],
-    };
-  },
-  resources: {
-    search() {
-      return {
-        url: "helpdesk.search.search",
-        makeParams(query) {
-          return { query };
-        },
-        debounce: 300,
-        transform(groups) {
-          for (let group of groups) {
-            if (group.title === "Tickets") {
-              group.component = "CPGroupResult";
-              group.items = group.items.map((item) => {
-                item.showName = true;
-                item.route = {
-                  name: isCustomerPortal.value
-                    ? "TicketCustomer"
-                    : "TicketAgent",
-                  params: {
-                    ticketId: item.name,
-                  },
-                };
-                return item;
-              });
-            } else if (group.title === "Articles") {
-              group.component = "CPGroupResult";
-              group.items = group.items.map((item) => {
-                if (item.headings) {
-                  item.subject = item.subject + " / " + item.headings;
-                }
-                item.route = {
-                  name: "ArticlePublic",
-                  params: {
-                    articleId: item.name.split("#")[0],
-                  },
-                  hash: `#${item.name.split("#")[1]}`,
-                };
-                return item;
-              });
-            }
-          }
-          return groups;
-        },
-      };
-    },
-  },
-  computed: {
-    navigationItems() {
-      return {
-        title: "Jump to",
-        component: "CPGroup",
-        items: [
-          {
-            title: "Tickets",
-            icon: () => h(LucideTicket),
-            route: { name: "TicketsAgent" },
-          },
-          // {
-          //   title: "Agents",
-          //   icon: () => h(LucideUser),
-          //   route: { name: "AgentList" },
-          //   condition: () => true,
-          // },
-          {
-            title: "Knowledge Base",
-            icon: () => h(LucideBookOpen),
-            route: {
-              name: isCustomerPortal.value
-                ? "CustomerKnowledgeBase"
-                : "AgentKnowledgeBase",
-            },
-            condition: () => true,
-          },
-        ].filter((item) => (item.condition ? item.condition() : true)),
-      };
-    },
-    fullSearchItem() {
-      return {
-        title: "Search",
-        hideTitle: true,
-        component: "CPGroup",
-        items: [
-          {
-            title: `Search for "${this.query}"`,
-            icon: () => h(LucideSearch),
-            route: { name: "Search", query: { q: this.query } },
-          },
-        ],
-      };
-    },
-    groupedSearchResults() {
-      let groups = [{ title: "Tickets", component: "CPTicket" }];
-      let itemsByGroup = {};
-      for (const group of groups) {
-        itemsByGroup[group.title] = [];
-      }
-      for (const item of this.filteredOptions) {
-        itemsByGroup[item.group].push(item);
-      }
-      let localResults = groups
-        .map((group) => {
-          return {
-            ...group,
-            items: itemsByGroup[group.title],
-          };
-        })
-        .filter((group) => group.items.length > 0);
+// Watchers
+watch(show, (value) => {
+  if (value) {
+    query.value = "";
+  }
+});
 
-      let serverResults =
-        this.query.length > 2 && this.$resources.search.data
-          ? this.$resources.search.data
-          : [];
-      let results = [...localResults, ...serverResults];
-      return [
-        ...(results.length === 0 ? [this.navigationItems] : []),
-        ...results,
-      ];
-    },
-  },
-  watch: {
-    show(value) {
-      if (value) {
-        this.query = "";
-      }
-    },
-  },
-  mounted() {
-    this.addKeyboardShortcut();
-  },
-  beforeUnmount() {
-    hideCommandPalette();
-  },
-  methods: {
-    onInput(e) {
-      this.query = e.target.value;
-      if (this.query && this.query.length > 2) {
-        this.$resources.search.submit(this.query);
-      } else {
-        this.filteredOptions = [];
-      }
-    },
-    onSelection(value) {
-      if (value) {
-        this.$router.push(value.route);
-        hideCommandPalette();
-      }
-    },
-    addKeyboardShortcut() {
-      window.addEventListener("keydown", (e) => {
-        if (
-          e.key === "k" &&
-          (e.ctrlKey || e.metaKey) &&
-          !e.target.classList?.contains("ProseMirror")
-        ) {
-          toggleCommandPalette();
-          e.preventDefault();
-        }
-      });
-    },
-  },
-};
+// Lifecycle hooks
+onMounted(() => {
+  if (isCustomerPortal.value) return;
+  addKeyboardShortcut();
+});
+
+onBeforeUnmount(() => {
+  hideCommandPalette();
+});
 </script>
