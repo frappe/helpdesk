@@ -1,7 +1,7 @@
 <template>
-  <div class="flex items-center cursor-pointer hover:bg-gray-50 rounded">
+  <div class="flex items-center cursor-pointer relative group rounded my-1">
     <div
-      class="w-full py-3 pl-2"
+      class="w-full flex flex-col justify-center h-12.5"
       @click="
         router.push({
           name: 'EditBusinessHolidays',
@@ -9,7 +9,11 @@
         })
       "
     >
-      <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
+      <div
+        class="text-base text-ink-gray-7 font-medium overflow-ellipsis overflow-hidden"
+      >
+        {{ data.name }}
+      </div>
       <div
         v-if="data.description && data.description.length > 0"
         class="text-sm text-ink-gray-5 mt-1 whitespace-nowrap overflow-ellipsis overflow-hidden"
@@ -28,6 +32,13 @@
         </Dropdown>
       </div>
     </div>
+    <div
+      class="absolute -left-2.5 -top-1 w-full h-full group-hover:bg-gray-50 rounded-md z-[-1]"
+      :style="{
+        width: 'calc(100% + 20px)',
+        height: 'calc(100% + 8px)',
+      }"
+    />
   </div>
   <Dialog
     :options="{ title: `Duplicate Holiday List` }"

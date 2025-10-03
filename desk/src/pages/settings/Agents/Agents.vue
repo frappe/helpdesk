@@ -38,36 +38,60 @@
       />
     </div>
     <!-- Agent List -->
-    <div
-      class="overflow-y-auto w-full hide-scrollbar"
-      v-if="!agents.loading && Boolean(agents.data?.length)"
-    >
-      <div v-for="(agent, idx) in agents.data" :key="agent.agent_name">
-        <AgentCard
-          :agent="agent"
-          :show-status="true"
-          :class="idx !== agents.data.length - 1 && 'border-b '"
+    <div v-if="!agents.loading && Boolean(agents.data?.length)">
+      <div class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600">
+        <div class="col-span-6 text-p-sm">Agent Name</div>
+      </div>
+      <hr class="mt-2" />
+      <div v-for="agent in agents.data" :key="agent.agent_name" class="">
+        <div
+          class="flex items-center justify-between h-12.5 group rounded relative my-1"
         >
-          <template #right>
-            <Dropdown
-              v-if="isManager"
-              class="w-1/5 flex justify-end items-center"
-              :options="getRoles(agent.name)"
-              :label="getUserRole(agent.name)"
-              :button="{
-                label: getUserRole(agent.name),
-                iconRight: 'chevron-down',
-              }"
+          <div class="flex items-center space-x-3 w-4/5">
+            <Avatar
+              :image="agent.user_image"
+              :label="agent.agent_name"
+              size="xl"
             />
-            <Dropdown :options="getOptions(agent)" :key="agent" class="ml-2">
-              <Button>
-                <template #icon>
-                  <IconMoreHorizontal class="h-4 w-4" />
-                </template>
-              </Button>
-            </Dropdown>
-          </template>
-        </AgentCard>
+            <div>
+              <div class="flex items-center gap-2">
+                <p class="text-base">
+                  {{ agent.agent_name }}
+                </p>
+                <Badge
+                  :label="'Inactive'"
+                  :theme="'gray'"
+                  :class="!agent.is_active ? 'opacity-100' : 'opacity-0'"
+                  variant="subtle"
+                />
+              </div>
+              <div class="text-base text-ink-gray-6 mt-1">
+                {{ agent.name }}
+              </div>
+            </div>
+          </div>
+          <Dropdown
+            v-if="isManager"
+            class="w-1/5 flex justify-end items-center"
+            :options="getRoles(agent.name)"
+            :label="getUserRole(agent.name)"
+            :button="{
+              label: getUserRole(agent.name),
+              iconRight: 'chevron-down',
+            }"
+          />
+          <Dropdown :options="getOptions(agent)" :key="agent" class="ml-2">
+            <Button icon="more-horizontal" variant="ghost" />
+          </Dropdown>
+          <div
+            class="absolute -left-2.5 -top-1 w-full h-full group-hover:bg-gray-50 rounded-md z-[-1]"
+            :style="{
+              width: 'calc(100% + 20px)',
+              height: 'calc(100% + 8px)',
+            }"
+          />
+        </div>
+        <hr />
       </div>
       <!-- Load More Button -->
       <div class="flex justify-center">
@@ -170,7 +194,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { call, Input, toast } from "frappe-ui";
+import { Avatar, Badge, call, Input, toast } from "frappe-ui";
 import { computed, h } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";

@@ -34,13 +34,13 @@
       </div>
       <div v-else>
         <div class="flex text-sm text-gray-600">
-          <div class="ml-2 text-p-sm">Schedule name</div>
+          <div class="text-p-sm">Schedule name</div>
         </div>
-        <hr class="mx-2 mt-2" />
+        <hr class="mt-2" />
         <div>
           <div v-for="holiday in holidayList.list.data" :key="holiday.name">
             <HolidayListItem :data="holiday" />
-            <hr class="mx-2" />
+            <hr />
           </div>
         </div>
       </div>

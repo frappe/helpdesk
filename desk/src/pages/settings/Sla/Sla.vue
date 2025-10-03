@@ -33,15 +33,15 @@
         </div>
         <div v-else>
           <div
-            class="grid grid-cols-8 sm:grid-cols-6 items-center gap-3 text-sm text-gray-600 ml-2"
+            class="grid grid-cols-8 sm:grid-cols-6 items-center gap-3 text-sm text-gray-600"
           >
             <div class="col-span-6 sm:col-span-5 text-p-sm">Policy Name</div>
             <div class="col-span-2 sm:col-span-1 text-p-sm">Enabled</div>
           </div>
-          <hr class="mt-2 mx-2" />
+          <hr class="mt-2" />
           <div v-for="sla in slaPolicyList.list.data" :key="sla.name">
             <SlaPolicyListItem :data="sla" />
-            <hr class="mx-2" />
+            <hr />
           </div>
         </div>
       </div>

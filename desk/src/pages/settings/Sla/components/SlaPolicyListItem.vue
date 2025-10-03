@@ -1,10 +1,10 @@
 <template>
   <div
-    class="grid grid-cols-8 sm:grid-cols-6 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+    class="grid grid-cols-8 sm:grid-cols-6 items-center gap-4 cursor-pointer group rounded relative my-1"
   >
     <div
       @click="router.push({ name: 'EditSLAPolicy', params: { id: data.name } })"
-      class="w-full py-3 pl-2 col-span-6 sm:col-span-5"
+      class="w-full col-span-6 sm:col-span-5 flex flex-col justify-center h-12.5"
     >
       <div
         class="text-base text-ink-gray-7 font-medium flex items-center gap-2"
@@ -39,6 +39,13 @@
         </Dropdown>
       </div>
     </div>
+    <div
+      class="absolute -left-2.5 -top-1 w-full h-full group-hover:bg-gray-50 rounded-md z-[-1]"
+      :style="{
+        width: 'calc(100% + 20px)',
+        height: 'calc(100% + 8px)',
+      }"
+    />
   </div>
   <Dialog
     :options="{ title: `Duplicate SLA Policy` }"

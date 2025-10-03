@@ -46,20 +46,21 @@
         "
       >
         <!-- table heading -->
-        <div class="grid grid-cols-8 sm:grid-cols-11 items-center p-2 pt-0">
+        <div
+          class="grid grid-cols-8 sm:grid-cols-11 items-center p-2 pl-0 pt-0"
+        >
           <p class="col-span-3 sm:col-span-7 text-p-sm text-ink-gray-5">Name</p>
           <p class="col-span-3 sm:col-span-2 text-p-sm text-ink-gray-5">
             Created By
           </p>
           <p class="col-span-2 text-p-sm text-ink-gray-5">Enabled</p>
         </div>
-        <div class="h-px border-t mx-1 border-outline-gray-modals" />
+        <div class="h-px border-t border-outline-gray-modals" />
 
         <!-- Table content -->
         <ul>
           <!-- Each row -->
           <li
-            class="w-full flex flex-col items-center cursor-pointer hover:bg-surface-menu-bar rounded"
             v-for="(row, idx) in fieldDependenciesList.data"
             @click.stop="
               router.push({
@@ -70,47 +71,60 @@
             :key="row.name"
           >
             <div
-              class="w-full grid grid-cols-8 sm:grid-cols-11 items-center p-2"
+              class="w-full flex flex-col items-center cursor-pointer group rounded relative my-1"
             >
-              <!-- Parent to Child -->
               <div
-                class="col-span-3 sm:col-span-7 text-base text-ink-gray-7 pr-3"
+                class="w-full grid grid-cols-8 sm:grid-cols-11 items-center h-12.5"
               >
-                <span>{{ getFieldDependencyLabel(row.name) }}</span>
-              </div>
-              <!-- Owner -->
-              <p class="col-span-3 sm:col-span-2 flex items-center gap-2 pr-3">
-                <Avatar size="sm" :image="row.owner" :label="row.owner" />
-                <span class="text-base text-ink-gray-7 truncate">{{
-                  row.owner
-                }}</span>
-              </p>
-              <!-- Enabled -->
-              <p class="col-span-2 flex items-center justify-between">
-                <Switch
-                  :model-value="row.enabled"
-                  @update:modelValue="(e) => handleSwitchToggle(row.name, e)"
-                  @click.stop
+                <!-- Parent to Child -->
+                <div
+                  class="col-span-3 sm:col-span-7 text-base text-ink-gray-7 pr-3"
+                >
+                  <span>{{ getFieldDependencyLabel(row.name) }}</span>
+                </div>
+                <!-- Owner -->
+                <p
+                  class="col-span-3 sm:col-span-2 flex items-center gap-2 pr-3"
+                >
+                  <Avatar size="sm" :image="row.owner" :label="row.owner" />
+                  <span class="text-base text-ink-gray-7 truncate">{{
+                    row.owner
+                  }}</span>
+                </p>
+                <!-- Enabled -->
+                <p class="col-span-2 flex items-center justify-between">
+                  <Switch
+                    :model-value="row.enabled"
+                    @update:modelValue="(e) => handleSwitchToggle(row.name, e)"
+                    @click.stop
+                  />
+                  <Dropdown :options="getOptions(row.name)">
+                    <Button
+                      variant="ghost"
+                      @click.stop="
+                        () => {
+                          isConfirmingDelete = false;
+                        }
+                      "
+                    >
+                      <template #icon>
+                        <LucideMoreHorizontal class="h-4 w-4" />
+                      </template>
+                    </Button>
+                  </Dropdown>
+                </p>
+                <div
+                  class="absolute -left-2.5 -top-1 w-full h-full group-hover:bg-gray-50 rounded-md z-[-1]"
+                  :style="{
+                    width: 'calc(100% + 20px)',
+                    height: 'calc(100% + 8px)',
+                  }"
                 />
-                <Dropdown :options="getOptions(row.name)">
-                  <Button
-                    variant="ghost"
-                    @click.stop="
-                      () => {
-                        isConfirmingDelete = false;
-                      }
-                    "
-                  >
-                    <template #icon>
-                      <LucideMoreHorizontal class="h-4 w-4" />
-                    </template>
-                  </Button>
-                </Dropdown>
-              </p>
+              </div>
+              <!-- Separator -->
             </div>
-            <!-- Separator -->
             <div
-              class="h-px border-b mx-1 border-outline-gray-modals w-[99%]"
+              class="h-px border-b border-outline-gray-modals w-full"
               v-if="idx < fieldDependenciesList.data?.length - 1"
             />
           </li>

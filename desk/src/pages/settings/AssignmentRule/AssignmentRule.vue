@@ -39,19 +39,19 @@
           <div
             class="grid grid-cols-8 sm:grid-cols-11 items-center gap-4 text-p-sm text-gray-600"
           >
-            <div class="col-span-3 sm:col-span-7 ml-2">
+            <div class="col-span-3 sm:col-span-7">
               {{ __("Assignment rule") }}
             </div>
             <div class="col-span-3 sm:col-span-2">{{ __("Priority") }}</div>
             <div class="col-span-2">{{ __("Enabled") }}</div>
           </div>
-          <hr class="mt-2 mx-2" />
+          <hr class="mt-2" />
           <div
             v-for="assignmentRule in assignmentRulesList.data"
             :key="assignmentRule.name"
           >
             <AssignmentRuleListItem :data="assignmentRule" />
-            <hr class="mx-2" />
+            <hr />
           </div>
         </div>
       </div>

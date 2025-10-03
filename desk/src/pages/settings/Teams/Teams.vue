@@ -25,15 +25,13 @@
       </div>
       <!-- List -->
       <div class="w-full" v-if="!teams.loading && teams.data?.length > 0">
-        <div
-          class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600 ml-2"
-        >
+        <div class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600">
           <div class="col-span-6 text-p-sm">Team Name</div>
         </div>
-        <hr class="mt-2 mx-2" />
+        <hr class="mt-2" />
         <div v-for="team in teams.data" :key="team.name">
           <div
-            class="grid grid-cols-8 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+            class="grid grid-cols-8 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded group relative my-1"
           >
             <div
               @click="
@@ -42,7 +40,7 @@
                   params: { id: team.name },
                 })
               "
-              class="w-full py-3.5 pl-2 col-span-7"
+              class="w-full col-span-7 flex flex-col justify-center h-12.5"
             >
               <div
                 class="text-base text-ink-gray-7 font-medium flex items-center gap-2"
@@ -61,8 +59,15 @@
                 </Dropdown>
               </div>
             </div>
+            <div
+              class="absolute -left-2.5 -top-1 w-full h-full group-hover:bg-gray-50 rounded-md z-[-1]"
+              :style="{
+                width: 'calc(100% + 20px)',
+                height: 'calc(100% + 8px)',
+              }"
+            />
           </div>
-          <hr class="mx-2" />
+          <hr />
         </div>
       </div>
       <!-- Loading State -->
