@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-30 23:02\n"
+"POT-Creation-Date: 2025-09-28 10:35+0000\n"
+"PO-Revision-Date: 2025-10-01 23:08\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Tamil\n"
 "MIME-Version: 1.0\n"
@@ -340,6 +340,10 @@ msgstr ""
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
 msgstr ""
 
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:38
+msgid "At least one feedback option must be enabled for rating {0}"
+msgstr ""
+
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:28
 msgid "At-least one of priority, team and ticket type is required"
 msgstr ""
@@ -432,7 +436,7 @@ msgstr ""
 msgid "Call Details"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:596
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:607
 msgid "Can not send email. No sender email set up!"
 msgstr ""
 
@@ -707,6 +711,11 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Details"
+msgstr ""
+
+#. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+msgid "Disabled"
 msgstr ""
 
 #. Description of the 'Ignore Restrictions' (Check) field in DocType 'HD Team'
@@ -1768,11 +1777,11 @@ msgstr ""
 msgid "Rating"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:22
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:18
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:19
 msgid "Rating {0} is not allowed"
 msgstr ""
 
@@ -2025,6 +2034,14 @@ msgstr ""
 #. Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Search Term Param Name"
+msgstr ""
+
+#: helpdesk/api/search.py:38
+msgid "Search index not available. Please contact administrator."
+msgstr ""
+
+#: helpdesk/api/search.py:15
+msgid "Search query must be at least 2 characters"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:157

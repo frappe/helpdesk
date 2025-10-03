@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-17 19:27\n"
+"POT-Creation-Date: 2025-09-28 10:35+0000\n"
+"PO-Revision-Date: 2025-10-01 23:08\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Esperanto\n"
 "MIME-Version: 1.0\n"
@@ -340,6 +340,10 @@ msgstr "crwdns158436:0crwdne158436:0"
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
 msgstr "crwdns159040:0{0}crwdne159040:0"
 
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:38
+msgid "At least one feedback option must be enabled for rating {0}"
+msgstr "crwdns160042:0{0}crwdne160042:0"
+
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:28
 msgid "At-least one of priority, team and ticket type is required"
 msgstr "crwdns157568:0crwdne157568:0"
@@ -432,7 +436,7 @@ msgstr "crwdns157598:0crwdne157598:0"
 msgid "Call Details"
 msgstr "crwdns159214:0crwdne159214:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:596
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:607
 msgid "Can not send email. No sender email set up!"
 msgstr "crwdns157600:0crwdne157600:0"
 
@@ -708,6 +712,11 @@ msgstr "crwdns157668:0crwdne157668:0"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Details"
 msgstr "crwdns157670:0crwdne157670:0"
+
+#. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+msgid "Disabled"
+msgstr "crwdns160044:0crwdne160044:0"
 
 #. Description of the 'Ignore Restrictions' (Check) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
@@ -1768,11 +1777,11 @@ msgstr "crwdns158000:0crwdne158000:0"
 msgid "Rating"
 msgstr "crwdns158002:0crwdne158002:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:22
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
 msgstr "crwdns158004:0crwdne158004:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:18
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:19
 msgid "Rating {0} is not allowed"
 msgstr "crwdns158006:0{0}crwdne158006:0"
 
@@ -2026,6 +2035,14 @@ msgstr "crwdns158086:0crwdne158086:0"
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Search Term Param Name"
 msgstr "crwdns158088:0crwdne158088:0"
+
+#: helpdesk/api/search.py:38
+msgid "Search index not available. Please contact administrator."
+msgstr "crwdns160046:0crwdne160046:0"
+
+#: helpdesk/api/search.py:15
+msgid "Search query must be at least 2 characters"
+msgstr "crwdns160048:0crwdne160048:0"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:157
 msgid "Select a Default Priority."
