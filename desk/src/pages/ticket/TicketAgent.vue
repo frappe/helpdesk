@@ -34,6 +34,7 @@ import {
 import { createResource, toast } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, provide, watch } from "vue";
 import { useRoute } from "vue-router";
+import { showCommentBox, showEmailBox } from "./modalStates";
 const { $socket } = globalStore();
 
 const props = defineProps({
@@ -120,6 +121,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   stopViewing(props.ticketId);
+  showEmailBox.value = false;
+  showCommentBox.value = false;
 });
 </script>
 
