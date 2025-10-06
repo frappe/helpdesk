@@ -17,12 +17,12 @@
     </template>
     <template #body>
       <div
-        class="flex flex-col justify-between mx-3 p-3 rounded-lg gap-3 border border-gray-100 bg-white shadow-xl"
+        class="flex flex-col justify-between mx-3 p-1.5 rounded-lg border border-gray-100 bg-white shadow-xl"
       >
         <div v-for="app in apps.data" key="name">
           <a
             :href="app.route"
-            class="flex gap-2 rounded items-center hover:bg-gray-100"
+            class="flex gap-2 rounded items-center hover:bg-gray-100 p-1.5"
           >
             <img class="size-6" :src="app.logo" />
             <div class="text-sm" @click="app.onClick">
