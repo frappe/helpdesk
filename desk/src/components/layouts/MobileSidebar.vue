@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot :show="sidebarOpened">
-    <Dialog as="div" @close="sidebarOpened = false" class="fixed inset-0 z-40">
+    <Dialog as="div" @close="sidebarOpened = false" class="fixed inset-0">
       <TransitionChild
         as="template"
         enter="transition ease-in-out duration-200 transform"
