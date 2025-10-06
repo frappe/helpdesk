@@ -6,6 +6,7 @@
           'group w-full flex h-7 items-center justify-between rounded px-2 text-base text-gray-800 hover:bg-gray-100',
         ]"
         @click.prevent="togglePopover()"
+        @mouseenter="togglePopover()"
       >
         <div class="flex gap-2">
           <AppsIcon />
@@ -16,14 +17,14 @@
     </template>
     <template #body>
       <div
-        class="grid grid-cols-3 justify-between mx-3 p-2 rounded-lg border border-gray-100 bg-white shadow-xl"
+        class="flex flex-col justify-between mx-3 p-3 rounded-lg gap-3 border border-gray-100 bg-white shadow-xl"
       >
         <div v-for="app in apps.data" key="name">
           <a
             :href="app.route"
-            class="flex flex-col gap-1.5 rounded justify-center items-center py-2 px-3 hover:bg-gray-100"
+            class="flex gap-2 rounded items-center hover:bg-gray-100"
           >
-            <img class="size-8" :src="app.logo" />
+            <img class="size-6" :src="app.logo" />
             <div class="text-sm" @click="app.onClick">
               {{ app.title }}
             </div>
