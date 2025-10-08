@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-09-28 10:35+0000\n"
-"PO-Revision-Date: 2025-10-01 23:08\n"
+"PO-Revision-Date: 2025-10-08 00:31\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Portuguese, Brazilian\n"
 "MIME-Version: 1.0\n"
@@ -99,7 +99,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
-msgstr ""
+msgstr "Adicionar responsável"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -118,7 +118,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
 msgid "Add condition"
-msgstr ""
+msgstr "Adicionar condição"
 
 #. Label of the get_weekly_off_dates (Button) field in DocType 'HD Service
 #. Holiday List'
@@ -286,11 +286,11 @@ msgstr "Atribuído A"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
 msgid "Assignee Rules"
-msgstr ""
+msgstr "Regras de Atribuição"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:75
 msgid "Assignees"
-msgstr ""
+msgstr "Responsáveis"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -322,11 +322,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:278
 msgid "Assignment Schedule"
-msgstr ""
+msgstr "Cronograma de atribuições"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:134
 msgid "Assignment condition"
-msgstr ""
+msgstr "Condição de atribuição"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:19
 msgid "Assignment rule"
@@ -334,7 +334,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:6
 msgid "Assignment rules"
-msgstr ""
+msgstr "Regra de atribuição"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:73
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
@@ -479,7 +479,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:282
 msgid "Choose the days of the week when this rule should be active."
-msgstr ""
+msgstr "Escolha os dias da semana em que esta regra deve estar ativa."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:139
 msgid "Choose which tickets are affected by this assignment rule."
@@ -752,7 +752,7 @@ msgstr "Duplicar"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:45
 msgid "Duplicate Assignment Rule"
-msgstr ""
+msgstr "Duplicar Regra de Atribuição"
 
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
@@ -1354,7 +1354,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:82
 msgid "Invite agent"
-msgstr ""
+msgstr "Convidar agente"
 
 #. Label of the is_active (Check) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
@@ -1427,16 +1427,16 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
-msgstr ""
+msgstr "Último"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
 msgid "Last user assigned by this rule"
-msgstr ""
+msgstr "Último usuário atribuído por esta regra"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:145
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:217
 msgid "Learn about conditions"
-msgstr ""
+msgstr "Saiba mais sobre as condições"
 
 #. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
 #. Source'
@@ -1538,7 +1538,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:51
 msgid "New Assignment Rule Name"
-msgstr ""
+msgstr "Novo nome da regra de atribuição"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:12
 msgid "No assignees"
@@ -1546,7 +1546,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:14
 msgid "No items in the list"
-msgstr ""
+msgstr "Nenhum item na lista"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:74
 msgid "No results found"
@@ -1570,7 +1570,7 @@ msgstr "Configurações de notificação"
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:232
 msgid "Old Condition"
-msgstr ""
+msgstr "Condição antiga"
 
 #. Label of the on_hold_since (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2598,7 +2598,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:204
 msgid "Unassignment condition"
-msgstr ""
+msgstr "Condição de desatribuição"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:16
 msgid "Unauthorized Access"
