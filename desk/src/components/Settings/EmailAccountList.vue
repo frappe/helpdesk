@@ -32,7 +32,9 @@
       v-else
       class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
     >
-      <div class="p-4 size-14.5 rounded-full bg-surface-gray-1">
+      <div
+        class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+      >
         <EmailIcon class="size-6 text-ink-gray-6" />
       </div>
       <div class="flex flex-col items-center gap-1">
