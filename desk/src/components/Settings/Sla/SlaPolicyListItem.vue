@@ -4,7 +4,7 @@
   >
     <div
       @click="slaActiveScreen = { screen: 'view', data: data, fetchData: true }"
-      class="w-full py-3 pl-2 col-span-5"
+      class="w-full pl-2 col-span-5 flex flex-col justify-center h-14"
     >
       <div
         class="text-base text-ink-gray-7 font-medium flex items-center gap-2"

@@ -35,7 +35,7 @@ class HDTeam(Document):
         rule_doc = frappe.get_doc("Assignment Rule", rule)
         rule_doc.assign_condition = f"status == 'Open' and agent_group == '{newdn}'"
         rule_doc.assign_condition_json = (
-            '[["status", "==", "Open"], "and", ["agent_group", "==", newdn]]]'
+            f'[["status", "==", "Open"], "and", ["agent_group", "==", "{newdn}"]]'
         )
         rule_doc.save(ignore_permissions=True)
 
@@ -72,7 +72,7 @@ class HDTeam(Document):
         rule_doc.document_type = "HD Ticket"
         rule_doc.assign_condition = f"status == 'Open' and agent_group == '{self.name}'"
         rule_doc.assign_condition_json = (
-            '[["status","==","Open"],"and",["agent_group","==","Product Experts"]]'
+            f'[["status","==","Open"],"and",["agent_group","==","{self.name}"]]'
         )
         rule_doc.priority = 1
         rule_doc.disabled = True  # Disable the rule by default, when agents are added to the group, the rule will be enabled

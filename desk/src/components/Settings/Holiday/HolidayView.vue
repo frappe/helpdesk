@@ -62,6 +62,7 @@
           label="Name"
           v-model="holidayData.holiday_list_name"
           required
+          maxlength="50"
           @change="validateHoliday('holiday_list_name')"
         />
         <ErrorMessage
@@ -76,6 +77,7 @@
         placeholder="Description"
         label="Description"
         v-model="holidayData.description"
+        maxlength="140"
       />
     </div>
     <hr class="my-8" />

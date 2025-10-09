@@ -117,7 +117,7 @@
           placeholder="Description"
           label="Description"
           required
-          maxlength="250"
+          maxlength="140"
           @change="validateAssignmentRule('description')"
           v-model="assignmentRuleData.description"
         />

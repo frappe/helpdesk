@@ -4,7 +4,7 @@
   >
     <div
       @click="assignmentRulesActiveScreen = { screen: 'view', data: data }"
-      class="w-full py-3 pl-2 col-span-7"
+      class="w-full pl-2 col-span-7 h-14 flex flex-col justify-center"
     >
       <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
       <div
