@@ -304,7 +304,12 @@ const getSlaData = createResource({
     docname: slaActiveScreen.value.data?.name,
   },
   onSuccess(data) {
-    const condition_json = JSON.parse(data.condition_json || "[]");
+    let condition_json;
+    try {
+      condition_json = JSON.parse(data.condition_json || "[]");
+    } catch (error) {
+      condition_json = [];
+    }
 
     const newData = {
       ...data,

@@ -15,7 +15,7 @@ from frappe.utils import (
     to_timedelta,
 )
 
-from helpdesk.utils import get_context, publish_event
+from helpdesk.utils import get_context, is_json_valid, publish_event
 
 from .utils import convert_to_seconds
 
@@ -91,7 +91,6 @@ class HDServiceLevelAgreement(Document):
         support_days = []
 
         for support_and_resolution in self.support_and_resolution:
-
             if to_timedelta(support_and_resolution.start_time) >= to_timedelta(
                 support_and_resolution.end_time
             ):
@@ -137,14 +136,23 @@ class HDServiceLevelAgreement(Document):
             frappe.throw(_("You cannot disable the default SLA."))
 
     def validate_condition(self):
-        if not self.condition:
-            return
-        try:
-            temp_doc = frappe.new_doc(self.doctype_ticket)
-            frappe.safe_eval(self.condition, None, get_context(temp_doc))
-        except Exception as e:
+        if self.condition:
+            try:
+                temp_doc = frappe.new_doc(self.doctype_ticket)
+                frappe.safe_eval(self.condition, None, get_context(temp_doc))
+            except Exception as e:
+                frappe.throw(
+                    _("The assignment condition '{0}' is invalid: {1}").format(
+                        self.condition, str(e)
+                    )
+                )
+
+        if self.condition_json and not is_json_valid(self.condition_json):
             frappe.throw(
-                _("The Condition '{0}' is invalid: {1}").format(self.condition, str(e))
+                _("The assignment condition json '{0}' is invalid: {1}").format(
+                    self.condition_json,
+                    "Condition format should be like this e.g [['status','==','open']], it's recommended to use portal view to create conditions.",
+                )
             )
 
     def before_save(self):

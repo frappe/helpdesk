@@ -351,12 +351,24 @@ const getAssignmentRuleData = createResource({
   },
   auto: Boolean(assignmentRulesActiveScreen.value.data),
   onSuccess(data) {
+    let assignConditionJson;
+    let unassignConditionJson;
+    try {
+      assignConditionJson = JSON.parse(data.assign_condition_json || "[]");
+    } catch (error) {
+      assignConditionJson = [];
+    }
+    try {
+      unassignConditionJson = JSON.parse(data.unassign_condition_json || "[]");
+    } catch (error) {
+      unassignConditionJson = [];
+    }
     assignmentRuleData.value = {
       loading: false,
       assignCondition: data.assign_condition,
       unassignCondition: data.unassign_condition,
-      assignConditionJson: JSON.parse(data.assign_condition_json || "[]"),
-      unassignConditionJson: JSON.parse(data.unassign_condition_json || "[]"),
+      assignConditionJson: assignConditionJson,
+      unassignConditionJson: unassignConditionJson,
       rule: data.rule,
       priority: data.priority,
       users: data.users,
