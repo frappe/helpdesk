@@ -8,12 +8,13 @@ from frappe.model.document import Document
 class HDAgent(Document):
     def before_save(self):
         frappe.set_value("User", self.user, "user_image", self.user_image)
-        agent_name = self.agent_name.split()
-        frappe.set_value(
-            "User",
-            self.user,
-            {"first_name": agent_name[0], "last_name": " ".join(agent_name[1:])},
-        )
+        if self.agent_name:
+            agent_name = self.agent_name.split()
+            frappe.set_value(
+                "User",
+                self.user,
+                {"first_name": agent_name[0], "last_name": " ".join(agent_name[1:])},
+            )
         self.set_user_roles()
 
     def set_user_roles(self):
