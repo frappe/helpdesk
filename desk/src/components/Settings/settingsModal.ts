@@ -1,4 +1,4 @@
-import { h, markRaw, ref } from "vue";
+import { computed, h, markRaw, ref } from "vue";
 import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
@@ -21,11 +21,31 @@ import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
 import Telephony from "./Telephony/Telephony.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
+import Profile from "./Profile/Profile.vue";
+import { Avatar } from "frappe-ui";
+import { useAuthStore } from "@/stores/auth";
+import General from "./General/General.vue";
+import SettingsGear from "~icons/lucide/settings";
 
-export const tabs = [
+const auth = useAuthStore();
+
+export const tabs = computed(() => [
   {
-    label: __("Settings"),
-    hideLabel: true,
+    label: __("User Settings"),
+    items: [
+      {
+        label: "Profile",
+        icon: h(Avatar, {
+          image: auth.userImage,
+          label: auth.userName,
+          size: "xs",
+        }),
+        component: markRaw(Profile),
+      },
+    ],
+  },
+  {
+    label: __("Email Settings"),
     items: [
       {
         label: "Email Accounts",
@@ -37,10 +57,15 @@ export const tabs = [
         icon: markRaw(LucideMailOpen),
         component: markRaw(EmailNotifications),
       },
+    ],
+  },
+  {
+    label: __("App Settings"),
+    items: [
       {
-        label: "Branding",
-        icon: markRaw(ImageUp),
-        component: markRaw(Branding),
+        label: "General",
+        icon: markRaw(SettingsGear),
+        component: markRaw(General),
       },
       {
         label: "Agents",
@@ -89,20 +114,34 @@ export const tabs = [
       },
     ],
   },
-];
+]);
 
-export const activeTab = ref(tabs[0].items[0]);
+export const activeTab = ref(tabs.value[0].items[0]);
 
 export const nextActiveTab = ref(null);
 
 export const disableSettingModalOutsideClick = ref(false);
 
-export const setActiveSettingsTab = (tabName: string) => {
+type TabName =
+  | "Profile"
+  | "Email Accounts"
+  | "Email Notifications"
+  | "General"
+  | "Agents"
+  | "Invite Agents"
+  | "Teams"
+  | "SLA Policies"
+  | "Business Holidays"
+  | "Assignment Rules"
+  | "Field Dependencies"
+  | "Telephony";
+
+export const setActiveSettingsTab = (tabName: TabName) => {
   activeTab.value =
     (tabName &&
-      tabs
+      tabs.value
         .map((tab) => tab.items)
         .flat()
         .find((tab) => tab.label == tabName)) ||
-    tabs[0].items[0];
+    tabs.value[0].items[0];
 };

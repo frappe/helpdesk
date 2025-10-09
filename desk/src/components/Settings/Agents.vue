@@ -1,101 +1,154 @@
 <template>
-  <div v-bind:class="$attrs.class" class="px-10 py-8">
+  <div v-bind:class="$attrs.class">
     <!-- Header -->
-    <SettingsLayoutHeader
-      :title="__('Agents')"
-      :description="__('Add, manage agents and assign roles to them.')"
-    >
-      <template #actions>
-        <Button
-          @click="() => (showNewAgentsDialog = !showNewAgentsDialog)"
-          label="New"
-          variant="solid"
-        >
-          <template #prefix>
-            <LucidePlus class="h-4 w-4 stroke-1.5" />
-          </template>
-        </Button>
-      </template>
-      <template #bottom-section>
-        <div class="flex items-center gap-2 justify-between">
-          <FormControl
-            v-model="search"
-            :placeholder="'Search'"
-            type="text"
-            :debounce="300"
-            class="w-60"
+    <div class="px-10 py-8">
+      <SettingsLayoutHeader
+        :title="__('Agents')"
+        :description="__('Add, manage agents and assign roles to them.')"
+      >
+        <template #actions>
+          <Button
+            @click="() => setActiveSettingsTab('Invite Agents')"
+            label="New"
+            variant="solid"
           >
             <template #prefix>
-              <LucideSearch class="h-4 w-4 text-gray-500" />
+              <LucidePlus class="h-4 w-4 stroke-1.5" />
             </template>
-          </FormControl>
-          <Dropdown :options="dropdownOptions" placement="right">
-            <template #default="{ open }">
+          </Button>
+        </template>
+        <template #bottom-section>
+          <div class="flex items-center gap-2 justify-between">
+            <div class="relative grow">
+              <Input
+                v-model="search"
+                @input="search = $event"
+                placeholder="Search"
+                type="text"
+                class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+                icon-left="search"
+                debounce="300"
+                inputClass="p-4 pr-12"
+              />
               <Button
-                :label="activeFilter"
-                class="flex items-center justify-between w-[90px]"
-              >
-                <template #suffix>
-                  <FeatherIcon
-                    :name="open ? 'chevron-up' : 'chevron-down'"
-                    class="h-4"
-                  />
-                </template>
-              </Button>
-            </template>
-            <template #item="{ item, active }">
-              <button
-                class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base"
-                :class="{ 'bg-surface-gray-3': active }"
-                @click="item.onClick"
-              >
-                <div class="flex items-center justify-between flex-1">
-                  <span class="whitespace-nowrap">
-                    {{ item.label }}
-                  </span>
-                  <FeatherIcon
-                    v-if="activeFilter === item.label"
-                    name="check"
-                    class="size-4 text-ink-gray-7"
+                v-if="search"
+                icon="x"
+                variant="ghost"
+                @click="search = ''"
+                class="absolute right-1 top-1/2 -translate-y-1/2"
+              />
+            </div>
+            <Dropdown :options="dropdownOptions">
+              <template #default="{ open }">
+                <Button
+                  :label="activeFilter"
+                  class="flex items-center justify-between w-fit p-4"
+                >
+                  <template #suffix>
+                    <FeatherIcon
+                      :name="open ? 'chevron-up' : 'chevron-down'"
+                      class="h-4"
+                    />
+                  </template>
+                </Button>
+              </template>
+              <template #item="{ item, active }">
+                <button
+                  class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base"
+                  :class="{ 'bg-surface-gray-3': active }"
+                  @click="item.onClick"
+                >
+                  <div class="flex items-center justify-between flex-1">
+                    <span class="whitespace-nowrap">
+                      {{ item.label }}
+                    </span>
+                    <FeatherIcon
+                      v-if="activeFilter === item.label"
+                      name="check"
+                      class="size-4 text-ink-gray-7"
+                    />
+                  </div>
+                </button>
+              </template>
+            </Dropdown>
+          </div>
+        </template>
+      </SettingsLayoutHeader>
+    </div>
+    <div class="px-10 pb-8 overflow-y-auto">
+      <!-- loading state -->
+      <div
+        v-if="agents.loading"
+        class="flex mt-28 justify-between w-full h-full"
+      >
+        <Button
+          :loading="agents.loading"
+          variant="ghost"
+          class="w-full"
+          size="2xl"
+        />
+      </div>
+      <!-- Empty State -->
+      <div
+        v-if="!agents.loading && !agents.data?.length"
+        class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
+      >
+        <div class="p-4 size-16 rounded-full bg-surface-gray-1">
+          <AgentIcon class="size-8 text-ink-gray-6" />
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <div class="text-lg font-medium text-ink-gray-6">No agent found</div>
+          <div class="text-base text-ink-gray-5 max-w-60 text-center">
+            {{
+              activeFilter.length
+                ? "Change your search terms or filters"
+                : "Add your first agent to get started."
+            }}
+          </div>
+        </div>
+        <Button
+          label="Add Agent"
+          variant="outline"
+          icon-left="plus"
+          @click="setActiveSettingsTab('Invite Agents')"
+        />
+      </div>
+      <!-- Agent List -->
+      <div
+        class="overflow-y-auto w-full hide-scrollbar"
+        v-if="!agents.loading && Boolean(agents.data?.length)"
+      >
+        <div class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600">
+          <div class="col-span-6 text-p-sm">Agent Name</div>
+        </div>
+        <hr class="mt-2" />
+        <div v-for="agent in agents.data" :key="agent.agent_name" class="">
+          <div
+            class="flex items-center justify-between h-12.5 group rounded relative my-1"
+          >
+            <div class="flex items-center space-x-3 w-4/5">
+              <Avatar
+                :image="agent.user_image"
+                :label="agent.agent_name"
+                size="xl"
+              />
+              <div>
+                <div class="flex items-center gap-2">
+                  <p class="text-base">
+                    {{ agent.agent_name }}
+                  </p>
+                  <Badge
+                    :label="'Inactive'"
+                    :theme="'gray'"
+                    :class="!agent.is_active ? 'opacity-100' : 'opacity-0'"
+                    variant="subtle"
                   />
                 </div>
-              </button>
-            </template>
-          </Dropdown>
-        </div>
-      </template>
-    </SettingsLayoutHeader>
-
-    <!-- loading state -->
-    <div v-if="agents.loading" class="flex mt-28 justify-between w-full h-full">
-      <Button
-        :loading="agents.loading"
-        variant="ghost"
-        class="w-full"
-        size="2xl"
-      />
-    </div>
-    <!-- Empty State -->
-    <div
-      v-if="!agents.loading && !agents.data?.length"
-      class="flex mt-28 justify-between w-full h-full"
-    >
-      <p class="text-sm text-gray-500 w-full flex justify-center">
-        No agents found
-      </p>
-    </div>
-    <!-- Agent List -->
-    <div
-      class="overflow-y-auto w-full hide-scrollbar mt-4"
-      v-if="!agents.loading && Boolean(agents.data?.length)"
-    >
-      <div v-for="(agent, idx) in agents.data" :key="agent.agent_name">
-        <AgentCard
-          :agent="agent"
-          :show-status="true"
-          :class="idx !== agents.data.length - 1 && 'border-b '"
-        >
-          <template #right>
+                <div class="text-base text-ink-gray-6 mt-1">
+                  {{ agent.name }}
+                </div>
+              </div>
+            </div>
             <Dropdown
               v-if="isManager"
               class="w-1/5 flex justify-end items-center"
@@ -105,54 +158,47 @@
                 label: getUserRole(agent.name),
                 iconRight: 'chevron-down',
               }"
-              placement="right"
             />
-            <Dropdown
-              :options="getOptions(agent)"
-              placement="right"
-              :key="agent"
-              class="ml-2"
-            >
-              <Button>
-                <template #icon>
-                  <IconMoreHorizontal class="h-4 w-4" />
-                </template>
-              </Button>
+            <Dropdown :options="getOptions(agent)" :key="agent" class="ml-2">
+              <Button icon="more-horizontal" variant="ghost" />
             </Dropdown>
-          </template>
-        </AgentCard>
-      </div>
-      <!-- Load More Button -->
-      <div class="flex justify-center">
-        <Button
-          v-if="!agents.loading && agents.hasNextPage"
-          class="mt-3.5 p-2"
-          @click="() => agents.next()"
-          :loading="agents.loading"
-          label="Load More"
-          icon-left="refresh-cw"
-        />
+            <div
+              class="absolute -left-2.5 -top-1 w-full h-full group-hover:bg-gray-50 rounded-md z-[-1]"
+              :style="{
+                width: 'calc(100% + 20px)',
+                height: 'calc(100% + 8px)',
+              }"
+            />
+          </div>
+          <hr />
+        </div>
+        <!-- Load More Button -->
+        <div class="flex justify-center">
+          <Button
+            v-if="!agents.loading && agents.hasNextPage"
+            class="mt-3.5 p-2"
+            @click="() => agents.next()"
+            :loading="agents.loading"
+            label="Load More"
+            icon-left="refresh-cw"
+          />
+        </div>
       </div>
     </div>
   </div>
-  <AddNewAgentsDialog
-    :title="__('Add Agents')"
-    @close="showNewAgentsDialog = false"
-    :modelValue="showNewAgentsDialog"
-    :show="showNewAgentsDialog"
-    @update:modelValue="showNewAgentsDialog = $event"
-  />
 </template>
 
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { call, FormControl, toast } from "frappe-ui";
-import { h } from "vue";
+import { Avatar, call, toast } from "frappe-ui";
+import { h, onUnmounted } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import AgentCard from "./AgentCard.vue";
 import { activeFilter, showNewAgentsDialog, useAgents } from "./agents";
+import AgentIcon from "../icons/AgentIcon.vue";
+import { setActiveSettingsTab } from "./settingsModal";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
@@ -277,6 +323,8 @@ const dropdownOptions = [
     },
   },
 ];
-</script>
 
-<style scoped></style>
+onUnmounted(() => {
+  agents.filters = {};
+});
+</script>

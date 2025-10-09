@@ -1,18 +1,32 @@
 <template>
   <div
-    v-if="assignmentRulesList.loading && !assignmentRulesList.data"
+    v-if="assignmentRulesListData.loading && !assignmentRulesListData.data"
     class="flex items-center justify-center mt-12"
   >
     <LoadingIndicator class="w-4" />
   </div>
-  <div v-else>
+  <div v-else class="-ml-2">
     <div
-      v-if="assignmentRulesList.data?.length === 0"
-      class="flex items-center justify-center rounded-md border border-gray-200 p-4"
+      v-if="!assignmentRulesListData.loading && !assignmentRulesList?.length"
+      class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
     >
-      <div class="text-sm text-ink-gray-7">
-        {{ __("No items in the list") }}
+      <div class="p-4 size-16 rounded-full bg-surface-gray-1">
+        <Settings class="size-8 text-ink-gray-6 rotate-90" />
       </div>
+      <div class="flex flex-col items-center gap-1">
+        <div class="text-lg font-medium text-ink-gray-6">
+          No assignment rule found
+        </div>
+        <div class="text-base text-ink-gray-5 max-w-60 text-center">
+          Add your first assignment rule to get started.
+        </div>
+      </div>
+      <Button
+        label="New"
+        variant="outline"
+        icon-left="plus"
+        @click="goToNew()"
+      />
     </div>
     <div v-else>
       <div class="grid grid-cols-11 items-center gap-4 text-sm text-gray-600">
@@ -22,7 +36,7 @@
       </div>
       <hr class="mt-2 mx-2" />
       <div
-        v-for="assignmentRule in assignmentRulesList.data"
+        v-for="assignmentRule in assignmentRulesList"
         :key="assignmentRule.name"
       >
         <AssignmentRuleListItem :data="assignmentRule" />
@@ -34,8 +48,42 @@
 
 <script setup lang="ts">
 import { LoadingIndicator } from "frappe-ui";
-import { inject } from "vue";
+import { inject, Ref, ref, watch } from "vue";
 import AssignmentRuleListItem from "./AssignmentRuleListItem.vue";
+import {
+  assignmentRulesActiveScreen,
+  resetAssignmentRuleData,
+} from "@/stores/assignmentRules";
+import Settings from "~icons/lucide/settings-2";
 
-const assignmentRulesList = inject<any>("assignmentRulesList");
+const assignmentRulesListData = inject<any>("assignmentRulesListData");
+
+const assignmentRulesList = ref(assignmentRulesListData.data || []);
+
+const assignmentRuleSearchQuery = inject<Ref>("assignmentRuleSearchQuery");
+
+const goToNew = () => {
+  resetAssignmentRuleData();
+  assignmentRulesActiveScreen.value = {
+    screen: "view",
+    data: null,
+  };
+};
+
+watch(
+  () => [assignmentRuleSearchQuery.value, assignmentRulesListData.data],
+  ([query, data]) => {
+    if (!query) {
+      assignmentRulesList.value = data || [];
+      return;
+    }
+    assignmentRulesList.value =
+      data?.filter((item) => {
+        return (
+          item.name.toLowerCase().includes(query.toLowerCase()) ||
+          item.description.toLowerCase().includes(query.toLowerCase())
+        );
+      }) || [];
+  }
+);
 </script>

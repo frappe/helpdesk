@@ -27,6 +27,30 @@
           icon-left="plus"
         />
       </template>
+      <template
+        v-if="slaPolicyList.data?.length > 0 || slaSearchQuery.length"
+        #bottom-section
+      >
+        <div class="relative">
+          <Input
+            v-model="slaSearchQuery"
+            @input="slaSearchQuery = $event"
+            placeholder="Search"
+            type="text"
+            class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+            icon-left="search"
+            debounce="300"
+            inputClass="p-4 pr-12"
+          />
+          <Button
+            v-if="slaSearchQuery"
+            icon="x"
+            variant="ghost"
+            @click="slaSearchQuery = ''"
+            class="absolute right-1 top-1/2 -translate-y-1/2"
+          />
+        </div>
+      </template>
     </SettingsLayoutHeader>
   </div>
   <div class="px-10 pb-8 overflow-y-auto">
@@ -39,6 +63,10 @@ import { resetSlaData, slaActiveScreen } from "@/stores/sla";
 import { Button } from "frappe-ui";
 import SlaPolicyList from "./SlaPolicyList.vue";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
+import { inject, Ref, watch } from "vue";
+
+const slaPolicyList = inject<any>("slaPolicyList");
+const slaSearchQuery = inject<Ref>("slaSearchQuery");
 
 const goToNew = () => {
   resetSlaData();
@@ -48,4 +76,15 @@ const goToNew = () => {
     fetchData: true,
   };
 };
+
+watch(slaSearchQuery, (newValue) => {
+  slaPolicyList.filters = {
+    name: ["like", `%${newValue}%`],
+  };
+  if (!newValue) {
+    slaPolicyList.start = 0;
+    slaPolicyList.pageLength = 10;
+  }
+  slaPolicyList.reload();
+});
 </script>

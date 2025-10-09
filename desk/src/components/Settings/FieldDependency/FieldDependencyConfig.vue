@@ -11,14 +11,18 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref } from "vue";
+import { onUnmounted, provide, Ref, ref } from "vue";
 import FieldDependency from "./FieldDependency.vue";
 import FieldDependencyList from "./FieldDependencyList.vue";
+import { fieldDependenciesList } from "./fieldDependency";
 
 type FieldDependencyStep = "fd-list" | "fd";
 
 const step: Ref<FieldDependencyStep> = ref("fd-list");
 const fieldDependencyName = ref("");
+const fieldDependencySearchQuery = ref("");
+
+provide("fieldDependencySearchQuery", fieldDependencySearchQuery);
 
 function updateStep(
   newStep: FieldDependencyStep,
@@ -27,6 +31,8 @@ function updateStep(
   step.value = newStep;
   fieldDependencyName.value = fieldDependency;
 }
-</script>
 
-<style scoped></style>
+onUnmounted(() => {
+  fieldDependenciesList.filters = {};
+});
+</script>

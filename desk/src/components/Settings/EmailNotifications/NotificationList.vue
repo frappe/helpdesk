@@ -11,7 +11,7 @@
     />
   </div>
   <!-- Body -->
-  <ul class="mt-4 pb-8 isolate">
+  <ul class="mt-4 pb-8 isolate -ml-3">
     <li
       v-for="notification in notifications"
       :key="notification.name"

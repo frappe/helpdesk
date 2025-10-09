@@ -5,12 +5,28 @@
   >
     <LoadingIndicator class="w-4" />
   </div>
-  <div v-else>
+  <div v-else class="-ml-2">
     <div
-      v-if="holidayList.list.data?.length === 0"
-      class="flex items-center justify-center rounded-md border border-gray-200 p-4"
+      v-if="!holidayList.list.loading && !holidayList.list.data?.length"
+      class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
     >
-      <div class="text-sm text-ink-gray-7">No items in the list</div>
+      <div class="p-4 size-16 rounded-full bg-surface-gray-1">
+        <Briefcase class="size-8 text-ink-gray-6" />
+      </div>
+      <div class="flex flex-col items-center gap-1">
+        <div class="text-lg font-medium text-ink-gray-6">
+          No Holiday list found
+        </div>
+        <div class="text-base text-ink-gray-5 max-w-60 text-center">
+          Add your first Holiday list to get started.
+        </div>
+      </div>
+      <Button
+        label="Add Holiday"
+        variant="outline"
+        icon-left="plus"
+        @click="goToNew()"
+      />
     </div>
     <div v-else>
       <div class="flex text-sm text-gray-600">
@@ -30,8 +46,21 @@
 <script setup lang="ts">
 import HolidayListItem from "./HolidayListItem.vue";
 import { LoadingIndicator } from "frappe-ui";
+import Briefcase from "~icons/lucide/briefcase";
 
 import { inject } from "vue";
+import {
+  holidayListActiveScreen,
+  resetHolidayData,
+} from "@/stores/holidayList";
 
 const holidayList = inject<any>("holidayList");
+
+const goToNew = () => {
+  resetHolidayData();
+  holidayListActiveScreen.value = {
+    screen: "view",
+    data: null,
+  };
+};
 </script>
