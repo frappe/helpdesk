@@ -15,6 +15,9 @@ class HDAgent(Document):
                 self.user,
                 {"first_name": agent_name[0], "last_name": " ".join(agent_name[1:])},
             )
+        else:
+            self.agent_name = frappe.get_value("User", self.user, "full_name")
+
         self.set_user_roles()
 
     def set_user_roles(self):
