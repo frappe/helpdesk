@@ -93,12 +93,16 @@
         v-if="!agents.loading && !agents.data?.length"
         class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
       >
-        <div class="p-4 size-16 rounded-full bg-surface-gray-1">
-          <AgentIcon class="size-8 text-ink-gray-6" />
+        <div
+          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex items-center justify-center"
+        >
+          <AgentIcon class="size-6 text-ink-gray-6" />
         </div>
         <div class="flex flex-col items-center gap-1">
-          <div class="text-lg font-medium text-ink-gray-6">No agent found</div>
-          <div class="text-base text-ink-gray-5 max-w-60 text-center">
+          <div class="text-base font-medium text-ink-gray-6">
+            No agent found
+          </div>
+          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
             {{
               activeFilter.length
                 ? "Change your search terms or filters"
@@ -124,7 +128,7 @@
         <hr class="mt-2" />
         <div v-for="agent in agents.data" :key="agent.agent_name" class="">
           <div
-            class="flex items-center justify-between h-12.5 group rounded relative my-1"
+            class="flex items-center justify-between h-14 group rounded relative"
           >
             <div class="flex items-center space-x-3 w-4/5">
               <Avatar

@@ -58,6 +58,7 @@
           required
           @change="validateSlaData('service_level')"
           :disabled="Boolean(slaActiveScreen.data)"
+          maxlength="50"
         />
         <ErrorMessage :message="slaDataErrors.service_level" class="mt-2" />
       </div>
@@ -68,6 +69,7 @@
         placeholder="Description"
         label="Description"
         v-model="slaData.description"
+        maxlength="140"
       />
     </div>
     <hr class="my-8" />

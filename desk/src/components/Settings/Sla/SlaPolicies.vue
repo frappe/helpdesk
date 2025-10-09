@@ -1,5 +1,5 @@
 <template>
-  <div class="px-10 py-8">
+  <div class="px-10 py-8 sticky top-0">
     <SettingsLayoutHeader>
       <template #title>
         <h1 class="text-lg font-semibold text-ink-gray-8">
