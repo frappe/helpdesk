@@ -308,6 +308,9 @@ const getSlaData = createResource({
     try {
       condition_json = JSON.parse(data.condition_json || "[]");
     } catch (error) {
+      toast.error(
+        "Assignment conditions are invalid or corrupt, recreate the conditions."
+      );
       condition_json = [];
     }
 
