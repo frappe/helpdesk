@@ -17,7 +17,7 @@
       </template>
       <template #actions>
         <Button
-          :label="__('Create new')"
+          :label="__('New')"
           theme="gray"
           variant="solid"
           @click="goToNew()"
