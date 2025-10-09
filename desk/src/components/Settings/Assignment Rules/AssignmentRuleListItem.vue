@@ -81,7 +81,7 @@ import {
 } from "frappe-ui";
 import { inject, ref } from "vue";
 
-const assignmentRulesList = inject<any>("assignmentRulesList");
+const assignmentRulesListData = inject<any>("assignmentRulesListData");
 
 const props = defineProps({
   data: {
@@ -113,7 +113,7 @@ const deleteAssignmentRule = () => {
       name: props.data.name,
     },
     onSuccess: () => {
-      assignmentRulesList.reload();
+      assignmentRulesListData.reload();
       isConfirmingDelete.value = false;
       toast.success("Assignment rule deleted");
     },
@@ -146,7 +146,7 @@ const duplicate = () => {
       new_name: duplicateDialog.value.name,
     },
     onSuccess: (data) => {
-      assignmentRulesList.reload();
+      assignmentRulesListData.reload();
       toast.success("Assignment rule duplicated");
       duplicateDialog.value.show = false;
       duplicateDialog.value.name = "";
@@ -183,7 +183,7 @@ const setAssignmentRuleValue = (key, value, fieldName = undefined) => {
       value: value,
     },
     onSuccess: () => {
-      assignmentRulesList.reload();
+      assignmentRulesListData.reload();
       toast.success(`Assignment rule ${fieldName || key} updated`);
     },
     auto: true,

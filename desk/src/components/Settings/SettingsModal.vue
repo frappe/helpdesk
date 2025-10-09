@@ -5,12 +5,11 @@
     :disableOutsideClickToClose="disableSettingModalOutsideClick"
   >
     <template #body>
-      <div class="flex" :style="{ height: 'calc(100vh - 8rem)' }">
+      <div class="flex z-50" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex w-52 shrink-0 flex-col bg-gray-50 p-2">
-          <h1 class="px-2 pt-2 text-lg font-semibold mb-3">Settings</h1>
+          <h1 class="px-2 pt-2 text-lg font-semibold mb-2">Settings</h1>
           <div v-for="tab in tabs">
             <div
-              v-if="!tab.hideLabel"
               class="mb-2 mt-3 flex gap-1.5 px-1 text-base font-medium text-ink-gray-5"
             >
               <span>{{ __(tab.label) }}</span>
