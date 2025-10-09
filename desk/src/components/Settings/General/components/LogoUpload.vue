@@ -35,6 +35,7 @@
             iconLeft="upload"
             label="Upload Image"
             :loading="props.isLoading"
+            :disabled="props.isDisabled"
           />
         </template>
       </FileUploader>
@@ -46,6 +47,7 @@
           iconLeft="trash"
           theme="red"
           :loading="props.isLoading"
+          :disabled="props.isDisabled"
         />
       </div>
     </div>
@@ -71,6 +73,10 @@ const props = defineProps({
     required: true,
   },
   isLoading: {
+    type: Boolean,
+    required: true,
+  },
+  isDisabled: {
     type: Boolean,
     required: true,
   },
