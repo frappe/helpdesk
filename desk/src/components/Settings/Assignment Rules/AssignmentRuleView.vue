@@ -356,11 +356,17 @@ const getAssignmentRuleData = createResource({
     try {
       assignConditionJson = JSON.parse(data.assign_condition_json || "[]");
     } catch (error) {
+      toast.error(
+        "Assignment conditions are invalid or corrupt, recreate the conditions."
+      );
       assignConditionJson = [];
     }
     try {
       unassignConditionJson = JSON.parse(data.unassign_condition_json || "[]");
     } catch (error) {
+      toast.error(
+        "Unassignment conditions are invalid or corrupt, recreate the conditions."
+      );
       unassignConditionJson = [];
     }
     assignmentRuleData.value = {
