@@ -55,7 +55,7 @@ def get_agent():
             {
                 "doctype": "HD Agent",
                 "user": frappe.session.user,
-                "agent_name": f"{user.first_name} {user.last_name}",
+                "agent_name": user.full_name,
                 "user_image": user.user_image,
             }
         ).insert(ignore_permissions=True)
