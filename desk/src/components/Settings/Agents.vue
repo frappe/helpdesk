@@ -38,7 +38,7 @@
                 class="absolute right-1 top-1/2 -translate-y-1/2"
               />
             </div>
-            <Dropdown :options="dropdownOptions">
+            <Dropdown :options="dropdownOptions" placement="right">
               <template #default="{ open }">
                 <Button
                   :label="activeFilter"
@@ -162,8 +162,14 @@
                 label: getUserRole(agent.name),
                 iconRight: 'chevron-down',
               }"
+              placement="right"
             />
-            <Dropdown :options="getOptions(agent)" :key="agent" class="ml-2">
+            <Dropdown
+              :options="getOptions(agent)"
+              :key="agent"
+              class="ml-2"
+              placement="right"
+            >
               <Button icon="more-horizontal" variant="ghost" />
             </Dropdown>
             <div
