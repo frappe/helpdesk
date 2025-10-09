@@ -8,6 +8,7 @@
       @onUpload="update($event, 'HD Settings', 'brand_logo')"
       @onRemove="update('', 'HD Settings', 'brand_logo')"
       :isLoading="loadingState.logoLoading"
+      :isDisabled="loadingState.faviconLoading"
     />
     <LogoUpload
       title="Favicon"
@@ -16,6 +17,7 @@
       @onUpload="update($event, 'Website Settings', 'favicon')"
       @onRemove="update('', 'Website Settings', 'favicon')"
       :isLoading="loadingState.faviconLoading"
+      :isDisabled="loadingState.logoLoading"
     />
   </div>
 </template>
