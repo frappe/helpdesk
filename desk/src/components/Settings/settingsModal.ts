@@ -28,93 +28,112 @@ import General from "./General/General.vue";
 import SettingsGear from "~icons/lucide/settings";
 
 const auth = useAuthStore();
+const { isAdmin, isManager, isWebsiteManager } = auth;
 
-export const tabs = computed(() => [
-  {
-    label: __("User Settings"),
-    items: [
-      {
-        label: "Profile",
-        icon: h(Avatar, {
-          image: auth.userImage,
-          label: auth.userName,
-          size: "xs",
-        }),
-        component: markRaw(Profile),
-      },
-    ],
-  },
-  {
-    label: __("Email Settings"),
-    items: [
-      {
-        label: "Email Accounts",
-        icon: markRaw(LucideMail),
-        component: markRaw(EmailConfig),
-      },
-      {
-        label: "Email Notifications",
-        icon: markRaw(LucideMailOpen),
-        component: markRaw(EmailNotifications),
-      },
-    ],
-  },
-  {
-    label: __("App Settings"),
-    items: [
-      {
-        label: "General",
-        icon: markRaw(SettingsGear),
-        component: markRaw(General),
-      },
-      {
-        label: "Agents",
-        icon: markRaw(LucideUser),
-        component: markRaw(Agents),
-      },
-      {
-        label: "Invite Agents",
-        icon: markRaw(LucideUserPlus),
-        component: markRaw(InviteAgents),
-      },
-      {
-        label: "Teams",
-        icon: markRaw(LucideUsers),
-        component: markRaw(TeamsConfig),
-      },
-      {
-        label: "SLA Policies",
-        icon: markRaw(ShieldCheck),
-        component: markRaw(Sla),
-      },
-      {
-        label: "Business Holidays",
-        icon: markRaw(Briefcase),
-        component: markRaw(HolidayList),
-      },
-      {
-        label: "Assignment Rules",
-        icon: markRaw(h(Settings, { class: "rotate-90" })),
-        component: markRaw(AssignmentRules),
-      },
-      {
-        label: "Field Dependencies",
-        icon: markRaw(FieldDependencyIcon),
-        component: markRaw(FieldDependencyConfig),
-      },
-    ],
-  },
-  {
-    label: __("Integrations"),
-    items: [
-      {
-        label: "Telephony",
-        icon: markRaw(PhoneIcon),
-        component: markRaw(Telephony),
-      },
-    ],
-  },
-]);
+export const tabs = computed(() => {
+  const _tabs = [
+    {
+      label: __("User Settings"),
+      hideLabel: true,
+      items: [
+        {
+          label: "Profile",
+          icon: h(Avatar, {
+            image: auth.userImage,
+            label: auth.userName,
+            size: "xs",
+          }),
+          component: markRaw(Profile),
+        },
+      ],
+    },
+    {
+      label: __("Email Settings"),
+      condition: () => isAdmin || isManager,
+      items: [
+        {
+          label: "Email Accounts",
+          icon: markRaw(LucideMail),
+          component: markRaw(EmailConfig),
+        },
+        {
+          label: "Email Notifications",
+          icon: markRaw(LucideMailOpen),
+          component: markRaw(EmailNotifications),
+        },
+      ],
+    },
+    {
+      label: __("App Settings"),
+      condition: () => isAdmin || isManager,
+      items: [
+        {
+          label: "General",
+          icon: markRaw(SettingsGear),
+          component: markRaw(General),
+          condition: () => isAdmin || isWebsiteManager,
+        },
+        {
+          label: "Agents",
+          icon: markRaw(LucideUser),
+          component: markRaw(Agents),
+        },
+        {
+          label: "Invite Agents",
+          icon: markRaw(LucideUserPlus),
+          component: markRaw(InviteAgents),
+        },
+        {
+          label: "Teams",
+          icon: markRaw(LucideUsers),
+          component: markRaw(TeamsConfig),
+        },
+        {
+          label: "SLA Policies",
+          icon: markRaw(ShieldCheck),
+          component: markRaw(Sla),
+        },
+        {
+          label: "Business Holidays",
+          icon: markRaw(Briefcase),
+          component: markRaw(HolidayList),
+        },
+        {
+          label: "Assignment Rules",
+          icon: markRaw(h(Settings, { class: "rotate-90" })),
+          component: markRaw(AssignmentRules),
+        },
+        {
+          label: "Field Dependencies",
+          icon: markRaw(FieldDependencyIcon),
+          component: markRaw(FieldDependencyConfig),
+        },
+      ],
+    },
+    {
+      label: __("Integrations"),
+      show: true,
+      items: [
+        {
+          label: "Telephony",
+          icon: markRaw(PhoneIcon),
+          component: markRaw(Telephony),
+        },
+      ],
+    },
+  ];
+
+  return _tabs.filter((tab) => {
+    if (tab.condition && !tab.condition()) return false;
+    if (tab.items) {
+      tab.items = tab.items.filter((item) => {
+        if (item.condition && !item.condition()) return false;
+        return true;
+      });
+    }
+    return true;
+  });
+});
 
 export const activeTab = ref(tabs.value[0].items[0]);
 
