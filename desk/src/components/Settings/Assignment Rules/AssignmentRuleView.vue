@@ -43,7 +43,11 @@
           theme="gray"
           variant="solid"
           @click="saveAssignmentRule()"
-          :loading="isLoading || getAssignmentRuleData.loading"
+          :loading="
+            isLoading ||
+            getAssignmentRuleData.loading ||
+            createAssignmentRuleResource.loading
+          "
         />
       </div>
     </div>
@@ -442,63 +446,55 @@ const saveAssignmentRule = () => {
     }
     updateAssignmentRule();
   } else {
-    createAssignmentRule();
+    createAssignmentRuleResource.submit();
   }
 };
 
-const createAssignmentRule = () => {
-  isLoading.value = true;
-  createResource({
-    url: "frappe.client.insert",
-    params: {
-      doc: {
+const createAssignmentRuleResource = createResource({
+  url: "frappe.client.insert",
+  params: {
+    doc: {
+      doctype: "Assignment Rule",
+      document_type: "HD Ticket",
+      rule: assignmentRuleData.value.rule,
+      priority: assignmentRuleData.value.priority,
+      users: assignmentRuleData.value.users,
+      disabled: assignmentRuleData.value.disabled,
+      description: assignmentRuleData.value.description,
+      assignment_days: assignmentRuleData.value.assignmentDays.map((day) => ({
+        day: day,
+      })),
+      name: assignmentRuleData.value.assignmentRuleName,
+      assignment_rule_name: assignmentRuleData.value.assignmentRuleName,
+      assign_condition: convertToConditions({
+        conditions: assignmentRuleData.value.assignConditionJson,
+      }),
+      unassign_condition: convertToConditions({
+        conditions: assignmentRuleData.value.unassignConditionJson,
+      }),
+      assign_condition_json: JSON.stringify(
+        assignmentRuleData.value.assignConditionJson
+      ),
+      unassign_condition_json: JSON.stringify(
+        assignmentRuleData.value.unassignConditionJson
+      ),
+    },
+  },
+  onSuccess(data) {
+    getAssignmentRuleData
+      .submit({
         doctype: "Assignment Rule",
-        document_type: "HD Ticket",
-        rule: assignmentRuleData.value.rule,
-        priority: assignmentRuleData.value.priority,
-        users: assignmentRuleData.value.users,
-        disabled: assignmentRuleData.value.disabled,
-        description: assignmentRuleData.value.description,
-        assignment_days: assignmentRuleData.value.assignmentDays.map((day) => ({
-          day: day,
-        })),
-        name: assignmentRuleData.value.assignmentRuleName,
-        assignment_rule_name: assignmentRuleData.value.assignmentRuleName,
-        assign_condition: convertToConditions({
-          conditions: assignmentRuleData.value.assignConditionJson,
-        }),
-        unassign_condition: convertToConditions({
-          conditions: assignmentRuleData.value.unassignConditionJson,
-        }),
-        assign_condition_json: JSON.stringify(
-          assignmentRuleData.value.assignConditionJson
-        ),
-        unassign_condition_json: JSON.stringify(
-          assignmentRuleData.value.unassignConditionJson
-        ),
-      },
-    },
-    auto: true,
-    onSuccess(data) {
-      getAssignmentRuleData
-        .submit({
-          doctype: "Assignment Rule",
-          name: data.name,
-        })
-        .then(() => {
-          isLoading.value = false;
-          toast.success("Assignment rule created");
-        });
-      assignmentRulesActiveScreen.value = {
-        screen: "view",
-        data: data,
-      };
-    },
-    onError: () => {
-      isLoading.value = false;
-    },
-  });
-};
+        name: data.name,
+      })
+      .then(() => {
+        toast.success("Assignment rule created");
+      });
+    assignmentRulesActiveScreen.value = {
+      screen: "view",
+      data: data,
+    };
+  },
+});
 
 const priorityOptions = [
   { label: "Low", value: "0" },

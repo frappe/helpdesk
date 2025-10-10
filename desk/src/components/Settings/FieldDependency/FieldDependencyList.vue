@@ -29,7 +29,7 @@
       </template>
       <template
         v-if="
-          fieldDependenciesList.data?.length > 0 ||
+          fieldDependenciesList.data?.length > 9 ||
           fieldDependencySearchQuery.length
         "
         #bottom-section

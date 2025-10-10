@@ -1,16 +1,18 @@
 <template>
-  <div class="px-10 py-8">
-    <SettingsLayoutHeader
-      title="General"
-      description="Manage general settings of your app"
-    />
-  </div>
-  <div class="px-10 pb-8 overflow-y-auto hide-scrollbar">
-    <Branding />
-    <hr class="my-8" />
-    <TicketSettings />
-    <hr class="my-8" />
-    <WorkflowKnowledgebaseSettings />
+  <div class="pb-8">
+    <div class="px-10 py-8">
+      <SettingsLayoutHeader
+        title="General"
+        description="Manage general settings of your app"
+      />
+    </div>
+    <div class="px-10 pb-8 overflow-y-auto hide-scrollbar">
+      <Branding />
+      <hr class="my-8" />
+      <TicketSettings />
+      <hr class="my-8" />
+      <WorkflowKnowledgebaseSettings />
+    </div>
   </div>
 </template>
 
