@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import { provide, ref } from "vue";
-import { assignmentRulesActiveScreen } from "../../../stores/assignmentRules";
+import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
 import AssignmentRulesList from "./AssignmentRulesList.vue";
 import AssignmentRuleView from "./AssignmentRuleView.vue";
 

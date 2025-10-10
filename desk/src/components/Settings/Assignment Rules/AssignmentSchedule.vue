@@ -29,7 +29,7 @@ import { onMounted, ref } from "vue";
 import {
   assignmentRuleData,
   assignmentRulesErrors,
-} from "../../../stores/assignmentRules";
+} from "@/stores/assignmentRules";
 import AssignmentScheduleItem from "./AssignmentScheduleItem.vue";
 
 const columns = [

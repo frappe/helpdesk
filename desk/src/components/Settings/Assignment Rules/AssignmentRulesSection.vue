@@ -42,7 +42,7 @@ import CFConditions from "@/components/conditions-filter/CFConditions.vue";
 import { validateConditions } from "@/utils";
 import { watchDebounced } from "@vueuse/core";
 import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
-import { validateAssignmentRule } from "../../../stores/assignmentRules";
+import { validateAssignmentRule } from "@/stores/assignmentRules";
 
 const props = defineProps({
   conditions: Array<any>,
