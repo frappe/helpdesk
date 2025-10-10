@@ -1,12 +1,17 @@
 <template>
-  <Popover placement="right-start" class="flex w-full">
+  <Popover
+    placement="right-start"
+    class="flex w-full"
+    trigger="hover"
+    :hoverDelay="0.1"
+    :leaveDelay="0.1"
+  >
     <template #target="{ togglePopover }">
       <button
         :class="[
           'group w-full flex h-7 items-center justify-between rounded px-2 text-base text-gray-800 hover:bg-gray-100',
         ]"
         @click.prevent="togglePopover()"
-        @mouseenter="togglePopover()"
       >
         <div class="flex gap-2">
           <AppsIcon />
