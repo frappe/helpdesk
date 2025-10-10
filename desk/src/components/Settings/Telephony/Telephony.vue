@@ -306,6 +306,9 @@ const telephonyAgent = createDocumentResource({
   cache: ["tp_telephony_agent"],
   fields: ["*"],
   auto: false,
+  onError(er) {
+    toast.error(er?.messages?.[0] || "Failed to load telephony agent");
+  },
 });
 
 const twilioAppsResource = createResource({

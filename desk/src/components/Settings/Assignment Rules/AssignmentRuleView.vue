@@ -331,7 +331,7 @@ import {
   resetAssignmentRuleData,
   resetAssignmentRuleErrors,
   validateAssignmentRule,
-} from "../../../stores/assignmentRules";
+} from "@/stores/assignmentRules";
 import AssigneeRules from "./AssigneeRules.vue";
 import AssignmentRulesSection from "./AssignmentRulesSection.vue";
 import AssignmentSchedule from "./AssignmentSchedule.vue";

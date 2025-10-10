@@ -115,7 +115,7 @@ import {
   assignmentRuleData,
   assignmentRulesErrors,
   validateAssignmentRule,
-} from "../../../stores/assignmentRules";
+} from "@/stores/assignmentRules";
 import AssigneeSearch from "./AssigneeSearch.vue";
 import { computed } from "vue";
 import { useUserStore } from "@/stores/user";

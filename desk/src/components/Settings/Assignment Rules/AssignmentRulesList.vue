@@ -64,7 +64,7 @@ import { inject, provide, Ref } from "vue";
 import {
   assignmentRulesActiveScreen,
   resetAssignmentRuleData,
-} from "../../../stores/assignmentRules";
+} from "@/stores/assignmentRules";
 import AssignmentRulesListView from "./AssignmentRulesListView.vue";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 
