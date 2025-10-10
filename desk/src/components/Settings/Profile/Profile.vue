@@ -15,7 +15,7 @@
           }
         "
       >
-        <template #default="{ openFileSelector, error: _error }">
+        <template #default="{ openFileSelector, error: _error, uploading }">
           <div class="flex items-center justify-center gap-2">
             <div class="group relative !size-14">
               <Avatar
@@ -52,6 +52,12 @@
                   <CameraIcon class="size-4 cursor-pointer text-white" />
                 </div>
               </component>
+              <div
+                v-if="uploading"
+                class="w-full h-full top-0 left-0 absolute bg-black bg-opacity-20 rounded-full flex items-center justify-center"
+              >
+                <LoadingIndicator class="size-4" />
+              </div>
             </div>
             <div class="flex flex-col gap-1">
               <div class="flex flex-col">
@@ -121,6 +127,7 @@ import {
   createResource,
   Dropdown,
   FileUploader,
+  LoadingIndicator,
   toast,
 } from "frappe-ui";
 import { __ } from "@/translation";
