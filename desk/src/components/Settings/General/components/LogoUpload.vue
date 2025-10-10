@@ -29,12 +29,12 @@
           }
         "
       >
-        <template #default="{ openFileSelector }">
+        <template #default="{ openFileSelector, uploading }">
           <Button
             @click="openFileSelector()"
             iconLeft="upload"
             label="Upload Image"
-            :loading="props.isLoading"
+            :loading="props.isLoading || uploading"
             :disabled="props.isDisabled"
           />
         </template>
