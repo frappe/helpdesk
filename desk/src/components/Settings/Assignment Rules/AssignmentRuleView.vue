@@ -469,26 +469,31 @@ const saveAssignmentRule = () => {
   }
 
   if (assignmentRulesActiveScreen.value.data) {
-    if (
-      (isAssignConditionOld.value || isUnassignConditionOld.value) &&
-      (useNewUIForAssignCondition.value || useNewUIForUnassignCondition.value)
-    ) {
-      showConfirmDialog.value = {
-        show: true,
-        title: "Confirm overwrite",
-        message:
-          "Your old condition will be overwritten. Are you sure you want to save?",
-        onConfirm: () => {
-          updateAssignmentRule();
-          showConfirmDialog.value.show = false;
-        },
-      };
+    if (isAssignConditionOld.value && useNewUIForAssignCondition.value) {
+      showOverwriteConfirm();
+      return;
+    }
+    if (isUnassignConditionOld.value && useNewUIForUnassignCondition.value) {
+      showOverwriteConfirm();
       return;
     }
     updateAssignmentRule();
   } else {
     createAssignmentRule();
   }
+};
+
+const showOverwriteConfirm = () => {
+  showConfirmDialog.value = {
+    show: true,
+    title: "Confirm overwrite",
+    message:
+      "Your old condition will be overwritten. Are you sure you want to save?",
+    onConfirm: () => {
+      updateAssignmentRule();
+      showConfirmDialog.value.show = false;
+    },
+  };
 };
 
 const createAssignmentRule = () => {
