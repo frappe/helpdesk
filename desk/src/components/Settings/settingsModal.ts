@@ -112,7 +112,6 @@ export const tabs = computed(() => {
     },
     {
       label: __("Integrations"),
-      show: true,
       items: [
         {
           label: "Telephony",
