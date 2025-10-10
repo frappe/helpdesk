@@ -28,7 +28,7 @@
         />
       </template>
       <template
-        v-if="slaPolicyList.data?.length > 0 || slaSearchQuery.length"
+        v-if="slaPolicyList.data?.length > 9 || slaSearchQuery.length"
         #bottom-section
       >
         <div class="relative">

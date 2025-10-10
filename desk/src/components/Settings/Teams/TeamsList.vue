@@ -16,7 +16,7 @@
           />
         </template>
         <template
-          v-if="teams.data?.length > 0 || teamsSearchQuery.length"
+          v-if="teams.data?.length > 9 || teamsSearchQuery.length"
           #bottom-section
         >
           <div class="relative">

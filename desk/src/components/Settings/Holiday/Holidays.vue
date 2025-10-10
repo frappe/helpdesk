@@ -14,7 +14,7 @@
         />
       </template>
       <template
-        v-if="holidayList.data?.length > 0 || holidaySearchRef.length"
+        v-if="holidayList.data?.length > 9 || holidaySearchRef.length"
         #bottom-section
       >
         <div class="relative">

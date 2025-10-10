@@ -43,7 +43,11 @@
           theme="gray"
           variant="solid"
           @click="saveAssignmentRule()"
-          :loading="isLoading || getAssignmentRuleData.loading"
+          :loading="
+            isLoading ||
+            getAssignmentRuleData.loading ||
+            createAssignmentRuleResource.loading
+          "
         />
       </div>
     </div>

@@ -26,7 +26,7 @@
       </template>
       <template
         v-if="
-          assignmentRulesListData.data?.length > 0 ||
+          assignmentRulesListData.data?.length > 9 ||
           assignmentRuleSearchQuery.length
         "
         #bottom-section
