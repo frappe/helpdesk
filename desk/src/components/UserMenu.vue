@@ -2,14 +2,8 @@
   <Dropdown :options="options">
     <template #default="{ open }">
       <button
-        class="flex h-12 items-center rounded-md py-2 duration-300 ease-in-out"
-        :class="
-          !sidebarStore.isExpanded
-            ? 'w-auto px-0'
-            : open
-            ? 'w-full bg-white px-1 shadow-sm'
-            : 'w-full px-1 hover:bg-gray-200'
-        "
+        class="flex h-12 items-center rounded-md p-1 duration-300 ease-in-out w-full"
+        :class="open ? ' bg-white shadow-sm' : ' hover:bg-gray-200'"
       >
         <BrandLogo />
         <div
