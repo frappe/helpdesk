@@ -69,7 +69,7 @@ import {
   FieldValue,
   TicketSymbol,
 } from "@/types";
-import { computed, inject } from "vue";
+import { computed, inject, onMounted, ref } from "vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
@@ -180,6 +180,17 @@ function handleFieldUpdate(
     //show error toast
   );
 }
+
+const coreFieldsRef = ref(null);
+
+onMounted(() => {
+  // useShortcut("priority", "p");
+  // useShortcut("ticket_type", "o");
+  // useShortcut("teamRef", "t");
+  // window.addEventListener("keydown", (e) => {
+  //   document.querySelector("#abc").click();
+  // });
+});
 </script>
 
 <style scoped>
@@ -187,9 +198,7 @@ function handleFieldUpdate(
   @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
 }
 :deep(.form-control-core button > div) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @apply truncate;
 }
 
 :deep(.form-control-core div) {
