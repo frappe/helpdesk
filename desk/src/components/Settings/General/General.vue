@@ -7,11 +7,15 @@
       />
     </div>
     <div class="px-10 pb-8 overflow-y-auto hide-scrollbar">
-      <Branding />
-      <hr class="my-8" />
-      <TicketSettings />
-      <hr class="my-8" />
-      <WorkflowKnowledgebaseSettings />
+      <div v-if="isWebsiteManager">
+        <Branding />
+        <hr class="my-8" />
+      </div>
+      <div v-if="isAdmin">
+        <TicketSettings />
+        <hr class="my-8" />
+        <WorkflowKnowledgebaseSettings />
+      </div>
     </div>
   </div>
 </template>
@@ -23,6 +27,9 @@ import Branding from "./components/Branding.vue";
 import TicketSettings from "./components/TicketSettings.vue";
 import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
 import { provide } from "vue";
+import { useAuthStore } from "@/stores/auth";
+
+const { isWebsiteManager, isAdmin } = useAuthStore();
 
 const settingsData = createDocumentResource({
   doctype: "HD Settings",
