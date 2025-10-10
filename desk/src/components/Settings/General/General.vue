@@ -9,8 +9,8 @@
     <div class="px-10 pb-8 overflow-y-auto hide-scrollbar">
       <div v-if="isWebsiteManager">
         <Branding />
-        <hr class="my-8" />
       </div>
+      <hr class="my-8" v-if="isWebsiteManager && isAdmin" />
       <div v-if="isAdmin">
         <TicketSettings />
         <hr class="my-8" />
