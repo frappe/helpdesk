@@ -15,8 +15,7 @@ class HDTeam(Document):
         self.rename(new_name)
 
     def after_insert(self):
-        # nosemgrep
-        self.create_assignment_rule()
+        self.create_assignment_rule()  # nosemgrep
         assignment_rule_doc = frappe.get_doc("Assignment Rule", self.assignment_rule)
 
         for user in self.users:
