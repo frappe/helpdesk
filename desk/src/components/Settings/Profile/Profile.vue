@@ -76,8 +76,17 @@
     <hr class="my-6" />
     <div>
       <div class="flex items-center justify-between">
-        <div class="text-base font-semibold text-ink-gray-9">
-          Account info & security
+        <div class="flex gap-2 items-center">
+          <div class="text-base font-semibold text-ink-gray-9">
+            Account info & security
+          </div>
+          <Badge
+            v-if="isAccountInfoDirty"
+            :variant="'subtle'"
+            :theme="'orange'"
+            size="sm"
+            :label="__('Unsaved changes')"
+          />
         </div>
         <Button
           label="Save"
@@ -123,6 +132,7 @@
 import { computed, ref } from "vue";
 import {
   Avatar,
+  Badge,
   Button,
   createResource,
   Dropdown,
