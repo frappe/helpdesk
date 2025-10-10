@@ -22,7 +22,7 @@ bench set-redis-socketio-host redis://redis:6379
 sed -i '/redis/d' ./Procfile
 sed -i '/watch/d' ./Procfile
 
-bench get-app telephony --branch main
+bench get-app telephony
 bench get-app helpdesk --branch main
 
 bench new-site helpdesk.localhost \

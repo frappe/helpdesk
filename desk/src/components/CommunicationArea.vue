@@ -135,13 +135,21 @@ function submitComment() {
   }
 }
 
+function splitIfString(str: string | string[]) {
+  if (typeof str === "string") {
+    return str.split(",");
+  }
+  return str;
+}
+
 function replyToEmail(data: object) {
   showEmailBox.value = true;
+
   emailEditorRef.value.addToReply(
     data.content,
-    data.to?.split(","),
-    data.cc?.split(","),
-    data.bcc?.split(",")
+    splitIfString(data.to),
+    splitIfString(data.cc),
+    splitIfString(data.bcc)
   );
 }
 

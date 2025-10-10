@@ -12,6 +12,7 @@ class HDTicketFeedbackOption(Document):
     def validate(self):
         self.validate_allowed_ratings()
         self.validate_bounds()
+        self.validate_one_enabled_option()
 
     def validate_allowed_ratings(self):
         if self.rating not in self.allowed_ratings:
@@ -20,3 +21,21 @@ class HDTicketFeedbackOption(Document):
     def validate_bounds(self):
         if not (0.2 <= self.rating <= 1.0):
             frappe.throw(_("Rating must be between 0.2 and 1.0"))
+
+    def validate_one_enabled_option(self):
+        if self.is_new():
+            return
+        if not self.has_value_changed("disabled") and self.disabled == 1:
+            return
+
+        rating = self.rating
+        count = frappe.db.count(
+            "HD Ticket Feedback Option",
+            filters={"rating": rating, "disabled": 0, "name": ["!=", self.name]},
+        )
+        if not count:
+            frappe.throw(
+                _("At least one feedback option must be enabled for rating {0}").format(
+                    rating
+                )
+            )

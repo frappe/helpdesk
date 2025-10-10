@@ -41,8 +41,9 @@ import {
 import { createResource, toast } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-const telephonyStore = useTelephonyStore();
+import { showCommentBox, showEmailBox } from "./modalStates";
 
+const telephonyStore = useTelephonyStore();
 const { $socket } = globalStore();
 
 const props = defineProps({
@@ -126,8 +127,6 @@ type TicketUpdateData = {
 };
 
 onMounted(() => {
-  // startViewing(props.ticketId);
-
   ticketsToNavigate.update({
     params: {
       ticket: props.ticketId,
@@ -147,6 +146,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   stopViewing(props.ticketId);
+  showEmailBox.value = false;
+  showCommentBox.value = false;
 });
 </script>
 
