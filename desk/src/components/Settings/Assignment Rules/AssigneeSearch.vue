@@ -58,11 +58,11 @@
                     :label="user.agent_name"
                     size="lg"
                   />
-                  <div class="flex flex-col gap-1">
-                    <div class="font-semibold text-ink-gray-7">
+                  <div class="flex flex-col gap-1 truncate">
+                    <div class="font-semibold text-ink-gray-7 truncate">
                       {{ user.agent_name }}
                     </div>
-                    <div class="text-ink-gray-6">{{ user.user }}</div>
+                    <div class="text-ink-gray-6 truncate">{{ user.user }}</div>
                   </div>
                 </div>
               </li>
