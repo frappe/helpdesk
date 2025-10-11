@@ -6,8 +6,10 @@ import { computed, ComputedRef } from "vue";
 export const useConfigStore = defineStore("config", () => {
   const configRes = createResource({
     url: "helpdesk.api.config.get_config",
-    auto: true,
+    auto:  !window.hasOwnProperty("hd_config"),
   });
+
+  window.hd_config && configRes.setData(window.hd_config);
 
   const config = computed(() => configRes.data || {});
   const brandLogo = computed(() => config.value.brand_logo);

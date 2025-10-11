@@ -4,6 +4,8 @@ from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
 from frappe.utils import cint
 from frappe.utils.telemetry import capture
 
+from helpdesk.api.config import get_config
+
 no_cache = 1
 
 
@@ -37,6 +39,7 @@ def get_boot():
             "session_user": frappe.session.user,
             "date_format": frappe.get_system_settings("date_format"),
             "time_format": frappe.get_system_settings("time_format"),
+            "hd_config": get_config(),
         }
     )
 

@@ -524,5 +524,6 @@ declare global {
     date_format: string;
     time_format: string;
     session_user: string;
+    hd_config?: object;
   }
 }
