@@ -92,8 +92,23 @@
           </AgentCard>
         </div>
       </div>
-      <div v-else class="flex justify-center h-full">
-        <p class="text-p-base text-gray-500">No members found</p>
+      <div
+        v-else
+        class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
+      >
+        <div
+          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+        >
+          <UserIcon class="size-6 text-ink-gray-6" />
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <div class="text-base font-medium text-ink-gray-6">
+            No members found
+          </div>
+          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
+            Add members to this team to get started.
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -149,6 +164,7 @@ import AgentCard from "../AgentCard.vue";
 import Settings from "~icons/lucide/settings-2";
 import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
 import { setActiveSettingsTab } from "../settingsModal";
+import UserIcon from "~icons/lucide/user";
 
 const props = defineProps<{
   teamName: string;
