@@ -119,7 +119,7 @@
       </div>
       <!-- Agent List -->
       <div
-        class="overflow-y-auto w-full hide-scrollbar"
+        class="w-full"
         v-if="!agents.loading && Boolean(agents.data?.length)"
       >
         <div class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600">

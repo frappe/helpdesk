@@ -8,6 +8,8 @@ export const fieldDependenciesList = createListResource({
   auto: true,
   cache: ["FD", "List"],
   orderBy: "modified desc",
+  start: 0,
+  pageLength: 20,
 });
 
 export const hiddenChildFields = computed(() => {

@@ -41,11 +41,22 @@
         <hr class="mx-2" />
       </div>
     </div>
+    <!-- Load More Button -->
+    <div class="flex justify-center">
+      <Button
+        v-if="!slaPolicyList.loading && slaPolicyList.hasNextPage"
+        class="mt-3.5 p-2"
+        @click="() => slaPolicyList.next()"
+        :loading="slaPolicyList.loading"
+        label="Load More"
+        icon-left="refresh-cw"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { LoadingIndicator } from "frappe-ui";
+import { Button, LoadingIndicator } from "frappe-ui";
 import SlaPolicyListItem from "./SlaPolicyListItem.vue";
 import { inject } from "vue";
 import { resetSlaData, slaActiveScreen } from "@/stores/sla";

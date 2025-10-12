@@ -34,6 +34,24 @@ const { isWebsiteManager, isAdmin } = useAuthStore();
 const settingsData = createDocumentResource({
   doctype: "HD Settings",
   name: "HD Settings",
+  fields: [
+    "brand_logo",
+    "favicon",
+    "auto_close_after_days",
+    "auto_close_status",
+    "auto_close_tickets",
+    "assign_within_team",
+    "do_not_restrict_tickets_without_an_agent_group",
+    "restrict_tickets_by_agent_group",
+    "update_status_to",
+    "auto_update_status",
+    "is_feedback_mandatory",
+    "allow_anyone_to_create_tickets",
+    "default_ticket_type",
+    "prefer_knowledge_base",
+    "instantly_send_email",
+    "skip_email_workflow",
+  ],
   auto: true,
   setValue: {
     onSuccess() {
