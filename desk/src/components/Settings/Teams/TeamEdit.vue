@@ -1,117 +1,124 @@
 <template>
-  <div class="w-full h-full flex flex-col">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center gap-1 justify-center -ml-[16px]">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="teamName"
-          size="md"
-          @click="() => emit('update:step', 'team-list')"
-          class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70 !pr-0"
-        />
-      </div>
-      <Dropdown placement="right" :options="options">
-        <Button variant="ghost">
-          <template #icon>
-            <LucideMoreHorizontal class="h-4 w-4" />
-          </template>
-        </Button>
-      </Dropdown>
-    </div>
-    <!-- Add member -->
-    <div class="flex flex-col gap-4 h-full">
-      <div class="flex gap-2 items-end">
-        <!-- Form control for search -->
-        <Link
-          doctype="HD Agent"
-          class="form-control flex-1"
-          placeholder="Search members"
-          v-model="search"
-          label="Members"
-          :hide-me="true"
-          :filters="agentFilters"
-        >
-          <template #prefix>
-            <LucideSearch class="h-4 w-4 text-gray-500 mr-2" />
-          </template>
-          <template #item-label="{ option }">
-            <div class="flex items-center justify-between !w-full">
-              <div class="flex items-center gap-1">
-                <Avatar
-                  :label="option.label || option.value"
-                  :image="getUser(option.label)?.user_image"
-                  size="sm"
-                />
-                <p>{{ getUser(option.label)?.full_name || "User" }}</p>
-              </div>
-              <p class="text-gray-600 text-sm">
-                {{ option.label }}
-              </p>
-            </div>
-          </template>
-        </Link>
-        <Button
-          label="Add"
-          variant="solid"
-          :disabled="!search"
-          @click="addMember(search)"
-        >
-          <template #prefix>
-            <LucidePlus class="h-4 w-4 stroke-1.5" />
-          </template>
-        </Button>
-      </div>
-
-      <!-- Member List -->
-      <div
-        class="flex flex-col divide-y divide-gray-200 overflow-y-scroll hide-scrollbar h-full"
-        v-if="teamMembers.length"
-      >
-        <div
-          v-for="(member, idx) in teamMembers"
-          :key="member.user"
-          class="group py-2"
-          :class="idx == teamMembers.length - 1 && 'mb-12'"
-        >
-          <AgentCard :agent="member" class="!py-0">
-            <template #right>
-              <Button
-                variant="ghost"
-                @click.stop="() => removeMemberFromTeam(member.name)"
-                theme="red"
-                class="opacity-0 group-hover:opacity-100"
-                :disabled="team.loading"
-              >
-                <template #icon>
-                  <LucideX class="h-4 w-4" />
-                </template>
-              </Button>
+  <!-- Header -->
+  <div class="px-10 py-8 sticky top-0">
+    <SettingsLayoutHeader>
+      <template #title>
+        <div class="flex items-center justify-between w-full">
+          <div class="flex items-center gap-1 justify-center -ml-[16px]">
+            <Button
+              variant="ghost"
+              icon-left="chevron-left"
+              :label="teamName"
+              size="md"
+              @click="() => emit('update:step', 'team-list')"
+              class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70 !pr-0"
+            />
+          </div>
+        </div>
+      </template>
+      <template #actions>
+        <Dropdown placement="right" :options="options">
+          <Button variant="ghost">
+            <template #icon>
+              <LucideMoreHorizontal class="h-4 w-4" />
             </template>
-          </AgentCard>
+          </Button>
+        </Dropdown>
+      </template>
+      <template #bottom-section>
+        <!-- Add member -->
+        <div class="flex flex-col">
+          <div class="flex gap-2 items-end">
+            <!-- Form control for search -->
+            <Link
+              doctype="HD Agent"
+              class="form-control flex-1"
+              placeholder="Search members"
+              v-model="search"
+              :hide-me="true"
+              :filters="agentFilters"
+            >
+              <template #prefix>
+                <LucideSearch class="h-4 w-4 text-gray-500 mr-2" />
+              </template>
+              <template #item-label="{ option }">
+                <div class="flex items-center justify-between !w-full">
+                  <div class="flex items-center gap-1">
+                    <Avatar
+                      :label="option.label || option.value"
+                      :image="getUser(option.label)?.user_image"
+                      size="sm"
+                    />
+                    <p>{{ getUser(option.label)?.full_name || "User" }}</p>
+                  </div>
+                  <p class="text-gray-600 text-sm">
+                    {{ option.label }}
+                  </p>
+                </div>
+              </template>
+            </Link>
+            <Button
+              label="Add"
+              variant="solid"
+              :disabled="!search"
+              @click="addMember(search)"
+            >
+              <template #prefix>
+                <LucidePlus class="h-4 w-4 stroke-1.5" />
+              </template>
+            </Button>
+          </div>
+        </div>
+      </template>
+    </SettingsLayoutHeader>
+  </div>
+
+  <!-- Member List -->
+  <div class="px-10 pb-8 overflow-y-auto" v-if="teamMembers?.length > 0">
+    <div class="w-full h-full">
+      <div class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600">
+        <div class="col-span-6 text-p-sm">
+          Members ({{ teamMembers.length }})
         </div>
       </div>
-      <div
-        v-else
-        class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
-      >
-        <div
-          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
-        >
-          <UserIcon class="size-6 text-ink-gray-6" />
-        </div>
-        <div class="flex flex-col items-center gap-1">
-          <div class="text-base font-medium text-ink-gray-6">
-            No members found
+      <hr class="mt-2" />
+      <div v-for="member in teamMembers" :key="member.name">
+        <div class="grid grid-cols-8 items-center gap-4 group">
+          <div class="w-full p-2 pl-0 col-span-8">
+            <AgentCard :agent="member" class="!py-0">
+              <template #right>
+                <Dropdown :options="memberDropdownOptions(member)">
+                  <Button
+                    icon="more-horizontal"
+                    variant="ghost"
+                    @click="isConfirmingDelete = false"
+                  />
+                </Dropdown>
+              </template>
+            </AgentCard>
           </div>
-          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-            Add members to this team to get started.
-          </div>
         </div>
+        <hr />
       </div>
     </div>
   </div>
+  <div
+    v-else
+    class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
+  >
+    <div
+      class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+    >
+      <UserIcon class="size-6 text-ink-gray-6" />
+    </div>
+    <div class="flex flex-col items-center gap-1">
+      <div class="text-base font-medium text-ink-gray-6">No members found</div>
+      <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
+        Add members to this team to get started.
+      </div>
+    </div>
+  </div>
+
   <Dialog v-model="showDelete" :options="{ title: 'Delete team' }">
     <template #body-content>
       <p class="text-p-base text-ink-gray-7">
@@ -153,7 +160,6 @@ import {
   createDocumentResource,
   createResource,
   Dialog,
-  Dropdown,
   toast,
   Tooltip,
 } from "frappe-ui";
@@ -165,6 +171,8 @@ import Settings from "~icons/lucide/settings-2";
 import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
 import { setActiveSettingsTab } from "../settingsModal";
 import UserIcon from "~icons/lucide/user";
+import { ConfirmDelete } from "@/utils";
+import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 
 const props = defineProps<{
   teamName: string;
@@ -372,6 +380,15 @@ const options = [
     }),
   },
 ];
+
+const isConfirmingDelete = ref(false);
+
+const memberDropdownOptions = (member) => {
+  return ConfirmDelete({
+    onConfirmDelete: () => removeMemberFromTeam(member.name),
+    isConfirmingDelete,
+  });
+};
 </script>
 
 <style scoped></style>

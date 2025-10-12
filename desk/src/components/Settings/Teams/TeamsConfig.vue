@@ -1,9 +1,11 @@
 <template>
-  <div v-if="step === 'team-list'" class="h-full">
-    <TeamsList @update:step="updateStep" />
-  </div>
-  <div v-else-if="step === 'team-edit'" class="h-full px-10 py-8">
-    <TeamEdit @update:step="updateStep" :team-name="teamName" />
+  <div class="pb-8">
+    <TeamsList v-if="step === 'team-list'" @update:step="updateStep" />
+    <TeamEdit
+      v-else-if="step === 'team-edit'"
+      @update:step="updateStep"
+      :team-name="teamName"
+    />
   </div>
 </template>
 
@@ -29,6 +31,8 @@ const teams = createListResource({
   fields: ["name"],
   auto: true,
   orderBy: "creation desc",
+  start: 0,
+  pageLength: 20,
 });
 
 provide("teamsSearchQuery", teamsSearchQuery);

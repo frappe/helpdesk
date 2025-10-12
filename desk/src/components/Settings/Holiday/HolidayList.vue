@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import HolidayListItem from "./HolidayListItem.vue";
-import { LoadingIndicator } from "frappe-ui";
+import { Button, LoadingIndicator } from "frappe-ui";
 import Briefcase from "~icons/lucide/briefcase";
 
 import { inject } from "vue";

@@ -77,6 +77,17 @@
           </div>
           <hr class="mx-2" />
         </div>
+        <!-- Load More Button -->
+        <div class="flex justify-center">
+          <Button
+            v-if="!teams.loading && teams.hasNextPage"
+            class="mt-3.5 p-2"
+            @click="() => teams.next()"
+            :loading="teams.loading"
+            label="Load More"
+            icon-left="refresh-cw"
+          />
+        </div>
       </div>
       <!-- Loading State -->
       <div

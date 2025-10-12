@@ -152,13 +152,27 @@
           </div>
           <hr class="mx-2" />
         </div>
+        <!-- Load More Button -->
+        <div class="flex justify-center">
+          <Button
+            v-if="
+              !fieldDependenciesList.loading &&
+              fieldDependenciesList.hasNextPage
+            "
+            class="mt-3.5 p-2"
+            @click="() => fieldDependenciesList.next()"
+            :loading="fieldDependenciesList.loading"
+            label="Load More"
+            icon-left="refresh-cw"
+          />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Avatar, LoadingIndicator, Switch, toast } from "frappe-ui";
+import { Avatar, Button, LoadingIndicator, Switch, toast } from "frappe-ui";
 import { getFieldDependencyLabel, ConfirmDelete } from "@/utils";
 import { inject, onMounted, Ref, ref, watch } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";
