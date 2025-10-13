@@ -25,7 +25,7 @@
             v-if="confirmPasswordMessage"
             class="text-sm text-ink-gray-5 mt-2"
             :class="
-              confirmPasswordMessage === 'Passwords match'
+              confirmPasswordMessage === __('Passwords match')
                 ? 'text-ink-green-3'
                 : 'text-ink-red-3'
             "

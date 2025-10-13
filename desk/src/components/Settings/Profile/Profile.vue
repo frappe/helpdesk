@@ -1,8 +1,8 @@
 <template>
   <div class="px-10 py-8">
     <SettingsLayoutHeader
-      title="Profile"
-      description="Manage your profile information"
+      :title="__('Profile')"
+      :description="__('Manage your profile information')"
     />
   </div>
   <div class="px-10 pb-8 overflow-y-auto">
@@ -78,7 +78,7 @@
       <div class="flex items-center justify-between">
         <div class="flex gap-2 items-center">
           <div class="text-base font-semibold text-ink-gray-9">
-            Account info & security
+            {{ __("Account info & security") }}
           </div>
           <Badge
             v-if="isAccountInfoDirty"
@@ -89,7 +89,7 @@
           />
         </div>
         <Button
-          label="Save"
+          :label="__('Save')"
           @click="setAgent.submit()"
           :loading="setAgent.loading"
           :disabled="!isAccountInfoDirty"
@@ -98,25 +98,27 @@
       <div class="flex flex-col sm:flex-row items-center gap-2 mt-6">
         <FormControl
           class="w-full"
-          label="First Name"
+          :label="__('First Name')"
           v-model="profile.firstName"
         />
         <FormControl
           class="w-full"
-          label="Last Name"
+          :label="__('Last Name')"
           v-model="profile.lastName"
         />
       </div>
       <div class="flex items-center justify-between mt-6">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">Password</span>
-          <span class="text-p-sm text-ink-gray-6"
-            >Change your account password for security.</span
-          >
+          <span class="text-base font-medium text-ink-gray-8">
+            {{ __("Password") }}
+          </span>
+          <span class="text-p-sm text-ink-gray-6">{{
+            __("Change your account password for security.")
+          }}</span>
         </div>
         <Button
           icon-left="lock"
-          label="Change Password"
+          :label="__('Change Password')"
           @click="showChangePasswordModal = true"
         />
       </div>
@@ -181,7 +183,7 @@ const setAgent = createResource({
   url: "frappe.client.set_value",
   validate: () => {
     if (!profile.value.firstName.trim()) {
-      return "Please enter first name at least";
+      return __("Please enter first name at least");
     }
   },
   makeParams() {

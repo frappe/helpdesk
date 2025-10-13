@@ -1,13 +1,11 @@
 import { computed, h, markRaw, ref } from "vue";
 import Agents from "./Agents.vue";
-import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
 import Sla from "./Sla/Sla.vue";
 import HolidayList from "./Holiday/Holiday.vue";
 import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
 import InviteAgents from "./InviteAgents.vue";
-import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
 import LucideMailOpen from "~icons/lucide/mail-open";
 import LucideUser from "~icons/lucide/user";
@@ -28,7 +26,6 @@ import General from "./General/General.vue";
 import SettingsGear from "~icons/lucide/settings";
 
 const auth = useAuthStore();
-const { isAdmin, isManager, isWebsiteManager } = auth;
 
 export const tabs = computed(() => {
   const _tabs = [
@@ -49,7 +46,7 @@ export const tabs = computed(() => {
     },
     {
       label: __("Email Settings"),
-      condition: () => isAdmin || isManager,
+      condition: () => auth.isAdmin || auth.isManager,
       items: [
         {
           label: "Email Accounts",
@@ -65,13 +62,13 @@ export const tabs = computed(() => {
     },
     {
       label: __("App Settings"),
-      condition: () => isAdmin || isManager,
+      condition: () => auth.isAdmin || auth.isManager,
       items: [
         {
           label: "General",
           icon: markRaw(SettingsGear),
           component: markRaw(General),
-          condition: () => isAdmin || isWebsiteManager,
+          condition: () => auth.isAdmin || auth.isWebsiteManager,
         },
         {
           label: "Agents",

@@ -33,7 +33,7 @@
           <Button
             @click="openFileSelector()"
             iconLeft="upload"
-            label="Upload Image"
+            :label="__('Upload Image')"
             :loading="props.isLoading || uploading"
             :disabled="props.isDisabled"
           />
@@ -42,7 +42,7 @@
 
       <div v-else>
         <Button
-          :label="`Remove ${props.title}`"
+          :label="__(`Remove {0}`, props.title)"
           @click="emit('onRemove')"
           iconLeft="trash"
           theme="red"

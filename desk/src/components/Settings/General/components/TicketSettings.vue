@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div class="text-base font-semibold text-gray-900">Ticket Settings</div>
+    <div class="text-base font-semibold text-gray-900">
+      {{ __("Ticket Settings") }}
+    </div>
     <div
       v-if="
         ticketTypeList.data && autoUpdateticketStatusList && settingsData.doc
@@ -9,12 +11,12 @@
     >
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8"
-            >Default ticket type</span
-          >
-          <span class="text-p-sm text-ink-gray-6"
-            >Select what type all tickets get by default</span
-          >
+          <span class="text-base font-medium text-ink-gray-8">{{
+            __("Default ticket type")
+          }}</span>
+          <span class="text-p-sm text-ink-gray-6">{{
+            __("Select what type all tickets get by default")
+          }}</span>
         </div>
         <Popover>
           <template #target="{ togglePopover }">
@@ -56,7 +58,7 @@
               <hr class="my-1" />
               <Button
                 variant="ghost"
-                label="Reset"
+                :label="__('Reset')"
                 icon-left="refresh-ccw"
                 class="w-full focus-visible:ring-0"
                 @click="onChange({ default_ticket_type: null })"
@@ -67,12 +69,12 @@
       </div>
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8"
-            >Allow anyone to create tickets</span
-          >
-          <span class="text-p-sm text-ink-gray-6"
-            >Anyone will able to create tickets</span
-          >
+          <span class="text-base font-medium text-ink-gray-8">{{
+            __("Allow anyone to create tickets")
+          }}</span>
+          <span class="text-p-sm text-ink-gray-6">{{
+            __("Anyone will able to create tickets")
+          }}</span>
         </div>
         <Switch
           :model-value="settingsData.doc.allow_anyone_to_create_tickets"
@@ -83,13 +85,14 @@
       </div>
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8"
-            >Make feedback mandatory</span
-          >
-          <span class="text-p-sm text-ink-gray-6"
-            >The feedback dialog will be shown, when a user tries to close a
-            ticket.</span
-          >
+          <span class="text-base font-medium text-ink-gray-8">{{
+            __("Make feedback mandatory")
+          }}</span>
+          <span class="text-p-sm text-ink-gray-6">{{
+            __(
+              "The feedback dialog will be shown, when a user tries to close a ticket."
+            )
+          }}</span>
         </div>
         <Switch
           :model-value="settingsData.doc.is_feedback_mandatory"
@@ -98,9 +101,9 @@
       </div>
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8"
-            >Auto update status</span
-          >
+          <span class="text-base font-medium text-ink-gray-8">{{
+            __("Auto update status")
+          }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
             __(
               "The ticket status will automatically change whenever the agent respond to a ticket."
@@ -152,7 +155,7 @@
               <hr class="my-1" />
               <Button
                 variant="ghost"
-                label="Reset"
+                :label="__('Reset')"
                 icon-left="refresh-ccw"
                 class="w-full focus-visible:ring-0"
                 @click="
@@ -171,12 +174,12 @@
       <div>
         <div class="flex items-center justify-between">
           <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-ink-gray-8"
-              >Restrict tickets by Team</span
-            >
-            <span class="text-p-sm text-ink-gray-6"
-              >Restrict tickets to be created by team members only.</span
-            >
+            <span class="text-base font-medium text-ink-gray-8">{{
+              __("Restrict tickets by Team")
+            }}</span>
+            <span class="text-p-sm text-ink-gray-6">{{
+              __("Restrict tickets to be created by team members only.")
+            }}</span>
           </div>
           <Switch
             :model-value="settingsData.doc.restrict_tickets_by_agent_group"
@@ -204,7 +207,7 @@
                 settingsData.doc.do_not_restrict_tickets_without_an_agent_group
               "
             />
-            <FormLabel label="Do not restrict tickets without a Team" />
+            <FormLabel :label="__('Do not restrict tickets without a Team')" />
           </div>
           <div
             class="flex items-start sm:items-center gap-2"
@@ -215,22 +218,24 @@
             "
           >
             <Checkbox :model-value="settingsData.doc.assign_within_team" />
-            <FormLabel label="Restrict agent assignment to selected Team" />
+            <FormLabel
+              :label="__('Restrict agent assignment to selected Team')"
+            />
           </div>
         </div>
       </div>
       <div>
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8"
-            >Automatically Close Tickets</span
-          >
-          <span class="text-p-sm text-ink-gray-6"
-            >Automatically close tickets after a certain condition is met.</span
-          >
+          <span class="text-base font-medium text-ink-gray-8">{{
+            __("Automatically Close Tickets")
+          }}</span>
+          <span class="text-p-sm text-ink-gray-6">{{
+            __("Automatically close tickets after a certain condition is met.")
+          }}</span>
         </div>
         <div class="grid grid-cols-2 gap-4 mt-3">
           <div class="flex flex-col gap-1.5">
-            <FormLabel label="Auto-close status" />
+            <FormLabel :label="__('Auto-close status')" />
             <Popover>
               <template #target="{ togglePopover }">
                 <div
@@ -277,7 +282,7 @@
                   <hr class="my-1" />
                   <Button
                     variant="ghost"
-                    label="Reset"
+                    :label="__('Reset')"
                     icon-left="refresh-ccw"
                     class="w-full focus-visible:ring-0"
                     @click="
@@ -294,7 +299,7 @@
             </Popover>
           </div>
           <FormControl
-            label="Auto-close after (Days)"
+            :label="__('Auto-close after (Days)')"
             placeholder="e.g. 30"
             :model-value="settingsData.doc.auto_close_after_days"
             @update:model-value="

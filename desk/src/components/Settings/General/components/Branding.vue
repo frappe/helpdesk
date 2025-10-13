@@ -1,9 +1,15 @@
 <template>
   <div v-if="settingsData.doc && websiteSettings.data">
-    <div class="text-base font-semibold text-gray-900">Branding</div>
+    <div class="text-base font-semibold text-gray-900">
+      {{ __("Branding") }}
+    </div>
     <LogoUpload
-      title="Logo"
-      description="Appears in the left sidebar. Recommended size is 32x32 px in PNG or SVG"
+      :title="__('Logo')"
+      :description="
+        __(
+          'Appears in the left sidebar. Recommended size is minimum 32x32 px in PNG or SVG'
+        )
+      "
       :image="settingsData.doc.brand_logo"
       @onUpload="update($event, 'HD Settings', 'brand_logo')"
       @onRemove="update('', 'HD Settings', 'brand_logo')"
@@ -11,8 +17,12 @@
       :isDisabled="loadingState.faviconLoading"
     />
     <LogoUpload
-      title="Favicon"
-      description="Appears next to the title in your browser tab. Recommended size is 32x32 px in PNG or ICO"
+      :title="__('Favicon')"
+      :description="
+        __(
+          'Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO'
+        )
+      "
       :image="websiteSettings.data.favicon"
       @onUpload="update($event, 'Website Settings', 'favicon')"
       @onRemove="update('', 'Website Settings', 'favicon')"
@@ -26,6 +36,7 @@
 import { inject, reactive } from "vue";
 import LogoUpload from "./LogoUpload.vue";
 import { createResource, toast } from "frappe-ui";
+import { __ } from "@/translation";
 
 const settingsData = inject<any>("settingsData");
 const loadingState = reactive({
@@ -54,7 +65,7 @@ const settingsResource = createResource({
       websiteSettings.data.favicon = data.favicon;
       loadingState.faviconLoading = false;
     }
-    toast.success("Updated successfully");
+    toast.success(__("Updated successfully"));
   },
   onError() {
     loadingState.logoLoading = false;

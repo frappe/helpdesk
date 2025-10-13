@@ -2,8 +2,8 @@
   <div class="pb-8">
     <div class="px-10 py-8">
       <SettingsLayoutHeader
-        title="General"
-        description="Manage general settings of your app"
+        :title="__('General')"
+        :description="__('Manage general settings of your app')"
       />
     </div>
     <div class="px-10 pb-8 overflow-y-auto hide-scrollbar">
@@ -28,6 +28,7 @@ import TicketSettings from "./components/TicketSettings.vue";
 import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
 import { provide } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
 
 const { isWebsiteManager, isAdmin } = useAuthStore();
 
@@ -55,7 +56,7 @@ const settingsData = createDocumentResource({
   auto: true,
   setValue: {
     onSuccess() {
-      toast.success("Settings updated");
+      toast.success(__("Settings updated"));
     },
   },
 });
