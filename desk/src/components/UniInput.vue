@@ -28,6 +28,7 @@ import { Autocomplete, Link } from "@/components";
 import { Field } from "@/types";
 import { createResource, FormControl } from "frappe-ui";
 import { computed, h } from "vue";
+import DatePicker from "frappe-ui/src/components/DatePicker/DatePicker.vue";
 
 type Value = string | number | boolean;
 
@@ -79,6 +80,10 @@ const component = computed(() => {
         },
       ],
       size: "sm",
+    });
+  } else if (props.field.fieldtype === "Date") {
+    return h(DatePicker, {
+      id: props.field.fieldname,
     });
   } else {
     return h(FormControl, {
