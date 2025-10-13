@@ -1,0 +1,381 @@
+<template>
+  <!-- Main Settings View -->
+  <SettingsView
+    v-if="currentView === 'main'"
+    title="Otto"
+    description="Configure Otto settings to enable AI features."
+    :isDirty="isAnyDirty"
+    :saving="saving"
+    @save="save"
+  >
+    <!-- Warning if Otto is not installed -->
+    <div
+      v-if="canUseOtto.data === false"
+      class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6"
+    >
+      <div class="flex items-start gap-3">
+        <svg
+          class="w-5 h-5 text-amber-600 mt-0.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+        <div>
+          <p class="text-sm font-medium text-amber-900">
+            Otto is not installed
+          </p>
+          <p class="text-sm text-amber-700 mt-1">
+            Please install Otto to enable AI features.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enable Otto Section -->
+    <div v-if="canUseOtto.data === true && hdSettings.doc" class="mb-6">
+      <Checkbox
+        label="Enable AI Features"
+        title="Enable or disable AI features for Helpdesk."
+        v-model="hdSettings.doc.enable_ai_features"
+        @update:modelValue="hdSettings.doc.enable_ai_features = $event ? 1 : 0"
+      />
+      <div class="text-p-xs text-ink-gray-6 mt-1">
+        Enable or disable AI features for Helpdesk.
+      </div>
+    </div>
+
+    <!-- API Keys Section -->
+    <div
+      v-if="canUseOtto.data === true && hdSettings.doc.enable_ai_features"
+      class="mt-6"
+    >
+      <div class="text-base font-semibold text-ink-gray-8">API Keys</div>
+      <div class="text-p-xs text-ink-gray-6 mt-1">
+        Configure API keys for LLM providers.
+      </div>
+      <div class="grid grid-cols-2 gap-4 mt-4" v-if="!getKeysSet.loading">
+        <Password
+          label="Anthropic API Key"
+          v-model="apiKeys.Anthropic"
+          :placeholder="'sk-ant-...'"
+        />
+        <Password
+          label="OpenAI API Key"
+          v-model="apiKeys.OpenAI"
+          :placeholder="'sk-...'"
+        />
+        <Password
+          label="Gemini API Key (Google)"
+          v-model="apiKeys.Google"
+          :placeholder="'...'"
+        />
+      </div>
+      <div v-else>
+        <div class="text-p-xs text-ink-gray-6 mt-1">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div
+      v-if="canUseOtto.data === true && hdSettings.doc?.enable_ai_features"
+      class="mt-6"
+    >
+      <div class="text-base font-semibold text-ink-gray-8">Features</div>
+      <div class="text-p-xs text-ink-gray-6 mt-1">
+        Configure Otto AI features for your helpdesk.
+      </div>
+      <div class="mt-4">
+        <!-- Summary Feature -->
+        <div
+          class="flex items-center justify-between p-4 border border-ink-gray-3 rounded-lg"
+        >
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <h3 class="text-sm font-medium text-ink-gray-8">Summary</h3>
+            </div>
+            <p class="text-p-xs text-ink-gray-6 mt-1">
+              Automatically generate summaries for tickets using AI.
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <Button
+              label="Settings"
+              theme="gray"
+              variant="subtle"
+              icon-left="settings"
+              @click="openSummarySettings"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </SettingsView>
+
+  <!-- Summary Settings View -->
+  <SettingsView
+    v-else-if="currentView === 'summary'"
+    title="Summary Settings"
+    description="Configure summary AI feature settings."
+    :isDirty="isAnyDirty"
+    :saving="saving"
+    :showBackButton="true"
+    @back="currentView = 'main'"
+    @save="save"
+  >
+    <div v-if="loading" class="text-p-xs text-ink-gray-6">Loading...</div>
+    <div v-else-if="featureConfig">
+      <!-- Enable Summary Feature -->
+      <div class="mb-6">
+        <Checkbox
+          label="Enable Summary Generation"
+          title="When enabled, AI will automatically generate summaries for tickets."
+          v-model="featureConfig.summary.enabled"
+        />
+        <div class="text-p-xs text-ink-gray-6 mt-1">
+          Enable summary generation for tickets.
+        </div>
+      </div>
+
+      <!-- Model Selection -->
+      <div v-if="featureConfig.summary.enabled" class="mb-6">
+        <Select
+          label="LLM"
+          v-model="featureConfig.summary.llm"
+          :options="modelOptions"
+          placeholder="Select a model"
+        />
+        <div class="text-p-xs text-ink-gray-6 mt-1">
+          Select the LLM model to use for summary generation.
+        </div>
+      </div>
+
+      <!-- Directive/Prompt -->
+      <div v-if="featureConfig.summary.enabled" class="mb-6">
+        <Textarea
+          label="Directive"
+          v-model="featureConfig.summary.directive"
+          placeholder="Enter custom instructions for summary generation..."
+          :rows="6"
+        />
+        <div class="text-p-xs text-ink-gray-6 mt-1">
+          Customize the instructions for the AI when generating summaries.
+        </div>
+      </div>
+    </div>
+  </SettingsView>
+</template>
+
+<script setup lang="ts">
+import Password from "@/components/Password.vue";
+import SettingsView from "./SettingsView.vue";
+import {
+  Autocomplete,
+  Button,
+  Checkbox,
+  Select,
+  Textarea,
+  createDocumentResource,
+  createResource,
+  toast,
+} from "frappe-ui";
+import { computed, ref, watch } from "vue";
+import { isDocDirty } from "../Telephony/utils";
+import type { AIFeatureConfig } from "./types";
+
+type ViewType = "main" | "summary";
+
+const currentView = ref<ViewType>("main");
+
+const dummyKey = "••••••••";
+
+const apiKeys = ref({
+  OpenAI: "",
+  Anthropic: "",
+  Google: "",
+});
+
+const isDirty = ref({
+  hdSettings: false,
+  apiKeys: false,
+  featureConfig: false,
+});
+
+const loading = ref(true);
+const saving = ref(false);
+
+const featureConfig = ref<AIFeatureConfig>({
+  summary: {
+    llm: "",
+    enabled: false,
+    directive: "",
+  },
+});
+
+const originalConfig = ref<AIFeatureConfig | null>(null);
+const modelOptions = ref<string[]>([]);
+
+const canUseOtto = createResource({
+  url: "helpdesk.api.otto.can_use_otto",
+  auto: true,
+});
+
+const hdSettings = createDocumentResource({
+  doctype: "HD Settings",
+  name: "HD Settings",
+  fields: ["enable_ai_features"],
+  auto: true,
+});
+
+const getKeysSet = createResource({
+  url: "otto.lib.model.get_keys_set",
+  auto: true,
+  onSuccess: (data) => {
+    Object.keys(data).forEach((key) => {
+      if (data[key]) apiKeys.value[key] = dummyKey;
+    });
+  },
+});
+
+const setApiKeys = createResource({
+  url: "otto.lib.model.set_api_keys",
+});
+
+createResource({
+  url: "helpdesk.api.otto.get_feature_config",
+  auto: true,
+  onSuccess: (data) => {
+    originalConfig.value = data;
+
+    if (data.summary) {
+      featureConfig.value.summary.llm = data.summary?.llm ?? "";
+      featureConfig.value.summary.enabled = data.summary?.enabled ?? false;
+      featureConfig.value.summary.directive = data.summary?.directive ?? "";
+    }
+
+    loading.value = false;
+  },
+  onError: () => {
+    loading.value = false;
+    toast.error("Failed to load summary settings");
+  },
+});
+
+createResource({
+  url: "otto.lib.model.get_models",
+  params: { get_details: true },
+  auto: true,
+  onSuccess: (data) => {
+    modelOptions.value = data.map((model) => ({
+      label: model.title,
+      value: model.name,
+    }));
+  },
+});
+
+const setFeatureConfig = createResource({
+  url: "helpdesk.api.otto.set_feature_config",
+});
+
+const isAnyDirty = computed(() => {
+  return (
+    isDirty.value.hdSettings ||
+    isDirty.value.apiKeys ||
+    isDirty.value.featureConfig
+  );
+});
+
+async function save() {
+  const promises = [];
+  saving.value = true;
+
+  // Save main settings
+  if (isDirty.value.hdSettings) {
+    promises.push(
+      hdSettings.save.submit().catch((er) => {
+        const error = `HD Settings error: ${er?.messages?.[0]}`;
+        toast.error(error || "Failed to save HD Settings");
+      })
+    );
+  }
+
+  if (isDirty.value.apiKeys) {
+    // Only send non-empty keys
+    const keysToSave: Record<string, string> = {};
+    if (apiKeys.value.OpenAI) keysToSave.OpenAI = apiKeys.value.OpenAI;
+    if (apiKeys.value.Anthropic) keysToSave.Anthropic = apiKeys.value.Anthropic;
+    if (apiKeys.value.Google) keysToSave.Google = apiKeys.value.Google;
+
+    if (Object.keys(keysToSave).length > 0) {
+      promises.push(
+        setApiKeys.submit({ keys: keysToSave }).catch((er) => {
+          const error = `API Keys error: ${er?.messages?.[0]}`;
+          toast.error(error || "Failed to save API keys");
+        })
+      );
+    }
+  }
+
+  if (isDirty.value.featureConfig) {
+    const config = JSON.parse(JSON.stringify(featureConfig.value));
+    console.log(config);
+    promises.push(
+      setFeatureConfig.submit({ config }).catch((er) => {
+        const error = `Summary settings error: ${er?.messages?.[0]}`;
+        toast.error(error || "Failed to save summary settings");
+      })
+    );
+  }
+
+  try {
+    await Promise.all(promises);
+    Object.keys(isDirty.value).forEach((key) => (isDirty.value[key] = false));
+
+    toast.success("Otto settings updated!");
+  } catch {
+    toast.error("Failed to save Otto settings");
+  }
+
+  await hdSettings.reload();
+}
+
+function openSummarySettings() {
+  currentView.value = "summary";
+}
+
+watch(
+  () => hdSettings.doc,
+  (newVal) => {
+    isDirty.value.hdSettings = isDocDirty(newVal, hdSettings.originalDoc);
+  },
+  { deep: true }
+);
+
+watch(
+  apiKeys,
+  (newVal) => {
+    isDirty.value.apiKeys =
+      newVal.OpenAI !== dummyKey ||
+      newVal.Anthropic !== dummyKey ||
+      newVal.Google !== dummyKey;
+  },
+  { deep: true }
+);
+
+watch(
+  featureConfig,
+  (newVal) => {
+    if (originalConfig.value) {
+      isDirty.value.featureConfig =
+        JSON.stringify(newVal) !== JSON.stringify(originalConfig.value);
+    }
+  },
+  { deep: true }
+);
+</script>

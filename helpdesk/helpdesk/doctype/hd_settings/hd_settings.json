@@ -50,6 +50,9 @@
   "setup_complete",
   "initial_helpdesk_name_setup_skipped",
   "column_break_hjfh",
+  "otto_section",
+  "enable_ai_features",
+  "ai_feature_config",
   "search_tab",
   "name_weight",
   "subject_weight",
@@ -449,12 +452,30 @@
    "link_filters": "[[\"HD Ticket Status\",\"category\",\"in\",[\"Paused\",\"Resolved\",null]]]",
    "mandatory_depends_on": "eval: doc.auto_close_tickets",
    "options": "HD Ticket Status"
+  },
+  {
+   "fieldname": "otto_section",
+   "fieldtype": "Section Break",
+   "label": "AI Features"
+  },
+  {
+   "default": "0",
+   "description": "Checking this enables AI features dependent on Otto.\nRequires Otto to be installed to function.",
+   "fieldname": "enable_ai_features",
+   "fieldtype": "Check",
+   "label": "Enable AI Features"
+  },
+  {
+   "default": "{}",
+   "fieldname": "ai_feature_config",
+   "fieldtype": "JSON",
+   "label": "AI Feature Config"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-29 13:34:17.018321",
+ "modified": "2025-10-13 13:50:46.205796",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
