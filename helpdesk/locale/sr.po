@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-10-05 10:35+0000\n"
-"PO-Revision-Date: 2025-10-11 02:12\n"
+"PO-Revision-Date: 2025-10-13 02:15\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Cyrillic)\n"
 "MIME-Version: 1.0\n"
@@ -51,7 +51,7 @@ msgstr "<br>Молимо Вас да ажурирате споразуме о н
 #. Introduction text of the email-feedback Web Form
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "<div class=\"ql-editor read-mode\"><p>Let us know if we solved your issue well. It’ll help us serve you better next time.</p></div>"
-msgstr ""
+msgstr "<div class=\"ql-editor read-mode\"><p>Реците нам да ли смо добро решили Ваш проблем. Ваше мишљење ће нам помоћи да Вам следећи пут пружимо још бољу услугу.</p></div>"
 
 #. Header text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -1804,7 +1804,7 @@ msgstr "Опсег"
 #. Title of the email-feedback Web Form
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Rate Your Support Experience"
-msgstr ""
+msgstr "Оцените своје искуство подршке"
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
