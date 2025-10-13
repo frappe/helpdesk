@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-10-05 10:35+0000\n"
-"PO-Revision-Date: 2025-10-12 02:10\n"
+"PO-Revision-Date: 2025-10-13 02:15\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Polish\n"
 "MIME-Version: 1.0\n"
@@ -69,7 +69,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: helpdesk/api/knowledge_base.py:15
 msgid "Access denied"
@@ -85,7 +85,7 @@ msgstr ""
 #. Label of the action (Data) field in DocType 'HD Ticket Activity'
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "Action"
-msgstr ""
+msgstr "Akcja"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:22
 msgid "Action Required"
@@ -771,14 +771,14 @@ msgstr "Duplikat reguły przypisania"
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "Email"
-msgstr ""
+msgstr "E-mail"
 
 #. Label of the email_account (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Email Account"
-msgstr ""
+msgstr "Konto e-mail"
 
 #. Label of the feedback_email_content (Text) field in DocType 'HD Settings'
 #. Label of the acknowledgement_email_content (Text) field in DocType 'HD
@@ -1517,7 +1517,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Message"
-msgstr ""
+msgstr "Wiadomość"
 
 #. Label of the meta_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1590,7 +1590,7 @@ msgstr ""
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Notification Settings"
-msgstr ""
+msgstr "Ustawienia powiadomień"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:232
@@ -2050,7 +2050,7 @@ msgstr "Sobota"
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:50
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Save"
-msgstr ""
+msgstr "Zapisz"
 
 #. Label of the script (Code) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -2284,7 +2284,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:30
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Subject"
-msgstr ""
+msgstr "Temat"
 
 #. Label of the subject_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2636,7 +2636,7 @@ msgstr "Wtorek"
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Type"
-msgstr ""
+msgstr "Typ"
 
 #. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
