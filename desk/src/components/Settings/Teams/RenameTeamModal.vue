@@ -3,8 +3,8 @@
     <template #body-content>
       <FormControl
         v-model="teamName"
-        label="Title"
-        placeholder="Product Experts"
+        :label="__('Title')"
+        :placeholder="__('Product Experts')"
       />
     </template>
     <template #actions>
@@ -20,6 +20,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { createResource, Dialog, toast } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 
@@ -41,20 +42,20 @@ const renameTeamResource = createResource({
     };
   },
   validate(params) {
-    if (!params.new_name) return "New title is required";
+    if (!params.new_name) return __("New title is required");
     if (params.new_name === params.old_name)
-      return "New and old title cannot be same";
+      return __("New and old title cannot be same");
   },
   onSuccess(data) {
-    toast.success("Team renamed");
+    toast.success(__("Team renamed"));
     dialog.value.show = false;
     emit("onRename", data);
   },
 });
 
 const renameDialogOptions = computed(() => ({
-  title: "Rename team",
-  message: "Enter the new name for the team",
+  title: __("Rename team"),
+  message: __("Enter the new name for the team"),
 }));
 
 function renameTeam() {
