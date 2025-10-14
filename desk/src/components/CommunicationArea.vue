@@ -3,7 +3,7 @@
     <div
       class="flex justify-between gap-3 border-t px-6 md:px-10 py-4 md:py-2.5"
     >
-      <div class="flex gap-1.5 items-center">
+      <div class="flex gap-1.5 items-center w-full">
         <Button
           ref="sendEmailRef"
           variant="ghost"
@@ -26,6 +26,18 @@
           </template>
         </Button>
         <TypingIndicator :ticketId="ticketId" />
+        <Button
+          title="Summarize ticket activity"
+          variant="ghost"
+          label="Summarize"
+          @click="summarizeTicket()"
+          class="ml-auto"
+          v-if="enabledAiFeatures.data.summary"
+        >
+          <template #prefix>
+            <SummarizeIcon class="h-4" />
+          </template>
+        </Button>
       </div>
     </div>
     <div
@@ -99,6 +111,20 @@ import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { ref, watch } from "vue";
+
+import SummarizeIcon from "./icons/SummarizeIcon.vue";
+import { enabledAiFeatures } from "@/composables/otto";
+import { createResource } from "frappe-ui";
+
+async function summarizeTicket() {
+  const res = await createResource({
+    url: "helpdesk.api.otto.summarize_ticket",
+  }).submit({
+    ticket_id: props.ticketId,
+  });
+
+  console.log(res);
+}
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");

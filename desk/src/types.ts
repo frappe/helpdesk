@@ -45,6 +45,14 @@ export interface Communication {
   cc?: string;
 }
 
+export interface Summary {
+  creation: string;
+  content: string;
+  summarizer: string;
+  summarized_by: string;
+  snippet: string;
+}
+
 export interface Activity {
   action: string;
   name: string;
@@ -355,12 +363,20 @@ export interface FeedbackActivity {
   key: string;
 }
 
+export interface SummaryActivity extends BaseActivity {
+  type: "summary";
+  snippet: string;
+  summarizer: string;
+  summarizedBy: string;
+}
+
 export type TicketActivity =
   | HistoryActivity
   | EmailActivity
   | CommentActivity
   | CallActivity
-  | FeedbackActivity;
+  | FeedbackActivity
+  | SummaryActivity;
 
 interface FileAttachment {
   name: string;
@@ -492,6 +508,7 @@ export interface TicketActivities {
   communications: Communication[];
   history: Activity[];
   views: ViewLog[];
+  summaries: Summary[];
 }
 
 // symbols

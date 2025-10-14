@@ -42,6 +42,10 @@
                 "
                 class="text-gray-600 absolute left-[7.5px] size-4"
               />
+              <SummarizeIcon
+                v-else-if="activity.type === 'summary'"
+                class="text-gray-600 absolute left-[7.5px]"
+              />
               <DotIcon v-else class="text-gray-600 absolute left-[7.5px]" />
             </div>
           </div>
@@ -70,6 +74,10 @@
             <FeedbackBox
               :activity="activity"
               v-else-if="activity.type === 'feedback'"
+            />
+            <SummaryBox
+              v-else-if="activity.type === 'summary'"
+              :activity="activity"
             />
             <HistoryBox v-else :activity="activity" />
           </div>
@@ -123,6 +131,8 @@ import { Avatar, FeatherIcon } from "frappe-ui";
 import { PropType, Ref, computed, h, inject, nextTick, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
+import SummaryBox from "../ticket-agent/SummaryBox.vue";
+import SummarizeIcon from "../icons/SummarizeIcon.vue";
 
 const props = defineProps({
   activities: {

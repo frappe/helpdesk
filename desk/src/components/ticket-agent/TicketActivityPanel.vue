@@ -171,12 +171,28 @@ const _activities = computed(() => {
     };
   });
 
-  const sorted = [
+  const summaryProps = activities.value.data.summaries.map((summary) => {
+    return {
+      type: "summary",
+      snippet: summary.snippet,
+      content: summary.content,
+      creation: summary.creation,
+      summarizer: summary.summarizer,
+      summarizedBy: summary.summarized_by,
+    };
+  });
+
+  const unsorted = [
     ...emailProps,
     ...commentProps,
     ...historyProps,
     ...callProps,
-  ].sort((a, b) => new Date(a.creation) - new Date(b.creation));
+    ...summaryProps,
+  ];
+
+  const sorted = unsorted.sort(
+    (a, b) => new Date(a.creation) - new Date(b.creation)
+  );
   const data = [];
   let i = 0;
 
@@ -236,6 +252,7 @@ function filterActivities(eventType: TicketTab) {
   if (eventType === "activity") {
     return _activities.value;
   }
+
   return _activities.value.filter((activity) => activity.type === eventType);
 }
 </script>
