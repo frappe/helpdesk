@@ -148,7 +148,7 @@ def get_summaries(ticket: str) -> list[Summary]:
 
     for session, use in tool_uses:
         summarized_by = owner_map.get(session, "Unknown")
-        summary = _get_summary_from_tool_use(use, summarized_by)
+        summary = _get_summary_from_tool_use(use, summarized_by, session)
         summaries.append(summary)
     return summaries
 
@@ -192,8 +192,8 @@ def _summarize(ticket_id: str):
             },
         )
 
-    # Mark tool uses as completed, session won't be called after this Mainly
-    # used for timestamps
+    # Mark tool uses as completed, session won't be called after this.
+    # Mainly to show up as completed in the reports.
     updates: list[otto.types.ToolUseUpdate] = []
     for use in session.get_pending_tool_use():
         now = time.time()
@@ -212,7 +212,11 @@ def _summarize(ticket_id: str):
     # Publish summary to the frontend
     uses = session.get_tool_uses(name="summarize_ticket")
     if len(uses):
-        summary = _get_summary_from_tool_use(uses[0], frappe.session.user or "Unknown")
+        summary = _get_summary_from_tool_use(
+            uses[0],
+            frappe.session.user or "Unknown",
+            session.id,
+        )
         frappe.publish_realtime(
             event=summary_event,
             user=frappe.session.user,
@@ -226,11 +230,15 @@ def _summarize(ticket_id: str):
     return res, session
 
 
-def _get_summary_from_tool_use(use: "ToolUseContent", summarized_by: str):
+def _get_summary_from_tool_use(use: "ToolUseContent", summarized_by: str, session: str):
     from otto.lib.utils import to_html
 
     use["end_time"]
     args = use["args"]
+
+    creation = frappe.get_value("Otto Session", session, "modified")
+    if isinstance(creation, datetime.datetime):
+        creation = creation.isoformat()
 
     user = frappe.get_value(
         "User",
@@ -241,7 +249,7 @@ def _get_summary_from_tool_use(use: "ToolUseContent", summarized_by: str):
     summarizer = user.get("full_name", user.get("first_name", ""))
 
     return Summary(
-        creation=datetime.datetime.fromtimestamp(use["end_time"]).isoformat(),
+        creation=creation,
         summarizer=summarizer,
         summarized_by=summarized_by,
         snippet=to_html(args.get("snippet", "")),
@@ -309,7 +317,7 @@ def _get_context_from_communications(ticket_id: str):
         context.append(
             f"<ticket_communication date='{date}' sender_name='{name}' sender_email='{sender}' subject='{subject}' >"
         )
-        context.extend(otto.utils.interpolate_imgs(content))
+        context.extend(otto.utils.interpolate_imgs(content, skip_errors=True))
         context.append("</ticket_communication>")
 
     return context
