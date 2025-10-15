@@ -1,5 +1,5 @@
 <template>
-  <Tabs v-model="tabIndex" :tabs="tabs">
+  <Tabs :modelValue="tabIndex" :tabs="tabs" @update:modelValue="changeTabTo">
     <TabList />
     <TabPanel v-slot="{ tab }" class="flex-1">
       <TicketAgentActivities
@@ -104,7 +104,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   return _tabs;
 });
 
-const { tabIndex } = useActiveTabManager(tabs, "lastTicketTab");
+const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend

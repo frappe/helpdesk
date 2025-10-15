@@ -62,7 +62,11 @@
     <div v-if="ticket.data" class="flex flex-1 overflow-x-hidden">
       <div class="flex flex-1 flex-col overflow-x-hidden">
         <div class="flex-1 flex flex-col">
-          <Tabs v-model="tabIndex" :tabs="tabs">
+          <Tabs
+            :modelValue="tabIndex"
+            :tabs="tabs"
+            @update:modelValue="changeTabTo"
+          >
             <TabList />
             <TabPanel v-slot="{ tab }" class="h-full">
               <div v-if="tab.name === 'details'">
@@ -372,7 +376,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   return _tabs;
 });
 
-const { tabIndex } = useActiveTabManager(tabs, "lastTicketTab");
+const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
 
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email, idx: number) => {
