@@ -5,5 +5,5 @@ export interface AIFeatureConfig {
 export interface SummaryConfig {
   llm: string;
   enabled: boolean;
-  directive: string;
+  guidelines: string;
 }

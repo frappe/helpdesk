@@ -22,6 +22,7 @@ import Telephony from "./Telephony/Telephony.vue";
 import Otto from "./Otto/Otto.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
+import BotIcon from "../icons/BotIcon.vue";
 
 export const tabs = [
   {
@@ -90,7 +91,7 @@ export const tabs = [
       },
       {
         label: "Otto",
-        icon: markRaw(PhoneIcon),
+        icon: markRaw(BotIcon), // TODO: use line version of Otto's logo
         component: markRaw(Otto),
       },
     ],

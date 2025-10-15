@@ -14,6 +14,7 @@ from otto.lib.types import ToolSchema, ToolSchemaParameters
 
 from helpdesk.api.otto.types import Summary, SummaryConfig
 
+summary_event = "helpdesk:otto-summarize"
 default_summary_guidelines = """
 Your goal is to analyze a support ticket and its exchange and produce a clear, structured summary that captures:
 1. The main issue raised by the customer
@@ -43,7 +44,7 @@ The output should be in the following format:
 """.strip()
 
 default_summary_config = SummaryConfig(
-    enabled=False,
+    enabled=True,
     llm="",  # Defaults to any available Small model
     guidelines=default_summary_guidelines,
 )
@@ -105,10 +106,11 @@ summary_tool = ToolSchema(
 
 @frappe.whitelist()
 def summarize(ticket_id: str):
-    frappe.enqueue(
-        _summarize,
-        ticket_id=ticket_id,
-    )
+    # frappe.enqueue(
+    #     _summarize,
+    #     ticket_id=ticket_id,
+    # )
+    _summarize(ticket_id)
 
 
 @frappe.whitelist()
@@ -179,10 +181,11 @@ def _summarize(ticket_id: str):
     res = session.interact(context, stream=True)
     for chunk in res:
         frappe.publish_realtime(
-            event="helpdesk.api.otto.summary.summarize",
+            event=summary_event,
             user=frappe.session.user,
             message={
                 "type": "chunk",
+                "ticket": ticket_id,
                 "data": dict(chunk),
             },
         )
@@ -209,10 +212,11 @@ def _summarize(ticket_id: str):
     if len(uses):
         summary = _get_summary_from_tool_use(uses[0], frappe.session.user or "Unknown")
         frappe.publish_realtime(
-            event="helpdesk.api.otto.summary.summarize",
+            event=summary_event,
             user=frappe.session.user,
             message={
                 "type": "summary",
+                "ticket": ticket_id,
                 "data": dict(summary),
             },
         )
@@ -238,7 +242,7 @@ def _get_summary_from_tool_use(use: "ToolUseContent", summarized_by: str):
         creation=datetime.datetime.fromtimestamp(use["end_time"]).isoformat(),
         summarizer=summarizer,
         summarized_by=summarized_by,
-        snippet=args.get("snippet", ""),
+        snippet=to_html(args.get("snippet", "")),
         content=to_html(args.get("content", "")),
     )
 

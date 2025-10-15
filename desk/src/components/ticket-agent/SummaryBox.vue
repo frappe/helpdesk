@@ -32,12 +32,19 @@
 
     <div class="rounded bg-gray-50 transition-colors px-4 py-3">
       <!-- Summary Snippet -->
-      <div class="flex items-center justify-between">
-        <p title="Summary snippet" class="text-p-sm">{{ activity.snippet }}</p>
+      <div
+        class="flex items-center justify-between cursor-pointer"
+        @click="show = !show"
+      >
+        <p
+          title="Summary snippet"
+          class="text-p-sm"
+          v-html="activity.snippet"
+        ></p>
         <Button
           variant="ghost"
           :icon="show ? 'chevron-up' : 'chevron-down'"
-          @click="show = !show"
+          @click.stop="show = !show"
         >
         </Button>
       </div>

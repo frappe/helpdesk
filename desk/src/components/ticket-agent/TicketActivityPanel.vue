@@ -36,6 +36,7 @@
     :cc-emails="[]"
     :bcc-emails="[]"
     :key="ticket.doc?.name"
+    :show-summarize-button="showSummarizeButton"
     @update="
       () => {
         activities.reload();
@@ -65,6 +66,7 @@ import { LoadingIndicator, TabList, TabPanel, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
+import { enabledAiFeatures } from "@/composables/otto";
 
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);
@@ -256,6 +258,17 @@ function filterActivities(eventType: TicketTab) {
 
   return _activities.value.filter((activity) => activity.type === eventType);
 }
-</script>
 
-<style scoped></style>
+const showSummarizeButton = computed(() => {
+  if (!enabledAiFeatures.data?.summary) return false;
+  if (tabIndex.value !== 0) return false;
+  if (
+    _activities.value
+      .filter((a) => ["email", "summary"].includes(a.type))
+      .at(-1).type === "summary"
+  )
+    return false;
+
+  return true;
+});
+</script>
