@@ -5,7 +5,7 @@
     title="Otto"
     description="Configure Otto settings to enable AI features."
     :isDirty="isAnyDirty"
-    :saving="saving"
+    :saving="isSaving"
     @save="save"
   >
     <!-- Warning if Otto is not installed -->
@@ -124,12 +124,12 @@
     title="Summary Settings"
     description="Configure summary AI feature settings."
     :isDirty="isAnyDirty"
-    :saving="saving"
+    :saving="isSaving"
     :showBackButton="true"
     @back="currentView = 'main'"
     @save="save"
   >
-    <div v-if="loading" class="text-p-xs text-ink-gray-6">Loading...</div>
+    <div v-if="isLoading" class="text-p-xs text-ink-gray-6">Loading...</div>
     <div v-else-if="featureConfig">
       <!-- Enable Summary Feature -->
       <div class="mb-6">
@@ -174,9 +174,7 @@
 
 <script setup lang="ts">
 import Password from "@/components/Password.vue";
-import SettingsView from "./SettingsView.vue";
 import {
-  Autocomplete,
   Button,
   Checkbox,
   Select,
@@ -187,6 +185,7 @@ import {
 } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { isDocDirty } from "../Telephony/utils";
+import SettingsView from "./SettingsView.vue";
 import type { AIFeatureConfig } from "./types";
 
 type ViewType = "main" | "summary";
@@ -206,9 +205,8 @@ const isDirty = ref({
   apiKeys: false,
   featureConfig: false,
 });
-
-const loading = ref(true);
-const saving = ref(false);
+const isSaving = ref(false);
+const isLoading = ref(true);
 
 const featureConfig = ref<AIFeatureConfig>({
   summary: {
@@ -259,10 +257,10 @@ createResource({
       featureConfig.value.summary.directive = data.summary?.directive ?? "";
     }
 
-    loading.value = false;
+    isLoading.value = false;
   },
   onError: () => {
-    loading.value = false;
+    isLoading.value = false;
     toast.error("Failed to load summary settings");
   },
 });
@@ -283,17 +281,16 @@ const setFeatureConfig = createResource({
   url: "helpdesk.api.otto.set_feature_config",
 });
 
-const isAnyDirty = computed(() => {
-  return (
+const isAnyDirty = computed(
+  () =>
     isDirty.value.hdSettings ||
     isDirty.value.apiKeys ||
     isDirty.value.featureConfig
-  );
-});
+);
 
 async function save() {
+  isSaving.value = true;
   const promises = [];
-  saving.value = true;
 
   // Save main settings
   if (isDirty.value.hdSettings) {
@@ -308,9 +305,12 @@ async function save() {
   if (isDirty.value.apiKeys) {
     // Only send non-empty keys
     const keysToSave: Record<string, string> = {};
-    if (apiKeys.value.OpenAI) keysToSave.OpenAI = apiKeys.value.OpenAI;
-    if (apiKeys.value.Anthropic) keysToSave.Anthropic = apiKeys.value.Anthropic;
-    if (apiKeys.value.Google) keysToSave.Google = apiKeys.value.Google;
+    if (apiKeys.value.OpenAI && apiKeys.value.OpenAI !== dummyKey)
+      keysToSave.OpenAI = apiKeys.value.OpenAI;
+    if (apiKeys.value.Anthropic && apiKeys.value.Anthropic !== dummyKey)
+      keysToSave.Anthropic = apiKeys.value.Anthropic;
+    if (apiKeys.value.Google && apiKeys.value.Google !== dummyKey)
+      keysToSave.Google = apiKeys.value.Google;
 
     if (Object.keys(keysToSave).length > 0) {
       promises.push(
@@ -324,7 +324,6 @@ async function save() {
 
   if (isDirty.value.featureConfig) {
     const config = JSON.parse(JSON.stringify(featureConfig.value));
-    console.log(config);
     promises.push(
       setFeatureConfig.submit({ config }).catch((er) => {
         const error = `Summary settings error: ${er?.messages?.[0]}`;
@@ -335,6 +334,7 @@ async function save() {
 
   try {
     await Promise.all(promises);
+    isSaving.value = false;
     Object.keys(isDirty.value).forEach((key) => (isDirty.value[key] = false));
 
     toast.success("Otto settings updated!");

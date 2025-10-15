@@ -32,7 +32,7 @@
           label="Summarize"
           @click="summarizeTicket()"
           class="ml-auto"
-          v-if="enabledAiFeatures.data.summary"
+          v-if="enabledAiFeatures.data?.summary"
         >
           <template #prefix>
             <SummarizeIcon class="h-4" />
@@ -117,13 +117,11 @@ import { enabledAiFeatures } from "@/composables/otto";
 import { createResource } from "frappe-ui";
 
 async function summarizeTicket() {
-  const res = await createResource({
-    url: "helpdesk.api.otto.summarize_ticket",
+  await createResource({
+    url: "helpdesk.api.otto.summary.summarize",
   }).submit({
     ticket_id: props.ticketId,
   });
-
-  console.log(res);
 }
 
 const emit = defineEmits(["update"]);

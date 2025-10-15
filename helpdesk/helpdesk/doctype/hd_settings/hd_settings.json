@@ -469,13 +469,15 @@
    "default": "{}",
    "fieldname": "ai_feature_config",
    "fieldtype": "JSON",
-   "label": "AI Feature Config"
+   "hidden": 1,
+   "label": "AI Feature Config",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-10-13 13:50:46.205796",
+ "modified": "2025-10-15 11:04:02.434569",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

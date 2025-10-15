@@ -174,6 +174,7 @@ const _activities = computed(() => {
   const summaryProps = activities.value.data.summaries.map((summary) => {
     return {
       type: "summary",
+      key: summary.creation,
       snippet: summary.snippet,
       content: summary.content,
       creation: summary.creation,

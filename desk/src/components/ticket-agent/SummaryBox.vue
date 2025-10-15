@@ -71,16 +71,19 @@ import { useUserStore } from "@/stores/user";
 import { SummaryActivity } from "@/types";
 import { dateFormat, dateTooltipFormat, getFontFamily, timeAgo } from "@/utils";
 import { Avatar, Button, TextEditor } from "frappe-ui";
-import { PropType, ref } from "vue";
-
-const show = ref(false);
+import { PropType, ref, toRef, watch } from "vue";
 
 const props = defineProps({
   activity: {
     type: Object as PropType<SummaryActivity>,
     required: true,
   },
+  isLast: {
+    type: Boolean,
+    default: false,
+  },
 });
 
+const show = toRef(props.isLast);
 const { getUser } = useUserStore();
 </script>

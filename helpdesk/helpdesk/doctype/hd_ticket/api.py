@@ -766,7 +766,7 @@ def get_similar_tickets(ticket: str):
 
 @frappe.whitelist()
 def get_ticket_activities(ticket: str):
-    from helpdesk.api.otto import get_summaries
+    from helpdesk.api.otto.summary import get_summaries
 
     activities = {
         "comments": get_comments(ticket),

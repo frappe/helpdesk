@@ -78,6 +78,7 @@
             <SummaryBox
               v-else-if="activity.type === 'summary'"
               :activity="activity"
+              :is-last="isLastSummary(activity)"
             />
             <HistoryBox v-else :activity="activity" />
           </div>
@@ -182,6 +183,14 @@ const emptyTextIcon = computed(() => {
   }
   return h(icon, { class: "text-gray-500" });
 });
+
+const summaries = computed(() => {
+  return props.activities.filter((activity) => activity.type === "summary");
+});
+
+function isLastSummary(activity: TicketActivity) {
+  return summaries.value.at(-1).key === activity.key;
+}
 
 function scrollToLatestActivity() {
   if (route.hash) {
