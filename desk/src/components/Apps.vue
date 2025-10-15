@@ -1,5 +1,11 @@
 <template>
-  <Popover placement="right-start" class="flex w-full">
+  <Popover
+    placement="right-start"
+    class="flex w-full"
+    trigger="hover"
+    :hoverDelay="0.1"
+    :leaveDelay="0.1"
+  >
     <template #target="{ togglePopover }">
       <button
         :class="[
@@ -16,14 +22,14 @@
     </template>
     <template #body>
       <div
-        class="grid grid-cols-3 justify-between mx-3 p-2 rounded-lg border border-gray-100 bg-white shadow-xl"
+        class="flex flex-col justify-between mx-3 p-1.5 rounded-lg border border-gray-100 bg-white shadow-xl"
       >
         <div v-for="app in apps.data" key="name">
           <a
             :href="app.route"
-            class="flex flex-col gap-1.5 rounded justify-center items-center py-2 px-3 hover:bg-gray-100"
+            class="flex gap-2 rounded items-center hover:bg-gray-100 p-1.5"
           >
-            <img class="size-8" :src="app.logo" />
+            <img class="size-6" :src="app.logo" />
             <div class="text-sm" @click="app.onClick">
               {{ app.title }}
             </div>
