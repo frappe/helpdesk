@@ -15,8 +15,7 @@ class HDTeam(Document):
         self.rename(new_name)
 
     def after_insert(self):
-        # nosemgrep
-        self.create_assignment_rule()  # nosemgrep
+        self.create_assignment_rule()
         assignment_rule_doc = frappe.get_doc("Assignment Rule", self.assignment_rule)
 
         for user in self.users:
@@ -28,6 +27,7 @@ class HDTeam(Document):
         if assignment_rule_doc.disabled and assignment_rule_doc.users:
             assignment_rule_doc.disabled = False
         assignment_rule_doc.save()
+        frappe.db.commit()
 
     def after_rename(self, olddn, newdn, merge=False):
         # Update the condition for the linked assignment rule
