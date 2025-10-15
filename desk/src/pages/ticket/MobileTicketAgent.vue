@@ -241,7 +241,8 @@ import { HDTicketStatus } from "@/types/doctypes";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 
 const telephonyStore = useTelephonyStore();
-const { isCallingEnabled } = storeToRefs(telephonyStore);
+const { isLoading: isTelephonyLoading, isCallingEnabled } =
+  storeToRefs(telephonyStore);
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
@@ -376,7 +377,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   return _tabs;
 });
 
-const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
+const { tabIndex, changeTabTo } = useActiveTabManager(tabs, isTelephonyLoading);
 
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email, idx: number) => {

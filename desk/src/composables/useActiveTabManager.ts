@@ -1,13 +1,17 @@
 import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-export function useActiveTabManager(tabs) {
+export function useActiveTabManager(tabs, isLoading) {
   const route = useRoute();
   const router = useRouter();
 
   const changeTabTo = (tab) => {
     tabIndex.value = tab;
-    setActiveTabInUrl(tabs.value?.[tab]?.name || tabs.value[0].name);
+    if (tab == 0) {
+      router.replace({ path: route.path });
+    } else {
+      setActiveTabInUrl(tabs.value?.[tab]?.name || tabs.value[0].name);
+    }
   };
 
   function setActiveTabInUrl(tabName) {
@@ -24,32 +28,44 @@ export function useActiveTabManager(tabs) {
 
   const tabIndex = ref(0);
 
+  const setActiveTab = () => {
+    let _activeTab = route.hash.replace("#", "");
+    if (_activeTab) {
+      let index = findTabIndex(_activeTab);
+      if (index !== -1 || index === 0) {
+        tabIndex.value = index;
+        setActiveTabInUrl(tabs.value[index].name);
+        return;
+      }
+    }
+
+    tabIndex.value = 0;
+    router.replace({ path: route.path });
+  };
+
+  // Handle when page is navigated
   watch(
     () => route.hash,
     (newHash) => {
       let index = findTabIndex(newHash.replace("#", ""));
       if (index === -1) index = 0;
 
+      if (index == 0) {
+        router.replace({ path: route.path });
+      }
+
       tabIndex.value = index;
     }
   );
 
+  // Handle when tabs array is updated
   watch(
-    tabs,
-    (tabsValue) => {
+    [tabs, isLoading],
+    ([tabsValue, isLoadingValue]) => {
       if (!tabsValue?.length) return;
-
-      let _activeTab = route.hash.replace("#", "");
-      if (_activeTab) {
-        let index = findTabIndex(_activeTab);
-        if (index !== -1) {
-          tabIndex.value = index;
-          setActiveTabInUrl(tabsValue[index].name);
-          return;
-        }
+      if (!isLoadingValue) {
+        setActiveTab();
       }
-      tabIndex.value = 0;
-      setActiveTabInUrl(tabsValue[0].name);
     },
     { deep: true, flush: "post" }
   );
