@@ -318,7 +318,7 @@ import {
   Switch,
   toast,
 } from "frappe-ui";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, provide, ref, watch } from "vue";
 import {
   assignmentRuleData,
   assignmentRulesActiveScreen,
@@ -336,6 +336,7 @@ import { disableSettingModalOutsideClick } from "../settingsModal";
 const isDirty = ref(false);
 const initialData = ref(null);
 const isLoading = ref(false);
+provide("isAssignmentRuleFormDirty", isDirty);
 
 const showConfirmDialog = ref({
   show: false,
@@ -343,6 +344,8 @@ const showConfirmDialog = ref({
   message: "",
   onConfirm: () => {},
 });
+
+provide("showConfirmDialog", showConfirmDialog);
 const useNewUI = ref(true);
 const isOldSla = ref(false);
 const deskUrl = `${window.location.origin}/app/assignment-rule/${assignmentRulesActiveScreen.value.data?.name}`;
@@ -390,6 +393,7 @@ const getAssignmentRuleData = createResource({
 
 if (!assignmentRulesActiveScreen.value.data) {
   disableSettingModalOutsideClick.value = true;
+  initialData.value = JSON.stringify(assignmentRuleData.value);
 }
 
 const goBack = () => {
@@ -400,13 +404,6 @@ const goBack = () => {
     onConfirm: goBack,
   };
   if (isDirty.value && !showConfirmDialog.value.show) {
-    showConfirmDialog.value = confirmDialogInfo;
-    return;
-  }
-  if (
-    !assignmentRulesActiveScreen.value.data &&
-    !showConfirmDialog.value.show
-  ) {
     showConfirmDialog.value = confirmDialogInfo;
     return;
   }
@@ -446,40 +443,39 @@ const saveAssignmentRule = () => {
     }
     updateAssignmentRule();
   } else {
-    createAssignmentRuleResource.submit();
+    createAssignmentRuleResource.submit({
+      doc: {
+        doctype: "Assignment Rule",
+        document_type: "HD Ticket",
+        rule: assignmentRuleData.value.rule,
+        priority: assignmentRuleData.value.priority,
+        users: assignmentRuleData.value.users,
+        disabled: assignmentRuleData.value.disabled,
+        description: assignmentRuleData.value.description,
+        assignment_days: assignmentRuleData.value.assignmentDays.map((day) => ({
+          day: day,
+        })),
+        name: assignmentRuleData.value.assignmentRuleName,
+        assignment_rule_name: assignmentRuleData.value.assignmentRuleName,
+        assign_condition: convertToConditions({
+          conditions: assignmentRuleData.value.assignConditionJson,
+        }),
+        unassign_condition: convertToConditions({
+          conditions: assignmentRuleData.value.unassignConditionJson,
+        }),
+        assign_condition_json: JSON.stringify(
+          assignmentRuleData.value.assignConditionJson
+        ),
+        unassign_condition_json: JSON.stringify(
+          assignmentRuleData.value.unassignConditionJson
+        ),
+      },
+    });
   }
 };
 
 const createAssignmentRuleResource = createResource({
   url: "frappe.client.insert",
-  params: {
-    doc: {
-      doctype: "Assignment Rule",
-      document_type: "HD Ticket",
-      rule: assignmentRuleData.value.rule,
-      priority: assignmentRuleData.value.priority,
-      users: assignmentRuleData.value.users,
-      disabled: assignmentRuleData.value.disabled,
-      description: assignmentRuleData.value.description,
-      assignment_days: assignmentRuleData.value.assignmentDays.map((day) => ({
-        day: day,
-      })),
-      name: assignmentRuleData.value.assignmentRuleName,
-      assignment_rule_name: assignmentRuleData.value.assignmentRuleName,
-      assign_condition: convertToConditions({
-        conditions: assignmentRuleData.value.assignConditionJson,
-      }),
-      unassign_condition: convertToConditions({
-        conditions: assignmentRuleData.value.unassignConditionJson,
-      }),
-      assign_condition_json: JSON.stringify(
-        assignmentRuleData.value.assignConditionJson
-      ),
-      unassign_condition_json: JSON.stringify(
-        assignmentRuleData.value.unassignConditionJson
-      ),
-    },
-  },
   onSuccess(data) {
     getAssignmentRuleData
       .submit({
