@@ -31,7 +31,9 @@
         label="Enable Smart Features"
         title="Enable or disable smart features for Helpdesk."
         v-model="hdSettings.doc.enable_smart_features"
-        @update:modelValue="hdSettings.doc.enable_smart_features = $event ? 1 : 0"
+        @update:modelValue="
+          hdSettings.doc.enable_smart_features = $event ? 1 : 0
+        "
       />
       <div class="text-p-xs text-ink-gray-6 mt-1">
         Enable or disable smart features for Helpdesk.

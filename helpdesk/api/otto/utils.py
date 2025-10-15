@@ -64,4 +64,4 @@ def set_feature_config(config: dict) -> None:
     import json
 
     val = json.dumps(config, indent=2)
-    frappe.db.set_value("HD Settings", "HD Settings", "smart_feature_config", val)
+    frappe.db.set_single_value("HD Settings", "smart_feature_config", val)

@@ -233,7 +233,6 @@ def _summarize(ticket_id: str):
 def _get_summary_from_tool_use(use: "ToolUseContent", summarized_by: str, session: str):
     from otto.lib.utils import to_html
 
-    use["end_time"]
     args = use["args"]
 
     creation = frappe.get_value("Otto Session", session, "modified")
@@ -270,7 +269,7 @@ def _get_context(ticket_id: str):
 
     doc = frappe.get_doc("HD Ticket", ticket_id)
 
-    context: dict = dict(ticket_name=doc.name)
+    context: dict = {"ticket_name": doc.name}
     if customer := doc.get("contact"):
         context["customer"] = customer
     if customer_email := doc.get("owner"):

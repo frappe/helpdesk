@@ -19,6 +19,6 @@ class FeatureConfig(TypedDict):
 class Summary(TypedDict):
     creation: str
     content: str
-    summarizer: str # User Name
-    summarized_by: str # User Email
+    summarizer: str  # User Name
+    summarized_by: str  # User Email
     snippet: str
