@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-09-28 10:35+0000\n"
-"PO-Revision-Date: 2025-10-01 23:08\n"
+"POT-Creation-Date: 2025-10-05 10:35+0000\n"
+"PO-Revision-Date: 2025-10-13 02:15\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Polish\n"
 "MIME-Version: 1.0\n"
@@ -48,6 +48,11 @@ msgstr ""
 msgid "<br>Please update the SLA(s) to use a different status before disabling this status."
 msgstr ""
 
+#. Introduction text of the email-feedback Web Form
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
+msgid "<div class=\"ql-editor read-mode\"><p>Let us know if we solved your issue well. It’ll help us serve you better next time.</p></div>"
+msgstr ""
+
 #. Header text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Visit Helpdesk</a></span>"
@@ -64,7 +69,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: helpdesk/api/knowledge_base.py:15
 msgid "Access denied"
@@ -80,7 +85,7 @@ msgstr ""
 #. Label of the action (Data) field in DocType 'HD Ticket Activity'
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "Action"
-msgstr ""
+msgstr "Akcja"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:22
 msgid "Action Required"
@@ -349,7 +354,9 @@ msgid "At-least one of priority, team and ticket type is required"
 msgstr ""
 
 #. Label of the attachment (Attach) field in DocType 'HD Ticket'
+#. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Attachment"
 msgstr "Załącznik"
 
@@ -504,6 +511,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:61
 msgid "Close"
+msgstr ""
+
+#. Option in a Select field in the tickets Web Form
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
+msgid "Closed"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
@@ -684,6 +696,7 @@ msgstr "Zdefiniuj, kto otrzyma zgłoszenia i w jaki sposób będą one rozdziela
 #. Label of the description (Text Editor) field in DocType 'HD Ticket'
 #. Label of the description (Small Text) field in DocType 'HD Ticket Priority'
 #. Label of the description (Small Text) field in DocType 'HD Ticket Type'
+#. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -691,6 +704,7 @@ msgstr "Zdefiniuj, kto otrzyma zgłoszenia i w jaki sposób będą one rozdziela
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Description"
 msgstr ""
 
@@ -757,14 +771,14 @@ msgstr "Duplikat reguły przypisania"
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "Email"
-msgstr ""
+msgstr "E-mail"
 
 #. Label of the email_account (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Email Account"
-msgstr ""
+msgstr "Konto e-mail"
 
 #. Label of the feedback_email_content (Text) field in DocType 'HD Settings'
 #. Label of the acknowledgement_email_content (Text) field in DocType 'HD
@@ -864,7 +878,9 @@ msgstr ""
 
 #. Label of the feedback_extra (Small Text) field in DocType 'HD Email
 #. Feedback'
+#. Label of a field in the email-feedback Web Form
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Feedback "
 msgstr "Informacja zwrotna "
 
@@ -883,7 +899,9 @@ msgid "Feedback Already Exists"
 msgstr ""
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Email Feedback'
+#. Label of a field in the email-feedback Web Form
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Feedback Rating"
 msgstr ""
 
@@ -945,7 +963,7 @@ msgstr ""
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Form"
-msgstr ""
+msgstr "Formularz"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -1243,6 +1261,11 @@ msgstr ""
 msgid "Hide from customer"
 msgstr ""
 
+#. Option in a Select field in the tickets Web Form
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
+msgid "Hold"
+msgstr ""
+
 #. Label of the holiday_list (Link) field in DocType 'HD Service Level
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
@@ -1398,8 +1421,10 @@ msgstr ""
 
 #. Label of the key (Data) field in DocType 'HD Email Feedback'
 #. Label of the key (Data) field in DocType 'HD Ticket'
+#. Label of a field in the email-feedback Web Form
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Key"
 msgstr "Klucz"
 
@@ -1492,7 +1517,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Message"
-msgstr ""
+msgstr "Wiadomość"
 
 #. Label of the meta_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1523,7 +1548,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Name"
-msgstr ""
+msgstr "Nazwa"
 
 #. Label of the name_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1565,7 +1590,7 @@ msgstr ""
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Notification Settings"
-msgstr ""
+msgstr "Ustawienia powiadomień"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:232
@@ -1595,7 +1620,9 @@ msgid "Only the 'color' and 'order' fields of the 'Closed' status can be modifie
 msgstr ""
 
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
+#. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Open"
 msgstr ""
 
@@ -1714,12 +1741,14 @@ msgstr ""
 #. Label of the priority_section (Section Break) field in DocType 'HD Settings'
 #. Label of the priority (Link) field in DocType 'HD Ticket'
 #. Label of the priority (Link) field in DocType 'HD Ticket Type'
+#. Label of a field in the tickets Web Form
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:20
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Priority"
 msgstr ""
 
@@ -1768,6 +1797,11 @@ msgstr "Wywołany przez (Email)"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:31
 msgid "Range"
+msgstr ""
+
+#. Title of the email-feedback Web Form
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
+msgid "Rate Your Support Experience"
 msgstr ""
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
@@ -1826,6 +1860,11 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:6
 msgid "Regenerate Search Index"
+msgstr ""
+
+#. Option in a Select field in the tickets Web Form
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
+msgid "Replied"
 msgstr ""
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
@@ -2006,10 +2045,12 @@ msgstr ""
 msgid "Saturday"
 msgstr "Sobota"
 
+#. Button label of the email-feedback Web Form
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:42
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:50
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Save"
-msgstr ""
+msgstr "Zapisz"
 
 #. Label of the script (Code) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -2095,7 +2136,7 @@ msgstr ""
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Settings"
-msgstr ""
+msgstr "Ustawienia"
 
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2181,13 +2222,15 @@ msgstr ""
 #. Label of the status (Select) field in DocType 'HD Article'
 #. Label of the status_section (Section Break) field in DocType 'HD Settings'
 #. Label of the status (Link) field in DocType 'HD Ticket'
+#. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:44
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:31
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #. Label of the auto_close_status (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2236,10 +2279,12 @@ msgid "Still got questions? We're here to assist you."
 msgstr ""
 
 #. Label of the subject (Data) field in DocType 'HD Ticket'
+#. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:30
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Subject"
-msgstr ""
+msgstr "Temat"
 
 #. Label of the subject_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2316,7 +2361,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "System Manager"
-msgstr ""
+msgstr "Menedżer systemu"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.py:12
 msgid "System types can not be deleted"
@@ -2354,7 +2399,7 @@ msgstr ""
 #. Label of the template (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Template"
-msgstr ""
+msgstr "Szablon"
 
 #. Label of the template_name (Data) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -2417,9 +2462,11 @@ msgstr "Czwartek"
 #. Label of the ticket (Link) field in DocType 'HD Email Feedback'
 #. Label of the reference_ticket (Link) field in DocType 'HD Notification'
 #. Label of the ticket_tab (Tab Break) field in DocType 'HD Settings'
+#. Title of the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Ticket"
 msgstr ""
 
@@ -2529,7 +2576,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
 msgid "Title"
-msgstr ""
+msgstr "Tytuł"
 
 #. Label of the title_slug (Data) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -2589,7 +2636,7 @@ msgstr "Wtorek"
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Type"
-msgstr ""
+msgstr "Typ"
 
 #. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
@@ -2642,7 +2689,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:55
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:83
 msgid "User"
-msgstr ""
+msgstr "Użytkownik"
 
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.py:133
 msgid "User Not found"
@@ -2665,7 +2712,9 @@ msgid "Valid From"
 msgstr ""
 
 #. Label of the via_customer_portal (Check) field in DocType 'HD Ticket'
+#. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Via Customer Portal"
 msgstr ""
 
