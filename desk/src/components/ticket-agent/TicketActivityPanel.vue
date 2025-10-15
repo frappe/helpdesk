@@ -264,8 +264,8 @@ const showSummarizeButton = computed(() => {
   if (tabIndex.value !== 0) return false;
   if (
     _activities.value
-      .filter((a) => ["email", "summary"].includes(a.type))
-      .at(-1).type === "summary"
+      .filter((a) => ["email", "summary"].includes(a?.type))
+      .at(-1)?.type === "summary"
   )
     return false;
 

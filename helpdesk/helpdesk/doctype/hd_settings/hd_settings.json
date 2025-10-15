@@ -51,8 +51,8 @@
   "initial_helpdesk_name_setup_skipped",
   "column_break_hjfh",
   "otto_section",
-  "enable_ai_features",
-  "ai_feature_config",
+  "enable_smart_features",
+  "smart_feature_config",
   "search_tab",
   "name_weight",
   "subject_weight",
@@ -460,24 +460,24 @@
   },
   {
    "default": "0",
-   "description": "Checking this enables AI features dependent on Otto.\nRequires Otto to be installed to function.",
-   "fieldname": "enable_ai_features",
+   "description": "Checking this enables smart features powered by Otto.\nRequires Otto to be installed to function.",
+   "fieldname": "enable_smart_features",
    "fieldtype": "Check",
-   "label": "Enable AI Features"
+   "label": "Enable Smart Features"
   },
   {
    "default": "{}",
-   "fieldname": "ai_feature_config",
+   "fieldname": "smart_feature_config",
    "fieldtype": "JSON",
    "hidden": 1,
-   "label": "AI Feature Config",
+   "label": "Smart Feature Config",
    "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-10-15 11:04:02.434569",
+ "modified": "2025-10-15 16:09:38.440549",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

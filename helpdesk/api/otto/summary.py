@@ -16,7 +16,7 @@ from helpdesk.api.otto.types import Summary, SummaryConfig
 
 summary_event = "helpdesk:otto-summarize"
 default_summary_guidelines = """
-Your goal is to analyze a support ticket and its exchange and produce a clear, structured summary that captures:
+Analyze a support ticket and its exchange and produce a clear, structured summary that captures:
 1. The main issue raised by the customer
 2. The resolution provided by the support team
 3. Short summary of the exchange between the customer and the support team
@@ -41,6 +41,8 @@ The output should be in the following format:
 ### Exchange
 ...
 ```
+
+Use a list if multiple points are to be covered.
 """.strip()
 
 default_summary_config = SummaryConfig(

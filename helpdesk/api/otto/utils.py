@@ -15,7 +15,7 @@ def can_use_otto() -> bool:
 
 @frappe.whitelist()
 def is_enabled() -> bool:
-    return bool(frappe.get_single_value("HD Settings", "enable_ai_features"))
+    return bool(frappe.get_single_value("HD Settings", "enable_smart_features"))
 
 
 @frappe.whitelist()
@@ -36,12 +36,13 @@ def get_enabled_features() -> FeatureFlags:
 @frappe.whitelist()
 def get_feature_config() -> FeatureConfig:
     import json
+
     from helpdesk.api.otto.summary import (
         default_summary_config,
         default_summary_guidelines,
     )
 
-    val = frappe.get_single_value("HD Settings", "ai_feature_config") or "{}"
+    val = frappe.get_single_value("HD Settings", "smart_feature_config") or "{}"
     conf = json.loads(val)
 
     if not conf.get("summary"):
@@ -63,4 +64,4 @@ def set_feature_config(config: dict) -> None:
     import json
 
     val = json.dumps(config, indent=2)
-    frappe.db.set_value("HD Settings", "HD Settings", "ai_feature_config", val)
+    frappe.db.set_value("HD Settings", "HD Settings", "smart_feature_config", val)

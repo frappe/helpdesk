@@ -1,4 +1,4 @@
-export interface AIFeatureConfig {
+export interface SmartFeatureConfig {
   summary?: SummaryConfig;
 }
 

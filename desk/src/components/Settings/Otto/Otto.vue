@@ -3,7 +3,7 @@
   <SettingsView
     v-if="currentView === 'main'"
     title="Otto"
-    description="Configure Otto settings to enable AI features."
+    description="Configure Otto settings to enable smart features."
     :isDirty="isAnyDirty"
     :saving="isSaving"
     @save="save"
@@ -19,7 +19,7 @@
             Otto is not installed
           </p>
           <p class="text-sm text-amber-700 mt-1">
-            Please install Otto to enable AI features.
+            Please install Otto to enable smart features.
           </p>
         </div>
       </div>
@@ -28,19 +28,19 @@
     <!-- Enable Otto Section -->
     <div v-if="canUseOtto.data === true && hdSettings.doc" class="mb-6">
       <Checkbox
-        label="Enable AI Features"
-        title="Enable or disable AI features for Helpdesk."
-        v-model="hdSettings.doc.enable_ai_features"
-        @update:modelValue="hdSettings.doc.enable_ai_features = $event ? 1 : 0"
+        label="Enable Smart Features"
+        title="Enable or disable smart features for Helpdesk."
+        v-model="hdSettings.doc.enable_smart_features"
+        @update:modelValue="hdSettings.doc.enable_smart_features = $event ? 1 : 0"
       />
       <div class="text-p-xs text-ink-gray-6 mt-1">
-        Enable or disable AI features for Helpdesk.
+        Enable or disable smart features for Helpdesk.
       </div>
     </div>
 
     <!-- API Keys Section -->
     <div
-      v-if="canUseOtto.data === true && hdSettings.doc.enable_ai_features"
+      v-if="canUseOtto.data === true && hdSettings.doc.enable_smart_features"
       class="mt-6"
     >
       <div class="text-base font-semibold text-ink-gray-8">API Keys</div>
@@ -71,12 +71,12 @@
 
     <!-- Features Section -->
     <div
-      v-if="canUseOtto.data === true && hdSettings.doc?.enable_ai_features"
+      v-if="canUseOtto.data === true && hdSettings.doc?.enable_smart_features"
       class="mt-6"
     >
       <div class="text-base font-semibold text-ink-gray-8">Features</div>
       <div class="text-p-xs text-ink-gray-6 mt-1">
-        Configure Otto AI features for your helpdesk.
+        Configure Otto enabled smart features.
       </div>
       <div class="mt-4">
         <!-- Summary Feature -->
@@ -85,10 +85,12 @@
         >
           <div class="flex-1">
             <div class="flex items-center gap-2">
-              <h3 class="text-sm font-medium text-ink-gray-8">Summary</h3>
+              <h3 class="text-sm font-medium text-ink-gray-8">
+                Activity Summarization
+              </h3>
             </div>
             <p class="text-p-xs text-ink-gray-6 mt-1">
-              Automatically generate summaries for tickets using AI.
+              Generate summary of ticket activity on demand.
             </p>
           </div>
           <div class="flex items-center gap-3">
@@ -108,8 +110,8 @@
   <!-- Summary Settings View -->
   <SettingsView
     v-else-if="currentView === 'summary'"
-    title="Summary Settings"
-    description="Configure summary AI feature settings."
+    title="Activity Summarization"
+    description="Configure activity summarization."
     :isDirty="isAnyDirty"
     :saving="isSaving"
     :showBackButton="true"
@@ -121,12 +123,12 @@
       <!-- Enable Summary Feature -->
       <div class="mb-6">
         <Checkbox
-          label="Enable Summary Generation"
-          title="When enabled, AI will automatically generate summaries for tickets."
+          label="Enable Activity Summarization"
+          title="Summarize button will be shown if enabled."
           v-model="featureConfig.summary.enabled"
         />
         <div class="text-p-xs text-ink-gray-6 mt-1">
-          Enable summary generation for tickets.
+          Summarize button will be shown if enabled.
         </div>
       </div>
 
@@ -139,7 +141,7 @@
           placeholder="Select a model"
         />
         <div class="text-p-xs text-ink-gray-6 mt-1">
-          Select the LLM model to use for summary generation.
+          LLM to use for activity summarization.
         </div>
       </div>
 
@@ -153,7 +155,8 @@
           :rows="12"
         />
         <div class="text-p-xs text-ink-gray-6 mt-1">
-          Guidelines for the AI when generating summaries.
+          Guidelines such as style, format, etc to be followed during activity
+          summarization.
         </div>
       </div>
     </div>
@@ -174,7 +177,7 @@ import {
 import { computed, ref, watch } from "vue";
 import { isDocDirty } from "../Telephony/utils";
 import SettingsView from "./SettingsView.vue";
-import type { AIFeatureConfig } from "./types";
+import type { SmartFeatureConfig } from "./types";
 
 type ViewType = "main" | "summary";
 
@@ -196,15 +199,15 @@ const isDirty = ref({
 const isSaving = ref(false);
 const isLoading = ref(true);
 
-const featureConfig = ref<AIFeatureConfig>({
+const featureConfig = ref<SmartFeatureConfig>({
   summary: {
     llm: "",
     enabled: false,
-    directive: "",
+    guidelines: "",
   },
 });
 
-const originalConfig = ref<AIFeatureConfig | null>(null);
+const originalConfig = ref<SmartFeatureConfig | null>(null);
 const modelOptions = ref<string[]>([]);
 
 const canUseOtto = createResource({
@@ -215,7 +218,7 @@ const canUseOtto = createResource({
 const hdSettings = createDocumentResource({
   doctype: "HD Settings",
   name: "HD Settings",
-  fields: ["enable_ai_features"],
+  fields: ["enable_smart_features"],
   auto: true,
 });
 
