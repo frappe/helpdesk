@@ -80,26 +80,16 @@
               class="w-full"
               icon-left="plus"
               :label="__('Invite agent')"
-              @click="setActiveSettingsTab('Invite Agents')"
+              @click="inviteAgents"
             />
           </div>
         </div>
       </template>
     </Popover>
   </Combobox>
-
-  <AddNewAgentsDialog
-    :title="__('Add Agents')"
-    @close="showNewAgentsDialog = false"
-    :modelValue="showNewAgentsDialog"
-    :show="showNewAgentsDialog"
-    @update:modelValue="showNewAgentsDialog = $event"
-    @onAgentsInvited="addInvitedAgents"
-  />
 </template>
 
 <script setup lang="ts">
-import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
 import { assignmentRuleData } from "@/stores/assignmentRules";
 import {
   Combobox,
@@ -108,15 +98,25 @@ import {
   ComboboxOptions,
 } from "@headlessui/vue";
 import { Avatar, Popover } from "frappe-ui";
-import { computed, ref } from "vue";
+import { computed, inject, Ref, ref } from "vue";
 import { setActiveSettingsTab } from "../settingsModal";
 import { useAgentStore } from "@/stores/agent";
 import { onMounted } from "vue";
 
 const emit = defineEmits(["addAssignee"]);
 const query = ref("");
-const showNewAgentsDialog = ref(false);
 const { agents } = useAgentStore();
+const isAssignmentRuleFormDirty = inject<Ref<boolean>>(
+  "isAssignmentRuleFormDirty"
+);
+const showConfirmDialog = inject<
+  Ref<{
+    show: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>
+>("showConfirmDialog");
 
 const users = computed(() => {
   let filteredAgents =
@@ -139,17 +139,26 @@ const users = computed(() => {
   return filteredAgents;
 });
 
-const addInvitedAgents = (users) => {
-  users.forEach((user) => {
-    addAssignee({ user });
-  });
-};
-
 const addAssignee = (user) => {
   assignmentRuleData.value.users.push({
     user: user.user,
   });
   emit("addAssignee", user);
+};
+
+const inviteAgents = () => {
+  if (isAssignmentRuleFormDirty.value) {
+    showConfirmDialog.value = {
+      show: true,
+      title: "Unsaved changes",
+      message: "Are you sure you want to leave? Unsaved changes will be lost.",
+      onConfirm: () => {
+        setActiveSettingsTab("Invite Agents");
+      },
+    };
+  } else {
+    setActiveSettingsTab("Invite Agents");
+  }
 };
 
 onMounted(() => {

@@ -18,7 +18,7 @@
     <!-- list accounts -->
     <div
       v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
-      class="mt-4 divide-y"
+      class="mt-8 divide-y"
     >
       <div v-for="emailAccount in emailAccounts.data" :key="emailAccount.name">
         <EmailAccountCard

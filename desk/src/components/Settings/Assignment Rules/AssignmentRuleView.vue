@@ -323,7 +323,7 @@ import {
   Switch,
   toast,
 } from "frappe-ui";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, provide, ref, watch } from "vue";
 import {
   assignmentRuleData,
   assignmentRulesActiveScreen,
@@ -341,6 +341,7 @@ import { disableSettingModalOutsideClick } from "../settingsModal";
 const isDirty = ref(false);
 const initialData = ref(null);
 const isLoading = ref(false);
+provide("isAssignmentRuleFormDirty", isDirty);
 
 const showConfirmDialog = ref({
   show: false,
@@ -428,6 +429,7 @@ const getAssignmentRuleData = createResource({
 
 if (!assignmentRulesActiveScreen.value.data) {
   disableSettingModalOutsideClick.value = true;
+  initialData.value = JSON.stringify(assignmentRuleData.value);
 }
 
 const goBack = () => {
@@ -438,13 +440,6 @@ const goBack = () => {
     onConfirm: goBack,
   };
   if (isDirty.value && !showConfirmDialog.value.show) {
-    showConfirmDialog.value = confirmDialogInfo;
-    return;
-  }
-  if (
-    !assignmentRulesActiveScreen.value.data &&
-    !showConfirmDialog.value.show
-  ) {
     showConfirmDialog.value = confirmDialogInfo;
     return;
   }
