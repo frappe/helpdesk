@@ -58,6 +58,7 @@ export function useTicketNavigation() {
     let routeToNavigate: any = {
       name: "TicketAgent",
       params: { ticketId },
+      hash: "#activity",
     };
     if (view) {
       routeToNavigate["query"] = { view };
