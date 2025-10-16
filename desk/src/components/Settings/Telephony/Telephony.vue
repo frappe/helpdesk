@@ -410,6 +410,11 @@ watch(
       newVal,
       telephonyAgent.originalDoc
     );
+    if (isDirty.value.telephonyAgent) {
+      disableSettingModalOutsideClick.value = true;
+    } else {
+      disableSettingModalOutsideClick.value = false;
+    }
   },
   { deep: true }
 );
@@ -423,6 +428,11 @@ watch(
         label: app,
         value: app,
       })) || [];
+    if (isDirty.value.twilio) {
+      disableSettingModalOutsideClick.value = true;
+    } else {
+      disableSettingModalOutsideClick.value = false;
+    }
   },
   { deep: true }
 );
@@ -431,7 +441,7 @@ watch(
   () => exotel.doc,
   (newVal) => {
     isDirty.value.exotel = isDocDirty(newVal, exotel.originalDoc);
-    if (isDirty.value) {
+    if (isDirty.value.exotel) {
       disableSettingModalOutsideClick.value = true;
     } else {
       disableSettingModalOutsideClick.value = false;
