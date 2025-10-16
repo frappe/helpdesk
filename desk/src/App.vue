@@ -16,7 +16,12 @@ import { computed, defineAsyncComponent, h, onMounted, onUnmounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
 import { useAuthStore } from "./stores/auth";
-useConfigStore();
+import { useFavicon } from "@vueuse/core";
+import { storeToRefs } from "pinia";
+const configStore = useConfigStore();
+const { favicon } = storeToRefs(configStore);
+
+useFavicon(favicon);
 
 onMounted(() => {
   window.addEventListener("online", () => {

@@ -50,7 +50,9 @@ import { inject, ref, watch } from "vue";
 import LogoUpload from "./LogoUpload.vue";
 import { createResource, toast } from "frappe-ui";
 import { __ } from "@/translation";
+import { useConfigStore } from "@/stores/config";
 
+const configStore = useConfigStore();
 const settingsData = inject<any>("settingsData");
 const isLoading = ref(false);
 const brandLogo = ref(settingsData.value?.brandLogo);
@@ -69,6 +71,7 @@ const settingsResource = createResource({
     brandLogo.value = data.brand_logo;
     favicon.value = data.favicon;
     isLoading.value = false;
+    configStore.configResource.reload();
     toast.success(__("Updated successfully"));
   },
   onError() {
