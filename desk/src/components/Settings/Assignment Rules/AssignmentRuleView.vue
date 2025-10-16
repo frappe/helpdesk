@@ -15,15 +15,15 @@
           variant="ghost"
           icon-left="chevron-left"
           :label="
-            assignmentRuleData.assignmentRuleName || 'New Assignment Rule'
+            assignmentRuleData.assignmentRuleName || __('New Assignment Rule')
           "
           size="md"
           @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-xl hover:opacity-70 !pr-0 !max-w-96 !justify-start"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-lg hover:opacity-70 !pr-0 !max-w-96 !justify-start"
         />
         <Badge
-          :variant="'subtle'"
-          :theme="'orange'"
+          variant="subtle"
+          theme="orange"
           size="sm"
           :label="__('Unsaved')"
           v-if="isDirty"

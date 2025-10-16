@@ -4,7 +4,7 @@
       <template #title>
         <div class="flex items-center gap-2">
           <h1 class="text-lg font-semibold text-ink-gray-8">
-            Field Dependencies
+            {{ __("Field Dependencies") }}
           </h1>
           <DocumentationButton
             url="https://docs.frappe.io/helpdesk/field-dependency"
@@ -14,45 +14,21 @@
       </template>
       <template #description>
         <p class="text-p-sm max-w-md text-ink-gray-6">
-          Create dependencies between fields to dynamically control options
-          based on user selections.
+          {{
+            __(
+              "Create dependencies between fields to dynamically control options based on user selections."
+            )
+          }}
         </p>
       </template>
       <template #actions>
         <Button
-          label="New"
+          :label="__('New')"
           theme="gray"
           variant="solid"
           @click="$emit('update:step', 'fd')"
           icon-left="plus"
         />
-      </template>
-      <template
-        v-if="
-          fieldDependenciesList.data?.length > 9 ||
-          fieldDependencySearchQuery.length
-        "
-        #bottom-section
-      >
-        <div class="relative">
-          <Input
-            v-model="fieldDependencySearchQuery"
-            @input="fieldDependencySearchQuery = $event"
-            placeholder="Search"
-            type="text"
-            class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
-            icon-left="search"
-            debounce="300"
-            inputClass="p-4 pr-12"
-          />
-          <Button
-            v-if="fieldDependencySearchQuery"
-            icon="x"
-            variant="ghost"
-            @click="fieldDependencySearchQuery = ''"
-            class="absolute right-1 top-1/2 -translate-y-1/2"
-          />
-        </div>
       </template>
     </SettingsLayoutHeader>
   </div>
@@ -79,14 +55,14 @@
       </div>
       <div class="flex flex-col items-center gap-1">
         <div class="text-base font-medium text-ink-gray-6">
-          No field dependency found
+          {{ __("No field dependency found") }}
         </div>
         <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-          Add your first field dependency to get started.
+          {{ __("Add your first field dependency to get started") }}
         </div>
       </div>
       <Button
-        label="New"
+        :label="__('New')"
         variant="outline"
         icon-left="plus"
         @click="$emit('update:step', 'fd')"
@@ -152,20 +128,6 @@
           </div>
           <hr class="mx-2" />
         </div>
-        <!-- Load More Button -->
-        <div class="flex justify-center">
-          <Button
-            v-if="
-              !fieldDependenciesList.loading &&
-              fieldDependenciesList.hasNextPage
-            "
-            class="mt-3.5 p-2"
-            @click="() => fieldDependenciesList.next()"
-            :loading="fieldDependenciesList.loading"
-            label="Load More"
-            icon-left="refresh-cw"
-          />
-        </div>
       </div>
     </div>
   </div>
@@ -174,17 +136,16 @@
 <script setup lang="ts">
 import { Avatar, Button, LoadingIndicator, Switch, toast } from "frappe-ui";
 import { getFieldDependencyLabel, ConfirmDelete } from "@/utils";
-import { inject, onMounted, Ref, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import DocumentationButton from "@/components/DocumentationButton.vue";
 import FieldDependencyIcon from "@/components/icons/FieldDependencyIcon.vue";
+import { __ } from "@/translation";
 
 onMounted(() => {
   fieldDependenciesList.reload();
 });
-
-const fieldDependencySearchQuery = inject<Ref>("fieldDependencySearchQuery");
 
 const isConfirmingDelete = ref(false);
 
@@ -194,7 +155,7 @@ function getOptions(rowName: string) {
     onConfirmDelete: () => {
       fieldDependenciesList.delete.submit(rowName, {
         onSuccess: () => {
-          toast.success("Field dependency deleted successfully");
+          toast.success(__("Field dependency deleted successfully"));
           fieldDependenciesList.reload();
         },
       });
@@ -210,20 +171,9 @@ function handleSwitchToggle(rowName: string, value: boolean) {
     },
     {
       onSuccess: () => {
-        toast.success("Field dependency updated successfully.");
+        toast.success(__("Field dependency updated successfully."));
       },
     }
   );
 }
-
-watch(fieldDependencySearchQuery, (newValue) => {
-  fieldDependenciesList.filters = {
-    name: ["like", `%${newValue}%`],
-  };
-  if (!newValue) {
-    fieldDependenciesList.start = 0;
-    fieldDependenciesList.pageLength = 10;
-  }
-  fieldDependenciesList.reload();
-});
 </script>

@@ -9,7 +9,7 @@
       <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
       <div
         v-if="data.description && data.description.length > 0"
-        class="text-sm w-full text-ink-gray-5 mt-1 whitespace-nowrap overflow-ellipsis overflow-hidden"
+        class="text-sm w-full text-ink-gray-5 mt-1 truncate"
       >
         {{ data.description }}
       </div>
@@ -69,6 +69,7 @@
 
 <script setup lang="ts">
 import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
+import { __ } from "@/translation";
 import { ConfirmDelete } from "@/utils";
 import {
   Button,
@@ -115,7 +116,7 @@ const deleteAssignmentRule = () => {
     onSuccess: () => {
       assignmentRulesListData.reload();
       isConfirmingDelete.value = false;
-      toast.success("Assignment rule deleted");
+      toast.success(__("Assignment rule deleted"));
     },
     auto: true,
   });
@@ -147,7 +148,7 @@ const duplicate = () => {
     },
     onSuccess: (data) => {
       assignmentRulesListData.reload();
-      toast.success("Assignment rule duplicated");
+      toast.success(__("Assignment rule duplicated"));
       duplicateDialog.value.show = false;
       duplicateDialog.value.name = "";
       assignmentRulesActiveScreen.value = {
@@ -167,7 +168,7 @@ const onPriorityChange = () => {
 
 const onToggle = () => {
   if (!props.data.users_exists && props.data.disabled) {
-    toast.error("Cannot enable rule without adding users in it");
+    toast.error(__("Cannot enable rule without adding users in it"));
     return;
   }
   setAssignmentRuleValue("disabled", !props.data.disabled, "status");
@@ -184,7 +185,7 @@ const setAssignmentRuleValue = (key, value, fieldName = undefined) => {
     },
     onSuccess: () => {
       assignmentRulesListData.reload();
-      toast.success(`Assignment rule ${fieldName || key} updated`);
+      toast.success(__("Assignment rule {0} updated", fieldName || key));
     },
     auto: true,
   });

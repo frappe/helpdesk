@@ -10,6 +10,7 @@ export const useConfigStore = defineStore("config", () => {
   });
 
   const config = computed(() => configRes.data || {});
+  const brandName = computed(() => config.value.brand_name);
   const brandLogo = computed(() => config.value.brand_logo);
   const teamRestrictionApplied = computed(
     () => !!parseInt(config.value.restrict_tickets_by_agent_group)
@@ -30,6 +31,7 @@ export const useConfigStore = defineStore("config", () => {
   socket.on("helpdesk:settings-updated", () => configRes.reload());
 
   return {
+    brandName,
     brandLogo,
     config,
     preferKnowledgeBase,

@@ -2,16 +2,43 @@
   <div class="pb-8">
     <div class="px-10 py-8">
       <SettingsLayoutHeader
-        :title="__('General')"
         :description="__('Manage general settings of your app')"
-      />
+      >
+        <template #title>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-semibold text-ink-gray-8">
+              {{ __("General") }}
+            </h1>
+            <Badge
+              variant="subtle"
+              theme="orange"
+              size="sm"
+              :label="__('Unsaved')"
+              v-if="isDirty"
+            />
+          </div>
+        </template>
+        <template #actions>
+          <Button
+            :label="__('Save')"
+            variant="solid"
+            @click="saveSettings.submit()"
+            :loading="saveSettings.loading"
+            :disabled="!isDirty"
+          />
+        </template>
+      </SettingsLayoutHeader>
     </div>
-    <div class="px-10 pb-8 overflow-y-auto hide-scrollbar">
-      <div v-if="isWebsiteManager">
-        <Branding />
-      </div>
-      <hr class="my-8" v-if="isWebsiteManager && isAdmin" />
-      <div v-if="isAdmin">
+    <div
+      v-if="settingsDataResource.loading && !settingsDataResource.data"
+      class="flex items-center justify-center mt-12"
+    >
+      <LoadingIndicator class="w-4" />
+    </div>
+    <div v-else class="px-10 pb-8 overflow-y-auto hide-scrollbar">
+      <Branding />
+      <hr class="my-8" />
+      <div>
         <TicketSettings />
         <hr class="my-8" />
         <WorkflowKnowledgebaseSettings />
@@ -21,45 +48,125 @@
 </template>
 
 <script setup lang="ts">
-import { createDocumentResource, toast } from "frappe-ui";
+import {
+  Badge,
+  Button,
+  createResource,
+  LoadingIndicator,
+  toast,
+} from "frappe-ui";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import Branding from "./components/Branding.vue";
 import TicketSettings from "./components/TicketSettings.vue";
 import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
-import { provide } from "vue";
-import { useAuthStore } from "@/stores/auth";
+import { provide, ref, watch } from "vue";
 import { __ } from "@/translation";
+import { disableSettingModalOutsideClick } from "../settingsModal";
 
-const { isWebsiteManager, isAdmin } = useAuthStore();
-
-const settingsData = createDocumentResource({
-  doctype: "HD Settings",
-  name: "HD Settings",
-  fields: [
-    "brand_logo",
-    "favicon",
-    "auto_close_after_days",
-    "auto_close_status",
-    "auto_close_tickets",
-    "assign_within_team",
-    "do_not_restrict_tickets_without_an_agent_group",
-    "restrict_tickets_by_agent_group",
-    "update_status_to",
-    "auto_update_status",
-    "is_feedback_mandatory",
-    "allow_anyone_to_create_tickets",
-    "default_ticket_type",
-    "prefer_knowledge_base",
-    "instantly_send_email",
-    "skip_email_workflow",
-  ],
-  auto: true,
-  setValue: {
-    onSuccess() {
-      toast.success(__("Settings updated"));
-    },
-  },
+const isDirty = ref(false);
+const initialData = ref(null);
+const settingsData = ref({
+  brandName: "",
+  brandLogo: "",
+  favicon: "",
+  autoCloseAfterDays: "",
+  autoCloseStatus: "",
+  autoCloseTickets: "",
+  assignWithinTeam: false,
+  doNotRestrictTicketsWithoutAnAgentGroup: false,
+  restrictTicketsByAgentGroup: false,
+  updateStatusTo: "",
+  autoUpdateStatus: false,
+  isFeedbackMandatory: false,
+  allowAnyoneToCreateTickets: false,
+  defaultTicketType: "",
+  preferKnowledgeBase: false,
+  skipEmailWorkflow: false,
 });
 
 provide("settingsData", settingsData);
+
+const settingsDataResource = createResource({
+  url: "frappe.client.get",
+  params: {
+    doctype: "HD Settings",
+    name: "HD Settings",
+  },
+  auto: true,
+  onSuccess(data) {
+    settingsData.value = transformData(data);
+    initialData.value = JSON.stringify(settingsData.value);
+  },
+});
+
+const saveSettings = createResource({
+  url: "frappe.client.set_value",
+  makeParams() {
+    return {
+      doctype: "HD Settings",
+      name: "HD Settings",
+      fieldname: {
+        brand_name: settingsData.value.brandName,
+        auto_close_after_days: Number(settingsData.value.autoCloseAfterDays),
+        auto_close_status: settingsData.value.autoCloseStatus,
+        auto_close_tickets: settingsData.value.autoCloseTickets,
+        assign_within_team: settingsData.value.assignWithinTeam,
+        do_not_restrict_tickets_without_an_agent_group:
+          settingsData.value.doNotRestrictTicketsWithoutAnAgentGroup,
+        restrict_tickets_by_agent_group:
+          settingsData.value.restrictTicketsByAgentGroup,
+        update_status_to: settingsData.value.updateStatusTo,
+        auto_update_status: settingsData.value.autoUpdateStatus,
+        is_feedback_mandatory: settingsData.value.isFeedbackMandatory,
+        allow_anyone_to_create_tickets:
+          settingsData.value.allowAnyoneToCreateTickets,
+        default_ticket_type: settingsData.value.defaultTicketType,
+        prefer_knowledge_base: settingsData.value.preferKnowledgeBase,
+        skip_email_workflow: settingsData.value.skipEmailWorkflow,
+      },
+    };
+  },
+  onSuccess(data) {
+    settingsData.value = transformData(data);
+    initialData.value = JSON.stringify(settingsData.value);
+    toast.success(__("Settings updated"));
+  },
+});
+
+const transformData = (data: any) => {
+  return {
+    brandName: data.brand_name,
+    brandLogo: data.brand_logo,
+    favicon: data.favicon,
+    autoCloseAfterDays: data.auto_close_after_days,
+    autoCloseStatus: data.auto_close_status,
+    autoCloseTickets: data.auto_close_tickets,
+    assignWithinTeam: Boolean(data.assign_within_team),
+    doNotRestrictTicketsWithoutAnAgentGroup: Boolean(
+      data.do_not_restrict_tickets_without_an_agent_group
+    ),
+    restrictTicketsByAgentGroup: Boolean(data.restrict_tickets_by_agent_group),
+    updateStatusTo: data.update_status_to,
+    autoUpdateStatus: data.auto_update_status,
+    isFeedbackMandatory: Boolean(data.is_feedback_mandatory),
+    allowAnyoneToCreateTickets: Boolean(data.allow_anyone_to_create_tickets),
+    defaultTicketType: data.default_ticket_type,
+    preferKnowledgeBase: Boolean(data.prefer_knowledge_base),
+    skipEmailWorkflow: Boolean(data.skip_email_workflow),
+  };
+};
+
+watch(
+  settingsData,
+  (data) => {
+    if (!initialData.value) return;
+    isDirty.value = JSON.stringify(data) !== initialData.value;
+    if (isDirty.value) {
+      disableSettingModalOutsideClick.value = true;
+    } else {
+      disableSettingModalOutsideClick.value = false;
+    }
+  },
+  { deep: true }
+);
 </script>

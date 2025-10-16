@@ -3,14 +3,16 @@
     <SettingsLayoutHeader description="Configure your telephony settings.">
       <template #title>
         <div class="flex items-center gap-2">
-          <h1 class="text-lg font-semibold text-ink-gray-8">Telephony</h1>
+          <h1 class="text-lg font-semibold text-ink-gray-8">
+            {{ __("Telephony") }}
+          </h1>
           <Badge
             :class="[
               isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent
                 ? 'opacity-100'
                 : 'opacity-0',
             ]"
-            label="Unsaved"
+            :label="__('Unsaved')"
             theme="orange"
             variant="subtle"
           />
@@ -18,7 +20,7 @@
       </template>
       <template #actions>
         <Button
-          label="Save"
+          :label="__('Save')"
           theme="gray"
           variant="solid"
           @click="save"
@@ -83,7 +85,7 @@
         v-if="telephonyAgent.doc && exotel.doc?.enabled"
       >
         <FormControl
-          label="Personal mobile no"
+          :label="__('Personal mobile no')"
           type="text"
           required
           v-model="telephonyAgent.doc.mobile_no"
@@ -97,12 +99,12 @@
       <div class="mt-4">
         <div class="grid grid-cols-2 gap-4">
           <Checkbox
-            label="Enabled"
+            :label="__('Enabled')"
             v-model="twilio.doc.enabled"
             @update:modelValue="twilio.doc.enabled = $event ? 1 : 0"
           />
           <Checkbox
-            label="Record Calls"
+            :label="__('Record Calls')"
             v-model="twilio.doc.record_calls"
             v-if="twilio.doc.enabled"
             @update:modelValue="twilio.doc.record_calls = $event ? 1 : 0"
@@ -148,7 +150,7 @@
           >
             <template #footer="{ togglePopover }">
               <Button
-                label="Refresh Apps"
+                :label="__('Refresh Apps')"
                 theme="gray"
                 variant="subtle"
                 class="w-full"
@@ -172,12 +174,12 @@
       <div class="mt-4">
         <div class="grid grid-cols-2 gap-4">
           <Checkbox
-            label="Enabled"
+            :label="__('Enabled')"
             v-model="exotel.doc.enabled"
             @update:modelValue="exotel.doc.enabled = $event ? 1 : 0"
           />
           <Checkbox
-            label="Record Calls"
+            :label="__('Record Calls')"
             v-model="exotel.doc.record_call"
             v-if="exotel.doc.enabled"
             @update:modelValue="exotel.doc.record_call = $event ? 1 : 0"
@@ -256,6 +258,8 @@ import { nextTick, ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
 import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
+import { disableSettingModalOutsideClick } from "../settingsModal";
+import { __ } from "@/translation";
 
 const auth = useAuthStore();
 const telephonyStore = useTelephonyStore();
@@ -307,7 +311,7 @@ const telephonyAgent = createDocumentResource({
   fields: ["*"],
   auto: false,
   onError(er) {
-    toast.error(er?.messages?.[0] || "Failed to load telephony agent");
+    toast.error(er?.messages?.[0] || __("Failed to load telephony agent"));
   },
 });
 
@@ -328,11 +332,11 @@ async function save() {
   validateTwilio(twilio.doc, telephonyAgent.doc, twilioErrors);
   validateExotel(exotel.doc, telephonyAgent.doc, exotelErrors);
   if (Object.values(twilioErrors.value).some((v) => v)) {
-    toast.error("Please fill all required fields for Twilio");
+    toast.error(__("Please fill all required fields for Twilio"));
     return;
   }
   if (Object.values(exotelErrors.value).some((v) => v)) {
-    toast.error("Please fill all required fields for Exotel");
+    toast.error(__("Please fill all required fields for Exotel"));
     return;
   }
 
@@ -342,16 +346,16 @@ async function save() {
   if (isDirty.value.twilio) {
     promises.push(
       twilio.save.submit().catch((er) => {
-        const error = `Twilio error: ${er?.messages?.[0]}`;
-        toast.error(error || "Failed to save Twilio settings");
+        const error = __(`Twilio error: {0}`, er?.messages?.[0]);
+        toast.error(error || __("Failed to save Twilio settings"));
       })
     );
   }
   if (isDirty.value.exotel) {
     promises.push(
       exotel.save.submit().catch((er) => {
-        const error = `Exotel error: ${er?.messages?.[0]}`;
-        toast.error(error || "Failed to save Exotel settings");
+        const error = __(`Exotel error: {0}`, er?.messages?.[0]);
+        toast.error(error || __("Failed to save Exotel settings"));
       })
     );
   }
@@ -373,7 +377,7 @@ async function save() {
   const results = await Promise.all(promises);
 
   if (!results.some((result) => result == undefined)) {
-    toast.success("Telephony settings updated!");
+    toast.success(__("Telephony settings updated!"));
   }
 
   // Reload twilio to prevent "doc has been modified" error, as an application is created and doc is updated on save
@@ -427,6 +431,11 @@ watch(
   () => exotel.doc,
   (newVal) => {
     isDirty.value.exotel = isDocDirty(newVal, exotel.originalDoc);
+    if (isDirty.value) {
+      disableSettingModalOutsideClick.value = true;
+    } else {
+      disableSettingModalOutsideClick.value = false;
+    }
   },
   { deep: true }
 );

@@ -47,6 +47,7 @@ def get_default_route():
 
 def get_favicon():
     return (
-        frappe.db.get_single_value("Website Settings", "favicon")
+        frappe.db.get_single_value("HD Settings", "favicon")
+        or frappe.db.get_single_value("Website Settings", "favicon")
         or "/assets/helpdesk/desk/favicon.svg"
     )

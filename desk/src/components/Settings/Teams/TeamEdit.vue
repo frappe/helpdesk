@@ -11,7 +11,7 @@
               :label="teamName"
               size="md"
               @click="() => emit('update:step', 'team-list')"
-              class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70 !pr-0"
+              class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
             />
           </div>
         </div>
@@ -33,7 +33,7 @@
             <Link
               doctype="HD Agent"
               class="form-control flex-1"
-              placeholder="Search members"
+              :placeholder="__('Search members')"
               v-model="search"
               :hide-me="true"
               :filters="agentFilters"
@@ -58,7 +58,7 @@
               </template>
             </Link>
             <Button
-              label="Add"
+              :label="__('Add')"
               variant="solid"
               :disabled="!search"
               @click="addMember(search)"
@@ -74,11 +74,11 @@
   </div>
 
   <!-- Member List -->
-  <div class="px-10 pb-8 overflow-y-auto" v-if="teamMembers?.length > 0">
-    <div class="w-full h-full">
+  <div class="px-10 pb-8 overflow-y-auto">
+    <div class="w-full h-full" v-if="teamMembers?.length > 0">
       <div class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600">
         <div class="col-span-6 text-p-sm">
-          Members ({{ teamMembers.length }})
+          {{ __("Members ({0})", teamMembers.length) }}
         </div>
       </div>
       <hr class="mt-2" />
@@ -101,20 +101,22 @@
         <hr />
       </div>
     </div>
-  </div>
-  <div
-    v-else
-    class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
-  >
     <div
-      class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+      v-else
+      class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
     >
-      <UserIcon class="size-6 text-ink-gray-6" />
-    </div>
-    <div class="flex flex-col items-center gap-1">
-      <div class="text-base font-medium text-ink-gray-6">No members found</div>
-      <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-        Add members to this team to get started.
+      <div
+        class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+      >
+        <UserIcon class="size-6 text-ink-gray-6" />
+      </div>
+      <div class="flex flex-col items-center gap-1">
+        <div class="text-base font-medium text-ink-gray-6">
+          {{ __("No members found") }}
+        </div>
+        <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
+          {{ __("Add members to this team to get started.") }}
+        </div>
       </div>
     </div>
   </div>
@@ -122,13 +124,16 @@
   <Dialog v-model="showDelete" :options="{ title: 'Delete team' }">
     <template #body-content>
       <p class="text-p-base text-ink-gray-7">
-        Are you sure you want to delete this team? This action cannot be
-        reversed!
+        {{
+          __(
+            "Are you sure you want to delete this team? This action cannot be reversed!"
+          )
+        }}
       </p>
       <Button
         variant="solid"
         class="mt-4 float-right"
-        label="Confirm"
+        :label="__('Confirm')"
         theme="red"
         @click="
           () => {
@@ -143,8 +148,8 @@
     <template #body-content>
       <FormControl
         v-model="_teamName"
-        label="Title"
-        placeholder="Product Experts"
+        :label="__('Title')"
+        :placeholder="__('Product Experts')"
       />
     </template>
   </Dialog>
@@ -173,6 +178,7 @@ import { setActiveSettingsTab } from "../settingsModal";
 import UserIcon from "~icons/lucide/user";
 import { ConfirmDelete } from "@/utils";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
+import { __ } from "@/translation";
 
 const props = defineProps<{
   teamName: string;
@@ -192,7 +198,7 @@ const team = createDocumentResource({
   auto: true,
   delete: {
     onSuccess() {
-      toast.success("Team deleted");
+      toast.success(__("Team deleted"));
       emit("update:step", "team-list");
     },
   },
@@ -247,11 +253,11 @@ function addMember(user: string) {
 const showRename = ref(false);
 
 const renameDialogOptions = {
-  title: "Rename team",
-  message: "Enter the new name for the team",
+  title: __("Rename team"),
+  message: __("Enter the new name for the team"),
   actions: [
     {
-      label: "Confirm",
+      label: __("Confirm"),
       variant: "solid",
       loading: team.loading,
       onClick: ({ close }) => {
@@ -272,12 +278,12 @@ function renameTeam(close) {
       };
     },
     validate(params) {
-      if (!params.new_name) return "New title is required";
+      if (!params.new_name) return __("New title is required");
       if (params.new_name === params.old_name)
-        return "New and old title cannot be same";
+        return __("New and old title cannot be same");
     },
     onSuccess() {
-      toast.success("Team renamed");
+      toast.success(__("Team renamed"));
       close();
       emit("update:step", "team-list");
     },
@@ -287,24 +293,10 @@ function renameTeam(close) {
 }
 
 const showDelete = ref(false);
-const deleteDialogOptions = {
-  title: "Delete team",
-  message: `Are you sure you want to delete this team? This action cannot be reversed!`,
-  actions: [
-    {
-      label: "Confirm",
-      variant: "solid",
-      onClick: (ctx) => {
-        team.delete.submit();
-        ctx.close();
-      },
-    },
-  ],
-};
 
 const options = [
   {
-    label: "View Assignment rule",
+    label: __("View Assignment rule"),
     icon: markRaw(h(Settings, { class: "rotate-90" })),
     onClick: () => {
       assignmentRulesActiveScreen.value = {
@@ -315,22 +307,26 @@ const options = [
     },
   },
   {
-    label: "Rename",
+    label: __("Rename"),
     icon: "edit-3",
     onClick: () => (showRename.value = !showRename.value),
   },
   {
     condition: () => teamRestrictionApplied,
     label: team.doc?.ignore_restrictions
-      ? "Disable Bypass Restrictions"
-      : "Enable Bypass Restrictions",
+      ? __("Disable Bypass Restrictions")
+      : __("Enable Bypass Restrictions"),
     component: () =>
       h(
         Tooltip,
         {
           text: ignoreRestrictions.value
-            ? "Members of this team will see the tickets assigned to this team only"
-            : "Members of this team will be able to see the tickets assigned to all the teams",
+            ? __(
+                "Members of this team will see the tickets assigned to this team only"
+              )
+            : __(
+                "Members of this team will be able to see the tickets assigned to all the teams"
+              ),
         },
         {
           default: () => [
@@ -356,8 +352,8 @@ const options = [
                   },
                   [
                     team.doc?.ignore_restrictions
-                      ? "Access only this team's tickets"
-                      : "Access all team tickets",
+                      ? __("Access only this team's tickets")
+                      : __("Access all team tickets"),
                   ]
                 ),
               ]
@@ -367,9 +363,9 @@ const options = [
       ),
   },
   {
-    label: "Delete",
+    label: __("Delete"),
     component: h(Button, {
-      label: "Delete",
+      label: __("Delete"),
       variant: "ghost",
       iconLeft: "trash-2",
       theme: "red",

@@ -21,7 +21,6 @@
     </div>
     <div>
       <FileUploader
-        v-if="!props.image"
         :fileTypes="['image/*']"
         @success="
           (file) => {
@@ -29,33 +28,37 @@
           }
         "
       >
-        <template #default="{ openFileSelector, uploading }">
-          <Button
-            @click="openFileSelector()"
-            iconLeft="upload"
-            :label="__('Upload Image')"
-            :loading="props.isLoading || uploading"
-            :disabled="props.isDisabled"
-          />
+        <template v-slot="{ progress, uploading, openFileSelector }">
+          <div class="flex items-end space-x-2">
+            <Button
+              @click="openFileSelector"
+              :iconLeft="ImageUpIcon"
+              :label="
+                uploading
+                  ? __('Uploading {0}%', progress)
+                  : props.image
+                  ? __('Change')
+                  : __('Upload')
+              "
+              :loading="isLoading"
+            />
+            <Button
+              v-if="props.image"
+              iconLeft="trash-2"
+              :label="__('Remove')"
+              @click="emit('onRemove')"
+              :loading="isLoading"
+            />
+          </div>
         </template>
       </FileUploader>
-
-      <div v-else>
-        <Button
-          :label="__(`Remove {0}`, props.title)"
-          @click="emit('onRemove')"
-          iconLeft="trash"
-          theme="red"
-          :loading="props.isLoading"
-          :disabled="props.isDisabled"
-        />
-      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Avatar, Button, FeatherIcon, FileUploader } from "frappe-ui";
+import ImageUpIcon from "~icons/lucide/image-up";
 
 const emit = defineEmits(["onUpload", "onRemove"]);
 
@@ -73,10 +76,6 @@ const props = defineProps({
     required: true,
   },
   isLoading: {
-    type: Boolean,
-    required: true,
-  },
-  isDisabled: {
     type: Boolean,
     required: true,
   },

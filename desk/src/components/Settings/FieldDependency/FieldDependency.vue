@@ -9,9 +9,9 @@
             :label="dependencyLabel"
             size="md"
             @click="handleBackNavigation"
-            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70 !pr-0"
+            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
           />
-          <Badge v-if="isDirty" theme="orange"> Unsaved </Badge>
+          <Badge v-if="isDirty" theme="orange"> {{ __("Unsaved") }} </Badge>
         </div>
       </template>
       <template #actions>
@@ -19,12 +19,14 @@
           <!-- Switch -->
           <div class="flex gap-2 items-center">
             <Switch v-model="state.enabled" class="!w-fit" />
-            <span class="text-p-base text-ink-gray-6">Enabled</span>
+            <span class="text-p-base text-ink-gray-6">
+              {{ __("Enabled") }}
+            </span>
           </div>
           <!-- Actions -->
           <div class="flex gap-1">
             <Button
-              label="Save"
+              :label="__('Save')"
               variant="solid"
               size="sm"
               :disabled="
@@ -67,8 +69,10 @@
   </div>
   <ConfirmDialog
     v-model="showConfirmDialog"
-    title="Unsaved changes"
-    message="Are you sure you want to go back? Unsaved changes will be lost."
+    :title="__('Unsaved changes')"
+    :message="
+      __('Are you sure you want to go back? Unsaved changes will be lost.')
+    "
     :onConfirm="() => $emit('update:step', 'fd-list')"
     :onCancel="() => (showConfirmDialog = false)"
   />
@@ -86,6 +90,7 @@ import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
 import FieldDependencyCriteria from "./FieldDependencyCriteria.vue";
 import FieldDependencyFieldsSelection from "./FieldDependencyFieldsSelection.vue";
 import FieldDependencyValueSelection from "./FieldDependencyValueSelection.vue";
+import { __ } from "@/translation";
 
 const props = defineProps({
   fieldDependencyName: {
@@ -98,7 +103,7 @@ const emit = defineEmits(["update:step"]);
 const isNew = computed(() => !props.fieldDependencyName);
 
 const dependencyLabel = computed(() => {
-  if (isNew.value) return "New Field Dependency";
+  if (isNew.value) return __("New Field Dependency");
   return getFieldDependencyLabel(props.fieldDependencyName);
 });
 
@@ -297,8 +302,8 @@ function handleSubmit() {
   if (!isDirty.value) return;
   createUpdateFieldDependency.submit();
   let successMessage = isNew.value
-    ? "Field Dependency created successfully"
-    : "Field Dependency updated successfully";
+    ? __("Field Dependency created successfully")
+    : __("Field Dependency updated successfully");
   toast.success(successMessage);
 }
 

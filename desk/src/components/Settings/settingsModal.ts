@@ -68,7 +68,7 @@ export const tabs = computed(() => {
           label: "General",
           icon: markRaw(SettingsGear),
           component: markRaw(General),
-          condition: () => auth.isAdmin || auth.isWebsiteManager,
+          condition: () => auth.isAdmin,
         },
         {
           label: "Agents",

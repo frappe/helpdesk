@@ -1,5 +1,5 @@
 <template>
-  <div v-bind:class="$attrs.class">
+  <div v-bind:class="$attrs.class" class="pb-6">
     <!-- Header -->
     <div class="px-10 py-8">
       <SettingsLayoutHeader
@@ -17,13 +17,16 @@
             </template>
           </Button>
         </template>
-        <template #bottom-section>
+        <template
+          #bottom-section
+          v-if="!agents.loading && Boolean(agents.data?.length)"
+        >
           <div class="flex items-center gap-2 justify-between">
             <div class="relative grow">
               <Input
                 v-model="search"
                 @input="search = $event"
-                placeholder="Search"
+                :placeholder="__('Search')"
                 type="text"
                 class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
                 icon-left="search"
@@ -100,18 +103,18 @@
         </div>
         <div class="flex flex-col items-center gap-1">
           <div class="text-base font-medium text-ink-gray-6">
-            No agent found
+            {{ __("No agent found") }}
           </div>
           <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
             {{
               activeFilter.length
-                ? "Change your search terms or filters"
-                : "Add your first agent to get started."
+                ? __("Change your search terms or filters")
+                : __("Add your first agent to get started.")
             }}
           </div>
         </div>
         <Button
-          label="Add Agent"
+          :label="__('Add Agent')"
           variant="outline"
           icon-left="plus"
           @click="setActiveSettingsTab('Invite Agents')"
@@ -123,13 +126,11 @@
         v-if="!agents.loading && Boolean(agents.data?.length)"
       >
         <div class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600">
-          <div class="col-span-6 text-p-sm">Agent Name</div>
+          <div class="col-span-6 text-p-sm">{{ __("Agent Name") }}</div>
         </div>
         <hr class="mt-2" />
-        <div v-for="agent in agents.data" :key="agent.agent_name" class="">
-          <div
-            class="flex items-center justify-between h-14 group rounded relative"
-          >
+        <div v-for="agent in agents.data" :key="agent.agent_name">
+          <div class="flex items-center justify-between h-14 group rounded">
             <div class="flex items-center space-x-3 w-4/5">
               <Avatar
                 :image="agent.user_image"
@@ -142,7 +143,7 @@
                     {{ agent.agent_name }}
                   </p>
                   <Badge
-                    :label="'Inactive'"
+                    :label="__('Inactive')"
                     :theme="'gray'"
                     :class="!agent.is_active ? 'opacity-100' : 'opacity-0'"
                     variant="subtle"
@@ -161,6 +162,12 @@
               :button="{
                 label: getUserRole(agent.name),
                 iconRight: 'chevron-down',
+                iconLeft:
+                  getUserRole(agent.name) === 'Agent'
+                    ? 'user'
+                    : getUserRole(agent.name) === 'Manager'
+                    ? 'briefcase'
+                    : null,
               }"
               placement="right"
             />
@@ -172,13 +179,6 @@
             >
               <Button icon="more-horizontal" variant="ghost" />
             </Dropdown>
-            <div
-              class="absolute -left-2.5 -top-1 w-full h-full group-hover:bg-gray-50 rounded-md z-[-1]"
-              :style="{
-                width: 'calc(100% + 20px)',
-                height: 'calc(100% + 8px)',
-              }"
-            />
           </div>
           <hr />
         </div>
@@ -189,7 +189,7 @@
             class="mt-3.5 p-2"
             @click="() => agents.next()"
             :loading="agents.loading"
-            label="Load More"
+            :label="__('Load More')"
             icon-left="refresh-cw"
           />
         </div>
@@ -201,12 +201,10 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { Avatar, call, toast } from "frappe-ui";
+import { Avatar, Button, call, FeatherIcon, toast } from "frappe-ui";
 import { h, onUnmounted } from "vue";
 import LucideCheck from "~icons/lucide/check";
-import IconMoreHorizontal from "~icons/lucide/more-horizontal";
-import AgentCard from "./AgentCard.vue";
-import { activeFilter, showNewAgentsDialog, useAgents } from "./agents";
+import { activeFilter, useAgents } from "./agents";
 import AgentIcon from "../icons/AgentIcon.vue";
 import { setActiveSettingsTab } from "./settingsModal";
 
@@ -227,6 +225,7 @@ function getRoles(agent: string) {
           role: "Agent",
           active: props.active,
           selected: agentRole === "Agent",
+          icon: "user",
           onClick: () => {
             updateRole(agent, "Agent");
           },
@@ -241,6 +240,7 @@ function getRoles(agent: string) {
           role: "Manager",
           active: props.active,
           selected: agentRole === "Manager",
+          icon: "briefcase",
           onClick: () => {
             updateRole(agent, "Manager");
           },
@@ -250,18 +250,29 @@ function getRoles(agent: string) {
 
   return roles;
 }
-function RoleOption({ active, role, onClick, selected }) {
+
+function RoleOption({ active, role, onClick, selected, icon = null }) {
   return h(
     "button",
     {
       class: [
         active ? "bg-surface-gray-2" : "text-ink-gray-7",
-        "group flex w-full justify-between items-center rounded-md px-2 py-2 text-base",
+
+        "group flex w-full text-ink-gray-8 justify-between items-center rounded-md px-2 py-2 text-sm hover:bg-surface-gray-2",
       ],
       onClick: !selected ? onClick : null,
     },
     [
-      h("span", { class: "whitespace-nowrap" }, role),
+      h("div", { class: "flex gap-2" }, [
+        icon
+          ? h(FeatherIcon, {
+              name: icon,
+              class: ["h-4 w-4 shrink-0"],
+              "aria-hidden": true,
+            })
+          : null,
+        h("span", { class: "whitespace-nowrap" }, role),
+      ]),
       selected
         ? h(LucideCheck, {
             class: ["h-4 w-4 shrink-0 text-ink-gray-7"],

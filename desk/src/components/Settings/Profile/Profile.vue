@@ -99,11 +99,13 @@
         <FormControl
           class="w-full"
           :label="__('First Name')"
+          maxlength="40"
           v-model="profile.firstName"
         />
         <FormControl
           class="w-full"
           :label="__('Last Name')"
+          maxlength="40"
           v-model="profile.lastName"
         />
       </div>
@@ -146,6 +148,7 @@ import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
 import CameraIcon from "~icons/lucide/camera";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
+import { disableSettingModalOutsideClick } from "../settingsModal";
 
 const auth = useAuthStore();
 const profile = ref({
@@ -159,10 +162,15 @@ const showChangePasswordModal = ref(false);
 const isAccountInfoDirty = computed(() => {
   const agentName = agentData.data?.agent_name?.split(" ");
   if (!agentName) return false;
-  return (
+  const isDirty =
     profile.value.firstName !== agentName[0] ||
-    profile.value.lastName !== agentName[1]
-  );
+    profile.value.lastName !== agentName[1];
+  if (isDirty) {
+    disableSettingModalOutsideClick.value = true;
+  } else {
+    disableSettingModalOutsideClick.value = false;
+  }
+  return isDirty;
 });
 
 const agentData = createResource({
