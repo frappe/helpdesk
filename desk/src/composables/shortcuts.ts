@@ -1,4 +1,5 @@
-import { onUnmounted, ref } from "vue";
+import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
+import { computed, onBeforeUnmount, ref } from "vue";
 
 interface ShortcutBinding {
   key: string;
@@ -9,15 +10,16 @@ interface ShortcutBinding {
 }
 
 export const shortcutsList = ref<ShortcutBinding[]>([]);
-export const isShortcutsDisabled = ref(true);
+export const isShortcutsDisabled = computed(() => {
+  return showEmailBox.value || showCommentBox.value;
+});
 
 export const useShortcut = (
   binding: string | ShortcutBinding,
   cb: Function
 ) => {
-  if (isShortcutsDisabled.value) return;
-
-  window.addEventListener("keydown", (e) => {
+  const handleKeydown = (e: KeyboardEvent) => {
+    if (isShortcutsDisabled.value) return;
     let matches = false;
 
     // means if binding is a string, e.g., "s"
@@ -59,13 +61,11 @@ export const useShortcut = (
       e.preventDefault();
       cb();
     }
-  });
+  };
 
-  onUnmounted(() => {
-    console.log("EHRE");
+  window.addEventListener("keydown", handleKeydown);
 
-    window.removeEventListener("keydown", () => {
-      /* cleanup */
-    });
+  onBeforeUnmount(() => {
+    window.removeEventListener("keydown", handleKeydown);
   });
 };
