@@ -4,14 +4,16 @@ import { defineStore } from "pinia";
 import { computed, ComputedRef } from "vue";
 
 export const useConfigStore = defineStore("config", () => {
-  const configRes = createResource({
+  const configResource = createResource({
     url: "helpdesk.api.config.get_config",
     auto: true,
   });
 
-  const config = computed(() => configRes.data || {});
+  const config = computed(() => configResource.data || {});
   const brandName = computed(() => config.value.brand_name);
   const brandLogo = computed(() => config.value.brand_logo);
+  const favicon = computed(() => config.value.favicon);
+
   const teamRestrictionApplied = computed(
     () => !!parseInt(config.value.restrict_tickets_by_agent_group)
   );
@@ -28,11 +30,13 @@ export const useConfigStore = defineStore("config", () => {
     () => !!parseInt(config.value.is_feedback_mandatory)
   );
 
-  socket.on("helpdesk:settings-updated", () => configRes.reload());
+  socket.on("helpdesk:settings-updated", () => configResource.reload());
 
   return {
+    configResource,
     brandName,
     brandLogo,
+    favicon,
     config,
     preferKnowledgeBase,
     skipEmailWorkflow,
