@@ -24,7 +24,6 @@ def get_user():
 
     is_agent = _is_agent()
     is_admin = ("System Manager" or "Admistrator") in frappe.get_roles(current_user)
-    is_website_manager = ("Website Manager") in frappe.get_roles(current_user)
     has_desk_access = is_agent or is_admin
     user_image = user.user_image
     user_first_name = user.first_name
@@ -37,7 +36,6 @@ def get_user():
         "has_desk_access": has_desk_access,
         "is_admin": is_admin,
         "is_agent": is_agent,
-        "is_website_manager": is_website_manager,
         "user_id": user_id,
         "is_manager": is_manager,
         "user_image": user_image,

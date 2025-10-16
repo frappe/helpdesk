@@ -14,23 +14,23 @@
         <Button
           variant="ghost"
           icon-left="chevron-left"
-          :label="holidayData?.holiday_list_name || 'New Business Holiday'"
+          :label="holidayData?.holiday_list_name || __('New Business Holiday')"
           size="md"
           @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70 !pr-0"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
         />
         <Badge
-          :variant="'subtle'"
-          :theme="'orange'"
+          variant="subtle"
+          theme="orange"
           size="sm"
-          label="Unsaved changes"
+          :label="__('Unsaved changes')"
           v-if="isDirty"
         />
       </div>
     </div>
     <div class="flex gap-2 items-center">
       <Button
-        label="Save"
+        :label="__('Save')"
         theme="gray"
         variant="solid"
         @click="saveHoliday()"
@@ -55,11 +55,11 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       <div>
         <FormControl
-          :type="'text'"
+          type="text"
           size="sm"
           variant="subtle"
-          placeholder="Name"
-          label="Name"
+          :placeholder="__('Name')"
+          :label="__('Name')"
           v-model="holidayData.holiday_list_name"
           required
           maxlength="50"
@@ -71,11 +71,11 @@
         />
       </div>
       <FormControl
-        :type="'textarea'"
+        type="textarea"
         size="sm"
         variant="subtle"
-        placeholder="Description"
-        label="Description"
+        :placeholder="__('Description')"
+        :label="__('Description')"
         v-model="holidayData.description"
         maxlength="140"
       />
@@ -90,7 +90,7 @@
       </div>
       <div class="mt-3.5 flex gap-5 flex-col md:flex-row">
         <div class="w-full space-y-1.5">
-          <FormLabel label="From date" for="from_date" required />
+          <FormLabel :label="__('From date')" for="from_date" required />
           <DatePicker
             v-model="holidayData.from_date"
             variant="subtle"
@@ -112,7 +112,7 @@
           />
         </div>
         <div class="w-full space-y-1.5">
-          <FormLabel label="To date" for="to_date" required />
+          <FormLabel :label="__('To date')" for="to_date" required />
           <DatePicker
             v-model="holidayData.to_date"
             variant="subtle"
@@ -135,10 +135,10 @@
     <div>
       <div class="flex flex-col gap-1">
         <div class="text-lg font-semibold text-ink-gray-8">
-          Recurring holidays
+          {{ __("Recurring holidays") }}
         </div>
         <div class="text-p-sm text-ink-gray-6">
-          Add recurring holidays such as weekends.
+          {{ __("Add recurring holidays such as weekends.") }}
         </div>
       </div>
       <div class="mt-5">
@@ -152,10 +152,15 @@
     <div>
       <div class="flex justify-between items-center">
         <div class="flex justify-between flex-col gap-1">
-          <span class="text-lg font-semibold text-ink-gray-8">Holidays</span>
+          <span class="text-lg font-semibold text-ink-gray-8">
+            {{ __("Holidays") }}
+          </span>
           <div class="text-p-sm text-ink-gray-6">
-            Add holidays here to make sure they’re excluded from SLA
-            calculations.
+            {{
+              __(
+                "Add holidays here to make sure they’re excluded from SLA calculations."
+              )
+            }}
           </div>
         </div>
         <TabButtons
@@ -179,7 +184,7 @@
       <div class="mt-2.5 flex justify-between items-center">
         <Button
           variant="subtle"
-          label="Add Holiday"
+          :label="__('Add Holiday')"
           @click="dialog.show = true"
           icon-left="plus"
         />
@@ -187,11 +192,13 @@
         <div class="flex gap-4" v-if="holidayListView === 'calendar'">
           <div class="gap-1 flex items-center">
             <span class="bg-yellow-100 size-4 rounded-sm" />
-            <span class="text-sm text-ink-gray-6">Holidays</span>
+            <span class="text-sm text-ink-gray-6">{{ __("Holidays") }}</span>
           </div>
           <div class="gap-1 flex items-center">
             <span class="bg-gray-100 size-4 rounded-sm" />
-            <span class="text-sm text-ink-gray-6">Recurring holidays</span>
+            <span class="text-sm text-ink-gray-6">{{
+              __("Recurring holidays")
+            }}</span>
           </div>
         </div>
       </div>
@@ -200,8 +207,10 @@
   <AddHolidayModal v-model="dialog" />
   <ConfirmDialog
     v-model="showConfirmDialog"
-    title="Unsaved changes"
-    message="Are you sure you want to go back? Unsaved changes will be lost."
+    :title="__('Unsaved changes')"
+    :message="
+      __('Are you sure you want to go back? Unsaved changes will be lost.')
+    "
     :onConfirm="goBack"
     :onCancel="() => (showConfirmDialog = false)"
   />
@@ -239,6 +248,7 @@ import {
 } from "../settingsModal";
 import HolidaysCalendarView from "./HolidaysCalendarView.vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
+import { __ } from "@/translation";
 
 const dialog = ref({
   show: false,
@@ -322,7 +332,7 @@ const saveHoliday = () => {
   const validationErrors = validateHoliday();
   if (Object.values(validationErrors).some((error) => error)) {
     toast.error(
-      "Invalid fields, check if all are filled in and values are correct."
+      __("Invalid fields, check if all are filled in and values are correct.")
     );
     return;
   }
@@ -352,7 +362,7 @@ const createHoliday = () => {
     },
     {
       onSuccess(data) {
-        toast.success("Holiday list created");
+        toast.success(__("Holiday list created"));
         holidayListActiveScreen.value.data = data;
         holidayListActiveScreen.value.screen = "view";
         getHolidayData.submit({
@@ -370,7 +380,7 @@ const updateHolidayResource = createResource({
     getHolidayData.submit({
       docname: data.name,
     });
-    toast.success("Holiday list updated");
+    toast.success(__("Holiday list updated"));
   },
 });
 

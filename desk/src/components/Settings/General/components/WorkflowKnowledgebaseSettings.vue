@@ -3,7 +3,23 @@
     <div class="text-base font-semibold text-gray-900">
       {{ __("Workflow & Knowledgebase Settings") }}
     </div>
-    <div v-if="settingsData.doc" class="mt-6 flex flex-col gap-6">
+    <div class="mt-6 flex flex-col gap-6">
+      <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-1">
+          <span class="text-base font-medium text-ink-gray-8">{{
+            __("Prefer knowledge base")
+          }}</span>
+          <span class="text-p-sm text-ink-gray-6">{{
+            __("Guide users to articles before tickets.")
+          }}</span>
+        </div>
+        <Switch
+          :model-value="settingsData.preferKnowledgeBase"
+          @update:model-value="
+            (value) => (settingsData.preferKnowledgeBase = value)
+          "
+        />
+      </div>
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
           <span class="text-base font-medium text-ink-gray-8">{{
@@ -16,38 +32,10 @@
           }}</span>
         </div>
         <Switch
-          :model-value="settingsData.doc.skip_email_workflow"
-          @update:model-value="onChange({ skip_email_workflow: $event })"
-        />
-      </div>
-      <div class="flex items-center justify-between">
-        <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">{{
-            __("Instantly send Email")
-          }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
-            __(
-              "Sends immediately, skipping the queue. The e-mail goes out as soon as you click Send."
-            )
-          }}</span>
-        </div>
-        <Switch
-          :model-value="settingsData.doc.instantly_send_email"
-          @update:model-value="onChange({ instantly_send_email: $event })"
-        />
-      </div>
-      <div class="flex items-center justify-between">
-        <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">{{
-            __("Prefer knowledge base")
-          }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
-            __("Guide users to articles before tickets.")
-          }}</span>
-        </div>
-        <Switch
-          :model-value="settingsData.doc.prefer_knowledge_base"
-          @update:model-value="onChange({ prefer_knowledge_base: $event })"
+          :model-value="settingsData.skipEmailWorkflow"
+          @update:model-value="
+            (value) => (settingsData.skipEmailWorkflow = value)
+          "
         />
       </div>
     </div>
@@ -59,8 +47,4 @@ import { Switch } from "frappe-ui";
 import { inject } from "vue";
 
 const settingsData = inject<any>("settingsData");
-
-const onChange = (data) => {
-  settingsData.setValue.submit(data);
-};
 </script>

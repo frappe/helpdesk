@@ -34,13 +34,13 @@
   },
   {
    "fieldname": "user_image",
-   "fieldtype": "Long Text",
+   "fieldtype": "Attach Image",
    "label": "Image"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-09 14:54:21.787477",
+ "modified": "2025-10-15 20:46:39.229016",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
