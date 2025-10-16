@@ -16,6 +16,8 @@ import WifiOff from "~icons/lucide/wifi-off";
 import { useAuthStore } from "./stores/auth";
 import { useFavicon } from "@vueuse/core";
 import { storeToRefs } from "pinia";
+import { __ } from "./translation";
+
 const configStore = useConfigStore();
 const { favicon } = storeToRefs(configStore);
 
@@ -24,14 +26,14 @@ useFavicon(favicon);
 onMounted(() => {
   window.addEventListener("online", () => {
     toast.create({
-      message: "You are now online",
+      message: __("You are now online"),
       icon: h(Wifi, { class: "text-white" }),
     });
   });
 
   window.addEventListener("offline", () => {
     toast.create({
-      message: "You are now offline",
+      message: __("You are now offline"),
       icon: h(WifiOff, { class: "text-white" }),
     });
   });

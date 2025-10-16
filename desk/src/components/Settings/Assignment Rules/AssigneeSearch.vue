@@ -102,6 +102,7 @@ import { computed, inject, Ref, ref } from "vue";
 import { setActiveSettingsTab } from "../settingsModal";
 import { useAgentStore } from "@/stores/agent";
 import { onMounted } from "vue";
+import { __ } from "@/translation";
 
 const emit = defineEmits(["addAssignee"]);
 const query = ref("");
@@ -150,8 +151,10 @@ const inviteAgents = () => {
   if (isAssignmentRuleFormDirty.value) {
     showConfirmDialog.value = {
       show: true,
-      title: "Unsaved changes",
-      message: "Are you sure you want to leave? Unsaved changes will be lost.",
+      title: __("Unsaved changes"),
+      message: __(
+        "Are you sure you want to leave? Unsaved changes will be lost."
+      ),
       onConfirm: () => {
         setActiveSettingsTab("Invite Agents");
       },

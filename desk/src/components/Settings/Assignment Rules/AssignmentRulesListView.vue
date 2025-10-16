@@ -17,14 +17,14 @@
       </div>
       <div class="flex flex-col items-center gap-1">
         <div class="text-base font-medium text-ink-gray-6">
-          No assignment rule found
+          {{ __("No assignment rule found") }}
         </div>
         <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-          Add your first assignment rule to get started.
+          {{ __("Add your first assignment rule to get started.") }}
         </div>
       </div>
       <Button
-        label="New"
+        :label="__('New')"
         variant="outline"
         icon-left="plus"
         @click="goToNew()"

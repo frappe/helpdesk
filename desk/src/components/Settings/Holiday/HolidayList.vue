@@ -17,14 +17,14 @@
       </div>
       <div class="flex flex-col items-center gap-1">
         <div class="text-base font-medium text-ink-gray-6">
-          No Holiday list found
+          {{ __("No Holiday list found") }}
         </div>
         <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-          Add your first Holiday list to get started.
+          {{ __("Add your first Holiday list to get started.") }}
         </div>
       </div>
       <Button
-        label="Add Holiday"
+        :label="__('Add Holiday')"
         variant="outline"
         icon-left="plus"
         @click="goToNew()"
@@ -32,7 +32,7 @@
     </div>
     <div v-else>
       <div class="flex text-sm text-gray-600">
-        <div class="ml-2">Schedule name</div>
+        <div class="ml-2">{{ __("Schedule name") }}</div>
       </div>
       <hr class="mx-2 mt-2" />
       <div>

@@ -35,7 +35,7 @@
           <Input
             v-model="assignmentRuleSearchQuery"
             @input="assignmentRuleSearchQuery = $event"
-            placeholder="Search"
+            :placeholder="__('Search')"
             type="text"
             class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
             icon-left="search"

@@ -16,13 +16,15 @@
         <ShieldCheck class="size-6 text-ink-gray-6" />
       </div>
       <div class="flex flex-col items-center gap-1">
-        <div class="text-base font-medium text-ink-gray-6">No SLA found</div>
+        <div class="text-base font-medium text-ink-gray-6">
+          {{ __("No SLA found") }}
+        </div>
         <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-          Add your first SLA to get started.
+          {{ __("Add your first SLA to get started.") }}
         </div>
       </div>
       <Button
-        label="Add SLA"
+        :label="__('Add SLA')"
         variant="outline"
         icon-left="plus"
         @click="goToNew()"
@@ -32,25 +34,16 @@
       <div
         class="grid grid-cols-6 items-center gap-3 text-sm text-gray-600 ml-2"
       >
-        <div class="col-span-5">Policy Name</div>
-        <div class="col-span-1">Enabled</div>
+        <div class="col-span-5">
+          {{ __("Policy Name") }}
+        </div>
+        <div class="col-span-1">{{ __("Enabled") }}</div>
       </div>
       <hr class="mt-2 mx-2" />
       <div v-for="sla in slaPolicyList.list.data" :key="sla.name">
         <SlaPolicyListItem :data="sla" />
         <hr class="mx-2" />
       </div>
-    </div>
-    <!-- Load More Button -->
-    <div class="flex justify-center">
-      <Button
-        v-if="!slaPolicyList.loading && slaPolicyList.hasNextPage"
-        class="mt-3.5 p-2"
-        @click="() => slaPolicyList.next()"
-        :loading="slaPolicyList.loading"
-        label="Load More"
-        icon-left="refresh-cw"
-      />
     </div>
   </div>
 </template>

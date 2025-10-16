@@ -12,6 +12,7 @@
         variant="solid"
         @click="renameTeam"
         :loading="renameTeamResource.loading"
+        :disabled="teamName == dialog.teamName || teamName.trim() == ''"
       >
         Confirm
       </Button>
