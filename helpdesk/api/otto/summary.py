@@ -10,7 +10,6 @@ if TYPE_CHECKING:
 
 
 import frappe
-from otto.lib.types import ToolSchema, ToolSchemaParameters
 
 from helpdesk.api.otto.types import Summary, SummaryConfig
 
@@ -86,24 +85,28 @@ Adhere to the following user given guidelines when summarizing the support ticke
 </user_guidelines>
 """.strip()
 
-summary_tool = ToolSchema(
-    name="summarize_ticket",
-    description="Use this tool to summarize the ticket. The snippet should be a short one sentence summary of the ticket. The content should be the full content of the summary.",
-    parameters=ToolSchemaParameters(
-        type="object",
-        properties={
-            "snippet": {
-                "type": "string",
-                "description": "A short one sentence snippet of the summary",
+
+def get_summary_tool():
+    from otto.lib.types import ToolSchema, ToolSchemaParameters
+
+    return ToolSchema(
+        name="summarize_ticket",
+        description="Use this tool to summarize the ticket. The snippet should be a short one sentence summary of the ticket. The content should be the full content of the summary.",
+        parameters=ToolSchemaParameters(
+            type="object",
+            properties={
+                "snippet": {
+                    "type": "string",
+                    "description": "A short one sentence snippet of the summary",
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The full content of the summary",
+                },
             },
-            "content": {
-                "type": "string",
-                "description": "The full content of the summary",
-            },
-        },
-        required=["snippet", "content"],
-    ),
-)
+            required=["snippet", "content"],
+        ),
+    )
 
 
 @frappe.whitelist()
@@ -173,7 +176,7 @@ def _summarize(ticket_id: str):
     session = otto.new(
         model=llm,
         instruction=instruction,
-        tools=[summary_tool],
+        tools=[get_summary_tool()],
         reasoning_effort=reasoning_effort,
         reference_doctype="HD Ticket",
         reference_name=ticket_id,
