@@ -3,12 +3,14 @@
     <!-- Header -->
     <div class="px-10 py-8">
       <SettingsLayoutHeader
-        title="Teams"
-        description="Create and manage teams and assign agents to specific teams."
+        :title="__('Teams')"
+        :description="
+          __('Create and manage teams and assign agents to specific teams.')
+        "
       >
         <template #actions>
           <Button
-            label="New"
+            :label="__('New')"
             theme="gray"
             variant="solid"
             @click="() => (showForm = !showForm)"
@@ -23,7 +25,7 @@
             <Input
               v-model="teamsSearchQuery"
               @input="teamsSearchQuery = $event"
-              placeholder="Search"
+              :placeholder="__('Search')"
               type="text"
               class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
               icon-left="search"
@@ -48,7 +50,7 @@
         class="w-full h-full -ml-2"
       >
         <div class="flex text-sm text-gray-600">
-          <div class="ml-2">Team name</div>
+          <div class="ml-2">{{ __("Team name") }}</div>
         </div>
         <hr class="mx-2 mt-2" />
         <div v-for="team in teams.data" :key="team.name">
@@ -84,7 +86,7 @@
             class="mt-3.5 p-2"
             @click="() => teams.next()"
             :loading="teams.loading"
-            label="Load More"
+            :label="__('Load More')"
             icon-left="refresh-cw"
           />
         </div>
@@ -112,17 +114,19 @@
           <AgentIcon class="size-6 text-ink-gray-6" />
         </div>
         <div class="flex flex-col items-center gap-1">
-          <div class="text-base font-medium text-ink-gray-6">No team found</div>
+          <div class="text-base font-medium text-ink-gray-6">
+            {{ __("No team found") }}
+          </div>
           <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
             {{
               teamsSearchQuery.length
-                ? "Change your search terms to find teams."
-                : "Add your first team to get started."
+                ? __("Change your search terms to find teams.")
+                : __("Add your first team to get started.")
             }}
           </div>
         </div>
         <Button
-          label="Add Team"
+          :label="__('Add Team')"
           variant="outline"
           icon-left="plus"
           @click="showForm = true"
@@ -149,6 +153,7 @@ import NewTeamModal from "../NewTeamModal.vue";
 import { ConfirmDelete } from "@/utils";
 import EditIcon from "@/components/icons/EditIcon.vue";
 import RenameTeamModal from "./RenameTeamModal.vue";
+import { __ } from "@/translation";
 
 interface E {
   (event: "update:step", step: string, team: string): void;
@@ -168,7 +173,7 @@ const isConfirmingDelete = ref(false);
 const dropdownOptions = (team: any) => {
   return [
     {
-      label: "Rename",
+      label: __("Rename"),
       icon: markRaw(EditIcon),
       onClick: () => {
         showRename.value = {
@@ -192,7 +197,7 @@ const deleteTeam = (team: any) => {
 
   teams.delete.submit(team.name, {
     onSuccess: () => {
-      toast.success("Team deleted");
+      toast.success(__("Team deleted"));
     },
   });
 };

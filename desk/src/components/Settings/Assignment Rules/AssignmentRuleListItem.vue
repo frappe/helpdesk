@@ -124,7 +124,7 @@ const deleteAssignmentRule = () => {
 
 const dropdownOptions = [
   {
-    label: "Duplicate",
+    label: __("Duplicate"),
     onClick: () => {
       duplicateDialog.value = {
         show: true,

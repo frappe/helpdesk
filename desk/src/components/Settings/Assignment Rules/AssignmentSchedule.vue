@@ -31,45 +31,46 @@ import {
   assignmentRulesErrors,
 } from "@/stores/assignmentRules";
 import AssignmentScheduleItem from "./AssignmentScheduleItem.vue";
+import { __ } from "@/translation";
 
 const columns = [
   {
-    label: "Days",
+    label: __("Days"),
     key: "day",
   },
   {
-    label: "Active",
+    label: __("Active"),
     key: "active",
   },
 ];
 
 const days = ref([
   {
-    day: "Monday",
+    day: __("Monday"),
     active: false,
   },
   {
-    day: "Tuesday",
+    day: __("Tuesday"),
     active: false,
   },
   {
-    day: "Wednesday",
+    day: __("Wednesday"),
     active: false,
   },
   {
-    day: "Thursday",
+    day: __("Thursday"),
     active: false,
   },
   {
-    day: "Friday",
+    day: __("Friday"),
     active: false,
   },
   {
-    day: "Saturday",
+    day: __("Saturday"),
     active: false,
   },
   {
-    day: "Sunday",
+    day: __("Sunday"),
     active: false,
   },
 ]);

@@ -30,6 +30,7 @@ import { EmailAccount } from "@/types";
 import { emailIcon } from "./emailConfig";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import { computed } from "vue";
+import { __ } from "@/translation";
 
 interface P {
   emailAccount: EmailAccount;
@@ -46,16 +47,16 @@ const badgeTitleColor = computed(() => {
       props.emailAccount.enable_incoming && props.emailAccount.enable_outgoing
         ? "blue"
         : "gray";
-    return ["Default Sending and Inbox", color];
+    return [__("Default Sending and Inbox"), color];
   } else if (props.emailAccount.default_incoming) {
     const color = props.emailAccount.enable_incoming ? "blue" : "gray";
-    return ["Default Inbox", color];
+    return [__("Default Inbox"), color];
   } else if (props.emailAccount.default_outgoing) {
     const color = props.emailAccount.enable_outgoing ? "blue" : "gray";
-    return ["Default Sending", color];
+    return [__("Default Sending"), color];
   } else {
     const color = props.emailAccount.enable_incoming ? "blue" : "gray";
-    return ["Inbox", color];
+    return [__("Inbox"), color];
   }
 });
 </script>

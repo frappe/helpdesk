@@ -3,24 +3,27 @@
     <SettingsLayoutHeader>
       <template #title>
         <h1 class="text-lg font-semibold text-ink-gray-8">
-          Service Level Agreements (SLAs)
+          {{ __("Service Level Agreements (SLAs)") }}
         </h1>
       </template>
       <template #description>
         <p class="text-p-sm max-w-md text-ink-gray-6">
-          SLAs align your team and customers with defined timelines for a
-          reliable experience.
+          {{
+            __(
+              "SLAs align your team and customers with defined timelines for a reliable experience."
+            )
+          }}
           <a
             href="https://docs.frappe.io/helpdesk/service-level-agreement"
             target="_blank"
             class="underline"
-            >Learn more about SLA
+            >{{ __("Learn more about SLA") }}
           </a>
         </p>
       </template>
       <template #actions>
         <Button
-          label="New"
+          :label="__('New')"
           theme="gray"
           variant="solid"
           @click="goToNew()"
@@ -35,7 +38,7 @@
           <Input
             v-model="slaSearchQuery"
             @input="slaSearchQuery = $event"
-            placeholder="Search"
+            :placeholder="__('Search')"
             type="text"
             class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
             icon-left="search"

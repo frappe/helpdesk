@@ -83,9 +83,11 @@
     <hr class="my-8" />
     <div>
       <div class="flex flex-col gap-1">
-        <span class="text-lg font-semibold text-ink-gray-8">Valid from</span>
+        <span class="text-lg font-semibold text-ink-gray-8">{{
+          __("Valid from")
+        }}</span>
         <span class="text-p-sm text-ink-gray-6">
-          Choose the duration of this holiday list.
+          {{ __("Choose the duration of this holiday list.") }}
         </span>
       </div>
       <div class="mt-3.5 flex gap-5 flex-col md:flex-row">

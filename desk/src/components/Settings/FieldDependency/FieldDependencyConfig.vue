@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { provide, Ref, ref } from "vue";
+import { Ref, ref } from "vue";
 import FieldDependency from "./FieldDependency.vue";
 import FieldDependencyList from "./FieldDependencyList.vue";
 
@@ -19,9 +19,6 @@ type FieldDependencyStep = "fd-list" | "fd";
 
 const step: Ref<FieldDependencyStep> = ref("fd-list");
 const fieldDependencyName = ref("");
-const fieldDependencySearchQuery = ref("");
-
-provide("fieldDependencySearchQuery", fieldDependencySearchQuery);
 
 function updateStep(
   newStep: FieldDependencyStep,

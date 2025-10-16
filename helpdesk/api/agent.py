@@ -20,6 +20,7 @@ def sent_invites(emails, send_welcome_mail_to_user=True):
         frappe.get_doc(
             {
                 "doctype": "HD Agent",
+                "ID": email,
                 "user": user.name,
                 "agent_name": user.full_name,
                 "user_image": user.user_image,

@@ -1,12 +1,16 @@
 <template>
   <div class="px-10 py-8 sticky top-0">
     <SettingsLayoutHeader
-      title="Business Holidays"
-      description="Set your team’s working days, hours, and holidays using a template or custom schedule."
+      :title="__('Business Holidays')"
+      :description="
+        __(
+          'Set your team’s working days, hours, and holidays using a template or custom schedule.'
+        )
+      "
     >
       <template #actions>
         <Button
-          label="New"
+          :label="__('New')"
           theme="gray"
           variant="solid"
           @click="goToNew()"
@@ -21,7 +25,7 @@
           <Input
             v-model="holidaySearchRef"
             @input="holidaySearchRef = $event"
-            placeholder="Search"
+            :placeholder="__('Search')"
             type="text"
             class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
             icon-left="search"

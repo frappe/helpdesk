@@ -59,8 +59,8 @@
           :type="'text'"
           size="sm"
           variant="subtle"
-          placeholder="Name"
-          label="Name"
+          :placeholder="__('Name')"
+          :label="__('Name')"
           v-model="assignmentRuleData.assignmentRuleName"
           required
           maxlength="50"
@@ -72,7 +72,7 @@
         />
       </div>
       <div class="flex flex-col gap-1.5">
-        <FormLabel label="Priority" />
+        <FormLabel :label="__('Priority')" />
         <Popover>
           <template #target="{ togglePopover }">
             <div
@@ -118,8 +118,8 @@
           :type="'textarea'"
           size="sm"
           variant="subtle"
-          placeholder="Description"
-          label="Description"
+          :placeholder="__('Description')"
+          :label="__('Description')"
           required
           maxlength="140"
           @change="validateAssignmentRule('description')"
@@ -332,6 +332,7 @@ import AssignmentRulesSection from "./AssignmentRulesSection.vue";
 import AssignmentSchedule from "./AssignmentSchedule.vue";
 import { convertToConditions } from "@/utils";
 import { disableSettingModalOutsideClick } from "../settingsModal";
+import { __ } from "@/translation";
 
 const isDirty = ref(false);
 const initialData = ref(null);
@@ -399,8 +400,10 @@ if (!assignmentRulesActiveScreen.value.data) {
 const goBack = () => {
   const confirmDialogInfo = {
     show: true,
-    title: "Unsaved changes",
-    message: "Are you sure you want to go back? Unsaved changes will be lost.",
+    title: __("Unsaved changes"),
+    message: __(
+      "Are you sure you want to go back? Unsaved changes will be lost."
+    ),
     onConfirm: goBack,
   };
   if (isDirty.value && !showConfirmDialog.value.show) {
@@ -422,7 +425,7 @@ const saveAssignmentRule = () => {
 
   if (Object.values(validationErrors).some((error) => error)) {
     toast.error(
-      "Invalid fields, check if all are filled in and values are correct."
+      __("Invalid fields, check if all are filled in and values are correct.")
     );
     return;
   }
@@ -431,9 +434,10 @@ const saveAssignmentRule = () => {
     if (isOldSla.value && useNewUI.value) {
       showConfirmDialog.value = {
         show: true,
-        title: "Confirm overwrite",
-        message:
-          "Your old condition will be overwritten. Are you sure you want to save?",
+        title: __("Confirm overwrite"),
+        message: __(
+          "Your old condition will be overwritten. Are you sure you want to save?"
+        ),
         onConfirm: () => {
           updateAssignmentRule();
           showConfirmDialog.value.show = false;
@@ -483,7 +487,7 @@ const createAssignmentRuleResource = createResource({
         name: data.name,
       })
       .then(() => {
-        toast.success("Assignment rule created");
+        toast.success(__("Assignment rule created"));
       });
     assignmentRulesActiveScreen.value = {
       screen: "view",
@@ -535,7 +539,8 @@ const updateAssignmentRule = async () => {
     },
   }).catch((er) => {
     const error =
-      er?.messages?.[0] || "Some error occurred while updating assignment rule";
+      er?.messages?.[0] ||
+      __("Some error occurred while updating assignment rule");
     toast.error(error);
     isLoading.value = false;
   });
@@ -551,7 +556,7 @@ const updateAssignmentRule = async () => {
     }).catch(async (er) => {
       const error =
         er?.messages?.[0] ||
-        "Some error occurred while renaming assignment rule";
+        __("Some error occurred while renaming assignment rule");
       toast.error(error);
       // Reset assignment rule to previous state
       await getAssignmentRuleData.reload();
@@ -566,7 +571,7 @@ const updateAssignmentRule = async () => {
   }
 
   isLoading.value = false;
-  toast.success("Assignment rule updated");
+  toast.success(__("Assignment rule updated"));
 };
 
 watch(
