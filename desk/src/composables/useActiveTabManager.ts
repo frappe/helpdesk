@@ -1,9 +1,13 @@
+import { useTelephonyStore } from "@/stores/telephony";
+import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-export function useActiveTabManager(tabs, isLoading) {
+export function useActiveTabManager(tabs) {
   const route = useRoute();
   const router = useRouter();
+  const telephonyStore = useTelephonyStore();
+  const { isLoading: isTelephonyLoading } = storeToRefs(telephonyStore);
 
   const changeTabTo = (tab) => {
     tabIndex.value = tab;
@@ -60,10 +64,10 @@ export function useActiveTabManager(tabs, isLoading) {
 
   // Handle when tabs array is updated
   watch(
-    [tabs, isLoading],
-    ([tabsValue, isLoadingValue]) => {
+    [tabs, isTelephonyLoading],
+    ([tabsValue, isLoading]) => {
       if (!tabsValue?.length) return;
-      if (!isLoadingValue) {
+      if (!isLoading) {
         setActiveTab();
       }
     },

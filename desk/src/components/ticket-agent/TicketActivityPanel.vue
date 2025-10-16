@@ -73,8 +73,7 @@ const activities = inject(ActivitiesSymbol);
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const telephonyStore = useTelephonyStore();
-const { isCallingEnabled, isLoading: isTelephonyLoading } =
-  storeToRefs(telephonyStore);
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs: TabObject[] = [
@@ -105,7 +104,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   return _tabs;
 });
 
-const { tabIndex, changeTabTo } = useActiveTabManager(tabs, isTelephonyLoading);
+const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend
