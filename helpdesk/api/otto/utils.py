@@ -24,7 +24,7 @@ def get_enabled_features() -> FeatureFlags:
         summary=False,
     )
 
-    if not can_use_otto() or not is_enabled():
+    if not is_enabled() or not can_use_otto():
         return enabled_features
 
     conf = get_feature_config()

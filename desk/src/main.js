@@ -1,4 +1,4 @@
-import { createApp, h } from "vue";
+import { isCustomerPortal } from "@/utils";
 import {
   Badge,
   Button,
@@ -15,15 +15,15 @@ import {
   Tooltip,
 } from "frappe-ui";
 import { createPinia } from "pinia";
+import { createApp, h } from "vue";
+import CircleAlert from "~icons/lucide/circle-alert";
 import App from "./App.vue";
 import { createDialog } from "./components/dialogs";
 import "./index.css";
 import { router } from "./router";
-import { posthogPlugin } from "./telemetry";
-import { isCustomerPortal } from "@/utils";
-import { translationPlugin } from "./translation";
-import CircleAlert from "~icons/lucide/circle-alert";
 import { initSocket } from "./socket";
+import { posthogPlugin } from "./telemetry";
+import { translationPlugin } from "./translation";
 
 const globalComponents = {
   Badge,
@@ -48,6 +48,7 @@ setConfig("serverMessagesHandler", (msgs) => {
       toast.success(msg.message);
       return;
     }
+    if (msg && msg.message.toLowerCase().includes("otto settings")) return;
     toast.create({
       message: msg.message,
       icon: h(CircleAlert, { class: "text-blue-500" }),

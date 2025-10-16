@@ -19,7 +19,9 @@
             Otto is not installed
           </p>
           <p class="text-sm text-amber-700 mt-1">
-            Please install Otto to enable smart features.
+            <!-- TODO: add docs link to enable OTTO Integration -->
+            Please install <a href="#" class="underline">Otto</a> to enable
+            smart features.
           </p>
         </div>
       </div>
@@ -136,11 +138,11 @@
 
       <!-- Model Selection -->
       <div v-if="featureConfig.summary.enabled" class="mb-6">
-        <Select
-          label="LLM"
+        <FormControl
+          type="select"
+          label="Select a model"
           v-model="featureConfig.summary.llm"
           :options="modelOptions"
-          placeholder="Select a model"
         />
         <div class="text-p-xs text-ink-gray-6 mt-1">
           LLM to use for activity summarization.
@@ -150,7 +152,7 @@
       <!-- Guidelines/Prompt -->
       <div v-if="featureConfig.summary.enabled" class="mb-6">
         <Textarea
-          id="guidelines-textarea"
+          class="text-p-sm [&>textarea]:font-mono"
           label="Guidelines"
           v-model="featureConfig.summary.guidelines"
           placeholder="Enter custom instructions for summary generation..."
@@ -170,7 +172,7 @@ import Password from "@/components/Password.vue";
 import {
   Button,
   Checkbox,
-  Select,
+  FormControl,
   Textarea,
   createDocumentResource,
   createResource,
@@ -185,7 +187,7 @@ type ViewType = "main" | "summary";
 
 const currentView = ref<ViewType>("main");
 
-const dummyKey = "••••••••";
+const dummyKey = "••••••••••••••••••••••••••••••••";
 
 const apiKeys = ref({
   OpenAI: "",
@@ -215,6 +217,12 @@ const modelOptions = ref<string[]>([]);
 const canUseOtto = createResource({
   url: "helpdesk.api.otto.can_use_otto",
   auto: true,
+  onSuccess: (data) => {
+    if (!data) return;
+    getKeysSet.reload();
+    getOttoConfig.reload();
+    ottoModels.reload();
+  },
 });
 
 const hdSettings = createDocumentResource({
@@ -226,11 +234,11 @@ const hdSettings = createDocumentResource({
 
 const getKeysSet = createResource({
   url: "otto.lib.model.get_keys_set",
-  auto: true,
   onSuccess: (data) => {
     Object.keys(data).forEach((key) => {
       if (data[key]) apiKeys.value[key] = dummyKey;
     });
+    isDirty.value.apiKeys = false;
   },
 });
 
@@ -238,9 +246,8 @@ const setApiKeys = createResource({
   url: "otto.lib.model.set_api_keys",
 });
 
-createResource({
+const getOttoConfig = createResource({
   url: "helpdesk.api.otto.get_feature_config",
-  auto: true,
   onSuccess: (data) => {
     originalConfig.value = data;
 
@@ -258,10 +265,9 @@ createResource({
   },
 });
 
-createResource({
+const ottoModels = createResource({
   url: "otto.lib.model.get_models",
   params: { get_details: true },
-  auto: true,
   onSuccess: (data) => {
     modelOptions.value = data.map((model) => ({
       label: model.title,
@@ -298,11 +304,11 @@ async function save() {
   if (isDirty.value.apiKeys) {
     // Only send non-empty keys
     const keysToSave: Record<string, string> = {};
-    if (apiKeys.value.OpenAI && apiKeys.value.OpenAI !== dummyKey)
+    if (apiKeys.value.OpenAI !== dummyKey)
       keysToSave.OpenAI = apiKeys.value.OpenAI;
-    if (apiKeys.value.Anthropic && apiKeys.value.Anthropic !== dummyKey)
+    if (apiKeys.value.Anthropic !== dummyKey)
       keysToSave.Anthropic = apiKeys.value.Anthropic;
-    if (apiKeys.value.Google && apiKeys.value.Google !== dummyKey)
+    if (apiKeys.value.Google !== dummyKey)
       keysToSave.Google = apiKeys.value.Google;
 
     if (Object.keys(keysToSave).length > 0) {

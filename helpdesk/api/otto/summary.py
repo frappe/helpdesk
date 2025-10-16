@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, cast
 if TYPE_CHECKING:
     from otto.lib.types import ToolUseContent
 
-
 import frappe
 
 from helpdesk.api.otto.types import Summary, SummaryConfig
@@ -315,9 +314,10 @@ def _get_context_from_communications(ticket_id: str):
         sender = c.get("sender", email)
         subject = c.get("subject", "EMPTY")
         content = c.get("content", "EMPTY")
+        is_agent = c.get("sent_or_received") == "Sent"
 
         context.append(
-            f"<ticket_communication date='{date}' sender_name='{name}' sender_email='{sender}' subject='{subject}' >"
+            f"<ticket_communication date='{date}' sender_name='{name}' sender_email='{sender}' subject='{subject}' is_agent='{is_agent}' >"
         )
         context.extend(otto.utils.interpolate_imgs(content, skip_errors=True))
         context.append("</ticket_communication>")

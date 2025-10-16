@@ -54,6 +54,7 @@ import {
   EmailIcon,
   PhoneIcon,
 } from "@/components/icons";
+import { enabledAiFeatures } from "@/composables/otto";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
   ActivitiesSymbol,
@@ -66,7 +67,6 @@ import { LoadingIndicator, TabList, TabPanel, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
-import { enabledAiFeatures } from "@/composables/otto";
 
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);
@@ -260,6 +260,8 @@ function filterActivities(eventType: TicketTab) {
 }
 
 const showSummarizeButton = computed(() => {
+  // TODO: show whether want or not
+  return true;
   if (!enabledAiFeatures.data?.summary) return false;
   if (tabIndex.value !== 0) return false;
   if (

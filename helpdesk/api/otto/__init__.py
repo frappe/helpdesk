@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from helpdesk.api.otto.utils import (
     can_use_otto,
     get_enabled_features,
