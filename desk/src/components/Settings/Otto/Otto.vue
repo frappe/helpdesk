@@ -5,7 +5,7 @@
     title="Otto"
     description="Configure Otto settings to enable smart features."
     :isDirty="isAnyDirty"
-    :saving="isSaving"
+    :isSaving="isSaving"
     @save="save"
   >
     <!-- Warning if Otto is not installed -->
@@ -74,39 +74,41 @@
     </div>
 
     <!-- Features Section -->
-    <div
-      v-if="canUseOtto.data === true && hdSettings.doc?.enable_smart_features"
-      class="mt-6"
-    >
+    <div class="mt-6">
       <div class="text-base font-semibold text-ink-gray-8">Features</div>
       <div class="text-p-xs text-ink-gray-6 mt-1">
         Configure Otto enabled smart features.
       </div>
-      <div class="mt-4">
-        <!-- Summary Feature -->
-        <div
-          class="flex items-center justify-between p-4 border border-ink-gray-3 rounded-lg"
-        >
-          <div class="flex-1">
-            <div class="flex items-center gap-2">
-              <h3 class="text-sm font-medium text-ink-gray-8">
-                Activity Summarization
-              </h3>
-            </div>
-            <p class="text-p-xs text-ink-gray-6 mt-1">
-              Generate summary of ticket activity on demand.
-            </p>
-          </div>
-          <div class="flex items-center gap-3">
-            <Button
-              label="Settings"
-              theme="gray"
-              variant="subtle"
-              icon-left="settings"
-              @click="openSummarySettings"
-            />
-          </div>
+
+      <div
+        v-if="canUseOtto.data === true && hdSettings.doc?.enable_smart_features"
+        class="flex items-center justify-between p-3 rounded relative"
+      >
+        <div class="flex flex-col gap-1">
+          <h2
+            class="text-base font-medium text-ink-gray-7 relative z-10 pointer-events-none"
+          >
+            Activity Summarization
+          </h2>
+          <p
+            class="text-sm text-ink-gray-5 truncate relative z-10 pointer-events-none"
+          >
+            Generate summary of ticket activity on demand.
+          </p>
         </div>
+        <FeatherIcon
+          name="chevron-right"
+          class="text-ink-gray-7 size-4 relative z-10 pointer-events-none"
+        />
+        <button
+          type="button"
+          class="w-full h-full absolute top-0 left-0 hover:bg-gray-50 rounded-[inherit]"
+          @click="openSummarySettings"
+        >
+          <span class="sr-only">{{
+            __("configure activity summarization")
+          }}</span>
+        </button>
       </div>
     </div>
   </SettingsView>
@@ -114,28 +116,18 @@
   <!-- Summary Settings View -->
   <SettingsView
     v-else-if="currentView === 'summary'"
+    v-model="featureConfig.summary.enabled"
     title="Activity Summarization"
     description="Configure activity summarization."
     :isDirty="isAnyDirty"
-    :saving="isSaving"
+    :isSaving="isSaving"
+    :showEnabledSwitch="true"
     :showBackButton="true"
     @back="currentView = 'main'"
     @save="save"
   >
     <div v-if="isLoading" class="text-p-xs text-ink-gray-6">Loading...</div>
     <div v-else-if="featureConfig">
-      <!-- Enable Summary Feature -->
-      <div class="mb-6">
-        <Checkbox
-          label="Enable Activity Summarization"
-          title="Summarize button will be shown if enabled."
-          v-model="featureConfig.summary.enabled"
-        />
-        <div class="text-p-xs text-ink-gray-6 mt-1">
-          Summarize button will be shown if enabled.
-        </div>
-      </div>
-
       <!-- Model Selection -->
       <div v-if="featureConfig.summary.enabled" class="mb-6">
         <FormControl
