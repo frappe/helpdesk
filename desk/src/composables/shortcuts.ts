@@ -1,5 +1,5 @@
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
-import { computed, ref } from "vue";
+import { computed, ref, onUnmounted, getCurrentInstance } from "vue";
 
 interface ShortcutBinding {
   key: string;
@@ -98,7 +98,11 @@ export const useShortcut = (
 
   window.addEventListener("keydown", handleKeydown);
 
-  return () => {
-    window.removeEventListener("keydown", handleKeydown);
-  };
+  const instance = getCurrentInstance();
+  if (instance) {
+    onUnmounted(() => {
+      window.removeEventListener("keydown", handleKeydown);
+      // Remove from shortcuts list on unmount
+    });
+  }
 };
