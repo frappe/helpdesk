@@ -18,6 +18,7 @@
             <Link
               v-if="field.visible"
               :key="field.fieldname"
+              :ref="(el) => setFieldRef(field.fieldname, el)"
               class="form-control-core"
               :id="field.fieldname"
               :class="section.group ? 'flex-1' : 'w-full'"
@@ -71,7 +72,7 @@ import {
   FieldValue,
   TicketSymbol,
 } from "@/types";
-import { computed, inject, nextTick, onMounted, ref } from "vue";
+import { computed, inject, nextTick, onMounted, onUnmounted, ref } from "vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
@@ -184,28 +185,29 @@ function handleFieldUpdate(
   );
 }
 
-onMounted(() => {
-  setTimeout(() => {
-    const ticketType = document.querySelector(
-      "#ticket_type button"
-    ) as HTMLButtonElement;
-    const priority = document.querySelector(
-      "#priority button"
-    ) as HTMLButtonElement;
-    const team = document.querySelector(
-      "#agent_group button"
-    ) as HTMLButtonElement;
+const fieldRefs = ref<Record<string, any>>({});
 
+const setFieldRef = (fieldname: string, el: any) => {
+  if (el) {
+    fieldRefs.value[fieldname] = el;
+  }
+};
+
+onMounted(() => {
+  // Wait for next tick to ensure refs are populated
+  nextTick(() => {
     useShortcut("t", () => {
-      ticketType?.click();
+      fieldRefs.value.ticket_type?.$el?.querySelector("button")?.click();
     });
+
     useShortcut("p", () => {
-      priority?.click();
+      fieldRefs.value.priority?.$el?.querySelector("button")?.click();
     });
+
     useShortcut({ key: "t", shift: true }, () => {
-      team?.click();
+      fieldRefs.value.agent_group?.$el?.querySelector("button")?.click();
     });
-  }, 200);
+  });
 });
 </script>
 

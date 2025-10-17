@@ -1,5 +1,5 @@
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
-import { computed, ref, onUnmounted, getCurrentInstance } from "vue";
+import { computed, ref, onBeforeUnmount, getCurrentInstance } from "vue";
 
 interface ShortcutBinding {
   key: string;
@@ -18,6 +18,37 @@ export const useShortcut = (
   binding: string | ShortcutBinding,
   cb: Function
 ) => {
+  // Normalize the binding to a consistent format
+  const shortcutBinding: ShortcutBinding =
+    typeof binding === "string"
+      ? { key: binding, shift: false, ctrl: false, alt: false, meta: false }
+      : {
+          shift: false,
+          ctrl: false,
+          alt: false,
+          meta: false,
+          ...binding,
+        };
+
+  // Register shortcut immediately when useShortcut is called
+  const exists = shortcutsList.value.some((shortcut) => {
+    return (
+      shortcut.key === shortcutBinding.key &&
+      shortcut.shift === shortcutBinding.shift &&
+      shortcut.ctrl === shortcutBinding.ctrl &&
+      shortcut.alt === shortcutBinding.alt &&
+      shortcut.meta === shortcutBinding.meta
+    );
+  });
+
+  if (!exists) {
+    shortcutsList.value.push(shortcutBinding);
+  } else {
+    console.warn(
+      `Shortcut conflict: ${shortcutBinding.key} already registered`
+    );
+  }
+
   const handleKeydown = (e: KeyboardEvent) => {
     if (isShortcutsDisabled.value) return;
 
@@ -37,17 +68,39 @@ export const useShortcut = (
       return; // Don't trigger shortcuts when typing
     }
 
+    // Create binding from the current key event
+    const eventBinding: ShortcutBinding = {
+      key: e.key.toLowerCase(),
+      shift: e.shiftKey,
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      meta: e.metaKey,
+    };
+
+    // Check if this key combination is registered
+    const isRegistered = shortcutsList.value.some((shortcut) => {
+      return (
+        shortcut.key === eventBinding.key &&
+        shortcut.shift === eventBinding.shift &&
+        shortcut.ctrl === eventBinding.ctrl &&
+        shortcut.alt === eventBinding.alt &&
+        shortcut.meta === eventBinding.meta
+      );
+    });
+
+    // If not registered, don't execute further
+    if (!isRegistered) {
+      return;
+    }
+
+    // Check if this specific handler should execute
     let matches = false;
 
-    // means if binding is a string, e.g., "s"
     if (typeof binding === "string") {
       const keyMatches = e.key.toLowerCase() === binding.toLowerCase();
       const noModifiers = !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey;
-
-      matches = keyMatches && noModifiers; // This prevents the overlap
-    }
-    // means it is a combination of keys like Shift+S or Ctrl+S ({ key: "s", shift: true })
-    else {
+      matches = keyMatches && noModifiers;
+    } else {
       // Complex binding with modifiers
       if (
         e.key === "Shift" ||
@@ -58,7 +111,6 @@ export const useShortcut = (
         return; // Ignore modifier key events
       }
       const keyMatches = e.key.toLowerCase() === binding.key.toLowerCase();
-
       const shiftMatches = binding.shift ? e.shiftKey : !e.shiftKey;
       const ctrlMatches = binding.ctrl ? e.ctrlKey : !e.ctrlKey;
       const altMatches = binding.alt ? e.altKey : !e.altKey;
@@ -66,43 +118,36 @@ export const useShortcut = (
       matches =
         keyMatches && shiftMatches && ctrlMatches && altMatches && metaMatches;
     }
-    // validate if the shortcut already exists in the list
-    const exists = shortcutsList.value.some((shortcut) => {
-      return (
-        shortcut.key ===
-          (typeof binding === "string" ? binding : binding.key) &&
-        shortcut.shift ===
-          (typeof binding === "string" ? false : binding.shift) &&
-        shortcut.ctrl ===
-          (typeof binding === "string" ? false : binding.ctrl) &&
-        shortcut.alt === (typeof binding === "string" ? false : binding.alt) &&
-        shortcut.meta === (typeof binding === "string" ? false : binding.meta)
-      );
-    });
-
-    if (!exists) {
-      // FIXED: Properly convert string to ShortcutBinding
-      const shortcutBinding: ShortcutBinding =
-        typeof binding === "string"
-          ? { key: binding, shift: false, ctrl: false, alt: false, meta: false }
-          : binding;
-
-      shortcutsList.value.push(shortcutBinding);
-    }
 
     if (matches) {
       e.preventDefault();
-      cb();
+      try {
+        cb();
+      } catch (error) {
+        console.error("Error executing shortcut:", binding, error);
+      }
     }
   };
+
+  function removeShortcut() {
+    shortcutsList.value = shortcutsList.value.filter((shortcut) => {
+      return !(
+        shortcut.key === shortcutBinding.key &&
+        shortcut.shift === shortcutBinding.shift &&
+        shortcut.ctrl === shortcutBinding.ctrl &&
+        shortcut.alt === shortcutBinding.alt &&
+        shortcut.meta === shortcutBinding.meta
+      );
+    });
+  }
 
   window.addEventListener("keydown", handleKeydown);
 
   const instance = getCurrentInstance();
   if (instance) {
-    onUnmounted(() => {
+    onBeforeUnmount(() => {
       window.removeEventListener("keydown", handleKeydown);
-      // Remove from shortcuts list on unmount
+      removeShortcut();
     });
   }
 };
