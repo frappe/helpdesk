@@ -22,3 +22,8 @@ class Summary(TypedDict):
     summarizer: str  # User Name
     summarized_by: str  # User Email
     snippet: str
+
+
+class FeatureConfigs(TypedDict):
+    saved: FeatureConfig
+    default: FeatureConfig

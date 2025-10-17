@@ -6,8 +6,11 @@
     description="Configure Otto settings to enable smart features."
     :isDirty="isAnyDirty"
     :isSaving="isSaving"
+    :showSaveButton="true"
     @save="save"
   >
+    <LoadingIndicator v-if="canUseOtto.loading || hdSettings.loading" />
+
     <!-- Warning if Otto is not installed -->
     <div
       v-if="canUseOtto.data === false"
@@ -28,7 +31,7 @@
     </div>
 
     <!-- Enable Otto Section -->
-    <div v-if="canUseOtto.data === true && hdSettings.doc" class="mb-6">
+    <div v-if="canUseOtto.data && hdSettings.doc" class="mb-6">
       <Checkbox
         label="Enable Smart Features"
         title="Enable or disable smart features for Helpdesk."
@@ -43,15 +46,27 @@
     </div>
 
     <!-- API Keys Section -->
+    <LoadingIndicator v-if="getKeysSet.loading" />
+
     <div
-      v-if="canUseOtto.data === true && hdSettings.doc.enable_smart_features"
+      v-if="
+        canUseOtto.data &&
+        hdSettings.doc.enable_smart_features &&
+        getKeysSet.data
+      "
       class="mt-6"
     >
       <div class="text-base font-semibold text-ink-gray-8">API Keys</div>
       <div class="text-p-xs text-ink-gray-6 mt-1">
-        Configure API keys for LLM providers.
+        Configure API keys for LLM providers. API key is used only if a model is
+        selected to be used for a feature.
+        <span
+          class="text-ink-blue-6 cursor-pointer underline"
+          @click="currentView = 'models'"
+          >View models</span
+        >
       </div>
-      <div class="grid grid-cols-2 gap-4 mt-4" v-if="!getKeysSet.loading">
+      <div class="grid grid-cols-2 gap-4 mt-4">
         <Password
           label="Anthropic API Key"
           v-model="apiKeys.Anthropic"
@@ -68,27 +83,39 @@
           :placeholder="'...'"
         />
       </div>
-      <div v-else>
-        <div class="text-p-xs text-ink-gray-6 mt-1">Loading...</div>
+
+      <div
+        v-if="
+          Object.keys(getKeysSet.data ?? {}).every(
+            (key) => !getKeysSet.data[key]
+          )
+        "
+        class="text-p-xs text-ink-red-4 mt-4"
+      >
+        At least one API key must be set for smart features to work.
       </div>
     </div>
 
     <!-- Features Section -->
-    <div class="mt-6">
+    <div
+      v-if="canUseOtto.data && hdSettings.doc?.enable_smart_features"
+      class="mt-6"
+    >
       <div class="text-base font-semibold text-ink-gray-8">Features</div>
       <div class="text-p-xs text-ink-gray-6 mt-1">
         Configure Otto enabled smart features.
       </div>
 
-      <div
-        v-if="canUseOtto.data === true && hdSettings.doc?.enable_smart_features"
-        class="flex items-center justify-between p-3 rounded relative"
-      >
+      <div class="flex items-center justify-between p-3 rounded relative mt-2">
         <div class="flex flex-col gap-1">
           <h2
-            class="text-base font-medium text-ink-gray-7 relative z-10 pointer-events-none"
+            class="text-base font-medium text-ink-gray-7 relative z-10 pointer-events-none flex items-center gap-2"
           >
             Activity Summarization
+            <div
+              v-if="!modelMap[featureConfig.summary.llm]?.is_api_key_set"
+              class="w-1 h-1 rounded-full bg-red-500 inline-block"
+            ></div>
           </h2>
           <p
             class="text-sm text-ink-gray-5 truncate relative z-10 pointer-events-none"
@@ -113,6 +140,21 @@
     </div>
   </SettingsView>
 
+  <!-- Models View -->
+  <SettingsView
+    v-else-if="currentView === 'models'"
+    title="Models"
+    description="View available models."
+    :isDirty="isAnyDirty"
+    :isSaving="isSaving"
+    :showBackButton="true"
+    :showSaveButton="false"
+    @back="currentView = 'main'"
+  >
+    <LoadingIndicator v-if="getModels.loading" />
+    <ModelList v-else :models="getModels.data ?? []" />
+  </SettingsView>
+
   <!-- Summary Settings View -->
   <SettingsView
     v-else-if="currentView === 'summary'"
@@ -123,21 +165,40 @@
     :isSaving="isSaving"
     :showEnabledSwitch="true"
     :showBackButton="true"
+    :showSaveButton="true"
     @back="currentView = 'main'"
     @save="save"
   >
-    <div v-if="isLoading" class="text-p-xs text-ink-gray-6">Loading...</div>
-    <div v-else-if="featureConfig">
+    <LoadingIndicator v-if="getFeatureConfig.loading" />
+    <div v-else>
       <!-- Model Selection -->
       <div v-if="featureConfig.summary.enabled" class="mb-6">
         <FormControl
           type="select"
           label="Select a model"
           v-model="featureConfig.summary.llm"
-          :options="modelOptions"
+          :options="
+            getModels.data
+              ?.filter((model) => model.is_enabled)
+              .map((model) => ({
+                label: model.title,
+                value: model.name,
+              }))
+              .sort((a, b) => a.label.localeCompare(b.label)) ?? []
+          "
         />
         <div class="text-p-xs text-ink-gray-6 mt-1">
           LLM to use for activity summarization.
+        </div>
+
+        <div
+          v-if="!modelMap[featureConfig.summary.llm]?.is_api_key_set"
+          class="text-p-xs text-ink-red-4 mt-1"
+        >
+          API key not set for this model, feature will not work.
+          <span class="cursor-pointer underline" @click="currentView = 'models'"
+            >View models</span
+          >
         </div>
       </div>
 
@@ -150,9 +211,28 @@
           placeholder="Enter custom instructions for summary generation..."
           :rows="12"
         />
-        <div class="text-p-xs text-ink-gray-6 mt-1">
-          Guidelines such as style, format, etc to be followed during activity
-          summarization.
+        <div class="mt-1 flex justify-between items-start">
+          <p class="text-p-xs text-ink-gray-6 m-0 p-0">
+            Guidelines such as style, format, etc to be followed.
+          </p>
+
+          <Button
+            v-if="getDefaultSummaryConfig.data"
+            class="w-fit"
+            :disabled="
+              featureConfig.summary.guidelines ===
+              getDefaultSummaryConfig.data?.guidelines
+            "
+            type="button"
+            size="sm"
+            variant="subtle"
+            @click="
+              featureConfig.summary.guidelines =
+                getDefaultSummaryConfig.data?.guidelines
+            "
+          >
+            {{ __("Reset Content") }}
+          </Button>
         </div>
       </div>
     </div>
@@ -162,9 +242,9 @@
 <script setup lang="ts">
 import Password from "@/components/Password.vue";
 import {
-  Button,
   Checkbox,
   FormControl,
+  LoadingIndicator,
   Textarea,
   createDocumentResource,
   createResource,
@@ -174,12 +254,13 @@ import { computed, ref, watch } from "vue";
 import { isDocDirty } from "../Telephony/utils";
 import SettingsView from "./SettingsView.vue";
 import type { SmartFeatureConfig } from "./types";
+import ModelList from "./ModelList.vue";
 
-type ViewType = "main" | "summary";
+type ViewType = "main" | "summary" | "models";
 
 const currentView = ref<ViewType>("main");
 
-const dummyKey = "••••••••••••••••••••••••••••••••";
+const dummyKey = "*********************************";
 
 const apiKeys = ref({
   OpenAI: "",
@@ -193,7 +274,6 @@ const isDirty = ref({
   featureConfig: false,
 });
 const isSaving = ref(false);
-const isLoading = ref(true);
 
 const featureConfig = ref<SmartFeatureConfig>({
   summary: {
@@ -204,18 +284,6 @@ const featureConfig = ref<SmartFeatureConfig>({
 });
 
 const originalConfig = ref<SmartFeatureConfig | null>(null);
-const modelOptions = ref<string[]>([]);
-
-const canUseOtto = createResource({
-  url: "helpdesk.api.otto.can_use_otto",
-  auto: true,
-  onSuccess: (data) => {
-    if (!data) return;
-    getKeysSet.reload();
-    getOttoConfig.reload();
-    ottoModels.reload();
-  },
-});
 
 const hdSettings = createDocumentResource({
   doctype: "HD Settings",
@@ -223,22 +291,35 @@ const hdSettings = createDocumentResource({
   fields: ["enable_smart_features"],
   auto: true,
 });
-
+const setApiKeys = createResource({ url: "otto.lib.model.set_api_keys" });
+const setFeatureConfig = createResource({
+  url: "helpdesk.api.otto.set_feature_config",
+});
+const canUseOtto = createResource({
+  url: "helpdesk.api.otto.can_use_otto",
+  auto: true,
+  onSuccess: (data) => {
+    if (!data) return;
+    getKeysSet.reload();
+    getFeatureConfig.reload();
+    getModels.reload();
+    getDefaultSummaryConfig.reload();
+  },
+});
+const getModels = createResource({
+  url: "otto.lib.model.get_models",
+  params: { get_details: true, include_unavailable: true },
+});
 const getKeysSet = createResource({
   url: "otto.lib.model.get_keys_set",
   onSuccess: (data) => {
-    Object.keys(data).forEach((key) => {
-      if (data[key]) apiKeys.value[key] = dummyKey;
-    });
-    isDirty.value.apiKeys = false;
+    for (const k in data) {
+      if (!data[k]) continue;
+      apiKeys.value[k] = dummyKey;
+    }
   },
 });
-
-const setApiKeys = createResource({
-  url: "otto.lib.model.set_api_keys",
-});
-
-const getOttoConfig = createResource({
+const getFeatureConfig = createResource({
   url: "helpdesk.api.otto.get_feature_config",
   onSuccess: (data) => {
     originalConfig.value = data;
@@ -248,28 +329,21 @@ const getOttoConfig = createResource({
       featureConfig.value.summary.enabled = data.summary?.enabled ?? false;
       featureConfig.value.summary.guidelines = data.summary?.guidelines ?? "";
     }
-
-    isLoading.value = false;
   },
   onError: () => {
-    isLoading.value = false;
     toast.error("Failed to load summary settings");
   },
 });
-
-const ottoModels = createResource({
-  url: "otto.lib.model.get_models",
-  params: { get_details: true },
-  onSuccess: (data) => {
-    modelOptions.value = data.map((model) => ({
-      label: model.title,
-      value: model.name,
-    }));
-  },
+const getDefaultSummaryConfig = createResource({
+  url: "helpdesk.api.otto.summary.get_default_summary_config",
 });
+const modelMap = computed(() => {
+  if (!getModels.data) return {};
 
-const setFeatureConfig = createResource({
-  url: "helpdesk.api.otto.set_feature_config",
+  return getModels.data.reduce((acc, model) => {
+    acc[model.name] = model;
+    return acc;
+  }, {} as Record<string, unknown>);
 });
 
 const isAnyDirty = computed(
@@ -294,14 +368,13 @@ async function save() {
   }
 
   if (isDirty.value.apiKeys) {
-    // Only send non-empty keys
     const keysToSave: Record<string, string> = {};
-    if (apiKeys.value.OpenAI !== dummyKey)
-      keysToSave.OpenAI = apiKeys.value.OpenAI;
-    if (apiKeys.value.Anthropic !== dummyKey)
-      keysToSave.Anthropic = apiKeys.value.Anthropic;
-    if (apiKeys.value.Google !== dummyKey)
-      keysToSave.Google = apiKeys.value.Google;
+    for (const key in apiKeys.value) {
+      if (apiKeys.value[key] === dummyKey && (getKeysSet.data ?? {})[key])
+        continue;
+      if (!apiKeys.value[key] && !(getKeysSet.data ?? {})[key]) continue;
+      keysToSave[key] = apiKeys.value[key];
+    }
 
     if (Object.keys(keysToSave).length > 0) {
       promises.push(
@@ -325,15 +398,13 @@ async function save() {
 
   try {
     await Promise.all(promises);
-    isSaving.value = false;
-    Object.keys(isDirty.value).forEach((key) => (isDirty.value[key] = false));
-
     toast.success("Otto settings updated!");
+    Object.keys(isDirty.value).forEach((k) => (isDirty.value[k] = false));
   } catch {
     toast.error("Failed to save Otto settings");
   }
 
-  await hdSettings.reload();
+  isSaving.value = false;
 }
 
 function openSummarySettings() {
@@ -342,23 +413,22 @@ function openSummarySettings() {
 
 watch(
   () => hdSettings.doc,
-  (newVal) => {
-    isDirty.value.hdSettings = isDocDirty(newVal, hdSettings.originalDoc);
-  },
+  (newVal) =>
+    (isDirty.value.hdSettings = isDocDirty(newVal, hdSettings.originalDoc)),
   { deep: true }
 );
-
 watch(
   apiKeys,
   (newVal) => {
-    isDirty.value.apiKeys =
-      newVal.OpenAI !== dummyKey ||
-      newVal.Anthropic !== dummyKey ||
-      newVal.Google !== dummyKey;
+    const keysSet = getKeysSet.data ?? {};
+    isDirty.value.apiKeys = Object.keys(newVal).some((k) => {
+      if (keysSet[k] && newVal[k] === dummyKey) return false;
+      if (!keysSet[k] && !newVal[k]) return false;
+      return true;
+    });
   },
   { deep: true }
 );
-
 watch(
   featureConfig,
   (newVal) => {

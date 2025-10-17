@@ -37,24 +37,13 @@ def get_enabled_features() -> FeatureFlags:
 def get_feature_config() -> FeatureConfig:
     import json
 
-    from helpdesk.api.otto.summary import (
-        default_summary_config,
-        default_summary_guidelines,
-    )
-
     val = frappe.get_single_value("HD Settings", "smart_feature_config") or "{}"
     conf = json.loads(val)
 
     if not conf.get("summary"):
-        conf["summary"] = default_summary_config
+        from helpdesk.api.otto.summary import get_default_summary_config
 
-    if not conf.get("summary").get("llm"):
-        import otto.lib as otto
-
-        conf["summary"]["llm"] = otto.get_model(size="Small")
-
-    if not conf.get("summary").get("guidelines"):
-        conf["summary"]["guidelines"] = default_summary_guidelines
+        conf["summary"] = get_default_summary_config()
 
     return conf
 

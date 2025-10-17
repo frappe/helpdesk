@@ -43,12 +43,6 @@ The output should be in the following format:
 Use a list if multiple points are to be covered.
 """.strip()
 
-default_summary_config = SummaryConfig(
-    enabled=True,
-    llm="",  # Defaults to any available Small model
-    guidelines=default_summary_guidelines,
-)
-
 
 summary_instruction = """
 You are a highly accurate and concise support ticket summarizer.
@@ -83,6 +77,17 @@ Adhere to the following user given guidelines when summarizing the support ticke
 {{guidelines}}
 </user_guidelines>
 """.strip()
+
+
+@frappe.whitelist()
+def get_default_summary_config() -> SummaryConfig:
+    import otto.lib as otto
+
+    return SummaryConfig(
+        enabled=True,
+        llm=otto.get_model(size="Small") or "",
+        guidelines=default_summary_guidelines,
+    )
 
 
 def get_summary_tool():
@@ -171,6 +176,9 @@ def _summarize(ticket_id: str):
 
     if not llm:
         raise frappe.ValidationError("LLM is required")
+
+    if not otto.is_model_available(llm):
+        raise frappe.ValidationError("LLM cannot be used")
 
     session = otto.new(
         model=llm,

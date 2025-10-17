@@ -37,6 +37,7 @@
               class="flex-row-reverse gap-x-2 pl-0"
             />
             <Button
+              v-if="showSaveButton"
               label="Save"
               theme="gray"
               variant="solid"
@@ -55,7 +56,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import { Badge, Button, Switch } from "frappe-ui";
 
@@ -68,6 +68,7 @@ const props = defineProps<{
   modelValue?: boolean;
   showBackButton?: boolean;
   showEnabledSwitch?: boolean;
+  showSaveButton: boolean;
 }>();
 
 const emit = defineEmits(["update:modelValue", "back", "save"]);
