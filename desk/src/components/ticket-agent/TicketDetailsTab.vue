@@ -19,6 +19,7 @@
               v-if="field.visible"
               :key="field.fieldname"
               class="form-control-core"
+              :id="field.fieldname"
               :class="section.group ? 'flex-1' : 'w-full'"
               :page-length="10"
               :label="field.label"
@@ -62,6 +63,7 @@
 import { Link } from "@/components";
 import { parseField } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
+import { useShortcut } from "@/composables/shortcuts";
 import { getMeta } from "@/stores/meta";
 import {
   AssigneeSymbol,
@@ -69,7 +71,7 @@ import {
   FieldValue,
   TicketSymbol,
 } from "@/types";
-import { computed, inject, onMounted, ref } from "vue";
+import { computed, inject, nextTick, onMounted, ref } from "vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
@@ -99,6 +101,7 @@ const coreFields = computed(() => {
 
       // cant handle required depends on as we directly set the value in DB on change
       f["required"] = f.reqd;
+      f["ref"] = f.fieldname;
 
       f = getFieldInFormat(f, f);
       f["visible"] = true;
@@ -181,15 +184,28 @@ function handleFieldUpdate(
   );
 }
 
-const coreFieldsRef = ref(null);
-
 onMounted(() => {
-  // useShortcut("priority", "p");
-  // useShortcut("ticket_type", "o");
-  // useShortcut("teamRef", "t");
-  // window.addEventListener("keydown", (e) => {
-  //   document.querySelector("#abc").click();
-  // });
+  setTimeout(() => {
+    const ticketType = document.querySelector(
+      "#ticket_type button"
+    ) as HTMLButtonElement;
+    const priority = document.querySelector(
+      "#priority button"
+    ) as HTMLButtonElement;
+    const team = document.querySelector(
+      "#agent_group button"
+    ) as HTMLButtonElement;
+
+    useShortcut("t", () => {
+      ticketType?.click();
+    });
+    useShortcut("p", () => {
+      priority?.click();
+    });
+    useShortcut({ key: "t", shift: true }, () => {
+      team?.click();
+    });
+  }, 200);
 });
 </script>
 
