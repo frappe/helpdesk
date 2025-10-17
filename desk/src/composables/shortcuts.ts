@@ -1,5 +1,5 @@
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
-import { computed, onBeforeUnmount, ref } from "vue";
+import { computed, ref } from "vue";
 
 interface ShortcutBinding {
   key: string;
@@ -20,22 +20,49 @@ export const useShortcut = (
 ) => {
   const handleKeydown = (e: KeyboardEvent) => {
     if (isShortcutsDisabled.value) return;
+
+    // Disable shortcuts when typing in input, textarea, or contenteditable elements
+    const activeElement = document.activeElement;
+    const isTypingInInput =
+      activeElement instanceof HTMLInputElement ||
+      activeElement instanceof HTMLTextAreaElement ||
+      (activeElement as any)?.contentEditable === "true" ||
+      activeElement?.closest("input") ||
+      activeElement?.closest("textarea") ||
+      activeElement?.closest("[contenteditable]") ||
+      activeElement?.closest(".dropdown-options") || // Dropdown search
+      activeElement?.classList.contains("form-control"); // Form inputs
+
+    if (isTypingInInput) {
+      return; // Don't trigger shortcuts when typing
+    }
+
     let matches = false;
 
     // means if binding is a string, e.g., "s"
     if (typeof binding === "string") {
-      // Simple string binding (case-insensitive)
-      matches = e.key.toLowerCase() === binding.toLowerCase();
+      const keyMatches = e.key.toLowerCase() === binding.toLowerCase();
+      const noModifiers = !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey;
+
+      matches = keyMatches && noModifiers; // This prevents the overlap
     }
     // means it is a combination of keys like Shift+S or Ctrl+S ({ key: "s", shift: true })
     else {
       // Complex binding with modifiers
+      if (
+        e.key === "Shift" ||
+        e.key === "Control" ||
+        e.key === "Alt" ||
+        e.key === "Meta"
+      ) {
+        return; // Ignore modifier key events
+      }
       const keyMatches = e.key.toLowerCase() === binding.key.toLowerCase();
+
       const shiftMatches = binding.shift ? e.shiftKey : !e.shiftKey;
       const ctrlMatches = binding.ctrl ? e.ctrlKey : !e.ctrlKey;
       const altMatches = binding.alt ? e.altKey : !e.altKey;
       const metaMatches = binding.meta ? e.metaKey : !e.metaKey;
-
       matches =
         keyMatches && shiftMatches && ctrlMatches && altMatches && metaMatches;
     }
@@ -54,7 +81,13 @@ export const useShortcut = (
     });
 
     if (!exists) {
-      shortcutsList.value.push(binding as ShortcutBinding);
+      // FIXED: Properly convert string to ShortcutBinding
+      const shortcutBinding: ShortcutBinding =
+        typeof binding === "string"
+          ? { key: binding, shift: false, ctrl: false, alt: false, meta: false }
+          : binding;
+
+      shortcutsList.value.push(shortcutBinding);
     }
 
     if (matches) {
@@ -65,7 +98,7 @@ export const useShortcut = (
 
   window.addEventListener("keydown", handleKeydown);
 
-  onBeforeUnmount(() => {
+  return () => {
     window.removeEventListener("keydown", handleKeydown);
-  });
+  };
 };
