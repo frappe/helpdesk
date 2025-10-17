@@ -178,6 +178,7 @@ def get_communications(ticket: str):
             QBCommunication.recipients,
             QBCommunication.subject,
             QBCommunication.delivery_status,
+            QBCommunication.sent_or_received,
         )
         .where(QBCommunication.reference_doctype == "HD Ticket")
         .where(QBCommunication.reference_name == ticket)
@@ -766,12 +767,15 @@ def get_similar_tickets(ticket: str):
 
 @frappe.whitelist()
 def get_ticket_activities(ticket: str):
+    from helpdesk.api.otto.summary import get_summaries
+
     activities = {
         "comments": get_comments(ticket),
         "communications": get_communications(ticket),
         "history": get_history(ticket),
         "views": get_views(ticket),
         "calls": get_call_logs(ticket),
+        "summaries": get_summaries(ticket),
     }
     return activities
 

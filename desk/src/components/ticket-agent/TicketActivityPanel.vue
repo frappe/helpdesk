@@ -36,6 +36,7 @@
     :cc-emails="[]"
     :bcc-emails="[]"
     :key="ticket.doc?.name"
+    :show-summarize-button="showSummarizeButton"
     @update="
       () => {
         activities.reload();
@@ -53,6 +54,7 @@ import {
   EmailIcon,
   PhoneIcon,
 } from "@/components/icons";
+import { enabledAiFeatures } from "@/composables/otto";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
   ActivitiesSymbol,
@@ -171,12 +173,29 @@ const _activities = computed(() => {
     };
   });
 
-  const sorted = [
+  const summaryProps = activities.value.data.summaries.map((summary) => {
+    return {
+      type: "summary",
+      key: summary.creation,
+      snippet: summary.snippet,
+      content: summary.content,
+      creation: summary.creation,
+      summarizer: summary.summarizer,
+      summarizedBy: summary.summarized_by,
+    };
+  });
+
+  const unsorted = [
     ...emailProps,
     ...commentProps,
     ...historyProps,
     ...callProps,
-  ].sort((a, b) => new Date(a.creation) - new Date(b.creation));
+    ...summaryProps,
+  ];
+
+  const sorted = unsorted.sort(
+    (a, b) => new Date(a.creation) - new Date(b.creation)
+  );
   const data = [];
   let i = 0;
 
@@ -236,8 +255,22 @@ function filterActivities(eventType: TicketTab) {
   if (eventType === "activity") {
     return _activities.value;
   }
+
   return _activities.value.filter((activity) => activity.type === eventType);
 }
-</script>
 
-<style scoped></style>
+const showSummarizeButton = computed(() => {
+  // TODO: show whether want or not
+  return true;
+  if (!enabledAiFeatures.data?.summary) return false;
+  if (tabIndex.value !== 0) return false;
+  if (
+    _activities.value
+      .filter((a) => ["email", "summary"].includes(a?.type))
+      .at(-1)?.type === "summary"
+  )
+    return false;
+
+  return true;
+});
+</script>

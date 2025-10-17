@@ -19,8 +19,11 @@ import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
 import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
 import Telephony from "./Telephony/Telephony.vue";
+import Otto from "./Otto/Otto.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
+import BotIcon from "../icons/BotIcon.vue";
+import OttoIcon from "../icons/OttoIcon.vue";
 
 export const tabs = [
   {
@@ -86,6 +89,11 @@ export const tabs = [
         label: "Telephony",
         icon: markRaw(PhoneIcon),
         component: markRaw(Telephony),
+      },
+      {
+        label: "Otto",
+        icon: markRaw(OttoIcon),
+        component: markRaw(Otto),
       },
     ],
   },

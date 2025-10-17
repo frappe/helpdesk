@@ -50,6 +50,9 @@
   "setup_complete",
   "initial_helpdesk_name_setup_skipped",
   "column_break_hjfh",
+  "otto_section",
+  "enable_smart_features",
+  "smart_feature_config",
   "search_tab",
   "name_weight",
   "subject_weight",
@@ -449,12 +452,32 @@
    "link_filters": "[[\"HD Ticket Status\",\"category\",\"in\",[\"Paused\",\"Resolved\",null]]]",
    "mandatory_depends_on": "eval: doc.auto_close_tickets",
    "options": "HD Ticket Status"
+  },
+  {
+   "fieldname": "otto_section",
+   "fieldtype": "Section Break",
+   "label": "AI Features"
+  },
+  {
+   "default": "0",
+   "description": "Checking this enables smart features powered by Otto.\nRequires Otto to be installed to function.",
+   "fieldname": "enable_smart_features",
+   "fieldtype": "Check",
+   "label": "Enable Smart Features"
+  },
+  {
+   "default": "{}",
+   "fieldname": "smart_feature_config",
+   "fieldtype": "JSON",
+   "hidden": 1,
+   "label": "Smart Feature Config",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-29 13:34:17.018321",
+ "modified": "2025-10-15 16:09:38.440549",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
