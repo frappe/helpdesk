@@ -63,7 +63,8 @@
 
 <script setup>
 import { TextEditor, createListResource } from "frappe-ui";
-import { ref, computed, nextTick, watch, onMounted } from "vue";
+import { ref, computed, nextTick, watch, onMounted, onUnmounted } from "vue";
+import { showEmailBox } from "../pages/ticket/modalStates";
 
 const props = defineProps({
   doctype: {
@@ -92,6 +93,9 @@ onMounted(() => {
   if (templates.data == null) {
     templates.fetch();
   }
+});
+onUnmounted(() => {
+  showEmailBox.value = true;
 });
 
 const filteredTemplates = computed(() => {
