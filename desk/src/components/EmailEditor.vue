@@ -154,6 +154,7 @@
     v-model="showCannedResponseSelectorModal"
     :doctype="doctype"
     @apply="applyCannedResponse"
+    :ticketId="ticketId"
   />
 </template>
 
@@ -265,7 +266,7 @@ const ccInput = ref(null);
 const bccInput = ref(null);
 
 function applyCannedResponse(template) {
-  newEmail.value = template.message;
+  newEmail.value = template;
   showCannedResponseSelectorModal.value = false;
 }
 

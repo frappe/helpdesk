@@ -1,0 +1,473 @@
+<template>
+  <SettingsLayoutBase>
+    <template #title>
+      <div class="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          icon-left="chevron-left"
+          :label="cannedResponseData.title || __('New Canned Response')"
+          size="md"
+          @click="goBack()"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
+        />
+        <Badge
+          :variant="'subtle'"
+          :theme="'orange'"
+          size="sm"
+          :label="__('Unsaved changes')"
+          v-if="isDirty"
+        />
+      </div>
+    </template>
+    <template #actions>
+      <Button
+        :label="__('Save')"
+        variant="solid"
+        theme="gray"
+        @click="onSave"
+        :loading="isLoading"
+        :disabled="Boolean(!isDirty)"
+      />
+    </template>
+    <template #content>
+      <div class="flex flex-col gap-5">
+        <div class="grid grid-cols-2 gap-5">
+          <div class="space-y-1.5">
+            <FormControl
+              :label="__('Name')"
+              type="text"
+              v-model="cannedResponseData.title"
+              required
+              maxLength="50"
+              @change="validateData('title')"
+            />
+            <ErrorMessage :message="errors.title" />
+          </div>
+          <div class="space-y-1.5">
+            <FormControl
+              :label="__('Subject')"
+              type="text"
+              v-model="cannedResponseData.subject"
+              required
+              maxLength="50"
+              @change="validateData('subject')"
+            />
+            <ErrorMessage :message="errors.subject" />
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <Autocomplete
+            :label="__('Teams')"
+            :multiple="true"
+            :options="getTeamsList.data"
+            v-model="cannedResponseData.teams"
+          />
+          <div class="text-xs text-ink-gray-5 cursor-default">
+            {{ __("Restrict visibility to these teams") }}
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5 w-full">
+          <FormLabel :label="__('Response')" required />
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <Button
+                :label="__('Preview')"
+                size="sm"
+                @click="onShowPreview()"
+                icon-left="eye"
+                :disabled="
+                  Boolean(
+                    !content?.editor?.state?.doc?.textContent?.trim()?.length
+                  )
+                "
+              />
+              <FieldSearch @onFieldSelected="insertField" />
+            </div>
+            <Popover
+              placement="top-end"
+              trigger="hover"
+              :matchTargetWidth="true"
+              :hoverDelay="0.25"
+            >
+              <template #target="{ togglePopover }">
+                <div class="p-2">
+                  <FeatherIcon
+                    name="info"
+                    class="h-4 w-4 text-gray-600 cursor-pointer"
+                    @click="togglePopover()"
+                  />
+                </div>
+              </template>
+              <template #body-main>
+                <div
+                  class="p-3 text-ink-gray-6 text-xs flex flex-col gap-2 max-w-[450px] w-full"
+                >
+                  <div>
+                    {{
+                      __(
+                        "Insert dynamic fields like ticket details or user info into your response."
+                      )
+                    }}
+                  </div>
+                  <div>
+                    {{
+                      __(
+                        "Apply rich text formatting by selecting text and using the toolbar options."
+                      )
+                    }}
+                  </div>
+                </div>
+              </template>
+            </Popover>
+          </div>
+          <PreviewDialog v-model="previewDialog" />
+          <TextEditor
+            editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors"
+            ref="content"
+            :bubble-menu="menuButtons"
+            :content="cannedResponseData.response"
+            @change="
+              (val) => {
+                cannedResponseData.response = val;
+                validateData('response');
+              }
+            "
+            :placeholder="'Hello {{ customer }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ company }}'"
+          />
+          <ErrorMessage :message="errors.response" />
+        </div>
+      </div>
+    </template>
+  </SettingsLayoutBase>
+  <ConfirmDialog
+    v-model="showConfirmDialog.show"
+    :title="showConfirmDialog.title"
+    :message="showConfirmDialog.message"
+    :onConfirm="showConfirmDialog.onConfirm"
+    :onCancel="() => (showConfirmDialog.show = false)"
+  />
+</template>
+
+<script setup lang="ts">
+import {
+  Autocomplete,
+  Badge,
+  Button,
+  call,
+  createListResource,
+  createResource,
+  ErrorMessage,
+  FeatherIcon,
+  FormControl,
+  FormLabel,
+  Popover,
+  TextEditor,
+  toast,
+} from "frappe-ui";
+import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import { computed, inject, onUnmounted, ref, watch } from "vue";
+import { disableSettingModalOutsideClick } from "../settingsModal";
+import { __ } from "@/translation";
+import { getMeta } from "@/stores/meta";
+import { watchDebounced } from "@vueuse/core";
+import FieldSearch from "./components/FieldSearch.vue";
+import PreviewDialog from "./components/PreviewDialog.vue";
+import { menuButtons, userFields } from "./cannedResponse";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
+
+const ticketMeta = getMeta("HD Ticket");
+const fieldSearchQuery = ref("");
+const showConfirmDialog = ref({
+  show: false,
+  title: "",
+  message: "",
+  onConfirm: () => {},
+});
+
+watchDebounced(
+  fieldSearchQuery,
+  (newQuery) => {
+    metaFieldsList.value = metaFields.value.filter((f) =>
+      f.label.toLowerCase().includes(newQuery.toLowerCase())
+    );
+  },
+  {
+    debounce: 250,
+  }
+);
+
+const metaFields = computed(() => {
+  return ticketMeta
+    .getFields()
+    .filter(
+      (f) =>
+        f.fieldtype !== "Tab Break" &&
+        f.fieldtype !== "Section Break" &&
+        Boolean(f.label)
+    )
+    .map((f) => ({ label: f.label, value: f.fieldname }))
+    .concat(userFields);
+});
+
+const metaFieldsList = ref(metaFields.value);
+
+const cannedResponseActiveScreen = inject<any>("cannedResponseActiveScreen");
+const cannedResponseListData = inject<any>("cannedResponseListData");
+const previewDialog = ref({
+  show: false,
+  ticketId: "",
+  cannedResponse: "",
+  preview: null,
+});
+const content = ref();
+
+const cannedResponseData = ref({
+  name: "",
+  title: "",
+  subject: "",
+  response: "",
+  teams: [],
+});
+const isLoading = ref(false);
+const initialData = ref("");
+const errors = ref({
+  title: "",
+  subject: "",
+  response: "",
+});
+
+const getCannedResponseData = createResource({
+  url: "frappe.client.get",
+  params: {
+    doctype: "Email Template",
+    name: cannedResponseActiveScreen.value.data?.name,
+  },
+  auto: false,
+  onSuccess: (data) => {
+    cannedResponseData.value = {
+      name: data.name,
+      title: data.name,
+      subject: data.subject,
+      response: data.response,
+      teams: data.teams.map((team) => ({
+        label: team.team,
+        value: team.team,
+      })),
+    };
+    initialData.value = JSON.stringify(cannedResponseData.value);
+  },
+});
+
+const getTeamsList = createListResource({
+  doctype: "HD Team",
+  auto: true,
+  fields: ["name"],
+  start: 0,
+  pageLength: 999,
+  transform: (data) => {
+    return data.map((item) => ({
+      value: item.name,
+      label: item.name,
+    }));
+  },
+});
+
+const insertField = (field: any) => {
+  content.value.editor.commands.insertContent(`{{ ${field.value} }}`);
+  content.value.editor.commands.focus();
+};
+
+const onShowPreview = () => {
+  previewDialog.value.show = true;
+  previewDialog.value.cannedResponse = cannedResponseData.value.response;
+};
+
+if (cannedResponseActiveScreen.value.data?.name) {
+  getCannedResponseData.submit();
+} else {
+  initialData.value = JSON.stringify(cannedResponseData.value);
+}
+
+const isDirty = ref(false);
+
+const goBack = () => {
+  const confirmDialogInfo = {
+    show: true,
+    title: "Unsaved changes",
+    message: "Are you sure you want to go back? Unsaved changes will be lost.",
+    onConfirm: goBack,
+  };
+  if (isDirty.value && !showConfirmDialog.value.show) {
+    showConfirmDialog.value = confirmDialogInfo;
+    return;
+  }
+  // Workaround fix for settings modal not closing after going back
+  setTimeout(() => {
+    cannedResponseActiveScreen.value = {
+      screen: "list",
+      data: null,
+    };
+  }, 250);
+  showConfirmDialog.value.show = false;
+};
+
+const onSave = () => {
+  isLoading.value = true;
+  validateData();
+
+  if (errors.value.title || errors.value.subject || errors.value.response) {
+    isLoading.value = false;
+    toast.error(__("Please fill all the required fields"));
+    return;
+  }
+
+  if (cannedResponseActiveScreen.value.data?.name) {
+    updateCannedResponse();
+  } else {
+    createCannedResponse();
+  }
+};
+
+const createCannedResponse = () => {
+  cannedResponseListData.insert.submit(
+    {
+      name: cannedResponseData.value.title,
+      title: cannedResponseData.value.title,
+      subject: cannedResponseData.value.subject,
+      response: cannedResponseData.value.response,
+      teams: cannedResponseData.value.teams.map((team) => ({
+        team: team.value,
+      })),
+      reference_doctype: "HD Ticket",
+    },
+    {
+      onSuccess: (data) => {
+        toast.success(__("Canned response saved"));
+        isLoading.value = false;
+        cannedResponseData.value = {
+          ...cannedResponseData.value,
+          name: data.name,
+        };
+        initialData.value = JSON.stringify(cannedResponseData.value);
+        cannedResponseActiveScreen.value = {
+          screen: "view",
+          data: { name: data.name },
+        };
+      },
+      onError: (er) => {
+        toast.error(
+          er?.messages?.[0] ||
+            "Some error occurred while saving canned response"
+        );
+        isLoading.value = false;
+      },
+    }
+  );
+};
+
+const updateCannedResponse = async () => {
+  let renameError = false;
+
+  if (cannedResponseData.value.name !== cannedResponseData.value.title) {
+    await call("frappe.client.rename_doc", {
+      doctype: "Email Template",
+      old_name: cannedResponseData.value.name,
+      new_name: cannedResponseData.value.title,
+    })
+      .then(() => {
+        cannedResponseData.value = {
+          ...cannedResponseData.value,
+          name: cannedResponseData.value.title,
+        };
+      })
+      .catch(async (er) => {
+        const error =
+          er?.messages?.[0] ||
+          "Some error occurred while renaming canned response";
+        toast.error(error);
+        isLoading.value = false;
+        renameError = true;
+      });
+    await cannedResponseListData.list.reload();
+  }
+  if (renameError) return;
+
+  cannedResponseListData.setValue.submit(
+    {
+      name: cannedResponseData.value.title,
+      title: cannedResponseData.value.title,
+      subject: cannedResponseData.value.subject,
+      response: cannedResponseData.value.response,
+      teams: cannedResponseData.value.teams.map((team) => ({
+        team: team.value,
+      })),
+    },
+    {
+      onSuccess: () => {
+        isDirty.value = false;
+        isLoading.value = false;
+        disableSettingModalOutsideClick.value = false;
+        toast.success(__("Canned response updated"));
+      },
+    }
+  );
+};
+
+const validateData = (key?: string) => {
+  const validateField = (key) => {
+    switch (key) {
+      case "title":
+        if (!cannedResponseData.value.title) {
+          errors.value.title = "Title is required";
+        } else {
+          errors.value.title = "";
+        }
+        break;
+
+      case "subject":
+        if (!cannedResponseData.value.subject) {
+          errors.value.subject = "Subject is required";
+        } else {
+          errors.value.subject = "";
+        }
+        break;
+
+      case "response":
+        if (!content.value?.editor?.state?.doc?.textContent?.trim()?.length) {
+          errors.value.response = "Response is required";
+        } else {
+          errors.value.response = "";
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+  if (key) {
+    validateField(key);
+  } else {
+    (Object.keys(errors.value) as string[]).forEach(validateField);
+  }
+
+  return errors.value;
+};
+
+watch(
+  cannedResponseData,
+  (newVal) => {
+    if (!initialData.value) return;
+    isDirty.value = JSON.stringify(newVal) != initialData.value;
+    if (isDirty.value) {
+      disableSettingModalOutsideClick.value = true;
+    } else {
+      disableSettingModalOutsideClick.value = false;
+    }
+  },
+  { deep: true }
+);
+
+onUnmounted(() => {
+  disableSettingModalOutsideClick.value = false;
+});
+</script>

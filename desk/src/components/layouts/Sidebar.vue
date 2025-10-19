@@ -218,7 +218,10 @@ import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
 import { useTelephonyStore } from "@/stores/telephony";
-import { setActiveSettingsTab } from "../Settings/settingsModal";
+import {
+  setActiveSettingsTab,
+  showSettingsModal,
+} from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
 
@@ -230,8 +233,6 @@ const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
-
-const showSettingsModal = ref(false);
 
 const { pinnedViews, publicViews } = useView();
 
