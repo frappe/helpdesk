@@ -25,6 +25,8 @@ import { useAuthStore } from "@/stores/auth";
 import General from "./General/General.vue";
 import SettingsGear from "~icons/lucide/settings";
 
+export const showSettingsModal = ref(false);
+
 const auth = useAuthStore();
 
 export const tabs = computed(() => {

@@ -207,7 +207,6 @@ import {
 } from "./layoutSettings";
 
 import { useShortcut } from "@/composables/shortcuts";
-import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
@@ -223,7 +222,11 @@ import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
-import { setActiveSettingsTab } from "../Settings/settingsModal";
+import { useTelephonyStore } from "@/stores/telephony";
+import {
+  setActiveSettingsTab,
+  showSettingsModal,
+} from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
 
@@ -236,7 +239,6 @@ const device = useDevice();
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
-const showSettingsModal = ref(false);
 const showShortcutsModal = ref(false);
 const showCommandPalette = ref(false);
 

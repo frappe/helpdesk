@@ -33,3 +33,5 @@ helpdesk.patches.enable_new_email_notifications
 helpdesk.patches.add_fulltext_index #v2
 helpdesk.patches.add_telephony_app
 helpdesk.patches.add_website_settings_permission
+helpdesk.patches.add_field_in_email_template
+helpdesk.patches.move_canned_responses_to_email_templates
