@@ -9,6 +9,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
+from frappe.utils import get_time, now_datetime
 from frappe.utils.jinja import validate_template
 
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
@@ -107,8 +108,46 @@ class HDSettings(Document):
                 continue
             validate_template(getattr(self, content_field_name))
 
+    def is_outside_working_hours(self):
+        """Check if current time is outside working hours"""
+
+        if not self.show_message_outside_working_hours:
+            return False
+
+        current_time = now_datetime()
+        current_day = current_time.strftime("%A").lower()
+        current_hour = current_time.time()
+
+        is_working_day = self.get(current_day, 0)
+
+        if not is_working_day:
+            return True
+
+        if self.work_start_time and self.work_end_time:
+            work_start_time = get_time(self.work_start_time)
+            work_end_time = get_time(self.work_end_time)
+
+            if not (work_start_time <= current_hour <= work_end_time):
+                return True
+
+        return False
+
     @property
     def hd_search(self):
         from helpdesk.api.article import search
 
         return search
+
+
+@frappe.whitelist(allow_guest=True)
+def check_working_hours():
+    """API to check if customer portal should show outside hours message"""
+
+    hd_settings = frappe.get_single("HD Settings")
+
+    return {
+        "show_message": hd_settings.is_outside_working_hours(),
+        "message": hd_settings.outside_hours_message
+        if hd_settings.outside_hours_message
+        else "",
+    }
