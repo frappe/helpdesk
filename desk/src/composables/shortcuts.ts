@@ -1,6 +1,7 @@
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { computed, ref } from "vue";
 import { useEventListener } from "@vueuse/core";
+import { useDevice } from "@/composables";
 
 interface ShortcutBinding {
   key: string;
@@ -16,7 +17,7 @@ export const useShortcut = (
   binding: string | ShortcutBinding,
   cb: Function
 ) => {
-  // Normalize the binding to a consistent format
+  binding = parseBinding(binding);
   const shortcutBinding: ShortcutBinding =
     typeof binding === "string"
       ? { key: binding, shift: false, ctrl: false, alt: false, meta: false }
@@ -50,18 +51,9 @@ export const useShortcut = (
       return;
     }
     const activeElement = document.activeElement;
-    const isTypingInInput =
-      activeElement instanceof HTMLInputElement ||
-      activeElement instanceof HTMLTextAreaElement ||
-      (activeElement as any)?.contentEditable === "true" ||
-      activeElement?.closest("input") ||
-      activeElement?.closest("textarea") ||
-      activeElement?.closest("[contenteditable]") ||
-      activeElement?.closest(".dropdown-options") || // Dropdown search
-      activeElement?.classList.contains("form-control"); // Form inputs
 
-    if (isTypingInInput) {
-      return; // Don't trigger shortcuts when typing
+    if (disableShortcuts()) {
+      return; // Don't trigger shortcuts when typing, or in modals/menus
     }
 
     // Check if this specific handler should execute
@@ -100,18 +92,6 @@ export const useShortcut = (
     }
   };
 
-  function removeShortcut() {
-    shortcutsList.value = shortcutsList.value.filter((shortcut) => {
-      return !(
-        shortcut.key === shortcutBinding.key &&
-        shortcut.shift === shortcutBinding.shift &&
-        shortcut.ctrl === shortcutBinding.ctrl &&
-        shortcut.alt === shortcutBinding.alt &&
-        shortcut.meta === shortcutBinding.meta
-      );
-    });
-  }
-
   useEventListener(document, "keydown", handleKeydown);
 };
 
@@ -133,4 +113,41 @@ function isEventRegistered(e): boolean {
       shortcut.meta === eventBinding.meta
     );
   });
+}
+
+function parseBinding(binding: string | ShortcutBinding): ShortcutBinding {
+  if (typeof binding === "string") return binding;
+
+  if (!binding.meta) return binding;
+  const { isMac } = useDevice();
+  if (isMac) {
+    // on Mac, treat ctrl as meta
+    if (binding.ctrl) {
+      binding.meta = true;
+      binding.ctrl = false;
+    }
+  } else {
+    // on non-Mac, treat meta as ctrl
+    if (binding.meta) {
+      binding.ctrl = true;
+      binding.meta = false;
+    }
+  }
+  return binding;
+}
+
+function disableShortcuts(): boolean {
+  const activeElement = document.activeElement;
+  return (
+    activeElement instanceof HTMLInputElement ||
+    activeElement instanceof HTMLTextAreaElement ||
+    (activeElement as any)?.contentEditable === "true" ||
+    activeElement?.closest("input") ||
+    activeElement?.closest("textarea") ||
+    activeElement?.closest("[contenteditable]") ||
+    activeElement?.closest(".dropdown-options") || // Dropdown search
+    activeElement?.closest('[role="dialog"]') ||
+    activeElement?.closest('[role="menu"]') ||
+    activeElement?.classList.contains("form-control") // Form inputs
+  );
 }
