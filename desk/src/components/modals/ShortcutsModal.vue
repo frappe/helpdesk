@@ -70,21 +70,20 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
     title: "General",
     shortcuts: [
       { keys: [metaKey, "K"], description: "Open command palette" },
-      { keys: [shiftKey, "?"], description: "Show keyboard shortcuts" },
-      //     useShortcut({ key: ",", meta: true }, () => {
-      // showSettingsModal.value = !showSettingsModal.value;
-      //   });
       { keys: [metaKey, ","], description: "Open settings" },
+      { keys: [metaKey, "/"], description: "Show keyboard shortcuts" },
     ],
   },
   {
-    title: "Ticket Fields",
+    title: "Ticket Management",
     shortcuts: [
       { keys: ["T"], description: "Change ticket type" },
       { keys: ["P"], description: "Change priority" },
-      { keys: [shiftKey, "T"], description: "Change agent group" },
+      { keys: [shiftKey, "T"], description: "Change team" },
       { keys: ["A"], description: "Assign ticket" },
       { keys: ["S"], description: "Change status" },
+      { keys: [metaKey, "."], description: "Copy ticket id" },
+      { keys: [metaKey, shiftKey, "."], description: "Copy ticket URL" },
     ],
   },
   {
@@ -106,7 +105,7 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
 const open = defineModel();
 
 // Add shortcut to open/close the modal
-useShortcut({ key: "?", shift: true }, () => {
+useShortcut({ key: "/", meta: true }, () => {
   open.value = !open.value;
 });
 </script>

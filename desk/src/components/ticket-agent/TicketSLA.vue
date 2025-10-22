@@ -68,6 +68,7 @@ import { TicketSymbol } from "@/types";
 import { copyToClipboard } from "@/utils";
 import { dayjs } from "frappe-ui";
 import Badge from "frappe-ui/src/components/Badge/Badge.vue";
+import { useShortcut } from "@/composables/shortcuts";
 import { computed, inject } from "vue";
 
 const ticket = inject(TicketSymbol);
@@ -175,6 +176,17 @@ function formatTimeShort(date: string, end?: string): string {
     return `${minutes}m`;
   }
 }
+
+useShortcut({ meta: true, shift: true, key: "." }, () => {
+  copyToClipboard(window.location.href, `Ticket URL copied to clipboard`);
+});
+
+useShortcut({ meta: true, key: "." }, () => {
+  copyToClipboard(
+    ticket.value.doc.name,
+    `Ticket #${ticket.value.doc.name} copied to clipboard`
+  );
+});
 </script>
 
 <style scoped></style>
