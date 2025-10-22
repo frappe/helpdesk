@@ -127,7 +127,7 @@ onBeforeUnmount(() => {
 
 usePageMeta(() => {
   return {
-    title: ticket.value?.doc?.subject || "Ticket",
+    title: props.ticketId,
   };
 });
 </script>

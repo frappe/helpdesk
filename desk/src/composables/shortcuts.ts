@@ -1,5 +1,6 @@
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
-import { computed, ref, onBeforeUnmount, getCurrentInstance } from "vue";
+import { computed, ref } from "vue";
+import { useEventListener } from "@vueuse/core";
 
 interface ShortcutBinding {
   key: string;
@@ -10,9 +11,6 @@ interface ShortcutBinding {
 }
 
 export const shortcutsList = ref<ShortcutBinding[]>([]);
-export const isShortcutsDisabled = computed(() => {
-  return showEmailBox.value || showCommentBox.value;
-});
 
 export const useShortcut = (
   binding: string | ShortcutBinding,
@@ -43,16 +41,14 @@ export const useShortcut = (
 
   if (!exists) {
     shortcutsList.value.push(shortcutBinding);
-  } else {
-    console.warn(
-      `Shortcut conflict: ${shortcutBinding.key} already registered`
-    );
   }
 
   const handleKeydown = (e: KeyboardEvent) => {
-    if (isShortcutsDisabled.value) return;
-
     // Disable shortcuts when typing in input, textarea, or contenteditable elements
+    // if event is not registered, return
+    if (!isEventRegistered(e)) {
+      return;
+    }
     const activeElement = document.activeElement;
     const isTypingInInput =
       activeElement instanceof HTMLInputElement ||
@@ -66,31 +62,6 @@ export const useShortcut = (
 
     if (isTypingInInput) {
       return; // Don't trigger shortcuts when typing
-    }
-
-    // Create binding from the current key event
-    const eventBinding: ShortcutBinding = {
-      key: e.key.toLowerCase(),
-      shift: e.shiftKey,
-      ctrl: e.ctrlKey,
-      alt: e.altKey,
-      meta: e.metaKey,
-    };
-
-    // Check if this key combination is registered
-    const isRegistered = shortcutsList.value.some((shortcut) => {
-      return (
-        shortcut.key === eventBinding.key &&
-        shortcut.shift === eventBinding.shift &&
-        shortcut.ctrl === eventBinding.ctrl &&
-        shortcut.alt === eventBinding.alt &&
-        shortcut.meta === eventBinding.meta
-      );
-    });
-
-    // If not registered, don't execute further
-    if (!isRegistered) {
-      return;
     }
 
     // Check if this specific handler should execute
@@ -141,13 +112,25 @@ export const useShortcut = (
     });
   }
 
-  window.addEventListener("keydown", handleKeydown);
-
-  const instance = getCurrentInstance();
-  if (instance) {
-    onBeforeUnmount(() => {
-      window.removeEventListener("keydown", handleKeydown);
-      removeShortcut();
-    });
-  }
+  useEventListener(document, "keydown", handleKeydown);
 };
+
+function isEventRegistered(e): boolean {
+  const eventBinding: ShortcutBinding = {
+    key: e.key.toLowerCase(),
+    shift: e.shiftKey,
+    ctrl: e.ctrlKey,
+    alt: e.altKey,
+    meta: e.metaKey,
+  };
+
+  return shortcutsList.value.some((shortcut) => {
+    return (
+      shortcut.key === eventBinding.key &&
+      shortcut.shift === eventBinding.shift &&
+      shortcut.ctrl === eventBinding.ctrl &&
+      shortcut.alt === eventBinding.alt &&
+      shortcut.meta === eventBinding.meta
+    );
+  });
+}

@@ -193,21 +193,16 @@ const setFieldRef = (fieldname: string, el: any) => {
   }
 };
 
-onMounted(() => {
-  // Wait for next tick to ensure refs are populated
-  nextTick(() => {
-    useShortcut("t", () => {
-      fieldRefs.value.ticket_type?.$el?.querySelector("button")?.click();
-    });
+useShortcut("t", () => {
+  fieldRefs.value?.ticket_type?.$el?.querySelector("button")?.click();
+});
 
-    useShortcut("p", () => {
-      fieldRefs.value.priority?.$el?.querySelector("button")?.click();
-    });
+useShortcut("p", () => {
+  fieldRefs.value?.priority?.$el?.querySelector("button")?.click();
+});
 
-    useShortcut({ key: "t", shift: true }, () => {
-      fieldRefs.value.agent_group?.$el?.querySelector("button")?.click();
-    });
-  });
+useShortcut({ key: "t", shift: true }, () => {
+  fieldRefs.value?.agent_group?.$el?.querySelector("button")?.click();
 });
 </script>
 
