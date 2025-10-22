@@ -140,6 +140,7 @@
       :isSidebarCollapsed="!isExpanded"
     />
     <SettingsModal v-model="showSettingsModal" />
+    <ShortcutsModal v-model="showShortcutsModal" />
     <HelpModal
       v-if="showHelpModal"
       v-model="showHelpModal"
@@ -157,6 +158,7 @@
       v-model="showIntermediateModal"
       :currentStep="currentStep"
     />
+    <CP v-model="showCommandPalette" />
   </div>
 </template>
 
@@ -166,7 +168,9 @@ import { Section, SidebarLink } from "@/components";
 import Apps from "@/components/Apps.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
+import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
+import CP from "@/components/command-palette/CP.vue";
 import { useDevice } from "@/composables";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useScreenSize } from "@/composables/screen";
@@ -203,6 +207,7 @@ import {
 } from "./layoutSettings";
 
 import { globalStore } from "@/stores/globalStore";
+import { useShortcut } from "@/composables/shortcuts";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
@@ -232,6 +237,8 @@ const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const showSettingsModal = ref(false);
+const showShortcutsModal = ref(false);
+const showCommandPalette = ref(false);
 
 const { pinnedViews, publicViews } = useView();
 
@@ -329,6 +336,11 @@ const agentPortalDropdown = computed(() => [
     condition: () => !isMobileView.value && window.is_fc_site,
   },
   {
+    label: "Shortcuts",
+    icon: h(LucideKeyboard),
+    onClick: () => (showShortcutsModal.value = true),
+  },
+  {
     label: "Settings",
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
@@ -361,9 +373,7 @@ function isActiveTab(to: any) {
 }
 
 function openCommandPalette() {
-  window.dispatchEvent(
-    new KeyboardEvent("keydown", { key: "k", metaKey: true })
-  );
+  showCommandPalette.value = true;
 }
 
 const logo = h(
@@ -632,5 +642,9 @@ function setUpOnboarding() {
 
 onMounted(() => {
   setUpOnboarding();
+  if (isCustomerPortal.value) return;
+  useShortcut({ key: ",", meta: true }, () => {
+    showSettingsModal.value = !showSettingsModal.value;
+  });
 });
 </script>

@@ -73,7 +73,7 @@ const router = useRouter();
 const { isMac } = useDevice();
 
 // Reactive data
-const show = ref(false);
+const show = defineModel();
 const query = ref("");
 
 // Computed properties
@@ -149,9 +149,7 @@ const onSelection = (value) => {
 };
 
 const addKeyboardShortcut = () => {
-  isMac
-    ? useShortcut({ key: "k", meta: true }, toggleCommandPalette)
-    : useShortcut({ key: "k", ctrl: true }, toggleCommandPalette);
+  useShortcut({ key: "k", meta: true }, toggleCommandPalette);
 };
 
 function hideCommandPalette() {
