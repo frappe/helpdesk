@@ -1,7 +1,6 @@
-import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
-import { computed, ref } from "vue";
-import { useEventListener } from "@vueuse/core";
 import { useDevice } from "@/composables";
+import { useEventListener } from "@vueuse/core";
+import { ref } from "vue";
 
 interface ShortcutBinding {
   key: string;
@@ -31,8 +30,8 @@ export const useShortcut = (
     }
 
     if (executeHandler(e, shortcutBinding)) {
-      e.preventDefault();
       try {
+        e.preventDefault();
         cb();
       } catch (error) {
         console.error("Error executing shortcut:", binding, error);
@@ -113,17 +112,17 @@ function isEventRegistered(
 
 function disableShortcuts(): boolean {
   const activeElement = document.activeElement;
-  return (
+  return Boolean(
     activeElement instanceof HTMLInputElement ||
-    activeElement instanceof HTMLTextAreaElement ||
-    (activeElement as any)?.contentEditable === "true" ||
-    activeElement?.closest("input") ||
-    activeElement?.closest("textarea") ||
-    activeElement?.closest("[contenteditable]") ||
-    activeElement?.closest(".dropdown-options") || // Dropdown search
-    activeElement?.closest('[role="dialog"]') ||
-    activeElement?.closest('[role="menu"]') ||
-    activeElement?.classList.contains("form-control") // Form inputs
+      activeElement instanceof HTMLTextAreaElement ||
+      (activeElement as any)?.contentEditable === "true" ||
+      activeElement?.closest("input") ||
+      activeElement?.closest("textarea") ||
+      activeElement?.closest("[contenteditable]") ||
+      activeElement?.closest(".dropdown-options") || // Dropdown search
+      activeElement?.closest('[role="dialog"]') ||
+      activeElement?.closest('[role="menu"]') ||
+      activeElement?.classList.contains("form-control") // Form inputs
   );
 }
 
