@@ -27,7 +27,6 @@ class HDTeam(Document):
         if assignment_rule_doc.disabled and assignment_rule_doc.users:
             assignment_rule_doc.disabled = False
         assignment_rule_doc.save()
-        frappe.db.commit()
 
     def after_rename(self, olddn, newdn, merge=False):
         # Update the condition for the linked assignment rule
