@@ -8,7 +8,8 @@
         <div
           v-for="group in shortcutGroups"
           :key="group.title"
-          class="border-b border-outline-gray-2 pb-4"
+          class="pb-4"
+          :class="!group.hideBorder && 'border-b border-outline-gray-2'"
         >
           <h2 class="text-lg font-semibold text-ink-gray-9 mb-4">
             {{ group.title }}
@@ -40,17 +41,17 @@
 </template>
 
 <script setup lang="ts">
+import { useDevice } from "@/composables/device";
+import { useShortcut } from "@/composables/shortcuts";
 import { Dialog } from "frappe-ui";
 import { computed } from "vue";
-import { useShortcut } from "@/composables/shortcuts";
-import { useDevice } from "@/composables/device";
 
 const props = defineProps({
   modelValue: Boolean,
 });
 const emit = defineEmits(["update:modelValue"]);
 
-const { isMac, metaKey } = useDevice();
+const { metaIcon } = useDevice();
 
 // const shiftKey = "⇧";
 const shiftKey = "Shift";
@@ -63,15 +64,16 @@ interface Shortcut {
 interface ShortcutGroup {
   title: string;
   shortcuts: Shortcut[];
+  hideBorder?: boolean;
 }
 
 const shortcutGroups = computed<ShortcutGroup[]>(() => [
   {
     title: "General",
     shortcuts: [
-      { keys: [metaKey, "K"], description: "Open command palette" },
-      { keys: [metaKey, ","], description: "Open settings" },
-      { keys: [metaKey, "/"], description: "Show keyboard shortcuts" },
+      { keys: [metaIcon, "K"], description: "Open command palette" },
+      { keys: [metaIcon, ","], description: "Open settings" },
+      { keys: [metaIcon, "/"], description: "Show keyboard shortcuts" },
     ],
   },
   {
@@ -82,8 +84,8 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
       { keys: [shiftKey, "T"], description: "Change team" },
       { keys: ["A"], description: "Assign ticket" },
       { keys: ["S"], description: "Change status" },
-      { keys: [metaKey, "."], description: "Copy ticket id" },
-      { keys: [metaKey, shiftKey, "."], description: "Copy ticket URL" },
+      { keys: [metaIcon, "."], description: "Copy ticket id" },
+      { keys: [metaIcon, shiftKey, "."], description: "Copy ticket URL" },
     ],
   },
   {
@@ -92,6 +94,7 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
       { keys: ["R"], description: "Open reply box" },
       { keys: ["C"], description: "Open comment box" },
     ],
+    hideBorder: true,
   },
   {
     title: "Navigation",
@@ -99,10 +102,11 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
       { keys: [shiftKey, ">"], description: "Next ticket" },
       { keys: [shiftKey, "<"], description: "Previous ticket" },
     ],
+    hideBorder: true,
   },
 ]);
 
-const open = defineModel();
+const open = defineModel<boolean>();
 
 // Add shortcut to open/close the modal
 useShortcut({ key: "/", meta: true }, () => {
