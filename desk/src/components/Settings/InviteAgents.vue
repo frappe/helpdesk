@@ -1,98 +1,99 @@
 <template>
-  <div class="px-10 pb-8 h-full overflow-y-auto">
-    <form @submit.prevent="onSubmit" class="flex flex-col gap-5">
-      <div class="sticky top-0 z-10 bg-white pt-8 pb-1">
-        <SettingsLayoutHeader
-          title="Invite Agents"
-          description="Easily invite new agents, managers, or admins"
+  <SettingsLayoutBase
+    :title="__('Invite Agents')"
+    :description="__('Easily invite new agents, managers, or admins')"
+  >
+    <template #content>
+      <form @submit.prevent="onSubmit" class="flex flex-col gap-5">
+        <FormControl
+          type="textarea"
+          :required="true"
+          :label="__('Invite by email')"
+          placeholder="user1@example.com, user2@example.com, ..."
+          v-model="emails"
+          :debounce="100"
+          :description="__('Comma separated emails to invite')"
         />
-      </div>
-      <FormControl
-        type="textarea"
-        :required="true"
-        label="Invite by email"
-        placeholder="user1@example.com, user2@example.com, ..."
-        v-model="emails"
-        :debounce="100"
-        description="Comma separated emails to invite"
-      />
-      <FormControl
-        label="Role"
-        type="select"
-        :required="true"
-        :options="roleOptions"
-        v-model="role"
-        :description="roleDescription"
-      />
-      <Button
-        type="submit"
-        variant="solid"
-        class="w-fit mt-1"
-        :disabled="cancelInviteResource.loading"
-        :loading="inviteByEmailResource.loading"
-        >Send Invites</Button
-      >
-    </form>
-    <template v-if="pendingInvitesResource.data?.length">
-      <h2 class="mt-8 text-base font-semibold">Pending Invites</h2>
-      <ul class="flex flex-col gap-[0.375rem] mt-3">
-        <li
-          v-for="invite in pendingInvitesResource.data"
-          :key="invite.name"
-          class="flex items-center justify-between px-3 py-1 rounded-lg bg-surface-gray-2"
+        <FormControl
+          :label="__('Role')"
+          type="select"
+          :required="true"
+          :options="roleOptions"
+          v-model="role"
+          :description="roleDescription"
+        />
+        <Button
+          type="submit"
+          variant="solid"
+          class="w-fit mt-1"
+          :disabled="cancelInviteResource.loading"
+          :loading="inviteByEmailResource.loading"
+          >{{ __("Send Invites") }}</Button
         >
-          <div class="text-base">
-            <span class="text-ink-gray-8">
-              {{ invite.email }}
-            </span>
-            <span class="text-ink-gray-5">
-              ({{ rolesToLabel(invite.roles) }})
-            </span>
-          </div>
-          <div>
-            <Tooltip
-              :disabled="
-                inviteByEmailResource.loading || cancelInviteResource.loading
-              "
-              text="Cancel Invitation"
-            >
-              <div>
-                <Button
-                  icon="x"
-                  variant="ghost"
-                  :loading="
-                    cancelInviteResource.loading &&
-                    invite.name === cancelInviteResource.params.name
-                  "
-                  @click="
-                    () => {
-                      if (
-                        inviteByEmailResource.loading ||
-                        cancelInviteResource.loading
-                      ) {
-                        return;
+      </form>
+      <template v-if="pendingInvitesResource.data?.length">
+        <h2 class="mt-8 text-base font-semibold">
+          {{ __("Pending Invites") }}
+        </h2>
+        <ul class="flex flex-col gap-[0.375rem] mt-3">
+          <li
+            v-for="invite in pendingInvitesResource.data"
+            :key="invite.name"
+            class="flex items-center justify-between px-3 py-1 rounded-lg bg-surface-gray-2"
+          >
+            <div class="text-base">
+              <span class="text-ink-gray-8">
+                {{ invite.email }}
+              </span>
+              <span class="text-ink-gray-5">
+                ({{ rolesToLabel(invite.roles) }})
+              </span>
+            </div>
+            <div>
+              <Tooltip
+                :disabled="
+                  inviteByEmailResource.loading || cancelInviteResource.loading
+                "
+                :text="__('Cancel Invitation')"
+              >
+                <div>
+                  <Button
+                    icon="x"
+                    variant="ghost"
+                    :loading="
+                      cancelInviteResource.loading &&
+                      invite.name === cancelInviteResource.params.name
+                    "
+                    @click="
+                      () => {
+                        if (
+                          inviteByEmailResource.loading ||
+                          cancelInviteResource.loading
+                        ) {
+                          return;
+                        }
+                        cancelInviteResource.submit({
+                          name: invite.name,
+                          app_name: 'helpdesk',
+                        });
                       }
-                      cancelInviteResource.submit({
-                        name: invite.name,
-                        app_name: 'helpdesk',
-                      });
-                    }
-                  "
-                  v-bind="{
-                    ...((cancelInviteResource.loading &&
-                      cancelInviteResource.params.name !== invite.name) ||
-                    inviteByEmailResource.loading
-                      ? { 'aria-disabled': true, class: 'opacity-25' }
-                      : {}),
-                  }"
-                />
-              </div>
-            </Tooltip>
-          </div>
-        </li>
-      </ul>
+                    "
+                    v-bind="{
+                      ...((cancelInviteResource.loading &&
+                        cancelInviteResource.params.name !== invite.name) ||
+                      inviteByEmailResource.loading
+                        ? { 'aria-disabled': true, class: 'opacity-25' }
+                        : {}),
+                    }"
+                  />
+                </div>
+              </Tooltip>
+            </div>
+          </li>
+        </ul>
+      </template>
     </template>
-  </div>
+  </SettingsLayoutBase>
 </template>
 
 <script setup lang="ts">
@@ -100,7 +101,8 @@ import { useAuthStore } from "@/stores/auth";
 import { FormControl, Button, Tooltip, createResource, toast } from "frappe-ui";
 import { computed, ref } from "vue";
 import { useOnboarding } from "frappe-ui/frappe";
-import SettingsLayoutHeader from "./SettingsLayoutHeader.vue";
+import SettingsLayoutBase from "./SettingsLayoutBase.vue";
+import { __ } from "@/translation";
 
 const authStore = useAuthStore();
 const { isAdmin, isManager } = authStore;
@@ -134,21 +136,23 @@ const roleOptions: [RoleOption, ...RoleOption[]] = [
   {
     label: roleToLabel("Agent"),
     value: "Agent",
-    description:
-      "Can work on tickets, create custom views and manage private views.",
+    description: __(
+      "Can work on tickets, create custom views and manage private views."
+    ),
   },
 ];
 const managerRoleOption: RoleOption = {
   label: roleToLabel("Agent Manager"),
   value: "Agent Manager",
-  description:
-    "Can invite new agents, manage tickets, create custom views and manage public views.",
+  description: __(
+    "Can invite new agents, manage tickets, create custom views and manage public views."
+  ),
 };
 if (isAdmin) {
   roleOptions.push(managerRoleOption, {
     label: roleToLabel("System Manager"),
     value: "System Manager",
-    description: "Can manage all aspects of Helpdesk.",
+    description: __("Can manage all aspects of Helpdesk."),
   });
 } else if (isManager) {
   roleOptions.push(managerRoleOption);
@@ -163,7 +167,7 @@ const roleDescription = computed(
 
 const onSubmit = async () => {
   if (emails.value.trim() === "") {
-    toast.error("At least one email required");
+    toast.error(__("At least one email required"));
   }
   await inviteByEmailResource.submit({
     emails: emails.value,

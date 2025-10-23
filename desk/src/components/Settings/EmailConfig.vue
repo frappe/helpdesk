@@ -1,14 +1,12 @@
 <template>
-  <div class="flex-1 px-10 py-8">
-    <div v-if="step === 'email-add'" class="h-full">
-      <EmailAdd @update:step="updateStep" />
-    </div>
-    <div v-else-if="step === 'email-list'" class="h-full">
-      <EmailAccountList @update:step="updateStep" />
-    </div>
-    <div v-else-if="step === 'email-edit'" class="h-full">
-      <EmailEdit :account-data="accountData" @update:step="updateStep" />
-    </div>
+  <div v-if="step === 'email-add'" class="h-full">
+    <EmailAdd @update:step="updateStep" />
+  </div>
+  <div v-else-if="step === 'email-list'" class="h-full">
+    <EmailAccountList @update:step="updateStep" />
+  </div>
+  <div v-else-if="step === 'email-edit'" class="h-full">
+    <EmailEdit :account-data="accountData" @update:step="updateStep" />
   </div>
 </template>
 

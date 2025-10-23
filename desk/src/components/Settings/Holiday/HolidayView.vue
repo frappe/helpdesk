@@ -1,15 +1,6 @@
 <template>
-  <div
-    v-if="holidayData.loading"
-    class="flex items-center h-full justify-center"
-  >
-    <LoadingIndicator class="w-4" />
-  </div>
-  <div
-    v-if="!holidayData.loading"
-    class="flex items-center justify-between sticky top-0 z-10 bg-white px-10 pt-8 pb-4"
-  >
-    <div>
+  <SettingsLayoutBase>
+    <template #title>
       <div class="flex items-center gap-2">
         <Button
           variant="ghost"
@@ -27,8 +18,8 @@
           v-if="isDirty"
         />
       </div>
-    </div>
-    <div class="flex gap-2 items-center">
+    </template>
+    <template #actions>
       <Button
         :label="__('Save')"
         theme="gray"
@@ -41,171 +32,174 @@
           getHolidayData.loading
         "
       />
-    </div>
-  </div>
-
-  <div v-if="!holidayData.loading" class="px-10 pb-8 overflow-y-scroll h-full">
-    <div class="flex items-center gap-2 mt-2">
-      <span class="text-sm">
-        There are in total <b>{{ holidayData.holidays.length }}</b> holidays in
-        this list</span
-      >
-    </div>
-    <hr class="mb-8 mt-2" />
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-      <div>
-        <FormControl
-          type="text"
-          size="sm"
-          variant="subtle"
-          :placeholder="__('Name')"
-          :label="__('Name')"
-          v-model="holidayData.holiday_list_name"
-          required
-          maxlength="50"
-          @change="validateHoliday('holiday_list_name')"
-        />
-        <ErrorMessage
-          :message="holidayDataErrors.holiday_list_name"
-          class="mt-2"
-        />
-      </div>
-      <FormControl
-        type="textarea"
-        size="sm"
-        variant="subtle"
-        :placeholder="__('Description')"
-        :label="__('Description')"
-        v-model="holidayData.description"
-        maxlength="140"
-      />
-    </div>
-    <hr class="my-8" />
-    <div>
-      <div class="flex flex-col gap-1">
-        <span class="text-lg font-semibold text-ink-gray-8">{{
-          __("Valid from")
-        }}</span>
-        <span class="text-p-sm text-ink-gray-6">
-          {{ __("Choose the duration of this holiday list.") }}
-        </span>
-      </div>
-      <div class="mt-3.5 flex gap-5 flex-col md:flex-row">
-        <div class="w-full space-y-1.5">
-          <FormLabel :label="__('From date')" for="from_date" required />
-          <DatePicker
-            v-model="holidayData.from_date"
-            variant="subtle"
-            placeholder="11/01/2025"
-            class="w-full"
-            id="from_date"
-            :formatter="(date) => getFormattedDate(date)"
-            :debounce="300"
-            @update:model-value="updateDuration('from_date')"
+    </template>
+    <template #content>
+      <div v-if="!holidayData.loading" class="h-full">
+        <div class="flex items-center gap-2 mt-2">
+          <span class="text-sm">
+            There are in total <b>{{ holidayData.holidays.length }}</b> holidays
+            in this list</span
           >
-            <template #prefix>
-              <LucideCalendar class="size-4" />
-            </template>
-          </DatePicker>
-          <ErrorMessage
-            :message="
-              holidayDataErrors.from_date || holidayDataErrors.dateRange
-            "
+        </div>
+        <hr class="mb-8 mt-2" />
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <FormControl
+              type="text"
+              size="sm"
+              variant="subtle"
+              :placeholder="__('Name')"
+              :label="__('Name')"
+              v-model="holidayData.holiday_list_name"
+              required
+              maxlength="50"
+              @change="validateHoliday('holiday_list_name')"
+            />
+            <ErrorMessage
+              :message="holidayDataErrors.holiday_list_name"
+              class="mt-2"
+            />
+          </div>
+          <FormControl
+            type="textarea"
+            size="sm"
+            variant="subtle"
+            :placeholder="__('Description')"
+            :label="__('Description')"
+            v-model="holidayData.description"
+            maxlength="140"
           />
         </div>
-        <div class="w-full space-y-1.5">
-          <FormLabel :label="__('To date')" for="to_date" required />
-          <DatePicker
-            v-model="holidayData.to_date"
-            variant="subtle"
-            placeholder="25/12/2025"
-            class="w-full"
-            id="to_date"
-            :formatter="(date) => getFormattedDate(date)"
-            :debounce="300"
-            @update:model-value="updateDuration('to_date')"
-          >
-            <template #prefix>
-              <LucideCalendar class="size-4" />
-            </template>
-          </DatePicker>
-          <ErrorMessage :message="holidayDataErrors.to_date" />
-        </div>
-      </div>
-    </div>
-    <hr class="my-8" />
-    <div>
-      <div class="flex flex-col gap-1">
-        <div class="text-lg font-semibold text-ink-gray-8">
-          {{ __("Recurring holidays") }}
-        </div>
-        <div class="text-p-sm text-ink-gray-6">
-          {{ __("Add recurring holidays such as weekends.") }}
-        </div>
-      </div>
-      <div class="mt-5">
-        <RecurringHolidaysList
-          :holidayData="holidayData"
-          :holidays="holidayData.recurring_holidays"
-        />
-      </div>
-    </div>
-    <hr class="my-8" />
-    <div>
-      <div class="flex justify-between items-center">
-        <div class="flex justify-between flex-col gap-1">
-          <span class="text-lg font-semibold text-ink-gray-8">
-            {{ __("Holidays") }}
-          </span>
-          <div class="text-p-sm text-ink-gray-6">
-            {{
-              __(
-                "Add holidays here to make sure they’re excluded from SLA calculations."
-              )
-            }}
-          </div>
-        </div>
-        <TabButtons
-          :buttons="[
-            {
-              value: 'calendar',
-              icon: 'calendar',
-            },
-            {
-              value: 'list',
-              icon: 'list',
-            },
-          ]"
-          v-model="holidayListView"
-        />
-      </div>
-      <div class="mt-5">
-        <HolidaysTableView v-if="holidayListView === 'list'" />
-        <HolidaysCalendarView v-else />
-      </div>
-      <div class="mt-2.5 flex justify-between items-center">
-        <Button
-          variant="subtle"
-          :label="__('Add Holiday')"
-          @click="dialog.show = true"
-          icon-left="plus"
-        />
-        <!-- Indicators -->
-        <div class="flex gap-4" v-if="holidayListView === 'calendar'">
-          <div class="gap-1 flex items-center">
-            <span class="bg-yellow-100 size-4 rounded-sm" />
-            <span class="text-sm text-ink-gray-6">{{ __("Holidays") }}</span>
-          </div>
-          <div class="gap-1 flex items-center">
-            <span class="bg-gray-100 size-4 rounded-sm" />
-            <span class="text-sm text-ink-gray-6">{{
-              __("Recurring holidays")
+        <hr class="my-8" />
+        <div>
+          <div class="flex flex-col gap-1">
+            <span class="text-lg font-semibold text-ink-gray-8">{{
+              __("Valid from")
             }}</span>
+            <span class="text-p-sm text-ink-gray-6">
+              {{ __("Choose the duration of this holiday list.") }}
+            </span>
+          </div>
+          <div class="mt-3.5 flex gap-5 flex-col md:flex-row">
+            <div class="w-full space-y-1.5">
+              <FormLabel :label="__('From date')" for="from_date" required />
+              <DatePicker
+                v-model="holidayData.from_date"
+                variant="subtle"
+                placeholder="11/01/2025"
+                class="w-full"
+                id="from_date"
+                :formatter="(date) => getFormattedDate(date)"
+                :debounce="300"
+                @update:model-value="updateDuration('from_date')"
+              >
+                <template #prefix>
+                  <LucideCalendar class="size-4" />
+                </template>
+              </DatePicker>
+              <ErrorMessage
+                :message="
+                  holidayDataErrors.from_date || holidayDataErrors.dateRange
+                "
+              />
+            </div>
+            <div class="w-full space-y-1.5">
+              <FormLabel :label="__('To date')" for="to_date" required />
+              <DatePicker
+                v-model="holidayData.to_date"
+                variant="subtle"
+                placeholder="25/12/2025"
+                class="w-full"
+                id="to_date"
+                :formatter="(date) => getFormattedDate(date)"
+                :debounce="300"
+                @update:model-value="updateDuration('to_date')"
+              >
+                <template #prefix>
+                  <LucideCalendar class="size-4" />
+                </template>
+              </DatePicker>
+              <ErrorMessage :message="holidayDataErrors.to_date" />
+            </div>
+          </div>
+        </div>
+        <hr class="my-8" />
+        <div>
+          <div class="flex flex-col gap-1">
+            <div class="text-lg font-semibold text-ink-gray-8">
+              {{ __("Recurring holidays") }}
+            </div>
+            <div class="text-p-sm text-ink-gray-6">
+              {{ __("Add recurring holidays such as weekends.") }}
+            </div>
+          </div>
+          <div class="mt-5">
+            <RecurringHolidaysList
+              :holidayData="holidayData"
+              :holidays="holidayData.recurring_holidays"
+            />
+          </div>
+        </div>
+        <hr class="my-8" />
+        <div>
+          <div class="flex justify-between items-center">
+            <div class="flex justify-between flex-col gap-1">
+              <span class="text-lg font-semibold text-ink-gray-8">
+                {{ __("Holidays") }}
+              </span>
+              <div class="text-p-sm text-ink-gray-6">
+                {{
+                  __(
+                    "Add holidays here to make sure they’re excluded from SLA calculations."
+                  )
+                }}
+              </div>
+            </div>
+            <TabButtons
+              :buttons="[
+                {
+                  value: 'calendar',
+                  icon: 'calendar',
+                },
+                {
+                  value: 'list',
+                  icon: 'list',
+                },
+              ]"
+              v-model="holidayListView"
+            />
+          </div>
+          <div class="mt-5">
+            <HolidaysTableView v-if="holidayListView === 'list'" />
+            <HolidaysCalendarView v-else />
+          </div>
+          <div class="mt-2.5 flex justify-between items-center">
+            <Button
+              variant="subtle"
+              :label="__('Add Holiday')"
+              @click="dialog.show = true"
+              icon-left="plus"
+            />
+            <!-- Indicators -->
+            <div class="flex gap-4" v-if="holidayListView === 'calendar'">
+              <div class="gap-1 flex items-center">
+                <span class="bg-yellow-100 size-4 rounded-sm" />
+                <span class="text-sm text-ink-gray-6">{{
+                  __("Holidays")
+                }}</span>
+              </div>
+              <div class="gap-1 flex items-center">
+                <span class="bg-gray-100 size-4 rounded-sm" />
+                <span class="text-sm text-ink-gray-6">{{
+                  __("Recurring holidays")
+                }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </template>
+  </SettingsLayoutBase>
   <AddHolidayModal v-model="dialog" />
   <ConfirmDialog
     v-model="showConfirmDialog"
@@ -251,6 +245,7 @@ import {
 import HolidaysCalendarView from "./HolidaysCalendarView.vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 import { __ } from "@/translation";
+import SettingsLayoutBase from "../SettingsLayoutBase.vue";
 
 const dialog = ref({
   show: false,
@@ -289,7 +284,7 @@ if (holidayListActiveScreen.value.data?.name) {
   holidayData.value.loading = true;
   getHolidayData.fetch();
 } else {
-  disableSettingModalOutsideClick.value = true;
+  initialData.value = JSON.stringify(holidayData.value);
 }
 
 const updateDuration = (key) => {
@@ -304,10 +299,6 @@ const updateDuration = (key) => {
 
 const goBack = () => {
   if (isDirty.value && !showConfirmDialog.value) {
-    showConfirmDialog.value = true;
-    return;
-  }
-  if (!holidayListActiveScreen.value.data && !showConfirmDialog.value) {
     showConfirmDialog.value = true;
     return;
   }

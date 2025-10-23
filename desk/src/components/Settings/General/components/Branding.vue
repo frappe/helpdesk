@@ -5,7 +5,7 @@
     </div>
     <FormControl
       type="text"
-      class="w-1/2 mt-4"
+      class="w-1/2 mt-6"
       v-model="settingsData.brandName"
       :label="__('Brand name')"
       :placeholder="__('Enter brand name')"

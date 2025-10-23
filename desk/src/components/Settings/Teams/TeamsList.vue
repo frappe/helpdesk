@@ -1,49 +1,44 @@
 <template>
-  <div class="w-full h-full flex flex-col">
-    <!-- Header -->
-    <div class="px-10 py-8">
-      <SettingsLayoutHeader
-        :title="__('Teams')"
-        :description="
-          __('Create and manage teams and assign agents to specific teams.')
-        "
-      >
-        <template #actions>
-          <Button
-            :label="__('New')"
-            theme="gray"
-            variant="solid"
-            @click="() => (showForm = !showForm)"
-            icon-left="plus"
-          />
-        </template>
-        <template
-          v-if="teams.data?.length > 9 || teamsSearchQuery.length"
-          #bottom-section
-        >
-          <div class="relative">
-            <Input
-              v-model="teamsSearchQuery"
-              @input="teamsSearchQuery = $event"
-              :placeholder="__('Search')"
-              type="text"
-              class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
-              icon-left="search"
-              debounce="300"
-              inputClass="p-4 pr-12"
-            />
-            <Button
-              v-if="teamsSearchQuery"
-              icon="x"
-              variant="ghost"
-              @click="teamsSearchQuery = ''"
-              class="absolute right-1 top-1/2 -translate-y-1/2"
-            />
-          </div>
-        </template>
-      </SettingsLayoutHeader>
-    </div>
-    <div class="px-10 pb-8 overflow-y-auto">
+  <SettingsLayoutBase
+    :title="__('Teams')"
+    :description="
+      __('Create and manage teams and assign agents to specific teams.')
+    "
+  >
+    <template #actions>
+      <Button
+        :label="__('New')"
+        theme="gray"
+        variant="solid"
+        @click="() => (showForm = !showForm)"
+        icon-left="plus"
+      />
+    </template>
+    <template
+      v-if="teams.data?.length > 9 || teamsSearchQuery.length"
+      #bottom-section
+    >
+      <div class="relative">
+        <Input
+          v-model="teamsSearchQuery"
+          @input="teamsSearchQuery = $event"
+          :placeholder="__('Search')"
+          type="text"
+          class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+          icon-left="search"
+          debounce="300"
+          inputClass="p-4 pr-12"
+        />
+        <Button
+          v-if="teamsSearchQuery"
+          icon="x"
+          variant="ghost"
+          @click="teamsSearchQuery = ''"
+          class="absolute right-1 top-1/2 -translate-y-1/2"
+        />
+      </div>
+    </template>
+    <template #content>
       <!-- List -->
       <div
         v-if="!teams.loading && teams.data?.length > 0"
@@ -132,9 +127,8 @@
           @click="showForm = true"
         />
       </div>
-    </div>
-  </div>
-
+    </template>
+  </SettingsLayoutBase>
   <NewTeamModal
     v-model="showForm"
     @create="
@@ -154,6 +148,7 @@ import { ConfirmDelete } from "@/utils";
 import EditIcon from "@/components/icons/EditIcon.vue";
 import RenameTeamModal from "./RenameTeamModal.vue";
 import { __ } from "@/translation";
+import SettingsLayoutBase from "../SettingsLayoutBase.vue";
 
 interface E {
   (event: "update:step", step: string, team: string): void;
@@ -204,12 +199,9 @@ const deleteTeam = (team: any) => {
 
 watch(teamsSearchQuery, (newValue) => {
   teams.filters = {
+    ...teams.filters,
     name: ["like", `%${newValue}%`],
   };
-  if (!newValue) {
-    teams.start = 0;
-    teams.pageLength = 10;
-  }
   teams.reload();
 });
 </script>

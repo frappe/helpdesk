@@ -1,12 +1,10 @@
 <template>
-  <div class="pb-8">
-    <TeamsList v-if="step === 'team-list'" @update:step="updateStep" />
-    <TeamEdit
-      v-else-if="step === 'team-edit'"
-      @update:step="updateStep"
-      :team-name="teamName"
-    />
-  </div>
+  <TeamsList v-if="step === 'team-list'" @update:step="updateStep" />
+  <TeamEdit
+    v-else-if="step === 'team-edit'"
+    @update:step="updateStep"
+    :team-name="teamName"
+  />
 </template>
 
 <script setup lang="ts">
