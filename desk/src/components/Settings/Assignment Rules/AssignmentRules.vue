@@ -1,8 +1,6 @@
 <template>
-  <div class="pb-8">
-    <AssignmentRulesList v-if="assignmentRulesActiveScreen.screen === 'list'" />
-    <AssignmentRuleView v-if="assignmentRulesActiveScreen.screen === 'view'" />
-  </div>
+  <AssignmentRulesList v-if="assignmentRulesActiveScreen.screen === 'list'" />
+  <AssignmentRuleView v-if="assignmentRulesActiveScreen.screen === 'view'" />
 </template>
 
 <script setup lang="ts">

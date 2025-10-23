@@ -1,8 +1,6 @@
 <template>
-  <div class="pb-8">
-    <SlaPolicies v-if="slaActiveScreen.screen == 'list'" />
-    <SlaPolicyView v-else-if="slaActiveScreen.screen == 'view'" />
-  </div>
+  <SlaPolicies v-if="slaActiveScreen.screen == 'list'" />
+  <SlaPolicyView v-else-if="slaActiveScreen.screen == 'view'" />
 </template>
 
 <script setup lang="ts">

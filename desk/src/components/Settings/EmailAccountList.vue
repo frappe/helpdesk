@@ -1,77 +1,76 @@
 <template>
-  <div>
-    <!-- header -->
-    <div class="mb-8">
-      <SettingsLayoutHeader
-        :title="__('Email Accounts')"
-        :description="
-          __(
-            'Manage your email accounts and configure incoming and outgoing settings.'
-          )
-        "
-      >
-        <template #actions>
-          <Button
-            :label="__('Add Account')"
-            theme="gray"
-            variant="solid"
-            @click="emit('update:step', 'email-add')"
-            icon-left="plus"
-          />
-        </template>
-      </SettingsLayoutHeader>
-    </div>
-
-    <!-- list accounts -->
-    <div
-      class="-ml-2"
-      v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
-    >
-      <div class="flex text-sm text-gray-600">
-        <div class="ml-2">{{ __("Email Account name") }}</div>
-      </div>
-      <hr class="mx-2 mt-2" />
-      <div v-for="emailAccount in emailAccounts.data" :key="emailAccount.name">
-        <EmailAccountCard
-          :emailAccount="emailAccount"
-          @click="emit('update:step', 'email-edit', emailAccount)"
-        />
-        <hr class="mx-2" />
-      </div>
-    </div>
-    <!-- fallback if no email accounts -->
-    <div
-      v-else
-      class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
-    >
-      <div
-        class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
-      >
-        <EmailIcon class="size-6 text-ink-gray-6" />
-      </div>
-      <div class="flex flex-col items-center gap-1">
-        <div class="text-base font-medium text-ink-gray-6">
-          {{ __("No email account found") }}
-        </div>
-        <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-          {{ __("Add your first account to get started.") }}
-        </div>
-      </div>
+  <SettingsLayoutBase
+    :title="__('Email Accounts')"
+    :description="
+      __(
+        'Manage your email accounts and configure incoming and outgoing settings.'
+      )
+    "
+  >
+    <template #actions>
       <Button
-        :label="__('Add Email Account')"
-        variant="outline"
-        icon-left="plus"
+        :label="__('Add Account')"
+        theme="gray"
+        variant="solid"
         @click="emit('update:step', 'email-add')"
+        icon-left="plus"
       />
-    </div>
-  </div>
+    </template>
+    <template #content>
+      <!-- list accounts -->
+      <div
+        class="-ml-2"
+        v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
+      >
+        <div class="flex text-sm text-gray-600">
+          <div class="ml-2">{{ __("Email Account name") }}</div>
+        </div>
+        <hr class="mx-2 mt-2" />
+        <div
+          v-for="emailAccount in emailAccounts.data"
+          :key="emailAccount.name"
+        >
+          <EmailAccountCard
+            :emailAccount="emailAccount"
+            @click="emit('update:step', 'email-edit', emailAccount)"
+          />
+          <hr class="mx-2" />
+        </div>
+      </div>
+      <!-- fallback if no email accounts -->
+      <div
+        v-else
+        class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
+      >
+        <div
+          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+        >
+          <EmailIcon class="size-6 text-ink-gray-6" />
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <div class="text-base font-medium text-ink-gray-6">
+            {{ __("No email account found") }}
+          </div>
+          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
+            {{ __("Add your first account to get started.") }}
+          </div>
+        </div>
+        <Button
+          :label="__('Add Email Account')"
+          variant="outline"
+          icon-left="plus"
+          @click="emit('update:step', 'email-add')"
+        />
+      </div>
+    </template>
+  </SettingsLayoutBase>
 </template>
 
 <script setup lang="ts">
 import { EmailAccount } from "@/types";
 import { createListResource } from "frappe-ui";
 import EmailAccountCard from "./EmailAccountCard.vue";
-import SettingsLayoutHeader from "./SettingsLayoutHeader.vue";
+import SettingsLayoutBase from "./SettingsLayoutBase.vue";
 
 const emit = defineEmits(["update:step"]);
 

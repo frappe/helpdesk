@@ -1,50 +1,46 @@
 <template>
-  <div class="pb-8">
-    <div class="px-10 py-8">
-      <SettingsLayoutHeader
-        :description="__('Manage general settings of your app')"
-      >
-        <template #title>
-          <div class="flex items-center gap-2">
-            <h1 class="text-lg font-semibold text-ink-gray-8">
-              {{ __("General") }}
-            </h1>
-            <Badge
-              variant="subtle"
-              theme="orange"
-              size="sm"
-              :label="__('Unsaved')"
-              v-if="isDirty"
-            />
-          </div>
-        </template>
-        <template #actions>
-          <Button
-            :label="__('Save')"
-            variant="solid"
-            @click="saveSettings.submit()"
-            :loading="saveSettings.loading"
-            :disabled="!isDirty"
-          />
-        </template>
-      </SettingsLayoutHeader>
-    </div>
-    <div
-      v-if="settingsDataResource.loading && !settingsDataResource.data"
-      class="flex items-center justify-center mt-12"
-    >
-      <LoadingIndicator class="w-4" />
-    </div>
-    <div v-else class="px-10 pb-8 overflow-y-auto hide-scrollbar">
-      <Branding />
-      <hr class="my-8" />
-      <div>
-        <TicketSettings />
-        <hr class="my-8" />
-        <WorkflowKnowledgebaseSettings />
+  <SettingsLayoutBase :description="__('Manage general settings of your app')">
+    <template #title>
+      <div class="flex items-center gap-2">
+        <h1 class="text-lg font-semibold text-ink-gray-8">
+          {{ __("General") }}
+        </h1>
+        <Badge
+          variant="subtle"
+          theme="orange"
+          size="sm"
+          :label="__('Unsaved')"
+          v-if="isDirty"
+        />
       </div>
-    </div>
-  </div>
+    </template>
+    <template #actions>
+      <Button
+        :label="__('Save')"
+        variant="solid"
+        @click="saveSettings.submit()"
+        :loading="saveSettings.loading"
+        :disabled="!isDirty"
+      />
+    </template>
+    <template #content>
+      <div
+        v-if="settingsDataResource.loading && !settingsDataResource.data"
+        class="flex items-center justify-center mt-12"
+      >
+        <LoadingIndicator class="w-4" />
+      </div>
+      <div v-else>
+        <Branding />
+        <hr class="my-8" />
+        <div>
+          <TicketSettings />
+          <hr class="my-8" />
+          <WorkflowKnowledgebaseSettings />
+        </div>
+      </div>
+    </template>
+  </SettingsLayoutBase>
 </template>
 
 <script setup lang="ts">
@@ -55,13 +51,13 @@ import {
   LoadingIndicator,
   toast,
 } from "frappe-ui";
-import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import Branding from "./components/Branding.vue";
 import TicketSettings from "./components/TicketSettings.vue";
 import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
 import { provide, ref, watch } from "vue";
 import { __ } from "@/translation";
 import { disableSettingModalOutsideClick } from "../settingsModal";
+import SettingsLayoutBase from "../SettingsLayoutBase.vue";
 
 const isDirty = ref(false);
 const initialData = ref(null);

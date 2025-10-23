@@ -1,95 +1,100 @@
 <template>
-  <div class="flex h-full flex-col gap-4">
-    <!-- title and desc -->
-    <div class="mb-2">
-      <SettingsLayoutHeader
-        :title="__('Edit Email')"
-        :description="__('Edit your email account')"
-      />
-    </div>
-    <div class="overflow-y-auto flex flex-col gap-4">
-      <div class="w-fit">
-        <EmailProviderIcon
-          :logo="emailIcon[accountData.service]"
-          :service-name="accountData.service"
-        />
-      </div>
-      <!-- banner for setting up email account -->
-      <div class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200">
-        <CircleAlert
-          class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-2"
-        />
-        <div class="text-wrap text-xs text-gray-700">
-          {{ info.description }}
-          <a :href="info.link" target="_blank" class="text-ink-blue-2 underline"
-            >here</a
-          >
-          .
-        </div>
-      </div>
-      <!-- fields -->
-      <div class="flex flex-col gap-4">
-        <div class="grid grid-cols-1 gap-4">
-          <div
-            v-for="field in fields"
-            :key="field.name"
-            class="flex flex-col gap-1"
-          >
-            <FormControl
-              v-model="state[field.name]"
-              :label="field.label"
-              :name="field.name"
-              :type="field.type"
-              :placeholder="field.placeholder"
+  <SettingsLayoutBase
+    :title="__('Edit Email')"
+    :description="__('Edit your email account')"
+  >
+    <template #content>
+      <div class="flex h-full flex-col gap-4">
+        <div class="overflow-y-auto flex flex-col gap-4 p-0.5">
+          <div class="w-fit">
+            <EmailProviderIcon
+              :logo="emailIcon[accountData.service]"
+              :service-name="accountData.service"
             />
           </div>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
+          <!-- banner for setting up email account -->
           <div
-            v-for="field in incomingOutgoingFields"
-            :key="field.name"
-            class="flex flex-col gap-1"
+            class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200"
           >
-            <FormControl
-              v-model="state[field.name]"
-              :label="field.label"
-              :name="field.name"
-              :type="field.type"
+            <CircleAlert
+              class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-2"
             />
-            <p class="text-p-sm text-gray-500">{{ field.description }}</p>
+            <div class="text-wrap text-xs text-gray-700">
+              {{ info.description }}
+              <a
+                :href="info.link"
+                target="_blank"
+                class="text-ink-blue-2 underline"
+                >here</a
+              >
+              .
+            </div>
+          </div>
+          <!-- fields -->
+          <div class="flex flex-col gap-4">
+            <div class="grid grid-cols-1 gap-4">
+              <div
+                v-for="field in fields"
+                :key="field.name"
+                class="flex flex-col gap-1"
+              >
+                <FormControl
+                  v-model="state[field.name]"
+                  :label="field.label"
+                  :name="field.name"
+                  :type="field.type"
+                  :placeholder="field.placeholder"
+                />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div
+                v-for="field in incomingOutgoingFields"
+                :key="field.name"
+                class="flex flex-col gap-1"
+              >
+                <FormControl
+                  v-model="state[field.name]"
+                  :label="field.label"
+                  :name="field.name"
+                  :type="field.type"
+                />
+                <p class="text-p-sm text-gray-500">{{ field.description }}</p>
+              </div>
+            </div>
+            <ErrorMessage v-if="error" class="ml-1" :message="error" />
           </div>
         </div>
-        <ErrorMessage v-if="error" class="ml-1" :message="error" />
-      </div>
-    </div>
 
-    <!-- action buttons -->
-    <div class="mt-auto flex justify-between">
-      <Button
-        :label="__('Back')"
-        theme="gray"
-        variant="outline"
-        :disabled="loading"
-        @click="emit('update:step', 'email-list')"
-      />
-      <div class="flex gap-2">
-        <Button
-          :label="__('Update Account')"
-          variant="solid"
-          @click="updateAccount"
-          :loading="loading"
-        />
-        <Button
-          v-if="accountData.enable_incoming"
-          :label="__('Pull Emails')"
-          variant="subtle"
-          @click="pullEmails"
-          :loading="loadingPull"
-          :disabled="loading"
-        />
+        <!-- action buttons -->
+        <div class="mt-auto flex justify-between -mb-8">
+          <Button
+            :label="__('Back')"
+            theme="gray"
+            variant="outline"
+            :disabled="loading"
+            @click="emit('update:step', 'email-list')"
+          />
+          <div class="flex gap-2">
+            <Button
+              :label="__('Update Account')"
+              variant="solid"
+              @click="updateAccount"
+              :loading="loading"
+            />
+            <Button
+              v-if="accountData.enable_incoming"
+              :label="__('Pull Emails')"
+              variant="subtle"
+              @click="pullEmails"
+              :loading="loadingPull"
+              :disabled="loading"
+            />
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    </template>
+  </SettingsLayoutBase>
 </template>
 
 <script setup lang="ts">
@@ -107,8 +112,8 @@ import {
   services,
   validateInputs,
 } from "./emailConfig";
-import SettingsLayoutHeader from "./SettingsLayoutHeader.vue";
 import { __ } from "@/translation";
+import SettingsLayoutBase from "./SettingsLayoutBase.vue";
 
 interface P {
   accountData: EmailAccount;

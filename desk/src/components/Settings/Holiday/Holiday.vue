@@ -1,8 +1,6 @@
 <template>
-  <div class="pb-8">
-    <Holidays v-if="holidayListActiveScreen.screen == 'list'" />
-    <HolidayView v-else-if="holidayListActiveScreen.screen == 'view'" />
-  </div>
+  <Holidays v-if="holidayListActiveScreen.screen == 'list'" />
+  <HolidayView v-else-if="holidayListActiveScreen.screen == 'view'" />
 </template>
 
 <script setup lang="ts">

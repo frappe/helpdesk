@@ -1,72 +1,74 @@
 <template>
-  <div class="flex flex-col py-8 gap-8 overflow-y-hidden">
-    <SettingsLayoutHeader>
-      <template #title>
-        <div class="flex items-center gap-2 pl-10">
-          <Button
-            variant="ghost"
-            icon-left="chevron-left"
-            :label="dependencyLabel"
-            size="md"
-            @click="handleBackNavigation"
-            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
-          />
-          <Badge v-if="isDirty" theme="orange"> {{ __("Unsaved") }} </Badge>
+  <SettingsLayoutBase>
+    <template #title>
+      <div class="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          icon-left="chevron-left"
+          :label="dependencyLabel"
+          size="md"
+          @click="handleBackNavigation"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
+        />
+        <Badge v-if="isDirty" theme="orange"> {{ __("Unsaved") }} </Badge>
+      </div>
+    </template>
+    <template #actions>
+      <div class="flex gap-4">
+        <!-- Switch -->
+        <div class="flex gap-2 items-center">
+          <Switch v-model="state.enabled" class="!w-fit" />
+          <span class="text-p-base text-ink-gray-6">
+            {{ __("Enabled") }}
+          </span>
         </div>
-      </template>
-      <template #actions>
-        <div class="flex gap-4 pr-10">
-          <!-- Switch -->
-          <div class="flex gap-2 items-center">
-            <Switch v-model="state.enabled" class="!w-fit" />
-            <span class="text-p-base text-ink-gray-6">
-              {{ __("Enabled") }}
-            </span>
-          </div>
-          <!-- Actions -->
-          <div class="flex gap-1">
-            <Button
-              :label="__('Save')"
-              variant="solid"
-              size="sm"
-              :disabled="
-                !state.selectedParentField ||
-                !state.selectedChildField ||
-                Object.keys(state.childSelections).length === 0
-              "
-              :loading="createUpdateFieldDependency.loading"
-              @click="handleSubmit"
+        <!-- Actions -->
+        <div class="flex gap-1">
+          <Button
+            :label="__('Save')"
+            variant="solid"
+            size="sm"
+            :disabled="
+              !state.selectedParentField ||
+              !state.selectedChildField ||
+              Object.keys(state.childSelections).length === 0
+            "
+            :loading="createUpdateFieldDependency.loading"
+            @click="handleSubmit"
+          />
+        </div>
+      </div>
+    </template>
+    <template #content>
+      <div>
+        <!-- Body -->
+        <div class="w-full flex-1 flex flex-col gap-8">
+          <!-- Field Selection -->
+          <FieldDependencyFieldsSelection
+            v-model="state"
+            :is-new="isNew"
+            :parent-fields="parentFields"
+          />
+
+          <div class="flex flex-col gap-8">
+            <!-- Value Selection -->
+            <FieldDependencyValueSelection
+              v-model="state"
+              :is-new="isNew"
+              :parent-fields="parentFields"
+            />
+
+            <!-- Criteria selection -->
+            <FieldDependencyCriteria
+              :parent-field-values="state.parentFieldValues"
+              v-model="fieldCriteriaState"
+              v-model:selections="state"
             />
           </div>
         </div>
-      </template>
-    </SettingsLayoutHeader>
-    <!-- Body -->
-    <div class="w-full flex-1 flex flex-col gap-8 overflow-y-hidden px-10">
-      <!-- Field Selection -->
-      <FieldDependencyFieldsSelection
-        v-model="state"
-        :is-new="isNew"
-        :parent-fields="parentFields"
-      />
-
-      <div class="flex flex-col gap-8 overflow-y-scroll">
-        <!-- Value Selection -->
-        <FieldDependencyValueSelection
-          v-model="state"
-          :is-new="isNew"
-          :parent-fields="parentFields"
-        />
-
-        <!-- Criteria selection -->
-        <FieldDependencyCriteria
-          :parent-field-values="state.parentFieldValues"
-          v-model="fieldCriteriaState"
-          v-model:selections="state"
-        />
       </div>
-    </div>
-  </div>
+    </template>
+  </SettingsLayoutBase>
   <ConfirmDialog
     v-model="showConfirmDialog"
     :title="__('Unsaved changes')"
@@ -83,14 +85,14 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
 import { createResource, Switch, toast } from "frappe-ui";
-import { computed, reactive, ref, watch } from "vue";
-import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
+import { computed, onUnmounted, reactive, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
 import FieldDependencyCriteria from "./FieldDependencyCriteria.vue";
 import FieldDependencyFieldsSelection from "./FieldDependencyFieldsSelection.vue";
 import FieldDependencyValueSelection from "./FieldDependencyValueSelection.vue";
 import { __ } from "@/translation";
+import SettingsLayoutBase from "../SettingsLayoutBase.vue";
 
 const props = defineProps({
   fieldDependencyName: {
@@ -334,4 +336,8 @@ watch(
     state.childSearch = ""; // Reset child search when parent selection changes
   }
 );
+
+onUnmounted(() => {
+  disableSettingModalOutsideClick.value = false;
+});
 </script>
