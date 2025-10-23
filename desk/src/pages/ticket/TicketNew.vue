@@ -15,6 +15,14 @@
     <div
       class="flex flex-col gap-5 py-6 h-full flex-1 self-center overflow-auto mx-auto w-full max-w-4xl px-5"
     >
+    <div v-if="afterHoursSettings.data?.outside_working_hours_message" 
+      class="form-message border-bottom yellow  max-w-4xl rounded  bg-yellow-100"
+    >
+      <p 
+        class="text-sm text-yellow-800 px-2.5 py-2">
+        {{ afterHoursSettings.data.outside_working_hours_message }}
+      </p>
+    </div>
       <!-- custom fields descriptions -->
       <div v-if="Boolean(template.data?.about)" class="">
         <div class="prose-f" v-html="sanitize(template.data.about)" />
@@ -264,6 +272,12 @@ const ticket = createResource({
       });
     }
   },
+});
+
+const afterHoursSettings = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_customer_portal_settings",
+  cache: "afterHoursWarning",
+  auto: true,
 });
 
 function sanitize(html: string) {

@@ -6,6 +6,9 @@ import frappe
 from pypika import JoinType
 
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
+from helpdesk.utils import (
+    is_outside_working_hours
+)
 from helpdesk.utils import check_permissions
 
 DOCTYPE_TEMPLATE = "HD Ticket Template"
@@ -32,6 +35,16 @@ def get_one(name: str):
             "HD Ticket", apply_on_new_page=True, is_customer_portal=False
         ),
     }
+    
+@frappe.whitelist()
+def get_customer_portal_settings():
+    settings = frappe.get_single("HD Settings")
+    show_message = bool(settings.working_hours_notification)
+    message = "Your ticket is outside office hours, unless it is a critical issue, you will get a response by Monday"
+    outside_hours = is_outside_working_hours()
+    return {
+        "outside_working_hours_message": message if show_message and outside_hours else "",
+        }
 
 
 def get_fields_meta(template: str):

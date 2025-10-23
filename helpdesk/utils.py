@@ -9,6 +9,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.query_builder import Order
 from frappe.realtime import get_website_room
+from frappe.utils import now_datetime,get_time
 from frappe.utils import floor
 from frappe.utils.safe_exec import get_safe_globals
 from frappe.utils.telemetry import capture as _capture
@@ -184,6 +185,76 @@ def get_agents_team():
         .run(as_dict=True)
     )
     return teams
+
+
+def is_outside_working_hours():
+    """Return True if current time is outside SLA or Helpdesk working hours."""
+
+    current_time = now_datetime()
+    current_weekday = current_time.weekday() 
+
+    day_map = {
+        0: "Monday",
+        1: "Tuesday",
+        2: "Wednesday",
+        3: "Thursday",
+        4: "Friday",
+        5: "Saturday",
+        6: "Sunday",
+    }
+
+    current_day_name = day_map[current_weekday]
+    sla_doc = frappe.db.get_value(
+        "HD Service Level Agreement", {"default_sla": 1}, "name"
+    )
+    
+    settings = frappe.get_single("HD Settings")
+
+
+    if sla_doc:
+        sla = frappe.get_doc("HD Service Level Agreement", sla_doc)
+        working_hours = sla.get_working_hours()  
+
+        if current_day_name not in working_hours:
+            return True
+
+        start_time, end_time = working_hours[current_day_name]
+
+        start_dt = current_time.replace(
+            hour=start_time.seconds // 3600,
+            minute=(start_time.seconds // 60) % 60,
+            second=0,
+            microsecond=0,
+        )
+        end_dt = current_time.replace(
+            hour=end_time.seconds // 3600,
+            minute=(end_time.seconds // 60) % 60,
+            second=0,
+            microsecond=0,
+        )
+
+        if not (start_dt <= current_time < end_dt):
+            return True
+
+        return False
+
+    # Default Sat and Sun
+    if current_weekday in [5, 6]:
+        return True
+
+
+    if settings.working_hours_start and settings.working_hours_end:
+        working_start = get_time(settings.working_hours_start)
+        working_end = get_time(settings.working_hours_end)
+
+        if not (working_start <= current_time.time() < working_end):
+            return True
+    else:
+        # Default 9 AM to 6 PM
+        if not (9 <= current_time.hour < 18):
+            return True
+
+    return False
 
 
 contact_default_columns = [

@@ -37,6 +37,9 @@
   "default_ticket_status",
   "column_break_yfbu",
   "ticket_reopen_status",
+  "working_hours_section",
+  "working_hours_notification",
+  "column_break_working_hours",
   "workflow_tab",
   "skip_email_workflow",
   "instantly_send_email",
@@ -440,6 +443,21 @@
    "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
    "options": "HD Ticket Status",
    "reqd": 1
+  },
+  {
+    "fieldname": "working_hours_section",
+    "fieldtype": "Section Break",
+    "label": "Outside Working Hours Settings"
+  },  
+  { "description": "Let customers know they're raising a ticket outside working hours, and when they can expect a reply.",
+    "fieldname": "working_hours_notification",
+    "label": "Show Message Outside Working Hours",
+    "fieldtype": "Check",
+    "default": "0"
+  },
+  {
+    "fieldname": "column_break_working_hours",
+    "fieldtype": "Column Break"
   },
   {
    "depends_on": "auto_close_tickets",
