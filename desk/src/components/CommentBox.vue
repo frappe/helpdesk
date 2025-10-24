@@ -49,7 +49,10 @@
         </div>
       </div>
     </div>
-    <div class="rounded bg-gray-50 px-4 py-3">
+    <div
+      :id="`comment-${name}`"
+      class="rounded bg-gray-50 transition-colors px-4 py-3"
+    >
       <TextEditor
         ref="editorRef"
         :editor-class="[
@@ -162,6 +165,7 @@ const deleteComment = createResource({
   }),
   onSuccess() {
     emit("update");
+    showDialog.value = false;
     toast.success("Comment deleted");
   },
 });
