@@ -249,10 +249,11 @@ const getCannedResponseData = createResource({
       title: data.name,
       subject: data.subject,
       response: data.response,
-      teams: data.teams.map((team) => ({
-        label: team.team,
-        value: team.team,
-      })),
+      teams:
+        data.teams?.map((team) => ({
+          label: team.team,
+          value: team.team,
+        })) || [],
     };
     initialData.value = JSON.stringify(cannedResponseData.value);
   },
@@ -293,8 +294,10 @@ const isDirty = ref(false);
 const goBack = () => {
   const confirmDialogInfo = {
     show: true,
-    title: "Unsaved changes",
-    message: "Are you sure you want to go back? Unsaved changes will be lost.",
+    title: __("Unsaved changes"),
+    message: __(
+      "Are you sure you want to go back? Unsaved changes will be lost."
+    ),
     onConfirm: goBack,
   };
   if (isDirty.value && !showConfirmDialog.value.show) {
@@ -357,7 +360,7 @@ const createCannedResponse = () => {
       onError: (er) => {
         toast.error(
           er?.messages?.[0] ||
-            "Some error occurred while saving canned response"
+            __("Some error occurred while saving canned response")
         );
         isLoading.value = false;
       },
@@ -383,7 +386,7 @@ const updateCannedResponse = async () => {
       .catch(async (er) => {
         const error =
           er?.messages?.[0] ||
-          "Some error occurred while renaming canned response";
+          __("Some error occurred while renaming canned response");
         toast.error(error);
         isLoading.value = false;
         renameError = true;
@@ -418,7 +421,7 @@ const validateData = (key?: string) => {
     switch (key) {
       case "title":
         if (!cannedResponseData.value.title) {
-          errors.value.title = "Title is required";
+          errors.value.title = __("Title is required");
         } else {
           errors.value.title = "";
         }
@@ -426,7 +429,7 @@ const validateData = (key?: string) => {
 
       case "subject":
         if (!cannedResponseData.value.subject) {
-          errors.value.subject = "Subject is required";
+          errors.value.subject = __("Subject is required");
         } else {
           errors.value.subject = "";
         }
@@ -434,7 +437,7 @@ const validateData = (key?: string) => {
 
       case "response":
         if (!content.value?.editor?.state?.doc?.textContent?.trim()?.length) {
-          errors.value.response = "Response is required";
+          errors.value.response = __("Response is required");
         } else {
           errors.value.response = "";
         }

@@ -90,8 +90,8 @@
       </div>
       <div v-else class="mt-2">
         <div class="flex h-56 flex-col items-center justify-center">
-          <div class="text-lg text-gray-500">
-            {{ "No templates found" }}
+          <div class="text-p-sm text-gray-500">
+            {{ "No Canned Responses found" }}
           </div>
         </div>
       </div>
@@ -176,7 +176,7 @@ const selectedTemplate = ref({
 const cannedResponsesResource = createResource({
   url: "helpdesk.api.canned_response.get_canned_responses",
   params: {
-    teams: ["No team"],
+    teams: teamsList.value,
   },
   onSuccess: (data) => {
     cannedResponsesList.value = data;
