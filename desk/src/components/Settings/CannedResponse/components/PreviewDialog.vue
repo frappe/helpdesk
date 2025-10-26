@@ -18,35 +18,9 @@
           class="form-control flex-1"
           placeholder="Search ticket"
           :show-description="true"
-          @change="getResponsePreview($event)"
-        >
-          <template #target="{ togglePopover }">
-            <div class="w-full">
-              <button
-                class="flex w-full items-center justify-between focus:outline-none text-base rounded h-7 py-1.5 px-2 border border-gray-100 bg-gray-100 placeholder-gray-500 hover:border-gray-200 hover:bg-gray-200 focus:bg-white focus:border-gray-500 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400"
-                @click="togglePopover()"
-              >
-                <div class="flex items-center">
-                  <slot name="prefix" />
-                  <span
-                    class="overflow-hidden text-ellipsis whitespace-nowrap text-base leading-5"
-                    v-if="dialogModel.ticketId"
-                  >
-                    {{ dialogModel.ticketId }}
-                  </span>
-                  <span class="text-base leading-5 text-gray-500" v-else>
-                    {{ __("Select a ticket to preview") }}
-                  </span>
-                </div>
-                <FeatherIcon
-                  name="chevron-down"
-                  class="h-4 w-4 text-gray-600"
-                  aria-hidden="true"
-                />
-              </button>
-            </div>
-          </template>
-        </Link>
+          @change="getResponsePreview"
+        />
+
         <div class="space-y-1.5">
           <FormLabel :label="__('Preview')" />
           <div class="relative">
@@ -73,6 +47,7 @@
 import { createResource, Dialog, FormLabel, TextEditor } from "frappe-ui";
 import { LoadingIndicator } from "frappe-ui";
 import { menuButtons } from "../cannedResponse";
+import { Link } from "@/components";
 
 const dialogModel = defineModel<{
   show: boolean;
@@ -89,6 +64,7 @@ const getResponsePreviewResource = createResource({
 });
 
 const getResponsePreview = (ticketId: string) => {
+  if (!ticketId) return;
   dialogModel.value.ticketId = ticketId;
   dialogModel.value.preview = null;
   getResponsePreviewResource.submit({

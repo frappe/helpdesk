@@ -225,7 +225,7 @@ function filterOptions(options) {
 }
 
 function displayValue(option) {
-  if (typeof option === "string") {
+  if (typeof option === "string" || typeof option === "number") {
     let allOptions = groups.value.flatMap((group) => group.items);
     let selectedOption = allOptions.find((o) => o.value === option);
     return selectedOption?.label || option;
