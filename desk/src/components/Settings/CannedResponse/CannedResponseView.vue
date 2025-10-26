@@ -11,8 +11,8 @@
           class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
         />
         <Badge
-          :variant="'subtle'"
-          :theme="'orange'"
+          variant="subtle"
+          theme="orange"
           size="sm"
           :label="__('Unsaved changes')"
           v-if="isDirty"
@@ -20,14 +20,25 @@
       </div>
     </template>
     <template #actions>
-      <Button
-        :label="__('Save')"
-        variant="solid"
-        theme="gray"
-        @click="onSave"
-        :loading="isLoading"
-        :disabled="Boolean(!isDirty)"
-      />
+      <div class="flex items-center gap-2">
+        <Button
+          :label="__('Preview')"
+          size="sm"
+          @click="onShowPreview()"
+          icon-left="eye"
+          :disabled="
+            Boolean(!content?.editor?.state?.doc?.textContent?.trim()?.length)
+          "
+        />
+        <Button
+          :label="__('Save')"
+          variant="solid"
+          theme="gray"
+          @click="onSave"
+          :loading="isLoading"
+          :disabled="Boolean(!isDirty)"
+        />
+      </div>
     </template>
     <template #content>
       <div class="flex flex-col gap-5">
@@ -43,88 +54,25 @@
             />
             <ErrorMessage :message="errors.title" />
           </div>
-          <div class="space-y-1.5">
-            <FormControl
-              :label="__('Subject')"
-              type="text"
-              v-model="cannedResponseData.subject"
-              required
-              maxLength="50"
-              @change="validateData('subject')"
+          <div class="flex flex-col gap-1.5">
+            <Autocomplete
+              :label="__('Teams')"
+              :multiple="true"
+              :options="getTeamsList.data"
+              v-model="cannedResponseData.teams"
             />
-            <ErrorMessage :message="errors.subject" />
-          </div>
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <Autocomplete
-            :label="__('Teams')"
-            :multiple="true"
-            :options="getTeamsList.data"
-            v-model="cannedResponseData.teams"
-          />
-          <div class="text-xs text-ink-gray-5 cursor-default">
-            {{ __("Restrict visibility to these teams") }}
+            <div class="text-xs text-ink-gray-5 cursor-default">
+              {{ __("Restrict visibility to these teams") }}
+            </div>
           </div>
         </div>
         <div class="flex flex-col gap-1.5 w-full">
           <FormLabel :label="__('Response')" required />
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <Button
-                :label="__('Preview')"
-                size="sm"
-                @click="onShowPreview()"
-                icon-left="eye"
-                :disabled="
-                  Boolean(
-                    !content?.editor?.state?.doc?.textContent?.trim()?.length
-                  )
-                "
-              />
-              <FieldSearch @onFieldSelected="insertField" />
-            </div>
-            <Popover
-              placement="top-end"
-              trigger="hover"
-              :matchTargetWidth="true"
-              :hoverDelay="0.25"
-            >
-              <template #target="{ togglePopover }">
-                <div class="p-2">
-                  <FeatherIcon
-                    name="info"
-                    class="h-4 w-4 text-gray-600 cursor-pointer"
-                    @click="togglePopover()"
-                  />
-                </div>
-              </template>
-              <template #body-main>
-                <div
-                  class="p-3 text-ink-gray-6 text-xs flex flex-col gap-2 max-w-[450px] w-full"
-                >
-                  <div>
-                    {{
-                      __(
-                        "Insert dynamic fields like ticket details or user info into your response."
-                      )
-                    }}
-                  </div>
-                  <div>
-                    {{
-                      __(
-                        "Apply rich text formatting by selecting text and using the toolbar options."
-                      )
-                    }}
-                  </div>
-                </div>
-              </template>
-            </Popover>
-          </div>
           <PreviewDialog v-model="previewDialog" />
           <TextEditor
             editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors"
             ref="content"
-            :bubble-menu="menuButtons"
+            :bubble-menu="false"
             :content="cannedResponseData.response"
             @change="
               (val) => {
@@ -132,6 +80,7 @@
                 validateData('response');
               }
             "
+            :fixed-menu="true"
             :placeholder="'Hello {{ customer }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ company }}'"
           />
           <ErrorMessage :message="errors.response" />
@@ -224,7 +173,6 @@ const content = ref();
 const cannedResponseData = ref({
   name: "",
   title: "",
-  subject: "",
   response: "",
   teams: [],
 });
@@ -232,7 +180,6 @@ const isLoading = ref(false);
 const initialData = ref("");
 const errors = ref({
   title: "",
-  subject: "",
   response: "",
 });
 
@@ -247,7 +194,6 @@ const getCannedResponseData = createResource({
     cannedResponseData.value = {
       name: data.name,
       title: data.name,
-      subject: data.subject,
       response: data.response,
       teams:
         data.teams?.map((team) => ({
@@ -318,7 +264,7 @@ const onSave = () => {
   isLoading.value = true;
   validateData();
 
-  if (errors.value.title || errors.value.subject || errors.value.response) {
+  if (errors.value.title || errors.value.response) {
     isLoading.value = false;
     toast.error(__("Please fill all the required fields"));
     return;
@@ -336,7 +282,7 @@ const createCannedResponse = () => {
     {
       name: cannedResponseData.value.title,
       title: cannedResponseData.value.title,
-      subject: cannedResponseData.value.subject,
+      subject: cannedResponseData.value.title,
       response: cannedResponseData.value.response,
       teams: cannedResponseData.value.teams.map((team) => ({
         team: team.value,
@@ -399,7 +345,7 @@ const updateCannedResponse = async () => {
     {
       name: cannedResponseData.value.title,
       title: cannedResponseData.value.title,
-      subject: cannedResponseData.value.subject,
+      subject: cannedResponseData.value.title,
       response: cannedResponseData.value.response,
       teams: cannedResponseData.value.teams.map((team) => ({
         team: team.value,
@@ -424,14 +370,6 @@ const validateData = (key?: string) => {
           errors.value.title = __("Title is required");
         } else {
           errors.value.title = "";
-        }
-        break;
-
-      case "subject":
-        if (!cannedResponseData.value.subject) {
-          errors.value.subject = __("Subject is required");
-        } else {
-          errors.value.subject = "";
         }
         break;
 
