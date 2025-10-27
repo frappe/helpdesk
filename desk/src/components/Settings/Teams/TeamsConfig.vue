@@ -30,7 +30,7 @@ const teams = createListResource({
   cache: ["Teams"],
   fields: ["name"],
   auto: true,
-  orderBy: "creation desc",
+  orderBy: "modified desc",
   start: 0,
   pageLength: 20,
 });

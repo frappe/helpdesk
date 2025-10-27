@@ -14,7 +14,7 @@ const holidayListData = createListResource({
   doctype: "HD Service Holiday List",
   fields: ["name", "description"],
   cache: ["HolidayList"],
-  orderBy: "creation desc",
+  orderBy: "modified desc",
   start: 0,
   pageLength: 999,
   auto: true,
