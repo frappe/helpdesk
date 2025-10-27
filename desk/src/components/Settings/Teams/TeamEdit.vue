@@ -25,46 +25,28 @@
     </template>
     <template #bottom-section>
       <!-- Add member -->
-      <div class="flex flex-col">
-        <div class="flex gap-2 items-end">
-          <!-- Form control for search -->
-          <Link
-            doctype="HD Agent"
-            class="form-control flex-1"
-            :placeholder="__('Search members')"
-            v-model="search"
-            :hide-me="true"
-            :filters="agentFilters"
-          >
-            <template #prefix>
-              <LucideSearch class="h-4 w-4 text-gray-500 mr-2" />
-            </template>
-            <template #item-label="{ option }">
-              <div class="flex items-center justify-between !w-full">
-                <div class="flex items-center gap-1">
-                  <Avatar
-                    :label="option.label || option.value"
-                    :image="getUser(option.label)?.user_image"
-                    size="sm"
-                  />
-                  <p>{{ getUser(option.label)?.full_name || "User" }}</p>
-                </div>
-                <p class="text-gray-600 text-sm">
-                  {{ option.label }}
-                </p>
-              </div>
-            </template>
-          </Link>
-          <Button
-            :label="__('Add')"
-            variant="solid"
-            :disabled="!search"
-            @click="addMember(search)"
-          >
-            <template #prefix>
-              <LucidePlus class="h-4 w-4 stroke-1.5" />
-            </template>
-          </Button>
+      <div class="flex gap-2 items-center">
+        <!-- Form control for search -->
+        <div class="flex flex-col gap-1.5 w-full">
+          <div class="flex gap-2">
+            <div class="flex flex-1">
+              <AgentSelector
+                v-model="invitees"
+                :existing-agents="teamMembers.map((m) => m.name)"
+              />
+            </div>
+            <Button
+              label="Add Member"
+              variant="solid"
+              :disabled="!invitees.length"
+              @click="addMember(invitees)"
+              class="h-8"
+            >
+              <template #prefix>
+                <LucidePlus class="h-4 w-4 stroke-1.5" />
+              </template>
+            </Button>
+          </div>
         </div>
       </div>
     </template>
@@ -81,7 +63,10 @@
             <div class="w-full p-2 pl-0 col-span-8">
               <AgentCard :agent="member" class="!py-0">
                 <template #right>
-                  <Dropdown :options="memberDropdownOptions(member)">
+                  <Dropdown
+                    :options="memberDropdownOptions(member)"
+                    placement="right"
+                  >
                     <Button
                       icon="more-horizontal"
                       variant="ghost"
@@ -133,6 +118,7 @@
           () => {
             team.delete.submit();
             showDelete = false;
+            emit('update:step', 'team-list');
           }
         "
       />
@@ -144,13 +130,13 @@
         v-model="_teamName"
         :label="__('Title')"
         :placeholder="__('Product Experts')"
+        maxlength="50"
       />
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import Link from "@/components/frappe-ui/Link.vue";
 import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
 import {
@@ -162,7 +148,7 @@ import {
   toast,
   Tooltip,
 } from "frappe-ui";
-import { computed, h, markRaw, ref } from "vue";
+import { computed, h, inject, markRaw, onMounted, ref } from "vue";
 import LucideLock from "~icons/lucide/lock";
 import LucideUnlock from "~icons/lucide/unlock";
 import AgentCard from "../AgentCard.vue";
@@ -173,18 +159,25 @@ import UserIcon from "~icons/lucide/user";
 import { ConfirmDelete } from "@/utils";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import { useAgentStore } from "@/stores/agent";
+import AgentSelector from "./components/AgentSelector.vue";
 
 const props = defineProps<{
   teamName: string;
 }>();
 
 interface E {
-  (event: "update:step", value: string): void;
+  (event: "update:step", step: string, team?: string): void;
 }
 const emit = defineEmits<E>();
 
 const { getUser } = useUserStore();
+const { agents } = useAgentStore();
+const teamsList = inject<any>("teamsData");
+
 const { teamRestrictionApplied } = useConfigStore();
+const invitees = ref<string[]>([]);
+
 const _teamName = ref(props.teamName);
 const team = createDocumentResource({
   doctype: "HD Team",
@@ -209,7 +202,6 @@ const ignoreRestrictions = computed({
     });
   },
 });
-const search = ref("");
 
 const teamMembers = computed(() => {
   let users = team.doc?.users || [];
@@ -223,12 +215,6 @@ const teamMembers = computed(() => {
   });
 });
 
-const agentFilters = computed(() => {
-  return {
-    name: ["not in", teamMembers.value.map((user) => user.name)],
-  };
-});
-
 function removeMemberFromTeam(member: string) {
   const users = team.doc?.users?.filter((u) => u.user !== member);
   team.setValue.submit({
@@ -236,12 +222,12 @@ function removeMemberFromTeam(member: string) {
   });
 }
 
-function addMember(user: string) {
-  const users = team.doc.users.concat([{ user }]);
+function addMember(users: string[]) {
+  const _users = team.doc.users.concat(users.map((user) => ({ user })));
   team.setValue.submit({
-    users,
+    users: _users,
   });
-  search.value = "";
+  invitees.value = [];
 }
 
 const showRename = ref(false);
@@ -277,6 +263,7 @@ function renameTeam(close) {
         return __("New and old title cannot be same");
     },
     onSuccess() {
+      teamsList.reload();
       toast.success(__("Team renamed"));
       close();
       emit("update:step", "team-list");
@@ -379,6 +366,11 @@ const memberDropdownOptions = (member) => {
     isConfirmingDelete,
   });
 };
-</script>
 
-<style scoped></style>
+onMounted(() => {
+  if (agents.loading || agents.data?.length || agents.list.promise) {
+    return;
+  }
+  agents.fetch();
+});
+</script>

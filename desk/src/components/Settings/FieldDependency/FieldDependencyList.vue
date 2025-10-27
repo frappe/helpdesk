@@ -84,7 +84,10 @@
               <div class="col-span-2">{{ __("Enabled") }}</div>
             </div>
             <hr class="mt-2 mx-2" />
-            <div v-for="row in fieldDependenciesList.data" :key="row.name">
+            <div
+              v-for="(row, index) in fieldDependenciesList.data"
+              :key="row.name"
+            >
               <div
                 class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded h-12.5"
               >
@@ -130,7 +133,10 @@
                   </div>
                 </div>
               </div>
-              <hr class="mx-2" />
+              <hr
+                v-if="index !== fieldDependenciesList.data.length - 1"
+                class="mx-2"
+              />
             </div>
           </div>
         </div>

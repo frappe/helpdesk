@@ -10,7 +10,7 @@
         :label="__('New')"
         theme="gray"
         variant="solid"
-        @click="() => (showForm = !showForm)"
+        @click="emit('update:step', 'new-team', '')"
         icon-left="plus"
       />
     </template>
@@ -48,7 +48,7 @@
           <div class="ml-2">{{ __("Team name") }}</div>
         </div>
         <hr class="mx-2 mt-2" />
-        <div v-for="team in teams.data" :key="team.name">
+        <div v-for="(team, index) in teams.data" :key="team.name">
           <div
             class="flex items-center cursor-pointer hover:bg-gray-50 rounded h-12.5"
           >
@@ -72,7 +72,7 @@
               </div>
             </div>
           </div>
-          <hr class="mx-2" />
+          <hr v-if="index !== teams.data.length - 1" class="mx-2" />
         </div>
         <!-- Load More Button -->
         <div class="flex justify-center">

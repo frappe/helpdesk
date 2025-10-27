@@ -40,9 +40,9 @@
         <div class="col-span-1">{{ __("Enabled") }}</div>
       </div>
       <hr class="mt-2 mx-2" />
-      <div v-for="sla in slaPolicyList.list.data" :key="sla.name">
+      <div v-for="(sla, index) in slaPolicyList.list.data" :key="sla.name">
         <SlaPolicyListItem :data="sla" />
-        <hr class="mx-2" />
+        <hr v-if="index !== slaPolicyList.list.data.length - 1" class="mx-2" />
       </div>
     </div>
   </div>

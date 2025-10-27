@@ -1,5 +1,6 @@
 <template>
   <TeamsList v-if="step === 'team-list'" @update:step="updateStep" />
+  <NewTeam v-else-if="step === 'new-team'" @update:step="updateStep" />
   <TeamEdit
     v-else-if="step === 'team-edit'"
     @update:step="updateStep"
@@ -12,8 +13,9 @@ import { onMounted, provide, Ref, ref } from "vue";
 import TeamEdit from "./TeamEdit.vue";
 import TeamsList from "./TeamsList.vue";
 import { createListResource } from "frappe-ui";
+import NewTeam from "./NewTeam.vue";
 
-type TeamStep = "team-list" | "team-edit";
+type TeamStep = "team-list" | "team-edit" | "new-team";
 
 const step: Ref<TeamStep> = ref("team-list");
 const teamName: Ref<string> = ref("");

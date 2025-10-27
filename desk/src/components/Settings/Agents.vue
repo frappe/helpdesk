@@ -124,7 +124,7 @@
             <div class="col-span-6 text-p-sm">{{ __("Agent Name") }}</div>
           </div>
           <hr class="mt-2" />
-          <div v-for="agent in agents.data" :key="agent.agent_name">
+          <div v-for="(agent, index) in agents.data" :key="agent.agent_name">
             <div class="flex items-center justify-between h-14 group rounded">
               <div class="flex items-center space-x-3 w-4/5">
                 <Avatar
@@ -175,7 +175,7 @@
                 <Button icon="more-horizontal" variant="ghost" />
               </Dropdown>
             </div>
-            <hr />
+            <hr v-if="index !== agents.data.length - 1" />
           </div>
           <!-- Load More Button -->
           <div class="flex justify-center">
