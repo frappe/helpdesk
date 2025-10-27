@@ -36,9 +36,12 @@
       </div>
       <hr class="mx-2 mt-2" />
       <div>
-        <div v-for="holiday in holidayList.list.data" :key="holiday.name">
+        <div
+          v-for="(holiday, index) in holidayList.list.data"
+          :key="holiday.name"
+        >
           <HolidayListItem :data="holiday" />
-          <hr class="mx-2" />
+          <hr v-if="index !== holidayList.list.data.length - 1" class="mx-2" />
         </div>
       </div>
     </div>

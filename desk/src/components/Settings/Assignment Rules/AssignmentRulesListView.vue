@@ -38,11 +38,11 @@
       </div>
       <hr class="mt-2 mx-2" />
       <div
-        v-for="assignmentRule in assignmentRulesList"
+        v-for="(assignmentRule, index) in assignmentRulesList"
         :key="assignmentRule.name"
       >
         <AssignmentRuleListItem :data="assignmentRule" />
-        <hr class="mx-2" />
+        <hr v-if="index !== assignmentRulesList.length - 1" class="mx-2" />
       </div>
     </div>
   </div>
