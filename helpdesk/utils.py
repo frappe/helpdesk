@@ -207,9 +207,6 @@ def is_outside_working_hours():
     sla_doc = frappe.db.get_value(
         "HD Service Level Agreement", {"default_sla": 1}, "name"
     )
-    
-    settings = frappe.get_single("HD Settings")
-
 
     if sla_doc:
         sla = frappe.get_doc("HD Service Level Agreement", sla_doc)
@@ -242,16 +239,7 @@ def is_outside_working_hours():
     if current_weekday in [5, 6]:
         return True
 
-
-    if settings.working_hours_start and settings.working_hours_end:
-        working_start = get_time(settings.working_hours_start)
-        working_end = get_time(settings.working_hours_end)
-
-        if not (working_start <= current_time.time() < working_end):
-            return True
-    else:
-        # Default 9 AM to 6 PM
-        if not (9 <= current_time.hour < 18):
+    if not (9 <= current_time.hour < 18):
             return True
 
     return False
