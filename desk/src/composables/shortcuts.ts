@@ -12,6 +12,8 @@ interface ShortcutBinding {
 
 export const shortcutsList = ref<ShortcutBinding[]>([]);
 
+// Registers a keyboard shortcut and its callback
+// can take either a string (key) or a ShortcutBinding object, e.g., 'k' or { key: 'k', cmnd: true }
 export const useShortcut = (
   binding: string | ShortcutBinding,
   cb: Function
@@ -29,7 +31,7 @@ export const useShortcut = (
       return; // Don't trigger shortcuts when typing, or in modals/menus
     }
 
-    if (executeHandler(e, shortcutBinding)) {
+    if (checkKeyCombination(e, shortcutBinding)) {
       try {
         e.preventDefault();
         cb();
@@ -126,7 +128,7 @@ function disableShortcuts(): boolean {
   );
 }
 
-function executeHandler(
+function checkKeyCombination(
   e: KeyboardEvent,
   shortcutBinding: ShortcutBinding
 ): boolean {
@@ -141,11 +143,45 @@ function executeHandler(
     return; // Ignore modifier key events
   }
 
-  const keyMatches = e.key.toLowerCase() === shortcutBinding.key.toLowerCase();
   const shiftMatches = shortcutBinding.shift ? e.shiftKey : !e.shiftKey;
   const ctrlMatches = shortcutBinding.ctrl ? e.ctrlKey : !e.ctrlKey;
   const altMatches = shortcutBinding.alt ? e.altKey : !e.altKey;
   const metaMatches = shortcutBinding.meta ? e.metaKey : !e.metaKey;
+
+  // Normalize keys that have different values with Shift modifier
+  // e.g., "." becomes ">" on Windows/Linux when Shift is pressed
+  const normalizeKey = (key: string): string => {
+    const shiftKeyMap: Record<string, string> = {
+      ">": ".",
+      "<": ",",
+      "?": "/",
+      ":": ";",
+      '"': "'",
+      "{": "[",
+      "}": "]",
+      "|": "\\",
+      "+": "=",
+      _: "-",
+      "!": "1",
+      "@": "2",
+      "#": "3",
+      $: "4",
+      "%": "5",
+      "^": "6",
+      "&": "7",
+      "*": "8",
+      "(": "9",
+      ")": "0",
+    };
+    return shiftKeyMap[key] || key;
+  };
+
+  const normalizedEventKey = normalizeKey(e.key.toLowerCase());
+  const normalizedBindingKey = shortcutBinding.key.toLowerCase();
+  const keyMatches =
+    normalizedEventKey === normalizedBindingKey ||
+    e.key.toLowerCase() === normalizedBindingKey;
+
   matches =
     keyMatches && shiftMatches && ctrlMatches && altMatches && metaMatches;
 
