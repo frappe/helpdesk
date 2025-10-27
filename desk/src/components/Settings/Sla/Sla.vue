@@ -14,7 +14,7 @@ const slaPolicyListData = createListResource({
   doctype: "HD Service Level Agreement",
   fields: ["name", "default_sla", "enabled", "description"],
   cache: ["SLAPolicyList"],
-  orderBy: "creation desc",
+  orderBy: "modified desc",
   start: 0,
   pageLength: 999,
   auto: true,
