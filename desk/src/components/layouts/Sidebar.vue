@@ -166,11 +166,11 @@
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
 import Apps from "@/components/Apps.vue";
-import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
-import SettingsModal from "@/components/Settings/SettingsModal.vue";
-import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
-import UserMenu from "@/components/UserMenu.vue";
 import CP from "@/components/command-palette/CP.vue";
+import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
+import SettingsModal from "@/components/Settings/SettingsModal.vue";
+import UserMenu from "@/components/UserMenu.vue";
 import { useDevice } from "@/composables";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useScreenSize } from "@/composables/screen";
@@ -206,8 +206,8 @@ import {
   customerPortalSidebarOptions,
 } from "./layoutSettings";
 
-import { globalStore } from "@/stores/globalStore";
 import { useShortcut } from "@/composables/shortcuts";
+import { useTelephonyStore } from "@/stores/telephony";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
@@ -222,7 +222,6 @@ import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
-import { useTelephonyStore } from "@/stores/telephony";
 import { setActiveSettingsTab } from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
@@ -646,5 +645,9 @@ onMounted(() => {
   useShortcut({ key: ",", meta: true }, () => {
     showSettingsModal.value = !showSettingsModal.value;
   });
+});
+
+useShortcut({ key: "h", meta: true }, () => {
+  showHelpModal.value = !showHelpModal.value;
 });
 </script>

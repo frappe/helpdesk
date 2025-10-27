@@ -64,11 +64,11 @@
 </template>
 
 <script setup lang="ts">
+import { useShortcut } from "@/composables/shortcuts";
 import { TicketSymbol } from "@/types";
 import { copyToClipboard } from "@/utils";
 import { dayjs } from "frappe-ui";
 import Badge from "frappe-ui/src/components/Badge/Badge.vue";
-import { useShortcut } from "@/composables/shortcuts";
 import { computed, inject } from "vue";
 
 const ticket = inject(TicketSymbol);
@@ -188,5 +188,3 @@ useShortcut({ meta: true, key: "." }, () => {
   );
 });
 </script>
-
-<style scoped></style>
