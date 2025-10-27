@@ -4,7 +4,7 @@
     :options="{ title: 'Keyboard Shortcuts', size: '4xl' }"
   >
     <template #body-content>
-      <div v-focus class="w-full grid grid-cols-2 gap-10 py-1">
+      <div class="w-full grid grid-cols-2 gap-10 py-1 shortcutsModal">
         <div
           v-for="group in shortcutGroups"
           :key="group.title"
@@ -27,7 +27,11 @@
                 <span
                   v-for="(key, kIndex) in shortcut.keys"
                   :key="kIndex"
-                  class="px-2 py-0.5 bg-surface-gray-2 border border-outline-gray-2 text-xs rounded-sm font-mono text-ink-gray-8 shadow-sm"
+                  class="bg-surface-gray-2 border border-outline-gray-2 text-xs rounded-sm text-ink-gray-8 shadow-sm min-w-5 h-5 flex items-center justify-center"
+                  :class="[
+                    ![metaIcon, shiftKey].includes(key) && 'w-5 ',
+                    key === shiftKey && '!px-2',
+                  ]"
                 >
                   {{ key }}
                 </span>
@@ -50,6 +54,7 @@ const props = defineProps({
   modelValue: Boolean,
 });
 const emit = defineEmits(["update:modelValue"]);
+const open = defineModel<boolean>();
 
 const { metaIcon } = useDevice();
 
@@ -74,6 +79,7 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
       { keys: [metaIcon, "K"], description: "Open command palette" },
       { keys: [metaIcon, ","], description: "Open settings" },
       { keys: [metaIcon, "/"], description: "Show keyboard shortcuts" },
+      { keys: [metaIcon, "H"], description: "Open help" },
     ],
   },
   {
@@ -106,10 +112,13 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
   },
 ]);
 
-const open = defineModel<boolean>();
-
-// Add shortcut to open/close the modal
 useShortcut({ key: "/", meta: true }, () => {
   open.value = !open.value;
 });
 </script>
+<style>
+/* Hack to remove focus ring from buttons in shortcuts modal */
+.bg-surface-modal:has(.shortcutsModal) button {
+  @apply focus-visible:ring-0;
+}
+</style>
