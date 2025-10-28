@@ -8,7 +8,7 @@
               <LucideSearch class="h-4 w-4" />
             </div>
             <ComboboxInput
-              placeholder="Search tickets, emails, comments, or #234 to navigate to ticket"
+              placeholder="Search or type # to go to ticket"
               class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-gray-800 placeholder:text-gray-500 focus:ring-0"
               autocomplete="off"
               @input="onInput"
@@ -61,17 +61,28 @@ import {
 } from "@headlessui/vue";
 import { useDevice } from "@/composables";
 import { useShortcut } from "@/composables/shortcuts";
+import { useTranslation } from "@/composables/useTranslation";
 
 import { Dialog } from "frappe-ui";
 import { computed, h, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
 import LucideBookOpen from "~icons/lucide/book-open";
+import LucideFileSearch from "~icons/lucide/file-search";
+import LucideSearch from "~icons/lucide/search";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import LucideTicket from "~icons/lucide/ticket";
 import CPGroup from "./CPGroup.vue";
 const router = useRouter();
 const { isMac } = useDevice();
+
+// Reactive translations
+const tGoToTicket = useTranslation("Go to Ticket");
+const tTickets = useTranslation("Tickets");
+const tKnowledgeBase = useTranslation("Knowledge Base");
+const tJumpTo = useTranslation("Jump to");
+const tSearch = useTranslation("Search");
+const tSearchFor = useTranslation("Search for");
 
 // Reactive data
 const show = defineModel();
@@ -82,7 +93,7 @@ const navigationItems = computed(() => {
   const items = [];
   if (query.value.startsWith("#")) {
     items.push({
-      title: `Go to Ticket #${query.value.slice(1)}`,
+      title: `${tGoToTicket.value} #${query.value.slice(1)}`,
       icon: () => h(LucideTicket),
       route: {
         name: "TicketAgent",
@@ -91,13 +102,13 @@ const navigationItems = computed(() => {
     });
   } else {
     items.push({
-      title: "Tickets",
+      title: tTickets.value,
       icon: () => h(LucideTicket),
       route: { name: "TicketsAgent" },
     });
   }
   items.push({
-    title: "Knowledge Base",
+    title: tKnowledgeBase.value,
     icon: () => h(LucideBookOpen),
     route: {
       name: isCustomerPortal.value
@@ -107,19 +118,19 @@ const navigationItems = computed(() => {
   });
 
   return {
-    title: "Jump to",
+    title: tJumpTo.value,
     component: h(CPGroup),
     items,
   };
 });
 
 const fullSearchItem = computed(() => ({
-  title: "Search",
+  title: tSearch.value,
   hideTitle: true,
   component: h(CPGroup),
   items: [
     {
-      title: `Search for "${query.value}"`,
+      title: `${tSearchFor.value} "${query.value}"`,
       icon: () => h(LucideFileSearch),
       route: { name: "SearchAgent", query: { q: query.value } },
     },

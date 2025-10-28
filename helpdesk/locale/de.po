@@ -3084,3 +3084,19 @@ msgstr "Neuer Kunde"
 msgid "No Customers Found"
 msgstr "Keine Kunden gefunden"
 
+#: desk/src/components/command-palette/CP.vue
+msgid "Go to Ticket"
+msgstr "Gehe zu Ticket"
+
+#: desk/src/components/command-palette/CP.vue
+msgid "Jump to"
+msgstr "Springen zu"
+
+#: desk/src/components/command-palette/CP.vue
+msgid "Search"
+msgstr "Suchen"
+
+#: desk/src/components/command-palette/CP.vue
+msgid "Search for"
+msgstr "Suchen nach"
+
