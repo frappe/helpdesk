@@ -2,11 +2,11 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Customers</div>
+        <div class="text-lg font-medium text-gray-900">{{ __("Customers") }}</div>
       </template>
       <template #right-header>
         <Button
-          label="New customer"
+          :label="__('New customer')"
           theme="gray"
           variant="solid"
           @click="isDialogVisible = !isDialogVisible"
@@ -40,6 +40,7 @@
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
+import { __ } from "@/translation";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CustomerDialog from "./CustomerDialog.vue";
@@ -79,14 +80,14 @@ const options = computed(() => {
       },
     },
     emptyState: {
-      title: "No Customers Found",
+      title: __("No Customers Found"),
     },
   };
 });
 
 usePageMeta(() => {
   return {
-    title: "Customers",
+    title: __("Customers"),
   };
 });
 </script>

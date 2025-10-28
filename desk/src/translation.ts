@@ -1,5 +1,9 @@
 import { createResource } from "frappe-ui";
 import type { App } from "vue";
+import { ref } from "vue";
+
+// Reactive signal for when translations are loaded
+export const translationsLoaded = ref(false);
 
 function getTranslatedMessage(message: string): string {
     const translatedMessages = (("translatedMessages" in window ? window["translatedMessages"] : null) ?? {}) as Record<string, string>;
@@ -9,6 +13,10 @@ function getTranslatedMessage(message: string): string {
 function translate(message: string): string;
 function translate(message: string, ...args: string[]): string;
 function translate(message: string, ...args: string[]): string {
+    // Access the ref to create dependency for computed properties
+    if (translationsLoaded.value) {
+        // This ensures computed properties re-evaluate when translations load
+    }
     const translatedMessage = getTranslatedMessage(message)
     if (args.length === 0) {
         return translatedMessage;
@@ -28,6 +36,7 @@ function fetchTranslations() {
         auto: true,
         transform(data: Record<string, string>) {
             (window as any).translatedMessages = data;
+            translationsLoaded.value = true;
         }
     });
 }
