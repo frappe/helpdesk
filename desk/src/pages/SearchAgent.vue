@@ -203,6 +203,7 @@
 <script setup lang="ts">
 import { LayoutHeader } from "@/components";
 import SearchMultiSelect from "@/components/SearchMultiSelect.vue";
+import { useShortcut } from "@/composables/shortcuts";
 import dayjs from "dayjs";
 import {
   Breadcrumbs,
@@ -211,9 +212,8 @@ import {
   ErrorMessage,
   TextInput,
 } from "frappe-ui";
-import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from "vue";
+import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useShortcut } from "@/composables/shortcuts";
 // Icons
 
 // Type Definitions
@@ -516,14 +516,6 @@ watch(
   }
 );
 
-function addFocusShortcut() {
-  nextTick(() => {
-    useShortcut("/", () => {
-      searchInput.value.el.focus();
-    });
-  });
-}
-
 // Lifecycle
 onMounted(() => {
   const searchQuery = route.query.q as string;
@@ -536,6 +528,8 @@ onMounted(() => {
     clearStoredSearches();
   }
   // add a shortcut when presses "/" focus on this element
-  addFocusShortcut();
+  useShortcut("/", () => {
+    searchInput.value.el.focus();
+  });
 });
 </script>
