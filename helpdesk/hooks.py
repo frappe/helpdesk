@@ -6,7 +6,7 @@ app_icon = "octicon octicon-file-directory"
 app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
-required_apps = ["telephony"]
+required_apps = ["frappe/telephony"]
 
 add_to_apps_screen = [
     {
