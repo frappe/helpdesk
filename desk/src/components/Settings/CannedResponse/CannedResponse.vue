@@ -17,7 +17,7 @@ const cannedResponseSearchQuery = ref("");
 
 const cannedResponseListData = createListResource({
   doctype: "Email Template",
-  fields: ["name", "subject", "response", "teams"],
+  fields: ["name", "scope"],
   filters: {
     reference_doctype: "HD Ticket",
   },

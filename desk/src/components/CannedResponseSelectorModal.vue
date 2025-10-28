@@ -2,101 +2,78 @@
   <Dialog
     v-model="show"
     :options="{
-      title: 'Canned Responses',
       size: '4xl',
     }"
   >
-    <template #body-content>
-      <div class="flex items-center gap-2">
-        <TextInput
-          class="w-full"
-          ref="searchInput"
-          v-model="search"
-          type="text"
-          :placeholder="'Site Down'"
-        >
-          <template #prefix>
-            <FeatherIcon name="search" class="h-4 w-4 text-gray-500" />
-          </template>
-        </TextInput>
-        <Popover placement="bottom-end">
-          <template #target="{ togglePopover }">
-            <Button label="Teams" icon-left="filter" @click="togglePopover()">
-              <template #suffix>
-                <div
-                  class="flex items-center rounded-full bg-gray-300 justify-center text-xs size-5"
-                >
-                  {{ teamsList.length }}
-                </div>
+    <template #body>
+      <div :style="{ height: 'calc(100vh - 8rem)' }">
+        <div class="flex items-center justify-between w-full p-4 pb-2">
+          <div class="text-2xl font-semibold">Canned Responses</div>
+          <Button
+            variant="solid"
+            icon-left="plus"
+            label="New"
+            @click="onNewCannedResponseClick"
+          />
+        </div>
+        <div class="p-4">
+          <div class="flex items-center gap-2">
+            <TextInput
+              class="w-full"
+              ref="searchInput"
+              v-model="search"
+              type="text"
+              :placeholder="'Site Down'"
+            >
+              <template #prefix>
+                <FeatherIcon name="search" class="h-4 w-4 text-gray-500" />
               </template>
-            </Button>
-          </template>
-          <template #body-main>
-            <div class="p-2 text-ink-gray-9 w-52 overflow-y-auto max-h-60">
+            </TextInput>
+            <Dropdown :options="filters" placement="right">
+              <Button :label="activeFilter" icon-left="filter" />
+            </Dropdown>
+          </div>
+        </div>
+        <div class="px-4 h-full overflow-y-auto">
+          <div
+            v-if="filteredTemplates.length"
+            class="grid grid-cols-1 md:grid-cols-3 gap-2 pb-36"
+          >
+            <div
+              v-for="template in filteredTemplates"
+              :key="template.name"
+              class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-gray-100 relative"
+              @click="onTemplateSelect(template)"
+            >
+              <div class="text-base font-semibold truncate border-b pb-2">
+                {{ template.name }}
+              </div>
+              <TextEditor
+                v-if="template.response"
+                :content="template.response"
+                :editable="false"
+                editor-class="!prose-sm max-w-none !text-sm text-gray-600 focus:outline-none"
+                class="flex-1 overflow-hidden"
+              />
               <div
-                v-for="team in teamsListResource.data"
-                :key="team.name"
-                class="p-2 cursor-pointer hover:bg-gray-50 text-base flex items-center justify-between rounded select-none"
-                @click="toggleTeamToFilter(team.name)"
+                v-if="
+                  selectedTemplate.name === template.name &&
+                  selectedTemplate.isLoading
+                "
+                class="flex items-center justify-center absolute top-0 left-0 w-full h-full bg-black/20 rounded-lg"
               >
-                <span class="truncate">
-                  {{ team.name }}
-                </span>
-                <FeatherIcon
-                  v-if="isTeamInFilter(team.name)"
-                  name="check"
-                  class="size-4"
-                />
+                <LoadingIndicator class="size-4" />
               </div>
             </div>
-          </template>
-        </Popover>
-      </div>
-      <div
-        v-if="filteredTemplates.length"
-        class="mt-2 grid max-h-[560px] grid-cols-1 md:grid-cols-3 gap-2 overflow-y-auto"
-      >
-        <div
-          v-for="template in filteredTemplates"
-          :key="template.name"
-          class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-gray-100 relative"
-          @click="onTemplateSelect(template)"
-        >
-          <div class="flex flex-col pb-2 border-b gap-0.5">
-            <div class="text-base font-semibold truncate">
-              {{ template.name }}
-            </div>
-            <div class="text-xs text-gray-500 truncate">
-              {{ template.teams?.join(", ") || "No team" }}
+          </div>
+          <div v-else class="mt-2">
+            <div class="flex h-56 flex-col items-center justify-center">
+              <div class="text-p-sm text-gray-500">
+                {{ "No Canned Responses found" }}
+              </div>
             </div>
           </div>
-          <TextEditor
-            v-if="template.response"
-            :content="template.response"
-            :editable="false"
-            editor-class="!prose-sm max-w-none !text-sm text-gray-600 focus:outline-none"
-            class="flex-1 overflow-hidden"
-          />
-          <div
-            v-if="
-              selectedTemplate.name === template.name &&
-              selectedTemplate.isLoading
-            "
-            class="flex items-center justify-center absolute top-0 left-0 w-full h-full bg-black/20 rounded-lg"
-          >
-            <LoadingIndicator class="size-4" />
-          </div>
         </div>
-      </div>
-      <div v-else class="mt-2">
-        <div class="flex h-56 flex-col items-center justify-center">
-          <div class="text-p-sm text-gray-500">
-            {{ "No Canned Responses found" }}
-          </div>
-        </div>
-      </div>
-      <div class="flex justify-end mt-4">
-        <Button label="New Canned Response" @click="onNewCannedResponseClick" />
       </div>
     </template>
   </Dialog>
@@ -104,11 +81,11 @@
 
 <script setup lang="ts">
 import {
+  Button,
+  Dropdown,
   FeatherIcon,
   LoadingIndicator,
-  Popover,
   TextEditor,
-  createListResource,
   createResource,
 } from "frappe-ui";
 import { ref, computed, nextTick, watch, onUnmounted } from "vue";
@@ -135,32 +112,26 @@ const props = defineProps({
 
 const show = defineModel();
 const searchInput = ref("");
-const teamsList = ref([...auth.userTeams.value, "No team"]);
+const activeFilter = ref("My Team");
 
-const teamsListResource = createListResource({
-  doctype: "HD Team",
-  fields: ["name"],
-  auto: true,
-  transform: (data) => {
-    return [{ name: "No team" }, ...data];
+const filters = [
+  {
+    label: "My Team",
+    onClick: () => (activeFilter.value = "My Team"),
   },
-});
+  {
+    label: "Global",
+    onClick: () => (activeFilter.value = "Global"),
+  },
+  {
+    label: "Personal",
+    onClick: () => (activeFilter.value = "Personal"),
+  },
+];
 
-const isTeamInFilter = (teamName: string) => {
-  return teamsList.value.includes(teamName);
-};
-
-const toggleTeamToFilter = (teamName: string) => {
-  if (teamsList.value.includes(teamName)) {
-    teamsList.value = teamsList.value.filter((team) => team !== teamName);
-  } else {
-    teamsList.value = [...teamsList.value, teamName];
-  }
-};
-
-watch(teamsList, () => {
+watch(activeFilter, () => {
   cannedResponsesResource.reload({
-    teams: teamsList.value,
+    scope: activeFilter.value,
   });
 });
 
@@ -176,7 +147,7 @@ const selectedTemplate = ref({
 const cannedResponsesResource = createResource({
   url: "helpdesk.api.canned_response.get_canned_responses",
   params: {
-    teams: teamsList.value,
+    scope: activeFilter.value,
   },
   onSuccess: (data) => {
     cannedResponsesList.value = data;

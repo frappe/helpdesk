@@ -55,7 +55,7 @@
           !cannedResponseListData.list.loading &&
           !cannedResponseListData.list.data?.length
         "
-        class="flex flex-col items-center justify-center gap-4 p-4 h-[500px]"
+        class="flex flex-col items-center justify-center gap-4 p-4 h-[300px]"
       >
         <div
           class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
@@ -78,16 +78,19 @@
         />
       </div>
       <div v-else class="-ml-2">
-        <div class="flex text-sm text-gray-600">
-          <div class="ml-2">{{ __("Name") }}</div>
+        <div
+          class="grid grid-cols-12 items-center gap-3 text-sm text-gray-600 ml-2"
+        >
+          <div class="col-span-9">{{ __("Name") }}</div>
+          <div class="col-span-3">{{ __("Scope") }}</div>
         </div>
         <hr class="mt-2 mx-2" />
         <div
-          v-for="cannedResponse in cannedResponseListData.data"
+          v-for="(cannedResponse, index) in cannedResponseListData.data"
           :key="cannedResponse.name"
         >
           <div
-            class="flex items-center cursor-pointer hover:bg-gray-50 rounded"
+            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
           >
             <div
               @click="
@@ -96,35 +99,37 @@
                   data: cannedResponse,
                 }
               "
-              class="w-full px-2 flex flex-col justify-center h-14"
+              class="w-full px-2 flex flex-col justify-center h-12.5 col-span-9"
             >
               <div
-                class="text-base text-ink-gray-7 font-medium flex items-center gap-2"
+                class="text-base text-ink-gray-7 font-medium w-full truncate"
               >
                 {{ cannedResponse.name }}
               </div>
-              <div
-                v-if="
-                  cannedResponse.subject && cannedResponse.subject.length > 0
-                "
-                class="text-sm w-full text-ink-gray-5 mt-1 whitespace-nowrap overflow-ellipsis overflow-hidden"
-              >
-                {{ cannedResponse.subject }}
-              </div>
             </div>
-            <Dropdown
-              placement="right"
-              :options="dropdownOptions(cannedResponse)"
+            <div
+              class="flex justify-between items-center w-full pr-2 col-span-3"
             >
-              <Button
-                icon="more-horizontal"
-                variant="ghost"
-                @click="isConfirmingDelete = false"
-                class="mr-2"
-              />
-            </Dropdown>
+              <div class="text-sm text-ink-gray-7">
+                {{ cannedResponse.scope }}
+              </div>
+              <Dropdown
+                placement="right"
+                :options="dropdownOptions(cannedResponse)"
+              >
+                <Button
+                  icon="more-horizontal"
+                  variant="ghost"
+                  @click="isConfirmingDelete = false"
+                  class="mr-2"
+                />
+              </Dropdown>
+            </div>
           </div>
-          <hr class="mx-2" />
+          <hr
+            v-if="index !== cannedResponseListData.data.length - 1"
+            class="mx-2"
+          />
         </div>
       </div>
     </template>
@@ -242,6 +247,7 @@ const duplicate = async () => {
 
 watch(cannedResponseSearchQuery, (newValue) => {
   cannedResponseListData.filters = {
+    ...cannedResponseListData.filters,
     name: ["like", `%${newValue}%`],
   };
   if (!newValue) {
