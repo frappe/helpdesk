@@ -47,8 +47,9 @@
 <script setup lang="ts">
 import { useDevice } from "@/composables/device";
 import { useShortcut } from "@/composables/shortcuts";
+import { isCustomerPortal } from "@/utils";
 import { Dialog } from "frappe-ui";
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 const props = defineProps({
   modelValue: Boolean,
@@ -112,8 +113,11 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
   },
 ]);
 
-useShortcut({ key: "/", meta: true }, () => {
-  open.value = !open.value;
+onMounted(() => {
+  if (isCustomerPortal.value) return;
+  useShortcut({ key: "/", meta: true }, () => {
+    open.value = !open.value;
+  });
 });
 </script>
 <style>
