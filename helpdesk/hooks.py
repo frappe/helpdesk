@@ -61,6 +61,7 @@ doc_events = {
     },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
+        "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
     "HD Ticket": {
         "on_trash": [
