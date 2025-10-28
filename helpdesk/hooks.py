@@ -32,7 +32,6 @@ sqlite_search = ["helpdesk.search_sqlite.HelpdeskSearch"]
 scheduler_events = {
     "all": [
         "helpdesk.search.build_index_if_not_exists",
-        "helpdesk.search_sqlite.build_index_if_not_exists",
         "helpdesk.search.download_corpus",
     ],
     "daily": [
