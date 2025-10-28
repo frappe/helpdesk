@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { AssigneeSymbol, TicketSymbol } from "@/types";
+import { ActivitiesSymbol, AssigneeSymbol, TicketSymbol } from "@/types";
 import { Popover } from "frappe-ui";
 import { inject, nextTick, onMounted, useTemplateRef } from "vue";
 import { useShortcut } from "@/composables/shortcuts";
@@ -59,7 +59,7 @@ import MultipleAvatar from "../MultipleAvatar.vue";
 import AssignToBody from "./AssignToBody.vue";
 const ticket = inject(TicketSymbol);
 const assignees = inject(AssigneeSymbol);
-
+const activities = inject(ActivitiesSymbol);
 async function saveAssignees(
   addedAssignees,
   removedAssignees,
@@ -68,6 +68,7 @@ async function saveAssignees(
 ) {
   removedAssignees.length && (await removeAssignees.submit(removedAssignees));
   addedAssignees.length && (await addAssignees.submit(addedAssignees));
+  activities.value.reload();
 }
 
 const assignToRef = useTemplateRef("assigneeButton");

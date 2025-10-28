@@ -174,7 +174,7 @@ async function updateAssignees() {
   if (addedAssignees.length || removedAssignees.length) {
     let logMessage = `${
       addedAssignees.length ? `assigned ${addedAssignees.join(", ")}` : ""
-    } ${removeAssignees.length ? " & " : ""} ${
+    } ${addedAssignees.length && removedAssignees.length ? " & " : ""} ${
       removedAssignees.length ? `unassigned ${removedAssignees.join(", ")}` : ""
     }`;
     call("frappe.client.insert", {
@@ -197,7 +197,7 @@ async function updateAssignees() {
       await removeAssignees.submit(removedAssignees);
     }
     if (addedAssignees.length) {
-      addAssignees.submit(addedAssignees);
+      await addAssignees.submit(addedAssignees);
     }
   }
 }

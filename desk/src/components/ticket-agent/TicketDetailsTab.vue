@@ -67,6 +67,7 @@ import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
 import { getMeta } from "@/stores/meta";
 import {
+  ActivitiesSymbol,
   AssigneeSymbol,
   CustomizationSymbol,
   FieldValue,
@@ -80,6 +81,7 @@ import TicketContact from "./TicketContact.vue";
 const ticket = inject(TicketSymbol);
 const assignees = inject(AssigneeSymbol);
 const customizations = inject(CustomizationSymbol);
+const activities = inject(ActivitiesSymbol);
 const { getFields, getField } = getMeta("HD Ticket");
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
 
@@ -178,6 +180,7 @@ function handleFieldUpdate(
         if (fieldname === "agent_group") {
           assignees.value.reload();
         }
+        activities.value.reload();
       },
     }
 
