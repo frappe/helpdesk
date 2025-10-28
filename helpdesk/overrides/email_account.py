@@ -45,6 +45,7 @@ class CustomEmailAccount(EmailAccount):
                         ).format(index, e),
                         message=frappe.get_traceback(),
                     )
+                    self.handle_bad_emails(index, message, frappe.get_traceback())
                     continue
 
         if not self.enable_incoming:
