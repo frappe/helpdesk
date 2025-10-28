@@ -34,11 +34,16 @@
 </template>
 
 <script setup lang="ts">
+import { useShortcut } from "@/composables/shortcuts";
 import {
   ticketsToNavigate,
   useTicketNavigation,
 } from "@/composables/useTicketNavigation";
+<<<<<<< HEAD
 import { computed } from "vue";
+=======
+import { computed, onMounted, ref } from "vue";
+>>>>>>> 8b1bd753 (fix: remove unwanted imports)
 import LucideChevronLeft from "~icons/lucide/chevron-left";
 import LucideChevronRight from "~icons/lucide/chevron-right";
 

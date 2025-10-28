@@ -69,7 +69,11 @@ import {
   FieldValue,
   TicketSymbol,
 } from "@/types";
+<<<<<<< HEAD
 import { computed, inject } from "vue";
+=======
+import { computed, inject, ref } from "vue";
+>>>>>>> 8b1bd753 (fix: remove unwanted imports)
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";

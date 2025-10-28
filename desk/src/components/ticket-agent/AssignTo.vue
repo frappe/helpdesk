@@ -49,9 +49,16 @@
 </template>
 
 <script setup lang="ts">
+<<<<<<< HEAD
 import { AssigneeSymbol, TicketSymbol } from "@/types";
 import { Popover } from "frappe-ui";
 import { inject } from "vue";
+=======
+import { useShortcut } from "@/composables/shortcuts";
+import { ActivitiesSymbol, AssigneeSymbol, TicketSymbol } from "@/types";
+import { Popover } from "frappe-ui";
+import { inject, useTemplateRef } from "vue";
+>>>>>>> 8b1bd753 (fix: remove unwanted imports)
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import AssignToBody from "./AssignToBody.vue";
