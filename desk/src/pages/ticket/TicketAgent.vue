@@ -31,7 +31,7 @@ import {
   TicketContactSymbol,
   TicketSymbol,
 } from "@/types";
-import { createResource, toast } from "frappe-ui";
+import { createResource, toast, usePageMeta } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, provide, watch } from "vue";
 import { useRoute } from "vue-router";
 import { showCommentBox, showEmailBox } from "./modalStates";
@@ -123,6 +123,12 @@ onBeforeUnmount(() => {
   stopViewing(props.ticketId);
   showEmailBox.value = false;
   showCommentBox.value = false;
+});
+
+usePageMeta(() => {
+  return {
+    title: props.ticketId,
+  };
 });
 </script>
 

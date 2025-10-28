@@ -214,10 +214,6 @@ import {
 } from "frappe-ui";
 import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-<<<<<<< HEAD
-
-=======
->>>>>>> 8b1bd753 (fix: remove unwanted imports)
 // Icons
 
 // Type Definitions
@@ -520,20 +516,6 @@ watch(
   }
 );
 
-<<<<<<< HEAD
-function addFocusShortcut() {
-  nextTick(() => {
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "/") {
-        e.preventDefault();
-        searchInput.value.el.focus();
-      }
-    });
-  });
-}
-
-=======
->>>>>>> 8b1bd753 (fix: remove unwanted imports)
 // Lifecycle
 onMounted(() => {
   const searchQuery = route.query.q as string;

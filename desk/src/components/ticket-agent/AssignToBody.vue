@@ -19,6 +19,7 @@
         <div
           class="w-full min-h-12 flex flex-wrap items-center gap-1.5 p-1.5 pb-5 rounded-lg bg-surface-gray-2 cursor-text"
           @click.stop="togglePopover"
+          ref="input"
         >
           <Tooltip
             :text="assignee.name"
@@ -74,7 +75,7 @@ import Link from "@/components/frappe-ui/Link.vue";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { Tooltip, Switch, createResource, call } from "frappe-ui";
-import { ref, watch } from "vue";
+import { ref, watch, useTemplateRef, nextTick } from "vue";
 
 const props = defineProps({
   doctype: {
@@ -173,7 +174,7 @@ async function updateAssignees() {
   if (addedAssignees.length || removedAssignees.length) {
     let logMessage = `${
       addedAssignees.length ? `assigned ${addedAssignees.join(", ")}` : ""
-    } ${removeAssignees.length ? " & " : ""} ${
+    } ${addedAssignees.length && removedAssignees.length ? " & " : ""} ${
       removedAssignees.length ? `unassigned ${removedAssignees.join(", ")}` : ""
     }`;
     call("frappe.client.insert", {
@@ -196,7 +197,7 @@ async function updateAssignees() {
       await removeAssignees.submit(removedAssignees);
     }
     if (addedAssignees.length) {
-      addAssignees.submit(addedAssignees);
+      await addAssignees.submit(addedAssignees);
     }
   }
 }
@@ -220,5 +221,10 @@ const removeAssignees = createResource({
     name: props.docname,
     assignees: removedAssignees,
   }),
+});
+
+const targetRef = useTemplateRef("input");
+nextTick(() => {
+  targetRef.value.click();
 });
 </script>

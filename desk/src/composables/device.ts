@@ -12,6 +12,7 @@ export function useDevice() {
   const metaKey = isMac ? "⌘" : "Meta";
   const modifier = isMac ? "meta" : "control";
   const modifierIcon = isMac ? LucideCommand : LucideChevronUp;
+  const metaIcon = isMac ? "⌘" : "Ctrl";
   return {
     altKey,
     controlKey,
@@ -19,5 +20,6 @@ export function useDevice() {
     metaKey,
     modifier,
     modifierIcon,
+    metaIcon,
   };
 }

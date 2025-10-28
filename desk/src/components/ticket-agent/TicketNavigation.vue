@@ -39,11 +39,7 @@ import {
   ticketsToNavigate,
   useTicketNavigation,
 } from "@/composables/useTicketNavigation";
-<<<<<<< HEAD
-import { computed } from "vue";
-=======
 import { computed, onMounted, ref } from "vue";
->>>>>>> 8b1bd753 (fix: remove unwanted imports)
 import LucideChevronLeft from "~icons/lucide/chevron-left";
 import LucideChevronRight from "~icons/lucide/chevron-right";
 
@@ -55,6 +51,9 @@ const {
   getPreviousTicket,
 } = useTicketNavigation();
 
+const leftArrowRef = ref(null);
+const rightArrowRef = ref(null);
+
 const disableLeftCondition = computed(() => {
   if (ticketsToNavigate.loading || !ticketsToNavigate.data?.length) return true;
 
@@ -65,5 +64,20 @@ const disableRightCondition = computed(() => {
   if (ticketsToNavigate.loading || !ticketsToNavigate.data?.length) return true;
   if (ticketsToNavigate.data.length <= 1) return true;
   return currentTicketIndex.value >= ticketsToNavigate.data.length - 1;
+});
+
+onMounted(() => {
+  // Register shortcuts and store cleanup functions
+  useShortcut({ key: ">", shift: true }, () => {
+    if (!disableRightCondition.value) {
+      goToNextTicket();
+    }
+  });
+
+  useShortcut({ key: "<", shift: true }, () => {
+    if (!disableLeftCondition.value) {
+      goToPreviousTicket();
+    }
+  });
 });
 </script>
