@@ -637,6 +637,9 @@ async function getGeneralCategory() {
 function setUpOnboarding() {
   if (!authStore.isManager) return;
   setUp(steps);
+  useShortcut({ key: "h", meta: true }, () => {
+    showHelpModal.value = !showHelpModal.value;
+  });
 }
 
 onMounted(() => {
@@ -645,9 +648,5 @@ onMounted(() => {
   useShortcut({ key: ",", meta: true }, () => {
     showSettingsModal.value = !showSettingsModal.value;
   });
-});
-
-useShortcut({ key: "h", meta: true }, () => {
-  showHelpModal.value = !showHelpModal.value;
 });
 </script>
