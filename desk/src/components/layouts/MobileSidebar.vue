@@ -20,7 +20,7 @@
             <div class="mb-3 flex flex-col gap-1">
               <SidebarLink
                 class="relative"
-                label="Notifications"
+                :label="t.notifications.value"
                 :icon="LucideBell"
                 :on-click="() => (sidebarOpened = false)"
                 :is-expanded="true"
@@ -38,7 +38,7 @@
               <SidebarLink
                 v-if="!isCustomerPortal"
                 class="relative"
-                label="Dashboard"
+                :label="t.dashboard.value"
                 :icon="LucideLayoutDashboard"
                 :to="'Dashboard'"
                 :is-active="isActiveTab('Dashboard')"
@@ -120,6 +120,7 @@ import UserMenu from "@/components/UserMenu.vue";
 import { useNotificationStore } from "@/stores/notification";
 
 import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
+import { useTranslations } from "@/composables/useTranslation";
 import { currentView, useView } from "@/composables/useView";
 
 import LucideBell from "~icons/lucide/bell";
@@ -143,6 +144,12 @@ const router = useRouter();
 const authStore = useAuthStore();
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
+
+// Reactive translations
+const t = useTranslations({
+  notifications: "Notifications",
+  dashboard: "Dashboard",
+});
 
 const allViews = computed(() => {
   let items = isCustomerPortal.value

@@ -9,7 +9,7 @@
     <UserMenu class="mb-2" :options="profileSettings" />
     <SidebarLink
       v-if="!isCustomerPortal"
-      label="Search"
+      :label="t.search.value"
       class="my-0.5"
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
@@ -25,7 +25,7 @@
     <SidebarLink
       v-if="!isCustomerPortal"
       class="relative my-0.5 min-h-7"
-      label="Dashboard"
+      :label="t.dashboard.value"
       :icon="LucideLayoutDashboard"
       :to="'Dashboard'"
       :is-active="isActiveTab('Dashboard')"
@@ -40,7 +40,7 @@
       />
       <SidebarLink
         class="relative my-0.5"
-        label="Notifications"
+        :label="t.notifications.value"
         :icon="LucideBell"
         :on-click="() => notificationStore.toggle()"
         :is-expanded="isExpanded"
@@ -117,7 +117,7 @@
       <SidebarLink
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
         :icon="HelpIcon"
-        :label="'Help'"
+        :label="t.help.value"
         :is-expanded="isExpanded"
         @click="
           () => {
@@ -131,7 +131,7 @@
         :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
         :is-active="false"
         :is-expanded="isExpanded"
-        :label="isExpanded ? 'Collapse' : 'Expand'"
+        :label="isExpanded ? t.collapse.value : t.expand.value"
         :on-click="() => (isExpanded = !isExpanded)"
       />
     </div>
@@ -174,6 +174,7 @@ import UserMenu from "@/components/UserMenu.vue";
 import { useDevice } from "@/composables";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useScreenSize } from "@/composables/screen";
+import { useTranslations } from "@/composables/useTranslation";
 import { currentView, useView } from "@/composables/useView";
 import { showNewContactModal } from "@/pages/desk/contact/dialogState";
 import {
@@ -185,6 +186,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 import { isCustomerPortal } from "@/utils";
 import { call } from "frappe-ui";
 import {
@@ -234,6 +236,16 @@ const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
+
+// Reactive translations
+const t = useTranslations({
+  search: "Search",
+  dashboard: "Dashboard",
+  notifications: "Notifications",
+  help: "Help",
+  collapse: "Collapse",
+  expand: "Expand",
+});
 
 const showSettingsModal = ref(false);
 const showShortcutsModal = ref(false);
