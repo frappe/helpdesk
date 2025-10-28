@@ -87,8 +87,6 @@ const textFields = ["Long Text", "Small Text", "Text", "Text Editor", "Data"];
 const numberFields = ["Int", "Float", "Currency", "Percent"];
 
 const component = computed(() => {
-  console.log(props.field.fieldtype);
-
   if (props.field.url_method) {
     return h(Autocomplete, {
       options: apiOptions.data,
