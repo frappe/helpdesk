@@ -66,11 +66,8 @@ import { Dialog } from "frappe-ui";
 import { computed, h, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
-<<<<<<< HEAD
 import LucideBookOpen from "~icons/lucide/book-open";
-=======
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
->>>>>>> upstream/develop
 import LucideTicket from "~icons/lucide/ticket";
 import CPGroup from "./CPGroup.vue";
 const router = useRouter();
