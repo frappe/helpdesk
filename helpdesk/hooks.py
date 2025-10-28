@@ -66,8 +66,7 @@ doc_events = {
     },
     "HD Ticket": {
         "on_trash": [
-            "helpdesk.search.remove_doc",
-            "helpdesk.search_sqlite.delete_doc_index",
+            "helpdesk.search_sqlite.delete_doc",
         ],
     },
 }

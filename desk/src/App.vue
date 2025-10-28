@@ -2,13 +2,11 @@
   <FrappeUIProvider>
     <PortalRoot />
   </FrappeUIProvider>
-  <KeymapDialog />
   <Dialogs />
 </template>
 
 <script setup lang="ts">
 import { Dialogs } from "@/components/dialogs";
-import KeymapDialog from "@/pages/KeymapDialog.vue";
 import { useConfigStore } from "@/stores/config";
 import { stopSession } from "@/telemetry";
 import { FrappeUIProvider, toast } from "frappe-ui";

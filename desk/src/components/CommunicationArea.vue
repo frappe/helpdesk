@@ -30,6 +30,7 @@
     </div>
     <div
       v-show="showEmailBox"
+      ref="emailBoxRef"
       class="flex gap-1.5 flex-1"
       @keydown.ctrl.enter.capture.stop="submitEmail"
       @keydown.meta.enter.capture.stop="submitEmail"
@@ -60,6 +61,7 @@
     </div>
     <div
       v-show="showCommentBox"
+      ref="commentBoxRef"
       @keydown.ctrl.enter.capture.stop="submitComment"
       @keydown.meta.enter.capture.stop="submitComment"
     >
@@ -99,6 +101,7 @@ import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { ref, watch } from "vue";
+import { useShortcut } from "@/composables/shortcuts";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
@@ -108,6 +111,8 @@ let doc = defineModel();
 // let doc = inject(TicketSymbol)?.value.doc
 const emailEditorRef = ref(null);
 const commentTextEditorRef = ref(null);
+const emailBoxRef = ref(null);
+const commentBoxRef = ref(null);
 
 function toggleEmailBox() {
   if (showCommentBox.value) {
@@ -194,11 +199,32 @@ watch(
   }
 );
 
+useShortcut("r", () => {
+  toggleEmailBox();
+});
+useShortcut("c", () => {
+  toggleCommentBox();
+});
+
 defineExpose({
   replyToEmail,
   toggleEmailBox,
   toggleCommentBox,
   editor: emailEditorRef,
+});
+
+import { onClickOutside } from "@vueuse/core";
+
+onClickOutside(emailBoxRef, () => {
+  if (showEmailBox.value) {
+    showEmailBox.value = false;
+  }
+});
+
+onClickOutside(commentBoxRef, () => {
+  if (showCommentBox.value) {
+    showCommentBox.value = false;
+  }
 });
 </script>
 
