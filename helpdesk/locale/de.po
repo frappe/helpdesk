@@ -3026,3 +3026,61 @@ msgstr ""
 msgid "synonym"
 msgstr ""
 
+#: desk/src/components/layouts/Sidebar.vue
+msgid "Search"
+msgstr "Suchen"
+
+#: desk/src/components/layouts/Sidebar.vue
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: desk/src/components/layouts/Sidebar.vue
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
+#: desk/src/components/layouts/Sidebar.vue
+msgid "Help"
+msgstr "Hilfe"
+
+#: desk/src/components/layouts/Sidebar.vue
+msgid "Collapse"
+msgstr "Einklappen"
+
+#: desk/src/components/layouts/Sidebar.vue
+msgid "Expand"
+msgstr "Ausklappen"
+
+#: desk/src/components/layouts/layoutSettings.ts
+#: desk/src/pages/desk/customer/Customers.vue
+msgid "Tickets"
+msgstr "Tickets"
+
+#: desk/src/components/layouts/layoutSettings.ts
+msgid "Knowledge Base"
+msgstr "Wissensdatenbank"
+
+#: desk/src/components/layouts/layoutSettings.ts
+msgid "Canned responses"
+msgstr "Vorgefertigte Antworten"
+
+#: desk/src/components/layouts/layoutSettings.ts
+#: desk/src/pages/desk/customer/Customers.vue
+msgid "Customers"
+msgstr "Kunden"
+
+#: desk/src/components/layouts/layoutSettings.ts
+msgid "Contacts"
+msgstr "Kontakte"
+
+#: desk/src/components/layouts/layoutSettings.ts
+msgid "Call Logs"
+msgstr "Anruflisten"
+
+#: desk/src/pages/desk/customer/Customers.vue
+msgid "New customer"
+msgstr "Neuer Kunde"
+
+#: desk/src/pages/desk/customer/Customers.vue
+msgid "No Customers Found"
+msgstr "Keine Kunden gefunden"
+

@@ -245,11 +245,11 @@ const isFCSite = ref(window.is_fc_site);
 
 const allViews = computed(() => {
   let items = isCustomerPortal.value
-    ? customerPortalSidebarOptions
-    : agentPortalSidebarOptions;
+    ? customerPortalSidebarOptions.value
+    : agentPortalSidebarOptions.value;
 
   if (!isCallingEnabled.value) {
-    items = items.filter((item) => item.label !== "Call Logs");
+    items = items.filter((item) => item.label !== __("Call Logs"));
   }
 
   const options = [

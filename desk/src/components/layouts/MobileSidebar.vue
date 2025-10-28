@@ -127,6 +127,7 @@ import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
+import { __ } from "@/translation";
 import Apps from "../Apps.vue";
 import {
   agentPortalSidebarOptions,
@@ -145,11 +146,11 @@ const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const allViews = computed(() => {
   let items = isCustomerPortal.value
-    ? customerPortalSidebarOptions
-    : agentPortalSidebarOptions;
+    ? customerPortalSidebarOptions.value
+    : agentPortalSidebarOptions.value;
 
   if (!isCallingEnabled.value) {
-    items = items.filter((item) => item.label !== "Call Logs");
+    items = items.filter((item) => item.label !== __("Call Logs"));
   }
 
   const options = [
