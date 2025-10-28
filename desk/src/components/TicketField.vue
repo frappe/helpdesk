@@ -19,7 +19,7 @@
         :model-value="transValue"
         autocomplete="off"
         v-on="
-          textFields.includes(field.fieldtype)
+          [...textFields, ...numberFields].includes(field.fieldtype)
             ? {
                 blur: (event) => {
                   emitUpdate(field.fieldname, event.target.value);
@@ -84,6 +84,7 @@ const apiOptions = createResource({
 });
 
 const textFields = ["Long Text", "Small Text", "Text", "Text Editor", "Data"];
+const numberFields = ["Int", "Float", "Currency", "Percent"];
 
 const component = computed(() => {
   if (props.field.url_method) {

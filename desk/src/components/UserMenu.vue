@@ -7,8 +7,8 @@
           !sidebarStore.isExpanded
             ? 'w-auto px-0'
             : open
-            ? 'w-52 bg-white px-1 shadow-sm'
-            : 'w-52 px-1 hover:bg-gray-200'
+            ? 'w-full bg-white px-1 shadow-sm'
+            : 'w-full px-1 hover:bg-gray-200'
         "
       >
         <BrandLogo />
