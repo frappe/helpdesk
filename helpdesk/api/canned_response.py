@@ -5,52 +5,35 @@ from helpdesk.utils import get_agents_team
 
 
 @frappe.whitelist()
-def get_canned_responses(teams=None):
-    user_team = get_agents_team()
-    user_team_names = [team["team_name"] for team in user_team]
-
-    if isinstance(teams, list):
-        user_team_names = teams
-
+def get_canned_responses(scope):
     QBEmailTemplate = frappe.qb.DocType("Email Template")
     QBChildTeam = frappe.qb.DocType("HD Canned Response Team")
-    if user_team_names:
-        if "No team" in user_team_names:
-            query = (
-                frappe.qb.from_(QBEmailTemplate)
-                .left_join(QBChildTeam)
-                .on(QBChildTeam.parent == QBEmailTemplate.name)
-                .select(QBEmailTemplate.star, QBChildTeam.team)
-                .where(QBEmailTemplate.reference_doctype == "HD Ticket")
-                .where(
-                    (QBChildTeam.team.isin(user_team_names))
-                    | (QBChildTeam.team.isnull())
-                )
-            )
-        else:
-            query = (
-                frappe.qb.from_(QBEmailTemplate)
-                .left_join(QBChildTeam)
-                .on(QBChildTeam.parent == QBEmailTemplate.name)
-                .select(QBEmailTemplate.star, QBChildTeam.team)
-                .where(QBEmailTemplate.reference_doctype == "HD Ticket")
-                .where(QBChildTeam.team.isin(user_team_names))
-            )
-    else:
-        return []
+
+    base_query = (
+        frappe.qb.from_(QBEmailTemplate)
+        .left_join(QBChildTeam)
+        .on(QBChildTeam.parent == QBEmailTemplate.name)
+        .select(QBEmailTemplate.star, QBChildTeam.team)
+        .where(QBEmailTemplate.reference_doctype == "HD Ticket")
+    )
+
+    if scope == "Global":
+        query = base_query.where(QBEmailTemplate.scope == "Global")
+    elif scope == "Personal":
+        query = base_query.where(
+            (QBEmailTemplate.scope == "Personal")
+            & (QBEmailTemplate.owner == frappe.session.user)
+        )
+    elif scope == "My Team":
+        user_team = get_agents_team()
+        user_team_names = [team["team_name"] for team in user_team]
+
+        query = base_query.where(
+            (QBEmailTemplate.scope == "Team") & (QBChildTeam.team.isin(user_team_names))
+        )
 
     results = query.run(as_dict=True)
-    unique_templates = {}
-    for row in results:
-        name = row["name"]
-        if name not in unique_templates:
-            unique_templates[name] = row.copy()
-            unique_templates[name]["teams"] = []
-        if row.get("team"):
-            unique_templates[name]["teams"].append(row["team"])
-        if "team" in unique_templates[name]:
-            del unique_templates[name]["team"]
-    return list(unique_templates.values())
+    return results
 
 
 @frappe.whitelist()

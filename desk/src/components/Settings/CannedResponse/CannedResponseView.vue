@@ -54,23 +54,55 @@
             />
             <ErrorMessage :message="errors.title" />
           </div>
-          <div class="flex flex-col gap-1.5">
-            <Autocomplete
-              :label="__('Teams')"
-              :multiple="true"
-              :options="getTeamsList.data"
-              v-model="cannedResponseData.teams"
+          <div class="space-y-1.5">
+            <FormLabel :label="__('Scope')" />
+            <Select
+              v-model="cannedResponseData.scope"
+              :options="[
+                {
+                  label: 'Global',
+                  value: 'Global',
+                },
+                {
+                  label: 'Team',
+                  value: 'Team',
+                },
+                {
+                  label: 'Personal',
+                  value: 'Personal',
+                },
+              ]"
+              required
             />
-            <div class="text-xs text-ink-gray-5 cursor-default">
-              {{ __("Restrict visibility to these teams") }}
-            </div>
+            <FormLabel
+              :label="__('Choose who can view and use this response')"
+            />
           </div>
         </div>
-        <div class="flex flex-col gap-1.5 w-full">
-          <FormLabel :label="__('Response')" required />
+        <div v-if="cannedResponseData.scope === 'Team'" class="space-y-1.5">
+          <FormLabel :label="__('Teams')" required />
+          <Autocomplete
+            :multiple="true"
+            :options="getTeamsList.data"
+            v-model="cannedResponseData.teams"
+            required
+            @update:modelValue="validateData('teams')"
+          />
+          <div class="text-xs text-ink-gray-5 cursor-default">
+            {{ __("Restrict visibility to these teams") }}
+          </div>
+          <ErrorMessage :message="errors.teams" />
+        </div>
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <FormLabel :label="__('Response')" required />
+            <DocumentationButton
+              url="https://docs.frappe.io/helpdesk/canned-response"
+            />
+          </div>
           <PreviewDialog v-model="previewDialog" />
           <TextEditor
-            editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors"
+            editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5"
             ref="content"
             :bubble-menu="false"
             :content="cannedResponseData.response"
@@ -80,8 +112,9 @@
                 validateData('response');
               }
             "
-            :fixed-menu="true"
-            :placeholder="'Hello {{ customer }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ company }}'"
+            :fixed-menu="menuButtons"
+            :extensions="[FieldAutocomplete]"
+            :placeholder="'Hello {{ customer }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ full_name }}'"
           />
           <ErrorMessage :message="errors.response" />
         </div>
@@ -106,59 +139,28 @@ import {
   createListResource,
   createResource,
   ErrorMessage,
-  FeatherIcon,
   FormControl,
   FormLabel,
-  Popover,
+  Select,
   TextEditor,
   toast,
 } from "frappe-ui";
 import SettingsLayoutBase from "../SettingsLayoutBase.vue";
-import { computed, inject, onUnmounted, ref, watch } from "vue";
+import { inject, onUnmounted, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
-import { getMeta } from "@/stores/meta";
-import { watchDebounced } from "@vueuse/core";
-import FieldSearch from "./components/FieldSearch.vue";
 import PreviewDialog from "./components/PreviewDialog.vue";
-import { menuButtons, userFields } from "./cannedResponse";
+import { menuButtons } from "./cannedResponse";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { FieldAutocomplete } from "./components/field-autocomplete-extension";
+import DocumentationButton from "@/components/DocumentationButton.vue";
 
-const ticketMeta = getMeta("HD Ticket");
-const fieldSearchQuery = ref("");
 const showConfirmDialog = ref({
   show: false,
   title: "",
   message: "",
   onConfirm: () => {},
 });
-
-watchDebounced(
-  fieldSearchQuery,
-  (newQuery) => {
-    metaFieldsList.value = metaFields.value.filter((f) =>
-      f.label.toLowerCase().includes(newQuery.toLowerCase())
-    );
-  },
-  {
-    debounce: 250,
-  }
-);
-
-const metaFields = computed(() => {
-  return ticketMeta
-    .getFields()
-    .filter(
-      (f) =>
-        f.fieldtype !== "Tab Break" &&
-        f.fieldtype !== "Section Break" &&
-        Boolean(f.label)
-    )
-    .map((f) => ({ label: f.label, value: f.fieldname }))
-    .concat(userFields);
-});
-
-const metaFieldsList = ref(metaFields.value);
 
 const cannedResponseActiveScreen = inject<any>("cannedResponseActiveScreen");
 const cannedResponseListData = inject<any>("cannedResponseListData");
@@ -173,6 +175,7 @@ const content = ref();
 const cannedResponseData = ref({
   name: "",
   title: "",
+  scope: "Global",
   response: "",
   teams: [],
 });
@@ -181,6 +184,7 @@ const initialData = ref("");
 const errors = ref({
   title: "",
   response: "",
+  teams: "",
 });
 
 const getCannedResponseData = createResource({
@@ -194,6 +198,7 @@ const getCannedResponseData = createResource({
     cannedResponseData.value = {
       name: data.name,
       title: data.name,
+      scope: data.scope,
       response: data.response,
       teams:
         data.teams?.map((team) => ({
@@ -218,11 +223,6 @@ const getTeamsList = createListResource({
     }));
   },
 });
-
-const insertField = (field: any) => {
-  content.value.editor.commands.insertContent(`{{ ${field.value} }}`);
-  content.value.editor.commands.focus();
-};
 
 const onShowPreview = () => {
   previewDialog.value.show = true;
@@ -264,7 +264,7 @@ const onSave = () => {
   isLoading.value = true;
   validateData();
 
-  if (errors.value.title || errors.value.response) {
+  if (Object.values(errors.value).some((e) => e)) {
     isLoading.value = false;
     toast.error(__("Please fill all the required fields"));
     return;
@@ -284,6 +284,7 @@ const createCannedResponse = () => {
       title: cannedResponseData.value.title,
       subject: cannedResponseData.value.title,
       response: cannedResponseData.value.response,
+      scope: cannedResponseData.value.scope,
       teams: cannedResponseData.value.teams.map((team) => ({
         team: team.value,
       })),
@@ -347,6 +348,7 @@ const updateCannedResponse = async () => {
       title: cannedResponseData.value.title,
       subject: cannedResponseData.value.title,
       response: cannedResponseData.value.response,
+      scope: cannedResponseData.value.scope,
       teams: cannedResponseData.value.teams.map((team) => ({
         team: team.value,
       })),
@@ -378,6 +380,17 @@ const validateData = (key?: string) => {
           errors.value.response = __("Response is required");
         } else {
           errors.value.response = "";
+        }
+        break;
+
+      case "teams":
+        if (
+          cannedResponseData.value.scope === "Team" &&
+          !cannedResponseData.value.teams.length
+        ) {
+          errors.value.teams = __("At least one team is required");
+        } else {
+          errors.value.teams = "";
         }
         break;
 

@@ -44,10 +44,17 @@
 </template>
 
 <script setup lang="ts">
-import { createResource, Dialog, FormLabel, TextEditor } from "frappe-ui";
+import {
+  createListResource,
+  createResource,
+  Dialog,
+  FormLabel,
+  TextEditor,
+} from "frappe-ui";
 import { LoadingIndicator } from "frappe-ui";
 import { menuButtons } from "../cannedResponse";
 import { Link } from "@/components";
+import { watch } from "vue";
 
 const dialogModel = defineModel<{
   show: boolean;
@@ -72,4 +79,23 @@ const getResponsePreview = (ticketId: string) => {
     canned_response: dialogModel.value.cannedResponse,
   });
 };
+
+watch(
+  () => dialogModel.value.show,
+  (newShowValue) => {
+    if (newShowValue) {
+      createListResource({
+        doctype: "HD Ticket",
+        fields: ["name"],
+        start: 0,
+        pageLength: 1,
+        auto: true,
+        onSuccess: (data) => {
+          dialogModel.value.ticketId = data[0].name;
+          getResponsePreview(data[0].name);
+        },
+      });
+    }
+  }
+);
 </script>
