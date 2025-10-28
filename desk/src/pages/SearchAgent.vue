@@ -213,7 +213,7 @@ import {
 } from "frappe-ui";
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-
+import { useShortcut } from "@/composables/shortcuts";
 // Icons
 
 // Type Definitions
@@ -518,11 +518,8 @@ watch(
 
 function addFocusShortcut() {
   nextTick(() => {
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "/") {
-        e.preventDefault();
-        searchInput.value.el.focus();
-      }
+    useShortcut("/", () => {
+      searchInput.value.el.focus();
     });
   });
 }

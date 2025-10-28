@@ -6,6 +6,7 @@
         <Button
           variant="outline"
           class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm"
+          ref="assigneeButton"
           @click="togglePopover()"
         >
           <p v-if="assignees.loading || assignees.data?.length === 0">
@@ -51,7 +52,8 @@
 <script setup lang="ts">
 import { ActivitiesSymbol, AssigneeSymbol, TicketSymbol } from "@/types";
 import { Popover } from "frappe-ui";
-import { inject } from "vue";
+import { inject, nextTick, onMounted, useTemplateRef } from "vue";
+import { useShortcut } from "@/composables/shortcuts";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import AssignToBody from "./AssignToBody.vue";
@@ -68,6 +70,10 @@ async function saveAssignees(
   addedAssignees.length && (await addAssignees.submit(addedAssignees));
   activities.value.reload();
 }
-</script>
 
-<style scoped></style>
+const assignToRef = useTemplateRef("assigneeButton");
+
+useShortcut("a", () => {
+  (assignToRef.value?.$el as HTMLElement)?.nextElementSibling?.click();
+});
+</script>
