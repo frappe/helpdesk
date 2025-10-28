@@ -211,13 +211,6 @@ const defaultActions = computed(() => {
       onClick: () => (showMergeModal.value = true),
     });
   }
-  // items.push({
-  //   label: "Jump to ticket",
-  //   icon: LucideTicket,
-  //   onClick: () => {
-  //     console.log("HELLO");
-  //   },
-  // });
   return [
     {
       group: "Default actions",
