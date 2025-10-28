@@ -3,10 +3,16 @@ from frappe import _
 
 from helpdesk.utils import agent_only
 
+HD_TICKET = "HD Ticket"
+COUNT_NAME = "count(name) as count"
+COUNT_DESC = "count desc"
+
 
 @frappe.whitelist()
 @agent_only
-def get_dashboard_data(dashboard_type, filters=None):
+def get_dashboard_data(
+    dashboard_type: str, filters: dict[str, any] = None
+) -> list[dict[str, any]] | None:
     """
     Get dashboard data based on the type and date range.
     """
@@ -73,7 +79,12 @@ def get_dashboard_data(dashboard_type, filters=None):
         )
 
 
-def get_number_card_data(from_date, to_date, conds="", resolved_statuses=None):
+def get_number_card_data(
+    from_date: str,
+    to_date: str,
+    conds: str = "",
+    resolved_statuses: tuple[str, ...] = None,
+) -> list[dict[str, any]]:
     """
     Get number card data for the dashboard.
     """
@@ -97,7 +108,9 @@ def get_number_card_data(from_date, to_date, conds="", resolved_statuses=None):
     ]
 
 
-def get_ticket_count(from_date, to_date, conds="", return_result=False):
+def get_ticket_count(
+    from_date: str, to_date: str, conds: str = "", return_result: bool = False
+) -> dict[str, any]:
     """
     Get ticket data for the dashboard.
     """
@@ -144,16 +157,21 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
     )
 
     return {
-        "title": "Tickets",
+        "title": _("Tickets"),
         "value": current_month_tickets,
         "delta": delta_in_percentage,
         "deltaSuffix": "%",
         "negativeIsBetter": True,
-        "tooltip": "Total number of tickets created",
+        "tooltip": _("Total number of tickets created"),
     }
 
 
-def get_sla_fulfilled_count(from_date, to_date, conds="", resolved_statuses=None):
+def get_sla_fulfilled_count(
+    from_date: str,
+    to_date: str,
+    conds: str = "",
+    resolved_statuses: tuple[str, ...] = None,
+) -> dict[str, any]:
     """
     Get the percent of SLA tickets fulfilled for the dashboard.
     """
@@ -210,16 +228,18 @@ def get_sla_fulfilled_count(from_date, to_date, conds="", resolved_statuses=None
         current_month_fulfilled_percentage - prev_month_fulfilled_percentage
     )
     return {
-        "title": "% SLA Fulfilled",
+        "title": _("% SLA Fulfilled"),
         "value": current_month_fulfilled_percentage,
         "suffix": "%",
         "delta": delta_in_percentage,
         "deltaSuffix": "%",
-        "tooltip": "% of tickets created that were resolved within SLA",
+        "tooltip": _("% of tickets created that were resolved within SLA"),
     }
 
 
-def get_avg_first_response_time(from_date, to_date, conds=""):
+def get_avg_first_response_time(
+    from_date: str, to_date: str, conds: str = ""
+) -> dict[str, any]:
     """
     first_response_time is the time taken to first respond to a ticket.
     Get average first response time for the dashboard.
@@ -257,19 +277,25 @@ def get_avg_first_response_time(from_date, to_date, conds=""):
     prev_month_avg = result[0].prev_month_avg or 0
 
     delta = current_month_avg - prev_month_avg if prev_month_avg else 0
+    suffix = _("hrs")
 
     return {
-        "title": "Avg. First Response",
+        "title": _("Avg. First Response"),
         "value": current_month_avg,
-        "suffix": " hrs",
+        "suffix": " " + suffix,
         "delta": delta,
-        "deltaSuffix": " hrs",
+        "deltaSuffix": " " + suffix,
         "negativeIsBetter": True,
-        "tooltip": "Avg. time taken to first respond to a ticket",
+        "tooltip": _("Avg. time taken to first respond to a ticket"),
     }
 
 
-def get_avg_resolution_time(from_date, to_date, conds="", resolved_statuses=None):
+def get_avg_resolution_time(
+    from_date: str,
+    to_date: str,
+    conds: str = "",
+    resolved_statuses: tuple[str, ...] = None,
+) -> dict[str, any]:
     """
     Get average resolution time for the dashboard.
     """
@@ -305,18 +331,20 @@ def get_avg_resolution_time(from_date, to_date, conds="", resolved_statuses=None
     prev_month_avg = result[0].prev_month_avg or 0
 
     delta = current_month_avg - prev_month_avg if prev_month_avg else 0
+    suffix = _("days")
+
     return {
-        "title": "Avg. Resolution",
+        "title": _("Avg. Resolution"),
         "value": current_month_avg,
-        "suffix": " days",
+        "suffix": " " + suffix,
         "delta": delta,
-        "deltaSuffix": " days",
+        "deltaSuffix": " " + suffix,
         "negativeIsBetter": True,
-        "tooltip": "Avg. time taken to resolve a ticket",
+        "tooltip": _("Avg. time taken to resolve a ticket"),
     }
 
 
-def get_avg_feedback_score(from_date, to_date, conds=""):
+def get_avg_feedback_score(from_date: str, to_date: str, conds: str = ""):
     """
     Get average feedback score for the dashboard.
     """
@@ -353,18 +381,21 @@ def get_avg_feedback_score(from_date, to_date, conds=""):
     prev_month_avg = result[0].prev_month_avg or 0
 
     delta = current_month_avg - prev_month_avg
+    suffix = _("stars")
 
     return {
-        "title": "Avg. Feedback Rating",
+        "title": _("Avg. Feedback Rating"),
         "value": current_month_avg * 5,
         "suffix": "/5",
         "delta": delta * 5,
-        "deltaSuffix": " stars",
-        "tooltip": "Avg. feedback rating for the tickets resolved",
+        "deltaSuffix": " " + suffix,
+        "tooltip": _("Avg. feedback rating for the tickets resolved"),
     }
 
 
-def get_master_dashboard_data(from_date, to_date, team=None, agent=None):
+def get_master_dashboard_data(
+    from_date: str, to_date: str, team: str = None, agent: str = None
+) -> list[dict[str, any]]:
     filters = {
         "creation": ["between", [from_date, to_date]],
     }
@@ -380,96 +411,102 @@ def get_master_dashboard_data(from_date, to_date, team=None, agent=None):
     return [team_data, ticket_type_data, ticket_priority_data, ticket_channel_data]
 
 
-def get_team_chart_data(from_date, to_date, filters=None):
+def get_team_chart_data(
+    from_date: str, to_date: str, filters: dict[str, any] = None
+) -> dict[str, any]:
     """
     Get team chart data for the dashboard.
     """
     result = frappe.get_all(
-        "HD Ticket",
-        fields=["agent_group as team", "count(name) as count"],
+        HD_TICKET,
+        fields=["agent_group as team", COUNT_NAME],
         filters=filters,
         group_by="agent_group",
-        order_by="count desc",
+        order_by=COUNT_DESC,
     )
     for r in result:
         if not r.team:
-            r.team = "No Team"
+            r.team = _("No Team")
 
     if len(result) < 7:
         return get_pie_chart_config(
             result,
-            "Tickets by Team",
-            "Percentage of Total Tickets by Team",
+            _("Tickets by Team"),
+            _("Percentage of Total Tickets by Team"),
             "team",
             "count",
         )
     else:
         return get_bar_chart_config(
             result,
-            "Tickets by Team",
-            "Total Tickets by Team",
+            _("Tickets by Team"),
+            _("Total Tickets by Team"),
             {"key": "team", "type": "category", "title": "Team", "timeGrain": "day"},
             "Tickets",
             [{"name": "count", "type": "bar"}],
         )
 
 
-def get_ticket_type_chart_data(from_date, to_date, filters=None):
+def get_ticket_type_chart_data(
+    from_date: str, to_date: str, filters: dict[str, any] = None
+) -> dict[str, any]:
     """
     Get ticket type chart data for the dashboard.
     """
     result = frappe.get_all(
-        "HD Ticket",
-        fields=["ticket_type as type", "count(name) as count"],
+        HD_TICKET,
+        fields=["ticket_type as type", COUNT_NAME],
         filters=filters,
         group_by="ticket_type",
-        order_by="count desc",
+        order_by=COUNT_DESC,
     )
     # based on length show different chart, if len greater than 5 then show pie chart else bar chart
     if len(result) < 7:
         return get_pie_chart_config(
             result,
-            "Tickets by Type",
-            "Percentage of Total Tickets by Type",
+            _("Tickets by Type"),
+            _("Percentage of Total Tickets by Type"),
             "type",
             "count",
         )
     else:
         return get_bar_chart_config(
             result,
-            "Tickets by Type",
-            "Total Tickets by Type",
+            _("Tickets by Type"),
+            _("Total Tickets by Type"),
             {"key": "type", "type": "category", "title": "Type", "timeGrain": "day"},
             "Tickets",
             [{"name": "count", "type": "bar"}],
         )
 
 
-def get_ticket_priority_chart_data(from_date, to_date, filters=None):
+def get_ticket_priority_chart_data(
+    from_date: str, to_date: str, filters: dict[str, any] = None
+) -> dict[str, any]:
     """
     Get ticket priority chart data for the dashboard.
     """
     result = frappe.get_all(
-        "HD Ticket",
-        fields=["priority as priority", "count(name) as count"],
+        HD_TICKET,
+        fields=["priority as priority", COUNT_NAME],
         filters=filters,
         group_by="priority",
-        order_by="count desc",
+        order_by=COUNT_DESC,
     )
     # based on length show different chart, if len greater than 5 then show pie chart else bar chart
     if len(result) < 7:
         return get_pie_chart_config(
             result,
-            "Tickets by Priority",
-            "Percentage of Total Tickets by Priority",
+            _("Tickets by Priority"),
+            _("Percentage of Total Tickets by Priority"),
             "priority",
             "count",
         )
     else:
         return get_bar_chart_config(
             result,
-            "Tickets by Priority",
-            "Total Tickets by Priority",
+            _("Tickets by Priority"),
+            _("Total Tickets by Priority"),
             {
                 "key": "priority",
                 "type": "category",
@@ -481,13 +518,15 @@ def get_ticket_priority_chart_data(from_date, to_date, filters=None):
         )
 
 
-def get_ticket_channel_chart_data(from_date, to_date, filters=None):
+def get_ticket_channel_chart_data(
+    from_date: str, to_date: str, filters: dict[str, any] = None
+) -> dict[str, any]:
     """
     Get ticket channel chart data for the dashboard.
     """
     result = frappe.get_all(
-        "HD Ticket",
-        fields=["via_customer_portal as channel ", "count(name) as count"],
+        HD_TICKET,
+        fields=["via_customer_portal as channel ", COUNT_NAME],
         filters=filters,
         group_by="via_customer_portal",
         order_by="via_customer_portal desc",
@@ -498,16 +537,20 @@ def get_ticket_channel_chart_data(from_date, to_date, filters=None):
 
     return get_pie_chart_config(
         result,
-        "Tickets by Channel",
-        "Percentage of Total Tickets by Channel",
+        _("Tickets by Channel"),
+        _("Percentage of Total Tickets by Channel"),
         "channel",
         "count",
     )
 
 
 def get_trend_data(
-    from_date, to_date, conds="", open_statuses=None, resolved_statuses=None
-):
+    from_date: str,
+    to_date: str,
+    conds: str = "",
+    open_statuses: tuple[str, ...] = None,
+    resolved_statuses: tuple[str, ...] = None,
+) -> list[dict[str, any]]:
     """
     Get trend data for the dashboard.
     """
@@ -524,20 +567,29 @@ def get_trend_data(
 
 
 def get_ticket_trend_data(
-    from_date, to_date, conds="", open_statuses=None, resolved_statuses=None
-):
+    from_date: str,
+    to_date: str,
+    conds: str = "",
+    open_statuses: tuple[str, ...] = None,
+    resolved_statuses: tuple[str, ...] = None,
+) -> dict[str, any]:
     """
     Trend data for tickets in the dashboard. Ticket trend +SLA fulfilled
     """
     if len(open_statuses) == 1:
         open_statuses = f"('{open_statuses[0]}')"
+
+    open_status = _("open")
+    closed_status = _("closed")
+    sla_fulfilled_status = _("SLA_fulfilled")
+
     result = frappe.db.sql(
         f"""
             SELECT 
                 DATE(creation) as date,
-                COUNT(CASE WHEN status in {open_statuses} THEN name END) as open,
-                COUNT(CASE WHEN status in {resolved_statuses} THEN name END) as closed,
-                COUNT(CASE WHEN agreement_status = 'Fulfilled' THEN name END) as SLA_fulfilled
+                COUNT(CASE WHEN status in {open_statuses} THEN name END) as {open_status},
+                COUNT(CASE WHEN status in {resolved_statuses} THEN name END) as {closed_status},
+                COUNT(CASE WHEN agreement_status = 'Fulfilled' THEN name END) as {sla_fulfilled_status}
             FROM `tabHD Ticket` # noqa: W604
             WHERE creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
             {conds}
@@ -551,18 +603,20 @@ def get_ticket_trend_data(
         as_dict=1,
     )
     avg_tickets = get_avg_tickets_per_day(from_date, to_date, conds)
-    subtitle = f"Average tickets per day is around {avg_tickets:.0f}"
+    subtitle = _("Average tickets per day is around {0}").format(
+        "{:.0f}".format(avg_tickets)
+    )
     return get_bar_chart_config(
         result,
-        "Ticket Trend",
+        _("Ticket Trend"),
         subtitle,
         {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
-        "Tickets",
+        _("Tickets"),
         [
-            {"name": "closed", "type": "bar"},
-            {"name": "open", "type": "bar"},
+            {"name": closed_status, "type": "bar"},
+            {"name": open_status, "type": "bar"},
             {
-                "name": "SLA_fulfilled",
+                "name": _("SLA_fulfilled"),
                 "type": "line",
                 "showDataPoints": True,
                 "axis": "y2",
@@ -577,16 +631,22 @@ def get_ticket_trend_data(
     )
 
 
-def get_feedback_trend_data(from_date, to_date, conds=""):
+def get_feedback_trend_data(
+    from_date: str, to_date: str, conds: str = ""
+) -> dict[str, any]:
     """
     Get feedback trend data for the dashboard.
     """
+
+    rating = _("rating")
+    rated_tickets = _("rated_tickets")
+
     result = frappe.db.sql(
         f"""
         SELECT 
             DATE(creation) as date,
-            AVG(CASE WHEN feedback_rating > 0 THEN feedback_rating END) * 5 as rating,
-            COUNT(CASE WHEN feedback_rating > 0 THEN name END) as rated_tickets
+            AVG(CASE WHEN feedback_rating > 0 THEN feedback_rating END) * 5 as {rating},
+            COUNT(CASE WHEN feedback_rating > 0 THEN name END) as {rated_tickets}
         FROM `tabHD Ticket` # noqa: W604
         WHERE 
             creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
@@ -619,18 +679,20 @@ def get_feedback_trend_data(from_date, to_date, conds=""):
     )
     avg_rating = avg_rating_result[0] if avg_rating_result[0] else 0
 
-    subtitle = f"Average feedback rating per day is around {avg_rating:.1f} stars"
+    subtitle = _("Average feedback rating per day is around {0} stars").format(
+        "{:.1f}".format(avg_rating)
+    )
 
     return get_bar_chart_config(
         result,
-        "Feedback Trend",
+        _("Feedback Trend"),
         subtitle,
         {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
-        "Rated Tickets",
+        _("Rated Tickets"),
         [
-            {"name": "rated_tickets", "type": "bar"},
+            {"name": rated_tickets, "type": "bar"},
             {
-                "name": "rating",
+                "name": rating,
                 "type": "line",
                 "showDataPoints": True,
                 "axis": "y2",
@@ -638,40 +700,52 @@ def get_feedback_trend_data(from_date, to_date, conds=""):
             },
         ],
         y2Axis={
-            "title": "Rating",
+            "title": _("Rating"),
             "yMin": 0,
             "yMax": 5,
         },
     )
 
 
-def get_pie_chart_config(data, title, subtitle, categoryColumn, valueColumn):
+def get_pie_chart_config(
+    data: list[dict[str, any]],
+    title: str,
+    subtitle: str,
+    category_column: str,
+    value_column: str,
+) -> dict[str, any]:
     return {
         "type": "pie",
         "data": data,
         "title": title,
         "subtitle": subtitle,
-        "categoryColumn": categoryColumn,
-        "valueColumn": valueColumn,
+        "categoryColumn": category_column,
+        "valueColumn": value_column,
     }
 
 
 def get_bar_chart_config(
-    data, title, subtitle, xAxisConfig, yAxisTitle, series, **kwargs
-):
+    data: list[dict[str, any]],
+    title: str,
+    subtitle: str,
+    x_axis_config: dict[str, any],
+    y_axis_title: str,
+    series: list,
+    **kwargs: dict[str, any],
+) -> dict[str, any]:
     return {
         "type": "axis",
         "data": data,
         "title": title,
         "subtitle": subtitle,
-        "xAxis": xAxisConfig,
-        "yAxis": {"title": yAxisTitle},
+        "xAxis": x_axis_config,
+        "yAxis": {"title": y_axis_title},
         "series": series,
         **kwargs,
     }
 
 
-def get_conditions_from_filters(filters):
+def get_conditions_from_filters(filters: dict[str, any]) -> str:
     """
     Get conditions from filters.
     """
@@ -687,7 +761,7 @@ def get_conditions_from_filters(filters):
     return " AND ".join(conditions) if conditions else ""
 
 
-def get_avg_tickets_per_day(from_date, to_date, conds=""):
+def get_avg_tickets_per_day(from_date: str, to_date: str, conds: str = "") -> float:
     """
     Get average tickets per day for the dashboard.
     """

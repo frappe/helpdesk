@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-09-14 10:34+0000\n"
-"PO-Revision-Date: 2025-09-17 19:27\n"
+"POT-Creation-Date: 2025-10-05 10:35+0000\n"
+"PO-Revision-Date: 2025-10-11 02:12\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -47,6 +47,11 @@ msgstr "<br>Uppdatera Inställningar för att använda annan status innan du ina
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:95
 msgid "<br>Please update the SLA(s) to use a different status before disabling this status."
 msgstr "<br>Uppdatera Service Nivå Avtal för att använda annan status innan du inaktiverar denna status."
+
+#. Introduction text of the email-feedback Web Form
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
+msgid "<div class=\"ql-editor read-mode\"><p>Let us know if we solved your issue well. It’ll help us serve you better next time.</p></div>"
+msgstr "<div class=\"ql-editor read-mode\"><p>Låt oss veta om vi löste ditt problem på ett bra sätt. Det hjälper oss att ge dig bättre service nästa gång.</p></div>"
 
 #. Header text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -340,12 +345,18 @@ msgstr "Tilldelning Regler"
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
 msgstr "Minst en aktiverad status för <u>{0}</u> kategori måste vara aktiverad."
 
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:38
+msgid "At least one feedback option must be enabled for rating {0}"
+msgstr "Åtminstone en återkoppling alternativ måste vara aktiverad för betygsättning {0}"
+
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:28
 msgid "At-least one of priority, team and ticket type is required"
 msgstr "Minst en av prioritet, team och ärendetyp erfordras"
 
 #. Label of the attachment (Attach) field in DocType 'HD Ticket'
+#. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Attachment"
 msgstr "Bilaga"
 
@@ -432,7 +443,7 @@ msgstr "Knapp"
 msgid "Call Details"
 msgstr "Samtal Information"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:596
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:607
 msgid "Can not send email. No sender email set up!"
 msgstr "Kan inte skicka e-post. Ingen avsändare e-postadress konfigurerad!"
 
@@ -501,6 +512,11 @@ msgstr "Klicka på 'Lägg till Helger'. Detta kommer att fylla helg tabell med a
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:61
 msgid "Close"
 msgstr "Stäng"
+
+#. Option in a Select field in the tickets Web Form
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
+msgid "Closed"
+msgstr "Stängd"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
 msgid "Closed or rated tickets cannot be updated by non-agents"
@@ -680,6 +696,7 @@ msgstr "Definiera vem som får ärendena och hur de fördelas mellan handläggar
 #. Label of the description (Text Editor) field in DocType 'HD Ticket'
 #. Label of the description (Small Text) field in DocType 'HD Ticket Priority'
 #. Label of the description (Small Text) field in DocType 'HD Ticket Type'
+#. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -687,6 +704,7 @@ msgstr "Definiera vem som får ärendena och hur de fördelas mellan handläggar
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Description"
 msgstr "Beskrivning"
 
@@ -708,6 +726,11 @@ msgstr "Beskrivning Vikt"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Details"
 msgstr "Detaljer"
+
+#. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+msgid "Disabled"
+msgstr "Inaktiverad"
 
 #. Description of the 'Ignore Restrictions' (Check) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
@@ -855,7 +878,9 @@ msgstr "Återkoppling"
 
 #. Label of the feedback_extra (Small Text) field in DocType 'HD Email
 #. Feedback'
+#. Label of a field in the email-feedback Web Form
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Feedback "
 msgstr "Återkoppling "
 
@@ -874,7 +899,9 @@ msgid "Feedback Already Exists"
 msgstr "Återkoppling finns redan"
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Email Feedback'
+#. Label of a field in the email-feedback Web Form
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Feedback Rating"
 msgstr "Återkoppling Betyg"
 
@@ -1234,6 +1261,11 @@ msgstr "Dölj villkor"
 msgid "Hide from customer"
 msgstr "Dölj från kund"
 
+#. Option in a Select field in the tickets Web Form
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
+msgid "Hold"
+msgstr "Spärra"
+
 #. Label of the holiday_list (Link) field in DocType 'HD Service Level
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
@@ -1389,8 +1421,10 @@ msgstr "John Doe"
 
 #. Label of the key (Data) field in DocType 'HD Email Feedback'
 #. Label of the key (Data) field in DocType 'HD Ticket'
+#. Label of a field in the email-feedback Web Form
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Key"
 msgstr "Nyckel"
 
@@ -1586,7 +1620,9 @@ msgid "Only the 'color' and 'order' fields of the 'Closed' status can be modifie
 msgstr "Endast fält \"färg\" och \"ordning\" för \"Stängd\" status kan ändras."
 
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
+#. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Open"
 msgstr "Öppen"
 
@@ -1707,12 +1743,14 @@ msgstr "Prioriteringar"
 #. Label of the priority_section (Section Break) field in DocType 'HD Settings'
 #. Label of the priority (Link) field in DocType 'HD Ticket'
 #. Label of the priority (Link) field in DocType 'HD Ticket Type'
+#. Label of a field in the tickets Web Form
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:20
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Priority"
 msgstr "Prioritet"
 
@@ -1763,6 +1801,11 @@ msgstr "Initierad av (E-post)"
 msgid "Range"
 msgstr "Intervall"
 
+#. Title of the email-feedback Web Form
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
+msgid "Rate Your Support Experience"
+msgstr "Betygsätt Din Supportupplevelse"
+
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1770,11 +1813,11 @@ msgstr "Intervall"
 msgid "Rating"
 msgstr "Bedömning"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:22
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
 msgstr "Betyg måste vara mellan 0,2 och 1,0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:18
+#: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:19
 msgid "Rating {0} is not allowed"
 msgstr "Betygsättning av {0} är inte tillåten"
 
@@ -1820,6 +1863,11 @@ msgstr "Referenser"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:6
 msgid "Regenerate Search Index"
 msgstr "Återskapa Sökindex"
+
+#. Option in a Select field in the tickets Web Form
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
+msgid "Replied"
+msgstr "Besvarad"
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -1999,8 +2047,10 @@ msgstr "Service Nivå Avtal Status"
 msgid "Saturday"
 msgstr "Lördag"
 
+#. Button label of the email-feedback Web Form
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:42
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:50
+#: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Save"
 msgstr "Spara"
 
@@ -2028,6 +2078,14 @@ msgstr "Sökresultat"
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Search Term Param Name"
 msgstr "Sökterm Parameter Namn"
+
+#: helpdesk/api/search.py:38
+msgid "Search index not available. Please contact administrator."
+msgstr "Sök Index är inte tillgängligt. Kontakta administratör."
+
+#: helpdesk/api/search.py:15
+msgid "Search query must be at least 2 characters"
+msgstr "Sökfråga måste innehålla minst 2 tecken"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:157
 msgid "Select a Default Priority."
@@ -2166,11 +2224,13 @@ msgstr "Starttiden kan inte vara senare än eller lika med sluttid på rad <u>{0
 #. Label of the status (Select) field in DocType 'HD Article'
 #. Label of the status_section (Section Break) field in DocType 'HD Settings'
 #. Label of the status (Link) field in DocType 'HD Ticket'
+#. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:44
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:31
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Status"
 msgstr "Status"
 
@@ -2223,8 +2283,10 @@ msgid "Still got questions? We're here to assist you."
 msgstr "Har du fortfarande frågor? Vi finns här för att hjälpa dig."
 
 #. Label of the subject (Data) field in DocType 'HD Ticket'
+#. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:30
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Subject"
 msgstr "Ämne"
 
@@ -2404,9 +2466,11 @@ msgstr "Torsdag"
 #. Label of the ticket (Link) field in DocType 'HD Email Feedback'
 #. Label of the reference_ticket (Link) field in DocType 'HD Notification'
 #. Label of the ticket_tab (Tab Break) field in DocType 'HD Settings'
+#. Title of the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Ticket"
 msgstr "Ärende"
 
@@ -2652,7 +2716,9 @@ msgid "Valid From"
 msgstr "Gäller Från"
 
 #. Label of the via_customer_portal (Check) field in DocType 'HD Ticket'
+#. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+#: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Via Customer Portal"
 msgstr "Via Kund Portal"
 
