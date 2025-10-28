@@ -3100,3 +3100,432 @@ msgstr "Suchen"
 msgid "Search for"
 msgstr "Suchen nach"
 
+#: desk/src/pages/dashboard/Dashboard.vue
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: desk/src/pages/dashboard/Dashboard.vue
+msgid "Team"
+msgstr "Team"
+
+#: desk/src/pages/dashboard/Dashboard.vue
+msgid "Agent"
+msgstr "Agent"
+
+#: desk/src/pages/dashboard/Dashboard.vue
+msgid "Today"
+msgstr "Heute"
+
+#: desk/src/pages/dashboard/Dashboard.vue
+msgid "Last 7 Days"
+msgstr "Letzte 7 Tage"
+
+#: desk/src/pages/dashboard/Dashboard.vue
+msgid "Last 30 Days"
+msgstr "Letzte 30 Tage"
+
+#: desk/src/pages/dashboard/Dashboard.vue
+msgid "Last 60 Days"
+msgstr "Letzte 60 Tage"
+
+#: desk/src/pages/dashboard/Dashboard.vue
+msgid "Last 90 Days"
+msgstr "Letzte 90 Tage"
+
+#: desk/src/pages/dashboard/Dashboard.vue
+msgid "Custom Range"
+msgstr "Benutzerdefinierter Zeitraum"
+
+#: desk/src/pages/dashboard/Dashboard.vue
+msgid "to"
+msgstr "bis"
+
+#: helpdesk/api/dashboard.py
+msgid "No Team"
+msgstr "Kein Team"
+
+#: helpdesk/api/dashboard.py
+msgid "Tickets by Team"
+msgstr "Tickets nach Team"
+
+#: helpdesk/api/dashboard.py
+msgid "Percentage of Total Tickets by Team"
+msgstr "Prozentsatz der Gesamttickets nach Team"
+
+#: helpdesk/api/dashboard.py
+msgid "Total Tickets by Team"
+msgstr "Gesamttickets nach Team"
+
+#: helpdesk/api/dashboard.py
+msgid "Tickets by Type"
+msgstr "Tickets nach Typ"
+
+#: helpdesk/api/dashboard.py
+msgid "Percentage of Total Tickets by Type"
+msgstr "Prozentsatz der Gesamttickets nach Typ"
+
+#: helpdesk/api/dashboard.py
+msgid "Total Tickets by Type"
+msgstr "Gesamttickets nach Typ"
+
+#: helpdesk/api/dashboard.py
+msgid "Tickets by Priority"
+msgstr "Tickets nach Priorität"
+
+#: helpdesk/api/dashboard.py
+msgid "Percentage of Total Tickets by Priority"
+msgstr "Prozentsatz der Gesamttickets nach Priorität"
+
+#: helpdesk/api/dashboard.py
+msgid "Total Tickets by Priority"
+msgstr "Gesamttickets nach Priorität"
+
+#: helpdesk/api/dashboard.py
+msgid "Tickets by Channel"
+msgstr "Tickets nach Kanal"
+
+#: helpdesk/api/dashboard.py
+msgid "Percentage of Total Tickets by Channel"
+msgstr "Prozentsatz der Gesamttickets nach Kanal"
+
+#: helpdesk/api/dashboard.py
+msgid "Ticket Trend"
+msgstr "Ticket-Trend"
+
+#: helpdesk/api/dashboard.py
+msgid "Average tickets per day is around {0}"
+msgstr "Durchschnittlich {0} Tickets pro Tag"
+
+#: helpdesk/api/dashboard.py
+msgid "Feedback Trend"
+msgstr "Feedback-Trend"
+
+#: helpdesk/api/dashboard.py
+msgid "Average feedback rating per day is around {0} stars"
+msgstr "Durchschnittliche Feedback-Bewertung pro Tag liegt bei {0} Sternen"
+
+#: helpdesk/api/dashboard.py
+msgid "Total number of tickets created"
+msgstr "Gesamtanzahl der erstellten Tickets"
+
+#: helpdesk/api/dashboard.py
+msgid "% SLA Fulfilled"
+msgstr "% SLA erfüllt"
+
+#: helpdesk/api/dashboard.py
+msgid "% of tickets created that were resolved within SLA"
+msgstr "% der erstellten Tickets, die innerhalb der SLA gelöst wurden"
+
+#: helpdesk/api/dashboard.py
+msgid "Avg. First Response"
+msgstr "Ø erste Antwort"
+
+#: helpdesk/api/dashboard.py
+msgid "Avg. time taken to first respond to a ticket"
+msgstr "Durchschnittliche Zeit bis zur ersten Antwort auf ein Ticket"
+
+#: helpdesk/api/dashboard.py
+msgid "Avg. Resolution"
+msgstr "Ø Lösungszeit"
+
+#: helpdesk/api/dashboard.py
+msgid "Avg. time taken to resolve a ticket"
+msgstr "Durchschnittliche Zeit zur Lösung eines Tickets"
+
+#: helpdesk/api/dashboard.py
+msgid "Avg. Feedback Rating"
+msgstr "Ø Feedback-Bewertung"
+
+#: helpdesk/api/dashboard.py
+msgid "Avg. feedback rating for the tickets resolved"
+msgstr "Durchschnittliche Feedback-Bewertung für gelöste Tickets"
+
+#: helpdesk/api/dashboard.py
+msgid "% SLA"
+msgstr "% SLA"
+
+#: helpdesk/api/dashboard.py
+msgid "Rated Tickets"
+msgstr "Bewertete Tickets"
+
+#: helpdesk/api/dashboard.py
+msgid "open"
+msgstr "offen"
+
+#: helpdesk/api/dashboard.py
+msgid "closed"
+msgstr "geschlossen"
+
+#: helpdesk/api/dashboard.py
+msgid "rating"
+msgstr "Bewertung"
+
+#: helpdesk/api/dashboard.py
+msgid "rated_tickets"
+msgstr "bewertete_tickets"
+
+#: desk/src/pages/CannedResponses.vue
+msgid "Canned Responses"
+msgstr "Vorgefertigte Antworten"
+
+#: desk/src/pages/CannedResponses.vue
+msgid "Search canned responses"
+msgstr "Vorgefertigte Antworten durchsuchen"
+
+#: desk/src/pages/CannedResponses.vue
+#: desk/src/components/EmptyState.vue
+msgid "Create"
+msgstr "Erstellen"
+
+#: desk/src/pages/CannedResponses.vue
+msgid "Delete"
+msgstr "Löschen"
+
+#: desk/src/pages/CannedResponses.vue
+msgid "No Canned Responses Found"
+msgstr "Keine vorgefertigten Antworten gefunden"
+
+#: desk/src/components/telephony/TwilioCallUI.vue
+#: desk/src/components/telephony/ExotelCallUI.vue
+msgid "Incoming call..."
+msgstr "Eingehender Anruf..."
+
+#: desk/src/components/telephony/TwilioCallUI.vue
+msgid "Accept"
+msgstr "Annehmen"
+
+#: desk/src/components/telephony/TwilioCallUI.vue
+msgid "Reject"
+msgstr "Ablehnen"
+
+#: desk/src/components/telephony/TwilioCallUI.vue
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: desk/src/components/telephony/TwilioCallUI.vue
+#: desk/src/components/telephony/ExotelCallUI.vue
+msgid "Calling..."
+msgstr "Anrufen..."
+
+#: desk/src/components/telephony/TwilioCallUI.vue
+#: desk/src/components/telephony/ExotelCallUI.vue
+msgid "Ringing..."
+msgstr "Es klingelt..."
+
+#: desk/src/components/telephony/TwilioCallUI.vue
+msgid "Initiating call..."
+msgstr "Anruf wird initiiert..."
+
+#: desk/src/components/telephony/TwilioCallUI.vue
+#: desk/src/components/telephony/ExotelCallUI.vue
+msgid "Unknown"
+msgstr "Unbekannt"
+
+#: desk/src/components/telephony/ExotelCallUI.vue
+msgid "In progress"
+msgstr "In Bearbeitung"
+
+#: desk/src/components/telephony/ExotelCallUI.vue
+msgid "No answer"
+msgstr "Keine Antwort"
+
+#: desk/src/components/telephony/ExotelCallUI.vue
+msgid "Call ended"
+msgstr "Anruf beendet"
+
+#: desk/src/components/telephony/ExotelCallUI.vue
+msgid "Incoming call"
+msgstr "Eingehender Anruf"
+
+#: desk/src/pages/desk/contact/Contacts.vue
+msgid "Contacts"
+msgstr "Kontakte"
+
+#: desk/src/pages/desk/contact/Contacts.vue
+msgid "New contact"
+msgstr "Neuer Kontakt"
+
+#: desk/src/pages/desk/contact/Contacts.vue
+msgid "No Contacts Found"
+msgstr "Keine Kontakte gefunden"
+
+#: desk/src/pages/desk/contact/Contacts.vue
+msgid "Contact updated"
+msgstr "Kontakt aktualisiert"
+
+#: desk/src/pages/desk/customer/Customers.vue
+msgid "Customers"
+msgstr "Kunden"
+
+#: desk/src/pages/desk/customer/Customers.vue
+msgid "New customer"
+msgstr "Neuer Kunde"
+
+#: desk/src/pages/desk/customer/Customers.vue
+msgid "No Customers Found"
+msgstr "Keine Kunden gefunden"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Knowledge Base"
+msgstr "Wissensdatenbank"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Add new"
+msgstr "Neu hinzufügen"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Category"
+msgstr "Kategorie"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Article"
+msgstr "Artikel"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "General"
+msgstr "Allgemein"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Add New Article"
+msgstr "Neuen Artikel hinzufügen"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Edit Title"
+msgstr "Titel bearbeiten"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Merge"
+msgstr "Zusammenführen"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Share"
+msgstr "Teilen"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Move To"
+msgstr "Verschieben nach"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Confirm"
+msgstr "Bestätigen"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Delete articles?"
+msgstr "Artikel löschen?"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Are you sure you want to delete these articles?"
+msgstr "Möchten Sie diese Artikel wirklich löschen?"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Articles moved"
+msgstr "Artikel verschoben"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Category created"
+msgstr "Kategorie erstellt"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Category updated"
+msgstr "Kategorie aktualisiert"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Delete category?"
+msgstr "Kategorie löschen?"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "All articles from this category will move to General category."
+msgstr "Alle Artikel dieser Kategorie werden in die Kategorie Allgemein verschoben."
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Category deleted"
+msgstr "Kategorie gelöscht"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Articles deleted"
+msgstr "Artikel gelöscht"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Category merged"
+msgstr "Kategorie zusammengeführt"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Published"
+msgstr "Veröffentlicht"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Draft"
+msgstr "Entwurf"
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue
+msgid "Archived"
+msgstr "Archiviert"
+
+#: helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Created On"
+msgstr "Erstellt am"
+
+#: helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Modified"
+msgstr "Geändert"
+
+#: helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Owner"
+msgstr "Eigentümer"
+
+#: helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Modified By"
+msgstr "Geändert von"
+
+#: helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Customer Name"
+msgstr "Kundenname"
+
+#: helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Domain"
+msgstr "Domain"
+
+#: helpdesk/doctype/hd_customer/hd_customer.json
+msgid "References"
+msgstr "Referenzen"
+
+#: helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Image"
+msgstr "Bild"
+
+#: helpdesk/doctype/hd_customer/hd_customer.json
+msgid "Contact HTML"
+msgstr "Kontakt HTML"
+
+#: helpdesk/doctype/hd_article/hd_article.json
+msgid "Title"
+msgstr "Titel"
+
+#: helpdesk/doctype/hd_article/hd_article.json
+msgid "Category"
+msgstr "Kategorie"
+
+#: helpdesk/doctype/hd_article/hd_article.json
+msgid "Content"
+msgstr "Inhalt"
+
+#: helpdesk/doctype/hd_article/hd_article.json
+msgid "Author"
+msgstr "Autor"
+
+#: helpdesk/doctype/hd_article/hd_article.json
+msgid "Published On"
+msgstr "Veröffentlicht am"
+
+#: helpdesk/doctype/hd_article/hd_article.json
+msgid "Status"
+msgstr "Status"
+
+#: helpdesk/doctype/hd_article/hd_article.json
+msgid "Title Slug"
+msgstr "Titel-Slug"
+
+#: helpdesk/doctype/hd_article/hd_article.json
+msgid "Views"
+msgstr "Ansichten"
+

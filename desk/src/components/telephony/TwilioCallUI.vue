@@ -20,7 +20,7 @@
         />
         <div class="flex flex-col items-center justify-center gap-1">
           <div class="text-xl font-medium">
-            {{ contact?.full_name ?? "Unknown" }}
+            {{ contact?.full_name ?? tUnknown }}
           </div>
           <div class="text-sm text-ink-gray-5">
             {{ contact?.mobile_no || contact?.phone }}
@@ -34,12 +34,12 @@
         <div v-if="!onCall" class="my-1 text-base">
           {{
             callStatus == "initiating"
-              ? "Initiating call..."
+              ? tInitiatingCall
               : callStatus == "ringing"
-              ? "Ringing..."
+              ? tRinging
               : calling
-              ? "Calling..."
-              : "Incoming call..."
+              ? tCalling
+              : tIncomingCall
           }}
         </div>
         <div v-if="onCall" class="flex gap-2">
@@ -62,7 +62,7 @@
             size="md"
             variant="solid"
             theme="red"
-            :label="'Cancel'"
+            :label="tCancel"
             @click="cancelCall"
             class="rounded-lg"
           >
@@ -76,7 +76,7 @@
             size="md"
             variant="solid"
             theme="green"
-            :label="'Accept'"
+            :label="tAccept"
             class="rounded-lg"
             @click="acceptIncomingCall"
           >
@@ -88,7 +88,7 @@
             size="md"
             variant="solid"
             theme="red"
-            :label="'Reject'"
+            :label="tReject"
             class="rounded-lg"
             @click="rejectIncomingCall"
           >
@@ -113,7 +113,7 @@
         class="relative flex !h-5 !w-5 items-center justify-center"
       />
       <div class="max-w-[120px] truncate">
-        {{ contact?.full_name ?? "Unknown" }}
+        {{ contact?.full_name ?? tUnknown }}
       </div>
     </div>
     <div v-if="onCall" class="flex items-center gap-2">
@@ -133,7 +133,7 @@
     </div>
     <div v-else-if="calling" class="flex items-center gap-3">
       <div class="my-1">
-        {{ callStatus == "ringing" ? "Ringing..." : "Calling..." }}
+        {{ callStatus == "ringing" ? tRinging : tCalling }}
       </div>
       <Button
         variant="solid"
@@ -176,12 +176,23 @@ import { useTelephonyStore } from "@/stores/telephony";
 import { Call, Device } from "@twilio/voice-sdk";
 import { useDraggable, useWindowSize } from "@vueuse/core";
 import { Avatar, call, toast } from "frappe-ui";
-import { inject, ref, watch } from "vue";
+import { computed, inject, ref, watch } from "vue";
 import LucidePhone from "~icons/lucide/phone";
 import CountUpTimer from "./CountUpTimer.vue";
 import MinimizeIcon from "./Icons/MinimizeIcon.vue";
+import { useTranslation } from "@/composables/useTranslation";
 
 const telephonyStore = useTelephonyStore();
+
+// Reactive translations
+const tIncomingCall = useTranslation("Incoming call...");
+const tAccept = useTranslation("Accept");
+const tReject = useTranslation("Reject");
+const tCancel = useTranslation("Cancel");
+const tCalling = useTranslation("Calling...");
+const tRinging = useTranslation("Ringing...");
+const tInitiatingCall = useTranslation("Initiating call...");
+const tUnknown = useTranslation("Unknown");
 
 const onCallStarted = inject<() => void>("onCallStarted");
 const onCallEnded = inject<() => void>("onCallEnded");

@@ -2,11 +2,11 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Knowledge Base</div>
+        <div class="text-lg font-medium text-gray-900">{{ tKnowledgeBase }}</div>
       </template>
       <template #right-header>
         <Dropdown :options="headerOptions">
-          <Button label="Add new" variant="solid">
+          <Button :label="tAddNew" variant="solid">
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>
@@ -66,9 +66,37 @@ import {
 import { computed, h, onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
+import { useTranslation } from "@/composables/useTranslation";
 
 const router = useRouter();
 const { $dialog } = globalStore();
+
+// Reactive translations
+const tKnowledgeBase = useTranslation("Knowledge Base");
+const tAddNew = useTranslation("Add new");
+const tCategory = useTranslation("Category");
+const tArticle = useTranslation("Article");
+const tGeneral = useTranslation("General");
+const tAddNewArticle = useTranslation("Add New Article");
+const tEditTitle = useTranslation("Edit Title");
+const tMerge = useTranslation("Merge");
+const tShare = useTranslation("Share");
+const tDelete = useTranslation("Delete");
+const tMoveTo = useTranslation("Move To");
+const tConfirm = useTranslation("Confirm");
+const tDeleteArticlesQuestion = useTranslation("Delete articles?");
+const tDeleteArticlesMessage = useTranslation("Are you sure you want to delete these articles?");
+const tArticlesMoved = useTranslation("Articles moved");
+const tCategoryCreated = useTranslation("Category created");
+const tCategoryUpdated = useTranslation("Category updated");
+const tDeleteCategoryQuestion = useTranslation("Delete category?");
+const tDeleteCategoryMessage = useTranslation("All articles from this category will move to General category.");
+const tCategoryDeleted = useTranslation("Category deleted");
+const tArticlesDeleted = useTranslation("Articles deleted");
+const tCategoryMerged = useTranslation("Category merged");
+const tPublished = useTranslation("Published");
+const tDraft = useTranslation("Draft");
+const tArchived = useTranslation("Archived");
 
 const category = reactive({
   title: "",
@@ -90,9 +118,9 @@ const generalCategory = createResource({
   cache: ["GeneralCategory"],
 });
 
-const headerOptions = [
+const headerOptions = computed(() => [
   {
-    label: "Category",
+    label: tCategory.value,
     icon: "folder",
     onClick: () => {
       resetState();
@@ -101,7 +129,7 @@ const headerOptions = [
     },
   },
   {
-    label: "Article",
+    label: tArticle.value,
     icon: "file-text",
     onClick: () => {
       router.push({
@@ -110,16 +138,16 @@ const headerOptions = [
           id: generalCategory.data,
         },
         query: {
-          title: "General",
+          title: tGeneral.value,
         },
       });
     },
   },
-];
+]);
 
-const groupByActions = [
+const groupByActions = computed(() => [
   {
-    label: "Add New Article",
+    label: tAddNewArticle.value,
     icon: "plus",
     onClick: (groupedRow) => {
       router.push({
@@ -134,7 +162,7 @@ const groupByActions = [
     },
   },
   {
-    label: "Edit Title",
+    label: tEditTitle.value,
     icon: "edit",
     onClick: (groupedRow) => {
       editTitle.value = true;
@@ -145,7 +173,7 @@ const groupByActions = [
     },
   },
   {
-    label: "Merge",
+    label: tMerge.value,
     icon: LucideMerge,
     onClick: (groupedRow) => {
       mergeModal.value = true;
@@ -154,7 +182,7 @@ const groupByActions = [
     },
   },
   {
-    label: "Share",
+    label: tShare.value,
     icon: "link",
     onClick: async ({ group }) => {
       const { label, value } = group;
@@ -167,18 +195,18 @@ const groupByActions = [
     },
   },
   {
-    label: "Delete",
+    label: tDelete.value,
     icon: "trash-2",
     onClick: (groupedRow) => {
       handleCategoryDelete(groupedRow);
     },
   },
-];
+]);
 
 const listSelections = ref(new Set());
-const selectBannerActions = [
+const selectBannerActions = computed(() => [
   {
-    label: "Move To",
+    label: tMoveTo.value,
     icon: "corner-up-right",
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
@@ -186,16 +214,16 @@ const selectBannerActions = [
     },
   },
   {
-    label: "Delete",
+    label: tDelete.value,
     icon: "trash-2",
     onClick: (selections: Set<string>) => {
       listSelections.value = selections;
       $dialog({
-        title: "Delete articles?",
-        message: `Are you sure you want to delete these articles?`,
+        title: tDeleteArticlesQuestion.value,
+        message: tDeleteArticlesMessage.value,
         actions: [
           {
-            label: "Confirm",
+            label: tConfirm.value,
             variant: "solid",
             onClick({ close }) {
               handleDeleteArticles();
@@ -206,7 +234,7 @@ const selectBannerActions = [
       });
     },
   },
-];
+]);
 
 function handleMoveToCategory(category: string) {
   moveToCategory.submit(
@@ -220,7 +248,7 @@ function handleMoveToCategory(category: string) {
         listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value.clear();
-        toast.success("Articles moved");
+        toast.success(tArticlesMoved.value);
       },
       onError: (error: Error) => {
         const title = error?.messages?.[0] || error.message;
@@ -251,7 +279,7 @@ function handleCategoryCreate() {
             isEdit: 1,
           },
         });
-        toast.success("Category created");
+        toast.success(tCategoryCreated.value);
         capture("category_created", {
           data: {
             category: category.title,
@@ -286,7 +314,7 @@ function handleCategoryUpdate() {
         showCategoryModal.value = false;
         editTitle.value = false;
 
-        toast.success("Category updated");
+        toast.success(tCategoryUpdated.value);
         resetState();
       },
       onError: (error: string) => {
@@ -298,11 +326,11 @@ function handleCategoryUpdate() {
 
 function handleCategoryDelete(groupedRow) {
   $dialog({
-    title: "Delete category?",
-    message: `All articles from this category will move to General category.`,
+    title: tDeleteCategoryQuestion.value,
+    message: tDeleteCategoryMessage.value,
     actions: [
       {
-        label: "Confirm",
+        label: tConfirm.value,
         variant: "solid",
         onClick(close: Function) {
           deleteCategory.submit(
@@ -312,7 +340,7 @@ function handleCategoryDelete(groupedRow) {
             },
             {
               onSuccess: () => {
-                toast.success("Category deleted");
+                toast.success(tCategoryDeleted.value);
                 listViewRef.value.reload();
               },
             }
@@ -334,7 +362,7 @@ function handleDeleteArticles() {
         listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value?.clear();
-        toast.success("Articles deleted");
+        toast.success(tArticlesDeleted.value);
       },
     }
   );
@@ -349,7 +377,7 @@ function handleMergeCategory(source: string, target: string) {
     {
       onSuccess: () => {
         listViewRef.value.reload();
-        toast.success("Category merged");
+        toast.success(tCategoryMerged.value);
         mergeModal.value = false;
         resetState();
       },
@@ -389,7 +417,7 @@ const options = computed(() => {
       status: {
         custom: ({ item }) => {
           return h(Badge, {
-            ...statusMap[item],
+            ...statusMap.value[item],
           });
         },
       },
@@ -398,27 +426,27 @@ const options = computed(() => {
       name: "Article",
       prop: "articleId",
     },
-    groupByActions,
+    groupByActions: groupByActions.value,
     showSelectBanner: true,
-    selectBannerActions,
+    selectBannerActions: selectBannerActions.value,
     default_page_length: 100,
   };
 });
 
-const statusMap = {
+const statusMap = computed(() => ({
   Published: {
-    label: "Published",
+    label: tPublished.value,
     theme: "green",
   },
   Draft: {
-    label: "Draft",
+    label: tDraft.value,
     theme: "orange",
   },
   Archived: {
-    label: "Archived",
+    label: tArchived.value,
     theme: "gray",
   },
-};
+}));
 
 onMounted(() => {
   capture("kb_agent_page_viewed");
@@ -426,7 +454,7 @@ onMounted(() => {
 
 usePageMeta(() => {
   return {
-    title: "Knowledge Base",
+    title: tKnowledgeBase.value,
   };
 });
 </script>
