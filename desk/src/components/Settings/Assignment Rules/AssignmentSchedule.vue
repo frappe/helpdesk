@@ -46,31 +46,31 @@ const columns = [
 
 const days = ref([
   {
-    day: __("Monday"),
+    day: "Monday",
     active: false,
   },
   {
-    day: __("Tuesday"),
+    day: "Tuesday",
     active: false,
   },
   {
-    day: __("Wednesday"),
+    day: "Wednesday",
     active: false,
   },
   {
-    day: __("Thursday"),
+    day: "Thursday",
     active: false,
   },
   {
-    day: __("Friday"),
+    day: "Friday",
     active: false,
   },
   {
-    day: __("Saturday"),
+    day: "Saturday",
     active: false,
   },
   {
-    day: __("Sunday"),
+    day: "Sunday",
     active: false,
   },
 ]);
