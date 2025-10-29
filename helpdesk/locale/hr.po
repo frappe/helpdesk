@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-10-05 10:35+0000\n"
-"PO-Revision-Date: 2025-10-11 02:13\n"
+"POT-Creation-Date: 2025-10-26 10:35+0000\n"
+"PO-Revision-Date: 2025-10-29 08:39\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Croatian\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +17,15 @@ msgstr ""
 "X-Crowdin-File: /[frappe.helpdesk] develop/helpdesk/locale/main.pot\n"
 "X-Crowdin-File-ID: 118\n"
 "Language: hr_HR\n"
+
+#: helpdesk/api/dashboard.py:231
+msgid "% SLA Fulfilled"
+msgstr "% ispunjenog SLA-a"
+
+#: helpdesk/api/dashboard.py:236
+#, python-format
+msgid "% of tickets created that were resolved within SLA"
+msgstr "% kreiranih slučajeva koji su riješeni u okviru SLA-a"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
@@ -395,6 +404,38 @@ msgstr "Automatizacija"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Average Response Time"
 msgstr "Prosječno Vreme Odziva"
+
+#: helpdesk/api/dashboard.py:682
+msgid "Average feedback rating per day is around {0} stars"
+msgstr "Prosječna ocjena povratnih informacija po danu je oko {0} zvjezdica"
+
+#: helpdesk/api/dashboard.py:606
+msgid "Average tickets per day is around {0}"
+msgstr "Prosječan broj slučajeva dnevno je oko {0}"
+
+#: helpdesk/api/dashboard.py:387
+msgid "Avg. Feedback Rating"
+msgstr "Prosječna ocjena povratnih informacija"
+
+#: helpdesk/api/dashboard.py:283
+msgid "Avg. First Response"
+msgstr "Prosječan prvi odgovor"
+
+#: helpdesk/api/dashboard.py:337
+msgid "Avg. Resolution"
+msgstr "Prosječna Rezolucija"
+
+#: helpdesk/api/dashboard.py:392
+msgid "Avg. feedback rating for the tickets resolved"
+msgstr "Prosječna ocjena povratnih informacija za riješene Slučajeve"
+
+#: helpdesk/api/dashboard.py:289
+msgid "Avg. time taken to first respond to a ticket"
+msgstr "Prosječno vrijeme potrebno za prvi odgovor na Slučaj"
+
+#: helpdesk/api/dashboard.py:343
+msgid "Avg. time taken to resolve a ticket"
+msgstr "Prosječno vrijeme potrebno za rješavanje Slučaja"
 
 #. Label of the base_support_rotation (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -904,6 +945,10 @@ msgstr "Povratne informacije već postoje"
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Feedback Rating"
 msgstr "Ocjena povratnih informacija"
+
+#: helpdesk/api/dashboard.py:688
+msgid "Feedback Trend"
+msgstr "Trend povratnih informacija"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:160
 msgid "Feedback email has been sent to the customer"
@@ -1565,6 +1610,10 @@ msgstr "Ime prikazano na korisničkom portalu<br> (npr. Odgovoreno → Čeka se 
 msgid "New Assignment Rule Name"
 msgstr "Naziv novog pravila dodjeljivanja"
 
+#: helpdesk/api/dashboard.py:429
+msgid "No Team"
+msgstr "Nema Tima"
+
 #: desk/src/components/ticket-agent/AssignTo.vue:12
 msgid "No assignees"
 msgstr "Nema dodijeljenih"
@@ -1675,6 +1724,22 @@ msgstr "Obavezno je nadređeno polje, podređeno polje i mapiranje nadređeno-po
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Paused"
 msgstr "Pauzirano"
+
+#: helpdesk/api/dashboard.py:541
+msgid "Percentage of Total Tickets by Channel"
+msgstr "Procenat ukupnog broja Slučajeva po Kanalu"
+
+#: helpdesk/api/dashboard.py:501
+msgid "Percentage of Total Tickets by Priority"
+msgstr "Procenat ukupnog broja Slučajeva po Prioritetu"
+
+#: helpdesk/api/dashboard.py:435
+msgid "Percentage of Total Tickets by Team"
+msgstr "Procenat ukupnog broja Slučajeva po Timu"
+
+#: helpdesk/api/dashboard.py:468
+msgid "Percentage of Total Tickets by Type"
+msgstr "Procenat ukupnog broja Slučajeva po Tipu"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1806,8 +1871,13 @@ msgstr "Raspon"
 msgid "Rate Your Support Experience"
 msgstr "Ocijenite Iskustvo s Podrškom"
 
+#: helpdesk/api/dashboard.py:691
+msgid "Rated Tickets"
+msgstr "Ocijenjeni Slučajevi"
+
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
+#: helpdesk/api/dashboard.py:703
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
@@ -2038,6 +2108,10 @@ msgstr "Mapiranje Standard Nivo Ugovora"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA Status"
 msgstr "Status Standard Nivo Ugovora"
+
+#: helpdesk/api/dashboard.py:584 helpdesk/api/dashboard.py:619
+msgid "SLA_fulfilled"
+msgstr "SLA_ispunjen"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2526,6 +2600,10 @@ msgstr "Slučaj Razdjeljen Od"
 msgid "Ticket Summary"
 msgstr "Sažetak Slučaja"
 
+#: helpdesk/api/dashboard.py:611
+msgid "Ticket Trend"
+msgstr "Trend Slučajeva"
+
 #. Label of the ticket_type_section (Section Break) field in DocType 'HD
 #. Settings'
 #. Label of the ticket_type (Link) field in DocType 'HD Ticket'
@@ -2570,6 +2648,26 @@ msgstr "Tip Slučaja je obavezan"
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
 msgid "Ticket-Search Analysis"
 msgstr "Analiza Pretrage Slučaja"
+
+#: helpdesk/api/dashboard.py:160 helpdesk/api/dashboard.py:614
+msgid "Tickets"
+msgstr "Slučajevi"
+
+#: helpdesk/api/dashboard.py:540
+msgid "Tickets by Channel"
+msgstr "Slučajevi po Kanalu"
+
+#: helpdesk/api/dashboard.py:500 helpdesk/api/dashboard.py:508
+msgid "Tickets by Priority"
+msgstr "Slučajevi po Prioritetu"
+
+#: helpdesk/api/dashboard.py:434 helpdesk/api/dashboard.py:442
+msgid "Tickets by Team"
+msgstr "Slučajevi po Timu"
+
+#: helpdesk/api/dashboard.py:467 helpdesk/api/dashboard.py:475
+msgid "Tickets by Type"
+msgstr "Slučajevi po Tipu"
 
 #: helpdesk/api/ticket.py:18
 msgid "Tickets can only be assigned to agents"
@@ -2626,6 +2724,22 @@ msgstr "Ukupno Praznika"
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:126
 msgid "Total Ticket"
 msgstr "Ukupano Slučajeva"
+
+#: helpdesk/api/dashboard.py:509
+msgid "Total Tickets by Priority"
+msgstr "Ukupan broj Slučajeva po Prioritetu"
+
+#: helpdesk/api/dashboard.py:443
+msgid "Total Tickets by Team"
+msgstr "Ukupan broj Slučajeva po Timu"
+
+#: helpdesk/api/dashboard.py:476
+msgid "Total Tickets by Type"
+msgstr "Ukupan broj Slučajeva po Tipu"
+
+#: helpdesk/api/dashboard.py:165
+msgid "Total number of tickets created"
+msgstr "Ukupan broj kreiranih slučajeva"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2795,7 +2909,7 @@ msgstr "Godišnje"
 msgid "Yellow"
 msgstr "Žuta"
 
-#: helpdesk/api/dashboard.py:18
+#: helpdesk/api/dashboard.py:24
 msgid "You are not allowed to view this dashboard data."
 msgstr "Nemate dopuštenje za pregled podataka ove nadzorne ploče."
 
@@ -2831,9 +2945,17 @@ msgstr "Morate postaviti jedan sporazum o nivou usluge kao zadani. Označi opcij
 msgid "back to email event list"
 msgstr "natrag na popis događaja putem e-pošte"
 
+#: helpdesk/api/dashboard.py:583
+msgid "closed"
+msgstr "zatvoreno"
+
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:46
 msgid "customize {0}"
 msgstr "prilagodi {0}"
+
+#: helpdesk/api/dashboard.py:334
+msgid "days"
+msgstr "dana"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2852,6 +2974,10 @@ msgstr "je kontaktirao"
 msgid "here"
 msgstr "ovdje"
 
+#: helpdesk/api/dashboard.py:280
+msgid "hrs"
+msgstr "sati"
+
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "kanban"
@@ -2862,10 +2988,26 @@ msgstr "oglasna Tabla"
 msgid "list"
 msgstr "lista"
 
+#: helpdesk/api/dashboard.py:582
+msgid "open"
+msgstr "otvori"
+
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "purple"
 msgstr "ljubičasta"
+
+#: helpdesk/api/dashboard.py:642
+msgid "rated_tickets"
+msgstr "ocijenjeni_slučajevi"
+
+#: helpdesk/api/dashboard.py:641
+msgid "rating"
+msgstr "procjena"
+
+#: helpdesk/api/dashboard.py:384
+msgid "stars"
+msgstr "zvijezde"
 
 #. Label of the synonym (Data) field in DocType 'HD Synonym'
 #: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json
