@@ -27,7 +27,8 @@ def get_canned_responses(scope):
     elif scope == "My Team":
         user_team = get_agents_team()
         user_team_names = [team["team_name"] for team in user_team]
-
+        if not user_team_names:
+            return []
         query = base_query.where(
             (QBEmailTemplate.scope == "Team") & (QBChildTeam.team.isin(user_team_names))
         )

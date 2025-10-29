@@ -42,7 +42,7 @@
     </template>
     <template #content>
       <div class="flex flex-col gap-5">
-        <div class="grid grid-cols-2 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div class="space-y-1.5">
             <FormControl
               :label="__('Name')"
@@ -114,7 +114,7 @@
             "
             :fixed-menu="menuButtons"
             :extensions="[FieldAutocomplete]"
-            :placeholder="'Hello {{ customer }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ full_name }}'"
+            :placeholder="'Hello {{ contact }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ full_name }}'"
           />
           <ErrorMessage :message="errors.response" />
         </div>
