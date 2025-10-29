@@ -76,5 +76,4 @@ const assignToRef = useTemplateRef("assigneeButton");
 useShortcut("a", () => {
   (assignToRef.value?.$el as HTMLElement)?.nextElementSibling?.click();
 });
-  
 </script>
