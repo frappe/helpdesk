@@ -131,6 +131,19 @@
             class="mx-2"
           />
         </div>
+        <div class="flex justify-center">
+          <Button
+            v-if="
+              !cannedResponseListData.loading &&
+              cannedResponseListData.hasNextPage
+            "
+            class="mt-3.5 p-2"
+            @click="() => cannedResponseListData.next()"
+            :loading="cannedResponseListData.loading"
+            label="Load More"
+            icon-left="refresh-cw"
+          />
+        </div>
       </div>
     </template>
   </SettingsLayoutBase>

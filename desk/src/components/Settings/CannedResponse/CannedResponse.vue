@@ -23,7 +23,7 @@ const cannedResponseListData = createListResource({
   },
   orderBy: "modified desc",
   start: 0,
-  pageLength: 999,
+  pageLength: 10,
   auto: true,
 });
 
