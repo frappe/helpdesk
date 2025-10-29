@@ -6,7 +6,7 @@ app_icon = "octicon octicon-file-directory"
 app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
-required_apps = ["telephony"]
+required_apps = ["frappe/telephony"]
 
 add_to_apps_screen = [
     {
@@ -32,7 +32,6 @@ sqlite_search = ["helpdesk.search_sqlite.HelpdeskSearch"]
 scheduler_events = {
     "all": [
         "helpdesk.search.build_index_if_not_exists",
-        "helpdesk.search_sqlite.build_index_if_not_exists",
         "helpdesk.search.download_corpus",
     ],
     "daily": [
@@ -62,11 +61,11 @@ doc_events = {
     },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
+        "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
     "HD Ticket": {
         "on_trash": [
-            "helpdesk.search.remove_doc",
-            "helpdesk.search_sqlite.delete_doc_index",
+            "helpdesk.search_sqlite.delete_doc",
         ],
     },
 }

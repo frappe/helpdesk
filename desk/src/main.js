@@ -67,7 +67,7 @@ const app = createApp(App);
 app.use(FrappeUI);
 app.use(pinia);
 app.use(router);
-app.use(posthogPlugin);
+// app.use(posthogPlugin);
 app.use(translationPlugin);
 
 for (const c in globalComponents) {

@@ -64,6 +64,7 @@
 </template>
 
 <script setup lang="ts">
+import { useShortcut } from "@/composables/shortcuts";
 import { TicketSymbol } from "@/types";
 import { copyToClipboard } from "@/utils";
 import { dayjs } from "frappe-ui";
@@ -175,6 +176,15 @@ function formatTimeShort(date: string, end?: string): string {
     return `${minutes}m`;
   }
 }
-</script>
 
-<style scoped></style>
+useShortcut({ meta: true, shift: true, key: "." }, () => {
+  copyToClipboard(window.location.href, `Ticket URL copied to clipboard`);
+});
+
+useShortcut({ meta: true, key: "." }, () => {
+  copyToClipboard(
+    ticket.value.doc.name,
+    `Ticket #${ticket.value.doc.name} copied to clipboard`
+  );
+});
+</script>
