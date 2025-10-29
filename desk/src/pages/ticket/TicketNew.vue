@@ -15,13 +15,14 @@
     <div
       class="flex flex-col gap-5 py-6 h-full flex-1 self-center overflow-auto mx-auto w-full max-w-4xl px-5"
     >
-    <div v-if="afterHoursSettings.data?.outside_working_hours_message" 
-      class="form-message border-bottom yellow  max-w-4xl rounded  bg-yellow-100"
+    <div v-if="afterHoursSettings.data?.outside_working_hours_message && !isDismissed" 
+      class="form-message border-bottom yellow  max-w-4xl rounded  bg-yellow-100  flex  py-1.5 px-2 justify-between items-center"
     >
       <p 
         class="text-sm text-yellow-800 px-2.5 py-2">
         {{ afterHoursSettings.data.outside_working_hours_message }}
       </p>
+      <Button icon="x"  @click="dismissBanner" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800"  />
     </div>
       <!-- custom fields descriptions -->
       <div v-if="Boolean(template.data?.about)" class="">
@@ -162,11 +163,11 @@ const router = useRouter();
 const { $dialog } = globalStore();
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager, userId: userID } = useAuthStore();
-
 const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
+const isDismissed = ref(false);
 
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
@@ -315,4 +316,30 @@ onMounted(() => {
     },
   });
 });
+
+
+function getTodayKey() {
+  return new Date().toISOString().split("T")[0];
+}
+
+function dismissBanner() {
+  try {
+    const todayKey = getTodayKey();
+    localStorage.setItem(`dismiss_banner_${todayKey}`, "true");
+    isDismissed.value = true;
+  } catch (error) {
+    console.error("Error saving banner dismissal:", error);
+  }
+}
+
+onMounted(() => {
+  try {
+    const todayKey = getTodayKey();
+    const dismissed = localStorage.getItem(`dismiss_banner_${todayKey}`);
+    isDismissed.value = dismissed === "true";
+  } catch (error) {
+    console.error("Error reading banner dismissal:", error);
+  }
+});
+ 
 </script>
