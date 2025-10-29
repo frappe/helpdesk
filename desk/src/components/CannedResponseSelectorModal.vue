@@ -6,7 +6,7 @@
     }"
   >
     <template #body>
-      <div :style="{ height: 'calc(100vh - 8rem)' }">
+      <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex items-center justify-between w-full p-4 pb-2">
           <div class="text-2xl font-semibold">Canned Responses</div>
           <Button
