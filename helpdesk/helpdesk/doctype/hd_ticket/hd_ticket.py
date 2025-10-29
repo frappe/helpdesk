@@ -110,7 +110,6 @@ class HDTicket(Document):
         )
 
     def handle_email_feedback(self):
-
         if (
             self.is_new()
             or self.via_customer_portal
@@ -196,7 +195,6 @@ class HDTicket(Document):
                 self.get_doc_before_save()
                 and self.get_doc_before_save().status_category != "Open"
             ):
-
                 agents = self.get_assigned_agents()
                 if agents:
                     for agent in agents:
@@ -436,7 +434,6 @@ class HDTicket(Document):
         if hasattr(self, "_assign") and self._assign:
             assignees = json.loads(self._assign)
             if len(assignees) > 0:
-
                 # TODO: temporary fix, remove this when only agents can be assigned to ticket
                 exists = frappe.db.exists("HD Agent", assignees[0])
                 if exists:
@@ -661,7 +658,6 @@ class HDTicket(Document):
     def create_communication_via_contact(
         self, message, attachments=[], new_ticket=False
     ):
-
         if not new_ticket and frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_to_agent"
         ):
@@ -758,7 +754,6 @@ class HDTicket(Document):
             frappe.throw(_(e))
 
     def send_acknowledgement_email(self):
-
         acknowledgement_email_content = frappe.db.get_single_value(
             "HD Settings", "acknowledgement_email_content"
         )
@@ -1114,7 +1109,6 @@ class HDTicket(Document):
 # permission checks which is not possible with standard permission system. This function
 # is being called from hooks. `doc` is the ticket to check against
 def has_permission(doc, user=None):
-
     if not user:
         user = frappe.session.user
 
@@ -1141,6 +1135,14 @@ def has_permission(doc, user=None):
     if show_tickets_without_team and not doc.get("agent_group"):
         return True
 
+    if doc.get("_assign", None):
+        try:
+            assignees = json.loads(doc._assign)
+            if user in assignees:
+                return True
+        except:
+            return False
+
     teams = get_agents_team()
     if any([team.get("ignore_restrictions") for team in teams]):
         return True
@@ -1158,7 +1160,6 @@ def has_permission(doc, user=None):
 # Custom perms for list query. Only the `WHERE` part
 # https://frappeframework.com/docs/user/en/python-api/hooks#modify-list-query
 def permission_query(user):
-
     if not user:
         user = frappe.session.user
     if is_admin(user):
@@ -1206,6 +1207,12 @@ def permission_query(user):
         if not show_tickets_without_team:
             query += " OR (`tabHD Ticket`.agent_group is null)"
         return query
+
+    query += (
+        " OR (JSON_SEARCH(`tabHD Ticket`._assign, 'all', {user}) IS NOT NULL)".format(
+            user=frappe.db.escape(user)
+        )
+    )
 
     team_names = [t.get("team_name") for t in teams]
 

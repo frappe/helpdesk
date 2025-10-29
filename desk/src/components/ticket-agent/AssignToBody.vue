@@ -115,6 +115,8 @@ const removeValue = (value) => {
 };
 
 const addValue = (value) => {
+  if (!value) return;
+
   if (value === getUser("").name) {
     assignToMe.value = true;
   }
