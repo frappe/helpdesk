@@ -95,7 +95,7 @@
             :disabled="!isAccountInfoDirty"
           />
         </div>
-        <div class="flex flex-col sm:flex-row items-center gap-2 mt-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
           <FormControl
             class="w-full"
             :label="__('First Name')"

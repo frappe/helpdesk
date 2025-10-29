@@ -52,7 +52,7 @@
         <LoadingIndicator class="w-4" />
       </div>
       <div v-if="!getAssignmentRuleData.loading">
-        <div class="grid grid-cols-2 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <FormControl
               :type="'text'"
