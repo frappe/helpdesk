@@ -18,7 +18,9 @@
             <Link
               v-if="field.visible"
               :key="field.fieldname"
+              :ref="(el) => setFieldRef(field.fieldname, el)"
               class="form-control-core"
+              :id="field.fieldname"
               :class="section.group ? 'flex-1' : 'w-full'"
               :page-length="10"
               :label="field.label"
@@ -62,6 +64,7 @@
 import { Link } from "@/components";
 import { parseField } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
+import { useShortcut } from "@/composables/shortcuts";
 import { getMeta } from "@/stores/meta";
 import {
   ActivitiesSymbol,
@@ -70,7 +73,7 @@ import {
   FieldValue,
   TicketSymbol,
 } from "@/types";
-import { computed, inject } from "vue";
+import { computed, inject, ref } from "vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
@@ -101,6 +104,7 @@ const coreFields = computed(() => {
 
       // cant handle required depends on as we directly set the value in DB on change
       f["required"] = f.reqd;
+      f["ref"] = f.fieldname;
 
       f = getFieldInFormat(f, f);
       f["visible"] = true;
@@ -183,6 +187,26 @@ function handleFieldUpdate(
     //show error toast
   );
 }
+
+const fieldRefs = ref<Record<string, any>>({});
+
+const setFieldRef = (fieldname: string, el: any) => {
+  if (el) {
+    fieldRefs.value[fieldname] = el;
+  }
+};
+
+useShortcut("t", () => {
+  fieldRefs.value?.ticket_type?.$el?.querySelector("button")?.click();
+});
+
+useShortcut("p", () => {
+  fieldRefs.value?.priority?.$el?.querySelector("button")?.click();
+});
+
+useShortcut({ key: "t", shift: true }, () => {
+  fieldRefs.value?.agent_group?.$el?.querySelector("button")?.click();
+});
 </script>
 
 <style scoped>
@@ -190,9 +214,7 @@ function handleFieldUpdate(
   @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
 }
 :deep(.form-control-core button > div) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @apply truncate;
 }
 
 :deep(.form-control-core div) {

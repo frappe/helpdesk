@@ -53,7 +53,7 @@
         <!-- Status -->
         <Dropdown :options="statusDropdown" placement="right">
           <template #default="{ open }">
-            <Button :label="ticket.doc.status">
+            <Button :label="ticket.doc.status" ref="statusRef">
               <template #prefix>
                 <IndicatorIcon
                   :class="
@@ -90,6 +90,7 @@ import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";
 import { setupCustomizations } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
+import { useShortcut } from "@/composables/shortcuts";
 import { useView } from "@/composables/useView";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
@@ -107,8 +108,10 @@ import {
   ComputedRef,
   h,
   inject,
+  onMounted,
   PropType,
   ref,
+  useTemplateRef,
   watchEffect,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -208,13 +211,6 @@ const defaultActions = computed(() => {
       onClick: () => (showMergeModal.value = true),
     });
   }
-  // items.push({
-  //   label: "Jump to ticket",
-  //   icon: LucideTicket,
-  //   onClick: () => {
-  //     console.log("HELLO");
-  //   },
-  // });
   return [
     {
       group: "Default actions",
@@ -280,6 +276,14 @@ watchEffect(async () => {
       ...(customizations.value?.data?._customActions || []),
     ];
   }
+});
+
+const statusRef = useTemplateRef("statusRef");
+
+onMounted(() => {
+  useShortcut("s", () => {
+    statusRef.value?.$el?.nextElementSibling?.click();
+  });
 });
 </script>
 

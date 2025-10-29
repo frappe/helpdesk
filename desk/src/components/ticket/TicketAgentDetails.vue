@@ -65,6 +65,7 @@ const firstResponseBadge = computed(() => {
     firstResponse = {
       label: `Due in ${formatTime(firstResponseSeconds.value)}`,
       color: "orange",
+      date: props.ticket.response_by,
     };
   } else if (
     dayjs(props.ticket.first_responded_on).isBefore(
@@ -79,11 +80,13 @@ const firstResponseBadge = computed(() => {
         )
       )}`,
       color: "green",
+      date: props.ticket.first_responded_on,
     };
   } else {
     firstResponse = {
       label: "Failed",
       color: "red",
+      date: props.ticket.response_by,
     };
   }
   return firstResponse;
@@ -103,6 +106,7 @@ const resolutionBadge = computed(() => {
     resolution = {
       label: `${formatTime(timeLeft)} left (On Hold)`,
       color: "blue",
+      date: props.ticket.on_hold_since,
     };
   } else if (
     !props.ticket.resolution_date &&
@@ -116,6 +120,7 @@ const resolutionBadge = computed(() => {
     resolution = {
       label: `Due in ${formatTime(resolutionSeconds.value)}`,
       color: "orange",
+      date: props.ticket.resolution_by,
     };
   } else if (props.ticket.agreement_status === "Fulfilled") {
     resolution = {
@@ -123,11 +128,13 @@ const resolutionBadge = computed(() => {
         dayjs(props.ticket.resolution_time, "s")
       )}`,
       color: "green",
+      date: props.ticket.resolution_date,
     };
   } else {
     resolution = {
       label: "Failed",
       color: "red",
+      date: props.ticket.resolution_by,
     };
   }
   return resolution;
@@ -146,16 +153,13 @@ function getCalculatedResolution() {
 const sections = computed(() => [
   {
     label: "First Response",
-    tooltipValue: dateFormat(props.ticket.response_by, dateTooltipFormat),
+    tooltipValue: dateFormat(firstResponseBadge.value.date, dateTooltipFormat),
     badgeText: firstResponseBadge.value.label,
     badgeColor: firstResponseBadge.value.color,
   },
   {
     label: "Resolution",
-    tooltipValue: dateFormat(
-      props.ticket.resolution_date || props.ticket.resolution_by,
-      dateTooltipFormat
-    ),
+    tooltipValue: dateFormat(resolutionBadge.value.date, dateTooltipFormat),
     badgeText: resolutionBadge.value.label,
     badgeColor: resolutionBadge.value.color,
   },
