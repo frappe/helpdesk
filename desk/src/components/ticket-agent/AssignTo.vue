@@ -50,10 +50,10 @@
 </template>
 
 <script setup lang="ts">
+import { useShortcut } from "@/composables/shortcuts";
 import { ActivitiesSymbol, AssigneeSymbol, TicketSymbol } from "@/types";
 import { Popover } from "frappe-ui";
-import { inject, nextTick, onMounted, useTemplateRef } from "vue";
-import { useShortcut } from "@/composables/shortcuts";
+import { inject, useTemplateRef } from "vue";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import AssignToBody from "./AssignToBody.vue";
@@ -76,4 +76,5 @@ const assignToRef = useTemplateRef("assigneeButton");
 useShortcut("a", () => {
   (assignToRef.value?.$el as HTMLElement)?.nextElementSibling?.click();
 });
+  
 </script>
