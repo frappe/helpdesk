@@ -1,30 +1,27 @@
+import { useTelephonyStore } from "@/stores/telephony";
+import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useDebounceFn, useStorage } from "@vueuse/core";
 
-export function useActiveTabManager(tabs, storageKey) {
-  const activeTab = useStorage(storageKey, "activity");
+export function useActiveTabManager(tabs) {
   const route = useRoute();
   const router = useRouter();
+  const telephonyStore = useTelephonyStore();
+  const { isLoading: isTelephonyLoading } = storeToRefs(telephonyStore);
 
-  const changeTabTo = (tabName) => {
-    let index = findTabIndex(tabName);
-    if (index == -1) return;
-    tabIndex.value = index;
+  const changeTabTo = (tab) => {
+    tabIndex.value = tab;
+    if (tab == 0) {
+      router.replace({ path: route.path });
+    } else {
+      setActiveTabInUrl(tabs.value?.[tab]?.name || tabs.value[0].name);
+    }
   };
-
-  const preserveLastVisitedTab = useDebounceFn((tabName) => {
-    activeTab.value = tabName.toLowerCase();
-  }, 300);
 
   function setActiveTabInUrl(tabName) {
     let hash = "#" + tabName?.toLowerCase();
     if (route.hash === hash) return;
-    router.push({ hash });
-  }
-
-  function getActiveTabFromUrl() {
-    return route.hash.replace("#", "");
+    router.push({ hash, query: route.query });
   }
 
   function findTabIndex(tabName) {
@@ -33,73 +30,48 @@ export function useActiveTabManager(tabs, storageKey) {
     );
   }
 
-  function getTabIndex(tabName) {
-    let index = findTabIndex(tabName);
-    return index !== -1 ? index : 0; // Default to the first tab if not found
-  }
+  const tabIndex = ref(0);
 
-  function getActiveTab() {
-    let _activeTab = getActiveTabFromUrl();
+  const setActiveTab = () => {
+    let _activeTab = route.hash.replace("#", "");
     if (_activeTab) {
       let index = findTabIndex(_activeTab);
-      if (index !== -1) {
-        preserveLastVisitedTab(_activeTab);
-        return index;
+      if (index !== -1 || index === 0) {
+        tabIndex.value = index;
+        setActiveTabInUrl(tabs.value[index].name);
+        return;
       }
-      return 0;
     }
 
-    let lastVisitedTab = activeTab.value;
-    if (lastVisitedTab) {
-      return getTabIndex(lastVisitedTab);
-    }
+    tabIndex.value = 0;
+    router.replace({ path: route.path });
+  };
 
-    return 0; // Default to the first tab if nothing is found
-  }
-
-  const tabIndex = ref(getActiveTab());
-
-  watch(tabIndex, (tabIndexValue) => {
-    let currentTab = tabs.value?.[tabIndexValue].name;
-    setActiveTabInUrl(currentTab);
-    preserveLastVisitedTab(currentTab);
-  });
-
+  // Handle when page is navigated
   watch(
     () => route.hash,
-    (tabValue) => {
-      if (!tabValue) return;
-
-      let tabName = tabValue.replace("#", "");
-      let index = findTabIndex(tabName);
+    (newHash) => {
+      let index = findTabIndex(newHash.replace("#", ""));
       if (index === -1) index = 0;
 
-      let currentTab = tabs.value?.[index].name;
-      preserveLastVisitedTab(currentTab);
+      if (index == 0) {
+        router.replace({ path: route.path });
+      }
+
       tabIndex.value = index;
     }
   );
 
+  // Handle when tabs array is updated
   watch(
-    tabs,
-    (tabsValue) => {
+    [tabs, isTelephonyLoading],
+    ([tabsValue, isLoading]) => {
       if (!tabsValue?.length) return;
-
-      const currentTab = getActiveTab();
-      tabIndex.value = currentTab;
-
-      const tab = tabsValue.find(
-        (t) => t.name.toLowerCase() === activeTab.value
-      );
-
-      if (tab) {
-        setActiveTabInUrl(tab.name);
-      } else if (tabsValue.length > 0) {
-        setActiveTabInUrl(tabsValue[0].name);
-        tabIndex.value = 0;
+      if (!isLoading) {
+        setActiveTab();
       }
     },
-    { immediate: true, deep: true }
+    { deep: true, flush: "post" }
   );
 
   return { tabIndex, changeTabTo };
