@@ -88,11 +88,12 @@ import {
   TextEditor,
   createResource,
 } from "frappe-ui";
-import { ref, computed, nextTick, watch } from "vue";
 import {
   setActiveSettingsTab,
   showSettingsModal,
 } from "./Settings/settingsModal";
+import { ref, computed, nextTick, watch, onUnmounted } from "vue";
+import { showEmailBox } from "../pages/ticket/modalStates";
 
 const props = defineProps({
   doctype: {
@@ -148,6 +149,9 @@ const cannedResponsesResource = createResource({
     cannedResponsesList.value = data;
   },
   auto: true,
+});
+onUnmounted(() => {
+  showEmailBox.value = true;
 });
 
 const filteredTemplates = computed(() => {

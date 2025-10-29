@@ -1,5 +1,5 @@
 <template>
-  <Tabs v-model="tabIndex" :tabs="tabs">
+  <Tabs :modelValue="tabIndex" :tabs="tabs" @update:modelValue="changeTabTo">
     <TabList />
     <TabPanel v-slot="{ tab }" class="flex-1">
       <TicketAgentActivities
@@ -65,11 +65,11 @@ import { LoadingIndicator, TabList, TabPanel, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
+import { useActiveTabManager } from "@/composables/useActiveTabManager";
 
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);
 
-const tabIndex = ref(0);
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const telephonyStore = useTelephonyStore();
@@ -103,6 +103,8 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   }
   return _tabs;
 });
+
+const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend

@@ -140,6 +140,7 @@
       :isSidebarCollapsed="!isExpanded"
     />
     <SettingsModal v-model="showSettingsModal" />
+    <ShortcutsModal v-model="showShortcutsModal" />
     <HelpModal
       v-if="showHelpModal"
       v-model="showHelpModal"
@@ -157,6 +158,7 @@
       v-model="showIntermediateModal"
       :currentStep="currentStep"
     />
+    <CP v-model="showCommandPalette" />
   </div>
 </template>
 
@@ -164,7 +166,9 @@
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
 import Apps from "@/components/Apps.vue";
+import CP from "@/components/command-palette/CP.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useDevice } from "@/composables";
@@ -202,7 +206,8 @@ import {
   customerPortalSidebarOptions,
 } from "./layoutSettings";
 
-import { globalStore } from "@/stores/globalStore";
+import { useShortcut } from "@/composables/shortcuts";
+import { useTelephonyStore } from "@/stores/telephony";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
@@ -217,7 +222,8 @@ import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
-import { useTelephonyStore } from "@/stores/telephony";
+import LucideKeyboard from "~icons/lucide/keyboard";
+
 import {
   setActiveSettingsTab,
   showSettingsModal,
@@ -233,6 +239,9 @@ const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
+
+const showShortcutsModal = ref(false);
+const showCommandPalette = ref(false);
 
 const { pinnedViews, publicViews } = useView();
 
@@ -330,6 +339,11 @@ const agentPortalDropdown = computed(() => [
     condition: () => !isMobileView.value && window.is_fc_site,
   },
   {
+    label: "Shortcuts",
+    icon: h(LucideKeyboard),
+    onClick: () => (showShortcutsModal.value = true),
+  },
+  {
     label: "Settings",
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
@@ -362,9 +376,7 @@ function isActiveTab(to: any) {
 }
 
 function openCommandPalette() {
-  window.dispatchEvent(
-    new KeyboardEvent("keydown", { key: "k", metaKey: true })
-  );
+  showCommandPalette.value = true;
 }
 
 const logo = h(
@@ -629,9 +641,16 @@ async function getGeneralCategory() {
 function setUpOnboarding() {
   if (!authStore.isManager) return;
   setUp(steps);
+  useShortcut({ key: "h", meta: true }, () => {
+    showHelpModal.value = !showHelpModal.value;
+  });
 }
 
 onMounted(() => {
   setUpOnboarding();
+  if (isCustomerPortal.value) return;
+  useShortcut({ key: ",", meta: true }, () => {
+    showSettingsModal.value = !showSettingsModal.value;
+  });
 });
 </script>

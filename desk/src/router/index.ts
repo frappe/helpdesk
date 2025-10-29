@@ -5,7 +5,7 @@ import { isCustomerPortal } from "@/utils";
 import { createRouter, createWebHistory } from "vue-router";
 const { isMobileView } = useScreenSize();
 
-export const LOGIN_PAGE = "/login?redirect-to=/helpdesk";
+export const LOGIN_PAGE = "/login";
 
 // type the meta fields
 declare module "vue-router" {
@@ -200,7 +200,11 @@ router.beforeEach(async (to, _, next) => {
   }
 
   if (!authStore.isLoggedIn) {
-    window.location.href = LOGIN_PAGE;
+    const redirectURL = to.fullPath !== "/" ? to.fullPath : "";
+
+    window.location.href =
+      LOGIN_PAGE +
+      (redirectURL ? `?redirect-to=/helpdesk${redirectURL}` : "/helpdesk");
   } else if (!to.meta.public && !authStore.hasDeskAccess) {
     next({ name: "TicketsCustomer" });
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {

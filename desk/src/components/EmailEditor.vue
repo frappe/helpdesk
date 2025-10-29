@@ -151,6 +151,7 @@
     </template>
   </TextEditor>
   <CannedResponseSelectorModal
+    v-if="showCannedResponseSelectorModal"
     v-model="showCannedResponseSelectorModal"
     :doctype="doctype"
     @apply="applyCannedResponse"
