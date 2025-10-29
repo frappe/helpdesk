@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-10-05 10:35+0000\n"
-"PO-Revision-Date: 2025-10-11 02:13\n"
+"PO-Revision-Date: 2025-10-20 04:53\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -1990,7 +1990,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Result Preview Field"
-msgstr "فیلد پیش نمایش نتایج"
+msgstr "فیلد پیش‌نمایش نتایج"
 
 #. Label of the result_route_field (Data) field in DocType 'HD Support Search
 #. Source'

@@ -19,6 +19,7 @@
         <div
           class="w-full min-h-12 flex flex-wrap items-center gap-1.5 p-1.5 pb-5 rounded-lg bg-surface-gray-2 cursor-text"
           @click.stop="togglePopover"
+          ref="input"
         >
           <Tooltip
             :text="assignee.name"
@@ -74,7 +75,7 @@ import Link from "@/components/frappe-ui/Link.vue";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { Tooltip, Switch, createResource, call } from "frappe-ui";
-import { ref, watch } from "vue";
+import { ref, watch, useTemplateRef, nextTick } from "vue";
 
 const props = defineProps({
   doctype: {
@@ -114,6 +115,8 @@ const removeValue = (value) => {
 };
 
 const addValue = (value) => {
+  if (!value) return;
+
   if (value === getUser("").name) {
     assignToMe.value = true;
   }
@@ -220,5 +223,10 @@ const removeAssignees = createResource({
     name: props.docname,
     assignees: removedAssignees,
   }),
+});
+
+const targetRef = useTemplateRef("input");
+nextTick(() => {
+  targetRef.value.click();
 });
 </script>

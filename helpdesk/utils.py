@@ -1,4 +1,5 @@
 import functools
+import json
 import re
 from typing import List
 
@@ -478,3 +479,11 @@ def parse_call_log(call):
 
 def parse_call_logs(calls):
     return [parse_call_log(call) for call in calls] if calls else []
+
+
+def is_json_valid(json_string):
+    try:
+        json.loads(json_string)
+        return True
+    except json.JSONDecodeError:
+        return False
