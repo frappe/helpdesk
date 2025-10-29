@@ -84,12 +84,10 @@ class HelpdeskSearch(SQLiteSearch):
             document["reference_ticket"] = int(doc.reference_ticket)
 
         if doc.doctype == "Communication":
-            # For communications, ensure reference fields are set
+            # For communications, ensure reference fields are set for ticket doctype
             document["reference_doctype"] = doc.reference_doctype
             if doc.reference_doctype == "HD Ticket":
                 document["reference_ticket"] = int(doc.reference_name)
-            else:
-                document["reference_ticket"] = doc.reference_name
 
         if doc.doctype == "HD Ticket":
             document["reference_ticket"] = int(doc.name)
