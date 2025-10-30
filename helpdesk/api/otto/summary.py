@@ -135,6 +135,8 @@ def get_summaries(ticket: str) -> list[Summary]:
         "Otto Session",
         filters={"reference_doctype": "HD Ticket", "reference_name": ticket},
         fields=["name", "owner"],
+        order_by="modified desc",
+        limit=1,
     )
     if not sessions:
         return []

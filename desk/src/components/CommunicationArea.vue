@@ -26,19 +26,16 @@
           </template>
         </Button>
         <TypingIndicator :ticketId="ticketId" />
-        <Button
-          title="Summarize ticket activity"
-          variant="ghost"
-          label="Summarize"
-          @click="summarize()"
-          class="ml-auto"
-          :loading="isSummarizing"
+        <SummarizeButton
           v-if="showSummarizeButton"
-        >
-          <template #prefix>
-            <SummarizeIcon class="h-4" />
-          </template>
-        </Button>
+          :ticketId="ticketId"
+          :showSummarize-button="showSummarizeButton"
+          @update="
+            () => {
+              emit('update');
+            }
+          "
+        />
       </div>
     </div>
     <div
@@ -111,50 +108,8 @@ import { CommentIcon, EmailIcon } from "@/components/icons/";
 import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
-import { ref, watch, onMounted, onUnmounted } from "vue";
-
-import SummarizeIcon from "./icons/SummarizeIcon.vue";
-import { createResource, toast } from "frappe-ui";
-import { globalStore } from "@/stores/globalStore";
-
-const { $socket } = globalStore();
-const isSummarizing = ref(false);
-const summarizationToastId = ref<string | null>(null);
-async function summarize() {
-  summarizationToastId.value = toast.info("Generating summary...", {
-    duration: 60,
-  });
-  isSummarizing.value = true;
-  await createResource({
-    url: "helpdesk.api.otto.summary.summarize",
-  }).submit({
-    ticket_id: props.ticketId,
-  });
-}
-
-function handleSummarize(data: any) {
-  if (data.ticket !== props.ticketId) return;
-  if (data.type === "summary") emit("update");
-  if (data.type !== "chunk") return;
-
-  // TODO: maintain same toast until summary generation is complete
-  const chunk = data.data;
-  if (chunk.type === "system" && chunk.message === "end") {
-    isSummarizing.value = false;
-    toast.remove(summarizationToastId.value);
-    toast.success("Summary generated");
-    summarizationToastId.value = null;
-  }
-
-  if (chunk.type === "system" && chunk.message === "error") {
-    isSummarizing.value = false;
-    toast.error("Error generating summary");
-    console.error(chunk.content);
-  }
-}
-
-onMounted(() => $socket.on("helpdesk:otto-summarize", handleSummarize));
-onUnmounted(() => $socket.off("helpdesk:otto-summarize"));
+import { ref, watch } from "vue";
+import SummarizeButton from "./SummarizeButton.vue";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");

@@ -1,6 +1,6 @@
 <template>
   <div class="flex-col text-base flex-1" ref="commentBoxRef">
-    <div class="mb-1 ml-0.5 flex items-center justify-between">
+    <div class="mb-1.5 ml-0.5 flex items-center justify-between">
       <div class="text-gray-600 flex items-center gap-2">
         <Avatar
           size="md"

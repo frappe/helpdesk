@@ -111,7 +111,7 @@
           <h2
             class="text-base font-medium text-ink-gray-7 relative z-10 pointer-events-none flex items-center gap-2"
           >
-            Activity Summarization
+            {{ __("Ticket Summarization") }}
             <div
               v-if="!modelMap[featureConfig.summary.llm]?.is_api_key_set"
               class="w-1 h-1 rounded-full bg-red-500 inline-block"
@@ -120,7 +120,7 @@
           <p
             class="text-sm text-ink-gray-5 truncate relative z-10 pointer-events-none"
           >
-            Generate summary of ticket activity on demand.
+            {{ __("Generate summary of the ticket on demand.") }}
           </p>
         </div>
         <FeatherIcon
@@ -133,7 +133,7 @@
           @click="openSummarySettings"
         >
           <span class="sr-only">{{
-            __("configure activity summarization")
+            __("configure ticket summarization")
           }}</span>
         </button>
       </div>
@@ -151,7 +151,7 @@
     :showSaveButton="false"
     @back="currentView = 'main'"
   >
-    <LoadingIndicator v-if="getModels.loading" />
+    <LoadingIndicator :scale="10" v-if="getModels.loading" />
     <ModelList v-else :models="getModels.data ?? []" />
   </SettingsView>
 
@@ -159,8 +159,8 @@
   <SettingsView
     v-else-if="currentView === 'summary'"
     v-model="featureConfig.summary.enabled"
-    title="Activity Summarization"
-    description="Configure activity summarization."
+    :title="__('Ticket Summarization')"
+    :description="__('Configure ticket summarization.')"
     :isDirty="isAnyDirty"
     :isSaving="isSaving"
     :showEnabledSwitch="true"
@@ -188,16 +188,18 @@
           "
         />
         <div class="text-p-xs text-ink-gray-6 mt-1">
-          LLM to use for activity summarization.
+          {{ __("LLM to use for ticket summarization.") }}
         </div>
 
         <div
           v-if="!modelMap[featureConfig.summary.llm]?.is_api_key_set"
           class="text-p-xs text-ink-red-4 mt-1"
         >
-          API key not set for this model, feature will not work.
-          <span class="cursor-pointer underline" @click="currentView = 'models'"
-            >View models</span
+          {{ __("API key not set for this model, feature will not work.") }}
+          <span
+            class="cursor-pointer underline"
+            @click="currentView = 'models'"
+            >{{ __("View models") }}</span
           >
         </div>
       </div>
@@ -208,12 +210,14 @@
           class="text-p-sm [&>textarea]:font-mono"
           label="Guidelines"
           v-model="featureConfig.summary.guidelines"
-          placeholder="Enter custom instructions for summary generation..."
+          :placeholder="
+            __('Enter custom instructions for summary generation...')
+          "
           :rows="12"
         />
         <div class="mt-1 flex justify-between items-start">
           <p class="text-p-xs text-ink-gray-6 m-0 p-0">
-            Guidelines such as style, format, etc to be followed.
+            {{ __("Guidelines such as style, format, etc to be followed.") }}
           </p>
 
           <Button
@@ -241,20 +245,22 @@
 
 <script setup lang="ts">
 import Password from "@/components/Password.vue";
+import { Resource } from "@/types";
 import {
   Checkbox,
+  createDocumentResource,
+  createResource,
   FormControl,
   LoadingIndicator,
   Textarea,
-  createDocumentResource,
-  createResource,
   toast,
 } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { isDocDirty } from "../Telephony/utils";
+import ModelList from "./ModelList.vue";
 import SettingsView from "./SettingsView.vue";
 import type { SmartFeatureConfig } from "./types";
-import ModelList from "./ModelList.vue";
+import { OttoModel } from "./types";
 
 type ViewType = "main" | "summary" | "models";
 
@@ -275,7 +281,7 @@ const isDirty = ref({
 });
 const isSaving = ref(false);
 
-const featureConfig = ref<SmartFeatureConfig>({
+const featureConfig = ref({
   summary: {
     llm: "",
     enabled: false,
@@ -306,10 +312,7 @@ const canUseOtto = createResource({
     getDefaultSummaryConfig.reload();
   },
 });
-const getModels = createResource({
-  url: "otto.lib.model.get_models",
-  params: { get_details: true, include_unavailable: true },
-});
+
 const getKeysSet = createResource({
   url: "otto.lib.model.get_keys_set",
   onSuccess: (data) => {
@@ -337,13 +340,19 @@ const getFeatureConfig = createResource({
 const getDefaultSummaryConfig = createResource({
   url: "helpdesk.api.otto.summary.get_default_summary_config",
 });
+
+const getModels: Resource<OttoModel[]> = createResource({
+  url: "otto.lib.model.get_models",
+  params: { get_details: true, include_unavailable: true },
+});
+
 const modelMap = computed(() => {
   if (!getModels.data) return {};
 
   return getModels.data.reduce((acc, model) => {
     acc[model.name] = model;
     return acc;
-  }, {} as Record<string, unknown>);
+  }, {} as Record<string, OttoModel>);
 });
 
 const isAnyDirty = computed(
@@ -408,6 +417,10 @@ async function save() {
 }
 
 function openSummarySettings() {
+  if (isAnyDirty.value) {
+    // toast.error("Please save or discard your changes before proceeding.");
+    // return;
+  }
   currentView.value = "summary";
 }
 

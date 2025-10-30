@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full">
+  <div class="w-full" v-if="Boolean(_models.length)">
     <!-- Header -->
     <div
       class="grid grid-cols-12 items-center gap-4 py-3 text-sm font-medium text-gray-600 border-b border-gray-200 sticky top-0 bg-white"
@@ -23,12 +23,7 @@
     </div>
 
     <!-- Model Items -->
-    <template
-      v-for="(model, index) in models
-        .filter((model) => model.is_enabled)
-        .sort((a, b) => a.provider.localeCompare(b.provider))"
-      :key="model.name"
-    >
+    <template v-for="(model, index) in _models" :key="model.name">
       <div
         class="grid grid-cols-12 items-center gap-4 pt-3 hover:bg-gray-50 transition-colors -mx-2 px-2 rounded"
       >
@@ -62,5 +57,14 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ models: Record<string, any>[] }>();
+import { computed } from "vue";
+import { OttoModel } from "./types";
+
+const props = defineProps<{ models: OttoModel[] }>();
+
+const _models = computed(() => {
+  return props.models
+    .filter((model) => model.is_enabled)
+    .sort((a, b) => a.provider.localeCompare(b.provider));
+});
 </script>
