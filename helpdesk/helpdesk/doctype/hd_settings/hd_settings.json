@@ -40,6 +40,7 @@
   "working_hours_section",
   "working_hours_notification",
   "column_break_working_hours",
+  "set_outside_working_hours_message",
   "workflow_tab",
   "skip_email_workflow",
   "instantly_send_email",
@@ -445,19 +446,20 @@
    "reqd": 1
   },
   {
-    "fieldname": "working_hours_section",
-    "fieldtype": "Section Break",
-    "label": "Outside Working Hours Settings"
-  },  
-  { "description": "Let customers know they're raising a ticket outside working hours, and when they can expect a reply.",
-    "fieldname": "working_hours_notification",
-    "label": "Show Message Outside Working Hours",
-    "fieldtype": "Check",
-    "default": "0"
+   "fieldname": "working_hours_section",
+   "fieldtype": "Section Break",
+   "label": "Outside Working Hours Settings"
   },
   {
-    "fieldname": "column_break_working_hours",
-    "fieldtype": "Column Break"
+   "default": "0",
+   "description": "Let customers know they're raising a ticket outside working hours, and when they can expect a reply.",
+   "fieldname": "working_hours_notification",
+   "fieldtype": "Check",
+   "label": "Show Message Outside Working Hours"
+  },
+  {
+   "fieldname": "column_break_working_hours",
+   "fieldtype": "Column Break"
   },
   {
    "depends_on": "auto_close_tickets",
@@ -467,12 +469,20 @@
    "link_filters": "[[\"HD Ticket Status\",\"category\",\"in\",[\"Paused\",\"Resolved\",null]]]",
    "mandatory_depends_on": "eval: doc.auto_close_tickets",
    "options": "HD Ticket Status"
+  },
+  {
+   "depends_on": "working_hours_notification",
+   "description": "By default the following message is displayed \u201cYour ticket is outside office hours. For non-critical issues, expect a response by Monday.\u201d",
+   "fieldname": "set_outside_working_hours_message",
+   "fieldtype": "Small Text",
+   "label": "Set Outside Working Hours Message",
+   "placeholder": "Add your custom message here"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-29 13:34:17.018321",
+ "modified": "2025-10-29 21:05:04.116492",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

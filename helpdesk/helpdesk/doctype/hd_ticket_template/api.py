@@ -40,7 +40,8 @@ def get_one(name: str):
 def get_customer_portal_settings():
     settings = frappe.get_single("HD Settings")
     show_message = bool(settings.working_hours_notification)
-    message = "Your ticket is outside office hours, unless it is a critical issue, you will get a response by Monday"
+    msg_content=settings.set_outside_working_hours_message
+    message = msg_content or "Your ticket is outside office hours, unless it is a critical issue, you will get a response by Monday"
     outside_hours = is_outside_working_hours()
     return {
         "outside_working_hours_message": message if show_message and outside_hours else "",
