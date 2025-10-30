@@ -39,7 +39,7 @@ import {
   TicketSymbol,
 } from "@/types";
 import { createResource, toast, usePageMeta } from "frappe-ui";
-import { computed, onBeforeUnmount, onMounted, provide, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { showCommentBox, showEmailBox } from "./modalStates";
 const telephonyStore = useTelephonyStore();
