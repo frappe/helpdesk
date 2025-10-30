@@ -75,10 +75,14 @@ const apiOptions = createResource({
   transform: (data) => {
     if (!data?.length) return [];
     return (
-      data?.map((o) => ({
-        label: o,
-        value: o,
-      })) || []
+      data?.map((o) =>
+        typeof o === "object" && o.label && o.value
+          ? o
+          : {
+              label: o?.toString(),
+              value: o,
+            }
+      ) || []
     );
   },
 });
