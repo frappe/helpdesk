@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-10-26 10:35+0000\n"
-"PO-Revision-Date: 2025-10-29 08:39\n"
+"PO-Revision-Date: 2025-10-30 09:07\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Cyrillic)\n"
 "MIME-Version: 1.0\n"
@@ -20,12 +20,12 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:231
 msgid "% SLA Fulfilled"
-msgstr ""
+msgstr "% испуњености споразума о нивоу услуге"
 
 #: helpdesk/api/dashboard.py:236
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
-msgstr ""
+msgstr "% решених креираних тикета у оквиру рокова из споразума о нивоу услуге"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
@@ -407,35 +407,35 @@ msgstr "Просечно време одговора"
 
 #: helpdesk/api/dashboard.py:682
 msgid "Average feedback rating per day is around {0} stars"
-msgstr ""
+msgstr "Просечна оцена повратних информација по дану је око {0} звезда"
 
 #: helpdesk/api/dashboard.py:606
 msgid "Average tickets per day is around {0}"
-msgstr ""
+msgstr "Просечан број тикета по дану је око {0}"
 
 #: helpdesk/api/dashboard.py:387
 msgid "Avg. Feedback Rating"
-msgstr ""
+msgstr "Просечна оцена повратних информација"
 
 #: helpdesk/api/dashboard.py:283
 msgid "Avg. First Response"
-msgstr ""
+msgstr "Просечно време првог одговора"
 
 #: helpdesk/api/dashboard.py:337
 msgid "Avg. Resolution"
-msgstr ""
+msgstr "Просечно време решавања"
 
 #: helpdesk/api/dashboard.py:392
 msgid "Avg. feedback rating for the tickets resolved"
-msgstr ""
+msgstr "Просечна оцена повратних информација за решене тикете"
 
 #: helpdesk/api/dashboard.py:289
 msgid "Avg. time taken to first respond to a ticket"
-msgstr ""
+msgstr "Просечно време потребно за први одговор на тикет"
 
 #: helpdesk/api/dashboard.py:343
 msgid "Avg. time taken to resolve a ticket"
-msgstr ""
+msgstr "Просечно време потребно за решавање тикета"
 
 #. Label of the base_support_rotation (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -948,7 +948,7 @@ msgstr "Оцена повратне информације"
 
 #: helpdesk/api/dashboard.py:688
 msgid "Feedback Trend"
-msgstr ""
+msgstr "Тренд повратних информација"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:160
 msgid "Feedback email has been sent to the customer"
@@ -1612,7 +1612,7 @@ msgstr "Назив новог правила додељивања"
 
 #: helpdesk/api/dashboard.py:429
 msgid "No Team"
-msgstr ""
+msgstr "Без тима"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:12
 msgid "No assignees"
@@ -1727,19 +1727,19 @@ msgstr "Паузирано"
 
 #: helpdesk/api/dashboard.py:541
 msgid "Percentage of Total Tickets by Channel"
-msgstr ""
+msgstr "Проценат укупног броја тикета по каналу"
 
 #: helpdesk/api/dashboard.py:501
 msgid "Percentage of Total Tickets by Priority"
-msgstr ""
+msgstr "Проценат укупног броја тикета по приоритету"
 
 #: helpdesk/api/dashboard.py:435
 msgid "Percentage of Total Tickets by Team"
-msgstr ""
+msgstr "Проценат укупног броја тикета по тиму"
 
 #: helpdesk/api/dashboard.py:468
 msgid "Percentage of Total Tickets by Type"
-msgstr ""
+msgstr "Проценат укупног броја тикета по врсти"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1873,7 +1873,7 @@ msgstr "Оцените своје искуство подршке"
 
 #: helpdesk/api/dashboard.py:691
 msgid "Rated Tickets"
-msgstr ""
+msgstr "Оцењени тикети"
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
@@ -2111,7 +2111,7 @@ msgstr "Статус споразума о нивоу услуге"
 
 #: helpdesk/api/dashboard.py:584 helpdesk/api/dashboard.py:619
 msgid "SLA_fulfilled"
-msgstr ""
+msgstr "SLA_fulfilled"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2601,7 +2601,7 @@ msgstr "Резиме тикета"
 
 #: helpdesk/api/dashboard.py:611
 msgid "Ticket Trend"
-msgstr ""
+msgstr "Тренд тикета"
 
 #. Label of the ticket_type_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -2650,23 +2650,23 @@ msgstr "Анализа претраге тикета"
 
 #: helpdesk/api/dashboard.py:160 helpdesk/api/dashboard.py:614
 msgid "Tickets"
-msgstr ""
+msgstr "Тикети"
 
 #: helpdesk/api/dashboard.py:540
 msgid "Tickets by Channel"
-msgstr ""
+msgstr "Тикети по каналу"
 
 #: helpdesk/api/dashboard.py:500 helpdesk/api/dashboard.py:508
 msgid "Tickets by Priority"
-msgstr ""
+msgstr "Тикети по приоритету"
 
 #: helpdesk/api/dashboard.py:434 helpdesk/api/dashboard.py:442
 msgid "Tickets by Team"
-msgstr ""
+msgstr "Тикети по тиму"
 
 #: helpdesk/api/dashboard.py:467 helpdesk/api/dashboard.py:475
 msgid "Tickets by Type"
-msgstr ""
+msgstr "Тикети по врсти"
 
 #: helpdesk/api/ticket.py:18
 msgid "Tickets can only be assigned to agents"
@@ -2726,19 +2726,19 @@ msgstr "Укупан број тикета"
 
 #: helpdesk/api/dashboard.py:509
 msgid "Total Tickets by Priority"
-msgstr ""
+msgstr "Укупан број тикета по приоритету"
 
 #: helpdesk/api/dashboard.py:443
 msgid "Total Tickets by Team"
-msgstr ""
+msgstr "Укупан број тикета по тиму"
 
 #: helpdesk/api/dashboard.py:476
 msgid "Total Tickets by Type"
-msgstr ""
+msgstr "Укупан број тикета по врсти"
 
 #: helpdesk/api/dashboard.py:165
 msgid "Total number of tickets created"
-msgstr ""
+msgstr "Укупан број креираних тикета"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2998,7 +2998,7 @@ msgstr "љубичаста"
 
 #: helpdesk/api/dashboard.py:642
 msgid "rated_tickets"
-msgstr ""
+msgstr "rated_tickets"
 
 #: helpdesk/api/dashboard.py:641
 msgid "rating"
