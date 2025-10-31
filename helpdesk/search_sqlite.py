@@ -180,12 +180,6 @@ class HelpdeskSearch(SQLiteSearch):
 
 
 def build_index():
-    """Build search index - called by background job."""
+    """Build search index - can be called from console."""
     search = HelpdeskSearch()
     search.build_index()
-
-
-def delete_doc():
-    """Delete document from index - called by background job."""
-    search = HelpdeskSearch()
-    search.remove_doc()
