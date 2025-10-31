@@ -63,11 +63,6 @@ doc_events = {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
-    "HD Ticket": {
-        "on_trash": [
-            "helpdesk.search_sqlite.delete_doc",
-        ],
-    },
 }
 
 has_permission = {
