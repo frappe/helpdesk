@@ -12,7 +12,7 @@
           <span class="font-medium text-ink-gray-9">
             {{ activity.summarizer }}
           </span>
-          <span> {{ __("generated a summary") }}</span>
+          <span> generated a summary</span>
         </p>
       </div>
 
@@ -34,7 +34,7 @@
 
       <div class="mt-4 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
         <span
-          v-if="firstDetailPreview && !show"
+          v-if="firstDetailPreview && previewVisible"
           class="fade-text text-start text-p-sm font-medium text-ink-gray-5"
         >
           {{ firstDetailPreview }}
@@ -54,6 +54,7 @@
       </div>
 
       <div
+        ref="detailsWrapper"
         class="details-wrapper"
         :class="{ 'details-wrapper--open': show }"
         :style="{ '--details-height': `${detailsHeight}px` }"
@@ -99,11 +100,14 @@ const props = defineProps({
 });
 
 const show = ref(false);
+const previewVisible = ref(true);
 
 const { getUser } = useUserStore();
 
+const detailsWrapper = ref<HTMLElement | null>(null);
 const detailsContent = ref<HTMLElement | null>(null);
 const detailsHeight = ref(0);
+let collapseTimeout: number | undefined;
 
 const truncateText = (input: string, wordLimit = 18) => {
   const words = input.split(/\s+/);
@@ -136,6 +140,17 @@ const toggleDetails = () => {
   show.value = !show.value;
 };
 
+const onCollapseTransitionEnd = (event: TransitionEvent) => {
+  if (event.propertyName !== "max-height" || show.value) {
+    return;
+  }
+  previewVisible.value = true;
+  if (collapseTimeout !== undefined) {
+    window.clearTimeout(collapseTimeout);
+    collapseTimeout = undefined;
+  }
+};
+
 const measureDetailsHeight = () => {
   if (!detailsContent.value) {
     return;
@@ -151,16 +166,50 @@ const scheduleMeasure = () => {
 
 onMounted(() => {
   scheduleMeasure();
+  previewVisible.value = !show.value;
   window.addEventListener("resize", scheduleMeasure, { passive: true });
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", scheduleMeasure);
+  if (collapseTimeout !== undefined) {
+    window.clearTimeout(collapseTimeout);
+  }
 });
 
-watch(show, () => {
-  scheduleMeasure();
-});
+watch(
+  () => show.value,
+  (expanded) => {
+    if (collapseTimeout !== undefined) {
+      window.clearTimeout(collapseTimeout);
+      collapseTimeout = undefined;
+    }
+
+    previewVisible.value = false;
+    scheduleMeasure();
+
+    if (expanded) {
+      return;
+    }
+
+    const wrapper = detailsWrapper.value;
+    if (!wrapper) {
+      previewVisible.value = true;
+      return;
+    }
+
+    wrapper.addEventListener("transitionend", onCollapseTransitionEnd, {
+      once: true,
+    });
+
+    collapseTimeout = window.setTimeout(() => {
+      if (!show.value) {
+        previewVisible.value = true;
+      }
+      collapseTimeout = undefined;
+    }, 420);
+  }
+);
 
 watch(
   () => props.activity.content,
