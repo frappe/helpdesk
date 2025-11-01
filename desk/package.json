@@ -10,11 +10,6 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.22",
-    "@iconify-json/lucide": "^1.1.99",
-    "@iconify-json/ph": "^1.1.5",
-    "@iconify/tools": "^2.2.6",
-    "@iconify/vue": "^4.1.1",
-    "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.9",
     "@tiptap/core": "^2.2.4",
     "@twilio/voice-sdk": "^2.15.0",
@@ -23,21 +18,13 @@
     "@vueuse/core": "^13.8.0",
     "@vueuse/integrations": "^13.8.0",
     "dayjs": "^1.11.7",
-    "echarts": "^5.4.1",
     "frappe-ui": "0.1.192",
     "gemoji": "^8.1.0",
-    "lodash": "^4.17.21",
-    "lucide-static": "^0.276.0",
     "mime": "^3.0.0",
     "pinia": "^2.0.33",
-    "pluralize": "^8.0.0",
     "sanitize-html": "^2.10.0",
     "socket.io-client": "^4.7.2",
-    "unplugin-icons": "^0.16.1",
-    "unplugin-vue-components": "^0.25.2",
-    "vee-validate": "^4.8.2",
     "vue": "^3.5.14",
-    "vue-echarts": "^6.5.4",
     "vue-router": "^4.2.2",
     "vuedraggable": "^4.1.0",
     "zod": "^3.21.4"
@@ -48,12 +35,14 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue-jsx": "^3.0.1",
-    "prettier": "2.8.4",
-    "typescript": "^5.0.2",
-    "vite": "^4.4.9",
-    "vite-plugin-pwa": "^0.20.5",
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.5",
-    "tailwindcss": "^3.4.15"
+    "prettier": "2.8.4",
+    "rollup-plugin-visualizer": "^6.0.5",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.9",
+    "vite-bundle-visualizer": "^1.2.1",
+    "vite-plugin-pwa": "^0.20.5"
   }
 }
