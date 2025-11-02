@@ -101,7 +101,7 @@ import { useAuthStore } from "@/stores/auth";
 import { FormControl, Button, Tooltip, createResource, toast } from "frappe-ui";
 import { computed, ref } from "vue";
 import { useOnboarding } from "frappe-ui/frappe";
-import SettingsLayoutBase from "./SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
 
 const authStore = useAuthStore();

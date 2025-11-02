@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { __ } from "@/translation";
 import type { AtLeastOneNotifcation, Notification } from "./types";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const props = defineProps<{
   onSelect: (notification: Notification) => void;

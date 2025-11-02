@@ -20,7 +20,7 @@
         }}
       </p>
     </template>
-    <template #actions>
+    <template #header-actions>
       <Button
         :label="__('New')"
         theme="gray"
@@ -30,7 +30,7 @@
       />
     </template>
     <template #content>
-      <div>
+      <div class="grow">
         <!-- Loading State -->
         <div
           v-if="fieldDependenciesList.loading"
@@ -45,7 +45,7 @@
             !fieldDependenciesList.loading &&
             !fieldDependenciesList.data?.length
           "
-          class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
+          class="flex flex-col items-center justify-center gap-4 p-4 h-full"
         >
           <div
             class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
@@ -153,7 +153,7 @@ import { fieldDependenciesList } from "./fieldDependency";
 import DocumentationButton from "@/components/DocumentationButton.vue";
 import FieldDependencyIcon from "@/components/icons/FieldDependencyIcon.vue";
 import { __ } from "@/translation";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 onMounted(() => {
   fieldDependenciesList.reload();

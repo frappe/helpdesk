@@ -14,7 +14,7 @@
         </div>
       </div>
     </template>
-    <template #actions>
+    <template #header-actions>
       <Dropdown placement="right" :options="options">
         <Button variant="ghost">
           <template #icon>
@@ -23,7 +23,7 @@
         </Button>
       </Dropdown>
     </template>
-    <template #bottom-section>
+    <template #header-bottom>
       <!-- Add member -->
       <div class="flex gap-2 items-center">
         <!-- Form control for search -->
@@ -82,7 +82,7 @@
       </div>
       <div
         v-else
-        class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
+        class="flex flex-col items-center justify-center gap-4 h-full"
       >
         <div
           class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
@@ -158,7 +158,7 @@ import { setActiveSettingsTab } from "../settingsModal";
 import UserIcon from "~icons/lucide/user";
 import { ConfirmDelete } from "@/utils";
 import { __ } from "@/translation";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAgentStore } from "@/stores/agent";
 import AgentSelector from "./components/AgentSelector.vue";
 

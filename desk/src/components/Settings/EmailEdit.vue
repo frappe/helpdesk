@@ -113,7 +113,7 @@ import {
   validateInputs,
 } from "./emailConfig";
 import { __ } from "@/translation";
-import SettingsLayoutBase from "./SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 interface P {
   accountData: EmailAccount;

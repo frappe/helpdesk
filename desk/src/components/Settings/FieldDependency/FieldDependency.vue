@@ -13,7 +13,7 @@
         <Badge v-if="isDirty" theme="orange"> {{ __("Unsaved") }} </Badge>
       </div>
     </template>
-    <template #actions>
+    <template #header-actions>
       <div class="flex gap-4">
         <!-- Switch -->
         <div class="flex gap-2 items-center">
@@ -92,7 +92,7 @@ import FieldDependencyCriteria from "./FieldDependencyCriteria.vue";
 import FieldDependencyFieldsSelection from "./FieldDependencyFieldsSelection.vue";
 import FieldDependencyValueSelection from "./FieldDependencyValueSelection.vue";
 import { __ } from "@/translation";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const props = defineProps({
   fieldDependencyName: {

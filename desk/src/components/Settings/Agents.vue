@@ -3,7 +3,7 @@
     :title="__('Agents')"
     :description="__('Add, manage agents and assign roles to them.')"
   >
-    <template #actions>
+    <template #header-actions>
       <Button
         @click="() => setActiveSettingsTab('Invite Agents')"
         label="New"
@@ -14,11 +14,11 @@
         </template>
       </Button>
     </template>
-    <template #bottom-section>
+    <template #header-bottom>
       <div class="flex items-center gap-2 justify-between">
         <div class="relative grow">
           <Input
-            v-model="search"
+            :model-value="search"
             @input="search = $event"
             :placeholder="__('Search')"
             type="text"
@@ -71,7 +71,7 @@
       </div>
     </template>
     <template #content>
-      <div>
+      <div class="grow">
         <!-- loading state -->
         <div
           v-if="agents.loading"
@@ -87,7 +87,7 @@
         <!-- Empty State -->
         <div
           v-if="!agents.loading && !agents.data?.length"
-          class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
+          class="flex flex-col items-center justify-center gap-4 h-full"
         >
           <div
             class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex items-center justify-center"
@@ -203,7 +203,7 @@ import LucideCheck from "~icons/lucide/check";
 import { activeFilter, useAgents } from "./agents";
 import AgentIcon from "../icons/AgentIcon.vue";
 import { setActiveSettingsTab } from "./settingsModal";
-import SettingsLayoutBase from "./SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();

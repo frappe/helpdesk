@@ -5,7 +5,7 @@
       __('Create and manage teams and assign agents to specific teams.')
     "
   >
-    <template #actions>
+    <template #header-actions>
       <Button
         :label="__('New')"
         theme="gray"
@@ -16,11 +16,11 @@
     </template>
     <template
       v-if="teams.data?.length > 9 || teamsSearchQuery.length"
-      #bottom-section
+      #header-bottom
     >
       <div class="relative">
         <Input
-          v-model="teamsSearchQuery"
+          :model-value="teamsSearchQuery"
           @input="teamsSearchQuery = $event"
           :placeholder="__('Search')"
           type="text"
@@ -101,7 +101,7 @@
       <!-- Empty State -->
       <div
         v-if="!teams.loading && !teams.data?.length"
-        class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
+        class="flex flex-col items-center justify-center gap-4 h-full"
       >
         <div
           class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
@@ -148,7 +148,7 @@ import { ConfirmDelete } from "@/utils";
 import EditIcon from "@/components/icons/EditIcon.vue";
 import RenameTeamModal from "./RenameTeamModal.vue";
 import { __ } from "@/translation";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 interface E {
   (event: "update:step", step: string, team: string): void;

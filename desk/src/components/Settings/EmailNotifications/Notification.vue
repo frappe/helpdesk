@@ -26,7 +26,7 @@
         />
       </div>
     </template>
-    <template #actions>
+    <template #header-actions>
       <div
         :inert="notificationDataResource.loading"
         class="flex items-center gap-x-4 pt-[0.125rem]"
@@ -138,7 +138,7 @@ import type { NotificationName } from "./types";
 import { createResource, Switch, LoadingIndicator } from "frappe-ui";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const props = defineProps<{
   title: string;

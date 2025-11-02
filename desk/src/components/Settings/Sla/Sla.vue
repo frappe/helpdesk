@@ -8,7 +8,7 @@ import { slaActiveScreen } from "@/stores/sla";
 import SlaPolicies from "./SlaPolicies.vue";
 import SlaPolicyView from "./SlaPolicyView.vue";
 import { createListResource } from "frappe-ui";
-import { provide, ref } from "vue";
+import { onUnmounted, provide, ref } from "vue";
 
 const slaPolicyListData = createListResource({
   doctype: "HD Service Level Agreement",
@@ -23,4 +23,9 @@ const slaSearchQuery = ref("");
 
 provide("slaSearchQuery", slaSearchQuery);
 provide("slaPolicyList", slaPolicyListData);
+
+onUnmounted(() => {
+  slaSearchQuery.value = "";
+  slaPolicyListData.filters = {};
+});
 </script>

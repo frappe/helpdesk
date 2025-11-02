@@ -14,7 +14,7 @@
         />
       </div>
     </template>
-    <template #actions>
+    <template #header-actions>
       <Button
         :label="__('Save')"
         variant="solid"
@@ -57,7 +57,7 @@ import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSet
 import { provide, ref, watch } from "vue";
 import { __ } from "@/translation";
 import { disableSettingModalOutsideClick } from "../settingsModal";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const isDirty = ref(false);
 const initialData = ref(null);

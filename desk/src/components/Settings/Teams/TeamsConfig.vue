@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, provide, Ref, ref } from "vue";
+import { onUnmounted, provide, Ref, ref } from "vue";
 import TeamEdit from "./TeamEdit.vue";
 import TeamsList from "./TeamsList.vue";
 import { createListResource } from "frappe-ui";
@@ -38,10 +38,9 @@ const teams = createListResource({
 provide("teamsSearchQuery", teamsSearchQuery);
 provide("teamsData", teams);
 
-onMounted(() => {
+onUnmounted(() => {
   teamsSearchQuery.value = "";
   teams.filters = {};
-  teams.reload();
 });
 </script>
 

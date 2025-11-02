@@ -7,7 +7,7 @@
       )
     "
   >
-    <template #actions>
+    <template #header-actions>
       <Button
         :label="__('Add Account')"
         theme="gray"
@@ -19,7 +19,7 @@
     <template #content>
       <!-- list accounts -->
       <div
-        class="-ml-2"
+        class="-ml-2 grow"
         v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
       >
         <div class="flex text-sm text-gray-600">
@@ -40,7 +40,7 @@
       <!-- fallback if no email accounts -->
       <div
         v-else
-        class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
+        class="flex flex-col items-center justify-center gap-4 h-full"
       >
         <div
           class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
@@ -70,7 +70,7 @@
 import { EmailAccount } from "@/types";
 import { createListResource } from "frappe-ui";
 import EmailAccountCard from "./EmailAccountCard.vue";
-import SettingsLayoutBase from "./SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const emit = defineEmits(["update:step"]);
 

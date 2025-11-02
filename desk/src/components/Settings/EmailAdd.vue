@@ -117,7 +117,7 @@ import {
 } from "./emailConfig";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import { __ } from "@/translation";
-import SettingsLayoutBase from "./SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 interface E {
   (event: "update:step", value: EmailStep): void;
