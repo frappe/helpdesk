@@ -57,6 +57,7 @@
               "
               class="py-2 px-3"
               @reply="(e) => emit('email:reply', e)"
+              @forward="(e) => emit('email:forward', e)"
             />
             <CommentBox
               v-else-if="activity.type === 'comment'"
@@ -139,7 +140,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["email:reply", "update"]);
+const emit = defineEmits(["email:reply", "email:forward", "update"]);
 
 const route = useRoute();
 const router = useRouter();

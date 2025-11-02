@@ -52,15 +52,30 @@
         <Button variant="ghost" class="text-gray-700" @click="replyAll">
           <ReplyAllIcon class="h-4 w-4" />
         </Button>
+
+        <Button
+          variant="ghost"
+          class="text-gray-700"
+          @click="emit('forward', {
+            content: content,
+            attachments: attachments,
+            subject: subject,
+            to: sender?.name ?? to,
+            cc: cc,
+            bcc: bcc,
+          })"
+        >
+          <ForwardIcon class="h-4 w-4" />
+        </Button>
         <Dropdown
           v-if="showSplitOption"
           :placement="'right'"
           :options="[
-            {
+            ...(showSplitOption ? [{
               label: 'Split Ticket',
               icon: LucideSplit,
               onClick: () => (showSplitModal = true),
-            },
+            }] : []),
           ]"
         >
           <Button
@@ -111,7 +126,7 @@ import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
 import { Dropdown } from "frappe-ui";
 import { computed, ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
-import { ReplyAllIcon, ReplyIcon } from "./icons";
+import { ReplyAllIcon, ReplyIcon, ForwardIcon } from "./icons";
 import TicketSplitModal from "./ticket/TicketSplitModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
@@ -140,7 +155,7 @@ const {
   deliveryStatus,
 } = props.activity;
 
-const emit = defineEmits(["reply"]);
+const emit = defineEmits(["reply","forward"]);
 
 const auth = storeToRefs(useAuthStore());
 

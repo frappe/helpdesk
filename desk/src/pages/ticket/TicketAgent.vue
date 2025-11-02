@@ -1,10 +1,101 @@
 <template>
-  <div v-if="ticket.doc?.name" class="flex-1">
-    <TicketHeader :viewers="viewers" />
-    <div class="h-full flex overflow-hidden">
-      <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Tabs & Communication Area -->
-        <TicketActivityPanel />
+  <div class="flex flex-col">
+    <LayoutHeader v-if="ticket.data">
+      <template #left-header>
+        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
+          <template #prefix="{ item }">
+            <Icon
+              v-if="item.icon"
+              :icon="item.icon"
+              class="mr-1 h-4 flex items-center justify-center self-center"
+            />
+          </template>
+        </Breadcrumbs>
+      </template>
+      <template #right-header>
+        <CustomActions
+          v-if="ticket.data._customActions"
+          :actions="ticket.data._customActions"
+        />
+        <div v-if="ticket.data.assignees?.length">
+          <component :is="ticket.data.assignees.length == 1 ? 'Button' : 'div'">
+            <MultipleAvatar
+              :avatars="ticket.data.assignees"
+              @click="showAssignmentModal = true"
+            />
+          </component>
+        </div>
+        <button
+          v-else
+          class="rounded bg-gray-100 px-2 py-1.5 text-base text-gray-800"
+          @click="showAssignmentModal = true"
+        >
+          Assign
+        </button>
+        <Dropdown :options="dropdownOptions">
+          <template #default="{ open }">
+            <Button :label="ticket.data.status">
+              <template #prefix>
+                <IndicatorIcon
+                  :class="ticketStatusStore.textColorMap[ticket.data.status]"
+                />
+              </template>
+              <template #suffix>
+                <FeatherIcon
+                  :name="open ? 'chevron-up' : 'chevron-down'"
+                  class="h-4"
+                />
+              </template>
+            </Button>
+          </template>
+        </Dropdown>
+      </template>
+    </LayoutHeader>
+    <div v-if="ticket.data" class="flex h-full overflow-hidden">
+      <div class="flex flex-1 flex-col max-w-[calc(100%-382px)]">
+        <!-- ticket activities -->
+        <div class="overflow-y-hidden flex flex-1 !h-full flex-col">
+          <Tabs v-model="tabIndex" :tabs="tabs">
+            <TabList />
+            <TabPanel v-slot="{ tab }" class="h-full">
+              <TicketAgentActivities
+                ref="ticketAgentActivitiesRef"
+                :activities="filterActivities(tab.name)"
+                :title="tab.label"
+                :ticket-status="ticket.data?.status"
+                @update="
+                  () => {
+                    ticket.reload();
+                  }
+                "
+                @email:reply="
+                  (e) => {
+                    communicationAreaRef.replyToEmail(e);
+                  }
+                "
+                @email:forward="
+                  (e) => {
+                    communicationAreaRef.forwardEmail(e);
+                  }
+                "
+              />
+            </TabPanel>
+          </Tabs>
+        </div>
+        <CommunicationArea
+          ref="communicationAreaRef"
+          v-model="ticket.data"
+          :to-emails="[ticket.data?.raised_by]"
+          :cc-emails="[]"
+          :bcc-emails="[]"
+          :key="ticket.data?.name"
+          @update="
+            () => {
+              ticket.reload();
+              ticketAgentActivitiesRef.scrollToLatestActivity();
+            }
+          "
+        />
       </div>
 
       <!-- Sidepanel with Resizer -->
