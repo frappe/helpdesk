@@ -14,7 +14,7 @@
         }}
       </p>
     </template>
-    <template #actions>
+    <template #header-actions>
       <Button
         :label="__('New')"
         theme="gray"
@@ -28,11 +28,11 @@
         assignmentRulesListData.data?.length > 9 ||
         assignmentRuleSearchQuery.length
       "
-      #bottom-section
+      #header-bottom
     >
       <div class="relative">
         <Input
-          v-model="assignmentRuleSearchQuery"
+          :model-value="assignmentRuleSearchQuery"
           @input="assignmentRuleSearchQuery = $event"
           :placeholder="__('Search')"
           type="text"
@@ -64,7 +64,7 @@ import {
   resetAssignmentRuleData,
 } from "@/stores/assignmentRules";
 import AssignmentRulesListView from "./AssignmentRulesListView.vue";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const assignmentRulesListData = createResource({
   url: "helpdesk.api.assignment_rule.get_assignment_rules_list",

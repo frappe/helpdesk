@@ -150,7 +150,7 @@ import { useAuthStore } from "@/stores/auth";
 import CameraIcon from "~icons/lucide/camera";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const auth = useAuthStore();
 const profile = ref({

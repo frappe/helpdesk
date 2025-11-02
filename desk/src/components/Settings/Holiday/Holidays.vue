@@ -7,7 +7,7 @@
       )
     "
   >
-    <template #actions>
+    <template #header-actions>
       <Button
         :label="__('New')"
         theme="gray"
@@ -18,11 +18,11 @@
     </template>
     <template
       v-if="holidayList.data?.length > 9 || holidaySearchRef.length"
-      #bottom-section
+      #header-bottom
     >
       <div class="relative">
         <Input
-          v-model="holidaySearchRef"
+          :model-value="holidaySearchRef"
           @input="holidaySearchRef = $event"
           :placeholder="__('Search')"
           type="text"
@@ -53,7 +53,7 @@ import {
 } from "@/stores/holidayList";
 import HolidayList from "./HolidayList.vue";
 import { inject, Ref, ref, watch } from "vue";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const holidayList = inject<any>("holidayList");
 const holidaySearchRef = inject<Ref>("holidaySearchRef");

@@ -5,10 +5,10 @@
   >
     <LoadingIndicator class="w-4" />
   </div>
-  <div v-else class="-ml-2">
+  <div v-else class="-ml-2 grow">
     <div
       v-if="!assignmentRulesListData.loading && !assignmentRulesList?.length"
-      class="flex flex-col items-center justify-center gap-4 p-4 mt-7 h-[500px]"
+      class="flex flex-col items-center justify-center gap-4 h-full"
     >
       <div
         class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"

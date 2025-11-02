@@ -19,7 +19,7 @@
         />
       </div>
     </template>
-    <template #actions>
+    <template #header-actions>
       <Button
         :label="__('Save')"
         variant="solid"
@@ -58,7 +58,7 @@
 
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from "vue";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { Badge, ErrorMessage, FormControl, FormLabel, toast } from "frappe-ui";
 import { __ } from "@/translation";
 import AgentSelector from "./components/AgentSelector.vue";

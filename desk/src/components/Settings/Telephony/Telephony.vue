@@ -17,7 +17,7 @@
         />
       </div>
     </template>
-    <template #actions>
+    <template #header-actions>
       <Button
         :label="__('Save')"
         theme="gray"
@@ -262,7 +262,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const auth = useAuthStore();
 const telephonyStore = useTelephonyStore();

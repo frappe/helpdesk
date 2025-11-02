@@ -20,7 +20,7 @@
         </a>
       </p>
     </template>
-    <template #actions>
+    <template #header-actions>
       <Button
         :label="__('New')"
         theme="gray"
@@ -31,11 +31,11 @@
     </template>
     <template
       v-if="slaPolicyList.data?.length > 9 || slaSearchQuery.length"
-      #bottom-section
+      #header-bottom
     >
       <div class="relative">
         <Input
-          v-model="slaSearchQuery"
+          :model-value="slaSearchQuery"
           @input="slaSearchQuery = $event"
           :placeholder="__('Search')"
           type="text"
@@ -64,7 +64,7 @@ import { resetSlaData, slaActiveScreen } from "@/stores/sla";
 import { Button } from "frappe-ui";
 import SlaPolicyList from "./SlaPolicyList.vue";
 import { inject, Ref, watch } from "vue";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const slaPolicyList = inject<any>("slaPolicyList");
 const slaSearchQuery = inject<Ref>("slaSearchQuery");

@@ -19,7 +19,7 @@
         />
       </div>
     </template>
-    <template #actions>
+    <template #header-actions>
       <Button
         :label="__('Save')"
         theme="gray"
@@ -245,7 +245,7 @@ import {
 import HolidaysCalendarView from "./HolidaysCalendarView.vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 import { __ } from "@/translation";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const dialog = ref({
   show: false,

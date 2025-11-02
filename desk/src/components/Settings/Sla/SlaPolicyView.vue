@@ -19,7 +19,7 @@
         />
       </div>
     </template>
-    <template #actions>
+    <template #header-actions>
       <div class="flex gap-4 items-center">
         <div
           class="flex items-center justify-between gap-2 cursor-pointer"
@@ -298,7 +298,7 @@ import SlaStatusList from "./SlaStatusList.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { useOnboarding } from "frappe-ui/frappe";
 import { __ } from "@/translation";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 
