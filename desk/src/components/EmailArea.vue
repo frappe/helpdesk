@@ -61,6 +61,21 @@
         >
           <ReplyAllIcon class="h-4 w-4" />
         </Button>
+
+        <Button
+          variant="ghost"
+          class="text-gray-700"
+          @click="emit('forward', {
+            content: content,
+            attachments: attachments,
+            subject: subject,
+            to: sender?.name ?? to,
+            cc: cc,
+            bcc: bcc,
+          })"
+        >
+          <ForwardIcon class="h-4 w-4" />
+        </Button>
         <Dropdown
           v-if="showSplitOption"
           :placement="'right'"
@@ -70,18 +85,6 @@
               icon: LucideSplit,
               onClick: () => (showSplitModal = true),
             }] : []),
-            {
-              label: 'Forward',
-              icon: ForwardIcon,
-              onClick: () => emit('forward', {
-                content: content,
-                attachments: attachments,
-                subject: subject,
-                to: sender?.name ?? to,
-                cc: cc,
-                bcc: bcc,
-              }),
-            },
           ]"
         >
           <Button
