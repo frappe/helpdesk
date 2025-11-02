@@ -15,6 +15,7 @@
     :mentions="agents"
     @change="editable ? (newComment = $event) : null"
     :extensions="[PreserveVideoControls]"
+    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #bottom>
       <div v-if="editable" class="flex flex-col gap-2 px-6 md:pl-10 md:pr-9">
@@ -24,6 +25,7 @@
             v-for="a in attachments"
             :key="a.file_url"
             :label="a.file_name"
+            :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
           >
             <template #suffix>
               <FeatherIcon
@@ -44,7 +46,7 @@
             <FileUploader
               :upload-args="{
                 doctype: doctype,
-                docname: modelValue.name,
+                docname: ticketId,
                 private: true,
               }"
               @success="(f) => attachments.push(f)"
@@ -103,15 +105,21 @@ import {
   createResource,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import { AttachmentItem } from "@/components/";
 import { AttachmentIcon } from "@/components/icons/";
+import { useTyping } from "@/composables/realtime";
 import { useAgentStore } from "@/stores/agent";
-
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
-import { getFontFamily, isContentEmpty, textEditorMenuButtons } from "@/utils";
+import {
+  getFontFamily,
+  isContentEmpty,
+  removeAttachmentFromServer,
+  textEditorMenuButtons,
+  uploadFunction,
+} from "@/utils";
 import { useStorage } from "@vueuse/core";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
@@ -130,6 +138,10 @@ onMounted(() => {
 });
 
 const props = defineProps({
+  ticketId: {
+    type: String,
+    default: null,
+  },
   placeholder: {
     type: String,
     default: null,
@@ -149,13 +161,28 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["submit", "discard"]);
-const doc = defineModel();
-const newComment = useStorage("commentBoxContent" + doc.value.name, "");
+
+const newComment = useStorage("commentBoxContent" + props.ticketId, null);
+
+// Initialize typing composable
+const { onUserType, cleanup } = useTyping(props.ticketId);
+
 const attachments = ref([]);
 const commentEmpty = computed(() => {
   return isContentEmpty(newComment.value);
 });
 const loading = ref(false);
+
+// Watch for changes in comment content to trigger typing events
+watch(newComment, (newValue, oldValue) => {
+  if (newValue !== oldValue && newValue) {
+    onUserType();
+  }
+});
+
+onBeforeUnmount(() => {
+  cleanup();
+});
 
 const label = computed(() => {
   return loading.value ? "Sending..." : props.label;
@@ -172,6 +199,7 @@ const agents = computed(() => {
 
 function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
+  removeAttachmentFromServer(attachment.name);
 }
 
 async function submitComment() {
@@ -182,7 +210,7 @@ async function submitComment() {
     url: "run_doc_method",
     makeParams: () => ({
       dt: props.doctype,
-      dn: doc.value.name,
+      dn: props.ticketId,
       method: "new_comment",
       args: {
         content: newComment.value,

@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-1 flex-col overflow-hidden overflow-y-auto border-b">
-    <UniInput2
+    <TicketField
       v-for="field in fields"
       :key="field.fieldname"
       :field="field"
@@ -14,7 +14,7 @@
 import { Field, FieldValue } from "@/types";
 import { toast } from "frappe-ui";
 import { computed } from "vue";
-import UniInput2 from "../UniInput2.vue";
+import TicketField from "../TicketField.vue";
 const emit = defineEmits(["update"]);
 
 const props = defineProps({

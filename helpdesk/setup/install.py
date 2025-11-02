@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import frappe
+from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.permissions import add_permission, update_permission_property
 
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY
@@ -13,6 +14,8 @@ from .welcome_ticket import create_welcome_ticket
 
 
 def after_install():
+    create_custom_fields(get_custom_fields())
+    add_default_status()
     add_default_categories_and_articles()
     add_default_ticket_priorities()
     add_default_sla()
@@ -20,14 +23,15 @@ def after_install():
     update_agent_role_permissions()
     add_agent_manager_permissions()
     add_default_assignment_rule()
-    add_system_preset_filters()
     create_default_template()
     create_fallback_ticket_type()
     create_helpdesk_folder()
     create_ootb_ticket_types()
     create_welcome_ticket()
     create_ticket_feedback_options()
-    add_property_setter()
+    add_property_setters()
+    # Always keep this at last, because sql_ddl makes the db commit
+    add_fts_index()
 
 
 def add_default_categories_and_articles():
@@ -53,7 +57,6 @@ def add_default_categories_and_articles():
 
 
 def add_default_sla():
-
     add_default_ticket_priorities()
     add_default_holiday_list()
     if frappe.db.exists("HD Service Level Agreement", "Default"):
@@ -109,29 +112,6 @@ def add_default_sla():
     sla_doc.append("priorities", medium_priority)
     sla_doc.append("priorities", high_priority)
     sla_doc.append("priorities", urgent_priority)
-
-    sla_fullfilled_on_resolved = frappe.get_doc(
-        {
-            "doctype": "HD Service Level Agreement Fulfilled On Status",
-            "status": "Resolved",
-        }
-    )
-
-    sla_fullfilled_on_closed = frappe.get_doc(
-        {
-            "doctype": "HD Service Level Agreement Fulfilled On Status",
-            "status": "Closed",
-        }
-    )
-
-    sla_doc.append("sla_fulfilled_on", sla_fullfilled_on_resolved)
-    sla_doc.append("sla_fulfilled_on", sla_fullfilled_on_closed)
-
-    sla_paused_on_replied = frappe.get_doc(
-        {"doctype": "HD Pause Service Level Agreement On Status", "status": "Replied"}
-    )
-
-    sla_doc.append("pause_sla_on", sla_paused_on_replied)
 
     sla_doc.holiday_list = "Default"
 
@@ -215,14 +195,18 @@ def update_agent_role_permissions():
 def add_agent_manager_permissions():
     if not frappe.db.exists("Role", "Agent Manager"):
         return
-
-    ptype = ["create", "delete", "write"]
-    doctypes = ["Email Account", "File", "Contact", "Communication"]
-    for dt in doctypes:
+    doc_to_permissions = {
+        "Email Account": ["create", "delete", "write"],
+        "File": ["create", "delete", "write"],
+        "Contact": ["create", "delete", "write"],
+        "Communication": ["create", "delete", "write"],
+        "User Invitation": ["create", "write"],
+        "Role": [],
+    }
+    for dt in doc_to_permissions.keys():
         # this adds read permission to the role
         add_permission(dt, "Agent Manager")
-        for p in ptype:
-            # now we update the above role to have all permissions from the ptype
+        for p in doc_to_permissions[dt]:
             update_permission_property(dt, "Agent Manager", 0, p, 1)
 
 
@@ -231,44 +215,7 @@ def add_default_assignment_rule():
     support_settings.create_base_support_rotation()
 
 
-def add_system_preset_filters():
-    preset_filters = []
-    for status in ["Closed", "Resolved", "Replied", "Open"]:
-        preset_filters.append(
-            {
-                "doctype": "HD Preset Filter",
-                "title": f"My {status} Tickets",
-                "reference_doctype": "HD Ticket",
-                "filters": [
-                    {
-                        "label": "Assigned To",
-                        "fieldname": "_assign",
-                        "filter_type": "is",
-                        "value": "@me",
-                    },
-                    {
-                        "label": "Status",
-                        "fieldname": "status",
-                        "filter_type": "is",
-                        "value": status,
-                    },
-                ],
-            }
-        )
-    preset_filters.append(
-        {
-            "doctype": "HD Preset Filter",
-            "title": "All Tickets",
-            "reference_doctype": "HD Ticket",
-            "filters": [],
-        }
-    )
-    for preset in preset_filters:
-        preset_filter_doc = frappe.get_doc(preset)
-        preset_filter_doc.insert()
-
-
-def add_property_setter():
+def add_property_setters():
     if not frappe.db.exists("Property Setter", {"name": "Contact-main-search_fields"}):
         doc = frappe.new_doc("Property Setter")
         doc.doctype_or_field = "DocType"
@@ -277,3 +224,161 @@ def add_property_setter():
         doc.property_type = "Data"
         doc.value = "email_id"
         doc.insert()
+
+    add_assignment_rule_property_setters()
+
+
+def get_custom_fields():
+    """Helpdesk specific custom fields that needs to be added to the Assignment Rule DocType."""
+    return {
+        "Assignment Rule": [
+            {
+                "description": "Autogenerated field by Helpdesk App",
+                "fieldname": "assign_condition_json",
+                "fieldtype": "Code",
+                "label": "Assign Condition JSON",
+                "insert_after": "assign_condition",
+                "depends_on": "eval: doc.assign_condition_json",
+            },
+            {
+                "description": "Autogenerated field by Helpdesk App",
+                "fieldname": "unassign_condition_json",
+                "fieldtype": "Code",
+                "label": "Unassign Condition JSON",
+                "insert_after": "unassign_condition",
+                "depends_on": "eval: doc.unassign_condition_json",
+            },
+        ],
+    }
+
+
+def add_assignment_rule_property_setters():
+    """Add a property setter to the Assignment Rule DocType for assign_condition and unassign_condition."""
+
+    default_fields = {
+        "doctype": "Property Setter",
+        "doctype_or_field": "DocField",
+        "doc_type": "Assignment Rule",
+        "property_type": "Data",
+        "is_system_generated": 1,
+    }
+
+    if not frappe.db.exists(
+        "Property Setter", {"name": "Assignment Rule-assign_condition-depends_on"}
+    ):
+        frappe.get_doc(
+            {
+                **default_fields,
+                "name": "Assignment Rule-assign_condition-depends_on",
+                "field_name": "assign_condition",
+                "property": "depends_on",
+                "value": "eval: !doc.assign_condition_json",
+            }
+        ).insert()
+    else:
+        frappe.db.set_value(
+            "Property Setter",
+            {"name": "Assignment Rule-assign_condition-depends_on"},
+            "value",
+            "eval: !doc.assign_condition_json",
+        )
+    if not frappe.db.exists(
+        "Property Setter", {"name": "Assignment Rule-unassign_condition-depends_on"}
+    ):
+        frappe.get_doc(
+            {
+                **default_fields,
+                "name": "Assignment Rule-unassign_condition-depends_on",
+                "field_name": "unassign_condition",
+                "property": "depends_on",
+                "value": "eval: !doc.unassign_condition_json",
+            }
+        ).insert()
+    else:
+        frappe.db.set_value(
+            "Property Setter",
+            {"name": "Assignment Rule-unassign_condition-depends_on"},
+            "value",
+            "eval: !doc.unassign_condition_json",
+        )
+
+
+def add_default_status():
+    statuses = [
+        {
+            "label_agent": "Open",
+            "color": "Red",
+            "enabled": 1,
+            "category": "Open",
+            "order": 1,
+        },
+        {
+            "label_agent": "Replied",
+            "color": "Blue",
+            "enabled": 1,
+            "category": "Paused",
+            "different_view": 1,
+            "label_customer": "Awaiting Response",
+            "order": 2,
+        },
+        {
+            "label_agent": "Resolved",
+            "color": "Green",
+            "enabled": 1,
+            "category": "Resolved",
+            "order": 3,
+        },
+        {
+            "label_agent": "Closed",
+            "color": "Gray",
+            "enabled": 1,
+            "category": "Resolved",
+            "order": 4,
+        },
+    ]
+    for status in statuses:
+        if not frappe.db.exists("HD Ticket Status", status["label_agent"]):
+            frappe.get_doc({"doctype": "HD Ticket Status", **status}).insert()
+
+    frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
+    frappe.db.set_single_value("HD Settings", "ticket_reopen_status", "Open")
+
+
+def add_fts_index():
+    indexes = [
+        {"table": "tabHD Ticket", "column": "subject", "index_name": "ft_subject"},
+        {
+            "table": "tabHD Ticket",
+            "column": "description",
+            "index_name": "ft_description",
+        },
+    ]
+
+    for i in indexes:
+        add_index_if_not_exists(i["table"], i["column"], i["index_name"])
+
+
+def add_index_if_not_exists(table, column, index_name):
+    index_exists = frappe.db.sql(
+        """
+        SHOW INDEX FROM `{table}` 
+            WHERE Column_name = '{column}' 
+            AND Index_type = 'FULLTEXT'
+        """.format(
+            table=table, column=column
+        ),
+        as_dict=True,
+    )
+    print("\n\n", index_exists, "\n\n")
+    if index_exists:
+        frappe.db.sql_ddl(
+            "DROP INDEX `{index_name}` ON `{table}`".format(
+                index_name=index_exists[0].Key_name, table=table
+            )
+        )
+
+    frappe.db.sql_ddl(
+        "ALTER TABLE `{table}` ADD FULLTEXT INDEX `{index_name}` (`{column}`)".format(
+            table=table, index_name=index_name, column=column
+        )
+    )

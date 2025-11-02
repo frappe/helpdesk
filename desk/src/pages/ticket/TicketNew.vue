@@ -69,6 +69,7 @@
             v-model:content="description"
             placeholder="Detailed explanation"
             expand
+            :uploadFunction="(file:any)=>uploadFunction(file)"
           >
             <template #bottom-right>
               <Button
@@ -123,7 +124,7 @@ import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
 import { Field } from "@/types";
-import { isCustomerPortal } from "@/utils";
+import { isCustomerPortal, uploadFunction } from "@/utils";
 import {
   Breadcrumbs,
   Button,
@@ -201,7 +202,7 @@ const customOnChange = computed(() => template.data?._customOnChange);
 
 const visibleFields = computed(() => {
   let _fields = template.data?.fields?.filter(
-    (f) => route.meta.agent || !f.hide_from_customer
+    (f) => !isCustomerPortal.value || !f.hide_from_customer
   );
   if (!_fields) return [];
   return _fields.map((field) => parseField(field, templateFields));
@@ -276,7 +277,7 @@ const breadcrumbs = computed(() => {
     {
       label: "Tickets",
       route: {
-        name: "TicketsCustomer",
+        name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
       },
     },
     {

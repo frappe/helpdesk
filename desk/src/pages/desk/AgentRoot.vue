@@ -1,5 +1,5 @@
 <template>
-  <Layout>
+  <Layout class="isolate">
     <router-view class="flex flex-1 flex-col overflow-auto" />
   </Layout>
 </template>

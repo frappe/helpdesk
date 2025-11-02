@@ -1,9 +1,13 @@
 <template>
   <div
+    :id="`communication-${name}`"
     v-bind="$attrs"
     class="grow cursor-pointer border-transparent bg-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >
-    <div class="flex items-center justify-between gap-2">
+    <div
+      class="flex items-center justify-between gap-2"
+      :class="isMobileView && 'items-start'"
+    >
       <!-- email design for mobile -->
       <div v-if="isMobileView" class="flex items-center gap-2 text-sm">
         <div class="leading-tight">
@@ -27,6 +31,13 @@
       </div>
 
       <div class="flex gap-0.5 items-center">
+        <Badge
+          v-if="status.label"
+          :label="__(status.label)"
+          variant="subtle"
+          :theme="status.color"
+          class="mr-1.5"
+        />
         <Tooltip
           :text="dateFormat(creation, dateTooltipFormat)"
           v-if="!isMobileView"
@@ -35,30 +46,10 @@
             {{ timeAgo(creation) }}
           </p>
         </Tooltip>
-        <Button
-          variant="ghost"
-          class="text-gray-700"
-          @click="
-            emit('reply', {
-              content: content,
-              to: sender?.name ?? to,
-            })
-          "
-        >
+        <Button variant="ghost" class="text-gray-700" @click="reply">
           <ReplyIcon class="h-4 w-4" />
         </Button>
-        <Button
-          variant="ghost"
-          class="text-gray-700"
-          @click="
-            emit('reply', {
-              content: content,
-              to: sender?.name ?? to,
-              cc: cc,
-              bcc: bcc,
-            })
-          "
-        >
+        <Button variant="ghost" class="text-gray-700" @click="replyAll">
           <ReplyAllIcon class="h-4 w-4" />
         </Button>
 
@@ -133,10 +124,13 @@ import { AttachmentItem } from "@/components";
 import { useScreenSize } from "@/composables/screen";
 import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
 import { Dropdown } from "frappe-ui";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
 import { ReplyAllIcon, ReplyIcon, ForwardIcon } from "./icons";
 import TicketSplitModal from "./ticket/TicketSplitModal.vue";
+import { useAuthStore } from "@/stores/auth";
+import { storeToRefs } from "pinia";
+
 const props = defineProps({
   activity: {
     type: Object,
@@ -148,14 +142,88 @@ const props = defineProps({
   },
 });
 
-const { sender, to, cc, bcc, creation, subject, attachments, content, name } =
-  props.activity;
+const {
+  sender,
+  to,
+  cc,
+  bcc,
+  creation,
+  subject,
+  attachments,
+  content,
+  name,
+  deliveryStatus,
+} = props.activity;
 
 const emit = defineEmits(["reply","forward"]);
+
+const auth = storeToRefs(useAuthStore());
 
 const { isMobileView } = useScreenSize();
 
 const showSplitModal = ref(false);
+
+const status = computed(() => {
+  let _status = deliveryStatus;
+  let indicator_color = "red";
+  if (["Sent", "Clicked"].includes(_status)) {
+    indicator_color = "green";
+  } else if (["Sending", "Scheduled"].includes(_status)) {
+    indicator_color = "orange";
+  } else if (["Opened", "Read"].includes(_status)) {
+    indicator_color = "blue";
+  } else if (_status == "Error") {
+    indicator_color = "red";
+  }
+  return { label: _status, color: indicator_color };
+});
+
+const reply = () => {
+  const user = auth.user.value;
+  emit("reply", {
+    content: content,
+    to: user === sender.name ? to : sender.name,
+  });
+};
+
+const replyAll = () => {
+  const user = auth.user.value;
+
+  const normalizeAndFilter = (field) => {
+    let arr;
+    if (typeof field === "string") {
+      arr = field.split(",").map((s) => s.trim());
+    } else {
+      arr = field || [];
+    }
+    return arr.filter((item) => item !== user && item !== sender.name);
+  };
+
+  const filteredTo = normalizeAndFilter(to);
+  const filteredCc = normalizeAndFilter(cc);
+  const filteredBcc = normalizeAndFilter(bcc);
+
+  let _to, _cc, _bcc;
+
+  if (user === sender.name) {
+    // User is the sender, reply to all original recipients
+    _to = filteredTo.join(", ");
+    _cc = filteredCc;
+    _bcc = filteredBcc;
+  } else {
+    // User is a recipient, reply to sender with all other recipients in cc
+    _to = sender.name;
+    _cc = [...filteredTo, ...filteredCc];
+    _bcc = filteredBcc;
+  }
+
+  emit("reply", {
+    content: content,
+    to: _to,
+    cc: _cc.filter(Boolean),
+    bcc: _bcc.filter(Boolean),
+  });
+};
 
 // TODO: Implement reply functionality using this way instead of emit drillup
 // function reply(email, reply_all = false) {

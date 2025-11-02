@@ -1,11 +1,17 @@
 import frappe
 from frappe import _
+from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
 from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
-from helpdesk.utils import check_permissions
+from helpdesk.utils import (
+    call_log_default_columns,
+    check_permissions,
+    contact_default_columns,
+    parse_call_logs,
+)
 
 
 @frappe.whitelist()
@@ -37,9 +43,6 @@ def get_list_data(
 
     handle_at_me_support(filters)
 
-    if doctype == "HD Ticket" and not show_customer_portal_fields:
-        handle_team_restrictions(filters)
-
     _list = get_controller(doctype)
     default_rows = []
     if hasattr(_list, "default_list_data"):
@@ -69,7 +72,11 @@ def get_list_data(
     if is_default:
         default_view = default_view_exists(doctype)
         if not default_view:
-            if hasattr(_list, "default_list_data"):
+            if doctype == "Contact":
+                columns = contact_default_columns
+            elif doctype == "TP Call Log":
+                columns = call_log_default_columns
+            elif hasattr(_list, "default_list_data"):
                 columns = (
                     _list.default_list_data(show_customer_portal_fields).get("columns")
                     if doctype == "HD Ticket"
@@ -105,6 +112,9 @@ def get_list_data(
         )
         or []
     )
+
+    if doctype == "TP Call Log":
+        data = parse_call_logs(data)
 
     fields = frappe.get_meta(doctype).fields
     fields = [field for field in fields if field.fieldtype not in no_value_fields]
@@ -382,6 +392,9 @@ def get_quick_filters(doctype: str, show_customer_portal_fields=False):
     if doctype == "Contact":
         quick_filters.append(name_filter)
         return quick_filters
+    elif doctype == "TP Call Log":
+        quick_filters.append(name_filter)
+        return quick_filters
     name_filter_doctypes = ["HD Agent", "HD Customer", "HD Ticket"]
     if doctype in name_filter_doctypes:
         quick_filters.append(name_filter)
@@ -465,11 +478,18 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
     rows = frappe.parse_json(rows)
 
     if not columns:
-        columns = (
-            _list.default_list_data(show_customer_portal_fields).get("columns")
-            if doctype == "HD Ticket"
-            else _list.default_list_data().get("columns")
-        )
+        if doctype == "Contact":
+            columns = contact_default_columns
+            rows = ["name", "email_id", "creation"]
+        elif doctype == "TP Call Log":
+            columns = call_log_default_columns
+            rows = ["name", "caller", "receiver", "creation"]
+        else:
+            columns = (
+                _list.default_list_data(show_customer_portal_fields).get("columns")
+                if doctype == "HD Ticket"
+                else _list.default_list_data().get("columns")
+            )
     if not rows:
         rows = _list.default_list_data().get("rows")
 
@@ -493,38 +513,19 @@ def handle_at_me_support(filters):
     return filters
 
 
-# filters out tickets based on team restrictions
-def handle_team_restrictions(filters):
-    enable_restrictions = frappe.db.get_single_value(
-        "HD Settings", "restrict_tickets_by_agent_group"
-    )
-    if not enable_restrictions:
-        return
-    show_tickets_without_team = frappe.db.get_single_value(
-        "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
-    )
+@frappe.whitelist()
+def remove_assignments(doctype, name, assignees, ignore_permissions=False):
+    assignees = frappe.parse_json(assignees)
 
-    QBTeam = frappe.qb.DocType("HD Team")
-    QBTeamMember = frappe.qb.DocType("HD Team Member")
-
-    teams = (
-        frappe.qb.from_(QBTeamMember)
-        .where(QBTeamMember.user == frappe.session.user)
-        .join(QBTeam)
-        .on(QBTeam.name == QBTeamMember.parent)
-        .select(QBTeam.team_name, QBTeam.ignore_restrictions)
-        .run(as_dict=True)
-    )
-
-    if any([team.get("ignore_restrictions") for team in teams]):
+    if not assignees:
         return
 
-    team_names = [t.get("team_name") for t in teams]
-
-    if show_tickets_without_team:
-        team_names = team_names + [""]
-
-    if not filters:
-        filters.append({"agent_group": ["in", team_names]})
-    else:
-        filters["agent_group"] = ["in", team_names]
+    for assign_to in assignees:
+        set_status(
+            doctype,
+            name,
+            todo=None,
+            assign_to=assign_to,
+            status="Cancelled",
+            ignore_permissions=ignore_permissions,
+        )

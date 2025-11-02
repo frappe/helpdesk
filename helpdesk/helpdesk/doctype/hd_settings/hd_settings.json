@@ -11,6 +11,7 @@
   "agent_groups_section",
   "restrict_tickets_by_agent_group",
   "do_not_restrict_tickets_without_an_agent_group",
+  "assign_within_team",
   "column_break_dxlq",
   "assignment_rules_section",
   "base_support_rotation",
@@ -21,13 +22,21 @@
   "default_ticket_type",
   "is_ticket_type_mandatory",
   "column_break_zxek",
+  "feedback_section",
+  "is_feedback_mandatory",
+  "column_break_kegb",
   "ticket_restrictions_section",
   "allow_anyone_to_create_tickets",
-  "is_feedback_mandatory",
   "auto_update_status",
+  "update_status_to",
   "column_break_iarl",
   "auto_close_tickets",
+  "auto_close_status",
   "auto_close_after_days",
+  "status_section",
+  "default_ticket_status",
+  "column_break_yfbu",
+  "ticket_reopen_status",
   "workflow_tab",
   "skip_email_workflow",
   "instantly_send_email",
@@ -46,7 +55,21 @@
   "subject_weight",
   "column_break_qoxt",
   "description_weight",
-  "headings_weight"
+  "headings_weight",
+  "email_customisations_tab",
+  "share_feedback_section",
+  "enable_email_ticket_feedback",
+  "send_email_feedback_on_status",
+  "feedback_email_content",
+  "acknowledgement_section",
+  "send_acknowledgement_email",
+  "acknowledgement_email_content",
+  "reply_from_contact_section",
+  "enable_reply_email_to_agent",
+  "reply_email_to_agent_content",
+  "reply_from_agent_section",
+  "enable_reply_email_via_agent",
+  "reply_via_agent_email_content"
  ],
  "fields": [
   {
@@ -252,7 +275,7 @@
   },
   {
    "default": "0",
-   "description": "When enabled, the ticket status will automatically change to \"Replied\" whenever the agent responds to a ticket.\n",
+   "description": "When enabled, the ticket status will automatically change to the status selected below whenever the agent responds to a ticket.\n",
    "fieldname": "auto_update_status",
    "fieldtype": "Check",
    "label": "Auto update status"
@@ -262,7 +285,7 @@
    "description": "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \n",
    "fieldname": "is_feedback_mandatory",
    "fieldtype": "Check",
-   "label": "Make feedback mandatory"
+   "label": "Enable feedback for Customer Portal"
   },
   {
    "fieldname": "column_break_iarl",
@@ -272,7 +295,7 @@
    "default": "0",
    "fieldname": "auto_close_tickets",
    "fieldtype": "Check",
-   "label": "Automatically Close Replied Tickets"
+   "label": "Automatically Close Tickets when"
   },
   {
    "default": "14",
@@ -280,13 +303,158 @@
    "fieldname": "auto_close_after_days",
    "fieldtype": "Int",
    "label": "Auto-close after (Days)",
-   "mandatory_depends_on": "auto_close_tickets"
+   "mandatory_depends_on": "eval: doc.auto_close_tickets"
+  },
+  {
+   "fieldname": "feedback_section",
+   "fieldtype": "Section Break",
+   "label": "Feedback"
+  },
+  {
+   "fieldname": "column_break_kegb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.enable_email_ticket_feedback",
+   "fieldname": "send_email_feedback_on_status",
+   "fieldtype": "Link",
+   "label": "Send feedback when",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Resolved\"]]",
+   "mandatory_depends_on": "eval:doc.enable_email_ticket_feedback",
+   "options": "HD Ticket Status"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, feedback email will be sent to the customer when you mark a ticket as the status selected below.\n",
+   "fieldname": "enable_email_ticket_feedback",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "default": "0",
+   "depends_on": "restrict_tickets_by_agent_group",
+   "fieldname": "assign_within_team",
+   "fieldtype": "Check",
+   "label": "Restrict agent assignment to selected Team"
+  },
+  {
+   "fieldname": "email_customisations_tab",
+   "fieldtype": "Tab Break",
+   "label": "Email Notifications"
+  },
+  {
+   "fieldname": "share_feedback_section",
+   "fieldtype": "Section Break",
+   "label": "Share Feedback"
+  },
+  {
+   "fieldname": "feedback_email_content",
+   "fieldtype": "Text",
+   "label": "Email Content"
+  },
+  {
+   "fieldname": "acknowledgement_section",
+   "fieldtype": "Section Break",
+   "label": "Acknowledgement"
+  },
+  {
+   "fieldname": "acknowledgement_email_content",
+   "fieldtype": "Text",
+   "label": "Email Content"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, a ticket creation acknowledgement email will be sent to the user right after creating an email ticket",
+   "fieldname": "send_acknowledgement_email",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "default": "1",
+   "description": "If enabled, an email will be sent to all of the assigned agents after a reply from one of the contacts",
+   "fieldname": "enable_reply_email_to_agent",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "reply_email_to_agent_content",
+   "fieldtype": "Text",
+   "label": "Email Content"
+  },
+  {
+   "default": "1",
+   "description": "If enabled, an email is sent to all of the recipients associated with an agent's reply",
+   "fieldname": "enable_reply_email_via_agent",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "reply_via_agent_email_content",
+   "fieldtype": "Text",
+   "label": "Email Content"
+  },
+  {
+   "fieldname": "reply_from_contact_section",
+   "fieldtype": "Section Break",
+   "label": "Reply From Contact"
+  },
+  {
+   "fieldname": "reply_from_agent_section",
+   "fieldtype": "Section Break",
+   "label": "Reply From Agent"
+  },
+  {
+   "depends_on": "eval:doc.auto_update_status",
+   "fieldname": "update_status_to",
+   "fieldtype": "Link",
+   "label": "Update status to",
+   "link_filters": "[]",
+   "mandatory_depends_on": "eval:doc.auto_update_status",
+   "options": "HD Ticket Status"
+  },
+  {
+   "fieldname": "status_section",
+   "fieldtype": "Section Break",
+   "label": "Status"
+  },
+  {
+   "description": "Status of the ticket, when it is created in the system.",
+   "fieldname": "default_ticket_status",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Default ticket status",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
+   "options": "HD Ticket Status",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_yfbu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Status of the ticket, when a customer replies on the ticket.",
+   "fieldname": "ticket_reopen_status",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Ticket Reopen status",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"=\",\"Open\"]]",
+   "options": "HD Ticket Status",
+   "reqd": 1
+  },
+  {
+   "depends_on": "auto_close_tickets",
+   "fieldname": "auto_close_status",
+   "fieldtype": "Link",
+   "label": "Status ",
+   "link_filters": "[[\"HD Ticket Status\",\"category\",\"in\",[\"Paused\",\"Resolved\",null]]]",
+   "mandatory_depends_on": "eval: doc.auto_close_tickets",
+   "options": "HD Ticket Status"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-04-23 20:17:23.058689",
+ "modified": "2025-08-29 13:34:17.018321",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
@@ -308,6 +476,16 @@
    "read": 1,
    "role": "Agent",
    "share": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Agent Manager",
+   "share": 1,
+   "write": 1
   }
  ],
  "quick_entry": 1,

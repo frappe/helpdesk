@@ -99,6 +99,13 @@
       "
     />
   </div>
+  <!-- Loading State -->
+  <div
+    v-else-if="list.loading"
+    class="w-full h-full flex items-center justify-center -mt-48"
+  >
+    <LoadingIndicator :scale="10" />
+  </div>
   <!-- Empty State -->
   <EmptyState
     v-else
@@ -130,6 +137,7 @@ import { View, ViewType } from "@/types";
 import { formatTimeShort, getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import {
   call,
   createResource,
@@ -141,6 +149,7 @@ import {
   ListRowItem,
   ListSelectBanner,
   ListView,
+  LoadingIndicator,
   toast,
 } from "frappe-ui";
 import {
@@ -190,6 +199,7 @@ const route = useRoute();
 const router = useRouter();
 const { isManager } = useAuthStore();
 const { $dialog } = globalStore();
+const { getStatus } = useTicketStatusStore();
 
 const listSelections = ref(new Set());
 const defaultOptions = reactive({
@@ -292,16 +302,6 @@ const list = createResource({
       handleFetchFromField(column);
       handleColumnConfig(column);
     });
-    if (options.value.doctype === "HD Ticket") {
-      data.data.forEach((row) => {
-        if (
-          defaultParams.show_customer_portal_fields &&
-          row.status === "Replied"
-        ) {
-          row.status = "Awaiting Response";
-        }
-      });
-    }
     return data;
   },
   onSuccess: (data) => {
@@ -487,8 +487,9 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
   }
   e.stopPropagation();
   e.preventDefault();
-  if (item == "Awaiting Response") {
-    item = "Replied";
+
+  if (column.label == "Status" && options.value.doctype === "HD Ticket") {
+    item = getStatus(item)?.label_agent;
   }
 
   if (column.type === "MultipleAvatar") {

@@ -17,7 +17,7 @@ class HDAgent(Document):
         user = frappe.get_doc("User", self.user)
         for role in ["Agent"]:
             user.append("roles", {"role": role})
-        user.save()
+        user.save(ignore_permissions=True)
 
 
 @frappe.whitelist()

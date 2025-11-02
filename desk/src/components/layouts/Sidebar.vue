@@ -10,7 +10,7 @@
     <SidebarLink
       v-if="!isCustomerPortal"
       label="Search"
-      class="mb-1"
+      class="my-0.5"
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
       :is-expanded="isExpanded"
@@ -22,15 +22,24 @@
         </span>
       </template>
     </SidebarLink>
+    <SidebarLink
+      v-if="!isCustomerPortal"
+      class="relative my-0.5 min-h-7"
+      label="Dashboard"
+      :icon="LucideLayoutDashboard"
+      :to="'Dashboard'"
+      :is-active="isActiveTab('Dashboard')"
+      :is-expanded="isExpanded"
+    />
     <div class="mb-4" v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
-        class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400 left-1"
+        class="absolute size-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400 left-1"
         theme="gray"
         variant="solid"
       />
       <SidebarLink
-        class="relative"
+        class="relative my-0.5"
         label="Notifications"
         :icon="LucideBell"
         :on-click="() => notificationStore.toggle()"
@@ -95,7 +104,7 @@
       </div>
     </div>
     <div class="grow" />
-    <div class="flex flex-col gap-1">
+    <div class="flex flex-col gap-2">
       <TrialBanner
         v-if="isFCSite && !isCustomerPortal"
         :isSidebarCollapsed="!isExpanded"
@@ -130,10 +139,8 @@
       v-if="isFCSite && !isCustomerPortal"
       :isSidebarCollapsed="!isExpanded"
     />
-    <SettingsModal
-      v-model="showSettingsModal"
-      :default-tab="defaultSettingsTab"
-    />
+    <SettingsModal v-model="showSettingsModal" />
+    <ShortcutsModal v-model="showShortcutsModal" />
     <HelpModal
       v-if="showHelpModal"
       v-model="showHelpModal"
@@ -151,6 +158,7 @@
       v-model="showIntermediateModal"
       :currentStep="currentStep"
     />
+    <CP v-model="showCommandPalette" />
   </div>
 </template>
 
@@ -158,8 +166,9 @@
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
 import Apps from "@/components/Apps.vue";
+import CP from "@/components/command-palette/CP.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
-import { showNewAgentsDialog } from "@/components/Settings/agents";
+import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useDevice } from "@/composables";
@@ -187,21 +196,24 @@ import {
   TrialBanner,
   useOnboarding,
 } from "frappe-ui/frappe";
+
 import HelpIcon from "frappe-ui/frappe/Icons/HelpIcon.vue";
 import { storeToRefs } from "pinia";
-import { computed, h, markRaw, onMounted, onUnmounted, ref } from "vue";
+import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
 } from "./layoutSettings";
 
-import { globalStore } from "@/stores/globalStore";
+import { useShortcut } from "@/composables/shortcuts";
+import { useTelephonyStore } from "@/stores/telephony";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
+import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
@@ -210,6 +222,8 @@ import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
+import { setActiveSettingsTab } from "../Settings/settingsModal";
+
 const { isMobileView } = useScreenSize();
 
 const route = useRoute();
@@ -218,22 +232,25 @@ const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
-const { $socket } = globalStore();
+const telephonyStore = useTelephonyStore();
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const showSettingsModal = ref(false);
+const showShortcutsModal = ref(false);
+const showCommandPalette = ref(false);
 
 const { pinnedViews, publicViews } = useView();
-declare global {
-  interface Window {
-    is_fc_site: boolean;
-  }
-}
+
 const isFCSite = ref(window.is_fc_site);
 
 const allViews = computed(() => {
-  const items = isCustomerPortal.value
+  let items = isCustomerPortal.value
     ? customerPortalSidebarOptions
     : agentPortalSidebarOptions;
+
+  if (!isCallingEnabled.value) {
+    items = items.filter((item) => item.label !== "Call Logs");
+  }
 
   const options = [
     {
@@ -318,6 +335,11 @@ const agentPortalDropdown = computed(() => [
     condition: () => !isMobileView.value && window.is_fc_site,
   },
   {
+    label: "Shortcuts",
+    icon: h(LucideKeyboard),
+    onClick: () => (showShortcutsModal.value = true),
+  },
+  {
     label: "Settings",
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
@@ -350,9 +372,7 @@ function isActiveTab(to: any) {
 }
 
 function openCommandPalette() {
-  window.dispatchEvent(
-    new KeyboardEvent("keydown", { key: "k", metaKey: true })
-  );
+  showCommandPalette.value = true;
 }
 
 const logo = h(
@@ -362,8 +382,6 @@ const logo = h(
   },
   null
 );
-
-const defaultSettingsTab = ref(0);
 
 const showOnboardingBanner = computed(() => {
   return (
@@ -382,7 +400,7 @@ const steps = [
     onClick: () => {
       minimize.value = true;
       showSettingsModal.value = true;
-      defaultSettingsTab.value = 0;
+      setActiveSettingsTab("Email Accounts");
     },
   },
   {
@@ -393,10 +411,7 @@ const steps = [
     onClick: () => {
       minimize.value = true;
       showSettingsModal.value = true;
-      defaultSettingsTab.value = 2;
-      setTimeout(() => {
-        showNewAgentsDialog.value = true;
-      }, 300);
+      setActiveSettingsTab("Invite Agents");
     },
   },
   {
@@ -405,9 +420,9 @@ const steps = [
     completed: false,
     icon: markRaw(Timer),
     onClick: () => {
-      console.log("clicked");
-      const url = "/app/hd-service-level-agreement";
-      window.open(url, "_blank");
+      setActiveSettingsTab("SLA Policies");
+      showSettingsModal.value = true;
+      minimize.value = true;
     },
   },
   {
@@ -478,7 +493,6 @@ const steps = [
     completed: false,
     icon: markRaw(InviteCustomer),
     onClick: () => {
-      console.log("clicked");
       minimize.value = true;
       currentStep.value = {
         title: "Create & invite a contact",
@@ -622,17 +636,17 @@ async function getGeneralCategory() {
 
 function setUpOnboarding() {
   if (!authStore.isManager) return;
-  $socket.on("update_sla_status", () => {
-    updateOnboardingStep("setup_sla");
-  });
   setUp(steps);
+  useShortcut({ key: "h", meta: true }, () => {
+    showHelpModal.value = !showHelpModal.value;
+  });
 }
 
 onMounted(() => {
   setUpOnboarding();
-});
-
-onUnmounted(() => {
-  $socket.off("update_sla_status");
+  if (isCustomerPortal.value) return;
+  useShortcut({ key: ",", meta: true }, () => {
+    showSettingsModal.value = !showSettingsModal.value;
+  });
 });
 </script>

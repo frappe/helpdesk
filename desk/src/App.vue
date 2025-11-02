@@ -2,13 +2,11 @@
   <FrappeUIProvider>
     <PortalRoot />
   </FrappeUIProvider>
-  <KeymapDialog />
   <Dialogs />
 </template>
 
 <script setup lang="ts">
 import { Dialogs } from "@/components/dialogs";
-import KeymapDialog from "@/pages/KeymapDialog.vue";
 import { useConfigStore } from "@/stores/config";
 import { stopSession } from "@/telemetry";
 import { FrappeUIProvider, toast } from "frappe-ui";
@@ -22,14 +20,14 @@ onMounted(() => {
   window.addEventListener("online", () => {
     toast.create({
       message: "You are now online",
-      icon: h(Wifi),
+      icon: h(Wifi, { class: "text-white" }),
     });
   });
 
   window.addEventListener("offline", () => {
     toast.create({
       message: "You are now offline",
-      icon: h(WifiOff),
+      icon: h(WifiOff, { class: "text-white" }),
     });
   });
 });

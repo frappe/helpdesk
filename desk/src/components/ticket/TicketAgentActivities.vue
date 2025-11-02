@@ -1,6 +1,9 @@
 <template>
   <ActivityHeader :title="title" />
-  <FadedScrollableDiv class="flex flex-col flex-1 overflow-y-scroll">
+  <FadedScrollableDiv
+    class="flex flex-col flex-1 overflow-y-scroll"
+    :mask-length="20"
+  >
     <div v-if="activities.length" class="activities flex-1 h-full mt-1">
       <div
         v-for="(activity, i) in activities"
@@ -16,11 +19,11 @@
             :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
           >
             <div
-              class="z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white"
-              :class="[activity.type === 'email' && 'mt-2']"
+              class="z-1 flex h-7 w-7 items-center justify-center rounded-full bg-white"
+              :class="[['email', 'feedback'].includes(activity.type) && 'mt-2']"
             >
               <Avatar
-                v-if="activity.type === 'email'"
+                v-if="activity.type === 'email' || activity.type === 'feedback'"
                 size="lg"
                 :label="activity.sender?.full_name"
                 :image="getUser(activity.sender?.name).user_image"
@@ -29,6 +32,15 @@
               <CommentIcon
                 v-else-if="activity.type === 'comment'"
                 class="text-gray-600 absolute left-[7.5px]"
+              />
+              <FeatherIcon
+                v-else-if="activity.type === 'call'"
+                :name="
+                  activity.call_type === 'Incoming'
+                    ? 'phone-incoming'
+                    : 'phone-outgoing'
+                "
+                class="text-gray-600 absolute left-[7.5px] size-4"
               />
               <DotIcon v-else class="text-gray-600 absolute left-[7.5px]" />
             </div>
@@ -52,6 +64,14 @@
               :activity="activity"
               @update="() => emit('update')"
             />
+            <CallArea
+              v-else-if="activity.type === 'call'"
+              :activity="activity"
+            />
+            <FeedbackBox
+              :activity="activity"
+              v-else-if="activity.type === 'feedback'"
+            />
             <HistoryBox v-else :activity="activity" />
           </div>
         </div>
@@ -66,12 +86,17 @@
       <Button
         v-if="title == 'Emails'"
         label="New Email"
-        @click="communicationAreaRef.toggleEmailBox()"
+        @click="communicationAreaRef?.toggleEmailBox() ?? toggleEmailBox()"
       />
       <Button
         v-else-if="title == 'Comments'"
         label="New Comment"
-        @click="communicationAreaRef.toggleCommentBox()"
+        @click="communicationAreaRef?.toggleCommentBox() ?? toggleCommentBox()"
+      />
+      <Button
+        v-else-if="title == 'Calls'"
+        label="Make a Call"
+        @click="makeCall()"
       />
     </div>
   </FadedScrollableDiv>
@@ -89,12 +114,17 @@ import {
   CommentIcon,
   DotIcon,
   EmailIcon,
+  PhoneIcon,
 } from "@/components/icons";
+import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
-import { useElementVisibility } from "@vueuse/core";
-import { Avatar } from "frappe-ui";
-import { PropType, Ref, computed, h, inject, onMounted, watch } from "vue";
+import { isElementInViewport } from "@/utils";
+import { Avatar, FeatherIcon } from "frappe-ui";
+import { PropType, Ref, computed, h, inject, nextTick, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
+
 const props = defineProps({
   activities: {
     type: Array as PropType<TicketActivity[]>,
@@ -112,8 +142,12 @@ const props = defineProps({
 
 const emit = defineEmits(["email:reply", "email:forward", "update"]);
 
+const route = useRoute();
+const router = useRouter();
+
 const { getUser } = useUserStore();
 const communicationAreaRef: Ref = inject("communicationArea");
+const makeCall = inject<() => void>("makeCall");
 
 const emptyText = computed(() => {
   let text = "No Activities";
@@ -121,6 +155,9 @@ const emptyText = computed(() => {
     text = "No Email Communications";
   } else if (props.title == "Comments") {
     text = "No Comments";
+    return text;
+  } else if (props.title == "Calls") {
+    text = "No Calls";
     return text;
   }
 });
@@ -131,34 +168,70 @@ const emptyTextIcon = computed(() => {
     icon = EmailIcon;
   } else if (props.title == "Comments") {
     icon = CommentIcon;
+  } else if (props.title == "Calls") {
+    icon = PhoneIcon;
   }
   return h(icon, { class: "text-gray-500" });
 });
 
 function scrollToLatestActivity() {
+  if (route.hash) {
+    scrollToHash();
+    return;
+  }
   setTimeout(() => {
     let el;
     let e = document.getElementsByClassName("activity");
     el = e[e.length - 1];
-    if (el && !useElementVisibility(el).value) {
-      el.scrollIntoView();
+    if (el && !isElementInViewport(el)) {
+      el.scrollIntoViewIfNeeded();
       el.focus();
     }
   }, 500);
 }
+function scrollToHash() {
+  const hash = route.hash;
+  if (hash) {
+    // Remove the # symbol
+    const elementId = hash.substring(1);
 
-defineExpose({
-  scrollToLatestActivity,
-});
+    nextTick(() => {
+      // Wait for activities to be rendered
+      setTimeout(() => {
+        const element = document.getElementById(elementId);
+        if (element) {
+          (element as any).scrollIntoViewIfNeeded();
 
-onMounted(() => {
-  scrollToLatestActivity();
-});
+          // Add highlight effect using Tailwind class
+          element.classList.add("bg-yellow-100");
+
+          // Remove highlight after 2 seconds
+          setTimeout(() => {
+            element.classList.remove("bg-yellow-100");
+            router.replace({ hash: "" });
+          }, 2000);
+        }
+      }, 1000);
+    });
+  }
+}
+
+watch(
+  () => route.hash,
+  () => {
+    scrollToLatestActivity();
+  }
+);
 
 watch(
   () => props.title,
   () => {
     scrollToLatestActivity();
-  }
+  },
+  { immediate: true }
 );
+
+defineExpose({
+  scrollToLatestActivity,
+});
 </script>

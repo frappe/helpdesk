@@ -1,9 +1,9 @@
 <template>
-  <div class="flex flex-col comm-area">
+  <div class="comm-area">
     <div
       class="flex justify-between gap-3 border-t px-6 md:px-10 py-4 md:py-2.5"
     >
-      <div class="flex gap-1.5">
+      <div class="flex gap-1.5 items-center">
         <Button
           ref="sendEmailRef"
           variant="ghost"
@@ -25,10 +25,12 @@
             <CommentIcon class="h-4" />
           </template>
         </Button>
+        <TypingIndicator :ticketId="ticketId" />
       </div>
     </div>
     <div
       v-show="showEmailBox"
+      ref="emailBoxRef"
       class="flex gap-1.5 flex-1"
       @keydown.ctrl.enter.capture.stop="submitEmail"
       @keydown.meta.enter.capture.stop="submitEmail"
@@ -38,9 +40,9 @@
         :label="
           isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
         "
-        v-model="doc"
         v-model:content="content"
         placeholder="Hi John, we are looking into this issue."
+        :ticketId="ticketId"
         :to-emails="toEmails"
         :cc-emails="ccEmails"
         :bcc-emails="bccEmails"
@@ -59,6 +61,7 @@
     </div>
     <div
       v-show="showCommentBox"
+      ref="commentBoxRef"
       @keydown.ctrl.enter.capture.stop="submitComment"
       @keydown.meta.enter.capture.stop="submitComment"
     >
@@ -71,7 +74,7 @@
             ? 'Comment (⌘ + ⏎)'
             : 'Comment (Ctrl + ⏎)'
         "
-        v-model="doc"
+        :ticketId="ticketId"
         :editable="showCommentBox"
         :doctype="doctype"
         placeholder="@John could you please look into this?"
@@ -92,21 +95,24 @@
 </template>
 
 <script setup lang="ts">
-import { CommentTextEditor, EmailEditor } from "@/components";
+import { CommentTextEditor, EmailEditor, TypingIndicator } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
 import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { ref, watch } from "vue";
+import { useShortcut } from "@/composables/shortcuts";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
-const doc = defineModel();
 const { isMac } = useDevice();
 const { isMobileView } = useScreenSize();
-
+let doc = defineModel();
+// let doc = inject(TicketSymbol)?.value.doc
 const emailEditorRef = ref(null);
 const commentTextEditorRef = ref(null);
+const emailBoxRef = ref(null);
+const commentBoxRef = ref(null);
 
 function toggleEmailBox() {
   if (showCommentBox.value) {
@@ -134,13 +140,21 @@ function submitComment() {
   }
 }
 
+function splitIfString(str: string | string[]) {
+  if (typeof str === "string") {
+    return str.split(",");
+  }
+  return str;
+}
+
 function replyToEmail(data: object) {
   showEmailBox.value = true;
+
   emailEditorRef.value.addToReply(
     data.content,
-    data.to?.split(","),
-    data.cc?.split(","),
-    data.bcc?.split(",")
+    splitIfString(data.to),
+    splitIfString(data.cc),
+    splitIfString(data.bcc)
   );
 }
 
@@ -157,6 +171,10 @@ const props = defineProps({
   doctype: {
     type: String,
     default: "HD Ticket",
+  },
+  ticketId: {
+    type: String,
+    default: null,
   },
   toEmails: {
     type: Array,
@@ -190,12 +208,33 @@ watch(
   }
 );
 
+useShortcut("r", () => {
+  toggleEmailBox();
+});
+useShortcut("c", () => {
+  toggleCommentBox();
+});
+
 defineExpose({
   replyToEmail,
   forwardEmail,
   toggleEmailBox,
   toggleCommentBox,
   editor: emailEditorRef,
+});
+
+import { onClickOutside } from "@vueuse/core";
+
+onClickOutside(emailBoxRef, () => {
+  if (showEmailBox.value) {
+    showEmailBox.value = false;
+  }
+});
+
+onClickOutside(commentBoxRef, () => {
+  if (showCommentBox.value) {
+    showCommentBox.value = false;
+  }
 });
 </script>
 
@@ -204,8 +243,5 @@ defineExpose({
   .comm-area {
     width: 100vw;
   }
-}
-.comm-area {
-  width: 100%;
 }
 </style>

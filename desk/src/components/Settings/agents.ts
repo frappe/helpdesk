@@ -2,12 +2,13 @@ import { isCustomerPortal } from "@/utils";
 import { createListResource, createResource } from "frappe-ui";
 import { reactive, ref, watch } from "vue";
 
+const PAGE_LENGTH = 20;
+
 export const agents = createListResource({
   doctype: "HD Agent",
   fields: ["name", "user_image", "agent_name", "is_active"],
-  cache: ["hd_agent_list"],
   start: 0,
-  pageLength: 10,
+  pageLength: PAGE_LENGTH,
   orderBy: "creation desc",
   auto: !isCustomerPortal.value,
 });
@@ -28,7 +29,7 @@ export const useAgents = () => {
         ...filters,
       };
       agents.start = 0;
-      agents.pageLength = 10;
+      agents.pageLength = PAGE_LENGTH;
     }
     agents.reload();
   });
@@ -40,7 +41,7 @@ export const useAgents = () => {
         ...newVal,
       };
       agents.start = 0;
-      agents.pageLength = 10;
+      agents.pageLength = PAGE_LENGTH;
       agents.reload();
     },
     { deep: true }
@@ -65,7 +66,7 @@ export const useAgents = () => {
         };
       }
       agents.start = 0;
-      agents.pageLength = 10;
+      agents.pageLength = PAGE_LENGTH;
       agents.reload();
     },
     { immediate: true }

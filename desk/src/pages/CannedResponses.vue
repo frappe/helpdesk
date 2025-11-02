@@ -2,25 +2,38 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" />
+        <Breadcrumbs :items="breadcrumbs" class="-ml-0.5" />
       </template>
       <template #right-header>
-        <Button
-          label="Create"
-          theme="gray"
-          variant="solid"
-          @click="
-            () => {
-              title = null;
-              message = null;
-              showNewDialog = true;
-            }
-          "
-        >
-          <template #prefix>
-            <LucidePlus class="h-4 w-4" />
-          </template>
-        </Button>
+        <div class="flex items-center gap-2">
+          <TextInput
+            v-model="searchQuery"
+            type="text"
+            :placeholder="'Search canned responses'"
+            class="input input-bordered h-8 px-2 text-sm"
+            style="min-width: 290px"
+          >
+            <template #prefix>
+              <FeatherIcon name="search" class="h-4 w-4 text-gray-500 ml-2" />
+            </template>
+          </TextInput>
+          <Button
+            label="Create"
+            theme="gray"
+            variant="solid"
+            @click="
+              () => {
+                title = null;
+                message = null;
+                showNewDialog = true;
+              }
+            "
+          >
+            <template #prefix>
+              <LucidePlus class="h-4 w-4" />
+            </template>
+          </Button>
+        </div>
       </template>
     </LayoutHeader>
     <div class="flex-1 overflow-y-auto">
@@ -117,6 +130,7 @@ import { CannedResponseModal } from "@/components/canned-response/";
 import { dayjs } from "@/dayjs";
 import { useUserStore } from "@/stores/user";
 import { dateFormat, dateTooltipFormat } from "@/utils";
+import { watchDebounced } from "@vueuse/core";
 import {
   Breadcrumbs,
   Dropdown,
@@ -142,13 +156,32 @@ const message = ref(null);
 const name = ref(null);
 const isNew = route.hash.split("#")[1] === "new";
 const showNewDialog = ref(isNew || false);
+const searchQuery = ref("");
 
 const cannedResponses = createListResource({
   doctype: "HD Canned Response",
   fields: ["name", "title", "message", "owner", "modified"],
   auto: true,
+  orFilters: {},
   orderBy: "modified desc",
 });
+
+// reload responses when search query changes
+watchDebounced(
+  searchQuery,
+  (newValue) => {
+    cannedResponses.update({
+      orFilters: newValue
+        ? {
+            message: ["like", `%${newValue}%`],
+            title: ["like", `%${newValue}%`],
+          }
+        : {},
+    });
+    cannedResponses.reload();
+  },
+  { debounce: 300 }
+);
 
 function editItem(cannedResponse) {
   title.value = cannedResponse.title;

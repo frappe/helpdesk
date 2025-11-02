@@ -16,7 +16,7 @@
             <button
               class="flex w-full items-center justify-between focus:outline-none"
               :class="inputClasses"
-              @click="() => togglePopover()"
+              @click="() => !disabled && togglePopover()"
             >
               <div class="flex items-center">
                 <slot name="prefix" />
@@ -137,7 +137,7 @@ import { ref, computed, useAttrs, useSlots, watch, nextTick } from "vue";
 
 const props = defineProps({
   modelValue: {
-    type: String,
+    type: [String, Object],
     default: "",
   },
   options: {

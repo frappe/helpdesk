@@ -37,8 +37,11 @@
         v-for="field in ticketBasicInfo"
       >
         <span class="w-[126px] text-sm text-gray-600">{{ field.label }}</span>
-        <span class="text-base text-gray-800 flex-1">
-          {{ field.value }}
+        <span
+          class="text-base text-gray-800 flex-1"
+          :class="!field.value && 'text-ink-gray-4'"
+        >
+          {{ field.value || "—" }}
         </span>
       </div>
 
@@ -52,7 +55,7 @@
 
         <div class="break-words text-base text-gray-800">
           <Tooltip :text="dayjs(data.value).long()">
-            <Badge :label="data.label" :theme="data.theme" variant="outline" />
+            <Badge :label="data.label" :theme="data.theme" variant="subtle" />
           </Tooltip>
         </div>
       </div>
@@ -63,14 +66,17 @@
       class="border-b text-base text-gray-600"
       :ticket="ticket.data"
     />
-    <div class="flex flex-col gap-4 pt-0 px-5 py-3">
+    <div class="flex flex-col gap-4 pt-0 px-5 py-3 overflow-y-scroll">
       <div
         class="flex items-center text-base leading-5"
         v-for="field in ticketAdditionalInfo"
       >
         <span class="w-[126px] text-sm text-gray-600">{{ field.label }}</span>
-        <span class="text-base text-gray-800 flex-1">
-          {{ field.value }}
+        <span
+          class="text-base text-gray-800 flex-1"
+          :class="!field.value && 'text-ink-gray-4'"
+        >
+          {{ field.value || "—" }}
         </span>
       </div>
     </div>
@@ -155,15 +161,10 @@ function resolutionData() {
       )}`,
       color: "orange",
     };
-  } else if (
-    dayjs(ticket.data.resolution_date).isBefore(ticket.data.resolution_by)
-  ) {
+  } else if (ticket.data.agreement_status === "Fulfilled") {
     resolution = {
       label: `Fulfilled in ${formatTime(
-        dayjs(ticket.data.resolution_date).diff(
-          dayjs(ticket.data.creation),
-          "s"
-        )
+        dayjs(ticket.data.resolution_time, "s")
       )}`,
       color: "green",
     };
@@ -183,7 +184,7 @@ const ticketBasicInfo = computed(() => [
   },
   {
     label: "Status",
-    value: transformStatus(ticket.data.status),
+    value: ticket.data.status,
     bold: true,
   },
 ]);
@@ -216,14 +217,6 @@ const ticketAdditionalInfo = computed(() => {
 
   return [...fields, ...custom_fields];
 });
-function transformStatus(status: string) {
-  switch (status) {
-    case "Replied":
-      return "Awaiting reply";
-    default:
-      return status;
-  }
-}
 </script>
 
 <style scoped></style>

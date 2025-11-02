@@ -60,14 +60,15 @@
 </template>
 
 <script setup lang="ts">
-import { Ticket } from "@/types";
+import { Link } from "@/components";
+import { HDTicket } from "@/types/doctypes";
 import { Dialog, createListResource, createResource, toast } from "frappe-ui";
 import { ref, watch } from "vue";
 import LucideMerge from "~icons/lucide/merge";
 import TriangleAlert from "~icons/lucide/triangle-alert";
 // interface P
 interface Props {
-  ticket: Ticket;
+  ticket: HDTicket;
 }
 
 interface E {
@@ -80,7 +81,7 @@ const emit = defineEmits<E>();
 const showDialog = defineModel<boolean>();
 
 interface Filter {
-  status: [string, string[] | string];
+  status_category: [string, string[] | string];
   is_merged: number;
   name: string[];
   customer?: any;
@@ -89,7 +90,7 @@ interface Filter {
 
 function getDefaultFilters() {
   const filters: Filter = {
-    status: ["in", ["Open", "Replied"]],
+    status_category: ["in", ["Open", "Paused"]],
     is_merged: 0,
     name: ["!=", props.ticket.name],
   };

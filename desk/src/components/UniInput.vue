@@ -10,6 +10,7 @@
       :is="component"
       :placeholder="placeholder"
       :value="transValue"
+      :disabled="field.disabled"
       :model-value="transValue"
       @update:model-value="emitUpdate(field.fieldname, $event)"
       @change="
@@ -23,10 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h } from "vue";
 import { Autocomplete, Link } from "@/components";
-import { createResource, FormControl } from "frappe-ui";
 import { Field } from "@/types";
+import { createResource, FormControl } from "frappe-ui";
+import { computed, h } from "vue";
 
 type Value = string | number | boolean;
 
@@ -51,6 +52,7 @@ const component = computed(() => {
   if (props.field.url_method) {
     return h(Autocomplete, {
       options: apiOptions.data,
+      size: "sm",
     });
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     return h(Link, {
@@ -62,6 +64,7 @@ const component = computed(() => {
       options: props.field.options
         .split("\n")
         .map((o) => ({ label: o, value: o })),
+      size: "sm",
     });
   } else if (props.field.fieldtype === "Check") {
     return h(Autocomplete, {
@@ -75,6 +78,7 @@ const component = computed(() => {
           value: 0,
         },
       ],
+      size: "sm",
     });
   } else {
     return h(FormControl, {
@@ -87,10 +91,10 @@ const apiOptions = createResource({
   url: props.field.url_method,
   auto: !!props.field.url_method,
   transform: (data) =>
-    data.map((o) => ({
+    data?.map((o) => ({
       label: o,
       value: o,
-    })),
+    })) || [],
 });
 
 const transValue = computed(() => {
@@ -101,6 +105,9 @@ const transValue = computed(() => {
 });
 
 const placeholder = computed(() => {
+  if (props.field.placeholder) {
+    return props.field.placeholder;
+  }
   if (props.field.fieldtype === "Data" && !props.field.url_method) {
     return "Type something";
   }

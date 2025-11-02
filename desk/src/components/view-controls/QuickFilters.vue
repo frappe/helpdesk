@@ -1,7 +1,7 @@
 <template>
   <div v-if="!quickFilters.loading">
     <FadedScrollableDiv
-      class="flex flex-1 items-center -ml-1 flex-wrap gap-1 gap-y-2"
+      class="flex flex-1 items-center -ml-1 flex-wrap gap-2"
       orientation="horizontal"
     >
       <div
@@ -11,6 +11,7 @@
       >
         <QuickFilterField
           :filter="filter"
+          :value="getValue(filter, list.params?.filters)"
           @applyQuickFilter="(f, v) => applyQuickFilter(f, v)"
         />
       </div>
@@ -27,22 +28,55 @@ const listViewData = inject("listViewData");
 const listViewActions = inject("listViewActions");
 const { list, quickFilters } = listViewData;
 
+const directValueFilterTypes = ["Check", "Select", "Link", "Date", "Datetime"];
+
 function applyQuickFilter(filter, value) {
   let filters = { ...list.params?.filters };
 
   let field = filter.name;
   if (value) {
-    if (["Check", "Select", "Link", "Date", "Datetime"].includes(filter.type)) {
+    if (directValueFilterTypes.includes(filter.type)) {
       filters[field] = value;
     } else {
       filters[field] = ["LIKE", `%${value}%`];
     }
-    filter["value"] = value;
   } else {
     delete filters[field];
-    filter["value"] = "";
   }
   listViewActions.applyFilters(filters);
+}
+
+function getDefaultValue(quickFilter) {
+  return quickFilter.type === "Check" ? false : "";
+}
+
+function getValue(quickFilter, filters) {
+  if (!filters || !(quickFilter && quickFilter.name)) {
+    return getDefaultValue(quickFilter);
+  }
+  const filter = filters[quickFilter.name];
+  if (filter === undefined) {
+    // not a part of the customizable filters
+    return getDefaultValue(quickFilter);
+  }
+  if (directValueFilterTypes.includes(quickFilter.type)) {
+    return filter;
+  }
+  if (
+    !Array.isArray(filter) ||
+    filter.length !== 2 ||
+    filter[0].toLowerCase() !== "like"
+  ) {
+    return getDefaultValue(quickFilter);
+  }
+  let value = filter[1];
+  if (value.startsWith("%")) {
+    value = value.substring(1);
+  }
+  if (value.endsWith("%")) {
+    value = value.substring(0, value.length - 1);
+  }
+  return value;
 }
 </script>
 

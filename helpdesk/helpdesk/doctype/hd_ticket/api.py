@@ -1,15 +1,25 @@
+import json
+
 import frappe
+from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
 from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
+from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
-from helpdesk.utils import agent_only, check_permissions, get_customer, is_agent
+from helpdesk.utils import (
+    agent_only,
+    check_permissions,
+    get_customer,
+    is_agent,
+    parse_call_logs,
+)
 
 
 @frappe.whitelist()
@@ -24,7 +34,7 @@ def new(doc, attachments=[]):
 
 @frappe.whitelist()
 def get_one(name, is_customer_portal=False):
-    check_permissions("HD Ticket", None)
+    check_permissions("HD Ticket", None, doc=name)
     QBContact = frappe.qb.DocType("Contact")
     QBTicket = frappe.qb.DocType("HD Ticket")
 
@@ -66,19 +76,51 @@ def get_one(name, is_customer_portal=False):
             "name": ticket.raised_by.split("@")[0],
         }
     template = ticket.template or DEFAULT_TICKET_TEMPLATE
+
+    linked_calls = frappe.db.get_all(
+        "Dynamic Link",
+        filters={"link_name": ticket["name"], "parenttype": "TP Call Log"},
+        pluck="parent",
+    )
+
+    calls = []
+
+    for call in linked_calls:
+        call = frappe.get_cached_doc(
+            "TP Call Log",
+            call,
+            fields=[
+                "name",
+                "caller",
+                "receiver",
+                "duration",
+                "type",
+                "status",
+                "from",
+                "to",
+                "recording_url",
+                "creation",
+            ],
+        ).as_dict()
+
+        calls.append(call)
+
+    call_logs = parse_call_logs(calls)
+
     return {
         **ticket,
         "comments": get_comments(name),
         "communications": get_communications(name),
-        "contact": contact,
         "history": get_history(name),
+        "views": get_views(name),
+        "contact": contact,
         "tags": get_tags(name),
         "template": get_template(template),
-        "views": get_views(name),
         "_form_script": get_form_script(
             "HD Ticket", is_customer_portal=is_customer_portal
         ),
         "fields": get_meta(template),
+        "calls": call_logs,
     }
 
 
@@ -106,6 +148,7 @@ def get_customer_criteria():
     conditions = [
         QBTicket.contact == user,
         QBTicket.raised_by == user,
+        QBTicket.owner == user,
     ]
     customer = get_customer(user)
     for c in customer:
@@ -134,6 +177,7 @@ def get_communications(ticket: str):
             QBCommunication.sender,
             QBCommunication.recipients,
             QBCommunication.subject,
+            QBCommunication.delivery_status,
         )
         .where(QBCommunication.reference_doctype == "HD Ticket")
         .where(QBCommunication.reference_name == ticket)
@@ -220,6 +264,39 @@ def get_tags(ticket: str):
     for tag in rows:
         res.append(tag.tag)
     return res
+
+
+def get_call_logs(ticket: str):
+    linked_calls = frappe.db.get_all(
+        "Dynamic Link",
+        filters={"link_name": ticket, "parenttype": "TP Call Log"},
+        pluck="parent",
+    )
+
+    calls = []
+
+    for call in linked_calls:
+        call = frappe.get_cached_doc(
+            "TP Call Log",
+            call,
+            fields=[
+                "name",
+                "caller",
+                "receiver",
+                "duration",
+                "type",
+                "status",
+                "from",
+                "to",
+                "recording_url",
+                "creation",
+            ],
+        ).as_dict()
+
+        calls.append(call)
+
+    call_logs = parse_call_logs(calls)
+    return call_logs
 
 
 @redis_cache()
@@ -356,7 +433,6 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: int, cont
 @frappe.whitelist()
 @agent_only
 def split_ticket(subject: str, communication_id: str):
-
     communicaton_creation_time = frappe.db.get_value(
         "Communication", communication_id, "creation"
     )
@@ -463,3 +539,244 @@ def duplicate_ticket(ticket_doc, subject):
     new_ticket.insert(ignore_permissions=True)
 
     return new_ticket.name
+
+
+@frappe.whitelist()
+@agent_only
+def get_ticket_customizations():
+    # get form script
+    # get default ticket template
+    custom_fields = frappe.get_all(
+        "HD Ticket Template Field",
+        filters={"parent": "Default"},
+        fields=["fieldname", "required", "placeholder", "url_method"],
+        order_by="idx",
+    )
+    form_scripts = get_form_script("HD Ticket")
+    return {"custom_fields": custom_fields, "_form_script": form_scripts}
+
+
+@frappe.whitelist()
+# TODO: make it bette, on mount fetch only once and cache it
+def get_navigation_tickets(ticket: str, current_view: str = None):
+    """
+    Get a list of tickets to navigate
+    """
+
+    filters = get_navigation_filters(ticket, current_view)
+    order_by = get_navigation_order_by(current_view)
+
+    try:
+        tickets = frappe.get_list(
+            "HD Ticket",
+            pluck="name",
+            filters=filters,
+            order_by=order_by,
+            limit=40,
+        )
+
+        # Extract just the ticket IDs
+        ticket_ids = [int(ticket), *tickets]
+        # print("\n\n", ticket_ids, "\n\n")
+        return ticket_ids
+
+    except Exception as e:
+        frappe.log_error(f"Error in get_navigation_tickets: {str(e)}")
+        # Return empty list if there's an error
+        return []
+
+
+def get_navigation_filters(ticket: str, current_view: str = None):
+    filters = []
+    if current_view:
+        _filters = frappe.get_value("HD View", current_view, "filters")
+        if _filters:
+            try:
+                # Parse the filters string to list/dict
+                filters = (
+                    json.loads(_filters) if isinstance(_filters, str) else _filters
+                )
+            except (json.JSONDecodeError, TypeError):
+                filters = []
+
+    if not filters:
+        default_view = frappe.db.get_value(
+            "HD View",
+            {"dt": "HD Ticket", "is_default": 1, "user": frappe.session.user},
+            "filters",
+        )
+
+        if default_view:
+            try:
+                filters = (
+                    json.loads(default_view)
+                    if isinstance(default_view, str)
+                    else default_view
+                )
+            except (json.JSONDecodeError, TypeError):
+                filters = []
+
+    # Base filters - exclude the current ticket
+    base_filters = {"name": ["!=", ticket]}
+
+    # Combine base filters with view filters
+    # is instance of {}
+
+    if filters and isinstance(filters, object):
+        final_filters = {**filters, **base_filters}
+    else:
+        final_filters = base_filters
+    final_filters = handle_at_me_support(final_filters)
+
+    return final_filters
+
+
+def get_navigation_order_by(view):
+    if not view:
+        order_by = frappe.get_value(
+            "HD View",
+            {"dt": "HD Ticket", "is_default": 1, "user": frappe.session.user},
+            "order_by",
+        )
+    elif view:
+        order_by = frappe.get_value("HD View", view, "order_by")
+
+    if order_by:
+        return order_by
+    return "modified desc"
+
+
+@frappe.whitelist()
+def get_ticket_contact(ticket: str):
+    if not frappe.db.exists("HD Ticket", ticket):
+        return None
+    contact = frappe.db.get_value("HD Ticket", ticket, "contact")
+    if not contact:
+        raised_by = frappe.db.get_value("HD Ticket", ticket, "raised_by")
+        return {
+            "email_id": raised_by,
+            "name": raised_by.split("@")[0],
+            "phone": "",
+            "mobile_no": "",
+            "image": "",
+        }
+
+    return frappe.db.get_value(
+        "Contact",
+        contact,
+        ["name", "email_id", "phone", "mobile_no", "image"],
+        as_dict=1,
+    )
+
+
+@frappe.whitelist()
+def get_recent_similar_tickets(ticket: str):
+    if not frappe.db.exists("HD Ticket", ticket):
+        return {"recent_tickets": [], "similar_tickets": []}
+
+    recent_tickets = get_recent_tickets(ticket)
+    similar_tickets = get_similar_tickets(ticket)
+    # print('\n\n',recent_tickets,'\n\n')
+    return {"recent_tickets": recent_tickets, "similar_tickets": similar_tickets}
+
+
+def get_recent_tickets(ticket: str):
+    fields = ["subject", "creation", "name", "status"]
+    [raised_by, customer] = frappe.db.get_value(
+        "HD Ticket", ticket, ["raised_by", "customer"]
+    )
+    org_tickets = []
+    user_tickets = []
+    if customer:
+        org_tickets = (
+            frappe.get_list(
+                "HD Ticket",
+                filters={
+                    "name": ["!=", ticket],
+                    "customer": customer,
+                },
+                fields=fields,
+                order_by="creation desc",
+                limit=2,
+            )
+            or []
+        )
+    elif raised_by:
+        user_tickets = (
+            frappe.get_list(
+                "HD Ticket",
+                filters={
+                    "name": ["!=", ticket],
+                    "raised_by": raised_by,
+                },
+                fields=fields,
+                order_by="creation desc",
+                limit=4 - len(org_tickets),
+            )
+            or []
+        )
+    return org_tickets + user_tickets
+
+
+def get_similar_tickets(ticket: str):
+    doc = frappe.get_doc("HD Ticket", ticket)
+
+    # Separate search terms
+    subject_search = ""
+    desc_search = ""
+    relevance_threshold = 70  # Minimum relevance percentage to consider
+
+    if doc.subject:
+        subject_search = doc.subject.strip()
+
+    if doc.description:
+        soup = BeautifulSoup(doc.description, "html.parser")
+        text = soup.get_text()
+        if text:
+            desc_search = text.strip()
+
+    tickets = frappe.db.sql(
+        """
+        SELECT `name`, `subject`, `status`, `creation`,
+            (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION)) as `raw_relevance`
+        FROM `tabHD Ticket`
+        WHERE (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION))
+            AND name != %(ticket)s
+            AND creation > DATE_SUB(NOW(), INTERVAL 90 DAY)
+        ORDER BY `raw_relevance` DESC, creation DESC
+        LIMIT 4
+        """,
+        {
+            "subject_search": subject_search,
+            "ticket": ticket,
+        },
+        as_dict=1,
+    )
+
+    max_relevance = max((t["raw_relevance"] for t in tickets), default=0)
+    for t in tickets:
+        t["relevance"] = (
+            round((t["raw_relevance"] / max_relevance) * 100) if max_relevance else 0
+        )
+
+    tickets = [t for t in tickets if t["relevance"] > relevance_threshold]
+
+    return tickets
+
+
+@frappe.whitelist()
+def get_ticket_activities(ticket: str):
+    activities = {
+        "comments": get_comments(ticket),
+        "communications": get_communications(ticket),
+        "history": get_history(ticket),
+        "views": get_views(ticket),
+        "calls": get_call_logs(ticket),
+    }
+    return activities
+
+
+@frappe.whitelist()
+def get_ticket_assignees(ticket: str):
+    assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
+    return assignees

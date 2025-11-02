@@ -5,7 +5,7 @@ import { isCustomerPortal } from "@/utils";
 import { createRouter, createWebHistory } from "vue-router";
 const { isMobileView } = useScreenSize();
 
-export const LOGIN_PAGE = "/login?redirect-to=/helpdesk";
+export const LOGIN_PAGE = "/login";
 
 // type the meta fields
 declare module "vue-router" {
@@ -60,6 +60,12 @@ const routes = [
     component: () => import("@/pages/knowledge-base/KnowledgeBaseAgent.vue"),
   },
   {
+    path: "/search",
+    name: "SearchAgent",
+    component: () => import("@/pages/SearchAgent.vue"),
+    meta: { auth: true },
+  },
+  {
     path: "/kb/articles/:articleId",
     name: "Article",
     component: () => import("@/pages/knowledge-base/Article.vue"),
@@ -100,6 +106,16 @@ const routes = [
     path: "/canned-responses",
     name: "CannedResponses",
     component: () => import("@/pages/CannedResponses.vue"),
+  },
+  {
+    path: "/dashboard",
+    name: "Dashboard",
+    component: () => import("@/pages/dashboard/Dashboard.vue"),
+  },
+  {
+    path: "/call-logs",
+    name: "CallLogs",
+    component: () => import("@/pages/call-logs/CallLogs.vue"),
   },
 
   // Customer Portal Routes
@@ -189,7 +205,11 @@ router.beforeEach(async (to, _, next) => {
   }
 
   if (!authStore.isLoggedIn) {
-    window.location.href = LOGIN_PAGE;
+    const redirectURL = to.fullPath !== "/" ? to.fullPath : "";
+
+    window.location.href =
+      LOGIN_PAGE +
+      (redirectURL ? `?redirect-to=/helpdesk${redirectURL}` : "/helpdesk");
   } else if (!to.meta.public && !authStore.hasDeskAccess) {
     next({ name: "TicketsCustomer" });
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {

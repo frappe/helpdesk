@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot :show="sidebarOpened">
-    <Dialog as="div" @close="sidebarOpened = false" class="fixed inset-0 z-40">
+    <Dialog as="div" @close="sidebarOpened = false" class="fixed inset-0">
       <TransitionChild
         as="template"
         enter="transition ease-in-out duration-200 transform"
@@ -17,7 +17,7 @@
           <div><UserMenu class="p-2 mb-2" :options="profileSettings" /></div>
           <!-- notifications -->
           <div class="overflow-y-auto px-2" v-if="!isCustomerPortal">
-            <div class="mb-3 flex flex-col">
+            <div class="mb-3 flex flex-col gap-1">
               <SidebarLink
                 class="relative"
                 label="Notifications"
@@ -35,6 +35,15 @@
                   />
                 </template>
               </SidebarLink>
+              <SidebarLink
+                v-if="!isCustomerPortal"
+                class="relative"
+                label="Dashboard"
+                :icon="LucideLayoutDashboard"
+                :to="'Dashboard'"
+                :is-active="isActiveTab('Dashboard')"
+                :is-expanded="true"
+              />
             </div>
           </div>
 
@@ -102,7 +111,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
-import { computed, markRaw } from "vue";
+import { computed, markRaw, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { Section } from "@/components";
@@ -114,6 +123,7 @@ import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { currentView, useView } from "@/composables/useView";
 
 import LucideBell from "~icons/lucide/bell";
+import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
@@ -122,17 +132,25 @@ import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
 } from "./layoutSettings";
+import { useTelephonyStore } from "@/stores/telephony";
+import { storeToRefs } from "pinia";
 const { pinnedViews, publicViews } = useView();
 
 const notificationStore = useNotificationStore();
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const telephonyStore = useTelephonyStore();
+const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const allViews = computed(() => {
-  const items = isCustomerPortal.value
+  let items = isCustomerPortal.value
     ? customerPortalSidebarOptions
     : agentPortalSidebarOptions;
+
+  if (!isCallingEnabled.value) {
+    items = items.filter((item) => item.label !== "Call Logs");
+  }
 
   const options = [
     {

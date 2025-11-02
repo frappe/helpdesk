@@ -24,7 +24,7 @@
     </LayoutHeader>
     <div class="flex overflow-hidden h-full w-full">
       <!-- Main Ticket Comm -->
-      <section class="flex flex-col flex-1 max-w-[calc(100%-382px)]">
+      <section class="flex flex-col flex-1 w-full md:max-w-[calc(100%-382px)]">
         <!-- show for only mobile -->
         <TicketCustomerTemplateFields v-if="isMobileView" />
 
@@ -43,6 +43,7 @@
             placeholder="Type a message"
             autofocus
             @clear="() => (isExpanded = false)"
+            :uploadFunction="(file:any)=>uploadFunction(file, 'HD Ticket', props.ticketId)"
           >
             <template #bottom-right>
               <Button
@@ -72,17 +73,17 @@ import { useScreenSize } from "@/composables/screen";
 import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
-import { isContentEmpty } from "@/utils";
+import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
 import { Icon } from "@iconify/vue";
 import { Breadcrumbs, Button, call, createResource, toast } from "frappe-ui";
 import { computed, onMounted, onUnmounted, provide, ref } from "vue";
 import { useRouter } from "vue-router";
-import { useTicket } from "./data";
 import { ITicket } from "./symbols";
-import TicketConversation from "./TicketConversation.vue";
 import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
+import TicketConversation from "./TicketConversation.vue";
 import TicketFeedback from "./TicketFeedback.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 
 interface P {
   ticketId: string;
@@ -90,11 +91,19 @@ interface P {
 const router = useRouter();
 
 const props = defineProps<P>();
-const ticket = useTicket(
-  props.ticketId,
-  true,
-  null,
-  (data) => {
+
+const { getStatus } = useTicketStatusStore();
+
+const ticket = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
+  cache: ["Ticket", props.ticketId],
+  params: {
+    name: props.ticketId,
+    is_customer_portal: isCustomerPortal.value,
+  },
+  auto: true,
+  onSuccess: (data) => {
+    data.status = getStatus(data.status)?.label_customer;
     setupCustomizations(ticket, {
       doc: data,
       call,
@@ -105,11 +114,12 @@ const ticket = useTicket(
       createToast: toast.create,
     });
   },
-  () => {
+  onError: () => {
     toast.error("Ticket not found");
     router.replace("/my-tickets");
-  }
-);
+  },
+});
+
 provide(ITicket, ticket);
 const editor = ref(null);
 const editorContent = ref("");

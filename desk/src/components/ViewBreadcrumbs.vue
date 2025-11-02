@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center">
+  <div class="flex items-center -ml-0.5">
     <router-link
       :to="{ name: routeName }"
       class="px-0.5 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
@@ -34,10 +34,9 @@
           </template>
         </Button>
       </template>
-      <template #item="{ item, active }">
+      <template #item="{ item }">
         <button
-          class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base"
-          :class="{ 'bg-surface-gray-3': active }"
+          class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base hover:bg-surface-gray-3"
           @click="item.onClick"
         >
           <div class="flex items-center">
@@ -56,19 +55,17 @@
               {{ item.label }}
             </span>
           </div>
-          <div class="flex flex-row-reverse gap-2 items-center min-w-11">
-            <Dropdown
-              v-if="item.name"
-              :class="active ? 'block' : 'hidden'"
-              placement="right-start"
-              :options="dropdownActions(item)"
-            >
-              <template #default="{ togglePopover }">
+          <div
+            v-if="item.name"
+            class="flex flex-row-reverse gap-2 items-center min-w-11"
+          >
+            <Dropdown placement="right-start" :options="dropdownActions(item)">
+              <template #default>
                 <Button
                   variant="ghost"
-                  class="!size-5"
+                  class="group-hover:!size-5 !size-0 group-hover:opacity-100 opacity-0 group-hover:ml-0 -ml-2"
                   icon="more-horizontal"
-                  @click.stop="togglePopover()"
+                  @click.stop
                 />
               </template>
             </Dropdown>
@@ -85,9 +82,9 @@
 </template>
 
 <script setup>
-import Dropdown from "@/components/frappe-ui/Dropdown.vue";
 import { useScreenSize } from "@/composables/screen";
 import { Icon } from "@iconify/vue";
+import { Dropdown } from "frappe-ui";
 import { useRoute } from "vue-router";
 
 const props = defineProps({

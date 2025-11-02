@@ -22,6 +22,7 @@ bench set-redis-socketio-host redis://redis:6379
 sed -i '/redis/d' ./Procfile
 sed -i '/watch/d' ./Procfile
 
+bench get-app telephony
 bench get-app helpdesk --branch main
 
 bench new-site helpdesk.localhost \
@@ -30,6 +31,7 @@ bench new-site helpdesk.localhost \
 --admin-password admin \
 --no-mariadb-socket
 
+bench --site helpdesk.localhost install-app telephony
 bench --site helpdesk.localhost install-app helpdesk
 bench --site helpdesk.localhost set-config developer_mode 1
 bench --site helpdesk.localhost set-config mute_emails 1

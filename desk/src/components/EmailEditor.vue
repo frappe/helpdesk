@@ -13,6 +13,7 @@
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
     :extensions="[PreserveVideoControls]"
+    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
@@ -76,12 +77,13 @@
           v-for="a in attachments"
           :key="a.file_url"
           :label="a.file_name"
+          :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
         >
           <template #suffix>
             <FeatherIcon
               class="h-3.5"
               name="x"
-              @click.stop="removeAttachment(a)"
+              @click.self.stop="removeAttachment(a)"
             />
           </template>
         </AttachmentItem>
@@ -95,7 +97,7 @@
             <FileUploader
               :upload-args="{
                 doctype: doctype,
-                docname: modelValue?.name,
+                docname: ticketId,
                 private: true,
               }"
               @success="
@@ -149,6 +151,7 @@
     </template>
   </TextEditor>
   <CannedResponseSelectorModal
+    v-if="showCannedResponseSelectorModal"
     v-model="showCannedResponseSelectorModal"
     :doctype="doctype"
     @apply="applyCannedResponse"
@@ -162,12 +165,15 @@ import {
   MultiSelectInput,
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
+import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,
+  removeAttachmentFromServer,
   textEditorMenuButtons,
+  uploadFunction,
   validateEmail,
 } from "@/utils";
 // import { EditorContent } from "@tiptap/vue-3";
@@ -180,12 +186,16 @@ import {
   toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, nextTick, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
 
 const props = defineProps({
+  ticketId: {
+    type: String,
+    default: null,
+  },
   placeholder: {
     type: String,
     default: null,
@@ -221,15 +231,28 @@ const label = computed(() => {
 });
 
 const emit = defineEmits(["submit", "discard"]);
-const doc = defineModel();
 
-const newEmail = useStorage("emailBoxContent" + doc.value.name, "");
+const newEmail = useStorage("emailBoxContent" + props.ticketId, null);
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
+
+// Initialize typing composable
+const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
 const emailEmpty = computed(() => {
   return isContentEmpty(newEmail.value);
+});
+
+// Watch for changes in email content to trigger typing events
+watch(newEmail, (newValue, oldValue) => {
+  if (newValue !== oldValue && newValue) {
+    onUserType();
+  }
+});
+
+onBeforeUnmount(() => {
+  cleanup();
 });
 
 const toEmailsClone = ref([...props.toEmails]);
@@ -251,7 +274,7 @@ const sendMail = createResource({
   url: "run_doc_method",
   makeParams: () => ({
     dt: props.doctype,
-    dn: doc.value.name,
+    dn: props.ticketId,
     method: "reply_via_agent",
     args: {
       attachments: attachments.value.map((x) => x.name),
@@ -303,8 +326,9 @@ function toggleBCC() {
     });
 }
 
-function removeAttachment(attachment) {
+async function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
+  await removeAttachmentFromServer(attachment.name);
 }
 
 function addToReply(

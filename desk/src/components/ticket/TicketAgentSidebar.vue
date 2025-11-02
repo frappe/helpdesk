@@ -3,11 +3,16 @@
     <div
       class="flex h-10.5 items-center border-b px-5 py-2.5 text-lg font-medium text-ink-gray-9 justify-between"
     >
-      <span class="cursor-copy text-lg font-semibold" @click="copyToClipboard()"
+      <span
+        class="cursor-copy text-lg font-semibold"
+        @click="
+          copyToClipboard(ticket.name, `'${ticket.name}' copied to clipboard`)
+        "
         >#{{ ticket.name }}
       </span>
       <Dropdown
         v-if="showMergeOption"
+        placement="right"
         :options="[
           {
             label: 'Merge Ticket',
@@ -22,6 +27,7 @@
     </div>
     <TicketAgentContact
       :contact="ticket.contact"
+      :ticketId="ticket.name"
       @email:open="(e) => emit('email:open', e)"
     />
     <!-- feedback component -->
@@ -72,7 +78,8 @@ const showMergeModal = ref(false);
 
 const showMergeOption = computed(() => {
   return (
-    !props.ticket.is_merged && ["Open", "Replied"].includes(props.ticket.status)
+    !props.ticket.is_merged &&
+    ["Open", "Paused"].includes(props.ticket.status_category)
   );
 });
 </script>

@@ -1,0 +1,131 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:label_agent",
+ "creation": "2025-08-13 10:00:15.235225",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "label_agent",
+  "order",
+  "column_break_neks",
+  "different_view",
+  "label_customer",
+  "sla_mapping_section",
+  "category",
+  "column_break_xcba",
+  "color"
+ ],
+ "fields": [
+  {
+   "fieldname": "column_break_neks",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "color",
+   "fieldtype": "Select",
+   "label": "Color",
+   "options": "Black\nGray\nBlue\nGreen\nRed\nPink\nOrange\nAmber\nYellow\nCyan\nTeal\nViolet\npurple"
+  },
+  {
+   "fieldname": "label_agent",
+   "fieldtype": "Data",
+   "label": "Label",
+   "read_only_depends_on": "eval:doc.name==\"Closed\";",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "different_view",
+   "fieldtype": "Check",
+   "label": "Show end users a different view",
+   "read_only_depends_on": "eval:doc.label_agent==\"Closed\";"
+  },
+  {
+   "depends_on": "eval:doc.different_view",
+   "description": "Name shown on the customer portal<br> (e.g., Replied \u2192 Awaiting Response).",
+   "fieldname": "label_customer",
+   "fieldtype": "Data",
+   "label": "Label (customer view)",
+   "mandatory_depends_on": "eval:doc.different_view"
+  },
+  {
+   "description": "Open: SLA continues. <br>\nPaused: SLA is paused. <br>\nResolved: SLA timer stops.",
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Open\nPaused\nResolved",
+   "read_only_depends_on": "eval:doc.label_agent==\"Closed\";",
+   "reqd": 1
+  },
+  {
+   "fieldname": "order",
+   "fieldtype": "Int",
+   "label": "Order"
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "read_only_depends_on": "eval:doc.label_agent==\"Closed\";"
+  },
+  {
+   "fieldname": "sla_mapping_section",
+   "fieldtype": "Section Break",
+   "label": "SLA Mapping"
+  },
+  {
+   "fieldname": "column_break_xcba",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-08-25 12:29:02.646874",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Ticket Status",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

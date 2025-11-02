@@ -2,7 +2,7 @@
   "name": "helpdesk-ui",
   "private": true,
   "version": "0.0.0",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -17,13 +17,15 @@
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.9",
     "@tiptap/core": "^2.2.4",
+    "@twilio/voice-sdk": "^2.15.0",
     "@vee-validate/zod": "^4.8.2",
-    "@vueuse/core": "^10.0.2",
-    "@vueuse/integrations": "^12.0.0",
-    "autoprefixer": "^10.4.13",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "@vueuse/core": "^13.8.0",
+    "@vueuse/integrations": "^13.8.0",
     "dayjs": "^1.11.7",
     "echarts": "^5.4.1",
-    "frappe-ui": "0.1.150",
+    "frappe-ui": "0.1.192",
+    "gemoji": "^8.1.0",
     "lodash": "^4.17.21",
     "lucide-static": "^0.276.0",
     "mime": "^3.0.0",
@@ -31,7 +33,6 @@
     "pluralize": "^8.0.0",
     "sanitize-html": "^2.10.0",
     "socket.io-client": "^4.7.2",
-    "tailwindcss": "^3.2.7",
     "unplugin-icons": "^0.16.1",
     "unplugin-vue-components": "^0.25.2",
     "vee-validate": "^4.8.2",
@@ -39,18 +40,20 @@
     "vue-echarts": "^6.5.4",
     "vue-router": "^4.2.2",
     "vuedraggable": "^4.1.0",
-    "gemoji": "^8.1.0",
-    "zod": "^3.21.4",
-    "@vitejs/plugin-vue": "^4.2.3"
+    "zod": "^3.21.4"
   },
   "resolutions": {
-    "cheerio": "1.0.0-rc.12"
+    "cheerio": "1.0.0-rc.12",
+    "prosemirror-model": "1.25.1"
   },
   "devDependencies": {
-    "vite": "^4.4.9",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
-    "vite-plugin-pwa": "^0.20.5",
+    "prettier": "2.8.4",
     "typescript": "^5.0.2",
-    "prettier": "2.8.4"
+    "vite": "^4.4.9",
+    "vite-plugin-pwa": "^0.20.5",
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.5",
+    "tailwindcss": "^3.4.15"
   }
 }
