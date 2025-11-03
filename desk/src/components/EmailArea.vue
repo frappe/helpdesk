@@ -46,30 +46,10 @@
             {{ timeAgo(creation) }}
           </p>
         </Tooltip>
-        <Button
-          variant="ghost"
-          class="text-gray-700"
-          @click="
-            emit('reply', {
-              content: content,
-              to: sender?.name ?? to,
-            })
-          "
-        >
+        <Button variant="ghost" class="text-gray-700" @click="reply">
           <ReplyIcon class="h-4 w-4" />
         </Button>
-        <Button
-          variant="ghost"
-          class="text-gray-700"
-          @click="
-            emit('reply', {
-              content: content,
-              to: sender?.name ?? to,
-              cc: cc ? cc : [],
-              bcc: bcc ? bcc : [],
-            })
-          "
-        >
+        <Button variant="ghost" class="text-gray-700" @click="replyAll">
           <ReplyAllIcon class="h-4 w-4" />
         </Button>
         <Dropdown
@@ -133,6 +113,9 @@ import { computed, ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
 import { ReplyAllIcon, ReplyIcon } from "./icons";
 import TicketSplitModal from "./ticket/TicketSplitModal.vue";
+import { useAuthStore } from "@/stores/auth";
+import { storeToRefs } from "pinia";
+
 const props = defineProps({
   activity: {
     type: Object,
@@ -159,6 +142,8 @@ const {
 
 const emit = defineEmits(["reply"]);
 
+const auth = storeToRefs(useAuthStore());
+
 const { isMobileView } = useScreenSize();
 
 const showSplitModal = ref(false);
@@ -177,6 +162,53 @@ const status = computed(() => {
   }
   return { label: _status, color: indicator_color };
 });
+
+const reply = () => {
+  const user = auth.user.value;
+  emit("reply", {
+    content: content,
+    to: user === sender.name ? to : sender.name,
+  });
+};
+
+const replyAll = () => {
+  const user = auth.user.value;
+
+  const normalizeAndFilter = (field) => {
+    let arr;
+    if (typeof field === "string") {
+      arr = field.split(",").map((s) => s.trim());
+    } else {
+      arr = field || [];
+    }
+    return arr.filter((item) => item !== user && item !== sender.name);
+  };
+
+  const filteredTo = normalizeAndFilter(to);
+  const filteredCc = normalizeAndFilter(cc);
+  const filteredBcc = normalizeAndFilter(bcc);
+
+  let _to, _cc, _bcc;
+
+  if (user === sender.name) {
+    // User is the sender, reply to all original recipients
+    _to = filteredTo.join(", ");
+    _cc = filteredCc;
+    _bcc = filteredBcc;
+  } else {
+    // User is a recipient, reply to sender with all other recipients in cc
+    _to = sender.name;
+    _cc = [...filteredTo, ...filteredCc];
+    _bcc = filteredBcc;
+  }
+
+  emit("reply", {
+    content: content,
+    to: _to,
+    cc: _cc.filter(Boolean),
+    bcc: _bcc.filter(Boolean),
+  });
+};
 
 // TODO: Implement reply functionality using this way instead of emit drillup
 // function reply(email, reply_all = false) {

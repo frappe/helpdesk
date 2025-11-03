@@ -1129,6 +1129,14 @@ def has_permission(doc, user=None):
     if show_tickets_without_team and not doc.get("agent_group"):
         return True
 
+    if doc.get("_assign", None):
+        try:
+            assignees = json.loads(doc._assign)
+            if user in assignees:
+                return True
+        except:
+            return False
+
     teams = get_agents_team()
     if any([team.get("ignore_restrictions") for team in teams]):
         return True
@@ -1193,6 +1201,12 @@ def permission_query(user):
         if not show_tickets_without_team:
             query += " OR (`tabHD Ticket`.agent_group is null)"
         return query
+
+    query += (
+        " OR (JSON_SEARCH(`tabHD Ticket`._assign, 'all', {user}) IS NOT NULL)".format(
+            user=frappe.db.escape(user)
+        )
+    )
 
     team_names = [t.get("team_name") for t in teams]
 

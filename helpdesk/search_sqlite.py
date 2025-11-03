@@ -84,9 +84,10 @@ class HelpdeskSearch(SQLiteSearch):
             document["reference_ticket"] = int(doc.reference_ticket)
 
         if doc.doctype == "Communication":
-            # For communications, ensure reference fields are set
+            # For communications, ensure reference fields are set for ticket doctype
             document["reference_doctype"] = doc.reference_doctype
-            document["reference_ticket"] = int(doc.reference_name)
+            if doc.reference_doctype == "HD Ticket":
+                document["reference_ticket"] = int(doc.reference_name)
 
         if doc.doctype == "HD Ticket":
             document["reference_ticket"] = int(doc.name)
@@ -179,6 +180,6 @@ class HelpdeskSearch(SQLiteSearch):
 
 
 def build_index():
-    """Build search index - called by background job."""
+    """Build search index - can be called from console."""
     search = HelpdeskSearch()
     search.build_index()

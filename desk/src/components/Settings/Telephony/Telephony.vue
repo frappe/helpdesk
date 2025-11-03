@@ -58,7 +58,7 @@
           </div>
           <div
             class="flex flex-col gap-1.5"
-            v-if="telephonyAgent.doc && twilio.doc.enabled"
+            v-if="telephonyAgent.doc && twilio.doc?.enabled"
           >
             <FormControl
               label="Twilio number"
@@ -70,7 +70,7 @@
           </div>
           <div
             class="flex flex-col gap-1.5"
-            v-if="telephonyAgent.doc && exotel.doc.enabled"
+            v-if="telephonyAgent.doc && exotel.doc?.enabled"
           >
             <FormControl
               label="Exotel number"
@@ -82,7 +82,7 @@
           </div>
           <div
             class="flex flex-col gap-1.5"
-            v-if="telephonyAgent.doc && exotel.doc.enabled"
+            v-if="telephonyAgent.doc && exotel.doc?.enabled"
           >
             <FormControl
               :label="__('Personal mobile no')"

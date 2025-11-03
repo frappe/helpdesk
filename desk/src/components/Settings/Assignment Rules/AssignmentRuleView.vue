@@ -150,7 +150,7 @@
                   >{{ __("Learn about conditions") }}</a
                 >
               </span>
-              <div v-if="isOldSla && assignmentRulesActiveScreen.data">
+              <div v-if="isAssignConditionOld && assignmentRulesActiveScreen.data">
                 <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
                   <template #target>
                     <div
@@ -174,7 +174,9 @@
           <div class="mt-5">
             <div
               class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
-              v-if="!useNewUI && assignmentRuleData.assignCondition"
+              v-if="
+            !useNewUIForAssignCondition && assignmentRuleData.assignCondition
+          "
             >
               <span class="text-p-sm">
                 Conditions for this rule were created from
@@ -187,7 +189,7 @@
                 label="I understand, add conditions"
                 variant="subtle"
                 theme="gray"
-                @click="useNewUI = true"
+                @click="useNewUIForAssignCondition = true"
               />
             </div>
             <AssignmentRulesSection
@@ -224,7 +226,7 @@
               </span>
               <div
                 v-if="
-                  isOldSla &&
+                  isUnassignConditionOld &&
                   assignmentRulesActiveScreen.data &&
                   assignmentRuleData.unassignCondition
                 "
@@ -252,7 +254,10 @@
           <div class="mt-5">
             <div
               class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
-              v-if="!useNewUI && assignmentRuleData.unassignCondition"
+              v-if="
+            !useNewUIForUnassignCondition &&
+            assignmentRuleData.unassignCondition
+          "
             >
               <span class="text-p-sm">
                 Conditions for this rule were created from
@@ -265,7 +270,7 @@
                 label="I understand, add conditions"
                 variant="subtle"
                 theme="gray"
-                @click="useNewUI = true"
+                @click="useNewUIForUnassignCondition = true"
               />
             </div>
             <AssignmentRulesSection
@@ -368,8 +373,10 @@ const showConfirmDialog = ref<{
 });
 
 provide("showConfirmDialog", showConfirmDialog);
-const useNewUI = ref(true);
-const isOldSla = ref(false);
+const useNewUIForAssignCondition = ref(true);
+const useNewUIForUnassignCondition = ref(true);
+const isAssignConditionOld = ref(false);
+const isUnassignConditionOld = ref(false);
 const deskUrl = `${window.location.origin}/app/assignment-rule/${assignmentRulesActiveScreen.value.data?.name}`;
 
 const getAssignmentRuleData = createResource({
@@ -380,12 +387,30 @@ const getAssignmentRuleData = createResource({
   },
   auto: Boolean(assignmentRulesActiveScreen.value.data),
   onSuccess(data) {
+    let assignConditionJson;
+    let unassignConditionJson;
+    try {
+      assignConditionJson = JSON.parse(data.assign_condition_json || "[]");
+    } catch (error) {
+      toast.error(
+        "Assignment conditions are invalid or corrupt, recreate the conditions."
+      );
+      assignConditionJson = [];
+    }
+    try {
+      unassignConditionJson = JSON.parse(data.unassign_condition_json || "[]");
+    } catch (error) {
+      toast.error(
+        "Unassignment conditions are invalid or corrupt, recreate the conditions."
+      );
+      unassignConditionJson = [];
+    }
     assignmentRuleData.value = {
       loading: false,
       assignCondition: data.assign_condition,
       unassignCondition: data.unassign_condition,
-      assignConditionJson: JSON.parse(data.assign_condition_json || "[]"),
-      unassignConditionJson: JSON.parse(data.unassign_condition_json || "[]"),
+      assignConditionJson: assignConditionJson,
+      unassignConditionJson: unassignConditionJson,
       rule: data.rule,
       priority: data.priority,
       users: data.users,
@@ -398,17 +423,30 @@ const getAssignmentRuleData = createResource({
 
     initialData.value = JSON.stringify(assignmentRuleData.value);
 
-    const conditionsAvailable =
+    const assignConditionsAvailable =
       assignmentRuleData.value.assignCondition?.length > 0;
-    const conditionsJsonAvailable =
+    const assignConditionsJsonAvailable =
       assignmentRuleData.value.assignConditionJson?.length > 0;
 
-    if (conditionsAvailable && !conditionsJsonAvailable) {
-      useNewUI.value = false;
-      isOldSla.value = true;
+    if (assignConditionsAvailable && !assignConditionsJsonAvailable) {
+      useNewUIForAssignCondition.value = false;
+      isAssignConditionOld.value = true;
     } else {
-      useNewUI.value = true;
-      isOldSla.value = false;
+      useNewUIForAssignCondition.value = true;
+      isAssignConditionOld.value = false;
+    }
+
+    const unassignConditionsAvailable =
+      assignmentRuleData.value.unassignCondition?.length > 0;
+    const unassignConditionsJsonAvailable =
+      assignmentRuleData.value.unassignConditionJson?.length > 0;
+
+    if (unassignConditionsAvailable && !unassignConditionsJsonAvailable) {
+      useNewUIForUnassignCondition.value = false;
+      isUnassignConditionOld.value = true;
+    } else {
+      useNewUIForUnassignCondition.value = true;
+      isUnassignConditionOld.value = false;
     }
   },
 });
@@ -442,7 +480,11 @@ const goBack = () => {
 };
 
 const saveAssignmentRule = () => {
-  const validationErrors = validateAssignmentRule(undefined, !useNewUI.value);
+  const validationErrors = validateAssignmentRule(
+    undefined,
+    !useNewUIForAssignCondition.value,
+    !useNewUIForUnassignCondition.value
+  );
 
   if (Object.values(validationErrors).some((error) => error)) {
     toast.error(
@@ -452,23 +494,38 @@ const saveAssignmentRule = () => {
   }
 
   if (assignmentRulesActiveScreen.value.data) {
-    if (isOldSla.value && useNewUI.value) {
-      showConfirmDialog.value = {
-        show: true,
-        title: __("Confirm overwrite"),
-        message: __(
-          "Your old condition will be overwritten. Are you sure you want to save?"
-        ),
-        onConfirm: () => {
-          updateAssignmentRule();
-          showConfirmDialog.value.show = false;
-        },
-      };
+    if (isAssignConditionOld.value && useNewUIForAssignCondition.value) {
+      showOverwriteConfirm();
+      return;
+    }
+    if (isUnassignConditionOld.value && useNewUIForUnassignCondition.value) {
+      showOverwriteConfirm();
       return;
     }
     updateAssignmentRule();
   } else {
-    createAssignmentRuleResource.submit({
+    createAssignmentRule();
+  }
+};
+
+const showOverwriteConfirm = () => {
+  showConfirmDialog.value = {
+    show: true,
+    title: "Confirm overwrite",
+    message:
+      "Your old condition will be overwritten. Are you sure you want to save?",
+    onConfirm: () => {
+      updateAssignmentRule();
+      showConfirmDialog.value.show = false;
+    },
+  };
+};
+
+const createAssignmentRule = () => {
+  isLoading.value = true;
+  createResource({
+    url: "frappe.client.insert",
+    params: {
       doc: {
         doctype: "Assignment Rule",
         document_type: "HD Ticket",
@@ -495,8 +552,8 @@ const saveAssignmentRule = () => {
           assignmentRuleData.value.unassignConditionJson
         ),
       },
+    }
     });
-  }
 };
 
 const createAssignmentRuleResource = createResource({
@@ -541,20 +598,20 @@ const updateAssignmentRule = async () => {
       assignment_days: assignmentRuleData.value.assignmentDays.map((day) => ({
         day: day,
       })),
-      assign_condition: useNewUI.value
+      assign_condition: useNewUIForAssignCondition.value
         ? convertToConditions({
             conditions: assignmentRuleData.value.assignConditionJson,
           })
         : assignmentRuleData.value.assignCondition,
-      unassign_condition: useNewUI.value
+      unassign_condition: useNewUIForUnassignCondition.value
         ? convertToConditions({
             conditions: assignmentRuleData.value.unassignConditionJson,
           })
         : assignmentRuleData.value.unassignCondition,
-      assign_condition_json: useNewUI.value
+      assign_condition_json: useNewUIForAssignCondition.value
         ? JSON.stringify(assignmentRuleData.value.assignConditionJson)
         : null,
-      unassign_condition_json: useNewUI.value
+      unassign_condition_json: useNewUIForUnassignCondition.value
         ? JSON.stringify(assignmentRuleData.value.unassignConditionJson)
         : null,
     },
