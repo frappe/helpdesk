@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-10-26 10:35+0000\n"
-"PO-Revision-Date: 2025-10-29 08:39\n"
+"PO-Revision-Date: 2025-11-03 11:31\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Chinese Simplified\n"
 "MIME-Version: 1.0\n"
@@ -20,57 +20,57 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:231
 msgid "% SLA Fulfilled"
-msgstr ""
+msgstr "SLA达成率"
 
 #: helpdesk/api/dashboard.py:236
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
-msgstr ""
+msgstr "在SLA时限内解决的工单创建百分比"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
-msgstr ""
+msgstr "- 默认工单状态<br>"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:116
 msgid "- Ticket Reopen Status<br>"
-msgstr ""
+msgstr "- 工单重开状态<br>"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:92
 msgid "- {0} as Default Status<br>"
-msgstr ""
+msgstr "- {0}作为默认状态<br>"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:94
 msgid "- {0} as Reopen Status<br>"
-msgstr ""
+msgstr "- {0}作为重开状态<br>"
 
 #. Description of the 'Feedback' (Select) field in DocType 'HD Article
 #. Feedback'
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "0 is no feedback, 1 is Like, 2 is Dislike"
-msgstr ""
+msgstr "0表示无反馈，1表示满意，2表示不满意"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:117
 msgid "<br>Please update HD Settings to use a different status before disabling this status."
-msgstr ""
+msgstr "<br>请在禁用此状态前，更新HD设置以使用其他状态。"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:95
 msgid "<br>Please update the SLA(s) to use a different status before disabling this status."
-msgstr ""
+msgstr "<br>请在禁用此状态前，更新SLA以使用其他状态。"
 
 #. Introduction text of the email-feedback Web Form
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "<div class=\"ql-editor read-mode\"><p>Let us know if we solved your issue well. It’ll help us serve you better next time.</p></div>"
-msgstr ""
+msgstr "<div class=\"ql-editor read-mode\"><p>请告知我们是否妥善解决了您的问题。这将帮助我们下次为您提供更好的服务。</p></div>"
 
 #. Header text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Visit Helpdesk</a></span>"
-msgstr ""
+msgstr "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">访问服务台</a></span>"
 
 #. Paragraph text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "<span class=\"h4\">Helpdesk Configuration<br></span>"
-msgstr ""
+msgstr "<span class=\"h4\">服务台配置<br></span>"
 
 #. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
 #. Source'
@@ -82,14 +82,14 @@ msgstr "API"
 
 #: helpdesk/api/knowledge_base.py:15
 msgid "Access denied"
-msgstr ""
+msgstr "访问被拒绝"
 
 #. Label of the acknowledgement_section (Section Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:72
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Acknowledgement"
-msgstr ""
+msgstr "确认响应"
 
 #. Label of the action (Data) field in DocType 'HD Ticket Activity'
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
@@ -98,22 +98,22 @@ msgstr "操作"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:22
 msgid "Action Required"
-msgstr ""
+msgstr "需要处理"
 
 #. Description of the 'On click (Javascript)' (Code) field in DocType 'HD
 #. Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Action to perform when clicking the button. The doc will be available as `this`"
-msgstr ""
+msgstr "点击按钮时执行的操作。文档将作为`this`可用"
 
 #: desk/src/components/Settings/Agents.vue:139
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:97
 msgid "Add Agents"
-msgstr ""
+msgstr "添加客服人员"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
-msgstr ""
+msgstr "添加负责人"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -123,16 +123,16 @@ msgstr "添加每周休息日"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
-msgstr ""
+msgstr "添加条件"
 
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
 msgid "Add a custom condition"
-msgstr ""
+msgstr "添加自定义条件"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
 msgid "Add condition"
-msgstr ""
+msgstr "添加条件"
 
 #. Label of the get_weekly_off_dates (Button) field in DocType 'HD Service
 #. Holiday List'
@@ -142,7 +142,7 @@ msgstr "添加至假期"
 
 #: desk/src/components/Settings/Agents.vue:6
 msgid "Add, manage agents and assign roles to them."
-msgstr ""
+msgstr "添加、管理客服人员并为其分配角色。"
 
 #. Label of the about (Code) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -186,7 +186,7 @@ msgstr "代理商"
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Agent Configuration"
-msgstr ""
+msgstr "客服人员配置"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -195,16 +195,16 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Agent Manager"
-msgstr ""
+msgstr "客服经理"
 
 #. Label of the agent_name (Data) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Agent Name"
-msgstr ""
+msgstr "客服姓名"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:39
 msgid "Agent settings"
-msgstr ""
+msgstr "客服设置"
 
 #: desk/src/components/Settings/Agents.vue:5
 msgid "Agents"
@@ -231,12 +231,12 @@ msgstr "全部"
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Allow anyone to create tickets"
-msgstr ""
+msgstr "允许任何人创建工单"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Amber"
-msgstr ""
+msgstr "琥珀色"
 
 #. Label of the apply_sla_for_resolution (Check) field in DocType 'HD Service
 #. Level Agreement'
@@ -252,13 +252,13 @@ msgstr "应用于"
 #. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply on new page"
-msgstr ""
+msgstr "在新页面应用"
 
 #. Label of the apply_to_customer_portal (Check) field in DocType 'HD Form
 #. Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply to customer portal"
-msgstr ""
+msgstr "应用于客户门户"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -267,20 +267,20 @@ msgstr "已归档"
 
 #: desk/src/components/Settings/SettingsModal.vue:52
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
-msgstr ""
+msgstr "是否确认切换标签页？未保存的更改将会丢失。"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:114
 msgid "Are you sure you want to go back? Unsaved changes will be lost."
-msgstr ""
+msgstr "是否确认返回？未保存的修改将会丢失。"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:127
 msgid "Are you sure you want to reset the content? Current content will be overridden."
-msgstr ""
+msgstr "是否确认重置内容？当前内容将被覆盖。"
 
 #. Label of the article (Link) field in DocType 'HD Article Feedback'
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "Article"
-msgstr ""
+msgstr "知识库文章"
 
 #. Label of the assign_to_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
@@ -300,11 +300,11 @@ msgstr "创建待办"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
 msgid "Assignee Rules"
-msgstr ""
+msgstr "负责人分配规则"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:75
 msgid "Assignees"
-msgstr ""
+msgstr "负责人列表"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -332,35 +332,35 @@ msgstr "分配规则集"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:10
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
-msgstr ""
+msgstr "分配规则根据预设条件自动将工单路由至正确的团队成员。"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:278
 msgid "Assignment Schedule"
-msgstr ""
+msgstr "分配计划"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:134
 msgid "Assignment condition"
-msgstr ""
+msgstr "分配条件"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:19
 msgid "Assignment rule"
-msgstr ""
+msgstr "分配规则"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:6
 msgid "Assignment rules"
-msgstr ""
+msgstr "分配规则"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:73
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
-msgstr ""
+msgstr "<u>{0}</u>类别中必须至少启用一个状态。"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:38
 msgid "At least one feedback option must be enabled for rating {0}"
-msgstr ""
+msgstr "必须为{0}评级启用至少一个反馈选项"
 
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:28
 msgid "At-least one of priority, team and ticket type is required"
-msgstr ""
+msgstr "必须至少填写优先级、团队或工单类型中的一项"
 
 #. Label of the attachment (Attach) field in DocType 'HD Ticket'
 #. Label of a field in the tickets Web Form
@@ -377,23 +377,23 @@ msgstr "作者"
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Auto update status"
-msgstr ""
+msgstr "自动更新状态"
 
 #. Label of the auto_close_after_days (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Auto-close after (Days)"
-msgstr ""
+msgstr "自动关闭时限（天数）"
 
 #. Description of the 'Condition' (Code) field in DocType 'HD Service Level
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Auto-generated from the portal view — do not edit directly unless you know what you're doing! "
-msgstr ""
+msgstr "从门户视图自动生成——除非您明确操作目的，否则请勿直接编辑！"
 
 #. Label of the auto_close_tickets (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Automatically Close Tickets when"
-msgstr ""
+msgstr "自动关闭工单条件"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -407,40 +407,40 @@ msgstr "平均响应时间"
 
 #: helpdesk/api/dashboard.py:682
 msgid "Average feedback rating per day is around {0} stars"
-msgstr ""
+msgstr "每日平均反馈评分约为{0}星"
 
 #: helpdesk/api/dashboard.py:606
 msgid "Average tickets per day is around {0}"
-msgstr ""
+msgstr "每日平均工单数约为{0}"
 
 #: helpdesk/api/dashboard.py:387
 msgid "Avg. Feedback Rating"
-msgstr ""
+msgstr "平均反馈评分"
 
 #: helpdesk/api/dashboard.py:283
 msgid "Avg. First Response"
-msgstr ""
+msgstr "平均首次响应"
 
 #: helpdesk/api/dashboard.py:337
 msgid "Avg. Resolution"
-msgstr ""
+msgstr "平均解决"
 
 #: helpdesk/api/dashboard.py:392
 msgid "Avg. feedback rating for the tickets resolved"
-msgstr ""
+msgstr "已解决工单的平均反馈评分"
 
 #: helpdesk/api/dashboard.py:289
 msgid "Avg. time taken to first respond to a ticket"
-msgstr ""
+msgstr "首次响应工单的平均耗时"
 
 #: helpdesk/api/dashboard.py:343
 msgid "Avg. time taken to resolve a ticket"
-msgstr ""
+msgstr "解决工单的平均耗时"
 
 #. Label of the base_support_rotation (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Base Support Rotation"
-msgstr ""
+msgstr "基础支持轮换"
 
 #. Label of the base_url (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
@@ -486,23 +486,23 @@ msgstr "通话详情"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:607
 msgid "Can not send email. No sender email set up!"
-msgstr ""
+msgstr "无法发送邮件。未设置发件人邮件地址！"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:500
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
-msgstr ""
+msgstr "无法删除默认SLA。必须至少有一个SLA标记为默认。"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:110
 msgid "Cannot disable this status as it is linked in HD Settings:<br><br>"
-msgstr ""
+msgstr "无法禁用此状态，因其在HD设置中被引用：<br><br>"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:88
 msgid "Cannot disable this status as it is linked in the following SLAs:<br><br>"
-msgstr ""
+msgstr "无法禁用此状态，因其在以下SLA中被引用：<br><br>"
 
 #: helpdesk/api/knowledge_base.py:122
 msgid "Cannot merge General category"
-msgstr ""
+msgstr "无法合并通用类别"
 
 #. Label of the category (Link) field in DocType 'HD Article'
 #. Label of the category (Select) field in DocType 'HD Ticket Status'
@@ -514,32 +514,32 @@ msgstr "类别"
 #: helpdesk/api/knowledge_base.py:72
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.py:59
 msgid "Category must have atleast one article"
-msgstr ""
+msgstr "类别必须至少包含一篇文章"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Channels"
-msgstr ""
+msgstr "渠道"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:22
 msgid "Choose how tickets are distributed among selected assignees."
-msgstr ""
+msgstr "选择工单在选定负责人间的分配方式。"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:282
 msgid "Choose the days of the week when this rule should be active."
-msgstr ""
+msgstr "选择本周内规则生效的具体日期。"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:139
 msgid "Choose which tickets are affected by this assignment rule."
-msgstr ""
+msgstr "选择受本分配规则影响的工单范围。"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:209
 msgid "Choose which tickets are affected by this un-assignment rule."
-msgstr ""
+msgstr "选择受本取消分配规则影响的工单范围。"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:78
 msgid "Choose who receives the tickets."
-msgstr ""
+msgstr "选择工单接收人。"
 
 #. Label of the clear_table (Button) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -561,7 +561,7 @@ msgstr "已关闭"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
 msgid "Closed or rated tickets cannot be updated by non-agents"
-msgstr ""
+msgstr "非客服人员无法更新已关闭或已评分工单"
 
 #. Label of the color (Color) field in DocType 'HD Service Holiday List'
 #. Label of the color (Select) field in DocType 'HD Ticket Status'
@@ -583,7 +583,7 @@ msgstr "评论"
 #. Label of the commented_by (Link) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "Commented By"
-msgstr ""
+msgstr "评论人"
 
 #. Label of the condition (Code) field in DocType 'HD Service Level Agreement'
 #. Label of the condition_json (Code) field in DocType 'HD Service Level
@@ -594,7 +594,7 @@ msgstr "条件"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:42
 msgid "Configure your agent’s telephony details."
-msgstr ""
+msgstr "配置客服人员的电话详细信息。"
 
 #. Label of the contact (Link) field in DocType 'HD Organization Contact Item'
 #. Label of the contact (Link) field in DocType 'HD Ticket'
@@ -614,7 +614,7 @@ msgstr "联系HTML"
 
 #: helpdesk/templates/components/contact_with_us.html:11
 msgid "Contact with us"
-msgstr ""
+msgstr "联系我们"
 
 #. Label of the contacts (Table) field in DocType 'HD Organization'
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
@@ -636,25 +636,25 @@ msgstr "内容类型"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:625
 msgid "Could not an email due to: {0}"
-msgstr ""
+msgstr "无法发送邮件，原因：{0}"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:785
 msgid "Could not send an acknowledgement email due to: {0}"
-msgstr ""
+msgstr "无法发送确认邮件，原因：{0}"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:162
 msgid "Could not send feedback email,due to: {0}"
-msgstr ""
+msgstr "无法发送反馈邮件，原因：{0}"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:17
 msgid "Create new"
-msgstr ""
+msgstr "新建"
 
 #. Label of the criterion_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Criterion"
-msgstr ""
+msgstr "条件标准"
 
 #. Label of the customer (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -668,7 +668,7 @@ msgstr "客户名称"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:7
 msgid "Customize your email notification preferences to stay informed about important updates and activities."
-msgstr ""
+msgstr "自定义邮件通知偏好设置，及时了解重要更新和活动。"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -683,7 +683,7 @@ msgstr "日期"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:29
 msgid "Day count for auto closing tickets cannot be negative or zero"
-msgstr ""
+msgstr "自动关闭工单的天数不能为负数或零"
 
 #. Label of the default_priority (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -698,7 +698,7 @@ msgstr "默认优先级"
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Default SLA"
-msgstr ""
+msgstr "默认SLA"
 
 #. Label of the default_ticket_status (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -709,25 +709,25 @@ msgstr "默认工单状态"
 #. Label of the default_priority (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Default priority"
-msgstr ""
+msgstr "默认优先级"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:59
 msgid "Default template can not be deleted"
-msgstr ""
+msgstr "无法删除默认模板"
 
 #. Label of the default_ticket_status (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Default ticket status"
-msgstr ""
+msgstr "默认工单状态"
 
 #. Label of the default_ticket_type (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Default ticket type"
-msgstr ""
+msgstr "默认工单类型"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:9
 msgid "Define who receives the tickets and how they’re distributed among agents."
-msgstr ""
+msgstr "定义工单接收人及其在客服人员间的分配方式。"
 
 #. Label of the description (Text) field in DocType 'HD Article Category'
 #. Label of the description (Text Editor) field in DocType 'HD Holiday'
@@ -753,12 +753,12 @@ msgstr "描述"
 #. Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Description Template"
-msgstr ""
+msgstr "描述模板"
 
 #. Label of the description_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Description Weight"
-msgstr ""
+msgstr "描述权重"
 
 #. Label of the details_section (Section Break) field in DocType 'HD
 #. Notification'
@@ -776,13 +776,13 @@ msgstr "禁用"
 #. Description of the 'Ignore Restrictions' (Check) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Do not apply filters and restrictions to agents of this team"
-msgstr ""
+msgstr "不向本团队成员应用筛选器和限制"
 
 #. Label of the do_not_restrict_tickets_without_an_agent_group (Check) field in
 #. DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Do not restrict tickets without a Team"
-msgstr ""
+msgstr "不限制无团队的工单"
 
 #. Label of the dt (Link) field in DocType 'HD Form Script'
 #. Label of the dt (Link) field in DocType 'HD View'
@@ -807,7 +807,7 @@ msgstr "复制"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:45
 msgid "Duplicate Assignment Rule"
-msgstr ""
+msgstr "复制分配规则"
 
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
@@ -831,19 +831,19 @@ msgstr "电子邮箱帐号"
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:74
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Email Content"
-msgstr ""
+msgstr "邮件内容"
 
 #. Label of the email_customisations_tab (Tab Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:5
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Email Notifications"
-msgstr ""
+msgstr "邮件通知"
 
 #. Label of the is_feedback_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Enable feedback for Customer Portal"
-msgstr ""
+msgstr "为客户门户启用反馈功能"
 
 #. Label of the is_enabled (Check) field in DocType 'HD Action'
 #. Label of the is_enabled (Check) field in DocType 'HD Escalation Rule'
@@ -884,11 +884,11 @@ msgstr "结束时间"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:22
 msgid "Enter a name for this HD Service Holiday List."
-msgstr ""
+msgstr "请输入此HD服务假日列表的名称。"
 
 #: helpdesk/api/knowledge_base.py:80
 msgid "Error moving article to category"
-msgstr ""
+msgstr "移动文章至类别时出错"
 
 #: helpdesk/overrides/email_account.py:69
 msgid "Error while connecting to email account {0}"
@@ -896,12 +896,12 @@ msgstr "连接到电子邮箱帐号{0}时出错"
 
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:43
 msgid "Escalation rule already exists for this criteria"
-msgstr ""
+msgstr "此条件已存在升级规则"
 
 #. Label of the is_external_link (Check) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "External link"
-msgstr ""
+msgstr "外部链接"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -928,44 +928,44 @@ msgstr "反馈 "
 #. Label of the feedback_extra (Long Text) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback (Extra)"
-msgstr ""
+msgstr "反馈（附加）"
 
 #. Label of the feedback (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback (Option)"
-msgstr ""
+msgstr "反馈（选项）"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:30
 msgid "Feedback Already Exists"
-msgstr ""
+msgstr "反馈已存在"
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Email Feedback'
 #. Label of a field in the email-feedback Web Form
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Feedback Rating"
-msgstr ""
+msgstr "反馈评分"
 
 #: helpdesk/api/dashboard.py:688
 msgid "Feedback Trend"
-msgstr ""
+msgstr "反馈趋势"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:160
 msgid "Feedback email has been sent to the customer"
-msgstr ""
+msgstr "反馈邮件已发送至客户"
 
 #. Label of the fieldname (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Field (fieldname)"
-msgstr ""
+msgstr "字段（字段名）"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:27
 msgid "Field `{0}` does not exist in Ticket"
-msgstr ""
+msgstr "字段`{0}`在工单中不存在"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:43
 msgid "Field `{0}` is not allowed in Ticket Template"
-msgstr ""
+msgstr "字段`{0}`不允许在工单模板中使用"
 
 #. Label of the fields (Table) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -980,7 +980,7 @@ msgstr "过滤条件"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:83
 msgid "Find out all of the variables that can be used in the content"
-msgstr ""
+msgstr "查看可在内容中使用的所有变量"
 
 #. Label of the first_responded_on (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1003,7 +1003,7 @@ msgstr "首次响应时间"
 #. Name of a report
 #: helpdesk/helpdesk/report/first_response_time_for_tickets/first_response_time_for_tickets.json
 msgid "First Response Time for Tickets"
-msgstr ""
+msgstr "工单首次响应时间"
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -1044,11 +1044,11 @@ msgstr "常规设置"
 
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:24
 msgid "General category can't be deleted"
-msgstr ""
+msgstr "无法删除通用类别"
 
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:20
 msgid "General category name can't be changed"
-msgstr ""
+msgstr "无法更改通用类别名称"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1080,138 +1080,138 @@ msgstr "访客"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "HD Action"
-msgstr ""
+msgstr "HD操作"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "HD Agent"
-msgstr ""
+msgstr "HD客服"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "HD Article"
-msgstr ""
+msgstr "HD知识库文章"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 msgid "HD Article Category"
-msgstr ""
+msgstr "HD文章类别"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "HD Article Feedback"
-msgstr ""
+msgstr "HD文章反馈"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
 msgid "HD Canned Response"
-msgstr ""
+msgstr "HD预设回复"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "HD Customer"
-msgstr ""
+msgstr "HD客户"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "HD Desk Account Request"
-msgstr ""
+msgstr "HD服务台账户申请"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 msgid "HD Email Feedback"
-msgstr ""
+msgstr "HD邮件反馈"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "HD Escalation Rule"
-msgstr ""
+msgstr "HD升级规则"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "HD Form Script"
-msgstr ""
+msgstr "HD表单脚本"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 msgid "HD Holiday"
-msgstr ""
+msgstr "HD假日"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "HD Notification"
-msgstr ""
+msgstr "HD通知"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 msgid "HD Organization"
-msgstr ""
+msgstr "HD组织"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_organization_contact_item/hd_organization_contact_item.json
 msgid "HD Organization Contact Item"
-msgstr ""
+msgstr "HD组织联系人项"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
 msgid "HD Portal Signup Request"
-msgstr ""
+msgstr "HD门户注册申请"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "HD Service Day"
-msgstr ""
+msgstr "HD服务日"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list_calendar.js:20
 msgid "HD Service Holiday List"
-msgstr ""
+msgstr "HD服务假日列表"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "HD Service Level Agreement"
-msgstr ""
+msgstr "HD服务等级协议"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 msgid "HD Service Level Priority"
-msgstr ""
+msgstr "HD服务等级优先级"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "HD Settings"
-msgstr ""
+msgstr "HD设置"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
 msgid "HD Stopword"
-msgstr ""
+msgstr "HD停用词"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "HD Support Search Source"
-msgstr ""
+msgstr "HD支持搜索源"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json
 msgid "HD Synonym"
-msgstr ""
+msgstr "HD同义词"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
 msgid "HD Synonyms"
-msgstr ""
+msgstr "HD同义词"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "HD Team"
-msgstr ""
+msgstr "HD团队"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_team_member/hd_team_member.json
 msgid "HD Team Member"
-msgstr ""
+msgstr "HD团队成员"
 
 #. Name of a DocType
 #. Label of the ticket (Link) field in DocType 'HD Ticket Activity'
@@ -1219,77 +1219,77 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "HD Ticket"
-msgstr ""
+msgstr "HD工单"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "HD Ticket Activity"
-msgstr ""
+msgstr "HD工单活动"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "HD Ticket Comment"
-msgstr ""
+msgstr "HD工单评论"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "HD Ticket Feedback Option"
-msgstr ""
+msgstr "HD工单反馈选项"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 msgid "HD Ticket Priority"
-msgstr ""
+msgstr "HD工单优先级"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "HD Ticket Status"
-msgstr ""
+msgstr "HD工单状态"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "HD Ticket Template"
-msgstr ""
+msgstr "HD工单模板"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "HD Ticket Template Field"
-msgstr ""
+msgstr "HD工单模板字段"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "HD Ticket Type"
-msgstr ""
+msgstr "HD工单类型"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "HD View"
-msgstr ""
+msgstr "HD视图"
 
 #. Label of the headings_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Headings Weight"
-msgstr ""
+msgstr "标题权重"
 
 #: helpdesk/config/desktop.py:11
 msgid "HelpDesk"
-msgstr ""
+msgstr "服务台"
 
 #. Name of a Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk"
-msgstr ""
+msgstr "服务台"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Helpdesk Contact"
-msgstr ""
+msgstr "服务台联系人"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk Reports"
-msgstr ""
+msgstr "服务台报告"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:53
 msgid "Here, your weekly offs are pre-populated based on the previous selections. You can add more rows to also add public and national holidays individually."
@@ -1298,13 +1298,13 @@ msgstr "此处每周休息日已根据先前选择预填充，您可新增行单
 #. Label of the cond_hidden (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Hide condition"
-msgstr ""
+msgstr "隐藏条件"
 
 #. Label of the hide_from_customer (Check) field in DocType 'HD Ticket Template
 #. Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Hide from customer"
-msgstr ""
+msgstr "对客户隐藏"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -1347,39 +1347,39 @@ msgstr "图标"
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, a ticket creation acknowledgement email will be sent to the user right after creating an email ticket"
-msgstr ""
+msgstr "若启用，创建邮件工单后将立即向用户发送工单创建确认邮件"
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, an email is sent to all of the recipients associated with an agent's reply"
-msgstr ""
+msgstr "若启用，客服回复时将向所有相关收件人发送邮件"
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, an email will be sent to all of the assigned agents after a reply from one of the contacts"
-msgstr ""
+msgstr "若启用，任一联系人回复后将向所有指派客服发送邮件"
 
 #. Description of the 'Allow anyone to create tickets' (Check) field in DocType
 #. 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, anyone will be able to create tickets (without any permission). "
-msgstr ""
+msgstr "若启用，任何人都能创建工单（无需任何权限）。"
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, feedback email will be sent to the customer when you mark a ticket as the status selected below.\n"
-msgstr ""
+msgstr "若启用，当您将工单标记为下方所选状态时，将向客户发送反馈邮件。\n"
 
 #. Description of the 'Enable feedback for Customer Portal' (Check) field in
 #. DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \n"
-msgstr ""
+msgstr "若启用，当用户尝试关闭工单时将显示反馈对话框。\n"
 
 #. Label of the ignore_restrictions (Check) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Ignore Restrictions"
-msgstr ""
+msgstr "忽略限制"
 
 #. Label of the user_image (Data) field in DocType 'HD Agent'
 #. Label of the image (Attach Image) field in DocType 'HD Customer'
@@ -1391,7 +1391,7 @@ msgstr "图片"
 #. Description of the 'Logo' (Attach Image) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Image to be used in various places, including Login and Signup pages. An image with transparent background and 160 x 32 is preferred"
-msgstr ""
+msgstr "用于登录和注册页面等多个场景的图片。推荐使用透明背景且尺寸为160 x 32的图片"
 
 #. Label of the images_column (Column Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1405,7 +1405,7 @@ msgstr "呼入通话"
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Instantly send e-mail"
-msgstr ""
+msgstr "立即发送邮件"
 
 #: helpdesk/utils.py:32
 msgid "Insufficient Permission for {0}"
@@ -1414,15 +1414,15 @@ msgstr "{0} 权限不足"
 #. Label of the integer_value (Int) field in DocType 'HD Ticket Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 msgid "Integer value"
-msgstr ""
+msgstr "整数值"
 
 #: helpdesk/api/settings/email_notifications.py:112
 msgid "Invalid notification"
-msgstr ""
+msgstr "无效通知"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:82
 msgid "Invite agent"
-msgstr ""
+msgstr "邀请客服"
 
 #. Label of the is_active (Check) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
@@ -1432,7 +1432,7 @@ msgstr "生效"
 #. Label of the is_customer_portal (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Is Customer Portal"
-msgstr ""
+msgstr "是否为客户门户"
 
 #. Label of the is_default (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1448,17 +1448,17 @@ msgstr "是否标准"
 #. 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Is name setup skipped"
-msgstr ""
+msgstr "是否跳过名称设置"
 
 #. Label of the is_pinned (Check) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "Is pinned"
-msgstr ""
+msgstr "是否置顶"
 
 #. Label of the setup_complete (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Is setup complete"
-msgstr ""
+msgstr "设置是否完成"
 
 #: desk/src/components/ticket-agent/AssignToBody.vue:11
 msgid "John Doe"
@@ -1493,20 +1493,20 @@ msgstr "标签"
 #. Label of the label_customer (Data) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Label (customer view)"
-msgstr ""
+msgstr "标签（客户视图）"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
-msgstr ""
+msgstr "最近"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
 msgid "Last user assigned by this rule"
-msgstr ""
+msgstr "本规则最后分配的用户"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:145
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:217
 msgid "Learn about conditions"
-msgstr ""
+msgstr "了解条件设置"
 
 #. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
 #. Source'
@@ -1545,7 +1545,7 @@ msgstr "Logo"
 #. Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 msgid "Lower the Integer value, higher is the priority of the issue"
-msgstr ""
+msgstr "整数值越低，问题优先级越高"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -1555,7 +1555,7 @@ msgstr "@提及"
 #. Label of the merged_with (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Merged With"
-msgstr ""
+msgstr "合并至"
 
 #. Label of the message (Text Editor) field in DocType 'HD Canned Response'
 #. Label of the message (Text) field in DocType 'HD Notification'
@@ -1572,7 +1572,7 @@ msgstr "元数据"
 #. Label of the misc_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Misc"
-msgstr ""
+msgstr "杂项"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -1598,33 +1598,33 @@ msgstr "名称"
 #. Label of the name_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Name Weight"
-msgstr ""
+msgstr "名称权重"
 
 #. Description of the 'Label (customer view)' (Data) field in DocType 'HD
 #. Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Name shown on the customer portal<br> (e.g., Replied → Awaiting Response)."
-msgstr ""
+msgstr "客户门户显示的名称<br>（例如：已回复 → 等待响应）。"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:51
 msgid "New Assignment Rule Name"
-msgstr ""
+msgstr "新分配规则名称"
 
 #: helpdesk/api/dashboard.py:429
 msgid "No Team"
-msgstr ""
+msgstr "无团队"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:12
 msgid "No assignees"
-msgstr ""
+msgstr "无负责人"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:14
 msgid "No items in the list"
-msgstr ""
+msgstr "列表中无项目"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:74
 msgid "No results found"
-msgstr ""
+msgstr "未找到匹配结果"
 
 #: helpdesk/utils.py:165
 msgid "Not Allowed"
@@ -1644,7 +1644,7 @@ msgstr "通知设置"
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:232
 msgid "Old Condition"
-msgstr ""
+msgstr "原有条件"
 
 #. Label of the on_hold_since (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1653,20 +1653,20 @@ msgstr "挂起时间"
 
 #: desk/src/components/Settings/EmailNotifications/ShareFeedback.vue:20
 msgid "On Ticket Status"
-msgstr ""
+msgstr "基于工单状态"
 
 #. Label of the action (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "On click (Javascript)"
-msgstr ""
+msgstr "点击时（Javascript）"
 
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.py:29
 msgid "Only one default view is allowed per user for {0}"
-msgstr ""
+msgstr "每个用户对于{0}仅允许一个默认视图"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:29
 msgid "Only the 'color' and 'order' fields of the 'Closed' status can be modified."
-msgstr ""
+msgstr "仅可修改“已关闭”状态的“颜色”和“排序”字段。"
 
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
 #. Option in a Select field in the tickets Web Form
@@ -1680,7 +1680,9 @@ msgstr "待处理"
 msgid "Open: SLA continues. <br>\n"
 "Paused: SLA is paused. <br>\n"
 "Resolved: SLA timer stops."
-msgstr ""
+msgstr "开启：SLA继续计时。 <br>\n"
+"暂停：SLA暂停计时。 <br>\n"
+"已解决：SLA计时器停止。"
 
 #. Label of the opening_date (Date) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1714,7 +1716,7 @@ msgstr "呼出通话"
 
 #: helpdesk/api/settings/field_dependency.py:59
 msgid "Parent field, child field, and parent-child mapping are required."
-msgstr ""
+msgstr "必须填写父字段、子字段及父子映射关系。"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
@@ -1725,19 +1727,19 @@ msgstr "已暂停"
 
 #: helpdesk/api/dashboard.py:541
 msgid "Percentage of Total Tickets by Channel"
-msgstr ""
+msgstr "各渠道工单占总工单百分比"
 
 #: helpdesk/api/dashboard.py:501
 msgid "Percentage of Total Tickets by Priority"
-msgstr ""
+msgstr "各优先级工单占总工单百分比"
 
 #: helpdesk/api/dashboard.py:435
 msgid "Percentage of Total Tickets by Team"
-msgstr ""
+msgstr "各团队工单占总工单百分比"
 
 #: helpdesk/api/dashboard.py:468
 msgid "Percentage of Total Tickets by Type"
-msgstr ""
+msgstr "各类型工单占总工单百分比"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1756,11 +1758,11 @@ msgstr "占位符"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:19
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
-msgstr ""
+msgstr "请在<a href='/app/hd-service-level-agreement'>所需SLA文档</a>中添加此优先级"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:318
 msgid "Please add {0} priority in {1} SLA"
-msgstr ""
+msgstr "请在{1} SLA中添加{0}优先级"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:41
 msgid "Please select weekly off day"
@@ -1792,7 +1794,7 @@ msgstr "帖子标题密钥"
 #. Label of the prefer_knowledge_base (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Prefer knowledge base"
-msgstr ""
+msgstr "偏好知识库"
 
 #. Label of the priorities (Table) field in DocType 'HD Service Level
 #. Agreement'
@@ -1819,7 +1821,7 @@ msgstr "优先级"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:84
 msgid "Priority <u>{0}</u> must be included in the SLA {1}."
-msgstr ""
+msgstr "必须在SLA {1}中包含优先级<u>{0}</u>。"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:75
 msgid "Priority {0} has been repeated."
@@ -1867,11 +1869,11 @@ msgstr "范围"
 #. Title of the email-feedback Web Form
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Rate Your Support Experience"
-msgstr ""
+msgstr "评价您的支持体验"
 
 #: helpdesk/api/dashboard.py:691
 msgid "Rated Tickets"
-msgstr ""
+msgstr "已评分工单"
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
@@ -1883,16 +1885,16 @@ msgstr "评分"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
-msgstr ""
+msgstr "评分必须在0.2至1.0之间"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:19
 msgid "Rating {0} is not allowed"
-msgstr ""
+msgstr "不允许{0}评分"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Reaction"
-msgstr ""
+msgstr "反应"
 
 #. Label of the read (Check) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -1903,7 +1905,7 @@ msgstr "读"
 #. List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Recurring holidays"
-msgstr ""
+msgstr "重复假日"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1918,7 +1920,7 @@ msgstr "参考"
 #. Label of the reference_ticket (Link) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "Reference Ticket"
-msgstr ""
+msgstr "参考工单"
 
 #. Label of the references_tab (Tab Break) field in DocType 'HD Customer'
 #. Label of the references_section (Section Break) field in DocType 'HD
@@ -1930,7 +1932,7 @@ msgstr "参考"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:6
 msgid "Regenerate Search Index"
-msgstr ""
+msgstr "重新生成搜索索引"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -1942,14 +1944,14 @@ msgstr "已回复"
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:84
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Reply From Agent"
-msgstr ""
+msgstr "客服回复"
 
 #. Label of the reply_from_contact_section (Section Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:77
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Reply From Contact"
-msgstr ""
+msgstr "联系人回复"
 
 #. Label of the request_key (Data) field in DocType 'HD Desk Account Request'
 #. Label of the request_key (Data) field in DocType 'HD Portal Signup Request'
@@ -1961,19 +1963,19 @@ msgstr "请求密钥"
 #. Label of the required (Check) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Required"
-msgstr ""
+msgstr "必填"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:90
 msgid "Required for exotel integration"
-msgstr ""
+msgstr "Exotel集成必需"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:102
 msgid "Reset Content"
-msgstr ""
+msgstr "重置内容"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:125
 msgid "Reset content"
-msgstr ""
+msgstr "重置内容"
 
 #. Label of the resolution_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2048,13 +2050,13 @@ msgstr "响应与解决方案"
 #. Label of the assign_within_team (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Restrict agent assignment to selected Team"
-msgstr ""
+msgstr "将客服分配限制在选定团队内"
 
 #. Label of the restrict_tickets_by_agent_group (Check) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Restrict tickets by Team"
-msgstr ""
+msgstr "按团队限制工单"
 
 #. Label of the result_preview_field (Data) field in DocType 'HD Support Search
 #. Source'
@@ -2100,7 +2102,7 @@ msgstr "SLA创建"
 #. Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "SLA Mapping"
-msgstr ""
+msgstr "SLA映射"
 
 #. Label of the agreement_status (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2109,7 +2111,7 @@ msgstr "SLA状态"
 
 #: helpdesk/api/dashboard.py:584 helpdesk/api/dashboard.py:619
 msgid "SLA_fulfilled"
-msgstr ""
+msgstr "SLA已达成"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2139,11 +2141,11 @@ msgstr "搜索"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:10
 msgid "Search Index Regenerated"
-msgstr ""
+msgstr "搜索索引已重新生成"
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:40
 msgid "Search Score"
-msgstr ""
+msgstr "搜索评分"
 
 #. Label of the search_term_param_name (Data) field in DocType 'HD Support
 #. Search Source'
@@ -2153,11 +2155,11 @@ msgstr "搜索字词Param Name"
 
 #: helpdesk/api/search.py:38
 msgid "Search index not available. Please contact administrator."
-msgstr ""
+msgstr "搜索索引不可用。请联系管理员。"
 
 #: helpdesk/api/search.py:15
 msgid "Search query must be at least 2 characters"
-msgstr ""
+msgstr "搜索查询必须至少2个字符"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:157
 msgid "Select a Default Priority."
@@ -2171,23 +2173,23 @@ msgstr "选择每周休息日"
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Send feedback when"
-msgstr ""
+msgstr "发送反馈时机"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:78
 msgid "Sent to all of the assigned agents after a reply from one of the contacts"
-msgstr ""
+msgstr "任一联系人回复后发送给所有指派客服"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:85
 msgid "Sent to all of the recipients associated with an agent's reply"
-msgstr ""
+msgstr "发送给客服回复的所有相关收件人"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:73
 msgid "Sent to the user right after creating an email ticket"
-msgstr ""
+msgstr "创建邮件工单后立即发送给用户"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:66
 msgid "Sent to the user who has raised the ticket after the ticket is closed or resolved"
-msgstr ""
+msgstr "工单关闭或解决后发送给提交用户"
 
 #. Label of the service_level (Data) field in DocType 'HD Service Level
 #. Agreement'
@@ -2197,7 +2199,7 @@ msgstr "服务水平协议名"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:56
 msgid "Set Resolution Time for Priority {0} in row {1}."
-msgstr ""
+msgstr "请在第{1}行为优先级{0}设置解决时间。"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:48
 msgid "Set Response Time for Priority {0} in row {1}."
@@ -2205,7 +2207,7 @@ msgstr "为第{1}行的优先级{0}设置响应时间。"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:124
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
-msgstr ""
+msgstr "设置 <strong>{0}</strong> 设为默认SLA将移除 <strong>{1}</strong> 的默认SLA状态。您需要在 <strong>{1}</strong> 中添加条件才能使SLA生效。"
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
@@ -2222,12 +2224,12 @@ msgstr "设置"
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:65
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Share Feedback"
-msgstr ""
+msgstr "分享反馈"
 
 #. Label of the different_view (Check) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Show end users a different view"
-msgstr ""
+msgstr "向最终用户显示不同视图"
 
 #. Description of the 'Condition' (Code) field in DocType 'HD Service Level
 #. Agreement'
@@ -2238,7 +2240,7 @@ msgstr "简单Python表达式，示例：doc.status == 'Open' and doc.ticket_typ
 #. Label of the skip_email_workflow (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Skip e-mail workflow"
-msgstr ""
+msgstr "跳过邮件工作流"
 
 #. Label of the source_doctype (Link) field in DocType 'HD Support Search
 #. Source'
@@ -2259,25 +2261,25 @@ msgstr "来源类型"
 
 #: helpdesk/api/knowledge_base.py:119
 msgid "Source and target category cannot be same"
-msgstr ""
+msgstr "源类别和目标类别不能相同"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:324
 msgid "Source and target ticket cannot be same"
-msgstr ""
+msgstr "源工单和目标工单不能相同"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:320
 msgid "Source ticket does not exist"
-msgstr ""
+msgstr "源工单不存在"
 
 #. Label of the split_and_merge_section (Section Break) field in DocType 'HD
 #. Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Split and Merge"
-msgstr ""
+msgstr "拆分与合并"
 
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.js:9
 msgid "Standard Form Scripts can't be modified, duplicate the script instead."
-msgstr ""
+msgstr "标准表单脚本无法修改，请复制该脚本进行修改。"
 
 #. Label of the start_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
@@ -2291,7 +2293,7 @@ msgstr "开始时间"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:99
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
-msgstr ""
+msgstr "第<u>{0}</u>行的开始时间不能大于或等于结束时间。"
 
 #. Label of the status (Select) field in DocType 'HD Article'
 #. Label of the status_section (Section Break) field in DocType 'HD Settings'
@@ -2314,7 +2316,7 @@ msgstr "状态 "
 #. Label of the status_category (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Status Category"
-msgstr ""
+msgstr "状态类别"
 
 #. Label of the status_details (Section Break) field in DocType 'HD Service
 #. Level Agreement'
@@ -2327,30 +2329,32 @@ msgstr "状态信息"
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status of the ticket, when a customer replies on the ticket with this SLA.\n\n"
 "If not selected, the value will be takes from HD Settings DocType."
-msgstr ""
+msgstr "客户回复使用此SLA的工单时的工单状态。\n\n"
+"若未选择，该值将从HD设置文档类型中获取。"
 
 #. Description of the 'Ticket Reopen status' (Link) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Status of the ticket, when a customer replies on the ticket."
-msgstr ""
+msgstr "客户回复工单时的工单状态。"
 
 #. Description of the 'Default Ticket Status' (Link) field in DocType 'HD
 #. Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status of the ticket, when it is created in the system with this SLA.\n"
 "If not selected, the value will be taken from HD Settings DocType"
-msgstr ""
+msgstr "在系统中使用此SLA创建工单时的工单状态。\n"
+"若未选择，该值将从HD设置文档类型中获取"
 
 #. Description of the 'Default ticket status' (Link) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Status of the ticket, when it is created in the system."
-msgstr ""
+msgstr "在系统中创建工单时的工单状态。"
 
 #: helpdesk/templates/components/contact_with_us.html:7
 msgid "Still got questions? We're here to assist you."
-msgstr ""
+msgstr "仍有疑问？我们随时为您提供帮助。"
 
 #. Label of the subject (Data) field in DocType 'HD Ticket'
 #. Label of a field in the tickets Web Form
@@ -2363,7 +2367,7 @@ msgstr "主题"
 #. Label of the subject_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Subject Weight"
-msgstr ""
+msgstr "主题权重"
 
 #. Label of the summary (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2386,7 +2390,7 @@ msgstr "售后支持时间分布"
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Support Policy"
-msgstr ""
+msgstr "支持政策"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -2397,7 +2401,7 @@ msgstr "售后支持团队"
 #. Label of the synonyms (Table) field in DocType 'HD Synonyms'
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
 msgid "Synonyms"
-msgstr ""
+msgstr "同义词"
 
 #. Label of the is_system (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
@@ -2439,20 +2443,20 @@ msgstr "系统管理员"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.py:12
 msgid "System types can not be deleted"
-msgstr ""
+msgstr "无法删除系统类型"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:22
 msgid "Tampered Access"
-msgstr ""
+msgstr "篡改访问"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:322
 msgid "Target ticket does not exist"
-msgstr ""
+msgstr "目标工单不存在"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Teal"
-msgstr ""
+msgstr "青蓝色"
 
 #. Label of the team (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_team (Link) field in DocType 'HD Escalation Rule'
@@ -2468,7 +2472,7 @@ msgstr "团队"
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Team Restrictions"
-msgstr ""
+msgstr "团队限制"
 
 #. Label of the template (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2482,7 +2486,7 @@ msgstr "模板名称"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:12
 msgid "The 'Closed' status cannot be renamed."
-msgstr ""
+msgstr "无法重命名“已关闭”状态。"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:147
 msgid "The Condition '{0}' is invalid: {1}"
@@ -2494,24 +2498,24 @@ msgstr "在{0}这个节日之间不在开始日期和结束日期之间"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:40
 msgid "The status for sending feedback must be of <u>Resolved</u> category."
-msgstr ""
+msgstr "发送反馈的状态必须属于<u>已解决</u>类别。"
 
 #. Description of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "This doctype will be deprecated in the future"
-msgstr ""
+msgstr "本文档类型将在未来弃用"
 
 #. Description of the 'Instantly send e-mail' (Check) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "This field is used to send an email instantly without adding it into the queue. If this field is checked, the email will be sent immediately after clicking the \"Send\" button, instead of being added to the email queue for later processing."
-msgstr ""
+msgstr "此字段用于立即发送邮件而不加入队列。若勾选此字段，邮件将在点击“发送”按钮后立即发送，而非加入邮件队列等待后续处理。"
 
 #. Description of the 'Skip e-mail workflow' (Check) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "This field is used to skip email-related workflows for tickets. If this field is checked, no emails will be sent related to tickets, such as new ticket creation, status updates, or notifications."
-msgstr ""
+msgstr "此字段用于跳过工单的邮件相关工作流。若勾选此字段，将不会发送与工单相关的邮件，如新工单创建、状态更新或通知。"
 
 #: helpdesk/www/helpdesk/index.py:23
 msgid "This method is only meant for developer mode"
@@ -2519,11 +2523,11 @@ msgstr "本方法仅适用于开发者模式"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:358
 msgid "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
-msgstr ""
+msgstr "本工单（#{0}）已与工单<a href = '/helpdesk/tickets/{1}'>#{1}</a>合并。"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:499
 msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
-msgstr ""
+msgstr "本工单已拆分为新工单。请跟进工单<a href={0}>#{1}</a>。"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2542,35 +2546,35 @@ msgstr "星期四"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Ticket"
-msgstr ""
+msgstr "工单"
 
 #. Name of a report
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Analytics"
-msgstr ""
+msgstr "工单分析"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Configuration"
-msgstr ""
+msgstr "工单配置"
 
 #. Label of the is_merged (Check) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Ticket Merged"
-msgstr ""
+msgstr "工单已合并"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:40
 msgid "Ticket Not Found"
-msgstr ""
+msgstr "工单未找到"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:50
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:77
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:37
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:105
 msgid "Ticket Priority"
-msgstr ""
+msgstr "工单优先级"
 
 #. Label of the ticket_reopen_status (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -2578,27 +2582,27 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Ticket Reopen status"
-msgstr ""
+msgstr "工单重开状态"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:18
 msgid "Ticket Routing"
-msgstr ""
+msgstr "工单路由"
 
 #. Label of the ticket_split_from (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Ticket Split From"
-msgstr ""
+msgstr "工单拆分自"
 
 #. Name of a report
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Summary"
-msgstr ""
+msgstr "工单摘要"
 
 #: helpdesk/api/dashboard.py:611
 msgid "Ticket Trend"
-msgstr ""
+msgstr "工单趋势"
 
 #. Label of the ticket_type_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -2610,64 +2614,64 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:94
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Type"
-msgstr ""
+msgstr "工单类型"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:21
 msgid "Ticket does not exist."
-msgstr ""
+msgstr "工单不存在。"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:318
 msgid "Ticket must be resolved with a feedback"
-msgstr ""
+msgstr "工单必须附带反馈才能解决"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:55
 msgid "Ticket not found"
-msgstr ""
+msgstr "工单未找到"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:40
 msgid "Ticket not found for the provided key."
-msgstr ""
+msgstr "未找到对应提供密钥的工单。"
 
 #. Label of the ticket_type (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_ticket_type (Link) field in DocType 'HD Escalation Rule'
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Ticket type"
-msgstr ""
+msgstr "工单类型"
 
 #. Label of the is_ticket_type_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:295
 msgid "Ticket type is mandatory"
-msgstr ""
+msgstr "工单类型为必填项"
 
 #. Name of a report
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
 msgid "Ticket-Search Analysis"
-msgstr ""
+msgstr "工单搜索分析"
 
 #: helpdesk/api/dashboard.py:160 helpdesk/api/dashboard.py:614
 msgid "Tickets"
-msgstr ""
+msgstr "工单"
 
 #: helpdesk/api/dashboard.py:540
 msgid "Tickets by Channel"
-msgstr ""
+msgstr "按渠道统计工单"
 
 #: helpdesk/api/dashboard.py:500 helpdesk/api/dashboard.py:508
 msgid "Tickets by Priority"
-msgstr ""
+msgstr "按优先级统计工单"
 
 #: helpdesk/api/dashboard.py:434 helpdesk/api/dashboard.py:442
 msgid "Tickets by Team"
-msgstr ""
+msgstr "按团队统计工单"
 
 #: helpdesk/api/dashboard.py:467 helpdesk/api/dashboard.py:475
 msgid "Tickets by Type"
-msgstr ""
+msgstr "按类型统计工单"
 
 #: helpdesk/api/ticket.py:18
 msgid "Tickets can only be assigned to agents"
-msgstr ""
+msgstr "工单仅可分配给客服人员"
 
 #. Label of the title (Data) field in DocType 'HD Article'
 #. Label of the title (Data) field in DocType 'HD Canned Response'
@@ -2679,7 +2683,7 @@ msgstr "标题"
 #. Label of the title_slug (Data) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Title Slug"
-msgstr ""
+msgstr "标题别名"
 
 #. Label of the user_to (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -2701,7 +2705,7 @@ msgstr "到日期不能早于日期"
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:35
 msgid "Top Result"
-msgstr ""
+msgstr "置顶结果"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:98
 msgid "Total"
@@ -2719,23 +2723,23 @@ msgstr "总假期数"
 
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:126
 msgid "Total Ticket"
-msgstr ""
+msgstr "工单总数"
 
 #: helpdesk/api/dashboard.py:509
 msgid "Total Tickets by Priority"
-msgstr ""
+msgstr "按优先级统计工单总数"
 
 #: helpdesk/api/dashboard.py:443
 msgid "Total Tickets by Team"
-msgstr ""
+msgstr "按团队统计工单总数"
 
 #: helpdesk/api/dashboard.py:476
 msgid "Total Tickets by Type"
-msgstr ""
+msgstr "按类型统计工单总数"
 
 #: helpdesk/api/dashboard.py:165
 msgid "Total number of tickets created"
-msgstr ""
+msgstr "创建的工单总数"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2755,29 +2759,29 @@ msgstr "类型"
 #. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "URL/Method"
-msgstr ""
+msgstr "URL/方法"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:204
 msgid "Unassignment condition"
-msgstr ""
+msgstr "取消分配条件"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:16
 msgid "Unauthorized Access"
-msgstr ""
+msgstr "未授权访问"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:16
 msgid "Unauthorized access."
-msgstr ""
+msgstr "未授权访问。"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:28
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:30
 msgid "Unsaved"
-msgstr ""
+msgstr "未保存"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:112
 #: desk/src/components/Settings/SettingsModal.vue:50
 msgid "Unsaved changes"
-msgstr ""
+msgstr "未保存的修改"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:8
 msgid "Untitled"
@@ -2786,7 +2790,7 @@ msgstr "未命名"
 #. Label of the update_status_to (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Update status to"
-msgstr ""
+msgstr "更新状态至"
 
 #. Label of the user (Link) field in DocType 'HD Agent'
 #. Label of the user (Link) field in DocType 'HD Article Feedback'
@@ -2807,7 +2811,7 @@ msgstr "用户"
 
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.py:133
 msgid "User Not found"
-msgstr ""
+msgstr "用户未找到"
 
 #. Label of the user_resolution_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2865,14 +2869,14 @@ msgstr "周末"
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "When enabled, the ticket status will automatically change to the status selected below whenever the agent responds to a ticket.\n"
-msgstr ""
+msgstr "启用后，每当客服响应工单时，工单状态将自动更改为下方所选状态。\n"
 
 #. Label of the word (Data) field in DocType 'HD Stopword'
 #. Label of the word (Data) field in DocType 'HD Synonyms'
 #: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
 msgid "Word"
-msgstr ""
+msgstr "词语"
 
 #. Label of the workday (Select) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
@@ -2907,7 +2911,7 @@ msgstr "黄色"
 
 #: helpdesk/api/dashboard.py:24
 msgid "You are not allowed to view this dashboard data."
-msgstr ""
+msgstr "您无权查看此仪表板数据。"
 
 #: helpdesk/utils.py:164
 msgid "You are not permitted to access this resource."
@@ -2915,7 +2919,7 @@ msgstr "您无权访问此资源"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:530
 msgid "You are not permitted to add a comment"
-msgstr ""
+msgstr "您无权添加评论"
 
 #: desk/src/components/telephony/CallUI.vue:35
 msgid "You can change the default calling medium from the settings"
@@ -2923,23 +2927,23 @@ msgstr "可在设置中修改默认呼叫媒介"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:137
 msgid "You cannot disable the default SLA."
-msgstr ""
+msgstr "您无法禁用默认SLA。"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:41
 msgid "You cannot set more than one Default Priority."
-msgstr ""
+msgstr "您无法设置多个默认优先级。"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:29
 msgid "You have already provided feedback for this ticket."
-msgstr ""
+msgstr "您已为本工单提供过反馈。"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:131
 msgid "You must set one SLA as Default. Please check the Default SLA option."
-msgstr ""
+msgstr "您必须设置一个SLA为默认。请勾选默认SLA选项。"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:17
 msgid "back to email event list"
-msgstr ""
+msgstr "返回邮件事件列表"
 
 #: helpdesk/api/dashboard.py:583
 msgid "closed"
@@ -2947,7 +2951,7 @@ msgstr "已关闭"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:46
 msgid "customize {0}"
-msgstr ""
+msgstr "自定义{0}"
 
 #: helpdesk/api/dashboard.py:334
 msgid "days"
@@ -2968,7 +2972,7 @@ msgstr "已联系"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:91
 msgid "here"
-msgstr ""
+msgstr "此处"
 
 #: helpdesk/api/dashboard.py:280
 msgid "hrs"
@@ -2995,7 +2999,7 @@ msgstr "紫色"
 
 #: helpdesk/api/dashboard.py:642
 msgid "rated_tickets"
-msgstr ""
+msgstr "已评分工单"
 
 #: helpdesk/api/dashboard.py:641
 msgid "rating"
@@ -3008,5 +3012,5 @@ msgstr "星级"
 #. Label of the synonym (Data) field in DocType 'HD Synonym'
 #: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json
 msgid "synonym"
-msgstr ""
+msgstr "同义词"
 
