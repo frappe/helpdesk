@@ -19,7 +19,7 @@
         />
       </div>
     </template>
-    <template #actions>
+    <template #header-actions>
       <div class="flex items-center gap-2">
         <Button
           :label="__('Preview')"
@@ -83,7 +83,7 @@
           <FormLabel :label="__('Teams')" required />
           <Autocomplete
             :multiple="true"
-            :options="getTeamsList.data"
+            :options="teamsList"
             v-model="cannedResponseData.teams"
             required
             @update:modelValue="validateData('teams')"
@@ -146,7 +146,7 @@ import {
   toast,
 } from "frappe-ui";
 import SettingsLayoutBase from "../SettingsLayoutBase.vue";
-import { inject, onUnmounted, ref, watch } from "vue";
+import { computed, inject, onUnmounted, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
 import PreviewDialog from "./components/PreviewDialog.vue";
@@ -154,6 +154,9 @@ import { menuButtons } from "./cannedResponse";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { FieldAutocomplete } from "./components/field-autocomplete-extension";
 import DocumentationButton from "@/components/DocumentationButton.vue";
+import { storeToRefs } from "pinia";
+import { useConfigStore } from "@/stores/config";
+import { useAuthStore } from "@/stores/auth";
 
 const showConfirmDialog = ref({
   show: false,
@@ -171,6 +174,9 @@ const previewDialog = ref({
   preview: null,
 });
 const content = ref();
+
+const { teamRestrictionApplied } = storeToRefs(useConfigStore());
+const { userTeams } = storeToRefs(useAuthStore());
 
 const cannedResponseData = ref({
   name: "",
@@ -210,7 +216,7 @@ const getCannedResponseData = createResource({
   },
 });
 
-const getTeamsList = createListResource({
+const getTeamsListResource = createListResource({
   doctype: "HD Team",
   auto: true,
   fields: ["name"],
@@ -222,6 +228,18 @@ const getTeamsList = createListResource({
       label: item.name,
     }));
   },
+});
+
+const teamsList = computed(() => {
+  if (teamRestrictionApplied.value) {
+    return (
+      userTeams.value?.map((team) => ({
+        value: team,
+        label: team,
+      })) || []
+    );
+  }
+  return getTeamsListResource.data || [];
 });
 
 const onShowPreview = () => {

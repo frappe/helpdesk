@@ -17,13 +17,13 @@
             </p>
           </slot>
         </div>
-        <slot name="actions" v-if="Boolean($slots['actions'])" />
+        <slot name="header-actions" v-if="Boolean($slots['header-actions'])" />
       </div>
-      <div class="mt-6" v-if="Boolean($slots['bottom-section'])">
-        <slot name="bottom-section" />
+      <div class="mt-6" v-if="Boolean($slots['header-bottom'])">
+        <slot name="header-bottom" />
       </div>
     </div>
-    <div class="px-10 pb-8 overflow-y-auto h-full">
+    <div class="px-10 pb-8 overflow-y-auto h-full flex flex-col">
       <slot name="content" />
     </div>
   </div>

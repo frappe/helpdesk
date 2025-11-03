@@ -94,6 +94,8 @@ import {
 } from "./Settings/settingsModal";
 import { ref, computed, nextTick, watch, onUnmounted } from "vue";
 import { showEmailBox } from "../pages/ticket/modalStates";
+import { useConfigStore } from "@/stores/config";
+import { storeToRefs } from "pinia";
 
 const props = defineProps({
   doctype: {
@@ -106,24 +108,28 @@ const props = defineProps({
   },
 });
 
+const { teamRestrictionApplied } = storeToRefs(useConfigStore());
 const show = defineModel();
 const searchInput = ref("");
-const activeFilter = ref("My Team");
+const activeFilter = ref(teamRestrictionApplied.value ? "My Team" : "Global");
 
-const filters = [
-  {
-    label: "My Team",
-    onClick: () => (activeFilter.value = "My Team"),
-  },
-  {
-    label: "Global",
-    onClick: () => (activeFilter.value = "Global"),
-  },
-  {
-    label: "Personal",
-    onClick: () => (activeFilter.value = "Personal"),
-  },
-];
+const filters = computed(() => {
+  return [
+    {
+      label: "Global",
+      onClick: () => (activeFilter.value = "Global"),
+      disabled: teamRestrictionApplied.value,
+    },
+    {
+      label: "My Team",
+      onClick: () => (activeFilter.value = "My Team"),
+    },
+    {
+      label: "Personal",
+      onClick: () => (activeFilter.value = "Personal"),
+    },
+  ].filter((filter) => !filter.disabled);
+});
 
 watch(activeFilter, () => {
   cannedResponsesResource.reload({
@@ -150,6 +156,7 @@ const cannedResponsesResource = createResource({
   },
   auto: true,
 });
+
 onUnmounted(() => {
   showEmailBox.value = true;
 });

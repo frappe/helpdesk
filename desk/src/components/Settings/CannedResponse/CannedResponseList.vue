@@ -7,7 +7,7 @@
       )
     "
   >
-    <template #actions>
+    <template #header-actions>
       <Button
         label="New"
         theme="gray"
@@ -17,15 +17,12 @@
       />
     </template>
     <template
-      #bottom-section
-      v-if="
-        cannedResponseListData.data?.length > 9 ||
-        cannedResponseSearchQuery.length
-      "
+      #header-bottom
+      v-if="cannedResponsesList.length > 9 || cannedResponseSearchQuery.length"
     >
       <div class="relative">
         <Input
-          v-model="cannedResponseSearchQuery"
+          :model-value="cannedResponseSearchQuery"
           @input="cannedResponseSearchQuery = $event"
           :placeholder="__('Search')"
           type="text"
@@ -45,17 +42,16 @@
     </template>
     <template #content>
       <div
-        v-if="cannedResponseListData.loading && !cannedResponseListData.data"
+        v-if="cannedResponsesListResource.loading"
         class="flex items-center justify-center mt-12"
       >
         <LoadingIndicator class="w-4" />
       </div>
       <div
         v-if="
-          !cannedResponseListData.list.loading &&
-          !cannedResponseListData.list.data?.length
+          !cannedResponsesListResource.loading && !cannedResponsesList?.length
         "
-        class="flex flex-col items-center justify-center gap-4 p-4 h-[300px]"
+        class="flex flex-col items-center justify-center gap-4 grow"
       >
         <div
           class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
@@ -86,7 +82,7 @@
         </div>
         <hr class="mt-2 mx-2" />
         <div
-          v-for="(cannedResponse, index) in cannedResponseListData.data"
+          v-for="(cannedResponse, index) in cannedResponsesList"
           :key="cannedResponse.name"
         >
           <div
@@ -126,23 +122,7 @@
               </Dropdown>
             </div>
           </div>
-          <hr
-            v-if="index !== cannedResponseListData.data.length - 1"
-            class="mx-2"
-          />
-        </div>
-        <div class="flex justify-center">
-          <Button
-            v-if="
-              !cannedResponseListData.loading &&
-              cannedResponseListData.hasNextPage
-            "
-            class="mt-3.5 p-2"
-            @click="() => cannedResponseListData.next()"
-            :loading="cannedResponseListData.loading"
-            label="Load More"
-            icon-left="refresh-cw"
-          />
+          <hr v-if="index !== cannedResponsesList.length - 1" class="mx-2" />
         </div>
       </div>
     </template>
@@ -174,7 +154,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, call, Input, toast } from "frappe-ui";
+import { Button, call, createResource, Input, toast } from "frappe-ui";
 import SettingsLayoutBase from "../SettingsLayoutBase.vue";
 import { inject, ref, Ref, watch } from "vue";
 import { __ } from "@/translation";
@@ -189,6 +169,7 @@ const duplicateDialog = ref({
   name: "",
   newName: "",
 });
+const cannedResponsesList = ref([]);
 
 const goToNew = () => {
   cannedResponseActiveScreen.value = {
@@ -198,6 +179,17 @@ const goToNew = () => {
 };
 
 const isConfirmingDelete = ref(false);
+
+const cannedResponsesListResource = createResource({
+  url: "helpdesk.api.canned_response.get_canned_responses",
+  params: {
+    scope: "All",
+  },
+  onSuccess: (data) => {
+    cannedResponsesList.value = data;
+  },
+  auto: true,
+});
 
 const dropdownOptions = (cannedResponse) => [
   {
@@ -258,15 +250,17 @@ const duplicate = async () => {
   });
 };
 
-watch(cannedResponseSearchQuery, (newValue) => {
-  cannedResponseListData.filters = {
-    ...cannedResponseListData.filters,
-    name: ["like", `%${newValue}%`],
-  };
-  if (!newValue) {
-    cannedResponseListData.start = 0;
-    cannedResponseListData.pageLength = 10;
+watch(
+  () => [cannedResponseSearchQuery.value, cannedResponsesListResource.data],
+  ([query, data]) => {
+    if (!query) {
+      cannedResponsesList.value = data || [];
+      return;
+    }
+    cannedResponsesList.value =
+      data?.filter((item) => {
+        return item.name.toLowerCase().includes(query.toLowerCase());
+      }) || [];
   }
-  cannedResponseListData.reload();
-});
+);
 </script>
