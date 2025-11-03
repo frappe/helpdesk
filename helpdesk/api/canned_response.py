@@ -1,13 +1,16 @@
 import frappe
 from frappe import _
 
-from helpdesk.utils import get_agents_team
+from helpdesk.utils import get_agents_team, is_admin
 
 
 @frappe.whitelist()
 def get_canned_responses(scope):
     QBEmailTemplate = frappe.qb.DocType("Email Template")
     QBChildTeam = frappe.qb.DocType("HD Canned Response Team")
+    is_team_restriction_applied = frappe.db.get_single_value(
+        "HD Settings", "restrict_tickets_by_agent_group"
+    )
 
     base_query = (
         frappe.qb.from_(QBEmailTemplate)
@@ -18,6 +21,8 @@ def get_canned_responses(scope):
     )
 
     if scope == "Global":
+        if is_team_restriction_applied:
+            return []
         query = base_query.where(QBEmailTemplate.scope == "Global")
     elif scope == "Personal":
         query = base_query.where(
@@ -32,6 +37,28 @@ def get_canned_responses(scope):
         query = base_query.where(
             (QBEmailTemplate.scope == "Team") & (QBChildTeam.team.isin(user_team_names))
         )
+    elif scope == "All":
+        if is_team_restriction_applied:
+            user_team = get_agents_team()
+            user_team_names = [team["team_name"] for team in user_team]
+            if not user_team_names:
+                return []
+
+            if is_admin():
+                query = base_query
+            else:
+                query = base_query.where(
+                    (
+                        (QBEmailTemplate.scope == "Team")
+                        & (QBChildTeam.team.isin(user_team_names))
+                    )
+                    | (
+                        (QBEmailTemplate.scope == "Personal")
+                        & (QBEmailTemplate.owner == frappe.session.user)
+                    )
+                )
+        else:
+            query = base_query
 
     results = query.run(as_dict=True)
     return results

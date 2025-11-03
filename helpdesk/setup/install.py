@@ -36,6 +36,7 @@ def after_install():
     create_ticket_feedback_options()
     add_property_setters()
     add_website_settings_permission()
+    add_email_template_perms_for_agent_and_agent_manager()
     # Always keep this at last, because sql_ddl makes the db commit
     add_fts_index()
 
@@ -225,6 +226,15 @@ def add_website_settings_permission():
         update_permission_property(doctype, role, 0, p, 1)
 
 
+def add_email_template_perms_for_agent_and_agent_manager():
+    for_roles = ["Agent", "Agent Manager"]
+    permissions = ["create", "delete", "write"]
+    for role in for_roles:
+        add_permission("Email Template", role)
+        for perm in permissions:
+            update_permission_property("Email Template", role, 0, perm, 1)
+
+
 def add_default_assignment_rule():
     support_settings = frappe.get_doc("HD Settings")
     support_settings.create_base_support_rotation()
@@ -410,9 +420,7 @@ def add_index_if_not_exists(table, column, index_name):
         SHOW INDEX FROM `{table}`
             WHERE Column_name = '{column}'
             AND Index_type = 'FULLTEXT'
-        """.format(
-            table=table, column=column
-        ),
+        """.format(table=table, column=column),
         as_dict=True,
     )
     print("\n\n", index_exists, "\n\n")

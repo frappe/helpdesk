@@ -19,6 +19,7 @@
           placeholder="Search ticket"
           :show-description="true"
           @change="getResponsePreview"
+          :filters="ticketFilters"
         />
 
         <div class="space-y-1.5">
@@ -50,11 +51,16 @@ import {
   Dialog,
   FormLabel,
   TextEditor,
+  toast,
 } from "frappe-ui";
 import { LoadingIndicator } from "frappe-ui";
 import { menuButtons } from "../cannedResponse";
 import { Link } from "@/components";
-import { watch } from "vue";
+import { computed, watch } from "vue";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
+import { __ } from "@/translation";
 
 const dialogModel = defineModel<{
   show: boolean;
@@ -63,11 +69,23 @@ const dialogModel = defineModel<{
   preview: string;
 }>();
 
+const { userTeams } = storeToRefs(useAuthStore());
+const { teamRestrictionApplied } = storeToRefs(useConfigStore());
+
 const getResponsePreviewResource = createResource({
   url: "helpdesk.api.canned_response.get_rendered_canned_response",
   onSuccess: (data) => {
     dialogModel.value.preview = data;
   },
+});
+
+const ticketFilters = computed(() => {
+  if (teamRestrictionApplied.value) {
+    return {
+      agent_group: ["in", userTeams.value.join(", ")],
+    };
+  }
+  return {};
 });
 
 const getResponsePreview = (ticketId: string) => {
@@ -91,9 +109,19 @@ watch(
         pageLength: 1,
         auto: true,
         onSuccess: (data) => {
+          if (data.length === 0) {
+            toast.error(
+              __(
+                "No tickets found for these team(s) to preview: {0}",
+                userTeams.value.join(", ")
+              )
+            );
+            return;
+          }
           dialogModel.value.ticketId = data[0].name;
           getResponsePreview(data[0].name);
         },
+        filters: ticketFilters.value,
       });
     }
   }
