@@ -10,7 +10,7 @@
           theme="orange"
           size="sm"
           :label="__('Unsaved')"
-          v-if="isDirty"
+          v-if="isDirty || isLanguageChanged"
         />
       </div>
     </template>
@@ -18,9 +18,9 @@
       <Button
         :label="__('Save')"
         variant="solid"
-        @click="saveSettings.submit()"
-        :loading="saveSettings.loading"
-        :disabled="!isDirty"
+        @click="saveSettings"
+        :loading="saveSettingsResource.loading || saveLanguageResource.loading"
+        :disabled="!isDirty && !isLanguageChanged"
       />
     </template>
     <template #content>
@@ -31,6 +31,11 @@
         <LoadingIndicator class="w-4" />
       </div>
       <div v-else>
+        <div class="flex flex-col gap-1.5">
+          <FormLabel :label="__('Language')" />
+          <Link v-model="language" doctype="Language" class="w-full md:w-1/2" />
+        </div>
+        <hr class="my-8" />
         <Branding />
         <hr class="my-8" />
         <div>
@@ -48,16 +53,18 @@ import {
   Badge,
   Button,
   createResource,
+  FormLabel,
   LoadingIndicator,
   toast,
 } from "frappe-ui";
 import Branding from "./components/Branding.vue";
 import TicketSettings from "./components/TicketSettings.vue";
 import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
-import { provide, ref, watch } from "vue";
+import { computed, provide, ref, watch } from "vue";
 import { __ } from "@/translation";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import Link from "@/components/frappe-ui/Link.vue";
 
 const isDirty = ref(false);
 const initialData = ref(null);
@@ -79,6 +86,7 @@ const settingsData = ref({
   preferKnowledgeBase: false,
   skipEmailWorkflow: false,
 });
+const language = ref("");
 
 provide("settingsData", settingsData);
 
@@ -95,7 +103,24 @@ const settingsDataResource = createResource({
   },
 });
 
-const saveSettings = createResource({
+const systemSettingsResource = createResource({
+  url: "frappe.client.get",
+  params: {
+    doctype: "System Settings",
+    fields: ["language"],
+  },
+  fields: ["language"],
+  auto: true,
+  onSuccess(data) {
+    language.value = data.language;
+  },
+});
+
+const isLanguageChanged = computed(() => {
+  return language.value !== systemSettingsResource.data?.language;
+});
+
+const saveSettingsResource = createResource({
   url: "frappe.client.set_value",
   makeParams() {
     return {
@@ -150,6 +175,32 @@ const transformData = (data: any) => {
     preferKnowledgeBase: Boolean(data.prefer_knowledge_base),
     skipEmailWorkflow: Boolean(data.skip_email_workflow),
   };
+};
+
+const saveLanguageResource = createResource({
+  url: "frappe.client.set_value",
+  makeParams() {
+    return {
+      doctype: "System Settings",
+      name: "System Settings",
+      fieldname: {
+        language: language.value,
+      },
+    };
+  },
+  onSuccess() {
+    toast.success(__("Language updated"));
+    window.location.reload();
+  },
+});
+
+const saveSettings = async () => {
+  if (isDirty.value) {
+    await saveSettingsResource.submit();
+  }
+  if (isLanguageChanged.value) {
+    await saveLanguageResource.submit();
+  }
 };
 
 watch(
