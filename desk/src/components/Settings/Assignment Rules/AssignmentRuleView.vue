@@ -150,7 +150,9 @@
                   >{{ __("Learn about conditions") }}</a
                 >
               </span>
-              <div v-if="isAssignConditionOld && assignmentRulesActiveScreen.data">
+              <div
+                v-if="isAssignConditionOld && assignmentRulesActiveScreen.data"
+              >
                 <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
                   <template #target>
                     <div
@@ -175,8 +177,9 @@
             <div
               class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
               v-if="
-            !useNewUIForAssignCondition && assignmentRuleData.assignCondition
-          "
+                !useNewUIForAssignCondition &&
+                assignmentRuleData.assignCondition
+              "
             >
               <span class="text-p-sm">
                 Conditions for this rule were created from
@@ -255,9 +258,9 @@
             <div
               class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
               v-if="
-            !useNewUIForUnassignCondition &&
-            assignmentRuleData.unassignCondition
-          "
+                !useNewUIForUnassignCondition &&
+                assignmentRuleData.unassignCondition
+              "
             >
               <span class="text-p-sm">
                 Conditions for this rule were created from
@@ -552,8 +555,8 @@ const createAssignmentRule = () => {
           assignmentRuleData.value.unassignConditionJson
         ),
       },
-    }
-    });
+    },
+  });
 };
 
 const createAssignmentRuleResource = createResource({
