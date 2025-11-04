@@ -62,7 +62,9 @@
                     <div class="font-semibold text-ink-gray-7 truncate">
                       {{ user.agent_name }}
                     </div>
-                    <div class="text-ink-gray-6 truncate">{{ user.user }}</div>
+                    <div class="text-ink-gray-6 truncate">
+                      {{ user.user }}
+                    </div>
                   </div>
                 </div>
               </li>
@@ -131,9 +133,9 @@ const users = computed(() => {
     const isEmail = val.includes("@") || val.includes(".");
     filteredAgents = filteredAgents.filter((user) => {
       if (isEmail) {
-        return user.email?.toLowerCase().includes(val);
+        return user.user?.toLowerCase().includes(val);
       } else {
-        return user.full_name?.toLowerCase().includes(val);
+        return user.agent_name?.toLowerCase().includes(val);
       }
     });
   }
