@@ -9,7 +9,7 @@
   >
     <template #header-actions>
       <Button
-        :label="__('Add Account')"
+        :label="__('New')"
         theme="gray"
         variant="solid"
         @click="emit('update:step', 'email-add')"
@@ -56,7 +56,7 @@
           </div>
         </div>
         <Button
-          :label="__('Add Email Account')"
+          :label="__('New')"
           variant="outline"
           icon-left="plus"
           @click="emit('update:step', 'email-add')"

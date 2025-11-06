@@ -107,7 +107,7 @@
             </div>
           </div>
           <Button
-            :label="__('Add Agent')"
+            :label="__('New')"
             variant="outline"
             icon-left="plus"
             @click="setActiveSettingsTab('Invite Agents')"

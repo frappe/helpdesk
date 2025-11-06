@@ -85,7 +85,7 @@
               :variant="'subtle'"
               :theme="'orange'"
               size="sm"
-              :label="__('Unsaved changes')"
+              :label="__('Unsaved')"
             />
           </div>
           <Button

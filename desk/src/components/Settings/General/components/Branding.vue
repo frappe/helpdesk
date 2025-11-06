@@ -51,9 +51,10 @@ import LogoUpload from "./LogoUpload.vue";
 import { createResource, toast } from "frappe-ui";
 import { __ } from "@/translation";
 import { useConfigStore } from "@/stores/config";
+import { HDSettingsSymbol } from "@/types";
 
 const configStore = useConfigStore();
-const settingsData = inject<any>("settingsData");
+const settingsData = inject(HDSettingsSymbol);
 const isLoading = ref(false);
 const brandLogo = ref(settingsData.value?.brandLogo);
 const favicon = ref(settingsData.value?.favicon);

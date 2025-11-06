@@ -76,8 +76,9 @@ import { ref, inject } from "vue";
 import { slaActiveScreen } from "@/stores/sla";
 import { ConfirmDelete } from "@/utils";
 import { __ } from "@/translation";
+import { SlaPolicyListResourceSymbol } from "@/types";
 
-const slaPolicyList = inject<any>("slaPolicyList");
+const slaPolicyList = inject(SlaPolicyListResourceSymbol);
 
 const duplicateDialog = ref({
   show: false,

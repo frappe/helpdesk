@@ -9,6 +9,7 @@ import Holidays from "./Holidays.vue";
 import HolidayView from "./HolidayView.vue";
 import { createListResource } from "frappe-ui";
 import { onUnmounted, provide, ref } from "vue";
+import { HolidayListResourceSymbol } from "@/types";
 
 const holidayListData = createListResource({
   doctype: "HD Service Holiday List",
@@ -22,7 +23,7 @@ const holidayListData = createListResource({
 const holidaySearchRef = ref("");
 
 provide("holidaySearchRef", holidaySearchRef);
-provide("holidayList", holidayListData);
+provide(HolidayListResourceSymbol, holidayListData);
 
 onUnmounted(() => {
   holidaySearchRef.value = "";

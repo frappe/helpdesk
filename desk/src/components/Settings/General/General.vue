@@ -65,6 +65,7 @@ import { __ } from "@/translation";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import Link from "@/components/frappe-ui/Link.vue";
+import { HDSettingsSymbol } from "@/types";
 
 const isDirty = ref(false);
 const initialData = ref(null);
@@ -88,7 +89,7 @@ const settingsData = ref({
 });
 const language = ref("");
 
-provide("settingsData", settingsData);
+provide(HDSettingsSymbol, settingsData);
 
 const settingsDataResource = createResource({
   url: "frappe.client.get",

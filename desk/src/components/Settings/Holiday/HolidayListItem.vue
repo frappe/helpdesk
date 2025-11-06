@@ -55,6 +55,7 @@ import { inject, ref } from "vue";
 import { holidayListActiveScreen } from "@/stores/holidayList";
 import { ConfirmDelete } from "@/utils";
 import { __ } from "@/translation";
+import { HolidayListResourceSymbol } from "@/types";
 
 const props = defineProps({
   data: {
@@ -63,7 +64,7 @@ const props = defineProps({
   },
 });
 
-const holidayList = inject<any>("holidayList");
+const holidayList = inject(HolidayListResourceSymbol);
 
 const duplicateDialog = ref({
   show: false,

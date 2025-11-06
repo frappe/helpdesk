@@ -89,6 +89,12 @@
       </template>
     </Popover>
   </Combobox>
+  <ConfirmDialog
+    v-model="showConfirmDialog.show"
+    :title="showConfirmDialog.title"
+    :message="showConfirmDialog.message"
+    :onConfirm="showConfirmDialog.onConfirm"
+  />
 </template>
 
 <script setup lang="ts">
@@ -105,6 +111,7 @@ import { setActiveSettingsTab } from "../settingsModal";
 import { useAgentStore } from "@/stores/agent";
 import { onMounted } from "vue";
 import { __ } from "@/translation";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 const emit = defineEmits(["addAssignee"]);
 const query = ref("");
@@ -112,14 +119,12 @@ const { agents } = useAgentStore();
 const isAssignmentRuleFormDirty = inject<Ref<boolean>>(
   "isAssignmentRuleFormDirty"
 );
-const showConfirmDialog = inject<
-  Ref<{
-    show: boolean;
-    title: string;
-    message: string;
-    onConfirm: () => void;
-  }>
->("showConfirmDialog");
+const showConfirmDialog = ref({
+  show: false,
+  title: "",
+  message: "",
+  onConfirm: () => {},
+});
 
 const users = computed(() => {
   let filteredAgents =

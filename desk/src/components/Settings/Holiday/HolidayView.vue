@@ -14,7 +14,7 @@
           variant="subtle"
           theme="orange"
           size="sm"
-          :label="__('Unsaved changes')"
+          :label="__('Unsaved')"
           v-if="isDirty"
         />
       </div>
@@ -27,7 +27,7 @@
         @click="saveHoliday()"
         :disabled="Boolean(!isDirty && holidayListActiveScreen.data)"
         :loading="
-          holidayList.loading ||
+          holidayList.list.loading ||
           updateHolidayResource.loading ||
           getHolidayData.loading
         "
@@ -246,6 +246,7 @@ import HolidaysCalendarView from "./HolidaysCalendarView.vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { HolidayListResourceSymbol } from "@/types";
 
 const dialog = ref({
   show: false,
@@ -260,7 +261,7 @@ const holidayListView = ref("calendar");
 
 const showConfirmDialog = ref(false);
 
-const holidayList = inject<any>("holidayList");
+const holidayList = inject(HolidayListResourceSymbol);
 
 const getHolidayData = createResource({
   url: "helpdesk.api.holiday_list.get_holiday_list",
