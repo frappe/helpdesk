@@ -375,7 +375,6 @@ const showConfirmDialog = ref<{
   onConfirm: () => {},
 });
 
-provide("showConfirmDialog", showConfirmDialog);
 const useNewUIForAssignCondition = ref(true);
 const useNewUIForUnassignCondition = ref(true);
 const isAssignConditionOld = ref(false);

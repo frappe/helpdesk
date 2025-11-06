@@ -121,7 +121,7 @@
           </div>
         </div>
         <Button
-          :label="__('Add Team')"
+          :label="__('New')"
           variant="outline"
           icon-left="plus"
           @click="showForm = true"
@@ -149,6 +149,7 @@ import EditIcon from "@/components/icons/EditIcon.vue";
 import RenameTeamModal from "./RenameTeamModal.vue";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { TeamListResourceSymbol } from "@/types";
 
 interface E {
   (event: "update:step", step: string, team: string): void;
@@ -157,7 +158,7 @@ interface E {
 const emit = defineEmits<E>();
 const teamsSearchQuery = inject<Ref>("teamsSearchQuery");
 
-const teams = inject<any>("teamsData");
+const teams = inject(TeamListResourceSymbol);
 const showForm = ref(false);
 const showRename = ref({
   show: false,

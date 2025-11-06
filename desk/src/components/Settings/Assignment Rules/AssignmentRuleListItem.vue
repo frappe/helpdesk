@@ -70,6 +70,7 @@
 <script setup lang="ts">
 import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
 import { __ } from "@/translation";
+import { AssignmentRuleListResourceSymbol } from "@/types";
 import { ConfirmDelete } from "@/utils";
 import {
   Button,
@@ -82,7 +83,7 @@ import {
 } from "frappe-ui";
 import { inject, ref } from "vue";
 
-const assignmentRulesListData = inject<any>("assignmentRulesListData");
+const assignmentRulesListData = inject(AssignmentRuleListResourceSymbol);
 
 const props = defineProps({
   data: {

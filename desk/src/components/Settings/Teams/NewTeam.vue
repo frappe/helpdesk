@@ -14,7 +14,7 @@
           variant="subtle"
           theme="orange"
           size="sm"
-          :label="__('Unsaved changes')"
+          :label="__('Unsaved')"
           v-if="isDirty"
         />
       </div>
@@ -63,6 +63,7 @@ import { Badge, ErrorMessage, FormControl, FormLabel, toast } from "frappe-ui";
 import { __ } from "@/translation";
 import AgentSelector from "./components/AgentSelector.vue";
 import { useAgentStore } from "@/stores/agent";
+import { TeamListResourceSymbol } from "@/types";
 
 interface E {
   (event: "update:step", step: string, team?: string): void;
@@ -70,7 +71,7 @@ interface E {
 
 const emit = defineEmits<E>();
 
-const teamsList = inject<any>("teamsData");
+const teamsList = inject(TeamListResourceSymbol);
 const { agents } = useAgentStore();
 
 const isDirty = computed(() => {

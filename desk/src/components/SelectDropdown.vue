@@ -1,18 +1,18 @@
 <template>
-  <Popover :placement="'bottom-start'">
+  <Popover :placement="props.placement">
     <template #target="{ togglePopover }">
-      <div
-        class="flex items-center justify-between text-base rounded h-7 py-1.5 pl-2 pr-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] cursor-default gap-2 min-w-36"
+      <Button
+        class="flex items-center justify-between min-w-36"
         @click="togglePopover()"
         :class="targetClass"
+        icon-right="chevron-down"
       >
         <div class="w-full truncate">
           {{
             options?.find((option) => option.value == model)?.label || "Select"
           }}
         </div>
-        <FeatherIcon name="chevron-down" class="size-4" />
-      </div>
+      </Button>
     </template>
     <template #body="{ togglePopover }">
       <div
@@ -47,7 +47,7 @@
           :label="__('Reset')"
           icon-left="refresh-ccw"
           class="w-full focus-visible:ring-0"
-          @click="onReset"
+          @click="onReset(togglePopover)"
         />
       </div>
     </template>
@@ -55,12 +55,10 @@
 </template>
 
 <script setup lang="ts">
-import { Popover } from "frappe-ui";
+import { Button, FeatherIcon, Popover } from "frappe-ui";
 import { PopoverProps } from "frappe-ui/src/components/Popover/types";
 
 const model = defineModel();
-
-const emit = defineEmits(["update:modelValue", "onReset", "onChange"]);
 
 interface Props {
   options: Array<{ value: string; label: string }>;
@@ -73,15 +71,12 @@ const props = withDefaults(defineProps<Props>(), {
   placement: "bottom-start",
 });
 
-const onReset = () => {
-  emit("onReset");
-  emit("update:modelValue", null);
+const onReset = (togglePopover: () => void) => {
   model.value = null;
+  togglePopover();
 };
 
 const onChange = (value: string) => {
-  emit("onChange", value);
-  emit("update:modelValue", value);
   model.value = value;
 };
 </script>

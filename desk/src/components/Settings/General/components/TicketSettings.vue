@@ -78,20 +78,19 @@
         <SelectDropdown
           :options="autoUpdateticketStatusList"
           :model-value="settingsData.updateStatusTo"
+          @update:model-value="
+            (value) => {
+              if (value) {
+                settingsData.updateStatusTo = value;
+                settingsData.autoUpdateStatus = true;
+              } else {
+                settingsData.updateStatusTo = null;
+                settingsData.autoUpdateStatus = false;
+              }
+            }
+          "
           target-class="max-w-40"
           placement="bottom-end"
-          @on-reset="
-            () => {
-              settingsData.updateStatusTo = null;
-              settingsData.autoUpdateStatus = false;
-            }
-          "
-          @on-change="
-            (value) => {
-              settingsData.updateStatusTo = value;
-              settingsData.autoUpdateStatus = true;
-            }
-          "
         />
       </div>
       <div class="flex items-center justify-between">
@@ -121,11 +120,9 @@
         </div>
         <SelectDropdown
           :options="ticketTypeList.data"
-          :model-value="settingsData.defaultTicketType"
+          v-model="settingsData.defaultTicketType"
           target-class="max-w-40"
           placement="bottom-end"
-          @on-reset="() => (settingsData.defaultTicketType = null)"
-          @on-change="(value) => (settingsData.defaultTicketType = value)"
         />
       </div>
       <div>
@@ -143,30 +140,26 @@
             <SelectDropdown
               :options="autoCloseTicketStatusList"
               :model-value="settingsData.autoCloseStatus"
+              @update:model-value="
+                (value) => {
+                  if (value) {
+                    settingsData.autoCloseStatus = value;
+                    settingsData.autoCloseTickets = true;
+                  } else {
+                    settingsData.autoCloseStatus = null;
+                    settingsData.autoCloseTickets = false;
+                  }
+                }
+              "
               target-class="w-full"
               placement="bottom-end"
-              @on-reset="
-                () => {
-                  settingsData.autoCloseStatus = null;
-                  settingsData.autoCloseTickets = false;
-                }
-              "
-              @on-change="
-                (value) => {
-                  settingsData.autoCloseStatus = value;
-                  settingsData.autoCloseTickets = true;
-                }
-              "
             />
           </div>
           <div class="flex flex-col gap-1.5">
             <FormControl
               :label="__('Auto-close after (Days)')"
               placeholder="e.g. 30"
-              :model-value="settingsData.autoCloseAfterDays"
-              @update:model-value="
-                (value) => (settingsData.autoCloseAfterDays = value)
-              "
+              v-model="settingsData.autoCloseAfterDays"
               type="number"
               :debounce="300"
               :disabled="!settingsData.autoCloseStatus"
@@ -189,6 +182,7 @@
 <script setup lang="ts">
 import SelectDropdown from "@/components/SelectDropdown.vue";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { HDSettingsSymbol } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import {
   Checkbox,
@@ -200,7 +194,7 @@ import {
 } from "frappe-ui";
 import { computed, inject } from "vue";
 
-const settingsData = inject<any>("settingsData");
+const settingsData = inject(HDSettingsSymbol);
 
 const { statuses } = useTicketStatusStore();
 
@@ -240,7 +234,7 @@ const autoCloseTicketStatusList = computed(() => {
         (s: HDTicketStatus) =>
           s.category === "Resolved" || s.category === "Paused"
       )
-      .map((s: HDTicketStatus) => {
+      ?.map((s: HDTicketStatus) => {
         return {
           label: s.label_agent,
           value: s.label_agent,

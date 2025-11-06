@@ -24,7 +24,7 @@
         </div>
       </div>
       <Button
-        :label="__('Add SLA')"
+        :label="__('New')"
         variant="outline"
         icon-left="plus"
         @click="goToNew()"
@@ -54,8 +54,9 @@ import SlaPolicyListItem from "./SlaPolicyListItem.vue";
 import { inject } from "vue";
 import { resetSlaData, slaActiveScreen } from "@/stores/sla";
 import ShieldCheck from "~icons/lucide/shield-check";
+import { SlaPolicyListResourceSymbol } from "@/types";
 
-const slaPolicyList = inject<any>("slaPolicyList");
+const slaPolicyList = inject(SlaPolicyListResourceSymbol);
 
 const goToNew = () => {
   resetSlaData();

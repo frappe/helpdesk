@@ -14,7 +14,7 @@
           :variant="'subtle'"
           :theme="'orange'"
           size="sm"
-          :label="__('Unsaved changes')"
+          :label="__('Unsaved')"
           v-if="isDirty"
         />
       </div>
@@ -299,6 +299,7 @@ import { disableSettingModalOutsideClick } from "../settingsModal";
 import { useOnboarding } from "frappe-ui/frappe";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { SlaPolicyListResourceSymbol } from "@/types";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 
@@ -314,7 +315,7 @@ const initialData = ref(null);
 const useNewUI = ref(true);
 const isOldSla = ref(false);
 
-const slaPolicyList = inject<any>("slaPolicyList");
+const slaPolicyList = inject(SlaPolicyListResourceSymbol);
 const deskUrl = `${window.location.origin}/app/hd-service-level-agreement/${slaActiveScreen.value.data?.name}`;
 
 const getSlaData = createResource({

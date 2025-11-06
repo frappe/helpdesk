@@ -9,6 +9,7 @@ import SlaPolicies from "./SlaPolicies.vue";
 import SlaPolicyView from "./SlaPolicyView.vue";
 import { createListResource } from "frappe-ui";
 import { onUnmounted, provide, ref } from "vue";
+import { SlaPolicyListResourceSymbol } from "@/types";
 
 const slaPolicyListData = createListResource({
   doctype: "HD Service Level Agreement",
@@ -22,7 +23,7 @@ const slaPolicyListData = createListResource({
 const slaSearchQuery = ref("");
 
 provide("slaSearchQuery", slaSearchQuery);
-provide("slaPolicyList", slaPolicyListData);
+provide(SlaPolicyListResourceSymbol, slaPolicyListData);
 
 onUnmounted(() => {
   slaSearchQuery.value = "";

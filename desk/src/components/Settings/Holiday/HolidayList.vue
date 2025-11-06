@@ -24,7 +24,7 @@
         </div>
       </div>
       <Button
-        :label="__('Add Holiday')"
+        :label="__('New')"
         variant="outline"
         icon-left="plus"
         @click="goToNew()"
@@ -58,8 +58,9 @@ import {
   holidayListActiveScreen,
   resetHolidayData,
 } from "@/stores/holidayList";
+import { HolidayListResourceSymbol } from "@/types";
 
-const holidayList = inject<any>("holidayList");
+const holidayList = inject(HolidayListResourceSymbol);
 
 const goToNew = () => {
   resetHolidayData();

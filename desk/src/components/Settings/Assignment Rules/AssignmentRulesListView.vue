@@ -57,8 +57,9 @@ import {
   resetAssignmentRuleData,
 } from "@/stores/assignmentRules";
 import Settings from "~icons/lucide/settings-2";
+import { AssignmentRuleListResourceSymbol } from "@/types";
 
-const assignmentRulesListData = inject<any>("assignmentRulesListData");
+const assignmentRulesListData = inject(AssignmentRuleListResourceSymbol);
 
 const assignmentRulesList = ref(assignmentRulesListData.data || []);
 

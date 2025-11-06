@@ -65,6 +65,7 @@ import {
 } from "@/stores/assignmentRules";
 import AssignmentRulesListView from "./AssignmentRulesListView.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { AssignmentRuleListResourceSymbol } from "@/types";
 
 const assignmentRulesListData = createResource({
   url: "helpdesk.api.assignment_rule.get_assignment_rules_list",
@@ -73,7 +74,7 @@ const assignmentRulesListData = createResource({
 });
 const assignmentRuleSearchQuery = inject<Ref>("assignmentRuleSearchQuery");
 
-provide("assignmentRulesListData", assignmentRulesListData);
+provide(AssignmentRuleListResourceSymbol, assignmentRulesListData);
 
 const goToNew = () => {
   resetAssignmentRuleData();

@@ -65,8 +65,9 @@ import { Button } from "frappe-ui";
 import SlaPolicyList from "./SlaPolicyList.vue";
 import { inject, Ref, watch } from "vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { SlaPolicyListResourceSymbol } from "@/types";
 
-const slaPolicyList = inject<any>("slaPolicyList");
+const slaPolicyList = inject(SlaPolicyListResourceSymbol);
 const slaSearchQuery = inject<Ref>("slaSearchQuery");
 
 const goToNew = () => {

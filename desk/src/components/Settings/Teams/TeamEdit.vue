@@ -161,6 +161,7 @@ import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAgentStore } from "@/stores/agent";
 import AgentSelector from "./components/AgentSelector.vue";
+import { TeamListResourceSymbol } from "@/types";
 
 const props = defineProps<{
   teamName: string;
@@ -173,7 +174,7 @@ const emit = defineEmits<E>();
 
 const { getUser } = useUserStore();
 const { agents } = useAgentStore();
-const teamsList = inject<any>("teamsData");
+const teamsList = inject(TeamListResourceSymbol);
 
 const { teamRestrictionApplied } = useConfigStore();
 const invitees = ref<string[]>([]);

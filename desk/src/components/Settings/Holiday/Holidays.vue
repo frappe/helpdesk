@@ -54,9 +54,10 @@ import {
 import HolidayList from "./HolidayList.vue";
 import { inject, Ref, ref, watch } from "vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { HolidayListResourceSymbol } from "@/types";
 
-const holidayList = inject<any>("holidayList");
-const holidaySearchRef = inject<Ref>("holidaySearchRef");
+const holidayList = inject(HolidayListResourceSymbol);
+const holidaySearchRef = inject<Ref<string>>("holidaySearchRef");
 
 const goToNew = () => {
   resetHolidayData();

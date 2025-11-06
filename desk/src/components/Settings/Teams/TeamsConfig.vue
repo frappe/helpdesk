@@ -14,6 +14,7 @@ import TeamEdit from "./TeamEdit.vue";
 import TeamsList from "./TeamsList.vue";
 import { createListResource } from "frappe-ui";
 import NewTeam from "./NewTeam.vue";
+import { TeamListResourceSymbol } from "@/types";
 
 type TeamStep = "team-list" | "team-edit" | "new-team";
 
@@ -36,7 +37,7 @@ const teams = createListResource({
 });
 
 provide("teamsSearchQuery", teamsSearchQuery);
-provide("teamsData", teams);
+provide(TeamListResourceSymbol, teams);
 
 onUnmounted(() => {
   teamsSearchQuery.value = "";

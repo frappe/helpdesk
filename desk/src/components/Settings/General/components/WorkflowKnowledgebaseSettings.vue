@@ -27,7 +27,7 @@
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
             __(
-              "Skips automated ticket e-mails. No creation, update, or notification e-mails will be sent."
+              "Disables all email notifications for the ticket - including creation, updates, and alerts."
             )
           }}</span>
         </div>
@@ -43,8 +43,9 @@
 </template>
 
 <script setup lang="ts">
+import { HDSettingsSymbol } from "@/types";
 import { Switch } from "frappe-ui";
 import { inject } from "vue";
 
-const settingsData = inject<any>("settingsData");
+const settingsData = inject(HDSettingsSymbol);
 </script>
