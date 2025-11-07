@@ -167,7 +167,7 @@ function handleFieldUpdate(
   value: FieldValue,
   isCoreFieldUpdated = false
 ) {
-  if (ticket.value.doc[fieldname] === value) return;
+  if (ticket.value.doc[fieldname] == value) return;
   if (isCoreFieldUpdated) {
     const label = getField(fieldname)?.label || fieldname;
     notifyTicketUpdate(label, value as string);
