@@ -304,12 +304,7 @@ class HDTicket(Document):
         )
 
     def validate_feedback(self):
-        if (
-            self.feedback
-            or self.status_category != "Resolved"
-            or is_agent()
-            or not self.has_agent_replied
-        ):
+        if self.feedback or is_agent() or not self.has_agent_replied:
             return
 
         frappe.throw(
@@ -317,7 +312,7 @@ class HDTicket(Document):
         )
 
     def check_update_perms(self):
-        if self.is_new() or is_agent():
+        if self.is_new() or is_agent() or not self.via_customer_portal:
             return
         old_doc = self.get_doc_before_save()
         is_closed = old_doc.status == "Closed"
