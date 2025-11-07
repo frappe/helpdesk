@@ -44,12 +44,12 @@ import { Autocomplete, Link } from "@/components";
 import { Field, FieldValue } from "@/types";
 import {
   createResource,
+  DatePicker,
   DateTimePicker,
   dayjs,
   FormControl,
   Tooltip,
 } from "frappe-ui";
-import DatePicker from "frappe-ui/src/components/DatePicker/DatePicker.vue";
 import { computed, h } from "vue";
 
 interface P {
