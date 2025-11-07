@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-10-05 10:35+0000\n"
-"PO-Revision-Date: 2025-10-11 02:13\n"
+"POT-Creation-Date: 2025-10-26 10:35+0000\n"
+"PO-Revision-Date: 2025-10-29 08:39\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Esperanto\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +17,15 @@ msgstr ""
 "X-Crowdin-File: /[frappe.helpdesk] develop/helpdesk/locale/main.pot\n"
 "X-Crowdin-File-ID: 118\n"
 "Language: eo_UY\n"
+
+#: helpdesk/api/dashboard.py:231
+msgid "% SLA Fulfilled"
+msgstr "crwdns160518:0crwdne160518:0"
+
+#: helpdesk/api/dashboard.py:236
+#, python-format
+msgid "% of tickets created that were resolved within SLA"
+msgstr "crwdns160520:0crwdne160520:0"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
@@ -395,6 +404,38 @@ msgstr "crwdns157582:0crwdne157582:0"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Average Response Time"
 msgstr "crwdns157584:0crwdne157584:0"
+
+#: helpdesk/api/dashboard.py:682
+msgid "Average feedback rating per day is around {0} stars"
+msgstr "crwdns160522:0{0}crwdne160522:0"
+
+#: helpdesk/api/dashboard.py:606
+msgid "Average tickets per day is around {0}"
+msgstr "crwdns160524:0{0}crwdne160524:0"
+
+#: helpdesk/api/dashboard.py:387
+msgid "Avg. Feedback Rating"
+msgstr "crwdns160526:0crwdne160526:0"
+
+#: helpdesk/api/dashboard.py:283
+msgid "Avg. First Response"
+msgstr "crwdns160528:0crwdne160528:0"
+
+#: helpdesk/api/dashboard.py:337
+msgid "Avg. Resolution"
+msgstr "crwdns160530:0crwdne160530:0"
+
+#: helpdesk/api/dashboard.py:392
+msgid "Avg. feedback rating for the tickets resolved"
+msgstr "crwdns160532:0crwdne160532:0"
+
+#: helpdesk/api/dashboard.py:289
+msgid "Avg. time taken to first respond to a ticket"
+msgstr "crwdns160534:0crwdne160534:0"
+
+#: helpdesk/api/dashboard.py:343
+msgid "Avg. time taken to resolve a ticket"
+msgstr "crwdns160536:0crwdne160536:0"
 
 #. Label of the base_support_rotation (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -904,6 +945,10 @@ msgstr "crwdns157716:0crwdne157716:0"
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Feedback Rating"
 msgstr "crwdns157718:0crwdne157718:0"
+
+#: helpdesk/api/dashboard.py:688
+msgid "Feedback Trend"
+msgstr "crwdns160538:0crwdne160538:0"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:160
 msgid "Feedback email has been sent to the customer"
@@ -1565,6 +1610,10 @@ msgstr "crwdns159088:0crwdne159088:0"
 msgid "New Assignment Rule Name"
 msgstr "crwdns158466:0crwdne158466:0"
 
+#: helpdesk/api/dashboard.py:429
+msgid "No Team"
+msgstr "crwdns160540:0crwdne160540:0"
+
 #: desk/src/components/ticket-agent/AssignTo.vue:12
 msgid "No assignees"
 msgstr "crwdns159224:0crwdne159224:0"
@@ -1673,6 +1722,22 @@ msgstr "crwdns157954:0crwdne157954:0"
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Paused"
 msgstr "crwdns157956:0crwdne157956:0"
+
+#: helpdesk/api/dashboard.py:541
+msgid "Percentage of Total Tickets by Channel"
+msgstr "crwdns160542:0crwdne160542:0"
+
+#: helpdesk/api/dashboard.py:501
+msgid "Percentage of Total Tickets by Priority"
+msgstr "crwdns160544:0crwdne160544:0"
+
+#: helpdesk/api/dashboard.py:435
+msgid "Percentage of Total Tickets by Team"
+msgstr "crwdns160546:0crwdne160546:0"
+
+#: helpdesk/api/dashboard.py:468
+msgid "Percentage of Total Tickets by Type"
+msgstr "crwdns160548:0crwdne160548:0"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1804,8 +1869,13 @@ msgstr "crwdns158000:0crwdne158000:0"
 msgid "Rate Your Support Experience"
 msgstr "crwdns160190:0crwdne160190:0"
 
+#: helpdesk/api/dashboard.py:691
+msgid "Rated Tickets"
+msgstr "crwdns160550:0crwdne160550:0"
+
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
+#: helpdesk/api/dashboard.py:703
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
@@ -2036,6 +2106,10 @@ msgstr "crwdns159112:0crwdne159112:0"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA Status"
 msgstr "crwdns158076:0crwdne158076:0"
+
+#: helpdesk/api/dashboard.py:584 helpdesk/api/dashboard.py:619
+msgid "SLA_fulfilled"
+msgstr "crwdns160552:0crwdne160552:0"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2522,6 +2596,10 @@ msgstr "crwdns158206:0crwdne158206:0"
 msgid "Ticket Summary"
 msgstr "crwdns158208:0crwdne158208:0"
 
+#: helpdesk/api/dashboard.py:611
+msgid "Ticket Trend"
+msgstr "crwdns160554:0crwdne160554:0"
+
 #. Label of the ticket_type_section (Section Break) field in DocType 'HD
 #. Settings'
 #. Label of the ticket_type (Link) field in DocType 'HD Ticket'
@@ -2566,6 +2644,26 @@ msgstr "crwdns158222:0crwdne158222:0"
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
 msgid "Ticket-Search Analysis"
 msgstr "crwdns158224:0crwdne158224:0"
+
+#: helpdesk/api/dashboard.py:160 helpdesk/api/dashboard.py:614
+msgid "Tickets"
+msgstr "crwdns160556:0crwdne160556:0"
+
+#: helpdesk/api/dashboard.py:540
+msgid "Tickets by Channel"
+msgstr "crwdns160558:0crwdne160558:0"
+
+#: helpdesk/api/dashboard.py:500 helpdesk/api/dashboard.py:508
+msgid "Tickets by Priority"
+msgstr "crwdns160560:0crwdne160560:0"
+
+#: helpdesk/api/dashboard.py:434 helpdesk/api/dashboard.py:442
+msgid "Tickets by Team"
+msgstr "crwdns160562:0crwdne160562:0"
+
+#: helpdesk/api/dashboard.py:467 helpdesk/api/dashboard.py:475
+msgid "Tickets by Type"
+msgstr "crwdns160564:0crwdne160564:0"
 
 #: helpdesk/api/ticket.py:18
 msgid "Tickets can only be assigned to agents"
@@ -2622,6 +2720,22 @@ msgstr "crwdns158244:0crwdne158244:0"
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:126
 msgid "Total Ticket"
 msgstr "crwdns158246:0crwdne158246:0"
+
+#: helpdesk/api/dashboard.py:509
+msgid "Total Tickets by Priority"
+msgstr "crwdns160566:0crwdne160566:0"
+
+#: helpdesk/api/dashboard.py:443
+msgid "Total Tickets by Team"
+msgstr "crwdns160568:0crwdne160568:0"
+
+#: helpdesk/api/dashboard.py:476
+msgid "Total Tickets by Type"
+msgstr "crwdns160570:0crwdne160570:0"
+
+#: helpdesk/api/dashboard.py:165
+msgid "Total number of tickets created"
+msgstr "crwdns160572:0crwdne160572:0"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2791,7 +2905,7 @@ msgstr "crwdns158290:0crwdne158290:0"
 msgid "Yellow"
 msgstr "crwdns159154:0crwdne159154:0"
 
-#: helpdesk/api/dashboard.py:18
+#: helpdesk/api/dashboard.py:24
 msgid "You are not allowed to view this dashboard data."
 msgstr "crwdns158292:0crwdne158292:0"
 
@@ -2827,9 +2941,17 @@ msgstr "crwdns158304:0crwdne158304:0"
 msgid "back to email event list"
 msgstr "crwdns159156:0crwdne159156:0"
 
+#: helpdesk/api/dashboard.py:583
+msgid "closed"
+msgstr "crwdns160574:0crwdne160574:0"
+
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:46
 msgid "customize {0}"
 msgstr "crwdns159158:0{0}crwdne159158:0"
+
+#: helpdesk/api/dashboard.py:334
+msgid "days"
+msgstr "crwdns160576:0crwdne160576:0"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2848,6 +2970,10 @@ msgstr "crwdns159236:0crwdne159236:0"
 msgid "here"
 msgstr "crwdns159160:0crwdne159160:0"
 
+#: helpdesk/api/dashboard.py:280
+msgid "hrs"
+msgstr "crwdns160578:0crwdne160578:0"
+
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "kanban"
@@ -2858,10 +2984,26 @@ msgstr "crwdns158308:0crwdne158308:0"
 msgid "list"
 msgstr "crwdns158310:0crwdne158310:0"
 
+#: helpdesk/api/dashboard.py:582
+msgid "open"
+msgstr "crwdns160580:0crwdne160580:0"
+
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "purple"
 msgstr "crwdns159162:0crwdne159162:0"
+
+#: helpdesk/api/dashboard.py:642
+msgid "rated_tickets"
+msgstr "crwdns160582:0crwdne160582:0"
+
+#: helpdesk/api/dashboard.py:641
+msgid "rating"
+msgstr "crwdns160584:0crwdne160584:0"
+
+#: helpdesk/api/dashboard.py:384
+msgid "stars"
+msgstr "crwdns160586:0crwdne160586:0"
 
 #. Label of the synonym (Data) field in DocType 'HD Synonym'
 #: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json
