@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-11-02 10:35+0000\n"
-"PO-Revision-Date: 2025-11-08 13:45\n"
+"POT-Creation-Date: 2025-11-09 10:36+0000\n"
+"PO-Revision-Date: 2025-11-09 14:11\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -484,7 +484,7 @@ msgstr "Knapp"
 msgid "Call Details"
 msgstr "Samtal Information"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:604
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:599
 msgid "Can not send email. No sender email set up!"
 msgstr "Kan inte skicka e-post. Ingen avsändare e-postadress konfigurerad!"
 
@@ -559,7 +559,7 @@ msgstr "Stäng"
 msgid "Closed"
 msgstr "Stängd"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:321
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Stängda eller betygsatta ärenden kan bara uppdateras av handläggare"
 
@@ -634,11 +634,11 @@ msgstr "Innehåll "
 msgid "Content Type"
 msgstr "Innehållstyp"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:622
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:617
 msgid "Could not an email due to: {0}"
 msgstr "Kunde inte skicka e-post på grund av: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:780
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:775
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "Kunde inte skicka bekräftelse e-post på grund av: {0}"
 
@@ -2636,7 +2636,7 @@ msgstr "Ärende Typ"
 msgid "Ticket does not exist."
 msgstr "Ärende finns inte."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:316
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:311
 msgid "Ticket must be resolved with a feedback"
 msgstr "Ärende måste lösas med återkoppling"
 
@@ -2933,7 +2933,7 @@ msgstr "Du har inte behörighet att visa översikt panel data."
 msgid "You are not permitted to access this resource."
 msgstr "Du har inte behörighet att komma åt denna resurs."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:527
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:522
 msgid "You are not permitted to add a comment"
 msgstr "Du har inte behörighet att lägga till kommentar"
 
