@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-11-02 10:35+0000\n"
-"PO-Revision-Date: 2025-11-08 13:45\n"
+"POT-Creation-Date: 2025-11-09 10:36+0000\n"
+"PO-Revision-Date: 2025-11-09 14:11\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Cyrillic)\n"
 "MIME-Version: 1.0\n"
@@ -484,7 +484,7 @@ msgstr "Дугме"
 msgid "Call Details"
 msgstr "Детаљи позива"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:604
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:599
 msgid "Can not send email. No sender email set up!"
 msgstr "Није могуће послати имејл. Није подешен имејл пошиљаоца!"
 
@@ -559,7 +559,7 @@ msgstr "Затвори"
 msgid "Closed"
 msgstr "Затворено"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:321
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Затворени или оцењени тикети не могу бити ажурирани од стране особа које нису агенти"
 
@@ -634,11 +634,11 @@ msgstr "Садржај"
 msgid "Content Type"
 msgstr "Врста садржаја"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:622
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:617
 msgid "Could not an email due to: {0}"
 msgstr "Није могуће послати имејл због: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:780
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:775
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "Није могуће послати имејл потврду пријема због: {0}"
 
@@ -2635,7 +2635,7 @@ msgstr "Врста тикета"
 msgid "Ticket does not exist."
 msgstr "Тикет не постоји."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:316
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:311
 msgid "Ticket must be resolved with a feedback"
 msgstr "Тикет мора бити решен са повратном информацијом"
 
@@ -2932,7 +2932,7 @@ msgstr "Није Вам дозвољено да видите податке са
 msgid "You are not permitted to access this resource."
 msgstr "Немате дозволу да приступите овом ресурсу."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:527
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:522
 msgid "You are not permitted to add a comment"
 msgstr "Није Вам дозвољено да додате коментар"
 
