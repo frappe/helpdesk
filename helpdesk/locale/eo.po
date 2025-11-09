@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-11-02 10:35+0000\n"
-"PO-Revision-Date: 2025-11-08 13:45\n"
+"POT-Creation-Date: 2025-11-09 10:36+0000\n"
+"PO-Revision-Date: 2025-11-09 14:12\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Esperanto\n"
 "MIME-Version: 1.0\n"
@@ -484,7 +484,7 @@ msgstr "crwdns157598:0crwdne157598:0"
 msgid "Call Details"
 msgstr "crwdns159214:0crwdne159214:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:604
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:599
 msgid "Can not send email. No sender email set up!"
 msgstr "crwdns157600:0crwdne157600:0"
 
@@ -559,7 +559,7 @@ msgstr "crwdns158448:0crwdne158448:0"
 msgid "Closed"
 msgstr "crwdns160186:0crwdne160186:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:321
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "crwdns157618:0crwdne157618:0"
 
@@ -634,11 +634,11 @@ msgstr "crwdns157638:0crwdne157638:0"
 msgid "Content Type"
 msgstr "crwdns157640:0crwdne157640:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:622
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:617
 msgid "Could not an email due to: {0}"
 msgstr "crwdns159052:0{0}crwdne159052:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:780
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:775
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "crwdns159054:0{0}crwdne159054:0"
 
@@ -2632,7 +2632,7 @@ msgstr "crwdns158210:0crwdne158210:0"
 msgid "Ticket does not exist."
 msgstr "crwdns158212:0crwdne158212:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:316
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:311
 msgid "Ticket must be resolved with a feedback"
 msgstr "crwdns158214:0crwdne158214:0"
 
@@ -2929,7 +2929,7 @@ msgstr "crwdns158292:0crwdne158292:0"
 msgid "You are not permitted to access this resource."
 msgstr "crwdns158294:0crwdne158294:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:527
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:522
 msgid "You are not permitted to add a comment"
 msgstr "crwdns158296:0crwdne158296:0"
 
