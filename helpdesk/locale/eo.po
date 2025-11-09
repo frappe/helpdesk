@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-10-26 10:35+0000\n"
-"PO-Revision-Date: 2025-10-29 08:39\n"
+"POT-Creation-Date: 2025-11-02 10:35+0000\n"
+"PO-Revision-Date: 2025-11-08 13:45\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Esperanto\n"
 "MIME-Version: 1.0\n"
@@ -289,7 +289,7 @@ msgstr "crwdns157554:0crwdne157554:0"
 msgid "Assign to"
 msgstr "crwdns157556:0crwdne157556:0"
 
-#: desk/src/components/ticket-agent/AssignToBody.vue:64
+#: desk/src/components/ticket-agent/AssignToBody.vue:65
 msgid "Assign to me"
 msgstr "crwdns159212:0crwdne159212:0"
 
@@ -334,7 +334,7 @@ msgstr "crwdns157566:0crwdne157566:0"
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
 msgstr "crwdns158428:0crwdne158428:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:278
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:283
 msgid "Assignment Schedule"
 msgstr "crwdns158430:0crwdne158430:0"
 
@@ -484,11 +484,11 @@ msgstr "crwdns157598:0crwdne157598:0"
 msgid "Call Details"
 msgstr "crwdns159214:0crwdne159214:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:607
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:604
 msgid "Can not send email. No sender email set up!"
 msgstr "crwdns157600:0crwdne157600:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:500
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:508
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr "crwdns157602:0crwdne157602:0"
 
@@ -525,7 +525,7 @@ msgstr "crwdns157610:0crwdne157610:0"
 msgid "Choose how tickets are distributed among selected assignees."
 msgstr "crwdns158438:0crwdne158438:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:282
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:287
 msgid "Choose the days of the week when this rule should be active."
 msgstr "crwdns158440:0crwdne158440:0"
 
@@ -533,7 +533,7 @@ msgstr "crwdns158440:0crwdne158440:0"
 msgid "Choose which tickets are affected by this assignment rule."
 msgstr "crwdns158442:0crwdne158442:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:209
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:211
 msgid "Choose which tickets are affected by this un-assignment rule."
 msgstr "crwdns158444:0crwdne158444:0"
 
@@ -559,7 +559,7 @@ msgstr "crwdns158448:0crwdne158448:0"
 msgid "Closed"
 msgstr "crwdns160186:0crwdne160186:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "crwdns157618:0crwdne157618:0"
 
@@ -634,15 +634,15 @@ msgstr "crwdns157638:0crwdne157638:0"
 msgid "Content Type"
 msgstr "crwdns157640:0crwdne157640:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:625
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:622
 msgid "Could not an email due to: {0}"
 msgstr "crwdns159052:0{0}crwdne159052:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:785
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:780
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "crwdns159054:0{0}crwdne159054:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:162
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:161
 msgid "Could not send feedback email,due to: {0}"
 msgstr "crwdns157642:0{0}crwdne157642:0"
 
@@ -890,7 +890,11 @@ msgstr "crwdns157696:0crwdne157696:0"
 msgid "Error moving article to category"
 msgstr "crwdns157698:0crwdne157698:0"
 
-#: helpdesk/overrides/email_account.py:69
+#: helpdesk/overrides/email_account.py:43
+msgid "Error processing email at index {0}, message: {1}"
+msgstr "crwdns160636:0{0}crwdnd160636:0{1}crwdne160636:0"
+
+#: helpdesk/overrides/email_account.py:90
 msgid "Error while connecting to email account {0}"
 msgstr "crwdns157700:0{0}crwdne157700:0"
 
@@ -950,7 +954,7 @@ msgstr "crwdns157718:0crwdne157718:0"
 msgid "Feedback Trend"
 msgstr "crwdns160538:0crwdne160538:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:160
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:159
 msgid "Feedback email has been sent to the customer"
 msgstr "crwdns157720:0crwdne157720:0"
 
@@ -1407,7 +1411,7 @@ msgstr "crwdns159218:0crwdne159218:0"
 msgid "Instantly send e-mail"
 msgstr "crwdns157878:0crwdne157878:0"
 
-#: helpdesk/utils.py:32
+#: helpdesk/utils.py:33
 msgid "Insufficient Permission for {0}"
 msgstr "crwdns157880:0{0}crwdne157880:0"
 
@@ -1504,7 +1508,7 @@ msgid "Last user assigned by this rule"
 msgstr "crwdns158462:0crwdne158462:0"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:145
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:217
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:219
 msgid "Learn about conditions"
 msgstr "crwdns158464:0crwdne158464:0"
 
@@ -1614,7 +1618,7 @@ msgstr "crwdns158466:0crwdne158466:0"
 msgid "No Team"
 msgstr "crwdns160540:0crwdne160540:0"
 
-#: desk/src/components/ticket-agent/AssignTo.vue:12
+#: desk/src/components/ticket-agent/AssignTo.vue:13
 msgid "No assignees"
 msgstr "crwdns159224:0crwdne159224:0"
 
@@ -1626,7 +1630,7 @@ msgstr "crwdns158468:0crwdne158468:0"
 msgid "No results found"
 msgstr "crwdns158470:0crwdne158470:0"
 
-#: helpdesk/utils.py:165
+#: helpdesk/utils.py:166
 msgid "Not Allowed"
 msgstr "crwdns157934:0crwdne157934:0"
 
@@ -1642,7 +1646,7 @@ msgid "Notification Settings"
 msgstr "crwdns157938:0crwdne157938:0"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:232
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:234
 msgid "Old Condition"
 msgstr "crwdns158472:0crwdne158472:0"
 
@@ -1758,7 +1762,7 @@ msgstr "crwdns157960:0crwdne157960:0"
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
 msgstr "crwdns157962:0crwdne157962:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:318
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:326
 msgid "Please add {0} priority in {1} SLA"
 msgstr "crwdns157964:0{0}crwdnd157964:0{1}crwdne157964:0"
 
@@ -2159,7 +2163,7 @@ msgstr "crwdns160046:0crwdne160046:0"
 msgid "Search query must be at least 2 characters"
 msgstr "crwdns160048:0crwdne160048:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:157
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:165
 msgid "Select a Default Priority."
 msgstr "crwdns158090:0crwdne158090:0"
 
@@ -2203,7 +2207,7 @@ msgstr "crwdns158100:0{0}crwdnd158100:0{1}crwdne158100:0"
 msgid "Set Response Time for Priority {0} in row {1}."
 msgstr "crwdns158102:0{0}crwdnd158102:0{1}crwdne158102:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:124
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:123
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
 msgstr "crwdns158104:0{0}crwdnd158104:0{1}crwdnd158104:0{1}crwdne158104:0"
 
@@ -2289,7 +2293,7 @@ msgstr "crwdns158130:0crwdne158130:0"
 msgid "Start Time"
 msgstr "crwdns158132:0crwdne158132:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:99
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:98
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
 msgstr "crwdns158134:0{0}crwdne158134:0"
 
@@ -2484,9 +2488,21 @@ msgstr "crwdns158174:0crwdne158174:0"
 msgid "The 'Closed' status cannot be renamed."
 msgstr "crwdns159140:0crwdne159140:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:147
-msgid "The Condition '{0}' is invalid: {1}"
-msgstr "crwdns158176:0{0}crwdnd158176:0{1}crwdne158176:0"
+#: helpdesk/extends/assignment_rule.py:18
+msgid "The Assign Condition JSON '{0}' is invalid: </br> {1}"
+msgstr "crwdns160638:0{0}crwdnd160638:0{1}crwdne160638:0"
+
+#: helpdesk/extends/assignment_rule.py:26
+msgid "The Unassign Condition JSON '{0}' is invalid: </br> {1}"
+msgstr "crwdns160640:0{0}crwdnd160640:0{1}crwdne160640:0"
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:145
+msgid "The assignment condition '{0}' is invalid: {1}"
+msgstr "crwdns160642:0{0}crwdnd160642:0{1}crwdne160642:0"
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:152
+msgid "The assignment condition json '{0}' is invalid: {1}"
+msgstr "crwdns160644:0{0}crwdnd160644:0{1}crwdne160644:0"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:54
 msgid "The holiday on {0} is not between From Date and To Date"
@@ -2616,7 +2632,7 @@ msgstr "crwdns158210:0crwdne158210:0"
 msgid "Ticket does not exist."
 msgstr "crwdns158212:0crwdne158212:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:318
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:316
 msgid "Ticket must be resolved with a feedback"
 msgstr "crwdns158214:0crwdne158214:0"
 
@@ -2636,7 +2652,7 @@ msgstr "crwdns158220:0crwdne158220:0"
 
 #. Label of the is_ticket_type_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:295
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:293
 msgid "Ticket type is mandatory"
 msgstr "crwdns158222:0crwdne158222:0"
 
@@ -2757,7 +2773,7 @@ msgstr "crwdns158250:0crwdne158250:0"
 msgid "URL/Method"
 msgstr "crwdns158252:0crwdne158252:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:204
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:206
 msgid "Unassignment condition"
 msgstr "crwdns158478:0crwdne158478:0"
 
@@ -2879,7 +2895,7 @@ msgstr "crwdns158280:0crwdne158280:0"
 msgid "Workday"
 msgstr "crwdns158282:0crwdne158282:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:110
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:109
 msgid "Workday {0} has been repeated."
 msgstr "crwdns158284:0{0}crwdne158284:0"
 
@@ -2909,11 +2925,11 @@ msgstr "crwdns159154:0crwdne159154:0"
 msgid "You are not allowed to view this dashboard data."
 msgstr "crwdns158292:0crwdne158292:0"
 
-#: helpdesk/utils.py:164
+#: helpdesk/utils.py:165
 msgid "You are not permitted to access this resource."
 msgstr "crwdns158294:0crwdne158294:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:530
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:527
 msgid "You are not permitted to add a comment"
 msgstr "crwdns158296:0crwdne158296:0"
 
@@ -2921,7 +2937,7 @@ msgstr "crwdns158296:0crwdne158296:0"
 msgid "You can change the default calling medium from the settings"
 msgstr "crwdns159232:0crwdne159232:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:137
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:136
 msgid "You cannot disable the default SLA."
 msgstr "crwdns158298:0crwdne158298:0"
 
@@ -2933,7 +2949,7 @@ msgstr "crwdns158300:0crwdne158300:0"
 msgid "You have already provided feedback for this ticket."
 msgstr "crwdns158302:0crwdne158302:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:131
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:130
 msgid "You must set one SLA as Default. Please check the Default SLA option."
 msgstr "crwdns158304:0crwdne158304:0"
 
