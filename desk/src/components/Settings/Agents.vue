@@ -197,7 +197,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { Avatar, Button, call, FeatherIcon, toast } from "frappe-ui";
+import { Avatar, Button, call, Dropdown, FeatherIcon, toast } from "frappe-ui";
 import { h, onUnmounted } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import { activeFilter, useAgents } from "./agents";

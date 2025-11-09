@@ -71,6 +71,7 @@ import {
   toast,
   Dialog,
   Badge,
+  Dropdown,
 } from "frappe-ui";
 import { ref, inject } from "vue";
 import { slaActiveScreen } from "@/stores/sla";

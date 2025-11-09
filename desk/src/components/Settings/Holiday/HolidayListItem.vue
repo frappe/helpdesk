@@ -50,7 +50,7 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-import { Button, createResource, toast } from "frappe-ui";
+import { Button, createResource, Dropdown, toast } from "frappe-ui";
 import { inject, ref } from "vue";
 import { holidayListActiveScreen } from "@/stores/holidayList";
 import { ConfirmDelete } from "@/utils";

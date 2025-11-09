@@ -141,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { Input, toast } from "frappe-ui";
+import { Dropdown, Input, toast } from "frappe-ui";
 import { inject, markRaw, Ref, ref, watch } from "vue";
 import NewTeamModal from "../NewTeamModal.vue";
 import { ConfirmDelete } from "@/utils";
