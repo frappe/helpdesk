@@ -91,10 +91,14 @@ const apiOptions = createResource({
   url: props.field.url_method,
   auto: !!props.field.url_method,
   transform: (data) =>
-    data?.map((o) => ({
-      label: o,
-      value: o,
-    })) || [],
+    data?.map((o) =>
+      typeof o === "object" && o.label && o.value
+        ? o
+        : {
+            label: o?.toString(),
+            value: o,
+          }
+    ) || [],
 });
 
 const transValue = computed(() => {
