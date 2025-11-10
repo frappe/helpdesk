@@ -74,22 +74,24 @@ const apiOptions = createResource({
   auto: !!props.field.url_method,
   transform: (data) => {
     if (!data?.length) return [];
-    return data
-      .filter((o) => Boolean(o))
-      .map((o) => {
-        if (
-          typeof o === "object" &&
-          o.hasOwnProperty("label") &&
-          o.hasOwnProperty("value")
-        ) {
-          return o;
-        } else {
-          return {
-            label: o?.toString(),
-            value: o,
-          };
-        }
-      });
+    return (
+      data
+        .filter((o) => Boolean(o))
+        .map((o) => {
+          if (
+            typeof o === "object" &&
+            o.hasOwnProperty("label") &&
+            o.hasOwnProperty("value")
+          ) {
+            return o;
+          } else {
+            return {
+              label: o?.toString(),
+              value: o,
+            };
+          }
+        }) || []
+    );
   },
 });
 
