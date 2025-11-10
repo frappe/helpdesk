@@ -304,7 +304,12 @@ class HDTicket(Document):
         )
 
     def validate_feedback(self):
-        if self.feedback or is_agent() or not self.has_agent_replied:
+        if (
+            self.feedback_rating
+            or self.status_category != "Resolved"
+            or is_agent()
+            or not self.has_agent_replied
+        ):
             return
 
         frappe.throw(
