@@ -126,7 +126,7 @@
           <hr class="mt-2" />
           <div v-for="(agent, index) in agents.data" :key="agent.agent_name">
             <div class="flex items-center justify-between h-14 group rounded">
-              <div class="flex items-center space-x-3 w-4/5">
+              <div class="flex items-center space-x-3 grow">
                 <Avatar
                   :image="agent.user_image"
                   :label="agent.agent_name"
@@ -149,31 +149,33 @@
                   </div>
                 </div>
               </div>
-              <Dropdown
-                v-if="isManager"
-                class="w-1/5 flex justify-end items-center"
-                :options="getRoles(agent.name)"
-                :label="getUserRole(agent.name)"
-                :button="{
-                  label: getUserRole(agent.name),
-                  iconRight: 'chevron-down',
-                  iconLeft:
-                    getUserRole(agent.name) === 'Agent'
-                      ? 'user'
-                      : getUserRole(agent.name) === 'Manager'
-                      ? 'briefcase'
-                      : null,
-                }"
-                placement="right"
-              />
-              <Dropdown
-                :options="getOptions(agent)"
-                :key="agent"
-                class="ml-2"
-                placement="right"
-              >
-                <Button icon="more-horizontal" variant="ghost" />
-              </Dropdown>
+              <div class="flex items-center gap-2">
+                <Dropdown
+                  v-if="isManager"
+                  class="flex justify-end items-center"
+                  :options="getRoles(agent.name)"
+                  :label="getUserRole(agent.name)"
+                  :button="{
+                    label: getUserRole(agent.name),
+                    iconRight: 'chevron-down',
+                    iconLeft:
+                      getUserRole(agent.name) === 'Agent'
+                        ? 'user'
+                        : getUserRole(agent.name) === 'Manager'
+                        ? 'briefcase'
+                        : null,
+                  }"
+                  placement="right"
+                />
+                <Dropdown
+                  :options="getOptions(agent)"
+                  :key="agent"
+                  class="ml-2"
+                  placement="right"
+                >
+                  <Button icon="more-horizontal" variant="ghost" />
+                </Dropdown>
+              </div>
             </div>
             <hr v-if="index !== agents.data.length - 1" />
           </div>
