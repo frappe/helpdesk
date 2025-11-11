@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-09 10:36+0000\n"
-"PO-Revision-Date: 2025-11-09 14:11\n"
+"PO-Revision-Date: 2025-11-11 15:18\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -450,7 +450,7 @@ msgstr "Bas URL"
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:9
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:9
 msgid "Based On"
-msgstr "Baserad På"
+msgstr "Baserat På"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:34
 msgid "Based on your HR Policy, select your leave allocation period's end date"
@@ -892,7 +892,7 @@ msgstr "Fel vid flytt av artikel till kategori"
 
 #: helpdesk/overrides/email_account.py:43
 msgid "Error processing email at index {0}, message: {1}"
-msgstr ""
+msgstr "Fel vid bearbetning av e-post vid index {0}, meddelande: {1}"
 
 #: helpdesk/overrides/email_account.py:90
 msgid "Error while connecting to email account {0}"
@@ -1067,7 +1067,7 @@ msgstr "Grön"
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Group By"
-msgstr "Gruppera efter"
+msgstr "Gruppera Efter"
 
 #. Label of the group_by_field (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2494,19 +2494,19 @@ msgstr "\"Stängd\" status kan inte döpas om."
 
 #: helpdesk/extends/assignment_rule.py:18
 msgid "The Assign Condition JSON '{0}' is invalid: </br> {1}"
-msgstr ""
+msgstr "Tilldelningsvillkor JSON '{0}' är ogiltig: </br> {1}"
 
 #: helpdesk/extends/assignment_rule.py:26
 msgid "The Unassign Condition JSON '{0}' is invalid: </br> {1}"
-msgstr ""
+msgstr "Avtilldelningsvillkor JSON '{0}' är ogiltig: </br> {1}"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:145
 msgid "The assignment condition '{0}' is invalid: {1}"
-msgstr ""
+msgstr "Tilldelningsvillkor '{0}' är ogiltig: {1}"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:152
 msgid "The assignment condition json '{0}' is invalid: {1}"
-msgstr ""
+msgstr "Tilldelningsvillkor JSON '{0}' är ogiltig: {1}"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:54
 msgid "The holiday on {0} is not between From Date and To Date"
