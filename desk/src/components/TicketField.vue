@@ -41,7 +41,8 @@
 
 <script setup lang="ts">
 import { Autocomplete, Link } from "@/components";
-import { Field, FieldValue } from "@/types";
+import { APIOptions, Field, FieldValue } from "@/types";
+import { parseApiOptions } from "@/utils";
 import {
   createResource,
   DateTimePicker,
@@ -72,26 +73,8 @@ const emit = defineEmits<E>();
 const apiOptions = createResource({
   url: props.field.url_method,
   auto: !!props.field.url_method,
-  transform: (data) => {
-    if (!data?.length) return [];
-    return (
-      data
-        .filter((o) => Boolean(o))
-        .map((o) => {
-          if (
-            typeof o === "object" &&
-            o.hasOwnProperty("label") &&
-            o.hasOwnProperty("value")
-          ) {
-            return o;
-          } else {
-            return {
-              label: o?.toString(),
-              value: o,
-            };
-          }
-        }) || []
-    );
+  transform: (data: APIOptions) => {
+    return parseApiOptions(data);
   },
 });
 
