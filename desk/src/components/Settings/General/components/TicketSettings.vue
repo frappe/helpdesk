@@ -103,7 +103,7 @@
           <span class="text-p-sm text-ink-gray-6"
             >{{
               __(
-                "Anyone will be able to create tickets (without any permission). e.g. from webform."
+                "Anyone will be able to create tickets without any permission. e.g. from webform."
               )
             }}
           </span>
