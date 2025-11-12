@@ -20,7 +20,7 @@
           {{ __("No Holiday list found") }}
         </div>
         <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-          {{ __("Add your first Holiday list to get started.") }}
+          {{ __("Add one to get started.") }}
         </div>
       </div>
       <Button

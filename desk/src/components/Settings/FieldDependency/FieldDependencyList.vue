@@ -57,7 +57,7 @@
               {{ __("No field dependency found") }}
             </div>
             <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-              {{ __("Add your first field dependency to get started") }}
+              {{ __("Add one to get started") }}
             </div>
           </div>
           <Button

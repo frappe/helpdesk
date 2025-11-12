@@ -61,7 +61,7 @@ const props = defineProps<{
 const notifications: AtLeastOneNotifcation = [
   {
     name: "share_feedback",
-    label: __("Share Feedback"),
+    label: __("Share feedback"),
     description: __(
       "Sent to the user who has raised the ticket after the ticket is closed or resolved"
     ),
@@ -73,14 +73,14 @@ const notifications: AtLeastOneNotifcation = [
   },
   {
     name: "reply_to_agents",
-    label: __("Reply From Contact"),
+    label: __("Reply from contact"),
     description: __(
       "Sent to all of the assigned agents after a reply from one of the contacts"
     ),
   },
   {
     name: "reply_via_agent",
-    label: __("Reply From Agent"),
+    label: __("Reply from agent"),
     description: __(
       "Sent to all of the recipients associated with an agent's reply"
     ),

@@ -1,5 +1,5 @@
 <template>
-  <SettingsLayoutBase :description="__('Manage general settings of your app')">
+  <SettingsLayoutBase :description="__('Manage general settings of your app.')">
     <template #title>
       <div class="flex items-center gap-2">
         <h1 class="text-lg font-semibold text-ink-gray-8">
@@ -10,7 +10,7 @@
           theme="orange"
           size="sm"
           :label="__('Unsaved')"
-          v-if="isDirty || isLanguageChanged"
+          v-if="isDirty || isLanguageChanged || isWebsiteSettingsChanged"
         />
       </div>
     </template>
@@ -19,8 +19,12 @@
         :label="__('Save')"
         variant="solid"
         @click="saveSettings"
-        :loading="saveSettingsResource.loading || saveLanguageResource.loading"
-        :disabled="!isDirty && !isLanguageChanged"
+        :loading="
+          saveSettingsResource.loading ||
+          saveLanguageResource.loading ||
+          saveWebsiteSettingsResource.loading
+        "
+        :disabled="!isDirty && !isLanguageChanged && !isWebsiteSettingsChanged"
       />
     </template>
     <template #content>
@@ -31,17 +35,29 @@
         <LoadingIndicator class="w-4" />
       </div>
       <div v-else>
-        <div class="flex flex-col gap-1.5">
-          <FormLabel :label="__('Language')" />
-          <Link v-model="language" doctype="Language" class="w-full md:w-1/2" />
-        </div>
-        <hr class="my-8" />
         <Branding />
         <hr class="my-8" />
+        <TicketSettings />
+        <hr class="my-8" />
+        <WorkflowKnowledgebaseSettings />
+        <hr class="my-8" />
         <div>
-          <TicketSettings />
-          <hr class="my-8" />
-          <WorkflowKnowledgebaseSettings />
+          <div class="text-base font-semibold text-gray-900">
+            {{ __("User signup") }}
+          </div>
+          <div class="flex items-center justify-between mt-6">
+            <div class="flex flex-col gap-1">
+              <span class="text-base font-medium text-ink-gray-8">{{
+                __("Disable signup")
+              }}</span>
+              <span class="text-p-sm text-ink-gray-6">{{
+                __(
+                  "New users will have to be manually registered by system managers."
+                )
+              }}</span>
+            </div>
+            <Switch v-model="disableSignup" />
+          </div>
         </div>
       </div>
     </template>
@@ -53,8 +69,8 @@ import {
   Badge,
   Button,
   createResource,
-  FormLabel,
   LoadingIndicator,
+  Switch,
   toast,
 } from "frappe-ui";
 import Branding from "./components/Branding.vue";
@@ -64,7 +80,6 @@ import { computed, provide, ref, watch } from "vue";
 import { __ } from "@/translation";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import Link from "@/components/frappe-ui/Link.vue";
 import { HDSettingsSymbol } from "@/types";
 
 const isDirty = ref(false);
@@ -88,6 +103,7 @@ const settingsData = ref({
   skipEmailWorkflow: false,
 });
 const language = ref("");
+const disableSignup = ref(false);
 
 provide(HDSettingsSymbol, settingsData);
 
@@ -119,6 +135,13 @@ const systemSettingsResource = createResource({
 
 const isLanguageChanged = computed(() => {
   return language.value !== systemSettingsResource.data?.language;
+});
+
+const isWebsiteSettingsChanged = computed(() => {
+  return (
+    disableSignup.value !==
+    Boolean(websiteSettingsResource.data?.disable_signup)
+  );
 });
 
 const saveSettingsResource = createResource({
@@ -195,12 +218,45 @@ const saveLanguageResource = createResource({
   },
 });
 
+const websiteSettingsResource = createResource({
+  url: "frappe.client.get",
+  params: {
+    doctype: "Website Settings",
+    name: "Website Settings",
+    fields: ["disable_signup"],
+  },
+  auto: true,
+  onSuccess(data) {
+    disableSignup.value = Boolean(data.disable_signup);
+  },
+});
+
+const saveWebsiteSettingsResource = createResource({
+  url: "frappe.client.set_value",
+  makeParams() {
+    return {
+      doctype: "Website Settings",
+      name: "Website Settings",
+      fieldname: {
+        disable_signup: disableSignup.value,
+      },
+    };
+  },
+  onSuccess() {
+    toast.success(__("Website Settings updated"));
+    websiteSettingsResource.reload();
+  },
+});
+
 const saveSettings = async () => {
   if (isDirty.value) {
     await saveSettingsResource.submit();
   }
   if (isLanguageChanged.value) {
     await saveLanguageResource.submit();
+  }
+  if (isWebsiteSettingsChanged.value) {
+    await saveWebsiteSettingsResource.submit();
   }
 };
 

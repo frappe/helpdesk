@@ -81,7 +81,7 @@
               {{ __("Account info & security") }}
             </div>
             <Badge
-              v-if="isAccountInfoDirty"
+              v-if="isAccountInfoDirty || isLanguageChanged"
               :variant="'subtle'"
               :theme="'orange'"
               size="sm"
@@ -90,9 +90,9 @@
           </div>
           <Button
             :label="__('Save')"
-            @click="setAgent.submit()"
-            :loading="setAgent.loading"
-            :disabled="!isAccountInfoDirty"
+            @click="onSave"
+            :loading="setAgent.loading || saveLanguageResource.loading"
+            :disabled="!isAccountInfoDirty && !isLanguageChanged"
           />
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
@@ -115,13 +115,29 @@
               {{ __("Password") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">{{
-              __("Change your account password for security.")
+              __("Change your account password for security")
             }}</span>
           </div>
           <Button
             icon-left="lock"
             :label="__('Change Password')"
             @click="showChangePasswordModal = true"
+          />
+        </div>
+        <div class="flex items-center justify-between mt-6">
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-medium text-ink-gray-8">
+              {{ __("Language") }}
+            </span>
+            <span class="text-p-sm text-ink-gray-6">{{
+              __("Change language of the application")
+            }}</span>
+          </div>
+          <Link
+            :model-value="language"
+            @update:modelValue="language = $event || auth.language"
+            doctype="Language"
+            class="w-40"
           />
         </div>
       </div>
@@ -151,6 +167,7 @@ import CameraIcon from "~icons/lucide/camera";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import Link from "@/components/frappe-ui/Link.vue";
 
 const auth = useAuthStore();
 const profile = ref({
@@ -160,6 +177,11 @@ const profile = ref({
   lastName: auth.userLastName,
 });
 const showChangePasswordModal = ref(false);
+const language = ref(auth.language);
+
+const isLanguageChanged = computed(() => {
+  return language.value !== auth?.language;
+});
 
 const isAccountInfoDirty = computed(() => {
   const agentName = agentData.data?.agent_name?.split(" ");
@@ -212,6 +234,33 @@ const setAgent = createResource({
     toast.success(__("Profile updated"));
   },
 });
+
+const saveLanguageResource = createResource({
+  url: "frappe.client.set_value",
+  makeParams() {
+    return {
+      doctype: "User",
+      name: auth.userId,
+      fieldname: {
+        language: language.value,
+      },
+    };
+  },
+  onSuccess() {
+    toast.success(__("Language updated"));
+    window.location.reload();
+  },
+});
+
+const onSave = () => {
+  if (isAccountInfoDirty.value) {
+    setAgent.submit();
+  }
+
+  if (isLanguageChanged.value) {
+    saveLanguageResource.submit();
+  }
+};
 
 const updateImage = (file: string | null) => {
   profile.value.userImage = file;

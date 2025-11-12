@@ -116,7 +116,7 @@
             {{
               teamsSearchQuery.length
                 ? __("Change your search terms to find teams.")
-                : __("Add your first team to get started.")
+                : __("Add one to get started.")
             }}
           </div>
         </div>
