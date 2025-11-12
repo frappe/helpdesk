@@ -1,7 +1,7 @@
 <template>
   <SettingsLayoutBase
     :title="__('Profile')"
-    :description="__('Manage your profile information')"
+    :description="__('Manage your profile information.')"
   >
     <template #content>
       <div class="flex items-center justify-between gap-2">
@@ -115,7 +115,7 @@
               {{ __("Password") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">{{
-              __("Change your account password for security")
+              __("Change your account password for security.")
             }}</span>
           </div>
           <Button
@@ -130,7 +130,7 @@
               {{ __("Language") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">{{
-              __("Change language of the application")
+              __("Change language of the application.")
             }}</span>
           </div>
           <Link
