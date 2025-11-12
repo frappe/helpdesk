@@ -1,7 +1,7 @@
 <template>
   <SettingsLayoutBase
     :title="__('Invite Agents')"
-    :description="__('Easily invite new agents, managers, or admins')"
+    :description="__('Easily invite new agents, managers, or admins.')"
   >
     <template #content>
       <form @submit.prevent="onSubmit" class="flex flex-col gap-5">

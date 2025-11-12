@@ -11,7 +11,7 @@
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
             __(
-              "The feedback dialog will be shown, when a user tries to close a ticket from the customer portal"
+              "The feedback dialog will be shown, when a user tries to close a ticket from the customer portal."
             )
           }}</span>
         </div>
@@ -21,10 +21,12 @@
         <div class="flex items-center justify-between">
           <div class="flex flex-col gap-1">
             <span class="text-base font-medium text-ink-gray-8">{{
-              __("Restrict tickets by Team")
+              __("Restrict tickets by team")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">{{
-              __("Restrict tickets to be created by team members only.")
+              __(
+                "Restrict tickets to be viewed and managed by team members only."
+              )
             }}</span>
           </div>
           <Switch v-model="settingsData.restrictTicketsByAgentGroup" />
@@ -47,7 +49,7 @@
                 settingsData.doNotRestrictTicketsWithoutAnAgentGroup
               "
             />
-            <FormLabel :label="__('Do not restrict tickets without a Team')" />
+            <FormLabel :label="__('Do not restrict tickets without a team')" />
           </div>
           <div
             class="flex items-start sm:items-center gap-2"
@@ -59,7 +61,7 @@
           >
             <Checkbox :model-value="settingsData.assignWithinTeam" />
             <FormLabel
-              :label="__('Restrict agent assignment to selected Team')"
+              :label="__('Restrict agent assignment to selected team')"
             />
           </div>
         </div>
@@ -76,7 +78,7 @@
           }}</span>
         </div>
         <SelectDropdown
-          :options="autoUpdateticketStatusList"
+          :options="autoUpdateTicketStatusList"
           :model-value="settingsData.updateStatusTo"
           @update:model-value="
             (value) => {
@@ -98,9 +100,13 @@
           <span class="text-base font-medium text-ink-gray-8">{{
             __("Allow anyone to create tickets")
           }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
-            __("Anyone will able to create tickets, e.g. from webform")
-          }}</span>
+          <span class="text-p-sm text-ink-gray-6"
+            >{{
+              __(
+                "Anyone will be able to create tickets (without any permission). e.g. from webform."
+              )
+            }}
+          </span>
         </div>
         <Switch
           :model-value="settingsData.allowAnyoneToCreateTickets"
@@ -115,7 +121,7 @@
             __("Default ticket type")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
-            __("Select what type all tickets get by default")
+            __("Select what type all tickets get by default.")
           }}</span>
         </div>
         <SelectDropdown
@@ -128,15 +134,17 @@
       <div>
         <div class="flex flex-col gap-1">
           <span class="text-base font-medium text-ink-gray-8">{{
-            __("Automatically Close Tickets")
+            __("Automatically close stale tickets")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
-            __("Automatically close tickets after a certain condition is met.")
+            __(
+              "Auto-close tickets that remain in a status for the specified number of days."
+            )
           }}</span>
         </div>
         <div class="grid grid-cols-2 gap-4 mt-3">
           <div class="flex flex-col gap-1.5">
-            <FormLabel :label="__('Auto-close status')" />
+            <FormLabel :label="__('Ticket status')" />
             <SelectDropdown
               :options="autoCloseTicketStatusList"
               :model-value="settingsData.autoCloseStatus"
@@ -212,18 +220,14 @@ const ticketTypeList = createListResource({
   },
 });
 
-const autoUpdateticketStatusList = computed(() => {
+const autoUpdateTicketStatusList = computed(() => {
   return (
-    statuses.data
-      ?.filter(
-        (s: HDTicketStatus) => s.category === "Open" || s.category === "Paused"
-      )
-      .map((s: HDTicketStatus) => {
-        return {
-          label: s.label_agent,
-          value: s.label_agent,
-        };
-      }) || []
+    statuses.data?.map((s: HDTicketStatus) => {
+      return {
+        label: s.label_agent,
+        value: s.label_agent,
+      };
+    }) || []
   );
 });
 

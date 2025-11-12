@@ -34,7 +34,7 @@ export const tabs = computed(() => {
       hideLabel: true,
       items: [
         {
-          label: "Profile",
+          label: __("Profile"),
           icon: h(Avatar, {
             image: auth.userImage,
             label: auth.userName,
@@ -49,12 +49,12 @@ export const tabs = computed(() => {
       condition: () => auth.isAdmin || auth.isManager,
       items: [
         {
-          label: "Email Accounts",
+          label: __("Email Accounts"),
           icon: markRaw(LucideMail),
           component: markRaw(EmailConfig),
         },
         {
-          label: "Email Notifications",
+          label: __("Email Notifications"),
           icon: markRaw(LucideMailOpen),
           component: markRaw(EmailNotifications),
         },
@@ -65,43 +65,43 @@ export const tabs = computed(() => {
       condition: () => auth.isAdmin || auth.isManager,
       items: [
         {
-          label: "General",
+          label: __("General"),
           icon: markRaw(SettingsGear),
           component: markRaw(General),
           condition: () => auth.isAdmin,
         },
         {
-          label: "Agents",
+          label: __("Agents"),
           icon: markRaw(LucideUser),
           component: markRaw(Agents),
         },
         {
-          label: "Invite Agents",
+          label: __("Invite Agents"),
           icon: markRaw(LucideUserPlus),
           component: markRaw(InviteAgents),
         },
         {
-          label: "Teams",
+          label: __("Teams"),
           icon: markRaw(LucideUsers),
           component: markRaw(TeamsConfig),
         },
         {
-          label: "SLA Policies",
+          label: __("SLA Policies"),
           icon: markRaw(ShieldCheck),
           component: markRaw(Sla),
         },
         {
-          label: "Business Holidays",
+          label: __("Business Holidays"),
           icon: markRaw(Briefcase),
           component: markRaw(HolidayList),
         },
         {
-          label: "Assignment Rules",
+          label: __("Assignment Rules"),
           icon: markRaw(h(Settings, { class: "rotate-90" })),
           component: markRaw(AssignmentRules),
         },
         {
-          label: "Field Dependencies",
+          label: __("Field Dependencies"),
           icon: markRaw(FieldDependencyIcon),
           component: markRaw(FieldDependencyConfig),
         },
@@ -111,7 +111,7 @@ export const tabs = computed(() => {
       label: __("Integrations"),
       items: [
         {
-          label: "Telephony",
+          label: __("Telephony"),
           icon: markRaw(PhoneIcon),
           component: markRaw(Telephony),
         },
@@ -157,6 +157,6 @@ export const setActiveSettingsTab = (tabName: TabName) => {
       tabs.value
         .map((tab) => tab.items)
         .flat()
-        .find((tab) => tab.label == tabName)) ||
+        .find((tab) => tab.label == __(tabName))) ||
     tabs.value[0].items[0];
 };

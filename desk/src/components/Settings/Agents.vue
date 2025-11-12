@@ -102,7 +102,7 @@
               {{
                 activeFilter.length
                   ? __("Change your search terms or filters")
-                  : __("Add your first agent to get started.")
+                  : __("Add one to get started.")
               }}
             </div>
           </div>
