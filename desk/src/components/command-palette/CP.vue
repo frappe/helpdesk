@@ -8,7 +8,7 @@
               <LucideSearch class="h-4 w-4" />
             </div>
             <ComboboxInput
-              placeholder="Search or type # to go to ticket"
+              :placeholder="tSearchPlaceholder"
               class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-gray-800 placeholder:text-gray-500 focus:ring-0"
               autocomplete="off"
               @input="onInput"
@@ -83,6 +83,7 @@ const tKnowledgeBase = useTranslation("Knowledge Base");
 const tJumpTo = useTranslation("Jump to");
 const tSearch = useTranslation("Search");
 const tSearchFor = useTranslation("Search for");
+const tSearchPlaceholder = useTranslation("Search or type # to go to ticket");
 
 // Reactive data
 const show = defineModel();

@@ -41,13 +41,13 @@
       >
         <div class="flex flex-col gap-2">
           <span class="block text-sm text-gray-700">
-            Subject
+            {{ tSubject }}
             <span class="place-self-center text-red-500"> * </span>
           </span>
           <FormControl
             v-model="subject"
             type="text"
-            placeholder="A short description"
+            :placeholder="tShortDescription"
           />
         </div>
         <SearchArticles
@@ -60,20 +60,20 @@
             v-show="subject.length <= 2 && description.length === 0"
             class="text-p-sm text-gray-500 ml-1"
           >
-            Please enter a subject to continue
+            {{ tPleaseEnterSubject }}
           </h4>
           <TicketTextEditor
             v-show="subject.length > 2 || description.length > 0"
             ref="editor"
             v-model:attachments="attachments"
             v-model:content="description"
-            placeholder="Detailed explanation"
+            :placeholder="tDetailedExplanation"
             expand
             :uploadFunction="(file:any)=>uploadFunction(file)"
           >
             <template #bottom-right>
               <Button
-                label="Submit"
+                :label="tSubmit"
                 theme="gray"
                 variant="solid"
                 :disabled="
@@ -92,12 +92,12 @@
           ref="editor"
           v-model:attachments="attachments"
           v-model:content="description"
-          placeholder="Detailed explanation"
+          :placeholder="tDetailedExplanation"
           expand
         >
           <template #bottom-right>
             <Button
-              label="Submit"
+              :label="tSubmit"
               theme="gray"
               variant="solid"
               :disabled="
@@ -120,6 +120,7 @@ import {
   parseField,
   setupCustomizations,
 } from "@/composables/formCustomisation";
+import { useTranslation } from "@/composables/useTranslation";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
@@ -154,6 +155,15 @@ const router = useRouter();
 const { $dialog } = globalStore();
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager, userId: userID } = useAuthStore();
+
+// Reactive translations
+const tTickets = useTranslation("Tickets");
+const tNewTicket = useTranslation("New Ticket");
+const tSubject = useTranslation("Subject");
+const tShortDescription = useTranslation("A short description");
+const tPleaseEnterSubject = useTranslation("Please enter a subject to continue");
+const tDetailedExplanation = useTranslation("Detailed explanation");
+const tSubmit = useTranslation("Submit");
 
 const subject = ref("");
 const description = ref("");
@@ -275,13 +285,13 @@ function sanitize(html: string) {
 const breadcrumbs = computed(() => {
   const items = [
     {
-      label: "Tickets",
+      label: tTickets.value,
       route: {
         name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
       },
     },
     {
-      label: "New Ticket",
+      label: tNewTicket.value,
       route: {
         name: "TicketNew",
       },
@@ -291,7 +301,7 @@ const breadcrumbs = computed(() => {
 });
 
 usePageMeta(() => ({
-  title: "New Ticket",
+  title: tNewTicket.value,
 }));
 
 onMounted(() => {
