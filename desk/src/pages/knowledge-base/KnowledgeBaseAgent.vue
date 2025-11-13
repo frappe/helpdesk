@@ -6,7 +6,7 @@
       </template>
       <template #right-header>
         <Dropdown :options="headerOptions">
-          <Button label="Add new" variant="solid">
+          <Button label="Create" variant="solid">
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>

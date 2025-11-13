@@ -11,16 +11,18 @@
           class="w-full focus:outline-none outline-none border-inherit shadow-none"
           v-bind="$attrs"
           v-model="query"
-          @update:model-value="(e:string)=>{
-            if (e.length >= 3) {
-              open();
-            } else {
-            close();
+          @update:model-value="
+            (e: string) => {
+              if (e.length >= 3) {
+                open();
+              } else {
+                close();
+              }
             }
-          }"
+          "
         >
           <template #prefix>
-            <Icon icon="lucide:search" class="h-4 w-4 text-gray-500" />
+            <LucideSearch class="size-4 text-ink-gray-4" />
           </template>
         </FormControl>
       </div>
@@ -40,9 +42,8 @@
 
 <script setup lang="ts">
 import { FormControl, Popover } from "frappe-ui";
-import SearchArticles from "./SearchArticles.vue";
 import { ModelRef } from "vue";
-import { Icon } from "@iconify/vue";
+import SearchArticles from "./SearchArticles.vue";
 
 interface P {
   popoverClass: Array<string>;

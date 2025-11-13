@@ -29,7 +29,6 @@
 
 <script setup lang="ts">
 import { createResource, toast } from "frappe-ui";
-import { isEmpty } from "lodash";
 import { ref } from "vue";
 
 const emit = defineEmits(["create"]);
@@ -47,7 +46,7 @@ const newTeam = createResource({
     };
   },
   validate(params) {
-    if (isEmpty(params.doc.team_name)) return "Title is required";
+    if (!params.doc.team_name) return "Title is required";
   },
   auto: false,
   onSuccess() {

@@ -102,12 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  CommentBox,
-  EmailArea,
-  FadedScrollableDiv,
-  HistoryBox,
-} from "@/components";
+import { FadedScrollableDiv } from "@/components";
 import {
   ActivityIcon,
   CommentIcon,
@@ -120,7 +115,16 @@ import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
 import { isElementInViewport } from "@/utils";
 import { Avatar, FeatherIcon } from "frappe-ui";
-import { PropType, Ref, computed, h, inject, nextTick, watch } from "vue";
+import {
+  PropType,
+  Ref,
+  computed,
+  defineAsyncComponent,
+  h,
+  inject,
+  nextTick,
+  watch,
+} from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
 
@@ -140,6 +144,16 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["email:reply", "update"]);
+
+const CommentBox = defineAsyncComponent(
+  () => import("@/components/CommentBox.vue")
+);
+const EmailArea = defineAsyncComponent(
+  () => import("@/components/EmailArea.vue")
+);
+const HistoryBox = defineAsyncComponent(
+  () => import("@/components/HistoryBox.vue")
+);
 
 const route = useRoute();
 const router = useRouter();

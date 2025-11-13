@@ -153,12 +153,11 @@
 </template>
 
 <script setup lang="ts">
-import { getFormattedDate, htmlToText } from "@/utils";
-import { Popover } from "frappe-ui";
-import { useDatePicker } from "frappe-ui/src/components/DatePicker/useDatePicker";
-import { ref, watch } from "vue";
 import { holidayData } from "@/stores/holidayList";
+import { getFormattedDate, htmlToText } from "@/utils";
 import dayjs from "dayjs";
+import { Popover, useDatePicker } from "frappe-ui";
+import { ref, watch } from "vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 
 const dialog = ref({

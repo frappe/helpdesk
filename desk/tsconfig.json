@@ -4,13 +4,12 @@
 		"allowSyntheticDefaultImports": true,
 		"target": "es2022",
 		"module": "esnext",
-		"moduleResolution":"node",
+		"moduleResolution":"bundler",
 		"jsx": "preserve",
 		"paths": {
 			"@/*": ["./src/*"]
 		},
 		"types": [
-			"unplugin-icons/types/vue",
 			"vite/client"
 		],
 	},

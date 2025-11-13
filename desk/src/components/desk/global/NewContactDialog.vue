@@ -23,11 +23,14 @@
               type="text"
               @blur="field.action"
             />
-            <Autocomplete
-              v-else
+            <Link
+              v-else-if="field.type === 'Link'"
+              :doctype="field.doctype"
               v-model="state[field.value]"
               :options="customerResource.data"
-              @update:model-value="handleCustomerChange"
+              class="form-control flex-1"
+              placeholder="Link to a customer record"
+              :hide-me="true"
             />
             <ErrorMessage :message="error[field.error]" />
           </div>
@@ -51,7 +54,6 @@ import { useContactStore } from "@/stores/contact";
 import { computed, ref } from "vue";
 
 import {
-  Autocomplete,
   Dialog,
   ErrorMessage,
   Input,
@@ -98,6 +100,7 @@ interface FormField {
   error: string;
   type: string;
   required: boolean;
+  doctype?: string;
   action?: () => void;
 }
 
@@ -137,7 +140,8 @@ const formFields: FormField[] = [
     label: "Customer",
     value: "selectedCustomer",
     error: "customerValidationError",
-    type: "autocomplete",
+    type: "Link",
+    doctype: "HD Customer",
     required: false,
   },
 ];
@@ -256,5 +260,3 @@ function existingContactEmails(contacts) {
   return contacts.map((contact) => contact.email_id);
 }
 </script>
-
-<style></style>

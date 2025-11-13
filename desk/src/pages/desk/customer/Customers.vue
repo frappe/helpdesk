@@ -6,7 +6,7 @@
       </template>
       <template #right-header>
         <Button
-          label="New customer"
+          label="Create"
           theme="gray"
           variant="solid"
           @click="isDialogVisible = !isDialogVisible"

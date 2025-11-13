@@ -197,7 +197,7 @@ import {
   useOnboarding,
 } from "frappe-ui/frappe";
 
-import HelpIcon from "frappe-ui/frappe/Icons/HelpIcon.vue";
+import { HelpIcon } from "frappe-ui/icons";
 import { storeToRefs } from "pinia";
 import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -205,6 +205,9 @@ import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
 } from "./layoutSettings";
+
+import { saveLocal } from "frappe-ui/src/resources/local";
+console.log(saveLocal("test_key", "test_value"));
 
 import { useShortcut } from "@/composables/shortcuts";
 import { useTelephonyStore } from "@/stores/telephony";
