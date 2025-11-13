@@ -9,7 +9,7 @@
           <TextInput
             v-model="searchQuery"
             type="text"
-            :placeholder="'Search canned responses'"
+            :placeholder="tSearchCannedResponses"
             class="input input-bordered h-8 px-2 text-sm"
             style="min-width: 290px"
           >
@@ -18,7 +18,7 @@
             </template>
           </TextInput>
           <Button
-            label="Create"
+            :label="tCreate"
             theme="gray"
             variant="solid"
             @click="
@@ -54,7 +54,7 @@
             <Dropdown
               :options="[
                 {
-                  label: 'Delete',
+                  label: tDelete,
                   icon: 'trash-2',
                   onClick: () => deleteItem(cannedResponse.name),
                 },
@@ -94,7 +94,7 @@
       </div>
       <EmptyState
         v-else
-        title="No Canned Responses Found"
+        :title="tNoCannedResponsesFound"
         @emptyStateAction="showNewDialog = true"
       />
     </div>
@@ -130,6 +130,7 @@ import { CannedResponseModal } from "@/components/canned-response/";
 import { dayjs } from "@/dayjs";
 import { useUserStore } from "@/stores/user";
 import { dateFormat, dateTooltipFormat } from "@/utils";
+import { useTranslation } from "@/composables/useTranslation";
 import { watchDebounced } from "@vueuse/core";
 import {
   Breadcrumbs,
@@ -140,15 +141,22 @@ import {
   createListResource,
   usePageMeta,
 } from "frappe-ui";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 import EmptyState from "../components/EmptyState.vue";
 
 const { getUser } = useUserStore();
 
-const breadcrumbs = [
-  { label: "Canned Responses", route: { name: "CannedResponses" } },
-];
+// Reactive translations
+const tCannedResponses = useTranslation("Canned Responses");
+const tSearchCannedResponses = useTranslation("Search canned responses");
+const tCreate = useTranslation("Create");
+const tDelete = useTranslation("Delete");
+const tNoCannedResponsesFound = useTranslation("No Canned Responses Found");
+
+const breadcrumbs = computed(() => [
+  { label: tCannedResponses.value, route: { name: "CannedResponses" } },
+]);
 const route = useRoute();
 
 const title = ref(null);
@@ -200,7 +208,7 @@ async function deleteItem(name) {
 
 usePageMeta(() => {
   return {
-    title: "Canned Responses",
+    title: tCannedResponses.value,
   };
 });
 </script>

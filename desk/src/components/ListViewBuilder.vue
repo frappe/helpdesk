@@ -133,6 +133,7 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
+import { __, translationsLoaded } from "@/translation";
 import { View, ViewType } from "@/types";
 import { formatTimeShort, getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
@@ -306,7 +307,7 @@ const list = createResource({
   },
   onSuccess: (data) => {
     list.params = defaultParams;
-    columns.value = data.columns;
+    rawColumns.value = data.columns;
   },
 });
 
@@ -351,7 +352,21 @@ const rows = computed(() => {
   }
   return list.data?.data;
 });
-const columns = ref([]);
+
+// Store raw columns from API without translation
+const rawColumns = ref([]);
+
+// Computed columns with translated labels
+const columns = computed(() => {
+  // Create reactive dependency on translations
+  translationsLoaded.value;
+
+  // Translate each column label
+  return rawColumns.value.map(column => ({
+    ...column,
+    label: __(column.label)
+  }));
+});
 
 function getGroupedByRows(listRows, groupByField) {
   let groupedRows = [];
@@ -557,7 +572,7 @@ function updateColumns(obj) {
     handleFetchFromField(column);
     handleColumnConfig(column);
   });
-  columns.value = defaultParams.columns = isDefault ? "" : _columns;
+  rawColumns.value = defaultParams.columns = isDefault ? "" : _columns;
   defaultParams.rows = isDefault ? "" : rows;
   list.reload({ ...defaultParams });
 }

@@ -38,7 +38,7 @@
             </div>
             <div class="flex items-center gap-2">
               <Button
-                label="Discard"
+                :label="tDiscard"
                 theme="gray"
                 variant="subtle"
                 @click="
@@ -58,6 +58,7 @@
 </template>
 <script setup lang="ts">
 import { UserAvatar } from "@/components";
+import { useTranslation } from "@/composables/useTranslation";
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import { getFontFamily } from "@/utils";
@@ -79,6 +80,9 @@ const props = withDefaults(defineProps<P>(), {
 });
 
 defineEmits<E>();
+
+// Reactive translations
+const tDiscard = useTranslation("Discard");
 
 const e = ref(null);
 const editor = computed(() => e.value.editor);

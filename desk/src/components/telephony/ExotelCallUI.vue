@@ -69,7 +69,7 @@
           />
           <div class="flex flex-col items-center justify-center gap-1">
             <div class="text-xl font-medium">
-              {{ contact?.full_name ?? "Unknown" }}
+              {{ contact?.full_name ?? tUnknown }}
             </div>
             <div class="text-sm text-ink-gray-5">
               {{ contact?.mobile_no || contact?.phone }}
@@ -97,8 +97,18 @@ import { inject, onBeforeUnmount, ref, watch } from "vue";
 import CountUpTimer from "./CountUpTimer.vue";
 import AvatarIcon from "./Icons/AvatarIcon.vue";
 import MinimizeIcon from "./Icons/MinimizeIcon.vue";
+import { useTranslation } from "@/composables/useTranslation";
 
 const telephonyStore = useTelephonyStore();
+
+// Reactive translations
+const tCalling = useTranslation("Calling...");
+const tRinging = useTranslation("Ringing...");
+const tInProgress = useTranslation("In progress");
+const tNoAnswer = useTranslation("No answer");
+const tCallEnded = useTranslation("Call ended");
+const tIncomingCall = useTranslation("Incoming call");
+const tUnknown = useTranslation("Unknown");
 
 const onCallStarted = inject<() => void>("onCallStarted");
 const onCallEnded = inject<() => void>("onCallEnded");
@@ -160,7 +170,7 @@ function makeOutgoingCall(number) {
   })
     .then((callDetails) => {
       callData.value = callDetails;
-      callStatus.value = "Calling...";
+      callStatus.value = tCalling.value;
       showCallPopup.value = true;
       showSmallCallPopup.value = false;
       onCallStarted && onCallStarted();
@@ -211,7 +221,7 @@ function updateStatus(data) {
     data["Legs[0][Status]"] == "in-progress" &&
     data["Legs[1][Status]"] == ""
   ) {
-    return "Ringing...";
+    return tRinging.value;
   } else if (
     data.EventType == "answered" &&
     data.Direction == "outbound-api" &&
@@ -220,7 +230,7 @@ function updateStatus(data) {
   ) {
     counterUp.value.start();
     onCallStarted && onCallStarted();
-    return "In progress";
+    return tInProgress.value;
   } else if (
     data.EventType == "terminal" &&
     data.Direction == "outbound-api" &&
@@ -232,7 +242,7 @@ function updateStatus(data) {
   ) {
     counterUp.value.stop();
     onCallFailed && onCallFailed();
-    return "No answer";
+    return tNoAnswer.value;
   } else if (
     data.EventType == "terminal" &&
     data.Direction == "outbound-api" &&
@@ -245,7 +255,7 @@ function updateStatus(data) {
     );
     closeCallPopup();
     onCallEnded && onCallEnded();
-    return "Call ended";
+    return tCallEnded.value;
   }
 
   // incoming call
@@ -256,7 +266,7 @@ function updateStatus(data) {
   ) {
     phoneNumber.value = data.From || data.CallFrom;
     counterUp.value.start();
-    return "Incoming call";
+    return tIncomingCall.value;
   } else if (
     data.Direction == "incoming" &&
     data.CallType == "incomplete" &&
@@ -264,7 +274,7 @@ function updateStatus(data) {
   ) {
     onCallFailed && onCallFailed();
     counterUp.value.stop();
-    return "No answer";
+    return tNoAnswer.value;
   } else if (
     data.Direction == "incoming" &&
     (data.CallType == "completed" || data.CallType == "client-hangup") &&
@@ -277,7 +287,7 @@ function updateStatus(data) {
     );
     closeCallPopup();
     counterUp.value.stop();
-    return "Call ended";
+    return tCallEnded.value;
   }
 }
 

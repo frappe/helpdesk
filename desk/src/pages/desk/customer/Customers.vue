@@ -2,11 +2,11 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Customers</div>
+        <div class="text-lg font-medium text-gray-900">{{ tCustomers }}</div>
       </template>
       <template #right-header>
         <Button
-          label="New customer"
+          :label="tNewCustomer"
           theme="gray"
           variant="solid"
           @click="isDialogVisible = !isDialogVisible"
@@ -40,15 +40,20 @@
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
+import { useTranslation } from "@/composables/useTranslation";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CustomerDialog from "./CustomerDialog.vue";
+
+// Reactive translations
+const tCustomers = useTranslation("Customers");
+const tNewCustomer = useTranslation("New customer");
+const tNoCustomersFound = useTranslation("No Customers Found");
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
 const selectedCustomer = ref(null);
 const listViewRef = ref(null);
-// const emptyMessage = "No Customers Found";
 
 function openCustomer(id: string) {
   selectedCustomer.value = id;
@@ -79,14 +84,14 @@ const options = computed(() => {
       },
     },
     emptyState: {
-      title: "No Customers Found",
+      title: tNoCustomersFound.value,
     },
   };
 });
 
 usePageMeta(() => {
   return {
-    title: "Customers",
+    title: tCustomers.value,
   };
 });
 </script>

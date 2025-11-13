@@ -2,11 +2,11 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Contacts</div>
+        <div class="text-lg font-medium text-gray-900">{{ tContacts }}</div>
       </template>
       <template #right-header>
         <Button
-          label="New contact"
+          :label="tNewContact"
           theme="gray"
           variant="solid"
           @click="showNewContactModal = !showNewContactModal"
@@ -40,10 +40,17 @@
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
 import { PhoneIcon } from "@/components/icons";
+import { useTranslation } from "@/composables/useTranslation";
 import { Avatar, toast, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import ContactDialog from "./ContactDialog.vue";
 import { showNewContactModal } from "./dialogState";
+
+// Reactive translations
+const tContacts = useTranslation("Contacts");
+const tNewContact = useTranslation("New contact");
+const tNoContactsFound = useTranslation("No Contacts Found");
+const tContactUpdated = useTranslation("Contact updated");
 
 const isContactDialogVisible = ref(false);
 const selectedContact = ref(null);
@@ -70,7 +77,7 @@ const options = computed(() => {
       },
     },
     emptyState: {
-      title: "No Contacts Found",
+      title: tNoContactsFound.value,
     },
   };
 });
@@ -86,13 +93,13 @@ function openContact(id: string): void {
 }
 
 function handleContactUpdated(): void {
-  toast.success("Contact updated");
+  toast.success(tContactUpdated.value);
   isContactDialogVisible.value = !isContactDialogVisible.value;
   listViewRef.value?.reload();
 }
 usePageMeta(() => {
   return {
-    title: "Contacts",
+    title: tContacts.value,
   };
 });
 </script>
