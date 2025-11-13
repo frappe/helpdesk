@@ -15,6 +15,8 @@
     <div
       class="flex flex-col gap-5 py-6 h-full flex-1 self-center overflow-auto mx-auto w-full max-w-4xl px-5"
     >
+      <!-- outside working hours alert -->
+      <OutsideHoursAlert />
       <!-- custom fields descriptions -->
       <div v-if="Boolean(template.data?.about)" class="">
         <div class="prose-f" v-html="sanitize(template.data.about)" />
@@ -140,6 +142,7 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SearchArticles from "../../components/SearchArticles.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
+import OutsideHoursAlert from "../../components/OutsideHoursAlert.vue";
 
 interface P {
   templateId?: string;

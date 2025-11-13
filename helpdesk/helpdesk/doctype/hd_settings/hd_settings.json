@@ -69,7 +69,22 @@
   "reply_email_to_agent_content",
   "reply_from_agent_section",
   "enable_reply_email_via_agent",
-  "reply_via_agent_email_content"
+  "reply_via_agent_email_content",
+  "work_tab",
+  "work_duration_section",
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "column_break_ydtb",
+  "work_start_time",
+  "work_end_time",
+  "notification_section",
+  "show_message_outside_working_hours",
+  "outside_hours_message"
  ],
  "fields": [
   {
@@ -449,12 +464,95 @@
    "link_filters": "[[\"HD Ticket Status\",\"category\",\"in\",[\"Paused\",\"Resolved\",null]]]",
    "mandatory_depends_on": "eval: doc.auto_close_tickets",
    "options": "HD Ticket Status"
+  },
+  {
+   "fieldname": "work_tab",
+   "fieldtype": "Tab Break",
+   "label": "Work Duration"
+  },
+  {
+   "fieldname": "work_duration_section",
+   "fieldtype": "Section Break",
+   "label": "Working days and hours"
+  },
+  {
+   "default": "0",
+   "fieldname": "sunday",
+   "fieldtype": "Check",
+   "label": "Sunday"
+  },
+  {
+   "default": "0",
+   "fieldname": "monday",
+   "fieldtype": "Check",
+   "label": "Monday"
+  },
+  {
+   "default": "0",
+   "fieldname": "tuesday",
+   "fieldtype": "Check",
+   "label": "Tuesday"
+  },
+  {
+   "default": "0",
+   "fieldname": "wednesday",
+   "fieldtype": "Check",
+   "label": "Wednesday"
+  },
+  {
+   "default": "0",
+   "fieldname": "thursday",
+   "fieldtype": "Check",
+   "label": "Thursday"
+  },
+  {
+   "default": "0",
+   "fieldname": "friday",
+   "fieldtype": "Check",
+   "label": "Friday"
+  },
+  {
+   "fieldname": "column_break_ydtb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "work_start_time",
+   "fieldtype": "Time",
+   "label": "Work start time"
+  },
+  {
+   "fieldname": "work_end_time",
+   "fieldtype": "Time",
+   "label": "Work end time"
+  },
+  {
+   "fieldname": "notification_section",
+   "fieldtype": "Section Break",
+   "label": "Notification"
+  },
+  {
+   "fieldname": "outside_hours_message",
+   "fieldtype": "Text",
+   "label": "Outside hours message"
+  },
+  {
+   "default": "0",
+   "fieldname": "saturday",
+   "fieldtype": "Check",
+   "label": "Saturday"
+  },
+  {
+   "default": "0",
+   "description": "Enable this to show a notification to users who create a ticket outside of work hours.\n\nYou must configure the 'Work Duration' section and set a message in 'Outside hours notification message' for this to work.",
+   "fieldname": "show_message_outside_working_hours",
+   "fieldtype": "Check",
+   "label": "Show message outside working hours"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-29 13:34:17.018321",
+ "modified": "2025-10-20 01:44:08.616238",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
