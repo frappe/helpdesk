@@ -51,7 +51,7 @@
           </template>
           <template #item="{ item }">
             <button
-              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-2"
+              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-3"
               @click="item.onClick"
             >
               <div class="flex items-center justify-between flex-1">
@@ -256,7 +256,7 @@ function RoleOption({ active, role, onClick, selected, icon = null }) {
       class: [
         active ? "bg-surface-gray-2" : "text-ink-gray-7",
 
-        "group flex w-full text-ink-gray-8 justify-between items-center rounded-md px-2 py-2 text-sm hover:bg-surface-gray-2",
+        "group flex w-full text-ink-gray-8 justify-between items-center rounded-md px-2 py-2 text-sm hover:bg-surface-gray-3",
       ],
       onClick: !selected ? onClick : null,
     },

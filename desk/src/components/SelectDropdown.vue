@@ -23,7 +23,7 @@
           <div
             v-for="option in options"
             :key="option.value"
-            class="p-2 cursor-pointer hover:bg-gray-50 text-base flex items-center justify-between rounded"
+            class="p-2 cursor-pointer hover:bg-surface-gray-3 text-base flex items-center justify-between rounded"
             @click="
               () => {
                 onChange(option.value);
