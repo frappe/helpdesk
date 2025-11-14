@@ -1,3 +1,4 @@
+import type { DropdownOption } from "@/types";
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import dayjs from "dayjs";
 import { FeatherIcon, call, toast, useFileUpload } from "frappe-ui";
@@ -574,5 +575,29 @@ export function isElementInViewport(el: HTMLElement) {
     rect.left >= 0 &&
     rect.bottom <= window.innerHeight &&
     rect.right <= window.innerWidth
+  );
+}
+
+export function parseApiOptions(
+  options: string[] | DropdownOption[]
+): DropdownOption[] | [] {
+  if (!options.length) return [];
+  return (
+    options
+      .filter((o) => Boolean(o))
+      .map((o) => {
+        if (
+          typeof o === "object" &&
+          o.hasOwnProperty("label") &&
+          o.hasOwnProperty("value")
+        ) {
+          return o;
+        } else {
+          return {
+            label: o?.toString(),
+            value: o as string,
+          };
+        }
+      }) || []
   );
 }

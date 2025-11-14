@@ -646,6 +646,13 @@ export interface Team {
   name: string;
 }
 
+export type APIOptions = DropdownOption[] | string[] | [];
+
+export type DropdownOption = {
+  label: string;
+  value: string | number;
+};
+
 // symbols
 export const TicketSymbol: InjectionKey<
   ComputedRef<DocumentResource<HDTicket>>
