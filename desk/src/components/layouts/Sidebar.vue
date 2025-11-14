@@ -222,7 +222,12 @@ import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
-import { setActiveSettingsTab } from "../Settings/settingsModal";
+import LucideKeyboard from "~icons/lucide/keyboard";
+
+import {
+  setActiveSettingsTab,
+  showSettingsModal,
+} from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
 
@@ -235,7 +240,6 @@ const device = useDevice();
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
-const showSettingsModal = ref(false);
 const showShortcutsModal = ref(false);
 const showCommandPalette = ref(false);
 
