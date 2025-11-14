@@ -26,13 +26,15 @@ import { HDTicketStatus } from "@/types/doctypes";
 const { statuses } = useTicketStatusStore();
 
 const openStatuses: ComputedRef<HDTicketStatus[]> = computed(() => {
-  return statuses.data
-    .filter((s: HDTicketStatus) => s.category === "Open")
-    .map((s: HDTicketStatus) => {
-      return {
-        label: s.label_agent,
-        value: s.label_agent,
-      };
-    });
+  return (
+    statuses?.data
+      ?.filter((s: HDTicketStatus) => s.category === "Open")
+      ?.map((s: HDTicketStatus) => {
+        return {
+          label: s.label_agent,
+          value: s.label_agent,
+        };
+      }) || []
+  );
 });
 </script>

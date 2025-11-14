@@ -20,7 +20,6 @@
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
-  "is_ticket_type_mandatory",
   "column_break_zxek",
   "feedback_section",
   "is_feedback_mandatory",
@@ -42,9 +41,11 @@
   "instantly_send_email",
   "column_break_aomm",
   "branding_tab",
-  "images_column",
-  "brand_logo",
   "column_break_fsjn",
+  "brand_name",
+  "brand_logo",
+  "favicon",
+  "images_column",
   "misc_tab",
   "setup_section",
   "setup_complete",
@@ -151,12 +152,6 @@
    "options": "HD Ticket Type"
   },
   {
-   "default": "0",
-   "fieldname": "is_ticket_type_mandatory",
-   "fieldtype": "Check",
-   "label": "Ticket type is mandatory"
-  },
-  {
    "fieldname": "column_break_zxek",
    "fieldtype": "Column Break"
   },
@@ -190,8 +185,7 @@
   },
   {
    "fieldname": "images_column",
-   "fieldtype": "Column Break",
-   "label": "Images"
+   "fieldtype": "Column Break"
   },
   {
    "description": "Image to be used in various places, including Login and Signup pages. An image with transparent background and 160 x 32 is preferred",
@@ -449,12 +443,23 @@
    "link_filters": "[[\"HD Ticket Status\",\"category\",\"in\",[\"Paused\",\"Resolved\",null]]]",
    "mandatory_depends_on": "eval: doc.auto_close_tickets",
    "options": "HD Ticket Status"
+  },
+  {
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "label": "Name"
+  },
+  {
+   "description": "Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO",
+   "fieldname": "favicon",
+   "fieldtype": "Attach Image",
+   "label": "Favicon"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-29 13:34:17.018321",
+ "modified": "2025-10-16 11:46:00.714066",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

@@ -2,11 +2,14 @@
   <div class="flex items-center justify-between">
     <div class="flex flex-col gap-1">
       <div class="text-lg font-semibold text-ink-gray-8">
-        Work schedule and holidays
+        {{ __("Work schedule and holidays") }}
       </div>
       <div class="text-p-sm text-ink-gray-6 max-w-lg">
-        Set working days, hours, and holidays by selecting a predefined schedule
-        or creating a new one.
+        {{
+          __(
+            "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one"
+          )
+        }}
       </div>
     </div>
     <NestedPopover>
@@ -19,13 +22,13 @@
       </template>
       <template #body>
         <div
-          class="my-2 p-1 min-w-40 rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+          class="my-2 min-w-40 rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
         >
-          <div>
+          <div class="max-h-52 overflow-y-auto p-1">
             <div
               v-for="holiday in holidayListData.data"
               :key="holiday.name"
-              class="flex items-center justify-between gap-4 rounded px-2 py-1.5 text-base text-ink-gray-8 cursor-pointer hover:bg-surface-gray-2"
+              class="flex items-center justify-between gap-4 rounded px-2 py-1.5 text-base text-ink-gray-8 cursor-pointer hover:bg-surface-gray-3"
               @click="slaData.holiday_list = holiday.name"
             >
               <div class="flex items-center gap-2 w-full">
@@ -44,17 +47,17 @@
                 />
               </div>
             </div>
-            <div
-              class="mt-1.5 flex flex-col gap-1 border-t border-outline-gray-modals pt-1.5"
-            >
-              <Button
-                class="w-full !justify-start !text-ink-gray-5"
-                variant="ghost"
-                label="Create new business holiday"
-                @click="createNewHolidayList()"
-                icon-left="plus"
-              />
-            </div>
+          </div>
+          <div
+            class="mt-1.5 flex flex-col gap-1 border-t border-outline-gray-modals pt-1.5 p-1"
+          >
+            <Button
+              class="w-full !justify-start !text-ink-gray-5"
+              variant="ghost"
+              :label="__('Create new business holiday')"
+              @click="createNewHolidayList()"
+              icon-left="plus"
+            />
           </div>
         </div>
       </template>

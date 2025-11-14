@@ -17,5 +17,13 @@ def sent_invites(emails, send_welcome_mail_to_user=True):
             if send_welcome_mail_to_user:
                 user.send_welcome_mail_to_user()
 
-        frappe.get_doc({"doctype": "HD Agent", "user": user.name}).insert()
+        frappe.get_doc(
+            {
+                "doctype": "HD Agent",
+                "ID": email,
+                "user": user.name,
+                "agent_name": user.full_name,
+                "user_image": user.user_image,
+            }
+        ).insert()
     return

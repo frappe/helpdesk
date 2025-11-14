@@ -4,7 +4,7 @@ import frappe
 @frappe.whitelist()
 def get_assignment_rules_list():
     assignment_rules = []
-    for docname in frappe.get_all("Assignment Rule"):
+    for docname in frappe.get_all("Assignment Rule", order_by="modified desc"):
         doc = frappe.get_value(
             "Assignment Rule",
             docname,

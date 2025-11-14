@@ -1,15 +1,17 @@
 <template>
   <div
-    class="flex justify-between items-center border-gray-200 p-2 pl-0 cursor-pointer"
+    class="flex justify-between items-center border-gray-200 p-2 cursor-pointer hover:bg-gray-50 rounded h-14"
   >
     <!-- avatar and name -->
     <div class="flex justify-between items-center gap-2">
       <EmailProviderIcon :logo="emailIcon[emailAccount.service]" />
       <div>
-        <p class="text-gray-700 font-semibold">
+        <p class="text-base text-ink-gray-7 font-medium">
           {{ emailAccount.email_account_name }}
         </p>
-        <div class="text-sm text-gray-500">{{ emailAccount.email_id }}</div>
+        <div class="text-sm w-full text-ink-gray-5 mt-1">
+          {{ emailAccount.email_id }}
+        </div>
       </div>
     </div>
     <div>
@@ -28,6 +30,7 @@ import { EmailAccount } from "@/types";
 import { emailIcon } from "./emailConfig";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import { computed } from "vue";
+import { __ } from "@/translation";
 
 interface P {
   emailAccount: EmailAccount;
@@ -44,16 +47,16 @@ const badgeTitleColor = computed(() => {
       props.emailAccount.enable_incoming && props.emailAccount.enable_outgoing
         ? "blue"
         : "gray";
-    return ["Default Sending and Inbox", color];
+    return [__("Default Sending and Inbox"), color];
   } else if (props.emailAccount.default_incoming) {
     const color = props.emailAccount.enable_incoming ? "blue" : "gray";
-    return ["Default Inbox", color];
+    return [__("Default Inbox"), color];
   } else if (props.emailAccount.default_outgoing) {
     const color = props.emailAccount.enable_outgoing ? "blue" : "gray";
-    return ["Default Sending", color];
+    return [__("Default Sending"), color];
   } else {
     const color = props.emailAccount.enable_incoming ? "blue" : "gray";
-    return ["Inbox", color];
+    return [__("Inbox"), color];
   }
 });
 </script>
