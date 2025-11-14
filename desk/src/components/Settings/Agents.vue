@@ -49,10 +49,9 @@
               </template>
             </Button>
           </template>
-          <template #item="{ item, active }">
+          <template #item="{ item }">
             <button
-              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base"
-              :class="{ 'bg-surface-gray-3': active }"
+              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-2"
               @click="item.onClick"
             >
               <div class="flex items-center justify-between flex-1">
