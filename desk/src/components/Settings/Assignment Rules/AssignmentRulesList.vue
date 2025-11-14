@@ -2,7 +2,7 @@
   <SettingsLayoutBase>
     <template #title>
       <h1 class="text-lg font-semibold text-ink-gray-8">
-        {{ __("Assignment rules") }}
+        {{ __("Assignment Rules") }}
       </h1>
     </template>
     <template #description>

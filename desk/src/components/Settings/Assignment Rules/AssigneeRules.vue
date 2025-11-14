@@ -47,7 +47,7 @@
               <div
                 v-for="option in ticketRoutingOptions"
                 :key="option.value"
-                class="p-2 cursor-pointer hover:bg-gray-50 text-sm flex items-center justify-between rounded"
+                class="p-2 cursor-pointer hover:bg-surface-gray-3 text-sm flex items-center justify-between rounded"
                 @click="
                   () => {
                     assignmentRuleData.rule = option.value;

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="text-base font-semibold text-gray-900">
-      {{ __("Ticket Settings") }}
+      {{ __("Ticket settings") }}
     </div>
     <div class="mt-6 flex flex-col gap-6">
       <div class="flex items-center justify-between">
