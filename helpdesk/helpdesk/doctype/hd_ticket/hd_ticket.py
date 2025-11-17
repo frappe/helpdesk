@@ -876,23 +876,55 @@ class HDTicket(Document):
         # be reopened.
         # handle re opening tickets for email
         if c.sent_or_received == "Received":
-            # check if agent has replied
+             # Check if sender is an agent (agent replying via email)
+            sender_is_agent = is_agent(c.sender)
 
-            if self.has_agent_replied:
-                self.status = self.ticket_reopen_status
+            if sender_is_agent:
+                # Agent replying via email - treat as helpdesk panel response
+                # Set first response date from communication timestamp if not set already
+                if not self.first_responded_on:
+                    # Use communication_date if available, otherwise use current time
+                    self.first_responded_on = c.communication_date or frappe.utils.now_datetime()
+                
+                # If ticket is not resolved, change status to "Replied" or configured status
+                if self.status_category != "Resolved":
+                    # TODO: remove this feature once we add automation feature
+                    if frappe.db.get_single_value("HD Settings", "auto_update_status"):
+                        self.status = frappe.db.get_single_value(
+                            "HD Settings", "update_status_to"
+                        )
+                    else:
+                        self.status = "Replied"
             else:
-                self.status = self.default_open_status
+                # Customer reply - reopen ticket
+                if self.has_agent_replied:
+                    self.status = self.ticket_reopen_status
+                else:
+                    self.status = self.default_open_status
         # If communication is outgoing, it must be a reply from agent
         if c.sent_or_received == "Sent":
-            # Set first response date if not set already
-            self.first_responded_on = (
-                self.first_responded_on or frappe.utils.now_datetime()
-            )
-
-            # TODO: remove this feature once we add automation feature
-            if frappe.db.get_single_value("HD Settings", "auto_update_status"):
-                self.status = frappe.db.get_single_value(
-                    "HD Settings", "update_status_to"
+            # Check if sender is an agent
+            sender_is_agent = is_agent(c.sender)
+            
+            if sender_is_agent:
+                # Set first response date from communication timestamp if not set already
+                if not self.first_responded_on:
+                    # Use communication_date if available, otherwise use current time
+                    self.first_responded_on = c.communication_date or frappe.utils.now_datetime()
+                
+                # If ticket is not resolved, change status to "Replied" or configured status
+                if self.status_category != "Resolved":
+                    # TODO: remove this feature once we add automation feature
+                    if frappe.db.get_single_value("HD Settings", "auto_update_status"):
+                        self.status = frappe.db.get_single_value(
+                            "HD Settings", "update_status_to"
+                        )
+                    else:
+                        self.status = "Replied"
+            else:
+                # Non-agent outgoing communication
+                self.first_responded_on = (
+                    self.first_responded_on or frappe.utils.now_datetime()
                 )
 
         # Fetch description from communication if not set already. This might not be needed

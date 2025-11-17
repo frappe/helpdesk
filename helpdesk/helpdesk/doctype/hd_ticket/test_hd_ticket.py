@@ -576,6 +576,101 @@ class TestHDTicket(IntegrationTestCase):
             ticket.save()
             self.assertEqual(ticket.resolution_time, 30 * 60)
 
+    def test_agent_reply_via_communication(self):
+        """
+        Test that when an agent replies via communication:
+        1. first_responded_on is set from communication timestamp
+        2. status changes to "Replied" if ticket is not resolved
+        3. Works for both Sent (panel) and Received (email) communications
+        """
+        # Create a ticket
+        ticket = frappe.get_doc(get_ticket_obj())
+        ticket.insert()
+        
+        # Ensure first_responded_on is not set
+        self.assertIsNone(ticket.first_responded_on)
+        
+        # Test 1: Agent replying via email (Received)
+        communication_email = frappe.get_doc({
+            "doctype": "Communication",
+            "communication_type": "Communication",
+            "communication_medium": "Email",
+            "sent_or_received": "Received",
+            "sender": agent,
+            "content": "Agent reply via email to ticket",
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket.name,
+            "subject": f"Re: {ticket.subject}",
+        })
+        communication_email.insert(ignore_permissions=True)
+        
+        # Reload ticket and verify
+        ticket.reload()
+        self.assertIsNotNone(ticket.first_responded_on)
+        self.assertEqual(ticket.status, "Replied")
+        
+        # Test 2: Agent replying via panel (Sent) - subsequent reply
+        ticket.reload()
+        ticket.status = "Open"
+        ticket.save()
+        
+        communication_panel = frappe.get_doc({
+            "doctype": "Communication",
+            "communication_type": "Communication",
+            "communication_medium": "Email",
+            "sent_or_received": "Sent",
+            "sender": agent,
+            "content": "Agent reply via panel",
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket.name,
+            "subject": f"Re: {ticket.subject}",
+        })
+        communication_panel.insert(ignore_permissions=True)
+        
+        ticket.reload()
+        self.assertEqual(ticket.status, "Replied")
+        
+        # Test 3: Customer reply after agent reply (Received from non-agent)
+        ticket.reload()
+        customer_communication = frappe.get_doc({
+            "doctype": "Communication",
+            "communication_type": "Communication",
+            "communication_medium": "Email",
+            "sent_or_received": "Received",
+            "sender": non_agent,
+            "content": "Customer reply",
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket.name,
+            "subject": f"Re: {ticket.subject}",
+        })
+        customer_communication.insert(ignore_permissions=True)
+        
+        ticket.reload()
+        # Status should change to reopen status for customer reply
+        self.assertNotEqual(ticket.status, "Replied")
+        
+        # Test 4: Resolved tickets don't change to Replied
+        ticket.reload()
+        ticket.status = "Resolved"
+        ticket.save()
+        
+        communication_resolved = frappe.get_doc({
+            "doctype": "Communication",
+            "communication_type": "Communication",
+            "communication_medium": "Email",
+            "sent_or_received": "Received",
+            "sender": agent,
+            "content": "Agent reply after resolved",
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket.name,
+            "subject": f"Re: {ticket.subject}",
+        })
+        communication_resolved.insert(ignore_permissions=True)
+        
+        ticket.reload()
+        # Status should remain Resolved, not change to Replied
+        self.assertEqual(ticket.status, "Resolved")
+
     def tearDown(self):
         remove_holidays()
         frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
