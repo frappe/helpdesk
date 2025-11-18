@@ -47,11 +47,12 @@ export function validateEmailWithZod(email: string) {
 
 export function dateFormat(date, format?: string) {
   const _format = format || "DD-MM-YYYY HH:mm:ss";
-  return useDateFormat(date, _format).value;
+  const _date = date ? dayjs.tz(date).toDate() : date;
+  return useDateFormat(_date, _format).value;
 }
 
 export function timeAgo(date) {
-  return useTimeAgo(date).value;
+  return useTimeAgo(dayjs.tz(date).toDate()).value;
 }
 
 export const dateTooltipFormat = "ddd, MMM D, YYYY h:mm A";
