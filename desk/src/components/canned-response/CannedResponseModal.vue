@@ -37,7 +37,7 @@
             editor-class="!prose-sm overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded border border-gray-300 bg-white hover:border-gray-400 hover:shadow-sm focus:bg-white focus:border-gray-500 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400 text-gray-800 transition-colors"
             :bubble-menu="true"
             :content="message"
-            :placeholder="'Your query has been resolved. Thank you for reaching out.'"
+            :placeholder="'Hi {\{ customer \}} Your {\{ ticket_no \}} query has been resolved. Thank you for reaching out.'"
             @change="(val) => (message = val)"
           />
         </div>
