@@ -265,8 +265,40 @@ const bcc = computed(() => (bccEmailsClone.value?.length ? true : false));
 const ccInput = ref(null);
 const bccInput = ref(null);
 
-function applyCannedResponse(template) {
-  newEmail.value = template.message;
+const ticketDoc = createResource({
+  url: "frappe.client.get",
+  makeParams: () => ({
+    doctype: "HD Ticket",
+    name: props.ticketId,
+  }),
+});
+
+async function replaceVariables(templateMessage) {
+  let message = templateMessage;
+
+  let ticketDetailsData = (await ticketDoc.submit()) || {};
+
+  const context = {
+    ticket_no: props.ticketId,
+    ...ticketDetailsData,
+  };
+  const regex = /\{\{\s*(\w+)\s*\}\}/g;
+
+  message = message.replace(regex, (match, varName) => {
+    const value = context[varName];
+    return value !== undefined && value !== null ? String(value) : match;
+  });
+
+  return message;
+}
+
+async function applyCannedResponse(template) {
+  let message = template.message;
+
+  if (message.includes("{{")) {
+    message = await replaceVariables(message);
+  }
+  newEmail.value = message;
   showCannedResponseSelectorModal.value = false;
 }
 
