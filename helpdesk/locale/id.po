@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-09 10:36+0000\n"
-"PO-Revision-Date: 2025-11-16 16:15\n"
+"PO-Revision-Date: 2025-11-20 17:45\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Indonesian\n"
 "MIME-Version: 1.0\n"
@@ -113,7 +113,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
-msgstr ""
+msgstr "Tambahkan Penerima"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -123,7 +123,7 @@ msgstr "Tambah Hari Libur Mingguan"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
-msgstr ""
+msgstr "Tambahkan ketentuan"
 
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
 msgid "Add a custom condition"
@@ -132,7 +132,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
 msgid "Add condition"
-msgstr ""
+msgstr "Tambahkan ketentuan"
 
 #. Label of the get_weekly_off_dates (Button) field in DocType 'HD Service
 #. Holiday List'
