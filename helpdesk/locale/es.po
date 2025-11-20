@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-09 10:36+0000\n"
-"PO-Revision-Date: 2025-11-16 16:15\n"
+"PO-Revision-Date: 2025-11-20 17:45\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -1960,7 +1960,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 #: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
 msgid "Request Key"
-msgstr ""
+msgstr "ID de la Solicitud"
 
 #. Label of the required (Check) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
@@ -2456,7 +2456,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Teal"
-msgstr ""
+msgstr "Turquesa"
 
 #. Label of the team (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_team (Link) field in DocType 'HD Escalation Rule'
