@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-09 10:36+0000\n"
-"PO-Revision-Date: 2025-11-20 17:45\n"
+"PO-Revision-Date: 2025-11-21 18:44\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Slovenian\n"
 "MIME-Version: 1.0\n"
@@ -29,25 +29,25 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
-msgstr ""
+msgstr "- Privzeto Stanje Zahtevnice<br>"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:116
 msgid "- Ticket Reopen Status<br>"
-msgstr ""
+msgstr "- Status ponovnega odprtja Zahtevnice<br>"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:92
 msgid "- {0} as Default Status<br>"
-msgstr ""
+msgstr "- {0} kot Privzeto Stanje<br>"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:94
 msgid "- {0} as Reopen Status<br>"
-msgstr ""
+msgstr "- {0} kot Stanje Ponovnega Odprtja<br>"
 
 #. Description of the 'Feedback' (Select) field in DocType 'HD Article
 #. Feedback'
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "0 is no feedback, 1 is Like, 2 is Dislike"
-msgstr ""
+msgstr "0 je brez ovratnih informacij, 1 je Všeč mi je, 2 je Neprijetno"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:117
 msgid "<br>Please update HD Settings to use a different status before disabling this status."
@@ -78,42 +78,42 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: helpdesk/api/knowledge_base.py:15
 msgid "Access denied"
-msgstr ""
+msgstr "Dostop zavrnjen"
 
 #. Label of the acknowledgement_section (Section Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:72
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Acknowledgement"
-msgstr ""
+msgstr "Potrditev"
 
 #. Label of the action (Data) field in DocType 'HD Ticket Activity'
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "Action"
-msgstr ""
+msgstr "Dejanje"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:22
 msgid "Action Required"
-msgstr ""
+msgstr "Zahtevano Dejanje"
 
 #. Description of the 'On click (Javascript)' (Code) field in DocType 'HD
 #. Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Action to perform when clicking the button. The doc will be available as `this`"
-msgstr ""
+msgstr "Dejanje, ki se izvede ob kliku na gumb. Dokument bo na voljo kot `this`"
 
 #: desk/src/components/Settings/Agents.vue:139
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:97
 msgid "Add Agents"
-msgstr ""
+msgstr "Dodaj Agente"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
-msgstr ""
+msgstr "Dodaj Dodeljevalca"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -154,7 +154,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Administrator"
-msgstr ""
+msgstr "Administrator"
 
 #. Name of a role
 #. Label of the to_agent (Link) field in DocType 'HD Escalation Rule'
@@ -181,12 +181,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Agent"
-msgstr ""
+msgstr "Agent"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Agent Configuration"
-msgstr ""
+msgstr "Konfiguracija Agenta"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -195,12 +195,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Agent Manager"
-msgstr ""
+msgstr "Upravitelj Agenta"
 
 #. Label of the agent_name (Data) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Agent Name"
-msgstr ""
+msgstr "Ime Agenta"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:39
 msgid "Agent settings"
@@ -225,24 +225,24 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "All"
-msgstr ""
+msgstr "Vsi"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Allow anyone to create tickets"
-msgstr ""
+msgstr "Omogočite vsakomur, da ustvari zahteve"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Amber"
-msgstr ""
+msgstr "Jantar"
 
 #. Label of the apply_sla_for_resolution (Check) field in DocType 'HD Service
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Apply SLA for Resolution Time"
-msgstr ""
+msgstr "Uporabi SLA za čas reševanja"
 
 #. Label of the apply_to (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -280,14 +280,14 @@ msgstr ""
 #. Label of the article (Link) field in DocType 'HD Article Feedback'
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "Article"
-msgstr ""
+msgstr "Članek"
 
 #. Label of the assign_to_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
 #: desk/src/components/ticket-agent/AssignToBody.vue:5
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Assign to"
-msgstr ""
+msgstr "Dodeli"
 
 #: desk/src/components/ticket-agent/AssignToBody.vue:65
 msgid "Assign to me"
@@ -296,7 +296,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:62
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:49
 msgid "Assigned To"
-msgstr ""
+msgstr "Dodeljeno"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
 msgid "Assignee Rules"
@@ -309,26 +309,26 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Assignment"
-msgstr ""
+msgstr "Naloga"
 
 #. Label of the filters_section (Section Break) field in DocType 'HD Service
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Assignment Conditions"
-msgstr ""
+msgstr "Pogoji Dodelitve"
 
 #. Label of the assignment_rule (Link) field in DocType 'HD Team'
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Assignment Rule"
-msgstr ""
+msgstr "Pravilo Dodelitve"
 
 #. Label of the assignment_rules_section (Section Break) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Assignment Rules"
-msgstr ""
+msgstr "Pravila Dodeljevanja"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:10
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
@@ -659,12 +659,12 @@ msgstr ""
 #. Label of the customer (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Customer"
-msgstr ""
+msgstr "Stranka"
 
 #. Label of the customer_name (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Customer Name"
-msgstr ""
+msgstr "Ime Stranke"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:7
 msgid "Customize your email notification preferences to stay informed about important updates and activities."
