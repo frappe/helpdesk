@@ -12,11 +12,16 @@ from helpdesk.utils import capture_event
 class HDArticle(Document):
     def validate(self):
         self.validate_article_category()
+        self.validate_published_content()
 
     def validate_article_category(self):
         if self.has_value_changed("category") and not self.is_new():
             old_category = self.get_doc_before_save().get("category")
             self.check_category_length(old_category)
+
+    def validate_published_content(self):
+        if self.status == "Published" and not self.content:
+            frappe.throw(_("Published articles must have content."))
 
     def before_insert(self):
         self.author = frappe.session.user
