@@ -1,9 +1,9 @@
 <template>
   <div
-    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200"
+    class="flex size-8 cursor-pointer items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
     :class="{ 'ring-2 ring-blue-500': selected }"
   >
-    <img :src="logo" class="h-6 w-6" />
+    <img :src="logo" class="size-4.5" />
   </div>
   <p v-if="serviceName" class="text-center text-p-xs text-gray-700">
     {{ serviceName }}

@@ -29,16 +29,17 @@ import { onMounted, ref } from "vue";
 import {
   assignmentRuleData,
   assignmentRulesErrors,
-} from "../../../stores/assignmentRules";
+} from "@/stores/assignmentRules";
 import AssignmentScheduleItem from "./AssignmentScheduleItem.vue";
+import { __ } from "@/translation";
 
 const columns = [
   {
-    label: "Days",
+    label: __("Days"),
     key: "day",
   },
   {
-    label: "Active",
+    label: __("Active"),
     key: "active",
   },
 ];
