@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-09 10:36+0000\n"
-"PO-Revision-Date: 2025-11-23 18:47\n"
+"PO-Revision-Date: 2025-11-24 18:53\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Slovenian\n"
 "MIME-Version: 1.0\n"
@@ -463,7 +463,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Black"
-msgstr ""
+msgstr "Črna"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -544,7 +544,7 @@ msgstr ""
 #. Label of the clear_table (Button) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Clear Table"
-msgstr ""
+msgstr "Počisti Tabelo"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:46
 msgid "Click on Add to Holidays. This will populate the holidays table with all the dates that fall on the selected weekly off. Repeat the process for populating the dates for all your weekly holidays"
@@ -1084,27 +1084,27 @@ msgstr "Gost"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "HD Action"
-msgstr ""
+msgstr "Akcija"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "HD Agent"
-msgstr ""
+msgstr "Agent"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "HD Article"
-msgstr ""
+msgstr "Članek"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 msgid "HD Article Category"
-msgstr ""
+msgstr "Kategorija Članka"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "HD Article Feedback"
-msgstr ""
+msgstr "Povratne informacije o Članku"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
@@ -1114,7 +1114,7 @@ msgstr ""
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "HD Customer"
-msgstr ""
+msgstr "Stranka"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
@@ -1139,17 +1139,17 @@ msgstr ""
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 msgid "HD Holiday"
-msgstr ""
+msgstr "Prazniki"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "HD Notification"
-msgstr ""
+msgstr "Obvestilo"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 msgid "HD Organization"
-msgstr ""
+msgstr "Organizacija"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_organization_contact_item/hd_organization_contact_item.json
@@ -1210,12 +1210,12 @@ msgstr ""
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "HD Team"
-msgstr ""
+msgstr "Ekipa"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_team_member/hd_team_member.json
 msgid "HD Team Member"
-msgstr ""
+msgstr "Član Ekipe"
 
 #. Name of a DocType
 #. Label of the ticket (Link) field in DocType 'HD Ticket Activity'
@@ -1268,7 +1268,7 @@ msgstr ""
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "HD View"
-msgstr ""
+msgstr "Prikaz"
 
 #. Label of the headings_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1277,23 +1277,23 @@ msgstr ""
 
 #: helpdesk/config/desktop.py:11
 msgid "HelpDesk"
-msgstr ""
+msgstr "Helpdesk"
 
 #. Name of a Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk"
-msgstr ""
+msgstr "Helpdesk"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Helpdesk Contact"
-msgstr ""
+msgstr "Kontakt"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk Reports"
-msgstr ""
+msgstr "Poročila"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:53
 msgid "Here, your weekly offs are pre-populated based on the previous selections. You can add more rows to also add public and national holidays individually."
@@ -1302,13 +1302,13 @@ msgstr ""
 #. Label of the cond_hidden (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Hide condition"
-msgstr ""
+msgstr "Skrij stanje"
 
 #. Label of the hide_from_customer (Check) field in DocType 'HD Ticket Template
 #. Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Hide from customer"
-msgstr ""
+msgstr "Skrij pred stranko"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -1475,13 +1475,13 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Key"
-msgstr ""
+msgstr "Ključ"
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Knowledge Base"
-msgstr ""
+msgstr "Baza Znanja"
 
 #. Label of the button_label (Data) field in DocType 'HD Action'
 #. Label of the label (Data) field in DocType 'HD Ticket Feedback Option'
@@ -1492,7 +1492,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Label"
-msgstr ""
+msgstr "Oznaka"
 
 #. Label of the label_customer (Data) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1501,7 +1501,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
-msgstr ""
+msgstr "Zadnji"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
 msgid "Last user assigned by this rule"
@@ -1516,7 +1516,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Link"
-msgstr ""
+msgstr "Povezava"
 
 #. Label of the link_options_sb (Section Break) field in DocType 'HD Support
 #. Search Source'
@@ -1529,11 +1529,11 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
-msgstr ""
+msgstr "Seznam"
 
 #: desk/src/components/CallArea.vue:72
 msgid "Listen"
-msgstr ""
+msgstr "Poslušaj"
 
 #. Label of the load_default_columns (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1543,7 +1543,7 @@ msgstr ""
 #. Label of the brand_logo (Attach Image) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Logo"
-msgstr ""
+msgstr "Logotip"
 
 #. Description of the 'Integer value' (Int) field in DocType 'HD Ticket
 #. Priority'
@@ -1554,7 +1554,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Mention"
-msgstr ""
+msgstr "Omemba"
 
 #. Label of the merged_with (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1566,17 +1566,17 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Message"
-msgstr ""
+msgstr "Sporočilo"
 
 #. Label of the meta_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Meta"
-msgstr ""
+msgstr "Meta"
 
 #. Label of the misc_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Misc"
-msgstr ""
+msgstr "Razno"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -1584,11 +1584,11 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Monday"
-msgstr ""
+msgstr "Ponedeljek"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:35
 msgid "Monthly"
-msgstr ""
+msgstr "Mesečno"
 
 #. Label of the category_name (Data) field in DocType 'HD Article Category'
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
@@ -1597,7 +1597,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Name"
-msgstr ""
+msgstr "Ime"
 
 #. Label of the name_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1616,11 +1616,11 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:429
 msgid "No Team"
-msgstr ""
+msgstr "Brez Ekipe"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:13
 msgid "No assignees"
-msgstr ""
+msgstr "Ni prejemnikov"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:14
 msgid "No items in the list"
@@ -1632,13 +1632,13 @@ msgstr ""
 
 #: helpdesk/utils.py:166
 msgid "Not Allowed"
-msgstr ""
+msgstr "Ni dovoljeno"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:250
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:270
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:363
 msgid "Not Specified"
-msgstr ""
+msgstr "Ni določeno"
 
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -1648,12 +1648,12 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:234
 msgid "Old Condition"
-msgstr ""
+msgstr "Staro stanje"
 
 #. Label of the on_hold_since (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "On Hold Since"
-msgstr ""
+msgstr "Na čakanju od"
 
 #: desk/src/components/Settings/EmailNotifications/ShareFeedback.vue:20
 msgid "On Ticket Status"
@@ -1930,7 +1930,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "References"
-msgstr ""
+msgstr "Reference"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:6
 msgid "Regenerate Search Index"
@@ -2015,7 +2015,7 @@ msgstr ""
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Resolved"
-msgstr ""
+msgstr "Rešeno"
 
 #. Label of the response_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
