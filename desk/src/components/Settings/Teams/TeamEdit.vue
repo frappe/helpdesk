@@ -58,7 +58,7 @@
           </div>
         </div>
         <hr class="mt-2" />
-        <div v-for="member in teamMembers" :key="member.name">
+        <div v-for="(member, idx) in teamMembers" :key="member.name">
           <div class="grid grid-cols-8 items-center gap-4 group">
             <div class="w-full p-2 pl-0 col-span-8">
               <AgentCard :agent="member" class="!py-0">
@@ -77,7 +77,7 @@
               </AgentCard>
             </div>
           </div>
-          <hr />
+          <hr v-if="member !== teamMembers.at(-1)" />
         </div>
       </div>
       <div
@@ -137,10 +137,15 @@
 </template>
 
 <script setup lang="ts">
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { useAgentStore } from "@/stores/agent";
+import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
 import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
+import { __ } from "@/translation";
+import { TeamListResourceSymbol } from "@/types";
+import { ConfirmDelete } from "@/utils";
 import {
-  Avatar,
   Button,
   createDocumentResource,
   createResource,
@@ -151,18 +156,12 @@ import {
 } from "frappe-ui";
 import { computed, h, inject, markRaw, onMounted, ref } from "vue";
 import LucideLock from "~icons/lucide/lock";
-import LucideUnlock from "~icons/lucide/unlock";
-import AgentCard from "../AgentCard.vue";
 import Settings from "~icons/lucide/settings-2";
-import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
-import { setActiveSettingsTab } from "../settingsModal";
+import LucideUnlock from "~icons/lucide/unlock";
 import UserIcon from "~icons/lucide/user";
-import { ConfirmDelete } from "@/utils";
-import { __ } from "@/translation";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { useAgentStore } from "@/stores/agent";
+import AgentCard from "../AgentCard.vue";
+import { setActiveSettingsTab } from "../settingsModal";
 import AgentSelector from "./components/AgentSelector.vue";
-import { TeamListResourceSymbol } from "@/types";
 
 const props = defineProps<{
   teamName: string;
