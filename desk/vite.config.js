@@ -95,5 +95,6 @@ export default defineConfig({
       "lowlight",
       "interactjs",
     ],
+    exclude: ["frappe-ui"],
   },
 });
