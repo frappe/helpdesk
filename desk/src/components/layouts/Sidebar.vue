@@ -206,16 +206,6 @@ import {
   customerPortalSidebarOptions,
 } from "./layoutSettings";
 
-// Unavailable:
-// ImageExtension,ConfirmDialog
-
-// ### getCommonSiteConfig
-// this should not be part of src/index.ts since it is a nodejs utility and not for the browser.
-// we should probably put it in vite/index.ts
-
-import { saveLocal } from "frappe-ui";
-console.log(saveLocal("test_key", "test_value"));
-
 import { useShortcut } from "@/composables/shortcuts";
 import { useTelephonyStore } from "@/stores/telephony";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
