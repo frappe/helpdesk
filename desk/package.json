@@ -18,7 +18,7 @@
     "@vueuse/core": "^13.8.0",
     "@vueuse/integrations": "^13.8.0",
     "dayjs": "^1.11.7",
-    "frappe-ui": "github:frappe/frappe-ui#6c769c13e7a2c8a53e7b0dcae53623fa51159665",
+    "frappe-ui": "0.1.220",
     "gemoji": "^8.1.0",
     "mime": "^3.0.0",
     "pinia": "^2.0.33",
