@@ -15,11 +15,6 @@
           :label="currentView.label"
         >
           <template #prefix>
-            <!-- <Icon
-              :icon="currentView.icon"
-              class="h-4"
-              v-if="typeof currentView.icon == 'string'"
-            /> -->
             <component
               :is="currentView.icon"
               class="h-4 flex items-center justify-center"

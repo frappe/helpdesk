@@ -2,18 +2,11 @@ import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import frappeui from "frappe-ui/vite";
 import path from "path";
-// import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
-    // visualizer({
-    //   filename: "stats.html", // output file name
-    //   open: true, // automatically open the report in your browser
-    //   gzipSize: true, // show gzip sizes
-    //   brotliSize: true, // show brotli sizes
-    // }),
     frappeui({
       frappeProxy: true,
       lucideIcons: true,
