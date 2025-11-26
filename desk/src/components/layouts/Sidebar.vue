@@ -197,7 +197,7 @@ import {
   useOnboarding,
 } from "frappe-ui/frappe";
 
-import HelpIcon from "frappe-ui/frappe/Icons/HelpIcon.vue";
+import { HelpIcon } from "frappe-ui/icons";
 import { storeToRefs } from "pinia";
 import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";

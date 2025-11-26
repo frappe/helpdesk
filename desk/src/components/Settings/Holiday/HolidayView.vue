@@ -237,7 +237,7 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { slaActiveScreen } from "@/stores/sla";
 import { getFormattedDate, htmlToText } from "@/utils";
 import dayjs from "dayjs";
-import FormLabel from "frappe-ui/src/components/FormLabel.vue";
+import { FormLabel } from "frappe-ui";
 import {
   disableSettingModalOutsideClick,
   setActiveSettingsTab,
