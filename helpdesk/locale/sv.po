@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-09 10:36+0000\n"
-"PO-Revision-Date: 2025-11-11 15:18\n"
+"PO-Revision-Date: 2025-11-16 16:15\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -880,7 +880,7 @@ msgstr "Slut Datum"
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "End Time"
-msgstr "Slut Tid"
+msgstr "Slut Tid "
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:22
 msgid "Enter a name for this HD Service Holiday List."
@@ -919,7 +919,7 @@ msgstr "Misslyckad"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback"
-msgstr "Återkoppling"
+msgstr "Återkoppling "
 
 #. Label of the feedback_extra (Small Text) field in DocType 'HD Email
 #. Feedback'
@@ -1332,7 +1332,7 @@ msgstr "Helg Lista Namn"
 #. Label of the holidays (Table) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Holidays"
-msgstr "Helg Dagar"
+msgstr "Helger"
 
 #. Label of the ip_address (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
@@ -2735,7 +2735,7 @@ msgstr "Totalt Parkerad Tid"
 #. Label of the total_holidays (Int) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Total Holidays"
-msgstr "Totalt Helg Dagar"
+msgstr "Totalt Antal Helger"
 
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:126
 msgid "Total Ticket"
@@ -2770,7 +2770,7 @@ msgstr "Tisdag"
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Type"
-msgstr "Typ"
+msgstr "Typ "
 
 #. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json

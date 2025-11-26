@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-09 10:36+0000\n"
-"PO-Revision-Date: 2025-11-10 14:29\n"
+"PO-Revision-Date: 2025-11-24 18:53\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -225,7 +225,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "All"
-msgstr ""
+msgstr "Tous"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
@@ -263,7 +263,7 @@ msgstr ""
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Archived"
-msgstr "Archivé"
+msgstr ""
 
 #: desk/src/components/Settings/SettingsModal.vue:52
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
@@ -590,7 +590,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Condition"
-msgstr "Conditions"
+msgstr ""
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:42
 msgid "Configure your agent’s telephony details."
@@ -1020,7 +1020,7 @@ msgstr "Formulaire"
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Friday"
-msgstr "Vendredi"
+msgstr ""
 
 #. Label of the user_from (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -1332,7 +1332,7 @@ msgstr "Nom de la Liste de Vacances"
 #. Label of the holidays (Table) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Holidays"
-msgstr "Jours Fériés"
+msgstr ""
 
 #. Label of the ip_address (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
@@ -1584,7 +1584,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Monday"
-msgstr "Lundi"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:35
 msgid "Monthly"
@@ -1883,7 +1883,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
-msgstr "Évaluation"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
@@ -2121,7 +2121,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Saturday"
-msgstr "Samedi"
+msgstr ""
 
 #. Button label of the email-feedback Web Form
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:42
@@ -2253,7 +2253,7 @@ msgstr "DocType source"
 #. Label of the source_name (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Source Name"
-msgstr "Nom de la Source"
+msgstr ""
 
 #. Label of the source_type (Select) field in DocType 'HD Support Search
 #. Source'
@@ -2291,7 +2291,7 @@ msgstr ""
 #. Label of the start_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "Start Time"
-msgstr "Heure de Début"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:98
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
@@ -2380,7 +2380,7 @@ msgstr "Résumé"
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Sunday"
-msgstr "Dimanche"
+msgstr ""
 
 #. Name of a report
 #: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.json
@@ -2482,7 +2482,7 @@ msgstr ""
 #. Label of the template_name (Data) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Template Name"
-msgstr "Nom du Modèle"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:12
 msgid "The 'Closed' status cannot be renamed."
@@ -2547,7 +2547,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Thursday"
-msgstr "Jeudi"
+msgstr ""
 
 #. Label of the ticket (Link) field in DocType 'HD Email Feedback'
 #. Label of the reference_ticket (Link) field in DocType 'HD Notification'
@@ -2759,7 +2759,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Tuesday"
-msgstr "Mardi"
+msgstr ""
 
 #. Label of the notification_type (Select) field in DocType 'HD Notification'
 #. Label of the type (Select) field in DocType 'HD View'
@@ -2864,7 +2864,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Wednesday"
-msgstr "Mercredi"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:34
 msgid "Weekly"
