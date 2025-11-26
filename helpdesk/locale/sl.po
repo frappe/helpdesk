@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-11-09 10:36+0000\n"
-"PO-Revision-Date: 2025-11-25 18:52\n"
+"POT-Creation-Date: 2025-11-23 10:36+0000\n"
+"PO-Revision-Date: 2025-11-26 19:21\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Slovenian\n"
 "MIME-Version: 1.0\n"
@@ -484,7 +484,7 @@ msgstr ""
 msgid "Call Details"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:599
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:604
 msgid "Can not send email. No sender email set up!"
 msgstr ""
 
@@ -559,7 +559,7 @@ msgstr ""
 msgid "Closed"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:321
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr ""
 
@@ -634,11 +634,11 @@ msgstr ""
 msgid "Content Type"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:617
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:622
 msgid "Could not an email due to: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:775
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:780
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr ""
 
@@ -1960,7 +1960,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 #: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
 msgid "Request Key"
-msgstr ""
+msgstr "Ključ Zahteva"
 
 #. Label of the required (Check) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
@@ -2632,7 +2632,7 @@ msgstr ""
 msgid "Ticket does not exist."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:311
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:316
 msgid "Ticket must be resolved with a feedback"
 msgstr ""
 
@@ -2929,7 +2929,7 @@ msgstr ""
 msgid "You are not permitted to access this resource."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:522
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:527
 msgid "You are not permitted to add a comment"
 msgstr ""
 
