@@ -31,7 +31,8 @@
   },
   "resolutions": {
     "cheerio": "1.0.0-rc.12",
-    "prosemirror-model": "1.25.1"
+    "prosemirror-model": "1.25.1",
+    "workbox-build": "6.4.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue-jsx": "^3.0.1",
