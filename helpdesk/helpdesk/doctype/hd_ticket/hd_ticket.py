@@ -308,8 +308,7 @@ class HDTicket(Document):
             "HD Settings", "HD Settings", "is_feedback_mandatory"
         )
         if (
-            self.feedback
-            or self.feedback_rating
+            self.feedback_rating
             or self.status_category != "Resolved"
             or is_agent()
             or not self.has_agent_replied
