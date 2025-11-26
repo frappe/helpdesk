@@ -4,12 +4,12 @@
   >
     <div
       @click="assignmentRulesActiveScreen = { screen: 'view', data: data }"
-      class="w-full py-3 pl-2 col-span-7"
+      class="w-full pl-2 col-span-7 h-14 flex flex-col justify-center"
     >
       <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
       <div
         v-if="data.description && data.description.length > 0"
-        class="text-sm w-full text-ink-gray-5 mt-1 whitespace-nowrap overflow-ellipsis overflow-hidden"
+        class="text-sm w-full text-ink-gray-5 mt-1 truncate"
       >
         {{ data.description }}
       </div>
@@ -69,11 +69,14 @@
 
 <script setup lang="ts">
 import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
+import { __ } from "@/translation";
+import { AssignmentRuleListResourceSymbol } from "@/types";
 import { ConfirmDelete } from "@/utils";
 import {
   Button,
   createResource,
   Dialog,
+  Dropdown,
   FormControl,
   Select,
   Switch,
@@ -81,7 +84,7 @@ import {
 } from "frappe-ui";
 import { inject, ref } from "vue";
 
-const assignmentRulesList = inject<any>("assignmentRulesList");
+const assignmentRulesListData = inject(AssignmentRuleListResourceSymbol);
 
 const props = defineProps({
   data: {
@@ -113,9 +116,9 @@ const deleteAssignmentRule = () => {
       name: props.data.name,
     },
     onSuccess: () => {
-      assignmentRulesList.reload();
+      assignmentRulesListData.reload();
       isConfirmingDelete.value = false;
-      toast.success("Assignment rule deleted");
+      toast.success(__("Assignment rule deleted"));
     },
     auto: true,
   });
@@ -123,7 +126,7 @@ const deleteAssignmentRule = () => {
 
 const dropdownOptions = [
   {
-    label: "Duplicate",
+    label: __("Duplicate"),
     onClick: () => {
       duplicateDialog.value = {
         show: true,
@@ -146,8 +149,8 @@ const duplicate = () => {
       new_name: duplicateDialog.value.name,
     },
     onSuccess: (data) => {
-      assignmentRulesList.reload();
-      toast.success("Assignment rule duplicated");
+      assignmentRulesListData.reload();
+      toast.success(__("Assignment rule duplicated"));
       duplicateDialog.value.show = false;
       duplicateDialog.value.name = "";
       assignmentRulesActiveScreen.value = {
@@ -167,7 +170,7 @@ const onPriorityChange = () => {
 
 const onToggle = () => {
   if (!props.data.users_exists && props.data.disabled) {
-    toast.error("Cannot enable rule without adding users in it");
+    toast.error(__("Cannot enable rule without adding users in it"));
     return;
   }
   setAssignmentRuleValue("disabled", !props.data.disabled, "status");
@@ -183,8 +186,8 @@ const setAssignmentRuleValue = (key, value, fieldName = undefined) => {
       value: value,
     },
     onSuccess: () => {
-      assignmentRulesList.reload();
-      toast.success(`Assignment rule ${fieldName || key} updated`);
+      assignmentRulesListData.reload();
+      toast.success(__("Assignment rule {0} updated", fieldName || key));
     },
     auto: true,
   });

@@ -99,9 +99,9 @@ import { CommentTextEditor, EmailEditor, TypingIndicator } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
 import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
+import { useShortcut } from "@/composables/shortcuts";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { ref, watch } from "vue";
-import { useShortcut } from "@/composables/shortcuts";
 import { onClickOutside } from "@vueuse/core";
 
 const emit = defineEmits(["update"]);

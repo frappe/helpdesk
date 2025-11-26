@@ -163,6 +163,7 @@ import {
   watch,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
+
 import EmptyState from "./EmptyState.vue";
 import ListRows from "./ListRows.vue";
 
@@ -658,7 +659,7 @@ watch(
     handleViewChanges();
     if (!val) {
       headerView.value.label = "List";
-      headerView.value.icon = "lucide:align-justify";
+      headerView.value.icon = LucideAlignJustify;
     }
   }
 );

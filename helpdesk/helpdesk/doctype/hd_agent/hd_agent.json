@@ -19,13 +19,11 @@
    "options": "User"
   },
   {
-   "fetch_from": "user.full_name",
    "fieldname": "agent_name",
    "fieldtype": "Data",
    "in_global_search": 1,
    "in_standard_filter": 1,
-   "label": "Agent Name",
-   "read_only": 1
+   "label": "Agent Name"
   },
   {
    "default": "1",
@@ -35,16 +33,14 @@
    "label": "Is Active"
   },
   {
-   "fetch_from": "user.user_image",
    "fieldname": "user_image",
-   "fieldtype": "Data",
-   "label": "Image",
-   "read_only": 1
+   "fieldtype": "Attach Image",
+   "label": "Image"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-03 14:32:27.007395",
+ "modified": "2025-10-15 20:46:39.229016",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
@@ -84,6 +80,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "search_fields": "agent_name",
  "sort_field": "modified",
  "sort_order": "DESC",

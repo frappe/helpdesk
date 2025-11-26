@@ -15,15 +15,9 @@
           :label="currentView.label"
         >
           <template #prefix>
-            <Icon
-              :icon="currentView.icon"
-              class="h-4"
-              v-if="typeof currentView.icon == 'string'"
-            />
             <component
               :is="currentView.icon"
               class="h-4 flex items-center justify-center"
-              v-else
             />
           </template>
           <template #suffix>
@@ -83,7 +77,6 @@
 
 <script setup>
 import { useScreenSize } from "@/composables/screen";
-import { Icon } from "@iconify/vue";
 import { Dropdown } from "frappe-ui";
 import { useRoute } from "vue-router";
 
