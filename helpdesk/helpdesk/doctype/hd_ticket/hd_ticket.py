@@ -298,11 +298,15 @@ class HDTicket(Document):
         )
 
     def validate_feedback(self):
+        is_feedback_mandatory = frappe.get_cached_value(
+            "HD Settings", "HD Settings", "is_feedback_mandatory"
+        )
         if (
             self.feedback_rating
             or self.status_category != "Resolved"
             or is_agent()
             or not self.has_agent_replied
+            or not is_feedback_mandatory
         ):
             return
 
