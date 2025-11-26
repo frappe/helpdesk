@@ -36,7 +36,7 @@
             <ComboboxOption
               v-show="users.length > 0"
               v-for="user in users"
-              :key="user.username"
+              :key="user.name"
               :value="user"
               as="template"
               v-slot="{ active }"
@@ -55,14 +55,16 @@
                   <Avatar
                     :shape="'circle'"
                     :image="user.user_image"
-                    :label="user.full_name"
+                    :label="user.agent_name"
                     size="lg"
                   />
                   <div class="flex flex-col gap-1 truncate">
                     <div class="font-semibold text-ink-gray-7 truncate">
-                      {{ user.full_name }}
+                      {{ user.agent_name }}
                     </div>
-                    <div class="text-ink-gray-6 truncate">{{ user.email }}</div>
+                    <div class="text-ink-gray-6 truncate">
+                      {{ user.user }}
+                    </div>
                   </div>
                 </div>
               </li>
@@ -80,31 +82,22 @@
               class="w-full"
               icon-left="plus"
               :label="__('Invite agent')"
-              @click="
-                () => {
-                  showNewAgentsDialog = true;
-                  togglePopover();
-                }
-              "
+              @click="inviteAgents"
             />
           </div>
         </div>
       </template>
     </Popover>
   </Combobox>
-
-  <AddNewAgentsDialog
-    :title="__('Add Agents')"
-    @close="showNewAgentsDialog = false"
-    :modelValue="showNewAgentsDialog"
-    :show="showNewAgentsDialog"
-    @update:modelValue="showNewAgentsDialog = $event"
-    @onAgentsInvited="addInvitedAgents"
+  <ConfirmDialog
+    v-model="showConfirmDialog.show"
+    :title="showConfirmDialog.title"
+    :message="showConfirmDialog.message"
+    :onConfirm="showConfirmDialog.onConfirm"
   />
 </template>
 
 <script setup lang="ts">
-import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
 import { assignmentRuleData } from "@/stores/assignmentRules";
 import {
   Combobox,
@@ -112,87 +105,76 @@ import {
   ComboboxOption,
   ComboboxOptions,
 } from "@headlessui/vue";
-import { watchDebounced } from "@vueuse/core";
-import { Avatar, createListResource, Popover } from "frappe-ui";
-import { computed, ref } from "vue";
+import { Avatar, Popover } from "frappe-ui";
+import { computed, inject, Ref, ref } from "vue";
+import { setActiveSettingsTab } from "../settingsModal";
+import { useAgentStore } from "@/stores/agent";
+import { onMounted } from "vue";
+import { __ } from "@/translation";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 const emit = defineEmits(["addAssignee"]);
 const query = ref("");
-const showNewAgentsDialog = ref(false);
-
-watchDebounced(
-  () => query.value,
-  (val) => {
-    const filters = {
-      full_name: undefined,
-      email: undefined,
-    };
-    const isEmail = val.includes("@") || val.includes(".");
-    if (isEmail) {
-      filters.email = ["like", `%${val}%`];
-    } else {
-      filters.full_name = ["like", `%${val}%`];
-    }
-    usersList.update({
-      filters,
-    });
-    usersList.reload();
-  },
-  { debounce: 500 }
+const { agents } = useAgentStore();
+const isAssignmentRuleFormDirty = inject<Ref<boolean>>(
+  "isAssignmentRuleFormDirty"
 );
-
-const usersList = createListResource({
-  doctype: "User",
-  fields: ["name", "email", "full_name", "user_image"],
-  start: 0,
-  pageLength: 5,
-  auto: true,
-  transform: (data) => {
-    return data
-      .map((user) => {
-        if (user.full_name == "Administrator") {
-          return {
-            ...user,
-            email: "Administrator",
-            user: "Administrator",
-          };
-        }
-        return {
-          ...user,
-          user: user.email,
-        };
-      })
-      .filter((user) => user.full_name != "Guest");
-  },
+const showConfirmDialog = ref({
+  show: false,
+  title: "",
+  message: "",
+  onConfirm: () => {},
 });
 
 const users = computed(() => {
-  return (
-    usersList.data?.filter(
+  let filteredAgents =
+    agents.data?.filter(
       (user) =>
-        !assignmentRuleData.value.users.some((u) => u.user === user.email)
-    ) || []
-  );
+        !assignmentRuleData.value.users.some((u) => u.user === user.user)
+    ) || [];
+
+  if (query.value) {
+    const val = query.value.toLowerCase();
+    const isEmail = val.includes("@") || val.includes(".");
+    filteredAgents = filteredAgents.filter((user) => {
+      if (isEmail) {
+        return user.user?.toLowerCase().includes(val);
+      } else {
+        return user.agent_name?.toLowerCase().includes(val);
+      }
+    });
+  }
+  return filteredAgents;
 });
 
-const addInvitedAgents = (users) => {
-  users.forEach((user) => {
-    addAssignee({ user });
+const addAssignee = (user) => {
+  assignmentRuleData.value.users.push({
+    user: user.user,
   });
+  emit("addAssignee", user);
 };
 
-const addAssignee = (user) => {
-  const userExists = assignmentRuleData.value.users.some(
-    (u) => u.user === user.user
-  );
-  if (!userExists) {
-    assignmentRuleData.value.users.push({
-      full_name: user.full_name,
-      email: user.email,
-      user_image: user.user_image,
-      user: user.email,
-    });
-    emit("addAssignee", user);
+const inviteAgents = () => {
+  if (isAssignmentRuleFormDirty.value) {
+    showConfirmDialog.value = {
+      show: true,
+      title: __("Unsaved changes"),
+      message: __(
+        "Are you sure you want to leave? Unsaved changes will be lost."
+      ),
+      onConfirm: () => {
+        setActiveSettingsTab("Invite Agents");
+      },
+    };
+  } else {
+    setActiveSettingsTab("Invite Agents");
   }
 };
+
+onMounted(() => {
+  if (agents.loading || agents.data?.length || agents.list.promise) {
+    return;
+  }
+  agents.fetch();
+});
 </script>

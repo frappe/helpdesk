@@ -20,7 +20,7 @@ export const views = createListResource({
 
 export const currentView = ref({
   label: "List",
-  icon: "lucide:align-justify",
+  icon: LucideAlignJustify,
 });
 
 export function useView(dt: string = null) {
@@ -56,15 +56,15 @@ export function useView(dt: string = null) {
           !view.is_default &&
           view.user === auth.userId &&
           !view.public &&
-          !view.pinned
+          !view.pinned,
       )
-      .map(parseView)
+      .map(parseView),
   );
 
   async function createView(
     view: View,
     successCB: Function = () => {},
-    errorCB: Function = () => {}
+    errorCB: Function = () => {},
   ) {
     createResource({
       url: "frappe.client.insert",
@@ -95,17 +95,17 @@ export function useView(dt: string = null) {
   const pinnedViews = computed(() =>
     views.data
       ?.filter((view: View) => view.pinned && view.user === auth.userId)
-      .map(parseView)
+      .map(parseView),
   );
 
   const publicViews = computed(() =>
-    views.data?.filter((view: View) => view.public).map(parseView)
+    views.data?.filter((view: View) => view.public).map(parseView),
   );
 
   const defaultView = computed(() =>
     views.data?.find(
-      (v: View) => v.is_default && v.user === auth.userId && v.dt === dt
-    )
+      (v: View) => v.is_default && v.user === auth.userId && v.dt === dt,
+    ),
   );
 
   function updateView(view: any, successCB: Function = () => {}) {
@@ -137,7 +137,7 @@ export function useView(dt: string = null) {
 
   function createOrUpdateDefaultView(view: View) {
     const defaultView = views.data?.find(
-      (v: View) => v.is_default && v.user === auth.userId && v.dt === view.dt
+      (v: View) => v.is_default && v.user === auth.userId && v.dt === view.dt,
     );
     view.is_customer_portal = isCustomerPortal.value;
     if (defaultView) {
@@ -184,7 +184,7 @@ export function useView(dt: string = null) {
     (newVal) => {
       views.isCustomerPortal = newVal;
       callGetViews();
-    }
+    },
   );
 
   return {

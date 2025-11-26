@@ -549,7 +549,7 @@ onMounted(() => {
   if (!route.query.view) {
     currentView.value = {
       label: "List",
-      icon: "lucide:align-justify",
+      icon: LucideAlignJustify,
     };
   }
   $socket.on("helpdesk:new-ticket", () => {
