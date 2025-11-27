@@ -1,5 +1,5 @@
 <template>
-  <ActivityHeader :title="title" />
+  <ActivityHeader :title="__(title)" />
   <FadedScrollableDiv
     class="flex flex-col flex-1 overflow-y-scroll"
     :mask-length="20"

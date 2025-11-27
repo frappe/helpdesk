@@ -28,6 +28,7 @@ import { useTicket } from "@/composables/useTicket";
 import { ticketsToNavigate } from "@/composables/useTicketNavigation";
 import { globalStore } from "@/stores/globalStore";
 import { useTelephonyStore } from "@/stores/telephony";
+import { __ } from "@/translation";
 import {
   ActivitiesSymbol,
   AssigneeSymbol,
@@ -139,7 +140,9 @@ onMounted(() => {
   $socket.on("ticket_update", (data: TicketUpdateData) => {
     if (data.ticket_id === ticket.value?.name) {
       // Notify the user about the update
-      toast.info(`User ${data.user} updated ${data.field} to ${data.value}`);
+      toast.info(
+        __(`User ${data.user} updated ${data.field} to ${data.value}`)
+      );
     }
   });
 });

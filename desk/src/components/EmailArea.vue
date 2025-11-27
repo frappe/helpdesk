@@ -57,7 +57,7 @@
           :placement="'right'"
           :options="[
             {
-              label: 'Split Ticket',
+              label: __('Split Ticket'),
               icon: LucideSplit,
               onClick: () => (showSplitModal = true),
             },
@@ -107,14 +107,14 @@
 <script setup lang="ts">
 import { AttachmentItem } from "@/components";
 import { useScreenSize } from "@/composables/screen";
+import { useAuthStore } from "@/stores/auth";
 import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
 import { Dropdown } from "frappe-ui";
+import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
 import { ReplyAllIcon, ReplyIcon } from "./icons";
 import TicketSplitModal from "./ticket/TicketSplitModal.vue";
-import { useAuthStore } from "@/stores/auth";
-import { storeToRefs } from "pinia";
 
 const props = defineProps({
   activity: {

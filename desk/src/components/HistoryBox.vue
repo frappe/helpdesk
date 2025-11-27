@@ -7,9 +7,9 @@
         v-if="relatedActivities.length > 1"
         class="inline-flex flex-wrap gap-1.5 text-ink-gray-8 font-medium w-4/5"
       >
-        <span>{{ `${show_others ? "Hide " : "Show "}` }}</span>
+        <span>{{ `${show_others ? __("Hide ") : __("Show ")}` }}</span>
         <span>+{{ relatedActivities.length }} </span>
-        <span>changes from </span>
+        <span>{{ __("changes from") }}</span>
         <span>{{ user }}</span>
 
         <Button
@@ -26,7 +26,7 @@
         <span class="font-medium text-gray-800">
           {{ user }}
         </span>
-        <span> {{ content }}</span>
+        <span> {{ __(content) }}</span>
       </div>
 
       <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
@@ -45,7 +45,7 @@
           <span class="font-medium text-gray-800">
             {{ relatedActivity.user }}
           </span>
-          <span> {{ relatedActivity.content }}</span>
+          <span> {{ __(relatedActivity.content) }}</span>
         </div>
         <Tooltip
           :text="dateFormat(relatedActivity.creation, dateTooltipFormat)"
@@ -69,6 +69,7 @@ const props = defineProps({
     required: true,
   },
 });
+console.log(props.activity);
 
 const { user, content, creation, relatedActivities } = props.activity;
 

@@ -25,7 +25,7 @@
             @click="
               copyToClipboard(
                 contact.data.email_id,
-                `'${contact.data.email_id}' copied to clipboard`
+                __('{0} copied to clipboard', [contact.data.email_id])
               )
             "
           />
@@ -62,18 +62,18 @@
       <div class="px-5 border-t pb-2.5" v-for="section in sections">
         <Section
           :key="section.label"
-          :label="section.label"
+          :label="__(section.label)"
           :hideLabel="section.hideLabel"
           :opened="section.opened"
         >
           <template #header="{ opened, hide, toggle }">
             <div class="flex gap-2.5 items-center py-[13px] justify-between">
-              <Tooltip :text="section.tooltipMessage">
+              <Tooltip :text="__(section.tooltipMessage)">
                 <span
                   class="text-ink-gray-8 font-medium text-base cursor-pointer select-none"
                   @click="toggle"
                 >
-                  {{ section.label }}
+                  {{ __(section.label) }}
                 </span>
               </Tooltip>
               <LucideChevronDown
@@ -91,7 +91,7 @@
               @click="openTicket(ticket.name)"
             >
               <p class="text-base text-ink-gray-8 max-w-[60%] truncate">
-                {{ ticket.subject }}
+                {{ __(ticket.subject) }}
               </p>
               <div class="flex items-end justify-between">
                 <p class="text-base text-ink-gray-5">
@@ -104,7 +104,7 @@
                   class="px-1.5 py-[3px] text-sm rounded-sm max-w-[80px] text-center truncate h-5"
                   :class="getStatusColor(ticket.status)"
                 >
-                  {{ ticket.status }}
+                  {{ __(ticket.status) }}
                 </p>
               </div>
             </li>
@@ -118,6 +118,7 @@
 <script setup lang="ts">
 import { useTelephonyStore } from "@/stores/telephony";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation";
 import { RecentSimilarTicketsSymbol, TicketContactSymbol } from "@/types";
 import { copyToClipboard } from "@/utils";
 import dayjs from "dayjs";
