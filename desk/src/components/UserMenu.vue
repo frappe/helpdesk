@@ -10,16 +10,16 @@
           class="flex flex-1 flex-col text-left duration-300 ease-in-out overflow-hidden"
           :class="
             !sidebarStore.isExpanded
-              ? 'ml-0 w-0 overflow-hidden opacity-0'
-              : 'ml-2 w-auto opacity-100'
+              ? 'ms-0 w-0 overflow-hidden opacity-0'
+              : 'ms-2 w-auto opacity-100'
           "
         >
           <div
-            class="text-base font-medium leading-none text-gray-900 truncate"
+            class="text-base font-medium leading-none text-gray-900 truncate rtl:text-right"
           >
             {{ config.brandName || "Helpdesk" }}
           </div>
-          <div class="mt-1 text-sm leading-none text-gray-700">
+          <div class="mt-1 text-sm leading-none text-gray-700 rtl:text-right">
             {{ authStore.userName }}
           </div>
         </div>
@@ -43,11 +43,11 @@
 </template>
 
 <script setup lang="ts">
-import { Dropdown, Avatar } from "frappe-ui";
-import { useAuthStore } from "@/stores/auth";
-import { useSidebarStore } from "@/stores/sidebar";
-import { useConfigStore } from "@/stores/config";
 import BrandLogo from "@/components/BrandLogo.vue";
+import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
+import { useSidebarStore } from "@/stores/sidebar";
+import { Dropdown } from "frappe-ui";
 
 const config = useConfigStore();
 

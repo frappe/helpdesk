@@ -129,7 +129,7 @@ function replaceReplyToContent(
 const htmlContent = computed(
   () => `
   <!DOCTYPE html>
-  <html>
+  <html dir="${window.dir}">
   <head>
     <link rel="stylesheet" href="${cssHref.value}" />
     <base target="_blank" />

@@ -7,15 +7,15 @@ function getTranslatedMessage(message: string): string {
 }
 
 function translate(message: string): string;
-function translate(message: string, ...args: string[]): string;
-function translate(message: string, ...args: string[]): string {
-    const translatedMessage = getTranslatedMessage(message)
-    if (args.length === 0) {
-        return translatedMessage;
-    }
-    return translatedMessage.replace(/{(\d+)}/g, function (match, index) {
-        return typeof args[index] != 'undefined' ? args[index] : match;
-    });
+function translate(message: string, ...args: any[]): string;
+function translate(message: string, ...args: any[]): string {
+  const translatedMessage = getTranslatedMessage(message);
+  if (args.length === 0) {
+    return translatedMessage;
+  }
+  return translatedMessage.replace(/{(\d+)}/g, function (match, index) {
+    return typeof args[index] != "undefined" ? args[index] : match;
+  });
 }
 
 export const __ = translate;

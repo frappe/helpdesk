@@ -1,5 +1,8 @@
 <template>
-  <Resizer class="flex flex-col justify-between border-l" side="right">
+  <Resizer
+    class="flex flex-col justify-between border-l rtl:border-r"
+    side="right"
+  >
     <TabButtons
       :buttons="tabs"
       v-model="currentTab"

@@ -28,7 +28,7 @@
           <Button
             v-for="action in normalActions"
             :key="action.label"
-            :label="action.label"
+            :label="__(action.label)"
             @click="action.onClick()"
           >
             <template v-if="action.icon" #prefix>
@@ -53,7 +53,7 @@
         <!-- Status -->
         <Dropdown :options="statusDropdown" placement="right">
           <template #default="{ open }">
-            <Button :label="ticket.doc.status" ref="statusRef">
+            <Button :label="__(ticket.doc.status)" ref="statusRef">
               <template #prefix>
                 <IndicatorIcon
                   :class="
@@ -94,6 +94,7 @@ import { useShortcut } from "@/composables/shortcuts";
 import { useView } from "@/composables/useView";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation";
 import {
   ActivitiesSymbol,
   CustomizationSymbol,
@@ -165,12 +166,12 @@ const statusDropdown = computed(() => {
   }));
 });
 const breadcrumbs = computed(() => {
-  let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
+  let items = [{ label: __("Tickets"), route: { name: "TicketsAgent" } }];
   if (route.query.view) {
     const currView: ComputedRef<View> = findView(route.query.view as string);
     if (currView) {
       items.push({
-        label: currView.value?.label,
+        label: __(currView.value?.label),
         icon: getIcon(currView.value?.icon),
         route: { name: "TicketsAgent", query: { view: currView.value?.name } },
       });

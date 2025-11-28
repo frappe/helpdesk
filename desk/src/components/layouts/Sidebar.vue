@@ -9,7 +9,7 @@
     <UserMenu class="mb-2" :options="profileSettings" />
     <SidebarLink
       v-if="!isCustomerPortal"
-      label="Search"
+      :label="__('Search')"
       class="my-0.5"
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
@@ -25,7 +25,7 @@
     <SidebarLink
       v-if="!isCustomerPortal"
       class="relative my-0.5 min-h-7"
-      label="Dashboard"
+      :label="__('Dashboard')"
       :icon="LucideLayoutDashboard"
       :to="'Dashboard'"
       :is-active="isActiveTab('Dashboard')"
@@ -40,7 +40,7 @@
       />
       <SidebarLink
         class="relative my-0.5"
-        label="Notifications"
+        :label="__('Notifications')"
         :icon="LucideBell"
         :on-click="() => notificationStore.toggle()"
         :is-expanded="isExpanded"
@@ -117,7 +117,7 @@
       <SidebarLink
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
         :icon="HelpIcon"
-        :label="'Help'"
+        :label="__('Help')"
         :is-expanded="isExpanded"
         @click="
           () => {
@@ -131,7 +131,7 @@
         :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
         :is-active="false"
         :is-expanded="isExpanded"
-        :label="isExpanded ? 'Collapse' : 'Expand'"
+        :label="isExpanded ? __('Collapse') : __('Expand')"
         :on-click="() => (isExpanded = !isExpanded)"
       />
     </div>
@@ -208,6 +208,7 @@ import {
 
 import { useShortcut } from "@/composables/shortcuts";
 import { useTelephonyStore } from "@/stores/telephony";
+import { __ } from "@/translation";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
@@ -262,7 +263,7 @@ const allViews = computed(() => {
   ];
   if (publicViews.value?.length && !isCustomerPortal.value) {
     options.push({
-      label: "Public Views",
+      label: __("Public Views"),
       opened: true,
       hideLabel: false,
       views: parseViews(publicViews.value),
@@ -270,7 +271,7 @@ const allViews = computed(() => {
   }
   if (pinnedViews.value?.length) {
     options.push({
-      label: "Private Views",
+      label: __("Private Views"),
       opened: true,
       hideLabel: false,
       views: parseViews(pinnedViews.value),

@@ -10,7 +10,7 @@
           @click="
             copyToClipboard(
               ticket.doc.name,
-              `Ticket #${ticket.doc.name} copied to clipboard`
+              __(`Ticket #{0} copied to clipboard`, [ticket.doc.name])
             )
           "
           class="cursor-copy"
@@ -22,22 +22,22 @@
           v-if="!ticket.doc.via_customer_portal"
           class="text-ink-gray-4 flex items-center"
         >
-          <span class="text-ink-gray-4 mr-[6px]">via</span>
+          <span class="text-ink-gray-4 mr-[6px]">{{ __("via") }}</span>
           <EmailIcon class="size-4 inline-block mr-1" />
-          <span class="">Email</span>
+          <span class="">{{ __("Email") }}</span>
         </div>
         <!-- Via Portal -->
         <div v-else class="text-ink-gray-4 flex items-center">
-          <span class="text-ink-gray-4 mr-[6px]">via</span>
+          <span class="text-ink-gray-4 mr-[6px]">{{ __("via") }}</span>
           <GlobeIcon class="size-4 inline-block mr-1" />
-          <span class="font-medium">Portal</span>
+          <span class="font-medium">{{ __("Portal") }}</span>
         </div>
       </div>
       <!-- divider -->
       <div class="border-l border-outline-gray-2 h-[13px]" />
       <!-- First Response -->
       <div class="flex items-center gap-1">
-        <span>First Response</span>
+        <span>{{ __("First Response") }}</span>
         <Tooltip
           :text="dateFormat(firstResponse.date, dateTooltipFormat)"
           :hover-delay="0.25"
@@ -54,7 +54,7 @@
       <div class="border-l border-outline-gray-2 h-[13px]" />
       <!-- Resolution by -->
       <div class="flex items-center gap-1">
-        <span>Resolution </span>
+        <span>{{ __("Resolution") }}</span>
         <Tooltip
           :text="dateFormat(resolutionBy.date, dateTooltipFormat)"
           :hover-delay="0.25"
@@ -77,6 +77,7 @@
 
 <script setup lang="ts">
 import { useShortcut } from "@/composables/shortcuts";
+import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";
 import {
   copyToClipboard,
@@ -111,7 +112,7 @@ const firstResponse = computed(() => {
       ticket.value.doc.creation
     );
     return {
-      label: `Fulfilled in ${responseBy}`,
+      label: __("Fulfilled in {0}", ...[responseBy]),
       color: "green",
       date: ticket.value.doc.first_responded_on,
     };

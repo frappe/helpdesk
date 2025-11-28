@@ -67,7 +67,7 @@
               </template>
             </FileUploader>
           </div>
-          <div class="flex items-center justify-end space-x-2 w-[40%]">
+          <div class="flex items-center justify-end space-s-2 w-[40%]">
             <Button
               label="Discard"
               @click="

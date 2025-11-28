@@ -7,6 +7,7 @@ import { h, markRaw, ref } from "vue";
 import zod from "zod";
 import TicketIcon from "./components/icons/TicketIcon.vue";
 import { getMeta } from "./stores/meta";
+import { __ } from "./translation";
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
@@ -51,7 +52,7 @@ export function dateFormat(date, format?: string) {
 }
 
 export function timeAgo(date) {
-  return useTimeAgo(date).value;
+  return __(useTimeAgo(date).value);
 }
 
 export const dateTooltipFormat = "ddd, MMM D, YYYY h:mm A";

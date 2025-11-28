@@ -11,9 +11,9 @@
           <span class="font-medium text-gray-800">
             {{ commenter }}
           </span>
-          <span> added a</span>
+          <span> &nbsp;{{ __("added a") }}</span>
           <span class="max-w-xs truncate font-medium text-gray-800">
-            comment
+            &nbsp;{{ __("comment") }}
           </span>
         </p>
       </div>
@@ -28,13 +28,13 @@
             :placement="'right'"
             :options="[
               {
-                label: 'Edit',
+                label: __('Edit'),
                 onClick: () => handleEditMode(),
                 icon: 'edit-2',
                 condition: () => !isTicketMergedComment,
               },
               {
-                label: 'Delete',
+                label: __('Delete'),
                 onClick: () => (showDialog = true),
                 icon: 'trash-2',
               },

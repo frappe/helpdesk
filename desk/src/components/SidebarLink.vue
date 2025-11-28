@@ -33,7 +33,7 @@
     </span>
 
     <div
-      class="-all ml-2 flex shrink-0 grow items-center justify-between text-sm duration-300 ease-in-out"
+      class="-all ms-2 flex shrink-0 grow items-center justify-between text-sm duration-300 ease-in-out"
       :class="{
         'opacity-100': isExpanded,
         'opacity-0': !isExpanded,
