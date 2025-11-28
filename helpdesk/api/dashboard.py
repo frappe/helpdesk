@@ -3,6 +3,13 @@ from frappe import _
 
 from helpdesk.utils import agent_only
 
+<<<<<<< HEAD
+=======
+HD_TICKET = "HD Ticket"
+COUNT_NAME = {"COUNT": "name", "as": "count"}
+COUNT_DESC = "count desc"
+
+>>>>>>> 825ec55d (chore: add v16 support)
 
 @frappe.whitelist()
 @agent_only
