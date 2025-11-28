@@ -4,7 +4,7 @@ from frappe import _
 from helpdesk.utils import agent_only
 
 HD_TICKET = "HD Ticket"
-COUNT_NAME = "count(name) as count"
+COUNT_NAME = {"COUNT": "name", "as": "count"}
 COUNT_DESC = "count desc"
 
 

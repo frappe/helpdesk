@@ -41,8 +41,8 @@
 </template>
 <script setup>
 import { Popover, createResource } from "frappe-ui";
-import AppsIcon from "./icons/AppsIcon.vue";
 import ChevronRight from "~icons/lucide/chevron-right";
+import AppsIcon from "./icons/AppsIcon.vue";
 
 const apps = createResource({
   url: "frappe.apps.get_apps",
@@ -54,7 +54,7 @@ const apps = createResource({
         name: "frappe",
         logo: "/assets/helpdesk/desk/desk.png",
         title: "Desk",
-        route: "/app",
+        route: "/desk/helpdesk",
       },
     ];
     data.map((app) => {
