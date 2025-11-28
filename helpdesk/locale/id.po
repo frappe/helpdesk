@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-09 10:36+0000\n"
-"PO-Revision-Date: 2025-11-09 14:11\n"
+"PO-Revision-Date: 2025-11-20 17:45\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Indonesian\n"
 "MIME-Version: 1.0\n"
@@ -113,7 +113,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
-msgstr ""
+msgstr "Tambahkan Penerima"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -123,7 +123,7 @@ msgstr "Tambah Hari Libur Mingguan"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
-msgstr ""
+msgstr "Tambahkan ketentuan"
 
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
 msgid "Add a custom condition"
@@ -132,7 +132,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
 msgid "Add condition"
-msgstr ""
+msgstr "Tambahkan ketentuan"
 
 #. Label of the get_weekly_off_dates (Button) field in DocType 'HD Service
 #. Holiday List'
@@ -468,7 +468,7 @@ msgstr "Hitam"
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Blue"
-msgstr "Biru"
+msgstr ""
 
 #. Label of the branding_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -557,7 +557,7 @@ msgstr "Tutup"
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Closed"
-msgstr "Tertutup"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:321
 msgid "Closed or rated tickets cannot be updated by non-agents"
@@ -619,7 +619,7 @@ msgstr ""
 #. Label of the contacts (Table) field in DocType 'HD Organization'
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 msgid "Contacts"
-msgstr ""
+msgstr "Kontak"
 
 #. Label of the content_section (Section Break) field in DocType 'HD Article'
 #. Label of the content (Text Editor) field in DocType 'HD Article'
@@ -875,12 +875,12 @@ msgstr "Diaktifkan"
 #. Label of the end_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "End Date"
-msgstr "Tanggal Akhir"
+msgstr "Tanggal Berakhir"
 
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "End Time"
-msgstr ""
+msgstr "Waktu Selesai"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:22
 msgid "Enter a name for this HD Service Holiday List."
@@ -910,7 +910,7 @@ msgstr ""
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
-msgstr "Gagal"
+msgstr ""
 
 #. Label of the feedback (Select) field in DocType 'HD Article Feedback'
 #. Label of the feedback_section (Section Break) field in DocType 'HD Settings'
@@ -919,7 +919,7 @@ msgstr "Gagal"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback"
-msgstr "Umpan balik"
+msgstr ""
 
 #. Label of the feedback_extra (Small Text) field in DocType 'HD Email
 #. Feedback'
@@ -980,7 +980,7 @@ msgstr ""
 #. Label of the filters (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
-msgstr "Penyaring"
+msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:83
 msgid "Find out all of the variables that can be used in the content"
@@ -1062,7 +1062,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Green"
-msgstr "Hijau"
+msgstr ""
 
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1431,7 +1431,7 @@ msgstr ""
 #. Label of the is_active (Check) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Is Active"
-msgstr "Aktif"
+msgstr ""
 
 #. Label of the is_customer_portal (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1643,7 +1643,7 @@ msgstr "Tidak ditentukan"
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Notification Settings"
-msgstr ""
+msgstr "Pengaturan pemberitahuan"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:234
@@ -1912,7 +1912,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Red"
-msgstr "Merah"
+msgstr ""
 
 #. Label of the reference_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1939,7 +1939,7 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Replied"
-msgstr "Menjawab"
+msgstr ""
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -2477,7 +2477,7 @@ msgstr ""
 #. Label of the template (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Template"
-msgstr "Contoh"
+msgstr ""
 
 #. Label of the template_name (Data) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -2766,7 +2766,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Type"
-msgstr "Jenis"
+msgstr ""
 
 #. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
@@ -2851,7 +2851,7 @@ msgstr ""
 #. Label of the views (Int) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Views"
-msgstr "Tampilan"
+msgstr ""
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -2902,7 +2902,7 @@ msgstr "Hari kerja {0} telah diulang."
 #. Label of the workflow_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Workflow"
-msgstr ""
+msgstr "Alur Kerja"
 
 #. Label of the support_and_resolution_section_break (Section Break) field in
 #. DocType 'HD Service Level Agreement'

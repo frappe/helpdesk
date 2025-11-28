@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-09 10:36+0000\n"
-"PO-Revision-Date: 2025-11-09 14:11\n"
+"PO-Revision-Date: 2025-11-16 16:16\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Bosnian\n"
 "MIME-Version: 1.0\n"
@@ -225,7 +225,7 @@ msgstr "Agenti"
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "All"
-msgstr "Sve"
+msgstr "Svi"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
@@ -875,7 +875,7 @@ msgstr "Omogućeno"
 #. Label of the end_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "End Date"
-msgstr "Datum završetka"
+msgstr "Datum Završetka"
 
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
@@ -892,7 +892,7 @@ msgstr "Greška pri premještanju članka u kategoriju"
 
 #: helpdesk/overrides/email_account.py:43
 msgid "Error processing email at index {0}, message: {1}"
-msgstr ""
+msgstr "Greška pri obradi e-pošte na indeksu {0}, poruka: {1}"
 
 #: helpdesk/overrides/email_account.py:90
 msgid "Error while connecting to email account {0}"
@@ -1067,7 +1067,7 @@ msgstr "Zeleno"
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Group By"
-msgstr "Grupiši po"
+msgstr "Grupiši Po"
 
 #. Label of the group_by_field (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1431,7 +1431,7 @@ msgstr "Pozovi agenta"
 #. Label of the is_active (Check) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Is Active"
-msgstr "Aktivan"
+msgstr "Aktivno"
 
 #. Label of the is_customer_portal (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1632,7 +1632,7 @@ msgstr "Nisu pronađeni rezultati"
 
 #: helpdesk/utils.py:166
 msgid "Not Allowed"
-msgstr "Nije dozvoljeno"
+msgstr "Nije Dozvoljeno"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:250
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:270
@@ -1643,7 +1643,7 @@ msgstr "Nije Navedeno"
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Notification Settings"
-msgstr "Postavke Obavijesti"
+msgstr "Postavke Obaveštenja"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:234
@@ -1885,7 +1885,7 @@ msgstr "Ocijenjeni Slučajevi"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
-msgstr "Procjena"
+msgstr "Ocjena"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
@@ -2288,12 +2288,12 @@ msgstr "Standardni Formulari Skripte se ne mogu mijenjati, umjesto toga duplicir
 #. Label of the start_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Start Date"
-msgstr "Start Datum"
+msgstr "Datum Početka"
 
 #. Label of the start_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "Start Time"
-msgstr "Vrijeme Početka"
+msgstr "Počni Vrijeme"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:98
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
@@ -2494,19 +2494,19 @@ msgstr "Status 'Zatvoreno' se ne može preimenovati."
 
 #: helpdesk/extends/assignment_rule.py:18
 msgid "The Assign Condition JSON '{0}' is invalid: </br> {1}"
-msgstr ""
+msgstr "JSON Uvjet Dodjeljivanja '{0}' nije valjan: </br> {1}"
 
 #: helpdesk/extends/assignment_rule.py:26
 msgid "The Unassign Condition JSON '{0}' is invalid: </br> {1}"
-msgstr ""
+msgstr "JSON Uvjet Poništavanja Dodjele '{0}' nije važeći: </br> {1}"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:145
 msgid "The assignment condition '{0}' is invalid: {1}"
-msgstr ""
+msgstr "Uslov dodjeljivanja '{0}' je nevažeći: {1}"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:152
 msgid "The assignment condition json '{0}' is invalid: {1}"
-msgstr ""
+msgstr "JSON Uvjet Dodjeljivanja {0}' nije valjan: {1}"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:54
 msgid "The holiday on {0} is not between From Date and To Date"
@@ -2704,7 +2704,7 @@ msgstr "Slug Naslova"
 #. Label of the user_to (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "To"
-msgstr "Do"
+msgstr "Za"
 
 #. Label of the to_date (Date) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -2855,7 +2855,7 @@ msgstr "Preko Portala za Klijente"
 #. Label of the views (Int) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Views"
-msgstr "Pogledi"
+msgstr "Prikazi"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json

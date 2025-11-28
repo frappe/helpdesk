@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-09 10:36+0000\n"
-"PO-Revision-Date: 2025-11-09 14:11\n"
+"PO-Revision-Date: 2025-11-19 17:44\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -154,7 +154,7 @@ msgstr "اطلاعات تکمیلی"
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Administrator"
-msgstr "مدیر"
+msgstr "ادمین"
 
 #. Name of a role
 #. Label of the to_agent (Link) field in DocType 'HD Escalation Rule'
@@ -263,7 +263,7 @@ msgstr ""
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Archived"
-msgstr "بایگانی شد"
+msgstr ""
 
 #: desk/src/components/Settings/SettingsModal.vue:52
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
@@ -309,7 +309,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Assignment"
-msgstr "تخصیص"
+msgstr ""
 
 #. Label of the filters_section (Section Break) field in DocType 'HD Service
 #. Level Agreement'
@@ -419,7 +419,7 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:283
 msgid "Avg. First Response"
-msgstr ""
+msgstr "میانگین اولین پاسخ"
 
 #: helpdesk/api/dashboard.py:337
 msgid "Avg. Resolution"
@@ -557,7 +557,7 @@ msgstr "بستن"
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Closed"
-msgstr "بسته شده"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:321
 msgid "Closed or rated tickets cannot be updated by non-agents"
@@ -910,7 +910,7 @@ msgstr ""
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
-msgstr "ناموفق"
+msgstr ""
 
 #. Label of the feedback (Select) field in DocType 'HD Article Feedback'
 #. Label of the feedback_section (Section Break) field in DocType 'HD Settings'
@@ -980,7 +980,7 @@ msgstr "فیلدها"
 #. Label of the filters (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
-msgstr "فیلترها"
+msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:83
 msgid "Find out all of the variables that can be used in the content"
@@ -1067,7 +1067,7 @@ msgstr "سبز"
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Group By"
-msgstr "دسته‌بندی بر اساس"
+msgstr "دسته بندی بر اساس"
 
 #. Label of the group_by_field (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1378,7 +1378,7 @@ msgstr ""
 #. DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \n"
-msgstr ""
+msgstr "در صورت فعال بودن، وقتی کاربری سعی در بستن تیکت دارد، کادر محاوره‌ای بازخورد نمایش داده می‌شود. \n"
 
 #. Label of the ignore_restrictions (Check) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
@@ -1737,11 +1737,11 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:435
 msgid "Percentage of Total Tickets by Team"
-msgstr ""
+msgstr "درصد کل تیکت‌ها بر اساس تیم"
 
 #: helpdesk/api/dashboard.py:468
 msgid "Percentage of Total Tickets by Type"
-msgstr ""
+msgstr "درصد کل تیکت‌ها بر اساس نوع"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1883,7 +1883,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
-msgstr "رتبه بندی"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
@@ -1939,7 +1939,7 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Replied"
-msgstr "پاسخ داده شده"
+msgstr ""
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -1992,7 +1992,7 @@ msgstr "حل و فصل توسط"
 #. Label of the resolution_date (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Date"
-msgstr "تاریخ حل و فصل"
+msgstr ""
 
 #. Label of the resolution_details (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2121,7 +2121,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Saturday"
-msgstr "شنبه"
+msgstr ""
 
 #. Button label of the email-feedback Web Form
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:42
@@ -2291,7 +2291,7 @@ msgstr "تاریخ شروع"
 #. Label of the start_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "Start Time"
-msgstr "زمان شروع"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:98
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
@@ -2547,7 +2547,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Thursday"
-msgstr "پنج‌شنبه"
+msgstr ""
 
 #. Label of the ticket (Link) field in DocType 'HD Email Feedback'
 #. Label of the reference_ticket (Link) field in DocType 'HD Notification'
@@ -2663,7 +2663,7 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:160 helpdesk/api/dashboard.py:614
 msgid "Tickets"
-msgstr ""
+msgstr "تیکت‌ها"
 
 #: helpdesk/api/dashboard.py:540
 msgid "Tickets by Channel"
@@ -2759,7 +2759,7 @@ msgstr "تعداد کل تیکت‌های ایجاد شده"
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Tuesday"
-msgstr "سه‌شنبه"
+msgstr ""
 
 #. Label of the notification_type (Select) field in DocType 'HD Notification'
 #. Label of the type (Select) field in DocType 'HD View'
@@ -2864,7 +2864,7 @@ msgstr "بنفش"
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Wednesday"
-msgstr "چهارشنبه"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:34
 msgid "Weekly"
