@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-23 10:36+0000\n"
-"PO-Revision-Date: 2025-11-26 19:20\n"
+"PO-Revision-Date: 2025-12-01 20:23\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -113,7 +113,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
-msgstr ""
+msgstr "Añadir responsable"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -123,7 +123,7 @@ msgstr "Añadir Vacaciones Semanales"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
-msgstr ""
+msgstr "Añadir una condición"
 
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
 msgid "Add a custom condition"
@@ -132,7 +132,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
 msgid "Add condition"
-msgstr ""
+msgstr "Añadir condición"
 
 #. Label of the get_weekly_off_dates (Button) field in DocType 'HD Service
 #. Holiday List'
@@ -225,7 +225,7 @@ msgstr "Agentes"
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "All"
-msgstr ""
+msgstr "Todos"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
@@ -271,7 +271,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:114
 msgid "Are you sure you want to go back? Unsaved changes will be lost."
-msgstr ""
+msgstr "¿Estás seguro de volver atrás? Los cambios no guardados se perderán."
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:127
 msgid "Are you sure you want to reset the content? Current content will be overridden."
@@ -473,7 +473,7 @@ msgstr "Azul"
 #. Label of the branding_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Branding"
-msgstr ""
+msgstr "Personalización de marca"
 
 #. Label of the button_section (Section Break) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
