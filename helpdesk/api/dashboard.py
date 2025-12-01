@@ -1,12 +1,19 @@
 import frappe
 from frappe import _
+from frappe.pulse.utils import get_frappe_version
 
 from helpdesk.utils import agent_only
 
 <<<<<<< HEAD
 =======
 HD_TICKET = "HD Ticket"
-COUNT_NAME = {"COUNT": "name", "as": "count"}
+
+COUNT_NAME = (
+    {"COUNT": "name", "as": "count"}
+    if "16" in get_frappe_version()
+    else "count(name) as count"
+)
+
 COUNT_DESC = "count desc"
 
 >>>>>>> 825ec55d (chore: add v16 support)
