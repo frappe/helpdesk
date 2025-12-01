@@ -10,7 +10,7 @@ HD_TICKET = "HD Ticket"
 
 COUNT_NAME = (
     {"COUNT": "name", "as": "count"}
-    if "16" in get_frappe_version()
+    if get_frappe_version().startswith("16")
     else "count(name) as count"
 )
 
