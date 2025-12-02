@@ -15,6 +15,7 @@ def get_user():
         "user_image",
         "username",
         "time_zone",
+        "language",
     ]
     user = frappe.get_value(
         doctype="User",
@@ -34,6 +35,9 @@ def get_user():
     is_manager = ("Agent Manager") in frappe.get_roles(current_user)
     user_team = get_agents_team()
     user_team_names = [team["team_name"] for team in user_team]
+    language = user.language or frappe.db.get_single_value(
+        "System Settings", "language"
+    )
 
     return {
         "has_desk_access": has_desk_access,
@@ -47,6 +51,7 @@ def get_user():
         "username": username,
         "time_zone": user.time_zone,
         "user_teams": user_team_names,
+        "language": language,
     }
 
 

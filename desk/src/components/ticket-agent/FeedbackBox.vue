@@ -1,7 +1,10 @@
 <template>
   <div class="w-full p-4 rounded" :class="styles[0]">
     <!-- Header -->
-    <div class="flex gap-[9px] mb-1.5 items-center">
+    <div
+      class="flex mb-1.5 items-center"
+      :class="activity.feedback && 'gap-[9px]'"
+    >
       <p class="text-base text-ink-gray-8 font-medium">
         {{ activity.feedback }}
       </p>

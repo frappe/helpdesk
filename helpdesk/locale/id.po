@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-10-05 10:35+0000\n"
-"PO-Revision-Date: 2025-10-11 02:13\n"
+"POT-Creation-Date: 2025-11-09 10:36+0000\n"
+"PO-Revision-Date: 2025-11-20 17:45\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Indonesian\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +17,15 @@ msgstr ""
 "X-Crowdin-File: /[frappe.helpdesk] develop/helpdesk/locale/main.pot\n"
 "X-Crowdin-File-ID: 118\n"
 "Language: id_ID\n"
+
+#: helpdesk/api/dashboard.py:231
+msgid "% SLA Fulfilled"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:236
+#, python-format
+msgid "% of tickets created that were resolved within SLA"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
@@ -104,7 +113,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
-msgstr ""
+msgstr "Tambahkan Penerima"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -114,7 +123,7 @@ msgstr "Tambah Hari Libur Mingguan"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
-msgstr ""
+msgstr "Tambahkan ketentuan"
 
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
 msgid "Add a custom condition"
@@ -123,7 +132,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
 msgid "Add condition"
-msgstr ""
+msgstr "Tambahkan ketentuan"
 
 #. Label of the get_weekly_off_dates (Button) field in DocType 'HD Service
 #. Holiday List'
@@ -280,7 +289,7 @@ msgstr ""
 msgid "Assign to"
 msgstr "Tugaskan ke"
 
-#: desk/src/components/ticket-agent/AssignToBody.vue:64
+#: desk/src/components/ticket-agent/AssignToBody.vue:65
 msgid "Assign to me"
 msgstr "Tetapkan ke saya"
 
@@ -325,7 +334,7 @@ msgstr ""
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:278
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:283
 msgid "Assignment Schedule"
 msgstr ""
 
@@ -396,6 +405,38 @@ msgstr "Otomatisasi"
 msgid "Average Response Time"
 msgstr ""
 
+#: helpdesk/api/dashboard.py:682
+msgid "Average feedback rating per day is around {0} stars"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:606
+msgid "Average tickets per day is around {0}"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:387
+msgid "Avg. Feedback Rating"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:283
+msgid "Avg. First Response"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:337
+msgid "Avg. Resolution"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:392
+msgid "Avg. feedback rating for the tickets resolved"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:289
+msgid "Avg. time taken to first respond to a ticket"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:343
+msgid "Avg. time taken to resolve a ticket"
+msgstr ""
+
 #. Label of the base_support_rotation (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Base Support Rotation"
@@ -427,7 +468,7 @@ msgstr "Hitam"
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Blue"
-msgstr "Biru"
+msgstr ""
 
 #. Label of the branding_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -443,11 +484,11 @@ msgstr ""
 msgid "Call Details"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:607
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:599
 msgid "Can not send email. No sender email set up!"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:500
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:508
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr ""
 
@@ -484,7 +525,7 @@ msgstr ""
 msgid "Choose how tickets are distributed among selected assignees."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:282
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:287
 msgid "Choose the days of the week when this rule should be active."
 msgstr ""
 
@@ -492,7 +533,7 @@ msgstr ""
 msgid "Choose which tickets are affected by this assignment rule."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:209
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:211
 msgid "Choose which tickets are affected by this un-assignment rule."
 msgstr ""
 
@@ -516,9 +557,9 @@ msgstr "Tutup"
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Closed"
-msgstr "Tertutup"
+msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:321
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr ""
 
@@ -578,7 +619,7 @@ msgstr ""
 #. Label of the contacts (Table) field in DocType 'HD Organization'
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 msgid "Contacts"
-msgstr ""
+msgstr "Kontak"
 
 #. Label of the content_section (Section Break) field in DocType 'HD Article'
 #. Label of the content (Text Editor) field in DocType 'HD Article'
@@ -593,15 +634,15 @@ msgstr ""
 msgid "Content Type"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:625
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:617
 msgid "Could not an email due to: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:785
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:775
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:162
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:161
 msgid "Could not send feedback email,due to: {0}"
 msgstr ""
 
@@ -834,12 +875,12 @@ msgstr "Diaktifkan"
 #. Label of the end_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "End Date"
-msgstr "Tanggal Akhir"
+msgstr "Tanggal Berakhir"
 
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "End Time"
-msgstr ""
+msgstr "Waktu Selesai"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:22
 msgid "Enter a name for this HD Service Holiday List."
@@ -849,7 +890,11 @@ msgstr ""
 msgid "Error moving article to category"
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:69
+#: helpdesk/overrides/email_account.py:43
+msgid "Error processing email at index {0}, message: {1}"
+msgstr ""
+
+#: helpdesk/overrides/email_account.py:90
 msgid "Error while connecting to email account {0}"
 msgstr "Kesalahan saat menyambung ke akun email {0}"
 
@@ -865,7 +910,7 @@ msgstr ""
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
-msgstr "Gagal"
+msgstr ""
 
 #. Label of the feedback (Select) field in DocType 'HD Article Feedback'
 #. Label of the feedback_section (Section Break) field in DocType 'HD Settings'
@@ -874,7 +919,7 @@ msgstr "Gagal"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback"
-msgstr "Umpan balik"
+msgstr ""
 
 #. Label of the feedback_extra (Small Text) field in DocType 'HD Email
 #. Feedback'
@@ -905,7 +950,11 @@ msgstr ""
 msgid "Feedback Rating"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:160
+#: helpdesk/api/dashboard.py:688
+msgid "Feedback Trend"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:159
 msgid "Feedback email has been sent to the customer"
 msgstr ""
 
@@ -931,7 +980,7 @@ msgstr ""
 #. Label of the filters (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
-msgstr "Penyaring"
+msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:83
 msgid "Find out all of the variables that can be used in the content"
@@ -1013,7 +1062,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Green"
-msgstr "Hijau"
+msgstr ""
 
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1362,7 +1411,7 @@ msgstr "Panggilan Masuk"
 msgid "Instantly send e-mail"
 msgstr ""
 
-#: helpdesk/utils.py:32
+#: helpdesk/utils.py:33
 msgid "Insufficient Permission for {0}"
 msgstr "Izin tidak cukup untuk {0}"
 
@@ -1382,7 +1431,7 @@ msgstr ""
 #. Label of the is_active (Check) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Is Active"
-msgstr "Aktif"
+msgstr ""
 
 #. Label of the is_customer_portal (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1459,7 +1508,7 @@ msgid "Last user assigned by this rule"
 msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:145
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:217
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:219
 msgid "Learn about conditions"
 msgstr ""
 
@@ -1565,7 +1614,11 @@ msgstr ""
 msgid "New Assignment Rule Name"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:12
+#: helpdesk/api/dashboard.py:429
+msgid "No Team"
+msgstr ""
+
+#: desk/src/components/ticket-agent/AssignTo.vue:13
 msgid "No assignees"
 msgstr ""
 
@@ -1577,7 +1630,7 @@ msgstr ""
 msgid "No results found"
 msgstr "Hasil tidak ditemukan"
 
-#: helpdesk/utils.py:165
+#: helpdesk/utils.py:166
 msgid "Not Allowed"
 msgstr "Tidak Diizinkan"
 
@@ -1590,10 +1643,10 @@ msgstr "Tidak ditentukan"
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Notification Settings"
-msgstr ""
+msgstr "Pengaturan pemberitahuan"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:232
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:234
 msgid "Old Condition"
 msgstr ""
 
@@ -1674,6 +1727,22 @@ msgstr ""
 msgid "Paused"
 msgstr ""
 
+#: helpdesk/api/dashboard.py:541
+msgid "Percentage of Total Tickets by Channel"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:501
+msgid "Percentage of Total Tickets by Priority"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:435
+msgid "Percentage of Total Tickets by Team"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:468
+msgid "Percentage of Total Tickets by Type"
+msgstr ""
+
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Pink"
@@ -1693,7 +1762,7 @@ msgstr ""
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:318
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:326
 msgid "Please add {0} priority in {1} SLA"
 msgstr ""
 
@@ -1804,8 +1873,13 @@ msgstr "Jarak"
 msgid "Rate Your Support Experience"
 msgstr ""
 
+#: helpdesk/api/dashboard.py:691
+msgid "Rated Tickets"
+msgstr ""
+
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
+#: helpdesk/api/dashboard.py:703
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
@@ -1838,7 +1912,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Red"
-msgstr "Merah"
+msgstr ""
 
 #. Label of the reference_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1865,7 +1939,7 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Replied"
-msgstr "Menjawab"
+msgstr ""
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -2037,6 +2111,10 @@ msgstr ""
 msgid "SLA Status"
 msgstr "Status SLA"
 
+#: helpdesk/api/dashboard.py:584 helpdesk/api/dashboard.py:619
+msgid "SLA_fulfilled"
+msgstr ""
+
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
@@ -2085,7 +2163,7 @@ msgstr ""
 msgid "Search query must be at least 2 characters"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:157
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:165
 msgid "Select a Default Priority."
 msgstr "Pilih Prioritas Default."
 
@@ -2129,7 +2207,7 @@ msgstr ""
 msgid "Set Response Time for Priority {0} in row {1}."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:124
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:123
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
 msgstr ""
 
@@ -2215,7 +2293,7 @@ msgstr "Tanggal Mulai"
 msgid "Start Time"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:99
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:98
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
 msgstr ""
 
@@ -2399,7 +2477,7 @@ msgstr ""
 #. Label of the template (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Template"
-msgstr "Contoh"
+msgstr ""
 
 #. Label of the template_name (Data) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -2410,9 +2488,21 @@ msgstr ""
 msgid "The 'Closed' status cannot be renamed."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:147
-msgid "The Condition '{0}' is invalid: {1}"
-msgstr "Kondisi '{0}' tidak valid: {1}"
+#: helpdesk/extends/assignment_rule.py:18
+msgid "The Assign Condition JSON '{0}' is invalid: </br> {1}"
+msgstr ""
+
+#: helpdesk/extends/assignment_rule.py:26
+msgid "The Unassign Condition JSON '{0}' is invalid: </br> {1}"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:145
+msgid "The assignment condition '{0}' is invalid: {1}"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:152
+msgid "The assignment condition json '{0}' is invalid: {1}"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:54
 msgid "The holiday on {0} is not between From Date and To Date"
@@ -2522,6 +2612,10 @@ msgstr ""
 msgid "Ticket Summary"
 msgstr ""
 
+#: helpdesk/api/dashboard.py:611
+msgid "Ticket Trend"
+msgstr ""
+
 #. Label of the ticket_type_section (Section Break) field in DocType 'HD
 #. Settings'
 #. Label of the ticket_type (Link) field in DocType 'HD Ticket'
@@ -2538,7 +2632,7 @@ msgstr ""
 msgid "Ticket does not exist."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:318
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:311
 msgid "Ticket must be resolved with a feedback"
 msgstr ""
 
@@ -2558,13 +2652,33 @@ msgstr ""
 
 #. Label of the is_ticket_type_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:295
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:293
 msgid "Ticket type is mandatory"
 msgstr ""
 
 #. Name of a report
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
 msgid "Ticket-Search Analysis"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:160 helpdesk/api/dashboard.py:614
+msgid "Tickets"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:540
+msgid "Tickets by Channel"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:500 helpdesk/api/dashboard.py:508
+msgid "Tickets by Priority"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:434 helpdesk/api/dashboard.py:442
+msgid "Tickets by Team"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:467 helpdesk/api/dashboard.py:475
+msgid "Tickets by Type"
 msgstr ""
 
 #: helpdesk/api/ticket.py:18
@@ -2623,6 +2737,22 @@ msgstr ""
 msgid "Total Ticket"
 msgstr ""
 
+#: helpdesk/api/dashboard.py:509
+msgid "Total Tickets by Priority"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:443
+msgid "Total Tickets by Team"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:476
+msgid "Total Tickets by Type"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:165
+msgid "Total number of tickets created"
+msgstr ""
+
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
@@ -2636,14 +2766,14 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Type"
-msgstr "Jenis"
+msgstr ""
 
 #. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "URL/Method"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:204
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:206
 msgid "Unassignment condition"
 msgstr ""
 
@@ -2721,7 +2851,7 @@ msgstr ""
 #. Label of the views (Int) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Views"
-msgstr "Tampilan"
+msgstr ""
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -2765,14 +2895,14 @@ msgstr ""
 msgid "Workday"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:110
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:109
 msgid "Workday {0} has been repeated."
 msgstr "Hari kerja {0} telah diulang."
 
 #. Label of the workflow_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Workflow"
-msgstr ""
+msgstr "Alur Kerja"
 
 #. Label of the support_and_resolution_section_break (Section Break) field in
 #. DocType 'HD Service Level Agreement'
@@ -2791,15 +2921,15 @@ msgstr "Tahunan"
 msgid "Yellow"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:18
+#: helpdesk/api/dashboard.py:24
 msgid "You are not allowed to view this dashboard data."
 msgstr ""
 
-#: helpdesk/utils.py:164
+#: helpdesk/utils.py:165
 msgid "You are not permitted to access this resource."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:530
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:522
 msgid "You are not permitted to add a comment"
 msgstr ""
 
@@ -2807,7 +2937,7 @@ msgstr ""
 msgid "You can change the default calling medium from the settings"
 msgstr "Anda dapat mengubah media panggilan default dari pengaturan"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:137
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:136
 msgid "You cannot disable the default SLA."
 msgstr ""
 
@@ -2819,7 +2949,7 @@ msgstr ""
 msgid "You have already provided feedback for this ticket."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:131
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:130
 msgid "You must set one SLA as Default. Please check the Default SLA option."
 msgstr ""
 
@@ -2827,9 +2957,17 @@ msgstr ""
 msgid "back to email event list"
 msgstr ""
 
+#: helpdesk/api/dashboard.py:583
+msgid "closed"
+msgstr "ditutup"
+
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:46
 msgid "customize {0}"
 msgstr ""
+
+#: helpdesk/api/dashboard.py:334
+msgid "days"
+msgstr "hari"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2848,6 +2986,10 @@ msgstr "telah menghubungi"
 msgid "here"
 msgstr "di sini"
 
+#: helpdesk/api/dashboard.py:280
+msgid "hrs"
+msgstr "jam"
+
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "kanban"
@@ -2858,9 +3000,25 @@ msgstr "kanban"
 msgid "list"
 msgstr ""
 
+#: helpdesk/api/dashboard.py:582
+msgid "open"
+msgstr "buka"
+
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "purple"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:642
+msgid "rated_tickets"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:641
+msgid "rating"
+msgstr "peringkat"
+
+#: helpdesk/api/dashboard.py:384
+msgid "stars"
 msgstr ""
 
 #. Label of the synonym (Data) field in DocType 'HD Synonym'

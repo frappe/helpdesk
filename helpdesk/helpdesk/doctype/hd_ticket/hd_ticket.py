@@ -85,7 +85,6 @@ class HDTicket(Document):
 
     def validate(self):
         self.validate_feedback()
-        self.validate_ticket_type()
 
     def before_save(self):
         self.apply_sla()
@@ -287,11 +286,6 @@ class HDTicket(Document):
         feedback_option = frappe.get_doc("HD Ticket Feedback Option", self.feedback)
         self.feedback_rating = feedback_option.rating
 
-    def validate_ticket_type(self):
-        settings = frappe.get_doc("HD Settings")
-        if settings.is_ticket_type_mandatory and not self.ticket_type:
-            frappe.throw(_("Ticket type is mandatory"))
-
     @property
     def has_agent_replied(self):
         return frappe.db.exists(
@@ -304,11 +298,15 @@ class HDTicket(Document):
         )
 
     def validate_feedback(self):
+        is_feedback_mandatory = frappe.get_cached_value(
+            "HD Settings", "HD Settings", "is_feedback_mandatory"
+        )
         if (
-            self.feedback
+            self.feedback_rating
             or self.status_category != "Resolved"
             or is_agent()
             or not self.has_agent_replied
+            or not is_feedback_mandatory
         ):
             return
 
@@ -317,7 +315,7 @@ class HDTicket(Document):
         )
 
     def check_update_perms(self):
-        if self.is_new() or is_agent():
+        if self.is_new() or is_agent() or not self.via_customer_portal:
             return
         old_doc = self.get_doc_before_save()
         is_closed = old_doc.status == "Closed"

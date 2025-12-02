@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Button, Select } from "frappe-ui";
+import { Button, Dropdown, Select } from "frappe-ui";
 import WorkDayModal from "./Modals/WorkDayModal.vue";
 import { ConfirmDelete, getGridTemplateColumnsForTable } from "@/utils";
 import { slaData } from "@/stores/sla";

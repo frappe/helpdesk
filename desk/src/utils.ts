@@ -1,3 +1,4 @@
+import type { DropdownOption } from "@/types";
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import dayjs from "dayjs";
 import { FeatherIcon, call, toast, useFileUpload } from "frappe-ui";
@@ -270,7 +271,7 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
     {
       class: [
         active ? "bg-surface-gray-2" : "text-ink-gray-8",
-        "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base",
+        "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base hover:bg-surface-gray-3",
         variant == "danger" ? "text-ink-red-3 hover:bg-ink-red-1" : "",
       ],
       onClick: onClick,
@@ -518,6 +519,7 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
           variant: "grey",
           onClick: (event) => {
             event.preventDefault();
+            event.stopImmediatePropagation();
             isConfirmingDelete.value = true;
           },
         }),
@@ -573,5 +575,29 @@ export function isElementInViewport(el: HTMLElement) {
     rect.left >= 0 &&
     rect.bottom <= window.innerHeight &&
     rect.right <= window.innerWidth
+  );
+}
+
+export function parseApiOptions(
+  options: string[] | DropdownOption[]
+): DropdownOption[] | [] {
+  if (!options.length) return [];
+  return (
+    options
+      .filter((o) => Boolean(o))
+      .map((o) => {
+        if (
+          typeof o === "object" &&
+          o.hasOwnProperty("label") &&
+          o.hasOwnProperty("value")
+        ) {
+          return o;
+        } else {
+          return {
+            label: o?.toString(),
+            value: o as string,
+          };
+        }
+      }) || []
   );
 }

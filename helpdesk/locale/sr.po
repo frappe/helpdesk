@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-10-05 10:35+0000\n"
-"PO-Revision-Date: 2025-10-13 02:15\n"
+"POT-Creation-Date: 2025-11-09 10:36+0000\n"
+"PO-Revision-Date: 2025-11-16 16:15\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Cyrillic)\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +17,15 @@ msgstr ""
 "X-Crowdin-File: /[frappe.helpdesk] develop/helpdesk/locale/main.pot\n"
 "X-Crowdin-File-ID: 118\n"
 "Language: sr_SP\n"
+
+#: helpdesk/api/dashboard.py:231
+msgid "% SLA Fulfilled"
+msgstr "% испуњености споразума о нивоу услуге"
+
+#: helpdesk/api/dashboard.py:236
+#, python-format
+msgid "% of tickets created that were resolved within SLA"
+msgstr "% решених креираних тикета у оквиру рокова из споразума о нивоу услуге"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
@@ -280,7 +289,7 @@ msgstr "Чланак"
 msgid "Assign to"
 msgstr "Додели"
 
-#: desk/src/components/ticket-agent/AssignToBody.vue:64
+#: desk/src/components/ticket-agent/AssignToBody.vue:65
 msgid "Assign to me"
 msgstr "Додели себи"
 
@@ -325,7 +334,7 @@ msgstr "Правила доделе"
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
 msgstr "Правила додељивања аутоматски усмеравају тикете ка одговарајућим члановима тима на основу унапред дефинисаних услова."
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:278
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:283
 msgid "Assignment Schedule"
 msgstr "Распоред додељивања"
 
@@ -396,6 +405,38 @@ msgstr "Аутоматизација"
 msgid "Average Response Time"
 msgstr "Просечно време одговора"
 
+#: helpdesk/api/dashboard.py:682
+msgid "Average feedback rating per day is around {0} stars"
+msgstr "Просечна оцена повратних информација по дану је око {0} звезда"
+
+#: helpdesk/api/dashboard.py:606
+msgid "Average tickets per day is around {0}"
+msgstr "Просечан број тикета по дану је око {0}"
+
+#: helpdesk/api/dashboard.py:387
+msgid "Avg. Feedback Rating"
+msgstr "Просечна оцена повратних информација"
+
+#: helpdesk/api/dashboard.py:283
+msgid "Avg. First Response"
+msgstr "Просечно време првог одговора"
+
+#: helpdesk/api/dashboard.py:337
+msgid "Avg. Resolution"
+msgstr "Просечно време решавања"
+
+#: helpdesk/api/dashboard.py:392
+msgid "Avg. feedback rating for the tickets resolved"
+msgstr "Просечна оцена повратних информација за решене тикете"
+
+#: helpdesk/api/dashboard.py:289
+msgid "Avg. time taken to first respond to a ticket"
+msgstr "Просечно време потребно за први одговор на тикет"
+
+#: helpdesk/api/dashboard.py:343
+msgid "Avg. time taken to resolve a ticket"
+msgstr "Просечно време потребно за решавање тикета"
+
 #. Label of the base_support_rotation (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Base Support Rotation"
@@ -443,11 +484,11 @@ msgstr "Дугме"
 msgid "Call Details"
 msgstr "Детаљи позива"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:607
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:599
 msgid "Can not send email. No sender email set up!"
 msgstr "Није могуће послати имејл. Није подешен имејл пошиљаоца!"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:500
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:508
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr "Није могуће обрисати подразумевани споразум о нивоу услуге. Барем један споразум мора бити означен као подразумевани."
 
@@ -484,7 +525,7 @@ msgstr "Канали"
 msgid "Choose how tickets are distributed among selected assignees."
 msgstr "Изаберите како се тикети распоређују међу изабраним извршиоцима."
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:282
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:287
 msgid "Choose the days of the week when this rule should be active."
 msgstr "Изаберите дане у недељи када ово правило треба да буде активно."
 
@@ -492,7 +533,7 @@ msgstr "Изаберите дане у недељи када ово правил
 msgid "Choose which tickets are affected by this assignment rule."
 msgstr "Изаберите који тикет подлеже овом правилу додељивања."
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:209
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:211
 msgid "Choose which tickets are affected by this un-assignment rule."
 msgstr "Изаберите који тикети подлежу правилу уклањања додељивања."
 
@@ -518,7 +559,7 @@ msgstr "Затвори"
 msgid "Closed"
 msgstr "Затворено"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:321
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Затворени или оцењени тикети не могу бити ажурирани од стране особа које нису агенти"
 
@@ -593,15 +634,15 @@ msgstr "Садржај"
 msgid "Content Type"
 msgstr "Врста садржаја"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:625
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:617
 msgid "Could not an email due to: {0}"
 msgstr "Није могуће послати имејл због: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:785
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:775
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "Није могуће послати имејл потврду пријема због: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:162
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:161
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Неуспешно слање имејла са повратном информацијом због: {0}"
 
@@ -849,7 +890,11 @@ msgstr "Унесите назив за ову HD листу празника з�
 msgid "Error moving article to category"
 msgstr "Грешка при премештању чланка у категорију"
 
-#: helpdesk/overrides/email_account.py:69
+#: helpdesk/overrides/email_account.py:43
+msgid "Error processing email at index {0}, message: {1}"
+msgstr "Грешка при обради имејла на индексу {0}, порука: {1}"
+
+#: helpdesk/overrides/email_account.py:90
 msgid "Error while connecting to email account {0}"
 msgstr "Грешка при повезивању са имејл налогом {0}"
 
@@ -905,7 +950,11 @@ msgstr "Повратна информација већ постоји"
 msgid "Feedback Rating"
 msgstr "Оцена повратне информације"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:160
+#: helpdesk/api/dashboard.py:688
+msgid "Feedback Trend"
+msgstr "Тренд повратних информација"
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:159
 msgid "Feedback email has been sent to the customer"
 msgstr "Имејл са повратном информацијом је послат клијенту"
 
@@ -1362,7 +1411,7 @@ msgstr "Долазни позив"
 msgid "Instantly send e-mail"
 msgstr "Слање имејла тренутно"
 
-#: helpdesk/utils.py:32
+#: helpdesk/utils.py:33
 msgid "Insufficient Permission for {0}"
 msgstr "Недовољна овлашћења за {0}"
 
@@ -1459,7 +1508,7 @@ msgid "Last user assigned by this rule"
 msgstr "Последњи корисник којем је тикет додељен по овом правилу"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:145
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:217
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:219
 msgid "Learn about conditions"
 msgstr "Сазнајте више о условима"
 
@@ -1467,7 +1516,7 @@ msgstr "Сазнајте више о условима"
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Link"
-msgstr "Повезивање"
+msgstr "Линк"
 
 #. Label of the link_options_sb (Section Break) field in DocType 'HD Support
 #. Search Source'
@@ -1548,7 +1597,7 @@ msgstr "Месечно"
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Name"
-msgstr "Име"
+msgstr "Назив"
 
 #. Label of the name_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1565,7 +1614,11 @@ msgstr "Назив приказан на порталу за клијента<br
 msgid "New Assignment Rule Name"
 msgstr "Назив новог правила додељивања"
 
-#: desk/src/components/ticket-agent/AssignTo.vue:12
+#: helpdesk/api/dashboard.py:429
+msgid "No Team"
+msgstr "Без тима"
+
+#: desk/src/components/ticket-agent/AssignTo.vue:13
 msgid "No assignees"
 msgstr "Нема извршилаца"
 
@@ -1577,7 +1630,7 @@ msgstr "Нема ставки у листи"
 msgid "No results found"
 msgstr "Нема резултата"
 
-#: helpdesk/utils.py:165
+#: helpdesk/utils.py:166
 msgid "Not Allowed"
 msgstr "Није дозвољено"
 
@@ -1593,7 +1646,7 @@ msgid "Notification Settings"
 msgstr "Подешавање обавештења"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:232
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:234
 msgid "Old Condition"
 msgstr "Стари услов"
 
@@ -1676,6 +1729,22 @@ msgstr "Матично поље, зависно поље и мапирање м�
 msgid "Paused"
 msgstr "Паузирано"
 
+#: helpdesk/api/dashboard.py:541
+msgid "Percentage of Total Tickets by Channel"
+msgstr "Проценат укупног броја тикета по каналу"
+
+#: helpdesk/api/dashboard.py:501
+msgid "Percentage of Total Tickets by Priority"
+msgstr "Проценат укупног броја тикета по приоритету"
+
+#: helpdesk/api/dashboard.py:435
+msgid "Percentage of Total Tickets by Team"
+msgstr "Проценат укупног броја тикета по тиму"
+
+#: helpdesk/api/dashboard.py:468
+msgid "Percentage of Total Tickets by Type"
+msgstr "Проценат укупног броја тикета по врсти"
+
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Pink"
@@ -1695,7 +1764,7 @@ msgstr "Резервисани текст"
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
 msgstr "Молимо Вас да додате овај приоритет у <a href='/app/hd-service-level-agreement'> обавезне документе споразума о нивоу услуге</a>"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:318
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:326
 msgid "Please add {0} priority in {1} SLA"
 msgstr "Молимо Вас да додате приоритет {0} у споразум о нивоу услуге {1}"
 
@@ -1806,12 +1875,17 @@ msgstr "Опсег"
 msgid "Rate Your Support Experience"
 msgstr "Оцените своје искуство подршке"
 
+#: helpdesk/api/dashboard.py:691
+msgid "Rated Tickets"
+msgstr "Оцењени тикети"
+
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
+#: helpdesk/api/dashboard.py:703
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
-msgstr "Оцењивање"
+msgstr "Оцена"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
@@ -1920,12 +1994,12 @@ msgstr "Решено од стране"
 #. Label of the resolution_date (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Date"
-msgstr "Датум решавања"
+msgstr "Датум резолуције"
 
 #. Label of the resolution_details (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Details"
-msgstr "Детаљи решавања"
+msgstr "Детаљи резолуције"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2039,6 +2113,10 @@ msgstr "Мапирање споразума о нивоу услуге"
 msgid "SLA Status"
 msgstr "Статус споразума о нивоу услуге"
 
+#: helpdesk/api/dashboard.py:584 helpdesk/api/dashboard.py:619
+msgid "SLA_fulfilled"
+msgstr "SLA_fulfilled"
+
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
@@ -2087,7 +2165,7 @@ msgstr "Индекс претраге није доступан. Молимо В
 msgid "Search query must be at least 2 characters"
 msgstr "Упит за претрагу мора имати најмање 2 карактера"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:157
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:165
 msgid "Select a Default Priority."
 msgstr "Изаберите подразумевани приоритет."
 
@@ -2131,7 +2209,7 @@ msgstr "Поставите време решавања за приоритет {
 msgid "Set Response Time for Priority {0} in row {1}."
 msgstr "Постави време одговора за приоритет {0} у реду {1}."
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:124
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:123
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
 msgstr "Постављање <strong>{0}</strong> као подразумевани споразум о нивоу услуге уклања <strong>{1}</strong> као подразумевани споразум. Неопходно је да додате услов у <strong>{1}</strong> да би споразум о нивоу услуге могао да функционише."
 
@@ -2217,7 +2295,7 @@ msgstr "Датум почетка"
 msgid "Start Time"
 msgstr "Време почетка"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:99
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:98
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
 msgstr "Време почетка не може бити веће или једнако времену завршетка у реду <u>{0}</u>."
 
@@ -2413,9 +2491,21 @@ msgstr "Назив шаблона"
 msgid "The 'Closed' status cannot be renamed."
 msgstr "Статус 'Затворено' не може се преименовати."
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:147
-msgid "The Condition '{0}' is invalid: {1}"
-msgstr "Услов '{0}' је неважећи: {1}"
+#: helpdesk/extends/assignment_rule.py:18
+msgid "The Assign Condition JSON '{0}' is invalid: </br> {1}"
+msgstr "JSON додељеног услова '{0}' је неважећи: </br> {1}"
+
+#: helpdesk/extends/assignment_rule.py:26
+msgid "The Unassign Condition JSON '{0}' is invalid: </br> {1}"
+msgstr "JSON услова за уклањање доделе '{0}' је неважећи: </br> {1}"
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:145
+msgid "The assignment condition '{0}' is invalid: {1}"
+msgstr "Услов доделе '{0}' је неважећи: {1}"
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:152
+msgid "The assignment condition json '{0}' is invalid: {1}"
+msgstr "JSON услов доделе '{0}' је неважећи: {1}"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:54
 msgid "The holiday on {0} is not between From Date and To Date"
@@ -2525,6 +2615,10 @@ msgstr "Тикет раздељен из"
 msgid "Ticket Summary"
 msgstr "Резиме тикета"
 
+#: helpdesk/api/dashboard.py:611
+msgid "Ticket Trend"
+msgstr "Тренд тикета"
+
 #. Label of the ticket_type_section (Section Break) field in DocType 'HD
 #. Settings'
 #. Label of the ticket_type (Link) field in DocType 'HD Ticket'
@@ -2541,7 +2635,7 @@ msgstr "Врста тикета"
 msgid "Ticket does not exist."
 msgstr "Тикет не постоји."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:318
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:311
 msgid "Ticket must be resolved with a feedback"
 msgstr "Тикет мора бити решен са повратном информацијом"
 
@@ -2561,7 +2655,7 @@ msgstr "Врста тикета"
 
 #. Label of the is_ticket_type_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:295
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:293
 msgid "Ticket type is mandatory"
 msgstr "Врста тикета је обавезна"
 
@@ -2569,6 +2663,26 @@ msgstr "Врста тикета је обавезна"
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
 msgid "Ticket-Search Analysis"
 msgstr "Анализа претраге тикета"
+
+#: helpdesk/api/dashboard.py:160 helpdesk/api/dashboard.py:614
+msgid "Tickets"
+msgstr "Тикети"
+
+#: helpdesk/api/dashboard.py:540
+msgid "Tickets by Channel"
+msgstr "Тикети по каналу"
+
+#: helpdesk/api/dashboard.py:500 helpdesk/api/dashboard.py:508
+msgid "Tickets by Priority"
+msgstr "Тикети по приоритету"
+
+#: helpdesk/api/dashboard.py:434 helpdesk/api/dashboard.py:442
+msgid "Tickets by Team"
+msgstr "Тикети по тиму"
+
+#: helpdesk/api/dashboard.py:467 helpdesk/api/dashboard.py:475
+msgid "Tickets by Type"
+msgstr "Тикети по врсти"
 
 #: helpdesk/api/ticket.py:18
 msgid "Tickets can only be assigned to agents"
@@ -2620,11 +2734,27 @@ msgstr "Укупно време задржавања"
 #. Label of the total_holidays (Int) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Total Holidays"
-msgstr "Укупан број празника"
+msgstr "Укупно празника"
 
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:126
 msgid "Total Ticket"
 msgstr "Укупан број тикета"
+
+#: helpdesk/api/dashboard.py:509
+msgid "Total Tickets by Priority"
+msgstr "Укупан број тикета по приоритету"
+
+#: helpdesk/api/dashboard.py:443
+msgid "Total Tickets by Team"
+msgstr "Укупан број тикета по тиму"
+
+#: helpdesk/api/dashboard.py:476
+msgid "Total Tickets by Type"
+msgstr "Укупан број тикета по врсти"
+
+#: helpdesk/api/dashboard.py:165
+msgid "Total number of tickets created"
+msgstr "Укупан број креираних тикета"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2646,7 +2776,7 @@ msgstr "Врста"
 msgid "URL/Method"
 msgstr "URL/Метод"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:204
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:206
 msgid "Unassignment condition"
 msgstr "Услов уклањања додељивања"
 
@@ -2724,7 +2854,7 @@ msgstr "Путем портала за клијенте"
 #. Label of the views (Int) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Views"
-msgstr "Прикази"
+msgstr "Прегледи"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -2768,7 +2898,7 @@ msgstr "Реч"
 msgid "Workday"
 msgstr "Радни дан"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:110
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:109
 msgid "Workday {0} has been repeated."
 msgstr "Радни дан {0} је поновљен."
 
@@ -2794,15 +2924,15 @@ msgstr "Годишње"
 msgid "Yellow"
 msgstr "Жута"
 
-#: helpdesk/api/dashboard.py:18
+#: helpdesk/api/dashboard.py:24
 msgid "You are not allowed to view this dashboard data."
 msgstr "Није Вам дозвољено да видите податке са ове контролне табле."
 
-#: helpdesk/utils.py:164
+#: helpdesk/utils.py:165
 msgid "You are not permitted to access this resource."
 msgstr "Немате дозволу да приступите овом ресурсу."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:530
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:522
 msgid "You are not permitted to add a comment"
 msgstr "Није Вам дозвољено да додате коментар"
 
@@ -2810,7 +2940,7 @@ msgstr "Није Вам дозвољено да додате коментар"
 msgid "You can change the default calling medium from the settings"
 msgstr "Можете променити подразумевано средство за позивање у подешавањима"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:137
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:136
 msgid "You cannot disable the default SLA."
 msgstr "Не можете онемогућити подразумевани споразум о нивоу услуге."
 
@@ -2822,7 +2952,7 @@ msgstr "Не можете поставити више од једног подр
 msgid "You have already provided feedback for this ticket."
 msgstr "Већ сте дали повратну информацију за овај тикет."
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:131
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:130
 msgid "You must set one SLA as Default. Please check the Default SLA option."
 msgstr "Морате поставити један споразум о нивоу услуге као подразумевани. Молимо Вас да означите опцију подразумевани споразум о нивоу услуге."
 
@@ -2830,9 +2960,17 @@ msgstr "Морате поставити један споразум о ниво�
 msgid "back to email event list"
 msgstr "назад на листу догађаја имејла"
 
+#: helpdesk/api/dashboard.py:583
+msgid "closed"
+msgstr "затворено"
+
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:46
 msgid "customize {0}"
 msgstr "прилагоди {0}"
+
+#: helpdesk/api/dashboard.py:334
+msgid "days"
+msgstr "дани"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2851,6 +2989,10 @@ msgstr "је ступио у контакт"
 msgid "here"
 msgstr "овде"
 
+#: helpdesk/api/dashboard.py:280
+msgid "hrs"
+msgstr "часови"
+
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "kanban"
@@ -2861,10 +3003,26 @@ msgstr "канбан"
 msgid "list"
 msgstr "листа"
 
+#: helpdesk/api/dashboard.py:582
+msgid "open"
+msgstr "отворено"
+
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "purple"
 msgstr "љубичаста"
+
+#: helpdesk/api/dashboard.py:642
+msgid "rated_tickets"
+msgstr "rated_tickets"
+
+#: helpdesk/api/dashboard.py:641
+msgid "rating"
+msgstr "оцењивање"
+
+#: helpdesk/api/dashboard.py:384
+msgid "stars"
+msgstr "звезде"
 
 #. Label of the synonym (Data) field in DocType 'HD Synonym'
 #: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json

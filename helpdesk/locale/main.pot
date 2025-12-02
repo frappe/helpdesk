@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-10-26 10:35+0000\n"
-"PO-Revision-Date: 2025-10-26 10:35+0000\n"
+"POT-Creation-Date: 2025-11-23 10:36+0000\n"
+"PO-Revision-Date: 2025-11-23 10:36+0000\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -287,7 +287,7 @@ msgstr ""
 msgid "Assign to"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignToBody.vue:64
+#: desk/src/components/ticket-agent/AssignToBody.vue:65
 msgid "Assign to me"
 msgstr ""
 
@@ -332,7 +332,7 @@ msgstr ""
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:278
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:283
 msgid "Assignment Schedule"
 msgstr ""
 
@@ -482,11 +482,11 @@ msgstr ""
 msgid "Call Details"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:607
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:604
 msgid "Can not send email. No sender email set up!"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:500
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:508
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr ""
 
@@ -523,7 +523,7 @@ msgstr ""
 msgid "Choose how tickets are distributed among selected assignees."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:282
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:287
 msgid "Choose the days of the week when this rule should be active."
 msgstr ""
 
@@ -531,7 +531,7 @@ msgstr ""
 msgid "Choose which tickets are affected by this assignment rule."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:209
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:211
 msgid "Choose which tickets are affected by this un-assignment rule."
 msgstr ""
 
@@ -557,7 +557,7 @@ msgstr ""
 msgid "Closed"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr ""
 
@@ -632,15 +632,15 @@ msgstr ""
 msgid "Content Type"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:625
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:622
 msgid "Could not an email due to: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:785
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:780
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:162
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:161
 msgid "Could not send feedback email,due to: {0}"
 msgstr ""
 
@@ -888,7 +888,11 @@ msgstr ""
 msgid "Error moving article to category"
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:69
+#: helpdesk/overrides/email_account.py:43
+msgid "Error processing email at index {0}, message: {1}"
+msgstr ""
+
+#: helpdesk/overrides/email_account.py:90
 msgid "Error while connecting to email account {0}"
 msgstr ""
 
@@ -948,7 +952,7 @@ msgstr ""
 msgid "Feedback Trend"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:160
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:159
 msgid "Feedback email has been sent to the customer"
 msgstr ""
 
@@ -1405,7 +1409,7 @@ msgstr ""
 msgid "Instantly send e-mail"
 msgstr ""
 
-#: helpdesk/utils.py:32
+#: helpdesk/utils.py:33
 msgid "Insufficient Permission for {0}"
 msgstr ""
 
@@ -1502,7 +1506,7 @@ msgid "Last user assigned by this rule"
 msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:145
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:217
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:219
 msgid "Learn about conditions"
 msgstr ""
 
@@ -1612,7 +1616,7 @@ msgstr ""
 msgid "No Team"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:12
+#: desk/src/components/ticket-agent/AssignTo.vue:13
 msgid "No assignees"
 msgstr ""
 
@@ -1624,7 +1628,7 @@ msgstr ""
 msgid "No results found"
 msgstr ""
 
-#: helpdesk/utils.py:165
+#: helpdesk/utils.py:166
 msgid "Not Allowed"
 msgstr ""
 
@@ -1640,7 +1644,7 @@ msgid "Notification Settings"
 msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:154
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:232
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:234
 msgid "Old Condition"
 msgstr ""
 
@@ -1757,7 +1761,7 @@ msgstr ""
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:318
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:326
 msgid "Please add {0} priority in {1} SLA"
 msgstr ""
 
@@ -2158,7 +2162,7 @@ msgstr ""
 msgid "Search query must be at least 2 characters"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:157
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:165
 msgid "Select a Default Priority."
 msgstr ""
 
@@ -2202,7 +2206,7 @@ msgstr ""
 msgid "Set Response Time for Priority {0} in row {1}."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:124
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:123
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
 msgstr ""
 
@@ -2288,7 +2292,7 @@ msgstr ""
 msgid "Start Time"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:99
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:98
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
 msgstr ""
 
@@ -2486,8 +2490,20 @@ msgstr ""
 msgid "The 'Closed' status cannot be renamed."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:147
-msgid "The Condition '{0}' is invalid: {1}"
+#: helpdesk/extends/assignment_rule.py:18
+msgid "The Assign Condition JSON '{0}' is invalid: </br> {1}"
+msgstr ""
+
+#: helpdesk/extends/assignment_rule.py:26
+msgid "The Unassign Condition JSON '{0}' is invalid: </br> {1}"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:145
+msgid "The assignment condition '{0}' is invalid: {1}"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:152
+msgid "The assignment condition json '{0}' is invalid: {1}"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:54
@@ -2618,7 +2634,7 @@ msgstr ""
 msgid "Ticket does not exist."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:318
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:316
 msgid "Ticket must be resolved with a feedback"
 msgstr ""
 
@@ -2638,7 +2654,7 @@ msgstr ""
 
 #. Label of the is_ticket_type_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:295
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:293
 msgid "Ticket type is mandatory"
 msgstr ""
 
@@ -2759,7 +2775,7 @@ msgstr ""
 msgid "URL/Method"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:204
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:206
 msgid "Unassignment condition"
 msgstr ""
 
@@ -2881,7 +2897,7 @@ msgstr ""
 msgid "Workday"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:110
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:109
 msgid "Workday {0} has been repeated."
 msgstr ""
 
@@ -2911,11 +2927,11 @@ msgstr ""
 msgid "You are not allowed to view this dashboard data."
 msgstr ""
 
-#: helpdesk/utils.py:164
+#: helpdesk/utils.py:165
 msgid "You are not permitted to access this resource."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:530
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:527
 msgid "You are not permitted to add a comment"
 msgstr ""
 
@@ -2923,7 +2939,7 @@ msgstr ""
 msgid "You can change the default calling medium from the settings"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:137
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:136
 msgid "You cannot disable the default SLA."
 msgstr ""
 
@@ -2935,7 +2951,7 @@ msgstr ""
 msgid "You have already provided feedback for this ticket."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:131
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:130
 msgid "You must set one SLA as Default. Please check the Default SLA option."
 msgstr ""
 

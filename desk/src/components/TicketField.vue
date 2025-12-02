@@ -41,15 +41,16 @@
 
 <script setup lang="ts">
 import { Autocomplete, Link } from "@/components";
-import { Field, FieldValue } from "@/types";
+import { APIOptions, Field, FieldValue } from "@/types";
+import { parseApiOptions } from "@/utils";
 import {
   createResource,
+  DatePicker,
   DateTimePicker,
   dayjs,
   FormControl,
   Tooltip,
 } from "frappe-ui";
-import DatePicker from "frappe-ui/src/components/DatePicker/DatePicker.vue";
 import { computed, h } from "vue";
 
 interface P {
@@ -72,14 +73,8 @@ const emit = defineEmits<E>();
 const apiOptions = createResource({
   url: props.field.url_method,
   auto: !!props.field.url_method,
-  transform: (data) => {
-    if (!data?.length) return [];
-    return (
-      data?.map((o) => ({
-        label: o,
-        value: o,
-      })) || []
-    );
+  transform: (data: APIOptions) => {
+    return parseApiOptions(data);
   },
 });
 
