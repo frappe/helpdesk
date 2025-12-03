@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="!isEmpty(articles.data) && query.length > 2"
+    v-if="Boolean(articles.data?.length) && query.length > 2"
     class="rounded border p-4 text-base"
   >
     <div class="mb-2 font-medium pl-2" v-if="!hideViewAll">
@@ -52,7 +52,7 @@
     "
     class="flex flex-col items-center justify-center h-[240px] gap-2 rounded border"
   >
-    <Icon icon="heroicons-outline:search" class="h-8 w-8 text-gray-400" />
+    <LucideSearch class="size-8 text-ink-gray-3" />
     <div class="flex items-center flex-col justify-center">
       <p class="font-base">No answers found</p>
       <span class="font-base text-p-sm text-gray-600 text-center"
@@ -64,7 +64,7 @@
     v-else-if="articles.loading"
     class="flex flex-col items-center justify-center h-[240px] gap-2 rounded border"
   >
-    <Icon icon="heroicons-outline:search" class="h-8 w-8 text-gray-400" />
+    <LucideSearch class="size-8 text-ink-gray-3" />
     <div class="flex items-center flex-col justify-center">
       <p class="font-base">Searching...</p>
       <span class="font-base text-p-sm text-gray-600 text-center"
@@ -75,11 +75,9 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from "vue";
-import { createResource } from "frappe-ui";
-import { isEmpty } from "lodash";
-import { Icon } from "@iconify/vue";
 import { capture } from "@/telemetry";
+import { createResource } from "frappe-ui";
+import { watch } from "vue";
 interface P {
   query: string;
   hideViewAll?: boolean;

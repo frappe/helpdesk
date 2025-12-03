@@ -6,7 +6,7 @@
       </template>
       <template #right-header>
         <Button
-          label="New contact"
+          label="Create"
           theme="gray"
           variant="solid"
           @click="showNewContactModal = !showNewContactModal"

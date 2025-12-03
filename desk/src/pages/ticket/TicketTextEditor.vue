@@ -16,8 +16,8 @@
           :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
         >
           <template #suffix>
-            <Icon
-              icon="lucide:x"
+            <LucideX
+              class="size-4"
               @click.stop="
                 () => {
                   $emit(
@@ -40,13 +40,15 @@
             folder: 'Home/Helpdesk',
             private: true,
           }"
-          @success="(f: File) => $emit('update:attachments', [...attachments, f])"
+          @success="
+            (f: File) => $emit('update:attachments', [...attachments, f])
+          "
           @failure="() => toast.error('Error uploading file')"
         >
           <template #default="{ openFileSelector }">
             <Button theme="gray" variant="ghost" @click="openFileSelector()">
               <template #icon>
-                <Icon icon="lucide:paperclip" />
+                <LucidePaperclip class="size-4" />
               </template>
             </Button>
           </template>
@@ -88,7 +90,6 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import { File } from "@/types";
 import { removeAttachmentFromServer } from "@/utils";
-import { Icon } from "@iconify/vue";
 import { FileUploader, toast } from "frappe-ui";
 import { computed, ref } from "vue";
 

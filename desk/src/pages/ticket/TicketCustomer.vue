@@ -17,7 +17,7 @@
           @click="handleClose()"
         >
           <template #prefix>
-            <Icon icon="lucide:check" />
+            <LucideCheck class="size-4" />
           </template>
         </Button>
       </template>
@@ -43,7 +43,9 @@
             placeholder="Type a message"
             autofocus
             @clear="() => (isExpanded = false)"
-            :uploadFunction="(file:any)=>uploadFunction(file, 'HD Ticket', props.ticketId)"
+            :uploadFunction="
+              (file: any) => uploadFunction(file, 'HD Ticket', props.ticketId)
+            "
           >
             <template #bottom-right>
               <Button
@@ -73,17 +75,25 @@ import { useScreenSize } from "@/composables/screen";
 import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
-import { Icon } from "@iconify/vue";
 import { Breadcrumbs, Button, call, createResource, toast } from "frappe-ui";
-import { computed, onMounted, onUnmounted, provide, ref } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  onMounted,
+  onUnmounted,
+  provide,
+  ref,
+} from "vue";
 import { useRouter } from "vue-router";
 import { ITicket } from "./symbols";
-import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
 import TicketConversation from "./TicketConversation.vue";
+import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
 import TicketFeedback from "./TicketFeedback.vue";
-import TicketTextEditor from "./TicketTextEditor.vue";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
+const TicketTextEditor = defineAsyncComponent(
+  () => import("./TicketTextEditor.vue")
+);
 
 interface P {
   ticketId: string;
