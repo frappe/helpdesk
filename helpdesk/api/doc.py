@@ -217,9 +217,7 @@ def get_list_data(
         "columns": columns,
         "rows": rows,
         "fields": fields if doctype == "HD Ticket" else [],
-        "total_count": frappe.get_list(
-            doctype, filters=filters, fields="count(*) as count"
-        )[0].count,
+        "total_count": frappe.db.count(doctype, filters=filters),
         "row_count": len(data),
         "group_by_field": group_by_field,
         "view_type": view_type,
