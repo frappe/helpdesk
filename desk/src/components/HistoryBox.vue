@@ -22,7 +22,7 @@
           </template>
         </Button>
       </div>
-      <div class="text-gray-600 w-4/6" v-else>
+      <div class="text-gray-600 w-4/6 text-p-base" v-else>
         <span class="font-medium text-gray-800">
           {{ user }}
         </span>

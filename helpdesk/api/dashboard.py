@@ -1,7 +1,15 @@
 import frappe
 from frappe import _
 
-from helpdesk.utils import agent_only
+from helpdesk.utils import agent_only, is_version_16
+
+HD_TICKET = "HD Ticket"
+
+COUNT_NAME = (
+    {"COUNT": "name", "as": "count"} if is_version_16() else "count(name) as count"
+)
+
+COUNT_DESC = "count desc"
 
 
 @frappe.whitelist()
