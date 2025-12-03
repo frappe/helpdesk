@@ -791,4 +791,3 @@ def get_avg_tickets_per_day(from_date: str, to_date: str, conds: str = "") -> fl
     avg_tickets_per_day = total_tickets / days
 
     return avg_tickets_per_day
-    return avg_tickets_per_day
