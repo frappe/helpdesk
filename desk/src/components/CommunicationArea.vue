@@ -29,8 +29,8 @@
       </div>
     </div>
     <div
-      v-show="showEmailBox"
       ref="emailBoxRef"
+      v-show="showEmailBox"
       class="flex gap-1.5 flex-1"
       @keydown.ctrl.enter.capture.stop="submitEmail"
       @keydown.meta.enter.capture.stop="submitEmail"
@@ -60,8 +60,8 @@
       />
     </div>
     <div
-      v-show="showCommentBox"
       ref="commentBoxRef"
+      v-show="showCommentBox"
       @keydown.ctrl.enter.capture.stop="submitComment"
       @keydown.meta.enter.capture.stop="submitComment"
     >
@@ -102,6 +102,7 @@ import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { ref, watch } from "vue";
+import { onClickOutside } from "@vueuse/core";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
@@ -213,19 +214,29 @@ defineExpose({
   editor: emailEditorRef,
 });
 
-import { onClickOutside } from "@vueuse/core";
-
-onClickOutside(emailBoxRef, () => {
-  if (showEmailBox.value) {
-    showEmailBox.value = false;
+onClickOutside(
+  emailBoxRef,
+  () => {
+    if (showEmailBox.value) {
+      showEmailBox.value = false;
+    }
+  },
+  {
+    ignore: [".tippy-box", ".tippy-content"],
   }
-});
+);
 
-onClickOutside(commentBoxRef, () => {
-  if (showCommentBox.value) {
-    showCommentBox.value = false;
+onClickOutside(
+  commentBoxRef,
+  () => {
+    if (showCommentBox.value) {
+      showCommentBox.value = false;
+    }
+  },
+  {
+    ignore: [".tippy-box", ".tippy-content"],
   }
-});
+);
 </script>
 
 <style>
