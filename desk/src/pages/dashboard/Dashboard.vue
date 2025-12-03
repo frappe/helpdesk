@@ -136,17 +136,7 @@
 <script setup lang="ts">
 import { Link } from "@/components";
 import { useAuthStore } from "@/stores/auth";
-import {
-  AxisChart,
-  createResource,
-  DateRangePicker,
-  dayjs,
-  DonutChart,
-  Dropdown,
-  NumberChart,
-  Tooltip,
-  usePageMeta,
-} from "frappe-ui";
+import { AxisChart, DonutChart, NumberChart } from "frappe-ui";
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
 
 const { isManager, userId } = useAuthStore();

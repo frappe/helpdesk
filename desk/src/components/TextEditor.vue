@@ -32,7 +32,7 @@
           <div
             class="flex flex-col space-y-1.5 overflow-auto sm:flex-row sm:justify-between"
           >
-            <div class="flex items-center gap-1">
+            <div class="flex items-center">
               <TextEditorFixedMenu :buttons="fixedMenu" />
               <slot name="bottom-left" />
             </div>
