@@ -13,12 +13,19 @@
       <div v-if="column.key === 'start_time' || column.key === 'end_time'">
         {{ formatTime(props.row[column.key]) }}
       </div>
-      <div v-else>
-        <Select
-          class="bg-transparent cursor-pointer border-0 focus-visible:!ring-0 bg-none"
-          :options="workDayOptions"
+      <div v-else class="ml-2">
+        <select
+          class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-md p-0 pl-2 pr-5 bg-transparent -ml-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
           v-model="props.row[column.key]"
-        />
+        >
+          <option
+            v-for="option in workDayOptions"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
       </div>
     </div>
     <div class="flex justify-end">
@@ -40,7 +47,11 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+<<<<<<< HEAD
 import { Button, Select } from "frappe-ui";
+=======
+import { Button, Dropdown } from "frappe-ui";
+>>>>>>> e2a2d29b (fix: bugs related to frappe-ui update)
 import WorkDayModal from "./Modals/WorkDayModal.vue";
 import { ConfirmDelete, getGridTemplateColumnsForTable } from "@/utils";
 import { slaData } from "@/stores/sla";
