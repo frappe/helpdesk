@@ -1,17 +1,14 @@
 import frappe
 from frappe import _
-from frappe.pulse.utils import get_frappe_version
 
-from helpdesk.utils import agent_only
+from helpdesk.utils import agent_only, is_version_16
 
 <<<<<<< HEAD
 =======
 HD_TICKET = "HD Ticket"
 
 COUNT_NAME = (
-    {"COUNT": "name", "as": "count"}
-    if get_frappe_version().startswith("16")
-    else "count(name) as count"
+    {"COUNT": "name", "as": "count"} if is_version_16() else "count(name) as count"
 )
 
 COUNT_DESC = "count desc"
@@ -726,4 +723,5 @@ def get_avg_tickets_per_day(from_date, to_date, conds=""):
 
     avg_tickets_per_day = total_tickets / days
 
+    return avg_tickets_per_day
     return avg_tickets_per_day
