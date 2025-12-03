@@ -1,4 +1,4 @@
-import { createSuggestionExtension } from "frappe-ui/src/components/TextEditor/extensions/suggestion/createSuggestionExtension";
+import { createSuggestionExtension } from "frappe-ui";
 import { PluginKey } from "@tiptap/pm/state";
 import FieldAutocompleteList from "./FieldAutocompleteList.vue";
 import { getMeta } from "@/stores/meta";

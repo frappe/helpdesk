@@ -66,7 +66,6 @@ export const tabs = computed(() => {
     },
     {
       label: __("App Settings"),
-      condition: () => auth.isAdmin || auth.isManager,
       items: [
         {
           label: __("General"),
@@ -78,36 +77,43 @@ export const tabs = computed(() => {
           label: __("Agents"),
           icon: markRaw(LucideUser),
           component: markRaw(Agents),
+          condition: () => auth.isAdmin || auth.isManager,
         },
         {
           label: __("Invite Agents"),
           icon: markRaw(LucideUserPlus),
           component: markRaw(InviteAgents),
+          condition: () => auth.isAdmin || auth.isManager,
         },
         {
           label: __("Teams"),
           icon: markRaw(LucideUsers),
           component: markRaw(TeamsConfig),
+          condition: () => auth.isAdmin || auth.isManager,
         },
         {
           label: __("SLA Policies"),
           icon: markRaw(ShieldCheck),
           component: markRaw(Sla),
+          condition: () => auth.isAdmin || auth.isManager,
         },
         {
           label: __("Business Holidays"),
           icon: markRaw(Briefcase),
           component: markRaw(HolidayList),
+          condition: () => auth.isAdmin || auth.isManager,
         },
         {
           label: __("Assignment Rules"),
           icon: markRaw(h(Settings, { class: "rotate-90" })),
           component: markRaw(AssignmentRules),
+          condition: () => auth.isAdmin || auth.isManager,
         },
         {
           label: __("Field Dependencies"),
           icon: markRaw(FieldDependencyIcon),
           component: markRaw(FieldDependencyConfig),
+          condition: () => auth.isAdmin || auth.isManager,
         },
         {
           label: "Canned Responses",

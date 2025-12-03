@@ -58,20 +58,7 @@
             <FormLabel :label="__('Scope')" />
             <Select
               v-model="cannedResponseData.scope"
-              :options="[
-                {
-                  label: 'Global',
-                  value: 'Global',
-                },
-                {
-                  label: 'Team',
-                  value: 'Team',
-                },
-                {
-                  label: 'Personal',
-                  value: 'Personal',
-                },
-              ]"
+              :options="scopeDropdownOptions"
               required
             />
             <FormLabel
@@ -166,7 +153,6 @@ const showConfirmDialog = ref({
 });
 
 const cannedResponseActiveScreen = inject<any>("cannedResponseActiveScreen");
-const cannedResponseListData = inject<any>("cannedResponseListData");
 const previewDialog = ref({
   show: false,
   ticketId: "",
@@ -181,7 +167,7 @@ const { userTeams } = storeToRefs(useAuthStore());
 const cannedResponseData = ref({
   name: "",
   title: "",
-  scope: "Global",
+  scope: "Personal",
   response: "",
   teams: [],
 });
@@ -191,6 +177,26 @@ const errors = ref({
   title: "",
   response: "",
   teams: "",
+});
+
+const scopeDropdownOptions = computed(() => {
+  const _scopes = [
+    {
+      label: "Personal",
+      value: "Personal",
+    },
+    {
+      label: "Team",
+      value: "Team",
+    },
+  ];
+  if (!teamRestrictionApplied.value) {
+    _scopes.push({
+      label: "Global",
+      value: "Global",
+    });
+  }
+  return _scopes;
 });
 
 const getCannedResponseData = createResource({
@@ -296,41 +302,39 @@ const onSave = () => {
 };
 
 const createCannedResponse = () => {
-  cannedResponseListData.insert.submit(
-    {
-      name: cannedResponseData.value.title,
-      title: cannedResponseData.value.title,
-      subject: cannedResponseData.value.title,
-      response: cannedResponseData.value.response,
-      scope: cannedResponseData.value.scope,
-      teams: cannedResponseData.value.teams.map((team) => ({
-        team: team.value,
-      })),
-      reference_doctype: "HD Ticket",
+  createResource({
+    url: "frappe.client.insert",
+    params: {
+      doc: {
+        doctype: "Email Template",
+        name: cannedResponseData.value.title,
+        title: cannedResponseData.value.title,
+        subject: cannedResponseData.value.title,
+        response: cannedResponseData.value.response,
+        scope: cannedResponseData.value.scope,
+        teams: cannedResponseData.value.teams.map((team) => ({
+          team: team.value,
+        })),
+        reference_doctype: "HD Ticket",
+      },
     },
-    {
-      onSuccess: (data) => {
-        toast.success(__("Canned response saved"));
-        isLoading.value = false;
-        cannedResponseData.value = {
-          ...cannedResponseData.value,
-          name: data.name,
-        };
-        initialData.value = JSON.stringify(cannedResponseData.value);
-        cannedResponseActiveScreen.value = {
-          screen: "view",
-          data: { name: data.name },
-        };
-      },
-      onError: (er) => {
-        toast.error(
-          er?.messages?.[0] ||
-            __("Some error occurred while saving canned response")
-        );
-        isLoading.value = false;
-      },
-    }
-  );
+    auto: true,
+    onSuccess: (data) => {
+      toast.success(__("Canned response saved"));
+      isLoading.value = false;
+      cannedResponseData.value = {
+        ...cannedResponseData.value,
+        name: data.name,
+      };
+      initialData.value = JSON.stringify(cannedResponseData.value);
+      cannedResponseActiveScreen.value = {
+        screen: "view",
+        data: { name: data.name },
+      };
+    },
+  }).promise.catch(() => {
+    isLoading.value = false;
+  });
 };
 
 const updateCannedResponse = async () => {
@@ -356,30 +360,33 @@ const updateCannedResponse = async () => {
         isLoading.value = false;
         renameError = true;
       });
-    await cannedResponseListData.list.reload();
   }
   if (renameError) return;
 
-  cannedResponseListData.setValue.submit(
-    {
-      name: cannedResponseData.value.title,
-      title: cannedResponseData.value.title,
-      subject: cannedResponseData.value.title,
-      response: cannedResponseData.value.response,
-      scope: cannedResponseData.value.scope,
-      teams: cannedResponseData.value.teams.map((team) => ({
-        team: team.value,
-      })),
-    },
-    {
-      onSuccess: () => {
-        isDirty.value = false;
-        isLoading.value = false;
-        disableSettingModalOutsideClick.value = false;
-        toast.success(__("Canned response updated"));
+  createResource({
+    url: "frappe.client.set_value",
+    params: {
+      doctype: "Email Template",
+      name: cannedResponseData.value.name,
+      fieldname: {
+        name: cannedResponseData.value.title,
+        title: cannedResponseData.value.title,
+        subject: cannedResponseData.value.title,
+        response: cannedResponseData.value.response,
+        scope: cannedResponseData.value.scope,
+        teams: cannedResponseData.value.teams.map((team) => ({
+          team: team.value,
+        })),
       },
-    }
-  );
+    },
+    auto: true,
+    onSuccess: () => {
+      isDirty.value = false;
+      isLoading.value = false;
+      disableSettingModalOutsideClick.value = false;
+      toast.success(__("Canned response updated"));
+    },
+  });
 };
 
 const validateData = (key?: string) => {

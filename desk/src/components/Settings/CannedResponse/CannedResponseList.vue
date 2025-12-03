@@ -18,7 +18,7 @@
     </template>
     <template
       #header-bottom
-      v-if="cannedResponsesList.length > 9 || cannedResponseSearchQuery.length"
+      v-if="cannedResponsesList.length > 9 || cannedResponseSearchQuery?.length"
     >
       <div class="relative">
         <Input
@@ -154,15 +154,23 @@
 </template>
 
 <script setup lang="ts">
-import { Button, call, createResource, Input, toast } from "frappe-ui";
+import {
+  Button,
+  call,
+  createResource,
+  Dropdown,
+  Input,
+  toast,
+} from "frappe-ui";
 import SettingsLayoutBase from "../SettingsLayoutBase.vue";
 import { inject, ref, Ref, watch } from "vue";
 import { __ } from "@/translation";
 import { ConfirmDelete } from "@/utils";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 
-const cannedResponseSearchQuery = inject<Ref>("cannedResponseSearchQuery");
-const cannedResponseListData = inject<any>("cannedResponseListData");
+const cannedResponseSearchQuery = inject<Ref<string>>(
+  "cannedResponseSearchQuery"
+);
 const cannedResponseActiveScreen = inject<any>("cannedResponseActiveScreen");
 const duplicateDialog = ref({
   show: false,
@@ -215,8 +223,15 @@ const deleteCannedResponse = (cannedResponse) => {
     return;
   }
 
-  cannedResponseListData.delete.submit(cannedResponse.name, {
+  createResource({
+    url: "frappe.client.delete",
+    params: {
+      doctype: "Email Template",
+      name: cannedResponse.name,
+    },
+    auto: true,
     onSuccess: () => {
+      cannedResponsesListResource.reload();
       toast.success(__("Canned response deleted"));
     },
   });
@@ -227,31 +242,34 @@ const duplicate = async () => {
     doctype: "Email Template",
     name: duplicateDialog.value.name,
   }).then((data) => {
-    cannedResponseListData.insert.submit(
-      {
-        ...data,
-        name: duplicateDialog.value.newName,
-      },
-      {
-        onSuccess: (data) => {
-          toast.success(__("Canned response duplicated"));
-          duplicateDialog.value = {
-            show: false,
-            name: "",
-            newName: "",
-          };
-          cannedResponseActiveScreen.value = {
-            screen: "view",
-            data: { name: data.name },
-          };
+    createResource({
+      url: "frappe.client.insert",
+      params: {
+        doc: {
+          ...data,
+          doctype: "Email Template",
+          name: duplicateDialog.value.newName,
         },
-      }
-    );
+      },
+      auto: true,
+      onSuccess: (data) => {
+        toast.success(__("Canned response duplicated"));
+        duplicateDialog.value = {
+          show: false,
+          name: "",
+          newName: "",
+        };
+        cannedResponseActiveScreen.value = {
+          screen: "view",
+          data: { name: data.name },
+        };
+      },
+    });
   });
 };
 
 watch(
-  () => [cannedResponseSearchQuery.value, cannedResponsesListResource.data],
+  () => [cannedResponseSearchQuery?.value, cannedResponsesListResource.data],
   ([query, data]) => {
     if (!query) {
       cannedResponsesList.value = data || [];
