@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-30 10:36+0000\n"
-"PO-Revision-Date: 2025-12-03 21:26\n"
+"PO-Revision-Date: 2025-12-04 21:27\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Slovenian\n"
 "MIME-Version: 1.0\n"
@@ -20,12 +20,12 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:231
 msgid "% SLA Fulfilled"
-msgstr ""
+msgstr "% izpolnjen Sporazum o Ravni Storitev"
 
 #: helpdesk/api/dashboard.py:236
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
-msgstr ""
+msgstr "% ustvarjenih zahtevkov, ki so bili rešeni v okviru Sporazuma o Ravni Storitev"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
@@ -51,26 +51,26 @@ msgstr "0 je brez ovratnih informacij, 1 je Všeč mi je, 2 je Neprijetno"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:117
 msgid "<br>Please update HD Settings to use a different status before disabling this status."
-msgstr ""
+msgstr "<br>Preden onemogočite to stanje, posodobite nastavitve, da uporabite drugo stanje."
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:95
 msgid "<br>Please update the SLA(s) to use a different status before disabling this status."
-msgstr ""
+msgstr "<br>Preden onemogočite ta status, posodobite Sporazuma o Ravni Storitev, da bodo uporabljali drug status."
 
 #. Introduction text of the email-feedback Web Form
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "<div class=\"ql-editor read-mode\"><p>Let us know if we solved your issue well. It’ll help us serve you better next time.</p></div>"
-msgstr ""
+msgstr "<div class=\"ql-editor read-mode\"><p>Sporočite nam, če smo vašo težavo dobro rešili. To nam bo pomagalo, da vam bomo naslednjič bolje služili.</p></div>"
 
 #. Header text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Visit Helpdesk</a></span>"
-msgstr ""
+msgstr "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Obiščite Helpdesk</a></span>"
 
 #. Paragraph text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "<span class=\"h4\">Helpdesk Configuration<br></span>"
-msgstr ""
+msgstr "<span class=\"h4\">Konfiguracija<br></span>"
 
 #. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
 #. Source'
@@ -128,7 +128,7 @@ msgstr "Dodaj Dodeljevalca"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:179
 msgid "Add Holiday"
-msgstr ""
+msgstr "Dodaj Praznik"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -138,17 +138,17 @@ msgstr "Dodaj Tedenske Praznike"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
-msgstr ""
+msgstr "Dodaj Pogoj"
 
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
 msgid "Add a custom condition"
-msgstr ""
+msgstr "Dodaj pogoj po meri"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:66
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
 msgid "Add condition"
-msgstr ""
+msgstr "Dodaj pogoj"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:72
 msgid "Add condition group"
@@ -156,15 +156,15 @@ msgstr "Dodaj skupino pogojev"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:152
 msgid "Add holidays here to make sure they’re excluded from SLA calculations."
-msgstr ""
+msgstr "Dodajte praznike, da zagotovite, da bodo izključeni iz izračunov Sporazuma o Ravni Storitev."
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:97
 msgid "Add members to this team to get started."
-msgstr ""
+msgstr "Za začetek dodajte člane tej ekipi."
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:60
 msgid "Add one to get started"
-msgstr ""
+msgstr "Dodajte enega za začetek"
 
 #: desk/src/components/Settings/Agents.vue:104
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:23
@@ -173,15 +173,15 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:23
 #: desk/src/components/Settings/Teams/TeamsList.vue:119
 msgid "Add one to get started."
-msgstr ""
+msgstr "Za začetek dodajte enega."
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:133
 msgid "Add recurring holidays such as weekends."
-msgstr ""
+msgstr "Dodajte ponavljajoče se praznike, kot so vikendi."
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:198
 msgid "Add time targets around support milestones like first reply and resolution times"
-msgstr ""
+msgstr "Dodajte časovne cilje glede mejnikov podpore, kot so časi prvega odgovora in reševanja"
 
 #. Label of the get_weekly_off_dates (Button) field in DocType 'HD Service
 #. Holiday List'
@@ -191,7 +191,7 @@ msgstr "Dodaj v Praznike"
 
 #: desk/src/components/Settings/Agents.vue:4
 msgid "Add, manage agents and assign roles to them."
-msgstr ""
+msgstr "Dodajte, upravljajte agente in jim dodelite vloge."
 
 #. Label of the about (Code) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -254,7 +254,7 @@ msgstr "Ime Agenta"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:39
 msgid "Agent settings"
-msgstr ""
+msgstr "Nastavitve agenta"
 
 #: desk/src/components/Settings/Agents.vue:3
 msgid "Agents"
@@ -345,7 +345,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:368
 #: desk/src/components/Settings/Teams/NewTeam.vue:101
 msgid "Are you sure you want to go back? Unsaved changes will be lost."
-msgstr ""
+msgstr "Ste prepričani, da se želite vrniti? Neshranjene spremembe bodo izgubljene."
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:162
 msgid "Are you sure you want to leave? Unsaved changes will be lost."
@@ -386,7 +386,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:75
 msgid "Assignees"
-msgstr ""
+msgstr "Prejemniki"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -427,7 +427,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:81
 msgid "Assignment conditions"
-msgstr ""
+msgstr "Pogoji dodelitve"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:35
 msgid "Assignment rule"
@@ -479,7 +479,7 @@ msgstr "Priloga"
 #. Label of the author (Link) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Author"
-msgstr ""
+msgstr "Avtor"
 
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:72
@@ -613,7 +613,7 @@ msgstr "Gumb"
 
 #: desk/src/pages/call-logs/CallLogDetailModal.vue:8
 msgid "Call Details"
-msgstr ""
+msgstr "Podrobnosti klica"
 
 #: desk/src/components/Settings/InviteAgents.vue:147
 msgid "Can invite new agents, manage tickets, create custom views and manage public views."
@@ -637,7 +637,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:508
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
-msgstr ""
+msgstr "Privzetega Sporazuma o Ravni Storitev (SLA) ni mogoče izbrisati. Vsaj en Sporazuma o Ravni Storitev mora biti označen kot privzeti."
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:110
 msgid "Cannot disable this status as it is linked in HD Settings:<br><br>"
@@ -645,7 +645,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:88
 msgid "Cannot disable this status as it is linked in the following SLAs:<br><br>"
-msgstr ""
+msgstr "Tega stanja ni mogoče onemogočiti, ker je povezano z naslednjimi Sporazumi o Ravni Storitev:<br><br>"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:173
 msgid "Cannot enable rule without adding users in it"
@@ -703,7 +703,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:150
 msgid "Choose how long this SLA policy will be active."
-msgstr ""
+msgstr "Izberite, kako dolgo bo ta pravila o Sporazuma o Ravni Storitev aktiven."
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:22
 msgid "Choose how tickets are distributed among selected assignees."
@@ -813,7 +813,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:406
 msgid "Confirm overwrite"
-msgstr ""
+msgstr "Potrdi prepis"
 
 #. Label of the contact (Link) field in DocType 'HD Organization Contact Item'
 #. Label of the contact (Link) field in DocType 'HD Ticket'
@@ -879,7 +879,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:57
 msgid "Create new business holiday"
-msgstr ""
+msgstr "Ustvari nove počitnice"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:83
 msgid "Created By"
@@ -941,7 +941,7 @@ msgstr "Privzeta Prioriteta"
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Default SLA"
-msgstr ""
+msgstr "Privzeti Sporazum o Ravni Storitev (SLA)"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:56
 msgid "Default Sending"
@@ -955,7 +955,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Default Ticket Status"
-msgstr ""
+msgstr "Privzeto Stanje Zahtevka"
 
 #. Label of the default_priority (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1087,7 +1087,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:61
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:100
 msgid "Duplicate"
-msgstr ""
+msgstr "Podvoji"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:45
 msgid "Duplicate Assignment Rule"
@@ -1099,7 +1099,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:42
 msgid "Duplicate SLA Policy"
-msgstr ""
+msgstr "Podvoji pravilo Sporazuma o Ravni Storitev"
 
 #: desk/src/components/Settings/InviteAgents.vue:4
 msgid "Easily invite new agents, managers, or admins."
@@ -1204,12 +1204,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Enabled"
-msgstr ""
+msgstr "Omogočeno"
 
 #. Label of the end_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "End Date"
-msgstr ""
+msgstr "Končni datum"
 
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
@@ -1253,7 +1253,7 @@ msgstr ""
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
-msgstr ""
+msgstr "Neuspešno"
 
 #: desk/src/components/Settings/EmailAdd.vue:167
 msgid "Failed to create email account, Invalid credentials"
@@ -1436,12 +1436,12 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayView.vue:85
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:155
 msgid "From date"
-msgstr ""
+msgstr "Od datuma"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Fulfilled"
-msgstr ""
+msgstr "Izpolnjeno"
 
 #: desk/src/components/Settings/General/General.vue:6
 msgid "General"
@@ -1585,7 +1585,7 @@ msgstr ""
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "HD Service Level Agreement"
-msgstr ""
+msgstr "Sporazum o Ravni Storitev"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
@@ -1633,7 +1633,7 @@ msgstr "Član Ekipe"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "HD Ticket"
-msgstr ""
+msgstr "Zahtevka"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
@@ -1729,7 +1729,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Holiday List"
-msgstr ""
+msgstr "Seznam Praznikov"
 
 #. Label of the holiday_list_name (Data) field in DocType 'HD Service Holiday
 #. List'
@@ -1764,7 +1764,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:130
 msgid "I understand, add conditions"
-msgstr ""
+msgstr "Razumem, dodaj pogoje"
 
 #. Label of the ip_address (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
@@ -1859,7 +1859,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayView.vue:329
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:397
 msgid "Invalid fields, check if all are filled in and values are correct."
-msgstr ""
+msgstr "Neveljavna polja, preverite, ali so vsa izpolnjena in ali so vrednosti pravilne."
 
 #: helpdesk/api/settings/email_notifications.py:112
 msgid "Invalid notification"
@@ -1975,7 +1975,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:19
 msgid "Learn more about SLA"
-msgstr ""
+msgstr "Več o Sporazumu o Ravni Storitev"
 
 #. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
 #. Source'
@@ -2164,11 +2164,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:8
 msgid "New SLA Policy"
-msgstr ""
+msgstr "Novo pravilo Sporazuma o Ravni Storitev"
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:48
 msgid "New SLA Policy Name"
-msgstr ""
+msgstr "Ime novega pravila Sporazuma o Ravni Storitev"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:8
 msgid "New Team"
@@ -2194,7 +2194,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:20
 msgid "No SLA found"
-msgstr ""
+msgstr "Sporazum o Ravni Storitev ni bil najden"
 
 #: helpdesk/api/dashboard.py:429
 msgid "No Team"
@@ -2258,7 +2258,7 @@ msgstr "Staro stanje"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:103
 msgid "Old Conditions"
-msgstr ""
+msgstr "Stari pogoji"
 
 #. Label of the on_hold_since (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2294,7 +2294,9 @@ msgstr ""
 msgid "Open: SLA continues. <br>\n"
 "Paused: SLA is paused. <br>\n"
 "Resolved: SLA timer stops."
-msgstr ""
+msgstr "Odprto: Sporazum o Ravni Storitev se nadaljuje. <br>\n"
+"Ustavljeno: Sporazum o Ravni Storitev prekinjena. <br>\n"
+"Rešeno: Sporazum o Ravni Storitev se ustavi."
 
 #. Label of the opening_date (Date) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2360,7 +2362,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Paused"
-msgstr ""
+msgstr "Pauzirano"
 
 #: desk/src/components/Settings/InviteAgents.vue:36
 msgid "Pending Invites"
@@ -2403,11 +2405,11 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:19
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
-msgstr ""
+msgstr "Prosimo, dodajte to prioriteto v <a href='/app/hd-service-level-agreement'>zahtevane dokumente Sporazuma o Ravni Storitev </a>"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:326
 msgid "Please add {0} priority in {1} SLA"
-msgstr ""
+msgstr "Prosimo, dodajte prioriteto {0} v {1} Sporazum o Ravni Storitev"
 
 #: desk/src/components/Settings/Profile/Profile.vue:218
 msgid "Please enter first name at least"
@@ -2431,7 +2433,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:38
 msgid "Policy Name"
-msgstr ""
+msgstr "Ime Pravila"
 
 #. Label of the post_description_key (Data) field in DocType 'HD Support Search
 #. Source'
@@ -2488,7 +2490,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:84
 msgid "Priority <u>{0}</u> must be included in the SLA {1}."
-msgstr ""
+msgstr "Prioriteta <u>{0}</u> mora biti vključena v Sporazum o Ravni Storitev {1}."
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:75
 msgid "Priority {0} has been repeated."
@@ -2736,7 +2738,7 @@ msgstr ""
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Due"
-msgstr ""
+msgstr "Rok za resolucijo"
 
 #. Label of the resolution_time (Duration) field in DocType 'HD Service Level
 #. Priority'
@@ -2785,7 +2787,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:194
 msgid "Response and resolution"
-msgstr ""
+msgstr "Odziv in reševanje"
 
 #. Label of the assign_within_team (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2846,57 +2848,57 @@ msgstr ""
 #. Label of the sla_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA"
-msgstr ""
+msgstr "Sporazum o Ravni Storitev"
 
 #. Label of the service_level_agreement_creation (Datetime) field in DocType
 #. 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA Creation"
-msgstr ""
+msgstr "Ustvarjanje Sporazuma o Ravni Storitev"
 
 #. Label of the sla_mapping_section (Section Break) field in DocType 'HD Ticket
 #. Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "SLA Mapping"
-msgstr ""
+msgstr "Kartiranje Sporazuma o Ravni Storitev"
 
 #. Label of the agreement_status (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA Status"
-msgstr ""
+msgstr "Stanje Sporazuma o Ravni Storitev"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:443
 msgid "SLA policy created"
-msgstr ""
+msgstr "Pravilo Sporazuma o Ravni Storitev je ustvarjena"
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:149
 msgid "SLA policy deleted"
-msgstr ""
+msgstr "Pravilo Sporazuma o Ravni Storitev je izbrisana"
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:124
 msgid "SLA policy duplicated"
-msgstr ""
+msgstr "Pravilo Sporazuma o Ravni Storitev je podvojena"
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:166
 msgid "SLA policy status updated"
-msgstr ""
+msgstr "Stanje pravila Sporazuma o Ravni Storitev je posodobljeno"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:481
 msgid "SLA policy updated"
-msgstr ""
+msgstr "Pravilo Sporazuma o Ravni Storitev je posodobljen"
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:156
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:490
 msgid "SLA set as default cannot be disabled"
-msgstr ""
+msgstr "Sporazum o Ravni Storitev, ki je nastavljen kot privzet, ni mogoče onemogočiti"
 
 #: helpdesk/api/dashboard.py:584 helpdesk/api/dashboard.py:619
 msgid "SLA_fulfilled"
-msgstr ""
+msgstr "Sporazum o Ravni Storitev_izpolnjen"
 
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:11
 msgid "SLAs align your team and customers with defined timelines for a reliable experience."
-msgstr ""
+msgstr "Sporazumi o Ravni Storitev (SLA) usklajujejo vašo ekipo in stranke z določenimi časovnimi okviri za zanesljivo izkušnjo."
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2918,7 +2920,7 @@ msgstr ""
 #: desk/src/components/Settings/Telephony/Telephony.vue:22
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Save"
-msgstr ""
+msgstr "Shrani"
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:35
 msgid "Schedule name"
@@ -2938,7 +2940,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamsList.vue:25
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Search"
-msgstr ""
+msgstr "Iskanje"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:10
 msgid "Search Index Regenerated"
@@ -2964,7 +2966,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:165
 msgid "Select a Default Priority."
-msgstr ""
+msgstr "Izberite Privzeto Prioriteto."
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:124
 msgid "Select what type all tickets get by default."
@@ -3002,13 +3004,13 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:5
 msgid "Service Level Agreements (SLAs)"
-msgstr ""
+msgstr "Sporazumi o Ravni Storitev (SLA)"
 
 #. Label of the service_level (Data) field in DocType 'HD Service Level
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
-msgstr ""
+msgstr "Ime Ravni Storitve"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:56
 msgid "Set Resolution Time for Priority {0} in row {1}."
