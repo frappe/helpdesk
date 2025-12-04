@@ -87,15 +87,6 @@
               <div class="col-span-1 flex gap-1 items-center">
                 <Badge
                   v-if="
-                    !ticket.first_responded_on &&
-                    dayjs(ticket.response_by).isBefore(new Date())
-                  "
-                  :label="__('Failed')"
-                  theme="red"
-                  variant="outline"
-                />
-                <Badge
-                  v-else-if="
                     ticket.first_responded_on &&
                     dayjs(ticket.first_responded_on).isBefore(
                       ticket.response_by
