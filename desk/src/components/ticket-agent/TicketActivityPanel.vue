@@ -1,6 +1,6 @@
 <template>
   <Tabs :modelValue="tabIndex" :tabs="tabs" @update:modelValue="changeTabTo">
-    <template v-slot="{ tab }">
+    <template #tab-panel="{ tab }">
       <TicketAgentActivities
         v-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"

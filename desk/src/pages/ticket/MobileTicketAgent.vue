@@ -67,7 +67,7 @@
             :tabs="tabs"
             @update:modelValue="changeTabTo"
           >
-            <template v-slot="{ tab }">
+            <template #tab-panel="{ tab }">
               <div v-if="tab.name === 'details'">
                 <!-- ticket contact info -->
                 <TicketAgentContact
