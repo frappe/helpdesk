@@ -67,8 +67,7 @@
             :tabs="tabs"
             @update:modelValue="changeTabTo"
           >
-            <TabList />
-            <TabPanel v-slot="{ tab }" class="h-full">
+            <template #tab-panel="{ tab }">
               <div v-if="tab.name === 'details'">
                 <!-- ticket contact info -->
                 <TicketAgentContact
@@ -112,7 +111,7 @@
                   }
                 "
               />
-            </TabPanel>
+            </template>
           </Tabs>
           <CommunicationArea
             class="sticky bottom-0 z-50 bg-white"
@@ -192,8 +191,6 @@ import {
   Dialog,
   Dropdown,
   FormControl,
-  TabList,
-  TabPanel,
   Tabs,
   call,
   createResource,
