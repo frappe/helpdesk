@@ -24,7 +24,7 @@ def get_dashboard(reset_layout=False):
                 "layout": get_default_agent_dashboard(),
             },
         ).insert(ignore_permissions=True)
-        frappe.db.commit()
+        frappe.db.commit()  # nosemgrep
         layout = json.loads(get_default_agent_dashboard())
     else:
         if reset_layout:

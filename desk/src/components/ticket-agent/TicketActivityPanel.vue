@@ -1,7 +1,6 @@
 <template>
   <Tabs :modelValue="tabIndex" :tabs="tabs" @update:modelValue="changeTabTo">
-    <TabList />
-    <TabPanel v-slot="{ tab }" class="flex-1">
+    <template v-slot="{ tab }">
       <TicketAgentActivities
         v-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
@@ -26,7 +25,7 @@
           Loading...
         </p>
       </div>
-    </TabPanel>
+    </template>
   </Tabs>
   <!-- Comm Area -->
   <CommunicationArea
@@ -61,7 +60,7 @@ import {
   TicketSymbol,
   TicketTab,
 } from "@/types";
-import { LoadingIndicator, TabList, TabPanel, Tabs } from "frappe-ui";
+import { LoadingIndicator, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ComputedRef, defineAsyncComponent, inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
