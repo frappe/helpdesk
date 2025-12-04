@@ -11,9 +11,9 @@ EXTRA_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
-class IntegrationTestHDDashboard(IntegrationTestCase):
+class IntegrationTestHDFieldLayout(IntegrationTestCase):
     """
-    Integration tests for HDDashboard.
+    Integration tests for HDFieldLayout.
     Use this class for testing interactions between multiple components.
     """
 

@@ -1,0 +1,88 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-04 14:45:25.230447",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "document_type",
+  "user",
+  "column_break_svia",
+  "type",
+  "apply_to_system",
+  "section_break_wenl",
+  "layout"
+ ],
+ "fields": [
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Link",
+   "label": "Document Type",
+   "mandatory_depends_on": "apply_to_system",
+   "options": "DocType"
+  },
+  {
+   "depends_on": "eval:doc.apply_to_system == 0",
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "mandatory_depends_on": "eval:doc.apply_to_system == 0",
+   "options": "User"
+  },
+  {
+   "fieldname": "column_break_svia",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Landing Page",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "apply_to_system",
+   "fieldtype": "Check",
+   "label": "Is applied to system"
+  },
+  {
+   "fieldname": "section_break_wenl",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "layout",
+   "fieldtype": "Code",
+   "in_list_view": 1,
+   "label": "Layout",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-04 15:50:21.718151",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Field Layout",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -13,30 +13,29 @@ def get_default_agent_dashboard():
 @frappe.whitelist()
 @agent_only
 def get_dashboard(reset_layout=False):
-    dashboard = frappe.db.exists("HD Dashboard", frappe.session.user)
+    dashboard = frappe.db.exists("HD Field Layout", {"user": frappe.session.user})
 
     if not dashboard:
         dashboard = frappe.get_doc(
             {
-                "doctype": "HD Dashboard",
-                "name": frappe.session.user,
+                "doctype": "HD Field Layout",
                 "user": frappe.session.user,
+                "type": "Landing Page",
                 "layout": get_default_agent_dashboard(),
             },
         ).insert(ignore_permissions=True)
         frappe.db.commit()  # nosemgrep
         layout = json.loads(get_default_agent_dashboard())
     else:
+        dashboard = frappe.get_doc(
+            "HD Field Layout",
+            {"user": frappe.session.user},
+            fields=["name", "layout"],
+        )
         if reset_layout:
             layout = json.loads(get_default_agent_dashboard())
         else:
-            layout = json.loads(
-                frappe.get_value(
-                    "HD Dashboard",
-                    frappe.session.user,
-                    "layout",
-                )
-            )
+            layout = json.loads(dashboard.layout)
 
     for chart in layout:
         method_name = f"get_{chart['chart']}"
@@ -48,7 +47,11 @@ def get_dashboard(reset_layout=False):
         else:
             chart["data"] = None
 
-    return {"layout": layout, "default_layout": get_default_agent_dashboard()}
+    return {
+        "layout": layout,
+        "default_layout": get_default_agent_dashboard(),
+        "dashboard_id": dashboard.name,
+    }
 
 
 @frappe.whitelist()

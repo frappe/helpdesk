@@ -177,8 +177,8 @@ const saveDashboard = createResource({
       };
     });
     return {
-      doctype: "HD Dashboard",
-      name: userId.value,
+      doctype: "HD Field Layout",
+      name: agentDashboard.data.dashboard_id,
       fieldname: "layout",
       value: JSON.stringify(layoutData),
     };
