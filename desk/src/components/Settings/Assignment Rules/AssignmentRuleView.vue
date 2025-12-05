@@ -157,7 +157,11 @@
               </template>
               <template #body-main>
                 <div
+<<<<<<< HEAD
                   class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+=======
+                  class="p-1 text-ink-gray-6 top-1 absolute bg-white shadow-2xl rounded w-[--reka-popper-anchor-width]"
+>>>>>>> 2c2039fa (fix: popover width)
                 >
                   <code>{{ assignmentRuleData.assignCondition }}</code>
                 </div>
