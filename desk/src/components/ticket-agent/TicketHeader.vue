@@ -30,6 +30,7 @@
             :key="action.label"
             :label="action.label"
             @click="action.onClick()"
+            v-bind="action"
           >
             <template v-if="action.icon" #prefix>
               <FeatherIcon :name="action.icon" class="h-4 w-4" />
