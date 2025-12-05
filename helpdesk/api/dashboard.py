@@ -20,7 +20,9 @@ COUNT_DESC = "count desc"
 
 @frappe.whitelist()
 @agent_only
-def get_dashboard_data(dashboard_type, filters=None):
+def get_dashboard_data(
+    dashboard_type: str, filters: dict[str, any] = None
+) -> list[dict[str, any]] | None:
     """
     Get dashboard data based on the type and date range.
     """
@@ -402,7 +404,9 @@ class HelpdeskDashboard:
         return total_tickets / days
 
 
-def get_master_dashboard_data(from_date, to_date, team=None, agent=None):
+def get_master_dashboard_data(
+    from_date: str, to_date: str, team: str = None, agent: str = None
+) -> list[dict[str, any]]:
     filters = {
         "creation": ["between", [from_date, to_date]],
     }
@@ -418,96 +422,102 @@ def get_master_dashboard_data(from_date, to_date, team=None, agent=None):
     return [team_data, ticket_type_data, ticket_priority_data, ticket_channel_data]
 
 
-def get_team_chart_data(from_date, to_date, filters=None):
+def get_team_chart_data(
+    from_date: str, to_date: str, filters: dict[str, any] = None
+) -> dict[str, any]:
     """
     Get team chart data for the dashboard.
     """
     result = frappe.get_all(
-        "HD Ticket",
-        fields=["agent_group as team", "count(name) as count"],
+        HD_TICKET,
+        fields=["agent_group as team", COUNT_NAME],
         filters=filters,
         group_by="agent_group",
-        order_by="count desc",
+        order_by=COUNT_DESC,
     )
     for r in result:
         if not r.team:
-            r.team = "No Team"
+            r.team = _("No Team")
 
     if len(result) < 7:
         return get_pie_chart_config(
             result,
-            "Tickets by Team",
-            "Percentage of Total Tickets by Team",
+            _("Tickets by Team"),
+            _("Percentage of Total Tickets by Team"),
             "team",
             "count",
         )
     else:
         return get_bar_chart_config(
             result,
-            "Tickets by Team",
-            "Total Tickets by Team",
+            _("Tickets by Team"),
+            _("Total Tickets by Team"),
             {"key": "team", "type": "category", "title": "Team", "timeGrain": "day"},
             "Tickets",
             [{"name": "count", "type": "bar"}],
         )
 
 
-def get_ticket_type_chart_data(from_date, to_date, filters=None):
+def get_ticket_type_chart_data(
+    from_date: str, to_date: str, filters: dict[str, any] = None
+) -> dict[str, any]:
     """
     Get ticket type chart data for the dashboard.
     """
     result = frappe.get_all(
-        "HD Ticket",
-        fields=["ticket_type as type", "count(name) as count"],
+        HD_TICKET,
+        fields=["ticket_type as type", COUNT_NAME],
         filters=filters,
         group_by="ticket_type",
-        order_by="count desc",
+        order_by=COUNT_DESC,
     )
     # based on length show different chart, if len greater than 5 then show pie chart else bar chart
     if len(result) < 7:
         return get_pie_chart_config(
             result,
-            "Tickets by Type",
-            "Percentage of Total Tickets by Type",
+            _("Tickets by Type"),
+            _("Percentage of Total Tickets by Type"),
             "type",
             "count",
         )
     else:
         return get_bar_chart_config(
             result,
-            "Tickets by Type",
-            "Total Tickets by Type",
+            _("Tickets by Type"),
+            _("Total Tickets by Type"),
             {"key": "type", "type": "category", "title": "Type", "timeGrain": "day"},
             "Tickets",
             [{"name": "count", "type": "bar"}],
         )
 
 
-def get_ticket_priority_chart_data(from_date, to_date, filters=None):
+def get_ticket_priority_chart_data(
+    from_date: str, to_date: str, filters: dict[str, any] = None
+) -> dict[str, any]:
     """
     Get ticket priority chart data for the dashboard.
     """
     result = frappe.get_all(
-        "HD Ticket",
-        fields=["priority as priority", "count(name) as count"],
+        HD_TICKET,
+        fields=["priority as priority", COUNT_NAME],
         filters=filters,
         group_by="priority",
-        order_by="count desc",
+        order_by=COUNT_DESC,
     )
     # based on length show different chart, if len greater than 5 then show pie chart else bar chart
     if len(result) < 7:
         return get_pie_chart_config(
             result,
-            "Tickets by Priority",
-            "Percentage of Total Tickets by Priority",
+            _("Tickets by Priority"),
+            _("Percentage of Total Tickets by Priority"),
             "priority",
             "count",
         )
     else:
         return get_bar_chart_config(
             result,
-            "Tickets by Priority",
-            "Total Tickets by Priority",
+            _("Tickets by Priority"),
+            _("Total Tickets by Priority"),
             {
                 "key": "priority",
                 "type": "category",
@@ -519,13 +529,15 @@ def get_ticket_priority_chart_data(from_date, to_date, filters=None):
         )
 
 
-def get_ticket_channel_chart_data(from_date, to_date, filters=None):
+def get_ticket_channel_chart_data(
+    from_date: str, to_date: str, filters: dict[str, any] = None
+) -> dict[str, any]:
     """
     Get ticket channel chart data for the dashboard.
     """
     result = frappe.get_all(
-        "HD Ticket",
-        fields=["via_customer_portal as channel ", "count(name) as count"],
+        HD_TICKET,
+        fields=["via_customer_portal as channel ", COUNT_NAME],
         filters=filters,
         group_by="via_customer_portal",
         order_by="via_customer_portal desc",
@@ -536,8 +548,8 @@ def get_ticket_channel_chart_data(from_date, to_date, filters=None):
 
     return get_pie_chart_config(
         result,
-        "Tickets by Channel",
-        "Percentage of Total Tickets by Channel",
+        _("Tickets by Channel"),
+        _("Percentage of Total Tickets by Channel"),
         "channel",
         "count",
     )
@@ -555,21 +567,27 @@ def get_pie_chart_config(
         "data": data,
         "title": title,
         "subtitle": subtitle,
-        "categoryColumn": categoryColumn,
-        "valueColumn": valueColumn,
+        "categoryColumn": category_column,
+        "valueColumn": value_column,
     }
 
 
 def get_bar_chart_config(
-    data, title, subtitle, xAxisConfig, yAxisTitle, series, **kwargs
-):
+    data: list[dict[str, any]],
+    title: str,
+    subtitle: str,
+    x_axis_config: dict[str, any],
+    y_axis_title: str,
+    series: list,
+    **kwargs: dict[str, any],
+) -> dict[str, any]:
     return {
         "type": "axis",
         "data": data,
         "title": title,
         "subtitle": subtitle,
-        "xAxis": xAxisConfig,
-        "yAxis": {"title": yAxisTitle},
+        "xAxis": x_axis_config,
+        "yAxis": {"title": y_axis_title},
         "series": series,
         **kwargs,
     }
