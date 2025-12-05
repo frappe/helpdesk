@@ -71,6 +71,7 @@
 import { LayoutHeader } from "@/components";
 import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
 import { setupCustomizations } from "@/composables/formCustomisation";
+import { useActiveViewers } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
 import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
@@ -258,17 +259,20 @@ const showFeedback = computed(() => {
   );
   return hasAgentCommunication && isFeedbackMandatory;
 });
-
+const { startViewing, stopViewing } = useActiveViewers(props.ticketId);
 onMounted(() => {
+  startViewing(props.ticketId);
   document.title = props.ticketId;
-  socket.on("helpdesk:ticket-update", (ticketID) => {
-    if (ticketID === Number(props.ticketId)) {
+
+  socket.on("helpdesk:ticket-update", ({ ticket_id }) => {
+    if (ticket_id === props.ticketId) {
       ticket.reload();
     }
   });
 });
 
 onUnmounted(() => {
+  stopViewing(props.ticketId);
   document.title = "Helpdesk";
   socket.off("helpdesk:ticket-update");
 });
