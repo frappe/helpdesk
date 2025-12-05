@@ -524,36 +524,32 @@ const showOverwriteConfirm = () => {
 };
 
 const createAssignmentRule = () => {
-  isLoading.value = true;
-  createResource({
-    url: "frappe.client.insert",
-    params: {
-      doc: {
-        doctype: "Assignment Rule",
-        document_type: "HD Ticket",
-        rule: assignmentRuleData.value.rule,
-        priority: assignmentRuleData.value.priority,
-        users: assignmentRuleData.value.users,
-        disabled: assignmentRuleData.value.disabled,
-        description: assignmentRuleData.value.description,
-        assignment_days: assignmentRuleData.value.assignmentDays.map((day) => ({
-          day: day,
-        })),
-        name: assignmentRuleData.value.assignmentRuleName,
-        assignment_rule_name: assignmentRuleData.value.assignmentRuleName,
-        assign_condition: convertToConditions({
-          conditions: assignmentRuleData.value.assignConditionJson,
-        }),
-        unassign_condition: convertToConditions({
-          conditions: assignmentRuleData.value.unassignConditionJson,
-        }),
-        assign_condition_json: JSON.stringify(
-          assignmentRuleData.value.assignConditionJson
-        ),
-        unassign_condition_json: JSON.stringify(
-          assignmentRuleData.value.unassignConditionJson
-        ),
-      },
+  createAssignmentRuleResource.submit({
+    doc: {
+      doctype: "Assignment Rule",
+      document_type: "HD Ticket",
+      rule: assignmentRuleData.value.rule,
+      priority: assignmentRuleData.value.priority,
+      users: assignmentRuleData.value.users,
+      disabled: assignmentRuleData.value.disabled,
+      description: assignmentRuleData.value.description,
+      assignment_days: assignmentRuleData.value.assignmentDays.map((day) => ({
+        day: day,
+      })),
+      name: assignmentRuleData.value.assignmentRuleName,
+      assignment_rule_name: assignmentRuleData.value.assignmentRuleName,
+      assign_condition: convertToConditions({
+        conditions: assignmentRuleData.value.assignConditionJson,
+      }),
+      unassign_condition: convertToConditions({
+        conditions: assignmentRuleData.value.unassignConditionJson,
+      }),
+      assign_condition_json: JSON.stringify(
+        assignmentRuleData.value.assignConditionJson
+      ),
+      unassign_condition_json: JSON.stringify(
+        assignmentRuleData.value.unassignConditionJson
+      ),
     },
   });
 };
@@ -561,18 +557,15 @@ const createAssignmentRule = () => {
 const createAssignmentRuleResource = createResource({
   url: "frappe.client.insert",
   onSuccess(data) {
-    getAssignmentRuleData
-      .submit({
-        doctype: "Assignment Rule",
-        name: data.name,
-      })
-      .then(() => {
-        toast.success(__("Assignment rule created"));
-      });
+    toast.success(__("Assignment rule created"));
     assignmentRulesActiveScreen.value = {
       screen: "view",
       data: data,
     };
+    getAssignmentRuleData.submit({
+      doctype: "Assignment Rule",
+      name: data.name,
+    });
   },
 });
 

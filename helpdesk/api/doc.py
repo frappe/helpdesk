@@ -226,7 +226,9 @@ def get_list_data(
 
 @frappe.whitelist()
 @redis_cache()
-def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
+def get_filterable_fields(
+    doctype: str, show_customer_portal_fields=False, ignore_team_restrictions=False
+):
     check_permissions(doctype, None)
     QBDocField = frappe.qb.DocType("DocField")
     QBCustomField = frappe.qb.DocType("Custom Field")
@@ -323,11 +325,12 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
             }
         )
 
-    enable_restrictions = frappe.db.get_single_value(
-        "HD Settings", "restrict_tickets_by_agent_group"
-    )
-    if enable_restrictions and doctype == "HD Ticket":
-        res = [r for r in res if r.get("fieldname") != "agent_group"]
+    if not ignore_team_restrictions:
+        enable_restrictions = frappe.db.get_single_value(
+            "HD Settings", "restrict_tickets_by_agent_group"
+        )
+        if enable_restrictions and doctype == "HD Ticket":
+            res = [r for r in res if r.get("fieldname") != "agent_group"]
 
     standard_fields = [
         {"fieldname": "name", "fieldtype": "Link", "label": "ID", "options": doctype},
