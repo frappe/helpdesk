@@ -139,11 +139,11 @@ import { __ } from "@/translation";
 import PreviewDialog from "./components/PreviewDialog.vue";
 import { menuButtons } from "./cannedResponse";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import { FieldAutocomplete } from "./components/field-autocomplete-extension";
 import DocumentationButton from "@/components/DocumentationButton.vue";
 import { storeToRefs } from "pinia";
 import { useConfigStore } from "@/stores/config";
 import { useAuthStore } from "@/stores/auth";
+import { FieldAutocomplete } from "../../../tiptap-extensions";
 
 const showConfirmDialog = ref({
   show: false,
