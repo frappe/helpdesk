@@ -132,7 +132,6 @@ import {
   TextEditor,
   toast,
 } from "frappe-ui";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
 import { computed, inject, onUnmounted, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
@@ -144,6 +143,7 @@ import { storeToRefs } from "pinia";
 import { useConfigStore } from "@/stores/config";
 import { useAuthStore } from "@/stores/auth";
 import { FieldAutocomplete } from "../../../tiptap-extensions";
+import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
 
 const showConfirmDialog = ref({
   show: false,

@@ -164,7 +164,8 @@ type TabName =
   | "Business Holidays"
   | "Assignment Rules"
   | "Field Dependencies"
-  | "Telephony";
+  | "Telephony"
+  | "Canned Responses";
 
 export const setActiveSettingsTab = (tabName: TabName) => {
   activeTab.value =
