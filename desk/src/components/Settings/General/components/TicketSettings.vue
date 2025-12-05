@@ -35,38 +35,16 @@
           class="grid grid-cols-2 gap-4 mt-3"
           v-if="settingsData.restrictTicketsByAgentGroup"
         >
-          <div class="flex items-start sm:items-center gap-2">
-            <div class="inline-flex space-x-2 rounded transition">
-              <input
-                class="rounded-sm mt-[1px] bg-surface-white border-outline-gray-4 text-ink-gray-9 hover:border-outline-gray-5 focus:ring-offset-0 focus:border-outline-gray-8 active:border-outline-gray-6 transition hover:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 active:bg-surface-gray-2 w-3.5 h-3.5"
-                type="checkbox"
-                id="doNotRestrictTicketsWithoutAnAgentGroup"
-                v-model="settingsData.doNotRestrictTicketsWithoutAnAgentGroup"
-              />
-              <label
-                class="block text-sm font-medium text-ink-gray-8 select-none"
-                for="doNotRestrictTicketsWithoutAnAgentGroup"
-              >
-                {{ __("Do not restrict tickets without a team") }}
-              </label>
-            </div>
-          </div>
-          <div class="flex items-start sm:items-center gap-2">
-            <div class="inline-flex space-x-2 rounded transition">
-              <input
-                class="rounded-sm mt-[1px] bg-surface-white border-outline-gray-4 text-ink-gray-9 hover:border-outline-gray-5 focus:ring-offset-0 focus:border-outline-gray-8 active:border-outline-gray-6 transition hover:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 active:bg-surface-gray-2 w-3.5 h-3.5"
-                type="checkbox"
-                id="assignWithinTeam"
-                v-model="settingsData.assignWithinTeam"
-              />
-              <label
-                class="block text-sm font-medium text-ink-gray-8 select-none"
-                for="assignWithinTeam"
-              >
-                {{ __("Restrict agent assignment to selected team") }}
-              </label>
-            </div>
-          </div>
+          <Checkbox
+            size="sm"
+            v-model="settingsData.doNotRestrictTicketsWithoutAnAgentGroup"
+            :label="__('Do not restrict tickets without a team')"
+          />
+          <Checkbox
+            size="sm"
+            v-model="settingsData.assignWithinTeam"
+            :label="__('Restrict agent assignment to selected team')"
+          />
         </div>
       </div>
       <div class="flex items-center justify-between">
