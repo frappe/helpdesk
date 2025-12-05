@@ -24,7 +24,7 @@ import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import { useActiveViewers } from "@/composables/realtime";
-import { useTicket } from "@/composables/useTicket";
+import { reloadTicket, useTicket } from "@/composables/useTicket";
 import { ticketsToNavigate } from "@/composables/useTicketNavigation";
 import { globalStore } from "@/stores/globalStore";
 import { useTelephonyStore } from "@/stores/telephony";
@@ -142,12 +142,28 @@ onMounted(() => {
       toast.info(`User ${data.user} updated ${data.field} to ${data.value}`);
     }
   });
+
+  $socket.on("helpdesk:ticket-comment", (data: { ticket_id: string }) => {
+    if (data.ticket_id == props.ticketId) {
+      ticketComposable.value.activities.reload();
+    }
+  });
+
+  $socket.on("helpdesk:ticket-update", (data: { ticket_id: string }) => {
+    if (data.ticket_id == props.ticketId) {
+      reloadTicket(props.ticketId);
+    }
+  });
 });
 
 onBeforeUnmount(() => {
   stopViewing(props.ticketId);
   showEmailBox.value = false;
   showCommentBox.value = false;
+
+  $socket.off("ticket_update");
+  $socket.off("helpdesk:ticket-comment");
+  $socket.off("helpdesk:ticket-update");
 });
 
 usePageMeta(() => {
