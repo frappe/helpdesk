@@ -86,12 +86,6 @@ class HelpdeskDashboard:
         self.prev_from_date = frappe.utils.add_days(self.from_date, -self.diff)
         self.to_date_next = frappe.utils.add_days(self.to_date, 1)
 
-<<<<<<< HEAD
-def get_number_card_data(from_date, to_date, conds="", resolved_statuses=None):
-    """
-    Get number card data for the dashboard.
-    """
-=======
         self.open_statuses = frappe.get_all(
             "HD Ticket Status",
             filters={"category": "Open"},
@@ -102,7 +96,6 @@ def get_number_card_data(from_date, to_date, conds="", resolved_statuses=None):
             filters={"category": "Resolved"},
             pluck="name",
         )
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
 
     def _get_conditions(self):
         conds = []
@@ -126,15 +119,6 @@ def get_number_card_data(from_date, to_date, conds="", resolved_statuses=None):
 
         return func(Case().when(cond, value).else_(None))
 
-<<<<<<< HEAD
-def get_ticket_count(from_date, to_date, conds="", return_result=False):
-    """
-    Get ticket data for the dashboard.
-    """
-    diff = frappe.utils.date_diff(to_date, from_date)
-    if diff == 0:
-        diff = 1
-=======
     def get_metric_data(self, value, func, extra_cond=None):
         current_expr = self._get_case(
             self.from_date, self.to_date_next, value, func, extra_cond
@@ -142,7 +126,6 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
         prev_expr = self._get_case(
             self.prev_from_date, self.from_date, value, func, extra_cond
         )
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
 
         query = frappe.qb.from_(self.ticket).select(
             current_expr.as_("current"), prev_expr.as_("prev")
@@ -178,16 +161,6 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
             self.ticket.name, Count, extra_cond
         )
 
-<<<<<<< HEAD
-    return {
-        "title": "Tickets",
-        "value": current_month_tickets,
-        "delta": delta_in_percentage,
-        "deltaSuffix": "%",
-        "negativeIsBetter": True,
-        "tooltip": "Total number of tickets created",
-    }
-=======
         status_cond = (
             self.ticket.status.isin(self.resolved_statuses)
             if self.resolved_statuses
@@ -196,20 +169,10 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
         current_total, prev_total = self.get_metric_data(
             self.ticket.name, Count, status_cond
         )
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
 
         current_pct = (current_fulfilled / current_total * 100) if current_total else 0
         prev_pct = (prev_fulfilled / prev_total * 100) if prev_total else 0
 
-<<<<<<< HEAD
-def get_sla_fulfilled_count(from_date, to_date, conds="", resolved_statuses=None):
-    """
-    Get the percent of SLA tickets fulfilled for the dashboard.
-    """
-    diff = frappe.utils.date_diff(to_date, from_date)
-    if diff == 0:
-        diff = 1
-=======
         return {
             "title": _("% SLA Fulfilled"),
             "value": current_pct,
@@ -218,7 +181,6 @@ def get_sla_fulfilled_count(from_date, to_date, conds="", resolved_statuses=None
             "deltaSuffix": "%",
             "tooltip": _("% of tickets created that were resolved within SLA"),
         }
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
 
     def get_avg_first_response_time(self):
         extra_cond = self.ticket.first_responded_on.isnotnull()
@@ -255,35 +217,11 @@ def get_sla_fulfilled_count(from_date, to_date, conds="", resolved_statuses=None
             "tooltip": _("Avg. time taken to resolve a ticket"),
         }
 
-<<<<<<< HEAD
-    current_month_fulfilled_percentage = (
-        current_month_fulfilled / ticket_count.current_month_tickets * 100
-        if ticket_count.current_month_tickets
-        else 0
-    )
-    prev_month_fulfilled_percentage = (
-        prev_month_fulfilled / ticket_count.prev_month_tickets * 100
-        if ticket_count.prev_month_tickets
-        else 0
-    )
-    delta_in_percentage = (
-        current_month_fulfilled_percentage - prev_month_fulfilled_percentage
-    )
-    return {
-        "title": "% SLA Fulfilled",
-        "value": current_month_fulfilled_percentage,
-        "suffix": "%",
-        "delta": delta_in_percentage,
-        "deltaSuffix": "%",
-        "tooltip": "% of tickets created that were resolved within SLA",
-    }
-=======
     def get_avg_feedback_score(self):
         extra_cond = self.ticket.feedback_rating > 0
         current, prev = self.get_metric_data(
             self.ticket.feedback_rating, Avg, extra_cond
         )
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
 
         return {
             "title": _("Avg. Feedback Rating"),
@@ -294,22 +232,11 @@ def get_sla_fulfilled_count(from_date, to_date, conds="", resolved_statuses=None
             "tooltip": _("Avg. feedback rating for the tickets resolved"),
         }
 
-<<<<<<< HEAD
-def get_avg_first_response_time(from_date, to_date, conds=""):
-    """
-    first_response_time is the time taken to first respond to a ticket.
-    Get average first response time for the dashboard.
-    """
-    diff = frappe.utils.date_diff(to_date, from_date)
-    if diff == 0:
-        diff = 1
-=======
     def get_trend_data(self):
         return [
             self.get_ticket_trend_data(),
             self.get_feedback_trend_data(),
         ]
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
 
     def get_ticket_trend_data(self):
         open_status = "Open"
@@ -322,19 +249,6 @@ def get_avg_first_response_time(from_date, to_date, conds=""):
         if self.combined_cond:
             base_cond = base_cond & self.combined_cond
 
-<<<<<<< HEAD
-    delta = current_month_avg - prev_month_avg if prev_month_avg else 0
-
-    return {
-        "title": "Avg. First Response",
-        "value": current_month_avg,
-        "suffix": " hrs",
-        "delta": delta,
-        "deltaSuffix": " hrs",
-        "negativeIsBetter": True,
-        "tooltip": "Avg. time taken to first respond to a ticket",
-    }
-=======
         query = (
             frappe.qb.from_(self.ticket)
             .select(
@@ -368,7 +282,6 @@ def get_avg_first_response_time(from_date, to_date, conds=""):
         subtitle = _("Average tickets per day is around {0}").format(
             "{:.0f}".format(avg_tickets)
         )
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
 
         return get_bar_chart_config(
             result,
@@ -390,19 +303,9 @@ def get_avg_first_response_time(from_date, to_date, conds=""):
             y2Axis={"title": "% SLA", "yMin": 0, "yMax": 100},
         )
 
-<<<<<<< HEAD
-def get_avg_resolution_time(from_date, to_date, conds="", resolved_statuses=None):
-    """
-    Get average resolution time for the dashboard.
-    """
-    diff = frappe.utils.date_diff(to_date, from_date)
-    if diff == 0:
-        diff = 1
-=======
     def get_feedback_trend_data(self):
         rating = "Rating"
         rated_tickets = "Rated Tickets"
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
 
         base_cond = (self.ticket.creation > self.from_date) & (
             self.ticket.creation < self.to_date_next
@@ -410,18 +313,6 @@ def get_avg_resolution_time(from_date, to_date, conds="", resolved_statuses=None
         if self.combined_cond:
             base_cond = base_cond & self.combined_cond
 
-<<<<<<< HEAD
-    delta = current_month_avg - prev_month_avg if prev_month_avg else 0
-    return {
-        "title": "Avg. Resolution",
-        "value": current_month_avg,
-        "suffix": " days",
-        "delta": delta,
-        "deltaSuffix": " days",
-        "negativeIsBetter": True,
-        "tooltip": "Avg. time taken to resolve a ticket",
-    }
-=======
         query = (
             frappe.qb.from_(self.ticket)
             .select(
@@ -448,7 +339,6 @@ def get_avg_resolution_time(from_date, to_date, conds="", resolved_statuses=None
         )
 
         result = query.run(as_dict=True)
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
 
         # Avg rating query
         avg_query = (
@@ -462,20 +352,10 @@ def get_avg_resolution_time(from_date, to_date, conds="", resolved_statuses=None
         if self.combined_cond:
             avg_query = avg_query.where(self.combined_cond)
 
-<<<<<<< HEAD
-def get_avg_feedback_score(from_date, to_date, conds=""):
-    """
-    Get average feedback score for the dashboard.
-    """
-    diff = frappe.utils.date_diff(to_date, from_date)
-    if diff == 0:
-        diff = 1
-=======
         avg_rating_result = avg_query.run(pluck=True)
         avg_rating = (
             avg_rating_result[0] if avg_rating_result and avg_rating_result[0] else 0
         )
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
 
         subtitle = _("Average feedback rating per day is around {0} stars").format(
             "{:.1f}".format(avg_rating)
@@ -500,18 +380,6 @@ def get_avg_feedback_score(from_date, to_date, conds=""):
             y2Axis={"title": _("Rating"), "yMin": 0, "yMax": 5},
         )
 
-<<<<<<< HEAD
-    delta = current_month_avg - prev_month_avg
-
-    return {
-        "title": "Avg. Feedback Rating",
-        "value": current_month_avg * 5,
-        "suffix": "/5",
-        "delta": delta * 5,
-        "deltaSuffix": " stars",
-        "tooltip": "Avg. feedback rating for the tickets resolved",
-    }
-=======
     def get_avg_tickets_per_day(self):
         base_cond = (self.ticket.creation > self.from_date) & (
             self.ticket.creation < self.to_date_next
@@ -532,7 +400,6 @@ def get_avg_feedback_score(from_date, to_date, conds=""):
         total_tickets = result[0].total_tickets or 0
         days = result[0].days or 1
         return total_tickets / days
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
 
 
 def get_master_dashboard_data(from_date, to_date, team=None, agent=None):
@@ -676,149 +543,6 @@ def get_ticket_channel_chart_data(from_date, to_date, filters=None):
     )
 
 
-<<<<<<< HEAD
-def get_trend_data(
-    from_date, to_date, conds="", open_statuses=None, resolved_statuses=None
-):
-    """
-    Get trend data for the dashboard.
-    """
-
-    ticket_trend_data = get_ticket_trend_data(
-        from_date, to_date, conds, open_statuses, resolved_statuses
-    )
-    feedback_trend_data = get_feedback_trend_data(from_date, to_date, conds)
-
-    return [
-        ticket_trend_data,
-        feedback_trend_data,
-    ]
-
-
-def get_ticket_trend_data(
-    from_date, to_date, conds="", open_statuses=None, resolved_statuses=None
-):
-    """
-    Trend data for tickets in the dashboard. Ticket trend +SLA fulfilled
-    """
-    if len(open_statuses) == 1:
-        open_statuses = f"('{open_statuses[0]}')"
-    result = frappe.db.sql(
-        f"""
-            SELECT 
-                DATE(creation) as date,
-                COUNT(CASE WHEN status in {open_statuses} THEN name END) as open,
-                COUNT(CASE WHEN status in {resolved_statuses} THEN name END) as closed,
-                COUNT(CASE WHEN agreement_status = 'Fulfilled' THEN name END) as SLA_fulfilled
-            FROM `tabHD Ticket` # noqa: W604
-            WHERE creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
-            {conds}
-            GROUP BY DATE(creation)
-            ORDER BY DATE(creation)
-        """,
-        {
-            "from_date": from_date,
-            "to_date": to_date,
-        },
-        as_dict=1,
-    )
-    avg_tickets = get_avg_tickets_per_day(from_date, to_date, conds)
-    subtitle = f"Average tickets per day is around {avg_tickets:.0f}"
-    return get_bar_chart_config(
-        result,
-        "Ticket Trend",
-        subtitle,
-        {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
-        "Tickets",
-        [
-            {"name": "closed", "type": "bar"},
-            {"name": "open", "type": "bar"},
-            {
-                "name": "SLA_fulfilled",
-                "type": "line",
-                "showDataPoints": True,
-                "axis": "y2",
-            },
-        ],
-        stacked=True,
-        y2Axis={
-            "title": "% SLA",
-            "yMin": 0,
-            "yMax": 100,
-        },
-    )
-
-
-def get_feedback_trend_data(from_date, to_date, conds=""):
-    """
-    Get feedback trend data for the dashboard.
-    """
-    result = frappe.db.sql(
-        f"""
-        SELECT 
-            DATE(creation) as date,
-            AVG(CASE WHEN feedback_rating > 0 THEN feedback_rating END) * 5 as rating,
-            COUNT(CASE WHEN feedback_rating > 0 THEN name END) as rated_tickets
-        FROM `tabHD Ticket` # noqa: W604
-        WHERE 
-            creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
-            {conds}
-        GROUP BY DATE(creation)
-        ORDER BY DATE(creation)
-    """,
-        {
-            "from_date": from_date,
-            "to_date": to_date,
-        },
-        as_dict=1,
-    )
-
-    avg_rating_result = frappe.db.sql(
-        f"""
-        SELECT 
-            AVG(feedback_rating) * 5 as avg_rating
-        FROM `tabHD Ticket` # noqa: W604
-        WHERE 
-            creation BETWEEN %(from_date)s AND DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
-            {conds}
-            AND feedback_rating > 0
-    """,
-        {
-            "from_date": from_date,
-            "to_date": to_date,
-        },
-        pluck=True,
-    )
-    avg_rating = avg_rating_result[0] if avg_rating_result[0] else 0
-
-    subtitle = f"Average feedback rating per day is around {avg_rating:.1f} stars"
-
-    return get_bar_chart_config(
-        result,
-        "Feedback Trend",
-        subtitle,
-        {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
-        "Rated Tickets",
-        [
-            {"name": "rated_tickets", "type": "bar"},
-            {
-                "name": "rating",
-                "type": "line",
-                "showDataPoints": True,
-                "axis": "y2",
-                "color": "#48BB74",
-            },
-        ],
-        y2Axis={
-            "title": "Rating",
-            "yMin": 0,
-            "yMax": 5,
-        },
-    )
-
-
-def get_pie_chart_config(data, title, subtitle, categoryColumn, valueColumn):
-=======
 def get_pie_chart_config(
     data: list[dict[str, any]],
     title: str,
@@ -826,7 +550,6 @@ def get_pie_chart_config(
     category_column: str,
     value_column: str,
 ) -> dict[str, any]:
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
     return {
         "type": "pie",
         "data": data,
@@ -850,50 +573,3 @@ def get_bar_chart_config(
         "series": series,
         **kwargs,
     }
-<<<<<<< HEAD
-
-
-def get_conditions_from_filters(filters):
-    """
-    Get conditions from filters.
-    """
-    conditions = [
-        f" AND creation between '{filters['from_date']}' and '{filters['to_date']}'"
-    ]
-
-    if filters.get("team"):
-        conditions.append(f"agent_group = '{filters['team']}'")
-    if filters.get("agent"):
-        conditions.append(f"owner = '{filters['agent']}'")
-
-    return " AND ".join(conditions) if conditions else ""
-
-
-def get_avg_tickets_per_day(from_date, to_date, conds=""):
-    """
-    Get average tickets per day for the dashboard.
-    """
-    result = frappe.db.sql(
-        f"""
-            SELECT 
-                COUNT(name) as total_tickets,
-                DATEDIFF(DATE_ADD(%(to_date)s, INTERVAL 1 DAY), %(from_date)s) as days
-            FROM `tabHD Ticket` # noqa: W604
-            WHERE creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
-            {conds}
-        """,
-        {
-            "from_date": from_date,
-            "to_date": to_date,
-        },
-        as_dict=1,
-    )
-
-    total_tickets = result[0].total_tickets or 0
-    days = result[0].days or 1  # Avoid division by zero
-
-    avg_tickets_per_day = total_tickets / days
-
-    return avg_tickets_per_day
-=======
->>>>>>> 1e1cd602 (refactor: convert dashboard api to class and add QB support)
