@@ -8,11 +8,11 @@
     <template #body>
       <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex items-center justify-between w-full p-4 pb-2">
-          <div class="text-2xl font-semibold">Canned Responses</div>
+          <div class="text-2xl font-semibold">{{ __("Canned Responses") }}</div>
           <Button
             variant="solid"
             icon-left="plus"
-            label="New"
+            :label="__('New')"
             @click="onNewCannedResponseClick"
           />
         </div>
@@ -23,7 +23,7 @@
               ref="searchInput"
               v-model="search"
               type="text"
-              :placeholder="'Site Down'"
+              :placeholder="__('Site Down')"
             >
               <template #prefix>
                 <FeatherIcon name="search" class="h-4 w-4 text-gray-500" />
@@ -69,7 +69,7 @@
           <div v-else class="mt-2">
             <div class="flex h-56 flex-col items-center justify-center">
               <div class="text-p-sm text-gray-500">
-                {{ "No Canned Responses found" }}
+                {{ __("No Canned Responses found") }}
               </div>
             </div>
           </div>

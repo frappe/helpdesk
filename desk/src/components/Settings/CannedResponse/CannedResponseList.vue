@@ -9,7 +9,7 @@
   >
     <template #header-actions>
       <Button
-        label="New"
+        :label="__('New')"
         theme="gray"
         variant="solid"
         @click="goToNew()"
@@ -162,11 +162,11 @@ import {
   Input,
   toast,
 } from "frappe-ui";
-import SettingsLayoutBase from "../SettingsLayoutBase.vue";
 import { inject, ref, Ref, watch } from "vue";
 import { __ } from "@/translation";
 import { ConfirmDelete } from "@/utils";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
+import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
 
 const cannedResponseSearchQuery = inject<Ref<string>>(
   "cannedResponseSearchQuery"
