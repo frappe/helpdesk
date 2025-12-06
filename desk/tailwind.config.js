@@ -27,6 +27,7 @@ export default {
   },
   plugins: [
     require("@tailwindcss/typography"),
+    require("daisyui"),
     function ({ addUtilities }) {
       addUtilities({
         ".hide-scrollbar": {
@@ -39,4 +40,10 @@ export default {
       });
     },
   ],
+  daisyui: {
+    themes: ["light"],
+    base: false,  // Disable DaisyUI base styles to prevent conflicts
+    styled: true,  // Keep component styles
+    utils: true,   // Keep utility classes
+  },
 };

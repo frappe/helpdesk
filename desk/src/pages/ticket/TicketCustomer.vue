@@ -75,7 +75,7 @@ import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
 import { Icon } from "@iconify/vue";
-import { Breadcrumbs, Button, call, createResource, toast } from "frappe-ui";
+import { Breadcrumbs, Button, call, createResource, toast } from "@/components/ui";
 import { computed, onMounted, onUnmounted, provide, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ITicket } from "./symbols";

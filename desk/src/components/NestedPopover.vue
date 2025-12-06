@@ -1,31 +1,27 @@
 <template>
-  <Popover v-slot="{ open }">
-    <PopoverButton
+  <!-- DaisyUI Dropdown-based Popover -->
+  <div class="relative">
+    <div
       ref="reference"
-      v-slot="{ open: o }"
-      as="div"
-      @click="updatePosition"
+      @click="toggleOpen"
       @focusin="updatePosition"
       @keydown="updatePosition"
     >
-      <slot name="target" :open="o" />
-    </PopoverButton>
+      <slot name="target" :open="open" />
+    </div>
     <div v-show="open">
-      <PopoverPanel
-        v-slot="{ open: o, close }"
+      <div
         ref="popover"
-        static
         class="z-[100]"
       >
-        <slot name="body" :open="o" :close="close" />
-      </PopoverPanel>
+        <slot name="body" :open="open" :close="close" />
+      </div>
     </div>
-  </Popover>
+  </div>
 </template>
 
 <script setup>
-import { nextTick, ref, onBeforeUnmount } from "vue";
-import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
+import { nextTick, ref, onBeforeUnmount, onMounted } from "vue";
 import { createPopper } from "@popperjs/core";
 
 const props = defineProps({
@@ -37,24 +33,53 @@ const props = defineProps({
 
 const reference = ref(null);
 const popover = ref(null);
+const open = ref(false);
 
 let popper = ref(null);
 
 function setupPopper() {
-  if (!popper.value) {
-    popper.value = createPopper(reference.value.el, popover.value.el, {
+  if (!popper.value && reference.value && popover.value) {
+    popper.value = createPopper(reference.value, popover.value, {
       placement: props.placement,
     });
-  } else {
+  } else if (popper.value) {
     popper.value.update();
   }
 }
 
 function updatePosition() {
-  nextTick(() => setupPopper());
+  if (open.value) {
+    nextTick(() => setupPopper());
+  }
 }
 
+function toggleOpen() {
+  open.value = !open.value;
+  updatePosition();
+}
+
+function close() {
+  open.value = false;
+}
+
+// Close on click outside
+function handleClickOutside(event) {
+  if (
+    reference.value &&
+    popover.value &&
+    !reference.value.contains(event.target) &&
+    !popover.value.contains(event.target)
+  ) {
+    close();
+  }
+}
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+});
+
 onBeforeUnmount(() => {
+  document.removeEventListener("click", handleClickOutside);
   popper.value?.destroy();
 });
 </script>

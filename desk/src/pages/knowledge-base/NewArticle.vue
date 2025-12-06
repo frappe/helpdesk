@@ -70,13 +70,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Breadcrumbs,
-  TextEditor,
-  TextEditorFixedMenu,
-  toast,
-  usePageMeta,
-} from "frappe-ui";
+import { TextEditor, TextEditorFixedMenu, usePageMeta } from "frappe-ui";
+import { Breadcrumbs, toast } from "@/components/ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, ref } from "vue";
 

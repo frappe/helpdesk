@@ -102,7 +102,8 @@ import {
 } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
-import { Breadcrumbs, call, Dropdown, toast } from "frappe-ui";
+import { call } from "frappe-ui";
+import { Breadcrumbs, Dropdown, toast } from "@/components/ui";
 import {
   computed,
   ComputedRef,

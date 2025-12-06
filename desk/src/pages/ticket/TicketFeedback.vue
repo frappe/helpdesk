@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { StarRating } from "@/components";
-import { createListResource, createResource } from "frappe-ui";
+import { createListResource, createResource } from "@/components/ui";
 import { inject, ref, watch } from "vue";
 import { ITicket } from "./symbols";
 

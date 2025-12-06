@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import { EmailIcon, PhoneIcon } from "@/components/icons/";
 import { useTelephonyStore } from "@/stores/telephony";
-import { Avatar, Tooltip, Button } from "frappe-ui";
+import { Avatar, Tooltip, Button } from "@/components/ui";
 import { storeToRefs } from "pinia";
 import SetContactPhoneModal from "./SetContactPhoneModal.vue";
 import { inject, ref } from "vue";

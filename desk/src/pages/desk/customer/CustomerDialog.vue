@@ -36,13 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Avatar,
-  createDocumentResource,
-  Dialog,
-  FileUploader,
-  toast,
-} from "frappe-ui";
+import { createDocumentResource, FileUploader } from "frappe-ui";
+import { Avatar, Dialog, toast } from "@/components/ui";
 import { computed } from "vue";
 
 const props = defineProps({

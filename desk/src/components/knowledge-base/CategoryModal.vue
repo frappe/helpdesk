@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { Dialog } from "frappe-ui";
+import { Dialog } from "@/components/ui";
 import { ref } from "vue";
 import { watch } from "vue";
 

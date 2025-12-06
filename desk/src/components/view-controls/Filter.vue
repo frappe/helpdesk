@@ -164,11 +164,9 @@ import {
   DatePicker,
   DateRangePicker,
   DateTimePicker,
-  FeatherIcon,
   FormControl,
-  Popover,
-  Tooltip,
 } from "frappe-ui";
+import { FeatherIcon, Popover, Tooltip } from "@/components/ui";
 import { computed, h, inject } from "vue";
 
 const props = defineProps({

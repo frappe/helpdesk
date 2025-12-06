@@ -48,12 +48,13 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue-jsx": "^3.0.1",
+    "autoprefixer": "^10.4.13",
+    "daisyui": "^5.5.8",
+    "postcss": "^8.4.5",
     "prettier": "2.8.4",
+    "tailwindcss": "^3.4.15",
     "typescript": "^5.0.2",
     "vite": "^4.4.9",
-    "vite-plugin-pwa": "^0.20.5",
-    "autoprefixer": "^10.4.13",
-    "postcss": "^8.4.5",
-    "tailwindcss": "^3.4.15"
+    "vite-plugin-pwa": "^0.20.5"
   }
 }

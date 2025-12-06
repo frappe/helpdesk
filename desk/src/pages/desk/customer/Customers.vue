@@ -40,7 +40,8 @@
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
-import { Avatar, usePageMeta } from "frappe-ui";
+import { Avatar } from "@/components/ui";
+import { usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CustomerDialog from "./CustomerDialog.vue";
 

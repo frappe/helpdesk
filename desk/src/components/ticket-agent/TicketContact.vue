@@ -46,7 +46,7 @@ import { toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useTelephonyStore } from "@/stores/telephony";
 import { useUserStore } from "@/stores/user";
 import { TicketContactSymbol, TicketSymbol } from "@/types";
-import { Avatar, Button, Tooltip } from "frappe-ui";
+import { Avatar, Button, Tooltip } from "@/components/ui";
 import { storeToRefs } from "pinia";
 import { computed, inject, ref } from "vue";
 import { ExternalLinkIcon } from "../icons";

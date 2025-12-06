@@ -132,17 +132,8 @@ import {
   isCustomerPortal,
   textEditorMenuButtons,
 } from "@/utils";
-import {
-  Avatar,
-  Breadcrumbs,
-  Button,
-  createResource,
-  debounce,
-  Dropdown,
-  TextEditor,
-  TextEditorFixedMenu,
-  toast,
-} from "frappe-ui";
+import { createResource, debounce, TextEditor, TextEditorFixedMenu } from "frappe-ui";
+import { Avatar, Breadcrumbs, Button, Dropdown, toast } from "@/components/ui";
 import { computed, h, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";

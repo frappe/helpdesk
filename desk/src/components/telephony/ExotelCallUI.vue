@@ -92,7 +92,8 @@
 import { globalStore } from "@/stores/globalStore";
 import { useTelephonyStore } from "@/stores/telephony";
 import { useDraggable, useWindowSize } from "@vueuse/core";
-import { Avatar, Button, call, toast } from "frappe-ui";
+import { call } from "frappe-ui";
+import { Avatar, Button, toast } from "@/components/ui";
 import { inject, onBeforeUnmount, ref, watch } from "vue";
 import CountUpTimer from "./CountUpTimer.vue";
 import AvatarIcon from "./Icons/AvatarIcon.vue";

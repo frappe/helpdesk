@@ -205,13 +205,8 @@ import { LayoutHeader } from "@/components";
 import SearchMultiSelect from "@/components/SearchMultiSelect.vue";
 import { useShortcut } from "@/composables/shortcuts";
 import dayjs from "dayjs";
-import {
-  Breadcrumbs,
-  createResource,
-  debounce,
-  ErrorMessage,
-  TextInput,
-} from "frappe-ui";
+import { createResource, debounce, TextInput } from "frappe-ui";
+import { Breadcrumbs, ErrorMessage } from "@/components/ui";
 import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 // Icons

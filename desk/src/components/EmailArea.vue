@@ -123,7 +123,7 @@
 import { AttachmentItem } from "@/components";
 import { useScreenSize } from "@/composables/screen";
 import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
-import { Dropdown } from "frappe-ui";
+import { Dropdown } from "@/components/ui";
 import { computed, ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
 import { ReplyAllIcon, ReplyIcon, ForwardIcon } from "./icons";

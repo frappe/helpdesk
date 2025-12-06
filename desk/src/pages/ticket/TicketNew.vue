@@ -125,14 +125,8 @@ import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
 import { Field } from "@/types";
 import { isCustomerPortal, uploadFunction } from "@/utils";
-import {
-  Breadcrumbs,
-  Button,
-  call,
-  createResource,
-  FormControl,
-  usePageMeta,
-} from "frappe-ui";
+import { call, createResource, usePageMeta } from "frappe-ui";
+import { Breadcrumbs, Button, FormControl } from "@/components/ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { isEmpty } from "lodash";
 import sanitizeHtml from "sanitize-html";

@@ -36,7 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { createResource, Dialog, ErrorMessage, toast } from "frappe-ui";
+import { createResource } from "frappe-ui";
+import { Dialog, ErrorMessage, toast } from "@/components/ui";
 import { ref, watch } from "vue";
 import { z } from "zod";
 

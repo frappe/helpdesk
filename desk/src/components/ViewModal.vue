@@ -38,7 +38,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { Dialog } from "frappe-ui";
+import { Dialog } from "@/components/ui";
 import IconPicker from "@/components/IconPicker.vue";
 import { computed } from "vue";
 

@@ -40,7 +40,8 @@
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
 import { PhoneIcon } from "@/components/icons";
-import { Avatar, toast, usePageMeta } from "frappe-ui";
+import { Avatar, toast } from "@/components/ui";
+import { usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import ContactDialog from "./ContactDialog.vue";
 import { showNewContactModal } from "./dialogState";

@@ -32,7 +32,7 @@ import {
   formatTime,
   getTimeInSeconds,
 } from "@/utils";
-import { Badge, Tooltip } from "frappe-ui";
+import { Badge, Tooltip } from "@/components/ui";
 import { computed, onUnmounted, ref, watch } from "vue";
 
 const props = defineProps({

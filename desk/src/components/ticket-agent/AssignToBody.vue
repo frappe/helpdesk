@@ -74,7 +74,8 @@ import UserAvatar from "@/components/UserAvatar.vue";
 import Link from "@/components/frappe-ui/Link.vue";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
-import { Tooltip, Switch, createResource, call } from "frappe-ui";
+import { createResource, call } from "frappe-ui";
+import { Tooltip, Switch } from "@/components/ui";
 import { ref, watch, useTemplateRef, nextTick } from "vue";
 
 const props = defineProps({

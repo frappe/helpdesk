@@ -25,7 +25,8 @@
 <script setup lang="ts">
 import { onMounted, computed } from "vue";
 import { categoryName } from "@/stores/knowledgeBase";
-import { Breadcrumbs, createResource } from "frappe-ui";
+import { createResource } from "frappe-ui";
+import { Breadcrumbs } from "@/components/ui";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ArticleCard from "@/components/knowledge-base/ArticleCard.vue";
 import { capture } from "@/telemetry";

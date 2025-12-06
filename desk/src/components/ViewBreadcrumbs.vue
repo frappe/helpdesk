@@ -84,7 +84,7 @@
 <script setup>
 import { useScreenSize } from "@/composables/screen";
 import { Icon } from "@iconify/vue";
-import { Dropdown } from "frappe-ui";
+import { Dropdown } from "@/components/ui";
 import { useRoute } from "vue-router";
 
 const props = defineProps({

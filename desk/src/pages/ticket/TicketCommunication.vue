@@ -31,7 +31,7 @@ import { AttachmentItem, UserAvatar } from "@/components";
 import { dayjs } from "@/dayjs";
 import { UserInfo } from "@/types";
 import { Icon } from "@iconify/vue";
-import { Tooltip } from "frappe-ui";
+import { Tooltip } from "@/components/ui";
 import sanitizeHtml from "sanitize-html";
 
 interface Attachment {

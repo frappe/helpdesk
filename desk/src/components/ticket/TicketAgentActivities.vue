@@ -120,7 +120,7 @@ import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
 import { isElementInViewport } from "@/utils";
-import { Avatar, FeatherIcon } from "frappe-ui";
+import { Avatar, FeatherIcon } from "@/components/ui";
 import { PropType, Ref, computed, h, inject, nextTick, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";

@@ -52,13 +52,11 @@ import { computed, ref } from "vue";
 
 import {
   Autocomplete,
-  Dialog,
-  ErrorMessage,
   Input,
   createListResource,
   createResource,
-  toast,
 } from "frappe-ui";
+import { Dialog, ErrorMessage, toast } from "@/components/ui";
 import zod from "zod";
 
 import { AutoCompleteItem } from "@/types";

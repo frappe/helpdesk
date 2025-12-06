@@ -780,3 +780,132 @@ def get_ticket_activities(ticket: str):
 def get_ticket_assignees(ticket: str):
     assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
     return assignees
+
+
+@frappe.whitelist()
+@agent_only
+def update_ticket_field(ticket_id: str, field: str, value):
+    """
+    Update a single field on a ticket (for inline editing).
+
+    Args:
+        ticket_id: Ticket ID
+        field: Field name to update
+        value: New value for the field
+
+    Returns:
+        Updated ticket data
+    """
+    # Check permissions
+    check_permissions("HD Ticket", None, doc=ticket_id)
+
+    # Get ticket doc
+    ticket = frappe.get_doc("HD Ticket", ticket_id)
+
+    # Validate field exists
+    if not hasattr(ticket, field):
+        frappe.throw(_(f"Invalid field: {field}"))
+
+    # Set value
+    ticket.set(field, value)
+
+    # Save ticket (triggers validation and workflows)
+    ticket.save(ignore_permissions=False)
+
+    # Return updated ticket data
+    return {
+        "name": ticket.name,
+        "field": field,
+        "value": ticket.get(field),
+        "modified": ticket.modified,
+    }
+
+
+@frappe.whitelist()
+@agent_only
+def bulk_update_tickets(tickets: str | list, updates: str | dict):
+    """
+    Bulk update multiple tickets with the same field values.
+
+    Args:
+        tickets: JSON string or list of ticket IDs
+        updates: JSON string or dict of field: value pairs to update
+
+    Returns:
+        dict with success/failure counts and any errors
+    """
+    # Parse inputs if they're JSON strings
+    if isinstance(tickets, str):
+        tickets = json.loads(tickets)
+    if isinstance(updates, str):
+        updates = json.loads(updates)
+
+    if not tickets or not isinstance(tickets, list):
+        frappe.throw(_("Invalid tickets parameter"))
+
+    if not updates or not isinstance(updates, dict):
+        frappe.throw(_("Invalid updates parameter"))
+
+    # Track results
+    results = {
+        "success": [],
+        "failed": [],
+        "total": len(tickets),
+    }
+
+    # Update each ticket
+    for ticket_id in tickets:
+        try:
+            # Check permissions
+            check_permissions("HD Ticket", None, doc=ticket_id)
+
+            # Get ticket doc
+            ticket = frappe.get_doc("HD Ticket", ticket_id)
+
+            # Apply updates
+            for field, value in updates.items():
+                # Validate field exists
+                if not hasattr(ticket, field):
+                    frappe.throw(_(f"Invalid field: {field}"))
+
+                # Set value
+                ticket.set(field, value)
+
+            # Save ticket (triggers validation and workflows)
+            ticket.save(ignore_permissions=False)
+
+            results["success"].append(ticket_id)
+
+        except Exception as e:
+            results["failed"].append({
+                "ticket": ticket_id,
+                "error": str(e)
+            })
+
+    return results
+
+
+@frappe.whitelist()
+@agent_only
+def get_agents():
+    """
+    Get list of all agents (users with HD Agent role).
+
+    Returns:
+        list: List of agents with name and agent_name fields
+    """
+    QBAgent = frappe.qb.DocType("HD Agent")
+
+    agents = (
+        frappe.qb.from_(QBAgent)
+        .select(
+            QBAgent.name,
+            QBAgent.agent_name,
+            QBAgent.user,
+        )
+        .where(QBAgent.is_active == 1)
+        .orderby(QBAgent.agent_name)
+        .run(as_dict=True)
+    )
+
+    return agents

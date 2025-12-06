@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-1 flex-col h-full">
     <LayoutHeader v-if="ticket.data">
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" />
@@ -197,13 +197,11 @@ import {
   Dialog,
   Dropdown,
   FormControl,
-  TabList,
-  TabPanel,
-  Tabs,
   call,
   createResource,
   toast,
-} from "frappe-ui";
+} from "@/components/ui";
+import { TabList, TabPanel, Tabs } from "frappe-ui";
 import {
   computed,
   ComputedRef,

@@ -76,9 +76,9 @@ import {
   createDocumentResource,
   createListResource,
   Dialog,
-  FileUploader,
   toast,
-} from "frappe-ui";
+} from "@/components/ui";
+import { FileUploader } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import type { Ref } from "vue";
 import { computed, ref } from "vue";

@@ -54,15 +54,8 @@ import {
 import { capture } from "@/telemetry";
 import { Error } from "@/types";
 import { copyToClipboard } from "@/utils";
-import {
-  Badge,
-  Button,
-  Dropdown,
-  FeatherIcon,
-  createResource,
-  toast,
-  usePageMeta,
-} from "frappe-ui";
+import { createResource, usePageMeta } from "frappe-ui";
+import { Badge, Button, Dropdown, FeatherIcon, toast } from "@/components/ui";
 import { computed, h, onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";

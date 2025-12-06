@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { inject } from "vue";
-import { Breadcrumbs } from "frappe-ui";
+import { Breadcrumbs } from "@/components/ui";
 import { PageTitle } from "@/components";
 import { ITicket } from "./symbols";
 

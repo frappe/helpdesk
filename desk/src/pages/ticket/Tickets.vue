@@ -66,6 +66,9 @@ import {
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
+import StatusInlineEdit from "@/components/inline-editors/StatusInlineEdit.vue";
+import PriorityInlineEdit from "@/components/inline-editors/PriorityInlineEdit.vue";
+import TeamInlineEdit from "@/components/inline-editors/TeamInlineEdit.vue";
 import { currentView, useView } from "@/composables/useView";
 import { dayjs } from "@/dayjs";
 import { useAuthStore } from "@/stores/auth";
@@ -73,7 +76,8 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
-import { Badge, FeatherIcon, toast, Tooltip, usePageMeta } from "frappe-ui";
+import { Badge, FeatherIcon, toast, Tooltip, createResource, call } from "@/components/ui";
+import { usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -98,6 +102,31 @@ const showExportModal = ref(false);
 
 const { getStatus } = useTicketStatusStore();
 
+// Handle inline field updates
+async function handleTicketFieldUpdate(ticketId: string | number, field: string, value: any) {
+  console.log("[Tickets] handleTicketFieldUpdate called:", { ticketId, field, value });
+
+  try {
+    const result = await call("helpdesk.helpdesk.doctype.hd_ticket.api.update_ticket_field", {
+      ticket_id: String(ticketId),
+      field: field,
+      value: value,
+    });
+
+    console.log("[Tickets] Update successful:", result);
+
+    // Reload the list to show updated data
+    listViewRef.value?.list?.reload();
+
+    // TODO: Fix toast - currently throws error
+    // toast({ title: "Success", text: "Ticket updated successfully" });
+  } catch (error) {
+    console.error("[Tickets] Failed to update ticket:", error);
+    // TODO: Fix toast - currently throws error
+    // toast({ title: "Error", text: error.message || "Failed to update ticket" });
+  }
+}
+
 const listSelections = ref(new Set());
 const selectBannerActions = [
   {
@@ -114,19 +143,57 @@ const options = {
   doctype: "HD Ticket",
   columnConfig: {
     status: {
-      custom: ({ item }) => {
-        const status = getStatus(item);
-        const label = isCustomerPortal.value
-          ? status?.["label_customer"]
-          : status?.["label_agent"];
-        return h(
-          "div",
-          { class: "flex items-center space-x-2 justify-start w-full" },
-          [
-            h(IndicatorIcon, { class: status?.["parsed_color"] }),
-            h("span", { class: "truncate flex-1" }, label),
-          ]
-        );
+      custom: ({ row, item }) => {
+        // Only allow inline editing for agents (not customer portal)
+        if (isCustomerPortal.value) {
+          const status = getStatus(item);
+          const label = status?.["label_customer"];
+          return h(
+            "div",
+            { class: "flex items-center space-x-2 justify-start w-full" },
+            [
+              h(IndicatorIcon, { class: status?.["parsed_color"] }),
+              h("span", { class: "truncate flex-1" }, label),
+            ]
+          );
+        }
+
+        return h(StatusInlineEdit, {
+          modelValue: item,
+          ticketId: row.name,
+          editable: true,
+          onUpdated: ({ field, value }) => handleTicketFieldUpdate(row.name, field, value),
+        });
+      },
+    },
+    priority: {
+      custom: ({ row, item }) => {
+        // Only allow inline editing for agents (not customer portal)
+        if (isCustomerPortal.value) {
+          return h("span", { class: "truncate flex-1" }, item || "No Priority");
+        }
+
+        return h(PriorityInlineEdit, {
+          modelValue: item,
+          ticketId: row.name,
+          editable: true,
+          onUpdated: ({ field, value }) => handleTicketFieldUpdate(row.name, field, value),
+        });
+      },
+    },
+    agent_group: {
+      custom: ({ row, item }) => {
+        // Only allow inline editing for agents (not customer portal)
+        if (isCustomerPortal.value) {
+          return h("span", { class: "truncate flex-1" }, item || "No Team");
+        }
+
+        return h(TeamInlineEdit, {
+          modelValue: item,
+          ticketId: row.name,
+          editable: true,
+          onUpdated: ({ field, value }) => handleTicketFieldUpdate(row.name, field, value),
+        });
       },
     },
     agreement_status: {

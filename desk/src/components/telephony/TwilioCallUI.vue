@@ -175,7 +175,8 @@
 import { useTelephonyStore } from "@/stores/telephony";
 import { Call, Device } from "@twilio/voice-sdk";
 import { useDraggable, useWindowSize } from "@vueuse/core";
-import { Avatar, call, toast } from "frappe-ui";
+import { call } from "frappe-ui";
+import { Avatar, toast } from "@/components/ui";
 import { inject, ref, watch } from "vue";
 import LucidePhone from "~icons/lucide/phone";
 import CountUpTimer from "./CountUpTimer.vue";

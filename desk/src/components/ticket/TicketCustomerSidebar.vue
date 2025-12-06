@@ -88,7 +88,7 @@ import { dayjs } from "@/dayjs";
 import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
 import { formatTime } from "@/utils";
-import { Avatar, Tooltip } from "frappe-ui";
+import { Avatar, Tooltip } from "@/components/ui";
 import { computed, inject } from "vue";
 
 const emit = defineEmits(["open"]);

@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { dayjs } from "@/dayjs";
 import { isElementInViewport } from "@/utils";
-import { Avatar } from "frappe-ui";
+import { Avatar } from "@/components/ui";
 import { orderBy } from "lodash";
 import { computed, inject, nextTick, watch } from "vue";
 import { useRoute } from "vue-router";

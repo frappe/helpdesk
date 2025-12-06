@@ -115,10 +115,9 @@ import {
   DatePicker,
   DateRangePicker,
   DateTimePicker,
-  Dialog,
-  Dropdown,
   FormControl,
 } from "frappe-ui";
+import { Dialog, Dropdown } from "@/components/ui";
 import { computed, defineEmits, h, ref } from "vue";
 import GroupIcon from "~icons/lucide/group";
 import UnGroupIcon from "~icons/lucide/ungroup";

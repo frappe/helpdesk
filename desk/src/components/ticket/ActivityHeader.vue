@@ -70,7 +70,7 @@ import { CommentIcon, EmailIcon, PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
 import { useTelephonyStore } from "@/stores/telephony";
 import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
-import { Dropdown } from "frappe-ui";
+import { Dropdown } from "@/components/ui";
 import { storeToRefs } from "pinia";
 import { computed, h, inject, ref, Ref } from "vue";
 defineProps({

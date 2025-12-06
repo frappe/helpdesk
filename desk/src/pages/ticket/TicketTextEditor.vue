@@ -89,7 +89,8 @@ import { useAuthStore } from "@/stores/auth";
 import { File } from "@/types";
 import { removeAttachmentFromServer } from "@/utils";
 import { Icon } from "@iconify/vue";
-import { FileUploader, toast } from "frappe-ui";
+import { FileUploader } from "frappe-ui";
+import { toast } from "@/components/ui";
 import { computed, ref } from "vue";
 
 interface P {

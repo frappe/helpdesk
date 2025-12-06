@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { Dropdown, Avatar } from "frappe-ui";
+import { Dropdown, Avatar } from "@/components/ui";
 import { useAuthStore } from "@/stores/auth";
 import { useSidebarStore } from "@/stores/sidebar";
 import { useConfigStore } from "@/stores/config";

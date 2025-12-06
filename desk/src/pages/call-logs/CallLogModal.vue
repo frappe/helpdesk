@@ -128,14 +128,11 @@ import { useAuthStore } from "@/stores/auth";
 import { getRandom } from "@/utils";
 import {
   createResource,
-  Dialog,
-  ErrorMessage,
-  FormControl,
   FormLabel,
   Select,
-  toast,
   type DialogProps,
 } from "frappe-ui";
+import { Dialog, ErrorMessage, FormControl, toast } from "@/components/ui";
 import { computed, ref, watch } from "vue";
 
 const show = defineModel<boolean>();

@@ -40,7 +40,8 @@
 <script setup lang="ts">
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
-import { Avatar, Badge, Button, FeatherIcon, usePageMeta } from "frappe-ui";
+import { Avatar, Badge, Button, FeatherIcon } from "@/components/ui";
+import { usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CallLogDetailModal from "./CallLogDetailModal.vue";
 import CallLogModal from "./CallLogModal.vue";

@@ -62,7 +62,7 @@ import {
 import { useDevice } from "@/composables";
 import { useShortcut } from "@/composables/shortcuts";
 
-import { Dialog } from "frappe-ui";
+import { Dialog } from "@/components/ui";
 import { computed, h, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 

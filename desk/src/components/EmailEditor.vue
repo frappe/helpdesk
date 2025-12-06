@@ -179,11 +179,13 @@ import {
 // import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
 import {
+  createResource,
+  toast,
+} from "@/components/ui";
+import {
   FileUploader,
   TextEditor,
   TextEditorFixedMenu,
-  createResource,
-  toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";

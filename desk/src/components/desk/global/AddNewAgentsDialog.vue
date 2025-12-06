@@ -77,7 +77,8 @@
 
 <script setup>
 import { useAuthStore } from "@/stores/auth";
-import { createResource, Dialog, FeatherIcon, Input, toast } from "frappe-ui";
+import { createResource, Input } from "frappe-ui";
+import { Dialog, FeatherIcon, toast } from "@/components/ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { ref } from "vue";
 

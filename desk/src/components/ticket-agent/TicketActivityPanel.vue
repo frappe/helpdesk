@@ -61,7 +61,8 @@ import {
   TicketSymbol,
   TicketTab,
 } from "@/types";
-import { LoadingIndicator, TabList, TabPanel, Tabs } from "frappe-ui";
+import { TabList, TabPanel, Tabs } from "frappe-ui";
+import { LoadingIndicator } from "@/components/ui";
 import { storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";

@@ -121,7 +121,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { RecentSimilarTicketsSymbol, TicketContactSymbol } from "@/types";
 import { copyToClipboard } from "@/utils";
 import dayjs from "dayjs";
-import { Avatar, Tooltip } from "frappe-ui";
+import { Avatar, Tooltip } from "@/components/ui";
 import { storeToRefs } from "pinia";
 import { computed, inject } from "vue";
 import { CopyIcon } from "../icons";

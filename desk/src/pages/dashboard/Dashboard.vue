@@ -142,11 +142,10 @@ import {
   DateRangePicker,
   dayjs,
   DonutChart,
-  Dropdown,
   NumberChart,
-  Tooltip,
   usePageMeta,
 } from "frappe-ui";
+import { Dropdown, Tooltip } from "@/components/ui";
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
 
 const { isManager, userId } = useAuthStore();

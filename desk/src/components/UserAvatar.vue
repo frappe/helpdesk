@@ -19,7 +19,7 @@
 </template>
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
-import { Avatar } from "frappe-ui";
+import { Avatar } from "@/components/ui";
 import { computed } from "vue";
 const userStore = useUserStore();
 

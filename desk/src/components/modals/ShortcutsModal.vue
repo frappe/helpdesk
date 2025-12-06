@@ -48,7 +48,7 @@
 import { useDevice } from "@/composables/device";
 import { useShortcut } from "@/composables/shortcuts";
 import { isCustomerPortal } from "@/utils";
-import { Dialog } from "frappe-ui";
+import { Dialog } from "@/components/ui";
 import { computed, onMounted } from "vue";
 
 const props = defineProps({

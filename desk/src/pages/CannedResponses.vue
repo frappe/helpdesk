@@ -134,10 +134,12 @@ import { watchDebounced } from "@vueuse/core";
 import {
   Breadcrumbs,
   Dropdown,
-  TextEditor,
   Tooltip,
   call,
   createListResource,
+} from "@/components/ui";
+import {
+  TextEditor,
   usePageMeta,
 } from "frappe-ui";
 import { ref } from "vue";

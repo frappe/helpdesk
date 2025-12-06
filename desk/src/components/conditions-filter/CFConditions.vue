@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Dropdown } from "frappe-ui";
+import { Button, Dropdown } from "@/components/ui";
 import { computed, onMounted } from "vue";
 import CFCondition from "./CFCondition.vue";
 import { filterableFields } from "./filterableFields";

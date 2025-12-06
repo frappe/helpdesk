@@ -68,7 +68,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Breadcrumbs, Tooltip } from "frappe-ui";
+import { Breadcrumbs, Tooltip } from "@/components/ui";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { useNotificationStore } from "@/stores/notification";
 import { ref } from "vue";

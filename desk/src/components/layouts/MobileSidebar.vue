@@ -1,116 +1,100 @@
 <template>
-  <TransitionRoot :show="sidebarOpened">
-    <Dialog as="div" @close="sidebarOpened = false" class="fixed inset-0">
-      <TransitionChild
-        as="template"
-        enter="transition ease-in-out duration-200 transform"
-        enter-from="-translate-x-full"
-        enter-to="translate-x-0"
-        leave="transition ease-in-out duration-200 transform"
-        leave-from="translate-x-0"
-        leave-to="-translate-x-full"
-      >
+  <!-- DaisyUI Drawer -->
+  <Transition name="drawer">
+    <div v-if="sidebarOpened" class="fixed inset-0 z-50">
+      <!-- Overlay -->
+      <Transition name="fade">
         <div
-          class="relative z-10 flex h-full w-[230px] flex-col border-r bg-gray-50 transition-all duration-300 ease-in-out"
-        >
-          <!-- user dropwdown -->
-          <div><UserMenu class="p-2 mb-2" :options="profileSettings" /></div>
-          <!-- notifications -->
-          <div class="overflow-y-auto px-2" v-if="!isCustomerPortal">
-            <div class="mb-3 flex flex-col gap-1">
-              <SidebarLink
-                class="relative"
-                label="Notifications"
-                :icon="LucideBell"
-                :on-click="() => (sidebarOpened = false)"
-                :is-expanded="true"
-                to="Notifications"
-              >
-                <template #right>
-                  <Badge
-                    v-if="notificationStore.unread"
-                    :label="notificationStore.unread"
-                    theme="gray"
-                    variant="subtle"
-                  />
-                </template>
-              </SidebarLink>
-              <SidebarLink
-                v-if="!isCustomerPortal"
-                class="relative"
-                label="Dashboard"
-                :icon="LucideLayoutDashboard"
-                :to="'Dashboard'"
-                :is-active="isActiveTab('Dashboard')"
-                :is-expanded="true"
-              />
-            </div>
-          </div>
+          v-if="sidebarOpened"
+          class="drawer-overlay fixed inset-0 bg-gray-600 bg-opacity-50"
+          @click="sidebarOpened = false"
+        />
+      </Transition>
 
-          <div v-for="view in allViews" :key="view.label">
-            <div
-              v-if="!view.hideLabel && view.views?.length"
-              class="mx-2 my-2 h-1"
-            />
-            <Section
-              :label="view.label"
-              :hideLabel="view.hideLabel"
-              :opened="view.opened"
+      <!-- Sidebar -->
+      <div
+        class="drawer-side fixed left-0 top-0 z-10 flex h-full w-[230px] flex-col border-r bg-gray-50 shadow-xl"
+      >
+        <!-- user dropwdown -->
+        <div><UserMenu class="p-2 mb-2" :options="profileSettings" /></div>
+        <!-- notifications -->
+        <div class="overflow-y-auto px-2" v-if="!isCustomerPortal">
+          <div class="mb-3 flex flex-col gap-1">
+            <SidebarLink
+              class="relative"
+              label="Notifications"
+              :icon="LucideBell"
+              :on-click="() => (sidebarOpened = false)"
+              :is-expanded="true"
+              to="Notifications"
             >
-              <template #header="{ opened, hide, toggle }">
-                <div
-                  v-if="!hide"
-                  class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
-                  :class="'ml-2 mt-4 h-7 w-auto opacity-100'"
-                  @click="toggle()"
-                >
-                  <FeatherIcon
-                    name="chevron-right"
-                    class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
-                    :class="{ 'rotate-90': opened }"
-                  />
-                  <span>{{ view.label }}</span>
-                </div>
-              </template>
-              <nav class="flex flex-col ml-2 mr-1">
-                <SidebarLink
-                  v-for="link in view.views"
-                  :icon="link.icon"
-                  :label="link.label"
-                  :to="link.to"
-                  :key="link.label"
-                  :is-expanded="true"
-                  :is-active="isActiveTab(link.to)"
-                  class="my-0.5"
-                  :onClick="link.onClick"
+              <template #right>
+                <Badge
+                  v-if="notificationStore.unread"
+                  :label="notificationStore.unread"
+                  theme="gray"
+                  variant="subtle"
                 />
-              </nav>
-            </Section>
+              </template>
+            </SidebarLink>
+            <SidebarLink
+              v-if="!isCustomerPortal"
+              class="relative"
+              label="Dashboard"
+              :icon="LucideLayoutDashboard"
+              :to="'Dashboard'"
+              :is-active="isActiveTab('Dashboard')"
+              :is-expanded="true"
+            />
           </div>
         </div>
-      </TransitionChild>
-      <TransitionChild
-        as="template"
-        enter="transition-opacity ease-linear duration-200"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="transition-opacity ease-linear duration-200"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
-      >
-        <DialogOverlay class="fixed inset-0 bg-gray-600 bg-opacity-50" />
-      </TransitionChild>
-    </Dialog>
-  </TransitionRoot>
+
+        <div v-for="view in allViews" :key="view.label">
+          <div
+            v-if="!view.hideLabel && view.views?.length"
+            class="mx-2 my-2 h-1"
+          />
+          <Section
+            :label="view.label"
+            :hideLabel="view.hideLabel"
+            :opened="view.opened"
+          >
+            <template #header="{ opened, hide, toggle }">
+              <div
+                v-if="!hide"
+                class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+                :class="'ml-2 mt-4 h-7 w-auto opacity-100'"
+                @click="toggle()"
+              >
+                <FeatherIcon
+                  name="chevron-right"
+                  class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
+                  :class="{ 'rotate-90': opened }"
+                />
+                <span>{{ view.label }}</span>
+              </div>
+            </template>
+            <nav class="flex flex-col ml-2 mr-1">
+              <SidebarLink
+                v-for="link in view.views"
+                :icon="link.icon"
+                :label="link.label"
+                :to="link.to"
+                :key="link.label"
+                :is-expanded="true"
+                :is-active="isActiveTab(link.to)"
+                class="my-0.5"
+                :onClick="link.onClick"
+              />
+            </nav>
+          </Section>
+        </div>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <script setup lang="ts">
-import {
-  Dialog,
-  DialogOverlay,
-  TransitionChild,
-  TransitionRoot,
-} from "@headlessui/vue";
 import { computed, markRaw, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -248,4 +232,36 @@ function isActiveTab(to: string) {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Drawer slide-in animation */
+.drawer-enter-active .drawer-side,
+.drawer-leave-active .drawer-side {
+  transition: transform 0.2s ease-in-out;
+}
+
+.drawer-enter-from .drawer-side,
+.drawer-leave-to .drawer-side {
+  transform: translateX(-100%);
+}
+
+.drawer-enter-to .drawer-side,
+.drawer-leave-from .drawer-side {
+  transform: translateX(0);
+}
+
+/* Overlay fade animation */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease-linear;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+}
+</style>

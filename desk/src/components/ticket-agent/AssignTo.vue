@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { useShortcut } from "@/composables/shortcuts";
 import { ActivitiesSymbol, AssigneeSymbol, TicketSymbol } from "@/types";
-import { Popover } from "frappe-ui";
+import { Popover } from "@/components/ui";
 import { inject, useTemplateRef } from "vue";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import MultipleAvatar from "../MultipleAvatar.vue";

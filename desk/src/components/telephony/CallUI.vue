@@ -41,7 +41,8 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-import { FormControl, call, toast } from "frappe-ui";
+import { call } from "frappe-ui";
+import { FormControl, toast } from "@/components/ui";
 import { nextTick, ref, watch } from "vue";
 import TwilioCallUI from "./TwilioCallUI.vue";
 import ExotelCallUI from "./ExotelCallUI.vue";

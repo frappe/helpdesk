@@ -40,7 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import { Dialog, createResource, toast } from "frappe-ui";
+import { createResource } from "frappe-ui";
+import { Dialog, toast } from "@/components/ui";
 import { ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
 import TriangleAlert from "~icons/lucide/triangle-alert";

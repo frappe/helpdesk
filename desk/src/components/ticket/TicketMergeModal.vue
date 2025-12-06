@@ -62,7 +62,8 @@
 <script setup lang="ts">
 import { Link } from "@/components";
 import { HDTicket } from "@/types/doctypes";
-import { Dialog, createListResource, createResource, toast } from "frappe-ui";
+import { createListResource, createResource } from "frappe-ui";
+import { Dialog, toast } from "@/components/ui";
 import { ref, watch } from "vue";
 import LucideMerge from "~icons/lucide/merge";
 import TriangleAlert from "~icons/lucide/triangle-alert";

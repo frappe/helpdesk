@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar } from "frappe-ui";
+import { Avatar } from "@/components/ui";
 import { Article } from "@/types";
 import { dayjs } from "@/dayjs";
 
