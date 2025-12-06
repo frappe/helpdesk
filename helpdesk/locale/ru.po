@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-30 10:36+0000\n"
-"PO-Revision-Date: 2025-12-04 21:27\n"
+"PO-Revision-Date: 2025-12-06 21:21\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -3463,7 +3463,7 @@ msgstr "Четверг"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Ticket"
-msgstr "Тикет"
+msgstr "Заявка"
 
 #. Name of a report
 #. Label of a Link in the Helpdesk Workspace
