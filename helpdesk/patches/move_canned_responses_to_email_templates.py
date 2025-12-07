@@ -22,7 +22,7 @@ def execute():
                 f"{canned_response.title} {name_counts[canned_response.title]}"
             )
 
-        frappe.get_doc(
+        cr = frappe.get_doc(
             {
                 "doctype": "Email Template",
                 "name": template_name,
@@ -32,6 +32,8 @@ def execute():
                 "owner": canned_response.owner,
             }
         ).insert(ignore_permissions=True)
+
+        frappe.db.set_value("Email Template", cr.name, "owner", canned_response.owner)
 
     if not frappe.db.exists("DocType", doctype):
         return
