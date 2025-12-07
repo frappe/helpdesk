@@ -1,6 +1,6 @@
 <template>
   <SettingsLayoutBase
-    :title="__('Canned Responses')"
+    :title="__('Saved Replies')"
     :description="
       __(
         'Manage pre-defined responses that can be used to respond to customer queries.'
@@ -20,8 +20,8 @@
       <div class="flex items-center gap-2 justify-between">
         <div class="relative w-full">
           <Input
-            :model-value="cannedResponseSearchQuery"
-            @input="cannedResponseSearchQuery = $event"
+            :model-value="savedRepliesSearchQuery"
+            @input="savedRepliesSearchQuery = $event"
             :placeholder="__('Search')"
             type="text"
             class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
@@ -30,10 +30,10 @@
             inputClass="p-4 pr-12"
           />
           <Button
-            v-if="cannedResponseSearchQuery"
+            v-if="savedRepliesSearchQuery"
             icon="x"
             variant="ghost"
-            @click="cannedResponseSearchQuery = ''"
+            @click="savedRepliesSearchQuery = ''"
             class="absolute right-1 top-1/2 -translate-y-1/2"
           />
         </div>
@@ -73,15 +73,13 @@
     </template>
     <template #content>
       <div
-        v-if="cannedResponsesListResource.loading"
+        v-if="savedRepliesListResource.loading"
         class="flex items-center justify-center mt-12"
       >
         <LoadingIndicator class="w-4" />
       </div>
       <div
-        v-if="
-          !cannedResponsesListResource.loading && !cannedResponsesList?.length
-        "
+        v-if="!savedRepliesListResource.loading && !savedRepliesList?.length"
         class="flex flex-col items-center justify-center gap-4 grow"
       >
         <div
@@ -91,20 +89,20 @@
         </div>
         <div class="flex flex-col items-center gap-1">
           <div class="text-base font-medium text-ink-gray-6">
-            {{ __("No Canned Response found") }}
+            {{ __("No Saved reply found") }}
           </div>
           <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-            {{ __("Add your first Canned response to get started.") }}
+            {{ __("Add your first Saved reply to get started.") }}
           </div>
         </div>
         <Button
-          :label="__('Add Canned Response')"
+          :label="__('Add Saved reply')"
           variant="outline"
           icon-left="plus"
           @click="goToNew()"
         />
       </div>
-      <div v-else class="-ml-2">
+      <div v-if="savedRepliesList?.length" class="-ml-2">
         <div
           class="grid grid-cols-11 items-center gap-3 text-sm text-gray-600 ml-2"
         >
@@ -114,17 +112,17 @@
         </div>
         <hr class="mt-2 mx-2" />
         <div
-          v-for="(cannedResponse, index) in cannedResponsesList"
-          :key="cannedResponse.name"
+          v-for="(savedReply, index) in savedRepliesList"
+          :key="savedReply.name"
         >
           <div
             class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
           >
             <div
               @click="
-                cannedResponseActiveScreen = {
+                savedRepliesActiveScreen = {
                   screen: 'view',
-                  data: cannedResponse,
+                  data: savedReply,
                 }
               "
               class="w-full px-2 flex flex-col justify-center h-12.5 col-span-7"
@@ -132,31 +130,28 @@
               <div
                 class="text-base text-ink-gray-7 font-medium w-full truncate"
               >
-                {{ cannedResponse.name }}
+                {{ savedReply.name }}
               </div>
             </div>
             <div
               class="flex items-center gap-1.5 text-sm text-ink-gray-7 truncate col-span-2"
             >
               <Avatar
-                :name="
-                  getUser(cannedResponse.owner)?.full_name ||
-                  cannedResponse.owner
-                "
-                :image="getUser(cannedResponse.owner)?.user_image"
+                :name="getUser(savedReply.owner)?.full_name || savedReply.owner"
+                :image="getUser(savedReply.owner)?.user_image"
                 size="xs"
               />
-              {{ getUser(cannedResponse.owner)?.full_name }}
+              {{ getUser(savedReply.owner)?.full_name }}
             </div>
             <div
               class="flex justify-between items-center w-full pr-2 col-span-2"
             >
               <div class="text-sm text-ink-gray-7">
-                {{ cannedResponse.scope }}
+                {{ savedReply.scope }}
               </div>
               <Dropdown
                 placement="right"
-                :options="dropdownOptions(cannedResponse)"
+                :options="dropdownOptions(savedReply)"
               >
                 <Button
                   icon="more-horizontal"
@@ -167,19 +162,19 @@
               </Dropdown>
             </div>
           </div>
-          <hr v-if="index !== cannedResponsesList.length - 1" class="mx-2" />
+          <hr v-if="index !== savedRepliesList.length - 1" class="mx-2" />
         </div>
       </div>
     </template>
   </SettingsLayoutBase>
   <Dialog
-    :options="{ title: __('Duplicate Canned Response') }"
+    :options="{ title: __('Duplicate Saved reply') }"
     v-model="duplicateDialog.show"
   >
     <template #body-content>
       <div class="flex flex-col gap-4">
         <FormControl
-          :label="__('New Canned Response Name')"
+          :label="__('New Saved reply Name')"
           type="text"
           v-model="duplicateDialog.newName"
         />
@@ -215,24 +210,22 @@ import { __ } from "@/translation";
 import { ConfirmDelete } from "@/utils";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
-import { activeFilter } from "./cannedResponse";
+import { activeFilter } from "./savedReplies";
 import { useUserStore } from "../../../stores/user";
 
 const { getUser } = useUserStore();
 
-const cannedResponseSearchQuery = inject<Ref<string>>(
-  "cannedResponseSearchQuery"
-);
-const cannedResponseActiveScreen = inject<any>("cannedResponseActiveScreen");
+const savedRepliesSearchQuery = inject<Ref<string>>("savedRepliesSearchQuery");
+const savedRepliesActiveScreen = inject<any>("savedRepliesActiveScreen");
 const duplicateDialog = ref({
   show: false,
   name: "",
   newName: "",
 });
-const cannedResponsesList = ref([]);
+const savedRepliesList = ref([]);
 
 const goToNew = () => {
-  cannedResponseActiveScreen.value = {
+  savedRepliesActiveScreen.value = {
     screen: "view",
     data: null,
   };
@@ -240,36 +233,36 @@ const goToNew = () => {
 
 const isConfirmingDelete = ref(false);
 
-const cannedResponsesListResource = createResource({
-  url: "helpdesk.api.canned_response.get_canned_responses",
+const savedRepliesListResource = createResource({
+  url: "helpdesk.api.saved_replies.get_saved_replies",
   params: {
     scope: activeFilter.value,
   },
   onSuccess: (data) => {
-    cannedResponsesList.value = data;
+    savedRepliesList.value = data;
   },
   auto: true,
 });
 
-const dropdownOptions = (cannedResponse) => [
+const dropdownOptions = (savedReply) => [
   {
     label: __("Duplicate"),
     onClick: () => {
       duplicateDialog.value = {
         show: true,
-        name: cannedResponse.name,
-        newName: `${cannedResponse.name} (Copy)`,
+        name: savedReply.name,
+        newName: `${savedReply.name} (Copy)`,
       };
     },
     icon: "copy",
   },
   ...ConfirmDelete({
-    onConfirmDelete: () => deleteCannedResponse(cannedResponse),
+    onConfirmDelete: () => deleteSavedReply(savedReply),
     isConfirmingDelete,
   }),
 ];
 
-const deleteCannedResponse = (cannedResponse) => {
+const deleteSavedReply = (savedReply) => {
   if (!isConfirmingDelete.value) {
     isConfirmingDelete.value = true;
     return;
@@ -279,12 +272,12 @@ const deleteCannedResponse = (cannedResponse) => {
     url: "frappe.client.delete",
     params: {
       doctype: "Email Template",
-      name: cannedResponse.name,
+      name: savedReply.name,
     },
     auto: true,
     onSuccess: () => {
-      cannedResponsesListResource.reload();
-      toast.success(__("Canned response deleted"));
+      savedRepliesListResource.reload();
+      toast.success(__("Saved reply deleted"));
     },
   });
 };
@@ -305,13 +298,13 @@ const duplicate = async () => {
       },
       auto: true,
       onSuccess: (data) => {
-        toast.success(__("Canned response duplicated"));
+        toast.success(__("Saved reply duplicated"));
         duplicateDialog.value = {
           show: false,
           name: "",
           newName: "",
         };
-        cannedResponseActiveScreen.value = {
+        savedRepliesActiveScreen.value = {
           screen: "view",
           data: { name: data.name },
         };
@@ -326,7 +319,7 @@ const filterOptions = computed(() => [
     value: "All",
     onClick: () => {
       activeFilter.value = "All";
-      cannedResponsesListResource.submit({
+      savedRepliesListResource.submit({
         scope: "All",
       });
     },
@@ -336,7 +329,7 @@ const filterOptions = computed(() => [
     value: "Personal",
     onClick: () => {
       activeFilter.value = "Personal";
-      cannedResponsesListResource.submit({
+      savedRepliesListResource.submit({
         scope: "Personal",
       });
     },
@@ -346,7 +339,7 @@ const filterOptions = computed(() => [
     value: "My Team",
     onClick: () => {
       activeFilter.value = "My Team";
-      cannedResponsesListResource.submit({
+      savedRepliesListResource.submit({
         scope: "My Team",
       });
     },
@@ -356,7 +349,7 @@ const filterOptions = computed(() => [
     value: "Global",
     onClick: () => {
       activeFilter.value = "Global";
-      cannedResponsesListResource.submit({
+      savedRepliesListResource.submit({
         scope: "Global",
       });
     },
@@ -364,13 +357,13 @@ const filterOptions = computed(() => [
 ]);
 
 watch(
-  () => [cannedResponseSearchQuery?.value, cannedResponsesListResource.data],
+  () => [savedRepliesSearchQuery?.value, savedRepliesListResource.data],
   ([query, data]) => {
     if (!query) {
-      cannedResponsesList.value = data || [];
+      savedRepliesList.value = data || [];
       return;
     }
-    cannedResponsesList.value =
+    savedRepliesList.value =
       data?.filter((item) => {
         return item.name.toLowerCase().includes(query.toLowerCase());
       }) || [];

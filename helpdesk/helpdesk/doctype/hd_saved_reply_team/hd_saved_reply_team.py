@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class HDCannedResponseTeam(Document):
+class HDSavedReplyTeam(Document):
     pass

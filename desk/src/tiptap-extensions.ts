@@ -2,8 +2,8 @@ import { Extension } from "@tiptap/core";
 import { createSuggestionExtension } from "frappe-ui";
 import { PluginKey } from "@tiptap/pm/state";
 import { getMeta } from "./stores/meta";
-import { userFields } from "./components/Settings/CannedResponse/cannedResponse";
-import FieldAutocompleteList from "./components/Settings/CannedResponse/components/FieldAutocompleteList.vue";
+import { userFields } from "./components/Settings/SavedReplies/savedReplies";
+import FieldAutocompleteList from "./components/Settings/SavedReplies/components/FieldAutocompleteList.vue";
 
 export interface FieldItem {
   title: string;

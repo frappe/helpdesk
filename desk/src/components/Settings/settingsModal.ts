@@ -19,11 +19,13 @@ import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
 import Telephony from "./Telephony/Telephony.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
+import SavedReplies from "./SavedReplies/SavedReplies.vue";
 import Profile from "./Profile/Profile.vue";
 import { Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import General from "./General/General.vue";
 import SettingsGear from "~icons/lucide/settings";
+import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
 
 export const showSettingsModal = ref(false);
 
@@ -113,6 +115,11 @@ export const tabs = computed(() => {
           component: markRaw(FieldDependencyConfig),
           condition: () => auth.isAdmin || auth.isManager,
         },
+        {
+          label: "Saved Replies",
+          icon: markRaw(SavedReplyIcon),
+          component: markRaw(SavedReplies),
+        },
       ],
     },
     {
@@ -158,7 +165,7 @@ type TabName =
   | "Assignment Rules"
   | "Field Dependencies"
   | "Telephony"
-  | "Canned Responses";
+  | "Saved Replies";
 
 export const setActiveSettingsTab = (tabName: TabName) => {
   activeTab.value =

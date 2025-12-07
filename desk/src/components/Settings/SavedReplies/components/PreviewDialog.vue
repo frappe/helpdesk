@@ -53,24 +53,20 @@ import {
   toast,
 } from "frappe-ui";
 import { LoadingIndicator } from "frappe-ui";
-import { menuButtons } from "../cannedResponse";
+import { menuButtons } from "../savedReplies";
 import { Link } from "@/components";
 import { watch } from "vue";
-import { storeToRefs } from "pinia";
-import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 
 const dialogModel = defineModel<{
   show: boolean;
   ticketId: string;
-  cannedResponse: string;
+  savedReply: string;
   preview: string;
 }>();
 
-const { userTeams } = storeToRefs(useAuthStore());
-
 const getResponsePreviewResource = createResource({
-  url: "helpdesk.api.canned_response.get_rendered_canned_response",
+  url: "helpdesk.api.saved_replies.get_rendered_saved_reply",
   onSuccess: (data) => {
     dialogModel.value.preview = data;
   },
@@ -82,7 +78,7 @@ const getResponsePreview = (ticketId: string) => {
   dialogModel.value.preview = null;
   getResponsePreviewResource.submit({
     ticket_id: ticketId,
-    canned_response: dialogModel.value.cannedResponse,
+    saved_reply: dialogModel.value.savedReply,
   });
 };
 
