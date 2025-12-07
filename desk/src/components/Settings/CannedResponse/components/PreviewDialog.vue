@@ -98,12 +98,7 @@ watch(
         auto: true,
         onSuccess: (data) => {
           if (data.length === 0) {
-            toast.error(
-              __(
-                "No tickets found for these team(s) to preview: {0}",
-                userTeams.value.join(", ")
-              )
-            );
+            toast.error(__("No tickets found to preview."));
             return;
           }
           dialogModel.value.ticketId = data[0].name;
