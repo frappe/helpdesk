@@ -19,7 +19,6 @@
           placeholder="Search ticket"
           :show-description="true"
           @change="getResponsePreview"
-          :filters="ticketFilters"
         />
 
         <div class="space-y-1.5">
@@ -56,10 +55,9 @@ import {
 import { LoadingIndicator } from "frappe-ui";
 import { menuButtons } from "../cannedResponse";
 import { Link } from "@/components";
-import { computed, watch } from "vue";
+import { watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
-import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
 
 const dialogModel = defineModel<{
@@ -70,22 +68,12 @@ const dialogModel = defineModel<{
 }>();
 
 const { userTeams } = storeToRefs(useAuthStore());
-const { teamRestrictionApplied } = storeToRefs(useConfigStore());
 
 const getResponsePreviewResource = createResource({
   url: "helpdesk.api.canned_response.get_rendered_canned_response",
   onSuccess: (data) => {
     dialogModel.value.preview = data;
   },
-});
-
-const ticketFilters = computed(() => {
-  if (teamRestrictionApplied.value) {
-    return {
-      agent_group: ["in", userTeams.value.join(", ")],
-    };
-  }
-  return {};
 });
 
 const getResponsePreview = (ticketId: string) => {
@@ -121,7 +109,6 @@ watch(
           dialogModel.value.ticketId = data[0].name;
           getResponsePreview(data[0].name);
         },
-        filters: ticketFilters.value,
       });
     }
   }

@@ -94,8 +94,7 @@ import {
   showSettingsModal,
 } from "./Settings/settingsModal";
 import { showEmailBox } from "../pages/ticket/modalStates";
-import { useConfigStore } from "@/stores/config";
-import { storeToRefs } from "pinia";
+import { useStorage } from "@vueuse/core";
 
 const props = defineProps({
   doctype: {
@@ -108,28 +107,24 @@ const props = defineProps({
   },
 });
 
-const { teamRestrictionApplied } = storeToRefs(useConfigStore());
 const show = defineModel();
 const searchInput = ref("");
-const activeFilter = ref(teamRestrictionApplied.value ? "My Team" : "Global");
+const activeFilter = useStorage("saved-replies-filter", "Personal");
 
-const filters = computed(() => {
-  return [
-    {
-      label: "Global",
-      onClick: () => (activeFilter.value = "Global"),
-      disabled: teamRestrictionApplied.value,
-    },
-    {
-      label: "My Team",
-      onClick: () => (activeFilter.value = "My Team"),
-    },
-    {
-      label: "Personal",
-      onClick: () => (activeFilter.value = "Personal"),
-    },
-  ].filter((filter) => !filter.disabled);
-});
+const filters = computed(() => [
+  {
+    label: "Global",
+    onClick: () => (activeFilter.value = "Global"),
+  },
+  {
+    label: "My Team",
+    onClick: () => (activeFilter.value = "My Team"),
+  },
+  {
+    label: "Personal",
+    onClick: () => (activeFilter.value = "Personal"),
+  },
+]);
 
 watch(activeFilter, () => {
   cannedResponsesResource.reload({
