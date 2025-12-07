@@ -23,7 +23,7 @@
  "modified": "2025-10-13 16:46:58.471428",
  "modified_by": "Administrator",
  "module": "Helpdesk",
- "name": "HD Canned Response Team",
+ "name": "HD Saved Reply Team",
  "owner": "Administrator",
  "permissions": [],
  "row_format": "Dynamic",

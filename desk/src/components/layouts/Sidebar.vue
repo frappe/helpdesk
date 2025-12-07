@@ -572,7 +572,7 @@ const articles = ref([
       { name: "contact", title: "Contact" },
       { name: "customer", title: "Customer" },
       { name: "knowledge-base", title: "Knowledge Base" },
-      { name: "canned-response", title: "Canned Responses" },
+      { name: "saved-replies", title: "Saved Replies" },
       { name: "service-level-agreement", title: "Service Level Agreement" },
       { name: "ticket-type", title: "Ticket Type" },
       { name: "ticket-priority", title: "Ticket Priority" },

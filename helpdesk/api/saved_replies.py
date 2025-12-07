@@ -5,9 +5,9 @@ from helpdesk.utils import get_agents_team, is_admin
 
 
 @frappe.whitelist()
-def get_canned_responses(scope):
+def get_saved_replies(scope):
     QBEmailTemplate = frappe.qb.DocType("Email Template")
-    QBChildTeam = frappe.qb.DocType("HD Canned Response Team")
+    QBChildTeam = frappe.qb.DocType("HD Saved Reply Team")
     is_team_restriction_applied = frappe.db.get_single_value(
         "HD Settings", "restrict_tickets_by_agent_group"
     )
@@ -63,15 +63,11 @@ def get_canned_responses(scope):
 
 
 @frappe.whitelist()
-def get_rendered_canned_response(
-    ticket_id, canned_response_id=None, canned_response=None
-):
-    if not (canned_response_id or canned_response):
-        frappe.throw(
-            _("Please provide either canned_response_id or canned_response data")
-        )
-    if not canned_response:
-        canned_response = frappe.get_doc("Email Template", canned_response_id).response
+def get_rendered_saved_reply(ticket_id, saved_reply_id=None, saved_reply=None):
+    if not (saved_reply_id or saved_reply):
+        frappe.throw(_("Please provide either saved_reply_id or saved_reply data"))
+    if not saved_reply:
+        saved_reply = frappe.get_doc("Email Template", saved_reply_id).response
     ticket = frappe.get_doc("HD Ticket", ticket_id).as_dict()
     user = frappe.get_doc("User", frappe.session.user).as_dict()
-    return frappe.render_template(canned_response, {**ticket, **user})
+    return frappe.render_template(saved_reply, {**ticket, **user})

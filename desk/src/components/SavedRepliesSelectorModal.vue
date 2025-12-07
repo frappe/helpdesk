@@ -8,12 +8,12 @@
     <template #body>
       <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex items-center justify-between w-full p-4 pb-2">
-          <div class="text-2xl font-semibold">{{ __("Canned Responses") }}</div>
+          <div class="text-2xl font-semibold">{{ __("Saved Replies") }}</div>
           <Button
             variant="solid"
             icon-left="plus"
             :label="__('New')"
-            @click="onNewCannedResponseClick"
+            @click="onNewSavedReplyClick"
           />
         </div>
         <div class="p-4">
@@ -69,7 +69,7 @@
           <div v-else class="mt-2">
             <div class="flex h-56 flex-col items-center justify-center">
               <div class="text-p-sm text-gray-500">
-                {{ __("No Canned Responses found") }}
+                {{ __("No Saved Replies found") }}
               </div>
             </div>
           </div>
@@ -127,7 +127,7 @@ const filters = computed(() => [
 ]);
 
 watch(activeFilter, () => {
-  cannedResponsesResource.reload({
+  getSavedRepliesResource.reload({
     scope: activeFilter.value,
   });
 });
@@ -135,19 +135,19 @@ watch(activeFilter, () => {
 const emit = defineEmits(["apply"]);
 
 const search = ref("");
-const cannedResponsesList = ref([]);
+const savedRepliesList = ref([]);
 const selectedTemplate = ref({
   name: "",
   isLoading: false,
 });
 
-const cannedResponsesResource = createResource({
-  url: "helpdesk.api.canned_response.get_canned_responses",
+const getSavedRepliesResource = createResource({
+  url: "helpdesk.api.saved_replies.get_saved_replies",
   params: {
     scope: activeFilter.value,
   },
   onSuccess: (data) => {
-    cannedResponsesList.value = data;
+    savedRepliesList.value = data;
   },
   auto: true,
 });
@@ -158,7 +158,7 @@ onUnmounted(() => {
 
 const filteredTemplates = computed(() => {
   return (
-    cannedResponsesList.value?.filter((template) => {
+    savedRepliesList.value?.filter((template) => {
       return (
         template.name.toLowerCase().includes(search.value.toLowerCase()) ||
         template.subject.toLowerCase().includes(search.value.toLowerCase())
@@ -174,9 +174,9 @@ const onTemplateSelect = (template) => {
     isLoading: true,
   };
   const renderResponse = createResource({
-    url: "helpdesk.api.canned_response.get_rendered_canned_response",
+    url: "helpdesk.api.saved_replies.get_rendered_saved_reply",
     params: {
-      canned_response_id: template.name,
+      saved_reply_id: template.name,
       ticket_id: props.ticketId,
     },
     onSuccess: (data) => {
@@ -195,17 +195,17 @@ const onTemplateSelect = (template) => {
   });
 };
 
-const onNewCannedResponseClick = () => {
+const onNewSavedReplyClick = () => {
   show.value = false;
   showSettingsModal.value = true;
-  setActiveSettingsTab("Canned Responses");
+  setActiveSettingsTab("Saved Replies");
 };
 
 watch(show, (value) => {
   if (value) {
     // @ts-ignore
     nextTick(() => searchInput.value?.el?.focus());
-    cannedResponsesResource.reload();
+    getSavedRepliesResource.reload();
   }
 });
 </script>

@@ -42,7 +42,7 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 - **Knowledge Base**: Learn how to create and manage help articles to empower users and reduce tickets.
 
-- **Canned Responses**: Pre-written replies for common queries to ensure quick and consistent communication.
+- **Saved Replies**: Pre-written replies for common queries to ensure quick and consistent communication.
 
 <details open>
 <summary >View Screenshots</summary>

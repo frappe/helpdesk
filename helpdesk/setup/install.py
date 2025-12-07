@@ -283,7 +283,7 @@ def get_custom_fields():
                 "fieldtype": "Table MultiSelect",
                 "label": "Teams",
                 "insert_after": "response",
-                "options": "HD Canned Response Team",
+                "options": "HD Saved Reply Team",
                 "depends_on": 'eval: doc.scope=="Team"',
             },
             {
