@@ -22,6 +22,8 @@ def execute():
                 f"{canned_response.title} {name_counts[canned_response.title]}"
             )
 
+        scope = "Global" if canned_response.owner == "Administrator" else "Personal"
+
         cr = frappe.get_doc(
             {
                 "doctype": "Email Template",
@@ -30,6 +32,7 @@ def execute():
                 "response": canned_response.message,
                 "reference_doctype": "HD Ticket",
                 "owner": canned_response.owner,
+                "scope": scope,
             }
         ).insert(ignore_permissions=True)
 

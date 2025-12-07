@@ -139,11 +139,14 @@
               class="flex items-center gap-1.5 text-sm text-ink-gray-7 truncate col-span-2"
             >
               <Avatar
-                :name="cannedResponse.owner"
+                :name="
+                  getUser(cannedResponse.owner)?.full_name ||
+                  cannedResponse.owner
+                "
                 :image="getUser(cannedResponse.owner)?.user_image"
                 size="xs"
               />
-              {{ cannedResponse.owner }}
+              {{ getUser(cannedResponse.owner)?.full_name }}
             </div>
             <div
               class="flex justify-between items-center w-full pr-2 col-span-2"
