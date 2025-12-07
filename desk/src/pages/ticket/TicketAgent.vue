@@ -32,6 +32,16 @@
         >
           Assign
         </button>
+        <Button
+          v-if="ticket.data"
+          variant="outline"
+          :label="__('Transfer to CRM Lead')"
+          @click="openTransferDialog"
+        >
+          <template #prefix>
+            <FeatherIcon name="arrow-right" class="h-4 w-4" />
+          </template>
+        </Button>
         <Dropdown :options="dropdownOptions">
           <template #default="{ open }">
             <Button :label="ticket.data.status">
@@ -58,7 +68,13 @@
           <Tabs v-model="tabIndex" :tabs="tabs">
             <TabList />
             <TabPanel v-slot="{ tab }" class="h-full">
+              <TicketOrderDetails
+                v-if="tab.name === 'order_details'"
+                :key="`order-details-${ticketId}-${tabIndex}`"
+                :ticketId="ticketId"
+              />
               <TicketAgentActivities
+                v-else
                 ref="ticketAgentActivitiesRef"
                 :activities="filterActivities(tab.name)"
                 :title="tab.label"
@@ -132,14 +148,24 @@
         </div>
       </template>
     </Dialog>
+    <EmailTransferDialog
+      v-model="showTransferDialog"
+      :source-doc="ticket.data"
+      :emails="transferEmails"
+      target-type="CRM Lead"
+      @transfer="handleTransfer"
+      @close="showTransferDialog = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import {
   Breadcrumbs,
+  Button,
   Dialog,
   Dropdown,
+  FeatherIcon,
   FormControl,
   TabList,
   TabPanel,
@@ -158,13 +184,16 @@ import {
   LayoutHeader,
   MultipleAvatar,
 } from "@/components";
+import EmailTransferDialog from "@/components/EmailTransferDialog.vue";
 import {
   ActivityIcon,
   CommentIcon,
   EmailIcon,
   IndicatorIcon,
+  OrderDetailsIcon,
 } from "@/components/icons";
 import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
+import TicketOrderDetails from "@/components/ticket/TicketOrderDetails.vue";
 import { setupCustomizations } from "@/composables/formCustomisation";
 import { useView } from "@/composables/useView";
 import { socket } from "@/socket";
@@ -175,6 +204,8 @@ import { TabObject, TicketTab, View } from "@/types";
 import { getIcon } from "@/utils";
 import { ComputedRef } from "vue";
 import { showAssignmentModal } from "./modalStates";
+import { getCommunicationsForTransfer, transferToCRM } from "@/api/transfer";
+import { ITicket } from "./symbols";
 const route = useRoute();
 const router = useRouter();
 
@@ -185,6 +216,9 @@ const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const renameSubject = ref("");
 const isLoading = ref(false);
+const showTransferDialog = ref(false);
+const transferEmails = ref([]);
+const isLoadingEmails = ref(false);
 
 const props = defineProps({
   ticketId: {
@@ -236,6 +270,9 @@ const ticket = createResource({
     });
   },
 });
+
+provide(ITicket, ticket);
+
 function updateField(name: string, value: string, callback = () => {}) {
   updateTicket(name, value);
   callback();
@@ -305,6 +342,11 @@ const tabs: TabObject[] = [
     name: "comment",
     label: "Comments",
     icon: CommentIcon,
+  },
+  {
+    name: "order_details",
+    label: "Order Details",
+    icon: OrderDetailsIcon,
   },
 ];
 
@@ -383,7 +425,7 @@ const activities = computed(() => {
 });
 
 function filterActivities(eventType: TicketTab) {
-  if (eventType === "activity") {
+  if (eventType === "activity" || eventType === "order_details") {
     return activities.value;
   }
   return activities.value.filter((activity) => activity.type === eventType);
@@ -426,6 +468,41 @@ function updateTicket(fieldname: string, value: string) {
 function updateOptimistic(fieldname: string, value: string) {
   ticket.data[fieldname] = value;
   toast.success("Ticket updated");
+}
+
+async function openTransferDialog() {
+  if (!ticket.data) return;
+  
+  isLoadingEmails.value = true;
+  showTransferDialog.value = true;
+  
+  try {
+    transferEmails.value = await getCommunicationsForTransfer("HD Ticket", props.ticketId);
+  } catch (error) {
+    console.error("Error fetching communications:", error);
+    toast.error("Error loading emails");
+    showTransferDialog.value = false;
+  } finally {
+    isLoadingEmails.value = false;
+  }
+}
+
+async function handleTransfer(selectedEmailIds: string[]) {
+  if (!ticket.data || !selectedEmailIds || selectedEmailIds.length === 0) return;
+  
+  try {
+    const result = await transferToCRM(props.ticketId, selectedEmailIds, true);
+    
+    if (result.success) {
+      showTransferDialog.value = false;
+      
+      // Navigate to tickets list (stay in HD)
+      router.push({ name: "Tickets" });
+    }
+  } catch (error) {
+    console.error("Error transferring to CRM:", error);
+    // Error toast is already shown by transferToCRM
+  }
 }
 
 onMounted(() => {

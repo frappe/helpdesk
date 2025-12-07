@@ -11,12 +11,12 @@
         <Avatar
           size="2xl"
           :image="ticket.data.contact.image"
-          :label="ticket.data.contact.name"
+          :label="ticket.data.contact.full_name || ticket.data.contact.name"
         />
         <div class="flex items-center justify-between">
-          <Tooltip :text="ticket.data.contact.name">
+          <Tooltip :text="ticket.data.contact.full_name || ticket.data.contact.name">
             <div class="w-[242px] truncate text-2xl font-medium">
-              {{ ticket.data.contact.name }}
+              {{ ticket.data.contact.full_name || ticket.data.contact.name }}
             </div>
           </Tooltip>
           <div class="flex gap-1.5" v-if="!ticket.data.feedback_rating">

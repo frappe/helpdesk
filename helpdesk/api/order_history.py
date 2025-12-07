@@ -1,0 +1,302 @@
+# Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and Contributors
+# License: AGPLv3. See LICENSE
+
+import frappe
+from frappe import _
+
+
+@frappe.whitelist()
+def fetch_ticket_order_history(ticket_name, customer_name):
+	"""
+	Fetch order history for HD Ticket from Sales Orders
+	
+	Args:
+		ticket_name: HD Ticket document name
+		customer_name: Customer name for matching (from Contact's linked Customer)
+	"""
+	try:
+		if not ticket_name:
+			return {
+				'success': False,
+				'message': 'Ticket name is required'
+			}
+
+		# Truncate customer name if it has duplicated format (e.g., "Alan Tom-Alan Tom" -> "Alan Tom")
+		if customer_name and '-' in customer_name:
+			parts = customer_name.split('-')
+			if len(parts) == 2 and parts[0].strip() == parts[1].strip():
+				customer_name = parts[0].strip()
+
+		# Find customer(s) matching this customer name (case-insensitive)
+		customers = frappe.db.sql("""
+			SELECT name, customer_name
+			FROM `tabCustomer`
+			WHERE LOWER(customer_name) LIKE LOWER(%s)
+		""", f"%{customer_name}%", as_dict=True)
+
+		if not customers:
+			return {
+				'success': False,
+				'message': f'No customers found matching "{customer_name}"'
+			}
+
+		# Process each customer separately
+		all_sales_orders = []
+
+		for customer in customers:
+			sales_orders = frappe.db.sql("""
+				SELECT name, customer, transaction_date, delivery_status, 
+					   delivery_date, status, net_total,
+					   shopify_order_number
+				FROM `tabSales Order`
+				WHERE customer = %s
+				AND docstatus != 2
+				ORDER BY transaction_date DESC
+			""", customer.name, as_dict=True)
+
+			all_sales_orders.extend(sales_orders)
+
+		if not all_sales_orders:
+			return {
+				'success': False,
+				'message': 'No sales orders found for this customer'
+			}
+
+		# Get the Ticket document
+		ticket_doc = frappe.get_doc("HD Ticket", ticket_name)
+
+		# Process each Sales Order
+		total_items_added = 0
+
+		for so in all_sales_orders:
+			# Get items for this Sales Order (include name field for Sales Order Item)
+			so_items = frappe.db.sql("""
+				SELECT name, item_code, item_name, qty, rate
+				FROM `tabSales Order Item`
+				WHERE parent = %s
+			""", so.name, as_dict=True)
+
+			for item in so_items:
+				# Check if this item already exists
+				existing_items = [row for row in ticket_doc.custom_order_history 
+								if row.sales_order == so.name and row.item_name == item.item_name]
+
+				# Get Work Order statuses via correct connection path
+				# Pass sales_order name, item_code, and sales_order_item name
+				ops_status, mat_status, pro_status, qa_status = _get_work_order_statuses(
+					so.name, 
+					item.item_code,
+					item.get('name')  # Sales Order Item name
+				)
+
+				if existing_items:
+					# UPDATE existing item with current statuses
+					existing_item = existing_items[0]
+					existing_item.ops_status = ops_status
+					existing_item.mat_status = mat_status
+					existing_item.pro_status = pro_status
+					existing_item.qa_status = qa_status
+					existing_item.order_status = so.status
+					existing_item.delivery_status = so.delivery_status or "Not Delivered"
+					existing_item.delivery_date = so.delivery_date
+					total_items_added += 1
+				else:
+					# ADD new item
+					ticket_doc.append("custom_order_history", {
+						"sales_order": so.name,
+						"order_date": so.transaction_date,
+						"item_code": item.item_code,
+						"item_name": item.item_name,
+						"qty": item.qty,
+						"rate": item.rate,
+						"amount": so.net_total,
+						"delivery_status": so.delivery_status or "Not Delivered",
+						"delivery_date": so.delivery_date,
+						"order_status": so.status,
+						"ops_status": ops_status,
+						"mat_status": mat_status,
+						"pro_status": pro_status,
+						"qa_status": qa_status
+					})
+
+					total_items_added += 1
+
+		# Save the ticket document
+		if total_items_added > 0:
+			ticket_doc.save()
+			frappe.db.commit()
+
+		return {
+			'success': True,
+			'message': f'Successfully synced {total_items_added} items from {len(all_sales_orders)} orders'
+		}
+
+	except Exception as e:
+		frappe.log_error(f"Error fetching ticket order history: {str(e)}", "Fetch Ticket Order History Error")
+		return {
+			'success': False,
+			'message': f'Error: {str(e)}'
+		}
+
+
+def _get_work_order_statuses(sales_order_name, item_code, sales_order_item_name=None):
+	"""
+	Get Work Order statuses - Simply copy whatever is in the Work Order
+	Workflow: Sales Order → Purchase Order → Inter Company SO → Work Order
+	
+	Args:
+		sales_order_name: Sales Order document name
+		item_code: Item code from Sales Order Item
+		sales_order_item_name: Optional Sales Order Item name
+	
+	Returns:
+		tuple: (ops_status, mat_status, pro_status, qa_status)
+	"""
+	# Default values
+	ops_status = "Not Started"
+	mat_status = "NO RECIPE"
+	pro_status = "NEW"
+	qa_status = "AWAITING"
+
+	try:
+		# Step 1: Find Purchase Orders linked to this Sales Order
+		purchase_orders = frappe.db.sql("""
+			SELECT DISTINCT poi.parent
+			FROM `tabPurchase Order Item` poi
+			WHERE poi.sales_order = %s
+			AND poi.item_code = %s
+		""", (sales_order_name, item_code), as_dict=True)
+
+		# Step 2: Get Inter Company Order Reference from Purchase Order
+		for po_result in purchase_orders:
+			try:
+				po = frappe.get_doc("Purchase Order", po_result.parent)
+				inter_company_so = po.get("inter_company_order_reference")
+
+				if inter_company_so:
+					# Step 3: Find Work Order - Get the document directly to access ALL fields
+					wo_names = frappe.db.sql("""
+						SELECT name
+						FROM `tabWork Order`
+						WHERE sales_order = %s
+						AND production_item = %s
+						AND docstatus != 2
+						LIMIT 1
+					""", (inter_company_so, item_code), as_dict=True)
+
+					if wo_names:
+						# Get Work Order document to access ALL fields
+						wo_doc = frappe.get_doc("Work Order", wo_names[0].name)
+						
+						# Get ALL fields as dictionary
+						wo_dict = wo_doc.as_dict()
+						
+						# Simply copy whatever status fields exist - try all possible field names
+						# OPS Status
+						ops_status_raw = (wo_dict.get("work_order_status") or 
+										  wo_dict.get("custom_ops_status") or 
+										  wo_dict.get("ops_status") or 
+										  "Not Started")
+						ops_status = str(ops_status_raw).strip() if ops_status_raw else "Not Started"
+						
+						# Production Status
+						pro_status_raw = (wo_dict.get("production_status") or 
+										 wo_dict.get("custom_production_status") or 
+										 "NEW")
+						pro_status = str(pro_status_raw).strip() if pro_status_raw else "NEW"
+						
+						# QA Status
+						qa_status_raw = (wo_dict.get("qa_status") or 
+										 wo_dict.get("custom_qa_status") or 
+										 "AWAITING")
+						qa_status = str(qa_status_raw).strip() if qa_status_raw else "AWAITING"
+						
+						# Material Status - get ingredient status
+						ingredients_status_raw = (wo_dict.get("ingredient_status") or 
+												   wo_dict.get("custom_ingredient_status") or 
+												   wo_dict.get("custom_ingredients_status") or 
+												   wo_dict.get("ingredients_status"))
+						ingredients_status = str(ingredients_status_raw).strip() if ingredients_status_raw else None
+						
+						material_reservation_raw = (wo_dict.get("material_reservation_status") or 
+												   wo_dict.get("custom_material_reservation_status"))
+						material_reservation = str(material_reservation_raw).strip() if material_reservation_raw else None
+						material_transferred = wo_dict.get("material_transferred_for_manufacturing") or 0
+						
+						# Material status logic
+						if material_transferred and material_transferred > 0:
+							mat_status = "READY"
+						elif ingredients_status and ingredients_status == "IN_STOCK":
+							mat_status = "READY"
+						elif material_reservation and material_reservation == "Fully Reserved":
+							mat_status = "READY"
+						elif ingredients_status:
+							mat_status = ingredients_status
+						else:
+							mat_status = "NO RECIPE"
+						
+						return (ops_status, mat_status, pro_status, qa_status)
+			except Exception as e:
+				pass
+
+		# Fallback: Try direct lookup from Sales Order to Work Order
+		wo_names = frappe.db.sql("""
+			SELECT name
+			FROM `tabWork Order`
+			WHERE sales_order = %s
+			AND production_item = %s
+			AND docstatus != 2
+			LIMIT 1
+		""", (sales_order_name, item_code), as_dict=True)
+
+		if wo_names:
+			wo_doc = frappe.get_doc("Work Order", wo_names[0].name)
+			wo_dict = wo_doc.as_dict()
+			
+			# Simply copy whatever status fields exist
+			ops_status_raw = (wo_dict.get("work_order_status") or 
+							  wo_dict.get("custom_ops_status") or 
+							  wo_dict.get("ops_status") or 
+							  "Not Started")
+			ops_status = str(ops_status_raw).strip() if ops_status_raw else "Not Started"
+			
+			pro_status_raw = (wo_dict.get("production_status") or 
+							 wo_dict.get("custom_production_status") or 
+							 "NEW")
+			pro_status = str(pro_status_raw).strip() if pro_status_raw else "NEW"
+			
+			qa_status_raw = (wo_dict.get("qa_status") or 
+							 wo_dict.get("custom_qa_status") or 
+							 "AWAITING")
+			qa_status = str(qa_status_raw).strip() if qa_status_raw else "AWAITING"
+			
+			ingredients_status_raw = (wo_dict.get("ingredient_status") or 
+									   wo_dict.get("custom_ingredient_status") or 
+									   wo_dict.get("custom_ingredients_status") or 
+									   wo_dict.get("ingredients_status"))
+			ingredients_status = str(ingredients_status_raw).strip() if ingredients_status_raw else None
+			
+			material_reservation_raw = (wo_dict.get("material_reservation_status") or 
+									   wo_dict.get("custom_material_reservation_status"))
+			material_reservation = str(material_reservation_raw).strip() if material_reservation_raw else None
+			material_transferred = wo_dict.get("material_transferred_for_manufacturing") or 0
+			
+			if material_transferred and material_transferred > 0:
+				mat_status = "READY"
+			elif ingredients_status and ingredients_status == "IN_STOCK":
+				mat_status = "READY"
+			elif material_reservation and material_reservation == "Fully Reserved":
+				mat_status = "READY"
+			elif ingredients_status:
+				mat_status = ingredients_status
+			else:
+				mat_status = "NO RECIPE"
+			
+			return (ops_status, mat_status, pro_status, qa_status)
+			
+	except Exception as e:
+		pass
+
+	# Return defaults if no Work Order found
+	return (ops_status, mat_status, pro_status, qa_status)
+

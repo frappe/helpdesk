@@ -50,6 +50,7 @@ def get_one(name, is_customer_portal=False):
         .select(
             QBContact.company_name,
             QBContact.email_id,
+            QBContact.full_name,
             QBContact.image,
             QBContact.mobile_no,
             QBContact.name,
@@ -123,6 +124,8 @@ def get_assignee(_assign: str):
 
 def get_communications(ticket: str):
     QBCommunication = frappe.qb.DocType("Communication")
+    # Ensure ticket name is string for comparison (HD Ticket names are integers)
+    ticket_name_str = str(ticket)
     communications = (
         frappe.qb.from_(QBCommunication)
         .select(
@@ -138,7 +141,7 @@ def get_communications(ticket: str):
             QBCommunication.delivery_status,
         )
         .where(QBCommunication.reference_doctype == "HD Ticket")
-        .where(QBCommunication.reference_name == ticket)
+        .where(QBCommunication.reference_name == ticket_name_str)
         .orderby(QBCommunication.creation, order=Order.asc)
         .run(as_dict=True)
     )

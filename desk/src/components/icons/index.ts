@@ -30,3 +30,4 @@ export { default as ThumbsUpFilledIcon } from "./ThumbsUpFilledIcon.vue";
 export { default as ThumbsUpIcon } from "./ThumbsUpIcon.vue";
 export { default as TicketIcon } from "./TicketIcon.vue";
 export { default as UnpinIcon } from "./UnpinIcon.vue";
+export { default as OrderDetailsIcon } from "./OrderDetailsIcon.vue";

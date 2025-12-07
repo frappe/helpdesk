@@ -215,7 +215,7 @@ export interface EmailAccount {
   default_incoming?: boolean;
 }
 
-export type TicketTab = "activity" | "email" | "comment" | "details";
+export type TicketTab = "activity" | "email" | "comment" | "details" | "order_details";
 
 export interface TabObject {
   name: TicketTab;
