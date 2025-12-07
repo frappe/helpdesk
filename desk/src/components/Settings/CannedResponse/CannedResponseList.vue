@@ -16,28 +16,59 @@
         icon-left="plus"
       />
     </template>
-    <template
-      #header-bottom
-      v-if="cannedResponsesList.length > 9 || cannedResponseSearchQuery?.length"
-    >
-      <div class="relative">
-        <Input
-          :model-value="cannedResponseSearchQuery"
-          @input="cannedResponseSearchQuery = $event"
-          :placeholder="__('Search')"
-          type="text"
-          class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
-          icon-left="search"
-          debounce="300"
-          inputClass="p-4 pr-12"
-        />
-        <Button
-          v-if="cannedResponseSearchQuery"
-          icon="x"
-          variant="ghost"
-          @click="cannedResponseSearchQuery = ''"
-          class="absolute right-1 top-1/2 -translate-y-1/2"
-        />
+    <template #header-bottom>
+      <div class="flex items-center gap-2 justify-between">
+        <div class="relative w-full">
+          <Input
+            :model-value="cannedResponseSearchQuery"
+            @input="cannedResponseSearchQuery = $event"
+            :placeholder="__('Search')"
+            type="text"
+            class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+            icon-left="search"
+            debounce="300"
+            inputClass="p-4 pr-12"
+          />
+          <Button
+            v-if="cannedResponseSearchQuery"
+            icon="x"
+            variant="ghost"
+            @click="cannedResponseSearchQuery = ''"
+            class="absolute right-1 top-1/2 -translate-y-1/2"
+          />
+        </div>
+        <Dropdown :options="filterOptions" placement="right">
+          <template #default="{ open }">
+            <Button
+              :label="activeFilter"
+              class="flex items-center justify-between w-fit p-4"
+            >
+              <template #suffix>
+                <FeatherIcon
+                  :name="open ? 'chevron-up' : 'chevron-down'"
+                  class="h-4"
+                />
+              </template>
+            </Button>
+          </template>
+          <template #item="{ item }">
+            <button
+              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-3"
+              @click="item.onClick"
+            >
+              <div class="flex items-center justify-between flex-1">
+                <span class="whitespace-nowrap">
+                  {{ item.label }}
+                </span>
+                <FeatherIcon
+                  v-if="activeFilter === item.label"
+                  name="check"
+                  class="size-4 text-ink-gray-7"
+                />
+              </div>
+            </button>
+          </template>
+        </Dropdown>
       </div>
     </template>
     <template #content>
@@ -75,10 +106,11 @@
       </div>
       <div v-else class="-ml-2">
         <div
-          class="grid grid-cols-12 items-center gap-3 text-sm text-gray-600 ml-2"
+          class="grid grid-cols-11 items-center gap-3 text-sm text-gray-600 ml-2"
         >
-          <div class="col-span-9">{{ __("Name") }}</div>
-          <div class="col-span-3">{{ __("Scope") }}</div>
+          <div class="col-span-7">{{ __("Name") }}</div>
+          <div class="col-span-2">{{ __("Owner") }}</div>
+          <div class="col-span-2">{{ __("Scope") }}</div>
         </div>
         <hr class="mt-2 mx-2" />
         <div
@@ -86,7 +118,7 @@
           :key="cannedResponse.name"
         >
           <div
-            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+            class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
           >
             <div
               @click="
@@ -95,7 +127,7 @@
                   data: cannedResponse,
                 }
               "
-              class="w-full px-2 flex flex-col justify-center h-12.5 col-span-9"
+              class="w-full px-2 flex flex-col justify-center h-12.5 col-span-7"
             >
               <div
                 class="text-base text-ink-gray-7 font-medium w-full truncate"
@@ -104,7 +136,17 @@
               </div>
             </div>
             <div
-              class="flex justify-between items-center w-full pr-2 col-span-3"
+              class="flex items-center gap-1.5 text-sm text-ink-gray-7 truncate col-span-2"
+            >
+              <Avatar
+                :name="cannedResponse.owner"
+                :image="getUser(cannedResponse.owner)?.user_image"
+                size="xs"
+              />
+              {{ cannedResponse.owner }}
+            </div>
+            <div
+              class="flex justify-between items-center w-full pr-2 col-span-2"
             >
               <div class="text-sm text-ink-gray-7">
                 {{ cannedResponse.scope }}
@@ -155,18 +197,25 @@
 
 <script setup lang="ts">
 import {
+  Avatar,
   Button,
   call,
   createResource,
   Dropdown,
+  FeatherIcon,
   Input,
+  LoadingIndicator,
   toast,
 } from "frappe-ui";
-import { inject, ref, Ref, watch } from "vue";
+import { computed, inject, ref, Ref, watch } from "vue";
 import { __ } from "@/translation";
 import { ConfirmDelete } from "@/utils";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
+import { activeFilter } from "./cannedResponse";
+import { useUserStore } from "../../../stores/user";
+
+const { getUser } = useUserStore();
 
 const cannedResponseSearchQuery = inject<Ref<string>>(
   "cannedResponseSearchQuery"
@@ -191,7 +240,7 @@ const isConfirmingDelete = ref(false);
 const cannedResponsesListResource = createResource({
   url: "helpdesk.api.canned_response.get_canned_responses",
   params: {
-    scope: "All",
+    scope: activeFilter.value,
   },
   onSuccess: (data) => {
     cannedResponsesList.value = data;
@@ -267,6 +316,49 @@ const duplicate = async () => {
     });
   });
 };
+
+const filterOptions = computed(() => [
+  {
+    label: "All",
+    value: "All",
+    onClick: () => {
+      activeFilter.value = "All";
+      cannedResponsesListResource.submit({
+        scope: "All",
+      });
+    },
+  },
+  {
+    label: "Personal",
+    value: "Personal",
+    onClick: () => {
+      activeFilter.value = "Personal";
+      cannedResponsesListResource.submit({
+        scope: "Personal",
+      });
+    },
+  },
+  {
+    label: "My Team",
+    value: "My Team",
+    onClick: () => {
+      activeFilter.value = "My Team";
+      cannedResponsesListResource.submit({
+        scope: "My Team",
+      });
+    },
+  },
+  {
+    label: "Global",
+    value: "Global",
+    onClick: () => {
+      activeFilter.value = "Global";
+      cannedResponsesListResource.submit({
+        scope: "Global",
+      });
+    },
+  },
+]);
 
 watch(
   () => [cannedResponseSearchQuery?.value, cannedResponsesListResource.data],

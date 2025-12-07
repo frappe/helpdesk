@@ -1,3 +1,5 @@
+import { ref } from "vue";
+
 export const menuButtons = [
   [
     "Heading 1",
@@ -91,3 +93,5 @@ export const userFields = [
     value: "mobile_no",
   },
 ];
+
+export const activeFilter = ref("Personal");

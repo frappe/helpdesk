@@ -18,11 +18,10 @@ def get_canned_responses(scope):
         .on(QBChildTeam.parent == QBEmailTemplate.name)
         .select(QBEmailTemplate.star, QBChildTeam.team)
         .where(QBEmailTemplate.reference_doctype == "HD Ticket")
+        .groupby(QBEmailTemplate.name)
     )
 
     if scope == "Global":
-        if is_team_restriction_applied:
-            return []
         query = base_query.where(QBEmailTemplate.scope == "Global")
     elif scope == "Personal":
         query = base_query.where(
@@ -60,8 +59,7 @@ def get_canned_responses(scope):
         else:
             query = base_query
 
-    results = query.run(as_dict=True)
-    return results
+    return query.run(as_dict=True)
 
 
 @frappe.whitelist()

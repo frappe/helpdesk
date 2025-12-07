@@ -40,7 +40,7 @@
         </slot>
       </template>
       <template #body="{ isOpen }">
-        <div v-show="isOpen">
+        <div v-show="isOpen" class="min-w-[--reka-popper-anchor-width]">
           <div class="mt-1 rounded-lg bg-white py-1 text-base shadow-2xl">
             <div class="relative px-1.5 pt-0.5">
               <ComboboxInput

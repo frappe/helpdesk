@@ -68,11 +68,10 @@
         </div>
         <div v-if="cannedResponseData.scope === 'Team'" class="space-y-1.5">
           <FormLabel :label="__('Teams')" required />
-          <Autocomplete
-            :multiple="true"
+          <MultiSelect
             :options="teamsList"
             v-model="cannedResponseData.teams"
-            required
+            placeholder="Select teams"
             @update:modelValue="validateData('teams')"
           />
           <div class="text-xs text-ink-gray-5 cursor-default">
@@ -119,7 +118,6 @@
 
 <script setup lang="ts">
 import {
-  Autocomplete,
   Badge,
   Button,
   call,
@@ -128,6 +126,7 @@ import {
   ErrorMessage,
   FormControl,
   FormLabel,
+  MultiSelect,
   Select,
   TextEditor,
   toast,
@@ -144,6 +143,9 @@ import { useConfigStore } from "@/stores/config";
 import { useAuthStore } from "@/stores/auth";
 import { FieldAutocomplete } from "../../../tiptap-extensions";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
+import UserIcon from "~icons/lucide/user";
+import UsersIcon from "~icons/lucide/users";
+import GlobeIcon from "~icons/lucide/globe";
 
 const showConfirmDialog = ref({
   show: false,
@@ -162,7 +164,7 @@ const previewDialog = ref({
 const content = ref();
 
 const { teamRestrictionApplied } = storeToRefs(useConfigStore());
-const { userTeams } = storeToRefs(useAuthStore());
+const { userTeams, isAdmin } = storeToRefs(useAuthStore());
 
 const cannedResponseData = ref({
   name: "",
@@ -179,25 +181,23 @@ const errors = ref({
   teams: "",
 });
 
-const scopeDropdownOptions = computed(() => {
-  const _scopes = [
-    {
-      label: "Personal",
-      value: "Personal",
-    },
-    {
-      label: "Team",
-      value: "Team",
-    },
-  ];
-  if (!teamRestrictionApplied.value) {
-    _scopes.push({
-      label: "Global",
-      value: "Global",
-    });
-  }
-  return _scopes;
-});
+const scopeDropdownOptions = computed(() => [
+  {
+    label: "Personal",
+    value: "Personal",
+    icon: UserIcon,
+  },
+  {
+    label: "Team",
+    value: "Team",
+    icon: UsersIcon,
+  },
+  {
+    label: "Global",
+    value: "Global",
+    icon: GlobeIcon,
+  },
+]);
 
 const getCannedResponseData = createResource({
   url: "frappe.client.get",
@@ -212,11 +212,7 @@ const getCannedResponseData = createResource({
       title: data.name,
       scope: data.scope,
       response: data.response,
-      teams:
-        data.teams?.map((team) => ({
-          label: team.team,
-          value: team.team,
-        })) || [],
+      teams: data.teams?.map((team) => team.team) || [],
     };
     initialData.value = JSON.stringify(cannedResponseData.value);
   },
@@ -237,7 +233,7 @@ const getTeamsListResource = createListResource({
 });
 
 const teamsList = computed(() => {
-  if (teamRestrictionApplied.value) {
+  if (!isAdmin.value && teamRestrictionApplied.value) {
     return (
       userTeams.value?.map((team) => ({
         value: team,
@@ -313,7 +309,7 @@ const createCannedResponse = () => {
         response: cannedResponseData.value.response,
         scope: cannedResponseData.value.scope,
         teams: cannedResponseData.value.teams.map((team) => ({
-          team: team.value,
+          team: team,
         })),
         reference_doctype: "HD Ticket",
       },
@@ -375,7 +371,7 @@ const updateCannedResponse = async () => {
         response: cannedResponseData.value.response,
         scope: cannedResponseData.value.scope,
         teams: cannedResponseData.value.teams.map((team) => ({
-          team: team.value,
+          team: team,
         })),
       },
     },
