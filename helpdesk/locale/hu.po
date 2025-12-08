@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-30 10:36+0000\n"
-"PO-Revision-Date: 2025-12-05 21:22\n"
+"PO-Revision-Date: 2025-12-08 21:35\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -1895,7 +1895,7 @@ msgstr "Ez alapértelmezett"
 #. Label of the is_standard (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Is Standard"
-msgstr ""
+msgstr "Szabványos"
 
 #. Label of the initial_helpdesk_name_setup_skipped (Check) field in DocType
 #. 'HD Settings'
@@ -1924,7 +1924,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Key"
-msgstr ""
+msgstr "Kulcs"
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
