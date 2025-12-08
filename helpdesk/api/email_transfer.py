@@ -189,7 +189,7 @@ def transfer_to_crm(ticket_name, communication_ids=None, delete_source=True):
 		# Create CRM Lead with field mapping and fallbacks
 		lead = frappe.new_doc("CRM Lead")
 		if first_name:
-		lead.first_name = first_name
+			lead.first_name = first_name
 		if last_name:
 			lead.last_name = last_name
 		
@@ -212,6 +212,10 @@ def transfer_to_crm(ticket_name, communication_ids=None, delete_source=True):
 				lead.phone = customer_phone
 		
 		lead.status = "New"
+		
+		# Copy custom_reply_email_alias if it exists on the Ticket
+		if ticket.get("custom_reply_email_alias"):
+			lead.custom_reply_email_alias = ticket.custom_reply_email_alias
 		
 		# Set source - create "Support Transfer" if it doesn't exist
 		source_name = "Support Transfer"

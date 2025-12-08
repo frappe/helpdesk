@@ -449,9 +449,12 @@ class HDTicket(Document):
     def sender_email(self):
         """
         Find an email to use as sender. Fall back through multiple choices
+        Always returns the main Email Account (for SMTP), but sender address is overridden in reply_via_agent
 
         :return: `Email Account`
         """
+        # Always use the default/main Email Account for SMTP
+        # The actual sender address will be overridden in reply_via_agent if custom_reply_email_alias exists
         if email_account := self.last_communication_email():
             return email_account
 
@@ -549,7 +552,12 @@ class HDTicket(Document):
 
         message = self.parse_content(message)
 
-        reply_to_email = sender_email.email_id
+        # Use alias if available, otherwise use sender_email
+        if self.get("custom_reply_email_alias"):
+            reply_to_email = self.custom_reply_email_alias
+        else:
+            reply_to_email = sender_email.email_id
+        
         template = (
             "new_reply_on_customer_portal_notification"
             if self.via_customer_portal
