@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-11-30 10:36+0000\n"
-"PO-Revision-Date: 2025-12-06 21:21\n"
+"PO-Revision-Date: 2025-12-08 21:35\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -3976,7 +3976,7 @@ msgstr "здесь"
 
 #: helpdesk/api/dashboard.py:280
 msgid "hrs"
-msgstr "р§р°СЃС‹"
+msgstr "часов"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
