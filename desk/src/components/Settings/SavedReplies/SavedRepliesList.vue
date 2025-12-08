@@ -104,11 +104,11 @@
       </div>
       <div v-if="savedRepliesList?.length" class="-ml-2">
         <div
-          class="grid grid-cols-11 items-center gap-3 text-sm text-gray-600 ml-2"
+          class="grid grid-cols-12 items-center gap-3 text-sm text-gray-600 ml-2"
         >
           <div class="col-span-7">{{ __("Name") }}</div>
           <div class="col-span-2">{{ __("Owner") }}</div>
-          <div class="col-span-2">{{ __("Scope") }}</div>
+          <div class="col-span-3">{{ __("Scope") }}</div>
         </div>
         <hr class="mt-2 mx-2" />
         <div
@@ -116,7 +116,7 @@
           :key="savedReply.name"
         >
           <div
-            class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
           >
             <div
               @click="
@@ -144,9 +144,13 @@
               {{ getUser(savedReply.owner)?.full_name }}
             </div>
             <div
-              class="flex justify-between items-center w-full pr-2 col-span-2"
+              class="flex justify-between items-center w-full pr-2 col-span-3"
             >
-              <div class="text-sm text-ink-gray-7">
+              <div class="flex items-center gap-1 text-sm text-ink-gray-7">
+                <component
+                  :is="getScopeIcon(savedReply.scope)"
+                  class="size-4"
+                />
                 {{ savedReply.scope }}
               </div>
               <Dropdown
@@ -212,6 +216,9 @@ import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
 import { activeFilter } from "./savedReplies";
 import { useUserStore } from "../../../stores/user";
+import UserIcon from "~icons/lucide/user";
+import UsersIcon from "~icons/lucide/users";
+import GlobeIcon from "~icons/lucide/globe";
 
 const { getUser } = useUserStore();
 
@@ -355,6 +362,24 @@ const filterOptions = computed(() => [
     },
   },
 ]);
+
+const getScopeIcon = (scope: string) => {
+  const scopes = [
+    {
+      name: "Personal",
+      icon: UserIcon,
+    },
+    {
+      name: "Team",
+      icon: UsersIcon,
+    },
+    {
+      name: "Global",
+      icon: GlobeIcon,
+    },
+  ];
+  return scopes.find((x) => x.name === scope)?.icon;
+};
 
 watch(
   () => [savedRepliesSearchQuery?.value, savedRepliesListResource.data],
