@@ -66,7 +66,22 @@
               v-model="savedReplyData.scope"
               :options="scopeDropdownOptions"
               required
-            />
+            >
+              <template #prefix>
+                <component
+                  :is="getScopeIcon(savedReplyData.scope)"
+                  class="size-4 text-ink-gray-9"
+                />
+              </template>
+              <template #option="{ option }">
+                <div class="inline-flex gap-2 items-center">
+                  <component :is="option.icon" class="size-4 text-ink-gray-9" />
+                  <span>
+                    {{ option.label }}
+                  </span>
+                </div>
+              </template>
+            </Select>
             <FormLabel
               :label="__('Choose who can view and use this response')"
             />
@@ -390,6 +405,10 @@ const updateSavedReply = async () => {
       toast.success(__("Saved reply updated"));
     },
   });
+};
+
+const getScopeIcon = (scope: string) => {
+  return scopeDropdownOptions.value.find((x) => x.value === scope)?.icon;
 };
 
 const validateData = (key?: string) => {
