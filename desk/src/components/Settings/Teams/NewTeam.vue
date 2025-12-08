@@ -54,6 +54,12 @@
       </div>
     </template>
   </SettingsLayoutBase>
+  <ConfirmDialog
+    v-model="showConfirmDialog.show"
+    :title="showConfirmDialog.title"
+    :message="showConfirmDialog.message"
+    :onConfirm="showConfirmDialog.onConfirm"
+  />
 </template>
 
 <script setup lang="ts">
@@ -64,6 +70,7 @@ import { __ } from "@/translation";
 import AgentSelector from "./components/AgentSelector.vue";
 import { useAgentStore } from "@/stores/agent";
 import { TeamListResourceSymbol } from "@/types";
+import ConfirmDialog from "../../ConfirmDialog.vue";
 
 interface E {
   (event: "update:step", step: string, team?: string): void;

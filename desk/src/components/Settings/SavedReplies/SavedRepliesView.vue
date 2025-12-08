@@ -58,7 +58,7 @@
               maxLength="50"
               @change="validateData('title')"
             />
-            <ErrorMessage :message="errors.title" />
+            <ErrorMessage class="text-p-sm" :message="errors.title" />
           </div>
           <div class="space-y-1.5">
             <FormLabel :label="__('Scope')" />
@@ -83,7 +83,7 @@
           <div class="text-xs text-ink-gray-5 cursor-default">
             {{ __("Restrict visibility to these teams") }}
           </div>
-          <ErrorMessage :message="errors.teams" />
+          <ErrorMessage class="text-p-sm" :message="errors.teams" />
         </div>
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
@@ -108,7 +108,7 @@
             :extensions="[FieldAutocomplete]"
             :placeholder="'Hello {{ contact }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ full_name }}'"
           />
-          <ErrorMessage :message="errors.response" />
+          <ErrorMessage class="text-p-sm" :message="errors.response" />
         </div>
       </div>
     </template>

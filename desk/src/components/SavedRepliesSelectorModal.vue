@@ -53,7 +53,7 @@
                 :content="template.response"
                 :editable="false"
                 editor-class="!prose-sm max-w-none !text-sm text-gray-600 focus:outline-none"
-                class="flex-1 overflow-hidden"
+                class="flex-1 overflow-hidden pointer-events-none"
               />
               <div
                 v-if="
