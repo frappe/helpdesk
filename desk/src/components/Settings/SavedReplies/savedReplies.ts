@@ -23,6 +23,7 @@ export const menuButtons = [
   "Align Right",
   "FontColor",
   "Separator",
+  "Image",
   "Link",
   "Blockquote",
   "Code",
