@@ -79,6 +79,40 @@
           :url="a.file_url"
         />
       </div>
+      <!-- Reactions Section -->
+      <div class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100" v-if="!editable">
+        <!-- Reaction Display -->
+        <div class="flex items-center gap-1" v-if="reactions['👍']">
+          <Tooltip>
+            <template #body>
+              <div class="text-sm p-1">
+                <div v-for="user in reactions['👍'].users" :key="user.user" class="flex items-center gap-1 py-0.5">
+                  <Avatar size="xs" :label="user.full_name" :image="user.user_image" />
+                  <span>{{ user.full_name }}</span>
+                </div>
+              </div>
+            </template>
+            <button
+              class="flex items-center gap-1 px-2 py-1 rounded-full text-sm transition-colors"
+              :class="reactions['👍']?.current_user_reacted 
+                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+              @click="handleReaction('👍')"
+            >
+              <span>👍</span>
+              <span class="font-medium">{{ reactions['👍'].count }}</span>
+            </button>
+          </Tooltip>
+        </div>
+        <!-- Add Reaction Button (when no reactions yet) -->
+        <button
+          v-else
+          class="flex items-center gap-1 px-2 py-1 rounded-full text-sm bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+          @click="handleReaction('👍')"
+        >
+          <span>👍</span>
+        </button>
+      </div>
     </div>
   </div>
   <Dialog
@@ -117,6 +151,7 @@ import {
   Dialog,
   Dropdown,
   TextEditor,
+  Tooltip,
   createResource,
   toast,
 } from "frappe-ui";
@@ -142,6 +177,33 @@ const emit = defineEmits(["update"]);
 const showDialog = ref(false);
 const editable = ref(false);
 const _content = ref(content);
+
+// Reactions state
+const reactions = ref<Record<string, { count: number; users: Array<{ user: string; full_name: string; user_image: string | null }>; current_user_reacted: boolean }>>({});
+
+// Fetch reactions on mount
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const fetchReactions = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_comment_reaction.hd_comment_reaction.get_comment_reactions",
+  makeParams: () => ({ comment: name }),
+  auto: true,
+  onSuccess(data) {
+    reactions.value = data || {};
+  },
+});
+
+// Toggle reaction
+const toggleReaction = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_comment_reaction.hd_comment_reaction.toggle_reaction",
+  makeParams: (reaction: string) => ({ comment: name, reaction }),
+  onSuccess(data) {
+    reactions.value = data.reactions || {};
+  },
+});
+
+function handleReaction(reaction: string) {
+  toggleReaction.submit(reaction);
+}
 
 // HTML refs
 const commentBoxRef = ref(null);
