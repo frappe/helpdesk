@@ -25,7 +25,8 @@
 
 <script setup lang="ts">
 import { Autocomplete, Link } from "@/components";
-import { Field } from "@/types";
+import { APIOptions, Field } from "@/types";
+import { parseApiOptions } from "@/utils";
 import { createResource, FormControl } from "frappe-ui";
 import { computed, h } from "vue";
 
@@ -90,11 +91,9 @@ const component = computed(() => {
 const apiOptions = createResource({
   url: props.field.url_method,
   auto: !!props.field.url_method,
-  transform: (data) =>
-    data?.map((o) => ({
-      label: o,
-      value: o,
-    })) || [],
+  transform: (data: APIOptions) => {
+    return parseApiOptions(data);
+  },
 });
 
 const transValue = computed(() => {
@@ -110,8 +109,13 @@ const placeholder = computed(() => {
   }
   if (props.field.fieldtype === "Data" && !props.field.url_method) {
     return "Type something";
+  } else if (
+    props.field.fieldtype === "Select" ||
+    props.field.fieldtype === "Link"
+  ) {
+    return "Select an option";
   }
-  return "Select an option";
+  return "Type something";
 });
 
 function emitUpdate(fieldname: Field["fieldname"], value: Value) {

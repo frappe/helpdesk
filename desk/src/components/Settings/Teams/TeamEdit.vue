@@ -1,17 +1,20 @@
 <template>
-  <div class="w-full h-full flex flex-col">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center gap-1 justify-center -ml-[16px]">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="teamName"
-          size="md"
-          @click="() => emit('update:step', 'team-list')"
-          class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5"
-        />
+  <SettingsLayoutBase>
+    <template #title>
+      <div class="flex items-center justify-between w-full">
+        <div class="flex items-center gap-1 justify-center -ml-[16px]">
+          <Button
+            variant="ghost"
+            icon-left="chevron-left"
+            :label="teamName"
+            size="md"
+            @click="() => emit('update:step', 'team-list')"
+            class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
+          />
+        </div>
       </div>
+    </template>
+    <template #header-actions>
       <Dropdown placement="right" :options="options">
         <Button variant="ghost">
           <template #icon>
@@ -19,99 +22,103 @@
           </template>
         </Button>
       </Dropdown>
-    </div>
-    <!-- Add member -->
-    <div class="flex flex-col gap-4 h-full">
-      <div class="flex gap-2 items-end">
+    </template>
+    <template #header-bottom>
+      <!-- Add member -->
+      <div class="flex gap-2 items-center">
         <!-- Form control for search -->
-        <Link
-          doctype="HD Agent"
-          class="form-control flex-1"
-          placeholder="Search members"
-          v-model="search"
-          label="Members"
-          :hide-me="true"
-          :filters="agentFilters"
-        >
-          <template #prefix>
-            <LucideSearch class="h-4 w-4 text-gray-500 mr-2" />
-          </template>
-          <template #item-label="{ option }">
-            <div class="flex items-center justify-between !w-full">
-              <div class="flex items-center gap-1">
-                <Avatar
-                  :label="option.label || option.value"
-                  :image="getUser(option.label)?.user_image"
-                  size="sm"
-                />
-                <p>{{ getUser(option.label)?.full_name || "User" }}</p>
-              </div>
-              <p class="text-gray-600 text-sm">
-                {{ option.label }}
-              </p>
+        <div class="flex flex-col gap-1.5 w-full">
+          <div class="flex gap-2">
+            <div class="flex flex-1">
+              <AgentSelector
+                v-model="invitees"
+                :existing-agents="teamMembers.map((m) => m.name)"
+              />
             </div>
-          </template>
-        </Link>
-        <Button
-          label="Add"
-          variant="solid"
-          :disabled="!search"
-          @click="addMember(search)"
-        >
-          <template #prefix>
-            <LucidePlus class="h-4 w-4 stroke-1.5" />
-          </template>
-        </Button>
-      </div>
-
-      <!-- Member List -->
-      <div
-        class="flex flex-col divide-y divide-gray-200 overflow-y-scroll hide-scrollbar h-full"
-        v-if="teamMembers.length"
-      >
-        <div
-          v-for="(member, idx) in teamMembers"
-          :key="member.user"
-          class="group py-2"
-          :class="idx == teamMembers.length - 1 && 'mb-12'"
-        >
-          <AgentCard :agent="member" class="!py-0">
-            <template #right>
-              <Button
-                variant="ghost"
-                @click.stop="() => removeMemberFromTeam(member.name)"
-                theme="red"
-                class="opacity-0 group-hover:opacity-100"
-                :disabled="team.loading"
-              >
-                <template #icon>
-                  <LucideX class="h-4 w-4" />
-                </template>
-              </Button>
-            </template>
-          </AgentCard>
+            <Button
+              label="Add Member"
+              variant="solid"
+              :disabled="!invitees.length"
+              @click="addMember(invitees)"
+              class="h-8"
+            >
+              <template #prefix>
+                <LucidePlus class="h-4 w-4 stroke-1.5" />
+              </template>
+            </Button>
+          </div>
         </div>
       </div>
-      <div v-else class="flex justify-center h-full">
-        <p class="text-p-base text-gray-500">No members found</p>
+    </template>
+    <template #content>
+      <div class="w-full h-full" v-if="teamMembers?.length > 0">
+        <div class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600">
+          <div class="col-span-6 text-p-sm">
+            {{ __("Members ({0})", teamMembers.length) }}
+          </div>
+        </div>
+        <hr class="mt-2" />
+        <div v-for="(member, idx) in teamMembers" :key="member.name">
+          <div class="grid grid-cols-8 items-center gap-4 group">
+            <div class="w-full p-2 pl-0 col-span-8">
+              <AgentCard :agent="member" class="!py-0">
+                <template #right>
+                  <Dropdown
+                    :options="memberDropdownOptions(member)"
+                    placement="right"
+                  >
+                    <Button
+                      icon="more-horizontal"
+                      variant="ghost"
+                      @click="isConfirmingDelete = false"
+                    />
+                  </Dropdown>
+                </template>
+              </AgentCard>
+            </div>
+          </div>
+          <hr v-if="member !== teamMembers.at(-1)" />
+        </div>
       </div>
-    </div>
-  </div>
+      <div
+        v-else
+        class="flex flex-col items-center justify-center gap-4 h-full"
+      >
+        <div
+          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+        >
+          <UserIcon class="size-6 text-ink-gray-6" />
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <div class="text-base font-medium text-ink-gray-6">
+            {{ __("No members found") }}
+          </div>
+          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
+            {{ __("Add members to this team to get started.") }}
+          </div>
+        </div>
+      </div>
+    </template>
+  </SettingsLayoutBase>
   <Dialog v-model="showDelete" :options="{ title: 'Delete team' }">
     <template #body-content>
       <p class="text-p-base text-ink-gray-7">
-        Are you sure you want to delete this team? This action cannot be
-        reversed!
+        {{
+          __(
+            "Are you sure you want to delete this team? This action cannot be reversed!"
+          )
+        }}
       </p>
       <Button
         variant="solid"
         class="mt-4 float-right"
-        label="Confirm"
+        :label="__('Confirm')"
         theme="red"
         @click="
           () => {
             team.delete.submit();
             showDelete = false;
+            emit('update:step', 'team-list');
           }
         "
       />
@@ -121,19 +128,24 @@
     <template #body-content>
       <FormControl
         v-model="_teamName"
-        label="Title"
-        placeholder="Product Experts"
+        :label="__('Title')"
+        :placeholder="__('Product Experts')"
+        maxlength="50"
       />
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import Link from "@/components/frappe-ui/Link.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { useAgentStore } from "@/stores/agent";
+import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
 import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
+import { __ } from "@/translation";
+import { TeamListResourceSymbol } from "@/types";
+import { ConfirmDelete } from "@/utils";
 import {
-  Avatar,
   Button,
   createDocumentResource,
   createResource,
@@ -142,25 +154,31 @@ import {
   toast,
   Tooltip,
 } from "frappe-ui";
-import { computed, h, markRaw, ref } from "vue";
+import { computed, h, inject, markRaw, onMounted, ref } from "vue";
 import LucideLock from "~icons/lucide/lock";
-import LucideUnlock from "~icons/lucide/unlock";
-import AgentCard from "../AgentCard.vue";
 import Settings from "~icons/lucide/settings-2";
-import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
+import LucideUnlock from "~icons/lucide/unlock";
+import UserIcon from "~icons/lucide/user";
+import AgentCard from "../AgentCard.vue";
 import { setActiveSettingsTab } from "../settingsModal";
+import AgentSelector from "./components/AgentSelector.vue";
 
 const props = defineProps<{
   teamName: string;
 }>();
 
 interface E {
-  (event: "update:step", value: string): void;
+  (event: "update:step", step: string, team?: string): void;
 }
 const emit = defineEmits<E>();
 
 const { getUser } = useUserStore();
+const { agents } = useAgentStore();
+const teamsList = inject(TeamListResourceSymbol);
+
 const { teamRestrictionApplied } = useConfigStore();
+const invitees = ref<string[]>([]);
+
 const _teamName = ref(props.teamName);
 const team = createDocumentResource({
   doctype: "HD Team",
@@ -168,7 +186,7 @@ const team = createDocumentResource({
   auto: true,
   delete: {
     onSuccess() {
-      toast.success("Team deleted");
+      toast.success(__("Team deleted"));
       emit("update:step", "team-list");
     },
   },
@@ -185,7 +203,6 @@ const ignoreRestrictions = computed({
     });
   },
 });
-const search = ref("");
 
 const teamMembers = computed(() => {
   let users = team.doc?.users || [];
@@ -199,12 +216,6 @@ const teamMembers = computed(() => {
   });
 });
 
-const agentFilters = computed(() => {
-  return {
-    name: ["not in", teamMembers.value.map((user) => user.name)],
-  };
-});
-
 function removeMemberFromTeam(member: string) {
   const users = team.doc?.users?.filter((u) => u.user !== member);
   team.setValue.submit({
@@ -212,22 +223,22 @@ function removeMemberFromTeam(member: string) {
   });
 }
 
-function addMember(user: string) {
-  const users = team.doc.users.concat([{ user }]);
+function addMember(users: string[]) {
+  const _users = team.doc.users.concat(users.map((user) => ({ user })));
   team.setValue.submit({
-    users,
+    users: _users,
   });
-  search.value = "";
+  invitees.value = [];
 }
 
 const showRename = ref(false);
 
 const renameDialogOptions = {
-  title: "Rename team",
-  message: "Enter the new name for the team",
+  title: __("Rename team"),
+  message: __("Enter the new name for the team"),
   actions: [
     {
-      label: "Confirm",
+      label: __("Confirm"),
       variant: "solid",
       loading: team.loading,
       onClick: ({ close }) => {
@@ -248,12 +259,13 @@ function renameTeam(close) {
       };
     },
     validate(params) {
-      if (!params.new_name) return "New title is required";
+      if (!params.new_name) return __("New title is required");
       if (params.new_name === params.old_name)
-        return "New and old title cannot be same";
+        return __("New and old title cannot be same");
     },
     onSuccess() {
-      toast.success("Team renamed");
+      teamsList.reload();
+      toast.success(__("Team renamed"));
       close();
       emit("update:step", "team-list");
     },
@@ -263,24 +275,10 @@ function renameTeam(close) {
 }
 
 const showDelete = ref(false);
-const deleteDialogOptions = {
-  title: "Delete team",
-  message: `Are you sure you want to delete this team? This action cannot be reversed!`,
-  actions: [
-    {
-      label: "Confirm",
-      variant: "solid",
-      onClick: (ctx) => {
-        team.delete.submit();
-        ctx.close();
-      },
-    },
-  ],
-};
 
 const options = [
   {
-    label: "View Assignment rule",
+    label: __("View Assignment rule"),
     icon: markRaw(h(Settings, { class: "rotate-90" })),
     onClick: () => {
       assignmentRulesActiveScreen.value = {
@@ -291,22 +289,26 @@ const options = [
     },
   },
   {
-    label: "Rename",
+    label: __("Rename"),
     icon: "edit-3",
     onClick: () => (showRename.value = !showRename.value),
   },
   {
     condition: () => teamRestrictionApplied,
     label: team.doc?.ignore_restrictions
-      ? "Disable Bypass Restrictions"
-      : "Enable Bypass Restrictions",
+      ? __("Disable Bypass Restrictions")
+      : __("Enable Bypass Restrictions"),
     component: () =>
       h(
         Tooltip,
         {
           text: ignoreRestrictions.value
-            ? "Members of this team will see the tickets assigned to this team only"
-            : "Members of this team will be able to see the tickets assigned to all the teams",
+            ? __(
+                "Members of this team will see the tickets assigned to this team only"
+              )
+            : __(
+                "Members of this team will be able to see the tickets assigned to all the teams"
+              ),
         },
         {
           default: () => [
@@ -332,8 +334,8 @@ const options = [
                   },
                   [
                     team.doc?.ignore_restrictions
-                      ? "Access only this team's tickets"
-                      : "Access all team tickets",
+                      ? __("Access only this team's tickets")
+                      : __("Access all team tickets"),
                   ]
                 ),
               ]
@@ -343,9 +345,9 @@ const options = [
       ),
   },
   {
-    label: "Delete",
+    label: __("Delete"),
     component: h(Button, {
-      label: "Delete",
+      label: __("Delete"),
       variant: "ghost",
       iconLeft: "trash-2",
       theme: "red",
@@ -356,6 +358,20 @@ const options = [
     }),
   },
 ];
-</script>
 
-<style scoped></style>
+const isConfirmingDelete = ref(false);
+
+const memberDropdownOptions = (member) => {
+  return ConfirmDelete({
+    onConfirmDelete: () => removeMemberFromTeam(member.name),
+    isConfirmingDelete,
+  });
+};
+
+onMounted(() => {
+  if (agents.loading || agents.data?.length || agents.list.promise) {
+    return;
+  }
+  agents.fetch();
+});
+</script>

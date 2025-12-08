@@ -1,21 +1,131 @@
 import { Dayjs } from "dayjs";
-import { Component, ComputedRef, InjectionKey } from "vue";
+import { Component, ComputedRef, InjectionKey, Ref } from "vue";
 import type { HDTicket } from "./types/doctypes";
 
-export interface Resource<T = unknown> {
-  auto: boolean;
+interface ResourceOptions<T = any> {
+  method?: string;
+  url: string;
+  initialData?: T;
+  auto?: boolean;
+  cache?: string | string[];
+  debounce?: number;
+  params?: any;
+  makeParams?: (params: any) => any;
+  onFetch?: (params: any) => void;
+  beforeSubmit?: (params: any) => void;
+  validate?: (params: any) => string | void;
+  onError?: (error: Error) => void;
+  onSuccess?: (data: T) => void;
+  onData?: (data: T) => void;
+  transform?: (data: any) => T;
+  resourceFetcher?: (options: any) => Promise<any>;
+}
+
+interface Resource<T = any> {
+  method: string | undefined;
+  url: string;
+  data: T | null;
+  previousData: T | null;
   loading: boolean;
-  data: T;
-  pageLength: number;
-  totalCount: number;
-  hasNextPage: boolean;
-  promise: Promise<void> | null;
-  list: {
-    loading: boolean;
+  fetched: boolean;
+  error: Error | null;
+  promise: Promise<T> | null;
+  auto: boolean;
+  params: any;
+  fetch: (
+    params?: any,
+    tempOptions?: Partial<ResourceOptions<T>>
+  ) => Promise<T>;
+  reload: (
+    params?: any,
+    tempOptions?: Partial<ResourceOptions<T>>
+  ) => Promise<T>;
+  submit: (
+    params?: any,
+    tempOptions?: Partial<ResourceOptions<T>>
+  ) => Promise<T>;
+  reset: () => void;
+  update: (options: {
+    method?: string;
+    url?: string;
+    params?: any;
+    auto?: boolean;
+  }) => void;
+  setData: (data: T | ((currentData: T) => T)) => void;
+}
+
+export interface ListResourceOptions {
+  doctype: string;
+  fields?: string[];
+  filters?: Record<string, any>;
+  orFilters?: Record<string, any>;
+  orderBy?: string;
+  start?: number;
+  pageLength?: number;
+  groupBy?: string;
+  parent?: string;
+  debug?: number;
+  auto?: boolean;
+  url?: string;
+  cache?: any;
+  realtime?: boolean;
+  onSuccess?: (data: any) => void;
+  onError?: (error: any) => void;
+  onData?: (data: any) => void;
+  transform?: (data: any) => any;
+  fetchOne?: {
+    onSuccess?: (data: any) => void;
+    onError?: (error: any) => void;
   };
+  insert?: {
+    onSuccess?: (data: any) => void;
+    onError?: (error: any) => void;
+  };
+  setValue?: {
+    onSuccess?: (data: any) => void;
+    onError?: (error: any) => void;
+  };
+  delete?: {
+    onSuccess?: (data: any) => void;
+    onError?: (error: any) => void;
+  };
+  runDocMethod?: {
+    onSuccess?: (data: any) => void;
+    onError?: (error: any) => void;
+  };
+}
+
+export interface ListResource<T = any> {
+  doctype: string;
+  fields?: string[];
+  filters?: Record<string, any>;
+  orFilters?: Record<string, any>;
+  orderBy?: string;
+  start: number;
+  pageLength: number;
+  groupBy?: string;
+  parent?: string;
+  debug: number;
+  originalData: T[] | null;
+  dataMap: Record<string, T>;
+  data: T[] | null;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+  auto?: boolean;
+  list: Resource<T[]>;
+  fetchOne: Resource<T>;
+  insert: Resource<T>;
+  setValue: Resource<T>;
+  delete: Resource<T>;
+  runDocMethod: Resource<T>;
+  update: (updatedOptions: Partial<ListResourceOptions>) => void;
+  fetch: () => void;
+  reload: () => Promise<T[]>;
+  setData: (data: T[] | ((data: T[]) => T[])) => void;
+  transform: (data: T[]) => T[];
+  getRow: (name: string) => T;
+  previous: () => void;
   next: () => void;
-  reload: () => void;
-  update: (r: unknown) => void;
 }
 
 export interface Error {
@@ -511,6 +621,55 @@ export interface TicketActivities {
   summaries: Summary[];
 }
 
+export interface AssignmentRule {
+  name: string;
+  description: string;
+  priority: string;
+  enabled: boolean;
+}
+
+export interface HDSettings {
+  brandName: string;
+  brandLogo: string;
+  favicon: string;
+  autoCloseAfterDays: string;
+  autoCloseStatus: string;
+  autoCloseTickets: string;
+  assignWithinTeam: boolean;
+  doNotRestrictTicketsWithoutAnAgentGroup: boolean;
+  restrictTicketsByAgentGroup: boolean;
+  updateStatusTo: string;
+  autoUpdateStatus: boolean;
+  isFeedbackMandatory: boolean;
+  allowAnyoneToCreateTickets: boolean;
+  defaultTicketType: string;
+  preferKnowledgeBase: boolean;
+  skipEmailWorkflow: boolean;
+}
+
+export interface HolidayList {
+  name: string;
+  description: string;
+}
+
+export interface SlaPolicy {
+  name: string;
+  description: string;
+  default_sla: boolean;
+  enabled: boolean;
+}
+
+export interface Team {
+  name: string;
+}
+
+export type APIOptions = DropdownOption[] | string[] | [];
+
+export type DropdownOption = {
+  label: string;
+  value: string | number;
+};
+
 // symbols
 export const TicketSymbol: InjectionKey<
   ComputedRef<DocumentResource<HDTicket>>
@@ -534,6 +693,24 @@ export const RecentSimilarTicketsSymbol: InjectionKey<
 export const ActivitiesSymbol: InjectionKey<
   ComputedRef<Resource<TicketActivities>>
 > = Symbol("activities");
+
+export const AssignmentRuleListResourceSymbol: InjectionKey<
+  Resource<AssignmentRule[]>
+> = Symbol("assignmentRuleListResource");
+
+export const HDSettingsSymbol: InjectionKey<Ref<HDSettings>> =
+  Symbol("hdSettings");
+
+export const HolidayListResourceSymbol: InjectionKey<
+  ListResource<HolidayList>
+> = Symbol("holidayListResource");
+
+export const SlaPolicyListResourceSymbol: InjectionKey<
+  ListResource<SlaPolicy>
+> = Symbol("slaPolicyListResource");
+
+export const TeamListResourceSymbol: InjectionKey<ListResource<Team>> =
+  Symbol("teamListResource");
 
 declare global {
   interface Window {

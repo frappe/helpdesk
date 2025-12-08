@@ -138,13 +138,12 @@ import { Link } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import {
   AxisChart,
-  createResource,
   DateRangePicker,
-  dayjs,
   DonutChart,
   Dropdown,
   NumberChart,
-  Tooltip,
+  createResource,
+  dayjs,
   usePageMeta,
 } from "frappe-ui";
 import { computed, h, onMounted, reactive, ref, watch } from "vue";

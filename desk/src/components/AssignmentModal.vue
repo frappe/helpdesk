@@ -86,7 +86,7 @@ import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
 import { call, createResource } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 const props = defineProps({
   doctype: {

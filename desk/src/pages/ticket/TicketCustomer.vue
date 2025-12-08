@@ -17,7 +17,7 @@
           @click="handleClose()"
         >
           <template #prefix>
-            <Icon icon="lucide:check" />
+            <LucideCheck class="size-4" />
           </template>
         </Button>
       </template>
@@ -43,7 +43,9 @@
             placeholder="Type a message"
             autofocus
             @clear="() => (isExpanded = false)"
-            :uploadFunction="(file:any)=>uploadFunction(file, 'HD Ticket', props.ticketId)"
+            :uploadFunction="
+              (file: any) => uploadFunction(file, 'HD Ticket', props.ticketId)
+            "
           >
             <template #bottom-right>
               <Button
@@ -69,21 +71,30 @@
 import { LayoutHeader } from "@/components";
 import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
 import { setupCustomizations } from "@/composables/formCustomisation";
+import { useActiveViewers } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
 import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
-import { Icon } from "@iconify/vue";
 import { Breadcrumbs, Button, call, createResource, toast } from "frappe-ui";
-import { computed, onMounted, onUnmounted, provide, ref } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  onMounted,
+  onUnmounted,
+  provide,
+  ref,
+} from "vue";
 import { useRouter } from "vue-router";
 import { ITicket } from "./symbols";
-import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
 import TicketConversation from "./TicketConversation.vue";
+import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
 import TicketFeedback from "./TicketFeedback.vue";
-import TicketTextEditor from "./TicketTextEditor.vue";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
+const TicketTextEditor = defineAsyncComponent(
+  () => import("./TicketTextEditor.vue")
+);
 
 interface P {
   ticketId: string;
@@ -248,17 +259,20 @@ const showFeedback = computed(() => {
   );
   return hasAgentCommunication && isFeedbackMandatory;
 });
-
+const { startViewing, stopViewing } = useActiveViewers(props.ticketId);
 onMounted(() => {
+  startViewing(props.ticketId);
   document.title = props.ticketId;
-  socket.on("helpdesk:ticket-update", (ticketID) => {
-    if (ticketID === Number(props.ticketId)) {
+
+  socket.on("helpdesk:ticket-update", ({ ticket_id }) => {
+    if (ticket_id === props.ticketId) {
       ticket.reload();
     }
   });
 });
 
 onUnmounted(() => {
+  stopViewing(props.ticketId);
   document.title = "Helpdesk";
   socket.off("helpdesk:ticket-update");
 });

@@ -19,7 +19,7 @@
         :model-value="transValue"
         autocomplete="off"
         v-on="
-          textFields.includes(field.fieldtype)
+          [...textFields, ...numberFields].includes(field.fieldtype)
             ? {
                 blur: (event) => {
                   emitUpdate(field.fieldname, event.target.value);
@@ -41,15 +41,16 @@
 
 <script setup lang="ts">
 import { Autocomplete, Link } from "@/components";
-import { Field, FieldValue } from "@/types";
+import { APIOptions, Field, FieldValue } from "@/types";
+import { parseApiOptions } from "@/utils";
 import {
   createResource,
+  DatePicker,
   DateTimePicker,
   dayjs,
   FormControl,
   Tooltip,
 } from "frappe-ui";
-import DatePicker from "frappe-ui/src/components/DatePicker/DatePicker.vue";
 import { computed, h } from "vue";
 
 interface P {
@@ -72,18 +73,13 @@ const emit = defineEmits<E>();
 const apiOptions = createResource({
   url: props.field.url_method,
   auto: !!props.field.url_method,
-  transform: (data) => {
-    if (!data?.length) return [];
-    return (
-      data?.map((o) => ({
-        label: o,
-        value: o,
-      })) || []
-    );
+  transform: (data: APIOptions) => {
+    return parseApiOptions(data);
   },
 });
 
 const textFields = ["Long Text", "Small Text", "Text", "Text Editor", "Data"];
+const numberFields = ["Int", "Float", "Currency", "Percent"];
 
 const component = computed(() => {
   if (props.field.url_method) {

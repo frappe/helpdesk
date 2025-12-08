@@ -1,11 +1,7 @@
 {
 	"compilerOptions": {
-		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
-		"target": "es2022",
-		"module": "esnext",
-		"moduleResolution":"node",
-		"jsx": "preserve",
+		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"]
 		},
@@ -13,7 +9,9 @@
 			"unplugin-icons/types/vue",
 			"vite/client"
 		],
+
 	},
+	"extends":"frappe-ui/tsconfig.base.json",
 	"include": ["src","src/*","src/**/*.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx","src/**/*.vue"],
 	"exclude": ["node_modules"]
 }

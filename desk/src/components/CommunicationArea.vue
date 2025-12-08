@@ -39,6 +39,7 @@
       </div>
     </div>
     <div
+      ref="emailBoxRef"
       v-show="showEmailBox"
       class="flex gap-1.5 flex-1"
       @keydown.ctrl.enter.capture.stop="submitEmail"
@@ -69,6 +70,7 @@
       />
     </div>
     <div
+      ref="commentBoxRef"
       v-show="showCommentBox"
       @keydown.ctrl.enter.capture.stop="submitComment"
       @keydown.meta.enter.capture.stop="submitComment"
@@ -107,9 +109,11 @@ import { CommentTextEditor, EmailEditor, TypingIndicator } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
 import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
+import { useShortcut } from "@/composables/shortcuts";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { ref, watch } from "vue";
 import SummarizeButton from "./SummarizeButton.vue";
+import { onClickOutside } from "@vueuse/core";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
@@ -119,6 +123,8 @@ let doc = defineModel();
 // let doc = inject(TicketSymbol)?.value.doc
 const emailEditorRef = ref(null);
 const commentTextEditorRef = ref(null);
+const emailBoxRef = ref(null);
+const commentBoxRef = ref(null);
 
 function toggleEmailBox() {
   if (showCommentBox.value) {
@@ -209,12 +215,43 @@ watch(
   }
 );
 
+useShortcut("r", () => {
+  toggleEmailBox();
+});
+useShortcut("c", () => {
+  toggleCommentBox();
+});
+
 defineExpose({
   replyToEmail,
   toggleEmailBox,
   toggleCommentBox,
   editor: emailEditorRef,
 });
+
+onClickOutside(
+  emailBoxRef,
+  () => {
+    if (showEmailBox.value) {
+      showEmailBox.value = false;
+    }
+  },
+  {
+    ignore: [".tippy-box", ".tippy-content"],
+  }
+);
+
+onClickOutside(
+  commentBoxRef,
+  () => {
+    if (showCommentBox.value) {
+      showCommentBox.value = false;
+    }
+  },
+  {
+    ignore: [".tippy-box", ".tippy-content"],
+  }
+);
 </script>
 
 <style>

@@ -134,12 +134,13 @@ import {
   usePageMeta,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { isEmpty } from "lodash";
 import sanitizeHtml from "sanitize-html";
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, defineAsyncComponent, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SearchArticles from "../../components/SearchArticles.vue";
-import TicketTextEditor from "./TicketTextEditor.vue";
+const TicketTextEditor = defineAsyncComponent(
+  () => import("./TicketTextEditor.vue")
+);
 
 interface P {
   templateId?: string;
@@ -234,7 +235,7 @@ const ticket = createResource({
     const fields = visibleFields.value?.filter((f) => f.required) || [];
     const toVerify = [...fields, "subject", "description"];
     for (const field of toVerify) {
-      if (isEmpty(params.doc[field.fieldname || field])) {
+      if (!params.doc[field.fieldname || field]) {
         return `${field.label || field} is required`;
       }
     }

@@ -50,7 +50,8 @@ export const assignmentRulesActiveScreen = ref<{
 
 export const validateAssignmentRule = (
   key?: string,
-  skipConditionCheck = false
+  skipAssignConditionCheck = false,
+  skipUnAssignConditionCheck = false
 ) => {
   const validateField = (field: string) => {
     if (key && field !== key) return;
@@ -70,7 +71,7 @@ export const validateAssignmentRule = (
             : "Description is required";
         break;
       case "assignCondition":
-        if (skipConditionCheck) {
+        if (skipAssignConditionCheck) {
           break;
         }
         assignmentRulesErrors.value.assignCondition =
@@ -87,7 +88,7 @@ export const validateAssignmentRule = (
 
         break;
       case "unassignCondition":
-        if (skipConditionCheck) {
+        if (skipUnAssignConditionCheck) {
           break;
         }
         if (

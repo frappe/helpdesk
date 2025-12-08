@@ -62,9 +62,13 @@
     <div v-if="ticket.data" class="flex flex-1 overflow-x-hidden">
       <div class="flex flex-1 flex-col overflow-x-hidden">
         <div class="flex-1 flex flex-col">
-          <Tabs v-model="tabIndex" :tabs="tabs">
-            <TabList />
-            <TabPanel v-slot="{ tab }" class="h-full">
+          <Tabs
+            :modelValue="tabIndex"
+            :tabs="tabs"
+            @update:modelValue="changeTabTo"
+            class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5"
+          >
+            <template #tab-panel="{ tab }">
               <div v-if="tab.name === 'details'">
                 <!-- ticket contact info -->
                 <TicketAgentContact
@@ -108,7 +112,7 @@
                   }
                 "
               />
-            </TabPanel>
+            </template>
           </Tabs>
           <CommunicationArea
             class="sticky bottom-0 z-50 bg-white"
@@ -188,8 +192,6 @@ import {
   Dialog,
   Dropdown,
   FormControl,
-  TabList,
-  TabPanel,
   Tabs,
   call,
   createResource,
@@ -372,7 +374,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   return _tabs;
 });
 
-const { tabIndex } = useActiveTabManager(tabs, "lastTicketTab");
+const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
 
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email, idx: number) => {

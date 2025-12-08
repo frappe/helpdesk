@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot :show="sidebarOpened">
-    <Dialog as="div" @close="sidebarOpened = false" class="fixed inset-0 z-40">
+    <Dialog as="div" @close="sidebarOpened = false" class="fixed inset-0">
       <TransitionChild
         as="template"
         enter="transition ease-in-out duration-200 transform"
@@ -14,7 +14,9 @@
           class="relative z-10 flex h-full w-[230px] flex-col border-r bg-gray-50 transition-all duration-300 ease-in-out"
         >
           <!-- user dropwdown -->
-          <div><UserMenu class="p-2 mb-2" :options="profileSettings" /></div>
+          <div class="p-1">
+            <UserMenu :options="profileSettings" />
+          </div>
           <!-- notifications -->
           <div class="overflow-y-auto px-2" v-if="!isCustomerPortal">
             <div class="mb-3 flex flex-col gap-1">
