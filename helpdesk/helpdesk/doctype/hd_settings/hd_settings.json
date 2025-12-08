@@ -466,6 +466,8 @@
    "hidden": 1,
    "label": "Smart Feature Config",
    "read_only": 1
+  },
+  {
    "fieldname": "brand_name",
    "fieldtype": "Data",
    "label": "Name"
