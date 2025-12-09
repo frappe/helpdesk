@@ -263,19 +263,25 @@ function applyCannedResponse(template) {
 
 const sendMail = createResource({
   url: "run_doc_method",
-  makeParams: () => ({
-    dt: props.doctype,
-    dn: doc.value.name,
-    method: "reply_via_agent",
-    args: {
+  makeParams: () => {
+    const args: any = {
       attachments: attachments.value.map((x) => x.name),
       to: toEmailsClone.value.join(","),
       cc: ccEmailsClone.value?.join(","),
       bcc: bccEmailsClone.value?.join(","),
       message: newEmail.value,
-      email_account: fromEmailAccount.value || undefined,
-    },
-  }),
+    };
+    // Only include email_account if it has a value (for backward compatibility)
+    if (fromEmailAccount.value) {
+      args.email_account = fromEmailAccount.value;
+    }
+    return {
+      dt: props.doctype,
+      dn: doc.value.name,
+      method: "reply_via_agent",
+      args,
+    };
+  },
   onSuccess: () => {
     resetState();
     emit("submit");
