@@ -16,7 +16,7 @@
     </template>
     <template #body="{ togglePopover }">
       <div
-        class="p-1 text-ink-gray-6 top-1 absolute w-full bg-white shadow-2xl rounded"
+        class="p-1 text-ink-gray-6 top-1 absolute w-[--reka-popper-anchor-width] bg-white shadow-2xl rounded"
         :class="bodyClass"
       >
         <div class="max-h-52 overflow-y-auto">
@@ -56,7 +56,6 @@
 
 <script setup lang="ts">
 import { Button, FeatherIcon, Popover } from "frappe-ui";
-import { PopoverProps } from "frappe-ui/src/components/Popover/types";
 
 const model = defineModel();
 
@@ -64,7 +63,7 @@ interface Props {
   options: Array<{ value: string; label: string }>;
   targetClass?: string;
   bodyClass?: string;
-  placement?: PopoverProps["placement"];
+  placement?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {

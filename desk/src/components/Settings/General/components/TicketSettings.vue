@@ -35,35 +35,16 @@
           class="grid grid-cols-2 gap-4 mt-3"
           v-if="settingsData.restrictTicketsByAgentGroup"
         >
-          <div
-            class="flex items-start sm:items-center gap-2"
-            @click="
-              () => {
-                settingsData.doNotRestrictTicketsWithoutAnAgentGroup =
-                  !settingsData.doNotRestrictTicketsWithoutAnAgentGroup;
-              }
-            "
-          >
-            <Checkbox
-              :model-value="
-                settingsData.doNotRestrictTicketsWithoutAnAgentGroup
-              "
-            />
-            <FormLabel :label="__('Do not restrict tickets without a team')" />
-          </div>
-          <div
-            class="flex items-start sm:items-center gap-2"
-            @click="
-              () => {
-                settingsData.assignWithinTeam = !settingsData.assignWithinTeam;
-              }
-            "
-          >
-            <Checkbox :model-value="settingsData.assignWithinTeam" />
-            <FormLabel
-              :label="__('Restrict agent assignment to selected team')"
-            />
-          </div>
+          <Checkbox
+            size="sm"
+            v-model="settingsData.doNotRestrictTicketsWithoutAnAgentGroup"
+            :label="__('Do not restrict tickets without a team')"
+          />
+          <Checkbox
+            size="sm"
+            v-model="settingsData.assignWithinTeam"
+            :label="__('Restrict agent assignment to selected team')"
+          />
         </div>
       </div>
       <div class="flex items-center justify-between">
@@ -92,7 +73,7 @@
             }
           "
           target-class="max-w-40"
-          placement="bottom-end"
+          placement="bottom-start"
         />
       </div>
       <div class="flex items-center justify-between">
@@ -128,7 +109,7 @@
           :options="ticketTypeList.data"
           v-model="settingsData.defaultTicketType"
           target-class="max-w-40"
-          placement="bottom-end"
+          placement="bottom-start"
         />
       </div>
       <div>
@@ -160,7 +141,7 @@
                 }
               "
               target-class="w-full"
-              placement="bottom-end"
+              placement="bottom-start"
             />
           </div>
           <div class="flex flex-col gap-1.5">

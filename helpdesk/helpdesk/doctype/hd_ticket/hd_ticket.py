@@ -35,6 +35,7 @@ from helpdesk.utils import (
     capture_event,
     get_agents_team,
     get_customer,
+    get_doc_room,
     is_admin,
     is_agent,
     publish_event,
@@ -62,7 +63,10 @@ class HDTicket(Document):
         ) or frappe.db.get_single_value("HD Settings", "ticket_reopen_status")
 
     def publish_update(self):
-        publish_event("helpdesk:ticket-update", self.name)
+        room = get_doc_room("HD Ticket", self.name)
+        publish_event(
+            "helpdesk:ticket-update", room=room, data={"ticket_id": self.name}
+        )
         capture_event("ticket_updated")
 
     def autoname(self):
@@ -172,7 +176,7 @@ class HDTicket(Document):
             return
 
         capture_event("ticket_created")
-        publish_event("helpdesk:new-ticket", {"name": self.name})
+        publish_event("helpdesk:new-ticket")
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
             self.handle_inline_media_new_ticket()
@@ -417,8 +421,6 @@ class HDTicket(Document):
 
         if frappe.session.user != agent:
             self.notify_agent(agent, "Assignment")
-
-        publish_event("helpdesk:ticket-assignee-update", {"name": self.name})
 
     def get_assigned_agents(self):
         assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
