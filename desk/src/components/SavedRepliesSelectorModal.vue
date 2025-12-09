@@ -91,7 +91,6 @@
 import {
   Button,
   Dropdown,
-  FeatherIcon,
   LoadingIndicator,
   TextEditor,
   createListResource,
@@ -123,14 +122,17 @@ const activeFilter = useStorage("saved-replies-filter", "Personal");
 const filters = computed(() => [
   {
     label: "Global",
+    value: "Global",
     onClick: () => (activeFilter.value = "Global"),
   },
   {
     label: "My Team",
+    value: "Team",
     onClick: () => (activeFilter.value = "My Team"),
   },
   {
     label: "Personal",
+    value: "Personal",
     onClick: () => (activeFilter.value = "Personal"),
   },
 ]);
@@ -146,7 +148,13 @@ const selectedTemplate = ref({
 const savedReplyListResource = createListResource({
   doctype: "HD Saved Reply",
   fields: ["name", "title", "owner", "scope", "response"],
-  cache: ["SavedReplyList"],
+  filters: {
+    scope: [
+      "=",
+      filters.value.find((f) => f.label === activeFilter.value)?.value,
+    ],
+  },
+  cache: ["SavedReplyListForModal"],
   auto: true,
   orderBy: "modified desc",
   start: 0,
@@ -208,9 +216,10 @@ watch(search, (newValue) => {
 });
 
 watch(activeFilter, (newActiveFilter) => {
+  const scope = filters.value.find((f) => f.label === newActiveFilter)?.value;
   savedReplyListResource.filters = {
     ...savedReplyListResource?.filters,
-    scope: ["=", newActiveFilter],
+    scope: ["=", scope],
   };
   savedReplyListResource.list.reload();
 });
