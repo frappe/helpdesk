@@ -74,7 +74,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
 import { Badge, FeatherIcon, toast, Tooltip, usePageMeta } from "frappe-ui";
-import { computed, h, onMounted, reactive, ref } from "vue";
+import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
@@ -552,10 +552,19 @@ onMounted(() => {
       icon: LucideAlignJustify,
     };
   }
-  $socket.on("helpdesk:new-ticket", () => {
-    listViewRef.value?.reload();
-  });
+  if (!isCustomerPortal.value) {
+    $socket.on("helpdesk:new-ticket", () => {
+      listViewRef.value?.reload();
+    });
+  }
 });
+
+onUnmounted(() => {
+  if (!isCustomerPortal.value) {
+    $socket.off("helpdesk:new-ticket");
+  }
+});
+
 usePageMeta(() => {
   return {
     title: "Tickets",

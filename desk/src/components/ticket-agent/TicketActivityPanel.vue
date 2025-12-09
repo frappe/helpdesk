@@ -1,5 +1,10 @@
 <template>
-  <Tabs :modelValue="tabIndex" :tabs="tabs" @update:modelValue="changeTabTo">
+  <Tabs
+    :modelValue="tabIndex"
+    :tabs="tabs"
+    @update:modelValue="changeTabTo"
+    class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5"
+  >
     <template #tab-panel="{ tab }">
       <TicketAgentActivities
         v-if="Boolean(activities.data)"
