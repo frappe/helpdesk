@@ -9,6 +9,7 @@ import SavedRepliesList from "./SavedRepliesList.vue";
 import SavedReplyView from "./SavedReplyView.vue";
 import { onUnmounted, provide, ref } from "vue";
 import { SavedReplyListResourceSymbol } from "../../../types";
+import { activeFilter } from "./savedReplies";
 
 const savedRepliesActiveScreen = ref({
   screen: "list",
@@ -19,6 +20,9 @@ const savedRepliesSearchQuery = ref("");
 const savedReplyListResource = createListResource({
   doctype: "HD Saved Reply",
   fields: ["name", "title", "owner", "scope"],
+  filters: {
+    scope: activeFilter.value == "All" ? undefined : ["=", activeFilter.value],
+  },
   cache: ["SavedReplyList"],
   auto: true,
   orderBy: "modified desc",
@@ -32,6 +36,8 @@ provide("savedRepliesSearchQuery", savedRepliesSearchQuery);
 
 onUnmounted(() => {
   savedRepliesSearchQuery.value = "";
-  savedReplyListResource.filters = {};
+  savedReplyListResource.filters = {
+    scope: activeFilter.value == "All" ? undefined : ["=", activeFilter.value],
+  };
 });
 </script>

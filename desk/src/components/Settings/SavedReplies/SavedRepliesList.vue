@@ -73,7 +73,7 @@
     </template>
     <template #content>
       <div
-        v-if="savedRepliesListResource.loading"
+        v-if="savedRepliesListResource?.list?.loading"
         class="flex items-center justify-center mt-12"
       >
         <LoadingIndicator class="w-4" />
@@ -88,7 +88,7 @@
         <div
           class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
         >
-          <LucideCloudLightning class="size-6 text-ink-gray-6" />
+          <SavedReplyIcon class="size-6 text-ink-gray-6" />
         </div>
         <div class="flex flex-col items-center gap-1">
           <div class="text-base font-medium text-ink-gray-6">
@@ -109,7 +109,7 @@
         <div
           class="grid grid-cols-12 items-center gap-3 text-sm text-gray-600 ml-2"
         >
-          <div class="col-span-7">{{ __("Name") }}</div>
+          <div class="col-span-7">{{ __("Title") }}</div>
           <div class="col-span-2">{{ __("Owner") }}</div>
           <div class="col-span-3">{{ __("Scope") }}</div>
         </div>
@@ -205,7 +205,6 @@ import {
   Avatar,
   Button,
   call,
-  createResource,
   Dropdown,
   FeatherIcon,
   Input,
@@ -215,7 +214,6 @@ import {
 import { computed, inject, ref, Ref, watch } from "vue";
 import { __ } from "@/translation";
 import { ConfirmDelete } from "@/utils";
-import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
 import { activeFilter } from "./savedReplies";
 import { useUserStore } from "../../../stores/user";
@@ -223,6 +221,7 @@ import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
 import GlobeIcon from "~icons/lucide/globe";
 import { SavedReplyListResourceSymbol } from "../../../types";
+import SavedReplyIcon from "../../icons/SavedReplyIcon.vue";
 
 const { getUser } = useUserStore();
 
@@ -315,6 +314,7 @@ const filterOptions = computed(() => [
     onClick: () => {
       applyFilter("All");
     },
+    icon: undefined,
   },
   {
     label: "Personal",
@@ -322,6 +322,7 @@ const filterOptions = computed(() => [
     onClick: () => {
       applyFilter("Personal");
     },
+    icon: UserIcon,
   },
   {
     label: "My Team",
@@ -329,6 +330,7 @@ const filterOptions = computed(() => [
     onClick: () => {
       applyFilter("Team");
     },
+    icon: UsersIcon,
   },
   {
     label: "Global",
@@ -336,6 +338,7 @@ const filterOptions = computed(() => [
     onClick: () => {
       applyFilter("Global");
     },
+    icon: GlobeIcon,
   },
 ]);
 
@@ -350,21 +353,7 @@ const applyFilter = (scope: string) => {
 };
 
 const getScopeIcon = (scope: string) => {
-  const scopes = [
-    {
-      name: "Personal",
-      icon: UserIcon,
-    },
-    {
-      name: "Team",
-      icon: UsersIcon,
-    },
-    {
-      name: "Global",
-      icon: GlobeIcon,
-    },
-  ];
-  return scopes.find((x) => x.name === scope)?.icon;
+  return filterOptions.value.find((x) => x.value === scope)?.icon;
 };
 
 watch(savedRepliesSearchQuery, (newValue) => {
