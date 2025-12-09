@@ -18,35 +18,43 @@
         </div>
         <div class="p-4">
           <div class="flex items-center gap-2">
-            <TextInput
-              class="w-full"
-              ref="searchInput"
-              v-model="search"
-              type="text"
-              :placeholder="__('Site Down')"
-            >
-              <template #prefix>
-                <FeatherIcon name="search" class="h-4 w-4 text-gray-500" />
-              </template>
-            </TextInput>
+            <div class="relative w-full">
+              <Input
+                :model-value="search"
+                @input="search = $event"
+                :placeholder="__('Search')"
+                type="text"
+                class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+                icon-left="search"
+                debounce="300"
+                inputClass="p-4 pr-12"
+              />
+              <Button
+                v-if="search"
+                icon="x"
+                variant="ghost"
+                @click="search = ''"
+                class="absolute right-1 top-1/2 -translate-y-1/2"
+              />
+            </div>
             <Dropdown :options="filters" placement="right">
-              <Button :label="activeFilter" icon-left="filter" />
+              <Button :label="activeFilter" icon-left="filter" class="p-4" />
             </Dropdown>
           </div>
         </div>
         <div class="px-4 h-full overflow-y-auto">
           <div
-            v-if="filteredTemplates.length"
+            v-if="savedReplyListResource?.data?.length"
             class="grid grid-cols-1 md:grid-cols-3 gap-2 pb-36"
           >
             <div
-              v-for="template in filteredTemplates"
+              v-for="template in savedReplyListResource?.data"
               :key="template.name"
               class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-gray-100 relative"
               @click="onTemplateSelect(template)"
             >
               <div class="text-base font-semibold truncate border-b pb-2">
-                {{ template.name }}
+                {{ template.title }}
               </div>
               <TextEditor
                 v-if="template.response"
@@ -86,6 +94,7 @@ import {
   FeatherIcon,
   LoadingIndicator,
   TextEditor,
+  createListResource,
   createResource,
 } from "frappe-ui";
 import { ref, computed, nextTick, watch, onUnmounted } from "vue";
@@ -126,45 +135,26 @@ const filters = computed(() => [
   },
 ]);
 
-watch(activeFilter, () => {
-  getSavedRepliesResource.reload({
-    scope: activeFilter.value,
-  });
-});
-
 const emit = defineEmits(["apply"]);
 
 const search = ref("");
-const savedRepliesList = ref([]);
 const selectedTemplate = ref({
   name: "",
   isLoading: false,
 });
 
-const getSavedRepliesResource = createResource({
-  url: "helpdesk.api.saved_replies.get_saved_replies",
-  params: {
-    scope: activeFilter.value,
-  },
-  onSuccess: (data) => {
-    savedRepliesList.value = data;
-  },
+const savedReplyListResource = createListResource({
+  doctype: "HD Saved Reply",
+  fields: ["name", "title", "owner", "scope", "response"],
+  cache: ["SavedReplyList"],
   auto: true,
+  orderBy: "modified desc",
+  start: 0,
+  pageLength: 999,
 });
 
 onUnmounted(() => {
   showEmailBox.value = true;
-});
-
-const filteredTemplates = computed(() => {
-  return (
-    savedRepliesList.value?.filter((template) => {
-      return (
-        template.name.toLowerCase().includes(search.value.toLowerCase()) ||
-        template.subject.toLowerCase().includes(search.value.toLowerCase())
-      );
-    }) ?? []
-  );
 });
 
 const onTemplateSelect = (template) => {
@@ -205,7 +195,23 @@ watch(show, (value) => {
   if (value) {
     // @ts-ignore
     nextTick(() => searchInput.value?.el?.focus());
-    getSavedRepliesResource.reload();
+    savedReplyListResource.list.reload();
   }
+});
+
+watch(search, (newValue) => {
+  savedReplyListResource.filters = {
+    ...savedReplyListResource.filters,
+    title: ["like", `%${newValue}%`],
+  };
+  savedReplyListResource.list.reload();
+});
+
+watch(activeFilter, (newActiveFilter) => {
+  savedReplyListResource.filters = {
+    ...savedReplyListResource?.filters,
+    scope: ["=", newActiveFilter],
+  };
+  savedReplyListResource.list.reload();
 });
 </script>
