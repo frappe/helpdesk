@@ -318,28 +318,69 @@ async function sendMailFunction() {
     }
 
     // Step 1: Create communication without sending
-    const result = await call("frappe.core.doctype.communication.email.make", {
-      recipients: recipients,
-      attachments: attachments.value.map((x) => x.name),
-      cc: cc || undefined,
-      bcc: bcc || undefined,
-      subject: subject,
-      content: newEmail.value,
-      doctype: props.doctype,
-      name: doc.value.name,
-      send_email: false, // Don't send yet, we need to set email_account first
-      sender: senderEmail,
-      sender_full_name: senderFullName || undefined,
-    });
+    let result;
+    try {
+      result = await call("frappe.core.doctype.communication.email.make", {
+        recipients: recipients,
+        attachments: attachments.value.map((x) => x.name),
+        cc: cc || undefined,
+        bcc: bcc || undefined,
+        subject: subject,
+        content: newEmail.value,
+        doctype: props.doctype,
+        name: doc.value.name,
+        send_email: false, // Don't send yet, we need to set email_account first
+        sender: senderEmail,
+        sender_full_name: senderFullName || undefined,
+      });
+    } catch (apiError) {
+      console.error("Error creating communication:", apiError);
+      // Extract error message from various possible formats
+      let errorMsg = "Failed to create communication";
+      if (apiError) {
+        if (typeof apiError === "string") {
+          errorMsg = apiError;
+        } else if (apiError.message) {
+          errorMsg = apiError.message;
+        } else if (apiError.exc) {
+          errorMsg = typeof apiError.exc === "string" ? apiError.exc : JSON.stringify(apiError.exc);
+        } else if (apiError.exc_type) {
+          errorMsg = apiError.exc_type;
+        } else if (apiError.messages && Array.isArray(apiError.messages) && apiError.messages.length > 0) {
+          errorMsg = apiError.messages[0];
+        }
+      }
+      throw new Error(errorMsg);
+    }
 
     // Step 2: Send the email with the selected email_account (if any)
     if (result && result.name) {
-      await call("helpdesk.api.settings.email.send_communication_email", {
-        communication_name: result.name,
-        email_account: emailAccount || undefined,
-      });
+      try {
+        await call("helpdesk.api.settings.email.send_communication_email", {
+          communication_name: result.name,
+          email_account: emailAccount || undefined,
+        });
+      } catch (sendError) {
+        console.error("Error sending email:", sendError);
+        // Extract error message from various possible formats
+        let errorMsg = "Failed to send email";
+        if (sendError) {
+          if (typeof sendError === "string") {
+            errorMsg = sendError;
+          } else if (sendError.message) {
+            errorMsg = sendError.message;
+          } else if (sendError.exc) {
+            errorMsg = typeof sendError.exc === "string" ? sendError.exc : JSON.stringify(sendError.exc);
+          } else if (sendError.exc_type) {
+            errorMsg = sendError.exc_type;
+          } else if (sendError.messages && Array.isArray(sendError.messages) && sendError.messages.length > 0) {
+            errorMsg = sendError.messages[0];
+          }
+        }
+        throw new Error(errorMsg);
+      }
     } else {
-      throw new Error("Failed to create communication");
+      throw new Error("Failed to create communication: No communication name returned");
     }
 
     resetState();
@@ -350,23 +391,50 @@ async function sendMailFunction() {
     }
   } catch (error) {
     console.error("Email send error:", error);
-    // Handle different error formats
+    // Handle different error formats - be very defensive
     let errorMessage = "Failed to send email";
-    if (error) {
-      if (typeof error === "string") {
-        errorMessage = error;
-      } else if (error.exc) {
-        errorMessage = error.exc;
-      } else if (error.message) {
-        errorMessage = error.message;
-      } else if (error.exc_type) {
-        errorMessage = error.exc_type;
-      } else if (error.messages && Array.isArray(error.messages)) {
-        errorMessage = error.messages[0];
+    
+    try {
+      if (error) {
+        if (typeof error === "string") {
+          errorMessage = error;
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else if (error.exc) {
+          // exc might be a string or object
+          if (typeof error.exc === "string") {
+            errorMessage = error.exc;
+          } else {
+            try {
+              errorMessage = JSON.stringify(error.exc);
+            } catch {
+              errorMessage = String(error.exc);
+            }
+          }
+        } else if (error.exc_type) {
+          errorMessage = error.exc_type;
+        } else if (error.messages && Array.isArray(error.messages) && error.messages.length > 0) {
+          errorMessage = error.messages[0];
+        } else if (error._error_message) {
+          errorMessage = error._error_message;
+        } else {
+          // Last resort - try to stringify the whole error
+          try {
+            errorMessage = JSON.stringify(error);
+          } catch {
+            errorMessage = String(error) || "Failed to send email";
+          }
+        }
       }
+    } catch (parseError) {
+      // If even error parsing fails, use a safe fallback
+      console.error("Error parsing error object:", parseError);
+      errorMessage = "Failed to send email. Please check the console for details.";
     }
+    
     toast.error(errorMessage);
-    throw error;
+    // Don't re-throw to prevent further error propagation
+    // The error is already logged and shown to user
   }
 }
 
