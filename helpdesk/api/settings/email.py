@@ -80,6 +80,9 @@ def get_outgoing_email_accounts():
 @frappe.whitelist()
 def send_communication_email(communication_name, email_account=None):
 	"""Send email from a Communication document with optional email_account"""
+	if not communication_name:
+		frappe.throw("Communication name is required")
+	
 	comm = frappe.get_doc("Communication", communication_name)
 	
 	# Set email_account if provided
