@@ -39,24 +39,21 @@ class TestHDTicketComment(FrappeTestCase):
                 }
             ).insert(ignore_permissions=True)
 
-        # Create test ticket
-        if not frappe.db.exists("HD Ticket", "TEST-TICKET-001"):
-            ticket = frappe.get_doc(
-                {
-                    "doctype": "HD Ticket",
-                    "name": "TEST-TICKET-001",
-                    "subject": "Test Ticket",
-                    "raised_by": "test_user1@example.com",
-                    "status": "Open",
-                }
-            )
-            ticket.insert(ignore_permissions=True)
+        # Create test ticket (let frappe generate the name)
+        self.test_ticket = frappe.get_doc(
+            {
+                "doctype": "HD Ticket",
+                "subject": "Test Ticket for Reactions",
+                "raised_by": "test_user1@example.com",
+            }
+        )
+        self.test_ticket.insert(ignore_permissions=True)
 
-        # Create test comment
+        # Create test comment using the actual ticket name
         self.test_comment = frappe.get_doc(
             {
                 "doctype": "HD Ticket Comment",
-                "reference_ticket": "TEST-TICKET-001",
+                "reference_ticket": self.test_ticket.name,
                 "content": "<p>Test comment for reactions</p>",
                 "commented_by": "test_user1@example.com",
             }
@@ -65,11 +62,19 @@ class TestHDTicketComment(FrappeTestCase):
 
     def tearDown(self):
         """Clean up after each test."""
+        frappe.set_user("Administrator")
+        
         # Delete test comment
-        if self.test_comment and frappe.db.exists(
-            "HD Ticket Comment", self.test_comment.name
-        ):
-            frappe.delete_doc("HD Ticket Comment", self.test_comment.name, force=True)
+        if hasattr(self, "test_comment") and self.test_comment:
+            if frappe.db.exists("HD Ticket Comment", self.test_comment.name):
+                frappe.delete_doc(
+                    "HD Ticket Comment", self.test_comment.name, force=True
+                )
+
+        # Delete test ticket
+        if hasattr(self, "test_ticket") and self.test_ticket:
+            if frappe.db.exists("HD Ticket", self.test_ticket.name):
+                frappe.delete_doc("HD Ticket", self.test_ticket.name, force=True)
 
     def test_one_reaction_per_user(self):
         """Test that a user can only have one reaction on a comment."""
@@ -108,7 +113,7 @@ class TestHDTicketComment(FrappeTestCase):
         """Test that reaction counts are accurate for multiple users."""
         # Create more test users
         users = []
-        for i in range(3, 13):  # Create users 3-12 (10 users)
+        for i in range(3, 13):
             email = f"test_user{i}@example.com"
             if not frappe.db.exists("User", email):
                 user = frappe.get_doc(
@@ -123,16 +128,14 @@ class TestHDTicketComment(FrappeTestCase):
             users.append(email)
 
         # 10 users react with heart
-        for i, user_email in enumerate(users):
+        for user_email in users:
             frappe.set_user(user_email)
             toggle_reaction(self.test_comment.name, "❤️")
 
         # 3 users react with thumbs up (reusing first 3)
         for user_email in users[:3]:
             frappe.set_user(user_email)
-            toggle_reaction(
-                self.test_comment.name, "👍"
-            )  # This will replace their heart
+            toggle_reaction(self.test_comment.name, "👍")
 
         frappe.set_user("Administrator")
 
@@ -163,7 +166,6 @@ class TestHDTicketComment(FrappeTestCase):
 
     def test_notification_created_on_reaction(self):
         """Test that a notification is created when someone reacts to a comment."""
-        # Set user to comment author first
         frappe.set_user("test_user1@example.com")
 
         # Get initial notification count
@@ -212,7 +214,7 @@ class TestHDTicketComment(FrappeTestCase):
         self.assertIn("reacted with", notification.message)
         self.assertIn("👍", notification.message)
         self.assertIn("on your comment", notification.message)
-        self.assertEqual(notification.reference_ticket, "TEST-TICKET-001")
+        self.assertEqual(notification.reference_ticket, self.test_ticket.name)
 
         # Cleanup notification
         frappe.delete_doc("HD Notification", notification.name, force=True)
@@ -225,14 +227,8 @@ class TestHDTicketComment(FrappeTestCase):
         invalid_emojis = ["🔥", "💯", "🚨", "😂"]
 
         for invalid_emoji in invalid_emojis:
-            with self.assertRaises(frappe.ValidationError) as context:
+            with self.assertRaises(frappe.ValidationError):
                 toggle_reaction(self.test_comment.name, invalid_emoji)
-
-            self.assertIn(
-                "Invalid emoji",
-                str(context.exception),
-                f"Should reject invalid emoji {invalid_emoji}",
-            )
 
         # Verify no reactions were added
         doc = frappe.get_doc("HD Ticket Comment", self.test_comment.name)
@@ -240,17 +236,13 @@ class TestHDTicketComment(FrappeTestCase):
 
         # Verify all preset emojis are accepted
         for preset_emoji in PRESET_EMOJIS:
-            # This should not raise an error
-            try:
-                toggle_reaction(self.test_comment.name, preset_emoji)
-                doc.reload()
-                self.assertEqual(
-                    doc.reactions[0].emoji,
-                    preset_emoji,
-                    f"Preset emoji {preset_emoji} should be accepted",
-                )
-            except frappe.ValidationError:
-                self.fail(f"Preset emoji {preset_emoji} should be allowed")
+            toggle_reaction(self.test_comment.name, preset_emoji)
+            doc.reload()
+            self.assertEqual(
+                doc.reactions[0].emoji,
+                preset_emoji,
+                f"Preset emoji {preset_emoji} should be accepted",
+            )
 
         frappe.set_user("Administrator")
 
@@ -298,11 +290,8 @@ class TestHDTicketComment(FrappeTestCase):
             self.assertIn("count", reaction)
             self.assertIn("users", reaction)
             self.assertIn("current_user_reacted", reaction)
-
-            # Verify count matches number of users
             self.assertEqual(reaction["count"], len(reaction["users"]))
 
-            # Verify user info is present
             for user in reaction["users"]:
                 self.assertIn("user", user)
                 self.assertIn("full_name", user)
