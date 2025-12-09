@@ -81,37 +81,56 @@
       </div>
       <!-- Reactions Section -->
       <div class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100" v-if="!editable">
-        <!-- Reaction Display -->
-        <div class="flex items-center gap-1" v-if="reactions['👍']">
+        <!-- Existing reactions -->
+        <template v-for="reaction in reactionsList" :key="reaction.emoji">
           <Tooltip>
             <template #body>
               <div class="text-sm p-1">
-                <div v-for="user in reactions['👍'].users" :key="user.user" class="flex items-center gap-1 py-0.5">
-                  <Avatar size="xs" :label="user.full_name" :image="user.user_image" />
+                <div v-for="user in reaction.users" :key="user.user" class="flex items-center gap-1 py-0.5">
+                  <Avatar size="xs" :label="user.full_name" />
                   <span>{{ user.full_name }}</span>
                 </div>
               </div>
             </template>
             <button
               class="flex items-center gap-1 px-2 py-1 rounded-full text-sm transition-colors"
-              :class="reactions['👍']?.current_user_reacted 
+              :class="reaction.current_user_reacted 
                 ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-              @click="handleReaction('👍')"
+              @click="handleReaction(reaction.emoji)"
             >
-              <span>👍</span>
-              <span class="font-medium">{{ reactions['👍'].count }}</span>
+              <span>{{ reaction.emoji }}</span>
+              <span class="font-medium">{{ reaction.count }}</span>
             </button>
           </Tooltip>
-        </div>
-        <!-- Add Reaction Button (when no reactions yet) -->
-        <button
-          v-else
-          class="flex items-center gap-1 px-2 py-1 rounded-full text-sm bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-          @click="handleReaction('👍')"
-        >
-          <span>👍</span>
-        </button>
+        </template>
+        
+        <!-- Add Reaction Button with Emoji Picker -->
+        <Popover>
+          <template #target="{ togglePopover, isOpen }">
+            <button
+              class="flex items-center justify-center w-7 h-7 rounded-full text-sm transition-colors"
+              :class="isOpen ? 'bg-gray-200 text-gray-700' : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600'"
+              @click="togglePopover()"
+            >
+              <FeatherIcon name="smile" class="w-4 h-4" />
+            </button>
+          </template>
+          <template #body>
+            <div class="bg-white rounded-lg shadow-lg p-2 border border-gray-200">
+              <div class="grid grid-cols-6 gap-1">
+                <button
+                  v-for="emoji in emojiList"
+                  :key="emoji"
+                  class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-lg transition-colors"
+                  @click="handleReaction(emoji)"
+                >
+                  {{ emoji }}
+                </button>
+              </div>
+            </div>
+          </template>
+        </Popover>
       </div>
     </div>
   </div>
@@ -150,12 +169,15 @@ import {
   Avatar,
   Dialog,
   Dropdown,
+  FeatherIcon,
+  Popover,
   TextEditor,
   Tooltip,
   createResource,
   toast,
 } from "frappe-ui";
 import { PropType, computed, onMounted, ref } from "vue";
+
 const authStore = useAuthStore();
 const props = defineProps({
   activity: {
@@ -178,31 +200,36 @@ const showDialog = ref(false);
 const editable = ref(false);
 const _content = ref(content);
 
+// Available emoji reactions
+const emojiList = ["👍", "👎", "❤️", "😄", "🎉", "😕", "👀", "🚀"];
+
 // Reactions state
-const reactions = ref<Record<string, { count: number; users: Array<{ user: string; full_name: string; user_image: string | null }>; current_user_reacted: boolean }>>({});
+const reactions = ref<Array<{ emoji: string; count: number; users: Array<{ user: string; full_name: string }>; current_user_reacted: boolean }>>([]);
+
+// Computed to get reactions list
+const reactionsList = computed(() => reactions.value || []);
 
 // Fetch reactions on mount
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fetchReactions = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_comment_reaction.hd_comment_reaction.get_comment_reactions",
+  url: "helpdesk.helpdesk.doctype.hd_ticket_comment.hd_ticket_comment.get_reactions",
   makeParams: () => ({ comment: name }),
   auto: true,
   onSuccess(data) {
-    reactions.value = data || {};
+    reactions.value = data || [];
   },
 });
 
 // Toggle reaction
 const toggleReaction = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_comment_reaction.hd_comment_reaction.toggle_reaction",
-  makeParams: (reaction: string) => ({ comment: name, reaction }),
-  onSuccess(data) {
-    reactions.value = data.reactions || {};
+  url: "helpdesk.helpdesk.doctype.hd_ticket_comment.hd_ticket_comment.toggle_reaction",
+  makeParams: (emoji: string) => ({ comment: name, emoji }),
+  onSuccess() {
+    fetchReactions.reload();
   },
 });
 
-function handleReaction(reaction: string) {
-  toggleReaction.submit(reaction);
+function handleReaction(emoji: string) {
+  toggleReaction.submit(emoji);
 }
 
 // HTML refs

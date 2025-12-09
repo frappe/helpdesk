@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Frappe Technologies and contributors
 # For license information, please see license.txt
 
+import frappe
 from frappe.model.document import Document
 
 from helpdesk.mixins.mentions import HasMentions
@@ -34,3 +35,102 @@ class HDTicketComment(HasMentions, Document):
         room = get_doc_room("HD Ticket", self.reference_ticket)
         publish_event(event, room=room, data=data)
         capture_event(telemetry_event)
+
+
+@frappe.whitelist()
+def toggle_reaction(comment: str, emoji: str):
+    """Add or remove a reaction on a comment"""
+    if not frappe.db.exists("HD Ticket Comment", comment):
+        frappe.throw("Comment not found")
+
+    user = frappe.session.user
+    doc = frappe.get_doc("HD Ticket Comment", comment)
+
+    # Check if user already has any reaction
+    existing_reaction = None
+    for r in doc.reactions:
+        if r.user == user:
+            existing_reaction = r
+            break
+
+    if existing_reaction:
+        if existing_reaction.emoji == emoji:
+            # Remove reaction if clicking the same emoji
+            doc.reactions.remove(existing_reaction)
+            doc.save(ignore_permissions=True)
+            action = "removed"
+        else:
+            # Replace with new emoji
+            existing_reaction.emoji = emoji
+            doc.save(ignore_permissions=True)
+            action = "changed"
+            
+            # Notify comment author
+            if doc.commented_by != user:
+                notify_reaction(doc, emoji, user)
+    else:
+        # Add new reaction
+        doc.append("reactions", {"emoji": emoji, "user": user})
+        doc.save(ignore_permissions=True)
+        action = "added"
+
+        # Notify comment author
+        if doc.commented_by != user:
+            notify_reaction(doc, emoji, user)
+
+    # Publish real-time update
+    room = get_doc_room("HD Ticket", doc.reference_ticket)
+    publish_event(
+        "helpdesk:comment-reaction-update",
+        room=room,
+        data={"comment": comment, "ticket_id": doc.reference_ticket},
+    )
+
+    return {"action": action, "emoji": emoji}
+
+
+@frappe.whitelist()
+def get_reactions(comment: str):
+    """Get all reactions for a comment grouped by emoji"""
+    if not frappe.db.exists("HD Ticket Comment", comment):
+        frappe.throw("Comment not found")
+
+    doc = frappe.get_doc("HD Ticket Comment", comment)
+    current_user = frappe.session.user
+
+    # Group reactions by emoji
+    reactions_map = {}
+    for r in doc.reactions:
+        if r.emoji not in reactions_map:
+            reactions_map[r.emoji] = {"emoji": r.emoji, "users": [], "current_user_reacted": False}
+        
+        user_info = frappe.get_cached_doc("User", r.user)
+        reactions_map[r.emoji]["users"].append({
+            "user": r.user,
+            "full_name": user_info.full_name or r.user,
+        })
+        
+        if r.user == current_user:
+            reactions_map[r.emoji]["current_user_reacted"] = True
+
+    # Add count to each reaction
+    for emoji in reactions_map:
+        reactions_map[emoji]["count"] = len(reactions_map[emoji]["users"])
+
+    return list(reactions_map.values())
+
+
+def notify_reaction(doc, emoji, user):
+    """Notify comment author about reaction"""
+    try:
+        frappe.get_doc({
+            "doctype": "HD Notification",
+            "message": f"reacted {emoji} to your comment",
+            "notification_type": "Reaction",
+            "reference_comment": doc.name,
+            "reference_ticket": doc.reference_ticket,
+            "user_from": user,
+            "user_to": doc.commented_by,
+        }).insert(ignore_permissions=True)
+    except Exception:
+        pass  # Don't fail if notification fails
