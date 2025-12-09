@@ -46,28 +46,18 @@ def toggle_reaction(comment: str, emoji: str):
     user = frappe.session.user
     doc = frappe.get_doc("HD Ticket Comment", comment)
 
-    # Check if user already has any reaction
+    # Check if user already reacted with this specific emoji
     existing_reaction = None
     for r in doc.reactions:
-        if r.user == user:
+        if r.user == user and r.emoji == emoji:
             existing_reaction = r
             break
 
     if existing_reaction:
-        if existing_reaction.emoji == emoji:
-            # Remove reaction if clicking the same emoji
-            doc.reactions.remove(existing_reaction)
-            doc.save(ignore_permissions=True)
-            action = "removed"
-        else:
-            # Replace with new emoji
-            existing_reaction.emoji = emoji
-            doc.save(ignore_permissions=True)
-            action = "changed"
-            
-            # Notify comment author
-            if doc.commented_by != user:
-                notify_reaction(doc, emoji, user)
+        # Remove reaction (toggle off)
+        doc.reactions.remove(existing_reaction)
+        doc.save(ignore_permissions=True)
+        action = "removed"
     else:
         # Add new reaction
         doc.append("reactions", {"emoji": emoji, "user": user})

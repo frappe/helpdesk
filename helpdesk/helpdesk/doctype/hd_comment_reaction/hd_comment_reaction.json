@@ -31,7 +31,7 @@
     "modified": "2024-12-09 17:00:00.000000",
     "modified_by": "Administrator",
     "module": "Helpdesk",
-    "name": "HD Reaction",
+    "name": "HD Comment Reaction",
     "naming_rule": "Autoincrement",
     "owner": "Administrator",
     "permissions": [],

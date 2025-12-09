@@ -48,7 +48,7 @@
             "fieldname": "reactions",
             "fieldtype": "Table",
             "label": "Reactions",
-            "options": "HD Reaction"
+            "options": "HD Comment Reaction"
         }
     ],
     "index_web_pages_for_search": 1,

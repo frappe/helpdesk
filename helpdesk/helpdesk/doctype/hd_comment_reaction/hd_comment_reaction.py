@@ -4,5 +4,5 @@
 from frappe.model.document import Document
 
 
-class HDReaction(Document):
+class HDCommentReaction(Document):
     pass
