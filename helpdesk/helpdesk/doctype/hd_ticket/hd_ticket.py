@@ -567,15 +567,50 @@ class HDTicket(Document):
         # PRIORITY 1: Use email_account from FROM field if provided
         # PRIORITY 2: Use custom_reply_email_alias if available
         # PRIORITY 3: Use sender_email
+        reply_to_email = None
+        sender_account = None
+        
         if email_account and sender_email:
             # FROM field was used - use that email account's email_id
             reply_to_email = sender_email.email_id
+            sender_account = sender_email.name
         elif self.get("custom_reply_email_alias"):
             # Use stored alias from initial routing
-            reply_to_email = self.custom_reply_email_alias
+            alias_email = self.custom_reply_email_alias
+            reply_to_email = alias_email
+            
+            # Try to find an Email Account with this email_id
+            try:
+                alias_account_name = frappe.db.get_value(
+                    "Email Account",
+                    {"email_id": alias_email, "enable_outgoing": 1},
+                    "name"
+                )
+                if alias_account_name:
+                    # Use the Email Account that matches the alias
+                    sender_account = alias_account_name
+                elif sender_email:
+                    # No Email Account found for alias, use default sender_email
+                    # The reply_to will still be set to the alias so replies go to the right place
+                    sender_account = sender_email.name
+                else:
+                    # No sender_email available, try to get any outgoing email account
+                    default_account = default_outgoing_email_account()
+                    if default_account:
+                        sender_account = default_account.get("name")
+                    else:
+                        frappe.throw(_("Can not send email. No sender email set up!"))
+            except Exception as e:
+                # If lookup fails, use default sender_email
+                frappe.log_error(f"Error looking up Email Account for alias {alias_email}: {str(e)}", "Email Account Lookup")
+                if sender_email:
+                    sender_account = sender_email.name
+                else:
+                    frappe.throw(_("Can not send email. No sender email set up!"))
         elif sender_email:
             # Fall back to default sender_email
             reply_to_email = sender_email.email_id
+            sender_account = sender_email.name
         else:
             frappe.throw(_("Can not send email. No sender email set up!"))
         
@@ -612,7 +647,7 @@ class HDTicket(Document):
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
                 reply_to=reply_to_email,
-                sender=reply_to_email,
+                sender=sender_account or reply_to_email,
                 subject=subject,
                 template=template,
                 with_container=False,

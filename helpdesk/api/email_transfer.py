@@ -69,7 +69,7 @@ def create_transfer_notes(source_doc, selected_emails, all_emails):
 			last = source_doc.get('last_name') or ''
 			name = f"{first} {last}".strip()
 			if name:
-			notes.append(f"Lead Name: {name}")
+				notes.append(f"Lead Name: {name}")
 	
 	# Email summaries
 	if selected_emails:
