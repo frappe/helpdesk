@@ -271,8 +271,10 @@ const sendMail = createResource({
       bcc: bccEmailsClone.value?.join(","),
       message: newEmail.value,
     };
-    // Only include email_account if it has a value (for backward compatibility)
-    if (fromEmailAccount.value) {
+    // CRITICAL: Only include email_account if it has a valid non-empty value
+    // This prevents TypeError when production backend doesn't have email_account parameter
+    // Production backend's reply_via_agent() doesn't accept email_account parameter yet
+    if (fromEmailAccount.value && String(fromEmailAccount.value).trim()) {
       args.email_account = fromEmailAccount.value;
     }
     return {
