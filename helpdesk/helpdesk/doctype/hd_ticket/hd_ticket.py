@@ -494,13 +494,24 @@ class HDTicket(Document):
         cc: str = None,
         bcc: str = None,
         attachments: List[str] = [],
+        email_account: str = None,
     ):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject}"
         sender = frappe.session.user
         recipients = to or self.raised_by
-        sender_email = None if skip_email_workflow else self.sender_email()
+        
+        # PRIORITY 1: Use email_account from FROM field if provided
+        # PRIORITY 2: Use sender_email() (default behavior)
+        if email_account:
+            try:
+                sender_email = frappe.get_doc("Email Account", email_account)
+            except Exception:
+                # If email_account doesn't exist, fall back to default
+                sender_email = None if skip_email_workflow else self.sender_email()
+        else:
+            sender_email = None if skip_email_workflow else self.sender_email()
 
         if recipients == "Administrator":
             admin_email = frappe.get_value("User", "Administrator", "email")
@@ -514,7 +525,7 @@ class HDTicket(Document):
                 "communication_type": "Communication",
                 "content": message,
                 "doctype": "Communication",
-                "email_account": sender_email.name if sender_email else None,
+                "email_account": email_account or (sender_email.name if sender_email else None),
                 "email_status": "Open",
                 "recipients": recipients,
                 "reference_doctype": "HD Ticket",
@@ -536,7 +547,8 @@ class HDTicket(Document):
         if skip_email_workflow:
             return
 
-        if not sender_email:
+        # Only check sender_email if email_account was not provided
+        if not email_account and not sender_email:
             frappe.throw(_("Can not send email. No sender email set up!"))
 
         _attachments = []
@@ -552,11 +564,20 @@ class HDTicket(Document):
 
         message = self.parse_content(message)
 
-        # Use alias if available, otherwise use sender_email
-        if self.get("custom_reply_email_alias"):
-            reply_to_email = self.custom_reply_email_alias
-        else:
+        # PRIORITY 1: Use email_account from FROM field if provided
+        # PRIORITY 2: Use custom_reply_email_alias if available
+        # PRIORITY 3: Use sender_email
+        if email_account and sender_email:
+            # FROM field was used - use that email account's email_id
             reply_to_email = sender_email.email_id
+        elif self.get("custom_reply_email_alias"):
+            # Use stored alias from initial routing
+            reply_to_email = self.custom_reply_email_alias
+        elif sender_email:
+            # Fall back to default sender_email
+            reply_to_email = sender_email.email_id
+        else:
+            frappe.throw(_("Can not send email. No sender email set up!"))
         
         template = (
             "new_reply_on_customer_portal_notification"

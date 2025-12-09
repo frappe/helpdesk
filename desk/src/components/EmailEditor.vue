@@ -16,6 +16,14 @@
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, modelValue?.name)"
   >
     <template #top>
+      <div class="mx-6 md:mx-10 flex items-center gap-2 border-t py-2.5">
+        <span class="text-xs text-gray-500">FROM:</span>
+        <SingleSelectEmailInput
+          v-model="fromEmailAccount"
+          class="flex-1"
+          placeholder="Select email account"
+        />
+      </div>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
@@ -162,6 +170,7 @@ import {
   AttachmentItem,
   CannedResponseSelectorModal,
   MultiSelectInput,
+  SingleSelectEmailInput,
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
@@ -236,6 +245,7 @@ const emailEmpty = computed(() => {
   return isContentEmpty(newEmail.value);
 });
 
+const fromEmailAccount = ref<string | null>(null);
 const toEmailsClone = ref([...props.toEmails]);
 const ccEmailsClone = ref([...props.ccEmails]);
 const bccEmailsClone = ref([...props.bccEmails]);
@@ -263,6 +273,7 @@ const sendMail = createResource({
       cc: ccEmailsClone.value?.join(","),
       bcc: bccEmailsClone.value?.join(","),
       message: newEmail.value,
+      email_account: fromEmailAccount.value || undefined,
     },
   }),
   onSuccess: () => {
@@ -335,11 +346,13 @@ function addToReply(
 function resetState() {
   newEmail.value = null;
   attachments.value = [];
+  fromEmailAccount.value = null;
 }
 
 function handleDiscard() {
   attachments.value = [];
   newEmail.value = null;
+  fromEmailAccount.value = null;
 
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
@@ -358,5 +371,6 @@ defineExpose({
   addToReply,
   editor,
   submitMail,
+  fromEmailAccount,
 });
 </script>

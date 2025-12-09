@@ -88,6 +88,10 @@ def fetch_ticket_order_history(ticket_name, customer_name):
 					item.item_code,
 					item.get('name')  # Sales Order Item name
 				)
+				
+				# Ensure mat_status is always set to a valid value (not None or empty)
+				if not mat_status or not str(mat_status).strip():
+					mat_status = "NO_RECIPE"
 
 				if existing_items:
 					# UPDATE existing item with current statuses
@@ -154,7 +158,7 @@ def _get_work_order_statuses(sales_order_name, item_code, sales_order_item_name=
 	"""
 	# Default values
 	ops_status = "Not Started"
-	mat_status = "NO RECIPE"
+	mat_status = "NO_RECIPE"
 	pro_status = "NEW"
 	qa_status = "AWAITING"
 
@@ -188,7 +192,7 @@ def _get_work_order_statuses(sales_order_name, item_code, sales_order_item_name=
 						# Get Work Order document to access ALL fields
 						wo_doc = frappe.get_doc("Work Order", wo_names[0].name)
 						
-						# Get ALL fields as dictionary
+						# Get ALL fields as dictionary (includes custom fields)
 						wo_dict = wo_doc.as_dict()
 						
 						# Simply copy whatever status fields exist - try all possible field names
@@ -211,29 +215,37 @@ def _get_work_order_statuses(sales_order_name, item_code, sales_order_item_name=
 										 "AWAITING")
 						qa_status = str(qa_status_raw).strip() if qa_status_raw else "AWAITING"
 						
-						# Material Status - get ingredient status
-						ingredients_status_raw = (wo_dict.get("ingredient_status") or 
-												   wo_dict.get("custom_ingredient_status") or 
-												   wo_dict.get("custom_ingredients_status") or 
-												   wo_dict.get("ingredients_status"))
-						ingredients_status = str(ingredients_status_raw).strip() if ingredients_status_raw else None
+						# Ingredient Status - prioritize custom_ingredients_status field from Work Order
+						# Try both dictionary access and direct attribute access to ensure we get the custom field
+						ingredients_status_raw = (wo_dict.get("custom_ingredients_status") or 
+												   getattr(wo_doc, "custom_ingredients_status", None))
 						
-						material_reservation_raw = (wo_dict.get("material_reservation_status") or 
-												   wo_dict.get("custom_material_reservation_status"))
-						material_reservation = str(material_reservation_raw).strip() if material_reservation_raw else None
-						material_transferred = wo_dict.get("material_transferred_for_manufacturing") or 0
-						
-						# Material status logic
-						if material_transferred and material_transferred > 0:
-							mat_status = "READY"
-						elif ingredients_status and ingredients_status == "IN_STOCK":
-							mat_status = "READY"
-						elif material_reservation and material_reservation == "Fully Reserved":
-							mat_status = "READY"
-						elif ingredients_status:
-							mat_status = ingredients_status
+						if ingredients_status_raw and str(ingredients_status_raw).strip():
+							# Use the custom_ingredients_status value directly
+							mat_status = str(ingredients_status_raw).strip()
 						else:
-							mat_status = "NO RECIPE"
+							# Fallback to other field names if custom_ingredients_status doesn't exist
+							ingredients_status_raw = (wo_dict.get("ingredient_status") or 
+													   wo_dict.get("custom_ingredient_status") or 
+													   wo_dict.get("ingredients_status"))
+							ingredients_status = str(ingredients_status_raw).strip() if ingredients_status_raw else None
+							
+							material_reservation_raw = (wo_dict.get("material_reservation_status") or 
+													   wo_dict.get("custom_material_reservation_status"))
+							material_reservation = str(material_reservation_raw).strip() if material_reservation_raw else None
+							material_transferred = wo_dict.get("material_transferred_for_manufacturing") or 0
+							
+							# Material status logic (fallback)
+							if material_transferred and material_transferred > 0:
+								mat_status = "READY"
+							elif ingredients_status and ingredients_status == "IN_STOCK":
+								mat_status = "READY"
+							elif material_reservation and material_reservation == "Fully Reserved":
+								mat_status = "READY"
+							elif ingredients_status:
+								mat_status = ingredients_status
+							else:
+								mat_status = "NO_RECIPE"
 						
 						return (ops_status, mat_status, pro_status, qa_status)
 			except Exception as e:
@@ -270,27 +282,37 @@ def _get_work_order_statuses(sales_order_name, item_code, sales_order_item_name=
 							 "AWAITING")
 			qa_status = str(qa_status_raw).strip() if qa_status_raw else "AWAITING"
 			
-			ingredients_status_raw = (wo_dict.get("ingredient_status") or 
-									   wo_dict.get("custom_ingredient_status") or 
-									   wo_dict.get("custom_ingredients_status") or 
-									   wo_dict.get("ingredients_status"))
-			ingredients_status = str(ingredients_status_raw).strip() if ingredients_status_raw else None
+			# Ingredient Status - prioritize custom_ingredients_status field from Work Order
+			# Try both dictionary access and direct attribute access to ensure we get the custom field
+			ingredients_status_raw = (wo_dict.get("custom_ingredients_status") or 
+									   getattr(wo_doc, "custom_ingredients_status", None))
 			
-			material_reservation_raw = (wo_dict.get("material_reservation_status") or 
-									   wo_dict.get("custom_material_reservation_status"))
-			material_reservation = str(material_reservation_raw).strip() if material_reservation_raw else None
-			material_transferred = wo_dict.get("material_transferred_for_manufacturing") or 0
-			
-			if material_transferred and material_transferred > 0:
-				mat_status = "READY"
-			elif ingredients_status and ingredients_status == "IN_STOCK":
-				mat_status = "READY"
-			elif material_reservation and material_reservation == "Fully Reserved":
-				mat_status = "READY"
-			elif ingredients_status:
-				mat_status = ingredients_status
+			if ingredients_status_raw and str(ingredients_status_raw).strip():
+				# Use the custom_ingredients_status value directly
+				mat_status = str(ingredients_status_raw).strip()
 			else:
-				mat_status = "NO RECIPE"
+				# Fallback to other field names if custom_ingredients_status doesn't exist
+				ingredients_status_raw = (wo_dict.get("ingredient_status") or 
+										   wo_dict.get("custom_ingredient_status") or 
+										   wo_dict.get("ingredients_status"))
+				ingredients_status = str(ingredients_status_raw).strip() if ingredients_status_raw else None
+				
+				material_reservation_raw = (wo_dict.get("material_reservation_status") or 
+										   wo_dict.get("custom_material_reservation_status"))
+				material_reservation = str(material_reservation_raw).strip() if material_reservation_raw else None
+				material_transferred = wo_dict.get("material_transferred_for_manufacturing") or 0
+				
+				# Material status logic (fallback)
+				if material_transferred and material_transferred > 0:
+					mat_status = "READY"
+				elif ingredients_status and ingredients_status == "IN_STOCK":
+					mat_status = "READY"
+				elif material_reservation and material_reservation == "Fully Reserved":
+					mat_status = "READY"
+				elif ingredients_status:
+					mat_status = ingredients_status
+				else:
+					mat_status = "NO_RECIPE"
 			
 			return (ops_status, mat_status, pro_status, qa_status)
 			

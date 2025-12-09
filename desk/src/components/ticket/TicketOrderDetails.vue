@@ -26,7 +26,7 @@
               <th class="text-right p-3 font-semibold">Amount</th>
               <th class="text-left p-3 font-semibold">QA Status</th>
               <th class="text-left p-3 font-semibold">OPS Status</th>
-              <th class="text-left p-3 font-semibold">Material Status</th>
+              <th class="text-left p-3 font-semibold">Ingredient Status</th>
               <th class="text-left p-3 font-semibold">Production Status</th>
             </tr>
           </thead>

@@ -50,27 +50,54 @@ def create_email_account(data):
         frappe.throw(str(e))
 
 
+@frappe.whitelist()
+def get_outgoing_email_accounts():
+	"""Get outgoing email accounts for the logged-in user"""
+	user = frappe.session.user
+	
+	# Get email accounts from User Email child table where enable_outgoing=1
+	accounts = frappe.get_all(
+		"User Email",
+		filters={"parent": user, "enable_outgoing": 1},
+		fields=["email_account", "email_id"],
+		distinct=True,
+		order_by="idx",
+	)
+	
+	# Format as options for select component
+	email_accounts = []
+	for account in accounts:
+		email_accounts.append({
+			"label": account.email_id,
+			"value": account.email_account,
+			"email_id": account.email_id,
+		})
+	
+	# If no accounts found, return empty list
+	return email_accounts
+
+
 email_service_config = {
-    "Frappe Mail": {
-        "domain": None,
-        "password": None,
-        "awaiting_password": 0,
-        "ascii_encode_password": 0,
-        "login_id_is_different": 0,
-        "login_id": None,
-        "use_imap": 0,
-        "use_ssl": 0,
-        "validate_ssl_certificate": 0,
-        "use_starttls": 0,
-        "email_server": None,
-        "incoming_port": 0,
-        "always_use_account_email_id_as_sender": 1,
-        "use_tls": 0,
-        "use_ssl_for_outgoing": 0,
-        "smtp_server": None,
-        "smtp_port": None,
-        "no_smtp_authentication": 0,
-    },
+	"Frappe Mail": {
+		"domain": None,
+		"password": None,
+		"awaiting_password": 0,
+		"ascii_encode_password": 0,
+		"login_id_is_different": 0,
+		"login_id": None,
+		"use_imap": 0,
+		"use_ssl": 0,
+		"validate_ssl_certificate": 0,
+		"use_starttls": 0,
+		"email_server": None,
+		"incoming_port": 0,
+		"always_use_account_email_id_as_sender": 1,
+		"use_tls": 0,
+		"use_ssl_for_outgoing": 0,
+		"smtp_server": None,
+		"smtp_port": None,
+		"no_smtp_authentication": 0,
+	},
     "GMail": {
         "email_server": "imap.gmail.com",
         "use_ssl": 1,

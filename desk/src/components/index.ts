@@ -14,6 +14,7 @@ export { default as MultipleAvatar } from "./MultipleAvatar.vue";
 export { default as EmailEditor } from "./EmailEditor.vue";
 export { default as CommentTextEditor } from "./CommentTextEditor.vue";
 export { default as MultiSelectInput } from "./MultiSelectInput.vue";
+export { default as SingleSelectEmailInput } from "./SingleSelectEmailInput.vue";
 export { default as CommunicationArea } from "./CommunicationArea.vue";
 export { default as EmailArea } from "./EmailArea.vue";
 export { default as CommentBox } from "./CommentBox.vue";
