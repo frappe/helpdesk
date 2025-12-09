@@ -140,7 +140,6 @@ const { userName } = storeToRefs(useAuthStore());
 const editing = ref(false);
 const layout = ref([]);
 const oldLayout = ref([]);
-const { userId } = storeToRefs(useAuthStore());
 
 const isDirty = computed(() => {
   return JSON.stringify(layout.value) !== JSON.stringify(oldLayout.value);

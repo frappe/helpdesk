@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, PropType } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { Avatar, createResource, FeatherIcon, Tooltip } from "frappe-ui";
 import LucideStar from "~icons/lucide/star";
 import { useRouter } from "vue-router";

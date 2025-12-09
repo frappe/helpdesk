@@ -122,18 +122,6 @@ function getPriorityBadgeColor(integerValue) {
   return "gray";
 }
 
-function getTimeRemainingClass(resolutionBy: string) {
-  const now = dayjs();
-  const resolutionTime = dayjs(resolutionBy);
-  const diffInMinutes = resolutionTime.diff(now, "minute");
-
-  if (diffInMinutes < 60) {
-    return "text-red-600";
-  } else if (diffInMinutes < 120) {
-    return "text-orange-600";
-  }
-}
-
 const goToTicket = (ticket: any) => {
   router.push({
     name: "TicketAgent",
