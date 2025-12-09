@@ -54,7 +54,7 @@
           <template #item="{ item }">
             <button
               class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-3"
-              @click="item.onClick"
+              @click="item.onSelect"
             >
               <div class="flex items-center justify-between flex-1">
                 <span class="whitespace-nowrap">
@@ -311,7 +311,7 @@ const filterOptions = computed(() => [
   {
     label: "All",
     value: "All",
-    onClick: () => {
+    onSelect: () => {
       applyFilter("All");
     },
     icon: undefined,
@@ -319,7 +319,7 @@ const filterOptions = computed(() => [
   {
     label: "Personal",
     value: "Personal",
-    onClick: () => {
+    onSelect: () => {
       applyFilter("Personal");
     },
     icon: UserIcon,
@@ -327,7 +327,7 @@ const filterOptions = computed(() => [
   {
     label: "My Team",
     value: "Team",
-    onClick: () => {
+    onSelect: () => {
       applyFilter("Team");
     },
     icon: UsersIcon,
@@ -335,7 +335,7 @@ const filterOptions = computed(() => [
   {
     label: "Global",
     value: "Global",
-    onClick: () => {
+    onSelect: () => {
       applyFilter("Global");
     },
     icon: GlobeIcon,
