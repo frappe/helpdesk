@@ -200,8 +200,8 @@ const showDialog = ref(false);
 const editable = ref(false);
 const _content = ref(content);
 
-// Available emoji reactions
-const emojiList = ["👍", "👎", "❤️", "😄", "🎉", "😕", "👀", "🚀"];
+// Preset emoji reactions (must match backend PRESET_EMOJIS)
+const emojiList = ["👍", "👎", "❤️", "🎉", "👀", "✅"];
 
 // Reactions state
 const reactions = ref<Array<{ emoji: string; count: number; users: Array<{ user: string; full_name: string }>; current_user_reacted: boolean }>>([]);

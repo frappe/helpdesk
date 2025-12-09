@@ -8,6 +8,10 @@ from helpdesk.mixins.mentions import HasMentions
 from helpdesk.utils import capture_event, get_doc_room, publish_event
 
 
+# Preset allowed emojis
+PRESET_EMOJIS = ["👍", "👎", "❤️", "🎉", "👀", "✅"]
+
+
 class HDTicketComment(HasMentions, Document):
     mentions_field = "content"
 
@@ -39,25 +43,41 @@ class HDTicketComment(HasMentions, Document):
 
 @frappe.whitelist()
 def toggle_reaction(comment: str, emoji: str):
-    """Add or remove a reaction on a comment"""
+    """Add or remove a reaction on a comment. Only one reaction per user allowed."""
+    # Validate emoji is from preset list
+    if emoji not in PRESET_EMOJIS:
+        frappe.throw(
+            f"Invalid emoji. Only preset emojis are allowed: {', '.join(PRESET_EMOJIS)}"
+        )
+
     if not frappe.db.exists("HD Ticket Comment", comment):
         frappe.throw("Comment not found")
 
     user = frappe.session.user
     doc = frappe.get_doc("HD Ticket Comment", comment)
 
-    # Check if user already reacted with this specific emoji
+    # Check if user already has any reaction
     existing_reaction = None
     for r in doc.reactions:
-        if r.user == user and r.emoji == emoji:
+        if r.user == user:
             existing_reaction = r
             break
 
     if existing_reaction:
-        # Remove reaction (toggle off)
-        doc.reactions.remove(existing_reaction)
-        doc.save(ignore_permissions=True)
-        action = "removed"
+        if existing_reaction.emoji == emoji:
+            # Remove reaction (toggle off same emoji)
+            doc.reactions.remove(existing_reaction)
+            doc.save(ignore_permissions=True)
+            action = "removed"
+        else:
+            # Replace with new emoji (one reaction per user)
+            existing_reaction.emoji = emoji
+            doc.save(ignore_permissions=True)
+            action = "changed"
+
+            # Notify comment author
+            if doc.commented_by != user:
+                notify_reaction(doc, emoji, user)
     else:
         # Add new reaction
         doc.append("reactions", {"emoji": emoji, "user": user})
@@ -81,7 +101,7 @@ def toggle_reaction(comment: str, emoji: str):
 
 @frappe.whitelist()
 def get_reactions(comment: str):
-    """Get all reactions for a comment grouped by emoji"""
+    """Get all reactions for a comment grouped by emoji."""
     if not frappe.db.exists("HD Ticket Comment", comment):
         frappe.throw("Comment not found")
 
@@ -92,14 +112,20 @@ def get_reactions(comment: str):
     reactions_map = {}
     for r in doc.reactions:
         if r.emoji not in reactions_map:
-            reactions_map[r.emoji] = {"emoji": r.emoji, "users": [], "current_user_reacted": False}
-        
+            reactions_map[r.emoji] = {
+                "emoji": r.emoji,
+                "users": [],
+                "current_user_reacted": False,
+            }
+
         user_info = frappe.get_cached_doc("User", r.user)
-        reactions_map[r.emoji]["users"].append({
-            "user": r.user,
-            "full_name": user_info.full_name or r.user,
-        })
-        
+        reactions_map[r.emoji]["users"].append(
+            {
+                "user": r.user,
+                "full_name": user_info.full_name or r.user,
+            }
+        )
+
         if r.user == current_user:
             reactions_map[r.emoji]["current_user_reacted"] = True
 
@@ -111,16 +137,27 @@ def get_reactions(comment: str):
 
 
 def notify_reaction(doc, emoji, user):
-    """Notify comment author about reaction"""
+    """Notify comment author about reaction with proper message format."""
     try:
-        frappe.get_doc({
-            "doctype": "HD Notification",
-            "message": f"reacted {emoji} to your comment",
-            "notification_type": "Reaction",
-            "reference_comment": doc.name,
-            "reference_ticket": doc.reference_ticket,
-            "user_from": user,
-            "user_to": doc.commented_by,
-        }).insert(ignore_permissions=True)
+        user_info = frappe.get_cached_doc("User", user)
+        username = user_info.full_name or user
+
+        frappe.get_doc(
+            {
+                "doctype": "HD Notification",
+                "message": f"reacted with {emoji} on your comment",
+                "notification_type": "Reaction",
+                "reference_comment": doc.name,
+                "reference_ticket": doc.reference_ticket,
+                "user_from": user,
+                "user_to": doc.commented_by,
+            }
+        ).insert(ignore_permissions=True)
     except Exception:
         pass  # Don't fail if notification fails
+
+
+@frappe.whitelist()
+def get_preset_emojis():
+    """Return the list of preset emojis allowed for reactions."""
+    return PRESET_EMOJIS
