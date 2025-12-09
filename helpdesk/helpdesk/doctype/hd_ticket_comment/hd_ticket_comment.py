@@ -139,9 +139,6 @@ def get_reactions(comment: str):
 def notify_reaction(doc, emoji, user):
     """Notify comment author about reaction with proper message format."""
     try:
-        user_info = frappe.get_cached_doc("User", user)
-        username = user_info.full_name or user
-
         frappe.get_doc(
             {
                 "doctype": "HD Notification",
