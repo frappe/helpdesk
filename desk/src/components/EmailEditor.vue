@@ -174,6 +174,7 @@ import {
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
   getFontFamily,
@@ -239,7 +240,8 @@ const doc = defineModel();
 
 const newEmail = useStorage("emailBoxContent" + doc.value.name, null);
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { isManager, userId } = useAuthStore();
+const { isManager, userId, username } = useAuthStore();
+const { getUser, users } = useUserStore();
 
 const attachments = ref([]);
 const emailEmpty = computed(() => {
@@ -272,26 +274,72 @@ async function sendMailFunction() {
     const bcc = bccEmailsClone.value?.join(", ") || "";
     const emailAccount = fromEmailAccount.value;
 
+    // Get current user's email address from User doctype
+    // Frappe's email.make needs a valid email address, not username
+    let senderEmail = userId.value; // Start with userId
+    let senderFullName = undefined;
+    
+    // Fetch user's email from User doctype
+    try {
+      const userInfo = await call("frappe.client.get", {
+        doctype: "User",
+        name: userId.value,
+      });
+      if (userInfo) {
+        // User.email is the email field, User.name might be username
+        senderEmail = userInfo.email || userInfo.name;
+        senderFullName = userInfo.full_name;
+      }
+    } catch (e) {
+      console.warn("Could not fetch user email:", e);
+      // If userId is already an email, use it
+      if (userId.value.includes("@")) {
+        senderEmail = userId.value;
+      } else {
+        // userId is username, not email - we need to get email
+        // Try to get from users list
+        if (users.data && Array.isArray(users.data)) {
+          const currentUser = users.data.find((u: any) => u.name === userId.value);
+          if (currentUser && currentUser.email) {
+            senderEmail = currentUser.email;
+            senderFullName = currentUser.full_name;
+          }
+        }
+        // If still no email, throw error
+        if (!senderEmail || !senderEmail.includes("@")) {
+          throw new Error(`Invalid sender email: ${senderEmail}. Please ensure your user has a valid email address.`);
+        }
+      }
+    }
+    
+    // Validate sender email before proceeding
+    if (!senderEmail || !senderEmail.includes("@")) {
+      throw new Error(`Invalid sender email: ${senderEmail}. Please ensure your user has a valid email address.`);
+    }
+
     // Step 1: Create communication without sending
     const result = await call("frappe.core.doctype.communication.email.make", {
       recipients: recipients,
       attachments: attachments.value.map((x) => x.name),
-      cc: cc,
-      bcc: bcc,
+      cc: cc || undefined,
+      bcc: bcc || undefined,
       subject: subject,
       content: newEmail.value,
       doctype: props.doctype,
       name: doc.value.name,
-      send_email: 0, // Don't send yet, we need to set email_account first
-      sender: userId.value,
+      send_email: false, // Don't send yet, we need to set email_account first
+      sender: senderEmail,
+      sender_full_name: senderFullName || undefined,
     });
 
     // Step 2: Send the email with the selected email_account (if any)
-    if (result.name) {
+    if (result && result.name) {
       await call("helpdesk.api.settings.email.send_communication_email", {
         communication_name: result.name,
         email_account: emailAccount || undefined,
       });
+    } else {
+      throw new Error("Failed to create communication");
     }
 
     resetState();
@@ -301,7 +349,23 @@ async function sendMailFunction() {
       updateOnboardingStep("reply_on_ticket");
     }
   } catch (error) {
-    toast.error(error.message || "Failed to send email");
+    console.error("Email send error:", error);
+    // Handle different error formats
+    let errorMessage = "Failed to send email";
+    if (error) {
+      if (typeof error === "string") {
+        errorMessage = error;
+      } else if (error.exc) {
+        errorMessage = error.exc;
+      } else if (error.message) {
+        errorMessage = error.message;
+      } else if (error.exc_type) {
+        errorMessage = error.exc_type;
+      } else if (error.messages && Array.isArray(error.messages)) {
+        errorMessage = error.messages[0];
+      }
+    }
+    toast.error(errorMessage);
     throw error;
   }
 }
