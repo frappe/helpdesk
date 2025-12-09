@@ -13,7 +13,7 @@
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
     :extensions="[PreserveVideoControls]"
-    :uploadFunction="(file:any)=>uploadFunction(file, doctype, modelValue?.name)"
+    :uploadFunction="(file:any)=>uploadFunction(file, doctype, doc.value?.name)"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-t py-2.5">
@@ -105,7 +105,7 @@
             <FileUploader
               :upload-args="{
                 doctype: doctype,
-                docname: modelValue?.name,
+                docname: doc.value?.name,
                 private: true,
               }"
               @success="
@@ -174,7 +174,6 @@ import {
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
-import { useUserStore } from "@/stores/user";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
   getFontFamily,
@@ -238,10 +237,9 @@ const label = computed(() => {
 const emit = defineEmits(["submit", "discard"]);
 const doc = defineModel();
 
-const newEmail = useStorage("emailBoxContent" + doc.value.name, null);
+const newEmail = useStorage("emailBoxContent" + (doc.value?.name || "default"), null);
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { isManager, userId, username } = useAuthStore();
-const { getUser, users } = useUserStore();
+const { isManager } = useAuthStore();
 
 const attachments = ref([]);
 const emailEmpty = computed(() => {
@@ -264,141 +262,43 @@ function applyCannedResponse(template) {
   showCannedResponseSelectorModal.value = false;
 }
 
-// Use CRM approach: create Communication first, then send via API
-// This avoids the reply_via_agent method signature issue completely
+// Original method: Use reply_via_agent directly
 async function sendMailFunction() {
   try {
+    // Validate doc exists
+    if (!doc.value || !doc.value.name) {
+      throw new Error("Document information is not available. Please refresh the page and try again.");
+    }
+    
     // Validate inputs
     if (!toEmailsClone.value || !Array.isArray(toEmailsClone.value) || toEmailsClone.value.length === 0) {
       throw new Error("Please add at least one recipient email address.");
     }
     
     const recipients = toEmailsClone.value.join(", ");
-    const subject = doc.value.subject ? `Re: ${doc.value.subject}` : "No Subject";
     const cc = (ccEmailsClone.value && Array.isArray(ccEmailsClone.value)) ? ccEmailsClone.value.join(", ") : "";
     const bcc = (bccEmailsClone.value && Array.isArray(bccEmailsClone.value)) ? bccEmailsClone.value.join(", ") : "";
     const emailAccount = fromEmailAccount.value;
-
-    // Get current user's email address from User doctype
-    // Frappe's email.make needs a valid email address, not username
-    // Use userId, fallback to username, then to frappe.session.user
-    const frappeUser = typeof window !== 'undefined' && (window as any).frappe?.session?.user;
-    let userIdentifier = (userId && userId.value) || (username && username.value) || frappeUser;
-    let senderEmail: string | undefined = undefined;
-    let senderFullName: string | undefined = undefined;
     
-    // Defensive check: ensure we have a user identifier
-    if (!userIdentifier || typeof userIdentifier !== "string") {
-      throw new Error("User ID is not available. Please refresh the page and try again.");
-    }
-    
-    // Fetch user's email from User doctype
-    try {
-      const userInfo = await call("frappe.client.get", {
-        doctype: "User",
-        name: userIdentifier,
-      });
-      if (userInfo && userInfo.email) {
-        senderEmail = userInfo.email;
-        senderFullName = userInfo.full_name || undefined;
-      } else if (userInfo && userInfo.name) {
-        // Fallback to name if email not available
-        senderEmail = userInfo.name;
-        senderFullName = userInfo.full_name || undefined;
-      }
-    } catch (e) {
-      // If userIdentifier is already an email, use it
-      if (userIdentifier.includes("@")) {
-        senderEmail = userIdentifier;
-      } else {
-        // userIdentifier is username, not email - try to get from users list
-        if (users && users.data && Array.isArray(users.data)) {
-          const currentUser = users.data.find((u: any) => u && u.name === userIdentifier);
-          if (currentUser && currentUser.email) {
-            senderEmail = currentUser.email;
-            senderFullName = currentUser.full_name || undefined;
-          }
-        }
-      }
-    }
-    
-    // Final validation: ensure we have a valid sender email
-    if (!senderEmail || typeof senderEmail !== "string" || !senderEmail.includes("@")) {
-      throw new Error("Unable to determine sender email address. Please ensure your user account has a valid email address configured.");
-    }
-
-    // Step 1: Create communication without sending
     // Validate attachments array
     const attachmentNames = (attachments.value && Array.isArray(attachments.value)) 
       ? attachments.value.map((x: any) => x && x.name).filter(Boolean)
       : [];
     
-    let result;
-    try {
-      result = await call("frappe.core.doctype.communication.email.make", {
-        recipients: recipients,
-        attachments: attachmentNames,
+    // Use original reply_via_agent method
+    await call("run_doc_method", {
+      dt: props.doctype,
+      dn: doc.value.name,
+      method: "reply_via_agent",
+      args: {
+        message: newEmail.value || "",
+        to: recipients,
         cc: cc || undefined,
         bcc: bcc || undefined,
-        subject: subject,
-        content: newEmail.value || "",
-        doctype: props.doctype,
-        name: doc.value?.name,
-        send_email: false, // Don't send yet, we need to set email_account first
-        sender: senderEmail,
-        sender_full_name: senderFullName || undefined,
-      });
-    } catch (apiError: any) {
-      // Extract error message from various possible formats
-      let errorMsg = "Failed to create communication";
-      if (apiError) {
-        if (typeof apiError === "string") {
-          errorMsg = apiError;
-        } else if (apiError.message) {
-          errorMsg = apiError.message;
-        } else if (apiError.exc) {
-          errorMsg = typeof apiError.exc === "string" ? apiError.exc : JSON.stringify(apiError.exc);
-        } else if (apiError.exc_type) {
-          errorMsg = apiError.exc_type;
-        } else if (apiError.messages && Array.isArray(apiError.messages) && apiError.messages.length > 0) {
-          errorMsg = apiError.messages[0];
-        } else if (apiError._error_message) {
-          errorMsg = apiError._error_message;
-        }
-      }
-      throw new Error(errorMsg);
-    }
-
-    // Step 2: Send the email with the selected email_account (if any)
-    if (!result || !result.name) {
-      throw new Error("Failed to create communication: No communication name returned");
-    }
-    
-    try {
-      await call("helpdesk.api.settings.email.send_communication_email", {
-        communication_name: result.name,
+        attachments: attachmentNames,
         email_account: emailAccount || undefined,
-      });
-    } catch (sendError: any) {
-      // Extract error message from various possible formats
-      let errorMsg = "Failed to send email";
-      if (sendError) {
-        if (typeof sendError === "string") {
-          errorMsg = sendError;
-        } else if (sendError.message) {
-          errorMsg = sendError.message;
-        } else if (sendError.exc) {
-          errorMsg = typeof sendError.exc === "string" ? sendError.exc : JSON.stringify(sendError.exc);
-        } else if (sendError.exc_type) {
-          errorMsg = sendError.exc_type;
-        } else if (sendError.messages && Array.isArray(sendError.messages) && sendError.messages.length > 0) {
-          errorMsg = sendError.messages[0];
-        } else if (sendError._error_message) {
-          errorMsg = sendError._error_message;
-        }
-      }
-      throw new Error(errorMsg);
-    }
+      },
+    });
 
     resetState();
     emit("submit");
@@ -407,49 +307,26 @@ async function sendMailFunction() {
       updateOnboardingStep("reply_on_ticket");
     }
   } catch (error: any) {
-    // Handle different error formats - be very defensive
+    // Handle error messages
     let errorMessage = "Failed to send email";
     
-    try {
-      if (error) {
-        if (typeof error === "string") {
-          errorMessage = error;
-        } else if (error.message) {
-          errorMessage = error.message;
-        } else if (error.exc) {
-          // exc might be a string or object
-          if (typeof error.exc === "string") {
-            errorMessage = error.exc;
-          } else {
-            try {
-              errorMessage = JSON.stringify(error.exc);
-            } catch {
-              errorMessage = String(error.exc);
-            }
-          }
-        } else if (error.exc_type) {
-          errorMessage = error.exc_type;
-        } else if (error.messages && Array.isArray(error.messages) && error.messages.length > 0) {
-          errorMessage = error.messages[0];
-        } else if (error._error_message) {
-          errorMessage = error._error_message;
-        } else {
-          // Last resort - try to stringify the whole error
-          try {
-            errorMessage = JSON.stringify(error);
-          } catch {
-            errorMessage = String(error) || "Failed to send email";
-          }
-        }
+    if (error) {
+      if (typeof error === "string") {
+        errorMessage = error;
+      } else if (error.message) {
+        errorMessage = error.message;
+      } else if (error.exc) {
+        errorMessage = typeof error.exc === "string" ? error.exc : String(error.exc);
+      } else if (error.exc_type) {
+        errorMessage = error.exc_type;
+      } else if (error.messages && Array.isArray(error.messages) && error.messages.length > 0) {
+        errorMessage = error.messages[0];
+      } else if (error._error_message) {
+        errorMessage = error._error_message;
       }
-    } catch (parseError) {
-      // If even error parsing fails, use a safe fallback
-      errorMessage = "Failed to send email. Please try again or contact support if the issue persists.";
     }
     
     toast.error(errorMessage);
-    // Don't re-throw to prevent further error propagation
-    // The error is already logged and shown to user
   }
 }
 
@@ -536,9 +413,9 @@ function handleDiscard() {
   newEmail.value = null;
   fromEmailAccount.value = null;
 
+  toEmailsClone.value = [];
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
-  ccEmailsClone.value = [];
   showCC.value = false;
   showBCC.value = false;
 
