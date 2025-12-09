@@ -168,6 +168,7 @@ import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
 import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
 import GlobeIcon from "~icons/lucide/globe";
+import { SavedReplyListResourceSymbol } from "../../../types";
 
 const showConfirmDialog = ref({
   show: false,
@@ -177,6 +178,8 @@ const showConfirmDialog = ref({
 });
 
 const savedRepliesActiveScreen = inject<any>("savedRepliesActiveScreen");
+const savedRepliesListResource = inject(SavedReplyListResourceSymbol);
+
 const previewDialog = ref({
   show: false,
   ticketId: "",
@@ -224,14 +227,14 @@ const scopeDropdownOptions = computed(() => [
 const getSavedReplyData = createResource({
   url: "frappe.client.get",
   params: {
-    doctype: "Email Template",
+    doctype: "HD Saved Reply",
     name: savedRepliesActiveScreen.value.data?.name,
   },
   auto: false,
   onSuccess: (data) => {
     savedReplyData.value = {
       name: data.name,
-      title: data.name,
+      title: data.title,
       scope: data.scope,
       response: data.response,
       teams: data.teams?.map((team) => team.team) || [],
@@ -320,91 +323,54 @@ const onSave = () => {
 };
 
 const createSavedReply = () => {
-  createResource({
-    url: "frappe.client.insert",
-    params: {
-      doc: {
-        doctype: "Email Template",
-        name: savedReplyData.value.title,
-        title: savedReplyData.value.title,
-        subject: savedReplyData.value.title,
-        response: savedReplyData.value.response,
-        scope: savedReplyData.value.scope,
-        teams: savedReplyData.value.teams.map((team) => ({
-          team: team,
-        })),
-        reference_doctype: "HD Ticket",
+  savedRepliesListResource?.insert.submit(
+    {
+      title: savedReplyData.value.title,
+      response: savedReplyData.value.response,
+      scope: savedReplyData.value.scope,
+      teams: savedReplyData.value.teams.map((team) => ({
+        team: team,
+      })),
+    },
+    {
+      onSuccess: (data) => {
+        toast.success(__("Saved reply saved"));
+        isLoading.value = false;
+        savedReplyData.value = {
+          ...savedReplyData.value,
+          name: data.name,
+        };
+        initialData.value = JSON.stringify(savedReplyData.value);
+        savedRepliesActiveScreen.value = {
+          screen: "view",
+          data: { name: data.name },
+        };
       },
-    },
-    auto: true,
-    onSuccess: (data) => {
-      toast.success(__("Saved reply saved"));
-      isLoading.value = false;
-      savedReplyData.value = {
-        ...savedReplyData.value,
-        name: data.name,
-      };
-      initialData.value = JSON.stringify(savedReplyData.value);
-      savedRepliesActiveScreen.value = {
-        screen: "view",
-        data: { name: data.name },
-      };
-    },
-  }).promise.catch(() => {
-    isLoading.value = false;
-  });
+    }
+  );
 };
 
 const updateSavedReply = async () => {
-  let renameError = false;
-
-  if (savedReplyData.value.name !== savedReplyData.value.title) {
-    await call("frappe.client.rename_doc", {
-      doctype: "Email Template",
-      old_name: savedReplyData.value.name,
-      new_name: savedReplyData.value.title,
-    })
-      .then(() => {
-        savedReplyData.value = {
-          ...savedReplyData.value,
-          name: savedReplyData.value.title,
-        };
-      })
-      .catch(async (er) => {
-        const error =
-          er?.messages?.[0] ||
-          __("Some error occurred while renaming saved reply");
-        toast.error(error);
-        isLoading.value = false;
-        renameError = true;
-      });
-  }
-  if (renameError) return;
-
-  createResource({
-    url: "frappe.client.set_value",
-    params: {
-      doctype: "Email Template",
+  savedRepliesListResource?.setValue.submit(
+    {
       name: savedReplyData.value.name,
-      fieldname: {
-        name: savedReplyData.value.title,
-        title: savedReplyData.value.title,
-        subject: savedReplyData.value.title,
-        response: savedReplyData.value.response,
-        scope: savedReplyData.value.scope,
-        teams: savedReplyData.value.teams.map((team) => ({
-          team: team,
-        })),
+      title: savedReplyData.value.title,
+      subject: savedReplyData.value.title,
+      response: savedReplyData.value.response,
+      scope: savedReplyData.value.scope,
+      teams: savedReplyData.value.teams.map((team) => ({
+        team: team,
+      })),
+    },
+    {
+      onSuccess: () => {
+        isDirty.value = false;
+        isLoading.value = false;
+        disableSettingModalOutsideClick.value = false;
+        toast.success(__("Saved reply updated"));
       },
-    },
-    auto: true,
-    onSuccess: () => {
-      isDirty.value = false;
-      isLoading.value = false;
-      disableSettingModalOutsideClick.value = false;
-      toast.success(__("Saved reply updated"));
-    },
-  });
+    }
+  );
 };
 
 const getScopeIcon = (scope: string) => {

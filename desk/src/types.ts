@@ -695,6 +695,9 @@ export const SlaPolicyListResourceSymbol: InjectionKey<
 export const TeamListResourceSymbol: InjectionKey<ListResource<Team>> =
   Symbol("teamListResource");
 
+export const SavedReplyListResourceSymbol: InjectionKey<ListResource<Team>> =
+  Symbol("savedReplyListResource");
+
 declare global {
   interface Window {
     is_fc_site: boolean;
