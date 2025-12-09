@@ -191,6 +191,7 @@ import {
   TextEditorFixedMenu,
   createResource,
   toast,
+  call,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, nextTick, ref } from "vue";
@@ -238,7 +239,7 @@ const doc = defineModel();
 
 const newEmail = useStorage("emailBoxContent" + doc.value.name, null);
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { isManager } = useAuthStore();
+const { isManager, userId } = useAuthStore();
 
 const attachments = ref([]);
 const emailEmpty = computed(() => {
@@ -261,39 +262,65 @@ function applyCannedResponse(template) {
   showCannedResponseSelectorModal.value = false;
 }
 
-const sendMail = createResource({
-  url: "run_doc_method",
-  makeParams: () => {
-    const args: any = {
+// Use CRM approach: create Communication first, then send via API
+// This avoids the reply_via_agent method signature issue completely
+async function sendMailFunction() {
+  try {
+    const recipients = toEmailsClone.value.join(", ");
+    const subject = doc.value.subject ? `Re: ${doc.value.subject}` : "No Subject";
+    const cc = ccEmailsClone.value?.join(", ") || "";
+    const bcc = bccEmailsClone.value?.join(", ") || "";
+    const emailAccount = fromEmailAccount.value;
+
+    // Step 1: Create communication without sending
+    const result = await call("frappe.core.doctype.communication.email.make", {
+      recipients: recipients,
       attachments: attachments.value.map((x) => x.name),
-      to: toEmailsClone.value.join(","),
-      cc: ccEmailsClone.value?.join(","),
-      bcc: bccEmailsClone.value?.join(","),
-      message: newEmail.value,
-    };
-    // CRITICAL: Only include email_account if it has a valid non-empty value
-    // This prevents TypeError when production backend doesn't have email_account parameter
-    // Production backend's reply_via_agent() doesn't accept email_account parameter yet
-    if (fromEmailAccount.value && String(fromEmailAccount.value).trim()) {
-      args.email_account = fromEmailAccount.value;
+      cc: cc,
+      bcc: bcc,
+      subject: subject,
+      content: newEmail.value,
+      doctype: props.doctype,
+      name: doc.value.name,
+      send_email: 0, // Don't send yet, we need to set email_account first
+      sender: userId.value,
+    });
+
+    // Step 2: Send the email with the selected email_account (if any)
+    if (result.name) {
+      await call("helpdesk.api.settings.email.send_communication_email", {
+        communication_name: result.name,
+        email_account: emailAccount || undefined,
+      });
     }
-    return {
-      dt: props.doctype,
-      dn: doc.value.name,
-      method: "reply_via_agent",
-      args,
-    };
-  },
-  onSuccess: () => {
+
     resetState();
     emit("submit");
 
     if (isManager) {
       updateOnboardingStep("reply_on_ticket");
     }
+  } catch (error) {
+    toast.error(error.message || "Failed to send email");
+    throw error;
+  }
+}
+
+// Create a resource wrapper for the async function
+const sendMailLoading = ref(false);
+const sendMail = {
+  get loading() {
+    return sendMailLoading.value;
   },
-  debounce: 300,
-});
+  submit: async () => {
+    sendMailLoading.value = true;
+    try {
+      await sendMailFunction();
+    } finally {
+      sendMailLoading.value = false;
+    }
+  },
+};
 
 function submitMail() {
   if (isContentEmpty(newEmail.value)) {
