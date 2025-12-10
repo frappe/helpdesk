@@ -82,45 +82,47 @@
               </div>
             </div>
           </div>
-          <div class="flex flex-col items-stretch gap-2">
+          <div class="flex flex-col items-stretch gap-2.5">
             <Dropdown :options="statusOptionsList(ticket)" placement="bottom-end">
-              <Button
-                variant="outline"
-                theme="gray"
-                size="sm"
-                class="w-[160px] justify-between text-left"
+              <button
+                class="group flex items-center justify-between gap-3 rounded-lg border border-outline-gray-2 bg-surface-white px-3.5 py-2.5 text-left shadow-sm transition-all hover:border-outline-gray-3 hover:shadow focus:outline-none focus:ring-2 focus:ring-gray-200"
               >
-                <span class="flex items-center gap-2 truncate">
+                <div class="flex items-center gap-2.5 overflow-hidden">
                   <span
-                    class="h-2 w-2 rounded-full flex-shrink-0"
+                    class="h-2.5 w-2.5 rounded-full flex-shrink-0"
                     :class="statusDot(ticket)"
                   />
-                  <span class="truncate text-sm">{{ statusLabel(ticket) }}</span>
-                </span>
-                <LucideChevronDown class="h-3.5 w-3.5 text-ink-gray-5 flex-shrink-0" />
-              </Button>
+                  <span class="truncate text-sm font-medium text-ink-gray-9">
+                    {{ statusLabel(ticket) }}
+                  </span>
+                </div>
+                <LucideChevronDown class="h-4 w-4 text-ink-gray-6 flex-shrink-0 transition-transform group-hover:text-ink-gray-8" />
+              </button>
             </Dropdown>
             <Dropdown
               v-if="priorityOptions?.length"
               :options="priorityOptionsList(ticket)"
               placement="bottom-end"
             >
-              <Button variant="outline" theme="gray" size="sm" class="w-[160px] justify-between text-left">
-                <span class="truncate text-sm">
-                  {{ ticket.priority || "No priority" }}
-                </span>
-                <LucideChevronDown class="h-3.5 w-3.5 text-ink-gray-5 flex-shrink-0" />
-              </Button>
+              <button
+                class="group flex items-center justify-between gap-3 rounded-lg border border-outline-gray-2 bg-surface-white px-3.5 py-2.5 text-left shadow-sm transition-all hover:border-outline-gray-3 hover:shadow focus:outline-none focus:ring-2 focus:ring-gray-200"
+              >
+                <div class="flex items-center gap-2.5 overflow-hidden">
+                  <LucideFlag class="h-4 w-4 text-ink-gray-6 flex-shrink-0" />
+                  <span class="truncate text-sm font-medium text-ink-gray-9">
+                    {{ ticket.priority || "No priority" }}
+                  </span>
+                </div>
+                <LucideChevronDown class="h-4 w-4 text-ink-gray-6 flex-shrink-0 transition-transform group-hover:text-ink-gray-8" />
+              </button>
             </Dropdown>
-            <Button
-              variant="ghost"
-              theme="gray"
-              size="sm"
-              class="w-[160px] text-sm text-ink-gray-7 hover:text-ink-gray-9 justify-center"
+            <button
+              class="flex items-center justify-center gap-2 rounded-lg px-3.5 py-2.5 text-sm font-medium text-ink-gray-7 transition-colors hover:bg-surface-gray-1 hover:text-ink-gray-9"
               @click="$emit('rowClick', ticket.name)"
             >
-              View details →
-            </Button>
+              <span>View details</span>
+              <LucideArrowRight class="h-4 w-4" />
+            </button>
           </div>
         </div>
       </div>
@@ -136,8 +138,10 @@ import { Badge, Button, Dropdown, LoadingIndicator } from "frappe-ui";
 import MultipleAvatar from "@/components/MultipleAvatar.vue";
 import { withDefaults } from "vue";
 import LucideAlarmClock from "~icons/lucide/alarm-clock";
+import LucideArrowRight from "~icons/lucide/arrow-right";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import LucideClock3 from "~icons/lucide/clock-3";
+import LucideFlag from "~icons/lucide/flag";
 import LucideUser from "~icons/lucide/user";
 import LucideUsers from "~icons/lucide/users";
 
