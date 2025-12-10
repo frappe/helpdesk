@@ -1,13 +1,17 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col h-full bg-gray-50">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Dashboard</div>
+        <div class="text-lg font-medium text-gray-900">My Dashboard</div>
       </template>
-      <template #right-header> </template>
+      <template #right-header>
+        <span class="text-sm text-blue-600 cursor-pointer hover:underline">
+          Recent activities &gt;
+        </span>
+      </template>
     </LayoutHeader>
 
-    <div class="p-5 w-full overflow-y-scroll">
+    <div class="p-5 w-full overflow-y-auto flex-1">
       <!-- Filters -->
       <div class="mb-4 flex items-center gap-4 overflow-x-auto">
         <Dropdown
@@ -20,13 +24,13 @@
         >
           <template #default>
             <div
-              class="flex justify-between !w-48 items-center border border-outline-gray-2 rounded text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
+              class="flex justify-between !w-48 items-center border border-gray-200 rounded-lg bg-white text-gray-700 px-3 py-2 hover:border-gray-300 hover:shadow-sm transition-colors cursor-pointer"
             >
               <div class="flex items-center">
-                <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
-                <span class="text-base">{{ preset }}</span>
+                <LucideCalendar class="size-4 text-gray-400 mr-2" />
+                <span class="text-sm">{{ preset }}</span>
               </div>
-              <LucideChevronDown class="size-4 text-ink-gray-5" />
+              <LucideChevronDown class="size-4 text-gray-400" />
             </div>
           </template>
         </Dropdown>
@@ -37,16 +41,11 @@
           v-model="filters.period"
           variant="outline"
           placeholder="Period"
-          @update:model-value="
-            (e:string) => {
-              showDatePicker = false;
-              preset = formatter(e);
-            }
-          "
+          @update:model-value="handleDateChange"
           :formatter="formatRange"
         >
           <template #prefix>
-            <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
+            <LucideCalendar class="size-4 text-gray-400 mr-2" />
           </template>
         </DateRangePicker>
         <Link
@@ -59,7 +58,7 @@
           :hide-me="true"
         >
           <template #prefix>
-            <LucideUsers class="size-4 text-ink-gray-5 mr-2" />
+            <LucideUsers class="size-4 text-gray-400 mr-2" />
           </template>
         </Link>
         <Link
@@ -73,61 +72,77 @@
           :hide-me="true"
         >
           <template #prefix>
-            <LucideUser class="size-4 text-ink-gray-5 mr-2" />
+            <LucideUser class="size-4 text-gray-400 mr-2" />
           </template>
         </Link>
       </div>
-      <!-- Charts -->
-      <div v-if="!loading" class="transition-all animate-fade-in duration-300">
-        <!-- Number Cards -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
-          v-if="!numberCards.loading"
-        >
-          <Tooltip
-            v-for="(config, index) in numberCards.data"
-            :text="config.tooltip"
-          >
-            <NumberChart
-              :key="index"
-              class="border rounded-md"
-              :config="config"
-            />
-          </Tooltip>
-        </div>
-        <!-- Trend Charts -->
-        <div
-          class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
-          v-if="!trendData.loading"
-        >
+
+      <!-- Status Cards Row -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
+        <StatusCard
+          v-for="card in statusCards.data || []"
+          :key="card.label"
+          :label="card.label"
+          :count="card.count"
+          :color="card.color"
+          :filters="{ status: card.status_filter }"
+        />
+        <template v-if="statusCards.loading">
           <div
-            class="border rounded-md min-h-80"
-            v-for="(chart, index) in trendData.data"
-            :key="index"
+            v-for="i in 6"
+            :key="i"
+            class="bg-white border border-gray-200 rounded-lg p-4 animate-pulse"
           >
-            <component :is="getChartType(chart)" />
+            <div class="h-4 bg-gray-200 rounded w-20 mb-2"></div>
+            <div class="h-8 bg-gray-200 rounded w-12"></div>
           </div>
-        </div>
-        <!-- Master Data Charts -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
-          v-if="!masterData.loading"
-        >
-          <div
-            class="border rounded-md"
-            v-for="(chart, index) in masterData.data"
-            :key="index"
-          >
-            <component :is="getChartType(chart)" />
-          </div>
+        </template>
+      </div>
+
+      <!-- Today's Trends Section -->
+      <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+        <TrendChartSection
+          v-if="!trendData.loading && trendData.data"
+          :today-data="trendData.data?.today || []"
+          :yesterday-data="trendData.data?.yesterday || []"
+          :summary-metrics="trendData.data?.summary || { received: 0, avgFirstResponse: 0, resolutionRate: 0 }"
+        />
+        <div v-else class="flex items-center justify-center h-64">
+          <Button :loading="true" size="lg" variant="ghost" />
         </div>
       </div>
-      <!-- Loading State -->
-      <div
-        v-else
-        class="flex items-center justify-center h-[240px] gap-2 rounded transition-all animate-fade-in"
-      >
-        <Button :loading="true" size="2xl" variant="ghost" />
+
+      <!-- Bottom Row: Unresolved, Undelivered Emails, Customer Satisfaction -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Unresolved Tickets -->
+        <UnresolvedSection
+          :groups="unresolvedData.data || []"
+        />
+
+        <!-- Undelivered Emails (placeholder) -->
+        <div class="bg-white border border-gray-200 rounded-lg p-4">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="text-base font-medium text-gray-900">Undelivered emails</h3>
+              <p class="text-xs text-gray-500">Across helpdesk</p>
+            </div>
+            <button class="text-sm text-blue-600 hover:text-blue-700">
+              View details
+            </button>
+          </div>
+          <div class="flex flex-col items-center justify-center py-8 text-gray-400">
+            <LucideMail class="w-12 h-12 mb-2 opacity-50" />
+            <span class="text-sm">No undelivered emails</span>
+          </div>
+        </div>
+
+        <!-- Customer Satisfaction -->
+        <CustomerSatisfactionSection
+          :responses-received="satisfactionData.data?.responsesReceived || 0"
+          :positive="satisfactionData.data?.positive || 0"
+          :neutral="satisfactionData.data?.neutral || 0"
+          :negative="satisfactionData.data?.negative || 0"
+        />
       </div>
     </div>
   </div>
@@ -137,74 +152,78 @@
 import { Link } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import {
-  AxisChart,
   DateRangePicker,
-  DonutChart,
   Dropdown,
-  NumberChart,
   createResource,
   dayjs,
   usePageMeta,
 } from "frappe-ui";
-import { computed, h, onMounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
+import LucideCalendar from "~icons/lucide/calendar";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideMail from "~icons/lucide/mail";
+import LucideUser from "~icons/lucide/user";
+import LucideUsers from "~icons/lucide/users";
+
+import {
+  StatusCard,
+  TrendChartSection,
+  UnresolvedSection,
+  CustomerSatisfactionSection,
+} from "./components";
 
 const { isManager, userId } = useAuthStore();
 
 const filters = reactive({
   period: getLastXDays(),
-  agent: null,
-  team: null,
+  agent: null as string | null,
+  team: null as string | null,
 });
 
-const colors = [
-  "#318AD8",
-  "#F683AE",
-  "#48BB74",
-  "#F56B6B",
-  "#FACF7A",
-  "#44427B",
-  "#5FD8C4",
-  "#F8814F",
-  "#15CCEF",
-  "#A6B1B9",
-];
-
-const numberCards = createResource({
-  url: "helpdesk.api.dashboard.get_dashboard_data",
-  cache: ["Analytics", "NumberCards"],
+// Status Cards Resource
+const statusCards = createResource({
+  url: "helpdesk.api.dashboard.get_status_card_data",
+  cache: ["Dashboard", "StatusCards"],
   params: {
-    dashboard_type: "number_card",
-    filters,
+    filters: getApiFilters(),
   },
 });
 
-const masterData = createResource({
-  url: "helpdesk.api.dashboard.get_dashboard_data",
-  cache: ["Analytics", "MasterCharts"],
-  params: {
-    dashboard_type: "master",
-    filters,
-  },
-});
-
+// Today's Trend Data Resource
 const trendData = createResource({
-  url: "helpdesk.api.dashboard.get_dashboard_data",
-  cache: ["Analytics", "TrendCharts"],
+  url: "helpdesk.api.dashboard.get_today_trend_data",
+  cache: ["Dashboard", "TrendData"],
   params: {
-    dashboard_type: "trend",
-    filters,
+    filters: getApiFilters(),
+  },
+});
+
+// Unresolved Grouped Data Resource
+const unresolvedData = createResource({
+  url: "helpdesk.api.dashboard.get_unresolved_grouped_data",
+  cache: ["Dashboard", "UnresolvedData"],
+  params: {
+    filters: getApiFilters(),
+  },
+});
+
+// Satisfaction Data Resource
+const satisfactionData = createResource({
+  url: "helpdesk.api.dashboard.get_satisfaction_data",
+  cache: ["Dashboard", "SatisfactionData"],
+  params: {
+    filters: getApiFilters(),
   },
 });
 
 const agentFilter = ref(null);
 const teamMembers = createResource({
   url: "helpdesk.helpdesk.doctype.hd_team.hd_team.get_team_members",
-  cache: ["Analytics", "TeamMembers"],
+  cache: ["Dashboard", "TeamMembers"],
   params: {
     team: filters.team,
   },
-  onSuccess: (data) => {
-    // Set Agent Filters
+  onSuccess: (data: string[]) => {
     agentFilter.value = { name: ["in", data] };
   },
 });
@@ -212,47 +231,47 @@ const teamMembers = createResource({
 watch(
   () => filters.team,
   (newVal) => {
-    filters.agent = null; // Reset agent when team is selected
+    filters.agent = null;
     if (newVal) {
-      teamMembers.update({
-        params: {
-          team: newVal,
-        },
-      });
+      teamMembers.update({ params: { team: newVal } });
       teamMembers.reload();
     }
     if (!newVal) {
-      agentFilter.value = null; // Reset agent filter if no team is selected
+      agentFilter.value = null;
     }
   }
 );
 
-const loading = computed(() => {
-  return numberCards.loading || masterData.loading || trendData.loading;
-});
+function getApiFilters() {
+  return {
+    from_date: filters.period?.split(",")[0] || null,
+    to_date: filters.period?.split(",")[1] || null,
+    agent: filters.agent || null,
+    team: filters.team || null,
+  };
+}
 
-function getChartType(chart: any) {
-  chart.colors = colors;
-  if (chart["type"] === "axis") {
-    return h(AxisChart, {
-      config: chart,
-    });
-  }
-  if (chart["type"] === "pie") {
-    return h(DonutChart, {
-      config: chart,
-    });
-  }
+function reloadAllResources() {
+  const apiFilters = getApiFilters();
+
+  statusCards.update({ params: { filters: apiFilters } });
+  statusCards.reload();
+
+  trendData.update({ params: { filters: apiFilters } });
+  trendData.reload();
+
+  unresolvedData.update({ params: { filters: apiFilters } });
+  unresolvedData.reload();
+
+  satisfactionData.update({ params: { filters: apiFilters } });
+  satisfactionData.reload();
 }
 
 function getLastXDays(range: number = 30): string {
   const today = new Date();
   const lastXDate = new Date(today);
   lastXDate.setDate(today.getDate() - range);
-
-  return `${dayjs(lastXDate).format("YYYY-MM-DD")},${dayjs(today).format(
-    "YYYY-MM-DD"
-  )}`;
+  return `${dayjs(lastXDate).format("YYYY-MM-DD")},${dayjs(today).format("YYYY-MM-DD")}`;
 }
 
 const showDatePicker = ref(false);
@@ -264,55 +283,33 @@ const options = computed(() => [
     group: "Presets",
     hideLabel: true,
     items: [
-      {
-        label: "Today",
-        onClick: () => {
-          preset.value = "Today";
-          filters.period = getLastXDays(0);
-        },
-      },
-      {
-        label: "Last 7 Days",
-        onClick: () => {
-          preset.value = "Last 7 Days";
-          filters.period = getLastXDays(7);
-        },
-      },
-      {
-        label: "Last 30 Days",
-        onClick: () => {
-          preset.value = "Last 30 Days";
-          filters.period = getLastXDays(30);
-        },
-      },
-      {
-        label: "Last 60 Days",
-        onClick: () => {
-          preset.value = "Last 60 Days";
-          filters.period = getLastXDays(60);
-        },
-      },
-      {
-        label: "Last 90 Days",
-        onClick: () => {
-          preset.value = "Last 90 Days";
-          filters.period = getLastXDays(90);
-        },
-      },
+      { label: "Today", onClick: () => setPreset("Today", 0) },
+      { label: "Last 7 Days", onClick: () => setPreset("Last 7 Days", 7) },
+      { label: "Last 30 Days", onClick: () => setPreset("Last 30 Days", 30) },
+      { label: "Last 60 Days", onClick: () => setPreset("Last 60 Days", 60) },
+      { label: "Last 90 Days", onClick: () => setPreset("Last 90 Days", 90) },
     ],
   },
   {
     label: "Custom Range",
     onClick: () => {
       showDatePicker.value = true;
-      setTimeout(() => {
-        datePickerRef.value?.open();
-      }, 0);
+      setTimeout(() => datePickerRef.value?.open(), 0);
       preset.value = "Custom Range";
-      filters.period = null; // Reset period to allow custom date selection
+      filters.period = null;
     },
   },
 ]);
+
+function setPreset(label: string, days: number) {
+  preset.value = label;
+  filters.period = getLastXDays(days);
+}
+
+function handleDateChange(e: string) {
+  showDatePicker.value = false;
+  preset.value = formatter(e);
+}
 
 function formatter(range: string) {
   if (!range) {
@@ -320,7 +317,7 @@ function formatter(range: string) {
     preset.value = "Last 30 Days";
     return preset.value;
   }
-  let [from, to] = range.split(",");
+  const [from, to] = range.split(",");
   return `${formatRange(from)} to ${formatRange(to)}`;
 }
 
@@ -329,82 +326,40 @@ function formatRange(date: string) {
   return dateObj.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
-    year:
-      dateObj.getFullYear() === new Date().getFullYear()
-        ? undefined
-        : "numeric",
+    year: dateObj.getFullYear() === new Date().getFullYear() ? undefined : "numeric",
   });
 }
 
 watch(
   () => filters,
-  (newVal) => {
-    if (showDatePicker.value) {
-      return;
+  () => {
+    if (!showDatePicker.value) {
+      reloadAllResources();
     }
-    const filters = {
-      from_date: newVal.period?.split(",")[0] || null,
-      to_date: newVal.period?.split(",")[1] || null,
-      agent: newVal.agent || null,
-      team: newVal.team || null,
-    };
-
-    numberCards.update({
-      params: {
-        dashboard_type: "number_card",
-        filters: filters,
-      },
-    });
-    numberCards.reload();
-
-    masterData.update({
-      params: {
-        dashboard_type: "master",
-        filters: filters,
-      },
-    });
-    masterData.reload();
-
-    trendData.update({
-      params: {
-        dashboard_type: "trend",
-        filters: filters,
-      },
-    });
-    trendData.reload();
   },
   { deep: true }
 );
 
 onMounted(() => {
   if (!isManager) {
-    // when filters are updated, resources are reloaded coz of the watcher
     filters.agent = userId;
     return;
   }
-  // If not managers call the resources
-  numberCards.reload();
-  masterData.reload();
-  trendData.reload();
+  reloadAllResources();
 });
 
-usePageMeta(() => {
-  return {
-    title: "Dashboard",
-  };
-});
+usePageMeta(() => ({ title: "Dashboard" }));
 </script>
 
 <style scoped>
 :deep(.form-control button) {
-  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
+  @apply text-sm rounded-lg py-2 border border-gray-200 bg-white placeholder-gray-400 hover:border-gray-300 hover:shadow-sm focus:bg-white focus:border-gray-400 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-gray-700 transition-colors w-full;
 }
 :deep(.form-control button > div) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 :deep(.form-control div) {
   width: 100%;
   display: flex;
