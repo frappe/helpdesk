@@ -159,6 +159,13 @@
       :currentStep="currentStep"
     />
     <CP v-model="showCommandPalette" />
+    <span
+      v-if="appVersion"
+      class="text-sm text-gray-600 cursor-pointer"
+      @click="goToRelease"
+    >
+      v{{ appVersion }}
+    </span>
   </div>
 </template>
 
@@ -186,7 +193,7 @@ import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
-import { call } from "frappe-ui";
+import { call, createResource } from "frappe-ui";
 import {
   GettingStartedBanner,
   HelpModal,
@@ -242,6 +249,23 @@ const showCommandPalette = ref(false);
 const { pinnedViews, publicViews } = useView();
 
 const isFCSite = ref(window.is_fc_site);
+
+const appVersion = ref("");
+createResource({
+  url: "helpdesk.api.get_app_version",
+  auto: true,
+  onSuccess: (data) => {
+    appVersion.value = data;
+  },
+});
+
+const goToRelease = () => {
+  if (!appVersion.value) return;
+  window.open(
+    `https://github.com/frappe/helpdesk/releases/tag/v${appVersion.value}`,
+    "_blank"
+  );
+};
 
 const allViews = computed(() => {
   let items = isCustomerPortal.value
