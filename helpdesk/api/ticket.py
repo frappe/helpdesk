@@ -7,7 +7,7 @@ from frappe import _
 
 @frappe.whitelist()
 def reply_via_agent(
-	ticket_name: str,
+	ticket_name: int,
 	message: str,
 	to: str = None,
 	cc: str = None,
