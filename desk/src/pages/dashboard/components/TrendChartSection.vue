@@ -11,7 +11,7 @@
           </div>
         </div>
         <!-- Legend -->
-        <div class="flex items-center gap-6 mt-4 text-sm">
+        <div class="flex items-center gap-6 mt-6 pt-2 mb-4 text-sm">
           <div class="flex items-center gap-2">
             <span class="w-4 h-0.5 bg-[#318AD8] rounded"></span>
             <span class="text-gray-600">Today</span>
