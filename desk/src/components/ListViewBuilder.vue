@@ -632,10 +632,17 @@ function handleViewChanges() {
     reload(true);
     return;
   }
+  // Start with view filters
   defaultParams.filters = currentView.filters;
   defaultParams.order_by = currentView.order_by || "modified desc";
   defaultParams.columns = currentView.columns;
   defaultParams.rows = currentView.rows;
+
+  // Merge query filters (from dashboard, etc.) with view filters
+  const queryFilters = applyQueryFilters();
+  if (Object.keys(queryFilters).length > 0) {
+    defaultParams.filters = { ...defaultParams.filters, ...queryFilters };
+  }
 
   list.submit({ ...defaultParams });
 }
@@ -682,37 +689,53 @@ function handleScrollPosition() {
 // Handle filter query params (status, etc.)
 function applyQueryFilters() {
   const queryFilters: Record<string, any> = {};
-  const statusParam = route.query.status as string;
   
-  if (!statusParam) return;
-  
-  // Handle special filter cases
-  if (statusParam === "today") {
-    // Today's tickets - filter by creation date
-    const today = new Date().toISOString().split("T")[0];
-    queryFilters["creation"] = [">=", today];
-  } else if (statusParam === "pending") {
-    // Pending tickets - filter by status containing "pending"
-    queryFilters["status"] = ["like", "%pending%"];
-  } else if (statusParam === "Closed") {
-    // Closed tickets - filter by Closed or Resolved status
-    queryFilters["status"] = ["in", ["Closed", "Resolved"]];
-  } else {
-    // Direct status filter (Open, etc.)
-    queryFilters["status"] = statusParam;
+  // Check if filters are passed as a JSON string (from dashboard)
+  if (route.query.filters) {
+    try {
+      const parsed = JSON.parse(route.query.filters as string);
+      Object.assign(queryFilters, parsed);
+      
+      // Handle special cases
+      if (parsed.today) {
+        delete queryFilters.today;
+        const today = new Date().toISOString().split("T")[0];
+        queryFilters["creation"] = [">=", today];
+      }
+      
+      return queryFilters;
+    } catch (e) {
+      console.error("Failed to parse filters from query:", e);
+    }
   }
   
-  // Apply filters if any query params exist
+  // Fallback: Handle individual query params
+  for (const [key, value] of Object.entries(route.query)) {
+    if (!value || key === 'view') continue;
+    
+    if (key === 'status') {
+      queryFilters[key] = value;
+    } else if (key === 'today' && value === 'true') {
+      const today = new Date().toISOString().split("T")[0];
+      queryFilters["creation"] = [">=", today];
+    }
+  }
+  
+  return queryFilters;
+}
+
+function mergeQueryFiltersWithDefaultParams() {
+  const queryFilters = applyQueryFilters();
   if (Object.keys(queryFilters).length > 0) {
     defaultParams.filters = { ...defaultParams.filters, ...queryFilters };
   }
 }
 
-// Watch for query param changes
+// Watch for query param changes (filters, status, etc.)
 watch(
-  () => route.query.status,
+  () => [route.query.filters, route.query.status],
   () => {
-    applyQueryFilters();
+    mergeQueryFiltersWithDefaultParams();
     list.submit({ ...defaultParams });
   }
 );
@@ -720,20 +743,11 @@ watch(
 onMounted(async () => {
   handleScrollPosition();
 
-  // Apply query filters first
-  applyQueryFilters();
-
   if (views.data?.length > 0 && views.filters?.dt === options.value.doctype) {
     handleViewChanges();
   } else {
     await views.list.promise;
     handleViewChanges();
-  }
-  
-  // Re-apply query filters after view changes
-  applyQueryFilters();
-  if (Object.keys(route.query).length > 0 && route.query.status) {
-    list.submit({ ...defaultParams });
   }
   
   if (route.query.view || defaultView.value) {

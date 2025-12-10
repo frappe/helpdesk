@@ -85,7 +85,7 @@
           :label="card.label"
           :count="card.count"
           :color="card.color"
-          :filters="{ status: card.status_filter }"
+          :filters="card.status_filter"
         />
         <template v-if="statusCards.loading">
           <div

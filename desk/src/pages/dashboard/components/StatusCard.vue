@@ -37,9 +37,16 @@ const displayColor = computed(() => {
 
 function handleClick() {
   if (props.route) {
+    // Convert filter object to JSON string for query params
+    const queryParams: Record<string, string> = {};
+    if (Object.keys(props.filters).length > 0) {
+      // Pass filters as JSON string to preserve complex filter structures
+      queryParams.filters = JSON.stringify(props.filters);
+    }
+    
     router.push({
       name: props.route,
-      query: props.filters,
+      query: queryParams,
     });
   }
 }

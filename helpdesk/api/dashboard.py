@@ -700,11 +700,15 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     todays_tickets_cond = Function("DATE", ticket.creation) == today
     todays_tickets = get_count(todays_tickets_cond)
 
+    # Format filters to match the query logic
+    resolved_filter = {"status": ["in", resolved_statuses]} if resolved_statuses else {"status": "Closed"}
+    pending_filter = {"status": ["in", pending_statuses]} if pending_statuses else {}
+    
     return [
-        {"label": _("Open"), "count": open_count, "status_filter": "Open", "color": "#318AD8"},
-        {"label": _("Closed"), "count": closed_count, "status_filter": "Closed", "color": "#48BB78"},
-        {"label": _("Pending"), "count": pending_count, "status_filter": "pending", "color": "#F6AD55"},
-        {"label": _("Today's Tickets"), "count": todays_tickets, "status_filter": "today", "color": "#9F7AEA"},
+        {"label": _("Open"), "count": open_count, "status_filter": {"status": "Open"}, "color": "#318AD8"},
+        {"label": _("Closed"), "count": closed_count, "status_filter": resolved_filter, "color": "#48BB78"},
+        {"label": _("Pending"), "count": pending_count, "status_filter": pending_filter, "color": "#F6AD55"},
+        {"label": _("Today's Tickets"), "count": todays_tickets, "status_filter": {"today": True}, "color": "#9F7AEA"},
     ]
 
 
