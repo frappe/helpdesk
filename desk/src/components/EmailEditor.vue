@@ -194,7 +194,7 @@ import {
   call,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, nextTick, ref } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
@@ -256,6 +256,28 @@ const cc = computed(() => (ccEmailsClone.value?.length ? true : false));
 const bcc = computed(() => (bccEmailsClone.value?.length ? true : false));
 const ccInput = ref(null);
 const bccInput = ref(null);
+
+// Fetch email accounts and set default to support@zipcushions.com
+const emailAccounts = createResource({
+  url: 'helpdesk.api.settings.email.get_outgoing_email_accounts',
+  auto: true,
+});
+
+// Watch for accounts and set default
+watch(
+  () => emailAccounts.data,
+  (accounts: any) => {
+    if (accounts && accounts.length > 0 && !fromEmailAccount.value) {
+      const supportAccount = accounts.find(
+        (acc: any) => acc.email_id === 'support@zipcushions.com'
+      );
+      if (supportAccount) {
+        fromEmailAccount.value = supportAccount.value;
+      }
+    }
+  },
+  { immediate: true }
+);
 
 function applyCannedResponse(template) {
   newEmail.value = template.message;
