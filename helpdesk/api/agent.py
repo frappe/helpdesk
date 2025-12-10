@@ -27,3 +27,6 @@ def sent_invites(emails, send_welcome_mail_to_user=True):
             }
         ).insert()
     return
+
+
+
