@@ -679,8 +679,49 @@ function handleScrollPosition() {
   }, 200);
 }
 
+// Handle filter query params (status, etc.)
+function applyQueryFilters() {
+  const queryFilters: Record<string, any> = {};
+  const statusParam = route.query.status as string;
+  
+  if (!statusParam) return;
+  
+  // Handle special filter cases
+  if (statusParam === "today") {
+    // Today's tickets - filter by creation date
+    const today = new Date().toISOString().split("T")[0];
+    queryFilters["creation"] = [">=", today];
+  } else if (statusParam === "pending") {
+    // Pending tickets - filter by status containing "pending"
+    queryFilters["status"] = ["like", "%pending%"];
+  } else if (statusParam === "Closed") {
+    // Closed tickets - filter by Closed or Resolved status
+    queryFilters["status"] = ["in", ["Closed", "Resolved"]];
+  } else {
+    // Direct status filter (Open, etc.)
+    queryFilters["status"] = statusParam;
+  }
+  
+  // Apply filters if any query params exist
+  if (Object.keys(queryFilters).length > 0) {
+    defaultParams.filters = { ...defaultParams.filters, ...queryFilters };
+  }
+}
+
+// Watch for query param changes
+watch(
+  () => route.query.status,
+  () => {
+    applyQueryFilters();
+    list.submit({ ...defaultParams });
+  }
+);
+
 onMounted(async () => {
   handleScrollPosition();
+
+  // Apply query filters first
+  applyQueryFilters();
 
   if (views.data?.length > 0 && views.filters?.dt === options.value.doctype) {
     handleViewChanges();
@@ -688,6 +729,13 @@ onMounted(async () => {
     await views.list.promise;
     handleViewChanges();
   }
+  
+  // Re-apply query filters after view changes
+  applyQueryFilters();
+  if (Object.keys(route.query).length > 0 && route.query.status) {
+    list.submit({ ...defaultParams });
+  }
+  
   if (route.query.view || defaultView.value) {
     if (route.query.view) {
       const currentView = findCurrentView();
