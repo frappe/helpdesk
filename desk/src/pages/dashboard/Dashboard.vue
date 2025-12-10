@@ -78,7 +78,7 @@
       </div>
 
       <!-- Status Cards Row -->
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         <StatusCard
           v-for="card in statusCards.data || []"
           :key="card.label"
@@ -89,7 +89,7 @@
         />
         <template v-if="statusCards.loading">
           <div
-            v-for="i in 6"
+            v-for="i in 4"
             :key="i"
             class="bg-white border border-gray-200 rounded-lg p-4 animate-pulse"
           >
