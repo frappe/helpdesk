@@ -315,6 +315,7 @@ const exposeFunctions = {
   list,
   reload,
   unselectAll: () => {},
+  handlePageLength,
 };
 
 function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {

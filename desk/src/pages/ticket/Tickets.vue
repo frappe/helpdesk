@@ -11,6 +11,39 @@
         />
       </template>
       <template #right-header>
+      <div class="flex items-center gap-2">
+        <div
+          class="flex items-center gap-1 rounded-lg border border-outline-gray-2 bg-surface-white p-1"
+        >
+          <Button
+            variant="ghost"
+            theme="gray"
+            class="h-9 w-9"
+            :class="
+              isTableView
+                ? 'bg-surface-gray-2 border border-outline-gray-3'
+                : ''
+            "
+            :aria-pressed="isTableView"
+            @click="viewMode = 'table'"
+          >
+            <LucideLayoutList class="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            theme="gray"
+            class="h-9 w-9"
+            :class="
+              !isTableView
+                ? 'bg-surface-gray-2 border border-outline-gray-3'
+                : ''
+            "
+            :aria-pressed="!isTableView"
+            @click="viewMode = 'card'"
+          >
+            <LucideLayoutGrid class="h-4 w-4" />
+          </Button>
+        </div>
         <RouterLink
           :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
         >
@@ -20,8 +53,10 @@
             </template>
           </Button>
         </RouterLink>
+      </div>
       </template>
     </LayoutHeader>
+  <div v-show="isTableView">
     <ListViewBuilder
       ref="listViewRef"
       :options="options"
@@ -39,6 +74,115 @@
           })
       "
     />
+  </div>
+  <div v-if="!isTableView" class="flex gap-4 px-5 pb-6 pt-3">
+    <div class="flex-1">
+      <TicketCardView
+        :rows="cardRows"
+        :loading="listLoading"
+        :status-options="statusOptionList"
+        :priority-options="priorityOptionList"
+        @rowClick="
+          (rowId) =>
+            $router.push({
+              name: isCustomerPortal ? 'TicketCustomer' : 'TicketAgent',
+              params: { ticketId: typeof rowId === 'string' ? rowId : rowId?.name },
+            })
+        "
+        @updateStatus="(ticketId, value) => handleCardStatus(ticketId, value)"
+        @updatePriority="(ticketId, value) => handleCardPriority(ticketId, value)"
+      />
+      <div v-if="ticketRows.length > 0" class="mt-2">
+        <Button
+          variant="outline"
+          theme="gray"
+          class="w-full sm:w-auto"
+          :loading="listLoading"
+          @click="handleCardLoadMore"
+        >
+          Load more
+        </Button>
+      </div>
+    </div>
+    <div
+      class="hidden lg:flex w-80 shrink-0 flex-col gap-5 rounded-lg border border-outline-gray-2 bg-surface-white p-5 shadow-sm h-fit sticky top-4"
+    >
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-lg font-semibold text-ink-gray-9">
+          <LucideFilter class="h-5 w-5" />
+          <span>Filters</span>
+        </div>
+        <Button size="sm" variant="ghost" theme="gray" @click="resetCardFilters">
+          Reset
+        </Button>
+      </div>
+      <div class="space-y-5 border-t border-outline-gray-2 pt-5">
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide">
+            Status
+          </label>
+          <MultiSelectCombobox
+            v-model="cardFilters.status"
+            :options="statusFilterOptions"
+            placeholder="All Status"
+            @update:modelValue="applyCardFilters"
+            :multiple="true"
+            :button-classes="'!h-9 !bg-surface-white border border-outline-gray-2 hover:!bg-surface-gray-1'"
+          >
+            <template #item-prefix="{ option, selected }">
+              <span
+                v-if="option.value"
+                class="h-2 w-2 rounded-full mr-2"
+                :class="option.indicatorClass"
+              />
+            </template>
+          </MultiSelectCombobox>
+        </div>
+        
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide">
+            Priority
+          </label>
+          <MultiSelectCombobox
+            v-model="cardFilters.priority"
+            :options="priorityFilterOptions"
+            placeholder="Any Priority"
+            @update:modelValue="applyCardFilters"
+            :multiple="true"
+            :button-classes="'!h-9 !bg-surface-white border border-outline-gray-2 hover:!bg-surface-gray-1'"
+          />
+        </div>
+        
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide">
+            Department
+          </label>
+          <MultiSelectCombobox
+            v-model="cardFilters.department"
+            :options="departmentFilterOptions"
+            placeholder="Any Department"
+            @update:modelValue="applyCardFilters"
+            :multiple="true"
+            :button-classes="'!h-9 !bg-surface-white border border-outline-gray-2 hover:!bg-surface-gray-1'"
+          />
+        </div>
+        
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide">
+            Agent
+          </label>
+          <MultiSelectCombobox
+            v-model="cardFilters.agent"
+            :options="agentFilterOptions"
+            placeholder="Any Agent"
+            @update:modelValue="applyCardFilters"
+            :multiple="true"
+            :button-classes="'!h-9 !bg-surface-white border border-outline-gray-2 hover:!bg-surface-gray-1'"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
     <ExportModal
       v-model="showExportModal"
       :rowCount="$refs.listViewRef?.list?.data?.total_count ?? 0"
@@ -69,6 +213,8 @@ import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
 import { dayjs } from "@/dayjs";
+import TicketCardView from "@/components/ticket/TicketCardView.vue";
+import MultiSelectCombobox from "@/components/frappe-ui/MultiSelectCombobox.vue";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
@@ -76,8 +222,14 @@ import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
 import { Badge, FeatherIcon, toast, Tooltip, usePageMeta, Dropdown, call, createResource } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
+import { useStorage } from "@vueuse/core";
 import { useRoute, useRouter } from "vue-router";
 import LucidePencil from "~icons/lucide/pencil";
+import LucideLayoutList from "~icons/lucide/layout-list";
+import LucideLayoutGrid from "~icons/lucide/layout-grid";
+import LucideFilter from "~icons/lucide/filter";
+import LucideAlignJustify from "~icons/lucide/align-justify";
+import LucidePlus from "~icons/lucide/plus";
 
 const router = useRouter();
 const route = useRoute();
@@ -95,7 +247,21 @@ const {
 const { $dialog, $socket } = globalStore();
 const { isManager } = useAuthStore();
 
-const listViewRef = ref(null);
+const listViewRef = ref<any>(null);
+const viewMode = useStorage<"table" | "card">("tickets_view_mode", "table");
+const isTableView = computed(() => viewMode.value === "table");
+const ticketRows = computed(() => listViewRef.value?.list?.data?.data || []);
+const cardRows = computed(() => {
+  const rows = ticketRows.value || [];
+  return [...rows].sort((a, b) => statusRank(a) - statusRank(b));
+});
+const listLoading = computed(() => listViewRef.value?.list?.loading);
+const cardFilters = reactive({
+  status: [] as string[],
+  priority: [] as string[],
+  department: [] as string[],
+  agent: [] as string[],
+});
 const showExportModal = ref(false);
 
 const { getStatus, statuses } = useTicketStatusStore();
@@ -260,6 +426,71 @@ const options = {
   hideColumnSetting: false,
 };
 
+const statusOptionList = computed(() =>
+  (statuses.data || []).map((s) => ({
+    label: isCustomerPortal.value ? s.label_customer : s.label_agent,
+    value: s.label_agent,
+    indicatorClass: s.parsed_color,
+    category: s.category,
+  }))
+);
+
+const priorityOptionList = computed(() =>
+  (priorities.data || []).map((p) => p.name)
+);
+
+const departmentOptions = createResource({
+  url: "frappe.client.get_list",
+  params: {
+    doctype: "Department",
+    fields: ["name", "department_name"],
+    limit: 100,
+  },
+  auto: true,
+});
+
+const agentOptions = createResource({
+  url: "frappe.client.get_list",
+  params: {
+    doctype: "HD Agent",
+    fields: ["name", "agent_name"],
+    limit: 100,
+  },
+  auto: true,
+});
+
+// Filter dropdown options
+const statusFilterOptions = computed(() => {
+  const options = (statuses.data || []).map((s) => ({
+    label: isCustomerPortal.value ? s.label_customer : s.label_agent,
+    value: s.label_agent,
+    indicatorClass: s.parsed_color,
+    category: s.category,
+  }));
+  return options;
+});
+
+const priorityFilterOptions = computed(() =>
+  (priorities.data || []).map((p) => ({
+    label: p.name,
+    value: p.name,
+  }))
+);
+
+const departmentFilterOptions = computed(() =>
+  (departmentOptions.data || []).map((d) => ({
+    label: d.department_name || d.name,
+    value: d.name,
+  }))
+);
+
+const agentFilterOptions = computed(() =>
+  (agentOptions.data || []).map((a) => ({
+    label: a.agent_name || a.name,
+    value: a.name,
+  }))
+);
+
 function handle_response_by_field(row: any, item: string) {
   if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
     return h(Badge, {
@@ -353,6 +584,81 @@ function reset(reload = false) {
   listViewRef.value?.unselectAll();
   listSelections.value?.clear();
   if (reload) listViewRef.value.reload();
+}
+
+const pageLengthCount = computed(
+  () =>
+    listViewRef.value?.list?.params?.page_length_count ||
+    options.default_page_length ||
+    20
+);
+
+function handleCardLoadMore() {
+  const count = pageLengthCount.value;
+  listViewRef.value?.handlePageLength?.(count, true);
+}
+
+function statusRank(row: any) {
+  const meta = getStatus(row?.status) || {};
+  const category = meta.category || "";
+  if (category === "Resolved") return 3;
+  if (category === "Paused") return 1;
+  return 0;
+}
+
+function handleCardStatus(ticketId: string, value: string) {
+  updateTicketField(ticketId, "status", value);
+}
+
+function handleCardPriority(ticketId: string, value: string) {
+  updateTicketField(ticketId, "priority", value);
+}
+
+function applyCardFilters() {
+  if (!listViewRef.value?.list) return;
+  const list = listViewRef.value.list;
+  const filters = { ...(list.params?.filters || {}) };
+
+  if (cardFilters.status.length) {
+    filters["status"] = ["in", cardFilters.status];
+  } else {
+    delete filters["status"];
+  }
+
+  if (cardFilters.priority.length) {
+    filters["priority"] = ["in", cardFilters.priority];
+  } else {
+    delete filters["priority"];
+  }
+
+  if (cardFilters.department.length) {
+    filters["department"] = ["in", cardFilters.department];
+  } else {
+    delete filters["department"];
+  }
+
+  if (cardFilters.agent.length) {
+    filters["assigned_to"] = ["in", cardFilters.agent];
+  } else {
+    delete filters["assigned_to"];
+  }
+
+  list.submit({
+    ...list.params,
+    filters,
+  });
+}
+
+function resetCardFilters() {
+  cardFilters.status = [];
+  cardFilters.priority = [];
+  cardFilters.department = [];
+  cardFilters.agent = [];
+  applyCardFilters();
+}
+
+function toggleValue(arr: string[], value: string) {
+  return arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
 }
 
 const slaStatusColorMap = {
