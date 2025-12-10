@@ -86,6 +86,8 @@
           :count="card.count"
           :color="card.color"
           :filters="card.status_filter"
+          :team="filters.team"
+          :agent="filters.agent"
         />
         <template v-if="statusCards.loading">
           <div
@@ -174,8 +176,14 @@ import {
 
 const { isManager, userId } = useAuthStore();
 
+function getThisYear(): string {
+  const today = new Date();
+  const startOfYear = new Date(today.getFullYear(), 0, 1);
+  return `${dayjs(startOfYear).format("YYYY-MM-DD")},${dayjs(today).format("YYYY-MM-DD")}`;
+}
+
 const filters = reactive({
-  period: getLastXDays(),
+  period: getThisYear(),
   agent: null as string | null,
   team: null as string | null,
 });
@@ -276,7 +284,7 @@ function getLastXDays(range: number = 30): string {
 
 const showDatePicker = ref(false);
 const datePickerRef = ref(null);
-const preset = ref("Last 30 Days");
+const preset = ref("This Year");
 
 const options = computed(() => [
   {
@@ -288,6 +296,8 @@ const options = computed(() => [
       { label: "Last 30 Days", onClick: () => setPreset("Last 30 Days", 30) },
       { label: "Last 60 Days", onClick: () => setPreset("Last 60 Days", 60) },
       { label: "Last 90 Days", onClick: () => setPreset("Last 90 Days", 90) },
+      { label: "This Year", onClick: () => setPresetYear("This Year") },
+      { label: "Last Year", onClick: () => setPresetYear("Last Year") },
     ],
   },
   {
@@ -306,6 +316,18 @@ function setPreset(label: string, days: number) {
   filters.period = getLastXDays(days);
 }
 
+function setPresetYear(label: string) {
+  preset.value = label;
+  if (label === "This Year") {
+    filters.period = getThisYear();
+  } else if (label === "Last Year") {
+    const today = new Date();
+    const startOfLastYear = new Date(today.getFullYear() - 1, 0, 1);
+    const endOfLastYear = new Date(today.getFullYear() - 1, 11, 31);
+    filters.period = `${dayjs(startOfLastYear).format("YYYY-MM-DD")},${dayjs(endOfLastYear).format("YYYY-MM-DD")}`;
+  }
+}
+
 function handleDateChange(e: string) {
   showDatePicker.value = false;
   preset.value = formatter(e);
@@ -313,8 +335,8 @@ function handleDateChange(e: string) {
 
 function formatter(range: string) {
   if (!range) {
-    filters.period = getLastXDays();
-    preset.value = "Last 30 Days";
+    filters.period = getThisYear();
+    preset.value = "This Year";
     return preset.value;
   }
   const [from, to] = range.split(",");

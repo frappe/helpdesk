@@ -20,12 +20,16 @@ interface Props {
   color?: string;
   route?: string;
   filters?: Record<string, any>;
+  team?: string | null;
+  agent?: string | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   color: "#318AD8",
   route: "TicketsAgent",
   filters: () => ({}),
+  team: null,
+  agent: null,
 });
 
 const router = useRouter();
@@ -37,11 +41,24 @@ const displayColor = computed(() => {
 
 function handleClick() {
   if (props.route) {
+    // Merge status filters with team/agent filters
+    const combinedFilters: Record<string, any> = { ...props.filters };
+    
+    // Add team filter if selected
+    if (props.team) {
+      combinedFilters.agent_group = props.team;
+    }
+    
+    // Add agent filter if selected
+    if (props.agent) {
+      combinedFilters._assign = ["LIKE", `%${props.agent}%`];
+    }
+    
     // Convert filter object to JSON string for query params
     const queryParams: Record<string, string> = {};
-    if (Object.keys(props.filters).length > 0) {
+    if (Object.keys(combinedFilters).length > 0) {
       // Pass filters as JSON string to preserve complex filter structures
-      queryParams.filters = JSON.stringify(props.filters);
+      queryParams.filters = JSON.stringify(combinedFilters);
     }
     
     router.push({
