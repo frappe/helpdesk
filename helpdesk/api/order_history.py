@@ -65,6 +65,20 @@ def fetch_ticket_order_history(ticket_name, customer_name):
 		# Get the Ticket document
 		ticket_doc = frappe.get_doc("HD Ticket", ticket_name)
 
+		# Check if custom_order_history field exists in doctype meta
+		if not ticket_doc.meta.has_field('custom_order_history'):
+			return {
+				'success': False,
+				'message': 'custom_order_history field does not exist on HD Ticket doctype. Please add it as a child table field linking to HD Ticket Order Item.'
+			}
+		
+		# Safely get custom_order_history field - initialize as empty list if None
+		try:
+			if not hasattr(ticket_doc, 'custom_order_history') or ticket_doc.custom_order_history is None:
+				ticket_doc.custom_order_history = []
+		except AttributeError:
+			ticket_doc.custom_order_history = []
+
 		# Process each Sales Order
 		total_items_added = 0
 
@@ -77,8 +91,9 @@ def fetch_ticket_order_history(ticket_name, customer_name):
 			""", so.name, as_dict=True)
 
 			for item in so_items:
-				# Check if this item already exists
-				existing_items = [row for row in ticket_doc.custom_order_history 
+				# Check if this item already exists - safely access custom_order_history
+				order_history = getattr(ticket_doc, 'custom_order_history', []) or []
+				existing_items = [row for row in order_history
 								if row.sales_order == so.name and row.item_name == item.item_name]
 
 				# Get Work Order statuses via correct connection path
@@ -106,22 +121,30 @@ def fetch_ticket_order_history(ticket_name, customer_name):
 					total_items_added += 1
 				else:
 					# ADD new item
-					ticket_doc.append("custom_order_history", {
-						"sales_order": so.name,
-						"order_date": so.transaction_date,
-						"item_code": item.item_code,
-						"item_name": item.item_name,
-						"qty": item.qty,
-						"rate": item.rate,
-						"amount": so.net_total,
-						"delivery_status": so.delivery_status or "Not Delivered",
-						"delivery_date": so.delivery_date,
-						"order_status": so.status,
-						"ops_status": ops_status,
-						"mat_status": mat_status,
-						"pro_status": pro_status,
-						"qa_status": qa_status
-					})
+					try:
+						ticket_doc.append("custom_order_history", {
+							"sales_order": so.name,
+							"order_date": so.transaction_date,
+							"item_code": item.item_code,
+							"item_name": item.item_name,
+							"qty": item.qty,
+							"rate": item.rate,
+							"amount": so.net_total,
+							"delivery_status": so.delivery_status or "Not Delivered",
+							"delivery_date": so.delivery_date,
+							"order_status": so.status,
+							"ops_status": ops_status,
+							"mat_status": mat_status,
+							"pro_status": pro_status,
+							"qa_status": qa_status
+						})
+					except AttributeError:
+						# Field doesn't exist on doctype, skip adding
+						frappe.log_error(
+							f"custom_order_history field does not exist on HD Ticket doctype. Please add it as a child table field.",
+							"Order History Field Missing"
+						)
+						continue
 
 					total_items_added += 1
 

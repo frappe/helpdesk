@@ -1,12 +1,12 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-12-04 16:27:53.224101",
+ "creation": "2025-12-10 14:22:53.149565",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "section_break_jwy7",
+  "section_break_k4cy",
   "sales_order",
   "order_date",
   "item_code",
@@ -24,7 +24,7 @@
  ],
  "fields": [
   {
-   "fieldname": "section_break_jwy7",
+   "fieldname": "section_break_k4cy",
    "fieldtype": "Section Break"
   },
   {
@@ -67,8 +67,7 @@
   {
    "fieldname": "delivery_status",
    "fieldtype": "Data",
-   "label": "Delivery Status",
-   "read_only": 1
+   "label": "Delivery Status"
   },
   {
    "fieldname": "delivery_date",
@@ -78,39 +77,34 @@
   {
    "fieldname": "order_status",
    "fieldtype": "Data",
-   "label": "Order Status",
-   "read_only": 1
+   "label": "Order Status"
   },
   {
    "fieldname": "qa_status",
    "fieldtype": "Data",
-   "label": "QA Status",
-   "read_only": 1
-  },
-  {
-   "fieldname": "pro_status",
-   "fieldtype": "Data",
-   "label": "Production Status",
-   "read_only": 1
-  },
-  {
-   "fieldname": "ops_status",
-   "fieldtype": "Data",
-   "label": "OPS Status",
-   "read_only": 1
+   "label": "QA Status"
   },
   {
    "fieldname": "custom_ingredients_status",
    "fieldtype": "Data",
-   "label": "Ingredient Status",
-   "read_only": 1
+   "label": "Ingredient Status"
+  },
+  {
+   "fieldname": "pro_status",
+   "fieldtype": "Data",
+   "label": "Production Status"
+  },
+  {
+   "fieldname": "ops_status",
+   "fieldtype": "Data",
+   "label": "OPS Status"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-08 15:26:02.542912",
+ "modified": "2025-12-10 14:26:00.149969",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Order Item",
