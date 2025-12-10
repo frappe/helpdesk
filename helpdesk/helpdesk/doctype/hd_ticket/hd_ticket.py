@@ -86,9 +86,11 @@ class HDTicket(Document):
 
         self.set_contact()
         self.set_customer()
+        print("Before Validate", self.priority)
 
     def validate(self):
         self.validate_feedback()
+        print("Validate", self.priority)
 
     def before_save(self):
         self.apply_sla()
@@ -96,6 +98,7 @@ class HDTicket(Document):
             self.handle_ticket_activity_update()
 
         self.handle_email_feedback()
+        print("Before Save", self.priority)
 
     def _get_rendered_template(
         self, content: str, default_content: str, args: dict[str, str] | None = None
@@ -165,6 +168,8 @@ class HDTicket(Document):
 
     def before_insert(self):
         self.generate_key()
+        # breakpoint()
+        print("Before Insert", self.priority)
 
     def after_insert(self):
         if self.ticket_split_from:
@@ -260,11 +265,9 @@ class HDTicket(Document):
     def set_priority(self):
         if self.priority:
             return
-        self.priority = (
-            frappe.get_cached_value("HD Ticket Type", self.ticket_type, "priority")
-            or frappe.get_cached_value("HD Settings", "HD Settings", "default_priority")
-            or DEFAULT_TICKET_PRIORITY
-        )
+        self.priority = frappe.get_cached_value(
+            "HD Ticket Type", self.ticket_type, "priority"
+        ) or frappe.get_cached_value("HD Settings", "HD Settings", "default_priority")
 
     def set_first_responded_on(self):
         if self.is_new():

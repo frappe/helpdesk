@@ -175,8 +175,8 @@ class HDServiceLevelAgreement(Document):
         if not doc.is_new():
             return
         creation = doc.service_level_agreement_creation or now_datetime()
-        doc.service_level_agreement_creation = creation
         doc.priority = doc.priority or self.default_priority
+        doc.service_level_agreement_creation = creation
 
     def handle_doc_status(self, doc: Document):
         if doc.is_new() or not doc.has_value_changed("status"):

@@ -269,6 +269,7 @@
 
 <script setup lang="ts">
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import {
   resetSlaDataErrors,
   slaActiveScreen,
@@ -276,6 +277,8 @@ import {
   slaDataErrors,
   validateSlaData,
 } from "@/stores/sla";
+import { __ } from "@/translation";
+import { SlaPolicyListResourceSymbol } from "@/types";
 import { convertToConditions, getFormattedDate } from "@/utils";
 import {
   Badge,
@@ -290,16 +293,13 @@ import {
   Switch,
   toast,
 } from "frappe-ui";
+import { useOnboarding } from "frappe-ui/frappe";
 import { inject, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { disableSettingModalOutsideClick } from "../settingsModal";
 import SlaAssignmentConditions from "./SlaAssignmentConditions.vue";
 import SlaHolidays from "./SlaHolidays.vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
 import SlaStatusList from "./SlaStatusList.vue";
-import { disableSettingModalOutsideClick } from "../settingsModal";
-import { useOnboarding } from "frappe-ui/frappe";
-import { __ } from "@/translation";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { SlaPolicyListResourceSymbol } from "@/types";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 
@@ -459,6 +459,14 @@ const updateSla = () => {
   const ticketReopenStatus = slaData.value.reopen_ticket_status
     ? slaData.value.reopen_ticket_status?.value
     : null;
+  console.log(
+    convertToConditions({
+      conditions: slaData.value.condition_json,
+      fieldPrefix: "doc",
+    })
+  );
+  console.log(slaData.value.condition_json);
+
   slaPolicyList.setValue.submit(
     {
       ...slaData.value,

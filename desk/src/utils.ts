@@ -322,6 +322,8 @@ export const convertToConditions = ({
   conditions: any[];
   fieldPrefix?: string;
 }): string => {
+  console.log(conditions);
+
   if (!conditions || conditions.length === 0) {
     return "";
   }
