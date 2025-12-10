@@ -64,6 +64,7 @@ import {
   UnpinIcon,
 } from "@/components/icons";
 import ExportModal from "@/components/ticket/ExportModal.vue";
+import TicketRowActions from "@/components/ticket/TicketRowActions.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
@@ -73,9 +74,10 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
-import { Badge, FeatherIcon, toast, Tooltip, usePageMeta } from "frappe-ui";
+import { Badge, FeatherIcon, toast, Tooltip, usePageMeta, Dropdown, call, createResource } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import LucidePencil from "~icons/lucide/pencil";
 
 const router = useRouter();
 const route = useRoute();
@@ -96,7 +98,19 @@ const { isManager } = useAuthStore();
 const listViewRef = ref(null);
 const showExportModal = ref(false);
 
-const { getStatus } = useTicketStatusStore();
+const { getStatus, statuses } = useTicketStatusStore();
+
+// Priority options
+const priorities = createResource({
+  url: "frappe.client.get_list",
+  params: {
+    doctype: "HD Ticket Priority",
+    fields: ["name"],
+    orderBy: "`tabHD Ticket Priority`.order",
+    limit: 100,
+  },
+  auto: true,
+});
 
 const listSelections = ref(new Set());
 const selectBannerActions = [
@@ -110,23 +124,98 @@ const selectBannerActions = [
   },
 ];
 
+// Update ticket field function
+async function updateTicketField(ticketId: string, field: string, value: string) {
+  try {
+    await call("frappe.client.set_value", {
+      doctype: "HD Ticket",
+      name: ticketId,
+      fieldname: field,
+      value: value,
+    });
+    toast({
+      title: "Updated successfully",
+      icon: "check",
+      iconClasses: "text-green-500",
+    });
+    // Reload the list
+    listViewRef.value?.reload(false);
+  } catch (error) {
+    toast({
+      title: "Failed to update",
+      text: error.message,
+      icon: "x",
+      iconClasses: "text-red-500",
+    });
+  }
+}
+
 const options = {
   doctype: "HD Ticket",
   columnConfig: {
     status: {
-      custom: ({ item }) => {
+      custom: ({ item, row }) => {
         const status = getStatus(item);
         const label = isCustomerPortal.value
           ? status?.["label_customer"]
           : status?.["label_agent"];
-        return h(
-          "div",
-          { class: "flex items-center space-x-2 justify-start w-full" },
-          [
-            h(IndicatorIcon, { class: status?.["parsed_color"] }),
-            h("span", { class: "truncate flex-1" }, label),
-          ]
-        );
+        
+        const statusOptions = (statuses.data || []).map((s) => ({
+          label: s.label_agent,
+          icon: () => h(IndicatorIcon, { class: s.parsed_color }),
+          onClick: () => updateTicketField(row.name, "status", s.label_agent),
+        }));
+        
+        return h("div", { class: "group relative" }, [
+          h(
+            Dropdown,
+            {
+              options: statusOptions,
+              placement: "right",
+            },
+            {
+              default: () =>
+                h(
+                  "div",
+                  { class: "flex items-center space-x-2 justify-start w-full px-2 py-1 rounded hover:bg-surface-gray-2 cursor-pointer" },
+                  [
+                    h(IndicatorIcon, { class: status?.["parsed_color"] }),
+                    h("span", { class: "truncate flex-1" }, label),
+                    h(LucidePencil, { class: "size-3 text-ink-gray-5 opacity-0 group-hover:opacity-100 transition-opacity" }),
+                  ]
+                ),
+            }
+          ),
+        ]);
+      },
+    },
+    priority: {
+      custom: ({ item, row }) => {
+        const priorityOptions = (priorities.data || []).map((p) => ({
+          label: p.name,
+          onClick: () => updateTicketField(row.name, "priority", p.name),
+        }));
+        
+        return h("div", { class: "group relative" }, [
+          h(
+            Dropdown,
+            {
+              options: priorityOptions,
+              placement: "right",
+            },
+            {
+              default: () =>
+                h(
+                  "div",
+                  { class: "flex items-center space-x-2 justify-start w-full px-2 py-1 rounded hover:bg-surface-gray-2 cursor-pointer" },
+                  [
+                    h("span", { class: "truncate flex-1" }, item || "None"),
+                    h(LucidePencil, { class: "size-3 text-ink-gray-5 opacity-0 group-hover:opacity-100 transition-opacity" }),
+                  ]
+                ),
+            }
+          ),
+        ]);
       },
     },
     agreement_status: {
@@ -143,6 +232,15 @@ const options = {
     },
     resolution_by: {
       custom: ({ row, item }) => handle_resolution_by_field(row, item),
+    },
+    actions: {
+      custom: ({ row }) => {
+        if (isCustomerPortal.value) return null;
+        return h(TicketRowActions, {
+          ticket: row,
+          onUpdate: () => listViewRef.value?.reload(false),
+        });
+      },
     },
   },
   isCustomerPortal: isCustomerPortal.value,

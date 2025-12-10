@@ -36,7 +36,10 @@
           :key="row.name"
           v-slot="{ idx, column, item }"
           :row="row"
-          class="truncate text-base row"
+          :class="[
+            'truncate text-base row transition-all duration-200',
+            getRowClass(row)
+          ]"
         >
           <slot v-bind="{ idx, column, item, row }" />
         </ListRow>
@@ -49,7 +52,10 @@
       :key="row.name"
       v-slot="{ idx, column, item }"
       :row="row"
-      class="truncate text-base"
+      :class="[
+        'truncate text-base transition-all duration-200',
+        getRowClass(row)
+      ]"
     >
       <slot v-bind="{ idx, column, item, row }" />
     </ListRow>
@@ -104,6 +110,73 @@ let showGroupedRows = computed(() => {
     (row) => row.group && row.rows && Array.isArray(row.rows)
   );
 });
+
+// Get status category from ticket status
+function getStatusCategory(row) {
+  // Check if row has status_category field (from backend)
+  if (row.status_category) {
+    return row.status_category;
+  }
+  
+  // Fallback: determine from status name
+  const closedStatuses = ["Closed", "Resolved"];
+  const pausedStatuses = ["Replied", "Pending", "On Hold", "Awaiting Response"];
+  
+  if (closedStatuses.includes(row.status)) {
+    return "Resolved";
+  } else if (pausedStatuses.some(s => row.status?.includes(s))) {
+    return "Paused";
+  }
+  
+  return "Open";
+}
+
+// Check if ticket is overdue
+function isOverdue(row) {
+  if (!row.resolution_by) return false;
+  const now = new Date();
+  const resolutionDate = new Date(row.resolution_by);
+  return resolutionDate < now && getStatusCategory(row) !== "Resolved";
+}
+
+// Get conditional row classes based on ticket state
+function getRowClass(row) {
+  const statusCategory = getStatusCategory(row);
+  const overdue = isOverdue(row);
+  
+  const classes = [];
+  
+  // Status-based coloring
+  if (statusCategory === "Resolved") {
+    classes.push("bg-surface-gray-1", "text-ink-gray-6", "opacity-75");
+  } else if (overdue) {
+    classes.push("bg-red-50", "border-l-2", "border-red-400");
+  }
+  
+  // Hover effect
+  classes.push("hover:shadow-sm", "hover:bg-surface-gray-1");
+  
+  return classes.join(" ");
+}
 </script>
 
-<style></style>
+<style scoped>
+/* Enhanced row styles */
+:deep(.list-row) {
+  transition: all 0.15s ease-in-out;
+}
+
+:deep(.list-row:hover) {
+  transform: translateX(2px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Smooth transitions for inline edits */
+:deep(.inline-edit-wrapper) {
+  transition: background-color 0.2s ease;
+}
+
+:deep(.inline-edit-wrapper:hover) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+</style>
