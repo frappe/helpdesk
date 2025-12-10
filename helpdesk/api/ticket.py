@@ -1,32 +1,35 @@
+# Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and Contributors
+# License: AGPLv3. See LICENSE
+
 import frappe
 from frappe import _
 
-from helpdesk.utils import agent_only
-
-
-def assign_ticket_to_agent(ticket_id, agent_id=None):
-    if not ticket_id:
-        return
-
-    ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
-
-    if not agent_id:
-        # assign to self
-        agent_id = frappe.session.user
-
-    if not frappe.db.exists("HD Agent", agent_id):
-        frappe.throw(_("Tickets can only be assigned to agents"))
-
-    ticket_doc.assign_agent(agent_id)
-    return ticket_doc
-
 
 @frappe.whitelist()
-@agent_only
-def bulk_assign_ticket_to_agent(ticket_ids, agent_id=None):
-    if ticket_ids:
-        ticket_docs = []
-        for ticket_id in ticket_ids:
-            ticket_doc = assign_ticket_to_agent(ticket_id, agent_id)
-            ticket_docs.append(ticket_doc)
-        return ticket_docs
+def reply_via_agent(
+	ticket_name: str,
+	message: str,
+	to: str = None,
+	cc: str = None,
+	bcc: str = None,
+	attachments: list = None,
+	email_account: str = None,
+):
+	"""
+	Wrapper API to call reply_via_agent method on HD Ticket
+	This avoids the run_doc_method signature issue
+	"""
+	if not ticket_name:
+		frappe.throw(_("Ticket name is required"))
+	
+	ticket = frappe.get_doc("HD Ticket", ticket_name)
+	
+	# Call the method directly
+	return ticket.reply_via_agent(
+		message=message,
+		to=to,
+		cc=cc,
+		bcc=bcc,
+		attachments=attachments or [],
+		email_account=email_account,
+	)

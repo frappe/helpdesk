@@ -286,19 +286,16 @@ async function sendMailFunction() {
       ? attachments.value.map((x: any) => x && x.name).filter(Boolean)
       : [];
     
-    // Use original reply_via_agent method
-    await call("run_doc_method", {
-      dt: props.doctype,
-      dn: doc.value.name,
-      method: "reply_via_agent",
-      args: {
-        message: newEmail.value || "",
-        to: recipients,
-        cc: cc || undefined,
-        bcc: bcc || undefined,
-        attachments: attachmentNames,
-        email_account: emailAccount || undefined,
-      },
+    // Use custom API endpoint to call reply_via_agent method
+    // This avoids the run_doc_method signature issue
+    await call("helpdesk.api.ticket.reply_via_agent", {
+      ticket_name: doc.value.name,
+      message: newEmail.value || "",
+      to: recipients,
+      cc: cc || undefined,
+      bcc: bcc || undefined,
+      attachments: attachmentNames,
+      email_account: emailAccount || undefined,
     });
 
     resetState();
