@@ -217,7 +217,7 @@ def make_status(name: str = "Test Status", category: str = "Open"):
     return doc.insert(ignore_if_duplicate=True)
 
 
-def create_automation():
+def create_base_automation():
     title = "Team Assignment"
     if frappe.db.exists("HD Automation", title):
         return frappe.get_doc("HD Automation", title)

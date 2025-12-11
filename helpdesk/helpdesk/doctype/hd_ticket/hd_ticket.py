@@ -87,7 +87,6 @@ class HDTicket(Document):
 
         self.set_contact()
         self.set_customer()
-        # print("Before Validate", self.priority)
 
     def validate(self):
         self.validate_feedback()

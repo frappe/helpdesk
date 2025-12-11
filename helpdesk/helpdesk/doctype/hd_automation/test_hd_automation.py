@@ -5,7 +5,7 @@ import frappe
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.helpdesk.doctype.hd_ticket.test_hd_ticket import get_ticket_obj
-from helpdesk.test_utils import create_automation
+from helpdesk.test_utils import create_base_automation
 
 # On IntegrationTestCase, the doctype test records and all
 # link-field test record dependencies are recursively loaded
@@ -22,7 +22,7 @@ class IntegrationTestHDAutomation(IntegrationTestCase):
 
     def setUp(self):
         # Setup run before every test method.
-        create_automation()
+        create_base_automation()
         pass
 
     def test_base_automation(self):

@@ -9,6 +9,11 @@ from frappe.utils.data import validate_json_string
 
 from helpdesk.utils import get_context
 
+HOOK_MAP = {
+    "before_save": "On ticket creation",
+    "on_update": "On ticket update",
+}
+
 
 class HDAutomation(Document):
     def validate(self) -> None:
@@ -18,9 +23,9 @@ class HDAutomation(Document):
         rule = json.loads(self.rule)
         if not self.apply_presets(doc, rule):
             return
-
+        print("\n\n", "RAN", self.name, "\n\n")
         rule = rule.get("rule") or []
-        self.parse_rule(doc, rule)
+        self.handle_rule(doc, rule)
 
     def apply_presets(self, doc, rule) -> bool:
         filter_expression: str = rule.get("event", {}).get("presets", "")
@@ -33,18 +38,24 @@ class HDAutomation(Document):
 
         return True
 
-    def parse_rule(self, doc, rule) -> None:
-        for r in rule:
-            self.apply_actions(doc, r)
-
-    def apply_actions(self, doc, action) -> None:
-        expression = action.get("condition", "")
+    def handle_rule(self, doc, rule) -> None:
         context = get_context(doc)
-        # TODO: Handle if / else conditions
-        if expression and not frappe.safe_eval(expression, None, context):
-            return
+        matched = False
 
-        actions = action.get("actions") or []
+        for r in rule:
+            rule_type = r.get("type", "")
+            actions = r.get("actions") or []
+
+            if rule_type == "if":
+                expression = r.get("condition", "")
+                if expression and frappe.safe_eval(expression, None, context):
+                    self.run_actions(doc, actions)
+                    matched = True
+
+            elif rule_type == "else" and not matched:
+                self.run_actions(doc, actions)
+
+    def run_actions(self, doc, actions) -> None:
         for a in actions:
             action_type = a.get("type") or ""
             if not action_type:
@@ -64,22 +75,16 @@ class HDAutomation(Document):
         doc.set(field, value)
 
 
-hook_map = {
-    "before_save": "On ticket creation",
-    "on_update": "On ticket update",
-}
-
-
 def apply_automations(doc, hook) -> None:
     doctype: str = doc.doctype
     if doctype == "HD Automation":
         return
 
-    event = hook_map.get(hook, "")
+    event = HOOK_MAP.get(hook, "")
     if not event:
         return
 
-    if not doc.is_new() and event == "On ticket creation":
+    if event == "On ticket creation" and not doc.is_new():
         return
 
     automations: list["str"] = frappe.db.get_all(
