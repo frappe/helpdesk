@@ -64,7 +64,7 @@ doc_events = {
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
     "HD Ticket": {
-        "before_insert": "helpdesk.helpdesk.doctype.hd_automation.hd_automation.apply_automations",
+        "before_save": "helpdesk.helpdesk.doctype.hd_automation.hd_automation.apply_automations",
         "on_update": "helpdesk.helpdesk.doctype.hd_automation.hd_automation.apply_automations",
     },
 }

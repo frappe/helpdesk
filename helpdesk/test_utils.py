@@ -1,9 +1,34 @@
+import json
+
 import frappe
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 
 SLA_PRIORITY_NAME = "SLA Priority"
+
+AUTOMATION_RULE = {
+    "event": {
+        "type": "created",
+        "presets": "doc.ticket_type == 'Unspecified'",
+        "presets_json": [["ticket_type", "==", "Unspecified"]],
+    },
+    "rule": [
+        {
+            "type": "if",
+            "condition": "doc.priority == 'High' ",
+            "actions": [
+                {"type": "set", "field": "agent_group", "value": "Product Experts"}
+            ],
+            "condition_json": [["priority", "==", "High"]],
+        },
+        {
+            "type": "else",
+            "condition": "True",
+            "actions": [{"type": "set", "field": "agent_group", "value": "Billing"}],
+        },
+    ],
+}
 
 
 def before_tests():
@@ -95,7 +120,7 @@ def make_ticket(
     subject: str = "Test Ticket",
     description: str = "This is a test ticket.",
     save: bool = True,
-    **args
+    **args,
 ):
     """
     Creates a test HD Ticket with the given subject, description, priority, and ticket type.
@@ -189,4 +214,20 @@ def make_status(name: str = "Test Status", category: str = "Open"):
             "is_default": 0,
         }
     )
+    return doc.insert(ignore_if_duplicate=True)
+
+
+def create_automation():
+    title = "Team Assignment"
+    if frappe.db.exists("HD Automation", title):
+        return frappe.get_doc("HD Automation", title)
+    doc = frappe.new_doc(
+        "HD Automation",
+        title=title,
+        dt="HD Ticket",
+        enabled=1,
+        event_type="On ticket creation",
+        rule=json.dumps(AUTOMATION_RULE),
+    )
+    return doc.insert(ignore_if_duplicate=True)
     return doc.insert(ignore_if_duplicate=True)

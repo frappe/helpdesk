@@ -2,7 +2,6 @@
 # For license information, please see license.txt
 
 import json
-from typing import Literal
 
 import frappe
 from frappe.model.document import Document
@@ -17,7 +16,6 @@ class HDAutomation(Document):
 
     def apply(self, doc) -> None:
         print("\n\n", doc.get("priority"), "\n\n")
-        # breakpoint()
         rule = json.loads(self.rule)
         if not self.apply_presets(doc, rule):
             return
@@ -26,7 +24,6 @@ class HDAutomation(Document):
         self.parse_rule(doc, rule)
 
     def apply_presets(self, doc, rule) -> bool:
-        # breakpoint()
         filter_expression: str = rule.get("event", {}).get("presets", "")
         if not filter_expression:
             return True
@@ -62,23 +59,31 @@ class HDAutomation(Document):
     def set_field(self, doc, action) -> None:
         field = action.get("field") or ""
         value = action.get("value") or ""
+        breakpoint()
         if not field:
             return
+        breakpoint()
+        doc.set(field, value)
 
-        doc[field] = value
+
+hook_map = {
+    "before_save": "On ticket creation",
+    "on_update": "On ticket update",
+}
 
 
 def apply_automations(doc, hook) -> None:
-    event: Literal["On ticket creation", "On ticket update"]
     doctype: str = doc.doctype
-
-    if hook == "before_insert":
-        event = "On ticket creation"
-    elif hook == "on_update":
-        event = "On ticket update"
-    else:
+    if doctype == "HD Automation":
         return
-    return
+
+    event = hook_map.get(hook, "")
+    if not event:
+        return
+
+    if not doc.is_new() and event == "On ticket creation":
+        return
+
     automations: list["str"] = frappe.db.get_all(
         "HD Automation",
         {"enabled": 1, "event_type": event, "dt": doctype},
