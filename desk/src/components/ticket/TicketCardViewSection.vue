@@ -55,7 +55,7 @@
             Status
           </label>
           <MultiSelectCombobox
-            :model-value="filters.status"
+            :model-value="filters.status?.[0] || null"
             :options="statusFilterOptions"
             placeholder="All Status"
             @update:modelValue="updateFilter('status', $event)"
@@ -79,7 +79,7 @@
             Priority
           </label>
           <MultiSelectCombobox
-            :model-value="filters.priority"
+            :model-value="filters.priority?.[0] || null"
             :options="priorityFilterOptions"
             placeholder="Any Priority"
             @update:modelValue="updateFilter('priority', $event)"
@@ -95,7 +95,7 @@
             Team
           </label>
           <MultiSelectCombobox
-            :model-value="filters.team"
+            :model-value="filters.team?.[0] || null"
             :options="teamFilterOptions"
             placeholder="Any Team"
             @update:modelValue="updateFilter('team', $event)"
@@ -111,7 +111,7 @@
             Agent
           </label>
           <MultiSelectCombobox
-            :model-value="filters.agent"
+            :model-value="filters.agent?.[0] || null"
             :options="agentFilterOptions"
             placeholder="Any Agent"
             @update:modelValue="updateFilter('agent', $event)"
