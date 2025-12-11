@@ -57,153 +57,40 @@
       </template>
     </LayoutHeader>
   <div v-show="isTableView">
-    <ListViewBuilder
-      ref="listViewRef"
+    <TicketListViewSection
+      ref="listViewSectionRef"
       :options="options"
-      @empty-state-action="
-        () =>
-          $router.push({
-            name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew',
-          })
-      "
-      @row-click="
-        (row) =>
-          $router.push({
-            name: isCustomerPortal ? 'TicketCustomer' : 'TicketAgent',
-            params: { ticketId: row },
-          })
-      "
+      @empty-action="handleEmptyStateAction"
+      @row-click="handleTableRowClick"
     />
   </div>
-  <div v-if="!isTableView" class="flex gap-4 px-5 pb-6 pt-3">
-    <div class="flex-1">
-      <div v-if="!listLoading && totalCount > 0" class="mb-4 flex items-center justify-between">
-        <p class="text-sm text-ink-gray-6">
-          Showing <span class="font-semibold text-ink-gray-9">{{ currentCount }}</span> of 
-          <span class="font-semibold text-ink-gray-9">{{ totalCount }}</span> tickets
-        </p>
-      </div>
-      <TicketCardView
-        :rows="cardRows"
-        :loading="listLoading"
-        :status-options="statusOptionList"
-        :priority-options="priorityOptionList"
-        @row-click="handleCardClick"
-        @update-status="(ticketId, value) => handleCardStatus(ticketId, value)"
-        @update-priority="(ticketId, value) => handleCardPriority(ticketId, value)"
-      />
-      <div v-if="currentCount < totalCount" class="mt-4 flex items-center justify-center">
-        <Button
-          variant="outline"
-          theme="gray"
-          :loading="listLoading"
-          @click="handleCardLoadMore"
-        >
-          Load more
-        </Button>
-      </div>
-    </div>
-    <div
-      class="hidden lg:flex w-80 shrink-0 flex-col gap-5 rounded-lg border border-outline-gray-2 bg-surface-white p-5 shadow-sm h-fit sticky top-4"
-    >
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2 text-lg font-semibold text-ink-gray-9">
-          <LucideFilter class="h-5 w-5" />
-          <span>Filters</span>
-        </div>
-        <Button size="sm" variant="ghost" theme="gray" @click="resetCardFilters">
-          Reset
-        </Button>
-      </div>
-      <div class="space-y-5 border-t border-outline-gray-2 pt-5">
-        <div class="space-y-2">
-          <label class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide">
-            Status
-          </label>
-          <MultiSelectCombobox
-            v-model="cardFilters.status"
-            :options="statusFilterOptions"
-            placeholder="All Status"
-            @update:modelValue="applyCardFilters"
-            :multiple="true"
-            :button-classes="'!h-9 !bg-surface-white border border-outline-gray-2 hover:!bg-surface-gray-1'"
-          >
-            <template #item-prefix="{ option, selected }">
-              <span
-                v-if="option.value"
-                class="h-2 w-2 rounded-full mr-2"
-                :class="option.indicatorClass"
-              />
-            </template>
-          </MultiSelectCombobox>
-        </div>
-        
-        <div class="space-y-2">
-          <label class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide">
-            Priority
-          </label>
-          <MultiSelectCombobox
-            v-model="cardFilters.priority"
-            :options="priorityFilterOptions"
-            placeholder="Any Priority"
-            @update:modelValue="applyCardFilters"
-            :multiple="true"
-            :button-classes="'!h-9 !bg-surface-white border border-outline-gray-2 hover:!bg-surface-gray-1'"
-          />
-        </div>
-        
-        <div class="space-y-2">
-          <label class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide">
-            Department
-          </label>
-          <MultiSelectCombobox
-            v-model="cardFilters.department"
-            :options="departmentFilterOptions"
-            placeholder="Any Department"
-            @update:modelValue="applyCardFilters"
-            :multiple="true"
-            :button-classes="'!h-9 !bg-surface-white border border-outline-gray-2 hover:!bg-surface-gray-1'"
-          />
-        </div>
-        
-        <div class="space-y-2">
-          <label class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide">
-            Agent
-          </label>
-          <MultiSelectCombobox
-            v-model="cardFilters.agent"
-            :options="agentFilterOptions"
-            placeholder="Any Agent"
-            @update:modelValue="applyCardFilters"
-            :multiple="true"
-            :button-classes="'!h-9 !bg-surface-white border border-outline-gray-2 hover:!bg-surface-gray-1'"
-          />
-        </div>
-      </div>
-      
-      <!-- Quick Views Section -->
-      <div class="space-y-3 border-t border-outline-gray-2 pt-5">
-        <div class="text-xs font-semibold text-ink-gray-7 uppercase tracking-wide">
-          Quick Views
-        </div>
-        <div class="space-y-1">
-          <button
-            v-for="view in quickViews"
-            :key="view.label"
-            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink-gray-8 transition-colors hover:bg-surface-gray-1 hover:text-ink-gray-9"
-            :class="{ 'bg-surface-gray-2 font-medium text-ink-gray-9': activeQuickView === view.label }"
-            @click="applyQuickView(view)"
-          >
-            <component :is="view.icon" class="h-4 w-4 flex-shrink-0" />
-            <span class="truncate">{{ view.label }}</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <TicketCardViewSection
+    v-if="!isTableView"
+    :rows="cardRows"
+    :loading="listLoading"
+    :total-count="totalCount"
+    :current-count="currentCount"
+    :status-options="statusOptionList"
+    :priority-options="priorityOptionList"
+    :status-filter-options="statusFilterOptions"
+    :priority-filter-options="priorityFilterOptions"
+    :department-filter-options="departmentFilterOptions"
+    :agent-filter-options="agentFilterOptions"
+    :filters="cardFilters"
+    :quick-views="quickViews"
+    :active-quick-view="activeQuickView"
+    @row-click="handleCardClick"
+    @update-status="handleCardStatus"
+    @update-priority="handleCardPriority"
+    @load-more="handleCardLoadMore"
+    @update:filters="updateCardFilters"
+    @apply-filters="applyCardFilters"
+    @reset-filters="resetCardFilters"
+    @apply-quick-view="applyQuickView"
+  />
     <ExportModal
       v-model="showExportModal"
-      :rowCount="$refs.listViewRef?.list?.data?.total_count ?? 0"
+      :rowCount="exportRowCount"
       @update="
         ({ export_type, export_all }) => exportRows(export_type, export_all)
       "
@@ -217,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { LayoutHeader, ListViewBuilder } from "@/components";
+import { LayoutHeader } from "@/components";
 import {
   EditIcon,
   IndicatorIcon,
@@ -227,12 +114,12 @@ import {
 } from "@/components/icons";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import TicketRowActions from "@/components/ticket/TicketRowActions.vue";
+import TicketCardViewSection from "@/components/ticket/TicketCardViewSection.vue";
+import TicketListViewSection from "@/components/ticket/TicketListViewSection.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
 import { dayjs } from "@/dayjs";
-import TicketCardView from "@/components/ticket/TicketCardView.vue";
-import MultiSelectCombobox from "@/components/frappe-ui/MultiSelectCombobox.vue";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
@@ -245,13 +132,19 @@ import { useRoute, useRouter } from "vue-router";
 import LucidePencil from "~icons/lucide/pencil";
 import LucideLayoutList from "~icons/lucide/layout-list";
 import LucideLayoutGrid from "~icons/lucide/layout-grid";
-import LucideFilter from "~icons/lucide/filter";
 import LucideAlignJustify from "~icons/lucide/align-justify";
 import LucidePlus from "~icons/lucide/plus";
 import LucideInbox from "~icons/lucide/inbox";
 import LucideMailOpen from "~icons/lucide/mail-open";
 import LucideAlertCircle from "~icons/lucide/alert-circle";
 import LucideUser from "~icons/lucide/user";
+
+type CardFilters = {
+  status: any[];
+  priority: any[];
+  department: any[];
+  agent: any[];
+};
 
 const router = useRouter();
 const route = useRoute();
@@ -269,7 +162,8 @@ const {
 const { $dialog, $socket } = globalStore();
 const { isManager } = useAuthStore();
 
-const listViewRef = ref<any>(null);
+const listViewSectionRef = ref<any>(null);
+const listViewRef = computed(() => listViewSectionRef.value?.listViewRef);
 const viewMode = useStorage<"table" | "card">("tickets_view_mode", "table");
 const isTableView = computed(() => viewMode.value === "table");
 const ticketRows = computed(() => listViewRef.value?.list?.data?.data || []);
@@ -280,11 +174,14 @@ const cardRows = computed(() => {
 const listLoading = computed(() => listViewRef.value?.list?.loading);
 const totalCount = computed(() => listViewRef.value?.list?.data?.total_count || 0);
 const currentCount = computed(() => cardRows.value.length);
-const cardFilters = reactive({
-  status: [] as string[],
-  priority: [] as string[],
-  department: [] as string[],
-  agent: [] as string[],
+const exportRowCount = computed(
+  () => listViewRef.value?.list?.data?.total_count ?? 0
+);
+const cardFilters = reactive<CardFilters>({
+  status: [],
+  priority: [],
+  department: [],
+  agent: [],
 });
 const activeQuickView = ref<string>("");
 const showExportModal = ref(false);
@@ -346,6 +243,19 @@ const selectBannerActions = [
   },
 ];
 
+function handleEmptyStateAction() {
+  router.push({
+    name: isCustomerPortal.value ? "TicketNew" : "TicketAgentNew",
+  });
+}
+
+function handleTableRowClick(row: string) {
+  router.push({
+    name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
+    params: { ticketId: row },
+  });
+}
+
 // Update ticket field function
 async function updateTicketField(ticketId: string, field: string, value: string) {
   try {
@@ -362,6 +272,10 @@ async function updateTicketField(ticketId: string, field: string, value: string)
     toast.error(error.message || "Failed to update");
   }
 }
+
+const defaultFilters = {
+  status: ["in", ["Open"]],
+};
 
 const options = {
   doctype: "HD Ticket",
@@ -472,6 +386,7 @@ const options = {
   },
   hideColumnSetting: false,
   default_page_length: 25,
+  defaultFilters,
 };
 
 const statusOptionList = computed(() =>
@@ -537,6 +452,37 @@ const agentFilterOptions = computed(() =>
     label: a.agent_name || a.name,
     value: a.name,
   }))
+);
+
+function syncCardFiltersWithDefault() {
+  const defaults: Record<string, any> = defaultFilters || {};
+  const pickValues = (
+    key: keyof CardFilters,
+    optionsList: { value: string; label: string; indicatorClass?: string }[]
+  ) => {
+    const filter = defaults[key];
+    if (Array.isArray(filter) && filter[0] === "in" && Array.isArray(filter[1])) {
+      const values = filter[1] as string[];
+      return optionsList.filter((opt) => values.includes(opt.value));
+    }
+    return [];
+  };
+
+  cardFilters.status = pickValues("status", statusFilterOptions.value);
+  cardFilters.priority = pickValues("priority", priorityFilterOptions.value as any);
+  cardFilters.department = pickValues("department", departmentFilterOptions.value as any);
+  cardFilters.agent = pickValues("agent", agentFilterOptions.value as any);
+}
+
+watch(
+  () => [
+    statusFilterOptions.value,
+    priorityFilterOptions.value,
+    departmentFilterOptions.value,
+    agentFilterOptions.value,
+  ],
+  () => syncCardFiltersWithDefault(),
+  { immediate: true }
 );
 
 function handle_response_by_field(row: any, item: string) {
@@ -678,7 +624,17 @@ function handleCardPriority(ticketId: string, value: string) {
   updateTicketField(ticketId, "priority", value);
 }
 
-function applyCardFilters() {
+function updateCardFilters(value: CardFilters) {
+  cardFilters.status = value?.status || [];
+  cardFilters.priority = value?.priority || [];
+  cardFilters.department = value?.department || [];
+  cardFilters.agent = value?.agent || [];
+}
+
+function applyCardFilters(filtersArg: CardFilters = cardFilters) {
+  const sourceFilters = filtersArg || cardFilters;
+  updateCardFilters(sourceFilters);
+
   if (!listViewRef.value?.list) return;
   const list = listViewRef.value.list;
   
@@ -690,28 +646,30 @@ function applyCardFilters() {
   Object.assign(filters, defaultFilters);
 
   // Extract values from filter objects (they might be objects with {label, value} or just strings)
-  const extractValues = (arr: any[]) => {
-    return arr.map((item) => (typeof item === "object" && item?.value ? item.value : item));
+  const extractValues = (arr: any[] = []) => {
+    return arr.map((item) =>
+      typeof item === "object" && item?.value ? item.value : item
+    );
   };
 
   // Apply card filters
-  if (cardFilters.status.length) {
-    const statusValues = extractValues(cardFilters.status);
+  if (sourceFilters.status?.length) {
+    const statusValues = extractValues(sourceFilters.status);
     filters["status"] = ["in", statusValues];
   }
 
-  if (cardFilters.priority.length) {
-    const priorityValues = extractValues(cardFilters.priority);
+  if (sourceFilters.priority?.length) {
+    const priorityValues = extractValues(sourceFilters.priority);
     filters["priority"] = ["in", priorityValues];
   }
 
-  if (cardFilters.department.length) {
-    const departmentValues = extractValues(cardFilters.department);
+  if (sourceFilters.department?.length) {
+    const departmentValues = extractValues(sourceFilters.department);
     filters["department"] = ["in", departmentValues];
   }
 
-  if (cardFilters.agent.length) {
-    const agentValues = extractValues(cardFilters.agent);
+  if (sourceFilters.agent?.length) {
+    const agentValues = extractValues(sourceFilters.agent);
     filters["assigned_to"] = ["in", agentValues];
   }
 
@@ -724,10 +682,7 @@ function applyCardFilters() {
 }
 
 function resetCardFilters() {
-  cardFilters.status = [];
-  cardFilters.priority = [];
-  cardFilters.department = [];
-  cardFilters.agent = [];
+  syncCardFiltersWithDefault();
   activeQuickView.value = "";
   
   // Reset to default filters only
@@ -747,10 +702,7 @@ function applyQuickView(view: any) {
   if (!listViewRef.value?.list) return;
   
   // Reset card filters state
-  cardFilters.status = [];
-  cardFilters.priority = [];
-  cardFilters.department = [];
-  cardFilters.agent = [];
+  syncCardFiltersWithDefault();
   
   // Set active quick view
   activeQuickView.value = view.label;
