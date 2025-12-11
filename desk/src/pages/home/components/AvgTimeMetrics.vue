@@ -5,9 +5,6 @@
         {{ __("Average Time Metrics") }}
       </div>
       <TabButtons
-        v-if="
-          timeAverages.first_response != '0m' || timeAverages.resolution != '0m'
-        "
         :buttons="[
           {
             label: '3M',
