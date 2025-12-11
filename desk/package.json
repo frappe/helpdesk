@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.22",
@@ -31,13 +33,17 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue-jsx": "^3.0.1",
+    "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.13",
+    "fast-check": "^3.22.0",
+    "happy-dom": "^15.11.7",
     "postcss": "^8.4.5",
     "prettier": "2.8.4",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.0.2",
     "vite": "^4.4.9",
-    "vite-plugin-pwa": "0.15.0"
+    "vite-plugin-pwa": "0.15.0",
+    "vitest": "^2.1.9"
   },
   "resolutions": {
     "cheerio": "1.0.0-rc.12",

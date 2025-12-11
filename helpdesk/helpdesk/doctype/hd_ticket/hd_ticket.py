@@ -1053,6 +1053,7 @@ class HDTicket(Document):
             "name",
             "subject",
             "status",
+            "status_category",
             "priority",
             "ticket_type",
             "agent_group",

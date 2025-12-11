@@ -315,6 +315,7 @@ const exposeFunctions = {
   list,
   reload,
   unselectAll: () => {},
+  handlePageLength,
 };
 
 function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
@@ -632,10 +633,17 @@ function handleViewChanges() {
     reload(true);
     return;
   }
+  // Start with view filters
   defaultParams.filters = currentView.filters;
   defaultParams.order_by = currentView.order_by || "modified desc";
   defaultParams.columns = currentView.columns;
   defaultParams.rows = currentView.rows;
+
+  // Merge query filters (from dashboard, etc.) with view filters
+  const queryFilters = applyQueryFilters();
+  if (Object.keys(queryFilters).length > 0) {
+    defaultParams.filters = { ...defaultParams.filters, ...queryFilters };
+  }
 
   list.submit({ ...defaultParams });
 }
@@ -679,6 +687,60 @@ function handleScrollPosition() {
   }, 200);
 }
 
+// Handle filter query params (status, etc.)
+function applyQueryFilters() {
+  const queryFilters: Record<string, any> = {};
+  
+  // Check if filters are passed as a JSON string (from dashboard)
+  if (route.query.filters) {
+    try {
+      const parsed = JSON.parse(route.query.filters as string);
+      Object.assign(queryFilters, parsed);
+      
+      // Handle special cases
+      if (parsed.today) {
+        delete queryFilters.today;
+        const today = new Date().toISOString().split("T")[0];
+        queryFilters["creation"] = [">=", today];
+      }
+      
+      return queryFilters;
+    } catch (e) {
+      console.error("Failed to parse filters from query:", e);
+    }
+  }
+  
+  // Fallback: Handle individual query params
+  for (const [key, value] of Object.entries(route.query)) {
+    if (!value || key === 'view') continue;
+    
+    if (key === 'status') {
+      queryFilters[key] = value;
+    } else if (key === 'today' && value === 'true') {
+      const today = new Date().toISOString().split("T")[0];
+      queryFilters["creation"] = [">=", today];
+    }
+  }
+  
+  return queryFilters;
+}
+
+function mergeQueryFiltersWithDefaultParams() {
+  const queryFilters = applyQueryFilters();
+  if (Object.keys(queryFilters).length > 0) {
+    defaultParams.filters = { ...defaultParams.filters, ...queryFilters };
+  }
+}
+
+// Watch for query param changes (filters, status, etc.)
+watch(
+  () => [route.query.filters, route.query.status],
+  () => {
+    mergeQueryFiltersWithDefaultParams();
+    list.submit({ ...defaultParams });
+  }
+);
+
 onMounted(async () => {
   handleScrollPosition();
 
@@ -688,6 +750,7 @@ onMounted(async () => {
     await views.list.promise;
     handleViewChanges();
   }
+  
   if (route.query.view || defaultView.value) {
     if (route.query.view) {
       const currentView = findCurrentView();

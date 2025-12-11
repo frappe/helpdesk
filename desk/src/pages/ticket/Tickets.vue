@@ -11,6 +11,39 @@
         />
       </template>
       <template #right-header>
+      <div class="flex items-center gap-2">
+        <div
+          class="flex items-center gap-1 rounded-lg border border-outline-gray-2 bg-surface-white p-1"
+        >
+          <Button
+            variant="ghost"
+            theme="gray"
+            class="h-9 w-9"
+            :class="
+              isTableView
+                ? 'bg-surface-gray-2 border border-outline-gray-3'
+                : ''
+            "
+            :aria-pressed="isTableView"
+            @click="viewMode = 'table'"
+          >
+            <LucideLayoutList class="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            theme="gray"
+            class="h-9 w-9"
+            :class="
+              !isTableView
+                ? 'bg-surface-gray-2 border border-outline-gray-3'
+                : ''
+            "
+            :aria-pressed="!isTableView"
+            @click="viewMode = 'card'"
+          >
+            <LucideLayoutGrid class="h-4 w-4" />
+          </Button>
+        </div>
         <RouterLink
           :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
         >
@@ -20,28 +53,44 @@
             </template>
           </Button>
         </RouterLink>
+      </div>
       </template>
     </LayoutHeader>
-    <ListViewBuilder
-      ref="listViewRef"
+  <div v-show="isTableView">
+    <TicketListViewSection
+      ref="listViewSectionRef"
       :options="options"
-      @empty-state-action="
-        () =>
-          $router.push({
-            name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew',
-          })
-      "
-      @row-click="
-        (row) =>
-          $router.push({
-            name: isCustomerPortal ? 'TicketCustomer' : 'TicketAgent',
-            params: { ticketId: row },
-          })
-      "
+      @empty-action="handleEmptyStateAction"
+      @row-click="handleTableRowClick"
     />
+  </div>
+  <TicketCardViewSection
+    v-if="!isTableView"
+    :rows="cardRows"
+    :loading="listLoading"
+    :total-count="totalCount"
+    :current-count="currentCount"
+    :status-options="statusOptionList"
+    :priority-options="priorityOptionList"
+    :status-filter-options="statusFilterOptions"
+    :priority-filter-options="priorityFilterOptions"
+    :team-filter-options="teamFilterOptions"
+    :agent-filter-options="effectiveAgentFilterOptions"
+    :filters="cardFilters"
+    :quick-views="quickViews"
+    :active-quick-view="activeQuickView"
+    @row-click="handleCardClick"
+    @update-status="handleCardStatus"
+    @update-priority="handleCardPriority"
+    @load-more="handleCardLoadMore"
+    @update:filters="updateCardFilters"
+    @apply-filters="applyCardFilters"
+    @reset-filters="resetCardFilters"
+    @apply-quick-view="applyQuickView"
+  />
     <ExportModal
       v-model="showExportModal"
-      :rowCount="$refs.listViewRef?.list?.data?.total_count ?? 0"
+      :rowCount="exportRowCount"
       @update="
         ({ export_type, export_all }) => exportRows(export_type, export_all)
       "
@@ -55,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { LayoutHeader, ListViewBuilder } from "@/components";
+import { LayoutHeader } from "@/components";
 import {
   EditIcon,
   IndicatorIcon,
@@ -64,6 +113,9 @@ import {
   UnpinIcon,
 } from "@/components/icons";
 import ExportModal from "@/components/ticket/ExportModal.vue";
+import TicketRowActions from "@/components/ticket/TicketRowActions.vue";
+import TicketCardViewSection from "@/components/ticket/TicketCardViewSection.vue";
+import TicketListViewSection from "@/components/ticket/TicketListViewSection.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
@@ -73,9 +125,26 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
-import { Badge, FeatherIcon, toast, Tooltip, usePageMeta } from "frappe-ui";
-import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
+import { Badge, FeatherIcon, toast, Tooltip, usePageMeta, Dropdown, call, createResource } from "frappe-ui";
+import { computed, h, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import { useStorage } from "@vueuse/core";
 import { useRoute, useRouter } from "vue-router";
+import LucidePencil from "~icons/lucide/pencil";
+import LucideLayoutList from "~icons/lucide/layout-list";
+import LucideLayoutGrid from "~icons/lucide/layout-grid";
+import LucideAlignJustify from "~icons/lucide/align-justify";
+import LucidePlus from "~icons/lucide/plus";
+import LucideInbox from "~icons/lucide/inbox";
+import LucideMailOpen from "~icons/lucide/mail-open";
+import LucideAlertCircle from "~icons/lucide/alert-circle";
+import LucideUser from "~icons/lucide/user";
+
+type CardFilters = {
+  status: any[];
+  priority: any[];
+  team: any[];
+  agent: any[];
+};
 
 const router = useRouter();
 const route = useRoute();
@@ -93,10 +162,74 @@ const {
 const { $dialog, $socket } = globalStore();
 const { isManager } = useAuthStore();
 
-const listViewRef = ref(null);
+const listViewSectionRef = ref<any>(null);
+const listViewRef = computed(() => listViewSectionRef.value?.listViewRef);
+const viewMode = useStorage<"table" | "card">("tickets_view_mode", "table");
+const isTableView = computed(() => viewMode.value === "table");
+const ticketRows = computed(() => listViewRef.value?.list?.data?.data || []);
+const cardRows = computed(() => {
+  const rows = ticketRows.value || [];
+  return [...rows].sort((a, b) => statusRank(a) - statusRank(b));
+});
+const listLoading = computed(() => listViewRef.value?.list?.loading);
+const totalCount = computed(() => listViewRef.value?.list?.data?.total_count || 0);
+const currentCount = computed(() => cardRows.value.length);
+const exportRowCount = computed(
+  () => listViewRef.value?.list?.data?.total_count ?? 0
+);
+const cardFilters = reactive<CardFilters>({
+  status: [],
+  priority: [],
+  team: [],
+  agent: [],
+});
+const activeQuickView = ref<string>("");
 const showExportModal = ref(false);
+const currentUserEmail = computed(() => useAuthStore().userResource?.email || "");
 
-const { getStatus } = useTicketStatusStore();
+const quickViews = computed(() => [
+  {
+    label: "All tickets",
+    icon: LucideInbox,
+    filters: {},
+  },
+  {
+    label: "All unresolved tickets",
+    icon: LucideAlertCircle,
+    filters: {
+      status: ["!=", "Resolved"],
+    },
+  },
+  {
+    label: "New and my open tickets",
+    icon: LucideMailOpen,
+    filters: {
+      status: ["in", ["Open", "New"]],
+      assigned_to: currentUserEmail.value,
+    },
+  },
+  {
+    label: "Tickets I raised",
+    icon: LucideUser,
+    filters: {
+      raised_by: currentUserEmail.value,
+    },
+  },
+]);
+
+const { getStatus, statuses } = useTicketStatusStore();
+
+// Priority options
+const priorities = createResource({
+  url: "frappe.client.get_list",
+  params: {
+    doctype: "HD Ticket Priority",
+    fields: ["name"],
+    orderBy: "`tabHD Ticket Priority`.order",
+    limit: 100,
+  },
+  auto: true,
+});
 
 const listSelections = ref(new Set());
 const selectBannerActions = [
@@ -110,23 +243,104 @@ const selectBannerActions = [
   },
 ];
 
+function handleEmptyStateAction() {
+  router.push({
+    name: isCustomerPortal.value ? "TicketNew" : "TicketAgentNew",
+  });
+}
+
+function handleTableRowClick(row: string) {
+  router.push({
+    name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
+    params: { ticketId: row },
+  });
+}
+
+// Update ticket field function
+async function updateTicketField(ticketId: string, field: string, value: string) {
+  try {
+    await call("frappe.client.set_value", {
+      doctype: "HD Ticket",
+      name: ticketId,
+      fieldname: field,
+      value: value,
+    });
+    toast.success("Updated successfully");
+    // Reload the list to reflect changes
+    await listViewRef.value?.reload(false);
+  } catch (error: any) {
+    toast.error(error.message || "Failed to update");
+  }
+}
+
+const defaultFilters = reactive<Record<string, any>>({});
+
 const options = {
   doctype: "HD Ticket",
   columnConfig: {
     status: {
-      custom: ({ item }) => {
+      custom: ({ item, row }) => {
         const status = getStatus(item);
         const label = isCustomerPortal.value
           ? status?.["label_customer"]
           : status?.["label_agent"];
-        return h(
-          "div",
-          { class: "flex items-center space-x-2 justify-start w-full" },
-          [
-            h(IndicatorIcon, { class: status?.["parsed_color"] }),
-            h("span", { class: "truncate flex-1" }, label),
-          ]
-        );
+        
+        const statusOptions = (statuses.data || []).map((s) => ({
+          label: s.label_agent,
+          icon: () => h(IndicatorIcon, { class: s.parsed_color }),
+          onClick: () => updateTicketField(row.name, "status", s.label_agent),
+        }));
+        
+        return h("div", { class: "group relative" }, [
+          h(
+            Dropdown,
+            {
+              options: statusOptions,
+              placement: "right",
+            },
+            {
+              default: () =>
+                h(
+                  "div",
+                  { class: "flex items-center space-x-2 justify-start w-full px-2 py-1 rounded hover:bg-surface-gray-2 cursor-pointer" },
+                  [
+                    h(IndicatorIcon, { class: status?.["parsed_color"] }),
+                    h("span", { class: "truncate flex-1" }, label),
+                    h(LucidePencil, { class: "size-3 text-ink-gray-5 opacity-0 group-hover:opacity-100 transition-opacity" }),
+                  ]
+                ),
+            }
+          ),
+        ]);
+      },
+    },
+    priority: {
+      custom: ({ item, row }) => {
+        const priorityOptions = (priorities.data || []).map((p) => ({
+          label: p.name,
+          onClick: () => updateTicketField(row.name, "priority", p.name),
+        }));
+        
+        return h("div", { class: "group relative" }, [
+          h(
+            Dropdown,
+            {
+              options: priorityOptions,
+              placement: "right",
+            },
+            {
+              default: () =>
+                h(
+                  "div",
+                  { class: "flex items-center space-x-2 justify-start w-full px-2 py-1 rounded hover:bg-surface-gray-2 cursor-pointer" },
+                  [
+                    h("span", { class: "truncate flex-1" }, item || "None"),
+                    h(LucidePencil, { class: "size-3 text-ink-gray-5 opacity-0 group-hover:opacity-100 transition-opacity" }),
+                  ]
+                ),
+            }
+          ),
+        ]);
       },
     },
     agreement_status: {
@@ -144,6 +358,15 @@ const options = {
     resolution_by: {
       custom: ({ row, item }) => handle_resolution_by_field(row, item),
     },
+    actions: {
+      custom: ({ row }) => {
+        if (isCustomerPortal.value) return null;
+        return h(TicketRowActions, {
+          ticket: row,
+          onUpdate: () => listViewRef.value?.reload(false),
+        });
+      },
+    },
   },
   isCustomerPortal: isCustomerPortal.value,
   selectable: true,
@@ -160,7 +383,192 @@ const options = {
     prop: "ticketId",
   },
   hideColumnSetting: false,
+  default_page_length: 25,
+  defaultFilters,
 };
+
+const statusOptionList = computed(() =>
+  (statuses.data || []).map((s) => ({
+    label: isCustomerPortal.value ? s.label_customer : s.label_agent,
+    value: s.label_agent,
+    indicatorClass: s.parsed_color,
+    category: s.category,
+  }))
+);
+
+const priorityOptionList = computed(() =>
+  (priorities.data || []).map((p) => p.name)
+);
+
+const agentOptions = createResource({
+  url: "frappe.client.get_list",
+  params: {
+    doctype: "HD Agent",
+    fields: ["name", "agent_name"],
+    limit: 100,
+  },
+  auto: true,
+});
+
+// Filter dropdown options
+const statusFilterOptions = computed(() => {
+  const options = (statuses.data || []).map((s) => ({
+    label: isCustomerPortal.value ? s.label_customer : s.label_agent,
+    value: s.label_agent,
+    indicatorClass: s.parsed_color,
+    category: s.category,
+  }));
+  return [
+    {
+      label: "All",
+      value: "",
+    },
+    ...options,
+  ];
+});
+
+const priorityFilterOptions = computed(() =>
+  (priorities.data || []).map((p) => ({
+    label: p.name,
+    value: p.name,
+  }))
+);
+
+const agentFilterOptions = computed(() =>
+  (agentOptions.data || []).map((a) => ({
+    label: a.agent_name || a.name,
+    value: a.name,
+  }))
+);
+
+const teamOptions = createResource({
+  url: "frappe.client.get_list",
+  params: {
+    doctype: "HD Team",
+    fields: ["name", "team_name"],
+    limit: 100,
+  },
+  auto: true,
+});
+
+const teamFilterOptions = computed(() =>
+  (teamOptions.data || []).map((t) => ({
+    label: t.team_name || t.name,
+    value: t.name,
+  }))
+);
+
+const selectedTeam = computed(() => {
+  const first = cardFilters.team?.[0];
+  if (!first) return "";
+  if (typeof first === "string") return first;
+  return first?.value || "";
+});
+
+const teamMembers = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_team.hd_team.get_team_members",
+  cache: ["TicketCard", "TeamMembers"],
+  auto: false,
+  params: {
+    team: selectedTeam.value,
+  },
+});
+
+watch(
+  selectedTeam,
+  (team) => {
+    if (team) {
+      teamMembers.update({ params: { team } });
+      teamMembers.reload();
+    } else {
+      teamMembers.data = [];
+    }
+    cardFilters.agent = [];
+  },
+  { immediate: false }
+);
+
+const teamAgentOptions = computed(() => {
+  const data = teamMembers.data || [];
+  if (!selectedTeam.value || !Array.isArray(data) || !data.length) return [];
+  return data.map((member: string) => ({
+    label: member,
+    value: member,
+  }));
+});
+
+const effectiveAgentFilterOptions = computed(() => {
+  if (teamAgentOptions.value.length) return teamAgentOptions.value;
+  return agentFilterOptions.value;
+});
+
+function setDefaultFilters(filters: Record<string, any> = {}) {
+  Object.keys(defaultFilters).forEach((key) => delete defaultFilters[key]);
+  Object.assign(defaultFilters, filters || {});
+}
+
+function getBaseDefaultFilters() {
+  const listFilters = listViewRef.value?.list?.params?.filters;
+  if (Object.keys(defaultFilters).length) {
+    return { ...defaultFilters };
+  }
+  if (listFilters && Object.keys(listFilters).length) {
+    return { ...listFilters };
+  }
+  return {};
+}
+
+function syncCardFiltersWithDefault(sourceFilters?: Record<string, any>) {
+  const defaults: Record<string, any> =
+    (sourceFilters && Object.keys(sourceFilters).length ? sourceFilters : null) ||
+    getBaseDefaultFilters();
+  const pickValues = (
+    key: keyof CardFilters,
+    optionsList: { value: string; label: string; indicatorClass?: string }[]
+  ) => {
+    const filter = defaults[key];
+    if (Array.isArray(filter) && filter[0] === "in" && Array.isArray(filter[1])) {
+      const values = filter[1] as string[];
+      return optionsList.filter((opt) => values.includes(opt.value));
+    }
+    return [];
+  };
+
+  cardFilters.status = pickValues("status", statusFilterOptions.value);
+  cardFilters.priority = pickValues("priority", priorityFilterOptions.value as any);
+  cardFilters.team = pickValues("team", teamFilterOptions.value as any);
+  cardFilters.agent = pickValues("agent", agentFilterOptions.value as any);
+}
+
+watch(
+  () => listViewRef.value?.list?.params?.filters,
+  (filters) => {
+    if (!filters) return;
+    if (!Object.keys(defaultFilters).length && Object.keys(filters).length) {
+      setDefaultFilters(filters);
+    }
+    syncCardFiltersWithDefault(filters);
+  },
+  { immediate: true, deep: true }
+);
+
+watch(
+  () => [
+    statusFilterOptions.value,
+    priorityFilterOptions.value,
+    teamFilterOptions.value,
+    agentFilterOptions.value,
+  ],
+  () => syncCardFiltersWithDefault(),
+  { immediate: true }
+);
+
+watch(
+  () => route.query.view,
+  () => {
+    setDefaultFilters({});
+  }
+);
 
 function handle_response_by_field(row: any, item: string) {
   if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
@@ -255,6 +663,179 @@ function reset(reload = false) {
   listViewRef.value?.unselectAll();
   listSelections.value?.clear();
   if (reload) listViewRef.value.reload();
+}
+
+const pageLengthCount = computed(
+  () =>
+    listViewRef.value?.list?.params?.page_length_count ||
+    options.default_page_length ||
+    20
+);
+
+function handleCardLoadMore() {
+  const count = pageLengthCount.value;
+  listViewRef.value?.handlePageLength?.(count, true);
+}
+
+function statusRank(row: any) {
+  const meta = getStatus(row?.status) || {};
+  const category = meta.category || "";
+  // Open/New tickets first (0)
+  if (category === "Open" || row?.status === "Open" || row?.status === "New") return 0;
+  // Pending/Paused tickets second (1)
+  if (category === "Paused" || row?.status === "Pending") return 1;
+  // Resolved/Closed tickets last (2)
+  if (category === "Resolved" || row?.status === "Closed" || row?.status === "Resolved") return 2;
+  return 0;
+}
+
+function handleCardClick(ticketId: string) {
+  console.log("Navigating to ticket:", ticketId);
+  if (!ticketId) {
+    console.error("No ticket ID provided");
+    return;
+  }
+  router.push({
+    name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
+    params: { ticketId },
+  });
+}
+
+function handleCardStatus(ticketId: string, value: string) {
+  updateTicketField(ticketId, "status", value);
+}
+
+function handleCardPriority(ticketId: string, value: string) {
+  updateTicketField(ticketId, "priority", value);
+}
+
+function updateCardFilters(value: CardFilters) {
+  cardFilters.status = value?.status || [];
+  cardFilters.priority = value?.priority || [];
+  cardFilters.team = value?.team || [];
+  cardFilters.agent = value?.agent || [];
+}
+
+function applyCardFilters(filtersArg: CardFilters = cardFilters) {
+  const sourceFilters = filtersArg || cardFilters;
+  updateCardFilters(sourceFilters);
+
+  if (!listViewRef.value?.list) return;
+  const list = listViewRef.value.list;
+
+  // Build fresh filters object (don't merge with existing)
+  let filters: Record<string, any> = {};
+  
+  // Extract values from filter objects (they might be objects with {label, value} or just strings)
+  const extractValues = (arr: any[] = []) => {
+    return arr.map((item) =>
+      typeof item === "object" && item !== null && "value" in item
+        ? item.value
+        : item
+    );
+  };
+
+  let rawStatusValues = extractValues(sourceFilters.status);
+  const statusAllSelected = rawStatusValues.some(
+    (v) => v === "" || v === null || v === undefined
+  );
+  if (statusAllSelected) {
+    sourceFilters.status = [];
+    cardFilters.status = [];
+    rawStatusValues = [];
+    filters = {};
+  }
+
+  // If "All" is selected, drop all status filters (empty filters)
+  if (!statusAllSelected) {
+    // Apply card filters
+    if (sourceFilters.status?.length) {
+      const statusValues = rawStatusValues.filter(Boolean);
+      if (statusValues.length) {
+        filters["status"] = ["in", statusValues];
+      }
+    }
+  }
+
+  if (sourceFilters.priority?.length) {
+    const priorityValues = extractValues(sourceFilters.priority);
+    filters["priority"] = ["in", priorityValues];
+  }
+
+  if (sourceFilters.team?.length) {
+    const teamValues = extractValues(sourceFilters.team);
+    filters["agent_group"] = ["in", teamValues];
+  }
+
+  if (sourceFilters.agent?.length) {
+    const agentValues = extractValues(sourceFilters.agent);
+    const agent = agentValues[0];
+    if (agent) {
+      // Frappe stores assignees in _assign JSON field
+      filters["_assign"] = ["like", `%\"${agent}\"%`];
+    }
+  }
+
+  console.log("Applying card filters:", filters);
+
+  const params = {
+    ...list.params,
+    filters: statusAllSelected ? {} : filters,
+    default_filters: {},
+  };
+
+  list.submit(params);
+  list.params = params;
+}
+
+function resetCardFilters() {
+  syncCardFiltersWithDefault();
+  activeQuickView.value = "";
+  
+  // Reset to default filters only
+  if (!listViewRef.value?.list) return;
+  const list = listViewRef.value.list;
+  const baseDefaultFilters = getBaseDefaultFilters();
+  
+  console.log("Resetting card filters to defaults:", baseDefaultFilters);
+  
+  list.submit({
+    ...list.params,
+    filters: baseDefaultFilters,
+    default_filters: baseDefaultFilters,
+  });
+}
+
+function applyQuickView(view: any) {
+  if (!listViewRef.value?.list) return;
+  
+  // Reset card filters state
+  syncCardFiltersWithDefault();
+  
+  // Set active quick view
+  activeQuickView.value = view.label;
+  
+  console.log("Applying quick view:", view.label, "Filters:", view.filters);
+  
+  // Apply the quick view filters directly to the list
+  const list = listViewRef.value.list;
+  
+  const isAll = view.label === "All tickets";
+  const baseDefaultFilters = isAll ? {} : getBaseDefaultFilters();
+  const mergedFilters = { ...baseDefaultFilters, ...view.filters };
+
+  const params = {
+    ...list.params,
+    filters: mergedFilters,
+    default_filters: isAll ? {} : baseDefaultFilters,
+  };
+
+  list.submit(params);
+  list.params = params;
+}
+
+function toggleValue(arr: string[], value: string) {
+  return arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
 }
 
 const slaStatusColorMap = {
@@ -544,6 +1125,17 @@ function resetState() {
   viewDialog.mode = null;
   selectedView = null;
 }
+
+// Watch viewMode and reset filters when switching to card view
+watch(viewMode, async (newMode, oldMode) => {
+  if (newMode === 'card') {
+    // Wait for DOM update
+    await nextTick();
+    // Reset all filters when entering card view
+    console.log("Switched to card view, resetting filters");
+    resetCardFilters();
+  }
+});
 
 onMounted(() => {
   if (!route.query.view) {

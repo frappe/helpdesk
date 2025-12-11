@@ -591,3 +591,374 @@ def get_bar_chart_config(
         "series": series,
         **kwargs,
     }
+
+
+@frappe.whitelist()
+@agent_only
+def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]:
+    """
+    Get status card data for Freshdesk-style dashboard.
+    Returns counts for: Unresolved, Overdue, Due Today, Open, On Hold, Unassigned
+    """
+    user = frappe.session.user
+    is_manager = "Agent Manager" in frappe.get_roles(user)
+
+    if filters and not is_manager and (filters.get("agent") != user or filters.get("team")):
+        frappe.throw(
+            _("You are not allowed to view this dashboard data."),
+            frappe.PermissionError,
+        )
+
+    ticket = DocType("HD Ticket")
+    today = frappe.utils.nowdate()
+
+    # Get open statuses
+    open_statuses = frappe.get_all(
+        "HD Ticket Status",
+        filters={"category": "Open"},
+        pluck="name",
+    )
+
+    # Build base conditions
+    base_conds = []
+    if filters:
+        if filters.get("team"):
+            base_conds.append(ticket.agent_group == filters.get("team"))
+        if filters.get("agent"):
+            agent = filters.get("agent")
+            if agent == "@me":
+                agent = user
+            base_conds.append(
+                Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull()
+            )
+
+    def get_count(extra_cond=None):
+        query = frappe.qb.from_(ticket).select(Count(ticket.name).as_("count"))
+        for cond in base_conds:
+            query = query.where(cond)
+        if extra_cond is not None:
+            query = query.where(extra_cond)
+        result = query.run(as_dict=True)
+        return result[0].count if result else 0
+
+    # Unresolved: All tickets in open statuses
+    unresolved_cond = ticket.status.isin(open_statuses) if open_statuses else None
+    unresolved = get_count(unresolved_cond)
+
+    # Overdue: Open tickets past their resolution_by date
+    overdue_cond = (
+        ticket.status.isin(open_statuses) if open_statuses else ticket.status == "Open"
+    ) & (ticket.resolution_by < today) & (ticket.resolution_by.isnotnull())
+    overdue = get_count(overdue_cond)
+
+    # Due Today: Open tickets with resolution_by = today
+    due_today_cond = (
+        ticket.status.isin(open_statuses) if open_statuses else ticket.status == "Open"
+    ) & (ticket.resolution_by == today)
+    due_today = get_count(due_today_cond)
+
+    # Open: Tickets with status "Open"
+    open_count = get_count(ticket.status == "Open")
+
+    # On Hold: Tickets with status containing "hold" or "pending"
+    on_hold_statuses = frappe.get_all(
+        "HD Ticket Status",
+        filters=[["name", "like", "%hold%"]],
+        pluck="name",
+    )
+    on_hold_statuses += frappe.get_all(
+        "HD Ticket Status",
+        filters=[["name", "like", "%pending%"]],
+        pluck="name",
+    )
+    on_hold = get_count(ticket.status.isin(on_hold_statuses)) if on_hold_statuses else 0
+
+    # Unassigned: Open tickets with no assignee
+    unassigned_cond = (
+        ticket.status.isin(open_statuses) if open_statuses else ticket.status == "Open"
+    ) & ((ticket._assign.isnull()) | (ticket._assign == "[]"))
+    unassigned = get_count(unassigned_cond)
+
+    # Closed: Tickets with resolved/closed status
+    resolved_statuses = frappe.get_all(
+        "HD Ticket Status",
+        filters={"category": "Resolved"},
+        pluck="name",
+    )
+    closed_cond = ticket.status.isin(resolved_statuses) if resolved_statuses else ticket.status == "Closed"
+    closed_count = get_count(closed_cond)
+
+    # Pending: Tickets with status containing "pending"
+    pending_statuses = frappe.get_all(
+        "HD Ticket Status",
+        filters=[["name", "like", "%pending%"]],
+        pluck="name",
+    )
+    pending_count = get_count(ticket.status.isin(pending_statuses)) if pending_statuses else 0
+
+    # Today's Tickets: Tickets created today
+    todays_tickets_cond = Function("DATE", ticket.creation) == today
+    todays_tickets = get_count(todays_tickets_cond)
+
+    # Format filters to match the query logic
+    resolved_filter = {"status": ["in", resolved_statuses]} if resolved_statuses else {"status": "Closed"}
+    pending_filter = {"status": ["in", pending_statuses]} if pending_statuses else {}
+    
+    return [
+        {"label": _("Open"), "count": open_count, "status_filter": {"status": "Open"}, "color": "#318AD8"},
+        {"label": _("Closed"), "count": closed_count, "status_filter": resolved_filter, "color": "#48BB78"},
+        {"label": _("Pending"), "count": pending_count, "status_filter": pending_filter, "color": "#F6AD55"},
+        {"label": _("Today's Tickets"), "count": todays_tickets, "status_filter": {"today": True}, "color": "#9F7AEA"},
+    ]
+
+
+@frappe.whitelist()
+@agent_only
+def get_today_trend_data(filters: dict[str, any] = None) -> dict[str, any]:
+    """
+    Get hourly ticket trend data for today and yesterday.
+    """
+    user = frappe.session.user
+    is_manager = "Agent Manager" in frappe.get_roles(user)
+
+    if filters and not is_manager and (filters.get("agent") != user or filters.get("team")):
+        frappe.throw(
+            _("You are not allowed to view this dashboard data."),
+            frappe.PermissionError,
+        )
+
+    ticket = DocType("HD Ticket")
+    today = frappe.utils.nowdate()
+    yesterday = frappe.utils.add_days(today, -1)
+    tomorrow = frappe.utils.add_days(today, 1)
+
+    # Build base conditions
+    base_conds = []
+    if filters:
+        if filters.get("team"):
+            base_conds.append(ticket.agent_group == filters.get("team"))
+        if filters.get("agent"):
+            agent = filters.get("agent")
+            if agent == "@me":
+                agent = user
+            base_conds.append(
+                Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull()
+            )
+
+    def get_hourly_data(date_start, date_end):
+        query = (
+            frappe.qb.from_(ticket)
+            .select(
+                Function("HOUR", ticket.creation).as_("hour"),
+                Count(ticket.name).as_("count"),
+            )
+            .where(ticket.creation >= date_start)
+            .where(ticket.creation < date_end)
+            .groupby(Function("HOUR", ticket.creation))
+            .orderby(Function("HOUR", ticket.creation))
+        )
+        for cond in base_conds:
+            query = query.where(cond)
+        return query.run(as_dict=True)
+
+    today_data = get_hourly_data(today, tomorrow)
+    yesterday_data = get_hourly_data(yesterday, today)
+
+    # Get summary metrics
+    resolved_statuses = frappe.get_all(
+        "HD Ticket Status",
+        filters={"category": "Resolved"},
+        pluck="name",
+    )
+
+    # Received today
+    received_query = (
+        frappe.qb.from_(ticket)
+        .select(Count(ticket.name).as_("count"))
+        .where(ticket.creation >= today)
+        .where(ticket.creation < tomorrow)
+    )
+    for cond in base_conds:
+        received_query = received_query.where(cond)
+    received_result = received_query.run(as_dict=True)
+    received = received_result[0].count if received_result else 0
+
+    # Avg first response (in hours)
+    avg_response_query = (
+        frappe.qb.from_(ticket)
+        .select(Avg(ticket.first_response_time / 3600).as_("avg"))
+        .where(ticket.creation >= today)
+        .where(ticket.creation < tomorrow)
+        .where(ticket.first_responded_on.isnotnull())
+    )
+    for cond in base_conds:
+        avg_response_query = avg_response_query.where(cond)
+    avg_response_result = avg_response_query.run(as_dict=True)
+    avg_first_response = round(avg_response_result[0].avg or 0, 1)
+
+    # Resolution rate (resolved / total * 100)
+    total_query = (
+        frappe.qb.from_(ticket)
+        .select(Count(ticket.name).as_("count"))
+        .where(ticket.creation >= today)
+        .where(ticket.creation < tomorrow)
+    )
+    for cond in base_conds:
+        total_query = total_query.where(cond)
+    total_result = total_query.run(as_dict=True)
+    total = total_result[0].count if total_result else 0
+
+    resolved_query = (
+        frappe.qb.from_(ticket)
+        .select(Count(ticket.name).as_("count"))
+        .where(ticket.creation >= today)
+        .where(ticket.creation < tomorrow)
+        .where(ticket.status.isin(resolved_statuses) if resolved_statuses else ticket.status == "Closed")
+    )
+    for cond in base_conds:
+        resolved_query = resolved_query.where(cond)
+    resolved_result = resolved_query.run(as_dict=True)
+    resolved = resolved_result[0].count if resolved_result else 0
+
+    resolution_rate = round((resolved / total * 100) if total > 0 else 0, 0)
+
+    return {
+        "today": today_data,
+        "yesterday": yesterday_data,
+        "summary": {
+            "received": received,
+            "avgFirstResponse": avg_first_response,
+            "resolutionRate": resolution_rate,
+        },
+    }
+
+
+@frappe.whitelist()
+@agent_only
+def get_unresolved_grouped_data(filters: dict[str, any] = None) -> list[dict[str, any]]:
+    """
+    Get unresolved tickets grouped by team.
+    """
+    user = frappe.session.user
+    is_manager = "Agent Manager" in frappe.get_roles(user)
+
+    if filters and not is_manager and (filters.get("agent") != user or filters.get("team")):
+        frappe.throw(
+            _("You are not allowed to view this dashboard data."),
+            frappe.PermissionError,
+        )
+
+    open_statuses = frappe.get_all(
+        "HD Ticket Status",
+        filters={"category": "Open"},
+        pluck="name",
+    )
+
+    base_filters = {
+        "status": ["in", open_statuses] if open_statuses else ["=", "Open"],
+    }
+    if filters:
+        if filters.get("team"):
+            base_filters["agent_group"] = filters.get("team")
+        if filters.get("agent"):
+            agent = filters.get("agent")
+            if agent == "@me":
+                agent = user
+            base_filters["_assign"] = ["like", f"%{agent}%"]
+
+    result = frappe.get_all(
+        HD_TICKET,
+        fields=["agent_group as name", COUNT_NAME],
+        filters=base_filters,
+        group_by="agent_group",
+        order_by=COUNT_DESC,
+    )
+
+    for r in result:
+        if not r.name:
+            r.name = _("Unassigned")
+
+    return result
+
+
+@frappe.whitelist()
+@agent_only
+def get_satisfaction_data(filters: dict[str, any] = None) -> dict[str, any]:
+    """
+    Get customer satisfaction breakdown.
+    """
+    user = frappe.session.user
+    is_manager = "Agent Manager" in frappe.get_roles(user)
+
+    if filters and not is_manager and (filters.get("agent") != user or filters.get("team")):
+        frappe.throw(
+            _("You are not allowed to view this dashboard data."),
+            frappe.PermissionError,
+        )
+
+    ticket = DocType("HD Ticket")
+
+    # Build base conditions
+    base_conds = [ticket.feedback_rating > 0]
+    if filters:
+        if filters.get("team"):
+            base_conds.append(ticket.agent_group == filters.get("team"))
+        if filters.get("agent"):
+            agent = filters.get("agent")
+            if agent == "@me":
+                agent = user
+            base_conds.append(
+                Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull()
+            )
+        if filters.get("from_date"):
+            base_conds.append(ticket.creation >= filters.get("from_date"))
+        if filters.get("to_date"):
+            base_conds.append(ticket.creation <= filters.get("to_date"))
+
+    # Total responses
+    total_query = frappe.qb.from_(ticket).select(Count(ticket.name).as_("count"))
+    for cond in base_conds:
+        total_query = total_query.where(cond)
+    total_result = total_query.run(as_dict=True)
+    total = total_result[0].count if total_result else 0
+
+    if total == 0:
+        return {
+            "responsesReceived": 0,
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0,
+        }
+
+    # Positive (rating >= 0.8, i.e., 4-5 stars on 5-star scale)
+    positive_query = frappe.qb.from_(ticket).select(Count(ticket.name).as_("count"))
+    for cond in base_conds:
+        positive_query = positive_query.where(cond)
+    positive_query = positive_query.where(ticket.feedback_rating >= 0.8)
+    positive_result = positive_query.run(as_dict=True)
+    positive = positive_result[0].count if positive_result else 0
+
+    # Neutral (rating between 0.5 and 0.8, i.e., 3 stars)
+    neutral_query = frappe.qb.from_(ticket).select(Count(ticket.name).as_("count"))
+    for cond in base_conds:
+        neutral_query = neutral_query.where(cond)
+    neutral_query = neutral_query.where(
+        (ticket.feedback_rating >= 0.5) & (ticket.feedback_rating < 0.8)
+    )
+    neutral_result = neutral_query.run(as_dict=True)
+    neutral = neutral_result[0].count if neutral_result else 0
+
+    # Negative (rating < 0.5, i.e., 1-2 stars)
+    negative_query = frappe.qb.from_(ticket).select(Count(ticket.name).as_("count"))
+    for cond in base_conds:
+        negative_query = negative_query.where(cond)
+    negative_query = negative_query.where(ticket.feedback_rating < 0.5)
+    negative_result = negative_query.run(as_dict=True)
+    negative = negative_result[0].count if negative_result else 0
+
+    return {
+        "responsesReceived": total,
+        "positive": round(positive / total * 100) if total > 0 else 0,
+        "neutral": round(neutral / total * 100) if total > 0 else 0,
+        "negative": round(negative / total * 100) if total > 0 else 0,
+    }
