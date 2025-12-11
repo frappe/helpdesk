@@ -194,7 +194,7 @@ import {
   call,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, nextTick, ref } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
@@ -256,6 +256,70 @@ const cc = computed(() => (ccEmailsClone.value?.length ? true : false));
 const bcc = computed(() => (bccEmailsClone.value?.length ? true : false));
 const ccInput = ref(null);
 const bccInput = ref(null);
+
+// Fetch email accounts and set default to support@zipcushions.com
+const emailAccounts = createResource({
+  url: "helpdesk.api.settings.email.get_outgoing_email_accounts",
+  auto: true,
+  cache: "user-outgoing-email-accounts",
+});
+
+// Watch for email accounts to load and set default to support@zipcushions.com
+// Use multiple delayed attempts to override SingleSelectEmailInput's auto-select
+watch(
+  () => emailAccounts.data,
+  (accounts: any) => {
+    if (accounts && accounts.length > 0) {
+      const supportAccount = accounts.find(
+        (acc: any) => acc.email_id?.toLowerCase() === "support@zipcushions.com"
+      );
+      if (supportAccount) {
+        // Use multiple delayed attempts to ensure we override SingleSelectEmailInput's auto-select
+        // SingleSelectEmailInput auto-selects at ~0ms, so we need to run after that
+        const setDefault = () => {
+          // Only set if fromEmailAccount is null or matches first account (auto-selected)
+          const firstAccount = accounts[0];
+          if (
+            !fromEmailAccount.value ||
+            fromEmailAccount.value === firstAccount?.value
+          ) {
+            fromEmailAccount.value = supportAccount.value;
+          }
+        };
+        // Try immediately (might be too early)
+        setDefault();
+        // Try after SingleSelectEmailInput's watch runs
+        setTimeout(setDefault, 50);
+        setTimeout(setDefault, 150);
+        setTimeout(setDefault, 300);
+        setTimeout(setDefault, 500);
+      }
+    }
+  },
+  { immediate: true }
+);
+
+// Also watch fromEmailAccount to catch when SingleSelectEmailInput changes it
+watch(
+  () => fromEmailAccount.value,
+  (currentValue) => {
+    if (emailAccounts.data && emailAccounts.data.length > 0 && currentValue) {
+      const supportAccount = emailAccounts.data.find(
+        (acc: any) => acc.email_id?.toLowerCase() === "support@zipcushions.com"
+      );
+      if (supportAccount && currentValue !== supportAccount.value) {
+        // Check if it's the first account (auto-selected by SingleSelectEmailInput)
+        const firstAccount = emailAccounts.data[0];
+        if (currentValue === firstAccount?.value) {
+          // It was auto-selected, override with support account after a short delay
+          setTimeout(() => {
+            fromEmailAccount.value = supportAccount.value;
+          }, 100);
+        }
+      }
+    }
+  }
+);
 
 
 function applyCannedResponse(template) {
