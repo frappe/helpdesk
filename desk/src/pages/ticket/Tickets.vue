@@ -82,13 +82,7 @@
         :loading="listLoading"
         :status-options="statusOptionList"
         :priority-options="priorityOptionList"
-        @row-click="
-          (rowId) =>
-            $router.push({
-              name: isCustomerPortal ? 'TicketCustomer' : 'TicketAgent',
-              params: { ticketId: typeof rowId === 'string' ? rowId : rowId?.name },
-            })
-        "
+        @row-click="handleCardClick"
         @update-status="(ticketId, value) => handleCardStatus(ticketId, value)"
         @update-priority="(ticketId, value) => handleCardPriority(ticketId, value)"
       />
@@ -668,6 +662,18 @@ function statusRank(row: any) {
   if (category === "Resolved") return 3;
   if (category === "Paused") return 1;
   return 0;
+}
+
+function handleCardClick(ticketId: string) {
+  console.log("Navigating to ticket:", ticketId);
+  if (!ticketId) {
+    console.error("No ticket ID provided");
+    return;
+  }
+  router.push({
+    name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
+    params: { ticketId },
+  });
 }
 
 function handleCardStatus(ticketId: string, value: string) {

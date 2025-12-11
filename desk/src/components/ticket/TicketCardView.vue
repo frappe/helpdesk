@@ -13,11 +13,11 @@
       <div
         v-for="ticket in rows"
         :key="ticket.name"
-        class="rounded-lg border border-outline-gray-2 bg-surface-white p-4 shadow-sm transition-all duration-200 hover:border-outline-gray-3 hover:shadow-md"
+        class="rounded-lg border border-outline-gray-2 bg-surface-white p-4 shadow-sm transition-all duration-200 hover:border-outline-gray-3 hover:shadow-md cursor-pointer"
         :class="resolvedClass(ticket)"
-        @click="$emit('rowClick', ticket.name)"
+        @click="handleCardClick(ticket)"
       >
-        <div class="flex items-start justify-between gap-4" @click.stop>
+        <div class="flex items-start justify-between gap-4">
           <div class="flex min-w-0 flex-1 flex-col gap-3">
             <div class="flex flex-col gap-2">
               <div class="flex items-center gap-2">
@@ -125,7 +125,6 @@ import { IndicatorIcon } from "@/components/icons";
 import { dayjs } from "@/dayjs";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { Badge, Button, Dropdown, LoadingIndicator } from "frappe-ui";
-import { withDefaults } from "vue";
 import LucideAlarmClock from "~icons/lucide/alarm-clock";
 import LucideArrowRight from "~icons/lucide/arrow-right";
 import LucideChevronDown from "~icons/lucide/chevron-down";
@@ -208,9 +207,15 @@ function priorityOptionsList(row: any) {
 function resolvedClass(row: any) {
   const meta = statusMeta(row);
   if (meta.category === "Resolved") {
-    return "!bg-gray-50 !border-gray-200 opacity-70 cursor-default hover:!shadow-sm";
+    return "!bg-gray-50 !border-gray-200 opacity-70 !cursor-default hover:!shadow-sm";
   }
-  return "cursor-pointer";
+  return "";
+}
+
+function handleCardClick(ticket: any) {
+  const ticketId = ticket.name || ticket;
+  console.log("Card clicked, ticket ID:", ticketId);
+  emit("rowClick", ticketId);
 }
 
 function isFirstResponseDue(row: any) {
