@@ -146,13 +146,6 @@ function getRowClass(row) {
   
   const classes = [];
   
-  // Status-based coloring
-  if (statusCategory === "Resolved") {
-    classes.push("bg-surface-gray-1", "text-ink-gray-6", "opacity-75");
-  } else if (overdue) {
-    classes.push("bg-red-50", "border-l-2", "border-red-400");
-  }
-  
   // Hover effect
   classes.push("hover:shadow-sm", "hover:bg-surface-gray-1");
   
