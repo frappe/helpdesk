@@ -273,7 +273,7 @@ async function updateTicketField(ticketId: string, field: string, value: string)
   }
 }
 
-const defaultFilters = {};
+const defaultFilters = reactive<Record<string, any>>({});
 
 const options = {
   doctype: "HD Ticket",
@@ -502,8 +502,26 @@ const effectiveAgentFilterOptions = computed(() => {
   return agentFilterOptions.value;
 });
 
-function syncCardFiltersWithDefault() {
-  const defaults: Record<string, any> = defaultFilters || {};
+function setDefaultFilters(filters: Record<string, any> = {}) {
+  Object.keys(defaultFilters).forEach((key) => delete defaultFilters[key]);
+  Object.assign(defaultFilters, filters || {});
+}
+
+function getBaseDefaultFilters() {
+  const listFilters = listViewRef.value?.list?.params?.filters;
+  if (Object.keys(defaultFilters).length) {
+    return { ...defaultFilters };
+  }
+  if (listFilters && Object.keys(listFilters).length) {
+    return { ...listFilters };
+  }
+  return {};
+}
+
+function syncCardFiltersWithDefault(sourceFilters?: Record<string, any>) {
+  const defaults: Record<string, any> =
+    (sourceFilters && Object.keys(sourceFilters).length ? sourceFilters : null) ||
+    getBaseDefaultFilters();
   const pickValues = (
     key: keyof CardFilters,
     optionsList: { value: string; label: string; indicatorClass?: string }[]
@@ -523,6 +541,18 @@ function syncCardFiltersWithDefault() {
 }
 
 watch(
+  () => listViewRef.value?.list?.params?.filters,
+  (filters) => {
+    if (!filters) return;
+    if (!Object.keys(defaultFilters).length && Object.keys(filters).length) {
+      setDefaultFilters(filters);
+    }
+    syncCardFiltersWithDefault(filters);
+  },
+  { immediate: true, deep: true }
+);
+
+watch(
   () => [
     statusFilterOptions.value,
     priorityFilterOptions.value,
@@ -531,6 +561,13 @@ watch(
   ],
   () => syncCardFiltersWithDefault(),
   { immediate: true }
+);
+
+watch(
+  () => route.query.view,
+  () => {
+    setDefaultFilters({});
+  }
 );
 
 function handle_response_by_field(row: any, item: string) {
@@ -758,14 +795,14 @@ function resetCardFilters() {
   // Reset to default filters only
   if (!listViewRef.value?.list) return;
   const list = listViewRef.value.list;
-  const defaultFilters = options.defaultFilters || {};
+  const baseDefaultFilters = getBaseDefaultFilters();
   
-  console.log("Resetting card filters to defaults:", defaultFilters);
+  console.log("Resetting card filters to defaults:", baseDefaultFilters);
   
   list.submit({
     ...list.params,
-    filters: defaultFilters,
-    default_filters: defaultFilters,
+    filters: baseDefaultFilters,
+    default_filters: baseDefaultFilters,
   });
 }
 
@@ -784,13 +821,13 @@ function applyQuickView(view: any) {
   const list = listViewRef.value.list;
   
   const isAll = view.label === "All tickets";
-  const defaultFilters = isAll ? {} : options.defaultFilters || {};
-  const mergedFilters = { ...defaultFilters, ...view.filters };
+  const baseDefaultFilters = isAll ? {} : getBaseDefaultFilters();
+  const mergedFilters = { ...baseDefaultFilters, ...view.filters };
 
   const params = {
     ...list.params,
     filters: mergedFilters,
-    default_filters: isAll ? {} : defaultFilters,
+    default_filters: isAll ? {} : baseDefaultFilters,
   };
 
   list.submit(params);

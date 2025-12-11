@@ -37,6 +37,12 @@
 
         <!-- Assignee component -->
         <AssignTo />
+        <div class="flex flex-col gap-1.5 mt-2">
+          <span class="block text-xs text-gray-600">Owner</span>
+          <span class="text-base text-ink-gray-8 break-all">
+            {{ ownerDisplay || "—" }}
+          </span>
+        </div>
       </div>
     </div>
 
@@ -73,7 +79,7 @@ import {
   FieldValue,
   TicketSymbol,
 } from "@/types";
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, watch } from "vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
@@ -84,6 +90,30 @@ const customizations = inject(CustomizationSymbol);
 const activities = inject(ActivitiesSymbol);
 const { getFields, getField } = getMeta("HD Ticket");
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
+
+const ownerDisplay = ref("");
+
+watch(
+  () => ticket.value?.doc,
+  (doc) => {
+    if (doc) {
+      console.log("Ticket doc (TicketDetailsTab):", doc);
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => ticket.value?.doc?.owner,
+  (owner) => {
+    ownerDisplay.value =
+      owner ||
+      ticket.value?.data?.owner ||
+      ticket.value?.doc?.modified_by ||
+      "";
+  },
+  { immediate: true }
+);
 
 // ticket_type, priority, customer, agent_group
 const coreFields = computed(() => {
