@@ -714,7 +714,11 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
 
   if (sourceFilters.agent?.length) {
     const agentValues = extractValues(sourceFilters.agent);
-    filters["assigned_to"] = ["in", agentValues];
+    const agent = agentValues[0];
+    if (agent) {
+      // Frappe stores assignees in _assign JSON field
+      filters["_assign"] = ["like", `%\"${agent}\"%`];
+    }
   }
 
   console.log("Applying card filters:", filters);
