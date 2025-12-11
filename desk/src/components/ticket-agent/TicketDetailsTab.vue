@@ -39,9 +39,13 @@
         <AssignTo />
         <div class="flex flex-col gap-1.5 mt-2">
           <span class="block text-xs text-gray-600">Owner</span>
-          <span class="text-base text-ink-gray-8 break-all">
-            {{ ownerDisplay || "—" }}
-          </span>
+          <FormControl
+            type="select"
+            :options="ownerOptions"
+            :model-value="ownerDisplay"
+            disabled
+            class="!h-9"
+          />
         </div>
       </div>
     </div>
@@ -80,6 +84,7 @@ import {
   TicketSymbol,
 } from "@/types";
 import { computed, inject, ref, watch } from "vue";
+import { FormControl } from "frappe-ui";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
@@ -92,6 +97,12 @@ const { getFields, getField } = getMeta("HD Ticket");
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
 
 const ownerDisplay = ref("");
+const ownerOptions = computed(() => [
+  {
+    label: ownerDisplay.value || "—",
+    value: ownerDisplay.value,
+  },
+]);
 
 watch(
   () => ticket.value?.doc,
