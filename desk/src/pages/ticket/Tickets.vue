@@ -77,6 +77,12 @@
   </div>
   <div v-if="!isTableView" class="flex gap-4 px-5 pb-6 pt-3">
     <div class="flex-1">
+      <div v-if="!listLoading && totalCount > 0" class="mb-4 flex items-center justify-between">
+        <p class="text-sm text-ink-gray-6">
+          Showing <span class="font-semibold text-ink-gray-9">{{ currentCount }}</span> of 
+          <span class="font-semibold text-ink-gray-9">{{ totalCount }}</span> tickets
+        </p>
+      </div>
       <TicketCardView
         :rows="cardRows"
         :loading="listLoading"
@@ -86,11 +92,10 @@
         @update-status="(ticketId, value) => handleCardStatus(ticketId, value)"
         @update-priority="(ticketId, value) => handleCardPriority(ticketId, value)"
       />
-      <div v-if="ticketRows.length > 0" class="mt-2">
+      <div v-if="currentCount < totalCount" class="mt-4 flex items-center justify-center">
         <Button
           variant="outline"
           theme="gray"
-          class="w-full sm:w-auto"
           :loading="listLoading"
           @click="handleCardLoadMore"
         >
@@ -234,7 +239,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
 import { Badge, FeatherIcon, toast, Tooltip, usePageMeta, Dropdown, call, createResource } from "frappe-ui";
-import { computed, h, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import { computed, h, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useStorage } from "@vueuse/core";
 import { useRoute, useRouter } from "vue-router";
 import LucidePencil from "~icons/lucide/pencil";
@@ -246,11 +251,7 @@ import LucidePlus from "~icons/lucide/plus";
 import LucideInbox from "~icons/lucide/inbox";
 import LucideMailOpen from "~icons/lucide/mail-open";
 import LucideAlertCircle from "~icons/lucide/alert-circle";
-import LucideEye from "~icons/lucide/eye";
 import LucideUser from "~icons/lucide/user";
-import LucideAtSign from "~icons/lucide/at-sign";
-import LucideShare2 from "~icons/lucide/share-2";
-import LucideUsers from "~icons/lucide/users";
 
 const router = useRouter();
 const route = useRoute();
@@ -277,6 +278,8 @@ const cardRows = computed(() => {
   return [...rows].sort((a, b) => statusRank(a) - statusRank(b));
 });
 const listLoading = computed(() => listViewRef.value?.list?.loading);
+const totalCount = computed(() => listViewRef.value?.list?.data?.total_count || 0);
+const currentCount = computed(() => cardRows.value.length);
 const cardFilters = reactive({
   status: [] as string[],
   priority: [] as string[],
@@ -313,20 +316,6 @@ const quickViews = computed(() => [
     icon: LucideUser,
     filters: {
       raised_by: currentUserEmail.value,
-    },
-  },
-  {
-    label: "Tickets I'm watching",
-    icon: LucideEye,
-    filters: {
-      _liked_by: ["like", `%${currentUserEmail.value}%`],
-    },
-  },
-  {
-    label: "Tickets I've shared",
-    icon: LucideShare2,
-    filters: {
-      _shared_by: currentUserEmail.value,
     },
   },
 ]);
@@ -482,6 +471,7 @@ const options = {
     prop: "ticketId",
   },
   hideColumnSetting: false,
+  default_page_length: 25,
 };
 
 const statusOptionList = computed(() =>
@@ -659,8 +649,12 @@ function handleCardLoadMore() {
 function statusRank(row: any) {
   const meta = getStatus(row?.status) || {};
   const category = meta.category || "";
-  if (category === "Resolved") return 3;
-  if (category === "Paused") return 1;
+  // Open/New tickets first (0)
+  if (category === "Open" || row?.status === "Open" || row?.status === "New") return 0;
+  // Pending/Paused tickets second (1)
+  if (category === "Paused" || row?.status === "Pending") return 1;
+  // Resolved/Closed tickets last (2)
+  if (category === "Resolved" || row?.status === "Closed" || row?.status === "Resolved") return 2;
   return 0;
 }
 
@@ -687,31 +681,41 @@ function handleCardPriority(ticketId: string, value: string) {
 function applyCardFilters() {
   if (!listViewRef.value?.list) return;
   const list = listViewRef.value.list;
-  const filters = { ...(list.params?.filters || {}) };
+  
+  // Build fresh filters object (don't merge with existing)
+  const filters: Record<string, any> = {};
+  
+  // Apply default filters if they exist
+  const defaultFilters = options.defaultFilters || {};
+  Object.assign(filters, defaultFilters);
 
+  // Extract values from filter objects (they might be objects with {label, value} or just strings)
+  const extractValues = (arr: any[]) => {
+    return arr.map((item) => (typeof item === "object" && item?.value ? item.value : item));
+  };
+
+  // Apply card filters
   if (cardFilters.status.length) {
-    filters["status"] = ["in", cardFilters.status];
-  } else {
-    delete filters["status"];
+    const statusValues = extractValues(cardFilters.status);
+    filters["status"] = ["in", statusValues];
   }
 
   if (cardFilters.priority.length) {
-    filters["priority"] = ["in", cardFilters.priority];
-  } else {
-    delete filters["priority"];
+    const priorityValues = extractValues(cardFilters.priority);
+    filters["priority"] = ["in", priorityValues];
   }
 
   if (cardFilters.department.length) {
-    filters["department"] = ["in", cardFilters.department];
-  } else {
-    delete filters["department"];
+    const departmentValues = extractValues(cardFilters.department);
+    filters["department"] = ["in", departmentValues];
   }
 
   if (cardFilters.agent.length) {
-    filters["assigned_to"] = ["in", cardFilters.agent];
-  } else {
-    delete filters["assigned_to"];
+    const agentValues = extractValues(cardFilters.agent);
+    filters["assigned_to"] = ["in", agentValues];
   }
+
+  console.log("Applying card filters:", filters);
 
   list.submit({
     ...list.params,
@@ -725,23 +729,44 @@ function resetCardFilters() {
   cardFilters.department = [];
   cardFilters.agent = [];
   activeQuickView.value = "";
-  applyCardFilters();
+  
+  // Reset to default filters only
+  if (!listViewRef.value?.list) return;
+  const list = listViewRef.value.list;
+  const defaultFilters = options.defaultFilters || {};
+  
+  console.log("Resetting card filters to defaults:", defaultFilters);
+  
+  list.submit({
+    ...list.params,
+    filters: defaultFilters,
+  });
 }
 
 function applyQuickView(view: any) {
   if (!listViewRef.value?.list) return;
   
-  // Reset existing filters first
-  resetCardFilters();
+  // Reset card filters state
+  cardFilters.status = [];
+  cardFilters.priority = [];
+  cardFilters.department = [];
+  cardFilters.agent = [];
   
   // Set active quick view
   activeQuickView.value = view.label;
   
+  console.log("Applying quick view:", view.label, "Filters:", view.filters);
+  
   // Apply the quick view filters directly to the list
   const list = listViewRef.value.list;
+  
+  // Merge with default filters
+  const defaultFilters = options.defaultFilters || {};
+  const mergedFilters = { ...defaultFilters, ...view.filters };
+  
   list.submit({
     ...list.params,
-    filters: view.filters,
+    filters: mergedFilters,
   });
 }
 
@@ -1038,8 +1063,12 @@ function resetState() {
 }
 
 // Watch viewMode and reset filters when switching to card view
-watch(viewMode, (newMode, oldMode) => {
-  if (newMode === 'card' && oldMode === 'table') {
+watch(viewMode, async (newMode, oldMode) => {
+  if (newMode === 'card') {
+    // Wait for DOM update
+    await nextTick();
+    // Reset all filters when entering card view
+    console.log("Switched to card view, resetting filters");
     resetCardFilters();
   }
 });
