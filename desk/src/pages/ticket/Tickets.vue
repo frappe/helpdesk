@@ -82,15 +82,15 @@
         :loading="listLoading"
         :status-options="statusOptionList"
         :priority-options="priorityOptionList"
-        @rowClick="
+        @row-click="
           (rowId) =>
             $router.push({
               name: isCustomerPortal ? 'TicketCustomer' : 'TicketAgent',
               params: { ticketId: typeof rowId === 'string' ? rowId : rowId?.name },
             })
         "
-        @updateStatus="(ticketId, value) => handleCardStatus(ticketId, value)"
-        @updatePriority="(ticketId, value) => handleCardPriority(ticketId, value)"
+        @update-status="(ticketId, value) => handleCardStatus(ticketId, value)"
+        @update-priority="(ticketId, value) => handleCardPriority(ticketId, value)"
       />
       <div v-if="ticketRows.length > 0" class="mt-2">
         <Button
@@ -181,6 +181,25 @@
           />
         </div>
       </div>
+      
+      <!-- Quick Views Section -->
+      <div class="space-y-3 border-t border-outline-gray-2 pt-5">
+        <div class="text-xs font-semibold text-ink-gray-7 uppercase tracking-wide">
+          Quick Views
+        </div>
+        <div class="space-y-1">
+          <button
+            v-for="view in quickViews"
+            :key="view.label"
+            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink-gray-8 transition-colors hover:bg-surface-gray-1 hover:text-ink-gray-9"
+            :class="{ 'bg-surface-gray-2 font-medium text-ink-gray-9': activeQuickView === view.label }"
+            @click="applyQuickView(view)"
+          >
+            <component :is="view.icon" class="h-4 w-4 flex-shrink-0" />
+            <span class="truncate">{{ view.label }}</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
     <ExportModal
@@ -221,7 +240,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
 import { Badge, FeatherIcon, toast, Tooltip, usePageMeta, Dropdown, call, createResource } from "frappe-ui";
-import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
+import { computed, h, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useStorage } from "@vueuse/core";
 import { useRoute, useRouter } from "vue-router";
 import LucidePencil from "~icons/lucide/pencil";
@@ -230,6 +249,14 @@ import LucideLayoutGrid from "~icons/lucide/layout-grid";
 import LucideFilter from "~icons/lucide/filter";
 import LucideAlignJustify from "~icons/lucide/align-justify";
 import LucidePlus from "~icons/lucide/plus";
+import LucideInbox from "~icons/lucide/inbox";
+import LucideMailOpen from "~icons/lucide/mail-open";
+import LucideAlertCircle from "~icons/lucide/alert-circle";
+import LucideEye from "~icons/lucide/eye";
+import LucideUser from "~icons/lucide/user";
+import LucideAtSign from "~icons/lucide/at-sign";
+import LucideShare2 from "~icons/lucide/share-2";
+import LucideUsers from "~icons/lucide/users";
 
 const router = useRouter();
 const route = useRoute();
@@ -262,7 +289,53 @@ const cardFilters = reactive({
   department: [] as string[],
   agent: [] as string[],
 });
+const activeQuickView = ref<string>("");
 const showExportModal = ref(false);
+const currentUserEmail = computed(() => useAuthStore().userResource?.email || "");
+
+const quickViews = computed(() => [
+  {
+    label: "All tickets",
+    icon: LucideInbox,
+    filters: {},
+  },
+  {
+    label: "All unresolved tickets",
+    icon: LucideAlertCircle,
+    filters: {
+      status: ["!=", "Resolved"],
+    },
+  },
+  {
+    label: "New and my open tickets",
+    icon: LucideMailOpen,
+    filters: {
+      status: ["in", ["Open", "New"]],
+      assigned_to: currentUserEmail.value,
+    },
+  },
+  {
+    label: "Tickets I raised",
+    icon: LucideUser,
+    filters: {
+      raised_by: currentUserEmail.value,
+    },
+  },
+  {
+    label: "Tickets I'm watching",
+    icon: LucideEye,
+    filters: {
+      _liked_by: ["like", `%${currentUserEmail.value}%`],
+    },
+  },
+  {
+    label: "Tickets I've shared",
+    icon: LucideShare2,
+    filters: {
+      _shared_by: currentUserEmail.value,
+    },
+  },
+]);
 
 const { getStatus, statuses } = useTicketStatusStore();
 
@@ -299,20 +372,11 @@ async function updateTicketField(ticketId: string, field: string, value: string)
       fieldname: field,
       value: value,
     });
-    toast({
-      title: "Updated successfully",
-      icon: "check",
-      iconClasses: "text-green-500",
-    });
-    // Reload the list
-    listViewRef.value?.reload(false);
-  } catch (error) {
-    toast({
-      title: "Failed to update",
-      text: error.message,
-      icon: "x",
-      iconClasses: "text-red-500",
-    });
+    toast.success("Updated successfully");
+    // Reload the list to reflect changes
+    await listViewRef.value?.reload(false);
+  } catch (error: any) {
+    toast.error(error.message || "Failed to update");
   }
 }
 
@@ -654,7 +718,25 @@ function resetCardFilters() {
   cardFilters.priority = [];
   cardFilters.department = [];
   cardFilters.agent = [];
+  activeQuickView.value = "";
   applyCardFilters();
+}
+
+function applyQuickView(view: any) {
+  if (!listViewRef.value?.list) return;
+  
+  // Reset existing filters first
+  resetCardFilters();
+  
+  // Set active quick view
+  activeQuickView.value = view.label;
+  
+  // Apply the quick view filters directly to the list
+  const list = listViewRef.value.list;
+  list.submit({
+    ...list.params,
+    filters: view.filters,
+  });
 }
 
 function toggleValue(arr: string[], value: string) {
@@ -948,6 +1030,13 @@ function resetState() {
   viewDialog.mode = null;
   selectedView = null;
 }
+
+// Watch viewMode and reset filters when switching to card view
+watch(viewMode, (newMode, oldMode) => {
+  if (newMode === 'card' && oldMode === 'table') {
+    resetCardFilters();
+  }
+});
 
 onMounted(() => {
   if (!route.query.view) {
