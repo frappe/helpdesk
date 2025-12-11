@@ -74,8 +74,8 @@
     :priority-options="priorityOptionList"
     :status-filter-options="statusFilterOptions"
     :priority-filter-options="priorityFilterOptions"
-    :department-filter-options="departmentFilterOptions"
-    :agent-filter-options="agentFilterOptions"
+    :team-filter-options="teamFilterOptions"
+    :agent-filter-options="effectiveAgentFilterOptions"
     :filters="cardFilters"
     :quick-views="quickViews"
     :active-quick-view="activeQuickView"
@@ -142,7 +142,7 @@ import LucideUser from "~icons/lucide/user";
 type CardFilters = {
   status: any[];
   priority: any[];
-  department: any[];
+  team: any[];
   agent: any[];
 };
 
@@ -180,7 +180,7 @@ const exportRowCount = computed(
 const cardFilters = reactive<CardFilters>({
   status: [],
   priority: [],
-  department: [],
+  team: [],
   agent: [],
 });
 const activeQuickView = ref<string>("");
@@ -402,16 +402,6 @@ const priorityOptionList = computed(() =>
   (priorities.data || []).map((p) => p.name)
 );
 
-const departmentOptions = createResource({
-  url: "frappe.client.get_list",
-  params: {
-    doctype: "Department",
-    fields: ["name", "department_name"],
-    limit: 100,
-  },
-  auto: true,
-});
-
 const agentOptions = createResource({
   url: "frappe.client.get_list",
   params: {
@@ -440,19 +430,73 @@ const priorityFilterOptions = computed(() =>
   }))
 );
 
-const departmentFilterOptions = computed(() =>
-  (departmentOptions.data || []).map((d) => ({
-    label: d.department_name || d.name,
-    value: d.name,
-  }))
-);
-
 const agentFilterOptions = computed(() =>
   (agentOptions.data || []).map((a) => ({
     label: a.agent_name || a.name,
     value: a.name,
   }))
 );
+
+const teamOptions = createResource({
+  url: "frappe.client.get_list",
+  params: {
+    doctype: "HD Team",
+    fields: ["name", "team_name"],
+    limit: 100,
+  },
+  auto: true,
+});
+
+const teamFilterOptions = computed(() =>
+  (teamOptions.data || []).map((t) => ({
+    label: t.team_name || t.name,
+    value: t.name,
+  }))
+);
+
+const selectedTeam = computed(() => {
+  const first = cardFilters.team?.[0];
+  if (!first) return "";
+  if (typeof first === "string") return first;
+  return first?.value || "";
+});
+
+const teamMembers = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_team.hd_team.get_team_members",
+  cache: ["TicketCard", "TeamMembers"],
+  auto: false,
+  params: {
+    team: selectedTeam.value,
+  },
+});
+
+watch(
+  selectedTeam,
+  (team) => {
+    if (team) {
+      teamMembers.update({ params: { team } });
+      teamMembers.reload();
+    } else {
+      teamMembers.data = [];
+    }
+    cardFilters.agent = [];
+  },
+  { immediate: false }
+);
+
+const teamAgentOptions = computed(() => {
+  const data = teamMembers.data || [];
+  if (!selectedTeam.value || !Array.isArray(data) || !data.length) return [];
+  return data.map((member: string) => ({
+    label: member,
+    value: member,
+  }));
+});
+
+const effectiveAgentFilterOptions = computed(() => {
+  if (teamAgentOptions.value.length) return teamAgentOptions.value;
+  return agentFilterOptions.value;
+});
 
 function syncCardFiltersWithDefault() {
   const defaults: Record<string, any> = defaultFilters || {};
@@ -470,7 +514,7 @@ function syncCardFiltersWithDefault() {
 
   cardFilters.status = pickValues("status", statusFilterOptions.value);
   cardFilters.priority = pickValues("priority", priorityFilterOptions.value as any);
-  cardFilters.department = pickValues("department", departmentFilterOptions.value as any);
+  cardFilters.team = pickValues("team", teamFilterOptions.value as any);
   cardFilters.agent = pickValues("agent", agentFilterOptions.value as any);
 }
 
@@ -478,7 +522,7 @@ watch(
   () => [
     statusFilterOptions.value,
     priorityFilterOptions.value,
-    departmentFilterOptions.value,
+    teamFilterOptions.value,
     agentFilterOptions.value,
   ],
   () => syncCardFiltersWithDefault(),
@@ -627,7 +671,7 @@ function handleCardPriority(ticketId: string, value: string) {
 function updateCardFilters(value: CardFilters) {
   cardFilters.status = value?.status || [];
   cardFilters.priority = value?.priority || [];
-  cardFilters.department = value?.department || [];
+  cardFilters.team = value?.team || [];
   cardFilters.agent = value?.agent || [];
 }
 
@@ -663,9 +707,9 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
     filters["priority"] = ["in", priorityValues];
   }
 
-  if (sourceFilters.department?.length) {
-    const departmentValues = extractValues(sourceFilters.department);
-    filters["department"] = ["in", departmentValues];
+  if (sourceFilters.team?.length) {
+    const teamValues = extractValues(sourceFilters.team);
+    filters["agent_group"] = ["in", teamValues];
   }
 
   if (sourceFilters.agent?.length) {

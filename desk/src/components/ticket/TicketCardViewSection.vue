@@ -92,13 +92,13 @@
           <label
             class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide"
           >
-            Department
+            Team
           </label>
           <MultiSelectCombobox
-            :model-value="filters.department"
-            :options="departmentFilterOptions"
-            placeholder="Any Department"
-            @update:modelValue="updateFilter('department', $event)"
+            :model-value="filters.team"
+            :options="teamFilterOptions"
+            placeholder="Any Team"
+            @update:modelValue="updateFilter('team', $event)"
             :multiple="false"
             :button-classes="'!h-9 !bg-surface-white border border-outline-gray-2 hover:!bg-surface-gray-1'"
           />
@@ -155,7 +155,7 @@ import LucideFilter from "~icons/lucide/filter";
 type CardFilters = {
   status: any[];
   priority: any[];
-  department: any[];
+  team: any[];
   agent: any[];
 };
 
@@ -187,7 +187,7 @@ const props = withDefaults(
     priorityOptions?: string[];
     statusFilterOptions?: FilterOption[];
     priorityFilterOptions?: FilterOption[];
-    departmentFilterOptions?: FilterOption[];
+    teamFilterOptions?: FilterOption[];
     agentFilterOptions?: FilterOption[];
     filters: CardFilters;
     quickViews: QuickView[];
@@ -202,12 +202,12 @@ const props = withDefaults(
     priorityOptions: () => [],
     statusFilterOptions: () => [],
     priorityFilterOptions: () => [],
-    departmentFilterOptions: () => [],
+    teamFilterOptions: () => [],
     agentFilterOptions: () => [],
     filters: () => ({
       status: [],
       priority: [],
-      department: [],
+      team: [],
       agent: [],
     }),
     quickViews: () => [],
@@ -226,10 +226,26 @@ const emit = defineEmits<{
   (e: "apply-quick-view", view: QuickView): void;
 }>();
 
-function updateFilter(key: keyof CardFilters, value: any[]) {
+function updateFilter(key: keyof CardFilters, value: any) {
+  const optionPool: Record<keyof CardFilters, FilterOption[]> = {
+    status: props.statusFilterOptions || [],
+    priority: props.priorityFilterOptions || [],
+    team: props.teamFilterOptions || [],
+    agent: props.agentFilterOptions || [],
+  };
+
   const normalize = (v: any) => {
-    if (Array.isArray(v)) return v.filter(Boolean);
-    return v ? [v] : [];
+    const base = Array.isArray(v) ? v : v ? [v] : [];
+    return base
+      .filter(Boolean)
+      .map((item) => {
+        if (typeof item === "object" && item?.label && item?.value) return item;
+        const raw = typeof item === "object" && "value" in item ? item.value : item;
+        const match = (optionPool[key] || []).find((o) => o.value === raw);
+        const valueStr = raw ?? "";
+        return match || { label: String(valueStr), value: String(valueStr) };
+      })
+      .slice(0, 1);
   };
 
   const nextFilters = {
