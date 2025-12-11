@@ -15,7 +15,6 @@ class HDAutomation(Document):
         validate_json_string(self.rule)
 
     def apply(self, doc) -> None:
-        print("\n\n", doc.get("priority"), "\n\n")
         rule = json.loads(self.rule)
         if not self.apply_presets(doc, rule):
             return
@@ -59,10 +58,8 @@ class HDAutomation(Document):
     def set_field(self, doc, action) -> None:
         field = action.get("field") or ""
         value = action.get("value") or ""
-        breakpoint()
         if not field:
             return
-        breakpoint()
         doc.set(field, value)
 
 

@@ -230,4 +230,3 @@ def create_automation():
         rule=json.dumps(AUTOMATION_RULE),
     )
     return doc.insert(ignore_if_duplicate=True)
-    return doc.insert(ignore_if_duplicate=True)
