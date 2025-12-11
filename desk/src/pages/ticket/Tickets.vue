@@ -273,9 +273,7 @@ async function updateTicketField(ticketId: string, field: string, value: string)
   }
 }
 
-const defaultFilters = {
-  status: ["in", ["Open"]],
-};
+const defaultFilters = {};
 
 const options = {
   doctype: "HD Ticket",
@@ -420,7 +418,13 @@ const statusFilterOptions = computed(() => {
     indicatorClass: s.parsed_color,
     category: s.category,
   }));
-  return options;
+  return [
+    {
+      label: "All",
+      value: "",
+    },
+    ...options,
+  ];
 });
 
 const priorityFilterOptions = computed(() =>
@@ -681,25 +685,39 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
 
   if (!listViewRef.value?.list) return;
   const list = listViewRef.value.list;
-  
-  // Build fresh filters object (don't merge with existing)
-  const filters: Record<string, any> = {};
-  
-  // Apply default filters if they exist
-  const defaultFilters = options.defaultFilters || {};
-  Object.assign(filters, defaultFilters);
 
+  // Build fresh filters object (don't merge with existing)
+  let filters: Record<string, any> = {};
+  
   // Extract values from filter objects (they might be objects with {label, value} or just strings)
   const extractValues = (arr: any[] = []) => {
     return arr.map((item) =>
-      typeof item === "object" && item?.value ? item.value : item
+      typeof item === "object" && item !== null && "value" in item
+        ? item.value
+        : item
     );
   };
 
-  // Apply card filters
-  if (sourceFilters.status?.length) {
-    const statusValues = extractValues(sourceFilters.status);
-    filters["status"] = ["in", statusValues];
+  let rawStatusValues = extractValues(sourceFilters.status);
+  const statusAllSelected = rawStatusValues.some(
+    (v) => v === "" || v === null || v === undefined
+  );
+  if (statusAllSelected) {
+    sourceFilters.status = [];
+    cardFilters.status = [];
+    rawStatusValues = [];
+    filters = {};
+  }
+
+  // If "All" is selected, drop all status filters (empty filters)
+  if (!statusAllSelected) {
+    // Apply card filters
+    if (sourceFilters.status?.length) {
+      const statusValues = rawStatusValues.filter(Boolean);
+      if (statusValues.length) {
+        filters["status"] = ["in", statusValues];
+      }
+    }
   }
 
   if (sourceFilters.priority?.length) {
@@ -723,10 +741,14 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
 
   console.log("Applying card filters:", filters);
 
-  list.submit({
+  const params = {
     ...list.params,
-    filters,
-  });
+    filters: statusAllSelected ? {} : filters,
+    default_filters: {},
+  };
+
+  list.submit(params);
+  list.params = params;
 }
 
 function resetCardFilters() {
@@ -743,6 +765,7 @@ function resetCardFilters() {
   list.submit({
     ...list.params,
     filters: defaultFilters,
+    default_filters: defaultFilters,
   });
 }
 
