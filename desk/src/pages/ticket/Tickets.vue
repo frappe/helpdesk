@@ -760,14 +760,18 @@ function applyQuickView(view: any) {
   // Apply the quick view filters directly to the list
   const list = listViewRef.value.list;
   
-  // Merge with default filters
-  const defaultFilters = options.defaultFilters || {};
+  const isAll = view.label === "All tickets";
+  const defaultFilters = isAll ? {} : options.defaultFilters || {};
   const mergedFilters = { ...defaultFilters, ...view.filters };
-  
-  list.submit({
+
+  const params = {
     ...list.params,
     filters: mergedFilters,
-  });
+    default_filters: isAll ? {} : defaultFilters,
+  };
+
+  list.submit(params);
+  list.params = params;
 }
 
 function toggleValue(arr: string[], value: string) {
