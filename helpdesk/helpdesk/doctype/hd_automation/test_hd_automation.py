@@ -28,8 +28,13 @@ class IntegrationTestHDAutomation(IntegrationTestCase):
     def test_base_automation(self):
         ticket = frappe.get_doc(get_ticket_obj())
         ticket.insert()
-        print("\n\n", ticket.agent_group, "\n\n")
         self.assertEqual(ticket.agent_group, "Billing")
+
+        ticket2 = frappe.get_doc(get_ticket_obj())
+        ticket2.priority = "High"
+        ticket2.insert()
+        # ticket2.reload()
+        self.assertEqual(ticket2.agent_group, "Product Experts")
 
     def tearDown(self):
         # Clean up run after every test method.

@@ -83,6 +83,7 @@ class HDTicket(Document):
         self.set_status_category()
         # self.apply_escalation_rule()
         self.set_sla()
+        self.apply_sla()
 
         self.set_contact()
         self.set_customer()
@@ -93,7 +94,6 @@ class HDTicket(Document):
         # print("Validate", self.priority)
 
     def before_save(self):
-        self.apply_sla()
         if not self.is_new():
             self.handle_ticket_activity_update()
 

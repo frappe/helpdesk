@@ -40,6 +40,7 @@ class HDAutomation(Document):
     def apply_actions(self, doc, action) -> None:
         expression = action.get("condition", "")
         context = get_context(doc)
+        # TODO: Handle if / else conditions
         if expression and not frappe.safe_eval(expression, None, context):
             return
 
