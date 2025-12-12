@@ -57,6 +57,7 @@ def get_tickets_for_card_view(
         Ticket.name,
         Ticket.subject,
         Ticket.status,
+        Ticket.status_category,
         Ticket.priority,
         Ticket.creation,
         Ticket.modified,
@@ -126,8 +127,28 @@ def get_tickets_for_card_view(
         if raised_by:
             query = query.where(Ticket.raised_by == raised_by)
     
-    # Order by
-    if order_by:
+    # Check if "All" filter is applied (no status filter)
+    is_all_filter = "status" not in filters or not filters.get("status")
+    
+    # Order by - if "All" filter, sort by status category first
+    if is_all_filter:
+        # Custom sorting: Open (0) -> Paused (1) -> Resolved (2)
+        # Use CASE statement for category-based sorting
+        from pypika import Case
+        
+        category_order = (
+            Case()
+            .when(Ticket.status_category == "Open", 0)
+            .when(Ticket.status_category == "Paused", 1)
+            .when(Ticket.status_category == "Resolved", 2)
+            .else_(3)
+        )
+        
+        query = query.orderby(category_order)
+        
+        # Then order by modified desc as secondary sort
+        query = query.orderby(Ticket.modified, order=frappe.qb.desc)
+    elif order_by:
         # Parse order_by string (e.g., "modified desc")
         order_parts = order_by.split()
         if len(order_parts) == 2:
@@ -139,6 +160,8 @@ def get_tickets_for_card_view(
                 query = query.orderby(order_field, order=frappe.qb.asc)
         else:
             query = query.orderby(Ticket.modified, order=frappe.qb.desc)
+    else:
+        query = query.orderby(Ticket.modified, order=frappe.qb.desc)
     
     # Get total count before applying limit/offset
     from pypika import functions as fn

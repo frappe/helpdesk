@@ -188,8 +188,10 @@ const cardViewResource = createResource({
 const ticketRows = computed(() => listViewRef.value?.list?.data?.data || []);
 const cardRows = computed(() => {
   if (viewMode.value === "card") {
+    // Backend already sorts by category when "All" filter is applied
+    // No need to sort again on frontend
     const rows = cardViewResource.data?.data || [];
-    return [...rows].sort((a, b) => statusRank(a) - statusRank(b));
+    return rows;
   }
   const rows = ticketRows.value || [];
   return [...rows].sort((a, b) => statusRank(a) - statusRank(b));
@@ -216,7 +218,7 @@ const exportRowCount = computed(
   () => listViewRef.value?.list?.data?.total_count ?? 0
 );
 const cardFilters = reactive<CardFilters>({
-  status: [],
+  status: [{ label: "All", value: "" }],
   priority: [],
   team: [],
   agent: [],
@@ -884,17 +886,20 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
 }
 
 function resetCardFilters() {
-  syncCardFiltersWithDefault();
+  // Reset to "All" filter
+  cardFilters.status = [{ label: "All", value: "" }];
+  cardFilters.priority = [];
+  cardFilters.team = [];
+  cardFilters.agent = [];
   activeQuickView.value = "";
   
   if (viewMode.value === "card") {
     cardViewOffset.value = 0;
-    const baseDefaultFilters = getBaseDefaultFilters();
-    console.log("Resetting card filters to defaults:", baseDefaultFilters);
+    console.log("Resetting card filters to All (default)");
     
     cardViewResource.update({
       params: {
-        filters: JSON.stringify(baseDefaultFilters),
+        filters: JSON.stringify({}),
         limit: cardViewLimit.value,
         offset: 0,
         order_by: "modified desc"
@@ -1250,7 +1255,13 @@ watch(viewMode, async (newMode, oldMode) => {
     await nextTick();
     console.log("Switched to card view, loading tickets");
     cardViewOffset.value = 0;
-    resetCardFilters();
+    // Set default "All" filter
+    cardFilters.status = [{ label: "All", value: "" }];
+    cardFilters.priority = [];
+    cardFilters.team = [];
+    cardFilters.agent = [];
+    activeQuickView.value = "";
+    loadCardViewTickets();
   }
 });
 
@@ -1271,8 +1282,13 @@ onMounted(() => {
     });
   }
   
-  // Load card view data if in card mode on mount
+  // Load card view data if in card mode on mount with "All" filter
   if (viewMode.value === "card") {
+    cardFilters.status = [{ label: "All", value: "" }];
+    cardFilters.priority = [];
+    cardFilters.team = [];
+    cardFilters.agent = [];
+    activeQuickView.value = "";
     loadCardViewTickets();
   }
 });
