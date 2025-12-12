@@ -228,9 +228,9 @@ const showExportModal = ref(false);
 const currentUserEmail = computed(() => useAuthStore().userResource?.email || "");
 
 const quickViews = computed(() => {
-  // Get all status names that are Open or Paused (unresolved)
-  const unresolvedStatuses = (statuses.data || [])
-    .filter((s) => s.category === "Open" || s.category === "Paused")
+  // Get only Open status tickets (category = "Open")
+  const openStatuses = (statuses.data || [])
+    .filter((s) => s.category === "Open")
     .map((s) => s.label_agent);
 
   return [
@@ -242,9 +242,9 @@ const quickViews = computed(() => {
     {
       label: "All unresolved tickets",
       icon: LucideAlertCircle,
-      filters: unresolvedStatuses.length > 0
-        ? { status: ["in", unresolvedStatuses] }
-        : { status: ["!=", "Resolved"] },
+      filters: openStatuses.length > 0
+        ? { status: ["in", openStatuses] }
+        : { status: "Open" },
     },
     {
       label: "New and my open tickets",
