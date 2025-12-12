@@ -288,12 +288,10 @@ function avatarClasses(row: any) {
 
 function isFirstResponseDue(row: any) {
   if (!row.response_by) return false;
-  const now = dayjs();
   const responseBy = dayjs(row.response_by);
   const firstResponded = row.first_responded_on ? dayjs(row.first_responded_on) : null;
-  if (firstResponded) {
-    return firstResponded.isAfter(responseBy);
-  }
-  return responseBy.isBefore(now);
+  // Show badge until first response is recorded, or if first response missed the SLA window.
+  if (!firstResponded) return true;
+  return firstResponded.isAfter(responseBy);
 }
 </script>

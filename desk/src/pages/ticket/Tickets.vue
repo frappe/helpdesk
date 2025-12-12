@@ -70,6 +70,7 @@
     :loading="listLoading"
     :total-count="totalCount"
     :current-count="currentCount"
+    :page-length-count="pageLengthCount"
     :status-options="statusOptionList"
     :priority-options="priorityOptionList"
     :status-filter-options="statusFilterOptions"
@@ -82,6 +83,8 @@
     @row-click="handleCardClick"
     @update-status="handleCardStatus"
     @update-priority="handleCardPriority"
+    @next-page="handleCardNextPage"
+    @prev-page="handleCardPrevPage"
     @load-more="handleCardLoadMore"
     @update:filters="updateCardFilters"
     @apply-filters="applyCardFilters"
@@ -675,6 +678,18 @@ const pageLengthCount = computed(
 function handleCardLoadMore() {
   const count = pageLengthCount.value;
   listViewRef.value?.handlePageLength?.(count, true);
+}
+
+function handleCardNextPage() {
+  const count = pageLengthCount.value;
+  listViewRef.value?.handlePageLength?.(count, true);
+}
+
+function handleCardPrevPage() {
+  const count = pageLengthCount.value;
+  const currentLength = listViewRef.value?.list?.params?.page_length || count;
+  const newLength = Math.max(count, currentLength - count);
+  listViewRef.value?.handlePageLength?.(newLength, false);
 }
 
 function statusRank(row: any) {

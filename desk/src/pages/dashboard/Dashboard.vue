@@ -75,6 +75,19 @@
             <LucideUser class="size-4 text-gray-400 mr-2" />
           </template>
         </Link>
+        <Link
+          v-if="isManager"
+          class="form-control w-48"
+          doctype="User"
+          placeholder="Owner"
+          v-model="filters.owner"
+          :page-length="5"
+          :hide-me="true"
+        >
+          <template #prefix>
+            <LucideUser class="size-4 text-gray-400 mr-2" />
+          </template>
+        </Link>
       </div>
 
       <!-- Status Cards Row -->
@@ -114,7 +127,7 @@
         </div>
       </div>
 
-      <!-- Bottom Row: Unresolved, Undelivered Emails, Customer Satisfaction -->
+      <!-- Bottom Row: Unresolved, Undelivered Emails, Status Breakdown -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Unresolved Tickets -->
         <UnresolvedSection
@@ -138,12 +151,10 @@
           </div>
         </div>
 
-        <!-- Customer Satisfaction -->
-        <CustomerSatisfactionSection
-          :responses-received="satisfactionData.data?.responsesReceived || 0"
-          :positive="satisfactionData.data?.positive || 0"
-          :neutral="satisfactionData.data?.neutral || 0"
-          :negative="satisfactionData.data?.negative || 0"
+        <!-- Status Breakdown -->
+        <StatusBreakdownSection
+          :breakdown="statusBreakdown"
+          :loading="statusCards.loading"
         />
       </div>
     </div>
@@ -171,7 +182,7 @@ import {
   StatusCard,
   TrendChartSection,
   UnresolvedSection,
-  CustomerSatisfactionSection,
+  StatusBreakdownSection,
 } from "./components";
 
 const { isManager, userId } = useAuthStore();
@@ -186,6 +197,7 @@ const filters = reactive({
   period: getThisYear(),
   agent: null as string | null,
   team: null as string | null,
+  owner: null as string | null,
 });
 
 // Status Cards Resource
@@ -210,15 +222,6 @@ const trendData = createResource({
 const unresolvedData = createResource({
   url: "helpdesk.api.dashboard.get_unresolved_grouped_data",
   cache: ["Dashboard", "UnresolvedData"],
-  params: {
-    filters: getApiFilters(),
-  },
-});
-
-// Satisfaction Data Resource
-const satisfactionData = createResource({
-  url: "helpdesk.api.dashboard.get_satisfaction_data",
-  cache: ["Dashboard", "SatisfactionData"],
   params: {
     filters: getApiFilters(),
   },
@@ -256,6 +259,7 @@ function getApiFilters() {
     to_date: filters.period?.split(",")[1] || null,
     agent: filters.agent || null,
     team: filters.team || null,
+    owner: filters.owner || null,
   };
 }
 
@@ -270,10 +274,26 @@ function reloadAllResources() {
 
   unresolvedData.update({ params: { filters: apiFilters } });
   unresolvedData.reload();
-
-  satisfactionData.update({ params: { filters: apiFilters } });
-  satisfactionData.reload();
 }
+
+const statusBreakdown = computed(() => {
+  const cards = statusCards.data || [];
+  const getCount = (label: string, color: string) => {
+    const byLabel = cards.find((card) => card.label === label);
+    if (byLabel && typeof byLabel.count === "number") {
+      return byLabel.count;
+    }
+    const byColor = cards.find((card) => card.color === color);
+    return byColor && typeof byColor.count === "number" ? byColor.count : 0;
+  };
+
+  const open = getCount("Open", "#318AD8");
+  const closed = getCount("Closed", "#48BB78");
+  const pending = getCount("Pending", "#F6AD55");
+  const total = open + closed + pending;
+
+  return { open, closed, pending, total };
+});
 
 function getLastXDays(range: number = 30): string {
   const today = new Date();
