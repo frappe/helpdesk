@@ -3,7 +3,7 @@
     <div class="flex-1">
       <div
         v-if="!loading && totalCount > 0"
-        class="mb-5 flex flex-wrap items-center justify-between gap-3 px-1"
+        class="sticky top-0 z-30 mb-4 flex flex-wrap items-center justify-between gap-4 border-b border-outline-gray-2 bg-surface-white px-4 py-2.5 shadow-[0_6px_16px_rgba(0,0,0,0.04)]"
       >
         <div class="flex items-center gap-2 text-sm text-ink-gray-8">
           <span class="font-semibold text-ink-gray-9">{{ pageStart }}</span>
@@ -13,26 +13,31 @@
           <span class="font-semibold text-ink-gray-9">{{ totalCount }}</span>
         </div>
 
-        <div class="flex items-center gap-2">
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-ink-gray-7">Show:</span>
-            <select
-              :value="pageLengthCount"
-              @change="emit('update-limit', Number($event.target.value))"
-              class="h-8 rounded-md border border-outline-gray-3 bg-surface-white px-2 text-sm text-ink-gray-9 hover:bg-surface-gray-1 focus:outline-none focus:ring-2 focus:ring-ink-gray-4"
-            >
-              <option :value="10">10</option>
-              <option :value="20">20</option>
-              <option :value="50">50</option>
-              <option :value="100">100</option>
-            </select>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2.5">
+            <span class="text-sm font-semibold text-ink-gray-7">Show</span>
+            <Dropdown :options="pageLengthOptions" placement="bottom-end">
+              <template #default="{ open }">
+                <button
+                  type="button"
+                  class="flex h-9 items-center gap-2 rounded-lg border border-outline-gray-3 bg-surface-white px-3 text-sm font-semibold text-ink-gray-9 transition-all hover:border-outline-gray-4 hover:bg-surface-gray-1 focus:border-outline-gray-4 focus:outline-none focus:ring-2 focus:ring-outline-gray-3"
+                  aria-label="Select results per page"
+                >
+                  <span>{{ pageLengthCount }}</span>
+                  <LucideChevronDown
+                    class="h-4 w-4 text-ink-gray-5 transition-transform"
+                    :class="open ? 'rotate-180' : ''"
+                  />
+                </button>
+              </template>
+            </Dropdown>
           </div>
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-2">
             <Button
               size="sm"
               variant="ghost"
               theme="gray"
-              class="h-8 w-8 rounded-md border border-outline-gray-3 bg-surface-white hover:bg-surface-gray-1"
+              class="h-9 w-9 rounded-lg border border-outline-gray-3 bg-surface-white hover:bg-surface-gray-1"
               :disabled="pageStart <= 1 || loading"
               @click="emit('prev-page')"
               aria-label="Previous page"
@@ -43,7 +48,7 @@
               size="sm"
               variant="ghost"
               theme="gray"
-              class="h-8 w-8 rounded-md border border-outline-gray-3 bg-surface-white hover:bg-surface-gray-1"
+              class="h-9 w-9 rounded-lg border border-outline-gray-3 bg-surface-white hover:bg-surface-gray-1"
               :disabled="currentCount >= totalCount || loading"
               @click="emit('next-page')"
               aria-label="Next page"
@@ -190,9 +195,10 @@
 import TicketCardView from "@/components/ticket/TicketCardView.vue";
 // @ts-expect-error - legacy component lacks types
 import MultiSelectCombobox from "@/components/frappe-ui/MultiSelectCombobox.vue";
-import { Button } from "frappe-ui";
+import { Button, Dropdown } from "frappe-ui";
 import { computed } from "vue";
 import LucideFilter from "~icons/lucide/filter";
+import LucideChevronDown from "~icons/lucide/chevron-down";
 import LucideChevronLeft from "~icons/lucide/chevron-left";
 import LucideChevronRight from "~icons/lucide/chevron-right";
 
@@ -320,6 +326,13 @@ const pageStart = computed(() => {
   const start = pageEnd.value - pageLength.value + 1;
   return start < 1 ? 1 : start;
 });
+
+const pageLengthOptions = computed(() =>
+  [10, 20, 50, 100].map((value) => ({
+    label: `${value} per page`,
+    onClick: () => emit("update-limit", value),
+  }))
+);
 
 // Computed property to get the selected status option from statusFilterOptions
 const selectedStatusOption = computed(() => {
