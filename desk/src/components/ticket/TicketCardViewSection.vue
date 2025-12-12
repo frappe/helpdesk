@@ -95,7 +95,7 @@
               Status
             </label>
             <MultiSelectCombobox
-              :model-value="filters.status?.[0] || null"
+              :model-value="selectedStatusOption"
               :options="statusFilterOptions"
               placeholder="All status"
               @update:modelValue="updateFilter('status', $event)"
@@ -319,5 +319,22 @@ const pageStart = computed(() => {
   if (!pageEnd.value) return 0;
   const start = pageEnd.value - pageLength.value + 1;
   return start < 1 ? 1 : start;
+});
+
+// Computed property to get the selected status option from statusFilterOptions
+const selectedStatusOption = computed(() => {
+  const currentFilter = props.filters.status?.[0];
+  
+  if (!currentFilter) {
+    // Default to "All" option
+    return props.statusFilterOptions?.find(opt => opt.value === "") || null;
+  }
+  
+  const filterValue = typeof currentFilter === "object" && "value" in currentFilter 
+    ? currentFilter.value 
+    : currentFilter;
+  
+  // Find matching option from statusFilterOptions
+  return props.statusFilterOptions?.find(opt => opt.value === filterValue) || currentFilter;
 });
 </script>

@@ -462,13 +462,15 @@ const statusFilterOptions = computed(() => {
     indicatorClass: s.parsed_color,
     category: s.category,
   }));
-  return [
-    {
-      label: "All",
-      value: "",
-    },
-    ...options,
-  ];
+  
+  const allOption = {
+    label: "All",
+    value: "",
+    indicatorClass: "",
+    category: "",
+  };
+  
+  return [allOption, ...options];
 });
 
 const priorityFilterOptions = computed(() =>
