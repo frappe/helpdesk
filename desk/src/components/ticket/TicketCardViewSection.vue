@@ -3,7 +3,7 @@
     <div class="flex-1">
       <div
         v-if="!loading && totalCount > 0"
-        class="sticky top-0 z-30 mb-4 flex flex-wrap items-center justify-between gap-4 border-b border-outline-gray-2 bg-surface-white px-4 py-2.5 shadow-[0_6px_16px_rgba(0,0,0,0.04)]"
+        class="sticky top-0 z-30 mb-4 flex flex-wrap items-center justify-between gap-4 rounded-sm border border-outline-gray-2 bg-surface-white px-5 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.05)]"
       >
         <div class="flex items-center gap-2 text-sm text-ink-gray-8">
           <span class="font-semibold text-ink-gray-9">{{ pageStart }}</span>
@@ -20,7 +20,7 @@
               <template #default="{ open }">
                 <button
                   type="button"
-                  class="flex h-9 items-center gap-2 rounded-lg border border-outline-gray-3 bg-surface-white px-3 text-sm font-semibold text-ink-gray-9 transition-all hover:border-outline-gray-4 hover:bg-surface-gray-1 focus:border-outline-gray-4 focus:outline-none focus:ring-2 focus:ring-outline-gray-3"
+                  class="flex h-9 items-center gap-2 rounded-lg border border-outline-gray-3 bg-surface-white px-3 text-sm font-semibold text-ink-gray-9 transition-all hover:-translate-y-0.5 hover:border-outline-gray-4 hover:bg-surface-gray-1 focus:-translate-y-0.5 focus:border-outline-gray-4 focus:outline-none focus:ring-2 focus:ring-outline-gray-3"
                   aria-label="Select results per page"
                 >
                   <span>{{ pageLengthCount }}</span>
@@ -37,7 +37,7 @@
               size="sm"
               variant="ghost"
               theme="gray"
-              class="h-9 w-9 rounded-lg border border-outline-gray-3 bg-surface-white hover:bg-surface-gray-1"
+              class="h-9 w-9 rounded-lg border border-outline-gray-3 bg-surface-white transition-transform hover:-translate-y-0.5 hover:bg-surface-gray-1"
               :disabled="pageStart <= 1 || loading"
               @click="emit('prev-page')"
               aria-label="Previous page"
@@ -48,7 +48,7 @@
               size="sm"
               variant="ghost"
               theme="gray"
-              class="h-9 w-9 rounded-lg border border-outline-gray-3 bg-surface-white hover:bg-surface-gray-1"
+              class="h-9 w-9 rounded-lg border border-outline-gray-3 bg-surface-white transition-transform hover:-translate-y-0.5 hover:bg-surface-gray-1"
               :disabled="currentCount >= totalCount || loading"
               @click="emit('next-page')"
               aria-label="Next page"
