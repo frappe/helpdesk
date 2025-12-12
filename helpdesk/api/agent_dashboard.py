@@ -655,7 +655,7 @@ def get_pending_tickets():
             pending_tickets.append(ticket)
 
     # Sort pending tickets by last customer reply time (most recent first)
-    pending_tickets.sort(key=lambda x: x["last_customer_reply"], reverse=True)
+    pending_tickets.sort(key=lambda x: x["last_customer_reply"])
 
     # Limit to 5 tickets
     tickets = pending_tickets[:5]
