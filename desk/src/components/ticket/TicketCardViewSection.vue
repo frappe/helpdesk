@@ -13,29 +13,44 @@
           <span class="font-semibold text-ink-gray-9">{{ totalCount }}</span>
         </div>
 
-        <div class="flex items-center gap-1">
-          <Button
-            size="sm"
-            variant="ghost"
-            theme="gray"
-            class="h-8 w-8 rounded-md border border-outline-gray-3 bg-surface-white hover:bg-surface-gray-1"
-            :disabled="pageStart <= 1 || loading"
-            @click="emit('prev-page')"
-            aria-label="Previous page"
-          >
-            <LucideChevronLeft class="h-4 w-4" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            theme="gray"
-            class="h-8 w-8 rounded-md border border-outline-gray-3 bg-surface-white hover:bg-surface-gray-1"
-            :disabled="currentCount >= totalCount || loading"
-            @click="emit('next-page')"
-            aria-label="Next page"
-          >
-            <LucideChevronRight class="h-4 w-4" />
-          </Button>
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-ink-gray-7">Show:</span>
+            <select
+              :value="pageLengthCount"
+              @change="emit('update-limit', Number($event.target.value))"
+              class="h-8 rounded-md border border-outline-gray-3 bg-surface-white px-2 text-sm text-ink-gray-9 hover:bg-surface-gray-1 focus:outline-none focus:ring-2 focus:ring-ink-gray-4"
+            >
+              <option :value="10">10</option>
+              <option :value="20">20</option>
+              <option :value="50">50</option>
+              <option :value="100">100</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-1">
+            <Button
+              size="sm"
+              variant="ghost"
+              theme="gray"
+              class="h-8 w-8 rounded-md border border-outline-gray-3 bg-surface-white hover:bg-surface-gray-1"
+              :disabled="pageStart <= 1 || loading"
+              @click="emit('prev-page')"
+              aria-label="Previous page"
+            >
+              <LucideChevronLeft class="h-4 w-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              theme="gray"
+              class="h-8 w-8 rounded-md border border-outline-gray-3 bg-surface-white hover:bg-surface-gray-1"
+              :disabled="currentCount >= totalCount || loading"
+              @click="emit('next-page')"
+              aria-label="Next page"
+            >
+              <LucideChevronRight class="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
       <TicketCardView
@@ -257,6 +272,7 @@ const emit = defineEmits<{
   (e: "apply-filters", value: CardFilters): void;
   (e: "reset-filters"): void;
   (e: "apply-quick-view", view: QuickView): void;
+  (e: "update-limit", value: number): void;
 }>();
 
 function updateFilter(key: keyof CardFilters, value: any) {
