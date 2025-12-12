@@ -4,11 +4,6 @@
       <template #left-header>
         <div class="text-lg font-medium text-gray-900">My Dashboard</div>
       </template>
-      <template #right-header>
-        <span class="text-sm text-blue-600 cursor-pointer hover:underline">
-          Recent activities &gt;
-        </span>
-      </template>
     </LayoutHeader>
 
     <div class="p-5 w-full overflow-y-auto flex-1">
