@@ -227,35 +227,42 @@ const activeQuickView = ref<string>("");
 const showExportModal = ref(false);
 const currentUserEmail = computed(() => useAuthStore().userResource?.email || "");
 
-const quickViews = computed(() => [
-  {
-    label: "All tickets",
-    icon: LucideInbox,
-    filters: {},
-  },
-  {
-    label: "All unresolved tickets",
-    icon: LucideAlertCircle,
-    filters: {
-      status: ["!=", "Resolved"],
+const quickViews = computed(() => {
+  // Get all status names that are Open or Paused (unresolved)
+  const unresolvedStatuses = (statuses.data || [])
+    .filter((s) => s.category === "Open" || s.category === "Paused")
+    .map((s) => s.label_agent);
+
+  return [
+    {
+      label: "All tickets",
+      icon: LucideInbox,
+      filters: {},
     },
-  },
-  {
-    label: "New and my open tickets",
-    icon: LucideMailOpen,
-    filters: {
-      status: ["in", ["Open", "New"]],
-      assigned_to: currentUserEmail.value,
+    {
+      label: "All unresolved tickets",
+      icon: LucideAlertCircle,
+      filters: unresolvedStatuses.length > 0
+        ? { status: ["in", unresolvedStatuses] }
+        : { status: ["!=", "Resolved"] },
     },
-  },
-  {
-    label: "Tickets I raised",
-    icon: LucideUser,
-    filters: {
-      raised_by: currentUserEmail.value,
+    {
+      label: "New and my open tickets",
+      icon: LucideMailOpen,
+      filters: {
+        status: ["in", ["Open", "New"]],
+        _assign: ["like", `%"${currentUserEmail.value}"%`],
+      },
     },
-  },
-]);
+    {
+      label: "Tickets I raised",
+      icon: LucideUser,
+      filters: {
+        raised_by: currentUserEmail.value,
+      },
+    },
+  ];
+});
 
 const { getStatus, statuses } = useTicketStatusStore();
 
