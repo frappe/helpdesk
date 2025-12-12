@@ -20,7 +20,8 @@
   "qa_status",
   "custom_ingredients_status",
   "pro_status",
-  "ops_status"
+  "ops_status",
+  "aggregate_production_status"
  ],
  "fields": [
   {
@@ -98,13 +99,18 @@
    "fieldname": "ops_status",
    "fieldtype": "Data",
    "label": "OPS Status"
+  },
+  {
+   "fieldname": "aggregate_production_status",
+   "fieldtype": "Data",
+   "label": "Aggregate Production Status"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-10 14:26:00.149969",
+ "modified": "2025-12-11 14:20:55.788876",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Order Item",

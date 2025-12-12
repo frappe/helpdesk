@@ -28,6 +28,7 @@
               <th class="text-left p-3 font-semibold">OPS Status</th>
               <th class="text-left p-3 font-semibold">Ingredient Status</th>
               <th class="text-left p-3 font-semibold">Production Status</th>
+              <th class="text-left p-3 font-semibold">Aggregate Production Status</th>
             </tr>
           </thead>
           <tbody>
@@ -66,14 +67,20 @@
                 <span v-else class="text-gray-400">-</span>
               </td>
               <td class="p-3">
-                <span v-if="item.mat_status" class="status-badge-crm" :class="'status-badge-' + getStatusColor(item.mat_status)">
-                  {{ getStatusIcon(item.mat_status) }} {{ item.mat_status }}
+                <span v-if="item.custom_ingredients_status" class="status-badge-crm" :class="'status-badge-' + getStatusColor(item.custom_ingredients_status)">
+                  {{ getStatusIcon(item.custom_ingredients_status) }} {{ item.custom_ingredients_status }}
                 </span>
                 <span v-else class="text-gray-400">-</span>
               </td>
               <td class="p-3">
                 <span v-if="item.pro_status" class="status-badge-crm" :class="'status-badge-' + getStatusColor(item.pro_status)">
                   {{ getStatusIcon(item.pro_status) }} {{ item.pro_status }}
+                </span>
+                <span v-else class="text-gray-400">-</span>
+              </td>
+              <td class="p-3">
+                <span v-if="item.aggregate_production_status" class="status-badge-crm" :class="'status-badge-' + getStatusColor(item.aggregate_production_status)">
+                  {{ getStatusIcon(item.aggregate_production_status) }} {{ item.aggregate_production_status }}
                 </span>
                 <span v-else class="text-gray-400">-</span>
               </td>

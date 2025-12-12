@@ -268,4 +268,3 @@ def transfer_to_crm(ticket_name, communication_ids=None, delete_source=True):
 	except Exception as e:
 		frappe.log_error(f"Error in transfer_to_crm: {str(e)}")
 		frappe.throw(_("Error transferring to CRM: {0}").format(str(e)))
-
