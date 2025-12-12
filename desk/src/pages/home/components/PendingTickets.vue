@@ -32,8 +32,8 @@
                 {{ ticket.agent_group || __("Not Assigned") }}
               </div>
               <div class="col-span-2 truncate">
-                <span v-if="ticket.last_agent_reply" class="text-ink-gray-7">
-                  {{ dayjs.tz(ticket.last_agent_reply).fromNow() }}
+                <span v-if="ticket.last_customer_reply" class="text-ink-gray-7">
+                  {{ dayjs.tz(ticket.last_customer_reply).fromNow() }}
                 </span>
                 <span v-else class="text-ink-gray-4">{{
                   __("Not replied")

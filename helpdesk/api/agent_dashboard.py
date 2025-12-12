@@ -582,7 +582,8 @@ def get_pending_tickets():
         "HD Ticket Status", filters={"category": ["=", "Open"]}, pluck="name"
     )
 
-    tickets = frappe.get_list(
+    # Get all tickets first
+    all_tickets = frappe.get_list(
         "HD Ticket",
         fields=[
             "name",
@@ -603,39 +604,61 @@ def get_pending_tickets():
             ["_assign", "like", f"%{frappe.session.user}%"],
             ["status", "in", allowed_statuses],
         ],
-        order_by="creation asc",
-        limit=5,
+        limit=50,
     )
 
-    # Get last agent reply time for each ticket
-    ticket_names = [ticket["name"] for ticket in tickets]
-    if ticket_names:
-        last_replies = frappe.db.sql(
-            """
-            SELECT
-                CAST(reference_name AS UNSIGNED) as reference_name_int,
-                MAX(creation) as last_agent_reply
-            FROM `tabCommunication`
-            WHERE reference_doctype = 'HD Ticket'
-            AND reference_name IN %(ticket_names)s
-            AND sent_or_received = 'Sent'
-            GROUP BY reference_name
-            """,
-            {"ticket_names": ticket_names},
-            as_dict=True,
-        )
-        # Create a mapping of ticket name to last reply time
-        last_reply_map = {}
-        for item in last_replies:
-            ticket_id = item["reference_name_int"]
-            if ticket_id and item["last_agent_reply"]:
-                last_reply_map[ticket_id] = item["last_agent_reply"]
-            elif ticket_id:
-                last_reply_map[ticket_id] = None
+    ticket_names = [ticket["name"] for ticket in all_tickets]
+    if not ticket_names:
+        return {
+            "tickets": [],
+            "min_priority": 0,
+            "max_priority": 0,
+        }
 
-        # Add last_agent_reply to each ticket
-        for ticket in tickets:
-            ticket["last_agent_reply"] = last_reply_map.get(ticket["name"])
+    # Get last customer reply and last agent reply for each ticket
+    last_replies = frappe.db.sql(
+        """
+        SELECT
+            CAST(reference_name AS UNSIGNED) as reference_name_int,
+            MAX(CASE WHEN sent_or_received = 'Received' THEN creation END) as last_customer_reply,
+            MAX(CASE WHEN sent_or_received = 'Sent' THEN creation END) as last_agent_reply
+        FROM `tabCommunication`
+        WHERE reference_doctype = 'HD Ticket'
+        AND reference_name IN %(ticket_names)s
+        GROUP BY reference_name
+        """,
+        {"ticket_names": ticket_names},
+        as_dict=True,
+    )
+
+    # Create mappings of ticket name to reply times
+    customer_reply_map = {}
+    agent_reply_map = {}
+
+    for item in last_replies:
+        ticket_id = item["reference_name_int"]
+        if ticket_id:
+            customer_reply_map[ticket_id] = item["last_customer_reply"]
+            agent_reply_map[ticket_id] = item["last_agent_reply"]
+
+    pending_tickets = []
+    for ticket in all_tickets:
+        ticket_id = ticket["name"]
+        last_customer_reply = customer_reply_map.get(ticket_id)
+        last_agent_reply = agent_reply_map.get(ticket_id)
+
+        if last_customer_reply and (
+            not last_agent_reply or last_agent_reply < last_customer_reply
+        ):
+            ticket["last_customer_reply"] = last_customer_reply
+            ticket["last_agent_reply"] = last_agent_reply
+            pending_tickets.append(ticket)
+
+    # Sort pending tickets by last customer reply time (most recent first)
+    pending_tickets.sort(key=lambda x: x["last_customer_reply"], reverse=True)
+
+    # Limit to 5 tickets
+    tickets = pending_tickets[:5]
 
     priorities = frappe.get_all("HD Ticket Priority", fields="integer_value")
     min_priority = min(priorities, key=lambda x: x["integer_value"])["integer_value"]

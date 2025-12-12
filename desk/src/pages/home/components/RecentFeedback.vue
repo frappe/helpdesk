@@ -106,9 +106,10 @@ const router = useRouter();
 
 interface Feedback {
   name: string;
-  rating: number;
+  feedback_rating: number;
   feedback: string;
   feedback_extra: string;
+  contact: string;
 }
 
 const props = defineProps({
