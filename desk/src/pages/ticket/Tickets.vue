@@ -225,7 +225,9 @@ const cardFilters = reactive<CardFilters>({
 });
 const activeQuickView = ref<string>("");
 const showExportModal = ref(false);
-const currentUserEmail = computed(() => useAuthStore().userResource?.email || "");
+const authStore = useAuthStore();
+const currentUserEmail = computed(() => authStore.userId || authStore.username || authStore.user || "");
+const currentUserName = computed(() => authStore.username || authStore.userId || authStore.user || "");
 
 const quickViews = computed(() => {
   return [
@@ -253,7 +255,7 @@ const quickViews = computed(() => {
       label: "Tickets I raised",
       icon: LucideUser,
       filters: {
-        raised_by: currentUserEmail.value,
+        owner: currentUserName.value,
       },
     },
   ];

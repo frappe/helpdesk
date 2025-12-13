@@ -127,6 +127,12 @@ def get_tickets_for_card_view(
         if raised_by:
             query = query.where(Ticket.raised_by == raised_by)
     
+    # Owner filter - compare with contact field
+    if "owner" in filters:
+        owner = filters["owner"]
+        if owner:
+            query = query.where(Ticket.contact == owner)
+    
     # Check if "All" filter is applied (no status filter)
     is_all_filter = "status" not in filters or not filters.get("status")
     
@@ -213,6 +219,11 @@ def get_tickets_for_card_view(
         raised_by = filters["raised_by"]
         if raised_by:
             count_query = count_query.where(Ticket.raised_by == raised_by)
+    
+    if "owner" in filters:
+        owner = filters["owner"]
+        if owner:
+            count_query = count_query.where(Ticket.contact == owner)
     
     total_count = count_query.run()[0][0] if count_query.run() else 0
     
