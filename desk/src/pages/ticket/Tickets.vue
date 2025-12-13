@@ -225,14 +225,11 @@ const cardFilters = reactive<CardFilters>({
 });
 const activeQuickView = ref<string>("");
 const showExportModal = ref(false);
-const currentUserEmail = computed(() => useAuthStore().userResource?.email || "");
+const authStore = useAuthStore();
+const currentUserEmail = computed(() => authStore.userId || authStore.username || authStore.user || "");
+const currentUserName = computed(() => authStore.username || authStore.userId || authStore.user || "");
 
 const quickViews = computed(() => {
-  // Get only Open status tickets (category = "Open")
-  const openStatuses = (statuses.data || [])
-    .filter((s) => s.category === "Open")
-    .map((s) => s.label_agent);
-
   return [
     {
       label: "All tickets",
@@ -242,9 +239,9 @@ const quickViews = computed(() => {
     {
       label: "All unresolved tickets",
       icon: LucideAlertCircle,
-      filters: openStatuses.length > 0
-        ? { status: ["in", openStatuses] }
-        : { status: "Open" },
+      filters: {
+        status: ["in", ["Open", "Pending"]],
+      },
     },
     {
       label: "New and my open tickets",
@@ -258,7 +255,7 @@ const quickViews = computed(() => {
       label: "Tickets I raised",
       icon: LucideUser,
       filters: {
-        raised_by: currentUserEmail.value,
+        owner: currentUserName.value,
       },
     },
   ];
