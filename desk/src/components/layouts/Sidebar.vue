@@ -114,7 +114,7 @@
         :isSidebarCollapsed="!isExpanded"
         appName="helpdesk"
       />
-      <SidebarLink
+      <!-- <SidebarLink
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
         :icon="HelpIcon"
         :label="'Help'"
@@ -125,7 +125,7 @@
             minimize = !showHelpModal;
           }
         "
-      />
+      /> -->
 
       <SidebarLink
         :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
