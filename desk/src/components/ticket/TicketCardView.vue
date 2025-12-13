@@ -13,104 +13,107 @@
       <div
         v-for="ticket in rows"
         :key="ticket.name"
-        class="rounded-lg border border-outline-gray-2 bg-surface-white p-4 shadow-sm transition-all duration-200 hover:border-outline-gray-3 hover:shadow-md cursor-pointer"
+        class="cursor-pointer rounded-xl border border-outline-gray-2 bg-surface-white p-4 shadow-sm transition-all duration-200 hover:border-outline-gray-3 hover:shadow-md"
         :class="resolvedClass(ticket)"
         @click="handleCardClick(ticket)"
       >
-        <div class="flex items-start justify-between gap-4">
-          <div class="flex min-w-0 flex-1 flex-col gap-3">
-            <div class="flex flex-col gap-2">
-              <div class="flex items-center gap-2">
-                <span
-                  v-if="isFirstResponseDue(ticket)"
-                  class="w-fit rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600"
-                >
-                  First response due
-                </span>
-                <span class="text-xs font-medium text-ink-gray-5">#{{ ticket.name }}</span>
-              </div>
-              <div class="text-base font-semibold text-ink-gray-9 line-clamp-2">
-                {{ ticket.subject || ticket.name }}
-              </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-medium text-ink-gray-6">Status:</span>
-                <Badge
-                  v-if="statusLabel(ticket)"
-                  :label="statusLabel(ticket)"
-                  variant="subtle"
-                  :theme="statusTheme(ticket)"
-                  class="text-xs font-medium"
-                />
-              </div>
-              <div v-if="ticket.priority" class="flex items-center gap-2">
-                <span class="text-xs font-medium text-ink-gray-6">Priority:</span>
-                <Badge
-                  :label="ticket.priority"
-                  variant="outline"
-                  theme="gray"
-                  class="text-xs font-medium"
-                />
-              </div>
-            </div>
-            <div class="flex flex-wrap gap-4 text-sm text-ink-gray-6">
-              <div v-if="ticket.customer" class="flex items-center gap-1.5">
-                <LucideUser class="h-4 w-4" />
-                <span class="truncate">{{ ticket.customer }}</span>
-              </div>
-              <div
-                v-if="ticket.assignees?.length"
-                class="flex items-center gap-1.5"
+        <div class="flex items-start gap-4">
+          <input
+            type="checkbox"
+            class="mt-1 h-4 w-4 rounded-sm border border-outline-gray-3 text-ink-gray-8 focus:ring-2 focus:ring-outline-gray-3"
+            @click.stop
+            aria-label="Select ticket"
+          />
+          <div
+            class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+            :class="avatarClasses(ticket)"
+          >
+            {{ ticketInitials(ticket) }}
+          </div>
+          <div class="min-w-0 flex-1 space-y-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                v-if="isFirstResponseDue(ticket)"
+                class="rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-600"
               >
-                <LucideUsers class="h-4 w-4" />
-                <MultipleAvatar
-                  :avatars="ticket.assignees"
-                  hide-name
-                  class="h-6"
-                />
+                First response due
+              </span>
+              <div class="flex min-w-0 flex-wrap items-baseline gap-2">
+                <p class="line-clamp-1 text-base font-semibold text-ink-gray-9">
+                  {{ ticket.subject || ticket.name }}
+                </p>
+                <span class="text-sm font-medium text-ink-gray-6">#{{ ticket.name }}</span>
               </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 text-sm text-ink-gray-7">
+              <div v-if="requesterName(ticket)" class="flex items-center gap-1.5">
+                <LucideUser class="h-4 w-4" />
+                <span class="truncate">{{ requesterName(ticket) }}</span>
+              </div>
+              <span
+                v-if="requesterName(ticket) && ticket.creation"
+                class="text-ink-gray-4"
+                aria-hidden="true"
+              >
+                &bull;
+              </span>
               <div v-if="ticket.creation" class="flex items-center gap-1.5">
                 <LucideClock3 class="h-4 w-4" />
                 <span>{{ createdText(ticket.creation) }}</span>
               </div>
+              <span
+                v-if="ticket.creation && ticket.resolution_by"
+                class="text-ink-gray-4"
+                aria-hidden="true"
+              >
+                &bull;
+              </span>
               <div v-if="ticket.resolution_by" class="flex items-center gap-1.5">
                 <LucideAlarmClock class="h-4 w-4" />
                 <span>{{ dueText(ticket.resolution_by) }}</span>
               </div>
             </div>
-          </div>
-          <div class="flex flex-col items-stretch gap-2" @click.stop>
-            <Dropdown :options="statusOptionsList(ticket)" placement="bottom-end">
-              <button
-                class="group flex items-center justify-between gap-2.5 rounded-lg border border-outline-gray-2 bg-surface-white px-3 py-2 text-left shadow-sm transition-all hover:border-outline-gray-3 hover:shadow focus:outline-none focus:ring-2 focus:ring-gray-200"
+
+            <div class="flex flex-wrap items-center gap-4 text-sm text-ink-gray-8">
+              <Dropdown
+                v-if="priorityOptions?.length"
+                :options="priorityOptionsList(ticket)"
+                placement="bottom-start"
               >
-                <div class="flex items-center gap-2 overflow-hidden">
-                  <IndicatorIcon :class="[statusDot(ticket), 'flex-shrink-0 h-4 w-4']" />
-                  <span class="truncate text-sm font-medium text-ink-gray-9">
-                    {{ statusLabel(ticket) }}
-                  </span>
-                </div>
-                <LucideChevronDown class="h-3.5 w-3.5 text-ink-gray-6 flex-shrink-0 transition-transform group-hover:text-ink-gray-8" />
-              </button>
-            </Dropdown>
-            <Dropdown
-              v-if="priorityOptions?.length"
-              :options="priorityOptionsList(ticket)"
-              placement="bottom-end"
-            >
-              <button
-                class="group flex items-center justify-between gap-2.5 rounded-lg border border-outline-gray-2 bg-surface-white px-3 py-2 text-left shadow-sm transition-all hover:border-outline-gray-3 hover:shadow focus:outline-none focus:ring-2 focus:ring-gray-200"
-              >
-                <div class="flex items-center gap-2 overflow-hidden">
-                  <LucideFlag class="h-3.5 w-3.5 text-ink-gray-6 flex-shrink-0" />
-                  <span class="truncate text-sm font-medium text-ink-gray-9">
+                <button
+                  class="flex items-center gap-1.5 rounded-md px-0.5 py-1 text-ink-gray-9 transition-colors hover:text-ink-gray-8"
+                  @click.stop
+                >
+                  <span class="h-2.5 w-2.5 rounded-full" :class="priorityMeta(ticket.priority).dot" />
+                  <span class="font-medium" :class="priorityMeta(ticket.priority).text">
                     {{ ticket.priority || "No priority" }}
                   </span>
-                </div>
-                <LucideChevronDown class="h-3.5 w-3.5 text-ink-gray-6 flex-shrink-0 transition-transform group-hover:text-ink-gray-8" />
-              </button>
-            </Dropdown>
+                  <LucideChevronDown class="h-3.5 w-3.5 text-ink-gray-6" />
+                </button>
+              </Dropdown>
+              <div v-else class="flex items-center gap-1.5">
+                <span class="h-2.5 w-2.5 rounded-full" :class="priorityMeta(ticket.priority).dot" />
+                <span class="font-medium" :class="priorityMeta(ticket.priority).text">
+                  {{ ticket.priority || "No priority" }}
+                </span>
+              </div>
+              <div v-if="assigneeName(ticket)" class="flex items-center gap-1.5 text-ink-gray-8">
+                <LucideUsers class="h-4 w-4 text-ink-gray-6" />
+                <span class="truncate">{{ assigneeName(ticket) }}</span>
+                <LucideChevronDown class="h-3.5 w-3.5 text-ink-gray-6" />
+              </div>
+              <Dropdown :options="statusOptionsList(ticket)" placement="bottom-start">
+                <button
+                  class="flex items-center gap-1.5 rounded-md px-0.5 py-1 text-ink-gray-9 transition-colors hover:text-ink-gray-8"
+                  @click.stop
+                >
+                  <span class="h-2.5 w-2.5 rounded-full" :class="statusDot(ticket)" />
+                  <span class="font-medium">{{ statusLabel(ticket) }}</span>
+                  <LucideChevronDown class="h-3.5 w-3.5 text-ink-gray-6" />
+                </button>
+              </Dropdown>
+            </div>
           </div>
         </div>
       </div>
@@ -120,16 +123,12 @@
 
 <script setup lang="ts">
 import EmptyState from "@/components/EmptyState.vue";
-import MultipleAvatar from "@/components/MultipleAvatar.vue";
-import { IndicatorIcon } from "@/components/icons";
 import { dayjs } from "@/dayjs";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { Badge, Button, Dropdown, LoadingIndicator } from "frappe-ui";
+import { Dropdown, LoadingIndicator } from "frappe-ui";
 import LucideAlarmClock from "~icons/lucide/alarm-clock";
-import LucideArrowRight from "~icons/lucide/arrow-right";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import LucideClock3 from "~icons/lucide/clock-3";
-import LucideFlag from "~icons/lucide/flag";
 import LucideUser from "~icons/lucide/user";
 import LucideUsers from "~icons/lucide/users";
 
@@ -171,14 +170,6 @@ function statusLabel(row: any) {
   return statusMeta(row)?.label_agent || row?.status;
 }
 
-function statusTheme(row: any) {
-  const category = statusMeta(row)?.category;
-  if (category === "Resolved") return "green";
-  if (category === "Paused") return "blue";
-  if (category === "Overdue") return "red";
-  return "orange";
-}
-
 const createdText = (value?: string) =>
   value ? `Created ${dayjs(value).fromNow()}` : "";
 
@@ -188,6 +179,59 @@ const dueText = (value?: string) =>
 function statusDot(row: any) {
   const meta = statusMeta(row);
   return meta?.parsed_color || "bg-ink-gray-4";
+}
+
+function ticketInitials(row: any) {
+  const source =
+    row?.customer ||
+    row?.contact_name ||
+    row?.contact ||
+    row?.raised_by_name ||
+    row?.subject ||
+    row?.name ||
+    "";
+  const cleaned = String(source).trim();
+  if (!cleaned) return "NA";
+  return cleaned
+    .split(/[\s@._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("") || "NA";
+}
+
+function requesterName(row: any) {
+  return (
+    row?.customer ||
+    row?.contact_name ||
+    row?.contact ||
+    row?.raised_by_name ||
+    row?.raised_by ||
+    ""
+  );
+}
+
+function assigneeName(row: any) {
+  if (Array.isArray(row?.assignees) && row.assignees.length) {
+    const primary = row.assignees[0];
+    if (typeof primary === "string") return primary;
+    return primary?.full_name || primary?.name || primary?.email || "";
+  }
+  return row?.assigned_to || row?.owner || "";
+}
+
+function priorityMeta(priority?: string) {
+  const value = String(priority || "").toLowerCase();
+  if (value.includes("urgent") || value.includes("high")) {
+    return { dot: "bg-red-600", text: "text-red-600" };
+  }
+  if (value.includes("medium")) {
+    return { dot: "bg-purple-600", text: "text-purple-700" };
+  }
+  if (value.includes("low")) {
+    return { dot: "bg-green-500", text: "text-green-600" };
+  }
+  return { dot: "bg-outline-gray-3", text: "text-ink-gray-9" };
 }
 
 function statusOptionsList(row: any) {
@@ -218,15 +262,36 @@ function handleCardClick(ticket: any) {
   emit("rowClick", ticketId);
 }
 
+function avatarClasses(row: any) {
+  const palette = [
+    ["bg-indigo-100", "text-indigo-700"],
+    ["bg-purple-100", "text-purple-700"],
+    ["bg-amber-100", "text-amber-700"],
+    ["bg-green-100", "text-green-700"],
+    ["bg-blue-100", "text-blue-700"],
+    ["bg-pink-100", "text-pink-700"],
+  ];
+  const base =
+    row?.customer ||
+    row?.contact_name ||
+    row?.contact ||
+    row?.raised_by_name ||
+    row?.subject ||
+    row?.name ||
+    "";
+  const hash = String(base)
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const [bg, text] = palette[hash % palette.length];
+  return [bg, text].join(" ");
+}
+
 function isFirstResponseDue(row: any) {
   if (!row.response_by) return false;
-  const now = dayjs();
   const responseBy = dayjs(row.response_by);
   const firstResponded = row.first_responded_on ? dayjs(row.first_responded_on) : null;
-  if (firstResponded) {
-    return firstResponded.isAfter(responseBy);
-  }
-  return responseBy.isBefore(now);
+  // Show badge until first response is recorded, or if first response missed the SLA window.
+  if (!firstResponded) return true;
+  return firstResponded.isAfter(responseBy);
 }
 </script>
-

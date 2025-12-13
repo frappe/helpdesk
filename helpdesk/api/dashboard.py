@@ -603,7 +603,11 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     user = frappe.session.user
     is_manager = "Agent Manager" in frappe.get_roles(user)
 
-    if filters and not is_manager and (filters.get("agent") != user or filters.get("team")):
+    if filters and not is_manager and (
+        filters.get("team")
+        or filters.get("agent") not in (None, user, "@me")
+        or filters.get("owner") not in (None, user, "@me")
+    ):
         frappe.throw(
             _("You are not allowed to view this dashboard data."),
             frappe.PermissionError,
@@ -631,6 +635,11 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
             base_conds.append(
                 Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull()
             )
+        if filters.get("owner"):
+            owner = filters.get("owner")
+            if owner == "@me":
+                owner = user
+            base_conds.append(ticket.owner == owner)
 
     def get_count(extra_cond=None):
         query = frappe.qb.from_(ticket).select(Count(ticket.name).as_("count"))
@@ -721,7 +730,11 @@ def get_today_trend_data(filters: dict[str, any] = None) -> dict[str, any]:
     user = frappe.session.user
     is_manager = "Agent Manager" in frappe.get_roles(user)
 
-    if filters and not is_manager and (filters.get("agent") != user or filters.get("team")):
+    if filters and not is_manager and (
+        filters.get("team")
+        or filters.get("agent") not in (None, user, "@me")
+        or filters.get("owner") not in (None, user, "@me")
+    ):
         frappe.throw(
             _("You are not allowed to view this dashboard data."),
             frappe.PermissionError,
@@ -744,6 +757,11 @@ def get_today_trend_data(filters: dict[str, any] = None) -> dict[str, any]:
             base_conds.append(
                 Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull()
             )
+        if filters.get("owner"):
+            owner = filters.get("owner")
+            if owner == "@me":
+                owner = user
+            base_conds.append(ticket.owner == owner)
 
     def get_hourly_data(date_start, date_end):
         query = (
@@ -842,7 +860,11 @@ def get_unresolved_grouped_data(filters: dict[str, any] = None) -> list[dict[str
     user = frappe.session.user
     is_manager = "Agent Manager" in frappe.get_roles(user)
 
-    if filters and not is_manager and (filters.get("agent") != user or filters.get("team")):
+    if filters and not is_manager and (
+        filters.get("team")
+        or filters.get("agent") not in (None, user, "@me")
+        or filters.get("owner") not in (None, user, "@me")
+    ):
         frappe.throw(
             _("You are not allowed to view this dashboard data."),
             frappe.PermissionError,
@@ -865,6 +887,11 @@ def get_unresolved_grouped_data(filters: dict[str, any] = None) -> list[dict[str
             if agent == "@me":
                 agent = user
             base_filters["_assign"] = ["like", f"%{agent}%"]
+        if filters.get("owner"):
+            owner = filters.get("owner")
+            if owner == "@me":
+                owner = user
+            base_filters["owner"] = owner
 
     result = frappe.get_all(
         HD_TICKET,
@@ -890,7 +917,11 @@ def get_satisfaction_data(filters: dict[str, any] = None) -> dict[str, any]:
     user = frappe.session.user
     is_manager = "Agent Manager" in frappe.get_roles(user)
 
-    if filters and not is_manager and (filters.get("agent") != user or filters.get("team")):
+    if filters and not is_manager and (
+        filters.get("team")
+        or filters.get("agent") not in (None, user, "@me")
+        or filters.get("owner") not in (None, user, "@me")
+    ):
         frappe.throw(
             _("You are not allowed to view this dashboard data."),
             frappe.PermissionError,
@@ -910,6 +941,11 @@ def get_satisfaction_data(filters: dict[str, any] = None) -> dict[str, any]:
             base_conds.append(
                 Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull()
             )
+        if filters.get("owner"):
+            owner = filters.get("owner")
+            if owner == "@me":
+                owner = user
+            base_conds.append(ticket.owner == owner)
         if filters.get("from_date"):
             base_conds.append(ticket.creation >= filters.get("from_date"))
         if filters.get("to_date"):

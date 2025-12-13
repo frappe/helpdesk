@@ -70,6 +70,7 @@
     :loading="listLoading"
     :total-count="totalCount"
     :current-count="currentCount"
+    :page-length-count="pageLengthCount"
     :status-options="statusOptionList"
     :priority-options="priorityOptionList"
     :status-filter-options="statusFilterOptions"
@@ -82,11 +83,14 @@
     @row-click="handleCardClick"
     @update-status="handleCardStatus"
     @update-priority="handleCardPriority"
+    @next-page="handleCardNextPage"
+    @prev-page="handleCardPrevPage"
     @load-more="handleCardLoadMore"
     @update:filters="updateCardFilters"
     @apply-filters="applyCardFilters"
     @reset-filters="resetCardFilters"
     @apply-quick-view="applyQuickView"
+    @update-limit="handleUpdateLimit"
   />
     <ExportModal
       v-model="showExportModal"
@@ -166,19 +170,55 @@ const listViewSectionRef = ref<any>(null);
 const listViewRef = computed(() => listViewSectionRef.value?.listViewRef);
 const viewMode = useStorage<"table" | "card">("tickets_view_mode", "table");
 const isTableView = computed(() => viewMode.value === "table");
+
+// Separate resource for card view
+const cardViewLimit = ref(20);
+const cardViewOffset = ref(0);
+const cardViewResource = createResource({
+  url: "helpdesk.api.ticket.get_tickets_for_card_view",
+  params: {
+    filters: {},
+    limit: cardViewLimit.value,
+    offset: cardViewOffset.value,
+    order_by: "modified desc"
+  },
+  auto: false,
+});
+
 const ticketRows = computed(() => listViewRef.value?.list?.data?.data || []);
 const cardRows = computed(() => {
+  if (viewMode.value === "card") {
+    // Backend already sorts by category when "All" filter is applied
+    // No need to sort again on frontend
+    const rows = cardViewResource.data?.data || [];
+    return rows;
+  }
   const rows = ticketRows.value || [];
   return [...rows].sort((a, b) => statusRank(a) - statusRank(b));
 });
-const listLoading = computed(() => listViewRef.value?.list?.loading);
-const totalCount = computed(() => listViewRef.value?.list?.data?.total_count || 0);
-const currentCount = computed(() => cardRows.value.length);
+const listLoading = computed(() => {
+  if (viewMode.value === "card") {
+    return cardViewResource.loading;
+  }
+  return listViewRef.value?.list?.loading;
+});
+const totalCount = computed(() => {
+  if (viewMode.value === "card") {
+    return cardViewResource.data?.total_count || 0;
+  }
+  return listViewRef.value?.list?.data?.total_count || 0;
+});
+const currentCount = computed(() => {
+  if (viewMode.value === "card") {
+    return cardViewOffset.value + (cardViewResource.data?.data?.length || 0);
+  }
+  return cardRows.value.length;
+});
 const exportRowCount = computed(
   () => listViewRef.value?.list?.data?.total_count ?? 0
 );
 const cardFilters = reactive<CardFilters>({
-  status: [],
+  status: [{ label: "All", value: "" }],
   priority: [],
   team: [],
   agent: [],
@@ -187,35 +227,42 @@ const activeQuickView = ref<string>("");
 const showExportModal = ref(false);
 const currentUserEmail = computed(() => useAuthStore().userResource?.email || "");
 
-const quickViews = computed(() => [
-  {
-    label: "All tickets",
-    icon: LucideInbox,
-    filters: {},
-  },
-  {
-    label: "All unresolved tickets",
-    icon: LucideAlertCircle,
-    filters: {
-      status: ["!=", "Resolved"],
+const quickViews = computed(() => {
+  // Get only Open status tickets (category = "Open")
+  const openStatuses = (statuses.data || [])
+    .filter((s) => s.category === "Open")
+    .map((s) => s.label_agent);
+
+  return [
+    {
+      label: "All tickets",
+      icon: LucideInbox,
+      filters: {},
     },
-  },
-  {
-    label: "New and my open tickets",
-    icon: LucideMailOpen,
-    filters: {
-      status: ["in", ["Open", "New"]],
-      assigned_to: currentUserEmail.value,
+    {
+      label: "All unresolved tickets",
+      icon: LucideAlertCircle,
+      filters: openStatuses.length > 0
+        ? { status: ["in", openStatuses] }
+        : { status: "Open" },
     },
-  },
-  {
-    label: "Tickets I raised",
-    icon: LucideUser,
-    filters: {
-      raised_by: currentUserEmail.value,
+    {
+      label: "New and my open tickets",
+      icon: LucideMailOpen,
+      filters: {
+        status: ["in", ["Open", "New"]],
+        _assign: ["like", `%"${currentUserEmail.value}"%`],
+      },
     },
-  },
-]);
+    {
+      label: "Tickets I raised",
+      icon: LucideUser,
+      filters: {
+        raised_by: currentUserEmail.value,
+      },
+    },
+  ];
+});
 
 const { getStatus, statuses } = useTicketStatusStore();
 
@@ -266,8 +313,12 @@ async function updateTicketField(ticketId: string, field: string, value: string)
       value: value,
     });
     toast.success("Updated successfully");
-    // Reload the list to reflect changes
-    await listViewRef.value?.reload(false);
+    
+    if (viewMode.value === "card") {
+      await cardViewResource.reload();
+    } else {
+      await listViewRef.value?.reload(false);
+    }
   } catch (error: any) {
     toast.error(error.message || "Failed to update");
   }
@@ -418,13 +469,15 @@ const statusFilterOptions = computed(() => {
     indicatorClass: s.parsed_color,
     category: s.category,
   }));
-  return [
-    {
-      label: "All",
-      value: "",
-    },
-    ...options,
-  ];
+  
+  const allOption = {
+    label: "All",
+    value: "",
+    indicatorClass: "",
+    category: "",
+  };
+  
+  return [allOption, ...options];
 });
 
 const priorityFilterOptions = computed(() =>
@@ -665,16 +718,55 @@ function reset(reload = false) {
   if (reload) listViewRef.value.reload();
 }
 
-const pageLengthCount = computed(
-  () =>
+const pageLengthCount = computed(() => {
+  if (viewMode.value === "card") {
+    return cardViewLimit.value;
+  }
+  return (
     listViewRef.value?.list?.params?.page_length_count ||
     options.default_page_length ||
     20
-);
+  );
+});
 
 function handleCardLoadMore() {
-  const count = pageLengthCount.value;
-  listViewRef.value?.handlePageLength?.(count, true);
+  if (viewMode.value === "card") {
+    cardViewOffset.value += cardViewLimit.value;
+    loadCardViewTickets();
+  } else {
+    const count = pageLengthCount.value;
+    listViewRef.value?.handlePageLength?.(count, true);
+  }
+}
+
+function handleCardNextPage() {
+  if (viewMode.value === "card") {
+    if (currentCount.value < totalCount.value) {
+      cardViewOffset.value += cardViewLimit.value;
+      loadCardViewTickets();
+    }
+  } else {
+    const count = pageLengthCount.value;
+    listViewRef.value?.handlePageLength?.(count, true);
+  }
+}
+
+function handleCardPrevPage() {
+  if (viewMode.value === "card") {
+    cardViewOffset.value = Math.max(0, cardViewOffset.value - cardViewLimit.value);
+    loadCardViewTickets();
+  } else {
+    const count = pageLengthCount.value;
+    const currentLength = listViewRef.value?.list?.params?.page_length || count;
+    const newLength = Math.max(count, currentLength - count);
+    listViewRef.value?.handlePageLength?.(newLength, false);
+  }
+}
+
+function handleUpdateLimit(newLimit: number) {
+  cardViewLimit.value = newLimit;
+  cardViewOffset.value = 0;
+  loadCardViewTickets();
 }
 
 function statusRank(row: any) {
@@ -716,17 +808,10 @@ function updateCardFilters(value: CardFilters) {
   cardFilters.agent = value?.agent || [];
 }
 
-function applyCardFilters(filtersArg: CardFilters = cardFilters) {
+function buildCardFilters(filtersArg: CardFilters = cardFilters): Record<string, any> {
   const sourceFilters = filtersArg || cardFilters;
-  updateCardFilters(sourceFilters);
-
-  if (!listViewRef.value?.list) return;
-  const list = listViewRef.value.list;
-
-  // Build fresh filters object (don't merge with existing)
   let filters: Record<string, any> = {};
   
-  // Extract values from filter objects (they might be objects with {label, value} or just strings)
   const extractValues = (arr: any[] = []) => {
     return arr.map((item) =>
       typeof item === "object" && item !== null && "value" in item
@@ -739,21 +824,11 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
   const statusAllSelected = rawStatusValues.some(
     (v) => v === "" || v === null || v === undefined
   );
-  if (statusAllSelected) {
-    sourceFilters.status = [];
-    cardFilters.status = [];
-    rawStatusValues = [];
-    filters = {};
-  }
 
-  // If "All" is selected, drop all status filters (empty filters)
-  if (!statusAllSelected) {
-    // Apply card filters
-    if (sourceFilters.status?.length) {
-      const statusValues = rawStatusValues.filter(Boolean);
-      if (statusValues.length) {
-        filters["status"] = ["in", statusValues];
-      }
+  if (!statusAllSelected && sourceFilters.status?.length) {
+    const statusValues = rawStatusValues.filter(Boolean);
+    if (statusValues.length) {
+      filters["status"] = ["in", statusValues];
     }
   }
 
@@ -771,67 +846,124 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
     const agentValues = extractValues(sourceFilters.agent);
     const agent = agentValues[0];
     if (agent) {
-      // Frappe stores assignees in _assign JSON field
       filters["_assign"] = ["like", `%\"${agent}\"%`];
     }
   }
 
-  console.log("Applying card filters:", filters);
+  return filters;
+}
 
-  const params = {
-    ...list.params,
-    filters: statusAllSelected ? {} : filters,
-    default_filters: {},
-  };
+function loadCardViewTickets() {
+  const filters = buildCardFilters(cardFilters);
+  console.log("Loading card view tickets with filters:", filters);
+  
+  cardViewResource.update({
+    params: {
+      filters: JSON.stringify(filters),
+      limit: cardViewLimit.value,
+      offset: cardViewOffset.value,
+      order_by: "modified desc"
+    }
+  });
+  
+  cardViewResource.reload();
+}
 
-  list.submit(params);
-  list.params = params;
+function applyCardFilters(filtersArg: CardFilters = cardFilters) {
+  const sourceFilters = filtersArg || cardFilters;
+  updateCardFilters(sourceFilters);
+
+  if (viewMode.value === "card") {
+    cardViewOffset.value = 0;
+    loadCardViewTickets();
+  } else {
+    if (!listViewRef.value?.list) return;
+    const list = listViewRef.value.list;
+
+    const filters = buildCardFilters(sourceFilters);
+    console.log("Applying card filters to list view:", filters);
+
+    const params = {
+      ...list.params,
+      filters: filters,
+      default_filters: {},
+    };
+
+    list.submit(params);
+    list.params = params;
+  }
 }
 
 function resetCardFilters() {
-  syncCardFiltersWithDefault();
+  // Reset to "All" filter
+  cardFilters.status = [{ label: "All", value: "" }];
+  cardFilters.priority = [];
+  cardFilters.team = [];
+  cardFilters.agent = [];
   activeQuickView.value = "";
   
-  // Reset to default filters only
-  if (!listViewRef.value?.list) return;
-  const list = listViewRef.value.list;
-  const baseDefaultFilters = getBaseDefaultFilters();
-  
-  console.log("Resetting card filters to defaults:", baseDefaultFilters);
-  
-  list.submit({
-    ...list.params,
-    filters: baseDefaultFilters,
-    default_filters: baseDefaultFilters,
-  });
+  if (viewMode.value === "card") {
+    cardViewOffset.value = 0;
+    console.log("Resetting card filters to All (default)");
+    
+    cardViewResource.update({
+      params: {
+        filters: JSON.stringify({}),
+        limit: cardViewLimit.value,
+        offset: 0,
+        order_by: "modified desc"
+      }
+    });
+    cardViewResource.reload();
+  } else {
+    if (!listViewRef.value?.list) return;
+    const list = listViewRef.value.list;
+    const baseDefaultFilters = getBaseDefaultFilters();
+    
+    console.log("Resetting card filters to defaults:", baseDefaultFilters);
+    
+    list.submit({
+      ...list.params,
+      filters: baseDefaultFilters,
+      default_filters: baseDefaultFilters,
+    });
+  }
 }
 
 function applyQuickView(view: any) {
-  if (!listViewRef.value?.list) return;
-  
-  // Reset card filters state
   syncCardFiltersWithDefault();
-  
-  // Set active quick view
   activeQuickView.value = view.label;
   
   console.log("Applying quick view:", view.label, "Filters:", view.filters);
-  
-  // Apply the quick view filters directly to the list
-  const list = listViewRef.value.list;
   
   const isAll = view.label === "All tickets";
   const baseDefaultFilters = isAll ? {} : getBaseDefaultFilters();
   const mergedFilters = { ...baseDefaultFilters, ...view.filters };
 
-  const params = {
-    ...list.params,
-    filters: mergedFilters,
-    default_filters: isAll ? {} : baseDefaultFilters,
-  };
+  if (viewMode.value === "card") {
+    cardViewOffset.value = 0;
+    cardViewResource.update({
+      params: {
+        filters: JSON.stringify(mergedFilters),
+        limit: cardViewLimit.value,
+        offset: 0,
+        order_by: "modified desc"
+      }
+    });
+    cardViewResource.reload();
+  } else {
+    if (!listViewRef.value?.list) return;
+    const list = listViewRef.value.list;
 
-  list.submit(params);
-  list.params = params;
+    const params = {
+      ...list.params,
+      filters: mergedFilters,
+      default_filters: isAll ? {} : baseDefaultFilters,
+    };
+
+    list.submit(params);
+    list.params = params;
+  }
 }
 
 function toggleValue(arr: string[], value: string) {
@@ -1126,14 +1258,19 @@ function resetState() {
   selectedView = null;
 }
 
-// Watch viewMode and reset filters when switching to card view
+// Watch viewMode and load data when switching to card view
 watch(viewMode, async (newMode, oldMode) => {
   if (newMode === 'card') {
-    // Wait for DOM update
     await nextTick();
-    // Reset all filters when entering card view
-    console.log("Switched to card view, resetting filters");
-    resetCardFilters();
+    console.log("Switched to card view, loading tickets");
+    cardViewOffset.value = 0;
+    // Set default "All" filter
+    cardFilters.status = [{ label: "All", value: "" }];
+    cardFilters.priority = [];
+    cardFilters.team = [];
+    cardFilters.agent = [];
+    activeQuickView.value = "";
+    loadCardViewTickets();
   }
 });
 
@@ -1146,8 +1283,22 @@ onMounted(() => {
   }
   if (!isCustomerPortal.value) {
     $socket.on("helpdesk:new-ticket", () => {
-      listViewRef.value?.reload();
+      if (viewMode.value === "card") {
+        cardViewResource.reload();
+      } else {
+        listViewRef.value?.reload();
+      }
     });
+  }
+  
+  // Load card view data if in card mode on mount with "All" filter
+  if (viewMode.value === "card") {
+    cardFilters.status = [{ label: "All", value: "" }];
+    cardFilters.priority = [];
+    cardFilters.team = [];
+    cardFilters.agent = [];
+    activeQuickView.value = "";
+    loadCardViewTickets();
   }
 });
 
