@@ -616,6 +616,17 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     ticket = DocType("HD Ticket")
     today = frappe.utils.nowdate()
 
+    # Get date range from filters
+    from_date = filters.get("from_date") if filters else None
+    to_date = filters.get("to_date") if filters else None
+    
+    # If no dates provided, default to all time
+    if from_date and to_date:
+        to_date_next = frappe.utils.add_days(to_date, 1)
+    else:
+        from_date = None
+        to_date_next = None
+
     # Get open statuses
     open_statuses = frappe.get_all(
         "HD Ticket Status",
@@ -625,6 +636,11 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
 
     # Build base conditions
     base_conds = []
+    # Add date filter if provided
+    if from_date and to_date_next:
+        base_conds.append(ticket.creation >= from_date)
+        base_conds.append(ticket.creation < to_date_next)
+    
     if filters:
         if filters.get("team"):
             base_conds.append(ticket.agent_group == filters.get("team"))
@@ -688,13 +704,19 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     ) & ((ticket._assign.isnull()) | (ticket._assign == "[]"))
     unassigned = get_count(unassigned_cond)
 
-    # Closed: Tickets with resolved/closed status
+    # Resolved: Tickets with resolved status (category = Resolved, but not "Closed")
     resolved_statuses = frappe.get_all(
         "HD Ticket Status",
         filters={"category": "Resolved"},
         pluck="name",
     )
-    closed_cond = ticket.status.isin(resolved_statuses) if resolved_statuses else ticket.status == "Closed"
+    # Exclude "Closed" from resolved for separate counting
+    resolved_only_statuses = [s for s in resolved_statuses if s != "Closed"] if resolved_statuses else []
+    resolved_cond = ticket.status.isin(resolved_only_statuses) if resolved_only_statuses else None
+    resolved_count = get_count(resolved_cond) if resolved_cond else 0
+
+    # Closed: Tickets with status "Closed" specifically
+    closed_cond = ticket.status == "Closed"
     closed_count = get_count(closed_cond)
 
     # Pending: Tickets with status containing "pending"
@@ -710,14 +732,16 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     todays_tickets = get_count(todays_tickets_cond)
 
     # Format filters to match the query logic
-    resolved_filter = {"status": ["in", resolved_statuses]} if resolved_statuses else {"status": "Closed"}
+    resolved_filter = {"status": ["in", resolved_only_statuses]} if resolved_only_statuses else {}
+    closed_filter = {"status": "Closed"}
     pending_filter = {"status": ["in", pending_statuses]} if pending_statuses else {}
     
     return [
         {"label": _("Open"), "count": open_count, "status_filter": {"status": "Open"}, "color": "#318AD8"},
-        {"label": _("Closed"), "count": closed_count, "status_filter": resolved_filter, "color": "#48BB78"},
+        {"label": _("Resolved"), "count": resolved_count, "status_filter": resolved_filter, "color": "#48BB78"},
+        {"label": _("Closed"), "count": closed_count, "status_filter": closed_filter, "color": "#9F7AEA"},
         {"label": _("Pending"), "count": pending_count, "status_filter": pending_filter, "color": "#F6AD55"},
-        {"label": _("Today's Tickets"), "count": todays_tickets, "status_filter": {"today": True}, "color": "#9F7AEA"},
+        {"label": _("Today's Tickets"), "count": todays_tickets, "status_filter": {"today": True}, "color": "#F6AD55"},
     ]
 
 

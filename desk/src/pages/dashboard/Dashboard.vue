@@ -273,21 +273,17 @@ function reloadAllResources() {
 
 const statusBreakdown = computed(() => {
   const cards = statusCards.data || [];
-  const getCount = (label: string, color: string) => {
+  const getCount = (label: string) => {
     const byLabel = cards.find((card) => card.label === label);
-    if (byLabel && typeof byLabel.count === "number") {
-      return byLabel.count;
-    }
-    const byColor = cards.find((card) => card.color === color);
-    return byColor && typeof byColor.count === "number" ? byColor.count : 0;
+    return byLabel && typeof byLabel.count === "number" ? byLabel.count : 0;
   };
 
-  const open = getCount("Open", "#318AD8");
-  const closed = getCount("Closed", "#48BB78");
-  const pending = getCount("Pending", "#F6AD55");
-  const total = open + closed + pending;
+  const open = getCount("Open");
+  const resolved = getCount("Resolved");
+  const closed = getCount("Closed");
+  const total = open + resolved + closed;
 
-  return { open, closed, pending, total };
+  return { open, resolved, closed, total };
 });
 
 function getLastXDays(range: number = 30): string {
