@@ -22,6 +22,9 @@ interface Props {
   filters?: Record<string, any>;
   team?: string | null;
   agent?: string | null;
+  owner?: string | null;
+  fromDate?: string | null;
+  toDate?: string | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -30,6 +33,9 @@ const props = withDefaults(defineProps<Props>(), {
   filters: () => ({}),
   team: null,
   agent: null,
+  owner: null,
+  fromDate: null,
+  toDate: null,
 });
 
 const router = useRouter();
@@ -41,8 +47,17 @@ const displayColor = computed(() => {
 
 function handleClick() {
   if (props.route) {
-    // Merge status filters with team/agent filters
+    // Merge status filters with team/agent/owner/date filters
     const combinedFilters: Record<string, any> = { ...props.filters };
+    
+    // Add date range filter if provided
+    if (props.fromDate && props.toDate) {
+      combinedFilters.creation = ["between", [props.fromDate, props.toDate]];
+    } else if (props.fromDate) {
+      combinedFilters.creation = [">=", props.fromDate];
+    } else if (props.toDate) {
+      combinedFilters.creation = ["<=", props.toDate];
+    }
     
     // Add team filter if selected
     if (props.team) {
@@ -52,6 +67,11 @@ function handleClick() {
     // Add agent filter if selected
     if (props.agent) {
       combinedFilters._assign = ["LIKE", `%${props.agent}%`];
+    }
+    
+    // Add owner filter if selected
+    if (props.owner) {
+      combinedFilters.owner = props.owner;
     }
     
     // Convert filter object to JSON string for query params

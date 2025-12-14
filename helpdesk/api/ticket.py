@@ -133,6 +133,24 @@ def get_tickets_for_card_view(
         if owner:
             query = query.where(Ticket.contact == owner)
     
+    # Date range filter (creation date)
+    if "creation" in filters:
+        creation_filter = filters["creation"]
+        if isinstance(creation_filter, list) and len(creation_filter) == 2:
+            operator, value = creation_filter
+            if operator == "between" and isinstance(value, list) and len(value) == 2:
+                from_date, to_date = value
+                query = query.where(Ticket.creation >= from_date)
+                query = query.where(Ticket.creation <= to_date)
+            elif operator == ">=":
+                query = query.where(Ticket.creation >= value)
+            elif operator == "<=":
+                query = query.where(Ticket.creation <= value)
+            elif operator == ">":
+                query = query.where(Ticket.creation > value)
+            elif operator == "<":
+                query = query.where(Ticket.creation < value)
+    
     # Check if "All" filter is applied (no status filter)
     is_all_filter = "status" not in filters or not filters.get("status")
     
@@ -224,6 +242,23 @@ def get_tickets_for_card_view(
         owner = filters["owner"]
         if owner:
             count_query = count_query.where(Ticket.contact == owner)
+    
+    if "creation" in filters:
+        creation_filter = filters["creation"]
+        if isinstance(creation_filter, list) and len(creation_filter) == 2:
+            operator, value = creation_filter
+            if operator == "between" and isinstance(value, list) and len(value) == 2:
+                from_date, to_date = value
+                count_query = count_query.where(Ticket.creation >= from_date)
+                count_query = count_query.where(Ticket.creation <= to_date)
+            elif operator == ">=":
+                count_query = count_query.where(Ticket.creation >= value)
+            elif operator == "<=":
+                count_query = count_query.where(Ticket.creation <= value)
+            elif operator == ">":
+                count_query = count_query.where(Ticket.creation > value)
+            elif operator == "<":
+                count_query = count_query.where(Ticket.creation < value)
     
     total_count = count_query.run()[0][0] if count_query.run() else 0
     
