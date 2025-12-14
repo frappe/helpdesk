@@ -151,6 +151,20 @@ onMounted(() => {
 
   $socket.on("helpdesk:ticket-update", (data: { ticket_id: string }) => {
     if (data.ticket_id == props.ticketId) {
+      // Reload ticket data and activities to show new activity log entries in real-time
+      // This event is emitted after commit, so the activity log entry is already created
+      console.log("Received helpdesk:ticket-update event for ticket:", data.ticket_id);
+      
+      // Reload activities with a delay to ensure backend has committed the activity log
+      setTimeout(() => {
+        const activitiesResource = ticketComposable.value.activities;
+        if (activitiesResource) {
+          // Force reload by calling fetch with updated timestamp to bypass cache
+          activitiesResource.reload();
+        }
+      }, 300);
+      
+      // Also reload ticket data
       reloadTicket(props.ticketId);
     }
   });
