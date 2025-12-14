@@ -65,8 +65,9 @@ function handleClick() {
     }
     
     // Add agent filter if selected
+    // _assign field stores JSON array, so we need to match the JSON format
     if (props.agent) {
-      combinedFilters._assign = ["LIKE", `%${props.agent}%`];
+      combinedFilters._assign = ["like", `%"${props.agent}"%`];
     }
     
     // Add owner filter if selected

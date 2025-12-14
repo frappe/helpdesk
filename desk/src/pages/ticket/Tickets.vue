@@ -330,7 +330,20 @@ if (route.query.filters) {
       ? JSON.parse(route.query.filters) 
       : route.query.filters;
     if (queryFilters && Object.keys(queryFilters).length > 0) {
-      Object.assign(defaultFilters, queryFilters);
+      // Normalize filter operators (convert LIKE to like, etc.)
+      const normalizedFilters = { ...queryFilters };
+      Object.keys(normalizedFilters).forEach(key => {
+        const filterValue = normalizedFilters[key];
+        if (Array.isArray(filterValue) && filterValue.length === 2) {
+          const operator = filterValue[0];
+          if (typeof operator === 'string') {
+            // Normalize operator to lowercase
+            normalizedFilters[key] = [operator.toLowerCase(), filterValue[1]];
+          }
+        }
+      });
+      Object.assign(defaultFilters, normalizedFilters);
+      console.log("Initialized defaultFilters from route:", defaultFilters);
     }
   } catch (error) {
     console.error("Error parsing filters from route on init:", error);
@@ -645,10 +658,23 @@ watch(
           : route.query.filters;
         
         if (queryFilters && Object.keys(queryFilters).length > 0) {
+          // Normalize filter operators (convert LIKE to like, etc.)
+          const normalizedFilters = { ...queryFilters };
+          Object.keys(normalizedFilters).forEach(key => {
+            const filterValue = normalizedFilters[key];
+            if (Array.isArray(filterValue) && filterValue.length === 2) {
+              const operator = filterValue[0];
+              if (typeof operator === 'string') {
+                // Normalize operator to lowercase
+                normalizedFilters[key] = [operator.toLowerCase(), filterValue[1]];
+              }
+            }
+          });
+          
           // Check if filters need to be applied
           const currentFilters = list.params?.filters || {};
-          const filtersMatch = Object.keys(queryFilters).every(key => {
-            const routeValue = JSON.stringify(queryFilters[key]);
+          const filtersMatch = Object.keys(normalizedFilters).every(key => {
+            const routeValue = JSON.stringify(normalizedFilters[key]);
             const currentValue = JSON.stringify(currentFilters[key]);
             return routeValue === currentValue;
           });
@@ -656,7 +682,8 @@ watch(
           // Only apply if filters don't match
           if (!filtersMatch) {
             // Merge with existing filters to preserve any that might have been set
-            const mergedFilters = { ...currentFilters, ...queryFilters };
+            const mergedFilters = { ...currentFilters, ...normalizedFilters };
+            console.log("Applying route filters to list view:", mergedFilters);
             list.params = {
               ...list.params,
               filters: mergedFilters,
@@ -906,29 +933,39 @@ function buildCardFilters(filtersArg: CardFilters = cardFilters): Record<string,
 function loadCardViewTickets() {
   const filters = buildCardFilters(cardFilters);
   
-  // Merge with route query filters (for date, owner, etc.)
+  // Merge with route query filters (for date, owner, agent, team, etc.)
   if (route.query.filters) {
     try {
-      const queryFilters = typeof route.query.filters === 'string' 
+      let queryFilters = typeof route.query.filters === 'string' 
         ? JSON.parse(route.query.filters) 
         : route.query.filters;
       
-      // Merge route filters with card filters (route filters take precedence for date/owner)
+      // Normalize filter operators
+      Object.keys(queryFilters).forEach(key => {
+        const filterValue = queryFilters[key];
+        if (Array.isArray(filterValue) && filterValue.length === 2) {
+          const operator = filterValue[0];
+          if (typeof operator === 'string') {
+            queryFilters[key] = [operator.toLowerCase(), filterValue[1]];
+          }
+        }
+      });
+      
+      // Merge route filters with card filters (route filters take precedence)
       if (queryFilters.creation) {
         filters.creation = queryFilters.creation;
       }
       if (queryFilters.owner) {
         filters.owner = queryFilters.owner;
       }
-      // Don't override status/priority/team/agent if they're already set from card filters
-      // But if route has them and card doesn't, use route
-      if (queryFilters.status && !filters.status) {
+      // Route filters take precedence over card filters when coming from dashboard
+      if (queryFilters.status) {
         filters.status = queryFilters.status;
       }
-      if (queryFilters.agent_group && !filters.agent_group) {
+      if (queryFilters.agent_group) {
         filters.agent_group = queryFilters.agent_group;
       }
-      if (queryFilters._assign && !filters._assign) {
+      if (queryFilters._assign) {
         filters._assign = queryFilters._assign;
       }
     } catch (error) {
@@ -963,19 +1000,36 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
 
     const filters = buildCardFilters(sourceFilters);
     
-    // Preserve route filters (date, owner) when applying card filters
+    // Preserve route filters (date, owner, agent, team) when applying card filters
     if (route.query.filters) {
       try {
-        const queryFilters = typeof route.query.filters === 'string' 
+        let queryFilters = typeof route.query.filters === 'string' 
           ? JSON.parse(route.query.filters) 
           : route.query.filters;
         
-        // Merge route filters (date, owner) with card filters (status, priority, team, agent)
+        // Normalize filter operators
+        Object.keys(queryFilters).forEach(key => {
+          const filterValue = queryFilters[key];
+          if (Array.isArray(filterValue) && filterValue.length === 2) {
+            const operator = filterValue[0];
+            if (typeof operator === 'string') {
+              queryFilters[key] = [operator.toLowerCase(), filterValue[1]];
+            }
+          }
+        });
+        
+        // Merge route filters with card filters (route filters take precedence for agent/team/date/owner)
         if (queryFilters.creation) {
           filters.creation = queryFilters.creation;
         }
         if (queryFilters.owner) {
           filters.owner = queryFilters.owner;
+        }
+        if (queryFilters.agent_group) {
+          filters.agent_group = queryFilters.agent_group;
+        }
+        if (queryFilters._assign) {
+          filters._assign = queryFilters._assign;
         }
       } catch (error) {
         console.error("Error merging route filters:", error);
@@ -1397,11 +1451,25 @@ watch(viewMode, async (newMode, oldMode) => {
 function applyFiltersFromRoute() {
   if (route.query.filters) {
     try {
-      const queryFilters = typeof route.query.filters === 'string' 
+      let queryFilters = typeof route.query.filters === 'string' 
         ? JSON.parse(route.query.filters) 
         : route.query.filters;
       
       if (queryFilters && Object.keys(queryFilters).length > 0) {
+        // Normalize filter operators (convert LIKE to like, etc.) at the start
+        Object.keys(queryFilters).forEach(key => {
+          const filterValue = queryFilters[key];
+          if (Array.isArray(filterValue) && filterValue.length === 2) {
+            const operator = filterValue[0];
+            if (typeof operator === 'string') {
+              // Normalize operator to lowercase
+              queryFilters[key] = [operator.toLowerCase(), filterValue[1]];
+            }
+          }
+        });
+        
+        console.log("Applying filters from route (normalized):", queryFilters);
+        
         // Set default filters for list view (this will be used by ListViewBuilder)
         setDefaultFilters(queryFilters);
         
@@ -1440,12 +1508,23 @@ function applyFiltersFromRoute() {
         // Apply agent filter if present
         if (queryFilters._assign) {
           const assignFilter = queryFilters._assign;
-          if (Array.isArray(assignFilter) && assignFilter[0] === "like") {
+          // Handle both "like" and "LIKE" (case insensitive)
+          const operator = Array.isArray(assignFilter) ? assignFilter[0]?.toLowerCase() : null;
+          if (operator === "like") {
             const assignValue = assignFilter[1];
-            // Extract email from like pattern: %"email"%
-            const emailMatch = assignValue.match(/%"([^"]+)"/);
-            if (emailMatch) {
-              const agentEmail = emailMatch[1];
+            // Extract email from like pattern: %"email"% or %email%
+            let agentEmail = null;
+            const quotedMatch = assignValue.match(/%"([^"]+)"/);
+            if (quotedMatch) {
+              agentEmail = quotedMatch[1];
+            } else {
+              // Try without quotes
+              const unquotedMatch = assignValue.match(/%([^%]+)%/);
+              if (unquotedMatch) {
+                agentEmail = unquotedMatch[1];
+              }
+            }
+            if (agentEmail) {
               const matchedAgent = agentFilterOptions.value.find(opt => opt.value === agentEmail);
               if (matchedAgent) {
                 cardFilters.agent = [matchedAgent];
@@ -1463,6 +1542,7 @@ function applyFiltersFromRoute() {
           nextTick(() => {
             if (listViewRef.value?.list) {
               const list = listViewRef.value.list;
+              console.log("Applying normalized route filters to list view:", queryFilters);
               // Update params and submit to apply filters
               list.params = {
                 ...list.params,
