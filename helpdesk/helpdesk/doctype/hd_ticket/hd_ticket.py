@@ -1159,12 +1159,21 @@ def has_permission(doc, user=None):
     return False
 
 
+def is_crm_agent(user):
+    from frappe_messenger.util import get_assignable_agents, get_roles_with_full_access
+    assignable_agents = get_assignable_agents()
+    roles_with_full_access = get_roles_with_full_access()
+    user_roles = frappe.get_roles(user)
+    return any(role in roles_with_full_access for role in user_roles) and user in assignable_agents  
+
+
+
 # Custom perms for list query. Only the `WHERE` part
 # https://frappeframework.com/docs/user/en/python-api/hooks#modify-list-query
 def permission_query(user):
     if not user:
         user = frappe.session.user
-    if is_admin(user):
+    if is_admin(user) or is_crm_agent(user):
         return
 
     #  To handle the case for normal users i.e. not agents
