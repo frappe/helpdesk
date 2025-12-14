@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2025-12-09 21:36\n"
+"PO-Revision-Date: 2025-12-14 23:04\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -2531,7 +2531,7 @@ msgstr "Опубликованные статьи должны иметь сод
 
 #: desk/src/components/Settings/EmailEdit.vue:87
 msgid "Pull Emails"
-msgstr "Потянуть письма"
+msgstr "Получить письма"
 
 #: desk/src/components/Settings/EmailEdit.vue:214
 msgid "Pulling emails, this may take a few minutes."
