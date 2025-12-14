@@ -1118,6 +1118,7 @@ def has_permission(doc, user=None):
         or doc.raised_by == user
         or doc.owner == user
         or is_admin(user)
+        or is_agent(user) 
         or doc.customer in get_customer(user)
     ):
         return True

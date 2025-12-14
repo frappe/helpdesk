@@ -1,10 +1,10 @@
 app_name = "helpdesk"
 app_title = "Helpdesk"
-app_publisher = "Frappe Technologies"
+app_publisher = "Dieture Technologies"
 app_description = "Customer Service Software"
 app_icon = "octicon octicon-file-directory"
 app_color = "grey"
-app_email = "hello@frappe.io"
+app_email = "hello@dieture.com"
 app_license = "AGPLv3"
 required_apps = ["telephony"]
 
@@ -69,9 +69,9 @@ has_permission = {
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
 }
 
-permission_query_conditions = {
-    "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
-}
+# permission_query_conditions = {
+#     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
+# }
 
 # DocType Class
 # ---------------
