@@ -339,18 +339,35 @@ class HDTicket(Document):
             "agent_group": "team",
             "ticket_type": "type",
             "contact": "contact",
+            "customer": "customer",
         }
         for field in [
             "status",
             "priority",
             "agent_group",
             "contact",
+            "customer",
             "ticket_type",
         ]:
             if self.has_value_changed(field):
-                log_ticket_activity(
-                    self.name, f"set {field_maps[field]} to {self.as_dict()[field]}"
-                )
+                # Get the display value for customer/contact
+                value = self.as_dict()[field]
+                if field == "customer" and value:
+                    # Get customer name for better display
+                    customer_name = frappe.db.get_value("Customer", value, "customer_name") or value
+                    log_ticket_activity(
+                        self.name, f"set {field_maps[field]} to {customer_name}"
+                    )
+                elif field == "contact" and value:
+                    # Get contact name for better display
+                    contact_name = frappe.db.get_value("Contact", value, "full_name") or frappe.db.get_value("Contact", value, "email_id") or value
+                    log_ticket_activity(
+                        self.name, f"set {field_maps[field]} to {contact_name}"
+                    )
+                else:
+                    log_ticket_activity(
+                        self.name, f"set {field_maps[field]} to {value}"
+                    )
 
     def generate_key(self):
         self.key = uuid.uuid4()

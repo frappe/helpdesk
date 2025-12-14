@@ -221,7 +221,12 @@ function handleFieldUpdate(
         if (fieldname === "agent_group") {
           assignees.value.reload();
         }
-        activities.value.reload();
+        // Reload activities after a short delay to ensure backend has created the activity log
+        // The helpdesk:ticket-update event (emitted with after_commit=True) will also trigger a reload
+        // This ensures real-time updates for both the user making the change and other viewers
+        setTimeout(() => {
+          activities.value.reload();
+        }, 800);
       },
     }
 

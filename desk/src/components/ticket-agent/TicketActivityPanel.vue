@@ -9,6 +9,7 @@
       <TicketAgentActivities
         v-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
+        :key="`${tab.name}-${activitiesKey}`"
         :activities="filterActivities(tab.name as TicketTab)"
         :title="tab.label"
         :ticket-status="ticket.doc.status"
@@ -19,8 +20,9 @@
         "
         @update="
           () => {
+            // This is a user action (comment/email), so scroll to latest
+            shouldScrollOnUpdate.value = true;
             activities.reload();
-            ticketAgentActivitiesRef.scrollToLatestActivity();
           }
         "
       />
@@ -42,8 +44,9 @@
     :key="ticket.doc?.name"
     @update="
       () => {
+        // This is a user action (comment/email), so scroll to latest
+        shouldScrollOnUpdate.value = true;
         activities.reload();
-        ticketAgentActivitiesRef.scrollToLatestActivity();
       }
     "
   />
@@ -67,7 +70,7 @@ import {
 } from "@/types";
 import { LoadingIndicator, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, ComputedRef, defineAsyncComponent, inject, ref } from "vue";
+import { computed, ComputedRef, defineAsyncComponent, inject, nextTick, ref, watch } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
 
 const CommunicationArea = defineAsyncComponent(
@@ -81,6 +84,25 @@ const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
+
+// Force re-render when activities data changes, but track if it's a user action
+const activitiesKey = ref(0);
+const shouldScrollOnUpdate = ref(false);
+
+watch(
+  () => activities.value?.data,
+  () => {
+    activitiesKey.value = Date.now();
+    // Only scroll if it was a user action (comment/email), not field updates
+    if (shouldScrollOnUpdate.value) {
+      nextTick(() => {
+        ticketAgentActivitiesRef.value?.scrollToLatestActivity();
+        shouldScrollOnUpdate.value = false;
+      });
+    }
+  },
+  { deep: true }
+);
 
 const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs: TabObject[] = [

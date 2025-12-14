@@ -175,10 +175,31 @@ const options = createResource({
   },
   transform: (data) => {
     let allData = data.map((option) => {
+      let label = option?.label || option.value;
+      let description = option?.description;
+      
+      // For HD Agent and User, prefer name over email
+      if (props.doctype === "HD Agent" || props.doctype === "User") {
+        // If label is an email (contains @), try to use description as name
+        if (label && label.includes("@")) {
+          // If description exists and doesn't look like an email, use it as label
+          if (description && !description.includes("@")) {
+            label = description;
+            // Keep email as description for reference
+            description = option?.label || option.value;
+          }
+        } else if (description && description.includes("@")) {
+          // Label is name, description is email - swap them
+          const temp = label;
+          label = description;
+          description = temp;
+        }
+      }
+      
       return {
         value: option.value,
-        label: option?.label || option.value,
-        description: option?.description,
+        label: label,
+        description: description,
       };
     });
 
