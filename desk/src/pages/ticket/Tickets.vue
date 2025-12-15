@@ -323,6 +323,33 @@ async function updateTicketField(ticketId: string, field: string, value: string)
 
 const defaultFilters = reactive<Record<string, any>>({});
 
+// Initialize defaultFilters from route query if present
+if (route.query.filters) {
+  try {
+    const queryFilters = typeof route.query.filters === 'string' 
+      ? JSON.parse(route.query.filters) 
+      : route.query.filters;
+    if (queryFilters && Object.keys(queryFilters).length > 0) {
+      // Normalize filter operators (convert LIKE to like, etc.)
+      const normalizedFilters = { ...queryFilters };
+      Object.keys(normalizedFilters).forEach(key => {
+        const filterValue = normalizedFilters[key];
+        if (Array.isArray(filterValue) && filterValue.length === 2) {
+          const operator = filterValue[0];
+          if (typeof operator === 'string') {
+            // Normalize operator to lowercase
+            normalizedFilters[key] = [operator.toLowerCase(), filterValue[1]];
+          }
+        }
+      });
+      Object.assign(defaultFilters, normalizedFilters);
+      console.log("Initialized defaultFilters from route:", defaultFilters);
+    }
+  } catch (error) {
+    console.error("Error parsing filters from route on init:", error);
+  }
+}
+
 const options = {
   doctype: "HD Ticket",
   columnConfig: {
@@ -620,6 +647,59 @@ watch(
   }
 );
 
+// Watch for list view to be ready and apply route filters if needed
+watch(
+  () => listViewRef.value?.list,
+  (list) => {
+    if (list && route.query.filters && viewMode.value === "table") {
+      try {
+        const queryFilters = typeof route.query.filters === 'string' 
+          ? JSON.parse(route.query.filters) 
+          : route.query.filters;
+        
+        if (queryFilters && Object.keys(queryFilters).length > 0) {
+          // Normalize filter operators (convert LIKE to like, etc.)
+          const normalizedFilters = { ...queryFilters };
+          Object.keys(normalizedFilters).forEach(key => {
+            const filterValue = normalizedFilters[key];
+            if (Array.isArray(filterValue) && filterValue.length === 2) {
+              const operator = filterValue[0];
+              if (typeof operator === 'string') {
+                // Normalize operator to lowercase
+                normalizedFilters[key] = [operator.toLowerCase(), filterValue[1]];
+              }
+            }
+          });
+          
+          // Check if filters need to be applied
+          const currentFilters = list.params?.filters || {};
+          const filtersMatch = Object.keys(normalizedFilters).every(key => {
+            const routeValue = JSON.stringify(normalizedFilters[key]);
+            const currentValue = JSON.stringify(currentFilters[key]);
+            return routeValue === currentValue;
+          });
+          
+          // Only apply if filters don't match
+          if (!filtersMatch) {
+            // Merge with existing filters to preserve any that might have been set
+            const mergedFilters = { ...currentFilters, ...normalizedFilters };
+            console.log("Applying route filters to list view:", mergedFilters);
+            list.params = {
+              ...list.params,
+              filters: mergedFilters,
+              default_filters: mergedFilters,
+            };
+            list.submit(list.params);
+          }
+        }
+      } catch (error) {
+        console.error("Error applying route filters to list view:", error);
+      }
+    }
+  },
+  { immediate: true }
+);
+
 function handle_response_by_field(row: any, item: string) {
   if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
     return h(Badge, {
@@ -852,6 +932,47 @@ function buildCardFilters(filtersArg: CardFilters = cardFilters): Record<string,
 
 function loadCardViewTickets() {
   const filters = buildCardFilters(cardFilters);
+  
+  // Merge with route query filters (for date, owner, agent, team, etc.)
+  if (route.query.filters) {
+    try {
+      let queryFilters = typeof route.query.filters === 'string' 
+        ? JSON.parse(route.query.filters) 
+        : route.query.filters;
+      
+      // Normalize filter operators
+      Object.keys(queryFilters).forEach(key => {
+        const filterValue = queryFilters[key];
+        if (Array.isArray(filterValue) && filterValue.length === 2) {
+          const operator = filterValue[0];
+          if (typeof operator === 'string') {
+            queryFilters[key] = [operator.toLowerCase(), filterValue[1]];
+          }
+        }
+      });
+      
+      // Merge route filters with card filters (route filters take precedence)
+      if (queryFilters.creation) {
+        filters.creation = queryFilters.creation;
+      }
+      if (queryFilters.owner) {
+        filters.owner = queryFilters.owner;
+      }
+      // Route filters take precedence over card filters when coming from dashboard
+      if (queryFilters.status) {
+        filters.status = queryFilters.status;
+      }
+      if (queryFilters.agent_group) {
+        filters.agent_group = queryFilters.agent_group;
+      }
+      if (queryFilters._assign) {
+        filters._assign = queryFilters._assign;
+      }
+    } catch (error) {
+      console.error("Error merging route filters:", error);
+    }
+  }
+  
   console.log("Loading card view tickets with filters:", filters);
   
   cardViewResource.update({
@@ -878,12 +999,49 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
     const list = listViewRef.value.list;
 
     const filters = buildCardFilters(sourceFilters);
+    
+    // Preserve route filters (date, owner, agent, team) when applying card filters
+    if (route.query.filters) {
+      try {
+        let queryFilters = typeof route.query.filters === 'string' 
+          ? JSON.parse(route.query.filters) 
+          : route.query.filters;
+        
+        // Normalize filter operators
+        Object.keys(queryFilters).forEach(key => {
+          const filterValue = queryFilters[key];
+          if (Array.isArray(filterValue) && filterValue.length === 2) {
+            const operator = filterValue[0];
+            if (typeof operator === 'string') {
+              queryFilters[key] = [operator.toLowerCase(), filterValue[1]];
+            }
+          }
+        });
+        
+        // Merge route filters with card filters (route filters take precedence for agent/team/date/owner)
+        if (queryFilters.creation) {
+          filters.creation = queryFilters.creation;
+        }
+        if (queryFilters.owner) {
+          filters.owner = queryFilters.owner;
+        }
+        if (queryFilters.agent_group) {
+          filters.agent_group = queryFilters.agent_group;
+        }
+        if (queryFilters._assign) {
+          filters._assign = queryFilters._assign;
+        }
+      } catch (error) {
+        console.error("Error merging route filters:", error);
+      }
+    }
+    
     console.log("Applying card filters to list view:", filters);
 
     const params = {
       ...list.params,
       filters: filters,
-      default_filters: {},
+      default_filters: filters,
     };
 
     list.submit(params);
@@ -935,7 +1093,25 @@ function applyQuickView(view: any) {
   
   const isAll = view.label === "All tickets";
   const baseDefaultFilters = isAll ? {} : getBaseDefaultFilters();
-  const mergedFilters = { ...baseDefaultFilters, ...view.filters };
+  let mergedFilters = { ...baseDefaultFilters, ...view.filters };
+  
+  // Preserve route filters (date, owner) when applying quick view
+  if (route.query.filters) {
+    try {
+      const queryFilters = typeof route.query.filters === 'string' 
+        ? JSON.parse(route.query.filters) 
+        : route.query.filters;
+      
+      if (queryFilters.creation) {
+        mergedFilters.creation = queryFilters.creation;
+      }
+      if (queryFilters.owner) {
+        mergedFilters.owner = queryFilters.owner;
+      }
+    } catch (error) {
+      console.error("Error merging route filters in quick view:", error);
+    }
+  }
 
   if (viewMode.value === "card") {
     cardViewOffset.value = 0;
@@ -955,7 +1131,7 @@ function applyQuickView(view: any) {
     const params = {
       ...list.params,
       filters: mergedFilters,
-      default_filters: isAll ? {} : baseDefaultFilters,
+      default_filters: mergedFilters,
     };
 
     list.submit(params);
@@ -1271,6 +1447,129 @@ watch(viewMode, async (newMode, oldMode) => {
   }
 });
 
+// Parse and apply filters from route query
+function applyFiltersFromRoute() {
+  if (route.query.filters) {
+    try {
+      let queryFilters = typeof route.query.filters === 'string' 
+        ? JSON.parse(route.query.filters) 
+        : route.query.filters;
+      
+      if (queryFilters && Object.keys(queryFilters).length > 0) {
+        // Normalize filter operators (convert LIKE to like, etc.) at the start
+        Object.keys(queryFilters).forEach(key => {
+          const filterValue = queryFilters[key];
+          if (Array.isArray(filterValue) && filterValue.length === 2) {
+            const operator = filterValue[0];
+            if (typeof operator === 'string') {
+              // Normalize operator to lowercase
+              queryFilters[key] = [operator.toLowerCase(), filterValue[1]];
+            }
+          }
+        });
+        
+        console.log("Applying filters from route (normalized):", queryFilters);
+        
+        // Set default filters for list view (this will be used by ListViewBuilder)
+        setDefaultFilters(queryFilters);
+        
+        // Sync card filters UI with route filters
+        if (queryFilters.status) {
+          const statusFilter = queryFilters.status;
+          if (Array.isArray(statusFilter) && statusFilter[0] === "in" && Array.isArray(statusFilter[1])) {
+            const statusValues = statusFilter[1];
+            const matchedStatuses = statusFilterOptions.value.filter(opt => 
+              statusValues.includes(opt.value)
+            );
+            if (matchedStatuses.length > 0) {
+              cardFilters.status = matchedStatuses;
+            }
+          } else if (typeof statusFilter === "string") {
+            const matchedStatus = statusFilterOptions.value.find(opt => opt.value === statusFilter);
+            if (matchedStatus) {
+              cardFilters.status = [matchedStatus];
+            }
+          }
+        }
+        
+        // Apply team filter if present
+        if (queryFilters.agent_group) {
+          const teamValue = Array.isArray(queryFilters.agent_group) 
+            ? queryFilters.agent_group[1]?.[0] 
+            : queryFilters.agent_group;
+          if (teamValue) {
+            const matchedTeam = teamFilterOptions.value.find(opt => opt.value === teamValue);
+            if (matchedTeam) {
+              cardFilters.team = [matchedTeam];
+            }
+          }
+        }
+        
+        // Apply agent filter if present
+        if (queryFilters._assign) {
+          const assignFilter = queryFilters._assign;
+          // Handle both "like" and "LIKE" (case insensitive)
+          const operator = Array.isArray(assignFilter) ? assignFilter[0]?.toLowerCase() : null;
+          if (operator === "like") {
+            const assignValue = assignFilter[1];
+            // Extract email from like pattern: %"email"% or %email%
+            let agentEmail = null;
+            const quotedMatch = assignValue.match(/%"([^"]+)"/);
+            if (quotedMatch) {
+              agentEmail = quotedMatch[1];
+            } else {
+              // Try without quotes
+              const unquotedMatch = assignValue.match(/%([^%]+)%/);
+              if (unquotedMatch) {
+                agentEmail = unquotedMatch[1];
+              }
+            }
+            if (agentEmail) {
+              const matchedAgent = agentFilterOptions.value.find(opt => opt.value === agentEmail);
+              if (matchedAgent) {
+                cardFilters.agent = [matchedAgent];
+              }
+            }
+          }
+        }
+        
+        // Apply filters based on view mode
+        if (viewMode.value === "card") {
+          cardViewOffset.value = 0;
+          loadCardViewTickets();
+        } else {
+          // For list view, wait for list to be ready then apply filters
+          nextTick(() => {
+            if (listViewRef.value?.list) {
+              const list = listViewRef.value.list;
+              console.log("Applying normalized route filters to list view:", queryFilters);
+              // Update params and submit to apply filters
+              list.params = {
+                ...list.params,
+                filters: queryFilters,
+                default_filters: queryFilters,
+              };
+              list.submit(list.params);
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error parsing filters from route:", error);
+    }
+  } else {
+    // No filters in route, use default behavior
+    if (viewMode.value === "card") {
+      cardFilters.status = [{ label: "All", value: "" }];
+      cardFilters.priority = [];
+      cardFilters.team = [];
+      cardFilters.agent = [];
+      activeQuickView.value = "";
+      loadCardViewTickets();
+    }
+  }
+}
+
 onMounted(() => {
   if (!route.query.view) {
     currentView.value = {
@@ -1288,16 +1587,18 @@ onMounted(() => {
     });
   }
   
-  // Load card view data if in card mode on mount with "All" filter
-  if (viewMode.value === "card") {
-    cardFilters.status = [{ label: "All", value: "" }];
-    cardFilters.priority = [];
-    cardFilters.team = [];
-    cardFilters.agent = [];
-    activeQuickView.value = "";
-    loadCardViewTickets();
-  }
+  // Apply filters from route query if present
+  applyFiltersFromRoute();
 });
+
+// Watch for route changes to apply filters
+watch(
+  () => route.query.filters,
+  () => {
+    applyFiltersFromRoute();
+  },
+  { immediate: false }
+);
 
 onUnmounted(() => {
   if (!isCustomerPortal.value) {

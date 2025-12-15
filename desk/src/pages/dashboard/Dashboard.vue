@@ -96,6 +96,9 @@
           :filters="card.status_filter"
           :team="filters.team"
           :agent="filters.agent"
+          :owner="filters.owner"
+          :from-date="filters.period?.split(',')[0]"
+          :to-date="filters.period?.split(',')[1]"
         />
         <template v-if="statusCards.loading">
           <div

@@ -239,9 +239,13 @@ watch(
 watch(
   () => props.title,
   () => {
-    scrollToLatestActivity();
+    // Only scroll when tab changes, not on every update
+    // This prevents unwanted scrolling when activities reload due to field updates
+    if (props.activities.length > 0) {
+      scrollToLatestActivity();
+    }
   },
-  { immediate: true }
+  { immediate: false }
 );
 
 defineExpose({
