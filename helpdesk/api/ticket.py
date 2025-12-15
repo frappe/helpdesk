@@ -97,7 +97,10 @@ def get_tickets_for_card_view(
 
         owner = raw_filters.get("owner")
         if owner:
-            filter_list.append(["contact", "=", owner])
+            # Owner refers to the ticket owner (User), not the contact.
+            # Align with list view / dashboard semantics so counts and
+            # card-view results stay consistent.
+            filter_list.append(["owner", "=", owner])
 
         return filter_list
 
