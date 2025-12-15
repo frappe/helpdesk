@@ -1,60 +1,64 @@
 {
  "actions": [],
- "allow_rename": 1,
- "creation": "2025-12-09 15:19:10.176092",
+ "autoname": "hash",
+ "creation": "2022-11-03 17:19:47.135176",
  "doctype": "DocType",
+ "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "title",
-  "column_break_pnpo",
+  "column_break_wdal",
   "scope",
   "teams",
-  "section_break_rojr",
-  "response"
+  "section_break_ybsb",
+  "message"
  ],
  "fields": [
   {
    "fieldname": "title",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Title",
    "reqd": 1
   },
   {
-   "fieldname": "column_break_pnpo",
+   "fieldname": "message",
+   "fieldtype": "Text Editor",
+   "label": "Message",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_wdal",
    "fieldtype": "Column Break"
   },
   {
+   "default": "Global",
    "fieldname": "scope",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Scope",
-   "options": "Global\nTeam\nPersonal"
+   "options": "Global\nTeam\nPersonal",
+   "reqd": 1
   },
   {
    "depends_on": "eval: doc.scope==\"Team\"",
    "fieldname": "teams",
    "fieldtype": "Table MultiSelect",
    "label": "Teams",
+   "mandatory_depends_on": "eval: doc.scope==\"Team\"",
    "options": "HD Saved Reply Team"
   },
   {
-   "fieldname": "section_break_rojr",
+   "fieldname": "section_break_ybsb",
    "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "response",
-   "fieldtype": "Code",
-   "label": "Response"
   }
  ],
- "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-09 18:56:42.171062",
+ "modified": "2025-12-15 11:24:12.143696",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Saved Reply",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {
@@ -95,8 +99,8 @@
   }
  ],
  "row_format": "Dynamic",
- "rows_threshold_for_grid_search": 20,
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "title"
 }

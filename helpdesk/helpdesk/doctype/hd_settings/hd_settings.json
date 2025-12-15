@@ -11,8 +11,9 @@
   "agent_groups_section",
   "restrict_tickets_by_agent_group",
   "do_not_restrict_tickets_without_an_agent_group",
-  "assign_within_team",
   "column_break_dxlq",
+  "assign_within_team",
+  "disable_saved_replies_global_scope",
   "assignment_rules_section",
   "base_support_rotation",
   "knowledge_base_section",
@@ -454,12 +455,18 @@
    "fieldname": "favicon",
    "fieldtype": "Attach Image",
    "label": "Favicon"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_saved_replies_global_scope",
+   "fieldtype": "Check",
+   "label": "Disable saved replies with scope 'Global'"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-10-16 11:46:00.714066",
+ "modified": "2025-12-15 12:18:21.420951",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

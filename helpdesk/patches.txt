@@ -7,6 +7,7 @@ execute:frappe.delete_doc("DocType", "HD Preset Filter")
 execute:frappe.delete_doc("DocType", "HD Preset Filter Item")
 execute:frappe.delete_doc("DocType", "HD Pause Service Level Agreement On Status")
 execute:frappe.delete_doc("DocType", "HD Service Level Agreement Fulfilled On Status")
+helpdesk.patches.rename_canned_response_to_saved_reply
 
 [post_model_sync]
 execute:frappe.delete_doc("Workspace", "Frappe Desk", force=True)
@@ -33,8 +34,3 @@ helpdesk.patches.enable_new_email_notifications
 helpdesk.patches.add_fulltext_index #v2
 helpdesk.patches.add_telephony_app
 helpdesk.patches.add_website_settings_permission
-helpdesk.patches.add_field_in_email_template
-helpdesk.patches.add_fields_in_email_template_for_saved_replies
-helpdesk.patches.move_canned_responses_to_email_templates
-helpdesk.patches.add_email_template_perms_for_agent_and_agent_manager
-helpdesk.patches.move_canned_responses_to_saved_reply

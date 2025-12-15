@@ -47,6 +47,22 @@
           />
         </div>
       </div>
+      <div
+        class="flex items-center justify-between"
+        v-if="settingsData.restrictTicketsByAgentGroup"
+      >
+        <div class="flex flex-col gap-1">
+          <span class="text-base font-medium text-ink-gray-8">{{
+            __("Disable global scope for saved replies")
+          }}</span>
+          <span class="text-p-sm text-ink-gray-6">{{
+            __(
+              "Agents will not be able to view and create saved replies with global scope."
+            )
+          }}</span>
+        </div>
+        <Switch v-model="settingsData.disableSavedRepliesGlobalScope" />
+      </div>
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
           <span class="text-base font-medium text-ink-gray-8">{{
