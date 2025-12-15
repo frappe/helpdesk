@@ -6,10 +6,12 @@ from frappe.model.document import get_controller
 from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
+from helpdesk.api.dashboard import COUNT_NAME
 from helpdesk.utils import (
     call_log_default_columns,
     check_permissions,
     contact_default_columns,
+    is_version_16,
     parse_call_logs,
 )
 
@@ -212,12 +214,15 @@ def get_list_data(
                     "type": field.get("type"),
                     "options": options,
                 }
+
     return {
         "data": data,
         "columns": columns,
         "rows": rows,
         "fields": fields if doctype == "HD Ticket" else [],
-        "total_count": frappe.db.count(doctype, filters=filters),
+        "total_count": frappe.get_list(doctype, fields=[COUNT_NAME], filters=filters)[
+            0
+        ].get("count", 0),
         "row_count": len(data),
         "group_by_field": group_by_field,
         "view_type": view_type,
