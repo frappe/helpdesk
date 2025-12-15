@@ -2,7 +2,7 @@
   <span
     v-if="notificationStore.visible"
     ref="target"
-    class="fixed z-10 h-screen overflow-auto bg-white"
+    class="fixed z-40 h-screen overflow-auto bg-white"
     :style="{
       'box-shadow': '8px 0px 8px rgba(0, 0, 0, 0.1)',
       'max-width': '350px',
