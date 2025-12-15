@@ -473,11 +473,13 @@ function updateOptimistic(fieldname: string, value: string) {
 async function openTransferDialog() {
   if (!ticket.data) return;
   
+  console.log('[TicketAgent] Opening transfer dialog for ticket:', props.ticketId);
   isLoadingEmails.value = true;
   showTransferDialog.value = true;
   
   try {
     transferEmails.value = await getCommunicationsForTransfer("HD Ticket", props.ticketId);
+    console.log('[TicketAgent] Loaded emails for transfer:', transferEmails.value.length, transferEmails.value);
   } catch (error) {
     console.error("Error fetching communications:", error);
     toast.error("Error loading emails");
@@ -488,16 +490,29 @@ async function openTransferDialog() {
 }
 
 async function handleTransfer(selectedEmailIds: string[]) {
-  if (!ticket.data || !selectedEmailIds || selectedEmailIds.length === 0) return;
+  console.log('[TicketAgent] handleTransfer called with:', selectedEmailIds);
+  console.log('[TicketAgent] Number of selected emails:', selectedEmailIds?.length || 0);
+  
+  if (!ticket.data) {
+    console.warn('[TicketAgent] No ticket data!');
+    return;
+  }
+  
+  if (!selectedEmailIds || selectedEmailIds.length === 0) {
+    console.warn('[TicketAgent] No emails selected - blocking transfer!');
+    console.warn('[TicketAgent] Available emails were:', transferEmails.value);
+    return;
+  }
   
   try {
     const result = await transferToCRM(props.ticketId, selectedEmailIds, true);
+    console.log('[TicketAgent] Transfer successful:', result);
     
     if (result.success) {
       showTransferDialog.value = false;
       
       // Navigate to tickets list (stay in HD)
-      router.push({ name: "Tickets" });
+      router.push({ name: "TicketsAgent" });
     }
   } catch (error) {
     console.error("Error transferring to CRM:", error);

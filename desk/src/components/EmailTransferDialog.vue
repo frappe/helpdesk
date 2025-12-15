@@ -142,13 +142,16 @@ const isLoading = ref(false)
 watch(
   () => props.emails,
   (newEmails) => {
+    console.log('[EmailTransferDialog] Emails changed:', newEmails?.length || 0, newEmails);
     if (newEmails && newEmails.length > 0) {
       selectedEmails.value = newEmails.map((e) => e.name)
+      console.log('[EmailTransferDialog] Auto-selected emails:', selectedEmails.value);
     } else {
       selectedEmails.value = []
+      console.log('[EmailTransferDialog] No emails to select');
     }
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 )
 
 const allSelected = computed(() => {
@@ -211,7 +214,12 @@ function closeDialog() {
 }
 
 async function handleTransfer() {
+  console.log('[EmailTransferDialog] handleTransfer called');
+  console.log('[EmailTransferDialog] Selected emails:', selectedEmails.value);
+  console.log('[EmailTransferDialog] All emails:', props.emails);
+  
   if (selectedEmails.value.length === 0) {
+    console.warn('[EmailTransferDialog] No emails selected!');
     return
   }
 
