@@ -98,10 +98,19 @@
                   {{ ticket.priority || "No priority" }}
                 </span>
               </div>
-              <div v-if="assigneeName(ticket)" class="flex items-center gap-1.5 text-ink-gray-8">
-                <LucideUsers class="h-4 w-4 text-ink-gray-6" />
-                <span class="truncate">{{ assigneeName(ticket) }}</span>
-                <LucideChevronDown class="h-3.5 w-3.5 text-ink-gray-6" />
+              <div
+                v-if="assigneeName(ticket)"
+                class="inline-flex items-center gap-1.5 rounded-full border border-outline-gray-2 bg-surface-gray-1 px-2 py-0.5 text-xs font-medium text-ink-gray-8"
+              >
+                <LucideUsers class="h-3.5 w-3.5 text-ink-gray-6" />
+                <span class="truncate">Assigned: {{ assigneeName(ticket) }}</span>
+              </div>
+              <div
+                v-if="teamName(ticket)"
+                class="inline-flex items-center gap-1.5 rounded-full border border-outline-gray-2 bg-surface-gray-1 px-2 py-0.5 text-xs font-medium text-ink-gray-8"
+              >
+                <LucideUsers class="h-3.5 w-3.5 text-ink-gray-6" />
+                <span class="truncate">Team: {{ teamName(ticket) }}</span>
               </div>
               <Dropdown :options="statusOptionsList(ticket)" placement="bottom-start">
                 <button
@@ -218,6 +227,10 @@ function assigneeName(row: any) {
     return primary?.full_name || primary?.name || primary?.email || "";
   }
   return row?.assigned_to || row?.owner || "";
+}
+
+function teamName(row: any) {
+  return row?.agent_group || "";
 }
 
 function priorityMeta(priority?: string) {
