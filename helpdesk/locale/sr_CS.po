@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-11-30 10:36+0000\n"
-"PO-Revision-Date: 2025-12-03 21:26\n"
+"POT-Creation-Date: 2025-12-07 10:36+0000\n"
+"PO-Revision-Date: 2025-12-10 22:03\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Latin)\n"
 "MIME-Version: 1.0\n"
@@ -18,11 +18,11 @@ msgstr ""
 "X-Crowdin-File-ID: 118\n"
 "Language: sr_CS\n"
 
-#: helpdesk/api/dashboard.py:231
+#: helpdesk/api/dashboard.py:179
 msgid "% SLA Fulfilled"
 msgstr "% ispunjenosti sporazuma o nivou usluge"
 
-#: helpdesk/api/dashboard.py:236
+#: helpdesk/api/dashboard.py:184
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
 msgstr "% rešenih kreiranih tiketa u okviru rokova iz sporazuma o nivou usluge"
@@ -82,7 +82,7 @@ msgstr "API"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:338
 msgid "Access all team tickets"
-msgstr ""
+msgstr "Pristup svim tiketima tima"
 
 #: helpdesk/api/knowledge_base.py:15
 msgid "Access denied"
@@ -90,11 +90,11 @@ msgstr "Pristup odbijen"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:337
 msgid "Access only this team's tickets"
-msgstr ""
+msgstr "Pristup samo tiketima ovog tima"
 
 #: desk/src/components/Settings/Profile/Profile.vue:81
 msgid "Account info & security"
-msgstr ""
+msgstr "Informacije o nalogu i bezbednost"
 
 #. Label of the acknowledgement_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -128,7 +128,7 @@ msgstr "Dodaj izvršioca"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:179
 msgid "Add Holiday"
-msgstr ""
+msgstr "Dodaj praznik"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -156,15 +156,15 @@ msgstr "Dodaj grupu uslova"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:152
 msgid "Add holidays here to make sure they’re excluded from SLA calculations."
-msgstr ""
+msgstr "Dodajte praznike ovde kako bi bili isključeni iz obračuna sporazuma o nivou usluge."
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:97
 msgid "Add members to this team to get started."
-msgstr ""
+msgstr "Dodajte članove ovom timu da biste započeli."
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:60
 msgid "Add one to get started"
-msgstr ""
+msgstr "Dodajte jedan da biste započeli"
 
 #: desk/src/components/Settings/Agents.vue:104
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:23
@@ -173,15 +173,15 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:23
 #: desk/src/components/Settings/Teams/TeamsList.vue:119
 msgid "Add one to get started."
-msgstr ""
+msgstr "Dodajte jedan da biste započeli."
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:133
 msgid "Add recurring holidays such as weekends."
-msgstr ""
+msgstr "Dodajte ponavljajuće praznike, kao što su vikendi."
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:198
 msgid "Add time targets around support milestones like first reply and resolution times"
-msgstr ""
+msgstr "Dodajte vremenske ciljeve oko ključnih tačaka podrške, kao što su vreme za prvi odgovor i vreme rešavanja"
 
 #. Label of the get_weekly_off_dates (Button) field in DocType 'HD Service
 #. Holiday List'
@@ -279,7 +279,7 @@ msgstr "Sve"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
-#: desk/src/components/Settings/General/components/TicketSettings.vue:101
+#: desk/src/components/Settings/General/components/TicketSettings.vue:82
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Allow anyone to create tickets"
 msgstr "Dozvoli svima da kreiraju tikete"
@@ -289,19 +289,19 @@ msgstr "Dozvoli svima da kreiraju tikete"
 msgid "Amber"
 msgstr "Amber"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:105
+#: desk/src/components/Settings/General/components/TicketSettings.vue:86
 msgid "Anyone will be able to create tickets without any permission. e.g. from webform."
-msgstr ""
+msgstr "Svako može kreirati tikete bez posebnih dozvola, na primer putem veb-obrasca."
 
 #: desk/src/components/Settings/General/components/Branding.vue:17
 msgid "Appears in the left sidebar. Recommended size is minimum 32x32 px in PNG or SVG"
-msgstr ""
+msgstr "Prikazuje se u levoj bočnoj traci. Preporučena veličina je minimalno 32x32 piksela u PNG ili SVG formatu"
 
 #. Description of the 'Favicon' (Attach Image) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:29
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO"
-msgstr ""
+msgstr "Prikazuje se pored naslova na kartici internet pretraživača. Preporučena veličina je minimalno 32x32 piksela u PNG ili ICO formatu"
 
 #. Label of the apply_sla_for_resolution (Check) field in DocType 'HD Service
 #. Level Agreement'
@@ -336,7 +336,7 @@ msgstr "Da li ste sigurni da želite da promenite karticu? Nesačuvane izmene ć
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:107
 msgid "Are you sure you want to delete this team? This action cannot be reversed!"
-msgstr ""
+msgstr "Da li ste sigurni da želite da obrišete ovaj tim? Ova radnja se ne može opozvati!"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:465
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:109
@@ -349,11 +349,11 @@ msgstr "Da li ste sigurni da želite da se vratite? Nesačuvane izmene će biti 
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:162
 msgid "Are you sure you want to leave? Unsaved changes will be lost."
-msgstr ""
+msgstr "Da li ste sigurni da želite da napustite? Nesačuvane izmene će biti izgubljene."
 
 #: desk/src/components/Settings/General/components/Branding.vue:97
 msgid "Are you sure you want to remove the logo?"
-msgstr ""
+msgstr "Da li ste sigurni da želite da uklonite logo?"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:122
 msgid "Are you sure you want to reset the content? Current content will be overridden."
@@ -427,35 +427,35 @@ msgstr "Uslov dodeljivanja"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:81
 msgid "Assignment conditions"
-msgstr ""
+msgstr "Uslovi dodele"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:35
 msgid "Assignment rule"
 msgstr "Pravilo dodele zadatka"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:570
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:560
 msgid "Assignment rule created"
 msgstr "Pravilo dodeljivanja je kreirano"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:121
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:129
 msgid "Assignment rule deleted"
 msgstr "Pravilo dodeljivanja je obrisano"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:153
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:161
 msgid "Assignment rule duplicated"
 msgstr "Pravilo dodeljivanja je duplirano"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:654
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:647
 msgid "Assignment rule updated"
 msgstr "Pravilo dodeljivanja je ažurirano"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:190
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:198
 msgid "Assignment rule {0} updated"
 msgstr "Pravilo dodeljivanja {0} je ažurirano"
 
 #: desk/src/components/Settings/InviteAgents.vue:170
 msgid "At least one email required"
-msgstr ""
+msgstr "Neophodan je barem jedan imejl"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:73
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
@@ -482,20 +482,20 @@ msgid "Author"
 msgstr "Autor"
 
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
-#: desk/src/components/Settings/General/components/TicketSettings.vue:72
+#: desk/src/components/Settings/General/components/TicketSettings.vue:53
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Auto update status"
 msgstr "Automatsko ažuriranje statusa"
 
 #. Label of the auto_close_after_days (Int) field in DocType 'HD Settings'
-#: desk/src/components/Settings/General/components/TicketSettings.vue:168
+#: desk/src/components/Settings/General/components/TicketSettings.vue:149
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Auto-close after (Days)"
 msgstr "Automatski zatvori nakon (dana)"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:140
+#: desk/src/components/Settings/General/components/TicketSettings.vue:121
 msgid "Auto-close tickets that remain in a status for the specified number of days."
-msgstr ""
+msgstr "Automatski zatvori tikete koji ostanu u određenom statusu zadati broj dana."
 
 #. Description of the 'Condition' (Code) field in DocType 'HD Service Level
 #. Agreement'
@@ -508,9 +508,9 @@ msgstr "Automatski generisano iz prikaza portala - ne uređujte direktno osim uk
 msgid "Automatically Close Tickets when"
 msgstr "Automatski zatvori tikete kada"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:137
+#: desk/src/components/Settings/General/components/TicketSettings.vue:118
 msgid "Automatically close stale tickets"
-msgstr ""
+msgstr "Automatski zatvori neaktivne tikete"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -522,35 +522,35 @@ msgstr "Automatizacija"
 msgid "Average Response Time"
 msgstr "Prosečno vreme odgovora"
 
-#: helpdesk/api/dashboard.py:682
+#: helpdesk/api/dashboard.py:362
 msgid "Average feedback rating per day is around {0} stars"
 msgstr "Prosečna ocena povratnih informacija po danu je oko {0} zvezda"
 
-#: helpdesk/api/dashboard.py:606
+#: helpdesk/api/dashboard.py:284
 msgid "Average tickets per day is around {0}"
 msgstr "Prosečan broj tiketa po danu je oko {0}"
 
-#: helpdesk/api/dashboard.py:387
+#: helpdesk/api/dashboard.py:229
 msgid "Avg. Feedback Rating"
 msgstr "Prosečna ocena povratnih informacija"
 
-#: helpdesk/api/dashboard.py:283
+#: helpdesk/api/dashboard.py:194
 msgid "Avg. First Response"
 msgstr "Prosečno vreme prvog odgovora"
 
-#: helpdesk/api/dashboard.py:337
+#: helpdesk/api/dashboard.py:213
 msgid "Avg. Resolution"
 msgstr "Prosečno vreme rešavanja"
 
-#: helpdesk/api/dashboard.py:392
+#: helpdesk/api/dashboard.py:234
 msgid "Avg. feedback rating for the tickets resolved"
 msgstr "Prosečna ocena povratnih informacija za rešene tikete"
 
-#: helpdesk/api/dashboard.py:289
+#: helpdesk/api/dashboard.py:200
 msgid "Avg. time taken to first respond to a ticket"
 msgstr "Prosečno vreme potrebno za prvi odgovor na tiket"
 
-#: helpdesk/api/dashboard.py:343
+#: helpdesk/api/dashboard.py:219
 msgid "Avg. time taken to resolve a ticket"
 msgstr "Prosečno vreme potrebno za rešavanje tiketa"
 
@@ -604,7 +604,7 @@ msgstr "Brendiranje"
 
 #: desk/src/components/Settings/Holiday/Holidays.vue:3
 msgid "Business Holidays"
-msgstr ""
+msgstr "Poslovni praznici"
 
 #. Label of the button_section (Section Break) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -617,23 +617,23 @@ msgstr "Detalji poziva"
 
 #: desk/src/components/Settings/InviteAgents.vue:147
 msgid "Can invite new agents, manage tickets, create custom views and manage public views."
-msgstr ""
+msgstr "Možete pozivati nove agente, upravljati tiketima, kreirati prilagođene prikaze i upravljati javnim prikazima."
 
 #: desk/src/components/Settings/InviteAgents.vue:155
 msgid "Can manage all aspects of Helpdesk."
-msgstr ""
+msgstr "Možete upravljati svim aspektima Helpdesk-a."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:602
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:604
 msgid "Can not send email. No sender email set up!"
 msgstr "Nije moguće poslati imejl. Nije podešen imejl pošiljaoca!"
 
 #: desk/src/components/Settings/InviteAgents.vue:139
 msgid "Can work on tickets, create custom views and manage private views."
-msgstr ""
+msgstr "Možete raditi na tiketima, kreirati prilagođene prikaze i upravljati privatnim prikazima."
 
 #: desk/src/components/Settings/InviteAgents.vue:57
 msgid "Cancel Invitation"
-msgstr ""
+msgstr "Otkaži pozivnicu"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:508
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
@@ -647,7 +647,7 @@ msgstr "Nije moguće onemogućiti ovaj status jer je povezan u HD podešavanjima
 msgid "Cannot disable this status as it is linked in the following SLAs:<br><br>"
 msgstr "Nije moguće onemogućiti ovaj status jer je povezan sa sledećim sporazumima o nivou usluge:<br><br>"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:173
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:181
 msgid "Cannot enable rule without adding users in it"
 msgstr "Pravilo se ne može omogućiti bez dodavanja korisnika"
 
@@ -682,19 +682,19 @@ msgstr "Promeni sliku"
 
 #: desk/src/components/Settings/Profile/Profile.vue:133
 msgid "Change language of the application."
-msgstr ""
+msgstr "Promenite jezik aplikacije."
 
 #: desk/src/components/Settings/Profile/Profile.vue:118
 msgid "Change your account password for security."
-msgstr ""
+msgstr "Promenite lozinku naloga radi bezbednosti."
 
 #: desk/src/components/Settings/Agents.vue:103
 msgid "Change your search terms or filters"
-msgstr ""
+msgstr "Promenite termine pretrage ili filtere"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:118
 msgid "Change your search terms to find teams."
-msgstr ""
+msgstr "Promenite termine pretrage da pronađete timove."
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -703,7 +703,7 @@ msgstr "Kanali"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:150
 msgid "Choose how long this SLA policy will be active."
-msgstr ""
+msgstr "Izaberite koliko će ova politika sporazuma o nivou usluge biti aktivna."
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:22
 msgid "Choose how tickets are distributed among selected assignees."
@@ -715,7 +715,7 @@ msgstr "Izaberite dane u nedelji kada ovo pravilo treba da bude aktivno."
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:80
 msgid "Choose the duration of this holiday list."
-msgstr ""
+msgstr "Izaberite trajanje ove liste praznika."
 
 #: desk/src/components/Settings/EmailAdd.vue:5
 msgid "Choose the email service provider you want to configure."
@@ -727,7 +727,7 @@ msgstr "Izaberite koji tiket podleže ovom pravilu dodeljivanja."
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:84
 msgid "Choose which tickets are affected by this policy."
-msgstr ""
+msgstr "Izaberite koji tiketi su pogođeni ovom politikom."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:219
 msgid "Choose which tickets are affected by this un-assignment rule."
@@ -746,7 +746,7 @@ msgstr "Očisti tabelu"
 msgid "Click on Add to Holidays. This will populate the holidays table with all the dates that fall on the selected weekly off. Repeat the process for populating the dates for all your weekly holidays"
 msgstr "Kliknite na Dodaj u praznike. Ovo će popuniti tabelu praznika sa svim datumima koji padaju na izabrane nedeljne slobodne dane. Ponovite proces za popunjavanje datuma svih nedeljnih praznika"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:61
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:69
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:44
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:58
 msgid "Close"
@@ -757,7 +757,7 @@ msgstr "Zatvori"
 msgid "Closed"
 msgstr "Zatvoreno"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:324
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Zatvoreni ili ocenjeni tiketi ne mogu biti ažurirani od strane osoba koje nisu agenti"
 
@@ -775,7 +775,7 @@ msgstr "Kolone"
 
 #: desk/src/components/Settings/InviteAgents.vue:15
 msgid "Comma separated emails to invite"
-msgstr ""
+msgstr "Imejlovi za poziv, odvojeni zarezom"
 
 #. Label of the reference_comment (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -800,7 +800,7 @@ msgstr "Konfigurišite detalje telefonije za svog agenta."
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:2
 msgid "Configure your telephony settings."
-msgstr ""
+msgstr "Konfigurišite podešavanja telefonije."
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:115
 #: desk/src/components/Settings/Teams/TeamEdit.vue:241
@@ -853,15 +853,15 @@ msgstr "Sadržaj"
 msgid "Content Type"
 msgstr "Vrsta sadržaja"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:620
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:622
 msgid "Could not an email due to: {0}"
 msgstr "Nije moguće poslati imejl zbog: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:778
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:780
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "Nije moguće poslati imejl potvrdu prijema zbog: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:160
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:164
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Neuspešno slanje imejla sa povratnom informacijom zbog: {0}"
 
@@ -871,15 +871,15 @@ msgstr "Kreiraj"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:5
 msgid "Create and manage teams and assign agents to specific teams."
-msgstr ""
+msgstr "Kreirajte i upravljajte timovima i dodeljujte agente određenim timovima."
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:17
 msgid "Create dependencies between fields to dynamically control options based on user selections."
-msgstr ""
+msgstr "Kreirajte zavisnosti između polja za dinamičko upravljanje opcijama na osnovu izbora korisnika."
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:57
 msgid "Create new business holiday"
-msgstr ""
+msgstr "Kreiraj novi poslovni praznik"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:83
 msgid "Created By"
@@ -972,7 +972,7 @@ msgid "Default ticket status"
 msgstr "Podrazumevani status tiketa"
 
 #. Label of the default_ticket_type (Link) field in DocType 'HD Settings'
-#: desk/src/components/Settings/General/components/TicketSettings.vue:121
+#: desk/src/components/Settings/General/components/TicketSettings.vue:102
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Default ticket type"
 msgstr "Podrazumevana vrsta tiketa"
@@ -1033,11 +1033,11 @@ msgstr "Detalji"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:299
 msgid "Disable Bypass Restrictions"
-msgstr ""
+msgstr "Onemogući zaobilaženje ograničenja"
 
 #: desk/src/components/Settings/General/General.vue:49
 msgid "Disable signup"
-msgstr ""
+msgstr "Onemogući registraciju"
 
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
@@ -1046,7 +1046,7 @@ msgstr "Onemogućeno"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:29
 msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
-msgstr ""
+msgstr "Onemogućava sva imejl obaveštenja za tiket - uključujući kreiranje, ažuriranja i upozorenja."
 
 #. Description of the 'Ignore Restrictions' (Check) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
@@ -1059,9 +1059,9 @@ msgstr "Ne primenjivati filtere i ograničenja na agente ovog tima"
 msgid "Do not restrict tickets without a Team"
 msgstr "Ne ograničavati tikete koji nemaju dodeljen tim"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:52
+#: desk/src/components/Settings/General/components/TicketSettings.vue:41
 msgid "Do not restrict tickets without a team"
-msgstr ""
+msgstr "Ne ograničavaj tikete bez tima"
 
 #. Label of the dt (Link) field in DocType 'HD Form Script'
 #. Label of the dt (Link) field in DocType 'HD View'
@@ -1080,8 +1080,8 @@ msgstr "Domen"
 msgid "Draft"
 msgstr "Nacrt"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:64
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:129
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:72
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:137
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:47
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:78
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:61
@@ -1089,21 +1089,21 @@ msgstr "Nacrt"
 msgid "Duplicate"
 msgstr "Duplikat"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:45
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:53
 msgid "Duplicate Assignment Rule"
 msgstr "Duplikat pravila dodeljivanja"
 
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:28
 msgid "Duplicate Holiday List"
-msgstr ""
+msgstr "Duplikat liste praznika"
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:42
 msgid "Duplicate SLA Policy"
-msgstr ""
+msgstr "Duplikat politike sporazuma o nivou usluge"
 
 #: desk/src/components/Settings/InviteAgents.vue:4
 msgid "Easily invite new agents, managers, or admins."
-msgstr ""
+msgstr "Jednostavno pozovite nove agente, menadžere ili administratore."
 
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
@@ -1111,7 +1111,7 @@ msgstr "Uredi imejl"
 
 #: desk/src/components/Settings/EmailEdit.vue:4
 msgid "Edit your email account"
-msgstr ""
+msgstr "Uredi svoj imejl nalog"
 
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
@@ -1127,7 +1127,7 @@ msgstr "Imejl nalog"
 
 #: desk/src/components/Settings/EmailAccountList.vue:26
 msgid "Email Account name"
-msgstr ""
+msgstr "Naziv imejl naloga"
 
 #: desk/src/components/Settings/EmailAccountList.vue:3
 msgid "Email Accounts"
@@ -1154,7 +1154,7 @@ msgstr "Imejl obaveštenja"
 
 #: desk/src/components/Settings/EmailAdd.vue:162
 msgid "Email account created"
-msgstr ""
+msgstr "Imejl nalog je kreiran"
 
 #: desk/src/components/Settings/EmailEdit.vue:267
 msgid "Email account updated successfully"
@@ -1162,11 +1162,11 @@ msgstr "Imejl nalog je uspešno ažuriran"
 
 #: desk/src/components/Settings/EmailEdit.vue:224
 msgid "Emails pulled successfully"
-msgstr ""
+msgstr "Imejlovi su uspešno preuzeti"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:300
 msgid "Enable Bypass Restrictions"
-msgstr ""
+msgstr "Omogući zaobilaženje ograničenja"
 
 #. Label of the is_feedback_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1227,7 +1227,7 @@ msgstr "Unesite naziv brenda"
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:59
 #: desk/src/components/Settings/Teams/TeamEdit.vue:238
 msgid "Enter the new name for the team"
-msgstr ""
+msgstr "Unesite novi naziv tima"
 
 #: helpdesk/api/knowledge_base.py:80
 msgid "Error moving article to category"
@@ -1261,19 +1261,19 @@ msgstr "Neuspešno kreiranje imejl naloga, nevažeći kredencijali"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:317
 msgid "Failed to load telephony agent"
-msgstr ""
+msgstr "Neuspešno učitavanje agenta telefonije"
 
 #: desk/src/components/Settings/EmailEdit.vue:229
 msgid "Failed to pull emails"
-msgstr ""
+msgstr "Neuspešno preuzimanje imejlova"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:361
 msgid "Failed to save Exotel settings"
-msgstr ""
+msgstr "Neuspešno čuvanje Exotel podešavanja"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:353
 msgid "Failed to save Twilio settings"
-msgstr ""
+msgstr "Neuspešno čuvanje Twilio podešavanja"
 
 #: desk/src/components/Settings/EmailEdit.vue:272
 msgid "Failed to update email account, Invalid credentials"
@@ -1323,11 +1323,11 @@ msgstr "Povratna informacija već postoji"
 msgid "Feedback Rating"
 msgstr "Ocena povratne informacije"
 
-#: helpdesk/api/dashboard.py:688
+#: helpdesk/api/dashboard.py:368
 msgid "Feedback Trend"
 msgstr "Trend povratnih informacija"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:158
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:162
 msgid "Feedback email has been sent to the customer"
 msgstr "Imejl sa povratnom informacijom je poslat klijentu"
 
@@ -1338,15 +1338,15 @@ msgstr "Polje (naziv polja)"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:6
 msgid "Field Dependencies"
-msgstr ""
+msgstr "Zavisnosti polja"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:307
 msgid "Field Dependency created successfully"
-msgstr ""
+msgstr "Zavisnost polja je uspešno kreirana"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:308
 msgid "Field Dependency updated successfully"
-msgstr ""
+msgstr "Zavisnost polja je uspešno ažurirana"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:27
 msgid "Field `{0}` does not exist in Ticket"
@@ -1358,11 +1358,11 @@ msgstr "Polje `{0}` nije dozvoljeno u šablonu tiketa"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:177
 msgid "Field dependency deleted successfully"
-msgstr ""
+msgstr "Zavisnost polja je uspešno obrisana"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:193
 msgid "Field dependency updated successfully."
-msgstr ""
+msgstr "Zavisnost polja je uspešno ažurirana."
 
 #. Label of the fields (Table) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -1436,7 +1436,7 @@ msgstr "Datum početka"
 #: desk/src/components/Settings/Holiday/HolidayView.vue:85
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:155
 msgid "From date"
-msgstr ""
+msgstr "Datum početka"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1489,7 +1489,7 @@ msgstr "Gost"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:13
 msgid "Guide users to articles before tickets."
-msgstr ""
+msgstr "Usmerite korisnike na članke pre kreiranja tiketa."
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -1739,19 +1739,19 @@ msgstr "Naziv liste praznika"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:359
 msgid "Holiday list created"
-msgstr ""
+msgstr "Lista praznika je kreirana"
 
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:124
 msgid "Holiday list deleted"
-msgstr ""
+msgstr "Lista praznika je obrisana"
 
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:100
 msgid "Holiday list duplicated"
-msgstr ""
+msgstr "Lista praznika je duplirana"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:377
 msgid "Holiday list updated"
-msgstr ""
+msgstr "Lista praznika je ažurirana"
 
 #. Label of the holidays_section (Section Break) field in DocType 'HD Service
 #. Holiday List'
@@ -1846,7 +1846,7 @@ msgstr "Prijemna pošta"
 msgid "Instantly send e-mail"
 msgstr "Slanje imejla trenutno"
 
-#: helpdesk/utils.py:33
+#: helpdesk/utils.py:32
 msgid "Insufficient Permission for {0}"
 msgstr "Nedovoljna ovlašćenja za {0}"
 
@@ -1867,7 +1867,7 @@ msgstr "Nevažeće obaveštenje"
 
 #: desk/src/components/Settings/InviteAgents.vue:3
 msgid "Invite Agents"
-msgstr ""
+msgstr "Pozovi agente"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:84
 msgid "Invite agent"
@@ -1954,7 +1954,7 @@ msgstr "Jezik"
 
 #: desk/src/components/Settings/Profile/Profile.vue:250
 msgid "Language updated"
-msgstr ""
+msgstr "Jezik je ažuriran"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
@@ -1975,7 +1975,7 @@ msgstr "Saznajte više o uslovima"
 
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:19
 msgid "Learn more about SLA"
-msgstr ""
+msgstr "Saznajte više o sporazumu o nivou usluge"
 
 #. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
 #. Source'
@@ -2024,19 +2024,19 @@ msgstr "Što je manja brojčana vrednost, veći je prioritet problema"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:10
 msgid "Make feedback mandatory"
-msgstr ""
+msgstr "Učinite povratnu informaciju obaveznom"
 
 #: desk/src/components/Settings/General/General.vue:2
 msgid "Manage general settings of your app."
-msgstr ""
+msgstr "Upravljajte opštim podešavanjima aplikacije."
 
 #: desk/src/components/Settings/EmailAccountList.vue:5
 msgid "Manage your email accounts and configure incoming and outgoing settings."
-msgstr ""
+msgstr "Upravljajte svojim imejl nalozima i konfigurišite podešavanja za dolazne i odlazne poruke."
 
 #: desk/src/components/Settings/Profile/Profile.vue:4
 msgid "Manage your profile information."
-msgstr ""
+msgstr "Upravljajte informacijama svog profila."
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:45
 msgid "Members"
@@ -2044,15 +2044,15 @@ msgstr "Članovi"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:57
 msgid "Members ({0})"
-msgstr ""
+msgstr "Članovi ({0})"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:309
 msgid "Members of this team will be able to see the tickets assigned to all the teams"
-msgstr ""
+msgstr "Članovi ovog tima će moći da vide tikete dodeljenje svim timovima"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:306
 msgid "Members of this team will see the tickets assigned to this team only"
-msgstr ""
+msgstr "Članovi ovog tima će videti samo tikete dodeljene ovom timu"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -2142,21 +2142,21 @@ msgstr "Novi"
 msgid "New Assignment Rule"
 msgstr "Novo pravilo dodeljivanja"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:51
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:59
 msgid "New Assignment Rule Name"
 msgstr "Naziv novog pravila dodeljivanja"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:8
 msgid "New Business Holiday"
-msgstr ""
+msgstr "Novi poslovni praznik"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:108
 msgid "New Field Dependency"
-msgstr ""
+msgstr "Nova zavisnost polja"
 
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:34
 msgid "New Holiday List Name"
-msgstr ""
+msgstr "Naziv nove liste praznika"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:8
 msgid "New Password"
@@ -2164,11 +2164,11 @@ msgstr "Nova lozinka"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:8
 msgid "New SLA Policy"
-msgstr ""
+msgstr "Nova politika sporazuma o nivou usluge"
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:48
 msgid "New SLA Policy Name"
-msgstr ""
+msgstr "Naziv nove politike sporazuma o nivou usluge"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:8
 msgid "New Team"
@@ -2177,12 +2177,12 @@ msgstr "Novi tim"
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:48
 #: desk/src/components/Settings/Teams/TeamEdit.vue:264
 msgid "New and old title cannot be same"
-msgstr ""
+msgstr "Novi i stari naslov ne mogu biti isti"
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:46
 #: desk/src/components/Settings/Teams/TeamEdit.vue:262
 msgid "New title is required"
-msgstr ""
+msgstr "Novi naslov je obavezan"
 
 #: desk/src/components/Settings/General/General.vue:52
 msgid "New users will have to be manually registered by system managers."
@@ -2190,19 +2190,19 @@ msgstr "Novi korisnici će morati biti ručno registrovani od strane sistem mena
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:20
 msgid "No Holiday list found"
-msgstr ""
+msgstr "Nije pronađena lista praznika"
 
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:20
 msgid "No SLA found"
-msgstr ""
+msgstr "Nije pronađen sporazum o nivou usluge"
 
-#: helpdesk/api/dashboard.py:429
+#: helpdesk/api/dashboard.py:440
 msgid "No Team"
 msgstr "Bez tima"
 
 #: desk/src/components/Settings/Agents.vue:98
 msgid "No agent found"
-msgstr ""
+msgstr "Nije pronađen agent"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:13
 msgid "No assignees"
@@ -2210,7 +2210,7 @@ msgstr "Nema izvršilaca"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:20
 msgid "No assignment rule found"
-msgstr ""
+msgstr "Nije pronađeno pravilo dodele"
 
 #: desk/src/components/Settings/EmailEdit.vue:184
 msgid "No changes made"
@@ -2218,11 +2218,11 @@ msgstr "Nije izvršena nijedna promena"
 
 #: desk/src/components/Settings/EmailAccountList.vue:52
 msgid "No email account found"
-msgstr ""
+msgstr "Nije pronađen imejl nalog"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:57
 msgid "No field dependency found"
-msgstr ""
+msgstr "Nije pronađena zavisnost polja"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:94
 msgid "No members found"
@@ -2234,9 +2234,9 @@ msgstr "Nema rezultata"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:113
 msgid "No team found"
-msgstr ""
+msgstr "Nije pronađen tim"
 
-#: helpdesk/utils.py:166
+#: helpdesk/utils.py:168
 msgid "Not Allowed"
 msgstr "Nije dozvoljeno"
 
@@ -2258,7 +2258,7 @@ msgstr "Stari uslov"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:103
 msgid "Old Conditions"
-msgstr ""
+msgstr "Stari uslovi"
 
 #. Label of the on_hold_since (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2338,11 +2338,11 @@ msgstr "Lozinka"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:104
 msgid "Password must be at least 8 characters"
-msgstr ""
+msgstr "Lozinka mora imati najmanje 8 karaktera"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:107
 msgid "Password must contain lowercase, uppercase, number, and symbol"
-msgstr ""
+msgstr "Lozinka mora sadržati malo slovo, veliko slovo, broj i simbol"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:87
 msgid "Password updated successfully"
@@ -2355,7 +2355,7 @@ msgstr "Lozinke se ne podudaraju"
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:36
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:123
 msgid "Passwords match"
-msgstr ""
+msgstr "Lozinke se poklapaju"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
@@ -2368,25 +2368,25 @@ msgstr "Pauzirano"
 msgid "Pending Invites"
 msgstr "Pozivi na čekanju"
 
-#: helpdesk/api/dashboard.py:541
+#: helpdesk/api/dashboard.py:552
 msgid "Percentage of Total Tickets by Channel"
 msgstr "Procenat ukupnog broja tiketa po kanalu"
 
-#: helpdesk/api/dashboard.py:501
+#: helpdesk/api/dashboard.py:512
 msgid "Percentage of Total Tickets by Priority"
 msgstr "Procenat ukupnog broja tiketa po prioritetu"
 
-#: helpdesk/api/dashboard.py:435
+#: helpdesk/api/dashboard.py:446
 msgid "Percentage of Total Tickets by Team"
 msgstr "Procenat ukupnog broja tiketa po timu"
 
-#: helpdesk/api/dashboard.py:468
+#: helpdesk/api/dashboard.py:479
 msgid "Percentage of Total Tickets by Type"
 msgstr "Procenat ukupnog broja tiketa po vrsti"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:88
 msgid "Personal mobile no"
-msgstr ""
+msgstr "Broj ličnog mobilnog telefona"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -2413,19 +2413,19 @@ msgstr "Molimo Vas da dodate prioritet {0} u sporazumu o nivou usluge {1}"
 
 #: desk/src/components/Settings/Profile/Profile.vue:218
 msgid "Please enter first name at least"
-msgstr ""
+msgstr "Molimo Vas da unesete barem ime"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:121
 msgid "Please fill all required fields"
-msgstr ""
+msgstr "Molimo Vas da popunite sva obavezna polja"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:342
 msgid "Please fill all required fields for Exotel"
-msgstr ""
+msgstr "Molimo Vas da popunite sva obavezna polja za Exotel"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:338
 msgid "Please fill all required fields for Twilio"
-msgstr ""
+msgstr "Molimo Vas da popunite sva obavezna polja za Twilio"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:41
 msgid "Please select weekly off day"
@@ -2433,7 +2433,7 @@ msgstr "Molimo Vas da izaberete nedeljni dan odmora"
 
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:38
 msgid "Policy Name"
-msgstr ""
+msgstr "Naziv politike"
 
 #. Label of the post_description_key (Data) field in DocType 'HD Support Search
 #. Source'
@@ -2500,7 +2500,7 @@ msgstr "Prioritet {0} je ponovljen."
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:7
 #: desk/src/components/Settings/Teams/TeamEdit.vue:132
 msgid "Product Experts"
-msgstr ""
+msgstr "Stručnjaci za proizvode"
 
 #: desk/src/components/Settings/Profile/Profile.vue:3
 msgid "Profile"
@@ -2508,7 +2508,7 @@ msgstr "Profil"
 
 #: desk/src/components/Settings/Profile/Profile.vue:234
 msgid "Profile updated"
-msgstr ""
+msgstr "Profil je ažuriran"
 
 #. Label of the public (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2527,7 +2527,7 @@ msgstr "Objavljeno na"
 
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.py:24
 msgid "Published articles must have content."
-msgstr ""
+msgstr "Objavljeni članci moraju imati sadržaj."
 
 #: desk/src/components/Settings/EmailEdit.vue:87
 msgid "Pull Emails"
@@ -2535,7 +2535,7 @@ msgstr "Povuci imejlove"
 
 #: desk/src/components/Settings/EmailEdit.vue:214
 msgid "Pulling emails, this may take a few minutes."
-msgstr ""
+msgstr "Preuzimanje imejlova, ovo može potrajati nekoliko minuta."
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:36
 msgid "Quarterly"
@@ -2566,13 +2566,13 @@ msgstr "Opseg"
 msgid "Rate Your Support Experience"
 msgstr "Ocenite svoje iskustvo podrške"
 
-#: helpdesk/api/dashboard.py:691
+#: helpdesk/api/dashboard.py:371
 msgid "Rated Tickets"
 msgstr "Ocenjeni tiketi"
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
-#: helpdesk/api/dashboard.py:703
+#: helpdesk/api/dashboard.py:382
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
@@ -2634,7 +2634,7 @@ msgstr "Reference"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:153
 msgid "Refresh Apps"
-msgstr ""
+msgstr "Osveži aplikacije"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:6
 msgid "Regenerate Search Index"
@@ -2646,7 +2646,7 @@ msgstr "Ukloni"
 
 #: desk/src/components/Settings/General/components/Branding.vue:96
 msgid "Remove Logo"
-msgstr ""
+msgstr "Ukloni logo"
 
 #: desk/src/components/Settings/Profile/Profile.vue:39
 msgid "Remove image"
@@ -2660,7 +2660,7 @@ msgstr "Preimenuj"
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:58
 #: desk/src/components/Settings/Teams/TeamEdit.vue:237
 msgid "Rename team"
-msgstr ""
+msgstr "Preimenuj tim"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -2681,11 +2681,11 @@ msgstr "Odgovor od kontakta"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:83
 msgid "Reply from agent"
-msgstr ""
+msgstr "Odgovor agenta"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:76
 msgid "Reply from contact"
-msgstr ""
+msgstr "Odgovor kontakta"
 
 #. Label of the request_key (Data) field in DocType 'HD Desk Account Request'
 #. Label of the request_key (Data) field in DocType 'HD Portal Signup Request'
@@ -2787,16 +2787,16 @@ msgstr "Odgovor i rešenje"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:194
 msgid "Response and resolution"
-msgstr ""
+msgstr "Odgovor i rezolucija"
 
 #. Label of the assign_within_team (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Restrict agent assignment to selected Team"
 msgstr "Ograniči dodelu agenata na izabrani tim"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:64
+#: desk/src/components/Settings/General/components/TicketSettings.vue:46
 msgid "Restrict agent assignment to selected team"
-msgstr ""
+msgstr "Ograniči dodelu agenta na odabrani tim"
 
 #. Label of the restrict_tickets_by_agent_group (Check) field in DocType 'HD
 #. Settings'
@@ -2806,11 +2806,11 @@ msgstr "Ograniči tikete po timu"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:24
 msgid "Restrict tickets by team"
-msgstr ""
+msgstr "Ograniči tikete po timu"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:27
 msgid "Restrict tickets to be viewed and managed by team members only."
-msgstr ""
+msgstr "Ograniči tikete da ih mogu pregledati i upravljati njima samo članovi tima."
 
 #. Label of the result_preview_field (Data) field in DocType 'HD Support Search
 #. Source'
@@ -2869,36 +2869,32 @@ msgstr "Status sporazuma o nivou usluge"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:443
 msgid "SLA policy created"
-msgstr ""
+msgstr "Politika sporazuma o nivou usluge je kreirana"
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:149
 msgid "SLA policy deleted"
-msgstr ""
+msgstr "Politika sporazuma o nivou usluge je obrisana"
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:124
 msgid "SLA policy duplicated"
-msgstr ""
+msgstr "Politika sporazuma o nivou usluge je duplirana"
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:166
 msgid "SLA policy status updated"
-msgstr ""
+msgstr "Status politike sporazuma o nivou usluge je ažuriran"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:481
 msgid "SLA policy updated"
-msgstr ""
+msgstr "Politika sporazuma o nivou usluge je ažurirana"
 
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:156
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:490
 msgid "SLA set as default cannot be disabled"
-msgstr ""
-
-#: helpdesk/api/dashboard.py:584 helpdesk/api/dashboard.py:619
-msgid "SLA_fulfilled"
-msgstr "SLA_fulfilled"
+msgstr "Sporazum o nivou usluge postavljen kao podrazumevani ne može biti onemogućen"
 
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:11
 msgid "SLAs align your team and customers with defined timelines for a reliable experience."
-msgstr ""
+msgstr "Sporazumi o nivou usluge usklađuju Vaš tim i klijente sa definisanim rokovima za pouzdano iskustvo."
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2924,7 +2920,7 @@ msgstr "Sačuvaj"
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:35
 msgid "Schedule name"
-msgstr ""
+msgstr "Naziv rasporeda"
 
 #. Label of the script (Code) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -2968,9 +2964,9 @@ msgstr "Upit za pretragu mora imate najmanje 2 karaktera"
 msgid "Select a Default Priority."
 msgstr "Izaberite podrazumevani prioritet."
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:124
+#: desk/src/components/Settings/General/components/TicketSettings.vue:105
 msgid "Select what type all tickets get by default."
-msgstr ""
+msgstr "Izaberite koju vrstu tiketa svi tiketi dobijaju podrazumevano."
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:41
 msgid "Select your weekly off day"
@@ -3004,7 +3000,7 @@ msgstr "Poslato korisniku koji je prijavio tiket nakon što je tiket zatvoren il
 
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:5
 msgid "Service Level Agreements (SLAs)"
-msgstr ""
+msgstr "Sporazumi o nivou usluge"
 
 #. Label of the service_level (Data) field in DocType 'HD Service Level
 #. Agreement'
@@ -3022,19 +3018,19 @@ msgstr "Postavi vreme odgovora za prioritet {0} u redu {1}."
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:90
 msgid "Set as default SLA"
-msgstr ""
+msgstr "Postavi kao podrazumevani sporazum o nivou usluge"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:246
 msgid "Set the default status assigned when a ticket is created, and the status to apply when a ticket is reopened. If not specified, the default status from HD Settings will be used."
-msgstr ""
+msgstr "Postavite podrazumevani status koji se dodeljuje kada se tiket kreira i status koji se primenjuje kada se tiket ponovo otvori. Ukoliko nije precizirano, koristiće se podrazumevani status iz podešavanja."
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:9
 msgid "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one"
-msgstr ""
+msgstr "Postavite radne dane, radno vreme i praznike izborom unapred definisanog rasporeda ili kreiranjem novog"
 
 #: desk/src/components/Settings/Holiday/Holidays.vue:5
 msgid "Set your team’s working days, hours, and holidays using a template or custom schedule."
-msgstr ""
+msgstr "Postavite radne dane, radno vreme i praznike za svoj tim koristeći šablon ili prilagođeni raspored."
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:123
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
@@ -3048,7 +3044,7 @@ msgstr "Podešavanja"
 
 #: desk/src/components/Settings/General/General.vue:221
 msgid "Settings updated"
-msgstr ""
+msgstr "Podešavanja su ažurirana"
 
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -3067,7 +3063,7 @@ msgstr "Podeli povratnu informaciju"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:64
 msgid "Share feedback"
-msgstr ""
+msgstr "Podeli povratnu informaciju"
 
 #. Label of the different_view (Check) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -3087,13 +3083,13 @@ msgstr "Preskoči radni tok imejla"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:26
 msgid "Skip email workflow"
-msgstr ""
+msgstr "Preskoči radni tok imejla"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:639
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:632
 msgid "Some error occurred while renaming assignment rule"
 msgstr "Došlo je do greške pri preimenovanju pravila dodeljivanja"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:623
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:616
 msgid "Some error occurred while updating assignment rule"
 msgstr "Došlo je do greške pri ažuriranju pravila dodeljivanja"
 
@@ -3181,7 +3177,7 @@ msgstr "Detalji statusa"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:242
 msgid "Status details"
-msgstr ""
+msgstr "Detalji statusa"
 
 #. Description of the 'Ticket Reopen status' (Link) field in DocType 'HD
 #. Service Level Agreement'
@@ -3328,7 +3324,7 @@ msgstr "Tim"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:36
 msgid "Team Name"
-msgstr ""
+msgstr "Naziv tima"
 
 #. Label of the agent_groups_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -3338,21 +3334,21 @@ msgstr "Ograničenja tima"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:131
 msgid "Team created"
-msgstr ""
+msgstr "Tim je kreiran"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:189
 #: desk/src/components/Settings/Teams/TeamsList.vue:196
 msgid "Team deleted"
-msgstr ""
+msgstr "Tim je obrisan"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:48
 msgid "Team name"
-msgstr ""
+msgstr "Naziv tima"
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:51
 #: desk/src/components/Settings/Teams/TeamEdit.vue:268
 msgid "Team renamed"
-msgstr ""
+msgstr "Tim je preimenovan"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:3
 msgid "Teams"
@@ -3364,7 +3360,7 @@ msgstr "Telefonija"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:383
 msgid "Telephony settings updated!"
-msgstr ""
+msgstr "Podešavanja telefonije su ažurirana!"
 
 #. Label of the template (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -3398,23 +3394,23 @@ msgstr "JSON uslov dodele '{0}' je nevažeći: {1}"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:13
 msgid "The feedback dialog will be shown, when a user tries to close a ticket from the customer portal."
-msgstr ""
+msgstr "Dijalog za povratne informacije će se prikazati kada korisnik pokuša da zatvori tiket sa portala za klijente."
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:54
 msgid "The holiday on {0} is not between From Date and To Date"
 msgstr "Praznik koji pada na {0} nije između datum početka i datuma završetka"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:179
+#: desk/src/components/Settings/General/components/TicketSettings.vue:160
 msgid "The number of days must be 1 or more"
-msgstr ""
+msgstr "Broj dana mora biti 1 ili više"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:40
 msgid "The status for sending feedback must be of <u>Resolved</u> category."
 msgstr "Status za slanje povratnih informacija mora biti u kategoriji <u>Rešeno</u>."
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:75
+#: desk/src/components/Settings/General/components/TicketSettings.vue:56
 msgid "The ticket status will automatically change whenever the agent respond to a ticket."
-msgstr ""
+msgstr "Status tiketa će se automatski promeniti svaki put kada agent odgovori na tiket."
 
 #. Description of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -3516,7 +3512,7 @@ msgstr "Tiket razdeljen iz"
 msgid "Ticket Summary"
 msgstr "Rezime tiketa"
 
-#: helpdesk/api/dashboard.py:611
+#: helpdesk/api/dashboard.py:290
 msgid "Ticket Trend"
 msgstr "Trend tiketa"
 
@@ -3536,7 +3532,7 @@ msgstr "Vrsta tiketa"
 msgid "Ticket does not exist."
 msgstr "Tiket ne postoji."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:314
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:318
 msgid "Ticket must be resolved with a feedback"
 msgstr "Tiket mora biti rešen sa povratnom informacijom"
 
@@ -3550,11 +3546,11 @@ msgstr "Tiket nije pronađen za dati ključ."
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:4
 msgid "Ticket settings"
-msgstr ""
+msgstr "Podešavanje tiketa"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:147
+#: desk/src/components/Settings/General/components/TicketSettings.vue:128
 msgid "Ticket status"
-msgstr ""
+msgstr "Status tiketa"
 
 #. Label of the ticket_type (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_ticket_type (Link) field in DocType 'HD Escalation Rule'
@@ -3567,23 +3563,23 @@ msgstr "Vrsta tiketa"
 msgid "Ticket-Search Analysis"
 msgstr "Analiza pretrage tiketa"
 
-#: helpdesk/api/dashboard.py:160 helpdesk/api/dashboard.py:614
+#: helpdesk/api/dashboard.py:152 helpdesk/api/dashboard.py:293
 msgid "Tickets"
 msgstr "Tiketi"
 
-#: helpdesk/api/dashboard.py:540
+#: helpdesk/api/dashboard.py:551
 msgid "Tickets by Channel"
 msgstr "Tiketi po kanalu"
 
-#: helpdesk/api/dashboard.py:500 helpdesk/api/dashboard.py:508
+#: helpdesk/api/dashboard.py:511 helpdesk/api/dashboard.py:519
 msgid "Tickets by Priority"
 msgstr "Tiketi po prioritetu"
 
-#: helpdesk/api/dashboard.py:434 helpdesk/api/dashboard.py:442
+#: helpdesk/api/dashboard.py:445 helpdesk/api/dashboard.py:453
 msgid "Tickets by Team"
 msgstr "Tiketi po timu"
 
-#: helpdesk/api/dashboard.py:467 helpdesk/api/dashboard.py:475
+#: helpdesk/api/dashboard.py:478 helpdesk/api/dashboard.py:486
 msgid "Tickets by Type"
 msgstr "Tiketi po vrsti"
 
@@ -3626,7 +3622,7 @@ msgstr "Datum završetka ne može biti pre datuma početka"
 #: desk/src/components/Settings/Holiday/HolidayView.vue:107
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:172
 msgid "To date"
-msgstr ""
+msgstr "Datum završetka"
 
 #: desk/src/components/Settings/EmailEdit.vue:147
 msgid "To know more about setting up email accounts, click"
@@ -3654,19 +3650,19 @@ msgstr "Ukupno praznika"
 msgid "Total Ticket"
 msgstr "Ukupan broj tiketa"
 
-#: helpdesk/api/dashboard.py:509
+#: helpdesk/api/dashboard.py:520
 msgid "Total Tickets by Priority"
 msgstr "Ukupan broj tiketa po prioritetu"
 
-#: helpdesk/api/dashboard.py:443
+#: helpdesk/api/dashboard.py:454
 msgid "Total Tickets by Team"
 msgstr "Ukupan broj tiketa po timu"
 
-#: helpdesk/api/dashboard.py:476
+#: helpdesk/api/dashboard.py:487
 msgid "Total Tickets by Type"
 msgstr "Ukupan broj tiketa po vrsti"
 
-#: helpdesk/api/dashboard.py:165
+#: helpdesk/api/dashboard.py:157
 msgid "Total number of tickets created"
 msgstr "Ukupan broj kreiranih tiketa"
 
@@ -3786,7 +3782,7 @@ msgstr "Vreme rešavanja za korisnika"
 
 #: desk/src/components/Settings/General/General.vue:44
 msgid "User signup"
-msgstr ""
+msgstr "Registracija korisnika"
 
 #. Label of the users (Table MultiSelect) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
@@ -3802,7 +3798,7 @@ msgstr "Važi od"
 #: desk/src/components/Settings/Holiday/HolidayView.vue:77
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:147
 msgid "Valid from"
-msgstr ""
+msgstr "Važi od"
 
 #. Label of the via_customer_portal (Check) field in DocType 'HD Ticket'
 #. Label of a field in the tickets Web Form
@@ -3813,7 +3809,7 @@ msgstr "Putem portala za klijente"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:281
 msgid "View Assignment rule"
-msgstr ""
+msgstr "Prikaži pravilo dodele"
 
 #. Label of the views (Int) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -3859,7 +3855,7 @@ msgstr "Reč"
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:5
 msgid "Work schedule and holidays"
-msgstr ""
+msgstr "Raspored rada i praznici"
 
 #. Label of the workday (Select) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
@@ -3877,7 +3873,7 @@ msgstr "Radni tok"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:4
 msgid "Workflow & knowledge base settings"
-msgstr ""
+msgstr "Podešavanja radnog toka i baze znanja"
 
 #. Label of the support_and_resolution_section_break (Section Break) field in
 #. DocType 'HD Service Level Agreement'
@@ -3896,25 +3892,25 @@ msgstr "Godišnje"
 msgid "Yellow"
 msgstr "Žuta"
 
-#: helpdesk/api/dashboard.py:24
+#: helpdesk/api/dashboard.py:34
 msgid "You are not allowed to view this dashboard data."
 msgstr "Nije Vam dozvoljeno da vidite podatke sa ove kontrolne table."
 
-#: helpdesk/utils.py:165
+#: helpdesk/utils.py:167
 msgid "You are not permitted to access this resource."
 msgstr "Nemate dozvolu da pristupite ovom resursu."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:525
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:527
 msgid "You are not permitted to add a comment"
 msgstr "Nije Vam dozvoljeno da dodate komentar"
 
 #: desk/src/App.vue:36
 msgid "You are now offline"
-msgstr ""
+msgstr "Sada ste van mreže"
 
 #: desk/src/App.vue:29
 msgid "You are now online"
-msgstr ""
+msgstr "Sada ste onlajn"
 
 #: desk/src/components/telephony/CallUI.vue:35
 msgid "You can change the default calling medium from the settings"
@@ -3938,21 +3934,17 @@ msgstr "Morate postaviti jedan sporazum o nivou usluge kao podrazumevani. Molimo
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:407
 msgid "Your old conditions will be overwritten. Are you sure you want to save?"
-msgstr ""
+msgstr "Vaši stari uslovi će biti prepisani. Da li ste sigurni da želite da sačuvate?"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:13
 msgid "back to email event list"
 msgstr "nazad na listu događaja imejla"
 
-#: helpdesk/api/dashboard.py:583
-msgid "closed"
-msgstr "zatvoreno"
-
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:43
 msgid "customize {0}"
 msgstr "prilagodi {0}"
 
-#: helpdesk/api/dashboard.py:334
+#: helpdesk/api/dashboard.py:215 helpdesk/api/dashboard.py:217
 msgid "days"
 msgstr "dani"
 
@@ -3973,7 +3965,7 @@ msgstr "je stupio u kontakt"
 msgid "here"
 msgstr "ovde"
 
-#: helpdesk/api/dashboard.py:280
+#: helpdesk/api/dashboard.py:196 helpdesk/api/dashboard.py:198
 msgid "hrs"
 msgstr "časovi"
 
@@ -3987,24 +3979,12 @@ msgstr "kanban"
 msgid "list"
 msgstr "lista"
 
-#: helpdesk/api/dashboard.py:582
-msgid "open"
-msgstr "otvoreno"
-
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "purple"
 msgstr "ljubičasta"
 
-#: helpdesk/api/dashboard.py:642
-msgid "rated_tickets"
-msgstr "rated_tickets"
-
-#: helpdesk/api/dashboard.py:641
-msgid "rating"
-msgstr "ocenjivanje"
-
-#: helpdesk/api/dashboard.py:384
+#: helpdesk/api/dashboard.py:233
 msgid "stars"
 msgstr "zvezde"
 
