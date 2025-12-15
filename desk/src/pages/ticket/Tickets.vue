@@ -988,6 +988,14 @@ function loadCardViewTickets() {
 }
 
 function applyCardFilters(filtersArg: CardFilters = cardFilters) {
+  // User is interacting with the sidebar filters; drop route-level filters
+  // so the manual selections are not overridden by stale query params.
+  if (route.query.filters) {
+    const newQuery = { ...route.query };
+    delete newQuery.filters;
+    router.replace({ query: newQuery });
+  }
+
   const sourceFilters = filtersArg || cardFilters;
   updateCardFilters(sourceFilters);
 
