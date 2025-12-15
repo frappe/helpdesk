@@ -98,6 +98,16 @@
                   {{ ticket.priority || "No priority" }}
                 </span>
               </div>
+              <Dropdown :options="statusOptionsList(ticket)" placement="bottom-start">
+                <button
+                  class="flex items-center gap-1.5 rounded-md px-0.5 py-1 text-ink-gray-9 transition-colors hover:text-ink-gray-8"
+                  @click.stop
+                >
+                  <span class="h-2.5 w-2.5 rounded-full" :class="statusDot(ticket)" />
+                  <span class="font-medium">{{ statusLabel(ticket) }}</span>
+                  <LucideChevronDown class="h-3.5 w-3.5 text-ink-gray-6" />
+                </button>
+              </Dropdown>
               <div
                 v-if="assigneeName(ticket)"
                 class="inline-flex items-center gap-1.5 rounded-full border border-outline-gray-2 bg-surface-gray-1 px-2 py-0.5 text-xs font-medium text-ink-gray-8"
@@ -112,16 +122,6 @@
                 <LucideUsers class="h-3.5 w-3.5 text-ink-gray-6" />
                 <span class="truncate">Team: {{ teamName(ticket) }}</span>
               </div>
-              <Dropdown :options="statusOptionsList(ticket)" placement="bottom-start">
-                <button
-                  class="flex items-center gap-1.5 rounded-md px-0.5 py-1 text-ink-gray-9 transition-colors hover:text-ink-gray-8"
-                  @click.stop
-                >
-                  <span class="h-2.5 w-2.5 rounded-full" :class="statusDot(ticket)" />
-                  <span class="font-medium">{{ statusLabel(ticket) }}</span>
-                  <LucideChevronDown class="h-3.5 w-3.5 text-ink-gray-6" />
-                </button>
-              </Dropdown>
             </div>
           </div>
         </div>
@@ -225,6 +225,17 @@ function assigneeName(row: any) {
     const primary = row.assignees[0];
     if (typeof primary === "string") return primary;
     return primary?.full_name || primary?.name || primary?.email || "";
+  }
+  // Fallback to _assign JSON (card API exposes this)
+  if (row?._assign) {
+    try {
+      const parsed = JSON.parse(row._assign);
+      if (Array.isArray(parsed) && parsed.length) {
+        return parsed[0];
+      }
+    } catch (e) {
+      // ignore JSON parse errors and fall through to other fields
+    }
   }
   return row?.assigned_to || row?.owner || "";
 }
