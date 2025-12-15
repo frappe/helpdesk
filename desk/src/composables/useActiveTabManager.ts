@@ -12,7 +12,7 @@ export function useActiveTabManager(tabs) {
   const changeTabTo = (tab) => {
     tabIndex.value = tab;
     if (tab == 0) {
-      router.replace({ path: route.path });
+      router.replace({ path: route.path, query: route.query });
     } else {
       setActiveTabInUrl(tabs.value?.[tab]?.name || tabs.value[0].name);
     }
@@ -44,7 +44,7 @@ export function useActiveTabManager(tabs) {
     }
 
     tabIndex.value = 0;
-    router.replace({ path: route.path });
+    router.replace({ path: route.path, query: route.query });
   };
 
   // Handle when page is navigated
@@ -55,7 +55,7 @@ export function useActiveTabManager(tabs) {
       if (index === -1) index = 0;
 
       if (index == 0) {
-        router.replace({ path: route.path });
+        router.replace({ path: route.path, query: route.query });
       }
 
       tabIndex.value = index;
