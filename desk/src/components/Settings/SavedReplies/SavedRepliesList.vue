@@ -220,10 +220,13 @@ import { useUserStore } from "../../../stores/user";
 import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
 import GlobeIcon from "~icons/lucide/globe";
-import { SavedReplyListResourceSymbol } from "../../../types";
+import { SavedReply, SavedReplyListResourceSymbol } from "../../../types";
 import SavedReplyIcon from "../../icons/SavedReplyIcon.vue";
+import { storeToRefs } from "pinia";
+import { useConfigStore } from "@/stores/config";
 
 const { getUser } = useUserStore();
+const { disableGlobalScopeForSavedReplies } = storeToRefs(useConfigStore());
 
 const savedRepliesSearchQuery = inject<Ref<string>>("savedRepliesSearchQuery");
 const savedRepliesActiveScreen = inject<any>("savedRepliesActiveScreen");
@@ -246,7 +249,7 @@ const isConfirmingDelete = ref(false);
 
 const savedRepliesListResource = inject(SavedReplyListResourceSymbol);
 
-const dropdownOptions = (savedReply) => [
+const dropdownOptions = (savedReply: SavedReply) => [
   {
     label: __("Duplicate"),
     onClick: () => {
@@ -265,7 +268,7 @@ const dropdownOptions = (savedReply) => [
   }),
 ];
 
-const deleteSavedReply = (savedReply) => {
+const deleteSavedReply = (savedReply: SavedReply) => {
   if (!isConfirmingDelete.value) {
     isConfirmingDelete.value = true;
     return;
@@ -282,7 +285,7 @@ const duplicate = async () => {
   await call("frappe.client.get", {
     doctype: "HD Saved Reply",
     name: duplicateDialog.value.name,
-  }).then((data) => {
+  }).then((data: SavedReply) => {
     savedRepliesListResource?.insert.submit(
       {
         ...data,
@@ -307,40 +310,42 @@ const duplicate = async () => {
   });
 };
 
-const filterOptions = computed(() => [
-  {
-    label: "All",
-    value: "All",
-    onSelect: () => {
-      applyFilter("All");
+const filterOptions = computed(() => {
+  const options = [
+    {
+      label: "All",
+      value: "All",
+      onSelect: () => {
+        applyFilter("All");
+      },
     },
-    icon: undefined,
-  },
-  {
-    label: "Personal",
-    value: "Personal",
-    onSelect: () => {
-      applyFilter("Personal");
+    {
+      label: "Personal",
+      value: "Personal",
+      onSelect: () => {
+        applyFilter("Personal");
+      },
     },
-    icon: UserIcon,
-  },
-  {
-    label: "My Team",
-    value: "Team",
-    onSelect: () => {
-      applyFilter("Team");
+    {
+      label: "My Team",
+      value: "Team",
+      onSelect: () => {
+        applyFilter("Team");
+      },
     },
-    icon: UsersIcon,
-  },
-  {
-    label: "Global",
-    value: "Global",
-    onSelect: () => {
-      applyFilter("Global");
+    {
+      label: "Global",
+      value: "Global",
+      onSelect: () => {
+        applyFilter("Global");
+      },
     },
-    icon: GlobeIcon,
-  },
-]);
+  ];
+  if (disableGlobalScopeForSavedReplies.value) {
+    options.pop();
+  }
+  return options;
+});
 
 const applyFilter = (scope: string) => {
   if (!savedRepliesListResource) return;
@@ -353,14 +358,33 @@ const applyFilter = (scope: string) => {
 };
 
 const getScopeIcon = (scope: string) => {
-  return filterOptions.value.find((x) => x.value === scope)?.icon;
+  const icons = [
+    {
+      label: "Personal",
+      icon: UserIcon,
+    },
+    {
+      label: "Team",
+      icon: UsersIcon,
+    },
+    {
+      label: "Global",
+      icon: GlobeIcon,
+    },
+  ];
+  return icons.find((x) => x.label === scope)?.icon;
 };
 
-watch(savedRepliesSearchQuery, (newValue) => {
-  savedRepliesListResource.filters = {
-    ...savedRepliesListResource.filters,
-    title: ["like", `%${newValue}%`],
-  };
-  savedRepliesListResource.list.reload();
-});
+watch(
+  () => savedRepliesSearchQuery?.value,
+  (newValue) => {
+    if (!savedRepliesListResource) return;
+
+    savedRepliesListResource.filters = {
+      ...savedRepliesListResource.filters,
+      title: ["like", `%${newValue}%`],
+    };
+    savedRepliesListResource.list.reload();
+  }
+);
 </script>

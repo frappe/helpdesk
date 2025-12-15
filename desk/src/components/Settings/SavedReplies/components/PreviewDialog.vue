@@ -29,6 +29,7 @@
               :bubble-menu="menuButtons"
               :content="dialogModel.preview"
               :editable="false"
+              class="pointer-events-none"
             />
             <div
               v-if="getResponsePreviewResource.loading"

@@ -57,8 +57,8 @@
                 {{ template.title }}
               </div>
               <TextEditor
-                v-if="template.response"
-                :content="template.response"
+                v-if="template.message"
+                :content="template.message"
                 :editable="false"
                 editor-class="!prose-sm max-w-none !text-sm text-gray-600 focus:outline-none"
                 class="flex-1 overflow-hidden pointer-events-none"
@@ -103,6 +103,9 @@ import {
 import { ref, computed, nextTick, watch, onUnmounted } from "vue";
 import { showEmailBox } from "../pages/ticket/modalStates";
 import { useStorage } from "@vueuse/core";
+import { SavedReply } from "@/types";
+import { storeToRefs } from "pinia";
+import { useConfigStore } from "@/stores/config";
 
 const props = defineProps({
   doctype: {
@@ -118,24 +121,31 @@ const props = defineProps({
 const show = defineModel();
 const searchInput = ref("");
 const activeFilter = useStorage("saved-replies-filter", "Personal");
+const { disableGlobalScopeForSavedReplies } = storeToRefs(useConfigStore());
 
-const filters = computed(() => [
-  {
-    label: "Global",
-    value: "Global",
-    onClick: () => (activeFilter.value = "Global"),
-  },
-  {
-    label: "My Team",
-    value: "Team",
-    onClick: () => (activeFilter.value = "My Team"),
-  },
-  {
-    label: "Personal",
-    value: "Personal",
-    onClick: () => (activeFilter.value = "Personal"),
-  },
-]);
+const filters = computed(() => {
+  const options = [
+    {
+      label: "Global",
+      value: "Global",
+      onClick: () => (activeFilter.value = "Global"),
+    },
+    {
+      label: "My Team",
+      value: "Team",
+      onClick: () => (activeFilter.value = "My Team"),
+    },
+    {
+      label: "Personal",
+      value: "Personal",
+      onClick: () => (activeFilter.value = "Personal"),
+    },
+  ];
+  if (disableGlobalScopeForSavedReplies.value) {
+    options.shift();
+  }
+  return options;
+});
 
 const emit = defineEmits(["apply"]);
 
@@ -147,7 +157,7 @@ const selectedTemplate = ref({
 
 const savedReplyListResource = createListResource({
   doctype: "HD Saved Reply",
-  fields: ["name", "title", "owner", "scope", "response"],
+  fields: ["name", "title", "owner", "scope", "message"],
   filters: {
     scope: [
       "=",
@@ -165,7 +175,7 @@ onUnmounted(() => {
   showEmailBox.value = true;
 });
 
-const onTemplateSelect = (template) => {
+const onTemplateSelect = (template: SavedReply) => {
   if (selectedTemplate.value.isLoading) return;
   selectedTemplate.value = {
     name: template.name,
@@ -177,7 +187,7 @@ const onTemplateSelect = (template) => {
       saved_reply_id: template.name,
       ticket_id: props.ticketId,
     },
-    onSuccess: (data) => {
+    onSuccess: (data: string) => {
       selectedTemplate.value = {
         name: "",
         isLoading: false,

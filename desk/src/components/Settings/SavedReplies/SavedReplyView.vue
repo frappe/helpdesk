@@ -112,18 +112,18 @@
             editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5"
             ref="content"
             :bubble-menu="false"
-            :content="savedReplyData.response"
+            :content="savedReplyData.message"
             @change="
               (val) => {
-                savedReplyData.response = val;
-                validateData('response');
+                savedReplyData.message = val;
+                validateData('message');
               }
             "
             :fixed-menu="menuButtons"
             :extensions="[FieldAutocomplete]"
             :placeholder="'Hello {{ contact }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ full_name }}'"
           />
-          <ErrorMessage class="text-p-sm" :message="errors.response" />
+          <ErrorMessage class="text-p-sm" :message="errors.message" />
         </div>
       </div>
     </template>
@@ -167,7 +167,7 @@ import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
 import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
 import GlobeIcon from "~icons/lucide/globe";
-import { SavedReplyListResourceSymbol } from "../../../types";
+import { SavedReply, SavedReplyListResourceSymbol, Team } from "../../../types";
 
 const showConfirmDialog = ref({
   show: false,
@@ -187,41 +187,50 @@ const previewDialog = ref({
 });
 const content = ref();
 
-const { teamRestrictionApplied } = storeToRefs(useConfigStore());
+const { teamRestrictionApplied, disableGlobalScopeForSavedReplies } =
+  storeToRefs(useConfigStore());
 const { userTeams, isAdmin } = storeToRefs(useAuthStore());
 
 const savedReplyData = ref({
   name: "",
   title: "",
   scope: "Personal",
-  response: "",
+  message: "",
   teams: [],
 });
 const isLoading = ref(false);
 const initialData = ref("");
 const errors = ref({
   title: "",
-  response: "",
+  message: "",
   teams: "",
 });
 
-const scopeDropdownOptions = computed(() => [
-  {
-    label: "Personal",
-    value: "Personal",
-    icon: UserIcon,
-  },
-  {
-    label: "Team",
-    value: "Team",
-    icon: UsersIcon,
-  },
-  {
-    label: "Global",
-    value: "Global",
-    icon: GlobeIcon,
-  },
-]);
+const scopeDropdownOptions = computed(() => {
+  const options = [
+    {
+      label: "Personal",
+      value: "Personal",
+      icon: UserIcon,
+    },
+    {
+      label: "Team",
+      value: "Team",
+      icon: UsersIcon,
+    },
+    {
+      label: "Global",
+      value: "Global",
+      icon: GlobeIcon,
+    },
+  ];
+
+  if (disableGlobalScopeForSavedReplies.value) {
+    options.pop();
+  }
+
+  return options;
+});
 
 const getSavedReplyData = createResource({
   url: "frappe.client.get",
@@ -230,12 +239,12 @@ const getSavedReplyData = createResource({
     name: savedRepliesActiveScreen.value.data?.name,
   },
   auto: false,
-  onSuccess: (data) => {
+  onSuccess: (data: SavedReply) => {
     savedReplyData.value = {
       name: data.name,
       title: data.title,
       scope: data.scope,
-      response: data.response,
+      message: data.message,
       teams: data.teams?.map((team) => team.team) || [],
     };
     initialData.value = JSON.stringify(savedReplyData.value);
@@ -248,7 +257,7 @@ const getTeamsListResource = createListResource({
   fields: ["name"],
   start: 0,
   pageLength: 999,
-  transform: (data) => {
+  transform: (data: Array<Team>) => {
     return data.map((item) => ({
       value: item.name,
       label: item.name,
@@ -259,7 +268,7 @@ const getTeamsListResource = createListResource({
 const teamsList = computed(() => {
   if (!isAdmin.value && teamRestrictionApplied.value) {
     return (
-      userTeams.value?.map((team) => ({
+      userTeams.value?.map((team: string) => ({
         value: team,
         label: team,
       })) || []
@@ -270,7 +279,7 @@ const teamsList = computed(() => {
 
 const onShowPreview = () => {
   previewDialog.value.show = true;
-  previewDialog.value.savedReply = savedReplyData.value.response;
+  previewDialog.value.savedReply = savedReplyData.value.message;
 };
 
 if (savedRepliesActiveScreen.value.data?.name) {
@@ -325,7 +334,7 @@ const createSavedReply = () => {
   savedRepliesListResource?.insert.submit(
     {
       title: savedReplyData.value.title,
-      response: savedReplyData.value.response,
+      message: savedReplyData.value.message,
       scope: savedReplyData.value.scope,
       teams: savedReplyData.value.teams.map((team) => ({
         team: team,
@@ -355,7 +364,7 @@ const updateSavedReply = async () => {
       name: savedReplyData.value.name,
       title: savedReplyData.value.title,
       subject: savedReplyData.value.title,
-      response: savedReplyData.value.response,
+      message: savedReplyData.value.message,
       scope: savedReplyData.value.scope,
       teams: savedReplyData.value.teams.map((team) => ({
         team: team,
@@ -377,7 +386,7 @@ const getScopeIcon = (scope: string) => {
 };
 
 const validateData = (key?: string) => {
-  const validateField = (key) => {
+  const validateField = (key: string) => {
     switch (key) {
       case "title":
         if (!savedReplyData.value.title) {
@@ -387,11 +396,11 @@ const validateData = (key?: string) => {
         }
         break;
 
-      case "response":
+      case "message":
         if (!content.value?.editor?.state?.doc?.textContent?.trim()?.length) {
-          errors.value.response = __("Response is required");
+          errors.value.message = __("Response is required");
         } else {
-          errors.value.response = "";
+          errors.value.message = "";
         }
         break;
 
