@@ -100,6 +100,7 @@
               Status
             </label>
             <MultiSelectCombobox
+              :key="selectedStatusOption ? selectedStatusOption.value ?? selectedStatusOption.label : 'all-status'"
               :model-value="selectedStatusOption"
               :options="statusFilterOptions"
               placeholder="All status"
