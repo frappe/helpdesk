@@ -252,6 +252,13 @@ const quickViews = computed(() => {
       },
     },
     {
+      label: "My all tickets",
+      icon: LucideUser,
+      filters: {
+        _assign: ["like", `%"${currentUserEmail.value}"%`],
+      },
+    },
+    {
       label: "Tickets I raised",
       icon: LucideUser,
       filters: {
