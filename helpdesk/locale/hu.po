@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2025-12-13 22:40\n"
+"PO-Revision-Date: 2025-12-15 23:04\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -120,7 +120,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentSchedule.vue:42
 msgid "Active"
-msgstr ""
+msgstr "Aktív"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
@@ -203,7 +203,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Administrator"
-msgstr ""
+msgstr "Rendszergazda"
 
 #. Name of a role
 #. Label of the to_agent (Link) field in DocType 'HD Escalation Rule'
@@ -275,7 +275,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "All"
-msgstr ""
+msgstr "Összes"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
@@ -378,7 +378,7 @@ msgstr "Hozzám rendelt"
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:62
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:49
 msgid "Assigned To"
-msgstr ""
+msgstr "Hozzárendelve"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
 msgid "Assignee Rules"
@@ -391,7 +391,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Assignment"
-msgstr ""
+msgstr "Feladat"
 
 #. Label of the filters_section (Section Break) field in DocType 'HD Service
 #. Level Agreement'
@@ -572,7 +572,7 @@ msgstr "Alapértelmezett URL"
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:9
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:9
 msgid "Based On"
-msgstr ""
+msgstr "Alapján"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:34
 msgid "Based on your HR Policy, select your leave allocation period's end date"
@@ -669,7 +669,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:40
 msgid "Change"
-msgstr ""
+msgstr "Változás"
 
 #: desk/src/components/Settings/Profile/Profile.vue:123
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:2
@@ -750,12 +750,12 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:44
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:58
 msgid "Close"
-msgstr ""
+msgstr "Bezárás"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Closed"
-msgstr ""
+msgstr "Lezárva"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
 msgid "Closed or rated tickets cannot be updated by non-agents"
@@ -838,7 +838,7 @@ msgstr ""
 #. Label of the contacts (Table) field in DocType 'HD Organization'
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 msgid "Contacts"
-msgstr ""
+msgstr "Kapcsolatok"
 
 #. Label of the content_section (Section Break) field in DocType 'HD Article'
 #. Label of the content (Text Editor) field in DocType 'HD Article'
@@ -867,7 +867,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:94
 msgid "Create"
-msgstr ""
+msgstr "Létrehozás"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:5
 msgid "Create and manage teams and assign agents to specific teams."
@@ -914,7 +914,7 @@ msgstr "Cián"
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.py:77
 msgid "Date"
-msgstr ""
+msgstr "Dátum"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:29
 msgid "Day count for auto closing tickets cannot be negative or zero"
@@ -922,7 +922,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentSchedule.vue:38
 msgid "Days"
-msgstr ""
+msgstr "Napok"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:53
 msgid "Default Inbox"
@@ -984,7 +984,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamEdit.vue:348
 #: desk/src/components/Settings/Teams/TeamEdit.vue:350
 msgid "Delete"
-msgstr ""
+msgstr "Törlés"
 
 #. Label of the description (Text) field in DocType 'HD Article Category'
 #. Label of the description (Text Editor) field in DocType 'HD Holiday'
@@ -1010,7 +1010,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Description"
-msgstr ""
+msgstr "Leírás"
 
 #. Label of the description_template (Text Editor) field in DocType 'HD Ticket
 #. Template'
@@ -1042,7 +1042,7 @@ msgstr ""
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Disabled"
-msgstr ""
+msgstr "Tiltva"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:29
 msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
@@ -1078,7 +1078,7 @@ msgstr "Domén"
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Draft"
-msgstr ""
+msgstr "Vázlat"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:72
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:137
@@ -1087,7 +1087,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:61
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:100
 msgid "Duplicate"
-msgstr ""
+msgstr "Másol"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:53
 msgid "Duplicate Assignment Rule"
@@ -1209,7 +1209,7 @@ msgstr "Engedélyezve"
 #. Label of the end_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "End Date"
-msgstr ""
+msgstr "Befejezés dátuma"
 
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
@@ -1253,7 +1253,7 @@ msgstr ""
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
-msgstr ""
+msgstr "Sikertelen"
 
 #: desk/src/components/Settings/EmailAdd.vue:167
 msgid "Failed to create email account, Invalid credentials"
@@ -1292,7 +1292,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback"
-msgstr ""
+msgstr "Visszajelzés"
 
 #. Label of the feedback_extra (Small Text) field in DocType 'HD Email
 #. Feedback'
@@ -1373,7 +1373,7 @@ msgstr "Mezők"
 #. Label of the filters (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
-msgstr ""
+msgstr "Szűrők"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:76
 msgid "Find out all of the variables that can be used in the content"
@@ -1422,7 +1422,7 @@ msgstr "Péntek"
 #. Label of the user_from (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "From"
-msgstr ""
+msgstr "-tól"
 
 #. Label of the from_date (Date) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -1431,7 +1431,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:17
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:17
 msgid "From Date"
-msgstr ""
+msgstr "Dátumtól"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:85
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:155
@@ -1473,7 +1473,7 @@ msgstr "Zöld"
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Group By"
-msgstr ""
+msgstr "Csoportosítva"
 
 #. Label of the group_by_field (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1880,7 +1880,7 @@ msgstr ""
 #. Label of the is_active (Check) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Is Active"
-msgstr ""
+msgstr "Aktív"
 
 #. Label of the is_customer_portal (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2091,7 +2091,7 @@ msgstr "Hétfő"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:35
 msgid "Monthly"
-msgstr ""
+msgstr "Havi"
 
 #. Label of the category_name (Data) field in DocType 'HD Article Category'
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
@@ -2109,7 +2109,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Name"
-msgstr ""
+msgstr "Név"
 
 #. Label of the name_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2136,7 +2136,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamsList.vue:10
 #: desk/src/components/Settings/Teams/TeamsList.vue:124
 msgid "New"
-msgstr ""
+msgstr "Új"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:9
 msgid "New Assignment Rule"
@@ -2238,7 +2238,7 @@ msgstr ""
 
 #: helpdesk/utils.py:168
 msgid "Not Allowed"
-msgstr ""
+msgstr "Nem Engedélyezett"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:250
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:270
@@ -2287,7 +2287,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Open"
-msgstr ""
+msgstr "Nyitott"
 
 #. Description of the 'Category' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -2484,7 +2484,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Priority"
-msgstr ""
+msgstr "Prioritás"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:84
 msgid "Priority <u>{0}</u> must be included in the SLA {1}."
@@ -2521,7 +2521,7 @@ msgstr "Közzétett"
 #. Label of the published_on (Datetime) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Published On"
-msgstr ""
+msgstr "Közzétette Ekkor"
 
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.py:24
 msgid "Published articles must have content."
@@ -2537,7 +2537,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:36
 msgid "Quarterly"
-msgstr ""
+msgstr "Negyedévenként"
 
 #. Label of the query_options_sb (Section Break) field in DocType 'HD Support
 #. Search Source'
@@ -2557,7 +2557,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:31
 msgid "Range"
-msgstr ""
+msgstr "Tartomány"
 
 #. Title of the email-feedback Web Form
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
@@ -2615,7 +2615,7 @@ msgstr "Piros"
 #. Label of the reference_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Reference"
-msgstr ""
+msgstr "Hivatkozás"
 
 #. Label of the reference_ticket (Link) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
@@ -2653,7 +2653,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamEdit.vue:292
 #: desk/src/components/Settings/Teams/TeamsList.vue:172
 msgid "Rename"
-msgstr ""
+msgstr "Átnevezés"
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:58
 #: desk/src/components/Settings/Teams/TeamEdit.vue:237
@@ -2663,7 +2663,7 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Replied"
-msgstr ""
+msgstr "Válaszolt"
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -2703,7 +2703,7 @@ msgstr ""
 
 #: desk/src/components/SelectDropdown.vue:47
 msgid "Reset"
-msgstr ""
+msgstr "Visszaállít"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:95
 msgid "Reset Content"
@@ -2914,7 +2914,7 @@ msgstr "Szombat"
 #: desk/src/components/Settings/Telephony/Telephony.vue:22
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Save"
-msgstr ""
+msgstr "Mentés"
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:35
 msgid "Schedule name"
@@ -2934,7 +2934,7 @@ msgstr "Szkript"
 #: desk/src/components/Settings/Teams/TeamsList.vue:25
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Search"
-msgstr ""
+msgstr "Keresés"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:10
 msgid "Search Index Regenerated"
@@ -3038,7 +3038,7 @@ msgstr ""
 #: desk/src/components/Settings/SettingsModal.vue:13
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Settings"
-msgstr ""
+msgstr "Beállítások"
 
 #: desk/src/components/Settings/General/General.vue:221
 msgid "Settings updated"
@@ -3133,7 +3133,7 @@ msgstr ""
 #. Label of the start_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Start Date"
-msgstr ""
+msgstr "Kezdés Dátuma"
 
 #. Label of the start_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
@@ -3155,7 +3155,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:31
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Status"
-msgstr ""
+msgstr "Állapot"
 
 #. Label of the auto_close_status (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -3213,7 +3213,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:30
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Subject"
-msgstr ""
+msgstr "Tárgy"
 
 #. Label of the subject_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -3362,7 +3362,7 @@ msgstr ""
 #. Label of the template (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Template"
-msgstr ""
+msgstr "Sablon"
 
 #. Label of the template_name (Data) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -3591,7 +3591,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
 msgid "Title"
-msgstr ""
+msgstr "Cím"
 
 #. Label of the title_slug (Data) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -3601,7 +3601,7 @@ msgstr ""
 #. Label of the user_to (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "To"
-msgstr ""
+msgstr "Címzett"
 
 #. Label of the to_date (Date) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -3610,7 +3610,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:24
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:24
 msgid "To Date"
-msgstr ""
+msgstr "Dátumig"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:45
 msgid "To Date cannot be before From Date"
@@ -3631,7 +3631,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:98
 msgid "Total"
-msgstr ""
+msgstr "Összesen"
 
 #. Label of the total_hold_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -3676,7 +3676,7 @@ msgstr "Kedd"
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Type"
-msgstr ""
+msgstr "Típus"
 
 #. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
@@ -3724,7 +3724,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:47
 msgid "Update"
-msgstr ""
+msgstr "Frissítés"
 
 #: desk/src/components/Settings/EmailEdit.vue:80
 msgid "Update Account"
@@ -3766,7 +3766,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:55
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:83
 msgid "User"
-msgstr ""
+msgstr "Felhasználó"
 
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.py:132
 msgid "User Not found"
@@ -3811,7 +3811,7 @@ msgstr ""
 #. Label of the views (Int) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Views"
-msgstr ""
+msgstr "Megtekintések"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -3828,7 +3828,7 @@ msgstr "Szerda"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:34
 msgid "Weekly"
-msgstr ""
+msgstr "Heti"
 
 #. Label of the weekly_off (Check) field in DocType 'HD Holiday'
 #. Label of the weekly_off (Select) field in DocType 'HD Service Holiday List'
@@ -3882,7 +3882,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:37
 msgid "Yearly"
-msgstr ""
+msgstr "Évi"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
