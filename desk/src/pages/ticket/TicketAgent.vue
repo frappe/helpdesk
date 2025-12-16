@@ -107,6 +107,14 @@ const viewers = computed(
 );
 const { startViewing, stopViewing } = viewerComposable.value;
 
+function openDocRoom(ticketId: string) {
+  $socket.emit("doc_open", "HD Ticket", ticketId);
+}
+
+function closeDocRoom(ticketId: string) {
+  $socket.emit("doc_close", "HD Ticket", ticketId);
+}
+
 // handling for faster navigation between tickets
 watch(
   () => route.params.ticketId,
@@ -115,6 +123,8 @@ watch(
 
     if (oldTicketId) stopViewing(oldTicketId as string);
     startViewing(newTicketId as string);
+    if (oldTicketId) closeDocRoom(oldTicketId as string);
+    openDocRoom(newTicketId as string);
   },
   { immediate: true }
 );
@@ -172,6 +182,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   stopViewing(props.ticketId);
+  closeDocRoom(props.ticketId);
   showEmailBox.value = false;
   showCommentBox.value = false;
 
