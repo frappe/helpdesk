@@ -33,7 +33,7 @@ import LucidePieChart from "~icons/lucide/pie-chart";
 type StatusBreakdown = {
   open: number;
   resolved: number;
-  closed: number;
+  pending: number;
   total: number;
 };
 
@@ -53,11 +53,11 @@ const chartConfig = computed(() => {
     data: [
       { label: "Open", value: props.breakdown.open },
       { label: "Resolved", value: props.breakdown.resolved },
-      { label: "Closed", value: props.breakdown.closed },
+      { label: "Pending", value: props.breakdown.pending },
     ],
     categoryColumn: "label",
     valueColumn: "value",
-    colors: ["#318AD8", "#48BB78", "#9F7AEA"],
+    colors: ["#318AD8", "#48BB78", "#F6AD55"],
     showInlineLabels: false,
   };
 });
