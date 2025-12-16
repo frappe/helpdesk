@@ -97,7 +97,23 @@ def get_tickets_for_card_view(
 
         owner = raw_filters.get("owner")
         if owner:
-            filter_list.append(["contact", "=", owner])
+            # Owner refers to the ticket owner (User), not the contact.
+            # Align with list view / dashboard semantics so counts and
+            # card-view results stay consistent.
+            filter_list.append(["owner", "=", owner])
+
+        # Date range / creation filters (from dashboard duration or query params)
+        creation_filter = raw_filters.get("creation")
+        if isinstance(creation_filter, list) and len(creation_filter) == 2:
+            operator, value = creation_filter
+            if isinstance(operator, str):
+                operator = operator.lower()
+            # Between date range: ["between", [from_date, to_date]]
+            if operator == "between" and isinstance(value, list) and len(value) == 2:
+                filter_list.append(["creation", "between", value])
+            # Direct comparisons: [">=", date], ["<=", date], etc.
+            elif operator in (">=", "<=", ">", "<", "="):
+                filter_list.append(["creation", operator, value])
 
         return filter_list
 

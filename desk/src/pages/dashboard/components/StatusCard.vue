@@ -49,14 +49,24 @@ function handleClick() {
   if (props.route) {
     // Merge status filters with team/agent/owner/date filters
     const combinedFilters: Record<string, any> = { ...props.filters };
-    
-    // Add date range filter if provided
-    if (props.fromDate && props.toDate) {
-      combinedFilters.creation = ["between", [props.fromDate, props.toDate]];
-    } else if (props.fromDate) {
-      combinedFilters.creation = [">=", props.fromDate];
-    } else if (props.toDate) {
-      combinedFilters.creation = ["<=", props.toDate];
+
+    const isTodayCard = combinedFilters.today === true;
+
+    if (isTodayCard) {
+      // Special handling for "Today's Tickets" card:
+      // ignore the dashboard period and filter strictly by today's date.
+      delete combinedFilters.today;
+      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+      combinedFilters.creation = ["between", [today, today]];
+    } else {
+      // Add date range filter if provided
+      if (props.fromDate && props.toDate) {
+        combinedFilters.creation = ["between", [props.fromDate, props.toDate]];
+      } else if (props.fromDate) {
+        combinedFilters.creation = [">=", props.fromDate];
+      } else if (props.toDate) {
+        combinedFilters.creation = ["<=", props.toDate];
+      }
     }
     
     // Add team filter if selected

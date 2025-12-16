@@ -715,10 +715,6 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     resolved_cond = ticket.status.isin(resolved_only_statuses) if resolved_only_statuses else None
     resolved_count = get_count(resolved_cond) if resolved_cond else 0
 
-    # Closed: Tickets with status "Closed" specifically
-    closed_cond = ticket.status == "Closed"
-    closed_count = get_count(closed_cond)
-
     # Pending: Tickets with status containing "pending"
     pending_statuses = frappe.get_all(
         "HD Ticket Status",
@@ -732,14 +728,17 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     todays_tickets = get_count(todays_tickets_cond)
 
     # Format filters to match the query logic
+    # Use a consistent ["in", [...]] shape for status so the tickets page
+    # always receives the same structure from dashboard clicks.
+    open_filter = {"status": ["in", ["Open"]]}
     resolved_filter = {"status": ["in", resolved_only_statuses]} if resolved_only_statuses else {}
-    closed_filter = {"status": "Closed"}
     pending_filter = {"status": ["in", pending_statuses]} if pending_statuses else {}
     
+    # Return only Open, Resolved and Pending status cards (plus Today's Tickets),
+    # since these are the only effective backend statuses we want to expose.
     return [
-        {"label": _("Open"), "count": open_count, "status_filter": {"status": "Open"}, "color": "#318AD8"},
+        {"label": _("Open"), "count": open_count, "status_filter": open_filter, "color": "#318AD8"},
         {"label": _("Resolved"), "count": resolved_count, "status_filter": resolved_filter, "color": "#48BB78"},
-        {"label": _("Closed"), "count": closed_count, "status_filter": closed_filter, "color": "#9F7AEA"},
         {"label": _("Pending"), "count": pending_count, "status_filter": pending_filter, "color": "#F6AD55"},
         {"label": _("Today's Tickets"), "count": todays_tickets, "status_filter": {"today": True}, "color": "#F6AD55"},
     ]
