@@ -114,6 +114,13 @@
         :isSidebarCollapsed="!isExpanded"
         appName="helpdesk"
       />
+      <SidebarLink
+        class="my-0.5"
+        label="Log out"
+        :icon="LucideLogOut"
+        :is-expanded="isExpanded"
+        :on-click="authStore.logout"
+      />
       <!-- <SidebarLink
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
         :icon="HelpIcon"
@@ -214,6 +221,7 @@ import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
+import LucideLogOut from "~icons/lucide/log-out";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
