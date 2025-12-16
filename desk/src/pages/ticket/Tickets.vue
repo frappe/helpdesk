@@ -228,6 +228,7 @@ const showExportModal = ref(false);
 const authStore = useAuthStore();
 const currentUserEmail = computed(() => authStore.userId || authStore.username || authStore.user || "");
 const currentUserName = computed(() => authStore.username || authStore.userId || authStore.user || "");
+const filtersApplied = ref(false);
 
 const quickViews = computed(() => {
   return [
@@ -938,6 +939,7 @@ function buildCardFilters(filtersArg: CardFilters = cardFilters): Record<string,
 }
 
 function loadCardViewTickets() {
+  console.log("loadCardViewTickets called");
   const filters = buildCardFilters(cardFilters);
   
   // Merge with route query filters (for date, owner, agent, team, etc.)
@@ -1000,6 +1002,7 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
   if (route.query.filters) {
     const newQuery = { ...route.query };
     delete newQuery.filters;
+    filtersApplied.value = false; // Reset so route watcher doesn't block
     router.replace({ query: newQuery });
   }
 
@@ -1071,6 +1074,7 @@ function resetCardFilters() {
   cardFilters.team = [];
   cardFilters.agent = [];
   activeQuickView.value = "";
+  filtersApplied.value = false; // Allow fresh filter application
   
   if (viewMode.value === "card") {
     cardViewOffset.value = 0;
@@ -1464,6 +1468,14 @@ watch(viewMode, async (newMode, oldMode) => {
 
 // Parse and apply filters from route query
 function applyFiltersFromRoute() {
+  console.log("applyFiltersFromRoute called, filtersApplied:", filtersApplied.value);
+  
+  // Prevent duplicate calls within same navigation
+  if (filtersApplied.value) {
+    console.log("Filters already applied, skipping duplicate");
+    return;
+  }
+  
   if (route.query.filters) {
     try {
       let queryFilters = typeof route.query.filters === 'string' 
@@ -1471,6 +1483,7 @@ function applyFiltersFromRoute() {
         : route.query.filters;
       
       if (queryFilters && Object.keys(queryFilters).length > 0) {
+        filtersApplied.value = true;
         // Normalize filter operators (convert LIKE to like, etc.) at the start
         Object.keys(queryFilters).forEach(key => {
           const filterValue = queryFilters[key];
@@ -1574,7 +1587,8 @@ function applyFiltersFromRoute() {
     }
   } else {
     // No filters in route, use default behavior
-    if (viewMode.value === "card") {
+    if (viewMode.value === "card" && !filtersApplied.value) {
+      filtersApplied.value = true;
       cardFilters.status = [{ label: "All", value: "" }];
       cardFilters.priority = [];
       cardFilters.team = [];
@@ -1609,8 +1623,18 @@ onMounted(() => {
 // Watch for route changes to apply filters
 watch(
   () => route.query.filters,
-  () => {
-    applyFiltersFromRoute();
+  (newFilters, oldFilters) => {
+    console.log("Route filters watcher triggered", { newFilters, oldFilters });
+    // Only process if filters actually changed
+    if (newFilters && JSON.stringify(newFilters) !== JSON.stringify(oldFilters)) {
+      console.log("Route filters changed, resetting applied flag");
+      filtersApplied.value = false;
+      applyFiltersFromRoute();
+    } else if (!newFilters && oldFilters) {
+      // Filters removed
+      console.log("Filters removed from route");
+      filtersApplied.value = false;
+    }
   },
   { immediate: false }
 );
@@ -1619,6 +1643,8 @@ onUnmounted(() => {
   if (!isCustomerPortal.value) {
     $socket.off("helpdesk:new-ticket");
   }
+  // Reset filter flag on unmount
+  filtersApplied.value = false;
 });
 
 usePageMeta(() => {

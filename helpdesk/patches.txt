@@ -33,3 +33,4 @@ helpdesk.patches.enable_new_email_notifications
 helpdesk.patches.add_fulltext_index #v2
 helpdesk.patches.add_telephony_app
 helpdesk.patches.add_website_settings_permission
+helpdesk.patches.add_overdue_ticket_status

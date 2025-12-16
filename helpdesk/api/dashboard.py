@@ -142,6 +142,7 @@ class HelpdeskDashboard:
             self.get_avg_first_response_time(),
             self.get_avg_resolution_time(),
             self.get_avg_feedback_score(),
+            self.get_overdue_ticket_count(),
         ]
 
     def get_ticket_count(self):
@@ -155,6 +156,23 @@ class HelpdeskDashboard:
             "deltaSuffix": "%",
             "negativeIsBetter": True,
             "tooltip": _("Total number of tickets created"),
+        }
+
+    def get_overdue_ticket_count(self):
+        overdue_status = frappe.db.get_value(
+            "HD Ticket Status", {"name": "Overdue"}, "name"
+        )
+        cond = self.ticket.status == overdue_status if overdue_status else None
+        current, prev = self.get_metric_data(self.ticket.name, Count, cond)
+        delta = ((current - prev) / prev * 100) if prev else 0
+
+        return {
+            "title": _("Overdue Tickets"),
+            "value": current,
+            "delta": delta,
+            "deltaSuffix": "%",
+            "negativeIsBetter": False,
+            "tooltip": _("Tickets currently marked as Overdue"),
         }
 
     def get_sla_fulfilled_count(self):
@@ -670,10 +688,17 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     unresolved_cond = ticket.status.isin(open_statuses) if open_statuses else None
     unresolved = get_count(unresolved_cond)
 
-    # Overdue: Open tickets past their resolution_by date
-    overdue_cond = (
-        ticket.status.isin(open_statuses) if open_statuses else ticket.status == "Open"
-    ) & (ticket.resolution_by < today) & (ticket.resolution_by.isnotnull())
+    # Overdue: tickets past resolution_by and not resolved. Include explicit "Overdue" status
+    overdue_status = frappe.db.get_value("HD Ticket Status", {"name": "Overdue"}, "name")
+    overdue_statuses = [overdue_status] if overdue_status else []
+    open_or_overdue_cond = (
+        ticket.status.isin(open_statuses + overdue_statuses)
+        if open_statuses or overdue_statuses
+        else ticket.status == "Open"
+    )
+    overdue_cond = open_or_overdue_cond & (ticket.resolution_by < today) & (
+        ticket.resolution_by.isnotnull()
+    )
     overdue = get_count(overdue_cond)
 
     # Due Today: Open tickets with resolution_by = today
@@ -715,14 +740,6 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     resolved_cond = ticket.status.isin(resolved_only_statuses) if resolved_only_statuses else None
     resolved_count = get_count(resolved_cond) if resolved_cond else 0
 
-    # Pending: Tickets with status containing "pending"
-    pending_statuses = frappe.get_all(
-        "HD Ticket Status",
-        filters=[["name", "like", "%pending%"]],
-        pluck="name",
-    )
-    pending_count = get_count(ticket.status.isin(pending_statuses)) if pending_statuses else 0
-
     # Today's Tickets: Tickets created today
     todays_tickets_cond = Function("DATE", ticket.creation) == today
     todays_tickets = get_count(todays_tickets_cond)
@@ -732,14 +749,13 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     # always receives the same structure from dashboard clicks.
     open_filter = {"status": ["in", ["Open"]]}
     resolved_filter = {"status": ["in", resolved_only_statuses]} if resolved_only_statuses else {}
-    pending_filter = {"status": ["in", pending_statuses]} if pending_statuses else {}
-    
-    # Return only Open, Resolved and Pending status cards (plus Today's Tickets),
-    # since these are the only effective backend statuses we want to expose.
+    overdue_filter = {"status": ["in", overdue_statuses]} if overdue_statuses else {}
+
+    # Return Open, Resolved, Overdue, Today's Tickets
     return [
         {"label": _("Open"), "count": open_count, "status_filter": open_filter, "color": "#318AD8"},
         {"label": _("Resolved"), "count": resolved_count, "status_filter": resolved_filter, "color": "#48BB78"},
-        {"label": _("Pending"), "count": pending_count, "status_filter": pending_filter, "color": "#F6AD55"},
+        {"label": _("Overdue"), "count": overdue, "status_filter": overdue_filter, "color": "#F56565"},
         {"label": _("Today's Tickets"), "count": todays_tickets, "status_filter": {"today": True}, "color": "#F6AD55"},
     ]
 

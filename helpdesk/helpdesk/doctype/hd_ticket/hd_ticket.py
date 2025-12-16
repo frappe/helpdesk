@@ -4,6 +4,7 @@ from email.utils import parseaddr
 from functools import lru_cache
 from typing import List
 
+from click.formatting import measure_table
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
@@ -40,6 +41,7 @@ from helpdesk.utils import (
     is_agent,
     publish_event,
 )
+from frappe.utils import now_datetime
 
 from ..hd_notification.utils import clear as clear_notifications
 from ..hd_service_level_agreement.utils import get_sla
@@ -1315,3 +1317,49 @@ def close_tickets_after_n_days():
         doc.flags.ignore_validate = True
         doc.save(ignore_permissions=True)
         frappe.db.commit()  # nosemgrep
+
+
+def mark_overdue_tickets():
+    try:
+        """Mark tickets as Overdue when resolution_date has passed and they are still open."""
+        overdue_status = frappe.db.get_value("HD Ticket Status", {"name": "Overdue"}, "name")
+        if not overdue_status:
+            print("No overdue status found")
+            return
+        print("overdue_status",overdue_status)
+        resolved_statuses = set(
+            frappe.get_all(
+                "HD Ticket Status", filters={"category": "Resolved", "name": ["!=", "Overdue"]}, pluck="name"
+            )
+            or []
+        )
+        # Closed may not be in the resolved category in every setup
+        resolved_statuses.update({"Closed", "Resolved"})
+
+        now_ts = now_datetime()
+        tickets = frappe.get_all(
+            "HD Ticket",
+            filters=[
+                ["resolution_by", "is", "set"],
+                ["resolution_by", "<", now_ts],
+                ["status", "not in", list(resolved_statuses)],
+                ["status", "!=", overdue_status],
+            ],
+            pluck="name",
+        )
+        print("tickets",tickets)
+
+        if not tickets:
+            return
+
+        for ticket in tickets:
+            frappe.db.set_value(
+                "HD Ticket",
+                ticket,
+                {"status": overdue_status, "status_category": "Paused"},
+                update_modified=False,
+            )
+
+        frappe.db.commit()  # nosemgrep
+    except Exception as e:
+        frappe.log_error(title="Error marking overdue tickets", message=frappe.get_traceback())

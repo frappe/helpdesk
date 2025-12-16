@@ -276,7 +276,8 @@ const defaultEmptyState = {
 };
 
 const defaultParams = reactive({
-  doctype: options.value.doctype,
+  // Always send a doctype; fall back to HD Ticket to avoid API errors.
+  doctype: options.value.doctype || "HD Ticket",
   filters: {},
   default_filters: options.value.defaultFilters,
   order_by: "modified desc",
@@ -317,6 +318,15 @@ const exposeFunctions = {
   unselectAll: () => {},
   handlePageLength,
 };
+
+watch(
+  () => options.value.doctype,
+  (doctype) => {
+    if (doctype) {
+      defaultParams.doctype = doctype;
+    }
+  }
+);
 
 function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
   exposeFunctions["unselectAll"] = unselectAll;
