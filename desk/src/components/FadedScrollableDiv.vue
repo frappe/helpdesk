@@ -72,4 +72,8 @@ function updateMaskStyle() {
 }
 
 onMounted(() => setTimeout(() => updateMaskStyle(), 300));
+
+defineExpose({
+  scrollableDiv,
+});
 </script>
