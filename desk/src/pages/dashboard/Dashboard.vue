@@ -283,10 +283,10 @@ const statusBreakdown = computed(() => {
 
   const open = getCount("Open");
   const resolved = getCount("Resolved");
-  const pending = getCount("Pending");
-  const total = open + resolved + pending;
+  const overdue = getCount("Overdue");
+  const total = open + resolved + overdue;
 
-  return { open, resolved, pending, total };
+  return { open, resolved, overdue, total };
 });
 
 function getLastXDays(range: number = 30): string {
