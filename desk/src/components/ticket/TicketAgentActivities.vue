@@ -1,7 +1,8 @@
 <template>
   <ActivityHeader :title="title" />
   <FadedScrollableDiv
-    class="flex flex-col flex-1 overflow-y-auto"
+    ref="scrollContainerRef"
+    class="flex flex-col flex-1 overflow-y-auto pb-6"
     :mask-length="20"
   >
     <div v-if="activities.length" class="activities flex-1 h-full mt-1">
@@ -113,7 +114,6 @@ import {
 import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
-import { isElementInViewport } from "@/utils";
 import { Avatar, FeatherIcon } from "frappe-ui";
 import {
   PropType,
@@ -123,6 +123,7 @@ import {
   h,
   inject,
   nextTick,
+  ref,
   watch,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -161,6 +162,7 @@ const router = useRouter();
 const { getUser } = useUserStore();
 const communicationAreaRef: Ref = inject("communicationArea");
 const makeCall = inject<() => void>("makeCall");
+const scrollContainerRef = ref<{ scrollableDiv?: HTMLElement | Ref<HTMLElement | null> } | null>(null);
 
 const emptyText = computed(() => {
   let text = "No Activities";
@@ -187,20 +189,47 @@ const emptyTextIcon = computed(() => {
   return h(icon, { class: "text-gray-500" });
 });
 
-function scrollToLatestActivity() {
-  if (route.hash) {
+function scrollToLatestActivity(force = false) {
+  if (route.hash && !force) {
     scrollToHash();
     return;
   }
-  setTimeout(() => {
-    let el;
-    let e = document.getElementsByClassName("activity");
-    el = e[e.length - 1];
-    if (el && !isElementInViewport(el)) {
-      el.scrollIntoViewIfNeeded();
-      el.focus();
-    }
-  }, 500);
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      const containerRef = scrollContainerRef.value?.scrollableDiv as
+        | HTMLElement
+        | Ref<HTMLElement | null>
+        | undefined;
+      const container =
+        (containerRef as Ref<HTMLElement | null>)?.value ||
+        (containerRef as HTMLElement);
+      const items = document.getElementsByClassName("activity");
+      const el = items[items.length - 1] as HTMLElement | undefined;
+      if (!el || !container) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const elTop = elRect.top - containerRect.top + container.scrollTop;
+      const elBottom = elTop + elRect.height;
+      const viewTop = container.scrollTop;
+      const viewBottom = viewTop + container.clientHeight;
+      const margin = 48;
+      const inView = elTop >= viewTop && elBottom <= viewBottom - margin;
+
+      if (force) {
+        const maxScroll = Math.max(container.scrollHeight - container.clientHeight, 0);
+        container.scrollTo({ top: maxScroll, behavior: "smooth" });
+        el.focus?.();
+        return;
+      }
+
+      if (!inView) {
+        const targetTop = Math.max(elTop - margin, 0);
+        container.scrollTo({ top: targetTop, behavior: "smooth" });
+        el.focus?.();
+      }
+    });
+  });
 }
 function scrollToHash() {
   const hash = route.hash;
@@ -213,7 +242,7 @@ function scrollToHash() {
       setTimeout(() => {
         const element = document.getElementById(elementId);
         if (element) {
-          (element as any).scrollIntoViewIfNeeded();
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
 
           // Add highlight effect using Tailwind class
           element.classList.add("bg-yellow-100");

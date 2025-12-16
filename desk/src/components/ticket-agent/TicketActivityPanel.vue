@@ -9,7 +9,6 @@
       <TicketAgentActivities
         v-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
-        :key="`${tab.name}-${activitiesKey}`"
         :activities="filterActivities(tab.name as TicketTab)"
         :title="tab.label"
         :ticket-status="ticket.doc.status"
@@ -19,11 +18,7 @@
           }
         "
         @update="
-          () => {
-            // This is a user action (comment/email), so scroll to latest
-            shouldScrollOnUpdate.value = true;
-            activities.reload();
-          }
+          handleUserUpdate
         "
       />
       <div v-else class="flex items-center justify-center flex-col mt-20">
@@ -43,11 +38,7 @@
     :bcc-emails="[]"
     :key="ticket.doc?.name"
     @update="
-      () => {
-        // This is a user action (comment/email), so scroll to latest
-        shouldScrollOnUpdate.value = true;
-        activities.reload();
-      }
+      handleUserUpdate
     "
   />
 </template>
@@ -85,24 +76,7 @@ const communicationAreaRef = ref(null);
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
-// Force re-render when activities data changes, but track if it's a user action
-const activitiesKey = ref(0);
 const shouldScrollOnUpdate = ref(false);
-
-watch(
-  () => activities.value?.data,
-  () => {
-    activitiesKey.value = Date.now();
-    // Only scroll if it was a user action (comment/email), not field updates
-    if (shouldScrollOnUpdate.value) {
-      nextTick(() => {
-        ticketAgentActivitiesRef.value?.scrollToLatestActivity();
-        shouldScrollOnUpdate.value = false;
-      });
-    }
-  },
-  { deep: true }
-);
 
 const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs: TabObject[] = [
@@ -268,6 +242,46 @@ function filterActivities(eventType: TicketTab) {
     return _activities.value;
   }
   return _activities.value.filter((activity) => activity.type === eventType);
+}
+
+watch(
+  () => activities.value?.data,
+  () => {
+    if (shouldScrollOnUpdate.value) {
+      nextTick(() => {
+        ticketAgentActivitiesRef.value?.scrollToLatestActivity(true);
+        shouldScrollOnUpdate.value = false;
+      });
+    }
+  },
+  { deep: true }
+);
+
+watch(
+  () => _activities.value.length,
+  (newLen, oldLen) => {
+    if (shouldScrollOnUpdate.value && newLen >= oldLen) {
+      nextTick(() => {
+        ticketAgentActivitiesRef.value?.scrollToLatestActivity(true);
+        shouldScrollOnUpdate.value = false;
+      });
+    }
+  }
+);
+
+async function handleUserUpdate() {
+  // Mark that the next activities reload is user-triggered (comment/email)
+  shouldScrollOnUpdate.value = true;
+  try {
+    await activities.reload?.();
+  } finally {
+    // Double-run scroll: once immediately after render, again after a short delay
+    nextTick(() => ticketAgentActivitiesRef.value?.scrollToLatestActivity(true));
+    setTimeout(
+      () => ticketAgentActivitiesRef.value?.scrollToLatestActivity(true),
+      300
+    );
+  }
 }
 </script>
 
