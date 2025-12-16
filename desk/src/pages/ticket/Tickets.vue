@@ -11,87 +11,91 @@
         />
       </template>
       <template #right-header>
-      <div class="flex items-center gap-2">
-        <div
-          class="flex items-center gap-1 rounded-lg border border-outline-gray-2 bg-surface-white p-1"
-        >
-          <Button
-            variant="ghost"
-            theme="gray"
-            class="h-9 w-9"
-            :class="
-              isTableView
-                ? 'bg-surface-gray-2 border border-outline-gray-3'
-                : ''
-            "
-            :aria-pressed="isTableView"
-            @click="viewMode = 'table'"
+        <div class="flex items-center gap-2">
+          <!--
+          <div
+            class="flex items-center gap-1 rounded-lg border border-outline-gray-2 bg-surface-white p-1"
           >
-            <LucideLayoutList class="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            theme="gray"
-            class="h-9 w-9"
-            :class="
-              !isTableView
-                ? 'bg-surface-gray-2 border border-outline-gray-3'
-                : ''
-            "
-            :aria-pressed="!isTableView"
-            @click="viewMode = 'card'"
+            <Button
+              variant="ghost"
+              theme="gray"
+              class="h-9 w-9"
+              :class="
+                isTableView
+                  ? 'bg-surface-gray-2 border border-outline-gray-3'
+                  : ''
+              "
+              :aria-pressed="isTableView"
+              @click="viewMode = 'table'"
+            >
+              <LucideLayoutList class="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              theme="gray"
+              class="h-9 w-9"
+              :class="
+                !isTableView
+                  ? 'bg-surface-gray-2 border border-outline-gray-3'
+                  : ''
+              "
+              :aria-pressed="!isTableView"
+              @click="viewMode = 'card'"
+            >
+              <LucideLayoutGrid class="h-4 w-4" />
+            </Button>
+          </div>
+          -->
+          <RouterLink
+            :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
           >
-            <LucideLayoutGrid class="h-4 w-4" />
-          </Button>
+            <Button label="Create" theme="gray" variant="solid">
+              <template #prefix>
+                <LucidePlus class="h-4 w-4" />
+              </template>
+            </Button>
+          </RouterLink>
         </div>
-        <RouterLink
-          :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
-        >
-          <Button label="Create" theme="gray" variant="solid">
-            <template #prefix>
-              <LucidePlus class="h-4 w-4" />
-            </template>
-          </Button>
-        </RouterLink>
-      </div>
       </template>
     </LayoutHeader>
-  <div v-show="isTableView">
-    <TicketListViewSection
-      ref="listViewSectionRef"
-      :options="options"
-      @empty-action="handleEmptyStateAction"
-      @row-click="handleTableRowClick"
+    <!--
+    <div v-show="isTableView">
+      <TicketListViewSection
+        ref="listViewSectionRef"
+        :options="options"
+        @empty-action="handleEmptyStateAction"
+        @row-click="handleTableRowClick"
+      />
+    </div>
+    -->
+    <TicketCardViewSection
+      v-if="!isTableView"
+      :rows="cardRows"
+      :loading="listLoading"
+      :total-count="totalCount"
+      :current-count="currentCount"
+      :page-length-count="pageLengthCount"
+      :status-options="statusOptionList"
+      :priority-options="priorityOptionList"
+      :status-filter-options="statusFilterOptions"
+      :priority-filter-options="priorityFilterOptions"
+      :team-filter-options="teamFilterOptions"
+      :agent-filter-options="effectiveAgentFilterOptions"
+      :filters="cardFilters"
+      :quick-views="quickViews"
+      :active-quick-view="activeQuickView"
+      @row-click="handleCardClick"
+      @update-status="handleCardStatus"
+      @update-priority="handleCardPriority"
+      @next-page="handleCardNextPage"
+      @prev-page="handleCardPrevPage"
+      @load-more="handleCardLoadMore"
+      @update:filters="updateCardFilters"
+      @apply-filters="applyCardFilters"
+      @reset-filters="resetCardFilters"
+      @apply-quick-view="applyQuickView"
+      @update-limit="handleUpdateLimit"
     />
-  </div>
-  <TicketCardViewSection
-    v-if="!isTableView"
-    :rows="cardRows"
-    :loading="listLoading"
-    :total-count="totalCount"
-    :current-count="currentCount"
-    :page-length-count="pageLengthCount"
-    :status-options="statusOptionList"
-    :priority-options="priorityOptionList"
-    :status-filter-options="statusFilterOptions"
-    :priority-filter-options="priorityFilterOptions"
-    :team-filter-options="teamFilterOptions"
-    :agent-filter-options="effectiveAgentFilterOptions"
-    :filters="cardFilters"
-    :quick-views="quickViews"
-    :active-quick-view="activeQuickView"
-    @row-click="handleCardClick"
-    @update-status="handleCardStatus"
-    @update-priority="handleCardPriority"
-    @next-page="handleCardNextPage"
-    @prev-page="handleCardPrevPage"
-    @load-more="handleCardLoadMore"
-    @update:filters="updateCardFilters"
-    @apply-filters="applyCardFilters"
-    @reset-filters="resetCardFilters"
-    @apply-quick-view="applyQuickView"
-    @update-limit="handleUpdateLimit"
-  />
     <ExportModal
       v-model="showExportModal"
       :rowCount="exportRowCount"
@@ -119,7 +123,7 @@ import {
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import TicketRowActions from "@/components/ticket/TicketRowActions.vue";
 import TicketCardViewSection from "@/components/ticket/TicketCardViewSection.vue";
-import TicketListViewSection from "@/components/ticket/TicketListViewSection.vue";
+// import TicketListViewSection from "@/components/ticket/TicketListViewSection.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
@@ -131,11 +135,11 @@ import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
 import { Badge, FeatherIcon, toast, Tooltip, usePageMeta, Dropdown, call, createResource } from "frappe-ui";
 import { computed, h, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
-import { useStorage } from "@vueuse/core";
+// import { useStorage } from "@vueuse/core";
 import { useRoute, useRouter } from "vue-router";
 import LucidePencil from "~icons/lucide/pencil";
-import LucideLayoutList from "~icons/lucide/layout-list";
-import LucideLayoutGrid from "~icons/lucide/layout-grid";
+// import LucideLayoutList from "~icons/lucide/layout-list";
+// import LucideLayoutGrid from "~icons/lucide/layout-grid";
 import LucideAlignJustify from "~icons/lucide/align-justify";
 import LucidePlus from "~icons/lucide/plus";
 import LucideInbox from "~icons/lucide/inbox";
@@ -168,7 +172,8 @@ const { isManager } = useAuthStore();
 
 const listViewSectionRef = ref<any>(null);
 const listViewRef = computed(() => listViewSectionRef.value?.listViewRef);
-const viewMode = useStorage<"table" | "card">("tickets_view_mode", "table");
+// const viewMode = useStorage<"table" | "card">("tickets_view_mode", "table");
+const viewMode = ref<"table" | "card">("card"); // lock to card view only
 const isTableView = computed(() => viewMode.value === "table");
 
 // Separate resource for card view
