@@ -12,38 +12,6 @@
       </template>
       <template #right-header>
       <div class="flex items-center gap-2">
-        <div
-          class="flex items-center gap-1 rounded-lg border border-outline-gray-2 bg-surface-white p-1"
-        >
-          <Button
-            variant="ghost"
-            theme="gray"
-            class="h-9 w-9"
-            :class="
-              isTableView
-                ? 'bg-surface-gray-2 border border-outline-gray-3'
-                : ''
-            "
-            :aria-pressed="isTableView"
-            @click="viewMode = 'table'"
-          >
-            <LucideLayoutList class="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            theme="gray"
-            class="h-9 w-9"
-            :class="
-              !isTableView
-                ? 'bg-surface-gray-2 border border-outline-gray-3'
-                : ''
-            "
-            :aria-pressed="!isTableView"
-            @click="viewMode = 'card'"
-          >
-            <LucideLayoutGrid class="h-4 w-4" />
-          </Button>
-        </div>
         <RouterLink
           :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
         >
@@ -56,16 +24,7 @@
       </div>
       </template>
     </LayoutHeader>
-  <div v-show="isTableView">
-    <TicketListViewSection
-      ref="listViewSectionRef"
-      :options="options"
-      @empty-action="handleEmptyStateAction"
-      @row-click="handleTableRowClick"
-    />
-  </div>
   <TicketCardViewSection
-    v-if="!isTableView"
     :rows="cardRows"
     :loading="listLoading"
     :total-count="totalCount"
@@ -134,8 +93,6 @@ import { computed, h, nextTick, onMounted, onUnmounted, reactive, ref, watch } f
 import { useStorage } from "@vueuse/core";
 import { useRoute, useRouter } from "vue-router";
 import LucidePencil from "~icons/lucide/pencil";
-import LucideLayoutList from "~icons/lucide/layout-list";
-import LucideLayoutGrid from "~icons/lucide/layout-grid";
 import LucideAlignJustify from "~icons/lucide/align-justify";
 import LucidePlus from "~icons/lucide/plus";
 import LucideInbox from "~icons/lucide/inbox";
@@ -168,8 +125,8 @@ const { isManager } = useAuthStore();
 
 const listViewSectionRef = ref<any>(null);
 const listViewRef = computed(() => listViewSectionRef.value?.listViewRef);
-const viewMode = useStorage<"table" | "card">("tickets_view_mode", "table");
-const isTableView = computed(() => viewMode.value === "table");
+const viewMode = useStorage<"table" | "card">("tickets_view_mode", "card");
+const isTableView = computed(() => false);
 
 // Separate resource for card view
 const cardViewLimit = ref(20);
@@ -187,32 +144,19 @@ const cardViewResource = createResource({
 
 const ticketRows = computed(() => listViewRef.value?.list?.data?.data || []);
 const cardRows = computed(() => {
-  if (viewMode.value === "card") {
-    // Backend already sorts by category when "All" filter is applied
-    // No need to sort again on frontend
-    const rows = cardViewResource.data?.data || [];
-    return rows;
-  }
-  const rows = ticketRows.value || [];
-  return [...rows].sort((a, b) => statusRank(a) - statusRank(b));
+  // Backend already sorts by category when "All" filter is applied
+  // No need to sort again on frontend
+  const rows = cardViewResource.data?.data || [];
+  return rows;
 });
 const listLoading = computed(() => {
-  if (viewMode.value === "card") {
-    return cardViewResource.loading;
-  }
-  return listViewRef.value?.list?.loading;
+  return cardViewResource.loading;
 });
 const totalCount = computed(() => {
-  if (viewMode.value === "card") {
-    return cardViewResource.data?.total_count || 0;
-  }
-  return listViewRef.value?.list?.data?.total_count || 0;
+  return cardViewResource.data?.total_count || 0;
 });
 const currentCount = computed(() => {
-  if (viewMode.value === "card") {
-    return cardViewOffset.value + (cardViewResource.data?.data?.length || 0);
-  }
-  return cardRows.value.length;
+  return cardViewOffset.value + (cardViewResource.data?.data?.length || 0);
 });
 const exportRowCount = computed(
   () => listViewRef.value?.list?.data?.total_count ?? 0
@@ -317,12 +261,7 @@ async function updateTicketField(ticketId: string, field: string, value: string)
       value: value,
     });
     toast.success("Updated successfully");
-    
-    if (viewMode.value === "card") {
-      await cardViewResource.reload();
-    } else {
-      await listViewRef.value?.reload(false);
-    }
+    await cardViewResource.reload();
   } catch (error: any) {
     toast.error(error.message || "Failed to update");
   }
@@ -658,7 +597,7 @@ watch(
 watch(
   () => listViewRef.value?.list,
   (list) => {
-    if (list && route.query.filters && viewMode.value === "table") {
+    if (list && route.query.filters && false) {
       try {
         const queryFilters = typeof route.query.filters === 'string' 
           ? JSON.parse(route.query.filters) 
@@ -803,48 +742,24 @@ function reset(reload = false) {
 }
 
 const pageLengthCount = computed(() => {
-  if (viewMode.value === "card") {
-    return cardViewLimit.value;
-  }
-  return (
-    listViewRef.value?.list?.params?.page_length_count ||
-    options.default_page_length ||
-    20
-  );
+  return cardViewLimit.value;
 });
 
 function handleCardLoadMore() {
-  if (viewMode.value === "card") {
-    cardViewOffset.value += cardViewLimit.value;
-    loadCardViewTickets();
-  } else {
-    const count = pageLengthCount.value;
-    listViewRef.value?.handlePageLength?.(count, true);
-  }
+  cardViewOffset.value += cardViewLimit.value;
+  loadCardViewTickets();
 }
 
 function handleCardNextPage() {
-  if (viewMode.value === "card") {
-    if (currentCount.value < totalCount.value) {
-      cardViewOffset.value += cardViewLimit.value;
-      loadCardViewTickets();
-    }
-  } else {
-    const count = pageLengthCount.value;
-    listViewRef.value?.handlePageLength?.(count, true);
+  if (currentCount.value < totalCount.value) {
+    cardViewOffset.value += cardViewLimit.value;
+    loadCardViewTickets();
   }
 }
 
 function handleCardPrevPage() {
-  if (viewMode.value === "card") {
-    cardViewOffset.value = Math.max(0, cardViewOffset.value - cardViewLimit.value);
-    loadCardViewTickets();
-  } else {
-    const count = pageLengthCount.value;
-    const currentLength = listViewRef.value?.list?.params?.page_length || count;
-    const newLength = Math.max(count, currentLength - count);
-    listViewRef.value?.handlePageLength?.(newLength, false);
-  }
+  cardViewOffset.value = Math.max(0, cardViewOffset.value - cardViewLimit.value);
+  loadCardViewTickets();
 }
 
 function handleUpdateLimit(newLimit: number) {
@@ -1006,62 +921,8 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
   const sourceFilters = filtersArg || cardFilters;
   updateCardFilters(sourceFilters);
 
-  if (viewMode.value === "card") {
-    cardViewOffset.value = 0;
-    loadCardViewTickets();
-  } else {
-    if (!listViewRef.value?.list) return;
-    const list = listViewRef.value.list;
-
-    const filters = buildCardFilters(sourceFilters);
-    
-    // Preserve route filters (date, owner, agent, team) when applying card filters
-    if (route.query.filters) {
-      try {
-        let queryFilters = typeof route.query.filters === 'string' 
-          ? JSON.parse(route.query.filters) 
-          : route.query.filters;
-        
-        // Normalize filter operators
-        Object.keys(queryFilters).forEach(key => {
-          const filterValue = queryFilters[key];
-          if (Array.isArray(filterValue) && filterValue.length === 2) {
-            const operator = filterValue[0];
-            if (typeof operator === 'string') {
-              queryFilters[key] = [operator.toLowerCase(), filterValue[1]];
-            }
-          }
-        });
-        
-        // Merge route filters with card filters (route filters take precedence for agent/team/date/owner)
-        if (queryFilters.creation) {
-          filters.creation = queryFilters.creation;
-        }
-        if (queryFilters.owner) {
-          filters.owner = queryFilters.owner;
-        }
-        if (queryFilters.agent_group) {
-          filters.agent_group = queryFilters.agent_group;
-        }
-        if (queryFilters._assign) {
-          filters._assign = queryFilters._assign;
-        }
-      } catch (error) {
-        console.error("Error merging route filters:", error);
-      }
-    }
-    
-    console.log("Applying card filters to list view:", filters);
-
-    const params = {
-      ...list.params,
-      filters: filters,
-      default_filters: filters,
-    };
-
-    list.submit(params);
-    list.params = params;
-  }
+  cardViewOffset.value = 0;
+  loadCardViewTickets();
 }
 
 function resetCardFilters() {
@@ -1072,32 +933,18 @@ function resetCardFilters() {
   cardFilters.agent = [];
   activeQuickView.value = "";
   
-  if (viewMode.value === "card") {
-    cardViewOffset.value = 0;
-    console.log("Resetting card filters to All (default)");
-    
-    cardViewResource.update({
-      params: {
-        filters: JSON.stringify({}),
-        limit: cardViewLimit.value,
-        offset: 0,
-        order_by: "modified desc"
-      }
-    });
-    cardViewResource.reload();
-  } else {
-    if (!listViewRef.value?.list) return;
-    const list = listViewRef.value.list;
-    const baseDefaultFilters = getBaseDefaultFilters();
-    
-    console.log("Resetting card filters to defaults:", baseDefaultFilters);
-    
-    list.submit({
-      ...list.params,
-      filters: baseDefaultFilters,
-      default_filters: baseDefaultFilters,
-    });
-  }
+  cardViewOffset.value = 0;
+  console.log("Resetting card filters to All (default)");
+  
+  cardViewResource.update({
+    params: {
+      filters: JSON.stringify({}),
+      limit: cardViewLimit.value,
+      offset: 0,
+      order_by: "modified desc"
+    }
+  });
+  cardViewResource.reload();
 }
 
 function applyQuickView(view: any) {
@@ -1128,30 +975,16 @@ function applyQuickView(view: any) {
     }
   }
 
-  if (viewMode.value === "card") {
-    cardViewOffset.value = 0;
-    cardViewResource.update({
-      params: {
-        filters: JSON.stringify(mergedFilters),
-        limit: cardViewLimit.value,
-        offset: 0,
-        order_by: "modified desc"
-      }
-    });
-    cardViewResource.reload();
-  } else {
-    if (!listViewRef.value?.list) return;
-    const list = listViewRef.value.list;
-
-    const params = {
-      ...list.params,
-      filters: mergedFilters,
-      default_filters: mergedFilters,
-    };
-
-    list.submit(params);
-    list.params = params;
-  }
+  cardViewOffset.value = 0;
+  cardViewResource.update({
+    params: {
+      filters: JSON.stringify(mergedFilters),
+      limit: cardViewLimit.value,
+      offset: 0,
+      order_by: "modified desc"
+    }
+  });
+  cardViewResource.reload();
 }
 
 function toggleValue(arr: string[], value: string) {
@@ -1181,14 +1014,6 @@ const dropdownOptions = computed(() => {
     {
       group: "Default Views",
       items: [
-        {
-          label: "List View",
-          icon: "align-justify",
-          onClick: () =>
-            router.push({
-              name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-            }),
-        },
       ],
     },
   ];
@@ -1446,22 +1271,6 @@ function resetState() {
   selectedView = null;
 }
 
-// Watch viewMode and load data when switching to card view
-watch(viewMode, async (newMode, oldMode) => {
-  if (newMode === 'card') {
-    await nextTick();
-    console.log("Switched to card view, loading tickets");
-    cardViewOffset.value = 0;
-    // Set default "All" filter
-    cardFilters.status = [{ label: "All", value: "" }];
-    cardFilters.priority = [];
-    cardFilters.team = [];
-    cardFilters.agent = [];
-    activeQuickView.value = "";
-    loadCardViewTickets();
-  }
-});
-
 // Parse and apply filters from route query
 function applyFiltersFromRoute() {
   if (route.query.filters) {
@@ -1548,40 +1357,21 @@ function applyFiltersFromRoute() {
           }
         }
         
-        // Apply filters based on view mode
-        if (viewMode.value === "card") {
-          cardViewOffset.value = 0;
-          loadCardViewTickets();
-        } else {
-          // For list view, wait for list to be ready then apply filters
-          nextTick(() => {
-            if (listViewRef.value?.list) {
-              const list = listViewRef.value.list;
-              console.log("Applying normalized route filters to list view:", queryFilters);
-              // Update params and submit to apply filters
-              list.params = {
-                ...list.params,
-                filters: queryFilters,
-                default_filters: queryFilters,
-              };
-              list.submit(list.params);
-            }
-          });
-        }
+        // Apply filters for card view
+        cardViewOffset.value = 0;
+        loadCardViewTickets();
       }
     } catch (error) {
       console.error("Error parsing filters from route:", error);
     }
   } else {
     // No filters in route, use default behavior
-    if (viewMode.value === "card") {
-      cardFilters.status = [{ label: "All", value: "" }];
-      cardFilters.priority = [];
-      cardFilters.team = [];
-      cardFilters.agent = [];
-      activeQuickView.value = "";
-      loadCardViewTickets();
-    }
+    cardFilters.status = [{ label: "All", value: "" }];
+    cardFilters.priority = [];
+    cardFilters.team = [];
+    cardFilters.agent = [];
+    activeQuickView.value = "";
+    loadCardViewTickets();
   }
 }
 
@@ -1594,15 +1384,19 @@ onMounted(() => {
   }
   if (!isCustomerPortal.value) {
     $socket.on("helpdesk:new-ticket", () => {
-      if (viewMode.value === "card") {
-        cardViewResource.reload();
-      } else {
-        listViewRef.value?.reload();
-      }
+      cardViewResource.reload();
     });
   }
   
-  // Apply filters from route query if present
+  // Initialize card view defaults
+  cardViewOffset.value = 0;
+  cardFilters.status = [{ label: "All", value: "" }];
+  cardFilters.priority = [];
+  cardFilters.team = [];
+  cardFilters.agent = [];
+  activeQuickView.value = "";
+  
+  // Apply filters from route query if present (will load tickets)
   applyFiltersFromRoute();
 });
 
