@@ -476,12 +476,14 @@ const options = {
 };
 
 const statusOptionList = computed(() =>
-  (statuses.data || []).map((s) => ({
-    label: isCustomerPortal.value ? s.label_customer : s.label_agent,
-    value: s.label_agent,
-    indicatorClass: s.parsed_color,
-    category: s.category,
-  }))
+  (statuses.data || [])
+    .filter((s) => s.label_agent !== "Overdue")
+    .map((s) => ({
+      label: isCustomerPortal.value ? s.label_customer : s.label_agent,
+      value: s.label_agent,
+      indicatorClass: s.parsed_color,
+      category: s.category,
+    }))
 );
 
 const priorityOptionList = computed(() =>
