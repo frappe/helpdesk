@@ -1181,7 +1181,8 @@ def is_crm_agent(user):
     assignable_agents = get_assignable_agents()
     roles_with_full_access = get_roles_with_full_access()
     user_roles = frappe.get_roles(user)
-    return any(role in roles_with_full_access for role in user_roles) and user in assignable_agents  
+    is_msg_admin = "Message Admin" in user_roles
+    return any(role in roles_with_full_access for role in user_roles) and (user in assignable_agents or is_msg_admin)  
 
 
 
