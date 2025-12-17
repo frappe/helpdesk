@@ -1,93 +1,100 @@
 <template>
-  <div class="flex h-full flex-col gap-4">
-    <!-- title and desc -->
-    <div
-      role="heading"
-      aria-level="1"
-      class="flex gap-1 justify-between pt-[5px]"
-    >
-      <h5 class="text-lg font-semibold">Edit Email</h5>
-    </div>
-    <div class="w-fit">
-      <EmailProviderIcon
-        :logo="emailIcon[accountData.service]"
-        :service-name="accountData.service"
-      />
-    </div>
-    <!-- banner for setting up email account -->
-    <div class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200">
-      <CircleAlert
-        class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-2"
-      />
-      <div class="text-wrap text-xs text-gray-700">
-        {{ info.description }}
-        <a :href="info.link" target="_blank" class="text-ink-blue-2 underline"
-          >here</a
-        >
-        .
-      </div>
-    </div>
-    <!-- fields -->
-    <div class="flex flex-col gap-4">
-      <div class="grid grid-cols-1 gap-4">
-        <div
-          v-for="field in fields"
-          :key="field.name"
-          class="flex flex-col gap-1"
-        >
-          <FormControl
-            v-model="state[field.name]"
-            :label="field.label"
-            :name="field.name"
-            :type="field.type"
-            :placeholder="field.placeholder"
+  <SettingsLayoutBase
+    :title="__('Edit Email')"
+    :description="__('Edit your email account')"
+  >
+    <template #content>
+      <div class="flex h-full flex-col gap-4">
+        <div class="overflow-y-auto flex flex-col gap-4 p-0.5">
+          <div class="w-fit">
+            <EmailProviderIcon
+              :logo="emailIcon[accountData.service]"
+              :service-name="accountData.service"
+            />
+          </div>
+          <!-- banner for setting up email account -->
+          <div
+            class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200"
+          >
+            <CircleAlert
+              class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-2"
+            />
+            <div class="text-wrap text-xs text-gray-700">
+              {{ info.description }}
+              <a
+                :href="info.link"
+                target="_blank"
+                class="text-ink-blue-2 underline"
+                >here</a
+              >
+              .
+            </div>
+          </div>
+          <!-- fields -->
+          <div class="flex flex-col gap-4">
+            <div class="grid grid-cols-1 gap-4">
+              <div
+                v-for="field in fields"
+                :key="field.name"
+                class="flex flex-col gap-1"
+              >
+                <FormControl
+                  v-model="state[field.name]"
+                  :label="field.label"
+                  :name="field.name"
+                  :type="field.type"
+                  :placeholder="field.placeholder"
+                />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                v-for="field in incomingOutgoingFields"
+                :key="field.name"
+                class="flex flex-col gap-1"
+              >
+                <FormControl
+                  v-model="state[field.name]"
+                  :label="field.label"
+                  :name="field.name"
+                  :type="field.type"
+                />
+                <p class="text-p-sm text-gray-500">{{ field.description }}</p>
+              </div>
+            </div>
+            <ErrorMessage v-if="error" class="ml-1" :message="error" />
+          </div>
+        </div>
+
+        <!-- action buttons -->
+        <div class="mt-auto flex justify-between -mb-8">
+          <Button
+            :label="__('Back')"
+            theme="gray"
+            variant="outline"
+            :disabled="loading"
+            @click="emit('update:step', 'email-list')"
           />
+          <div class="flex gap-2">
+            <Button
+              :label="__('Update Account')"
+              variant="solid"
+              @click="updateAccount"
+              :loading="loading"
+            />
+            <Button
+              v-if="accountData.enable_incoming"
+              :label="__('Pull Emails')"
+              variant="subtle"
+              @click="pullEmails"
+              :loading="loadingPull"
+              :disabled="loading"
+            />
+          </div>
         </div>
       </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div
-          v-for="field in incomingOutgoingFields"
-          :key="field.name"
-          class="flex flex-col gap-1"
-        >
-          <FormControl
-            v-model="state[field.name]"
-            :label="field.label"
-            :name="field.name"
-            :type="field.type"
-          />
-          <p class="text-p-sm text-gray-500">{{ field.description }}</p>
-        </div>
-      </div>
-      <ErrorMessage v-if="error" class="ml-1" :message="error" />
-    </div>
-    <!-- action buttons -->
-    <div class="mt-auto flex justify-between">
-      <Button
-        label="Back"
-        theme="gray"
-        variant="outline"
-        :disabled="loading"
-        @click="emit('update:step', 'email-list')"
-      />
-      <div class="flex gap-2">
-        <Button
-          label="Update Account"
-          variant="solid"
-          @click="updateAccount"
-          :loading="loading"
-        />
-        <Button
-          v-if="accountData.enable_incoming"
-          label="Pull Emails"
-          variant="subtle"
-          @click="pullEmails"
-          :loading="loadingPull"
-          :disabled="loading"
-        />
-      </div>
-    </div>
-  </div>
+    </template>
+  </SettingsLayoutBase>
 </template>
 
 <script setup lang="ts">
@@ -105,6 +112,8 @@ import {
   services,
   validateInputs,
 } from "./emailConfig";
+import { __ } from "@/translation";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 
 interface P {
   accountData: EmailAccount;
@@ -135,7 +144,7 @@ const state = reactive({
 });
 
 const info = {
-  description: "To know more about setting up email accounts, click",
+  description: __("To know more about setting up email accounts, click"),
   link: "https://docs.erpnext.com/docs/user/manual/en/email-account",
 };
 
@@ -172,7 +181,7 @@ async function updateAccount() {
 
   if (!nameChanged && !otherFieldsChanged) {
     toast.create({
-      message: "No changes made",
+      message: __("No changes made"),
       icon: h(CircleAlert, { class: "text-ink-blue-2" }),
     });
     return;
@@ -202,7 +211,7 @@ function pullEmails() {
   loadingPull.value = true;
 
   toast.create({
-    message: "Pulling emails, this may take a few minutes.",
+    message: __("Pulling emails, this may take a few minutes."),
     icon: h(CircleAlert, { class: "text-blue-500" }),
   });
 
@@ -212,12 +221,12 @@ function pullEmails() {
     .then(() => {
       localStorage.removeItem(`loading-emails-${state.email_account_name}`);
       loadingPull.value = null;
-      toast.success("Emails pulled successfully");
+      toast.success(__("Emails pulled successfully"));
     })
     .catch(() => {
       localStorage.removeItem(`loading-emails-${state.email_account_name}`);
       loadingPull.value = null;
-      error.value = "Failed to pull emails";
+      error.value = __("Failed to pull emails");
     });
 }
 
@@ -255,11 +264,11 @@ async function callSetValue(values) {
 
 function succesHandler() {
   emit("update:step", "email-list");
-  toast.success("Email account updated successfully");
+  toast.success(__("Email account updated successfully"));
 }
 
 function errorHandler() {
   loading.value = false;
-  error.value = "Failed to update email account, Invalid credentials";
+  error.value = __("Failed to update email account, Invalid credentials");
 }
 </script>
