@@ -968,13 +968,13 @@ function loadCardViewTickets() {
       });
       
       // Merge route filters with card filters (route filters take precedence)
+      // Merge specific filters from route query
       if (queryFilters.creation) {
         filters.creation = queryFilters.creation;
       }
       if (queryFilters.owner) {
         filters.owner = queryFilters.owner;
       }
-      // Route filters take precedence over card filters when coming from dashboard
       if (queryFilters.status) {
         filters.status = queryFilters.status;
       }
@@ -983,6 +983,10 @@ function loadCardViewTickets() {
       }
       if (queryFilters._assign) {
         filters._assign = queryFilters._assign;
+      }
+      // Merge resolution_by filter (for overdue/resolved tickets from dashboard)
+      if (queryFilters.resolution_by) {
+        filters.resolution_by = queryFilters.resolution_by;
       }
     } catch (error) {
       console.error("Error merging route filters:", error);

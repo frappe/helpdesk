@@ -115,6 +115,28 @@ def get_tickets_for_card_view(
             elif operator in (">=", "<=", ">", "<", "="):
                 filter_list.append(["creation", operator, value])
 
+        # Resolution by filter (for overdue/resolved tickets)
+        resolution_by_filter = raw_filters.get("resolution_by")
+        resolution_by_set_flag = raw_filters.get("_resolution_by", False) or raw_filters.get("resolution_by", False) is True
+        
+        if isinstance(resolution_by_filter, list) and len(resolution_by_filter) == 2:
+            operator, value = resolution_by_filter
+            if isinstance(operator, str):
+                operator = operator.lower()
+            if operator in (">=", "<=", ">", "<", "="):
+                filter_list.append(["resolution_by", operator, value])
+            # Handle "between" operator for date range queries
+            elif operator == "between" and isinstance(value, list) and len(value) == 2:
+                filter_list.append(["resolution_by", "between", value])
+            # If "is" operator, add as is set check
+            elif operator == "is" and value == "set":
+                filter_list.append(["resolution_by", "is", "set"])
+        
+        # If _resolution_by flag is True, ensure resolution_by is set
+        # Check if we haven't already added an "is set" filter
+        if resolution_by_set_flag and not any(f[0] == "resolution_by" and len(f) > 1 and f[1] == "is" for f in filter_list):
+            filter_list.append(["resolution_by", "is", "set"])
+
         return filter_list
 
     parsed_filters = build_filters(filters)

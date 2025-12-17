@@ -102,6 +102,18 @@ def get_list_data(
         rows.append(group_by_field)
 
     rows.append("name") if "name" not in rows else rows
+    
+    # Strip internal flags (keys starting with _) from filters before passing to Frappe
+    # Internal flags are used for control flow, not database queries
+    if isinstance(filters, dict):
+        # Process _resolution_by flag: if set, add "is set" check for resolution_by
+        if filters.get("_resolution_by") and filters.get("resolution_by"):
+            # resolution_by filter with a value implicitly requires the field to be set
+            # So we just strip the flag, no need to add explicit "is set"
+            pass
+        # Strip all internal flags (keys starting with _)
+        filters = {k: v for k, v in filters.items() if not k.startswith("_")}
+    
     data = (
         frappe.get_list(
             doctype,

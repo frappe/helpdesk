@@ -34,3 +34,4 @@ helpdesk.patches.add_fulltext_index #v2
 helpdesk.patches.add_telephony_app
 helpdesk.patches.add_website_settings_permission
 helpdesk.patches.add_overdue_ticket_status
+helpdesk.patches.convert_overdue_to_open

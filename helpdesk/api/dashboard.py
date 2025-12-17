@@ -633,6 +633,8 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
 
     ticket = DocType("HD Ticket")
     today = frappe.utils.nowdate()
+    today_start = frappe.utils.get_datetime(frappe.utils.today() + " 00:00:00")
+    today_end = frappe.utils.get_datetime(frappe.utils.add_days(frappe.utils.today(), 1) + " 00:00:00")
 
     # Get date range from filters
     from_date = filters.get("from_date") if filters else None
@@ -688,17 +690,11 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     unresolved_cond = ticket.status.isin(open_statuses) if open_statuses else None
     unresolved = get_count(unresolved_cond)
 
-    # Overdue: tickets past resolution_by and not resolved. Include explicit "Overdue" status
-    overdue_status = frappe.db.get_value("HD Ticket Status", {"name": "Overdue"}, "name")
-    overdue_statuses = [overdue_status] if overdue_status else []
-    open_or_overdue_cond = (
-        ticket.status.isin(open_statuses + overdue_statuses)
-        if open_statuses or overdue_statuses
-        else ticket.status == "Open"
-    )
-    overdue_cond = open_or_overdue_cond & (ticket.resolution_by < today) & (
-        ticket.resolution_by.isnotnull()
-    )
+    # Overdue: Open tickets past resolution_by (computed, not a status)
+    # Compare with start of today (00:00:00) to include all of today's overdue tickets
+    overdue_cond = (
+        ticket.status.isin(open_statuses) if open_statuses else ticket.status == "Open"
+    ) & (ticket.resolution_by < today_start) & (ticket.resolution_by.isnotnull())
     overdue = get_count(overdue_cond)
 
     # Due Today: Open tickets with resolution_by = today
@@ -748,8 +744,21 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     # Use a consistent ["in", [...]] shape for status so the tickets page
     # always receives the same structure from dashboard clicks.
     open_filter = {"status": ["in", ["Open"]]}
+    
+    # Resolved filter: status + resolution_by between today 00:00:00 and tomorrow 00:00:00
     resolved_filter = {"status": ["in", resolved_only_statuses]} if resolved_only_statuses else {}
-    overdue_filter = {"status": ["in", overdue_statuses]} if overdue_statuses else {}
+    if resolved_filter:
+        # Convert datetime to string for JSON serialization
+        resolved_filter["resolution_by"] = ["between", [
+            frappe.utils.get_datetime_str(today_start),
+            frappe.utils.get_datetime_str(today_end)
+        ]]
+    
+    # Overdue filter: Open status + resolution_by < start of today (matching overdue_cond logic)
+    overdue_filter = {
+        "status": ["in", open_statuses] if open_statuses else ["in", ["Open"]],
+        "resolution_by": ["<", frappe.utils.get_datetime_str(today_start)],
+    }
 
     # Return Open, Resolved, Overdue, Today's Tickets
     return [

@@ -57,7 +57,7 @@ const chartConfig = computed(() => {
     ],
     categoryColumn: "label",
     valueColumn: "value",
-    colors: ["#F56565", "#48BB78" , "#318AD8"],
+    colors: ["#318AD8","#F56565","#48BB78"],
     showInlineLabels: false,
   };
 });
