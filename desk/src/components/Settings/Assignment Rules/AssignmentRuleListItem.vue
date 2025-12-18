@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+    class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
   >
     <div
       @click="assignmentRulesActiveScreen = { screen: 'view', data: data }"
@@ -14,13 +14,21 @@
         {{ data.description }}
       </div>
     </div>
-    <div class="col-span-2">
-      <Select
-        class="w-max bg-transparent -ml-2 border-0 text-ink-gray-6 focus-visible:!ring-0 bg-none"
-        :options="priorityOptions"
+    <div class="col-span-3">
+      <select
+        class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-md p-0 pl-2 pr-5 bg-transparent -ml-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
         v-model="data.priority"
         @update:modelValue="onPriorityChange"
-      />
+        @change="onPriorityChange"
+      >
+        <option
+          v-for="option in priorityOptions"
+          :key="option.value"
+          :value="option.value"
+        >
+          {{ option.label }}
+        </option>
+      </select>
     </div>
     <div class="flex justify-between items-center w-full pr-2 col-span-2">
       <div>
