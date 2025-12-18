@@ -226,7 +226,8 @@ import { storeToRefs } from "pinia";
 import { useConfigStore } from "@/stores/config";
 
 const { getUser } = useUserStore();
-const { disableGlobalScopeForSavedReplies } = storeToRefs(useConfigStore());
+const { disableGlobalScopeForSavedReplies, teamRestrictionApplied } =
+  storeToRefs(useConfigStore());
 
 const savedRepliesSearchQuery = inject<Ref<string>>("savedRepliesSearchQuery");
 const savedRepliesActiveScreen = inject<any>("savedRepliesActiveScreen");
@@ -341,7 +342,7 @@ const filterOptions = computed(() => {
       },
     },
   ];
-  if (disableGlobalScopeForSavedReplies.value) {
+  if (teamRestrictionApplied.value && disableGlobalScopeForSavedReplies.value) {
     options.pop();
   }
   return options;

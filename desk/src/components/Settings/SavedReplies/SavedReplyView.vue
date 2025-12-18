@@ -225,7 +225,7 @@ const scopeDropdownOptions = computed(() => {
     },
   ];
 
-  if (disableGlobalScopeForSavedReplies.value) {
+  if (teamRestrictionApplied.value && disableGlobalScopeForSavedReplies.value) {
     options.pop();
   }
 

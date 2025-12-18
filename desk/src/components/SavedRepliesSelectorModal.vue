@@ -121,7 +121,8 @@ const props = defineProps({
 const show = defineModel();
 const searchInput = ref("");
 const activeFilter = useStorage("saved-replies-filter", "Personal");
-const { disableGlobalScopeForSavedReplies } = storeToRefs(useConfigStore());
+const { disableGlobalScopeForSavedReplies, teamRestrictionApplied } =
+  storeToRefs(useConfigStore());
 
 const filters = computed(() => {
   const options = [
@@ -141,7 +142,7 @@ const filters = computed(() => {
       onClick: () => (activeFilter.value = "Personal"),
     },
   ];
-  if (disableGlobalScopeForSavedReplies.value) {
+  if (teamRestrictionApplied.value && disableGlobalScopeForSavedReplies.value) {
     options.shift();
   }
   return options;

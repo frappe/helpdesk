@@ -51,6 +51,8 @@ const configureGlobalScope = async (
     scopes = _scopes.filter((scope) => scope !== "Global");
     scopes = scopes.join("\n");
     frm.set_df_property("scope", "options", scopes);
-    frm.set_value("scope", "Personal");
+    if (frm.doc.scope == "Global") {
+      frm.set_value("scope", "Personal");
+    }
   }
 };

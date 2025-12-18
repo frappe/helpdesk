@@ -458,6 +458,7 @@
   },
   {
    "default": "0",
+   "depends_on": "restrict_tickets_by_agent_group",
    "fieldname": "disable_saved_replies_global_scope",
    "fieldtype": "Check",
    "label": "Disable saved replies with scope 'Global'"
@@ -466,7 +467,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-12-15 12:18:21.420951",
+ "modified": "2025-12-18 10:37:02.103507",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
