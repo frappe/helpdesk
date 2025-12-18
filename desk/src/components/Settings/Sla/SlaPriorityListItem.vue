@@ -70,11 +70,7 @@
 import DurationPicker from "@/components/frappe-ui/DurationPicker.vue";
 import { slaData } from "@/stores/sla";
 import { ConfirmDelete } from "@/utils";
-<<<<<<< HEAD
-import { Button, Checkbox, Popover, Select } from "frappe-ui";
-=======
 import { Button, Checkbox, Dropdown, Popover } from "frappe-ui";
->>>>>>> e2a2d29b (fix: bugs related to frappe-ui update)
 import { inject, ref } from "vue";
 import EditResponseResolutionModal from "./Modals/EditResponseResolutionModal.vue";
 import { formatTimeHMS } from "./utils";

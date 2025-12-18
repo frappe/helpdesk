@@ -47,11 +47,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-<<<<<<< HEAD
-import { Button, Select } from "frappe-ui";
-=======
 import { Button, Dropdown } from "frappe-ui";
->>>>>>> e2a2d29b (fix: bugs related to frappe-ui update)
 import WorkDayModal from "./Modals/WorkDayModal.vue";
 import { ConfirmDelete, getGridTemplateColumnsForTable } from "@/utils";
 import { slaData } from "@/stores/sla";
