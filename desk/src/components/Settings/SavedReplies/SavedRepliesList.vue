@@ -105,7 +105,13 @@
           @click="goToNew()"
         />
       </div>
-      <div v-if="savedRepliesListResource?.data?.length" class="-ml-2">
+      <div
+        v-if="
+          !savedRepliesListResource?.list?.loading &&
+          savedRepliesListResource?.data?.length
+        "
+        class="-ml-2"
+      >
         <div
           class="grid grid-cols-12 items-center gap-3 text-sm text-gray-600 ml-2"
         >
