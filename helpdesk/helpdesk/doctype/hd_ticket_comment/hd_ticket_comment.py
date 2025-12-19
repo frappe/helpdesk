@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 from helpdesk.mixins.mentions import HasMentions
@@ -47,7 +48,7 @@ def toggle_reaction(comment: str, emoji: str):
         )
 
     if not frappe.db.exists("HD Ticket Comment", comment):
-        frappe.throw("Comment not found")
+        frappe.throw(_("Comment not found"))
 
     user = frappe.session.user
     doc = frappe.get_doc("HD Ticket Comment", comment)
@@ -89,7 +90,7 @@ def toggle_reaction(comment: str, emoji: str):
 @frappe.whitelist()
 def get_reactions(comment: str):
     if not frappe.db.exists("HD Ticket Comment", comment):
-        frappe.throw("Comment not found")
+        frappe.throw(_("Comment not found"))
 
     doc = frappe.get_doc("HD Ticket Comment", comment)
     current_user = frappe.session.user
