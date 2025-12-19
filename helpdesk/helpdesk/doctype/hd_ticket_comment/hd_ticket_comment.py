@@ -7,7 +7,6 @@ from frappe.model.document import Document
 from helpdesk.mixins.mentions import HasMentions
 from helpdesk.utils import capture_event, get_doc_room, publish_event
 
-
 PRESET_EMOJIS = ["👍", "👎", "❤️", "🎉", "👀", "✅"]
 
 
