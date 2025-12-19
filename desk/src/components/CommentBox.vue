@@ -79,19 +79,28 @@
           :url="a.file_url"
         />
       </div>
-      <div class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100" v-if="!editable">
+      <div
+        class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100"
+        v-if="!editable"
+      >
         <Popover>
           <template #target="{ togglePopover, isOpen }">
             <button
               class="flex items-center justify-center w-7 h-7 rounded-full text-sm transition-colors"
-              :class="isOpen ? 'bg-gray-200 text-gray-700' : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600'"
+              :class="
+                isOpen
+                  ? 'bg-gray-200 text-gray-700'
+                  : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+              "
               @click="togglePopover()"
             >
               <ReactionIcon class="w-4 h-4" />
             </button>
           </template>
           <template #body>
-            <div class="bg-white rounded-lg shadow-lg p-2 border border-gray-200">
+            <div
+              class="bg-white rounded-lg shadow-lg p-2 border border-gray-200"
+            >
               <div class="grid grid-cols-6 gap-1">
                 <button
                   v-for="emoji in emojiList"
@@ -110,10 +119,10 @@
           <Tooltip>
             <template #body>
               <div class="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg">
-              <span v-for="(user, idx) in reaction.users" :key="user.user"
-                >{{ user.full_name
-                }}<span v-if="idx < reaction.users.length - 1">, </span></span
-              >
+                <span v-for="(user, idx) in reaction.users" :key="user.user"
+                  >{{ user.full_name
+                  }}<span v-if="idx < reaction.users.length - 1">, </span></span
+                >
               </div>
             </template>
             <button
