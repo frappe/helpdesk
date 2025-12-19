@@ -110,14 +110,19 @@
           <Tooltip>
             <template #body>
               <div class="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg">
-                <span v-for="(user, idx) in reaction.users" :key="user.user">{{ user.full_name }}<span v-if="idx < reaction.users.length - 1">, </span></span>
+              <span v-for="(user, idx) in reaction.users" :key="user.user"
+                >{{ user.full_name
+                }}<span v-if="idx < reaction.users.length - 1">, </span></span
+              >
               </div>
             </template>
             <button
               class="flex items-center gap-1 px-2 py-1 rounded-full text-sm transition-colors"
-              :class="reaction.current_user_reacted 
-                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+              :class="
+                reaction.current_user_reacted
+                  ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              "
               @click="handleReaction(reaction.emoji)"
             >
               <span>{{ reaction.emoji }}</span>
@@ -197,7 +202,14 @@ const _content = ref(content);
 
 const emojiList = ["👍", "👎", "❤️", "🎉", "👀", "✅"];
 
-const reactions = ref<Array<{ emoji: string; count: number; users: Array<{ user: string; full_name: string }>; current_user_reacted: boolean }>>([]);
+const reactions = ref<
+  Array<{
+    emoji: string;
+    count: number;
+    users: Array<{ user: string; full_name: string }>;
+    current_user_reacted: boolean;
+  }>
+>([]);
 
 const reactionsList = computed(() => reactions.value || []);
 
