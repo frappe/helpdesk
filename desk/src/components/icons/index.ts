@@ -21,6 +21,7 @@ export { default as LinkIcon } from "./LinkIcon.vue";
 export { default as OrganizationsIcon } from "./OrganizationsIcon.vue";
 export { default as PhoneIcon } from "./PhoneIcon.vue";
 export { default as PinIcon } from "./PinIcon.vue";
+export { default as ReactionIcon } from "./ReactionIcon.vue";
 export { default as RefreshIcon } from "./RefreshIcon.vue";
 export { default as ReloadIcon } from "./ReloadIcon.vue";
 export { default as ReplyAllIcon } from "./ReplyAllIcon.vue";
