@@ -7,7 +7,7 @@
     <QuickFilters v-if="!isMobileView" class="flex-1" />
     <div class="flex items-start gap-2 justify-end h-full" v-if="!isMobileView">
       <Button
-        label="Save Changes"
+        :label="__('Save Changes')"
         v-if="isViewUpdated && canSaveView"
         @click="handleViewUpdate"
       />
@@ -152,6 +152,7 @@ import {
   LoadingIndicator,
   toast,
 } from "frappe-ui";
+import { __ } from "@/translation";
 import {
   computed,
   h,
@@ -222,15 +223,15 @@ const defaultOptions = reactive({
   },
   selectBannerActions: [
     {
-      label: "Delete",
+      label: __("Delete"),
       icon: "trash-2",
       onClick: (selections: Set<string>) => {
         $dialog({
-          title: "Delete",
-          message: `Are you sure you want to delete ${selections.size} item(s)?`,
+          title: __("Delete"),
+          message: __("Are you sure you want to delete {0} item(s)?", [selections.size]),
           actions: [
             {
-              label: "Confirm",
+              label: __("Confirm"),
               variant: "solid",
               onClick({ close }) {
                 handleBulkDelete(close, selections);
@@ -250,7 +251,7 @@ function handleBulkDelete(hide: Function, selections: Set<string>) {
     items: JSON.stringify(Array.from(selections)),
     doctype: props.options.doctype,
   }).then(() => {
-    toast.success("Item(s) deleted successfully");
+    toast.success(__("Item(s) deleted successfully"));
     hide();
     reset();
   });
@@ -272,7 +273,7 @@ const { isMobileView } = useScreenSize();
 
 const defaultEmptyState = {
   icon: "",
-  title: "No Data Found",
+  title: __("No Data Found"),
 };
 
 const defaultParams = reactive({
@@ -658,7 +659,7 @@ watch(
     defaultParams.view.name = val;
     handleViewChanges();
     if (!val) {
-      headerView.value.label = "List";
+      headerView.value.label = __("List");
       headerView.value.icon = LucideAlignJustify;
     }
   }
@@ -692,7 +693,7 @@ onMounted(async () => {
     if (route.query.view) {
       const currentView = findCurrentView();
       if (!currentView) return;
-      headerView.value.label = currentView.label || "List";
+      headerView.value.label = currentView.label || __("List");
       headerView.value.icon = getIcon(currentView.icon);
     }
     return;
