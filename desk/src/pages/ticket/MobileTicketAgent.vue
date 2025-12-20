@@ -48,7 +48,7 @@
           class="rounded bg-gray-100 px-2 py-1.5 text-base text-gray-800"
           @click="showAssignmentModal = true"
         >
-          Assign
+          {{ __("Assign") }}
         </button>
       </div>
       <!-- right side -->
@@ -83,10 +83,10 @@
                   :ticket="ticket.data"
                 />
                 <!-- SLA Section -->
-                <h3 class="px-6 pt-3 font-semibold text-base">SLA</h3>
+                <h3 class="px-6 pt-3 font-semibold text-base">{{ __("SLA") }}</h3>
                 <TicketAgentDetails :ticket="ticket.data" />
                 <!-- Ticket Fields -->
-                <h3 class="px-6 pt-3 font-semibold text-base">Details</h3>
+                <h3 class="px-6 pt-3 font-semibold text-base">{{ __("Details") }}</h3>
                 <TicketAgentFields
                   :ticket="ticket.data"
                   @update="({ field, value }) => updateTicket(field, value)"
@@ -149,7 +149,7 @@
     />
     <Dialog v-model="showSubjectDialog">
       <template #body-title>
-        <h3>Rename</h3>
+        <h3>{{ __("Rename") }}</h3>
       </template>
       <template #body-content>
         <FormControl
@@ -158,7 +158,7 @@
           size="sm"
           variant="subtle"
           :disabled="false"
-          label="New Subject"
+          :label="__('New Subject')"
         />
       </template>
       <template #actions>
@@ -173,9 +173,9 @@
             }
           "
         >
-          Confirm
+          {{ __("Confirm") }}
         </Button>
-        <Button class="ml-2" @click="showSubjectDialog = false"> Close </Button>
+        <Button class="ml-2" @click="showSubjectDialog = false"> {{ __("Close") }} </Button>
       </template>
     </Dialog>
     <SetContactPhoneModal
@@ -197,6 +197,7 @@ import {
   createResource,
   toast,
 } from "frappe-ui";
+import { __ } from "@/translation";
 import {
   computed,
   ComputedRef,
@@ -319,7 +320,7 @@ function updateField(name: string, value: string, callback = () => {}) {
 }
 
 const breadcrumbs = computed(() => {
-  let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
+  let items = [{ label: __("Tickets"), route: { name: "TicketsAgent" } }];
   items.push({
     label: ticket.data?.subject,
     route: { name: "TicketAgent" },
@@ -343,23 +344,23 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs = [
     {
       name: "details",
-      label: "Details",
+      label: __("Details"),
       icon: DetailsIcon,
       condition: () => isMobileView.value,
     },
     {
       name: "activity",
-      label: "Activity",
+      label: __("Activity"),
       icon: ActivityIcon,
     },
     {
       name: "email",
-      label: "Emails",
+      label: __("Emails"),
       icon: EmailIcon,
     },
     {
       name: "comment",
-      label: "Comments",
+      label: __("Comments"),
       icon: CommentIcon,
     },
   ];
@@ -367,7 +368,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   if (isCallingEnabled.value) {
     _tabs.push({
       name: "call",
-      label: "Calls",
+      label: __("Calls"),
       icon: PhoneIcon,
     });
   }
@@ -413,7 +414,7 @@ const activities = computed(() => {
       return {
         type: "history",
         key: h.creation,
-        content: h.action ? h.action : "viewed this",
+        content: h.action ? h.action : __("viewed this"),
         creation: h.creation,
         user: h.user.name + " ",
       };
@@ -488,7 +489,7 @@ function updateTicket(fieldname: string, value: string) {
     onSuccess: () => {
       isLoading.value = false;
       ticket.reload();
-      toast.success("Ticket updated");
+      toast.success(__("Ticket updated"));
     },
   });
 }
