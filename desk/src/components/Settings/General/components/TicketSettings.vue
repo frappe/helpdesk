@@ -53,11 +53,11 @@
       >
         <div class="flex flex-col gap-1">
           <span class="text-base font-medium text-ink-gray-8">{{
-            __("Disable global scope for saved replies")
+            __("Disable global saved replies")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
             __(
-              "Agents will not be able to view and create saved replies with global scope."
+              "Agents will no longer be able to view and create saved replies with global scope."
             )
           }}</span>
         </div>

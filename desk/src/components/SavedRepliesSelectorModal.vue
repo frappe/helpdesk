@@ -119,7 +119,6 @@ const props = defineProps({
 });
 
 const show = defineModel();
-const searchInput = ref("");
 const activeFilter = useStorage("saved-replies-filter", "Personal");
 const { disableGlobalScopeForSavedReplies, teamRestrictionApplied } =
   storeToRefs(useConfigStore());
@@ -147,6 +146,15 @@ const filters = computed(() => {
   }
   return options;
 });
+
+// Set default filter to Personal if Global is disabled
+if (
+  teamRestrictionApplied.value &&
+  disableGlobalScopeForSavedReplies.value &&
+  activeFilter.value == "Global"
+) {
+  activeFilter.value = "Personal";
+}
 
 const emit = defineEmits(["apply"]);
 
@@ -209,14 +217,6 @@ const onNewSavedReplyClick = () => {
   showSettingsModal.value = true;
   setActiveSettingsTab("Saved Replies");
 };
-
-watch(show, (value) => {
-  if (value) {
-    // @ts-ignore
-    nextTick(() => searchInput.value?.el?.focus());
-    savedReplyListResource.list.reload();
-  }
-});
 
 watch(search, (newValue) => {
   savedReplyListResource.filters = {
