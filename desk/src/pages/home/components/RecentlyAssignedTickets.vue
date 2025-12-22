@@ -3,7 +3,7 @@
     <div class="rounded-md p-4 grow min-w-[252px] h-full">
       <div class="space-y-2">
         <div class="text-lg font-semibold text-ink-gray-8">
-          {{ __("Recently assigned tickets") }}
+          {{ __("Recently Assigned Tickets") }}
         </div>
         <div
           v-if="chartConfig.ticketCount > 0"
@@ -58,7 +58,7 @@
           class="p-0 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none"
           @click="goToAllTickets"
         >
-          {{ __("See all") }}
+          {{ __("See all {0} tickets", chartConfig.ticketCount) }}
           <FeatherIcon name="arrow-right" class="size-4" />
         </div>
       </div>

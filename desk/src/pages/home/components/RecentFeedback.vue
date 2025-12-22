@@ -2,7 +2,7 @@
   <div class="w-full h-full overflow-hidden">
     <div class="flex flex-col rounded-md p-4 min-h-48 grow w-full h-full">
       <div class="text-ink-gray-8 text-lg font-semibold">
-        {{ __("Your rating") }}
+        {{ __("Your Rating") }}
       </div>
       <div
         v-if="chartConfig.averageRating == 0"
@@ -13,7 +13,7 @@
             {{ __("No feedback") }}
           </div>
           <div class="text-base text-ink-gray-6">
-            {{ __("You haven't received any feedback yet.") }}
+            {{ __("You haven't received any feedback yet") }}
           </div>
         </div>
       </div>

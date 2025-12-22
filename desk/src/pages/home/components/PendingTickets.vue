@@ -74,7 +74,7 @@
                 {{ __("No pending tickets") }}
               </div>
               <div class="text-ink-gray-6 text-center text-base">
-                {{ __("All tickets are resolved or in progress.") }}
+                {{ __("All tickets are resolved or in progress") }}
               </div>
             </div>
           </div>

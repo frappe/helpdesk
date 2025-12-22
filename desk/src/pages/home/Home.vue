@@ -266,7 +266,7 @@ const chartsDropdown = computed(() => {
         }),
     },
     {
-      label: __("Your rating"),
+      label: __("Your Rating"),
       chart: "recent_feedback",
       onClick: () =>
         addChart("recent_feedback", {
