@@ -6,21 +6,12 @@
       </div>
     </slot>
     <div class="flex flex-col gap-2 h-full w-full">
-      <slot name="body">
-        <div class="flex items-end w-full h-full gap-2">
-          <div
-            class="text-2xl font-medium text-center text-ink-gray-8 whitespace-nowrap"
-          >
-            {{ text }}
-          </div>
-          <slot name="chart">
-            <div v-if="props.chartConfig" class="w-full h-full">
-              <EChart :options="chartConfig" />
-            </div>
-          </slot>
+      <div class="flex items-end w-full gap-2">
+        <div
+          class="text-2xl font-medium text-center text-ink-gray-8 whitespace-nowrap"
+        >
+          {{ text }}
         </div>
-      </slot>
-      <slot v-if="!hideCardBottom" name="card-bottom">
         <div class="flex items-center text-sm gap-1">
           <div class="flex items-center gap-1" :class="percentageChange.color">
             <FeatherIcon :name="percentageChange.icon" class="size-4" />
@@ -35,6 +26,11 @@
             </div>
           </Dropdown>
         </div>
+      </div>
+      <slot name="chart">
+        <div v-if="chartConfig" class="w-full h-full">
+          <EChart :options="chartConfig" class="w-full h-full" />
+        </div>
       </slot>
     </div>
   </div>
@@ -45,6 +41,7 @@ import { computed, type PropType } from "vue";
 import EChart from "./EChart.vue";
 import { Dropdown, FeatherIcon } from "frappe-ui";
 import { __ } from "@/translation";
+import { EChartsOption } from "echarts";
 
 const props = defineProps({
   title: {
@@ -54,19 +51,24 @@ const props = defineProps({
     type: [Number, String] as PropType<number | string>,
     default: "",
   },
-  chartConfig: {
-    type: Object,
+  chartData: {
+    type: Array as PropType<number[]>,
+    required: true,
+  },
+  chartDates: {
+    type: Array as PropType<string[]>,
   },
   currentDuration: {
     type: String,
     default: "Last month",
   },
+  chartColor: {
+    type: Object,
+    required: true,
+  },
   percentageChange: {
     type: Object,
-  },
-  hideCardBottom: {
-    type: Boolean,
-    default: false,
+    required: true,
   },
 });
 
@@ -91,5 +93,60 @@ const durationOptions = computed(() => {
   ];
 
   return options.filter((option) => option.label !== currentDuration.value);
+});
+
+const chartConfig = computed<EChartsOption>(() => {
+  const color = props.chartColor.lineColor;
+  const gradientColor = props.chartColor.gradientColor;
+  return {
+    xAxis: {
+      type: "category",
+      data: props.chartDates,
+      show: false,
+      boundaryGap: false,
+    },
+    yAxis: {
+      type: "value",
+      show: false,
+    },
+    series: [
+      {
+        data: props.chartData,
+        type: "line",
+        symbol: "none",
+        lineStyle: {
+          width: 1.25,
+        },
+        areaStyle: {
+          opacity: 0.8,
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              {
+                offset: 0,
+                color: gradientColor.start,
+              },
+              {
+                offset: 1,
+                color: gradientColor.end,
+              },
+            ],
+            global: false,
+          },
+        },
+      },
+    ],
+    color: color,
+    grid: {
+      left: 2,
+      right: 2,
+      top: 2,
+      bottom: 2,
+    },
+  };
 });
 </script>

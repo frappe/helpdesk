@@ -14,8 +14,11 @@
           <div class="col-span-2">{{ __("Last Replied") }}</div>
         </div>
         <hr class="mx-2" />
-        <div v-if="tickets?.length > 0">
-          <div v-for="(ticket, index) in tickets" @click="goToTicket(ticket)">
+        <div v-if="chartConfig?.tickets?.length > 0">
+          <div
+            v-for="(ticket, index) in chartConfig?.tickets"
+            @click="goToTicket(ticket)"
+          >
             <div
               class="grid grid-cols-10 gap-2 text-sm items-center py-3 px-3 cursor-pointer hover:bg-gray-50 rounded"
             >
@@ -25,7 +28,7 @@
               <div class="col-span-1">
                 <Badge
                   :label="ticket.priority"
-                  :theme="getPriorityBadgeColor(ticket.integer_value)"
+                  :theme="getPriorityBadgeColor(ticket.priority_integer_value)"
                 />
               </div>
               <div class="col-span-2 truncate">
@@ -40,7 +43,15 @@
                 }}</span>
               </div>
             </div>
-            <hr class="mx-2" v-if="index !== tickets.length - 1" />
+            <hr class="mx-2" />
+          </div>
+          <div
+            v-if="chartConfig?.tickets?.length == 5"
+            class="p-2 pt-3 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none"
+            @click="goToAllPendingTickets"
+          >
+            {{ __("See all {0} tickets", chartConfig?.totalPendingTickets) }}
+            <FeatherIcon name="arrow-right" class="size-4" />
           </div>
         </div>
         <div v-else class="relative">
@@ -74,8 +85,10 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from "@/stores/auth";
 import dayjs from "dayjs";
 import { Badge, createResource } from "frappe-ui";
+import { storeToRefs } from "pinia";
 import { computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
@@ -87,32 +100,32 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const { userId } = storeToRefs(useAuthStore());
 
-const tickets = computed(() => {
-  return getPendingTicketsResource.fetched
-    ? getPendingTicketsResource.data.tickets
-    : props.data.tickets || [];
-});
+const chartConfig = computed(() => {
+  const _data = getPendingTicketsResource.fetched
+    ? getPendingTicketsResource.data
+    : props.data;
+  const maxPriority = _data.max_priority;
+  const minPriority = _data.min_priority;
+  const tickets = _data.tickets;
+  const totalPendingTickets = _data.total_pending_tickets;
 
-const minPriority = computed(() => {
-  return getPendingTicketsResource.fetched
-    ? getPendingTicketsResource.data.min_priority
-    : props.data.min_priority;
-});
-
-const maxPriority = computed(() => {
-  return getPendingTicketsResource.fetched
-    ? getPendingTicketsResource.data.max_priority
-    : props.data.max_priority;
+  return {
+    tickets,
+    maxPriority,
+    minPriority,
+    totalPendingTickets,
+  };
 });
 
 const getPendingTicketsResource = createResource({
   url: "helpdesk.api.agent_dashboard.get_pending_tickets",
 });
 
-function getPriorityBadgeColor(integerValue) {
-  const min = minPriority.value;
-  const max = maxPriority.value;
+function getPriorityBadgeColor(integerValue: number) {
+  const min = chartConfig.value.minPriority;
+  const max = chartConfig.value.maxPriority;
   const range = max - min;
   if (range === 0) return "gray";
   const position = (integerValue - min) / range;
@@ -126,6 +139,20 @@ const goToTicket = (ticket: any) => {
   router.push({
     name: "TicketAgent",
     params: { ticketId: ticket.name },
+  });
+};
+
+const goToAllPendingTickets = () => {
+  const filters = {
+    status_category: "Open",
+    _assign: ["LIKE", `%${userId.value}%`],
+  };
+  router.push({
+    name: "TicketsAgent",
+    query: {
+      filters: JSON.stringify(filters),
+      order_by: "modified desc",
+    },
   });
 };
 

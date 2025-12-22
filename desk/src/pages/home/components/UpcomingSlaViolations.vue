@@ -67,8 +67,11 @@
           <div class="col-span-1">{{ __("Resolution") }}</div>
         </div>
         <hr class="mx-2" />
-        <div v-if="tickets?.length > 0">
-          <div v-for="(ticket, index) in tickets" @click="goToTicket(ticket)">
+        <div v-if="chartConfig?.tickets?.length > 0">
+          <div
+            v-for="(ticket, index) in chartConfig?.tickets"
+            @click="goToTicket(ticket)"
+          >
             <div
               class="grid grid-cols-8 gap-2 text-sm items-center py-3 px-3 cursor-pointer hover:bg-gray-50 rounded"
             >
@@ -155,7 +158,17 @@
                 </Tooltip>
               </div>
             </div>
-            <hr class="mx-2" v-if="index !== tickets.length - 1" />
+            <hr class="mx-2" />
+          </div>
+          <div
+            v-if="chartConfig?.tickets?.length == 5"
+            class="p-2 pt-3 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none"
+            @click="goToAllSlaViolations"
+          >
+            {{
+              __("See all {0} tickets", chartConfig?.totalSlaViolationsCount)
+            }}
+            <FeatherIcon name="arrow-right" class="size-4" />
           </div>
         </div>
         <div v-else class="relative">
@@ -190,6 +203,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from "@/stores/auth";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import dayjs from "dayjs";
@@ -200,8 +214,10 @@ import {
   createListResource,
   createResource,
   Dropdown,
+  FeatherIcon,
   Tooltip,
 } from "frappe-ui";
+import { storeToRefs } from "pinia";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import TimerIcon from "~icons/lucide/timer";
@@ -223,6 +239,7 @@ const sortBy = ref({
     value: "response_by",
   },
 });
+const { userId } = storeToRefs(useAuthStore());
 
 const getPriorityListResource = createListResource({
   doctype: "HD Ticket Priority",
@@ -233,27 +250,26 @@ const getPriorityListResource = createListResource({
   },
 });
 
-const tickets = computed(() => {
-  return upcomingSlaViolations.fetched
-    ? upcomingSlaViolations.data.upcoming_sla_violations
-    : props.data?.upcoming_sla_violations || [];
-});
+const chartConfig = computed(() => {
+  const _data = upcomingSlaViolations.fetched
+    ? upcomingSlaViolations.data
+    : props.data;
+  const totalSlaViolationsCount = _data?.total_sla_violations_count || 0;
+  const tickets = _data?.upcoming_sla_violations || [];
+  const minPriority = _data?.min_priority;
+  const maxPriority = _data?.max_priority;
 
-const minPriority = computed(() => {
-  return upcomingSlaViolations.fetched
-    ? upcomingSlaViolations.data.min_priority
-    : props.data.min_priority;
-});
-
-const maxPriority = computed(() => {
-  return upcomingSlaViolations.fetched
-    ? upcomingSlaViolations.data.max_priority
-    : props.data.max_priority;
+  return {
+    totalSlaViolationsCount,
+    tickets,
+    minPriority,
+    maxPriority,
+  };
 });
 
 const priorityDropdownOptions = computed(() => {
   return (
-    getPriorityListResource?.data?.map((priority) => ({
+    getPriorityListResource?.data?.map((priority: string) => ({
       label: priority,
       onClick: () => {
         priorityFilter.value = priority;
@@ -289,9 +305,9 @@ const upcomingSlaViolations = createResource({
   url: "helpdesk.api.agent_dashboard.get_upcoming_sla_violations",
 });
 
-function getPriorityBadgeColor(integerValue) {
-  const min = minPriority.value;
-  const max = maxPriority.value;
+function getPriorityBadgeColor(integerValue: number) {
+  const min = chartConfig.value.minPriority;
+  const max = chartConfig.value.maxPriority;
   const range = max - min;
   if (range === 0) return "gray";
   const position = (integerValue - min) / range;
@@ -305,6 +321,28 @@ const goToTicket = (ticket: any) => {
   router.push({
     name: "TicketAgent",
     params: { ticketId: ticket.name },
+  });
+};
+
+const goToAllSlaViolations = () => {
+  const filters: Record<string, any> = {
+    sla: ["is", "set"],
+    status_category: ["!=", "Closed"],
+    agreement_status: ["in", ["First Response Due", "Resolution Due"]],
+    _assign: ["LIKE", `%${userId.value}%`],
+  };
+
+  // Add priority filter if set
+  if (priorityFilter.value) {
+    filters.priority = priorityFilter.value;
+  }
+
+  router.push({
+    name: "TicketsAgent",
+    query: {
+      filters: JSON.stringify(filters),
+      order_by: `${sortBy.value.fieldname.value} ${sortBy.value.direction}`,
+    },
   });
 };
 

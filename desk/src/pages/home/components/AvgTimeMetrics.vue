@@ -94,12 +94,11 @@ const getAvgTimeMetricsResource = createResource({
 });
 
 const timeAverages = computed(() => {
-  const _averageFirstResponse = getAvgTimeMetricsResource.fetched
-    ? getAvgTimeMetricsResource.data?.averages.first_response
-    : props.data?.averages?.first_response || 0;
-  const _averageResolution = getAvgTimeMetricsResource.fetched
-    ? getAvgTimeMetricsResource.data?.averages.resolution
-    : props.data?.averages?.resolution || 0;
+  const _data = getAvgTimeMetricsResource.fetched
+    ? getAvgTimeMetricsResource.data
+    : props.data;
+  const _averageFirstResponse = _data?.averages.first_response || 0;
+  const _averageResolution = _data?.averages.resolution || 0;
 
   return {
     first_response:
@@ -135,7 +134,7 @@ const chartConfig = computed<EChartsOption>(() => {
       formatter: (params) => {
         const [category, firstResponse, resolution] = params.data;
         if (params.seriesIndex === 0) {
-          return `<b>${category}</b><br/>${__(
+          return `<span>${category}</span><br/>${__(
             "Avg. First Response"
           )}: <b>${formatTime(firstResponse, {
             day: true,
@@ -143,7 +142,7 @@ const chartConfig = computed<EChartsOption>(() => {
             minute: true,
           })}</b>`;
         } else {
-          return `<b>${category}</b><br/>${__(
+          return `<span>${category}</span><br/>${__(
             "Avg. Resolution"
           )}: <b>${formatTime(resolution, {
             day: true,
