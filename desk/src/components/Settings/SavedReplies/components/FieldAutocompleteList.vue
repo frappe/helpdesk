@@ -15,7 +15,7 @@
         'flex w-full items-center whitespace-nowrap rounded-md px-2 py-1.5 text-sm text-ink-gray-9',
         index === selectedIndex ? 'bg-surface-gray-2' : '',
       ]"
-      @click="selectItem(index)"
+      @click.stop.prevent="selectItem(index)"
       @mouseover="selectedIndex = index"
     >
       {{ item.label }}

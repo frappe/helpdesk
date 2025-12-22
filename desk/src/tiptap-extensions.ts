@@ -22,6 +22,15 @@ export const FieldAutocomplete = createSuggestionExtension<FieldItem>({
   allowSpaces: true,
   pluginKey: FieldAutocompleteSuggestionKey,
   items: ({ editor, query, ...rest }) => {
+    // Return empty list to force the dropdown to close.
+    if (query.includes("}}")) {
+      return [];
+    }
+
+    // Clean up query when editing inside existing {{ }} brackets
+    // Remove any trailing `}}` and trim whitespace
+    const cleanedQuery = query.replace(/\s*}}.*$/, "").trim();
+
     const fields = ticketMeta
       .getFields()
       .filter(
@@ -35,16 +44,29 @@ export const FieldAutocomplete = createSuggestionExtension<FieldItem>({
 
     return fields.filter(
       (field) =>
-        field.label.toLowerCase().includes(query.toLowerCase()) ||
-        field.value.toLowerCase().includes(query.toLowerCase())
+        field.label.toLowerCase().includes(cleanedQuery.toLowerCase()) ||
+        field.value.toLowerCase().includes(cleanedQuery.toLowerCase())
     );
   },
   command: ({ editor, range, props: item }) => {
+    const { state } = editor;
+    const textAfterCursor = state.doc.textBetween(
+      range.to,
+      Math.min(range.to + 10, state.doc.content.size),
+      ""
+    );
+
+    let extendedTo = range.to;
+    const closingMatch = textAfterCursor.match(/^\s*}}/);
+    if (closingMatch) {
+      extendedTo = range.to + closingMatch[0].length;
+    }
+
     editor
       .chain()
       .focus()
-      .deleteRange(range)
-      .insertContent(`{{ ${item.value} }}`)
+      .deleteRange({ from: range.from, to: extendedTo })
+      .insertContent(`{{ ${item.value} }} `)
       .run();
   },
   component: FieldAutocompleteList,
