@@ -7,6 +7,7 @@
           variant="outline"
           class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm"
           ref="assigneeButton"
+          :disabled="readonly"
           @click="togglePopover()"
         >
           <p v-if="assignees.loading || assignees.data?.length === 0">
@@ -57,6 +58,10 @@ import { inject, useTemplateRef } from "vue";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import AssignToBody from "./AssignToBody.vue";
+
+const props = defineProps<{
+  readonly?: boolean;
+}>();
 const ticket = inject(TicketSymbol);
 const assignees = inject(AssigneeSymbol);
 const activities = inject(ActivitiesSymbol);

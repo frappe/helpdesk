@@ -28,6 +28,7 @@
               :doctype="field.doctype"
               :modelValue="field.value"
               :required="field.required"
+              :disabled="isTicketResolved || field.disabled"
               @update:model-value="
               (val:string) => handleFieldUpdate(field.fieldname, val,true)
             "
@@ -36,7 +37,7 @@
         </div>
 
         <!-- Assignee component -->
-        <AssignTo />
+        <AssignTo :readonly="isTicketResolved" />
         <div class="flex flex-col gap-1.5 mt-2">
           <span class="block text-xs text-gray-600">Owner</span>
           <FormControl
@@ -95,6 +96,11 @@ const customizations = inject(CustomizationSymbol);
 const activities = inject(ActivitiesSymbol);
 const { getFields, getField } = getMeta("HD Ticket");
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
+
+// Check if ticket is resolved to make fields readonly
+const isTicketResolved = computed(() => {
+  return ticket.value?.doc?.status_category === "Resolved";
+});
 
 const ownerDisplay = ref("");
 const ownerOptions = computed(() => [
@@ -194,8 +200,8 @@ function getFieldInFormat(fieldTemplate, fieldMeta) {
     placeholder:
       fieldTemplate.placeholder ||
       `Enter ${fieldMeta?.label || fieldTemplate.fieldname}`,
-    readonly: Boolean(fieldMeta.read_only),
-    disabled: Boolean(fieldMeta.read_only),
+    readonly: Boolean(fieldMeta.read_only) || isTicketResolved.value,
+    disabled: Boolean(fieldMeta.read_only) || isTicketResolved.value,
     url_method: fieldTemplate.url_method || "",
     fieldname: fieldTemplate.fieldname,
     required: fieldTemplate.required || fieldMeta?.required || false,
