@@ -457,6 +457,36 @@ class TestHDSavedReply(IntegrationTestCase):
         doc.save()  # Should not raise
         self.assertEqual(doc.message, "Admin updated")
 
+    def test_non_owner_cannot_edit_personal_reply(self):
+        """Non-owner agent should not be able to edit another's personal reply."""
+        reply = make_saved_reply(
+            "Agent1 Personal", "Original message", scope="Personal", owner=AGENT1
+        )
+
+        frappe.set_user(AGENT2)
+        doc = frappe.get_doc("HD Saved Reply", reply.name)
+        doc.message = "Agent2 trying to edit"
+        with self.assertRaises(frappe.PermissionError):
+            doc.save()
+
+    def test_non_team_member_cannot_edit_team_reply(self):
+        """Non-team member should not be able to edit team scope reply."""
+        set_hd_settings(restrict_tickets_by_agent_group=1)
+        reply = make_saved_reply(
+            "Team A Reply",
+            "Original message",
+            scope="Team",
+            teams=[TEAM_A],
+            owner=AGENT1,
+        )
+
+        # Agent2 is in Team B, not Team A
+        frappe.set_user(AGENT2)
+        doc = frappe.get_doc("HD Saved Reply", reply.name)
+        doc.message = "Agent2 trying to edit"
+        with self.assertRaises(frappe.PermissionError):
+            doc.save()
+
     # ==========================================================================
     # COMBINED SETTINGS TESTS
     # ==========================================================================
