@@ -1145,6 +1145,42 @@ def has_permission(doc, user=None):
     if not is_agent(user):
         return False
 
+    # First check if ticket is assigned to user - they should always have access
+    # even if ticket belongs to another team
+    if doc.get("_assign", None):
+        try:
+            assignees = json.loads(doc._assign)
+            if user in assignees:
+                return True
+        except:
+            pass  # Continue to other checks if assignment parsing fails
+    
+    # Check if user is mentioned in this ticket - they should have access
+    # even if not assigned and ticket belongs to another team
+    # Optimized: Use cached query to avoid repeated DB calls per ticket check
+    cache_key = f"hd_mentioned_tickets_{user}"
+    mentioned_tickets = frappe.cache().get_value(cache_key)
+    
+    if mentioned_tickets is None:
+        # Cache miss: fetch all tickets where user is mentioned (single query)
+        mentioned_tickets = set(
+            frappe.db.get_all(
+                "HD Notification",
+                filters={
+                    "user_to": user,
+                    "notification_type": "Mention",
+                },
+                pluck="reference_ticket",
+                distinct=True,
+            )
+        )
+        # Cache for 1 hour - reduces DB queries from N (per ticket) to 1 (per user per hour)
+        frappe.cache().set_value(cache_key, mentioned_tickets)
+        frappe.cache().expire(cache_key, 3600)
+    
+    if doc.name in mentioned_tickets:
+        return True
+
     enable_restrictions = frappe.db.get_single_value(
         "HD Settings", "restrict_tickets_by_agent_group"
     )
@@ -1155,14 +1191,6 @@ def has_permission(doc, user=None):
     )
     if show_tickets_without_team and not doc.get("agent_group"):
         return True
-
-    if doc.get("_assign", None):
-        try:
-            assignees = json.loads(doc._assign)
-            if user in assignees:
-                return True
-        except:
-            return False
 
     teams = get_agents_team()
     if any([team.get("ignore_restrictions") for team in teams]):
@@ -1209,11 +1237,32 @@ def permission_query(user):
     if not is_agent(user):
         return query
 
+    # First, add assignment check - users should always see tickets assigned to them
+    # even if the ticket belongs to another team
+    query += (
+        " OR (JSON_SEARCH(`tabHD Ticket`._assign, 'all', {user}) IS NOT NULL)".format(
+            user=frappe.db.escape(user)
+        )
+    )
+    
+    # Also check for mentions - users should see tickets where they are mentioned
+    # even if not assigned and ticket belongs to another team
+    # Optimized: Uses EXISTS with indexed columns (reference_ticket, user_to, notification_type)
+    query += (
+        " OR EXISTS (SELECT 1 FROM `tabHD Notification` "
+        "WHERE `tabHD Notification`.reference_ticket = `tabHD Ticket`.name "
+        "AND `tabHD Notification`.user_to = {user} "
+        "AND `tabHD Notification`.notification_type = 'Mention' "
+        "LIMIT 1)".format(
+            user=frappe.db.escape(user)
+        )
+    )
+
     enable_restrictions = frappe.db.get_single_value(
         "HD Settings", "restrict_tickets_by_agent_group"
     )
     if not enable_restrictions:
-        return  # If not enabled, return all tickets
+        return query  # If not enabled, return query with assignment check
 
     show_tickets_without_team = frappe.db.get_single_value(
         "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
@@ -1238,12 +1287,6 @@ def permission_query(user):
         if not show_tickets_without_team:
             query += " OR (`tabHD Ticket`.agent_group is null)"
         return query
-
-    query += (
-        " OR (JSON_SEARCH(`tabHD Ticket`._assign, 'all', {user}) IS NOT NULL)".format(
-            user=frappe.db.escape(user)
-        )
-    )
 
     team_names = [t.get("team_name") for t in teams]
 
