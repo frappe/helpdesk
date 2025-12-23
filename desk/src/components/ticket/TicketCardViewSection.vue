@@ -163,9 +163,6 @@
                 {{ option.label }}
               </option>
             </select>
-            <LucideChevronDown
-              class="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-gray-5"
-            />
           </div>
         </div>
 
@@ -188,9 +185,6 @@
                 {{ option.label }}
               </option>
             </select>
-            <LucideChevronDown
-              class="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-gray-5"
-            />
           </div>
         </div>
 
@@ -211,9 +205,6 @@
                 {{ option.label }}
               </option>
             </select>
-            <LucideChevronDown
-              class="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-gray-5"
-            />
           </div>
         </div>
 
@@ -235,9 +226,6 @@
                 {{ option.label }}
               </option>
             </select>
-            <LucideChevronDown
-              class="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-gray-5"
-            />
           </div>
         </div>
 
@@ -259,9 +247,6 @@
                 {{ option.label }}
               </option>
             </select>
-            <LucideChevronDown
-              class="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-gray-5"
-            />
           </div>
         </div>
       </div>
