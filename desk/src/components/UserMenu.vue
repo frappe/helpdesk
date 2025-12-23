@@ -3,7 +3,7 @@
     <template #default="{ open }">
       <button
         class="flex h-12 items-center rounded-md p-1 duration-300 ease-in-out w-full"
-        :class="open ? ' bg-white shadow-sm' : ' hover:bg-gray-200'"
+        :class="open ? 'bg-white text-ink-gray-9 shadow-sm' : 'text-ink-white hover:bg-white/10'"
       >
         <BrandLogo />
         <div
@@ -15,11 +15,15 @@
           "
         >
           <div
-            class="text-base font-medium leading-none text-gray-900 truncate"
+            class="text-base font-medium leading-none truncate"
+            :class="open ? 'text-ink-gray-9' : 'text-ink-white'"
           >
             {{ config.brandName || "Helpdesk" }}
           </div>
-          <div class="mt-1 text-sm leading-none text-gray-700">
+          <div
+            class="mt-1 text-sm leading-none"
+            :class="open ? 'text-ink-gray-7' : 'text-ink-gray-2'"
+          >
             {{ authStore.userName }}
           </div>
         </div>
@@ -33,7 +37,8 @@
         >
           <FeatherIcon
             name="chevron-down"
-            class="h-4 w-4 text-gray-600"
+            class="h-4 w-4"
+            :class="open ? 'text-ink-gray-7' : 'text-ink-gray-2'"
             aria-hidden="true"
           />
         </div>
