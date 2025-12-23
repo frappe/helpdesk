@@ -1,6 +1,6 @@
 <template>
   <div>
-    <LayoutHeader>
+    <!-- <LayoutHeader>
       <template #left-header>
         <ViewBreadcrumbs
           label="Tickets"
@@ -11,7 +11,7 @@
         />
       </template>
       <template #right-header>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2"> -->
           <!--
           <div
             class="flex items-center gap-1 rounded-lg border border-outline-gray-2 bg-surface-white p-1"
@@ -46,7 +46,7 @@
             </Button>
           </div>
           -->
-          <RouterLink
+          <!-- <RouterLink
             :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
           >
             <Button label="Create" theme="gray" variant="solid">
@@ -57,7 +57,7 @@
           </RouterLink>
         </div>
       </template>
-    </LayoutHeader>
+    </LayoutHeader> -->
     <!--
     <div v-show="isTableView">
       <TicketListViewSection
