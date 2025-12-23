@@ -89,7 +89,7 @@
     </div>
 
     <div
-      class="hidden lg:block w-4 shrink-0 self-stretch rounded-md"
+      class="hidden lg:block w-4 shrink-0 self-stretch -mt-3"
       style="background-color: #EBEEF3"
       aria-hidden="true"
     ></div>
