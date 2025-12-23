@@ -5,12 +5,27 @@
         v-if="!loading && totalCount > 0"
         class="sticky top-0 z-30 mb-4 flex flex-wrap items-center justify-between gap-4 rounded-sm border border-outline-gray-2 bg-surface-white px-5 py-3 shadow-[0_8px_18px_rgba(0,0,0,0.05)]"
       >
-        <div class="flex items-center gap-2 text-sm text-ink-gray-8">
-          <span class="font-semibold text-ink-gray-9">{{ pageStart }}</span>
-          <span class="text-ink-gray-4">-</span>
-          <span class="font-semibold text-ink-gray-9">{{ pageEnd }}</span>
-          <span class="text-ink-gray-6">of</span>
-          <span class="font-semibold text-ink-gray-9">{{ totalCount }}</span>
+        <div class="flex flex-wrap items-center gap-3">
+          <div
+            class="flex h-9 w-9 items-center justify-center rounded-lg border border-outline-gray-3 bg-surface-gray-1"
+          >
+            <LucideFilter class="h-4 w-4 text-ink-gray-7" />
+          </div>
+          <span class="text-base font-semibold text-ink-gray-9">
+            {{ quickViewLabel }}
+          </span>
+          <span
+            class="rounded-full bg-surface-gray-9 px-2.5 py-1 text-xs font-semibold leading-none text-ink-white"
+          >
+            {{ totalCount }}
+          </span>
+          <div class="flex items-center gap-2 text-sm text-ink-gray-8">
+            <span class="font-semibold text-ink-gray-9">{{ pageStart }}</span>
+            <span class="text-ink-gray-4">-</span>
+            <span class="font-semibold text-ink-gray-9">{{ pageEnd }}</span>
+            <span class="text-ink-gray-6">of</span>
+            <span class="font-semibold text-ink-gray-9">{{ totalCount }}</span>
+          </div>
         </div>
 
         <div class="flex items-center gap-4">
@@ -351,4 +366,6 @@ const selectedStatusOption = computed(() => {
   // Find matching option from statusFilterOptions
   return props.statusFilterOptions?.find(opt => opt.value === filterValue) || currentFilter;
 });
+
+const quickViewLabel = computed(() => props.activeQuickView || "All tickets");
 </script>
