@@ -95,7 +95,7 @@
     ></div>
 
     <div
-      class="hidden lg:flex w-56 shrink-0 flex-col gap-4 bg-surface-white p-4 h-fit sticky top-4"
+      class="hidden lg:flex w-72 shrink-0 flex-col gap-4 bg-surface-white p-4 h-fit sticky top-4"
     >
       <div class="flex items-center justify-between">
         <span class="font-['Poppins'] text-[14px] font-normal leading-[21px] text-ink-gray-9">

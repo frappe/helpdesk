@@ -14,3 +14,22 @@
 html, body {
 	color: var(--ink-gray-9);
 }
+
+:root {
+	scrollbar-width: thin;
+	scrollbar-color: #bdbdbd transparent;
+}
+
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: #bdbdbd;
+	border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+	background-color: transparent;
+}
