@@ -18,7 +18,7 @@
         :class="resolvedClass(ticket)"
         @click="handleCardClick(ticket)"
       >
-        <div class="flex items-start gap-4">
+        <div class="flex items-center gap-4">
           <input
             type="checkbox"
             class="mt-1 h-4 w-4 rounded-sm border border-outline-gray-3 text-ink-gray-8 focus:ring-2 focus:ring-outline-gray-3"
@@ -26,7 +26,8 @@
             aria-label="Select ticket"
           />
           <div
-            class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+            class="flex flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+            style="width: 37px; height: 37px; aspect-ratio: 1 / 1;"
             :class="avatarClasses(ticket)"
           >
             {{ ticketInitials(ticket) }}
