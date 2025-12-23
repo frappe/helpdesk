@@ -109,41 +109,37 @@
         </button>
       </div>
 
-      <div class="flex items-center gap-1 self-stretch">
+      <div class="relative">
         <label class="sr-only" for="ticket-filter-search">Search</label>
-        <div
-          class="flex h-[35px] w-[35px] items-center justify-center rounded border border-[#E4E4E4] bg-surface-white"
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
+          class="pointer-events-none absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2"
+          aria-hidden="true"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="none"
-            class="h-3 w-3"
-            aria-hidden="true"
-          >
-            <g clip-path="url(#clip0_7898_1623)">
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M5.0475 9.16873C2.68875 9.16873 0.77663 7.29 0.77663 4.96875C0.77663 2.6475 2.68875 0.765015 5.0475 0.765015C7.40625 0.765015 9.31875 2.6475 9.31875 4.96875C9.31875 7.29 7.40625 9.16873 5.0475 9.16873ZM11.883 11.3438L8.78587 8.295C9.59662 7.41375 10.095 6.25125 10.095 4.96875C10.095 2.22375 7.83525 0 5.0475 0C2.25975 0 0 2.22375 0 4.96875C0 7.71 2.25975 9.93375 5.0475 9.93375C6.252 9.93375 7.35675 9.51751 8.2245 8.82376L11.334 11.8837C11.4859 12.0337 11.7315 12.0337 11.883 11.8837C12.0349 11.7375 12.0349 11.4938 11.883 11.3438Z"
-                fill="black"
-              />
-            </g>
-            <defs>
-              <clipPath id="clip0_7898_1623">
-                <rect width="12" height="12" fill="white" />
-              </clipPath>
-            </defs>
-          </svg>
-        </div>
+          <g clip-path="url(#clip0_7898_1623)">
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M5.0475 9.16873C2.68875 9.16873 0.77663 7.29 0.77663 4.96875C0.77663 2.6475 2.68875 0.765015 5.0475 0.765015C7.40625 0.765015 9.31875 2.6475 9.31875 4.96875C9.31875 7.29 7.40625 9.16873 5.0475 9.16873ZM11.883 11.3438L8.78587 8.295C9.59662 7.41375 10.095 6.25125 10.095 4.96875C10.095 2.22375 7.83525 0 5.0475 0C2.25975 0 0 2.22375 0 4.96875C0 7.71 2.25975 9.93375 5.0475 9.93375C6.252 9.93375 7.35675 9.51751 8.2245 8.82376L11.334 11.8837C11.4859 12.0337 11.7315 12.0337 11.883 11.8837C12.0349 11.7375 12.0349 11.4938 11.883 11.3438Z"
+              fill="black"
+            />
+          </g>
+          <defs>
+            <clipPath id="clip0_7898_1623">
+              <rect width="12" height="12" fill="white" />
+            </clipPath>
+          </defs>
+        </svg>
         <input
           id="ticket-filter-search"
           v-model="searchQuery"
           type="text"
           placeholder="Search"
-          class="h-[35px] flex-1 rounded border border-[#E4E4E4] bg-surface-white px-3 text-[12px] leading-[18px] text-ink-gray-9 placeholder-ink-gray-4 focus:border-outline-gray-3 focus:outline-none focus:ring-2 focus:ring-outline-gray-2"
+          class="h-[35px] w-full rounded border border-[#E4E4E4] bg-surface-white pl-8 pr-3 text-[12px] leading-[18px] text-ink-gray-9 placeholder-ink-gray-4 focus:border-outline-gray-3 focus:outline-none focus:ring-2 focus:ring-outline-gray-2"
         />
       </div>
 
