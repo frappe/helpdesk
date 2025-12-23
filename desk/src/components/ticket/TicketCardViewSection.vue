@@ -95,119 +95,177 @@
     ></div>
 
     <div
-      class="hidden lg:flex w-80 shrink-0 flex-col gap-5 rounded-xl border border-outline-gray-2 bg-surface-white p-5 shadow-sm h-fit sticky top-4"
+      class="hidden lg:flex w-56 shrink-0 flex-col gap-4 bg-surface-white p-4 h-fit sticky top-4"
     >
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2 text-base font-semibold text-ink-gray-9">
-          <LucideFilter class="h-5 w-5" />
-          <span>Filters</span>
-        </div>
-        <Button size="sm" variant="ghost" theme="gray" class="text-ink-gray-7" @click="handleReset">
-          Reset
-        </Button>
+        <span class="font-['Poppins'] text-[14px] font-normal leading-[21px] text-ink-gray-9">
+          FILTERS
+        </span>
+        <button
+          type="button"
+          class="font-['Poppins'] text-[12px] font-medium leading-[18px] text-ink-gray-9 transition-colors hover:text-ink-gray-8"
+        >
+          Show Applied Filters
+        </button>
       </div>
 
-      <button
-        type="button"
-        class="text-xs font-semibold text-ink-gray-7 underline underline-offset-4 text-left hover:text-ink-gray-8 transition-colors"
-      >
-        Show applied filters
-      </button>
+      <div class="flex items-center gap-1 self-stretch">
+        <label class="sr-only" for="ticket-filter-search">Search</label>
+        <div
+          class="flex h-[35px] w-[35px] items-center justify-center rounded border border-[#E4E4E4] bg-surface-white"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            class="h-3 w-3"
+            aria-hidden="true"
+          >
+            <g clip-path="url(#clip0_7898_1623)">
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M5.0475 9.16873C2.68875 9.16873 0.77663 7.29 0.77663 4.96875C0.77663 2.6475 2.68875 0.765015 5.0475 0.765015C7.40625 0.765015 9.31875 2.6475 9.31875 4.96875C9.31875 7.29 7.40625 9.16873 5.0475 9.16873ZM11.883 11.3438L8.78587 8.295C9.59662 7.41375 10.095 6.25125 10.095 4.96875C10.095 2.22375 7.83525 0 5.0475 0C2.25975 0 0 2.22375 0 4.96875C0 7.71 2.25975 9.93375 5.0475 9.93375C6.252 9.93375 7.35675 9.51751 8.2245 8.82376L11.334 11.8837C11.4859 12.0337 11.7315 12.0337 11.883 11.8837C12.0349 11.7375 12.0349 11.4938 11.883 11.3438Z"
+                fill="black"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_7898_1623">
+                <rect width="12" height="12" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
+        </div>
+        <input
+          id="ticket-filter-search"
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search"
+          class="h-[35px] flex-1 rounded border border-[#E4E4E4] bg-surface-white px-3 text-[12px] leading-[18px] text-ink-gray-9 placeholder-ink-gray-4 focus:border-outline-gray-3 focus:outline-none focus:ring-2 focus:ring-outline-gray-2"
+        />
+      </div>
 
-      <div class="space-y-4 divide-y divide-outline-gray-2">
-        <div class="space-y-4 pb-4">
-          <div class="space-y-2">
-            <label
-              class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide"
+      <div class="space-y-3">
+        <div class="space-y-1.5">
+          <label class="text-[12px] font-normal leading-[18px] text-ink-gray-7">
+            Status
+          </label>
+          <div class="relative">
+            <select
+              class="h-[35px] w-full appearance-none rounded border border-[#E4E4E4] bg-surface-white px-3 pr-8 text-[12px] leading-[18px] text-ink-gray-9 focus:border-outline-gray-3 focus:outline-none focus:ring-2 focus:ring-outline-gray-2"
+              :value="selectedStatusValue"
+              @change="handleStatusChange"
             >
-              Status
-            </label>
-            <MultiSelectCombobox
-              :key="selectedStatusOption ? selectedStatusOption.value ?? selectedStatusOption.label : 'all-status'"
-              :model-value="selectedStatusOption"
-              :options="statusFilterOptions"
-              placeholder="All status"
-              @update:modelValue="updateFilter('status', $event)"
-              :multiple="false"
-              :button-classes="'w-full justify-between !h-10 !bg-surface-white border border-outline-gray-3 hover:!bg-surface-gray-1 rounded-lg px-3 text-sm text-ink-gray-9'"
-            >
-              <template #item-prefix="{ option }">
-                <span
-                  v-if="option.value"
-                  class="mr-2 h-2 w-2 rounded-full"
-                  :class="option.indicatorClass"
-                />
-              </template>
-            </MultiSelectCombobox>
-          </div>
-
-          <div class="space-y-2">
-            <label
-              class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide"
-            >
-              Priority
-            </label>
-            <MultiSelectCombobox
-              :model-value="filters.priority?.[0] || null"
-              :options="priorityFilterOptions"
-              placeholder="Any priority"
-              @update:modelValue="updateFilter('priority', $event)"
-              :multiple="false"
-              :button-classes="'w-full justify-between !h-10 !bg-surface-white border border-outline-gray-3 hover:!bg-surface-gray-1 rounded-lg px-3 text-sm text-ink-gray-9'"
-            />
-          </div>
-
-          <div class="space-y-2">
-            <label
-              class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide"
-            >
-              Team
-            </label>
-            <MultiSelectCombobox
-              :model-value="filters.team?.[0] || null"
-              :options="teamFilterOptions"
-              placeholder="Any team"
-              @update:modelValue="updateFilter('team', $event)"
-              :multiple="false"
-              :button-classes="'w-full justify-between !h-10 !bg-surface-white border border-outline-gray-3 hover:!bg-surface-gray-1 rounded-lg px-3 text-sm text-ink-gray-9'"
-            />
-          </div>
-
-          <div class="space-y-2">
-            <label
-              class="block text-xs font-semibold text-ink-gray-7 uppercase tracking-wide"
-            >
-              Agent
-            </label>
-            <MultiSelectCombobox
-              :model-value="filters.agent?.[0] || null"
-              :options="agentFilterOptions"
-              placeholder="Any agent"
-              @update:modelValue="updateFilter('agent', $event)"
-              :multiple="false"
-              :button-classes="'w-full justify-between !h-10 !bg-surface-white border border-outline-gray-3 hover:!bg-surface-gray-1 rounded-lg px-3 text-sm text-ink-gray-9'"
+              <option value="">--</option>
+              <option
+                v-for="option in statusSelectOptions"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+            <LucideChevronDown
+              class="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-gray-5"
             />
           </div>
         </div>
 
-        <div class="pt-4 space-y-3">
-          <div class="text-xs font-semibold text-ink-gray-7 uppercase tracking-wide">
-            Quick Views
-          </div>
-          <div class="space-y-1">
-            <button
-              v-for="view in quickViews"
-              :key="view.label"
-              class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink-gray-8 transition-colors hover:bg-surface-gray-1 hover:text-ink-gray-9"
-              :class="{
-                'bg-surface-gray-2 font-medium text-ink-gray-9 border border-outline-gray-3':
-                  activeQuickView === view.label,
-              }"
-              @click="applyQuickView(view)"
+        <div class="space-y-1.5">
+          <label class="text-[12px] font-normal leading-[18px] text-ink-gray-7">
+            Agents
+          </label>
+          <div class="relative">
+            <select
+              class="h-[35px] w-full appearance-none rounded border border-[#E4E4E4] bg-surface-white px-3 pr-8 text-[12px] leading-[18px] text-ink-gray-9 focus:border-outline-gray-3 focus:outline-none focus:ring-2 focus:ring-outline-gray-2"
+              :value="selectedAgentValue"
+              @change="handleAgentChange"
             >
-              <component :is="view.icon" class="h-4 w-4 flex-shrink-0 text-ink-gray-6" />
-              <span class="truncate">{{ view.label }}</span>
-            </button>
+              <option value="">--</option>
+              <option
+                v-for="option in agentFilterOptions"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+            <LucideChevronDown
+              class="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-gray-5"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[12px] font-normal leading-[18px] text-ink-gray-7">
+            Created
+          </label>
+          <div class="relative">
+            <select
+              v-model="createdRange"
+              class="h-[35px] w-full appearance-none rounded border border-[#E4E4E4] bg-surface-white px-3 pr-8 text-[12px] leading-[18px] text-ink-gray-9 focus:border-outline-gray-3 focus:outline-none focus:ring-2 focus:ring-outline-gray-2"
+            >
+              <option
+                v-for="option in createdRangeOptions"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+            <LucideChevronDown
+              class="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-gray-5"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[12px] font-normal leading-[18px] text-ink-gray-7">
+            Created At
+          </label>
+          <div class="relative">
+            <select
+              v-model="createdAt"
+              class="h-[35px] w-full appearance-none rounded border border-[#E4E4E4] bg-surface-white px-3 pr-8 text-[12px] leading-[18px] text-ink-gray-9 focus:border-outline-gray-3 focus:outline-none focus:ring-2 focus:ring-outline-gray-2"
+            >
+              <option value="">--</option>
+              <option
+                v-for="option in dateOptions"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+            <LucideChevronDown
+              class="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-gray-5"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[12px] font-normal leading-[18px] text-ink-gray-7">
+            Resolved At
+          </label>
+          <div class="relative">
+            <select
+              v-model="resolvedAt"
+              class="h-[35px] w-full appearance-none rounded border border-[#E4E4E4] bg-surface-white px-3 pr-8 text-[12px] leading-[18px] text-ink-gray-9 focus:border-outline-gray-3 focus:outline-none focus:ring-2 focus:ring-outline-gray-2"
+            >
+              <option value="">--</option>
+              <option
+                v-for="option in dateOptions"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+            <LucideChevronDown
+              class="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-gray-5"
+            />
           </div>
         </div>
       </div>
@@ -217,10 +275,8 @@
 
 <script setup lang="ts">
 import TicketCardView from "@/components/ticket/TicketCardView.vue";
-// @ts-expect-error - legacy component lacks types
-import MultiSelectCombobox from "@/components/frappe-ui/MultiSelectCombobox.vue";
 import { Button, Dropdown } from "frappe-ui";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import LucideFilter from "~icons/lucide/filter";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import LucideChevronLeft from "~icons/lucide/chevron-left";
@@ -305,6 +361,24 @@ const emit = defineEmits<{
   (e: "update-limit", value: number): void;
 }>();
 
+const searchQuery = ref("");
+const createdRange = ref("last_30_days");
+const createdAt = ref("");
+const resolvedAt = ref("");
+
+const createdRangeOptions = [
+  { label: "Last 7 days", value: "last_7_days" },
+  { label: "Last 30 days", value: "last_30_days" },
+  { label: "Last 90 days", value: "last_90_days" },
+];
+
+const dateOptions = [
+  { label: "Today", value: "today" },
+  { label: "Yesterday", value: "yesterday" },
+  { label: "This week", value: "this_week" },
+  { label: "This month", value: "this_month" },
+];
+
 function updateFilter(key: keyof CardFilters, value: any) {
   const optionPool: Record<keyof CardFilters, FilterOption[]> = {
     status: props.statusFilterOptions || [],
@@ -335,12 +409,37 @@ function updateFilter(key: keyof CardFilters, value: any) {
   emit("apply-filters", nextFilters);
 }
 
-function handleReset() {
-  emit("reset-filters");
+const statusSelectOptions = computed(() =>
+  (props.statusFilterOptions || []).filter((option) => option.value !== "")
+);
+
+const selectedStatusValue = computed(() => {
+  const first = props.filters.status?.[0];
+  if (!first) return "";
+  if (typeof first === "string") return first;
+  return first?.value || "";
+});
+
+function handleStatusChange(event: Event) {
+  const target = event.target as HTMLSelectElement | null;
+  const value = target?.value ?? "";
+  const option = (props.statusFilterOptions || []).find(
+    (item) => item.value === value
+  );
+  updateFilter("status", option || value || null);
 }
 
-function applyQuickView(view: QuickView) {
-  emit("apply-quick-view", view);
+const selectedAgentValue = computed(() => {
+  const first = props.filters.agent?.[0];
+  if (!first) return "";
+  if (typeof first === "string") return first;
+  return first?.value || "";
+});
+
+function handleAgentChange(event: Event) {
+  const target = event.target as HTMLSelectElement | null;
+  const value = target?.value || "";
+  updateFilter("agent", value || null);
 }
 
 const pageLength = computed(() => props.pageLengthCount || 20);
@@ -357,23 +456,6 @@ const pageLengthOptions = computed(() =>
     onClick: () => emit("update-limit", value),
   }))
 );
-
-// Computed property to get the selected status option from statusFilterOptions
-const selectedStatusOption = computed(() => {
-  const currentFilter = props.filters.status?.[0];
-  
-  if (!currentFilter) {
-    // Default to "All" option
-    return props.statusFilterOptions?.find(opt => opt.value === "") || null;
-  }
-  
-  const filterValue = typeof currentFilter === "object" && "value" in currentFilter 
-    ? currentFilter.value 
-    : currentFilter;
-  
-  // Find matching option from statusFilterOptions
-  return props.statusFilterOptions?.find(opt => opt.value === filterValue) || currentFilter;
-});
 
 const quickViewLabel = computed(() => props.activeQuickView || "All tickets");
 </script>
