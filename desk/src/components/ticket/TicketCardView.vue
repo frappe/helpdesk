@@ -13,7 +13,8 @@
       <div
         v-for="ticket in rows"
         :key="ticket.name"
-        class="cursor-pointer rounded-xl border border-outline-gray-2 bg-surface-white p-4 shadow-sm transition-all duration-200 hover:border-outline-gray-3 hover:shadow-md"
+        class="cursor-pointer border border-outline-gray-2 bg-surface-white p-4 transition-all duration-200 hover:border-outline-gray-3"
+        style="box-shadow: 9px 4px 4px 0 rgba(0, 0, 0, 0.02);"
         :class="resolvedClass(ticket)"
         @click="handleCardClick(ticket)"
       >
