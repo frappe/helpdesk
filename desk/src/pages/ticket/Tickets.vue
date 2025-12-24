@@ -82,6 +82,7 @@
       :team-filter-options="teamFilterOptions"
       :agent-filter-options="effectiveAgentFilterOptions"
       :filters="cardFilters"
+      :search="cardSearch"
       :quick-views="quickViews"
       :active-quick-view="activeQuickView"
       @row-click="handleCardClick"
@@ -91,6 +92,7 @@
       @prev-page="handleCardPrevPage"
       @load-more="handleCardLoadMore"
       @update:filters="updateCardFilters"
+      @update:search="handleCardSearchUpdate"
       @apply-filters="applyCardFilters"
       @reset-filters="resetCardFilters"
       @apply-quick-view="applyQuickView"
@@ -134,6 +136,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
 import { Badge, FeatherIcon, toast, Tooltip, usePageMeta, Dropdown, call, createResource } from "frappe-ui";
+import { useDebounceFn } from "@vueuse/core";
 import { computed, h, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 // import { useStorage } from "@vueuse/core";
 import { useRoute, useRouter } from "vue-router";
@@ -228,6 +231,10 @@ const cardFilters = reactive<CardFilters>({
   team: [],
   agent: [],
 });
+const cardSearch = ref("");
+const applySearchDebounced = useDebounceFn(() => {
+  applyCardFilters(cardFilters);
+}, 400);
 const activeQuickView = ref<string>("");
 const showExportModal = ref(false);
 const authStore = useAuthStore();
@@ -945,6 +952,13 @@ function buildCardFilters(filtersArg: CardFilters = cardFilters): Record<string,
   return filters;
 }
 
+function applyCardSearchFilter(filters: Record<string, any>) {
+  const searchText = cardSearch.value.trim();
+  if (searchText) {
+    filters.search = searchText;
+  }
+}
+
 function loadCardViewTickets() {
   console.log("loadCardViewTickets called");
   const filters = buildCardFilters(cardFilters);
@@ -992,6 +1006,8 @@ function loadCardViewTickets() {
       console.error("Error merging route filters:", error);
     }
   }
+
+  applyCardSearchFilter(filters);
   
   console.log("Loading card view tickets with filters:", filters);
   
@@ -1078,12 +1094,18 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
   }
 }
 
+function handleCardSearchUpdate(value: string) {
+  cardSearch.value = value;
+  applySearchDebounced();
+}
+
 function resetCardFilters() {
   // Reset to "All" filter
   cardFilters.status = [{ label: "All", value: "" }];
   cardFilters.priority = [];
   cardFilters.team = [];
   cardFilters.agent = [];
+  cardSearch.value = "";
   activeQuickView.value = "";
   filtersApplied.value = false; // Allow fresh filter application
   
@@ -1145,6 +1167,7 @@ function applyQuickView(view: any) {
 
   if (viewMode.value === "card") {
     cardViewOffset.value = 0;
+    applyCardSearchFilter(mergedFilters);
     cardViewResource.update({
       params: {
         filters: JSON.stringify(mergedFilters),

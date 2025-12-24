@@ -257,7 +257,7 @@
 <script setup lang="ts">
 import TicketCardView from "@/components/ticket/TicketCardView.vue";
 import { Button, Dropdown } from "frappe-ui";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import LucideFilter from "~icons/lucide/filter";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import LucideChevronLeft from "~icons/lucide/chevron-left";
@@ -302,6 +302,7 @@ const props = withDefaults(
     teamFilterOptions?: FilterOption[];
     agentFilterOptions?: FilterOption[];
     filters: CardFilters;
+    search?: string;
     quickViews: QuickView[];
     activeQuickView?: string;
   }>(),
@@ -323,6 +324,7 @@ const props = withDefaults(
       team: [],
       agent: [],
     }),
+    search: "",
     quickViews: () => [],
     activeQuickView: "",
   }
@@ -340,9 +342,11 @@ const emit = defineEmits<{
   (e: "reset-filters"): void;
   (e: "apply-quick-view", view: QuickView): void;
   (e: "update-limit", value: number): void;
+  (e: "update:search", value: string): void;
 }>();
 
-const searchQuery = ref("");
+const searchQuery = ref(props.search || "");
+const syncingSearch = ref(false);
 const createdRange = ref("last_30_days");
 const createdAt = ref("");
 const resolvedAt = ref("");
@@ -359,6 +363,25 @@ const dateOptions = [
   { label: "This week", value: "this_week" },
   { label: "This month", value: "this_month" },
 ];
+
+watch(
+  () => props.search,
+  (value) => {
+    const nextValue = value ?? "";
+    if (nextValue !== searchQuery.value) {
+      syncingSearch.value = true;
+      searchQuery.value = nextValue;
+    }
+  }
+);
+
+watch(searchQuery, (value) => {
+  if (syncingSearch.value) {
+    syncingSearch.value = false;
+    return;
+  }
+  emit("update:search", value);
+});
 
 function updateFilter(key: keyof CardFilters, value: any) {
   const optionPool: Record<keyof CardFilters, FilterOption[]> = {

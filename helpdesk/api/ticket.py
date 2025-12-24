@@ -41,7 +41,7 @@ def get_tickets_for_card_view(
 ):
     """
     Optimized API endpoint for fetching tickets in card view.
-    Supports filtering by status, priority, team (agent_group), and agent.
+    Supports filtering by status, priority, team (agent_group), agent, and search.
     """
     import json
 
@@ -141,12 +141,28 @@ def get_tickets_for_card_view(
 
     parsed_filters = build_filters(filters)
 
+    search_text = ""
+    if isinstance(filters, dict):
+        search_text = filters.get("search") or filters.get("search_text") or ""
+    search_text = (search_text or "").strip()
+    or_filters = []
+    if search_text:
+        like_value = f"%{search_text}%"
+        or_filters = [
+            ["name", "like", like_value],
+            ["subject", "like", like_value],
+            ["raised_by", "like", like_value],
+            ["contact", "like", like_value],
+            ["customer", "like", like_value],
+        ]
+
     # Default to ticket id based ordering so permission queries still apply.
     order_by_value = "name desc"
 
     tickets = frappe.get_list(
         "HD Ticket",
         filters=parsed_filters,
+        or_filters=or_filters,
         fields=[
             "name",
             "subject",
@@ -177,6 +193,7 @@ def get_tickets_for_card_view(
     total_count_result = frappe.get_list(
         "HD Ticket",
         filters=parsed_filters,
+        or_filters=or_filters,
         fields=["count(name) as total_count"]
     )
     total_count = total_count_result[0].get("total_count", 0) if total_count_result else 0
