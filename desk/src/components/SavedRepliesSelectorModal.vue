@@ -4,6 +4,7 @@
     :options="{
       size: '4xl',
     }"
+    @vue:unmounted="resetFilter"
   >
     <template #body>
       <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
@@ -20,6 +21,7 @@
           <div class="flex items-center gap-2">
             <div class="relative w-full">
               <Input
+                ref="searchInput"
                 :model-value="search"
                 @input="search = $event"
                 :placeholder="__('Search')"
@@ -91,16 +93,18 @@
 import {
   Button,
   Dropdown,
+  Input,
   LoadingIndicator,
   TextEditor,
   createListResource,
   createResource,
+  Dialog,
 } from "frappe-ui";
 import {
   setActiveSettingsTab,
   showSettingsModal,
 } from "./Settings/settingsModal";
-import { ref, computed, watch, onUnmounted } from "vue";
+import { ref, computed, watch, onUnmounted, nextTick } from "vue";
 import { showEmailBox } from "../pages/ticket/modalStates";
 import { useStorage } from "@vueuse/core";
 import { SavedReply } from "@/types";
@@ -159,6 +163,7 @@ if (
 const emit = defineEmits(["apply"]);
 
 const search = ref("");
+const searchInput = ref<InstanceType<typeof Input>>();
 const selectedTemplate = ref({
   name: "",
   isLoading: false,
@@ -218,6 +223,13 @@ const onNewSavedReplyClick = () => {
   setActiveSettingsTab("Saved Replies");
 };
 
+const resetFilter = () => {
+  savedReplyListResource.filters = {
+    ...savedReplyListResource.filters,
+    title: undefined,
+  };
+};
+
 watch(search, (newValue) => {
   savedReplyListResource.filters = {
     ...savedReplyListResource.filters,
@@ -234,4 +246,17 @@ watch(activeFilter, (newActiveFilter) => {
   };
   savedReplyListResource.list.reload();
 });
+
+watch(
+  show,
+  (newValue) => {
+    if (newValue) {
+      nextTick(() => {
+        const inputEl = searchInput.value?.$el?.querySelector("input");
+        inputEl?.focus();
+      });
+    }
+  },
+  { immediate: true }
+);
 </script>
