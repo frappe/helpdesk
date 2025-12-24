@@ -634,7 +634,6 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     ticket = DocType("HD Ticket")
     today = frappe.utils.nowdate()
     today_start = frappe.utils.get_datetime(frappe.utils.today() + " 00:00:00")
-    today_end = frappe.utils.get_datetime(frappe.utils.add_days(frappe.utils.today(), 1) + " 00:00:00")
 
     # Get date range from filters
     from_date = filters.get("from_date") if filters else None
@@ -745,14 +744,8 @@ def get_status_card_data(filters: dict[str, any] = None) -> list[dict[str, any]]
     # always receives the same structure from dashboard clicks.
     open_filter = {"status": ["in", ["Open"]]}
     
-    # Resolved filter: status + resolution_by between today 00:00:00 and tomorrow 00:00:00
+    # Resolved filter: status only to match resolved count logic
     resolved_filter = {"status": ["in", resolved_only_statuses]} if resolved_only_statuses else {}
-    if resolved_filter:
-        # Convert datetime to string for JSON serialization
-        resolved_filter["resolution_by"] = ["between", [
-            frappe.utils.get_datetime_str(today_start),
-            frappe.utils.get_datetime_str(today_end)
-        ]]
     
     # Overdue filter: Open status + resolution_by < start of today (matching overdue_cond logic)
     overdue_filter = {
