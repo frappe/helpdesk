@@ -190,26 +190,6 @@
 
         <div class="space-y-1.5">
           <label class="text-[12px] font-normal leading-[18px] text-ink-gray-7">
-            Created
-          </label>
-          <div class="relative">
-            <select
-              v-model="createdRange"
-              class="h-[35px] w-full appearance-none rounded border border-[#E4E4E4] bg-surface-white px-3 pr-8 text-[12px] leading-[18px] text-ink-gray-9 focus:border-outline-gray-3 focus:outline-none focus:ring-2 focus:ring-outline-gray-2"
-            >
-              <option
-                v-for="option in createdRangeOptions"
-                :key="option.value"
-                :value="option.value"
-              >
-                {{ option.label }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="text-[12px] font-normal leading-[18px] text-ink-gray-7">
             Created At
           </label>
           <div class="relative">
@@ -305,6 +285,8 @@ const props = withDefaults(
     search?: string;
     quickViews: QuickView[];
     activeQuickView?: string;
+    createdAt?: string;
+    resolvedAt?: string;
   }>(),
   {
     rows: () => [],
@@ -327,6 +309,8 @@ const props = withDefaults(
     search: "",
     quickViews: () => [],
     activeQuickView: "",
+    createdAt: "",
+    resolvedAt: "",
   }
 );
 
@@ -343,19 +327,27 @@ const emit = defineEmits<{
   (e: "apply-quick-view", view: QuickView): void;
   (e: "update-limit", value: number): void;
   (e: "update:search", value: string): void;
+  (e: "update:created-at", value: string): void;
+  (e: "update:resolved-at", value: string): void;
+  (e: "apply-date-filters"): void;
 }>();
 
 const searchQuery = ref(props.search || "");
 const syncingSearch = ref(false);
-const createdRange = ref("last_30_days");
-const createdAt = ref("");
-const resolvedAt = ref("");
-
-const createdRangeOptions = [
-  { label: "Last 7 days", value: "last_7_days" },
-  { label: "Last 30 days", value: "last_30_days" },
-  { label: "Last 90 days", value: "last_90_days" },
-];
+const createdAt = computed({
+  get: () => props.createdAt || "",
+  set: (value: string) => {
+    emit("update:created-at", value);
+    emit("apply-date-filters");
+  },
+});
+const resolvedAt = computed({
+  get: () => props.resolvedAt || "",
+  set: (value: string) => {
+    emit("update:resolved-at", value);
+    emit("apply-date-filters");
+  },
+});
 
 const dateOptions = [
   { label: "Today", value: "today" },

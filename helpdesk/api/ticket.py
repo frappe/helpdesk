@@ -41,7 +41,7 @@ def get_tickets_for_card_view(
 ):
     """
     Optimized API endpoint for fetching tickets in card view.
-    Supports filtering by status, priority, team (agent_group), agent, and search.
+    Supports filtering by status, priority, team (agent_group), agent, search, and date ranges.
     """
     import json
 
@@ -114,6 +114,17 @@ def get_tickets_for_card_view(
             # Direct comparisons: [">=", date], ["<=", date], etc.
             elif operator in (">=", "<=", ">", "<", "="):
                 filter_list.append(["creation", operator, value])
+
+        # Resolution date filters (actual resolved timestamp)
+        resolution_date_filter = raw_filters.get("resolution_date")
+        if isinstance(resolution_date_filter, list) and len(resolution_date_filter) == 2:
+            operator, value = resolution_date_filter
+            if isinstance(operator, str):
+                operator = operator.lower()
+            if operator == "between" and isinstance(value, list) and len(value) == 2:
+                filter_list.append(["resolution_date", "between", value])
+            elif operator in (">=", "<=", ">", "<", "="):
+                filter_list.append(["resolution_date", operator, value])
 
         # Resolution by filter (for overdue/resolved tickets)
         resolution_by_filter = raw_filters.get("resolution_by")

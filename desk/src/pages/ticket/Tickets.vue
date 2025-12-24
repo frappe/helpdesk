@@ -82,6 +82,8 @@
       :team-filter-options="teamFilterOptions"
       :agent-filter-options="effectiveAgentFilterOptions"
       :filters="cardFilters"
+      :created-at="cardDateFilters.createdAt"
+      :resolved-at="cardDateFilters.resolvedAt"
       :search="cardSearch"
       :quick-views="quickViews"
       :active-quick-view="activeQuickView"
@@ -92,8 +94,11 @@
       @prev-page="handleCardPrevPage"
       @load-more="handleCardLoadMore"
       @update:filters="updateCardFilters"
+      @update:created-at="(value) => updateCardDateFilter('createdAt', value)"
+      @update:resolved-at="(value) => updateCardDateFilter('resolvedAt', value)"
       @update:search="handleCardSearchUpdate"
       @apply-filters="applyCardFilters"
+      @apply-date-filters="applyCardDateFilters"
       @reset-filters="resetCardFilters"
       @apply-quick-view="applyQuickView"
       @update-limit="handleUpdateLimit"
@@ -155,6 +160,11 @@ type CardFilters = {
   priority: any[];
   team: any[];
   agent: any[];
+};
+
+type CardDateFilters = {
+  createdAt: string;
+  resolvedAt: string;
 };
 
 const router = useRouter();
@@ -230,6 +240,10 @@ const cardFilters = reactive<CardFilters>({
   priority: [],
   team: [],
   agent: [],
+});
+const cardDateFilters = reactive<CardDateFilters>({
+  createdAt: "",
+  resolvedAt: "",
 });
 const cardSearch = ref("");
 const applySearchDebounced = useDebounceFn(() => {
@@ -907,6 +921,52 @@ function updateCardFilters(value: CardFilters) {
   cardFilters.agent = value?.agent || [];
 }
 
+function updateCardDateFilter(key: keyof CardDateFilters, value: string) {
+  cardDateFilters[key] = value || "";
+}
+
+function applyCardDateFilters() {
+  applyCardFilters(cardFilters);
+}
+
+function getDateRange(option: string): [string, string] | null {
+  if (!option) return null;
+  const format = (value: ReturnType<typeof dayjs>) =>
+    value.format("YYYY-MM-DD HH:mm:ss");
+
+  if (option === "today") {
+    const today = dayjs();
+    return [format(today.startOf("day")), format(today.endOf("day"))];
+  }
+  if (option === "yesterday") {
+    const yesterday = dayjs().subtract(1, "day");
+    return [format(yesterday.startOf("day")), format(yesterday.endOf("day"))];
+  }
+  if (option === "this_week") {
+    const start = dayjs().startOf("week");
+    const end = dayjs().endOf("day");
+    return [format(start), format(end)];
+  }
+  if (option === "this_month") {
+    const start = dayjs().startOf("month");
+    const end = dayjs().endOf("day");
+    return [format(start), format(end)];
+  }
+  return null;
+}
+
+function applyCardDateRangeFilters(filters: Record<string, any>) {
+  const createdRange = getDateRange(cardDateFilters.createdAt);
+  if (createdRange) {
+    filters.creation = ["between", createdRange];
+  }
+
+  const resolvedRange = getDateRange(cardDateFilters.resolvedAt);
+  if (resolvedRange) {
+    filters.resolution_date = ["between", resolvedRange];
+  }
+}
+
 function buildCardFilters(filtersArg: CardFilters = cardFilters): Record<string, any> {
   const sourceFilters = filtersArg || cardFilters;
   let filters: Record<string, any> = {};
@@ -962,6 +1022,7 @@ function applyCardSearchFilter(filters: Record<string, any>) {
 function loadCardViewTickets() {
   console.log("loadCardViewTickets called");
   const filters = buildCardFilters(cardFilters);
+  applyCardDateRangeFilters(filters);
   
   // Merge with route query filters (for date, owner, agent, team, etc.)
   if (route.query.filters) {
@@ -1044,6 +1105,7 @@ function applyCardFilters(filtersArg: CardFilters = cardFilters) {
     const list = listViewRef.value.list;
 
     const filters = buildCardFilters(sourceFilters);
+    applyCardDateRangeFilters(filters);
     
     // Preserve route filters (date, owner, agent, team) when applying card filters
     if (route.query.filters) {
@@ -1105,6 +1167,8 @@ function resetCardFilters() {
   cardFilters.priority = [];
   cardFilters.team = [];
   cardFilters.agent = [];
+  cardDateFilters.createdAt = "";
+  cardDateFilters.resolvedAt = "";
   cardSearch.value = "";
   activeQuickView.value = "";
   filtersApplied.value = false; // Allow fresh filter application
@@ -1164,6 +1228,8 @@ function applyQuickView(view: any) {
       console.error("Error merging route filters in quick view:", error);
     }
   }
+
+  applyCardDateRangeFilters(mergedFilters);
 
   if (viewMode.value === "card") {
     cardViewOffset.value = 0;
