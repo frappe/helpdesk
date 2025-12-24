@@ -984,7 +984,20 @@ function buildCardFilters(filtersArg: CardFilters = cardFilters): Record<string,
     (v) => v === "" || v === null || v === undefined
   );
 
-  if (!statusAllSelected && sourceFilters.status?.length) {
+  const overdueSelected = rawStatusValues.includes("Overdue");
+
+  if (overdueSelected) {
+    const openStatuses = (statuses.data || [])
+      .filter((status) => status.category === "Open")
+      .map((status) => status.label_agent)
+      .filter(Boolean);
+    const statusValues = openStatuses.length ? openStatuses : ["Open"];
+    filters["status"] = ["in", statusValues];
+    filters["resolution_by"] = [
+      "<",
+      dayjs().startOf("day").format("YYYY-MM-DD HH:mm:ss"),
+    ];
+  } else if (!statusAllSelected && sourceFilters.status?.length) {
     const statusValues = rawStatusValues.filter(Boolean);
     if (statusValues.length) {
       filters["status"] = ["in", statusValues];

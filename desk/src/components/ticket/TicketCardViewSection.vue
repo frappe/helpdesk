@@ -453,5 +453,17 @@ const pageLengthOptions = computed(() =>
   }))
 );
 
-const quickViewLabel = computed(() => props.activeQuickView || "All tickets");
+const statusLabel = computed(() => {
+  const first = props.filters.status?.[0];
+  if (!first) return "";
+  if (typeof first === "string") return first;
+  return first?.label || first?.value || "";
+});
+
+const quickViewLabel = computed(() => {
+  if (props.activeQuickView) return props.activeQuickView;
+  const label = statusLabel.value;
+  if (label && label !== "All") return `${label} tickets`;
+  return "All tickets";
+});
 </script>
