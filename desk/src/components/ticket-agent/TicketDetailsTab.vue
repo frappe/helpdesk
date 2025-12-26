@@ -11,7 +11,7 @@
           v-for="(section, index) in coreFields"
           :key="index"
           :class="
-            section.group ? 'flex gap-2 items-center w-full mb-3' : 'mb-3'
+            section.group ? 'flex flex-col gap-2 w-full mb-3' : 'mb-3'
           "
         >
           <template v-for="field in section.fields">
@@ -19,9 +19,8 @@
               v-if="field.visible"
               :key="field.fieldname"
               :ref="(el) => setFieldRef(field.fieldname, el)"
-              class="form-control-core"
+              class="form-control-core form-control-link w-full"
               :id="field.fieldname"
-              :class="section.group ? 'flex-1' : 'w-full'"
               :page-length="10"
               :label="field.label"
               :placeholder="field.placeholder"
@@ -39,13 +38,13 @@
         <!-- Assignee component -->
         <AssignTo :readonly="isTicketResolved" />
         <div class="flex flex-col gap-1.5 mt-2">
-          <span class="block text-xs text-gray-600">Owner</span>
+          <span class="form-control-label text-xs">Owner</span>
           <FormControl
             type="select"
             :options="ownerOptions"
             :model-value="ownerDisplay"
             disabled
-            class="!h-9"
+            class="form-control-core"
           />
         </div>
       </div>
@@ -132,7 +131,7 @@ watch(
   { immediate: true }
 );
 
-// ticket_type, priority, customer, agent_group
+// ticket_type, priority, status, customer, agent_group
 const coreFields = computed(() => {
   // TODO: to confirm whether customizations should apply to core fields as well
   const fieldsMeta = getFields();
@@ -140,9 +139,11 @@ const coreFields = computed(() => {
     return [];
   }
   const _coreFields = [
-    { group: true, fields: [getField("ticket_type"), getField("priority")] },
+    { group: false, fields: [getField("ticket_type")] },
+    { group: false, fields: [getField("priority")] },
+    { group: false, fields: [getField("status")] },
     { group: false, fields: [getField("customer")] },
-    { group: true, fields: [getField("agent_group")] },
+    { group: false, fields: [getField("agent_group")] },
   ];
 
   _coreFields.forEach((section) => {
@@ -262,14 +263,36 @@ useShortcut({ key: "t", shift: true }, () => {
 </script>
 
 <style scoped>
-:deep(.form-control-core button) {
-  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
+:deep(.form-control-core label),
+.form-control-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  align-self: stretch;
+  color: #727272;
+}
+
+:deep(.form-control-core button),
+:deep(.form-control-core [role="combobox"]) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 8px 12px !important;
+  border-radius: 4px !important;
+  border: 1px solid var(--Color-Tokens-Border-Primary, #e4e4e4) !important;
+  background: var(--Color-Tokens-Background-Secondary, #f9f9f9) !important;
+  box-sizing: border-box !important;
 }
 :deep(.form-control-core button > div) {
   @apply truncate;
 }
 
-:deep(.form-control-core div) {
+:deep(.form-control-link div) {
   width: 100%;
   display: flex;
 }

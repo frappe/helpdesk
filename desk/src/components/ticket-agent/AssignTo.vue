@@ -2,10 +2,19 @@
   <Popover class="flex w-full" placement="bottom-end">
     <template #target="{ open, close, togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span class="block text-xs text-gray-600">Assignee</span>
+        <span
+          class="flex items-start gap-2 self-stretch text-xs"
+          style="color: #727272"
+        >
+          Assignee
+        </span>
         <Button
           variant="outline"
-          class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm"
+          class="!flex !items-center !justify-start !gap-2 w-full !h-9 !min-h-9 !px-3 !py-2 !rounded !border !text-sm !text-ink-gray-8 focus:!ring-0 focus-visible:!ring-0 shrink-0 self-stretch"
+          style="
+            border-color: var(--Color-Tokens-Border-Primary, #e4e4e4);
+            background: var(--Color-Tokens-Background-Secondary, #f9f9f9);
+          "
           ref="assigneeButton"
           :disabled="readonly"
           @click="togglePopover()"
