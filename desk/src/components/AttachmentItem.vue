@@ -19,7 +19,7 @@
       v-model="showDialog"
       :options="{
         title: label,
-        size: '4xl',
+        size: 'xl',
       }"
     >
       <template #body-content>
@@ -29,7 +29,19 @@
         >
           {{ content }}
         </div>
-        <img v-if="isImage" :src="url" class="m-auto rounded border" />
+        <div v-if="isImage" class="flex flex-col items-center gap-4">
+          <img :src="url" class="max-h-[70vh] max-w-full rounded border object-contain" />
+          <Button
+            :label="`Download ${label}`"
+            theme="gray"
+            variant="solid"
+            @click="downloadFile"
+          >
+            <template #prefix>
+              <LucideDownload class="h-4 w-4" />
+            </template>
+          </Button>
+        </div>
       </template>
     </Dialog>
   </span>
@@ -44,6 +56,7 @@ import LucideFileImage from "~icons/lucide/file-image";
 import LucideFileText from "~icons/lucide/file-text";
 import LucideFileSpreadsheet from "~icons/lucide/file-spreadsheet";
 import LucideFile from "~icons/lucide/file";
+import LucideDownload from "~icons/lucide/download";
 
 interface P {
   label: string;
@@ -77,5 +90,15 @@ function toggleDialog() {
     fetch(props.url).then((res) => res.text().then((t) => (content.value = t)));
   }
   showDialog.value = !showDialog.value;
+}
+
+function downloadFile() {
+  if (!props.url) return;
+  const link = document.createElement("a");
+  link.href = props.url;
+  link.download = props.label;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 </script>
