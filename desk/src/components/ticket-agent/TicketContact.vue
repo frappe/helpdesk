@@ -3,7 +3,7 @@
    
     class="my-3 bg-surface-white px-4 py-3"
   >
-    <p class="text-sm font-semibold text-ink-gray-9">{{ statusLabel }}</p>
+    <p class="text-xl font-semibold text-ink-gray-9">{{ statusLabel }}</p>
     <div class="mt-2.5">
       <div class="flex items-start gap-2 py-2">
         <span
@@ -76,9 +76,9 @@ const resolutionLabel = computed(() => {
 const firstResponseDotClass = computed(() => {
   const doc = ticket.value?.doc;
   if (doc?.first_responded_on) {
-    return "bg-surface-gray-6";
+    return "bg-red-500";
   }
-  return "bg-surface-gray-8";
+  return "bg-red-500";
 });
 
 const resolutionDotClass = computed(() => {
@@ -86,7 +86,7 @@ const resolutionDotClass = computed(() => {
   if (doc?.resolution_date || doc?.agreement_status === "Fulfilled") {
     return "bg-surface-gray-6";
   }
-  return "bg-surface-gray-7";
+  return "bg-green-500";
 });
 
 const firstResponseDate = computed(() => {
