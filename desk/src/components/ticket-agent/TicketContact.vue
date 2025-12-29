@@ -1,91 +1,107 @@
 <template>
   <div
-    v-if="!contact.loading"
-    class="my-4 flex items-center justify-start gap-5"
+   
+    class="my-3 bg-surface-white px-4 py-3"
   >
-    <Avatar :label="contact.data.name" :image="contactImage" size="2xl" />
-    <div class="flex flex-col gap-1.5">
-      <Tooltip :text="contact.data.name || contact.data.email_id">
-        <div class="flex gap-2.5 items-center">
-          <p class="text-ink-gray-8 font-medium text-xl max-w-[170px] truncate">
-            {{ contact.data.name || contact.data.email_id }}
-          </p>
-          <ExternalLinkIcon
-            class="size-4 text-ink-gray-6 cursor-pointer"
-            @click="openContact(contact.data.name)"
-          />
+    <p class="text-sm font-semibold text-ink-gray-9">{{ statusLabel }}</p>
+    <div class="mt-2.5">
+      <div class="flex items-start gap-2 py-2">
+        <span
+          class="mt-1 h-2 w-2 rounded-full"
+          :class="firstResponseDotClass"
+          aria-hidden="true"
+        />
+        <div class="flex flex-col gap-0.5">
+          <span class="text-sm font-medium text-ink-gray-8">
+            {{ firstResponseLabel }}
+          </span>
+          <span class="text-xs text-ink-gray-6">by {{ firstResponseDate }}</span>
         </div>
-      </Tooltip>
-      <div class="flex gap-1.5">
-        <Tooltip :text="contact.data.email_id">
-          <!-- Email Button -->
-          <Button size="sm" @click="toggleEmailBox()">
-            <template #icon>
-              <EmailIcon class="size-4" />
-            </template>
-          </Button>
-          <!-- Call Button -->
-          <Button size="sm" v-if="isCallingEnabled" @click="callContact">
-            <template #icon>
-              <PhoneIcon class="size-4" />
-            </template>
-          </Button>
-        </Tooltip>
+      </div>
+      <div class="flex items-start gap-2 py-2">
+        <span
+          class="mt-1 h-2 w-2 rounded-full"
+          :class="resolutionDotClass"
+          aria-hidden="true"
+        />
+        <div class="flex flex-col gap-0.5">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-ink-gray-8">
+              {{ resolutionLabel }}
+            </span>
+            <span
+              v-if="resolutionLabel === 'Resolution Due'"
+              class="text-xs font-medium text-ink-gray-6"
+            >
+              Edit
+            </span>
+          </div>
+          <span class="text-xs text-ink-gray-6">by {{ resolutionDate }}</span>
+        </div>
       </div>
     </div>
-    <SetContactPhoneModal
-      v-model="showPhoneModal"
-      :name="contact.data.name"
-      @onUpdate="contact.reload"
-    />
+    
   </div>
+  <div class="h-[1px] bg-[#EDEDED]  mb-4"/>
 </template>
 
 <script setup lang="ts">
-import { toggleEmailBox } from "@/pages/ticket/modalStates";
-import { useTelephonyStore } from "@/stores/telephony";
-import { useUserStore } from "@/stores/user";
-import { TicketContactSymbol, TicketSymbol } from "@/types";
-import { Avatar, Button, Tooltip } from "frappe-ui";
-import { storeToRefs } from "pinia";
-import { computed, inject, ref } from "vue";
-import { ExternalLinkIcon } from "../icons";
-import EmailIcon from "../icons/EmailIcon.vue";
-import PhoneIcon from "../icons/PhoneIcon.vue";
-import SetContactPhoneModal from "../ticket/SetContactPhoneModal.vue";
-
-const telephonyStore = useTelephonyStore();
-const { getUser } = useUserStore();
-const { isCallingEnabled } = storeToRefs(telephonyStore);
-const showPhoneModal = ref(false);
+import { TicketSymbol } from "@/types";
+import { dateFormat, dateTooltipFormat } from "@/utils";
+import { computed, inject } from "vue";
 
 const ticket = inject(TicketSymbol);
 
-const contact = inject(TicketContactSymbol);
-const contactImage = computed(() => {
-  return (
-    contact.value?.data?.image ||
-    getUser(contact.value?.data?.email_id)?.user_image ||
-    null
-  );
+const statusLabel = computed(() => {
+  const doc = ticket.value?.doc;
+  return doc?.status_category || doc?.status || "-";
 });
 
-function openContact(name: string) {
-  let url = window.location.origin + "/app/contact/" + name;
-  window.open(url, "_blank");
-}
+const firstResponseLabel = computed(() => {
+  const doc = ticket.value?.doc;
+  if (!doc) return "First Response Due";
+  if (doc.first_responded_on) return "First Response";
+  return "First Response Due";
+});
 
-const callContact = () => {
-  if (!contact.value.data.mobile_no && !contact.value.data.phone) {
-    showPhoneModal.value = true;
-    return;
+const resolutionLabel = computed(() => {
+  const doc = ticket.value?.doc;
+  if (!doc) return "Resolution Due";
+  if (doc.resolution_date || doc.agreement_status === "Fulfilled") {
+    return "Resolution";
   }
-  telephonyStore.makeCall({
-    number: contact.value.data.mobile_no || contact.value.data.phone,
-    doctype: "HD Ticket",
-    docname: ticket.value.name,
-  });
-};
+  return "Resolution Due";
+});
+
+const firstResponseDotClass = computed(() => {
+  const doc = ticket.value?.doc;
+  if (doc?.first_responded_on) {
+    return "bg-surface-gray-6";
+  }
+  return "bg-surface-gray-8";
+});
+
+const resolutionDotClass = computed(() => {
+  const doc = ticket.value?.doc;
+  if (doc?.resolution_date || doc?.agreement_status === "Fulfilled") {
+    return "bg-surface-gray-6";
+  }
+  return "bg-surface-gray-7";
+});
+
+const firstResponseDate = computed(() => {
+  const doc = ticket.value?.doc;
+  const responseDate = doc?.first_responded_on || doc?.response_by;
+  return responseDate ? dateFormat(responseDate, dateTooltipFormat) : "-";
+});
+
+const resolutionDate = computed(() => {
+  const doc = ticket.value?.doc;
+  const resolutionDateValue = doc?.resolution_date || doc?.resolution_by;
+  return resolutionDateValue
+    ? dateFormat(resolutionDateValue, dateTooltipFormat)
+    : "-";
+});
 </script>
 
 <style scoped></style>
