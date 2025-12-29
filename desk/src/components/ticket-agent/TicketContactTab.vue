@@ -50,30 +50,6 @@
             <p
               class="font-['Poppins'] text-[12px] font-[250] leading-[18px] text-ink-gray-6"
             >
-              Work Phone
-            </p>
-            <div class="mt-1 flex items-center gap-2">
-              <p
-                class="flex-1 truncate font-['Poppins'] text-[14px] font-[250] leading-[21px] text-ink-black"
-              >
-                {{ workPhone }}
-              </p>
-              <CopyIcon
-                v-if="hasWorkPhone"
-                class="size-4 cursor-pointer"
-                @click="
-                  copyToClipboard(
-                    workPhoneValue,
-                    `'${workPhoneValue}' copied to clipboard`
-                  )
-                "
-              />
-            </div>
-          </div>
-          <div>
-            <p
-              class="font-['Poppins'] text-[12px] font-[250] leading-[18px] text-ink-gray-6"
-            >
               Phone Number
             </p>
             <div class="mt-1 flex items-center gap-2">
@@ -164,7 +140,7 @@
 
 <script setup lang="ts">
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { RecentSimilarTicketsSymbol, TicketContactSymbol } from "@/types";
+import { RecentSimilarTicketsSymbol, TicketContactSymbol, TicketSymbol } from "@/types";
 import { copyToClipboard } from "@/utils";
 import dayjs from "dayjs";
 import { Tooltip } from "frappe-ui";
@@ -173,30 +149,28 @@ import { CopyIcon } from "../icons";
 import Section from "../Section.vue";
 import LucideUser from "~icons/lucide/user";
 
+const ticket = inject(TicketSymbol);
 const contact = inject(TicketContactSymbol);
 const recentSimilarTickets = inject(RecentSimilarTicketsSymbol);
 const dateFormat = window.date_format;
 
 const { getStatus, colorMap } = useTicketStatusStore();
-const contactData = computed(() => contact?.value?.data);
-const contactNameValue = computed(() => contactData.value?.name?.trim());
+const contactNameValue = computed(() => {
+  const customName = ticket?.value?.doc?.custom_customer_name;
+  return customName?.trim() || null;
+});
 const contactName = computed(() => contactNameValue.value || "Not available");
-const contactEmailValue = computed(() => contactData.value?.email_id);
-const contactEmail = computed(
-  () => contactEmailValue.value || "Not available"
-);
-const workPhoneValue = computed(() => contactData.value?.mobile_no);
-const workPhone = computed(() => workPhoneValue.value || "Not available");
-const phoneNumberValue = computed(() => contactData.value?.phone);
+const phoneNumberValue = computed(() => {
+  return ticket?.value?.doc?.custom_customer_phone || null;
+});
 const phoneNumber = computed(() => phoneNumberValue.value || "Not available");
-const hasWorkPhone = computed(() => !!workPhoneValue.value);
 const hasPhoneNumber = computed(() => !!phoneNumberValue.value);
 const contactInitial = computed(() => {
   if (!contactNameValue.value) return "?";
   return contactNameValue.value[0].toUpperCase();
 });
 const showContact = computed(
-  () => !!contact?.value && !contact.value.loading
+  () => !!ticket?.value?.doc
 );
 
 function getStatusColor(status: string) {
