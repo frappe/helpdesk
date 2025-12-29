@@ -63,6 +63,9 @@ doc_events = {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
+    "ToDo": {
+        "after_insert": "helpdesk.helpdesk.doctype.hd_notification.utils.notify_assignment_from_todo",
+    },
 }
 
 has_permission = {
