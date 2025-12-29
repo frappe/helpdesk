@@ -142,7 +142,6 @@ const coreFields = computed(() => {
     { group: false, fields: [getField("ticket_type")] },
     { group: false, fields: [getField("priority")] },
     { group: false, fields: [getField("status")] },
-    { group: false, fields: [getField("customer")] },
     { group: false, fields: [getField("agent_group")] },
   ];
 
