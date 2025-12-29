@@ -24,7 +24,8 @@
 
         <div class="mt-4 flex items-center gap-3">
           <div
-            class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-gray-2 text-ink-gray-8"
+            class="flex shrink-0 items-center justify-center rounded-full text-ink-gray-8"
+            style="width: 28.014px; height: 28.014px; aspect-ratio: 28.01/28.01; background-color: rgba(161, 105, 234, 0.70);"
           >
             <span class="font-['Poppins'] text-sm font-medium">
               {{ contactInitial }}
@@ -39,7 +40,7 @@
             <p
               class="font-['Poppins'] text-[12px] font-[250] leading-[18px] text-ink-gray-6 truncate"
             >
-              {{ contactEmail }}
+              {{ "Not available"}}
             </p>
           </div>
         </div>
