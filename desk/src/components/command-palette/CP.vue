@@ -8,7 +8,11 @@
               <LucideSearch class="h-4 w-4" />
             </div>
             <ComboboxInput
-              :placeholder="__('Search tickets, emails, comments, or #234 to navigate to ticket')"
+              :placeholder="
+                __(
+                  'Search tickets, emails, comments, or #234 to navigate to ticket'
+                )
+              "
               class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-gray-800 placeholder:text-gray-500 focus:ring-0"
               autocomplete="off"
               @input="onInput"

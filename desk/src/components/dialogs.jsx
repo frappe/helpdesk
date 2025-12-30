@@ -1,10 +1,10 @@
-import { Dialog, ErrorMessage } from 'frappe-ui'
-import { reactive, ref } from 'vue'
+import { Dialog, ErrorMessage } from "frappe-ui";
+import { reactive, ref } from "vue";
 
-let dialogs = ref([])
+let dialogs = ref([]);
 
 export let Dialogs = {
-  name: 'Dialogs',
+  name: "Dialogs",
   render() {
     return dialogs.value.map((dialog) => (
       <Dialog
@@ -13,29 +13,27 @@ export let Dialogs = {
         onUpdate:modelValue={(val) => (dialog.show = val)}
       >
         {{
-          'body-content': () => {
+          "body-content": () => {
             return [
               dialog.message && (
                 <p class="text-p-base text-ink-gray-7">{dialog.message}</p>
               ),
-              dialog.html && (
-                <div v-html={dialog.html} />
-              ),
+              dialog.html && <div v-html={dialog.html} />,
               <ErrorMessage class="mt-2" message={dialog.error} />,
-            ]
+            ];
           },
         }}
       </Dialog>
-    ))
+    ));
   },
-}
+};
 
 export function createDialog(dialogOptions) {
-  let dialog = reactive(dialogOptions)
-  dialog.key = 'dialog-' + dialogs.value.length
-  dialog.show = false
+  let dialog = reactive(dialogOptions);
+  dialog.key = "dialog-" + dialogs.value.length;
+  dialog.show = false;
   setTimeout(() => {
-    dialog.show = true
-  }, 0)
-  dialogs.value.push(dialog)
+    dialog.show = true;
+  }, 0);
+  dialogs.value.push(dialog);
 }

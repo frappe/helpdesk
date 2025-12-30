@@ -397,8 +397,9 @@ const viewActions = (view) => {
           if (_view.public) {
             $dialog({
               title: __("Make {0} private?", [_view.label]),
-              message:
-                __("This view is currently public. Changing it to private will hide it for all the users."),
+              message: __(
+                "This view is currently public. Changing it to private will hide it for all the users."
+              ),
               actions: [
                 {
                   label: __("Confirm"),
@@ -426,12 +427,14 @@ const viewActions = (view) => {
           onClick: () => {
             $dialog({
               title: __("Delete {0}?", [_view.label]),
-              message: __("Are you sure you want to delete this view?") +
-              (
-                _view.public
-                  ? " " + __("This view is public, and will be removed for all users.")
-                  : ""
-              ),
+              message:
+                __("Are you sure you want to delete this view?") +
+                (_view.public
+                  ? " " +
+                    __(
+                      "This view is public, and will be removed for all users."
+                    )
+                  : ""),
               actions: [
                 {
                   label: __("Confirm"),

@@ -18,7 +18,9 @@
           >
             <template #default="{ uploading, openFileSelector }">
               <Button
-                :label="contact.doc?.image ? __('Change photo') : __('Upload photo')"
+                :label="
+                  contact.doc?.image ? __('Change photo') : __('Upload photo')
+                "
                 :loading="uploading"
                 @click="openFileSelector"
               />

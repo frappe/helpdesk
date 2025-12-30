@@ -2,7 +2,9 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">{{ __("Knowledge Base") }}</div>
+        <div class="text-lg font-medium text-gray-900">
+          {{ __("Knowledge Base") }}
+        </div>
       </template>
       <template #right-header>
         <Dropdown :options="headerOptions">
@@ -300,7 +302,9 @@ function handleCategoryUpdate() {
 function handleCategoryDelete(groupedRow) {
   $dialog({
     title: __("Delete category?"),
-    message: __("All articles from this category will move to General category."),
+    message: __(
+      "All articles from this category will move to General category."
+    ),
     actions: [
       {
         label: __("Confirm"),
