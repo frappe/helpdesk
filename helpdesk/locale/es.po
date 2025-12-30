@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2025-12-15 23:04\n"
+"PO-Revision-Date: 2025-12-30 01:39\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -369,7 +369,7 @@ msgstr ""
 #: desk/src/components/ticket-agent/AssignToBody.vue:5
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Assign to"
-msgstr ""
+msgstr "Asignar a"
 
 #: desk/src/components/ticket-agent/AssignToBody.vue:65
 msgid "Assign to me"
@@ -431,27 +431,27 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:35
 msgid "Assignment rule"
-msgstr ""
+msgstr "Regla de asignación"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:560
 msgid "Assignment rule created"
-msgstr ""
+msgstr "Regla de asignación creada"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:129
 msgid "Assignment rule deleted"
-msgstr ""
+msgstr "Regla de asignación borrada"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:161
 msgid "Assignment rule duplicated"
-msgstr ""
+msgstr "Regla de asignación duplicada"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:647
 msgid "Assignment rule updated"
-msgstr ""
+msgstr "Regla de asignación actualizada"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:198
 msgid "Assignment rule {0} updated"
-msgstr ""
+msgstr "Regla de asignación {0} actualizada"
 
 #: desk/src/components/Settings/InviteAgents.vue:170
 msgid "At least one email required"
