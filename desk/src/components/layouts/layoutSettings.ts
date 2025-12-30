@@ -4,8 +4,14 @@ import LucideContact2 from "~icons/lucide/contact-2";
 import LucideTicket from "~icons/lucide/ticket";
 import { OrganizationsIcon } from "../icons";
 import PhoneIcon from "../icons/PhoneIcon.vue";
+import LucideHome from "~icons/lucide/home";
 
 export const agentPortalSidebarOptions = [
+  {
+    label: "Home",
+    icon: LucideHome,
+    to: "Home",
+  },
   {
     label: "Tickets",
     icon: LucideTicket,

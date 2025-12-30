@@ -60,7 +60,20 @@ export function errorMessage(title, message) {
   toast.error(message);
 }
 
-export function formatTime(seconds) {
+export function formatTime(
+  seconds,
+  config: {
+    day?: boolean;
+    hour?: boolean;
+    minute?: boolean;
+    second?: boolean;
+  } = {
+    day: true,
+    hour: true,
+    minute: true,
+    second: true,
+  }
+) {
   const days = Math.floor(seconds / (3600 * 24));
   const hours = Math.floor((seconds % (3600 * 24)) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -68,25 +81,27 @@ export function formatTime(seconds) {
 
   let formattedTime = "";
 
-  if (days > 0) {
+  if (config.day && days > 0) {
     formattedTime += `${days}d `;
   }
 
-  if (hours > 0 || days > 0) {
+  if (config.hour && (hours > 0 || days > 0)) {
     formattedTime += `${hours}h `;
   }
 
-  if (minutes > 0 || hours > 0 || days > 0) {
+  if (config.minute && (minutes > 0 || hours > 0 || days > 0)) {
     formattedTime += `${minutes}m `;
   }
 
-  formattedTime += `${
-    remainingSeconds >= 10
-      ? remainingSeconds
-      : remainingSeconds > 1
-      ? "0" + remainingSeconds
-      : "0"
-  }s`;
+  if (config.second) {
+    formattedTime += `${
+      remainingSeconds >= 10
+        ? remainingSeconds
+        : remainingSeconds > 1
+        ? "0" + remainingSeconds
+        : "0"
+    }s`;
+  }
 
   return formattedTime.trim();
 }
