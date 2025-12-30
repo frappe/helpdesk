@@ -1,9 +1,12 @@
+from datetime import datetime, timedelta
+
 import frappe
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 
 SLA_PRIORITY_NAME = "SLA Priority"
+TEST_HOLIDAY_LIST_NAME = "Test Holiday List"
 
 
 def before_tests():
@@ -12,6 +15,7 @@ def before_tests():
         "HD Settings", "enable_email_ticket_feedback", 0
     )  # nosemgrep
     # frappe.flags.mute_emails = True
+    make_holiday_list()
     make_new_sla()
     frappe.db.commit()  # nosemgrep
 
@@ -20,6 +24,7 @@ def make_new_sla():
     condition = "doc.priority in ['High', 'Urgent', 'Low']"
     sla_doc = make_sla(SLA_PRIORITY_NAME, condition)
     sla_doc = sla_doc.reload()
+    sla_doc.holiday_list = TEST_HOLIDAY_LIST_NAME
 
     sla_doc.support_and_resolution = []
     for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]:
@@ -81,6 +86,18 @@ def make_new_sla():
     sla_doc.save()
 
 
+def make_holiday_list():
+    if not frappe.db.exists("HD Service Holiday List", TEST_HOLIDAY_LIST_NAME):
+        frappe.get_doc(
+            {
+                "doctype": "HD Service Holiday List",
+                "holiday_list_name": TEST_HOLIDAY_LIST_NAME,
+                "from_date": datetime.today().date(),
+                "to_date": (datetime.today() + timedelta(days=365)).date(),
+            }
+        ).insert()
+
+
 def make_sla(sla_name: str = "Test SLA", condition: str = ""):
     def_sla = frappe.get_doc("HD Service Level Agreement", "Default")
     sla_doc = frappe.copy_doc(def_sla)
@@ -95,7 +112,7 @@ def make_ticket(
     subject: str = "Test Ticket",
     description: str = "This is a test ticket.",
     save: bool = True,
-    **args
+    **args,
 ):
     """
     Creates a test HD Ticket with the given subject, description, priority, and ticket type.
@@ -140,27 +157,27 @@ def get_priority_response_resolution_time(
     return expected_response_by, expected_resolution_by
 
 
-def add_holiday(date, description="_Test Holiday"):
+def add_holiday(holiday_date, description="_Test Holiday"):
     """
     Adds a holiday to the system.
     """
 
-    holiday_list = frappe.get_doc("HD Service Holiday List", "Default")
-    holiday_list.append(
+    holiday_list_doc = frappe.get_doc("HD Service Holiday List", "Test Holiday List")
+    holiday_list_doc.append(
         "holidays",
         {
-            "holiday_date": date,
+            "holiday_date": holiday_date,
             "description": description,
         },
     )
-    holiday_list.save()
+    holiday_list_doc.save()
 
 
 def remove_holidays():
     """
     Removes a holiday from the system.
     """
-    holiday_list = frappe.get_doc("HD Service Holiday List", "Default")
+    holiday_list = frappe.get_doc("HD Service Holiday List", TEST_HOLIDAY_LIST_NAME)
     holiday_list.holidays = []
     holiday_list.save()
 
