@@ -2,11 +2,11 @@
   <Dialog
     :model-value="open"
     :options="{
-      title: 'Rate this ticket',
+      title: __('Rate this ticket'),
       actions: [
         {
           disabled: !preset,
-          label: 'Submit',
+          label: __('Submit'),
           theme: 'gray',
           variant: 'solid',
           onClick: () =>
@@ -25,7 +25,7 @@
     <template #body-content>
       <div class="space-y-4 text-base text-gray-700">
         <div class="space-y-2">
-          <span> Select a rating </span>
+          <span> {{ __("Select a rating") }} </span>
           <span class="text-red-500"> * </span>
           <StarRating
             :static="false"
@@ -35,7 +35,7 @@
           />
         </div>
         <div v-if="options.data?.length" class="space-y-2">
-          <span> Pick an option </span>
+          <span> {{ __("Pick an option") }} </span>
           <span class="text-red-500"> * </span>
           <div class="flex flex-wrap gap-2">
             <Button
@@ -49,11 +49,11 @@
           </div>
         </div>
         <div class="space-y-2">
-          <span> Other </span>
+          <span> {{ __("Other") }} </span>
           <FormControl
             v-model="text"
             type="textarea"
-            placeholder="Tell us more"
+            :placeholder="__('Tell us more')"
           />
         </div>
       </div>
@@ -66,6 +66,7 @@ import { StarRating } from "@/components";
 import { createListResource, createResource } from "frappe-ui";
 import { inject, ref, watch } from "vue";
 import { ITicket } from "./symbols";
+import { __ } from "@/translation";
 
 interface P {
   open: boolean;

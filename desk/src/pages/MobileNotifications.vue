@@ -2,14 +2,16 @@
   <LayoutHeader>
     <template #left-header>
       <Breadcrumbs
-        :items="[{ label: 'Notifications', route: { name: 'Notifications' } }]"
+        :items="[
+          { label: __('Notifications'), route: { name: 'Notifications' } },
+        ]"
       />
     </template>
     <template #right-header>
-      <Tooltip :text="'Mark all as read'">
+      <Tooltip :text="__('Mark all as read')">
         <div>
           <Button
-            :label="'Mark all as read'"
+            :label="__('Mark all as read')"
             @click="() => notificationStore.clear.submit()"
           >
             <template #prefix>
@@ -37,15 +39,15 @@
         <div class="mb-2 leading-5">
           <span class="space-x-1 text-gray-700">
             <span class="font-medium text-gray-900">{{ n.user_from }}</span>
-            <span v-if="n.notification_type === 'Mention'"
-              >mentioned you in ticket</span
-            >
-            <span v-if="n.notification_type === 'Assignment'"
-              >assigned you a ticket</span
-            >
-            <span v-if="n.notification_type === 'Reaction'"
-              >has reopened the ticket</span
-            >
+            <span v-if="n.notification_type === 'Mention'">{{
+              __("mentioned you in ticket")
+            }}</span>
+            <span v-if="n.notification_type === 'Assignment'">{{
+              __("assigned you a ticket")
+            }}</span>
+            <span v-if="n.notification_type === 'Reaction'">{{
+              __("has reopened the ticket")
+            }}</span>
             <span class="font-medium text-gray-900">{{
               n.reference_ticket
             }}</span>
@@ -63,7 +65,7 @@
   <div v-else class="flex flex-1 flex-col items-center gap-2">
     <LucideBell class="h-20 w-20 text-gray-300" />
     <div class="text-lg font-medium text-gray-500">
-      {{ "No new notifications" }}
+      {{ __("No new notifications") }}
     </div>
   </div>
 </template>
@@ -77,6 +79,7 @@ import { dayjs } from "@/dayjs";
 import { Notification } from "@/types";
 import { UserAvatar } from "@/components";
 import LucideBell from "~icons/lucide/bell";
+import { __ } from "@/translation";
 const notificationStore = useNotificationStore();
 const target = ref(null);
 onClickOutside(
