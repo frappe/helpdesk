@@ -40,7 +40,16 @@
               />
             </div>
             <Dropdown :options="filters" placement="right">
-              <Button :label="activeFilter" icon-left="filter" class="p-4" />
+              <Button :label="activeFilter" icon-left="filter" class="p-4">
+                <template #suffix>
+                  <p
+                    class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-white pt-px text-xs font-medium text-ink-gray-8 shadow-sm"
+                    v-if="savedReplyListResource?.data?.length"
+                  >
+                    {{ savedReplyListResource?.data?.length }}
+                  </p>
+                </template>
+              </Button>
             </Dropdown>
           </div>
         </div>
@@ -105,27 +114,27 @@
 </template>
 
 <script setup lang="ts">
+import { useConfigStore } from "@/stores/config";
+import { __ } from "@/translation";
+import { SavedReply } from "@/types";
+import { useStorage } from "@vueuse/core";
 import {
   Button,
+  createListResource,
+  createResource,
+  Dialog,
   Dropdown,
   Input,
   LoadingIndicator,
   TextEditor,
-  createListResource,
-  createResource,
-  Dialog,
 } from "frappe-ui";
-import { ref, computed, nextTick, watch, onUnmounted } from "vue";
+import { storeToRefs } from "pinia";
+import { computed, nextTick, onUnmounted, ref, watch } from "vue";
+import { showEmailBox } from "../pages/ticket/modalStates";
 import {
   setActiveSettingsTab,
   showSettingsModal,
 } from "./Settings/settingsModal";
-import { showEmailBox } from "../pages/ticket/modalStates";
-import { useStorage } from "@vueuse/core";
-import { SavedReply } from "@/types";
-import { storeToRefs } from "pinia";
-import { useConfigStore } from "@/stores/config";
-import { __ } from "@/translation";
 
 const props = defineProps({
   doctype: {
