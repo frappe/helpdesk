@@ -1,13 +1,12 @@
 {
  "actions": [],
- "autoname": "hash",
+ "autoname": "field:title",
  "creation": "2022-11-03 17:19:47.135176",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "title",
-  "column_break_wdal",
   "scope",
   "teams",
   "section_break_ybsb",
@@ -18,17 +17,14 @@
    "fieldname": "title",
    "fieldtype": "Data",
    "label": "Title",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "message",
    "fieldtype": "Text Editor",
    "label": "Message",
    "reqd": 1
-  },
-  {
-   "fieldname": "column_break_wdal",
-   "fieldtype": "Column Break"
   },
   {
    "default": "Global",
@@ -54,11 +50,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-15 11:24:12.143696",
+ "modified": "2025-12-30 15:00:15.437935",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Saved Reply",
- "naming_rule": "Random",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -99,6 +95,7 @@
   }
  ],
  "row_format": "Dynamic",
+ "search_fields": "title",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
