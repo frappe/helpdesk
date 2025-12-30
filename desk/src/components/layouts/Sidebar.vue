@@ -84,7 +84,7 @@
                 class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
                 :class="{ 'rotate-90': opened }"
               />
-              <span>{{ view.label }}</span>
+              <span>{{ __(view.label) }}</span>
             </div>
           </template>
           <nav class="flex flex-col">
@@ -208,6 +208,7 @@ import {
 
 import { useShortcut } from "@/composables/shortcuts";
 import { useTelephonyStore } from "@/stores/telephony";
+import { __ } from "@/translation";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
@@ -223,7 +224,6 @@ import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
 import { setActiveSettingsTab } from "../Settings/settingsModal";
-import { __ } from "@/translation";
 
 const { isMobileView } = useScreenSize();
 
