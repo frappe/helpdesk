@@ -104,7 +104,32 @@ jobs:
           FRAPPE_BRANCH: ${{ github.event.inputs.branch }}
 
       - name: Run Tests
-        run: 'cd ~/frappe-bench/ && bench --site test_site run-tests --app helpdesk'
+        run: 'cd ~/frappe-bench/ && bench --site test_site run-tests --app helpdesk --with-coverage'
         env:
           TYPE: server
           CI_BUILD_ID: ${{ github.run_id }}
+      
+      - name: Upload coverage data
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.container }}
+          path: /home/runner/frappe-bench/sites/coverage.xml
+
+  coverage:
+    name: Coverage Wrap Up
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone
+        uses: actions/checkout@v6
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Upload coverage data
+        uses: codecov/codecov-action@v4
+        with:
+          name: MariaDB
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          verbose: true
