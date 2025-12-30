@@ -92,7 +92,7 @@
           <MultiSelect
             :options="teamsList"
             v-model="savedReplyData.teams"
-            placeholder="Select teams"
+            :placeholder="__('Select teams')"
             @update:modelValue="validateData('teams')"
           />
           <div class="text-xs text-ink-gray-5 cursor-default">
@@ -121,7 +121,11 @@
             "
             :fixed-menu="menuButtons"
             :extensions="[FieldAutocomplete]"
-            :placeholder="'Hello {{ contact }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ full_name }}'"
+            :placeholder="
+              __(
+                'Hello {{ contact }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ full_name }}'
+              )
+            "
           />
           <ErrorMessage class="text-p-sm" :message="errors.message" />
         </div>
@@ -209,17 +213,17 @@ const errors = ref({
 const scopeDropdownOptions = computed(() => {
   const options = [
     {
-      label: "Personal",
+      label: __("Personal"),
       value: "Personal",
       icon: UserIcon,
     },
     {
-      label: "Team",
+      label: __("Team"),
       value: "Team",
       icon: UsersIcon,
     },
     {
-      label: "Global",
+      label: __("Global"),
       value: "Global",
       icon: GlobeIcon,
     },

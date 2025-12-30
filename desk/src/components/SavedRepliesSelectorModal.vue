@@ -125,6 +125,7 @@ import { useStorage } from "@vueuse/core";
 import { SavedReply } from "@/types";
 import { storeToRefs } from "pinia";
 import { useConfigStore } from "@/stores/config";
+import { __ } from "@/translation";
 
 const props = defineProps({
   doctype: {
@@ -145,22 +146,22 @@ const { disableGlobalScopeForSavedReplies, teamRestrictionApplied } =
 const filters = computed(() => {
   const options = [
     {
-      label: "All",
+      label: __("All"),
       value: "All",
       onClick: () => (activeFilter.value = "All"),
     },
     {
-      label: "Personal",
+      label: __("Personal"),
       value: "Personal",
       onClick: () => (activeFilter.value = "Personal"),
     },
     {
-      label: "My Team",
+      label: __("My Team"),
       value: "Team",
       onClick: () => (activeFilter.value = "My Team"),
     },
     {
-      label: "Global",
+      label: __("Global"),
       value: "Global",
       onClick: () => (activeFilter.value = "Global"),
     },

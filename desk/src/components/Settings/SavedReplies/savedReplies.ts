@@ -1,3 +1,4 @@
+import { __ } from "@/translation";
 import { ref } from "vue";
 
 export const menuButtons = [
@@ -50,47 +51,47 @@ export const menuButtons = [
 
 export const userFields = [
   {
-    label: "Email",
+    label: __("Email"),
     value: "email",
   },
   {
-    label: "First Name",
+    label: __("First Name"),
     value: "first_name",
   },
   {
-    label: "Middle Name",
+    label: __("Middle Name"),
     value: "middle_name",
   },
   {
-    label: "Last Name",
+    label: __("Last Name"),
     value: "last_name",
   },
   {
-    label: "Full Name",
+    label: __("Full Name"),
     value: "full_name",
   },
   {
-    label: "Username",
+    label: __("Username"),
     value: "username",
   },
   {
-    label: "User Image",
+    label: __("User Image"),
     value: "user_image",
   },
   {
-    label: "Phone",
+    label: __("Phone"),
     value: "phone",
   },
   {
-    label: "Location",
+    label: __("Location"),
     value: "location",
   },
   {
-    label: "Bio",
+    label: __("Bio"),
     value: "bio",
   },
   {
-    label: "Mobile No",
+    label: __("Mobile No"),
     value: "mobile_no",
   },
 ];
