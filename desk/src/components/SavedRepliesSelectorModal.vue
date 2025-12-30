@@ -46,7 +46,16 @@
         </div>
         <div class="px-4 h-full overflow-y-auto">
           <div
-            v-if="savedReplyListResource?.data?.length"
+            v-if="savedReplyListResource?.list?.loading"
+            class="flex items-center justify-center mt-24"
+          >
+            <LoadingIndicator class="size-4" />
+          </div>
+          <div
+            v-if="
+              !savedReplyListResource?.list?.loading &&
+              savedReplyListResource?.data?.length
+            "
             class="grid grid-cols-1 md:grid-cols-3 gap-2 pb-36"
           >
             <div
@@ -76,7 +85,13 @@
               </div>
             </div>
           </div>
-          <div v-else class="mt-2">
+          <div
+            v-if="
+              !savedReplyListResource?.list?.loading &&
+              !savedReplyListResource?.data?.length
+            "
+            class="mt-2"
+          >
             <div class="flex h-56 flex-col items-center justify-center">
               <div class="text-p-sm text-gray-500">
                 {{ __("No Saved Replies found") }}
@@ -130,9 +145,14 @@ const { disableGlobalScopeForSavedReplies, teamRestrictionApplied } =
 const filters = computed(() => {
   const options = [
     {
-      label: "Global",
-      value: "Global",
-      onClick: () => (activeFilter.value = "Global"),
+      label: "All",
+      value: "All",
+      onClick: () => (activeFilter.value = "All"),
+    },
+    {
+      label: "Personal",
+      value: "Personal",
+      onClick: () => (activeFilter.value = "Personal"),
     },
     {
       label: "My Team",
@@ -140,13 +160,13 @@ const filters = computed(() => {
       onClick: () => (activeFilter.value = "My Team"),
     },
     {
-      label: "Personal",
-      value: "Personal",
-      onClick: () => (activeFilter.value = "Personal"),
+      label: "Global",
+      value: "Global",
+      onClick: () => (activeFilter.value = "Global"),
     },
   ];
   if (teamRestrictionApplied.value && disableGlobalScopeForSavedReplies.value) {
-    options.shift();
+    options.pop();
   }
   return options;
 });
@@ -169,14 +189,15 @@ const selectedTemplate = ref({
   isLoading: false,
 });
 
+const scope = computed(() => {
+  return filters.value.find((f) => f.label === activeFilter.value)?.value;
+});
+
 const savedReplyListResource = createListResource({
   doctype: "HD Saved Reply",
   fields: ["name", "title", "owner", "scope", "message"],
   filters: {
-    scope: [
-      "=",
-      filters.value.find((f) => f.label === activeFilter.value)?.value,
-    ],
+    scope: scope.value == "All" ? undefined : ["=", scope.value],
   },
   cache: ["SavedReplyListForModal"],
   auto: true,
@@ -238,11 +259,10 @@ watch(search, (newValue) => {
   savedReplyListResource.list.reload();
 });
 
-watch(activeFilter, (newActiveFilter) => {
-  const scope = filters.value.find((f) => f.label === newActiveFilter)?.value;
+watch(activeFilter, () => {
   savedReplyListResource.filters = {
     ...savedReplyListResource?.filters,
-    scope: ["=", scope],
+    scope: scope.value == "All" ? undefined : ["=", scope.value],
   };
   savedReplyListResource.list.reload();
 });

@@ -146,7 +146,9 @@
               class="flex items-center gap-1.5 text-sm text-ink-gray-7 truncate col-span-2"
             >
               <Avatar
-                :name="getUser(savedReply.owner)?.full_name || savedReply.owner"
+                :label="
+                  getUser(savedReply.owner)?.full_name || savedReply.owner
+                "
                 :image="getUser(savedReply.owner)?.user_image"
                 size="xs"
               />
