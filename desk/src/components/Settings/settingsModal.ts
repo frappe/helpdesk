@@ -116,7 +116,7 @@ export const tabs = computed(() => {
           condition: () => auth.isAdmin || auth.isManager,
         },
         {
-          label: "Saved Replies",
+          label: __("Saved Replies"),
           icon: markRaw(SavedReplyIcon),
           component: markRaw(SavedReplies),
         },
