@@ -322,28 +322,28 @@ const duplicate = async () => {
 const filterOptions = computed(() => {
   const options = [
     {
-      label: "All",
+      label: __("All"),
       value: "All",
       onSelect: () => {
         applyFilter("All");
       },
     },
     {
-      label: "Personal",
+      label: __("Personal"),
       value: "Personal",
       onSelect: () => {
         applyFilter("Personal");
       },
     },
     {
-      label: "My Team",
+      label: __("My Team"),
       value: "Team",
       onSelect: () => {
         applyFilter("Team");
       },
     },
     {
-      label: "Global",
+      label: __("Global"),
       value: "Global",
       onSelect: () => {
         applyFilter("Global");
@@ -369,15 +369,15 @@ const applyFilter = (scope: string) => {
 const getScopeIcon = (scope: string) => {
   const icons = [
     {
-      label: "Personal",
+      label: __("Personal"),
       icon: UserIcon,
     },
     {
-      label: "Team",
+      label: __("Team"),
       icon: UsersIcon,
     },
     {
-      label: "Global",
+      label: __("Global"),
       icon: GlobeIcon,
     },
   ];

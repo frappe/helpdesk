@@ -16,7 +16,7 @@
           :label="__('Select ticket to preview')"
           doctype="HD Ticket"
           class="form-control flex-1"
-          placeholder="Search ticket"
+          :placeholder="__('Search ticket')"
           :show-description="true"
           @change="getResponsePreview"
         />
