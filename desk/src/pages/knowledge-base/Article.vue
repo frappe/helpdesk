@@ -10,7 +10,9 @@
         <!-- Default Buttons -->
         <div class="flex gap-2" v-if="!editable">
           <Button
-            :label="article.data?.status === 'Draft' ? __('Publish') : __('Unpublish')"
+            :label="
+              article.data?.status === 'Draft' ? __('Publish') : __('Unpublish')
+            "
             :iconLeft="article.data?.status !== 'Published' && 'globe'"
             @click="toggleStatus()"
           />

@@ -83,10 +83,14 @@
                   :ticket="ticket.data"
                 />
                 <!-- SLA Section -->
-                <h3 class="px-6 pt-3 font-semibold text-base">{{ __("SLA") }}</h3>
+                <h3 class="px-6 pt-3 font-semibold text-base">
+                  {{ __("SLA") }}
+                </h3>
                 <TicketAgentDetails :ticket="ticket.data" />
                 <!-- Ticket Fields -->
-                <h3 class="px-6 pt-3 font-semibold text-base">{{ __("Details") }}</h3>
+                <h3 class="px-6 pt-3 font-semibold text-base">
+                  {{ __("Details") }}
+                </h3>
                 <TicketAgentFields
                   :ticket="ticket.data"
                   @update="({ field, value }) => updateTicket(field, value)"
@@ -175,7 +179,9 @@
         >
           {{ __("Confirm") }}
         </Button>
-        <Button class="ml-2" @click="showSubjectDialog = false"> {{ __("Close") }} </Button>
+        <Button class="ml-2" @click="showSubjectDialog = false">
+          {{ __("Close") }}
+        </Button>
       </template>
     </Dialog>
     <SetContactPhoneModal
