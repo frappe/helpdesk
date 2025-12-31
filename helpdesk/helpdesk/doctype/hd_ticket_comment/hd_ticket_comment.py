@@ -134,7 +134,7 @@ def notify_reaction(doc, emoji, user):
     if count == 1:
         message = "1 person reacted to your comment"
     else:
-        message = f"{count} people reacted to your comment"
+        message = "{} people reacted to your comment".format(count)
 
     existing = frappe.db.get_value(
         "HD Notification",
