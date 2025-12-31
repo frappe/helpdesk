@@ -5,8 +5,33 @@ import LogoSparkpost from "@/assets/images/sparkpost.webp";
 import LogoYahoo from "@/assets/images/yahoo.png";
 import LogoYandex from "@/assets/images/yandex.png";
 import LogoFrappeMail from "@/assets/images/frappe-mail.svg";
-import { RenderField, EmailService, EmailAccount } from "@/types";
+import { RenderField, EmailService } from "@/types";
 import { validateEmailWithZod } from "@/utils";
+
+type EmailAccountFormState = {
+  email_account_name?: string;
+  email_id?: string;
+  service?: string;
+  password?: string;
+  api_key?: string;
+  api_secret?: string;
+  frappe_mail_site?: string;
+  domain?: string;
+  email_server?: string;
+  incoming_port?: string | number;
+  smtp_server?: string;
+  smtp_port?: string | number;
+  use_ssl?: boolean | number;
+  use_starttls?: boolean | number;
+  use_tls?: boolean | number;
+  use_ssl_for_outgoing?: boolean | number;
+  validate_ssl_certificate?: boolean | number;
+  validate_ssl_certificate_for_outgoing?: boolean | number;
+  attachment_limit?: string | number;
+  append_emails_to_sent_folder?: boolean | number;
+  sent_folder_name?: string;
+};
+
 const fixedFields: RenderField[] = [
   {
     label: "Account Name",
@@ -62,7 +87,7 @@ export const popularProviderFields = [
   },
 ];
 
-export const customProviderFields = [
+export const frappeMailFields = [
   ...fixedFields,
   {
     label: "Frappe Mail Site",
@@ -83,6 +108,78 @@ export const customProviderFields = [
     placeholder: "********",
   },
 ];
+
+export const customProviderTopFields = [
+  ...fixedFields,
+  {
+    label: "Password",
+    name: "password",
+    type: "password",
+    placeholder: "********",
+  },
+  {
+    label: "Email Domain",
+    name: "domain",
+    type: "text",
+    placeholder: "example.com",
+  },
+];
+
+export const customIncomingFields = [
+  {
+    label: "Incoming Server (IMAP/POP)",
+    name: "email_server",
+    type: "text",
+    placeholder: "imap.example.com",
+  },
+  {
+    label: "Incoming Port",
+    name: "incoming_port",
+    type: "text",
+    placeholder: "993",
+  },
+  {
+    label: "Use SSL for Incoming",
+    name: "use_ssl",
+    type: "checkbox",
+    placeholder: "",
+  },
+  {
+    label: "Use TLS for Incoming",
+    name: "use_starttls",
+    type: "checkbox",
+    placeholder: "",
+  },
+];
+
+export const customOutgoingFields = [
+  {
+    label: "Outgoing Server (SMTP)",
+    name: "smtp_server",
+    type: "text",
+    placeholder: "smtp.example.com",
+  },
+  {
+    label: "Outgoing Port",
+    name: "smtp_port",
+    type: "text",
+    placeholder: "587",
+  },
+  {
+    label: "Use SSL for Outgoing",
+    name: "use_ssl_for_outgoing",
+    type: "checkbox",
+    placeholder: "",
+  },
+  {
+    label: "Use TLS for Outgoing",
+    name: "use_tls",
+    type: "checkbox",
+    placeholder: "",
+  },
+];
+
+export const customProviderFields = customProviderTopFields;
 
 export const services: EmailService[] = [
   {
@@ -140,6 +237,13 @@ export const services: EmailService[] = [
     link: "https://github.com/frappe/mail",
     custom: true,
   },
+  {
+    name: "Custom",
+    icon: "",
+    info: `Use your own IMAP/SMTP settings. Open in Desk`,
+    link: "/desk/email-account/new-email-account",
+    custom: true,
+  },
 ];
 
 export const emailIcon = {
@@ -150,9 +254,14 @@ export const emailIcon = {
   Yahoo: LogoYahoo,
   Yandex: LogoYandex,
   "Frappe Mail": LogoFrappeMail,
+  Custom: "",
 };
 
-export function validateInputs(state: EmailAccount, isCustom: boolean) {
+export function validateInputs(
+  state: EmailAccountFormState,
+  service: string,
+  allowMissingPassword = false
+) {
   if (!state.email_account_name) {
     return "Account name is required";
   }
@@ -163,16 +272,29 @@ export function validateInputs(state: EmailAccount, isCustom: boolean) {
   if (!validEmail) {
     return "Invalid email ID";
   }
-  if (!isCustom && !state.password) {
-    return "Password is required";
-  }
-  if (isCustom) {
+  if (service === "Frappe Mail") {
     if (!state.api_key) {
       return "API Key is required";
     }
     if (!state.api_secret) {
-      return;
+      return "API Secret is required";
     }
+    return "";
+  }
+  if (service === "Custom") {
+    const hasDomain = Boolean(state.domain);
+    const hasManualServers =
+      state.email_server && state.incoming_port && state.smtp_server && state.smtp_port;
+    if (!hasDomain && !hasManualServers) {
+      return "Email Domain or manual server settings are required";
+    }
+    if (!state.password && !allowMissingPassword) {
+      return "Password is required";
+    }
+    return "";
+  }
+  if (!state.password && !allowMissingPassword) {
+    return "Password is required";
   }
   return "";
 }
