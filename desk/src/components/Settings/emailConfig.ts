@@ -262,9 +262,10 @@ export function validateInputs(
     return "";
   }
   if (service === "Custom") {
+    const hasDomain = Boolean(state.domain);
     const hasManualServers =
       state.email_server && state.incoming_port && state.smtp_server && state.smtp_port;
-    if (!hasManualServers) {
+    if (!hasDomain && !hasManualServers) {
       return "Email Domain or manual server settings are required";
     }
     if (!state.password && !allowMissingPassword) {
