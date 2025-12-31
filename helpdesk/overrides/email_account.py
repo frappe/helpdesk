@@ -59,7 +59,9 @@ class CustomEmailAccount(EmailAccount):
                 )
                 process_mail(messages)
                 self.db_set(
-                    "last_synced_at", messages["last_received_at"], update_modified=False
+                    "last_synced_at",
+                    messages["last_received_at"],
+                    update_modified=False,
                 )
             else:
                 email_sync_rule = self.build_email_sync_rule()
