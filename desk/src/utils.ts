@@ -34,14 +34,73 @@ export function getAssign(s: string): string | undefined {
   return arr.slice(-1).pop();
 }
 
-export function validateEmail(email) {
-  const regExp =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return regExp.test(email);
+// Extract email from RFC-5322 format like "Name" <email> or just return as-is
+export function extractEmailAddress(emailString: string): string {
+  if (!emailString) return "";
+  emailString = emailString.trim();
+
+  const angleMatch = emailString.match(/<([^>]+)>/);
+  if (angleMatch) {
+    return angleMatch[1].trim();
+  }
+
+  return emailString;
 }
 
-export function validateEmailWithZod(email: string) {
-  const success = zod.string().email().safeParse(email).success;
+// Split email addresses while respecting quoted commas in display names
+// e.g. '"John, Doe" <john@example.com>, jane@example.com' -> 2 emails
+export function splitEmailAddresses(emailString: string): string[] {
+  if (!emailString) return [];
+
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+  let inAngleBrackets = false;
+
+  for (let i = 0; i < emailString.length; i++) {
+    const char = emailString[i];
+
+    if (char === '"' && (i === 0 || emailString[i - 1] !== '\\')) {
+      inQuotes = !inQuotes;
+      current += char;
+    } else if (char === '<' && !inQuotes) {
+      inAngleBrackets = true;
+      current += char;
+    } else if (char === '>' && !inQuotes) {
+      inAngleBrackets = false;
+      current += char;
+    } else if (char === ',' && !inQuotes && !inAngleBrackets) {
+      const trimmed = current.trim();
+      if (trimmed) {
+        result.push(trimmed);
+      }
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  const trimmed = current.trim();
+  if (trimmed) {
+    result.push(trimmed);
+  }
+
+  return result;
+}
+
+// Validate email, supports RFC-5322 format with display names
+export function validateEmail(email: string): boolean {
+  if (!email) return false;
+
+  const actualEmail = extractEmailAddress(email);
+  const regExp =
+    /^(([^<>()[\]\\.,;:\s@"]+(.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return regExp.test(actualEmail);
+}
+
+export function validateEmailWithZod(email: string): boolean {
+  const actualEmail = extractEmailAddress(email);
+  const success = zod.string().email().safeParse(actualEmail).success;
   return success;
 }
 
@@ -80,13 +139,12 @@ export function formatTime(seconds) {
     formattedTime += `${minutes}m `;
   }
 
-  formattedTime += `${
-    remainingSeconds >= 10
-      ? remainingSeconds
-      : remainingSeconds > 1
+  formattedTime += `${remainingSeconds >= 10
+    ? remainingSeconds
+    : remainingSeconds > 1
       ? "0" + remainingSeconds
       : "0"
-  }s`;
+    }s`;
 
   return formattedTime.trim();
 }
@@ -279,10 +337,10 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
     [
       icon
         ? h(FeatherIcon, {
-            name: icon,
-            class: ["h-4 w-4 shrink-0"],
-            "aria-hidden": true,
-          })
+          name: icon,
+          class: ["h-4 w-4 shrink-0"],
+          "aria-hidden": true,
+        })
         : null,
       h("span", { class: "whitespace-nowrap" }, option),
     ]
