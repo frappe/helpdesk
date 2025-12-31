@@ -122,60 +122,49 @@ def get_reactions(comment: str):
 
 
 def notify_reaction(doc, emoji, user):
-    try:
-        existing = frappe.db.get_value(
+    reacting_users = set()
+    for r in doc.reactions:
+        if r.user != doc.commented_by:
+            reacting_users.add(r.user)
+
+    if not reacting_users:
+        return
+
+    count = len(reacting_users)
+    if count == 1:
+        message = "1 person reacted to your comment"
+    else:
+        message = f"{count} people reacted to your comment"
+
+    existing = frappe.db.get_value(
+        "HD Notification",
+        {
+            "reference_comment": doc.name,
+            "user_to": doc.commented_by,
+            "notification_type": "Reaction",
+        },
+        ["name"],
+        as_dict=True,
+    )
+
+    if existing:
+        frappe.db.set_value(
             "HD Notification",
-            {
-                "reference_comment": doc.name,
-                "user_to": doc.commented_by,
-                "notification_type": "Reaction",
-                "read": 0,
-            },
-            ["name"],
-            as_dict=True,
+            existing.name,
+            {"message": message, "user_from": user, "read": 0},
         )
-
-        if existing:
-            reacting_users = set()
-            for r in doc.reactions:
-                if r.user != doc.commented_by:
-                    reacting_users.add(r.user)
-
-            if not reacting_users:
-                return
-
-            user_names = []
-            for u in list(reacting_users)[:3]:
-                user_info = frappe.get_cached_doc("User", u)
-                user_names.append(user_info.full_name or u)
-
-            if len(reacting_users) > 3:
-                others = len(reacting_users) - 3
-                message = f"{', '.join(user_names)} and {others} others reacted on your comment"
-            elif len(reacting_users) == 1:
-                message = f"reacted with {emoji} on your comment"
-            else:
-                message = f"{', '.join(user_names[:-1])} and {user_names[-1]} reacted on your comment"
-
-            frappe.db.set_value(
-                "HD Notification",
-                existing.name,
-                {"user_from": user, "message": message},
-            )
-        else:
-            frappe.get_doc(
-                {
-                    "doctype": "HD Notification",
-                    "message": f"reacted with {emoji} on your comment",
-                    "notification_type": "Reaction",
-                    "reference_comment": doc.name,
-                    "reference_ticket": doc.reference_ticket,
-                    "user_from": user,
-                    "user_to": doc.commented_by,
-                }
-            ).insert(ignore_permissions=True)
-    except Exception:
-        pass
+    else:
+        frappe.get_doc(
+            {
+                "doctype": "HD Notification",
+                "message": message,
+                "notification_type": "Reaction",
+                "reference_comment": doc.name,
+                "reference_ticket": doc.reference_ticket,
+                "user_from": user,
+                "user_to": doc.commented_by,
+            }
+        ).insert(ignore_permissions=True)
 
 
 @frappe.whitelist()

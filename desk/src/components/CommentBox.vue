@@ -86,11 +86,11 @@
         <Popover>
           <template #target="{ togglePopover, isOpen }">
             <button
-              class="flex items-center justify-center w-7 h-7 rounded-full text-sm transition-colors"
+              class="flex items-center justify-center rounded-full px-2 py-1 text-gray-500 transition-colors"
               :class="
                 isOpen
                   ? 'bg-gray-200 text-gray-700'
-                  : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+                  : 'bg-gray-100 hover:bg-gray-200 hover:text-gray-700'
               "
               @click="togglePopover()"
             >
