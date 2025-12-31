@@ -1,7 +1,7 @@
 <template>
   <Dialog
     v-model="open"
-    :options="{ title: 'Keyboard Shortcuts', size: '4xl' }"
+    :options="{ title: __('Keyboard Shortcuts'), size: '4xl' }"
   >
     <template #body-content>
       <div class="w-full grid grid-cols-2 gap-10 py-1 shortcutsModal">
@@ -50,6 +50,7 @@ import { useShortcut } from "@/composables/shortcuts";
 import { isCustomerPortal } from "@/utils";
 import { Dialog } from "frappe-ui";
 import { computed, onMounted } from "vue";
+import { __ } from "@/translation";
 
 const props = defineProps({
   modelValue: Boolean,
@@ -75,39 +76,39 @@ interface ShortcutGroup {
 
 const shortcutGroups = computed<ShortcutGroup[]>(() => [
   {
-    title: "General",
+    title: __("General"),
     shortcuts: [
-      { keys: [metaIcon, "K"], description: "Open command palette" },
-      { keys: [metaIcon, ","], description: "Open settings" },
-      { keys: [metaIcon, "/"], description: "Show keyboard shortcuts" },
-      { keys: [metaIcon, "H"], description: "Open help" },
+      { keys: [metaIcon, "K"], description: __("Open command palette") },
+      { keys: [metaIcon, ","], description: __("Open settings") },
+      { keys: [metaIcon, "/"], description: __("Show keyboard shortcuts") },
+      { keys: [metaIcon, "H"], description: __("Open help") },
     ],
   },
   {
-    title: "Ticket Management",
+    title: __("Ticket Management"),
     shortcuts: [
-      { keys: ["T"], description: "Change ticket type" },
-      { keys: ["P"], description: "Change priority" },
-      { keys: [shiftKey, "T"], description: "Change team" },
-      { keys: ["A"], description: "Assign ticket" },
-      { keys: ["S"], description: "Change status" },
-      { keys: [metaIcon, "."], description: "Copy ticket id" },
-      { keys: [metaIcon, shiftKey, "."], description: "Copy ticket URL" },
+      { keys: ["T"], description: __("Change ticket type") },
+      { keys: ["P"], description: __("Change priority") },
+      { keys: [shiftKey, "T"], description: __("Change team") },
+      { keys: ["A"], description: __("Assign ticket") },
+      { keys: ["S"], description: __("Change status") },
+      { keys: [metaIcon, "."], description: __("Copy ticket id") },
+      { keys: [metaIcon, shiftKey, "."], description: __("Copy ticket URL") },
     ],
   },
   {
-    title: "Communication",
+    title: __("Communication"),
     shortcuts: [
-      { keys: ["R"], description: "Open reply box" },
-      { keys: ["C"], description: "Open comment box" },
+      { keys: ["R"], description: __("Open reply box") },
+      { keys: ["C"], description: __("Open comment box") },
     ],
     hideBorder: true,
   },
   {
-    title: "Navigation",
+    title: __("Navigation"),
     shortcuts: [
-      { keys: [shiftKey, ">"], description: "Next ticket" },
-      { keys: [shiftKey, "<"], description: "Previous ticket" },
+      { keys: [shiftKey, ">"], description: __("Next ticket") },
+      { keys: [shiftKey, "<"], description: __("Previous ticket") },
     ],
     hideBorder: true,
   },

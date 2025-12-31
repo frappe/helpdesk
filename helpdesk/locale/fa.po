@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2025-12-09 21:36\n"
+"PO-Revision-Date: 2025-12-30 01:39\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -373,7 +373,7 @@ msgstr ""
 
 #: desk/src/components/ticket-agent/AssignToBody.vue:65
 msgid "Assign to me"
-msgstr "به من اختصاص دهید"
+msgstr "تخصیص به من"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:62
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:49
@@ -2214,7 +2214,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:184
 msgid "No changes made"
-msgstr ""
+msgstr "هیچ تغییری ایجاد نشد"
 
 #: desk/src/components/Settings/EmailAccountList.vue:52
 msgid "No email account found"
@@ -2537,7 +2537,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:36
 msgid "Quarterly"
-msgstr "سه ماه یکبار"
+msgstr "فصلی"
 
 #. Label of the query_options_sb (Section Break) field in DocType 'HD Support
 #. Search Source'
@@ -2690,7 +2690,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 #: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
 msgid "Request Key"
-msgstr ""
+msgstr "درخواست کلید"
 
 #. Label of the required (Check) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
