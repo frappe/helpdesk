@@ -113,7 +113,7 @@ onClickOutside(
   },
   {
     ignore: ["#notifications-btn"],
-  },
+  }
 );
 
 function handleNotificationClick(n: Notification) {
