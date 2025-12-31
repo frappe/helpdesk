@@ -1,5 +1,4 @@
 import LucideBookOpen from "~icons/lucide/book-open";
-import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
 import LucideTicket from "~icons/lucide/ticket";
 import { OrganizationsIcon } from "../icons";
@@ -18,12 +17,7 @@ export const agentPortalSidebarOptions = [
     to: "AgentKnowledgeBase",
   },
   {
-    label: __("Canned Responses"),
-    icon: LucideCloudLightning,
-    to: "CannedResponses",
-  },
-  {
-    label: __("Customers"),
+    label: "Customers",
     icon: OrganizationsIcon,
     to: "CustomerList",
   },

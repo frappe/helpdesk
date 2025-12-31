@@ -223,7 +223,12 @@ import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
-import { setActiveSettingsTab } from "../Settings/settingsModal";
+import LucideKeyboard from "~icons/lucide/keyboard";
+
+import {
+  setActiveSettingsTab,
+  showSettingsModal,
+} from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
 
@@ -236,7 +241,6 @@ const device = useDevice();
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
-const showSettingsModal = ref(false);
 const showShortcutsModal = ref(false);
 const showCommandPalette = ref(false);
 
@@ -569,7 +573,7 @@ const articles = ref([
       { name: "contact", title: "Contact" },
       { name: "customer", title: "Customer" },
       { name: "knowledge-base", title: "Knowledge Base" },
-      { name: "canned-response", title: "Canned Responses" },
+      { name: "saved-replies", title: "Saved Replies" },
       { name: "service-level-agreement", title: "Service Level Agreement" },
       { name: "ticket-type", title: "Ticket Type" },
       { name: "ticket-priority", title: "Ticket Priority" },
