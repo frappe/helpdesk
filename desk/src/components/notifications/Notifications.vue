@@ -53,6 +53,7 @@
           <div class="mb-2 leading-5">
             <span class="space-x-1 text-gray-700">
 <<<<<<< HEAD
+<<<<<<< HEAD
               <span
                 class="font-medium text-gray-900"
                 v-if="n.notification_type !== 'Reaction' || !n.message"
@@ -62,18 +63,27 @@
 =======
               <span v-if="n.notification_type !== 'Reaction'" class="font-medium text-gray-900">{{ n.user_from }}</span>
 >>>>>>> f69de39a (fix: improve reaction notification display and routing)
+=======
+              <span
+                v-if="n.notification_type !== 'Reaction'"
+                class="font-medium text-gray-900"
+                >{{ n.user_from }}</span
+              >
+>>>>>>> 1ca388de (style: apply prettier formatting)
               <span v-if="n.notification_type === 'Mention'"
                 >mentioned you in ticket</span
               >
               <span v-if="n.notification_type === 'Assignment'"
                 >assigned you a ticket</span
               >
-              <span v-if="n.notification_type === 'Reaction'"
-                >{{ n.message }}</span
-              >
-              <span v-if="n.notification_type !== 'Reaction'" class="font-medium text-gray-900">{{
-                n.reference_ticket
+              <span v-if="n.notification_type === 'Reaction'">{{
+                n.message
               }}</span>
+              <span
+                v-if="n.notification_type !== 'Reaction'"
+                class="font-medium text-gray-900"
+                >{{ n.reference_ticket }}</span
+              >
             </span>
           </div>
           <div class="flex items-center gap-2">
@@ -116,7 +126,7 @@ onClickOutside(
   },
   {
     ignore: ["#notifications-btn"],
-  }
+  },
 );
 
 function handleNotificationClick(n: Notification) {
@@ -148,7 +158,9 @@ function getRoute(n: Notification) {
         params: {
           ticketId: n.reference_ticket,
         },
-        hash: n.reference_comment ? "#comment-" + n.reference_comment : undefined,
+        hash: n.reference_comment
+          ? "#comment-" + n.reference_comment
+          : undefined,
       };
   }
 }
