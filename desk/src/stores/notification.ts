@@ -13,6 +13,7 @@ export const useNotificationStore = defineStore("notification", () => {
     cache: "Notifications",
     fields: [
       "creation",
+      "message",
       "name",
       "notification_type",
       "read",
