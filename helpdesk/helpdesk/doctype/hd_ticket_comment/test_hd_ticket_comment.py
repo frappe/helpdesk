@@ -169,8 +169,7 @@ class TestHDTicketComment(FrappeTestCase):
         )
 
         self.assertEqual(notification.user_from, "test_user2@example.com")
-        self.assertIn("reacted with", notification.message)
-        self.assertIn("👍", notification.message)
+        self.assertEqual(notification.message, "1 person reacted to your comment")
         self.assertEqual(str(notification.reference_ticket), str(self.test_ticket.name))
 
         frappe.delete_doc("HD Notification", notification.name, force=True)
@@ -308,7 +307,7 @@ class TestHDTicketComment(FrappeTestCase):
         self.assertEqual(len(notifications), 1)
 
         notification = frappe.get_doc("HD Notification", notifications[0].name)
-        self.assertIn("reacted on your comment", notification.message)
+        self.assertEqual(notification.message, "2 people reacted to your comment")
 
         frappe.delete_doc("HD Notification", notification.name, force=True)
         for email in test_users:
