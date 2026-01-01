@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="showSubjectDialog" :options="{ title: 'Rename Subject' }">
+  <Dialog v-model="showSubjectDialog" :options="{ title: __('Rename Subject') }">
     <template #body-content>
       <div class="flex flex-col flex-1 gap-3">
         <FormControl
@@ -12,7 +12,7 @@
         <Button
           variant="solid"
           :loading="isLoading"
-          label="Rename"
+          :label="__('Rename')"
           @click="handleRename"
         />
       </div>
@@ -23,6 +23,7 @@
 <script setup lang="ts">
 import { TicketSymbol } from "@/types";
 import { inject, ref } from "vue";
+import { __ } from "@/translation";
 
 const ticket = inject(TicketSymbol);
 const showSubjectDialog = defineModel();
