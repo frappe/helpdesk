@@ -1,17 +1,17 @@
 <template>
-  <Dialog :options="{ title: `Split ticket` }" v-model="showDialog">
+  <Dialog :options="{ title: __('Split ticket') }" v-model="showDialog">
     <template #body-content>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-8">
-          All
-          <span class="underline">emails/ comments</span>
-          from this email onwards will be moved to new ticket.
+          {{ __("All") }}
+          <span class="underline">{{ __("emails/ comments") }}</span>
+          {{ __("from this email onwards will be moved to new ticket.") }}
         </p>
         <FormControl
-          label="New Ticket Subject"
+          :label="__('New Ticket Subject')"
           type="text"
           v-model="subject"
-          placeholder="Add a subject for the new ticket"
+          :placeholder="__('Add a subject for the new ticket')"
         />
         <div
           class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200"
@@ -21,7 +21,7 @@
           />
 
           <div class="text-wrap text-sm text-gray-700">
-            This action is irreversible.
+            {{ __("This action is irreversible.") }}
           </div>
         </div>
       </div>
@@ -30,7 +30,7 @@
       <Button
         class="w-full"
         variant="solid"
-        label="Split into new ticket"
+        :label="__('Split into new ticket')"
         :loading="splitTicket.loading"
         :icon-left="LucideSplit"
         @click="handleTicketSplit"
@@ -44,6 +44,7 @@ import { Dialog, createResource, toast } from "frappe-ui";
 import { ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
 import TriangleAlert from "~icons/lucide/triangle-alert";
+import { __ } from "@/translation";
 
 interface Props {
   ticket_id: string;
@@ -70,11 +71,11 @@ const splitTicket = createResource({
     };
   },
   validate({ subject, communication_id }) {
-    if (!subject) throw { message: "Subject is required" };
-    if (!communication_id) throw { message: "Communication ID is required" };
+    if (!subject) throw { message: __("Subject is required") };
+    if (!communication_id) throw { message: __("Communication ID is required") };
   },
   onSuccess: (newTicket: string) => {
-    toast.success("Ticket split successfully");
+    toast.success(__("Ticket split successfully"));
     showDialog.value = false;
     window.open(
       window.location.origin + "/helpdesk/tickets/" + newTicket,

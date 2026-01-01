@@ -6,7 +6,7 @@
     }"
   >
     <template #body-content>
-      <div class="mb-1.5 block text-base text-ink-gray-5">View Name</div>
+      <div class="mb-1.5 block text-base text-ink-gray-5">{{ __("View Name") }}</div>
       <div class="flex gap-2">
         <IconPicker v-model="view.icon" v-slot="{ togglePopover }">
           <Button
@@ -20,7 +20,7 @@
           class="flex-1"
           size="md"
           type="text"
-          placeholder="My Open Tickets"
+          :placeholder="__('My Open Tickets')"
           v-model="view.label"
         />
       </div>
@@ -41,6 +41,7 @@ import { ref } from "vue";
 import { Dialog } from "frappe-ui";
 import IconPicker from "@/components/IconPicker.vue";
 import { computed } from "vue";
+import { __ } from "@/translation";
 
 let viewDialog = defineModel();
 
@@ -54,16 +55,16 @@ const modalInfo = computed(() => {
   return {
     modalTitle:
       viewDialog.value.mode === "edit"
-        ? "Edit View"
+        ? __("Edit View")
         : viewDialog.value.mode === "duplicate"
-        ? "Duplicate View"
-        : "Create View",
+        ? __("Duplicate View")
+        : __("Create View"),
     buttonLabel:
       viewDialog.value.mode === "edit"
-        ? "Update"
+        ? __("Update")
         : viewDialog.value.mode === "duplicate"
-        ? "Duplicate"
-        : "Create",
+        ? __("Duplicate")
+        : __("Create"),
     action:
       viewDialog.value.mode === "edit"
         ? "update"
