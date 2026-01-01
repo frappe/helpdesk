@@ -4,11 +4,11 @@
 from datetime import timedelta
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 from frappe.utils import getdate
 
 
-class TestHDServiceHolidayList(IntegrationTestCase):
+class TestHDServiceHolidayList(FrappeTestCase):
     def test_hd_service_holiday_list(self):
         today_date = getdate()
         test_holiday_dates = [

@@ -2,7 +2,7 @@
 # See license.txt
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.setup.install import add_default_status
 
@@ -13,7 +13,7 @@ EXTRA_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
-class IntegrationTestHDTicketStatus(IntegrationTestCase):
+class TestHDTicketStatus(FrappeTestCase):
     """
     Integration tests for HDTicketStatus.
     Use this class for testing interactions between multiple components.

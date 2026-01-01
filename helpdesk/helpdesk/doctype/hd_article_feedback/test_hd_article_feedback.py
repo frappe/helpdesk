@@ -2,7 +2,7 @@
 # See license.txt
 
 # import frappe
-from frappe.tests import IntegrationTestCase, UnitTestCase
+from frappe.tests.utils import FrappeTestCase
 
 # On IntegrationTestCase, the doctype test records and all
 # link-field test record depdendencies are recursively loaded
@@ -11,16 +11,8 @@ EXTRA_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
-class UnitTestHDArticleFeedback(UnitTestCase):
-    """
-    Unit tests for HDArticleFeedback.
-    Use this class for testing individual functions and methods.
-    """
 
-    pass
-
-
-class IntegrationTestHDArticleFeedback(IntegrationTestCase):
+class TestHDArticleFeedback(FrappeTestCase):
     """
     Integration tests for HDArticleFeedback.
     Use this class for testing interactions between multiple components.
