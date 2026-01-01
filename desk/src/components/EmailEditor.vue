@@ -13,7 +13,7 @@
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
     :extensions="[PreserveVideoControls]"
-    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    :uploadFunction="(file: any) => uploadFunction(file, doctype, ticketId)"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
@@ -22,7 +22,9 @@
           v-model="toEmailsClone"
           class="flex-1"
           :validate="validateEmail"
-          :error-message="(value) => __(`{0} is an invalid email address`, [value])"
+          :error-message="
+            (value) => __(`{0} is an invalid email address`, [value])
+          "
         />
         <Button
           :label="__('CC')"
@@ -46,7 +48,9 @@
           v-model="ccEmailsClone"
           class="flex-1"
           :validate="validateEmail"
-          :error-message="(value) => __(`{0} is an invalid email address`, [value])"
+          :error-message="
+            (value) => __(`{0} is an invalid email address`, [value])
+          "
         />
       </div>
       <div
@@ -60,7 +64,9 @@
           v-model="bccEmailsClone"
           class="flex-1"
           :validate="validateEmail"
-          :error-message="(value) => __(`{0} is an invalid email address`, [value])"
+          :error-message="
+            (value) => __(`{0} is an invalid email address`, [value])
+          "
         />
       </div>
     </template>
@@ -301,7 +307,9 @@ function submitMail() {
   }
   if (!toEmailsClone.value.length) {
     toast.warning(
-      __("Email has no recipients. Please add at least one email address in the 'TO' field.")
+      __(
+        "Email has no recipients. Please add at least one email address in the 'TO' field.",
+      ),
     );
     return false;
   }
@@ -335,7 +343,7 @@ function addToReply(
   body: string,
   toEmails: string[],
   ccEmails: string[],
-  bccEmails: string[]
+  bccEmails: string[],
 ) {
   toEmailsClone.value = toEmails;
   ccEmailsClone.value = ccEmails;

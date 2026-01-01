@@ -56,7 +56,7 @@ const firstResponseBadge = computed(() => {
     dayjs().isBefore(dayjs(props.ticket.response_by))
   ) {
     let responseBy = formatTime(
-      dayjs(props.ticket.response_by).diff(dayjs(), "s")
+      dayjs(props.ticket.response_by).diff(dayjs(), "s"),
     );
     if (firstResponseInterval) {
       clearInterval(firstResponseInterval);
@@ -70,16 +70,18 @@ const firstResponseBadge = computed(() => {
     };
   } else if (
     dayjs(props.ticket.first_responded_on).isBefore(
-      dayjs(props.ticket.response_by)
+      dayjs(props.ticket.response_by),
     )
   ) {
     firstResponse = {
-      label: __("Fulfilled in {0}", [formatTime(
-        dayjs(props.ticket.first_responded_on).diff(
-          dayjs(props.ticket.creation),
-          "s"
-        )
-      )]),
+      label: __("Fulfilled in {0}", [
+        formatTime(
+          dayjs(props.ticket.first_responded_on).diff(
+            dayjs(props.ticket.creation),
+            "s",
+          ),
+        ),
+      ]),
       color: "green",
       date: props.ticket.first_responded_on,
     };
@@ -114,7 +116,7 @@ const resolutionBadge = computed(() => {
     dayjs().isBefore(props.ticket.resolution_by)
   ) {
     let resolutionBy = formatTime(
-      dayjs(props.ticket.resolution_by).diff(dayjs(), "s")
+      dayjs(props.ticket.resolution_by).diff(dayjs(), "s"),
     );
     handleResolutionInterval(resolutionBy);
 
@@ -125,9 +127,9 @@ const resolutionBadge = computed(() => {
     };
   } else if (props.ticket.agreement_status === "Fulfilled") {
     resolution = {
-      label: __("Fulfilled in {0}", [formatTime(
-        dayjs(props.ticket.resolution_time, "s")
-      )]),
+      label: __("Fulfilled in {0}", [
+        formatTime(dayjs(props.ticket.resolution_time, "s")),
+      ]),
       color: "green",
       date: props.ticket.resolution_date,
     };
@@ -144,7 +146,7 @@ const resolutionBadge = computed(() => {
 function getCalculatedResolution() {
   let resolution = dayjs(props.ticket.resolution_by).add(
     props.ticket.total_hold_time,
-    "s"
+    "s",
   );
   // let now = new Date()
   resolution = dayjs(resolution).diff(dayjs(), "s");
@@ -185,7 +187,7 @@ watch(
       }
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 );
 
 function handleFirstResponseInterval(time: string) {

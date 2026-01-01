@@ -49,7 +49,9 @@
         class="w-full"
         variant="solid"
         :label="
-          targetTicket ? __('Merge with ticket #{0}', [targetTicket]) : __('Select Ticket')
+          targetTicket
+            ? __('Merge with ticket #{0}', [targetTicket])
+            : __('Select Ticket')
         "
         :loading="mergeTicket.loading"
         :icon-left="targetTicket && LucideMerge"
@@ -129,7 +131,7 @@ const mergeTicket = createResource({
     // open the target Ticket
     window.open(
       window.location.origin + "/helpdesk/tickets/" + targetTicket.value,
-      "_blank"
+      "_blank",
     );
     targetTicket.value = null;
   },
@@ -159,7 +161,7 @@ watch(
       });
       getTicketSubject.reload();
     }
-  }
+  },
 );
 
 function handleTicketMerge() {

@@ -16,7 +16,11 @@
   >
     <template #body-content>
       <div class="flex flex-col gap-4">
-        <FormControl type="text" v-model="mobileNumber" :label="__('Mobile Number')" />
+        <FormControl
+          type="text"
+          v-model="mobileNumber"
+          :label="__('Mobile Number')"
+        />
         <FormControl
           type="select"
           v-model="callMedium"
@@ -118,7 +122,7 @@ async function setCallingMedium() {
   telephonyStore.setDefaultCallingMedium(callMedium.value);
   telephonyStore.fetchCallIntegrationStatus();
   toast.success(
-    __("Default calling medium set successfully to {0}", [callMedium.value])
+    __("Default calling medium set successfully to {0}", [callMedium.value]),
   );
 }
 
@@ -141,6 +145,6 @@ watch(
         telephonyStore.setMakeCall(makeCall);
       }
     }),
-  { immediate: true }
+  { immediate: true },
 );
 </script>

@@ -1,5 +1,8 @@
 <template>
-  <Dialog v-model="showSubjectDialog" :options="{ title: __('Rename Subject') }">
+  <Dialog
+    v-model="showSubjectDialog"
+    :options="{ title: __('Rename Subject') }"
+  >
     <template #body-content>
       <div class="flex flex-col flex-1 gap-3">
         <FormControl
@@ -41,7 +44,7 @@ function handleRename() {
         isLoading.value = false;
         showSubjectDialog.value = false;
       },
-    }
+    },
   );
 }
 </script>

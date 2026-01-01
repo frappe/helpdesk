@@ -69,7 +69,9 @@
           :loading="sentInvitesResource.loading"
           >{{ __("Send Invites") }}
         </Button>
-        <Button @click="removeAllEmailFromQueue"> {{ __("Clear All") }} </Button>
+        <Button @click="removeAllEmailFromQueue">
+          {{ __("Clear All") }}
+        </Button>
       </div>
     </template>
   </Dialog>

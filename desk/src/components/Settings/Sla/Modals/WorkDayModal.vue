@@ -2,7 +2,9 @@
   <Dialog
     v-model="dialog.show"
     @after-leave="resetForm"
-    :options="{ title: dialog.isEditing ? __('Edit workday') : __('Add workday') }"
+    :options="{
+      title: dialog.isEditing ? __('Edit workday') : __('Add workday'),
+    }"
   >
     <template #body-content>
       <div class="flex flex-col gap-4">
@@ -162,7 +164,7 @@ const deleteWorkDay = (event) => {
   }
 
   const item = props.workDaysList.findIndex(
-    (item) => item.workday === workDayData.workday
+    (item) => item.workday === workDayData.workday,
   );
   if (item !== -1) {
     props.workDaysList.splice(item, 1);
@@ -176,7 +178,7 @@ function formatTimeToHHMMSS(timeStr: string) {
     const [hours, minutes, seconds] = timeStr.split(":");
     return `${hours.padStart(2, "0")}:${minutes.padStart(
       2,
-      "0"
+      "0",
     )}:${seconds.padStart(2, "0")}`;
   }
 
@@ -209,7 +211,8 @@ const validateField = (field: string) => {
 
 const validateTimeRange = () => {
   if (!workDayData.start_time || !workDayData.end_time) {
-    if (!workDayData.start_time) errors.start_time = __("Start time is required");
+    if (!workDayData.start_time)
+      errors.start_time = __("Start time is required");
     if (!workDayData.end_time) errors.end_time = __("End time is required");
     return false;
   }
@@ -248,7 +251,7 @@ const onSave = () => {
   try {
     if (dialog.value.isEditing) {
       const itemIndex = props.workDaysList.findIndex(
-        (item) => item.workday === dialog.value.data?.workday
+        (item) => item.workday === dialog.value.data?.workday,
       );
       if (itemIndex !== -1) {
         const updatedItem = {
@@ -260,7 +263,7 @@ const onSave = () => {
       }
     } else {
       const isDuplicate = props.workDaysList.some(
-        (item) => item.workday === workDayData.workday
+        (item) => item.workday === workDayData.workday,
       );
 
       if (isDuplicate) {
@@ -286,13 +289,13 @@ watch(
       if (dialog.value.isEditing && dialog.value.data) {
         workDayData.workday = dialog.value.data.workday;
         workDayData.start_time = formatTimeToHHMMSS(
-          dialog.value.data.start_time
+          dialog.value.data.start_time,
         );
         workDayData.end_time = formatTimeToHHMMSS(dialog.value.data.end_time);
       } else {
         resetForm();
       }
     }
-  }
+  },
 );
 </script>

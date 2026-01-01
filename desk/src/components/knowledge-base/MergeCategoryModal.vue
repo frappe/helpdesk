@@ -14,7 +14,9 @@
       <p class="text-p-base text-ink-gray-8 mb-4">
         {{ __("This will move all articles of the") }}
         <span class="whitespace-nowrap font-semibold">{{ categoryTitle }}</span>
-        {{ __("category to the selected category. This change is irreversible!") }}
+        {{
+          __("category to the selected category. This change is irreversible!")
+        }}
       </p>
       <Link
         class="form-control"

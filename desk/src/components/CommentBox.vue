@@ -62,11 +62,19 @@
         :content="_content"
         :editable="editable"
         :bubble-menu="textEditorMenuButtons"
-        @change="(event:string) => {_content = event}"
+        @change="
+          (event: string) => {
+            _content = event;
+          }
+        "
       >
         <template #bottom v-if="editable">
           <div class="flex flex-row-reverse gap-2">
-            <Button :label="__('Save')" @click="handleSaveComment" variant="solid" />
+            <Button
+              :label="__('Save')"
+              @click="handleSaveComment"
+              variant="solid"
+            />
             <Button :label="__('Discard')" @click="handleDiscard" />
           </div>
         </template>
@@ -194,7 +202,7 @@ function handleSaveComment() {
         emit("update");
         toast.success(__("Comment updated"));
       },
-    }
+    },
   );
 }
 

@@ -1,10 +1,9 @@
 <template>
   <div class="flex justify-between items-start flex-col gap-6">
     <span class="text-sm text-ink-gray-5 pt-4 w-full">{{
-      __(
-        "Set visibility and mandatory criteria for {0} field:",
-        [selections.childField || __("child")]
-      )
+      __("Set visibility and mandatory criteria for {0} field:", [
+        selections.childField || __("child"),
+      ])
     }}</span>
     <div class="flex flex-col gap-4 w-full pb-2">
       <!-- Display Criteria -->
@@ -13,10 +12,10 @@
           <Switch v-model="fieldCriteriaState.display.enabled" />
           <div class="flex items-center gap-1">
             <span class="text-sm text-ink-gray-5">{{
-              __(
-                "Show {0} if {1} is set to",
-                [selections.childField, selections.parentField]
-              )
+              __("Show {0} if {1} is set to", [
+                selections.childField,
+                selections.parentField,
+              ])
             }}</span>
             <DocumentationButton
               url="https://docs.frappe.io/helpdesk/field-dependency#handling-visibility-of-child-field"
@@ -41,10 +40,10 @@
           <Switch v-model="fieldCriteriaState.mandatory.enabled" />
           <div class="flex items-center gap-1">
             <span class="text-sm text-ink-gray-5">{{
-              __(
-                "Make {0} mandatory if {1} is set to",
-                [selections.childField, selections.parentField]
-              )
+              __("Make {0} mandatory if {1} is set to", [
+                selections.childField,
+                selections.parentField,
+              ])
             }}</span>
             <DocumentationButton
               url="https://docs.frappe.io/helpdesk/field-dependency#handling-if-the-child-field-is-mandatory"
@@ -107,7 +106,7 @@ const fieldCriteriaOptions = computed(() => {
 
 function handleCriteriaSelection(
   values: { label: string; value: string }[],
-  stateKey: "display" | "mandatory"
+  stateKey: "display" | "mandatory",
 ) {
   const _values = values.map((v) => v.value);
   fieldCriteriaState.value[stateKey].value = values;
