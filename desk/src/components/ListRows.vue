@@ -14,9 +14,9 @@
               <span>{{ group.group.label }}</span>
               <span class="text-xs text-ink-gray-5"
                 >{{
-                  group.rows.length +
-                  " Article" +
-                  (group.rows.length > 1 ? "s" : "")
+                  group.rows.length > 1
+                    ? __("{0} Articles", [group.rows.length])
+                    : __("{0} Article", [group.rows.length])
                 }}
               </span>
             </div>
@@ -68,6 +68,7 @@ import {
 import { computed, ref, watch } from "vue";
 
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
+import { __ } from "@/translation";
 const props = defineProps({
   rows: {
     type: Array,
@@ -88,8 +89,8 @@ const actions = (group) => {
       onClick: () => action.onClick(group),
     };
   });
-  if (group.group.label == "General") {
-    _actions = _actions.filter((action) => action.label === "Add New Article");
+  if (group.group.label == __("General")) {
+    _actions = _actions.filter((action) => action.label === __("Add New Article"));
   }
   return _actions;
 };
