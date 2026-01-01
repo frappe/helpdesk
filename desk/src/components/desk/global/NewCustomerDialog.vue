@@ -2,14 +2,14 @@
   <div>
     <Dialog
       v-model="model"
-      :options="{ title: 'Add New Customer', size: 'sm' }"
+      :options="{ title: __('Add New Customer'), size: 'sm' }"
     >
       <template #body-content>
         <div class="space-y-4">
           <div class="space-y-1">
             <Input
               v-model="state.customer"
-              label="Customer Name"
+              :label="__('Customer Name')"
               type="text"
               placeholder="Tesla Inc."
             />
@@ -17,14 +17,14 @@
           <div class="space-y-1">
             <Input
               v-model="state.domain"
-              label="Domain"
+              :label="__('Domain')"
               type="text"
               placeholder="eg: tesla.com, mycompany.com"
             />
           </div>
           <div class="float-right flex space-x-2">
             <Button
-              label="Add"
+              :label="__('Add')"
               theme="gray"
               variant="solid"
               @click.prevent="addCustomer"
@@ -39,6 +39,7 @@
 <script setup lang="ts">
 import { Dialog, Input, createResource, toast } from "frappe-ui";
 import { reactive } from "vue";
+import { __ } from "@/translation";
 
 const emit = defineEmits(["customerCreated"]);
 const model = defineModel<boolean>();
@@ -61,7 +62,7 @@ const customerResource = createResource({
   onSuccess: () => {
     state.customer = "";
     state.domain = "";
-    toast.success("Customer created");
+    toast.success(__("Customer created"));
     emit("customerCreated");
   },
   onError: (err) => {
@@ -71,7 +72,7 @@ const customerResource = createResource({
 
 function addCustomer() {
   if (!state.customer) {
-    toast.error("Customer name is required");
+    toast.error(__("Customer name is required"));
     return;
   }
   customerResource.submit({
