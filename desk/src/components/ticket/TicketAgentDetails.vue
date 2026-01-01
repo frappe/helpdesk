@@ -34,6 +34,7 @@ import {
 } from "@/utils";
 import { Badge, Tooltip } from "frappe-ui";
 import { computed, onUnmounted, ref, watch } from "vue";
+import { __ } from "@/translation";
 
 const props = defineProps({
   ticket: {
@@ -63,7 +64,7 @@ const firstResponseBadge = computed(() => {
     }
     handleFirstResponseInterval(responseBy);
     firstResponse = {
-      label: `Due in ${formatTime(firstResponseSeconds.value)}`,
+      label: __("Due in {0}", [formatTime(firstResponseSeconds.value)]),
       color: "orange",
       date: props.ticket.response_by,
     };
@@ -73,18 +74,18 @@ const firstResponseBadge = computed(() => {
     )
   ) {
     firstResponse = {
-      label: `Fulfilled in ${formatTime(
+      label: __("Fulfilled in {0}", [formatTime(
         dayjs(props.ticket.first_responded_on).diff(
           dayjs(props.ticket.creation),
           "s"
         )
-      )}`,
+      )]),
       color: "green",
       date: props.ticket.first_responded_on,
     };
   } else {
     firstResponse = {
-      label: "Failed",
+      label: __("Failed"),
       color: "red",
       date: props.ticket.response_by,
     };
@@ -104,7 +105,7 @@ const resolutionBadge = computed(() => {
   ) {
     let timeLeft = dayjs(props.ticket.resolution_by).diff(dayjs(), "s");
     resolution = {
-      label: `${formatTime(timeLeft)} left (On Hold)`,
+      label: __("{0} left (On Hold)", [formatTime(timeLeft)]),
       color: "blue",
       date: props.ticket.on_hold_since,
     };
@@ -118,21 +119,21 @@ const resolutionBadge = computed(() => {
     handleResolutionInterval(resolutionBy);
 
     resolution = {
-      label: `Due in ${formatTime(resolutionSeconds.value)}`,
+      label: __("Due in {0}", [formatTime(resolutionSeconds.value)]),
       color: "orange",
       date: props.ticket.resolution_by,
     };
   } else if (props.ticket.agreement_status === "Fulfilled") {
     resolution = {
-      label: `Fulfilled in ${formatTime(
+      label: __("Fulfilled in {0}", [formatTime(
         dayjs(props.ticket.resolution_time, "s")
-      )}`,
+      )]),
       color: "green",
       date: props.ticket.resolution_date,
     };
   } else {
     resolution = {
-      label: "Failed",
+      label: __("Failed"),
       color: "red",
       date: props.ticket.resolution_by,
     };
@@ -152,20 +153,20 @@ function getCalculatedResolution() {
 
 const sections = computed(() => [
   {
-    label: "First Response",
+    label: __("First Response"),
     tooltipValue: dateFormat(firstResponseBadge.value.date, dateTooltipFormat),
     badgeText: firstResponseBadge.value.label,
     badgeColor: firstResponseBadge.value.color,
   },
   {
-    label: "Resolution",
+    label: __("Resolution"),
     tooltipValue: dateFormat(resolutionBadge.value.date, dateTooltipFormat),
     badgeText: resolutionBadge.value.label,
     badgeColor: resolutionBadge.value.color,
   },
   {
-    label: "Source",
-    value: props.ticket.via_customer_portal ? "Portal" : "Mail",
+    label: __("Source"),
+    value: props.ticket.via_customer_portal ? __("Portal") : __("Mail"),
   },
 ]);
 
