@@ -3990,3 +3990,130 @@ msgstr ""
 msgid "synonym"
 msgstr ""
 
+
+#: desk/src/pages (new i18n strings)
+msgid "Add one to get started."
+msgstr "Ajoutez-en un pour commencer."
+
+msgid "Anyone will be able to create tickets without any permission. e.g. from webform."
+msgstr "N'importe qui pourra créer des tickets sans autorisation, par exemple depuis un formulaire web."
+
+msgid "Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO"
+msgstr "Apparaît à côté du titre dans l'onglet de votre navigateur. Taille recommandée : minimum 32x32 px en PNG ou ICO"
+
+msgid "Auto-close tickets that remain in a status for the specified number of days."
+msgstr "Fermer automatiquement les tickets restant dans un statut pendant le nombre de jours spécifié."
+
+msgid "Automatically close stale tickets"
+msgstr "Fermer automatiquement les tickets inactifs"
+
+msgid "Business Holidays"
+msgstr "Jours fériés"
+
+msgid "Change your search terms or filters"
+msgstr "Modifiez vos termes de recherche ou filtres"
+
+msgid "Create new business holiday"
+msgstr "Créer un nouveau jour férié"
+
+msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
+msgstr "Désactive toutes les notifications par e-mail pour le ticket - y compris la création, les mises à jour et les alertes."
+
+msgid "Do not restrict tickets without a team"
+msgstr "Ne pas restreindre les tickets sans équipe"
+
+msgid "Email Account name"
+msgstr "Nom du compte e-mail"
+
+msgid "Guide users to articles before tickets."
+msgstr "Guider les utilisateurs vers les articles avant les tickets."
+
+msgid "Learn more about SLA"
+msgstr "En savoir plus sur les SLA"
+
+msgid "Make feedback mandatory"
+msgstr "Rendre le retour obligatoire"
+
+msgid "Manage your email accounts and configure incoming and outgoing settings."
+msgstr "Gérez vos comptes e-mail et configurez les paramètres entrants et sortants."
+
+msgid "My Filter"
+msgstr "Mon filtre"
+
+msgid "No Holiday list found"
+msgstr "Aucune liste de jours fériés trouvée"
+
+msgid "No SLA found"
+msgstr "Aucun SLA trouvé"
+
+msgid "No agent found"
+msgstr "Aucun agent trouvé"
+
+msgid "No assignment rule found"
+msgstr "Aucune règle d'affectation trouvée"
+
+msgid "No email account found"
+msgstr "Aucun compte e-mail trouvé"
+
+msgid "Policy Name"
+msgstr "Nom de la politique"
+
+msgid "Published articles must have content."
+msgstr "Les articles publiés doivent avoir du contenu."
+
+msgid "Restrict agent assignment to selected team"
+msgstr "Restreindre l'affectation des agents à l'équipe sélectionnée"
+
+msgid "Restrict tickets by team"
+msgstr "Restreindre les tickets par équipe"
+
+msgid "Restrict tickets to be viewed and managed by team members only."
+msgstr "Restreindre les tickets pour qu'ils ne soient consultés et gérés que par les membres de l'équipe."
+
+msgid "SLAs align your team and customers with defined timelines for a reliable experience."
+msgstr "Les SLA alignent votre équipe et vos clients sur des délais définis pour une expérience fiable."
+
+msgid "Schedule name"
+msgstr "Nom du planning"
+
+msgid "Select what type all tickets get by default."
+msgstr "Sélectionnez le type par défaut pour tous les tickets."
+
+msgid "Service Level Agreements (SLAs)"
+msgstr "Accords de niveau de service (SLA)"
+
+msgid "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one"
+msgstr "Définissez les jours ouvrables, les heures et les jours fériés en sélectionnant un planning prédéfini ou en en créant un nouveau"
+
+msgid "Set your team's working days, hours, and holidays using a template or custom schedule."
+msgstr "Définissez les jours ouvrables, les heures et les jours fériés de votre équipe à l'aide d'un modèle ou d'un planning personnalisé."
+
+msgid "Skip email workflow"
+msgstr "Ignorer le workflow d'e-mail"
+
+msgid "The feedback dialog will be shown, when a user tries to close a ticket from the customer portal."
+msgstr "Le dialogue de retour sera affiché lorsqu'un utilisateur tente de fermer un ticket depuis le portail client."
+
+msgid "The number of days must be 1 or more"
+msgstr "Le nombre de jours doit être de 1 ou plus"
+
+msgid "The ticket status will automatically change whenever the agent respond to a ticket."
+msgstr "Le statut du ticket changera automatiquement chaque fois que l'agent répond à un ticket."
+
+msgid "Ticket settings"
+msgstr "Paramètres des tickets"
+
+msgid "Ticket status"
+msgstr "Statut du ticket"
+
+msgid "Ticket updated"
+msgstr "Ticket mis à jour"
+
+msgid "User Forum"
+msgstr "Forum utilisateur"
+
+msgid "Work schedule and holidays"
+msgstr "Planning de travail et jours fériés"
+
+msgid "Workflow & knowledge base settings"
+msgstr "Paramètres du workflow et de la base de connaissances"

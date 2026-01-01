@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Dialog v-model="open" :options="{ title: 'Create New Contact' }">
+    <Dialog v-model="open" :options="{ title: __('Create New Contact') }">
       <template #body-content>
         <div class="space-y-4">
           <div
@@ -29,14 +29,14 @@
               v-model="state[field.value]"
               :options="customerResource.data"
               class="form-control flex-1"
-              placeholder="Link to a customer record"
+              :placeholder="__('Link to a customer record')"
               :hide-me="true"
             />
             <ErrorMessage :message="error[field.error]" />
           </div>
           <div class="flex justify-end space-x-2">
             <Button
-              label="Create"
+              :label="__('Create')"
               :loading="contactResource.loading"
               theme="gray"
               variant="solid"
@@ -62,6 +62,7 @@ import {
   toast,
 } from "frappe-ui";
 import zod from "zod";
+import { __ } from "@/translation";
 
 import { AutoCompleteItem } from "@/types";
 
@@ -106,7 +107,7 @@ interface FormField {
 
 const formFields: FormField[] = [
   {
-    label: "Email Id",
+    label: __("Email Id"),
     value: "emailID",
     error: "emailValidationError",
     type: "input",
@@ -114,7 +115,7 @@ const formFields: FormField[] = [
     action: () => validateEmailInput(state.value.emailID),
   },
   {
-    label: "First Name",
+    label: __("First Name"),
     value: "firstName",
     error: "firstNameValidationError",
     type: "input",
@@ -122,14 +123,14 @@ const formFields: FormField[] = [
     action: () => validateFirstName(state.value.firstName),
   },
   {
-    label: "Last Name",
+    label: __("Last Name"),
     value: "lastName",
     error: "lastNameValidationError",
     type: "input",
     required: false,
   },
   {
-    label: "Phone",
+    label: __("Phone"),
     value: "phone",
     error: "phoneValidationError",
     type: "input",
@@ -137,7 +138,7 @@ const formFields: FormField[] = [
     action: () => validatePhone(state.value.phone),
   },
   {
-    label: "Customer",
+    label: __("Customer"),
     value: "selectedCustomer",
     error: "customerValidationError",
     type: "Link",
@@ -181,7 +182,7 @@ const contactResource = createResource({
       phone: "",
       selectedCustomer: null,
     };
-    toast.success("Contact created");
+    toast.success(__("Contact created"));
     emit("contactCreated");
   },
 });
@@ -230,11 +231,11 @@ function validateEmailInput(value: string) {
   const success = zod.string().email().safeParse(value).success;
 
   if (!value) {
-    error.value.emailValidationError = "Email should not be empty";
+    error.value.emailValidationError = __("Email should not be empty");
   } else if (!success) {
-    error.value.emailValidationError = "Enter a valid email";
+    error.value.emailValidationError = __("Enter a valid email");
   } else if (existingContactEmails(contactStore.options).includes(value)) {
-    error.value.emailValidationError = "Contact with email already exists";
+    error.value.emailValidationError = __("Contact with email already exists");
   }
   return error.value.emailValidationError;
 }
@@ -242,7 +243,7 @@ function validateEmailInput(value: string) {
 function validateFirstName(value: string) {
   error.value.firstNameValidationError = "";
   if (!value || value.trim() === "") {
-    error.value.firstNameValidationError = "First name should not be empty";
+    error.value.firstNameValidationError = __("First name should not be empty");
   }
   return error.value.firstNameValidationError;
 }
@@ -251,7 +252,7 @@ function validatePhone(value: string) {
   error.value.phoneValidationError = "";
   const reg = /[0-9]+/;
   if (value && (!reg.test(value) || value.length < 10)) {
-    error.value.phoneValidationError = "Enter a valid phone number";
+    error.value.phoneValidationError = __("Enter a valid phone number");
   }
   return error.value.phoneValidationError;
 }

@@ -2,11 +2,13 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Knowledge Base</div>
+        <div class="text-lg font-medium text-gray-900">
+          {{ __("Knowledge Base") }}
+        </div>
       </template>
       <template #right-header>
         <Dropdown :options="headerOptions">
-          <Button label="Create" variant="solid">
+          <Button :label="__('Create')" variant="solid">
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>
@@ -64,6 +66,7 @@ import {
   usePageMeta,
 } from "frappe-ui";
 import { computed, h, onMounted, reactive, ref } from "vue";
+import { __ } from "@/translation";
 import { useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 
@@ -92,7 +95,7 @@ const generalCategory = createResource({
 
 const headerOptions = [
   {
-    label: "Category",
+    label: __("Category"),
     icon: "folder",
     onClick: () => {
       resetState();
@@ -101,7 +104,7 @@ const headerOptions = [
     },
   },
   {
-    label: "Article",
+    label: __("Article"),
     icon: "file-text",
     onClick: () => {
       router.push({
@@ -119,7 +122,7 @@ const headerOptions = [
 
 const groupByActions = [
   {
-    label: "Add New Article",
+    label: __("Add New Article"),
     icon: "plus",
     onClick: (groupedRow) => {
       router.push({
@@ -134,7 +137,7 @@ const groupByActions = [
     },
   },
   {
-    label: "Edit Title",
+    label: __("Edit Title"),
     icon: "edit",
     onClick: (groupedRow) => {
       editTitle.value = true;
@@ -145,7 +148,7 @@ const groupByActions = [
     },
   },
   {
-    label: "Merge",
+    label: __("Merge"),
     icon: LucideMerge,
     onClick: (groupedRow) => {
       mergeModal.value = true;
@@ -154,7 +157,7 @@ const groupByActions = [
     },
   },
   {
-    label: "Share",
+    label: __("Share"),
     icon: "link",
     onClick: async ({ group }) => {
       const { label, value } = group;
@@ -162,12 +165,12 @@ const groupByActions = [
       url.pathname = `/helpdesk/kb-public/${value}`;
       await copyToClipboard(
         url.toString(),
-        `Category <u>'${label}'</u> link copied to clipboard`
+        __("Category '{0}' link copied to clipboard", [label])
       );
     },
   },
   {
-    label: "Delete",
+    label: __("Delete"),
     icon: "trash-2",
     onClick: (groupedRow) => {
       handleCategoryDelete(groupedRow);
@@ -178,7 +181,7 @@ const groupByActions = [
 const listSelections = ref(new Set());
 const selectBannerActions = [
   {
-    label: "Move To",
+    label: __("Move To"),
     icon: "corner-up-right",
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
@@ -186,16 +189,16 @@ const selectBannerActions = [
     },
   },
   {
-    label: "Delete",
+    label: __("Delete"),
     icon: "trash-2",
     onClick: (selections: Set<string>) => {
       listSelections.value = selections;
       $dialog({
-        title: "Delete articles?",
-        message: `Are you sure you want to delete these articles?`,
+        title: __("Delete articles?"),
+        message: __("Are you sure you want to delete these articles?"),
         actions: [
           {
-            label: "Confirm",
+            label: __("Confirm"),
             variant: "solid",
             onClick({ close }) {
               handleDeleteArticles();
@@ -220,7 +223,7 @@ function handleMoveToCategory(category: string) {
         listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value.clear();
-        toast.success("Articles moved");
+        toast.success(__("Articles moved"));
       },
       onError: (error: Error) => {
         const title = error?.messages?.[0] || error.message;
@@ -251,7 +254,7 @@ function handleCategoryCreate() {
             isEdit: 1,
           },
         });
-        toast.success("Category created");
+        toast.success(__("Category created"));
         capture("category_created", {
           data: {
             category: category.title,
@@ -286,7 +289,7 @@ function handleCategoryUpdate() {
         showCategoryModal.value = false;
         editTitle.value = false;
 
-        toast.success("Category updated");
+        toast.success(__("Category updated"));
         resetState();
       },
       onError: (error: string) => {
@@ -298,11 +301,13 @@ function handleCategoryUpdate() {
 
 function handleCategoryDelete(groupedRow) {
   $dialog({
-    title: "Delete category?",
-    message: `All articles from this category will move to General category.`,
+    title: __("Delete category?"),
+    message: __(
+      "All articles from this category will move to General category."
+    ),
     actions: [
       {
-        label: "Confirm",
+        label: __("Confirm"),
         variant: "solid",
         onClick(close: Function) {
           deleteCategory.submit(
@@ -312,7 +317,7 @@ function handleCategoryDelete(groupedRow) {
             },
             {
               onSuccess: () => {
-                toast.success("Category deleted");
+                toast.success(__("Category deleted"));
                 listViewRef.value.reload();
               },
             }
@@ -334,7 +339,7 @@ function handleDeleteArticles() {
         listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value?.clear();
-        toast.success("Articles deleted");
+        toast.success(__("Articles deleted"));
       },
     }
   );
@@ -349,7 +354,7 @@ function handleMergeCategory(source: string, target: string) {
     {
       onSuccess: () => {
         listViewRef.value.reload();
-        toast.success("Category merged");
+        toast.success(__("Category merged"));
         mergeModal.value = false;
         resetState();
       },
@@ -407,15 +412,15 @@ const options = computed(() => {
 
 const statusMap = {
   Published: {
-    label: "Published",
+    label: __("Published"),
     theme: "green",
   },
   Draft: {
-    label: "Draft",
+    label: __("Draft"),
     theme: "orange",
   },
   Archived: {
-    label: "Archived",
+    label: __("Archived"),
     theme: "gray",
   },
 };
@@ -426,7 +431,7 @@ onMounted(() => {
 
 usePageMeta(() => {
   return {
-    title: "Knowledge Base",
+    title: __("Knowledge Base"),
   };
 });
 </script>

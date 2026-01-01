@@ -10,7 +10,7 @@
     }"
     @click="handleNavigation"
   >
-    <Tooltip :text="label" v-if="!isExpanded">
+    <Tooltip :text="__(label)" v-if="!isExpanded">
       <span
         class="shrink-0 text-gray-700"
         :class="{
@@ -40,7 +40,7 @@
         '-z-50': !isExpanded,
       }"
     >
-      {{ label }}
+      {{ __(label) }}
       <slot name="right" />
     </div>
   </div>
