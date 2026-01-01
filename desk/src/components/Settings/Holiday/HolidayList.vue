@@ -59,6 +59,7 @@ import {
   resetHolidayData,
 } from "@/stores/holidayList";
 import { HolidayListResourceSymbol } from "@/types";
+import { __ } from "@/translation";
 
 const holidayList = inject(HolidayListResourceSymbol);
 
