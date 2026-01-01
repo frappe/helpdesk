@@ -35,7 +35,12 @@
           variant="solid"
           theme="gray"
           @click="onSave"
-          :loading="isLoading"
+          :loading="
+            savedRepliesListResource?.insert.loading ||
+            savedRepliesListResource?.setValue.loading ||
+            renameSavedReplyResource.loading ||
+            getSavedReplyData.loading
+          "
           :disabled="Boolean(!isDirty)"
         />
       </div>
@@ -74,7 +79,7 @@
                 />
               </template>
               <template #option="{ option }">
-                <div class="inline-flex gap-2 items-center">
+                <div class="flex gap-2 items-center cursor-pointer">
                   <component :is="option.icon" class="size-4 text-ink-gray-9" />
                   <span>
                     {{ option.label }}
@@ -202,7 +207,6 @@ const savedReplyData = ref({
   message: "",
   teams: [],
 });
-const isLoading = ref(false);
 const initialData = ref("");
 const errors = ref({
   title: "",
@@ -318,11 +322,9 @@ const goBack = () => {
 };
 
 const onSave = () => {
-  isLoading.value = true;
   validateData();
 
   if (Object.values(errors.value).some((e) => e)) {
-    isLoading.value = false;
     toast.error(__("Please fill all the required fields"));
     return;
   }
@@ -347,7 +349,6 @@ const createSavedReply = () => {
     {
       onSuccess: (data) => {
         toast.success(__("Saved reply saved"));
-        isLoading.value = false;
         savedReplyData.value = {
           ...savedReplyData.value,
           name: data.name,
@@ -362,27 +363,55 @@ const createSavedReply = () => {
   );
 };
 
+const renameSavedReplyResource = createResource({
+  url: "frappe.client.rename_doc",
+  makeParams() {
+    return {
+      doctype: "HD Saved Reply",
+      old_name: savedRepliesActiveScreen.value.data.name,
+      new_name: savedReplyData.value.title,
+    };
+  },
+});
+
 const updateSavedReply = async () => {
-  savedRepliesListResource?.setValue.submit(
-    {
-      name: savedReplyData.value.name,
-      title: savedReplyData.value.title,
-      subject: savedReplyData.value.title,
-      message: savedReplyData.value.message,
-      scope: savedReplyData.value.scope,
-      teams: savedReplyData.value.teams.map((team) => ({
-        team: team,
-      })),
-    },
-    {
-      onSuccess: () => {
-        isDirty.value = false;
-        isLoading.value = false;
-        disableSettingModalOutsideClick.value = false;
-        toast.success(__("Saved reply updated"));
-      },
-    }
-  );
+  await savedRepliesListResource?.setValue.submit({
+    name: savedReplyData.value.name,
+    title: savedReplyData.value.title,
+    subject: savedReplyData.value.title,
+    message: savedReplyData.value.message,
+    scope: savedReplyData.value.scope,
+    teams: savedReplyData.value.teams.map((team) => ({
+      team: team,
+    })),
+  });
+
+  if (savedReplyData.value.name !== savedReplyData.value.title) {
+    await renameSavedReplyResource.submit().catch(async (err: any) => {
+      const error =
+        err?.messages?.[0] ||
+        __("Some error occurred while renaming saved reply");
+      toast.error(error);
+      // Reset saved reply to previous state
+      await getSavedReplyData.reload();
+    });
+
+    await getSavedReplyData.submit({
+      doctype: "HD Saved Reply",
+      name: savedReplyData.value.title,
+    });
+
+    savedRepliesActiveScreen.value = {
+      screen: "view",
+      data: { name: savedReplyData.value.title },
+    };
+  } else {
+    await getSavedReplyData.reload();
+  }
+
+  savedRepliesListResource?.reload();
+  isDirty.value = false;
+  toast.success(__("Saved reply updated"));
 };
 
 const getScopeIcon = (scope: string) => {
