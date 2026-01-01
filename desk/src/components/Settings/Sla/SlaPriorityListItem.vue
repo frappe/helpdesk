@@ -74,6 +74,7 @@ import { Button, Checkbox, Dropdown, Popover } from "frappe-ui";
 import { inject, ref } from "vue";
 import EditResponseResolutionModal from "./Modals/EditResponseResolutionModal.vue";
 import { formatTimeHMS } from "./utils";
+import { __ } from "@/translation";
 
 const props = defineProps({
   columns: {
@@ -103,7 +104,7 @@ const priorityOptions = inject<Array<any>>("priorityOptions");
 
 const dropdownOptions = [
   {
-    label: "Edit",
+    label: __("Edit"),
     onClick: () => editItem(),
     icon: "edit",
   },

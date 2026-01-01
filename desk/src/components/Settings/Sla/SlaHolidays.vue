@@ -78,6 +78,7 @@ import {
 } from "@/stores/holidayList";
 import { watchDebounced } from "@vueuse/core";
 import { slaData, validateSlaData } from "@/stores/sla";
+import { __ } from "@/translation";
 
 const createNewHolidayList = () => {
   setActiveSettingsTab("Business Holidays");

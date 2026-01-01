@@ -2,7 +2,7 @@
   <Dialog
     v-model="dialog.show"
     @after-leave="resetForm"
-    :options="{ title: dialog.isEditing ? 'Edit workday' : 'Add workday' }"
+    :options="{ title: dialog.isEditing ? __('Edit workday') : __('Add workday') }"
   >
     <template #body-content>
       <div class="flex flex-col gap-4">
@@ -11,36 +11,36 @@
             :type="'select'"
             size="sm"
             variant="subtle"
-            placeholder="Select Workday"
-            label="Workday"
+            :placeholder="__('Select Workday')"
+            :label="__('Workday')"
             v-model="workDayData.workday"
             :options="[
               {
-                label: 'Monday',
+                label: __('Monday'),
                 value: 'Monday',
               },
               {
-                label: 'Tuesday',
+                label: __('Tuesday'),
                 value: 'Tuesday',
               },
               {
-                label: 'Wednesday',
+                label: __('Wednesday'),
                 value: 'Wednesday',
               },
               {
-                label: 'Thursday',
+                label: __('Thursday'),
                 value: 'Thursday',
               },
               {
-                label: 'Friday',
+                label: __('Friday'),
                 value: 'Friday',
               },
               {
-                label: 'Saturday',
+                label: __('Saturday'),
                 value: 'Saturday',
               },
               {
-                label: 'Sunday',
+                label: __('Sunday'),
                 value: 'Sunday',
               },
             ]"
@@ -55,8 +55,8 @@
             :type="'time'"
             size="sm"
             variant="subtle"
-            placeholder="Start Time"
-            label="Start Time"
+            :placeholder="__('Start Time')"
+            :label="__('Start Time')"
             v-model="workDayData.start_time"
             :class="{ 'border-red-500': errors.start_time }"
             @blur="validateField('start_time')"
@@ -69,8 +69,8 @@
             :type="'time'"
             size="sm"
             variant="subtle"
-            placeholder="End Time"
-            label="End Time"
+            :placeholder="__('End Time')"
+            :label="__('End Time')"
             v-model="workDayData.end_time"
             :class="{ 'border-red-500': errors.end_time }"
             @blur="validateTimeRange"
@@ -91,7 +91,7 @@
           <Button
             variant="subtle"
             :theme="isConfirmingDelete ? 'red' : 'gray'"
-            :label="isConfirmingDelete ? 'Confirm Delete' : 'Delete'"
+            :label="isConfirmingDelete ? __('Confirm Delete') : __('Delete')"
             @click="deleteWorkDay"
             icon-left="trash-2"
           />
@@ -101,9 +101,9 @@
             variant="subtle"
             theme="gray"
             @click="dialog.show = false"
-            label="Cancel"
+            :label="__('Cancel')"
           />
-          <Button variant="solid" @click="onSave" label="Save" />
+          <Button variant="solid" @click="onSave" :label="__('Save')" />
         </div>
       </div>
     </template>
@@ -113,6 +113,7 @@
 <script setup lang="ts">
 import { ref, defineModel, reactive, watch } from "vue";
 import { Dialog, FormControl, Button, toast } from "frappe-ui";
+import { __ } from "@/translation";
 
 const isConfirmingDelete = ref(false);
 const props = defineProps({
@@ -199,7 +200,7 @@ function resetForm() {
 
 const validateField = (field: string) => {
   if (!workDayData[field as keyof typeof workDayData]) {
-    errors[field as keyof typeof errors] = "This field is required";
+    errors[field as keyof typeof errors] = __("This field is required");
     return false;
   }
   errors[field as keyof typeof errors] = "";
@@ -208,8 +209,8 @@ const validateField = (field: string) => {
 
 const validateTimeRange = () => {
   if (!workDayData.start_time || !workDayData.end_time) {
-    if (!workDayData.start_time) errors.start_time = "Start time is required";
-    if (!workDayData.end_time) errors.end_time = "End time is required";
+    if (!workDayData.start_time) errors.start_time = __("Start time is required");
+    if (!workDayData.end_time) errors.end_time = __("End time is required");
     return false;
   }
 
@@ -222,7 +223,7 @@ const validateTimeRange = () => {
     endHours < startHours ||
     (endHours === startHours && endMinutes <= startMinutes)
   ) {
-    errors.end_time = "End time must be after start time";
+    errors.end_time = __("End time must be after start time");
     return false;
   }
 
@@ -240,7 +241,7 @@ const validateForm = () => {
 
 const onSave = () => {
   if (!validateForm()) {
-    toast.error("Please fix the errors in the form");
+    toast.error(__("Please fix the errors in the form"));
     return;
   }
 
@@ -255,7 +256,7 @@ const onSave = () => {
           ...workDayData,
         };
         props.workDaysList.splice(itemIndex, 1, updatedItem);
-        toast.success("Workday updated");
+        toast.success(__("Workday updated"));
       }
     } else {
       const isDuplicate = props.workDaysList.some(
@@ -263,18 +264,18 @@ const onSave = () => {
       );
 
       if (isDuplicate) {
-        errors.workday = "This workday already exists";
-        toast.error("A workday with this name already exists");
+        errors.workday = __("This workday already exists");
+        toast.error(__("A workday with this name already exists"));
         return;
       }
 
       const newWorkDay = { ...workDayData };
       props.workDaysList.push(newWorkDay);
-      toast.success("Workday added");
+      toast.success(__("Workday added"));
     }
     dialog.value.show = false;
   } catch (error) {
-    toast.error(`Failed to save workday: ${error}`);
+    toast.error(__("Failed to save workday: {0}", [error]));
   }
 };
 

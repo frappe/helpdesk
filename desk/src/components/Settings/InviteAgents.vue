@@ -121,11 +121,11 @@ type RoleOption = {
 const roleToLabel = (role: Role) => {
   switch (role) {
     case "Agent":
-      return "Agent";
+      return __("Agent");
     case "Agent Manager":
-      return "Manager";
+      return __("Manager");
     case "System Manager":
-      return "Admin";
+      return __("Admin");
     default:
       const x: never = role;
       throw new Error(`Invalid role: ${x}`);
@@ -199,19 +199,19 @@ const inviteByEmailResource = createResource({
     resetInputValues();
     let emailsStr = emailsToStr(data.invited_emails);
     if (emailsStr.trim() !== "") {
-      toast.success(`${emailsStr} invited successfully`);
+      toast.success(__("{0} invited successfully", [emailsStr]));
     }
     emailsStr = emailsToStr(data.disabled_user_emails);
     if (emailsStr.trim() !== "") {
-      toast.info(`${emailsStr} already present and disabled`);
+      toast.info(__("{0} already present and disabled", [emailsStr]));
     }
     emailsStr = emailsToStr(data.pending_invite_emails);
     if (emailsStr.trim() !== "") {
-      toast.info(`${emailsStr} already invited`);
+      toast.info(__("{0} already invited", [emailsStr]));
     }
     emailsStr = emailsToStr(data.accepted_invite_emails);
     if (emailsStr.trim() !== "") {
-      toast.info(`${emailsStr} already present`);
+      toast.info(__("{0} already present", [emailsStr]));
     }
     pendingInvitesResource.reload();
     updateOnboardingStep("invite_your_team");
@@ -229,7 +229,7 @@ const cancelInviteResource = createResource({
   url: "frappe.core.api.user_invitation.cancel_invitation",
   method: "PATCH",
   onSuccess() {
-    toast.success("Invitation cancelled successfully");
+    toast.success(__("Invitation cancelled successfully"));
     pendingInvitesResource.fetch();
   },
 });
