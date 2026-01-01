@@ -66,9 +66,13 @@
 <script setup lang="ts">
 import { useShortcut } from "@/composables/shortcuts";
 import { TicketSymbol } from "@/types";
-import { copyToClipboard } from "@/utils";
-import { dayjs } from "frappe-ui";
-import Badge from "frappe-ui/src/components/Badge/Badge.vue";
+import {
+  copyToClipboard,
+  dateFormat,
+  dateTooltipFormat,
+  formatTime,
+} from "@/utils";
+import { Badge, dayjs, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 
 const ticket = inject(TicketSymbol);

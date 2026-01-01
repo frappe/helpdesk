@@ -10,7 +10,7 @@
     }"
     @click="handleNavigation"
   >
-    <Tooltip :text="label" v-if="!isExpanded">
+    <Tooltip :text="__(label)" v-if="!isExpanded">
       <span
         class="shrink-0 text-gray-700"
         :class="{
@@ -18,8 +18,7 @@
           'icon-emoji': isMobileView,
         }"
       >
-        <Icon v-if="typeof icon === 'string'" :icon="icon" class="h-4 w-4" />
-        <component :is="icon" v-else class="h-4 w-4" />
+        <component :is="icon" class="h-4 w-4" />
       </span>
     </Tooltip>
     <span
@@ -30,8 +29,7 @@
         'icon-emoji': isMobileView,
       }"
     >
-      <Icon v-if="typeof icon === 'string'" :icon="icon" class="h-4 w-4" />
-      <component :is="icon" v-else class="h-4 w-4" />
+      <component :is="icon" class="h-4 w-4" />
     </span>
 
     <div
@@ -42,7 +40,7 @@
         '-z-50': !isExpanded,
       }"
     >
-      {{ label }}
+      {{ __(label) }}
       <slot name="right" />
     </div>
   </div>
@@ -50,7 +48,6 @@
 
 <script setup lang="ts">
 import { useScreenSize } from "@/composables/screen";
-import { Icon } from "@iconify/vue";
 import { useRouter } from "vue-router";
 
 interface P {

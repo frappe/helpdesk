@@ -1,7 +1,11 @@
 <template>
-  <Tabs :modelValue="tabIndex" :tabs="tabs" @update:modelValue="changeTabTo">
-    <TabList />
-    <TabPanel v-slot="{ tab }" class="flex-1">
+  <Tabs
+    :modelValue="tabIndex"
+    :tabs="tabs"
+    @update:modelValue="changeTabTo"
+    class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5"
+  >
+    <template #tab-panel="{ tab }">
       <TicketAgentActivities
         v-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
@@ -26,7 +30,7 @@
           Loading...
         </p>
       </div>
-    </TabPanel>
+    </template>
   </Tabs>
   <!-- Comm Area -->
   <CommunicationArea
@@ -46,7 +50,6 @@
 </template>
 
 <script setup lang="ts">
-import { CommunicationArea } from "@/components";
 import {
   ActivityIcon,
   CommentIcon,
@@ -62,10 +65,14 @@ import {
   TicketSymbol,
   TicketTab,
 } from "@/types";
-import { LoadingIndicator, TabList, TabPanel, Tabs } from "frappe-ui";
+import { LoadingIndicator, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, ComputedRef, inject, ref } from "vue";
+import { computed, ComputedRef, defineAsyncComponent, inject, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
+
+const CommunicationArea = defineAsyncComponent(
+  () => import("@/components/CommunicationArea.vue")
+);
 
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);

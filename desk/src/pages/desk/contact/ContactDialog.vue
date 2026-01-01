@@ -18,7 +18,9 @@
           >
             <template #default="{ uploading, openFileSelector }">
               <Button
-                :label="contact.doc?.image ? 'Change photo' : 'Upload photo'"
+                :label="
+                  contact.doc?.image ? __('Change photo') : __('Upload photo')
+                "
                 :loading="uploading"
                 @click="openFileSelector"
               />
@@ -26,19 +28,19 @@
           </FileUploader>
           <Button
             v-if="contact.doc?.image"
-            label="Remove photo"
+            :label="__('Remove photo')"
             @click="updateImage(null)"
           />
           <Button
             v-if="!contact.doc?.user && isManager"
-            label="Invite as user"
+            :label="__('Invite as user')"
             @click="inviteContact"
             :loading="isLoading"
           />
         </div>
         <div class="w-full space-y-2 text-sm text-gray-700">
           <div class="space-y-1">
-            <div class="text-xs">Emails</div>
+            <div class="text-xs">{{ __("Emails") }}</div>
             <MultiSelect
               v-model:items="emails"
               placeholder="john.doe@example.com"
@@ -46,7 +48,7 @@
             />
           </div>
           <div class="space-y-1">
-            <div class="text-xs">Phone Nos</div>
+            <div class="text-xs">{{ __("Phone Nos") }}</div>
             <MultiSelect
               v-model:items="phones"
               placeholder="+91 98765 43210"
@@ -54,11 +56,11 @@
             />
           </div>
           <div class="space-y-1">
-            <div class="text-xs">Customer</div>
+            <div class="text-xs">{{ __("Customer") }}</div>
             <Link
               doctype="HD Customer"
               class="form-control flex-1"
-              placeholder="Link to a customer"
+              :placeholder="__('Link to a customer')"
               v-model="selectedCustomer"
               :hide-me="true"
             />
@@ -83,6 +85,7 @@ import { useOnboarding } from "frappe-ui/frappe";
 import type { Ref } from "vue";
 import { computed, ref } from "vue";
 import zod from "zod";
+import { __ } from "@/translation";
 
 import Link from "@/components/frappe-ui/Link.vue";
 import MultiSelect from "@/components/MultiSelect.vue";
@@ -125,7 +128,7 @@ const emails = computed({
   },
   set(newVal) {
     if (newVal.length === 0) {
-      toast.error("At least one email is required");
+      toast.error(__("At least one email is required"));
       return;
     }
     if (newVal.length !== contact.doc.email_ids.length) {
@@ -229,7 +232,7 @@ const options = computed(() => ({
   title: contact.doc?.name,
   actions: [
     {
-      label: "Save",
+      label: __("Save"),
       theme: "gray",
       variant: "solid",
       onClick: () => update(),
@@ -239,7 +242,7 @@ const options = computed(() => ({
 
 function update(): void {
   if (!isDirty.value) {
-    toast.error("No changes to save");
+    toast.error(__("No changes to save"));
     return;
   }
   contact.setValue.submit({
@@ -267,7 +270,7 @@ function updateImage(file: File): void {
 
 function validateEmail(input: AutoCompleteItem): string | void {
   const success = zod.string().email().safeParse(input.value).success;
-  if (!success) return "Invalid email";
+  if (!success) return __("Invalid email");
 }
 
 function validatePhone(input: AutoCompleteItem): string | void {
@@ -277,14 +280,14 @@ function validatePhone(input: AutoCompleteItem): string | void {
     .min(10)
     .max(15)
     .safeParse(input.value).success;
-  if (!success) return "Invalid phone number";
+  if (!success) return __("Invalid phone number");
 }
 
 function validateFile(file: File): string | void {
   let extn = file.name.split(".").pop().toLowerCase();
   if (!["png", "jpg", "jpeg"].includes(extn)) {
-    toast.error("Invalid file type, only PNG and JPG images are allowed");
-    return "Invalid file type, only PNG and JPG images are allowed";
+    toast.error(__("Invalid file type, only PNG and JPG images are allowed"));
+    return __("Invalid file type, only PNG and JPG images are allowed");
   }
 }
 
@@ -298,7 +301,7 @@ async function inviteContact(): Promise<void> {
         contact: contact.doc.name,
       }
     );
-    toast.success("Contact invited successfully");
+    toast.success(__("Contact invited successfully"));
     await contact.setValue.submit({
       user: user,
     });

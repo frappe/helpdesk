@@ -43,10 +43,8 @@
 </template>
 
 <script setup lang="ts">
-import { dayjs } from "@/dayjs";
 import { isElementInViewport } from "@/utils";
 import { Avatar } from "frappe-ui";
-import { orderBy } from "lodash";
 import { computed, inject, nextTick, watch } from "vue";
 import { useRoute } from "vue-router";
 import TicketCommunication from "./TicketCommunication.vue";
@@ -63,7 +61,9 @@ const route = useRoute();
 const ticket = inject(ITicket);
 const communications = computed(() => {
   const _communications = ticket.data.communications || [];
-  return orderBy(_communications, (c) => dayjs(c.creation));
+  return _communications.sort(
+    (a, b) => new Date(a.creation) - new Date(b.creation)
+  );
 });
 
 function scroll(id: string) {

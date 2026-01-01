@@ -20,7 +20,7 @@ export const views = createListResource({
 
 export const currentView = ref({
   label: "List",
-  icon: "lucide:align-justify",
+  icon: LucideAlignJustify,
 });
 
 export function useView(dt: string = null) {

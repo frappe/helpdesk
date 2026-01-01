@@ -2,12 +2,13 @@
 # Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and Contributors
 # See license.txt
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.test_utils import SLA_PRIORITY_NAME, make_sla, make_ticket
 
 
-class TestHDServiceLevelAgreement(IntegrationTestCase):
+
+class TestHDServiceLevelAgreement(FrappeTestCase):
     def setUp(self):
         pass
 

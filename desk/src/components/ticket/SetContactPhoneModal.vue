@@ -2,10 +2,10 @@
   <Dialog
     v-model="show"
     :options="{
-      title: 'Set Phone Number',
+      title: __('Set Phone Number'),
       actions: [
         {
-          label: 'Set Phone Number',
+          label: __('Set Phone Number'),
           variant: 'solid',
           onClick: onSubmit,
         },
@@ -15,13 +15,16 @@
     <template #body-content>
       <div>
         <div class="text-base text-ink-gray-6">
-          <b>{{ contactDetails.name }}</b> does not have a phone number, set one
-          to call them.
+          {{
+            __("{0} does not have a phone number, set one to call them.", [
+              contactDetails.name,
+            ])
+          }}
         </div>
         <div class="flex flex-col gap-2 mt-6">
           <FormControl
             v-model="contactDetails.phone"
-            label="Phone"
+            :label="__('Phone')"
             type="text"
             size="sm"
             variant="subtle"
@@ -39,6 +42,7 @@
 import { createResource, Dialog, ErrorMessage, toast } from "frappe-ui";
 import { ref, watch } from "vue";
 import { z } from "zod";
+import { __ } from "@/translation";
 
 const emit = defineEmits(["onUpdate"]);
 const show = defineModel<boolean>();
@@ -62,7 +66,7 @@ const onSubmit = () => {
       .regex(/^\+(?:[0-9]){6,14}[0-9]$/)
       .safeParse(contactDetails.value.phone).success
   ) {
-    error.value = "Invalid phone number";
+    error.value = __("Invalid phone number");
     return;
   } else {
     error.value = "";
@@ -79,7 +83,7 @@ const onSubmit = () => {
     auto: true,
     onSuccess: () => {
       emit("onUpdate");
-      toast.success("Contact updated");
+      toast.success(__("Contact updated"));
       show.value = false;
     },
   });

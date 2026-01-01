@@ -11,13 +11,13 @@
         />
         <Button
           v-if="ticket.data.status !== 'Closed'"
-          label="Close"
+          :label="__('Close')"
           theme="gray"
           variant="solid"
           @click="handleClose()"
         >
           <template #prefix>
-            <Icon icon="lucide:check" />
+            <LucideCheck class="size-4" />
           </template>
         </Button>
       </template>
@@ -40,14 +40,16 @@
             v-model:attachments="attachments"
             v-model:content="editorContent"
             v-model:expand="isExpanded"
-            placeholder="Type a message"
+            :placeholder="__('Type a message')"
             autofocus
             @clear="() => (isExpanded = false)"
-            :uploadFunction="(file:any)=>uploadFunction(file, 'HD Ticket', props.ticketId)"
+            :uploadFunction="
+              (file: any) => uploadFunction(file, 'HD Ticket', props.ticketId)
+            "
           >
             <template #bottom-right>
               <Button
-                label="Send"
+                :label="__('Send')"
                 theme="gray"
                 variant="solid"
                 :disabled="$refs.editor?.editor.isEmpty || send.loading"
@@ -69,21 +71,31 @@
 import { LayoutHeader } from "@/components";
 import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
 import { setupCustomizations } from "@/composables/formCustomisation";
+import { useActiveViewers } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
 import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
-import { Icon } from "@iconify/vue";
 import { Breadcrumbs, Button, call, createResource, toast } from "frappe-ui";
-import { computed, onMounted, onUnmounted, provide, ref } from "vue";
+import { __ } from "@/translation";
+import {
+  computed,
+  defineAsyncComponent,
+  onMounted,
+  onUnmounted,
+  provide,
+  ref,
+} from "vue";
 import { useRouter } from "vue-router";
 import { ITicket } from "./symbols";
-import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
 import TicketConversation from "./TicketConversation.vue";
+import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
 import TicketFeedback from "./TicketFeedback.vue";
-import TicketTextEditor from "./TicketTextEditor.vue";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
+const TicketTextEditor = defineAsyncComponent(
+  () => import("./TicketTextEditor.vue")
+);
 
 interface P {
   ticketId: string;
@@ -115,7 +127,7 @@ const ticket = createResource({
     });
   },
   onError: () => {
-    toast.error("Ticket not found");
+    toast.error(__("Ticket not found"));
     router.replace("/my-tickets");
   },
 });
@@ -174,7 +186,7 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       ticket.reload();
-      toast.success("Ticket updated");
+      toast.success(__("Ticket updated"));
     },
   });
 }
@@ -189,11 +201,11 @@ function handleClose() {
 
 function showConfirmationDialog() {
   $dialog({
-    title: "Close Ticket",
-    message: "Are you sure you want to close this ticket?",
+    title: __("Close Ticket"),
+    message: __("Are you sure you want to close this ticket?"),
     actions: [
       {
-        label: "Confirm",
+        label: __("Confirm"),
         variant: "solid",
         onClick(close: Function) {
           ticket.data.status = "Closed";
@@ -201,7 +213,7 @@ function showConfirmationDialog() {
             { fieldname: "status", value: "Closed" },
             {
               onSuccess: () => {
-                toast.success("Ticket closed");
+                toast.success(__("Ticket closed"));
               },
             }
           );
@@ -230,7 +242,7 @@ const setValue = createResource({
 });
 
 const breadcrumbs = computed(() => {
-  let items = [{ label: "Tickets", route: { name: "TicketsCustomer" } }];
+  let items = [{ label: __("Tickets"), route: { name: "TicketsCustomer" } }];
   items.push({
     label: ticket.data?.subject,
     route: { name: "TicketCustomer" },
@@ -248,17 +260,20 @@ const showFeedback = computed(() => {
   );
   return hasAgentCommunication && isFeedbackMandatory;
 });
-
+const { startViewing, stopViewing } = useActiveViewers(props.ticketId);
 onMounted(() => {
+  startViewing(props.ticketId);
   document.title = props.ticketId;
-  socket.on("helpdesk:ticket-update", (ticketID) => {
-    if (ticketID === Number(props.ticketId)) {
+
+  socket.on("helpdesk:ticket-update", ({ ticket_id }) => {
+    if (ticket_id === props.ticketId) {
       ticket.reload();
     }
   });
 });
 
 onUnmounted(() => {
+  stopViewing(props.ticketId);
   document.title = "Helpdesk";
   socket.off("helpdesk:ticket-update");
 });

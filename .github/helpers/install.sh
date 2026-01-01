@@ -9,7 +9,7 @@ sudo apt remove mysql-server mysql-client
 sudo apt install libcups2-dev redis-server mariadb-client libmariadb-dev
 
 pip install frappe-bench
-git clone "https://github.com/frappe/frappe" --branch "develop" --depth 1 
+git clone "https://github.com/frappe/frappe" --branch "version-15" --depth 1 
 bench init --skip-assets --frappe-path ~/frappe --python "$(which python)" frappe-bench
 
 mkdir ~/frappe-bench/sites/test_site
