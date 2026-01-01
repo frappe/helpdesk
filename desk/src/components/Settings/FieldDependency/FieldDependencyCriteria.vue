@@ -106,7 +106,7 @@ const fieldCriteriaOptions = computed(() => {
 
 function handleCriteriaSelection(
   values: { label: string; value: string }[],
-  stateKey: "display" | "mandatory",
+  stateKey: "display" | "mandatory"
 ) {
   const _values = values.map((v) => v.value);
   fieldCriteriaState.value[stateKey].value = values;

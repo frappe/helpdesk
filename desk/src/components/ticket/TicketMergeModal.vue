@@ -131,7 +131,7 @@ const mergeTicket = createResource({
     // open the target Ticket
     window.open(
       window.location.origin + "/helpdesk/tickets/" + targetTicket.value,
-      "_blank",
+      "_blank"
     );
     targetTicket.value = null;
   },
@@ -161,7 +161,7 @@ watch(
       });
       getTicketSubject.reload();
     }
-  },
+  }
 );
 
 function handleTicketMerge() {

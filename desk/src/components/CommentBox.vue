@@ -202,7 +202,7 @@ function handleSaveComment() {
         emit("update");
         toast.success(__("Comment updated"));
       },
-    },
+    }
   );
 }
 

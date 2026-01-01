@@ -80,7 +80,7 @@ const splitTicket = createResource({
     showDialog.value = false;
     window.open(
       window.location.origin + "/helpdesk/tickets/" + newTicket,
-      "_blank",
+      "_blank"
     );
     window.location.reload();
   },

@@ -59,20 +59,20 @@ const modalInfo = computed(() => {
       viewDialog.value.mode === "edit"
         ? __("Edit View")
         : viewDialog.value.mode === "duplicate"
-          ? __("Duplicate View")
-          : __("Create View"),
+        ? __("Duplicate View")
+        : __("Create View"),
     buttonLabel:
       viewDialog.value.mode === "edit"
         ? __("Update")
         : viewDialog.value.mode === "duplicate"
-          ? __("Duplicate")
-          : __("Create"),
+        ? __("Duplicate")
+        : __("Create"),
     action:
       viewDialog.value.mode === "edit"
         ? "update"
         : viewDialog.value.mode === "duplicate"
-          ? "duplicate"
-          : "create",
+        ? "duplicate"
+        : "create",
   };
 });
 

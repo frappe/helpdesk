@@ -308,8 +308,8 @@ function submitMail() {
   if (!toEmailsClone.value.length) {
     toast.warning(
       __(
-        "Email has no recipients. Please add at least one email address in the 'TO' field.",
-      ),
+        "Email has no recipients. Please add at least one email address in the 'TO' field."
+      )
     );
     return false;
   }
@@ -343,7 +343,7 @@ function addToReply(
   body: string,
   toEmails: string[],
   ccEmails: string[],
-  bccEmails: string[],
+  bccEmails: string[]
 ) {
   toEmailsClone.value = toEmails;
   ccEmailsClone.value = ccEmails;

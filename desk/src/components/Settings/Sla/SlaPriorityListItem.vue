@@ -124,7 +124,7 @@ const deleteItem = () => {
 
   slaData.value.priorities.splice(
     slaData.value.priorities.indexOf(props.row),
-    1
+    1,
   );
 };
 

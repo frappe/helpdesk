@@ -244,7 +244,7 @@ function updateStatus(data) {
     counterUp.value.stop();
     callDuration.value = counterUp.value.getTime(
       parseInt(data["Legs[0][OnCallDuration]"]) ||
-        parseInt(data.DialCallDuration),
+        parseInt(data.DialCallDuration)
     );
     closeCallPopup();
     onCallEnded && onCallEnded();
@@ -276,7 +276,7 @@ function updateStatus(data) {
     onCallEnded && onCallEnded();
     callDuration.value = counterUp.value.getTime(
       parseInt(data["Legs[0][OnCallDuration]"]) ||
-        parseInt(data.DialCallDuration),
+        parseInt(data.DialCallDuration)
     );
     closeCallPopup();
     counterUp.value.stop();

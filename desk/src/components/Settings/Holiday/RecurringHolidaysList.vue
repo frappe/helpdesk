@@ -239,9 +239,9 @@ const availableWorkDays = computed(() => {
       .filter(
         (_, index) =>
           !recurringHolidayData.value.isEditing ||
-          index !== recurringHolidayData.value.editIndex
+          index !== recurringHolidayData.value.editIndex,
       )
-      .map((h) => h.day)
+      .map((h) => h.day),
   );
 
   if (recurringHolidayData.value.isEditing && recurringHolidayData.value.day) {
@@ -308,11 +308,13 @@ const saveHoliday = () => {
       (holiday) =>
         holiday.day === holidayData.day &&
         JSON.stringify(holiday.repetition) ===
-          JSON.stringify(holidayData.repetition)
+          JSON.stringify(holidayData.repetition),
     );
 
     if (isDuplicate) {
-      toast.error(__("Holiday with the same day and repetition already exists"));
+      toast.error(
+        __("Holiday with the same day and repetition already exists"),
+      );
       return;
     }
 

@@ -13,10 +13,12 @@
           :rows="1"
           maxlength="50"
           autofocus
-          @input="(e: Event) => {
-            const target = e.target as HTMLTextAreaElement;
-            target.style.height = `${target.scrollHeight}px`;
-          }"
+          @input="
+            (e: Event) => {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = `${target.scrollHeight}px`;
+            }
+          "
         />
       </div>
     </template>

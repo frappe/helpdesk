@@ -41,8 +41,8 @@
           isMobileView
             ? __('Send')
             : isMac
-              ? __('Send (⌘ + ⏎)')
-              : __('Send (Ctrl + ⏎)')
+            ? __('Send (⌘ + ⏎)')
+            : __('Send (Ctrl + ⏎)')
         "
         v-model:content="content"
         placeholder="Hi John, we are looking into this issue."
@@ -75,8 +75,8 @@
           isMobileView
             ? __('Comment')
             : isMac
-              ? __('Comment (⌘ + ⏎)')
-              : __('Comment (Ctrl + ⏎)')
+            ? __('Comment (⌘ + ⏎)')
+            : __('Comment (Ctrl + ⏎)')
         "
         :ticketId="ticketId"
         :editable="showCommentBox"
@@ -160,7 +160,7 @@ function replyToEmail(data: object) {
     data.content,
     splitIfString(data.to),
     splitIfString(data.cc),
-    splitIfString(data.bcc),
+    splitIfString(data.bcc)
   );
 }
 
@@ -193,7 +193,7 @@ watch(
     if (value) {
       emailEditorRef.value?.editor?.commands?.focus();
     }
-  },
+  }
 );
 
 watch(
@@ -202,7 +202,7 @@ watch(
     if (value) {
       commentTextEditorRef.value?.editor?.commands?.focus();
     }
-  },
+  }
 );
 
 useShortcut("r", () => {
@@ -228,7 +228,7 @@ onClickOutside(
   },
   {
     ignore: [".tippy-box", ".tippy-content"],
-  },
+  }
 );
 
 onClickOutside(
@@ -240,7 +240,7 @@ onClickOutside(
   },
   {
     ignore: [".tippy-box", ".tippy-content"],
-  },
+  }
 );
 </script>
 

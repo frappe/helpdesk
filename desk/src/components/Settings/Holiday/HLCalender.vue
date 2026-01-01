@@ -322,6 +322,6 @@ watch(
     currentYear.value = newYear;
     currentMonth.value = newMonth;
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>

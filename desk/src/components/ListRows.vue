@@ -91,7 +91,7 @@ const actions = (group) => {
   });
   if (group.group.label == __("General")) {
     _actions = _actions.filter(
-      (action) => action.label === __("Add New Article"),
+      (action) => action.label === __("Add New Article")
     );
   }
   return _actions;
@@ -99,12 +99,12 @@ const actions = (group) => {
 
 watch(
   () => props.rows,
-  (val) => (groupedRows.value = val),
+  (val) => (groupedRows.value = val)
 );
 
 let showGroupedRows = computed(() => {
   return props.rows.every(
-    (row) => row.group && row.rows && Array.isArray(row.rows),
+    (row) => row.group && row.rows && Array.isArray(row.rows)
   );
 });
 </script>

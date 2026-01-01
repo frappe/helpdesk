@@ -86,6 +86,6 @@ watchDebounced(
   () => {
     validateSlaData("condition");
   },
-  { deep: true, debounce: 100 }
+  { deep: true, debounce: 100 },
 );
 </script>

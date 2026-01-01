@@ -68,23 +68,23 @@ provide(TicketSymbol, ticket);
 
 provide(
   AssigneeSymbol,
-  computed(() => ticketComposable.value.assignees),
+  computed(() => ticketComposable.value.assignees)
 );
 provide(
   TicketContactSymbol,
-  computed(() => ticketComposable.value.contact),
+  computed(() => ticketComposable.value.contact)
 );
 provide(
   CustomizationSymbol,
-  computed(() => customizations),
+  computed(() => customizations)
 );
 provide(
   RecentSimilarTicketsSymbol,
-  computed(() => ticketComposable.value.recentSimilarTickets),
+  computed(() => ticketComposable.value.recentSimilarTickets)
 );
 provide(
   ActivitiesSymbol,
-  computed(() => ticketComposable.value.activities),
+  computed(() => ticketComposable.value.activities)
 );
 provide("makeCall", () => {
   if (
@@ -104,7 +104,7 @@ provide("makeCall", () => {
 });
 const viewerComposable = computed(() => useActiveViewers(ticket.value.name));
 const viewers = computed(
-  () => viewerComposable.value.currentViewers[props.ticketId] || [],
+  () => viewerComposable.value.currentViewers[props.ticketId] || []
 );
 const { startViewing, stopViewing } = viewerComposable.value;
 
@@ -117,7 +117,7 @@ watch(
     if (oldTicketId) stopViewing(oldTicketId as string);
     startViewing(newTicketId as string);
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 type TicketUpdateData = {
@@ -141,7 +141,7 @@ onMounted(() => {
     if (data.ticket_id === ticket.value?.name) {
       // Notify the user about the update
       toast.info(
-        __("User {0} updated {1} to {2}", [data.user, data.field, data.value]),
+        __("User {0} updated {1} to {2}", [data.user, data.field, data.value])
       );
     }
   });

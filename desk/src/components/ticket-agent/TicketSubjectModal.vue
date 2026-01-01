@@ -44,7 +44,7 @@ function handleRename() {
         isLoading.value = false;
         showSubjectDialog.value = false;
       },
-    },
+    }
   );
 }
 </script>
