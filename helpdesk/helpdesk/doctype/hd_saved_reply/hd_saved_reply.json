@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_rename": 1,
  "autoname": "field:title",
  "creation": "2022-11-03 17:19:47.135176",
  "doctype": "DocType",
@@ -50,7 +51,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-30 15:00:15.437935",
+ "modified": "2026-01-01 10:19:28.140701",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Saved Reply",
