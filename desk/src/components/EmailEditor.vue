@@ -25,12 +25,12 @@
           :error-message="(value) => __(`{0} is an invalid email address`, [value])"
         />
         <Button
-          :label="'CC'"
+          :label="__('CC')"
           :class="[cc ? 'bg-gray-300 hover:bg-gray-200' : '']"
           @click="toggleCC()"
         />
         <Button
-          :label="'BCC'"
+          :label="__('BCC')"
           :class="[bcc ? 'bg-gray-300 hover:bg-gray-200' : '']"
           @click="toggleBCC()"
         />
