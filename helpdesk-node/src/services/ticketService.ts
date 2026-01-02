@@ -1,6 +1,12 @@
 import { prisma } from '../utils/prisma.js';
 import { NotFoundError, ForbiddenError } from '../utils/errors.js';
 import { Prisma } from '@prisma/client';
+import {
+  emitTicketCreated,
+  emitTicketUpdated,
+  emitTicketAssigned,
+  emitCommentAdded,
+} from '../utils/socket.js';
 
 interface CreateTicketData {
   subject: string;
@@ -67,6 +73,9 @@ export class TicketService {
 
     // Log activity
     await this.logActivity(ticket.id, data.raisedById, 'created', null, null, null);
+
+    // Emit real-time event
+    emitTicketCreated(ticket);
 
     return ticket;
   }
@@ -234,6 +243,9 @@ export class TicketService {
       }
     }
 
+    // Emit real-time event
+    emitTicketUpdated(id, ticket);
+
     return ticket;
   }
 
@@ -284,6 +296,9 @@ export class TicketService {
     // Log activity
     await this.logActivity(ticketId, userId, 'commented', null, null, null);
 
+    // Emit real-time event
+    emitCommentAdded(ticketId, comment);
+
     return comment;
   }
 
@@ -305,6 +320,9 @@ export class TicketService {
       '',
       assignedToId
     );
+
+    // Emit real-time event
+    emitTicketAssigned(ticketId, assignedToId, ticket);
 
     return ticket;
   }
