@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { formatRelativeTime } from '@/lib/utils';
 
-const STATUS_COLORS: Record<string, 'default' | 'success' | 'warning' | 'destructive'> = {
+const STATUS_COLORS: Record<string, 'default' | 'secondary' | 'success' | 'warning' | 'destructive'> = {
   'Open': 'default',
   'Replied': 'warning',
   'Resolved': 'success',
