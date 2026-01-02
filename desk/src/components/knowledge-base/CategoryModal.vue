@@ -13,10 +13,12 @@
           :rows="1"
           maxlength="50"
           autofocus
-          @input="(e: Event) => {
-            const target = e.target as HTMLTextAreaElement;
-            target.style.height = `${target.scrollHeight}px`;
-          }"
+          @input="
+            (e: Event) => {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = `${target.scrollHeight}px`;
+            }
+          "
         />
       </div>
     </template>
@@ -28,6 +30,7 @@ import { computed } from "vue";
 import { Dialog } from "frappe-ui";
 import { ref } from "vue";
 import { watch } from "vue";
+import { __ } from "@/translation";
 
 const props = defineProps({
   title: {
@@ -46,7 +49,7 @@ const showDialog = defineModel<boolean>();
 const newTitle = defineModel<string>("title");
 
 const dialogTitle = computed(() =>
-  props.edit ? "Edit Category" : "Create Category"
+  props.edit ? __("Edit Category") : __("Create Category")
 );
 
 const titleRef = ref(null);
@@ -65,7 +68,7 @@ function getActionButton() {
   const action = [];
   if (props.edit) {
     action.push({
-      label: "Save",
+      label: __("Save"),
       variant: "solid",
       onClick: () => {
         emit("update");
@@ -73,7 +76,7 @@ function getActionButton() {
     });
   } else {
     action.push({
-      label: "Create",
+      label: __("Create"),
       variant: "solid",
       onClick: () => {
         emit("create");

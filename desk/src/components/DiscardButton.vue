@@ -4,25 +4,33 @@
 
 <script setup lang="ts">
 import { globalStore } from "@/stores/globalStore";
+import { __ } from "@/translation";
 const { $dialog } = globalStore();
 const emit = defineEmits<{
   (event: "discard"): void;
 }>();
 
-const {
-  label = "Discard",
-  hideDialog = false,
-  title = "Discard?",
-  message = "Are you sure you want to discard this?",
-} = defineProps<{
-  label?: string;
-  hideDialog?: boolean;
-  title?: string;
-  message?: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    label?: string;
+    hideDialog?: boolean;
+    title?: string;
+    message?: string;
+  }>(),
+  {
+    label: undefined,
+    hideDialog: false,
+    title: undefined,
+    message: undefined,
+  }
+);
+
+const label = props.label || __("Discard");
+const title = props.title || __("Discard?");
+const message = props.message || __("Are you sure you want to discard this?");
 
 function handleDiscard() {
-  if (hideDialog) {
+  if (props.hideDialog) {
     emit("discard");
     return;
   }
@@ -34,7 +42,7 @@ function handleDiscard() {
     },
     actions: [
       {
-        label: "Confirm",
+        label: __("Confirm"),
         variant: "solid",
         onClick(close: Function) {
           emit("discard");

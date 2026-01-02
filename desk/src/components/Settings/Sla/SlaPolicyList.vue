@@ -55,6 +55,7 @@ import { inject } from "vue";
 import { resetSlaData, slaActiveScreen } from "@/stores/sla";
 import ShieldCheck from "~icons/lucide/shield-check";
 import { SlaPolicyListResourceSymbol } from "@/types";
+import { __ } from "@/translation";
 
 const slaPolicyList = inject(SlaPolicyListResourceSymbol);
 

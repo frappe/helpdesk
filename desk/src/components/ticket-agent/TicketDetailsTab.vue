@@ -29,8 +29,8 @@
               :modelValue="field.value"
               :required="field.required"
               @update:model-value="
-              (val:string) => handleFieldUpdate(field.fieldname, val,true)
-            "
+                (val: string) => handleFieldUpdate(field.fieldname, val, true)
+              "
             />
           </template>
         </div>

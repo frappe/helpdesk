@@ -16,7 +16,7 @@
             class="rounded bg-surface-gray-7 py-1.5 px-2 text-xs text-ink-white shadow-xl"
           >
             <span class="flex items-center gap-1">
-              {{ show ? "Hide Password" : "Show Password" }}
+              {{ show ? __("Hide Password") : __("Show Password") }}
             </span>
           </div>
         </template>
@@ -37,6 +37,7 @@ import LucideEye from "~icons/lucide/eye";
 import LucideEyeOff from "~icons/lucide/eye-off";
 import { ref, computed } from "vue";
 import { FormControl, Tooltip } from "frappe-ui";
+import { __ } from "@/translation";
 
 const props = defineProps({
   value: {

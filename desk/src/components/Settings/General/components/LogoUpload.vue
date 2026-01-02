@@ -59,6 +59,7 @@
 <script setup lang="ts">
 import { Avatar, Button, FeatherIcon, FileUploader } from "frappe-ui";
 import ImageUpIcon from "~icons/lucide/image-up";
+import { __ } from "@/translation";
 
 const emit = defineEmits(["onUpload", "onRemove"]);
 

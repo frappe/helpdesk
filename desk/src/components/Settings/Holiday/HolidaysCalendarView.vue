@@ -47,7 +47,7 @@
           :disabled="visibleMonths === 'first-half'"
           @click="visibleMonths = 'first-half'"
         />
-        <Button variant="ghost" label="Today" @click="goToToday()" />
+        <Button variant="ghost" :label="__('Today')" @click="goToToday()" />
         <Button
           variant="ghost"
           icon="chevron-right"
@@ -110,6 +110,7 @@ import HLCalender from "./HLCalender.vue";
 import dayjs from "dayjs";
 import { holidayData } from "@/stores/holidayList";
 import { Button, Popover } from "frappe-ui";
+import { __ } from "@/translation";
 
 const visibleMonths = ref<"first-half" | "second-half">("first-half");
 const months = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);

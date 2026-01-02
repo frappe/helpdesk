@@ -149,12 +149,12 @@ const validateData = (key?: string) => {
     switch (field) {
       case "name":
         teamData.value.name?.length == 0
-          ? (errors.value.name = "Name is required")
+          ? (errors.value.name = __("Name is required"))
           : (errors.value.name = "");
         break;
       case "agents":
         teamData.value.agents.length == 0
-          ? (errors.value.agents = "At least one team member is required")
+          ? (errors.value.agents = __("At least one team member is required"))
           : (errors.value.agents = "");
         break;
     }

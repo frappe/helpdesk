@@ -1,13 +1,13 @@
 <template>
   <div class="grid grid-cols-3 md:grid-cols-1 gap-4 border-b px-5 py-2.5">
     <div class="space-y-1.5">
-      <span class="block text-sm text-gray-700"> Status </span>
+      <span class="block text-sm text-gray-700"> {{ __("Status") }} </span>
       <span class="block break-words text-base font-medium text-gray-900">
         {{ ticket.data.status }}
       </span>
     </div>
     <div class="space-y-1.5">
-      <span class="block text-sm text-gray-700"> Priority </span>
+      <span class="block text-sm text-gray-700"> {{ __("Priority") }} </span>
       <span class="block break-words text-base font-medium text-gray-900">
         {{ ticket.data.priority }}
       </span>
@@ -51,6 +51,7 @@ import { dayjs } from "@/dayjs";
 import { Field } from "@/types";
 import { computed, inject } from "vue";
 import { ITicket } from "./symbols";
+import { __ } from "@/translation";
 
 const ticket = inject(ITicket);
 
@@ -58,17 +59,17 @@ const slaData = computed(() => {
   const responseSla =
     ticket.data.first_responded_on &&
     dayjs(ticket.data.first_responded_on).isBefore(ticket.data.response_by)
-      ? "Fulfilled"
-      : "Failed";
+      ? __("Fulfilled")
+      : __("Failed");
 
   //TODO: no resolution date for unclassified tickets, configurable?
   if (ticket.data.priority === "Unclassified") {
     return [
       {
-        title: "Expected First Response",
+        title: __("Expected First Response"),
         showSla: ticket.data.first_responded_on,
         label: responseSla,
-        theme: responseSla === "Fulfilled" ? "green" : "red",
+        theme: responseSla === __("Fulfilled") ? "green" : "red",
         value: ticket.data.response_by,
       },
     ];
@@ -77,22 +78,22 @@ const slaData = computed(() => {
   const resolutionSla =
     ticket.data.resolution_date &&
     dayjs(ticket.data.resolution_date).isBefore(ticket.data.resolution_by)
-      ? "Fulfilled"
-      : "Failed";
+      ? __("Fulfilled")
+      : __("Failed");
 
   return [
     {
-      title: "Expected First Response",
+      title: __("Expected First Response"),
       showSla: ticket.data.first_responded_on,
       label: responseSla,
-      theme: responseSla === "Fulfilled" ? "green" : "red",
+      theme: responseSla === __("Fulfilled") ? "green" : "red",
       value: ticket.data.response_by,
     },
     {
-      title: "Expected Resolution",
+      title: __("Expected Resolution"),
       showSla: ticket.data.resolution_date,
       label: resolutionSla,
-      theme: resolutionSla === "Fulfilled" ? "green" : "red",
+      theme: resolutionSla === __("Fulfilled") ? "green" : "red",
       value: ticket.data.resolution_by,
     },
   ];

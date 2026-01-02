@@ -40,7 +40,7 @@
           variant="outline"
           :placeholder="__('Period')"
           @update:model-value="
-            (e:string) => {
+            (e: string) => {
               showDatePicker = false;
               preset = formatter(e);
             }

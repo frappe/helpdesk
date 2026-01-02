@@ -2,11 +2,13 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Customers</div>
+        <div class="text-lg font-medium text-gray-900">
+          {{ __("Customers") }}
+        </div>
       </template>
       <template #right-header>
         <Button
-          label="Create"
+          :label="__('Create')"
           theme="gray"
           variant="solid"
           @click="isDialogVisible = !isDialogVisible"
@@ -43,6 +45,7 @@ import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CustomerDialog from "./CustomerDialog.vue";
+import { __ } from "@/translation";
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
@@ -79,14 +82,14 @@ const options = computed(() => {
       },
     },
     emptyState: {
-      title: "No Customers Found",
+      title: __("No Customers Found"),
     },
   };
 });
 
 usePageMeta(() => {
   return {
-    title: "Customers",
+    title: __("Customers"),
   };
 });
 </script>
