@@ -325,7 +325,7 @@ export class TicketService {
     await this.logActivity(
       ticketId,
       userId,
-      'updated',
+      'assigned',
       'assignedToId',
       '',
       assignedToId

@@ -1,15 +1,23 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../config/index.js';
+import crypto from 'crypto';
 
 export interface JWTPayload {
   userId: string;
   email?: string;
   userType: string;
+  jti?: string;
 }
 
 // Main token generation function (used by tests)
 export const generateToken = (payload: JWTPayload, expiresIn?: string): string => {
-  return jwt.sign(payload, config.jwt.secret, {
+  // Add unique JWT ID to ensure tokens are always unique
+  const tokenPayload = {
+    ...payload,
+    jti: crypto.randomBytes(16).toString('hex'),
+  };
+
+  return jwt.sign(tokenPayload, config.jwt.secret, {
     expiresIn: expiresIn || config.jwt.expiresIn,
   });
 };
