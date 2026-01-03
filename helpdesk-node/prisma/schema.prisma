@@ -1,0 +1,312 @@
+// Prisma Schema for Helpdesk Application
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// User Management
+// ============================================
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  fullName      String   @map("full_name")
+  userType      UserType @default(CUSTOMER) @map("user_type")
+  isActive      Boolean  @default(true) @map("is_active")
+  userImage     String?  @map("user_image")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  agent              Agent?
+  customer           Customer?
+  ticketsRaised      Ticket[]           @relation("TicketRaisedBy")
+  ticketsAssigned    Ticket[]           @relation("TicketAssignedTo")
+  comments           Comment[]
+  activities         Activity[]
+  notifications      Notification[]
+  articlesAuthored   Article[]
+  refreshTokens      RefreshToken[]
+
+  @@map("users")
+}
+
+enum UserType {
+  AGENT
+  CUSTOMER
+  ADMIN
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// ============================================
+// Agent & Team Management
+// ============================================
+
+model Agent {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  agentName String   @map("agent_name")
+  teamId    String?  @map("team_id")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team Team? @relation(fields: [teamId], references: [id])
+
+  @@map("agents")
+}
+
+model Team {
+  id          String   @id @default(uuid())
+  teamName    String   @unique @map("team_name")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  agents  Agent[]
+  tickets Ticket[]
+
+  @@map("teams")
+}
+
+// ============================================
+// Customer Management
+// ============================================
+
+model Customer {
+  id           String   @id @default(uuid())
+  userId       String   @unique @map("user_id")
+  customerName String   @map("customer_name")
+  mobileNo     String?  @map("mobile_no")
+  organization String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tickets Ticket[]
+
+  @@map("customers")
+}
+
+// ============================================
+// Ticket System
+// ============================================
+
+model Ticket {
+  id               String        @id @default(uuid())
+  subject          String
+  description      String?       @db.Text
+  status           String        @default("Open")
+  priority         TicketPriority? @default(MEDIUM)
+  ticketType       String?       @map("ticket_type")
+
+  // Relationships
+  customerId       String        @map("customer_id")
+  raisedById       String        @map("raised_by_id")
+  assignedToId     String?       @map("assigned_to_id")
+  teamId           String?       @map("team_id")
+
+  // SLA Tracking
+  responseBy       DateTime?     @map("response_by")
+  resolutionBy     DateTime?     @map("resolution_by")
+  firstRespondedOn DateTime?     @map("first_responded_on")
+  resolutionDate   DateTime?     @map("resolution_date")
+
+  // Metadata
+  resolution       String?       @db.Text
+  ticketKey        String        @unique @default(uuid()) @map("ticket_key")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  customer     Customer      @relation(fields: [customerId], references: [id])
+  raisedBy     User          @relation("TicketRaisedBy", fields: [raisedById], references: [id])
+  assignedTo   User?         @relation("TicketAssignedTo", fields: [assignedToId], references: [id])
+  team         Team?         @relation(fields: [teamId], references: [id])
+  comments     Comment[]
+  activities   Activity[]
+  attachments  Attachment[]
+
+  @@index([customerId])
+  @@index([assignedToId])
+  @@index([status])
+  @@index([priority])
+  @@index([createdAt])
+  @@map("tickets")
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  ticketId   String   @map("ticket_id")
+  userId     String   @map("user_id")
+  content    String   @db.Text
+  isInternal Boolean  @default(false) @map("is_internal")
+  isPinned   Boolean  @default(false) @map("is_pinned")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  ticket      Ticket       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id])
+  attachments Attachment[]
+
+  @@index([ticketId])
+  @@map("comments")
+}
+
+model Activity {
+  id        String   @id @default(uuid())
+  ticketId  String   @map("ticket_id")
+  userId    String   @map("user_id")
+  action    String
+  fieldName String?  @map("field_name")
+  oldValue  String?  @map("old_value")
+  newValue  String?  @map("new_value")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([ticketId])
+  @@map("activities")
+}
+
+model Attachment {
+  id         String   @id @default(uuid())
+  fileName   String   @map("file_name")
+  fileUrl    String   @map("file_url")
+  fileSize   Int      @map("file_size")
+  mimeType   String   @map("mime_type")
+  ticketId   String?  @map("ticket_id")
+  commentId  String?  @map("comment_id")
+  uploadedBy String   @map("uploaded_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  ticket  Ticket?  @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
+}
+
+// ============================================
+// Knowledge Base
+// ============================================
+
+model Article {
+  id          String        @id @default(uuid())
+  title       String
+  content     String        @db.Text
+  categoryId  String        @map("category_id")
+  authorId    String        @map("author_id")
+  status      ArticleStatus @default(DRAFT)
+  views       Int           @default(0)
+  isPublished Boolean       @default(false) @map("is_published")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  category Category @relation(fields: [categoryId], references: [id])
+  author   User     @relation(fields: [authorId], references: [id])
+
+  @@index([categoryId])
+  @@index([status])
+  @@map("articles")
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  parentId    String?  @map("parent_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+  articles Article[]
+
+  @@map("categories")
+}
+
+// ============================================
+// Notifications
+// ============================================
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  message   String
+  type      String
+  isRead    Boolean  @default(false) @map("is_read")
+  link      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// ============================================
+// SLA & Configuration
+// ============================================
+
+model SLA {
+  id               String   @id @default(uuid())
+  name             String   @unique
+  priority         String
+  responseTime     Int      @map("response_time") // in minutes
+  resolutionTime   Int      @map("resolution_time") // in minutes
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("slas")
+}
+
+model Settings {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String @db.Text
+
+  @@map("settings")
+}
