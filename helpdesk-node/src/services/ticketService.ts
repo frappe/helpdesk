@@ -49,7 +49,7 @@ export class TicketService {
     }
 
     if (!customerId) {
-      throw new Error('Customer not found');
+      throw new NotFoundError('Customer not found');
     }
 
     const ticket = await prisma.ticket.create({
