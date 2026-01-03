@@ -33,8 +33,8 @@ export const createUser = async (overrides?: {
 export const createAgent = async (overrides?: { email?: string; password?: string; agentName?: string }) => {
   const { user, password } = await createUser({
     userType: 'AGENT',
-    email: overrides?.email,
-    password: overrides?.password,
+    ...(overrides?.email && { email: overrides.email }),
+    ...(overrides?.password && { password: overrides.password }),
     fullName: overrides?.agentName || 'Test Agent',
   });
 
@@ -55,8 +55,8 @@ export const createCustomer = async (overrides?: {
 }) => {
   const { user, password } = await createUser({
     userType: 'CUSTOMER',
-    email: overrides?.email,
-    password: overrides?.password,
+    ...(overrides?.email && { email: overrides.email }),
+    ...(overrides?.password && { password: overrides.password }),
     fullName: overrides?.customerName || 'Test Customer',
   });
 
