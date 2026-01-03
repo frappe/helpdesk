@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
+import 'express-async-errors'; // Handle async errors in Express
 import express from 'express';
 import ticketRoutes from '../../src/routes/ticket.routes.js';
 import { errorHandler } from '../../src/middleware/errorHandler.js';
