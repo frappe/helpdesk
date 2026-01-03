@@ -98,8 +98,12 @@ export class AuthService {
       where: { email: data.email },
     });
 
-    if (!user || !user.isActive) {
+    if (!user) {
       throw new UnauthorizedError('Invalid credentials');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedError('Account is inactive');
     }
 
     // Verify password
@@ -168,6 +172,59 @@ export class AuthService {
     await prisma.refreshToken.delete({
       where: { token },
     });
+  }
+
+  async logoutAll(userId: string) {
+    await prisma.refreshToken.deleteMany({
+      where: { userId },
+    });
+  }
+
+  async refreshToken(token: string) {
+    // Find and validate refresh token
+    const storedToken = await prisma.refreshToken.findUnique({
+      where: { token },
+      include: { user: true },
+    });
+
+    if (!storedToken) {
+      throw new UnauthorizedError('Invalid refresh token');
+    }
+
+    if (storedToken.expiresAt < new Date()) {
+      throw new UnauthorizedError('Refresh token expired');
+    }
+
+    // Generate new tokens
+    const accessToken = generateAccessToken({
+      userId: storedToken.user.id,
+      email: storedToken.user.email,
+      userType: storedToken.user.userType,
+    });
+
+    const newRefreshToken = generateRefreshToken({
+      userId: storedToken.user.id,
+      email: storedToken.user.email,
+      userType: storedToken.user.userType,
+    });
+
+    // Delete old refresh token and create new one
+    await prisma.refreshToken.delete({
+      where: { token },
+    });
+
+    await prisma.refreshToken.create({
+      data: {
+        token: newRefreshToken,
+        userId: storedToken.user.id,
+        expiresAt: addDays(new Date(), 30),
+      },
+    });
+
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
+    };
   }
 }
 

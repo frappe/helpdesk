@@ -7,12 +7,14 @@ export const createUser = async (overrides?: {
   password?: string;
   fullName?: string;
   userType?: UserType;
+  isActive?: boolean;
 }) => {
   const defaultData = {
     email: `test${Date.now()}@example.com`,
     password: 'password123',
     fullName: 'Test User',
     userType: 'CUSTOMER' as UserType,
+    isActive: true,
   };
 
   const data = { ...defaultData, ...overrides };
@@ -24,6 +26,7 @@ export const createUser = async (overrides?: {
       password: hashedPassword,
       fullName: data.fullName,
       userType: data.userType,
+      isActive: data.isActive,
     },
   });
 

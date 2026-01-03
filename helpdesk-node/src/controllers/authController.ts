@@ -40,6 +40,9 @@ export class AuthController {
 
     if (refreshToken) {
       await authService.logout(refreshToken);
+    } else {
+      // If no specific token provided, logout all sessions for this user
+      await authService.logoutAll(req.user!.userId);
     }
 
     res.json({
