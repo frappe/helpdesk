@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getList, getDoc, createDoc, updateDoc } from '@/lib/api';
+import { getTickets, getTicket, createTicket as apiCreateTicket, updateTicket as apiUpdateTicket } from '@/lib/api';
 import { Ticket } from '@/types';
 
 interface TicketState {
@@ -31,14 +31,18 @@ export const useTicketStore = create<TicketState>((set, get) => ({
   fetchTickets: async (options = {}) => {
     try {
       set({ isLoading: true });
-      const { data, total_count } = await getList<Ticket>('HD Ticket', {
-        fields: ['*'],
-        filters: options.filters || get().filters,
-        limit_page_length: options.limit || 20,
-        limit_start: options.offset || 0,
-        order_by: 'modified desc',
+      const response = await getTickets({
+        ...options.filters,
+        ...get().filters,
+        limit: options.limit || 20,
+        offset: options.offset || 0,
       });
-      set({ tickets: data, totalCount: total_count, isLoading: false });
+
+      // Handle both array and paginated response
+      const tickets = Array.isArray(response) ? response : response.data || response;
+      const totalCount = Array.isArray(response) ? response.length : response.totalCount || response.length;
+
+      set({ tickets, totalCount, isLoading: false });
     } catch (error) {
       console.error('Failed to fetch tickets:', error);
       set({ isLoading: false });
@@ -48,7 +52,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
   fetchTicket: async (id: string) => {
     try {
       set({ isLoading: true });
-      const ticket = await getDoc<Ticket>('HD Ticket', id);
+      const ticket = await getTicket(id);
       set({ currentTicket: ticket, isLoading: false });
     } catch (error) {
       console.error('Failed to fetch ticket:', error);
@@ -57,12 +61,12 @@ export const useTicketStore = create<TicketState>((set, get) => ({
   },
 
   createTicket: async (data: Partial<Ticket>) => {
-    const ticket = await createDoc<Ticket>('HD Ticket', data);
+    const ticket = await apiCreateTicket(data as any);
     return ticket;
   },
 
   updateTicket: async (id: string, data: Partial<Ticket>) => {
-    const ticket = await updateDoc<Ticket>('HD Ticket', id, data);
+    const ticket = await apiUpdateTicket(id, data);
     set({ currentTicket: ticket });
     return ticket;
   },
