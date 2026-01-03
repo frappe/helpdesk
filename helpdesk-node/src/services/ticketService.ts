@@ -307,7 +307,12 @@ export class TicketService {
     return comment;
   }
 
-  async assignTicket(ticketId: string, assignedToId: string, userId: string) {
+  async assignTicket(ticketId: string, assignedToId: string, userId: string, userType?: string) {
+    // Only agents and admins can assign tickets
+    if (userType === 'CUSTOMER') {
+      throw new ForbiddenError('Customers cannot assign tickets');
+    }
+
     const ticket = await prisma.ticket.update({
       where: { id: ticketId },
       data: { assignedToId },

@@ -113,7 +113,8 @@ export class TicketController {
     const ticket = await ticketService.assignTicket(
       id,
       data.assignedToId,
-      req.user!.userId
+      req.user!.userId,
+      req.user!.userType
     );
 
     res.json(ticket);
