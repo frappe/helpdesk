@@ -3,20 +3,25 @@ import { config } from '../config/index.js';
 
 export interface JWTPayload {
   userId: string;
-  email: string;
+  email?: string;
   userType: string;
 }
 
-export const generateAccessToken = (payload: JWTPayload): string => {
+// Main token generation function (used by tests)
+export const generateToken = (payload: JWTPayload, expiresIn?: string): string => {
   return jwt.sign(payload, config.jwt.secret, {
-    expiresIn: config.jwt.expiresIn,
+    expiresIn: expiresIn || config.jwt.expiresIn,
   });
 };
 
+// Alias for access token
+export const generateAccessToken = (payload: JWTPayload): string => {
+  return generateToken(payload, config.jwt.expiresIn);
+};
+
+// Refresh token with longer expiry
 export const generateRefreshToken = (payload: JWTPayload): string => {
-  return jwt.sign(payload, config.jwt.secret, {
-    expiresIn: config.jwt.refreshExpiresIn,
-  });
+  return generateToken(payload, config.jwt.refreshExpiresIn);
 };
 
 export const verifyToken = (token: string): JWTPayload => {
