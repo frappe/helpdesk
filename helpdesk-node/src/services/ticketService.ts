@@ -270,7 +270,7 @@ export class TicketService {
     return { message: 'Ticket deleted successfully' };
   }
 
-  async addComment(ticketId: string, userId: string, content: string, isInternal = false) {
+  async addComment(ticketId: string, userId: string, content: string, isInternal = false, userType?: string) {
     // Verify ticket exists
     const ticket = await prisma.ticket.findUnique({
       where: { id: ticketId },
@@ -278,6 +278,11 @@ export class TicketService {
 
     if (!ticket) {
       throw new NotFoundError('Ticket not found');
+    }
+
+    // Customers cannot create internal comments
+    if (userType === 'CUSTOMER') {
+      isInternal = false;
     }
 
     const comment = await prisma.comment.create({

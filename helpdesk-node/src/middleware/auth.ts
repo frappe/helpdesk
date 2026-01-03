@@ -23,7 +23,10 @@ export const authenticate = (
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new UnauthorizedError('No token provided');
+    return res.status(401).json({
+      status: 'error',
+      message: 'No token provided',
+    });
   }
 
   const token = authHeader.substring(7);
@@ -33,22 +36,41 @@ export const authenticate = (
     req.user = payload;
     next();
   } catch (error) {
-    throw new UnauthorizedError('Invalid or expired token');
+    return res.status(401).json({
+      status: 'error',
+      message: 'Invalid token',
+    });
   }
 };
 
 export const requireRole = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      return res.status(403).json({
+        status: 'error',
+        message: 'Authentication required',
+      });
+    }
+
+    // ADMIN users can access all endpoints
+    if (req.user.userType === 'ADMIN') {
+      return next();
     }
 
     if (!roles.includes(req.user.userType)) {
-      throw new ForbiddenError('Insufficient permissions');
+      return res.status(403).json({
+        status: 'error',
+        message: 'Insufficient permissions',
+      });
     }
 
     next();
   };
+};
+
+// Authorize function that accepts an array of roles
+export const authorize = (roles: string[]) => {
+  return requireRole(...roles);
 };
 
 export const requireAgent = requireRole('AGENT', 'ADMIN');

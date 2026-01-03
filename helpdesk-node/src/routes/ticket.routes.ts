@@ -17,6 +17,6 @@ router.delete('/:id', (req, res) => ticketController.deleteTicket(req, res));
 router.post('/:id/comments', (req, res) => ticketController.addComment(req, res));
 
 // Assignment
-router.post('/:id/assign', (req, res) => ticketController.assignTicket(req, res));
+router.patch('/:id/assign', (req, res) => ticketController.assignTicket(req, res));
 
 export default router;

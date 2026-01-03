@@ -87,22 +87,27 @@ export const getIO = () => {
 
 // Event emitters
 export const emitTicketCreated = (ticket: any) => {
+  if (!io) return; // Skip in test environment
   io.to('role:AGENT').emit('ticket:created', ticket);
 };
 
 export const emitTicketUpdated = (ticketId: string, ticket: any) => {
+  if (!io) return; // Skip in test environment
   io.to(`ticket:${ticketId}`).emit('ticket:updated', ticket);
 };
 
 export const emitTicketAssigned = (ticketId: string, agentId: string, ticket: any) => {
+  if (!io) return; // Skip in test environment
   io.to(`user:${agentId}`).emit('ticket:assigned', ticket);
   io.to(`ticket:${ticketId}`).emit('ticket:updated', ticket);
 };
 
 export const emitCommentAdded = (ticketId: string, comment: any) => {
+  if (!io) return; // Skip in test environment
   io.to(`ticket:${ticketId}`).emit('comment:added', comment);
 };
 
 export const emitNotification = (userId: string, notification: any) => {
+  if (!io) return; // Skip in test environment
   io.to(`user:${userId}`).emit('notification:new', notification);
 };

@@ -37,10 +37,7 @@ export class TicketController {
       raisedById: req.user!.userId,
     });
 
-    res.status(201).json({
-      status: 'success',
-      data: { ticket },
-    });
+    res.status(201).json(ticket);
   }
 
   async listTickets(req: Request, res: Response) {
@@ -58,10 +55,7 @@ export class TicketController {
       req.user!.userType
     );
 
-    res.json({
-      status: 'success',
-      ...result,
-    });
+    res.json(result);
   }
 
   async getTicket(req: Request, res: Response) {
@@ -72,10 +66,7 @@ export class TicketController {
       req.user!.userType
     );
 
-    res.json({
-      status: 'success',
-      data: { ticket },
-    });
+    res.json(ticket);
   }
 
   async updateTicket(req: Request, res: Response) {
@@ -88,24 +79,18 @@ export class TicketController {
       req.user!.userType
     );
 
-    res.json({
-      status: 'success',
-      data: { ticket },
-    });
+    res.json(ticket);
   }
 
   async deleteTicket(req: Request, res: Response) {
     const { id } = req.params;
-    const result = await ticketService.deleteTicket(
+    await ticketService.deleteTicket(
       id,
       req.user!.userId,
       req.user!.userType
     );
 
-    res.json({
-      status: 'success',
-      ...result,
-    });
+    res.status(204).send();
   }
 
   async addComment(req: Request, res: Response) {
@@ -115,13 +100,11 @@ export class TicketController {
       id,
       req.user!.userId,
       data.content,
-      data.isInternal
+      data.isInternal,
+      req.user!.userType
     );
 
-    res.status(201).json({
-      status: 'success',
-      data: { comment },
-    });
+    res.status(201).json(comment);
   }
 
   async assignTicket(req: Request, res: Response) {
@@ -133,10 +116,7 @@ export class TicketController {
       req.user!.userId
     );
 
-    res.json({
-      status: 'success',
-      data: { ticket },
-    });
+    res.json(ticket);
   }
 }
 
