@@ -91,6 +91,18 @@ export class SearchService {
       take: limit,
     });
 
+    // Increment views for all returned articles
+    if (articles.length > 0) {
+      await prisma.article.updateMany({
+        where: {
+          id: { in: articles.map(a => a.id) },
+        },
+        data: {
+          views: { increment: 1 },
+        },
+      });
+    }
+
     return articles;
   }
 

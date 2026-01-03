@@ -17,8 +17,8 @@ export const createTicket = async (overrides?: {
 
   if (!customerId || !raisedById) {
     const { customer, user } = await createCustomer();
-    customerId = customer.id;
-    raisedById = user.id;
+    if (!customerId) customerId = customer.id;
+    if (!raisedById) raisedById = user.id;
   }
 
   const ticket = await prisma.ticket.create({
