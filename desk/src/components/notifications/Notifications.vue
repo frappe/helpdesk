@@ -52,19 +52,25 @@
         <span>
           <div class="mb-2 leading-5">
             <span class="space-x-1 text-gray-700">
-              <span class="font-medium text-gray-900">{{ n.user_from }}</span>
+              <span
+                v-if="n.notification_type !== 'Reaction'"
+                class="font-medium text-gray-900"
+                >{{ n.user_from }}</span
+              >
               <span v-if="n.notification_type === 'Mention'"
                 >mentioned you in ticket</span
               >
               <span v-if="n.notification_type === 'Assignment'"
                 >assigned you a ticket</span
               >
-              <span v-if="n.notification_type === 'Reaction'"
-                >has reopened the ticket</span
-              >
-              <span class="font-medium text-gray-900">{{
-                n.reference_ticket
+              <span v-if="n.notification_type === 'Reaction'">{{
+                n.message
               }}</span>
+              <span
+                v-if="n.notification_type !== 'Reaction'"
+                class="font-medium text-gray-900"
+                >{{ n.reference_ticket }}</span
+              >
             </span>
           </div>
           <div class="flex items-center gap-2">
@@ -124,15 +130,24 @@ function getRoute(n: Notification) {
         params: {
           ticketId: n.reference_ticket,
         },
-        hash: "#" + n.reference_comment,
+        hash: "#comment-" + n.reference_comment,
       };
     case "Assignment":
+      return {
+        name: "TicketAgent",
+        params: {
+          ticketId: n.reference_ticket,
+        },
+      };
     case "Reaction":
       return {
         name: "TicketAgent",
         params: {
           ticketId: n.reference_ticket,
         },
+        hash: n.reference_comment
+          ? "#comment-" + n.reference_comment
+          : undefined,
       };
   }
 }
