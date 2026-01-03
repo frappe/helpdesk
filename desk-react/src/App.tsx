@@ -51,7 +51,7 @@ function App() {
     return <LoadingScreen />;
   }
 
-  const isAgent = user?.userType === 'AGENT';
+  const isAgent = user?.user_type === 'Agent';
 
   return (
     <BrowserRouter>
