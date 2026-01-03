@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, TrendingDown, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { call } from '@/lib/api';
+import { getDashboard } from '@/lib/api';
 import { DashboardMetrics } from '@/types';
 
 interface MetricCardProps {
@@ -48,7 +48,7 @@ export function Dashboard() {
   useEffect(() => {
     async function fetchDashboard() {
       try {
-        const data = await call<DashboardMetrics>('helpdesk.api.dashboard.get_dashboard_data');
+        const data = await getDashboard();
         setMetrics(data);
       } catch (error) {
         console.error('Failed to fetch dashboard:', error);
