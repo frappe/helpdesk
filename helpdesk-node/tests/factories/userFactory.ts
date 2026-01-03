@@ -1,0 +1,75 @@
+import bcrypt from 'bcryptjs';
+import { prisma } from '../setup.js';
+import { UserType } from '@prisma/client';
+
+export const createUser = async (overrides?: {
+  email?: string;
+  password?: string;
+  fullName?: string;
+  userType?: UserType;
+}) => {
+  const defaultData = {
+    email: `test${Date.now()}@example.com`,
+    password: 'password123',
+    fullName: 'Test User',
+    userType: 'CUSTOMER' as UserType,
+  };
+
+  const data = { ...defaultData, ...overrides };
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+
+  const user = await prisma.user.create({
+    data: {
+      email: data.email,
+      password: hashedPassword,
+      fullName: data.fullName,
+      userType: data.userType,
+    },
+  });
+
+  return { user, password: data.password };
+};
+
+export const createAgent = async (overrides?: { email?: string; agentName?: string }) => {
+  const { user, password } = await createUser({
+    userType: 'AGENT',
+    email: overrides?.email,
+    fullName: overrides?.agentName || 'Test Agent',
+  });
+
+  const agent = await prisma.agent.create({
+    data: {
+      userId: user.id,
+      agentName: user.fullName,
+    },
+  });
+
+  return { user, agent, password };
+};
+
+export const createCustomer = async (overrides?: {
+  email?: string;
+  customerName?: string;
+}) => {
+  const { user, password } = await createUser({
+    userType: 'CUSTOMER',
+    email: overrides?.email,
+    fullName: overrides?.customerName || 'Test Customer',
+  });
+
+  const customer = await prisma.customer.create({
+    data: {
+      userId: user.id,
+      customerName: user.fullName,
+    },
+  });
+
+  return { user, customer, password };
+};
+
+export const createAdmin = async () => {
+  return await createUser({
+    userType: 'ADMIN',
+    fullName: 'Admin User',
+  });
+};

@@ -2,25 +2,32 @@ import nodemailer from 'nodemailer';
 import { config } from '../config/index.js';
 import { logger } from './logger.js';
 
-// Create transporter
-const transporter = nodemailer.createTransporter({
-  host: config.email.smtp.host,
-  port: config.email.smtp.port,
-  secure: config.email.smtp.secure,
-  auth: {
-    user: config.email.smtp.auth.user,
-    pass: config.email.smtp.auth.pass,
-  },
-});
+// Lazy-load transporter to avoid initialization in test environment
+let transporter: nodemailer.Transporter | null = null;
 
-// Verify transporter configuration
-transporter.verify((error) => {
-  if (error) {
-    logger.error('Email transporter error:', error);
-  } else {
-    logger.info('✉️  Email service ready');
+const getTransporter = () => {
+  if (!transporter && process.env.NODE_ENV !== 'test') {
+    transporter = nodemailer.createTransport({
+      host: config.email.smtp.host,
+      port: config.email.smtp.port,
+      secure: config.email.smtp.secure,
+      auth: {
+        user: config.email.smtp.auth.user,
+        pass: config.email.smtp.auth.pass,
+      },
+    });
+
+    // Verify transporter configuration
+    transporter.verify((error) => {
+      if (error) {
+        logger.error('Email transporter error:', error);
+      } else {
+        logger.info('✉️  Email service ready');
+      }
+    });
   }
-});
+  return transporter;
+};
 
 interface EmailOptions {
   to: string;
@@ -30,8 +37,15 @@ interface EmailOptions {
 }
 
 export const sendEmail = async (options: EmailOptions) => {
+  const emailTransporter = getTransporter();
+
+  if (!emailTransporter) {
+    logger.warn('Email transporter not initialized (test mode)');
+    return { messageId: 'test-mode-no-email' };
+  }
+
   try {
-    const info = await transporter.sendMail({
+    const info = await emailTransporter.sendMail({
       from: config.email.from,
       to: options.to,
       subject: options.subject,

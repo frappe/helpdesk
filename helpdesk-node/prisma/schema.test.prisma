@@ -1,0 +1,154 @@
+// Test schema using SQLite for in-memory testing
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/test-client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file::memory:?cache=shared"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  fullName  String   @map("full_name")
+  userType  String   @map("user_type") // CUSTOMER, AGENT, ADMIN
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  customer            Customer?
+  ticketsRaised       Ticket[]            @relation("TicketRaisedBy")
+  ticketsAssigned     Ticket[]            @relation("TicketAssignedTo")
+  comments            Comment[]
+  activities          Activity[]
+  notifications       Notification[]
+  refreshTokens       RefreshToken[]
+
+  @@map("users")
+}
+
+model Customer {
+  id            String   @id @default(uuid())
+  userId        String   @unique @map("user_id")
+  customerName  String   @map("customer_name")
+  company       String?
+  phone         String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tickets Ticket[]
+
+  @@map("customers")
+}
+
+model Ticket {
+  id               String    @id @default(uuid())
+  subject          String
+  description      String?
+  status           String    @default("Open")
+  priority         String?   @default("MEDIUM")
+  customerId       String    @map("customer_id")
+  raisedById       String    @map("raised_by_id")
+  assignedToId     String?   @map("assigned_to_id")
+  responseBy       String?   @map("response_by")
+  resolutionBy     String?   @map("resolution_by")
+  firstRespondedOn String?   @map("first_responded_on")
+  resolvedOn       String?   @map("resolved_on")
+  closedOn         String?   @map("closed_on")
+  createdAt        String    @default("2024-01-01T00:00:00Z") @map("created_at")
+  updatedAt        String    @default("2024-01-01T00:00:00Z") @map("updated_at")
+
+  customer   Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  raisedBy   User       @relation("TicketRaisedBy", fields: [raisedById], references: [id])
+  assignedTo User?      @relation("TicketAssignedTo", fields: [assignedToId], references: [id])
+  comments   Comment[]
+  activities Activity[]
+
+  @@map("tickets")
+}
+
+model Comment {
+  id         String  @id @default(uuid())
+  ticketId   String  @map("ticket_id")
+  userId     String  @map("user_id")
+  content    String
+  isInternal Boolean @default(false) @map("is_internal")
+  createdAt  String  @default("2024-01-01T00:00:00Z") @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("comments")
+}
+
+model Activity {
+  id        String @id @default(uuid())
+  ticketId  String @map("ticket_id")
+  userId    String @map("user_id")
+  action    String
+  details   String?
+  createdAt String @default("2024-01-01T00:00:00Z") @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("activities")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  parentId    String?   @map("parent_id")
+  createdAt   String    @default("2024-01-01T00:00:00Z") @map("created_at")
+
+  articles Article[]
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+
+  @@map("categories")
+}
+
+model Article {
+  id          String  @id @default(uuid())
+  title       String
+  content     String
+  categoryId  String  @map("category_id")
+  isPublished Boolean @default(false) @map("is_published")
+  viewCount   Int     @default(0) @map("view_count")
+  createdAt   String  @default("2024-01-01T00:00:00Z") @map("created_at")
+  updatedAt   String  @default("2024-01-01T00:00:00Z") @map("updated_at")
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@map("articles")
+}
+
+model Notification {
+  id        String  @id @default(uuid())
+  userId    String  @map("user_id")
+  title     String
+  message   String
+  type      String
+  isRead    Boolean @default(false) @map("is_read")
+  createdAt String  @default("2024-01-01T00:00:00Z") @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model RefreshToken {
+  id        String @id @default(uuid())
+  token     String @unique
+  userId    String @map("user_id")
+  expiresAt String @map("expires_at")
+  createdAt String @default("2024-01-01T00:00:00Z") @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
