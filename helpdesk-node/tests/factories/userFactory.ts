@@ -38,7 +38,7 @@ export const createAgent = async (overrides?: { email?: string; password?: strin
     userType: 'AGENT',
     ...(overrides?.email && { email: overrides.email }),
     ...(overrides?.password && { password: overrides.password }),
-    fullName: overrides?.agentName || 'Test Agent',
+    fullName: overrides?.agentName || `Test Agent ${Date.now()}`,
   });
 
   const agent = await prisma.agent.create({
@@ -60,7 +60,7 @@ export const createCustomer = async (overrides?: {
     userType: 'CUSTOMER',
     ...(overrides?.email && { email: overrides.email }),
     ...(overrides?.password && { password: overrides.password }),
-    fullName: overrides?.customerName || 'Test Customer',
+    fullName: overrides?.customerName || `Test Customer ${Date.now()}`,
   });
 
   const customer = await prisma.customer.create({

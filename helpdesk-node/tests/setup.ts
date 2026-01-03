@@ -25,6 +25,7 @@ afterEach(async () => {
     prisma.ticket.deleteMany(),
     prisma.article.deleteMany(),
     prisma.category.deleteMany(),
+    prisma.agent.deleteMany(),
     prisma.customer.deleteMany(),
     prisma.user.deleteMany(),
   ];

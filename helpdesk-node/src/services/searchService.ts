@@ -127,6 +127,9 @@ export class SearchService {
           select: { tickets: true },
         },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
       take: limit,
     });
 
