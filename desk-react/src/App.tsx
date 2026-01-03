@@ -6,6 +6,10 @@ import { useAuthStore } from './stores/authStore';
 import { AgentLayout } from './components/layouts/AgentLayout';
 import { CustomerLayout } from './components/layouts/CustomerLayout';
 
+// Auth Pages
+import { Login } from './pages/Login';
+import { Register } from './pages/Register';
+
 // Agent Pages
 import { Dashboard } from './pages/Dashboard';
 import { TicketList } from './pages/TicketList';
@@ -32,39 +36,55 @@ function App() {
   const { user, isLoading, isAuthenticated, fetchUser } = useAuthStore();
 
   useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+    // Only fetch user if we have a token
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      fetchUser();
+    } else {
+      // Mark as not loading if no token
+      useAuthStore.setState({ isLoading: false });
+    }
+  }, []);
 
+  // Show loading screen while checking authentication
   if (isLoading) {
     return <LoadingScreen />;
   }
 
-  if (!isAuthenticated) {
-    window.location.href = '/login';
-    return null;
-  }
-
-  const isAgent = user?.user_type === 'Agent';
+  const isAgent = user?.userType === 'AGENT';
 
   return (
-    <BrowserRouter basename="/helpdesk">
+    <BrowserRouter>
       <Routes>
-        {isAgent ? (
-          <Route element={<AgentLayout />}>
-            <Route index element={<Navigate to="/tickets" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="tickets" element={<TicketList />} />
-            <Route path="tickets/:id" element={<TicketDetail />} />
-            <Route path="kb" element={<KnowledgeBase />} />
-          </Route>
+        {/* Public routes */}
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" replace />} />
+        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" replace />} />
+
+        {/* Protected routes */}
+        {isAuthenticated ? (
+          <>
+            {isAgent ? (
+              <Route element={<AgentLayout />}>
+                <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="tickets" element={<TicketList />} />
+                <Route path="tickets/:id" element={<TicketDetail />} />
+                <Route path="kb" element={<KnowledgeBase />} />
+              </Route>
+            ) : (
+              <Route element={<CustomerLayout />}>
+                <Route index element={<Navigate to="/my-tickets" replace />} />
+                <Route path="my-tickets" element={<CustomerTickets />} />
+                <Route path="my-tickets/:id" element={<CustomerTicketDetail />} />
+              </Route>
+            )}
+          </>
         ) : (
-          <Route element={<CustomerLayout />}>
-            <Route index element={<Navigate to="/my-tickets" replace />} />
-            <Route path="my-tickets" element={<CustomerTickets />} />
-            <Route path="my-tickets/:id" element={<CustomerTicketDetail />} />
-          </Route>
+          <Route path="*" element={<Navigate to="/login" replace />} />
         )}
-        <Route path="*" element={<Navigate to="/" replace />} />
+
+        {/* Catch all */}
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} replace />} />
       </Routes>
     </BrowserRouter>
   );
