@@ -42,6 +42,9 @@ class HDTicketComment(HasMentions, Document):
 
 @frappe.whitelist()
 def toggle_reaction(comment: str, emoji: str):
+    if not frappe.db.get_single_value("HD Settings", "enable_comment_reactions"):
+        return
+
     if emoji not in PRESET_EMOJIS:
         frappe.throw(
             f"Invalid emoji. Only preset emojis are allowed: {', '.join(PRESET_EMOJIS)}"
@@ -89,6 +92,9 @@ def toggle_reaction(comment: str, emoji: str):
 
 @frappe.whitelist()
 def get_reactions(comment: str):
+    if not frappe.db.get_single_value("HD Settings", "enable_comment_reactions"):
+        return []
+
     if not frappe.db.exists("HD Ticket Comment", comment):
         frappe.throw(_("Comment not found"))
 

@@ -24,6 +24,8 @@
   "feedback_section",
   "is_feedback_mandatory",
   "column_break_kegb",
+  "comments_section",
+  "enable_comment_reactions",
   "ticket_restrictions_section",
   "allow_anyone_to_create_tickets",
   "auto_update_status",
@@ -307,6 +309,18 @@
   {
    "fieldname": "column_break_kegb",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "comments_section",
+   "fieldtype": "Section Break",
+   "label": "Comments"
+  },
+  {
+   "default": "0",
+   "description": "Allow users to react to comments with emojis",
+   "fieldname": "enable_comment_reactions",
+   "fieldtype": "Check",
+   "label": "Enable comment reactions"
   },
   {
    "depends_on": "eval:doc.enable_email_ticket_feedback",
