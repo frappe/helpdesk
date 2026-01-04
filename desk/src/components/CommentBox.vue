@@ -82,7 +82,7 @@
       </div>
       <div
         class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100"
-        v-if="!editable"
+        v-if="!editable && enableCommentReactions"
       >
         <Popover>
           <template #target="{ togglePopover, isOpen }">
@@ -164,6 +164,7 @@
 import { AttachmentItem } from "@/components";
 import ReactionIcon from "@/components/icons/ReactionIcon.vue";
 import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
 import { updateRes as updateComment } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { CommentActivity } from "@/types";
@@ -196,6 +197,7 @@ const props = defineProps({
   },
 });
 const { getUser } = useUserStore();
+const { enableCommentReactions } = useConfigStore();
 
 const { name, creation, content, commenter, commentedBy, attachments } =
   props.activity;

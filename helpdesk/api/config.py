@@ -13,7 +13,11 @@ def get_config():
         "is_feedback_mandatory",
         "restrict_tickets_by_agent_group",
         "assign_within_team",
+<<<<<<< HEAD
         "disable_saved_replies_global_scope",
+=======
+        "enable_comment_reactions",
+>>>>>>> 0b05a7c0 (feat: add enable_comment_reactions setting to toggle feature)
     ]
     res = frappe.get_value(doctype="HD Settings", fieldname=fields, as_dict=True)
 
