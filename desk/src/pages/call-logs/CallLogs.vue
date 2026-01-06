@@ -2,11 +2,13 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Call Logs</div>
+        <div class="text-lg font-medium text-gray-900">
+          {{ __("Call Logs") }}
+        </div>
       </template>
       <template #right-header>
         <Button
-          label="New Call Log"
+          :label="__('New Call Log')"
           theme="gray"
           variant="solid"
           @click="newCallLog"
@@ -46,6 +48,7 @@ import CallLogDetailModal from "./CallLogDetailModal.vue";
 import CallLogModal from "./CallLogModal.vue";
 import { statusColorMap, statusLabelMap } from "./utils";
 import { PhoneIcon } from "@/components/icons";
+import { __ } from "@/translation";
 
 const showCallLogModal = ref(false);
 const showCallLogDetailModal = ref(false);
@@ -59,7 +62,7 @@ const options = computed(() => {
     selectable: true,
     showSelectBanner: true,
     emptyState: {
-      title: "No Call Logs Found",
+      title: __("No Call Logs Found"),
       icon: PhoneIcon,
     },
     columnConfig: {
@@ -135,7 +138,7 @@ function openCallLog(id: string): void {
 
 usePageMeta(() => {
   return {
-    title: "Call Logs",
+    title: __("Call Logs"),
   };
 });
 </script>

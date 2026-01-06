@@ -36,7 +36,7 @@
               />
             </div>
             <Button
-              label="Add Member"
+              :label="__('Add Member')"
               variant="solid"
               :disabled="!invitees.length"
               @click="addMember(invitees)"
@@ -100,7 +100,7 @@
       </div>
     </template>
   </SettingsLayoutBase>
-  <Dialog v-model="showDelete" :options="{ title: 'Delete team' }">
+  <Dialog v-model="showDelete" :options="{ title: __('Delete team') }">
     <template #body-content>
       <p class="text-p-base text-ink-gray-7">
         {{

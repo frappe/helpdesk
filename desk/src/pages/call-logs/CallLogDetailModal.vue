@@ -105,6 +105,7 @@ import dayjs from "dayjs";
 import { timeAgo } from "@/utils";
 import { statusColorMap, statusLabelMap } from "./utils";
 import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
 
 const show = defineModel();
 const callLog = ref(null);
@@ -145,7 +146,7 @@ const detailFields = computed(() => {
         class: "h-3.5 w-3.5",
       }),
       name: "type",
-      value: data.type.label + " Call",
+      value: data.type.label + " " + __("Call"),
     },
     {
       icon: ContactsIcon,

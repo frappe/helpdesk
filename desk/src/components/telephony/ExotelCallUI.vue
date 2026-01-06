@@ -20,19 +20,21 @@
         contact?.full_name ?? (contact?.mobile_no || contact?.phone)
       }}</span>
       <span>·</span>
-      <div v-if="callStatus == 'In progress'">
+      <div v-if="callStatus == __('In progress')">
         {{ counterUp?.updatedTime }}
       </div>
       <div
-        v-else-if="callStatus == 'Call ended' || callStatus == 'No answer'"
+        v-else-if="
+          callStatus == __('Call ended') || callStatus == __('No answer')
+        "
         class="blink"
         :class="{
           'text-red-700':
-            callStatus == 'Call ended' || callStatus == 'No answer',
+            callStatus == __('Call ended') || callStatus == __('No answer'),
         }"
       >
         <span>{{ callStatus }}</span>
-        <span v-if="callStatus == 'Call ended'">
+        <span v-if="callStatus == __('Call ended')">
           <span> · </span>
           <span>{{ callDuration }}</span>
         </span>
@@ -65,11 +67,11 @@
             :image="contact.image"
             :label="contact.full_name"
             class="relative flex !h-24 !w-24 items-center justify-center [&>div]:text-[30px]"
-            :class="callStatus == 'In progress' ? '' : 'pulse'"
+            :class="callStatus == __('In progress') ? '' : 'pulse'"
           />
           <div class="flex flex-col items-center justify-center gap-1">
             <div class="text-xl font-medium">
-              {{ contact?.full_name ?? "Unknown" }}
+              {{ contact?.full_name ?? __("Unknown") }}
             </div>
             <div class="text-sm text-ink-gray-5">
               {{ contact?.mobile_no || contact?.phone }}
@@ -97,6 +99,7 @@ import { inject, onBeforeUnmount, ref, watch } from "vue";
 import CountUpTimer from "./CountUpTimer.vue";
 import AvatarIcon from "./Icons/AvatarIcon.vue";
 import MinimizeIcon from "./Icons/MinimizeIcon.vue";
+import { __ } from "@/translation";
 
 const telephonyStore = useTelephonyStore();
 
@@ -160,7 +163,7 @@ function makeOutgoingCall(number) {
   })
     .then((callDetails) => {
       callData.value = callDetails;
-      callStatus.value = "Calling...";
+      callStatus.value = __("Calling...");
       showCallPopup.value = true;
       showSmallCallPopup.value = false;
       onCallStarted && onCallStarted();
@@ -211,7 +214,7 @@ function updateStatus(data) {
     data["Legs[0][Status]"] == "in-progress" &&
     data["Legs[1][Status]"] == ""
   ) {
-    return "Ringing...";
+    return __("Ringing...");
   } else if (
     data.EventType == "answered" &&
     data.Direction == "outbound-api" &&
@@ -220,7 +223,7 @@ function updateStatus(data) {
   ) {
     counterUp.value.start();
     onCallStarted && onCallStarted();
-    return "In progress";
+    return __("In progress");
   } else if (
     data.EventType == "terminal" &&
     data.Direction == "outbound-api" &&
@@ -232,7 +235,7 @@ function updateStatus(data) {
   ) {
     counterUp.value.stop();
     onCallFailed && onCallFailed();
-    return "No answer";
+    return __("No answer");
   } else if (
     data.EventType == "terminal" &&
     data.Direction == "outbound-api" &&
@@ -245,7 +248,7 @@ function updateStatus(data) {
     );
     closeCallPopup();
     onCallEnded && onCallEnded();
-    return "Call ended";
+    return __("Call ended");
   }
 
   // incoming call
@@ -256,7 +259,7 @@ function updateStatus(data) {
   ) {
     phoneNumber.value = data.From || data.CallFrom;
     counterUp.value.start();
-    return "Incoming call";
+    return __("Incoming call");
   } else if (
     data.Direction == "incoming" &&
     data.CallType == "incomplete" &&
@@ -264,7 +267,7 @@ function updateStatus(data) {
   ) {
     onCallFailed && onCallFailed();
     counterUp.value.stop();
-    return "No answer";
+    return __("No answer");
   } else if (
     data.Direction == "incoming" &&
     (data.CallType == "completed" || data.CallType == "client-hangup") &&
@@ -277,7 +280,7 @@ function updateStatus(data) {
     );
     closeCallPopup();
     counterUp.value.stop();
-    return "Call ended";
+    return __("Call ended");
   }
 }
 

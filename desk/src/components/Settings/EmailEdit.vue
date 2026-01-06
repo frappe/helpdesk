@@ -25,7 +25,7 @@
                 :href="info.link"
                 target="_blank"
                 class="text-ink-blue-2 underline"
-                >here</a
+                >{{ __("here") }}</a
               >
               .
             </div>

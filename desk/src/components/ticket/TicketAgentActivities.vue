@@ -84,17 +84,17 @@
       <span>{{ emptyText }}</span>
       <Button
         v-if="title == 'Emails'"
-        label="New Email"
+        :label="__('New Email')"
         @click="communicationAreaRef?.toggleEmailBox() ?? toggleEmailBox()"
       />
       <Button
         v-else-if="title == 'Comments'"
-        label="New Comment"
+        :label="__('New Comment')"
         @click="communicationAreaRef?.toggleCommentBox() ?? toggleCommentBox()"
       />
       <Button
         v-else-if="title == 'Calls'"
-        label="Make a Call"
+        :label="__('Make a Call')"
         @click="makeCall()"
       />
     </div>
@@ -125,6 +125,7 @@ import {
   nextTick,
   watch,
 } from "vue";
+import { __ } from "@/translation";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
 
@@ -163,14 +164,14 @@ const communicationAreaRef: Ref = inject("communicationArea");
 const makeCall = inject<() => void>("makeCall");
 
 const emptyText = computed(() => {
-  let text = "No Activities";
+  let text = __("No Activities");
   if (props.title == "Emails") {
-    text = "No Email Communications";
+    text = __("No Email Communications");
   } else if (props.title == "Comments") {
-    text = "No Comments";
+    text = __("No Comments");
     return text;
   } else if (props.title == "Calls") {
-    text = "No Calls";
+    text = __("No Calls");
     return text;
   }
 });

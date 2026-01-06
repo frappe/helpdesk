@@ -2,14 +2,14 @@
   <div class="flex gap-5 w-full">
     <FormControl
       type="autocomplete"
-      label="Default ticket status"
+      :label="__('Default ticket status')"
       :options="openStatuses"
       class="flex-1"
       v-model="slaData.default_ticket_status"
     />
     <FormControl
       type="autocomplete"
-      label="Ticket reopen status"
+      :label="__('Ticket reopen status')"
       :options="openStatuses"
       class="flex-1"
       v-model="slaData.reopen_ticket_status"
@@ -22,6 +22,7 @@ import { computed, ComputedRef } from "vue";
 import { slaData } from "@/stores/sla";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { HDTicketStatus } from "@/types/doctypes";
+import { __ } from "@/translation";
 
 const { statuses } = useTicketStatusStore();
 

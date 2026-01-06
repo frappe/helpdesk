@@ -14,7 +14,7 @@
         <div class="flex gap-2">
           <FileUploader
             :validate-file="validateFile"
-            @success="(file:File) => updateImage(file)"
+            @success="(file: File) => updateImage(file)"
           >
             <template #default="{ uploading, openFileSelector }">
               <Button
