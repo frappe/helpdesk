@@ -5,6 +5,15 @@
 
 **Customer Service, Made Simple and Effective**
 
+> **Prerequisites:** To fully use Frappe Helpdesk, you also need to install the **Telephony app**.
+>
+> ```bash
+> bench get-app --branch v16.0.0-beta.1 https://github.com/frappe/telephony
+> bench --site site1.local install-app telephony
+> ```
+
+
+
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/frappe/helpdesk)
 [![codecov](https://codecov.io/github/frappe/helpdesk/branch/develop/graph/badge.svg?token=8ZXHCY4G9U)](https://codecov.io/github/frappe/helpdesk)
 
