@@ -25,13 +25,7 @@
         <TicketNavigation :key="ticket.name" />
         <!-- Custom Actions -->
         <div v-if="normalActions.length" class="flex gap-2">
-          <Button
-            v-for="action in normalActions"
-            :key="action.label"
-            :label="action.label"
-            @click="action.onClick()"
-            v-bind="action"
-          >
+          <Button v-for="action in normalActions" v-bind="action">
             <template v-if="action.icon" #prefix>
               <FeatherIcon :name="action.icon" class="h-4 w-4" />
             </template>
