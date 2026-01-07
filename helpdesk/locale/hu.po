@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2026-01-06 01:55\n"
+"PO-Revision-Date: 2026-01-07 02:02\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -678,7 +678,7 @@ msgstr "Változtass Jelszót"
 
 #: desk/src/components/Settings/Profile/Profile.vue:33
 msgid "Change image"
-msgstr ""
+msgstr "Kép módosítása"
 
 #: desk/src/components/Settings/Profile/Profile.vue:133
 msgid "Change language of the application."
@@ -1441,7 +1441,7 @@ msgstr ""
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Fulfilled"
-msgstr ""
+msgstr "Teljesített"
 
 #: desk/src/components/Settings/General/General.vue:6
 msgid "General"
@@ -3106,7 +3106,7 @@ msgstr "Forrás Neve"
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Source Type"
-msgstr ""
+msgstr "Forrás típusa"
 
 #: helpdesk/api/knowledge_base.py:119
 msgid "Source and target category cannot be same"
