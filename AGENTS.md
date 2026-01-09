@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Frappe Helpdesk is an open-source ticket management tool built on the [Frappe Framework](https://github.com/frappe/frappe) (Python backend) and [Frappe UI](https://github.com/frappe/frappe-ui) (Vue.js frontend). It provides agent/customer portals, SLAs, assignment rules, a knowledge base, and canned responses.
+Frappe Helpdesk is an open-source ticket management tool built on the [Frappe Framework](https://github.com/frappe/frappe) (Python backend) and [Frappe UI](https://github.com/frappe/frappe-ui) (Vue.js frontend). It provides agent/customer portals, SLAs, assignment rules, a knowledge base, and saved replies.
 
 ## Tech Stack & Architecture
 

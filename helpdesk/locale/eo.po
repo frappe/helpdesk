@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2025-11-30 10:36+0000\n"
-"PO-Revision-Date: 2025-12-03 21:26\n"
+"POT-Creation-Date: 2025-12-07 10:36+0000\n"
+"PO-Revision-Date: 2025-12-09 21:36\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Esperanto\n"
 "MIME-Version: 1.0\n"
@@ -18,11 +18,11 @@ msgstr ""
 "X-Crowdin-File-ID: 118\n"
 "Language: eo_UY\n"
 
-#: helpdesk/api/dashboard.py:231
+#: helpdesk/api/dashboard.py:179
 msgid "% SLA Fulfilled"
 msgstr "crwdns160518:0crwdne160518:0"
 
-#: helpdesk/api/dashboard.py:236
+#: helpdesk/api/dashboard.py:184
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
 msgstr "crwdns160520:0crwdne160520:0"
@@ -279,7 +279,7 @@ msgstr "crwdns157540:0crwdne157540:0"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
-#: desk/src/components/Settings/General/components/TicketSettings.vue:101
+#: desk/src/components/Settings/General/components/TicketSettings.vue:82
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Allow anyone to create tickets"
 msgstr "crwdns157542:0crwdne157542:0"
@@ -289,7 +289,7 @@ msgstr "crwdns157542:0crwdne157542:0"
 msgid "Amber"
 msgstr "crwdns159032:0crwdne159032:0"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:105
+#: desk/src/components/Settings/General/components/TicketSettings.vue:86
 msgid "Anyone will be able to create tickets without any permission. e.g. from webform."
 msgstr "crwdns161558:0crwdne161558:0"
 
@@ -433,23 +433,23 @@ msgstr "crwdns161570:0crwdne161570:0"
 msgid "Assignment rule"
 msgstr "crwdns158434:0crwdne158434:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:570
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:560
 msgid "Assignment rule created"
 msgstr "crwdns161572:0crwdne161572:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:121
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:129
 msgid "Assignment rule deleted"
 msgstr "crwdns161574:0crwdne161574:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:153
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:161
 msgid "Assignment rule duplicated"
 msgstr "crwdns161576:0crwdne161576:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:654
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:647
 msgid "Assignment rule updated"
 msgstr "crwdns161578:0crwdne161578:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:190
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:198
 msgid "Assignment rule {0} updated"
 msgstr "crwdns161580:0{0}crwdne161580:0"
 
@@ -482,18 +482,18 @@ msgid "Author"
 msgstr "crwdns157572:0crwdne157572:0"
 
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
-#: desk/src/components/Settings/General/components/TicketSettings.vue:72
+#: desk/src/components/Settings/General/components/TicketSettings.vue:53
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Auto update status"
 msgstr "crwdns157574:0crwdne157574:0"
 
 #. Label of the auto_close_after_days (Int) field in DocType 'HD Settings'
-#: desk/src/components/Settings/General/components/TicketSettings.vue:168
+#: desk/src/components/Settings/General/components/TicketSettings.vue:149
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Auto-close after (Days)"
 msgstr "crwdns157576:0crwdne157576:0"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:140
+#: desk/src/components/Settings/General/components/TicketSettings.vue:121
 msgid "Auto-close tickets that remain in a status for the specified number of days."
 msgstr "crwdns161584:0crwdne161584:0"
 
@@ -508,7 +508,7 @@ msgstr "crwdns157578:0crwdne157578:0"
 msgid "Automatically Close Tickets when"
 msgstr "crwdns159042:0crwdne159042:0"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:137
+#: desk/src/components/Settings/General/components/TicketSettings.vue:118
 msgid "Automatically close stale tickets"
 msgstr "crwdns161586:0crwdne161586:0"
 
@@ -522,35 +522,35 @@ msgstr "crwdns157582:0crwdne157582:0"
 msgid "Average Response Time"
 msgstr "crwdns157584:0crwdne157584:0"
 
-#: helpdesk/api/dashboard.py:682
+#: helpdesk/api/dashboard.py:362
 msgid "Average feedback rating per day is around {0} stars"
 msgstr "crwdns160522:0{0}crwdne160522:0"
 
-#: helpdesk/api/dashboard.py:606
+#: helpdesk/api/dashboard.py:284
 msgid "Average tickets per day is around {0}"
 msgstr "crwdns160524:0{0}crwdne160524:0"
 
-#: helpdesk/api/dashboard.py:387
+#: helpdesk/api/dashboard.py:229
 msgid "Avg. Feedback Rating"
 msgstr "crwdns160526:0crwdne160526:0"
 
-#: helpdesk/api/dashboard.py:283
+#: helpdesk/api/dashboard.py:194
 msgid "Avg. First Response"
 msgstr "crwdns160528:0crwdne160528:0"
 
-#: helpdesk/api/dashboard.py:337
+#: helpdesk/api/dashboard.py:213
 msgid "Avg. Resolution"
 msgstr "crwdns160530:0crwdne160530:0"
 
-#: helpdesk/api/dashboard.py:392
+#: helpdesk/api/dashboard.py:234
 msgid "Avg. feedback rating for the tickets resolved"
 msgstr "crwdns160532:0crwdne160532:0"
 
-#: helpdesk/api/dashboard.py:289
+#: helpdesk/api/dashboard.py:200
 msgid "Avg. time taken to first respond to a ticket"
 msgstr "crwdns160534:0crwdne160534:0"
 
-#: helpdesk/api/dashboard.py:343
+#: helpdesk/api/dashboard.py:219
 msgid "Avg. time taken to resolve a ticket"
 msgstr "crwdns160536:0crwdne160536:0"
 
@@ -623,7 +623,7 @@ msgstr "crwdns161594:0crwdne161594:0"
 msgid "Can manage all aspects of Helpdesk."
 msgstr "crwdns161596:0crwdne161596:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:602
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:604
 msgid "Can not send email. No sender email set up!"
 msgstr "crwdns157600:0crwdne157600:0"
 
@@ -647,7 +647,7 @@ msgstr "crwdns159048:0crwdne159048:0"
 msgid "Cannot disable this status as it is linked in the following SLAs:<br><br>"
 msgstr "crwdns159050:0crwdne159050:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:173
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:181
 msgid "Cannot enable rule without adding users in it"
 msgstr "crwdns161602:0crwdne161602:0"
 
@@ -746,7 +746,7 @@ msgstr "crwdns157612:0crwdne157612:0"
 msgid "Click on Add to Holidays. This will populate the holidays table with all the dates that fall on the selected weekly off. Repeat the process for populating the dates for all your weekly holidays"
 msgstr "crwdns157614:0crwdne157614:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:61
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:69
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:44
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:58
 msgid "Close"
@@ -757,7 +757,7 @@ msgstr "crwdns158448:0crwdne158448:0"
 msgid "Closed"
 msgstr "crwdns160186:0crwdne160186:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:324
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "crwdns157618:0crwdne157618:0"
 
@@ -853,15 +853,15 @@ msgstr "crwdns157638:0crwdne157638:0"
 msgid "Content Type"
 msgstr "crwdns157640:0crwdne157640:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:620
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:622
 msgid "Could not an email due to: {0}"
 msgstr "crwdns159052:0{0}crwdne159052:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:778
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:780
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "crwdns159054:0{0}crwdne159054:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:160
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:164
 msgid "Could not send feedback email,due to: {0}"
 msgstr "crwdns157642:0{0}crwdne157642:0"
 
@@ -972,7 +972,7 @@ msgid "Default ticket status"
 msgstr "crwdns159062:0crwdne159062:0"
 
 #. Label of the default_ticket_type (Link) field in DocType 'HD Settings'
-#: desk/src/components/Settings/General/components/TicketSettings.vue:121
+#: desk/src/components/Settings/General/components/TicketSettings.vue:102
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Default ticket type"
 msgstr "crwdns157662:0crwdne157662:0"
@@ -1059,7 +1059,7 @@ msgstr "crwdns157672:0crwdne157672:0"
 msgid "Do not restrict tickets without a Team"
 msgstr "crwdns157674:0crwdne157674:0"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:52
+#: desk/src/components/Settings/General/components/TicketSettings.vue:41
 msgid "Do not restrict tickets without a team"
 msgstr "crwdns161662:0crwdne161662:0"
 
@@ -1080,8 +1080,8 @@ msgstr "crwdns157678:0crwdne157678:0"
 msgid "Draft"
 msgstr "crwdns157680:0crwdne157680:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:64
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:129
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:72
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:137
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:47
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:78
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:61
@@ -1089,7 +1089,7 @@ msgstr "crwdns157680:0crwdne157680:0"
 msgid "Duplicate"
 msgstr "crwdns158454:0crwdne158454:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:45
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:53
 msgid "Duplicate Assignment Rule"
 msgstr "crwdns158456:0crwdne158456:0"
 
@@ -1323,11 +1323,11 @@ msgstr "crwdns157716:0crwdne157716:0"
 msgid "Feedback Rating"
 msgstr "crwdns157718:0crwdne157718:0"
 
-#: helpdesk/api/dashboard.py:688
+#: helpdesk/api/dashboard.py:368
 msgid "Feedback Trend"
 msgstr "crwdns160538:0crwdne160538:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:158
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:162
 msgid "Feedback email has been sent to the customer"
 msgstr "crwdns157720:0crwdne157720:0"
 
@@ -1846,7 +1846,7 @@ msgstr "crwdns161734:0crwdne161734:0"
 msgid "Instantly send e-mail"
 msgstr "crwdns157878:0crwdne157878:0"
 
-#: helpdesk/utils.py:33
+#: helpdesk/utils.py:32
 msgid "Insufficient Permission for {0}"
 msgstr "crwdns157880:0{0}crwdne157880:0"
 
@@ -2142,7 +2142,7 @@ msgstr "crwdns161768:0crwdne161768:0"
 msgid "New Assignment Rule"
 msgstr "crwdns161770:0crwdne161770:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:51
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:59
 msgid "New Assignment Rule Name"
 msgstr "crwdns158466:0crwdne158466:0"
 
@@ -2196,7 +2196,7 @@ msgstr "crwdns161792:0crwdne161792:0"
 msgid "No SLA found"
 msgstr "crwdns161794:0crwdne161794:0"
 
-#: helpdesk/api/dashboard.py:429
+#: helpdesk/api/dashboard.py:440
 msgid "No Team"
 msgstr "crwdns160540:0crwdne160540:0"
 
@@ -2236,7 +2236,7 @@ msgstr "crwdns158470:0crwdne158470:0"
 msgid "No team found"
 msgstr "crwdns161808:0crwdne161808:0"
 
-#: helpdesk/utils.py:166
+#: helpdesk/utils.py:168
 msgid "Not Allowed"
 msgstr "crwdns157934:0crwdne157934:0"
 
@@ -2366,19 +2366,19 @@ msgstr "crwdns157956:0crwdne157956:0"
 msgid "Pending Invites"
 msgstr "crwdns161824:0crwdne161824:0"
 
-#: helpdesk/api/dashboard.py:541
+#: helpdesk/api/dashboard.py:552
 msgid "Percentage of Total Tickets by Channel"
 msgstr "crwdns160542:0crwdne160542:0"
 
-#: helpdesk/api/dashboard.py:501
+#: helpdesk/api/dashboard.py:512
 msgid "Percentage of Total Tickets by Priority"
 msgstr "crwdns160544:0crwdne160544:0"
 
-#: helpdesk/api/dashboard.py:435
+#: helpdesk/api/dashboard.py:446
 msgid "Percentage of Total Tickets by Team"
 msgstr "crwdns160546:0crwdne160546:0"
 
-#: helpdesk/api/dashboard.py:468
+#: helpdesk/api/dashboard.py:479
 msgid "Percentage of Total Tickets by Type"
 msgstr "crwdns160548:0crwdne160548:0"
 
@@ -2564,13 +2564,13 @@ msgstr "crwdns158000:0crwdne158000:0"
 msgid "Rate Your Support Experience"
 msgstr "crwdns160190:0crwdne160190:0"
 
-#: helpdesk/api/dashboard.py:691
+#: helpdesk/api/dashboard.py:371
 msgid "Rated Tickets"
 msgstr "crwdns160550:0crwdne160550:0"
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
-#: helpdesk/api/dashboard.py:703
+#: helpdesk/api/dashboard.py:382
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
@@ -2792,7 +2792,7 @@ msgstr "crwdns161870:0crwdne161870:0"
 msgid "Restrict agent assignment to selected Team"
 msgstr "crwdns158054:0crwdne158054:0"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:64
+#: desk/src/components/Settings/General/components/TicketSettings.vue:46
 msgid "Restrict agent assignment to selected team"
 msgstr "crwdns161872:0crwdne161872:0"
 
@@ -2890,10 +2890,6 @@ msgstr "crwdns161888:0crwdne161888:0"
 msgid "SLA set as default cannot be disabled"
 msgstr "crwdns161890:0crwdne161890:0"
 
-#: helpdesk/api/dashboard.py:584 helpdesk/api/dashboard.py:619
-msgid "SLA_fulfilled"
-msgstr "crwdns160552:0crwdne160552:0"
-
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:11
 msgid "SLAs align your team and customers with defined timelines for a reliable experience."
 msgstr "crwdns161892:0crwdne161892:0"
@@ -2966,7 +2962,7 @@ msgstr "crwdns160048:0crwdne160048:0"
 msgid "Select a Default Priority."
 msgstr "crwdns158090:0crwdne158090:0"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:124
+#: desk/src/components/Settings/General/components/TicketSettings.vue:105
 msgid "Select what type all tickets get by default."
 msgstr "crwdns161896:0crwdne161896:0"
 
@@ -3087,11 +3083,11 @@ msgstr "crwdns158112:0crwdne158112:0"
 msgid "Skip email workflow"
 msgstr "crwdns161916:0crwdne161916:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:639
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:632
 msgid "Some error occurred while renaming assignment rule"
 msgstr "crwdns161918:0crwdne161918:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:623
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:616
 msgid "Some error occurred while updating assignment rule"
 msgstr "crwdns161920:0crwdne161920:0"
 
@@ -3401,7 +3397,7 @@ msgstr "crwdns161940:0crwdne161940:0"
 msgid "The holiday on {0} is not between From Date and To Date"
 msgstr "crwdns158178:0{0}crwdne158178:0"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:179
+#: desk/src/components/Settings/General/components/TicketSettings.vue:160
 msgid "The number of days must be 1 or more"
 msgstr "crwdns161942:0crwdne161942:0"
 
@@ -3409,7 +3405,7 @@ msgstr "crwdns161942:0crwdne161942:0"
 msgid "The status for sending feedback must be of <u>Resolved</u> category."
 msgstr "crwdns159142:0crwdne159142:0"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:75
+#: desk/src/components/Settings/General/components/TicketSettings.vue:56
 msgid "The ticket status will automatically change whenever the agent respond to a ticket."
 msgstr "crwdns161944:0crwdne161944:0"
 
@@ -3513,7 +3509,7 @@ msgstr "crwdns158206:0crwdne158206:0"
 msgid "Ticket Summary"
 msgstr "crwdns158208:0crwdne158208:0"
 
-#: helpdesk/api/dashboard.py:611
+#: helpdesk/api/dashboard.py:290
 msgid "Ticket Trend"
 msgstr "crwdns160554:0crwdne160554:0"
 
@@ -3533,7 +3529,7 @@ msgstr "crwdns158210:0crwdne158210:0"
 msgid "Ticket does not exist."
 msgstr "crwdns158212:0crwdne158212:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:314
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:318
 msgid "Ticket must be resolved with a feedback"
 msgstr "crwdns158214:0crwdne158214:0"
 
@@ -3549,7 +3545,7 @@ msgstr "crwdns158218:0crwdne158218:0"
 msgid "Ticket settings"
 msgstr "crwdns161946:0crwdne161946:0"
 
-#: desk/src/components/Settings/General/components/TicketSettings.vue:147
+#: desk/src/components/Settings/General/components/TicketSettings.vue:128
 msgid "Ticket status"
 msgstr "crwdns161948:0crwdne161948:0"
 
@@ -3564,23 +3560,23 @@ msgstr "crwdns158220:0crwdne158220:0"
 msgid "Ticket-Search Analysis"
 msgstr "crwdns158224:0crwdne158224:0"
 
-#: helpdesk/api/dashboard.py:160 helpdesk/api/dashboard.py:614
+#: helpdesk/api/dashboard.py:152 helpdesk/api/dashboard.py:293
 msgid "Tickets"
 msgstr "crwdns160556:0crwdne160556:0"
 
-#: helpdesk/api/dashboard.py:540
+#: helpdesk/api/dashboard.py:551
 msgid "Tickets by Channel"
 msgstr "crwdns160558:0crwdne160558:0"
 
-#: helpdesk/api/dashboard.py:500 helpdesk/api/dashboard.py:508
+#: helpdesk/api/dashboard.py:511 helpdesk/api/dashboard.py:519
 msgid "Tickets by Priority"
 msgstr "crwdns160560:0crwdne160560:0"
 
-#: helpdesk/api/dashboard.py:434 helpdesk/api/dashboard.py:442
+#: helpdesk/api/dashboard.py:445 helpdesk/api/dashboard.py:453
 msgid "Tickets by Team"
 msgstr "crwdns160562:0crwdne160562:0"
 
-#: helpdesk/api/dashboard.py:467 helpdesk/api/dashboard.py:475
+#: helpdesk/api/dashboard.py:478 helpdesk/api/dashboard.py:486
 msgid "Tickets by Type"
 msgstr "crwdns160564:0crwdne160564:0"
 
@@ -3651,19 +3647,19 @@ msgstr "crwdns158244:0crwdne158244:0"
 msgid "Total Ticket"
 msgstr "crwdns158246:0crwdne158246:0"
 
-#: helpdesk/api/dashboard.py:509
+#: helpdesk/api/dashboard.py:520
 msgid "Total Tickets by Priority"
 msgstr "crwdns160566:0crwdne160566:0"
 
-#: helpdesk/api/dashboard.py:443
+#: helpdesk/api/dashboard.py:454
 msgid "Total Tickets by Team"
 msgstr "crwdns160568:0crwdne160568:0"
 
-#: helpdesk/api/dashboard.py:476
+#: helpdesk/api/dashboard.py:487
 msgid "Total Tickets by Type"
 msgstr "crwdns160570:0crwdne160570:0"
 
-#: helpdesk/api/dashboard.py:165
+#: helpdesk/api/dashboard.py:157
 msgid "Total number of tickets created"
 msgstr "crwdns160572:0crwdne160572:0"
 
@@ -3893,15 +3889,15 @@ msgstr "crwdns158290:0crwdne158290:0"
 msgid "Yellow"
 msgstr "crwdns159154:0crwdne159154:0"
 
-#: helpdesk/api/dashboard.py:24
+#: helpdesk/api/dashboard.py:34
 msgid "You are not allowed to view this dashboard data."
 msgstr "crwdns158292:0crwdne158292:0"
 
-#: helpdesk/utils.py:165
+#: helpdesk/utils.py:167
 msgid "You are not permitted to access this resource."
 msgstr "crwdns158294:0crwdne158294:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:525
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:527
 msgid "You are not permitted to add a comment"
 msgstr "crwdns158296:0crwdne158296:0"
 
@@ -3941,15 +3937,11 @@ msgstr "crwdns161980:0crwdne161980:0"
 msgid "back to email event list"
 msgstr "crwdns159156:0crwdne159156:0"
 
-#: helpdesk/api/dashboard.py:583
-msgid "closed"
-msgstr "crwdns160574:0crwdne160574:0"
-
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:43
 msgid "customize {0}"
 msgstr "crwdns159158:0{0}crwdne159158:0"
 
-#: helpdesk/api/dashboard.py:334
+#: helpdesk/api/dashboard.py:215 helpdesk/api/dashboard.py:217
 msgid "days"
 msgstr "crwdns160576:0crwdne160576:0"
 
@@ -3970,7 +3962,7 @@ msgstr "crwdns159236:0crwdne159236:0"
 msgid "here"
 msgstr "crwdns159160:0crwdne159160:0"
 
-#: helpdesk/api/dashboard.py:280
+#: helpdesk/api/dashboard.py:196 helpdesk/api/dashboard.py:198
 msgid "hrs"
 msgstr "crwdns160578:0crwdne160578:0"
 
@@ -3984,24 +3976,12 @@ msgstr "crwdns158308:0crwdne158308:0"
 msgid "list"
 msgstr "crwdns158310:0crwdne158310:0"
 
-#: helpdesk/api/dashboard.py:582
-msgid "open"
-msgstr "crwdns160580:0crwdne160580:0"
-
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "purple"
 msgstr "crwdns159162:0crwdne159162:0"
 
-#: helpdesk/api/dashboard.py:642
-msgid "rated_tickets"
-msgstr "crwdns160582:0crwdne160582:0"
-
-#: helpdesk/api/dashboard.py:641
-msgid "rating"
-msgstr "crwdns160584:0crwdne160584:0"
-
-#: helpdesk/api/dashboard.py:384
+#: helpdesk/api/dashboard.py:233
 msgid "stars"
 msgstr "crwdns160586:0crwdne160586:0"
 

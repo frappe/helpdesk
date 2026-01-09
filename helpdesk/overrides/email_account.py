@@ -55,11 +55,13 @@ class CustomEmailAccount(EmailAccount):
             if self.service == "Frappe Mail":
                 frappe_mail_client = self.get_frappe_mail_client()
                 messages = frappe_mail_client.pull_raw(
-                    last_synced_at=self.last_synced_at
+                    last_received_at=self.last_synced_at
                 )
                 process_mail(messages)
                 self.db_set(
-                    "last_synced_at", messages["last_synced_at"], update_modified=False
+                    "last_synced_at",
+                    messages["last_received_at"],
+                    update_modified=False,
                 )
             else:
                 email_sync_rule = self.build_email_sync_rule()

@@ -42,6 +42,9 @@ export const useAuthStore = defineStore("auth", () => {
   const userName: ComputedRef<string> = computed(() => user__.value.user_name);
   const username: ComputedRef<string> = computed(() => user__.value.username);
   const timezone: ComputedRef<string> = computed(() => user__.value.time_zone);
+  const userTeams: ComputedRef<string[]> = computed(
+    () => user__.value.user_teams
+  );
   const language: ComputedRef<string> = computed(() => user__.value.language);
 
   function sessionUser() {
@@ -88,6 +91,7 @@ export const useAuthStore = defineStore("auth", () => {
     userName,
     username,
     timezone,
+    userTeams,
     language,
     user,
     logout,
