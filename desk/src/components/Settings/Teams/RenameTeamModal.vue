@@ -14,7 +14,7 @@
         :loading="renameTeamResource.loading"
         :disabled="teamName == dialog.teamName || teamName.trim() == ''"
       >
-        Confirm
+        {{ __("Confirm") }}
       </Button>
     </template>
   </Dialog>

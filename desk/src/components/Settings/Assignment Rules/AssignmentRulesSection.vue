@@ -93,6 +93,6 @@ watchDebounced(
   () => {
     validateAssignmentRule(props.name);
   },
-  { deep: true, debounce: 300 }
+  { deep: true, debounce: 300 },
 );
 </script>

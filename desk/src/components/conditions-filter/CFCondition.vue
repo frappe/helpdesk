@@ -341,7 +341,7 @@ function getOperators() {
         { label: "In", value: "in" },
         { label: "Not In", value: "not in" },
         { label: "Is", value: "is" },
-      ]
+      ],
     );
   }
   if (fieldname === "_assign") {
@@ -365,7 +365,7 @@ function getOperators() {
         { label: ">", value: ">" },
         { label: "<=", value: "<=" },
         { label: ">=", value: ">=" },
-      ]
+      ],
     );
   }
   if (typeSelect.includes(fieldtype)) {
@@ -376,7 +376,7 @@ function getOperators() {
         { label: "In", value: "in" },
         { label: "Not In", value: "not in" },
         { label: "Is", value: "is" },
-      ]
+      ],
     );
   }
   if (typeLink.includes(fieldtype)) {
@@ -389,7 +389,7 @@ function getOperators() {
         { label: "In", value: "in" },
         { label: "Not In", value: "not in" },
         { label: "Is", value: "is" },
-      ]
+      ],
     );
   }
   if (typeCheck.includes(fieldtype)) {
@@ -403,7 +403,7 @@ function getOperators() {
         { label: "In", value: "in" },
         { label: "Not In", value: "not in" },
         { label: "Is", value: "is" },
-      ]
+      ],
     );
   }
   if (typeDate.includes(fieldtype)) {
@@ -417,7 +417,7 @@ function getOperators() {
         { label: ">=", value: ">=" },
         { label: "<=", value: "<=" },
         { label: "Between", value: "between" },
-      ]
+      ],
     );
   }
   if (typeRating.includes(fieldtype)) {
@@ -430,7 +430,7 @@ function getOperators() {
         { label: "<", value: "<" },
         { label: ">=", value: ">=" },
         { label: "<=", value: "<=" },
-      ]
+      ],
     );
   }
   const op = options.find((o) => o.value == props.condition[1]);

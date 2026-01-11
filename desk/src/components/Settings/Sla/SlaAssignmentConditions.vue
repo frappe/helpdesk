@@ -35,6 +35,7 @@ import { slaDataErrors, validateSlaData } from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
 import CFConditions from "@/components/conditions-filter/CFConditions.vue";
 import { validateConditions } from "@/utils";
+import { __ } from "@/translation";
 
 const props = defineProps({
   conditions: {
@@ -55,13 +56,13 @@ const getConjunction = () => {
 
 const dropdownOptions = [
   {
-    label: "Add condition",
+    label: __("Add condition"),
     onClick: () => {
       addCondition();
     },
   },
   {
-    label: "Add condition group",
+    label: __("Add condition group"),
     onClick: () => {
       const conjunction = getConjunction();
       props.conditions.push(conjunction, [[]]);
@@ -85,6 +86,6 @@ watchDebounced(
   () => {
     validateSlaData("condition");
   },
-  { deep: true, debounce: 100 }
+  { deep: true, debounce: 100 },
 );
 </script>

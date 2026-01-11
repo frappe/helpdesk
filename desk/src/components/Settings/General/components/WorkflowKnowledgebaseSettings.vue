@@ -46,6 +46,7 @@
 import { HDSettingsSymbol } from "@/types";
 import { Switch } from "frappe-ui";
 import { inject } from "vue";
+import { __ } from "@/translation";
 
 const settingsData = inject(HDSettingsSymbol);
 </script>

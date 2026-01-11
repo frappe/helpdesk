@@ -15,7 +15,7 @@
     :mentions="agents"
     @change="editable ? (newComment = $event) : null"
     :extensions="[PreserveVideoControls]"
-    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    :uploadFunction="(file: any) => uploadFunction(file, doctype, ticketId)"
   >
     <template #bottom>
       <div v-if="editable" class="flex flex-col gap-2 px-6 md:pl-10 md:pr-9">
