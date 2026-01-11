@@ -20,7 +20,7 @@
         />
         <div class="flex flex-col items-center justify-center gap-1">
           <div class="text-xl font-medium">
-            {{ contact?.full_name ?? "Unknown" }}
+            {{ contact?.full_name ?? __("Unknown") }}
           </div>
           <div class="text-sm text-ink-gray-5">
             {{ contact?.mobile_no || contact?.phone }}
@@ -34,12 +34,12 @@
         <div v-if="!onCall" class="my-1 text-base">
           {{
             callStatus == "initiating"
-              ? "Initiating call..."
+              ? __("Initiating call...")
               : callStatus == "ringing"
-              ? "Ringing..."
+              ? __("Ringing...")
               : calling
-              ? "Calling..."
-              : "Incoming call..."
+              ? __("Calling...")
+              : __("Incoming call...")
           }}
         </div>
         <div v-if="onCall" class="flex gap-2">
@@ -62,7 +62,7 @@
             size="md"
             variant="solid"
             theme="red"
-            :label="'Cancel'"
+            :label="__('Cancel')"
             @click="cancelCall"
             class="rounded-lg"
           >
@@ -76,7 +76,7 @@
             size="md"
             variant="solid"
             theme="green"
-            :label="'Accept'"
+            :label="__('Accept')"
             class="rounded-lg"
             @click="acceptIncomingCall"
           >
@@ -88,7 +88,7 @@
             size="md"
             variant="solid"
             theme="red"
-            :label="'Reject'"
+            :label="__('Reject')"
             class="rounded-lg"
             @click="rejectIncomingCall"
           >
@@ -113,7 +113,7 @@
         class="relative flex !h-5 !w-5 items-center justify-center"
       />
       <div class="max-w-[120px] truncate">
-        {{ contact?.full_name ?? "Unknown" }}
+        {{ contact?.full_name ?? __("Unknown") }}
       </div>
     </div>
     <div v-if="onCall" class="flex items-center gap-2">
@@ -133,7 +133,7 @@
     </div>
     <div v-else-if="calling" class="flex items-center gap-3">
       <div class="my-1">
-        {{ callStatus == "ringing" ? "Ringing..." : "Calling..." }}
+        {{ callStatus == "ringing" ? __("Ringing...") : __("Calling...") }}
       </div>
       <Button
         variant="solid"
@@ -180,6 +180,7 @@ import { inject, ref, watch } from "vue";
 import LucidePhone from "~icons/lucide/phone";
 import CountUpTimer from "./CountUpTimer.vue";
 import MinimizeIcon from "./Icons/MinimizeIcon.vue";
+import { __ } from "@/translation";
 
 const telephonyStore = useTelephonyStore();
 
@@ -414,7 +415,7 @@ async function makeOutgoingCall(number) {
   } else {
     onCallFailed && onCallFailed();
     log.value = "Unable to make call.";
-    toast.error("Unable to make call.");
+    toast.error(__("Unable to make call."));
   }
 }
 

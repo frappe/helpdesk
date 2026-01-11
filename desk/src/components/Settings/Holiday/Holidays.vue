@@ -55,6 +55,7 @@ import HolidayList from "./HolidayList.vue";
 import { inject, Ref, ref, watch } from "vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { HolidayListResourceSymbol } from "@/types";
+import { __ } from "@/translation";
 
 const holidayList = inject(HolidayListResourceSymbol);
 const holidaySearchRef = inject<Ref<string>>("holidaySearchRef");
