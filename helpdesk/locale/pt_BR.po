@@ -3993,3 +3993,1431 @@ msgstr "estrelas"
 #: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json
 msgid "synonym"
 msgstr "sinônimo"
+
+msgid "A short description"
+msgstr "Uma breve descrição"
+
+msgid "A workday with this name already exists"
+msgstr "Um dia útil com este nome já existe"
+
+msgid "API Key"
+msgstr "Chave de API"
+
+msgid "API Key is required"
+msgstr "Chave de API é obrigatória"
+
+msgid "API Secret"
+msgstr "Segredo de API"
+
+msgid "Accept"
+msgstr "Aceitar"
+
+msgid "Account Name"
+msgstr "Nome da Conta"
+
+msgid "Account name is required"
+msgstr "Nome da conta é obrigatório"
+
+msgid "Activity"
+msgstr "Atividade"
+
+msgid "Add"
+msgstr "Adicionar"
+
+msgid "Add Filter"
+msgstr "Adicionar Filtro"
+
+msgid "Add Member"
+msgstr "Adicionar Membro"
+
+msgid "Add New Article"
+msgstr "Adicionar Novo Artigo"
+
+msgid "Add New Customer"
+msgstr "Adicionar Novo Cliente"
+
+msgid "Add Recurring Holiday"
+msgstr "Adicionar Feriado Recorrente"
+
+msgid "Add Saved reply"
+msgstr "Adicionar Resposta Salva"
+
+msgid "Add Sort"
+msgstr "Adicionar Ordenação"
+
+msgid "Add a comment on a ticket"
+msgstr "Adicionar um comentário em um ticket"
+
+msgid "Add a subject for the new ticket"
+msgstr "Adicione um assunto para o novo ticket"
+
+msgid "Add row"
+msgstr "Adicionar linha"
+
+msgid "Add workday"
+msgstr "Adicionar dia útil"
+
+msgid "Add your first Saved reply to get started."
+msgstr "Adicione sua primeira resposta salva para começar."
+
+msgid "Admin"
+msgstr "Administrador"
+
+msgid "All Views"
+msgstr "Todas as Visualizações"
+
+msgid "All available priorities have already been added"
+msgstr "Todas as prioridades disponíveis já foram adicionadas"
+
+msgid "All comments and emails of the ticket"
+msgstr "Todos os comentários e e-mails do ticket"
+
+msgid "And"
+msgstr "E"
+
+msgid "Any"
+msgstr "Qualquer"
+
+msgid "App Settings"
+msgstr "Configurações do Aplicativo"
+
+msgid "Are you sure you want to close this ticket?"
+msgstr "Tem certeza de que deseja fechar este ticket?"
+
+msgid "Are you sure you want to confirm this action?"
+msgstr "Tem certeza de que deseja confirmar esta ação?"
+
+msgid "Are you sure you want to delete these articles?"
+msgstr "Tem certeza de que deseja excluir estes artigos?"
+
+msgid "Are you sure you want to delete this article?"
+msgstr "Tem certeza de que deseja excluir este artigo?"
+
+msgid "Are you sure you want to delete this view?"
+msgstr "Tem certeza de que deseja excluir esta visualização?"
+
+msgid "Are you sure you want to discard changes?"
+msgstr "Tem certeza de que deseja descartar as alterações?"
+
+msgid "Are you sure you want to discard this article?"
+msgstr "Tem certeza de que deseja descartar este artigo?"
+
+msgid "Are you sure you want to discard this?"
+msgstr "Tem certeza de que deseja descartar isto?"
+
+msgid "Article created"
+msgstr "Artigo criado"
+
+msgid "Article deleted"
+msgstr "Artigo excluído"
+
+msgid "Article link copied to clipboard"
+msgstr "Link do artigo copiado para a área de transferência"
+
+msgid "Article moved"
+msgstr "Artigo movido"
+
+msgid "Article updated"
+msgstr "Artigo atualizado"
+
+msgid "Articles deleted"
+msgstr "Artigos excluídos"
+
+msgid "Articles moved"
+msgstr "Artigos movidos"
+
+msgid "Ask a question..."
+msgstr "Faça uma pergunta..."
+
+msgid "Assign"
+msgstr "Atribuir"
+
+msgid "Assign To"
+msgstr "Atribuir a"
+
+msgid "Assign a ticket to an agent"
+msgstr "Atribuir um ticket a um agente"
+
+msgid "Assign by workload"
+msgstr "Atribuir por carga de trabalho"
+
+msgid "Assign ticket"
+msgstr "Atribuir ticket"
+
+msgid "At least one email is required"
+msgstr "Pelo menos um e-mail é obrigatório"
+
+msgid "At least one team is required"
+msgstr "Pelo menos um time é obrigatório"
+
+msgid "At least one team member is required"
+msgstr "Pelo menos um membro do time é obrigatório"
+
+msgid "Auto-rotate"
+msgstr "Rotação automática"
+
+msgid "BCC"
+msgstr "CCO"
+
+msgid "BCC:"
+msgstr "CCO:"
+
+msgid "Between"
+msgstr "Entre"
+
+msgid "Bio"
+msgstr "Biografia"
+
+msgid "Busy"
+msgstr "Ocupado"
+
+msgid "CC"
+msgstr "CC"
+
+msgid "CC:"
+msgstr "CC:"
+
+msgid "CSV"
+msgstr "CSV"
+
+msgid "Call"
+msgstr "Chamada"
+
+msgid "Call Logs"
+msgstr "Registros de Chamada"
+
+msgid "Call Received By"
+msgstr "Chamada Recebida Por"
+
+msgid "Call duration in seconds"
+msgstr "Duração da chamada em segundos"
+
+msgid "Call ended"
+msgstr "Chamada encerrada"
+
+msgid "Caller"
+msgstr "Chamador"
+
+msgid "Calling Medium"
+msgstr "Meio de Chamada"
+
+msgid "Calling..."
+msgstr "Ligando..."
+
+msgid "Calls"
+msgstr "Chamadas"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Canceled"
+msgstr "Cancelado"
+
+msgid "Categories"
+msgstr "Categorias"
+
+msgid "Category created"
+msgstr "Categoria criada"
+
+msgid "Category deleted"
+msgstr "Categoria excluída"
+
+msgid "Category is required"
+msgstr "Categoria é obrigatória"
+
+msgid "Category merged"
+msgstr "Categoria mesclada"
+
+msgid "Category updated"
+msgstr "Categoria atualizada"
+
+msgid "Change photo"
+msgstr "Mudar foto"
+
+msgid "Change priority"
+msgstr "Mudar prioridade"
+
+msgid "Change status"
+msgstr "Mudar status"
+
+msgid "Change team"
+msgstr "Mudar time"
+
+msgid "Change ticket type"
+msgstr "Mudar tipo de ticket"
+
+msgid "Child Field"
+msgstr "Campo Filho"
+
+msgid "Choose who can view and use this response"
+msgstr "Escolha quem pode ver e usar esta resposta"
+
+msgid "Clear"
+msgstr "Limpar"
+
+msgid "Clear All"
+msgstr "Limpar Tudo"
+
+msgid "Clear Sort"
+msgstr "Limpar Ordenação"
+
+msgid "Clear all Filter"
+msgstr "Limpar todos os Filtros"
+
+msgid "Clear all filters"
+msgstr "Limpar todos os filtros"
+
+msgid "Close Ticket"
+msgstr "Fechar Ticket"
+
+msgid "Collapse"
+msgstr "Recolher"
+
+msgid "Comment (Ctrl + ⏎)"
+msgstr "Comentário (Ctrl + ⏎)"
+
+msgid "Comment (⌘ + ⏎)"
+msgstr "Comentário (⌘ + ⏎)"
+
+msgid "Comment cannot be empty"
+msgstr "O comentário não pode estar vazio"
+
+msgid "Comment deleted"
+msgstr "Comentário excluído"
+
+msgid "Comment updated"
+msgstr "Comentário atualizado"
+
+msgid "Comments"
+msgstr "Comentários"
+
+msgid "Communication"
+msgstr "Comunicação"
+
+msgid "Communication ID is required"
+msgstr "ID de Comunicação é obrigatório"
+
+msgid "Completed"
+msgstr "Concluído"
+
+msgid "Confirm Delete"
+msgstr "Confirmar Exclusão"
+
+msgid "Connect your support email"
+msgstr "Conecte seu e-mail de suporte"
+
+msgid "Contact created"
+msgstr "Contato criado"
+
+msgid "Contact invited successfully"
+msgstr "Contato convidado com sucesso"
+
+msgid "Contact updated"
+msgstr "Contato atualizado"
+
+msgid "Contact with email already exists"
+msgstr "Contato com este e-mail já existe"
+
+msgid "Copy ticket URL"
+msgstr "Copiar URL do ticket"
+
+msgid "Copy ticket id"
+msgstr "Copiar ID do ticket"
+
+msgid "Create & invite a contact"
+msgstr "Criar e convidar um contato"
+
+msgid "Create Category"
+msgstr "Criar Categoria"
+
+msgid "Create New"
+msgstr "Criar Novo"
+
+msgid "Create New Contact"
+msgstr "Criar Novo Contato"
+
+msgid "Create View"
+msgstr "Criar Visualização"
+
+msgid "Create a ticket"
+msgstr "Criar um ticket"
+
+msgid "Create an article"
+msgstr "Criar um artigo"
+
+msgid "Custom Range"
+msgstr "Intervalo Personalizado"
+
+msgid "Customer created"
+msgstr "Cliente criado"
+
+msgid "Customer name is required"
+msgstr "Nome do cliente é obrigatório"
+
+msgid "Customer portal"
+msgstr "Portal do cliente"
+
+msgid "Customer updated"
+msgstr "Cliente atualizado"
+
+msgid "Customers"
+msgstr "Clientes"
+
+msgid "Danger"
+msgstr "Perigo"
+
+msgid "Dashboard"
+msgstr "Painel"
+
+msgid "Day"
+msgstr "Dia"
+
+msgid "Default Incoming"
+msgstr "Entrada Padrão"
+
+msgid "Default Outgoing"
+msgstr "Saída Padrão"
+
+msgid "Default Views"
+msgstr "Visualizações Padrão"
+
+msgid "Default actions"
+msgstr "Ações padrão"
+
+msgid "Delete Article"
+msgstr "Excluir Artigo"
+
+msgid "Delete Comment"
+msgstr "Excluir Comentário"
+
+msgid "Delete View"
+msgstr "Excluir Visualização"
+
+msgid "Delete articles?"
+msgstr "Excluir artigos?"
+
+msgid "Delete category?"
+msgstr "Excluir categoria?"
+
+msgid "Delete team"
+msgstr "Excluir time"
+
+msgid "Detailed explanation"
+msgstr "Explicação detalhada"
+
+msgid "Disable Agent"
+msgstr "Desabilitar Agente"
+
+msgid "Disable global saved replies"
+msgstr "Desabilitar respostas globais salvas"
+
+msgid "Discard"
+msgstr "Descartar"
+
+msgid "Discard Article"
+msgstr "Descartar Artigo"
+
+msgid "Discard changes?"
+msgstr "Descartar alterações?"
+
+msgid "Discard?"
+msgstr "Descartar?"
+
+msgid "Docs"
+msgstr "Documentação"
+
+msgid "Download"
+msgstr "Baixar"
+
+msgid "Duplicate Saved reply"
+msgstr "Duplicar Resposta Salva"
+
+msgid "Duplicate View"
+msgstr "Duplicar Visualização"
+
+msgid "Duration"
+msgstr "Duração"
+
+msgid "Duration is required"
+msgstr "Duração é obrigatória"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Edit Call Log"
+msgstr "Editar Registro de Chamada"
+
+msgid "Edit Category"
+msgstr "Editar Categoria"
+
+msgid "Edit Holiday"
+msgstr "Editar Feriado"
+
+msgid "Edit Recurring Holiday"
+msgstr "Editar Feriado Recorrente"
+
+msgid "Edit Title"
+msgstr "Editar Título"
+
+msgid "Edit View"
+msgstr "Editar Visualização"
+
+msgid "Edit response and resolution"
+msgstr "Editar resposta e resolução"
+
+msgid "Edit workday"
+msgstr "Editar dia útil"
+
+msgid "Email ID"
+msgstr "ID de E-mail"
+
+msgid "Email ID is required"
+msgstr "ID de E-mail é obrigatório"
+
+msgid "Email Id"
+msgstr "ID do Email"
+
+msgid "Email Settings"
+msgstr "Configurações de E-mail"
+
+msgid "Email should not be empty"
+msgstr "E-mail não deve estar vazio"
+
+msgid "Emails"
+msgstr "E-mails"
+
+msgid "Empty - Choose a field to filter by"
+msgstr "Vazio - Escolha um campo para filtrar"
+
+msgid "Empty - Choose a field to sort by"
+msgstr "Vazio - Escolha um campo para ordenar"
+
+msgid "Enable Agent"
+msgstr "Habilitar Agente"
+
+msgid "Enable Incoming"
+msgstr "Habilitar Entrada"
+
+msgid "Enable Outgoing"
+msgstr "Habilitar Saída"
+
+msgid "End time"
+msgstr "Hora de término"
+
+msgid "End time is required"
+msgstr "Hora de término é obrigatória"
+
+msgid "End time must be after start time"
+msgstr "A hora de término deve ser após a hora de início"
+
+msgid "Enter a valid email"
+msgstr "Digite um e-mail válido"
+
+msgid "Enter a valid phone number"
+msgstr "Digite um número de telefone válido"
+
+msgid "Equals"
+msgstr "Igual a"
+
+msgid "Error updating customer"
+msgstr "Erro ao atualizar cliente"
+
+msgid "Error uploading file"
+msgstr "Erro ao carregar arquivo"
+
+msgid "Error: Unable to find the holiday to update"
+msgstr "Erro: Não foi possível encontrar o feriado para atualizar"
+
+msgid "Every fifth week"
+msgstr "Cada quinta semana"
+
+msgid "Every first week"
+msgstr "Cada primeira semana"
+
+msgid "Every fourth week"
+msgstr "Cada quarta semana"
+
+msgid "Every second week"
+msgstr "Cada segunda semana"
+
+msgid "Every third week"
+msgstr "Cada terceira semana"
+
+msgid "Every week"
+msgstr "Cada semana"
+
+msgid "Excel"
+msgstr "Excel"
+
+msgid "Expand"
+msgstr "Expandir"
+
+msgid "Expected First Response"
+msgstr "Resposta Inicial Esperada"
+
+msgid "Expected Resolution"
+msgstr "Resolução Esperada"
+
+msgid "Explore customer portal"
+msgstr "Explorar portal do cliente"
+
+msgid "Export"
+msgstr "Exportar"
+
+msgid "Export Type"
+msgstr "Tipo de Exportação"
+
+msgid "Filter"
+msgstr "Filtro"
+
+msgid "First Response"
+msgstr "Primeira Resposta"
+
+msgid "First name"
+msgstr "Primeiro nome"
+
+msgid "First name should not be empty"
+msgstr "O primeiro nome não deve estar vazio"
+
+msgid "First response time"
+msgstr "Tempo da primeira resposta"
+
+msgid "Frappe Mail Site"
+msgstr "Site de E-mail Frappe"
+
+msgid "From is required"
+msgstr "De é obrigatório"
+
+msgid "Full Name"
+msgstr "Nome Completo"
+
+msgid "Global"
+msgstr "Global"
+
+msgid "Help"
+msgstr "Ajuda"
+
+msgid "Hide Password"
+msgstr "Ocultar Senha"
+
+msgid "Holiday already exists"
+msgstr "Feriado já existe"
+
+msgid "Holiday with the same day and repetition already exists"
+msgstr "Feriado com o mesmo dia e repetição já existe"
+
+msgid "If enabled, outgoing emails can be sent from this account."
+msgstr "Se ativado, e-mails de saída podem ser enviados desta conta."
+
+msgid "In"
+msgstr "Em"
+
+msgid "In Progress"
+msgstr "Em Andamento"
+
+msgid "In progress"
+msgstr "em progresso"
+
+msgid "Incoming"
+msgstr "Entrada"
+
+msgid "Incoming call"
+msgstr "Chamada recebida"
+
+msgid "Incoming call..."
+msgstr "Chamada recebida..."
+
+msgid "Initiated"
+msgstr "Iniciado"
+
+msgid "Initiating call..."
+msgstr "Iniciando chamada..."
+
+msgid "Integrations"
+msgstr "Integrações"
+
+msgid "Invalid email"
+msgstr "E-mail inválido"
+
+msgid "Invalid email ID"
+msgstr "ID de E-mail inválido"
+
+msgid "Invalid file type, only PNG and JPG images are allowed"
+msgstr "Tipo de arquivo inválido, apenas imagens PNG e JPG são permitidas"
+
+msgid "Invalid page or not permitted to access"
+msgstr "Página inválida ou não permitida para acessar"
+
+msgid "Invalid phone number"
+msgstr "Número de telefone inválido"
+
+msgid "Invitation cancelled successfully"
+msgstr "Convite cancelado com sucesso"
+
+msgid "Invite agents"
+msgstr "Convidar agentes"
+
+msgid "Invite as user"
+msgstr "Convidar como usuário"
+
+msgid "Invites sent successfully!"
+msgstr "Convites enviados com sucesso!"
+
+msgid "Is"
+msgstr "É"
+
+msgid "Item(s) deleted successfully"
+msgstr "Item(ns) excluído(s) com sucesso"
+
+msgid "Jump to"
+msgstr "Ir para"
+
+msgid "Keyboard Shortcuts"
+msgstr "Atalhos de Teclado"
+
+msgid "Last 30 Days"
+msgstr "Últimos 30 Dias"
+
+msgid "Last 6 Months"
+msgstr "Últimos 6 Meses"
+
+msgid "Last 60 Days"
+msgstr "Últimos 60 Dias"
+
+msgid "Last 7 Days"
+msgstr "Últimos 7 Dias"
+
+msgid "Last 90 Days"
+msgstr "Últimos 90 Dias"
+
+msgid "Last Month"
+msgstr "Último Mês"
+
+msgid "Last Quarter"
+msgstr "Último Trimestre"
+
+msgid "Last Week"
+msgstr "Última Semana"
+
+msgid "Last Year"
+msgstr "Último Ano"
+
+msgid "Like"
+msgstr "Curtir"
+
+msgid "Link to a customer"
+msgstr "Link para um cliente"
+
+msgid "Link to a customer record"
+msgstr "Link para um registro de cliente"
+
+msgid "List View"
+msgstr "Visualização em Lista"
+
+msgid "Location"
+msgstr "Localização"
+
+msgid "Log a Call"
+msgstr "Registrar uma Chamada"
+
+msgid "Log out"
+msgstr "Sair"
+
+msgid "Login to Frappe Cloud"
+msgstr "Faça login no Frappe Cloud"
+
+msgid "Mail"
+msgstr "Correio"
+
+msgid "Make Private"
+msgstr "Tornar Privado"
+
+msgid "Make Public"
+msgstr "Tornar Público"
+
+msgid "Make a Call"
+msgstr "Fazer uma Chamada"
+
+msgid "Make call"
+msgstr "Fazer chamada"
+
+msgid "Manager"
+msgstr "Gerente"
+
+msgid "Mark all as read"
+msgstr "Marcar tudo como lido"
+
+msgid "Merge"
+msgstr "Mesclar"
+
+msgid "Merge Ticket"
+msgstr "Mesclar Ticket"
+
+msgid "Merge with another category"
+msgstr "Mesclar com outra categoria"
+
+msgid "Merge with another ticket"
+msgstr "Mesclar com outro ticket"
+
+msgid "Middle Name"
+msgstr "Nome do Meio"
+
+msgid "Mobile No"
+msgstr "Número de Celular"
+
+msgid "Mobile Number"
+msgstr "Número de Celular"
+
+msgid "Move"
+msgstr "Mover"
+
+msgid "Move To"
+msgstr "Mover Para"
+
+msgid "My Open Tickets"
+msgstr "Meus Tickets Abertos"
+
+msgid "My Team"
+msgstr "Meu Time"
+
+msgid "Name is required"
+msgstr "Nome é obrigatório"
+
+msgid "National holiday, etc."
+msgstr "Feriado nacional, etc."
+
+msgid "Navigation"
+msgstr "Navegação"
+
+msgid "New Article"
+msgstr "Novo Artigo"
+
+msgid "New Call Log"
+msgstr "Novo Registro de Chamada"
+
+msgid "New Comment"
+msgstr "Novo Comentário"
+
+msgid "New Email"
+msgstr "Novo E-mail"
+
+msgid "New Saved Reply"
+msgstr "Nova Resposta Salva"
+
+msgid "New Saved reply Name"
+msgstr "Novo Nome de Resposta Salva"
+
+msgid "New Subject"
+msgstr "Novo Assunto"
+
+msgid "New Ticket"
+msgstr "Novo Ticket"
+
+msgid "New Ticket Subject"
+msgstr "Assunto do Novo Ticket"
+
+msgid "New team"
+msgstr "Novo time"
+
+msgid "Next 6 Months"
+msgstr "Próximos 6 Meses"
+
+msgid "Next Month"
+msgstr "Próximo Mês"
+
+msgid "Next Quarter"
+msgstr "Próximo Trimestre"
+
+msgid "Next Week"
+msgstr "Próxima Semana"
+
+msgid "Next Year"
+msgstr "Próximo Ano"
+
+msgid "Next ticket"
+msgstr "Próximo ticket"
+
+msgid "No"
+msgstr "Não"
+
+msgid "No Activities"
+msgstr "Sem Atividades"
+
+msgid "No Answer"
+msgstr "Sem Resposta"
+
+msgid "No Call Logs Found"
+msgstr "Nenhum Registro de Chamada Encontrado"
+
+msgid "No Calls"
+msgstr "Sem Chamadas"
+
+msgid "No Comments"
+msgstr "Sem Comentários"
+
+msgid "No Contacts Found"
+msgstr "Nenhum Contato Encontrado"
+
+msgid "No Customers Found"
+msgstr "Nenhum Cliente Encontrado"
+
+msgid "No Data Found"
+msgstr "Nenhum Dado Encontrado"
+
+msgid "No Email Communications"
+msgstr "Nenhuma Comunicação de E-mail"
+
+msgid "No Saved Replies found"
+msgstr "Nenhuma Resposta Salva Encontrada"
+
+msgid "No Saved reply found"
+msgstr "Nenhuma resposta salva encontrada"
+
+msgid "No Tickets Found"
+msgstr "Nenhum Ticket Encontrado"
+
+msgid "No answer"
+msgstr "Sem resposta"
+
+msgid "No changes to save"
+msgstr "Sem alterações para salvar"
+
+msgid "No items in the list"
+msgstr "Nenhum item na lista"
+
+msgid "No name found"
+msgstr "Nenhum nome encontrado"
+
+msgid "No new notifications"
+msgstr "Nenhuma notificação nova"
+
+msgid "No priorities in the list"
+msgstr "Nenhuma prioridade na lista"
+
+msgid "No results"
+msgstr "Nenhum resultado"
+
+msgid "No tickets found to preview."
+msgstr "Nenhum ticket encontrado para visualizar."
+
+msgid "No workdays in the list"
+msgstr "Nenhum dia útil na lista"
+
+msgid "Not Equals"
+msgstr "Não é igual a"
+
+msgid "Not In"
+msgstr "Não em"
+
+msgid "Not Like"
+msgstr "Não gosto"
+
+msgid "Not Saved"
+msgstr "Não Salvo"
+
+msgid "Not Set"
+msgstr "Não Definido"
+
+msgid "Notifications"
+msgstr "Notificações"
+
+msgid "Open command palette"
+msgstr "Abrir paleta de comandos"
+
+msgid "Open comment box"
+msgstr "Abrir caixa de comentários"
+
+msgid "Open help"
+msgstr "Abrir ajuda"
+
+msgid "Open reply box"
+msgstr "Abrir caixa de resposta"
+
+msgid "Open settings"
+msgstr "Abrir configurações"
+
+msgid "Other"
+msgstr "Outro"
+
+msgid "Outgoing"
+msgstr "Saída"
+
+msgid "Owner"
+msgstr "Proprietário"
+
+msgid "Parent Field"
+msgstr "Campo Pai"
+
+msgid "Password is required"
+msgstr "Senha é obrigatória"
+
+msgid "Period"
+msgstr "Período"
+
+msgid "Personal"
+msgstr "Pessoal"
+
+msgid "Phone"
+msgstr "Telefone"
+
+msgid "Phone Nos"
+msgstr "Números de Telefone"
+
+msgid "Pick an option"
+msgstr "Escolha uma opção"
+
+msgid "Pin View"
+msgstr "Fixar Visualização"
+
+msgid "Please enter a description"
+msgstr "Por favor, digite uma descrição"
+
+msgid "Please enter a subject to continue"
+msgstr "Por favor, digite um assunto para continuar"
+
+msgid "Please enter a valid date"
+msgstr "Por favor, digite uma data válida"
+
+msgid "Please enter a valid phone number"
+msgstr "Por favor, digite um número de telefone válido"
+
+msgid "Please fill all the required fields"
+msgstr "Por favor, preencha todos os campos obrigatórios"
+
+msgid "Please fix the errors in the form"
+msgstr "Por favor, corrija os erros no formulário"
+
+msgid "Please select a child field first"
+msgstr "Por favor, selecione primeiro um campo filho"
+
+msgid "Please select a day of the week"
+msgstr "Por favor, selecione um dia da semana"
+
+msgid "Please select a parent field first"
+msgstr "Por favor, selecione primeiro um campo pai"
+
+msgid "Please select a parent value first"
+msgstr "Por favor, selecione primeiro um valor pai"
+
+msgid "Please select a priority"
+msgstr "Por favor, selecione uma prioridade"
+
+msgid "Please select at least one repetition option"
+msgstr "Por favor, selecione pelo menos uma opção de repetição"
+
+msgid "Please select start and end date first"
+msgstr "Por favor, selecione primeiro a data de início e término"
+
+msgid "Portal"
+msgstr "Portal"
+
+msgid "Presets"
+msgstr "Predefinições"
+
+msgid "Press enter to search"
+msgstr "Pressione Enter para pesquisar"
+
+msgid "Preview"
+msgstr "Visualizar"
+
+msgid "Previous ticket"
+msgstr "Ticket anterior"
+
+msgid "Private Views"
+msgstr "Visualizações Privadas"
+
+msgid "Product experts"
+msgstr "Especialistas em Produtos"
+
+msgid "Public Views"
+msgstr "Visualizações Públicas"
+
+msgid "Publish"
+msgstr "Publicar"
+
+msgid "Queued"
+msgstr "Enfileirado"
+
+msgid "Random"
+msgstr "Aleatório"
+
+msgid "Rate this ticket"
+msgstr "Avalie este ticket"
+
+msgid "Reject"
+msgstr "Rejeitar"
+
+msgid "Remove photo"
+msgstr "Remover foto"
+
+msgid "Rename Subject"
+msgstr "Renomear Assunto"
+
+msgid "Repetition"
+msgstr "Repetição"
+
+msgid "Reply"
+msgstr "Responder"
+
+msgid "Reply on a ticket"
+msgstr "Responder em um ticket"
+
+msgid "Resolution time"
+msgstr "Tempo de resolução"
+
+msgid "Resolution time must be a positive number"
+msgstr "O tempo de resolução deve ser um número positivo"
+
+msgid "Response is required"
+msgstr "Resposta é obrigatória"
+
+msgid "Response time"
+msgstr "Tempo de resposta"
+
+msgid "Response time must be a positive number"
+msgstr "O tempo de resposta deve ser um número positivo"
+
+msgid "Restrict visibility to these teams"
+msgstr "Restringir visibilidade para estes times"
+
+msgid "Ringing"
+msgstr "Tocando"
+
+msgid "Ringing..."
+msgstr "Tocando..."
+
+msgid "SLA Policies"
+msgstr "Políticas de SLA"
+
+msgid "Save Changes"
+msgstr "Salvar Alterações"
+
+msgid "Saved Replies"
+msgstr "Respostas Salvas"
+
+msgid "Saved Views"
+msgstr "Visualizações Salvas"
+
+msgid "Saved reply deleted"
+msgstr "Resposta salva excluída"
+
+msgid "Saved reply duplicated"
+msgstr "Resposta salva duplicada"
+
+msgid "Saved reply saved"
+msgstr "Resposta salva foi salva"
+
+msgid "Saved reply updated"
+msgstr "Resposta salva atualizada"
+
+msgid "Scope"
+msgstr "Escopo"
+
+msgid "Search agents"
+msgstr "Pesquisar agentes"
+
+msgid "Search by keyword"
+msgstr "Pesquisar por palavra-chave"
+
+msgid "Search ticket"
+msgstr "Pesquisar ticket"
+
+msgid "Search tickets, comments, and communications..."
+msgstr "Pesquisar tickets, comentários e comunicações..."
+
+msgid "Search values"
+msgstr "Pesquisar valores"
+
+msgid "Searched for:"
+msgstr "Pesquisado por:"
+
+msgid "Searching..."
+msgstr "Pesquisando..."
+
+msgid "Select"
+msgstr "Selecionar"
+
+msgid "Select All"
+msgstr "Selecionar Tudo"
+
+msgid "Select Category"
+msgstr "Selecionar Categoria"
+
+msgid "Select Child Field values"
+msgstr "Selecionar valores de Campo Filho"
+
+msgid "Select Priority"
+msgstr "Selecionar Prioridade"
+
+msgid "Select Range"
+msgstr "Selecionar Intervalo"
+
+msgid "Select Ticket"
+msgstr "Selecionar Ticket"
+
+msgid "Select Workday"
+msgstr "Selecionar Dia Útil"
+
+msgid "Select a rating"
+msgstr "Selecione uma classificação"
+
+msgid "Select an option"
+msgstr "Selecione uma opção"
+
+msgid "Select child field value"
+msgstr "Selecione o valor do campo filho"
+
+msgid "Select parent field value"
+msgstr "Selecione o valor do campo pai"
+
+msgid "Select teams"
+msgstr "Selecionar times"
+
+msgid "Select ticket to preview"
+msgstr "Selecione o ticket para visualizar"
+
+msgid "Select time"
+msgstr "Selecione a hora"
+
+msgid "Send"
+msgstr "Enviar"
+
+msgid "Send (Ctrl + ⏎)"
+msgstr "Enviar (Ctrl + ⏎)"
+
+msgid "Send (⌘ + ⏎)"
+msgstr "Enviar (⌘ + ⏎)"
+
+msgid "Sending..."
+msgstr "Enviando..."
+
+msgid "Set"
+msgstr "Definir"
+
+msgid "Set Phone Number"
+msgstr "Definir Número de Telefone"
+
+msgid "Set default priority"
+msgstr "Definir prioridade padrão"
+
+msgid "Setup SLA"
+msgstr "Configurar SLA"
+
+msgid "Share"
+msgstr "Compartilhar"
+
+msgid "Shortcuts"
+msgstr "Atalhos"
+
+msgid "Show Password"
+msgstr "Mostrar Senha"
+
+msgid "Show keyboard shortcuts"
+msgstr "Mostrar atalhos de teclado"
+
+msgid "Some error occurred while renaming saved reply"
+msgstr "Ocorreu algum erro ao renomear a resposta salva"
+
+msgid "Sort"
+msgstr "Ordenar"
+
+msgid "Source"
+msgstr "Fonte"
+
+msgid "Split Ticket"
+msgstr "Dividir Ticket"
+
+msgid "Split into new ticket"
+msgstr "Dividir em novo ticket"
+
+msgid "Split ticket"
+msgstr "Dividir ticket"
+
+msgid "Start time"
+msgstr "Hora de início"
+
+msgid "Start time is required"
+msgstr "Hora de início é obrigatória"
+
+msgid "Status is required"
+msgstr "Status é obrigatório"
+
+msgid "Subject is required"
+msgstr "Assunto é obrigatório"
+
+msgid "Submit"
+msgstr "Enviar"
+
+msgid "Support"
+msgstr "Suporte"
+
+msgid "TO:"
+msgstr "PARA:"
+
+msgid "Tell us more"
+msgstr "Conte-nos mais"
+
+msgid "This Month"
+msgstr "Este Mês"
+
+msgid "This Quarter"
+msgstr "Este Trimestre"
+
+msgid "This Week"
+msgstr "Esta Semana"
+
+msgid "This Year"
+msgstr "Este Ano"
+
+msgid "This action is irreversible."
+msgstr "Esta ação é irreversível."
+
+msgid "This field is required"
+msgstr "Este campo é obrigatório"
+
+msgid "This will move all articles of the"
+msgstr "Isso moverá todos os artigos de"
+
+msgid "This workday already exists"
+msgstr "Este dia útil já existe"
+
+msgid "Ticket Management"
+msgstr "Gerenciamento de Tickets"
+
+msgid "Ticket Subject"
+msgstr "Assunto do Ticket"
+
+msgid "Ticket closed"
+msgstr "Ticket fechado"
+
+msgid "Ticket merged successfully"
+msgstr "Ticket mesclado com sucesso"
+
+msgid "Ticket reopen status"
+msgstr "Status de reabertura do ticket"
+
+msgid "Ticket split successfully"
+msgstr "Ticket dividido com sucesso"
+
+msgid "Ticket to merged with is required"
+msgstr "Ticket para mesclar é obrigatório"
+
+msgid "Ticket updated"
+msgstr "Ticket atualizado"
+
+msgid "Timespan"
+msgstr "Período de Tempo"
+
+msgid "Title is required"
+msgstr "Título é obrigatório"
+
+msgid "To is required"
+msgstr "Para é obrigatório"
+
+msgid "Today"
+msgstr "Hoje"
+
+msgid "Tomorrow"
+msgstr "Amanhã"
+
+msgid "Type a message"
+msgstr "Digite uma mensagem"
+
+msgid "Type emails"
+msgstr "Digite e-mails"
+
+msgid "Type is required"
+msgstr "Tipo é obrigatório"
+
+msgid "Type something"
+msgstr "Digite algo"
+
+msgid "Unable to make call."
+msgstr "Não foi possível fazer a chamada."
+
+msgid "Unknown"
+msgstr "Desconhecido"
+
+msgid "Unpin View"
+msgstr "Desafixar Visualização"
+
+msgid "Unpublish"
+msgstr "Desopublish"
+
+msgid "Update Holiday"
+msgstr "Atualizar Feriado"
+
+msgid "Upload photo"
+msgstr "Carregar foto"
+
+msgid "User Image"
+msgstr "Imagem do Usuário"
+
+msgid "User Settings"
+msgstr "Configurações do Usuário"
+
+msgid "Username"
+msgstr "Nome do Usuário"
+
+msgid "View Name"
+msgstr "Nome da Visualização"
+
+msgid "Where"
+msgstr "Onde"
+
+msgid "Workday added"
+msgstr "Dia útil adicionado"
+
+msgid "Workday updated"
+msgstr "Dia útil atualizado"
+
+msgid "Write your article here..."
+msgstr "Escreva seu artigo aqui..."
+
+msgid "Yes"
+msgstr "Sim"
+
+msgid "Yesterday"
+msgstr "Ontem"
+
+msgid "added a"
+msgstr "adicionou um"
+
+msgid "assigned you a ticket"
+msgstr "atribuiu-lhe um ticket"
+
+msgid "category to the selected category. This change is irreversible!"
+msgstr "categoria para a categoria selecionada. Esta mudança é irreversível!"
+
+msgid "child"
+msgstr "filho"
+
+msgid "comment"
+msgstr "comentário"
+
+msgid "created"
+msgstr "criado"
+
+msgid "deleted"
+msgstr "excluído"
+
+msgid "emails/ comments"
+msgstr "e-mails/comentários"
+
+msgid "from this email onwards will be moved to new ticket."
+msgstr "deste e-mail em diante será movido para o novo ticket."
+
+msgid "has reopened the ticket"
+msgstr "reabrindo o ticket"
+
+msgid "in"
+msgstr "em"
+
+msgid "mentioned you in ticket"
+msgstr "mencionou você no ticket"
+
+msgid "viewed this"
+msgstr "visualizou isto"
+
+msgid "will be moved to the selected ticket."
+msgstr "será movido para o ticket selecionado."
