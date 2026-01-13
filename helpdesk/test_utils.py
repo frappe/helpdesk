@@ -88,12 +88,15 @@ def make_new_sla():
 
 def make_holiday_list():
     if not frappe.db.exists("HD Service Holiday List", TEST_HOLIDAY_LIST_NAME):
+        # from_date = first date of current year
+        from_date = datetime(datetime.today().year, 1, 1).date()
+        to_date = datetime(datetime.today().year + 1, 1, 15).date()
         frappe.get_doc(
             {
                 "doctype": "HD Service Holiday List",
                 "holiday_list_name": TEST_HOLIDAY_LIST_NAME,
-                "from_date": datetime.today().date(),
-                "to_date": (datetime.today() + timedelta(days=365)).date(),
+                "from_date": from_date,
+                "to_date": to_date,
             }
         ).insert()
 
@@ -206,4 +209,5 @@ def make_status(name: str = "Test Status", category: str = "Open"):
             "is_default": 0,
         }
     )
+    return doc.insert(ignore_if_duplicate=True)
     return doc.insert(ignore_if_duplicate=True)
