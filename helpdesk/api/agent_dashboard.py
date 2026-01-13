@@ -5,7 +5,7 @@ import frappe
 from frappe.query_builder import DocType
 from frappe.query_builder.functions import Avg, Cast, Count, Function, Max
 
-from helpdesk.utils import agent_only
+from helpdesk.utils import agent_only, format_time_difference
 
 
 def calculate_percentage_change(current_value: float, previous_value: float) -> float:
@@ -478,19 +478,148 @@ def get_avg_time_metrics(period: str = "6m"):
     }
 
 
-@frappe.whitelist()
-@agent_only
-def get_pending_tickets():
+def _get_priority_range():
+    priorities = frappe.get_all("HD Ticket Priority", fields="integer_value")
+    if priorities:
+        min_priority = min(priorities, key=lambda x: x["integer_value"])[
+            "integer_value"
+        ]
+        max_priority = max(priorities, key=lambda x: x["integer_value"])[
+            "integer_value"
+        ]
+    else:
+        min_priority = max_priority = 0
+    return min_priority, max_priority
+
+
+def _get_upcoming_sla_tickets(limit=10):
+    filters = [
+        ["sla", "!=", ""],
+        ["agreement_status", "in", ["First Response Due", "Resolution Due"]],
+        ["status_category", "!=", "Closed"],
+        ["_assign", "like", f"%{frappe.session.user}%"],
+        ["response_by", ">", frappe.utils.now()],
+    ]
+
+    tickets = frappe.get_list(
+        "HD Ticket",
+        fields=[
+            "name",
+            "subject",
+            "status",
+            "priority",
+            "priority.integer_value as priority_integer_value",
+            "agent_group",
+            "response_by",
+            "resolution_by",
+            "agreement_status",
+            "creation",
+        ],
+        filters=filters,
+        order_by="response_by desc",
+        limit=limit,
+    )
+
+    for ticket in tickets:
+        agreement_status = ticket.get("agreement_status", "")
+        if agreement_status == "Resolution Due":
+            time_until = format_time_difference(
+                ticket.get("resolution_by"), context="until"
+            )
+            reason_text = (
+                f"Resolution due in {time_until}"
+                if time_until != "overdue"
+                else "Resolution overdue"
+            )
+        else:
+            time_until = format_time_difference(
+                ticket.get("response_by"), context="until"
+            )
+            reason_text = (
+                f"Response due in {time_until}"
+                if time_until != "overdue"
+                else "Response overdue"
+            )
+        ticket["reason"] = {
+            "type": "upcoming_sla",
+            "text": reason_text,
+        }
+
+    total_count = frappe.db.count("HD Ticket", filters=filters)
+
+    return tickets, total_count
+
+
+def _get_new_tickets(limit=10):
+    one_day_ago = frappe.utils.add_to_date(frappe.utils.now_datetime(), hours=-24)
+
+    todo = DocType("ToDo")
+    assigned_tickets = (
+        frappe.qb.from_(todo)
+        .select(todo.reference_name)
+        .distinct()
+        .where(todo.reference_type == "HD Ticket")
+        .where(todo.allocated_to == frappe.session.user)
+        .where(todo.creation >= one_day_ago)
+        .where(todo.status == "Open")
+        .run(as_dict=False)
+    )
+    ticket_names = [row[0] for row in assigned_tickets]
+
+    if not ticket_names:
+        return [], 0
+
     allowed_statuses = frappe.get_all(
         "HD Ticket Status", filters={"category": ["=", "Open"]}, pluck="name"
     )
 
-    # Define DocTypes
+    tickets = frappe.get_list(
+        "HD Ticket",
+        fields=[
+            "name",
+            "subject",
+            "status",
+            "priority",
+            "priority.integer_value as priority_integer_value",
+            "agent_group",
+            "creation",
+        ],
+        filters=[
+            ["name", "in", ticket_names],
+            ["_assign", "like", f"%{frappe.session.user}%"],
+            ["status", "in", allowed_statuses],
+        ],
+        order_by="creation desc",
+        limit=limit,
+    )
+
+    for ticket in tickets:
+        ticket["reason"] = {
+            "type": "new_tickets",
+            "text": "Recently assigned",
+        }
+
+    total_count = frappe.db.count(
+        "HD Ticket",
+        filters=[
+            ["name", "in", ticket_names],
+            ["_assign", "like", f"%{frappe.session.user}%"],
+            ["status", "in", allowed_statuses],
+        ],
+    )
+
+    return tickets, total_count
+
+
+def _get_pending_response_tickets(limit=10):
+    allowed_statuses = frappe.get_all(
+        "HD Ticket Status", filters={"category": ["=", "Open"]}, pluck="name"
+    )
+
     ticket = DocType("HD Ticket")
     priority = DocType("HD Ticket Priority")
     communication = DocType("Communication")
 
-    # Subquery for last customer reply (received communications)
     last_customer_subq = (
         frappe.qb.from_(communication)
         .select(
@@ -502,7 +631,6 @@ def get_pending_tickets():
         .groupby(communication.reference_name)
     )
 
-    # Subquery for last agent reply (sent communications)
     last_agent_subq = (
         frappe.qb.from_(communication)
         .select(
@@ -514,7 +642,6 @@ def get_pending_tickets():
         .groupby(communication.reference_name)
     )
 
-    # Build base query with joins and conditions
     base_query = (
         frappe.qb.from_(ticket)
         .left_join(priority)
@@ -539,11 +666,9 @@ def get_pending_tickets():
         )
     )
 
-    # Count query for total pending tickets
     count_result = base_query.select(Count(ticket.name).as_("total")).run(as_dict=True)
-    total_pending_tickets = count_result[0].total if count_result else 0
+    total_count = count_result[0].total if count_result else 0
 
-    # Main query with select, order and limit
     query = (
         base_query.select(
             ticket.name,
@@ -552,37 +677,55 @@ def get_pending_tickets():
             ticket.priority,
             priority.integer_value.as_("priority_integer_value"),
             ticket.agent_group,
-            ticket.response_by,
-            ticket.resolution_by,
-            ticket.resolution_date,
-            ticket.agreement_status,
-            ticket.status_category,
-            ticket.first_responded_on,
             ticket.creation,
             last_customer_subq.last_customer_reply,
-            last_agent_subq.last_agent_reply,
         )
-        .orderby(last_customer_subq.last_customer_reply, order=frappe.qb.desc)
-        .limit(5)
+        .orderby(last_customer_subq.last_customer_reply, order=frappe.qb.asc)
+        .limit(limit)
     )
 
-    pending_tickets = query.run(as_dict=True)
+    tickets = query.run(as_dict=True)
 
-    # Get priority range (cache this query as it's used frequently)
-    priorities = frappe.get_all("HD Ticket Priority", fields="integer_value")
-    if priorities:
-        min_priority = min(priorities, key=lambda x: x["integer_value"])[
-            "integer_value"
-        ]
-        max_priority = max(priorities, key=lambda x: x["integer_value"])[
-            "integer_value"
-        ]
-    else:
-        min_priority = max_priority = 0
+    for ticket in tickets:
+        time_ago = format_time_difference(ticket.get("last_customer_reply"))
+        ticket["reason"] = {
+            "type": "pending",
+            "text": f"Pending for {time_ago}",
+        }
+
+    return tickets, total_count
+
+
+@frappe.whitelist()
+@agent_only
+def get_pending_tickets(ticket_type="all"):
+    min_priority, max_priority = _get_priority_range()
+
+    if ticket_type == "upcoming_sla":
+        tickets, total_count = _get_upcoming_sla_tickets(limit=10)
+    elif ticket_type == "new_tickets":
+        tickets, total_count = _get_new_tickets(limit=10)
+    elif ticket_type == "pending":
+        tickets, total_count = _get_pending_response_tickets(limit=10)
+    else:  # "all" - combine all types with priority ordering
+        sla_tickets, sla_total = _get_upcoming_sla_tickets(limit=10)
+        pending_tickets, pending_total = _get_pending_response_tickets(limit=10)
+        new_tickets, new_total = _get_new_tickets(limit=10)
+
+        seen = set()
+        tickets = []
+        for ticket in sla_tickets + pending_tickets + new_tickets:
+            if ticket["name"] not in seen:
+                seen.add(ticket["name"])
+                tickets.append(ticket)
+                if len(tickets) >= 10:
+                    break
+
+        total_count = sla_total + pending_total + new_total
 
     return {
-        "tickets": pending_tickets,
-        "total_pending_tickets": total_pending_tickets,
+        "tickets": tickets,
+        "total_pending_tickets": total_count,
         "min_priority": min_priority,
         "max_priority": max_priority,
     }

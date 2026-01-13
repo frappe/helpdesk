@@ -437,3 +437,30 @@ def is_version_16():
 
     version = get_frappe_version()
     return version.startswith("16.")
+
+
+def format_time_difference(dt, context="ago"):
+    if not dt:
+        return ""
+    now = frappe.utils.now_datetime()
+    if isinstance(dt, str):
+        dt = frappe.utils.get_datetime(dt)
+
+    if context == "until":
+        diff = dt - now
+        past_label = "overdue"
+    else:
+        diff = now - dt
+        past_label = "0m"
+
+    total_seconds = diff.total_seconds()
+
+    if total_seconds < 0:
+        return past_label
+
+    if total_seconds < 3600:
+        return f"{int(total_seconds // 60)}m"
+    elif total_seconds < 86400:
+        return f"{int(total_seconds // 3600)}h"
+    else:
+        return f"{int(total_seconds // 86400)}d"

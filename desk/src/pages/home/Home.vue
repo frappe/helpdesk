@@ -296,10 +296,10 @@ const chartsDropdown = computed(() => {
       onClick: () =>
         addChart("pending_tickets", {
           w: 50,
-          h: 27,
+          h: 43,
           minW: 25,
-          minH: 27,
-          maxH: 27,
+          minH: 43,
+          maxH: 43,
         }),
     },
   ].filter((chart) => {

@@ -1,7 +1,10 @@
 <template>
   <div class="rounded-md p-4 grow w-full h-full overflow-hidden">
-    <div class="text-lg font-semibold text-ink-gray-8">
-      {{ __("Pending Tickets") }}
+    <div class="flex items-center justify-between">
+      <div class="text-lg font-semibold text-ink-gray-8">
+        {{ __("Pending Tickets") }}
+      </div>
+      <TabButtons :buttons="chartTabs" v-model="currentTab" />
     </div>
     <div class="mt-5 h-full overflow-auto hide-scrollbar -mx-2">
       <div class="min-w-[1050px]">
@@ -11,7 +14,7 @@
           <div class="col-span-1">{{ __("Status") }}</div>
           <div class="col-span-1">{{ __("Priority") }}</div>
           <div class="col-span-2">{{ __("Team") }}</div>
-          <div class="col-span-2">{{ __("Last Replied") }}</div>
+          <div class="col-span-2">{{ __("Reason") }}</div>
         </div>
         <hr class="mx-2" />
         <div v-if="chartConfig?.tickets?.length > 0">
@@ -35,18 +38,33 @@
                 {{ ticket.agent_group || __("Not Assigned") }}
               </div>
               <div class="col-span-2 truncate">
-                <span v-if="ticket.last_customer_reply" class="text-ink-gray-7">
-                  {{ dayjs.tz(ticket.last_customer_reply).fromNow() }}
-                </span>
+                <div
+                  v-if="ticket.reason"
+                  class="flex items-center gap-1 text-ink-gray-7"
+                >
+                  <TimerIcon
+                    v-if="ticket.reason.type === 'upcoming_sla'"
+                    class="size-4 flex-shrink-0"
+                  />
+                  <TicketPlusIcon
+                    v-else-if="ticket.reason.type === 'new_tickets'"
+                    class="size-4 flex-shrink-0"
+                  />
+                  <CalendarIcon
+                    v-else-if="ticket.reason.type === 'pending'"
+                    class="size-4 flex-shrink-0"
+                  />
+                  <span class="truncate">{{ ticket.reason.text }}</span>
+                </div>
                 <span v-else class="text-ink-gray-4">{{
-                  __("Not replied")
+                  __("No reason")
                 }}</span>
               </div>
             </div>
-            <hr class="mx-2" />
+            <hr class="mx-2" v-if="index < chartConfig?.tickets?.length - 1" />
           </div>
           <div
-            v-if="chartConfig?.tickets?.length == 5"
+            v-if="chartConfig?.tickets?.length == 10"
             class="p-2 pt-3 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none"
             @click="goToAllPendingTickets"
           >
@@ -55,7 +73,7 @@
           </div>
         </div>
         <div v-else class="relative">
-          <div v-for="i in 5" :key="i">
+          <div v-for="i in 10" :key="i">
             <div class="grid grid-cols-10 gap-2 py-3 px-3">
               <div class="col-span-1 h-4 bg-surface-gray-1" />
               <div class="col-span-3 h-4 bg-surface-gray-1" />
@@ -64,7 +82,7 @@
               <div class="col-span-2 h-4 bg-surface-gray-1" />
               <div class="col-span-2 h-4 bg-surface-gray-1" />
             </div>
-            <hr class="mx-2" v-if="i < 5" />
+            <hr class="mx-2" v-if="i < 10" />
           </div>
           <div
             class="absolute inset-0 flex flex-col items-center justify-center"
@@ -86,11 +104,13 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
-import dayjs from "dayjs";
-import { Badge, createResource } from "frappe-ui";
+import { Badge, createResource, FeatherIcon, TabButtons } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import TimerIcon from "~icons/lucide/timer";
+import TicketPlusIcon from "~icons/lucide/ticket-plus";
+import CalendarIcon from "~icons/lucide/calendar";
 
 const props = defineProps({
   data: {
@@ -101,6 +121,25 @@ const props = defineProps({
 
 const router = useRouter();
 const { userId } = storeToRefs(useAuthStore());
+const currentTab = ref("all");
+const chartTabs = [
+  {
+    label: "All",
+    value: "all",
+  },
+  {
+    label: "Upcoming SLA",
+    value: "upcoming_sla",
+  },
+  {
+    label: "New Tickets",
+    value: "new_tickets",
+  },
+  {
+    label: "Pending",
+    value: "pending",
+  },
+];
 
 const chartConfig = computed(() => {
   const _data = getPendingTicketsResource.fetched
@@ -158,7 +197,12 @@ const goToAllPendingTickets = () => {
 
 onMounted(() => {
   if (!Array.isArray(props.data.tickets)) {
-    getPendingTicketsResource.fetch();
+    getPendingTicketsResource.fetch({ ticket_type: currentTab.value });
   }
+});
+
+// Watch for tab changes and fetch tickets
+watch(currentTab, (newTab) => {
+  getPendingTicketsResource.fetch({ ticket_type: newTab });
 });
 </script>
