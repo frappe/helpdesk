@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import frappe
+from frappe.core.doctype.communication.test_communication import create_email_account
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
@@ -17,6 +18,7 @@ def before_tests():
     # frappe.flags.mute_emails = True
     make_holiday_list()
     make_new_sla()
+    create_email_account()
     frappe.db.commit()  # nosemgrep
 
 
@@ -210,4 +212,25 @@ def make_status(name: str = "Test Status", category: str = "Open"):
         }
     )
     return doc.insert(ignore_if_duplicate=True)
-    return doc.insert(ignore_if_duplicate=True)
+
+
+def add_comment(
+    ticket: str,
+    content: str = "This is a test comment.",
+    comment_by: str | None = None,
+    save: bool = True,
+):
+    """
+    Creates a test HD Ticket Comment for a given ticket.
+    """
+    comment = frappe.get_doc(
+        {
+            "doctype": "HD Ticket Comment",
+            "reference_ticket": ticket,
+            "content": content,
+            "comment_by": comment_by,
+        }
+    )
+    if save:
+        return comment.insert()
+    return comment
