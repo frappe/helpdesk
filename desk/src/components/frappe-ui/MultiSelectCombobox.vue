@@ -182,12 +182,15 @@
                 >
                   <Button
                     v-if="!areAllOptionsSelected"
-                    label="Select All"
+                    :label="__('Select All')"
                     @click.stop="selectAll"
                   />
                 </div>
                 <div v-else class="flex items-center justify-end">
-                  <Button label="Clear" @click.stop="selectedValue = null" />
+                  <Button
+                    :label="__('Clear')"
+                    @click.stop="selectedValue = null"
+                  />
                 </div>
               </slot>
             </div>
@@ -208,6 +211,7 @@ import {
 } from "@headlessui/vue";
 import { LoadingIndicator, Popover } from "frappe-ui";
 import { nextTick } from "vue";
+import { __ } from "@/translation";
 import LucideCheckSquare from "~icons/lucide/check-square";
 import LucideSquare from "~icons/lucide/square";
 

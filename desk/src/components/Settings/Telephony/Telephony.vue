@@ -43,7 +43,7 @@
         </div>
         <div class="grid grid-cols-2 gap-4 mt-4">
           <div class="flex flex-col gap-1.5">
-            <FormLabel label="Default medium" />
+            <FormLabel :label="__('Default medium')" />
             <Select
               v-if="telephonyAgent.doc"
               :options="telephonyProviders"
@@ -61,7 +61,7 @@
             v-if="telephonyAgent.doc && twilio.doc?.enabled"
           >
             <FormControl
-              label="Twilio number"
+              :label="__('Twilio number')"
               type="text"
               required
               v-model="telephonyAgent.doc.twilio_number"
@@ -73,7 +73,7 @@
             v-if="telephonyAgent.doc && exotel.doc?.enabled"
           >
             <FormControl
-              label="Exotel number"
+              :label="__('Exotel number')"
               type="text"
               required
               v-model="telephonyAgent.doc.exotel_number"
@@ -95,7 +95,9 @@
           </div>
         </div>
         <div class="mt-6" v-if="twilio?.doc">
-          <div class="text-base font-semibold text-ink-gray-8">Twilio</div>
+          <div class="text-base font-semibold text-ink-gray-8">
+            {{ __("Twilio") }}
+          </div>
           <div class="mt-4">
             <div class="grid grid-cols-2 gap-4">
               <Checkbox
@@ -113,37 +115,37 @@
             <div class="grid grid-cols-2 gap-4 mt-4" v-if="twilio.doc.enabled">
               <div class="flex flex-col gap-2">
                 <FormControl
-                  label="Account SID"
+                  :label="__('Account SID')"
                   required
                   v-model="twilio.doc.account_sid"
-                  placeholder="Account SID"
+                  :placeholder="__('Account SID')"
                 />
                 <ErrorMessage :message="twilioErrors.accountSid" />
               </div>
               <div class="flex flex-col gap-2">
                 <Password
-                  label="Auth Token"
+                  :label="__('Auth Token')"
                   required
                   v-model="twilio.doc.auth_token"
-                  placeholder="Auth Token"
+                  :placeholder="__('Auth Token')"
                 />
                 <ErrorMessage :message="twilioErrors.authToken" />
               </div>
               <FormControl
                 v-if="twilio.doc.api_key"
-                label="API Key"
+                :label="__('API Key')"
                 v-model="twilio.doc.api_key"
                 disabled
               />
               <Password
                 v-if="twilio.doc.api_secret"
-                label="API Secret"
+                :label="__('API Secret')"
                 v-model="twilio.doc.api_secret"
                 disabled
               />
               <Autocomplete
                 v-if="twilio.originalDoc?.account_sid && twilioApps.length > 0"
-                label="TwiML App Name"
+                :label="__('TwiML App Name')"
                 :model-value="twilio.doc.app_name"
                 @update:modelValue="twilio.doc.app_name = $event.value"
                 :options="twilioApps"
@@ -162,7 +164,7 @@
               </Autocomplete>
               <FormControl
                 v-if="twilio.doc.twiml_sid"
-                label="TwiML App SID"
+                :label="__('TwiML App SID')"
                 v-model="twilio.doc.twiml_sid"
                 disabled
               />
@@ -170,7 +172,9 @@
           </div>
         </div>
         <div class="mt-6" v-if="exotel?.doc">
-          <div class="text-base font-semibold text-ink-gray-8">Exotel</div>
+          <div class="text-base font-semibold text-ink-gray-8">
+            {{ __("Exotel") }}
+          </div>
           <div class="mt-4">
             <div class="grid grid-cols-2 gap-4">
               <Checkbox
@@ -188,47 +192,47 @@
             <div class="grid grid-cols-2 gap-4 mt-4" v-if="exotel.doc.enabled">
               <div class="flex flex-col gap-2">
                 <FormControl
-                  label="Account SID"
+                  :label="__('Account SID')"
                   required
                   v-model="exotel.doc.account_sid"
-                  placeholder="Account SID"
+                  :placeholder="__('Account SID')"
                 />
                 <ErrorMessage :message="exotelErrors.accountSid" />
               </div>
               <div class="flex flex-col gap-2">
                 <FormControl
-                  label="Webhook Verify Token"
+                  :label="__('Webhook Verify Token')"
                   required
                   v-model="exotel.doc.webhook_verify_token"
-                  placeholder="Webhook Verify Token"
+                  :placeholder="__('Webhook Verify Token')"
                 />
                 <ErrorMessage :message="exotelErrors.webhookVerifyToken" />
               </div>
 
               <div class="flex flex-col gap-2">
                 <FormControl
-                  label="API Key"
+                  :label="__('API Key')"
                   required
                   v-model="exotel.doc.api_key"
-                  placeholder="API Key"
+                  :placeholder="__('API Key')"
                 />
                 <ErrorMessage :message="exotelErrors.apiKey" />
               </div>
               <div class="flex flex-col gap-2">
                 <Password
-                  label="API Token"
+                  :label="__('API Token')"
                   required
                   v-model="exotel.doc.api_token"
-                  placeholder="API Token"
+                  :placeholder="__('API Token')"
                 />
                 <ErrorMessage :message="exotelErrors.apiToken" />
               </div>
               <div class="flex flex-col gap-2">
                 <FormControl
-                  label="Subdomain"
+                  :label="__('Subdomain')"
                   required
                   v-model="exotel.doc.subdomain"
-                  placeholder="Subdomain"
+                  :placeholder="__('Subdomain')"
                 />
                 <ErrorMessage :message="exotelErrors.subdomain" />
               </div>
