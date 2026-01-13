@@ -22,7 +22,7 @@
             <div class="mb-3 flex flex-col gap-1">
               <SidebarLink
                 class="relative"
-                label="Notifications"
+                :label="__('Notifications')"
                 :icon="LucideBell"
                 :on-click="() => (sidebarOpened = false)"
                 :is-expanded="true"
@@ -40,7 +40,7 @@
               <SidebarLink
                 v-if="!isCustomerPortal"
                 class="relative"
-                label="Dashboard"
+                :label="__('Dashboard')"
                 :icon="LucideLayoutDashboard"
                 :to="'Dashboard'"
                 :is-active="isActiveTab('Dashboard')"
@@ -120,6 +120,7 @@ import { Section } from "@/components";
 import SidebarLink from "@/components/SidebarLink.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useNotificationStore } from "@/stores/notification";
+import { __ } from "@/translation";
 
 import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { currentView, useView } from "@/composables/useView";

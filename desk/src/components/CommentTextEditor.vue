@@ -69,7 +69,7 @@
           </div>
           <div class="flex items-center justify-end space-x-2 w-[40%]">
             <Button
-              label="Discard"
+              :label="__('Discard')"
               @click="
                 () => {
                   newComment = '';
@@ -110,6 +110,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { AttachmentItem } from "@/components/";
 import { AttachmentIcon } from "@/components/icons/";
 import { useTyping } from "@/composables/realtime";
+import { __ } from "@/translation";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
