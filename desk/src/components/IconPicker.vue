@@ -37,12 +37,12 @@
             <div class="flex-1">
               <FormControl
                 type="text"
-                :placeholder="__('Search by keyword')"
+                placeholder="Search by keyword"
                 v-model="search"
                 :debounce="300"
               />
             </div>
-            <Button @click="setRandom">{{ __("Random") }}</Button>
+            <Button @click="setRandom">Random</Button>
           </div>
           <div class="w-96"></div>
           <div class="px-3" v-for="(emojis, group) in emojiGroups" :key="group">
@@ -72,7 +72,6 @@
 import { ref, computed } from "vue";
 import { Popover } from "frappe-ui";
 import { gemoji } from "gemoji";
-import { __ } from "@/translation";
 
 const search = ref("");
 const emoji = defineModel();
@@ -100,7 +99,7 @@ const emojiGroups = computed(() => {
     group.push(_emoji);
   }
   if (!Object.keys(groups).length) {
-    groups[__("No results")] = [];
+    groups["No results"] = [];
   }
   return groups;
 });

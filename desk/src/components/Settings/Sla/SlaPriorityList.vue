@@ -18,7 +18,7 @@
             column.key === 'resolution_time',
         }"
       >
-        {{ column.label }}
+        {{ __(column.label) }}
         <span v-if="column.isRequired" class="text-red-500">*</span>
       </div>
     </div>
@@ -131,27 +131,27 @@ const addRow = () => {
 
 const columns = computed(() => [
   {
-    label: __("Priority"),
+    label: "Priority",
     key: "priority",
     isRequired: true,
   },
   {
-    label: __("Default priority"),
+    label: "Default priority",
     key: "default_priority",
     isRequired: true,
   },
   {
-    label: __("First response time"),
+    label: "First response time",
     key: "response_time",
     isRequired: true,
   },
   {
-    label: __("Resolution time"),
+    label: "Resolution time",
     key: "resolution_time",
     isRequired: true,
   },
   //   slaData.value.apply_sla_for_resolution && {
-  //     label: __("Resolution time"),
+  //     label: "Resolution time",
   //     key: "resolution_time",
   //     isRequired: Boolean(slaData.value.apply_sla_for_resolution),
   //   },

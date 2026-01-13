@@ -11,7 +11,7 @@
               v-if="group.group.label != ''"
               class="flex items-end gap-1 w-full"
             >
-              <span>{{ group.group.label }}</span>
+              <span>{{ __(group.group.label) }}</span>
               <span class="text-xs text-ink-gray-5"
                 >{{
                   group.rows.length > 1
@@ -89,10 +89,8 @@ const actions = (group) => {
       onClick: () => action.onClick(group),
     };
   });
-  if (group.group.label == __("General")) {
-    _actions = _actions.filter(
-      (action) => action.label === __("Add New Article")
-    );
+  if (group.group.label == "General") {
+    _actions = _actions.filter((action) => action.label === "Add New Article");
   }
   return _actions;
 };
