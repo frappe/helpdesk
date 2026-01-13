@@ -1,91 +1,97 @@
 {
-    "actions": [],
-    "autoname": "hash",
-    "creation": "2022-08-25 23:50:58.598316",
-    "doctype": "DocType",
-    "editable_grid": 1,
-    "engine": "InnoDB",
-    "field_order": [
-        "reference_ticket",
-        "commented_by",
-        "is_pinned",
-        "column_break_3",
-        "content",
-        "reactions"
-    ],
-    "fields": [
-        {
-            "fieldname": "content",
-            "fieldtype": "Text Editor",
-            "label": "Content"
-        },
-        {
-            "fieldname": "reference_ticket",
-            "fieldtype": "Link",
-            "in_list_view": 1,
-            "label": "Reference Ticket",
-            "search_index": 1,
-            "options": "HD Ticket"
-        },
-        {
-            "fieldname": "column_break_3",
-            "fieldtype": "Column Break"
-        },
-        {
-            "fieldname": "commented_by",
-            "fieldtype": "Link",
-            "in_list_view": 1,
-            "label": "Commented By",
-            "options": "User"
-        },
-        {
-            "default": "0",
-            "fieldname": "is_pinned",
-            "fieldtype": "Check",
-            "label": "Is pinned"
-        },
-        {
-            "fieldname": "reactions",
-            "fieldtype": "Table",
-            "label": "Reactions",
-            "options": "HD Comment Reaction"
-        }
-    ],
-    "index_web_pages_for_search": 1,
-    "links": [],
-    "modified": "2024-12-09 17:00:00.000000",
-    "modified_by": "Administrator",
-    "module": "Helpdesk",
-    "name": "HD Ticket Comment",
-    "naming_rule": "Random",
-    "owner": "Administrator",
-    "permissions": [
-        {
-            "create": 1,
-            "delete": 1,
-            "email": 1,
-            "export": 1,
-            "print": 1,
-            "read": 1,
-            "report": 1,
-            "role": "System Manager",
-            "share": 1,
-            "write": 1
-        },
-        {
-            "create": 1,
-            "delete": 1,
-            "email": 1,
-            "export": 1,
-            "print": 1,
-            "read": 1,
-            "report": 1,
-            "role": "Agent",
-            "share": 1,
-            "write": 1
-        }
-    ],
-    "sort_field": "modified",
-    "sort_order": "DESC",
-    "states": []
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2022-08-25 23:50:58.598316",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "reference_ticket",
+  "commented_by",
+  "is_pinned",
+  "column_break_3",
+  "content",
+  "section_break_qtvl",
+  "reactions"
+ ],
+ "fields": [
+  {
+   "fieldname": "content",
+   "fieldtype": "Text Editor",
+   "label": "Content"
+  },
+  {
+   "fieldname": "reference_ticket",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Reference Ticket",
+   "options": "HD Ticket",
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "commented_by",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Commented By",
+   "options": "User"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_pinned",
+   "fieldtype": "Check",
+   "label": "Is pinned"
+  },
+  {
+   "fieldname": "reactions",
+   "fieldtype": "Table",
+   "label": "Reactions",
+   "options": "HD Comment Reaction"
+  },
+  {
+   "fieldname": "section_break_qtvl",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-13 11:47:02.079229",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Ticket Comment",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
 }
