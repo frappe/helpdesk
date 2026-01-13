@@ -4,9 +4,11 @@ import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
-from frappe.utils import get_user_info_for_avatar, now_datetime
+from frappe.utils import get_user_info_for_avatar, getdate, now_datetime
 from frappe.utils.caching import redis_cache
+from frappe.query_builder import DocType
 from pypika import Criterion, Order
+from datetime import timedelta
 
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
@@ -780,3 +782,75 @@ def get_ticket_activities(ticket: str):
 def get_ticket_assignees(ticket: str):
     assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
     return assignees
+
+def is_outside_working_hours():
+    """Return True if current time is outside SLA or Helpdesk working hours."""
+
+    current_date = getdate()
+    current_time = now_datetime() 
+
+    current_td = timedelta(
+        hours=current_time.hour,
+        minutes=current_time.minute,
+        seconds=current_time.second,
+        microseconds=current_time.microsecond
+    )
+    day_name = current_date.strftime("%A")
+    HDHoliday = DocType("HD Holiday")
+
+    # holidays = frappe.get_list(
+    #     "HD Holiday", 
+    #     pluck="holiday_date"
+    # )
+
+
+
+    sla_names = frappe.get_list("HD Service Level Agreement", filters={"enabled": 1}, pluck="name")
+    
+    if not sla_names:
+        return True
+
+    for name in sla_names:
+
+        holidays = (
+        frappe.qb.from_(HDHoliday)
+        .select(HDHoliday.holiday_date)
+        .where(HDHoliday.parent == name)
+        .run(pluck=True)
+        )
+
+        # If today is a holiday for this SLA, return True immediately
+        if current_date in holidays:
+            return True
+
+        sla_start_date, sla_end_date = frappe.db.get_value(
+            "HD Service Level Agreement", name, ["start_date", "end_date"]
+        )
+
+        if not (sla_start_date <= current_date <= sla_end_date):
+            continue
+
+        sla = frappe.get_doc("HD Service Level Agreement", name)
+        working_hours = sla.get_working_hours()
+
+        if day_name in working_hours:
+            start_time, end_time = working_hours[day_name]
+            
+            if start_time <= current_td < end_time:
+                return False
+    
+    return True
+
+
+
+@frappe.whitelist()
+def get_outside_working_hour_setting():
+    settings = frappe.db.get_single_value("HD Settings", "working_hours_notification")
+    if(not settings):
+        return 
+    msg_content = frappe.db.get_single_value("HD Settings", "working_hours_message")
+    message = msg_content or "Your ticket is outside office hours, unless it is a critical issue, you will get a response by Monday"
+
+    return {
+        "outside_working_hours_message": message if is_outside_working_hours() else "",
+        }
