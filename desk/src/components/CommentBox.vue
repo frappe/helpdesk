@@ -84,14 +84,9 @@
         v-if="!editable && enableCommentReactions"
       >
         <Popover>
-          <template #target="{ togglePopover, isOpen }">
+          <template #target="{ togglePopover }">
             <button
-              class="flex items-center justify-center rounded-full px-2 py-1 text-gray-500 transition-colors"
-              :class="
-                isOpen
-                  ? 'bg-gray-200 text-gray-700'
-                  : 'bg-gray-100 hover:bg-gray-200 hover:text-gray-700'
-              "
+              class="flex h-full items-center justify-center rounded-full bg-surface-gray-2 px-2 py-1 text-ink-gray-6 transition hover:bg-surface-gray-3"
               @click="togglePopover()"
             >
               <ReactionIcon class="w-4 h-4" />
@@ -99,13 +94,13 @@
           </template>
           <template #body>
             <div
-              class="bg-white rounded-lg shadow-lg p-2 border border-gray-200"
+              class="bg-surface-white rounded-lg shadow-lg p-2 border border-outline-gray-2"
             >
-              <div class="grid grid-cols-6 gap-1">
+              <div class="grid grid-cols-6 gap-2">
                 <button
                   v-for="emoji in emojiList"
                   :key="emoji"
-                  class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-lg transition-colors"
+                  class="size-6 flex items-center justify-center rounded hover:bg-surface-gray-2 text-lg transition-colors"
                   @click="handleReaction(emoji)"
                 >
                   {{ emoji }}
@@ -130,7 +125,7 @@
               :class="
                 reaction.current_user_reacted
                   ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-surface-gray-3 text-ink-gray-6 hover:bg-surface-gray-4'
               "
               @click="handleReaction(reaction.emoji)"
             >
@@ -179,7 +174,6 @@ import {
   Avatar,
   Dialog,
   Dropdown,
-  FeatherIcon,
   Popover,
   TextEditor,
   Tooltip,

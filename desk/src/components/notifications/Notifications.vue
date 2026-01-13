@@ -75,7 +75,7 @@
           </div>
           <div class="flex items-center gap-2">
             <div class="text-sm text-gray-600">
-              {{ dayjs.tz(n.creation).fromNow() }}
+              {{ dayjs.tz(n.modified).fromNow() }}
             </div>
             <div v-if="!n.read" class="h-1.5 w-1.5 rounded-full bg-blue-400" />
           </div>
