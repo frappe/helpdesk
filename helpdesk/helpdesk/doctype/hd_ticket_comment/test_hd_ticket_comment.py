@@ -13,6 +13,8 @@ from helpdesk.helpdesk.doctype.hd_ticket_comment.hd_ticket_comment import (
 
 class TestHDTicketComment(FrappeTestCase):
     def setUp(self):
+        frappe.db.set_single_value("HD Settings", "enable_comment_reactions", 1)
+
         if not frappe.db.exists("User", "test_user1@example.com"):
             frappe.get_doc(
                 {
@@ -66,6 +68,8 @@ class TestHDTicketComment(FrappeTestCase):
         if hasattr(self, "test_ticket") and self.test_ticket:
             if frappe.db.exists("HD Ticket", self.test_ticket.name):
                 frappe.delete_doc("HD Ticket", self.test_ticket.name, force=True)
+
+        frappe.db.set_single_value("HD Settings", "enable_comment_reactions", 0)
 
     def test_one_reaction_per_user(self):
         frappe.set_user("test_user2@example.com")
