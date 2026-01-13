@@ -16,7 +16,7 @@ repos:
         additional_dependencies:
           - flake8-bugbear
           - flake8-comprehensions
-          - flake8-simplify
+          - flake8-simplify==0.30.0
         args: ['--config', '.github/helpers/.flake8_strict']
 
   - repo: https://github.com/pre-commit/mirrors-prettier

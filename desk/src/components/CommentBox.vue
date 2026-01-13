@@ -63,11 +63,7 @@
         :editable="editable"
         :bubble-menu="textEditorMenuButtons"
         :mentions="[]"
-        @change="
-          (event: string) => {
-            _content = event;
-          }
-        "
+        @change="(event:string) => {_content = event}"
       >
         <template #bottom v-if="editable">
           <div class="flex flex-row-reverse gap-2">
