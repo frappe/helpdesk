@@ -33,6 +33,10 @@
   "auto_close_tickets",
   "auto_close_status",
   "auto_close_after_days",
+  "section_break_ylvs",
+  "working_hours_notification",
+  "working_hours_message",
+  "column_break_fzef",
   "status_section",
   "default_ticket_status",
   "column_break_yfbu",
@@ -462,12 +466,35 @@
    "fieldname": "disable_saved_replies_global_scope",
    "fieldtype": "Check",
    "label": "Disable saved replies with scope 'Global'"
+  },
+  {
+   "fieldname": "section_break_ylvs",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "working_hours_notification",
+   "fieldname": "working_hours_message",
+   "fieldtype": "Small Text",
+   "label": "Custom Outside Working Hours Message",
+   "mandatory_depends_on": "eval: doc.working_hours_notification",
+   "placeholder": "Add your Custom Message here"
+  },
+  {
+   "default": "0",
+   "description": "Let customers know they're raising a ticket outside working hours, and when they can expect a reply.",
+   "fieldname": "working_hours_notification",
+   "fieldtype": "Check",
+   "label": "Apply outside working hours"
+  },
+  {
+   "fieldname": "column_break_fzef",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-12-18 10:37:02.103507",
+ "modified": "2026-01-13 13:11:55.193431",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
