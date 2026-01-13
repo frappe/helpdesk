@@ -62,6 +62,7 @@
         :content="_content"
         :editable="editable"
         :bubble-menu="textEditorMenuButtons"
+        :mentions="[]"
         @change="
           (event: string) => {
             _content = event;
