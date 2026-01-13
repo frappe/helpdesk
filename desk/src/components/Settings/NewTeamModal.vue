@@ -2,10 +2,10 @@
   <Dialog
     v-model="show"
     :options="{
-      title: 'New team',
+      title: __('New team'),
       actions: [
         {
-          label: 'Create',
+          label: __('Create'),
           variant: 'solid',
           onClick: () => {
             newTeam.submit();
@@ -18,8 +18,8 @@
       <form class="space-y-2" @submit.prevent="newTeam.submit">
         <FormControl
           v-model="newTeamTitle"
-          label="Title"
-          placeholder="Product experts"
+          :label="__('Title')"
+          :placeholder="__('Product experts')"
           type="text"
         />
       </form>
@@ -30,6 +30,7 @@
 <script setup lang="ts">
 import { createResource, toast } from "frappe-ui";
 import { ref } from "vue";
+import { __ } from "@/translation";
 
 const emit = defineEmits(["create"]);
 const show = defineModel();
@@ -46,11 +47,11 @@ const newTeam = createResource({
     };
   },
   validate(params) {
-    if (!params.doc.team_name) return "Title is required";
+    if (!params.doc.team_name) return __("Title is required");
   },
   auto: false,
   onSuccess() {
-    toast.success("Team created");
+    toast.success(__("Team created"));
     newTeamTitle.value = null;
     show.value = false;
     emit("create");

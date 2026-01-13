@@ -628,6 +628,7 @@ export interface HDSettings {
   defaultTicketType: string;
   preferKnowledgeBase: boolean;
   skipEmailWorkflow: boolean;
+  disableSavedRepliesGlobalScope: boolean;
 }
 
 export interface HolidayList {
@@ -644,6 +645,16 @@ export interface SlaPolicy {
 
 export interface Team {
   name: string;
+  team: string;
+}
+
+export interface SavedReply {
+  name: string;
+  title: string;
+  message: string;
+  scope: string;
+  teams: Team[];
+  owner: string;
 }
 
 export type APIOptions = DropdownOption[] | string[] | [];
@@ -694,6 +705,10 @@ export const SlaPolicyListResourceSymbol: InjectionKey<
 
 export const TeamListResourceSymbol: InjectionKey<ListResource<Team>> =
   Symbol("teamListResource");
+
+export const SavedReplyListResourceSymbol: InjectionKey<
+  ListResource<SavedReply>
+> = Symbol("savedReplyListResource");
 
 declare global {
   interface Window {

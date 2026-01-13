@@ -25,13 +25,7 @@
         <TicketNavigation :key="ticket.name" />
         <!-- Custom Actions -->
         <div v-if="normalActions.length" class="flex gap-2">
-          <Button
-            v-for="action in normalActions"
-            :key="action.label"
-            :label="action.label"
-            @click="action.onClick()"
-            v-bind="action"
-          >
+          <Button v-for="action in normalActions" v-bind="action">
             <template v-if="action.icon" #prefix>
               <FeatherIcon :name="action.icon" class="h-4 w-4" />
             </template>
@@ -104,6 +98,7 @@ import {
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
 import { Breadcrumbs, call, Dropdown, toast } from "frappe-ui";
+import { __ } from "@/translation";
 import {
   computed,
   ComputedRef,
@@ -166,7 +161,7 @@ const statusDropdown = computed(() => {
   }));
 });
 const breadcrumbs = computed(() => {
-  let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
+  let items = [{ label: __("Tickets"), route: { name: "TicketsAgent" } }];
   if (route.query.view) {
     const currView: ComputedRef<View> = findView(route.query.view as string);
     if (currView) {
@@ -206,7 +201,7 @@ const defaultActions = computed(() => {
 
   if (showMergeOption.value) {
     items.push({
-      label: "Merge Ticket",
+      label: __("Merge Ticket"),
       icon: LucideMerge,
       condition: () => !ticket.value.doc.is_merged,
       onClick: () => (showMergeModal.value = true),
@@ -214,7 +209,7 @@ const defaultActions = computed(() => {
   }
   return [
     {
-      group: "Default actions",
+      group: __("Default actions"),
       hideLabel: true,
       items,
     },

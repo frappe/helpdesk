@@ -4,6 +4,7 @@
       {{ attrs.label }}
     </label>
     <Autocomplete
+      class="w-full"
       ref="autocomplete"
       :options="options.data"
       v-model="value"

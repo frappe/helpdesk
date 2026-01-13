@@ -4,19 +4,19 @@ fail_fast: false
 
 repos:
   - repo: https://github.com/psf/black
-    rev: 22.6.0
+    rev: 25.11.0
     hooks:
       - id: black
         types_or: [python, pyi]
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 5.0.4
+    rev: 7.3.0
     hooks:
       - id: flake8
         additional_dependencies:
           - flake8-bugbear
           - flake8-comprehensions
-          - flake8-simplify
+          - flake8-simplify==0.30.0
         args: ['--config', '.github/helpers/.flake8_strict']
 
   - repo: https://github.com/pre-commit/mirrors-prettier

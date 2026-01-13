@@ -1,18 +1,18 @@
 interface DocType {
-    name: string;
-    creation: string;
-    modified: string;
-    owner: string;
-    modified_by: string;
-  }
+  name: string;
+  creation: string;
+  modified: string;
+  owner: string;
+  modified_by: string;
+}
 
-  interface ChildDocType extends DocType {
-    parent?: string;
-    parentfield?: string;
-    parenttype?: string;
-    idx?: number;
-  }
-  
+interface ChildDocType extends DocType {
+  parent?: string;
+  parentfield?: string;
+  parenttype?: string;
+  idx?: number;
+}
+
 // Last updated: 2025-08-25 12:29:02.646874
 export interface HDTicketStatus extends DocType {
   /** Color: Select */
@@ -45,7 +45,7 @@ export interface HDTicketStatus extends DocType {
   parsed_color?: string;
 }
 
-// Last updated: 2025-09-04 19:44:36.006061
+// Last updated: 2025-10-26 17:07:55.243874
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;
@@ -70,7 +70,13 @@ export interface HDTicket extends DocType {
   /** Response By: Datetime */
   response_by?: string;
   /** SLA Status: Select */
-  agreement_status?: '' | 'First Response Due' | 'Resolution Due' | 'Failed' | 'Fulfilled' | 'Paused';
+  agreement_status?:
+    | ""
+    | "First Response Due"
+    | "Resolution Due"
+    | "Failed"
+    | "Fulfilled"
+    | "Paused";
   /** Resolution By: Datetime */
   resolution_by?: string;
   /** SLA Creation: Datetime */

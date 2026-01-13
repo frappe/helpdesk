@@ -78,10 +78,10 @@ import { computed, provide, ref, watch } from "vue";
 import { __ } from "@/translation";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { HDSettingsSymbol } from "@/types";
+import { HDSettings, HDSettingsSymbol } from "@/types";
 
 const isDirty = ref(false);
-const initialData = ref(null);
+const initialData = ref<null | string>(null);
 const settingsData = ref({
   brandName: "",
   brandLogo: "",
@@ -100,6 +100,7 @@ const settingsData = ref({
   defaultTicketType: "",
   preferKnowledgeBase: false,
   skipEmailWorkflow: false,
+  disableSavedRepliesGlobalScope: false,
 });
 const disableSignup = ref(false);
 
@@ -112,7 +113,7 @@ const settingsDataResource = createResource({
     name: "HD Settings",
   },
   auto: true,
-  onSuccess(data) {
+  onSuccess(data: HDSettings) {
     settingsData.value = transformData(data);
     initialData.value = JSON.stringify(settingsData.value);
   },
@@ -150,10 +151,12 @@ const saveSettingsResource = createResource({
         default_ticket_type: settingsData.value.defaultTicketType,
         prefer_knowledge_base: settingsData.value.preferKnowledgeBase,
         skip_email_workflow: settingsData.value.skipEmailWorkflow,
+        disable_saved_replies_global_scope:
+          settingsData.value.disableSavedRepliesGlobalScope,
       },
     };
   },
-  onSuccess(data) {
+  onSuccess(data: HDSettings) {
     settingsData.value = transformData(data);
     initialData.value = JSON.stringify(settingsData.value);
   },
@@ -180,6 +183,9 @@ const transformData = (data: any) => {
     defaultTicketType: data.default_ticket_type,
     preferKnowledgeBase: Boolean(data.prefer_knowledge_base),
     skipEmailWorkflow: Boolean(data.skip_email_workflow),
+    disableSavedRepliesGlobalScope: Boolean(
+      data.disable_saved_replies_global_scope
+    ),
   };
 };
 
@@ -191,7 +197,7 @@ const websiteSettingsResource = createResource({
     fields: ["disable_signup"],
   },
   auto: true,
-  onSuccess(data) {
+  onSuccess(data: any) {
     disableSignup.value = Boolean(data.disable_signup);
   },
 });
