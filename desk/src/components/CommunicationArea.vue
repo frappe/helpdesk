@@ -45,7 +45,7 @@
             : __('Send (Ctrl + ⏎)')
         "
         v-model:content="content"
-        placeholder="Hi John, we are looking into this issue."
+        :placeholder="__('Hi John, we are looking into this issue.')"
         :ticketId="ticketId"
         :to-emails="toEmails"
         :cc-emails="ccEmails"
@@ -81,7 +81,7 @@
         :ticketId="ticketId"
         :editable="showCommentBox"
         :doctype="doctype"
-        placeholder="@John could you please look into this?"
+        :placeholder="__('@John could you please look into this?')"
         @submit="
           () => {
             showCommentBox = false;

@@ -33,7 +33,7 @@
           <Input
             v-model="domain"
             :label="__('Domain')"
-            placeholder="example.com"
+            :placeholder="__('example.com')"
           />
         </form>
       </div>

@@ -34,7 +34,7 @@
               <FormControl
                 v-model="callLog.to"
                 type="text"
-                placeholder="+18596748596"
+                :placeholder="__('+18596748596')"
               />
               <ErrorMessage :message="errors.to" />
             </div>
@@ -45,7 +45,7 @@
               <FormControl
                 v-model="callLog.from"
                 type="text"
-                placeholder="+19138276548"
+                :placeholder="__('+19138276548')"
               />
               <ErrorMessage :message="errors.from" />
             </div>

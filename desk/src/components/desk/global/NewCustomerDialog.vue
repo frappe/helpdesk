@@ -11,7 +11,7 @@
               v-model="state.customer"
               :label="__('Customer Name')"
               type="text"
-              placeholder="Tesla Inc."
+              :placeholder="__('Tesla Inc.')"
             />
           </div>
           <div class="space-y-1">
@@ -19,7 +19,7 @@
               v-model="state.domain"
               :label="__('Domain')"
               type="text"
-              placeholder="eg: tesla.com, mycompany.com"
+              :placeholder="__('eg: tesla.com, mycompany.com')"
             />
           </div>
           <div class="float-right flex space-x-2">

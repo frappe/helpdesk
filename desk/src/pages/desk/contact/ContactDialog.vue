@@ -43,7 +43,7 @@
             <div class="text-xs">{{ __("Emails") }}</div>
             <MultiSelect
               v-model:items="emails"
-              placeholder="john.doe@example.com"
+              :placeholder="__('john.doe@example.com')"
               :validate="validateEmail"
             />
           </div>
@@ -51,7 +51,7 @@
             <div class="text-xs">{{ __("Phone Nos") }}</div>
             <MultiSelect
               v-model:items="phones"
-              placeholder="+91 98765 43210"
+              :placeholder="__('+91 98765 43210')"
               :validate="validatePhone"
             />
           </div>
