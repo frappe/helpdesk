@@ -119,7 +119,7 @@ const goToAllTickets = () => {
 };
 
 const getRecentlyAssignedTickets = createResource({
-  url: "helpdesk.api.agent_dashboard.get_recently_assigned_tickets",
+  url: "helpdesk.api.agent_home.agent_home.get_recently_assigned_tickets",
   type: "GET",
 });
 

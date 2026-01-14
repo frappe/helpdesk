@@ -412,7 +412,7 @@ const getRatingColor = (rating: number) => {
 };
 
 const getRecentFeedbackResource = createResource({
-  url: "helpdesk.api.agent_dashboard.get_recent_feedback",
+  url: "helpdesk.api.agent_home.agent_home.get_recent_feedback",
   makeParams: () => ({
     period: currentPeriod.value,
     sort_order: currentSort.value,

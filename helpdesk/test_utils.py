@@ -207,3 +207,21 @@ def make_status(name: str = "Test Status", category: str = "Open"):
         }
     )
     return doc.insert(ignore_if_duplicate=True)
+
+
+def make_agent(email: str, first_name: str = "Test Agent"):
+    """
+    Creates a test user and HD Agent if they don't exist.
+    Returns the user email.
+    """
+    if not frappe.db.exists("User", email):
+        frappe.get_doc(
+            {"doctype": "User", "first_name": first_name, "email": email}
+        ).insert(ignore_permissions=True)
+
+    if not frappe.db.exists("HD Agent", {"user": email}):
+        frappe.get_doc({"doctype": "HD Agent", "user": email}).insert(
+            ignore_permissions=True
+        )
+
+    return email

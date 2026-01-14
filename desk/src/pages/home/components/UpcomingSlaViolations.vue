@@ -222,17 +222,44 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import TimerIcon from "~icons/lucide/timer";
 
-const props = defineProps({
-  data: {
-    type: Object,
-    required: true,
-  },
-});
+interface SlaTicket {
+  name: string;
+  subject: string;
+  status: string;
+  priority: string;
+  integer_value: number;
+  agent_group: string;
+  first_responded_on: string | null;
+  response_by: string;
+  resolution_date: string | null;
+  resolution_by: string;
+}
+
+interface SlaViolationsData {
+  total_sla_violations_count: number;
+  upcoming_sla_violations: SlaTicket[];
+  min_priority: number;
+  max_priority: number;
+}
+
+interface SortByFieldname {
+  label: string;
+  value: string;
+}
+
+interface SortBy {
+  direction: "asc" | "desc";
+  fieldname: SortByFieldname;
+}
+
+const props = defineProps<{
+  data: SlaViolationsData;
+}>();
 
 const { getStatus } = useTicketStatusStore();
 const router = useRouter();
 const priorityFilter = ref("");
-const sortBy = ref({
+const sortBy = ref<SortBy>({
   direction: "asc",
   fieldname: {
     label: __("First Response"),
@@ -245,7 +272,7 @@ const getPriorityListResource = createListResource({
   doctype: "HD Ticket Priority",
   fields: ["name"],
   auto: true,
-  transform(data) {
+  transform(data: { name: string }[]) {
     return data.map((d) => d.name);
   },
 });
@@ -302,7 +329,7 @@ const sortDropdownOptions = computed(() => {
 });
 
 const upcomingSlaViolations = createResource({
-  url: "helpdesk.api.agent_dashboard.get_upcoming_sla_violations",
+  url: "helpdesk.api.agent_home.agent_home.get_upcoming_sla_violations",
 });
 
 function getPriorityBadgeColor(integerValue: number) {
@@ -317,7 +344,7 @@ function getPriorityBadgeColor(integerValue: number) {
   return "gray";
 }
 
-const goToTicket = (ticket: any) => {
+const goToTicket = (ticket: SlaTicket) => {
   router.push({
     name: "TicketAgent",
     params: { ticketId: ticket.name },

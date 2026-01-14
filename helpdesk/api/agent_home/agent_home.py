@@ -47,9 +47,9 @@ def get_dashboard(reset_layout=False):
 
     for chart in layout:
         method_name = f"get_{chart['chart']}"
-        if hasattr(frappe.get_attr("helpdesk.api.agent_dashboard"), method_name):
+        if hasattr(frappe.get_attr("helpdesk.api.agent_home.agent_home"), method_name):
             method = getattr(
-                frappe.get_attr("helpdesk.api.agent_dashboard"), method_name
+                frappe.get_attr("helpdesk.api.agent_home.agent_home"), method_name
             )
             chart["data"] = method()
         else:
@@ -230,79 +230,6 @@ def get_avg_first_response_time(period="last month"):
 @agent_only
 def get_avg_resolution_time(period="last month"):
     return _get_avg_time_metric(period, "resolution_time")
-
-
-@frappe.whitelist()
-@agent_only
-def get_unresolved_tickets():
-    allowed_statuses = frappe.get_all(
-        "HD Ticket Status", filters={"category": ["!=", "Resolved"]}, pluck="name"
-    )
-    count = frappe.db.count(
-        "HD Ticket",
-        filters=[
-            ["_assign", "like", f"%{frappe.session.user}%"],
-            ["status", "in", allowed_statuses],
-        ],
-    )
-    return {"total": count}
-
-
-@frappe.whitelist()
-@agent_only
-def get_recently_assigned_tickets():
-    one_week_ago = frappe.utils.add_days(frappe.utils.nowdate(), -7)
-
-    todo = DocType("ToDo")
-    assigned_tickets = (
-        frappe.qb.from_(todo)
-        .select(todo.reference_name)
-        .distinct()
-        .where(todo.reference_type == "HD Ticket")
-        .where(todo.allocated_to == frappe.session.user)
-        .where(todo.creation >= one_week_ago)
-        .where(todo.status == "Open")
-        .run(as_dict=False)
-    )
-    ticket_names = [row[0] for row in assigned_tickets]
-
-    if not ticket_names:
-        return {"count": 0, "tickets": []}
-
-    allowed_statuses = frappe.get_all(
-        "HD Ticket Status", filters={"category": ["!=", "Resolved"]}, pluck="name"
-    )
-
-    # Count tickets assigned in past week that are still assigned and not resolved
-    count = frappe.db.count(
-        "HD Ticket",
-        filters=[
-            ["name", "in", ticket_names],
-            ["_assign", "like", f"%{frappe.session.user}%"],
-            ["status", "in", allowed_statuses],
-        ],
-    )
-
-    tickets = frappe.get_list(
-        "HD Ticket",
-        fields=[
-            "name",
-            "subject",
-            "status",
-            "priority",
-            "modified",
-            "creation",
-        ],
-        filters=[
-            ["name", "in", ticket_names],
-            ["_assign", "like", f"%{frappe.session.user}%"],
-            ["status", "in", allowed_statuses],
-        ],
-        order_by="modified desc",
-        limit=5,
-    )
-
-    return {"count": count, "tickets": tickets}
 
 
 @frappe.whitelist()
@@ -773,56 +700,6 @@ def get_pending_tickets(ticket_type="all"):
     return {
         "tickets": tickets,
         "total_pending_tickets": total_count,
-        "min_priority": min_priority,
-        "max_priority": max_priority,
-    }
-
-
-@frappe.whitelist()
-@agent_only
-def get_upcoming_sla_violations(priority=None, order_by="response_by asc"):
-    filters = [
-        ["sla", "!=", ""],
-        ["agreement_status", "in", ["First Response Due", "Resolution Due"]],
-        ["status_category", "!=", "Closed"],
-        ["_assign", "like", f"%{frappe.session.user}%"],
-        ["resolution_by", ">", frappe.utils.now()],
-        ["response_by", ">", frappe.utils.now()],
-    ]
-    if priority:
-        filters.append(["priority", "=", priority])
-
-    # Get total count of tickets about to breach SLA
-    total_sla_violations_count = frappe.db.count("HD Ticket", filters=filters)
-
-    upcoming_sla_violations = frappe.get_list(
-        "HD Ticket",
-        fields=[
-            "name",
-            "subject",
-            "status",
-            "priority",
-            "priority.integer_value",
-            "agent_group",
-            "response_by",
-            "resolution_by",
-            "resolution_date",
-            "agreement_status",
-            "status_category",
-            "first_responded_on",
-        ],
-        filters=filters,
-        order_by=order_by,
-        limit=5,
-    )
-
-    priorities = frappe.get_all("HD Ticket Priority", fields="integer_value")
-    min_priority = min(priorities, key=lambda x: x["integer_value"])["integer_value"]
-    max_priority = max(priorities, key=lambda x: x["integer_value"])["integer_value"]
-
-    return {
-        "upcoming_sla_violations": upcoming_sla_violations,
-        "total_sla_violations_count": total_sla_violations_count,
         "min_priority": min_priority,
         "max_priority": max_priority,
     }

@@ -58,7 +58,7 @@ const chartConfig = computed(() => {
 });
 
 const getAvgFirstResponseTimeResource = createResource({
-  url: "helpdesk.api.agent_dashboard.get_avg_first_response_time",
+  url: "helpdesk.api.agent_home.agent_home.get_avg_first_response_time",
   type: "GET",
   makeParams: () => {
     return {

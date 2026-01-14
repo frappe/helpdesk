@@ -152,10 +152,26 @@ import { computed, provide, ref } from "vue";
 import ChartItem from "./components/ChartItem.vue";
 import { __ } from "@/translation";
 
+type LayoutItem = {
+  chart: string;
+  data: Record<string, unknown>;
+  layout: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    i: string;
+    minW?: number;
+    minH?: number;
+    maxW?: number;
+    maxH?: number;
+  };
+};
+
 const { userName, userId } = storeToRefs(useAuthStore());
 const editing = ref(false);
-const layout = ref([]);
-const oldLayout = ref([]);
+const layout = ref<LayoutItem[]>([]);
+const oldLayout = ref<LayoutItem[]>([]);
 
 const isDirty = computed(() => {
   return JSON.stringify(layout.value) !== JSON.stringify(oldLayout.value);
@@ -167,9 +183,13 @@ const isLoading = computed(() => {
 });
 
 const agentDashboard = createResource({
-  url: "helpdesk.api.agent_dashboard.get_dashboard",
+  url: "helpdesk.api.agent_home.agent_home.get_dashboard",
   auto: true,
-  onSuccess(data) {
+  onSuccess(data: {
+    layout: LayoutItem[];
+    default_layout: string;
+    dashboard_id?: string;
+  }) {
     layout.value = data.layout;
   },
 });

@@ -57,7 +57,7 @@ const chartConfig = computed(() => {
 });
 
 const getAvgResolutionTimeResource = createResource({
-  url: "helpdesk.api.agent_dashboard.get_avg_resolution_time",
+  url: "helpdesk.api.agent_home.agent_home.get_avg_resolution_time",
   type: "GET",
   makeParams: () => {
     return {

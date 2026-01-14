@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, markRaw, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import EChart from "./EChart.vue";
 import { EChartsOption } from "echarts";
 import { createResource, TabButtons } from "frappe-ui";
@@ -84,7 +84,7 @@ const props = defineProps({
 const currentDuration = ref("6m");
 
 const getAvgTimeMetricsResource = createResource({
-  url: "helpdesk.api.agent_dashboard.get_avg_time_metrics",
+  url: "helpdesk.api.agent_home.agent_home.get_avg_time_metrics",
   type: "GET",
   makeParams: () => {
     return {
@@ -132,8 +132,12 @@ const chartConfig = computed<EChartsOption>(() => {
         color: "#000",
       },
       formatter: (params) => {
-        const [category, firstResponse, resolution] = params.data;
-        if (params.seriesIndex === 0) {
+        const p = params as unknown as {
+          data: [string, number, number];
+          seriesIndex: number;
+        };
+        const [category, firstResponse, resolution] = p.data;
+        if (p.seriesIndex === 0) {
           return `<span>${category}</span><br/>${__(
             "Avg. First Response"
           )}: <b>${formatTime(firstResponse, {
@@ -162,7 +166,7 @@ const chartConfig = computed<EChartsOption>(() => {
     },
     yAxis: {
       axisLabel: {
-        formatter: (value) => {
+        formatter: (value: number) => {
           if (value < 3600) {
             return (value / 60).toFixed(0) + "m";
           } else if (value < 86400) {

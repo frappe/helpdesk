@@ -163,7 +163,7 @@ const chartConfig = computed(() => {
 });
 
 const getPendingTicketsResource = createResource({
-  url: "helpdesk.api.agent_dashboard.get_pending_tickets",
+  url: "helpdesk.api.agent_home.agent_home.get_pending_tickets",
 });
 
 function getPriorityBadgeColor(integerValue: number) {

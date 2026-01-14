@@ -58,7 +58,7 @@ const chartConfig = computed(() => {
 });
 
 const getAgentTicketsResource = createResource({
-  url: "helpdesk.api.agent_dashboard.get_agent_tickets",
+  url: "helpdesk.api.agent_home.agent_home.get_agent_tickets",
   type: "GET",
   makeParams: () => {
     return {
