@@ -29,7 +29,7 @@
       </div>
       <slot name="chart">
         <div v-if="chartConfig" class="w-full h-full">
-          <EChart :options="chartConfig" class="w-full h-full" />
+          <ECharts :options="chartConfig" class="w-full h-full" />
         </div>
       </slot>
     </div>
@@ -38,8 +38,7 @@
 
 <script setup lang="ts">
 import { computed, type PropType } from "vue";
-import EChart from "./EChart.vue";
-import { Dropdown, FeatherIcon } from "frappe-ui";
+import { Dropdown, FeatherIcon, ECharts } from "frappe-ui";
 import { __ } from "@/translation";
 import { EChartsOption } from "echarts";
 

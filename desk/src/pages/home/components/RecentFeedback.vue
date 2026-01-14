@@ -60,8 +60,8 @@
             </div>
           </div>
           <!-- Bar Chart -->
-          <div class="h-32 mt-2 w-full">
-            <EChart :options="barChartOptions" />
+          <div class="h-32 mt-2 w-full px-4">
+            <ECharts :options="barChartOptions" class="w-full h-full" />
           </div>
         </div>
         <div class="hidden sm:block h-full w-[1px] bg-surface-gray-2"></div>
@@ -187,12 +187,12 @@ import {
   Dropdown,
   FeatherIcon,
   TabButtons,
+  ECharts,
 } from "frappe-ui";
 import LucideStar from "~icons/lucide/star";
 import { useRouter } from "vue-router";
 import { __ } from "@/translation";
 import { timeAgo } from "@/utils";
-import EChart from "./EChart.vue";
 import type { EChartsOption } from "echarts";
 
 const router = useRouter();

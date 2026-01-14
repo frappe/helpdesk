@@ -60,7 +60,7 @@
         </div>
       </div>
       <div class="w-full grow">
-        <EChart :options="chartConfig" />
+        <ECharts :options="chartConfig" class="w-full h-full" />
       </div>
     </div>
   </div>
@@ -68,9 +68,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import EChart from "./EChart.vue";
 import { EChartsOption } from "echarts";
-import { createResource, TabButtons } from "frappe-ui";
+import { createResource, TabButtons, ECharts } from "frappe-ui";
 import { formatTime } from "@/utils";
 import { __ } from "@/translation";
 
