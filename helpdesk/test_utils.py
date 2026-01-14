@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-=======
-from datetime import datetime
-
->>>>>>> 3b85a3b2 (fix: better support for v16)
 import frappe
 from frappe.core.doctype.communication.test_communication import create_email_account
 from frappe.utils import add_to_date, getdate
@@ -225,6 +220,4 @@ def add_comment(
     )
     if save:
         return comment.insert()
-    return comment
-    return comment
     return comment
