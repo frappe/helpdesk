@@ -29,17 +29,9 @@ def get_default_agent_dashboard():
 @agent_only
 def get_dashboard(reset_layout=False):
     dashboard = frappe.db.exists("HD Field Layout", {"user": frappe.session.user})
+    dashboard_id = None
 
     if not dashboard:
-        dashboard = frappe.get_doc(
-            {
-                "doctype": "HD Field Layout",
-                "user": frappe.session.user,
-                "type": "Landing Page",
-                "layout": get_default_agent_dashboard(),
-            },
-        ).insert(ignore_permissions=True)
-        frappe.db.commit()  # nosemgrep
         layout = json.loads(get_default_agent_dashboard())
     else:
         dashboard = frappe.db.get_value(
@@ -51,6 +43,7 @@ def get_dashboard(reset_layout=False):
             layout = json.loads(get_default_agent_dashboard())
         else:
             layout = json.loads(dashboard[1])
+        dashboard_id = dashboard[0]
 
     for chart in layout:
         method_name = f"get_{chart['chart']}"
@@ -65,7 +58,7 @@ def get_dashboard(reset_layout=False):
     return {
         "layout": layout,
         "default_layout": get_default_agent_dashboard(),
-        "dashboard_id": dashboard[0],
+        "dashboard_id": dashboard_id,
     }
 
 
@@ -268,6 +261,7 @@ def get_recently_assigned_tickets():
         .where(todo.reference_type == "HD Ticket")
         .where(todo.allocated_to == frappe.session.user)
         .where(todo.creation >= one_week_ago)
+        .where(todo.status == "Open")
         .run(as_dict=False)
     )
     ticket_names = [row[0] for row in assigned_tickets]
@@ -313,21 +307,36 @@ def get_recently_assigned_tickets():
 
 @frappe.whitelist()
 @agent_only
-def get_recent_feedback():
+def get_recent_feedback(period="all_time", sort_order="positive_first"):
     agent = frappe.session.user
     ticket = DocType("HD Ticket")
+    contact = DocType("Contact")
 
-    # Get average rating and total feedbacks using query builder
-    avg_result = (
-        frappe.qb.from_(ticket)
-        .select(
-            (Avg(ticket.feedback_rating) * 5).as_("average"),
-            Count(ticket.name).as_("total_feedbacks"),
-        )
-        .where(ticket.feedback_rating > 0)
-        .where(Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull())
-        .run(as_dict=True)
+    # Build period filter
+    period_filter = None
+    if period == "last_week":
+        period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -7)
+    elif period == "last_month":
+        period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -30)
+    elif period == "last_3_months":
+        period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -90)
+
+    # Base query conditions
+    base_conditions = [
+        ticket.feedback_rating > 0,
+        Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull(),
+    ]
+    if period_filter:
+        base_conditions.append(ticket.modified >= period_filter)
+
+    # Get average rating and total feedbacks
+    avg_query = frappe.qb.from_(ticket).select(
+        (Avg(ticket.feedback_rating) * 5).as_("average"),
+        Count(ticket.name).as_("total_feedbacks"),
     )
+    for condition in base_conditions:
+        avg_query = avg_query.where(condition)
+    avg_result = avg_query.run(as_dict=True)
 
     average_rating = (
         avg_result[0]["average"]
@@ -340,26 +349,64 @@ def get_recent_feedback():
         else 0
     )
 
-    # Get recent feedbacks using query builder
-    feedback = (
+    # Get rating distribution (1-5 stars)
+    rating_dist_query = (
         frappe.qb.from_(ticket)
         .select(
+            Function("ROUND", ticket.feedback_rating * 5).as_("star_rating"),
+            Count(ticket.name).as_("count"),
+        )
+        .groupby(Function("ROUND", ticket.feedback_rating * 5))
+    )
+    for condition in base_conditions:
+        rating_dist_query = rating_dist_query.where(condition)
+    rating_dist_result = rating_dist_query.run(as_dict=True)
+
+    # Build rating distribution dict
+    rating_distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+    for row in rating_dist_result:
+        star = int(row["star_rating"])
+        if 1 <= star <= 5:
+            rating_distribution[star] = row["count"]
+
+    # Determine sort order
+    if sort_order == "negative_first":
+        order_direction = frappe.qb.asc
+    else:
+        order_direction = frappe.qb.desc
+
+    # Get recent feedbacks
+    feedback_query = (
+        frappe.qb.from_(ticket)
+        .left_join(contact)
+        .on(ticket.contact == contact.name)
+        .select(
             ticket.name,
+            ticket.subject,
             ticket.feedback_rating,
             ticket.feedback,
             ticket.feedback_extra,
             ticket.contact,
+            ticket.modified,
+            contact.full_name.as_("contact_name"),
+            contact.image.as_("contact_image"),
         )
-        .where(ticket.feedback_rating > 0)
-        .where(Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull())
+        .orderby(ticket.feedback_rating, order=order_direction)
         .orderby(ticket.modified, order=frappe.qb.desc)
-        .limit(10)
-        .run(as_dict=True)
+        .limit(20)
     )
+    for condition in base_conditions:
+        feedback_query = feedback_query.where(condition)
+    feedback = feedback_query.run(as_dict=True)
+
+    # Add star rating to each feedback
+    for f in feedback:
+        f["star_rating"] = round(f["feedback_rating"] * 5, 1)
 
     return {
         "average_rating": round(average_rating, 1),
         "total_feedbacks": total_feedbacks,
+        "rating_distribution": rating_distribution,
         "recent_feedbacks": feedback,
     }
 

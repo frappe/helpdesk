@@ -11,7 +11,7 @@
           variant="subtle"
           :icon-left="'refresh-ccw'"
           @click="agentDashboard.reload({ reset_layout: false })"
-          :disabled="agentDashboard.loading"
+          :disabled="isLoading"
         />
         <Button
           v-if="editing && isDashboardModified"
@@ -19,7 +19,7 @@
           variant="subtle"
           :icon-left="'rotate-cw'"
           @click="onReset"
-          :disabled="saveDashboard.loading"
+          :disabled="isLoading"
         />
         <Button
           v-if="editing"
@@ -28,7 +28,7 @@
           :icon-left="'check'"
           @click="onSave"
           :disabled="!isDirty"
-          :loading="saveDashboard.loading"
+          :loading="isLoading"
         />
         <Button
           v-if="layout.length > 0 && !editing"
@@ -36,14 +36,14 @@
           variant="subtle"
           :icon-left="'edit'"
           @click="onEdit"
-          :disabled="agentDashboard.loading"
+          :disabled="isLoading"
         />
         <Button
           v-if="editing"
           :label="__('Cancel')"
           variant="subtle"
           @click="onCancel"
-          :disabled="saveDashboard.loading"
+          :disabled="isLoading"
         />
         <Dropdown
           v-if="chartsDropdown.length > 0"
@@ -54,7 +54,7 @@
             :label="__('New')"
             variant="solid"
             icon-left="plus"
-            :disabled="agentDashboard.loading || saveDashboard.loading"
+            :disabled="isLoading"
           />
         </Dropdown>
       </div>
@@ -62,7 +62,7 @@
   </LayoutHeader>
   <div class="h-screen overflow-auto">
     <div
-      class="flex flex-col p-1 pt-4 md:p-5 mx-auto max-w-6xl w-full grow relative h-full"
+      class="flex flex-col p-1 pt-4 mb-16 md:p-5 mx-auto max-w-6xl w-full grow relative h-full"
     >
       <div class="grow">
         <div
@@ -152,13 +152,18 @@ import { computed, provide, ref } from "vue";
 import ChartItem from "./components/ChartItem.vue";
 import { __ } from "@/translation";
 
-const { userName } = storeToRefs(useAuthStore());
+const { userName, userId } = storeToRefs(useAuthStore());
 const editing = ref(false);
 const layout = ref([]);
 const oldLayout = ref([]);
 
 const isDirty = computed(() => {
   return JSON.stringify(layout.value) !== JSON.stringify(oldLayout.value);
+});
+const isLoading = computed(() => {
+  return (
+    agentDashboard.loading || createDashboard.loading || saveDashboard.loading
+  );
 });
 
 const agentDashboard = createResource({
@@ -181,6 +186,29 @@ const isDashboardModified = computed(() => {
 
 provide("agentDashboard", agentDashboard);
 provide("dashboardData", layout);
+
+const createDashboard = createResource({
+  url: "frappe.client.insert",
+  makeParams() {
+    const layoutData = layout.value.map((item) => {
+      return {
+        chart: item.chart,
+        layout: item.layout,
+      };
+    });
+    return {
+      doc: {
+        doctype: "HD Field Layout",
+        user: userId.value,
+        layout: JSON.stringify(layoutData),
+      },
+    };
+  },
+  onSuccess() {
+    toast.success(__("Dashboard saved"));
+    agentDashboard.reload();
+  },
+});
 
 const saveDashboard = createResource({
   url: "frappe.client.set_value",
@@ -215,18 +243,6 @@ const chartsDropdown = computed(() => {
           minW: 16,
           minH: 10,
           maxH: 11,
-        }),
-    },
-    {
-      label: __("Upcoming SLA Violations"),
-      chart: "upcoming_sla_violations",
-      onClick: () =>
-        addChart("upcoming_sla_violations", {
-          w: 50,
-          h: 27,
-          minW: 25,
-          minH: 27,
-          maxH: 27,
         }),
     },
     {
@@ -266,28 +282,14 @@ const chartsDropdown = computed(() => {
         }),
     },
     {
-      label: __("Your Rating"),
+      label: __("Reviews"),
       chart: "recent_feedback",
       onClick: () =>
         addChart("recent_feedback", {
-          w: 16,
-          h: 30,
-          minW: 16,
-          minH: 27,
-          maxW: 27,
-          maxH: 30,
-        }),
-    },
-    {
-      label: __("Recently Assigned Tickets"),
-      chart: "recently_assigned_tickets",
-      onClick: () =>
-        addChart("recently_assigned_tickets", {
-          w: 17,
-          h: 30,
-          minW: 16,
-          minH: 30,
-          maxH: 30,
+          w: 50,
+          h: 21,
+          minW: 50,
+          maxH: 21,
         }),
     },
     {
@@ -344,9 +346,15 @@ const onEdit = () => {
 };
 
 const onSave = () => {
-  saveDashboard.submit().then(() => {
-    editing.value = false;
-  });
+  if (agentDashboard.data?.dashboard_id) {
+    saveDashboard.submit().then(() => {
+      editing.value = false;
+    });
+  } else {
+    createDashboard.submit().then(() => {
+      editing.value = false;
+    });
+  }
 };
 
 const onCancel = () => {

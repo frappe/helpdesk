@@ -97,8 +97,8 @@ const timeAverages = computed(() => {
   const _data = getAvgTimeMetricsResource.fetched
     ? getAvgTimeMetricsResource.data
     : props.data;
-  const _averageFirstResponse = _data?.averages.first_response || 0;
-  const _averageResolution = _data?.averages.resolution || 0;
+  const _averageFirstResponse = _data?.averages?.first_response || 0;
+  const _averageResolution = _data?.averages?.resolution || 0;
 
   return {
     first_response:

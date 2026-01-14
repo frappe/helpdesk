@@ -1,10 +1,14 @@
 <template>
   <div class="rounded-md p-4 grow w-full h-full overflow-hidden">
-    <div class="flex items-center justify-between">
+    <div
+      class="flex sm:flex-row flex-col gap-4 sm:items-center sm:justify-between"
+    >
       <div class="text-lg font-semibold text-ink-gray-8">
         {{ __("Pending Tickets") }}
       </div>
-      <TabButtons :buttons="chartTabs" v-model="currentTab" />
+      <div class="w-max">
+        <TabButtons :buttons="chartTabs" v-model="currentTab" />
+      </div>
     </div>
     <div class="mt-5 h-full overflow-auto hide-scrollbar -mx-2">
       <div class="min-w-[1050px]">
@@ -128,11 +132,11 @@ const chartTabs = [
     value: "all",
   },
   {
-    label: "Upcoming SLA",
+    label: "SLA Due",
     value: "upcoming_sla",
   },
   {
-    label: "New Tickets",
+    label: "Recent",
     value: "new_tickets",
   },
   {
