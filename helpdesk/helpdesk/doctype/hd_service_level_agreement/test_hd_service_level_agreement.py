@@ -7,7 +7,6 @@ from frappe.tests.utils import FrappeTestCase
 from helpdesk.test_utils import SLA_PRIORITY_NAME, make_sla, make_ticket
 
 
-
 class TestHDServiceLevelAgreement(FrappeTestCase):
     def setUp(self):
         pass
