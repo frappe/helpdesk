@@ -114,7 +114,9 @@
         <template v-for="reaction in reactionsList" :key="reaction.emoji">
           <Tooltip>
             <template #body>
-              <div class="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg">
+              <div
+                class="bg-surface-gray-7 px-2 py-1 text-center text-p-xs text-ink-white shadow-xl rounded"
+              >
                 <span v-for="(user, idx) in reaction.users" :key="user.user"
                   >{{ user.full_name
                   }}<span v-if="idx < reaction.users.length - 1">, </span></span
