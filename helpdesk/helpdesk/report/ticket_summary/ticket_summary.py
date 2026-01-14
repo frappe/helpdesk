@@ -34,7 +34,7 @@ class TicketSummary:
             "HD Ticket Status",
             filters={"enabled": 1},
             fields=["label_agent", "color"],
-            order_by="order asc, label_agent asc",
+            order_by="order",
         )
 
         self.statuses = [status.label_agent for status in status_data]
@@ -466,4 +466,6 @@ class TicketSummary:
             return color_map.get(category, "Grey")
         except Exception:
             # Fallback for unknown statuses
+            return "Grey"
+            return "Grey"
             return "Grey"
