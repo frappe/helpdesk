@@ -25,8 +25,20 @@
     <div class="flex overflow-hidden h-full w-full">
       <!-- Main Ticket Comm -->
       <section class="flex flex-col flex-1 w-full md:max-w-[calc(100%-382px)]">
+       <div 
+        v-if="
+          outsideHourSettings.data?.outside_working_hours_message && !isDismissed
+        "
+       class="md:mx-10 md:my-4 justify-between text-lg font-medium mx-6 mb-4 !mt-8">
+           <Alert
+          :title="__(outsideHourSettings.data.outside_working_hours_message)"
+          theme="yellow"
+          v-model="removeAlert"
+
+        >
+        </Alert></div>
         <!-- show for only mobile -->
-        <TicketCustomerTemplateFields v-if="isMobileView" />
+        <TicketCustomerTemplateFields v-if="isMobileView" />        
 
         <TicketConversation class="grow" />
         <div
@@ -78,7 +90,7 @@ import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
-import { Breadcrumbs, Button, call, createResource, toast } from "frappe-ui";
+import { Breadcrumbs, Button, call, createResource, toast, Alert } from "frappe-ui";
 import { __ } from "@/translation";
 import {
   computed,
@@ -87,6 +99,7 @@ import {
   onUnmounted,
   provide,
   ref,
+  watch
 } from "vue";
 import { useRouter } from "vue-router";
 import { ITicket } from "./symbols";
@@ -141,6 +154,48 @@ const isExpanded = ref(false);
 
 const { isMobileView } = useScreenSize();
 const { $dialog } = globalStore();
+const isDismissed = ref(false);
+const removeAlert = ref(true);
+
+watch(removeAlert, (newValue) => {
+  if (!newValue) {
+    dismissBanner();
+  }
+});
+
+
+function getTodayKey() {
+  return new Date().toISOString().split("T")[0];
+}
+
+function dismissBanner() {
+  try {
+    const todayKey = getTodayKey();
+    localStorage.setItem(`dismissBanner_${props.ticketId}_${todayKey}`, "true");
+    isDismissed.value = true;
+  } catch (error) {
+    console.error("Error saving banner dismissal:", error);
+  }
+}
+
+onMounted(() => {
+  try {
+    const todayKey = getTodayKey();
+    const dismissed = localStorage.getItem(`dismissBanner_${props.ticketId}_${todayKey}`);
+    isDismissed.value = dismissed === "true";
+  } catch (error) {
+    console.error("Error reading banner dismissal:", error);
+  }
+});
+
+const outsideHourSettings = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_ticket.api.is_outside_check",
+  debounce: 300,
+  params: {
+    ticket_name: props.ticketId,
+  },
+  auto: true,
+});
 
 const send = createResource({
   url: "run_doc_method",
@@ -277,4 +332,5 @@ onUnmounted(() => {
   document.title = "Helpdesk";
   socket.off("helpdesk:ticket-update");
 });
+
 </script>
