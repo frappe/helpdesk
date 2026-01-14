@@ -6,7 +6,8 @@
         *
       </span>
     </span>
-    <component
+    <div class="flex gap-2 items-center">   
+      <component
       :is="component"
       :placeholder="placeholder"
       :value="transValue"
@@ -20,14 +21,17 @@
         )
       "
     />
+    <slot name="label-extra" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Autocomplete, Link } from "@/components";
+import { Autocomplete  } from "@/components";
 import { APIOptions, Field } from "@/types";
 import { parseApiOptions } from "@/utils";
 import { createResource, FormControl } from "frappe-ui";
+import { Link }  from "frappe-ui/frappe"
 import { computed, h } from "vue";
 
 type Value = string | number | boolean;
@@ -50,6 +54,7 @@ const props = defineProps<P>();
 const emit = defineEmits<E>();
 
 const component = computed(() => {
+  console.log("FIELD", props.field);
   if (props.field.url_method) {
     return h(Autocomplete, {
       options: apiOptions.data,

@@ -15,19 +15,6 @@
     <div
       class="flex flex-col gap-5 py-6 h-full flex-1 self-center overflow-auto mx-auto w-full max-w-4xl px-5"
     >
-      <div
-        v-if="
-          afterHoursSettings.data?.outside_working_hours_message && !isDismissed
-        "
-      >
-        <Alert
-          :title="__(afterHoursSettings.data.outside_working_hours_message)"
-          theme="yellow"
-          v-model="removeAlert"
-        >
-        </Alert>
-      </div>
-      
       <!-- custom fields descriptions -->
       <div v-if="Boolean(template.data?.about)" class="">
         <div class="prose-f" v-html="sanitize(template.data.about)" />
@@ -45,7 +32,18 @@
           @change="
             (e) => handleOnFieldChange(e, field.fieldname, field.fieldtype)
           "
-        />
+        >
+          <template v-if="field.fieldname === 'priority'" #label-extra>
+            <Tooltip
+              :text="__(
+                ticket_priority.data[templateFields[field.fieldname]] ||
+                'No description defined for this priority level'
+          )"
+            >
+              <lucide-circle-question-mark class="h-4 w-4 text-ink-gray-6" />
+            </Tooltip>
+          </template>
+        </UniInput>
       </div>
       <!-- existing fields -->
       <div
@@ -150,7 +148,13 @@ import {
 import { __ } from "@/translation";
 import { useOnboarding } from "frappe-ui/frappe";
 import sanitizeHtml from "sanitize-html";
-import { computed, defineAsyncComponent, onMounted, reactive, ref,watch } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  onMounted,
+  reactive,
+  ref,
+} from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SearchArticles from "../../components/SearchArticles.vue";
 
@@ -171,19 +175,11 @@ const router = useRouter();
 const { $dialog } = globalStore();
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager, userId: userID } = useAuthStore();
-
 const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
-const isDismissed = ref(false);
-const removeAlert = ref(true)
 
-watch(removeAlert, (newValue) => {
-  if (!newValue) {
-    dismissBanner();
-  }
-})
 
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
@@ -205,41 +201,19 @@ const template = createResource({
   },
 });
 
+
 function setupTemplateFields(fields) {
   fields.forEach((field: Field) => {
     templateFields[field.fieldname] = "";
   });
 }
 
-const afterHoursSettings = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_outside_working_hour_setting",
-  cache: "afterHoursWarning",
+//maybe only fetch when fieldname priority
+const ticket_priority = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_priority_description",
   auto: true,
 });
 
-function getTodayKey() {
-  return new Date().toISOString().split("T")[0];
-}
-
-function dismissBanner() {
-  try {
-    const todayKey = getTodayKey();
-    localStorage.setItem(`dismissBanner_${todayKey}`, "true");
-    isDismissed.value = true;
-  } catch (error) {
-    console.error("Error saving banner dismissal:", error);
-  }
-}
-
-onMounted(() => {
-  try {
-    const todayKey = getTodayKey();
-    const dismissed = localStorage.getItem(`dismiss_banner_${todayKey}`);
-    isDismissed.value = dismissed === "true";
-  } catch (error) {
-    console.error("Error reading banner dismissal:", error);
-  }
-});
 
 let oldFields = [];
 
