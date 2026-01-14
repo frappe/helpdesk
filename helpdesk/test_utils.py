@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import frappe
 from frappe.core.doctype.communication.test_communication import create_email_account
+from frappe.tests.utils import make_test_objects
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
@@ -18,6 +19,7 @@ def before_tests():
     # frappe.flags.mute_emails = True
     make_holiday_list()
     make_new_sla()
+    make_test_objects("Email Domain", reset=True)
     create_email_account()
     frappe.db.commit()  # nosemgrep
 
