@@ -242,5 +242,3 @@ def add_comment(
     if save:
         return comment.insert()
     return comment
-    return comment
-    return comment
