@@ -11,7 +11,6 @@ from helpdesk.utils import (
     call_log_default_columns,
     check_permissions,
     contact_default_columns,
-    is_version_16,
     parse_call_logs,
 )
 
