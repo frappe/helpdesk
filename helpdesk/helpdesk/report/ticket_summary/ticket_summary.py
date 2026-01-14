@@ -467,5 +467,3 @@ class TicketSummary:
         except Exception:
             # Fallback for unknown statuses
             return "Grey"
-            return "Grey"
-            return "Grey"
