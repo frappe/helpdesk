@@ -5,7 +5,9 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate
 
+from helpdesk.helpdesk.doctype.hd_ticket.api import merge_ticket, split_ticket
 from helpdesk.test_utils import (
+    add_comment,
     add_holiday,
     get_current_week_monday,
     get_priority_response_resolution_time,
@@ -458,7 +460,6 @@ class TestHDTicket(IntegrationTestCase):
 
         ticket.reload()
         with self.freeze_time(add_to_date(next_monday_date, minutes=30)):
-
             ticket.status = "Resolved"
             ticket.save()
             ticket = ticket.reload()
@@ -575,6 +576,55 @@ class TestHDTicket(IntegrationTestCase):
             ticket.status = "Closed"
             ticket.save()
             self.assertEqual(ticket.resolution_time, 30 * 60)
+
+    def test_ticket_merge(self):
+        ticket1 = make_ticket(description="Test Desc 1")
+        add_comment(ticket1.name, "First comment on ticket 1")
+
+        ticket2 = make_ticket(description="Test Desc 2")
+        add_comment(ticket2.name, "First comment on ticket 2")
+
+        merge_ticket(source=ticket1.name, target=ticket2.name)
+        ticket1.reload()
+        self.assertEqual(ticket1.status, "Closed")
+        self.assertTrue(ticket1.is_merged)
+        self.assertEqual(int(ticket1.merged_with), int(ticket2.name))
+
+        ticket2.reload()
+        comments = frappe.get_all(
+            "HD Ticket Comment",
+            filters={
+                "reference_ticket": ticket2.name,
+            },
+            fields=["content", "name"],
+        )
+        self.assertEqual(
+            len(comments), 3
+        )  # 2 original comments + 1 merge comment (Ticket 1 merged into Ticket 2)
+
+    def test_ticket_split(self):
+        ticket1 = make_ticket(description="Test Desc for split")
+        ticket1.reply_via_agent(message="Test reply to split")
+        communcation_name = frappe.get_all(
+            "Communication",
+            filters={
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket1.name,
+            },
+            pluck="name",
+        )[0]
+        self.assertTrue(communcation_name)
+
+        ticket2: str = split_ticket(
+            subject="Split Ticket", communication_id=communcation_name
+        )
+        ticket2_doc = frappe.get_doc("HD Ticket", ticket2)
+        self.assertTrue(ticket2_doc)
+        self.assertEqual(ticket2_doc.subject, "Split Ticket")
+        self.assertTrue(
+            frappe.get_value("Communication", communcation_name, "reference_name"),
+            ticket2_doc.name,
+        )
 
     def tearDown(self):
         remove_holidays()
