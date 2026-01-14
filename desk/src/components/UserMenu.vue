@@ -2,8 +2,14 @@
   <Dropdown :options="options">
     <template #default="{ open }">
       <button
-        class="flex h-12 items-center rounded-md p-1 duration-300 ease-in-out w-full"
-        :class="open ? ' bg-white shadow-sm' : ' hover:bg-gray-200'"
+        class="flex h-12 items-center rounded-md py-2 duration-300 ease-in-out"
+        :class="
+          !sidebarStore.isExpanded
+            ? 'w-auto px-0'
+            : open
+            ? 'w-full px-2 bg-surface-white shadow-sm'
+            : 'w-full px-2 hover:bg-surface-gray-3'
+        "
       >
         <BrandLogo />
         <div
@@ -43,11 +49,11 @@
 </template>
 
 <script setup lang="ts">
-import { Dropdown, Avatar } from "frappe-ui";
-import { useAuthStore } from "@/stores/auth";
-import { useSidebarStore } from "@/stores/sidebar";
-import { useConfigStore } from "@/stores/config";
 import BrandLogo from "@/components/BrandLogo.vue";
+import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
+import { useSidebarStore } from "@/stores/sidebar";
+import { Dropdown } from "frappe-ui";
 
 const config = useConfigStore();
 
