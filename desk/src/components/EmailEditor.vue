@@ -166,12 +166,8 @@
 <script setup lang="ts">
 import {
   AttachmentItem,
-<<<<<<< HEAD
   CannedResponseSelectorModal,
-=======
->>>>>>> 6bd424ff (fix: loading state in editor)
   MultiSelectInput,
-  SavedRepliesSelectorModal,
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
