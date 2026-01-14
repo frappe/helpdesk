@@ -65,7 +65,7 @@
   "feedback_rating",
   "feedback",
   "feedback_extra",
-  "meta_tab"
+  "is_outside"
  ],
  "fields": [
   {
@@ -400,11 +400,6 @@
    "label": "Feedback"
   },
   {
-   "fieldname": "meta_tab",
-   "fieldtype": "Tab Break",
-   "label": "Meta"
-  },
-  {
    "fieldname": "summary",
    "fieldtype": "Text Editor",
    "label": "Summary"
@@ -441,13 +436,20 @@
    "fieldtype": "Data",
    "label": "Status Category",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_outside",
+   "fieldtype": "Check",
+   "label": "Is Outside",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-10-26 17:07:55.243874",
+ "modified": "2026-01-14 23:19:31.806892",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
