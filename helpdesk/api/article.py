@@ -1,3 +1,5 @@
+import re
+
 import frappe
 from textblob import TextBlob
 from textblob.exceptions import MissingCorpusError
@@ -31,9 +33,17 @@ def search_with_enough_results(
     return items, len(items) == NUM_RESULTS
 
 
+def sanitize_query(query: str) -> str:
+    # Remove or escape characters that break search syntax
+    q = query.strip().lower()
+    q = re.sub(r'[/\\+\-!(){}[\]^"~*?:&|]', " ", q)
+    return q
+
+
 @frappe.whitelist()
 def search(query: str) -> list:
-    query = query.strip().lower()
+    query = sanitize_query(query)
+    print("\n\n", query, "\n\n")
     ret, enough = search_with_enough_results([], query)
     if enough:
         return ret
