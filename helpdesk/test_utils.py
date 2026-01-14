@@ -194,9 +194,6 @@ def make_status(name: str = "Test Status", category: str = "Open"):
         }
     )
     return doc.insert(ignore_if_duplicate=True)
-<<<<<<< HEAD
-=======
-
 
 def add_comment(
     ticket: str,
@@ -218,4 +215,3 @@ def add_comment(
     if save:
         return comment.insert()
     return comment
->>>>>>> b652cb9c (test: add tests for ticket split and merge)
