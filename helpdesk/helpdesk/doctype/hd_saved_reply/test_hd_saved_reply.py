@@ -2,7 +2,7 @@
 # See license.txt
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 # Test user emails
 AGENT1 = "saved_reply_agent1@test.com"
@@ -114,7 +114,7 @@ def set_hd_settings(
         )
 
 
-class TestHDSavedReply(IntegrationTestCase):
+class TestHDSavedReply(FrappeTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

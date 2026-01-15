@@ -384,7 +384,9 @@ def add_index_if_not_exists(table, column, index_name):
         SHOW INDEX FROM `{table}`
             WHERE Column_name = '{column}'
             AND Index_type = 'FULLTEXT'
-        """.format(table=table, column=column),
+        """.format(
+            table=table, column=column
+        ),
         as_dict=True,
     )
     print("\n\n", index_exists, "\n\n")
