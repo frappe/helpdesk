@@ -12,9 +12,9 @@ from helpdesk.utils import agent_only, is_frappe_version
 HD_TICKET = "HD Ticket"
 
 COUNT_NAME = (
-    {"COUNT": "name", "as": "total_count"}
+    {"COUNT": "name", "as": "count"}
     if is_frappe_version("16", above=True)
-    else "count(name) as total_count"
+    else "count(name) as count"
 )
 
 COUNT_DESC = "count desc"
