@@ -34,14 +34,22 @@
           "
         >
           <template v-if="field.fieldname === 'priority'" #label-extra>
-            <Tooltip
-              :text="__(
-                ticket_priority.data[templateFields[field.fieldname]] ||
-                'No description defined for this priority level'
-          )"
+            <template
+              v-if="
+                ticketPriorityResource.dataMap[templateFields[field.fieldname]]
+                  ?.description
+              "
             >
-              <lucide-circle-question-mark class="h-4 w-4 text-ink-gray-6" />
-            </Tooltip>
+              <Tooltip
+                :text="
+                  ticketPriorityResource.dataMap[
+                    templateFields[field.fieldname]
+                  ].description.trim()
+                "
+              >
+                <lucide-circle-question-mark class="h-4 w-4 text-ink-gray-6" />
+              </Tooltip>
+            </template>
           </template>
         </UniInput>
       </div>
@@ -141,20 +149,14 @@ import {
   Button,
   call,
   createResource,
+  createListResource,
   FormControl,
   usePageMeta,
-  Alert,
 } from "frappe-ui";
 import { __ } from "@/translation";
 import { useOnboarding } from "frappe-ui/frappe";
 import sanitizeHtml from "sanitize-html";
-import {
-  computed,
-  defineAsyncComponent,
-  onMounted,
-  reactive,
-  ref,
-} from "vue";
+import { computed, defineAsyncComponent, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SearchArticles from "../../components/SearchArticles.vue";
 
@@ -180,7 +182,6 @@ const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
 
-
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
   makeParams: () => ({
@@ -201,19 +202,17 @@ const template = createResource({
   },
 });
 
-
 function setupTemplateFields(fields) {
   fields.forEach((field: Field) => {
     templateFields[field.fieldname] = "";
   });
 }
 
-//maybe only fetch when fieldname priority
-const ticket_priority = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_priority_description",
+const ticketPriorityResource = createListResource({
+  doctype: "HD Ticket Priority",
+  fields: ["name", "description"],
   auto: true,
 });
-
 
 let oldFields = [];
 

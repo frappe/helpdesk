@@ -87,14 +87,3 @@ def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
                     "Property Setter", property_setter_id, "value"
                 )
     return result
-
-@frappe.whitelist()
-def get_priority_description():
-    ticket_priority = {
-    d["name"]: (d.get("description") or "").strip()
-    for d in frappe.get_list(
-        "HD Ticket Priority",
-        fields=["name", "description"]
-    )
-}
-    return ticket_priority
