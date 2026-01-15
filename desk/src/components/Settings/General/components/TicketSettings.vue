@@ -180,6 +180,37 @@
           </div>
         </div>
       </div>
+      <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-1">
+          <span class="text-base font-medium text-ink-gray-8">{{
+            __("Display's a banner for tickets raised outside working hours")
+          }}</span>
+          <span class="text-p-sm text-ink-gray-6"
+            >{{
+              __(
+                "Show a customizable message to customers when they raise tickets outside of working hours."
+              )
+            }}
+          </span>
+        </div>
+        <Switch
+          :model-value="settingsData.showOutsideWorkingHoursBanner"
+          @update:model-value="
+            (value) => (settingsData.showOutsideWorkingHoursBanner = value)
+          "
+        />
+
+        
+      </div>
+            <Textarea
+  v-if="settingsData.showOutsideWorkingHoursBanner"
+  variant="subtle"
+  size="sm"
+  placeholder="Enter Notification Message"
+  v-model="settingsData.outsideWorkingHoursBannerMessage"
+/>
+      </div>
     </div>
   </div>
 </template>
@@ -196,6 +227,7 @@ import {
   FormControl,
   FormLabel,
   Switch,
+  Textarea
 } from "frappe-ui";
 import { computed, inject } from "vue";
 
