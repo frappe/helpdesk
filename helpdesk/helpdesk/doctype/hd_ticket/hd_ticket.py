@@ -94,7 +94,7 @@ class HDTicket(Document):
 
     def before_save(self):
         self.apply_sla()
-        self.is_outside = self.is_outside_working_hours()
+        self.raised_outside_working_hours = self.is_outside_working_hours()
         if not self.is_new():
             self.handle_ticket_activity_update()
 
@@ -878,13 +878,13 @@ class HDTicket(Document):
         )
 
         day_name = current_date.strftime("%A")
-        HDHoliday = DocType("HD Holiday")
+        Holiday = DocType("HD Holiday")
 
         # Check holidays for this SLA
         holidays = (
-            frappe.qb.from_(HDHoliday)
-            .select(HDHoliday.holiday_date)
-            .where(HDHoliday.parent == sla.name)
+            frappe.qb.from_(Holiday)
+            .select(Holiday.holiday_date)
+            .where(Holiday.parent == sla.name)
             .run(pluck=True)
         )
 
@@ -902,6 +902,7 @@ class HDTicket(Document):
         # Outside working hours
         if not (start_time <= current_td < end_time):
             return True
+        return False
         
 
     # @frappe.whitelist()

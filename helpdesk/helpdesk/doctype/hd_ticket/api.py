@@ -784,12 +784,12 @@ def get_ticket_assignees(ticket: str):
 
 @frappe.whitelist()
 def is_outside_check(ticket_name: str):
-    ticket = frappe.get_doc("HD Ticket", ticket_name)
+    ticket = frappe.get_cached_doc("HD Ticket", ticket_name)
 
     # if currently is outside sla
-    is_outside = ticket.is_outside_working_hours()
+    display_ticket = ticket.is_outside_working_hours() and ticket.raised_outside_working_hours
 
-    if is_outside:
+    if display_ticket:
         settings = frappe.db.get_single_value("HD Settings", "working_hours_notification")
         if(not settings):
             return 
@@ -799,6 +799,6 @@ def is_outside_check(ticket_name: str):
         return {
             "outside_working_hours_message": message
             }   
-    return None
+    return False
 
 
