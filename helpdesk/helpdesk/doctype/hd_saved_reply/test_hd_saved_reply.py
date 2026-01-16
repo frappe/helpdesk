@@ -595,3 +595,6 @@ class TestHDSavedReply(FrappeTestCase):
         self.assertNotIn(personal_agent2.name, replies)
         self.assertIn(team_a_reply.name, replies)
         self.assertNotIn(team_b_reply.name, replies)
+
+    def tearDown(self):
+        frappe.set_user("Administrator")
