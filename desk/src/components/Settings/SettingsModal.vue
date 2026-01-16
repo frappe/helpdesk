@@ -39,7 +39,7 @@
             </nav>
           </div>
         </div>
-        <div class="flex flex-1 flex-col bg-surface-modal">
+        <div class="flex flex-1 flex-col bg-surface-modal max-w-[816px]">
           <component
             :is="activeTab.component"
             v-if="activeTab"
