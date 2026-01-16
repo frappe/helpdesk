@@ -32,6 +32,9 @@ export const useConfigStore = defineStore("config", () => {
   const isFeedbackMandatory = computed(
     () => !!parseInt(config.value.is_feedback_mandatory)
   );
+  const enableCommentReactions = computed(
+    () => !!parseInt(config.value.enable_comment_reactions)
+  );
 
   socket.on("helpdesk:settings-updated", () => configResource.reload());
 
@@ -47,5 +50,6 @@ export const useConfigStore = defineStore("config", () => {
     teamRestrictionApplied,
     assignWithinTeam,
     disableGlobalScopeForSavedReplies,
+    enableCommentReactions,
   };
 });

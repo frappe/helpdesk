@@ -1,18 +1,21 @@
 import { useAuthStore } from "@/stores/auth";
-import { Notification, Resource } from "@/types";
+import { ListResource, Notification } from "@/types";
 import { createListResource, createResource } from "frappe-ui";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
+import { globalStore } from "./globalStore";
 
 export const useNotificationStore = defineStore("notification", () => {
   const authStore = useAuthStore();
+  const { $socket } = globalStore();
 
   const visible = ref(false);
-  const resource: Resource<Array<Notification>> = createListResource({
+  const resource: ListResource<Notification> = createListResource({
     doctype: "HD Notification",
     cache: "Notifications",
     fields: [
-      "creation",
+      "modified",
+      "message",
       "name",
       "notification_type",
       "read",
@@ -21,7 +24,7 @@ export const useNotificationStore = defineStore("notification", () => {
       "user_from",
       "user_to",
     ],
-    orderBy: "creation desc",
+    orderBy: "modified desc",
   });
   const clear = createResource({
     url: "helpdesk.helpdesk.doctype.hd_notification.utils.clear",
@@ -29,12 +32,12 @@ export const useNotificationStore = defineStore("notification", () => {
     onSuccess: () => resource.reload(),
   });
 
-  const read = (ticket) => {
+  const read = (ticket: string) => {
     createResource({
       url: "helpdesk.helpdesk.doctype.hd_notification.utils.clear",
       auto: true,
       params: {
-        ticket: ticket,
+        ticket,
       },
       onSuccess: () => resource.reload(),
     });
@@ -58,6 +61,9 @@ export const useNotificationStore = defineStore("notification", () => {
     },
     { immediate: true }
   );
+  $socket.on("helpdesk:comment-reaction-update", () => {
+    resource.reload();
+  });
 
   return {
     clear,
