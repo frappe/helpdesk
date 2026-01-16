@@ -885,6 +885,8 @@ class HDTicket(Document):
                 self.status = self.ticket_reopen_status
             else:
                 self.status = self.default_open_status
+            # if received that means customer has replied
+            self.last_customer_response = frappe.utils.now_datetime()
         # If communication is outgoing, it must be a reply from agent
         if c.sent_or_received == "Sent":
             # Ignore system notifications
@@ -894,6 +896,7 @@ class HDTicket(Document):
             self.first_responded_on = (
                 self.first_responded_on or frappe.utils.now_datetime()
             )
+            self.last_agent_response = frappe.utils.now_datetime()
 
             # TODO: remove this feature once we add automation feature
             if frappe.db.get_single_value("HD Settings", "auto_update_status"):

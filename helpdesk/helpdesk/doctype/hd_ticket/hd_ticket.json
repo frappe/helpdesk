@@ -38,6 +38,8 @@
   "first_responded_on",
   "column_break_26",
   "avg_response_time",
+  "last_agent_response",
+  "last_customer_response",
   "resolution_tab",
   "section_break_19",
   "resolution_details",
@@ -418,7 +420,8 @@
    "default": "0",
    "fieldname": "is_merged",
    "fieldtype": "Check",
-   "label": "Ticket Merged"
+   "label": "Ticket Merged",
+   "read_only": 1
   },
   {
    "depends_on": "eval:doc.is_merged",
@@ -441,13 +444,23 @@
    "fieldtype": "Data",
    "label": "Status Category",
    "read_only": 1
+  },
+  {
+   "fieldname": "last_agent_response",
+   "fieldtype": "Datetime",
+   "label": "Last Agent Response"
+  },
+  {
+   "fieldname": "last_customer_response",
+   "fieldtype": "Datetime",
+   "label": "Last Customer Response"
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-10-26 17:07:55.243874",
+ "modified": "2026-01-16 13:21:43.018525",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
