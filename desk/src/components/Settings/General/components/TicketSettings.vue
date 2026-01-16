@@ -181,35 +181,66 @@
         </div>
       </div>
       <div class="flex flex-col gap-2">
-      <div class="flex items-center justify-between">
-        <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">{{
-            __("Display's a banner for tickets raised outside working hours")
-          }}</span>
-          <span class="text-p-sm text-ink-gray-6"
-            >{{
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <div class="flex flex-col gap-1">
+              <span class="text-base font-medium text-ink-gray-8">{{
+                __(
+                  "Display's a banner for tickets raised outside working hours"
+                )
+              }}</span>
+              <span class="text-p-sm text-ink-gray-6"
+                >{{
+                  __(
+                    "Show a customizable message to customers when they raise tickets outside of working hours."
+                  )
+                }}
+              </span>
+            </div>
+            <Switch
+              :model-value="settingsData.showOutsideWorkingHoursBanner"
+              @update:model-value="
+                (value) => (settingsData.showOutsideWorkingHoursBanner = value)
+              "
+            />
+          </div>
+          <Textarea
+            v-if="settingsData.showOutsideWorkingHoursBanner"
+            variant="subtle"
+            size="sm"
+            placeholder="Enter Notification Message"
+            :required="true"
+            v-model="settingsData.outsideWorkingHoursBannerMessage"
+          />
+        </div>
+        <div class="flex gap-x-1 items-start justify-between">
+          <p class="text-sm text-gray-700 leading-5">
+            {{
               __(
-                "Show a customizable message to customers when they raise tickets outside of working hours."
+                "Find out all of the variables that can be used in the content"
               )
             }}
-          </span>
+            <a
+              href="https://docs.frappe.io/helpdesk/#"
+              target="_blank"
+              class="underline font-semibold"
+              >{{ __("here") }}</a
+            >
+          </p>
+          <Button
+            :disabled="
+              settingsData.outsideWorkinyougHoursBannerMessage ===
+              defaultBannerMessage
+            "
+            type="button"
+            size="sm"
+            variant="subtle"
+            @click="onResetContent"
+            class="w-fit"
+          >
+            {{ __("Reset Content") }}
+          </Button>
         </div>
-        <Switch
-          :model-value="settingsData.showOutsideWorkingHoursBanner"
-          @update:model-value="
-            (value) => (settingsData.showOutsideWorkingHoursBanner = value)
-          "
-        />
-
-        
-      </div>
-            <Textarea
-  v-if="settingsData.showOutsideWorkingHoursBanner"
-  variant="subtle"
-  size="sm"
-  placeholder="Enter Notification Message"
-  v-model="settingsData.outsideWorkingHoursBannerMessage"
-/>
       </div>
     </div>
   </div>
@@ -223,17 +254,29 @@ import { HDTicketStatus } from "@/types/doctypes";
 import {
   Checkbox,
   createListResource,
+  createResource,
   ErrorMessage,
   FormControl,
   FormLabel,
   Switch,
-  Textarea
+  Textarea,
 } from "frappe-ui";
-import { computed, inject } from "vue";
+import { computed, inject, ref } from "vue";
 
 const settingsData = inject(HDSettingsSymbol);
-
 const { statuses } = useTicketStatusStore();
+const outsideHourMsg = createResource({
+  url: "frappe.client.get",
+  params: {
+    doctype: "HD Settings",
+    name: "HD Settings",
+  },
+  auto: true,
+});
+
+const defaultBannerMessage = computed(
+  () => outsideHourMsg.data?.working_hours_message || ""
+);
 
 const ticketTypeList = createListResource({
   doctype: "HD Ticket Type",
@@ -249,6 +292,12 @@ const ticketTypeList = createListResource({
   },
 });
 
+const onResetContent = () => {
+  if (settingsData?.value) {
+    settingsData.value.outsideWorkingHoursBannerMessage =
+      defaultBannerMessage.value;
+  }
+};
 const autoUpdateTicketStatusList = computed(() => {
   return (
     statuses.data?.map((s: HDTicketStatus) => {

@@ -25,20 +25,23 @@
     <div class="flex overflow-hidden h-full w-full">
       <!-- Main Ticket Comm -->
       <section class="flex flex-col flex-1 w-full md:max-w-[calc(100%-382px)]">
-       <div 
-        v-if="
-          outsideHourSettings.data?.outside_working_hours_message && !isDismissed
-        "
-       class="md:mx-10 md:my-4 justify-between text-lg font-medium mx-6 mb-4 !mt-8">
-           <Alert
-          :title="__(outsideHourSettings.data.outside_working_hours_message)"
-          theme="yellow"
-          v-model="removeAlert"
-
+        <div
+          v-if="
+            outsideHourSettings.data?.outside_working_hours_message &&
+            !isDismissed
+          "
+          class="md:mx-10 md:my-4 justify-between text-lg font-medium mx-6 mb-4 !mt-8"
         >
-        </Alert></div>
+          <Alert
+            v-if="bannerMsg.data?.banner_msg"
+            :title="bannerMsg.data.banner_msg"
+            theme="yellow"
+            v-model="removeAlert"
+          >
+          </Alert>
+        </div>
         <!-- show for only mobile -->
-        <TicketCustomerTemplateFields v-if="isMobileView" />        
+        <TicketCustomerTemplateFields v-if="isMobileView" />
 
         <TicketConversation class="grow" />
         <div
@@ -90,7 +93,14 @@ import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
-import { Breadcrumbs, Button, call, createResource, toast, Alert } from "frappe-ui";
+import {
+  Breadcrumbs,
+  Button,
+  call,
+  createResource,
+  toast,
+  Alert,
+} from "frappe-ui";
 import { __ } from "@/translation";
 import {
   computed,
@@ -99,7 +109,7 @@ import {
   onUnmounted,
   provide,
   ref,
-  watch
+  watch,
 } from "vue";
 import { useRouter } from "vue-router";
 import { ITicket } from "./symbols";
@@ -163,7 +173,6 @@ watch(removeAlert, (newValue) => {
   }
 });
 
-
 function getTodayKey() {
   return new Date().toISOString().split("T")[0];
 }
@@ -181,18 +190,62 @@ function dismissBanner() {
 onMounted(() => {
   try {
     const todayKey = getTodayKey();
-    const dismissed = localStorage.getItem(`dismissBanner_${props.ticketId}_${todayKey}`);
+    const dismissed = localStorage.getItem(
+      `dismissBanner_${props.ticketId}_${todayKey}`
+    );
     isDismissed.value = dismissed === "true";
+    cleanupOldBannerDismissals();
   } catch (error) {
     console.error("Error reading banner dismissal:", error);
   }
 });
+
+// Clean up old banner dismissal localStorage keys
+const cleanupOldBannerDismissals = () => {
+  const CLEANUP_KEY = "lastBannerCleanup";
+  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+  try {
+    const lastCleanup = localStorage.getItem(CLEANUP_KEY);
+    const now = Date.now();
+
+    if (lastCleanup && now - parseInt(lastCleanup) < ONE_WEEK_MS) {
+      return;
+    }
+
+    // Find and remove all dismissBanner keys
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("dismissBanner_")) {
+        keysToRemove.push(key);
+      }
+    }
+
+    // Remove the keys
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+
+    // Update last cleanup timestamp
+    localStorage.setItem(CLEANUP_KEY, now.toString());
+
+  } catch (error) {
+    console.error("Error cleaning up banner dismissals:", error);
+  }
+};
 
 const outsideHourSettings = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.is_outside_check",
   debounce: 300,
   params: {
     ticket_name: props.ticketId,
+  },
+  auto: true,
+});
+
+const bannerMsg = createResource({
+  url: "helpdesk.api.banner_msg.get_rendered_banner_msg",
+  params: {
+    ticket_id: props.ticketId,
   },
   auto: true,
 });
@@ -332,5 +385,4 @@ onUnmounted(() => {
   document.title = "Helpdesk";
   socket.off("helpdesk:ticket-update");
 });
-
 </script>

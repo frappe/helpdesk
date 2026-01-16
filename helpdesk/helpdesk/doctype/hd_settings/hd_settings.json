@@ -472,6 +472,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "default": "Thanks for reaching out \ud83d\udc4b. This ticket was created outside our working hours. You can expect the next response by {{ next_working_day}}.\n",
    "depends_on": "working_hours_notification",
    "fieldname": "working_hours_message",
    "fieldtype": "Small Text",
@@ -494,7 +495,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-01-13 13:11:55.193431",
+ "modified": "2026-01-16 20:41:10.110446",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
