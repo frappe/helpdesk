@@ -233,7 +233,8 @@
   {
    "fieldname": "first_responded_on",
    "fieldtype": "Datetime",
-   "label": "First Responded On"
+   "label": "First Responded On",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_26",
@@ -363,18 +364,21 @@
   {
    "fieldname": "feedback_extra",
    "fieldtype": "Long Text",
-   "label": "Feedback (Extra)"
+   "label": "Feedback (Extra)",
+   "read_only": 1
   },
   {
    "fieldname": "feedback",
    "fieldtype": "Link",
    "label": "Feedback (Option)",
-   "options": "HD Ticket Feedback Option"
+   "options": "HD Ticket Feedback Option",
+   "read_only": 1
   },
   {
    "fieldname": "feedback_rating",
    "fieldtype": "Rating",
-   "label": "Rating"
+   "label": "Rating",
+   "read_only": 1
   },
   {
    "fieldname": "sla_tab",
@@ -448,19 +452,21 @@
   {
    "fieldname": "last_agent_response",
    "fieldtype": "Datetime",
-   "label": "Last Agent Response"
+   "label": "Last Agent Response",
+   "read_only": 1
   },
   {
    "fieldname": "last_customer_response",
    "fieldtype": "Datetime",
-   "label": "Last Customer Response"
+   "label": "Last Customer Response",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-01-16 13:21:43.018525",
+ "modified": "2026-01-16 14:23:14.181727",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

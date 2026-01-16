@@ -3,66 +3,45 @@ import frappe
 
 def execute():
     today = frappe.utils.nowdate()
-    old_date = frappe.utils.add_days(today, -120)
-
-    Ticket = frappe.qb.DocType("HD Ticket")
-    Communication = frappe.qb.DocType("Communication")
+    old_date = frappe.utils.add_days(today, -180)
 
     BATCH_SIZE = 1000
 
     # Get tickets in batches
     tickets = frappe.get_list(
-        "HD Ticket",
-        filters={"creation": ["between", [old_date, today]]},
-        fields=["name"],
-        limit_page_length=0,
+        "HD Ticket", filters={"creation": ["between", [old_date, today]]}, pluck="name"
     )
+    print("TICKETS:", len(tickets))
 
     for i in range(0, len(tickets), BATCH_SIZE):
-        batch = [t["name"] for t in tickets[i : i + BATCH_SIZE]]
+        batch = list(tickets[i : i + BATCH_SIZE])
 
         # Update last_agent_response for batch
-        (
-            frappe.qb.update(Ticket)
-            .set(
-                Ticket.last_agent_response,
-                frappe.qb.from_(Communication)
-                .select(frappe.qb.max(Communication.creation))
-                .where(
-                    (Communication.reference_doctype == "HD Ticket")
-                    & (Communication.reference_name == Ticket.name)
-                    & (Communication.sent_or_received == "Sent")
-                ),
-            )
-            .where(
-                (
-                    Ticket.last_agent_response.isnull()
-                    | (Ticket.last_agent_response == "")
-                )
-                & Ticket.name.isin(batch)
-            )
-        ).run()
-
-        # Update last_customer_response for batch
-        (
-            frappe.qb.update(Ticket)
-            .set(
-                Ticket.last_customer_response,
-                frappe.qb.from_(Communication)
-                .select(frappe.qb.max(Communication.creation))
-                .where(
-                    (Communication.reference_doctype == "HD Ticket")
-                    & (Communication.reference_name == Ticket.name)
-                    & (Communication.sent_or_received == "Received")
-                ),
-            )
-            .where(
-                (
-                    Ticket.last_customer_response.isnull()
-                    | (Ticket.last_customer_response == "")
-                )
-                & Ticket.name.isin(batch)
-            )
-        ).run()
+        frappe.db.sql(
+            """
+				UPDATE `tabHD Ticket` t
+				SET 
+					t.last_agent_response = (
+						SELECT MAX(c.creation)
+						FROM `tabCommunication` c
+						WHERE c.reference_doctype = 'HD Ticket'
+							AND c.reference_name = t.name
+							AND c.sent_or_received = 'Sent'
+					),
+					t.last_customer_response = (
+						SELECT MAX(c.creation)
+						FROM `tabCommunication` c
+						WHERE c.reference_doctype = 'HD Ticket'
+							AND c.reference_name = t.name
+							AND c.sent_or_received = 'Received'
+					)
+				WHERE (
+					(t.last_agent_response IS NULL)
+					OR (t.last_customer_response IS NULL)
+				)
+				AND t.name IN %(batch)s
+			""",
+            {"batch": batch},
+        )
 
         frappe.db.commit()
