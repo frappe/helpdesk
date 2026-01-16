@@ -224,7 +224,10 @@
             v-model="settingsData.outsideWorkingHoursBannerMessage"
           />
         </div>
-        <div class="flex gap-x-1 items-start justify-between">
+        <div
+          v-if="settingsData.showOutsideWorkingHoursBanner"
+          class="flex gap-x-1 items-start justify-between"
+        >
           <p class="text-sm text-gray-700 leading-5">
             {{
               __(
@@ -240,7 +243,7 @@
           </p>
           <Button
             :disabled="
-              settingsData.outsideWorkinyougHoursBannerMessage ===
+              settingsData.outsideWorkingHoursBannerMessage ===
               defaultBannerMessage
             "
             type="button"
