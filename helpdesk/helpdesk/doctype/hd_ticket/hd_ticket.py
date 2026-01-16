@@ -646,9 +646,9 @@ class HDTicket(Document):
                 sender=reply_to_email,
                 subject=subject,
                 with_container=False,
-                in_reply_to=last_communication.name
-                if last_communication.name
-                else None,
+                in_reply_to=(
+                    last_communication.name if last_communication.name else None
+                ),
             )
         except Exception as e:
             frappe.throw(_(e))
@@ -1068,9 +1068,9 @@ class HDTicket(Document):
             "resolution_date",
         ]
         return {
-            "columns": customer_portal_columns
-            if show_customer_portal_fields
-            else columns,
+            "columns": (
+                customer_portal_columns if show_customer_portal_fields else columns
+            ),
             "rows": rows,
         }
 

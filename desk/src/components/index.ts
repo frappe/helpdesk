@@ -1,7 +1,7 @@
 export { default as AssignmentModal } from "./AssignmentModal.vue";
 export { default as AttachmentItem } from "./AttachmentItem.vue";
 export { default as Autocomplete } from "./Autocomplete.vue";
-export { default as CannedResponseSelectorModal } from "./CannedResponseSelectorModal.vue";
+export { default as SavedRepliesSelectorModal } from "./SavedRepliesSelectorModal.vue";
 export { default as CommandPalette } from "./command-palette/CP.vue";
 export { default as CommentBox } from "./CommentBox.vue";
 export { default as CommentTextEditor } from "./CommentTextEditor.vue";
