@@ -17,6 +17,17 @@
         </div>
         <Switch v-model="settingsData.isFeedbackMandatory" />
       </div>
+      <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-1">
+          <span class="text-base font-medium text-ink-gray-8">{{
+            __("Enable comment reactions")
+          }}</span>
+          <span class="text-p-sm text-ink-gray-6">{{
+            __("Allow users to react to comments with emojis")
+          }}</span>
+        </div>
+        <Switch v-model="settingsData.enableCommentReactions" />
+      </div>
       <div>
         <div class="flex items-center justify-between">
           <div class="flex flex-col gap-1">
