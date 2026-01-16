@@ -103,11 +103,6 @@ const routes = [
     redirect: "/tickets",
   },
   {
-    path: "/canned-responses",
-    name: "CannedResponses",
-    component: () => import("@/pages/CannedResponses.vue"),
-  },
-  {
     path: "/dashboard",
     name: "Dashboard",
     component: () => import("@/pages/dashboard/Dashboard.vue"),
