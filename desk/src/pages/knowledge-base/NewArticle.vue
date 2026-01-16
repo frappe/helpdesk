@@ -44,10 +44,10 @@
           maxlength="140"
           autofocus
           @input="
-          (e: Event) => {
-            const target = e.target as HTMLTextAreaElement;
-            target.style.height = `${target.scrollHeight}px`;
-          }
+            (e: Event) => {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = `${target.scrollHeight}px`;
+            }
           "
         />
         <!-- Article Content -->

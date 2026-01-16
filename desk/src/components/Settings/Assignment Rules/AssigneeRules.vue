@@ -119,16 +119,17 @@ import {
 import AssigneeSearch from "./AssigneeSearch.vue";
 import { computed } from "vue";
 import { useUserStore } from "@/stores/user";
+import { __ } from "@/translation";
 
 const { getUser } = useUserStore();
 
 const ticketRoutingOptions = [
   {
-    label: "Auto-rotate",
+    label: __("Auto-rotate"),
     value: "Round Robin",
   },
   {
-    label: "Assign by workload",
+    label: __("Assign by workload"),
     value: "Load Balancing",
   },
 ];

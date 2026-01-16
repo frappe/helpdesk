@@ -1,5 +1,5 @@
 <template>
-  <Button label="Refresh" :loading="loading">
+  <Button :label="__('Refresh')" :loading="loading">
     <template #icon>
       <RefreshIcon class="h-4 w-4" />
     </template>
@@ -7,6 +7,8 @@
 </template>
 
 <script setup>
+import { __ } from "@/translation";
+
 defineProps({
   loading: {
     type: Boolean,

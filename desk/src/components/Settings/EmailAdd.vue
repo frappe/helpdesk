@@ -38,7 +38,7 @@
                     :href="selectedService.link"
                     target="_blank"
                     class="text-blue-500 underline"
-                    >here</a
+                    >{{ __("here") }}</a
                   >
                   .
                 </div>

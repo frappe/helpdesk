@@ -11,12 +11,12 @@
               v-if="group.group.label != ''"
               class="flex items-end gap-1 w-full"
             >
-              <span>{{ group.group.label }}</span>
+              <span>{{ __(group.group.label) }}</span>
               <span class="text-xs text-ink-gray-5"
                 >{{
-                  group.rows.length +
-                  " Article" +
-                  (group.rows.length > 1 ? "s" : "")
+                  group.rows.length > 1
+                    ? __("{0} Articles", [group.rows.length])
+                    : __("{0} Article", [group.rows.length])
                 }}
               </span>
             </div>
@@ -68,6 +68,7 @@ import {
 import { computed, ref, watch } from "vue";
 
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
+import { __ } from "@/translation";
 const props = defineProps({
   rows: {
     type: Array,

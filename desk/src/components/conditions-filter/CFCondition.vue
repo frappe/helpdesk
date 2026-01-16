@@ -85,7 +85,7 @@
         variant="outline"
         v-if="props.isGroup && (props.level == 2 || props.level == 4)"
         @click="show = true"
-        label="Open nested conditions"
+        :label="__('Open nested conditions')"
       />
     </div>
     <div :class="'w-max'">
@@ -120,6 +120,7 @@ import {
   FormControl,
 } from "frappe-ui";
 import { computed, defineEmits, h, ref } from "vue";
+import { __ } from "@/translation";
 import GroupIcon from "~icons/lucide/group";
 import UnGroupIcon from "~icons/lucide/ungroup";
 import CFConditions from "./CFConditions.vue";

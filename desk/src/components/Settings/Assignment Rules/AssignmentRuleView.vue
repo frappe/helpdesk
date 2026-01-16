@@ -80,9 +80,12 @@
                 >
                   <div>
                     {{
-                      priorityOptions.find(
-                        (option) => option.value == assignmentRuleData.priority
-                      )?.label
+                      __(
+                        priorityOptions.find(
+                          (option) =>
+                            option.value == assignmentRuleData.priority
+                        )?.label
+                      )
                     }}
                   </div>
                   <FeatherIcon name="chevron-down" class="size-4" />
@@ -101,7 +104,7 @@
                       togglePopover();
                     "
                   >
-                    {{ option.label }}
+                    {{ __(option.label) }}
                     <FeatherIcon
                       v-if="assignmentRuleData.priority == option.value"
                       name="check"
@@ -182,14 +185,14 @@
               "
             >
               <span class="text-p-sm">
-                Conditions for this rule were created from
-                <a :href="deskUrl" target="_blank" class="underline">desk</a>
-                which are not compatible with this UI, you will need to recreate
-                the conditions here if you want to manage and add new conditions
-                from this UI.
+                {{
+                  __(
+                    "Conditions for this rule were created from {0} which are not compatible with this UI, you will need to recreate the conditions here if you want to manage and add new conditions from this UI."
+                  ).replace("{0}", "")
+                }}<a :href="deskUrl" target="_blank" class="underline">desk</a>
               </span>
               <Button
-                label="I understand, add conditions"
+                :label="__('I understand, add conditions')"
                 variant="subtle"
                 theme="gray"
                 @click="useNewUIForAssignCondition = true"
@@ -263,14 +266,14 @@
               "
             >
               <span class="text-p-sm">
-                Conditions for this rule were created from
-                <a :href="deskUrl" target="_blank" class="underline">desk</a>
-                which are not compatible with this UI, you will need to recreate
-                the conditions here if you want to manage and add new conditions
-                from this UI.
+                {{
+                  __(
+                    "Conditions for this rule were created from {0} which are not compatible with this UI, you will need to recreate the conditions here if you want to manage and add new conditions from this UI."
+                  ).replace("{0}", "")
+                }}<a :href="deskUrl" target="_blank" class="underline">desk</a>
               </span>
               <Button
-                label="I understand, add conditions"
+                :label="__('I understand, add conditions')"
                 variant="subtle"
                 theme="gray"
                 @click="useNewUIForUnassignCondition = true"
@@ -395,7 +398,9 @@ const getAssignmentRuleData = createResource({
       assignConditionJson = JSON.parse(data.assign_condition_json || "[]");
     } catch (error) {
       toast.error(
-        "Assignment conditions are invalid or corrupt, recreate the conditions."
+        __(
+          "Assignment conditions are invalid or corrupt, recreate the conditions."
+        )
       );
       assignConditionJson = [];
     }
@@ -403,7 +408,9 @@ const getAssignmentRuleData = createResource({
       unassignConditionJson = JSON.parse(data.unassign_condition_json || "[]");
     } catch (error) {
       toast.error(
-        "Unassignment conditions are invalid or corrupt, recreate the conditions."
+        __(
+          "Unassignment conditions are invalid or corrupt, recreate the conditions."
+        )
       );
       unassignConditionJson = [];
     }
@@ -513,9 +520,10 @@ const saveAssignmentRule = () => {
 const showOverwriteConfirm = () => {
   showConfirmDialog.value = {
     show: true,
-    title: "Confirm overwrite",
-    message:
-      "Your old condition will be overwritten. Are you sure you want to save?",
+    title: __("Confirm overwrite"),
+    message: __(
+      "Your old condition will be overwritten. Are you sure you want to save?"
+    ),
     onConfirm: () => {
       updateAssignmentRule();
       showConfirmDialog.value.show = false;

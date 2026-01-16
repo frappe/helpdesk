@@ -29,6 +29,7 @@ import { APIOptions, Field } from "@/types";
 import { parseApiOptions } from "@/utils";
 import { createResource, FormControl } from "frappe-ui";
 import { computed, h } from "vue";
+import { __ } from "@/translation";
 
 type Value = string | number | boolean;
 
@@ -71,11 +72,11 @@ const component = computed(() => {
     return h(Autocomplete, {
       options: [
         {
-          label: "Yes",
+          label: __("Yes"),
           value: 1,
         },
         {
-          label: "No",
+          label: __("No"),
           value: 0,
         },
       ],
@@ -98,7 +99,7 @@ const apiOptions = createResource({
 
 const transValue = computed(() => {
   if (props.field.fieldtype === "Check") {
-    return props.value ? "Yes" : "No";
+    return props.value ? __("Yes") : __("No");
   }
   return props.value;
 });
@@ -108,14 +109,14 @@ const placeholder = computed(() => {
     return props.field.placeholder;
   }
   if (props.field.fieldtype === "Data" && !props.field.url_method) {
-    return "Type something";
+    return __("Type something");
   } else if (
     props.field.fieldtype === "Select" ||
     props.field.fieldtype === "Link"
   ) {
-    return "Select an option";
+    return __("Select an option");
   }
-  return "Type something";
+  return __("Type something");
 });
 
 function emitUpdate(fieldname: Field["fieldname"], value: Value) {

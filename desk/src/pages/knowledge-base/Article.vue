@@ -91,9 +91,11 @@
           :content="textEditorContentWithIDs"
           :extensions="[PreserveIds]"
           :editable="editable"
-          @change="(event:string) => {
-			      content = event;
-		      }"
+          @change="
+            (event: string) => {
+              content = event;
+            }
+          "
           :placeholder="__('Write your article here...')"
         >
           <template #bottom v-if="editable">

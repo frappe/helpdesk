@@ -13,24 +13,26 @@
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
     :extensions="[PreserveVideoControls]"
-    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    :uploadFunction="(file: any) => uploadFunction(file, doctype, ticketId)"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
-        <span class="text-xs text-gray-500">TO:</span>
+        <span class="text-xs text-gray-500">{{ __("TO:") }}</span>
         <MultiSelectInput
           v-model="toEmailsClone"
           class="flex-1"
           :validate="validateEmail"
-          :error-message="(value) => `${value} is an invalid email address`"
+          :error-message="
+            (value) => __(`{0} is an invalid email address`, [value])
+          "
         />
         <Button
-          :label="'CC'"
+          :label="__('CC')"
           :class="[cc ? 'bg-gray-300 hover:bg-gray-200' : '']"
           @click="toggleCC()"
         />
         <Button
-          :label="'BCC'"
+          :label="__('BCC')"
           :class="[bcc ? 'bg-gray-300 hover:bg-gray-200' : '']"
           @click="toggleBCC()"
         />
@@ -40,13 +42,15 @@
         class="mx-10 flex items-center gap-2 py-2.5"
         :class="cc || showCC ? 'border-b' : ''"
       >
-        <span class="text-xs text-gray-500">CC:</span>
+        <span class="text-xs text-gray-500">{{ __("CC:") }}</span>
         <MultiSelectInput
           ref="ccInput"
           v-model="ccEmailsClone"
           class="flex-1"
           :validate="validateEmail"
-          :error-message="(value) => `${value} is an invalid email address`"
+          :error-message="
+            (value) => __(`{0} is an invalid email address`, [value])
+          "
         />
       </div>
       <div
@@ -54,13 +58,15 @@
         class="mx-10 flex items-center gap-2 py-2.5"
         :class="bcc || showBCC ? 'border-b' : ''"
       >
-        <span class="text-xs text-gray-500">BCC:</span>
+        <span class="text-xs text-gray-500">{{ __("BCC:") }}</span>
         <MultiSelectInput
           ref="bccInput"
           v-model="bccEmailsClone"
           class="flex-1"
           :validate="validateEmail"
-          :error-message="(value) => `${value} is an invalid email address`"
+          :error-message="
+            (value) => __(`{0} is an invalid email address`, [value])
+          "
         />
       </div>
     </template>
@@ -136,7 +142,7 @@
         <div
           class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%] mr-9"
         >
-          <Button label="Discard" @click="handleDiscard" />
+          <Button :label="__('Discard')" @click="handleDiscard" />
           <Button
             variant="solid"
             :disabled="isDisabled"
@@ -191,6 +197,7 @@ import {
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
+import { __ } from "@/translation";
 
 const editorRef = ref(null);
 const showSavedRepliesSelectorModal = ref(false);
@@ -231,7 +238,7 @@ const props = defineProps({
 });
 
 const label = computed(() => {
-  return sendMail.loading ? "Sending..." : props.label;
+  return sendMail.loading ? __("Sending...") : props.label;
 });
 
 const emit = defineEmits(["submit", "discard"]);
@@ -308,7 +315,9 @@ function submitMail() {
   }
   if (!toEmailsClone.value.length) {
     toast.warning(
-      "Email has no recipients. Please add at least one email address in the 'TO' field."
+      __(
+        "Email has no recipients. Please add at least one email address in the 'TO' field."
+      )
     );
     return false;
   }

@@ -97,7 +97,7 @@
                         class="w-full flex !justify-start"
                         icon-left="edit"
                         variant="ghost"
-                        label="Edit"
+                        :label="__('Edit')"
                         @click="
                           () => {
                             closePopover();
@@ -111,7 +111,9 @@
                         icon-left="trash-2"
                         variant="ghost"
                         :label="
-                          isConfirmingDelete ? 'Confirm Delete' : 'Delete'
+                          isConfirmingDelete
+                            ? __('Confirm Delete')
+                            : __('Delete')
                         "
                         :theme="isConfirmingDelete ? 'red' : 'gray'"
                         @click="
@@ -159,6 +161,7 @@ import dayjs from "dayjs";
 import { Popover, useDatePicker } from "frappe-ui";
 import { ref, watch } from "vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
+import { __ } from "@/translation";
 
 const dialog = ref({
   show: false,
@@ -307,7 +310,7 @@ const getHolidayDescription = (date: Date): string => {
   });
 
   const text = holiday?.weekly_off
-    ? `${htmlToText(holiday?.description || "")}: Recurring holiday`
+    ? __("{0}: Recurring holiday", [htmlToText(holiday?.description || "")])
     : htmlToText(holiday?.description || "");
 
   return text;
@@ -319,6 +322,6 @@ watch(
     currentYear.value = newYear;
     currentMonth.value = newMonth;
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>

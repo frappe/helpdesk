@@ -2,7 +2,9 @@
   <div class="p-5 pb-10 px-10 w-full overflow-scroll items-center">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Knowledge Base</div>
+        <div class="text-lg font-medium text-gray-900">
+          {{ __("Knowledge Base") }}
+        </div>
       </template>
     </LayoutHeader>
     <div
@@ -13,7 +15,7 @@
           'max-w-[310px] md:max-w-[856px] !top-1 md:min-w-[856px]',
         ]"
         v-model="query"
-        placeholder="Ask a question..."
+        :placeholder="__('Ask a question...')"
         size="md"
         :autofocus="true"
       />
@@ -21,7 +23,7 @@
       <!-- Categories Folder -->
       <section class="flex flex-col gap-3">
         <!-- Heading -->
-        <p class="text-lg text-gray-900">Categories</p>
+        <p class="text-lg text-gray-900">{{ __("Categories") }}</p>
         <CategoryFolderContainer />
       </section>
     </div>
@@ -36,6 +38,7 @@ import { LayoutHeader } from "@/components";
 import CategoryFolderContainer from "@/components/knowledge-base/CategoryFolderContainer.vue";
 import SearchPopover from "@/components/SearchPopover.vue";
 import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 
 const query = ref("");
 
@@ -44,7 +47,7 @@ onMounted(() => {
 });
 usePageMeta(() => {
   return {
-    title: "Knowledge Base",
+    title: __("Knowledge Base"),
   };
 });
 </script>

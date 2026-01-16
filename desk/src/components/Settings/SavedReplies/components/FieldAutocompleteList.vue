@@ -8,7 +8,7 @@
       :key="item.value"
       :ref="
         (el) => {
-          if (el) itemRefs[index] = el as HTMLButtonElement
+          if (el) itemRefs[index] = el as HTMLButtonElement;
         }
       "
       :class="[

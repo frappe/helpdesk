@@ -82,6 +82,7 @@ import {
   nextActiveTab,
   tabs,
 } from "./settingsModal";
+import { __ } from "@/translation";
 
 const show: ModelRef<boolean> = defineModel();
 

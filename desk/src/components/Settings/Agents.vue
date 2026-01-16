@@ -6,7 +6,7 @@
     <template #header-actions>
       <Button
         @click="() => setActiveSettingsTab('Invite Agents')"
-        label="New"
+        :label="__('New')"
         variant="solid"
       >
         <template #prefix>
@@ -205,6 +205,7 @@ import { activeFilter, useAgents } from "./agents";
 import AgentIcon from "../icons/AgentIcon.vue";
 import { setActiveSettingsTab } from "./settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { __ } from "@/translation";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
@@ -217,10 +218,10 @@ function getRoles(agent: string) {
   const agentRole = getUserRole(agent);
   const roles = [
     {
-      label: "Agent",
+      label: __("Agent"),
       component: (props) =>
         RoleOption({
-          role: "Agent",
+          role: __("Agent"),
           active: props.active,
           selected: agentRole === "Agent",
           icon: "user",
@@ -232,10 +233,10 @@ function getRoles(agent: string) {
   ];
   if (isManager) {
     roles.unshift({
-      label: "Manager",
+      label: __("Manager"),
       component: (props) =>
         RoleOption({
-          role: "Manager",
+          role: __("Manager"),
           active: props.active,
           selected: agentRole === "Manager",
           icon: "briefcase",
@@ -291,7 +292,7 @@ function updateRole(agent: string, newRole: string) {
     new_role: newRole,
   }).then(() => {
     updateUserRoleCache(agent, newRole);
-    toast.success(`Role updated to ${newRole}`);
+    toast.success(__("Role updated to {0}", [newRole]));
   });
 }
 
@@ -299,7 +300,7 @@ function getOptions(agent) {
   let filters = agentStore.filters;
   return [
     {
-      label: "Disable Agent",
+      label: __("Disable Agent"),
       icon: "x-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 0);
@@ -308,7 +309,7 @@ function getOptions(agent) {
       condition: () => agent.is_active,
     },
     {
-      label: "Enable Agent",
+      label: __("Enable Agent"),
       icon: "check-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 1);
@@ -321,24 +322,24 @@ function getOptions(agent) {
 
 const dropdownOptions = [
   {
-    label: "All",
+    label: __("All"),
     onClick: () => {
       agentStore.filters["is_active"] = ["in", [0, 1]];
-      activeFilter.value = "All";
+      activeFilter.value = __("All");
     },
   },
   {
-    label: "Active",
+    label: __("Active"),
     onClick: () => {
       agentStore.filters["is_active"] = ["=", 1];
-      activeFilter.value = "Active";
+      activeFilter.value = __("Active");
     },
   },
   {
-    label: "Inactive",
+    label: __("Inactive"),
     onClick: () => {
       agentStore.filters["is_active"] = ["=", 0];
-      activeFilter.value = "Inactive";
+      activeFilter.value = __("Inactive");
     },
   },
 ];
