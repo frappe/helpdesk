@@ -7,12 +7,14 @@ from frappe.query_builder import DocType
 from frappe.query_builder.functions import Avg, Count, Function
 from pypika import Case
 
-from helpdesk.utils import agent_only, is_version_16
+from helpdesk.utils import agent_only, is_frappe_version
 
 HD_TICKET = "HD Ticket"
 
 COUNT_NAME = (
-    {"COUNT": "name", "as": "count"} if is_version_16() else "count(name) as count"
+    {"COUNT": "name", "as": "count"}
+    if is_frappe_version("16", above=True)
+    else "count(name) as count"
 )
 
 COUNT_DESC = "count desc"

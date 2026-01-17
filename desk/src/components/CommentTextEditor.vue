@@ -39,10 +39,6 @@
         <!-- Fixed Menu -->
         <div class="flex justify-between overflow-hidden border-t py-2.5">
           <div class="flex items-center overflow-x-auto w-[60%]">
-            <TextEditorFixedMenu
-              class="-ml-1"
-              :buttons="textEditorMenuButtons"
-            />
             <FileUploader
               :upload-args="{
                 doctype: doctype,
@@ -51,7 +47,8 @@
               }"
               @success="(f) => attachments.push(f)"
             >
-              <template #default="{ openFileSelector }">
+              <template #default="{ openFileSelector, uploading }">
+                {{ void (loading = uploading) }}
                 <Button
                   theme="gray"
                   variant="ghost"
@@ -66,6 +63,10 @@
                 </Button>
               </template>
             </FileUploader>
+            <TextEditorFixedMenu
+              class="-ml-0.5"
+              :buttons="textEditorMenuButtons"
+            />
           </div>
           <div class="flex items-center justify-end space-x-2 w-[40%]">
             <Button
@@ -81,7 +82,7 @@
             <Button
               variant="solid"
               :label="label"
-              :disabled="commentEmpty"
+              :disabled="isDisabled"
               :loading="loading"
               @click="
                 () => {
@@ -168,8 +169,8 @@ const newComment = useStorage("commentBoxContent" + props.ticketId, null);
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
-const commentEmpty = computed(() => {
-  return isContentEmpty(newComment.value);
+const isDisabled = computed(() => {
+  return isContentEmpty(newComment.value) || loading.value;
 });
 const loading = ref(false);
 
