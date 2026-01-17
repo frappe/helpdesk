@@ -54,7 +54,7 @@
         <div class="w-[126px] text-gray-600 text-sm">{{ data.title }}</div>
 
         <div class="break-words text-base text-gray-800">
-          <Tooltip :text="dayjs(data.value).long()">
+          <Tooltip :text="dayjs(data.value).format('ddd, MMM DD, YYYY h:mm A')">
             <Badge :label="data.label" :theme="data.theme" variant="subtle" />
           </Tooltip>
         </div>
@@ -84,11 +84,10 @@
 </template>
 
 <script setup lang="ts">
-import { dayjs } from "@/dayjs";
 import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
 import { formatTime } from "@/utils";
-import { Avatar, Tooltip } from "frappe-ui";
+import { Avatar, dayjs, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 
 const emit = defineEmits(["open"]);
@@ -162,10 +161,12 @@ function resolutionData() {
       color: "orange",
     };
   } else if (ticket.data.agreement_status === "Fulfilled") {
+    let resolutionBy = formatTimeShort(
+      ticket.data.resolution_date,
+      ticket.data.creation
+    );
     resolution = {
-      label: `Fulfilled in ${formatTime(
-        dayjs(ticket.data.resolution_time, "s")
-      )}`,
+      label: `Fulfilled in ${resolutionBy}`,
       color: "green",
     };
   } else {
@@ -175,6 +176,26 @@ function resolutionData() {
     };
   }
   return resolution;
+}
+
+function formatTimeShort(date: string, end?: string): string {
+  if (!end) {
+    end = dayjs().toString();
+  }
+  let _date = dayjs(date);
+  let duration = dayjs.duration(_date.diff(dayjs(end)));
+
+  let days = duration.days();
+  let hours = duration.hours();
+  let minutes = duration.minutes();
+
+  if (days > 0) {
+    return `${days}d ${hours}h`;
+  } else if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  } else {
+    return `${minutes}m`;
+  }
 }
 
 const ticketBasicInfo = computed(() => [
