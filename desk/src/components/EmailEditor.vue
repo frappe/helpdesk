@@ -106,8 +106,13 @@
                 }
               "
             >
-              <template #default="{ openFileSelector }">
-                <Button variant="ghost" @click="openFileSelector()">
+              <template #default="{ openFileSelector, uploading }">
+                {{ void (isUploading = uploading) }}
+                <Button
+                  variant="ghost"
+                  @click="openFileSelector()"
+                  :loading="uploading"
+                >
                   <template #icon>
                     <AttachmentIcon
                       class="h-4"
@@ -134,7 +139,7 @@
           <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
-            :disabled="emailEmpty"
+            :disabled="isDisabled"
             :loading="sendMail.loading"
             :label="label"
             @click="
@@ -159,8 +164,8 @@
 <script setup lang="ts">
 import {
   AttachmentItem,
-  SavedRepliesSelectorModal,
   MultiSelectInput,
+  SavedRepliesSelectorModal,
 } from "@/components";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
@@ -239,8 +244,11 @@ const { isManager } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
-const emailEmpty = computed(() => {
-  return isContentEmpty(newEmail.value);
+const isUploading = ref(false);
+const isDisabled = computed(() => {
+  return (
+    isContentEmpty(newEmail.value) || sendMail.loading || isUploading.value
+  );
 });
 
 // Watch for changes in email content to trigger typing events
