@@ -155,7 +155,8 @@ const saveSettingsResource = createResource({
         skip_email_workflow: settingsData.value.skipEmailWorkflow,
         disable_saved_replies_global_scope:
           settingsData.value.disableSavedRepliesGlobalScope,
-        working_hours_notification: settingsData.value.showOutsideWorkingHoursBanner,
+        working_hours_notification:
+          settingsData.value.showOutsideWorkingHoursBanner,
         working_hours_message:
           settingsData.value.outsideWorkingHoursBannerMessage,
       },
@@ -193,7 +194,6 @@ const transformData = (data: any) => {
     ),
     showOutsideWorkingHoursBanner: Boolean(data.working_hours_notification),
     outsideWorkingHoursBannerMessage: data.working_hours_message || "",
-
   };
 };
 

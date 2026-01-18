@@ -1,6 +1,7 @@
 import frappe
 from frappe.utils import get_datetime
 
+
 @frappe.whitelist()
 def get_rendered_banner_msg(ticket_id):
     settings = frappe.get_doc("HD Settings", "HD Settings")
@@ -8,9 +9,9 @@ def get_rendered_banner_msg(ticket_id):
 
     if not banner_msg_template:
         return None
-    
+
     ticket = frappe.get_doc("HD Ticket", ticket_id).as_dict()
-    
+
     next_working_day = None
     next_working_daytime = None
     next_working_date = None
@@ -19,21 +20,20 @@ def get_rendered_banner_msg(ticket_id):
     if ticket.get("response_by"):
         next_working_day_dt = get_datetime(ticket.get("response_by"))
         next_working_day = next_working_day_dt.strftime("%A, %d %b")
-        next_working_date = next_working_day_dt.strftime("%d %b")  
+        next_working_date = next_working_day_dt.strftime("%d %b")
         expected_response = next_working_day_dt.strftime("%H:%M, %A, %d %b")
-    
+
     context = {
         "ticket": ticket,
         "next_working_day": next_working_day,
         "next_working_daytime": next_working_daytime,
         "next_working_date": next_working_date,
         "expected_response": expected_response,
-
         **ticket,
     }
-    
+
     rendered = frappe.render_template(banner_msg_template, context)
-    
+
     return {
         "banner_msg": rendered,
     }

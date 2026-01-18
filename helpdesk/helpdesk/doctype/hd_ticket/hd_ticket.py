@@ -1,9 +1,9 @@
 import json
 import uuid
+from datetime import timedelta
 from email.utils import parseaddr
 from functools import lru_cache
 from typing import List
-from datetime import timedelta
 
 import frappe
 from bs4 import BeautifulSoup
@@ -13,9 +13,9 @@ from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
 from frappe.model.document import Document
-from frappe.utils import  getdate, now_datetime
 from frappe.permissions import add_permission, update_permission_property
-from frappe.query_builder import Order, DocType
+from frappe.query_builder import DocType, Order
+from frappe.utils import getdate, now_datetime
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -858,10 +858,9 @@ class HDTicket(Document):
         """
         if sla := frappe.get_last_doc("HD Service Level Agreement", {"name": self.sla}):
             sla.apply(self)
-      
+
     def get_sla(self):
         return frappe.get_doc("HD Service Level Agreement", {"name": self.sla})
-    
 
     def is_outside_working_hours(self):
         """Return True if current time is outside this SLA's working hours."""
@@ -898,18 +897,17 @@ class HDTicket(Document):
             return True
 
         start_time, end_time = working_hours[day_name]
-        
+
         # Outside working hours
         if not (start_time <= current_td < end_time):
             return True
         return False
-        
 
     # @frappe.whitelist()
     # def get_outside_working_hour_setting():
     #     settings = frappe.db.get_single_value("HD Settings", "working_hours_notification")
     #     if(not settings):
-    #         return 
+    #         return
     #     msg_content = frappe.db.get_single_value("HD Settings", "working_hours_message")
     #     message = msg_content or "Your ticket is outside office hours, unless it is a critical issue, you will get a response by Monday"
 
@@ -917,7 +915,6 @@ class HDTicket(Document):
     #         "outside_working_hours_message": message if is_outside_working_hours() else "",
     #         }
 
-        
     def set_default_status(self):
         if self.is_new():
             self.status = self.default_open_status

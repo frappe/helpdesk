@@ -6,32 +6,32 @@
         *
       </span>
     </span>
-    <div class="flex gap-2 items-center">   
+    <div class="flex gap-2 items-center">
       <component
-      :is="component"
-      :placeholder="placeholder"
-      :value="transValue"
-      :disabled="field.disabled"
-      :model-value="transValue"
-      @update:model-value="emitUpdate(field.fieldname, $event)"
-      @change="
-        emitUpdate(
-          field.fieldname,
-          $event.target?.value || $event.value || $event
-        )
-      "
-    />
-    <slot name="label-extra" />
+        :is="component"
+        :placeholder="placeholder"
+        :value="transValue"
+        :disabled="field.disabled"
+        :model-value="transValue"
+        @update:model-value="emitUpdate(field.fieldname, $event)"
+        @change="
+          emitUpdate(
+            field.fieldname,
+            $event.target?.value || $event.value || $event
+          )
+        "
+      />
+      <slot name="label-extra" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Autocomplete  } from "@/components";
+import { Autocomplete } from "@/components";
 import { APIOptions, Field } from "@/types";
 import { parseApiOptions } from "@/utils";
 import { createResource, FormControl } from "frappe-ui";
-import { Link }  from "frappe-ui/frappe"
+import { Link } from "frappe-ui/frappe";
 import { computed, h } from "vue";
 
 type Value = string | number | boolean;

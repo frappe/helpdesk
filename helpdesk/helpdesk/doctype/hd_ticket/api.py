@@ -4,7 +4,7 @@ import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
-from frappe.utils import get_user_info_for_avatar, getdate, now_datetime
+from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
@@ -787,18 +787,21 @@ def is_outside_check(ticket_name: str):
     ticket = frappe.get_cached_doc("HD Ticket", ticket_name)
 
     # if currently is outside sla
-    display_ticket = ticket.is_outside_working_hours() and ticket.raised_outside_working_hours
+    display_ticket = (
+        ticket.is_outside_working_hours() and ticket.raised_outside_working_hours
+    )
 
     if display_ticket:
-        settings = frappe.db.get_single_value("HD Settings", "working_hours_notification")
-        if(not settings):
-            return 
+        settings = frappe.db.get_single_value(
+            "HD Settings", "working_hours_notification"
+        )
+        if not settings:
+            return
         msg_content = frappe.db.get_single_value("HD Settings", "working_hours_message")
-        message = msg_content or "Your ticket is outside office hours, unless it is a critical issue, you will get a response by Monday"
+        message = (
+            msg_content
+            or "Your ticket is outside office hours, unless it is a critical issue, you will get a response by Monday"
+        )
 
-        return {
-            "outside_working_hours_message": message
-            }   
+        return {"outside_working_hours_message": message}
     return False
-
-

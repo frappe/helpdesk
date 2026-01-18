@@ -227,7 +227,6 @@ const cleanupOldBannerDismissals = () => {
 
     // Update last cleanup timestamp
     localStorage.setItem(CLEANUP_KEY, now.toString());
-
   } catch (error) {
     console.error("Error cleaning up banner dismissals:", error);
   }
