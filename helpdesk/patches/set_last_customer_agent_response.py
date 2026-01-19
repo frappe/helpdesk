@@ -1,12 +1,9 @@
-import time
-
 import frappe
 
 
 def execute():
-    start = time.time()
     today = frappe.utils.nowdate()
-    old_date = frappe.utils.add_days(today, -490)
+    old_date = frappe.utils.add_days(today, -180)  # All tickets in the last 180 days
     communications = frappe.get_all(
         "Communication",
         filters=[
@@ -68,4 +65,3 @@ def execute():
         """
         )
         frappe.db.commit()
-    print("Total time:", time.time() - start)
