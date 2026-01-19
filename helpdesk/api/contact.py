@@ -6,9 +6,10 @@ import frappe
 @frappe.whitelist(methods=["GET"])
 def search_contacts(
     txt: str,
-) -> list[dict[Literal["full_name", "name", "email_id"], str]]:
+) -> list[dict[Literal["full_name", "name", "email_id", "image"], str]]:
     doctype = "Contact"
     or_filters: list[list[str]] = []
+    fields = ["full_name", "email_id", "name", "image"]
     search_fields = ["full_name", "email_id", "name"]
     if txt:
         for field in search_fields:
@@ -16,7 +17,7 @@ def search_contacts(
     return frappe.get_list(
         doctype,
         filters=[[doctype, "email_id", "is", "set"]],
-        fields=search_fields,
+        fields=fields,
         or_filters=or_filters,
         limit_start=0,
         limit_page_length=10,
