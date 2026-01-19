@@ -94,12 +94,12 @@ class HelpdeskDashboard:
             "HD Ticket Status",
             filters={"category": "Open"},
             pluck="name",
-        )
+        ) or ["Open"]
         self.resolved_statuses = frappe.get_all(
             "HD Ticket Status",
             filters={"category": "Resolved"},
             pluck="name",
-        )
+        ) or ["Closed"]
 
     def _get_conditions(self):
         conds = []
