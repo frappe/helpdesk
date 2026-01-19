@@ -1,15 +1,12 @@
 import frappe
 from frappe.utils import get_datetime
 
+from helpdesk.helpdesk.doctype.hd_settings.helpers import get_default_banner_msg
+
 
 @frappe.whitelist()
 def get_rendered_banner_msg(ticket_id):
-    settings = frappe.get_doc("HD Settings", "HD Settings")
-    banner_msg_template = settings.working_hours_message
-
-    if not banner_msg_template:
-        return None
-
+    banner_msg_template = get_default_banner_msg()
     ticket = frappe.get_doc("HD Ticket", ticket_id).as_dict()
 
     next_working_day = None
@@ -29,7 +26,6 @@ def get_rendered_banner_msg(ticket_id):
         "next_working_daytime": next_working_daytime,
         "next_working_date": next_working_date,
         "expected_response": expected_response,
-        **ticket,
     }
 
     rendered = frappe.render_template(banner_msg_template, context)

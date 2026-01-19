@@ -1,3 +1,6 @@
+import frappe
+
+
 def is_email_content_empty(content: str | None) -> bool:
     return content is None or content.strip() == ""
 
@@ -72,3 +75,10 @@ def get_default_email_content(type: str) -> str:
   <br />
 </div>
 """
+
+
+@frappe.whitelist()
+def get_default_banner_msg():
+    return """Thanks for reaching out 👋. 
+This ticket was created outside our working hours.
+You can expect the next response by {{ next_working_day }}."""

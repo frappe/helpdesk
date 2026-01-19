@@ -800,7 +800,7 @@ def is_outside_check(ticket_name: str):
         msg_content = frappe.db.get_single_value("HD Settings", "working_hours_message")
         message = (
             msg_content
-            or "Your ticket is outside office hours, unless it is a critical issue, you will get a response by Monday"
+            or "Your ticket was raised outside office working hours, So you might face a delay in getting a response"
         )
 
         return {"outside_working_hours_message": message}

@@ -280,18 +280,11 @@ import { computed, inject, ref } from "vue";
 const settingsData = inject(HDSettingsSymbol);
 const { statuses } = useTicketStatusStore();
 const outsideHourMsg = createResource({
-  url: "frappe.client.get",
-  params: {
-    doctype: "HD Settings",
-    name: "HD Settings",
-  },
+  url: "helpdesk.helpdesk.doctype.hd_settings.helpers.get_default_banner_msg",
   auto: true,
 });
 
-const defaultBannerMessage = computed(
-  () => outsideHourMsg.data?.working_hours_message || ""
-);
-
+const defaultBannerMessage = computed(() => outsideHourMsg.data || "");
 const ticketTypeList = createListResource({
   doctype: "HD Ticket Type",
   name: "HD Ticket Type",
