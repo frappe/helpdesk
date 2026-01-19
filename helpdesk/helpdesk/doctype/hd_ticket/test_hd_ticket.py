@@ -13,6 +13,7 @@ from helpdesk.test_utils import (
     get_priority_response_resolution_time,
     make_status,
     make_ticket,
+    make_sla,
     remove_holidays,
 )
 
@@ -625,6 +626,32 @@ class TestHDTicket(IntegrationTestCase):
             frappe.get_value("Communication", communcation_name, "reference_name"),
             ticket2_doc.name,
         )
+        
+    def test_ticket_inside_working_hours(self):
+        inside_working_hour = get_current_week_monday(hours=14)
+        with self.freeze_time(inside_working_hour):
+            ticket = make_ticket(priority="High")
+            self.assertFalse(ticket.raised_outside_working_hours)
+
+    def test_ticket_outside_working_hours(self):
+        outside_working_hour = get_current_week_monday(hours=8)
+        with self.freeze_time(outside_working_hour):
+            ticket = make_ticket(priority="High")
+            self.assertTrue(ticket.raised_outside_working_hours)
+
+    def test_ticket_outside_working_hours_weekend(self):
+        weekend = add_to_date(get_current_week_monday(), days=5, hours=14)
+        with self.freeze_time(weekend):
+            ticket = make_ticket(priority="High")
+            self.assertTrue(ticket.raised_outside_working_hours)
+
+    def test_ticket_outside_working_hours_holiday(self):
+        holiday_date = add_to_date(get_current_week_monday(), hours=14)
+        add_holiday(getdate(holiday_date), "Test Holiday")
+        
+        with self.freeze_time(holiday_date):
+            ticket = make_ticket(priority="High")
+            self.assertTrue(ticket.raised_outside_working_hours)
 
     def tearDown(self):
         remove_holidays()
