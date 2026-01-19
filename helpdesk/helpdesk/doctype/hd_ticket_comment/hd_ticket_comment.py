@@ -1,7 +1,6 @@
 # Copyright (c) 2022, Frappe Technologies and contributors
 # For license information, please see license.txt
 
-
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -15,8 +14,11 @@ PRESET_EMOJIS = ["👍", "👎", "❤️", "🎉", "👀", "✅"]
 class HDTicketComment(HasMentions, Document):
     mentions_field = "content"
 
+    def on_update(self):
+        if self.has_value_changed("content"):
+            self.notify_mentions()
+
     def after_insert(self):
-        self.notify_mentions()
         event = "helpdesk:ticket-comment"
         data = {"ticket_id": self.reference_ticket}
         telemetry_event = "ticket_comment_added"
