@@ -53,10 +53,11 @@
           <div class="mb-2 leading-5">
             <span class="space-x-1 text-gray-700">
               <span
-                v-if="n.notification_type !== 'Reaction'"
                 class="font-medium text-gray-900"
-                >{{ n.user_from }}</span
+                v-if="n.notification_type !== 'Reaction' && n.message"
               >
+                {{ n.user_from }}
+              </span>
               <span v-if="n.notification_type === 'Mention'"
                 >mentioned you in ticket</span
               >
@@ -66,11 +67,12 @@
               <span v-if="n.notification_type === 'Reaction'">{{
                 n.message
               }}</span>
-              <span
-                v-if="n.notification_type !== 'Reaction'"
-                class="font-medium text-gray-900"
-                >{{ n.reference_ticket }}</span
-              >
+            </span>
+            <span v-if="n.notification_type === 'Reaction' && !n.message">
+              has reopened the ticket
+            </span>
+            <span class="font-medium text-gray-900"
+              >&nbsp{{ n.reference_ticket }}
             </span>
           </div>
           <div class="flex items-center gap-2">
