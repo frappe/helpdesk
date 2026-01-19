@@ -275,7 +275,7 @@ import {
   Switch,
   Textarea,
 } from "frappe-ui";
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, watch } from "vue";
 
 const settingsData = inject(HDSettingsSymbol);
 const { statuses } = useTicketStatusStore();
@@ -285,6 +285,15 @@ const outsideHourMsg = createResource({
 });
 
 const defaultBannerMessage = computed(() => outsideHourMsg.data || "");
+
+watch(
+  () => settingsData?.showOutsideWorkingHoursBanner,
+  (isEnabled) => {
+    if (isEnabled && !settingsData?.outsideWorkingHoursBannerMessage) {
+      settingsData.outsideWorkingHoursBannerMessage = defaultBannerMessage.value;
+    }
+  }
+);
 const ticketTypeList = createListResource({
   doctype: "HD Ticket Type",
   name: "HD Ticket Type",
