@@ -2,8 +2,11 @@
 # For license information, please see license.txt
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
+=======
+>>>>>>> 07ea05aa (fix: notify only when comment is updated)
 import frappe
 from frappe import _
 >>>>>>> 67a753e5 (fix: duplicate mention notification)
@@ -16,8 +19,11 @@ from helpdesk.utils import capture_event, get_doc_room, publish_event
 class HDTicketComment(HasMentions, Document):
     mentions_field = "content"
 
+    def on_update(self):
+        if self.has_value_changed("content"):
+            self.notify_mentions()
+
     def after_insert(self):
-        self.notify_mentions()
         event = "helpdesk:ticket-comment"
         data = {"ticket_id": self.reference_ticket}
         telemetry_event = "ticket_comment_added"
