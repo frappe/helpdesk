@@ -54,7 +54,7 @@
             <span class="space-x-1 text-gray-700">
               <span
                 class="font-medium text-gray-900"
-                v-if="n.notification_type !== 'Reaction' && n.message"
+                v-if="n.notification_type !== 'Reaction' || !n.message"
               >
                 {{ n.user_from }}
               </span>
