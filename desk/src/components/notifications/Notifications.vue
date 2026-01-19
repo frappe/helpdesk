@@ -52,7 +52,16 @@
         <span>
           <div class="mb-2 leading-5">
             <span class="space-x-1 text-gray-700">
+<<<<<<< HEAD
               <span class="font-medium text-gray-900">{{ n.user_from }}</span>
+=======
+              <span
+                class="font-medium text-gray-900"
+                v-if="n.notification_type !== 'Reaction' || !n.message"
+              >
+                {{ n.user_from }}
+              </span>
+>>>>>>> b784ea80 (fix: update yarn lock in frontend folder)
               <span v-if="n.notification_type === 'Mention'"
                 >mentioned you in ticket</span
               >
