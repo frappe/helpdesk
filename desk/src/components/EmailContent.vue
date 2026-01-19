@@ -134,14 +134,6 @@ const htmlContent = computed(
     <link rel="stylesheet" href="${cssHref.value}" />
     <base target="_blank" />
     <style>
-      :root {
-        --bg-surface-gray-3: #ededed;
-        --bg-surface-gray-4: #e2e2e2;
-      }
-      [data-theme='dark'] {
-        --bg-surface-gray-3: #343434;
-        --bg-surface-gray-4: #424242;
-      }
       .replied-content .collapse {
         margin: 10px 0 10px 0;
         visibility: visible;
@@ -226,12 +218,8 @@ watch(iframeRef, (iframe) => {
 
       const parent = emailContent.closest("html");
       if (!parent) return;
-      let theme = document.documentElement.getAttribute("data-theme");
-      parent.setAttribute("data-theme", theme);
 
-      const font = getFontFamily(_content.value);
-      if (font) emailContent.classList.add(font);
-
+      emailContent.classList.add(getFontFamily(_content.value));
       iframe.style.height = parent.offsetHeight + 1 + "px";
 
       const replyCollapsers = emailContent.querySelectorAll(".replyCollapser");

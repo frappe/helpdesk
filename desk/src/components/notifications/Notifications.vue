@@ -59,24 +59,13 @@
               <span v-if="n.notification_type === 'Assignment'"
                 >assigned you a ticket</span
               >
-<<<<<<< HEAD
               <span v-if="n.notification_type === 'Reaction'"
                 >has reopened the ticket</span
               >
               <span class="font-medium text-gray-900">{{
                 n.reference_ticket
-=======
-              <span v-if="n.notification_type === 'Reaction'">{{
-                n.message
->>>>>>> c696a595 (fix: render notifications properly)
               }}</span>
             </span>
-            <span v-if="n.notification_type === 'Reaction' && !n.message">
-              has reopened the ticket</span
-            >
-            <span class="font-medium text-gray-900"
-              >&nbsp{{ n.reference_ticket }}</span
-            >
           </div>
           <div class="flex items-center gap-2">
             <div class="text-sm text-gray-600">
