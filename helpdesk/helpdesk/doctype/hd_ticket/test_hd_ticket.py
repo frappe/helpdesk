@@ -5,7 +5,11 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate
 
-from helpdesk.helpdesk.doctype.hd_ticket.api import merge_ticket, split_ticket
+from helpdesk.helpdesk.doctype.hd_ticket.api import (
+    is_outside_check,
+    merge_ticket,
+    split_ticket,
+)
 from helpdesk.test_utils import (
     add_comment,
     add_holiday,
@@ -636,13 +640,17 @@ class TestHDTicket(IntegrationTestCase):
         outside_working_hour = get_current_week_monday(hours=8)
         with self.freeze_time(outside_working_hour):
             ticket = make_ticket(priority="High")
+            banner_shown = is_outside_check(ticket)
             self.assertTrue(ticket.raised_outside_working_hours)
+            self.assertTrue(banner_shown)
 
     def test_ticket_outside_working_hours_weekend(self):
         weekend = add_to_date(get_current_week_monday(), days=5, hours=14)
         with self.freeze_time(weekend):
             ticket = make_ticket(priority="High")
+            banner_shown = is_outside_check(ticket)
             self.assertTrue(ticket.raised_outside_working_hours)
+            self.assertTrue(banner_shown)
 
     def test_ticket_outside_working_hours_holiday(self):
         holiday_date = add_to_date(get_current_week_monday(), hours=14)

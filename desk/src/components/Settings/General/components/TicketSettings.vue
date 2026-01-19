@@ -287,12 +287,20 @@ const outsideHourMsg = createResource({
 const defaultBannerMessage = computed(() => outsideHourMsg.data || "");
 
 watch(
-  () => settingsData?.showOutsideWorkingHoursBanner,
-  (isEnabled) => {
-    if (isEnabled && !settingsData?.outsideWorkingHoursBannerMessage) {
-      settingsData.outsideWorkingHoursBannerMessage = defaultBannerMessage.value;
+  [
+    () => settingsData?.showOutsideWorkingHoursBanner,
+    () => defaultBannerMessage.value,
+  ],
+  ([isEnabled, defaultMsg]) => {
+    if (
+      isEnabled &&
+      defaultMsg &&
+      !settingsData?.outsideWorkingHoursBannerMessage
+    ) {
+      settingsData.outsideWorkingHoursBannerMessage = defaultMsg;
     }
-  }
+  },
+  { immediate: true }
 );
 const ticketTypeList = createListResource({
   doctype: "HD Ticket Type",
