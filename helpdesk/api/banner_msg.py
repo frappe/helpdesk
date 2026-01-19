@@ -6,8 +6,10 @@ from helpdesk.helpdesk.doctype.hd_settings.helpers import get_default_banner_msg
 
 @frappe.whitelist()
 def get_rendered_banner_msg(ticket_id):
-    banner_msg_template = get_default_banner_msg()
+    banner_msg = frappe.db.get_single_value("HD Settings", "working_hours_message")
     ticket = frappe.get_doc("HD Ticket", ticket_id).as_dict()
+    if not banner_msg:
+        get_default_banner_msg()
 
     next_working_day = None
     next_working_daytime = None
@@ -28,7 +30,7 @@ def get_rendered_banner_msg(ticket_id):
         "expected_response": expected_response,
     }
 
-    rendered = frappe.render_template(banner_msg_template, context)
+    rendered = frappe.render_template(banner_msg, context)
 
     return {
         "banner_msg": rendered,

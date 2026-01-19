@@ -8,6 +8,7 @@ from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
+from helpdesk.api.banner_msg import get_rendered_banner_msg
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
@@ -784,24 +785,15 @@ def get_ticket_assignees(ticket: str):
 
 @frappe.whitelist()
 def is_outside_check(ticket_name: str):
-    ticket = frappe.get_cached_doc("HD Ticket", ticket_name)
+    settings = frappe.db.get_single_value("HD Settings", "working_hours_notification")
+    if not (settings):
+        return {"show": False}
 
-    # if currently is outside sla
-    display_ticket = (
-        ticket.is_outside_working_hours() and ticket.raised_outside_working_hours
-    )
+    ticket = frappe.get_doc("HD Ticket", ticket_name)
+    is_outside = ticket.raised_outside_working_hours
+    if is_outside:
+        banner_data = get_rendered_banner_msg(ticket_name)
 
-    if display_ticket:
-        settings = frappe.db.get_single_value(
-            "HD Settings", "working_hours_notification"
-        )
-        if not settings:
-            return
-        msg_content = frappe.db.get_single_value("HD Settings", "working_hours_message")
-        message = (
-            msg_content
-            or "Your ticket was raised outside office working hours, So you might face a delay in getting a response"
-        )
+        return {"msg": banner_data.get("banner_msg"), "show": True}
 
-        return {"outside_working_hours_message": message}
-    return False
+    return {"show": False}

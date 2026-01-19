@@ -26,15 +26,12 @@
       <!-- Main Ticket Comm -->
       <section class="flex flex-col flex-1 w-full md:max-w-[calc(100%-382px)]">
         <div
-          v-if="
-            outsideHourSettings.data?.outside_working_hours_message &&
-            !isDismissed
-          "
+          v-if="outsideHourSettings.data?.show && !isDismissed"
           class="md:mx-10 md:my-4 justify-between text-lg font-medium mx-6 mb-4 !mt-8"
         >
           <Alert
-            v-if="bannerMsg.data?.banner_msg"
-            :title="bannerMsg.data.banner_msg"
+            v-if="outsideHourSettings.data?.show"
+            :title="outsideHourSettings.data?.msg"
             theme="yellow"
             v-model="removeAlert"
           >
@@ -241,13 +238,13 @@ const outsideHourSettings = createResource({
   auto: true,
 });
 
-const bannerMsg = createResource({
-  url: "helpdesk.api.banner_msg.get_rendered_banner_msg",
-  params: {
-    ticket_id: props.ticketId,
-  },
-  auto: true,
-});
+// const bannerMsg = createResource({
+//   url: "helpdesk.api.banner_msg.get_rendered_banner_msg",
+//   params: {
+//     ticket_id: props.ticketId,
+//   },
+//   auto: true,
+// });
 
 const send = createResource({
   url: "run_doc_method",

@@ -8,6 +8,7 @@
     </span>
     <div class="flex gap-2 items-center">
       <component
+        class="w-full"
         :is="component"
         :placeholder="placeholder"
         :value="transValue"
