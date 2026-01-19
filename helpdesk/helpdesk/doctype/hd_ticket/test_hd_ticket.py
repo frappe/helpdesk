@@ -43,9 +43,10 @@ class TestHDTicket(FrappeTestCase):
         frappe.get_doc(
             {"doctype": "User", "first_name": "Agent", "email": agent}
         ).insert(ignore_if_duplicate=True)
-        frappe.get_doc({"doctype": "HD Agent", "user": agent}).insert(
-            ignore_if_duplicate=True
-        )
+
+        frappe.get_doc(
+            {"doctype": "HD Agent", "user": agent, " agent_name": "agent"}
+        ).insert(ignore_if_duplicate=True)
 
         frappe.get_doc(
             {"doctype": "User", "first_name": "Agent2", "email": agent2}
