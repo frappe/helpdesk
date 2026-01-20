@@ -197,7 +197,7 @@
             <div class="flex flex-col gap-1">
               <span class="text-base font-medium text-ink-gray-8">{{
                 __(
-                  "Display's a banner for tickets raised outside working hours"
+                  "Display a customizable banner when customers raise tickets outside working hours."
                 )
               }}</span>
               <span class="text-p-sm text-ink-gray-6"
@@ -208,12 +208,7 @@
                 }}
               </span>
             </div>
-            <Switch
-              :model-value="settingsData.showOutsideWorkingHoursBanner"
-              @update:model-value="
-                (value) => (settingsData.showOutsideWorkingHoursBanner = value)
-              "
-            />
+            <Switch v-model="settingsData.showOutsideWorkingHoursBanner" />
           </div>
           <Textarea
             v-if="settingsData.showOutsideWorkingHoursBanner"
@@ -242,14 +237,11 @@
             >
           </p>
           <Button
-            :disabled="
-              settingsData.outsideWorkingHoursBannerMessage ===
-              defaultBannerMessage
-            "
+            :disabled="!canResetBannerContent"
             type="button"
             size="sm"
             variant="subtle"
-            @click="onResetContent"
+            @click="onResetBannerContent"
             class="w-fit"
           >
             {{ __("Reset Content") }}
@@ -275,33 +267,37 @@ import {
   Switch,
   Textarea,
 } from "frappe-ui";
-import { computed, inject, ref, watch } from "vue";
+import { computed, inject } from "vue";
 
 const settingsData = inject(HDSettingsSymbol);
 const { statuses } = useTicketStatusStore();
-const outsideHourMsg = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_settings.helpers.get_default_banner_msg",
+
+const bannerMsgResource = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_settings.helpers.check_banner_msg",
   auto: true,
 });
 
-const defaultBannerMessage = computed(() => outsideHourMsg.data || "");
+const defaultBannerMessage = computed(() => {
+  return bannerMsgResource.data?.default || "";
+});
 
-watch(
-  [
-    () => settingsData?.showOutsideWorkingHoursBanner,
-    () => defaultBannerMessage.value,
-  ],
-  ([isEnabled, defaultMsg]) => {
-    if (
-      isEnabled &&
-      defaultMsg &&
-      !settingsData?.outsideWorkingHoursBannerMessage
-    ) {
-      settingsData.outsideWorkingHoursBannerMessage = defaultMsg;
-    }
-  },
-  { immediate: true }
-);
+const canResetBannerContent = computed(() => {
+  if (!settingsData?.value || !defaultBannerMessage.value) {
+    return false;
+  }
+  return (
+    settingsData.value.outsideWorkingHoursBannerMessage !==
+    defaultBannerMessage.value
+  );
+});
+
+const onResetBannerContent = () => {
+  if (settingsData?.value && defaultBannerMessage.value) {
+    settingsData.value.outsideWorkingHoursBannerMessage =
+      defaultBannerMessage.value;
+  }
+};
+
 const ticketTypeList = createListResource({
   doctype: "HD Ticket Type",
   name: "HD Ticket Type",
@@ -316,12 +312,6 @@ const ticketTypeList = createListResource({
   },
 });
 
-const onResetContent = () => {
-  if (settingsData?.value) {
-    settingsData.value.outsideWorkingHoursBannerMessage =
-      defaultBannerMessage.value;
-  }
-};
 const autoUpdateTicketStatusList = computed(() => {
   return (
     statuses.data?.map((s: HDTicketStatus) => {

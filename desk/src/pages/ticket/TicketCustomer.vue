@@ -25,15 +25,13 @@
     <div class="flex overflow-hidden h-full w-full">
       <!-- Main Ticket Comm -->
       <section class="flex flex-col flex-1 w-full md:max-w-[calc(100%-382px)]">
-        <div
-          v-if="outsideHourSettings.data?.show && !isDismissed"
-          class="md:mx-10 md:my-4 justify-between text-lg font-medium mx-6 mb-4 !mt-8"
-        >
+        <div v-if="outsideHourSettings.data?.show && !isDismissed">
           <Alert
             v-if="outsideHourSettings.data?.show"
             :title="outsideHourSettings.data?.msg"
             theme="yellow"
-            v-model="removeAlert"
+            class="rounded-none"
+            @dismiss="dismissBanner"
           >
           </Alert>
         </div>
@@ -162,12 +160,12 @@ const isExpanded = ref(false);
 const { isMobileView } = useScreenSize();
 const { $dialog } = globalStore();
 const isDismissed = ref(false);
-const removeAlert = ref(true);
 
-watch(removeAlert, (newValue) => {
-  if (!newValue) {
-    dismissBanner();
-  }
+const hasDifferentSenders = computed(() => {
+  const data = ticket.data?.communications || [];
+  const senders = new Set(data.map((c) => c.sender));
+  if (senders.size > 1) return false;
+  return true;
 });
 
 function getTodayKey() {
@@ -237,14 +235,6 @@ const outsideHourSettings = createResource({
   },
   auto: true,
 });
-
-// const bannerMsg = createResource({
-//   url: "helpdesk.api.banner_msg.get_rendered_banner_msg",
-//   params: {
-//     ticket_id: props.ticketId,
-//   },
-//   auto: true,
-// });
 
 const send = createResource({
   url: "run_doc_method",

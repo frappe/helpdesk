@@ -903,18 +903,6 @@ class HDTicket(Document):
             return True
         return False
 
-    # @frappe.whitelist()
-    # def get_outside_working_hour_setting():
-    #     settings = frappe.db.get_single_value("HD Settings", "working_hours_notification")
-    #     if(not settings):
-    #         return
-    #     msg_content = frappe.db.get_single_value("HD Settings", "working_hours_message")
-    #     message = msg_content or "Your ticket is outside office hours, unless it is a critical issue, you will get a response by Monday"
-
-    #     return {
-    #         "outside_working_hours_message": message if is_outside_working_hours() else "",
-    #         }
-
     def set_default_status(self):
         if self.is_new():
             self.status = self.default_open_status

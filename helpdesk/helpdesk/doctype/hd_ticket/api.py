@@ -8,10 +8,10 @@ from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
-from helpdesk.api.banner_msg import get_rendered_banner_msg
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
+from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
 from helpdesk.utils import (
@@ -789,8 +789,10 @@ def is_outside_check(ticket_name: str):
     if not (settings):
         return {"show": False}
 
-    ticket = frappe.get_doc("HD Ticket", ticket_name)
-    is_outside = ticket.raised_outside_working_hours
+    ticket = frappe.get_cached_doc("HD Ticket", ticket_name)
+    is_outside = (
+        ticket.is_outside_working_hours() and ticket.raised_outside_working_hours
+    )
     if is_outside:
         banner_data = get_rendered_banner_msg(ticket_name)
 

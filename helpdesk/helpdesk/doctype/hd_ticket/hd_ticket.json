@@ -442,14 +442,15 @@
    "fieldname": "raised_outside_working_hours",
    "fieldtype": "Check",
    "label": "Ticket raised outside working hours",
-   "read_only": 1
+   "read_only": 1,
+   "set_only_once": 1
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-01-15 19:52:12.056063",
+ "modified": "2026-01-20 15:18:57.195606",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
