@@ -28,11 +28,10 @@
 </template>
 
 <script setup lang="ts">
-import { Autocomplete } from "@/components";
+import { Autocomplete, Link } from "@/components";
 import { APIOptions, Field } from "@/types";
 import { parseApiOptions } from "@/utils";
 import { createResource, FormControl } from "frappe-ui";
-import { Link } from "frappe-ui/frappe";
 import { computed, h } from "vue";
 
 type Value = string | number | boolean;
