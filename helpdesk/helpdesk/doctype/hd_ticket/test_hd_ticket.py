@@ -5,10 +5,7 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate
 
-from helpdesk.helpdesk.doctype.hd_ticket.api import (
-    merge_ticket,
-    split_ticket,
-)
+from helpdesk.helpdesk.doctype.hd_ticket.api import merge_ticket, split_ticket
 from helpdesk.test_utils import (
     add_comment,
     add_holiday,

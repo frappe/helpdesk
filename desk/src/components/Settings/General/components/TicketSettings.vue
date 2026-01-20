@@ -196,9 +196,7 @@
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-1">
               <span class="text-base font-medium text-ink-gray-8">{{
-                __(
-                  "Display an after-hours ticket banner"
-                )
+                __("Display an after-hours ticket banner")
               }}</span>
               <span class="text-p-sm text-ink-gray-6"
                 >{{

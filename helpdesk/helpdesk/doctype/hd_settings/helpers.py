@@ -79,8 +79,7 @@ def get_default_email_content(type: str) -> str:
 
 
 def get_default_banner_msg():
-    return """Thanks for reaching out 👋. This ticket was created outside our working hours.
-You can expect the next response by {{ next_working_day }}."""
+    return """Thanks for reaching out 👋. This ticket was created outside our working hours. You can expect the next response by {{ next_working_day }}."""
 
 
 @frappe.whitelist()
