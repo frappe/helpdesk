@@ -206,7 +206,10 @@
                 }}
               </span>
             </div>
-            <Switch v-model="settingsData.showOutsideWorkingHoursBanner" />
+            <Switch
+              :model-value="settingsData.showOutsideWorkingHoursBanner"
+              @update:model-value="handleShowBannerToggle"
+            />
           </div>
           <Textarea
             v-if="settingsData.showOutsideWorkingHoursBanner"
@@ -235,12 +238,16 @@
             >
           </p>
           <Button
-            :disabled="!canResetBannerContent"
             type="button"
             size="sm"
             variant="subtle"
-            @click="onResetBannerContent"
             class="w-fit"
+            :disabled="!hasBannerMessageChanged"
+            @click="resetBannerContent"
+            :tooltip="
+              hasBannerMessageChanged &&
+              __('This will reset the content to the default message.')
+            "
           >
             {{ __("Reset Content") }}
           </Button>
@@ -270,31 +277,33 @@ import { computed, inject } from "vue";
 const settingsData = inject(HDSettingsSymbol);
 const { statuses } = useTicketStatusStore();
 
-const bannerMsgResource = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_settings.helpers.check_banner_msg",
+const bannerMsg = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_settings.helpers.get_banner_msg",
   auto: true,
 });
 
-const defaultBannerMessage = computed(() => {
-  return bannerMsgResource.data?.default || "";
-});
-
-const canResetBannerContent = computed(() => {
-  if (!settingsData?.value || !defaultBannerMessage.value) {
-    return false;
-  }
+const hasBannerMessageChanged = computed(() => {
   return (
     settingsData.value.outsideWorkingHoursBannerMessage !==
-    defaultBannerMessage.value
+    bannerMsg.data?.default
   );
 });
 
-const onResetBannerContent = () => {
-  if (settingsData?.value && defaultBannerMessage.value) {
-    settingsData.value.outsideWorkingHoursBannerMessage =
-      defaultBannerMessage.value;
+function resetBannerContent() {
+  settingsData.value.outsideWorkingHoursBannerMessage = bannerMsg.data?.default;
+}
+
+function handleShowBannerToggle(value: boolean) {
+  if (!bannerMsg.data.current) {
+    if (value) {
+      settingsData.value.outsideWorkingHoursBannerMessage =
+        bannerMsg.data?.default;
+    } else {
+      settingsData.value.outsideWorkingHoursBannerMessage = "";
+    }
   }
-};
+  settingsData.value.showOutsideWorkingHoursBanner = value;
+}
 
 const ticketTypeList = createListResource({
   doctype: "HD Ticket Type",

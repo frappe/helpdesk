@@ -629,6 +629,8 @@ export interface HDSettings {
   preferKnowledgeBase: boolean;
   skipEmailWorkflow: boolean;
   disableSavedRepliesGlobalScope: boolean;
+  showOutsideWorkingHoursBanner: boolean;
+  outsideWorkingHoursBannerMessage: string;
 }
 
 export interface HolidayList {

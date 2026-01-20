@@ -87,16 +87,16 @@ import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
 import {
+  Alert,
   Breadcrumbs,
   Button,
   call,
   createResource,
   toast,
-  Alert,
 } from "frappe-ui";
-import { __ } from "@/translation";
 import {
   computed,
   defineAsyncComponent,
@@ -104,7 +104,6 @@ import {
   onUnmounted,
   provide,
   ref,
-  watch,
 } from "vue";
 import { useRouter } from "vue-router";
 import { ITicket } from "./symbols";
@@ -228,8 +227,8 @@ const cleanupOldBannerDismissals = () => {
 };
 
 const outsideHourSettings = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket.api.is_outside_check",
-  debounce: 300,
+  url: "helpdesk.helpdesk.doctype.hd_ticket.api.show_outside_hours_banner",
+  cache: ["OutsideHourBanner", props.ticketId],
   params: {
     ticket_name: props.ticketId,
   },

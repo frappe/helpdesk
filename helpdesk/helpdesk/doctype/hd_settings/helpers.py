@@ -82,17 +82,15 @@ default_banner_msg = """Thanks for reaching out 👋. This ticket was created ou
 
 
 @frappe.whitelist()
-def check_banner_msg():
+def get_banner_msg():
     """Get current and default banner message for settings UI"""
 
     current_msg = frappe.db.get_single_value("HD Settings", "working_hours_message")
-    if not current_msg:
-        current_msg = default_banner_msg
     enabled = frappe.db.get_single_value("HD Settings", "working_hours_notification")
 
     return {
         "default": default_banner_msg,
-        "current": current_msg or default_banner_msg,
+        "current": current_msg or None,
         "enabled": bool(enabled),
     }
 
@@ -101,7 +99,7 @@ def get_rendered_banner_msg(ticket_id):
     banner_msg = frappe.db.get_single_value("HD Settings", "working_hours_message")
     ticket = frappe.get_doc("HD Ticket", ticket_id).as_dict()
     if not banner_msg:
-        default_banner_msg
+        banner_msg = default_banner_msg
 
     next_working_day = None
     next_working_daytime = None

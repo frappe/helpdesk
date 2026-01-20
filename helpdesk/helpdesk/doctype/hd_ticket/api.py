@@ -784,16 +784,19 @@ def get_ticket_assignees(ticket: str):
 
 
 @frappe.whitelist()
-def is_outside_check(ticket_name: str):
-    settings = frappe.db.get_single_value("HD Settings", "working_hours_notification")
-    if not (settings):
+def show_outside_hours_banner(ticket_name: str | int):
+    show_banner_settings = frappe.db.get_single_value(
+        "HD Settings", "working_hours_notification"
+    )
+    if not show_banner_settings:
         return {"show": False}
 
     ticket = frappe.get_cached_doc("HD Ticket", ticket_name)
-    is_outside = (
-        ticket.is_outside_working_hours() and ticket.raised_outside_working_hours
+    is_currently_outside = (
+        ticket.is_currently_outside_working_hours()
+        and ticket.raised_outside_working_hours
     )
-    if is_outside:
+    if is_currently_outside and not ticket.has_agent_replied:
         banner_data = get_rendered_banner_msg(ticket_name)
 
         return {"msg": banner_data.get("banner_msg"), "show": True}
