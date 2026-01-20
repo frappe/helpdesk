@@ -78,20 +78,21 @@ def get_default_email_content(type: str) -> str:
 """
 
 
-def get_default_banner_msg():
-    return """Thanks for reaching out 👋. This ticket was created outside our working hours. You can expect the next response by {{ next_working_day }}."""
+default_banner_msg = """Thanks for reaching out 👋. This ticket was created outside our working hours. You can expect the next response by {{ next_working_day }}."""
 
 
 @frappe.whitelist()
 def check_banner_msg():
     """Get current and default banner message for settings UI"""
+
     current_msg = frappe.db.get_single_value("HD Settings", "working_hours_message")
-    default_msg = get_default_banner_msg()
+    if not current_msg:
+        current_msg = default_banner_msg
     enabled = frappe.db.get_single_value("HD Settings", "working_hours_notification")
 
     return {
-        "default": default_msg,
-        "current": current_msg or default_msg,
+        "default": default_banner_msg,
+        "current": current_msg or default_banner_msg,
         "enabled": bool(enabled),
     }
 
@@ -100,7 +101,7 @@ def get_rendered_banner_msg(ticket_id):
     banner_msg = frappe.db.get_single_value("HD Settings", "working_hours_message")
     ticket = frappe.get_doc("HD Ticket", ticket_id).as_dict()
     if not banner_msg:
-        get_default_banner_msg()
+        default_banner_msg
 
     next_working_day = None
     next_working_daytime = None
@@ -137,5 +138,5 @@ def update_banner_settings(enabled: bool, content: str):
 
     return {
         "enabled": settings.working_hours_notification,
-        "content": settings.working_hours_message or get_default_banner_msg(),
+        "content": settings.working_hours_message or default_banner_msg,
     }

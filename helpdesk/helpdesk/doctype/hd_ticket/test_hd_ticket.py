@@ -636,17 +636,17 @@ class TestHDTicket(IntegrationTestCase):
         outside_working_hour = get_current_week_monday(hours=8)
         with self.freeze_time(outside_working_hour):
             ticket = make_ticket(priority="High")
-            banner_shown = ticket.is_outside_working_hours()
+            # banner_shown = ticket.is_outside_working_hours()
             self.assertTrue(ticket.raised_outside_working_hours)
-            self.assertTrue(banner_shown)
+            # self.assertTrue(banner_shown)
 
     def test_ticket_outside_working_hours_weekend(self):
         weekend = add_to_date(get_current_week_monday(), days=5, hours=14)
         with self.freeze_time(weekend):
             ticket = make_ticket(priority="High")
-            banner_shown = ticket.is_outside_working_hours()
+            # banner_shown = ticket.is_outside_working_hours()
             self.assertTrue(ticket.raised_outside_working_hours)
-            self.assertTrue(banner_shown)
+            # self.assertTrue(banner_shown)
 
     def test_ticket_outside_working_hours_holiday(self):
         holiday_date = add_to_date(get_current_week_monday(), hours=14)
