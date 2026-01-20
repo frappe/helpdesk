@@ -12,7 +12,7 @@
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
-    :mentions="agents"
+    :mentions="dropdown"
     @change="editable ? (newComment = $event) : null"
     :extensions="[PreserveVideoControls]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
@@ -39,10 +39,6 @@
         <!-- Fixed Menu -->
         <div class="flex justify-between overflow-hidden border-t py-2.5">
           <div class="flex items-center overflow-x-auto w-[60%]">
-            <TextEditorFixedMenu
-              class="-ml-1"
-              :buttons="textEditorMenuButtons"
-            />
             <FileUploader
               :upload-args="{
                 doctype: doctype,
@@ -51,7 +47,8 @@
               }"
               @success="(f) => attachments.push(f)"
             >
-              <template #default="{ openFileSelector }">
+              <template #default="{ openFileSelector, uploading }">
+                {{ void (loading = uploading) }}
                 <Button
                   theme="gray"
                   variant="ghost"
@@ -66,6 +63,10 @@
                 </Button>
               </template>
             </FileUploader>
+            <TextEditorFixedMenu
+              class="-ml-0.5"
+              :buttons="textEditorMenuButtons"
+            />
           </div>
           <div class="flex items-center justify-end space-x-2 w-[40%]">
             <Button
@@ -81,7 +82,7 @@
             <Button
               variant="solid"
               :label="label"
-              :disabled="commentEmpty"
+              :disabled="isDisabled"
               :loading="loading"
               @click="
                 () => {
@@ -121,21 +122,11 @@ import {
   uploadFunction,
 } from "@/utils";
 import { useStorage } from "@vueuse/core";
+import { storeToRefs } from "pinia";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { agents: agentsList } = useAgentStore();
+const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());
 const { isManager } = useAuthStore();
-
-onMounted(() => {
-  if (
-    agentsList.loading ||
-    agentsList.data?.length ||
-    agentsList.list.promise
-  ) {
-    return;
-  }
-  agentsList.fetch();
-});
 
 const props = defineProps({
   ticketId: {
@@ -168,8 +159,8 @@ const newComment = useStorage("commentBoxContent" + props.ticketId, null);
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
-const commentEmpty = computed(() => {
-  return isContentEmpty(newComment.value);
+const isDisabled = computed(() => {
+  return isContentEmpty(newComment.value) || loading.value;
 });
 const loading = ref(false);
 
@@ -186,15 +177,6 @@ onBeforeUnmount(() => {
 
 const label = computed(() => {
   return loading.value ? "Sending..." : props.label;
-});
-
-const agents = computed(() => {
-  return (
-    agentsList.data?.map((agent) => ({
-      label: agent.agent_name.trimEnd(),
-      value: agent.name,
-    })) || []
-  );
 });
 
 function removeAttachment(attachment) {
@@ -236,6 +218,17 @@ async function submitComment() {
 
 const editorRef = ref(null);
 const editor = computed(() => editorRef.value?.editor);
+
+onMounted(() => {
+  if (
+    agentsList.value.loading ||
+    agentsList.value.data?.length ||
+    agentsList.value.list.promise
+  ) {
+    return;
+  }
+  agentsList.value.fetch();
+});
 
 defineExpose({
   submitComment,

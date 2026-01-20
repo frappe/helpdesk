@@ -40,8 +40,10 @@ def make_agent(user_email):
     """Create an HD Agent for the given user."""
     if frappe.db.exists("HD Agent", {"user": user_email}):
         return frappe.get_doc("HD Agent", {"user": user_email})
-
-    agent = frappe.get_doc({"doctype": "HD Agent", "user": user_email})
+    name = user_email.split("@")[0] or "Agent"
+    agent = frappe.get_doc(
+        {"doctype": "HD Agent", "user": user_email, "agent_name": name}
+    )
     agent.insert(ignore_permissions=True)
     return agent
 
@@ -595,3 +597,6 @@ class TestHDSavedReply(IntegrationTestCase):
         self.assertNotIn(personal_agent2.name, replies)
         self.assertIn(team_a_reply.name, replies)
         self.assertNotIn(team_b_reply.name, replies)
+
+    def tearDown(self):
+        frappe.set_user("Administrator")

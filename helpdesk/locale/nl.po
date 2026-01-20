@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2025-12-09 21:36\n"
+"PO-Revision-Date: 2026-01-06 01:55\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Dutch\n"
 "MIME-Version: 1.0\n"
@@ -152,7 +152,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:72
 msgid "Add condition group"
-msgstr ""
+msgstr "Voorwaardengroep toevoegen"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:152
 msgid "Add holidays here to make sure they’re excluded from SLA calculations."
@@ -275,7 +275,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "All"
-msgstr ""
+msgstr "Allemaal"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
@@ -345,7 +345,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:368
 #: desk/src/components/Settings/Teams/NewTeam.vue:101
 msgid "Are you sure you want to go back? Unsaved changes will be lost."
-msgstr ""
+msgstr "Weet u zeker dat u terug wilt gaan? Niet-opgeslagen wijzigingen zullen verloren gaan."
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:162
 msgid "Are you sure you want to leave? Unsaved changes will be lost."
@@ -369,7 +369,7 @@ msgstr ""
 #: desk/src/components/ticket-agent/AssignToBody.vue:5
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Assign to"
-msgstr ""
+msgstr "Assign to"
 
 #: desk/src/components/ticket-agent/AssignToBody.vue:65
 msgid "Assign to me"
@@ -431,27 +431,27 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:35
 msgid "Assignment rule"
-msgstr ""
+msgstr "Assignment rule"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:560
 msgid "Assignment rule created"
-msgstr ""
+msgstr "Assignment rule created"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:129
 msgid "Assignment rule deleted"
-msgstr ""
+msgstr "Assignment rule deleted"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:161
 msgid "Assignment rule duplicated"
-msgstr ""
+msgstr "Assignment rule duplicated"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:647
 msgid "Assignment rule updated"
-msgstr ""
+msgstr "Assignment rule updated"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:198
 msgid "Assignment rule {0} updated"
-msgstr ""
+msgstr "Assignment rule {0} updated"
 
 #: desk/src/components/Settings/InviteAgents.vue:170
 msgid "At least one email required"
@@ -594,13 +594,13 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/Branding.vue:10
 msgid "Brand name"
-msgstr ""
+msgstr "Merknaam"
 
 #. Label of the branding_tab (Tab Break) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:4
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Branding"
-msgstr ""
+msgstr "Huisstijl"
 
 #: desk/src/components/Settings/Holiday/Holidays.vue:3
 msgid "Business Holidays"
@@ -649,7 +649,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:181
 msgid "Cannot enable rule without adding users in it"
-msgstr ""
+msgstr "Kan regel niet inschakelen zonder gebruikers toe te voegen"
 
 #: helpdesk/api/knowledge_base.py:122
 msgid "Cannot merge General category"
@@ -660,7 +660,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Category"
-msgstr ""
+msgstr "Categorie"
 
 #: helpdesk/api/knowledge_base.py:72
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.py:64
@@ -669,7 +669,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:40
 msgid "Change"
-msgstr ""
+msgstr "Verandering"
 
 #: desk/src/components/Settings/Profile/Profile.vue:123
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:2
@@ -678,7 +678,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:33
 msgid "Change image"
-msgstr ""
+msgstr "Afbeelding wijzigen"
 
 #: desk/src/components/Settings/Profile/Profile.vue:133
 msgid "Change language of the application."
@@ -719,7 +719,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:5
 msgid "Choose the email service provider you want to configure."
-msgstr ""
+msgstr "Kies de e-mailprovider die u wilt configureren."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:142
 msgid "Choose which tickets are affected by this assignment rule."
@@ -750,7 +750,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:44
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:58
 msgid "Close"
-msgstr ""
+msgstr "Dichtbij"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -766,7 +766,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Color"
-msgstr ""
+msgstr "Kleur"
 
 #. Label of the columns (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -780,7 +780,7 @@ msgstr ""
 #. Label of the reference_comment (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Comment"
-msgstr ""
+msgstr "Commentaar"
 
 #. Label of the commented_by (Link) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
@@ -813,7 +813,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:406
 msgid "Confirm overwrite"
-msgstr ""
+msgstr "Bevestig overschrijven"
 
 #. Label of the contact (Link) field in DocType 'HD Organization Contact Item'
 #. Label of the contact (Link) field in DocType 'HD Ticket'
@@ -838,7 +838,7 @@ msgstr ""
 #. Label of the contacts (Table) field in DocType 'HD Organization'
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 msgid "Contacts"
-msgstr ""
+msgstr "Contactpersonen"
 
 #. Label of the content_section (Section Break) field in DocType 'HD Article'
 #. Label of the content (Text Editor) field in DocType 'HD Article'
@@ -867,7 +867,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:94
 msgid "Create"
-msgstr ""
+msgstr "Creëren"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:5
 msgid "Create and manage teams and assign agents to specific teams."
@@ -914,7 +914,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.py:77
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:29
 msgid "Day count for auto closing tickets cannot be negative or zero"
@@ -926,7 +926,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAccountCard.vue:53
 msgid "Default Inbox"
-msgstr ""
+msgstr "Standaard Inbox"
 
 #. Label of the default_priority (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -945,11 +945,11 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAccountCard.vue:56
 msgid "Default Sending"
-msgstr ""
+msgstr "Standaard verzenden"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:50
 msgid "Default Sending and Inbox"
-msgstr ""
+msgstr "Standaard verzenden en Inbox"
 
 #. Label of the default_ticket_status (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -984,7 +984,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamEdit.vue:348
 #: desk/src/components/Settings/Teams/TeamEdit.vue:350
 msgid "Delete"
-msgstr ""
+msgstr "Verwijder"
 
 #. Label of the description (Text) field in DocType 'HD Article Category'
 #. Label of the description (Text Editor) field in DocType 'HD Holiday'
@@ -1010,7 +1010,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Description"
-msgstr ""
+msgstr "Beschrijving"
 
 #. Label of the description_template (Text Editor) field in DocType 'HD Ticket
 #. Template'
@@ -1042,7 +1042,7 @@ msgstr ""
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Disabled"
-msgstr ""
+msgstr "Uitgeschakeld"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:29
 msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
@@ -1087,7 +1087,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:61
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:100
 msgid "Duplicate"
-msgstr ""
+msgstr "Dupliceer"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:53
 msgid "Duplicate Assignment Rule"
@@ -1107,7 +1107,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
-msgstr ""
+msgstr "E-mail bewerken"
 
 #: desk/src/components/Settings/EmailEdit.vue:4
 msgid "Edit your email account"
@@ -1116,7 +1116,7 @@ msgstr ""
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "Email"
-msgstr ""
+msgstr "E-mail"
 
 #. Label of the email_account (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
@@ -1131,7 +1131,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAccountList.vue:3
 msgid "Email Accounts"
-msgstr ""
+msgstr "E-mail account"
 
 #. Label of the feedback_email_content (Text) field in DocType 'HD Settings'
 #. Label of the acknowledgement_email_content (Text) field in DocType 'HD
@@ -1158,7 +1158,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:267
 msgid "Email account updated successfully"
-msgstr ""
+msgstr "E-mailaccount succesvol bijgewerkt"
 
 #: desk/src/components/Settings/EmailEdit.vue:224
 msgid "Emails pulled successfully"
@@ -1204,12 +1204,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Enabled"
-msgstr ""
+msgstr "Ingeschakeld"
 
 #. Label of the end_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "End Date"
-msgstr ""
+msgstr "Einddatum"
 
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
@@ -1222,7 +1222,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/Branding.vue:11
 msgid "Enter brand name"
-msgstr ""
+msgstr "Voer merknaam in"
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:59
 #: desk/src/components/Settings/Teams/TeamEdit.vue:238
@@ -1253,11 +1253,11 @@ msgstr ""
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
-msgstr ""
+msgstr "Gefaald"
 
 #: desk/src/components/Settings/EmailAdd.vue:167
 msgid "Failed to create email account, Invalid credentials"
-msgstr ""
+msgstr "Maken van e-mailaccount is mislukt, ongeldige referenties"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:317
 msgid "Failed to load telephony agent"
@@ -1277,13 +1277,13 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:272
 msgid "Failed to update email account, Invalid credentials"
-msgstr ""
+msgstr "E-mailaccount bijwerken is mislukt, ongeldige referenties"
 
 #. Label of the favicon (Attach Image) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:27
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Favicon"
-msgstr ""
+msgstr "Favicon"
 
 #. Label of the feedback (Select) field in DocType 'HD Article Feedback'
 #. Label of the feedback_section (Section Break) field in DocType 'HD Settings'
@@ -1381,7 +1381,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:101
 msgid "First Name"
-msgstr ""
+msgstr "Voornaam"
 
 #. Label of the first_responded_on (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1399,7 +1399,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Response Time"
-msgstr ""
+msgstr "Eerste reactietijd"
 
 #. Name of a report
 #: helpdesk/helpdesk/report/first_response_time_for_tickets/first_response_time_for_tickets.json
@@ -1422,7 +1422,7 @@ msgstr ""
 #. Label of the user_from (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "From"
-msgstr ""
+msgstr "Van"
 
 #. Label of the from_date (Date) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -1431,7 +1431,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:17
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:17
 msgid "From Date"
-msgstr ""
+msgstr "Van Datum"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:85
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:155
@@ -1478,7 +1478,7 @@ msgstr ""
 #. Label of the group_by_field (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Group By Field"
-msgstr ""
+msgstr "Groepeer op veld"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -1764,7 +1764,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:130
 msgid "I understand, add conditions"
-msgstr ""
+msgstr "Ik begrijp het, voeg voorwaarden toe"
 
 #. Label of the ip_address (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
@@ -1778,7 +1778,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Icon"
-msgstr ""
+msgstr "Icoon"
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1835,11 +1835,11 @@ msgstr ""
 
 #: desk/src/components/CallArea.vue:36
 msgid "Inbound Call"
-msgstr ""
+msgstr "Binnenkomend gesprek"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:59
 msgid "Inbox"
-msgstr ""
+msgstr "Postvak IN"
 
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1859,7 +1859,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayView.vue:329
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:397
 msgid "Invalid fields, check if all are filled in and values are correct."
-msgstr ""
+msgstr "Ongeldige velden, controleer of alle velden zijn ingevuld en de waarden correct zijn."
 
 #: helpdesk/api/settings/email_notifications.py:112
 msgid "Invalid notification"
@@ -1890,7 +1890,7 @@ msgstr ""
 #. Label of the is_default (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Is Default"
-msgstr ""
+msgstr "Is Standaard"
 
 #. Label of the is_standard (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -1915,7 +1915,7 @@ msgstr ""
 
 #: desk/src/components/ticket-agent/AssignToBody.vue:11
 msgid "John Doe"
-msgstr ""
+msgstr "John Doe"
 
 #. Label of the key (Data) field in DocType 'HD Email Feedback'
 #. Label of the key (Data) field in DocType 'HD Ticket'
@@ -1962,7 +1962,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:107
 msgid "Last Name"
-msgstr ""
+msgstr "Achternaam"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
 msgid "Last user assigned by this rule"
@@ -1998,17 +1998,17 @@ msgstr ""
 
 #: desk/src/components/CallArea.vue:72
 msgid "Listen"
-msgstr ""
+msgstr "Luister"
 
 #. Label of the load_default_columns (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Load Default Columns"
-msgstr ""
+msgstr "Laad standaard Kolommen"
 
 #: desk/src/components/Settings/Agents.vue:188
 #: desk/src/components/Settings/Teams/TeamsList.vue:84
 msgid "Load More"
-msgstr ""
+msgstr "Meer laden"
 
 #. Label of the brand_logo (Attach Image) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:15
@@ -2069,7 +2069,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Message"
-msgstr ""
+msgstr "Bericht"
 
 #. Label of the meta_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2091,7 +2091,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:35
 msgid "Monthly"
-msgstr ""
+msgstr "Maandelijks"
 
 #. Label of the category_name (Data) field in DocType 'HD Article Category'
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
@@ -2109,7 +2109,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Name"
-msgstr ""
+msgstr "Naam"
 
 #. Label of the name_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2136,11 +2136,11 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamsList.vue:10
 #: desk/src/components/Settings/Teams/TeamsList.vue:124
 msgid "New"
-msgstr ""
+msgstr "Nieuw"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:9
 msgid "New Assignment Rule"
-msgstr ""
+msgstr "Nieuwe toewijzingsregel"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:59
 msgid "New Assignment Rule Name"
@@ -2230,7 +2230,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:76
 msgid "No results found"
-msgstr ""
+msgstr "No results found"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:113
 msgid "No team found"
@@ -2238,7 +2238,7 @@ msgstr ""
 
 #: helpdesk/utils.py:168
 msgid "Not Allowed"
-msgstr ""
+msgstr "Niet Toegestaan"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:250
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:270
@@ -2324,7 +2324,7 @@ msgstr ""
 
 #: desk/src/components/CallArea.vue:37
 msgid "Outbound Call"
-msgstr ""
+msgstr "Uitgaande oproep"
 
 #: helpdesk/api/settings/field_dependency.py:59
 msgid "Parent field, child field, and parent-child mapping are required."
@@ -2344,7 +2344,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:87
 msgid "Password updated successfully"
-msgstr ""
+msgstr "Wachtwoord succesvol veranderd"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:117
 msgid "Passwords do not match"
@@ -2364,7 +2364,7 @@ msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:36
 msgid "Pending Invites"
-msgstr ""
+msgstr "In afwachting van uitnodigingen"
 
 #: helpdesk/api/dashboard.py:552
 msgid "Percentage of Total Tickets by Channel"
@@ -2394,7 +2394,7 @@ msgstr ""
 #. Label of the pinned (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Pinned"
-msgstr ""
+msgstr "Vastgezet"
 
 #. Label of the placeholder (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
@@ -2484,7 +2484,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Priority"
-msgstr ""
+msgstr "Prioriteit"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:84
 msgid "Priority <u>{0}</u> must be included in the SLA {1}."
@@ -2511,7 +2511,7 @@ msgstr ""
 #. Label of the public (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Public"
-msgstr ""
+msgstr "Publiek"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -2592,12 +2592,12 @@ msgstr ""
 #. Label of the read (Check) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Read"
-msgstr ""
+msgstr "Lezen"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:107
 #: desk/src/components/Settings/Telephony/Telephony.vue:182
 msgid "Record Calls"
-msgstr ""
+msgstr "Opname gesprek"
 
 #. Label of the recurring_holidays (JSON) field in DocType 'HD Service Holiday
 #. List'
@@ -2648,7 +2648,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:39
 msgid "Remove image"
-msgstr ""
+msgstr "Verwijder afbeelding"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:292
 #: desk/src/components/Settings/Teams/TeamsList.vue:172
@@ -2830,29 +2830,29 @@ msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:18
 msgid "Role"
-msgstr ""
+msgstr "Rol"
 
 #. Label of the route_name (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Route Name"
-msgstr ""
+msgstr "Route Naam"
 
 #. Label of the rows (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Rows"
-msgstr ""
+msgstr "Rijen"
 
 #. Label of the sla (Link) field in DocType 'HD Ticket'
 #. Label of the sla_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA"
-msgstr ""
+msgstr "SLA"
 
 #. Label of the service_level_agreement_creation (Datetime) field in DocType
 #. 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA Creation"
-msgstr ""
+msgstr "SLA Creatie"
 
 #. Label of the sla_mapping_section (Section Break) field in DocType 'HD Ticket
 #. Status'
@@ -2863,7 +2863,7 @@ msgstr ""
 #. Label of the agreement_status (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA Status"
-msgstr ""
+msgstr "SLA-status"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:443
 msgid "SLA policy created"
@@ -2914,7 +2914,7 @@ msgstr ""
 #: desk/src/components/Settings/Telephony/Telephony.vue:22
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Save"
-msgstr ""
+msgstr "bewaren"
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:35
 msgid "Schedule name"
@@ -2934,7 +2934,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamsList.vue:25
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Search"
-msgstr ""
+msgstr "Zoek"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:10
 msgid "Search Index Regenerated"
@@ -2972,7 +2972,7 @@ msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:31
 msgid "Send Invites"
-msgstr ""
+msgstr "Stuur uitnodiging"
 
 #. Label of the send_email_feedback_on_status (Link) field in DocType 'HD
 #. Settings'
@@ -3038,7 +3038,7 @@ msgstr ""
 #: desk/src/components/Settings/SettingsModal.vue:13
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Settings"
-msgstr ""
+msgstr "instellingen"
 
 #: desk/src/components/Settings/General/General.vue:221
 msgid "Settings updated"
@@ -3051,7 +3051,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:3
 msgid "Setup Email"
-msgstr ""
+msgstr "E-mail instellen"
 
 #. Label of the share_feedback_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -3085,11 +3085,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:632
 msgid "Some error occurred while renaming assignment rule"
-msgstr ""
+msgstr "Er is een fout opgetreden bij het hernoemen van de toewijzingsregel"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:616
 msgid "Some error occurred while updating assignment rule"
-msgstr ""
+msgstr "Er is een fout opgetreden tijdens het bijwerken van de toewijzingsregel"
 
 #. Label of the source_doctype (Link) field in DocType 'HD Support Search
 #. Source'
@@ -3133,7 +3133,7 @@ msgstr ""
 #. Label of the start_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Start Date"
-msgstr ""
+msgstr "Startdatum"
 
 #. Label of the start_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
@@ -3213,7 +3213,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:30
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Subject"
-msgstr ""
+msgstr "Onderwerp"
 
 #. Label of the subject_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -3353,7 +3353,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:6
 msgid "Telephony"
-msgstr ""
+msgstr "Telefonie"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:383
 msgid "Telephony settings updated!"
@@ -3591,7 +3591,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_canned_response/hd_canned_response.json
 msgid "Title"
-msgstr ""
+msgstr "Titel"
 
 #. Label of the title_slug (Data) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -3601,7 +3601,7 @@ msgstr ""
 #. Label of the user_to (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "To"
-msgstr ""
+msgstr "Naar"
 
 #. Label of the to_date (Date) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -3610,7 +3610,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:24
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:24
 msgid "To Date"
-msgstr ""
+msgstr "Tot Datum"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:45
 msgid "To Date cannot be before From Date"
@@ -3623,7 +3623,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:147
 msgid "To know more about setting up email accounts, click"
-msgstr ""
+msgstr "Als u meer wilt weten over het instellen van e-mailaccounts, klikt u op"
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:35
 msgid "Top Result"
@@ -3631,7 +3631,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:98
 msgid "Total"
-msgstr ""
+msgstr "Totaal"
 
 #. Label of the total_hold_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -3716,19 +3716,19 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:367
 #: desk/src/components/Settings/Teams/NewTeam.vue:100
 msgid "Unsaved changes"
-msgstr ""
+msgstr "Niet-opgeslagen wijzigingen"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:8
 msgid "Untitled"
-msgstr ""
+msgstr "Ongetiteld"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:47
 msgid "Update"
-msgstr ""
+msgstr "Bijwerken"
 
 #: desk/src/components/Settings/EmailEdit.vue:80
 msgid "Update Account"
-msgstr ""
+msgstr "Account updaten"
 
 #. Label of the update_status_to (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -3741,11 +3741,11 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:41
 msgid "Upload"
-msgstr ""
+msgstr "Uploaden"
 
 #: desk/src/components/Settings/Profile/Profile.vue:34
 msgid "Upload image"
-msgstr ""
+msgstr "Afbeelding uploaden"
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:38
 msgid "Uploading {0}%"
@@ -3766,7 +3766,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:55
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:83
 msgid "User"
-msgstr ""
+msgstr "Gebruiker"
 
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.py:132
 msgid "User Not found"
@@ -3784,7 +3784,7 @@ msgstr ""
 #. Label of the users (Table MultiSelect) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Users"
-msgstr ""
+msgstr "Gebruikers"
 
 #. Label of the agreement_details_section (Section Break) field in DocType 'HD
 #. Service Level Agreement'
@@ -3811,7 +3811,7 @@ msgstr ""
 #. Label of the views (Int) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Views"
-msgstr ""
+msgstr "Keer bekeken"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -3878,7 +3878,7 @@ msgstr ""
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Working Hours"
-msgstr ""
+msgstr "Werkuren"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:37
 msgid "Yearly"
@@ -3911,7 +3911,7 @@ msgstr ""
 
 #: desk/src/components/telephony/CallUI.vue:35
 msgid "You can change the default calling medium from the settings"
-msgstr ""
+msgstr "U kunt het standaard oproepmedium wijzigen via de instellingen"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:136
 msgid "You cannot disable the default SLA."
@@ -3948,19 +3948,19 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "group_by"
-msgstr ""
+msgstr "groep_bij"
 
 #: desk/src/components/CallArea.vue:16
 msgid "has made a call"
-msgstr ""
+msgstr "heeft gebeld"
 
 #: desk/src/components/CallArea.vue:15
 msgid "has reached out"
-msgstr ""
+msgstr "heeft contact opgenomen"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:84
 msgid "here"
-msgstr ""
+msgstr "Hier"
 
 #: helpdesk/api/dashboard.py:196 helpdesk/api/dashboard.py:198
 msgid "hrs"
@@ -3969,7 +3969,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "kanban"
-msgstr ""
+msgstr "kanban"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json

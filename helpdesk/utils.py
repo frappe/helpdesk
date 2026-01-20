@@ -432,11 +432,17 @@ def is_json_valid(json_string):
         return False
 
 
-def is_version_16():
+def is_frappe_version(version: str, above: bool = False, below: bool = False):
     from frappe.pulse.utils import get_frappe_version
+    current_version = get_frappe_version()
+    major_version = int(current_version.split(".")[0])
+    target_version = int(version.split(".")[0])
 
-    version = get_frappe_version()
-    return version.startswith("16.")
+    if above:
+        return major_version >= target_version
+    if below:
+        return major_version < target_version
+    return major_version == target_version
 
 
 def format_time_difference(dt, context="ago"):
@@ -464,3 +470,4 @@ def format_time_difference(dt, context="ago"):
         return f"{int(total_seconds // 3600)}h"
     else:
         return f"{int(total_seconds // 86400)}d"
+

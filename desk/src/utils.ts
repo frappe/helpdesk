@@ -231,14 +231,14 @@ function hasArabicContent(content: string) {
 
 export function getFontFamily(content: string) {
   const langMap = {
-    default: "!font-[InterVar]",
+    default: "!font-[Inter]",
     arabic: "!font-[system-ui]",
   };
-  let lang = "default";
+  let lang = "";
   if (hasArabicContent(content)) {
     lang = "arabic";
   }
-  return langMap[lang];
+  return langMap[lang] || "";
 }
 
 /**
