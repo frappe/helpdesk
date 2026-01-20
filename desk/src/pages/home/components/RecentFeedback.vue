@@ -55,8 +55,7 @@
             </div>
             <div class="text-sm">
               {{ __("Your performance is") }}
-              <span :class="performance.color">{{ performance.text }}</span
-              >!
+              {{ performance }}!
             </div>
           </div>
           <!-- Bar Chart -->
@@ -309,13 +308,13 @@ const chartConfig = computed(() => {
 
 const performance = computed(() => {
   if (chartConfig.value.averageRating >= 4) {
-    return { text: __("excellent"), color: "text-green-600" };
+    return __("excellent");
   } else if (chartConfig.value.averageRating >= 3) {
-    return { text: __("good"), color: "text-green-600" };
+    return __("good");
   } else if (chartConfig.value.averageRating >= 2) {
-    return { text: __("average"), color: "text-yellow-600" };
+    return __("average");
   } else {
-    return { text: __("poor"), color: "text-red-600" };
+    return __("poor");
   }
 });
 
