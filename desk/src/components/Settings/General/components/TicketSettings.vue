@@ -197,13 +197,13 @@
             <div class="flex flex-col gap-1">
               <span class="text-base font-medium text-ink-gray-8">{{
                 __(
-                  "Display a customizable banner when customers raise tickets outside working hours."
+                  "Display an after-hours ticket banner"
                 )
               }}</span>
               <span class="text-p-sm text-ink-gray-6"
                 >{{
                   __(
-                    "Show a customizable message to customers when they raise tickets outside of working hours."
+                    "Inform customers when tickets are submitted outside business hours with a clear, customizable message."
                   )
                 }}
               </span>
