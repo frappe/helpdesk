@@ -47,9 +47,10 @@ class TestHDTicket(IntegrationTestCase):
         frappe.get_doc(
             {"doctype": "User", "first_name": "Agent", "email": agent}
         ).insert(ignore_if_duplicate=True)
-        frappe.get_doc({"doctype": "HD Agent", "user": agent}).insert(
-            ignore_if_duplicate=True
-        )
+
+        frappe.get_doc(
+            {"doctype": "HD Agent", "user": agent, "agent_name": "agent"}
+        ).insert(ignore_if_duplicate=True)
 
         frappe.get_doc(
             {"doctype": "User", "first_name": "Agent2", "email": agent2}
@@ -57,6 +58,9 @@ class TestHDTicket(IntegrationTestCase):
         frappe.get_doc({"doctype": "HD Agent", "user": agent2}).insert(
             ignore_if_duplicate=True
         )
+        frappe.get_doc(
+            {"doctype": "HD Agent", "user": agent2, "agent_name": "agent2"}
+        ).insert(ignore_if_duplicate=True)
         frappe.set_value("HD Settings", "HD Settings", "working_hours_notification", 1)
 
     def test_ticket_creation(self):
