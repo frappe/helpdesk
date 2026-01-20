@@ -94,7 +94,6 @@ class HDTicket(Document):
 
     def before_save(self):
         self.apply_sla()
-        self.raised_outside_working_hours = self.is_outside_working_hours()
         if not self.is_new():
             self.handle_ticket_activity_update()
 
@@ -168,6 +167,7 @@ class HDTicket(Document):
 
     def before_insert(self):
         self.generate_key()
+        self.raised_outside_working_hours = self.is_outside_working_hours()
 
     def after_insert(self):
         if self.ticket_split_from:
