@@ -85,8 +85,12 @@ default_banner_msg = """Thanks for reaching out 👋. This ticket was created ou
 def get_banner_msg():
     """Get current and default banner message for settings UI"""
 
-    current_msg = frappe.db.get_single_value("HD Settings", "working_hours_message")
-    enabled = frappe.db.get_single_value("HD Settings", "working_hours_notification")
+    current_msg = frappe.db.get_single_value(
+        "HD Settings", "outside_working_hours_message"
+    )
+    enabled = frappe.db.get_single_value(
+        "HD Settings", "outside_working_hours_notification"
+    )
 
     return {
         "default": default_banner_msg,
@@ -96,7 +100,9 @@ def get_banner_msg():
 
 
 def get_rendered_banner_msg(ticket_id):
-    banner_msg = frappe.db.get_single_value("HD Settings", "working_hours_message")
+    banner_msg = frappe.db.get_single_value(
+        "HD Settings", "outside_working_hours_message"
+    )
     ticket = frappe.get_doc("HD Ticket", ticket_id).as_dict()
     if not banner_msg:
         banner_msg = default_banner_msg
@@ -130,11 +136,11 @@ def get_rendered_banner_msg(ticket_id):
 @frappe.whitelist()
 def update_banner_settings(enabled: bool, content: str):
     settings = frappe.get_single("HD Settings")
-    settings.working_hours_notification = enabled
-    settings.working_hours_message = content
+    settings.outside_working_hours_notification = enabled
+    settings.outside_working_hours_message = content
     settings.save(ignore_permissions=True)
 
     return {
-        "enabled": settings.working_hours_notification,
-        "content": settings.working_hours_message or default_banner_msg,
+        "enabled": settings.outside_working_hours_notification,
+        "content": settings.outside_working_hours_message or default_banner_msg,
     }

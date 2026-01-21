@@ -160,13 +160,6 @@ const { isMobileView } = useScreenSize();
 const { $dialog } = globalStore();
 const isDismissed = ref(false);
 
-const hasDifferentSenders = computed(() => {
-  const data = ticket.data?.communications || [];
-  const senders = new Set(data.map((c) => c.sender));
-  if (senders.size > 1) return false;
-  return true;
-});
-
 function getTodayKey() {
   return new Date().toISOString().split("T")[0];
 }
