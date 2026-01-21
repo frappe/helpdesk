@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2026-01-06 01:55\n"
+"PO-Revision-Date: 2026-01-21 11:39\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Dutch\n"
 "MIME-Version: 1.0\n"
@@ -124,7 +124,7 @@ msgstr "Actief"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
-msgstr ""
+msgstr "Gemachtigde toevoegen"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:179
 msgid "Add Holiday"
@@ -138,7 +138,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
-msgstr ""
+msgstr "Een voorwaarde toevoegen"
 
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
 msgid "Add a custom condition"
@@ -148,7 +148,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:66
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
 msgid "Add condition"
-msgstr ""
+msgstr "Voorwaarde toevoegen"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:72
 msgid "Add condition group"
@@ -382,11 +382,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
 msgid "Assignee Rules"
-msgstr ""
+msgstr "Toegewezen regels"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:75
 msgid "Assignees"
-msgstr ""
+msgstr "Toegewezenen"
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -419,11 +419,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:291
 msgid "Assignment Schedule"
-msgstr ""
+msgstr "Toewijzing schema"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:137
 msgid "Assignment condition"
-msgstr ""
+msgstr "Toewijzing conditie"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:81
 msgid "Assignment conditions"
@@ -711,7 +711,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:295
 msgid "Choose the days of the week when this rule should be active."
-msgstr ""
+msgstr "Kies de dagen van de week waarop deze regel actief moet zijn."
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:80
 msgid "Choose the duration of this holiday list."
@@ -1091,7 +1091,7 @@ msgstr "Dupliceer"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:53
 msgid "Duplicate Assignment Rule"
-msgstr ""
+msgstr "Regel voor dubbele toewijzing"
 
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:28
 msgid "Duplicate Holiday List"
@@ -1692,7 +1692,7 @@ msgstr ""
 #. Name of a Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk"
-msgstr ""
+msgstr "Helpdesk"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
@@ -1871,7 +1871,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:84
 msgid "Invite agent"
-msgstr ""
+msgstr "Agent uitnodigen"
 
 #: desk/src/components/Settings/InviteAgents.vue:11
 msgid "Invite by email"
@@ -1958,7 +1958,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
-msgstr ""
+msgstr "Laatste"
 
 #: desk/src/components/Settings/Profile/Profile.vue:107
 msgid "Last Name"
@@ -1966,12 +1966,12 @@ msgstr "Achternaam"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
 msgid "Last user assigned by this rule"
-msgstr ""
+msgstr "Laatst gebruiker toegewezen door deze regel"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:150
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:227
 msgid "Learn about conditions"
-msgstr ""
+msgstr "Lees meer over de voorwaarden"
 
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:19
 msgid "Learn more about SLA"
@@ -2144,7 +2144,7 @@ msgstr "Nieuwe toewijzingsregel"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:59
 msgid "New Assignment Rule Name"
-msgstr ""
+msgstr "Naam nieuwe toewijzingsregel"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:8
 msgid "New Business Holiday"
@@ -2226,7 +2226,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:94
 msgid "No members found"
-msgstr ""
+msgstr "Geen leden gevonden"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:76
 msgid "No results found"
@@ -2254,7 +2254,7 @@ msgstr "Notificatie instellingen"
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:161
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:242
 msgid "Old Condition"
-msgstr ""
+msgstr "Oude conditie"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:103
 msgid "Old Conditions"
@@ -3160,7 +3160,7 @@ msgstr ""
 #. Label of the auto_close_status (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Status "
-msgstr ""
+msgstr "Status "
 
 #. Label of the status_category (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -3685,7 +3685,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:214
 msgid "Unassignment condition"
-msgstr ""
+msgstr "Niet-toewijzingsvoorwaarde"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:16
 msgid "Unauthorized Access"
@@ -3705,7 +3705,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/NewTeam.vue:17
 #: desk/src/components/Settings/Telephony/Telephony.vue:14
 msgid "Unsaved"
-msgstr ""
+msgstr "Niet opgeslagen"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:161
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:464
@@ -3895,7 +3895,7 @@ msgstr ""
 
 #: helpdesk/utils.py:167
 msgid "You are not permitted to access this resource."
-msgstr ""
+msgstr "U hebt geen toegang tot deze bron."
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:527
 msgid "You are not permitted to add a comment"
