@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2026-01-21 11:39\n"
+"PO-Revision-Date: 2026-01-22 12:01\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Dutch\n"
 "MIME-Version: 1.0\n"
@@ -287,7 +287,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Amber"
-msgstr ""
+msgstr "Amber"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:86
 msgid "Anyone will be able to create tickets without any permission. e.g. from webform."
@@ -3307,7 +3307,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Teal"
-msgstr ""
+msgstr "Groenblauw"
 
 #. Label of the team (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_team (Link) field in DocType 'HD Escalation Rule'
@@ -3749,7 +3749,7 @@ msgstr "Afbeelding uploaden"
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:38
 msgid "Uploading {0}%"
-msgstr ""
+msgstr "{0}% uploaden"
 
 #. Label of the user (Link) field in DocType 'HD Agent'
 #. Label of the user (Link) field in DocType 'HD Article Feedback'
@@ -3943,7 +3943,7 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:215 helpdesk/api/dashboard.py:217
 msgid "days"
-msgstr ""
+msgstr "dagen"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
