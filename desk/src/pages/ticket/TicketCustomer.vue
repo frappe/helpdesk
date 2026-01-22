@@ -25,12 +25,15 @@
     <div class="flex overflow-hidden h-full w-full">
       <!-- Main Ticket Comm -->
       <section class="flex flex-col flex-1 w-full md:max-w-[calc(100%-382px)]">
-        <div v-if="outsideHourSettings.data?.show && !isDismissed">
+        <div
+          class="px-6 md:px-10 mt-6"
+          v-if="outsideHourSettings.data?.show && !isDismissed"
+        >
           <Alert
             v-if="outsideHourSettings.data?.show"
             :title="outsideHourSettings.data?.msg"
             theme="yellow"
-            class="rounded-none"
+            class="text-p-sm"
             @dismiss="dismissBanner"
           >
           </Alert>
