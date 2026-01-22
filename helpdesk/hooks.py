@@ -54,6 +54,9 @@ user_invitation = {
     },
     "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
 }
+automation_rule_config = {
+    "allowed_doctypes": ["HD Ticket"],
+}
 
 doc_events = {
     "Contact": {
