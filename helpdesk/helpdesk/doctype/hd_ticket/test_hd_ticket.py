@@ -693,6 +693,20 @@ class TestHDTicket(IntegrationTestCase):
             self.assertTrue(ticket.raised_outside_working_hours)
             self.assertFalse(banner_shown)
 
+    def test_if_ticket_not_shown_after_next_working_day(self):
+        outside_working_hour = get_current_week_monday(hours=20)  # Monday 8 PM
+        with self.freeze_time(outside_working_hour):
+            ticket = make_ticket(priority="High")
+
+        ticket.reload()
+
+        next_working_day_morning = add_to_date(
+            get_current_week_monday(hours=9), days=1
+        )  # Tuesday 9 AM
+        with self.freeze_time(next_working_day_morning):
+            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            self.assertFalse(banner_shown)
+
     def tearDown(self):
         remove_holidays()
         frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")

@@ -15,7 +15,7 @@ from frappe.desk.form.assign_to import get as get_assignees
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
 from frappe.query_builder import DocType, Order
-from frappe.utils import getdate, now_datetime
+from frappe.utils import add_to_date, getdate, now_datetime
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -895,6 +895,7 @@ class HDTicket(Document):
             return True
 
         working_hours = sla.get_working_hours()
+        print(working_hours)
 
         # No working hours today
         if day_name not in working_hours:
@@ -906,6 +907,33 @@ class HDTicket(Document):
         if not (start_time <= current_td < end_time):
             return True
         return False
+
+    def show_banner_next_day(self):
+        sla = self.get_sla()
+        working_hours = sla.get_working_hours()
+
+        now = now_datetime()
+
+        nine_am = timedelta(hours=9)
+
+        next_date = add_to_date(now, days=1)
+        next_date_day_name = next_date.strftime("%A")
+
+        if next_date_day_name in working_hours:
+            start_time = working_hours[next_date_day_name][0]
+        else:
+            start_time = nine_am
+
+        now_td = timedelta(
+            hours=now.hour,
+            minutes=now.minute,
+            seconds=now.second,
+        )
+
+        if now_td >= start_time and next_date_day_name in working_hours:
+            return False
+
+        return True
 
     def set_default_status(self):
         if self.is_new():

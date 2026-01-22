@@ -795,6 +795,7 @@ def show_outside_hours_banner(ticket_name: str | int):
     is_currently_outside = (
         ticket.is_currently_outside_working_hours()
         and ticket.raised_outside_working_hours
+        and ticket.show_banner_next_day()
     )
     if is_currently_outside and not ticket.has_agent_replied:
         banner_data = get_rendered_banner_msg(ticket_name)
