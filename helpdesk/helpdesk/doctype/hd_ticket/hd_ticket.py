@@ -895,8 +895,6 @@ class HDTicket(Document):
             return True
 
         working_hours = sla.get_working_hours()
-        print(working_hours)
-
         # No working hours today
         if day_name not in working_hours:
             return True
@@ -914,15 +912,13 @@ class HDTicket(Document):
 
         now = now_datetime()
 
-        nine_am = timedelta(hours=9)
-
         next_date = add_to_date(now, days=1)
         next_date_day_name = next_date.strftime("%A")
 
-        if next_date_day_name in working_hours:
-            start_time = working_hours[next_date_day_name][0]
-        else:
-            start_time = nine_am
+        if not next_date_day_name in working_hours:
+            return True
+
+        start_time = working_hours[next_date_day_name][0]
 
         now_td = timedelta(
             hours=now.hour,
@@ -930,7 +926,7 @@ class HDTicket(Document):
             seconds=now.second,
         )
 
-        if now_td >= start_time and next_date_day_name in working_hours:
+        if now_td >= start_time:
             return False
 
         return True
