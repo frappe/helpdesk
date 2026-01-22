@@ -1,10 +1,11 @@
 import json
+from datetime import timedelta
 
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
-from frappe.utils import get_user_info_for_avatar, now_datetime
+from frappe.utils import add_to_date, get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
@@ -781,6 +782,31 @@ def get_ticket_activities(ticket: str):
 def get_ticket_assignees(ticket: str):
     assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
     return assignees
+
+
+def show_banner_next_day(self):
+    sla = self.get_sla()
+    working_hours = sla.get_working_hours()
+
+    now = now_datetime()
+
+    next_date = add_to_date(now, days=1)
+    next_date_day_name = next_date.strftime("%A")
+
+    if not next_date_day_name in working_hours:
+        return True
+
+    start_time = working_hours[next_date_day_name][0]
+
+    now_td = timedelta(
+        hours=now.hour,
+        minutes=now.minute,
+        seconds=now.second,
+    )
+
+    if now_td >= start_time:
+        return False
+    return True
 
 
 @frappe.whitelist()
