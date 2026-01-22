@@ -36,9 +36,6 @@
             class="text-p-sm [&_.size-4]:relative [&>.size-4]:top-[3.5px] [&_button>:first-child]:top-[2.25px] border border-amber-200"
             @dismiss="dismissBanner"
           >
-            <!-- <template #icon>
-            <LucideWarning class="h-6 w-4 text-ink-amber-3"/>
-          </template> -->
           </Alert>
         </div>
         <!-- show for only mobile -->
