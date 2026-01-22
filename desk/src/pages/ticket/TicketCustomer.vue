@@ -33,9 +33,12 @@
             v-if="outsideHourSettings.data?.show"
             :title="outsideHourSettings.data?.msg"
             theme="yellow"
-            class="text-p-sm"
+            class="text-p-sm [&_.size-4]:relative [&>.size-4]:top-[3.5px] [&_button>:first-child]:top-[2.25px] border border-amber-200"
             @dismiss="dismissBanner"
           >
+            <!-- <template #icon>
+            <LucideWarning class="h-6 w-4 text-ink-amber-3"/>
+          </template> -->
           </Alert>
         </div>
         <!-- show for only mobile -->
@@ -92,6 +95,7 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
+import LucideWarning from "~icons/lucide/triangle-alert";
 import {
   Alert,
   Breadcrumbs,
