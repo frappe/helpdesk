@@ -801,13 +801,10 @@ def show_banner_next_day(ticket):
 
     start_time = working_hours[next_date_day_name][0]
 
-    now_td = timedelta(
-        hours=now.hour,
-        minutes=now.minute,
-        seconds=now.second,
+    next_day_start_datetime = (
+        next_date.replace(hour=0, minute=0, second=0, microsecond=0) + start_time
     )
-
-    if now_td > start_time:
+    if now > next_day_start_datetime:
         return False
     return True
 

@@ -106,7 +106,6 @@ def get_rendered_banner_msg(ticket_id):
         banner_msg = default_banner_msg
 
     next_working_day = None
-    next_working_daytime = None
     next_working_date = None
     expected_response = None
 
@@ -118,8 +117,8 @@ def get_rendered_banner_msg(ticket_id):
 
     context = {
         "ticket": ticket,
+        "next_working_daytime": next_working_day_dt,
         "next_working_day": next_working_day,
-        "next_working_daytime": next_working_daytime,
         "next_working_date": next_working_date,
         "expected_response": expected_response,
     }
