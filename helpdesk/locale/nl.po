@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2026-01-22 12:01\n"
+"PO-Revision-Date: 2026-01-23 12:08\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Dutch\n"
 "MIME-Version: 1.0\n"
@@ -590,7 +590,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Blue"
-msgstr ""
+msgstr "Blauw"
 
 #: desk/src/components/Settings/General/components/Branding.vue:10
 msgid "Brand name"
@@ -755,7 +755,7 @@ msgstr "Dichtbij"
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Closed"
-msgstr ""
+msgstr "Gesloten"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:328
 msgid "Closed or rated tickets cannot be updated by non-agents"
@@ -805,7 +805,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamEdit.vue:115
 #: desk/src/components/Settings/Teams/TeamEdit.vue:241
 msgid "Confirm"
-msgstr ""
+msgstr "Bevestigen"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:19
 msgid "Confirm Password"
@@ -1292,7 +1292,7 @@ msgstr "Favicon"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback"
-msgstr ""
+msgstr "Terugkoppeling"
 
 #. Label of the feedback_extra (Small Text) field in DocType 'HD Email
 #. Feedback'
@@ -1468,7 +1468,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Green"
-msgstr ""
+msgstr "Groen"
 
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -1950,7 +1950,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:130
 msgid "Language"
-msgstr ""
+msgstr "Taal"
 
 #: desk/src/components/Settings/Profile/Profile.vue:250
 msgid "Language updated"
@@ -2172,7 +2172,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:8
 msgid "New Team"
-msgstr ""
+msgstr "Nieuw Team"
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:48
 #: desk/src/components/Settings/Teams/TeamEdit.vue:264
@@ -2332,7 +2332,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:115
 msgid "Password"
-msgstr ""
+msgstr "Wachtwoord"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:104
 msgid "Password must be at least 8 characters"
@@ -2516,7 +2516,7 @@ msgstr "Publiek"
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Published"
-msgstr ""
+msgstr "Gepubliceerd"
 
 #. Label of the published_on (Datetime) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -2610,7 +2610,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Red"
-msgstr ""
+msgstr "Rood"
 
 #. Label of the reference_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -3223,7 +3223,7 @@ msgstr ""
 #. Label of the summary (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Summary"
-msgstr ""
+msgstr "Overzicht"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -3362,7 +3362,7 @@ msgstr ""
 #. Label of the template (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Template"
-msgstr ""
+msgstr "Sjabloon"
 
 #. Label of the template_name (Data) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
