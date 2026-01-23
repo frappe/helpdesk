@@ -906,28 +906,6 @@ class HDTicket(Document):
             return True
         return False
 
-    def show_banner_next_day(self):
-        sla = self.get_sla()
-        working_hours = sla.get_working_hours()
-        now = now_datetime()
-        creation_date = self.opening_date
-        next_date = add_to_date(creation_date, days=1)
-        next_date_day_name = next_date.strftime("%A")
-
-        if next_date_day_name not in working_hours:
-            return True
-
-        start_time = working_hours[next_date_day_name][0]
-
-        now_td = timedelta(
-            hours=now.hour,
-            minutes=now.minute,
-            seconds=now.second,
-        )
-        if now_td >= start_time:
-            return False
-        return True
-
     def set_default_status(self):
         if self.is_new():
             self.status = self.default_open_status

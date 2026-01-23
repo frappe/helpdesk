@@ -671,7 +671,8 @@ class TestHDTicket(IntegrationTestCase):
             self.assertTrue(banner_shown)
 
         ticket.reload()
-        with self.freeze_time(add_to_date(get_current_week_monday(), days=1)):
+        newtime = add_to_date(get_current_week_monday(hours=14), days=1)
+        with self.freeze_time(newtime):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
             self.assertTrue(ticket.raised_outside_working_hours)
@@ -693,17 +694,14 @@ class TestHDTicket(IntegrationTestCase):
             self.assertTrue(ticket.raised_outside_working_hours)
             self.assertFalse(banner_shown)
 
-    def test_if_ticket_not_shown_after_next_working_day(self):
-        outside_working_hour = get_current_week_monday(hours=20)  # Monday 8 PM
-        with self.freeze_time(outside_working_hour):
-            ticket = make_ticket(priority="High")
+    def test_if_banner_not_shown_after_next_working_day(self):
+        outside_working_hour_day_1 = get_current_week_monday(hours=20)  # Monday 8 PM
+        with self.freeze_time(outside_working_hour_day_1):
+            ticket = make_ticket(priority="low")
 
         ticket.reload()
-
-        next_working_day_morning = add_to_date(
-            get_current_week_monday(hours=9), days=1
-        )  # Tuesday 9 AM
-        with self.freeze_time(next_working_day_morning):
+        next_working_day = add_to_date(get_current_week_monday(hours=20), days=1)
+        with self.freeze_time(next_working_day):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
 
