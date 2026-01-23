@@ -5,7 +5,12 @@ import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
-from frappe.utils import add_to_date, get_user_info_for_avatar, now_datetime
+from frappe.utils import (
+    add_to_date,
+    get_datetime,
+    get_user_info_for_avatar,
+    now_datetime,
+)
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
@@ -788,10 +793,9 @@ def show_banner_next_day(ticket):
     sla = ticket.get_sla()
     working_hours = sla.get_working_hours()
     now = now_datetime()
-    creation_date = ticket.opening_date
+    creation_date = get_datetime(ticket.creation)
     next_date = add_to_date(creation_date, days=1)
     next_date_day_name = next_date.strftime("%A")
-
     if next_date_day_name not in working_hours:
         return True
 
@@ -802,7 +806,10 @@ def show_banner_next_day(ticket):
         minutes=now.minute,
         seconds=now.second,
     )
-    return now_td < start_time
+
+    if now_td > start_time:
+        return False
+    return True
 
 
 @frappe.whitelist()

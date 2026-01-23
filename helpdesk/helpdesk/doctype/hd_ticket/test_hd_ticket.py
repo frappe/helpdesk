@@ -1,9 +1,11 @@
 # Copyright (c) 2023, Frappe Technologies and Contributors
 # See license.txt
 
+from datetime import timedelta
+
 import frappe
 from frappe.tests import IntegrationTestCase
-from frappe.utils import add_to_date, get_datetime, getdate
+from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     merge_ticket,
@@ -663,8 +665,8 @@ class TestHDTicket(IntegrationTestCase):
             self.assertTrue(banner_shown)
 
     def test_ticket_outside_working_hours_currently_in_working_hour(self):
-        outside_working_hour = get_current_week_monday(hours=20)
-        with self.freeze_time(outside_working_hour):
+        outside_working_hours = get_current_week_monday(hours=8)
+        with self.freeze_time(outside_working_hours):
             ticket = make_ticket(priority="High")
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertTrue(ticket.raised_outside_working_hours)
@@ -695,7 +697,7 @@ class TestHDTicket(IntegrationTestCase):
             self.assertFalse(banner_shown)
 
     def test_if_banner_not_shown_after_next_working_day(self):
-        outside_working_hour_day_1 = get_current_week_monday(hours=20)  # Monday 8 PM
+        outside_working_hour_day_1 = get_current_week_monday(hours=20)
         with self.freeze_time(outside_working_hour_day_1):
             ticket = make_ticket(priority="low")
 
