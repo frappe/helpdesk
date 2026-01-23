@@ -72,6 +72,9 @@ def authenticate():
     if path.startswith("/telephony") or path.startswith("/api/method/telephony."):
         return
 
+    if path.startswith("/api/method/frappe.integrations.oauth2_logins.custom"):
+        return
+
     if is_server_script_path(path):
         return
 
