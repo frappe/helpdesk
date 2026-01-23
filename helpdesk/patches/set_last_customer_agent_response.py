@@ -9,6 +9,8 @@ def execute():
         filters=[
             ["reference_doctype", "=", "HD Ticket"],
             ["creation", ">=", old_date],
+            ["reference_name", "!=", ""],  # filter out empty strings at DB level
+            ["reference_name", "is", "set"],  # filter out NULL values
         ],
         fields=["name", "creation", "sent_or_received", "reference_name"],
         order_by="creation desc",
@@ -20,6 +22,9 @@ def execute():
 
     for c in communications:
         ticket_id = c.reference_name
+        # skip communications without a valid ticket reference (extra safety check)
+        if not ticket_id or not str(ticket_id).strip():
+            continue
         if ticket_id not in ticket_responses:
             ticket_responses[ticket_id] = {
                 "last_customer_response": None,
@@ -38,30 +43,30 @@ def execute():
         ):
             ticket_responses[ticket_id]["last_customer_response"] = c.creation
 
-    # Build VALUES from ticket_responses
-    values_rows = []
+    # Build parameterized VALUES for bulk upsert. Use None for missing dates so DB gets NULL.
+    placeholders = []
+    params = []
     for ticket_id, resp in ticket_responses.items():
-        cust = (
-            frappe.db.escape(str(resp["last_customer_response"]))
-            if resp["last_customer_response"]
-            else "NULL"
+        # ensure ticket_id is not empty and use direct params to avoid quoting issues
+        if not ticket_id or not str(ticket_id).strip():
+            continue
+        placeholders.append("(%s, %s, %s)")
+        params.extend(
+            [
+                ticket_id,
+                resp["last_customer_response"],
+                resp["last_agent_response"],
+            ]
         )
-        agent = (
-            frappe.db.escape(str(resp["last_agent_response"]))
-            if resp["last_agent_response"]
-            else "NULL"
-        )
-        values_rows.append(f"({frappe.db.escape(ticket_id)}, {cust}, {agent})")
 
-    # Bulk update
-    if values_rows:
-        frappe.db.sql(
-            f"""
+    # Bulk update using parameterized query to avoid incorrect quoting/escaping
+    if placeholders:
+        sql = f"""
             INSERT INTO `tabHD Ticket` (name, last_customer_response, last_agent_response)
-            VALUES {", ".join(values_rows)}
+            VALUES {", ".join(placeholders)}
             ON DUPLICATE KEY UPDATE
                 last_customer_response = VALUES(last_customer_response),
                 last_agent_response = VALUES(last_agent_response)
         """
-        )
+        frappe.db.sql(sql, tuple(params))
         frappe.db.commit()
