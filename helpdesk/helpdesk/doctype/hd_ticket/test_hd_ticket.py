@@ -43,16 +43,17 @@ class TestHDTicket(IntegrationTestCase):
         frappe.get_doc(
             {"doctype": "User", "first_name": "Agent", "email": agent}
         ).insert(ignore_if_duplicate=True)
-        frappe.get_doc({"doctype": "HD Agent", "user": agent}).insert(
-            ignore_if_duplicate=True
-        )
+
+        frappe.get_doc(
+            {"doctype": "HD Agent", "user": agent, "agent_name": "agent"}
+        ).insert(ignore_if_duplicate=True)
 
         frappe.get_doc(
             {"doctype": "User", "first_name": "Agent2", "email": agent2}
         ).insert(ignore_if_duplicate=True)
-        frappe.get_doc({"doctype": "HD Agent", "user": agent2}).insert(
-            ignore_if_duplicate=True
-        )
+        frappe.get_doc(
+            {"doctype": "HD Agent", "user": agent2, "agent_name": "agent2"}
+        ).insert(ignore_if_duplicate=True)
 
     def test_ticket_creation(self):
         ticket = frappe.get_doc(get_ticket_obj())
