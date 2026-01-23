@@ -212,6 +212,7 @@ const ticketPriorityResource = createListResource({
   doctype: "HD Ticket Priority",
   fields: ["name", "description"],
   auto: true,
+  cache: "ticketPriorities",
 });
 
 let oldFields = [];

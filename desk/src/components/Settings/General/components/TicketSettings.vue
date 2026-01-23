@@ -207,12 +207,12 @@
               </span>
             </div>
             <Switch
-              :model-value="settingsData.showOutsideWorkingHoursBanner"
+              :model-value="settingsData.enableOutsideHoursBanner"
               @update:model-value="handleShowBannerToggle"
             />
           </div>
           <Textarea
-            v-if="settingsData.showOutsideWorkingHoursBanner"
+            v-if="settingsData.enableOutsideHoursBanner"
             variant="subtle"
             size="sm"
             placeholder="Enter Notification Message"
@@ -221,7 +221,7 @@
           />
         </div>
         <div
-          v-if="settingsData.showOutsideWorkingHoursBanner"
+          v-if="settingsData.enableOutsideHoursBanner"
           class="flex gap-x-1 items-start justify-between"
         >
           <p class="text-sm text-gray-700 leading-5">
@@ -302,7 +302,7 @@ function handleShowBannerToggle(value: boolean) {
       settingsData.value.outsideWorkingHoursBannerMessage = "";
     }
   }
-  settingsData.value.showOutsideWorkingHoursBanner = value;
+  settingsData.value.enableOutsideHoursBanner = value;
 }
 
 const ticketTypeList = createListResource({

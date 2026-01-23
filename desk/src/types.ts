@@ -629,7 +629,7 @@ export interface HDSettings {
   preferKnowledgeBase: boolean;
   skipEmailWorkflow: boolean;
   disableSavedRepliesGlobalScope: boolean;
-  showOutsideWorkingHoursBanner: boolean;
+  enableOutsideHoursBanner: boolean;
   outsideWorkingHoursBannerMessage: string;
 }
 

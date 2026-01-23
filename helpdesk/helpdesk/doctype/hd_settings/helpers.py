@@ -88,9 +88,7 @@ def get_banner_msg():
     current_msg = frappe.db.get_single_value(
         "HD Settings", "outside_working_hours_message"
     )
-    enabled = frappe.db.get_single_value(
-        "HD Settings", "outside_working_hours_notification"
-    )
+    enabled = frappe.db.get_single_value("HD Settings", "enable_outside_hours_banner")
 
     return {
         "default": default_banner_msg,
@@ -130,17 +128,4 @@ def get_rendered_banner_msg(ticket_id):
 
     return {
         "banner_msg": rendered,
-    }
-
-
-@frappe.whitelist()
-def update_banner_settings(enabled: bool, content: str):
-    settings = frappe.get_single("HD Settings")
-    settings.outside_working_hours_notification = enabled
-    settings.outside_working_hours_message = content
-    settings.save(ignore_permissions=True)
-
-    return {
-        "enabled": settings.outside_working_hours_notification,
-        "content": settings.outside_working_hours_message or default_banner_msg,
     }

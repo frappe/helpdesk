@@ -36,7 +36,7 @@
   "auto_close_status",
   "auto_close_after_days",
   "section_break_ylvs",
-  "outside_working_hours_notification",
+  "enable_outside_hours_banner",
   "outside_working_hours_message",
   "column_break_fzef",
   "status_section",
@@ -490,26 +490,26 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "0",
-   "description": "Let customers know they're raising a ticket outside working hours, and when they can expect a reply.",
-   "fieldname": "outside_working_hours_notification",
-   "fieldtype": "Check",
-   "label": "Apply outside working hours"
-  },
-  {
    "default": "Thanks for reaching out \ud83d\udc4b. This ticket was created outside our working hours. You can expect the next response by {{ next_working_day }}.",
-   "depends_on": "outside_working_hours_notification",
+   "depends_on": "enable_outside_hours_banner",
    "fieldname": "outside_working_hours_message",
    "fieldtype": "Small Text",
    "label": "Custom Outside Working Hours Message",
-   "mandatory_depends_on": "eval: doc.outside_working_hours_notification",
+   "mandatory_depends_on": "eval: doc.enable_outside_hours_banner",
    "placeholder": "Add your Custom Message here"
+  },
+  {
+   "default": "0",
+   "description": "Let customers know they're raising a ticket outside working hours, and when they can expect a reply.",
+   "fieldname": "enable_outside_hours_banner",
+   "fieldtype": "Check",
+   "label": "Apply outside working hours"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-01-21 10:53:51.592656",
+ "modified": "2026-01-23 18:30:40.906948",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
