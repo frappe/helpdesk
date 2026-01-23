@@ -19,5 +19,5 @@ def setup_complete(args=None):
     new_user = new_user[0]
     new_agent = frappe.new_doc("HD Agent")
     new_agent.user = new_user
-    new_agent.agent_name = "new_user"
+    new_agent.agent_name = new_user
     new_agent.insert(ignore_if_duplicate=True)
