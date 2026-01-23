@@ -17,4 +17,6 @@ def clear(ticket: str | int = None, comment: str = None):
     for notification in frappe.get_all(
         "HD Notification", filters=filters, pluck="name"
     ):
-        frappe.db.set_value("HD Notification", notification, "read", 1)
+        frappe.db.set_value(
+            "HD Notification", notification, "read", 1, update_modified=False
+        )
