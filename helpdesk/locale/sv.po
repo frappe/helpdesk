@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2025-12-09 21:36\n"
+"PO-Revision-Date: 2026-01-22 12:01\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -78,7 +78,7 @@ msgstr "<span class=\"h4\">Helpdesk Konfiguration<br></span>"
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "API"
-msgstr "API"
+msgstr "Single sign on"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:338
 msgid "Access all team tickets"
@@ -851,7 +851,7 @@ msgstr "Innehåll "
 #. Label of the content_type (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Content Type"
-msgstr "Innehållstyp"
+msgstr "Innehåll Typ"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:622
 msgid "Could not an email due to: {0}"
