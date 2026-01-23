@@ -39,6 +39,8 @@
   "first_responded_on",
   "column_break_26",
   "avg_response_time",
+  "last_agent_response",
+  "last_customer_response",
   "resolution_tab",
   "section_break_19",
   "resolution_details",
@@ -231,7 +233,8 @@
   {
    "fieldname": "first_responded_on",
    "fieldtype": "Datetime",
-   "label": "First Responded On"
+   "label": "First Responded On",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_26",
@@ -361,18 +364,21 @@
   {
    "fieldname": "feedback_extra",
    "fieldtype": "Long Text",
-   "label": "Feedback (Extra)"
+   "label": "Feedback (Extra)",
+   "read_only": 1
   },
   {
    "fieldname": "feedback",
    "fieldtype": "Link",
    "label": "Feedback (Option)",
-   "options": "HD Ticket Feedback Option"
+   "options": "HD Ticket Feedback Option",
+   "read_only": 1
   },
   {
    "fieldname": "feedback_rating",
    "fieldtype": "Rating",
-   "label": "Rating"
+   "label": "Rating",
+   "read_only": 1
   },
   {
    "fieldname": "sla_tab",
@@ -413,7 +419,8 @@
    "default": "0",
    "fieldname": "is_merged",
    "fieldtype": "Check",
-   "label": "Ticket Merged"
+   "label": "Ticket Merged",
+   "read_only": 1
   },
   {
    "depends_on": "eval:doc.is_merged",
@@ -435,6 +442,18 @@
    "fieldname": "status_category",
    "fieldtype": "Data",
    "label": "Status Category",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_agent_response",
+   "fieldtype": "Datetime",
+   "label": "Last Agent Response",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_customer_response",
+   "fieldtype": "Datetime",
+   "label": "Last Customer Response",
    "read_only": 1
   },
   {
