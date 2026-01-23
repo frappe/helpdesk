@@ -1,33 +1,35 @@
+import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
+import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
+import { Avatar } from "frappe-ui";
+import { AutomationRule } from "frappe-ui/frappe";
+import { AutomationIcon } from "frappe-ui/icons";
 import { computed, h, markRaw, ref } from "vue";
-import Agents from "./Agents.vue";
-import EmailConfig from "./EmailConfig.vue";
-import TeamsConfig from "./Teams/TeamsConfig.vue";
-import Sla from "./Sla/Sla.vue";
-import HolidayList from "./Holiday/Holiday.vue";
-import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
-import InviteAgents from "./InviteAgents.vue";
+import Briefcase from "~icons/lucide/briefcase";
 import LucideMail from "~icons/lucide/mail";
 import LucideMailOpen from "~icons/lucide/mail-open";
+import SettingsGear from "~icons/lucide/settings";
+import Settings from "~icons/lucide/settings-2";
+import ShieldCheck from "~icons/lucide/shield-check";
 import LucideUser from "~icons/lucide/user";
 import LucideUserPlus from "~icons/lucide/user-plus";
 import LucideUsers from "~icons/lucide/users";
-import ShieldCheck from "~icons/lucide/shield-check";
-import Briefcase from "~icons/lucide/briefcase";
-import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
-import Settings from "~icons/lucide/settings-2";
-import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
-import Telephony from "./Telephony/Telephony.vue";
-import { EmailNotifications } from "./EmailNotifications";
-import { __ } from "@/translation";
-import SavedReplies from "./SavedReplies/SavedReplies.vue";
-import Profile from "./Profile/Profile.vue";
-import { Avatar } from "frappe-ui";
-import { useAuthStore } from "@/stores/auth";
-import General from "./General/General.vue";
-import SettingsGear from "~icons/lucide/settings";
 import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
+import Agents from "./Agents.vue";
+import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
+import EmailConfig from "./EmailConfig.vue";
+import { EmailNotifications } from "./EmailNotifications";
+import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
+import General from "./General/General.vue";
+import HolidayList from "./Holiday/Holiday.vue";
+import InviteAgents from "./InviteAgents.vue";
+import Profile from "./Profile/Profile.vue";
+import SavedReplies from "./SavedReplies/SavedReplies.vue";
+import Sla from "./Sla/Sla.vue";
+import TeamsConfig from "./Teams/TeamsConfig.vue";
+import Telephony from "./Telephony/Telephony.vue";
 
-export const showSettingsModal = ref(false);
+export const showSettingsModal = ref(true);
 
 const auth = useAuthStore();
 
@@ -37,6 +39,11 @@ export const tabs = computed(() => {
       label: __("User Settings"),
       hideLabel: true,
       items: [
+        {
+          label: __("Automation Rules"),
+          icon: markRaw(AutomationIcon),
+          component: markRaw(AutomationRule),
+        },
         {
           label: __("Profile"),
           icon: h(Avatar, {
