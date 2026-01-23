@@ -20,7 +20,6 @@ ALLOWED_PATHS = [
     "/api/method/frappe.www.login.login_via_frappe",
     "/api/method/frappe.www.login.login_via_office365",
     "/api/method/frappe.www.login.login_via_salesforce",
-    "/api/method/frappe.integrations.oauth2_logins.custom",
     "/api/method/frappe.www.login.login_via_fairlogin",
     "/api/method/frappe.www.login.login_via_keycloak",
     "/api/method/frappe.www.login.custom",
