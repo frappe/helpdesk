@@ -23,7 +23,11 @@ ALLOWED_PATHS = [
     "/api/method/frappe.www.login.login_via_fairlogin",
     "/api/method/frappe.www.login.login_via_keycloak",
     "/api/method/frappe.www.login.custom",
-    "api/method/frappe.core.api.user_invitation.get_pending_invitations",
+    "/api/method/frappe.integrations.oauth2_logins.login_via_frappe",
+    "/api/method/frappe.integrations.oauth2_logins.login_via_office365",
+    "/api/method/frappe.integrations.oauth2_logins.login_via_salesforce",
+    "/api/method/frappe.integrations.oauth2_logins.login_via_fairlogin",
+    "/api/method/frappe.core.api.user_invitation.get_pending_invitations",
     "/api/method/frappe.integrations.oauth2.openid_profile",
     "/api/method/frappe.website.doctype.web_page_view.web_page_view.make_view_log",
     "/api/method/upload_file",
@@ -50,6 +54,10 @@ ALLOWED_PATHS = [
     "/api/method/run_doc_method",
 ]
 
+WILDCARD_PATHS = [
+    "/api/method/frappe.integrations.oauth2_logins.custom",
+]
+
 
 def authenticate():
     if not frappe.conf.get("block_endpoints"):
@@ -72,8 +80,9 @@ def authenticate():
     if path.startswith("/telephony") or path.startswith("/api/method/telephony."):
         return
 
-    if path.startswith("/api/method/frappe.integrations.oauth2_logins.custom"):
-        return
+    for p in WILDCARD_PATHS:
+        if path.startswith(p):
+            return
 
     if is_server_script_path(path):
         return
