@@ -52,10 +52,27 @@
         class="flex items-center text-base"
       >
         <div class="w-[126px] text-gray-600 text-sm">{{ data.title }}</div>
-
-        <div class="break-words text-base text-gray-800">
+        <div
+          class="break-words text-base text-gray-800 flex items-center gap-2"
+        >
           <Tooltip :text="dayjs(data.value).long()">
             <Badge :label="data.label" :theme="data.theme" variant="subtle" />
+          </Tooltip>
+          <!-- SLA explanation icon -->
+          <Tooltip
+            v-if="
+              dayjs(data.value).diff(dayjs(), 'day', true) > 4 &&
+              data.title === 'Resolution'
+            "
+            :text="
+              __(
+                'This date is calculated based on configured SLAs, working hours, and holidays.'
+              )
+            "
+          >
+            <lucide-circle-question-mark
+              class="h-4 w-4 text-ink-gray-6 cursor-pointer"
+            />
           </Tooltip>
         </div>
       </div>

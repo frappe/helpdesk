@@ -15,7 +15,8 @@ class HDTicketComment(HasMentions, Document):
     mentions_field = "content"
 
     def on_update(self):
-        self.notify_mentions()
+        if self.has_value_changed("content"):
+            self.notify_mentions()
 
     def after_insert(self):
         event = "helpdesk:ticket-comment"
