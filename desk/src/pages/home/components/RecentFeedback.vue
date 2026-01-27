@@ -3,6 +3,12 @@
     <div class="flex flex-col rounded-md p-4 min-h-48 grow w-full h-full">
       <div
         v-if="chartConfig.averageRating == 0"
+        class="text-ink-gray-8 text-lg font-semibold"
+      >
+        {{ __("Reviews") }}
+      </div>
+      <div
+        v-if="chartConfig.averageRating == 0"
         class="flex flex-col justify-center items-center text-center gap-2 h-full w-full"
       >
         <div class="flex flex-col gap-2 max-w-60">
