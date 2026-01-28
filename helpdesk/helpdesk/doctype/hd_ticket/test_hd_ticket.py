@@ -1,11 +1,17 @@
 # Copyright (c) 2023, Frappe Technologies and Contributors
 # See license.txt
 
+from datetime import timedelta
+
 import frappe
 from frappe.tests import IntegrationTestCase
-from frappe.utils import add_to_date, get_datetime, getdate
+from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
-from helpdesk.helpdesk.doctype.hd_ticket.api import merge_ticket, split_ticket
+from helpdesk.helpdesk.doctype.hd_ticket.api import (
+    merge_ticket,
+    show_outside_hours_banner,
+    split_ticket,
+)
 from helpdesk.test_utils import (
     add_comment,
     add_holiday,
@@ -54,6 +60,7 @@ class TestHDTicket(IntegrationTestCase):
         frappe.get_doc(
             {"doctype": "HD Agent", "user": agent2, "agent_name": "agent2"}
         ).insert(ignore_if_duplicate=True)
+        frappe.set_value("HD Settings", "HD Settings", "enable_outside_hours_banner", 1)
 
     def test_ticket_creation(self):
         ticket = frappe.get_doc(get_ticket_obj())
@@ -626,6 +633,77 @@ class TestHDTicket(IntegrationTestCase):
             frappe.get_value("Communication", communcation_name, "reference_name"),
             ticket2_doc.name,
         )
+
+    def test_ticket_inside_working_hours(self):
+        inside_working_hour = get_current_week_monday(hours=14)
+        with self.freeze_time(inside_working_hour):
+            ticket = make_ticket(priority="High")
+            self.assertFalse(ticket.raised_outside_working_hours)
+
+    def test_ticket_inside_working_hours_currently_outside(self):
+        inside_working_hour = get_current_week_monday(hours=14)
+        with self.freeze_time(inside_working_hour):
+            # Ticket created inside working hours
+            ticket = make_ticket(priority="High")
+            self.assertFalse(ticket.raised_outside_working_hours)
+            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            self.assertFalse(banner_shown)
+
+        ticket.reload()
+        with self.freeze_time(get_current_week_monday(hours=20)):
+            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            self.assertFalse(banner_shown)
+
+    def test_ticket_outside_working_hours(self):
+        outside_working_hour = get_current_week_monday(hours=8)
+        with self.freeze_time(outside_working_hour):
+            ticket = make_ticket(priority="High")
+            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            self.assertTrue(ticket.raised_outside_working_hours)
+            self.assertTrue(banner_shown)
+
+    def test_ticket_outside_working_hours_currently_in_working_hour(self):
+        outside_working_hours = get_current_week_monday(hours=8)
+        with self.freeze_time(outside_working_hours):
+            ticket = make_ticket(priority="High")
+            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            self.assertTrue(ticket.raised_outside_working_hours)
+            self.assertTrue(banner_shown)
+
+        ticket.reload()
+        newtime = add_to_date(get_current_week_monday(hours=14), days=1)
+        with self.freeze_time(newtime):
+            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            self.assertFalse(banner_shown)
+            self.assertTrue(ticket.raised_outside_working_hours)
+
+    def test_ticket_outside_working_hours_weekend(self):
+        weekend = add_to_date(get_current_week_monday(), days=5, hours=14)
+        with self.freeze_time(weekend):
+            ticket = make_ticket(priority="High")
+            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            self.assertTrue(ticket.raised_outside_working_hours)
+            self.assertTrue(banner_shown)
+
+    def test_ticket_outside_working_hours_agent_replied(self):
+        outside_working_hour = get_current_week_monday(hours=8)
+        with self.freeze_time(outside_working_hour):
+            ticket = make_ticket(priority="High")
+            ticket.reply_via_agent(message="Test reply to split")
+            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            self.assertTrue(ticket.raised_outside_working_hours)
+            self.assertFalse(banner_shown)
+
+    def test_if_banner_not_shown_after_next_working_day(self):
+        outside_working_hour_day_1 = get_current_week_monday(hours=20)
+        with self.freeze_time(outside_working_hour_day_1):
+            ticket = make_ticket(priority="low")
+
+        ticket.reload()
+        next_working_day = add_to_date(get_current_week_monday(hours=20), days=1)
+        with self.freeze_time(next_working_day):
+            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            self.assertFalse(banner_shown)
 
     def tearDown(self):
         remove_holidays()

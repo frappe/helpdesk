@@ -32,7 +32,26 @@
           @change="
             (e) => handleOnFieldChange(e, field.fieldname, field.fieldtype)
           "
-        />
+        >
+          <template v-if="field.fieldname === 'priority'" #label-extra>
+            <template
+              v-if="
+                ticketPriorityResource.dataMap[templateFields[field.fieldname]]
+                  ?.description
+              "
+            >
+              <Tooltip
+                :text="
+                  ticketPriorityResource.dataMap[
+                    templateFields[field.fieldname]
+                  ].description.trim()
+                "
+              >
+                <lucide-circle-question-mark class="h-4 w-4 text-ink-gray-6" />
+              </Tooltip>
+            </template>
+          </template>
+        </UniInput>
       </div>
       <!-- existing fields -->
       <div
@@ -130,6 +149,7 @@ import {
   Button,
   call,
   createResource,
+  createListResource,
   FormControl,
   usePageMeta,
 } from "frappe-ui";
@@ -139,6 +159,7 @@ import sanitizeHtml from "sanitize-html";
 import { computed, defineAsyncComponent, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SearchArticles from "../../components/SearchArticles.vue";
+
 const TicketTextEditor = defineAsyncComponent(
   () => import("./TicketTextEditor.vue")
 );
@@ -156,7 +177,6 @@ const router = useRouter();
 const { $dialog } = globalStore();
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager, userId: userID } = useAuthStore();
-
 const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
@@ -187,6 +207,13 @@ function setupTemplateFields(fields) {
     templateFields[field.fieldname] = "";
   });
 }
+
+const ticketPriorityResource = createListResource({
+  doctype: "HD Ticket Priority",
+  fields: ["name", "description"],
+  auto: true,
+  cache: "ticketPriorities",
+});
 
 let oldFields = [];
 

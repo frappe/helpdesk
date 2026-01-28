@@ -1,16 +1,23 @@
 import json
+from datetime import timedelta
 
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
-from frappe.utils import get_user_info_for_avatar, now_datetime
+from frappe.utils import (
+    add_to_date,
+    get_datetime,
+    get_user_info_for_avatar,
+    now_datetime,
+)
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
+from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
 from helpdesk.utils import (
@@ -780,3 +787,45 @@ def get_ticket_activities(ticket: str):
 def get_ticket_assignees(ticket: str):
     assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
     return assignees
+
+
+def show_banner_next_day(ticket):
+    sla = ticket.get_sla()
+    working_hours = sla.get_working_hours()
+    now = now_datetime()
+    creation_date = get_datetime(ticket.creation)
+    next_date = add_to_date(creation_date, days=1)
+    next_date_day_name = next_date.strftime("%A")
+    if next_date_day_name not in working_hours:
+        return True
+
+    start_time = working_hours[next_date_day_name][0]
+
+    next_day_start_datetime = (
+        next_date.replace(hour=0, minute=0, second=0, microsecond=0) + start_time
+    )
+    if now > next_day_start_datetime:
+        return False
+    return True
+
+
+@frappe.whitelist()
+def show_outside_hours_banner(ticket_name: str | int):
+    show_banner_settings = frappe.db.get_single_value(
+        "HD Settings", "enable_outside_hours_banner"
+    )
+    if not show_banner_settings:
+        return {"show": False}
+
+    ticket = frappe.get_doc("HD Ticket", ticket_name)
+    is_currently_outside = (
+        ticket.is_currently_outside_working_hours()
+        and ticket.raised_outside_working_hours
+        and show_banner_next_day(ticket)
+    )
+    if is_currently_outside and not ticket.has_agent_replied:
+        banner_data = get_rendered_banner_msg(ticket_name)
+
+        return {"msg": banner_data.get("banner_msg"), "show": True}
+
+    return {"show": False}

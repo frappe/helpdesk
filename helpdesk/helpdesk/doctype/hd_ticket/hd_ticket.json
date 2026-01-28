@@ -26,6 +26,7 @@
   "service_level_section",
   "sla",
   "response_by",
+  "raised_outside_working_hours",
   "cb",
   "agreement_status",
   "resolution_by",
@@ -66,8 +67,7 @@
   "customer_feedback_section",
   "feedback_rating",
   "feedback",
-  "feedback_extra",
-  "meta_tab"
+  "feedback_extra"
  ],
  "fields": [
   {
@@ -406,11 +406,6 @@
    "label": "Feedback"
   },
   {
-   "fieldname": "meta_tab",
-   "fieldtype": "Tab Break",
-   "label": "Meta"
-  },
-  {
    "fieldname": "summary",
    "fieldtype": "Text Editor",
    "label": "Summary"
@@ -460,13 +455,21 @@
    "fieldtype": "Datetime",
    "label": "Last Customer Response",
    "read_only": 1
+  },
+  {
+   "default": "False",
+   "fieldname": "raised_outside_working_hours",
+   "fieldtype": "Check",
+   "label": "Ticket raised outside working hours",
+   "read_only": 1,
+   "set_only_once": 1
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-01-16 14:23:14.181727",
+ "modified": "2026-01-20 15:18:57.195606",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
