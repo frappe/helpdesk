@@ -70,7 +70,7 @@ export function capture(
   options: CaptureOptions = { data: { user: "" } }
 ) {
   if (!isTelemetryEnabled()) return;
-  window.posthog.capture(`${APP}_${event}`, options);
+  window.posthog?.capture?.(`${APP}_${event}`, options);
 }
 
 export function recordSession() {
