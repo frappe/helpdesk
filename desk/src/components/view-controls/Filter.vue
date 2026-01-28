@@ -332,6 +332,10 @@ function getOperators(fieldtype, fieldname) {
       ]
     );
   }
+  // Remove "is" option for "__assigned_on" as it will always be true
+  if (fieldname == "__assigned_on") {
+    options = options.filter((o) => o.value != "is");
+  }
   return options;
 }
 

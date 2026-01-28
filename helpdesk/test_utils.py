@@ -238,6 +238,8 @@ def make_agent(email: str, first_name: str = "Test Agent"):
         )
 
     return email
+
+
 def add_comment(
     ticket: str,
     content: str = "This is a test comment.",

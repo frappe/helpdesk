@@ -635,6 +635,9 @@ def get_navigation_filters(ticket: str, current_view: str = None):
         final_filters = base_filters
     final_filters = handle_at_me_support(final_filters)
 
+    # Remove custom filter "__assigned_on" as it is not available in any doctype
+    final_filters.pop("__assigned_on", None)
+
     return final_filters
 
 

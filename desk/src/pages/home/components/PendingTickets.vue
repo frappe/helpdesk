@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md p-4 grow w-full h-full overflow-hidden">
+  <div class="flex flex-col rounded-md p-4 grow w-full h-full overflow-hidden">
     <div class="flex gap-4 items-center justify-between">
       <div class="text-lg font-semibold text-ink-gray-8">
         {{ __("Pending Tickets") }}
@@ -8,8 +8,8 @@
         <TabButtons :buttons="chartTabs" v-model="currentTab" />
       </div>
     </div>
-    <div class="mt-5 h-full overflow-auto hide-scrollbar -mx-2">
-      <div class="min-w-[1050px]">
+    <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar -mx-2">
+      <div class="flex flex-col min-w-[1050px] grow">
         <div class="grid grid-cols-10 gap-2 text-sm text-gray-600 py-2 px-3">
           <div class="col-span-1">{{ __("ID") }}</div>
           <div class="col-span-3">{{ __("Subject") }}</div>
@@ -19,7 +19,10 @@
           <div class="col-span-2">{{ __("Reason") }}</div>
         </div>
         <hr class="mx-2" />
-        <div v-if="chartConfig?.tickets?.length > 0">
+        <div
+          class="flex flex-col justify-between grow"
+          v-if="chartConfig?.tickets?.length > 0"
+        >
           <div
             v-for="(ticket, index) in chartConfig?.tickets"
             @click="goToTicket(ticket)"
@@ -65,8 +68,8 @@
             </div>
             <hr class="mx-2" v-if="index < chartConfig?.tickets?.length - 1" />
           </div>
+          <!-- v-if="chartConfig?.tickets?.length == 10" -->
           <div
-            v-if="chartConfig?.tickets?.length == 10"
             class="p-2 pt-3 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none"
             @click="goToAllPendingTickets"
           >
@@ -106,6 +109,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
+import { useView } from "@/composables/useView";
 import { Badge, createResource, FeatherIcon, TabButtons } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref, watch } from "vue";
@@ -123,6 +127,7 @@ const props = defineProps({
 
 const router = useRouter();
 const { userId } = storeToRefs(useAuthStore());
+const { views } = useView("HD Ticket");
 const currentTab = ref("all");
 const chartTabs = [
   {
@@ -184,15 +189,28 @@ const goToTicket = (ticket: any) => {
 };
 
 const goToAllPendingTickets = () => {
-  const filters = {
-    status_category: "Open",
-    _assign: ["LIKE", `%${userId.value}%`],
+  // Map tab values to HD View labels
+  const tabToViewMap: Record<string, string> = {
+    all: "All tickets",
+    pending: "Pending tickets",
+    upcoming_sla: "SLA Due",
+    new_tickets: "Recently assigned tickets",
   };
+
+  const viewLabel = tabToViewMap[currentTab.value];
+  const view = views.data?.find((v: any) => v.label === viewLabel);
+
+  if (currentTab.value === "all") {
+    router.push({
+      name: "TicketsAgent",
+    });
+    return;
+  }
+  // Redirect to specific HD View using its document name
   router.push({
     name: "TicketsAgent",
     query: {
-      filters: JSON.stringify(filters),
-      order_by: "modified desc",
+      view: view.name,
     },
   });
 };
