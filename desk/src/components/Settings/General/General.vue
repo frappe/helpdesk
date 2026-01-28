@@ -101,6 +101,8 @@ const settingsData = ref({
   preferKnowledgeBase: false,
   skipEmailWorkflow: false,
   disableSavedRepliesGlobalScope: false,
+  enableOutsideHoursBanner: false,
+  outsideWorkingHoursBannerMessage: "",
 });
 const disableSignup = ref(false);
 
@@ -153,6 +155,11 @@ const saveSettingsResource = createResource({
         skip_email_workflow: settingsData.value.skipEmailWorkflow,
         disable_saved_replies_global_scope:
           settingsData.value.disableSavedRepliesGlobalScope,
+
+        enable_outside_hours_banner:
+          settingsData.value.enableOutsideHoursBanner,
+        outside_working_hours_message:
+          settingsData.value.outsideWorkingHoursBannerMessage,
       },
     };
   },
@@ -186,6 +193,8 @@ const transformData = (data: any) => {
     disableSavedRepliesGlobalScope: Boolean(
       data.disable_saved_replies_global_scope
     ),
+    enableOutsideHoursBanner: Boolean(data.enable_outside_hours_banner),
+    outsideWorkingHoursBannerMessage: data.outside_working_hours_message || "",
   };
 };
 

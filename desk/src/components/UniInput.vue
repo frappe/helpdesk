@@ -6,20 +6,24 @@
         *
       </span>
     </span>
-    <component
-      :is="component"
-      :placeholder="placeholder"
-      :value="transValue"
-      :disabled="field.disabled"
-      :model-value="transValue"
-      @update:model-value="emitUpdate(field.fieldname, $event)"
-      @change="
-        emitUpdate(
-          field.fieldname,
-          $event.target?.value || $event.value || $event
-        )
-      "
-    />
+    <div class="flex gap-2 items-center">
+      <component
+        class="w-full"
+        :is="component"
+        :placeholder="placeholder"
+        :value="transValue"
+        :disabled="field.disabled"
+        :model-value="transValue"
+        @update:model-value="emitUpdate(field.fieldname, $event)"
+        @change="
+          emitUpdate(
+            field.fieldname,
+            $event.target?.value || $event.value || $event
+          )
+        "
+      />
+      <slot name="label-extra" />
+    </div>
   </div>
 </template>
 

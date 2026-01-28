@@ -64,12 +64,9 @@
               <span v-if="n.notification_type === 'Assignment'"
                 >assigned you a ticket</span
               >
-              <span v-if="n.notification_type === 'Reaction'">{{
-                n.message
-              }}</span>
-            </span>
-            <span v-if="n.notification_type === 'Reaction' && !n.message">
-              has reopened the ticket
+              <span v-if="n.notification_type === 'Reaction'">
+                {{ n.message || "has reopened the ticket" }}
+              </span>
             </span>
             <span class="font-medium text-gray-900"
               >&nbsp{{ n.reference_ticket }}
@@ -77,7 +74,7 @@
           </div>
           <div class="flex items-center gap-2">
             <div class="text-sm text-gray-600">
-              {{ dayjs.tz(n.modified).fromNow() }}
+              {{ dayjs.tz(n.creation).fromNow() }}
             </div>
             <div v-if="!n.read" class="h-1.5 w-1.5 rounded-full bg-blue-400" />
           </div>
