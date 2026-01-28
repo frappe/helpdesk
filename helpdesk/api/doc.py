@@ -15,6 +15,83 @@ from helpdesk.utils import (
 )
 
 
+def apply_datetime_filter(query, field, filter_value):
+    """Apply datetime filter to query based on operator."""
+    if isinstance(filter_value, list):
+        operator, value = filter_value[0], filter_value[1]
+    else:
+        operator, value = "=", filter_value
+
+    if operator == "=":
+        query = query.where(field == value)
+    elif operator == "!=":
+        query = query.where(field != value)
+    elif operator == ">":
+        query = query.where(field > value)
+    elif operator == "<":
+        query = query.where(field < value)
+    elif operator == ">=":
+        query = query.where(field >= value)
+    elif operator == "<=":
+        query = query.where(field <= value)
+    elif operator == "between":
+        if isinstance(value, list) and len(value) == 2:
+            query = query.where(field >= value[0]).where(field <= value[1])
+    elif operator == "timespan":
+        from frappe.utils import get_timespan_date_range
+
+        start, end = get_timespan_date_range(value)
+        query = query.where(field >= start).where(field <= end)
+    elif operator == "is":
+        if value == "set":
+            query = query.where(field.isnotnull())
+        else:
+            query = query.where(field.isnull())
+
+    return query
+
+
+def handle_assigned_on_filter(filters, doctype):
+    """
+    Handle the custom __assigned_on filter by querying ToDo table
+    and returning ticket names that match the assignment date criteria.
+    """
+    if "__assigned_on" not in filters:
+        return filters
+
+    assigned_on_filter = filters.pop("__assigned_on")
+
+    # Build ToDo query based on the operator and value
+    todo = frappe.qb.DocType("ToDo")
+    query = (
+        frappe.qb.from_(todo)
+        .select(todo.reference_name)
+        .distinct()
+        .where(todo.reference_type == doctype)
+        .where(todo.allocated_to == frappe.session.user)
+        .where(todo.status == "Open")
+    )
+
+    # Apply date filter based on operator
+    query = apply_datetime_filter(query, todo.creation, assigned_on_filter)
+
+    ticket_names = [row[0] for row in query.run()]
+
+    if ticket_names:
+        # Merge with existing name filter if present
+        if "name" in filters:
+            existing_filter = filters["name"]
+            if isinstance(existing_filter, list) and existing_filter[0] == "in":
+                # Intersection of both filters
+                ticket_names = list(set(ticket_names) & set(existing_filter[1]))
+        filters["name"] = ["in", ticket_names]
+    else:
+        # No matching tickets, add impossible filter
+        filters["name"] = ["in", []]
+
+    return filters
+
+
 @frappe.whitelist()
 def get_list_data(
     doctype: str,
@@ -43,6 +120,7 @@ def get_list_data(
     label_field = view.get("label_field") if view else None
 
     handle_at_me_support(filters)
+    handle_assigned_on_filter(filters, doctype)
 
     _list = get_controller(doctype)
     default_rows = []
@@ -352,6 +430,13 @@ def get_filterable_fields(
         },
         {"fieldname": "creation", "fieldtype": "Datetime", "label": "Created On"},
         {"fieldname": "modified", "fieldtype": "Datetime", "label": "Last Updated On"},
+        {
+            "fieldname": "__assigned_on",
+            "fieldtype": "Datetime",
+            "label": "Assigned on",
+            "name": "__assigned_on",
+            "options": "",
+        },
     ]
     for field in standard_fields:
         if field.get("fieldname") not in [r.get("fieldname") for r in res]:
