@@ -31,7 +31,13 @@
 import { Autocomplete, Link } from "@/components";
 import { APIOptions, Field } from "@/types";
 import { parseApiOptions } from "@/utils";
-import { createResource, FormControl } from "frappe-ui";
+import {
+  createResource,
+  DatePicker,
+  DateTimePicker,
+  dayjs,
+  FormControl,
+} from "frappe-ui";
 import { computed, h } from "vue";
 
 type Value = string | number | boolean;
@@ -85,6 +91,11 @@ const component = computed(() => {
       ],
       size: "sm",
     });
+  } else if (["Date", "Datetime"].includes(props.field.fieldtype)) {
+    return h(
+      props.field.fieldtype === "Date" ? DatePicker : DateTimePicker,
+      {}
+    );
   } else {
     return h(FormControl, {
       debounce: 500,
@@ -103,6 +114,8 @@ const apiOptions = createResource({
 const transValue = computed(() => {
   if (props.field.fieldtype === "Check") {
     return props.value ? "Yes" : "No";
+  } else if (props.field.fieldtype === "Date" && props.value) {
+    return dayjs(props.value).format(window.date_format.toUpperCase());
   }
   return props.value;
 });
