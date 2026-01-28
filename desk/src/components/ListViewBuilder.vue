@@ -248,7 +248,11 @@ const defaultOptions = reactive({
 });
 
 function handleBulkDelete(hide: Function, selections: Set<string>) {
-  capture("bulk_delete" + props.options.doctype);
+  try {
+    capture("bulk_delete" + props.options.doctype);
+  } catch (error) {
+    console.warn("Error capturing bulk delete event", error);
+  }
   call("frappe.desk.reportview.delete_items", {
     items: JSON.stringify(Array.from(selections)),
     doctype: props.options.doctype,
