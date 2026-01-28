@@ -33,7 +33,11 @@ export const useShortcut = (
 
     if (validateKeyCombination(e, shortcutBinding)) {
       try {
-        e.preventDefault();
+        // Don't prevent default for page navigation keys
+        const navigationKeys = ['PageUp', 'PageDown', 'Home', 'End'];
+        if (!navigationKeys.includes(e.key)) {
+          e.preventDefault();
+        }
         cb();
       } catch (error) {
         console.error("Error executing shortcut:", binding, error);
@@ -116,15 +120,15 @@ function disableShortcuts(): boolean {
   const activeElement = document.activeElement;
   return Boolean(
     activeElement instanceof HTMLInputElement ||
-      activeElement instanceof HTMLTextAreaElement ||
-      (activeElement as any)?.contentEditable === "true" ||
-      activeElement?.closest("input") ||
-      activeElement?.closest("textarea") ||
-      activeElement?.closest("[contenteditable]") ||
-      activeElement?.closest(".dropdown-options") || // Dropdown search
-      activeElement?.closest('[role="dialog"]') ||
-      activeElement?.closest('[role="menu"]') ||
-      activeElement?.classList.contains("form-control") // Form inputs
+    activeElement instanceof HTMLTextAreaElement ||
+    (activeElement as any)?.contentEditable === "true" ||
+    activeElement?.closest("input") ||
+    activeElement?.closest("textarea") ||
+    activeElement?.closest("[contenteditable]") ||
+    activeElement?.closest(".dropdown-options") || // Dropdown search
+    activeElement?.closest('[role="dialog"]') ||
+    activeElement?.closest('[role="menu"]') ||
+    activeElement?.classList.contains("form-control") // Form inputs
   );
 }
 
