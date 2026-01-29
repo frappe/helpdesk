@@ -60,7 +60,7 @@
       </div>
     </header>
     <div v-if="ticket.data" class="flex flex-1 overflow-x-hidden">
-      <div class="flex flex-1 flex-col overflow-x-hidden">
+      <main class="flex flex-1 flex-col overflow-x-hidden">
         <div class="flex-1 flex flex-col">
           <Tabs
             :modelValue="tabIndex"
@@ -136,7 +136,7 @@
             "
           />
         </div>
-      </div>
+      </main>
     </div>
     <AssignmentModal
       v-if="ticket.data"
