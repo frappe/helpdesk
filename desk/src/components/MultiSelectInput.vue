@@ -93,6 +93,7 @@ import {
   ComboboxOption,
 } from "@headlessui/vue";
 import { UserAvatar } from "@/components/";
+import { splitEmailAddresses } from "@/utils";
 import { Popover, createResource } from "frappe-ui";
 import { ref, computed, nextTick } from "vue";
 import { watchDebounced } from "@vueuse/core";
@@ -177,28 +178,29 @@ function reload(val) {
 const addValue = (value) => {
   error.value = null;
   if (value) {
-    const splitValues = value.split(",");
-    splitValues.forEach((value) => {
-      value = value.trim();
-      if (value) {
+    const splitValues = splitEmailAddresses(value);
+    splitValues.forEach((emailValue) => {
+      emailValue = emailValue.trim();
+      if (emailValue) {
         // check if value is not already in the values array
-        if (!values.value?.includes(value)) {
+        if (!values.value?.includes(emailValue)) {
           // check if value is valid
-          if (value && props.validate && !props.validate(value)) {
-            error.value = props.errorMessage(value);
+          if (emailValue && props.validate && !props.validate(emailValue)) {
+            error.value = props.errorMessage(emailValue);
             return;
           }
           // add value to values array
           if (!values.value) {
-            values.value = [value];
+            values.value = [emailValue];
           } else {
-            values.value.push(value);
+            values.value.push(emailValue);
           }
-          value = value.replace(value, "");
         }
       }
     });
-    !error.value && (value = "");
+    if (!error.value) {
+      value = "";
+    }
   }
 };
 
