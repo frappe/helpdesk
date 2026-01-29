@@ -627,7 +627,7 @@ def _get_pending_response_tickets(limit=10):
 
 @frappe.whitelist()
 @agent_only
-def get_pending_tickets(ticket_type="all"):
+def get_pending_tickets(ticket_type="upcoming_sla"):
     min_priority, max_priority = _get_priority_range()
 
     if ticket_type == "upcoming_sla":
@@ -636,21 +636,6 @@ def get_pending_tickets(ticket_type="all"):
         tickets, total_count = _get_new_tickets(limit=6)
     elif ticket_type == "pending":
         tickets, total_count = _get_pending_response_tickets(limit=6)
-    else:  # "all" - combine all types with priority ordering
-        sla_tickets, sla_total = _get_upcoming_sla_tickets(limit=6)
-        pending_tickets, pending_total = _get_pending_response_tickets(limit=6)
-        new_tickets, new_total = _get_new_tickets(limit=6)
-
-        unique_tickets = set()
-        tickets = []
-        for ticket in sla_tickets + pending_tickets + new_tickets:
-            if ticket["name"] not in unique_tickets:
-                unique_tickets.add(ticket["name"])
-                tickets.append(ticket)
-                if len(tickets) >= 6:
-                    break
-
-        total_count = sla_total + pending_total + new_total
 
     return {
         "tickets": tickets,

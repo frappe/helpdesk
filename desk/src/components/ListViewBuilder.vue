@@ -653,25 +653,6 @@ function findCurrentView() {
     currentView = defaultView.value;
     defaultParams.is_default = true;
   }
-
-  // Apply filters from URL query params
-  if (route.query.filters) {
-    try {
-      const filters =
-        typeof route.query.filters === "string"
-          ? JSON.parse(route.query.filters)
-          : route.query.filters;
-
-      currentView.filters = filters;
-    } catch (e) {
-      console.error("Failed to parse filters from URL:", e);
-    }
-  }
-
-  // Apply order_by from URL query params
-  if (route.query.order_by && typeof route.query.order_by === "string") {
-    currentView.order_by = route.query.order_by;
-  }
   return currentView;
 }
 
