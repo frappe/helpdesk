@@ -759,6 +759,14 @@ def get_similar_tickets(ticket: str):
         },
         as_dict=1,
     )
+    
+    tickets = [
+        t for t in tickets
+        if frappe.has_permission("HD Ticket", "read", doc=t["name"])
+    ]
+    
+    if not tickets:
+        return []
 
     max_relevance = max((t["raw_relevance"] for t in tickets), default=0)
     for t in tickets:
