@@ -83,7 +83,7 @@
           </tr>
         </tbody>
         <tbody v-else>
-          <tr v-for="i in 10" :key="i" class="border-t border-gray-200">
+          <tr v-for="i in 6" :key="i" class="border-t border-gray-200">
             <td class="p-2 py-3">
               <div class="h-4 w-16 bg-surface-gray-1" />
             </td>
