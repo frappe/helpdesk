@@ -302,17 +302,34 @@ export function getGridTemplateColumnsForTable(columns) {
   return columnsWidth + " 22px";
 }
 
-export function uploadFunction(
+export async function uploadFunction(
   file: File,
   doctype: string = null,
   docname: string = null
 ) {
   let fileUpload = useFileUpload();
-  return fileUpload.upload(file, {
-    private: true,
-    doctype: doctype,
-    docname: docname,
-  });
+  try {
+    return await fileUpload.upload(file, {
+      private: true,
+      doctype: doctype,
+      docname: docname,
+    });
+  } catch (error: any) {
+    let message = error.message || "";
+    const status = error.status || error.xhr?.status || error.response?.status;
+
+    // Detection for 413 (Too Large) or 417 (Backend Failure)
+    if (status === 413 || message.toLowerCase().includes("exceeds") || message.toLowerCase().includes("large")) {
+      message = "File too large. Please upload a smaller file.";
+    } else if (status === 417) {
+      message = "Server rejected the upload. Please check file permissions or try a different format.";
+    } else {
+      message = message || "Error uploading file";
+    }
+
+    toast.error(message);
+    throw error;
+  }
 }
 
 export const convertToConditions = ({
