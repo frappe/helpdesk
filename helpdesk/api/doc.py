@@ -48,8 +48,6 @@ def apply_datetime_filter(query, field, filter_value):
         else:
             query = query.where(field.isnull())
 
-    return query
-
 
 def handle_assigned_on_filter(filters, doctype):
     """
@@ -73,7 +71,7 @@ def handle_assigned_on_filter(filters, doctype):
     )
 
     # Apply date filter based on operator
-    query = apply_datetime_filter(query, todo.creation, assigned_on_filter)
+    apply_datetime_filter(query, todo.creation, assigned_on_filter)
 
     ticket_names = [row[0] for row in query.run()]
 

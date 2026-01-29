@@ -39,8 +39,8 @@ const chartConfig = computed(() => {
 
   const _percentageChange = _data?.percentage_change;
   const total = _data?.total;
-  const dates = _data?.data.map((item: any) => item.date);
-  const counts = _data?.data.map((item: any) => item.count);
+  const dates = _data?.data?.map((item: any) => item.date);
+  const counts = _data?.data?.map((item: any) => item.count);
 
   const percentageChange = {
     icon: _percentageChange > 0 ? "arrow-up-right" : "arrow-down-left",

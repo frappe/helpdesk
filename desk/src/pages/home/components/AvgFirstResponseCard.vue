@@ -1,7 +1,7 @@
 <template>
   <div class="w-full h-full overflow-hidden">
     <CardBase
-      :title="__('Avg. First Response')"
+      :title="__('Average First Response')"
       :text="chartConfig.average"
       :currentDuration="currentDuration"
       :percentageChange="chartConfig.percentageChange"
@@ -38,8 +38,8 @@ const chartConfig = computed(() => {
     ? getAvgFirstResponseTimeResource.data
     : props.data;
 
-  const dates = _data.data.map((item: any) => item.date);
-  const avg_time = _data.data.map((item: any) => item.avg_time);
+  const dates = _data.data?.map((item: any) => item.date);
+  const avg_time = _data.data?.map((item: any) => item.avg_time);
   const average =
     formatTime(_data.average, { day: true, hour: true, minute: true }) || "0m";
   const _percentageChange = _data?.percentage_change;

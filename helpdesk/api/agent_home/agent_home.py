@@ -22,7 +22,7 @@ def calculate_percentage_change(current_value: float, previous_value: float) -> 
 
 
 def get_default_agent_dashboard():
-    return '[{"chart":"avg_time_metrics","layout":{"x":0,"y":53,"w":50,"h":24,"i":"0.856685865621656","minW":18,"minH":24,"maxH":44,"moved":false}},{"chart":"recent_feedback","layout":{"x":0,"y":77,"w":50,"h":21,"i":"0.6559156346002671","minW":50,"maxH":28,"moved":false}},{"chart":"pending_tickets","layout":{"x":0,"y":10,"w":50,"h":43,"i":"0.9527913896923091","minW":25,"minH":27,"moved":false}},{"chart":"avg_resolution_time","layout":{"x":33,"y":0,"w":17,"h":10,"i":"0.6094211168034576","minW":16,"minH":10,"maxH":11,"moved":false}},{"chart":"avg_first_response_time","layout":{"x":17,"y":0,"w":16,"h":10,"i":"0.40156637062095335","minW":16,"minH":10,"maxH":11,"moved":false}},{"chart":"agent_tickets","layout":{"x":0,"y":0,"w":17,"h":10,"i":"0.9679064559602701","minW":16,"minH":10,"maxH":11,"moved":false}}]'
+    return '[{"chart":"avg_resolution_time","layout":{"x":33,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"avg_first_response_time","layout":{"x":16,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"agent_tickets","layout":{"x":0,"y":0,"w":16,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"pending_tickets","layout":{"x":0,"y":10,"w":50,"h":31,"minW":25,"minH":31,"maxH":31}},{"chart":"recent_feedback","layout":{"x":0,"y":65,"w":50,"h":21,"minW":50,"maxH":21}},{"chart":"avg_time_metrics","layout":{"x":0,"y":41,"w":50,"h":24,"minW":18,"minH":24,"maxH":44}}]'
 
 
 @frappe.whitelist()
@@ -472,7 +472,6 @@ def _get_upcoming_sla_tickets(limit=10):
         ["agreement_status", "in", ["First Response Due", "Resolution Due"]],
         ["status_category", "!=", "Closed"],
         ["_assign", "like", f"%{frappe.session.user}%"],
-        ["response_by", ">", frappe.utils.now()],
     ]
 
     tickets = frappe.get_list(
@@ -490,33 +489,41 @@ def _get_upcoming_sla_tickets(limit=10):
             "creation",
         ],
         filters=filters,
-        order_by="response_by desc",
+        order_by="response_by asc",
         limit=limit,
     )
 
     for ticket in tickets:
         agreement_status = ticket.get("agreement_status", "")
         if agreement_status == "Resolution Due":
-            time_until = format_time_difference(
-                ticket.get("resolution_by"), context="until"
-            )
+            due_time = ticket.get("resolution_by")
+            time_until = format_time_difference(due_time, context="until")
             reason_text = (
                 f"Resolution due in {time_until}"
                 if time_until != "overdue"
                 else "Resolution overdue"
             )
         else:
-            time_until = format_time_difference(
-                ticket.get("response_by"), context="until"
-            )
+            due_time = ticket.get("response_by")
+            time_until = format_time_difference(due_time, context="until")
             reason_text = (
                 f"Response due in {time_until}"
                 if time_until != "overdue"
                 else "Response overdue"
             )
+
+        # Calculate seconds until due for frontend urgency coloring
+        seconds_until_due = None
+        if due_time:
+            now = frappe.utils.now_datetime()
+            if isinstance(due_time, str):
+                due_time = frappe.utils.get_datetime(due_time)
+            seconds_until_due = (due_time - now).total_seconds()
+
         ticket["reason"] = {
             "type": "upcoming_sla",
             "text": reason_text,
+            "seconds_until_due": seconds_until_due,
         }
 
     total_count = frappe.db.count("HD Ticket", filters=filters)
@@ -557,7 +564,7 @@ def _get_new_tickets(limit=10):
         filters=[
             ["name", "in", ticket_names],
             ["_assign", "like", f"%{frappe.session.user}%"],
-            ["status_category", "==", "Open"],
+            ["status_category", "=", "Open"],
         ],
         order_by="creation desc",
         limit=limit,
@@ -574,7 +581,7 @@ def _get_new_tickets(limit=10):
         filters=[
             ["name", "in", ticket_names],
             ["_assign", "like", f"%{frappe.session.user}%"],
-            ["status_category", "==", "Open"],
+            ["status_category", "=", "Open"],
         ],
     )
 

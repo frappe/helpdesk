@@ -4,28 +4,29 @@
   "docstatus": 0,
   "doctype": "HD View",
   "dt": "HD Ticket",
-  "filters": "{\"sla\":[\"is\",\"set\"],\"agreement_status\":[\"in\",\"First Response Due, Resolution Due\"],\"status_category\":[\"!=\",\"Closed\"],\"_assign\":[\"LIKE\",\"%@me%\"],\"response_by\":[\"timespan\",\"this year\"]}",
+  "filters": "{\"sla\":[\"is\",\"set\"],\"agreement_status\":[\"in\",\"First Response Due, Resolution Due\"],\"status_category\":[\"!=\",\"Closed\"],\"_assign\":[\"LIKE\",\"%@me%\"]}",
   "group_by_field": null,
   "icon": "",
   "is_customer_portal": 0,
   "is_default": 0,
   "is_standard": 1,
-  "label": "SLA Due",
+  "label": "SLA due",
   "load_default_columns": 0,
-  "modified": "2026-01-28 17:49:20.537066",
+  "modified": "2026-01-29 11:44:45.673096",
   "order_by": "response_by asc",
   "pinned": 0,
   "public": 0,
   "route_name": "TicketsAgent",
   "rows": "[\"name\",\"subject\",\"status\",\"priority\",\"ticket_type\",\"agent_group\",\"contact\",\"agreement_status\",\"response_by\",\"resolution_by\",\"customer\",\"first_responded_on\",\"modified\",\"creation\",\"_assign\",\"resolution_date\",\"feedback_rating\",\"owner\",\"modified_by\"]",
-  "type": "list"
+  "type": "list",
+  "user": "Administrator"
  },
  {
   "columns": "[{\"label\":\"ID\",\"type\":\"Int\",\"key\":\"name\",\"width\":\"5rem\"},{\"label\":\"Subject\",\"type\":\"Data\",\"key\":\"subject\",\"width\":\"25rem\"},{\"label\":\"Status\",\"type\":\"Select\",\"key\":\"status\",\"width\":\"8rem\"},{\"label\":\"First response\",\"type\":\"Datetime\",\"key\":\"response_by\",\"width\":\"8rem\"},{\"label\":\"Resolution\",\"type\":\"Datetime\",\"key\":\"resolution_by\",\"width\":\"8rem\"},{\"label\":\"Assigned To\",\"type\":\"MultipleAvatar\",\"key\":\"_assign\",\"width\":\"8rem\"},{\"label\":\"Customer\",\"type\":\"Link\",\"key\":\"customer\",\"options\":\"HD Customer\",\"width\":\"8rem\"},{\"label\":\"Priority\",\"type\":\"Link\",\"options\":\"HD Ticket Priority\",\"key\":\"priority\",\"width\":\"10rem\"},{\"label\":\"Type\",\"type\":\"Link\",\"options\":\"HD Ticket Type\",\"key\":\"ticket_type\",\"width\":\"11rem\"},{\"label\":\"Team\",\"type\":\"Link\",\"options\":\"HD Team\",\"key\":\"agent_group\",\"width\":\"10rem\"},{\"label\":\"Contact\",\"type\":\"Link\",\"key\":\"contact\",\"options\":\"Contact\",\"width\":\"8rem\"},{\"label\":\"Rating\",\"type\":\"Rating\",\"key\":\"feedback_rating\",\"width\":\"10rem\"},{\"label\":\"Created\",\"type\":\"Datetime\",\"key\":\"creation\",\"options\":\"Contact\",\"width\":\"8rem\"}]",
   "docstatus": 0,
   "doctype": "HD View",
   "dt": "HD Ticket",
-  "filters": "{\"__assigned_on\":[\"timespan\",\"last week\"],\"status_category\":\"Open\"}",
+  "filters": "{\"__assigned_on\":[\"timespan\",\"last week\"],\"status_category\":\"Open\",\"_assign\":[\"LIKE\",\"%@me%\"]}",
   "group_by_field": null,
   "icon": "",
   "is_customer_portal": 0,
@@ -33,13 +34,14 @@
   "is_standard": 1,
   "label": "Recently assigned tickets",
   "load_default_columns": 0,
-  "modified": "2026-01-28 17:49:16.886426",
-  "order_by": "modified desc",
+  "modified": "2026-01-29 14:28:14.117303",
+  "order_by": "creation desc",
   "pinned": 0,
   "public": 0,
   "route_name": "TicketsAgent",
   "rows": "[\"name\",\"subject\",\"status\",\"priority\",\"ticket_type\",\"agent_group\",\"contact\",\"agreement_status\",\"response_by\",\"resolution_by\",\"customer\",\"first_responded_on\",\"modified\",\"creation\",\"_assign\",\"resolution_date\",\"feedback_rating\",\"owner\",\"modified_by\"]",
-  "type": "list"
+  "type": "list",
+  "user": "Administrator"
  },
  {
   "columns": "[{\"label\":\"ID\",\"type\":\"Int\",\"key\":\"name\",\"width\":\"5rem\"},{\"label\":\"Subject\",\"type\":\"Data\",\"key\":\"subject\",\"width\":\"25rem\"},{\"label\":\"Status\",\"type\":\"Select\",\"key\":\"status\",\"width\":\"8rem\"},{\"label\":\"First response\",\"type\":\"Datetime\",\"key\":\"response_by\",\"width\":\"8rem\"},{\"label\":\"Resolution\",\"type\":\"Datetime\",\"key\":\"resolution_by\",\"width\":\"8rem\"},{\"label\":\"Assigned To\",\"type\":\"MultipleAvatar\",\"key\":\"_assign\",\"width\":\"8rem\"},{\"label\":\"Customer\",\"type\":\"Link\",\"key\":\"customer\",\"options\":\"HD Customer\",\"width\":\"8rem\"},{\"label\":\"Priority\",\"type\":\"Link\",\"options\":\"HD Ticket Priority\",\"key\":\"priority\",\"width\":\"10rem\"},{\"label\":\"Type\",\"type\":\"Link\",\"options\":\"HD Ticket Type\",\"key\":\"ticket_type\",\"width\":\"11rem\"},{\"label\":\"Team\",\"type\":\"Link\",\"options\":\"HD Team\",\"key\":\"agent_group\",\"width\":\"10rem\"},{\"label\":\"Contact\",\"type\":\"Link\",\"key\":\"contact\",\"options\":\"Contact\",\"width\":\"8rem\"},{\"label\":\"Rating\",\"type\":\"Rating\",\"key\":\"feedback_rating\",\"width\":\"10rem\"},{\"label\":\"Created\",\"type\":\"Datetime\",\"key\":\"creation\",\"options\":\"Contact\",\"width\":\"8rem\"}]",
@@ -60,6 +62,7 @@
   "public": 0,
   "route_name": "TicketsAgent",
   "rows": "[\"name\",\"subject\",\"status\",\"priority\",\"ticket_type\",\"agent_group\",\"contact\",\"agreement_status\",\"response_by\",\"resolution_by\",\"customer\",\"first_responded_on\",\"modified\",\"creation\",\"_assign\",\"resolution_date\",\"feedback_rating\",\"owner\",\"modified_by\"]",
-  "type": "list"
+  "type": "list",
+  "user": "Administrator"
  }
 ]

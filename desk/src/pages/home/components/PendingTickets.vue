@@ -8,110 +8,131 @@
         <TabButtons :buttons="chartTabs" v-model="currentTab" />
       </div>
     </div>
-    <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar -mx-2">
-      <div class="flex flex-col min-w-[1050px] grow">
-        <div class="grid grid-cols-10 gap-2 text-sm text-gray-600 py-2 px-3">
-          <div class="col-span-1">{{ __("ID") }}</div>
-          <div class="col-span-3">{{ __("Subject") }}</div>
-          <div class="col-span-1">{{ __("Status") }}</div>
-          <div class="col-span-1">{{ __("Priority") }}</div>
-          <div class="col-span-2">{{ __("Team") }}</div>
-          <div class="col-span-2">{{ __("Reason") }}</div>
-        </div>
-        <hr class="mx-2" />
-        <div
-          class="flex flex-col justify-between grow"
-          v-if="chartConfig?.tickets?.length > 0"
-        >
-          <div
-            v-for="(ticket, index) in chartConfig?.tickets"
+    <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar">
+      <table class="w-full table-auto">
+        <thead>
+          <tr class="text-sm text-gray-600">
+            <th class="p-2 text-left font-normal whitespace-nowrap">
+              {{ __("ID") }}
+            </th>
+            <th class="p-2 text-left font-normal">{{ __("Subject") }}</th>
+            <th class="p-2 text-left font-normal whitespace-nowrap">
+              {{ __("Status") }}
+            </th>
+            <th class="p-2 text-left font-normal whitespace-nowrap">
+              {{ __("Priority") }}
+            </th>
+            <th class="p-2 text-left font-normal whitespace-nowrap">
+              {{ __("Team") }}
+            </th>
+            <th class="p-2 text-left font-normal whitespace-nowrap">
+              {{ __("Reason") }}
+            </th>
+          </tr>
+        </thead>
+        <tbody v-if="chartConfig?.tickets?.length > 0" class="grow">
+          <tr
+            v-for="ticket in chartConfig?.tickets"
+            :key="ticket.name"
             @click="goToTicket(ticket)"
+            class="text-sm cursor-pointer hover:bg-gray-50 border-t border-gray-200"
           >
-            <div
-              class="grid grid-cols-10 gap-2 text-sm items-center py-3 px-3 cursor-pointer hover:bg-gray-50 rounded"
-            >
-              <div class="col-span-1 truncate">{{ ticket.name }}</div>
-              <div class="col-span-3 truncate">{{ ticket.subject }}</div>
-              <div class="col-span-1 truncate">{{ ticket.status }}</div>
-              <div class="col-span-1">
-                <Badge
-                  :label="ticket.priority"
-                  :theme="getPriorityBadgeColor(ticket.priority_integer_value)"
+            <td class="p-2 py-3 whitespace-nowrap">{{ ticket.name }}</td>
+            <td class="p-2 py-3 max-w-xs truncate">{{ ticket.subject }}</td>
+            <td class="p-2 py-3 whitespace-nowrap">{{ ticket.status }}</td>
+            <td class="p-2 py-3 whitespace-nowrap">
+              <Badge
+                :label="ticket.priority"
+                :theme="getPriorityBadgeColor(ticket.priority_integer_value)"
+              />
+            </td>
+            <td class="p-2 py-3 whitespace-nowrap">
+              {{ ticket.agent_group || __("Not Assigned") }}
+            </td>
+            <td class="p-2 py-3 whitespace-nowrap">
+              <div
+                v-if="ticket.reason"
+                class="flex items-center gap-1 text-ink-gray-7"
+                :class="getReasonColorClass(ticket.reason)"
+              >
+                <TimerIcon
+                  v-if="ticket.reason.type === 'upcoming_sla'"
+                  class="size-4 flex-shrink-0"
                 />
+                <TicketPlusIcon
+                  v-else-if="ticket.reason.type === 'new_tickets'"
+                  class="size-4 flex-shrink-0"
+                />
+                <CalendarIcon
+                  v-else-if="ticket.reason.type === 'pending'"
+                  class="size-4 flex-shrink-0"
+                />
+                <span>{{ ticket.reason.text }}</span>
               </div>
-              <div class="col-span-2 truncate">
-                {{ ticket.agent_group || __("Not Assigned") }}
-              </div>
-              <div class="col-span-2 truncate">
-                <div
-                  v-if="ticket.reason"
-                  class="flex items-center gap-1 text-ink-gray-7"
-                >
-                  <TimerIcon
-                    v-if="ticket.reason.type === 'upcoming_sla'"
-                    class="size-4 flex-shrink-0"
-                  />
-                  <TicketPlusIcon
-                    v-else-if="ticket.reason.type === 'new_tickets'"
-                    class="size-4 flex-shrink-0"
-                  />
-                  <CalendarIcon
-                    v-else-if="ticket.reason.type === 'pending'"
-                    class="size-4 flex-shrink-0"
-                  />
-                  <span class="truncate">{{ ticket.reason.text }}</span>
-                </div>
-                <span v-else class="text-ink-gray-4">{{
-                  __("No reason")
-                }}</span>
-              </div>
-            </div>
-            <hr class="mx-2" v-if="index < chartConfig?.tickets?.length - 1" />
-          </div>
-          <!-- v-if="chartConfig?.tickets?.length == 10" -->
-          <div
-            class="p-2 pt-3 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none"
-            @click="goToAllPendingTickets"
+              <span v-else class="text-ink-gray-4">{{ __("No reason") }}</span>
+            </td>
+          </tr>
+          <tr
+            v-for="i in Math.max(0, 6 - chartConfig?.tickets?.length)"
+            :key="'placeholder-' + i"
+            class="border-t border-gray-100"
           >
-            {{ __("See all {0} tickets", chartConfig?.totalPendingTickets) }}
-            <FeatherIcon name="arrow-right" class="size-4" />
+            <td v-for="j in 6" :key="j" class="p-2 py-3">
+              <div class="h-5 w-full bg-surface-gray-1" />
+            </td>
+          </tr>
+        </tbody>
+        <tbody v-else>
+          <tr v-for="i in 10" :key="i" class="border-t border-gray-200">
+            <td class="p-2 py-3">
+              <div class="h-4 w-16 bg-surface-gray-1" />
+            </td>
+            <td class="p-2 py-3">
+              <div class="h-4 w-48 bg-surface-gray-1" />
+            </td>
+            <td class="p-2 py-3">
+              <div class="h-4 w-16 bg-surface-gray-1" />
+            </td>
+            <td class="p-2 py-3">
+              <div class="h-4 w-16 bg-surface-gray-1" />
+            </td>
+            <td class="p-2 py-3">
+              <div class="h-4 w-24 bg-surface-gray-1" />
+            </td>
+            <td class="p-2 py-3">
+              <div class="h-4 w-32 bg-surface-gray-1" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div
+        v-if="chartConfig?.tickets?.length === 0"
+        class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
+      >
+        <div class="bg-surface-white space-y-1 w-64 p-3 rounded">
+          <div class="text-ink-gray-7 font-medium text-center text-base">
+            {{ __("No pending tickets") }}
+          </div>
+          <div class="text-ink-gray-6 text-center text-base">
+            {{ __("All tickets are resolved or in progress") }}
           </div>
         </div>
-        <div v-else class="relative">
-          <div v-for="i in 10" :key="i">
-            <div class="grid grid-cols-10 gap-2 py-3 px-3">
-              <div class="col-span-1 h-4 bg-surface-gray-1" />
-              <div class="col-span-3 h-4 bg-surface-gray-1" />
-              <div class="col-span-1 h-4 bg-surface-gray-1" />
-              <div class="col-span-1 h-4 bg-surface-gray-1" />
-              <div class="col-span-2 h-4 bg-surface-gray-1" />
-              <div class="col-span-2 h-4 bg-surface-gray-1" />
-            </div>
-            <hr class="mx-2" v-if="i < 10" />
-          </div>
-          <div
-            class="absolute inset-0 flex flex-col items-center justify-center"
-          >
-            <div class="bg-surface-white space-y-1 w-64 p-3 rounded">
-              <div class="text-ink-gray-7 font-medium text-center text-base">
-                {{ __("No pending tickets") }}
-              </div>
-              <div class="text-ink-gray-6 text-center text-base">
-                {{ __("All tickets are resolved or in progress") }}
-              </div>
-            </div>
-          </div>
-        </div>
+      </div>
+      <div
+        v-if="chartConfig?.totalPendingTickets > 6"
+        class="p-2 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none"
+        @click="redirectToSeeAllTickets"
+      >
+        {{ __("See all {0} tickets", chartConfig?.totalPendingTickets) }}
+        <FeatherIcon name="arrow-right" class="size-4" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/auth";
 import { useView } from "@/composables/useView";
 import { Badge, createResource, FeatherIcon, TabButtons } from "frappe-ui";
-import { storeToRefs } from "pinia";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import TimerIcon from "~icons/lucide/timer";
@@ -126,14 +147,9 @@ const props = defineProps({
 });
 
 const router = useRouter();
-const { userId } = storeToRefs(useAuthStore());
 const { views } = useView("HD Ticket");
-const currentTab = ref("all");
+const currentTab = ref("upcoming_sla");
 const chartTabs = [
-  {
-    label: "All",
-    value: "all",
-  },
   {
     label: "SLA Due",
     value: "upcoming_sla",
@@ -181,6 +197,30 @@ function getPriorityBadgeColor(integerValue: number) {
   return "gray";
 }
 
+function getReasonColorClass(reason: {
+  text: string;
+  seconds_until_due?: number;
+}) {
+  if (reason.text.includes("overdue")) {
+    return "text-red-500";
+  }
+
+  if (
+    reason.seconds_until_due !== undefined &&
+    reason.seconds_until_due !== null
+  ) {
+    const oneHour = 3600;
+    const twoHours = 7200;
+    if (reason.seconds_until_due <= oneHour) {
+      return "text-red-500";
+    }
+    if (reason.seconds_until_due <= twoHours) {
+      return "text-orange-500";
+    }
+  }
+  return "";
+}
+
 const goToTicket = (ticket: any) => {
   router.push({
     name: "TicketAgent",
@@ -188,25 +228,16 @@ const goToTicket = (ticket: any) => {
   });
 };
 
-const goToAllPendingTickets = () => {
-  // Map tab values to HD View labels
+const redirectToSeeAllTickets = () => {
   const tabToViewMap: Record<string, string> = {
-    all: "All tickets",
     pending: "Pending tickets",
-    upcoming_sla: "SLA Due",
+    upcoming_sla: "SLA due",
     new_tickets: "Recently assigned tickets",
   };
 
   const viewLabel = tabToViewMap[currentTab.value];
   const view = views.data?.find((v: any) => v.label === viewLabel);
 
-  if (currentTab.value === "all") {
-    router.push({
-      name: "TicketsAgent",
-    });
-    return;
-  }
-  // Redirect to specific HD View using its document name
   router.push({
     name: "TicketsAgent",
     query: {

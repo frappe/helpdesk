@@ -62,9 +62,9 @@
   </LayoutHeader>
   <div class="h-screen overflow-auto">
     <div
-      class="flex flex-col p-1 pt-4 mb-16 md:p-5 mx-auto max-w-6xl w-full grow relative h-full"
+      class="flex flex-col p-1 pt-4 md:p-5 mx-auto max-w-6xl w-full grow relative h-full"
     >
-      <div class="grow">
+      <div class="grow pb-12">
         <div
           v-if="agentDashboard.loading"
           class="flex items-center justify-center h-full"
@@ -168,6 +168,12 @@ type LayoutItem = {
   };
 };
 
+type DashboardResponse = {
+  layout: LayoutItem[];
+  default_layout: string;
+  dashboard_id?: string;
+};
+
 const { userName, userId } = storeToRefs(useAuthStore());
 const editing = ref(false);
 const layout = ref<LayoutItem[]>([]);
@@ -185,23 +191,48 @@ const isLoading = computed(() => {
 const agentDashboard = createResource({
   url: "helpdesk.api.agent_home.agent_home.get_dashboard",
   auto: true,
-  onSuccess(data: {
-    layout: LayoutItem[];
-    default_layout: string;
-    dashboard_id?: string;
-  }) {
+  transform(data: DashboardResponse) {
+    data.layout = data.layout.map((item) => {
+      return {
+        ...item,
+        layout: {
+          ...item.layout,
+          i: Math.random().toString(36).substring(2, 9),
+        },
+      };
+    });
+    return data;
+  },
+  onSuccess(data: DashboardResponse) {
     layout.value = data.layout;
   },
 });
 
-const isDashboardModified = computed(() => {
-  const _layout = layout.value.map((item) => {
+const cleanUpLayoutData = (layout: LayoutItem[]) => {
+  return layout.map((item) => {
+    const l = item.layout;
     return {
       chart: item.chart,
-      layout: item.layout,
+      layout: {
+        x: l.x,
+        y: l.y,
+        w: l.w,
+        h: l.h,
+        minW: l.minW,
+        minH: l.minH,
+        maxW: l.maxW,
+        maxH: l.maxH,
+      },
     };
   });
-  return JSON.stringify(_layout) !== agentDashboard.data.default_layout;
+};
+
+const isDashboardModified = computed(() => {
+  const _layout = cleanUpLayoutData(layout.value);
+  const defaultLayout = cleanUpLayoutData(
+    JSON.parse(agentDashboard.data.default_layout)
+  );
+  return JSON.stringify(_layout) !== JSON.stringify(defaultLayout);
 });
 
 provide("agentDashboard", agentDashboard);
@@ -215,12 +246,12 @@ const createDashboard = createResource({
         chart: item.chart,
         layout: item.layout,
       };
-    });
+    }) as LayoutItem[];
     return {
       doc: {
         doctype: "HD Field Layout",
         user: userId.value,
-        layout: JSON.stringify(layoutData),
+        layout: JSON.stringify(cleanUpLayoutData(layoutData)),
       },
     };
   },
@@ -238,12 +269,12 @@ const saveDashboard = createResource({
         chart: item.chart,
         layout: item.layout,
       };
-    });
+    }) as LayoutItem[];
     return {
       doctype: "HD Field Layout",
       name: agentDashboard.data.dashboard_id,
       fieldname: "layout",
-      value: JSON.stringify(layoutData),
+      value: JSON.stringify(cleanUpLayoutData(layoutData)),
     };
   },
   onSuccess() {
@@ -278,7 +309,7 @@ const chartsDropdown = computed(() => {
         }),
     },
     {
-      label: __("Avg. First Response Time"),
+      label: __("Average First Response Time"),
       chart: "avg_first_response_time",
       onClick: () =>
         addChart("avg_first_response_time", {
@@ -290,7 +321,7 @@ const chartsDropdown = computed(() => {
         }),
     },
     {
-      label: __("Avg. Resolution Time"),
+      label: __("Average Resolution Time"),
       chart: "avg_resolution_time",
       onClick: () =>
         addChart("avg_resolution_time", {
@@ -318,10 +349,10 @@ const chartsDropdown = computed(() => {
       onClick: () =>
         addChart("pending_tickets", {
           w: 50,
-          h: 43,
+          h: 31,
           minW: 25,
-          minH: 43,
-          maxH: 43,
+          minH: 31,
+          maxH: 31,
         }),
     },
   ].filter((chart) => {

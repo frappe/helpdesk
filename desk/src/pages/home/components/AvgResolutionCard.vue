@@ -1,7 +1,7 @@
 <template>
   <div class="w-full h-full overflow-hidden">
     <CardBase
-      :title="__('Avg. Resolution')"
+      :title="__('Average Resolution')"
       :text="chartConfig.average"
       :currentDuration="currentDuration"
       :percentageChange="chartConfig.percentageChange"
@@ -37,8 +37,8 @@ const chartConfig = computed(() => {
   const isDataFetched = getAvgResolutionTimeResource.fetched;
   const _data = isDataFetched ? getAvgResolutionTimeResource.data : props.data;
 
-  const dates = _data.data.map((item: any) => item.date);
-  const avg_time = _data.data.map((item: any) => item.avg_time);
+  const dates = _data.data?.map((item: any) => item.date);
+  const avg_time = _data.data?.map((item: any) => item.avg_time);
   const _percentageChange = _data?.percentage_change;
   const percentageChange = {
     icon: _percentageChange > 0 ? "arrow-up-right" : "arrow-down-left",
