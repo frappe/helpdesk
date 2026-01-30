@@ -17,3 +17,8 @@ build-backend = "flit_core.buildapi"
 
 [tool.bench.frappe-dependencies]
 frappe = ">=16.0.0-dev,<=17.0.0-dev"
+
+[tool.bench.assets]
+build_dir = "./desk"
+out_dir = "../helpdesk/public/desk"
+index_html_path = "../helpdesk/www/helpdesk/index.html"
