@@ -98,7 +98,7 @@ class TestAgentHome(IntegrationTestCase):
         # Clean up tickets before each test
         frappe.db.delete("HD Ticket")
         frappe.db.delete("HD Field Layout", {"user": agent_email})
-        frappe.db.commit()
+        frappe.db.commit()  # nosemgrep
 
     def _create_ticket(
         self,

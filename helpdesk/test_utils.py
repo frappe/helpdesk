@@ -233,9 +233,9 @@ def make_agent(email: str, first_name: str = "Test Agent"):
         ).insert(ignore_permissions=True)
 
     if not frappe.db.exists("HD Agent", {"user": email}):
-        frappe.get_doc({"doctype": "HD Agent", "user": email}).insert(
-            ignore_permissions=True
-        )
+        frappe.get_doc(
+            {"doctype": "HD Agent", "user": email, "agent_name": first_name}
+        ).insert(ignore_permissions=True)
 
     return email
 
