@@ -2,6 +2,7 @@ import json
 from datetime import date, datetime, timedelta
 
 import frappe
+from dateutil.relativedelta import relativedelta
 from frappe.query_builder import DocType
 from frappe.query_builder.functions import Avg, Count, Function
 
@@ -393,11 +394,11 @@ def get_avg_time_metrics(period: str = "6m"):
             "avg_resolution": round(row["avg_resolution"] or 0),
         }
 
-    # Generate all months in the period
     now = datetime.now()
+    num_months = days // 30
     data = []
-    for i in range(days // 30 - 1, -1, -1):  # Approximate months from days
-        month_date = now - timedelta(days=30 * i)
+    for i in range(num_months - 1, -1, -1):
+        month_date = now - relativedelta(months=i)
         key = f"{month_date.year}-{month_date.month:02d}"
         if key in data_dict:
             data.append(
