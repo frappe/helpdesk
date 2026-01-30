@@ -31,6 +31,12 @@ class HDView(Document):
 
     def before_save(self):
         self.toggle_pinned_public_view()
+        if not frappe.conf.developer_mode and self.is_standard:
+            self.is_standard = 0
+
+    def on_trash(self):
+        if self.is_standard and not frappe.conf.developer_mode:
+            frappe.throw(_("Standard HD View cannot be deleted."))
 
     def toggle_pinned_public_view(self):
         if self.pinned and self.public:
