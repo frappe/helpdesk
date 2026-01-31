@@ -3,6 +3,7 @@
     <FTextEditor
       ref="e"
       :extensions="[PreserveVideoControls]"
+      :dir="textDir"
       v-bind="$attrs"
       :editor-class="[
         'prose-f max-h-64 max-w-none  overflow-auto my-4 min-h-[5rem]',
@@ -13,7 +14,7 @@
       @change="$emit('update:modelValue', $event)"
     >
       <template #top>
-        <span class="text-base">
+        <span dir="ltr" class="text-base">
           <span class="flex items-center justify-between">
             <UserAvatar
               :name="authStore.userName"
@@ -27,7 +28,7 @@
         </span>
       </template>
       <template #bottom>
-        <div class="flex flex-col gap-2">
+        <div dir="ltr" class="flex flex-col gap-2">
           <slot name="bottom-top" />
           <div
             class="flex flex-col space-y-1.5 overflow-auto sm:flex-row sm:justify-between"
@@ -94,6 +95,11 @@ const fixedMenu = [
   "Blockquote",
   "Code",
 ];
+
+function isArabic(value: any) {
+  return /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(value || "");
+}
+const textDir = computed(() => (isArabic(props.modelValue) ? "rtl" : "ltr"));
 
 defineExpose({
   editor,
