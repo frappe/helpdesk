@@ -182,7 +182,7 @@ const htmlContent = computed(
     </style>
   </head>
   <body>
-    <div class="email-content prose-f">${_content.value}</div>
+    <div dir="auto" class="email-content prose-f">${_content.value}</div>
   </body>
   </html>
   `
