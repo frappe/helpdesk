@@ -1,5 +1,6 @@
 <template>
   <TextEditor
+    :dir="textDir"
     ref="editorRef"
     :editor-class="[
       'prose-sm max-w-full mx-6 md:mx-10 max-h-[50vh] py-3',
@@ -16,7 +17,10 @@
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #top>
-      <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
+      <div
+        dir="ltr"
+        class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5"
+      >
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
@@ -71,83 +75,88 @@
       />
     </template> -->
     <template #bottom>
-      <!-- Attachments -->
-      <div class="flex flex-wrap gap-2 px-10">
-        <AttachmentItem
-          v-for="a in attachments"
-          :key="a.file_url"
-          :label="a.file_name"
-          :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
+      <div dir="ltr">
+        <!-- Attachments -->
+        <div class="flex flex-wrap gap-2 px-10">
+          <AttachmentItem
+            v-for="a in attachments"
+            :key="a.file_url"
+            :label="a.file_name"
+            :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
+          >
+            <template #suffix>
+              <FeatherIcon
+                class="h-3.5"
+                name="x"
+                @click.self.stop="removeAttachment(a)"
+              />
+            </template>
+          </AttachmentItem>
+        </div>
+        <!-- TextEditor Fixed Menu -->
+        <div
+          class="flex justify-between overflow-scroll pl-10 py-2.5 items-center"
         >
-          <template #suffix>
-            <FeatherIcon
-              class="h-3.5"
-              name="x"
-              @click.self.stop="removeAttachment(a)"
+          <div class="flex items-center overflow-x-auto w-[60%]">
+            <div class="flex gap-1">
+              <FileUploader
+                :upload-args="{
+                  doctype: doctype,
+                  docname: ticketId,
+                  private: true,
+                }"
+                @success="
+                  (f) => {
+                    attachments.push(f);
+                  }
+                "
+              >
+                <template #default="{ openFileSelector, uploading }">
+                  {{ void (isUploading = uploading) }}
+                  <Button
+                    variant="ghost"
+                    @click="openFileSelector()"
+                    :loading="uploading"
+                  >
+                    <template #icon>
+                      <AttachmentIcon
+                        class="h-4"
+                        style="color: #000000; stroke-width: 1.5 !important"
+                      />
+                    </template>
+                  </Button>
+                </template>
+              </FileUploader>
+              <Button
+                variant="ghost"
+                @click="showSavedRepliesSelectorModal = true"
+              >
+                <template #icon>
+                  <SavedReplyIcon class="h-4" />
+                </template>
+              </Button>
+            </div>
+            <TextEditorFixedMenu
+              class="ml-1"
+              :buttons="textEditorMenuButtons"
             />
-          </template>
-        </AttachmentItem>
-      </div>
-      <!-- TextEditor Fixed Menu -->
-      <div
-        class="flex justify-between overflow-scroll pl-10 py-2.5 items-center"
-      >
-        <div class="flex items-center overflow-x-auto w-[60%]">
-          <div class="flex gap-1">
-            <FileUploader
-              :upload-args="{
-                doctype: doctype,
-                docname: ticketId,
-                private: true,
-              }"
-              @success="
-                (f) => {
-                  attachments.push(f);
+          </div>
+          <div
+            class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%] mr-9"
+          >
+            <Button label="Discard" @click="handleDiscard" />
+            <Button
+              variant="solid"
+              :disabled="isDisabled"
+              :loading="sendMail.loading"
+              :label="label"
+              @click="
+                () => {
+                  submitMail();
                 }
               "
-            >
-              <template #default="{ openFileSelector, uploading }">
-                {{ void (isUploading = uploading) }}
-                <Button
-                  variant="ghost"
-                  @click="openFileSelector()"
-                  :loading="uploading"
-                >
-                  <template #icon>
-                    <AttachmentIcon
-                      class="h-4"
-                      style="color: #000000; stroke-width: 1.5 !important"
-                    />
-                  </template>
-                </Button>
-              </template>
-            </FileUploader>
-            <Button
-              variant="ghost"
-              @click="showSavedRepliesSelectorModal = true"
-            >
-              <template #icon>
-                <SavedReplyIcon class="h-4" />
-              </template>
-            </Button>
+            />
           </div>
-          <TextEditorFixedMenu class="ml-1" :buttons="textEditorMenuButtons" />
-        </div>
-        <div
-          class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%] mr-9"
-        >
-          <Button label="Discard" @click="handleDiscard" />
-          <Button
-            variant="solid"
-            :disabled="isDisabled"
-            :loading="sendMail.loading"
-            :label="label"
-            @click="
-              () => {
-                submitMail();
-              }
-            "
-          />
         </div>
       </div>
     </template>
@@ -357,6 +366,11 @@ function addToReply(
     .focus("start")
     .run();
 }
+
+function isArabic(value: any) {
+  return /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(value || "");
+}
+const textDir = computed(() => (isArabic(newEmail.value) ? "rtl" : "ltr"));
 
 function resetState() {
   newEmail.value = null;

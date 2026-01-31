@@ -2,6 +2,7 @@
   <TextEditor
     v-if="agentsList.data"
     ref="editorRef"
+    :dir="textDir"
     :editor-class="[
       'prose-sm max-w-none',
       editable &&
@@ -18,7 +19,11 @@
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #bottom>
-      <div v-if="editable" class="flex flex-col gap-2 px-6 md:pl-10 md:pr-9">
+      <div
+        dir="ltr"
+        v-if="editable"
+        class="flex flex-col gap-2 px-6 md:pl-10 md:pr-9"
+      >
         <!-- Attachments -->
         <div class="flex flex-wrap gap-2">
           <AttachmentItem
@@ -163,6 +168,11 @@ const isDisabled = computed(() => {
   return isContentEmpty(newComment.value) || loading.value;
 });
 const loading = ref(false);
+
+function isArabic(value) {
+  return /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(value || "");
+}
+const textDir = computed(() => (isArabic(newComment.value) ? "rtl" : "ltr"));
 
 // Watch for changes in comment content to trigger typing events
 watch(newComment, (newValue, oldValue) => {
