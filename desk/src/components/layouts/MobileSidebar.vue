@@ -62,8 +62,8 @@
               <template #header="{ opened, hide, toggle }">
                 <div
                   v-if="!hide"
-                  class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
-                  :class="'ml-2 mt-4 h-7 w-auto opacity-100'"
+                  class="flex cursor-pointer gap-1.5 px-2 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+                  :class="'ml-2 mt-4 h-7.5 w-auto opacity-100'"
                   @click="toggle()"
                 >
                   <FeatherIcon
