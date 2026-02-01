@@ -6,8 +6,8 @@
       'max-width': width,
     }"
   >
-    <div :class="isExpanded ? 'mx-0 p-2' : 'm-2'">
-      <UserMenu :options="profileSettings" />
+    <div class="p-2">
+      <UserMenu class="mb-2" :options="profileSettings" />
     </div>
     <SidebarLink
       v-if="!isCustomerPortal"
@@ -15,7 +15,7 @@
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
       :is-expanded="isExpanded"
-      class="mt-1.5"
+      class="mt-4.5"
     >
       <template #right>
         <span class="flex items-center gap-0.5 font-medium text-gray-600">
@@ -24,6 +24,15 @@
         </span>
       </template>
     </SidebarLink>
+    <SidebarLink
+      v-if="!isCustomerPortal"
+      class="relative min-h-7.5"
+      :label="__('Dashboard')"
+      :icon="LucideLayoutDashboard"
+      :to="'Dashboard'"
+      :is-active="isActiveTab('Dashboard')"
+      :is-expanded="isExpanded"
+    />
     <div v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
@@ -32,7 +41,7 @@
         variant="solid"
       />
       <SidebarLink
-        class="relative my-0.5"
+        class="relative"
         :label="__('Notifications')"
         :icon="LucideBell"
         :on-click="() => notificationStore.toggle()"
@@ -50,18 +59,14 @@
         </template>
       </SidebarLink>
     </div>
-    <div
-      :class="[
-        'overflow-y-auto overflow-x-hidden',
-        !isExpanded && 'hide-scrollbar',
-      ]"
-    >
+    <div>
       <div v-for="view in allViews" :key="view.label">
         <!-- <div
           v-if="!view.hideLabel && !isExpanded && view.views?.length"
           class="mx-2 my-2 h-1 border-b"
-        /> -->
-        <div :class="['mx-2', isCustomerPortal ? 'my-1' : 'my-2.5']"></div>
+        />
+        <div class="border-t mx-2 my-1.5"></div>
+
         <Section
           :label="view.label"
           :hideLabel="view.hideLabel"
@@ -70,11 +75,11 @@
           <template #header="{ opened, hide }">
             <div
               v-if="!hide"
-              class="flex cursor-pointer gap-1.5 px-2 text-base mx-2 font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+              class="flex cursor-pointer gap-1.5 px-2 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
               :class="
                 !isExpanded
                   ? 'ml-0 h-0 overflow-hidden opacity-0'
-                  : 'pt-[11px] pb-2.5 w-auto opacity-100 '
+                  : 'py-[7px]  h-7.5 w-auto opacity-100'
               "
               @click="toggleSection(view.label, view.opened)"
             >

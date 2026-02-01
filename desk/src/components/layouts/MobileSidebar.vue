@@ -17,10 +17,64 @@
           <div class="p-1">
             <UserMenu :options="profileSettings" />
           </div>
-          <div class="overflow-y-auto overflow-x-hidden">
-            <!-- notifications -->
-            <div v-if="!isCustomerPortal">
-              <div class="flex flex-col gap-1">
+          <!-- notifications -->
+          <div class="overflow-y-auto px-2" v-if="!isCustomerPortal">
+            <div class="mb-3 flex flex-col gap-1">
+              <SidebarLink
+                class="relative"
+                label="Notifications"
+                :icon="LucideBell"
+                :on-click="() => (sidebarOpened = false)"
+                :is-expanded="true"
+                to="Notifications"
+              >
+                <template #right>
+                  <Badge
+                    v-if="notificationStore.unread"
+                    :label="notificationStore.unread"
+                    theme="gray"
+                    variant="subtle"
+                  />
+                </template>
+              </SidebarLink>
+              <SidebarLink
+                v-if="!isCustomerPortal"
+                class="relative"
+                label="Dashboard"
+                :icon="LucideLayoutDashboard"
+                :to="'Dashboard'"
+                :is-active="isActiveTab('Dashboard')"
+                :is-expanded="true"
+              />
+            </div>
+          </div>
+
+          <div v-for="view in allViews" :key="view.label">
+            <div
+              v-if="!view.hideLabel && view.views?.length"
+              class="mx-2 my-2 h-1"
+            />
+            <Section
+              :label="view.label"
+              :hideLabel="view.hideLabel"
+              :opened="view.opened"
+            >
+              <template #header="{ opened, hide, toggle }">
+                <div
+                  v-if="!hide"
+                  class="flex cursor-pointer gap-1.5 px-2 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+                  :class="'ml-2 mt-4 h-7.5 w-auto opacity-100'"
+                  @click="toggle()"
+                >
+                  <FeatherIcon
+                    name="chevron-right"
+                    class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
+                    :class="{ 'rotate-90': opened }"
+                  />
+                  <span>{{ view.label }}</span>
+                </div>
+              </template>
+              <nav class="flex flex-col ml-2 mr-1">
                 <SidebarLink
                   class="relative"
                   label="Notifications"
