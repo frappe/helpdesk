@@ -24,9 +24,13 @@ export default defineConfig({
             "hd_service_holiday_list",
             "hd_service_level_agreement",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "hd_agent",
 =======
 >>>>>>> 348884a9 (fix: security issues)
+=======
+            "hd_agent",
+>>>>>>> 064110d9 (fix: use standard api for fetching agent)
           ],
           frappe: ["assignment_rule"],
         },
