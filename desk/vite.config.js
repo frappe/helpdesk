@@ -18,7 +18,13 @@ export default defineConfig({
       },
       frappeTypes: {
         input: {
-          helpdesk: ["hd_ticket_status", "hd_ticket"],
+          helpdesk: [
+            "hd_ticket_status",
+            "hd_ticket",
+            "hd_service_holiday_list",
+            "hd_service_level_agreement",
+          ],
+          frappe: ["assignment_rule"],
         },
       },
     }),

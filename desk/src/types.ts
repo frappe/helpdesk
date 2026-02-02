@@ -1,6 +1,6 @@
 import { Dayjs } from "dayjs";
 import { Component, ComputedRef, InjectionKey, Ref } from "vue";
-import type { HDTicket } from "./types/doctypes";
+import type { AssignmentRule, HDTicket } from "./types/doctypes";
 
 interface ResourceOptions<T = any> {
   method?: string;
@@ -604,6 +604,7 @@ export interface TicketActivities {
   views: ViewLog[];
 }
 
+<<<<<<< HEAD
 export type APIOptions = DropdownOption[] | string[] | [];
 
 export type DropdownOption = {
@@ -617,6 +618,8 @@ export interface AssignmentRule {
   enabled: boolean;
 }
 
+=======
+>>>>>>> b3b6ac9a (fix: security issues)
 export interface HDSettings {
   brandName: string;
   brandLogo: string;
