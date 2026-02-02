@@ -262,3 +262,15 @@ export interface HDServiceLevelAgreement extends DocType {
   /** Default Ticket Status: Link (HD Ticket Status) */
   default_ticket_status?: string;
 }
+
+// Last updated: 2026-01-19 23:22:29.075052
+export interface HDAgent extends DocType {
+  /** User: Link (User) */
+  user: string;
+  /** Agent Name: Data */
+  agent_name: string;
+  /** Is Active: Check */
+  is_active: 0 | 1;
+  /** Image: Attach Image */
+  user_image?: string;
+}

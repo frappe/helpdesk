@@ -23,6 +23,7 @@ export default defineConfig({
             "hd_ticket",
             "hd_service_holiday_list",
             "hd_service_level_agreement",
+            "hd_agent",
           ],
           frappe: ["assignment_rule"],
         },
