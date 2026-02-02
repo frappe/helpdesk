@@ -413,15 +413,10 @@ const options = computed(() => {
       },
     },
     emptyState: {
-      title: "No articles found",
+      title: "No Articles Found",
       icon: h(LucideBookOpen, {
         class: "h-10 w-10",
       }),
-      description: hasActiveFilters.value
-        ? __(
-            "No articles found for the applied filters. Try adjusting or clearing your filters."
-          )
-        : __("No articles found in the following category."),
     },
     rowRoute: {
       name: "Article",

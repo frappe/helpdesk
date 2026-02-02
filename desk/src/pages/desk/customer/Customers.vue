@@ -44,7 +44,6 @@ import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CustomerDialog from "./CustomerDialog.vue";
 import { OrganizationsIcon } from "@/components/icons";
-import { __ } from "@/translation";
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
@@ -85,12 +84,7 @@ const options = computed(() => {
     },
 
     emptyState: {
-      title: "No customers found",
-      description: hasActiveFilters.value
-        ? __(
-            "No customers found for the applied filters. Try adjusting or clearing your filters."
-          )
-        : undefined,
+      title: "No Customers Found",
       icon: h(OrganizationsIcon, {
         class: "h-10 w-10",
       }),

@@ -9,14 +9,9 @@ import { __ } from "@/translation";
 
 export const agentPortalSidebarOptions = [
   {
-    label: __("Home"),
-    icon: LucideHome,
-    to: "Home",
-  },
-  {
     label: __("Dashboard"),
     icon: LucideLayoutDashboard,
-    to: "Dashboard"
+    to: "Dashboard",
   },
   {
     label: __("Tickets"),

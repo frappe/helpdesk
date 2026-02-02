@@ -15,7 +15,7 @@
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
       :is-expanded="isExpanded"
-      class="mt-4.5"
+      class="mt-2.5"
     >
       <template #right>
         <span class="flex items-center gap-0.5 font-medium text-gray-600">
@@ -24,15 +24,6 @@
         </span>
       </template>
     </SidebarLink>
-    <SidebarLink
-      v-if="!isCustomerPortal"
-      class="relative min-h-7.5"
-      :label="__('Dashboard')"
-      :icon="LucideLayoutDashboard"
-      :to="'Dashboard'"
-      :is-active="isActiveTab('Dashboard')"
-      :is-expanded="isExpanded"
-    />
     <div v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
@@ -75,7 +66,7 @@
           <template #header="{ opened, hide }">
             <div
               v-if="!hide"
-              class="flex cursor-pointer gap-1.5 px-2 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+              class="flex cursor-pointer gap-1.5 px-2 text-base mx-2 font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
               :class="
                 !isExpanded
                   ? 'ml-0 h-0 overflow-hidden opacity-0'
@@ -109,18 +100,15 @@
     </div>
     <div class="grow" />
     <div class="flex flex-col gap-2 pb-2.5">
-      <div class="px-2">
-        <TrialBanner
-          v-if="isFCSite && !isCustomerPortal"
-          :isSidebarCollapsed="!isExpanded"
-        />
-        <GettingStartedBanner
-          v-if="showOnboardingBanner"
-          :isSidebarCollapsed="!isExpanded"
-          appName="helpdesk"
-        />
-      </div>
-
+      <TrialBanner
+        v-if="isFCSite && !isCustomerPortal"
+        :isSidebarCollapsed="!isExpanded"
+      />
+      <GettingStartedBanner
+        v-if="showOnboardingBanner"
+        :isSidebarCollapsed="!isExpanded"
+        appName="helpdesk"
+      />
       <SidebarLink
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
         :icon="HelpIcon"
