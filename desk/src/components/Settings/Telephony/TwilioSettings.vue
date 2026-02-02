@@ -1,14 +1,12 @@
 <template>
-        
-        
-             <SettingsLayoutBase :description="__('Configure your Twilio settings.')">
+  <SettingsLayoutBase :description="__('Configure your Twilio settings.')">
     <template #title>
       <div class="flex items-center gap-2">
-     <Button
-        :icon="LucideChevronLeft"
-        variant="ghost"
-        @click="$emit('updateStep', 'telephony-settings')"
-      />
+        <Button
+          :icon="LucideChevronLeft"
+          variant="ghost"
+          @click="$emit('updateStep', 'telephony-settings')"
+        />
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("Twilio") }}
         </h1>
@@ -33,106 +31,99 @@
         :disabled="
           !isDirty.twilio && !isDirty.exotel && !isDirty.telephonyAgent
         "
-        :loading="
-          twilio.save.loading ||
-  
-          telephonyAgent.save.loading
-        "
+        :loading="twilio.save.loading || telephonyAgent.save.loading"
       />
     </template>
-    <template #content> 
-     
-
-                <div v-if="twilio?.doc">
-          <div class="mt-4">
-            <div class="grid grid-cols-2 gap-4">
-              <Checkbox
-                :label="__('Enabled')"
-                v-model="twilio.doc.enabled"
-                @update:modelValue="twilio.doc.enabled = $event ? 1 : 0"
-              />
-              <Checkbox
-                :label="__('Record Calls')"
-                v-model="twilio.doc.record_calls"
-                v-if="twilio.doc.enabled"
-                @update:modelValue="twilio.doc.record_calls = $event ? 1 : 0"
-              />
-            </div>
-            <div class="grid grid-cols-2 gap-4 mt-4" v-if="twilio.doc.enabled">
-              <div class="flex flex-col gap-2">
-                <FormControl
-                  label="Account SID"
-                  required
-                  v-model="twilio.doc.account_sid"
-                  placeholder="Account SID"
-                />
-                <ErrorMessage :message="twilioErrors.accountSid" />
-              </div>
-              <div class="flex flex-col gap-2">
-                <Password
-                  label="Auth Token"
-                  required
-                  v-model="twilio.doc.auth_token"
-                  placeholder="Auth Token"
-                />
-                <ErrorMessage :message="twilioErrors.authToken" />
-              </div>
-              <FormControl
-                v-if="twilio.doc.api_key"
-                label="API Key"
-                v-model="twilio.doc.api_key"
-                disabled
-              />
-              <Password
-                v-if="twilio.doc.api_secret"
-                label="API Secret"
-                v-model="twilio.doc.api_secret"
-                disabled
-              />
-              <Autocomplete
-                v-if="twilio.originalDoc?.account_sid && twilioApps.length > 0"
-                label="TwiML App Name"
-                :model-value="twilio.doc.app_name"
-                @update:modelValue="twilio.doc.app_name = $event.value"
-                :options="twilioApps"
-              >
-                <template #footer="{ togglePopover }">
-                  <Button
-                    :label="__('Refresh Apps')"
-                    theme="gray"
-                    variant="subtle"
-                    class="w-full"
-                    icon-left="refresh-cw"
-                    @click="refreshApps(togglePopover)"
-                    :loading="twilioAppsResource.loading"
-                  />
-                </template>
-              </Autocomplete>
-              <FormControl
-                v-if="twilio.doc.twiml_sid"
-                label="TwiML App SID"
-                v-model="twilio.doc.twiml_sid"
-                disabled
-              />
-                   <div
-            class="flex flex-col gap-1.5"
-            v-if="telephonyAgent.doc && twilio.doc?.enabled"
-          >
-            <FormControl
-              label="Twilio number"
-              type="text"
-              required
-              v-model="telephonyAgent.doc.twilio_number"
+    <template #content>
+      <div v-if="twilio?.doc">
+        <div class="mt-4">
+          <div class="grid grid-cols-2 gap-4">
+            <Checkbox
+              :label="__('Enabled')"
+              v-model="twilio.doc.enabled"
+              @update:modelValue="twilio.doc.enabled = $event ? 1 : 0"
             />
-            <ErrorMessage :message="twilioErrors.number" />
+            <Checkbox
+              :label="__('Record Calls')"
+              v-model="twilio.doc.record_calls"
+              v-if="twilio.doc.enabled"
+              @update:modelValue="twilio.doc.record_calls = $event ? 1 : 0"
+            />
           </div>
+          <div class="grid grid-cols-2 gap-4 mt-4" v-if="twilio.doc.enabled">
+            <div class="flex flex-col gap-2">
+              <FormControl
+                label="Account SID"
+                required
+                v-model="twilio.doc.account_sid"
+                placeholder="Account SID"
+              />
+              <ErrorMessage :message="twilioErrors.accountSid" />
+            </div>
+            <div class="flex flex-col gap-2">
+              <Password
+                label="Auth Token"
+                required
+                v-model="twilio.doc.auth_token"
+                placeholder="Auth Token"
+              />
+              <ErrorMessage :message="twilioErrors.authToken" />
+            </div>
+            <FormControl
+              v-if="twilio.doc.api_key"
+              label="API Key"
+              v-model="twilio.doc.api_key"
+              disabled
+            />
+            <Password
+              v-if="twilio.doc.api_secret"
+              label="API Secret"
+              v-model="twilio.doc.api_secret"
+              disabled
+            />
+            <Autocomplete
+              v-if="twilio.originalDoc?.account_sid && twilioApps.length > 0"
+              label="TwiML App Name"
+              :model-value="twilio.doc.app_name"
+              @update:modelValue="twilio.doc.app_name = $event.value"
+              :options="twilioApps"
+            >
+              <template #footer="{ togglePopover }">
+                <Button
+                  :label="__('Refresh Apps')"
+                  theme="gray"
+                  variant="subtle"
+                  class="w-full"
+                  icon-left="refresh-cw"
+                  @click="refreshApps(togglePopover)"
+                  :loading="twilioAppsResource.loading"
+                />
+              </template>
+            </Autocomplete>
+            <FormControl
+              v-if="twilio.doc.twiml_sid"
+              label="TwiML App SID"
+              v-model="twilio.doc.twiml_sid"
+              disabled
+            />
+            <div
+              class="flex flex-col gap-1.5"
+              v-if="telephonyAgent.doc && twilio.doc?.enabled"
+            >
+              <FormControl
+                label="Twilio number"
+                type="text"
+                required
+                v-model="telephonyAgent.doc.twilio_number"
+              />
+              <ErrorMessage :message="twilioErrors.number" />
             </div>
           </div>
         </div>
+      </div>
     </template>
-             </SettingsLayoutBase>
-          
-          </template>
+  </SettingsLayoutBase>
+</template>
 <script setup>
 import Password from "@/components/Password.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
@@ -281,5 +272,5 @@ watch(
   { deep: true }
 );
 
-const emit = defineEmits(['updateStep'])
+const emit = defineEmits(["updateStep"]);
 </script>

@@ -1,12 +1,12 @@
 <template>
-     <SettingsLayoutBase :description="__('Configure your Exotel settings.')">
+  <SettingsLayoutBase :description="__('Configure your Exotel settings.')">
     <template #title>
       <div class="flex items-center gap-2">
-            <Button
-        :icon="LucideChevronLeft"
-        variant="ghost"
-        @click="$emit('updateStep', 'telephony-settings')"
-      />
+        <Button
+          :icon="LucideChevronLeft"
+          variant="ghost"
+          @click="$emit('updateStep', 'telephony-settings')"
+        />
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("Exotel") }}
         </h1>
@@ -38,11 +38,9 @@
         "
       />
     </template>
-    <template #content>      
-         
-       <div class="flex flex-col h-full w-full pb-8">        
-  
-               <div v-if="exotel?.doc">
+    <template #content>
+      <div class="flex flex-col h-full w-full pb-8">
+        <div v-if="exotel?.doc">
           <div class="mt-4">
             <div class="grid grid-cols-2 gap-4">
               <Checkbox
@@ -58,31 +56,30 @@
               />
             </div>
             <div class="grid grid-cols-2 gap-4 mt-4" v-if="exotel.doc.enabled">
-
-                  <div
-            class="flex flex-col gap-2"
-            v-if="telephonyAgent.doc && exotel.doc?.enabled"
-          >
-            <FormControl
-              label="Exotel number"
-              type="text"
-              required
-              v-model="telephonyAgent.doc.exotel_number"
-            />
-            <ErrorMessage :message="exotelErrors.number" />
-          </div>
-          <div
-            class="flex flex-col gap-2"
-            v-if="telephonyAgent.doc && exotel.doc?.enabled"
-          >
-            <FormControl
-              :label="__('Personal mobile no')"
-              type="text"
-              required
-              v-model="telephonyAgent.doc.mobile_no"
-            />
-            <ErrorMessage :message="exotelErrors.mobileNo" />
-          </div>
+              <div
+                class="flex flex-col gap-2"
+                v-if="telephonyAgent.doc && exotel.doc?.enabled"
+              >
+                <FormControl
+                  label="Exotel number"
+                  type="text"
+                  required
+                  v-model="telephonyAgent.doc.exotel_number"
+                />
+                <ErrorMessage :message="exotelErrors.number" />
+              </div>
+              <div
+                class="flex flex-col gap-2"
+                v-if="telephonyAgent.doc && exotel.doc?.enabled"
+              >
+                <FormControl
+                  :label="__('Personal mobile no')"
+                  type="text"
+                  required
+                  v-model="telephonyAgent.doc.mobile_no"
+                />
+                <ErrorMessage :message="exotelErrors.mobileNo" />
+              </div>
               <div class="flex flex-col gap-2">
                 <FormControl
                   label="Account SID"
@@ -132,12 +129,11 @@
             </div>
           </div>
         </div>
-        </div>
-        </template>
-        </SettingsLayoutBase>
+      </div>
+    </template>
+  </SettingsLayoutBase>
 </template>
 <script setup>
-
 import Password from "@/components/Password.vue";
 import {
   Checkbox,
@@ -146,7 +142,6 @@ import {
   toast,
   ErrorMessage,
   createResource,
-
 } from "frappe-ui";
 import { nextTick, ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
@@ -164,7 +159,7 @@ const isDirty = ref({
   exotel: false,
   telephonyAgent: false,
 });
-const emit = defineEmits(['updateStep'])
+const emit = defineEmits(["updateStep"]);
 
 const twilioApps = ref([]);
 
@@ -219,8 +214,6 @@ const twilioAppsResource = createResource({
     twilio.reload();
   },
 });
-
-
 
 async function save() {
   validateTwilio(twilio.doc, telephonyAgent.doc, twilioErrors);
@@ -343,5 +336,4 @@ watch(
   },
   { deep: true }
 );
-
 </script>
