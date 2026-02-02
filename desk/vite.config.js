@@ -23,7 +23,10 @@ export default defineConfig({
             "hd_ticket",
             "hd_service_holiday_list",
             "hd_service_level_agreement",
+<<<<<<< HEAD
             "hd_agent",
+=======
+>>>>>>> 348884a9 (fix: security issues)
           ],
           frappe: ["assignment_rule"],
         },
