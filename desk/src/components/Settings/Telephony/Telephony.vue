@@ -35,82 +35,75 @@
     </template>
     <template #content>
       <div>
-
-
-    <div class="flex-1 flex flex-col overflow-y-auto">
-      <!-- General -->
-      <div class="flex items-center justify-between gap-8 py-3 px-2">
-        <div class="flex flex-col">
-          <div class="text-p-base font-medium text-ink-gray-7 truncate">
-            {{ __('Default medium') }}
+        <div class="flex-1 flex flex-col overflow-y-auto">
+          <!-- General -->
+          <div class="flex items-center justify-between gap-8 py-3 px-2">
+            <div class="flex flex-col">
+              <div class="text-p-base font-medium text-ink-gray-7 truncate">
+                {{ __("Default medium") }}
+              </div>
+              <div class="text-p-sm text-ink-gray-5">
+                {{ __("Default calling medium for logged in user") }}
+              </div>
+            </div>
+            <div class="flex items-center gap-1">
+              <Select
+                v-if="telephonyAgent.doc"
+                :options="telephonyProviders"
+                :modelValue="telephonyAgent.doc?.default_medium"
+                @update:modelValue="telephonyAgent.doc.default_medium = $event"
+              />
+              <ErrorMessage
+                :message="
+                  twilioErrors.default_medium || exotelErrors.default_medium
+                "
+              />
+            </div>
           </div>
-          <div class="text-p-sm text-ink-gray-5">
-            {{ __('Default calling medium for logged in user') }}
+
+          <div class="h-px border-t mx-2 border-outline-gray-modals" />
+
+          <div
+            class="flex items-center justify-between py-3 px-2 cursor-pointer hover:bg-gray-50 rounded"
+            @click="emit('updateStep', 'twilio-settings')"
+          >
+            <div class="flex flex-col">
+              <div class="text-p-base font-medium text-ink-gray-7 truncate">
+                {{ __("Twilio") }}
+              </div>
+              <div class="text-p-sm text-ink-gray-5 truncate">
+                {{
+                  __(
+                    "Configure your twilio telephony integration settings here"
+                  )
+                }}
+              </div>
+            </div>
+            <FeatherIcon name="chevron-right" class="size-4 text-ink-gray-5" />
           </div>
-        </div>
-        <div class="flex items-center gap-1">
-           <Select
-              v-if="telephonyAgent.doc"
-              :options="telephonyProviders"
-              :modelValue="telephonyAgent.doc?.default_medium"
-              @update:modelValue="telephonyAgent.doc.default_medium = $event"
-            />
-            <ErrorMessage
-              :message="
-                twilioErrors.default_medium || exotelErrors.default_medium
-              "
-            />
-        </div>
-      </div>
 
-      <div
+          <div class="h-px border-t mx-2 border-outline-gray-modals" />
 
-        class="h-px border-t mx-2 border-outline-gray-modals"
-      />
-
-      <div
-      
-        class="flex items-center justify-between py-3 px-2 cursor-pointer hover:bg-gray-50 rounded"
-        @click="emit('updateStep', 'twilio-settings')"
-      >
-        <div class="flex flex-col">
-          <div class="text-p-base font-medium text-ink-gray-7 truncate">
-            {{ __('Twilio') }}
-          </div>
-          <div class="text-p-sm text-ink-gray-5 truncate">
-            {{
-              __('Configure your twilio telephony integration settings here')
-            }}
-          </div>
-        </div>
-        <FeatherIcon name="chevron-right" class="size-4 text-ink-gray-5" />
-      </div>
-
-      <div
-    
-        class="h-px border-t mx-2 border-outline-gray-modals"
-      />
-
-      <div
-  
-        class="flex items-center justify-between py-3 px-2 cursor-pointer hover:bg-gray-50 rounded"
-        @click="emit('updateStep', 'exotel-settings')"
-      >
-        <div class="flex flex-col">
-          <div class="text-p-base font-medium text-ink-gray-7 truncate">
-            {{ __('Exotel') }}
-          </div>
-          <div class="text-p-sm text-ink-gray-5 truncate">
-            {{
-              __('Configure your exotel telephony integration settings here')
-            }}
+          <div
+            class="flex items-center justify-between py-3 px-2 cursor-pointer hover:bg-gray-50 rounded"
+            @click="emit('updateStep', 'exotel-settings')"
+          >
+            <div class="flex flex-col">
+              <div class="text-p-base font-medium text-ink-gray-7 truncate">
+                {{ __("Exotel") }}
+              </div>
+              <div class="text-p-sm text-ink-gray-5 truncate">
+                {{
+                  __(
+                    "Configure your exotel telephony integration settings here"
+                  )
+                }}
+              </div>
+            </div>
+            <FeatherIcon name="chevron-right" class="size-4 text-ink-gray-5" />
           </div>
         </div>
-        <FeatherIcon name="chevron-right" class="size-4 text-ink-gray-5" />
-      </div>
-    </div>
-    <ErrorMessage :message="error" />
-
+        <ErrorMessage :message="error" />
       </div>
     </template>
   </SettingsLayoutBase>
@@ -147,7 +140,7 @@ const isDirty = ref({
   exotel: false,
   telephonyAgent: false,
 });
-const emit = defineEmits(['updateStep'])
+const emit = defineEmits(["updateStep"]);
 
 const twilioApps = ref([]);
 
