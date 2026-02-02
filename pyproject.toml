@@ -23,6 +23,11 @@ frappe = ">=16.0.0-dev,<=17.0.0-dev"
 
 [tool.bench.assets]
 build_dir = "./desk"
+<<<<<<< HEAD
 out_dir = "../helpdesk/public/desk"
 index_html_path = "../helpdesk/www/helpdesk/index.html"
 >>>>>>> ce4c7388 (chore(setup): Add build info in pyproject)
+=======
+out_dir = "./helpdesk/public/desk"
+index_html_path = "./helpdesk/www/helpdesk/index.html"
+>>>>>>> a76ff09d (chore(build): Setup out dir and index from project root)
