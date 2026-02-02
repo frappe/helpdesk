@@ -18,8 +18,8 @@
             <UserMenu :options="profileSettings" />
           </div>
           <!-- notifications -->
-          <div class="overflow-y-auto px-2" v-if="!isCustomerPortal">
-            <div class="mb-3 flex flex-col gap-1">
+          <div class="overflow-y-auto" v-if="!isCustomerPortal">
+            <div class="flex flex-col gap-1">
               <SidebarLink
                 class="relative"
                 label="Notifications"
@@ -37,23 +37,13 @@
                   />
                 </template>
               </SidebarLink>
-              <SidebarLink
-                v-if="!isCustomerPortal"
-                class="relative"
-                label="Dashboard"
-                :icon="LucideLayoutDashboard"
-                :to="'Dashboard'"
-                :is-active="isActiveTab('Dashboard')"
-                :is-expanded="true"
-              />
             </div>
           </div>
 
           <div v-for="view in allViews" :key="view.label">
-            <div
-              v-if="!view.hideLabel && view.views?.length"
-              class="mx-2 my-2 h-1"
-            />
+            <div v-if="!view.hideLabel && view.views?.length" />
+            <div class="border-t mx-2 my-1.5"></div>
+
             <Section
               :label="view.label"
               :hideLabel="view.hideLabel"
@@ -62,8 +52,8 @@
               <template #header="{ opened, hide, toggle }">
                 <div
                   v-if="!hide"
-                  class="flex cursor-pointer gap-1.5 px-2 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
-                  :class="'ml-2 mt-4 h-7.5 w-auto opacity-100'"
+                  class="flex cursor-pointer gap-1.5 px-2 text-base font-medium text-ink-gray-5 mx-2 transition-all duration-300 ease-in-out"
+                  :class="'py-[7px] h-7.5 w-auto opacity-100'"
                   @click="toggle()"
                 >
                   <FeatherIcon
@@ -74,7 +64,7 @@
                   <span>{{ view.label }}</span>
                 </div>
               </template>
-              <nav class="flex flex-col ml-2 mr-1">
+              <nav class="flex flex-col">
                 <SidebarLink
                   v-for="link in view.views"
                   :icon="link.icon"
@@ -125,7 +115,6 @@ import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { currentView, useView } from "@/composables/useView";
 
 import LucideBell from "~icons/lucide/bell";
-import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";

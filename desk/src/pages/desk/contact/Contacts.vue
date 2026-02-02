@@ -44,6 +44,7 @@ import { Avatar, toast, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import ContactDialog from "./ContactDialog.vue";
 import { showNewContactModal } from "./dialogState";
+import LucideContact2 from "~icons/lucide/contact-2";
 
 const isContactDialogVisible = ref(false);
 const selectedContact = ref(null);
@@ -71,6 +72,9 @@ const options = computed(() => {
     },
     emptyState: {
       title: "No Contacts Found",
+      icon: h(LucideContact2, {
+        class: "h-10 w-10",
+      }),
     },
   };
 });

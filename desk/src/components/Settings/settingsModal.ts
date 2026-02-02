@@ -34,8 +34,9 @@ const auth = useAuthStore();
 export const tabs = computed(() => {
   const _tabs = [
     {
-      label: __("User Settings"),
+      label: __("My settings"),
       hideLabel: true,
+      noborder: true,
       items: [
         {
           label: __("Profile"),

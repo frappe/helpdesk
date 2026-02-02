@@ -69,6 +69,7 @@ import { computed, h, onMounted, reactive, ref } from "vue";
 import { __ } from "@/translation";
 import { useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
+import LucideBookOpen from "~icons/lucide/book-open";
 
 const router = useRouter();
 const { $dialog } = globalStore();
@@ -398,6 +399,12 @@ const options = computed(() => {
           });
         },
       },
+    },
+    emptyState: {
+      title: "No Articles Found",
+      icon: h(LucideBookOpen, {
+        class: "h-10 w-10",
+      }),
     },
     rowRoute: {
       name: "Article",
