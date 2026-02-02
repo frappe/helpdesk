@@ -1,19 +1,23 @@
 <template>
-  <SettingsLayoutBase
-    :description="__('Configure your Twilio settings for Helpdesk.')"
-  >
+        
+        
+             <SettingsLayoutBase :description="__('Configure your Twilio settings.')">
     <template #title>
       <div class="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="__('Twilio')"
-          size="md"
-          @click="goBack"
-          class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0 !pl-0 -ml-1.5"
-        />
+     <Button
+        :icon="LucideChevronLeft"
+        variant="ghost"
+        @click="$emit('updateStep', 'telephony-settings')"
+      />
+        <h1 class="text-lg font-semibold text-ink-gray-8">
+          {{ __("Twilio") }}
+        </h1>
         <Badge
-          :class="[isDirty.twilio ? 'opacity-100' : 'opacity-0']"
+          :class="[
+            isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent
+              ? 'opacity-100'
+              : 'opacity-0',
+          ]"
           :label="__('Unsaved')"
           theme="orange"
           variant="subtle"
@@ -26,113 +30,116 @@
         theme="gray"
         variant="solid"
         @click="save"
-        :disabled="!isDirty.twilio"
-        :loading="twilio.save.loading"
+        :disabled="
+          !isDirty.twilio && !isDirty.exotel && !isDirty.telephonyAgent
+        "
+        :loading="
+          twilio.save.loading ||
+  
+          telephonyAgent.save.loading
+        "
       />
     </template>
-    <template #content>
-      <div v-if="twilio?.doc">
-        <div>
-          <div class="grid grid-cols-2 gap-4">
-            <Checkbox
-              :label="__('Enabled')"
-              v-model="twilio.doc.enabled"
-              @update:modelValue="twilio.doc.enabled = $event ? 1 : 0"
-            />
-            <Checkbox
-              :label="__('Record Calls')"
-              v-model="twilio.doc.record_calls"
-              v-if="twilio.doc.enabled"
-              @update:modelValue="twilio.doc.record_calls = $event ? 1 : 0"
-            />
-          </div>
-          <div class="grid grid-cols-2 gap-4 mt-4" v-if="twilio.doc.enabled">
-            <div class="flex flex-col gap-2">
-              <FormControl
-                label="Account SID"
-                required
-                v-model="twilio.doc.account_sid"
-                placeholder="Account SID"
+    <template #content> 
+     
+
+                <div v-if="twilio?.doc">
+          <div class="mt-4">
+            <div class="grid grid-cols-2 gap-4">
+              <Checkbox
+                :label="__('Enabled')"
+                v-model="twilio.doc.enabled"
+                @update:modelValue="twilio.doc.enabled = $event ? 1 : 0"
               />
-              <ErrorMessage :message="twilioErrors.accountSid" />
-            </div>
-            <div class="flex flex-col gap-2">
-              <Password
-                label="Auth Token"
-                required
-                v-model="twilio.doc.auth_token"
-                placeholder="Auth Token"
+              <Checkbox
+                :label="__('Record Calls')"
+                v-model="twilio.doc.record_calls"
+                v-if="twilio.doc.enabled"
+                @update:modelValue="twilio.doc.record_calls = $event ? 1 : 0"
               />
-              <ErrorMessage :message="twilioErrors.authToken" />
             </div>
-            <FormControl
-              v-if="twilio.doc.api_key"
-              label="API Key"
-              v-model="twilio.doc.api_key"
-              disabled
-            />
-            <Password
-              v-if="twilio.doc.api_secret"
-              label="API Secret"
-              v-model="twilio.doc.api_secret"
-              disabled
-            />
-            <Autocomplete
-              v-if="twilio.originalDoc?.account_sid && twilioApps.length > 0"
-              label="TwiML App Name"
-              :model-value="twilio.doc.app_name"
-              @update:modelValue="twilio.doc.app_name = $event.value"
-              :options="twilioApps"
-            >
-              <template #footer="{ togglePopover }">
-                <Button
-                  :label="__('Refresh Apps')"
-                  theme="gray"
-                  variant="subtle"
-                  class="w-full"
-                  icon-left="refresh-cw"
-                  @click="refreshApps(togglePopover)"
-                  :loading="twilioAppsResource.loading"
+            <div class="grid grid-cols-2 gap-4 mt-4" v-if="twilio.doc.enabled">
+              <div class="flex flex-col gap-2">
+                <FormControl
+                  label="Account SID"
+                  required
+                  v-model="twilio.doc.account_sid"
+                  placeholder="Account SID"
                 />
-              </template>
-            </Autocomplete>
-            <FormControl
-              v-if="twilio.doc.twiml_sid"
-              label="TwiML App SID"
-              v-model="twilio.doc.twiml_sid"
-              disabled
-            />
-            <div
-              class="flex flex-col gap-1.5"
-              v-if="telephonyAgent.doc && twilio.doc?.enabled"
-            >
+                <ErrorMessage :message="twilioErrors.accountSid" />
+              </div>
+              <div class="flex flex-col gap-2">
+                <Password
+                  label="Auth Token"
+                  required
+                  v-model="twilio.doc.auth_token"
+                  placeholder="Auth Token"
+                />
+                <ErrorMessage :message="twilioErrors.authToken" />
+              </div>
               <FormControl
-                label="Twilio number"
-                type="text"
-                required
-                v-model="telephonyAgent.doc.twilio_number"
+                v-if="twilio.doc.api_key"
+                label="API Key"
+                v-model="twilio.doc.api_key"
+                disabled
               />
-              <ErrorMessage :message="twilioErrors.number" />
+              <Password
+                v-if="twilio.doc.api_secret"
+                label="API Secret"
+                v-model="twilio.doc.api_secret"
+                disabled
+              />
+              <Autocomplete
+                v-if="twilio.originalDoc?.account_sid && twilioApps.length > 0"
+                label="TwiML App Name"
+                :model-value="twilio.doc.app_name"
+                @update:modelValue="twilio.doc.app_name = $event.value"
+                :options="twilioApps"
+              >
+                <template #footer="{ togglePopover }">
+                  <Button
+                    :label="__('Refresh Apps')"
+                    theme="gray"
+                    variant="subtle"
+                    class="w-full"
+                    icon-left="refresh-cw"
+                    @click="refreshApps(togglePopover)"
+                    :loading="twilioAppsResource.loading"
+                  />
+                </template>
+              </Autocomplete>
+              <FormControl
+                v-if="twilio.doc.twiml_sid"
+                label="TwiML App SID"
+                v-model="twilio.doc.twiml_sid"
+                disabled
+              />
+                   <div
+            class="flex flex-col gap-1.5"
+            v-if="telephonyAgent.doc && twilio.doc?.enabled"
+          >
+            <FormControl
+              label="Twilio number"
+              type="text"
+              required
+              v-model="telephonyAgent.doc.twilio_number"
+            />
+            <ErrorMessage :message="twilioErrors.number" />
+          </div>
             </div>
           </div>
         </div>
-      </div>
     </template>
-  </SettingsLayoutBase>
-  <ConfirmDialog
-    v-if="showConfirmDialog.show"
-    :title="showConfirmDialog.title"
-    :message="showConfirmDialog.message"
-    @confirm="showConfirmDialog.onConfirm"
-    @cancel="showConfirmDialog.onCancel"
-  />
-</template>
+             </SettingsLayoutBase>
+          
+          </template>
 <script setup>
 import Password from "@/components/Password.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
   Button,
+  Select,
+  FormLabel,
   Checkbox,
   FormControl,
   createDocumentResource,
@@ -145,6 +152,8 @@ import {
 import { nextTick, ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
 import { useAuthStore } from "@/stores/auth";
+import { useTelephonyStore } from "@/stores/telephony";
+import LucideChevronLeft from "~icons/lucide/chevron-left";
 
 import { disableSettingModalOutsideClick } from "../settingsModal";
 const twilioApps = ref([]);
@@ -158,6 +167,7 @@ const twilioErrors = ref({
 });
 const isDirty = ref({
   twilio: false,
+  exotel: false,
   telephonyAgent: false,
 });
 
@@ -186,36 +196,15 @@ const telephonyAgent = createDocumentResource({
     toast.error(er?.messages?.[0] || __("Failed to load telephony agent"));
   },
 });
-
-const showConfirmDialog = ref({ show: false });
-
-const goBack = () => {
-  if (isDirty.value.twilio || isDirty.value.telephonyAgent) {
-    if (!showConfirmDialog.value.show) {
-      showConfirmDialog.value = {
-        show: true,
-        title: __("Unsaved changes"),
-        message: __(
-          "Are you sure you want to go back? Unsaved changes will be lost."
-        ),
-        onConfirm: () => {
-          showConfirmDialog.value.show = false;
-          emit("updateStep", "telephony-settings");
-        },
-        onCancel: () => {
-          showConfirmDialog.value.show = false;
-        },
-      };
-    }
-    return;
-  }
-  emit("updateStep", "telephony-settings");
-};
-
 async function save() {
   validateTwilio(twilio.doc, telephonyAgent.doc, twilioErrors);
+  validateExotel(exotel.doc, telephonyAgent.doc, exotelErrors);
   if (Object.values(twilioErrors.value).some((v) => v)) {
     toast.error(__("Please fill all required fields for Twilio"));
+    return;
+  }
+  if (Object.values(exotelErrors.value).some((v) => v)) {
+    toast.error(__("Please fill all required fields for Exotel"));
     return;
   }
 
@@ -230,7 +219,14 @@ async function save() {
       })
     );
   }
-
+  if (isDirty.value.exotel) {
+    promises.push(
+      exotel.save.submit().catch((er) => {
+        const error = __(`Exotel error: {0}`, er?.messages?.[0]);
+        toast.error(error || __("Failed to save Exotel settings"));
+      })
+    );
+  }
   if (isDirty.value.telephonyAgent) {
     if (telephonyAgent.doc.twilio_number) {
       telephonyAgent.doc.twilio = true;
@@ -238,13 +234,18 @@ async function save() {
       telephonyAgent.doc.twilio = false;
     }
 
+    if (telephonyAgent.doc.exotel_number) {
+      telephonyAgent.doc.exotel = true;
+    } else {
+      telephonyAgent.doc.exotel = false;
+    }
     promises.push(telephonyAgent.save.submit());
   }
 
   const results = await Promise.all(promises);
 
   if (!results.some((result) => result == undefined)) {
-    toast.success(__("Telephony settings updated successfully."));
+    toast.success(__("Telephony settings updated!"));
   }
 
   // Reload twilio to prevent "doc has been modified" error, as an application is created and doc is updated on save
@@ -280,5 +281,5 @@ watch(
   { deep: true }
 );
 
-const emit = defineEmits(["updateStep"]);
+const emit = defineEmits(['updateStep'])
 </script>

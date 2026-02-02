@@ -1,17 +1,15 @@
 <template>
-  <SettingsLayoutBase
-    :description="__('Configure your Exotel settings for Helpdesk.')"
-  >
+     <SettingsLayoutBase :description="__('Configure your Exotel settings.')">
     <template #title>
       <div class="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="__('Exotel')"
-          size="md"
-          @click="goBack"
-          class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0 !pl-0 -ml-1.5"
-        />
+            <Button
+        :icon="LucideChevronLeft"
+        variant="ghost"
+        @click="$emit('updateStep', 'telephony-settings')"
+      />
+        <h1 class="text-lg font-semibold text-ink-gray-8">
+          {{ __("Exotel") }}
+        </h1>
         <Badge
           :class="[
             isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent
@@ -40,10 +38,12 @@
         "
       />
     </template>
-    <template #content>
-      <div class="flex flex-col h-full w-full pb-8">
-        <div v-if="exotel?.doc">
-          <div>
+    <template #content>      
+         
+       <div class="flex flex-col h-full w-full pb-8">        
+  
+               <div v-if="exotel?.doc">
+          <div class="mt-4">
             <div class="grid grid-cols-2 gap-4">
               <Checkbox
                 :label="__('Enabled')"
@@ -58,30 +58,31 @@
               />
             </div>
             <div class="grid grid-cols-2 gap-4 mt-4" v-if="exotel.doc.enabled">
-              <div
-                class="flex flex-col gap-2"
-                v-if="telephonyAgent.doc && exotel.doc?.enabled"
-              >
-                <FormControl
-                  label="Exotel number"
-                  type="text"
-                  required
-                  v-model="telephonyAgent.doc.exotel_number"
-                />
-                <ErrorMessage :message="exotelErrors.number" />
-              </div>
-              <div
-                class="flex flex-col gap-2"
-                v-if="telephonyAgent.doc && exotel.doc?.enabled"
-              >
-                <FormControl
-                  :label="__('Personal mobile no')"
-                  type="text"
-                  required
-                  v-model="telephonyAgent.doc.mobile_no"
-                />
-                <ErrorMessage :message="exotelErrors.mobileNo" />
-              </div>
+
+                  <div
+            class="flex flex-col gap-2"
+            v-if="telephonyAgent.doc && exotel.doc?.enabled"
+          >
+            <FormControl
+              label="Exotel number"
+              type="text"
+              required
+              v-model="telephonyAgent.doc.exotel_number"
+            />
+            <ErrorMessage :message="exotelErrors.number" />
+          </div>
+          <div
+            class="flex flex-col gap-2"
+            v-if="telephonyAgent.doc && exotel.doc?.enabled"
+          >
+            <FormControl
+              :label="__('Personal mobile no')"
+              type="text"
+              required
+              v-model="telephonyAgent.doc.mobile_no"
+            />
+            <ErrorMessage :message="exotelErrors.mobileNo" />
+          </div>
               <div class="flex flex-col gap-2">
                 <FormControl
                   label="Account SID"
@@ -131,18 +132,12 @@
             </div>
           </div>
         </div>
-      </div>
-    </template>
-  </SettingsLayoutBase>
-  <ConfirmDialog
-    v-if="showConfirmDialog.show"
-    :title="showConfirmDialog.title"
-    :message="showConfirmDialog.message"
-    @confirm="showConfirmDialog.onConfirm"
-    @cancel="showConfirmDialog.onCancel"
-  />
+        </div>
+        </template>
+        </SettingsLayoutBase>
 </template>
 <script setup>
+
 import Password from "@/components/Password.vue";
 import {
   Checkbox,
@@ -151,6 +146,7 @@ import {
   toast,
   ErrorMessage,
   createResource,
+
 } from "frappe-ui";
 import { nextTick, ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
@@ -158,7 +154,6 @@ import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 import { __ } from "@/translation";
 
@@ -169,10 +164,9 @@ const isDirty = ref({
   exotel: false,
   telephonyAgent: false,
 });
-const emit = defineEmits(["updateStep"]);
+const emit = defineEmits(['updateStep'])
 
 const twilioApps = ref([]);
-const showConfirmDialog = ref({ show: false });
 
 const twilioErrors = ref({
   accountSid: "",
@@ -226,32 +220,7 @@ const twilioAppsResource = createResource({
   },
 });
 
-const goBack = () => {
-  if (
-    isDirty.value.twilio ||
-    isDirty.value.exotel ||
-    isDirty.value.telephonyAgent
-  ) {
-    if (!showConfirmDialog.value.show) {
-      showConfirmDialog.value = {
-        show: true,
-        title: __("Unsaved changes"),
-        message: __(
-          "Are you sure you want to go back? Unsaved changes will be lost."
-        ),
-        onConfirm: () => {
-          showConfirmDialog.value.show = false;
-          emit("updateStep", "telephony-settings");
-        },
-        onCancel: () => {
-          showConfirmDialog.value.show = false;
-        },
-      };
-    }
-    return;
-  }
-  emit("updateStep", "telephony-settings");
-};
+
 
 async function save() {
   validateTwilio(twilio.doc, telephonyAgent.doc, twilioErrors);
@@ -302,7 +271,7 @@ async function save() {
   const results = await Promise.all(promises);
 
   if (!results.some((result) => result == undefined)) {
-    toast.success(__("Telephony settings updated successfully."));
+    toast.success(__("Telephony settings updated!"));
   }
 
   // Reload twilio to prevent "doc has been modified" error, as an application is created and doc is updated on save
@@ -374,4 +343,5 @@ watch(
   },
   { deep: true }
 );
+
 </script>
