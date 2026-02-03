@@ -1,21 +1,19 @@
 <template>
-  <SettingsLayoutBase :description="__('Configure your Twilio settings.')">
+  <SettingsLayoutBase
+    :description="__('Configure your Twilio settings for Helpdesk.')"
+  >
     <template #title>
       <div class="flex items-center gap-2">
         <Button
-          :icon="LucideChevronLeft"
           variant="ghost"
+          icon-left="chevron-left"
+          :label="__('Twilio')"
+          size="md"
           @click="$emit('updateStep', 'telephony-settings')"
+          class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0 !pl-0"
         />
-        <h1 class="text-lg font-semibold text-ink-gray-8">
-          {{ __("Twilio") }}
-        </h1>
         <Badge
-          :class="[
-            isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent
-              ? 'opacity-100'
-              : 'opacity-0',
-          ]"
+          :class="[isDirty.twilio ? 'opacity-100' : 'opacity-0']"
           :label="__('Unsaved')"
           theme="orange"
           variant="subtle"
@@ -28,15 +26,13 @@
         theme="gray"
         variant="solid"
         @click="save"
-        :disabled="
-          !isDirty.twilio && !isDirty.exotel && !isDirty.telephonyAgent
-        "
-        :loading="twilio.save.loading || telephonyAgent.save.loading"
+        :disabled="!isDirty.twilio"
+        :loading="twilio.save.loading"
       />
     </template>
     <template #content>
       <div v-if="twilio?.doc">
-        <div class="mt-4">
+        <div>
           <div class="grid grid-cols-2 gap-4">
             <Checkbox
               :label="__('Enabled')"
@@ -129,8 +125,6 @@ import Password from "@/components/Password.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import {
   Button,
-  Select,
-  FormLabel,
   Checkbox,
   FormControl,
   createDocumentResource,
@@ -143,8 +137,6 @@ import {
 import { nextTick, ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
 import { useAuthStore } from "@/stores/auth";
-import { useTelephonyStore } from "@/stores/telephony";
-import LucideChevronLeft from "~icons/lucide/chevron-left";
 
 import { disableSettingModalOutsideClick } from "../settingsModal";
 const twilioApps = ref([]);
@@ -158,7 +150,6 @@ const twilioErrors = ref({
 });
 const isDirty = ref({
   twilio: false,
-  exotel: false,
   telephonyAgent: false,
 });
 
@@ -189,13 +180,8 @@ const telephonyAgent = createDocumentResource({
 });
 async function save() {
   validateTwilio(twilio.doc, telephonyAgent.doc, twilioErrors);
-  validateExotel(exotel.doc, telephonyAgent.doc, exotelErrors);
   if (Object.values(twilioErrors.value).some((v) => v)) {
     toast.error(__("Please fill all required fields for Twilio"));
-    return;
-  }
-  if (Object.values(exotelErrors.value).some((v) => v)) {
-    toast.error(__("Please fill all required fields for Exotel"));
     return;
   }
 
@@ -210,14 +196,7 @@ async function save() {
       })
     );
   }
-  if (isDirty.value.exotel) {
-    promises.push(
-      exotel.save.submit().catch((er) => {
-        const error = __(`Exotel error: {0}`, er?.messages?.[0]);
-        toast.error(error || __("Failed to save Exotel settings"));
-      })
-    );
-  }
+
   if (isDirty.value.telephonyAgent) {
     if (telephonyAgent.doc.twilio_number) {
       telephonyAgent.doc.twilio = true;
@@ -225,11 +204,6 @@ async function save() {
       telephonyAgent.doc.twilio = false;
     }
 
-    if (telephonyAgent.doc.exotel_number) {
-      telephonyAgent.doc.exotel = true;
-    } else {
-      telephonyAgent.doc.exotel = false;
-    }
     promises.push(telephonyAgent.save.submit());
   }
 

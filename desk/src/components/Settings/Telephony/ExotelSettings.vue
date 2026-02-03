@@ -1,15 +1,17 @@
 <template>
-  <SettingsLayoutBase :description="__('Configure your Exotel settings.')">
+  <SettingsLayoutBase
+    :description="__('Configure your Exotel settings for Helpdesk.')"
+  >
     <template #title>
       <div class="flex items-center gap-2">
         <Button
-          :icon="LucideChevronLeft"
           variant="ghost"
+          icon-left="chevron-left"
+          :label="__('Exotel')"
+          size="md"
           @click="$emit('updateStep', 'telephony-settings')"
+          class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0 !pl-0"
         />
-        <h1 class="text-lg font-semibold text-ink-gray-8">
-          {{ __("Exotel") }}
-        </h1>
         <Badge
           :class="[
             isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent
@@ -41,7 +43,7 @@
     <template #content>
       <div class="flex flex-col h-full w-full pb-8">
         <div v-if="exotel?.doc">
-          <div class="mt-4">
+          <div>
             <div class="grid grid-cols-2 gap-4">
               <Checkbox
                 :label="__('Enabled')"

@@ -37,7 +37,7 @@
       <div>
         <div class="flex-1 flex flex-col overflow-y-auto">
           <!-- General -->
-          <div class="flex items-center justify-between gap-8 py-3 px-2">
+          <div class="flex items-center justify-between gap-8 py-3">
             <div class="flex flex-col">
               <div class="text-p-base font-medium text-ink-gray-7 truncate">
                 {{ __("Default medium") }}
@@ -53,18 +53,12 @@
                 :modelValue="telephonyAgent.doc?.default_medium"
                 @update:modelValue="telephonyAgent.doc.default_medium = $event"
               />
-              <ErrorMessage
-                :message="
-                  twilioErrors.default_medium || exotelErrors.default_medium
-                "
-              />
             </div>
           </div>
-
           <div class="h-px border-t mx-2 border-outline-gray-modals" />
 
           <div
-            class="flex items-center justify-between py-3 px-2 cursor-pointer hover:bg-gray-50 rounded"
+            class="flex items-center justify-between py-3 cursor-pointer rounded"
             @click="emit('updateStep', 'twilio-settings')"
           >
             <div class="flex flex-col">
@@ -85,7 +79,7 @@
           <div class="h-px border-t mx-2 border-outline-gray-modals" />
 
           <div
-            class="flex items-center justify-between py-3 px-2 cursor-pointer hover:bg-gray-50 rounded"
+            class="flex items-center justify-between py-3 cursor-pointer rounded"
             @click="emit('updateStep', 'exotel-settings')"
           >
             <div class="flex flex-col">
@@ -206,11 +200,11 @@ async function save() {
   validateTwilio(twilio.doc, telephonyAgent.doc, twilioErrors);
   validateExotel(exotel.doc, telephonyAgent.doc, exotelErrors);
   if (Object.values(twilioErrors.value).some((v) => v)) {
-    toast.error(__("Please fill all required fields for Twilio"));
+    toast.error(__("Please configure your Twilio settings correctly"));
     return;
   }
   if (Object.values(exotelErrors.value).some((v) => v)) {
-    toast.error(__("Please fill all required fields for Exotel"));
+    toast.error(__("Please configure your Exotel settings correctly"));
     return;
   }
 
