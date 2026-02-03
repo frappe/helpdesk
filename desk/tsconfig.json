@@ -1,6 +1,11 @@
 {
 	"compilerOptions": {
+		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
+		"target": "es2022",
+		"module": "esnext",
+		"moduleResolution":"node",
+		"jsx": "preserve",
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"]
