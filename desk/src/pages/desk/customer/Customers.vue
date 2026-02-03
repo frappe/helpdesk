@@ -43,6 +43,7 @@ import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CustomerDialog from "./CustomerDialog.vue";
+import { OrganizationsIcon } from "@/components/icons";
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
@@ -80,6 +81,9 @@ const options = computed(() => {
     },
     emptyState: {
       title: "No Customers Found",
+      icon: h(OrganizationsIcon, {
+        class: "h-10 w-10",
+      }),
     },
   };
 });

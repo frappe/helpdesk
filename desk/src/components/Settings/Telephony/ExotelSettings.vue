@@ -1,10 +1,17 @@
 <template>
-  <SettingsLayoutBase :description="__('Configure your telephony settings.')">
+  <SettingsLayoutBase
+    :description="__('Configure your Exotel settings for Helpdesk.')"
+  >
     <template #title>
       <div class="flex items-center gap-2">
-        <h1 class="text-lg font-semibold text-ink-gray-8">
-          {{ __("Telephony") }}
-        </h1>
+        <Button
+          variant="ghost"
+          icon-left="chevron-left"
+          :label="__('Exotel')"
+          size="md"
+          @click="$emit('updateStep', 'telephony-settings')"
+          class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0 !pl-0"
+        />
         <Badge
           :class="[
             isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent
@@ -34,98 +41,118 @@
       />
     </template>
     <template #content>
-      <div>
-        <div class="flex-1 flex flex-col overflow-y-auto">
-          <!-- General -->
-          <div class="flex items-center justify-between gap-8 py-3">
-            <div class="flex flex-col">
-              <div class="text-p-base font-medium text-ink-gray-7 truncate">
-                {{ __("Default medium") }}
-              </div>
-              <div class="text-p-sm text-ink-gray-5">
-                {{ __("Default calling medium for logged in user") }}
-              </div>
-            </div>
-            <div class="flex items-center gap-1">
-              <Select
-                v-if="telephonyAgent.doc"
-                :options="telephonyProviders"
-                :modelValue="telephonyAgent.doc?.default_medium"
-                @update:modelValue="telephonyAgent.doc.default_medium = $event"
+      <div class="flex flex-col h-full w-full pb-8">
+        <div v-if="exotel?.doc">
+          <div>
+            <div class="grid grid-cols-2 gap-4">
+              <Checkbox
+                :label="__('Enabled')"
+                v-model="exotel.doc.enabled"
+                @update:modelValue="exotel.doc.enabled = $event ? 1 : 0"
+              />
+              <Checkbox
+                :label="__('Record Calls')"
+                v-model="exotel.doc.record_call"
+                v-if="exotel.doc.enabled"
+                @update:modelValue="exotel.doc.record_call = $event ? 1 : 0"
               />
             </div>
-          </div>
-          <div class="h-px border-t mx-2 border-outline-gray-modals" />
-
-          <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded"
-            @click="emit('updateStep', 'twilio-settings')"
-          >
-            <div class="flex flex-col">
-              <div class="text-p-base font-medium text-ink-gray-7 truncate">
-                {{ __("Twilio") }}
+            <div class="grid grid-cols-2 gap-4 mt-4" v-if="exotel.doc.enabled">
+              <div
+                class="flex flex-col gap-2"
+                v-if="telephonyAgent.doc && exotel.doc?.enabled"
+              >
+                <FormControl
+                  label="Exotel number"
+                  type="text"
+                  required
+                  v-model="telephonyAgent.doc.exotel_number"
+                />
+                <ErrorMessage :message="exotelErrors.number" />
               </div>
-              <div class="text-p-sm text-ink-gray-5 truncate">
-                {{
-                  __(
-                    "Configure your twilio telephony integration settings here"
-                  )
-                }}
+              <div
+                class="flex flex-col gap-2"
+                v-if="telephonyAgent.doc && exotel.doc?.enabled"
+              >
+                <FormControl
+                  :label="__('Personal mobile no')"
+                  type="text"
+                  required
+                  v-model="telephonyAgent.doc.mobile_no"
+                />
+                <ErrorMessage :message="exotelErrors.mobileNo" />
+              </div>
+              <div class="flex flex-col gap-2">
+                <FormControl
+                  label="Account SID"
+                  required
+                  v-model="exotel.doc.account_sid"
+                  placeholder="Account SID"
+                />
+                <ErrorMessage :message="exotelErrors.accountSid" />
+              </div>
+              <div class="flex flex-col gap-2">
+                <FormControl
+                  label="Webhook Verify Token"
+                  required
+                  v-model="exotel.doc.webhook_verify_token"
+                  placeholder="Webhook Verify Token"
+                />
+                <ErrorMessage :message="exotelErrors.webhookVerifyToken" />
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <FormControl
+                  label="API Key"
+                  required
+                  v-model="exotel.doc.api_key"
+                  placeholder="API Key"
+                />
+                <ErrorMessage :message="exotelErrors.apiKey" />
+              </div>
+              <div class="flex flex-col gap-2">
+                <Password
+                  label="API Token"
+                  required
+                  v-model="exotel.doc.api_token"
+                  placeholder="API Token"
+                />
+                <ErrorMessage :message="exotelErrors.apiToken" />
+              </div>
+              <div class="flex flex-col gap-2">
+                <FormControl
+                  label="Subdomain"
+                  required
+                  v-model="exotel.doc.subdomain"
+                  placeholder="Subdomain"
+                />
+                <ErrorMessage :message="exotelErrors.subdomain" />
               </div>
             </div>
-            <FeatherIcon name="chevron-right" class="size-4 text-ink-gray-5" />
-          </div>
-
-          <div class="h-px border-t mx-2 border-outline-gray-modals" />
-
-          <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded"
-            @click="emit('updateStep', 'exotel-settings')"
-          >
-            <div class="flex flex-col">
-              <div class="text-p-base font-medium text-ink-gray-7 truncate">
-                {{ __("Exotel") }}
-              </div>
-              <div class="text-p-sm text-ink-gray-5 truncate">
-                {{
-                  __(
-                    "Configure your exotel telephony integration settings here"
-                  )
-                }}
-              </div>
-            </div>
-            <FeatherIcon name="chevron-right" class="size-4 text-ink-gray-5" />
           </div>
         </div>
-        <ErrorMessage :message="error" />
       </div>
     </template>
   </SettingsLayoutBase>
 </template>
-
-<script setup lang="ts">
+<script setup>
 import Password from "@/components/Password.vue";
-import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import {
-  Button,
-  Select,
-  FormLabel,
   Checkbox,
   FormControl,
   createDocumentResource,
   toast,
   ErrorMessage,
   createResource,
-  Badge,
-  Autocomplete,
 } from "frappe-ui";
 import { nextTick, ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
 import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
 import { disableSettingModalOutsideClick } from "../settingsModal";
-import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+
+import { __ } from "@/translation";
 
 const auth = useAuthStore();
 const telephonyStore = useTelephonyStore();
@@ -190,21 +217,15 @@ const twilioAppsResource = createResource({
   },
 });
 
-const telephonyProviders = [
-  { label: "", value: "" },
-  { label: "Twilio", value: "Twilio" },
-  { label: "Exotel", value: "Exotel" },
-];
-
 async function save() {
   validateTwilio(twilio.doc, telephonyAgent.doc, twilioErrors);
   validateExotel(exotel.doc, telephonyAgent.doc, exotelErrors);
   if (Object.values(twilioErrors.value).some((v) => v)) {
-    toast.error(__("Please configure your Twilio settings correctly"));
+    toast.error(__("Please fill all required fields for Twilio"));
     return;
   }
   if (Object.values(exotelErrors.value).some((v) => v)) {
-    toast.error(__("Please configure your Exotel settings correctly"));
+    toast.error(__("Please fill all required fields for Exotel"));
     return;
   }
 

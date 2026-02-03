@@ -98,12 +98,6 @@
             {{ __("Add your first Saved reply to get started.") }}
           </div>
         </div>
-        <Button
-          :label="__('Add Saved reply')"
-          variant="outline"
-          icon-left="plus"
-          @click="goToNew()"
-        />
       </div>
       <div
         v-if="

@@ -8,7 +8,7 @@
           :label="_avatars[0].label"
           size="sm"
         />
-        <div class="truncate" v-if="!hideName">{{ _avatars[0].label }}</div>
+        <div class="truncate" v-if="hideName">{{ _avatars[0].label }}</div>
       </Tooltip>
     </div>
     <Tooltip
@@ -39,7 +39,7 @@ const props = defineProps({
   },
   size: {
     type: String,
-    default: "md",
+    default: "sm",
   },
   hideName: {
     type: Boolean,
