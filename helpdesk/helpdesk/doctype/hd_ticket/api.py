@@ -40,7 +40,7 @@ def new(doc, attachments=[]):
 
 
 @frappe.whitelist()
-def get_one(name, is_customer_portal=False):
+def get_one(name: str, is_customer_portal: bool = False):
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     QBContact = frappe.qb.DocType("Contact")
     QBTicket = frappe.qb.DocType("HD Ticket")

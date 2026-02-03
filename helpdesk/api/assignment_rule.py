@@ -9,7 +9,7 @@ def get_assignment_rules_list():
             frappe.PermissionError,
         )
 
-    assignment_rules = frappe.get_all(
+    assignment_rules = frappe.get_list(
         "Assignment Rule",
         fields=["name", "description", "disabled", "priority"],
         order_by="modified desc",
