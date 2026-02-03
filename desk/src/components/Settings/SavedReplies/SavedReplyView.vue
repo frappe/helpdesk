@@ -28,7 +28,9 @@
           @click="onShowPreview()"
           icon-left="eye"
           :disabled="
-            Boolean(!content?.editor?.state?.doc?.textContent?.trim()?.length)
+            Boolean(
+              !content?.editor?.state?.doc?.textContent?.trim()?.length
+            ) || isDirty
           "
         />
         <Button
@@ -243,9 +245,11 @@ const scopeDropdownOptions = computed(() => {
 
 const getSavedReplyData = createResource({
   url: "frappe.client.get",
-  params: {
-    doctype: "HD Saved Reply",
-    name: savedRepliesActiveScreen.value.data?.name,
+  makeParams() {
+    return {
+      doctype: "HD Saved Reply",
+      name: savedRepliesActiveScreen.value.data?.name,
+    };
   },
   auto: false,
   onSuccess: (data: SavedReply) => {
