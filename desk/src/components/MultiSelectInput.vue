@@ -60,12 +60,12 @@
                       >
                         <UserAvatar
                           class="mr-2"
-                          :name="option.value"
+                          :name="getUsernameLabel(option.value)"
                           size="lg"
                         />
                         <div class="flex flex-col gap-1 p-1 text-gray-800">
                           <div class="text-base font-medium">
-                            {{ option.label }}
+                            {{ getUsernameLabel(option.label) }}
                           </div>
                           <div class="text-sm text-gray-600">
                             {{ option.value }}
@@ -200,6 +200,15 @@ const addValue = (value) => {
     });
     !error.value && (value = "");
   }
+};
+const getUsernameLabel = (value: string) => {
+  if (!value) return "";
+
+  // Take everything before '<'
+  const beforeAngle = value.split("<")[0];
+
+  // Remove quotes and trim
+  return beforeAngle.replace(/"/g, "").trim();
 };
 
 const removeValue = (value) => {
