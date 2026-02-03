@@ -175,9 +175,22 @@ const replyAll = () => {
   const user = auth.user.value;
 
   const normalizeAndFilter = (field) => {
-    let arr;
+    let arr = [];
+    let current = "";
+    let inQuotes = false;
     if (typeof field === "string") {
-      arr = field.split(",").map((s) => s.trim());
+      for (let char of field) {
+        if (char === '"') {
+          inQuotes = !inQuotes;
+          current += char;
+        } else if (char === "," && !inQuotes) {
+          arr.push(current.trim());
+          current = "";
+        } else {
+          current += char;
+        }
+      }
+      if (current) arr.push(current.trim());
     } else {
       arr = field || [];
     }
