@@ -80,7 +80,11 @@
     </span>
   </div>
 </template>
-
+<style>
+.tiptap input[placeholder="Add caption"] {
+  display: none !important;
+}
+</style>
 <script setup lang="ts">
 import {
   AttachmentItem,
