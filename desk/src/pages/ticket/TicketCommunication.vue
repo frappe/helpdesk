@@ -66,6 +66,8 @@ function sanitize(html: string) {
         "valign",
         "bgcolor",
         "style",
+        "colspan",
+        "rowspan",
       ],
       td: ["width", "height", "align", "valign", "bgcolor", "style"],
       tr: ["style"],
