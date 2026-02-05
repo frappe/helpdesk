@@ -35,10 +35,24 @@
    "label": "Is Active"
   },
   {
+   "fieldname": "availability_status",
+   "fieldtype": "Select",
+   "label": "Availability Status",
+   "options": "Available\nAway",
+   "default": "Available",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "signature",
+   "fieldtype": "Small Text",
+   "label": "Signature"
+  },
+  {
    "fieldname": "user_image",
    "fieldtype": "Attach Image",
    "label": "Image"
   }
+
  ],
  "index_web_pages_for_search": 1,
  "links": [],
