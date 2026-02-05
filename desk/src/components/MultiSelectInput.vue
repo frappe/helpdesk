@@ -8,7 +8,10 @@
         :label="value"
         theme="gray"
         variant="subtle"
-        class="rounded-full"
+        :class="{
+          'rounded bg-surface-white hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
+            variant === 'subtle',
+        }"
         @keydown.delete.capture.stop="removeLastValue"
       >
         <template #suffix>
@@ -94,8 +97,7 @@ import {
 } from "@headlessui/vue";
 import { UserAvatar } from "@/components/";
 import { Popover, createResource } from "frappe-ui";
-import { ref, computed, nextTick } from "vue";
-import { watchDebounced } from "@vueuse/core";
+import { ref, computed, nextTick, watch } from "vue";
 
 const props = defineProps({
   validate: {
@@ -128,7 +130,7 @@ const selectedValue = computed({
   },
 });
 
-watchDebounced(
+watch(
   query,
   (val) => {
     val = val || "";
@@ -136,7 +138,7 @@ watchDebounced(
     text.value = val;
     reload(val);
   },
-  { debounce: 300, immediate: true }
+  { immediate: true }
 );
 
 const filterOptions = createResource({
@@ -174,10 +176,35 @@ function reload(val) {
   filterOptions.reload();
 }
 
+const normalizeAndFilter = (field) => {
+  let arr = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let char of field) {
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      current += char;
+    } else if (char === "," && !inQuotes) {
+      if (current.trim()) {
+        arr.push(current.trim());
+      }
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  if (current.trim()) {
+    arr.push(current.trim());
+  }
+
+  return arr;
+};
+
 const addValue = (value) => {
   error.value = null;
   if (value) {
-    const splitValues = value.split(",");
+    const splitValues = normalizeAndFilter(value);
     splitValues.forEach((value) => {
       value = value.trim();
       if (value) {
@@ -215,15 +242,14 @@ const removeValue = (value) => {
   values.value = values.value.filter((v) => v !== value);
 };
 
-const removeLastValue = () => {
+function removeLastValue() {
   if (query.value) return;
-
-  let emailRef = emails.value[emails.value.length - 1]?.$el;
+  let emailRef = emails.value[emails.value.length - 1]?.rootRef;
   if (document.activeElement === emailRef) {
     values.value.pop();
     nextTick(() => {
       if (values.value.length) {
-        emailRef = emails.value[emails.value.length - 1].$el;
+        emailRef = emails.value[emails.value.length - 1].rootRef;
         emailRef?.focus();
       } else {
         setFocus();
@@ -232,10 +258,10 @@ const removeLastValue = () => {
   } else {
     emailRef?.focus();
   }
-};
+}
 
 function setFocus() {
-  search.value.$el.focus();
+  search.value?.focus?.();
 }
 
 defineExpose({ setFocus });
