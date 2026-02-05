@@ -18,6 +18,7 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
+
 from helpdesk.consts import DEFAULT_TICKET_PRIORITY, DEFAULT_TICKET_TYPE
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
@@ -422,6 +423,7 @@ class HDTicket(Document):
         if frappe.session.user != agent:
             self.notify_agent(agent, "Assignment")
 
+
     def get_assigned_agents(self):
         assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
         if len(assignees) > 0:
@@ -549,7 +551,14 @@ class HDTicket(Document):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject}"
+        
         sender = frappe.session.user
+
+        signature = frappe.db.get_value("HD Agent", {"user": sender}, "signature")
+
+        if signature and signature not in message:
+            message = f"{message}\n\n{signature}"
+
         recipients = to or self.raised_by
         sender_email = None if skip_email_workflow else self.sender_email()
 
