@@ -39,8 +39,14 @@ export function validateEmail(email) {
   return regExp.test(email);
 }
 
+export function extractEmail(input: string) {
+  const match = input.match(/<([^>]+)>$/); // grabs the part inside <>
+  return match ? match[1] : input;
+}
+
 export function validateEmailWithZod(email: string) {
-  const success = zod.string().email().safeParse(email).success;
+  const extractedEmail = extractEmail(email);
+  const success = zod.string().email().safeParse(extractedEmail).success;
   return success;
 }
 

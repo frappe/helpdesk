@@ -97,7 +97,8 @@ import {
 } from "@headlessui/vue";
 import { UserAvatar } from "@/components/";
 import { Popover, createResource } from "frappe-ui";
-import { ref, computed, nextTick, watch } from "vue";
+import { ref, computed, nextTick } from "vue";
+import { watchDebounced } from "@vueuse/core";
 
 const props = defineProps({
   validate: {
@@ -130,7 +131,7 @@ const selectedValue = computed({
   },
 });
 
-watch(
+watchDebounced(
   query,
   (val) => {
     val = val || "";
@@ -138,7 +139,7 @@ watch(
     text.value = val;
     reload(val);
   },
-  { immediate: true }
+  { debounce: 50, immediate: true }
 );
 
 const filterOptions = createResource({
