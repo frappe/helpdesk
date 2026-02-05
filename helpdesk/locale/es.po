@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2026-01-21 11:39\n"
+"PO-Revision-Date: 2026-02-05 06:42\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -78,7 +78,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:338
 msgid "Access all team tickets"
@@ -609,7 +609,7 @@ msgstr ""
 #. Label of the button_section (Section Break) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Button"
-msgstr ""
+msgstr "Botón"
 
 #: desk/src/pages/call-logs/CallLogDetailModal.vue:8
 msgid "Call Details"
@@ -1010,7 +1010,7 @@ msgstr "Eliminar"
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Description"
-msgstr ""
+msgstr "Descripción"
 
 #. Label of the description_template (Text Editor) field in DocType 'HD Ticket
 #. Template'
@@ -1822,7 +1822,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Image"
-msgstr ""
+msgstr "Imagen"
 
 #. Description of the 'Logo' (Attach Image) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1981,7 +1981,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Link"
-msgstr ""
+msgstr "Enlace"
 
 #. Label of the link_options_sb (Section Break) field in DocType 'HD Support
 #. Search Source'
@@ -2109,7 +2109,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Name"
-msgstr ""
+msgstr "Nombre"
 
 #. Label of the name_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2172,7 +2172,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:8
 msgid "New Team"
-msgstr ""
+msgstr "Nuevo Equipo"
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:48
 #: desk/src/components/Settings/Teams/TeamEdit.vue:264
@@ -2574,7 +2574,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
-msgstr ""
+msgstr "Clasificación"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
@@ -2923,7 +2923,7 @@ msgstr ""
 #. Label of the script (Code) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Script"
-msgstr ""
+msgstr "Script"
 
 #. Label of the search_tab (Tab Break) field in DocType 'HD Settings'
 #: desk/src/components/Settings/Agents.vue:23
@@ -3349,7 +3349,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:3
 msgid "Teams"
-msgstr ""
+msgstr "Equipos"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:6
 msgid "Telephony"
@@ -3676,7 +3676,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
