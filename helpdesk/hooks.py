@@ -63,6 +63,9 @@ doc_events = {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
+    "ToDo": {
+        "before_insert": "helpdesk.overrides.assign.validate_agent_availability"
+    },
 }
 
 has_permission = {
