@@ -18,6 +18,7 @@ add_to_apps_screen = [
     }
 ]
 
+
 after_install = "helpdesk.setup.install.after_install"
 after_migrate = [
     "helpdesk.search.build_index_in_background",
@@ -67,6 +68,8 @@ doc_events = {
         "before_insert": "helpdesk.overrides.assign.validate_agent_availability"
     },
 }
+assign_to_conditions = "helpdesk.overrides.assign.user_query_condition"
+
 
 has_permission = {
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
@@ -77,6 +80,10 @@ permission_query_conditions = {
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
 }
+permission_query_conditions.update({
+    "User": "helpdesk.overrides.assign.user_query_condition"
+})
+
 
 # DocType Class
 # ---------------
