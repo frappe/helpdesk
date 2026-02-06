@@ -138,6 +138,7 @@ import { formatTimeShort, getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation";
 import {
   call,
   createResource,
@@ -152,7 +153,6 @@ import {
   LoadingIndicator,
   toast,
 } from "frappe-ui";
-import { __ } from "@/translation";
 import {
   computed,
   h,
@@ -278,13 +278,18 @@ const defaultEmptyState = {
   title: __("No Data Found"),
 };
 
+const pageLengthCount = useStorage(
+  `list_page_length_count+${props.options.doctype}`,
+  options.value.default_page_length
+);
+
 const defaultParams = reactive({
   doctype: options.value.doctype,
   filters: {},
   default_filters: options.value.defaultFilters,
   order_by: "modified desc",
-  page_length: options.value.default_page_length,
-  page_length_count: options.value.default_page_length,
+  page_length: pageLengthCount.value,
+  page_length_count: pageLengthCount.value,
   view: options.value.view,
   columns: [],
   rows: [],
@@ -571,7 +576,8 @@ function reload(reset: boolean = false) {
     defaultParams.filters = options.value.defaultFilters || {};
     defaultParams.order_by = "modified desc";
     defaultParams.page_length = options.value.default_page_length;
-    defaultParams.page_length_count = options.value.default_page_length;
+    pageLengthCount.value = options.value.default_page_length;
+    defaultParams.page_length_count = pageLengthCount.value;
     defaultParams.columns = [];
     defaultParams.rows = [];
     defaultParams.is_default = true;
@@ -580,7 +586,8 @@ function reload(reset: boolean = false) {
 }
 
 function handlePageLength(count: number, loadMore: boolean = false) {
-  defaultParams.page_length_count = count;
+  pageLengthCount.value = count;
+  defaultParams.page_length_count = pageLengthCount.value;
   if (loadMore) {
     defaultParams.page_length += count;
   } else {
