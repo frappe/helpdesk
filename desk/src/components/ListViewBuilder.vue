@@ -288,7 +288,7 @@ const defaultParams = reactive({
   filters: {},
   default_filters: options.value.defaultFilters,
   order_by: "modified desc",
-  page_length: options.value.default_page_length,
+  page_length: pageLengthCount.value,
   page_length_count: pageLengthCount.value,
   view: options.value.view,
   columns: [],
