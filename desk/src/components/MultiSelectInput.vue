@@ -8,7 +8,10 @@
         :label="value"
         theme="gray"
         variant="subtle"
-        class="rounded-full"
+        :class="{
+          'rounded bg-surface-white hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
+            variant === 'subtle',
+        }"
         @keydown.delete.capture.stop="removeLastValue"
       >
         <template #suffix>
@@ -60,12 +63,12 @@
                       >
                         <UserAvatar
                           class="mr-2"
-                          :name="option.value"
+                          :name="getUsernameLabel(option.value)"
                           size="lg"
                         />
                         <div class="flex flex-col gap-1 p-1 text-gray-800">
                           <div class="text-base font-medium">
-                            {{ option.label }}
+                            {{ getUsernameLabel(option.label) }}
                           </div>
                           <div class="text-sm text-gray-600">
                             {{ option.value }}
@@ -136,7 +139,7 @@ watchDebounced(
     text.value = val;
     reload(val);
   },
-  { debounce: 300, immediate: true }
+  { debounce: 50, immediate: true }
 );
 
 const filterOptions = createResource({
@@ -174,10 +177,35 @@ function reload(val) {
   filterOptions.reload();
 }
 
+const normalizeAndFilter = (field) => {
+  let arr = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let char of field) {
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      current += char;
+    } else if (char === "," && !inQuotes) {
+      if (current.trim()) {
+        arr.push(current.trim());
+      }
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  if (current.trim()) {
+    arr.push(current.trim());
+  }
+
+  return arr;
+};
+
 const addValue = (value) => {
   error.value = null;
   if (value) {
-    const splitValues = value.split(",");
+    const splitValues = normalizeAndFilter(value);
     splitValues.forEach((value) => {
       value = value.trim();
       if (value) {
@@ -201,20 +229,28 @@ const addValue = (value) => {
     !error.value && (value = "");
   }
 };
+const getUsernameLabel = (value: string) => {
+  if (!value) return "";
+
+  // Take everything before '<'
+  const beforeAngle = value.split("<")[0];
+
+  // Remove quotes and trim
+  return beforeAngle.replace(/"/g, "").trim();
+};
 
 const removeValue = (value) => {
   values.value = values.value.filter((v) => v !== value);
 };
 
-const removeLastValue = () => {
+function removeLastValue() {
   if (query.value) return;
-
-  let emailRef = emails.value[emails.value.length - 1]?.$el;
+  let emailRef = emails.value[emails.value.length - 1]?.rootRef;
   if (document.activeElement === emailRef) {
     values.value.pop();
     nextTick(() => {
       if (values.value.length) {
-        emailRef = emails.value[emails.value.length - 1].$el;
+        emailRef = emails.value[emails.value.length - 1].rootRef;
         emailRef?.focus();
       } else {
         setFocus();
@@ -223,10 +259,10 @@ const removeLastValue = () => {
   } else {
     emailRef?.focus();
   }
-};
+}
 
 function setFocus() {
-  search.value.$el.focus();
+  search.value?.focus?.();
 }
 
 defineExpose({ setFocus });
