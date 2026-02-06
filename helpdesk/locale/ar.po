@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2026-01-21 11:39\n"
+"PO-Revision-Date: 2026-01-23 12:08\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Arabic\n"
 "MIME-Version: 1.0\n"
@@ -307,7 +307,7 @@ msgstr ""
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Apply SLA for Resolution Time"
-msgstr ""
+msgstr "تطبيق اتفاقية مستوى الخدمة (SLA) لوقت الحل"
 
 #. Label of the apply_to (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -397,7 +397,7 @@ msgstr "مهمة"
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Assignment Conditions"
-msgstr ""
+msgstr "شروط التعيين"
 
 #. Label of the assignment_rule (Link) field in DocType 'HD Team'
 #. Label of a Link in the Helpdesk Workspace
@@ -576,11 +576,11 @@ msgstr "وبناء على"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:34
 msgid "Based on your HR Policy, select your leave allocation period's end date"
-msgstr ""
+msgstr "بناءً على سياسة الموارد البشرية الخاصة بك، حدد تاريخ انتهاء فترة تخصيص الإجازة الخاصة بك"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:27
 msgid "Based on your HR Policy, select your leave allocation period's start date"
-msgstr ""
+msgstr "بناءً على سياسة الموارد البشرية الخاصة بك، حدد تاريخ بدء فترة تخصيص الإجازة الخاصة بك"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -744,7 +744,7 @@ msgstr "مسح الجدول"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:46
 msgid "Click on Add to Holidays. This will populate the holidays table with all the dates that fall on the selected weekly off. Repeat the process for populating the dates for all your weekly holidays"
-msgstr ""
+msgstr "انقر على \"إضافة إلى العطلات\". سيؤدي هذا إلى ملء جدول العطلات بجميع التواريخ التي تقع ضمن العطلة الأسبوعية المحددة. كرر العملية لإضافة تواريخ جميع عطلاتك الأسبوعية."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:69
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:44
@@ -1391,7 +1391,7 @@ msgstr "أجاب أولا على"
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Response Due"
-msgstr ""
+msgstr "الاستجابة الأولى مطلوبة"
 
 #. Label of the response_time (Duration) field in DocType 'HD Service Level
 #. Priority'
@@ -1463,7 +1463,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Gray"
-msgstr ""
+msgstr "رمادي"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1707,7 +1707,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:53
 msgid "Here, your weekly offs are pre-populated based on the previous selections. You can add more rows to also add public and national holidays individually."
-msgstr ""
+msgstr "هنا، يتم ملء أيام إجازاتك الأسبوعية مسبقًا بناءً على اختياراتك السابقة. يمكنك إضافة المزيد من الصفوف لإضافة العطلات الرسمية والوطنية بشكل فردي."
 
 #. Label of the cond_hidden (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -2040,7 +2040,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:45
 msgid "Members"
-msgstr ""
+msgstr "أعضاء"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:57
 msgid "Members ({0})"
@@ -2074,7 +2074,7 @@ msgstr "رسالة"
 #. Label of the meta_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Meta"
-msgstr ""
+msgstr "ميتا"
 
 #. Label of the misc_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2186,7 +2186,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:52
 msgid "New users will have to be manually registered by system managers."
-msgstr ""
+msgstr "سيتعين على مديري النظام تسجيل المستخدمين الجدد يدويًا."
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:20
 msgid "No Holiday list found"
@@ -2214,7 +2214,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:184
 msgid "No changes made"
-msgstr ""
+msgstr "لم يتم إجراء أي تغييرات"
 
 #: desk/src/components/Settings/EmailAccountList.vue:52
 msgid "No email account found"
@@ -2309,7 +2309,7 @@ msgstr "يفتح من الساعة"
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Orange"
-msgstr ""
+msgstr "البرتقالي"
 
 #. Label of the order (Int) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -2360,7 +2360,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Paused"
-msgstr ""
+msgstr "توقف مؤقتًا"
 
 #: desk/src/components/Settings/InviteAgents.vue:36
 msgid "Pending Invites"
@@ -2399,7 +2399,7 @@ msgstr ""
 #. Label of the placeholder (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Placeholder"
-msgstr ""
+msgstr "عنصر نائب"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:19
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
@@ -2443,7 +2443,7 @@ msgstr "وظيفة الوصف"
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Post Route Key List"
-msgstr ""
+msgstr "قائمة مفاتيح مسار البريد"
 
 #. Label of the post_route (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
@@ -2502,7 +2502,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:3
 msgid "Profile"
-msgstr ""
+msgstr "حساب تعريفي"
 
 #: desk/src/components/Settings/Profile/Profile.vue:234
 msgid "Profile updated"
@@ -2529,7 +2529,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:87
 msgid "Pull Emails"
-msgstr ""
+msgstr "سحب رسائل البريد الإلكتروني"
 
 #: desk/src/components/Settings/EmailEdit.vue:214
 msgid "Pulling emails, this may take a few minutes."
@@ -2736,7 +2736,7 @@ msgstr ""
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Due"
-msgstr ""
+msgstr "موعد صدور القرار"
 
 #. Label of the resolution_time (Duration) field in DocType 'HD Service Level
 #. Priority'
@@ -2781,7 +2781,7 @@ msgstr "لا يمكن أن يكون وقت الاستجابة {0} للأولوي
 #. DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Response and Resolution"
-msgstr ""
+msgstr "الرد والحل"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:194
 msgid "Response and resolution"
@@ -2968,7 +2968,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:41
 msgid "Select your weekly off day"
-msgstr ""
+msgstr "اختر يوم عطلتك الأسبوعية"
 
 #: desk/src/components/Settings/InviteAgents.vue:31
 msgid "Send Invites"
@@ -3004,7 +3004,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
-msgstr ""
+msgstr "اسم مستوى الخدمة"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:56
 msgid "Set Resolution Time for Priority {0} in row {1}."
@@ -3012,7 +3012,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:48
 msgid "Set Response Time for Priority {0} in row {1}."
-msgstr ""
+msgstr "قم بتعيين وقت الاستجابة للأولوية {0} في الصف {1}."
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:90
 msgid "Set as default SLA"
@@ -3171,7 +3171,7 @@ msgstr ""
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status Details"
-msgstr ""
+msgstr "تفاصيل الحالة"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:242
 msgid "Status details"
@@ -3317,7 +3317,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Team"
-msgstr ""
+msgstr "فريق"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:36
 msgid "Team Name"
@@ -3887,7 +3887,7 @@ msgstr "سنويا"
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Yellow"
-msgstr ""
+msgstr "أصفر"
 
 #: helpdesk/api/dashboard.py:34
 msgid "You are not allowed to view this dashboard data."
