@@ -79,15 +79,22 @@ class HelpdeskSearch(SQLiteSearch):
         if not document:
             return None
 
-        if doc.doctype == "HD Ticket Comment":
-            # For comments, resolve the ticket for permissions
+        if (
+            doc.doctype == "HD Ticket Comment"
+            and doc.reference_ticket
+            and type(doc.reference_ticket) is str
+        ):
             document["reference_ticket"] = int(doc.reference_ticket)
 
         if doc.doctype == "Communication":
             # For communications, ensure reference fields are set for ticket doctype
             document["reference_doctype"] = doc.reference_doctype
-            if doc.reference_doctype == "HD Ticket":
-                document["reference_ticket"] = int(doc.reference_name)
+            if (
+                doc.reference_doctype == "HD Ticket"
+                and doc.reference_name
+                and type(doc.reference_name) is str
+            ):
+                document["reference_name"] = int(doc.reference_name)
 
         if doc.doctype == "HD Ticket":
             document["reference_ticket"] = int(doc.name)
