@@ -17,11 +17,6 @@ export const agentPortalSidebarOptions = [
     to: "AgentKnowledgeBase",
   },
   {
-    label: __("Canned Responses"),
-    icon: LucideCloudLightning,
-    to: "CannedResponses",
-  },
-  {
     label: __("Customers"),
     icon: OrganizationsIcon,
     to: "CustomerList",
