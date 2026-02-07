@@ -21,7 +21,7 @@
         <MultiSelectInput
           v-model="toEmailsClone"
           class="flex-1"
-          :validate="validateEmail"
+          :validate="validateEmailWithZod"
           :error-message="(value) => `${value} is an invalid email address`"
         />
         <Button
@@ -45,7 +45,7 @@
           ref="ccInput"
           v-model="ccEmailsClone"
           class="flex-1"
-          :validate="validateEmail"
+          :validate="validateEmailWithZod"
           :error-message="(value) => `${value} is an invalid email address`"
         />
       </div>
@@ -59,7 +59,7 @@
           ref="bccInput"
           v-model="bccEmailsClone"
           class="flex-1"
-          :validate="validateEmail"
+          :validate="validateEmailWithZod"
           :error-message="(value) => `${value} is an invalid email address`"
         />
       </div>
@@ -177,7 +177,7 @@ import {
   removeAttachmentFromServer,
   textEditorMenuButtons,
   uploadFunction,
-  validateEmail,
+  validateEmailWithZod,
 } from "@/utils";
 // import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";

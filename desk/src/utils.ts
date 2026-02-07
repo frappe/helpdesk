@@ -35,13 +35,18 @@ export function getAssign(s: string): string | undefined {
 }
 
 export function validateEmail(email) {
-  const regExp =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const regExp = /^((?:"[\p{L}\p{M}\d .,_%+-]+"|[\p{L}\d._%+-]+)\s)?<([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})>$|^([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})$/u;
   return regExp.test(email);
 }
 
+export function extractEmail(input: string) {
+  const match = input.match(/<([^>]+)>$/); // grabs the part inside <>
+  return match ? match[1] : input;
+}
+
 export function validateEmailWithZod(email: string) {
-  const success = zod.string().email().safeParse(email).success;
+  const extractedEmail = extractEmail(email);
+  const success = zod.string().email().safeParse(extractedEmail).success;
   return success;
 }
 
