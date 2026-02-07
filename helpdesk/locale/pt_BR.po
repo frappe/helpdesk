@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2026-01-21 11:40\n"
+"PO-Revision-Date: 2026-02-05 06:43\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Portuguese, Brazilian\n"
 "MIME-Version: 1.0\n"
@@ -196,7 +196,7 @@ msgstr ""
 #. Label of the about (Code) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Additional Information"
-msgstr ""
+msgstr "Informações Adicionais"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -914,7 +914,7 @@ msgstr "Ciano"
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.py:77
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:29
 msgid "Day count for auto closing tickets cannot be negative or zero"
@@ -1010,7 +1010,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Description"
-msgstr ""
+msgstr "Descrição"
 
 #. Label of the description_template (Text Editor) field in DocType 'HD Ticket
 #. Template'
@@ -1029,7 +1029,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Details"
-msgstr ""
+msgstr "Detalhes"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:299
 msgid "Disable Bypass Restrictions"
@@ -1042,7 +1042,7 @@ msgstr ""
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Disabled"
-msgstr ""
+msgstr "Desativado"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:29
 msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
@@ -1116,7 +1116,7 @@ msgstr ""
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "Email"
-msgstr "E-mail"
+msgstr "E-Mail"
 
 #. Label of the email_account (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
@@ -1381,7 +1381,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:101
 msgid "First Name"
-msgstr ""
+msgstr "Nome"
 
 #. Label of the first_responded_on (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1485,7 +1485,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Guest"
-msgstr ""
+msgstr "Convidado"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:13
 msgid "Guide users to articles before tickets."
@@ -1822,7 +1822,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Image"
-msgstr ""
+msgstr "Imagem"
 
 #. Description of the 'Logo' (Attach Image) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1962,7 +1962,7 @@ msgstr "Último"
 
 #: desk/src/components/Settings/Profile/Profile.vue:107
 msgid "Last Name"
-msgstr ""
+msgstr "Sobrenome"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
 msgid "Last user assigned by this rule"
@@ -3155,12 +3155,12 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:31
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Status"
-msgstr "Estado"
+msgstr "Situação"
 
 #. Label of the auto_close_status (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Status "
-msgstr "Estado "
+msgstr "Situação "
 
 #. Label of the status_category (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
