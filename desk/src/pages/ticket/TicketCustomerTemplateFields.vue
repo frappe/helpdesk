@@ -51,6 +51,7 @@ import { dayjs } from "@/dayjs";
 import { Field } from "@/types";
 import { computed, inject } from "vue";
 import { ITicket } from "./symbols";
+import { parseField } from "@/composables/formCustomisation";
 
 const ticket = inject(ITicket);
 
@@ -101,6 +102,8 @@ const slaData = computed(() => {
 const customFields = computed(() => {
   const _custom_fields = ticket.data.template.fields
     .filter((field: Field) => !field.hide_from_customer)
+    .map((field: Field) => parseField(field, ticket.data))
+    .filter((field: Field) => field.display_via_depends_on)
     .filter(
       (f: Field) => ["subject", "team", "priority"].indexOf(f.fieldname) === -1
     );
