@@ -22,12 +22,15 @@
     <template #header-actions>
       <div class="flex items-center gap-2">
         <Button
+          v-if="savedReplyData.name"
           :label="__('Preview')"
           size="sm"
           @click="onShowPreview()"
           icon-left="eye"
           :disabled="
-            Boolean(!content?.editor?.state?.doc?.textContent?.trim()?.length)
+            Boolean(
+              !content?.editor?.state?.doc?.textContent?.trim()?.length
+            ) || isDirty
           "
         />
         <Button
@@ -242,9 +245,11 @@ const scopeDropdownOptions = computed(() => {
 
 const getSavedReplyData = createResource({
   url: "frappe.client.get",
-  params: {
-    doctype: "HD Saved Reply",
-    name: savedRepliesActiveScreen.value.data?.name,
+  makeParams() {
+    return {
+      doctype: "HD Saved Reply",
+      name: savedRepliesActiveScreen.value.data?.name,
+    };
   },
   auto: false,
   onSuccess: (data: SavedReply) => {
@@ -287,7 +292,7 @@ const teamsList = computed(() => {
 
 const onShowPreview = () => {
   previewDialog.value.show = true;
-  previewDialog.value.savedReply = savedReplyData.value.message;
+  previewDialog.value.savedReply = savedReplyData.value.name;
 };
 
 if (savedRepliesActiveScreen.value.data?.name) {

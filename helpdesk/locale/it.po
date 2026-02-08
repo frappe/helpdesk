@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2026-01-21 11:40\n"
+"PO-Revision-Date: 2026-02-05 06:43\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -515,7 +515,7 @@ msgstr ""
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Automation"
-msgstr ""
+msgstr "Automazioni"
 
 #. Label of the avg_response_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -524,7 +524,7 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:362
 msgid "Average feedback rating per day is around {0} stars"
-msgstr ""
+msgstr "La valutazione media del feedback al giorno è di circa {0} stelle"
 
 #: helpdesk/api/dashboard.py:284
 msgid "Average tickets per day is around {0}"
@@ -750,7 +750,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:44
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:58
 msgid "Close"
-msgstr "Vicino"
+msgstr "Chiudi"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -984,7 +984,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamEdit.vue:348
 #: desk/src/components/Settings/Teams/TeamEdit.vue:350
 msgid "Delete"
-msgstr "Eliminare"
+msgstr "Elimina"
 
 #. Label of the description (Text) field in DocType 'HD Article Category'
 #. Label of the description (Text Editor) field in DocType 'HD Holiday'
@@ -1087,7 +1087,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:61
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:100
 msgid "Duplicate"
-msgstr "Duplicato"
+msgstr "Duplica"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:53
 msgid "Duplicate Assignment Rule"
@@ -1373,7 +1373,7 @@ msgstr ""
 #. Label of the filters (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
-msgstr ""
+msgstr "Filtri"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:76
 msgid "Find out all of the variables that can be used in the content"
@@ -1381,7 +1381,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:101
 msgid "First Name"
-msgstr "Nome di battesimo"
+msgstr "Nome"
 
 #. Label of the first_responded_on (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1485,7 +1485,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Guest"
-msgstr ""
+msgstr "Ospite"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:13
 msgid "Guide users to articles before tickets."
@@ -1778,7 +1778,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Icon"
-msgstr ""
+msgstr "Icona"
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1839,7 +1839,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAccountCard.vue:59
 msgid "Inbox"
-msgstr ""
+msgstr "Posta in arrivo"
 
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2091,7 +2091,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:35
 msgid "Monthly"
-msgstr ""
+msgstr "Mensile"
 
 #. Label of the category_name (Data) field in DocType 'HD Article Category'
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
@@ -2214,7 +2214,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:184
 msgid "No changes made"
-msgstr ""
+msgstr "Nessuna modifica apportata"
 
 #: desk/src/components/Settings/EmailAccountList.vue:52
 msgid "No email account found"
@@ -2249,7 +2249,7 @@ msgstr ""
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Notification Settings"
-msgstr "Impostazioni di Notifica"
+msgstr "Impostazioni notifica"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:161
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:242
@@ -2332,7 +2332,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:115
 msgid "Password"
-msgstr ""
+msgstr "Password"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:104
 msgid "Password must be at least 8 characters"
@@ -2690,7 +2690,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 #: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
 msgid "Request Key"
-msgstr ""
+msgstr "Richiedi Key"
 
 #. Label of the required (Check) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
@@ -2914,7 +2914,7 @@ msgstr ""
 #: desk/src/components/Settings/Telephony/Telephony.vue:22
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Save"
-msgstr ""
+msgstr "Salva"
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:35
 msgid "Schedule name"
@@ -2934,7 +2934,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamsList.vue:25
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Search"
-msgstr ""
+msgstr "Cerca"
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:10
 msgid "Search Index Regenerated"
@@ -3047,7 +3047,7 @@ msgstr ""
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Setup"
-msgstr ""
+msgstr "Configurazioni"
 
 #: desk/src/components/Settings/EmailAdd.vue:3
 msgid "Setup Email"
@@ -3155,7 +3155,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:31
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Status"
-msgstr "Stati"
+msgstr "Stato"
 
 #. Label of the auto_close_status (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -3257,7 +3257,7 @@ msgstr ""
 #. Label of the is_system (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "System"
-msgstr ""
+msgstr "Sistema"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -3349,7 +3349,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:3
 msgid "Teams"
-msgstr ""
+msgstr "Team"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:6
 msgid "Telephony"
@@ -3828,7 +3828,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:34
 msgid "Weekly"
-msgstr ""
+msgstr "Settimanale"
 
 #. Label of the weekly_off (Check) field in DocType 'HD Holiday'
 #. Label of the weekly_off (Select) field in DocType 'HD Service Holiday List'
@@ -3882,7 +3882,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:37
 msgid "Yearly"
-msgstr ""
+msgstr "Annuale"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json

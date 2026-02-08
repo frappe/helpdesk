@@ -86,7 +86,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-25 12:29:02.646874",
+ "modified": "2026-02-02 17:22:11.094897",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Status",
@@ -118,9 +118,7 @@
    "write": 1
   },
   {
-   "export": 1,
    "read": 1,
-   "report": 1,
    "role": "All"
   }
  ],

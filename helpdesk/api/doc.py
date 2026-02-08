@@ -19,16 +19,16 @@ from helpdesk.utils import (
 def get_list_data(
     doctype: str,
     # flake8: noqa
-    filters={},
-    default_filters={},
+    filters: dict = {},
+    default_filters: dict = {},
     order_by: str = "modified desc",
-    page_length=20,
-    columns=None,
-    rows=None,
-    show_customer_portal_fields=False,
-    view=None,
-    is_default=False,
-):
+    page_length: int = 20,
+    columns: list = [],
+    rows: list = [],
+    show_customer_portal_fields: bool = False,
+    view: dict | None = None,
+    is_default: bool = False,
+) -> dict:
     is_custom = False
 
     rows = frappe.parse_json(rows or "[]")
@@ -103,6 +103,8 @@ def get_list_data(
         rows.append(group_by_field)
 
     rows.append("name") if "name" not in rows else rows
+    if doctype == "HD Ticket":
+        rows.append("_seen") if "_seen" not in rows else rows
     data = (
         frappe.get_list(
             doctype,

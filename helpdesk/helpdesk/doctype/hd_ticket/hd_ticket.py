@@ -608,7 +608,9 @@ class HDTicket(Document):
             return
 
         if not sender_email:
-            frappe.throw(_("Can not send email. No sender email set up!"))
+            frappe.throw(
+                _("Unable to send email. Please setup default outgoing email account.")
+            )
 
         message = self.parse_content(message)
 
@@ -771,7 +773,7 @@ class HDTicket(Document):
         try:
             frappe.sendmail(
                 recipients=[self.raised_by],
-                subject=f"Ticket #{self.name}: We've received your request",
+                subject=_("Ticket #{0}: We've received your request").format(self.name),
                 message=self._get_rendered_template(
                     acknowledgement_email_content,
                     default_acknowledgement_email_content,
@@ -792,6 +794,7 @@ class HDTicket(Document):
         self.add_viewed(
             unique_views=True, force=True
         )  # Document class method, no way to add unique_views via document settings, hence used force and unique_views=True
+        self.add_seen()
         clear_notifications(ticket=self.name)
 
     def get_escalation_rule(self):

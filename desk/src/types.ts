@@ -1,6 +1,6 @@
 import { Dayjs } from "dayjs";
 import { Component, ComputedRef, InjectionKey, Ref } from "vue";
-import type { HDTicket } from "./types/doctypes";
+import type { AssignmentRule, HDTicket } from "./types/doctypes";
 
 interface ResourceOptions<T = any> {
   method?: string;
@@ -602,13 +602,6 @@ export interface TicketActivities {
   communications: Communication[];
   history: Activity[];
   views: ViewLog[];
-}
-
-export interface AssignmentRule {
-  name: string;
-  description: string;
-  priority: string;
-  enabled: boolean;
 }
 
 export interface HDSettings {

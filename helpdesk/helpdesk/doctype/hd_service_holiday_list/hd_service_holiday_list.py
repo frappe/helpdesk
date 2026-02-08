@@ -91,14 +91,17 @@ class HDServiceHolidayList(Document):
             filters={"holiday_list": self.name},
             pluck="name",
         )
+        frappe.flags.ignore_validation = True
         for sla in linked_sla:
             linked_tickets = frappe.get_all(
                 "HD Ticket",
-                filters={"sla": sla, "status": ["in", ["Open"]]},
+                filters={"sla": sla, "status_category": ["in", ["Open"]]},
                 pluck="name",
             )
+
             for ticket in linked_tickets:
-                ticket_doc = frappe.get_doc("HD Ticket", ticket).save()
+                frappe.get_doc("HD Ticket", ticket).save()
+        frappe.flags.ignore_validation = False
 
     @frappe.whitelist()
     def clear_table(self):
