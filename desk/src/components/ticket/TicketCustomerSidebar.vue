@@ -107,6 +107,7 @@ import { Field } from "@/types";
 import { formatTime } from "@/utils";
 import { Avatar, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
+import { parseField } from "@/composables/formCustomisation";
 
 const emit = defineEmits(["open"]);
 
@@ -227,6 +228,8 @@ const ticketAdditionalInfo = computed(() => {
         !field.hide_from_customer &&
         ["subject", "team", "priority"].indexOf(field.fieldname) === -1
     )
+    .map((field: Field) => parseField(field, ticket.data))
+    .filter((field: Field) => field.display_via_depends_on)
     .map((field: Field) => ({
       label: field.label,
       value: ticket.data[field.fieldname],
