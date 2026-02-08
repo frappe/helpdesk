@@ -57,25 +57,9 @@ function sanitize(html: string) {
   return sanitizeHtml(html, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "video"]),
     allowedAttributes: {
-      table: [
-        "width",
-        "cellpadding",
-        "cellspacing",
-        "border",
-        "align",
-        "valign",
-        "bgcolor",
-        "style",
-        "colspan",
-        "rowspan",
-      ],
-      td: ["width", "height", "align", "valign", "bgcolor", "style"],
-      tr: ["style"],
-      p: ["style"],
-      span: ["style"],
       a: ["href"],
       video: ["src", "controls"],
-      img: ["src", "alt", "width", "height", "style"],
+      img: ["src"],
     },
   });
 }
