@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2026-02-05 06:43\n"
+"PO-Revision-Date: 2026-02-08 07:16\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -975,7 +975,7 @@ msgstr ""
 #: desk/src/components/Settings/General/components/TicketSettings.vue:102
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Default ticket type"
-msgstr ""
+msgstr "Tipo di ticket predefinito"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:9
 msgid "Define who receives the tickets and how they’re distributed among agents."
@@ -1037,7 +1037,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:49
 msgid "Disable signup"
-msgstr ""
+msgstr "Disabilita registrazione"
 
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
@@ -1673,7 +1673,7 @@ msgstr ""
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "HD Ticket Type"
-msgstr ""
+msgstr "Tipo di ticket HD"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2218,7 +2218,7 @@ msgstr "Nessuna modifica apportata"
 
 #: desk/src/components/Settings/EmailAccountList.vue:52
 msgid "No email account found"
-msgstr ""
+msgstr "Nessun account email trovato"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:57
 msgid "No field dependency found"
@@ -2800,7 +2800,7 @@ msgstr ""
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Restrict tickets by Team"
-msgstr ""
+msgstr "Limita i ticket per team"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:24
 msgid "Restrict tickets by team"
@@ -3081,7 +3081,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:26
 msgid "Skip email workflow"
-msgstr ""
+msgstr "Salta workflow email"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:632
 msgid "Some error occurred while renaming assignment rule"
@@ -3645,7 +3645,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:126
 msgid "Total Ticket"
-msgstr ""
+msgstr "Totale ticket"
 
 #: helpdesk/api/dashboard.py:520
 msgid "Total Tickets by Priority"
