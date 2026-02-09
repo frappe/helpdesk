@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 
 
 @frappe.whitelist()
@@ -8,7 +9,7 @@ def create_email_account(data):
     service = data.get("service")
     service_config = email_service_config.get(service)
     if not service_config and service != "Custom":
-        return "Service not supported"
+        return frappe.throw(_("Service not supported"))
 
     try:
         email_doc = frappe.get_doc(
@@ -38,6 +39,7 @@ def create_email_account(data):
             email_doc.append_to = "HD Ticket"
         else:
             if service == "Custom":
+                email_doc.service = ""
                 email_doc.domain = data.get("domain")
                 email_doc.email_server = data.get("email_server")
                 email_doc.incoming_port = data.get("incoming_port")
