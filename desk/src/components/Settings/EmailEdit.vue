@@ -160,6 +160,9 @@
 </template>
 
 <script setup lang="ts">
+import { Link } from "@/components";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { __ } from "@/translation";
 import { EmailAccount, EmailStep } from "@/types";
 import { useStorage } from "@vueuse/core";
 import { call, toast } from "frappe-ui";
@@ -171,15 +174,12 @@ import {
   customOutgoingFields,
   customProviderTopFields,
   emailIcon,
+  frappeMailFields,
   incomingOutgoingFields,
   popularProviderFields,
   services,
   validateInputs,
-  frappeMailFields,
 } from "./emailConfig";
-import { __ } from "@/translation";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { Link } from "@/components";
 
 interface EmailAccountBaseState {
   email_account_name: string;
@@ -262,9 +262,7 @@ const getInitialCustomState = (): CustomEmailAccountState => ({
   sent_folder_name: (props.accountData as any)?.sent_folder_name || "",
 });
 
-const customState = reactive<CustomEmailAccountState>(
-  getInitialCustomState()
-);
+const customState = reactive<CustomEmailAccountState>(getInitialCustomState());
 
 const info = {
   description: __("To know more about setting up email accounts, click"),
