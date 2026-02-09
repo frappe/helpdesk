@@ -60,7 +60,8 @@ def permission_query(user):
     is_user_admin = "System Manager" in user_roles or "Agent Manager" in user_roles
 
     if is_user_admin:
-        return
+        personal_cond = f"(`tabHD Saved Reply`.scope = 'Personal' AND `tabHD Saved Reply`.owner = {frappe.db.escape(user)})"
+        return f"`tabHD Saved Reply`.scope != 'Personal' OR {personal_cond}"
 
     is_team_restriction_applied = frappe.db.get_single_value(
         "HD Settings", "restrict_tickets_by_agent_group"
