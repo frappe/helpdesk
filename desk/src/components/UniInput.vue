@@ -31,7 +31,6 @@ import {
   createResource,
   DatePicker,
   DateTimePicker,
-  dayjs,
   FormControl,
 } from "frappe-ui";
 import { computed, h } from "vue";
@@ -87,11 +86,15 @@ const component = computed(() => {
       ],
       size: "sm",
     });
-  } else if (["Date", "Datetime"].includes(props.field.fieldtype)) {
-    return h(
-      props.field.fieldtype === "Date" ? DatePicker : DateTimePicker,
-      {}
-    );
+  } else if (props.field.fieldtype === "Datetime") {
+    return h(DateTimePicker, {
+      format: `${window.date_format.toUpperCase()} ${window.time_format}`,
+    });
+  } else if (props.field.fieldtype === "Date") {
+    return h(DatePicker, {
+      id: props.field.fieldname,
+      format: window.date_format.toUpperCase(),
+    });
   } else {
     return h(FormControl, {
       debounce: 500,
@@ -110,8 +113,6 @@ const apiOptions = createResource({
 const transValue = computed(() => {
   if (props.field.fieldtype === "Check") {
     return props.value ? "Yes" : "No";
-  } else if (props.field.fieldtype === "Date" && props.value) {
-    return dayjs(props.value).format(window.date_format.toUpperCase());
   }
   return props.value;
 });
