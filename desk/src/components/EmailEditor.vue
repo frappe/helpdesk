@@ -273,7 +273,7 @@ const ccInput = ref(null);
 const bccInput = ref(null);
 
 function applySavedReplies(template) {
-  newEmail.value = template;
+  newEmail.value = newEmail.value ? newEmail.value + "\n" + template : template;
   showSavedRepliesSelectorModal.value = false;
 }
 
