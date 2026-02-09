@@ -16,7 +16,12 @@ class HDTicketComment(HasMentions, Document):
 
     def on_update(self):
         if self.has_value_changed("content"):
-            self.notify_mentions()
+            original_content = (
+                self.get_doc_before_save().content
+                if self.get_doc_before_save()
+                else None
+            )
+            self.notify_mentions(original_content=original_content)
 
     def after_insert(self):
         event = "helpdesk:ticket-comment"
@@ -30,6 +35,7 @@ class HDTicketComment(HasMentions, Document):
             data=data,
         )
         capture_event(telemetry_event)
+        self.notify_mentions()
 
     def after_delete(self):
         event = "helpdesk:ticket-comment"
