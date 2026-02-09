@@ -73,13 +73,24 @@ import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue
 import { setupCustomizations } from "@/composables/formCustomisation";
 import { useActiveViewers } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
-import { socket } from "@/socket";
+
 import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
+<<<<<<< HEAD
 import { Breadcrumbs, Button, call, createResource, toast } from "frappe-ui";
 import { __ } from "@/translation";
+=======
+import {
+  Alert,
+  Breadcrumbs,
+  Button,
+  call,
+  createResource,
+  toast,
+} from "frappe-ui";
+>>>>>>> 69e047f6 (fix: socket and saved reply)
 import {
   computed,
   defineAsyncComponent,
@@ -101,7 +112,6 @@ interface P {
   ticketId: string;
 }
 const router = useRouter();
-
 const props = defineProps<P>();
 
 const { getStatus } = useTicketStatusStore();
@@ -140,7 +150,80 @@ const showFeedbackDialog = ref(false);
 const isExpanded = ref(false);
 
 const { isMobileView } = useScreenSize();
+<<<<<<< HEAD
 const { $dialog } = globalStore();
+=======
+const { $dialog, $socket } = globalStore();
+const isDismissed = ref(false);
+
+function getTodayKey() {
+  return new Date().toISOString().split("T")[0];
+}
+
+function dismissBanner() {
+  try {
+    const todayKey = getTodayKey();
+    localStorage.setItem(`dismissBanner_${props.ticketId}_${todayKey}`, "true");
+    isDismissed.value = true;
+  } catch (error) {
+    console.error("Error saving banner dismissal:", error);
+  }
+}
+
+onMounted(() => {
+  try {
+    const todayKey = getTodayKey();
+    const dismissed = localStorage.getItem(
+      `dismissBanner_${props.ticketId}_${todayKey}`
+    );
+    isDismissed.value = dismissed === "true";
+    cleanupOldBannerDismissals();
+  } catch (error) {
+    console.error("Error reading banner dismissal:", error);
+  }
+});
+
+// Clean up old banner dismissal localStorage keys
+const cleanupOldBannerDismissals = () => {
+  const CLEANUP_KEY = "lastBannerCleanup";
+  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+  try {
+    const lastCleanup = localStorage.getItem(CLEANUP_KEY);
+    const now = Date.now();
+
+    if (lastCleanup && now - parseInt(lastCleanup) < ONE_WEEK_MS) {
+      return;
+    }
+
+    // Find and remove all dismissBanner keys
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("dismissBanner_")) {
+        keysToRemove.push(key);
+      }
+    }
+
+    // Remove the keys
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+
+    // Update last cleanup timestamp
+    localStorage.setItem(CLEANUP_KEY, now.toString());
+  } catch (error) {
+    console.error("Error cleaning up banner dismissals:", error);
+  }
+};
+
+const outsideHourSettings = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_ticket.api.show_outside_hours_banner",
+  cache: ["OutsideHourBanner", props.ticketId],
+  params: {
+    ticket_name: props.ticketId,
+  },
+  auto: true,
+});
+>>>>>>> 69e047f6 (fix: socket and saved reply)
 
 const send = createResource({
   url: "run_doc_method",
@@ -261,12 +344,13 @@ const showFeedback = computed(() => {
   return hasAgentCommunication && isFeedbackMandatory;
 });
 const { startViewing, stopViewing } = useActiveViewers(props.ticketId);
+
 onMounted(() => {
   startViewing(props.ticketId);
   document.title = props.ticketId;
 
-  socket.on("helpdesk:ticket-update", ({ ticket_id }) => {
-    if (ticket_id === props.ticketId) {
+  $socket.on("helpdesk:ticket-update", ({ ticket_id }) => {
+    if (ticket_id == props.ticketId) {
       ticket.reload();
     }
   });
