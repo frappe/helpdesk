@@ -117,16 +117,12 @@ const component = computed(() => {
     });
   } else if (props.field.fieldtype === "Datetime") {
     return h(DateTimePicker, {
-      formatter: (datetime: string) => {
-        if (!datetime) return datetime;
-        return dayjs(datetime).format(
-          `${window.date_format.toUpperCase()} ${window.time_format}`
-        );
-      },
+      format: `${window.date_format.toUpperCase()} ${window.time_format}`,
     });
   } else if (props.field.fieldtype === "Date") {
     return h(DatePicker, {
       id: props.field.fieldname,
+      format: window.date_format.toUpperCase(),
     });
   }
   // else if (props.field.fieldtype === "Duration") {
