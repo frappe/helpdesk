@@ -1,12 +1,14 @@
+from typing import Any
+
 import frappe
 from frappe import _
 
 
 @frappe.whitelist()
-def create_email_account(data):
+def create_email_account(data: dict[str, Any]):
     frappe.has_permission("Email Account", "create", throw=True)
 
-    service = data.get("service")
+    service: str = data.get("service", "")
     service_config = email_service_config.get(service)
     if not service_config and service != "Custom":
         return frappe.throw(_("Service not supported"))
