@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-08 10:41+0000\n"
-"PO-Revision-Date: 2026-02-09 07:32\n"
+"PO-Revision-Date: 2026-02-10 11:51\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -995,7 +995,7 @@ msgstr ""
 #: desk/src/components/ticket/ActivityHeader.vue:101
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Comment"
-msgstr ""
+msgstr "Commento"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:61
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:106
@@ -1177,7 +1177,7 @@ msgstr ""
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:83
 msgid "Created By"
-msgstr "Creato Da"
+msgstr "Creato da"
 
 #. Label of the criterion_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
@@ -1546,7 +1546,7 @@ msgstr ""
 #: desk/src/pages/SearchAgent.vue:184
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "Email"
-msgstr "E-mail"
+msgstr "Email"
 
 #. Label of the email_account (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
@@ -2664,7 +2664,7 @@ msgstr "Esci"
 
 #: desk/src/components/layouts/Sidebar.vue:337
 msgid "Login to Frappe Cloud"
-msgstr "Vuoi accedere a Frappe Cloud"
+msgstr "Accedi a Frappe Cloud"
 
 #. Label of the brand_logo (Attach Image) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:15
