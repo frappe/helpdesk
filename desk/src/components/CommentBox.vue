@@ -19,7 +19,7 @@
       </div>
       <div class="flex items-center gap-1">
         <Tooltip v-if="_isPinned" text="Pinned comment">
-          <LucidePin class="size-3.5 text-ink-gray-6" />
+          <LucidePin class="size-3.5 text-ink-gray-6" aria-label="Pinned comment" />
         </Tooltip>
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
           <span class="pl-0.5 text-sm text-gray-600">
