@@ -213,6 +213,7 @@ def get_comments(ticket: str):
             QBComment.name,
         )
         .where(QBComment.reference_ticket == ticket)
+        .orderby(QBComment.is_pinned, order=Order.desc)
         .orderby(QBComment.creation, order=Order.asc)
         .run(as_dict=True)
     )

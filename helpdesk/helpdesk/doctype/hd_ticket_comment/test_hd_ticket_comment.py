@@ -339,3 +339,140 @@ class TestHDTicketComment(FrappeTestCase):
         self.assertEqual(notification.message, "2 people reacted to your comment")
 
         frappe.delete_doc("HD Notification", notification.name, force=True)
+
+    def test_pinned_comments_appear_first(self):
+        """Test that pinned comments appear before unpinned ones."""
+        from helpdesk.helpdesk.doctype.hd_ticket.api import get_comments
+        import time
+
+        frappe.set_user("test_user1@example.com")
+
+        # Create first comment (unpinned)
+        comment1 = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Comment",
+                "reference_ticket": self.test_ticket.name,
+                "content": "<p>First comment</p>",
+                "commented_by": "test_user1@example.com",
+            }
+        )
+        comment1.insert(ignore_permissions=True)
+        time.sleep(0.1)
+
+        # Create second comment (to be pinned)
+        comment2 = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Comment",
+                "reference_ticket": self.test_ticket.name,
+                "content": "<p>Second comment - will be pinned</p>",
+                "commented_by": "test_user1@example.com",
+            }
+        )
+        comment2.insert(ignore_permissions=True)
+        time.sleep(0.1)
+
+        # Create third comment (unpinned)
+        comment3 = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Comment",
+                "reference_ticket": self.test_ticket.name,
+                "content": "<p>Third comment</p>",
+                "commented_by": "test_user1@example.com",
+            }
+        )
+        comment3.insert(ignore_permissions=True)
+
+        # Pin the second comment
+        frappe.db.set_value("HD Ticket Comment", comment2.name, "is_pinned", 1)
+
+        # Get comments via API
+        comments = get_comments(self.test_ticket.name)
+
+        # Filter out the test_comment from setUp
+        test_comments = [
+            c for c in comments if c.name in [comment1.name, comment2.name, comment3.name]
+        ]
+
+        # Verify pinned comment appears first
+        self.assertEqual(len(test_comments), 3)
+        self.assertEqual(test_comments[0].name, comment2.name)
+        self.assertEqual(test_comments[0].is_pinned, 1)
+
+        # Verify unpinned comments maintain chronological order
+        self.assertEqual(test_comments[1].name, comment1.name)
+        self.assertEqual(test_comments[2].name, comment3.name)
+
+        # Cleanup
+        frappe.delete_doc("HD Ticket Comment", comment1.name, force=True)
+        frappe.delete_doc("HD Ticket Comment", comment2.name, force=True)
+        frappe.delete_doc("HD Ticket Comment", comment3.name, force=True)
+
+        frappe.set_user("Administrator")
+
+    def test_multiple_pinned_comments_order(self):
+        """Test that multiple pinned comments maintain chronological order."""
+        from helpdesk.helpdesk.doctype.hd_ticket.api import get_comments
+        import time
+
+        frappe.set_user("test_user1@example.com")
+
+        # Create first comment (to be pinned)
+        comment1 = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Comment",
+                "reference_ticket": self.test_ticket.name,
+                "content": "<p>First pinned comment</p>",
+                "commented_by": "test_user1@example.com",
+                "is_pinned": 1,
+            }
+        )
+        comment1.insert(ignore_permissions=True)
+        time.sleep(0.1)
+
+        # Create second comment (to be pinned)
+        comment2 = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Comment",
+                "reference_ticket": self.test_ticket.name,
+                "content": "<p>Second pinned comment</p>",
+                "commented_by": "test_user1@example.com",
+                "is_pinned": 1,
+            }
+        )
+        comment2.insert(ignore_permissions=True)
+        time.sleep(0.1)
+
+        # Create unpinned comment
+        comment3 = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Comment",
+                "reference_ticket": self.test_ticket.name,
+                "content": "<p>Unpinned comment</p>",
+                "commented_by": "test_user1@example.com",
+            }
+        )
+        comment3.insert(ignore_permissions=True)
+
+        # Get comments via API
+        comments = get_comments(self.test_ticket.name)
+
+        # Filter to just test comments
+        test_comments = [
+            c for c in comments if c.name in [comment1.name, comment2.name, comment3.name]
+        ]
+
+        # Verify both pinned comments appear before unpinned
+        self.assertEqual(len(test_comments), 3)
+        self.assertEqual(test_comments[0].name, comment1.name)
+        self.assertEqual(test_comments[0].is_pinned, 1)
+        self.assertEqual(test_comments[1].name, comment2.name)
+        self.assertEqual(test_comments[1].is_pinned, 1)
+        self.assertEqual(test_comments[2].name, comment3.name)
+        self.assertEqual(test_comments[2].is_pinned, 0)
+
+        # Cleanup
+        frappe.delete_doc("HD Ticket Comment", comment1.name, force=True)
+        frappe.delete_doc("HD Ticket Comment", comment2.name, force=True)
+        frappe.delete_doc("HD Ticket Comment", comment3.name, force=True)
+
+        frappe.set_user("Administrator")

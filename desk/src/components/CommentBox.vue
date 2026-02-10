@@ -28,6 +28,11 @@
             :placement="'right'"
             :options="[
               {
+                label: _isPinned ? 'Unpin' : 'Pin',
+                onClick: () => togglePin.submit(),
+                icon: 'pin',
+              },
+              {
                 label: 'Edit',
                 onClick: () => handleEditMode(),
                 icon: 'edit-2',
@@ -198,7 +203,7 @@ const props = defineProps({
 const { getUser } = useUserStore();
 const { enableCommentReactions } = useConfigStore();
 
-const { name, creation, content, commenter, commentedBy, attachments } =
+const { name, creation, content, commenter, commentedBy, attachments, isPinned } =
   props.activity;
 
 const isTicketMergedComment = computed(() => {
@@ -210,6 +215,7 @@ const emit = defineEmits(["update"]);
 const showDialog = ref(false);
 const editable = ref(false);
 const _content = ref(content);
+const _isPinned = ref(isPinned || 0);
 
 const emojiList = ["👍", "👎", "❤️", "🎉", "👀", "✅"];
 
@@ -268,6 +274,21 @@ const deleteComment = createResource({
     emit("update");
     showDialog.value = false;
     toast.success("Comment deleted");
+  },
+});
+
+const togglePin = createResource({
+  url: "frappe.client.set_value",
+  makeParams: () => ({
+    doctype: "HD Ticket Comment",
+    name: name,
+    fieldname: "is_pinned",
+    value: _isPinned.value ? 0 : 1,
+  }),
+  onSuccess() {
+    _isPinned.value = _isPinned.value ? 0 : 1;
+    emit("update");
+    toast.success(_isPinned.value ? "Comment pinned" : "Comment unpinned");
   },
 });
 
