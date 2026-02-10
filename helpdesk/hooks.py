@@ -63,6 +63,9 @@ doc_events = {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
+    "ToDo": {
+        "before_insert": "helpdesk.overrides.assign.validate_agent_availability"
+    },
 }
 
 has_permission = {
@@ -74,6 +77,10 @@ permission_query_conditions = {
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
 }
+permission_query_conditions.update({
+    "User": "helpdesk.overrides.assign.user_query_condition"
+})
+
 
 # DocType Class
 # ---------------
@@ -98,3 +105,10 @@ setup_wizard_complete = "helpdesk.setup.setup_wizard.setup_complete"
 
 before_tests = "helpdesk.test_utils.before_tests"
 auth_hooks = ["helpdesk.auth.authenticate"]
+
+
+
+link_query_conditions = {
+    "User": "helpdesk.overrides.assign.user_query_condition"
+}
+

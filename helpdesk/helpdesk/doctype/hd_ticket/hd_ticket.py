@@ -424,6 +424,11 @@ class HDTicket(Document):
 
     @frappe.whitelist()
     def assign_agent(self, agent):
+        availability = frappe.db.get_value("HD Agent", agent, "availability_status")
+
+        if availability == "Away":
+            frappe.throw("This agent is marked as Away and cannot be assigned tickets.")
+
         assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
 
         if frappe.session.user != agent:
@@ -557,6 +562,11 @@ class HDTicket(Document):
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject}"
         sender = frappe.session.user
+        # Append agent signature if present
+        signature = frappe.db.get_value("HD Agent", {"user": sender}, "signature")
+        if signature and signature not in message:
+            message = f"{message}\n\n{signature}"
+
         recipients = to or self.raised_by
         sender_email = None if skip_email_workflow else self.sender_email()
 

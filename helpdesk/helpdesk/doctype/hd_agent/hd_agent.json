@@ -9,7 +9,9 @@
   "user",
   "agent_name",
   "user_image",
-  "is_active"
+  "is_active",
+  "availability_status",
+  "signature"
  ],
  "fields": [
   {
@@ -35,6 +37,21 @@
    "label": "Is Active"
   },
   {
+   "default": "Available",
+   "fieldname": "availability_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Availability Status",
+   "options": "Available\nAway",
+   "reqd": 1
+  },
+  {
+   "description": "automatically added in reply section",
+   "fieldname": "signature",
+   "fieldtype": "Small Text",
+   "label": "Signature"
+  },
+  {
    "fieldname": "user_image",
    "fieldtype": "Attach Image",
    "label": "Image"
@@ -42,7 +59,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-02 11:15:47.402850",
+ "modified": "2026-02-09 22:08:22.055831",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
