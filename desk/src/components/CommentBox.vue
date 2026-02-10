@@ -196,8 +196,6 @@ import {
 } from "frappe-ui";
 import { PropType, computed, onMounted, ref } from "vue";
 import LucidePin from "~icons/lucide/pin";
-} from "frappe-ui";
-import { PropType, computed, onMounted, ref } from "vue";
 
 const authStore = useAuthStore();
 const props = defineProps({
