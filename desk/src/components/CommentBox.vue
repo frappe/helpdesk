@@ -18,6 +18,9 @@
         </p>
       </div>
       <div class="flex items-center gap-1">
+        <Tooltip v-if="_isPinned" text="Pinned comment">
+          <LucidePin class="size-3.5 text-ink-gray-6" />
+        </Tooltip>
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
           <span class="pl-0.5 text-sm text-gray-600">
             {{ timeAgo(creation) }}
@@ -190,6 +193,9 @@ import {
   Tooltip,
   createResource,
   toast,
+} from "frappe-ui";
+import { PropType, computed, onMounted, ref } from "vue";
+import LucidePin from "~icons/lucide/pin";
 } from "frappe-ui";
 import { PropType, computed, onMounted, ref } from "vue";
 
