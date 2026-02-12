@@ -136,12 +136,13 @@ import { capture } from "@/telemetry";
 import { View, ViewType } from "@/types";
 import { formatTimeShort, getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
-
+import dayjs from "dayjs";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import {
   call,
   createResource,
+  dayjsLocal,
   Dropdown,
   FeatherIcon,
   ListFooter,
@@ -463,7 +464,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   if (column.type === "Datetime") {
     return h("span", {
       class: "text-p-xs",
-      textContent: formatTimeShort(item),
+      textContent: formatTimeShort(dayjsLocal(item)),
     });
   }
   if (column.type === "MultipleAvatar") {

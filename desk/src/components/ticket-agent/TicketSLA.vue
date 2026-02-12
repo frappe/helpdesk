@@ -38,17 +38,32 @@
       <!-- First Response -->
       <div class="flex items-center gap-1">
         <span>First Response</span>
+<<<<<<< HEAD
         <Badge
           :label="firstResponse.label"
           variant="subtle"
           :theme="firstResponse.color"
         />
+=======
+        <Tooltip
+          :text="dateFormat(dayjsLocal(firstResponse.date), dateTooltipFormat)"
+          :hover-delay="0.25"
+          :placement="'top'"
+        >
+          <Badge
+            :label="firstResponse.label"
+            variant="subtle"
+            :theme="firstResponse.color"
+          />
+        </Tooltip>
+>>>>>>> d4642916 (chore: add dayjs local for support in different timezones)
       </div>
       <!-- divider -->
       <div class="border-l border-outline-gray-2 h-[13px]" />
       <!-- Resolution by -->
       <div class="flex items-center gap-1">
         <span>Resolution </span>
+<<<<<<< HEAD
         <Badge
           v-if="resolutionBy"
           :label="resolutionBy.label"
@@ -58,6 +73,23 @@
             resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'
           "
         />
+=======
+        <Tooltip
+          :text="dateFormat(dayjsLocal(resolutionBy.date), dateTooltipFormat)"
+          :hover-delay="0.25"
+          :placement="'top'"
+        >
+          <Badge
+            v-if="resolutionBy"
+            :label="resolutionBy.label"
+            variant="subtle"
+            :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
+            :class="
+              resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'
+            "
+          />
+        </Tooltip>
+>>>>>>> d4642916 (chore: add dayjs local for support in different timezones)
       </div>
     </div>
   </teleport>
@@ -72,7 +104,7 @@ import {
   dateTooltipFormat,
   formatTime,
 } from "@/utils";
-import { Badge, dayjs, Tooltip } from "frappe-ui";
+import { Badge, dayjs, Tooltip, dayjsLocal } from "frappe-ui";
 import { computed, inject } from "vue";
 
 const ticket = inject(TicketSymbol);

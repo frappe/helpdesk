@@ -1,7 +1,7 @@
 import type { DropdownOption } from "@/types";
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import dayjs from "dayjs";
-import { FeatherIcon, call, toast, useFileUpload } from "frappe-ui";
+import { FeatherIcon, call, dayjsLocal, toast, useFileUpload,createResource } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
@@ -56,7 +56,7 @@ export function dateFormat(date, format?: string) {
 }
 
 export function timeAgo(date) {
-  return useTimeAgo(date).value;
+  return useTimeAgo(dayjsLocal(date)).value
 }
 
 export const dateTooltipFormat = "ddd, MMM D, YYYY h:mm A";
