@@ -39,7 +39,7 @@
       <div class="flex items-center gap-1">
         <span>First Response</span>
         <Tooltip
-          :text="dateFormat(firstResponse.date, dateTooltipFormat)"
+          :text="dateFormat(dayjsLocal(firstResponse.date), dateTooltipFormat)"
           :hover-delay="0.25"
           :placement="'top'"
         >
@@ -56,7 +56,7 @@
       <div class="flex items-center gap-1">
         <span>Resolution </span>
         <Tooltip
-          :text="dateFormat(resolutionBy.date, dateTooltipFormat)"
+          :text="dateFormat(dayjsLocal(resolutionBy.date), dateTooltipFormat)"
           :hover-delay="0.25"
           :placement="'top'"
         >
@@ -84,7 +84,7 @@ import {
   dateTooltipFormat,
   formatTime,
 } from "@/utils";
-import { Badge, dayjs, Tooltip } from "frappe-ui";
+import { Badge, dayjs, Tooltip, dayjsLocal } from "frappe-ui";
 import { computed, inject } from "vue";
 
 const ticket = inject(TicketSymbol);
