@@ -36,7 +36,14 @@ class HasMentions:
             if self.doctype == "HD Ticket Comment":
                 values.reference_comment = self.name
                 values.reference_ticket = self.reference_ticket
-            if frappe.db.exists("HD Notification", values):
-                # avoid loop notification at first mention
+            if frappe.db.exists(
+                "HD Notification",
+                {
+                    "reference_comment": self.name,
+                    "user_to": mention.email,
+                    "notification_type": "Mention",
+                },
+            ):
+                # avoid loop of notification to quit at first mention
                 continue
             frappe.get_doc(values).insert()
