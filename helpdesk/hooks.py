@@ -39,7 +39,6 @@ scheduler_events = {
     ],
 }
 
-
 website_route_rules = [
     {
         "from_route": "/helpdesk/<path:app_path>",
@@ -77,7 +76,7 @@ permission_query_conditions = {
 
 # DocType Class
 # ---------------
-# Override standard doctype classes
+
 override_doctype_class = {
     "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
 }
@@ -88,10 +87,16 @@ ignore_links_on_delete = [
 ]
 
 # setup wizard
-# setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"
-# setup_wizard_stages = "helpdesk.setup.setup_wizard.get_setup_stages"
+
 setup_wizard_complete = "helpdesk.setup.setup_wizard.setup_complete"
 
+# ---------------------------
+# Setup Check API Registration
+# ---------------------------
+
+override_whitelisted_methods = {
+    "helpdesk.api.is_setup_complete": "helpdesk.helpdesk.api.setup.is_helpdesk_setup_complete"
+}
 
 # Testing
 # ---------------

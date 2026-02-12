@@ -61,35 +61,55 @@ setConfig("fallbackErrorHandler", (error) => {
   toast.error(msg);
 });
 
-const pinia = createPinia();
-const app = createApp(App);
+async function bootstrap() {
+  try {
+    const response = await frappeRequest({
+      url: "/api/method/helpdesk.helpdesk.api.setup.is_helpdesk_setup_complete",
+    });
 
-app.use(FrappeUI);
-app.use(pinia);
-app.use(router);
-// app.use(posthogPlugin);
-app.use(translationPlugin);
+    const isSetupComplete = response?.message;
 
-for (const c in globalComponents) {
-  app.component(c, globalComponents[c]);
-}
-
-app.config.globalProperties.$dialog = createDialog;
-
-let socket;
-if (import.meta.env.DEV) {
-  frappeRequest({
-    url: "/api/method/helpdesk.www.helpdesk.index.get_context_for_dev",
-  }).then((values) => {
-    for (let key in values) {
-      window[key] = values[key];
+    if (!isSetupComplete) {
+      window.location.href = "/helpdesk-setup";
+      return;
     }
-    socket = initSocket();
-    app.config.globalProperties.$socket = socket;
-    app.mount("#app");
-  });
-} else {
-  socket = initSocket();
-  app.config.globalProperties.$socket = socket;
-  app.mount("#app");
+
+    const pinia = createPinia();
+    const app = createApp(App);
+
+    app.use(FrappeUI);
+    app.use(pinia);
+    app.use(router);
+    // app.use(posthogPlugin);
+    app.use(translationPlugin);
+
+    for (const c in globalComponents) {
+      app.component(c, globalComponents[c]);
+    }
+
+    app.config.globalProperties.$dialog = createDialog;
+
+    let socket;
+
+    if (import.meta.env.DEV) {
+      frappeRequest({
+        url: "/api/method/helpdesk.www.helpdesk.index.get_context_for_dev",
+      }).then((values) => {
+        for (let key in values) {
+          window[key] = values[key];
+        }
+        socket = initSocket();
+        app.config.globalProperties.$socket = socket;
+        app.mount("#app");
+      });
+    } else {
+      socket = initSocket();
+      app.config.globalProperties.$socket = socket;
+      app.mount("#app");
+    }
+  } catch (error) {
+    console.error("Error checking Helpdesk setup:", error);
+  }
 }
+
+bootstrap();

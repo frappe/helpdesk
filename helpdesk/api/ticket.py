@@ -2,9 +2,13 @@ import frappe
 from frappe import _
 
 from helpdesk.utils import agent_only
+from helpdesk.helpdesk.api.setup import is_helpdesk_setup_complete
 
 
 def assign_ticket_to_agent(ticket_id, agent_id=None):
+    if not is_helpdesk_setup_complete():
+        frappe.throw(_("Helpdesk setup is not complete"))
+
     if not ticket_id:
         return
 
@@ -24,6 +28,9 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
 @frappe.whitelist()
 @agent_only
 def bulk_assign_ticket_to_agent(ticket_ids, agent_id=None):
+    if not is_helpdesk_setup_complete():
+        frappe.throw(_("Helpdesk setup is not complete"))
+
     if ticket_ids:
         ticket_docs = []
         for ticket_id in ticket_ids:
