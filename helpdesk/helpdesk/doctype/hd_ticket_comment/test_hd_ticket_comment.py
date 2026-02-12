@@ -326,7 +326,6 @@ class TestHDTicketComment(FrappeTestCase):
         )
 
         agent_comment.insert(ignore_permissions=True)
-        print(agent_comment)
 
         notifications = frappe.get_all(
             "HD Notification",
@@ -336,7 +335,6 @@ class TestHDTicketComment(FrappeTestCase):
             },
             fields=["name", "user_to"],
         )
-        print(notifications)
         # notification one created should be equal to 1
         self.assertEqual(len(notifications), 1)
         self.assertEqual(notifications[0].user_to, "test_user2@example.com")
@@ -369,8 +367,6 @@ class TestHDTicketComment(FrappeTestCase):
             },
             fields=["user_to"],
         )
-        print("notificationsnow", notifications_updated)
-        print(agent_comment)
 
         user_emails = {n.user_to for n in notifications_updated}
 
