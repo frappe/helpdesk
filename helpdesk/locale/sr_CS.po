@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-08 10:41+0000\n"
-"PO-Revision-Date: 2026-02-11 11:55\n"
+"PO-Revision-Date: 2026-02-12 11:51\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Latin)\n"
 "MIME-Version: 1.0\n"
@@ -1939,7 +1939,7 @@ msgstr "Datum početka"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:374
 msgid "From is required"
-msgstr ""
+msgstr "Polje \"Od\" je obavezno"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: desk/src/pages/ticket/Tickets.vue:189 desk/src/pages/ticket/Tickets.vue:220
@@ -2696,7 +2696,7 @@ msgstr "Učinite povratnu informaciju obaveznom"
 
 #: desk/src/pages/ticket/Tickets.vue:412
 msgid "Make {0} private?"
-msgstr ""
+msgstr "Da li želite da {0} učinite privatnim?"
 
 #: desk/src/components/Settings/General/General.vue:2
 msgid "Manage general settings of your app."
@@ -3272,7 +3272,7 @@ msgstr "Molimo Vas da unesete naslov da biste nastavili"
 #: desk/src/pages/call-logs/CallLogModal.vue:368
 #: desk/src/pages/call-logs/CallLogModal.vue:376
 msgid "Please enter a valid phone number"
-msgstr "Molimo Vas da uneste važeći broj telefona"
+msgstr "Molimo Vas da unesete važeći broj telefona"
 
 #: desk/src/components/Settings/Profile/Profile.vue:225
 msgid "Please enter first name at least"
@@ -3339,7 +3339,7 @@ msgstr "Poželjno korišćenje baze znanja"
 
 #: desk/src/pages/dashboard/Dashboard.vue:267
 msgid "Presets"
-msgstr ""
+msgstr "Unapred definisane postavke"
 
 #: desk/src/pages/SearchAgent.vue:108
 msgid "Press enter to search"
@@ -3946,7 +3946,7 @@ msgstr "Naziv parametara za pretragu"
 
 #: desk/src/components/command-palette/CP.vue:127
 msgid "Search for \"{0}\""
-msgstr ""
+msgstr "Pretraga za \"{0}\""
 
 #: desk/src/pages/SearchAgent.vue:100
 msgid "Search index does not exist. Please build the index first."
@@ -3974,7 +3974,7 @@ msgstr "Pretražite tikete, imejlove, komentare ili #234 da biste prešli na tik
 
 #: desk/src/pages/SearchAgent.vue:137
 msgid "Searched for:"
-msgstr ""
+msgstr "Pretraženo:"
 
 #: desk/src/pages/SearchAgent.vue:111
 msgid "Searching..."
@@ -4800,7 +4800,7 @@ msgstr "Datum završetka"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:366
 msgid "To is required"
-msgstr ""
+msgstr "Polje \"Ka\" je obavezno"
 
 #: desk/src/components/Settings/EmailEdit.vue:147
 msgid "To know more about setting up email accounts, click"
@@ -5164,7 +5164,7 @@ msgstr "Vaši stari uslovi će biti prepisani. Da li ste sigurni da želite da s
 
 #: desk/src/pages/MobileNotifications.vue:46
 msgid "assigned you a ticket"
-msgstr ""
+msgstr "Vam je dodelio tiket"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:13
 msgid "back to email event list"
@@ -5201,7 +5201,7 @@ msgstr "je stupio u kontakt"
 
 #: desk/src/pages/MobileNotifications.vue:49
 msgid "has reopened the ticket"
-msgstr ""
+msgstr "je ponovo otvorio tiket"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:84
 #: desk/src/components/Settings/General/components/TicketSettings.vue:237
@@ -5228,7 +5228,7 @@ msgstr "lista"
 
 #: desk/src/pages/MobileNotifications.vue:43
 msgid "mentioned you in ticket"
-msgstr ""
+msgstr "Vas je pomenuo u tiketu"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -5246,5 +5246,5 @@ msgstr "sinonim"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:423
 msgid "viewed this"
-msgstr ""
+msgstr "pregledao je ovo"
 
