@@ -11,14 +11,15 @@
         />
       </template>
     </LayoutHeader>
-    <!-- Container -->
+
     <div
       class="flex flex-col gap-5 py-6 h-full flex-1 self-center overflow-auto mx-auto w-full max-w-4xl px-5"
     >
       <!-- custom fields descriptions -->
-      <div v-if="Boolean(template.data?.about)" class="">
+      <div v-if="Boolean(template.data?.about)">
         <div class="prose-f" v-html="sanitize(template.data.about)" />
       </div>
+
       <!-- custom fields -->
       <div
         class="grid grid-cols-1 gap-4 sm:grid-cols-3"
@@ -32,36 +33,34 @@
           @change="
             (e) => handleOnFieldChange(e, field.fieldname, field.fieldtype)
           "
-        >
-          <template v-if="field.fieldname === 'priority'" #label-extra>
-            <template
-              v-if="
-                ticketPriorityResource.dataMap[templateFields[field.fieldname]]
-                  ?.description
-              "
-            >
-              <Tooltip
-                :text="
-                  ticketPriorityResource.dataMap[
-                    templateFields[field.fieldname]
-                  ].description.trim()
-                "
-              >
-                <lucide-circle-question-mark class="h-4 w-4 text-ink-gray-6" />
-              </Tooltip>
-            </template>
-          </template>
-        </UniInput>
+        />
       </div>
-      <!-- existing fields -->
+
+      <!-- Project + Subject + Description -->
       <div
         class="flex flex-col"
         :class="(subject.length >= 2 || description.length) && 'gap-5'"
       >
+        <!-- PROJECT FIELD -->
+        <div class="flex flex-col gap-2">
+          <span class="block text-sm text-gray-700">
+            {{ __("Project") }}
+            <span class="text-red-500">*</span>
+          </span>
+
+          <FormControl
+            v-model="custom_project"
+            type="select"
+           :options="projectOptions"
+            :placeholder="__('Select project')"
+          />
+        </div>
+
+        <!-- SUBJECT FIELD -->
         <div class="flex flex-col gap-2">
           <span class="block text-sm text-gray-700">
             {{ __("Subject") }}
-            <span class="place-self-center text-red-500"> * </span>
+            <span class="text-red-500">*</span>
           </span>
           <FormControl
             v-model="subject"
@@ -69,44 +68,8 @@
             :placeholder="__('A short description')"
           />
         </div>
-        <SearchArticles
-          v-if="isCustomerPortal"
-          :query="subject"
-          class="shadow"
-        />
-        <div v-if="isCustomerPortal">
-          <h4
-            v-show="subject.length <= 2 && description.length === 0"
-            class="text-p-sm text-gray-500 ml-1"
-          >
-            {{ __("Please enter a subject to continue") }}
-          </h4>
-          <TicketTextEditor
-            v-show="subject.length > 2 || description.length > 0"
-            ref="editor"
-            v-model:attachments="attachments"
-            v-model:content="description"
-            :placeholder="__('Detailed explanation')"
-            expand
-            :uploadFunction="(file:any)=>uploadFunction(file)"
-          >
-            <template #bottom-right>
-              <Button
-                :label="__('Submit')"
-                theme="gray"
-                variant="solid"
-                :disabled="
-                  $refs.editor.editor.isEmpty || ticket.loading || !subject
-                "
-                @click="() => ticket.submit()"
-              />
-            </template>
-          </TicketTextEditor>
-        </div>
-      </div>
 
-      <!-- for agent portal -->
-      <div v-if="!isCustomerPortal">
+        <!-- DESCRIPTION -->
         <TicketTextEditor
           ref="editor"
           v-model:attachments="attachments"
@@ -120,9 +83,12 @@
               theme="gray"
               variant="solid"
               :disabled="
-                $refs.editor.editor.isEmpty || ticket.loading || !subject
+                $refs.editor?.editor?.isEmpty ||
+                ticket.loading ||
+                !subject ||
+                !custom_project
               "
-              @click="() => ticket.submit()"
+              @click="ticket.submit()"
             />
           </template>
         </TicketTextEditor>
@@ -133,32 +99,20 @@
 
 <script setup lang="ts">
 import { LayoutHeader, UniInput } from "@/components";
-import {
-  handleLinkFieldUpdate,
-  handleSelectFieldUpdate,
-  parseField,
-  setupCustomizations,
-} from "@/composables/formCustomisation";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
-import { Field } from "@/types";
-import { isCustomerPortal, uploadFunction } from "@/utils";
 import {
   Breadcrumbs,
   Button,
-  call,
   createResource,
-  createListResource,
   FormControl,
   usePageMeta,
 } from "frappe-ui";
 import { __ } from "@/translation";
-import { useOnboarding } from "frappe-ui/frappe";
 import sanitizeHtml from "sanitize-html";
 import { computed, defineAsyncComponent, onMounted, reactive, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import SearchArticles from "../../components/SearchArticles.vue";
+import { useRouter } from "vue-router";
 
 const TicketTextEditor = defineAsyncComponent(
   () => import("./TicketTextEditor.vue")
@@ -172,15 +126,16 @@ const props = withDefaults(defineProps<P>(), {
   templateId: "",
 });
 
-const route = useRoute();
 const router = useRouter();
-const { $dialog } = globalStore();
-const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { isManager, userId: userID } = useAuthStore();
+const { userId } = useAuthStore();
+
 const subject = ref("");
 const description = ref("");
+const custom_project = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
+
+/* ---------------- TEMPLATE RESOURCE ---------------- */
 
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
@@ -188,112 +143,77 @@ const template = createResource({
     name: props.templateId || "Default",
   }),
   auto: true,
-  onSuccess: (data) => {
-    description.value = data.description_template || "";
-    oldFields = window.structuredClone(data.fields || []);
-    setupCustomizations(template, {
-      doc: templateFields,
-      call,
-      router,
-      $dialog,
-      applyFilters,
-    });
-    setupTemplateFields(data.fields);
-  },
 });
 
-function setupTemplateFields(fields) {
-  fields.forEach((field: Field) => {
-    templateFields[field.fieldname] = "";
-  });
-}
+/* ---------------- FILTER PROJECT BY USER ---------------- */
 
-const ticketPriorityResource = createListResource({
-  doctype: "HD Ticket Priority",
-  fields: ["name", "description"],
+
+const projectResource = createResource({
+  url: "helpdesk.api.project_api.get_user_projects",
+  makeParams: () => ({
+    doctype: "Project",
+    txt: "",
+    searchfield: "name",
+    start: 0,
+    page_len: 100,
+  }),
   auto: true,
-  cache: "ticketPriorities",
 });
 
-let oldFields = [];
+const projectOptions = computed(() => {
+  if (!projectResource.data) return [];
 
-function applyFilters(fieldname: string, filters: any = null) {
-  const f: Field = template.data.fields.find((f) => f.fieldname === fieldname);
-  if (!f) return;
-  if (f.fieldtype === "Select") {
-    handleSelectFieldUpdate(f, fieldname, filters, templateFields, oldFields);
-  } else if (f.fieldtype === "Link") {
-    handleLinkFieldUpdate(f, fieldname, filters, templateFields, oldFields);
-  }
-}
-
-const customOnChange = computed(() => template.data?._customOnChange);
-
-const visibleFields = computed(() => {
-  let _fields = template.data?.fields?.filter(
-    (f) => !isCustomerPortal.value || !f.hide_from_customer
-  );
-  if (!_fields) return [];
-  return _fields.map((field) => parseField(field, templateFields));
+  // Frappe SQL returns list of arrays like: [["PROJ-001"], ["PROJ-002"]]
+  return projectResource.data.map((p: any) => {
+    // If array format
+    if (Array.isArray(p)) {
+      return p[0];
+    }
+    // If object format
+    return p.name;
+  });
 });
 
-function handleOnFieldChange(e: any, fieldname: string, fieldtype: string) {
-  templateFields[fieldname] = e.value;
-  const fieldDependentFns = customOnChange.value?.[fieldname];
-  if (fieldDependentFns) {
-    fieldDependentFns.forEach((fn: Function) => {
-      fn(e.value, fieldtype);
-    });
-  }
-}
+/* ---------------- TICKET CREATION ---------------- */
 
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.new",
   debounce: 300,
   makeParams: () => ({
     doc: {
-      description: description.value,
       subject: subject.value,
+      description: description.value,
+      custom_project: custom_project.value,
       template: props.templateId,
       ...templateFields,
     },
     attachments: attachments.value,
   }),
   validate: (params) => {
-    const fields = visibleFields.value?.filter((f) => f.required) || [];
-    const toVerify = [...fields, "subject", "description"];
-    for (const field of toVerify) {
-      if (!params.doc[field.fieldname || field]) {
-        return `${field.label || field} is required`;
-      }
-    }
+    if (!params.doc.custom_project) return "Project is required";
+    if (!params.doc.subject) return "Subject is required";
+    if (!params.doc.description) return "Description is required";
   },
   onSuccess: (data) => {
     router.push({
-      name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
+      name: "TicketAgent",
       params: {
         ticketId: data.name,
       },
     });
-    if (isManager) {
-      updateOnboardingStep("create_first_ticket", true, false, () =>
-        localStorage.setItem("firstTicket", data.name)
-      );
-    }
-    // only capture telemetry for customer portal
-    if (isCustomerPortal.value) {
-      capture("new_ticket_submitted", {
-        data: {
-          user: userID,
-          ticketID: data.name,
-          subject: subject.value,
-          description: description.value,
-          customFields: templateFields,
-        },
-      });
-    }
+
+    capture("new_ticket_submitted", {
+      data: {
+        user: userId,
+        ticketID: data.name,
+        subject: subject.value,
+        project: custom_project.value,
+      },
+    });
   },
 });
+
+/* ---------------- UTILITIES ---------------- */
 
 function sanitize(html: string) {
   return sanitizeHtml(html, {
@@ -301,23 +221,10 @@ function sanitize(html: string) {
   });
 }
 
-const breadcrumbs = computed(() => {
-  const items = [
-    {
-      label: __("Tickets"),
-      route: {
-        name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-      },
-    },
-    {
-      label: __("New Ticket"),
-      route: {
-        name: "TicketNew",
-      },
-    },
-  ];
-  return items;
-});
+const breadcrumbs = computed(() => [
+  { label: __("Tickets"), route: { name: "TicketsAgent" } },
+  { label: __("New Ticket"), route: { name: "TicketNew" } },
+]);
 
 usePageMeta(() => ({
   title: __("New Ticket"),
@@ -325,9 +232,7 @@ usePageMeta(() => ({
 
 onMounted(() => {
   capture("new_ticket_page", {
-    data: {
-      user: userID,
-    },
+    data: { user: userId },
   });
 });
 </script>
