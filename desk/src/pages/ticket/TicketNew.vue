@@ -159,7 +159,7 @@ const projectResource = createResource({
   }),
   auto: true,
 });
-
+console.log("projectResource", projectResource);
 const projectOptions = computed(() => {
   if (!projectResource.data) return [];
 
@@ -167,12 +167,17 @@ const projectOptions = computed(() => {
   return projectResource.data.map((p: any) => {
     // If array format
     if (Array.isArray(p)) {
-      return p[0];
+      return {
+         value: p[0], // Project ID (name)
+        label: `${p[0]} - ${p[1]}`, // ID + Project Name
+        }
     }
     // If object format
     return p.name;
   });
 });
+console.log("projectOptions", projectOptions);
+
 
 /* ---------------- TICKET CREATION ---------------- */
 
