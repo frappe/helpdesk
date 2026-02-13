@@ -1025,18 +1025,18 @@ class HDTicket(Document):
                 "key": "priority",
                 "width": "10rem",
             },
-            {
-                "label": "First response",
-                "type": "Datetime",
-                "key": "response_by",
-                "width": "8rem",
-            },
-            {
-                "label": "Resolution",
-                "type": "Datetime",
-                "key": "resolution_by",
-                "width": "8rem",
-            },
+            # {
+            #     "label": "First response",
+            #     "type": "Datetime",
+            #     "key": "response_by",
+            #     "width": "8rem",
+            # },
+            # {
+            #     "label": "Resolution",
+            #     "type": "Datetime",
+            #     "key": "resolution_by",
+            #     "width": "8rem",
+            # },
             {
                 "label": "Team",
                 "type": "Link",
