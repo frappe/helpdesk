@@ -250,7 +250,9 @@ const breadcrumbs = computed(() => {
   return items;
 });
 
-const showEditor = computed(() => ticket.data.status !== "Closed");
+// const showEditor = computed(() => ticket.data.status !== "Closed");
+const showEditor = computed(() => true);
+
 
 // this handles whether the ticket was raised and then was closed without any reply from the agent.
 const { isFeedbackMandatory } = useConfigStore();

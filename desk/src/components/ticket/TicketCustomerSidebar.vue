@@ -36,16 +36,25 @@
         class="flex items-center text-base leading-5"
         v-for="field in ticketBasicInfo"
       >
-        <span class="w-[126px] text-sm text-gray-600">{{ field.label }}</span>
         <span
-          class="text-base text-gray-800 flex-1"
-          :class="!field.value && 'text-ink-gray-4'"
+          class="w-[126px] text-sm"
+          :class="field.bold ? 'font-semibold text-gray-900' : 'text-gray-600'"
+        >
+          {{ field.label }}
+        </span>
+        <span
+          class="text-base flex-1"
+          :class="[
+            field.bold ? 'font-semibold text-gray-900' : 'text-gray-800',
+            !field.value && 'text-ink-gray-4'
+          ]"
         >
           {{ field.value || "—" }}
         </span>
       </div>
 
       <!-- sla info -->
+      <!--
       <div
         v-for="data in slaData"
         :key="data.label"
@@ -59,7 +68,9 @@
           </Tooltip>
         </div>
       </div>
+      -->
     </div>
+    
     <!-- feedback component -->
     <TicketFeedback
       v-if="ticket.data.feedback_rating"
@@ -181,11 +192,12 @@ const ticketBasicInfo = computed(() => [
   {
     label: "Ticket ID",
     value: ticket.data.name,
+    bold: true,
   },
   {
     label: "Status",
     value: ticket.data.status,
-    bold: true,
+    bold: false,
   },
 ]);
 
