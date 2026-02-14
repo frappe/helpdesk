@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-08 10:41+0000\n"
-"PO-Revision-Date: 2026-02-09 07:33\n"
+"PO-Revision-Date: 2026-02-14 13:26\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -444,11 +444,11 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:119
 msgid "Article created"
-msgstr ""
+msgstr "مقاله ایجاد شد"
 
 #: desk/src/pages/knowledge-base/Article.vue:330
 msgid "Article deleted"
-msgstr ""
+msgstr "مقاله حذف شد"
 
 #: desk/src/pages/knowledge-base/Article.vue:407
 msgid "Article link copied to clipboard"
@@ -456,19 +456,19 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:260
 msgid "Article moved"
-msgstr ""
+msgstr "مقاله منتقل شد"
 
 #: desk/src/pages/knowledge-base/Article.vue:306
 msgid "Article updated"
-msgstr ""
+msgstr "مقاله به‌روزرسانی شد"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:342
 msgid "Articles deleted"
-msgstr ""
+msgstr "مقالات حذف شدند"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:226
 msgid "Articles moved"
-msgstr ""
+msgstr "مقالات منتقل شدند"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:51
 msgid "Assign"
@@ -480,7 +480,7 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:93
 msgid "Assign ticket"
-msgstr ""
+msgstr "اختصاص تیکت"
 
 #. Label of the assign_to_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
@@ -573,7 +573,7 @@ msgstr ""
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:131
 msgid "At least one email is required"
-msgstr ""
+msgstr "حداقل یک ایمیل الزامی است"
 
 #: desk/src/components/Settings/InviteAgents.vue:170
 msgid "At least one email required"
@@ -589,7 +589,7 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:450
 msgid "At least one team is required"
-msgstr ""
+msgstr "حداقل یک تیم الزامی است"
 
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:28
 msgid "At-least one of priority, team and ticket type is required"
@@ -751,7 +751,7 @@ msgstr "جزئیات تماس"
 
 #: desk/src/components/layouts/Sidebar.vue:257
 msgid "Call Logs"
-msgstr ""
+msgstr "لاگ تماس"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:81
 msgid "Call Received By"
@@ -815,7 +815,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Category"
-msgstr "دسته بندی"
+msgstr "دسته‌بندی"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:168
 msgid "Category '{0}' link copied to clipboard"
@@ -823,15 +823,15 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:257
 msgid "Category created"
-msgstr ""
+msgstr "دسته‌بندی ایجاد شد"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:320
 msgid "Category deleted"
-msgstr ""
+msgstr "دسته‌بندی حذف شد"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:357
 msgid "Category merged"
-msgstr ""
+msgstr "دسته‌بندی ادغام شد"
 
 #: helpdesk/api/knowledge_base.py:72
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.py:64
@@ -840,7 +840,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:292
 msgid "Category updated"
-msgstr ""
+msgstr "دسته‌بندی به روز شد"
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:40
 msgid "Change"
@@ -861,11 +861,11 @@ msgstr ""
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:22
 msgid "Change photo"
-msgstr ""
+msgstr "تغییر عکس"
 
 #: desk/src/components/modals/ShortcutsModal.vue:91
 msgid "Change priority"
-msgstr ""
+msgstr "تغییر اولویت"
 
 #: desk/src/components/modals/ShortcutsModal.vue:94
 msgid "Change status"
@@ -873,11 +873,11 @@ msgstr "تغییر وضعیت"
 
 #: desk/src/components/modals/ShortcutsModal.vue:92
 msgid "Change team"
-msgstr ""
+msgstr "تغییر تیم"
 
 #: desk/src/components/modals/ShortcutsModal.vue:90
 msgid "Change ticket type"
-msgstr ""
+msgstr "تغییر نوع تیکت"
 
 #: desk/src/components/Settings/Profile/Profile.vue:118
 msgid "Change your account password for security."
@@ -943,7 +943,7 @@ msgstr "پاک کردن جدول"
 
 #: desk/src/pages/SearchAgent.vue:86
 msgid "Clear all filters"
-msgstr ""
+msgstr "پاک کردن همه فیلترها"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:46
 msgid "Click on Add to Holidays. This will populate the holidays table with all the dates that fall on the selected weekly off. Repeat the process for populating the dates for all your weekly holidays"
@@ -960,7 +960,7 @@ msgstr "بستن"
 
 #: desk/src/pages/ticket/TicketCustomer.vue:294
 msgid "Close Ticket"
-msgstr ""
+msgstr "بستن تیکت"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -1118,7 +1118,7 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:95
 msgid "Copy ticket id"
-msgstr ""
+msgstr "کپی شناسه تیکت"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:631
 msgid "Could not an email due to: {0}"
@@ -1157,11 +1157,11 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:434
 msgid "Create a ticket"
-msgstr ""
+msgstr "ایجاد تیکت"
 
 #: desk/src/components/layouts/Sidebar.vue:479
 msgid "Create an article"
-msgstr ""
+msgstr "ایجاد یک مقاله"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:5
 msgid "Create and manage teams and assign agents to specific teams."
@@ -1210,7 +1210,7 @@ msgstr "نام مشتری"
 
 #: desk/src/components/layouts/Sidebar.vue:319
 msgid "Customer portal"
-msgstr ""
+msgstr "پورتال مشتری"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:5
 msgid "Customize your email notification preferences to stay informed about important updates and activities."
@@ -1281,11 +1281,11 @@ msgstr "وضعیت پیش‌فرض تیکت"
 
 #: desk/src/pages/ticket/Tickets.vue:295 desk/src/pages/ticket/Tickets.vue:354
 msgid "Default Views"
-msgstr ""
+msgstr "نماهای پیش‌فرض"
 
 #: desk/src/components/ticket-agent/TicketHeader.vue:212
 msgid "Default actions"
-msgstr ""
+msgstr "اقدامات پیش‌فرض"
 
 #. Label of the default_priority (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1325,7 +1325,7 @@ msgstr "حذف"
 
 #: desk/src/pages/knowledge-base/Article.vue:316
 msgid "Delete Article"
-msgstr ""
+msgstr "حذف مقاله"
 
 #: desk/src/pages/ticket/Tickets.vue:434
 msgid "Delete View"
@@ -1992,7 +1992,7 @@ msgstr "سبز"
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Group By"
-msgstr "دسته بندی بر اساس"
+msgstr "دسته‌بندی بر اساس"
 
 #. Label of the group_by_field (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2558,7 +2558,7 @@ msgstr "۳۰ روز گذشته"
 #: desk/src/pages/dashboard/Dashboard.vue:292
 #: desk/src/pages/dashboard/Dashboard.vue:294
 msgid "Last 60 Days"
-msgstr ""
+msgstr "۶۰ روز گذشته"
 
 #: desk/src/pages/dashboard/Dashboard.vue:278
 #: desk/src/pages/dashboard/Dashboard.vue:280
@@ -2964,7 +2964,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:167
 msgid "No Tickets Found"
-msgstr ""
+msgstr "تیکتی یافت نشد"
 
 #: desk/src/components/Settings/Agents.vue:98
 msgid "No agent found"
@@ -2984,7 +2984,7 @@ msgstr "هیچ تغییری ایجاد نشد"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:245
 msgid "No changes to save"
-msgstr ""
+msgstr "هیچ تغییری برای ذخیره وجود ندارد"
 
 #: desk/src/components/Settings/EmailAccountList.vue:52
 msgid "No email account found"
@@ -3012,7 +3012,7 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:98
 msgid "No tickets found to preview."
-msgstr ""
+msgstr "تیکتی برای پیش‌نمایش یافت نشد."
 
 #: helpdesk/utils.py:168
 msgid "Not Allowed"
@@ -3082,11 +3082,11 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:103
 msgid "Open comment box"
-msgstr ""
+msgstr "باز کردن کادر دیدگاه"
 
 #: desk/src/components/modals/ShortcutsModal.vue:84
 msgid "Open help"
-msgstr ""
+msgstr "باز کردن راهنما"
 
 #: desk/src/components/modals/ShortcutsModal.vue:102
 msgid "Open reply box"
@@ -3988,7 +3988,7 @@ msgstr "انتخاب کردن"
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:21
 msgid "Select Category"
-msgstr ""
+msgstr "انتخاب دسته‌بندی"
 
 #: desk/src/pages/dashboard/Dashboard.vue:20
 msgid "Select Range"
