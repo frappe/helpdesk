@@ -101,6 +101,7 @@
 </template>
 
 <script setup lang="ts">
+import { parseField } from "@/composables/formCustomisation";
 import { dayjs } from "@/dayjs";
 import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
@@ -221,9 +222,12 @@ const ticketAdditionalInfo = computed(() => {
       value: ticket.data.priority,
     },
   ];
-  const custom_fields = ticket.data.template.fields
+  const templateFields = ticket.data.template?.fields || [];
+  const custom_fields = templateFields
+    .map((field: Field) => parseField(field, ticket.data))
     .filter(
       (field: Field) =>
+        field.display_via_depends_on &&
         !field.hide_from_customer &&
         ["subject", "team", "priority"].indexOf(field.fieldname) === -1
     )
@@ -238,7 +242,6 @@ const ticketAdditionalInfo = computed(() => {
         );
       }
       if (field.fieldtype === "Datetime") {
-        // window.time_format
         option.value = dayjs(option.value).format(
           `${window.date_format.toUpperCase()} ${window.time_format}`
         );

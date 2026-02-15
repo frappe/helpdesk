@@ -11,8 +11,8 @@
 </template>
 
 <script setup lang="ts">
+import { parseField } from "@/composables/formCustomisation";
 import { Field, FieldValue } from "@/types";
-import { toast } from "frappe-ui";
 import { computed } from "vue";
 import TicketField from "../TicketField.vue";
 const emit = defineEmits(["update"]);
@@ -25,7 +25,10 @@ const props = defineProps({
 });
 
 const fields = computed(() => {
-  return props.ticket.fields;
+  if (!props.ticket?.fields) return [];
+  return props.ticket.fields
+    .map((field: Field) => parseField(field, props.ticket))
+    .filter((field) => field.display_via_depends_on);
 });
 
 function update(field: Field["fieldname"], value: FieldValue, event = null) {
