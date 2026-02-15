@@ -242,6 +242,7 @@ const ticketAdditionalInfo = computed(() => {
         );
       }
       if (field.fieldtype === "Datetime") {
+        // window.time_format
         option.value = dayjs(option.value).format(
           `${window.date_format.toUpperCase()} ${window.time_format}`
         );
