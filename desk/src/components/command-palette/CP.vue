@@ -26,7 +26,7 @@
             <div
               v-for="group in groupedSearchResults"
               :key="group.title"
-              class="mt-4.5 mb-2 first:mt-3"
+              :class="group.title !== 'Jump To' && 'mt-4.5 mb-2 first:mt-3'"
             >
               <div
                 v-if="!group.hideTitle"
@@ -56,6 +56,8 @@
   </Dialog>
 </template>
 <script setup>
+import { useDevice } from "@/composables";
+import { useShortcut } from "@/composables/shortcuts";
 import { isCustomerPortal } from "@/utils";
 import {
   Combobox,
@@ -63,16 +65,13 @@ import {
   ComboboxOption,
   ComboboxOptions,
 } from "@headlessui/vue";
-import { useDevice } from "@/composables";
-import { useShortcut } from "@/composables/shortcuts";
 
+import { __ } from "@/translation";
 import { Dialog } from "frappe-ui";
 import { computed, h, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { __ } from "@/translation";
 
 import LucideBookOpen from "~icons/lucide/book-open";
-import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import LucideTicket from "~icons/lucide/ticket";
 import CPGroup from "./CPGroup.vue";
 const router = useRouter();
@@ -94,6 +93,12 @@ const navigationItems = computed(() => {
         params: { ticketId: query.value.slice(1) },
       },
     });
+  } else if (query.value) {
+    return {
+      title: __("Jump to"),
+      component: h(CPGroup),
+      items,
+    };
   } else {
     items.push({
       title: __("Tickets"),
