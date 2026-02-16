@@ -62,9 +62,15 @@
 
 <script setup lang="ts">
 import { Link } from "@/components";
-import { parseField } from "@/composables/formCustomisation";
+import {
+  handleLinkFieldUpdate,
+  handleSelectFieldUpdate,
+  parseField,
+  setupCustomizations,
+} from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
+import { globalStore } from "@/stores/globalStore";
 import { getMeta } from "@/stores/meta";
 import {
   ActivitiesSymbol,
@@ -73,7 +79,9 @@ import {
   FieldValue,
   TicketSymbol,
 } from "@/types";
-import { computed, inject, ref } from "vue";
+import { call, toast } from "frappe-ui";
+import { computed, inject, reactive, ref, watchEffect } from "vue";
+import { useRouter } from "vue-router";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
@@ -84,6 +92,97 @@ const customizations = inject(CustomizationSymbol);
 const activities = inject(ActivitiesSymbol);
 const { getFields, getField } = getMeta("HD Ticket");
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
+const router = useRouter();
+const { $dialog } = globalStore();
+
+const fieldOverrides = reactive<Record<string, Record<string, any>>>({});
+const snapshotsCache = new Map<
+  string,
+  { options: string; link_filters: string }
+>();
+
+const applyFilters = (
+  fieldname: string,
+  filters: string[] | null = null
+): void => {
+  const fieldMeta = getField(fieldname);
+  if (!fieldMeta) return;
+
+  const snapshot = snapshotsCache.get(fieldname);
+  const oldFieldData = snapshot || {
+    options: fieldMeta.options || "",
+    link_filters: fieldMeta.link_filters || "",
+  };
+
+  if (fieldMeta.fieldtype === "Select") {
+    handleSelectFieldUpdate(
+      fieldMeta,
+      fieldname,
+      filters,
+      ticket.value.doc,
+      [oldFieldData],
+      false // shouldReset: false for edit mode
+    );
+    fieldOverrides[fieldname] = {
+      options: fieldMeta.options,
+      disabled: !filters?.length,
+    };
+  } else if (fieldMeta.fieldtype === "Link") {
+    handleLinkFieldUpdate(
+      fieldMeta,
+      fieldname,
+      filters,
+      ticket.value.doc,
+      [oldFieldData],
+      false // shouldReset: false for edit mode
+    );
+    fieldOverrides[fieldname] = {
+      link_filters: fieldMeta.link_filters,
+      disabled: !filters?.length,
+    };
+  }
+};
+
+function updateField(fieldname: string, value: string, callback = () => {}) {
+  ticket.value.setValue.submit({ [fieldname]: value });
+  callback();
+}
+
+const customizationCtx = computed(() => ({
+  doc: ticket?.value?.doc,
+  call,
+  router,
+  toast,
+  $dialog,
+  updateField,
+  createToast: toast.create,
+  applyFilters,
+}));
+
+watchEffect(async () => {
+  if (!customizations.value?.data || !ticket.value?.doc) return;
+
+  await setupCustomizations(customizations.value.data, customizationCtx.value);
+
+  const onChangeHandlers =
+    ticket.value.doc._customOnChange ||
+    customizations.value.data._customOnChange;
+  if (!onChangeHandlers) return;
+
+  Object.entries(onChangeHandlers).forEach(([fieldname, handlers]) => {
+    const currentValue = ticket.value.doc[fieldname];
+    if (currentValue == null || currentValue === "") return;
+
+    const fieldtype = getField(fieldname)?.fieldtype;
+    (handlers as Function[]).forEach((fn) => fn(currentValue, fieldtype));
+  });
+});
+
+const customOnChange = computed(
+  () =>
+    ticket.value?.doc?._customOnChange ||
+    customizations.value?.data?._customOnChange
+);
 
 // ticket_type, priority, customer, agent_group
 const coreFields = computed(() => {
@@ -121,7 +220,7 @@ const customFields = computed(() => {
   }
 
   if (!customizations.value.data || customizations.value.loading) return [];
-  let customFields = customizations.value.data?.custom_fields || [];
+  let customFieldsList = customizations.value.data?.custom_fields || [];
   const _coreFields = [
     "ticket_type",
     "priority",
@@ -130,17 +229,39 @@ const customFields = computed(() => {
     "subject",
     "status",
   ];
-  customFields = customFields.filter((f) => !_coreFields.includes(f.fieldname));
-  let _customFields = customFields.map((f) => {
-    let fieldMeta = getField(f.fieldname);
+  customFieldsList = customFieldsList.filter(
+    (f) => !_coreFields.includes(f.fieldname)
+  );
 
-    fieldMeta = parseField(fieldMeta, ticket.value.doc);
-    // cant handle required depends on as we directly set the value in DB
-    fieldMeta["required"] = fieldMeta.reqd || f.required;
+  snapshotsCache.clear();
 
-    return getFieldInFormat(f, fieldMeta);
-  });
-  return _customFields;
+  return customFieldsList
+    .map((f) => {
+      const fieldMeta = parseField(getField(f.fieldname), ticket.value.doc);
+      if (!fieldMeta) return null;
+
+      snapshotsCache.set(f.fieldname, {
+        options: fieldMeta.options || "",
+        link_filters: fieldMeta.link_filters || "",
+      });
+
+      const formatted = getFieldInFormat(f, {
+        ...fieldMeta,
+        required: fieldMeta.reqd || f.required,
+      });
+      const overrides = fieldOverrides[f.fieldname];
+
+      return overrides
+        ? {
+            ...formatted,
+            ...overrides,
+            filters: overrides.link_filters
+              ? JSON.parse(overrides.link_filters)
+              : formatted.filters,
+          }
+        : formatted;
+    })
+    .filter(Boolean);
 });
 
 function getFieldInFormat(fieldTemplate, fieldMeta) {
@@ -150,6 +271,10 @@ function getFieldInFormat(fieldTemplate, fieldMeta) {
     fieldtype: fieldMeta?.fieldtype,
     doctype: fieldMeta?.options || "",
     options: fieldMeta?.options || "",
+    link_filters: fieldMeta?.link_filters || "",
+    filters: fieldMeta?.link_filters
+      ? JSON.parse(fieldMeta.link_filters)
+      : undefined,
     placeholder:
       fieldTemplate.placeholder ||
       `Enter ${fieldMeta?.label || fieldTemplate.fieldname}`,
@@ -167,11 +292,19 @@ function handleFieldUpdate(
   value: FieldValue,
   isCoreFieldUpdated = false
 ) {
-  if (ticket.value.doc[fieldname] == value) return;
+  const oldValue = ticket.value.doc[fieldname];
+  if (oldValue === value) return;
+
+  ticket.value.doc[fieldname] = value;
+  customOnChange.value?.[fieldname]?.forEach((fn: Function) =>
+    fn(value, getField(fieldname)?.fieldtype)
+  );
+
   if (isCoreFieldUpdated) {
     const label = getField(fieldname)?.label || fieldname;
     notifyTicketUpdate(label, value as string);
   }
+
   ticket.value.setValue.submit(
     { [fieldname]: value },
     {

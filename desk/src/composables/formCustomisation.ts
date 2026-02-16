@@ -51,7 +51,8 @@ export function handleSelectFieldUpdate(
   fieldname: string,
   filters: any,
   doc: any,
-  oldDoc: any
+  oldDoc: any,
+  shouldReset: boolean = true
 ) {
   if (!filters || !filters.length) {
     f.options = oldDoc.find((f) => f.fieldname === fieldname).options;
@@ -60,8 +61,10 @@ export function handleSelectFieldUpdate(
     f.options = filters.join("\n");
     f.disabled = false;
   }
-  // reset dependent field
-  doc[fieldname] = "";
+  // reset dependent field only if shouldReset is true (default: true for TicketNew)
+  if (shouldReset) {
+    doc[fieldname] = "";
+  }
 }
 
 export function handleLinkFieldUpdate(
@@ -69,7 +72,8 @@ export function handleLinkFieldUpdate(
   fieldname: string,
   filters: any,
   doc: any,
-  oldDoc: any
+  oldDoc: any,
+  shouldReset: boolean = true
 ) {
   if (!filters || !filters.length) {
     f.link_filters = oldDoc.find((f) => f.fieldname === fieldname).link_filters;
@@ -79,8 +83,10 @@ export function handleLinkFieldUpdate(
   f.link_filters = JSON.stringify([[f.options, "name", "in", filters]]);
   f.disabled = false;
 
-  // reset dependent field
-  doc[fieldname] = "";
+  // reset dependent field only if shouldReset is true (default: true for TicketNew)
+  if (shouldReset) {
+    doc[fieldname] = "";
+  }
 }
 
 //
