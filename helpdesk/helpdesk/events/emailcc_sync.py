@@ -193,7 +193,7 @@ def notify_customer_on_manager_reply(doc, method=None):
                 border-radius:6px;
                 font-weight:bold;
         ">
-        🔍 View Ticket
+         View Ticket
         </a>
 
         <br><br>
