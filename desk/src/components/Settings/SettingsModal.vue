@@ -28,7 +28,7 @@
               <button
                 v-for="item in tab.items"
                 :key="item.label"
-                class="flex h-7 w-full items-center gap-2 rounded px-2 py-1"
+                class="flex h-7 w-full items-center gap-2 rounded px-2 py-[7px]"
                 :class="[
                   activeTab?.label == item.label
                     ? 'bg-white shadow-sm'

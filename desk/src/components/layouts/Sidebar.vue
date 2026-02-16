@@ -32,7 +32,7 @@
         variant="solid"
       />
       <SidebarLink
-        class="relative"
+        class="relative my-0.5"
         :label="__('Notifications')"
         :icon="LucideBell"
         :on-click="() => notificationStore.toggle()"
@@ -52,12 +52,11 @@
     </div>
     <div>
       <div v-for="view in allViews" :key="view.label">
-        <div
+        <!-- <div
           v-if="!view.hideLabel && !isExpanded && view.views?.length"
           class="mx-2 my-2 h-1 border-b"
-        />
+        /> -->
         <div class="border-t mx-2 my-1.5"></div>
-
         <Section
           :label="view.label"
           :hideLabel="view.hideLabel"
@@ -70,7 +69,7 @@
               :class="
                 !isExpanded
                   ? 'ml-0 h-0 overflow-hidden opacity-0'
-                  : 'py-[7px]  h-7.5 w-auto opacity-100'
+                  : 'pt-[11px] pb-2.5 w-auto opacity-100 '
               "
               @click="toggle()"
             >
