@@ -121,3 +121,4 @@ def notify_project_manager_on_ticket_create(doc, method=None):
         subject=subject,
         message=message
     )
+  
