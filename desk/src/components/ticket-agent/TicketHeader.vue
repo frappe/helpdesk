@@ -61,7 +61,7 @@
         </Dropdown>
         <!-- Core Actions + Custom Actions -->
         <Dropdown
-          v-if="groupedActions[0]?.items?.length >= 1"
+          v-if="groupedActions[0].items.length >= 1"
           :options="groupedActions"
           placement="right"
         >
@@ -98,14 +98,13 @@ import {
 const { isAdmin } = useAuthStore();
 const { $dialog } = globalStore();
 import { HDTicketStatus } from "@/types/doctypes";
-import { getIcon, ConfirmDelete } from "@/utils";
+import { getIcon } from "@/utils";
 import {
   Breadcrumbs,
   call,
   Dropdown,
   toast,
-  createResource,
-  Button,
+  createListResource,
 } from "frappe-ui";
 import { __ } from "@/translation";
 import {
@@ -197,55 +196,23 @@ function updateField(fieldname: string, value: string, callback = () => {}) {
   });
   callback();
 }
+const ticketCount = ref();
 
-function handleDeleteTicket() {
-  $dialog({
-    title: __(`Delete ticket #${ticket?.value?.name}`),
-    message: __(
-      "Are you sure you want to delete this ticket? This is an irreversible action and cannot be undone."
-    ),
-    actions: [
-      {
-        label: __("Delete"),
-        theme: "red",
-        iconLeft: "trash-2",
-        variant: "solid",
-        onClick({ close }) {
-          call("frappe.client.delete", {
-            doctype: "HD Ticket",
-            name: ticket?.value?.doc.name,
-          })
-            .then(() => {
-              toast.success(__("Ticket deleted successfully."));
-              router.push({ name: "TicketsAgent" });
-            })
-            .catch((err: any) => {
-              toast.error(err || __("Failed to delete ticket."));
-            });
-          close();
-        },
-      },
-    ],
-  });
-}
-
-const ticketCount = createResource({
-  url: "frappe.client.get_count",
-  makeParams: () => ({
-    doctype: "HD Ticket",
-    filters: {
-      status_category: ["!=", "Resolved"],
-      is_merged: 0,
-    },
-  }),
+const candidateTickets = createListResource({
+  doctype: "HD Ticket",
+  fields: ["name"],
   auto: true,
+  onSuccess(data) {
+    ticketCount.value = data.length;
+  },
+  pageLength: 3,
 });
 const showMergeModal = ref(false);
 const showMergeOption = computed(() => {
   return (
-    !ticket?.value?.doc?.is_merged &&
-    ["Open", "Paused"].includes(ticket?.value?.doc?.status_category) &&
-    ticketCount.data > 1
+    !ticket.value.doc.is_merged &&
+    ["Open", "Paused"].includes(ticket.value.doc.status_category) &&
+    ticketCount.value > 1
   );
 });
 const defaultActions = computed(() => {
