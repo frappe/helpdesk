@@ -39,7 +39,7 @@ class HDAgent(Document):
 
 
 @frappe.whitelist()
-def update_agent_role(user, new_role):
+def update_agent_role(user: str, new_role: str):
     """
     Update the role of the user to Agent
     """
