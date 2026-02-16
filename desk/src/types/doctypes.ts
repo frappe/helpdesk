@@ -13,23 +13,10 @@ interface DocType {
     idx?: number;
   }
   
-// Last updated: 2025-08-25 12:29:02.646874
+// Last updated: 2026-02-02 17:22:11.094897
 export interface HDTicketStatus extends DocType {
   /** Color: Select */
-  color?:
-    | "Black"
-    | "Gray"
-    | "Blue"
-    | "Green"
-    | "Red"
-    | "Pink"
-    | "Orange"
-    | "Amber"
-    | "Yellow"
-    | "Cyan"
-    | "Teal"
-    | "Violet"
-    | "purple";
+  color?: 'Black' | 'Gray' | 'Blue' | 'Green' | 'Red' | 'Pink' | 'Orange' | 'Amber' | 'Yellow' | 'Cyan' | 'Teal' | 'Violet' | 'purple';
   /** Label: Data */
   label_agent: string;
   /** Show end users a different view: Check */
@@ -37,12 +24,11 @@ export interface HDTicketStatus extends DocType {
   /** Label (customer view): Data */
   label_customer?: string;
   /** Category: Select */
-  category: "Open" | "Paused" | "Resolved";
+  category: 'Open' | 'Paused' | 'Resolved';
   /** Order: Int */
   order?: number;
   /** Enabled: Check */
   enabled: 0 | 1;
-  parsed_color?: string;
 }
 
 // Last updated: 2026-01-20 15:18:57.195606
@@ -259,7 +245,7 @@ export interface HDServiceLevelAgreement extends DocType {
   default_ticket_status?: string;
 }
 
-// Last updated: 2026-01-19 23:22:29.075052
+// Last updated: 2026-02-02 11:15:47.402850
 export interface HDAgent extends DocType {
   /** User: Link (User) */
   user: string;
