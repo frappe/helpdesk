@@ -74,6 +74,15 @@ doc_events = {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
+     "HD Ticket": {
+        "after_insert": "helpdesk.helpdesk.events.email_sync.notify_project_manager_on_ticket_create"
+    },
+    "Communication": {
+        "after_insert": [
+            "helpdesk.helpdesk.events.emailcc_sync.notify_customer_on_manager_reply",
+            "helpdesk.helpdesk.events.emailcc_sync.notify_team_on_customer_reply"
+        ]
+    }
 }
 
 has_permission = {
@@ -109,3 +118,8 @@ setup_wizard_complete = "helpdesk.setup.setup_wizard.setup_complete"
 
 before_tests = "helpdesk.test_utils.before_tests"
 auth_hooks = ["helpdesk.auth.authenticate"]
+
+    # app_include_js = [
+    #     "/assets/helpdesk/js/email_sync.js"
+    # ]
+
