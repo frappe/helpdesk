@@ -43,7 +43,6 @@ def sanitize_query(query: str) -> str:
 @frappe.whitelist()
 def search(query: str) -> list:
     query = sanitize_query(query)
-    print("\n\n", query, "\n\n")
     ret, enough = search_with_enough_results([], query)
     if enough:
         return ret

@@ -2,7 +2,6 @@ import json
 import uuid
 from email.utils import parseaddr
 from functools import lru_cache
-from typing import List
 
 import frappe
 from bs4 import BeautifulSoup
@@ -416,7 +415,7 @@ class HDTicket(Document):
         return True
 
     @frappe.whitelist()
-    def assign_agent(self, agent):
+    def assign_agent(self, agent: str):
         assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
 
         if frappe.session.user != agent:
@@ -521,7 +520,7 @@ class HDTicket(Document):
         return f"{root_uri}/helpdesk/my-tickets/{self.name}"
 
     @frappe.whitelist()
-    def new_comment(self, content: str, attachments: List[str] = []):
+    def new_comment(self, content: str, attachments: list[str] = []):
         if not is_agent():
             frappe.throw(
                 _("You are not permitted to add a comment"), frappe.PermissionError
@@ -541,10 +540,10 @@ class HDTicket(Document):
     def reply_via_agent(
         self,
         message: str,
-        to: str = None,
-        cc: str = None,
-        bcc: str = None,
-        attachments: List[str] = [],
+        to: str | None = None,
+        cc: str | None = None,
+        bcc: str | None = None,
+        attachments: list[str] = [],
     ):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
@@ -658,7 +657,7 @@ class HDTicket(Document):
     @frappe.whitelist()
     # flake8: noqa
     def create_communication_via_contact(
-        self, message, attachments=[], new_ticket=False
+        self, message: str, attachments: list[dict] = [], new_ticket: bool = False
     ):
         if not new_ticket and frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_to_agent"
