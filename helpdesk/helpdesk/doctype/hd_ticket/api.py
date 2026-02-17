@@ -40,7 +40,7 @@ def new(doc: dict, attachments: list[dict] = []):
 
 
 @frappe.whitelist()
-def get_one(name: str, is_customer_portal: bool = False):
+def get_one(name: str | int, is_customer_portal: bool = False):
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     QBContact = frappe.qb.DocType("Contact")
     QBTicket = frappe.qb.DocType("HD Ticket")
@@ -569,7 +569,7 @@ def get_ticket_customizations():
 
 @frappe.whitelist()
 # TODO: make it bette, on mount fetch only once and cache it
-def get_navigation_tickets(ticket: str, current_view: str | None = None):
+def get_navigation_tickets(ticket: str | int, current_view: str | None = None):
     """
     Get a list of tickets to navigate
     """
@@ -658,7 +658,7 @@ def get_navigation_order_by(view):
 
 
 @frappe.whitelist()
-def get_ticket_contact(ticket: str):
+def get_ticket_contact(ticket: str | int):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
         return None
@@ -682,7 +682,7 @@ def get_ticket_contact(ticket: str):
 
 
 @frappe.whitelist()
-def get_recent_similar_tickets(ticket: str):
+def get_recent_similar_tickets(ticket: str | int):
     if not frappe.db.exists("HD Ticket", ticket):
         return {"recent_tickets": [], "similar_tickets": []}
 
@@ -783,7 +783,7 @@ def get_similar_tickets(ticket: str):
 
 
 @frappe.whitelist()
-def get_ticket_activities(ticket: str):
+def get_ticket_activities(ticket: str | int):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     activities = {
         "comments": get_comments(ticket),
@@ -796,7 +796,7 @@ def get_ticket_activities(ticket: str):
 
 
 @frappe.whitelist()
-def get_ticket_assignees(ticket: str):
+def get_ticket_assignees(ticket: str | int):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
     return assignees
