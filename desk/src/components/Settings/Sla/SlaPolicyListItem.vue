@@ -164,7 +164,7 @@ const deleteSla = () => {
 
   slaPolicyList?.delete.submit(props.data.name, {
     onSuccess: () => {
-      toast.success(__("SLA policy deleted successfully."));
+      toast.success(__("SLA policy deleted."));
     },
   });
 };
@@ -181,7 +181,7 @@ const onToggle = () => {
     },
     {
       onSuccess: () => {
-        toast.success(__("SLA policy status updated successfully."));
+        toast.success(__("SLA policy status updated."));
       },
     }
   );

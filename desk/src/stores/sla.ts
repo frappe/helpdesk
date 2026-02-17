@@ -131,7 +131,7 @@ export function validateSlaData(
     switch (field) {
       case "service_level":
         if (!slaData.value.service_level?.trim()) {
-          slaDataErrors.value.service_level = __("SLA policy name is required.");
+          slaDataErrors.value.service_level = "SLA policy name is required.";
         } else {
           slaDataErrors.value.service_level = "";
         }
@@ -141,7 +141,7 @@ export function validateSlaData(
           !Array.isArray(slaData.value.priorities) ||
           slaData.value.priorities.length === 0
         ) {
-          slaDataErrors.value.priorities = __("At least one priority is required.");
+          slaDataErrors.value.priorities = "At least one priority is required.";
         } else {
           const prioritiesError: string[] = [];
           slaData.value.priorities.forEach((priority, index) => {
