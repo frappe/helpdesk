@@ -26,7 +26,7 @@
             <div
               v-for="group in groupedSearchResults"
               :key="group.title"
-              :class="group.title !== 'Jump To' && 'mt-4.5 mb-2 first:mt-3'"
+              class="mt-4.5 mb-2 first:mt-3"
             >
               <div
                 v-if="!group.hideTitle"
@@ -93,12 +93,6 @@ const navigationItems = computed(() => {
         params: { ticketId: query.value.slice(1) },
       },
     });
-  } else if (query.value) {
-    return {
-      title: __("Jump to"),
-      component: h(CPGroup),
-      items,
-    };
   } else {
     items.push({
       title: __("Tickets"),
