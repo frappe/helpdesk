@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-08 10:41+0000\n"
-"PO-Revision-Date: 2026-02-10 11:51\n"
+"POT-Creation-Date: 2026-02-15 10:41+0000\n"
+"PO-Revision-Date: 2026-02-17 13:44\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -680,8 +680,8 @@ msgstr "Genomsnittlig tid det tar för först svar på ärende"
 msgid "Avg. time taken to resolve a ticket"
 msgstr "Genomsnittlig tid det tar att lösa ärende"
 
-#: desk/src/components/Settings/EmailAdd.vue:87
-#: desk/src/components/Settings/EmailEdit.vue:72
+#: desk/src/components/Settings/EmailAdd.vue:143
+#: desk/src/components/Settings/EmailEdit.vue:134
 msgid "Back"
 msgstr "Tillbaka"
 
@@ -1132,7 +1132,7 @@ msgstr "Kunde inte skicka bekräftelse e-post på grund av: {0}"
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Kunde inte skicka återkoppling e-post, på grund av: {0}"
 
-#: desk/src/components/Settings/EmailAdd.vue:94
+#: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
 #: desk/src/components/layouts/Sidebar.vue:503
@@ -1529,6 +1529,11 @@ msgstr "Redigera"
 msgid "Edit Call Log"
 msgstr "Redigera Samtalslogg"
 
+#: desk/src/components/Settings/EmailAdd.vue:70
+#: desk/src/components/Settings/EmailEdit.vue:63
+msgid "Edit Domain"
+msgstr "Redigera Domän"
+
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
 msgstr "Redigera E-post"
@@ -1586,11 +1591,11 @@ msgstr "E-post"
 msgid "Email Notifications"
 msgstr "E-post Aviseringar"
 
-#: desk/src/components/Settings/EmailAdd.vue:162
+#: desk/src/components/Settings/EmailAdd.vue:306
 msgid "Email account created"
 msgstr "E-postkonto Skapad"
 
-#: desk/src/components/Settings/EmailEdit.vue:267
+#: desk/src/components/Settings/EmailEdit.vue:471
 msgid "Email account updated successfully"
 msgstr "E-post konto uppdaterad"
 
@@ -1604,7 +1609,7 @@ msgstr "E-post adress får inte vara tom"
 msgid "Emails"
 msgstr "E-post "
 
-#: desk/src/components/Settings/EmailEdit.vue:224
+#: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
 msgstr "E-post hämtad"
 
@@ -1747,7 +1752,7 @@ msgstr "Extern länk"
 msgid "Failed"
 msgstr "Misslyckad"
 
-#: desk/src/components/Settings/EmailAdd.vue:167
+#: desk/src/components/Settings/EmailAdd.vue:311
 msgid "Failed to create email account, Invalid credentials"
 msgstr "Misslyckades med att skapa e-post konto, ogiltiga inloggningsuppgifter"
 
@@ -1755,7 +1760,7 @@ msgstr "Misslyckades med att skapa e-post konto, ogiltiga inloggningsuppgifter"
 msgid "Failed to load telephony agent"
 msgstr "Misslyckades med att ladda telefoni agent"
 
-#: desk/src/components/Settings/EmailEdit.vue:229
+#: desk/src/components/Settings/EmailEdit.vue:422
 msgid "Failed to pull emails"
 msgstr "Misslyckades med att hämta e-post"
 
@@ -1767,7 +1772,7 @@ msgstr "Misslyckades med att spara Exotel Inställningar"
 msgid "Failed to save Twilio settings"
 msgstr "Misslyckades med att spara Twilio Inställningar"
 
-#: desk/src/components/Settings/EmailEdit.vue:272
+#: desk/src/components/Settings/EmailEdit.vue:476
 msgid "Failed to update email account, Invalid credentials"
 msgstr "Misslyckades med att uppdatera e-post konto, ogiltiga inloggningsuppgifter"
 
@@ -2978,7 +2983,7 @@ msgstr "Inga tilldelade"
 msgid "No assignment rule found"
 msgstr "Ingen tilldelningsregel hittades"
 
-#: desk/src/components/Settings/EmailEdit.vue:184
+#: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
 msgstr "Inga ändringar gjorda"
 
@@ -3087,6 +3092,10 @@ msgstr "Öppna kommentarsfält"
 #: desk/src/components/modals/ShortcutsModal.vue:84
 msgid "Open help"
 msgstr "Öppna hjälp"
+
+#: desk/src/components/Settings/EmailEdit.vue:37
+msgid "Open in Desk"
+msgstr "Öppna i Skrivbord"
 
 #: desk/src/components/modals/ShortcutsModal.vue:102
 msgid "Open reply box"
@@ -3440,11 +3449,11 @@ msgstr "Publicerad"
 msgid "Published articles must have content."
 msgstr "Publicerade artiklar måste ha innehåll."
 
-#: desk/src/components/Settings/EmailEdit.vue:87
+#: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
 msgstr "Hämta E-post"
 
-#: desk/src/components/Settings/EmailEdit.vue:214
+#: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
 msgstr "Hämtar e-post, det kan ta några minuter."
 
@@ -4059,6 +4068,10 @@ msgstr "Service Nivå Avtalen"
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
 msgstr "Service Nivå Namn"
+
+#: helpdesk/api/settings/email.py:14
+msgid "Service not supported"
+msgstr "Tjänsten stöds inte"
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:5
 #: desk/src/components/ticket/SetContactPhoneModal.vue:8
@@ -4803,7 +4816,7 @@ msgstr "Till datum"
 msgid "To is required"
 msgstr "Till erfordras"
 
-#: desk/src/components/Settings/EmailEdit.vue:147
+#: desk/src/components/Settings/EmailEdit.vue:268
 msgid "To know more about setting up email accounts, click"
 msgstr "För att veta mer om hur du konfigurerar e-post konton, klicka här"
 
@@ -4937,7 +4950,7 @@ msgstr "Namnlös"
 msgid "Update"
 msgstr "Uppdatera"
 
-#: desk/src/components/Settings/EmailEdit.vue:80
+#: desk/src/components/Settings/EmailEdit.vue:142
 msgid "Update Account"
 msgstr "Uppdatera Konto"
 
