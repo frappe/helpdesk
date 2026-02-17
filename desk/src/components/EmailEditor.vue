@@ -281,11 +281,7 @@ const isUploading = ref(false);
 const contentEmpty = computed(() => isContentEmpty(newEmail.value));
 
 const isDisabled = computed(() => {
-  return (
-    (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
-    sendMail.loading ||
-    isUploading.value
-  );
+  return contentEmpty.value || sendMail.loading || isUploading.value;
 });
 
 // Watch for changes in email content to trigger typing events
