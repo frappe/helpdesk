@@ -81,8 +81,13 @@ doc_events = {
         "after_insert": [
             "helpdesk.helpdesk.events.emailcc_sync.notify_customer_on_manager_reply",
             "helpdesk.helpdesk.events.emailcc_sync.notify_team_on_customer_reply"
-        ]
-    }
+        ],
+        "before_insert": "helpdesk.helpdesk.events.emailcc_sync.block_default_email"
+    },
+    # "Email Queue": {
+    #     "before_insert": "helpdesk.helpdesk.events.emailcc_sync.block_default_email"
+    # }
+
 }
 
 has_permission = {

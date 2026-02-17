@@ -1,6 +1,22 @@
 import frappe
 
 
+def block_default_email(doc, method=None):
+
+    # Run only for Helpdesk Ticket communication
+    if doc.reference_doctype == "HD Ticket":
+
+        # Mark as communication only
+        doc.sent_or_received = "Received"
+
+        # Stop default email queue creation
+        doc.flags.ignore_email_queue = True
+        doc.flags.ignore_notifications = True
+
+        frappe.logger().info("""
+        Default Email Blocked for Helpdesk Communication
+        """)
+
 def notify_customer_on_manager_reply(doc, method=None):
 
     if doc.reference_doctype != "HD Ticket":
