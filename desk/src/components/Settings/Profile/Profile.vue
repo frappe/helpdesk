@@ -297,26 +297,7 @@ const saveLanguageResource = createResource({
     };
   },
   onSuccess() {
-    toast.success(__("Language updated successfully."));
-    setTimeout(() => {
-      window.location.reload(true);
-    }, 500);
-  },
-});
-
-const saveTimezoneResource = createResource({
-  url: "frappe.client.set_value",
-  makeParams() {
-    return {
-      doctype: "User",
-      name: auth.userId,
-      fieldname: {
-        time_zone: timezone.value,
-      },
-    };
-  },
-  onSuccess() {
-    toast.success(__("Timezone updated successfully."));
+    toast.success(__("Language updated"));
     setTimeout(() => {
       window.location.reload(true);
     }, 500);
