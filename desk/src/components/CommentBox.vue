@@ -158,9 +158,7 @@ import { useConfigStore } from "@/stores/config";
 import { updateRes as updateComment } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { CommentActivity } from "@/types";
-import { ConfirmDelete } from "@/utils";
-import { useDevice } from "@/composables";
-import { useScreenSize } from "@/composables/screen";
+import { Editor } from "@tiptap/core";
 import {
   dateFormat,
   dateTooltipFormat,
@@ -210,18 +208,6 @@ const _content = ref(content);
 
 const emojiList = ["👍", "👎", "❤️", "🎉", "👀", "✅"];
 
-const dropdownOptions = computed(() => [
-  {
-    label: "Edit",
-    onClick: () => handleEditMode(),
-    icon: "edit-2",
-    condition: () => !isTicketMergedComment.value,
-  },
-  ...ConfirmDelete({
-    onConfirmDelete: () => deleteComment.submit(),
-    isConfirmingDelete,
-  }),
-]);
 // editor.commands.focus('end')
 
 const reactions = ref<
@@ -294,7 +280,6 @@ const commentBoxState = ref(content);
 
 function handleEditMode() {
   editable.value = true;
-  commentBoxState.value = _content.value;
   editorRef.value?.editor.chain().focus("end").run();
 }
 
