@@ -521,7 +521,16 @@ def handle_at_me_support(filters):
 
 
 @frappe.whitelist()
+<<<<<<< HEAD
 def remove_assignments(doctype, name, assignees, ignore_permissions=False):
+=======
+def remove_assignments(
+    doctype: str,
+    name: str | int,
+    assignees: list[str],
+    ignore_permissions: bool = False,
+):
+>>>>>>> edc3d29d (fix: type check for ticket doctype with int | str)
     assignees = frappe.parse_json(assignees)
 
     if not assignees:

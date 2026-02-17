@@ -33,8 +33,13 @@ def new(doc, attachments=[]):
 
 
 @frappe.whitelist()
+<<<<<<< HEAD
 def get_one(name, is_customer_portal=False):
     check_permissions("HD Ticket", None, doc=name)
+=======
+def get_one(name: str | int, is_customer_portal: bool = False):
+    frappe.has_permission("HD Ticket", "read", name, throw=True)
+>>>>>>> edc3d29d (fix: type check for ticket doctype with int | str)
     QBContact = frappe.qb.DocType("Contact")
     QBTicket = frappe.qb.DocType("HD Ticket")
 
@@ -558,7 +563,11 @@ def get_ticket_customizations():
 
 @frappe.whitelist()
 # TODO: make it bette, on mount fetch only once and cache it
+<<<<<<< HEAD
 def get_navigation_tickets(ticket: str, current_view: str = None):
+=======
+def get_navigation_tickets(ticket: str | int, current_view: str | None = None):
+>>>>>>> edc3d29d (fix: type check for ticket doctype with int | str)
     """
     Get a list of tickets to navigate
     """
@@ -647,7 +656,12 @@ def get_navigation_order_by(view):
 
 
 @frappe.whitelist()
+<<<<<<< HEAD
 def get_ticket_contact(ticket: str):
+=======
+def get_ticket_contact(ticket: str | int):
+    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
+>>>>>>> edc3d29d (fix: type check for ticket doctype with int | str)
     if not frappe.db.exists("HD Ticket", ticket):
         return None
     contact = frappe.db.get_value("HD Ticket", ticket, "contact")
@@ -670,7 +684,7 @@ def get_ticket_contact(ticket: str):
 
 
 @frappe.whitelist()
-def get_recent_similar_tickets(ticket: str):
+def get_recent_similar_tickets(ticket: str | int):
     if not frappe.db.exists("HD Ticket", ticket):
         return {"recent_tickets": [], "similar_tickets": []}
 
@@ -765,7 +779,12 @@ def get_similar_tickets(ticket: str):
 
 
 @frappe.whitelist()
+<<<<<<< HEAD
 def get_ticket_activities(ticket: str):
+=======
+def get_ticket_activities(ticket: str | int):
+    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
+>>>>>>> edc3d29d (fix: type check for ticket doctype with int | str)
     activities = {
         "comments": get_comments(ticket),
         "communications": get_communications(ticket),
@@ -777,6 +796,11 @@ def get_ticket_activities(ticket: str):
 
 
 @frappe.whitelist()
+<<<<<<< HEAD
 def get_ticket_assignees(ticket: str):
+=======
+def get_ticket_assignees(ticket: str | int):
+    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
+>>>>>>> edc3d29d (fix: type check for ticket doctype with int | str)
     assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
     return assignees
