@@ -201,6 +201,8 @@ class HDTicket(Document):
                 agents = self.get_assigned_agents()
                 if agents:
                     for agent in agents:
+                        if agent.name == frappe.session.user:
+                            continue
                         self.notify_agent(agent.name, "Reaction")
 
         self.remove_assignment_if_not_in_team()
