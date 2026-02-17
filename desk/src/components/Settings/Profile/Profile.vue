@@ -296,7 +296,9 @@ const saveLanguageResource = createResource({
   },
   onSuccess() {
     toast.success(__("Language updated"));
-    window.location.reload();
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 500);
   },
 });
 
