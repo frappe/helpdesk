@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-08 10:41+0000\n"
-"PO-Revision-Date: 2026-02-12 11:51\n"
+"POT-Creation-Date: 2026-02-15 10:41+0000\n"
+"PO-Revision-Date: 2026-02-17 13:44\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -680,8 +680,8 @@ msgstr "Среднее время, затраченное на первый от
 msgid "Avg. time taken to resolve a ticket"
 msgstr "Среднее время на решение заявки"
 
-#: desk/src/components/Settings/EmailAdd.vue:87
-#: desk/src/components/Settings/EmailEdit.vue:72
+#: desk/src/components/Settings/EmailAdd.vue:143
+#: desk/src/components/Settings/EmailEdit.vue:134
 msgid "Back"
 msgstr "Назад"
 
@@ -1132,7 +1132,7 @@ msgstr "Не удалось отправить подтверждающее пи
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Не удалось отправить email обратной связи из-за: {0}"
 
-#: desk/src/components/Settings/EmailAdd.vue:94
+#: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
 #: desk/src/components/layouts/Sidebar.vue:503
@@ -1529,6 +1529,11 @@ msgstr "Редактировать"
 msgid "Edit Call Log"
 msgstr "Редактировать журнал вызовов"
 
+#: desk/src/components/Settings/EmailAdd.vue:70
+#: desk/src/components/Settings/EmailEdit.vue:63
+msgid "Edit Domain"
+msgstr "Редактировать домен"
+
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
 msgstr "Редактировать Email"
@@ -1586,11 +1591,11 @@ msgstr "Email Id"
 msgid "Email Notifications"
 msgstr "Email-уведомления"
 
-#: desk/src/components/Settings/EmailAdd.vue:162
+#: desk/src/components/Settings/EmailAdd.vue:306
 msgid "Email account created"
 msgstr "Учетная запись электронной почты создана"
 
-#: desk/src/components/Settings/EmailEdit.vue:267
+#: desk/src/components/Settings/EmailEdit.vue:471
 msgid "Email account updated successfully"
 msgstr "Учетная запись Email успешно обновлена"
 
@@ -1604,7 +1609,7 @@ msgstr "Адрес электронной почты не должен быть 
 msgid "Emails"
 msgstr "Электронные письма"
 
-#: desk/src/components/Settings/EmailEdit.vue:224
+#: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
 msgstr "Письма успешно извлечены"
 
@@ -1747,7 +1752,7 @@ msgstr "Внешняя ссылка"
 msgid "Failed"
 msgstr "Не выполнено"
 
-#: desk/src/components/Settings/EmailAdd.vue:167
+#: desk/src/components/Settings/EmailAdd.vue:311
 msgid "Failed to create email account, Invalid credentials"
 msgstr "Не удалось создать учетную запись email, неверные учетные данные"
 
@@ -1755,7 +1760,7 @@ msgstr "Не удалось создать учетную запись email, н
 msgid "Failed to load telephony agent"
 msgstr "Не удалось загрузить агент телефонии"
 
-#: desk/src/components/Settings/EmailEdit.vue:229
+#: desk/src/components/Settings/EmailEdit.vue:422
 msgid "Failed to pull emails"
 msgstr "Не удалось извлечь электронные письма"
 
@@ -1767,7 +1772,7 @@ msgstr "Не удалось сохранить настройки Exotel"
 msgid "Failed to save Twilio settings"
 msgstr "Не удалось сохранить настройки Twilio"
 
-#: desk/src/components/Settings/EmailEdit.vue:272
+#: desk/src/components/Settings/EmailEdit.vue:476
 msgid "Failed to update email account, Invalid credentials"
 msgstr "Не удалось обновить учетную запись email, неверные учетные данные"
 
@@ -2978,7 +2983,7 @@ msgstr "Нет исполнителей"
 msgid "No assignment rule found"
 msgstr "Правило назначения не найдено"
 
-#: desk/src/components/Settings/EmailEdit.vue:184
+#: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
 msgstr "Никаких изменений не было сделано"
 
@@ -3087,6 +3092,10 @@ msgstr "Открыть поле для комментариев"
 #: desk/src/components/modals/ShortcutsModal.vue:84
 msgid "Open help"
 msgstr "Открыть справку"
+
+#: desk/src/components/Settings/EmailEdit.vue:37
+msgid "Open in Desk"
+msgstr "Открыть в Desk"
 
 #: desk/src/components/modals/ShortcutsModal.vue:102
 msgid "Open reply box"
@@ -3440,11 +3449,11 @@ msgstr "Опубликовано"
 msgid "Published articles must have content."
 msgstr "Опубликованные статьи должны иметь содержание."
 
-#: desk/src/components/Settings/EmailEdit.vue:87
+#: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
 msgstr "Получить письма"
 
-#: desk/src/components/Settings/EmailEdit.vue:214
+#: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
 msgstr "Извлечение писем может занять несколько минут."
 
@@ -4059,6 +4068,10 @@ msgstr "Соглашения об уровне обслуживания (SLA)"
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
 msgstr "Название уровня обслуживания"
+
+#: helpdesk/api/settings/email.py:14
+msgid "Service not supported"
+msgstr "Сервис не поддерживается"
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:5
 #: desk/src/components/ticket/SetContactPhoneModal.vue:8
@@ -4803,7 +4816,7 @@ msgstr "На сегодняшний день"
 msgid "To is required"
 msgstr "Требуется"
 
-#: desk/src/components/Settings/EmailEdit.vue:147
+#: desk/src/components/Settings/EmailEdit.vue:268
 msgid "To know more about setting up email accounts, click"
 msgstr "Чтобы узнать больше о настройке учетных записей email, нажмите"
 
@@ -4937,7 +4950,7 @@ msgstr "Без названия"
 msgid "Update"
 msgstr "Обновить"
 
-#: desk/src/components/Settings/EmailEdit.vue:80
+#: desk/src/components/Settings/EmailEdit.vue:142
 msgid "Update Account"
 msgstr "Обновить учетную запись"
 
