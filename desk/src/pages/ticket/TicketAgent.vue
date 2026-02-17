@@ -200,7 +200,7 @@ usePageMeta(() => {
   }
 
   return {
-    title: props.ticketId + " - " + (ticket.value?.doc?.subject ?? ""),
+    title: props.ticketId + " - " + ticketComposable.value.ticket.doc.subject,
   };
 });
 </script>
