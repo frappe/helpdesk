@@ -109,22 +109,23 @@ class HDServiceHolidayList(Document):
 
 
 @frappe.whitelist()
-def get_events(start, end, filters=None):
+def get_events(start: str, end: str, filters: str | None = None):
     """Returns events for Gantt / Calendar view rendering.
 
     :param start: Start date-time.
     :param end: End date-time.
     :param filters: Filters (JSON).
     """
+    _filters = []
     if filters:
-        filters = json.loads(filters)
+        _filters = json.loads(filters)
     else:
-        filters = []
+        _filters = []
 
     if start:
-        filters.append(["HD Holiday", "holiday_date", ">", getdate(start)])
+        _filters.append(["HD Holiday", "holiday_date", ">", getdate(start)])
     if end:
-        filters.append(["HD Holiday", "holiday_date", "<", getdate(end)])
+        _filters.append(["HD Holiday", "holiday_date", "<", getdate(end)])
 
     return frappe.get_list(
         "HD Service Holiday List",
@@ -134,7 +135,7 @@ def get_events(start, end, filters=None):
             "`tabHD Holiday`.description",
             "`tabHD Service Holiday List`.color",
         ],
-        filters=filters,
+        filters=_filters,
         update={"allDay": 1},
     )
 
