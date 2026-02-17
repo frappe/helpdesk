@@ -91,7 +91,6 @@ function openContact(id: string): void {
 
 function handleContactUpdated(): void {
   toast.success("Contact updated");
-  isContactDialogVisible.value = !isContactDialogVisible.value;
   listViewRef.value?.reload();
 }
 usePageMeta(() => {

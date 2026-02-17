@@ -78,25 +78,10 @@
     </div>
     <div
       v-else
-      class="h-full flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
+      class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
     >
       <component :is="emptyTextIcon" class="h-10 w-10" />
       <span>{{ emptyText }}</span>
-      <Button
-        v-if="title == 'Emails'"
-        label="New Email"
-        @click="communicationAreaRef?.toggleEmailBox() ?? toggleEmailBox()"
-      />
-      <Button
-        v-else-if="title == 'Comments'"
-        label="New Comment"
-        @click="communicationAreaRef?.toggleCommentBox() ?? toggleCommentBox()"
-      />
-      <Button
-        v-else-if="title == 'Calls'"
-        label="Make a Call"
-        @click="makeCall()"
-      />
     </div>
   </FadedScrollableDiv>
 </template>
