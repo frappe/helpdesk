@@ -114,11 +114,11 @@
               <div class="space-y-1">
                 <p class="text-ink-gray-6">
                   {{
-                    __("{0} matches ({1}s)", [
-                      searchResponse.summary.filtered_matches,
-                      searchResponse.summary.duration,
-                    ])
+                    __("{0} matches", [searchResponse.summary.filtered_matches])
                   }}
+                  <span>
+                    {{ __("({0}s)", [searchResponse.summary.duration]) }}
+                  </span>
                   <span v-if="hasActiveFilters()">
                     •
                     {{
@@ -171,7 +171,7 @@
                 <div class="flex items-center">
                   <div
                     v-if="item.title"
-                    class="text-base font-medium"
+                    class="text-base font-medium truncate max-w-[60%]"
                     v-html="item.title"
                   />
                   <div class="text-base font-medium" v-else>
@@ -211,6 +211,7 @@
 import { LayoutHeader } from "@/components";
 import SearchMultiSelect from "@/components/SearchMultiSelect.vue";
 import { useShortcut } from "@/composables/shortcuts";
+import { __ } from "@/translation";
 import dayjs from "dayjs";
 import {
   Breadcrumbs,
@@ -221,7 +222,6 @@ import {
 } from "frappe-ui";
 import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { __ } from "@/translation";
 // Icons
 
 // Type Definitions
