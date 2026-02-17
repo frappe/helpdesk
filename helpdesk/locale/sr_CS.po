@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-08 10:41+0000\n"
-"PO-Revision-Date: 2026-02-12 11:51\n"
+"POT-Creation-Date: 2026-02-15 10:41+0000\n"
+"PO-Revision-Date: 2026-02-17 13:44\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Latin)\n"
 "MIME-Version: 1.0\n"
@@ -680,8 +680,8 @@ msgstr "Prosečno vreme potrebno za prvi odgovor na tiket"
 msgid "Avg. time taken to resolve a ticket"
 msgstr "Prosečno vreme potrebno za rešavanje tiketa"
 
-#: desk/src/components/Settings/EmailAdd.vue:87
-#: desk/src/components/Settings/EmailEdit.vue:72
+#: desk/src/components/Settings/EmailAdd.vue:143
+#: desk/src/components/Settings/EmailEdit.vue:134
 msgid "Back"
 msgstr "Nazad"
 
@@ -1132,7 +1132,7 @@ msgstr "Nije moguće poslati imejl potvrdu prijema zbog: {0}"
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Neuspešno slanje imejla sa povratnom informacijom zbog: {0}"
 
-#: desk/src/components/Settings/EmailAdd.vue:94
+#: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
 #: desk/src/components/layouts/Sidebar.vue:503
@@ -1529,6 +1529,11 @@ msgstr "Uredi"
 msgid "Edit Call Log"
 msgstr "Uredi evidenciju poziva"
 
+#: desk/src/components/Settings/EmailAdd.vue:70
+#: desk/src/components/Settings/EmailEdit.vue:63
+msgid "Edit Domain"
+msgstr ""
+
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
 msgstr "Uredi imejl"
@@ -1586,11 +1591,11 @@ msgstr "Imejl ID"
 msgid "Email Notifications"
 msgstr "Imejl obaveštenja"
 
-#: desk/src/components/Settings/EmailAdd.vue:162
+#: desk/src/components/Settings/EmailAdd.vue:306
 msgid "Email account created"
 msgstr "Imejl nalog je kreiran"
 
-#: desk/src/components/Settings/EmailEdit.vue:267
+#: desk/src/components/Settings/EmailEdit.vue:471
 msgid "Email account updated successfully"
 msgstr "Imejl nalog je uspešno ažuriran"
 
@@ -1604,7 +1609,7 @@ msgstr "Imejl ne sme biti prazan"
 msgid "Emails"
 msgstr "Imejlovi"
 
-#: desk/src/components/Settings/EmailEdit.vue:224
+#: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
 msgstr "Imejlovi su uspešno preuzeti"
 
@@ -1747,7 +1752,7 @@ msgstr "Spoljašnji link"
 msgid "Failed"
 msgstr "Neuspešno"
 
-#: desk/src/components/Settings/EmailAdd.vue:167
+#: desk/src/components/Settings/EmailAdd.vue:311
 msgid "Failed to create email account, Invalid credentials"
 msgstr "Neuspešno kreiranje imejl naloga, nevažeći kredencijali"
 
@@ -1755,7 +1760,7 @@ msgstr "Neuspešno kreiranje imejl naloga, nevažeći kredencijali"
 msgid "Failed to load telephony agent"
 msgstr "Neuspešno učitavanje agenta telefonije"
 
-#: desk/src/components/Settings/EmailEdit.vue:229
+#: desk/src/components/Settings/EmailEdit.vue:422
 msgid "Failed to pull emails"
 msgstr "Neuspešno preuzimanje imejlova"
 
@@ -1767,7 +1772,7 @@ msgstr "Neuspešno čuvanje Exotel podešavanja"
 msgid "Failed to save Twilio settings"
 msgstr "Neuspešno čuvanje Twilio podešavanja"
 
-#: desk/src/components/Settings/EmailEdit.vue:272
+#: desk/src/components/Settings/EmailEdit.vue:476
 msgid "Failed to update email account, Invalid credentials"
 msgstr "Neuspešno ažuriranje imejl naloga, nevažeći kredencijali"
 
@@ -2978,7 +2983,7 @@ msgstr "Nema izvršilaca"
 msgid "No assignment rule found"
 msgstr "Nije pronađeno pravilo dodele"
 
-#: desk/src/components/Settings/EmailEdit.vue:184
+#: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
 msgstr "Nije izvršena nijedna promena"
 
@@ -3087,6 +3092,10 @@ msgstr "Otvori polje za komentar"
 #: desk/src/components/modals/ShortcutsModal.vue:84
 msgid "Open help"
 msgstr "Otvori pomoć"
+
+#: desk/src/components/Settings/EmailEdit.vue:37
+msgid "Open in Desk"
+msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:102
 msgid "Open reply box"
@@ -3440,11 +3449,11 @@ msgstr "Objavljeno na"
 msgid "Published articles must have content."
 msgstr "Objavljeni članci moraju imati sadržaj."
 
-#: desk/src/components/Settings/EmailEdit.vue:87
+#: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
 msgstr "Povuci imejlove"
 
-#: desk/src/components/Settings/EmailEdit.vue:214
+#: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
 msgstr "Preuzimanje imejlova, ovo može potrajati nekoliko minuta."
 
@@ -4059,6 +4068,10 @@ msgstr "Sporazumi o nivou usluge"
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
 msgstr "Naziv nivoa usluge"
+
+#: helpdesk/api/settings/email.py:14
+msgid "Service not supported"
+msgstr ""
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:5
 #: desk/src/components/ticket/SetContactPhoneModal.vue:8
@@ -4802,7 +4815,7 @@ msgstr "Datum završetka"
 msgid "To is required"
 msgstr "Polje \"Ka\" je obavezno"
 
-#: desk/src/components/Settings/EmailEdit.vue:147
+#: desk/src/components/Settings/EmailEdit.vue:268
 msgid "To know more about setting up email accounts, click"
 msgstr "Da biste saznali više o podešavanju imejl naloga, kliknite"
 
@@ -4936,7 +4949,7 @@ msgstr "Bez naslova"
 msgid "Update"
 msgstr "Ažuriraj"
 
-#: desk/src/components/Settings/EmailEdit.vue:80
+#: desk/src/components/Settings/EmailEdit.vue:142
 msgid "Update Account"
 msgstr "Ažuriraj nalog"
 
