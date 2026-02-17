@@ -95,7 +95,7 @@ def get_synonym_words() -> list[str]:
 
 
 class Search:
-    unsafe_chars = re.compile(r"[\[\]{}<>+!-]")
+    unsafe_chars = re.compile(r"[\[\]{}<>+!,=-]")
 
     def __init__(self, index_name, prefix, schema) -> None:
         self.redis = frappe.cache()
