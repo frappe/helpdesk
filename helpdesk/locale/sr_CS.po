@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-15 10:41+0000\n"
-"PO-Revision-Date: 2026-02-17 13:44\n"
+"PO-Revision-Date: 2026-02-18 14:57\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Latin)\n"
 "MIME-Version: 1.0\n"
@@ -1532,7 +1532,7 @@ msgstr "Uredi evidenciju poziva"
 #: desk/src/components/Settings/EmailAdd.vue:70
 #: desk/src/components/Settings/EmailEdit.vue:63
 msgid "Edit Domain"
-msgstr ""
+msgstr "Uredi domen"
 
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
@@ -3095,7 +3095,7 @@ msgstr "Otvori pomoć"
 
 #: desk/src/components/Settings/EmailEdit.vue:37
 msgid "Open in Desk"
-msgstr ""
+msgstr "Otvori u radnoj površini"
 
 #: desk/src/components/modals/ShortcutsModal.vue:102
 msgid "Open reply box"
@@ -4071,7 +4071,7 @@ msgstr "Naziv nivoa usluge"
 
 #: helpdesk/api/settings/email.py:14
 msgid "Service not supported"
-msgstr ""
+msgstr "Usluga nije podržana"
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:5
 #: desk/src/components/ticket/SetContactPhoneModal.vue:8
