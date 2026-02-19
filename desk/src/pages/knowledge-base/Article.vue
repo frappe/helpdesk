@@ -2,8 +2,14 @@
   <div>
     <LayoutHeader>
       <template #left-header>
-        <div class="flex gap-1 items-center crumbs truncate">
-          <Breadcrumbs :items="breadcrumbs" class="-ml-0.5" />
+        <div class="flex gap-2 items-center crumbs">
+          <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
+          <Badge
+            variant="subtle"
+            :theme="article.data?.status === 'Draft' ? 'orange' : 'green'"
+            size="md"
+            >{{ article.data?.status }}</Badge
+          >
         </div>
       </template>
       <template #right-header v-if="!isCustomerPortal">
@@ -62,6 +68,7 @@
             </Dropdown>
             <div class="flex gap-2" v-if="editable">
               <DiscardButton
+                :disabled="!isDirty"
                 :hide-dialog="!isDirty"
                 :title="__('Discard changes?')"
                 :message="__('Are you sure you want to discard changes?')"
@@ -83,6 +90,16 @@
             autofocus
             :disabled="!editable"
           />
+          <div class="flex gap-2 text-sm text-gray-500 items-center">
+            <span>{{ articleStats.data?.views || 0 }} views</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              :label="articleStats.data?.likes || 0"
+              iconLeft="heart"
+              @click="handleLike"
+            />
+          </div>
         </div>
         <!-- Article Content -->
         <TextEditor
@@ -108,7 +125,11 @@
         <ArticleFeedback :feedback="feedback" :article-id="articleId" />
       </div>
     </div>
-    <MoveToCategoryModal v-model="moveToModal" @move="handleMoveToCategory" />
+    <MoveToCategoryModal
+      v-model="moveToModal"
+      @move="handleMoveToCategory"
+      :exclude-category="article.data?.category_id"
+    />
   </div>
 </template>
 
@@ -125,6 +146,7 @@ import {
   incrementView,
   moveToCategory,
   updateRes as updateArticle,
+  likeArticle,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { PreserveIds } from "@/tiptap-extensions";
@@ -144,8 +166,9 @@ import {
   TextEditor,
   TextEditorFixedMenu,
   toast,
+  Badge,
 } from "frappe-ui";
-import { computed, h, onMounted, ref, watch } from "vue";
+import { computed, h, onMounted, ref, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
@@ -165,7 +188,8 @@ const authStore = useAuthStore();
 
 const editorRef = ref(null);
 const editable = ref(route.query.isEdit ?? false);
-
+const likes = ref("");
+const views = ref("");
 const content = ref("");
 const title = ref("");
 const feedback = ref<FeedbackAction>();
@@ -212,6 +236,16 @@ const article: Resource<Article> = createResource({
   },
 });
 
+const articleStats = createResource({
+  url: "helpdesk.api.article.get_article_stats",
+  params: { article_name: props.articleId },
+  onSuccess(data) {
+    likes.value = data.likes;
+    views.value = data.views;
+  },
+  auto: true,
+});
+
 function incrementArticleViews(articleId: string) {
   incrementView.submit(
     {
@@ -222,6 +256,18 @@ function incrementArticleViews(articleId: string) {
         if (err.exc_type === "RateLimitExceededError") {
           return;
         }
+      },
+    }
+  );
+}
+
+function handleLike() {
+  likeArticle.submit(
+    { article: props.articleId },
+    {
+      onSuccess: () => {
+        if (articleStats.reload) articleStats.reload();
+        toast.success(__("Thanks for your feedback."));
       },
     }
   );
@@ -238,6 +284,9 @@ const toggleStatus = debounce(() => {
     },
     {
       onSuccess: () => {
+        if (status === "Published")
+          toast.success("Article published successfully.");
+        else toast.success("Article unpublished successfully.");
         article.reload();
       },
     }
@@ -257,7 +306,7 @@ function handleMoveToCategory(category: string) {
       onSuccess: () => {
         article.reload();
         moveToModal.value = false;
-        toast.success(__("Article moved"));
+        toast.success(__(`Article has been successfully moved.`));
       },
       onError: (error: Error) => {
         let msg = error?.messages?.[0] || error.message;
@@ -270,7 +319,7 @@ function handleMoveToCategory(category: string) {
 
 function handleEditMode() {
   editable.value = true;
-  editorRef.value.editor.chain().focus("start");
+  editorRef.value.editor.chain().focus("end").run();
 }
 
 function handleDiscard() {
@@ -278,6 +327,11 @@ function handleDiscard() {
   isDirty.value = false;
   title.value = article.data.title;
   content.value = article.data.content;
+  const original = addLinksToHeadings(article.data.content);
+  textEditorContentWithIDs.value = null;
+  nextTick(() => {
+    textEditorContentWithIDs.value = original;
+  });
 }
 
 function handleSave() {
@@ -340,9 +394,15 @@ function handleDelete() {
     ],
   });
 }
-
-const textEditorContentWithIDs = computed(() =>
-  article.data?.content ? addLinksToHeadings(article.data?.content) : null
+const textEditorContentWithIDs = ref(null);
+watch(
+  () => article.data?.content,
+  (newContent) => {
+    if (newContent) {
+      textEditorContentWithIDs.value = addLinksToHeadings(newContent);
+    }
+  },
+  { immediate: true }
 );
 
 function addLinksToHeadings(content: string) {

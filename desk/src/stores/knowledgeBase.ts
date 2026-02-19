@@ -121,3 +121,17 @@ export const incrementView = createResource({
     article,
   }),
 });
+
+// like (create a Comment of type 'Like')
+export const likeArticle = createResource({
+  url: "frappe.client.insert",
+  makeParams: ({ article }) => ({
+    doc: {
+      doctype: "Comment",
+      reference_doctype: "HD Article",
+      reference_name: article,
+      comment_type: "Like",
+      content: "",
+    },
+  }),
+});

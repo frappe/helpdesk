@@ -56,7 +56,7 @@
           v-if="!view.hideLabel && !isExpanded && view.views?.length"
           class="mx-2 my-2 h-1 border-b"
         /> -->
-        <div class="border-t mx-2 my-1.5"></div>
+        <div class="mx-2 my-1.5"></div>
         <Section
           :label="view.label"
           :hideLabel="view.hideLabel"

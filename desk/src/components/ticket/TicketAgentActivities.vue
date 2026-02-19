@@ -8,7 +8,7 @@
       <div
         v-for="(activity, i) in activities"
         :key="activity.key"
-        class="activity"
+        class="activity mt-2"
       >
         <!-- single activity -->
         <div
@@ -20,7 +20,7 @@
           >
             <div
               class="z-1 flex h-7 w-7 items-center justify-center rounded-full bg-white"
-              :class="[['email', 'feedback'].includes(activity.type) && 'mt-2']"
+              :class="[['email', 'feedback'].includes(activity.type) && 'mt-3']"
             >
               <Avatar
                 v-if="activity.type === 'email' || activity.type === 'feedback'"
