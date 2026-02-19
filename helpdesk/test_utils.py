@@ -138,6 +138,44 @@ def make_ticket(
     return ticket
 
 
+def create_agent(
+    email: str, first_name: str | None = None, last_name: str | None = None
+):
+    """
+    Creates a test agent user with the Agent role.
+    """
+    if not frappe.db.exists("User", email):
+        user = frappe.get_doc(
+            {
+                "doctype": "User",
+                "email": email,
+                "first_name": first_name or email.split("@")[0],
+                "last_name": last_name or "Agent",
+                "send_welcome_email": 0,
+            }
+        )
+        user.insert(ignore_permissions=True)
+    else:
+        user = frappe.get_doc("User", email)
+
+    if "Agent" not in frappe.get_roles(email):
+        user.add_roles("Agent")
+
+    agent_name = f"{user.first_name} {user.last_name or ''}".strip()
+    existing_agent = frappe.db.exists("HD Agent", {"user": email})
+    if not existing_agent:
+        frappe.get_doc(
+            {
+                "doctype": "HD Agent",
+                "user": email,
+                "agent_name": agent_name or email,
+                "is_active": 1,
+            }
+        ).insert(ignore_permissions=True)
+
+    return user
+
+
 def get_current_week_monday(hours: int = 11):
     """
     Returns the current week's Monday date

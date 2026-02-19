@@ -79,7 +79,7 @@ const getResponsePreview = (ticketId: string) => {
   dialogModel.value.preview = null;
   getResponsePreviewResource.submit({
     ticket_id: ticketId,
-    saved_reply: dialogModel.value.savedReply,
+    saved_reply_id: dialogModel.value.savedReply,
   });
 };
 

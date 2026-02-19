@@ -58,7 +58,7 @@
         <FormControl
           :label="__('New Assignment Rule Name')"
           type="text"
-          v-model="duplicateDialog.name"
+          v-model="duplicateDialog.newName"
         />
       </div>
     </template>
@@ -79,6 +79,7 @@
 import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
 import { __ } from "@/translation";
 import { AssignmentRuleListResourceSymbol } from "@/types";
+import { AssignmentRule } from "@/types/doctypes";
 import { ConfirmDelete } from "@/utils";
 import {
   Button,
@@ -86,7 +87,6 @@ import {
   Dialog,
   Dropdown,
   FormControl,
-  Select,
   Switch,
   toast,
 } from "frappe-ui";
@@ -111,6 +111,7 @@ const priorityOptions = [
 
 const duplicateDialog = ref({
   show: false,
+  newName: "",
   name: "",
 });
 
@@ -124,7 +125,7 @@ const deleteAssignmentRule = () => {
       name: props.data.name,
     },
     onSuccess: () => {
-      assignmentRulesListData.reload();
+      assignmentRulesListData?.reload();
       isConfirmingDelete.value = false;
       toast.success(__("Assignment rule deleted"));
     },
@@ -138,7 +139,8 @@ const dropdownOptions = [
     onClick: () => {
       duplicateDialog.value = {
         show: true,
-        name: props.data.name + " (Copy)",
+        newName: props.data.name + " (Copy)",
+        name: props.data.name,
       };
     },
     icon: "copy",
@@ -151,22 +153,37 @@ const dropdownOptions = [
 
 const duplicate = () => {
   createResource({
-    url: "helpdesk.api.assignment_rule.duplicate_assignment_rule",
+    url: "frappe.client.get",
     params: {
-      docname: props.data.name,
-      new_name: duplicateDialog.value.name,
+      doctype: "Assignment Rule",
+      name: duplicateDialog.value.name,
     },
-    onSuccess: (data) => {
-      assignmentRulesListData.reload();
-      toast.success(__("Assignment rule duplicated"));
-      duplicateDialog.value.show = false;
-      duplicateDialog.value.name = "";
-      assignmentRulesActiveScreen.value = {
-        screen: "view",
-        data: {
-          name: data.name,
+    onSuccess: (data: AssignmentRule) => {
+      createResource({
+        url: "frappe.client.insert",
+        params: {
+          doc: {
+            ...data,
+            name: duplicateDialog.value.newName,
+          },
         },
-      };
+        auto: true,
+        onSuccess(newAssignmentRuleData: AssignmentRule) {
+          assignmentRulesListData?.reload();
+          toast.success(__("Assignment rule duplicated"));
+          duplicateDialog.value = {
+            show: false,
+            newName: "",
+            name: "",
+          };
+          setTimeout(() => {
+            assignmentRulesActiveScreen.value = {
+              screen: "view",
+              data: newAssignmentRuleData,
+            };
+          }, 250);
+        },
+      });
     },
     auto: true,
   });
@@ -184,7 +201,11 @@ const onToggle = () => {
   setAssignmentRuleValue("disabled", !props.data.disabled, "status");
 };
 
-const setAssignmentRuleValue = (key, value, fieldName = undefined) => {
+const setAssignmentRuleValue = (
+  key: string,
+  value: any,
+  fieldName?: string
+) => {
   createResource({
     url: "frappe.client.set_value",
     params: {
@@ -194,7 +215,7 @@ const setAssignmentRuleValue = (key, value, fieldName = undefined) => {
       value: value,
     },
     onSuccess: () => {
-      assignmentRulesListData.reload();
+      assignmentRulesListData?.reload();
       toast.success(__("Assignment rule {0} updated", fieldName || key));
     },
     auto: true,

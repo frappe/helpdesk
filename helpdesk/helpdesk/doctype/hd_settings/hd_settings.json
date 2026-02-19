@@ -25,6 +25,8 @@
   "feedback_section",
   "is_feedback_mandatory",
   "column_break_kegb",
+  "comments_section",
+  "enable_comment_reactions",
   "ticket_restrictions_section",
   "allow_anyone_to_create_tickets",
   "auto_update_status",
@@ -33,6 +35,10 @@
   "auto_close_tickets",
   "auto_close_status",
   "auto_close_after_days",
+  "section_break_ylvs",
+  "enable_outside_hours_banner",
+  "outside_working_hours_message",
+  "column_break_fzef",
   "status_section",
   "default_ticket_status",
   "column_break_yfbu",
@@ -310,6 +316,18 @@
    "fieldtype": "Column Break"
   },
   {
+   "fieldname": "comments_section",
+   "fieldtype": "Section Break",
+   "label": "Comments"
+  },
+  {
+   "default": "0",
+   "description": "Allow users to react to comments with emojis",
+   "fieldname": "enable_comment_reactions",
+   "fieldtype": "Check",
+   "label": "Enable comment reactions"
+  },
+  {
    "depends_on": "eval:doc.enable_email_ticket_feedback",
    "fieldname": "send_email_feedback_on_status",
    "fieldtype": "Link",
@@ -462,6 +480,30 @@
    "fieldname": "disable_saved_replies_global_scope",
    "fieldtype": "Check",
    "label": "Disable saved replies with scope 'Global'"
+     },
+  {
+   "fieldname": "section_break_ylvs",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_fzef",
+   "fieldtype": "Column Break"
+  },
+{
+   "default": "Thanks for reaching out \ud83d\udc4b. This ticket was created outside our working hours. You can expect the next response by {{ next_working_day }}.",
+   "depends_on": "enable_outside_hours_banner",
+   "fieldname": "outside_working_hours_message",
+   "fieldtype": "Small Text",
+   "label": "Custom Outside Working Hours Message",
+   "mandatory_depends_on": "eval: doc.enable_outside_hours_banner",
+   "placeholder": "Add your Custom Message here"
+  },
+  {
+   "default": "0",
+   "description": "Let customers know they're raising a ticket outside working hours, and when they can expect a reply.",
+   "fieldname": "enable_outside_hours_banner",
+   "fieldtype": "Check",
+   "label": "Apply outside working hours"
   }
  ],
  "grid_page_length": 50,

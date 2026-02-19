@@ -81,7 +81,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-16 15:45:27.146697",
+ "modified": "2026-02-02 17:13:38.683167",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Form Script",
@@ -114,13 +114,8 @@
    "write": 1
   },
   {
-   "email": 1,
-   "export": 1,
-   "print": 1,
    "read": 1,
-   "report": 1,
-   "role": "All",
-   "share": 1
+   "role": "All"
   }
  ],
  "row_format": "Dynamic",
