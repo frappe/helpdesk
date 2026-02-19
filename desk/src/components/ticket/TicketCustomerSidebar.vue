@@ -210,10 +210,24 @@ const ticketAdditionalInfo = computed(() => {
         !field.hide_from_customer &&
         ["subject", "team", "priority"].indexOf(field.fieldname) === -1
     )
-    .map((field: Field) => ({
-      label: field.label,
-      value: ticket.data[field.fieldname],
-    }));
+    .map((field: Field) => {
+      const option = {
+        label: field.label,
+        value: ticket.data[field.fieldname],
+      };
+      if (field.fieldtype === "Date") {
+        option.value = dayjs(option.value).format(
+          window.date_format.toUpperCase()
+        );
+      }
+      if (field.fieldtype === "Datetime") {
+        // window.time_format
+        option.value = dayjs(option.value).format(
+          `${window.date_format.toUpperCase()} ${window.time_format}`
+        );
+      }
+      return option;
+    });
 
   return [...fields, ...custom_fields];
 });

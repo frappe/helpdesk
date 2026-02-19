@@ -11,5 +11,5 @@ def execute():
     if not frappe.db.exists("DocType", old):
         return
 
-    frappe.rename_doc("DocType", old, new)
+    frappe.rename_doc("DocType", old, new, ignore_if_exists=True)
     print("Migrated", old, "to", new)

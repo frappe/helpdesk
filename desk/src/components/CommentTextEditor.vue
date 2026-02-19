@@ -12,7 +12,7 @@
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
-    :mentions="agents"
+    :mentions="dropdown"
     @change="editable ? (newComment = $event) : null"
     :extensions="[PreserveVideoControls]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
@@ -122,21 +122,11 @@ import {
   uploadFunction,
 } from "@/utils";
 import { useStorage } from "@vueuse/core";
+import { storeToRefs } from "pinia";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { agents: agentsList } = useAgentStore();
+const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());
 const { isManager } = useAuthStore();
-
-onMounted(() => {
-  if (
-    agentsList.loading ||
-    agentsList.data?.length ||
-    agentsList.list.promise
-  ) {
-    return;
-  }
-  agentsList.fetch();
-});
 
 const props = defineProps({
   ticketId: {
@@ -189,15 +179,6 @@ const label = computed(() => {
   return loading.value ? "Sending..." : props.label;
 });
 
-const agents = computed(() => {
-  return (
-    agentsList.data?.map((agent) => ({
-      label: agent.agent_name.trimEnd(),
-      value: agent.name,
-    })) || []
-  );
-});
-
 function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
   removeAttachmentFromServer(attachment.name);
@@ -237,6 +218,17 @@ async function submitComment() {
 
 const editorRef = ref(null);
 const editor = computed(() => editorRef.value?.editor);
+
+onMounted(() => {
+  if (
+    agentsList.value.loading ||
+    agentsList.value.data?.length ||
+    agentsList.value.list.promise
+  ) {
+    return;
+  }
+  agentsList.value.fetch();
+});
 
 defineExpose({
   submitComment,

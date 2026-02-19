@@ -16,14 +16,16 @@
    "fieldname": "user",
    "fieldtype": "Link",
    "label": "User",
-   "options": "User"
+   "options": "User",
+   "reqd": 1
   },
   {
    "fieldname": "agent_name",
    "fieldtype": "Data",
    "in_global_search": 1,
    "in_standard_filter": 1,
-   "label": "Agent Name"
+   "label": "Agent Name",
+   "reqd": 1
   },
   {
    "default": "1",
@@ -40,7 +42,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-15 20:46:39.229016",
+ "modified": "2026-01-19 23:22:29.075052",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",

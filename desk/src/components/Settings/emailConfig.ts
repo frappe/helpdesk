@@ -1,11 +1,11 @@
+import LogoFrappeMail from "@/assets/images/frappe-mail.svg";
 import LogoGmail from "@/assets/images/gmail.png";
 import LogoOutlook from "@/assets/images/outlook.png";
 import LogoSendgrid from "@/assets/images/sendgrid.png";
 import LogoSparkpost from "@/assets/images/sparkpost.webp";
 import LogoYahoo from "@/assets/images/yahoo.png";
 import LogoYandex from "@/assets/images/yandex.png";
-import LogoFrappeMail from "@/assets/images/frappe-mail.svg";
-import { RenderField, EmailService, EmailAccount } from "@/types";
+import { EmailAccount, EmailService, RenderField } from "@/types";
 import { validateEmailWithZod } from "@/utils";
 const fixedFields: RenderField[] = [
   {
@@ -41,7 +41,7 @@ export const incomingOutgoingFields: RenderField[] = [
     name: "default_incoming",
     type: "checkbox",
     description:
-      "If enabled, all replies to your company (eg: replies@yourcomany.com) will come to this account. Note: Only one account can be default incoming.",
+      "If enabled, all replies to your company (eg: replies@yourcompany.com) will come to this account. Note: Only one account can be default incoming.",
   },
   {
     label: "Default Outgoing",

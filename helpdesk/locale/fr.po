@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2025-12-09 21:36\n"
+"PO-Revision-Date: 2026-01-21 11:39\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -78,7 +78,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "API"
-msgstr "API"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:338
 msgid "Access all team tickets"
@@ -124,7 +124,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
-msgstr ""
+msgstr "Ajouter un cessionnaire"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:179
 msgid "Add Holiday"
@@ -138,7 +138,7 @@ msgstr "Ajouter des vacances hebdomadaires"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
-msgstr ""
+msgstr "Ajoutez une condition"
 
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
 msgid "Add a custom condition"
@@ -148,7 +148,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:66
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
 msgid "Add condition"
-msgstr ""
+msgstr "Ajouter condition"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:72
 msgid "Add condition group"
@@ -312,7 +312,7 @@ msgstr "Appliquer l'accord de niveau de service (SLA) pour le délai de résolut
 #. Label of the apply_to (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply To"
-msgstr "Appliquer à"
+msgstr ""
 
 #. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -411,7 +411,7 @@ msgstr "Règle d&#39;assignation"
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:5
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Assignment Rules"
-msgstr "Règles d&#39;attribution"
+msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:11
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
@@ -419,11 +419,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:291
 msgid "Assignment Schedule"
-msgstr ""
+msgstr "Règle d’Affectation"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:137
 msgid "Assignment condition"
-msgstr ""
+msgstr "Conditions d'affectation"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:81
 msgid "Assignment conditions"
@@ -474,12 +474,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Attachment"
-msgstr "Pièce jointe"
+msgstr ""
 
 #. Label of the author (Link) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Author"
-msgstr "Auteur"
+msgstr ""
 
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:53
@@ -567,7 +567,7 @@ msgstr ""
 #. Label of the base_url (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Base URL"
-msgstr "URL de base"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:9
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:9
@@ -609,7 +609,7 @@ msgstr ""
 #. Label of the button_section (Section Break) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Button"
-msgstr "Bouton"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogDetailModal.vue:8
 msgid "Call Details"
@@ -674,7 +674,7 @@ msgstr ""
 #: desk/src/components/Settings/Profile/Profile.vue:123
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:2
 msgid "Change Password"
-msgstr "Changez le Mot de Passe"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:33
 msgid "Change image"
@@ -771,7 +771,7 @@ msgstr "Couleur"
 #. Label of the columns (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Columns"
-msgstr "Colonnes"
+msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:15
 msgid "Comma separated emails to invite"
@@ -851,7 +851,7 @@ msgstr "Contenu"
 #. Label of the content_type (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Content Type"
-msgstr "Type de Contenu"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:622
 msgid "Could not an email due to: {0}"
@@ -1769,7 +1769,7 @@ msgstr ""
 #. Label of the ip_address (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "IP Address"
-msgstr "Adresse IP"
+msgstr ""
 
 #. Label of the button_icon (Data) field in DocType 'HD Action'
 #. Label of the icon (Data) field in DocType 'HD Article Category'
@@ -1895,7 +1895,7 @@ msgstr "Est Défaut"
 #. Label of the is_standard (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Is Standard"
-msgstr "Est Standard"
+msgstr ""
 
 #. Label of the initial_helpdesk_name_setup_skipped (Check) field in DocType
 #. 'HD Settings'
@@ -1924,7 +1924,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Key"
-msgstr "Clé"
+msgstr ""
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -1994,7 +1994,7 @@ msgstr "Options du lien"
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
-msgstr "Liste"
+msgstr ""
 
 #: desk/src/components/CallArea.vue:72
 msgid "Listen"
@@ -2314,7 +2314,7 @@ msgstr "orange"
 #. Label of the order (Int) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Order"
-msgstr "Commande"
+msgstr ""
 
 #. Label of the order_by_tab (Tab Break) field in DocType 'HD View'
 #. Label of the order_by (Code) field in DocType 'HD View'
@@ -2543,7 +2543,7 @@ msgstr ""
 #. Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Query Options"
-msgstr "Options de Requête"
+msgstr ""
 
 #. Label of the query_route (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
@@ -2754,7 +2754,7 @@ msgstr "Résolu"
 #. Label of the response_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Response"
-msgstr "Réponse"
+msgstr ""
 
 #. Label of the response_by (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -3257,7 +3257,7 @@ msgstr ""
 #. Label of the is_system (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "System"
-msgstr "Système"
+msgstr ""
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -3979,7 +3979,7 @@ msgstr "liste"
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "purple"
-msgstr "violet"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:233
 msgid "stars"
@@ -3990,130 +3990,3 @@ msgstr ""
 msgid "synonym"
 msgstr ""
 
-
-#: desk/src/pages (new i18n strings)
-msgid "Add one to get started."
-msgstr "Ajoutez-en un pour commencer."
-
-msgid "Anyone will be able to create tickets without any permission. e.g. from webform."
-msgstr "N'importe qui pourra créer des tickets sans autorisation, par exemple depuis un formulaire web."
-
-msgid "Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO"
-msgstr "Apparaît à côté du titre dans l'onglet de votre navigateur. Taille recommandée : minimum 32x32 px en PNG ou ICO"
-
-msgid "Auto-close tickets that remain in a status for the specified number of days."
-msgstr "Fermer automatiquement les tickets restant dans un statut pendant le nombre de jours spécifié."
-
-msgid "Automatically close stale tickets"
-msgstr "Fermer automatiquement les tickets inactifs"
-
-msgid "Business Holidays"
-msgstr "Jours fériés"
-
-msgid "Change your search terms or filters"
-msgstr "Modifiez vos termes de recherche ou filtres"
-
-msgid "Create new business holiday"
-msgstr "Créer un nouveau jour férié"
-
-msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
-msgstr "Désactive toutes les notifications par e-mail pour le ticket - y compris la création, les mises à jour et les alertes."
-
-msgid "Do not restrict tickets without a team"
-msgstr "Ne pas restreindre les tickets sans équipe"
-
-msgid "Email Account name"
-msgstr "Nom du compte e-mail"
-
-msgid "Guide users to articles before tickets."
-msgstr "Guider les utilisateurs vers les articles avant les tickets."
-
-msgid "Learn more about SLA"
-msgstr "En savoir plus sur les SLA"
-
-msgid "Make feedback mandatory"
-msgstr "Rendre le retour obligatoire"
-
-msgid "Manage your email accounts and configure incoming and outgoing settings."
-msgstr "Gérez vos comptes e-mail et configurez les paramètres entrants et sortants."
-
-msgid "My Filter"
-msgstr "Mon filtre"
-
-msgid "No Holiday list found"
-msgstr "Aucune liste de jours fériés trouvée"
-
-msgid "No SLA found"
-msgstr "Aucun SLA trouvé"
-
-msgid "No agent found"
-msgstr "Aucun agent trouvé"
-
-msgid "No assignment rule found"
-msgstr "Aucune règle d'affectation trouvée"
-
-msgid "No email account found"
-msgstr "Aucun compte e-mail trouvé"
-
-msgid "Policy Name"
-msgstr "Nom de la politique"
-
-msgid "Published articles must have content."
-msgstr "Les articles publiés doivent avoir du contenu."
-
-msgid "Restrict agent assignment to selected team"
-msgstr "Restreindre l'affectation des agents à l'équipe sélectionnée"
-
-msgid "Restrict tickets by team"
-msgstr "Restreindre les tickets par équipe"
-
-msgid "Restrict tickets to be viewed and managed by team members only."
-msgstr "Restreindre les tickets pour qu'ils ne soient consultés et gérés que par les membres de l'équipe."
-
-msgid "SLAs align your team and customers with defined timelines for a reliable experience."
-msgstr "Les SLA alignent votre équipe et vos clients sur des délais définis pour une expérience fiable."
-
-msgid "Schedule name"
-msgstr "Nom du planning"
-
-msgid "Select what type all tickets get by default."
-msgstr "Sélectionnez le type par défaut pour tous les tickets."
-
-msgid "Service Level Agreements (SLAs)"
-msgstr "Accords de niveau de service (SLA)"
-
-msgid "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one"
-msgstr "Définissez les jours ouvrables, les heures et les jours fériés en sélectionnant un planning prédéfini ou en en créant un nouveau"
-
-msgid "Set your team's working days, hours, and holidays using a template or custom schedule."
-msgstr "Définissez les jours ouvrables, les heures et les jours fériés de votre équipe à l'aide d'un modèle ou d'un planning personnalisé."
-
-msgid "Skip email workflow"
-msgstr "Ignorer le workflow d'e-mail"
-
-msgid "The feedback dialog will be shown, when a user tries to close a ticket from the customer portal."
-msgstr "Le dialogue de retour sera affiché lorsqu'un utilisateur tente de fermer un ticket depuis le portail client."
-
-msgid "The number of days must be 1 or more"
-msgstr "Le nombre de jours doit être de 1 ou plus"
-
-msgid "The ticket status will automatically change whenever the agent respond to a ticket."
-msgstr "Le statut du ticket changera automatiquement chaque fois que l'agent répond à un ticket."
-
-msgid "Ticket settings"
-msgstr "Paramètres des tickets"
-
-msgid "Ticket status"
-msgstr "Statut du ticket"
-
-msgid "Ticket updated"
-msgstr "Ticket mis à jour"
-
-msgid "User Forum"
-msgstr "Forum utilisateur"
-
-msgid "Work schedule and holidays"
-msgstr "Planning de travail et jours fériés"
-
-msgid "Workflow & knowledge base settings"
-msgstr "Paramètres du workflow et de la base de connaissances"

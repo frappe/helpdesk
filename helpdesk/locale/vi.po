@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2025-12-09 21:36\n"
+"PO-Revision-Date: 2026-01-21 11:40\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Vietnamese\n"
 "MIME-Version: 1.0\n"
@@ -152,7 +152,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:72
 msgid "Add condition group"
-msgstr ""
+msgstr "Thêm nhóm điều kiện"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:152
 msgid "Add holidays here to make sure they’re excluded from SLA calculations."
@@ -287,7 +287,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Amber"
-msgstr ""
+msgstr "Màu vàng cam"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:86
 msgid "Anyone will be able to create tickets without any permission. e.g. from webform."
@@ -345,7 +345,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:368
 #: desk/src/components/Settings/Teams/NewTeam.vue:101
 msgid "Are you sure you want to go back? Unsaved changes will be lost."
-msgstr ""
+msgstr "Bạn chắc chắn muốn quay lại? Các thay đổi chưa lưu sẽ bị mất."
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:162
 msgid "Are you sure you want to leave? Unsaved changes will be lost."
@@ -431,27 +431,27 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:35
 msgid "Assignment rule"
-msgstr ""
+msgstr "Quy tắc phân công"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:560
 msgid "Assignment rule created"
-msgstr ""
+msgstr "Quy tắc phân công đã được tạo"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:129
 msgid "Assignment rule deleted"
-msgstr ""
+msgstr "Quy tắc phân công đã bị xóa"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:161
 msgid "Assignment rule duplicated"
-msgstr ""
+msgstr "Quy tắc phân công đã được sao chép"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:647
 msgid "Assignment rule updated"
-msgstr ""
+msgstr "Quy tắc phân công đã được cập nhật"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:198
 msgid "Assignment rule {0} updated"
-msgstr ""
+msgstr "Quy tắc phân công {0} đã được cập nhật"
 
 #: desk/src/components/Settings/InviteAgents.vue:170
 msgid "At least one email required"
@@ -594,7 +594,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/Branding.vue:10
 msgid "Brand name"
-msgstr ""
+msgstr "Tên thương hiệu"
 
 #. Label of the branding_tab (Tab Break) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:4
@@ -649,7 +649,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:181
 msgid "Cannot enable rule without adding users in it"
-msgstr ""
+msgstr "Không thể kích hoạt quy tắc mà không thêm người dùng vào đó"
 
 #: helpdesk/api/knowledge_base.py:122
 msgid "Cannot merge General category"
@@ -719,7 +719,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:5
 msgid "Choose the email service provider you want to configure."
-msgstr ""
+msgstr "Chọn nhà cung cấp dịch vụ email mà bạn muốn cấu hình."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:142
 msgid "Choose which tickets are affected by this assignment rule."
@@ -813,7 +813,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:406
 msgid "Confirm overwrite"
-msgstr ""
+msgstr "Xác nhận ghi đè"
 
 #. Label of the contact (Link) field in DocType 'HD Organization Contact Item'
 #. Label of the contact (Link) field in DocType 'HD Ticket'
@@ -1107,7 +1107,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
-msgstr ""
+msgstr "Chỉnh sửa email"
 
 #: desk/src/components/Settings/EmailEdit.vue:4
 msgid "Edit your email account"
@@ -1131,7 +1131,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAccountList.vue:3
 msgid "Email Accounts"
-msgstr ""
+msgstr "Tài khoản email"
 
 #. Label of the feedback_email_content (Text) field in DocType 'HD Settings'
 #. Label of the acknowledgement_email_content (Text) field in DocType 'HD
@@ -1158,7 +1158,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:267
 msgid "Email account updated successfully"
-msgstr ""
+msgstr "Cập nhật tài khoản email thành công"
 
 #: desk/src/components/Settings/EmailEdit.vue:224
 msgid "Emails pulled successfully"
@@ -1222,7 +1222,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/Branding.vue:11
 msgid "Enter brand name"
-msgstr ""
+msgstr "Nhập tên thương hiệu"
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:59
 #: desk/src/components/Settings/Teams/TeamEdit.vue:238
@@ -1257,7 +1257,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:167
 msgid "Failed to create email account, Invalid credentials"
-msgstr ""
+msgstr "Lỗi khi tạo tài khoản email, thông tin đăng nhập không hợp lệ"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:317
 msgid "Failed to load telephony agent"
@@ -1277,7 +1277,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:272
 msgid "Failed to update email account, Invalid credentials"
-msgstr ""
+msgstr "Lỗi khi cập nhật tài khoản email, thông tin đăng nhập không hợp lệ"
 
 #. Label of the favicon (Attach Image) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:27
@@ -1485,7 +1485,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Guest"
-msgstr ""
+msgstr "Khách"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:13
 msgid "Guide users to articles before tickets."
@@ -1764,7 +1764,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:130
 msgid "I understand, add conditions"
-msgstr ""
+msgstr "Xác nhận và thêm điều kiện"
 
 #. Label of the ip_address (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
@@ -1859,7 +1859,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayView.vue:329
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:397
 msgid "Invalid fields, check if all are filled in and values are correct."
-msgstr ""
+msgstr "Trường dữ liệu không hợp lệ, vui lòng kiểm tra lại xem tất cả đã được điền đủ và đúng giá trị chưa."
 
 #: helpdesk/api/settings/email_notifications.py:112
 msgid "Invalid notification"
@@ -2140,7 +2140,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:9
 msgid "New Assignment Rule"
-msgstr ""
+msgstr "Quy tắc phân công mới"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:59
 msgid "New Assignment Rule Name"
@@ -2172,7 +2172,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:8
 msgid "New Team"
-msgstr ""
+msgstr "Nhóm mới"
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:48
 #: desk/src/components/Settings/Teams/TeamEdit.vue:264
@@ -2230,7 +2230,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:76
 msgid "No results found"
-msgstr ""
+msgstr "Không tìm thấy kết quả nào"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:113
 msgid "No team found"
@@ -2344,7 +2344,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:87
 msgid "Password updated successfully"
-msgstr ""
+msgstr "Mật khẩu đã được cập nhật thành công"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:117
 msgid "Passwords do not match"
@@ -3051,7 +3051,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:3
 msgid "Setup Email"
-msgstr ""
+msgstr "Thiết lập Email"
 
 #. Label of the share_feedback_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -3085,11 +3085,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:632
 msgid "Some error occurred while renaming assignment rule"
-msgstr ""
+msgstr "Đã xảy ra lỗi khi đổi tên quy tắc phân công"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:616
 msgid "Some error occurred while updating assignment rule"
-msgstr ""
+msgstr "Đã xảy ra lỗi khi cập nhật quy tắc phân công"
 
 #. Label of the source_doctype (Link) field in DocType 'HD Support Search
 #. Source'

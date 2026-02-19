@@ -27,7 +27,12 @@
 import { Autocomplete, Link } from "@/components";
 import { APIOptions, Field } from "@/types";
 import { parseApiOptions } from "@/utils";
-import { createResource, FormControl } from "frappe-ui";
+import {
+  createResource,
+  DatePicker,
+  DateTimePicker,
+  FormControl,
+} from "frappe-ui";
 import { computed, h } from "vue";
 
 type Value = string | number | boolean;
@@ -80,6 +85,15 @@ const component = computed(() => {
         },
       ],
       size: "sm",
+    });
+  } else if (props.field.fieldtype === "Datetime") {
+    return h(DateTimePicker, {
+      format: `${window.date_format.toUpperCase()} ${window.time_format}`,
+    });
+  } else if (props.field.fieldtype === "Date") {
+    return h(DatePicker, {
+      id: props.field.fieldname,
+      format: window.date_format.toUpperCase(),
     });
   } else {
     return h(FormControl, {

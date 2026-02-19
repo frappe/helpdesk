@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2025-12-07 10:36+0000\n"
-"PO-Revision-Date: 2026-01-09 02:36\n"
+"PO-Revision-Date: 2026-01-21 11:39\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -2040,7 +2040,7 @@ msgstr "Управление информацией своего профиля.
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:45
 msgid "Members"
-msgstr "Члены"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:57
 msgid "Members ({0})"
@@ -2186,7 +2186,7 @@ msgstr "Требуется новое название"
 
 #: desk/src/components/Settings/General/General.vue:52
 msgid "New users will have to be manually registered by system managers."
-msgstr "Новые пользователи должны будут регистрироваться вручную менеджерами системы."
+msgstr ""
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:20
 msgid "No Holiday list found"
@@ -2504,7 +2504,7 @@ msgstr "Эксперты по продуктам"
 
 #: desk/src/components/Settings/Profile/Profile.vue:3
 msgid "Profile"
-msgstr "Профиль"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:234
 msgid "Profile updated"

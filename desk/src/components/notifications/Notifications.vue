@@ -54,7 +54,7 @@
             <span class="space-x-1 text-gray-700">
               <span
                 class="font-medium text-gray-900"
-                v-if="n.notification_type !== 'Reaction' && n.message"
+                v-if="n.notification_type !== 'Reaction' || !n.message"
               >
                 {{ n.user_from }}
               </span>
@@ -64,20 +64,9 @@
               <span v-if="n.notification_type === 'Assignment'"
                 >assigned you a ticket</span
               >
-<<<<<<< HEAD
-              <span v-if="n.notification_type === 'Reaction'"
-                >has reopened the ticket</span
-              >
-              <span class="font-medium text-gray-900">{{
-                n.reference_ticket
-=======
-              <span v-if="n.notification_type === 'Reaction'">{{
-                n.message
->>>>>>> c696a595 (fix: render notifications properly)
-              }}</span>
-            </span>
-            <span v-if="n.notification_type === 'Reaction' && !n.message">
-              has reopened the ticket
+              <span v-if="n.notification_type === 'Reaction'">
+                {{ n.message || "has reopened the ticket" }}
+              </span>
             </span>
             <span class="font-medium text-gray-900"
               >&nbsp{{ n.reference_ticket }}
@@ -140,15 +129,24 @@ function getRoute(n: Notification) {
         params: {
           ticketId: n.reference_ticket,
         },
-        hash: "#" + n.reference_comment,
+        hash: "#comment-" + n.reference_comment,
       };
     case "Assignment":
+      return {
+        name: "TicketAgent",
+        params: {
+          ticketId: n.reference_ticket,
+        },
+      };
     case "Reaction":
       return {
         name: "TicketAgent",
         params: {
           ticketId: n.reference_ticket,
         },
+        hash: n.reference_comment
+          ? "#comment-" + n.reference_comment
+          : undefined,
       };
   }
 }
