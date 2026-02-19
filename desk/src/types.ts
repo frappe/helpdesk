@@ -604,7 +604,6 @@ export interface TicketActivities {
   views: ViewLog[];
 }
 
-<<<<<<< HEAD
 export type APIOptions = DropdownOption[] | string[] | [];
 
 export type DropdownOption = {
@@ -612,8 +611,6 @@ export type DropdownOption = {
   value: string | number;
 };
 
-=======
->>>>>>> 348884a9 (fix: security issues)
 export interface HDSettings {
   brandName: string;
   brandLogo: string;
