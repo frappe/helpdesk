@@ -604,22 +604,13 @@ export interface TicketActivities {
   views: ViewLog[];
 }
 
-<<<<<<< HEAD
 export type APIOptions = DropdownOption[] | string[] | [];
 
 export type DropdownOption = {
   label: string;
   value: string | number;
 };
-export interface AssignmentRule {
-  name: string;
-  description: string;
-  priority: string;
-  enabled: boolean;
-}
 
-=======
->>>>>>> b3b6ac9a (fix: security issues)
 export interface HDSettings {
   brandName: string;
   brandLogo: string;
