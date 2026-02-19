@@ -261,9 +261,7 @@ function handleDiscard() {
   editable.value = false;
 }
 
-const mentionsForEditor = computed(() => {
-  return dropdown.value;
-});
+const mentionsForEditor = dropdown;
 
 const deleteComment = createResource({
   url: "frappe.client.delete",
