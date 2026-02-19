@@ -94,7 +94,7 @@ class HDArticle(Document):
         return {"columns": columns}
 
     @frappe.whitelist()
-    def set_feedback(self, value):
+    def set_feedback(self, value: int):
         # 0 empty, 1 like, 2 dislike
         user = frappe.session.user
         feedback = frappe.db.exists(

@@ -233,7 +233,9 @@ def get_list_data(
 @frappe.whitelist()
 @redis_cache()
 def get_filterable_fields(
-    doctype: str, show_customer_portal_fields=False, ignore_team_restrictions=False
+    doctype: str,
+    show_customer_portal_fields: bool = False,
+    ignore_team_restrictions: bool = False,
 ):
     check_permissions(doctype, None)
     QBDocField = frappe.qb.DocType("DocField")
@@ -362,7 +364,7 @@ def get_filterable_fields(
 
 
 @frappe.whitelist()
-def sort_options(doctype: str, show_customer_portal_fields=False):
+def sort_options(doctype: str, show_customer_portal_fields: bool = False):
     fields = frappe.get_meta(doctype).fields
     fields = [field for field in fields if field.fieldtype not in no_value_fields]
     fields = [
@@ -391,7 +393,7 @@ def sort_options(doctype: str, show_customer_portal_fields=False):
 
 
 @frappe.whitelist()
-def get_quick_filters(doctype: str, show_customer_portal_fields=False):
+def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
     meta = frappe.get_meta(doctype)
     fields = [field for field in meta.fields if field.in_standard_filter]
     quick_filters = []
@@ -521,16 +523,12 @@ def handle_at_me_support(filters):
 
 
 @frappe.whitelist()
-<<<<<<< HEAD
-def remove_assignments(doctype, name, assignees, ignore_permissions=False):
-=======
 def remove_assignments(
     doctype: str,
     name: str | int,
     assignees: list[str],
     ignore_permissions: bool = False,
 ):
->>>>>>> edc3d29d (fix: type check for ticket doctype with int | str)
     assignees = frappe.parse_json(assignees)
 
     if not assignees:

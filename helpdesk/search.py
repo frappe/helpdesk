@@ -344,7 +344,6 @@ class HelpdeskSearch(Search):
         return records
 
 
-@frappe.whitelist()
 def search(
     query, only_articles=False, qtype: Literal["and", "or"] = "and"
 ) -> list[dict[str, list[dict]]]:
