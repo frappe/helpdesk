@@ -607,7 +607,7 @@ def get_navigation_filters(ticket: str, current_view: str = None):
                 filters = (
                     json.loads(_filters) if isinstance(_filters, str) else _filters
                 )
-            except json.JSONDecodeError, TypeError:
+            except (json.JSONDecodeError, TypeError):
                 filters = []
 
     if not filters:
@@ -624,7 +624,7 @@ def get_navigation_filters(ticket: str, current_view: str = None):
                     if isinstance(default_view, str)
                     else default_view
                 )
-            except json.JSONDecodeError, TypeError:
+            except (json.JSONDecodeError, TypeError):
                 filters = []
 
     # Base filters - exclude the current ticket
