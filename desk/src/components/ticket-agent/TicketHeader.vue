@@ -61,7 +61,7 @@
         </Dropdown>
         <!-- Core Actions + Custom Actions -->
         <Dropdown
-          v-if="groupedActions.length"
+          v-if="groupedActions[0].items.length >= 1"
           :options="groupedActions"
           placement="right"
         >
@@ -97,7 +97,13 @@ import {
 } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
-import { Breadcrumbs, call, Dropdown, toast } from "frappe-ui";
+import {
+  Breadcrumbs,
+  call,
+  Dropdown,
+  toast,
+  createListResource,
+} from "frappe-ui";
 import { __ } from "@/translation";
 import {
   computed,
@@ -188,12 +194,23 @@ function updateField(fieldname: string, value: string, callback = () => {}) {
   });
   callback();
 }
+const ticketCount = ref();
 
+const candidateTickets = createListResource({
+  doctype: "HD Ticket",
+  fields: ["name"],
+  auto: true,
+  onSuccess(data) {
+    ticketCount.value = data.length;
+  },
+  pageLength: 3,
+});
 const showMergeModal = ref(false);
 const showMergeOption = computed(() => {
   return (
     !ticket.value.doc.is_merged &&
-    ["Open", "Paused"].includes(ticket.value.doc.status_category)
+    ["Open", "Paused"].includes(ticket.value.doc.status_category) &&
+    ticketCount.value > 1
   );
 });
 const defaultActions = computed(() => {

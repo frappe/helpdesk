@@ -165,10 +165,9 @@ onBeforeUnmount(() => {
   $socket.off("helpdesk:ticket-comment");
   $socket.off("helpdesk:ticket-update");
 });
-
 usePageMeta(() => {
   return {
-    title: props.ticketId,
+    title: props.ticketId + " - " + ticketComposable.value.ticket.doc.subject,
   };
 });
 </script>

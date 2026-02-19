@@ -60,12 +60,6 @@
               {{ __("Add one to get started") }}
             </div>
           </div>
-          <Button
-            :label="__('New')"
-            variant="outline"
-            icon-left="plus"
-            @click="$emit('update:step', 'fd')"
-          />
         </div>
 
         <div

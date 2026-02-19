@@ -77,8 +77,8 @@ import {
   toast,
   usePageMeta,
 } from "frappe-ui";
-import { useOnboarding } from "frappe-ui/frappe";
-import { computed, ref } from "vue";
+import { useOnboarding, Link } from "frappe-ui/frappe";
+import { computed, ref, watch } from "vue";
 import { __ } from "@/translation";
 
 import { LayoutHeader, UserAvatar } from "@/components";
@@ -172,12 +172,6 @@ const breadcrumbs = computed(() => {
       route: { name: "AgentKnowledgeBase" },
     },
   ];
-  if (categoryName.value) {
-    options.push({
-      label: categoryName.value,
-      route: { name: "AgentKnowledgeBase" },
-    });
-  }
   options.push({
     label: __("New Article"),
   });

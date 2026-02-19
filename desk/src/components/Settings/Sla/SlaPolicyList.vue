@@ -23,12 +23,6 @@
           {{ __("Add one to get started.") }}
         </div>
       </div>
-      <Button
-        :label="__('New')"
-        variant="outline"
-        icon-left="plus"
-        @click="goToNew()"
-      />
     </div>
     <div v-else class="-ml-2">
       <div

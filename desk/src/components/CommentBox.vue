@@ -168,6 +168,7 @@ import { useConfigStore } from "@/stores/config";
 import { updateRes as updateComment } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { CommentActivity } from "@/types";
+import { Editor } from "@tiptap/core";
 import {
   dateFormat,
   dateTooltipFormat,
@@ -213,6 +214,8 @@ const _content = ref(content);
 
 const emojiList = ["👍", "👎", "❤️", "🎉", "👀", "✅"];
 
+// editor.commands.focus('end')
+
 const reactions = ref<
   Array<{
     emoji: string;
@@ -250,7 +253,7 @@ const editorRef = ref(null);
 
 function handleEditMode() {
   editable.value = true;
-  editorRef.value.editor.chain().focus("start");
+  editorRef.value?.editor.chain().focus("end").run();
 }
 
 function handleDiscard() {

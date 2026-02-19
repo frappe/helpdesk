@@ -120,12 +120,6 @@
             }}
           </div>
         </div>
-        <Button
-          :label="__('New')"
-          variant="outline"
-          icon-left="plus"
-          @click="showForm = true"
-        />
       </div>
     </template>
   </SettingsLayoutBase>

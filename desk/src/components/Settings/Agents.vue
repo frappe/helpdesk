@@ -105,12 +105,6 @@
               }}
             </div>
           </div>
-          <Button
-            :label="__('New')"
-            variant="outline"
-            icon-left="plus"
-            @click="setActiveSettingsTab('Invite Agents')"
-          />
         </div>
         <!-- Agent List -->
         <div

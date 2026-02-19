@@ -8,7 +8,7 @@
       <div
         v-for="(activity, i) in activities"
         :key="activity.key"
-        class="activity"
+        class="activity mt-2"
       >
         <!-- single activity -->
         <div
@@ -20,7 +20,7 @@
           >
             <div
               class="z-1 flex h-7 w-7 items-center justify-center rounded-full bg-white"
-              :class="[['email', 'feedback'].includes(activity.type) && 'mt-2']"
+              :class="[['email', 'feedback'].includes(activity.type) && 'mt-3']"
             >
               <Avatar
                 v-if="activity.type === 'email' || activity.type === 'feedback'"
@@ -78,25 +78,10 @@
     </div>
     <div
       v-else
-      class="h-full flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
+      class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
     >
       <component :is="emptyTextIcon" class="h-10 w-10" />
       <span>{{ emptyText }}</span>
-      <Button
-        v-if="title == 'Emails'"
-        label="New Email"
-        @click="communicationAreaRef?.toggleEmailBox() ?? toggleEmailBox()"
-      />
-      <Button
-        v-else-if="title == 'Comments'"
-        label="New Comment"
-        @click="communicationAreaRef?.toggleCommentBox() ?? toggleCommentBox()"
-      />
-      <Button
-        v-else-if="title == 'Calls'"
-        label="Make a Call"
-        @click="makeCall()"
-      />
     </div>
   </FadedScrollableDiv>
 </template>
