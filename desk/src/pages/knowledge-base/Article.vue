@@ -5,7 +5,6 @@
         <div class="flex gap-2 items-center crumbs">
           <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
           <Badge
-            v-if="!article.loading"
             variant="subtle"
             :theme="article.data?.status === 'Draft' ? 'orange' : 'green'"
             size="md"
@@ -85,68 +84,24 @@
                 <span>{{ views }} views</span>
               </div>
             </div>
-            <div class="flex gap-4 items-start">
-              <div class="flex items-start gap-4 text-sm">
-                <div
-                  class="flex items-center gap-1"
-                  v-if="!editable && !isCustomerPortal"
-                >
-                  <Button
-                    variant="ghost"
-                    size="md"
-                    class="flex"
-                    :disabled="!isCustomerPortal"
-                  >
-                    <template #suffix>
-                      {{ likes }}
-                    </template>
-                    <template #icon>
-                      <ThumbsUpFilledIcon
-                        v-if="feedback === 1 && isCustomerPortal"
-                        class="size-4"
-                      />
-                      <ThumbsUpIcon v-else class="size-4" />
-                    </template>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="md"
-                    class="flex"
-                    :disabled="!isCustomerPortal"
-                  >
-                    <template #suffix>
-                      {{ dislikes }}
-                    </template>
-                    <template #icon>
-                      <ThumbsDownFilledIcon
-                        v-if="feedback === 2 && isCustomerPortal"
-                        class="size-4"
-                      />
-                      <ThumbsDownIcon v-else class="size-4" />
-                    </template>
-                  </Button>
-                </div>
-              </div>
-              <div class="flex gap-1 items-start justify-between">
-                <Dropdown
-                  :options="articleActions"
-                  v-if="!editable && !isCustomerPortal"
-                  @click="isConfirmingDeleteArticle = false"
-                >
-                  <Button size="md" variant="ghost">
-                    <template #icon>
-                      <IconMoreHorizontal class="h-4 w-4" />
-                    </template>
-                  </Button>
-                </Dropdown>
-                <div class="flex gap-2" v-if="editable">
-                  <DiscardButton
-                    :disabled="!isDirty"
-                    :hide-dialog="!isDirty"
-                    :title="__('Discard changes?')"
-                    :message="__('Are you sure you want to discard changes?')"
-                    @discard="handleDiscard"
-                  />
+            <Dropdown
+              :options="articleActions"
+              v-if="!editable && !isCustomerPortal"
+            >
+              <Button variant="ghost">
+                <template #icon>
+                  <IconMoreHorizontal class="h-4 w-4" />
+                </template>
+              </Button>
+            </Dropdown>
+            <div class="flex gap-2" v-if="editable">
+              <DiscardButton
+                :disabled="!isDirty"
+                :hide-dialog="!isDirty"
+                :title="__('Discard changes?')"
+                :message="__('Are you sure you want to discard changes?')"
+                @discard="handleDiscard"
+              />
 
                   <Button
                     :label="__('Save')"
@@ -156,6 +111,28 @@
                 </div>
               </div>
             </div>
+          </div>
+          <!-- Title -->
+          <textarea
+            ref="titleRef"
+            class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-gray-200 focus:ring-0 focus:border-gray-200 overflow-hidden"
+            v-model="title"
+            :placeholder="__('Title')"
+            rows="1"
+            wrap="soft"
+            maxlength="140"
+            autofocus
+            :disabled="!editable"
+          />
+          <div class="flex gap-2 text-sm text-gray-500 items-center">
+            <span>{{ articleStats.data?.views || 0 }} views</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              :label="articleStats.data?.likes || 0"
+              iconLeft="heart"
+              @click="handleLike"
+            />
           </div>
         </div>
 
@@ -208,23 +185,10 @@
         <ArticleFeedback :feedback="feedback" :article-id="articleId" />
       </div>
     </div>
-    <!-- Loading State -->
-    <div
-      v-if="article.loading"
-      class="w-full h-screen flex items-center justify-center"
-    >
-      <LoadingIndicator :scale="10" />
-    </div>
     <MoveToCategoryModal
       v-model="moveToModal"
       @move="handleMoveToCategory"
       :exclude-category="article.data?.category_id"
-    />
-    <CategoryModal
-      :edit="editTitle"
-      v-model:title="category.title"
-      v-model="showCategoryModal"
-      @create="handleCategoryCreate"
     />
   </div>
 </template>
@@ -267,13 +231,8 @@ import {
   TextEditorFixedMenu,
   toast,
   Badge,
-  dayjsLocal,
-  LoadingIndicator,
-  usePageMeta,
 } from "frappe-ui";
-import { computed, h, onMounted, ref, watch, nextTick, reactive } from "vue";
-import { useScreenSize } from "@/composables/screen";
-const { isMobileView } = useScreenSize();
+import { computed, h, onMounted, ref, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
@@ -336,9 +295,8 @@ const authStore = useAuthStore();
 
 const editorRef = ref(null);
 const editable = ref(route.query.isEdit ?? false);
-const likes = ref(0);
-const dislikes = ref(0);
-const views = ref(0);
+const likes = ref("");
+const views = ref("");
 const content = ref("");
 const title = ref("");
 const feedback = ref<FeedbackAction>();
@@ -398,7 +356,6 @@ const articleStats = createResource({
   params: { article_name: props.articleId },
   onSuccess(data) {
     likes.value = data.likes;
-    dislikes.value = data.dislikes;
     views.value = data.views;
   },
   auto: true,
@@ -414,6 +371,18 @@ function incrementArticleViews(articleId: string) {
         if (err.exc_type === "RateLimitExceededError") {
           return;
         }
+      },
+    }
+  );
+}
+
+function handleLike() {
+  likeArticle.submit(
+    { article: props.articleId },
+    {
+      onSuccess: () => {
+        if (articleStats.reload) articleStats.reload();
+        toast.success(__("Thanks for your feedback."));
       },
     }
   );
@@ -477,16 +446,6 @@ function handleDiscard() {
   textEditorContentWithIDs.value = null;
   nextTick(() => {
     textEditorContentWithIDs.value = original;
-  });
-}
-
-function hasParagraphContent(html: string) {
-  if (!html) return false;
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  const paragraphs = doc.querySelectorAll("p");
-  return Array.from(paragraphs).some((p) => {
-    return p.textContent.trim().length > 0;
   });
 }
 

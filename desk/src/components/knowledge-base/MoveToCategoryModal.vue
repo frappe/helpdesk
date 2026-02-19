@@ -31,6 +31,7 @@ const linkRef = ref(null);
 const props = defineProps<{
   excludeCategory?: string;
 }>();
+console.log(props.excludeCategory);
 
 const defaultFilters = computed(() => {
   if (!props.excludeCategory) return {};
@@ -39,12 +40,12 @@ const defaultFilters = computed(() => {
     name: ["!=", props.excludeCategory],
   };
 });
+
 watch(showDialog, async (val) => {
-  if (!val) return;
-  await nextTick();
-  setTimeout(() => {
-    linkRef.value?.$el?.querySelector("input")?.focus();
-  }, 300);
+  if (val) {
+    await nextTick();
+    linkRef.value?.$el?.querySelector("input").focus();
+  }
 });
 
 const actions = [

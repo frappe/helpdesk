@@ -9,7 +9,6 @@
         v-for="(activity, i) in activities"
         :key="activity.key"
         class="activity mt-2"
-        tabindex="0"
       >
         <!-- single activity -->
         <div

@@ -69,6 +69,28 @@ def get_article_stats(article_name: str):
 
 
 @frappe.whitelist()
+def get_article_stats(article_name):
+    views = frappe.db.count(
+        "View Log",
+        filters={
+            "reference_doctype": "HD Article",
+            "reference_name": article_name,
+        },
+    )
+
+    likes = frappe.db.count(
+        "Comment",
+        filters={
+            "reference_doctype": "HD Article",
+            "reference_name": article_name,
+            "comment_type": "Like",
+        },
+    )
+
+    return {"views": views, "likes": likes}
+
+
+@frappe.whitelist()
 def search(query: str) -> list:
     query = sanitize_query(query)
     ret, enough = search_with_enough_results([], query)
