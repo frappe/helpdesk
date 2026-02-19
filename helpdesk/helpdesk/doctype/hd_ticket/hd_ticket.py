@@ -1,8 +1,8 @@
 import json
 import uuid
+from datetime import timedelta
 from email.utils import parseaddr
 from functools import lru_cache
-from typing import List
 
 import frappe
 from bs4 import BeautifulSoup
@@ -13,7 +13,8 @@ from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
-from frappe.query_builder import Order
+from frappe.query_builder import DocType, Order
+from frappe.utils import add_to_date, getdate, now_datetime
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -72,6 +73,9 @@ class HDTicket(Document):
     def autoname(self):
         return self.name
 
+    def before_insert(self):
+        self.generate_key()
+
     def before_validate(self):
         self.check_update_perms()
         self.set_ticket_type()
@@ -96,6 +100,10 @@ class HDTicket(Document):
             self.handle_ticket_activity_update()
 
         self.handle_email_feedback()
+        if self.is_new():
+            self.raised_outside_working_hours = (
+                self.is_currently_outside_working_hours()
+            )
 
     def _get_rendered_template(
         self, content: str, default_content: str, args: dict[str, str] | None = None
@@ -162,9 +170,6 @@ class HDTicket(Document):
             frappe.msgprint(_("Feedback email has been sent to the customer"))
         except Exception as e:
             frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
-
-    def before_insert(self):
-        self.generate_key()
 
     def after_insert(self):
         if self.ticket_split_from:
@@ -418,7 +423,7 @@ class HDTicket(Document):
         return True
 
     @frappe.whitelist()
-    def assign_agent(self, agent):
+    def assign_agent(self, agent: str):
         assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
 
         if frappe.session.user != agent:
@@ -523,7 +528,7 @@ class HDTicket(Document):
         return f"{root_uri}/helpdesk/my-tickets/{self.name}"
 
     @frappe.whitelist()
-    def new_comment(self, content: str, attachments: List[str] = []):
+    def new_comment(self, content: str, attachments: list[str] = []):
         if not is_agent():
             frappe.throw(
                 _("You are not permitted to add a comment"), frappe.PermissionError
@@ -543,10 +548,10 @@ class HDTicket(Document):
     def reply_via_agent(
         self,
         message: str,
-        to: str = None,
-        cc: str = None,
-        bcc: str = None,
-        attachments: List[str] = [],
+        to: str | None = None,
+        cc: str | None = None,
+        bcc: str | None = None,
+        attachments: list[str] = [],
     ):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
@@ -660,7 +665,7 @@ class HDTicket(Document):
     @frappe.whitelist()
     # flake8: noqa
     def create_communication_via_contact(
-        self, message, attachments=[], new_ticket=False
+        self, message: str, attachments: list[dict] = [], new_ticket: bool = False
     ):
         if not new_ticket and frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_to_agent"
@@ -861,6 +866,49 @@ class HDTicket(Document):
         if sla := frappe.get_last_doc("HD Service Level Agreement", {"name": self.sla}):
             sla.apply(self)
 
+    def get_sla(self):
+        return frappe.get_doc("HD Service Level Agreement", {"name": self.sla})
+
+    def is_currently_outside_working_hours(self):
+        """Return True if current time is outside this SLA's working hours."""
+
+        sla = self.get_sla()
+        current_date = getdate()
+        now = now_datetime()
+
+        current_td = timedelta(
+            hours=now.hour,
+            minutes=now.minute,
+            seconds=now.second,
+            microseconds=now.microsecond,
+        )
+
+        day_name = current_date.strftime("%A")
+        Holiday = DocType("HD Holiday")
+
+        # Check holidays for this SLA
+        holidays = (
+            frappe.qb.from_(Holiday)
+            .select(Holiday.holiday_date)
+            .where(Holiday.parent == sla.name)
+            .run(pluck=True)
+        )
+
+        if current_date in holidays:
+            return True
+
+        working_hours = sla.get_working_hours()
+        # No working hours today
+        if day_name not in working_hours:
+            return True
+
+        start_time, end_time = working_hours[day_name]
+
+        # Outside working hours
+        if not (start_time <= current_td < end_time):
+            return True
+        return False
+
     def set_default_status(self):
         if self.is_new():
             self.status = self.default_open_status
@@ -887,12 +935,18 @@ class HDTicket(Document):
                 self.status = self.ticket_reopen_status
             else:
                 self.status = self.default_open_status
+            # if received that means customer has replied
+            self.last_customer_response = frappe.utils.now_datetime()
         # If communication is outgoing, it must be a reply from agent
         if c.sent_or_received == "Sent":
+            # Ignore system notifications
+            if c.communication_type and c.communication_type == "Automated Message":
+                return
             # Set first response date if not set already
             self.first_responded_on = (
                 self.first_responded_on or frappe.utils.now_datetime()
             )
+            self.last_agent_response = frappe.utils.now_datetime()
 
             # TODO: remove this feature once we add automation feature
             if frappe.db.get_single_value("HD Settings", "auto_update_status"):

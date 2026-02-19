@@ -48,7 +48,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-23 23:02:36.015099",
+ "modified": "2026-02-02 17:28:31.798544",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Team",
@@ -92,11 +92,12 @@
    "write": 1
   },
   {
-   "read": 1,
-   "role": "All"
+   "role": "All",
+   "select": 1
   }
  ],
  "quick_entry": 1,
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

@@ -1,6 +1,6 @@
 import { Dayjs } from "dayjs";
 import { Component, ComputedRef, InjectionKey, Ref } from "vue";
-import type { HDTicket } from "./types/doctypes";
+import type { AssignmentRule, HDTicket } from "./types/doctypes";
 
 interface ResourceOptions<T = any> {
   method?: string;
@@ -610,12 +610,6 @@ export type DropdownOption = {
   label: string;
   value: string | number;
 };
-export interface AssignmentRule {
-  name: string;
-  description: string;
-  priority: string;
-  enabled: boolean;
-}
 
 export interface HDSettings {
   brandName: string;
@@ -635,6 +629,8 @@ export interface HDSettings {
   preferKnowledgeBase: boolean;
   skipEmailWorkflow: boolean;
   disableSavedRepliesGlobalScope: boolean;
+  enableOutsideHoursBanner: boolean;
+  outsideWorkingHoursBannerMessage: string;
 }
 
 export interface HolidayList {

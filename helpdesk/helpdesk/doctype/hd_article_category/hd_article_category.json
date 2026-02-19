@@ -37,7 +37,7 @@
   }
  ],
  "links": [],
- "modified": "2025-01-21 19:52:51.131313",
+ "modified": "2026-02-02 17:13:11.729822",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Category",
@@ -70,24 +70,15 @@
    "write": 1
   },
   {
-   "email": 1,
-   "export": 1,
-   "print": 1,
    "read": 1,
-   "report": 1,
-   "role": "All",
-   "share": 1
+   "role": "All"
   },
   {
-   "email": 1,
-   "export": 1,
-   "print": 1,
    "read": 1,
-   "report": 1,
-   "role": "Guest",
-   "share": 1
+   "role": "Guest"
   }
  ],
+ "row_format": "Dynamic",
  "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
