@@ -68,12 +68,6 @@
                 {{ n.message || "has reopened the ticket" }}
               </span>
             </span>
-<<<<<<< HEAD
-=======
-            <span v-if="n.notification_type === 'Reaction' && !n.message">
-              has reopened the ticket
-            </span>
->>>>>>> af46f0b8 (chore: code cleanup)
             <span class="font-medium text-gray-900"
               >&nbsp{{ n.reference_ticket }}
             </span>
