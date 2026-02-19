@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-08 10:41+0000\n"
-"PO-Revision-Date: 2026-02-09 07:33\n"
+"POT-Creation-Date: 2026-02-15 10:41+0000\n"
+"PO-Revision-Date: 2026-02-17 13:44\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Bosnian\n"
 "MIME-Version: 1.0\n"
@@ -74,7 +74,7 @@ msgstr "<span class=\"h4\">Konfiguracija Podrške<br></span>"
 
 #: desk/src/pages/ticket/TicketNew.vue:69
 msgid "A short description"
-msgstr ""
+msgstr "Kratak opis"
 
 #. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
 #. Source'
@@ -140,11 +140,11 @@ msgstr "Dodaj praznik"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:125
 msgid "Add New Article"
-msgstr ""
+msgstr "Dodaj novi Članak"
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:102
 msgid "Add Saved reply"
-msgstr ""
+msgstr "Dodaj Definisani Odgovor"
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
 #. Service Holiday List'
@@ -154,7 +154,7 @@ msgstr "Dodaj sedmične praznike"
 
 #: desk/src/components/layouts/Sidebar.vue:467
 msgid "Add a comment on a ticket"
-msgstr ""
+msgstr "Dodaj komentar na slučaj"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
@@ -211,7 +211,7 @@ msgstr "Dodaj Praznicima"
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:98
 msgid "Add your first Saved reply to get started."
-msgstr ""
+msgstr "Dodaj prvi Definisani Odgovor da biste započeli."
 
 #: desk/src/components/Settings/Agents.vue:4
 msgid "Add, manage agents and assign roles to them."
@@ -288,7 +288,7 @@ msgstr "Agenti"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:70
 msgid "Agents will no longer be able to view and create saved replies with global scope."
-msgstr ""
+msgstr "Agenti više neće moći pregledavati i kreirati sačuvane odgovore s globalnim opsegom."
 
 #. Name of a role
 #: desk/src/components/SavedRepliesSelectorModal.vue:158
@@ -309,11 +309,11 @@ msgstr "Svi"
 
 #: desk/src/components/layouts/Sidebar.vue:262
 msgid "All Views"
-msgstr ""
+msgstr "Svi Prikazi"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:305
 msgid "All articles from this category will move to General category."
-msgstr ""
+msgstr "Svi članci iz ove kategorije bit će premješteni u kategoriju Općenito."
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
@@ -327,7 +327,7 @@ msgstr "Dozvoli svakom da kreira slučajeve"
 #: desk/src/components/Settings/General/components/TicketSettings.vue:26
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Allow users to react to comments with emojis"
-msgstr ""
+msgstr "Omogućite korisnicima da reaguju na komentare pomoću emotikona"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -368,7 +368,7 @@ msgstr "Primijeni na novoj stranici"
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Apply outside working hours"
-msgstr ""
+msgstr "Prijmjeni izvan radnog vremena"
 
 #. Label of the apply_to_customer_portal (Check) field in DocType 'HD Form
 #. Script'
@@ -388,15 +388,15 @@ msgstr "Jeste li sigurni da želite promijeniti kartice? Nespremljene promjene �
 
 #: desk/src/pages/ticket/TicketCustomer.vue:295
 msgid "Are you sure you want to close this ticket?"
-msgstr ""
+msgstr "Jeste li sigurni da želite zatvoriti ovaj slučaj?"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:198
 msgid "Are you sure you want to delete these articles?"
-msgstr ""
+msgstr "Jeste li sigurni da želite izbrisati ove članke?"
 
 #: desk/src/pages/knowledge-base/Article.vue:317
 msgid "Are you sure you want to delete this article?"
-msgstr ""
+msgstr "Jeste li sigurni da želite izbrisati ovaj članak?"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:107
 msgid "Are you sure you want to delete this team? This action cannot be reversed!"
@@ -404,15 +404,15 @@ msgstr "Jeste li sigurni da želite izbrisati ovaj tim? Ova radnja se ne može p
 
 #: desk/src/pages/ticket/Tickets.vue:444
 msgid "Are you sure you want to delete this view?"
-msgstr ""
+msgstr "Jeste li sigurni da želite izbrisati ovaj prikaz?"
 
 #: desk/src/pages/knowledge-base/Article.vue:67
 msgid "Are you sure you want to discard changes?"
-msgstr ""
+msgstr "Jeste li sigurni da želite odbaciti promjene?"
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:146
 msgid "Are you sure you want to discard this article?"
-msgstr ""
+msgstr "Jeste li sigurni da želite odbaciti ovaj članak?"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:465
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:109
@@ -444,31 +444,31 @@ msgstr "Članak"
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:119
 msgid "Article created"
-msgstr ""
+msgstr "Članak kreiran"
 
 #: desk/src/pages/knowledge-base/Article.vue:330
 msgid "Article deleted"
-msgstr ""
+msgstr "Članak izbrisan"
 
 #: desk/src/pages/knowledge-base/Article.vue:407
 msgid "Article link copied to clipboard"
-msgstr ""
+msgstr "Link članka kopiran u međuspremnik"
 
 #: desk/src/pages/knowledge-base/Article.vue:260
 msgid "Article moved"
-msgstr ""
+msgstr "Članak premješten"
 
 #: desk/src/pages/knowledge-base/Article.vue:306
 msgid "Article updated"
-msgstr ""
+msgstr "Članak ažuriran"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:342
 msgid "Articles deleted"
-msgstr ""
+msgstr "Članci izbrisani"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:226
 msgid "Articles moved"
-msgstr ""
+msgstr "Članci premješteni"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:51
 msgid "Assign"
@@ -476,11 +476,11 @@ msgstr "Dodijeli"
 
 #: desk/src/components/layouts/Sidebar.vue:444
 msgid "Assign a ticket to an agent"
-msgstr ""
+msgstr "Dodijelite slučaj agentu"
 
 #: desk/src/components/modals/ShortcutsModal.vue:93
 msgid "Assign ticket"
-msgstr ""
+msgstr "Dodijeli slučaj"
 
 #. Label of the assign_to_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
@@ -573,7 +573,7 @@ msgstr "Pravilo dodjele {0} ažurirano"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:131
 msgid "At least one email is required"
-msgstr ""
+msgstr "Potrebna je barem jedna e-mail adresa"
 
 #: desk/src/components/Settings/InviteAgents.vue:170
 msgid "At least one email required"
@@ -589,7 +589,7 @@ msgstr "Za ocjenu {0} mora biti omogućena barem jedna opcija povratnih informac
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:450
 msgid "At least one team is required"
-msgstr ""
+msgstr "Potreban je barem jedan tim"
 
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:28
 msgid "At-least one of priority, team and ticket type is required"
@@ -680,8 +680,8 @@ msgstr "Prosječno vrijeme potrebno za prvi odgovor na Slučaj"
 msgid "Avg. time taken to resolve a ticket"
 msgstr "Prosječno vrijeme potrebno za rješavanje Slučaja"
 
-#: desk/src/components/Settings/EmailAdd.vue:87
-#: desk/src/components/Settings/EmailEdit.vue:72
+#: desk/src/components/Settings/EmailAdd.vue:143
+#: desk/src/components/Settings/EmailEdit.vue:134
 msgid "Back"
 msgstr "Nazad"
 
@@ -751,7 +751,7 @@ msgstr "Detalji poziva"
 
 #: desk/src/components/layouts/Sidebar.vue:257
 msgid "Call Logs"
-msgstr ""
+msgstr "Zapisi Poziva"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:81
 msgid "Call Received By"
@@ -819,19 +819,19 @@ msgstr "Kategorija"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:168
 msgid "Category '{0}' link copied to clipboard"
-msgstr ""
+msgstr "Link kategorije '{0}' kopiran u međuspremnik"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:257
 msgid "Category created"
-msgstr ""
+msgstr "Kategorija kreirana"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:320
 msgid "Category deleted"
-msgstr ""
+msgstr "Kategorija je izbrisana"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:357
 msgid "Category merged"
-msgstr ""
+msgstr "Kategorija spojena"
 
 #: helpdesk/api/knowledge_base.py:72
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.py:64
@@ -840,7 +840,7 @@ msgstr "Kategorija mora imati barem jedan članak"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:292
 msgid "Category updated"
-msgstr ""
+msgstr "Kategorija ažurirana"
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:40
 msgid "Change"
@@ -861,11 +861,11 @@ msgstr "Promijenite jezik aplikacije."
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:22
 msgid "Change photo"
-msgstr ""
+msgstr "Promijeni sliku"
 
 #: desk/src/components/modals/ShortcutsModal.vue:91
 msgid "Change priority"
-msgstr ""
+msgstr "Promijeni prioritet"
 
 #: desk/src/components/modals/ShortcutsModal.vue:94
 msgid "Change status"
@@ -873,11 +873,11 @@ msgstr "Promijeni status"
 
 #: desk/src/components/modals/ShortcutsModal.vue:92
 msgid "Change team"
-msgstr ""
+msgstr "Promijeni tim"
 
 #: desk/src/components/modals/ShortcutsModal.vue:90
 msgid "Change ticket type"
-msgstr ""
+msgstr "Promijeni tip slučaja"
 
 #: desk/src/components/Settings/Profile/Profile.vue:118
 msgid "Change your account password for security."
@@ -930,7 +930,7 @@ msgstr "Odaberite na koje slučajeve se odnosi ovo pravilo o oduzimanju dodjele.
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:94
 msgid "Choose who can view and use this response"
-msgstr ""
+msgstr "Odaberi ko može vidjeti i koristiti ovaj odgovor"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:78
 msgid "Choose who receives the tickets."
@@ -943,7 +943,7 @@ msgstr "Očisti Tabelu"
 
 #: desk/src/pages/SearchAgent.vue:86
 msgid "Clear all filters"
-msgstr ""
+msgstr "Obriši sve filtere"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:46
 msgid "Click on Add to Holidays. This will populate the holidays table with all the dates that fall on the selected weekly off. Repeat the process for populating the dates for all your weekly holidays"
@@ -960,7 +960,7 @@ msgstr "Zatvori"
 
 #: desk/src/pages/ticket/TicketCustomer.vue:294
 msgid "Close Ticket"
-msgstr ""
+msgstr "Zatvori Slučaj"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -1000,7 +1000,7 @@ msgstr "Komentar"
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:61
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:106
 msgid "Comment not found"
-msgstr ""
+msgstr "Komentar nije pronađen"
 
 #. Label of the commented_by (Link) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
@@ -1060,7 +1060,7 @@ msgstr "Potvrdi prepisivanje"
 
 #: desk/src/components/layouts/Sidebar.vue:401
 msgid "Connect your support email"
-msgstr ""
+msgstr "Povežite adresu e-pošte za podršku"
 
 #. Label of the contact (Link) field in DocType 'HD Organization Contact Item'
 #. Label of the contact (Link) field in DocType 'HD Ticket'
@@ -1080,11 +1080,11 @@ msgstr "Kontakt HTML"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:185
 msgid "Contact created"
-msgstr ""
+msgstr "Kontakt kreiran"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:304
 msgid "Contact invited successfully"
-msgstr ""
+msgstr "Kontakt pozvan"
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:86
 msgid "Contact updated"
@@ -1092,7 +1092,7 @@ msgstr "Kontakt ažuriran"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:238
 msgid "Contact with email already exists"
-msgstr ""
+msgstr "Kontakt s adresom e-pošte već postoji"
 
 #. Label of the contacts (Table) field in DocType 'HD Organization'
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
@@ -1114,11 +1114,11 @@ msgstr "Tip Sadržaja"
 
 #: desk/src/components/modals/ShortcutsModal.vue:96
 msgid "Copy ticket URL"
-msgstr ""
+msgstr "Kopiraj URL slučaja"
 
 #: desk/src/components/modals/ShortcutsModal.vue:95
 msgid "Copy ticket id"
-msgstr ""
+msgstr "Kopiraj ID slučaja"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:631
 msgid "Could not an email due to: {0}"
@@ -1132,7 +1132,7 @@ msgstr "Nije moguće poslati e-poštu s potvrdom zbog: {0}"
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Nije moguće poslati e-poštu s povratnim informacijama zbog: {0}"
 
-#: desk/src/components/Settings/EmailAdd.vue:94
+#: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
 #: desk/src/components/layouts/Sidebar.vue:503
@@ -1145,7 +1145,7 @@ msgstr "Kreiraj"
 #: desk/src/components/layouts/Sidebar.vue:496
 #: desk/src/components/layouts/Sidebar.vue:502
 msgid "Create & invite a contact"
-msgstr ""
+msgstr "Kreiraj i pozovi kontakt"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:3
 msgid "Create New Contact"
@@ -1157,11 +1157,11 @@ msgstr "Kreiraj Prikaz"
 
 #: desk/src/components/layouts/Sidebar.vue:434
 msgid "Create a ticket"
-msgstr ""
+msgstr "Kreiraj slučaj"
 
 #: desk/src/components/layouts/Sidebar.vue:479
 msgid "Create an article"
-msgstr ""
+msgstr "Napravi članak"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:5
 msgid "Create and manage teams and assign agents to specific teams."
@@ -1189,7 +1189,7 @@ msgstr "Kriterij"
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Custom Outside Working Hours Message"
-msgstr ""
+msgstr "Prilagođena poruka izvan radnog vremena"
 
 #: desk/src/pages/dashboard/Dashboard.vue:308
 #: desk/src/pages/dashboard/Dashboard.vue:314
@@ -1210,7 +1210,7 @@ msgstr "Ime Klijenta"
 
 #: desk/src/components/layouts/Sidebar.vue:319
 msgid "Customer portal"
-msgstr ""
+msgstr "Klijent Portal"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:5
 msgid "Customize your email notification preferences to stay informed about important updates and activities."
@@ -1281,11 +1281,11 @@ msgstr "Standardni Status Slučaja"
 
 #: desk/src/pages/ticket/Tickets.vue:295 desk/src/pages/ticket/Tickets.vue:354
 msgid "Default Views"
-msgstr ""
+msgstr "Standard Prikazi"
 
 #: desk/src/components/ticket-agent/TicketHeader.vue:212
 msgid "Default actions"
-msgstr ""
+msgstr "Standard radnje"
 
 #. Label of the default_priority (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1325,7 +1325,7 @@ msgstr "Izbriši"
 
 #: desk/src/pages/knowledge-base/Article.vue:316
 msgid "Delete Article"
-msgstr ""
+msgstr "Obriši Članak"
 
 #: desk/src/pages/ticket/Tickets.vue:434
 msgid "Delete View"
@@ -1333,11 +1333,11 @@ msgstr "Izbriši Prikaz"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:197
 msgid "Delete articles?"
-msgstr ""
+msgstr "Obriši Članake?"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:304
 msgid "Delete category?"
-msgstr ""
+msgstr "Obriši kategoriju?"
 
 #: desk/src/pages/ticket/Tickets.vue:442
 msgid "Delete {0}?"
@@ -1383,7 +1383,7 @@ msgstr "Težina Opisa"
 #: desk/src/pages/ticket/TicketNew.vue:89
 #: desk/src/pages/ticket/TicketNew.vue:114
 msgid "Detailed explanation"
-msgstr ""
+msgstr "Detaljno objašnjenje"
 
 #. Label of the details_section (Section Break) field in DocType 'HD
 #. Notification'
@@ -1401,13 +1401,13 @@ msgstr "Onemogući zaobilaženje ograničenja"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:67
 msgid "Disable global saved replies"
-msgstr ""
+msgstr "Onemogući globalno definisane odgovore"
 
 #. Label of the disable_saved_replies_global_scope (Check) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Disable saved replies with scope 'Global'"
-msgstr ""
+msgstr "Onemogući definisane odgovore s opsegom 'Globalno'"
 
 #: desk/src/components/Settings/General/General.vue:49
 msgid "Disable signup"
@@ -1428,15 +1428,15 @@ msgstr "Odbaci"
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:145
 msgid "Discard Article"
-msgstr ""
+msgstr "Odbaci Članak"
 
 #: desk/src/pages/knowledge-base/Article.vue:66
 msgid "Discard changes?"
-msgstr ""
+msgstr "Odbaci promjene?"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:203
 msgid "Display a customizable banner message when customers raise tickets outside your working hours."
-msgstr ""
+msgstr "Prikažite prilagodljivu poruku na baneru kada klijenti registruju slučaj izvan radnog vremena."
 
 #. Description of the 'Ignore Restrictions' (Check) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
@@ -1462,7 +1462,7 @@ msgstr "DocType"
 
 #: desk/src/components/layouts/Sidebar.vue:333
 msgid "Docs"
-msgstr ""
+msgstr "Dokumenti"
 
 #. Label of the domain (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -1505,7 +1505,7 @@ msgstr "Dupliciraj Ugovor o Nivou Usluge princip"
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:186
 msgid "Duplicate Saved reply"
-msgstr ""
+msgstr "Dupliciraj Definisani Odgovor"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:64
 #: desk/src/pages/call-logs/CallLogModal.vue:68
@@ -1514,7 +1514,7 @@ msgstr "Trajanje"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:388
 msgid "Duration is required"
-msgstr ""
+msgstr "Trajanje je obavezno"
 
 #: desk/src/components/Settings/InviteAgents.vue:4
 msgid "Easily invite new agents, managers, or admins."
@@ -1529,13 +1529,18 @@ msgstr "Uredi"
 msgid "Edit Call Log"
 msgstr "Uredi Zapisnik Poziva"
 
+#: desk/src/components/Settings/EmailAdd.vue:70
+#: desk/src/components/Settings/EmailEdit.vue:63
+msgid "Edit Domain"
+msgstr "Uredi Domenu"
+
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
 msgstr "Uredi e-poštu"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:140
 msgid "Edit Title"
-msgstr ""
+msgstr "Uredi Naslov"
 
 #: desk/src/components/Settings/EmailEdit.vue:4
 msgid "Edit your email account"
@@ -1586,17 +1591,17 @@ msgstr "E-pošta"
 msgid "Email Notifications"
 msgstr "Obavijesti E-poštom"
 
-#: desk/src/components/Settings/EmailAdd.vue:162
+#: desk/src/components/Settings/EmailAdd.vue:306
 msgid "Email account created"
 msgstr "Kreiran je račun e-pošte"
 
-#: desk/src/components/Settings/EmailEdit.vue:267
+#: desk/src/components/Settings/EmailEdit.vue:471
 msgid "Email account updated successfully"
 msgstr "Račun e-pošte uspješno ažuriran"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:234
 msgid "Email should not be empty"
-msgstr ""
+msgstr "Adresa e-pošte ne smije biti prazna"
 
 #: desk/src/pages/SearchAgent.vue:352
 #: desk/src/pages/desk/contact/ContactDialog.vue:43
@@ -1604,14 +1609,14 @@ msgstr ""
 msgid "Emails"
 msgstr "E-pošta"
 
-#: desk/src/components/Settings/EmailEdit.vue:224
+#: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
 msgstr "E-pošta su uspješno preuzeta"
 
 #. Label of the emoji (Data) field in DocType 'HD Comment Reaction'
 #: helpdesk/helpdesk/doctype/hd_comment_reaction/hd_comment_reaction.json
 msgid "Emoji"
-msgstr ""
+msgstr "Emoji"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:300
 msgid "Enable Bypass Restrictions"
@@ -1621,7 +1626,7 @@ msgstr "Omogući zaobilaženje ograničenja"
 #: desk/src/components/Settings/General/components/TicketSettings.vue:23
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Enable comment reactions"
-msgstr ""
+msgstr "Omogući reakcije na komentare"
 
 #. Label of the is_feedback_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1677,11 +1682,11 @@ msgstr "Unesi naziv za ovu Listu Praznika."
 
 #: desk/src/components/desk/global/NewContactDialog.vue:236
 msgid "Enter a valid email"
-msgstr ""
+msgstr "Unesi važeću adresu e-pošte"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:255
 msgid "Enter a valid phone number"
-msgstr ""
+msgstr "Unesi važeći broj telefona"
 
 #: desk/src/components/Settings/General/components/Branding.vue:11
 msgid "Enter brand name"
@@ -1719,7 +1724,7 @@ msgstr "Proširi"
 
 #: desk/src/components/layouts/Sidebar.vue:516
 msgid "Explore customer portal"
-msgstr ""
+msgstr "Istraži Klijent Portal"
 
 #: desk/src/components/ticket/ExportModal.vue:2
 #: desk/src/pages/ticket/Tickets.vue:105
@@ -1747,7 +1752,7 @@ msgstr "Vanjska veza"
 msgid "Failed"
 msgstr "Neuspješno"
 
-#: desk/src/components/Settings/EmailAdd.vue:167
+#: desk/src/components/Settings/EmailAdd.vue:311
 msgid "Failed to create email account, Invalid credentials"
 msgstr "Nije uspjelo kreiranje računa e-pošte, nevažeći akreditivi"
 
@@ -1755,7 +1760,7 @@ msgstr "Nije uspjelo kreiranje računa e-pošte, nevažeći akreditivi"
 msgid "Failed to load telephony agent"
 msgstr "Nije uspjelo učitavanje telefonskog agenta"
 
-#: desk/src/components/Settings/EmailEdit.vue:229
+#: desk/src/components/Settings/EmailEdit.vue:422
 msgid "Failed to pull emails"
 msgstr "Preuzimanje e-pošte nije uspjelo"
 
@@ -1767,7 +1772,7 @@ msgstr "Nije uspjelo spremanje postavki Exotela"
 msgid "Failed to save Twilio settings"
 msgstr "Nije uspjelo spremanje postavki Twilia"
 
-#: desk/src/components/Settings/EmailEdit.vue:272
+#: desk/src/components/Settings/EmailEdit.vue:476
 msgid "Failed to update email account, Invalid credentials"
 msgstr "Nije uspjelo ažuriranje računa e-pošte, nevažeći akreditivi"
 
@@ -1902,7 +1907,7 @@ msgstr "Vrijeme prvog odgovora za Slučajeve"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:246
 msgid "First name should not be empty"
-msgstr ""
+msgstr "Ime ne smije biti prazno"
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -1939,7 +1944,7 @@ msgstr "Od datuma"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:374
 msgid "From is required"
-msgstr ""
+msgstr "\"Od\" je obavezno"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: desk/src/pages/ticket/Tickets.vue:189 desk/src/pages/ticket/Tickets.vue:220
@@ -1973,11 +1978,11 @@ msgstr "Naziv opšte kategorije ne može se promijeniti"
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:233
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Global"
-msgstr ""
+msgstr "Globalno"
 
 #: desk/src/components/command-palette/CP.vue:90
 msgid "Go to Ticket #{0}"
-msgstr ""
+msgstr "Idi na Slučaj #{0}"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -2038,7 +2043,7 @@ msgstr "Povratne informacije Članka"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_comment_reaction/hd_comment_reaction.json
 msgid "HD Comment Reaction"
-msgstr ""
+msgstr "Reakcija na Komentar"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -2093,12 +2098,12 @@ msgstr "Zahtjev za registraciju na portalu"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "HD Saved Reply"
-msgstr ""
+msgstr "Definisani Odgovor"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_saved_reply_team/hd_saved_reply_team.json
 msgid "HD Saved Reply Team"
-msgstr ""
+msgstr "Tim Definisanog Odgovora"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
@@ -2216,7 +2221,7 @@ msgstr "Težina Naslova"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:133
 msgid "Hello {{ contact }}, \\n\\nWe are sorry for the inconvenience, we will get back to you soon. \\n\\nRegards, \\n{{ full_name }}"
-msgstr ""
+msgstr "Zdravo {{ contact }}, \\n\\nŽao nam je zbog neugodnosti, uskoro ćemo vam se javiti. \\n\\nLijepi pozdrav, \\n{{ full_name }}"
 
 #: desk/src/components/layouts/Sidebar.vue:120
 msgid "Help"
@@ -2406,7 +2411,7 @@ msgstr "Brojčana vrijednost"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:273
 msgid "Invalid email"
-msgstr ""
+msgstr "Nevažeća adresa e-pošte"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:493
 #: desk/src/components/Settings/Holiday/HolidayView.vue:343
@@ -2417,7 +2422,7 @@ msgstr "Nevažeća polja, provjerite jesu li sva popunjena i jesu li vrijednosti
 #: desk/src/pages/desk/contact/ContactDialog.vue:289
 #: desk/src/pages/desk/contact/ContactDialog.vue:290
 msgid "Invalid file type, only PNG and JPG images are allowed"
-msgstr ""
+msgstr "Nevažeći tip datoteke, dozvoljene su samo PNG i JPG slike"
 
 #: helpdesk/api/settings/email_notifications.py:112
 msgid "Invalid notification"
@@ -2426,7 +2431,7 @@ msgstr "Nevažeća obavijest"
 #: desk/src/components/ticket/SetContactPhoneModal.vue:69
 #: desk/src/pages/desk/contact/ContactDialog.vue:283
 msgid "Invalid phone number"
-msgstr ""
+msgstr "Nevažeći broj telefona"
 
 #: desk/src/components/Settings/InviteAgents.vue:3
 msgid "Invite Agents"
@@ -2438,11 +2443,11 @@ msgstr "Pozovi agenta"
 
 #: desk/src/components/layouts/Sidebar.vue:412
 msgid "Invite agents"
-msgstr ""
+msgstr "Pozovi agente"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:36
 msgid "Invite as user"
-msgstr ""
+msgstr "Pozovi kao korisnika"
 
 #: desk/src/components/Settings/InviteAgents.vue:11
 msgid "Invite by email"
@@ -2486,7 +2491,7 @@ msgstr "Je podešavanje završeno"
 
 #: desk/src/components/ListViewBuilder.vue:256
 msgid "Item(s) deleted successfully"
-msgstr ""
+msgstr "Artikli su uspješno izbrisani"
 
 #: desk/src/components/ticket-agent/AssignToBody.vue:11
 msgid "John Doe"
@@ -2573,12 +2578,12 @@ msgstr "Posljednjih 90 Dana"
 #. Label of the last_agent_response (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Last Agent Response"
-msgstr ""
+msgstr "Posljednji odgovor agenta"
 
 #. Label of the last_customer_response (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Last Customer Response"
-msgstr ""
+msgstr "Posljednji odgovor klijenta"
 
 #: desk/src/components/Settings/Profile/Profile.vue:107
 #: desk/src/components/desk/global/NewContactDialog.vue:126
@@ -2602,7 +2607,7 @@ msgstr "Saznajte više o Ugovoru o Nivou Usluge"
 #. 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Let customers know they're raising a ticket outside working hours, and when they can expect a reply."
-msgstr ""
+msgstr "Obavijesti klijente da podnose slučaj izvan radnog vremena i kada mogu očekivati odgovor."
 
 #. Option for the 'Source Type' (Select) field in DocType 'HD Support Search
 #. Source'
@@ -2618,11 +2623,11 @@ msgstr "Opcije Veze"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:63
 msgid "Link to a customer"
-msgstr ""
+msgstr "Link do klijenta"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:32
 msgid "Link to a customer record"
-msgstr ""
+msgstr "Link do zapisa klijenta"
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #. Label of the list_tab (Tab Break) field in DocType 'HD View'
@@ -2696,7 +2701,7 @@ msgstr "Obavezno podnošenje povratnih informacija"
 
 #: desk/src/pages/ticket/Tickets.vue:412
 msgid "Make {0} private?"
-msgstr ""
+msgstr "Želite li {0} učiniti privatnim?"
 
 #: desk/src/components/Settings/General/General.vue:2
 msgid "Manage general settings of your app."
@@ -2704,7 +2709,7 @@ msgstr "Upravljaj općim postavkama vaše aplikacije."
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:5
 msgid "Manage pre-defined responses that can be used to respond to customer queries."
-msgstr ""
+msgstr "Upravljajte unaprijed definiranim odgovorima koji se mogu koristiti za odgovaranje na upite klijenta."
 
 #: desk/src/components/Settings/EmailAccountList.vue:5
 msgid "Manage your email accounts and configure incoming and outgoing settings."
@@ -2747,7 +2752,7 @@ msgstr "Spoji"
 #: desk/src/components/ticket-agent/TicketHeader.vue:204
 #: desk/src/components/ticket/TicketAgentSidebar.vue:18
 msgid "Merge Ticket"
-msgstr ""
+msgstr "Spoji Slučaj"
 
 #. Label of the merged_with (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2786,7 +2791,7 @@ msgstr "Premjesti u"
 #: desk/src/components/SavedRepliesSelectorModal.vue:168
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:339
 msgid "My Team"
-msgstr ""
+msgstr "Moj Tim"
 
 #. Label of the category_name (Data) field in DocType 'HD Article Category'
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
@@ -2820,7 +2825,7 @@ msgstr "Ime prikazano na korisničkom portalu<br> (npr. Odgovoreno → Čeka se 
 
 #: desk/src/components/modals/ShortcutsModal.vue:108
 msgid "Navigation"
-msgstr ""
+msgstr "Navigacija"
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:16
 #: desk/src/components/Settings/Agents.vue:109
@@ -2845,7 +2850,7 @@ msgstr "Novi"
 #: desk/src/pages/knowledge-base/NewArticle.vue:182
 #: desk/src/pages/knowledge-base/NewArticle.vue:189
 msgid "New Article"
-msgstr ""
+msgstr "Novi Članak"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:9
 msgid "New Assignment Rule"
@@ -2893,15 +2898,15 @@ msgstr "Naziv novog principa Ugovora o Nivou Usluge"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:8
 msgid "New Saved Reply"
-msgstr ""
+msgstr "Novi Definisani Ogovor"
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:192
 msgid "New Saved reply Name"
-msgstr ""
+msgstr "Novo ime Definisanog Odgovora"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:165
 msgid "New Subject"
-msgstr ""
+msgstr "Novi Predmet"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:8
 msgid "New Team"
@@ -2910,7 +2915,7 @@ msgstr "Novi Tim"
 #: desk/src/pages/ticket/TicketNew.vue:313
 #: desk/src/pages/ticket/TicketNew.vue:323
 msgid "New Ticket"
-msgstr ""
+msgstr "Novi Slučaj"
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:48
 #: desk/src/components/Settings/Teams/TeamEdit.vue:264
@@ -2932,7 +2937,7 @@ msgstr "Nove korisnike će morati manualno registrovati Upravitelji Sistema."
 
 #: desk/src/components/modals/ShortcutsModal.vue:110
 msgid "Next ticket"
-msgstr ""
+msgstr "Sljedeći slučaj"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:216
 msgid "No Answer"
@@ -2940,7 +2945,7 @@ msgstr "Bez Odgovora"
 
 #: desk/src/components/ListViewBuilder.vue:278
 msgid "No Data Found"
-msgstr ""
+msgstr "Nisu Pronađeni Podaci"
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:20
 msgid "No Holiday list found"
@@ -2952,11 +2957,11 @@ msgstr "Nije pronađen Ugovor o Nivou Usluge"
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:106
 msgid "No Saved Replies found"
-msgstr ""
+msgstr "Nema pronađenih Definisanih Odgovora"
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:95
 msgid "No Saved reply found"
-msgstr ""
+msgstr "Nije pronađen Definisani Odgovor"
 
 #: helpdesk/api/dashboard.py:442
 msgid "No Team"
@@ -2964,7 +2969,7 @@ msgstr "Nema Tima"
 
 #: desk/src/pages/ticket/Tickets.vue:167
 msgid "No Tickets Found"
-msgstr ""
+msgstr "Nisu Pronađeni Slučajevi"
 
 #: desk/src/components/Settings/Agents.vue:98
 msgid "No agent found"
@@ -2978,13 +2983,13 @@ msgstr "Nema dodijeljenih"
 msgid "No assignment rule found"
 msgstr "Nije pronađeno pravilo dodjeljivanja"
 
-#: desk/src/components/Settings/EmailEdit.vue:184
+#: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
 msgstr "Nisu napravljene promjene"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:245
 msgid "No changes to save"
-msgstr ""
+msgstr "Nema promjena za spremanje"
 
 #: desk/src/components/Settings/EmailAccountList.vue:52
 msgid "No email account found"
@@ -3012,7 +3017,7 @@ msgstr "Nije pronađen nijedan tim"
 
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:98
 msgid "No tickets found to preview."
-msgstr ""
+msgstr "Nisu pronađeni slučajevi za pregled."
 
 #: helpdesk/utils.py:168
 msgid "Not Allowed"
@@ -3078,23 +3083,27 @@ msgstr "Otvori"
 
 #: desk/src/components/modals/ShortcutsModal.vue:81
 msgid "Open command palette"
-msgstr ""
+msgstr "Otvori paletu komandi"
 
 #: desk/src/components/modals/ShortcutsModal.vue:103
 msgid "Open comment box"
-msgstr ""
+msgstr "Otvori okvir za komentare"
 
 #: desk/src/components/modals/ShortcutsModal.vue:84
 msgid "Open help"
-msgstr ""
+msgstr "Otvori pomoć"
+
+#: desk/src/components/Settings/EmailEdit.vue:37
+msgid "Open in Desk"
+msgstr "Otvori u Radnoj Površini"
 
 #: desk/src/components/modals/ShortcutsModal.vue:102
 msgid "Open reply box"
-msgstr ""
+msgstr "Otvori okvir za odgovor"
 
 #: desk/src/components/modals/ShortcutsModal.vue:82
 msgid "Open settings"
-msgstr ""
+msgstr "Otvori postavke"
 
 #. Description of the 'Category' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -3123,7 +3132,7 @@ msgstr "Narandžasta"
 #. Label of the order (Int) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Order"
-msgstr "Red"
+msgstr "Redoslijed"
 
 #. Label of the order_by_tab (Tab Break) field in DocType 'HD View'
 #. Label of the order_by (Code) field in DocType 'HD View'
@@ -3145,7 +3154,7 @@ msgstr "Odlazeća"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:199
 msgid "Outside working hours notice"
-msgstr ""
+msgstr "Izvan radnog vremena obavještenje"
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:119
 msgid "Owner"
@@ -3232,11 +3241,11 @@ msgstr "Telefon"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:51
 msgid "Phone Nos"
-msgstr ""
+msgstr "Brojevi telefona"
 
 #: desk/src/pages/ticket/TicketFeedback.vue:38
 msgid "Pick an option"
-msgstr ""
+msgstr "Odaberi opciju"
 
 #: desk/src/pages/ticket/Tickets.vue:386
 msgid "Pin View"
@@ -3267,12 +3276,12 @@ msgstr "Dodaj prioritet {0} u Ugovor o Nivou Usluge {1}"
 
 #: desk/src/pages/ticket/TicketNew.vue:82
 msgid "Please enter a subject to continue"
-msgstr ""
+msgstr "Unesi predmet da biste nastavili"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:368
 #: desk/src/pages/call-logs/CallLogModal.vue:376
 msgid "Please enter a valid phone number"
-msgstr ""
+msgstr "Unesi važeći broj telefona"
 
 #: desk/src/components/Settings/Profile/Profile.vue:225
 msgid "Please enter first name at least"
@@ -3294,11 +3303,11 @@ msgstr "Molimo Vas da popunite sva obavezna polja za Twilio"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:333
 msgid "Please fill all the required fields"
-msgstr ""
+msgstr "Popuni sva obavezna polja"
 
 #: helpdesk/api/saved_replies.py:11
 msgid "Please provide saved_reply_id"
-msgstr ""
+msgstr "Navedi Definisani Odgovor"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:41
 msgid "Please select weekly off day"
@@ -3339,7 +3348,7 @@ msgstr "Preferiraj bazu znanja"
 
 #: desk/src/pages/dashboard/Dashboard.vue:267
 msgid "Presets"
-msgstr ""
+msgstr "Predodabir"
 
 #: desk/src/pages/SearchAgent.vue:108
 msgid "Press enter to search"
@@ -3353,7 +3362,7 @@ msgstr "Pregled"
 
 #: desk/src/components/modals/ShortcutsModal.vue:111
 msgid "Previous ticket"
-msgstr ""
+msgstr "Prethodni slučaj"
 
 #. Label of the priorities (Table) field in DocType 'HD Service Level
 #. Agreement'
@@ -3391,7 +3400,7 @@ msgstr "Prioritet {0} je ponovljen."
 #: desk/src/components/layouts/Sidebar.vue:278
 #: desk/src/pages/ticket/Tickets.vue:318
 msgid "Private Views"
-msgstr ""
+msgstr "Privatni Pregledi"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:37
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:7
@@ -3401,7 +3410,7 @@ msgstr "Stručnjaci za proizvode"
 
 #: desk/src/components/Settings/NewTeamModal.vue:22
 msgid "Product experts"
-msgstr ""
+msgstr "Stručnjaci za Proizvode"
 
 #: desk/src/components/Settings/Profile/Profile.vue:3
 msgid "Profile"
@@ -3440,11 +3449,11 @@ msgstr "Objavljeno dana"
 msgid "Published articles must have content."
 msgstr "Objavljeni članci moraju imati sadržaj."
 
-#: desk/src/components/Settings/EmailEdit.vue:87
+#: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
 msgstr "Preuzmi e-poštu"
 
-#: desk/src/components/Settings/EmailEdit.vue:214
+#: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
 msgstr "Preuzimanje e-pošte, ovo može potrajati nekoliko minuta."
 
@@ -3483,7 +3492,7 @@ msgstr "Ocijenite Iskustvo s Podrškom"
 
 #: desk/src/pages/ticket/TicketFeedback.vue:5
 msgid "Rate this ticket"
-msgstr ""
+msgstr "Ocijenite ovaj slučaj"
 
 #: helpdesk/api/dashboard.py:373
 msgid "Rated Tickets"
@@ -3513,7 +3522,7 @@ msgstr "Reakcija"
 #. Label of the reactions (Table) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "Reactions"
-msgstr ""
+msgstr "Reakcije"
 
 #. Label of the read (Check) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -3578,7 +3587,7 @@ msgstr "Ukloni sliku"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:31
 msgid "Remove photo"
-msgstr ""
+msgstr "Ukloni sliku"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:292
 #: desk/src/components/Settings/Teams/TeamsList.vue:172
@@ -3618,7 +3627,7 @@ msgstr "Odgovor kontakta"
 
 #: desk/src/components/layouts/Sidebar.vue:455
 msgid "Reply on a ticket"
-msgstr ""
+msgstr "Odgovor na slučaj"
 
 #. Label of the request_key (Data) field in DocType 'HD Desk Account Request'
 #. Label of the request_key (Data) field in DocType 'HD Portal Signup Request'
@@ -3726,7 +3735,7 @@ msgstr "Odgovor i rješenje"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:439
 msgid "Response is required"
-msgstr ""
+msgstr "Odgovor je obevezan"
 
 #. Label of the assign_within_team (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -3753,7 +3762,7 @@ msgstr "Ograniči pregled i upravljanje slučajima samo od strane članova tima.
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:107
 msgid "Restrict visibility to these teams"
-msgstr ""
+msgstr "Ograničite vidljivost na ove timove"
 
 #. Label of the result_preview_field (Data) field in DocType 'HD Support Search
 #. Source'
@@ -3877,7 +3886,7 @@ msgstr "Spremi Promjene"
 #: desk/src/components/SavedRepliesSelectorModal.vue:12
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:3
 msgid "Saved Replies"
-msgstr ""
+msgstr "Definisani Odgovori"
 
 #: desk/src/pages/ticket/Tickets.vue:312
 msgid "Saved Views"
@@ -3885,19 +3894,19 @@ msgstr "Spremljeni Prikazi"
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:288
 msgid "Saved reply deleted"
-msgstr ""
+msgstr "Definisani Odgovor je izbrisan"
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:305
 msgid "Saved reply duplicated"
-msgstr ""
+msgstr "Definisani Odgovor je dupliciran"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:356
 msgid "Saved reply saved"
-msgstr ""
+msgstr "Definisani Odgovor sačuvan"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:419
 msgid "Saved reply updated"
-msgstr ""
+msgstr "Definisani Odgovor ažuriran"
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:35
 msgid "Schedule name"
@@ -3946,11 +3955,11 @@ msgstr "Naziv Parametra Pretrage"
 
 #: desk/src/components/command-palette/CP.vue:127
 msgid "Search for \"{0}\""
-msgstr ""
+msgstr "Traži \"{0}\""
 
 #: desk/src/pages/SearchAgent.vue:100
 msgid "Search index does not exist. Please build the index first."
-msgstr ""
+msgstr "Indeks pretrage ne postoji. Molimo vas da prvo kreirate indeks."
 
 #: helpdesk/api/search.py:38
 msgid "Search index not available. Please contact administrator."
@@ -3962,23 +3971,23 @@ msgstr "Upit za pretragu mora sadržavati najmanje 2 znaka"
 
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:19
 msgid "Search ticket"
-msgstr ""
+msgstr "Traži slučaj"
 
 #: desk/src/pages/SearchAgent.vue:16
 msgid "Search tickets, comments, and communications..."
-msgstr ""
+msgstr "Traži slučajeve, komentare i komunikacije..."
 
 #: desk/src/components/command-palette/CP.vue:12
 msgid "Search tickets, emails, comments, or #234 to navigate to ticket"
-msgstr ""
+msgstr "Traži slučajeve, e-poštu, komentare ili #234 da biste došli do slučaja"
 
 #: desk/src/pages/SearchAgent.vue:137
 msgid "Searched for:"
-msgstr ""
+msgstr "Tražilo se:"
 
 #: desk/src/pages/SearchAgent.vue:111
 msgid "Searching..."
-msgstr ""
+msgstr "Pretraga..."
 
 #: desk/src/pages/call-logs/CallLogModal.vue:28
 #: desk/src/pages/call-logs/CallLogModal.vue:57
@@ -3990,7 +3999,7 @@ msgstr "Odaberi"
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:21
 msgid "Select Category"
-msgstr ""
+msgstr "Odaberi Kategoriju"
 
 #: desk/src/pages/dashboard/Dashboard.vue:20
 msgid "Select Range"
@@ -4002,15 +4011,15 @@ msgstr "Odaberi Standard Prioritet."
 
 #: desk/src/pages/ticket/TicketFeedback.vue:28
 msgid "Select a rating"
-msgstr ""
+msgstr "Odaberi ocjenu"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:103
 msgid "Select teams"
-msgstr ""
+msgstr "Odaberi timove"
 
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:16
 msgid "Select ticket to preview"
-msgstr ""
+msgstr "Odaberi slučaj za pregled"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:132
 msgid "Select what type all tickets get by default."
@@ -4060,10 +4069,14 @@ msgstr "Ugovori o Nivou Usluge"
 msgid "Service Level Name"
 msgstr "Naziv Servisnog Nivoa"
 
+#: helpdesk/api/settings/email.py:14
+msgid "Service not supported"
+msgstr "Usluga nije podržana"
+
 #: desk/src/components/ticket/SetContactPhoneModal.vue:5
 #: desk/src/components/ticket/SetContactPhoneModal.vue:8
 msgid "Set Phone Number"
-msgstr ""
+msgstr "Postavi broj telefona"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:56
 msgid "Set Resolution Time for Priority {0} in row {1}."
@@ -4115,7 +4128,7 @@ msgstr "Postavljanje e-pošte"
 
 #: desk/src/components/layouts/Sidebar.vue:423
 msgid "Setup SLA"
-msgstr ""
+msgstr "Postavli SLA"
 
 #: desk/src/pages/knowledge-base/Article.vue:402
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:160
@@ -4143,7 +4156,7 @@ msgstr "Prikažite krajnjim korisnicima drugačiji pogled"
 
 #: desk/src/components/modals/ShortcutsModal.vue:83
 msgid "Show keyboard shortcuts"
-msgstr ""
+msgstr "Prikaži prečice na tastaturi"
 
 #. Description of the 'Condition' (Code) field in DocType 'HD Service Level
 #. Agreement'
@@ -4166,11 +4179,11 @@ msgstr "Došlo je do greške prilikom preimenovanja pravila dodjele"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:417
 msgid "Some error occurred while renaming holiday list"
-msgstr ""
+msgstr "Došlo je do greške prilikom preimenovanja liste praznika"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:398
 msgid "Some error occurred while renaming saved reply"
-msgstr ""
+msgstr "Došlo je do greške prilikom preimenovanja definisanog odgovora"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:616
 msgid "Some error occurred while updating assignment rule"
@@ -4178,7 +4191,7 @@ msgstr "Došlo je do greške prilikom ažuriranja pravila dodjeljivanja"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:407
 msgid "Some error occurred while updating holiday list"
-msgstr ""
+msgstr "Došlo je do greške prilikom ažuriranja liste praznika"
 
 #. Label of the source_doctype (Link) field in DocType 'HD Support Search
 #. Source'
@@ -4477,7 +4490,7 @@ msgstr "Postavke telefonije su ažurirane!"
 
 #: desk/src/pages/ticket/TicketFeedback.vue:56
 msgid "Tell us more"
-msgstr ""
+msgstr "Recite nam više"
 
 #. Label of the template (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -4531,7 +4544,7 @@ msgstr "Status slučaja će se automatski promijeniti kad god agent odgovori na 
 
 #: desk/src/components/ticket/TicketCustomerSidebar.vue:68
 msgid "This date is calculated based on configured SLAs, working hours, and holidays."
-msgstr ""
+msgstr "Ovaj datum se izračunava na osnovu konfigurisanih SLA, radnog vremena i praznika."
 
 #. Description of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
@@ -4564,15 +4577,15 @@ msgstr "Ovaj slučaj je razdjeljen na novi slučaj. Pratite situaciju u vezi s s
 
 #: desk/src/pages/ticket/Tickets.vue:413
 msgid "This view is currently public. Changing it to private will hide it for all the users."
-msgstr ""
+msgstr "Ovaj prikaz je trenutno javan. Promjenom u privatni prikaz, sakrit će se za sve korisnike."
 
 #: desk/src/pages/ticket/Tickets.vue:447
 msgid "This view is public, and will be removed for all users."
-msgstr ""
+msgstr "Ovaj prikaz je javan i bit će uklonjen za sve korisnike."
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:249
 msgid "This will reset the content to the default message."
-msgstr ""
+msgstr "Ovo će resetovati sadržaj na standard poruku."
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -4596,7 +4609,7 @@ msgstr "Slučaj"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:776
 msgid "Ticket #{0}: We've received your request"
-msgstr ""
+msgstr "Slučaj #{0}: Primili smo vaš zahtjev"
 
 #. Name of a report
 #. Label of a Link in the Helpdesk Workspace
@@ -4612,7 +4625,7 @@ msgstr "Konfiguracija Slučaja"
 
 #: desk/src/components/modals/ShortcutsModal.vue:88
 msgid "Ticket Management"
-msgstr ""
+msgstr "Upravljanje Slučajevima"
 
 #. Label of the is_merged (Check) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -4672,7 +4685,7 @@ msgstr "Tip Slučaja"
 
 #: desk/src/pages/ticket/TicketCustomer.vue:306
 msgid "Ticket closed"
-msgstr ""
+msgstr "Slučaj zatvoren"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:21
 msgid "Ticket does not exist."
@@ -4695,7 +4708,7 @@ msgstr "Slučaj nije pronađen za dati ključ."
 #. Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Ticket raised outside working hours"
-msgstr ""
+msgstr "Slučaj registrovan izvan radnog vremena"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:4
 msgid "Ticket settings"
@@ -4714,7 +4727,7 @@ msgstr "Tip Slučaja"
 #: desk/src/pages/ticket/MobileTicketAgent.vue:498
 #: desk/src/pages/ticket/TicketCustomer.vue:279
 msgid "Ticket updated"
-msgstr ""
+msgstr "Slučaj ažuriran"
 
 #. Name of a report
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
@@ -4801,9 +4814,9 @@ msgstr "Do datuma"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:366
 msgid "To is required"
-msgstr ""
+msgstr "Do je Obavezno"
 
-#: desk/src/components/Settings/EmailEdit.vue:147
+#: desk/src/components/Settings/EmailEdit.vue:268
 msgid "To know more about setting up email accounts, click"
 msgstr "Da biste saznali više o postavljanju računa e-pošte, klikni"
 
@@ -4869,11 +4882,11 @@ msgstr "Tip"
 
 #: desk/src/pages/ticket/TicketCustomer.vue:56
 msgid "Type a message"
-msgstr ""
+msgstr "Upiši poruku"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:360
 msgid "Type is required"
-msgstr ""
+msgstr "Tip je obavezan"
 
 #. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
@@ -4882,7 +4895,7 @@ msgstr "URL/Metod"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:612
 msgid "Unable to send email. Please setup default outgoing email account."
-msgstr ""
+msgstr "Nije moguće poslati e-poštu. Molimo vas da postavite standard račun za odlaznu e-poštu."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:214
 msgid "Unassignment condition"
@@ -4937,7 +4950,7 @@ msgstr "Neimenovan"
 msgid "Update"
 msgstr "Ažuriraj"
 
-#: desk/src/components/Settings/EmailEdit.vue:80
+#: desk/src/components/Settings/EmailEdit.vue:142
 msgid "Update Account"
 msgstr "Ažuriraj račun"
 
@@ -4960,7 +4973,7 @@ msgstr "Učitaj Sliku"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:22
 msgid "Upload photo"
-msgstr ""
+msgstr "Otpremi sliku"
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:38
 msgid "Uploading {0}%"
@@ -5104,7 +5117,7 @@ msgstr "Radno Vrijeme"
 #: desk/src/pages/knowledge-base/Article.vue:97
 #: desk/src/pages/knowledge-base/NewArticle.vue:57
 msgid "Write your article here..."
-msgstr ""
+msgstr "Napiši članak ovdje..."
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:37
 msgid "Yearly"
@@ -5149,7 +5162,7 @@ msgstr "Ne možete postaviti više od jednog Standard Prioriteta."
 
 #: helpdesk/api/assignment_rule.py:8
 msgid "You do not have permission to access Assignment Rules"
-msgstr ""
+msgstr "Nemate dozvolu za pristup Pravilima Dodjele"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:29
 msgid "You have already provided feedback for this ticket."
@@ -5165,7 +5178,7 @@ msgstr "Vaši stari uslovi će biti prepisani. Jeste li sigurni da želite saču
 
 #: desk/src/pages/MobileNotifications.vue:46
 msgid "assigned you a ticket"
-msgstr ""
+msgstr "dodijelio/la vam je slušaj"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:13
 msgid "back to email event list"
@@ -5202,7 +5215,7 @@ msgstr "je kontaktirao"
 
 #: desk/src/pages/MobileNotifications.vue:49
 msgid "has reopened the ticket"
-msgstr ""
+msgstr "je ponovo otvorio/la slušaj"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:84
 #: desk/src/components/Settings/General/components/TicketSettings.vue:237
@@ -5229,7 +5242,7 @@ msgstr "lista"
 
 #: desk/src/pages/MobileNotifications.vue:43
 msgid "mentioned you in ticket"
-msgstr ""
+msgstr "spomenuo/la te u slušaju"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -5247,5 +5260,5 @@ msgstr "sinonim"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:423
 msgid "viewed this"
-msgstr ""
+msgstr "pogledao/la je ovo"
 

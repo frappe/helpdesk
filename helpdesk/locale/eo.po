@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-08 10:41+0000\n"
-"PO-Revision-Date: 2026-02-09 07:33\n"
+"POT-Creation-Date: 2026-02-15 10:41+0000\n"
+"PO-Revision-Date: 2026-02-17 13:44\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Esperanto\n"
 "MIME-Version: 1.0\n"
@@ -680,8 +680,8 @@ msgstr "crwdns160534:0crwdne160534:0"
 msgid "Avg. time taken to resolve a ticket"
 msgstr "crwdns160536:0crwdne160536:0"
 
-#: desk/src/components/Settings/EmailAdd.vue:87
-#: desk/src/components/Settings/EmailEdit.vue:72
+#: desk/src/components/Settings/EmailAdd.vue:143
+#: desk/src/components/Settings/EmailEdit.vue:134
 msgid "Back"
 msgstr "crwdns161588:0crwdne161588:0"
 
@@ -1132,7 +1132,7 @@ msgstr "crwdns159054:0{0}crwdne159054:0"
 msgid "Could not send feedback email,due to: {0}"
 msgstr "crwdns157642:0{0}crwdne157642:0"
 
-#: desk/src/components/Settings/EmailAdd.vue:94
+#: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
 #: desk/src/components/layouts/Sidebar.vue:503
@@ -1529,6 +1529,11 @@ msgstr "crwdns195392:0crwdne195392:0"
 msgid "Edit Call Log"
 msgstr "crwdns195394:0crwdne195394:0"
 
+#: desk/src/components/Settings/EmailAdd.vue:70
+#: desk/src/components/Settings/EmailEdit.vue:63
+msgid "Edit Domain"
+msgstr "crwdns195808:0crwdne195808:0"
+
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
 msgstr "crwdns161670:0crwdne161670:0"
@@ -1586,11 +1591,11 @@ msgstr "crwdns195398:0crwdne195398:0"
 msgid "Email Notifications"
 msgstr "crwdns159066:0crwdne159066:0"
 
-#: desk/src/components/Settings/EmailAdd.vue:162
+#: desk/src/components/Settings/EmailAdd.vue:306
 msgid "Email account created"
 msgstr "crwdns161678:0crwdne161678:0"
 
-#: desk/src/components/Settings/EmailEdit.vue:267
+#: desk/src/components/Settings/EmailEdit.vue:471
 msgid "Email account updated successfully"
 msgstr "crwdns161680:0crwdne161680:0"
 
@@ -1604,7 +1609,7 @@ msgstr "crwdns195400:0crwdne195400:0"
 msgid "Emails"
 msgstr "crwdns195402:0crwdne195402:0"
 
-#: desk/src/components/Settings/EmailEdit.vue:224
+#: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
 msgstr "crwdns161682:0crwdne161682:0"
 
@@ -1747,7 +1752,7 @@ msgstr "crwdns157704:0crwdne157704:0"
 msgid "Failed"
 msgstr "crwdns157706:0crwdne157706:0"
 
-#: desk/src/components/Settings/EmailAdd.vue:167
+#: desk/src/components/Settings/EmailAdd.vue:311
 msgid "Failed to create email account, Invalid credentials"
 msgstr "crwdns161690:0crwdne161690:0"
 
@@ -1755,7 +1760,7 @@ msgstr "crwdns161690:0crwdne161690:0"
 msgid "Failed to load telephony agent"
 msgstr "crwdns161692:0crwdne161692:0"
 
-#: desk/src/components/Settings/EmailEdit.vue:229
+#: desk/src/components/Settings/EmailEdit.vue:422
 msgid "Failed to pull emails"
 msgstr "crwdns161694:0crwdne161694:0"
 
@@ -1767,7 +1772,7 @@ msgstr "crwdns161696:0crwdne161696:0"
 msgid "Failed to save Twilio settings"
 msgstr "crwdns161698:0crwdne161698:0"
 
-#: desk/src/components/Settings/EmailEdit.vue:272
+#: desk/src/components/Settings/EmailEdit.vue:476
 msgid "Failed to update email account, Invalid credentials"
 msgstr "crwdns161700:0crwdne161700:0"
 
@@ -2978,7 +2983,7 @@ msgstr "crwdns159224:0crwdne159224:0"
 msgid "No assignment rule found"
 msgstr "crwdns161798:0crwdne161798:0"
 
-#: desk/src/components/Settings/EmailEdit.vue:184
+#: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
 msgstr "crwdns161800:0crwdne161800:0"
 
@@ -3087,6 +3092,10 @@ msgstr "crwdns195554:0crwdne195554:0"
 #: desk/src/components/modals/ShortcutsModal.vue:84
 msgid "Open help"
 msgstr "crwdns195556:0crwdne195556:0"
+
+#: desk/src/components/Settings/EmailEdit.vue:37
+msgid "Open in Desk"
+msgstr "crwdns195810:0crwdne195810:0"
 
 #: desk/src/components/modals/ShortcutsModal.vue:102
 msgid "Open reply box"
@@ -3438,11 +3447,11 @@ msgstr "crwdns157990:0crwdne157990:0"
 msgid "Published articles must have content."
 msgstr "crwdns161844:0crwdne161844:0"
 
-#: desk/src/components/Settings/EmailEdit.vue:87
+#: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
 msgstr "crwdns161846:0crwdne161846:0"
 
-#: desk/src/components/Settings/EmailEdit.vue:214
+#: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
 msgstr "crwdns161848:0crwdne161848:0"
 
@@ -4057,6 +4066,10 @@ msgstr "crwdns161900:0crwdne161900:0"
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
 msgstr "crwdns158098:0crwdne158098:0"
+
+#: helpdesk/api/settings/email.py:14
+msgid "Service not supported"
+msgstr "crwdns195812:0crwdne195812:0"
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:5
 #: desk/src/components/ticket/SetContactPhoneModal.vue:8
@@ -4799,7 +4812,7 @@ msgstr "crwdns161950:0crwdne161950:0"
 msgid "To is required"
 msgstr "crwdns195710:0crwdne195710:0"
 
-#: desk/src/components/Settings/EmailEdit.vue:147
+#: desk/src/components/Settings/EmailEdit.vue:268
 msgid "To know more about setting up email accounts, click"
 msgstr "crwdns161952:0crwdne161952:0"
 
@@ -4933,7 +4946,7 @@ msgstr "crwdns159230:0crwdne159230:0"
 msgid "Update"
 msgstr "crwdns161954:0crwdne161954:0"
 
-#: desk/src/components/Settings/EmailEdit.vue:80
+#: desk/src/components/Settings/EmailEdit.vue:142
 msgid "Update Account"
 msgstr "crwdns161956:0crwdne161956:0"
 
