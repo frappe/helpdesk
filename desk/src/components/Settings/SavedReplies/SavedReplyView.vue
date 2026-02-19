@@ -22,6 +22,7 @@
     <template #header-actions>
       <div class="flex items-center gap-2">
         <Button
+          v-if="savedReplyData.name"
           :label="__('Preview')"
           size="sm"
           @click="onShowPreview()"
@@ -287,7 +288,7 @@ const teamsList = computed(() => {
 
 const onShowPreview = () => {
   previewDialog.value.show = true;
-  previewDialog.value.savedReply = savedReplyData.value.message;
+  previewDialog.value.savedReply = savedReplyData.value.name;
 };
 
 if (savedRepliesActiveScreen.value.data?.name) {

@@ -3,30 +3,27 @@ import frappe
 
 @frappe.whitelist()
 def get_assignment_rules_list():
-    assignment_rules = []
-    for docname in frappe.get_all("Assignment Rule", order_by="modified desc"):
-        doc = frappe.get_value(
-            "Assignment Rule",
-            docname,
-            fieldname=[
-                "name",
-                "description",
-                "disabled",
-                "priority",
-            ],
-            as_dict=True,
+    if not frappe.has_permission("Assignment Rule", "read"):
+        frappe.throw(
+            frappe._("You do not have permission to access Assignment Rules"),
+            frappe.PermissionError,
         )
-        users_exists = bool(
-            frappe.db.exists("Assignment Rule User", {"parent": docname.name})
+
+    assignment_rules = frappe.get_all(
+        "Assignment Rule",
+        fields=["name", "description", "disabled", "priority"],
+        order_by="modified desc",
+    )
+
+    parents_with_users = set(
+        frappe.get_all(
+            "Assignment Rule User",
+            filters={"parent": ["in", [r.name for r in assignment_rules]]},
+            pluck="parent",
         )
-        assignment_rules.append({**doc, "users_exists": users_exists})
+    )
+
+    for rule in assignment_rules:
+        rule["users_exists"] = rule.name in parents_with_users
+
     return assignment_rules
-
-
-@frappe.whitelist()
-def duplicate_assignment_rule(docname, new_name):
-    doc = frappe.get_doc("Assignment Rule", docname)
-    doc.name = new_name
-    doc.assignment_rule_name = new_name
-    doc.insert()
-    return doc

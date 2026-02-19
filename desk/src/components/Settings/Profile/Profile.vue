@@ -168,6 +168,7 @@ import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import Link from "@/components/frappe-ui/Link.vue";
+import { HDAgent } from "@/types/doctypes";
 
 const auth = useAuthStore();
 const profile = ref({
@@ -198,9 +199,15 @@ const isAccountInfoDirty = computed(() => {
 });
 
 const agentData = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_agent.hd_agent.get_agent",
+  url: "frappe.client.get",
   auto: true,
-  onSuccess: (data) => {
+  makeParams() {
+    return {
+      doctype: "HD Agent",
+      name: auth.userId,
+    };
+  },
+  onSuccess: (data: HDAgent) => {
     const fullName = data.agent_name.split(" ");
     profile.value = {
       fullName: data.agent_name,
