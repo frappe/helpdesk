@@ -97,16 +97,17 @@ class HDArticle(Document):
     def set_feedback(self, value):
         # 0 empty, 1 like, 2 dislike
         user = frappe.session.user
+
         feedback = frappe.db.exists(
             "HD Article Feedback", {"user": user, "article": self.name}
         )
         if feedback:
             frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
-            return
-
-        frappe.new_doc(
-            "HD Article Feedback", user=user, article=self.name, feedback=value
-        ).insert()
+        else:
+            frappe.new_doc(
+                "HD Article Feedback", user=user, article=self.name, feedback=value
+            ).insert()
+        self.get_feedback()
 
     @property
     def title_slug(self) -> str:
@@ -117,3 +118,18 @@ class HDArticle(Document):
         :return: Generated slug
         """
         return self.title.lower().replace(" ", "-")
+
+    def get_feedback(self):
+        data = frappe.db.get_list(
+            "HD Article Feedback", filters={"article": self.name}, fields=["feedback"]
+        )
+        feedbacks = [int(d.feedback) for d in data]
+        frappe.db.set_value(
+            "HD Article",
+            self.name,
+            {
+                "like_count": feedbacks.count(1),
+                "dislike_count": feedbacks.count(2),
+            },
+            update_modified=False,
+        )

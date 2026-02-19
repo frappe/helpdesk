@@ -90,15 +90,19 @@
             autofocus
             :disabled="!editable"
           />
-          <div class="flex gap-2 text-sm text-gray-500 items-center">
+          <div class="flex gap-4 text-sm text-gray-500 items-center">
             <span>{{ articleStats.data?.views || 0 }} views</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              :label="articleStats.data?.likes || 0"
-              iconLeft="heart"
-              @click="handleLike"
-            />
+
+            <div class="flex items-center gap-4 text-sm">
+              <div class="flex items-center gap-1">
+                <ThumbsUpIcon class="w-4 h-4" />
+                <span>{{ likes }}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <ThumbsDownIcon class="w-4 h-4" />
+                <span>{{ dislikes }}</span>
+              </div>
+            </div>
           </div>
         </div>
         <!-- Article Content -->
@@ -173,6 +177,7 @@ import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import { __ } from "@/translation";
+import { ThumbsDownIcon, ThumbsUpIcon } from "@/components/icons";
 const props = defineProps({
   articleId: {
     type: String,
@@ -188,7 +193,8 @@ const authStore = useAuthStore();
 
 const editorRef = ref(null);
 const editable = ref(route.query.isEdit ?? false);
-const likes = ref("");
+const likes = ref(0);
+const dislikes = ref(0);
 const views = ref("");
 const content = ref("");
 const title = ref("");
@@ -241,6 +247,7 @@ const articleStats = createResource({
   params: { article_name: props.articleId },
   onSuccess(data) {
     likes.value = data.likes;
+    dislikes.value = data.dislikes;
     views.value = data.views;
   },
   auto: true,
