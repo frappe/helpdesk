@@ -86,7 +86,6 @@ import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue
 import { setupCustomizations } from "@/composables/formCustomisation";
 import { useActiveViewers } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
-import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
@@ -122,7 +121,6 @@ interface P {
   ticketId: string;
 }
 const router = useRouter();
-
 const props = defineProps<P>();
 
 const { getStatus } = useTicketStatusStore();
@@ -161,7 +159,7 @@ const showFeedbackDialog = ref(false);
 const isExpanded = ref(false);
 
 const { isMobileView } = useScreenSize();
-const { $dialog } = globalStore();
+const { $dialog, $socket } = globalStore();
 const isDismissed = ref(false);
 
 function getTodayKey() {
@@ -351,12 +349,13 @@ const showFeedback = computed(() => {
   return hasAgentCommunication && isFeedbackMandatory;
 });
 const { startViewing, stopViewing } = useActiveViewers(props.ticketId);
+
 onMounted(() => {
   startViewing(props.ticketId);
   document.title = props.ticketId;
 
-  socket.on("helpdesk:ticket-update", ({ ticket_id }) => {
-    if (ticket_id === props.ticketId) {
+  $socket.on("helpdesk:ticket-update", ({ ticket_id }) => {
+    if (ticket_id == props.ticketId) {
       ticket.reload();
     }
   });
