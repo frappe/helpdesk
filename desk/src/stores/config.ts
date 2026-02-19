@@ -49,10 +49,7 @@ export const useConfigStore = defineStore("config", () => {
     isFeedbackMandatory,
     teamRestrictionApplied,
     assignWithinTeam,
-<<<<<<< HEAD
     disableGlobalScopeForSavedReplies,
-=======
     enableCommentReactions,
->>>>>>> 0b05a7c0 (feat: add enable_comment_reactions setting to toggle feature)
   };
 });
