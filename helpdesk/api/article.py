@@ -70,24 +70,10 @@ def get_article_stats(article_name: str):
 
 @frappe.whitelist()
 def get_article_stats(article_name):
-    views = frappe.db.count(
-        "View Log",
-        filters={
-            "reference_doctype": "HD Article",
-            "reference_name": article_name,
-        },
-    )
-
-    likes = frappe.db.count(
-        "Comment",
-        filters={
-            "reference_doctype": "HD Article",
-            "reference_name": article_name,
-            "comment_type": "Like",
-        },
-    )
-
-    return {"views": views, "likes": likes}
+    views = frappe.db.get_value("HD Article", article_name, "views")
+    likes = frappe.db.get_value("HD Article", article_name, "like_count")
+    dislikes = frappe.db.get_value("HD Article", article_name, "dislike_count")
+    return {"views": views, "likes": likes, "dislikes": dislikes}
 
 
 @frappe.whitelist()

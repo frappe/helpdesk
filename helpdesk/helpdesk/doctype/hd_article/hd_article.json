@@ -14,6 +14,8 @@
   "category",
   "author",
   "title_slug",
+  "like_count",
+  "dislike_count",
   "content_section",
   "content"
  ],
@@ -85,11 +87,23 @@
    "fieldtype": "Int",
    "label": "Views",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "like_count",
+   "fieldtype": "Int",
+   "label": "Likes"
+  },
+  {
+   "default": "0",
+   "fieldname": "dislike_count",
+   "fieldtype": "Int",
+   "label": "Dislikes"
   }
  ],
  "links": [],
  "make_attachments_public": 1,
- "modified": "2026-03-24 20:11:47.835393",
+ "modified": "2026-02-19 20:40:16.685292",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article",
