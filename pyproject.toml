@@ -22,3 +22,8 @@ frappe = ">=16.0.0-dev,<=17.0.0-dev"
 build_dir = "./desk"
 out_dir = "./helpdesk/public/desk"
 index_html_path = "./helpdesk/www/helpdesk/index.html"
+
+[project.urls]
+Homepage = "https://frappe.io/helpdesk"
+Repository = "https://github.com/frappe/helpdesk.git"
+"Bug Reports" = "https://github.com/frappe/helpdesk/issues"
