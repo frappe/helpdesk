@@ -14,7 +14,7 @@ export const useNotificationStore = defineStore("notification", () => {
     doctype: "HD Notification",
     cache: "Notifications",
     fields: [
-      "modified",
+      "creation",
       "message",
       "name",
       "notification_type",

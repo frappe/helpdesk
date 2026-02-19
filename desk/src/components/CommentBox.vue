@@ -72,7 +72,10 @@
           </div>
         </template>
       </TextEditor>
-      <div class="flex flex-wrap gap-2" v-if="!editable">
+      <div
+        class="flex flex-wrap gap-2"
+        v-if="!editable && Boolean(attachments.length)"
+      >
         <AttachmentItem
           v-for="a in attachments"
           :key="a.file_url"
@@ -81,7 +84,7 @@
         />
       </div>
       <div
-        class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100"
+        class="flex items-center gap-2 mt-2"
         v-if="!editable && enableCommentReactions"
       >
         <Popover>
