@@ -63,7 +63,7 @@ const emit = defineEmits(["articleReaction"]);
 
 function handleFeedbackClick(action: FeedbackAction) {
   if (action === _feedback.value) {
-    return;
+    action = 0;
   }
   _feedback.value = action;
   setFeedback.submit(
@@ -71,10 +71,6 @@ function handleFeedbackClick(action: FeedbackAction) {
     {
       onSuccess: () => {
         emit("articleReaction", _feedback.value);
-        if (_feedback.value === 0) {
-          return;
-        }
-        toast.success(__("Feedback submitted successfully."));
       },
     }
   );
