@@ -62,7 +62,7 @@
         :content="_content"
         :editable="editable"
         :bubble-menu="textEditorMenuButtons"
-        :mentions="dropdown"
+        :mentions="agentStore.dropdown"
         @change="(event:string) => {_content = event}"
       >
         <template #bottom v-if="editable">
@@ -187,7 +187,6 @@ import {
   createResource,
   toast,
 } from "frappe-ui";
-import { storeToRefs } from "pinia";
 import { PropType, computed, onMounted, ref } from "vue";
 
 const authStore = useAuthStore();
@@ -207,7 +206,7 @@ const isTicketMergedComment = computed(() => {
   const regex = /has been merged with ticket #\d+/;
   return regex.test(content);
 });
-const { dropdown } = storeToRefs(useAgentStore());
+const agentStore = useAgentStore();
 
 const emit = defineEmits(["update"]);
 const showDialog = ref(false);
