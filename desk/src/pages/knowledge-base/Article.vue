@@ -79,25 +79,30 @@
             </div>
           </div>
           <!-- Title -->
-          <textarea
-            ref="titleRef"
-            class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-gray-200 focus:ring-0 focus:border-gray-200 overflow-hidden"
-            v-model="title"
-            :placeholder="__('Title')"
-            rows="1"
-            wrap="soft"
-            maxlength="140"
-            autofocus
-            :disabled="!editable"
-          />
-          <div class="flex gap-4 text-sm text-gray-500 items-center">
-            <span>{{ views }} views</span>
-            <div class="flex items-center gap-4 text-sm">
+          <div class="flex justify-between">
+            <div>
+              <textarea
+                ref="titleRef"
+                class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-1 focus:ring-0 overflow-hidden"
+                v-model="title"
+                :placeholder="__('Title')"
+                rows="1"
+                wrap="soft"
+                maxlength="140"
+                autofocus
+                :disabled="!editable"
+              />
+              <div class="text-sm text-gray-500 items-center">
+                <span>{{ views }} views</span>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 text-sm">
               <div class="flex items-center gap-1">
                 <Button
                   variant="ghost"
                   size="md"
                   @click="handleFeedbackClick(1)"
+                  class="flex"
                 >
                   <template #suffix>
                     {{ likes }}
@@ -111,6 +116,7 @@
                   variant="ghost"
                   size="md"
                   @click="handleFeedbackClick(2)"
+                  class="flex"
                 >
                   <template #suffix>
                     {{ dislikes }}
