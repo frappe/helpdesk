@@ -14,8 +14,8 @@
     class="absolute left-0 top-0 w-full h-screen flex flex-col items-center justify-center"
   >
     <EmptyState
-      :title="__('No categories available')"
-      :description="__('There are no categories published at the moment.')"
+      title="No Categories available"
+      description="There are no categories published at the moment."
       :icon="iconVNode"
     />
   </div>

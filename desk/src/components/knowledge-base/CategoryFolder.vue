@@ -16,8 +16,8 @@
         {{ category?.category_name }}
       </p>
       <span class="truncate text-xs md:text-sm text-ink-gray-5">
-        {{ category?.article_count }}
-        {{ category?.article_count % 2 === 1 ? "article" : "articles" }}
+        {{ category.article_count }}
+        {{ category.article_count % 2 === 1 ? "article" : "articles" }}
       </span>
     </div>
   </router-link>
