@@ -28,7 +28,7 @@
                 >
                 <div class="flex items-center gap-x-1">
                   <component :is="item.icon" class="h-4 w-4 text-ink-gray-6" />
-                  <span class="text-sm text-ink-gray-7">{{ item.value }}</span>
+                  <span class="text-sm text-ink-gray-8">{{ item.value }}</span>
                 </div>
               </template>
             </template>
@@ -38,14 +38,15 @@
       <!-- Tabs -->
       <Tabs v-model="activeTab" :tabs="tabs">
         <template #tab-panel="{ tab }">
-          <div class="p-4">
-            <template v-if="tab.label === 'Tickets'">
+          <div class="p-5">
+            <div v-show="tab.label === 'Tickets'">
               <!-- Tickets tab content -->
               {{ tab.label }}
-            </template>
-            <template v-else-if="tab.label === 'Contacts'">
-              <!-- Contacts tab content -->
-            </template>
+            </div>
+            <CustomerContactTab
+              v-show="tab.label === 'Contacts'"
+              :customer="id"
+            />
           </div>
         </template>
       </Tabs>
@@ -54,6 +55,7 @@
 </template>
 
 <script setup lang="ts">
+import CustomerContactTab from "@/components/customer/CustomerContactTab.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { DocumentResource } from "@/types";
 import { HDCustomer } from "@/types/doctypes";

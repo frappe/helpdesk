@@ -713,3 +713,14 @@ declare global {
     session_user: string;
   }
 }
+
+export interface CustomerContact {
+  contact_name: string;
+  is_primary: 0 | 1;
+  is_manager: 0 | 1;
+  email_id: string | null;
+  mobile_no: string | null;
+  image: string | null;
+  modified: string;
+  ticket_count: number;
+}
