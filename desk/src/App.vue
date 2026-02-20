@@ -8,8 +8,14 @@
 <script setup lang="ts">
 import { Dialogs } from "@/components/dialogs";
 import { useConfigStore } from "@/stores/config";
+<<<<<<< HEAD
 import { FrappeUIProvider, toast } from "frappe-ui";
 import { computed, defineAsyncComponent, h, onMounted } from "vue";
+=======
+import { stopSession } from "@/telemetry";
+import { FrappeUIProvider, toast, setConfig } from "frappe-ui";
+import { computed, defineAsyncComponent, h, onMounted, onUnmounted } from "vue";
+>>>>>>> d2ea5904 (fix: fix localization all over helpdesk and fix config fetching and setting)
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
 import { useAuthStore } from "./stores/auth";
@@ -53,4 +59,14 @@ const PortalRoot = computed(() => {
     return CustomerPortalRoot;
   }
 });
+<<<<<<< HEAD
+=======
+
+setConfig("systemTimezone", window.timezone?.system || null);
+setConfig("localTimezone", window.timezone?.user || null);
+
+onUnmounted(() => {
+  stopSession();
+});
+>>>>>>> d2ea5904 (fix: fix localization all over helpdesk and fix config fetching and setting)
 </script>

@@ -46,7 +46,7 @@
         />
 =======
         <Tooltip
-          :text="dateFormat(dayjsLocal(firstResponse.date), dateTooltipFormat)"
+          :text="dateFormat(firstResponse.date, dateTooltipFormat)"
           :hover-delay="0.25"
           :placement="'top'"
         >
@@ -75,7 +75,7 @@
         />
 =======
         <Tooltip
-          :text="dateFormat(dayjsLocal(resolutionBy.date), dateTooltipFormat)"
+          :text="dateFormat(resolutionBy.date, dateTooltipFormat)"
           :hover-delay="0.25"
           :placement="'top'"
         >

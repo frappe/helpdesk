@@ -54,7 +54,12 @@ export function validateEmailWithZod(email: string) {
 
 export function dateFormat(date, format?: string) {
   const _format = format || "DD-MM-YYYY HH:mm:ss";
-  return useDateFormat(date, _format).value;
+  if (!date) return '';
+  let systemTimezone = getConfig('systemTimezone');
+  let localTimezone = getConfig('localTimezone') || getBrowserTimezone();
+  const timezone = systemTimezone || localTimezone;  
+  const tzDate = dayjs(date).tz(timezone);
+  return tzDate.format(_format);
 }
 
 export function timeAgo(date) {
@@ -70,12 +75,11 @@ export function prettyDate(date, mini = false) {
 
   let systemTimezone = getConfig('systemTimezone')
   let localTimezone = getConfig('localTimezone') || getBrowserTimezone()
-
   if (typeof date == 'string') {
     date = dayjsLocal(date)
   }
 
-  let nowDatetime = dayjs().tz(localTimezone || systemTimezone)
+  let nowDatetime = dayjs().tz(systemTimezone || localTimezone )
   let diff = nowDatetime.diff(date, 'seconds')
 
   let dayDiff = diff / 86400
@@ -331,8 +335,12 @@ export function getIcon(icon) {
   return icon || markRaw(TicketIcon);
 }
 export function formatTimeShort(date: string) {
-  const now = dayjs();
-  const inputDate = dayjs.tz(date);
+  let systemTimezone = getConfig('systemTimezone');
+  let localTimezone = getConfig('localTimezone') || getBrowserTimezone();
+  const timezone = systemTimezone || localTimezone;
+  
+  const now = dayjs().tz(timezone);
+  const inputDate = dayjs(date).tz(timezone);
   const diffSeconds = now.diff(inputDate, "second");
   const diffMinutes = now.diff(inputDate, "minute");
   const diffHours = now.diff(inputDate, "hour");
@@ -400,7 +408,11 @@ export function htmlToText(html: string): string {
 export function getFormattedDate(date) {
   if (!date) return "";
 
-  const dateObj = dayjs(date);
+  let systemTimezone = getConfig('systemTimezone');
+  let localTimezone = getConfig('localTimezone') || getBrowserTimezone();
+  const timezone = systemTimezone || localTimezone;
+  
+  const dateObj = dayjs(date).tz(timezone);
   if (!dateObj.isValid()) return "";
 
   return dateObj.format("DD-MM-YYYY");
