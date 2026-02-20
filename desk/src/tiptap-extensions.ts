@@ -134,6 +134,7 @@ export const ExcelPasteFix = Extension.create({
             const hasText = types.includes("text/plain");
 
             if (hasImage && (hasHtml || hasText)) {
+              event.preventDefault() 
               const html = clipboardData.getData("text/html");
               const text = clipboardData.getData("text/plain");
 

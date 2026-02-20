@@ -171,10 +171,37 @@ const htmlContent = computed(
       .email-content {
         word-break: break-word;
       }
-      .email-content :is(:where(table):not(:where([class~='not-prose'], [class~='not-prose'] *))) {
-        table-layout: auto;
-        background-color: transparent;
-      }
+.email-content table {
+  table-layout: auto;
+  width: unset;
+  text-align: unset;
+  margin-top: unset;
+  margin-bottom: unset;
+  font-size: unset;
+  line-height: unset;
+}
+
+
+.email-content td,
+.email-content th {
+  position: unset;
+  vertical-align: revert;
+}
+
+.email-content td:not([style]),
+.email-content th:not([style]) {
+  padding: 0;
+  border: none;
+}
+
+.email-content table:not([border]):not([style]) {
+  border: none;
+  border-collapse: collapse;
+}
+
+.email-content table:not([border]):not([style]) tbody tr {
+  border-bottom: none;
+}
       .email-content :is(:where(img):not(:where([class~='not-prose'], [class~='not-prose'] *))) {
         border-width: 0;
       }
