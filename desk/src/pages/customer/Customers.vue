@@ -42,7 +42,10 @@ import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
+import { useRouter } from "vue-router";
 import CustomerDialog from "./CustomerDialog.vue";
+
+const router = useRouter();
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
@@ -51,8 +54,10 @@ const listViewRef = ref(null);
 // const emptyMessage = "No Customers Found";
 
 function openCustomer(id: string) {
-  selectedCustomer.value = id;
-  isCustomerDialogVisible.value = true;
+  // move to route named "Customer" with id as param
+  router.push({ name: "Customer", params: { id } });
+  // selectedCustomer.value = id;
+  // isCustomerDialogVisible.value = true;
 }
 function handleCustomer(updated = false) {
   updated
