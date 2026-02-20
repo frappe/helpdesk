@@ -40,7 +40,16 @@ const props = defineProps<{
 const contacts = createResource<Resource<CustomerContact[]>>({
   url: "helpdesk.helpdesk.doctype.hd_customer.hd_customer.get_contacts_for_customer",
   params: { customer: props.customer },
+  cache: ["CustomerContact", props.customer],
   auto: true,
+  //   transform the response and say whicher is primar will be first
+  transform: (data: CustomerContact[]) => {
+    return data.sort((a, b) => {
+      if (a.is_primary) return -1;
+      if (b.is_primary) return 1;
+      return 0;
+    });
+  },
 });
 </script>
 
