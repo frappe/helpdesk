@@ -1,22 +1,35 @@
 interface DocType {
-    name: string;
-    creation: string;
-    modified: string;
-    owner: string;
-    modified_by: string;
-  }
+  name: string;
+  creation: string;
+  modified: string;
+  owner: string;
+  modified_by: string;
+}
 
-  interface ChildDocType extends DocType {
-    parent?: string;
-    parentfield?: string;
-    parenttype?: string;
-    idx?: number;
-  }
-  
+interface ChildDocType extends DocType {
+  parent?: string;
+  parentfield?: string;
+  parenttype?: string;
+  idx?: number;
+}
+
 // Last updated: 2026-02-02 17:22:11.094897
 export interface HDTicketStatus extends DocType {
   /** Color: Select */
-  color?: 'Black' | 'Gray' | 'Blue' | 'Green' | 'Red' | 'Pink' | 'Orange' | 'Amber' | 'Yellow' | 'Cyan' | 'Teal' | 'Violet' | 'purple';
+  color?:
+    | "Black"
+    | "Gray"
+    | "Blue"
+    | "Green"
+    | "Red"
+    | "Pink"
+    | "Orange"
+    | "Amber"
+    | "Yellow"
+    | "Cyan"
+    | "Teal"
+    | "Violet"
+    | "purple";
   /** Label: Data */
   label_agent: string;
   /** Show end users a different view: Check */
@@ -24,7 +37,7 @@ export interface HDTicketStatus extends DocType {
   /** Label (customer view): Data */
   label_customer?: string;
   /** Category: Select */
-  category: 'Open' | 'Paused' | 'Resolved';
+  category: "Open" | "Paused" | "Resolved";
   /** Order: Int */
   order?: number;
   /** Enabled: Check */
@@ -57,7 +70,13 @@ export interface HDTicket extends DocType {
   /** Response By: Datetime */
   response_by?: string;
   /** SLA Status: Select */
-  agreement_status?: '' | 'First Response Due' | 'Resolution Due' | 'Failed' | 'Fulfilled' | 'Paused';
+  agreement_status?:
+    | ""
+    | "First Response Due"
+    | "Resolution Due"
+    | "Failed"
+    | "Fulfilled"
+    | "Paused";
   /** Resolution By: Datetime */
   resolution_by?: string;
   /** SLA Creation: Datetime */
@@ -131,7 +150,14 @@ export interface AssignmentRuleUser extends ChildDocType {
 // Last updated: 2024-03-23 16:01:27.759155
 export interface AssignmentRuleDay extends ChildDocType {
   /** Day: Select */
-  day?: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  day?:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
 }
 
 // Last updated: 2026-03-03 13:08:12.561504
@@ -149,7 +175,11 @@ export interface AssignmentRule extends DocType {
   /** Unassign Condition: Code */
   unassign_condition?: string;
   /** Rule: Select */
-  rule: 'Round Robin' | 'Load Balancing' | 'Based on Field' | 'Weighted Distribution';
+  rule:
+    | "Round Robin"
+    | "Load Balancing"
+    | "Based on Field"
+    | "Weighted Distribution";
   /** Users: Table MultiSelect (Assignment Rule User) */
   users: AssignmentRuleUser[];
   /** Last User: Link (User) */
@@ -189,7 +219,15 @@ export interface HDServiceHolidayList extends DocType {
   /** Total Holidays: Int */
   total_holidays?: number;
   /** Weekly Off: Select */
-  weekly_off?: '' | 'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';
+  weekly_off?:
+    | ""
+    | "Sunday"
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday";
   /** Holidays: Table (HD Holiday) */
   holidays: HDHoliday[];
   /** Color: Color */
@@ -203,7 +241,14 @@ export interface HDServiceHolidayList extends DocType {
 // Last updated: 2021-10-21 14:27:08.190239
 export interface HDServiceDay extends ChildDocType {
   /** Workday: Select */
-  workday: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  workday:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
   /** Start Time: Time */
   start_time: any;
   /** End Time: Time */
@@ -266,4 +311,32 @@ export interface HDAgent extends DocType {
   is_active: 0 | 1;
   /** Image: Attach Image */
   user_image?: string;
+}
+
+// Last updated: 2026-02-20 17:04:23.230132
+export interface HDCustomerMember extends ChildDocType {
+  /** Is Manager: Check */
+  is_manager: 0 | 1;
+  /** Is Primary: Check */
+  is_primary: 0 | 1;
+  /** Name: Link (Contact) */
+  contact_name: string;
+}
+
+// Last updated: 2026-02-20 16:52:24.559244
+export interface HDCustomer extends DocType {
+  /** Image: Attach Image */
+  image?: string;
+  /** Customer Name: Data */
+  customer_name?: string;
+  /** Domain: Data */
+  domain?: string;
+  /** Contacts: Table (HD Customer Member) */
+  contacts: HDCustomerMember[];
+  /** Mobile No: Data */
+  mobile_no?: string;
+  /** Email ID: Data */
+  email_id?: string;
+  /** Primary Member: Data */
+  primary_member?: string;
 }

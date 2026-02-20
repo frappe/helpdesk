@@ -1,0 +1,52 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-20 11:46:06.430007",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "contact_name",
+  "is_manager",
+  "is_primary"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "is_manager",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Manager"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_primary",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Primary"
+  },
+  {
+   "fieldname": "contact_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Name",
+   "options": "Contact",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-02-20 17:04:23.230132",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Customer Member",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

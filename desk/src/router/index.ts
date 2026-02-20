@@ -84,12 +84,18 @@ const routes = [
   {
     path: "/customers",
     name: "CustomerList",
-    component: () => import("@/pages/desk/customer/Customers.vue"),
+    component: () => import("@/pages/customer/Customers.vue"),
+  },
+  {
+    path: "/customers/:id",
+    name: "Customer",
+    component: () => import("@/pages/customer/Customer.vue"),
+    props: true,
   },
   {
     path: "/contacts",
     name: "ContactList",
-    component: () => import("@/pages/desk/contact/Contacts.vue"),
+    component: () => import("@/pages/contact/Contacts.vue"),
   },
   {
     path: "/agents",
