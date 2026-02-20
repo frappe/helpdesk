@@ -116,6 +116,26 @@ export const PreserveIds: Extension = Extension.create({
 });
 
 
+// fix for table formatting
+export const TiptapTableMarker = Extension.create({
+  name: "tiptapTableMarker",
+  addGlobalAttributes() {
+    return [
+      {
+        types: ["table"],
+        attributes: {
+          "data-type": {
+            default: "tiptap-table",
+            parseHTML: (element) => element.getAttribute("data-type"),
+            renderHTML: () => ({ "data-type": "tiptap-table" }),
+          },
+        },
+      },
+    ];
+  },
+});
+
+//// fix for excel pasting
 export const ExcelPasteFix = Extension.create({
   name: "excelPasteFix",
 
@@ -129,12 +149,12 @@ export const ExcelPasteFix = Extension.create({
             if (!clipboardData) return false;
 
             const types = Array.from(clipboardData.types);
-            const hasImage = types.some((t) => t.startsWith("image/"));
+            const hasImage = types.some((t) => t.startsWith("image/")) || types.includes("Files");
             const hasHtml = types.includes("text/html");
             const hasText = types.includes("text/plain");
 
             if (hasImage && (hasHtml || hasText)) {
-              event.preventDefault() 
+              event.preventDefault()
               const html = clipboardData.getData("text/html");
               const text = clipboardData.getData("text/plain");
 

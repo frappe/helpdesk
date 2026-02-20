@@ -171,37 +171,48 @@ const htmlContent = computed(
       .email-content {
         word-break: break-word;
       }
-.email-content table {
-  table-layout: auto;
-  width: unset;
-  text-align: unset;
-  margin-top: unset;
-  margin-bottom: unset;
-  font-size: unset;
-  line-height: unset;
-}
+     .email-content :is(:where(table):not(:where([class~='not-prose'], [class~='not-prose'] *))) {
+        table-layout: auto;
+        background-color: #ffffff;
+      }
+      .email-content :where(table):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+        width: unset;
+        table-layout: auto;
+        text-align: unset;
+        margin-top: unset;
+        margin-bottom: unset;
+        font-size: unset;
+        line-height: unset;
+      }
+      .email-content :where(tbody tr):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+        border-bottom-width: 0;
+        border-bottom-color: transparent;
+      }
+      .email-content :is(:where(td):not(:where([class~='not-prose'], [class~='not-prose'] *))) {
+        position: unset;
+        border-width: 0;
+        border-color: transparent;
+        padding: 0;
+      }
+      .email-content :where(tbody td):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+        vertical-align: revert;
+      }
+      .email-content table[data-type="tiptap-table"] {
+        border-collapse: collapse;
+        width: max-content;
+      }
+      .email-content table[data-type="tiptap-table"] td,
+      .email-content table[data-type="tiptap-table"] th {
+        border: 1px solid #d1d5db;
+        padding: 6px 12px;
+        vertical-align: top;
+      }
 
-
-.email-content td,
-.email-content th {
-  position: unset;
-  vertical-align: revert;
-}
-
-.email-content td:not([style]),
-.email-content th:not([style]) {
-  padding: 0;
-  border: none;
-}
-
-.email-content table:not([border]):not([style]) {
-  border: none;
-  border-collapse: collapse;
-}
-
-.email-content table:not([border]):not([style]) tbody tr {
-  border-bottom: none;
-}
+      .email-content table[data-type="tiptap-table"] th {
+        background-color: #f3f4f6;
+        font-weight: 600;
+      }
+      
       .email-content :is(:where(img):not(:where([class~='not-prose'], [class~='not-prose'] *))) {
         border-width: 0;
       }
@@ -214,6 +225,7 @@ const htmlContent = computed(
       .email-content :where(blockquote p:last-of-type):not(:where([class~='not-prose'], [class~='not-prose'] *))::after {
         content: none;
       }
+
     </style>
   </head>
   <body>

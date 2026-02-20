@@ -55,26 +55,14 @@ withDefaults(defineProps<P>(), {
 
 function sanitize(html: string) {
   return sanitizeHtml(html, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
-      "img",
-      "video",
-      "col",
-      "colgroup",
-    ]),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "video"]),
     allowedAttributes: {
-      ...sanitizeHtml.defaults.allowedAttributes,
       a: ["href", "target"],
       video: ["src", "controls"],
-      img: ["src", "style", "width", "height"],
-      table: ["style", "border", "cellpadding", "cellspacing", "width"],
-      td: ["style", "colspan", "rowspan", "width", "align", "valign"],
-      th: ["style", "colspan", "rowspan", "width", "align", "valign"],
-      tr: ["style"],
-      col: ["style"],
-      colgroup: ["style"],
-      div: ["style", "class"],
-      p: ["style"],
-      span: ["style"],
+      img: ["src"],
+      table: ["border", "cellpadding", "cellspacing", "width", "data-type"],
+      td: ["colspan", "rowspan", "width", "align", "valign"],
+      th: ["colspan", "rowspan", "width", "align", "valign"],
     },
   });
 }

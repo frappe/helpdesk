@@ -14,7 +14,7 @@
     :editable="editable"
     :mentions="dropdown"
     @change="editable ? (newComment = $event) : null"
-    :extensions="[PreserveVideoControls, ExcelPasteFix]"
+    :extensions="[PreserveVideoControls, ExcelPasteFix, TiptapTableMarker]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #bottom>
@@ -113,7 +113,11 @@ import { AttachmentIcon } from "@/components/icons/";
 import { useTyping } from "@/composables/realtime";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
-import { ExcelPasteFix, PreserveVideoControls } from "@/tiptap-extensions";
+import {
+  ExcelPasteFix,
+  PreserveVideoControls,
+  TiptapTableMarker,
+} from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,
