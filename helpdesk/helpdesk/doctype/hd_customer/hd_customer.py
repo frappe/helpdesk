@@ -54,10 +54,10 @@ class HDCustomer(Document):
             frappe.throw(_("Duplicate contacts are not allowed"))
 
     def before_save(self):
-        self.set_primary_member_details()
+        self.set_primary_contact_details()
         self.set_manager_if_not_exists()
 
-    def set_primary_member_details(self):
+    def set_primary_contact_details(self):
         if not self.contacts:
             return
 
@@ -65,18 +65,16 @@ class HDCustomer(Document):
             contact.contact_name for contact in self.contacts if contact.is_primary
         ]
 
-        primary_contact = primary_contact[0]
-        self.primary_member = primary_contact
+        self.primary_contact = primary_contact[0]
 
         [email, mobile_no, phone] = frappe.get_value(
             "Contact",
             primary_contact,
             ["email_id", "mobile_no", "phone"],
         )
-        if email:
-            self.email_id = email
-        if mobile_no or phone:
-            self.mobile_no = mobile_no or phone
+
+        self.email_id = email
+        self.mobile_no = mobile_no or phone
 
     def set_manager_if_not_exists(self):
         if not self.contacts:
@@ -99,12 +97,9 @@ def get_contacts_for_customer(customer: str):
     # from customer doctype get contact list
     # and for each contact get the email_id and mobile_no, name, image from the contact doctype, get last modified as well
     # along with that get us tickets count ticket with status_category as Open or Paused
-    contacts = frappe.get_list(
-        # TODO: change this to Contact
-        "HD Customer Member",
-        filters={"parent": customer},
-        fields=["contact_name", "is_primary", "is_manager"],
-    )
+    customer_doc = frappe.get_doc("HD Customer", customer)
+    contacts = customer_doc.contacts
+
     result = []
     for contact in contacts:
         info = frappe.get_value(

@@ -39,12 +39,13 @@
       <Tabs v-model="activeTab" :tabs="tabs">
         <template #tab-panel="{ tab }">
           <div class="p-5">
-            <div v-show="tab.label === 'Tickets'">
+            <div v-if="tab.label === 'Tickets'">
               <!-- Tickets tab content -->
               {{ tab.label }}
+              <CustomerTicketsTab />
             </div>
             <CustomerContactTab
-              v-show="tab.label === 'Contacts'"
+              v-if="tab.label === 'Contacts'"
               :customer="id"
             />
           </div>
@@ -56,6 +57,7 @@
 
 <script setup lang="ts">
 import CustomerContactTab from "@/components/customer/CustomerContactTab.vue";
+import CustomerTicketsTab from "@/components/customer/CustomerTicketsTab.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { DocumentResource } from "@/types";
 import { HDCustomer } from "@/types/doctypes";

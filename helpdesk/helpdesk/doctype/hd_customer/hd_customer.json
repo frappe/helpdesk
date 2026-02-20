@@ -1,170 +1,170 @@
 {
-  "actions": [],
-  "allow_rename": 1,
-  "autoname": "field:customer_name",
-  "creation": "2022-11-30 00:08:11.831313",
-  "doctype": "DocType",
-  "editable_grid": 1,
-  "engine": "InnoDB",
-  "field_order": [
-    "image",
-    "customer_name",
-    "domain",
-    "column_break_fead",
-    "email_id",
-    "mobile_no",
-    "primary_member",
-    "section_break_fxor",
-    "contacts",
-    "references_tab",
-    "contact_html"
-  ],
-  "fields": [
-    {
-      "fieldname": "image",
-      "fieldtype": "Attach Image",
-      "label": "Image"
-    },
-    {
-      "fieldname": "customer_name",
-      "fieldtype": "Data",
-      "label": "Customer Name",
-      "unique": 1
-    },
-    {
-      "fieldname": "domain",
-      "fieldtype": "Data",
-      "in_list_view": 1,
-      "in_standard_filter": 1,
-      "label": "Domain"
-    },
-    {
-      "fieldname": "references_tab",
-      "fieldtype": "Tab Break",
-      "label": "References"
-    },
-    {
-      "fieldname": "contact_html",
-      "fieldtype": "HTML",
-      "label": "Contact HTML"
-    },
-    {
-      "fieldname": "contacts",
-      "fieldtype": "Table",
-      "label": "Contacts",
-      "options": "HD Customer Member"
-    },
-    {
-      "fieldname": "column_break_fead",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "section_break_fxor",
-      "fieldtype": "Section Break"
-    },
-    {
-      "fieldname": "mobile_no",
-      "fieldtype": "Data",
-      "label": "Mobile No",
-      "options": "Phone",
-      "read_only": 1
-    },
-    {
-      "description": "Email address of the primary member",
-      "fieldname": "email_id",
-      "fieldtype": "Data",
-      "label": "Email ID",
-      "options": "Email",
-      "read_only": 1
-    },
-    {
-      "fieldname": "primary_member",
-      "fieldtype": "Data",
-      "label": "Primary Member",
-      "read_only": 1
-    }
-  ],
-  "image_field": "image",
-  "index_web_pages_for_search": 1,
-  "links": [],
-  "modified": "2026-02-20 16:52:24.559244",
-  "modified_by": "Administrator",
-  "module": "Helpdesk",
-  "name": "HD Customer",
-  "naming_rule": "Expression",
-  "owner": "Administrator",
-  "permissions": [
-    {
-      "create": 1,
-      "delete": 1,
-      "email": 1,
-      "export": 1,
-      "print": 1,
-      "read": 1,
-      "report": 1,
-      "role": "System Manager",
-      "share": 1,
-      "write": 1
-    },
-    {
-      "email": 1,
-      "export": 1,
-      "print": 1,
-      "read": 1,
-      "report": 1,
-      "role": "Agent",
-      "select": 1,
-      "share": 1
-    },
-    {
-      "create": 1,
-      "delete": 1,
-      "email": 1,
-      "export": 1,
-      "print": 1,
-      "read": 1,
-      "report": 1,
-      "role": "Administrator",
-      "share": 1,
-      "write": 1
-    },
-    {
-      "create": 1,
-      "delete": 1,
-      "email": 1,
-      "export": 1,
-      "print": 1,
-      "read": 1,
-      "report": 1,
-      "role": "Agent Manager",
-      "select": 1,
-      "share": 1,
-      "write": 1
-    },
-    {
-      "email": 1,
-      "export": 1,
-      "print": 1,
-      "read": 1,
-      "report": 1,
-      "role": "HD Customer Manager",
-      "select": 1,
-      "share": 1,
-      "write": 1
-    },
-    {
-      "email": 1,
-      "export": 1,
-      "print": 1,
-      "read": 1,
-      "report": 1,
-      "role": "HD Customer",
-      "select": 1,
-      "share": 1
-    }
-  ],
-  "row_format": "Dynamic",
-  "sort_field": "modified",
-  "sort_order": "DESC",
-  "states": []
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:customer_name",
+ "creation": "2022-11-30 00:08:11.831313",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "image",
+  "customer_name",
+  "domain",
+  "column_break_fead",
+  "primary_contact",
+  "email_id",
+  "mobile_no",
+  "section_break_fxor",
+  "contacts",
+  "references_tab",
+  "contact_html"
+ ],
+ "fields": [
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "label": "Image"
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "domain",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Domain"
+  },
+  {
+   "fieldname": "references_tab",
+   "fieldtype": "Tab Break",
+   "label": "References"
+  },
+  {
+   "fieldname": "contact_html",
+   "fieldtype": "HTML",
+   "label": "Contact HTML"
+  },
+  {
+   "fieldname": "contacts",
+   "fieldtype": "Table",
+   "label": "Contacts",
+   "options": "HD Customer Member"
+  },
+  {
+   "fieldname": "column_break_fead",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_fxor",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "mobile_no",
+   "fieldtype": "Data",
+   "label": "Mobile No",
+   "options": "Phone",
+   "read_only": 1
+  },
+  {
+   "description": "Email address of the primary member",
+   "fieldname": "email_id",
+   "fieldtype": "Data",
+   "label": "Email ID",
+   "options": "Email",
+   "read_only": 1
+  },
+  {
+   "fieldname": "primary_contact",
+   "fieldtype": "Data",
+   "label": "Primary Contact",
+   "read_only": 1
+  }
+ ],
+ "image_field": "image",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-20 20:51:23.452754",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Customer",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "select": 1,
+   "share": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HD Customer Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HD Customer",
+   "select": 1,
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
 }

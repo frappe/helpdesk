@@ -4,10 +4,20 @@
   >
     <div class="flex items-center justify-between">
       <div class="flex gap-2 items-center min-w-0">
-        <Avatar size="lg" :shape="'circle'" :image="contact.image ?? ''" />
-        <p class="truncate min-w-0 max-w-[50%]">{{ contact.contact_name }}</p>
+        <Avatar
+          size="lg"
+          :shape="'circle'"
+          :image="contact.image ?? ''"
+          :label="contact.contact_name"
+        />
+        <p
+          class="truncate min-w-0"
+          :class="contact.is_manager || contact.is_primary ? 'max-w-[50%]' : ''"
+        >
+          {{ contact.contact_name }}
+        </p>
         <Badge v-if="contact.is_primary" label="Primary" theme="blue" />
-        <Tooltip v-if="contact.is_manager" content="Manager" placement="top">
+        <Tooltip v-if="contact.is_manager" text="Manager" placement="top">
           <LucideBriefcase class="h-4 w-4 text-ink-gray-6" />
         </Tooltip>
       </div>
@@ -21,7 +31,6 @@
     <div class="flex flex-col gap-3">
       <template v-for="(item, index) in contactDetails" :key="index">
         <div
-          v-if="item.condition"
           class="flex items-center gap-2 text-sm text-ink-gray-8 font-[420]"
           :class="item.class?.(item.value)"
         >
@@ -42,9 +51,8 @@
 </template>
 
 <script setup lang="ts">
-import { dayjs } from "@/dayjs";
 import { CustomerContact } from "@/types";
-import { Avatar, Badge, Button, Dropdown, Tooltip } from "frappe-ui";
+import { Avatar, Badge, Button, Dropdown, Tooltip, dayjs } from "frappe-ui";
 import { computed, markRaw } from "vue";
 import LucideBriefcase from "~icons/lucide/briefcase";
 import LucideMail from "~icons/lucide/mail";
@@ -79,23 +87,19 @@ const ticketLabel = computed(() => {
 const contactDetails = computed(() => [
   {
     icon: markRaw(LucideMail),
-    value: props.contact.email_id ?? "",
-    condition: !!props.contact.email_id,
+    value: props.contact.email_id || "-",
   },
   {
     icon: markRaw(LucidePhone),
-    value: props.contact.mobile_no ?? "",
-    condition: !!props.contact.mobile_no,
+    value: props.contact.mobile_no || "-",
   },
   {
     icon: markRaw(LucideRotateCW),
     value: `Updated ${dayjs(props.contact.modified).fromNow()}`,
-    condition: true,
   },
   {
     icon: markRaw(LucideTicket),
     value: ticketLabel.value,
-    condition: true,
     color: (value: string) =>
       value !== "No open tickets" ? "!text-amber-700" : "!text-ink-gray-7",
     class: (value: string) =>
