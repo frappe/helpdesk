@@ -12,7 +12,7 @@
     :placeholder="placeholder"
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
-    :extensions="[PreserveVideoControls]"
+    :extensions="[PreserveVideoControls, ExcelPasteFix]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #top>
@@ -170,7 +170,7 @@ import {
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
-import { PreserveVideoControls } from "@/tiptap-extensions";
+import { ExcelPasteFix, PreserveVideoControls } from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,
