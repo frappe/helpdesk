@@ -62,7 +62,7 @@
         :content="_content"
         :editable="editable"
         :bubble-menu="textEditorMenuButtons"
-        :mentions="mentionsForEditor"
+        :mentions="dropdown"
         @change="(event:string) => {_content = event}"
       >
         <template #bottom v-if="editable">
@@ -260,8 +260,6 @@ function handleDiscard() {
   _content.value = content;
   editable.value = false;
 }
-
-const mentionsForEditor = dropdown;
 
 const deleteComment = createResource({
   url: "frappe.client.delete",
