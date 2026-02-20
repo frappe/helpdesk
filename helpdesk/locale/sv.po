@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-15 10:41+0000\n"
-"PO-Revision-Date: 2026-02-17 13:44\n"
+"PO-Revision-Date: 2026-02-20 16:00\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -5020,7 +5020,7 @@ msgstr "Användare"
 #. Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Valid From"
-msgstr "Gäller Från"
+msgstr "Giltig Från"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:78
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:147
