@@ -62,7 +62,7 @@
         :content="_content"
         :editable="editable"
         :bubble-menu="textEditorMenuButtons"
-        :mentions="mentionsList"
+        :mentions="[]"
         @change="(event:string) => {_content = event}"
       >
         <template #bottom v-if="editable">
@@ -163,7 +163,6 @@
 <script setup lang="ts">
 import { AttachmentItem } from "@/components";
 import ReactionIcon from "@/components/icons/ReactionIcon.vue";
-import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { updateRes as updateComment } from "@/stores/knowledgeBase";
@@ -211,9 +210,6 @@ const emit = defineEmits(["update"]);
 const showDialog = ref(false);
 const editable = ref(false);
 const _content = ref(content);
-if (editable.value) {
-  _content.value = content;
-}
 
 const emojiList = ["👍", "👎", "❤️", "🎉", "👀", "✅"];
 
@@ -301,14 +297,4 @@ function handleSaveComment() {
     }
   );
 }
-
-function getMentions() {}
-
-const { dropdown } = useAgentStore();
-const mentionsList = computed(() => {
-  return editable.value ? dropdown.value : [];
-});
-onMounted(() => {
-  commentBoxRef.value.style.width = "0px";
-});
 </script>

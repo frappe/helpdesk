@@ -1,6 +1,6 @@
 import { Extension } from "@tiptap/core";
 import { createSuggestionExtension } from "frappe-ui";
-import { PluginKey } from "@tiptap/pm/state";
+import { PluginKey, Plugin } from "@tiptap/pm/state";
 import { getMeta } from "./stores/meta";
 import { userFields } from "./components/Settings/SavedReplies/savedReplies";
 import FieldAutocompleteList from "./components/Settings/SavedReplies/components/FieldAutocompleteList.vue";
@@ -111,6 +111,44 @@ export const PreserveIds: Extension = Extension.create({
           },
         },
       },
+    ];
+  },
+});
+
+
+export const ExcelPasteFix = Extension.create({
+  name: "excelPasteFix",
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("excelPasteFix"),
+        props: {
+          handlePaste(view, event) {
+            const clipboardData = event.clipboardData;
+            if (!clipboardData) return false;
+
+            const types = Array.from(clipboardData.types);
+            const hasImage = types.some((t) => t.startsWith("image/"));
+            const hasHtml = types.includes("text/html");
+            const hasText = types.includes("text/plain");
+
+            if (hasImage && (hasHtml || hasText)) {
+              const html = clipboardData.getData("text/html");
+              const text = clipboardData.getData("text/plain");
+
+              if (html) {
+                view.pasteHTML(html);
+              } else {
+                view.pasteText(text);
+              }
+              return true;
+            }
+
+            return false;
+          },
+        },
+      }),
     ];
   },
 });
