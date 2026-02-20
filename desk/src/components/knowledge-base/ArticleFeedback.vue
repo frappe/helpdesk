@@ -54,11 +54,21 @@ const props = withDefaults(defineProps<P>(), {
 });
 
 const _feedback = ref(props.feedback);
+const emit = defineEmits(["articleReaction"]);
 
 function handleFeedbackClick(action: FeedbackAction) {
+  if (action === _feedback.value) {
+    action = 0;
+  }
   _feedback.value = action;
-  if (action === props.feedback) return;
-  setFeedback.submit({ articleId: props.articleId, action });
+  setFeedback.submit(
+    { articleId: props.articleId, action },
+    {
+      onSuccess: () => {
+        emit("articleReaction", _feedback.value);
+      },
+    }
+  );
 }
 </script>
 

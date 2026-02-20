@@ -91,16 +91,38 @@
             :disabled="!editable"
           />
           <div class="flex gap-4 text-sm text-gray-500 items-center">
-            <span>{{ articleStats.data?.views || 0 }} views</span>
-
+            <span>{{ views }} views</span>
             <div class="flex items-center gap-4 text-sm">
               <div class="flex items-center gap-1">
-                <ThumbsUpIcon class="w-4 h-4" />
-                <span>{{ likes }}</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <ThumbsDownIcon class="w-4 h-4" />
-                <span>{{ dislikes }}</span>
+                <Button
+                  variant="ghost"
+                  size="md"
+                  @click="handleFeedbackClick(1)"
+                >
+                  <template #suffix>
+                    {{ likes }}
+                  </template>
+                  <template #icon>
+                    <ThumbsUpFilledIcon v-if="feedback === 1" class="size-4" />
+                    <ThumbsUpIcon v-else class="size-4" />
+                  </template>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="md"
+                  @click="handleFeedbackClick(2)"
+                >
+                  <template #suffix>
+                    {{ dislikes }}
+                  </template>
+                  <template #icon>
+                    <ThumbsDownFilledIcon
+                      v-if="feedback === 2"
+                      class="size-4"
+                    />
+                    <ThumbsDownIcon v-else class="size-4" />
+                  </template>
+                </Button>
               </div>
             </div>
           </div>
@@ -126,7 +148,11 @@
         </TextEditor>
       </div>
       <div class="p-4" v-if="isCustomerPortal">
-        <ArticleFeedback :feedback="feedback" :article-id="articleId" />
+        <ArticleFeedback
+          :feedback="feedback"
+          :article-id="articleId"
+          @article-reaction="handleFeedbackClick"
+        />
       </div>
     </div>
     <MoveToCategoryModal
@@ -177,7 +203,13 @@ import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import { __ } from "@/translation";
-import { ThumbsDownIcon, ThumbsUpIcon } from "@/components/icons";
+import { setFeedback } from "@/stores/knowledgeBase";
+import {
+  ThumbsDownIcon,
+  ThumbsUpIcon,
+  ThumbsDownFilledIcon,
+  ThumbsUpFilledIcon,
+} from "@/components/icons";
 const props = defineProps({
   articleId: {
     type: String,
@@ -195,7 +227,7 @@ const editorRef = ref(null);
 const editable = ref(route.query.isEdit ?? false);
 const likes = ref(0);
 const dislikes = ref(0);
-const views = ref("");
+const views = ref(0);
 const content = ref("");
 const title = ref("");
 const feedback = ref<FeedbackAction>();
@@ -438,6 +470,28 @@ function scrollToHeading() {
     }, 500);
   }, 500);
 }
+
+function handleFeedbackClick(action: FeedbackAction) {
+  if (action === feedback.value) {
+    action = 0;
+  }
+  feedback.value = action;
+  setFeedback.submit(
+    { articleId: props.articleId, action },
+    {
+      onSuccess: () => {
+        if (articleStats.reload) articleStats.reload();
+      },
+    }
+  );
+}
+
+watch(articleStats.data, () => {
+  if (articleStats.data) {
+    likes.value = articleStats.data.likes;
+    dislikes.value = articleStats.data.dislikes;
+  }
+});
 
 watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
   isDirty.value =
