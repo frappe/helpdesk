@@ -39,7 +39,7 @@
       <div class="flex items-center gap-1">
         <span>First Response</span>
         <Tooltip
-          :text="dateFormat(dayjsLocal(firstResponse.date), dateTooltipFormat)"
+          :text="dateFormat(firstResponse.date, dateTooltipFormat)"
           :hover-delay="0.25"
           :placement="'top'"
         >
@@ -56,7 +56,7 @@
       <div class="flex items-center gap-1">
         <span>Resolution </span>
         <Tooltip
-          :text="dateFormat(dayjsLocal(resolutionBy.date), dateTooltipFormat)"
+          :text="dateFormat(resolutionBy.date, dateTooltipFormat)"
           :hover-delay="0.25"
           :placement="'top'"
         >

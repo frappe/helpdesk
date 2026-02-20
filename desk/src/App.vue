@@ -9,7 +9,7 @@
 import { Dialogs } from "@/components/dialogs";
 import { useConfigStore } from "@/stores/config";
 import { stopSession } from "@/telemetry";
-import { FrappeUIProvider, toast } from "frappe-ui";
+import { FrappeUIProvider, toast, setConfig } from "frappe-ui";
 import { computed, defineAsyncComponent, h, onMounted, onUnmounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
@@ -54,6 +54,9 @@ const PortalRoot = computed(() => {
     return CustomerPortalRoot;
   }
 });
+
+setConfig("systemTimezone", window.timezone?.system || null);
+setConfig("localTimezone", window.timezone?.user || null);
 
 onUnmounted(() => {
   stopSession();
