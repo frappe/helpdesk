@@ -42,81 +42,6 @@
             <div>
               <textarea
                 ref="titleRef"
-                class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
-                v-model="title"
-                :placeholder="__('Title')"
-                rows="1"
-                wrap="soft"
-                maxlength="140"
-                autofocus
-                :disabled="!editable"
-              />
-              <div
-                v-if="!editable && isCustomerPortal"
-                class="flex gap-1 items-center pt-1.5"
-              >
-                <!-- Avatar -->
-                <div class="flex gap-2 pb-1.5 items-center justify-center">
-                  <Avatar
-                    :image="article.data.author.image"
-                    :label="article.data.author.name"
-                    size="md"
-                  />
-                  <div class="flex gap-1 items-end">
-                    <p class="truncate capitalize text-base text-ink-gray-7">
-                      {{ article.data.author.name }}
-                    </p>
-                    <IconDot class="h-4 w-4 text-gray-600" />
-                    <div class="text-base text-ink-gray-7">
-                      {{
-                        dayjsLocal(article.data.modified).format(
-                          "MMM D, h:mm A"
-                        )
-                      }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                v-if="!editable && !isCustomerPortal"
-                class="text-sm text-gray-500 items-center"
-              >
-                <span>{{ views }} views</span>
-              </div>
-            </div>
-            <Dropdown
-              :options="articleActions"
-              v-if="!editable && !isCustomerPortal"
-            >
-              <Button variant="ghost">
-                <template #icon>
-                  <IconMoreHorizontal class="h-4 w-4" />
-                </template>
-              </Button>
-            </Dropdown>
-            <div class="flex gap-2" v-if="editable">
-              <DiscardButton
-                :disabled="!isDirty"
-                :hide-dialog="!isDirty"
-                :title="__('Discard changes?')"
-                :message="__('Are you sure you want to discard changes?')"
-                @discard="handleDiscard"
-              />
-
-                  <Button
-                    :label="__('Save')"
-                    @click="handleSave"
-                    variant="solid"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Title -->
-          <div class="flex justify-between">
-            <div>
-              <textarea
-                ref="titleRef"
                 class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-1 focus:ring-0 overflow-hidden"
                 v-model="title"
                 :placeholder="__('Title')"
@@ -126,43 +51,83 @@
                 autofocus
                 :disabled="!editable"
               />
-              <div class="text-sm text-gray-500 items-center">
+              <div
+                v-if="!editable && !isCustomerPortal"
+                class="text-sm text-gray-500 items-center"
+              >
                 <span>{{ views }} views</span>
               </div>
             </div>
-            <div class="flex items-start gap-4 text-sm">
-              <div class="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="md"
-                  @click="handleFeedbackClick(1)"
-                  class="flex"
+            <div class="flex gap-4 items-start">
+              <div class="flex items-start gap-4 text-sm">
+                <div
+                  class="flex items-center gap-1"
+                  v-if="!editable && !isCustomerPortal"
                 >
-                  <template #suffix>
-                    {{ likes }}
-                  </template>
-                  <template #icon>
-                    <ThumbsUpFilledIcon v-if="feedback === 1" class="size-4" />
-                    <ThumbsUpIcon v-else class="size-4" />
-                  </template>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="md"
-                  @click="handleFeedbackClick(2)"
-                  class="flex"
+                  <Button
+                    variant="ghost"
+                    size="md"
+                    @click="handleFeedbackClick(1)"
+                    class="flex"
+                    :disabled="!isCustomerPortal"
+                  >
+                    <template #suffix>
+                      {{ likes }}
+                    </template>
+                    <template #icon>
+                      <ThumbsUpFilledIcon
+                        v-if="feedback === 1 && isCustomerPortal"
+                        class="size-4"
+                      />
+                      <ThumbsUpIcon v-else class="size-4" />
+                    </template>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="md"
+                    @click="handleFeedbackClick(2)"
+                    class="flex"
+                    :disabled="!isCustomerPortal"
+                  >
+                    <template #suffix>
+                      {{ dislikes }}
+                    </template>
+                    <template #icon>
+                      <ThumbsDownFilledIcon
+                        v-if="feedback === 2 && isCustomerPortal"
+                        class="size-4"
+                      />
+                      <ThumbsDownIcon v-else class="size-4" />
+                    </template>
+                  </Button>
+                </div>
+              </div>
+              <div class="flex gap-1 items-start justify-between">
+                <Dropdown
+                  :options="articleActions"
+                  v-if="!editable && !isCustomerPortal"
                 >
-                  <template #suffix>
-                    {{ dislikes }}
-                  </template>
-                  <template #icon>
-                    <ThumbsDownFilledIcon
-                      v-if="feedback === 2"
-                      class="size-4"
-                    />
-                    <ThumbsDownIcon v-else class="size-4" />
-                  </template>
-                </Button>
+                  <Button size="md" variant="ghost">
+                    <template #icon>
+                      <IconMoreHorizontal class="h-4 w-4" />
+                    </template>
+                  </Button>
+                </Dropdown>
+                <div class="flex gap-2" v-if="editable">
+                  <DiscardButton
+                    :disabled="!isDirty"
+                    :hide-dialog="!isDirty"
+                    :title="__('Discard changes?')"
+                    :message="__('Are you sure you want to discard changes?')"
+                    @discard="handleDiscard"
+                  />
+
+                  <Button
+                    :label="__('Save')"
+                    @click="handleSave"
+                    variant="solid"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -187,10 +152,7 @@
             />
           </template>
         </TextEditor>
-        <div
-          v-if="!editable && !isCustomerPortal"
-          class="flex gap-1 items-center pt-1.5 mt-4"
-        >
+        <div v-if="!editable" class="flex gap-1 items-center py-1.5 mt-4">
           <!-- Avatar -->
           <div class="flex gap-2 items-center justify-center">
             <Avatar
@@ -202,14 +164,15 @@
               <p
                 class="truncate capitalize text-base text-ink-gray-9 font-medium"
               >
-                <span class="text-base text-gray-600">published by </span>
+                <span class="text-base text-gray-800">published by </span>
                 {{ article.data.author.name }}
               </p>
-              <div class="text-xs text-gray-700">
+              <div class="text-xs text-gray-500">
                 {{ dayjsLocal(article.data.modified).format("MMM D, h:mm A") }}
               </div>
             </div>
           </div>
+          <IconDot class="h-4 w-4 text-gray-600" />
         </div>
       </div>
 
@@ -252,7 +215,7 @@ import {
   copyToClipboard,
   isCustomerPortal,
   textEditorMenuButtons,
-  ConfirmDelete,
+  timeAgo,
 } from "@/utils";
 import { newCategory } from "@/stores/knowledgeBase";
 import {
@@ -267,6 +230,7 @@ import {
   TextEditorFixedMenu,
   toast,
   Badge,
+  dayjsLocal,
 } from "frappe-ui";
 import { computed, h, onMounted, ref, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -484,6 +448,16 @@ function handleDiscard() {
   textEditorContentWithIDs.value = null;
   nextTick(() => {
     textEditorContentWithIDs.value = original;
+  });
+}
+
+function hasParagraphContent(html: string) {
+  if (!html) return false;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const paragraphs = doc.querySelectorAll("p");
+  return Array.from(paragraphs).some((p) => {
+    return p.textContent.trim().length > 0;
   });
 }
 
