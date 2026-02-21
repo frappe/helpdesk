@@ -37,47 +37,6 @@
       >
         <!-- Top Element -->
         <div class="flex flex-col gap-3">
-          <div class="flex gap-1 items-center justify-between">
-            <div class="flex gap-1 items-center">
-              <!-- Avatar -->
-              <div class="flex gap-1 items-center justify-center">
-                <Avatar
-                  :image="article.data.author.image"
-                  :label="article.data.author.name"
-                />
-                <span
-                  class="truncate capitalize text-base text-ink-gray-9 font-medium"
-                >
-                  {{ article.data.author.name }}
-                </span>
-              </div>
-              <IconDot class="h-4 w-4 text-gray-600" />
-              <div class="text-xs text-gray-500">
-                {{ dayjs(article.data.modified).short() }}
-              </div>
-            </div>
-            <Dropdown
-              :options="articleActions"
-              v-if="!editable && !isCustomerPortal"
-            >
-              <Button variant="ghost">
-                <template #icon>
-                  <IconMoreHorizontal class="h-4 w-4" />
-                </template>
-              </Button>
-            </Dropdown>
-            <div class="flex gap-2" v-if="editable">
-              <DiscardButton
-                :disabled="!isDirty"
-                :hide-dialog="!isDirty"
-                :title="__('Discard changes?')"
-                :message="__('Are you sure you want to discard changes?')"
-                @discard="handleDiscard"
-              />
-
-              <Button :label="__('Save')" @click="handleSave" variant="solid" />
-            </div>
-          </div>
           <!-- Title -->
           <div class="flex justify-between">
             <div>
@@ -92,47 +51,88 @@
                 autofocus
                 :disabled="!editable"
               />
-              <div class="text-sm text-gray-500 items-center">
+              <div
+                v-if="!editable && !isCustomerPortal"
+                class="text-sm text-gray-500 items-center"
+              >
                 <span>{{ views }} views</span>
               </div>
             </div>
-            <div class="flex items-start gap-4 text-sm">
-              <div class="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="md"
-                  @click="handleFeedbackClick(1)"
-                  class="flex"
+            <div class="flex gap-4 items-start">
+              <div class="flex items-start gap-4 text-sm">
+                <div
+                  class="flex items-center gap-1"
+                  v-if="!editable && !isCustomerPortal"
                 >
-                  <template #suffix>
-                    {{ likes }}
-                  </template>
-                  <template #icon>
-                    <ThumbsUpFilledIcon v-if="feedback === 1" class="size-4" />
-                    <ThumbsUpIcon v-else class="size-4" />
-                  </template>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="md"
-                  @click="handleFeedbackClick(2)"
-                  class="flex"
+                  <Button
+                    variant="ghost"
+                    size="md"
+                    @click="handleFeedbackClick(1)"
+                    class="flex"
+                    :disabled="!isCustomerPortal"
+                  >
+                    <template #suffix>
+                      {{ likes }}
+                    </template>
+                    <template #icon>
+                      <ThumbsUpFilledIcon
+                        v-if="feedback === 1 && isCustomerPortal"
+                        class="size-4"
+                      />
+                      <ThumbsUpIcon v-else class="size-4" />
+                    </template>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="md"
+                    @click="handleFeedbackClick(2)"
+                    class="flex"
+                    :disabled="!isCustomerPortal"
+                  >
+                    <template #suffix>
+                      {{ dislikes }}
+                    </template>
+                    <template #icon>
+                      <ThumbsDownFilledIcon
+                        v-if="feedback === 2 && isCustomerPortal"
+                        class="size-4"
+                      />
+                      <ThumbsDownIcon v-else class="size-4" />
+                    </template>
+                  </Button>
+                </div>
+              </div>
+              <div class="flex gap-1 items-start justify-between">
+                <Dropdown
+                  :options="articleActions"
+                  v-if="!editable && !isCustomerPortal"
                 >
-                  <template #suffix>
-                    {{ dislikes }}
-                  </template>
-                  <template #icon>
-                    <ThumbsDownFilledIcon
-                      v-if="feedback === 2"
-                      class="size-4"
-                    />
-                    <ThumbsDownIcon v-else class="size-4" />
-                  </template>
-                </Button>
+                  <Button size="md" variant="ghost">
+                    <template #icon>
+                      <IconMoreHorizontal class="h-4 w-4" />
+                    </template>
+                  </Button>
+                </Dropdown>
+                <div class="flex gap-2" v-if="editable">
+                  <DiscardButton
+                    :disabled="!isDirty"
+                    :hide-dialog="!isDirty"
+                    :title="__('Discard changes?')"
+                    :message="__('Are you sure you want to discard changes?')"
+                    @discard="handleDiscard"
+                  />
+
+                  <Button
+                    :label="__('Save')"
+                    @click="handleSave"
+                    variant="solid"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
+
         <!-- Article Content -->
         <TextEditor
           ref="editorRef"
@@ -152,7 +152,30 @@
             />
           </template>
         </TextEditor>
+        <div v-if="!editable" class="flex gap-1 items-center py-1.5 mt-4">
+          <!-- Avatar -->
+          <div class="flex gap-2 items-center justify-center">
+            <Avatar
+              :image="article.data.author.image"
+              :label="article.data.author.name"
+              size="lg"
+            />
+            <div class="flex flex-col justify-start gap-1">
+              <p
+                class="truncate capitalize text-base text-ink-gray-9 font-medium"
+              >
+                <span class="text-base text-gray-800">published by </span>
+                {{ article.data.author.name }}
+              </p>
+              <div class="text-xs text-gray-500">
+                {{ dayjsLocal(article.data.modified).format("MMM D, h:mm A") }}
+              </div>
+            </div>
+          </div>
+          <IconDot class="h-4 w-4 text-gray-600" />
+        </div>
       </div>
+
       <div class="p-4" v-if="isCustomerPortal">
         <ArticleFeedback
           :feedback="feedback"
@@ -191,6 +214,7 @@ import {
   copyToClipboard,
   isCustomerPortal,
   textEditorMenuButtons,
+  timeAgo,
 } from "@/utils";
 import {
   Avatar,
@@ -203,6 +227,7 @@ import {
   TextEditorFixedMenu,
   toast,
   Badge,
+  dayjsLocal,
 } from "frappe-ui";
 import { computed, h, onMounted, ref, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -379,7 +404,30 @@ function handleDiscard() {
   });
 }
 
+function hasParagraphContent(html: string) {
+  if (!html) return false;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const paragraphs = doc.querySelectorAll("p");
+  return Array.from(paragraphs).some((p) => {
+    return p.textContent.trim().length > 0;
+  });
+}
+
 function handleSave() {
+  const titleVal = title.value?.trim();
+  const bodyText = hasParagraphContent(content.value);
+
+  if (!titleVal) {
+    toast.error(__("Article title cannot be set as empty"));
+    return;
+  }
+
+  if (!bodyText) {
+    toast.error(__("Article body cannot be set as empty."));
+    return;
+  }
+
   editable.value = false;
   handleArticleUpdate();
 }
