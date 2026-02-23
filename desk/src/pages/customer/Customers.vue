@@ -27,13 +27,6 @@
       v-model="isDialogVisible"
       @customer-created="handleCustomer"
     />
-    <span v-if="isCustomerDialogVisible">
-      <CustomerDialog
-        v-model="isCustomerDialogVisible"
-        :name="selectedCustomer"
-        @customer-updated="handleCustomer(true)"
-      />
-    </span>
   </div>
 </template>
 <script setup lang="ts">
@@ -43,7 +36,6 @@ import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import { useRouter } from "vue-router";
-import CustomerDialog from "./CustomerDialog.vue";
 
 const router = useRouter();
 

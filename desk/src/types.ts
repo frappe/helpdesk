@@ -1,6 +1,6 @@
 import { Dayjs } from "dayjs";
 import { Component, ComputedRef, InjectionKey, Ref } from "vue";
-import type { AssignmentRule, HDTicket } from "./types/doctypes";
+import type { AssignmentRule, HDCustomer, HDTicket } from "./types/doctypes";
 
 interface ResourceOptions<T = any> {
   method?: string;
@@ -704,6 +704,10 @@ export const TeamListResourceSymbol: InjectionKey<ListResource<Team>> =
 export const SavedReplyListResourceSymbol: InjectionKey<
   ListResource<SavedReply>
 > = Symbol("savedReplyListResource");
+
+export const CustomerResourceSymbol: InjectionKey<
+  DocumentResource<HDCustomer>
+> = Symbol("customerResource");
 
 declare global {
   interface Window {
