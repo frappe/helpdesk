@@ -13,17 +13,13 @@ def validate_agent_availability(doc, method=None):
     )
 
     if status == "Away":
-        frappe.throw(
-            msg=_("This agent is marked as Away and cannot be assigned tickets."),
+        frappe.msgprint(
+            msg=_("This agent is marked as Away "),
             title=_("Agent Unavailable"),
-            exc=frappe.ValidationError,
-        )
+    )
+        frappe.log_error("Ticket assigned to Away agent", "Agent Unavailable")
 
-def user_query_condition(user):
-    return """
-        EXISTS (
-            SELECT 1 FROM `tabHD Agent`
-            WHERE `tabHD Agent`.user = `tabUser`.name
-            AND `tabHD Agent`.availability_status = 'Available'
-        )
-    """
+
+
+
+# removed user_query_condition

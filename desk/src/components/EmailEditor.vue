@@ -162,6 +162,8 @@
 </template>
 
 <script setup lang="ts">
+
+
 import {
   AttachmentItem,
   MultiSelectInput,
@@ -189,7 +191,8 @@ import {
   toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 
 const editorRef = ref(null);
@@ -241,8 +244,15 @@ const newEmail = useStorage<null | string>(
   null
 );
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { isManager } = useAuthStore();
-
+const auth = useAuthStore();
+const getSignature = createResource({
+  url: "frappe.client.get_value",
+  params: {
+    doctype: "HD Agent",
+    filters: { user: auth.userId },
+    fieldname: "signature",
+  },
+});
 // Initialize typing composable
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
@@ -299,10 +309,6 @@ const sendMail = createResource({
   onSuccess: () => {
     resetState();
     emit("submit");
-
-    if (isManager) {
-      updateOnboardingStep("reply_on_ticket");
-    }
   },
   debounce: 300,
 });
@@ -343,7 +349,7 @@ async function removeAttachment(attachment) {
   await removeAttachmentFromServer(attachment.name);
 }
 
-function addToReply(
+async function addToReply(
   body: string,
   toEmails: string[],
   ccEmails: string[],
@@ -352,13 +358,24 @@ function addToReply(
   toEmailsClone.value = toEmails;
   ccEmailsClone.value = ccEmails;
   bccEmailsClone.value = bccEmails;
+
+  let signature = "";
+
+  try {
+    const res = await getSignature.fetch();
+    signature = res?.signature || "";
+  } catch (err) {
+    console.error("Signature fetch failed", err);
+  }
+
+  const content = signature
+    ? `${body}<p><br/></p><p>${signature}</p>`
+    : body;
+
   editorRef.value.editor
     .chain()
     .clearContent()
-    .insertContent(body)
-    .focus("all")
-    .setBlockquote()
-    .insertContentAt(0, { type: "paragraph" })
+    .insertContent(content)
     .focus("start")
     .run();
 }
@@ -384,6 +401,37 @@ function handleDiscard() {
 const editor = computed(() => {
   return editorRef.value.editor;
 });
+
+watch(
+  () => props.editable,
+  async (isEditable) => {
+    if (isEditable) {
+      try {
+        const res = await getSignature.fetch();
+        const signature = String(res.signature || "").trim();
+        
+        console.log("signature value →", signature);
+        console.log("newEmail.value →", newEmail.value);
+
+        // Always set signature if box is empty or null
+        if (signature && (!newEmail.value || newEmail.value.trim() === "")) {
+          newEmail.value = `<p><br/></p><p>${signature.replace(/\n/g, "<br/>")}</p>`;
+          console.log("✅ Signature set!");
+        } else {
+          // Force clear localStorage and set signature
+          newEmail.value = null;
+          setTimeout(() => {
+            newEmail.value = `<p><br/></p><p>${signature.replace(/\n/g, "<br/>")}</p>`;
+            console.log("✅ Signature set after clear!");
+          }, 100);
+        }
+      } catch (err) {
+        console.error("Error →", err);
+      }
+    }
+  },
+  { immediate: true }
+);
 
 defineExpose({
   addToReply,

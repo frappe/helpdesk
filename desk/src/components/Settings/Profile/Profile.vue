@@ -108,6 +108,24 @@
             maxlength="40"
             v-model="profile.lastName"
           />
+
+
+          <FormControl
+            class="w-full"
+            type="select"
+            :label="__('Availability Status')"
+            :options="['Available', 'Away']"
+            v-model="profile.availabilityStatus"
+          />
+          <FormControl
+            class="w-full md:col-span-2"
+            type="textarea"
+            :label="__('Signature')"
+            v-model="profile.signature"
+          />
+
+
+
         </div>
         <div class="flex items-center justify-between mt-6">
           <div class="flex flex-col gap-1">
@@ -176,6 +194,8 @@ const profile = ref({
   userImage: auth.userImage,
   firstName: auth.userFirstName,
   lastName: auth.userLastName,
+  availabilityStatus: "Available",
+  signature: "",
 });
 const showChangePasswordModal = ref(false);
 const language = ref(auth.language);
@@ -214,6 +234,8 @@ const agentData = createResource({
       firstName: fullName[0],
       lastName: fullName[1] || "",
       userImage: data.user_image,
+      availabilityStatus: data.availability_status,
+      signature: data.signature,
     };
   },
 });
@@ -232,6 +254,8 @@ const setAgent = createResource({
       fieldname: {
         agent_name: `${profile.value.firstName} ${profile.value.lastName}`,
         user_image: profile.value.userImage,
+        availability_status: profile.value.availabilityStatus,
+        signature: profile.value.signature,
       },
     };
   },
