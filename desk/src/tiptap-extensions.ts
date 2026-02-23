@@ -127,7 +127,7 @@ export const TiptapTableMarker = Extension.create({
           "data-type": {
             default: "tiptap-table",
             parseHTML: (element) => element.getAttribute("data-type"),
-            renderHTML: () => ({ "data-choretype": "tiptap-table" }),
+            renderHTML: () => ({ "data-type": "tiptap-table" }),
           },
         },
       },
@@ -135,7 +135,7 @@ export const TiptapTableMarker = Extension.create({
   },
 });
 
-// fix for excel pasting
+//// fix for excel pasting
 export const ExcelPasteFix = Extension.create({
   name: "excelPasteFix",
 
@@ -149,13 +149,11 @@ export const ExcelPasteFix = Extension.create({
             if (!clipboardData) return false;
 
             const types = Array.from(clipboardData.types);
-            const hasFile = types.includes("Files");
+            const hasImage = types.some((t) => t.startsWith("image/")) || types.includes("Files");
             const hasHtml = types.includes("text/html");
             const hasText = types.includes("text/plain");
-            const hasRtf = types.includes("text/rtf")
 
-            //content pasted from excel has all 4 of the above
-            if (hasFile && hasHtml && hasText && hasRtf) {
+            if (hasImage && (hasHtml || hasText)) {
               event.preventDefault()
               const html = clipboardData.getData("text/html");
               const text = clipboardData.getData("text/plain");
