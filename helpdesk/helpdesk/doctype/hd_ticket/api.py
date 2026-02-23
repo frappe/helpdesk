@@ -278,9 +278,6 @@ def get_tags(ticket: str):
 
 
 def get_call_logs(ticket: str):
-    if not frappe.has_permission("TP Call Log", "read"):
-        return frappe.throw(_("You do not have permission to view call logs"))
-
     linked_calls = frappe.db.get_all(
         "Dynamic Link",
         filters={"link_name": ticket, "parenttype": "TP Call Log"},
