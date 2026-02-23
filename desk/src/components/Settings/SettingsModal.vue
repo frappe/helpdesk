@@ -7,19 +7,24 @@
     <template #body>
       <div class="flex z-50" :style="{ height: 'calc(100vh - 8rem)' }">
         <div
-          class="flex w-52 shrink-0 flex-col bg-gray-50 p-2 overflow-y-auto hide-scrollbar"
+          class="flex w-52 shrink-0 flex-col bg-gray-50 p-1 overflow-y-auto hide-scrollbar"
         >
-          <h1 class="px-2 pt-2 text-lg font-semibold mb-2">
-            {{ __("Settings") }}
+          <h1
+            class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-base text-ink-gray-5 transition-all duration-300 ease-in-out"
+          >
+            {{ __("My settings") }}
           </h1>
           <div v-for="tab in tabs">
+            <div v-if="!tab.noborder" class="border-t mx-2 my-2.5"></div>
+
             <div
               v-if="!tab.hideLabel"
-              class="mb-2 mt-3 flex gap-1.5 px-1 text-base font-medium text-ink-gray-5"
+              class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-base text-ink-gray-5 transition-all duration-300 ease-in-out"
             >
               <span>{{ __(tab.label) }}</span>
             </div>
-            <nav class="space-y-1">
+
+            <nav class="space-y-[3px] px-1">
               <button
                 v-for="item in tab.items"
                 :key="item.label"
@@ -32,7 +37,7 @@
                 @click="() => onTabChange(item)"
               >
                 <component :is="item.icon" class="h-4 w-4 text-gray-700" />
-                <span class="text-base text-gray-800">
+                <span class="text-sm text-gray-800">
                   {{ item.label }}
                 </span>
               </button>
