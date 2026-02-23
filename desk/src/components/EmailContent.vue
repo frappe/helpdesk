@@ -173,7 +173,7 @@ const htmlContent = computed(
       }
      .email-content :is(:where(table):not(:where([class~='not-prose'], [class~='not-prose'] *))) {
         table-layout: auto;
-        background-color: #ffffff;
+        background-color: transparent;
       }
       .email-content :where(table):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
         width: unset;
