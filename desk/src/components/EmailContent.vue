@@ -188,6 +188,12 @@ const htmlContent = computed(
         border-bottom-width: 0;
         border-bottom-color: transparent;
       }
+      .email-content :where(tbody th):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+        text-wrap:nowrap;
+      }
+         .email-content :where(tbody td):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+        text-wrap:nowrap;
+      }
       .email-content :is(:where(td):not(:where([class~='not-prose'], [class~='not-prose'] *))) {
         position: unset;
         border-width: 0;
