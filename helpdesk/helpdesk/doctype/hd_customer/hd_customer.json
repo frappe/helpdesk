@@ -87,35 +87,13 @@
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-20 20:51:23.452754",
+ "modified": "2026-02-23 14:37:53.288126",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Customer",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Agent",
-   "select": 1,
-   "share": 1
-  },
   {
    "create": 1,
    "delete": 1,
@@ -136,10 +114,33 @@
    "print": 1,
    "read": 1,
    "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
    "role": "Agent Manager",
    "select": 1,
    "share": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "select": 1,
+   "share": 1
   },
   {
    "email": 1,

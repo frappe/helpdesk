@@ -328,7 +328,7 @@ export interface HDCustomer extends DocType {
   /** Image: Attach Image */
   image?: string;
   /** Customer Name: Data */
-  customer_name?: string;
+  customer_name: string;
   /** Domain: Data */
   domain?: string;
   /** Contacts: Table (HD Customer Member) */

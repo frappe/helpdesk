@@ -1,6 +1,15 @@
 <template>
   <div>
-    <p class="mt-2.5 mb-4.5 font-semibold text-lg">Contacts</p>
+    <div class="flex items-center justify-between">
+      <p class="mt-2.5 mb-4.5 font-semibold text-lg">Contacts</p>
+      <Dropdown :options="headerOptions" placement="right">
+        <Button :label="__('Create')" variant="solid">
+          <template #prefix>
+            <LucidePlus class="h-4 w-4" />
+          </template>
+        </Button>
+      </Dropdown>
+    </div>
     <!-- Loading -->
     <div v-if="contacts.loading" class="flex justify-center py-10">
       <LoadingIndicator :scale="10" />
@@ -22,14 +31,16 @@
         v-for="contact in contacts.data"
         :key="contact.contact_name"
         :contact="contact"
+        @update="contacts.reload()"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { CustomerContact, Resource } from "@/types";
-import { createResource, LoadingIndicator } from "frappe-ui";
+import { createResource, Dropdown, LoadingIndicator } from "frappe-ui";
 import LucideUserX from "~icons/lucide/user-x";
 import ContactCard from "./ContactCard.vue";
 
@@ -42,7 +53,6 @@ const contacts = createResource<Resource<CustomerContact[]>>({
   params: { customer: props.customer },
   cache: ["CustomerContact", props.customer],
   auto: true,
-  //   transform the response and say whicher is primar will be first
   transform: (data: CustomerContact[]) => {
     return data.sort((a, b) => {
       if (a.is_primary) return -1;
@@ -51,6 +61,16 @@ const contacts = createResource<Resource<CustomerContact[]>>({
     });
   },
 });
+const headerOptions = [
+  {
+    label: __("Add existing contact"),
+    onClick: () => {},
+  },
+  {
+    label: __("Invite new contact"),
+    onClick: () => {},
+  },
+];
 </script>
 
 <style scoped></style>

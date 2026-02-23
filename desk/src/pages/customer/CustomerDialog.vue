@@ -53,7 +53,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["customer-updated"]);
+const emit = defineEmits(["update"]);
 
 const domain = computed({
   get() {
@@ -94,13 +94,15 @@ async function update() {
   await customer.setValue.submit({
     domain: domain.value,
   });
-  emit("customer-updated");
+  emit("update");
+  toast.success(__("Customer updated"));
 }
 
 function updateImage(file) {
   customer.setValue.submit({
     image: file?.file_url || null,
   });
-  emit("customer-updated");
+  emit("update");
+  toast.success(__("Customer updated"));
 }
 </script>
