@@ -65,20 +65,7 @@ const props = defineProps<{
   contact: CustomerContact;
 }>();
 
-const dropdownOptions = [
-  {
-    label: "Edit Contact",
-    icon: "edit-2",
-    onClick: () => console.log("Edit Contact"),
-  },
-  {
-    label: "Delete Contact",
-    icon: "trash-2",
-    onClick: () => console.log("Delete Contact"),
-  },
-];
-
-const ticketLabel = computed(() => {
+const ticketCountLabel = computed(() => {
   const count = props.contact.ticket_count;
   if (count === 0) return "No open tickets";
   return `${count} ${count === 1 ? "ticket" : "tickets"}`;
@@ -99,13 +86,26 @@ const contactDetails = computed(() => [
   },
   {
     icon: markRaw(LucideTicket),
-    value: ticketLabel.value,
+    value: ticketCountLabel.value,
     color: (value: string) =>
       value !== "No open tickets" ? "!text-amber-700" : "!text-ink-gray-7",
     class: (value: string) =>
       value !== "No open tickets" ? "hover:underline cursor-pointer" : "",
   },
 ]);
+
+const dropdownOptions = [
+  {
+    label: "Edit Contact",
+    icon: "edit-2",
+    onClick: () => console.log("Edit Contact"),
+  },
+  {
+    label: "Delete Contact",
+    icon: "trash-2",
+    onClick: () => console.log("Delete Contact"),
+  },
+];
 </script>
 
 <style scoped></style>

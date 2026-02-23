@@ -333,10 +333,12 @@ export interface HDCustomer extends DocType {
   domain?: string;
   /** Contacts: Table (HD Customer Member) */
   contacts: HDCustomerMember[];
+  /** Contacts: Table (HD Customer Member) */
+  contacts: HDCustomerMember[];
   /** Mobile No: Data */
   mobile_no?: string;
   /** Email ID: Data */
   email_id?: string;
-  /** Primary Member: Data */
-  primary_member?: string;
+  /** Primary Contact: Data */
+  primary_contact?: string;
 }
