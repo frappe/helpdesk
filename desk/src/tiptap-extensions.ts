@@ -72,8 +72,8 @@ export const FieldAutocomplete = createSuggestionExtension<FieldItem>({
   component: FieldAutocompleteList,
 });
 
-export const PreserveVideoControls: Extension = Extension.create({
-  name: "preserveVideoControls",
+export const ComponentUtils: Extension = Extension.create({
+  name: "ComponentUtils",
   addGlobalAttributes() {
     return [
       {
@@ -88,15 +88,7 @@ export const PreserveVideoControls: Extension = Extension.create({
           },
         },
       },
-    ];
-  },
-});
-
-export const PreserveIds: Extension = Extension.create({
-  name: "preserveIds",
-  addGlobalAttributes() {
-    return [
-      {
+           {
         types: ["heading"],
         attributes: {
           id: {
@@ -107,6 +99,19 @@ export const PreserveIds: Extension = Extension.create({
                 return {};
               }
               return { id: attributes.id };
+            },
+          },
+        },
+      },
+            {
+        types: ["paragraph"],
+        attributes: {
+          class: {
+            default: null,
+            parseHTML: (element) => element.getAttribute('class'),
+            renderHTML: (attributes) => {
+              if (!attributes.class) return {}
+              return { class: attributes.class }
             },
           },
         },
