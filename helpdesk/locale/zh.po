@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-08 10:41+0000\n"
-"PO-Revision-Date: 2026-02-09 07:33\n"
+"POT-Creation-Date: 2026-02-15 10:41+0000\n"
+"PO-Revision-Date: 2026-02-17 13:44\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Chinese Simplified\n"
 "MIME-Version: 1.0\n"
@@ -680,8 +680,8 @@ msgstr "首次响应工单的平均耗时"
 msgid "Avg. time taken to resolve a ticket"
 msgstr "解决工单的平均耗时"
 
-#: desk/src/components/Settings/EmailAdd.vue:87
-#: desk/src/components/Settings/EmailEdit.vue:72
+#: desk/src/components/Settings/EmailAdd.vue:143
+#: desk/src/components/Settings/EmailEdit.vue:134
 msgid "Back"
 msgstr "返回"
 
@@ -1132,7 +1132,7 @@ msgstr "无法发送确认邮件，原因：{0}"
 msgid "Could not send feedback email,due to: {0}"
 msgstr "无法发送反馈邮件，原因：{0}"
 
-#: desk/src/components/Settings/EmailAdd.vue:94
+#: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
 #: desk/src/components/layouts/Sidebar.vue:503
@@ -1529,6 +1529,11 @@ msgstr "编辑"
 msgid "Edit Call Log"
 msgstr "编辑通话记录"
 
+#: desk/src/components/Settings/EmailAdd.vue:70
+#: desk/src/components/Settings/EmailEdit.vue:63
+msgid "Edit Domain"
+msgstr ""
+
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
 msgstr "编辑邮件"
@@ -1586,11 +1591,11 @@ msgstr "邮箱"
 msgid "Email Notifications"
 msgstr "邮件通知"
 
-#: desk/src/components/Settings/EmailAdd.vue:162
+#: desk/src/components/Settings/EmailAdd.vue:306
 msgid "Email account created"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:267
+#: desk/src/components/Settings/EmailEdit.vue:471
 msgid "Email account updated successfully"
 msgstr "邮件账户更新成功。"
 
@@ -1604,7 +1609,7 @@ msgstr ""
 msgid "Emails"
 msgstr "电子邮件"
 
-#: desk/src/components/Settings/EmailEdit.vue:224
+#: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
 msgstr ""
 
@@ -1747,7 +1752,7 @@ msgstr "外部链接"
 msgid "Failed"
 msgstr "失败"
 
-#: desk/src/components/Settings/EmailAdd.vue:167
+#: desk/src/components/Settings/EmailAdd.vue:311
 msgid "Failed to create email account, Invalid credentials"
 msgstr "邮件账户创建失败，凭证无效"
 
@@ -1755,7 +1760,7 @@ msgstr "邮件账户创建失败，凭证无效"
 msgid "Failed to load telephony agent"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:229
+#: desk/src/components/Settings/EmailEdit.vue:422
 msgid "Failed to pull emails"
 msgstr ""
 
@@ -1767,7 +1772,7 @@ msgstr ""
 msgid "Failed to save Twilio settings"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:272
+#: desk/src/components/Settings/EmailEdit.vue:476
 msgid "Failed to update email account, Invalid credentials"
 msgstr "邮件账户更新失败，凭证无效"
 
@@ -2978,7 +2983,7 @@ msgstr "无负责人"
 msgid "No assignment rule found"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:184
+#: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
 msgstr "未作更改"
 
@@ -3086,6 +3091,10 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:84
 msgid "Open help"
+msgstr ""
+
+#: desk/src/components/Settings/EmailEdit.vue:37
+msgid "Open in Desk"
 msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:102
@@ -3440,11 +3449,11 @@ msgstr "发布于"
 msgid "Published articles must have content."
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:87
+#: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
 msgstr "拉取邮件"
 
-#: desk/src/components/Settings/EmailEdit.vue:214
+#: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
 msgstr ""
 
@@ -4059,6 +4068,10 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
 msgstr "服务水平协议名"
+
+#: helpdesk/api/settings/email.py:14
+msgid "Service not supported"
+msgstr ""
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:5
 #: desk/src/components/ticket/SetContactPhoneModal.vue:8
@@ -4803,7 +4816,7 @@ msgstr ""
 msgid "To is required"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:147
+#: desk/src/components/Settings/EmailEdit.vue:268
 msgid "To know more about setting up email accounts, click"
 msgstr "了解更多邮件账户设置信息，请点击"
 
@@ -4937,7 +4950,7 @@ msgstr "未命名"
 msgid "Update"
 msgstr "更新"
 
-#: desk/src/components/Settings/EmailEdit.vue:80
+#: desk/src/components/Settings/EmailEdit.vue:142
 msgid "Update Account"
 msgstr "更新账户"
 

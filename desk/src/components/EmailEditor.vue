@@ -236,7 +236,10 @@ const label = computed(() => {
 
 const emit = defineEmits(["submit", "discard"]);
 
-const newEmail = useStorage("emailBoxContent" + props.ticketId, null);
+const newEmail = useStorage<null | string>(
+  "emailBoxContent" + props.ticketId,
+  null
+);
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 
@@ -272,8 +275,10 @@ const bcc = computed(() => (bccEmailsClone.value?.length ? true : false));
 const ccInput = ref(null);
 const bccInput = ref(null);
 
-function applySavedReplies(template) {
-  newEmail.value = template;
+function applySavedReplies(template: string) {
+  isContentEmpty(newEmail.value)
+    ? (newEmail.value = template)
+    : (newEmail.value = newEmail.value + "\n" + template);
   showSavedRepliesSelectorModal.value = false;
 }
 

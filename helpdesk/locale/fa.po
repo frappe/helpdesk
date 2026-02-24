@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-08 10:41+0000\n"
-"PO-Revision-Date: 2026-02-09 07:33\n"
+"POT-Creation-Date: 2026-02-15 10:41+0000\n"
+"PO-Revision-Date: 2026-02-18 14:57\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -444,11 +444,11 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:119
 msgid "Article created"
-msgstr ""
+msgstr "مقاله ایجاد شد"
 
 #: desk/src/pages/knowledge-base/Article.vue:330
 msgid "Article deleted"
-msgstr ""
+msgstr "مقاله حذف شد"
 
 #: desk/src/pages/knowledge-base/Article.vue:407
 msgid "Article link copied to clipboard"
@@ -456,19 +456,19 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:260
 msgid "Article moved"
-msgstr ""
+msgstr "مقاله منتقل شد"
 
 #: desk/src/pages/knowledge-base/Article.vue:306
 msgid "Article updated"
-msgstr ""
+msgstr "مقاله به‌روزرسانی شد"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:342
 msgid "Articles deleted"
-msgstr ""
+msgstr "مقالات حذف شدند"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:226
 msgid "Articles moved"
-msgstr ""
+msgstr "مقالات منتقل شدند"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:51
 msgid "Assign"
@@ -480,7 +480,7 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:93
 msgid "Assign ticket"
-msgstr ""
+msgstr "اختصاص تیکت"
 
 #. Label of the assign_to_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
@@ -573,7 +573,7 @@ msgstr ""
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:131
 msgid "At least one email is required"
-msgstr ""
+msgstr "حداقل یک ایمیل الزامی است"
 
 #: desk/src/components/Settings/InviteAgents.vue:170
 msgid "At least one email required"
@@ -589,7 +589,7 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:450
 msgid "At least one team is required"
-msgstr ""
+msgstr "حداقل یک تیم الزامی است"
 
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:28
 msgid "At-least one of priority, team and ticket type is required"
@@ -680,8 +680,8 @@ msgstr ""
 msgid "Avg. time taken to resolve a ticket"
 msgstr ""
 
-#: desk/src/components/Settings/EmailAdd.vue:87
-#: desk/src/components/Settings/EmailEdit.vue:72
+#: desk/src/components/Settings/EmailAdd.vue:143
+#: desk/src/components/Settings/EmailEdit.vue:134
 msgid "Back"
 msgstr "بازگشت"
 
@@ -751,7 +751,7 @@ msgstr "جزئیات تماس"
 
 #: desk/src/components/layouts/Sidebar.vue:257
 msgid "Call Logs"
-msgstr ""
+msgstr "لاگ تماس"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:81
 msgid "Call Received By"
@@ -815,7 +815,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Category"
-msgstr "دسته بندی"
+msgstr "دسته‌بندی"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:168
 msgid "Category '{0}' link copied to clipboard"
@@ -823,15 +823,15 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:257
 msgid "Category created"
-msgstr ""
+msgstr "دسته‌بندی ایجاد شد"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:320
 msgid "Category deleted"
-msgstr ""
+msgstr "دسته‌بندی حذف شد"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:357
 msgid "Category merged"
-msgstr ""
+msgstr "دسته‌بندی ادغام شد"
 
 #: helpdesk/api/knowledge_base.py:72
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.py:64
@@ -840,7 +840,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:292
 msgid "Category updated"
-msgstr ""
+msgstr "دسته‌بندی به روز شد"
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:40
 msgid "Change"
@@ -861,11 +861,11 @@ msgstr ""
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:22
 msgid "Change photo"
-msgstr ""
+msgstr "تغییر عکس"
 
 #: desk/src/components/modals/ShortcutsModal.vue:91
 msgid "Change priority"
-msgstr ""
+msgstr "تغییر اولویت"
 
 #: desk/src/components/modals/ShortcutsModal.vue:94
 msgid "Change status"
@@ -873,11 +873,11 @@ msgstr "تغییر وضعیت"
 
 #: desk/src/components/modals/ShortcutsModal.vue:92
 msgid "Change team"
-msgstr ""
+msgstr "تغییر تیم"
 
 #: desk/src/components/modals/ShortcutsModal.vue:90
 msgid "Change ticket type"
-msgstr ""
+msgstr "تغییر نوع تیکت"
 
 #: desk/src/components/Settings/Profile/Profile.vue:118
 msgid "Change your account password for security."
@@ -943,7 +943,7 @@ msgstr "پاک کردن جدول"
 
 #: desk/src/pages/SearchAgent.vue:86
 msgid "Clear all filters"
-msgstr ""
+msgstr "پاک کردن همه فیلترها"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:46
 msgid "Click on Add to Holidays. This will populate the holidays table with all the dates that fall on the selected weekly off. Repeat the process for populating the dates for all your weekly holidays"
@@ -960,7 +960,7 @@ msgstr "بستن"
 
 #: desk/src/pages/ticket/TicketCustomer.vue:294
 msgid "Close Ticket"
-msgstr ""
+msgstr "بستن تیکت"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -1118,7 +1118,7 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:95
 msgid "Copy ticket id"
-msgstr ""
+msgstr "کپی شناسه تیکت"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:631
 msgid "Could not an email due to: {0}"
@@ -1132,7 +1132,7 @@ msgstr ""
 msgid "Could not send feedback email,due to: {0}"
 msgstr ""
 
-#: desk/src/components/Settings/EmailAdd.vue:94
+#: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
 #: desk/src/components/layouts/Sidebar.vue:503
@@ -1157,11 +1157,11 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:434
 msgid "Create a ticket"
-msgstr ""
+msgstr "ایجاد تیکت"
 
 #: desk/src/components/layouts/Sidebar.vue:479
 msgid "Create an article"
-msgstr ""
+msgstr "ایجاد یک مقاله"
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:5
 msgid "Create and manage teams and assign agents to specific teams."
@@ -1210,7 +1210,7 @@ msgstr "نام مشتری"
 
 #: desk/src/components/layouts/Sidebar.vue:319
 msgid "Customer portal"
-msgstr ""
+msgstr "پورتال مشتری"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:5
 msgid "Customize your email notification preferences to stay informed about important updates and activities."
@@ -1281,11 +1281,11 @@ msgstr "وضعیت پیش‌فرض تیکت"
 
 #: desk/src/pages/ticket/Tickets.vue:295 desk/src/pages/ticket/Tickets.vue:354
 msgid "Default Views"
-msgstr ""
+msgstr "نماهای پیش‌فرض"
 
 #: desk/src/components/ticket-agent/TicketHeader.vue:212
 msgid "Default actions"
-msgstr ""
+msgstr "اقدامات پیش‌فرض"
 
 #. Label of the default_priority (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1325,7 +1325,7 @@ msgstr "حذف"
 
 #: desk/src/pages/knowledge-base/Article.vue:316
 msgid "Delete Article"
-msgstr ""
+msgstr "حذف مقاله"
 
 #: desk/src/pages/ticket/Tickets.vue:434
 msgid "Delete View"
@@ -1529,6 +1529,11 @@ msgstr "ویرایش"
 msgid "Edit Call Log"
 msgstr "ویرایش لاگ تماس"
 
+#: desk/src/components/Settings/EmailAdd.vue:70
+#: desk/src/components/Settings/EmailEdit.vue:63
+msgid "Edit Domain"
+msgstr ""
+
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
 msgstr ""
@@ -1573,7 +1578,7 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:67
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Email Content"
-msgstr ""
+msgstr "محتوای ایمیل"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:110
 msgid "Email Id"
@@ -1584,13 +1589,13 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:3
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Email Notifications"
-msgstr ""
+msgstr "اعلان‌های ایمیلی"
 
-#: desk/src/components/Settings/EmailAdd.vue:162
+#: desk/src/components/Settings/EmailAdd.vue:306
 msgid "Email account created"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:267
+#: desk/src/components/Settings/EmailEdit.vue:471
 msgid "Email account updated successfully"
 msgstr ""
 
@@ -1604,7 +1609,7 @@ msgstr ""
 msgid "Emails"
 msgstr "ایمیل ها"
 
-#: desk/src/components/Settings/EmailEdit.vue:224
+#: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
 msgstr ""
 
@@ -1698,7 +1703,7 @@ msgstr ""
 
 #: helpdesk/overrides/email_account.py:43
 msgid "Error processing email at index {0}, message: {1}"
-msgstr ""
+msgstr "خطا در پردازش ایمیل در شاخص {0}، پیام: {1}"
 
 #: helpdesk/overrides/email_account.py:92
 msgid "Error while connecting to email account {0}"
@@ -1747,7 +1752,7 @@ msgstr ""
 msgid "Failed"
 msgstr "ناموفق"
 
-#: desk/src/components/Settings/EmailAdd.vue:167
+#: desk/src/components/Settings/EmailAdd.vue:311
 msgid "Failed to create email account, Invalid credentials"
 msgstr ""
 
@@ -1755,7 +1760,7 @@ msgstr ""
 msgid "Failed to load telephony agent"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:229
+#: desk/src/components/Settings/EmailEdit.vue:422
 msgid "Failed to pull emails"
 msgstr ""
 
@@ -1767,7 +1772,7 @@ msgstr ""
 msgid "Failed to save Twilio settings"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:272
+#: desk/src/components/Settings/EmailEdit.vue:476
 msgid "Failed to update email account, Invalid credentials"
 msgstr ""
 
@@ -1817,7 +1822,7 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:370
 msgid "Feedback Trend"
-msgstr ""
+msgstr "روند بازخورد"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:172
 msgid "Feedback email has been sent to the customer"
@@ -1870,7 +1875,7 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:76
 #: desk/src/components/Settings/General/components/TicketSettings.vue:229
 msgid "Find out all of the variables that can be used in the content"
-msgstr ""
+msgstr "پیدا کردن تمام متغیرهایی که می‌توانند در محتوا استفاده شوند"
 
 #: desk/src/components/Settings/Profile/Profile.vue:101
 #: desk/src/components/desk/global/NewContactDialog.vue:118
@@ -1973,11 +1978,11 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:233
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Global"
-msgstr ""
+msgstr "سراسری"
 
 #: desk/src/components/command-palette/CP.vue:90
 msgid "Go to Ticket #{0}"
-msgstr ""
+msgstr "به تیکت #{0} بروید"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -1992,7 +1997,7 @@ msgstr "سبز"
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Group By"
-msgstr "دسته بندی بر اساس"
+msgstr "دسته‌بندی بر اساس"
 
 #. Label of the group_by_field (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2255,7 +2260,7 @@ msgstr ""
 #. Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Hide from customer"
-msgstr ""
+msgstr "پنهان کردن از مشتری"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -2276,11 +2281,11 @@ msgstr "نام لیست تعطیلات"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:373
 msgid "Holiday list created"
-msgstr ""
+msgstr "لیست تعطیلات ایجاد شد"
 
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:151
 msgid "Holiday list deleted"
-msgstr ""
+msgstr "لیست تعطیلات حذف شد"
 
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:124
 msgid "Holiday list duplicated"
@@ -2288,7 +2293,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:435
 msgid "Holiday list updated"
-msgstr ""
+msgstr "لیست تعطیلات به‌روزرسانی شد"
 
 #. Label of the holidays_section (Section Break) field in DocType 'HD Service
 #. Holiday List'
@@ -2446,7 +2451,7 @@ msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:11
 msgid "Invite by email"
-msgstr ""
+msgstr "دعوت از طریق ایمیل"
 
 #. Label of the is_active (Check) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
@@ -2542,7 +2547,7 @@ msgstr "زبان"
 
 #: desk/src/components/Settings/Profile/Profile.vue:257
 msgid "Language updated"
-msgstr ""
+msgstr "زبان به‌روزرسانی شد"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
@@ -2558,7 +2563,7 @@ msgstr "۳۰ روز گذشته"
 #: desk/src/pages/dashboard/Dashboard.vue:292
 #: desk/src/pages/dashboard/Dashboard.vue:294
 msgid "Last 60 Days"
-msgstr ""
+msgstr "۶۰ روز گذشته"
 
 #: desk/src/pages/dashboard/Dashboard.vue:278
 #: desk/src/pages/dashboard/Dashboard.vue:280
@@ -2700,7 +2705,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:2
 msgid "Manage general settings of your app."
-msgstr ""
+msgstr "تنظیمات عمومی برنامه خود را مدیریت کنید."
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:5
 msgid "Manage pre-defined responses that can be used to respond to customer queries."
@@ -2712,7 +2717,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:4
 msgid "Manage your profile information."
-msgstr ""
+msgstr "اطلاعات پروفایل خود را مدیریت کنید."
 
 #: desk/src/pages/MobileNotifications.vue:11
 #: desk/src/pages/MobileNotifications.vue:14
@@ -2725,7 +2730,7 @@ msgstr "اعضا"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:57
 msgid "Members ({0})"
-msgstr ""
+msgstr "اعضا ({0})"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:309
 msgid "Members of this team will be able to see the tickets assigned to all the teams"
@@ -2747,7 +2752,7 @@ msgstr "ادغام"
 #: desk/src/components/ticket-agent/TicketHeader.vue:204
 #: desk/src/components/ticket/TicketAgentSidebar.vue:18
 msgid "Merge Ticket"
-msgstr ""
+msgstr "ادغام تیکت"
 
 #. Label of the merged_with (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2786,7 +2791,7 @@ msgstr "حرکت به"
 #: desk/src/components/SavedRepliesSelectorModal.vue:168
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:339
 msgid "My Team"
-msgstr ""
+msgstr "تیم من"
 
 #. Label of the category_name (Data) field in DocType 'HD Article Category'
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
@@ -2964,7 +2969,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:167
 msgid "No Tickets Found"
-msgstr ""
+msgstr "تیکتی یافت نشد"
 
 #: desk/src/components/Settings/Agents.vue:98
 msgid "No agent found"
@@ -2978,13 +2983,13 @@ msgstr ""
 msgid "No assignment rule found"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:184
+#: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
 msgstr "هیچ تغییری ایجاد نشد"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:245
 msgid "No changes to save"
-msgstr ""
+msgstr "هیچ تغییری برای ذخیره وجود ندارد"
 
 #: desk/src/components/Settings/EmailAccountList.vue:52
 msgid "No email account found"
@@ -3012,7 +3017,7 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:98
 msgid "No tickets found to preview."
-msgstr ""
+msgstr "تیکتی برای پیش‌نمایش یافت نشد."
 
 #: helpdesk/utils.py:168
 msgid "Not Allowed"
@@ -3082,10 +3087,14 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:103
 msgid "Open comment box"
-msgstr ""
+msgstr "باز کردن کادر دیدگاه"
 
 #: desk/src/components/modals/ShortcutsModal.vue:84
 msgid "Open help"
+msgstr "باز کردن راهنما"
+
+#: desk/src/components/Settings/EmailEdit.vue:37
+msgid "Open in Desk"
 msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:102
@@ -3221,7 +3230,7 @@ msgstr "شخصی"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:88
 msgid "Personal mobile no"
-msgstr ""
+msgstr "شماره موبایل شخصی"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:133
 #: desk/src/components/ticket/SetContactPhoneModal.vue:27
@@ -3438,11 +3447,11 @@ msgstr "منتشر شده در"
 msgid "Published articles must have content."
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:87
+#: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:214
+#: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
 msgstr ""
 
@@ -3576,7 +3585,7 @@ msgstr "حذف تصویر"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:31
 msgid "Remove photo"
-msgstr ""
+msgstr "حذف عکس"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:292
 #: desk/src/components/Settings/Teams/TeamsList.vue:172
@@ -3944,7 +3953,7 @@ msgstr "عبارت جستجو نام Param"
 
 #: desk/src/components/command-palette/CP.vue:127
 msgid "Search for \"{0}\""
-msgstr ""
+msgstr "جستجو برای «{0}»"
 
 #: desk/src/pages/SearchAgent.vue:100
 msgid "Search index does not exist. Please build the index first."
@@ -3960,7 +3969,7 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:19
 msgid "Search ticket"
-msgstr ""
+msgstr "جستجوی تیکت"
 
 #: desk/src/pages/SearchAgent.vue:16
 msgid "Search tickets, comments, and communications..."
@@ -3972,7 +3981,7 @@ msgstr ""
 
 #: desk/src/pages/SearchAgent.vue:137
 msgid "Searched for:"
-msgstr ""
+msgstr "جستجو شده برای:"
 
 #: desk/src/pages/SearchAgent.vue:111
 msgid "Searching..."
@@ -3988,7 +3997,7 @@ msgstr "انتخاب کردن"
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:21
 msgid "Select Category"
-msgstr ""
+msgstr "انتخاب دسته‌بندی"
 
 #: desk/src/pages/dashboard/Dashboard.vue:20
 msgid "Select Range"
@@ -4004,7 +4013,7 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:103
 msgid "Select teams"
-msgstr ""
+msgstr "انتخاب تیم‌ها"
 
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:16
 msgid "Select ticket to preview"
@@ -4058,10 +4067,14 @@ msgstr ""
 msgid "Service Level Name"
 msgstr "نام سطح خدمات"
 
+#: helpdesk/api/settings/email.py:14
+msgid "Service not supported"
+msgstr ""
+
 #: desk/src/components/ticket/SetContactPhoneModal.vue:5
 #: desk/src/components/ticket/SetContactPhoneModal.vue:8
 msgid "Set Phone Number"
-msgstr ""
+msgstr "تنظیم شماره تلفن"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:56
 msgid "Set Resolution Time for Priority {0} in row {1}."
@@ -4164,11 +4177,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:417
 msgid "Some error occurred while renaming holiday list"
-msgstr ""
+msgstr "هنگام تغییر نام لیست تعطیلات، خطایی رخ داد"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:398
 msgid "Some error occurred while renaming saved reply"
-msgstr ""
+msgstr "هنگام تغییر نام پاسخ ذخیره شده، خطایی رخ داد"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:616
 msgid "Some error occurred while updating assignment rule"
@@ -4176,7 +4189,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:407
 msgid "Some error occurred while updating holiday list"
-msgstr ""
+msgstr "هنگام به‌روزرسانی فهرست تعطیلات، خطایی رخ داد"
 
 #. Label of the source_doctype (Link) field in DocType 'HD Support Search
 #. Source'
@@ -4205,7 +4218,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:331
 msgid "Source ticket does not exist"
-msgstr ""
+msgstr "تیکت مبدا وجود ندارد"
 
 #. Label of the split_and_merge_section (Section Break) field in DocType 'HD
 #. Ticket'
@@ -4352,7 +4365,7 @@ msgstr "تیم پشتیبانی"
 #. Label of the synonyms (Table) field in DocType 'HD Synonyms'
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
 msgid "Synonyms"
-msgstr ""
+msgstr "مترادف‌ها"
 
 #. Label of the is_system (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
@@ -4532,7 +4545,7 @@ msgstr ""
 #. Description of a DocType
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "This doctype will be deprecated in the future"
-msgstr ""
+msgstr "این doctype در آینده منسوخ خواهد شد"
 
 #. Description of the 'Instantly send e-mail' (Check) field in DocType 'HD
 #. Settings'
@@ -4588,7 +4601,7 @@ msgstr "پنج‌شنبه"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Ticket"
-msgstr ""
+msgstr "تیکت"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:776
 msgid "Ticket #{0}: We've received your request"
@@ -4599,32 +4612,32 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Analytics"
-msgstr ""
+msgstr "تجزیه و تحلیل تیکت"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Configuration"
-msgstr ""
+msgstr "پیکربندی تیکت"
 
 #: desk/src/components/modals/ShortcutsModal.vue:88
 msgid "Ticket Management"
-msgstr ""
+msgstr "مدیریت تیکت"
 
 #. Label of the is_merged (Check) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Ticket Merged"
-msgstr ""
+msgstr "تیکت ادغام شد"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:40
 msgid "Ticket Not Found"
-msgstr ""
+msgstr "تیکت پیدا نشد"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:50
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:77
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:37
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:105
 msgid "Ticket Priority"
-msgstr ""
+msgstr "اولویت تیکت"
 
 #. Label of the ticket_reopen_status (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -4632,7 +4645,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Ticket Reopen status"
-msgstr ""
+msgstr "وضعیت بازگشایی تیکت"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:18
 msgid "Ticket Routing"
@@ -4648,11 +4661,11 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Summary"
-msgstr ""
+msgstr "خلاصه تیکت"
 
 #: helpdesk/api/dashboard.py:292
 msgid "Ticket Trend"
-msgstr ""
+msgstr "روند تیکت"
 
 #. Label of the ticket_type_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -4664,7 +4677,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:94
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Type"
-msgstr ""
+msgstr "نوع تیکت"
 
 #: desk/src/pages/ticket/TicketCustomer.vue:306
 msgid "Ticket closed"
@@ -4672,7 +4685,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:21
 msgid "Ticket does not exist."
-msgstr ""
+msgstr "تیکت موجود نیست."
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:325
 msgid "Ticket must be resolved with a feedback"
@@ -4681,7 +4694,7 @@ msgstr ""
 #: desk/src/pages/ticket/TicketCustomer.vue:151
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:62
 msgid "Ticket not found"
-msgstr ""
+msgstr "تیکت پیدا نشد"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:40
 msgid "Ticket not found for the provided key."
@@ -4695,11 +4708,11 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:4
 msgid "Ticket settings"
-msgstr ""
+msgstr "تنظیمات تیکت"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:155
 msgid "Ticket status"
-msgstr ""
+msgstr "وضعیت تیکت"
 
 #. Label of the ticket_type (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_ticket_type (Link) field in DocType 'HD Escalation Rule'
@@ -4710,7 +4723,7 @@ msgstr ""
 #: desk/src/pages/ticket/MobileTicketAgent.vue:498
 #: desk/src/pages/ticket/TicketCustomer.vue:279
 msgid "Ticket updated"
-msgstr ""
+msgstr "تیکت به‌روزرسانی شد"
 
 #. Name of a report
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
@@ -4734,15 +4747,15 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:513 helpdesk/api/dashboard.py:521
 msgid "Tickets by Priority"
-msgstr ""
+msgstr "تیکت ها بر اساس اولویت"
 
 #: helpdesk/api/dashboard.py:447 helpdesk/api/dashboard.py:455
 msgid "Tickets by Team"
-msgstr ""
+msgstr "تیکت‌ها بر اساس تیم"
 
 #: helpdesk/api/dashboard.py:480 helpdesk/api/dashboard.py:488
 msgid "Tickets by Type"
-msgstr ""
+msgstr "تیکت‌ها بر اساس نوع"
 
 #: helpdesk/api/ticket.py:18
 msgid "Tickets can only be assigned to agents"
@@ -4793,13 +4806,13 @@ msgstr "تا تاریخ نمی‌تواند قبل از از تاریخ باشد
 #: desk/src/components/Settings/Holiday/HolidayView.vue:108
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:172
 msgid "To date"
-msgstr ""
+msgstr "تا تاریخ"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:366
 msgid "To is required"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:147
+#: desk/src/components/Settings/EmailEdit.vue:268
 msgid "To know more about setting up email accounts, click"
 msgstr "برای کسب اطلاعات بیشتر در مورد تنظیم حساب‌های ایمیل، کلیک کنید"
 
@@ -4933,7 +4946,7 @@ msgstr "بدون عنوان"
 msgid "Update"
 msgstr "به‌روزرسانی"
 
-#: desk/src/components/Settings/EmailEdit.vue:80
+#: desk/src/components/Settings/EmailEdit.vue:142
 msgid "Update Account"
 msgstr "به‌روز‌رسانی حساب کاربری"
 
@@ -5100,7 +5113,7 @@ msgstr "ساعات کاری"
 #: desk/src/pages/knowledge-base/Article.vue:97
 #: desk/src/pages/knowledge-base/NewArticle.vue:57
 msgid "Write your article here..."
-msgstr ""
+msgstr "مطلب خود را اینجا بنویسید..."
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:37
 msgid "Yearly"
@@ -5113,7 +5126,7 @@ msgstr "زرد"
 
 #: helpdesk/api/dashboard.py:36
 msgid "You are not allowed to view this dashboard data."
-msgstr ""
+msgstr "شما مجاز به مشاهده داده‌های این داشبورد نیستید."
 
 #: helpdesk/utils.py:167
 msgid "You are not permitted to access this resource."
@@ -5121,15 +5134,15 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:534
 msgid "You are not permitted to add a comment"
-msgstr ""
+msgstr "شما مجاز به افزودن دیدگاه نیستید"
 
 #: desk/src/App.vue:36
 msgid "You are now offline"
-msgstr ""
+msgstr "شما اکنون آفلاین هستید"
 
 #: desk/src/App.vue:29
 msgid "You are now online"
-msgstr ""
+msgstr "شما اکنون آنلاین هستید"
 
 #: desk/src/components/telephony/CallUI.vue:35
 msgid "You can change the default calling medium from the settings"
