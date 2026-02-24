@@ -68,9 +68,18 @@ def get_form_script(
         .where(FormScript.dt == dt)
         .where(FormScript.apply_to == apply_to)
         .where(FormScript.enabled == 1)
-        .where(FormScript.apply_on_new_page == apply_on_new_page)
         .where(FormScript.apply_to_customer_portal == is_customer_portal)
     )
+
+    cond1 = FormScript.apply_on_new_page == apply_on_new_page
+    cond2 = (FormScript.apply_on_new_page != apply_on_new_page) & (
+        FormScript.apply_on_ticket_view == 1
+    )
+
+    if apply_on_new_page:
+        query = query.where(FormScript.apply_on_new_page == apply_on_new_page)
+    else:
+        query = query.where(cond1 | cond2)
 
     doc = query.run(as_dict=True)
     if doc:

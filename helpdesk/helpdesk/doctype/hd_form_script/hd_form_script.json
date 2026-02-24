@@ -13,6 +13,7 @@
   "column_break_lhfw",
   "apply_to_customer_portal",
   "apply_on_new_page",
+  "apply_on_ticket_view",
   "section_break_qhfq",
   "script"
  ],
@@ -71,6 +72,13 @@
   },
   {
    "default": "0",
+   "depends_on": "eval: doc.apply_to=='Form' && doc.apply_on_new_page==1",
+   "fieldname": "apply_on_ticket_view",
+   "fieldtype": "Check",
+   "label": "Apply on ticket view"
+  },
+  {
+   "default": "0",
    "depends_on": "eval:frappe.boot.developer_mode",
    "fieldname": "is_standard",
    "fieldtype": "Check",
@@ -81,7 +89,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-02 17:13:38.683167",
+ "modified": "2026-02-24 16:35:13.690791",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Form Script",

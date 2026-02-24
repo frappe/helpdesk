@@ -158,6 +158,9 @@ let fieldCriteriaState = reactive({
     enabled: true,
     value: [{ label: "Any", value: "Any" }],
   },
+  ticket_view: {
+    enabled: false,
+  },
 });
 
 const createUpdateFieldDependency = createResource({
@@ -169,6 +172,7 @@ const createUpdateFieldDependency = createResource({
     parent_child_mapping: stringifyParentChildMapping(),
     enabled: state.enabled,
     fields_criteria: JSON.stringify(fieldCriteriaState),
+    apply_on_ticket_view: fieldCriteriaState.ticket_view?.enabled ? 1 : 0,
   }),
   onSuccess: () => {
     if (!isNew.value) {
@@ -191,6 +195,15 @@ const fieldDependency = createResource({
     state.enabled = data.enabled;
     parseMapping(data.parent_child_mapping);
     parseFieldCriteria(data.fields_criteria);
+    // Sync apply_on_ticket_view if present
+    if (
+      typeof data.apply_on_ticket_view !== "undefined" &&
+      fieldCriteriaState.ticket_view
+    ) {
+      fieldCriteriaState.ticket_view.enabled = Boolean(
+        data.apply_on_ticket_view
+      );
+    }
   },
 });
 function parseMapping(data: string) {
@@ -219,6 +232,7 @@ function parseFieldCriteria(data: string) {
     enabled: true,
     value: [{ label: "Any", value: "Any" }],
   };
+  fieldCriteriaState.ticket_view = criteria.ticket_view || { enabled: false };
 }
 
 const isDirty = computed(() => {

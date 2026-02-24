@@ -35,6 +35,7 @@ def get_field_dependency(name):
     res["parent_field"] = doc.name.split("-")[1]
     res["child_field"] = doc.name.split("-")[2]
     res["enabled"] = doc.enabled
+    res["apply_on_ticket_view"] = getattr(doc, "apply_on_ticket_view", 0)
     res["parent_child_mapping"] = frappe.parse_json(doc.script.split("//JSON: ")[-1])
     res["fields_criteria"] = get_fields_criteria(doc.script)
 
@@ -51,7 +52,12 @@ def get_fields_criteria(script):
 
 @frappe.whitelist()
 def create_update_field_dependency(
-    parent_field, child_field, parent_child_mapping, enabled, fields_criteria
+    parent_field,
+    child_field,
+    parent_child_mapping,
+    enabled,
+    fields_criteria,
+    apply_on_ticket_view=0,
 ):
     frappe.has_permission("HD Form Script", "create", throw=True)
     if not parent_field or not child_field or not parent_child_mapping:
@@ -62,6 +68,7 @@ def create_update_field_dependency(
     script_doc = get_or_create_standard_form_script(parent_field, child_field)
     script_doc.enabled = enabled
     script_doc.apply_on_new_page = 1
+    script_doc.apply_on_ticket_view = apply_on_ticket_view
 
     func = generate_on_change_function(
         parent_child_mapping=frappe.parse_json(parent_child_mapping),
