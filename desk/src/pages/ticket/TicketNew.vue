@@ -142,18 +142,18 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 import { Field } from "@/types";
 import { isCustomerPortal, uploadFunction } from "@/utils";
 import {
   Breadcrumbs,
   Button,
   call,
-  createResource,
   createListResource,
+  createResource,
   FormControl,
   usePageMeta,
 } from "frappe-ui";
-import { __ } from "@/translation";
 import { useOnboarding } from "frappe-ui/frappe";
 import sanitizeHtml from "sanitize-html";
 import { computed, defineAsyncComponent, onMounted, reactive, ref } from "vue";
@@ -279,18 +279,6 @@ const ticket = createResource({
       updateOnboardingStep("create_first_ticket", true, false, () =>
         localStorage.setItem("firstTicket", data.name)
       );
-    }
-    // only capture telemetry for customer portal
-    if (isCustomerPortal.value) {
-      capture("new_ticket_submitted", {
-        data: {
-          user: userID,
-          ticketID: data.name,
-          subject: subject.value,
-          description: description.value,
-          customFields: templateFields,
-        },
-      });
     }
   },
 });

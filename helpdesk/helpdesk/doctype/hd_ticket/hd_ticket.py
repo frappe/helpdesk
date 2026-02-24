@@ -68,7 +68,6 @@ class HDTicket(Document):
         publish_event(
             "helpdesk:ticket-update", room=room, data={"ticket_id": self.name}
         )
-        capture_event("ticket_updated")
 
     def autoname(self):
         return self.name
@@ -172,16 +171,11 @@ class HDTicket(Document):
             frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
 
     def after_insert(self):
-        if self.ticket_split_from:
-            log_ticket_activity(
-                self.name,
-                "split the ticket from #{0}".format(self.ticket_split_from),
-            )
-            capture_event("ticket_split")
-            return
 
-        capture_event("ticket_created")
+        # Telemetry Event
+        self.capture_ticket_created_telemetry_events()
         publish_event("helpdesk:new-ticket")
+
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
             self.handle_inline_media_new_ticket()
@@ -195,6 +189,20 @@ class HDTicket(Document):
             and send_ack_email
         ):
             self.send_acknowledgement_email()
+
+    def capture_ticket_created_telemetry_events(self):
+        capture_event("ticket_created")
+        if not self.via_customer_portal:
+            capture_event("ticket_created_via_email")
+        if self.via_customer_portal and not is_agent():
+            capture_event("ticket_created_via_customer")
+
+        if self.ticket_split_from:
+            log_ticket_activity(
+                self.name,
+                "split the ticket from #{0}".format(self.ticket_split_from),
+            )
+            capture_event("ticket_split")
 
     def on_update(self):
         # flake8: noqa
@@ -212,6 +220,7 @@ class HDTicket(Document):
 
         self.remove_assignment_if_not_in_team()
         self.publish_update()
+        self.capture_update_telemetry_events()
         self.update_search_index()
 
     def notify_agent(self, agent, notification_type="Assignment"):
@@ -228,6 +237,17 @@ class HDTicket(Document):
     def update_search_index(self):
         search = HelpdeskSearch()
         search.index_doc(self)
+
+    def capture_update_telemetry_events(self):
+        capture_event("ticket_updated")
+
+        if self.has_value_changed("status"):
+            capture_event("ticket_status_updated")
+        if (
+            self.has_value_changed("status_category")
+            and self.status_category == "Resolved"
+        ):
+            capture_event("ticket_resolved")
 
     def set_ticket_type(self):
         if self.ticket_type:
