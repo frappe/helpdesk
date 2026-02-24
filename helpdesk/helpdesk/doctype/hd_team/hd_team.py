@@ -8,6 +8,8 @@ from frappe.exceptions import DoesNotExistError
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 
+from helpdesk.utils import capture_event
+
 
 class HDTeam(Document):
     @frappe.whitelist()
@@ -27,6 +29,8 @@ class HDTeam(Document):
         if assignment_rule_doc.disabled and assignment_rule_doc.users:
             assignment_rule_doc.disabled = False
         assignment_rule_doc.save()
+
+        capture_event("team_created")
 
     def after_rename(self, olddn, newdn, merge=False):
         # Update the condition for the linked assignment rule
@@ -175,4 +179,6 @@ def get_team_members(team: str):
     Returns the team members for the given team name
     """
     members = frappe.get_all("HD Team Member", filters={"parent": team}, pluck="user")
+    return members
+    return members
     return members
