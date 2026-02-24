@@ -470,11 +470,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
-<<<<<<< HEAD
- "modified": "2026-01-16 14:23:14.181727",
-=======
  "modified": "2026-02-24 09:06:31.899937",
->>>>>>> c00ab761 (fix: add disabled field in HD Ticket Type)
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
