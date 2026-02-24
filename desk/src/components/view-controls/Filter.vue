@@ -103,7 +103,7 @@
                 <div id="value" class="!min-w-[140px] flex-1">
                   <component
                     :is="getValueControl(f)"
-                    v-model="f.value"
+                    :model-value="f.value"
                     @change="(v) => updateValue(v, f)"
                     @update:modelValue="(v) => updateValue(v, f)"
                     :placeholder="'John Doe'"
