@@ -69,7 +69,8 @@
               <div id="value" class="w-full">
                 <component
                   :is="getValueControl(f)"
-                  v-model="f.value"
+                  :model-value="f.value"
+                  @update:modelValue="(v) => updateValue(v, f)"
                   @change="(v) => updateValue(v, f)"
                   :placeholder="'John Doe'"
                 />
@@ -104,6 +105,7 @@
                     :is="getValueControl(f)"
                     v-model="f.value"
                     @change="(v) => updateValue(v, f)"
+                    @update:modelValue="(v) => updateValue(v, f)"
                     :placeholder="'John Doe'"
                   />
                 </div>
