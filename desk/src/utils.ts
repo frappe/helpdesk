@@ -1,6 +1,5 @@
 import type { DropdownOption } from "@/types";
 import { useClipboard, useDateFormat } from "@vueuse/core";
-import dayjs from "dayjs";
 import { FeatherIcon, call, dayjsLocal, toast, useFileUpload, getConfig, } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
@@ -55,10 +54,7 @@ export function validateEmailWithZod(email: string) {
 export function dateFormat(date, format?: string) {
   const _format = format || "DD-MM-YYYY HH:mm:ss";
   if (!date) return '';
-  let systemTimezone = getConfig('systemTimezone');
-  let localTimezone = getConfig('localTimezone') || getBrowserTimezone();
-  const timezone = systemTimezone || localTimezone;  
-  const tzDate = dayjs(date).tz(timezone);
+  const tzDate = dayjsLocal(date);
   return tzDate.format(_format);
 }
 
@@ -73,13 +69,11 @@ function getBrowserTimezone() {
 export function prettyDate(date, mini = false) {
   if (!date) return ''
 
-  let systemTimezone = getConfig('systemTimezone')
-  let localTimezone = getConfig('localTimezone') || getBrowserTimezone()
   if (typeof date == 'string') {
     date = dayjsLocal(date)
   }
 
-  let nowDatetime = dayjs().tz(systemTimezone || localTimezone )
+  let nowDatetime = dayjsLocal()
   let diff = nowDatetime.diff(date, 'seconds')
 
   let dayDiff = diff / 86400
@@ -329,12 +323,12 @@ export function getIcon(icon) {
   return icon || markRaw(TicketIcon);
 }
 export function formatTimeShort(date: string) {
-  let systemTimezone = getConfig('systemTimezone');
-  let localTimezone = getConfig('localTimezone') || getBrowserTimezone();
-  const timezone = systemTimezone || localTimezone;
+  // let systemTimezone = getConfig('systemTimezone');
+  // let localTimezone = getConfig('localTimezone') || getBrowserTimezone();
+  // const timezone = systemTimezone || localTimezone;
   
-  const now = dayjs().tz(timezone);
-  const inputDate = dayjs(date).tz(timezone);
+  const now = dayjsLocal();
+  const inputDate = dayjsLocal();
   const diffSeconds = now.diff(inputDate, "second");
   const diffMinutes = now.diff(inputDate, "minute");
   const diffHours = now.diff(inputDate, "hour");
@@ -400,13 +394,8 @@ export function htmlToText(html: string): string {
  * @returns {string} Formatted date string in the user's locale and preferences
  */
 export function getFormattedDate(date) {
-  if (!date) return "";
-
-  let systemTimezone = getConfig('systemTimezone');
-  let localTimezone = getConfig('localTimezone') || getBrowserTimezone();
-  const timezone = systemTimezone || localTimezone;
-  
-  const dateObj = dayjs(date).tz(timezone);
+  if (!date) return ""; 
+  const dateObj = dayjsLocal(date);
   if (!dateObj.isValid()) return "";
 
   return dateObj.format("DD-MM-YYYY");
