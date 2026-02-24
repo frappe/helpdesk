@@ -62,7 +62,7 @@
         :content="_content"
         :editable="editable"
         :bubble-menu="textEditorMenuButtons"
-        :mentions="agentStore.dropdown"
+        :mentions="userMentions"
         @change="(event:string) => {_content = event}"
       >
         <template #bottom v-if="editable">
@@ -207,6 +207,7 @@ const isTicketMergedComment = computed(() => {
   return regex.test(content);
 });
 const agentStore = useAgentStore();
+const userMentions = computed(() => agentStore.dropdown ?? []);
 
 const emit = defineEmits(["update"]);
 const showDialog = ref(false);
