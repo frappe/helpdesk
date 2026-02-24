@@ -297,4 +297,7 @@ function handleSaveComment() {
     }
   );
 }
+onMounted(() => {
+  commentBoxRef.value.style.width = "0px";
+});
 </script>

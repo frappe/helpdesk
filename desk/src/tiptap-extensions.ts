@@ -72,8 +72,9 @@ export const FieldAutocomplete = createSuggestionExtension<FieldItem>({
   component: FieldAutocompleteList,
 });
 
-export const PreserveVideoControls: Extension = Extension.create({
-  name: "preserveVideoControls",
+export const TextEditorUtils: Extension = Extension.create({
+  name: "textEditorUtils",
+
   addGlobalAttributes() {
     return [
       {
@@ -88,18 +89,10 @@ export const PreserveVideoControls: Extension = Extension.create({
           },
         },
       },
-    ];
-  },
-});
-
-export const PreserveIds: Extension = Extension.create({
-  name: "preserveIds",
-  addGlobalAttributes() {
-    return [
       {
         types: ["heading"],
         attributes: {
-          id: {
+         id: {
             default: null,
             parseHTML: (element) => element.getAttribute("id"),
             renderHTML: (attributes) => {
@@ -111,23 +104,13 @@ export const PreserveIds: Extension = Extension.create({
           },
         },
       },
-    ];
-  },
-});
-
-
-// fix for table formatting
-export const TiptapTableMarker = Extension.create({
-  name: "tiptapTableMarker",
-  addGlobalAttributes() {
-    return [
       {
         types: ["table"],
-        attributes: {
+            attributes: {
           "data-type": {
             default: "tiptap-table",
             parseHTML: (element) => element.getAttribute("data-type"),
-            renderHTML: () => ({ "data-type": "tiptap-table" }),
+            renderHTML: () => ({ "data-type": "tiptap-table", "class": "tabular-data" }),
           },
         },
       },
@@ -135,9 +118,9 @@ export const TiptapTableMarker = Extension.create({
   },
 });
 
-// fix for excel pasting
-export const ExcelPasteFix = Extension.create({
-  name: "excelPasteFix",
+// fix for excel pasting issue
+export const HandleExcelPaste = Extension.create({
+  name: "handleExcelPaste",
 
   addProseMirrorPlugins() {
     return [
