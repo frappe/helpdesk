@@ -142,6 +142,7 @@ import { __ } from "@/translation";
 import {
   AxisChart,
   createResource,
+  DateRangePicker,
   dayjs,
   DonutChart,
   Dropdown,
