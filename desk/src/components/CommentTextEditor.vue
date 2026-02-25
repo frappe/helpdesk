@@ -14,7 +14,7 @@
     :editable="editable"
     :mentions="dropdown"
     @change="editable ? (newComment = $event) : null"
-    :extensions="[PreserveVideoControls]"
+    :extensions="[ComponentUtils]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #bottom>
@@ -113,7 +113,7 @@ import { AttachmentIcon } from "@/components/icons/";
 import { useTyping } from "@/composables/realtime";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
-import { PreserveVideoControls } from "@/tiptap-extensions";
+import { ComponentUtils } from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,

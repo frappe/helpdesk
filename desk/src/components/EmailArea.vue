@@ -11,7 +11,7 @@
       <!-- email design for mobile -->
       <div v-if="isMobileView" class="flex items-center gap-2 text-sm">
         <div class="leading-tight">
-          <p>{{ sender.full_name || "No name found" }}</p>
+          <p>{{ sender.full_name || "Guest" }}</p>
           <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
             <p class="text-xs md:text-sm text-gray-600">
               {{ timeAgo(creation) }}
@@ -24,7 +24,7 @@
       </div>
       <!-- email design for desktop -->
       <div v-else class="flex items-center gap-1">
-        <span>{{ sender.full_name || "No name found" }}</span>
+        <span>{{ sender.full_name || "Guest" }}</span>
         <span class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">{{
           "<" + sender.name + ">"
         }}</span>
