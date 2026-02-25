@@ -24,6 +24,7 @@ export default defineConfig({
             "hd_service_holiday_list",
             "hd_service_level_agreement",
             "hd_agent",
+            "hd_customer",
           ],
           frappe: ["assignment_rule"],
         },

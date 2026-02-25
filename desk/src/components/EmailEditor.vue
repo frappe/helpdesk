@@ -24,6 +24,7 @@
           class="flex-1"
           :validate="validateEmailWithZod"
           :error-message="(value) => `${value} is an invalid email address`"
+          variant="strong"
         />
         <Button
           :label="'CC'"
@@ -48,6 +49,7 @@
           class="flex-1"
           :validate="validateEmailWithZod"
           :error-message="(value) => `${value} is an invalid email address`"
+          variant="strong"
         />
       </div>
       <div
@@ -62,6 +64,7 @@
           class="flex-1"
           :validate="validateEmailWithZod"
           :error-message="(value) => `${value} is an invalid email address`"
+          variant="strong"
         />
       </div>
     </template>

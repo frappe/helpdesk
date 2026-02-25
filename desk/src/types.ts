@@ -1,6 +1,6 @@
 import { Dayjs } from "dayjs";
 import { Component, ComputedRef, InjectionKey, Ref } from "vue";
-import type { AssignmentRule, HDTicket } from "./types/doctypes";
+import type { AssignmentRule, HDCustomer, HDTicket } from "./types/doctypes";
 
 interface ResourceOptions<T = any> {
   method?: string;
@@ -21,7 +21,7 @@ interface ResourceOptions<T = any> {
   resourceFetcher?: (options: any) => Promise<any>;
 }
 
-interface Resource<T = any> {
+export interface Resource<T = any> {
   method: string | undefined;
   url: string;
   data: T | null;
@@ -118,6 +118,7 @@ export interface ListResource<T = any> {
   setValue: Resource<T>;
   delete: Resource<T>;
   runDocMethod: Resource<T>;
+  loading: boolean;
   update: (updatedOptions: Partial<ListResourceOptions>) => void;
   fetch: () => void;
   reload: () => Promise<T[]>;
@@ -705,6 +706,10 @@ export const SavedReplyListResourceSymbol: InjectionKey<
   ListResource<SavedReply>
 > = Symbol("savedReplyListResource");
 
+export const CustomerResourceSymbol: InjectionKey<
+  DocumentResource<HDCustomer>
+> = Symbol("customerResource");
+
 declare global {
   interface Window {
     is_fc_site: boolean;
@@ -712,4 +717,15 @@ declare global {
     time_format: string;
     session_user: string;
   }
+}
+
+export interface CustomerContact {
+  contact_name: string;
+  is_primary: 0 | 1;
+  is_manager: 0 | 1;
+  email_id: string | null;
+  mobile_no: string | null;
+  image: string | null;
+  modified: string;
+  ticket_count: number;
 }

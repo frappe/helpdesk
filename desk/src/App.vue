@@ -9,13 +9,13 @@
 import { Dialogs } from "@/components/dialogs";
 import { useConfigStore } from "@/stores/config";
 import { stopSession } from "@/telemetry";
+import { useFavicon } from "@vueuse/core";
 import { FrappeUIProvider, toast } from "frappe-ui";
+import { storeToRefs } from "pinia";
 import { computed, defineAsyncComponent, h, onMounted, onUnmounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
 import { useAuthStore } from "./stores/auth";
-import { useFavicon } from "@vueuse/core";
-import { storeToRefs } from "pinia";
 import { __ } from "./translation";
 
 const configStore = useConfigStore();
@@ -40,10 +40,10 @@ onMounted(() => {
 });
 
 const AgentPortalRoot = defineAsyncComponent(
-  () => import("@/pages/desk/AgentRoot.vue")
+  () => import("@/roots/AgentRoot.vue")
 );
 const CustomerPortalRoot = defineAsyncComponent(
-  () => import("@/pages/CustomerPortalRoot.vue")
+  () => import("@/roots/CustomerPortalRoot.vue")
 );
 
 const PortalRoot = computed(() => {
