@@ -106,7 +106,6 @@
 import { Link } from "@/components";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { capture } from "@/telemetry";
-import { __ } from "@/translation";
 import { EmailAccount, EmailService, EmailStep } from "@/types";
 import { call, createResource, toast } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
