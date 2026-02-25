@@ -4,11 +4,12 @@
 import frappe
 from frappe.model.document import Document
 
-from helpdesk.utils import get_agents_team
+from helpdesk.utils import capture_event, get_agents_team
 
 
 class HDSavedReply(Document):
-    pass
+    def after_insert(self):
+        capture_event("saved_reply_created")
 
 
 def has_permission(doc, user=None):

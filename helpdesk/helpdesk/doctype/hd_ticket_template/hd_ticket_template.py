@@ -6,15 +6,13 @@ from frappe import _
 from frappe.model.document import Document
 
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
+from helpdesk.utils import capture_event
 
 
 class HDTicketTemplate(Document):
     def validate(self):
         self.verify_field_exists()
         self.validate_unallowed_fields()
-
-    def on_trash(self):
-        self.prevent_default_delete()
 
     def verify_field_exists(self):
         for f in self.fields:
@@ -53,6 +51,12 @@ class HDTicketTemplate(Document):
                 "dt": "HD Ticket",
             }
         )
+
+    def on_update(self):
+        capture_event("ticket_template_updated")
+
+    def on_trash(self):
+        self.prevent_default_delete()
 
     def prevent_default_delete(self):
         if self.name == DEFAULT_TICKET_TEMPLATE:
