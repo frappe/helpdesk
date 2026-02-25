@@ -364,6 +364,6 @@ onMounted(() => {
 onUnmounted(() => {
   stopViewing(props.ticketId);
   document.title = "Helpdesk";
-  socket.off("helpdesk:ticket-update");
+  $socket.off("helpdesk:ticket-update");
 });
 </script>

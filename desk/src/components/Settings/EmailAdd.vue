@@ -103,8 +103,12 @@
 </template>
 
 <script setup lang="ts">
+import { Link } from "@/components";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 import { EmailAccount, EmailService, EmailStep } from "@/types";
-import { createResource, toast } from "frappe-ui";
+import { call, createResource, toast } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, Reactive, reactive, Ref, ref } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
@@ -162,6 +166,7 @@ const addEmailRes = createResource({
     toast.success(__("Email account created"));
     emit("update:step", "email-list");
     updateOnboardingStep("setup_email_account");
+    capture("email_account_created", { data: { service: state.service } });
   },
   onError: () => {
     error.value = __("Failed to create email account, Invalid credentials");

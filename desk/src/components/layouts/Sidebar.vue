@@ -149,9 +149,9 @@
       title="Frappe Helpdesk"
       :logo="logo"
       docsLink="https://docs.frappe.io/helpdesk"
-      :afterSkip="(step) => capture('onboarding_step_skipped_' + step)"
+      :afterSkip="(step: string) => capture('onboarding_step_skipped_' + step)"
       :afterSkipAll="() => capture('onboarding_steps_skipped')"
-      :afterReset="(step) => capture('onboarding_step_reset_' + step)"
+      :afterReset="(step: string) => capture('onboarding_step_reset_' + step)"
       :afterResetAll="() => capture('onboarding_steps_reset')"
     />
     <IntermediateStepModal
@@ -213,6 +213,7 @@ import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
+import LucideKeyboard from "~icons/lucide/keyboard";
 import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
