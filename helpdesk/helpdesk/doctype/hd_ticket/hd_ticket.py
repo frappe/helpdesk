@@ -222,7 +222,6 @@ class HDTicket(Document):
         self.remove_assignment_if_not_in_team()
         self.publish_update()
         self.capture_update_telemetry_events()
-        self.update_search_index()
 
     def notify_agent(self, agent, notification_type="Assignment"):
         frappe.get_doc(
@@ -234,10 +233,6 @@ class HDTicket(Document):
                 notification_type=notification_type,
             )
         ).insert(ignore_permissions=True)
-
-    def update_search_index(self):
-        search = HelpdeskSearch()
-        search.index_doc(self)
 
     def capture_update_telemetry_events(self):
         capture_event("ticket_updated")
