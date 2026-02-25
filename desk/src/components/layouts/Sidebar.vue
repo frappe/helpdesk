@@ -223,11 +223,7 @@ import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
-<<<<<<< HEAD
 import { useTelephonyStore } from "@/stores/telephony";
-=======
-
->>>>>>> 7f07d6bf (feat: telemetry with pulse)
 import {
   setActiveSettingsTab,
   showSettingsModal,

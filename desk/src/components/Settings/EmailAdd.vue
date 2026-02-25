@@ -103,17 +103,12 @@
 </template>
 
 <script setup lang="ts">
-<<<<<<< HEAD
-import { EmailAccount, EmailService, EmailStep } from "@/types";
-import { createResource, toast } from "frappe-ui";
-=======
 import { Link } from "@/components";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { EmailAccount, EmailService, EmailStep } from "@/types";
 import { call, createResource, toast } from "frappe-ui";
->>>>>>> 7f07d6bf (feat: telemetry with pulse)
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, Reactive, reactive, Ref, ref } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
