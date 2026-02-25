@@ -30,7 +30,12 @@ class HDTeam(Document):
             assignment_rule_doc.disabled = False
         assignment_rule_doc.save()
 
-        capture_event("team_created")
+        self.capture_team_creation_event()
+
+    def capture_team_creation_event(self):
+        should_capture = self.name not in ["Product Experts", "Billing"]
+        if should_capture:
+            capture_event("team_created")
 
     def after_rename(self, olddn, newdn, merge=False):
         # Update the condition for the linked assignment rule
@@ -179,6 +184,4 @@ def get_team_members(team: str):
     Returns the team members for the given team name
     """
     members = frappe.get_all("HD Team Member", filters={"parent": team}, pluck="user")
-    return members
-    return members
     return members

@@ -192,6 +192,9 @@ class HDTicket(Document):
             self.send_acknowledgement_email()
 
     def capture_ticket_created_telemetry_events(self):
+        if self.subject == "Welcome to Helpdesk":
+            return
+
         capture_event("ticket_created")
         if not self.via_customer_portal:
             capture_event("ticket_created_via_email")

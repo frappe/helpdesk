@@ -48,6 +48,9 @@ class HDArticle(Document):
             )
 
     def after_insert(self):
+        count = frappe.db.count("HD Article")
+        if count == 1:
+            return
         capture_event("article_created")
 
     def on_trash(self):
