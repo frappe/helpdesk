@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-15 10:41+0000\n"
-"PO-Revision-Date: 2026-02-17 13:44\n"
+"POT-Creation-Date: 2026-02-22 10:40+0000\n"
+"PO-Revision-Date: 2026-02-25 17:28\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,10 @@ msgstr "% Выполнение SLA"
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
 msgstr "% созданных билетов, которые были решены в рамках SLA"
+
+#: desk/src/pages/SearchAgent.vue:120
+msgid "({0}s)"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
@@ -386,7 +390,7 @@ msgstr "Архивные"
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
 msgstr "Вы уверены, что хотите сменить вкладку? Несохранённые изменения будут утеряны."
 
-#: desk/src/pages/ticket/TicketCustomer.vue:295
+#: desk/src/pages/ticket/TicketCustomer.vue:293
 msgid "Are you sure you want to close this ticket?"
 msgstr "Вы действительно хотите закрыть этот тикет?"
 
@@ -958,7 +962,7 @@ msgstr "Нажмите \"Добавить в праздники\". Это зап
 msgid "Close"
 msgstr "Закрыть"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:294
+#: desk/src/pages/ticket/TicketCustomer.vue:292
 msgid "Close Ticket"
 msgstr "Закрыть тикет"
 
@@ -967,7 +971,7 @@ msgstr "Закрыть тикет"
 msgid "Closed"
 msgstr "Закрыт"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:335
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:336
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Закрытые или оцененные тикеты не могут обновляться не агентами"
 
@@ -1045,7 +1049,7 @@ msgstr "Настройте параметры телефонии."
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:310
 #: desk/src/pages/knowledge-base/NewArticle.vue:149
 #: desk/src/pages/ticket/MobileTicketAgent.vue:180
-#: desk/src/pages/ticket/TicketCustomer.vue:298
+#: desk/src/pages/ticket/TicketCustomer.vue:296
 #: desk/src/pages/ticket/Tickets.vue:418 desk/src/pages/ticket/Tickets.vue:453
 msgid "Confirm"
 msgstr "Подтвердить"
@@ -1120,15 +1124,15 @@ msgstr "Скопировать URL-адрес билета"
 msgid "Copy ticket id"
 msgstr "Скопируйте идентификатор билета"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:631
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:632
 msgid "Could not an email due to: {0}"
 msgstr "Не удалось отправить email из-за: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:789
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:790
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "Не удалось отправить подтверждающее письмо из-за: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:174
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:173
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Не удалось отправить email обратной связи из-за: {0}"
 
@@ -1824,7 +1828,7 @@ msgstr "Оценка обратной связи"
 msgid "Feedback Trend"
 msgstr "Тенденция обратной связи"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:172
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:171
 msgid "Feedback email has been sent to the customer"
 msgstr "Email обратной связи отправлен клиенту"
 
@@ -1980,7 +1984,7 @@ msgstr "Название общей категории нельзя измени
 msgid "Global"
 msgstr "Глобальный"
 
-#: desk/src/components/command-palette/CP.vue:90
+#: desk/src/components/command-palette/CP.vue:89
 msgid "Go to Ticket #{0}"
 msgstr "Перейти к билету #{0}"
 
@@ -2497,7 +2501,7 @@ msgstr "Элемент(ы) успешно удалены"
 msgid "John Doe"
 msgstr "Джон Доуs"
 
-#: desk/src/components/command-palette/CP.vue:115
+#: desk/src/components/command-palette/CP.vue:114
 msgid "Jump to"
 msgstr "Перейти к"
 
@@ -2516,7 +2520,7 @@ msgstr "Горячие клавиши"
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
-#: desk/src/components/command-palette/CP.vue:105
+#: desk/src/components/command-palette/CP.vue:104
 #: desk/src/pages/knowledge-base/Article.vue:432
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:6
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:434
@@ -3160,7 +3164,7 @@ msgstr "Уведомление о работе вне рабочего врем�
 msgid "Owner"
 msgstr "Владелец"
 
-#: helpdesk/api/settings/field_dependency.py:59
+#: helpdesk/api/settings/field_dependency.py:47
 msgid "Parent field, child field, and parent-child mapping are required."
 msgstr "Требуются родительское поле, дочернее поле и сопоставление родитель-потомок."
 
@@ -3933,7 +3937,7 @@ msgstr "Скрипт"
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:25
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:40
 #: desk/src/components/Settings/Teams/TeamsList.vue:25
-#: desk/src/components/command-palette/CP.vue:122
+#: desk/src/components/command-palette/CP.vue:121
 #: desk/src/components/layouts/Sidebar.vue:12 desk/src/pages/SearchAgent.vue:7
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Search"
@@ -3953,7 +3957,7 @@ msgstr "Поисковый балл"
 msgid "Search Term Param Name"
 msgstr "Название параметра поискового запроса"
 
-#: desk/src/components/command-palette/CP.vue:127
+#: desk/src/components/command-palette/CP.vue:126
 msgid "Search for \"{0}\""
 msgstr "Поиск \"{0}\""
 
@@ -3961,11 +3965,11 @@ msgstr "Поиск \"{0}\""
 msgid "Search index does not exist. Please build the index first."
 msgstr "Поисковый индекс не существует. Пожалуйста, сначала создайте индекс."
 
-#: helpdesk/api/search.py:38
+#: helpdesk/api/search.py:41
 msgid "Search index not available. Please contact administrator."
 msgstr "Поисковый индекс недоступен. Пожалуйста, свяжитесь с администратором."
 
-#: helpdesk/api/search.py:15
+#: helpdesk/api/search.py:17
 msgid "Search query must be at least 2 characters"
 msgstr "Поисковый запрос должен содержать не менее 2 символов"
 
@@ -4607,7 +4611,7 @@ msgstr "Четверг"
 msgid "Ticket"
 msgstr "Заявка"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:776
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:777
 msgid "Ticket #{0}: We've received your request"
 msgstr "Заявка #{0}: Мы получили ваш запрос"
 
@@ -4683,7 +4687,7 @@ msgstr "Тренд заявки"
 msgid "Ticket Type"
 msgstr "Тип тикета"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:306
+#: desk/src/pages/ticket/TicketCustomer.vue:304
 msgid "Ticket closed"
 msgstr "Тикет закрыт"
 
@@ -4691,11 +4695,11 @@ msgstr "Тикет закрыт"
 msgid "Ticket does not exist."
 msgstr "Тикет не существует."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:325
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
 msgid "Ticket must be resolved with a feedback"
 msgstr "Тикет должен быть решен с обратной связью"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:151
+#: desk/src/pages/ticket/TicketCustomer.vue:149
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:62
 msgid "Ticket not found"
 msgstr "Тикет не найден"
@@ -4725,7 +4729,7 @@ msgid "Ticket type"
 msgstr "Тип тикета"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:498
-#: desk/src/pages/ticket/TicketCustomer.vue:279
+#: desk/src/pages/ticket/TicketCustomer.vue:277
 msgid "Ticket updated"
 msgstr "Тикет обновлен"
 
@@ -4734,11 +4738,11 @@ msgstr "Тикет обновлен"
 msgid "Ticket-Search Analysis"
 msgstr "Анализ поиска тикетов"
 
-#: desk/src/components/command-palette/CP.vue:99
+#: desk/src/components/command-palette/CP.vue:98
 #: desk/src/components/ticket-agent/TicketHeader.vue:164
 #: desk/src/pages/SearchAgent.vue:351
 #: desk/src/pages/ticket/MobileTicketAgent.vue:329
-#: desk/src/pages/ticket/TicketCustomer.vue:335
+#: desk/src/pages/ticket/TicketCustomer.vue:333
 #: desk/src/pages/ticket/TicketNew.vue:307 desk/src/pages/ticket/Tickets.vue:6
 #: desk/src/pages/ticket/Tickets.vue:587 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
@@ -4761,7 +4765,7 @@ msgstr "Заявки по команде"
 msgid "Tickets by Type"
 msgstr "Заявки по типу"
 
-#: helpdesk/api/ticket.py:18
+#: helpdesk/api/ticket.py:16
 msgid "Tickets can only be assigned to agents"
 msgstr "Тикеты можно назначать только агентам"
 
@@ -4893,7 +4897,7 @@ msgstr "Требуется ввести текст"
 msgid "URL/Method"
 msgstr "URL/Метод"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:612
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:613
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr "Не удаётся отправить электронное письмо. Пожалуйста, настройте учётную запись для исходящей почты по умолчанию."
 
@@ -5136,7 +5140,7 @@ msgstr "Вам не разрешено просматривать данные �
 msgid "You are not permitted to access this resource."
 msgstr "Вы не имеете права доступа к этому ресурсу."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:534
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:535
 msgid "You are not permitted to add a comment"
 msgstr "Вам не разрешено добавлять комментарий"
 
@@ -5261,4 +5265,8 @@ msgstr "синоним"
 #: desk/src/pages/ticket/MobileTicketAgent.vue:423
 msgid "viewed this"
 msgstr "просмотрели это"
+
+#: desk/src/pages/SearchAgent.vue:117
+msgid "{0} matches"
+msgstr ""
 
