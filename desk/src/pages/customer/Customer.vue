@@ -12,15 +12,12 @@
       <Tabs v-model="activeTab" :tabs="tabs">
         <template #tab-panel="{ tab }">
           <div class="p-5">
-            <div v-if="tab.label === 'Tickets'">
+            <div v-if="tab.label === __('Tickets')">
               <!-- Tickets tab content -->
               {{ tab.label }}
               <CustomerTicketsTab />
             </div>
-            <CustomerContactTab
-              v-if="tab.label === 'Contacts'"
-              :customer="id"
-            />
+            <CustomerContactTab v-if="tab.label === __('Contacts')" />
           </div>
         </template>
       </Tabs>
@@ -32,6 +29,7 @@
 import CustomerContactTab from "@/components/customer/CustomerContactTab.vue";
 import CustomerTicketsTab from "@/components/customer/CustomerTicketsTab.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
+import { __ } from "@/translation";
 import { CustomerResourceSymbol, DocumentResource } from "@/types";
 import { HDCustomer } from "@/types/doctypes";
 import {
@@ -52,13 +50,16 @@ const route = useRoute();
 const router = useRouter();
 
 const tabs = [
-  { label: "Tickets", hash: "tickets" },
-  { label: "Contacts", hash: "contacts" },
+  { label: __("Tickets"), hash: "tickets" },
+  { label: __("Contacts"), hash: "contacts" },
 ];
 
 const customer: DocumentResource<HDCustomer> = createDocumentResource({
   doctype: "HD Customer",
   name: props.id,
+  whitelistedMethods: {
+    updateContacts: "update_contacts",
+  },
 });
 
 provide(CustomerResourceSymbol, customer);
@@ -83,7 +84,7 @@ const activeTab = computed<number>({
 
 const breadcrumbs = [
   {
-    label: "Customers",
+    label: __("Customers"),
     route: { name: "CustomerList" },
   },
   {

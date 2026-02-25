@@ -16,12 +16,20 @@
         >
           {{ contact.contact_name }}
         </p>
-        <Badge v-if="contact.is_primary" label="Primary" theme="blue" />
-        <Tooltip v-if="contact.is_manager" text="Manager" placement="top">
+        <Badge v-if="contact.is_primary" :label="__('Primary')" theme="blue" />
+        <Tooltip
+          v-if="contact.is_manager"
+          :text="__('Manager')"
+          placement="top"
+        >
           <LucideBriefcase class="h-4 w-4 text-ink-gray-6" />
         </Tooltip>
       </div>
-      <Dropdown placement="right" :options="dropdownOptions">
+      <Dropdown
+        placement="right"
+        :options="dropdownOptions"
+        v-if="hasPermission()"
+      >
         <Button class="h-6 w-6 p-0" variant="ghost">
           <LucideMoreHorizontal class="h-4 w-4 text-ink-gray-6" />
         </Button>
@@ -29,7 +37,7 @@
     </div>
     <div class="border-t border-gray-200 w-full" />
     <div class="flex flex-col gap-3">
-      <template v-for="(item, index) in contactDetails" :key="index">
+      <template v-for="(item, index) in contactDetails" :key="item.value">
         <div
           class="flex items-center gap-2 text-sm text-ink-gray-8 font-[420]"
           :class="item.class?.(item.value)"
@@ -42,8 +50,9 @@
           <span
             class="text-ink-gray-8"
             :class="[item.class?.(item.value), item.color?.(item.value)]"
-            >{{ item.value }}</span
           >
+            {{ item.value }}
+          </span>
         </div>
       </template>
     </div>
@@ -52,8 +61,10 @@
 
 <script setup lang="ts">
 import { globalStore } from "@/stores/globalStore";
+import { __ } from "@/translation";
 import { CustomerContact, CustomerResourceSymbol } from "@/types";
 import { HDCustomerMember } from "@/types/doctypes";
+import { hasPermission } from "@/utils";
 import { Avatar, Badge, Button, Dropdown, Tooltip, dayjs } from "frappe-ui";
 import { computed, inject, markRaw } from "vue";
 import LucideBriefcase from "~icons/lucide/briefcase";
@@ -72,8 +83,8 @@ const customer = inject(CustomerResourceSymbol)!;
 
 const ticketCountLabel = computed(() => {
   const count = props.contact.ticket_count;
-  if (count === 0) return "No open tickets";
-  return `${count} ${count === 1 ? "ticket" : "tickets"}`;
+  if (count === 0) return __("No open tickets");
+  return `${count} ${count === 1 ? __("ticket") : __("tickets")}`;
 });
 
 function findPrimaryContact(): HDCustomerMember | undefined {
@@ -97,9 +108,9 @@ const contactDetails = computed(() => [
     icon: markRaw(LucideTicket),
     value: ticketCountLabel.value,
     color: (value: string) =>
-      value !== "No open tickets" ? "!text-amber-700" : "!text-ink-gray-7",
+      value !== __("No open tickets") ? "!text-amber-700" : "!text-ink-gray-7",
     class: (value: string) =>
-      value !== "No open tickets" ? "hover:underline cursor-pointer" : "",
+      value !== __("No open tickets") ? "hover:underline cursor-pointer" : "",
   },
 ]);
 
@@ -107,7 +118,7 @@ const dropdownOptions = computed(() => {
   const options = [];
   if (!props.contact.is_primary) {
     options.push({
-      label: "Set as Primary",
+      label: __("Set as Primary"),
       icon: "star",
       onClick: () => {
         /* TODO: set as primary action */
@@ -118,8 +129,7 @@ const dropdownOptions = computed(() => {
   }
   if (props.contact.is_manager) {
     options.push({
-      label: "Revoke Manager Access",
-      tooltip: "This will revoke manager access from this contact",
+      label: __("Revoke Manager Access"),
       icon: "user-x",
       theme: "red",
       onClick: () => {
@@ -130,7 +140,7 @@ const dropdownOptions = computed(() => {
     });
   } else {
     options.push({
-      label: "Set as Manager",
+      label: __("Set as Manager"),
       icon: "briefcase",
       onClick: () => {
         /* TODO: set as manager action */
@@ -141,7 +151,7 @@ const dropdownOptions = computed(() => {
     });
   }
   options.push({
-    label: "Remove Contact",
+    label: __("Remove Contact"),
     icon: "x",
     theme: "red",
     onClick: () => {

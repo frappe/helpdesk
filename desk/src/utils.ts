@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/stores/auth";
 import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
 import { FeatherIcon, call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
@@ -755,4 +756,9 @@ export function parseApiOptions(
 export function openContact(name: string) {
   const url = window.location.origin + "/app/contact/" + name;
   window.open(url, "_blank");
+}
+
+export function hasPermission() {
+  const authStore = useAuthStore();
+  return authStore.isAdmin || authStore.isManager;
 }
