@@ -89,7 +89,7 @@
           ref="editorRef"
           :editor-class="editorClass"
           :content="textEditorContentWithIDs"
-          :extensions="[PreserveIds]"
+          :extensions="[ComponentUtils]"
           :editable="editable"
           @change="(event:string) => {
 			      content = event;
@@ -127,7 +127,7 @@ import {
   updateRes as updateArticle,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
-import { PreserveIds } from "@/tiptap-extensions";
+import { ComponentUtils } from "@/tiptap-extensions";
 import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
 import {
   copyToClipboard,
