@@ -62,7 +62,7 @@ export function timeAgo(date) {
   return prettyDate(date)
 }
 
-function getBrowserTimezone() {
+export function getBrowserTimezone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone
 }
 
@@ -323,12 +323,8 @@ export function getIcon(icon) {
   return icon || markRaw(TicketIcon);
 }
 export function formatTimeShort(date: string) {
-  // let systemTimezone = getConfig('systemTimezone');
-  // let localTimezone = getConfig('localTimezone') || getBrowserTimezone();
-  // const timezone = systemTimezone || localTimezone;
-  
   const now = dayjsLocal();
-  const inputDate = dayjsLocal();
+  const inputDate = dayjsLocal(date);
   const diffSeconds = now.diff(inputDate, "second");
   const diffMinutes = now.diff(inputDate, "minute");
   const diffHours = now.diff(inputDate, "hour");

@@ -17,6 +17,7 @@ import { useAuthStore } from "./stores/auth";
 import { useFavicon } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { __ } from "./translation";
+import { isCustomerPortal, getBrowserTimezone } from "./utils";
 
 const configStore = useConfigStore();
 const { favicon } = storeToRefs(configStore);
@@ -37,6 +38,11 @@ onMounted(() => {
       icon: h(WifiOff, { class: "text-white" }),
     });
   });
+  setConfig(
+    "localTimezone",
+    (isCustomerPortal.value ? getBrowserTimezone() : window.timezone?.user) ||
+      window.timezone?.user
+  );
 });
 
 const AgentPortalRoot = defineAsyncComponent(
@@ -56,7 +62,6 @@ const PortalRoot = computed(() => {
 });
 
 setConfig("systemTimezone", window.timezone?.system || null);
-setConfig("localTimezone", window.timezone?.user || null);
 
 onUnmounted(() => {
   stopSession();
