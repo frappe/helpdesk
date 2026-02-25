@@ -118,6 +118,7 @@ export interface ListResource<T = any> {
   setValue: Resource<T>;
   delete: Resource<T>;
   runDocMethod: Resource<T>;
+  loading: boolean;
   update: (updatedOptions: Partial<ListResourceOptions>) => void;
   fetch: () => void;
   reload: () => Promise<T[]>;

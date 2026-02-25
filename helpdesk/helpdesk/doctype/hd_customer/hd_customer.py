@@ -3,6 +3,7 @@
 
 import frappe
 from frappe import _
+from frappe.contacts.doctype.contact.contact import invite_user
 from frappe.model.document import Document
 
 from helpdesk.utils import agent_only
@@ -36,9 +37,9 @@ class HDCustomer(Document):
         return {"columns": columns, "rows": rows}
 
     def validate(self):
-        self.validate_members()
+        self.validate_contacts()
 
-    def validate_members(self):
+    def validate_contacts(self):
         if len(self.contacts) == 0:
             return
         primary_contacts = [contact for contact in self.contacts if contact.is_primary]
@@ -56,6 +57,7 @@ class HDCustomer(Document):
     def before_save(self):
         self.set_primary_contact_details()
         self.set_manager_if_not_exists()
+        self.handle_roles()
 
     def set_primary_contact_details(self):
         if not self.contacts:
@@ -89,6 +91,66 @@ class HDCustomer(Document):
         ][0]
         for contact in self.contacts:
             contact.is_manager = contact.contact_name == primary_contact
+
+    def handle_roles(self):
+        # if any contact has is_manager set to true, then set the role of that contact to Customer Manager, and remove the role from other contacts
+        if not self.has_value_changed("contacts"):
+            return
+        for contact in self.contacts:
+            user = self.get_user(contact.contact_name)
+            if not user:
+                continue
+            user_doc = frappe.get_doc("User", user)
+            if contact.is_manager:
+                # add HD Customer Manager role to the contact
+                user_doc.append_roles("HD Customer Manager", "HD Customer")
+            else:
+                # add HD Customer role and remove HD Customer Manager role from the contactr)
+                user_doc.append_roles("HD Customer")
+                user_doc.remove_roles("HD Customer Manager")
+            user_doc.save()
+
+    def get_user(self, contact_name, throw=True):
+        user = frappe.get_value("Contact", contact_name, "user")
+        if user:
+            return user
+
+        # fallback to email if user is not set for the contact
+        email = frappe.get_value("Contact", contact_name, "email_id")
+        if email:
+            if user := frappe.db.exists("User", email):
+                frappe.db.set_value("Contact", contact_name, "user", user)
+            return user
+        elif throw:
+            frappe.throw(_("No user linked to contact {0}").format(contact_name))
+        else:
+            return None
+
+    @frappe.whitelist()
+    def update_contacts(self, contacts: str, role: str):
+        # check if current user has role of System Manager or Agent Manager,
+        if (
+            "System Manager" not in frappe.get_roles()
+            and "HD Agent Manager" not in frappe.get_roles()
+        ):
+            frappe.throw(_("You do not have permission to update contacts"))
+        try:
+            contacts = frappe.parse_json(contacts)
+            is_manager = role == "HD Customer Manager"
+            for contact in contacts:
+                self.create_user_if_not_exist(contact)
+                self.append(
+                    "contacts", {"contact_name": contact, "is_manager": is_manager}
+                )
+            self.save()
+        except Exception:
+            frappe.throw(_("Invalid users data"))
+
+    def create_user_if_not_exist(self, contact):
+        user_linked = self.get_user(contact, throw=False)
+        if user_linked:
+            return
+        invite_user(contact)
 
 
 @frappe.whitelist()

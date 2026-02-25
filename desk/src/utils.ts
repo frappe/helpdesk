@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/stores/auth";
 import type { DropdownOption } from "@/types";
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import dayjs from "dayjs";
@@ -605,4 +606,9 @@ export function parseApiOptions(
         }
       }) || []
   );
+}
+
+export function hasPermission() {
+  const authStore = useAuthStore();
+  return authStore.isAdmin || authStore.isManager;
 }

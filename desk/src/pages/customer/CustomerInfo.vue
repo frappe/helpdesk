@@ -29,10 +29,10 @@
         </div>
       </div>
     </div>
-    <Button label="Edit" @click="customerDialog = true">
+    <Button label="Edit" @click="customerDialog = true" v-if="hasPermission()">
       <div class="flex gap-1">
         <LucideSquarePen class="h-4 w-4" />
-        <span>Edit</span>
+        <span>{{ __("Edit") }}</span>
       </div>
     </Button>
   </div>
@@ -46,7 +46,9 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { CustomerResourceSymbol } from "@/types";
+import { hasPermission } from "@/utils";
 import { Avatar, Button } from "frappe-ui";
 import { computed, inject, markRaw, ref } from "vue";
 import LucideGlobe from "~icons/lucide/globe";
@@ -80,7 +82,7 @@ const customerInfo = computed(() => [
   {
     icon: markRaw(LucideSquareUser),
     value: `${customer.doc.contacts?.length ?? 0} ${
-      customer.doc.contacts?.length === 1 ? "contact" : "contacts"
+      customer.doc.contacts?.length === 1 ? __("contact") : __("contacts")
     }`,
     condition: true,
   },
