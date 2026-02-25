@@ -378,17 +378,6 @@ function incrementArticleViews(articleId: string) {
   );
 }
 
-function handleLike() {
-  likeArticle.submit(
-    { article: props.articleId },
-    {
-      onSuccess: () => {
-        if (articleStats.reload) articleStats.reload();
-        toast.success(__("Thanks for your feedback."));
-      },
-    }
-  );
-}
 
 const toggleStatus = debounce(() => {
   const status = article.data?.status === "Published" ? "Draft" : "Published";
