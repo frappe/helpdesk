@@ -38,11 +38,8 @@ onMounted(() => {
       icon: h(WifiOff, { class: "text-white" }),
     });
   });
-  setConfig(
-    "localTimezone",
-    (isCustomerPortal.value ? getBrowserTimezone() : window.timezone?.user) ||
-      window.timezone?.user
-  );
+  !isCustomerPortal.value && setConfig("localTimezone", window.timezone?.user);
+  setConfig("systemTimezone", window.timezone?.system || null);
 });
 
 const AgentPortalRoot = defineAsyncComponent(
@@ -60,8 +57,6 @@ const PortalRoot = computed(() => {
     return CustomerPortalRoot;
   }
 });
-
-setConfig("systemTimezone", window.timezone?.system || null);
 
 onUnmounted(() => {
   stopSession();
