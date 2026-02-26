@@ -160,7 +160,7 @@
             :model-value="timezone"
             @update:modelValue="timezone = $event?.value"
             placeholder="Select Timezone"
-            class="w-60"
+            class="w-40"
           />
         </div>
       </div>
