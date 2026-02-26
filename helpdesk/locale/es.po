@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-22 10:40+0000\n"
-"PO-Revision-Date: 2026-02-25 17:28\n"
+"PO-Revision-Date: 2026-02-26 17:30\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -3729,7 +3729,7 @@ msgstr "El tiempo de respuesta para la {0} prioridad en la fila {1} no puede ser
 #. DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Response and Resolution"
-msgstr ""
+msgstr "Respuesta y resolución"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:194
 msgid "Response and resolution"
