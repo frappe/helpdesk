@@ -183,8 +183,8 @@ import {
   FileUploader,
   LoadingIndicator,
   toast,
-  Autocomplete,
 } from "frappe-ui";
+import { Autocomplete } from "@/components";
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
 import CameraIcon from "~icons/lucide/camera";
