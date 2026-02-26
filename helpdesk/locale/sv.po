@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-22 10:40+0000\n"
-"PO-Revision-Date: 2026-02-25 17:28\n"
+"PO-Revision-Date: 2026-02-26 17:30\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -3500,7 +3500,7 @@ msgstr "Betygsätt detta ärende"
 
 #: helpdesk/api/dashboard.py:373
 msgid "Rated Tickets"
-msgstr "Betygsatta Ärenden"
+msgstr "Betygsatta Ärende"
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
@@ -4747,7 +4747,7 @@ msgstr "Ärendesökning Analys"
 #: desk/src/pages/ticket/Tickets.vue:587 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
 msgid "Tickets"
-msgstr "Ärenden"
+msgstr "Ärende"
 
 #: helpdesk/api/dashboard.py:553
 msgid "Tickets by Channel"
