@@ -33,7 +33,6 @@ ALLOWED_PATHS = [
     "/api/method/frappe.integrations.oauth2_logins.login_via_office365",
     "/api/method/frappe.integrations.oauth2_logins.login_via_salesforce",
     "/api/method/frappe.integrations.oauth2_logins.login_via_fairlogin",
-    "/api/method/frappe.core.api.user_invitation.get_pending_invitations",
     "/api/method/frappe.integrations.oauth2.openid_profile",
     "/api/method/frappe.website.doctype.web_page_view.web_page_view.make_view_log",
     "/api/method/upload_file",
@@ -58,6 +57,10 @@ ALLOWED_PATHS = [
     "/api/method/frappe.core.doctype.user.user.reset_password",
     "/api/method/frappe.desk.form.load.getdoctype",
     "/api/method/run_doc_method",
+    "/api/method/frappe.core.api.user_invitation.accept_invitation",
+    "/api/method/frappe.core.api.user_invitation.get_pending_invitations",
+    "/api/method/frappe.core.api.user_invitation.cancel_invitation",
+    "/api/method/frappe.core.api.user_invitation.invite_by_email",
 ]
 
 WILDCARD_PATHS = [

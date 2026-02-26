@@ -50,10 +50,22 @@ website_route_rules = [
 
 user_invitation = {
     "allowed_roles": {
-        "Agent Manager": ["Agent", "Agent Manager"],
-        "System Manager": ["Agent", "Agent Manager", "System Manager"],
+        "Agent Manager": [
+            "Agent",
+            "Agent Manager",
+            "HD Customer",
+            "HD Customer Manager",
+        ],
+        "System Manager": [
+            "Agent",
+            "Agent Manager",
+            "System Manager",
+            "HD Customer",
+            "HD Customer Manager",
+        ],
     },
     "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
+    "extra_invite_params": ["custom_customer"],
 }
 
 doc_events = {

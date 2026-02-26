@@ -94,6 +94,8 @@ class HDCustomer(Document):
 
     def handle_roles(self):
         # if any contact has is_manager set to true, then set the role of that contact to Customer Manager, and remove the role from other contacts
+        if frappe.flags.ignore_customer_role:
+            return
         if not self.has_value_changed("contacts"):
             return
         for contact in self.contacts:
@@ -105,7 +107,7 @@ class HDCustomer(Document):
                 # add HD Customer Manager role to the contact
                 user_doc.append_roles("HD Customer Manager", "HD Customer")
             else:
-                # add HD Customer role and remove HD Customer Manager role from the contactr)
+                # add HD Customer role and remove HD Customer Manager role from the contact)
                 user_doc.append_roles("HD Customer")
                 user_doc.remove_roles("HD Customer Manager")
             user_doc.save()
@@ -127,8 +129,54 @@ class HDCustomer(Document):
             return None
 
     @frappe.whitelist()
+    @agent_only
+    def get_contacts(self):
+
+        result = []
+        for contact in self.contacts:
+            info = frappe.get_value(
+                "Contact",
+                contact.contact_name,
+                ["email_id", "mobile_no", "phone", "image", "modified"],
+            )
+            if not info:
+                continue
+
+            email_id, mobile_no, phone, image, modified = info
+            pending_tickets_count = frappe.db.get_list(
+                "HD Ticket",
+                filters={
+                    "status_category": ["in", ["Open", "Paused"]],
+                },
+                or_filters=[
+                    ["raised_by", "=", contact.contact_name],
+                    ["contact", "=", contact.contact_name],
+                ],
+                pluck="name",
+            )
+
+            result.append(
+                {
+                    "contact_name": contact.contact_name,
+                    "is_primary": contact.is_primary,
+                    "is_manager": contact.is_manager,
+                    "email_id": email_id,
+                    "mobile_no": mobile_no or phone,
+                    "image": image,
+                    "modified": modified,
+                    "ticket_count": (
+                        len(pending_tickets_count) if pending_tickets_count else 0
+                    ),
+                }
+            )
+            # result = sort by is_primary first then is_manager
+            result.sort(
+                key=lambda x: (not x["is_primary"], not x["is_manager"], x["modified"]),
+            )
+        return result
+
+    @frappe.whitelist()
     def update_contacts(self, contacts: str, role: str):
-        # check if current user has role of System Manager or Agent Manager,
         if (
             "System Manager" not in frappe.get_roles()
             and "HD Agent Manager" not in frappe.get_roles()
@@ -152,51 +200,36 @@ class HDCustomer(Document):
             return
         invite_user(contact)
 
-
-@frappe.whitelist()
-@agent_only
-def get_contacts_for_customer(customer: str):
-    # from customer doctype get contact list
-    # and for each contact get the email_id and mobile_no, name, image from the contact doctype, get last modified as well
-    # along with that get us tickets count ticket with status_category as Open or Paused
-    customer_doc = frappe.get_doc("HD Customer", customer)
-    contacts = customer_doc.contacts
-
-    result = []
-    for contact in contacts:
-        info = frappe.get_value(
-            "Contact",
-            contact.contact_name,
-            ["email_id", "mobile_no", "phone", "image", "modified"],
-        )
-        if not info:
-            continue
-
-        email_id, mobile_no, phone, image, modified = info
-        pending_tickets_count = frappe.db.get_list(
-            "HD Ticket",
+    @frappe.whitelist()
+    def get_pending_invites(self):
+        pending_invites = frappe.db.get_all(
+            "User Invitation",
             filters={
-                "status_category": ["in", ["Open", "Paused"]],
+                "app_name": "helpdesk",
+                "status": "Pending",
+                "custom_customer": self.name,
             },
-            or_filters=[
-                ["raised_by", "=", contact.contact_name],
-                ["contact", "=", contact.contact_name],
+            fields=[
+                "name",
+                "email",
+                "invited_by",
+                "creation",
             ],
-            pluck="name",
         )
-
-        result.append(
-            {
-                "contact_name": contact.contact_name,
-                "is_primary": contact.is_primary,
-                "is_manager": contact.is_manager,
-                "email_id": email_id,
-                "mobile_no": mobile_no or phone,
-                "image": image,
-                "modified": modified,
-                "ticket_count": (
-                    len(pending_tickets_count) if pending_tickets_count else 0
-                ),
-            }
-        )
-    return result
+        res = []
+        for pending_invitation in pending_invites:
+            roles = frappe.db.get_all(
+                "User Role",
+                fields=["role"],
+                filters={"parent": pending_invitation.name},
+            )
+            res.append(
+                {
+                    "name": pending_invitation.name,
+                    "email": pending_invitation.email,
+                    "invited_by": pending_invitation.invited_by,
+                    "invited_on": pending_invitation.creation,
+                    "roles": [r.role for r in roles],
+                }
+            )
+        return res
