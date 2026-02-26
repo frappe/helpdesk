@@ -87,7 +87,7 @@
       <div
         class="flex items-center text-base leading-5"
         v-for="field in ticketAdditionalInfo"
-        :key="field.label"
+        :key="field.fieldname"
       >
         <span class="w-[126px] text-sm text-gray-600">{{ field.label }}</span>
         <span
@@ -215,14 +215,17 @@ const ticketBasicInfo = computed(() => [
 const ticketAdditionalInfo = computed(() => {
   const fields = [
     {
+      fieldname: "subject",
       label: "Subject",
       value: ticket.data.subject,
     },
     {
+      fieldname: "team",
       label: "Team",
       value: ticket.data.agent_group || "-",
     },
     {
+      fieldname: "priority",
       label: "Priority",
       value: ticket.data.priority,
     },
@@ -234,6 +237,7 @@ const ticketAdditionalInfo = computed(() => {
         ["subject", "team", "priority"].indexOf(field.fieldname) === -1
     )
     .map((field: Field) => ({
+      fieldname: field.fieldname,
       label: field.label,
       value: ticket.data[field.fieldname],
     }));
