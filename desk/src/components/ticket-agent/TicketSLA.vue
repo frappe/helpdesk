@@ -38,13 +38,7 @@
       <!-- First Response -->
       <div class="flex items-center gap-1">
         <span>First Response</span>
-<<<<<<< HEAD
-        <Badge
-          :label="firstResponse.label"
-          variant="subtle"
-          :theme="firstResponse.color"
-        />
-=======
+
         <Tooltip
           :text="dateFormat(firstResponse.date, dateTooltipFormat)"
           :hover-delay="0.25"
@@ -56,24 +50,12 @@
             :theme="firstResponse.color"
           />
         </Tooltip>
->>>>>>> d4642916 (chore: add dayjs local for support in different timezones)
       </div>
       <!-- divider -->
       <div class="border-l border-outline-gray-2 h-[13px]" />
       <!-- Resolution by -->
       <div class="flex items-center gap-1">
         <span>Resolution </span>
-<<<<<<< HEAD
-        <Badge
-          v-if="resolutionBy"
-          :label="resolutionBy.label"
-          variant="subtle"
-          :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
-          :class="
-            resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'
-          "
-        />
-=======
         <Tooltip
           :text="dateFormat(resolutionBy.date, dateTooltipFormat)"
           :hover-delay="0.25"
@@ -89,7 +71,6 @@
             "
           />
         </Tooltip>
->>>>>>> d4642916 (chore: add dayjs local for support in different timezones)
       </div>
     </div>
   </teleport>

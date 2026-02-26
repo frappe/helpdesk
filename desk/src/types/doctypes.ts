@@ -32,11 +32,7 @@ export interface HDTicketStatus extends DocType {
   parsed_color?: string;
 }
 
-<<<<<<< HEAD
 // Last updated: 2026-01-16 14:23:14.181727
-=======
-// Last updated: 2026-01-20 15:18:57.195606
->>>>>>> f7fbcce4 (chore: Revert chore: Delete desk/src/types/doctypes.ts)
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;
@@ -116,13 +112,10 @@ export interface HDTicket extends DocType {
   key?: string;
   /** Status Category: Data */
   status_category?: string;
-<<<<<<< HEAD
   /** Last Agent Response: Datetime */
   last_agent_response?: string;
   /** Last Customer Response: Datetime */
   last_customer_response?: string;
-=======
->>>>>>> f7fbcce4 (chore: Revert chore: Delete desk/src/types/doctypes.ts)
   /** Ticket raised outside working hours: Check */
   raised_outside_working_hours: 0 | 1;
 }

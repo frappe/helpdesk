@@ -237,7 +237,6 @@ const ticketAdditionalInfo = computed(() => {
         !field.hide_from_customer &&
         ["subject", "team", "priority"].indexOf(field.fieldname) === -1
     )
-<<<<<<< HEAD
     .map((field: Field) => {
       const option = {
         label: field.label,
@@ -256,13 +255,6 @@ const ticketAdditionalInfo = computed(() => {
       }
       return option;
     });
-=======
-    .map((field: Field) => ({
-      fieldname: field.fieldname,
-      label: field.label,
-      value: ticket.data[field.fieldname],
-    }));
->>>>>>> a2394c2b (chore: code cleanup)
 
   return [...fields, ...custom_fields];
 });
