@@ -8,7 +8,6 @@
 <script setup lang="ts">
 import { Dialogs } from "@/components/dialogs";
 import { useConfigStore } from "@/stores/config";
-import { stopSession } from "@/telemetry";
 import { FrappeUIProvider, toast, setConfig } from "frappe-ui";
 import { computed, defineAsyncComponent, h, onMounted, onUnmounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
@@ -56,9 +55,5 @@ const PortalRoot = computed(() => {
   } else {
     return CustomerPortalRoot;
   }
-});
-
-onUnmounted(() => {
-  stopSession();
 });
 </script>
