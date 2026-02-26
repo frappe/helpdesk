@@ -683,7 +683,7 @@ def get_ticket_contact(ticket: str | int):
 
 @frappe.whitelist()
 def get_recent_similar_tickets(ticket: str | int):
-    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
+    frappe.has_permission("HD Ticket", "read", str(ticket), throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
         return {"recent_tickets": [], "similar_tickets": []}
 
