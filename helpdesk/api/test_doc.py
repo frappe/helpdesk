@@ -1,8 +1,7 @@
 # Copyright (c) 2026, Frappe Technologies and Contributors
 # See license.txt
 
-import frappe
-from frappe.tests.utils import FrappeTestCase as IntegrationTestCase
+from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.doc import remove_assignments
 
