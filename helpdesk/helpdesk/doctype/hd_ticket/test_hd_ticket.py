@@ -715,7 +715,7 @@ class TestHDTicket(IntegrationTestCase):
         frappe.set_user(non_agent)
         
         with self.assertRaises(frappe.PermissionError):
-            ticket.reply_via_agent(message="I am a hacker!")
+            ticket.reply_via_agent(message="Test unauthorized reply")
         
         frappe.set_user("Administrator")
         
