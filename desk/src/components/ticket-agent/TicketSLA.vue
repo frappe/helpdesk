@@ -84,7 +84,7 @@ import {
   dateTooltipFormat,
   formatTime,
 } from "@/utils";
-import { Badge, dayjs, Tooltip } from "frappe-ui";
+import { Badge, dayjs, Tooltip, dayjsLocal } from "frappe-ui";
 import { computed, inject } from "vue";
 
 const ticket = inject(TicketSymbol);
