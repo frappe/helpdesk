@@ -29,6 +29,7 @@ export interface HDTicketStatus extends DocType {
   order?: number;
   /** Enabled: Check */
   enabled: 0 | 1;
+  parsed_color?: string;
 }
 
 // Last updated: 2026-01-16 14:23:14.181727

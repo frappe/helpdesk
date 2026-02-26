@@ -38,26 +38,39 @@
       <!-- First Response -->
       <div class="flex items-center gap-1">
         <span>First Response</span>
-        <Badge
-          :label="firstResponse.label"
-          variant="subtle"
-          :theme="firstResponse.color"
-        />
+
+        <Tooltip
+          :text="dateFormat(firstResponse.date, dateTooltipFormat)"
+          :hover-delay="0.25"
+          :placement="'top'"
+        >
+          <Badge
+            :label="firstResponse.label"
+            variant="subtle"
+            :theme="firstResponse.color"
+          />
+        </Tooltip>
       </div>
       <!-- divider -->
       <div class="border-l border-outline-gray-2 h-[13px]" />
       <!-- Resolution by -->
       <div class="flex items-center gap-1">
         <span>Resolution </span>
-        <Badge
-          v-if="resolutionBy"
-          :label="resolutionBy.label"
-          variant="subtle"
-          :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
-          :class="
-            resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'
-          "
-        />
+        <Tooltip
+          :text="dateFormat(resolutionBy.date, dateTooltipFormat)"
+          :hover-delay="0.25"
+          :placement="'top'"
+        >
+          <Badge
+            v-if="resolutionBy"
+            :label="resolutionBy.label"
+            variant="subtle"
+            :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
+            :class="
+              resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'
+            "
+          />
+        </Tooltip>
       </div>
     </div>
   </teleport>
@@ -72,7 +85,7 @@ import {
   dateTooltipFormat,
   formatTime,
 } from "@/utils";
-import { Badge, dayjs, Tooltip } from "frappe-ui";
+import { Badge, dayjs, Tooltip, dayjsLocal } from "frappe-ui";
 import { computed, inject } from "vue";
 
 const ticket = inject(TicketSymbol);
