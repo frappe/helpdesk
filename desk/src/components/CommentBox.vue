@@ -250,14 +250,17 @@ function handleReaction(emoji: string) {
 
 const commentBoxRef = ref(null);
 const editorRef = ref(null);
+const lastSavedContent = ref(content);
+const commentBoxState = ref(content);
 
 function handleEditMode() {
   editable.value = true;
+  commentBoxState.value = _content.value;
   editorRef.value.editor.chain().focus("start");
 }
 
 function handleDiscard() {
-  _content.value = content;
+  _content.value = commentBoxState.value;
   editable.value = false;
 }
 
@@ -275,7 +278,7 @@ const deleteComment = createResource({
 });
 
 function handleSaveComment() {
-  if (content === _content.value) {
+  if (lastSavedContent.value === _content.value) {
     editable.value = false;
     return;
   }
@@ -294,6 +297,7 @@ function handleSaveComment() {
     {
       onSuccess: () => {
         editable.value = false;
+        lastSavedContent.value = _content.value;
         emit("update");
         toast.success("Comment updated");
       },
