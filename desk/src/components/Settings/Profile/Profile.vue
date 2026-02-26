@@ -315,7 +315,9 @@ const saveTimezoneResource = createResource({
   },
   onSuccess() {
     toast.success(__("Timezone updated"));
-    window.location.reload();
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 500);
   },
 });
 
