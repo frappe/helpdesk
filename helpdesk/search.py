@@ -95,7 +95,7 @@ def get_synonym_words() -> list[str]:
 
 
 class Search:
-    unsafe_chars = re.compile(r"[\[\]{}<>+!-]")
+    unsafe_chars = re.compile(r"[^a-zA-Z0-9\s]")
 
     def __init__(self, index_name, prefix, schema) -> None:
         self.redis = frappe.cache()
@@ -182,6 +182,8 @@ class Search:
     def clean_query(self, query):
         query = query.strip().replace("-*", "*")
         query = self.unsafe_chars.sub(" ", query)
+        # Collapse multiple spaces
+        query = re.sub(r"\s+", " ", query)
         return query.strip().lower()
 
     def spellcheck(self, query, **kwargs):
@@ -344,7 +346,6 @@ class HelpdeskSearch(Search):
         return records
 
 
-@frappe.whitelist()
 def search(
     query, only_articles=False, qtype: Literal["and", "or"] = "and"
 ) -> list[dict[str, list[dict]]]:

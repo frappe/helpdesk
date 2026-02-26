@@ -57,8 +57,4 @@ const PortalRoot = computed(() => {
     return CustomerPortalRoot;
   }
 });
-
-onUnmounted(() => {
-  stopSession();
-});
 </script>

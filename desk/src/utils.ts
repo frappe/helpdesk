@@ -302,9 +302,15 @@ export const textEditorMenuButtons = [
 ];
 
 export function isContentEmpty(content: string) {
+  if (!content || content === null || content === undefined) {
+    return true;
+  }
   const parser = new DOMParser();
   const doc = parser.parseFromString(content, "text/html");
-  return doc.body.textContent === "";
+  if (doc.body.textContent === null) {
+    return true;
+  }
+  return doc.body.textContent.trim() === "";
 }
 
 export function isTouchScreenDevice() {
