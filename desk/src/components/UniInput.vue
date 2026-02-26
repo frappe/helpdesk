@@ -72,8 +72,8 @@ const component = computed(() => {
   } else if (props.field.fieldtype === "Select") {
     return h(Autocomplete, {
       options: props.field.options
-        .split("\n")
-        .map((o) => ({ label: o, value: o })),
+        ? props.field.options.split("\n").map((o) => ({ label: o, value: o }))
+        : [],
       size: "sm",
     });
   } else if (props.field.fieldtype === "Check") {
