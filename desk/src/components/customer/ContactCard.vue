@@ -64,7 +64,7 @@ import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { CustomerContact, CustomerResourceSymbol } from "@/types";
 import { HDCustomerMember } from "@/types/doctypes";
-import { hasPermission } from "@/utils";
+import { getErrorMessage, hasPermission } from "@/utils";
 import { Avatar, Badge, Button, Dropdown, Tooltip, dayjs } from "frappe-ui";
 import { computed, inject, markRaw } from "vue";
 import LucideBriefcase from "~icons/lucide/briefcase";
@@ -134,7 +134,6 @@ const dropdownOptions = computed(() => {
       theme: "red",
       onClick: () => {
         /* TODO: remove manager action */
-        console.log("Remove manager");
         updateManagerRole(0);
       },
     });
@@ -144,8 +143,6 @@ const dropdownOptions = computed(() => {
       icon: "briefcase",
       onClick: () => {
         /* TODO: set as manager action */
-        console.log("Set as manager");
-        console.log(customer.doc.contacts);
         updateManagerRole(1);
       },
     });
@@ -156,7 +153,7 @@ const dropdownOptions = computed(() => {
     theme: "red",
     onClick: () => {
       /* TODO: remove contact action */
-      console.log("Remove contact");
+      removeContact();
     },
   });
   return options;
@@ -176,6 +173,9 @@ function updateManagerRole(isManager: 0 | 1) {
     {
       onSuccess() {
         emit("update");
+      },
+      onError(error: any) {
+        getErrorMessage(error, true);
       },
     }
   );
@@ -203,6 +203,9 @@ function updatePrimaryContact(isPrimary: 0 | 1) {
       onSuccess() {
         emit("update");
       },
+      onError(error: any) {
+        getErrorMessage(error, true);
+      },
     }
   );
 }
@@ -219,6 +222,9 @@ function removeContact() {
     {
       onSuccess() {
         emit("update");
+      },
+      onError(error: any) {
+        getErrorMessage(error, true);
       },
     }
   );

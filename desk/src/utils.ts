@@ -762,3 +762,16 @@ export function hasPermission() {
   const authStore = useAuthStore();
   return authStore.isAdmin || authStore.isManager;
 }
+
+export function getErrorMessage(
+  error: any,
+  showToast: boolean = false
+): string {
+  const msg = error.exc_type
+    ? (error.messages || error.message || []).join(", ")
+    : error.message;
+  if (showToast) {
+    toast.error(msg);
+  }
+  return msg;
+}

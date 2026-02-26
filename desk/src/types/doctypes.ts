@@ -323,12 +323,12 @@ export interface HDCustomerMember extends ChildDocType {
   contact_name: string;
 }
 
-// Last updated: 2026-02-20 16:52:24.559244
+// Last updated: 2026-02-23 14:37:53.288126
 export interface HDCustomer extends DocType {
   /** Image: Attach Image */
   image?: string;
   /** Customer Name: Data */
-  customer_name: string;
+  customer_name?: string;
   /** Domain: Data */
   domain?: string;
   /** Contacts: Table (HD Customer Member) */
