@@ -168,6 +168,7 @@ function handleInviteUser() {
 function inviteNewUsers() {
   const emails = validateAndParseEmails();
   emit("invited", { contacts: emails, role: role.value });
+  newUsers.value = "";
 }
 function validateAndParseEmails() {
   if (newUsers.value.trim() === "") {

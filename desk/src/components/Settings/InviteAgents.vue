@@ -226,9 +226,17 @@ const inviteByEmailResource = createResource({
 
 const pendingInvitesResource = createResource({
   url: "frappe.core.api.user_invitation.get_pending_invitations",
-  params: { app_name: "helpdesk" },
+  params: {
+    app_name: "helpdesk",
+  },
   auto: true,
   method: "GET",
+  transform: (data) =>
+    data.filter((invite) =>
+      invite.roles.some((role) =>
+        ["Agent", "Agent Manager", "System Manager"].includes(role)
+      )
+    ),
 });
 
 const cancelInviteResource = createResource({

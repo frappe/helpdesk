@@ -38,7 +38,7 @@ import {
   Tabs,
   usePageMeta,
 } from "frappe-ui";
-import { computed, provide } from "vue";
+import { computed, onMounted, provide } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CustomerInfo from "./CustomerInfo.vue";
 // props with type set at string
@@ -53,12 +53,13 @@ const tabs = [
   { label: __("Tickets"), hash: "tickets" },
   { label: __("Contacts"), hash: "contacts" },
 ];
-
 const customer: DocumentResource<HDCustomer> = createDocumentResource({
   doctype: "HD Customer",
   name: props.id,
   whitelistedMethods: {
     updateContacts: "update_contacts",
+    getPendingInvites: "get_pending_invites",
+    getContacts: "get_contacts",
   },
 });
 
@@ -92,11 +93,14 @@ const breadcrumbs = [
   },
 ];
 
+onMounted(() => {
+  customer.getPendingInvites.fetch();
+  customer.getContacts.fetch();
+});
+
 usePageMeta(() => {
   return {
     title: props.id,
   };
 });
 </script>
-
-<style scoped></style>
