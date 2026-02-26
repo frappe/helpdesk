@@ -367,7 +367,7 @@ async function addToReply(
     const res = await getSignature.fetch();
     signature = res?.signature || "";
   } catch (err) {
-    console.error("Signature fetch failed", err);
+    
   }
 
   const content = signature
@@ -422,23 +422,21 @@ watch(
         const res = await getSignature.fetch();
         const signature = String(res.signature || "").trim();
         
-        console.log("signature value →", signature);
-        console.log("newEmail.value →", newEmail.value);
-
+    
         // Always set signature if box is empty or null
         if (signature && (!newEmail.value || newEmail.value.trim() === "")) {
           newEmail.value = `<p><br/></p><p>${signature.replace(/\n/g, "<br/>")}</p>`;
-          console.log("✅ Signature set!");
+          
         } else {
           // Force clear localStorage and set signature
           newEmail.value = null;
           setTimeout(() => {
             newEmail.value = `<p><br/></p><p>${signature.replace(/\n/g, "<br/>")}</p>`;
-            console.log("✅ Signature set after clear!");
+            
           }, 100);
         }
       } catch (err) {
-        console.error("Error →", err);
+        
       }
     }
   },
