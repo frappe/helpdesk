@@ -183,7 +183,7 @@ import {
   FileUploader,
   LoadingIndicator,
   toast,
-  Autocomplete
+  Autocomplete,
 } from "frappe-ui";
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
