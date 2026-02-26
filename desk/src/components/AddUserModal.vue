@@ -2,23 +2,24 @@
   <Dialog
     v-model="show"
     :options="{
-      title: forAgents ? __('Add Existing User') : __('Add Existing Contact'),
+      title: forAgents
+        ? __('Add Existing User')
+        : inviteNew
+        ? __('Invite New Contact')
+        : __('Add Existing Contact'),
     }"
-    @close="
-      () => {
-        show = false;
-        newUsers = [];
-      }
-    "
+    @close="handleDialogClose()"
   >
     <template #body-content>
       <div class="flex gap-1 border rounded mb-4 p-2 text-ink-gray-5">
-        <FeatherIcon name="info" class="size-3.5 mt-0.5 shrink-0" />
+        <LucideInfo class="size-3.5 mt-[4px] shrink-0" />
         <p class="text-p-sm">{{ infoText }}</p>
       </div>
 
-      <!-- EmailMultiSelect will go here -->
-      <div class="p-2 group bg-surface-gray-2 hover:bg-surface-gray-3 rounded">
+      <div
+        class="p-2 group bg-surface-gray-2 hover:bg-surface-gray-3 rounded"
+        v-if="!inviteNew"
+      >
         <EmailMultiSelect
           ref="emailMultiSelect"
           class="flex-1"
@@ -26,15 +27,25 @@
           :placeholder="
             forAgents ? __('Search users...') : __('Search contacts...')
           "
-          :existingUsers="props.existingUsers"
+          :existingUsers="existingUsers"
           :forAgents="forAgents"
           :validate="forAgents ? validateEmailWithZod : null"
-          v-model="newUsers"
+          v-model="selectedContacts"
           :emptyPlaceholder="
             forAgents ? __('No Users Found') : __('No Contacts Found')
           "
         />
       </div>
+      <FormControl
+        v-else
+        focus
+        type="textarea"
+        :required="true"
+        :label="__('Invite by email')"
+        placeholder="user1@example.com, user2@example.com, ..."
+        v-model="newUsers"
+        :description="__('Comma separated emails to invite')"
+      />
 
       <FormControl
         type="select"
@@ -49,10 +60,10 @@
       <div class="flex justify-end gap-2">
         <Button
           variant="solid"
-          :label="__('Add')"
-          :disabled="!newUsers.length"
+          :label="inviteNew ? __('Invite') : __('Add')"
           @click="handleInviteUser()"
           :loading="loading"
+          :disabled="inviteNew ? !newUsers.length : !selectedContacts.length"
         />
       </div>
     </template>
@@ -61,30 +72,39 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
-import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
 import { validateEmailWithZod } from "@/utils";
-import { Button, Dialog, FeatherIcon, FormControl } from "frappe-ui";
+import { Button, Dialog, FormControl, toast } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import EmailMultiSelect from "./EmailMultiSelect.vue";
 
-const props = defineProps<{
-  forAgents?: boolean;
-  existingUsers?: string[];
-  loading?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    forAgents?: boolean;
+    existingUsers?: string[];
+    loading?: boolean;
+    inviteNew?: boolean;
+  }>(),
+  {
+    forAgents: false,
+    existingUsers: () => [],
+    loading: false,
+    inviteNew: false,
+  }
+);
 // define emits with type
 const emit = defineEmits<{
-  (e: "invited", data: { users: string[]; role: string }): void;
+  (e: "addedExisting", data: { contacts: string[]; role: string }): void;
+  (e: "invited", data: { contacts: string; role: string }): void;
 }>();
 
 const show = defineModel<boolean>({ default: false });
 
-const { users } = useUserStore();
 const { isManager } = useAuthStore();
 
 const emailMultiSelect = ref<{ setFocus: () => void } | null>(null);
-const newUsers = ref<string[]>([]);
+const selectedContacts = ref<string[]>([]);
+const newUsers = ref<string>("");
 const role = ref(props.forAgents ? "Agent" : "HD Customer");
 
 watch(show, (val) => {
@@ -95,6 +115,10 @@ const infoText = computed<string>(() => {
   return props.forAgents
     ? __(
         "Add existing system users to Helpdesk. Assign them a role to grant access with their current credentials."
+      )
+    : props.inviteNew
+    ? __(
+        "Invite new contacts to Helpdesk by adding their email addresses. Assign them a role to grant access with their current credentials."
       )
     : __(
         "Add existing system users as contacts for this customer. Assign them a role to define their level of access."
@@ -133,9 +157,47 @@ const roleDescription = computed<string>(() => {
 });
 
 function handleInviteUser() {
-  // emit invited with users
-  emit("invited", { users: newUsers.value, role: role.value });
-  newUsers.value = [];
+  // emit invited with contacts
+  if (props.inviteNew) {
+    inviteNewUsers();
+  } else {
+    addExistingContacts();
+  }
+  selectedContacts.value = [];
+}
+function inviteNewUsers() {
+  const emails = validateAndParseEmails();
+  emit("invited", { contacts: emails, role: role.value });
+}
+function validateAndParseEmails() {
+  if (newUsers.value.trim() === "") {
+    toast.error(__("At least one email required"));
+    throw new Error("At least one email required");
+  }
+  const emails = newUsers.value
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean);
+
+  for (const email of emails) {
+    if (!validateEmailWithZod(email)) {
+      toast.error(__("Invalid email: {0}", [email]));
+      throw new Error(`Invalid email: ${email}`);
+    }
+  }
+  return emails.join(",");
+}
+
+function addExistingContacts() {
+  emit("addedExisting", { contacts: selectedContacts.value, role: role.value });
+}
+
+function handleDialogClose() {
   show.value = false;
+  if (props.inviteNew) {
+    newUsers.value = "";
+  } else {
+    selectedContacts.value = [];
+  }
 }
 </script>

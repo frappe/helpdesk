@@ -37,11 +37,13 @@
       />
     </div>
   </div>
-  <AddExistingUserModal
+  <AddUserModal
     v-model="showAddContact"
     :existing-users="existingContacts"
-    @invited="handleContactInvite"
     :for-agents="false"
+    :invite-new="inviteNewUsers"
+    @addedExisting="handleAddExistingContacts"
+    @invited="handleInviteContacts"
   />
 </template>
 
@@ -52,13 +54,14 @@ import { hasPermission } from "@/utils";
 import { createResource, Dropdown, LoadingIndicator, toast } from "frappe-ui";
 import { computed, inject, onMounted, ref } from "vue";
 import LucideUserX from "~icons/lucide/user-x";
-import AddExistingUserModal from "../AddExistingUserModal.vue";
+import AddUserModal from "../AddUserModal.vue";
 import { agents } from "../Settings/agents";
 import ContactCard from "./ContactCard.vue";
 
 const customer = inject(CustomerResourceSymbol)!;
 
 const showAddContact = ref(false);
+const inviteNewUsers = ref(false);
 
 const contacts: Resource<CustomerContact[]> = createResource({
   url: "helpdesk.helpdesk.doctype.hd_customer.hd_customer.get_contacts_for_customer",
@@ -91,10 +94,10 @@ function reload() {
   customer.reload();
 }
 
-function handleContactInvite(data: { users: string[]; role: string }) {
+function handleAddExistingContacts(data: { contacts: string[]; role: string }) {
   customer.updateContacts.submit(
     {
-      contacts: JSON.stringify(data.users),
+      contacts: JSON.stringify(data.contacts),
       role: data.role,
     },
     {
@@ -107,16 +110,24 @@ function handleContactInvite(data: { users: string[]; role: string }) {
   );
 }
 
+function handleInviteContacts(data: { contacts: string[]; role: string }) {
+  console.log("Inviting contacts", data);
+}
+
 const headerOptions = [
   {
     label: __("Add existing contact"),
     onClick: () => {
+      inviteNewUsers.value = false;
       showAddContact.value = true;
     },
   },
   {
     label: __("Invite new contact"),
-    onClick: () => {},
+    onClick: () => {
+      inviteNewUsers.value = true;
+      showAddContact.value = true;
+    },
   },
 ];
 

@@ -97,12 +97,12 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/auth";
-import { FormControl, Button, Tooltip, createResource, toast } from "frappe-ui";
-import { computed, ref } from "vue";
-import { useOnboarding } from "frappe-ui/frappe";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
+import { Button, FormControl, Tooltip, createResource, toast } from "frappe-ui";
+import { useOnboarding } from "frappe-ui/frappe";
+import { computed, ref } from "vue";
 
 const authStore = useAuthStore();
 const { isAdmin, isManager } = authStore;

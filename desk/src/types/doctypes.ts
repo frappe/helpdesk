@@ -12,7 +12,7 @@ interface ChildDocType extends DocType {
   parenttype?: string;
   idx?: number;
 }
-
+  
 // Last updated: 2026-02-02 17:22:11.094897
 export interface HDTicketStatus extends DocType {
   /** Color: Select */
@@ -309,12 +309,12 @@ export interface HDCustomerMember extends ChildDocType {
   contact_name: string;
 }
 
-// Last updated: 2026-02-20 20:51:23.452754
+// Last updated: 2026-02-23 14:37:53.288126
 export interface HDCustomer extends DocType {
   /** Image: Attach Image */
   image?: string;
   /** Customer Name: Data */
-  customer_name: string;
+  customer_name?: string;
   /** Domain: Data */
   domain?: string;
   /** Contacts: Table (HD Customer Member) */
