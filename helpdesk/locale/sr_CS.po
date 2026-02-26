@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-22 10:40+0000\n"
-"PO-Revision-Date: 2026-02-25 17:29\n"
+"PO-Revision-Date: 2026-02-26 17:30\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Latin)\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +29,7 @@ msgstr "% rešenih kreiranih tiketa u okviru rokova iz sporazuma o nivou usluge"
 
 #: desk/src/pages/SearchAgent.vue:120
 msgid "({0}s)"
-msgstr ""
+msgstr "({0})"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
@@ -5267,5 +5267,5 @@ msgstr "pregledao je ovo"
 
 #: desk/src/pages/SearchAgent.vue:117
 msgid "{0} matches"
-msgstr ""
+msgstr "{0} podudaranja"
 
