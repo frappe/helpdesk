@@ -88,7 +88,7 @@
       <div
         class="flex items-center text-base leading-5"
         v-for="field in ticketAdditionalInfo"
-        :key="field.label"
+        :key="field.fieldname"
       >
         <span class="w-[126px] text-sm text-gray-600">{{ field.label }}</span>
         <span
@@ -216,14 +216,17 @@ const ticketBasicInfo = computed(() => [
 const ticketAdditionalInfo = computed(() => {
   const fields = [
     {
+      fieldname: "subject",
       label: "Subject",
       value: ticket.data.subject,
     },
     {
+      fieldname: "team",
       label: "Team",
       value: ticket.data.agent_group || "-",
     },
     {
+      fieldname: "priority",
       label: "Priority",
       value: ticket.data.priority,
     },
@@ -234,6 +237,7 @@ const ticketAdditionalInfo = computed(() => {
         !field.hide_from_customer &&
         ["subject", "team", "priority"].indexOf(field.fieldname) === -1
     )
+<<<<<<< HEAD
     .map((field: Field) => {
       const option = {
         label: field.label,
@@ -252,6 +256,13 @@ const ticketAdditionalInfo = computed(() => {
       }
       return option;
     });
+=======
+    .map((field: Field) => ({
+      fieldname: field.fieldname,
+      label: field.label,
+      value: ticket.data[field.fieldname],
+    }));
+>>>>>>> a2394c2b (chore: code cleanup)
 
   return [...fields, ...custom_fields];
 });
