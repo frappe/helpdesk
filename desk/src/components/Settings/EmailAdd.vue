@@ -121,7 +121,6 @@ import {
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import { __ } from "@/translation";
 
-
 interface E {
   (event: "update:step", value: EmailStep): void;
 }
