@@ -115,6 +115,7 @@
 
 <script setup lang="ts">
 import { useConfigStore } from "@/stores/config";
+import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { SavedReply } from "@/types";
 import { useStorage } from "@vueuse/core";
@@ -238,6 +239,7 @@ const onTemplateSelect = (template: SavedReply) => {
         isLoading: false,
       };
       emit("apply", data);
+      capture("saved_reply_applied");
     },
   });
   renderResponse.submit().catch(() => {

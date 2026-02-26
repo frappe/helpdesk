@@ -6,13 +6,14 @@
       'min-h-[7rem]',
       getFontFamily(newEmail),
       editable && '!max-h-[35vh] overflow-y-auto',
+      '[&_p.reply-to-content]:hidden',
     ]"
     :content="newEmail"
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
-    :extensions="[PreserveVideoControls]"
+    :extensions="[ComponentUtils]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #top>
@@ -172,7 +173,7 @@ import {
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
-import { PreserveVideoControls } from "@/tiptap-extensions";
+import { ComponentUtils } from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,
@@ -258,6 +259,7 @@ const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
 const isUploading = ref(false);
+
 const isDisabled = computed(() => {
   return (
     isContentEmpty(newEmail.value) || sendMail.loading || isUploading.value
@@ -376,8 +378,18 @@ async function addToReply(
     .chain()
     .clearContent()
     .insertContent(content)
+  const repliedMessage = `<p class="reply-to-content"><p><blockquote>${body}</blockquote>`;
+  editorRef.value.editor
+    .chain()
+    .clearContent()
+    .insertContent(repliedMessage)
+    .focus("all")
+    .insertContentAt(0, { type: "paragraph" })
     .focus("start")
     .run();
+  nextTick(() => {
+    newEmail.value = editorRef.value.editor.getHTML();
+  });
 }
 
 function resetState() {

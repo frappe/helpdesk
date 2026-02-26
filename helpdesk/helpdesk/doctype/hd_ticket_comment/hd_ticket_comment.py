@@ -21,7 +21,7 @@ class HDTicketComment(HasMentions, Document):
     def after_insert(self):
         event = "helpdesk:ticket-comment"
         data = {"ticket_id": self.reference_ticket}
-        telemetry_event = "ticket_comment_added"
+        telemetry_event = "comment_added"
 
         room = get_doc_room("HD Ticket", self.reference_ticket)
         publish_event(
