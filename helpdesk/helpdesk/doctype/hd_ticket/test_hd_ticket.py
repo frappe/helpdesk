@@ -710,7 +710,7 @@ class TestHDTicket(IntegrationTestCase):
         frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
         frappe.delete_doc("HD Ticket Status", "New", force=True)
         
-    def test_security_unauthorized__reply_via_agent(self):
+    def test_security_unauthorized_reply_via_agent(self):
         ticket = make_ticket()
         frappe.set_user(non_agent)
         
