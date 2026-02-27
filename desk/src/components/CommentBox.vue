@@ -64,10 +64,24 @@
         :bubble-menu="textEditorMenuButtons"
         :mentions="userMentions"
         @change="(event:string) => {_content = event}"
+        @keydown.ctrl.enter.capture.stop="handleSaveComment"
+        @keydown.meta.enter.capture.stop="handleSaveComment"
       >
         <template #bottom v-if="editable">
           <div class="flex flex-row-reverse gap-2">
-            <Button label="Save" @click="handleSaveComment" variant="solid" />
+            <div>
+              <Button
+                :label="
+                  isMobileView
+                    ? 'Save'
+                    : isMac
+                    ? 'Save (⌘ + ⏎)'
+                    : 'Save (Ctrl + ⏎)'
+                "
+                @click="handleSaveComment"
+                variant="solid"
+              />
+            </div>
             <Button label="Discard" @click="handleDiscard" />
           </div>
         </template>
@@ -169,6 +183,8 @@ import { useConfigStore } from "@/stores/config";
 import { updateRes as updateComment } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { CommentActivity } from "@/types";
+import { useDevice } from "@/composables";
+import { useScreenSize } from "@/composables/screen";
 import {
   dateFormat,
   dateTooltipFormat,
@@ -202,6 +218,8 @@ const { enableCommentReactions } = useConfigStore();
 const { name, creation, content, commenter, commentedBy, attachments } =
   props.activity;
 
+const { isMac } = useDevice();
+const { isMobileView } = useScreenSize();
 const isTicketMergedComment = computed(() => {
   const regex = /has been merged with ticket #\d+/;
   return regex.test(content);
