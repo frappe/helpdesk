@@ -13,7 +13,7 @@
     :placeholder="placeholder"
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
-    :extensions="[ComponentUtils]"
+    :extensions="[ComponentUtils, HandleExcelPaste]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #top>
@@ -171,7 +171,7 @@ import {
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
-import { ComponentUtils } from "@/tiptap-extensions";
+import { ComponentUtils, HandleExcelPaste } from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,
