@@ -11,6 +11,7 @@ from helpdesk.helpdesk.doctype.hd_ticket_comment.hd_ticket_comment import (
     get_reactions,
     toggle_reaction,
 )
+from helpdesk.mixins.mentions import HasMentions
 from helpdesk.test_utils import create_agent
 
 
@@ -298,6 +299,80 @@ class TestHDTicketComment(FrappeTestCase):
         self.assertEqual(final_count, initial_count)
 
         frappe.delete_doc("HD Ticket Comment", agent_comment.name, force=True)
+
+    def test_if_repeated_notification_sent_on_mention_add(self):
+        agent_one = self.agent_emails[0]
+        frappe.set_user(agent_one)
+        self.assign_agent(agent_one)
+
+        agent_comment = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Comment",
+                "reference_ticket": self.test_ticket.name,
+                "content": """
+                <p>
+                    Hello
+                    <span class="mention"
+                        data-type="mention"
+                        data-id="test_user2@example.com"
+                        data-label="Test User Two">
+                        @Test User Two
+                    </span>
+                </p>
+            """,
+                "commented_by": agent_one,
+                "owner": agent_one,
+            }
+        )
+
+        agent_comment.insert(ignore_permissions=True)
+
+        notifications = frappe.get_all(
+            "HD Notification",
+            filters={
+                "reference_comment": agent_comment.name,
+                "notification_type": "Mention",
+            },
+            fields=["name", "user_to"],
+        )
+        # notification one created should be equal to 1
+        self.assertEqual(len(notifications), 1)
+        self.assertEqual(notifications[0].user_to, "test_user2@example.com")
+
+        agent_comment.content = """
+            <p>
+                Hello
+                <span class="mention"
+                    data-type="mention"
+                    data-id="test_user2@example.com"
+                    data-label="Test User Two">
+                    @Test User Two
+                </span>
+                <span class="mention"
+                    data-type="mention"
+                    data-id="test_user1@example.com"
+                    data-label="Test User One">
+                    @Test User One
+                </span>
+            </p>
+        """
+
+        agent_comment.save(ignore_permissions=True)
+        agent_comment.reload()
+        notifications_updated = frappe.get_all(
+            "HD Notification",
+            filters={
+                "reference_comment": agent_comment.name,
+                "notification_type": "Mention",
+            },
+            fields=["user_to"],
+        )
+
+        user_emails = {n.user_to for n in notifications_updated}
+
+        self.assertEqual(len(notifications_updated), 2)
+        self.assertIn("test_user2@example.com", user_emails)
+        self.assertIn("test_user1@example.com", user_emails)
 
     def test_grouped_notifications(self):
         test_users = self.agent_emails[3:6]
