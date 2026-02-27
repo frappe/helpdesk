@@ -56,7 +56,7 @@
         <div
           class="break-words text-base text-gray-800 flex items-center gap-2"
         >
-          <Tooltip :text="dayjs(data.value).long()">
+          <Tooltip :text="dateFormat(data.value, dateTooltipFormat)">
             <Badge :label="data.label" :theme="data.theme" variant="subtle" />
           </Tooltip>
           <!-- SLA explanation icon -->
@@ -88,13 +88,19 @@
       <div
         class="flex items-center text-base leading-5"
         v-for="field in ticketAdditionalInfo"
+        :key="field.fieldname"
       >
         <span class="w-[126px] text-sm text-gray-600">{{ field.label }}</span>
         <span
           class="text-base text-gray-800 flex-1"
           :class="!field.value && 'text-ink-gray-4'"
         >
-          {{ field.value || "—" }}
+          <template v-if="field.value && dayjs(field.value).isValid()">
+            {{ dateFormat(field.value, dateTooltipFormat) }}
+          </template>
+          <template v-else>
+            {{ field.value || "—" }}
+          </template>
         </span>
       </div>
     </div>
@@ -105,7 +111,7 @@
 import { dayjs } from "@/dayjs";
 import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
-import { formatTime } from "@/utils";
+import { dateFormat, dateTooltipFormat, formatTime } from "@/utils";
 import { Avatar, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 
@@ -210,14 +216,17 @@ const ticketBasicInfo = computed(() => [
 const ticketAdditionalInfo = computed(() => {
   const fields = [
     {
+      fieldname: "subject",
       label: "Subject",
       value: ticket.data.subject,
     },
     {
+      fieldname: "team",
       label: "Team",
       value: ticket.data.agent_group || "-",
     },
     {
+      fieldname: "priority",
       label: "Priority",
       value: ticket.data.priority,
     },

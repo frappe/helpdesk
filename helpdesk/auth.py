@@ -59,6 +59,7 @@ ALLOWED_PATHS = [
     "/api/method/frappe.core.doctype.user.user.reset_password",
     "/api/method/frappe.desk.form.load.getdoctype",
     "/api/method/run_doc_method",
+    "/api/method/frappe.desk.reportview.export_query",
 ]
 
 WILDCARD_PATHS = [

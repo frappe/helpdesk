@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-15 10:41+0000\n"
-"PO-Revision-Date: 2026-02-20 16:00\n"
+"POT-Creation-Date: 2026-02-22 10:40+0000\n"
+"PO-Revision-Date: 2026-02-26 17:30\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Cyrillic)\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,10 @@ msgstr "% испуњености споразума о нивоу услуге"
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
 msgstr "% решених креираних тикета у оквиру рокова из споразума о нивоу услуге"
+
+#: desk/src/pages/SearchAgent.vue:120
+msgid "({0}s)"
+msgstr "({0})"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
@@ -386,7 +390,7 @@ msgstr "Архивирано"
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
 msgstr "Да ли сте сигурни да желите да промените картицу? Несачуване измене ће бити изгубљене."
 
-#: desk/src/pages/ticket/TicketCustomer.vue:295
+#: desk/src/pages/ticket/TicketCustomer.vue:293
 msgid "Are you sure you want to close this ticket?"
 msgstr "Да ли сте сигурни да желите да затворите овај тикет?"
 
@@ -958,7 +962,7 @@ msgstr "Кликните на Додај у празнике. Ово ће поп
 msgid "Close"
 msgstr "Затвори"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:294
+#: desk/src/pages/ticket/TicketCustomer.vue:292
 msgid "Close Ticket"
 msgstr "Затвори тикет"
 
@@ -967,7 +971,7 @@ msgstr "Затвори тикет"
 msgid "Closed"
 msgstr "Затворено"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:335
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:336
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Затворени или оцењени тикети не могу бити ажурирани од стране особа које нису агенти"
 
@@ -1045,7 +1049,7 @@ msgstr "Конфигуришите подешавања телефоније."
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:310
 #: desk/src/pages/knowledge-base/NewArticle.vue:149
 #: desk/src/pages/ticket/MobileTicketAgent.vue:180
-#: desk/src/pages/ticket/TicketCustomer.vue:298
+#: desk/src/pages/ticket/TicketCustomer.vue:296
 #: desk/src/pages/ticket/Tickets.vue:418 desk/src/pages/ticket/Tickets.vue:453
 msgid "Confirm"
 msgstr "Потврди"
@@ -1120,15 +1124,15 @@ msgstr "Копирај URL тикета"
 msgid "Copy ticket id"
 msgstr "Копирај ИД тикета"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:631
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:632
 msgid "Could not an email due to: {0}"
 msgstr "Није могуће послати имејл због: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:789
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:790
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "Није могуће послати имејл потврду пријема због: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:174
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:173
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Неуспешно слање имејла са повратном информацијом због: {0}"
 
@@ -1824,7 +1828,7 @@ msgstr "Оцена повратне информације"
 msgid "Feedback Trend"
 msgstr "Тренд повратних информација"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:172
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:171
 msgid "Feedback email has been sent to the customer"
 msgstr "Имејл са повратном информацијом је послат клијенту"
 
@@ -1980,7 +1984,7 @@ msgstr "Назив опште категорије не може бити изм
 msgid "Global"
 msgstr "Глобално"
 
-#: desk/src/components/command-palette/CP.vue:90
+#: desk/src/components/command-palette/CP.vue:89
 msgid "Go to Ticket #{0}"
 msgstr "Иди на тикет #{0}"
 
@@ -2497,7 +2501,7 @@ msgstr "Ставке су успешно обрисане"
 msgid "John Doe"
 msgstr "Петар Петровић"
 
-#: desk/src/components/command-palette/CP.vue:115
+#: desk/src/components/command-palette/CP.vue:114
 msgid "Jump to"
 msgstr "Иди на"
 
@@ -2516,7 +2520,7 @@ msgstr "Пречице на тастатури"
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
-#: desk/src/components/command-palette/CP.vue:105
+#: desk/src/components/command-palette/CP.vue:104
 #: desk/src/pages/knowledge-base/Article.vue:432
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:6
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:434
@@ -3160,7 +3164,7 @@ msgstr "Обавештење ван радног времена"
 msgid "Owner"
 msgstr "Власник"
 
-#: helpdesk/api/settings/field_dependency.py:59
+#: helpdesk/api/settings/field_dependency.py:47
 msgid "Parent field, child field, and parent-child mapping are required."
 msgstr "Матично поље, зависно поље и мапирање матичног и зависног поља су обавезни."
 
@@ -3933,7 +3937,7 @@ msgstr "Скрипта"
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:25
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:40
 #: desk/src/components/Settings/Teams/TeamsList.vue:25
-#: desk/src/components/command-palette/CP.vue:122
+#: desk/src/components/command-palette/CP.vue:121
 #: desk/src/components/layouts/Sidebar.vue:12 desk/src/pages/SearchAgent.vue:7
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Search"
@@ -3953,7 +3957,7 @@ msgstr "Оцена претраге"
 msgid "Search Term Param Name"
 msgstr "Назив параметара за претрагу"
 
-#: desk/src/components/command-palette/CP.vue:127
+#: desk/src/components/command-palette/CP.vue:126
 msgid "Search for \"{0}\""
 msgstr "Претрага за \"{0}\""
 
@@ -3961,11 +3965,11 @@ msgstr "Претрага за \"{0}\""
 msgid "Search index does not exist. Please build the index first."
 msgstr "Индекс претраге не постоји. Молимо Вас да прво креирате индекс."
 
-#: helpdesk/api/search.py:38
+#: helpdesk/api/search.py:41
 msgid "Search index not available. Please contact administrator."
 msgstr "Индекс претраге није доступан. Молимо Вас да контактирате администратора."
 
-#: helpdesk/api/search.py:15
+#: helpdesk/api/search.py:17
 msgid "Search query must be at least 2 characters"
 msgstr "Упит за претрагу мора имати најмање 2 карактера"
 
@@ -4606,7 +4610,7 @@ msgstr "Четвртак"
 msgid "Ticket"
 msgstr "Тикет"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:776
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:777
 msgid "Ticket #{0}: We've received your request"
 msgstr "Тикет #{0}: Примили смо Ваш захтев"
 
@@ -4682,7 +4686,7 @@ msgstr "Тренд тикета"
 msgid "Ticket Type"
 msgstr "Врста тикета"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:306
+#: desk/src/pages/ticket/TicketCustomer.vue:304
 msgid "Ticket closed"
 msgstr "Тикет је затворен"
 
@@ -4690,11 +4694,11 @@ msgstr "Тикет је затворен"
 msgid "Ticket does not exist."
 msgstr "Тикет не постоји."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:325
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
 msgid "Ticket must be resolved with a feedback"
 msgstr "Тикет мора бити решен са повратном информацијом"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:151
+#: desk/src/pages/ticket/TicketCustomer.vue:149
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:62
 msgid "Ticket not found"
 msgstr "Тикет није пронађен"
@@ -4724,7 +4728,7 @@ msgid "Ticket type"
 msgstr "Врста тикета"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:498
-#: desk/src/pages/ticket/TicketCustomer.vue:279
+#: desk/src/pages/ticket/TicketCustomer.vue:277
 msgid "Ticket updated"
 msgstr "Тикет је ажуриран"
 
@@ -4733,11 +4737,11 @@ msgstr "Тикет је ажуриран"
 msgid "Ticket-Search Analysis"
 msgstr "Анализа претраге тикета"
 
-#: desk/src/components/command-palette/CP.vue:99
+#: desk/src/components/command-palette/CP.vue:98
 #: desk/src/components/ticket-agent/TicketHeader.vue:164
 #: desk/src/pages/SearchAgent.vue:351
 #: desk/src/pages/ticket/MobileTicketAgent.vue:329
-#: desk/src/pages/ticket/TicketCustomer.vue:335
+#: desk/src/pages/ticket/TicketCustomer.vue:333
 #: desk/src/pages/ticket/TicketNew.vue:307 desk/src/pages/ticket/Tickets.vue:6
 #: desk/src/pages/ticket/Tickets.vue:587 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
@@ -4760,7 +4764,7 @@ msgstr "Тикети по тиму"
 msgid "Tickets by Type"
 msgstr "Тикети по врсти"
 
-#: helpdesk/api/ticket.py:18
+#: helpdesk/api/ticket.py:16
 msgid "Tickets can only be assigned to agents"
 msgstr "Тикети могу бити додељени искључиво агентима"
 
@@ -4892,7 +4896,7 @@ msgstr "Врста је обавезна"
 msgid "URL/Method"
 msgstr "URL/Метод"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:612
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:613
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr "Није могуће послати имејл. Подесите подразумевани излазни имејл налог."
 
@@ -5135,7 +5139,7 @@ msgstr "Није Вам дозвољено да видите податке са
 msgid "You are not permitted to access this resource."
 msgstr "Немате дозволу да приступите овом ресурсу."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:534
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:535
 msgid "You are not permitted to add a comment"
 msgstr "Није Вам дозвољено да додате коментар"
 
@@ -5260,4 +5264,8 @@ msgstr "синоним"
 #: desk/src/pages/ticket/MobileTicketAgent.vue:423
 msgid "viewed this"
 msgstr "прегледао је ово"
+
+#: desk/src/pages/SearchAgent.vue:117
+msgid "{0} matches"
+msgstr "{0} подударања"
 
