@@ -120,14 +120,14 @@ export const ComponentUtils: Extension = Extension.create({
   },
 });
 
-// fix for excel pasting issue
+// Handle pasting from excel properly
 export const HandleExcelPaste = Extension.create({
   name: "handleExcelPaste",
 
   addProseMirrorPlugins() {
     return [
       new Plugin({
-        key: new PluginKey("excelPasteFix"),
+        key: new PluginKey("handleExcelPaste"),
         props: {
           handlePaste(view, event) {
             const clipboardData = event.clipboardData;
