@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-22 10:40+0000\n"
-"PO-Revision-Date: 2026-02-25 17:28\n"
+"PO-Revision-Date: 2026-02-27 17:48\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +29,7 @@ msgstr "% созданных билетов, которые были решен�
 
 #: desk/src/pages/SearchAgent.vue:120
 msgid "({0}s)"
-msgstr ""
+msgstr "({0}s)"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
@@ -5268,5 +5268,5 @@ msgstr "просмотрели это"
 
 #: desk/src/pages/SearchAgent.vue:117
 msgid "{0} matches"
-msgstr ""
+msgstr "{0} совпадений"
 
