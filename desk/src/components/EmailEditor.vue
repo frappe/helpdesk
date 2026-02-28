@@ -64,13 +64,17 @@
         />
       </div>
     </template>
-    <!-- <template v-slot:editor="{ _editor }">
-      <EditorContent
-        :class="[editable && 'max-h-[35vh] overflow-y-auto']"
-        :editor="_editor"
-      />
-    </template> -->
+
     <template #bottom>
+      <!-- Quoted Reply Content -->
+      <div
+        v-if="quotedContent"
+        ref="quotedContentRef"
+        contenteditable="true"
+        class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm max-h-[150px] overflow-y-auto"
+        v-html="quotedContent"
+      />
+
       <!-- Attachments -->
       <div class="flex flex-wrap gap-2 px-10">
         <AttachmentItem
@@ -179,7 +183,6 @@ import {
   uploadFunction,
   validateEmail,
 } from "@/utils";
-// import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,
@@ -194,6 +197,7 @@ import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 
 const editorRef = ref(null);
 const showSavedRepliesSelectorModal = ref(false);
+const quotedContentRef = ref<HTMLElement | null>(null);
 
 const props = defineProps({
   ticketId: {
@@ -245,6 +249,8 @@ const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
 const isUploading = ref(false);
+const quotedContent = ref<string | null>(null);
+
 const isDisabled = computed(() => {
   return (
     isContentEmpty(newEmail.value) || sendMail.loading || isUploading.value
@@ -288,7 +294,11 @@ const sendMail = createResource({
       to: toEmailsClone.value.join(","),
       cc: ccEmailsClone.value?.join(","),
       bcc: bccEmailsClone.value?.join(","),
-      message: newEmail.value,
+      message:
+        newEmail.value +
+        (quotedContentRef.value
+          ? `<p class="reply-to-content"><p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
+          : ""),
     },
   }),
   onSuccess: () => {
@@ -347,29 +357,24 @@ function addToReply(
   toEmailsClone.value = toEmails;
   ccEmailsClone.value = ccEmails;
   bccEmailsClone.value = bccEmails;
-  editorRef.value.editor
-    .chain()
-    .clearContent()
-    .insertContent(body)
-    .focus("all")
-    .setBlockquote()
-    .insertContentAt(0, { type: "paragraph" })
-    .focus("start")
-    .run();
+  quotedContent.value = `${body}`;
+
+  editorRef.value.editor.chain().clearContent().focus("start").run();
 }
 
 function resetState() {
   newEmail.value = null;
   attachments.value = [];
+  quotedContent.value = null;
 }
 
 function handleDiscard() {
   attachments.value = [];
   newEmail.value = null;
+  quotedContent.value = null;
 
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
-  ccEmailsClone.value = [];
   showCC.value = false;
   showBCC.value = false;
 

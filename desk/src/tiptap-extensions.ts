@@ -92,7 +92,7 @@ export const TextEditorUtils: Extension = Extension.create({
       {
         types: ["heading"],
         attributes: {
-         id: {
+          id: {
             default: null,
             parseHTML: (element) => element.getAttribute("id"),
             renderHTML: (attributes) => {
@@ -101,16 +101,6 @@ export const TextEditorUtils: Extension = Extension.create({
               }
               return { id: attributes.id };
             },
-          },
-        },
-      },
-      {
-        types: ["table"],
-            attributes: {
-          "data-type": {
-            default: "tiptap-table",
-            parseHTML: (element) => element.getAttribute("data-type"),
-            renderHTML: () => ({ "data-type": "tiptap-table", "class": "tabular-data" }),
           },
         },
       },
