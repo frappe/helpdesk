@@ -11,7 +11,7 @@
             />
           </template>
         </Breadcrumbs>
-        <TicketSLA />
+        <TicketSLA :custom-badges="customBadges" />
       </div>
     </template>
     <template #right-header>
@@ -89,6 +89,7 @@ import { useShortcut } from "@/composables/shortcuts";
 import { useView } from "@/composables/useView";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation";
 import {
   ActivitiesSymbol,
   CustomizationSymbol,
@@ -98,7 +99,6 @@ import {
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
 import { Breadcrumbs, call, Dropdown, toast } from "frappe-ui";
-import { __ } from "@/translation";
 import {
   computed,
   ComputedRef,
@@ -129,9 +129,9 @@ const router = useRouter();
 const { findView } = useView("HD Ticket");
 const ticketStatusStore = useTicketStatusStore();
 
-const ticket = inject(TicketSymbol);
-const customizations = inject(CustomizationSymbol);
-const activities = inject(ActivitiesSymbol);
+const ticket = inject(TicketSymbol)!;
+const customizations = inject(CustomizationSymbol)!;
+const activities = inject(ActivitiesSymbol)!;
 
 const showSubjectDialog = ref(false);
 
@@ -259,6 +259,8 @@ const customizationCtx = computed(() => ({
   createToast: toast.create,
 }));
 
+const customBadges = ref([]);
+
 // to manage the correct  customization context for actions, happens because of navigation between tickets using buttons
 watchEffect(async () => {
   if (customizations.value?.data) {
@@ -271,6 +273,7 @@ watchEffect(async () => {
       ...defaultActions.value,
       ...(customizations.value?.data?._customActions || []),
     ];
+    customBadges.value = customizations.value?.data?._customBadges || [];
   }
 });
 

@@ -2,8 +2,9 @@
   <!-- Teleport to App Header -->
   <teleport to="#app-header">
     <div
-      class="flex items-center mx-5 md:mr-0 text-p-sm gap-3 text-[14px] mb-[13px]"
+      class="flex items-center justify-between text-[14px] mb-[13px] mx-5 md:mr-0 text-p-sm"
     >
+<<<<<<< HEAD
       <!-- Source -->
       <div class="flex items-center gap-1">
         <p
@@ -68,9 +69,90 @@
             :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
             :class="
               resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'
+=======
+      <div class="flex items-center gap-3">
+        <!-- Source -->
+        <div class="flex items-center gap-1">
+          <p
+            @click="
+              copyToClipboard(
+                ticket.doc.name,
+                `Ticket #${ticket.doc.name} copied to clipboard`
+              )
+>>>>>>> 23ec306e (feat: custom badges in agent portal)
             "
-          />
-        </Tooltip>
+            class="cursor-copy"
+          >
+            #{{ ticket.doc.name }}
+          </p>
+          <!-- Via Email -->
+          <div
+            v-if="!ticket.doc.via_customer_portal"
+            class="text-ink-gray-4 flex items-center"
+          >
+            <span class="text-ink-gray-4 mr-[6px]">via</span>
+            <EmailIcon class="size-4 inline-block mr-1" />
+            <span class="">Email</span>
+          </div>
+          <!-- Via Portal -->
+          <div v-else class="text-ink-gray-4 flex items-center">
+            <span class="text-ink-gray-4 mr-[6px]">via</span>
+            <GlobeIcon class="size-4 inline-block mr-1" />
+            <span class="font-medium">Portal</span>
+          </div>
+        </div>
+        <!-- divider -->
+        <div class="border-l border-outline-gray-2 h-[13px]" />
+        <!-- First Response -->
+        <div class="flex items-center gap-1">
+          <span>First Response</span>
+          <Tooltip
+            :text="dateFormat(firstResponse.date, dateTooltipFormat)"
+            :hover-delay="0.25"
+            :placement="'top'"
+          >
+            <Badge
+              :label="firstResponse.label"
+              variant="subtle"
+              :theme="firstResponse.color"
+            />
+          </Tooltip>
+        </div>
+        <!-- divider -->
+        <div class="border-l border-outline-gray-2 h-[13px]" />
+        <!-- Resolution by -->
+        <div class="flex items-center gap-1">
+          <span>Resolution </span>
+          <Tooltip
+            :text="dateFormat(resolutionBy.date, dateTooltipFormat)"
+            :hover-delay="0.25"
+            :placement="'top'"
+          >
+            <Badge
+              v-if="resolutionBy"
+              :label="resolutionBy.label"
+              variant="subtle"
+              :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
+              :class="
+                resolutionBy.color === 'purple' &&
+                '!text-[#6B46C1] !bg-[#F3E8FF]'
+              "
+            />
+          </Tooltip>
+        </div>
+      </div>
+      <div
+        v-if="_customBadges"
+        class="flex flex-1 items-center gap-2 flex-row-reverse"
+      >
+        <Badge
+          v-for="(badge, index) in _customBadges"
+          :key="index"
+          :theme="badge.theme"
+          :size="badge.size"
+          :variant="badge.variant"
+          :label="badge.label"
+        />
       </div>
     </div>
   </teleport>
@@ -85,10 +167,18 @@ import {
   dateTooltipFormat,
   formatTime,
 } from "@/utils";
-import { Badge, dayjs, Tooltip, dayjsLocal } from "frappe-ui";
+import { Badge, BadgeProps, dayjs, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 
-const ticket = inject(TicketSymbol);
+const ticket = inject(TicketSymbol)!;
+
+const props = defineProps<{
+  customBadges?: BadgeProps[];
+}>();
+
+const _customBadges = computed(() => {
+  return props.customBadges || [];
+});
 
 const firstResponse = computed(() => {
   if (ticket.value?.get?.loading) return { label: "", color: "" };
@@ -181,17 +271,11 @@ function formatTimeShort(date: string, end?: string): string {
   let _date = dayjs(date);
   let duration = dayjs.duration(_date.diff(dayjs(end)));
 
-  let years = duration.years();
-  let months = duration.months();
   let days = duration.days();
   let hours = duration.hours();
   let minutes = duration.minutes();
 
-  if (years > 0) {
-    return `${years}y ${months}mo`;
-  } else if (months > 0) {
-    return `${months}mo ${days}d`;
-  } else if (days > 0) {
+  if (days > 0) {
     return `${days}d ${hours}h`;
   } else if (hours > 0) {
     return `${hours}h ${minutes}m`;
