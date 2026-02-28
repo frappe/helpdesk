@@ -9,6 +9,9 @@
     @apply break-normal max-w-none prose prose-code:break-all prose-code:whitespace-pre-wrap prose-img:border prose-img:rounded-lg prose-sm;
   }
 }
+.tiptap input[placeholder="Add caption"] {
+  display: none !important;
+}
 
 html,
 body {

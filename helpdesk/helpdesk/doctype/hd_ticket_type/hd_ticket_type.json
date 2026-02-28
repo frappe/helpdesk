@@ -10,6 +10,7 @@
  "engine": "InnoDB",
  "field_order": [
   "is_system",
+  "disabled",
   "description",
   "priority"
  ],
@@ -32,10 +33,16 @@
    "fieldtype": "Check",
    "label": "System",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
   }
  ],
  "links": [],
- "modified": "2026-02-02 17:29:45.978849",
+ "modified": "2026-02-24 09:05:55.809201",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Type",

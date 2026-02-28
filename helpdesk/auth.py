@@ -25,6 +25,9 @@ ALLOWED_PATHS = [
     "/api/method/frappe.www.login.login_via_salesforce",
     "/api/method/frappe.www.login.login_via_fairlogin",
     "/api/method/frappe.www.login.login_via_keycloak",
+    "/api/method/frappe.www.login.send_login_link",
+    "/api/method/frappe.www.login.login_via_token",
+    "/api/method/frappe.www.login.login_via_key",
     "/api/method/frappe.www.login.custom",
     "/api/method/frappe.integrations.oauth2_logins.login_via_frappe",
     "/api/method/frappe.integrations.oauth2_logins.login_via_office365",
@@ -55,6 +58,7 @@ ALLOWED_PATHS = [
     "/api/method/frappe.core.doctype.user.user.reset_password",
     "/api/method/frappe.desk.form.load.getdoctype",
     "/api/method/run_doc_method",
+    "/api/method/frappe.desk.reportview.export_query",
 ]
 
 WILDCARD_PATHS = [

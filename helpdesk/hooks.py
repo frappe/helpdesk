@@ -7,6 +7,7 @@ app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
 required_apps = ["telephony"]
+require_type_annotated_api_methods = True
 
 add_to_apps_screen = [
     {
@@ -17,6 +18,8 @@ add_to_apps_screen = [
         "has_permission": "helpdesk.api.permission.has_app_permission",
     }
 ]
+
+get_site_info = "helpdesk.activation.get_site_info"
 
 after_install = "helpdesk.setup.install.after_install"
 after_migrate = [

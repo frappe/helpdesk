@@ -71,12 +71,12 @@ import { dayjs } from "@/dayjs";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
 import { Badge, FeatherIcon, toast, Tooltip, usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { __ } from "@/translation";
 
 const router = useRouter();
 const route = useRoute();
@@ -92,7 +92,7 @@ const {
 } = useView("HD Ticket");
 
 const { $dialog, $socket } = globalStore();
-const { isManager } = useAuthStore();
+const { isManager, userId } = useAuthStore();
 
 const listViewRef = ref(null);
 const showExportModal = ref(false);
@@ -114,6 +114,19 @@ const selectBannerActions = [
 const options = {
   doctype: "HD Ticket",
   columnConfig: {
+    subject: {
+      custom: ({ row, item }) => {
+        const seenBy = row._seen ? JSON.parse(row._seen) : [];
+        const isSeen = seenBy.includes(userId || "");
+        return h(
+          "span",
+          {
+            class: ["truncate flex-1", !isSeen && "font-semibold"],
+          },
+          item
+        );
+      },
+    },
     status: {
       custom: ({ item }) => {
         const status = getStatus(item);

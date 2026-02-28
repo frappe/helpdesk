@@ -72,9 +72,8 @@ export const FieldAutocomplete = createSuggestionExtension<FieldItem>({
   component: FieldAutocompleteList,
 });
 
-export const TextEditorUtils: Extension = Extension.create({
-  name: "textEditorUtils",
-
+export const ComponentUtils: Extension = Extension.create({
+  name: "ComponentUtils",
   addGlobalAttributes() {
     return [
       {
@@ -89,7 +88,7 @@ export const TextEditorUtils: Extension = Extension.create({
           },
         },
       },
-      {
+           {
         types: ["heading"],
         attributes: {
           id: {
@@ -104,6 +103,60 @@ export const TextEditorUtils: Extension = Extension.create({
           },
         },
       },
+            {
+        types: ["paragraph"],
+        attributes: {
+          class: {
+            default: null,
+            parseHTML: (element) => element.getAttribute('class'),
+            renderHTML: (attributes) => {
+              if (!attributes.class) return {}
+              return { class: attributes.class }
+            },
+          },
+        },
+      },
+    ];
+  },
+});
+
+// Handle pasting from excel properly
+export const HandleExcelPaste = Extension.create({
+  name: "handleExcelPaste",
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("handleExcelPaste"),
+        props: {
+          handlePaste(view, event) {
+            const clipboardData = event.clipboardData;
+            if (!clipboardData) return false;
+
+            const types = Array.from(clipboardData.types);
+            const hasFile = types.includes("Files");
+            const hasHtml = types.includes("text/html");
+            const hasText = types.includes("text/plain");
+            const hasRtf = types.includes("text/rtf")
+
+
+            if (hasFile && hasHtml && hasText && hasRtf) {
+              event.preventDefault()
+              const html = clipboardData.getData("text/html");
+              const text = clipboardData.getData("text/plain");
+
+              if (html) {
+                view.pasteHTML(html);
+              } else {
+                view.pasteText(text);
+              }
+              return true;
+            }
+
+            return false;
+          },
+        },
+      }),
     ];
   },
 });
