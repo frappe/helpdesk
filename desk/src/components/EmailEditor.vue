@@ -74,6 +74,7 @@
         contenteditable="true"
         class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm max-h-[150px] overflow-y-auto"
         v-html="quotedContent"
+        @input="onQuotedInput"
       />
 
       <!-- Attachments -->
@@ -257,7 +258,9 @@ const quotedContent = ref<string | null>(null);
 
 const isDisabled = computed(() => {
   return (
-    isContentEmpty(newEmail.value) || sendMail.loading || isUploading.value
+    isContentEmpty(newEmail.value && quotedContent.value) ||
+    sendMail.loading ||
+    isUploading.value
   );
 });
 
@@ -319,7 +322,7 @@ const sendMail = createResource({
 });
 
 function submitMail() {
-  if (isContentEmpty(newEmail.value)) {
+  if (isContentEmpty(newEmail.value && quotedContent.value)) {
     return false;
   }
   if (!toEmailsClone.value.length) {
@@ -330,6 +333,15 @@ function submitMail() {
   }
 
   sendMail.submit();
+}
+
+function onQuotedInput() {
+  const content = quotedContentRef.value?.innerHTML;
+  if (!content || isContentEmpty(content)) {
+    quotedContent.value = null;
+  } else {
+    quotedContent.value = content;
+  }
 }
 
 function toggleCC() {
