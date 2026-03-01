@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-22 10:40+0000\n"
-"PO-Revision-Date: 2026-02-27 17:48\n"
+"PO-Revision-Date: 2026-03-01 18:12\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -1954,7 +1954,7 @@ msgstr "От требуется"
 #: desk/src/pages/ticket/Tickets.vue:189 desk/src/pages/ticket/Tickets.vue:220
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Fulfilled"
-msgstr "Выполнено"
+msgstr "Ответили"
 
 #: desk/src/components/Settings/General/General.vue:6
 #: desk/src/components/layouts/Sidebar.vue:487
