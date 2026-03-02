@@ -410,7 +410,7 @@ const options = computed(() => {
       },
     },
     emptyState: {
-      title: "No Articles Found",
+      title: "No articles found",
       icon: h(LucideBookOpen, {
         class: "h-10 w-10",
       }),

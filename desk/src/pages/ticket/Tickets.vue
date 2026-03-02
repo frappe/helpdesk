@@ -151,7 +151,7 @@ const options = {
   showSelectBanner: true,
   selectBannerActions,
   emptyState: {
-    title: __("No Tickets Found"),
+    title: __("No tickets found"),
     icon: h(TicketIcon, {
       class: "h-10 w-10",
     }),

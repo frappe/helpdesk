@@ -71,7 +71,7 @@ const options = computed(() => {
       },
     },
     emptyState: {
-      title: "No Contacts Found",
+      title: "No contacts found",
       icon: h(LucideContact2, {
         class: "h-10 w-10",
       }),
