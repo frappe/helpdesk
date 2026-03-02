@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-15 10:41+0000\n"
-"PO-Revision-Date: 2026-02-17 13:44\n"
+"POT-Creation-Date: 2026-02-22 10:40+0000\n"
+"PO-Revision-Date: 2026-02-25 17:28\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Chinese Simplified\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,10 @@ msgstr "SLA达成率"
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
 msgstr "在SLA时限内解决的工单创建百分比"
+
+#: desk/src/pages/SearchAgent.vue:120
+msgid "({0}s)"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
 msgid "- Default Ticket Status<br>"
@@ -386,7 +390,7 @@ msgstr "已存档"
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
 msgstr "是否确认切换标签页？未保存的更改将会丢失。"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:295
+#: desk/src/pages/ticket/TicketCustomer.vue:293
 msgid "Are you sure you want to close this ticket?"
 msgstr ""
 
@@ -958,7 +962,7 @@ msgstr "点击'添加至假期'，系统将填充所选周休日期的假期表�
 msgid "Close"
 msgstr "关闭"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:294
+#: desk/src/pages/ticket/TicketCustomer.vue:292
 msgid "Close Ticket"
 msgstr ""
 
@@ -967,7 +971,7 @@ msgstr ""
 msgid "Closed"
 msgstr "已关闭"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:335
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:336
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "非客服人员无法更新已关闭或已评分工单"
 
@@ -1045,7 +1049,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:310
 #: desk/src/pages/knowledge-base/NewArticle.vue:149
 #: desk/src/pages/ticket/MobileTicketAgent.vue:180
-#: desk/src/pages/ticket/TicketCustomer.vue:298
+#: desk/src/pages/ticket/TicketCustomer.vue:296
 #: desk/src/pages/ticket/Tickets.vue:418 desk/src/pages/ticket/Tickets.vue:453
 msgid "Confirm"
 msgstr "确认"
@@ -1120,15 +1124,15 @@ msgstr ""
 msgid "Copy ticket id"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:631
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:632
 msgid "Could not an email due to: {0}"
 msgstr "无法发送邮件，原因：{0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:789
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:790
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "无法发送确认邮件，原因：{0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:174
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:173
 msgid "Could not send feedback email,due to: {0}"
 msgstr "无法发送反馈邮件，原因：{0}"
 
@@ -1824,7 +1828,7 @@ msgstr "反馈评分"
 msgid "Feedback Trend"
 msgstr "反馈趋势"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:172
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:171
 msgid "Feedback email has been sent to the customer"
 msgstr "反馈邮件已发送至客户"
 
@@ -1980,7 +1984,7 @@ msgstr "无法更改通用类别名称"
 msgid "Global"
 msgstr ""
 
-#: desk/src/components/command-palette/CP.vue:90
+#: desk/src/components/command-palette/CP.vue:89
 msgid "Go to Ticket #{0}"
 msgstr ""
 
@@ -2497,7 +2501,7 @@ msgstr ""
 msgid "John Doe"
 msgstr "张三"
 
-#: desk/src/components/command-palette/CP.vue:115
+#: desk/src/components/command-palette/CP.vue:114
 msgid "Jump to"
 msgstr ""
 
@@ -2516,7 +2520,7 @@ msgstr "键盘快捷键"
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
-#: desk/src/components/command-palette/CP.vue:105
+#: desk/src/components/command-palette/CP.vue:104
 #: desk/src/pages/knowledge-base/Article.vue:432
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:6
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:434
@@ -3160,7 +3164,7 @@ msgstr ""
 msgid "Owner"
 msgstr "制单人"
 
-#: helpdesk/api/settings/field_dependency.py:59
+#: helpdesk/api/settings/field_dependency.py:47
 msgid "Parent field, child field, and parent-child mapping are required."
 msgstr "必须填写父字段、子字段及父子映射关系。"
 
@@ -3933,7 +3937,7 @@ msgstr "脚本"
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:25
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:40
 #: desk/src/components/Settings/Teams/TeamsList.vue:25
-#: desk/src/components/command-palette/CP.vue:122
+#: desk/src/components/command-palette/CP.vue:121
 #: desk/src/components/layouts/Sidebar.vue:12 desk/src/pages/SearchAgent.vue:7
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Search"
@@ -3953,7 +3957,7 @@ msgstr "搜索评分"
 msgid "Search Term Param Name"
 msgstr "搜索字词Param Name"
 
-#: desk/src/components/command-palette/CP.vue:127
+#: desk/src/components/command-palette/CP.vue:126
 msgid "Search for \"{0}\""
 msgstr ""
 
@@ -3961,11 +3965,11 @@ msgstr ""
 msgid "Search index does not exist. Please build the index first."
 msgstr ""
 
-#: helpdesk/api/search.py:38
+#: helpdesk/api/search.py:41
 msgid "Search index not available. Please contact administrator."
 msgstr "搜索索引不可用。请联系管理员。"
 
-#: helpdesk/api/search.py:15
+#: helpdesk/api/search.py:17
 msgid "Search query must be at least 2 characters"
 msgstr "搜索查询必须至少2个字符"
 
@@ -4607,7 +4611,7 @@ msgstr "星期四"
 msgid "Ticket"
 msgstr "工单"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:776
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:777
 msgid "Ticket #{0}: We've received your request"
 msgstr ""
 
@@ -4683,7 +4687,7 @@ msgstr "工单趋势"
 msgid "Ticket Type"
 msgstr "工单类型"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:306
+#: desk/src/pages/ticket/TicketCustomer.vue:304
 msgid "Ticket closed"
 msgstr ""
 
@@ -4691,11 +4695,11 @@ msgstr ""
 msgid "Ticket does not exist."
 msgstr "工单不存在。"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:325
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
 msgid "Ticket must be resolved with a feedback"
 msgstr "工单必须附带反馈才能解决"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:151
+#: desk/src/pages/ticket/TicketCustomer.vue:149
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:62
 msgid "Ticket not found"
 msgstr "工单未找到"
@@ -4725,7 +4729,7 @@ msgid "Ticket type"
 msgstr "工单类型"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:498
-#: desk/src/pages/ticket/TicketCustomer.vue:279
+#: desk/src/pages/ticket/TicketCustomer.vue:277
 msgid "Ticket updated"
 msgstr ""
 
@@ -4734,11 +4738,11 @@ msgstr ""
 msgid "Ticket-Search Analysis"
 msgstr "工单搜索分析"
 
-#: desk/src/components/command-palette/CP.vue:99
+#: desk/src/components/command-palette/CP.vue:98
 #: desk/src/components/ticket-agent/TicketHeader.vue:164
 #: desk/src/pages/SearchAgent.vue:351
 #: desk/src/pages/ticket/MobileTicketAgent.vue:329
-#: desk/src/pages/ticket/TicketCustomer.vue:335
+#: desk/src/pages/ticket/TicketCustomer.vue:333
 #: desk/src/pages/ticket/TicketNew.vue:307 desk/src/pages/ticket/Tickets.vue:6
 #: desk/src/pages/ticket/Tickets.vue:587 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
@@ -4761,7 +4765,7 @@ msgstr "按团队统计工单"
 msgid "Tickets by Type"
 msgstr "按类型统计工单"
 
-#: helpdesk/api/ticket.py:18
+#: helpdesk/api/ticket.py:16
 msgid "Tickets can only be assigned to agents"
 msgstr "工单仅可分配给客服人员"
 
@@ -4893,7 +4897,7 @@ msgstr ""
 msgid "URL/Method"
 msgstr "URL/方法"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:612
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:613
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr ""
 
@@ -5136,7 +5140,7 @@ msgstr "您无权查看此仪表板数据。"
 msgid "You are not permitted to access this resource."
 msgstr "您无权访问此资源"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:534
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:535
 msgid "You are not permitted to add a comment"
 msgstr "您无权添加评论"
 
@@ -5260,5 +5264,9 @@ msgstr "同义词"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:423
 msgid "viewed this"
+msgstr ""
+
+#: desk/src/pages/SearchAgent.vue:117
+msgid "{0} matches"
 msgstr ""
 
