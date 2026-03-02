@@ -212,11 +212,17 @@ function formatTimeShort(date: string, end?: string): string {
   let _date = dayjs(date);
   let duration = dayjs.duration(_date.diff(dayjs(end)));
 
+  let years = duration.years();
+  let months = duration.months();
   let days = duration.days();
   let hours = duration.hours();
   let minutes = duration.minutes();
 
-  if (days > 0) {
+  if (years > 0) {
+    return `${years}y ${months}mo`;
+  } else if (months > 0) {
+    return `${months}mo ${days}d`;
+  } else if (days > 0) {
     return `${days}d ${hours}h`;
   } else if (hours > 0) {
     return `${hours}h ${minutes}m`;
