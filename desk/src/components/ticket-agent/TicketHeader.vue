@@ -2,15 +2,23 @@
   <LayoutHeader>
     <template #left-header>
       <div class="flex flex-col truncate">
-        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
-          <template #prefix="{ item }">
-            <Icon
-              v-if="item.icon"
-              :icon="item.icon"
-              class="mr-1 h-4 flex items-center justify-center self-center"
-            />
-          </template>
-        </Breadcrumbs>
+        <div class="flex gap-1 items-center">
+          <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
+            <template #prefix="{ item }">
+              <Icon
+                v-if="item.icon"
+                :icon="item.icon"
+                class="mr-1 h-4 flex items-center justify-center self-center"
+              />
+            </template>
+          </Breadcrumbs>
+          <Tooltip
+            v-if="ticket.doc.is_first_ticket"
+            :text="'First ticket raised by ' + ticket.doc.raised_by"
+          >
+            <Badge label="First Ticket" theme="blue" />
+          </Tooltip>
+        </div>
         <TicketSLA :custom-badges="customBadges" />
       </div>
     </template>
@@ -98,7 +106,15 @@ import {
 } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
-import { Breadcrumbs, call, Dropdown, toast } from "frappe-ui";
+import {
+  Badge,
+  BadgeProps,
+  Breadcrumbs,
+  call,
+  Dropdown,
+  toast,
+  Tooltip,
+} from "frappe-ui";
 import {
   computed,
   ComputedRef,
@@ -259,9 +275,9 @@ const customizationCtx = computed(() => ({
   createToast: toast.create,
 }));
 
-const customBadges = ref([]);
+const customBadges = ref<BadgeProps[]>([]);
 
-// to manage the correct  customization context for actions, happens because of navigation between tickets using buttons
+// to manage the correct customization context for actions, happens because of navigation between tickets using buttons
 watchEffect(async () => {
   if (customizations.value?.data) {
     await setupCustomizations(
