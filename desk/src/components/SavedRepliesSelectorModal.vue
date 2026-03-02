@@ -201,7 +201,7 @@ const selectedTemplate = ref({
 });
 
 const scope = computed(() => {
-  return filters.value.find((f) => f.label === activeFilter.value)?.value;
+  return filters.value.find((f) => f.value === activeFilter.value)?.value;
 });
 
 const savedReplyListResource = createListResource({
