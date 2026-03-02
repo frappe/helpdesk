@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-22 10:40+0000\n"
-"PO-Revision-Date: 2026-03-01 18:12\n"
+"PO-Revision-Date: 2026-03-02 18:20\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -1234,7 +1234,7 @@ msgstr "Опасность"
 #: desk/src/pages/dashboard/Dashboard.vue:6
 #: desk/src/pages/dashboard/Dashboard.vue:396
 msgid "Dashboard"
-msgstr "Панель инструментов"
+msgstr "Дашборд"
 
 #. Label of the holiday_date (Date) field in DocType 'HD Holiday'
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
@@ -2605,7 +2605,7 @@ msgstr "Узнать об условиях"
 
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:19
 msgid "Learn more about SLA"
-msgstr "Узнайте больше о соглашении об SLA"
+msgstr "Узнайте больше о SLA"
 
 #. Description of the 'Apply outside working hours' (Check) field in DocType
 #. 'HD Settings'
@@ -2693,7 +2693,7 @@ msgstr "Сделать Приватным"
 
 #: desk/src/pages/ticket/Tickets.vue:399
 msgid "Make Public"
-msgstr "Сделать Публичным"
+msgstr "Сделать общим"
 
 #: desk/src/components/ticket/ActivityHeader.vue:118
 msgid "Make a Call"
@@ -3427,12 +3427,12 @@ msgstr "Профиль обновлен"
 #. Label of the public (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Public"
-msgstr "Общественность"
+msgstr "Общий"
 
 #: desk/src/components/layouts/Sidebar.vue:270
 #: desk/src/pages/ticket/Tickets.vue:324
 msgid "Public Views"
-msgstr "Публичный просмотр"
+msgstr "Общий просмотр"
 
 #: desk/src/pages/knowledge-base/Article.vue:14
 msgid "Publish"
