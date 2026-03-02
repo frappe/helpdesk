@@ -59,6 +59,7 @@
   "via_customer_portal",
   "attachment",
   "content_type",
+  "is_first_ticket",
   "split_and_merge_section",
   "is_merged",
   "merged_with",
@@ -463,13 +464,21 @@
    "label": "Ticket raised outside working hours",
    "read_only": 1,
    "set_only_once": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_first_ticket",
+   "fieldtype": "Check",
+   "label": "Is First Ticket",
+   "read_only": 1,
+   "set_only_once": 1
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-02-27 16:42:43.292656",
+ "modified": "2026-03-02 10:46:41.999513",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
