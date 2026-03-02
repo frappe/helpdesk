@@ -1,11 +1,11 @@
 <template>
-  <div
+  <article
     ref="scrollableDiv"
     :style="`maskImage: ${maskStyle}`"
     @scroll="updateMaskStyle"
   >
     <slot></slot>
-  </div>
+  </article>
 </template>
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
