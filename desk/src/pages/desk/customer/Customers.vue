@@ -84,7 +84,7 @@ const options = computed(() => {
     },
 
     emptyState: {
-      title: "No Customers Found",
+      title: "No customers found",
       icon: h(OrganizationsIcon, {
         class: "h-10 w-10",
       }),
