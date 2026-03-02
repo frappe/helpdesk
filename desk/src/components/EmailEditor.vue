@@ -68,15 +68,13 @@
 
     <template #bottom>
       <!-- Quoted Reply Content -->
-      <div
-        v-if="quotedContent"
-        ref="quotedContentRef"
-        contenteditable="true"
-        class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm max-h-[150px] overflow-y-auto"
-        v-html="quotedContent"
-        @input="onQuotedInput"
-      />
-
+    <div
+  v-if="quotedContent"
+  ref="quotedContentRef"
+  contenteditable="true"
+  class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm max-h-[150px] overflow-y-auto"
+  @input="onQuotedInput"
+/>
       <!-- Attachments -->
       <div class="flex flex-wrap gap-2 px-10">
         <AttachmentItem
@@ -335,13 +333,20 @@ function submitMail() {
   sendMail.submit();
 }
 
-function onQuotedInput() {
-  const content = quotedContentRef.value?.innerHTML;
-  if (!content || isContentEmpty(content)) {
-    quotedContent.value = null;
-  } else {
-    quotedContent.value = content;
+watch(quotedContent, (newVal, oldVal) => {
+  if (!oldVal && newVal) {
+    nextTick(() => {
+      if (quotedContentRef.value) {
+        quotedContentRef.value.innerHTML = newVal
+      }
+    })
   }
+})
+
+function onQuotedInput() {
+  const el = quotedContentRef.value
+  if (!el) return
+  quotedContent.value = el.innerHTML || null
 }
 
 function toggleCC() {
