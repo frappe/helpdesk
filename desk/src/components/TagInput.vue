@@ -25,7 +25,7 @@
           ref="inputRef"
           v-model="query"
           autocomplete="off"
-          class="flex-1 min-w-20 bg-transparent p-0 outline-none border-0 text-base text-ink-gray-8 h-7 placeholder:text-ink-gray-4 focus:outline-none focus:ring-0 focus:border-0"
+          class="flex-1 min-w-20 bg-transparent p-0 outline-none border-0 text-base text-ink-gray-8 h-7 placeholder:text-ink-gray-4 focus:outline-none focus:ring-0 focus:border-0 ml-1"
           :placeholder="values?.length ? '' : placeholder"
           @keydown.enter.prevent="commit"
           @keydown.space.prevent="commit"
@@ -70,24 +70,27 @@ const props = withDefaults(
 );
 
 const values = defineModel<string[]>({ default: () => [] });
-
-const inputRef = ref<HTMLInputElement | null>(null);
-const pillRefs = ref<Array<{ rootRef: HTMLElement }>>([]);
 const query = ref("");
+
+const pillRefs = ref<Array<{ rootRef: HTMLElement }>>([]);
+const inputRef = ref<HTMLInputElement | null>(null);
 const error = ref<string | null>(null);
 
 function commit() {
   const tag = query.value.trim().replace(/,$/, "").trim();
   if (!tag) return;
   error.value = null;
-  if (props.validate && !props.validate(tag)) {
-    error.value = props.errorMessage(tag);
-    return;
-  }
+  validateTag(tag);
   if (!values.value.includes(tag)) {
     values.value = [...values.value, tag];
   }
   query.value = "";
+}
+function validateTag(tag: string) {
+  if (props.validate && !props.validate(tag)) {
+    error.value = props.errorMessage(tag);
+    throw new Error(error.value);
+  }
 }
 
 function removeTag(tag: string) {
@@ -118,14 +121,19 @@ function removeFocusedPill(tag: string) {
 }
 
 function onPaste(e: ClipboardEvent) {
+  error.value = null;
+  query.value = "";
   const text = e.clipboardData?.getData("text") ?? "";
   const parts = text
     .split(/[\s,]+/)
     .map((p) => p.trim())
     .filter(Boolean);
-  const unique = parts.filter((p) => !values.value.includes(p));
-  if (unique.length) {
-    values.value = [...values.value, ...unique];
+  const unique = new Set(parts.filter((p) => !values.value.includes(p)));
+  if (unique.size) {
+    unique.forEach((tag) => {
+      validateTag(tag);
+    });
+    values.value = [...values.value, ...Array.from(unique)];
   }
   query.value = "";
 }

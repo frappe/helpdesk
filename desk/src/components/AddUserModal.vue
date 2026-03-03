@@ -43,7 +43,11 @@
         :validate="validateEmailWithZod"
         v-model="newUsers"
         :label="__('Invite by email')"
-        :description="__('Separate multiple addresses by pressing Enter')"
+        :description="
+          __(
+            'Separate multiple addresses by pressing Enter or by pasting a comma-separated list of emails.'
+          )
+        "
         :error-message="(input:string)=> `${input} ${__('is not a valid email address.')}` "
       />
 
@@ -128,7 +132,7 @@ const infoText = computed<string>(() => {
       )
     : props.inviteNew
     ? __(
-        "Invite new contacts to Helpdesk by adding their email addresses. Assign them a role to grant access with their current credentials."
+        "Invite new contacts to Helpdesk by adding their email addresses. Assign them a role to define their level of access."
       )
     : __(
         "Add existing contacts as system users for this customer. Assign them a role to define their level of access."
