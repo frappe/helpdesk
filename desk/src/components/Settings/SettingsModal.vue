@@ -15,7 +15,7 @@
             {{ __("My settings") }}
           </h1>
           <div v-for="tab in tabs">
-            <div v-if="!tab.noborder" class="border-t mx-2 my-2.5"></div>
+            <div v-if="!tab.noborder" class="mx-2 my-2.5"></div>
 
             <div
               v-if="!tab.hideLabel"
