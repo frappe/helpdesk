@@ -51,7 +51,7 @@
     :for-agents="false"
     :invite-new="inviteNewUsers"
     @addedExisting="handleAddExistingContacts"
-    @invited="handleInviteContacts"
+    @invited="handleInviteUsers"
   />
   <PendingInvitesModal
     v-if="Boolean(customer.getPendingInvites?.data?.length)"
@@ -125,10 +125,10 @@ const inviteByEmailResource = createResource({
   url: "frappe.core.api.user_invitation.invite_by_email",
 });
 
-function handleInviteContacts(data: { contacts: string; role: string }) {
+function handleInviteUsers(data: { users: string; role: string }) {
   inviteByEmailResource.submit(
     {
-      emails: data.contacts,
+      emails: data.users,
       roles: [data.role],
       redirect_to_path: "/helpdesk",
       app_name: "helpdesk",

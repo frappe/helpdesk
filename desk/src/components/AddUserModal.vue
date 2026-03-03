@@ -36,15 +36,15 @@
           "
         />
       </div>
-      <FormControl
+      <TagInput
         v-else
-        focus
-        type="textarea"
-        :required="true"
-        :label="__('Invite by email')"
-        placeholder="user1@example.com, user2@example.com, ..."
+        ref="tagInput"
+        :placeholder="__('user1@example.com, user2@example.com...')"
+        :validate="validateEmailWithZod"
         v-model="newUsers"
-        :description="__('Comma separated emails to invite')"
+        :label="__('Invite by email')"
+        :description="__('Separate multiple addresses by pressing Enter')"
+        :error-message="(input:string)=> `${input} ${__('is not a valid email address.')}` "
       />
 
       <FormControl
@@ -63,7 +63,11 @@
           :label="inviteNew ? __('Invite') : __('Add')"
           @click="handleInviteUser()"
           :loading="loading"
-          :disabled="inviteNew ? !newUsers.length : !selectedContacts.length"
+          :disabled="
+            inviteNew
+              ? !newUsers.length || tagInput?.hasError
+              : !selectedContacts.length
+          "
         />
       </div>
     </template>
@@ -77,6 +81,7 @@ import { validateEmailWithZod } from "@/utils";
 import { Button, Dialog, FormControl, toast } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import EmailMultiSelect from "./EmailMultiSelect.vue";
+import TagInput from "./TagInput.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -95,7 +100,7 @@ const props = withDefaults(
 // define emits with type
 const emit = defineEmits<{
   (e: "addedExisting", data: { contacts: string[]; role: string }): void;
-  (e: "invited", data: { contacts: string; role: string }): void;
+  (e: "invited", data: { users: string; role: string }): void;
 }>();
 
 const show = defineModel<boolean>({ default: false });
@@ -103,12 +108,17 @@ const show = defineModel<boolean>({ default: false });
 const { isManager } = useAuthStore();
 
 const emailMultiSelect = ref<{ setFocus: () => void } | null>(null);
+const tagInput = ref<{ setFocus: () => void; hasError: boolean } | null>(null);
 const selectedContacts = ref<string[]>([]);
-const newUsers = ref<string>("");
+const newUsers = ref<string[]>([]);
 const role = ref(props.forAgents ? "Agent" : "HD Customer");
 
 watch(show, (val) => {
-  if (val) setTimeout(() => emailMultiSelect.value?.setFocus(), 100);
+  if (val)
+    setTimeout(() => {
+      if (props.inviteNew) tagInput.value?.setFocus();
+      else emailMultiSelect.value?.setFocus();
+    }, 100);
 });
 
 const infoText = computed<string>(() => {
@@ -121,7 +131,7 @@ const infoText = computed<string>(() => {
         "Invite new contacts to Helpdesk by adding their email addresses. Assign them a role to grant access with their current credentials."
       )
     : __(
-        "Add existing system users as contacts for this customer. Assign them a role to define their level of access."
+        "Add existing contacts as system users for this customer. Assign them a role to define their level of access."
       );
 });
 
@@ -166,27 +176,12 @@ function handleInviteUser() {
   selectedContacts.value = [];
 }
 function inviteNewUsers() {
-  const emails = validateAndParseEmails();
-  emit("invited", { contacts: emails, role: role.value });
-  newUsers.value = "";
-}
-function validateAndParseEmails() {
-  if (newUsers.value.trim() === "") {
+  if (!newUsers.value.length) {
     toast.error(__("At least one email required"));
-    throw new Error("At least one email required");
+    return;
   }
-  const emails = newUsers.value
-    .split(",")
-    .map((email) => email.trim())
-    .filter(Boolean);
-
-  for (const email of emails) {
-    if (!validateEmailWithZod(email)) {
-      toast.error(__("Invalid email: {0}", [email]));
-      throw new Error(`Invalid email: ${email}`);
-    }
-  }
-  return emails.join(",");
+  emit("invited", { users: newUsers.value.join(","), role: role.value });
+  newUsers.value = [];
 }
 
 function addExistingContacts() {
@@ -196,7 +191,7 @@ function addExistingContacts() {
 function handleDialogClose() {
   show.value = false;
   if (props.inviteNew) {
-    newUsers.value = "";
+    newUsers.value = [];
   } else {
     selectedContacts.value = [];
   }
