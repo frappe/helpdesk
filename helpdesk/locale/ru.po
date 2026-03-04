@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-22 10:40+0000\n"
-"PO-Revision-Date: 2026-03-02 18:20\n"
+"PO-Revision-Date: 2026-03-04 18:54\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -3531,7 +3531,7 @@ msgstr "Реакции"
 #. Label of the read (Check) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Read"
-msgstr "Читать"
+msgstr "Прочитано"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:107
 #: desk/src/components/Settings/Telephony/Telephony.vue:182
@@ -3983,7 +3983,7 @@ msgstr "Поиск по заявкам, комментариям и сообще
 
 #: desk/src/components/command-palette/CP.vue:12
 msgid "Search tickets, emails, comments, or #234 to navigate to ticket"
-msgstr "Для перехода к заявке воспользуйтесь поиском по заявкам, электронным письмам, комментариям или заявкой #234."
+msgstr "Поиск тикетов, email, комментов или #234 для перехода к тикету"
 
 #: desk/src/pages/SearchAgent.vue:137
 msgid "Searched for:"
