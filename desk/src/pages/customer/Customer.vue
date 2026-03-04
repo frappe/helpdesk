@@ -32,7 +32,6 @@
           <div class="p-5">
             <div v-if="tab.label === __('Tickets')">
               <!-- Tickets tab content -->
-              {{ tab.label }}
               <CustomerTicketsTab />
             </div>
             <CustomerContactTab v-if="tab.label === __('Contacts')" />
