@@ -267,7 +267,7 @@ const quotedContent = ref<string | null>(null);
 
 const isDisabled = computed(() => {
   return (
-    isContentEmpty(newEmail.value && quotedContent.value) ||
+    (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
     sendMail.loading ||
     isUploading.value
   );
@@ -331,7 +331,7 @@ const sendMail = createResource({
 });
 
 function submitMail() {
-  if (isContentEmpty(newEmail.value && quotedContent.value)) {
+  if (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) {
     return false;
   }
   if (!toEmailsClone.value.length) {
