@@ -13,6 +13,7 @@
     @change="editable ? (newEmail = $event) : null"
     :extensions="[ComponentUtils, HandleExcelPaste]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    @keydown="handleKeydown"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
@@ -195,7 +196,14 @@ import {
   toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 
 const editorRef = ref(null);
@@ -407,6 +415,62 @@ function handleDiscard() {
   showBCC.value = false;
 
   emit("discard");
+}
+
+function selectAllBoth() {
+  const editorDom = editorRef.value?.editor?.view?.dom as
+    | HTMLElement
+    | undefined;
+  const quotedEl = quotedContentRef.value;
+  const sel = window.getSelection();
+  if (!sel || !editorDom) return;
+  sel.removeAllRanges();
+  const range = document.createRange();
+  if (quotedEl) {
+    range.setStartBefore(editorDom);
+    range.setEndAfter(quotedEl);
+  } else {
+    range.selectNodeContents(editorDom);
+  }
+  sel.addRange(range);
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  const key = e.key.toLowerCase();
+  if ((e.metaKey || e.ctrlKey) && key === "a") {
+    const active = document.activeElement;
+    const editorDom = editorRef.value?.editor?.view?.dom as
+      | HTMLElement
+      | undefined;
+    if (
+      (editorDom && editorDom.contains(active)) ||
+      (quotedContentRef.value && quotedContentRef.value.contains(active))
+    ) {
+      e.preventDefault();
+      selectAllBoth();
+    }
+  }
+
+  if (key === "backspace" || key === "delete") {
+    const sel = window.getSelection();
+    const quotedEl = quotedContentRef.value;
+    if (sel && !sel.isCollapsed && quotedEl) {
+      try {
+        const range = sel.getRangeAt(0);
+        if (range.intersectsNode(quotedEl)) {
+          e.preventDefault();
+          // clear the tiptap editor
+          editorRef.value?.editor?.commands?.clearContent();
+          newEmail.value = null;
+          // clear quoted section
+          quotedContent.value = null;
+          sel.removeAllRanges();
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+  }
 }
 
 const editor = computed(() => {
