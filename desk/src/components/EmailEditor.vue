@@ -444,25 +444,26 @@ function handleSelectAll(e: KeyboardEvent) {
 function handleDelete(e: KeyboardEvent) {
   const sel = window.getSelection();
   const quotedEl = quotedContentRef.value;
+  const editorDom = editorRef.value?.editor?.view?.dom as
+    | HTMLElement
+    | undefined;
 
-  if (!sel || sel.isCollapsed || !quotedEl) return;
+  if (!sel || sel.isCollapsed || !quotedEl || !editorDom) return;
 
-  try {
-    const range = sel.getRangeAt(0);
-    if (range.intersectsNode(quotedEl)) {
-      e.preventDefault();
+  const range = sel.getRangeAt(0);
 
-      //clean tiptap editor content
-      editorRef.value?.editor?.commands?.clearContent();
+  const isSelectingEntireEditor = sel.containsNode(editorDom, true);
 
-      //clean up quoted content and selection
-      newEmail.value = null;
-      quotedContent.value = null;
+  const isSelectingEntireQuote = sel.containsNode(quotedEl, true);
 
-      sel.removeAllRanges();
-    }
-  } catch (err) {
-    console.warn(err);
+  if (isSelectingEntireEditor && isSelectingEntireQuote) {
+    e.preventDefault();
+
+    editorRef.value?.editor?.commands?.clearContent();
+    newEmail.value = null;
+    quotedContent.value = null;
+
+    sel.removeAllRanges();
   }
 }
 
