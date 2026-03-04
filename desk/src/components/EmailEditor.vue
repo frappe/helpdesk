@@ -13,7 +13,7 @@
     @change="editable ? (newEmail = $event) : null"
     :extensions="[ComponentUtils, HandleExcelPaste]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
-    @keydown="handleKeydown"
+    @keydown.capture.stop="handleKeydown"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
@@ -417,15 +417,21 @@ function handleDiscard() {
   emit("discard");
 }
 
-function selectAllBoth() {
+function handleSelectAll(e: KeyboardEvent) {
+  const active = document.activeElement;
   const editorDom = editorRef.value?.editor?.view?.dom as
     | HTMLElement
     | undefined;
   const quotedEl = quotedContentRef.value;
   const sel = window.getSelection();
   if (!sel || !editorDom) return;
+  if (!editorDom.contains(active) && !(quotedEl && quotedEl.contains(active))) {
+    return;
+  }
+  e.preventDefault();
   sel.removeAllRanges();
   const range = document.createRange();
+
   if (quotedEl) {
     range.setStartBefore(editorDom);
     range.setEndAfter(quotedEl);
@@ -435,41 +441,42 @@ function selectAllBoth() {
   sel.addRange(range);
 }
 
+function handleDelete(e: KeyboardEvent) {
+  const sel = window.getSelection();
+  const quotedEl = quotedContentRef.value;
+
+  if (!sel || sel.isCollapsed || !quotedEl) return;
+
+  try {
+    const range = sel.getRangeAt(0);
+    if (range.intersectsNode(quotedEl)) {
+      e.preventDefault();
+
+      //clean tiptap editor content
+      editorRef.value?.editor?.commands?.clearContent();
+
+      //clean up quoted content and selection
+      newEmail.value = null;
+      quotedContent.value = null;
+
+      sel.removeAllRanges();
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+}
+
 function handleKeydown(e: KeyboardEvent) {
   const key = e.key.toLowerCase();
+
   if ((e.metaKey || e.ctrlKey) && key === "a") {
-    const active = document.activeElement;
-    const editorDom = editorRef.value?.editor?.view?.dom as
-      | HTMLElement
-      | undefined;
-    if (
-      (editorDom && editorDom.contains(active)) ||
-      (quotedContentRef.value && quotedContentRef.value.contains(active))
-    ) {
-      e.preventDefault();
-      selectAllBoth();
-    }
+    handleSelectAll(e);
+    return;
   }
 
   if (key === "backspace" || key === "delete") {
-    const sel = window.getSelection();
-    const quotedEl = quotedContentRef.value;
-    if (sel && !sel.isCollapsed && quotedEl) {
-      try {
-        const range = sel.getRangeAt(0);
-        if (range.intersectsNode(quotedEl)) {
-          e.preventDefault();
-          // clear the tiptap editor
-          editorRef.value?.editor?.commands?.clearContent();
-          newEmail.value = null;
-          // clear quoted section
-          quotedContent.value = null;
-          sel.removeAllRanges();
-        }
-      } catch (e) {
-        console.warn(e);
-      }
-    }
+    handleDelete(e);
+    return;
   }
 }
 
