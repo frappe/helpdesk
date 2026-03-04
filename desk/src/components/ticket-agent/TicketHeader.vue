@@ -273,6 +273,7 @@ const customizationCtx = computed(() => ({
   $dialog: globalStore().$dialog,
   updateField,
   createToast: toast.create,
+  applyFilters: () => {},
 }));
 
 const customBadges = ref<BadgeProps[]>([]);

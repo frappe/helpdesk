@@ -28,6 +28,7 @@
               :doctype="field.doctype"
               :modelValue="field.value"
               :required="field.required"
+              :filters="field.filters"
               @update:model-value="
               (val:string) => handleFieldUpdate(field.fieldname, val,true)
             "
@@ -98,7 +99,7 @@ const { $dialog } = globalStore();
 const fieldOverrides = reactive<Record<string, Record<string, any>>>({});
 const snapshotsCache = new Map<
   string,
-  { options: string; link_filters: string }
+  { fieldname: string; options: string; link_filters: string }
 >();
 
 const applyFilters = (
@@ -107,16 +108,18 @@ const applyFilters = (
 ): void => {
   const fieldMeta = getField(fieldname);
   if (!fieldMeta) return;
+  const fieldCopy = { ...fieldMeta };
 
   const snapshot = snapshotsCache.get(fieldname);
   const oldFieldData = snapshot || {
-    options: fieldMeta.options || "",
-    link_filters: fieldMeta.link_filters || "",
+    fieldname,
+    options: fieldCopy.options || "",
+    link_filters: fieldCopy.link_filters || "",
   };
 
-  if (fieldMeta.fieldtype === "Select") {
+  if (fieldCopy.fieldtype === "Select") {
     handleSelectFieldUpdate(
-      fieldMeta,
+      fieldCopy,
       fieldname,
       filters,
       ticket.value.doc,
@@ -124,12 +127,12 @@ const applyFilters = (
       false // shouldReset: false for edit mode
     );
     fieldOverrides[fieldname] = {
-      options: fieldMeta.options,
+      options: fieldCopy.options,
       disabled: !filters?.length,
     };
-  } else if (fieldMeta.fieldtype === "Link") {
+  } else if (fieldCopy.fieldtype === "Link") {
     handleLinkFieldUpdate(
-      fieldMeta,
+      fieldCopy,
       fieldname,
       filters,
       ticket.value.doc,
@@ -137,7 +140,7 @@ const applyFilters = (
       false // shouldReset: false for edit mode
     );
     fieldOverrides[fieldname] = {
-      link_filters: fieldMeta.link_filters,
+      link_filters: fieldCopy.link_filters,
       disabled: !filters?.length,
     };
   }
@@ -159,14 +162,19 @@ const customizationCtx = computed(() => ({
   applyFilters,
 }));
 
+const localCustomizationData = ref<Record<string, any> | null>(null);
+
 watchEffect(async () => {
   if (!customizations.value?.data || !ticket.value?.doc) return;
 
-  await setupCustomizations(customizations.value.data, customizationCtx.value);
+  localCustomizationData.value = { ...customizations.value.data };
 
-  const onChangeHandlers =
-    ticket.value.doc._customOnChange ||
-    customizations.value.data._customOnChange;
+  await setupCustomizations(
+    localCustomizationData.value,
+    customizationCtx.value
+  );
+
+  const onChangeHandlers = localCustomizationData.value?._customOnChange;
   if (!onChangeHandlers) return;
 
   Object.entries(onChangeHandlers).forEach(([fieldname, handlers]) => {
@@ -179,9 +187,7 @@ watchEffect(async () => {
 });
 
 const customOnChange = computed(
-  () =>
-    ticket.value?.doc?._customOnChange ||
-    customizations.value?.data?._customOnChange
+  () => localCustomizationData.value?._customOnChange
 );
 
 // ticket_type, priority, customer, agent_group
@@ -201,12 +207,33 @@ const coreFields = computed(() => {
     section.fields = section.fields.map((f) => {
       f = parseField(f, ticket.value.doc);
 
+      if (!snapshotsCache.has(f.fieldname)) {
+        snapshotsCache.set(f.fieldname, {
+          fieldname: f.fieldname,
+          options: f.options || "",
+          link_filters: f.link_filters || "",
+        });
+      }
+
       // cant handle required depends on as we directly set the value in DB on change
       f["required"] = f.reqd;
       f["ref"] = f.fieldname;
 
       f = getFieldInFormat(f, f);
       f["visible"] = true;
+
+      // Apply fieldOverrides from applyFilters (field dependency)
+      const overrides = fieldOverrides[f.fieldname];
+      if (overrides) {
+        f = {
+          ...f,
+          ...overrides,
+          filters: overrides.link_filters
+            ? JSON.parse(overrides.link_filters)
+            : f.filters,
+        };
+      }
+
       return f;
     });
   });
@@ -233,7 +260,12 @@ const customFields = computed(() => {
     (f) => !_coreFields.includes(f.fieldname)
   );
 
-  snapshotsCache.clear();
+  // Only clear non-core snapshots so core field snapshots persist
+  for (const key of snapshotsCache.keys()) {
+    if (!_coreFields.includes(key)) {
+      snapshotsCache.delete(key);
+    }
+  }
 
   return customFieldsList
     .map((f) => {
@@ -241,6 +273,7 @@ const customFields = computed(() => {
       if (!fieldMeta) return null;
 
       snapshotsCache.set(f.fieldname, {
+        fieldname: f.fieldname,
         options: fieldMeta.options || "",
         link_filters: fieldMeta.link_filters || "",
       });

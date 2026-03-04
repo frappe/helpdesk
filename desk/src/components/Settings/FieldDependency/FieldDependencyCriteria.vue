@@ -7,7 +7,7 @@
     <div class="flex flex-col gap-4 w-full pb-2">
       <!-- Ticket View Criteria Switch -->
       <div class="flex gap-3 items-center">
-        <Switch v-model="fieldCriteriaState.ticket_view.enabled" />
+        <Switch v-model="state.applyOnTicketView" />
         <span class="text-sm text-ink-gray-5">
           {{ __("Apply on Ticket View") }}
         </span>
@@ -82,7 +82,6 @@ const props = defineProps<{
 const fieldCriteriaState = defineModel<{
   display: { enabled: boolean; value: Record<"label" | "value", string>[] };
   mandatory: { enabled: boolean; value: Record<"label" | "value", string>[] };
-  ticket_view: { enabled: boolean };
 }>();
 const state = defineModel("selections") as any;
 

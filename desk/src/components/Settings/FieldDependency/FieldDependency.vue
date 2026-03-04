@@ -29,6 +29,7 @@
             variant="solid"
             size="sm"
             :disabled="
+              !isDirty ||
               !state.selectedParentField ||
               !state.selectedChildField ||
               Object.keys(state.childSelections).length === 0
@@ -85,7 +86,7 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
 import { createResource, Switch, toast } from "frappe-ui";
-import { computed, onUnmounted, reactive, ref, watch } from "vue";
+import { computed, nextTick, onUnmounted, reactive, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
 import FieldDependencyCriteria from "./FieldDependencyCriteria.vue";
@@ -141,12 +142,17 @@ let state = reactive({
 
   currentParentSelection: "",
 
-  childSelections: {}, // Initial value is a Set
-  initialChildSelections: {},
+  childSelections: {}, // values are Sets
   parentSearch: "",
   childSearch: "",
 
   enabled: true,
+
+  // standalone ticket-view toggle (no longer inside fieldCriteriaState)
+  applyOnTicketView: false,
+
+  // baseline snapshot for dirty-state detection (captured after load/save)
+  initialSnapshot: "",
 });
 
 let fieldCriteriaState = reactive({
@@ -157,9 +163,6 @@ let fieldCriteriaState = reactive({
   mandatory: {
     enabled: true,
     value: [{ label: "Any", value: "Any" }],
-  },
-  ticket_view: {
-    enabled: false,
   },
 });
 
@@ -172,7 +175,7 @@ const createUpdateFieldDependency = createResource({
     parent_child_mapping: stringifyParentChildMapping(),
     enabled: state.enabled,
     fields_criteria: JSON.stringify(fieldCriteriaState),
-    apply_on_ticket_view: fieldCriteriaState.ticket_view?.enabled ? 1 : 0,
+    apply_on_ticket_view: state.applyOnTicketView ? 1 : 0,
   }),
   onSuccess: () => {
     if (!isNew.value) {
@@ -192,38 +195,34 @@ const fieldDependency = createResource({
   onSuccess: (data) => {
     state.selectedParentField = data.parent_field;
     state.selectedChildField = data.child_field;
-    state.enabled = data.enabled;
+    state.enabled = Boolean(data.enabled);
     parseMapping(data.parent_child_mapping);
     parseFieldCriteria(data.fields_criteria);
-    // Sync apply_on_ticket_view if present
-    if (
-      typeof data.apply_on_ticket_view !== "undefined" &&
-      fieldCriteriaState.ticket_view
-    ) {
-      fieldCriteriaState.ticket_view.enabled = Boolean(
-        data.apply_on_ticket_view
-      );
-    }
+    // Sync standalone ticket-view toggle
+    state.applyOnTicketView = Boolean(data.apply_on_ticket_view);
+
+    nextTick(() => {
+      state.initialSnapshot = getStateSnapshot();
+    });
   },
 });
-function parseMapping(data: string) {
-  const mapping = JSON.parse(data || "{}");
+function parseMapping(data: string | object) {
+  const mapping =
+    typeof data === "string" ? JSON.parse(data || "{}") : data || {};
   let selections = {};
   Object.keys(mapping).forEach((parent) => {
     selections[parent] = new Set(mapping[parent]);
   });
   state.childSelections = selections;
 
-  // for checking dirty state
-  state.initialChildSelections = structuredClone(selections);
-
   if (!state.currentParentSelection) {
     state.currentParentSelection = Object.keys(mapping)[0] || "";
   }
 }
 
-function parseFieldCriteria(data: string) {
-  const criteria = JSON.parse(data || "{}");
+function parseFieldCriteria(data: string | object) {
+  const criteria =
+    typeof data === "string" ? JSON.parse(data || "{}") : data || {};
   fieldCriteriaState.display = criteria.display || {
     enabled: true,
     value: [{ label: "Any", value: "Any" }],
@@ -232,20 +231,23 @@ function parseFieldCriteria(data: string) {
     enabled: true,
     value: [{ label: "Any", value: "Any" }],
   };
-  fieldCriteriaState.ticket_view = criteria.ticket_view || { enabled: false };
+}
+
+function getStateSnapshot() {
+  return JSON.stringify({
+    enabled: state.enabled,
+    applyOnTicketView: state.applyOnTicketView,
+    childSelections: stringifyParentChildMapping(),
+    fieldCriteria: fieldCriteriaState,
+  });
 }
 
 const isDirty = computed(() => {
   if (isNew.value) {
     return state.enabled !== true || state.selectedParentField !== "";
   }
-  if (fieldDependency.loading) return false;
-  return (
-    Boolean(fieldDependency.data?.enabled) !== Boolean(state.enabled) ||
-    stringifyParentChildMapping(state.childSelections) !==
-      stringifyParentChildMapping(state.initialChildSelections) ||
-    JSON.stringify(fieldCriteriaState) !== fieldDependency.data?.fields_criteria
-  );
+  if (fieldDependency.loading || !state.initialSnapshot) return false;
+  return getStateSnapshot() !== state.initialSnapshot;
 });
 
 watch(

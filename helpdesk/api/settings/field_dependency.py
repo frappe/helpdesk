@@ -41,7 +41,7 @@ def create_update_field_dependency(
     parent_child_mapping: str,
     enabled: bool,
     fields_criteria: str,
-    apply_on_ticket_view=0,
+    apply_on_ticket_view: int = 0,
 ):
     frappe.has_permission("HD Form Script", "create", throw=True)
     if not parent_field or not child_field or not parent_child_mapping:
