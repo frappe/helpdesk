@@ -2,10 +2,8 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-full mx-6 md:mx-10 max-h-[50vh] py-3',
-      'min-h-[7rem]',
+      'prose-sm max-w-full mx-6 md:mx-10 py-3',
       getFontFamily(newEmail),
-      editable && '!max-h-[35vh] overflow-y-auto',
       '[&_p.reply-to-content]:hidden',
     ]"
     :content="newEmail"
@@ -66,15 +64,19 @@
       </div>
     </template>
 
+    <template #editor>
+      <div class="overflow-y-auto min-h-[7rem] max-h-[30vh]">
+        <EditorContent :editor="editor" />
+        <div
+          v-if="quotedContent"
+          ref="quotedContentRef"
+          contenteditable="true"
+          class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
+          @input="onQuotedInput"
+        />
+      </div>
+    </template>
     <template #bottom>
-      <!-- Quoted Reply Content -->
-    <div
-  v-if="quotedContent"
-  ref="quotedContentRef"
-  contenteditable="true"
-  class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm max-h-[150px] overflow-y-auto"
-  @input="onQuotedInput"
-/>
       <!-- Attachments -->
       <div class="flex flex-wrap gap-2 px-10">
         <AttachmentItem
@@ -171,6 +173,7 @@ import {
   MultiSelectInput,
   SavedRepliesSelectorModal,
 } from "@/components";
+import { Editor, EditorContent } from "@tiptap/vue-3";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
@@ -337,16 +340,16 @@ watch(quotedContent, (newVal, oldVal) => {
   if (!oldVal && newVal) {
     nextTick(() => {
       if (quotedContentRef.value) {
-        quotedContentRef.value.innerHTML = newVal
+        quotedContentRef.value.innerHTML = newVal;
       }
-    })
+    });
   }
-})
+});
 
 function onQuotedInput() {
-  const el = quotedContentRef.value
-  if (!el) return
-  quotedContent.value = el.innerHTML || null
+  const el = quotedContentRef.value;
+  if (!el) return;
+  quotedContent.value = el.innerHTML || null;
 }
 
 function toggleCC() {
