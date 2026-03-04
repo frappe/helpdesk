@@ -4,13 +4,21 @@
       <p class="mt-2.5 mb-4.5 font-semibold text-lg">{{ __("Contacts") }}</p>
       <div class="flex items-center gap-1">
         <Button
-          :label="pendingInvitesLabel"
           v-if="pendingInvitesLabel"
           variant="ghost"
           @click="showPendingInvites = true"
-        />
+        >
+          <div class="flex items-center gap-2">
+            <LucideTriangleAlert class="h-4 w-4" />
+            <span>{{ pendingInvitesLabel }}</span>
+          </div>
+        </Button>
         <Dropdown :options="headerOptions" placement="right">
-          <Button :label="__('New')" variant="subtle" v-if="hasPermission()">
+          <Button
+            :label="__('New')"
+            :variant="customer.getContacts?.data?.length ? 'subtle' : 'solid'"
+            v-if="hasPermission()"
+          >
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>
@@ -25,13 +33,13 @@
     <!-- Empty state -->
     <div
       v-else-if="!customer.getContacts?.data?.length"
-      class="flex flex-col items-center justify-center gap-3 py-16 text-center"
+      class="flex flex-col items-center justify-center gap-3 py-16 text-center h-full flex-1"
     >
       <LucideUserX class="h-10 w-10 text-ink-gray-4" />
       <div>
         <!-- make font larger -->
         <p class="text-lg font-medium text-ink-gray-7">
-          {{ __("No contacts found") }}
+          {{ __("No contacts found.") }}
         </p>
       </div>
     </div>
@@ -54,7 +62,6 @@
     @invited="handleInviteUsers"
   />
   <PendingInvitesModal
-    v-if="Boolean(customer.getPendingInvites?.data?.length)"
     v-model="showPendingInvites"
     :pending-invites="customer.getPendingInvites?.data || []"
     @invites-updated="customer.getPendingInvites?.fetch()"
@@ -73,6 +80,7 @@ import {
   toast,
 } from "frappe-ui";
 import { computed, inject, onMounted, ref } from "vue";
+import LucideTriangleAlert from "~icons/lucide/triangle-alert";
 import LucideUserX from "~icons/lucide/user-x";
 import AddUserModal from "../AddUserModal.vue";
 import { agents } from "../Settings/agents";

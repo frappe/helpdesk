@@ -29,7 +29,7 @@
           :placeholder="values?.length ? '' : placeholder"
           @keydown.enter.prevent="commit"
           @keydown.space.prevent="commit"
-          @keydown.188.prevent="commit"
+          @keydown.,.prevent="commit"
           @keydown.delete="removeLastTag"
           @blur="commit"
           @input="error = null"

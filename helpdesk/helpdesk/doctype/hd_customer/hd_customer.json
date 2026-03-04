@@ -10,6 +10,8 @@
   "image",
   "customer_name",
   "domain",
+  "website",
+  "country",
   "column_break_fead",
   "primary_contact",
   "email_id",
@@ -82,12 +84,23 @@
    "fieldtype": "Data",
    "label": "Primary Contact",
    "read_only": 1
+  },
+  {
+   "fieldname": "website",
+   "fieldtype": "Data",
+   "label": "Website"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country"
   }
  ],
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-23 14:37:53.288126",
+ "modified": "2026-03-04 12:18:32.424608",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Customer",
@@ -161,7 +174,8 @@
    "report": 1,
    "role": "HD Customer",
    "select": 1,
-   "share": 1
+   "share": 1,
+   "write": 1
   }
  ],
  "row_format": "Dynamic",

@@ -22,7 +22,7 @@
           :text="__('Manager')"
           placement="top"
         >
-          <LucideBriefcase class="h-4 w-4 text-ink-gray-6" />
+          <LucideBriefcaseBusiness class="h-4 w-4 text-ink-gray-6" />
         </Tooltip>
       </div>
       <Dropdown
@@ -60,14 +60,13 @@
 </template>
 
 <script setup lang="ts">
-import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { CustomerContact, CustomerResourceSymbol } from "@/types";
 import { HDCustomerMember } from "@/types/doctypes";
 import { getErrorMessage, hasPermission } from "@/utils";
 import { Avatar, Badge, Button, Dropdown, Tooltip, dayjs } from "frappe-ui";
 import { computed, inject, markRaw } from "vue";
-import LucideBriefcase from "~icons/lucide/briefcase";
+import LucideBriefcaseBusiness from "~icons/lucide/briefcase-business";
 import LucideMail from "~icons/lucide/mail";
 import LucideMoreHorizontal from "~icons/lucide/more-horizontal";
 import LucidePhone from "~icons/lucide/phone";
@@ -78,7 +77,6 @@ const props = defineProps<{
   contact: CustomerContact;
 }>();
 const emit = defineEmits(["update"]);
-const { $dialog } = globalStore();
 const customer = inject(CustomerResourceSymbol)!;
 
 const ticketCountLabel = computed(() => {
@@ -140,7 +138,7 @@ const dropdownOptions = computed(() => {
   } else {
     options.push({
       label: __("Set as Manager"),
-      icon: "briefcase",
+      icon: markRaw(LucideBriefcaseBusiness),
       onClick: () => {
         /* TODO: set as manager action */
         updateManagerRole(1);
