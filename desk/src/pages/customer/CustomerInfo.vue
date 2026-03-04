@@ -36,11 +36,8 @@
       </div>
     </Button>
   </div>
-  <!-- TODO: refactor this dialog -->
-  <CustomerDialog
-    v-if="customerDialog"
+  <EditCustomerDialog
     v-model="customerDialog"
-    :name="customer.doc.customer_name"
     @update="customerDialog = false"
   />
 </template>
@@ -53,10 +50,10 @@ import { Avatar, Button } from "frappe-ui";
 import { computed, inject, markRaw, ref } from "vue";
 import LucideGlobe from "~icons/lucide/globe";
 import LucideMail from "~icons/lucide/mail";
+import LucideMapPin from "~icons/lucide/map-pin";
 import LucidePhone from "~icons/lucide/phone";
 import LucideSquarePen from "~icons/lucide/square-pen";
-import LucideSquareUser from "~icons/lucide/square-user";
-import CustomerDialog from "./CustomerDialog.vue";
+import EditCustomerDialog from "./EditCustomerDialog.vue";
 
 const customer = inject(CustomerResourceSymbol)!;
 
@@ -80,11 +77,9 @@ const customerInfo = computed(() => [
     condition: !!customer.doc.mobile_no,
   },
   {
-    icon: markRaw(LucideSquareUser),
-    value: `${customer.doc.contacts?.length ?? 0} ${
-      customer.doc.contacts?.length === 1 ? __("contact") : __("contacts")
-    }`,
-    condition: true,
+    icon: markRaw(LucideMapPin),
+    value: customer.doc.country,
+    condition: !!customer.doc.country,
   },
 ]);
 </script>

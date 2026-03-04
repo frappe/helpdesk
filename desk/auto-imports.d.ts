@@ -8,6 +8,7 @@ export {}
 declare global {
   const LucideAlignJustify: typeof import('~icons/lucide/align-justify')['default']
   const LucideFileSearch: typeof import('~icons/lucide/file-search')['default']
+  const LucideGlobe: typeof import('~icons/lucide/globe')['default']
   const LucideKeyboard: typeof import('~icons/lucide/keyboard')['default']
   const LucideMail: typeof import('~icons/lucide/mail')['default']
   const LucidePhone: typeof import('~icons/lucide/phone')['default']

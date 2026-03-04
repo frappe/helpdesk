@@ -39,13 +39,13 @@
       <TagInput
         v-else
         ref="tagInput"
-        :placeholder="__('user1@example.com, user2@example.com...')"
+        :placeholder="__('Enter emails, comma separated ')"
         :validate="validateEmailWithZod"
         v-model="newUsers"
         :label="__('Invite by email')"
         :description="
           __(
-            'Separate multiple addresses by pressing Enter or by pasting a comma-separated list of emails.'
+            'Type an email and press Enter or comma to add it. You can also paste a comma-separated list.'
           )
         "
         :error-message="(input:string)=> `${input} ${__('is not a valid email address.')}` "

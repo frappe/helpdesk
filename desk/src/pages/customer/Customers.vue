@@ -23,18 +23,13 @@
       @row-click="openCustomer"
       @empty-state-action="isDialogVisible = true"
     />
-    <NewCustomerDialog
-      v-model="isDialogVisible"
-      @customer-created="handleCustomer"
-    />
+    <NewCustomerDialog v-model="isDialogVisible" />
   </div>
 </template>
 <script setup lang="ts">
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
-import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
-import { OrganizationsIcon } from "@/components/icons";
-import { __ } from "@/translation";
+import NewCustomerDialog from "@/components/customer/NewCustomerDialog.vue";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -56,13 +51,6 @@ function openCustomer(id: string) {
   // selectedCustomer.value = id;
   // isCustomerDialogVisible.value = true;
 }
-function handleCustomer(updated = false) {
-  updated
-    ? (isCustomerDialogVisible.value = false)
-    : (isDialogVisible.value = false);
-  listViewRef.value?.reload();
-}
-
 const options = computed(() => {
   return {
     doctype: "HD Customer",

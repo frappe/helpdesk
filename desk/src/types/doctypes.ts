@@ -341,4 +341,8 @@ export interface HDCustomer extends DocType {
   email_id?: string;
   /** Primary Contact: Data */
   primary_contact?: string;
+  /** Country: Link (Country) */
+  country?: string;
+  /** Website: Data */
+  website?: string;
 }

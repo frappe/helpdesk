@@ -42,6 +42,11 @@ class HDCustomer(Document):
     def validate_contacts(self):
         if len(self.contacts) == 0:
             return
+
+        if len(self.contacts) == 1:
+            # make the first contact primary if there is only one contact
+            self.contacts[0].is_primary = True
+
         primary_contacts = [contact for contact in self.contacts if contact.is_primary]
         if len(primary_contacts) == 0:
             frappe.throw(_("At least one primary contact is required"))
@@ -177,10 +182,8 @@ class HDCustomer(Document):
 
     @frappe.whitelist()
     def update_contacts(self, contacts: str, role: str):
-        if (
-            "System Manager" not in frappe.get_roles()
-            and "HD Agent Manager" not in frappe.get_roles()
-        ):
+        roles = frappe.get_roles()
+        if "System Manager" not in roles or "Agent Manager" not in roles:
             frappe.throw(_("You do not have permission to update contacts"))
         try:
             contacts = frappe.parse_json(contacts)
