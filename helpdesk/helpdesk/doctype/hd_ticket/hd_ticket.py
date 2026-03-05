@@ -1168,10 +1168,8 @@ class HDTicket(Document):
                 tag["embed"] = tag.get("src")
                 tag["width"] = "80%"
                 tag["height"] = "80%"
-                del tag["src"]
             elif tag.name == "video":
                 tag["embed"] = tag.get("src")
-                del tag["src"]
 
         return str(soup)
 
