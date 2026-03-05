@@ -196,13 +196,7 @@ import {
   toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  ref,
-  watch,
-} from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 
 const editorRef = ref(null);
