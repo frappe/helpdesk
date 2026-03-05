@@ -407,13 +407,14 @@ function resetState() {
   newEmail.value = null;
   attachments.value = [];
   quotedContent.value = null;
+  quotedNewEmail.value = null;
 }
 
 function handleDiscard() {
   attachments.value = [];
   newEmail.value = null;
   quotedContent.value = null;
-
+  quotedNewEmail.value = null;
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
   showCC.value = false;
@@ -459,8 +460,6 @@ function handleDelete(e: KeyboardEvent) {
     | undefined;
 
   if (!sel || sel.isCollapsed || !quotedEl || !editorDom) return;
-
-  const range = sel.getRangeAt(0);
 
   const isSelectingEntireEditor = sel.containsNode(editorDom, true);
 
