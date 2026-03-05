@@ -196,7 +196,14 @@ import {
   toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 
 const editorRef = ref(null);
@@ -246,6 +253,10 @@ const emit = defineEmits(["submit", "discard"]);
 
 const newEmail = useStorage<null | string>(
   "emailBoxContent" + props.ticketId,
+  null
+);
+const quotedNewEmail = useStorage<null | string>(
+  "quotedEmailBoxContent" + props.ticketId,
   null
 );
 const { updateOnboardingStep } = useOnboarding("helpdesk");
@@ -338,7 +349,7 @@ function submitMail() {
 }
 
 watch(quotedContent, (newVal, oldVal) => {
-  if (!oldVal && newVal) {
+  if (newVal && newVal !== oldVal) {
     nextTick(() => {
       if (quotedContentRef.value) {
         quotedContentRef.value.innerHTML = newVal;
@@ -386,6 +397,7 @@ function addToReply(
   bccEmailsClone.value = bccEmails;
   quotedContent.value = `${body}`;
   editorRef.value.editor.chain().clearContent().focus("start").run();
+  quotedNewEmail.value = quotedContent.value;
   nextTick(() => {
     newEmail.value = editorRef.value.editor.getHTML();
   });
@@ -410,6 +422,11 @@ function handleDiscard() {
   emit("discard");
 }
 
+onMounted(() => {
+  if (quotedNewEmail.value) {
+    quotedContent.value = quotedNewEmail.value;
+  }
+});
 function handleSelectAll(e: KeyboardEvent) {
   const active = document.activeElement;
   const editorDom = editorRef.value?.editor?.view?.dom as
