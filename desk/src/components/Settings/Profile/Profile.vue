@@ -91,8 +91,14 @@
           <Button
             :label="__('Save')"
             @click="onSave"
-            :loading="setAgent.loading || saveLanguageResource.loading"
-            :disabled="!isAccountInfoDirty && !isLanguageChanged"
+            :loading="
+              setAgent.loading ||
+              saveLanguageResource.loading ||
+              saveTimezoneResource.loading
+            "
+            :disabled="
+              !isAccountInfoDirty && !isLanguageChanged && !isTimezoneChanged
+            "
           />
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
@@ -158,6 +164,23 @@
             class="w-40"
           />
         </div>
+        <div class="flex items-center justify-between mt-6">
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-medium text-ink-gray-8">
+              {{ __("Timezone") }}
+            </span>
+            <span class="text-p-sm text-ink-gray-6">{{
+              __("Change timezone of the application.")
+            }}</span>
+          </div>
+          <Autocomplete
+            :options="timezoneOptions"
+            :model-value="timezone"
+            @update:modelValue="timezone = $event?.value"
+            placeholder="Select Timezone"
+            class="w-40"
+          />
+        </div>
       </div>
     </template>
   </SettingsLayoutBase>
@@ -179,6 +202,7 @@ import {
   LoadingIndicator,
   toast,
 } from "frappe-ui";
+import { Autocomplete } from "@/components";
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
 import CameraIcon from "~icons/lucide/camera";
@@ -199,9 +223,15 @@ const profile = ref({
 });
 const showChangePasswordModal = ref(false);
 const language = ref(auth.language);
+const timezone = ref(auth.timezone);
+const timezoneOptions = ref([]);
 
 const isLanguageChanged = computed(() => {
   return language.value !== auth?.language;
+});
+
+const isTimezoneChanged = computed(() => {
+  return timezone.value !== auth?.timezone;
 });
 
 const isAccountInfoDirty = computed(() => {
@@ -237,6 +267,17 @@ const agentData = createResource({
       availabilityStatus: data.availability_status,
       signature: data.signature,
     };
+  },
+});
+
+const timezoneData = createResource({
+  url: "frappe.core.doctype.user.user.get_timezones",
+  auto: true,
+  onSuccess(data) {
+    timezoneOptions.value = data.timezones.map((tz: any) => ({
+      label: tz,
+      value: tz,
+    }));
   },
 });
 
@@ -279,7 +320,28 @@ const saveLanguageResource = createResource({
   },
   onSuccess() {
     toast.success(__("Language updated"));
-    window.location.reload();
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 500);
+  },
+});
+
+const saveTimezoneResource = createResource({
+  url: "frappe.client.set_value",
+  makeParams() {
+    return {
+      doctype: "User",
+      name: auth.userId,
+      fieldname: {
+        time_zone: timezone.value,
+      },
+    };
+  },
+  onSuccess() {
+    toast.success(__("Timezone updated"));
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 500);
   },
 });
 
@@ -290,6 +352,10 @@ const onSave = () => {
 
   if (isLanguageChanged.value) {
     saveLanguageResource.submit();
+  }
+
+  if (isTimezoneChanged.value) {
+    saveTimezoneResource.submit();
   }
 };
 

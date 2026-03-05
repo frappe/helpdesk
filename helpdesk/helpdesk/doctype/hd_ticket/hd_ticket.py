@@ -104,6 +104,9 @@ class HDTicket(Document):
             self.raised_outside_working_hours = (
                 self.is_currently_outside_working_hours()
             )
+            self.is_first_ticket = (
+                frappe.db.count("HD Ticket", {"raised_by": self.raised_by}) == 0
+            )
 
     def _get_rendered_template(
         self, content: str, default_content: str, args: dict[str, str] | None = None

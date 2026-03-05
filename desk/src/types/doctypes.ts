@@ -113,6 +113,7 @@ export interface HDTicket extends DocType {
   status_category?: string;
   /** Ticket raised outside working hours: Check */
   raised_outside_working_hours: 0 | 1;
+  is_first_ticket: 0 | 1;
 }
 
 // Last updated: 2024-03-23 16:01:27.847608
@@ -246,6 +247,7 @@ export interface HDServiceLevelAgreement extends DocType {
 }
 
 // Last updated: 2026-02-09 22:08:22.055831
+// Last updated: 2026-02-02 11:15:47.402850
 export interface HDAgent extends DocType {
   /** User: Link (User) */
   user: string;
