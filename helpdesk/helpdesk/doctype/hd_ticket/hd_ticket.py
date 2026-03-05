@@ -655,7 +655,7 @@ class HDTicket(Document):
         if self.instantly_send_email():
             send_delayed = False
             send_now = True
-        print("\n\n", message, "\n\n")
+
         try:
             frappe.sendmail(
                 attachments=_attachments,
