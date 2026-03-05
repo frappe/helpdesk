@@ -626,3 +626,31 @@ export function getErrorMessage(
   }
   return msg;
 }
+const emailsToStr = (emails: readonly string[]) => emails.join(", ");
+
+export function handleInviteUserSuccess(
+  data: Record<
+    | "disabled_user_emails"
+    | "accepted_invite_emails"
+    | "pending_invite_emails"
+    | "invited_emails",
+    string[]
+  >
+) {
+  let emailsStr = emailsToStr(data.invited_emails);
+  if (emailsStr.trim() !== "") {
+    toast.success(`${emailsStr} invited successfully`);
+  }
+  emailsStr = emailsToStr(data.disabled_user_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already present and disabled`);
+  }
+  emailsStr = emailsToStr(data.pending_invite_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already invited`);
+  }
+  emailsStr = emailsToStr(data.accepted_invite_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already present`);
+  }
+}

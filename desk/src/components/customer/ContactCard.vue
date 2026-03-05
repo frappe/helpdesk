@@ -82,7 +82,7 @@ const customer = inject(CustomerResourceSymbol)!;
 const ticketCountLabel = computed(() => {
   const count = props.contact.ticket_count;
   if (count === 0) return __("No open tickets");
-  return `${count} ${count === 1 ? __("ticket") : __("tickets")}`;
+  return `${count} ${count === 1 ? __("active ticket") : __("active tickets")}`;
 });
 
 function findPrimaryContact(): HDCustomerMember | undefined {
@@ -106,7 +106,7 @@ const contactDetails = computed(() => [
     icon: markRaw(LucideTicket),
     value: ticketCountLabel.value,
     color: (value: string) =>
-      value !== __("No open tickets") ? "!text-amber-700" : "!text-ink-gray-7",
+      value !== __("No open tickets") ? "!text-amber-700" : "!text-ink-gray-4",
     class: (value: string) =>
       value !== __("No open tickets") ? "hover:underline cursor-pointer" : "",
   },

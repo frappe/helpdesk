@@ -71,7 +71,7 @@
 <script setup lang="ts">
 import { __ } from "@/translation";
 import { CustomerResourceSymbol } from "@/types";
-import { hasPermission } from "@/utils";
+import { handleInviteUserSuccess, hasPermission } from "@/utils";
 import {
   Button,
   createResource,
@@ -143,10 +143,18 @@ function handleInviteUsers(data: { users: string; role: string }) {
       custom_customer: customer.doc?.name,
     },
     {
-      onSuccess() {
+      onSuccess(
+        d: Record<
+          | "disabled_user_emails"
+          | "accepted_invite_emails"
+          | "pending_invite_emails"
+          | "invited_emails",
+          string[]
+        >
+      ) {
         showAddContact.value = false;
         reload(false);
-        toast.success(__("Contacts invited successfully"));
+        handleInviteUserSuccess(d);
       },
     }
   );
