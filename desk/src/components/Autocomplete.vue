@@ -13,7 +13,7 @@
                 }
               "
             >
-              <div class="flex items-center">
+              <div class="flex items-center truncate">
                 <slot name="prefix" />
                 <span
                   v-if="selectedValue"

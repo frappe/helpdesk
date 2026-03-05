@@ -59,6 +59,7 @@
   "via_customer_portal",
   "attachment",
   "content_type",
+  "is_first_ticket",
   "split_and_merge_section",
   "is_merged",
   "merged_with",
@@ -86,7 +87,6 @@
   },
   {
    "bold": 1,
-   "depends_on": "eval:doc.__islocal",
    "fieldname": "raised_by",
    "fieldtype": "Data",
    "in_global_search": 1,
@@ -122,6 +122,7 @@
    "fieldname": "ticket_type",
    "fieldtype": "Link",
    "label": "Ticket Type",
+   "link_filters": "[[\"HD Ticket Type\",\"disabled\",\"=\",0]]",
    "options": "HD Ticket Type"
   },
   {
@@ -463,13 +464,21 @@
    "label": "Ticket raised outside working hours",
    "read_only": 1,
    "set_only_once": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_first_ticket",
+   "fieldtype": "Check",
+   "label": "Is First Ticket",
+   "read_only": 1,
+   "set_only_once": 1
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-01-20 15:18:57.195606",
+ "modified": "2026-03-02 10:46:41.999513",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

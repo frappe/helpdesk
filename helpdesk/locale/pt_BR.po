@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-08 10:41+0000\n"
-"PO-Revision-Date: 2026-02-09 07:33\n"
+"POT-Creation-Date: 2026-02-22 10:40+0000\n"
+"PO-Revision-Date: 2026-02-25 17:28\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Portuguese, Brazilian\n"
 "MIME-Version: 1.0\n"
@@ -25,6 +25,10 @@ msgstr ""
 #: helpdesk/api/dashboard.py:186
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
+msgstr ""
+
+#: desk/src/pages/SearchAgent.vue:120
+msgid "({0}s)"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:114
@@ -220,7 +224,7 @@ msgstr ""
 #. Label of the about (Code) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Additional Information"
-msgstr "Informações Adicionais"
+msgstr "Informação Adicional"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -386,7 +390,7 @@ msgstr "Arquivado"
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:295
+#: desk/src/pages/ticket/TicketCustomer.vue:293
 msgid "Are you sure you want to close this ticket?"
 msgstr ""
 
@@ -680,8 +684,8 @@ msgstr ""
 msgid "Avg. time taken to resolve a ticket"
 msgstr ""
 
-#: desk/src/components/Settings/EmailAdd.vue:87
-#: desk/src/components/Settings/EmailEdit.vue:72
+#: desk/src/components/Settings/EmailAdd.vue:143
+#: desk/src/components/Settings/EmailEdit.vue:134
 msgid "Back"
 msgstr ""
 
@@ -958,7 +962,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:294
+#: desk/src/pages/ticket/TicketCustomer.vue:292
 msgid "Close Ticket"
 msgstr ""
 
@@ -967,7 +971,7 @@ msgstr ""
 msgid "Closed"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:335
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:336
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr ""
 
@@ -1045,7 +1049,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:310
 #: desk/src/pages/knowledge-base/NewArticle.vue:149
 #: desk/src/pages/ticket/MobileTicketAgent.vue:180
-#: desk/src/pages/ticket/TicketCustomer.vue:298
+#: desk/src/pages/ticket/TicketCustomer.vue:296
 #: desk/src/pages/ticket/Tickets.vue:418 desk/src/pages/ticket/Tickets.vue:453
 msgid "Confirm"
 msgstr ""
@@ -1120,19 +1124,19 @@ msgstr ""
 msgid "Copy ticket id"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:631
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:632
 msgid "Could not an email due to: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:789
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:790
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:174
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:173
 msgid "Could not send feedback email,due to: {0}"
 msgstr ""
 
-#: desk/src/components/Settings/EmailAdd.vue:94
+#: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
 #: desk/src/components/layouts/Sidebar.vue:503
@@ -1529,6 +1533,11 @@ msgstr ""
 msgid "Edit Call Log"
 msgstr ""
 
+#: desk/src/components/Settings/EmailAdd.vue:70
+#: desk/src/components/Settings/EmailEdit.vue:63
+msgid "Edit Domain"
+msgstr ""
+
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
 msgstr ""
@@ -1586,11 +1595,11 @@ msgstr ""
 msgid "Email Notifications"
 msgstr ""
 
-#: desk/src/components/Settings/EmailAdd.vue:162
+#: desk/src/components/Settings/EmailAdd.vue:306
 msgid "Email account created"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:267
+#: desk/src/components/Settings/EmailEdit.vue:471
 msgid "Email account updated successfully"
 msgstr ""
 
@@ -1604,7 +1613,7 @@ msgstr ""
 msgid "Emails"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:224
+#: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
 msgstr ""
 
@@ -1747,7 +1756,7 @@ msgstr ""
 msgid "Failed"
 msgstr ""
 
-#: desk/src/components/Settings/EmailAdd.vue:167
+#: desk/src/components/Settings/EmailAdd.vue:311
 msgid "Failed to create email account, Invalid credentials"
 msgstr ""
 
@@ -1755,7 +1764,7 @@ msgstr ""
 msgid "Failed to load telephony agent"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:229
+#: desk/src/components/Settings/EmailEdit.vue:422
 msgid "Failed to pull emails"
 msgstr ""
 
@@ -1767,7 +1776,7 @@ msgstr ""
 msgid "Failed to save Twilio settings"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:272
+#: desk/src/components/Settings/EmailEdit.vue:476
 msgid "Failed to update email account, Invalid credentials"
 msgstr ""
 
@@ -1819,7 +1828,7 @@ msgstr ""
 msgid "Feedback Trend"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:172
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:171
 msgid "Feedback email has been sent to the customer"
 msgstr ""
 
@@ -1975,7 +1984,7 @@ msgstr ""
 msgid "Global"
 msgstr ""
 
-#: desk/src/components/command-palette/CP.vue:90
+#: desk/src/components/command-palette/CP.vue:89
 msgid "Go to Ticket #{0}"
 msgstr ""
 
@@ -2492,7 +2501,7 @@ msgstr ""
 msgid "John Doe"
 msgstr ""
 
-#: desk/src/components/command-palette/CP.vue:115
+#: desk/src/components/command-palette/CP.vue:114
 msgid "Jump to"
 msgstr ""
 
@@ -2511,7 +2520,7 @@ msgstr ""
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
-#: desk/src/components/command-palette/CP.vue:105
+#: desk/src/components/command-palette/CP.vue:104
 #: desk/src/pages/knowledge-base/Article.vue:432
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:6
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:434
@@ -2978,7 +2987,7 @@ msgstr ""
 msgid "No assignment rule found"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:184
+#: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
 msgstr ""
 
@@ -3074,7 +3083,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Open"
-msgstr ""
+msgstr "Aberto"
 
 #: desk/src/components/modals/ShortcutsModal.vue:81
 msgid "Open command palette"
@@ -3086,6 +3095,10 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:84
 msgid "Open help"
+msgstr ""
+
+#: desk/src/components/Settings/EmailEdit.vue:37
+msgid "Open in Desk"
 msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:102
@@ -3149,7 +3162,7 @@ msgstr ""
 msgid "Owner"
 msgstr "Proprietário"
 
-#: helpdesk/api/settings/field_dependency.py:59
+#: helpdesk/api/settings/field_dependency.py:47
 msgid "Parent field, child field, and parent-child mapping are required."
 msgstr ""
 
@@ -3438,11 +3451,11 @@ msgstr "Publicado no"
 msgid "Published articles must have content."
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:87
+#: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:214
+#: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
 msgstr ""
 
@@ -3592,7 +3605,7 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Replied"
-msgstr ""
+msgstr "Respondido"
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -3922,7 +3935,7 @@ msgstr "Script"
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:25
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:40
 #: desk/src/components/Settings/Teams/TeamsList.vue:25
-#: desk/src/components/command-palette/CP.vue:122
+#: desk/src/components/command-palette/CP.vue:121
 #: desk/src/components/layouts/Sidebar.vue:12 desk/src/pages/SearchAgent.vue:7
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Search"
@@ -3942,7 +3955,7 @@ msgstr ""
 msgid "Search Term Param Name"
 msgstr ""
 
-#: desk/src/components/command-palette/CP.vue:127
+#: desk/src/components/command-palette/CP.vue:126
 msgid "Search for \"{0}\""
 msgstr ""
 
@@ -3950,11 +3963,11 @@ msgstr ""
 msgid "Search index does not exist. Please build the index first."
 msgstr ""
 
-#: helpdesk/api/search.py:38
+#: helpdesk/api/search.py:41
 msgid "Search index not available. Please contact administrator."
 msgstr ""
 
-#: helpdesk/api/search.py:15
+#: helpdesk/api/search.py:17
 msgid "Search query must be at least 2 characters"
 msgstr ""
 
@@ -4056,6 +4069,10 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
+msgstr ""
+
+#: helpdesk/api/settings/email.py:14
+msgid "Service not supported"
 msgstr ""
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:5
@@ -4590,7 +4607,7 @@ msgstr "Quinta"
 msgid "Ticket"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:776
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:777
 msgid "Ticket #{0}: We've received your request"
 msgstr ""
 
@@ -4666,7 +4683,7 @@ msgstr ""
 msgid "Ticket Type"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:306
+#: desk/src/pages/ticket/TicketCustomer.vue:304
 msgid "Ticket closed"
 msgstr ""
 
@@ -4674,11 +4691,11 @@ msgstr ""
 msgid "Ticket does not exist."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:325
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
 msgid "Ticket must be resolved with a feedback"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:151
+#: desk/src/pages/ticket/TicketCustomer.vue:149
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:62
 msgid "Ticket not found"
 msgstr ""
@@ -4708,7 +4725,7 @@ msgid "Ticket type"
 msgstr ""
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:498
-#: desk/src/pages/ticket/TicketCustomer.vue:279
+#: desk/src/pages/ticket/TicketCustomer.vue:277
 msgid "Ticket updated"
 msgstr ""
 
@@ -4717,11 +4734,11 @@ msgstr ""
 msgid "Ticket-Search Analysis"
 msgstr ""
 
-#: desk/src/components/command-palette/CP.vue:99
+#: desk/src/components/command-palette/CP.vue:98
 #: desk/src/components/ticket-agent/TicketHeader.vue:164
 #: desk/src/pages/SearchAgent.vue:351
 #: desk/src/pages/ticket/MobileTicketAgent.vue:329
-#: desk/src/pages/ticket/TicketCustomer.vue:335
+#: desk/src/pages/ticket/TicketCustomer.vue:333
 #: desk/src/pages/ticket/TicketNew.vue:307 desk/src/pages/ticket/Tickets.vue:6
 #: desk/src/pages/ticket/Tickets.vue:587 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
@@ -4744,7 +4761,7 @@ msgstr ""
 msgid "Tickets by Type"
 msgstr ""
 
-#: helpdesk/api/ticket.py:18
+#: helpdesk/api/ticket.py:16
 msgid "Tickets can only be assigned to agents"
 msgstr ""
 
@@ -4799,7 +4816,7 @@ msgstr ""
 msgid "To is required"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:147
+#: desk/src/components/Settings/EmailEdit.vue:268
 msgid "To know more about setting up email accounts, click"
 msgstr ""
 
@@ -4876,7 +4893,7 @@ msgstr ""
 msgid "URL/Method"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:612
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:613
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr ""
 
@@ -4933,7 +4950,7 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:80
+#: desk/src/components/Settings/EmailEdit.vue:142
 msgid "Update Account"
 msgstr ""
 
@@ -5119,7 +5136,7 @@ msgstr ""
 msgid "You are not permitted to access this resource."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:534
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:535
 msgid "You are not permitted to add a comment"
 msgstr ""
 
@@ -5243,5 +5260,9 @@ msgstr ""
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:423
 msgid "viewed this"
+msgstr ""
+
+#: desk/src/pages/SearchAgent.vue:117
+msgid "{0} matches"
 msgstr ""
 

@@ -1,12 +1,13 @@
 import type { DropdownOption } from "@/types";
-import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
-import dayjs from "dayjs";
-import { FeatherIcon, call, toast, useFileUpload } from "frappe-ui";
+import { useClipboard, useDateFormat } from "@vueuse/core";
+import { FeatherIcon, call, dayjsLocal, toast, useFileUpload, getConfig, } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
 import TicketIcon from "./components/icons/TicketIcon.vue";
 import { getMeta } from "./stores/meta";
+import { __ } from "./translation";
+
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
@@ -52,11 +53,138 @@ export function validateEmailWithZod(email: string) {
 
 export function dateFormat(date, format?: string) {
   const _format = format || "DD-MM-YYYY HH:mm:ss";
-  return useDateFormat(date, _format).value;
+  if (!date) return '';
+  const tzDate = dayjsLocal(date);
+  return tzDate.format(_format);
 }
 
 export function timeAgo(date) {
-  return useTimeAgo(date).value;
+  return prettyDate(date)
+}
+
+export function getBrowserTimezone() {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone
+}
+
+export function prettyDate(date, mini = false) {
+  if (!date) return ''
+
+  if (typeof date == 'string') {
+    date = dayjsLocal(date)
+  }
+
+  let nowDatetime = dayjsLocal()
+  let diff = nowDatetime.diff(date, 'seconds')
+
+  let dayDiff = diff / 86400
+
+  if (isNaN(dayDiff)) return ''
+
+  if (mini) {
+    // Return short format of time difference
+    if (dayDiff < 0) {
+      if (Math.abs(dayDiff) < 1) {
+        if (Math.abs(diff) < 60) {
+          return __('now')
+        } else if (Math.abs(diff) < 3600) {
+          return __('in {0} m', [Math.floor(Math.abs(diff) / 60)])
+        } else if (Math.abs(diff) < 86400) {
+          return __('in {0} h', [Math.floor(Math.abs(diff) / 3600)])
+        }
+      }
+      if (Math.abs(dayDiff) >= 1 && Math.abs(dayDiff) < 1.5) {
+        return __('tomorrow')
+      } else if (Math.abs(dayDiff) < 7) {
+        return __('in {0} d', [Math.floor(Math.abs(dayDiff))])
+      } else if (Math.abs(dayDiff) < 31) {
+        return __('in {0} w', [Math.floor(Math.abs(dayDiff) / 7)])
+      } else if (Math.abs(dayDiff) < 365) {
+        return __('in {0} M', [Math.floor(Math.abs(dayDiff) / 30)])
+      } else {
+        return __('in {0} y', [Math.floor(Math.abs(dayDiff) / 365)])
+      }
+    } else if (dayDiff >= 0 && dayDiff < 1) {
+      if (diff < 60) {
+        return __('now')
+      } else if (diff < 3600) {
+        return __('{0} m', [Math.floor(diff / 60)])
+      } else if (diff < 86400) {
+        return __('{0} h', [Math.floor(diff / 3600)])
+      }
+    } else {
+      dayDiff = Math.floor(dayDiff)
+      if (dayDiff < 7) {
+        return __('{0} d', [dayDiff])
+      } else if (dayDiff < 31) {
+        return __('{0} w', [Math.floor(dayDiff / 7)])
+      } else if (dayDiff < 365) {
+        return __('{0} M', [Math.floor(dayDiff / 30)])
+      } else {
+        return __('{0} y', [Math.floor(dayDiff / 365)])
+      }
+    }
+  } else {
+    // Return long format of time difference
+    if (dayDiff < 0) {
+      if (Math.abs(dayDiff) < 1) {
+        if (Math.abs(diff) < 60) {
+          return __('just now')
+        } else if (Math.abs(diff) < 120) {
+          return __('in 1 minute')
+        } else if (Math.abs(diff) < 3600) {
+          return __('in {0} minutes', [Math.floor(Math.abs(diff) / 60)])
+        } else if (Math.abs(diff) < 7200) {
+          return __('in 1 hour')
+        } else if (Math.abs(diff) < 86400) {
+          return __('in {0} hours', [Math.floor(Math.abs(diff) / 3600)])
+        }
+      }
+      if (Math.abs(dayDiff) >= 1 && Math.abs(dayDiff) < 1.5) {
+        return __('tomorrow')
+      } else if (Math.abs(dayDiff) < 7) {
+        return __('in {0} days', [Math.floor(Math.abs(dayDiff))])
+      } else if (Math.abs(dayDiff) < 31) {
+        return __('in {0} weeks', [Math.floor(Math.abs(dayDiff) / 7)])
+      } else if (Math.abs(dayDiff) < 365) {
+        return __('in {0} months', [Math.floor(Math.abs(dayDiff) / 30)])
+      } else if (Math.abs(dayDiff) < 730) {
+        return __('in 1 year')
+      } else {
+        return __('in {0} years', [Math.floor(Math.abs(dayDiff) / 365)])
+      }
+    } else if (dayDiff >= 0 && dayDiff < 1) {
+      if (diff < 60) {
+        return __('just now')
+      } else if (diff < 120) {
+        return __('1 minute ago')
+      } else if (diff < 3600) {
+        return __('{0} minutes ago', [Math.floor(diff / 60)])
+      } else if (diff < 7200) {
+        return __('1 hour ago')
+      } else if (diff < 86400) {
+        return __('{0} hours ago', [Math.floor(diff / 3600)])
+      }
+    } else {
+      dayDiff = Math.floor(dayDiff)
+      if (dayDiff == 1) {
+        return __('yesterday')
+      } else if (dayDiff < 7) {
+        return __('{0} days ago', [dayDiff])
+      } else if (dayDiff < 14) {
+        return __('1 week ago')
+      } else if (dayDiff < 31) {
+        return __('{0} weeks ago', [Math.floor(dayDiff / 7)])
+      } else if (dayDiff < 62) {
+        return __('1 month ago')
+      } else if (dayDiff < 365) {
+        return __('{0} months ago', [Math.floor(dayDiff / 30)])
+      } else if (dayDiff < 730) {
+        return __('1 year ago')
+      } else {
+        return __('{0} years ago', [Math.floor(dayDiff / 365)])
+      }
+    }
+  }
 }
 
 export const dateTooltipFormat = "ddd, MMM D, YYYY h:mm A";
@@ -174,9 +302,15 @@ export const textEditorMenuButtons = [
 ];
 
 export function isContentEmpty(content: string) {
+  if (!content || content === null || content === undefined) {
+    return true;
+  }
   const parser = new DOMParser();
   const doc = parser.parseFromString(content, "text/html");
-  return doc.body.textContent === "";
+  if (doc.body.textContent === null) {
+    return true;
+  }
+  return doc.body.textContent.trim() === "";
 }
 
 export function isTouchScreenDevice() {
@@ -195,8 +329,8 @@ export function getIcon(icon) {
   return icon || markRaw(TicketIcon);
 }
 export function formatTimeShort(date: string) {
-  const now = dayjs();
-  const inputDate = dayjs.tz(date);
+  const now = dayjsLocal();
+  const inputDate = dayjsLocal(date);
   const diffSeconds = now.diff(inputDate, "second");
   const diffMinutes = now.diff(inputDate, "minute");
   const diffHours = now.diff(inputDate, "hour");
@@ -262,9 +396,8 @@ export function htmlToText(html: string): string {
  * @returns {string} Formatted date string in the user's locale and preferences
  */
 export function getFormattedDate(date) {
-  if (!date) return "";
-
-  const dateObj = dayjs(date);
+  if (!date) return ""; 
+  const dateObj = dayjsLocal(date);
   if (!dateObj.isValid()) return "";
 
   return dateObj.format("DD-MM-YYYY");

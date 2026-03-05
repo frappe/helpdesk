@@ -152,9 +152,9 @@ const router = useRouter();
 const { findView } = useView("HD Ticket");
 const ticketStatusStore = useTicketStatusStore();
 
-const ticket = inject(TicketSymbol);
-const customizations = inject(CustomizationSymbol);
-const activities = inject(ActivitiesSymbol);
+const ticket = inject(TicketSymbol)!;
+const customizations = inject(CustomizationSymbol)!;
+const activities = inject(ActivitiesSymbol)!;
 
 const showSubjectDialog = ref(false);
 
@@ -323,6 +323,7 @@ watchEffect(async () => {
       ...defaultActions.value,
       ...(customizations.value?.data?._customActions || []),
     ];
+    customBadges.value = customizations.value?.data?._customBadges || [];
   }
 });
 

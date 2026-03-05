@@ -8,6 +8,8 @@ from frappe.exceptions import DoesNotExistError
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 
+from helpdesk.utils import capture_event
+
 
 class HDTeam(Document):
     @frappe.whitelist()
@@ -27,6 +29,13 @@ class HDTeam(Document):
         if assignment_rule_doc.disabled and assignment_rule_doc.users:
             assignment_rule_doc.disabled = False
         assignment_rule_doc.save()
+
+        self.capture_team_creation_event()
+
+    def capture_team_creation_event(self):
+        should_capture = self.name not in ["Product Experts", "Billing"]
+        if should_capture:
+            capture_event("team_created")
 
     def after_rename(self, olddn, newdn, merge=False):
         # Update the condition for the linked assignment rule

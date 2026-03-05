@@ -212,7 +212,7 @@ const addAssignees = createResource({
     assign_to: addedAssignees,
   }),
   onSuccess: () => {
-    capture("assign_to", { doctype: props.doctype });
+    capture("ticket_assigned", { doctype: props.doctype });
   },
 });
 
