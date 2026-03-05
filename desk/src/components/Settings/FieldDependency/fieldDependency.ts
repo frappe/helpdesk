@@ -5,7 +5,6 @@ export const fieldDependenciesList = createListResource({
   doctype: "HD Form Script",
   filters: { is_standard: 1, name: ["like", "%Field Dependency%"] },
   fields: ["name", "enabled", "owner"],
-  auto: true,
   cache: ["FD", "List"],
   orderBy: "modified desc",
   start: 0,

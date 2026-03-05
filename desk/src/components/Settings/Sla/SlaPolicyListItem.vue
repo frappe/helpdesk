@@ -47,7 +47,7 @@
         <FormControl
           :label="__('New SLA Policy Name')"
           type="text"
-          v-model="duplicateDialog.name"
+          v-model="duplicateDialog.newName"
         />
       </div>
     </template>
@@ -78,11 +78,13 @@ import { slaActiveScreen } from "@/stores/sla";
 import { ConfirmDelete } from "@/utils";
 import { __ } from "@/translation";
 import { SlaPolicyListResourceSymbol } from "@/types";
+import { HDServiceLevelAgreement } from "@/types/doctypes";
 
 const slaPolicyList = inject(SlaPolicyListResourceSymbol);
 
 const duplicateDialog = ref({
   show: false,
+  newName: "",
   name: "",
 });
 
@@ -101,7 +103,8 @@ const dropdownOptions = [
     onClick: () => {
       duplicateDialog.value = {
         show: true,
-        name: props.data.name + " (Copy)",
+        newName: props.data.name + " (Copy)",
+        name: props.data.name,
       };
     },
     icon: "copy",
@@ -114,25 +117,40 @@ const dropdownOptions = [
 
 const duplicate = () => {
   createResource({
-    url: "helpdesk.api.sla.duplicate_sla",
+    url: "frappe.client.get",
     params: {
-      docname: props.data.name,
-      new_name: duplicateDialog.value.name,
+      doctype: "HD Service Level Agreement",
+      name: duplicateDialog.value.name,
     },
-    onSuccess: (data) => {
-      slaPolicyList.reload();
-      toast.success(__("SLA policy duplicated"));
-      duplicateDialog.value = {
-        show: false,
-        name: "",
-      };
-      setTimeout(() => {
-        slaActiveScreen.value = {
-          screen: "view",
-          data: data,
-          fetchData: true,
-        };
-      }, 250);
+    onSuccess: (data: HDServiceLevelAgreement) => {
+      createResource({
+        url: "frappe.client.insert",
+        params: {
+          doc: {
+            ...data,
+            default_sla: false,
+            service_level: duplicateDialog.value.newName,
+            name: duplicateDialog.value.newName,
+          },
+        },
+        auto: true,
+        onSuccess(newSlaPolicyData: HDServiceLevelAgreement) {
+          slaPolicyList?.reload();
+          toast.success(__("SLA policy duplicated"));
+          duplicateDialog.value = {
+            show: false,
+            newName: "",
+            name: "",
+          };
+          setTimeout(() => {
+            slaActiveScreen.value = {
+              screen: "view",
+              data: newSlaPolicyData,
+              fetchData: true,
+            };
+          }, 250);
+        },
+      });
     },
     auto: true,
   });
@@ -144,7 +162,7 @@ const deleteSla = () => {
     return;
   }
 
-  slaPolicyList.delete.submit(props.data.name, {
+  slaPolicyList?.delete.submit(props.data.name, {
     onSuccess: () => {
       toast.success(__("SLA policy deleted"));
     },
@@ -156,7 +174,7 @@ const onToggle = () => {
     toast.error(__("SLA set as default cannot be disabled"));
     return;
   }
-  slaPolicyList.setValue.submit(
+  slaPolicyList?.setValue.submit(
     {
       name: props.data.name,
       enabled: !props.data.enabled,

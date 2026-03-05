@@ -1,6 +1,6 @@
 import { Extension } from "@tiptap/core";
 import { createSuggestionExtension } from "frappe-ui";
-import { PluginKey } from "@tiptap/pm/state";
+import { PluginKey, Plugin } from "@tiptap/pm/state";
 import { getMeta } from "./stores/meta";
 import { userFields } from "./components/Settings/SavedReplies/savedReplies";
 import FieldAutocompleteList from "./components/Settings/SavedReplies/components/FieldAutocompleteList.vue";
@@ -72,8 +72,8 @@ export const FieldAutocomplete = createSuggestionExtension<FieldItem>({
   component: FieldAutocompleteList,
 });
 
-export const PreserveVideoControls: Extension = Extension.create({
-  name: "preserveVideoControls",
+export const ComponentUtils: Extension = Extension.create({
+  name: "ComponentUtils",
   addGlobalAttributes() {
     return [
       {
@@ -88,15 +88,7 @@ export const PreserveVideoControls: Extension = Extension.create({
           },
         },
       },
-    ];
-  },
-});
-
-export const PreserveIds: Extension = Extension.create({
-  name: "preserveIds",
-  addGlobalAttributes() {
-    return [
-      {
+           {
         types: ["heading"],
         attributes: {
           id: {
@@ -111,6 +103,60 @@ export const PreserveIds: Extension = Extension.create({
           },
         },
       },
+            {
+        types: ["paragraph"],
+        attributes: {
+          class: {
+            default: null,
+            parseHTML: (element) => element.getAttribute('class'),
+            renderHTML: (attributes) => {
+              if (!attributes.class) return {}
+              return { class: attributes.class }
+            },
+          },
+        },
+      },
+    ];
+  },
+});
+
+// Handle pasting from excel properly
+export const HandleExcelPaste = Extension.create({
+  name: "handleExcelPaste",
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("handleExcelPaste"),
+        props: {
+          handlePaste(view, event) {
+            const clipboardData = event.clipboardData;
+            if (!clipboardData) return false;
+
+            const types = Array.from(clipboardData.types);
+            const hasFile = types.includes("Files");
+            const hasHtml = types.includes("text/html");
+            const hasText = types.includes("text/plain");
+            const hasRtf = types.includes("text/rtf")
+
+
+            if (hasFile && hasHtml && hasText && hasRtf) {
+              event.preventDefault()
+              const html = clipboardData.getData("text/html");
+              const text = clipboardData.getData("text/plain");
+
+              if (html) {
+                view.pasteHTML(html);
+              } else {
+                view.pasteText(text);
+              }
+              return true;
+            }
+
+            return false;
+          },
+        },
+      }),
     ];
   },
 });

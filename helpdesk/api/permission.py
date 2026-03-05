@@ -11,4 +11,5 @@ def has_app_permission():
     if any(role in roles for role in helpdesk_roles):
         return True
 
-    return False
+    # TODO: Check for Customer permission once the role is added
+    return True

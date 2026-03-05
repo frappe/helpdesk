@@ -300,6 +300,7 @@ import { useOnboarding } from "frappe-ui/frappe";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { SlaPolicyListResourceSymbol } from "@/types";
+import { HDServiceLevelAgreement } from "@/types/doctypes";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 
@@ -319,11 +320,12 @@ const slaPolicyList = inject(SlaPolicyListResourceSymbol);
 const deskUrl = `${window.location.origin}/app/hd-service-level-agreement/${slaActiveScreen.value.data?.name}`;
 
 const getSlaData = createResource({
-  url: "helpdesk.api.sla.get_sla",
+  url: "frappe.client.get",
   params: {
-    docname: slaActiveScreen.value.data?.name,
+    doctype: "HD Service Level Agreement",
+    name: slaActiveScreen.value.data?.name,
   },
-  onSuccess(data) {
+  onSuccess(data: HDServiceLevelAgreement) {
     let condition_json;
     try {
       condition_json = JSON.parse(data.condition_json || "[]");
@@ -427,7 +429,7 @@ const createSla = () => {
   const ticketReopenStatus = slaData.value.reopen_ticket_status
     ? slaData.value.reopen_ticket_status?.value
     : null;
-  slaPolicyList.insert.submit(
+  slaPolicyList?.insert.submit(
     {
       ...slaData.value,
       default_ticket_status: defaultTicketStatus,
@@ -444,7 +446,8 @@ const createSla = () => {
         slaActiveScreen.value.data = data;
         slaActiveScreen.value.screen = "view";
         getSlaData.submit({
-          docname: data.name,
+          doctype: "HD Service Level Agreement",
+          name: data.name,
         });
         updateOnboardingStep("setup_sla", true);
       },
@@ -459,10 +462,10 @@ const updateSla = () => {
   const ticketReopenStatus = slaData.value.reopen_ticket_status
     ? slaData.value.reopen_ticket_status?.value
     : null;
-  slaPolicyList.setValue.submit(
+  slaPolicyList?.setValue.submit(
     {
       ...slaData.value,
-      name: slaActiveScreen.value.data.name,
+      name: slaActiveScreen.value.data?.name,
       default_ticket_status: defaultTicketStatus,
       ticket_reopen_status: ticketReopenStatus,
       condition: useNewUI.value

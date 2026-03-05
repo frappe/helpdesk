@@ -1,6 +1,7 @@
 import { Dayjs } from "dayjs";
+import { BadgeProps } from "frappe-ui";
 import { Component, ComputedRef, InjectionKey, Ref } from "vue";
-import type { HDTicket } from "./types/doctypes";
+import type { AssignmentRule, HDTicket } from "./types/doctypes";
 
 interface ResourceOptions<T = any> {
   method?: string;
@@ -575,6 +576,7 @@ export interface Customizations {
   _form_script: string[];
   _customActions?: any;
   _customOnChange?: any;
+  _customBadges?: BadgeProps[];
 }
 
 export interface TicketContact {
@@ -603,13 +605,6 @@ export interface TicketActivities {
   communications: Communication[];
   history: Activity[];
   views: ViewLog[];
-}
-
-export interface AssignmentRule {
-  name: string;
-  description: string;
-  priority: string;
-  enabled: boolean;
 }
 
 export interface HDSettings {
@@ -719,5 +714,6 @@ declare global {
     date_format: string;
     time_format: string;
     session_user: string;
+    timezone: Record<"user" | "system", string>;
   }
 }

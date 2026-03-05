@@ -203,6 +203,7 @@ def add_agent_manager_permissions():
         "Communication": ["create", "delete", "write"],
         "User Invitation": ["create", "write"],
         "Role": [],
+        "Assignment Rule": ["create", "delete", "write"],
     }
     for dt in doc_to_permissions.keys():
         # this adds read permission to the role

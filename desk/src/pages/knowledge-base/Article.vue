@@ -47,7 +47,7 @@
               </div>
               <IconDot class="h-4 w-4 text-gray-600" />
               <div class="text-xs text-gray-500">
-                {{ dayjs(article.data.modified).short() }}
+                {{ dayjsLocal(article.data.modified).format("MMM D, h:mm A") }}
               </div>
             </div>
             <Dropdown
@@ -89,7 +89,7 @@
           ref="editorRef"
           :editor-class="editorClass"
           :content="textEditorContentWithIDs"
-          :extensions="[PreserveIds]"
+          :extensions="[ComponentUtils]"
           :editable="editable"
           @change="(event:string) => {
 			      content = event;
@@ -127,7 +127,7 @@ import {
   updateRes as updateArticle,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
-import { PreserveIds } from "@/tiptap-extensions";
+import { ComponentUtils } from "@/tiptap-extensions";
 import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
 import {
   copyToClipboard,
@@ -144,6 +144,7 @@ import {
   TextEditor,
   TextEditorFixedMenu,
   toast,
+  dayjsLocal,
 } from "frappe-ui";
 import { computed, h, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";

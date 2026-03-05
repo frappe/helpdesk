@@ -42,21 +42,12 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-19 23:22:29.075052",
+ "modified": "2026-02-02 11:15:47.402850",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
  "owner": "Administrator",
  "permissions": [
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "report": 1,
-   "role": "All",
-   "select": 1,
-   "share": 1
-  },
   {
    "create": 1,
    "delete": 1,
