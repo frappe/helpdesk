@@ -174,7 +174,7 @@ import {
   MultiSelectInput,
   SavedRepliesSelectorModal,
 } from "@/components";
-import { Editor, EditorContent } from "@tiptap/vue-3";
+import { EditorContent } from "@tiptap/vue-3";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
@@ -200,7 +200,6 @@ import {
   computed,
   nextTick,
   onBeforeUnmount,
-  onMounted,
   ref,
   watch,
 } from "vue";
