@@ -116,6 +116,7 @@
 </template>
 
 <script setup lang="ts">
+import { dayjs } from "@/dayjs";
 import { MultipleAvatar, StarRating } from "@/components";
 import {
   ColumnSettings,
@@ -460,6 +461,20 @@ function listCell(column: any, row: any, item: any, idx: number) {
       textContent: item,
     });
   }
+  // Created (relative time)
+  if (column.key === "creation" && item) {
+    return h("span", {
+      textContent: dayjs(item).format("DD-MM-YYYY HH:mm"),
+    });
+  }
+
+  // Created On (exact datetime)
+  // if (column.key === "creation_on" && item) {
+  //   return h("span", {
+  //     class: "text-p-xs",
+  //     textContent: dayjs(item).format("DD-MM-YYYY HH:mm"),
+  //   });
+  // }
   if (column.type === "Datetime") {
     return h("span", {
       class: "text-p-xs",

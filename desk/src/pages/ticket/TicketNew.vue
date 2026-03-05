@@ -55,9 +55,33 @@
             :placeholder="__('Select project')"
           />
         </div>
+      <div class="flex flex-col gap-2 mt-2">
+        <span class="block text-sm text-gray-700">
+          {{ __("Ticket Type") }}
+          <span class="text-red-500">*</span>
+        </span>
+
+        <FormControl
+          v-model="ticket_type"
+          type="select"
+          :options="ticketTypeOptions"
+        />
+      </div>
+        <div class="flex flex-col gap-2 mt-2">
+          <span class="block text-sm text-gray-700">
+            {{ __("Priority") }}
+            <span class="text-red-500">*</span>
+          </span>
+
+          <FormControl
+            v-model="priority"
+            type="select"
+           :options="priorityOptions"
+          />
+        </div>
 
         <!-- SUBJECT FIELD -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 mt-2">
           <span class="block text-sm text-gray-700">
             {{ __("Subject") }}
             <span class="text-red-500">*</span>
@@ -86,7 +110,9 @@
                 $refs.editor?.editor?.isEmpty ||
                 ticket.loading ||
                 !subject ||
-                !custom_project
+                !custom_project || 
+                !priority ||
+                !ticket_type
               "
               @click="ticket.submit()"
             />
@@ -105,6 +131,7 @@ import { capture } from "@/telemetry";
 import {
   Breadcrumbs,
   Button,
+  createListResource,
   createResource,
   FormControl,
   usePageMeta,
@@ -130,6 +157,9 @@ const router = useRouter();
 const { userId } = useAuthStore();
 
 const subject = ref("");
+const priority = ref("")
+const ticket_type = ref("")
+// const priorityoptions = ref([])
 const description = ref("");
 const custom_project = ref("");
 const attachments = ref([]);
@@ -160,6 +190,37 @@ const projectResource = createResource({
   auto: true,
 });
 console.log("projectResource", projectResource);
+const priorityResource  = createListResource({
+  doctype:"HD Ticket Priority",
+  fields: ["name"],
+
+})
+priorityResource.fetch()
+const priorityOptions = computed(() => {
+  console.log("priorityResource.data", priorityResource.data);
+  
+  if (!priorityResource.data) return [];
+  return priorityResource.data.map((p: any) => ({
+    value: p.name,
+    label: p.name,
+  }));
+});
+
+const ticketTypeResource = createListResource({
+  doctype: "HD Ticket Type",
+  fields: ["name"],
+})
+
+ticketTypeResource.fetch()
+
+const ticketTypeOptions = computed(() => {
+  if (!ticketTypeResource.data) return []
+
+  return ticketTypeResource.data.map((t: any) => ({
+    value: t.name,
+    label: t.name,
+  }))
+})
 const projectOptions = computed(() => {
   if (!projectResource.data) return [];
 
@@ -189,6 +250,8 @@ const ticket = createResource({
       subject: subject.value,
       description: description.value,
       custom_project: custom_project.value,
+      priority: priority.value,
+      ticket_type: ticket_type.value,
       template: props.templateId,
       ...templateFields,
     },
@@ -198,6 +261,7 @@ const ticket = createResource({
     if (!params.doc.custom_project) return "Project is required";
     if (!params.doc.subject) return "Subject is required";
     if (!params.doc.description) return "Description is required";
+    if (!params.doc.ticket_type) return "Ticket Type is required";
   },
   onSuccess: (data) => {
     router.push({

@@ -547,12 +547,15 @@ class HDTicket(Document):
     @frappe.whitelist()
     def reply_via_agent(
         self,
-        message: str,
+        message: str | None = "",
         to: str = None,
         cc: str = None,
         bcc: str = None,
         attachments: List[str] = [],
     ):
+        message = message or ""
+        if not message.strip():
+            frappe.throw(_("Message cannot be empty"))
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject}"
@@ -1051,6 +1054,12 @@ class HDTicket(Document):
                 "options": "Contact",
                 "width": "8rem",
             },
+            # {
+            # "label": "Created On",
+            # "type": "Datetime",
+            # "key": "creation_on",
+            # "width": "10rem",
+            # },
         ]
         customer_portal_columns = [
             {
@@ -1120,6 +1129,7 @@ class HDTicket(Document):
             "first_responded_on",
             "modified",
             "creation",
+            "creation as creation_on",
             "_assign",
             "resolution_date",
         ]
