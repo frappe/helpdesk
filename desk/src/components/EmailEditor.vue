@@ -255,10 +255,12 @@ const newEmail = useStorage<null | string>(
   "emailBoxContent" + props.ticketId,
   null
 );
-const quotedNewEmail = useStorage<null | string>(
+
+const quotedContent = useStorage<null | string>(
   "quotedEmailBoxContent" + props.ticketId,
   null
 );
+
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 
@@ -267,8 +269,6 @@ const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
 const isUploading = ref(false);
-const quotedContent = ref<string | null>(null);
-
 const isDisabled = computed(() => {
   return (
     (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
@@ -349,7 +349,7 @@ function submitMail() {
 }
 
 watch(quotedContent, (newVal, oldVal) => {
-  if (newVal && newVal !== oldVal) {
+  if (!oldVal && newVal) {
     nextTick(() => {
       if (quotedContentRef.value) {
         quotedContentRef.value.innerHTML = newVal;
@@ -357,7 +357,6 @@ watch(quotedContent, (newVal, oldVal) => {
     });
   }
 });
-
 function onQuotedInput() {
   const el = quotedContentRef.value;
   if (!el) return;
@@ -395,9 +394,16 @@ function addToReply(
   toEmailsClone.value = toEmails;
   ccEmailsClone.value = ccEmails;
   bccEmailsClone.value = bccEmails;
-  quotedContent.value = `${body}`;
+
+  if (body !== quotedContent.value) {
+    //trigger change for watch when replied to body data is different from current quoted content
+    quotedContent.value = null;
+    nextTick(() => {
+      quotedContent.value = body;
+    });
+  }
+
   editorRef.value.editor.chain().clearContent().focus("start").run();
-  quotedNewEmail.value = quotedContent.value;
   nextTick(() => {
     newEmail.value = editorRef.value.editor.getHTML();
   });
@@ -407,14 +413,12 @@ function resetState() {
   newEmail.value = null;
   attachments.value = [];
   quotedContent.value = null;
-  quotedNewEmail.value = null;
 }
 
 function handleDiscard() {
   attachments.value = [];
   newEmail.value = null;
   quotedContent.value = null;
-  quotedNewEmail.value = null;
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
   showCC.value = false;
@@ -423,11 +427,17 @@ function handleDiscard() {
   emit("discard");
 }
 
+//on load set quoted content from storage
 onMounted(() => {
-  if (quotedNewEmail.value) {
-    quotedContent.value = quotedNewEmail.value;
+  if (quotedContent.value) {
+    nextTick(() => {
+      if (quotedContentRef.value) {
+        quotedContentRef.value.innerHTML = quotedContent.value;
+      }
+    });
   }
 });
+
 function handleSelectAll(e: KeyboardEvent) {
   const active = document.activeElement;
   const editorDom = editorRef.value?.editor?.view?.dom as
