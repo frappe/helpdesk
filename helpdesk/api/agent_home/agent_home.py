@@ -28,7 +28,7 @@ def get_default_agent_dashboard():
 
 @frappe.whitelist()
 @agent_only
-def get_dashboard(reset_layout=False):
+def get_dashboard(reset_layout: bool = False):
     dashboard = frappe.db.exists("HD Field Layout", {"user": frappe.session.user})
     dashboard_id = None
 
@@ -65,7 +65,7 @@ def get_dashboard(reset_layout=False):
 
 @frappe.whitelist()
 @agent_only
-def get_agent_tickets(period="last month"):
+def get_agent_tickets(period: str = "last month"):
     periods = {"last week": 7, "last month": 30, "last 3 months": 90}
     days = periods.get(period, 7)
 
@@ -223,19 +223,19 @@ def _get_avg_time_metric(period: str, time_field: str) -> dict:
 
 @frappe.whitelist()
 @agent_only
-def get_avg_first_response_time(period="last month"):
+def get_avg_first_response_time(period: str = "last month"):
     return _get_avg_time_metric(period, "first_response_time")
 
 
 @frappe.whitelist()
 @agent_only
-def get_avg_resolution_time(period="last month"):
+def get_avg_resolution_time(period: str = "last month"):
     return _get_avg_time_metric(period, "resolution_time")
 
 
 @frappe.whitelist()
 @agent_only
-def get_recent_feedback(period="all_time", sort_order="positive_first"):
+def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_first"):
     agent = frappe.session.user
     ticket = DocType("HD Ticket")
     contact = DocType("Contact")
@@ -628,7 +628,7 @@ def _get_pending_response_tickets(limit=10):
 
 @frappe.whitelist()
 @agent_only
-def get_pending_tickets(ticket_type="upcoming_sla"):
+def get_pending_tickets(ticket_type: str = "upcoming_sla"):
     min_priority, max_priority = _get_priority_range()
 
     if ticket_type == "upcoming_sla":
