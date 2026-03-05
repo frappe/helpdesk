@@ -101,6 +101,7 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
+import { handleInviteUserSuccess } from "@/utils";
 import { Button, FormControl, Tooltip, createResource, toast } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, ref } from "vue";
@@ -184,8 +185,6 @@ const resetInputValues = () => {
   role.value = roleOptions[0].value;
 };
 
-const emailsToStr = (emails: readonly string[]) => emails.join(", ");
-
 const inviteByEmailResource = createResource({
   url: "frappe.core.api.user_invitation.invite_by_email",
   onSuccess(
@@ -198,22 +197,7 @@ const inviteByEmailResource = createResource({
     >
   ) {
     resetInputValues();
-    let emailsStr = emailsToStr(data.invited_emails);
-    if (emailsStr.trim() !== "") {
-      toast.success(`${emailsStr} invited successfully`);
-    }
-    emailsStr = emailsToStr(data.disabled_user_emails);
-    if (emailsStr.trim() !== "") {
-      toast.info(`${emailsStr} already present and disabled`);
-    }
-    emailsStr = emailsToStr(data.pending_invite_emails);
-    if (emailsStr.trim() !== "") {
-      toast.info(`${emailsStr} already invited`);
-    }
-    emailsStr = emailsToStr(data.accepted_invite_emails);
-    if (emailsStr.trim() !== "") {
-      toast.info(`${emailsStr} already present`);
-    }
+    handleInviteUserSuccess(data);
     pendingInvitesResource.reload();
     updateOnboardingStep("invite_your_team");
     capture("agents_invited", {

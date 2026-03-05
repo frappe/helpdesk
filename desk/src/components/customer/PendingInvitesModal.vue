@@ -12,61 +12,63 @@
         >
           Pending Invites
         </h3>
-        <div class="flex flex-col gap-3">
-          <div
-            v-for="invite in pendingInvites"
-            :key="invite.name"
-            class="flex items-center justify-between px-3 py-2 rounded-lg border border-outline-gray-2 min-h-[56px] overflow-hidden"
-          >
-            <Transition name="invite-row" mode="out-in">
-              <div
-                v-if="confirmingRevoke !== invite.name"
-                key="info"
-                class="flex items-center justify-between w-full"
-              >
-                <div>
-                  <div class="text-base">
-                    <span class="text-ink-gray-8">{{ invite.email }}</span>
-                    <span class="text-ink-gray-5 ml-1"
-                      >({{ parseRoles(invite.roles.join(", ")) }})</span
-                    >
+        <div class="flex flex-col">
+          <div v-for="(invite, idx) in pendingInvites" :key="invite.name">
+            <div class="relative h-13 overflow-hidden border-outline-gray-2">
+              <Transition name="invite-row" mode="out-in">
+                <div
+                  v-if="confirmingRevoke !== invite.name"
+                  key="info"
+                  class="absolute inset-0 flex items-center justify-between w-full"
+                >
+                  <div>
+                    <div class="text-base">
+                      <span class="text-ink-gray-8">{{ invite.email }}</span>
+                      <span class="text-ink-gray-5 ml-1"
+                        >({{ parseRoles(invite.roles.join(", ")) }})</span
+                      >
+                    </div>
+                    <p class="text-xs text-ink-gray-4 mt-0.5">
+                      {{ __("Invited by") }} {{ invite.invited_by }} ·
+                      {{ dayjsLocal(invite.invited_on).fromNow() }}
+                    </p>
                   </div>
-                  <p class="text-xs text-ink-gray-4 mt-0.5">
-                    {{ __("Invited by") }} {{ invite.invited_by }} ·
-                    {{ dayjsLocal(invite.invited_on).fromNow() }}
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  icon="x"
-                  :tooltip="__('Revoke Invite')"
-                  @click="confirmingRevoke = invite.name"
-                />
-              </div>
-              <div
-                v-else
-                key="confirm"
-                class="flex items-center justify-between w-full"
-              >
-                <p class="text-sm text-ink-gray-7">
-                  {{ __("Revoke this invite?") }}
-                </p>
-                <div class="flex gap-2">
                   <Button
                     variant="ghost"
-                    :label="__('Cancel')"
-                    @click="confirmingRevoke = null"
-                  />
-                  <Button
-                    variant="solid"
-                    theme="red"
-                    :label="__('Confirm')"
-                    :loading="cancelInviteResource.loading"
-                    @click="revokeInvite(invite.name)"
+                    icon="x"
+                    :tooltip="__('Revoke Invite')"
+                    @click="confirmingRevoke = invite.name"
                   />
                 </div>
-              </div>
-            </Transition>
+                <div
+                  v-else
+                  key="confirm"
+                  class="absolute inset-0 flex items-center justify-between w-full"
+                >
+                  <p class="text-sm text-ink-gray-7">
+                    {{ __("Revoke this invite?") }}
+                  </p>
+                  <div class="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      :label="__('Cancel')"
+                      @click="confirmingRevoke = null"
+                    />
+                    <Button
+                      variant="solid"
+                      theme="red"
+                      :label="__('Confirm')"
+                      :loading="cancelInviteResource.loading"
+                      @click="revokeInvite(invite.name)"
+                    />
+                  </div>
+                </div>
+              </Transition>
+            </div>
+            <div
+              v-if="idx !== pendingInvites.length - 1"
+              class="border-t border-gray-200 w-full"
+            />
           </div>
         </div>
       </div>
