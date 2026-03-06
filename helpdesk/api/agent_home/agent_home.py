@@ -23,7 +23,7 @@ def calculate_percentage_change(current_value: float, previous_value: float) -> 
 
 
 def get_default_agent_dashboard():
-    return '[{"chart":"avg_resolution_time","layout":{"x":33,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"avg_first_response_time","layout":{"x":16,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"agent_tickets","layout":{"x":0,"y":0,"w":16,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"pending_tickets","layout":{"x":0,"y":10,"w":50,"h":31,"minW":25,"minH":31,"maxH":31}},{"chart":"recent_feedback","layout":{"x":0,"y":65,"w":50,"h":21,"minW":50,"maxH":21,"minH":21}},{"chart":"avg_time_metrics","layout":{"x":0,"y":41,"w":50,"h":24,"minW":18,"minH":24,"maxH":44}}]'
+    return '[{"chart":"avg_resolution_time","layout":{"x":33,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"avg_first_response_time","layout":{"x":16,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"agent_tickets","layout":{"x":0,"y":0,"w":16,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"pending_tickets","layout":{"x":0,"y":10,"w":50,"h":32,"minW":25,"minH":32,"maxH":32}},{"chart":"recent_feedback","layout":{"x":0,"y":66,"w":50,"h":21,"minW":50,"minH":21,"maxH":21}},{"chart":"avg_time_metrics","layout":{"x":0,"y":42,"w":50,"h":24,"minW":18,"minH":24,"maxH":44}}]'
 
 
 @frappe.whitelist()

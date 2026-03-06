@@ -29,7 +29,7 @@
           </div>
           <!-- Average Rating -->
           <div class="flex items-end justify-between gap-4">
-            <div class="flex flex-col">
+            <div class="flex flex-col gap-0.5">
               <div class="flex items-center gap-1">
                 <LucideStar class="size-4 fill-[#de9735] text-[#de9735]" />
                 <div class="text-2xl font-medium text-ink-gray-8">
@@ -47,7 +47,16 @@
           </div>
           <!-- Bar Chart -->
           <div class="h-32 mt-2 w-full px-4">
-            <ECharts :options="barChartOptions" class="w-full h-full" />
+            <ECharts
+              v-if="chartConfig.totalFeedbacks > 0"
+              :options="barChartOptions"
+              class="w-full h-full"
+            />
+            <ECharts
+              v-else
+              :options="placeholderChartOptions"
+              class="w-full h-full"
+            />
           </div>
         </div>
         <div class="hidden sm:block h-full w-[1px] bg-surface-gray-2"></div>
@@ -390,6 +399,55 @@ const barChartOptions = computed<EChartsOption>(() => {
       },
     ],
     tooltip: { show: false },
+  };
+});
+
+const placeholderChartOptions = computed<EChartsOption>(() => {
+  const placeholderValues = Array.from(
+    { length: 5 },
+    () => Math.floor(Math.random() * 11) + 3
+  );
+  const data = placeholderValues.map((value) => ({
+    value,
+    itemStyle: {
+      color: "#f1f1f1",
+      borderRadius: [4, 4, 0, 0],
+    },
+  }));
+
+  return {
+    grid: {
+      left: 4,
+      right: 4,
+      top: 16,
+      bottom: 20,
+      containLabel: false,
+    },
+    xAxis: {
+      type: "category",
+      data: ["1", "2", "3", "4", "5"],
+      axisLine: { show: true, lineStyle: { color: "#e2e2e2" } },
+      axisTick: { show: false },
+      axisLabel: {
+        color: "#e2e2e2",
+        fontSize: 12,
+      },
+    },
+    yAxis: {
+      type: "value",
+      show: false,
+    },
+    series: [
+      {
+        type: "bar",
+        data,
+        barWidth: 24,
+        label: { show: false },
+        emphasis: { disabled: true },
+      },
+    ],
+    tooltip: { show: false },
+    animation: false,
   };
 });
 
