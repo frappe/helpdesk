@@ -809,7 +809,7 @@ class HDTicket(Document):
             )
 
     @frappe.whitelist()
-    def mark_seen(self):
+    def mark_seen(self: "HDTicket") -> None:
         self.add_viewed(
             unique_views=True, force=True
         )  # Document class method, no way to add unique_views via document settings, hence used force and unique_views=True

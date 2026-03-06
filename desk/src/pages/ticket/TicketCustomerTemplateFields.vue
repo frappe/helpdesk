@@ -47,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import { parseField } from "@/composables/formCustomisation";
 import { dayjs } from "@/dayjs";
 import { Field } from "@/types";
 import { computed, inject } from "vue";
@@ -99,11 +100,13 @@ const slaData = computed(() => {
 });
 
 const customFields = computed(() => {
-  const _custom_fields = ticket.data.template.fields
+  const templateFields = ticket.data.template?.fields || [];
+  return templateFields
+    .map((field: Field) => parseField(field, ticket.data))
+    .filter((field: Field) => field.display_via_depends_on)
     .filter((field: Field) => !field.hide_from_customer)
     .filter(
       (f: Field) => ["subject", "team", "priority"].indexOf(f.fieldname) === -1
     );
-  return _custom_fields;
 });
 </script>
