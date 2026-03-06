@@ -35,7 +35,7 @@
     </template>
     <template #content>
       <div>
-        <div class="flex-1 flex flex-col overflow-y-auto">
+        <div class="flex-1 flex flex-col">
           <!-- General -->
           <div class="flex items-center justify-between gap-8 py-3">
             <div class="flex flex-col">
@@ -68,7 +68,7 @@
               <div class="text-p-sm text-ink-gray-5 truncate">
                 {{
                   __(
-                    "Configure your twilio telephony integration settings here"
+                    "Configure your Twilio telephony integration settings here"
                   )
                 }}
               </div>
@@ -89,7 +89,7 @@
               <div class="text-p-sm text-ink-gray-5 truncate">
                 {{
                   __(
-                    "Configure your exotel telephony integration settings here"
+                    "Configure your Exotel telephony integration settings here"
                   )
                 }}
               </div>

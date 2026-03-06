@@ -92,10 +92,10 @@
         </div>
         <div class="flex flex-col items-center gap-1">
           <div class="text-base font-medium text-ink-gray-6">
-            {{ __("No saved replies found") }}
+            {{ __("No saved reply found") }}
           </div>
           <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-            {{ __("Add one to get started.") }}
+            {{ __("Add your first saved reply to get started.") }}
           </div>
         </div>
       </div>
