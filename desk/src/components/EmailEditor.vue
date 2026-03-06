@@ -169,6 +169,8 @@
 </template>
 
 <script setup lang="ts">
+
+
 import {
   AttachmentItem,
   MultiSelectInput,
@@ -196,6 +198,8 @@ import {
   toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
+
+
 import {
   computed,
   nextTick,
@@ -205,6 +209,7 @@ import {
   watch,
 } from "vue";
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 
 const editorRef = ref(null);
 const showSavedRepliesSelectorModal = ref(false);
@@ -255,6 +260,20 @@ const newEmail = useStorage<null | string>(
   "emailBoxContent" + props.ticketId,
   null
 );
+const auth = useAuthStore();
+
+function setSignatureContent() {
+  const signature = auth.userSignature;
+  newEmail.value = null;
+  if (signature) {
+    nextTick(() => {
+      newEmail.value = `<p dir="ltr"><br/></p><p dir="ltr">${String(signature).trim()}</p>`;
+      nextTick(() => {
+        editorRef.value?.editor?.commands.focus("start");
+      });
+    });
+  }
+}
 
 const quotedContent = useStorage<null | string>(
   "quotedEmailBoxContent" + props.ticketId,
@@ -326,10 +345,6 @@ const sendMail = createResource({
   onSuccess: () => {
     resetState();
     emit("submit");
-
-    if (isManager) {
-      updateOnboardingStep("reply_on_ticket");
-    }
   },
   debounce: 300,
 });
@@ -385,15 +400,24 @@ async function removeAttachment(attachment) {
   await removeAttachmentFromServer(attachment.name);
 }
 
-function addToReply(
-  body: string,
-  toEmails: string[],
-  ccEmails: string[],
-  bccEmails: string[]
-) {
+function addToReply(body, toEmails, ccEmails, bccEmails) {
   toEmailsClone.value = toEmails;
   ccEmailsClone.value = ccEmails;
   bccEmailsClone.value = bccEmails;
+
+  const signature = auth.userSignature || "";
+  const repliedMessage = `<blockquote class="reply-to-content">${body}</blockquote>`;
+  const content = signature
+    ? `<p><br/></p><p>${signature}</p>${repliedMessage}`
+    : repliedMessage;
+
+  editorRef.value.editor
+    .chain()
+    .clearContent()
+    .insertContent(content)
+    .insertContentAt(0, { type: "paragraph" })
+    .focus("start")
+    .run();
 
   if (body !== quotedContent.value) {
     //trigger change for watch when replied to body data is different from current quoted content
@@ -408,10 +432,10 @@ function addToReply(
     newEmail.value = editorRef.value.editor.getHTML();
   });
 }
-
 function resetState() {
   newEmail.value = null;
   attachments.value = [];
+  setSignatureContent();
   quotedContent.value = null;
 }
 
@@ -423,7 +447,7 @@ function handleDiscard() {
   bccEmailsClone.value = [];
   showCC.value = false;
   showBCC.value = false;
-
+  setSignatureContent();
   emit("discard");
 }
 
@@ -501,8 +525,24 @@ function handleKeydown(e: KeyboardEvent) {
 }
 
 const editor = computed(() => {
-  return editorRef.value.editor;
+  return editorRef.value?.editor;
 });
+
+
+watch(
+  () => auth.userSignature,
+  (signature) => {
+    if (props.editable && signature) setSignatureContent();
+  },
+  { immediate: true }
+);
+
+watch(
+  () => props.editable,
+  (isEditable) => {
+    if (isEditable) setSignatureContent();
+  }
+);
 
 defineExpose({
   addToReply,

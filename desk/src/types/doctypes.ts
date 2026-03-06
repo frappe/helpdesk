@@ -29,7 +29,6 @@ export interface HDTicketStatus extends DocType {
   order?: number;
   /** Enabled: Check */
   enabled: 0 | 1;
-  parsed_color?: string;
 }
 
 // Last updated: 2026-01-20 15:18:57.195606
@@ -246,6 +245,7 @@ export interface HDServiceLevelAgreement extends DocType {
   default_ticket_status?: string;
 }
 
+// Last updated: 2026-02-09 22:08:22.055831
 // Last updated: 2026-02-02 11:15:47.402850
 export interface HDAgent extends DocType {
   /** User: Link (User) */
@@ -254,6 +254,10 @@ export interface HDAgent extends DocType {
   agent_name: string;
   /** Is Active: Check */
   is_active: 0 | 1;
+  /** Availability Status: Select */
+  availability_status: 'Available' | 'Away';
+  /** Signature: Small Text */
+  signature?: string;
   /** Image: Attach Image */
   user_image?: string;
 }

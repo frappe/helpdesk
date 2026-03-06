@@ -448,6 +448,8 @@ class HDTicket(Document):
         if frappe.session.user != agent:
             self.notify_agent(agent, "Assignment")
 
+
+
     def get_assigned_agents(self):
         assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
         if len(assignees) > 0:
@@ -576,6 +578,8 @@ class HDTicket(Document):
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject}"
         sender = frappe.session.user
+       
+
         recipients = to or self.raised_by
         sender_email = None if skip_email_workflow else self.sender_email()
 

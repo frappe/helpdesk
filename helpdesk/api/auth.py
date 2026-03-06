@@ -23,7 +23,7 @@ def get_user():
         fieldname=fields,
         as_dict=True,
     )
-
+    
     is_agent = _is_agent()
     is_admin = ("System Manager" or "Admistrator") in frappe.get_roles(current_user)
     has_desk_access = is_agent or is_admin
@@ -38,7 +38,13 @@ def get_user():
     language = user.language or frappe.db.get_single_value(
         "System Settings", "language"
     )
-
+    signature = frappe.db.get_value(
+        "HD Agent",
+        {"user": current_user},
+        "signature"
+    ) or ""
+    frappe.logger().debug(f"Signature for {current_user}: {signature}")  # 👈 add this
+    print(f"Signature for {current_user}: {signature}")  # 👈 add this
     return {
         "has_desk_access": has_desk_access,
         "is_admin": is_admin,
@@ -52,4 +58,7 @@ def get_user():
         "time_zone": user.time_zone,
         "user_teams": user_team_names,
         "language": language,
+        "signature":signature ,
+        
     }
+
