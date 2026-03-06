@@ -120,7 +120,7 @@
       </div>
       <div
         v-if="chartConfig?.totalPendingTickets > 6"
-        class="p-2 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none"
+        class="p-2 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none mt-2"
         @click="redirectToSeeAllTickets"
       >
         {{ __("See all {0} tickets", chartConfig?.totalPendingTickets) }}

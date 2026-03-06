@@ -430,47 +430,49 @@ const viewActions = (view) => {
         },
       });
     }
-    actions.push({
-      group: __("Delete View"),
-      hideLabel: true,
-      items: [
-        {
-          label: __("Delete"),
-          icon: "trash-2",
-          onClick: () => {
-            $dialog({
-              title: __("Delete {0}?", [_view.label]),
-              message:
-                __("Are you sure you want to delete this view?") +
-                (_view.public
-                  ? " " +
-                    __(
-                      "This view is public, and will be removed for all users."
-                    )
-                  : ""),
-              actions: [
-                {
-                  label: __("Confirm"),
-                  variant: "solid",
-                  onClick({ close }) {
-                    if (route.query.view === _view.name) {
-                      router.push({
-                        name: isCustomerPortal.value
-                          ? "TicketsCustomer"
-                          : "TicketsAgent",
-                      });
-                    }
-                    deleteView(_view.name);
-                    handleSuccess(__("deleted"));
-                    close();
+    if (!_view.is_standard) {
+      actions.push({
+        group: __("Delete View"),
+        hideLabel: true,
+        items: [
+          {
+            label: __("Delete"),
+            icon: "trash-2",
+            onClick: () => {
+              $dialog({
+                title: __("Delete {0}?", [_view.label]),
+                message:
+                  __("Are you sure you want to delete this view?") +
+                  (_view.public
+                    ? " " +
+                      __(
+                        "This view is public, and will be removed for all users."
+                      )
+                    : ""),
+                actions: [
+                  {
+                    label: __("Confirm"),
+                    variant: "solid",
+                    onClick({ close }) {
+                      if (route.query.view === _view.name) {
+                        router.push({
+                          name: isCustomerPortal.value
+                            ? "TicketsCustomer"
+                            : "TicketsAgent",
+                        });
+                      }
+                      deleteView(_view.name);
+                      handleSuccess(__("deleted"));
+                      close();
+                    },
                   },
-                },
-              ],
-            });
+                ],
+              });
+            },
           },
-        },
-      ],
-    });
+        ],
+      });
+    }
   }
 
   return actions;
