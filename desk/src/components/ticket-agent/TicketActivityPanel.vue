@@ -150,6 +150,7 @@ const _activities = computed(() => {
       creation: comment.creation,
       content: comment.content,
       attachments: comment.attachments,
+      isPinned: comment.is_pinned,
     };
   });
 

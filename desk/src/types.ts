@@ -445,6 +445,7 @@ export interface CommentActivity extends BaseActivity {
   commenter: string;
   commentedBy: string;
   attachments: FileAttachment[];
+  isPinned?: number;
 }
 
 export interface CallActivity extends BaseActivity {
