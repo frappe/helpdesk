@@ -3,32 +3,35 @@
     <!-- Feedback Section -->
     <div>
       <!-- was this article helpful? -->
-      <div class="flex items-center gap-2">
-        <span class="text-gray-800 text-sm"
-          >Did this article solve your issue?</span
+      <div class="flex flex-col gap-2">
+        <span class="text-gray-800 text-sm !text-[14px]"
+          >Was this article Helpful?</span
         >
-        <div class="flex items-center gap-1">
-          <component
-            :is="_feedback === 1 ? ThumbsUpFilledIcon : ThumbsUpIcon"
-            class="w-4 h-4 cursor-pointer"
-            @click="handleFeedbackClick(1)"
-          />
-          <component
-            :is="_feedback === 2 ? ThumbsDownFilledIcon : ThumbsDownIcon"
-            class="w-4 h-4 cursor-pointer"
-            @click="handleFeedbackClick(2)"
-          />
+
+        <div class="flex gap-1 text-gray-600">
+          <span class="text-sm">
+            If your issue isn't resolved, raise a support ticket
+          </span>
+          <router-link :to="{ name: 'TicketNew' }">
+            <p class="underline font-base text-sm">here</p>
+          </router-link>
         </div>
       </div>
     </div>
     <!-- Create a ticket CTA -->
     <div class="flex items-center justify-center gap-2">
-      <span class="font-normal text-sm">
-        Can’t find what you’re looking for?
-      </span>
-      <router-link :to="{ name: 'TicketNew' }">
-        <p class="underline font-base text-sm">Create a ticket &rightarrow;</p>
-      </router-link>
+      <div class="flex items-center gap-1">
+        <component
+          :is="_feedback === 1 ? ThumbsUpFilledIcon : ThumbsUpIcon"
+          class="w-4 h-4 m-1.5 cursor-pointer"
+          @click="handleFeedbackClick(1)"
+        />
+        <component
+          :is="_feedback === 2 ? ThumbsDownFilledIcon : ThumbsDownIcon"
+          class="w-4 h-4 m-1.5 cursor-pointer"
+          @click="handleFeedbackClick(2)"
+        />
+      </div>
     </div>
   </div>
 </template>
