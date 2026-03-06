@@ -67,7 +67,13 @@ doc_events = {
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
     "ToDo": {
-        "before_insert": "helpdesk.overrides.assign.validate_agent_availability"
+        "before_insert": "helpdesk.overrides.assign.validate_agent_availability",
+    },
+    "HD Ticket": {                                                       
+        "validate": "helpdesk.overrides.assign.validate_hd_ticket_agent", 
+    },
+    "ToDo": {
+        "before_insert": "helpdesk.overrides.assign.validate_agent_availability",
     },
    
 }

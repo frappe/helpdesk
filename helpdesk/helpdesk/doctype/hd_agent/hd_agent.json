@@ -48,7 +48,7 @@
   {
    "description": "automatically added in reply section",
    "fieldname": "signature",
-   "fieldtype": "Small Text",
+   "fieldtype": "Text Editor",
    "label": "Signature"
   },
   {

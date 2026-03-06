@@ -123,12 +123,24 @@
             :options="['Available', 'Away']"
             v-model="profile.availabilityStatus"
           />
-          <FormControl
-            class="w-full md:col-span-2"
-            type="textarea"
-            :label="__('Signature')"
-            v-model="profile.signature"
-          />
+          
+          
+          <div class="w-full md:col-span-2">
+            <div class="mb-2 text-sm font-medium text-ink-gray-7">
+              {{ __("Signature") }}
+            </div>
+
+            <TextEditor
+              :content="profile.signature"
+              @change="(val) => (profile.signature = val)"
+              :editable="true"
+              :editor-class="[
+                'prose-sm max-w-full',
+                'min-h-[7rem]',
+                'border rounded-md p-3'
+              ]"
+            />
+          </div>
 
 
 
@@ -200,6 +212,7 @@ import {
   Dropdown,
   FileUploader,
   LoadingIndicator,
+  TextEditor,
   toast,
 } from "frappe-ui";
 import { Autocomplete } from "@/components";
@@ -212,6 +225,7 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import Link from "@/components/frappe-ui/Link.vue";
 import { HDAgent } from "@/types/doctypes";
 
+
 const auth = useAuthStore();
 const profile = ref({
   fullName: auth.userName,
@@ -221,6 +235,7 @@ const profile = ref({
   availabilityStatus: "Available",
   signature: "",
 });
+
 const showChangePasswordModal = ref(false);
 const language = ref(auth.language);
 const timezone = ref(auth.timezone);
@@ -235,11 +250,15 @@ const isTimezoneChanged = computed(() => {
 });
 
 const isAccountInfoDirty = computed(() => {
-  const agentName = agentData.data?.agent_name?.split(" ");
-  if (!agentName) return false;
+  const data = agentData.data;
+  if (!data) return false;
+  const agentName = data.agent_name?.split(" ") || [];
+
   const isDirty =
-    profile.value.firstName !== agentName[0] ||
-    profile.value.lastName !== (agentName[1] || "");
+    profile.value.firstName !== (agentName[0] || "") ||
+    profile.value.lastName !== (agentName[1] || "")  ||
+    profile.value.availabilityStatus !== agentData.data?.availability_status ||
+    (profile.value.signature?.trim() || "") !== (data.signature?.trim() || "")
   if (isDirty) {
     disableSettingModalOutsideClick.value = true;
   } else {
@@ -265,8 +284,9 @@ const agentData = createResource({
       lastName: fullName[1] || "",
       userImage: data.user_image,
       availabilityStatus: data.availability_status,
-      signature: data.signature,
+      signature: data.signature || "",
     };
+    
   },
 });
 
@@ -296,7 +316,7 @@ const setAgent = createResource({
         agent_name: `${profile.value.firstName} ${profile.value.lastName}`,
         user_image: profile.value.userImage,
         availability_status: profile.value.availabilityStatus,
-        signature: profile.value.signature,
+        signature: profile.value.signature || "",
       },
     };
   },
