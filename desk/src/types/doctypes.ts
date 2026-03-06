@@ -118,8 +118,6 @@ export interface HDTicket extends DocType {
   last_customer_response?: string;
   /** Ticket raised outside working hours: Check */
   raised_outside_working_hours: 0 | 1;
-  /** Is First Ticket: Check */
-  is_first_ticket: 0 | 1;
 }
 
 // Last updated: 2024-03-23 16:01:27.847608

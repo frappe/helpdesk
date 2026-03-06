@@ -1,5 +1,4 @@
 import { Field } from "@/types";
-import { BadgeProps } from "frappe-ui";
 
 export async function setupCustomizations(doc, obj) {
   // Supporting old format, will have to refactor later
@@ -8,12 +7,10 @@ export async function setupCustomizations(doc, obj) {
   if (!data._form_script) return [];
   let actions = [];
   let onChangeFieldMap = {};
-  let badges: BadgeProps[] = [];
   if (Array.isArray(data._form_script)) {
     for (const script of data._form_script) {
       const parsed = await parseScript(script, obj);
       actions = actions.concat(parsed.actions);
-      badges = badges.concat(parsed.badges || []);
       if (parsed.onChange) {
         parseOnChangeFn(onChangeFieldMap, parsed.onChange);
       }
@@ -21,7 +18,6 @@ export async function setupCustomizations(doc, obj) {
   } else {
     const parsed = await parseScript(data._form_script, obj);
     actions = parsed.actions;
-    badges = parsed.badges || [];
     if (parsed.onChange) {
       parseOnChangeFn(onChangeFieldMap, parsed.onChange);
     }
@@ -30,7 +26,6 @@ export async function setupCustomizations(doc, obj) {
   if (Object.keys(onChangeFieldMap).length) {
     data._customOnChange = onChangeFieldMap;
   }
-  data._customBadges = badges;
 }
 
 function parseOnChangeFn(fieldMap: object, currentField: object) {
@@ -48,7 +43,6 @@ async function parseScript(script, obj) {
   return {
     actions: formScript?.actions || [],
     onChange: formScript?.onChange || null,
-    badges: formScript?.badges || [],
   };
 }
 
