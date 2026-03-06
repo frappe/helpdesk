@@ -61,6 +61,9 @@ function sanitize(html: string) {
       a: ["href"],
       video: ["src", "controls"],
       img: ["src"],
+      table: ["border", "cellpadding", "cellspacing", "width", "data-type"],
+      td: ["colspan", "rowspan", "width", "align", "valign"],
+      th: ["colspan", "rowspan", "width", "align", "valign"],
     },
   });
 }

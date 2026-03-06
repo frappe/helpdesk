@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-02-22 10:40+0000\n"
-"PO-Revision-Date: 2026-02-26 17:30\n"
+"PO-Revision-Date: 2026-03-02 18:20\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -1960,7 +1960,7 @@ msgstr "Uppfylld"
 #: desk/src/components/layouts/Sidebar.vue:487
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
-msgstr "Allmän"
+msgstr "Allmänt"
 
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -3427,7 +3427,7 @@ msgstr "Profil uppdaterad"
 #. Label of the public (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Public"
-msgstr "Allmän"
+msgstr "Publik"
 
 #: desk/src/components/layouts/Sidebar.vue:270
 #: desk/src/pages/ticket/Tickets.vue:324
