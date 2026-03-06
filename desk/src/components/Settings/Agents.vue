@@ -114,7 +114,7 @@
           <div
             class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600"
           >
-            <div class="col-span-6 text-p-sm">{{ __("Agent Name") }}</div>
+            <div class="col-span-6 text-p-sm">{{ __("Agent name") }}</div>
           </div>
           <hr class="mt-2" />
           <div v-for="(agent, index) in agents.data" :key="agent.agent_name">

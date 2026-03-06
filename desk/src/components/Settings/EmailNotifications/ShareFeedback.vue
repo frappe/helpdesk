@@ -17,7 +17,7 @@
       <FormControl
         type="autocomplete"
         size="sm"
-        :label="__('On Ticket Status')"
+        :label="__('On ticket status')"
         :options="statusOptions"
         :required="true"
         :model-value="ticketStatus"

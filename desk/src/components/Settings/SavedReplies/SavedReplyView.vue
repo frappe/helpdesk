@@ -88,7 +88,7 @@
               </template>
             </Select>
             <FormLabel
-              :label="__('Choose who can view and use this response')"
+              :label="__('Choose who can view and use this response.')"
             />
           </div>
         </div>
@@ -203,7 +203,7 @@ const { userTeams, isAdmin } = storeToRefs(useAuthStore());
 const savedReplyData = ref({
   name: "",
   title: "",
-  scope: "Personal",
+  scope: savedRepliesActiveScreen.value.data?.scope || "Personal",
   message: "",
   teams: [],
 });

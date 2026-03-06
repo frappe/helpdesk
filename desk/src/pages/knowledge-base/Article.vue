@@ -331,7 +331,6 @@ function incrementArticleViews(articleId: string) {
   );
 }
 
-
 const toggleStatus = debounce(() => {
   const status = article.data?.status === "Published" ? "Draft" : "Published";
   updateArticle.submit(

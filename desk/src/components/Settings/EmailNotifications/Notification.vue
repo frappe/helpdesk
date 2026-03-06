@@ -64,7 +64,7 @@
             <FormControl
               type="textarea"
               size="sm"
-              :label="__('Email Content')"
+              :label="__('Email content')"
               :required="true"
               :rows="10"
               v-model="content"

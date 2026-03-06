@@ -29,7 +29,7 @@
         class="grid grid-cols-6 items-center gap-3 text-sm text-gray-600 ml-2"
       >
         <div class="col-span-5">
-          {{ __("Policy Name") }}
+          {{ __("Policy name") }}
         </div>
         <div class="col-span-1">{{ __("Enabled") }}</div>
       </div>

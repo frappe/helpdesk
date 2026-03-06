@@ -15,7 +15,7 @@
       :title="__('Logo')"
       :description="
         __(
-          'Appears in the left sidebar. Recommended size is minimum 32x32 px in PNG or SVG'
+          'Appears in the left sidebar. Recommended size is minimum 32x32 px in PNG or SVG.'
         )
       "
       :image="brandLogo"
@@ -27,7 +27,7 @@
       :title="__('Favicon')"
       :description="
         __(
-          'Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO'
+          'Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO.'
         )
       "
       :image="favicon"

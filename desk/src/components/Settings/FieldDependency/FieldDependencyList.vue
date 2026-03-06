@@ -5,19 +5,21 @@
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("Field Dependencies") }}
         </h1>
-        <DocumentationButton
-          url="https://docs.frappe.io/helpdesk/field-dependency"
-          color="!text-ink-gray-6"
-        />
       </div>
     </template>
     <template #description>
       <p class="text-p-sm max-w-md text-ink-gray-6">
         {{
           __(
-            "Create dependencies between fields to dynamically control options based on user selections."
+            "Create field dependencies to dynamically update options based on user selections. Learn more about field dependencies"
           )
         }}
+        <a
+          href="https://docs.frappe.io/helpdesk/field-dependency"
+          target="_blank"
+          class="underline"
+          >{{ __("here.") }}</a
+        >
       </p>
     </template>
     <template #header-actions>
@@ -74,7 +76,7 @@
               class="grid grid-cols-11 items-center gap-4 text-sm text-gray-600"
             >
               <div class="col-span-7 ml-2">{{ __("Name") }}</div>
-              <div class="col-span-2">{{ __("Created By") }}</div>
+              <div class="col-span-2">{{ __("Created by") }}</div>
               <div class="col-span-2">{{ __("Enabled") }}</div>
             </div>
             <hr class="mt-2 mx-2" />
@@ -151,7 +153,6 @@ import {
 import { getFieldDependencyLabel, ConfirmDelete } from "@/utils";
 import { onMounted, ref } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";
-import DocumentationButton from "@/components/DocumentationButton.vue";
 import FieldDependencyIcon from "@/components/icons/FieldDependencyIcon.vue";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
