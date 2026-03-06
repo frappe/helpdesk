@@ -123,6 +123,43 @@ export const ComponentUtils: Extension = Extension.create({
           },
         },
       },
+      {
+        types: ["table"],
+        attributes: {
+          style: {
+            default: null,
+            parseHTML: (el) => el.getAttribute("style"),
+            renderHTML: () => ({
+              style: "border-collapse: collapse; width: 100%; border: 1px solid #d1d5db;",
+            }),
+          },
+        },
+      },
+
+      {
+        types: ["tableRow"],
+        attributes: {
+          style: {
+            default: null,
+            parseHTML: (el) => el.getAttribute("style"),
+            renderHTML: () => ({ style: "border: 1px solid #d1d5db;" }),
+          },
+        },
+      },
+
+      {
+        types: ["tableCell", "tableHeader"],
+        attributes: {
+          style: {
+            default: null,
+            parseHTML: (el) => el.getAttribute("style"),
+            renderHTML: () => ({
+              style:
+                "border: 1px solid #d1d5db; padding: 6px 8px; vertical-align: top; text-align: left;",
+            }),
+          },
+        },
+      },
     ];
   },
 });
