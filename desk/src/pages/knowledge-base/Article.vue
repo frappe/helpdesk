@@ -164,10 +164,10 @@
               <p
                 class="truncate capitalize text-base text-ink-gray-9 font-medium"
               >
-                <span class="text-base text-gray-800">published by </span>
+                <span class="text-base text-gray-600">published by </span>
                 {{ article.data.author.name }}
               </p>
-              <div class="text-xs text-gray-500">
+              <div class="text-xs text-gray-700">
                 {{ dayjsLocal(article.data.modified).format("MMM D, h:mm A") }}
               </div>
             </div>

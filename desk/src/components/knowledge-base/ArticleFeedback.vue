@@ -4,13 +4,13 @@
     <div>
       <!-- was this article helpful? -->
       <div class="flex flex-col gap-2">
-        <span class="text-gray-800 text-sm !text-[14px]">{{
-          __("Was this article Helpful?")
-        }}</span>
+        <span class="text-gray-800 text-sm !text-[14px]"
+          >Was this article Helpful?</span
+        >
 
         <div class="flex gap-1 text-gray-600">
           <span class="text-sm">
-            {{ __("If your issue isn't resolved, raise a support ticket") }}
+            If your issue isn't resolved, raise a support ticket
           </span>
           <router-link :to="{ name: 'TicketNew' }">
             <p class="underline font-base text-sm">here</p>
