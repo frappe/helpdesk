@@ -1,26 +1,7 @@
 <template>
   <div class="w-full h-full overflow-hidden">
     <div class="flex flex-col rounded-md p-4 min-h-48 grow w-full h-full">
-      <div
-        v-if="chartConfig.averageRating == 0"
-        class="text-ink-gray-8 text-lg font-semibold"
-      >
-        {{ __("Reviews") }}
-      </div>
-      <div
-        v-if="chartConfig.averageRating == 0"
-        class="flex flex-col justify-center items-center text-center gap-2 h-full w-full"
-      >
-        <div class="flex flex-col gap-2 max-w-60">
-          <div class="text-base font-medium text-ink-gray-7">
-            {{ __("No feedback") }}
-          </div>
-          <div class="text-base text-ink-gray-6">
-            {{ __("You haven't received any feedback yet") }}
-          </div>
-        </div>
-      </div>
-      <div v-else class="flex flex-col sm:flex-row gap-4 h-full w-full">
+      <div class="flex flex-col sm:flex-row gap-4 h-full w-full">
         <div class="flex items-center justify-between sm:hidden">
           <div class="text-ink-gray-8 text-lg font-semibold">
             {{ __("Reviews") }}
@@ -59,7 +40,7 @@
                 {{ __("{0} reviews", chartConfig.totalFeedbacks) }}
               </div>
             </div>
-            <div class="text-sm">
+            <div v-if="chartConfig.totalFeedbacks > 0" class="text-sm">
               {{ __("Your performance is") }}
               {{ performance }}!
             </div>
@@ -92,7 +73,7 @@
 
           <!-- Feedback Card -->
           <div
-            v-if="currentFeedback"
+            v-if="currentFeedback && chartConfig.totalFeedbacks > 0"
             class="flex-1 flex flex-col rounded-lg mt-2"
           >
             <!-- Ticket Info -->
@@ -174,6 +155,19 @@
                 >
                   <FeatherIcon name="chevron-right" class="size-4" />
                 </Button>
+              </div>
+            </div>
+          </div>
+          <div
+            v-else
+            class="flex flex-col justify-center items-center text-center gap-2 h-full w-full"
+          >
+            <div class="flex flex-col gap-2 max-w-60">
+              <div class="text-base font-medium text-ink-gray-7">
+                {{ __("No feedback") }}
+              </div>
+              <div class="text-base text-ink-gray-6">
+                {{ __("You haven't received any feedback yet") }}
               </div>
             </div>
           </div>
