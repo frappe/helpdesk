@@ -23,7 +23,7 @@ def calculate_percentage_change(current_value: float, previous_value: float) -> 
 
 
 def get_default_agent_dashboard():
-    return '[{"chart":"avg_resolution_time","layout":{"x":33,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"avg_first_response_time","layout":{"x":16,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"agent_tickets","layout":{"x":0,"y":0,"w":16,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"pending_tickets","layout":{"x":0,"y":10,"w":50,"h":31,"minW":25,"minH":31,"maxH":31}},{"chart":"recent_feedback","layout":{"x":0,"y":65,"w":50,"h":21,"minW":50,"maxH":21}},{"chart":"avg_time_metrics","layout":{"x":0,"y":41,"w":50,"h":24,"minW":18,"minH":24,"maxH":44}}]'
+    return '[{"chart":"avg_resolution_time","layout":{"x":33,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"avg_first_response_time","layout":{"x":16,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"agent_tickets","layout":{"x":0,"y":0,"w":16,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"pending_tickets","layout":{"x":0,"y":10,"w":50,"h":31,"minW":25,"minH":31,"maxH":31}},{"chart":"recent_feedback","layout":{"x":0,"y":65,"w":50,"h":21,"minW":50,"maxH":21,"minH":21}},{"chart":"avg_time_metrics","layout":{"x":0,"y":41,"w":50,"h":24,"minW":18,"minH":24,"maxH":44}}]'
 
 
 @frappe.whitelist()
@@ -130,16 +130,29 @@ def get_agent_tickets(period: str = "last month"):
     }
 
 
-def get_avg_time(from_date, to_date, time_field):
+def get_avg_time(from_date, to_date, time_field, group_by_date=False):
     ticket = DocType("HD Ticket")
     to_date_plus_one = Function(
         "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
     )
 
+    query = frappe.qb.from_(ticket)
+
+    if group_by_date:
+        creation_date = Function("DATE", ticket.creation)
+        query = (
+            query.select(
+                creation_date.as_("date"),
+                Avg(ticket[time_field]).as_("avg_time"),
+            )
+            .groupby(creation_date)
+            .orderby(creation_date)
+        )
+    else:
+        query = query.select(Avg(ticket[time_field]).as_("avg_time"))
+
     result = (
-        frappe.qb.from_(ticket)
-        .select(Avg(ticket[time_field]).as_("avg_time"))
-        .where(ticket.creation >= from_date)
+        query.where(ticket.creation >= from_date)
         .where(ticket.creation < to_date_plus_one)
         .where(
             Function(
@@ -149,35 +162,11 @@ def get_avg_time(from_date, to_date, time_field):
         .where(ticket[time_field].isnotnull())
         .run(as_dict=True)
     )
+
+    if group_by_date:
+        return result
+
     return result[0]["avg_time"] if result and result[0]["avg_time"] is not None else 0
-
-
-def get_avg_time_data(from_date, to_date, field):
-    ticket = DocType("HD Ticket")
-    creation_date = Function("DATE", ticket.creation)
-    to_date_plus_one = Function(
-        "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
-    )
-
-    result = (
-        frappe.qb.from_(ticket)
-        .select(
-            creation_date.as_("date"),
-            Avg(ticket[field]).as_("avg_time"),
-        )
-        .where(ticket.creation >= from_date)
-        .where(ticket.creation < to_date_plus_one)
-        .where(
-            Function(
-                "JSON_SEARCH", ticket._assign, "one", frappe.session.user
-            ).isnotnull()
-        )
-        .where(ticket[field].isnotnull())
-        .groupby(creation_date)
-        .orderby(creation_date)
-        .run(as_dict=True)
-    )
-    return result
 
 
 def _get_avg_time_metric(period: str, time_field: str) -> dict:
@@ -189,7 +178,9 @@ def _get_avg_time_metric(period: str, time_field: str) -> dict:
     previous_from = frappe.utils.add_days(frappe.utils.nowdate(), -(2 * days - 1))
     previous_to = frappe.utils.add_days(frappe.utils.nowdate(), -days)
 
-    current_result = get_avg_time_data(current_from, current_to, time_field)
+    current_result = get_avg_time(
+        current_from, current_to, time_field, group_by_date=True
+    )
 
     current_avg = get_avg_time(current_from, current_to, time_field)
     previous_avg = get_avg_time(previous_from, previous_to, time_field)

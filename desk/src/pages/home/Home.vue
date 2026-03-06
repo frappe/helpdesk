@@ -341,6 +341,7 @@ const chartsDropdown = computed(() => {
           h: 21,
           minW: 50,
           maxH: 21,
+          minH: 21,
         }),
     },
     {
