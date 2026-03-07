@@ -8,11 +8,8 @@
     v-if="showViewControls"
   >
     <QuickFilters v-if="!isMobileView" />
-    <div v-if="!isMobileView" class="-ml-2 h-5 border-l"></div>
-    <div
-      class="flex items-start gap-2 justify-end h-full py-1 pl-0.5"
-      v-if="!isMobileView"
-    >
+    <div class="-ml-2 h-[70%] border-l"></div>
+    <div class="flex items-start gap-2 justify-end h-full" v-if="!isMobileView">
       <Button
         :label="__('Save Changes')"
         v-if="isViewUpdated && canSaveView"

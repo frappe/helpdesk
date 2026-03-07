@@ -1,13 +1,13 @@
 <template>
   <FadedScrollableDiv
-    class="flex flex-1 items-center -ml-1 overflow-x-scroll py-1 gap-2"
+    class="flex flex-1 items-center -ml-1 overflow-x-auto gap-2"
     orientation="horizontal"
     v-if="!quickFilters.loading"
   >
     <div
       v-for="filter in quickFilters.data"
       :key="filter.name"
-      class="min-w-36 pl-0.5"
+      class="min-w-36"
     >
       <QuickFilterField
         :filter="filter"
