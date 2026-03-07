@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-03-01 10:40+0000\n"
-"PO-Revision-Date: 2026-03-06 19:45\n"
+"PO-Revision-Date: 2026-03-07 20:08\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Cyrillic)\n"
 "MIME-Version: 1.0\n"
@@ -885,7 +885,7 @@ msgstr "Промените врсту тикета"
 
 #: desk/src/components/Settings/Profile/Profile.vue:155
 msgid "Change timezone of the application."
-msgstr ""
+msgstr "Промените временску зону апликације."
 
 #: desk/src/components/Settings/Profile/Profile.vue:124
 msgid "Change your account password for security."
@@ -4780,7 +4780,7 @@ msgstr "Временска зона"
 
 #: desk/src/components/Settings/Profile/Profile.vue:317
 msgid "Timezone updated"
-msgstr ""
+msgstr "Временска зона је ажурирана"
 
 #. Label of the title (Data) field in DocType 'HD Article'
 #. Label of the title (Data) field in DocType 'HD Saved Reply'
