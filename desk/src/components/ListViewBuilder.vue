@@ -7,7 +7,8 @@
     ]"
     v-if="showViewControls"
   >
-    <QuickFilters v-if="!isMobileView" class="flex-1" />
+    <QuickFilters v-if="!isMobileView" />
+    <div class="-ml-2 h-[70%] border-l"></div>
     <div class="flex items-start gap-2 justify-end h-full" v-if="!isMobileView">
       <Button
         :label="__('Save Changes')"
@@ -510,7 +511,10 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
     } else {
       item = item[0].name;
     }
-    applyFilters({ ...defaultParams.filters, [column.key]: ["LIKE", item] });
+    applyFilters({
+      ...defaultParams.filters,
+      [column.key]: ["LIKE", `%${item}%`],
+    });
     return;
   }
   applyFilters({ ...defaultParams.filters, [column.key]: item });
@@ -556,6 +560,9 @@ function applySort(order_by: string) {
   isViewUpdated.value = true;
   defaultParams.order_by = order_by;
   list.submit({ ...defaultParams, order_by });
+  if (!defaultParams.is_default) return;
+  handleViewUpdate();
+  isViewUpdated.value = false;
 }
 
 function updateColumns(obj) {
@@ -611,9 +618,38 @@ function handleViewUpdate() {
     route_name: route.name,
     is_customer_portal: options.value.isCustomerPortal,
   };
-  updateView(view, () => {
-    isViewUpdated.value = false;
-  });
+  const currentView = findView(route.query.view as string).value;
+  if (currentView && currentView.public) {
+    $dialog({
+      title: __("Confirm Changes"),
+      message: __(
+        "This view is public. Changes made will be visible to everyone."
+      ),
+      actions: [
+        {
+          label: __("Save"),
+          variant: "solid",
+          onClick({ close }) {
+            updateView(view, () => {
+              isViewUpdated.value = false;
+            });
+            close();
+          },
+        },
+        {
+          label: __("Cancel"),
+          variant: "outline",
+          onClick({ close }) {
+            close();
+          },
+        },
+      ],
+    });
+  } else {
+    updateView(view, () => {
+      isViewUpdated.value = false;
+    });
+  }
 }
 
 const { findView, updateView, defaultView } = useView(options.value.doctype);

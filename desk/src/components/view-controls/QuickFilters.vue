@@ -1,22 +1,21 @@
 <template>
-  <div v-if="!quickFilters.loading">
-    <FadedScrollableDiv
-      class="flex flex-1 items-center -ml-1 flex-wrap gap-2"
-      orientation="horizontal"
+  <FadedScrollableDiv
+    class="flex flex-1 items-center -ml-1 overflow-x-auto gap-2"
+    orientation="horizontal"
+    v-if="!quickFilters.loading"
+  >
+    <div
+      v-for="filter in quickFilters.data"
+      :key="filter.name"
+      class="min-w-36"
     >
-      <div
-        v-for="filter in quickFilters.data"
-        :key="filter.name"
-        class="min-w-36"
-      >
-        <QuickFilterField
-          :filter="filter"
-          :value="getValue(filter, list.params?.filters)"
-          @applyQuickFilter="(f, v) => applyQuickFilter(f, v)"
-        />
-      </div>
-    </FadedScrollableDiv>
-  </div>
+      <QuickFilterField
+        :filter="filter"
+        :value="getValue(filter, list.params?.filters)"
+        @applyQuickFilter="(f, v) => applyQuickFilter(f, v)"
+      />
+    </div>
+  </FadedScrollableDiv>
 </template>
 
 <script setup>
