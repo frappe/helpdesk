@@ -32,17 +32,13 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   title: "No Data Found",
   icon: "",
-  description:
-    "It appears that there is currently no data available. You can create more using the Create button.",
+  description: "Create new data using the Create Button.",
 });
 
 const descriptionText = computed(
   () =>
-    `It appears that there are currently no ${props.title
-      .split(" ")[1]
-      .toLocaleLowerCase()} present. You can create more ${props.title
-      .split(" ")[1]
-      .toLocaleLowerCase()} by using the Create button.` || props.description
+    `Create new  ${props.title.split(" ")[1].toLocaleLowerCase()}
+      using the Create button.` || props.description
 );
 
 const emit = defineEmits(["emptyStateAction"]);
