@@ -2,14 +2,8 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-ink-gray-9">
-          {{ __(dashboardTitle) }}
-        </div>
-      </template>
-      <template #right-header>
-        <!-- Segmented pill toggle: only visible to managers -->
-        <div v-if="isManager">
-          <TabButtons v-model="activeTab" :buttons="tabButtons" />
+        <div class="text-lg font-medium text-gray-900">
+          {{ isManager ? __("Organization Analytics") : __("Agent Dashboard") }}
         </div>
       </template>
     </LayoutHeader>
@@ -215,15 +209,7 @@ import LucideUser from "~icons/lucide/user";
 import { useScreenSize } from "@/composables/screen";
 import { useStorage } from "@vueuse/core";
 
-interface NumberCardData {
-  title: string;
-  value: number;
-  delta: number | null;
-  deltaSuffix: string;
-  suffix?: string;
-  negativeIsBetter?: boolean;
-  tooltip: string;
-}
+const { isManager, userId, isAgent } = useAuthStore();
 
 interface ChartData {
   data: ChartValues[];
