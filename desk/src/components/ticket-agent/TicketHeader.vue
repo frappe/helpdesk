@@ -76,7 +76,7 @@
     v-model="showMergeModal"
     @update="ticket.reload()"
   />
-  <TicketSubjectModal v-if="showSubjectDialog" v-model="showSubjectDialog" />
+  <TicketSubjectModal v-model="showSubjectDialog" />
 </template>
 
 <script setup lang="ts">
