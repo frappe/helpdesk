@@ -3,8 +3,8 @@
     <Tooltip
       :text="
         getPreviousTicket()
-          ? __(`Go to previous ticket (Shift + <)`)
-          : __('No previous ticket')
+          ? `Shift + < : Go to previous ticket`
+          : 'No previous ticket'
       "
       :disabled="disableLeftCondition"
     >
@@ -17,9 +17,7 @@
     </Tooltip>
     <Tooltip
       :text="
-        getNextTicket()
-          ? __(`Go to next ticket (Shift + >)`)
-          : __('No next ticket')
+        getNextTicket() ? `Shift + > : Go to next ticket` : 'No next ticket'
       "
       :disabled="disableRightCondition"
     >
