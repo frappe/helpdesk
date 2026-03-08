@@ -133,6 +133,7 @@
                   ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
                   : 'bg-surface-gray-3 text-ink-gray-6 hover:bg-surface-gray-4'
               "
+              v-if="reaction.count !== 0"
               @click="handleReaction(reaction.emoji)"
             >
               <span>{{ reaction.emoji }}</span>
@@ -245,6 +246,37 @@ const toggleReaction = createResource({
 });
 
 function handleReaction(emoji: string) {
+  const previousReaction = reactions.value.find(
+    (r) => r.current_user_reacted && r.emoji !== emoji
+  );
+  if (previousReaction) {
+    previousReaction.count = Math.max(0, previousReaction.count - 1);
+    previousReaction.current_user_reacted = false;
+  }
+
+  const existingReaction = reactions.value.find((r) => r.emoji === emoji);
+  if (existingReaction) {
+    if (existingReaction.current_user_reacted) {
+      existingReaction.count = Math.max(0, existingReaction.count - 1);
+      existingReaction.current_user_reacted = false;
+    } else {
+      existingReaction.count += 1;
+      existingReaction.current_user_reacted = true;
+    }
+  } else {
+    reactions.value.push({
+      emoji,
+      count: 1,
+      current_user_reacted: true,
+      users: [
+        {
+          user: authStore.userId,
+          full_name: getUser(authStore.userId).full_name,
+        },
+      ],
+    });
+  }
+
   toggleReaction.submit(emoji);
 }
 
