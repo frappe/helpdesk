@@ -3,7 +3,7 @@
     <LayoutHeader>
       <template #left-header>
         <div class="text-lg font-medium text-gray-900">
-          {{ __("Dashboard") }}
+          {{ isManager ? __("Organization Analytics") : __("Agent Dashboard") }}
         </div>
       </template>
       <template #right-header> </template>
@@ -151,7 +151,7 @@ import {
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
 import { __ } from "@/translation";
 
-const { isManager, userId } = useAuthStore();
+const { isManager, userId, isAgent } = useAuthStore();
 
 const filters = reactive({
   period: getLastXDays(),
