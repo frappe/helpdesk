@@ -11,14 +11,14 @@
         leave-to="-translate-x-full"
       >
         <div
-          class="relative z-10 flex h-full w-[230px] flex-col border-r bg-gray-50 transition-all duration-300 ease-in-out"
+          class="relative z-10 flex h-full w-[230px] flex-col border-r bg-gray-50 transition-all duration-300 ease-in-out overflow-y-auto"
         >
           <!-- user dropwdown -->
           <div class="p-1">
             <UserMenu :options="profileSettings" />
           </div>
           <!-- notifications -->
-          <div class="overflow-y-auto" v-if="!isCustomerPortal">
+          <div v-if="!isCustomerPortal">
             <div class="flex flex-col gap-1">
               <SidebarLink
                 class="relative"
@@ -42,7 +42,7 @@
 
           <div v-for="view in allViews" :key="view.label">
             <div v-if="!view.hideLabel && view.views?.length" />
-            <div class="border-t mx-2 my-1.5"></div>
+            <div class="mx-2 my-1.5"></div>
 
             <Section
               :label="view.label"
