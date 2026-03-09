@@ -480,7 +480,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
     return h(MultipleAvatar, {
       avatars: item,
       hideName: false,
-      class: "flex items-center flex-1 min-w-0",
+      class: "flex items-center truncate flex-1 flex-row-reverse justify-end",
     });
   }
   if (column.type === "Rating") {
