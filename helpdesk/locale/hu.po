@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-22 10:40+0000\n"
-"PO-Revision-Date: 2026-02-25 17:28\n"
+"POT-Creation-Date: 2026-03-01 10:40+0000\n"
+"PO-Revision-Date: 2026-03-06 19:45\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -295,7 +295,7 @@ msgid "Agents will no longer be able to view and create saved replies with globa
 msgstr ""
 
 #. Name of a role
-#: desk/src/components/SavedRepliesSelectorModal.vue:158
+#: desk/src/components/SavedRepliesSelectorModal.vue:159
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:325
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
@@ -398,7 +398,7 @@ msgstr ""
 msgid "Are you sure you want to delete these articles?"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:317
+#: desk/src/pages/knowledge-base/Article.vue:318
 msgid "Are you sure you want to delete this article?"
 msgstr ""
 
@@ -450,19 +450,19 @@ msgstr "Cikk"
 msgid "Article created"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:330
+#: desk/src/pages/knowledge-base/Article.vue:331
 msgid "Article deleted"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:407
+#: desk/src/pages/knowledge-base/Article.vue:408
 msgid "Article link copied to clipboard"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:260
+#: desk/src/pages/knowledge-base/Article.vue:261
 msgid "Article moved"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:306
+#: desk/src/pages/knowledge-base/Article.vue:307
 msgid "Article updated"
 msgstr ""
 
@@ -579,7 +579,7 @@ msgstr ""
 msgid "At least one email is required"
 msgstr ""
 
-#: desk/src/components/Settings/InviteAgents.vue:170
+#: desk/src/components/Settings/InviteAgents.vue:171
 msgid "At least one email required"
 msgstr ""
 
@@ -773,15 +773,15 @@ msgstr ""
 msgid "Calls"
 msgstr ""
 
-#: desk/src/components/Settings/InviteAgents.vue:147
+#: desk/src/components/Settings/InviteAgents.vue:148
 msgid "Can invite new agents, manage tickets, create custom views and manage public views."
 msgstr ""
 
-#: desk/src/components/Settings/InviteAgents.vue:155
+#: desk/src/components/Settings/InviteAgents.vue:156
 msgid "Can manage all aspects of Helpdesk."
 msgstr ""
 
-#: desk/src/components/Settings/InviteAgents.vue:139
+#: desk/src/components/Settings/InviteAgents.vue:140
 msgid "Can work on tickets, create custom views and manage private views."
 msgstr ""
 
@@ -793,7 +793,7 @@ msgstr ""
 msgid "Canceled"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:508
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:511
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr ""
 
@@ -838,7 +838,7 @@ msgid "Category merged"
 msgstr ""
 
 #: helpdesk/api/knowledge_base.py:72
-#: helpdesk/helpdesk/doctype/hd_article/hd_article.py:64
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.py:65
 msgid "Category must have atleast one article"
 msgstr ""
 
@@ -850,7 +850,7 @@ msgstr ""
 msgid "Change"
 msgstr "Változás"
 
-#: desk/src/components/Settings/Profile/Profile.vue:123
+#: desk/src/components/Settings/Profile/Profile.vue:129
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:2
 msgid "Change Password"
 msgstr "Változtass Jelszót"
@@ -859,7 +859,7 @@ msgstr "Változtass Jelszót"
 msgid "Change image"
 msgstr "Kép módosítása"
 
-#: desk/src/components/Settings/Profile/Profile.vue:133
+#: desk/src/components/Settings/Profile/Profile.vue:139
 msgid "Change language of the application."
 msgstr ""
 
@@ -883,7 +883,11 @@ msgstr ""
 msgid "Change ticket type"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:118
+#: desk/src/components/Settings/Profile/Profile.vue:155
+msgid "Change timezone of the application."
+msgstr ""
+
+#: desk/src/components/Settings/Profile/Profile.vue:124
 msgid "Change your account password for security."
 msgstr ""
 
@@ -971,7 +975,7 @@ msgstr ""
 msgid "Closed"
 msgstr "Lezárva"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:336
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:354
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr ""
 
@@ -1001,8 +1005,8 @@ msgstr ""
 msgid "Comment"
 msgstr "Megjegyzés"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:61
-#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:106
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:67
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:112
 msgid "Comment not found"
 msgstr ""
 
@@ -1044,7 +1048,7 @@ msgstr ""
 #: desk/src/components/ListViewBuilder.vue:236
 #: desk/src/components/Settings/Teams/TeamEdit.vue:115
 #: desk/src/components/Settings/Teams/TeamEdit.vue:241
-#: desk/src/pages/knowledge-base/Article.vue:320
+#: desk/src/pages/knowledge-base/Article.vue:321
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:201
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:310
 #: desk/src/pages/knowledge-base/NewArticle.vue:149
@@ -1124,15 +1128,15 @@ msgstr ""
 msgid "Copy ticket id"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:632
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:650
 msgid "Could not an email due to: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:790
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:808
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:173
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:172
 msgid "Could not send feedback email,due to: {0}"
 msgstr ""
 
@@ -1226,7 +1230,7 @@ msgid "Cyan"
 msgstr "Cián"
 
 #: desk/src/components/layouts/Sidebar.vue:353
-#: desk/src/pages/knowledge-base/Article.vue:411
+#: desk/src/pages/knowledge-base/Article.vue:412
 msgid "Danger"
 msgstr "Veszély"
 
@@ -1296,7 +1300,7 @@ msgstr ""
 msgid "Default priority"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:59
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:63
 msgid "Default template can not be deleted"
 msgstr ""
 
@@ -1319,15 +1323,15 @@ msgstr ""
 #: desk/src/components/ListViewBuilder.vue:230
 #: desk/src/components/Settings/Teams/TeamEdit.vue:348
 #: desk/src/components/Settings/Teams/TeamEdit.vue:350
-#: desk/src/pages/knowledge-base/Article.vue:415
-#: desk/src/pages/knowledge-base/Article.vue:417
+#: desk/src/pages/knowledge-base/Article.vue:416
+#: desk/src/pages/knowledge-base/Article.vue:418
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:173
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:192
 #: desk/src/pages/ticket/Tickets.vue:438
 msgid "Delete"
 msgstr "Törlés"
 
-#: desk/src/pages/knowledge-base/Article.vue:316
+#: desk/src/pages/knowledge-base/Article.vue:317
 msgid "Delete Article"
 msgstr ""
 
@@ -1418,7 +1422,9 @@ msgid "Disable signup"
 msgstr ""
 
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
+#. Label of the disabled (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Disabled"
 msgstr "Tiltva"
 
@@ -1524,7 +1530,7 @@ msgstr ""
 msgid "Easily invite new agents, managers, or admins."
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:390
+#: desk/src/pages/knowledge-base/Article.vue:391
 #: desk/src/pages/ticket/Tickets.vue:374
 msgid "Edit"
 msgstr "Szerkeszt"
@@ -1595,7 +1601,7 @@ msgstr "E-mail azonosító"
 msgid "Email Notifications"
 msgstr ""
 
-#: desk/src/components/Settings/EmailAdd.vue:306
+#: desk/src/components/Settings/EmailAdd.vue:307
 msgid "Email account created"
 msgstr ""
 
@@ -1756,7 +1762,7 @@ msgstr ""
 msgid "Failed"
 msgstr "Sikertelen"
 
-#: desk/src/components/Settings/EmailAdd.vue:311
+#: desk/src/components/Settings/EmailAdd.vue:313
 msgid "Failed to create email account, Invalid credentials"
 msgstr ""
 
@@ -1828,7 +1834,7 @@ msgstr ""
 msgid "Feedback Trend"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:171
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:170
 msgid "Feedback email has been sent to the customer"
 msgstr ""
 
@@ -1849,11 +1855,11 @@ msgstr ""
 msgid "Field Dependency updated successfully"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:27
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:25
 msgid "Field `{0}` does not exist in Ticket"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:43
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:41
 msgid "Field `{0}` is not allowed in Ticket Template"
 msgstr ""
 
@@ -1881,7 +1887,7 @@ msgstr "Szűrők"
 msgid "Find out all of the variables that can be used in the content"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:101
+#: desk/src/components/Settings/Profile/Profile.vue:107
 #: desk/src/components/desk/global/NewContactDialog.vue:118
 msgid "First Name"
 msgstr "Vezetéknév"
@@ -1976,7 +1982,7 @@ msgid "General category name can't be changed"
 msgstr ""
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/SavedRepliesSelectorModal.vue:173
+#: desk/src/components/SavedRepliesSelectorModal.vue:174
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:346
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:380
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:233
@@ -2521,7 +2527,7 @@ msgstr "Gyorsbillentyűk"
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/command-palette/CP.vue:104
-#: desk/src/pages/knowledge-base/Article.vue:432
+#: desk/src/pages/knowledge-base/Article.vue:433
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:6
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:434
 #: desk/src/pages/knowledge-base/NewArticle.vue:171
@@ -2545,11 +2551,11 @@ msgstr "Felirat"
 msgid "Label (customer view)"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:130
+#: desk/src/components/Settings/Profile/Profile.vue:136
 msgid "Language"
 msgstr "Nyelv"
 
-#: desk/src/components/Settings/Profile/Profile.vue:257
+#: desk/src/components/Settings/Profile/Profile.vue:298
 msgid "Language updated"
 msgstr ""
 
@@ -2589,7 +2595,7 @@ msgstr ""
 msgid "Last Customer Response"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:107
+#: desk/src/components/Settings/Profile/Profile.vue:113
 #: desk/src/components/desk/global/NewContactDialog.vue:126
 msgid "Last Name"
 msgstr "Vezetéknév"
@@ -2787,12 +2793,12 @@ msgstr "Hétfő"
 msgid "Monthly"
 msgstr "Havi"
 
-#: desk/src/pages/knowledge-base/Article.vue:397
+#: desk/src/pages/knowledge-base/Article.vue:398
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:184
 msgid "Move To"
 msgstr "Áthelyezés ide"
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:168
+#: desk/src/components/SavedRepliesSelectorModal.vue:169
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:339
 msgid "My Team"
 msgstr ""
@@ -2916,8 +2922,8 @@ msgstr ""
 msgid "New Team"
 msgstr "Új Csapat"
 
-#: desk/src/pages/ticket/TicketNew.vue:313
-#: desk/src/pages/ticket/TicketNew.vue:323
+#: desk/src/pages/ticket/TicketNew.vue:301
+#: desk/src/pages/ticket/TicketNew.vue:311
 msgid "New Ticket"
 msgstr ""
 
@@ -3166,7 +3172,7 @@ msgstr "Tulajdonos"
 msgid "Parent field, child field, and parent-child mapping are required."
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:115
+#: desk/src/components/Settings/Profile/Profile.vue:121
 msgid "Password"
 msgstr "Jelszó"
 
@@ -3224,7 +3230,7 @@ msgid "Period"
 msgstr "Időszak"
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/SavedRepliesSelectorModal.vue:163
+#: desk/src/components/SavedRepliesSelectorModal.vue:164
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:332
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:372
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:223
@@ -3285,7 +3291,7 @@ msgstr ""
 msgid "Please enter a valid phone number"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:225
+#: desk/src/components/Settings/Profile/Profile.vue:266
 msgid "Please enter first name at least"
 msgstr ""
 
@@ -3418,7 +3424,7 @@ msgstr ""
 msgid "Profile"
 msgstr "Profil"
 
-#: desk/src/components/Settings/Profile/Profile.vue:241
+#: desk/src/components/Settings/Profile/Profile.vue:282
 msgid "Profile updated"
 msgstr ""
 
@@ -4132,7 +4138,7 @@ msgstr ""
 msgid "Setup SLA"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:402
+#: desk/src/pages/knowledge-base/Article.vue:403
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:160
 msgid "Share"
 msgstr "Megosztás"
@@ -4607,7 +4613,7 @@ msgstr "Csütörtök"
 msgid "Ticket"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:777
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:795
 msgid "Ticket #{0}: We've received your request"
 msgstr ""
 
@@ -4691,7 +4697,7 @@ msgstr ""
 msgid "Ticket does not exist."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:344
 msgid "Ticket must be resolved with a feedback"
 msgstr ""
 
@@ -4739,7 +4745,7 @@ msgstr ""
 #: desk/src/pages/SearchAgent.vue:351
 #: desk/src/pages/ticket/MobileTicketAgent.vue:329
 #: desk/src/pages/ticket/TicketCustomer.vue:333
-#: desk/src/pages/ticket/TicketNew.vue:307 desk/src/pages/ticket/Tickets.vue:6
+#: desk/src/pages/ticket/TicketNew.vue:295 desk/src/pages/ticket/Tickets.vue:6
 #: desk/src/pages/ticket/Tickets.vue:587 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
 msgid "Tickets"
@@ -4763,6 +4769,14 @@ msgstr ""
 
 #: helpdesk/api/ticket.py:16
 msgid "Tickets can only be assigned to agents"
+msgstr ""
+
+#: desk/src/components/Settings/Profile/Profile.vue:152
+msgid "Timezone"
+msgstr ""
+
+#: desk/src/components/Settings/Profile/Profile.vue:317
+msgid "Timezone updated"
 msgstr ""
 
 #. Label of the title (Data) field in DocType 'HD Article'
@@ -4893,7 +4907,7 @@ msgstr ""
 msgid "URL/Method"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:613
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:631
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr ""
 
@@ -4998,7 +5012,7 @@ msgstr ""
 msgid "User"
 msgstr "Felhasználó"
 
-#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:132
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:141
 msgid "User Not found"
 msgstr ""
 
@@ -5136,7 +5150,7 @@ msgstr ""
 msgid "You are not permitted to access this resource."
 msgstr "Nincs hozzáférésed ehhez az erőforráshoz."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:535
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:553
 msgid "You are not permitted to add a comment"
 msgstr ""
 
