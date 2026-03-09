@@ -184,6 +184,13 @@
         />
       </div>
     </div>
+    <!-- Loading State -->
+    <div
+      v-if="article.loading"
+      class="w-full h-screen flex items-center justify-center"
+    >
+      <LoadingIndicator :scale="10" />
+    </div>
     <MoveToCategoryModal
       v-model="moveToModal"
       @move="handleMoveToCategory"
@@ -237,6 +244,7 @@ import {
   toast,
   Badge,
   dayjsLocal,
+  LoadingIndicator,
 } from "frappe-ui";
 import { computed, h, onMounted, ref, watch, nextTick, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
