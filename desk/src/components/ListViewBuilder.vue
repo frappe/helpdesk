@@ -469,7 +469,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   if (column.type === "MultipleAvatar") {
     return h(MultipleAvatar, {
       avatars: item,
-      hideName: true,
+      hideName: false,
       class: "flex items-center truncate flex-1 flex-row-reverse justify-end",
     });
   }

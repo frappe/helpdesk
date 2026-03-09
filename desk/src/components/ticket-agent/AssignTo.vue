@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { useShortcut } from "@/composables/shortcuts";
 import { ActivitiesSymbol, AssigneeSymbol, TicketSymbol } from "@/types";
-import { Popover } from "frappe-ui";
+import { Popover, toast } from "frappe-ui";
 import { inject, useTemplateRef } from "vue";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import MultipleAvatar from "../MultipleAvatar.vue";
@@ -66,9 +66,22 @@ async function saveAssignees(
   addAssignees,
   removeAssignees
 ) {
-  removedAssignees.length && (await removeAssignees.submit(removedAssignees));
-  addedAssignees.length && (await addAssignees.submit(addedAssignees));
-  activities.value.reload();
+  try {
+    if (removedAssignees.length) {
+      const removeResult = await removeAssignees.submit(removedAssignees);
+      if (removeResult?.exc) throw new Error(removeResult.exc);
+    }
+
+    if (addedAssignees.length) {
+      const addResult = await addAssignees.submit(addedAssignees);
+      if (addResult?.exc) throw new Error(addResult.exc);
+    }
+
+    toast.success("Assignee's successfully updated.");
+    activities.value.reload();
+  } catch (error) {
+    toast.error("Failed to update Assignee's.");
+  }
 }
 
 const assignToRef = useTemplateRef("assigneeButton");
