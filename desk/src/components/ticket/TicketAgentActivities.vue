@@ -80,8 +80,8 @@
       v-else
       class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
     >
-      <component :is="emptyTextIcon" class="h-10 w-10" />
-      <span>{{ emptyText }}</span>
+      <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
+      <span class="text-lg font-medium text-ink-gray-8">{{ emptyText }}</span>
     </div>
   </FadedScrollableDiv>
 </template>
@@ -149,11 +149,16 @@ const communicationAreaRef: Ref = inject("communicationArea");
 const makeCall = inject<() => void>("makeCall");
 
 const emptyText = computed(() => {
-  if (props.title === "Emails") return "No email communications";
-  if (props.title === "Comments") return "No comments found";
-  if (props.title === "Calls") return "No calls made";
-
-  return "No activity found";
+  let text = "No activities";
+  if (props.title == "Emails") {
+    text = "No email communications";
+  } else if (props.title == "Comments") {
+    text = "No comments found";
+    return text;
+  } else if (props.title == "Calls") {
+    text = "No calls made";
+    return text;
+  }
 });
 
 const emptyTextIcon = computed(() => {
