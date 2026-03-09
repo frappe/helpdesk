@@ -11,6 +11,7 @@
           label="Category"
           :filters="defaultFilters"
           :page-length="100"
+          :open-on-focus="false"
         />
       </div>
     </template>
@@ -31,7 +32,6 @@ const linkRef = ref(null);
 const props = defineProps<{
   excludeCategory?: string;
 }>();
-console.log(props.excludeCategory);
 
 const defaultFilters = computed(() => {
   if (!props.excludeCategory) return {};

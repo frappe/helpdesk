@@ -221,6 +221,7 @@ import {
   Breadcrumbs,
   Button,
   createResource,
+  createListResource,
   debounce,
   Dropdown,
   TextEditor,
@@ -274,6 +275,14 @@ watch(
     }
   }
 );
+
+let categories = createListResource({
+  doctype: "HD Article Category",
+  orderBy: "creation desc",
+  start: 0,
+  pageLength: 2,
+  auto: true,
+});
 
 const article: Resource<Article> = createResource({
   url: "helpdesk.api.knowledge_base.get_article",
@@ -556,11 +565,16 @@ const articleActions = computed(() => [
       handleEditMode();
     },
   },
-  {
-    label: __("Move To"),
-    icon: "corner-up-right",
-    onClick: () => (moveToModal.value = true),
-  },
+
+  ...(categories.data && categories.data.length > 1
+    ? [
+        {
+          label: __("Move To"),
+          icon: "corner-up-right",
+          onClick: () => (moveToModal.value = true),
+        },
+      ]
+    : []),
   {
     label: __("Share"),
     icon: "link",
