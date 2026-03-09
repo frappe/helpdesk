@@ -211,6 +211,7 @@ import {
   onMounted,
   onUnmounted,
   provide,
+  reactive,
   ref,
 } from "vue";
 import { useRouter } from "vue-router";
@@ -233,7 +234,11 @@ import { TicketAgentActivities } from "@/components/ticket";
 
 import TicketAgentDetails from "@/components/ticket/TicketAgentDetails.vue";
 import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
-import { setupCustomizations } from "@/composables/formCustomisation";
+import {
+  handleLinkFieldUpdate,
+  handleSelectFieldUpdate,
+  setupCustomizations,
+} from "@/composables/formCustomisation";
 import { useScreenSize } from "@/composables/screen";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
@@ -285,6 +290,71 @@ const { $dialog } = globalStore();
 const showAssignmentModal = ref(false);
 const showSubjectDialog = ref(false);
 
+const fieldOverrides = reactive<Record<string, Record<string, any>>>({});
+const snapshotsCache = new Map<
+  string,
+  { options: string; link_filters: string }
+>();
+
+const SNAPSHOTS_CACHE_MAX_SIZE = 100;
+const originalSnapshotsCacheSet = snapshotsCache.set.bind(snapshotsCache);
+
+snapshotsCache.set = ((key, value) => {
+  if (
+    !snapshotsCache.has(key) &&
+    snapshotsCache.size >= SNAPSHOTS_CACHE_MAX_SIZE
+  ) {
+    const firstKey = snapshotsCache.keys().next().value;
+    if (firstKey !== undefined) {
+      snapshotsCache.delete(firstKey);
+    }
+  }
+  return originalSnapshotsCacheSet(key, value);
+}) as typeof snapshotsCache.set;
+const applyFilters = (
+  fieldname: string,
+  filters: string[] | null = null
+): void => {
+  const fieldTemplate = ticket.data?.fields?.find(
+    (f) => f.fieldname === fieldname
+  );
+  if (!fieldTemplate) return;
+
+  const snapshot = snapshotsCache.get(fieldname);
+  const oldFieldData = snapshot || {
+    options: fieldTemplate.options || "",
+    link_filters: fieldTemplate.link_filters || "",
+  };
+
+  if (fieldTemplate.fieldtype === "Select") {
+    handleSelectFieldUpdate(
+      fieldTemplate,
+      fieldname,
+      filters,
+      ticket.data,
+      [oldFieldData],
+      false
+    );
+    fieldOverrides[fieldname] = {
+      options: fieldTemplate.options,
+      disabled: !filters?.length,
+    };
+  } else if (fieldTemplate.fieldtype === "Link") {
+    handleLinkFieldUpdate(
+      fieldTemplate,
+      fieldname,
+      filters,
+      ticket.data,
+      [oldFieldData],
+      false
+    );
+    fieldOverrides[fieldname] = {
+      link_filters: fieldTemplate.link_filters,
+      disabled: !filters?.length,
+    };
+  }
+};
+
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
   cache: ["Ticket", props.ticketId],
@@ -303,9 +373,18 @@ const ticket = createResource({
       });
     }
   },
-  onSuccess: (data) => {
+  onSuccess: async (data) => {
     subjectInput.value = ticket.subject;
-    setupCustomizations(ticket, {
+
+    snapshotsCache.clear();
+    data.fields?.forEach((f) =>
+      snapshotsCache.set(f.fieldname, {
+        options: f.options || "",
+        link_filters: f.link_filters || "",
+      })
+    );
+
+    await setupCustomizations(ticket, {
       doc: data,
       call,
       router,
@@ -313,12 +392,27 @@ const ticket = createResource({
       $dialog,
       updateField,
       createToast: toast.create,
+      applyFilters,
+    });
+
+    const onChangeHandlers = data._customOnChange;
+    if (!onChangeHandlers) return;
+
+    Object.entries(onChangeHandlers).forEach(([fieldname, handlers]) => {
+      const currentValue = data[fieldname];
+      if (currentValue == null || currentValue === "") return;
+
+      const fieldtype = data.fields?.find(
+        (f) => f.fieldname === fieldname
+      )?.fieldtype;
+      (handlers as Function[]).forEach((fn) => fn(currentValue, fieldtype));
     });
   },
 });
 
 provide("refreshTicket", () => ticket.reload());
 provide("onCallEnded", () => ticket.reload());
+provide("fieldOverrides", fieldOverrides);
 
 function updateField(name: string, value: string, callback = () => {}) {
   updateTicket(name, value);

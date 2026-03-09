@@ -89,6 +89,9 @@ const component = computed(() => {
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     return h(Link, {
       doctype: props.field.options,
+      filters: props.field.link_filters
+        ? JSON.parse(props.field.link_filters)
+        : props.field.filters || undefined,
       hideMe: true,
     });
   } else if (props.field.fieldtype === "Select") {

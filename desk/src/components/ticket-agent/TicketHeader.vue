@@ -257,6 +257,7 @@ const customizationCtx = computed(() => ({
   $dialog: globalStore().$dialog,
   updateField,
   createToast: toast.create,
+  applyFilters: () => {},
 }));
 
 // to manage the correct  customization context for actions, happens because of navigation between tickets using buttons
