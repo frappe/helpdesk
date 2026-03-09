@@ -1,5 +1,3 @@
-from helpdesk.api.agent_home.utils import calculate_percentage_change
-from helpdesk.api.agent_home.utils import get_default_agent_dashboard
 import json
 from datetime import date, datetime, timedelta
 
@@ -8,6 +6,10 @@ from dateutil.relativedelta import relativedelta
 from frappe.query_builder import DocType
 from frappe.query_builder.functions import Avg, Count, Function
 
+from helpdesk.api.agent_home.utils import (
+    calculate_percentage_change,
+    get_default_agent_dashboard,
+)
 from helpdesk.utils import agent_only, format_time_difference
 
 
