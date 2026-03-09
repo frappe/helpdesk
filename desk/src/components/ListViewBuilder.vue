@@ -107,7 +107,7 @@
   <!-- Loading State -->
   <div
     v-else-if="list.loading"
-    class="w-full h-full flex items-center justify-center -mt-14"
+    class="w-full h-full flex items-center justify-center"
   >
     <LoadingIndicator :scale="8" />
   </div>
