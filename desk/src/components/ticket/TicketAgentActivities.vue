@@ -9,6 +9,11 @@
         v-for="(activity, i) in activities"
         :key="activity.key"
         class="activity"
+        :class="[
+          activity.type === 'comment' && activity.isPinned
+            ? 'sticky top-0 z-10 bg-white shadow-sm'
+            : ''
+        ]"
       >
         <!-- single activity -->
         <div

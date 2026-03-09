@@ -18,6 +18,9 @@
         </p>
       </div>
       <div class="flex items-center gap-1">
+        <Tooltip v-if="_isPinned" text="Pinned comment">
+          <LucidePin class="size-3.5 text-ink-gray-6" aria-label="Pinned comment" />
+        </Tooltip>
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
           <span class="pl-0.5 text-sm text-gray-600">
             {{ timeAgo(creation) }}
@@ -27,6 +30,11 @@
           <Dropdown
             :placement="'right'"
             :options="[
+              {
+                label: _isPinned ? 'Unpin' : 'Pin',
+                onClick: () => togglePin.submit(),
+                icon: 'pin',
+              },
               {
                 label: 'Edit',
                 onClick: () => handleEditMode(),
@@ -204,6 +212,7 @@ import {
   toast,
 } from "frappe-ui";
 import { PropType, computed, onMounted, ref } from "vue";
+import LucidePin from "~icons/lucide/pin";
 
 const authStore = useAuthStore();
 const props = defineProps({
@@ -215,7 +224,7 @@ const props = defineProps({
 const { getUser } = useUserStore();
 const { enableCommentReactions } = useConfigStore();
 
-const { name, creation, content, commenter, commentedBy, attachments } =
+const { name, creation, content, commenter, commentedBy, attachments, isPinned } =
   props.activity;
 
 const { isMac } = useDevice();
@@ -231,6 +240,7 @@ const emit = defineEmits(["update"]);
 const showDialog = ref(false);
 const editable = ref(false);
 const _content = ref(content);
+const _isPinned = ref(isPinned || 0);
 
 const emojiList = ["👍", "👎", "❤️", "🎉", "👀", "✅"];
 
@@ -292,6 +302,21 @@ const deleteComment = createResource({
     emit("update");
     showDialog.value = false;
     toast.success("Comment deleted");
+  },
+});
+
+const togglePin = createResource({
+  url: "frappe.client.set_value",
+  makeParams: () => ({
+    doctype: "HD Ticket Comment",
+    name: name,
+    fieldname: "is_pinned",
+    value: _isPinned.value ? 0 : 1,
+  }),
+  onSuccess() {
+    _isPinned.value = _isPinned.value ? 0 : 1;
+    emit("update");
+    toast.success(_isPinned.value ? "Comment pinned" : "Comment unpinned");
   },
 });
 
