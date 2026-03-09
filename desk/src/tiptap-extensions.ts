@@ -5,7 +5,7 @@ import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import TextAlign from "@tiptap/extension-text-align";
 import TextStyle from "@tiptap/extension-text-style";
-import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 import StarterKit from "@tiptap/starter-kit";
 import { createSuggestionExtension } from "frappe-ui";
 import FieldAutocompleteList from "./components/Settings/SavedReplies/components/FieldAutocompleteList.vue";
@@ -130,7 +130,8 @@ export const ComponentUtils: Extension = Extension.create({
             default: null,
             parseHTML: (el) => el.getAttribute("style"),
             renderHTML: () => ({
-              style: "border-collapse: collapse; width: 100%; border: 1px solid #d1d5db;",
+              style:
+                "border-collapse: collapse; width: 100%; border: 1px solid #d1d5db;",
             }),
           },
         },
@@ -678,7 +679,61 @@ export const HandleExcelPaste = Extension.create({
                     .filter(Boolean);
 
                   if (!nodes.length) return;
-                  dispatch(tr.replaceWith(selection.from, selection.to, nodes));
+                  let totalInsertedSize = 0;
+                  nodes.forEach((n: any) => {
+                    totalInsertedSize += n.nodeSize;
+                  });
+
+                  const insertTr = tr.replaceWith(
+                    selection.from,
+                    selection.to,
+                    nodes
+                  );
+                  dispatch(insertTr);
+
+                  // After the table is inserted, ensure there is a paragraph after it
+                  // and move the cursor there. We do this in a separate transaction so
+                  // we can walk the already-updated document and find the exact node
+                  // position after the last inserted top-level node.
+                  requestAnimationFrame(() => {
+                    const currentState = view.state;
+                    const followUpTr = currentState.tr;
+
+                    // Walk top-level nodes to find the end of the inserted block.
+                    let tableEnd: number | null = null;
+                    let offset = 0;
+                    currentState.doc.forEach((node, nodeOffset) => {
+                      if (
+                        nodeOffset >= selection.from &&
+                        nodeOffset < selection.from + totalInsertedSize
+                      ) {
+                        tableEnd = nodeOffset + node.nodeSize;
+                      }
+                      offset = nodeOffset;
+                    });
+
+                    if (tableEnd === null) return;
+
+                    // If nothing exists after the table, insert an empty paragraph.
+                    const needsParagraph =
+                      tableEnd >= currentState.doc.content.size;
+                    if (needsParagraph) {
+                      followUpTr.insert(
+                        currentState.doc.content.size,
+                        currentState.schema.nodes.paragraph.create()
+                      );
+                    }
+
+                    // Resolve the position just inside the paragraph after the table.
+                    const targetPos = Math.min(
+                      tableEnd + 1,
+                      followUpTr.doc.content.size - 1
+                    );
+                    const $target = followUpTr.doc.resolve(targetPos);
+                    followUpTr.setSelection(TextSelection.near($target, 1));
+                    followUpTr.scrollIntoView();
+                    view.dispatch(followUpTr);
+                  });
                 }
               );
 
