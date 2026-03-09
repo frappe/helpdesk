@@ -189,6 +189,12 @@
       @move="handleMoveToCategory"
       :exclude-category="article.data?.category_id"
     />
+    <CategoryModal
+      :edit="editTitle"
+      v-model:title="category.title"
+      v-model="showCategoryModal"
+      @create="handleCategoryCreate"
+    />
   </div>
 </template>
 
@@ -196,6 +202,7 @@
 import DiscardButton from "@/components/DiscardButton.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
+import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { dayjs } from "@/dayjs";
 import { useAuthStore } from "@/stores/auth";
@@ -216,6 +223,7 @@ import {
   textEditorMenuButtons,
   timeAgo,
 } from "@/utils";
+import { newCategory } from "@/stores/knowledgeBase";
 import {
   Avatar,
   Breadcrumbs,
@@ -230,7 +238,7 @@ import {
   Badge,
   dayjsLocal,
 } from "frappe-ui";
-import { computed, h, onMounted, ref, watch, nextTick } from "vue";
+import { computed, h, onMounted, ref, watch, nextTick, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
@@ -247,6 +255,42 @@ const props = defineProps({
     type: String,
     required: true,
   },
+});
+
+const showCategoryModal = ref(false);
+const editTitle = ref(false);
+
+function handleCategoryCreate() {
+  newCategory.submit(
+    {
+      title: category.title,
+    },
+    {
+      onSuccess: (data: any) => {
+        showCategoryModal.value = false;
+        router.push({
+          name: "Article",
+          params: {
+            articleId: data.article,
+          },
+          query: {
+            category: data.category,
+            title: category.title,
+            isEdit: 1,
+          },
+        });
+        toast.success(__("Category created"));
+      },
+      onError: (error: string) => {
+        toast.error(error);
+      },
+    }
+  );
+}
+
+const category = reactive({
+  title: "",
+  id: "",
 });
 
 const { $dialog } = globalStore();
@@ -574,7 +618,13 @@ const articleActions = computed(() => [
           onClick: () => (moveToModal.value = true),
         },
       ]
-    : []),
+    : [
+        {
+          label: __("Add Category"),
+          icon: "folder-plus",
+          onClick: () => (showCategoryModal.value = true),
+        },
+      ]),
   {
     label: __("Share"),
     icon: "link",
