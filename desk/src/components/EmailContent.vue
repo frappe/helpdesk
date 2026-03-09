@@ -2,7 +2,7 @@
   <iframe
     ref="iframeRef"
     :srcdoc="htmlContent"
-    class="prose-f block h-10 max-h-[500px] w-full"
+    class="prose-f block max-h-[500px] w-full"
   />
 </template>
 
