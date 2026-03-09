@@ -189,6 +189,12 @@
       @move="handleMoveToCategory"
       :exclude-category="article.data?.category_id"
     />
+    <CategoryModal
+      :edit="editTitle"
+      v-model:title="category.title"
+      v-model="showCategoryModal"
+      @create="handleCategoryCreate"
+    />
   </div>
 </template>
 
@@ -232,7 +238,7 @@ import {
   Badge,
   dayjsLocal,
 } from "frappe-ui";
-import { computed, h, onMounted, ref, watch, nextTick } from "vue";
+import { computed, h, onMounted, ref, watch, nextTick, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
@@ -273,9 +279,7 @@ function handleCategoryCreate() {
             isEdit: 1,
           },
         });
-        //update category name in breadcrumb
-        article.data.category_name = category.title;
-        toast.success(__("Category created successfully."));
+        toast.success(__("Category created"));
       },
       onError: (error: string) => {
         toast.error(error);
@@ -288,6 +292,8 @@ const category = reactive({
   title: "",
   id: "",
 });
+
+const { $dialog } = globalStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -596,7 +602,13 @@ const articleActions = computed(() => [
           onClick: () => (moveToModal.value = true),
         },
       ]
-    : []),
+    : [
+        {
+          label: __("Add Category"),
+          icon: "folder-plus",
+          onClick: () => (showCategoryModal.value = true),
+        },
+      ]),
   {
     label: __("Share"),
     icon: "link",
