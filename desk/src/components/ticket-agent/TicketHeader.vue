@@ -61,7 +61,7 @@
         </Dropdown>
         <!-- Core Actions + Custom Actions -->
         <Dropdown
-          v-if="groupedActions[0].items.length >= 1"
+          v-if="groupedActions[0]?.items?.length >= 1"
           :options="groupedActions"
           placement="right"
         >
