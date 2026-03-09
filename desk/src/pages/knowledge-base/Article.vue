@@ -314,11 +314,11 @@ watch(
   }
 );
 
-const categories = createResource({
-  url: "frappe.client.get_count",
-  makeParams: () => ({
-    doctype: "HD Article Category",
-  }),
+let categories = createListResource({
+  doctype: "HD Article Category",
+  orderBy: "creation desc",
+  start: 0,
+  pageLength: 2,
   auto: true,
 });
 
@@ -588,7 +588,7 @@ const articleActions = computed(() => [
     },
   },
 
-  ...(categories.data && categories.data > 1
+  ...(categories.data && categories.data.length > 1
     ? [
         {
           label: __("Move To"),
@@ -596,13 +596,7 @@ const articleActions = computed(() => [
           onClick: () => (moveToModal.value = true),
         },
       ]
-    : [
-        {
-          label: __("Add Category"),
-          icon: "folder-plus",
-          onClick: () => (showCategoryModal.value = true),
-        },
-      ]),
+    : []),
   {
     label: __("Share"),
     icon: "link",
