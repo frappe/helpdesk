@@ -47,7 +47,6 @@ import {
 import { setFeedback } from "@/stores/knowledgeBase";
 import { ref } from "vue";
 import { toast } from "frappe-ui";
-import { __ } from "@/translation";
 
 interface P {
   feedback: FeedbackAction;
@@ -71,6 +70,11 @@ function handleFeedbackClick(action: FeedbackAction) {
     {
       onSuccess: () => {
         emit("articleReaction", _feedback.value);
+        if (_feedback.value === 0) {
+          toast.success("Feedback removed successfully.");
+          return;
+        }
+        toast.success("Feedback submitted successfully.");
       },
     }
   );
