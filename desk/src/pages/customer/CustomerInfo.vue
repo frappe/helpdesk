@@ -53,7 +53,7 @@ import LucideMail from "~icons/lucide/mail";
 import LucideMapPin from "~icons/lucide/map-pin";
 import LucidePhone from "~icons/lucide/phone";
 import LucideSquarePen from "~icons/lucide/square-pen";
-import EditCustomerDialog from "./EditCustomerDialog.vue";
+import EditCustomerDialog from "../../components/customer/EditCustomerDialog.vue";
 
 const customer = inject(CustomerResourceSymbol)!;
 

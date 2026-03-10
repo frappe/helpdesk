@@ -71,6 +71,9 @@
               :doctype="field.doctype"
               :required="field.required"
             >
+              <template #prefix>
+                <component :is="field.prefix" />
+              </template>
             </Link>
           </template>
 
@@ -101,9 +104,9 @@ import {
   createResource,
   toast,
 } from "frappe-ui";
-import { Link } from "frappe-ui/frappe";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
+import Link from "../frappe-ui/Link.vue";
 import { OrganizationsIcon } from "../icons";
 
 const model = defineModel<boolean>({ default: false });
