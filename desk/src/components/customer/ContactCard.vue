@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-w-96 rounded-md bg-surface-white border border-gray-200 px-3 py-2.5 flex flex-col gap-2.5"
+    class="rounded-md bg-surface-white border border-gray-200 px-3 py-2.5 flex flex-col gap-2.5"
   >
     <div class="flex items-center justify-between">
       <div class="flex gap-2 items-center min-w-0">
@@ -19,10 +19,10 @@
         <Badge v-if="contact.is_primary" :label="__('Primary')" theme="blue" />
         <Tooltip
           v-if="contact.is_manager"
-          :text="__('Manager')"
+          :text="__('Can view tickets raised by all contacts of the customer.')"
           placement="top"
         >
-          <LucideBriefcaseBusiness class="h-4 w-4 text-ink-gray-6" />
+          <Badge :label="__('Manager')" theme="green" variant="outline" />
         </Tooltip>
       </div>
       <Dropdown
@@ -60,13 +60,21 @@
 </template>
 
 <script setup lang="ts">
+import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { CustomerContact, CustomerResourceSymbol } from "@/types";
 import { HDCustomerMember } from "@/types/doctypes";
 import { getErrorMessage, hasPermission } from "@/utils";
-import { Avatar, Badge, Button, Dropdown, Tooltip, dayjs } from "frappe-ui";
+import {
+  Avatar,
+  Badge,
+  Button,
+  Dropdown,
+  Tooltip,
+  dayjs,
+  toast,
+} from "frappe-ui";
 import { computed, inject, markRaw } from "vue";
-import LucideBriefcaseBusiness from "~icons/lucide/briefcase-business";
 import LucideMail from "~icons/lucide/mail";
 import LucideMoreHorizontal from "~icons/lucide/more-horizontal";
 import LucidePhone from "~icons/lucide/phone";
@@ -77,6 +85,7 @@ const props = defineProps<{
   contact: CustomerContact;
 }>();
 const emit = defineEmits(["update"]);
+const { $dialog } = globalStore();
 const customer = inject(CustomerResourceSymbol)!;
 
 const ticketCountLabel = computed(() => {
@@ -113,9 +122,9 @@ const contactDetails = computed(() => [
 ]);
 
 const dropdownOptions = computed(() => {
-  const options = [];
+  const primaryActions = [];
   if (!props.contact.is_primary) {
-    options.push({
+    primaryActions.push({
       label: __("Set as Primary"),
       icon: "star",
       onClick: () => {
@@ -125,36 +134,54 @@ const dropdownOptions = computed(() => {
       },
     });
   }
-  if (props.contact.is_manager) {
-    options.push({
-      label: __("Revoke Manager Access"),
-      icon: "user-x",
-      theme: "red",
-      onClick: () => {
-        /* TODO: remove manager action */
-        updateManagerRole(0);
-      },
-    });
-  } else {
-    options.push({
-      label: __("Set as Manager"),
-      icon: markRaw(LucideBriefcaseBusiness),
-      onClick: () => {
-        /* TODO: set as manager action */
-        updateManagerRole(1);
-      },
-    });
-  }
-  options.push({
-    label: __("Remove Contact"),
-    icon: "x",
-    theme: "red",
-    onClick: () => {
-      /* TODO: remove contact action */
-      removeContact();
+  const roleActions = [
+    {
+      label: __("Role"),
+      icon: "briefcase",
+      submenu: [
+        {
+          label: __("Customer"),
+          icon: props.contact.is_manager ? undefined : "check",
+          onClick: () => {
+            if (!props.contact.is_manager) return;
+            updateManagerRole(0);
+          },
+        },
+        {
+          label: __("Customer Manager"),
+          icon: props.contact.is_manager ? "check" : undefined,
+          onClick: () => {
+            if (props.contact.is_manager) return;
+            updateManagerRole(1);
+          },
+        },
+      ],
     },
-  });
-  return options;
+  ];
+
+  const destructiveActions = [
+    {
+      label: __("Remove Contact"),
+      icon: "x",
+      theme: "red" as const,
+      onClick: () => {
+        removeContact();
+      },
+    },
+  ];
+
+  return [
+    {
+      group: "",
+      hideLabel: true,
+      items: [...primaryActions, ...roleActions],
+    },
+    {
+      group: "",
+      hideLabel: true,
+      items: destructiveActions,
+    },
+  ];
 });
 
 function updateManagerRole(isManager: 0 | 1) {
@@ -171,6 +198,7 @@ function updateManagerRole(isManager: 0 | 1) {
     {
       onSuccess() {
         emit("update");
+        toast.success(__("Role updated successfully"));
       },
       onError(error: any) {
         getErrorMessage(error, true);
@@ -209,24 +237,39 @@ function updatePrimaryContact(isPrimary: 0 | 1) {
 }
 
 function removeContact() {
-  // remove the current contact from the contacts array
-  customer.doc.contacts = customer.doc.contacts?.filter(
-    (c) => c.contact_name !== props.contact.contact_name
-  );
-  customer.setValue.submit(
-    {
-      contacts: customer.doc.contacts,
+  $dialog({
+    title: __("Remove Contact?"),
+    message: __(
+      "Are you sure you want to remove this contact from the customer?"
+    ),
+    onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
+      hideDialog();
     },
-    {
-      onSuccess() {
-        emit("update");
+    actions: [
+      {
+        label: __("Confirm"),
+        variant: "solid",
+        onClick(close: Function) {
+          customer.doc.contacts = customer.doc.contacts?.filter(
+            (c) => c.contact_name !== props.contact.contact_name
+          );
+          customer.setValue.submit(
+            {
+              contacts: customer.doc.contacts,
+            },
+            {
+              onSuccess() {
+                emit("update");
+                close();
+              },
+              onError(error: any) {
+                getErrorMessage(error, true);
+              },
+            }
+          );
+        },
       },
-      onError(error: any) {
-        getErrorMessage(error, true);
-      },
-    }
-  );
+    ],
+  });
 }
 </script>
-
-<style scoped></style>
