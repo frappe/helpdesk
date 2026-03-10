@@ -7,7 +7,7 @@ import LucideGlobe from "~icons/lucide/globe";
 import LucideMap from "~icons/lucide/map";
 import { OrganizationsIcon } from "../components/icons";
 
-type StateKey = "name" | "domain" | "website" | "image" | "country";
+type StateKey = "name" | "domain" | "image" | "country";
 
 interface FieldConfig {
   key: StateKey;
@@ -37,13 +37,6 @@ export const customerFields: FieldConfig[] = [
     doctype: "Country",
   },
   {
-    key: "website",
-    type: "text",
-    label: __("Website"),
-    placeholder: "www.tesla.com",
-    prefix: h(LucideGlobe, { class: "size-4" }),
-  },
-  {
     key: "domain",
     type: "text",
     label: __("Domain"),
@@ -51,7 +44,7 @@ export const customerFields: FieldConfig[] = [
     description: __(
       "Domain of the customer, eg: tesla.com. This will be used to auto-assign tickets to this customer based on the sender's email domain."
     ),
-    prefix: h("span", { class: "text-base " }, "@"),
+    prefix: h(LucideGlobe, { class: "size-4" }),
   },
 ];
 
@@ -74,7 +67,6 @@ export const useCustomer = (
   const state = reactive<Record<StateKey, string>>({
     name: name ? name : "",
     domain: "",
-    website: "",
     image: "",
     country: "",
   });
@@ -86,7 +78,6 @@ export const useCustomer = (
         if (data) {
           state.name = data.customer_name || "";
           state.domain = data.domain || "";
-          state.website = data.website || "";
           state.image = data.image || "";
           state.country = data.country || "";
         }
@@ -98,7 +89,6 @@ export const useCustomer = (
     return (
       state.name !== doc.doc?.customer_name ||
       state.domain !== doc.doc?.domain ||
-      state.website !== doc.doc?.website ||
       state.image !== doc.doc?.image ||
       state.country !== doc.doc?.country
     );
