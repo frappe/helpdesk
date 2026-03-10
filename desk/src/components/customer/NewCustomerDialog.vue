@@ -102,6 +102,7 @@ import {
   toast,
 } from "frappe-ui";
 import { Link } from "frappe-ui/frappe";
+import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { OrganizationsIcon } from "../icons";
 
@@ -130,4 +131,8 @@ function addCustomer() {
     },
   });
 }
+
+onMounted(() => {
+  state.country = window.default_country || "";
+});
 </script>

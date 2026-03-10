@@ -1,7 +1,7 @@
 import frappe
 from frappe import _
 from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
-from frappe.utils import cint, get_system_timezone
+from frappe.utils import cint
 from frappe.utils.telemetry import capture
 
 no_cache = 1
@@ -37,11 +37,7 @@ def get_boot():
             "agent": get_agent_name(),
             "date_format": frappe.get_system_settings("date_format"),
             "time_format": frappe.get_system_settings("time_format"),
-            "timezone": {
-                "system": get_system_timezone(),
-                "user": frappe.db.get_value("User", frappe.session.user, "time_zone")
-                or get_system_timezone(),
-            },
+            "default_country": frappe.db.get_default("country"),
         }
     )
 
