@@ -4,38 +4,35 @@
     :options="{
       title: __('Pending Invites'),
     }"
+    @close="confirmingRevoke = null"
   >
-    <template #body>
-      <div class="bg-surface-modal px-4 pb-6 pt-5 sm:px-6">
-        <h3
-          class="mb-6 flex items-center justify-between text-2xl font-semibold leading-6 text-ink-gray-9"
-        >
-          Pending Invites
-        </h3>
-        <div class="flex flex-col">
-          <div v-for="(invite, idx) in pendingInvites" :key="invite.name">
-            <div class="relative h-13 overflow-hidden border-outline-gray-2">
+    <template #body-content>
+      <div class="flex flex-col">
+        <div v-for="(invite, idx) in pendingInvites" :key="invite.name">
+          <div class="flex items-center justify-between gap-4 py-3">
+            <div>
+              <div class="text-base">
+                <span class="text-ink-gray-8">{{ invite.email }}</span>
+                <span class="text-ink-gray-5 ml-1"
+                  >({{ parseRoles(invite.roles.join(", ")) }})</span
+                >
+              </div>
+              <p class="text-xs text-ink-gray-4 mt-0.5">
+                {{ __("Invited by") }} {{ invite.invited_by }} ·
+                {{ dayjsLocal(invite.invited_on).fromNow() }}
+              </p>
+            </div>
+
+            <div class="relative h-7 min-w-[9rem] overflow-hidden">
               <Transition name="invite-row" mode="out-in">
                 <div
                   v-if="confirmingRevoke !== invite.name"
-                  key="info"
-                  class="absolute inset-0 flex items-center justify-between w-full"
+                  key="action"
+                  class="absolute inset-0 flex items-center justify-end"
                 >
-                  <div>
-                    <div class="text-base">
-                      <span class="text-ink-gray-8">{{ invite.email }}</span>
-                      <span class="text-ink-gray-5 ml-1"
-                        >({{ parseRoles(invite.roles.join(", ")) }})</span
-                      >
-                    </div>
-                    <p class="text-xs text-ink-gray-4 mt-0.5">
-                      {{ __("Invited by") }} {{ invite.invited_by }} ·
-                      {{ dayjsLocal(invite.invited_on).fromNow() }}
-                    </p>
-                  </div>
                   <Button
                     variant="ghost"
-                    icon="x"
+                    icon="trash-2"
                     :tooltip="__('Revoke Invite')"
                     @click="confirmingRevoke = invite.name"
                   />
@@ -43,33 +40,23 @@
                 <div
                   v-else
                   key="confirm"
-                  class="absolute inset-0 flex items-center justify-between w-full"
+                  class="absolute inset-0 flex items-center justify-end gap-2"
                 >
-                  <p class="text-sm text-ink-gray-7">
-                    {{ __("Revoke this invite?") }}
-                  </p>
-                  <div class="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      :label="__('Cancel')"
-                      @click="confirmingRevoke = null"
-                    />
-                    <Button
-                      variant="solid"
-                      theme="red"
-                      :label="__('Confirm')"
-                      :loading="cancelInviteResource.loading"
-                      @click="revokeInvite(invite.name)"
-                    />
-                  </div>
+                  <Button
+                    variant="subtle"
+                    theme="red"
+                    :label="__('Confirm')"
+                    :loading="cancelInviteResource.loading"
+                    @click="revokeInvite(invite.name)"
+                  />
                 </div>
               </Transition>
             </div>
-            <div
-              v-if="idx !== pendingInvites.length - 1"
-              class="border-t border-gray-200 w-full"
-            />
           </div>
+          <div
+            v-if="idx !== pendingInvites.length - 1"
+            class="border-t border-gray-200 w-full"
+          />
         </div>
       </div>
     </template>
@@ -82,7 +69,7 @@ import { CustomerResourceSymbol } from "@/types";
 import { Dialog, createResource, dayjsLocal, toast } from "frappe-ui";
 import { inject, ref, watch } from "vue";
 
-const show = defineModel<boolean>();
+const show = defineModel<boolean>({ default: false });
 
 interface PendingInvite {
   name: string;
