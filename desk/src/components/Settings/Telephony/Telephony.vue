@@ -34,10 +34,12 @@
       />
     </template>
     <template #content>
-      <div>
+      <div class="-ml-2 grow">
         <div class="flex-1 flex flex-col">
           <!-- General -->
-          <div class="flex items-center justify-between gap-8 py-3">
+          <div
+            class="flex items-center justify-between gap-8 py-3 hover:bg-gray-50 rounded px-2"
+          >
             <div class="flex flex-col">
               <div class="text-p-base font-medium text-ink-gray-7 truncate">
                 {{ __("Default medium") }}
@@ -46,19 +48,25 @@
                 {{ __("Default calling medium for logged in user") }}
               </div>
             </div>
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-2">
               <Select
                 v-if="telephonyAgent.doc"
                 :options="telephonyProviders"
                 :modelValue="telephonyAgent.doc?.default_medium"
                 @update:modelValue="telephonyAgent.doc.default_medium = $event"
               />
+              <Button
+                v-if="telephonyAgent.doc?.default_medium"
+                icon="x"
+                :tooltip="__('Clear')"
+                @click="telephonyAgent.doc.default_medium = ''"
+              />
             </div>
           </div>
           <div class="h-px border-t mx-2 border-outline-gray-modals" />
 
           <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded"
+            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-gray-50 px-2"
             @click="emit('updateStep', 'twilio-settings')"
           >
             <div class="flex flex-col">
@@ -79,7 +87,7 @@
           <div class="h-px border-t mx-2 border-outline-gray-modals" />
 
           <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded"
+            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-gray-50 px-2"
             @click="emit('updateStep', 'exotel-settings')"
           >
             <div class="flex flex-col">

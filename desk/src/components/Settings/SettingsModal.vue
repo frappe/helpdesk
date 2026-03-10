@@ -12,9 +12,9 @@
           <h1
             class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-base text-ink-gray-5 transition-all duration-300 ease-in-out"
           >
-            {{ __("My settings") }}
+            {{ __("My Settings") }}
           </h1>
-          <div v-for="tab in tabs">
+          <div v-for="tab in tabs" class="last:mb-2">
             <div v-if="!tab.noborder" class="mx-2 my-2.5"></div>
 
             <div
