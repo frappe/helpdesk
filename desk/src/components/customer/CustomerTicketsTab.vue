@@ -14,6 +14,7 @@
 
       <div class="flex items-center gap-2">
         <Link
+          class="w-48"
           v-for="filter in filterFields"
           :key="filter.key"
           v-model="filters[filter.key]"
@@ -25,92 +26,115 @@
     </div>
 
     <!-- Table -->
-    <div class="border-gray-200 overflow-hidden">
-      <!-- Header -->
-      <div
-        class="grid items-center border-b border-gray-200 px-4 py-2 text-xs font-medium text-ink-gray-5"
-        :style="gridTemplateStyle"
-      >
-        <div
-          v-for="col in columns"
-          :key="col.key"
-          class="group flex items-center gap-1 select-none text-ink-gray-5"
-          :class="col.sortable ? 'hover:text-ink-gray-8' : ''"
-          @click="handleSortClick(col)"
-        >
-          {{ col.label }}
-          <LucideArrowUpDown
-            v-if="col.sortable"
-            class="h-3 w-3 transition-opacity"
-            :class="
-              sort.field === col.key
-                ? 'opacity-100 text-ink-gray-7'
-                : 'opacity-0 group-hover:opacity-60'
-            "
-          />
-        </div>
-      </div>
-
+    <div class="min-h-0 flex flex-1 flex-col">
       <!-- Loading -->
       <template v-if="ticketsListResource.loading">
-        <div class="py-16 text-center text-sm text-ink-gray-4">
-          <p>HELLOOOO</p>
+        <div
+          class="py-16 text-center text-sm text-ink-gray-4 flex items-center justify-center"
+        >
           <LoadingIndicator :scale="10" />
         </div>
       </template>
       <!-- Empty -->
       <div
-        v-else-if="
-          !ticketsListResource.data?.length && !ticketsListResource.loading
-        "
-        class="py-16 text-center text-sm text-ink-gray-4"
+        v-else-if="!Boolean(ticketsListResource.data?.length)"
+        class="flex flex-col items-center justify-center gap-3 py-16 text-center h-full flex-1"
       >
-        {{ __("No tickets found.") }}
+        <LucideTicket class="h-10 w-10 text-ink-gray-4" />
+        <div>
+          <!-- make font larger -->
+          <p class="text-lg font-medium text-ink-gray-7">
+            {{ __("No tickets found.") }}
+          </p>
+        </div>
       </div>
-      <!-- Rows -->
+      <!-- Main Content -->
       <template v-else>
+        <!-- Headers -->
         <div
-          v-for="(ticket, i) in ticketsListResource.data"
-          :key="ticket.name"
-          class="grid items-center px-4 py-3 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 transition-colors"
-          :class="
-            i !== ticketsListResource?.data?.length - 1 &&
-            'border-b border-gray-200'
-          "
+          class="grid items-center border-b border-gray-200 px-4 py-2 text-xs font-medium text-ink-gray-5"
           :style="gridTemplateStyle"
         >
-          <!-- ID -->
-          <div class="text-ink-gray-6 font-base">{{ ticket.name }}</div>
-
-          <!-- Subject -->
-          <div class="truncate font-medium max-w-[90%]">
-            {{ ticket.subject }}
+          <div
+            v-for="col in columns"
+            :key="col.key"
+            class="group flex items-center gap-1 select-none text-ink-gray-5"
+            :class="col.sortable ? 'hover:text-ink-gray-8' : ''"
+            @click="handleSortClick(col)"
+          >
+            {{ col.label }}
+            <LucideArrowUpDown
+              v-if="col.sortable"
+              class="h-3 w-3 transition-opacity"
+              :class="
+                sort.field === col.key
+                  ? 'opacity-100 text-ink-gray-7'
+                  : 'opacity-0 group-hover:opacity-60'
+              "
+            />
           </div>
+        </div>
+        <!-- Rows -->
+        <div
+          class="min-h-0 max-h-[65vh] overflow-y-auto overflow-x-hidden pb-6"
+        >
+          <div
+            v-for="(ticket, i) in ticketsListResource.data"
+            :key="ticket.name"
+            class="grid items-center px-4 py-3 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 transition-colors"
+            :class="i !== ticketRowsCount - 1 && 'border-b border-gray-200'"
+            :style="gridTemplateStyle"
+          >
+            <!-- ID -->
+            <div class="text-ink-gray-6 font-base">{{ ticket.name }}</div>
 
-          <!-- Status -->
-          <div class="flex items-center gap-1.5">
-            <IndicatorIcon :class="ticket.statusColor" />
-            <span>{{ ticket.status }}</span>
+            <!-- Subject -->
+            <div class="truncate font-medium max-w-[90%]">
+              {{ ticket.subject }}
+            </div>
+
+            <!-- Status -->
+            <div class="flex items-center gap-1.5">
+              <IndicatorIcon :class="getStatus(ticket.status).parsed_color" />
+              <span>{{ ticket.status }}</span>
+            </div>
+
+            <!-- Priority -->
+            <div class="flex items-center gap-1.5">
+              <span>{{ ticket.priority }}</span>
+            </div>
+
+            <!-- First Response -->
+            <div class="text-ink-gray-6">
+              {{ dayjsLocal(ticket.response_by).fromNow() }}
+            </div>
+
+            <!-- Resolution -->
+            <div class="text-ink-gray-6">
+              {{ dayjsLocal(ticket.resolution_by).fromNow() }}
+            </div>
+
+            <!-- Assigned To -->
+            <div class="flex items-center gap-2">
+              <MultipleAvatar :avatars="ticket._assign" size="xs" />
+            </div>
           </div>
-
-          <!-- Priority -->
-          <div class="flex items-center gap-1.5">
-            <span>{{ ticket.priority }}</span>
-          </div>
-
-          <!-- First Response -->
-          <div class="text-ink-gray-6">
-            {{ dayjsLocal(ticket.response_by).fromNow() }}
-          </div>
-
-          <!-- Resolution -->
-          <div class="text-ink-gray-6">
-            {{ dayjsLocal(ticket.resolution_by).fromNow() }}
-          </div>
-
-          <!-- Assigned To -->
-          <div class="flex items-center gap-2">
-            <MultipleAvatar :avatars="ticket._assign" size="xs" />
+          <!-- Load More -->
+          <div class="flex justify-center py-6">
+            <Button
+              v-if="ticketsListResource.hasNextPage"
+              :loading="ticketsListResource.loading"
+              :label="__('Load More')"
+              icon-left="refresh-cw"
+              @click="
+                () => {
+                  ticketsListResource.update({
+                    pageLength: ticketsListResource.pageLength + 20,
+                  });
+                  ticketsListResource.reload();
+                }
+              "
+            />
           </div>
         </div>
       </template>
@@ -119,19 +143,14 @@
 </template>
 
 <script setup lang="ts">
+import Link from "@/components/frappe-ui/Link.vue";
 import { IndicatorIcon } from "@/components/icons";
+import { ticketsListResource } from "@/pages/customer/tickets";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
-import { CustomerResourceSymbol, ListResource } from "@/types";
-import { HDTicket } from "@/types/doctypes";
+import { CustomerResourceSymbol } from "@/types";
 import { watchDebounced } from "@vueuse/core";
-import {
-  createListResource,
-  dayjsLocal,
-  FormControl,
-  LoadingIndicator,
-} from "frappe-ui";
-import { Link } from "frappe-ui/frappe";
+import { dayjsLocal, FormControl, LoadingIndicator } from "frappe-ui";
 import { computed, inject, reactive, ref } from "vue";
 import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
@@ -181,33 +200,32 @@ function handleSortClick(column: Column) {
   }
 }
 
-const { getStatus } = useTicketStatusStore();
+const filterFields = computed(() => [
+  {
+    key: "status",
+    placeholder: __("Status"),
+    doctype: "HD Ticket Status",
+    filters: undefined,
+  },
+  {
+    key: "priority",
+    placeholder: __("Priority"),
+    doctype: "HD Ticket Priority",
+    filters: undefined,
+  },
+  {
+    key: "contact",
+    placeholder: __("Contact"),
+    doctype: "Contact",
+    filters: contactNames.value.length
+      ? { name: ["in", contactNames.value] }
+      : undefined,
+  },
+]);
 
-const ticketsListResource: ListResource<HDTicket> = createListResource({
-  doctype: "HD Ticket",
-  pageLength: 20,
-  fields: [
-    "name",
-    "subject",
-    "status",
-    "priority",
-    "creation",
-    "modified",
-    "_assign",
-    "response_by",
-    "resolution_by",
-  ],
-  filters: {
-    customer: customer.doc?.name,
-  },
-  orderBy: "modified desc",
-  transform: (data: HDTicket[]) => {
-    return data.map((d) => ({
-      ...d,
-      statusColor: getStatus(d.status)?.parsed_color || "text-gray-500",
-    }));
-  },
-});
+const ticketRowsCount = computed(() => ticketsListResource.data?.length ?? 0);
+
+const { getStatus } = useTicketStatusStore();
 
 watchDebounced(
   [search, () => sort.field, () => sort.order, () => ({ ...filters })],
@@ -231,27 +249,4 @@ watchDebounced(
   },
   { debounce: 300, immediate: true }
 );
-
-const filterFields = computed(() => [
-  {
-    key: "status",
-    placeholder: __("Status"),
-    doctype: "HD Ticket Status",
-    filters: undefined,
-  },
-  {
-    key: "priority",
-    placeholder: __("Priority"),
-    doctype: "HD Ticket Priority",
-    filters: undefined,
-  },
-  {
-    key: "contact",
-    placeholder: __("Contact"),
-    doctype: "Contact",
-    filters: contactNames.value.length
-      ? { name: ["in", contactNames.value] }
-      : undefined,
-  },
-]);
 </script>

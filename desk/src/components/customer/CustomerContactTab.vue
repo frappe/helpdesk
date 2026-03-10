@@ -14,11 +14,7 @@
           </div>
         </Button>
         <Dropdown :options="headerOptions" placement="right">
-          <Button
-            :label="__('New')"
-            :variant="customer.getContacts?.data?.length ? 'subtle' : 'solid'"
-            v-if="hasPermission()"
-          >
+          <Button :label="__('New')" variant="subtle" v-if="hasPermission()">
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>
