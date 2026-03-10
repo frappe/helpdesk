@@ -3,14 +3,17 @@
 from datetime import timedelta
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import frappe
 from frappe.tests.utils import FrappeTestCase
 =======
+=======
+import frappe
+>>>>>>> 03fb98df (fix: isort ordering for frappe imports)
 from frappe.tests import IntegrationTestCase
 >>>>>>> 90a33198 (chore(format): fix linting and formatting for CI)
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
-import frappe
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     merge_ticket,
     show_outside_hours_banner,
