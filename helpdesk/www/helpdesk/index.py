@@ -36,6 +36,7 @@ def get_boot():
             "session_user": frappe.session.user,
             "date_format": frappe.get_system_settings("date_format"),
             "time_format": frappe.get_system_settings("time_format"),
+            "default_country": frappe.db.get_default("country"),
         }
     )
 
