@@ -210,7 +210,7 @@ class HDCustomer(Document):
             filters={
                 "app_name": "helpdesk",
                 "status": "Pending",
-                "custom_customer": self.name,
+                "customer": self.name,
             },
             fields=[
                 "name",

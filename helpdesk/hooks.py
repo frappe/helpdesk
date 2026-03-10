@@ -68,7 +68,7 @@ user_invitation = {
         ],
     },
     "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
-    "extra_invite_params": ["custom_customer"],
+    "extra_invite_params": ["customer"],
 }
 
 doc_events = {

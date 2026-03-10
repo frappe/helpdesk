@@ -136,7 +136,7 @@ function handleInviteUsers(data: { users: string; role: string }) {
       roles: [data.role],
       redirect_to_path: "/helpdesk",
       app_name: "helpdesk",
-      custom_customer: customer.doc?.name,
+      customer: customer.doc?.name,
     },
     {
       onSuccess(
