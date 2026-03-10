@@ -1,9 +1,9 @@
 # Copyright (c) 2022, Frappe Technologies and Contributors
 # See license.txt
 
+import frappe
 from frappe.tests import IntegrationTestCase
 
-import frappe
 from helpdesk.helpdesk.doctype.hd_agent.hd_agent import update_agent_role
 
 
