@@ -260,6 +260,15 @@ def get_custom_fields():
                 "depends_on": "eval: doc.unassign_condition_json",
             },
         ],
+        "User Invitation": [
+            {
+                "fieldname": "customer",
+                "label": "Customer",
+                "fieldtype": "Link",
+                "options": "HD Customer",
+                "insert_after": "roles",
+            }
+        ],
     }
 
 

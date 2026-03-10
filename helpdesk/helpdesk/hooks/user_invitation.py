@@ -13,7 +13,7 @@ def after_accept(invitation: Document, user: Document, user_inserted: bool) -> N
             create_agent(user)
         elif role in customer_roles:
             create_contact(user)
-            link_to_customer(user, invitation.custom_customer)
+            link_to_customer(user, invitation.customer)
 
 
 def create_agent(user: Document) -> None:
@@ -42,4 +42,3 @@ def link_to_customer(user: Document, customer: str) -> None:
     doc.append("contacts", {"contact_name": contact})
     frappe.flags.ignore_customer_role = True
     doc.save(ignore_permissions=True)
-    frappe.flags.ignore_customer_role = False
