@@ -103,7 +103,7 @@
           >
             <div class="flex h-56 flex-col items-center justify-center">
               <div class="text-p-sm text-gray-500">
-                {{ __("No Saved Replies found") }}
+                {{ __("No saved replies found") }}
               </div>
             </div>
           </div>

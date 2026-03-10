@@ -8,6 +8,7 @@
         v-model="state.selectedParentField"
         :options="parentFields"
         :disabled="!isNew"
+        :open-on-focus="true"
       />
     </div>
     <div class="flex-1 flex flex-col gap-1.5">
@@ -18,6 +19,7 @@
         v-model="state.selectedChildField"
         :options="state.childFields"
         :disabled="!state.selectedParentField || !isNew"
+        :open-on-focus="true"
       />
     </div>
   </div>
