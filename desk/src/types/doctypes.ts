@@ -133,7 +133,7 @@ export interface HDTicket extends DocType {
   status_category?: string;
   /** Ticket raised outside working hours: Check */
   raised_outside_working_hours: 0 | 1;
-  /** Assignees On: Datetime */
+  /** Assignees: JSON */
   _assign: string;
 }
 

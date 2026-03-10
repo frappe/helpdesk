@@ -2,10 +2,13 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs"> </Breadcrumbs>
+        <Breadcrumbs :items="breadcrumbs" class="-ml-[2px]" />
       </template>
     </LayoutHeader>
-    <div class="gap-5 flex flex-col" v-if="!customer.loading && customer.doc">
+    <div
+      class="gap-5 flex flex-col overscroll-none overflow-hidden h-full"
+      v-if="!customer.loading && customer.doc"
+    >
       <!-- customer detail -->
       <CustomerInfo />
       <!-- Tabs -->
@@ -29,7 +32,7 @@
           </button>
         </template>
         <template #tab-panel="{ tab }">
-          <div class="p-5">
+          <div class="p-5 overflow-hidden">
             <div v-if="tab.label === __('Tickets')">
               <!-- Tickets tab content -->
               <CustomerTicketsTab />
@@ -55,6 +58,7 @@ import { computed, h, onMounted, provide } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideSquareUser from "~icons/lucide/square-user";
 import CustomerInfo from "./CustomerInfo.vue";
+import { ticketsListResource } from "./tickets";
 // props with type set at string
 const props = defineProps<{
   id: string;
@@ -67,7 +71,7 @@ const tabs = computed(() => [
   {
     label: __("Tickets"),
     hash: "tickets",
-    count: 0,
+    count: ticketsListResource.data?.length ?? 0,
     icon: h(TicketHashIcon, { class: "size-4" }),
   },
   {
