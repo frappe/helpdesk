@@ -14,7 +14,7 @@
     class="absolute left-0 top-0 w-full h-screen flex flex-col items-center justify-center"
   >
     <EmptyState
-      title="No Categories available"
+      title="No categories available"
       description="There are no categories published at the moment."
       :icon="iconVNode"
     />

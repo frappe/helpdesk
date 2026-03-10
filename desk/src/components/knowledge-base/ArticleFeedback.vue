@@ -62,7 +62,7 @@ const emit = defineEmits(["articleReaction"]);
 
 function handleFeedbackClick(action: FeedbackAction) {
   if (action === _feedback.value) {
-    action = 0;
+    return;
   }
   _feedback.value = action;
   setFeedback.submit(
@@ -71,7 +71,6 @@ function handleFeedbackClick(action: FeedbackAction) {
       onSuccess: () => {
         emit("articleReaction", _feedback.value);
         if (_feedback.value === 0) {
-          toast.success("Feedback removed successfully.");
           return;
         }
         toast.success("Feedback submitted successfully.");
