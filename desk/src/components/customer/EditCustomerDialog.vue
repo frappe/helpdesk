@@ -83,7 +83,11 @@
               :doctype="field.doctype"
               :required="field.required"
               v-model="state[field.key]"
-            />
+            >
+              <template #prefix>
+                <component :is="field.prefix" />
+              </template>
+            </Link>
           </template>
 
           <div class="float-right flex space-x-2 pb-5">
@@ -114,9 +118,9 @@ import {
   FormControl,
   toast,
 } from "frappe-ui";
-import { Link } from "frappe-ui/frappe";
 import { inject } from "vue";
-import { OrganizationsIcon } from "../../components/icons";
+import Link from "../frappe-ui/Link.vue";
+import { OrganizationsIcon } from "../icons";
 
 const model = defineModel<boolean>({ default: false });
 const emit = defineEmits(["update"]);

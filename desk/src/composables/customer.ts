@@ -4,7 +4,7 @@ import { HDCustomer } from "@/types/doctypes";
 import { createDocumentResource } from "frappe-ui";
 import { h, markRaw, reactive, watch } from "vue";
 import LucideGlobe from "~icons/lucide/globe";
-import LucideMap from "~icons/lucide/map";
+import LucideMapPin from "~icons/lucide/map-pin";
 import { OrganizationsIcon } from "../components/icons";
 
 type StateKey = "name" | "domain" | "image" | "country";
@@ -33,7 +33,7 @@ export const customerFields: FieldConfig[] = [
     type: "Link",
     label: __("Country"),
     placeholder: __("Select Country"),
-    prefix: h(LucideMap, { class: "size-4" }),
+    prefix: h(LucideMapPin, { class: "size-4 mr-1.5" }),
     doctype: "Country",
   },
   {
