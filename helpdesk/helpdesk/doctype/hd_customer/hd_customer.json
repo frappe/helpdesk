@@ -10,7 +10,6 @@
   "image",
   "customer_name",
   "domain",
-  "website",
   "country",
   "column_break_fead",
   "primary_contact",
@@ -86,11 +85,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "website",
-   "fieldtype": "Data",
-   "label": "Website"
-  },
-  {
    "fieldname": "country",
    "fieldtype": "Link",
    "label": "Country",
@@ -100,7 +94,7 @@
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-03-04 12:18:32.424608",
+ "modified": "2026-03-10 13:54:06.329471",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Customer",

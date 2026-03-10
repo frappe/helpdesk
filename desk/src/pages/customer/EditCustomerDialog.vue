@@ -128,7 +128,6 @@ async function save() {
   await customer.setValue.submit({
     customer_name: state.name,
     domain: state.domain,
-    website: state.website,
     country: state.country,
     image: state.image,
   });

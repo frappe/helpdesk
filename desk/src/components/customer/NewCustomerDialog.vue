@@ -125,7 +125,6 @@ function addCustomer() {
       doctype: "HD Customer",
       customer_name: state.name,
       domain: state.domain,
-      website: state.website,
       image: state.image,
       country: state.country,
     },
