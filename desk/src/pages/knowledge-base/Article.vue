@@ -42,7 +42,7 @@
             <div>
               <textarea
                 ref="titleRef"
-                class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-1 focus:ring-0 overflow-hidden"
+                class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
                 v-model="title"
                 :placeholder="__('Title')"
                 rows="1"
@@ -51,6 +51,32 @@
                 autofocus
                 :disabled="!editable"
               />
+              <div
+                v-if="!editable && isCustomerPortal"
+                class="flex gap-1 items-center pt-1.5"
+              >
+                <!-- Avatar -->
+                <div class="flex gap-2 pb-1.5 items-center justify-center">
+                  <Avatar
+                    :image="article.data.author.image"
+                    :label="article.data.author.name"
+                    size="md"
+                  />
+                  <div class="flex gap-1 items-end">
+                    <p class="truncate capitalize text-base text-ink-gray-7">
+                      {{ article.data.author.name }}
+                    </p>
+                    <IconDot class="h-4 w-4 text-gray-600" />
+                    <div class="text-base text-ink-gray-7">
+                      {{
+                        dayjsLocal(article.data.modified).format(
+                          "MMM D, h:mm A"
+                        )
+                      }}
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div
                 v-if="!editable && !isCustomerPortal"
                 class="text-sm text-gray-500 items-center"
@@ -67,7 +93,6 @@
                   <Button
                     variant="ghost"
                     size="md"
-                    @click="handleFeedbackClick(1)"
                     class="flex"
                     :disabled="!isCustomerPortal"
                   >
@@ -85,7 +110,6 @@
                   <Button
                     variant="ghost"
                     size="md"
-                    @click="handleFeedbackClick(2)"
                     class="flex"
                     :disabled="!isCustomerPortal"
                   >
@@ -152,7 +176,10 @@
             />
           </template>
         </TextEditor>
-        <div v-if="!editable" class="flex gap-1 items-center py-1.5 mt-4">
+        <div
+          v-if="!editable && !isCustomerPortal"
+          class="flex gap-1 items-center pt-1.5 mt-4"
+        >
           <!-- Avatar -->
           <div class="flex gap-2 items-center justify-center">
             <Avatar
@@ -172,16 +199,11 @@
               </div>
             </div>
           </div>
-          <IconDot class="h-4 w-4 text-gray-600" />
         </div>
       </div>
 
       <div class="p-4" v-if="isCustomerPortal">
-        <ArticleFeedback
-          :feedback="feedback"
-          :article-id="articleId"
-          @article-reaction="handleFeedbackClick"
-        />
+        <ArticleFeedback :feedback="feedback" :article-id="articleId" />
       </div>
     </div>
     <!-- Loading State -->
@@ -258,6 +280,7 @@ import {
   ThumbsDownFilledIcon,
   ThumbsUpFilledIcon,
 } from "@/components/icons";
+import Icon from "@/components/Icon.vue";
 const props = defineProps({
   articleId: {
     type: String,
@@ -287,6 +310,8 @@ function handleCategoryCreate() {
             isEdit: 1,
           },
         });
+        //update category name in breadcrumb
+        article.data.category_name = category.title;
         toast.success(__("Category created"));
       },
       onError: (error: string) => {
@@ -328,11 +353,11 @@ watch(
   }
 );
 
-let categories = createListResource({
-  doctype: "HD Article Category",
-  orderBy: "creation desc",
-  start: 0,
-  pageLength: 2,
+const categories = createResource({
+  url: "frappe.client.get_count",
+  makeParams: () => ({
+    doctype: "HD Article Category",
+  }),
   auto: true,
 });
 
@@ -556,21 +581,6 @@ function scrollToHeading() {
   }, 500);
 }
 
-function handleFeedbackClick(action: FeedbackAction) {
-  if (action === feedback.value) {
-    action = 0;
-  }
-  feedback.value = action;
-  setFeedback.submit(
-    { articleId: props.articleId, action },
-    {
-      onSuccess: () => {
-        if (articleStats.reload) articleStats.reload();
-      },
-    }
-  );
-}
-
 watch(articleStats.data, () => {
   if (articleStats.data) {
     likes.value = articleStats.data.likes;
@@ -602,7 +612,7 @@ const articleActions = computed(() => [
     },
   },
 
-  ...(categories.data && categories.data.length > 1
+  ...(categories.data && categories.data > 1
     ? [
         {
           label: __("Move To"),
