@@ -1,11 +1,11 @@
+import frappe
+from frappe import _
 from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
 from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
-import frappe
-from frappe import _
 from helpdesk.api.dashboard import COUNT_NAME
 from helpdesk.utils import (
     call_log_default_columns,
