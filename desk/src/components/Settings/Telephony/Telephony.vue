@@ -49,17 +49,18 @@
               </div>
             </div>
             <div class="flex items-center gap-2">
-              <Select
+              <!-- <Select
                 v-if="telephonyAgent.doc"
                 :options="telephonyProviders"
                 :modelValue="telephonyAgent.doc?.default_medium"
                 @update:modelValue="telephonyAgent.doc.default_medium = $event"
-              />
-              <Button
-                v-if="telephonyAgent.doc?.default_medium"
-                icon="x"
-                :tooltip="__('Clear')"
-                @click="telephonyAgent.doc.default_medium = ''"
+              /> -->
+              <SelectDropdown
+                :options="telephonyProviders"
+                :modelValue="telephonyAgent.doc?.default_medium"
+                @update:modelValue="telephonyAgent.doc.default_medium = $event"
+                :defaultValue="telephonyAgent.originalDoc?.default_medium"
+                placement="bottom-start"
               />
             </div>
           </div>
