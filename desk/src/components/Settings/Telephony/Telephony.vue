@@ -49,17 +49,18 @@
               </div>
             </div>
             <div class="flex items-center gap-2">
-              <Select
+              <!-- <Select
                 v-if="telephonyAgent.doc"
                 :options="telephonyProviders"
                 :modelValue="telephonyAgent.doc?.default_medium"
                 @update:modelValue="telephonyAgent.doc.default_medium = $event"
-              />
-              <Button
-                v-if="telephonyAgent.doc?.default_medium"
-                icon="x"
-                :tooltip="__('Clear')"
-                @click="telephonyAgent.doc.default_medium = ''"
+              /> -->
+              <SelectDropdown
+                :options="telephonyProviders"
+                :modelValue="telephonyAgent.doc?.default_medium"
+                @update:modelValue="telephonyAgent.doc.default_medium = $event"
+                :defaultValue="telephonyAgent.originalDoc?.default_medium"
+                placement="bottom-start"
               />
             </div>
           </div>
@@ -116,7 +117,6 @@ import Password from "@/components/Password.vue";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import {
   Button,
-  Select,
   FormLabel,
   Checkbox,
   FormControl,
@@ -127,6 +127,7 @@ import {
   Badge,
   Autocomplete,
 } from "frappe-ui";
+import SelectDropdown from "@/components/SelectDropdown.vue";
 import { nextTick, ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
 import { useAuthStore } from "@/stores/auth";
@@ -199,7 +200,6 @@ const twilioAppsResource = createResource({
 });
 
 const telephonyProviders = [
-  { label: "", value: "" },
   { label: "Twilio", value: "Twilio" },
   { label: "Exotel", value: "Exotel" },
 ];

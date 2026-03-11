@@ -95,7 +95,7 @@
                 settingsData.autoUpdateStatus = true;
               } else {
                 settingsData.updateStatusTo = null;
-                settingsData.autoUpdateStatus = false;
+                settingsData.autoUpdateStatus = 0;
               }
             }
           "
@@ -163,7 +163,7 @@
                     settingsData.autoCloseTickets = true;
                   } else {
                     settingsData.autoCloseStatus = null;
-                    settingsData.autoCloseTickets = false;
+                    settingsData.autoCloseTickets = 0;
                   }
                 }
               "
