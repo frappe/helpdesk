@@ -119,7 +119,7 @@
     v-else
     :title="emptyState.title"
     :icon="emptyState.icon"
-    @emptyStateAction="emit('emptyStateAction')"
+    :description="emptyState.description"
   />
 </template>
 
@@ -185,6 +185,7 @@ interface P {
       // type of a h componnt
       icon?: string | VNode;
       title: string;
+      description?: string;
     };
     hideViewControls?: boolean;
     hideColumnSetting?: boolean;
@@ -200,7 +201,6 @@ interface P {
 }
 
 interface E {
-  (event: "emptyStateAction"): void;
   (event: "rowClick", row: any): void;
 }
 const props = defineProps<P>();

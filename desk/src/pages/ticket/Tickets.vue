@@ -25,12 +25,6 @@
     <ListViewBuilder
       ref="listViewRef"
       :options="options"
-      @empty-state-action="
-        () =>
-          $router.push({
-            name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew',
-          })
-      "
       @row-click="
         (row) =>
           $router.push({
@@ -91,6 +85,11 @@ const {
   deleteView,
 } = useView("HD Ticket");
 
+const activeView = computed(() => findView(route.query.view as string).value);
+const hasActiveFilters = computed(
+  () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
+);
+
 const { $dialog, $socket } = globalStore();
 const { isManager } = useAuthStore();
 
@@ -111,7 +110,7 @@ const selectBannerActions = [
   },
 ];
 
-const options = {
+const options = computed(() => ({
   doctype: "HD Ticket",
   columnConfig: {
     status: {
@@ -155,13 +154,23 @@ const options = {
     icon: h(TicketIcon, {
       class: "h-10 w-10",
     }),
+    description:
+      activeView.value?.public || activeView.value?.pinned
+        ? __(
+            "No tickets found for this view. Try adjusting your filters or creating a new view."
+          )
+        : hasActiveFilters.value
+        ? __(
+            "No tickets found for the applied filters. Try adjusting or clearing your filters."
+          )
+        : undefined,
   },
   rowRoute: {
     name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
     prop: "ticketId",
   },
   hideColumnSetting: false,
-};
+}));
 
 function handle_response_by_field(row: any, item: string) {
   if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
