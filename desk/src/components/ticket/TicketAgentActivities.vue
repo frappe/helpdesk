@@ -149,16 +149,11 @@ const communicationAreaRef: Ref = inject("communicationArea");
 const makeCall = inject<() => void>("makeCall");
 
 const emptyText = computed(() => {
-  let text = "No activities";
-  if (props.title == "Emails") {
-    text = "No email communications";
-  } else if (props.title == "Comments") {
-    text = "No comments found";
-    return text;
-  } else if (props.title == "Calls") {
-    text = "No calls made";
-    return text;
-  }
+  if (props.title === "Emails") return "No email communications";
+  if (props.title === "Comments") return "No comments found";
+  if (props.title === "Calls") return "No calls made";
+
+  return "No activity found";
 });
 
 const emptyTextIcon = computed(() => {
