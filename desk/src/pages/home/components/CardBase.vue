@@ -21,7 +21,7 @@
             <div
               class="flex items-center gap-0.5 text-ink-gray-5 hover:text-ink-gray-6 cursor-pointer shrink-0"
             >
-              vs {{ currentDuration.label.toLowerCase() }}
+              vs {{ currentDuration.toLowerCase() }}
               <FeatherIcon name="chevron-down" class="size-4" />
             </div>
             <template #item="{ item }">
@@ -32,7 +32,7 @@
                   {{ item.label }}
                 </span>
                 <FeatherIcon
-                  v-if="item.value == currentDuration.value"
+                  v-if="item.label == __(currentDuration)"
                   name="check"
                   class="size-4"
                 />
@@ -74,11 +74,8 @@ const props = defineProps({
     required: true,
   },
   currentDuration: {
-    type: Object as PropType<DropdownOption>,
-    default: {
-      label: "Last month",
-      value: "Last month",
-    },
+    type: String,
+    default: __("Last month"),
   },
 });
 
@@ -91,24 +88,24 @@ const emit = defineEmits(["changeDuration"]);
 const durationOptions = [
   {
     label: __("Last week"),
-    value: "Last week",
-    onClick: () =>
-      emit("changeDuration", { label: __("Last week"), value: "Last week" }),
+    onClick: () => {
+      if (currentDuration.value == __("Last week")) return;
+      emit("changeDuration", __("Last week"));
+    },
   },
   {
     label: __("Last month"),
-    value: "Last month",
-    onClick: () =>
-      emit("changeDuration", { label: __("Last month"), value: "Last month" }),
+    onClick: () => {
+      if (currentDuration.value == __("Last month")) return;
+      emit("changeDuration", __("Last month"));
+    },
   },
   {
     label: __("Last 3 months"),
-    value: "Last 3 months",
-    onClick: () =>
-      emit("changeDuration", {
-        label: __("Last 3 months"),
-        value: "Last 3 months",
-      }),
+    onClick: () => {
+      if (currentDuration.value == __("Last 3 months")) return;
+      emit("changeDuration", __("Last 3 months"));
+    },
   },
 ];
 </script>

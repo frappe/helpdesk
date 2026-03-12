@@ -200,15 +200,15 @@ const { views } = useView("HD Ticket");
 const currentTab = ref("upcoming_sla");
 const chartTabs = [
   {
-    label: "SLA Due",
+    label: __("SLA Due"),
     value: "upcoming_sla",
   },
   {
-    label: "Pending",
+    label: __("Pending"),
     value: "pending",
   },
   {
-    label: "Recent",
+    label: __("Recent"),
     value: "new_tickets",
   },
 ];

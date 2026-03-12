@@ -18,7 +18,6 @@ import { createResource } from "frappe-ui";
 import { formatTime } from "@/utils";
 import { __ } from "@/translation";
 import { EChartsOption } from "echarts";
-import { DropdownOption } from "@/types";
 
 interface AverageResponseData {
   percentage_change: number;
@@ -48,10 +47,7 @@ const props = defineProps({
   },
 });
 
-const currentDuration = ref({
-  label: __("Last month"),
-  value: "Last month",
-});
+const currentDuration = ref(__("Last month"));
 
 const chartData = computed(() => {
   const isDataFetched = resource.fetched;
@@ -139,16 +135,13 @@ const resource = createResource({
   type: "GET",
   makeParams: () => {
     return {
-      period: currentDuration.value.value.toLowerCase(),
+      period: currentDuration.value.toLowerCase(),
     };
   },
 });
 
-const changeDuration = (period: DropdownOption) => {
-  currentDuration.value = {
-    label: period.label,
-    value: period.value + "",
-  };
+const changeDuration = (period: string) => {
+  currentDuration.value = period;
   resource.submit();
 };
 

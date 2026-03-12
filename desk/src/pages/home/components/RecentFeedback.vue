@@ -72,10 +72,38 @@
               <template #default>
                 <Button :label="currentPeriodLabel" icon-right="chevron-down" />
               </template>
+              <template #item="{ item }">
+                <div
+                  class="data-[disabled]:cursor-not-allowed group flex h-7 w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+                >
+                  <span>
+                    {{ item.label }}
+                  </span>
+                  <FeatherIcon
+                    v-if="item.label == __(periadLabels[currentPeriod])"
+                    name="check"
+                    class="size-4"
+                  />
+                </div>
+              </template>
             </Dropdown>
             <Dropdown :options="sortOptions">
               <template #default>
                 <Button :label="currentSortLabel" icon-right="chevron-down" />
+              </template>
+              <template #item="{ item }">
+                <div
+                  class="data-[disabled]:cursor-not-allowed group flex h-7 w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+                >
+                  <span>
+                    {{ item.label }}
+                  </span>
+                  <FeatherIcon
+                    v-if="item.label == __(sortLabels[currentSort])"
+                    name="check"
+                    class="size-4"
+                  />
+                </div>
               </template>
             </Dropdown>
           </div>
@@ -271,31 +299,35 @@ const sortOptions = computed(() => [
   },
 ]);
 
+const periadLabels: Record<string, string> = {
+  all_time: __("All Time"),
+  last_week: __("Last Week"),
+  last_month: __("Last Month"),
+  last_3_months: __("Last 3 Months"),
+};
+
 const currentPeriodLabel = computed(() => {
-  const labels: Record<string, string> = {
-    all_time: __("All Time"),
-    last_week: __("Last Week"),
-    last_month: __("Last Month"),
-    last_3_months: __("Last 3 Months"),
-  };
-  return labels[currentPeriod.value] || __("All Time");
+  return periadLabels[currentPeriod.value] || __("All Time");
 });
 
+const sortLabels: Record<string, string> = {
+  negative_first: __("Negative first"),
+  positive_first: __("Positive first"),
+};
+
 const currentSortLabel = computed(() => {
-  const labels: Record<string, string> = {
-    negative_first: __("Negative first"),
-    positive_first: __("Positive first"),
-  };
-  return labels[currentSort.value] || __("Positive first");
+  return sortLabels[currentSort.value] || __("Positive first");
 });
 
 const changePeriod = (period: string) => {
+  if (currentPeriod.value == period) return;
   currentPeriod.value = period;
   currentIndex.value = 0;
   getRecentFeedbackResource.fetch();
 };
 
 const changeSort = (sort: string) => {
+  if (currentSort.value == sort) return;
   currentSort.value = sort;
   currentIndex.value = 0;
   getRecentFeedbackResource.fetch();

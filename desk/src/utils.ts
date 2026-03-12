@@ -194,7 +194,7 @@ export function errorMessage(title, message) {
 }
 
 export function formatTime(
-  seconds,
+  seconds: number,
   config: {
     day?: boolean;
     hour?: boolean;

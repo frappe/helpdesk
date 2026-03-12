@@ -17,7 +17,6 @@ import CardBase from "./CardBase.vue";
 import { createResource } from "frappe-ui";
 import { __ } from "@/translation";
 import { EChartsOption } from "echarts";
-import { DropdownOption } from "@/types";
 
 interface Data {
   percentage_change: number;
@@ -32,10 +31,7 @@ const props = defineProps({
   },
 });
 
-const currentDuration = ref({
-  label: "Last month",
-  value: "Last month",
-});
+const currentDuration = ref(__("Last month"));
 
 const chartColor = {
   lineColor: "#5597F3",
@@ -127,16 +123,13 @@ const getAgentTicketsResource = createResource({
   type: "GET",
   makeParams: () => {
     return {
-      period: currentDuration.value.value.toLowerCase(),
+      period: currentDuration.value.toLowerCase(),
     };
   },
 });
 
-const changeDuration = (period: DropdownOption) => {
-  currentDuration.value = {
-    label: period.label,
-    value: period.value + "",
-  };
+const changeDuration = (period: string) => {
+  currentDuration.value = period;
   getAgentTicketsResource.submit();
 };
 

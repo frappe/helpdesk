@@ -8,12 +8,12 @@ import { __ } from "@/translation";
 
 export const agentPortalSidebarOptions = [
   {
-    label: "Home",
+    label: __("Home"),
     icon: LucideHome,
     to: "Home",
   },
   {
-    label: "Tickets",
+    label: __("Tickets"),
     icon: LucideTicket,
     to: "TicketsAgent",
   },
