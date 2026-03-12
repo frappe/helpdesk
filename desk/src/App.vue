@@ -15,8 +15,6 @@ import WifiOff from "~icons/lucide/wifi-off";
 import { useAuthStore } from "./stores/auth";
 import { useFavicon } from "@vueuse/core";
 import { storeToRefs } from "pinia";
-import { useTheme } from "frappe-ui";
-import { watch } from "vue";
 import { __ } from "./translation";
 import { isCustomerPortal, getBrowserTimezone } from "./utils";
 
@@ -43,31 +41,11 @@ onMounted(() => {
   setConfig("systemTimezone", window.timezone?.system || null);
 });
 
-const { setTheme } = useTheme();
-const authStore = useAuthStore();
-const { deskTheme } = storeToRefs(authStore);
-
-watch(
-  deskTheme,
-  (theme) => {
-    if (theme) {
-      if (theme === "Dark") {
-        setTheme("dark");
-      } else if (theme === "Light") {
-        setTheme("light");
-      } else {
-        setTheme("system");
-      }
-    }
-  },
-  { immediate: true },
-);
-
 const AgentPortalRoot = defineAsyncComponent(
-  () => import("@/pages/desk/AgentRoot.vue"),
+  () => import("@/pages/desk/AgentRoot.vue")
 );
 const CustomerPortalRoot = defineAsyncComponent(
-  () => import("@/pages/CustomerPortalRoot.vue"),
+  () => import("@/pages/CustomerPortalRoot.vue")
 );
 
 const PortalRoot = computed(() => {
