@@ -21,9 +21,23 @@
             <div
               class="flex items-center gap-0.5 text-ink-gray-5 hover:text-ink-gray-6 cursor-pointer shrink-0"
             >
-              vs {{ currentDuration.toLowerCase() }}
+              vs {{ currentDuration.label.toLowerCase() }}
               <FeatherIcon name="chevron-down" class="size-4" />
             </div>
+            <template #item="{ item }">
+              <div
+                class="data-[disabled]:cursor-not-allowed group flex h-7 w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+              >
+                <span>
+                  {{ item.label }}
+                </span>
+                <FeatherIcon
+                  v-if="item.value == currentDuration.value"
+                  name="check"
+                  class="size-4"
+                />
+              </div>
+            </template>
           </Dropdown>
         </div>
       </div>
@@ -41,6 +55,7 @@ import { computed, type PropType } from "vue";
 import { Dropdown, FeatherIcon, ECharts } from "frappe-ui";
 import { __ } from "@/translation";
 import { EChartsOption } from "echarts";
+import { DropdownOption } from "@/types";
 
 const props = defineProps({
   title: {
@@ -50,102 +65,50 @@ const props = defineProps({
     type: [Number, String] as PropType<number | string>,
     default: "",
   },
-  chartData: {
-    type: Array as PropType<number[]>,
-    required: true,
-  },
-  chartDates: {
-    type: Array as PropType<string[]>,
-  },
-  currentDuration: {
-    type: String,
-    default: "Last month",
-  },
-  chartColor: {
-    type: Object,
-    required: true,
-  },
   percentageChange: {
     type: Object,
     required: true,
   },
+  chartConfig: {
+    type: Object as PropType<EChartsOption>,
+    required: true,
+  },
+  currentDuration: {
+    type: Object as PropType<DropdownOption>,
+    default: {
+      label: "Last month",
+      value: "Last month",
+    },
+  },
 });
+
+const chartConfig = computed<EChartsOption>(() => props.chartConfig);
 
 const currentDuration = computed(() => props.currentDuration);
 
 const emit = defineEmits(["changeDuration"]);
 
-const durationOptions = computed(() => {
-  const options = [
-    {
-      label: __("Last week"),
-      onClick: () => emit("changeDuration", "Last week"),
-    },
-    {
-      label: __("Last month"),
-      onClick: () => emit("changeDuration", "Last month"),
-    },
-    {
-      label: __("Last 3 months"),
-      onClick: () => emit("changeDuration", "Last 3 months"),
-    },
-  ];
-
-  return options.filter((option) => option.label !== currentDuration.value);
-});
-
-const chartConfig = computed<EChartsOption>(() => {
-  const color = props.chartColor.lineColor;
-  const gradientColor = props.chartColor.gradientColor;
-  return {
-    xAxis: {
-      type: "category",
-      data: props.chartDates,
-      show: false,
-      boundaryGap: false,
-    },
-    yAxis: {
-      type: "value",
-      show: false,
-    },
-    series: [
-      {
-        data: props.chartData,
-        type: "line",
-        symbol: "none",
-        lineStyle: {
-          width: 1.25,
-        },
-        areaStyle: {
-          opacity: 0.8,
-          color: {
-            type: "linear",
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              {
-                offset: 0,
-                color: gradientColor.start,
-              },
-              {
-                offset: 1,
-                color: gradientColor.end,
-              },
-            ],
-            global: false,
-          },
-        },
-      },
-    ],
-    color: color,
-    grid: {
-      left: 2,
-      right: 2,
-      top: 2,
-      bottom: 2,
-    },
-  };
-});
+const durationOptions = [
+  {
+    label: __("Last week"),
+    value: "Last week",
+    onClick: () =>
+      emit("changeDuration", { label: __("Last week"), value: "Last week" }),
+  },
+  {
+    label: __("Last month"),
+    value: "Last month",
+    onClick: () =>
+      emit("changeDuration", { label: __("Last month"), value: "Last month" }),
+  },
+  {
+    label: __("Last 3 months"),
+    value: "Last 3 months",
+    onClick: () =>
+      emit("changeDuration", {
+        label: __("Last 3 months"),
+        value: "Last 3 months",
+      }),
+  },
+];
 </script>

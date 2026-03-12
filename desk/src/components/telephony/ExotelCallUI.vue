@@ -100,9 +100,15 @@ import MinimizeIcon from "./Icons/MinimizeIcon.vue";
 
 const telephonyStore = useTelephonyStore();
 
-const onCallStarted = inject<(() => void) | undefined>("onCallStarted", undefined);
+const onCallStarted = inject<(() => void) | undefined>(
+  "onCallStarted",
+  undefined
+);
 const onCallEnded = inject<(() => void) | undefined>("onCallEnded", undefined);
-const onCallFailed = inject<(() => void) | undefined>("onCallFailed", undefined);
+const onCallFailed = inject<(() => void) | undefined>(
+  "onCallFailed",
+  undefined
+);
 
 const callPopupHeader = ref(null);
 const showCallPopup = ref(false);

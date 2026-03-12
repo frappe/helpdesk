@@ -2,13 +2,11 @@
   <div class="w-full h-full overflow-hidden">
     <CardBase
       :title="__('My Tickets')"
-      :text="chartConfig.total"
-      :chartData="chartConfig.data"
-      :chartDates="chartConfig.dates"
+      :text="chartData.total"
+      :percentageChange="chartData.percentageChange"
+      :chartConfig="chartConfig"
       :currentDuration="currentDuration"
-      :percentageChange="chartConfig.percentageChange"
       @changeDuration="changeDuration"
-      :chartColor="chartColor"
     />
   </div>
 </template>
@@ -17,6 +15,9 @@
 import { computed, onMounted, ref, type PropType } from "vue";
 import CardBase from "./CardBase.vue";
 import { createResource } from "frappe-ui";
+import { __ } from "@/translation";
+import { EChartsOption } from "echarts";
+import { DropdownOption } from "@/types";
 
 interface Data {
   percentage_change: number;
@@ -31,14 +32,17 @@ const props = defineProps({
   },
 });
 
-const currentDuration = ref("Last month");
+const currentDuration = ref({
+  label: "Last month",
+  value: "Last month",
+});
 
 const chartColor = {
   lineColor: "#5597F3",
   gradientColor: { start: "#abccfc", end: "rgba(229,240,254,0)" },
 };
 
-const chartConfig = computed(() => {
+const chartData = computed(() => {
   const _data: Data = getAgentTicketsResource.fetched
     ? getAgentTicketsResource.data
     : props.data;
@@ -63,18 +67,76 @@ const chartConfig = computed(() => {
   };
 });
 
+const chartConfig = computed<EChartsOption>(() => {
+  const color = chartColor.lineColor;
+  const gradientColor = chartColor.gradientColor;
+  return {
+    xAxis: {
+      type: "category",
+      data: chartData.value.dates,
+      show: false,
+      boundaryGap: false,
+    },
+    yAxis: {
+      type: "value",
+      show: false,
+    },
+    series: [
+      {
+        data: chartData.value.data,
+        type: "line",
+        symbol: "none",
+        lineStyle: {
+          width: 1.25,
+        },
+        areaStyle: {
+          opacity: 0.8,
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              {
+                offset: 0,
+                color: gradientColor.start,
+              },
+              {
+                offset: 1,
+                color: gradientColor.end,
+              },
+            ],
+            global: false,
+          },
+        },
+      },
+    ],
+    color: color,
+    grid: {
+      left: 2,
+      right: 2,
+      top: 2,
+      bottom: 2,
+    },
+  };
+});
+
 const getAgentTicketsResource = createResource({
   url: "helpdesk.api.agent_home.agent_home.get_agent_tickets",
   type: "GET",
   makeParams: () => {
     return {
-      period: currentDuration.value.toLowerCase(),
+      period: currentDuration.value.value.toLowerCase(),
     };
   },
 });
 
-const changeDuration = (period: string) => {
-  currentDuration.value = period;
+const changeDuration = (period: DropdownOption) => {
+  currentDuration.value = {
+    label: period.label,
+    value: period.value + "",
+  };
   getAgentTicketsResource.submit();
 };
 

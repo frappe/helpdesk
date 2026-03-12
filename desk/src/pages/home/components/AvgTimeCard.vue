@@ -2,13 +2,11 @@
   <div class="w-full h-full overflow-hidden">
     <CardBase
       :title="title"
-      :text="chartConfig.average"
+      :text="chartData.average"
+      :percentageChange="chartData.percentageChange"
+      :chartConfig="chartConfig"
       :currentDuration="currentDuration"
-      :percentageChange="chartConfig.percentageChange"
-      :chartData="chartConfig.data"
-      :chartDates="chartConfig.dates"
       @changeDuration="changeDuration"
-      :chartColor="chartColor"
     />
   </div>
 </template>
@@ -19,6 +17,8 @@ import CardBase from "./CardBase.vue";
 import { createResource } from "frappe-ui";
 import { formatTime } from "@/utils";
 import { __ } from "@/translation";
+import { EChartsOption } from "echarts";
+import { DropdownOption } from "@/types";
 
 interface AverageResponseData {
   percentage_change: number;
@@ -48,22 +48,25 @@ const props = defineProps({
   },
 });
 
-const currentDuration = ref("Last month");
+const currentDuration = ref({
+  label: __("Last month"),
+  value: "Last month",
+});
 
-const chartConfig = computed(() => {
+const chartData = computed(() => {
   const isDataFetched = resource.fetched;
-  const _data = isDataFetched ? resource.data : props.data;
+  const _data: AverageResponseData = isDataFetched ? resource.data : props.data;
 
-  const dates = _data?.data?.map((item: any) => item.date) || [];
-  const avg_time = _data?.data?.map((item: any) => item.avg_time) || [];
+  const dates = _data?.data?.map((item) => item.date) || [];
+  const avg_time = _data?.data?.map((item) => item.avg_time) || [];
   const _percentageChange = _data?.percentage_change || 0;
-  
+
   const percentageChange = {
     icon: _percentageChange > 0 ? "arrow-up-right" : "arrow-down-left",
     value: _percentageChange > 0 ? `+${_percentageChange}` : _percentageChange,
     color: _percentageChange > 0 ? "text-red-600" : "text-green-600",
   };
-  
+
   const average =
     formatTime(_data?.average || 0, { day: true, hour: true, minute: true }) ||
     "0m";
@@ -76,18 +79,76 @@ const chartConfig = computed(() => {
   };
 });
 
+const chartConfig = computed<EChartsOption>(() => {
+  const color = props.chartColor.lineColor;
+  const gradientColor = props.chartColor.gradientColor;
+  return {
+    xAxis: {
+      type: "category",
+      data: chartData.value.dates,
+      show: false,
+      boundaryGap: false,
+    },
+    yAxis: {
+      type: "value",
+      show: false,
+    },
+    series: [
+      {
+        data: chartData.value.data,
+        type: "line",
+        symbol: "none",
+        lineStyle: {
+          width: 1.25,
+        },
+        areaStyle: {
+          opacity: 0.8,
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              {
+                offset: 0,
+                color: gradientColor.start,
+              },
+              {
+                offset: 1,
+                color: gradientColor.end,
+              },
+            ],
+            global: false,
+          },
+        },
+      },
+    ],
+    color: color,
+    grid: {
+      left: 2,
+      right: 2,
+      top: 2,
+      bottom: 2,
+    },
+  };
+});
+
 const resource = createResource({
   url: props.apiUrl,
   type: "GET",
   makeParams: () => {
     return {
-      period: currentDuration.value.toLowerCase(),
+      period: currentDuration.value.value.toLowerCase(),
     };
   },
 });
 
-const changeDuration = (period: string) => {
-  currentDuration.value = period;
+const changeDuration = (period: DropdownOption) => {
+  currentDuration.value = {
+    label: period.label,
+    value: period.value + "",
+  };
   resource.submit();
 };
 
