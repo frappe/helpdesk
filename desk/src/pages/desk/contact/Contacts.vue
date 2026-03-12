@@ -45,6 +45,7 @@ import { computed, h, ref } from "vue";
 import ContactDialog from "./ContactDialog.vue";
 import { showNewContactModal } from "./dialogState";
 import LucideContact2 from "~icons/lucide/contact-2";
+import { __ } from "@/translation";
 
 const isContactDialogVisible = ref(false);
 const selectedContact = ref(null);
@@ -77,6 +78,11 @@ const options = computed(() => {
       icon: h(LucideContact2, {
         class: "h-10 w-10",
       }),
+      description: hasActiveFilters.value
+        ? __(
+            "No contacts found for the applied filters. Try adjusting or clearing your filters."
+          )
+        : undefined,
     },
   };
 });

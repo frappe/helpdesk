@@ -269,6 +269,8 @@ import {
   LoadingIndicator,
 } from "frappe-ui";
 import { computed, h, onMounted, ref, watch, nextTick, reactive } from "vue";
+import { useScreenSize } from "@/composables/screen";
+const { isMobileView } = useScreenSize();
 import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";

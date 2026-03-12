@@ -105,6 +105,7 @@ import {
   Dropdown,
   toast,
   createListResource,
+  createResource,
 } from "frappe-ui";
 import { __ } from "@/translation";
 import {
@@ -196,23 +197,24 @@ function updateField(fieldname: string, value: string, callback = () => {}) {
   });
   callback();
 }
-const ticketCount = ref();
 
-const candidateTickets = createListResource({
-  doctype: "HD Ticket",
-  fields: ["name"],
+const ticketCount = createResource({
+  url: "frappe.client.get_count",
+  makeParams: () => ({
+    doctype: "HD Ticket",
+    filters: {
+      status_category: ["!=", "Resolved"],
+      is_merged: 0,
+    },
+  }),
   auto: true,
-  onSuccess(data) {
-    ticketCount.value = data.length;
-  },
-  pageLength: 3,
 });
 const showMergeModal = ref(false);
 const showMergeOption = computed(() => {
   return (
-    !ticket.value.doc.is_merged &&
-    ["Open", "Paused"].includes(ticket.value.doc.status_category) &&
-    ticketCount.value > 1
+    !ticket?.value?.doc?.is_merged &&
+    ["Open", "Paused"].includes(ticket?.value?.doc?.status_category) &&
+    ticketCount.data > 1
   );
 });
 const defaultActions = computed(() => {
@@ -235,30 +237,6 @@ const defaultActions = computed(() => {
     },
   ];
 });
-
-const deleteAction = computed(() => {
-  if (!isAdmin) return [];
-  return [
-    {
-      group: __("Default actions"),
-      hideLabel: true,
-      items: [
-        {
-          label: __("Delete"),
-          component: h(Button, {
-            label: __("Delete"),
-            variant: "ghost",
-            iconLeft: "trash-2",
-            theme: "red",
-            style: "width: 100%; justify-content: flex-start;",
-            onClick: handleDeleteTicket,
-          }),
-        },
-      ],
-    },
-  ];
-});
-
 const actions = ref<any[]>([]);
 const normalActions = computed(() => {
   return actions.value.filter((action) => !action.group);
@@ -291,7 +269,7 @@ const groupedActions = computed(() => {
   _actions = _actions.concat(
     actions.value.filter((action) => action.group && !action.buttonLabel)
   );
-  _actions = _actions.concat(deleteAction.value);
+  _actions = _actions.concat(defaultActions.value);
   return _actions;
 });
 

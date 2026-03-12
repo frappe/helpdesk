@@ -2,8 +2,49 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">
-          {{ isManager ? __("Organization Analytics") : __("Agent Dashboard") }}
+        <div class="text-lg font-medium text-ink-gray-9">
+          {{
+            isManager
+              ? viewMyStats
+                ? __("My Dashboard")
+                : !isMobileView
+                ? __("Organization Analytics")
+                : __("Organization")
+              : __("Agent Dashboard")
+          }}
+        </div>
+      </template>
+      <template #right-header>
+        <!-- Segmented pill toggle: only visible to managers -->
+        <div
+          v-if="isManager"
+          class="relative flex items-center rounded-full bg-surface-gray-2 p-0.5 gap-0.5"
+          role="tablist"
+          :aria-label="__('Dashboard view')"
+        >
+          <TabButtons
+            v-model="activeTab"
+            :buttons="[
+              {
+                value: 'organization',
+                class: '!w-auto !px-2',
+                icon: () =>
+                  h('div', { class: 'flex items-center gap-1.5' }, [
+                    h(LucideBuilding2, { class: 'size-3.5' }),
+                    h('span', { class: 'text-sm' }, __('Organization')),
+                  ]),
+              },
+              {
+                value: 'my_stats',
+                class: '!w-auto !px-2',
+                icon: () =>
+                  h('div', { class: 'flex items-center gap-1.5' }, [
+                    h(LucideUser, { class: 'size-3.5' }),
+                    h('span', { class: 'text-sm' }, __('My Stats')),
+                  ]),
+              },
+            ]"
+          />
         </div>
       </template>
     </LayoutHeader>
@@ -207,9 +248,6 @@ import { __ } from "@/translation";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideUser from "~icons/lucide/user";
 import { useScreenSize } from "@/composables/screen";
-import { useStorage } from "@vueuse/core";
-
-const { isManager, userId, isAgent } = useAuthStore();
 
 interface ChartData {
   data: ChartValues[];
@@ -354,8 +392,9 @@ const teamMembers = createResource({
 const { isManager, userId } = useAuthStore();
 
 const viewMyStats = ref(false);
-const activeTab = useStorage("dashboard_active_tab", "organization");
-function validateView(myStats: boolean) {
+const activeTab = ref("organization");
+
+function setView(myStats: boolean) {
   viewMyStats.value = myStats;
   if (myStats) {
     filters.team = null;
@@ -366,7 +405,7 @@ function validateView(myStats: boolean) {
 }
 
 watch(activeTab, (val) => {
-  validateView(val === "my_stats");
+  setView(val === "my_stats");
 });
 
 watch(
