@@ -1,11 +1,11 @@
 <template>
   <!-- View Controls -->
   <div
-    class="flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6 bg-surface-white"
+    class="flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6"
     v-if="showViewControls"
   >
     <QuickFilters v-if="!isMobileView" class="flex-1" />
-    <div class="flex items-start gap-2 justify-end h-full bg-surface-white" v-if="!isMobileView">
+    <div class="flex items-start gap-2 justify-end h-full" v-if="!isMobileView">
       <Button
         :label="__('Save Changes')"
         v-if="isViewUpdated && canSaveView"
@@ -19,7 +19,7 @@
         v-if="!options.hideColumnSetting"
       />
     </div>
-    <div v-else class="flex justify-between items-center w-full bg-surface-white">
+    <div v-else class="flex justify-between items-center w-full">
       <Filter :default_filters="defaultParams.filters" />
       <div class="flex items-center gap-2">
         <Reload @click="handleReload" :loading="list.loading" />
@@ -81,7 +81,7 @@
 
   <!-- List Footer -->
   <div
-    class="p-20 border-t sm:px-5 px-3 py-2 bg-surface-white"
+    class="p-20 border-t sm:px-5 px-3 py-2"
     v-if="list.data?.data.length > 0"
   >
     <ListFooter

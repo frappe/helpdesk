@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-outline-gray-2  bg-surface-menu-bar p-2 text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-r border-outline-gray-2 bg-surface-gray-2 p-2 text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,

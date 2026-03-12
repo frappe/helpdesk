@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-screen w-screen">
     <Sidebar />
-    <div class="flex-1 flex flex-col h-full overflow-auto bg-surface-white">
+    <div class="flex-1 flex flex-col h-full overflow-auto">
       <AppHeader />
       <slot />
     </div>

@@ -1,9 +1,9 @@
 <template>
-  <div class="mx-3 h-full overflow-y-auto sm:mx-5 bg-surface-white" v-if="showGroupedRows">
+  <div class="mx-3 h-full overflow-y-auto sm:mx-5" v-if="showGroupedRows">
     <div v-for="group in groupedRows" :key="group.group">
       <ListGroupHeader :group="group">
         <div
-          class="my-2 flex items-center gap-2 text-base font-medium text-ink-gray-8 justify-between w-full mr-1 "
+          class="my-2 flex items-center gap-2 text-base font-medium text-ink-gray-8 justify-between w-full mr-1"
         >
           <div class="flex items-center gap-2 w-full">
             <component v-if="group.icon" :is="group.icon" />
@@ -30,26 +30,26 @@
           </Dropdown>
         </div>
       </ListGroupHeader>
-      <ListGroupRows :group="group" id="list-rows" class="!mt-0 ">
+      <ListGroupRows :group="group" id="list-rows" class="!mt-0">
         <ListRow
           v-for="row in group.rows"
           :key="row.name"
           v-slot="{ idx, column, item }"
           :row="row"
-          class="truncate text-base  row"
+          class="truncate text-base row"
         >
           <slot v-bind="{ idx, column, item, row }" />
         </ListRow>
       </ListGroupRows>
     </div>
   </div>
-  <ListRows class="mx-3 sm:mx-5 bg-surface-white " v-else id="list-rows">
+  <ListRows class="mx-3 sm:mx-5" v-else id="list-rows">
     <ListRow
       v-for="row in groupedRows"
       :key="row.name"
       v-slot="{ idx, column, item }"
       :row="row"
-      class="truncate text-base  "
+      class="truncate text-base"
     >
       <slot v-bind="{ idx, column, item, row }" />
     </ListRow>

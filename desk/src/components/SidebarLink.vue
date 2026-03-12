@@ -65,7 +65,7 @@ const props = withDefaults(defineProps<P>(), {
   isActive: false,
   onClick: () => () => true,
   to: "",
-  bgColor: "bg-surface-selected",
+  bgColor: "bg-surface-white",
   hvColor: "hover:bg-surface-gray-3",
 });
 const router = useRouter();
