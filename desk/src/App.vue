@@ -13,9 +13,13 @@ import { computed, defineAsyncComponent, h, onMounted, onUnmounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
 import { useAuthStore } from "./stores/auth";
+
 import { useFavicon } from "@vueuse/core";
 import { storeToRefs } from "pinia";
+import { useTheme } from "frappe-ui";
+import { watch } from "vue";
 import { __ } from "./translation";
+
 import { isCustomerPortal, getBrowserTimezone } from "./utils";
 
 const configStore = useConfigStore();
@@ -40,6 +44,26 @@ onMounted(() => {
   !isCustomerPortal.value && setConfig("localTimezone", window.timezone?.user);
   setConfig("systemTimezone", window.timezone?.system || null);
 });
+
+const { setTheme } = useTheme();
+const authStore = useAuthStore();
+const { deskTheme } = storeToRefs(authStore);
+
+watch(
+  deskTheme,
+  (theme) => {
+    if (theme) {
+      if (theme === "Dark") {
+        setTheme("dark");
+      } else if (theme === "Light") {
+        setTheme("light");
+      } else {
+        setTheme("system");
+      }
+    }
+  },
+  { immediate: true }
+);
 
 const AgentPortalRoot = defineAsyncComponent(
   () => import("@/pages/desk/AgentRoot.vue")
