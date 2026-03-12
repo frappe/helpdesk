@@ -185,7 +185,4 @@ function openTicket(name: string) {
 
   window.open(url, "_blank");
 }
-// v-if="(false && contact.data.mobile_no) || contact.data.phone"
 </script>
-
-<style scoped></style>

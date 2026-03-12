@@ -114,7 +114,11 @@ const contactDetails = computed(() => [
   },
   {
     icon: markRaw(ModifiedIcon),
-    value: `Updated ${dayjs(props.contact.modified).fromNow()}`,
+    value: `Last seen ${
+      props.contact.last_active
+        ? dayjs(props.contact.last_active).fromNow()
+        : "Never"
+    }`,
   },
   {
     icon: markRaw(LucideTicket),
