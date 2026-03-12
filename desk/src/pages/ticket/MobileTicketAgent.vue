@@ -119,7 +119,7 @@
             </template>
           </Tabs>
           <CommunicationArea
-            class="sticky bottom-0 z-50 bg-white"
+            class="sticky bottom-0 z-50 bg-surface-white"
             ref="communicationAreaRef"
             v-model="ticket.data"
             :ticketId="ticket.data?.name"

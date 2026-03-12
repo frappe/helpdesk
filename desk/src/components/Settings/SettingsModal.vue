@@ -7,7 +7,7 @@
     <template #body>
       <div class="flex z-50" :style="{ height: 'calc(100vh - 8rem)' }">
         <div
-          class="flex w-52 shrink-0 flex-col bg-gray-50 p-2 overflow-y-auto hide-scrollbar"
+          class="flex w-52 shrink-0 flex-col bg-surface-gray-2 p-2 overflow-y-auto hide-scrollbar"
         >
           <h1 class="px-2 pt-2 text-lg font-semibold mb-2">
             {{ __("Settings") }}
@@ -26,13 +26,13 @@
                 class="flex h-7 w-full items-center gap-2 rounded px-2 py-1"
                 :class="[
                   activeTab?.label == item.label
-                    ? 'bg-white shadow-sm'
-                    : 'hover:bg-gray-100',
+                    ? 'bg-surface-white shadow-sm'
+                    : 'hover:bg-surface-gray-3',
                 ]"
                 @click="() => onTabChange(item)"
               >
-                <component :is="item.icon" class="h-4 w-4 text-gray-700" />
-                <span class="text-base text-gray-800">
+                <component :is="item.icon" class="h-4 w-4 text-ink-gray-7" />
+                <span class="text-base text-ink-gray-8">
                   {{ item.label }}
                 </span>
               </button>

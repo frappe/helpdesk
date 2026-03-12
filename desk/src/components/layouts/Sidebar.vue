@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-r border-outline-gray-2 bg-surface-gray-2 p-2 text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
@@ -16,7 +16,7 @@
       :is-expanded="isExpanded"
     >
       <template #right>
-        <span class="flex items-center gap-0.5 font-medium text-gray-600">
+        <span class="flex items-center gap-0.5 font-medium text-ink-gray-6">
           <component :is="device.modifierIcon" class="h-3 w-3" />
           <span>K</span>
         </span>

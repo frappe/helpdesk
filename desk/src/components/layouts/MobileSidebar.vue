@@ -11,7 +11,7 @@
         leave-to="-translate-x-full"
       >
         <div
-          class="relative z-10 flex h-full w-[230px] flex-col border-r bg-gray-50 transition-all duration-300 ease-in-out"
+          class="relative z-10 flex h-full w-[230px] flex-col border-r bg-surface-gray-2 transition-all duration-300 ease-in-out"
         >
           <!-- user dropwdown -->
           <div class="p-1">
@@ -100,7 +100,7 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <DialogOverlay class="fixed inset-0 bg-gray-600 bg-opacity-50" />
+        <DialogOverlay class="fixed inset-0 bg-surface-gray-8 bg-opacity-50" />
       </TransitionChild>
     </Dialog>
   </TransitionRoot>

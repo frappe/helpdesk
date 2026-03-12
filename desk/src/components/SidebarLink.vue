@@ -1,6 +1,6 @@
 <template>
   <div
-    class="-all flex h-7 cursor-pointer items-center rounded pl-2 pr-1 text-gray-800 duration-300 ease-in-out"
+    class="-all flex h-7 cursor-pointer items-center rounded pl-2 pr-1 text-ink-gray-8 duration-300 ease-in-out"
     :class="{
       'w-full': isExpanded,
       'w-8': !isExpanded,
@@ -12,9 +12,9 @@
   >
     <Tooltip :text="__(label)" v-if="!isExpanded">
       <span
-        class="shrink-0 text-gray-700"
+        class="shrink-0 text-ink-gray-7"
         :class="{
-          'text-gray-900': !isExpanded,
+          'text-ink-gray-9': !isExpanded,
           'icon-emoji': isMobileView,
         }"
       >
@@ -23,9 +23,9 @@
     </Tooltip>
     <span
       v-else
-      class="shrink-0 text-gray-700"
+      class="shrink-0 text-ink-gray-7"
       :class="{
-        'text-gray-900': !isExpanded,
+        'text-ink-gray-9': !isExpanded,
         'icon-emoji': isMobileView,
       }"
     >
@@ -65,8 +65,8 @@ const props = withDefaults(defineProps<P>(), {
   isActive: false,
   onClick: () => () => true,
   to: "",
-  bgColor: "bg-white",
-  hvColor: "hover:bg-gray-100",
+  bgColor: "bg-surface-white",
+  hvColor: "hover:bg-surface-gray-3",
 });
 const router = useRouter();
 const { isMobileView } = useScreenSize();
