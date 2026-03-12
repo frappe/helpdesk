@@ -56,6 +56,7 @@
     :invite-new="inviteNewUsers"
     @addedExisting="handleAddExistingContacts"
     @invited="handleInviteUsers"
+    :loading="inviteByEmailResource.loading || customer.updateContacts.loading"
   />
   <PendingInvitesModal
     v-model="showPendingInvites"

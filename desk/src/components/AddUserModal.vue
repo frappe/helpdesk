@@ -11,10 +11,7 @@
     @close="handleDialogClose()"
   >
     <template #body-content>
-      <div class="flex gap-1 border rounded mb-4 p-2 text-ink-gray-5">
-        <LucideInfo class="size-3.5 mt-[4px] shrink-0" />
-        <p class="text-p-sm">{{ infoText }}</p>
-      </div>
+      <p class="text-p-base text-ink-gray-7 mb-4">{{ infoText }}</p>
 
       <div
         class="p-2 group bg-surface-gray-2 hover:bg-surface-gray-3 rounded"
@@ -45,7 +42,7 @@
         :label="__('Invite by email')"
         :description="
           __(
-            'Type an email and press Enter or comma to add it. You can also paste a comma-separated list.'
+            'Type an email and press Enter / Comma to add it. You can also paste a comma-separated list.'
           )
         "
         :error-message="(input:string)=> `${input} ${__('is not a valid email address.')}` "
@@ -117,14 +114,6 @@ const selectedContacts = ref<string[]>([]);
 const newUsers = ref<string[]>([]);
 const role = ref(props.forAgents ? "Agent" : "HD Customer");
 
-watch(show, (val) => {
-  if (val)
-    setTimeout(() => {
-      if (props.inviteNew) tagInput.value?.setFocus();
-      else emailMultiSelect.value?.setFocus();
-    }, 100);
-});
-
 const infoText = computed<string>(() => {
   return props.forAgents
     ? __(
@@ -154,16 +143,16 @@ const roleOptions = computed(() => {
   ];
 });
 
-const roleDescription = computed<string>(() => {
+const roleDescription = computed(() => {
   const descriptions: Record<string, string> = {
     "HD Customer Manager": __(
-      "Has access to all tickets raised by the organisation. Can designate other members as managers and raise tickets on behalf of the organisation."
+      "Can view all tickets raised by the organization and assign other members as managers."
     ),
     "HD Customer": __(
-      "Can raise tickets on behalf of the organisation and view only the tickets raised by them."
+      "Can raise tickets on behalf of the organisation and manage the tickets they raised."
     ),
     "Agent Manager": __(
-      "Can manage and invite new users, and create public & private views (reports)."
+      "Can manage and invite new agents, and create public & private views (reports)."
     ),
     Agent: __("Can work with tickets and create private views (reports)."),
   };
@@ -200,4 +189,12 @@ function handleDialogClose() {
     selectedContacts.value = [];
   }
 }
+
+watch(show, (val) => {
+  if (val)
+    setTimeout(() => {
+      if (props.inviteNew) tagInput.value?.setFocus();
+      else emailMultiSelect.value?.setFocus();
+    }, 100);
+});
 </script>

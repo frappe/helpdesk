@@ -16,7 +16,12 @@
         >
           {{ contact.contact_name }}
         </p>
-        <Badge v-if="contact.is_primary" :label="__('Primary')" theme="blue" />
+        <Badge
+          v-if="contact.is_primary"
+          :label="__('Primary')"
+          theme="blue"
+          variant="outline"
+        />
         <Tooltip
           v-if="contact.is_manager"
           :text="__('Can view tickets raised by all contacts of the customer.')"
@@ -90,7 +95,7 @@ const customer = inject(CustomerResourceSymbol)!;
 
 const ticketCountLabel = computed(() => {
   const count = props.contact.ticket_count;
-  if (count === 0) return __("No open tickets");
+  if (count === 0) return __("No active tickets");
   return `${count} ${count === 1 ? __("active ticket") : __("active tickets")}`;
 });
 
@@ -115,9 +120,11 @@ const contactDetails = computed(() => [
     icon: markRaw(LucideTicket),
     value: ticketCountLabel.value,
     color: (value: string) =>
-      value !== __("No open tickets") ? "!text-amber-700" : "!text-ink-gray-4",
+      value !== __("No active tickets")
+        ? "!text-amber-700"
+        : "!text-ink-gray-4",
     class: (value: string) =>
-      value !== __("No open tickets") ? "hover:underline cursor-pointer" : "",
+      value !== __("No active tickets") ? "hover:underline cursor-pointer" : "",
   },
 ]);
 
@@ -238,7 +245,7 @@ function updatePrimaryContact(isPrimary: 0 | 1) {
 
 function removeContact() {
   $dialog({
-    title: __("Remove Contact?"),
+    title: __("Remove Contact"),
     message: __(
       "Are you sure you want to remove this contact from the customer?"
     ),
