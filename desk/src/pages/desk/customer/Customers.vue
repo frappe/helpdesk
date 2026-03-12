@@ -44,12 +44,16 @@ import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CustomerDialog from "./CustomerDialog.vue";
 import { OrganizationsIcon } from "@/components/icons";
+import { __ } from "@/translation";
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
 const selectedCustomer = ref(null);
 const listViewRef = ref(null);
 // const emptyMessage = "No Customers Found";
+const hasActiveFilters = computed(
+  () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
+);
 
 function openCustomer(id: string) {
   selectedCustomer.value = id;
@@ -79,8 +83,14 @@ const options = computed(() => {
         },
       },
     },
+
     emptyState: {
       title: "No customers found",
+      description: hasActiveFilters.value
+        ? __(
+            "No customers found for the applied filters. Try adjusting or clearing your filters."
+          )
+        : undefined,
       icon: h(OrganizationsIcon, {
         class: "h-10 w-10",
       }),

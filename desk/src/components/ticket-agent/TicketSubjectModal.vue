@@ -9,13 +9,21 @@
           size="sm"
           variant="subtle"
           :disabled="false"
+          @keydown.ctrl.enter.capture.stop="handleRename"
+          @keydown.meta.enter.capture.stop="handleRename"
         />
         <Button
           variant="solid"
           :loading="isLoading"
-          label="Rename"
+          :label="
+            isMobileView
+              ? 'Rename'
+              : isMac
+              ? 'Rename (⌘ + ⏎)'
+              : 'Rename (Ctrl + ⏎)'
+          "
           @click="handleRename"
-          :disabled="renameSubject === ticket?.doc?.subject"
+          :disabled="isDirty"
         />
       </div>
     </template>
@@ -24,17 +32,25 @@
 
 <script setup lang="ts">
 import { TicketSymbol } from "@/types";
-import { inject, ref, watch, nextTick } from "vue";
+import { inject, ref, watch, nextTick, computed } from "vue";
 const ticket = inject(TicketSymbol);
+const { isMac } = useDevice();
+const { isMobileView } = useScreenSize();
+import { useDevice } from "@/composables";
+import { useScreenSize } from "@/composables/screen";
 const showSubjectDialog = defineModel<boolean>({ default: false });
 const renameSubject = ref(ticket.value?.doc?.subject || "");
 const isLoading = ref(false);
 const subjectInput = ref<any>(null);
+const isDirty = computed(() => {
+  return renameSubject.value === ticket?.value?.doc?.subject;
+});
 
 watch(
   () => showSubjectDialog.value,
   async (val) => {
     if (val) {
+      renameSubject.value = ticket?.value?.doc?.subject || "";
       await nextTick();
       subjectInput.value?.$el?.querySelector("textarea").focus();
     }
@@ -42,6 +58,7 @@ watch(
 );
 
 function handleRename() {
+  if (isDirty.value) return;
   isLoading.value = true;
   ticket.value.setValue.submit(
     {

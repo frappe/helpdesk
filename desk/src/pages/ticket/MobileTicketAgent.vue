@@ -507,3 +507,13 @@ onUnmounted(() => {
   document.title = "Helpdesk";
 });
 </script>
+<style scoped>
+:deep(.breadcrumb-item span),
+:deep(a span) {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  white-space: normal !important;
+}
+</style>

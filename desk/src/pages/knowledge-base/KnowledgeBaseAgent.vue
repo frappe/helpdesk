@@ -88,7 +88,9 @@ const editTitle = ref(false);
 const showCategoryModal = ref(false);
 const moveToModal = ref(false);
 const mergeModal = ref(false);
-
+const hasActiveFilters = computed(
+  () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
+);
 const generalCategory = createResource({
   url: "helpdesk.api.knowledge_base.get_general_category",
   auto: true,
@@ -414,6 +416,11 @@ const options = computed(() => {
       icon: h(LucideBookOpen, {
         class: "h-10 w-10",
       }),
+      description: hasActiveFilters.value
+        ? __(
+            "No articles found for the applied filters. Try adjusting or clearing your filters."
+          )
+        : undefined,
     },
     rowRoute: {
       name: "Article",

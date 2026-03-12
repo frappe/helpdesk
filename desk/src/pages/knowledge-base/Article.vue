@@ -14,7 +14,7 @@
       </template>
       <template #right-header v-if="!isCustomerPortal">
         <!-- Default Buttons -->
-        <div class="flex gap-2" v-if="!editable">
+        <div class="flex gap-2" v-if="!editable && !article.loading">
           <Button
             :label="
               article.data?.status === 'Draft' ? __('Publish') : __('Unpublish')
@@ -269,6 +269,8 @@ import {
   LoadingIndicator,
 } from "frappe-ui";
 import { computed, h, onMounted, ref, watch, nextTick, reactive } from "vue";
+import { useScreenSize } from "@/composables/screen";
+const { isMobileView } = useScreenSize();
 import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
@@ -674,7 +676,7 @@ const articleActions = computed(() => [
 const breadcrumbs = computed(() => {
   const items: Breadcrumb[] = [
     {
-      label: __("Knowledge Base"),
+      label: isMobileView.value ? __("KB") : __("Knowledge Base"),
       route: {
         name: isCustomerPortal.value
           ? "CustomerKnowledgeBase"

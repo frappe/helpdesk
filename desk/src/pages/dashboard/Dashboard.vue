@@ -2,11 +2,51 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">
-          {{ isManager ? __("Organization Analytics") : __("Agent Dashboard") }}
+        <div class="text-lg font-medium text-ink-gray-9">
+          {{
+            isManager
+              ? viewMyStats
+                ? __("My Dashboard")
+                : !isMobileView
+                ? __("Organization Analytics")
+                : __("Organization")
+              : __("Agent Dashboard")
+          }}
         </div>
       </template>
-      <template #right-header> </template>
+      <template #right-header>
+        <!-- Segmented pill toggle: only visible to managers -->
+        <div
+          v-if="isManager"
+          class="relative flex items-center rounded-full bg-surface-gray-2 p-0.5 gap-0.5"
+          role="tablist"
+          :aria-label="__('Dashboard view')"
+        >
+          <TabButtons
+            v-model="activeTab"
+            :buttons="[
+              {
+                value: 'organization',
+                class: '!w-auto !px-2',
+                icon: () =>
+                  h('div', { class: 'flex items-center gap-1.5' }, [
+                    h(LucideBuilding2, { class: 'size-3.5' }),
+                    h('span', { class: 'text-sm' }, __('Organization')),
+                  ]),
+              },
+              {
+                value: 'my_stats',
+                class: '!w-auto !px-2',
+                icon: () =>
+                  h('div', { class: 'flex items-center gap-1.5' }, [
+                    h(LucideUser, { class: 'size-3.5' }),
+                    h('span', { class: 'text-sm' }, __('My Stats')),
+                  ]),
+              },
+            ]"
+          />
+        </div>
+      </template>
     </LayoutHeader>
 
     <div class="p-5 w-full overflow-y-scroll">
@@ -52,7 +92,7 @@
           </template>
         </DateRangePicker>
         <Link
-          v-if="isManager"
+          v-if="isManager && !viewMyStats"
           class="form-control w-48"
           doctype="HD Team"
           :placeholder="__('Team')"
@@ -65,7 +105,7 @@
           </template>
         </Link>
         <Link
-          v-if="isManager"
+          v-if="isManager && !viewMyStats"
           class="form-control w-48"
           doctype="HD Agent"
           :placeholder="__('Agent')"
@@ -143,15 +183,18 @@ import {
   DateRangePicker,
   DonutChart,
   Dropdown,
+  TabButtons,
   NumberChart,
   createResource,
   dayjs,
   usePageMeta,
 } from "frappe-ui";
+const { isMobileView } = useScreenSize();
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
 import { __ } from "@/translation";
-
-const { isManager, userId, isAgent } = useAuthStore();
+import LucideBuilding2 from "~icons/lucide/building-2";
+import LucideUser from "~icons/lucide/user";
+import { useScreenSize } from "@/composables/screen";
 
 const filters = reactive({
   period: getLastXDays(),
@@ -210,6 +253,25 @@ const teamMembers = createResource({
     // Set Agent Filters
     agentFilter.value = { name: ["in", data] };
   },
+});
+
+const { isManager, userId } = useAuthStore();
+
+const viewMyStats = ref(false);
+const activeTab = ref("organization");
+
+function setView(myStats: boolean) {
+  viewMyStats.value = myStats;
+  if (myStats) {
+    filters.team = null;
+    filters.agent = userId;
+  } else {
+    filters.agent = null;
+  }
+}
+
+watch(activeTab, (val) => {
+  setView(val === "my_stats");
 });
 
 watch(
