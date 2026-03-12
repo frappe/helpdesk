@@ -2,7 +2,7 @@
   <div
     :id="`communication-${name}`"
     v-bind="$attrs"
-    class="grow cursor-pointer border-transparent bg-surface-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
+    class="grow cursor-pointer border-transparent bg-surface-cards rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >
     <div
       class="flex items-center justify-between gap-2"
