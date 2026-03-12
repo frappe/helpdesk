@@ -449,7 +449,7 @@ def _get_upcoming_sla_tickets(limit=10):
     filters = [
         ["sla", "!=", ""],
         ["agreement_status", "in", ["First Response Due", "Resolution Due"]],
-        ["status_category", "!=", "Closed"],
+        ["status_category", "!=", "Resolved"],
         ["_assign", "like", f"%{frappe.session.user}%"],
     ]
 
@@ -570,7 +570,7 @@ def _get_new_tickets(limit=10):
 def _get_pending_response_tickets(limit=10):
     filters = [
         ["_assign", "like", f"%{frappe.session.user}%"],
-        ["status_category", "!=", "Closed"],
+        ["status_category", "!=", "Resolved"],
         ["last_customer_response", "is", "set"],
         ["last_agent_response", "is", "not set"],
     ]

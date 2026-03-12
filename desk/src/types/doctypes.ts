@@ -32,7 +32,7 @@ export interface HDTicketStatus extends DocType {
   parsed_color?: string;
 }
 
-// Last updated: 2026-03-02 10:46:41.999513
+// Last updated: 2026-02-27 16:42:43.292656
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;

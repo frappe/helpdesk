@@ -67,15 +67,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, type PropType } from "vue";
 import { EChartsOption } from "echarts";
 import { createResource, TabButtons, ECharts } from "frappe-ui";
 import { formatTime } from "@/utils";
 import { __ } from "@/translation";
 
+type MetricsData = {
+  averages: {
+    first_response: number;
+    resolution: number;
+  };
+  data: [string, number, number][];
+};
+
 const props = defineProps({
   data: {
-    type: Object,
+    type: Object as PropType<MetricsData>,
     required: true,
   },
 });

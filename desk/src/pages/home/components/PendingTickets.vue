@@ -1,8 +1,13 @@
 <template>
   <div class="flex flex-col rounded-md p-4 grow w-full h-full overflow-hidden">
     <div class="flex gap-4 items-center justify-between">
-      <div class="text-lg font-semibold text-ink-gray-8">
-        {{ __("Pending Tickets") }}
+      <div
+        class="flex items-center gap-2 text-lg font-semibold text-ink-gray-8"
+      >
+        {{ title }}
+        <Tooltip :text="tooltipText" placement="top">
+          <FeatherIcon name="info" class="size-3" />
+        </Tooltip>
       </div>
       <div class="w-max">
         <TabButtons :buttons="chartTabs" v-model="currentTab" />
@@ -10,22 +15,24 @@
     </div>
     <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar">
       <table class="w-full table-auto">
-        <thead>
+        <thead v-if="chartConfig?.tickets?.length > 0">
           <tr class="text-sm text-gray-600">
             <th class="p-2 text-left font-normal whitespace-nowrap">
               {{ __("ID") }}
             </th>
-            <th class="p-2 text-left font-normal">{{ __("Subject") }}</th>
-            <th class="p-2 text-left font-normal whitespace-nowrap">
+            <th class="p-2 text-left font-normal w-full">
+              {{ __("Subject") }}
+            </th>
+            <th class="p-2 text-left font-normal min-w-20 whitespace-nowrap">
               {{ __("Status") }}
             </th>
-            <th class="p-2 text-left font-normal whitespace-nowrap">
+            <th class="p-2 text-left font-normal min-w-20 whitespace-nowrap">
               {{ __("Priority") }}
             </th>
-            <th class="p-2 text-left font-normal whitespace-nowrap">
+            <th class="p-2 text-left font-normal min-w-32 whitespace-nowrap">
               {{ __("Team") }}
             </th>
-            <th class="p-2 text-left font-normal whitespace-nowrap">
+            <th class="p-2 text-left font-normal min-w-40 whitespace-nowrap">
               {{ __("Reason") }}
             </th>
           </tr>
@@ -38,21 +45,25 @@
             class="text-sm cursor-pointer hover:bg-gray-50 border-t border-gray-200"
           >
             <td class="p-2 py-3 whitespace-nowrap">{{ ticket.name }}</td>
-            <td class="p-2 py-3 max-w-xs truncate">{{ ticket.subject }}</td>
-            <td class="p-2 py-3 whitespace-nowrap">{{ ticket.status }}</td>
-            <td class="p-2 py-3 whitespace-nowrap">
+            <td class="p-2 py-3 w-full max-w-0 truncate">
+              {{ ticket.subject }}
+            </td>
+            <td class="p-2 py-3 min-w-20 truncate max-w-20">
+              {{ ticket.status }}
+            </td>
+            <td class="p-2 py-3 min-w-20 truncate max-w-20">
               <Badge
                 :label="ticket.priority"
                 :theme="getPriorityBadgeColor(ticket.priority_integer_value)"
               />
             </td>
-            <td class="p-2 py-3 whitespace-nowrap">
+            <td class="p-2 py-3 w-36 truncate max-w-36">
               {{ ticket.agent_group || __("Not Assigned") }}
             </td>
-            <td class="p-2 py-3 whitespace-nowrap">
+            <td class="p-2 py-3 min-w-40">
               <div
                 v-if="ticket.reason"
-                class="flex items-center gap-1 text-ink-gray-7"
+                class="flex items-center gap-1 text-ink-gray-7 truncate w-full"
                 :class="getReasonColorClass(ticket.reason)"
               >
                 <TimerIcon
@@ -67,13 +78,18 @@
                   v-else-if="ticket.reason.type === 'pending'"
                   class="size-4 flex-shrink-0"
                 />
-                <span>{{ ticket.reason.text }}</span>
+                <span class="truncate">{{ ticket.reason.text }}</span>
               </div>
-              <span v-else class="text-ink-gray-4">{{ __("No reason") }}</span>
+              <span
+                v-else
+                class="text-ink-gray-4 truncate inline-block w-full align-bottom"
+                >{{ __("No reason") }}</span
+              >
             </td>
           </tr>
           <tr
-            v-for="i in Math.max(0, 6 - chartConfig?.tickets?.length)"
+            v-if="chartConfig?.tickets?.length < 6"
+            v-for="i in Math.max(0, 7 - chartConfig?.tickets?.length)"
             :key="'placeholder-' + i"
             class="border-t border-gray-100"
           >
@@ -82,48 +98,52 @@
             </td>
           </tr>
         </tbody>
-        <tbody v-else>
-          <tr v-for="i in 6" :key="i" class="border-t border-gray-200">
-            <td class="p-2 py-3">
-              <div class="h-4 w-16 bg-surface-gray-1" />
+        <tbody class="relative" v-else>
+          <tr
+            v-for="i in 8"
+            :key="i"
+            :class="i > 1 ? 'border-t border-gray-200' : ''"
+          >
+            <td class="p-2 py-3 min-w-8">
+              <div class="h-4 w-full bg-surface-gray-1" />
             </td>
-            <td class="p-2 py-3">
-              <div class="h-4 w-48 bg-surface-gray-1" />
+            <td class="p-2 py-3 w-full max-w-0">
+              <div class="h-4 w-full bg-surface-gray-1 max-w-full" />
             </td>
-            <td class="p-2 py-3">
-              <div class="h-4 w-16 bg-surface-gray-1" />
+            <td class="p-2 py-3 min-w-14">
+              <div class="h-4 w-full bg-surface-gray-1" />
             </td>
-            <td class="p-2 py-3">
-              <div class="h-4 w-16 bg-surface-gray-1" />
+            <td class="p-2 py-3 min-w-21">
+              <div class="h-4 w-full bg-surface-gray-1" />
             </td>
-            <td class="p-2 py-3">
-              <div class="h-4 w-24 bg-surface-gray-1" />
+            <td class="p-2 py-3 min-w-28">
+              <div class="h-4 w-full bg-surface-gray-1" />
             </td>
-            <td class="p-2 py-3">
-              <div class="h-4 w-32 bg-surface-gray-1" />
+            <td class="p-2 py-3 min-w-40">
+              <div class="h-4 w-full bg-surface-gray-1" />
             </td>
           </tr>
+          <div
+            v-if="chartConfig?.tickets?.length === 0"
+            class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
+          >
+            <div class="bg-surface-white space-y-1 w-64 p-3 rounded">
+              <div class="text-ink-gray-7 font-medium text-center text-base">
+                {{ __("No pending tickets") }}
+              </div>
+              <div class="text-ink-gray-6 text-center text-base">
+                {{ __("All tickets are resolved or in progress") }}
+              </div>
+            </div>
+          </div>
         </tbody>
       </table>
-      <div
-        v-if="chartConfig?.tickets?.length === 0"
-        class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
-      >
-        <div class="bg-surface-white space-y-1 w-64 p-3 rounded">
-          <div class="text-ink-gray-7 font-medium text-center text-base">
-            {{ __("No pending tickets") }}
-          </div>
-          <div class="text-ink-gray-6 text-center text-base">
-            {{ __("All tickets are resolved or in progress") }}
-          </div>
-        </div>
-      </div>
       <div
         v-if="chartConfig?.totalPendingTickets > 6"
         class="p-2 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none mt-3"
         @click="redirectToSeeAllTickets"
       >
-        {{ __("See all {0} tickets", chartConfig?.totalPendingTickets) }}
+        {{ __("See all {0} tickets", chartConfig?.totalPendingTickets + "") }}
         <FeatherIcon name="arrow-right" class="size-4" />
       </div>
     </div>
@@ -131,17 +151,53 @@
 </template>
 
 <script setup lang="ts">
+import { useStorage } from "@vueuse/core";
 import { useView } from "@/composables/useView";
-import { Badge, createResource, FeatherIcon, TabButtons } from "frappe-ui";
-import { computed, onMounted, ref, watch } from "vue";
+import { __ } from "@/translation";
+import {
+  Badge,
+  createResource,
+  FeatherIcon,
+  Popover,
+  TabButtons,
+} from "frappe-ui";
+import { computed, onMounted, ref, watch, type PropType } from "vue";
 import { useRouter } from "vue-router";
 import TimerIcon from "~icons/lucide/timer";
 import TicketPlusIcon from "~icons/lucide/ticket-plus";
 import CalendarIcon from "~icons/lucide/calendar";
+import { Ticket, View } from "@/types";
+
+interface TicketReason {
+  type: string;
+  text: string;
+  seconds_until_due?: number;
+}
+
+interface PendingTicket {
+  name: string | number;
+  subject: string;
+  status: string;
+  priority: string;
+  priority_integer_value: number;
+  agent_group?: string;
+  agreement_status?: string;
+  creation: string;
+  resolution_by?: string;
+  response_by?: string;
+  reason?: TicketReason;
+}
+
+interface PendingTicketsData {
+  max_priority: number;
+  min_priority: number;
+  tickets: PendingTicket[];
+  total_pending_tickets: number;
+}
 
 const props = defineProps({
   data: {
-    type: Object,
+    type: Object as PropType<PendingTicketsData>,
     required: true,
   },
 });
@@ -164,8 +220,26 @@ const chartTabs = [
   },
 ];
 
+const title = computed(() => {
+  const labels: Record<string, string> = {
+    upcoming_sla: __("SLA Due"),
+    new_tickets: __("Recent Tickets"),
+    pending: __("Pending Tickets"),
+  };
+  return labels[currentTab.value] || __("Pending Tickets");
+});
+
+const tooltipText = computed(() => {
+  const texts: Record<string, string> = {
+    upcoming_sla: __("Tickets where SLA is about to breach"),
+    new_tickets: __("Tickets assigned to you in the last 24 hours"),
+    pending: __("Tickets that you have not responded to yet"),
+  };
+  return texts[currentTab.value];
+});
+
 const chartConfig = computed(() => {
-  const _data = getPendingTicketsResource.fetched
+  const _data: PendingTicketsData = getPendingTicketsResource.fetched
     ? getPendingTicketsResource.data
     : props.data;
   const maxPriority = _data.max_priority;
@@ -221,29 +295,30 @@ function getReasonColorClass(reason: {
   return "";
 }
 
-const goToTicket = (ticket: any) => {
+const goToTicket = (ticket: PendingTicket) => {
   router.push({
     name: "TicketAgent",
-    params: { ticketId: ticket.name },
+    params: { ticketId: String(ticket.name) },
   });
 };
 
 const redirectToSeeAllTickets = () => {
   const tabToViewMap: Record<string, string> = {
-    pending: "Pending tickets",
-    upcoming_sla: "SLA due",
-    new_tickets: "Recently assigned tickets",
+    pending: "STD-VIEW-PENDING-TICKETS",
+    upcoming_sla: "STD-VIEW-SLA-DUE",
+    new_tickets: "STD-VIEW-RECENTLY-ASSIGNED-TICKETS",
   };
 
   const viewLabel = tabToViewMap[currentTab.value];
-  const view = views.data?.find((v: any) => v.label === viewLabel);
+  const view: View = views.data?.find((v: any) => v.name === viewLabel);
 
-  router.push({
+  const route = router.resolve({
     name: "TicketsAgent",
     query: {
-      view: view.name,
+      view: view?.name,
     },
   });
+  window.open(route.href, "_blank");
 };
 
 onMounted(() => {

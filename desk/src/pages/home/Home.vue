@@ -1,135 +1,140 @@
 <template>
-  <LayoutHeader>
-    <template #left-header>
-      <div class="text-lg font-medium text-gray-900">{{ __("Home") }}</div>
-    </template>
-    <template #right-header>
-      <div class="flex items-center gap-2">
-        <Button
-          v-if="layout.length > 0 && !editing"
-          :label="__('Refresh')"
-          variant="subtle"
-          :icon-left="'refresh-ccw'"
-          @click="agentDashboard.reload({ reset_layout: false })"
-          :disabled="isLoading"
-        />
-        <Button
-          v-if="editing && isDashboardModified"
-          :label="__('Reset')"
-          variant="subtle"
-          :icon-left="'rotate-cw'"
-          @click="onReset"
-          :disabled="isLoading"
-        />
-        <Button
-          v-if="editing"
-          :label="__('Save')"
-          variant="subtle"
-          :icon-left="'check'"
-          @click="onSave"
-          :disabled="!isDirty"
-          :loading="isLoading"
-        />
-        <Button
-          v-if="layout.length > 0 && !editing"
-          :label="__('Edit')"
-          variant="subtle"
-          :icon-left="'edit'"
-          @click="onEdit"
-          :disabled="isLoading"
-        />
-        <Button
-          v-if="editing"
-          :label="__('Cancel')"
-          variant="subtle"
-          @click="onCancel"
-          :disabled="isLoading"
-        />
-        <Dropdown
-          v-if="chartsDropdown.length > 0"
-          :options="chartsDropdown"
-          placement="right"
-        >
+  <div class="flex flex-col h-full">
+    <LayoutHeader>
+      <template #left-header>
+        <div class="text-lg font-medium text-gray-900">{{ __("Home") }}</div>
+      </template>
+      <template #right-header>
+        <div class="flex items-center gap-2">
           <Button
-            :label="__('New')"
-            variant="solid"
-            icon-left="plus"
+            v-if="layout.length > 0 && !editing"
+            :label="__('Refresh')"
+            variant="subtle"
+            :icon-left="'refresh-ccw'"
+            @click="agentDashboard.reload({ reset_layout: false })"
             :disabled="isLoading"
           />
-        </Dropdown>
-      </div>
-    </template>
-  </LayoutHeader>
-  <div class="h-screen overflow-auto">
-    <div
-      class="flex flex-col p-1 pt-4 md:p-5 mx-auto max-w-6xl w-full grow relative h-full"
-    >
-      <div class="grow pb-12">
-        <div
-          v-if="agentDashboard.loading"
-          class="flex items-center justify-center h-full"
-        >
-          <LoadingIndicator class="size-6" />
+          <Button
+            v-if="editing && isDashboardModified"
+            :label="__('Reset')"
+            variant="subtle"
+            :icon-left="'rotate-cw'"
+            @click="onReset"
+            :disabled="isLoading"
+          />
+          <Button
+            v-if="editing"
+            :label="__('Save')"
+            variant="subtle"
+            :icon-left="'check'"
+            @click="onSave"
+            :disabled="!isDirty"
+            :loading="isLoading"
+          />
+          <Button
+            v-if="layout.length > 0 && !editing"
+            :label="__('Edit')"
+            variant="subtle"
+            :icon-left="'edit'"
+            @click="onEdit"
+            :disabled="isLoading"
+          />
+          <Button
+            v-if="editing"
+            :label="__('Cancel')"
+            variant="subtle"
+            @click="onCancel"
+            :disabled="isLoading"
+          />
+          <Dropdown
+            v-if="chartsDropdown.length > 0"
+            :options="chartsDropdown"
+            placement="right"
+          >
+            <Button
+              :label="__('New')"
+              variant="solid"
+              icon-left="plus"
+              :disabled="isLoading"
+            />
+          </Dropdown>
         </div>
-        <div
-          v-if="!agentDashboard.loading && layout.length > 0"
-          class="text-xl font-semibold text-ink-gray-8 pl-2"
-        >
-          {{ __("Hey") }}, {{ userName }}
-        </div>
-        <div
-          v-if="!agentDashboard.loading && layout.length === 0"
-          class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-        >
-          <div class="flex flex-col items-center justify-center gap-1">
-            <FeatherIcon name="layout" class="size-12 text-ink-gray-8" />
-            <div class="text-xl font-semibold text-ink-gray-8">
-              {{ __("No charts added") }}
-            </div>
-            <div class="text-sm text-ink-gray-5">
-              {{ __("Add charts to get started") }}
+      </template>
+    </LayoutHeader>
+    <div class="flex-1 overflow-auto">
+      <div
+        class="flex flex-col p-1 pt-4 md:p-5 mx-auto max-w-6xl w-full grow relative h-full"
+      >
+        <div class="grow pb-12">
+          <div
+            v-if="agentDashboard.loading"
+            class="flex items-center justify-center h-full"
+          >
+            <LoadingIndicator class="size-6" />
+          </div>
+          <div
+            v-if="!agentDashboard.loading && layout.length > 0"
+            class="text-xl font-semibold text-ink-gray-8 pl-2"
+          >
+            {{ __("Hey") }}, {{ userName }}
+          </div>
+          <div
+            v-if="!agentDashboard.loading && layout.length === 0"
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+          >
+            <div class="flex flex-col items-center justify-center gap-1">
+              <FeatherIcon name="layout" class="size-12 text-ink-gray-8" />
+              <div class="text-xl font-semibold text-ink-gray-8">
+                {{ __("No charts added") }}
+              </div>
+              <div class="text-sm text-ink-gray-5">
+                {{ __("Add charts to get started") }}
+              </div>
             </div>
           </div>
-        </div>
-        <div class="mt-5">
-          <GridLayout
-            v-if="!agentDashboard.loading && layout.length > 0"
-            class="h-fit w-full"
-            :class="[editing ? 'mb-[20rem] !select-none' : '']"
-            :cols="50"
-            :rowHeight="14"
-            :disabled="!editing"
-            :modelValue="layout.map((item) => item.layout)"
-            @update:modelValue="onLayoutUpdate"
-          >
-            <template #item="{ index }">
-              <div
-                class="group relative flex h-full w-full p-2 text-ink-gray-8"
-              >
+          <div class="mt-5">
+            <GridLayout
+              v-if="!agentDashboard.loading && layout.length > 0"
+              class="h-fit w-full"
+              :class="[editing ? 'mb-[20rem] !select-none' : '']"
+              :cols="50"
+              :rowHeight="14"
+              :disabled="!editing"
+              :modelValue="layout.map((item) => item.layout)"
+              @update:modelValue="onLayoutUpdate"
+            >
+              <template #item="{ index }">
                 <div
-                  class="flex h-full w-full items-center justify-center"
-                  :class="
-                    editing
-                      ? 'pointer-events-none  [&>div:first-child]:rounded [&>div:first-child]:group-hover:ring-2 [&>div:first-child]:group-hover:ring-outline-gray-2'
-                      : ''
-                  "
-                >
-                  <ChartItem :item="layout[index]" />
-                </div>
-                <div
-                  v-if="editing"
-                  class="flex absolute right-0 top-0 bg-surface-gray-6 rounded cursor-pointer opacity-0 group-hover:opacity-100"
+                  class="group relative flex h-full w-full p-2 text-ink-gray-8"
                 >
                   <div
-                    class="rounded p-1 hover:bg-surface-gray-5"
-                    @click="layout.splice(index, 1)"
+                    class="flex h-full w-full items-center justify-center"
+                    :class="
+                      editing
+                        ? 'pointer-events-none  [&>div:first-child]:rounded [&>div:first-child]:group-hover:ring-2 [&>div:first-child]:group-hover:ring-outline-gray-2'
+                        : ''
+                    "
                   >
-                    <FeatherIcon name="trash-2" class="size-3 text-ink-white" />
+                    <ChartItem :item="layout[index]" />
+                  </div>
+                  <div
+                    v-if="editing"
+                    class="flex absolute right-0 top-0 bg-surface-gray-6 rounded cursor-pointer opacity-0 group-hover:opacity-100"
+                  >
+                    <div
+                      class="rounded p-1 hover:bg-surface-gray-5"
+                      @click="layout.splice(index, 1)"
+                    >
+                      <FeatherIcon
+                        name="trash-2"
+                        class="size-3 text-ink-white"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </template>
-          </GridLayout>
+              </template>
+            </GridLayout>
+          </div>
         </div>
       </div>
     </div>
@@ -148,7 +153,7 @@ import {
 } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
-import { computed, provide, ref } from "vue";
+import { computed, ref } from "vue";
 import ChartItem from "./components/ChartItem.vue";
 import { __ } from "@/translation";
 
@@ -234,9 +239,6 @@ const isDashboardModified = computed(() => {
   );
   return JSON.stringify(_layout) !== JSON.stringify(defaultLayout);
 });
-
-provide("agentDashboard", agentDashboard);
-provide("dashboardData", layout);
 
 const createDashboard = createResource({
   url: "frappe.client.insert",

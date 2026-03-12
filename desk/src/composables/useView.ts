@@ -1,9 +1,20 @@
 import { useAuthStore } from "@/stores/auth";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
+import { useDebounceFn } from "@vueuse/core";
 import { call, createListResource, createResource } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+
+const debouncedSetValue = useDebounceFn(
+  (doctype: string, name: string, fieldname: any, cb?: Function) => {
+    call("frappe.client.set_value", { doctype, name, fieldname }).then(() => {
+      cb?.();
+      views.reload();
+    });
+  },
+  500
+);
 
 export const views = createListResource({
   doctype: "HD View",
@@ -110,15 +121,7 @@ export function useView(dt: string = null) {
 
   function updateView(view: any, successCB: Function = () => {}) {
     if (view.name !== "default") {
-      // handle custom view
-      call("frappe.client.set_value", {
-        doctype: "HD View",
-        name: view.name,
-        fieldname: view,
-      }).then(() => {
-        successCB();
-        views.reload();
-      });
+      debouncedSetValue("HD View", view.name, view, successCB);
     } else {
       // handle default view
       createOrUpdateDefaultView(view);
@@ -143,15 +146,7 @@ export function useView(dt: string = null) {
     if (defaultView) {
       delete view["name"];
 
-      call("frappe.client.set_value", {
-        doctype: "HD View",
-        name: defaultView.name,
-        fieldname: {
-          ...view,
-        },
-      }).then(() => {
-        views.reload();
-      });
+      debouncedSetValue("HD View", defaultView.name, view);
     } else {
       view["doctype"] = "HD View";
       // create default view

@@ -14,13 +14,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, type PropType } from "vue";
 import CardBase from "./CardBase.vue";
 import { createResource } from "frappe-ui";
 
+interface Data {
+  percentage_change: number;
+  total: number;
+  data: { date: string; count: number }[];
+}
+
 const props = defineProps({
   data: {
-    type: Object,
+    type: Object as PropType<Data>,
     required: true,
   },
 });
@@ -33,14 +39,14 @@ const chartColor = {
 };
 
 const chartConfig = computed(() => {
-  const _data = getAgentTicketsResource.fetched
+  const _data: Data = getAgentTicketsResource.fetched
     ? getAgentTicketsResource.data
     : props.data;
 
-  const _percentageChange = _data?.percentage_change;
-  const total = _data?.total;
-  const dates = _data?.data?.map((item: any) => item.date);
-  const counts = _data?.data?.map((item: any) => item.count);
+  const _percentageChange = _data?.percentage_change || 0;
+  const total = _data?.total || 0;
+  const dates = _data?.data?.map((item) => item.date) || [];
+  const counts = _data?.data?.map((item) => item.count) || [];
 
   const percentageChange = {
     icon: _percentageChange > 0 ? "arrow-up-right" : "arrow-down-left",

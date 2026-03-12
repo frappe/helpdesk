@@ -187,7 +187,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, type PropType } from "vue";
 import {
   Avatar,
   Button,
@@ -223,9 +223,16 @@ interface Feedback {
   modified: string;
 }
 
+interface Data {
+  recent_feedbacks: Feedback[];
+  total_feedbacks: number;
+  average_rating: number;
+  rating_distribution: Record<number, number>;
+}
+
 const props = defineProps({
   data: {
-    type: Object,
+    type: Object as PropType<Data>,
     required: true,
   },
 });
