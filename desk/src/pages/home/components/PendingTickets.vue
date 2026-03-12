@@ -151,22 +151,15 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from "@vueuse/core";
 import { useView } from "@/composables/useView";
 import { __ } from "@/translation";
-import {
-  Badge,
-  createResource,
-  FeatherIcon,
-  Popover,
-  TabButtons,
-} from "frappe-ui";
+import { Badge, createResource, FeatherIcon, TabButtons } from "frappe-ui";
 import { computed, onMounted, ref, watch, type PropType } from "vue";
 import { useRouter } from "vue-router";
 import TimerIcon from "~icons/lucide/timer";
 import TicketPlusIcon from "~icons/lucide/ticket-plus";
 import CalendarIcon from "~icons/lucide/calendar";
-import { Ticket, View } from "@/types";
+import { View } from "@/types";
 
 interface TicketReason {
   type: string;
@@ -211,12 +204,12 @@ const chartTabs = [
     value: "upcoming_sla",
   },
   {
-    label: "Recent",
-    value: "new_tickets",
-  },
-  {
     label: "Pending",
     value: "pending",
+  },
+  {
+    label: "Recent",
+    value: "new_tickets",
   },
 ];
 
