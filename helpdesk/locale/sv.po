@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-03-01 10:40+0000\n"
-"PO-Revision-Date: 2026-03-10 19:32\n"
+"PO-Revision-Date: 2026-03-12 19:34\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -3354,7 +3354,7 @@ msgstr "Ange Benämning Nyckel"
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:10
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Prefer knowledge base"
-msgstr "Föredrar kunskapsbas"
+msgstr "Föredra kunskap bas"
 
 #: desk/src/pages/dashboard/Dashboard.vue:267
 msgid "Presets"
@@ -5122,7 +5122,7 @@ msgstr "Arbetsflöde"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:4
 msgid "Workflow & knowledge base settings"
-msgstr "Arbetsflöde och kunskapsbas inställningar"
+msgstr "Arbetsflöde och kunskap bas inställningar"
 
 #. Label of the support_and_resolution_section_break (Section Break) field in
 #. DocType 'HD Service Level Agreement'
