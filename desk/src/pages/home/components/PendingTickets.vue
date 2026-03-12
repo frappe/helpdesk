@@ -309,8 +309,8 @@ const redirectToSeeAllTickets = () => {
     new_tickets: "STD-VIEW-RECENTLY-ASSIGNED-TICKETS",
   };
 
-  const viewLabel = tabToViewMap[currentTab.value];
-  const view: View = views.data?.find((v: any) => v.name === viewLabel);
+  const viewName = tabToViewMap[currentTab.value];
+  const view = views.data?.find((v: View) => v.name === viewName);
 
   const route = router.resolve({
     name: "TicketsAgent",

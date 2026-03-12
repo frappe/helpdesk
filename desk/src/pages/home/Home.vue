@@ -157,20 +157,22 @@ import { computed, ref } from "vue";
 import ChartItem from "./components/ChartItem.vue";
 import { __ } from "@/translation";
 
+type Layout = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  i: string;
+  minW?: number;
+  minH?: number;
+  maxW?: number;
+  maxH?: number;
+};
+
 type LayoutItem = {
   chart: string;
   data: Record<string, unknown>;
-  layout: {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    i: string;
-    minW?: number;
-    minH?: number;
-    maxW?: number;
-    maxH?: number;
-  };
+  layout: Layout;
 };
 
 type DashboardResponse = {
@@ -422,7 +424,7 @@ const onReset = () => {
   });
 };
 
-const onLayoutUpdate = (newLayout: any) => {
+const onLayoutUpdate = (newLayout: Layout[]) => {
   layout.value.forEach((item, idx) => {
     item.layout = newLayout[idx];
   });
