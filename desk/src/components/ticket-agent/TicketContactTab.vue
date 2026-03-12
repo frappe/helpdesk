@@ -202,5 +202,3 @@ const contactImage = computed(() => {
   );
 });
 </script>
-
-<style scoped></style>

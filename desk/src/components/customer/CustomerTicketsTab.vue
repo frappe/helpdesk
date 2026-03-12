@@ -247,6 +247,6 @@ watchDebounced(
     });
     ticketsListResource.reload();
   },
-  { debounce: 300, immediate: true }
+  { debounce: 300 }
 );
 </script>

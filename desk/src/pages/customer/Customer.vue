@@ -118,6 +118,7 @@ const breadcrumbs = [
 onMounted(() => {
   customer.getPendingInvites.fetch();
   customer.getContacts.fetch();
+  ticketsListResource.fetch();
 });
 
 usePageMeta(() => {

@@ -1,18 +1,18 @@
 interface DocType {
-    name: string;
-    creation: string;
-    modified: string;
-    owner: string;
-    modified_by: string;
-  }
+  name: string;
+  creation: string;
+  modified: string;
+  owner: string;
+  modified_by: string;
+}
 
-  interface ChildDocType extends DocType {
-    parent?: string;
-    parentfield?: string;
-    parenttype?: string;
-    idx?: number;
-  }
-  
+interface ChildDocType extends DocType {
+  parent?: string;
+  parentfield?: string;
+  parenttype?: string;
+  idx?: number;
+}
+
 // Last updated: 2026-02-02 17:22:11.094897
 export interface HDTicketStatus extends DocType {
   /** Color: Select */
@@ -142,9 +142,12 @@ export interface HDTicket extends DocType {
 }
 
 // Last updated: 2026-03-03 12:30:01.394107
+// Last updated: 2026-03-03 12:30:01.394107
 export interface AssignmentRuleUser extends ChildDocType {
   /** User: Link (User) */
   user: string;
+  /** Weight: Int */
+  weight?: number;
   /** Weight: Int */
   weight?: number;
 }

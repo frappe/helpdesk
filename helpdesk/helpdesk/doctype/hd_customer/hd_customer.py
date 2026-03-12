@@ -142,12 +142,13 @@ class HDCustomer(Document):
             info = frappe.get_value(
                 "Contact",
                 contact.contact_name,
-                ["email_id", "mobile_no", "phone", "image", "modified"],
+                ["email_id", "mobile_no", "phone", "image", "user"],
             )
             if not info:
                 continue
 
-            email_id, mobile_no, phone, image, modified = info
+            email_id, mobile_no, phone, image, user = info
+
             pending_tickets_count = frappe.db.get_list(
                 "HD Ticket",
                 filters={
@@ -168,7 +169,9 @@ class HDCustomer(Document):
                     "email_id": email_id,
                     "mobile_no": mobile_no or phone,
                     "image": image,
-                    "modified": modified,
+                    "last_active": (
+                        frappe.get_value("User", user, "last_active") if user else None
+                    ),
                     "ticket_count": (
                         len(pending_tickets_count) if pending_tickets_count else 0
                     ),
@@ -176,7 +179,7 @@ class HDCustomer(Document):
             )
             # result = sort by is_primary first then is_manager
             result.sort(
-                key=lambda x: (not x["is_primary"], not x["is_manager"], x["modified"]),
+                key=lambda x: (not x["is_primary"], not x["is_manager"]),
             )
         return result
 
@@ -204,6 +207,7 @@ class HDCustomer(Document):
         invite_user(contact)
 
     @frappe.whitelist()
+    @agent_only
     def get_pending_invites(self):
         pending_invites = frappe.db.get_all(
             "User Invitation",
