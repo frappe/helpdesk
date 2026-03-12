@@ -98,7 +98,10 @@
               saveThemeResource.loading
             "
             :disabled="
-              !isAccountInfoDirty && !isLanguageChanged && !isTimezoneChanged && !isThemeChanged
+              !isAccountInfoDirty &&
+              !isLanguageChanged &&
+              !isTimezoneChanged &&
+              !isThemeChanged
             "
           />
         </div>

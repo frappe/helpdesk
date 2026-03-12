@@ -24,29 +24,31 @@ export const useAuthStore = defineStore("auth", () => {
 
   const user__ = computed(() => userInfo.data || {});
   const hasDeskAccess: ComputedRef<boolean> = computed(
-    () => user__.value.has_desk_access
+    () => user__.value.has_desk_access,
   );
   const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
   const isAgent: ComputedRef<boolean> = computed(() => user__.value.is_agent);
   const isManager: ComputedRef<boolean> = computed(
-    () => user__.value.is_manager
+    () => user__.value.is_manager,
   );
 
   const userId: ComputedRef<string> = computed(() => user__.value.user_id);
   const userImage: ComputedRef<string> = computed(
-    () => user__.value.user_image
+    () => user__.value.user_image,
   );
   const userFirstName: ComputedRef<string> = computed(
-    () => user__.value.user_first_name
+    () => user__.value.user_first_name,
   );
   const userName: ComputedRef<string> = computed(() => user__.value.user_name);
   const username: ComputedRef<string> = computed(() => user__.value.username);
   const timezone: ComputedRef<string> = computed(() => user__.value.time_zone);
   const userTeams: ComputedRef<string[]> = computed(
-    () => user__.value.user_teams
+    () => user__.value.user_teams,
   );
   const language: ComputedRef<string> = computed(() => user__.value.language);
-  const deskTheme: ComputedRef<string> = computed(() => user__.value.desk_theme);
+  const deskTheme: ComputedRef<string> = computed(
+    () => user__.value.desk_theme,
+  );
 
   function sessionUser() {
     const cookies = new URLSearchParams(document.cookie.split("; ").join("&"));

@@ -60,14 +60,14 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const AgentPortalRoot = defineAsyncComponent(
-  () => import("@/pages/desk/AgentRoot.vue")
+  () => import("@/pages/desk/AgentRoot.vue"),
 );
 const CustomerPortalRoot = defineAsyncComponent(
-  () => import("@/pages/CustomerPortalRoot.vue")
+  () => import("@/pages/CustomerPortalRoot.vue"),
 );
 
 const PortalRoot = computed(() => {
