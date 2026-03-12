@@ -66,7 +66,7 @@
             >
               <div class="flex items-center">
                 <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
-                <span class="text-base">{{ preset }}</span>
+                <span class="text-base whitespace-nowrap">{{ preset }}</span>
               </div>
               <LucideChevronDown class="size-4 text-ink-gray-5" />
             </div>
