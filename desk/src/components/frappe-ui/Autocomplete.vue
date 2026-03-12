@@ -42,12 +42,12 @@
       <template #body="{ isOpen }">
         <div v-show="isOpen" class="min-w-[--reka-popper-anchor-width]">
           <div
-            class="mt-1 rounded-lg bg-surface-white py-1 text-base shadow-2xl"
+            class="mt-1 rounded-lg bg-surface-modal py-1 text-base shadow-2xl"
           >
             <div class="relative px-1.5 pt-0.5">
               <ComboboxInput
                 ref="search"
-                class="form-input w-full"
+                class="form-input w-full focus:bg-surface-gray-3 hover:bg-surface-gray-4"
                 type="text"
                 @change="
                   (e) => {
@@ -269,7 +269,7 @@ const inputClasses = computed(() => {
   let variant = props.disabled ? "disabled" : props.variant;
   let variantClasses = {
     subtle:
-      "border border-outline-gray-1 bg-surface-gray-3 placeholder-ink-gray-5 hover:border-outline-gray-2 hover:bg-surface-gray-4 focus:bg-surface-white focus:border-outline-gray-5 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
+      "border border-outline-gray-1 bg-surface-gray-2 placeholder-ink-gray-5 hover:border-outline-gray-2 hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-5 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
     outline:
       "border border-outline-gray-3 bg-surface-white placeholder-ink-gray-5 hover:border-outline-gray-4 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-5 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
     disabled: [

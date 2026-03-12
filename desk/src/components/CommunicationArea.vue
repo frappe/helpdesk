@@ -9,7 +9,9 @@
           variant="ghost"
           label="Reply"
           :class="[
-            showEmailBox ? '!bg-surface-gray-5 hover:!bg-surface-gray-4' : '',
+            showEmailBox
+              ? '!bg-surface-gray-4 hover:!bg-surface-gray-3  text-ink-gray-8 bg-transparent hover:bg-surface-gray-3 active:bg-surface-gray-4 focus-visible:ring focus-visible:ring-outline-gray-3'
+              : '',
           ]"
           @click="toggleEmailBox()"
         >
@@ -21,7 +23,9 @@
           variant="ghost"
           label="Comment"
           :class="[
-            showCommentBox ? '!bg-surface-gray-5 hover:!bg-surface-gray-4' : '',
+            showCommentBox
+              ? '!bg-surface-gray-4 hover:!bg-surface-gray-3  text-ink-gray-8 bg-transparent hover:bg-surface-gray-3 active:bg-surface-gray-4 focus-visible:ring focus-visible:ring-outline-gray-3'
+              : '',
           ]"
           @click="toggleCommentBox()"
         >

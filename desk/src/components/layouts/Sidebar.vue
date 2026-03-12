@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-outline-gray-2 bg-surface-gray-2 p-2 text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-r bg-surface-menu-bar p-2 text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
@@ -209,6 +209,7 @@ import {
 import { useShortcut } from "@/composables/shortcuts";
 import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
+import { useTheme } from "frappe-ui";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
@@ -243,6 +244,34 @@ const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const showShortcutsModal = ref(false);
 const showCommandPalette = ref(false);
+
+// Theme management
+const { setTheme } = useTheme();
+const currentTheme = ref(localStorage.getItem("desk_theme") || "Light");
+
+const updateTheme = (theme: string) => {
+  currentTheme.value = theme;
+  localStorage.setItem("desk_theme", theme);
+
+  if (theme === "Dark") {
+    setTheme("dark");
+  } else {
+    setTheme("light");
+  }
+};
+
+const toggleTheme = () => {
+  const themes = ["Light", "Dark"];
+  const currentIndex = themes.indexOf(currentTheme.value);
+  const nextTheme = themes[(currentIndex + 1) % themes.length];
+  updateTheme(nextTheme);
+};
+
+// Initialize theme on mount
+onMounted(() => {
+  const savedTheme = localStorage.getItem("desk_theme") || "Light";
+  updateTheme(savedTheme);
+});
 
 const { pinnedViews, publicViews } = useView();
 
@@ -348,6 +377,11 @@ const agentPortalDropdown = computed(() => [
     label: __("Settings"),
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
+  },
+  {
+    label: __("Theme"),
+    icon: currentTheme.value === "Dark" ? "moon" : "sun",
+    onClick: toggleTheme,
   },
   {
     group: __("Danger"),

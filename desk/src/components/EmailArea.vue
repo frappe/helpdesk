@@ -2,7 +2,7 @@
   <div
     :id="`communication-${name}`"
     v-bind="$attrs"
-    class="grow cursor-pointer border-transparent bg-surface-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
+    class="grow cursor-pointer border-transparent bg-surface-cards rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >
     <div
       class="flex items-center justify-between gap-2"
@@ -91,7 +91,7 @@
       <span v-if="bcc">{{ bcc }}</span>
     </div>
     <div class="border-0 border-t my-3 border-outline-gray-modals" />
-    <EmailContent :content="content" />
+    <EmailContent :content="sanitizedContent" />
     <div class="flex flex-wrap gap-2">
       <AttachmentItem
         v-for="a in attachments"
@@ -151,6 +151,17 @@ const auth = storeToRefs(useAuthStore());
 const { isMobileView } = useScreenSize();
 
 const showSplitModal = ref(false);
+
+const sanitizedContent = computed(() => {
+  if (!content) return content;
+  // Create a temporary div to parse HTML
+  const div = document.createElement("div");
+  div.innerHTML = content;
+  // Remove all style attributes
+  const elementsWithStyle = div.querySelectorAll("[style]");
+  elementsWithStyle.forEach((el) => el.removeAttribute("style"));
+  return div.innerHTML;
+});
 
 const status = computed(() => {
   let _status = deliveryStatus;
