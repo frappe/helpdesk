@@ -16,6 +16,7 @@ def get_user():
         "username",
         "time_zone",
         "language",
+        "desk_theme",
     ]
     user = frappe.get_value(
         doctype="User",
@@ -40,6 +41,7 @@ def get_user():
     )
 
     return {
+        "desk_theme": user.desk_theme or "Automatic",
         "has_desk_access": has_desk_access,
         "is_admin": is_admin,
         "is_agent": is_agent,

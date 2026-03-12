@@ -81,7 +81,7 @@
               {{ __("Account info & security") }}
             </div>
             <Badge
-              v-if="isAccountInfoDirty || isLanguageChanged"
+              v-if="isAccountInfoDirty || isLanguageChanged || isThemeChanged"
               :variant="'subtle'"
               :theme="'orange'"
               size="sm"
@@ -94,10 +94,11 @@
             :loading="
               setAgent.loading ||
               saveLanguageResource.loading ||
-              saveTimezoneResource.loading
+              saveTimezoneResource.loading ||
+              saveThemeResource.loading
             "
             :disabled="
-              !isAccountInfoDirty && !isLanguageChanged && !isTimezoneChanged
+              !isAccountInfoDirty && !isLanguageChanged && !isTimezoneChanged && !isThemeChanged
             "
           />
         </div>
@@ -163,6 +164,23 @@
             class="w-40"
           />
         </div>
+        <div class="flex items-center justify-between mt-6">
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-medium text-ink-gray-8">
+              {{ __("Theme") }}
+            </span>
+            <span class="text-p-sm text-ink-gray-6">{{
+              __("Change theme of the application.")
+            }}</span>
+          </div>
+          <Autocomplete
+            :options="themeOptions"
+            :model-value="deskTheme"
+            @update:modelValue="onThemeChange"
+            placeholder="Select Theme"
+            class="w-40"
+          />
+        </div>
       </div>
     </template>
   </SettingsLayoutBase>
@@ -183,6 +201,7 @@ import {
   FileUploader,
   LoadingIndicator,
   toast,
+  useTheme,
 } from "frappe-ui";
 import { Autocomplete } from "@/components";
 import { __ } from "@/translation";
@@ -204,7 +223,30 @@ const profile = ref({
 const showChangePasswordModal = ref(false);
 const language = ref(auth.language);
 const timezone = ref(auth.timezone);
+const deskTheme = ref(auth.deskTheme || "Automatic");
 const timezoneOptions = ref([]);
+
+const themeOptions = [
+  { label: __("Light"), value: "Light" },
+  { label: __("Dark"), value: "Dark" },
+  { label: __("Automatic"), value: "Automatic" },
+];
+
+const { setTheme } = useTheme();
+
+const onThemeChange = (option: any) => {
+  const val = option?.value || option;
+  deskTheme.value = val;
+  if (val) {
+    if (val === "Dark") {
+      setTheme("dark");
+    } else if (val === "Light") {
+      setTheme("light");
+    } else {
+      setTheme("system");
+    }
+  }
+};
 
 const isLanguageChanged = computed(() => {
   return language.value !== auth?.language;
@@ -212,6 +254,10 @@ const isLanguageChanged = computed(() => {
 
 const isTimezoneChanged = computed(() => {
   return timezone.value !== auth?.timezone;
+});
+
+const isThemeChanged = computed(() => {
+  return deskTheme.value !== auth?.deskTheme;
 });
 
 const isAccountInfoDirty = computed(() => {
@@ -321,6 +367,23 @@ const saveTimezoneResource = createResource({
   },
 });
 
+const saveThemeResource = createResource({
+  url: "frappe.client.set_value",
+  makeParams() {
+    return {
+      doctype: "User",
+      name: auth.userId,
+      fieldname: {
+        desk_theme: deskTheme.value,
+      },
+    };
+  },
+  onSuccess() {
+    toast.success(__("Theme updated"));
+    auth.reloadUser();
+  },
+});
+
 const onSave = () => {
   if (isAccountInfoDirty.value) {
     setAgent.submit();
@@ -332,6 +395,10 @@ const onSave = () => {
 
   if (isTimezoneChanged.value) {
     saveTimezoneResource.submit();
+  }
+
+  if (isThemeChanged.value) {
+    saveThemeResource.submit();
   }
 };
 
