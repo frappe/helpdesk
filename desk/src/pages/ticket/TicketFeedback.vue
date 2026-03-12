@@ -23,7 +23,7 @@
     @update:model-value="() => $emit('update:open', !open)"
   >
     <template #body-content>
-      <div class="space-y-4 text-base text-gray-700">
+      <div class="space-y-4 text-base text-ink-gray-7">
         <div class="space-y-2">
           <span> {{ __("Select a rating") }} </span>
           <span class="text-red-500"> * </span>

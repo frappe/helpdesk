@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md border px-2 border-gray-300 text-sm">
+  <div class="rounded-md border px-2 border-outline-gray-3 text-sm">
     <div
       class="grid p-2 px-4 items-center"
       :style="{
@@ -10,7 +10,7 @@
       <div
         v-for="column in columns"
         :key="column.key"
-        class="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis"
+        class="text-ink-gray-6 overflow-hidden whitespace-nowrap text-ellipsis"
         :class="{
           'ml-2':
             column.key === 'priority' ||
@@ -32,7 +32,7 @@
     />
     <div
       v-if="slaData.priorities?.length === 0"
-      class="text-center p-4 text-gray-600"
+      class="text-center p-4 text-ink-gray-6"
     >
       No priorities in the list
     </div>

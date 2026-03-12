@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center cursor-pointer hover:bg-gray-50 rounded">
+  <div class="flex items-center cursor-pointer hover:bg-surface-gray-2 rounded">
     <div
       class="w-full pl-2 flex flex-col justify-center h-14"
       @click="holidayListActiveScreen = { screen: 'view', data: data }"

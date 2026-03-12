@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mx-6 md:mx-10 md:my-2 flex items-center justify-between text-lg font-medium mb-4 !mt-6 md:h-8 md:text-xl md:font-semibold md:text-gray-800"
+    class="mx-6 md:mx-10 md:my-2 flex items-center justify-between text-lg font-medium mb-4 !mt-6 md:h-8 md:text-xl md:font-semibold md:text-ink-gray-8"
   >
     Activity
   </div>
@@ -16,7 +16,7 @@
         class="w-full activity grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4 h-full"
       >
         <div
-          class="relative flex justify-center after:absolute after:left-[50%] after:top-3 after:-z-10 after:border-l after:border-gray-200"
+          class="relative flex justify-center after:absolute after:left-[50%] after:top-3 after:-z-10 after:border-l after:border-outline-gray-2"
           :class="[
             i != communications.length - 1 ? 'after:h-full' : 'after:h-5',
           ]"

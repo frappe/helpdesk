@@ -24,7 +24,7 @@
             @input="savedRepliesSearchQuery = $event"
             :placeholder="__('Search')"
             type="text"
-            class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+            class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-2"
             icon-left="search"
             debounce="300"
             inputClass="p-4 pr-12"
@@ -113,7 +113,7 @@
         class="-ml-2"
       >
         <div
-          class="grid grid-cols-12 items-center gap-3 text-sm text-gray-600 ml-2"
+          class="grid grid-cols-12 items-center gap-3 text-sm text-ink-gray-6 ml-2"
         >
           <div class="col-span-7">{{ __("Title") }}</div>
           <div class="col-span-2">{{ __("Owner") }}</div>
@@ -125,7 +125,7 @@
           :key="savedReply.name"
         >
           <div
-            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-gray-2 rounded"
           >
             <div
               @click="

@@ -42,7 +42,7 @@
           </template>
           <template #body="{ togglePopover }">
             <div
-              class="p-1 text-ink-gray-7 mt-1 bg-white shadow-xl rounded w-[--reka-popper-anchor-width]"
+              class="p-1 text-ink-gray-7 mt-1 bg-surface-white shadow-xl rounded w-[--reka-popper-anchor-width]"
             >
               <div
                 v-for="option in ticketRoutingOptions"

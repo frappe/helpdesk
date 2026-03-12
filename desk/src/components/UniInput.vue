@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-1.5" v-if="field.display_via_depends_on">
-    <span class="block text-sm text-gray-700">
+    <span class="block text-sm text-ink-gray-7">
       {{ __(field.label) }}
       <span v-if="field.required" class="place-self-center text-red-500">
         *

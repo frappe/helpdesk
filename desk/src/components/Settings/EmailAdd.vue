@@ -32,7 +32,7 @@
                 <CircleAlert
                   class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-blue-500"
                 />
-                <div class="text-wrap text-xs text-gray-700">
+                <div class="text-wrap text-xs text-ink-gray-7">
                   {{ selectedService.info }}
                   <a
                     :href="selectedService.link"
@@ -129,7 +129,9 @@
                     :name="field.name"
                     :type="field.type"
                   />
-                  <p class="text-gray-500 text-p-sm">{{ field.description }}</p>
+                  <p class="text-ink-gray-5 text-p-sm">
+                    {{ field.description }}
+                  </p>
                 </div>
               </div>
               <ErrorMessage v-if="error" class="ml-1" :message="error" />

@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md border p-1 border-gray-300 text-sm">
+  <div class="rounded-md border p-1 border-outline-gray-3 text-sm">
     <div
       class="grid p-2 items-center"
       :style="{
@@ -10,7 +10,7 @@
       <div
         v-for="column in columns"
         :key="column.key"
-        class="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis"
+        class="text-ink-gray-6 overflow-hidden whitespace-nowrap text-ellipsis"
       >
         {{ column.label }}
       </div>
@@ -43,7 +43,7 @@
       </div>
       <hr class="my-0.5" v-if="index !== holidays.length - 1" />
     </div>
-    <div v-if="holidays?.length === 0" class="text-center p-4 text-gray-600">
+    <div v-if="holidays?.length === 0" class="text-center p-4 text-ink-gray-6">
       No items in the list
     </div>
   </div>
@@ -65,7 +65,7 @@
   >
     <template #body-content>
       <div v-if="!props.holidayData.from_date || !props.holidayData.to_date">
-        <div class="text-center p-4 text-gray-600">
+        <div class="text-center p-4 text-ink-gray-6">
           Please select start and end date first
         </div>
       </div>

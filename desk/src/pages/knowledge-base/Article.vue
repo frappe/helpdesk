@@ -45,8 +45,8 @@
                   {{ article.data.author.name }}
                 </span>
               </div>
-              <IconDot class="h-4 w-4 text-gray-600" />
-              <div class="text-xs text-gray-500">
+              <IconDot class="h-4 w-4 text-ink-gray-6" />
+              <div class="text-xs text-ink-gray-5">
                 {{ dayjsLocal(article.data.modified).format("MMM D, h:mm A") }}
               </div>
             </div>
@@ -74,7 +74,7 @@
           <!-- Title -->
           <textarea
             ref="titleRef"
-            class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-gray-200 focus:ring-0 focus:border-gray-200 overflow-hidden"
+            class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-outline-gray-2 focus:ring-0 focus:border-outline-gray-2 overflow-hidden"
             v-model="title"
             :placeholder="__('Title')"
             rows="1"

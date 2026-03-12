@@ -1,5 +1,7 @@
 <template>
-  <div class="rounded-lg border border-gray-300 p-3 flex flex-col gap-4 w-full">
+  <div
+    class="rounded-lg border border-outline-gray-3 p-3 flex flex-col gap-4 w-full"
+  >
     <template v-for="(condition, i) in props.conditions" :key="condition.field">
       <CFCondition
         v-if="Array.isArray(condition)"

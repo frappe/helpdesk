@@ -32,7 +32,7 @@
           />
           <button
             type="button"
-            class="w-full h-full absolute top-0 left-0 hover:bg-gray-50 rounded-[inherit]"
+            class="w-full h-full absolute top-0 left-0 hover:bg-surface-gray-2 rounded-[inherit]"
             @click="
               () => {
                 props.onSelect(notification);

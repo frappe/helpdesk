@@ -23,16 +23,16 @@
             <template #target="{ togglePopover }" class="w-max">
               <div
                 @click="togglePopover()"
-                class="w-full bg-gray-100 rounded p-1.5 px-2 text-base text-gray-800"
+                class="w-full bg-surface-gray-3 rounded p-1.5 px-2 text-base text-ink-gray-8"
               >
                 <div v-if="priorityData.response_time">
                   {{ formatTimeHMS(priorityData.response_time) }}
                 </div>
-                <div v-else class="text-gray-500">Select time</div>
+                <div v-else class="text-ink-gray-5">Select time</div>
               </div>
             </template>
             <template #body>
-              <div class="absolute bg-white top-2">
+              <div class="absolute bg-surface-white top-2">
                 <DurationPicker
                   v-model="priorityData.response_time"
                   :options="{ seconds: false }"
@@ -47,16 +47,16 @@
             <template #target="{ togglePopover }" class="w-max">
               <div
                 @click="togglePopover()"
-                class="w-full bg-gray-100 rounded p-1.5 px-2 text-base text-gray-800"
+                class="w-full bg-surface-gray-3 rounded p-1.5 px-2 text-base text-ink-gray-8"
               >
                 <div v-if="priorityData.resolution_time">
                   {{ formatTimeHMS(priorityData.resolution_time) }}
                 </div>
-                <div v-else class="text-gray-500">Select time</div>
+                <div v-else class="text-ink-gray-5">Select time</div>
               </div>
             </template>
             <template #body>
-              <div class="absolute bg-white top-2">
+              <div class="absolute bg-surface-white top-2">
                 <DurationPicker
                   v-model="priorityData.resolution_time"
                   :options="{ seconds: false }"

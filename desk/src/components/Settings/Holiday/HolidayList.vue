@@ -31,7 +31,7 @@
       />
     </div>
     <div v-else>
-      <div class="flex text-sm text-gray-600">
+      <div class="flex text-sm text-ink-gray-6">
         <div class="ml-2">{{ __("Schedule name") }}</div>
       </div>
       <hr class="mx-2 mt-2" />

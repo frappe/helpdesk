@@ -2,7 +2,7 @@
   <Dialog :options="options">
     <template #body-main>
       <div class="flex flex-col items-center gap-4 p-6">
-        <div class="text-xl font-medium text-gray-900">
+        <div class="text-xl font-medium text-ink-gray-9">
           {{ customer.doc?.name }}
         </div>
         <Avatar

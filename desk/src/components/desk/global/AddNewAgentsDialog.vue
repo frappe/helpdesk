@@ -34,12 +34,12 @@
           </Button>
         </form>
         <div
-          class="flex max-h-[300px] min-h-[100px] flex-col overflow-y-auto rounded border bg-gray-100 px-2"
+          class="flex max-h-[300px] min-h-[100px] flex-col overflow-y-auto rounded border bg-surface-gray-3 px-2"
           v-if="inviteQueue.length"
         >
           <ul class="flex flex-wrap gap-2 py-2">
             <li
-              class="flex items-center space-x-2 rounded bg-white p-1 shadow"
+              class="flex items-center space-x-2 rounded bg-surface-white p-1 shadow"
               v-for="email in inviteQueue.slice().reverse()"
               :key="email"
               :title="email"
@@ -48,7 +48,7 @@
                 {{ email }}
               </span>
               <button
-                class="grid h-4 w-4 place-items-center rounded text-gray-700 hover:bg-gray-300"
+                class="grid h-4 w-4 place-items-center rounded text-ink-gray-7 hover:bg-surface-gray-5"
                 @click="removeEmailFromQueue(email)"
               >
                 <FeatherIcon class="w-3" name="x" />

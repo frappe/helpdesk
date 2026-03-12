@@ -106,7 +106,7 @@
                   </template>
                   <template #body-main>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ slaData.condition }}</code>
                     </div>
@@ -116,7 +116,7 @@
             </div>
             <div class="mt-5" v-if="!slaData.default_sla">
               <div
-                class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
+                class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-3 rounded-md p-3 py-4"
                 v-if="!useNewUI"
               >
                 <span class="text-p-sm">

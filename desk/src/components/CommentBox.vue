@@ -1,25 +1,25 @@
 <template>
   <div class="flex-col text-base flex-1" ref="commentBoxRef">
     <div class="mb-1 ml-0.5 flex items-center justify-between">
-      <div class="text-gray-600 flex items-center gap-2">
+      <div class="text-ink-gray-6 flex items-center gap-2">
         <Avatar
           size="md"
           :label="commenter"
           :image="getUser(commentedBy).user_image"
         />
         <p>
-          <span class="font-medium text-gray-800">
+          <span class="font-medium text-ink-gray-8">
             {{ commenter }}
           </span>
           <span> added a</span>
-          <span class="max-w-xs truncate font-medium text-gray-800">
+          <span class="max-w-xs truncate font-medium text-ink-gray-8">
             comment
           </span>
         </p>
       </div>
       <div class="flex items-center gap-1">
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-          <span class="pl-0.5 text-sm text-gray-600">
+          <span class="pl-0.5 text-sm text-ink-gray-6">
             {{ timeAgo(creation) }}
           </span>
         </Tooltip>
@@ -42,7 +42,7 @@
           >
             <Button
               icon="more-horizontal"
-              class="text-gray-600"
+              class="text-ink-gray-6"
               variant="ghost"
             />
           </Dropdown>
@@ -51,7 +51,7 @@
     </div>
     <div
       :id="`comment-${name}`"
-      class="rounded bg-gray-50 transition-colors px-4 py-3"
+      class="rounded bg-surface-gray-2 transition-colors px-4 py-3"
     >
       <TextEditor
         ref="editorRef"

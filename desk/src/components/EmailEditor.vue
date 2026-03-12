@@ -17,7 +17,7 @@
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
-        <span class="text-xs text-gray-500">TO:</span>
+        <span class="text-xs text-ink-gray-5">TO:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
           class="flex-1"
@@ -26,12 +26,12 @@
         />
         <Button
           :label="'CC'"
-          :class="[cc ? 'bg-gray-300 hover:bg-gray-200' : '']"
+          :class="[cc ? 'bg-surface-gray-5 hover:bg-surface-gray-4' : '']"
           @click="toggleCC()"
         />
         <Button
           :label="'BCC'"
-          :class="[bcc ? 'bg-gray-300 hover:bg-gray-200' : '']"
+          :class="[bcc ? 'bg-surface-gray-5 hover:bg-surface-gray-4' : '']"
           @click="toggleBCC()"
         />
       </div>
@@ -40,7 +40,7 @@
         class="mx-10 flex items-center gap-2 py-2.5"
         :class="cc || showCC ? 'border-b' : ''"
       >
-        <span class="text-xs text-gray-500">CC:</span>
+        <span class="text-xs text-ink-gray-5">CC:</span>
         <MultiSelectInput
           ref="ccInput"
           v-model="ccEmailsClone"
@@ -54,7 +54,7 @@
         class="mx-10 flex items-center gap-2 py-2.5"
         :class="bcc || showBCC ? 'border-b' : ''"
       >
-        <span class="text-xs text-gray-500">BCC:</span>
+        <span class="text-xs text-ink-gray-5">BCC:</span>
         <MultiSelectInput
           ref="bccInput"
           v-model="bccEmailsClone"
@@ -72,7 +72,7 @@
           v-if="quotedContent"
           ref="quotedContentRef"
           contenteditable="true"
-          class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
+          class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-outline-gray-3 pl-4 text-sm focus:outline-none"
           @input="onQuotedInput"
         />
       </div>

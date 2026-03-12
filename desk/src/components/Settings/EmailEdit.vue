@@ -18,7 +18,7 @@
             <CircleAlert
               class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-2"
             />
-            <div class="text-wrap text-xs text-gray-700 flex flex-col gap-1">
+            <div class="text-wrap text-xs text-ink-gray-7 flex flex-col gap-1">
               <span>
                 {{ info.description }}
                 <a
@@ -122,7 +122,7 @@
                   :name="field.name"
                   :type="field.type"
                 />
-                <p class="text-p-sm text-gray-500">{{ field.description }}</p>
+                <p class="text-p-sm text-ink-gray-5">{{ field.description }}</p>
               </div>
             </div>
             <ErrorMessage v-if="error" class="ml-1" :message="error" />

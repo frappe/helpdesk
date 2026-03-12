@@ -39,7 +39,7 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
   const colorMap = {
     Green: ["text-green-700", "bg-surface-green-2"],
     Black: ["text-black", "bg-surface-gray-2"],
-    Gray: ["text-gray-700", "bg-surface-gray-2"],
+    Gray: ["text-ink-gray-7", "bg-surface-gray-2"],
     Blue: ["text-blue-700", "bg-surface-blue-2"],
     Red: ["text-red-500", "bg-surface-red-1"],
     Pink: ["text-pink-500", "bg-surface-pink-1"],

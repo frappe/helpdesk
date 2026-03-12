@@ -2,7 +2,7 @@
   <Popover class="flex w-full" placement="bottom-end">
     <template #target="{ open, close, togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span class="block text-xs text-gray-600">Assignee</span>
+        <span class="block text-xs text-ink-gray-6">Assignee</span>
         <Button
           variant="outline"
           class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm"

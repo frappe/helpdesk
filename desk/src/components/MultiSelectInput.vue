@@ -28,7 +28,7 @@
             <template #target="{ togglePopover }">
               <ComboboxInput
                 ref="search"
-                class="search-input form-input w-full border-none bg-white hover:bg-white focus:border-none focus:!shadow-none focus-visible:!ring-0"
+                class="search-input form-input w-full border-none bg-surface-white hover:bg-surface-white focus:border-none focus:!shadow-none focus-visible:!ring-0"
                 type="text"
                 :value="query"
                 autocomplete="off"
@@ -44,7 +44,9 @@
             </template>
             <template #body="{ isOpen }">
               <div v-show="isOpen">
-                <div class="mt-1 rounded-lg bg-white py-1 text-base shadow-2xl">
+                <div
+                  class="mt-1 rounded-lg bg-surface-white py-1 text-base shadow-2xl"
+                >
                   <ComboboxOptions
                     class="my-1 max-h-[12rem] overflow-y-auto px-1.5"
                     static
@@ -58,7 +60,7 @@
                       <li
                         :class="[
                           'flex cursor-pointer items-center rounded px-2 py-1 text-base',
-                          { 'bg-gray-100': active },
+                          { 'bg-surface-gray-3': active },
                         ]"
                       >
                         <UserAvatar
@@ -66,11 +68,11 @@
                           :name="getUsernameLabel(option.value)"
                           size="lg"
                         />
-                        <div class="flex flex-col gap-1 p-1 text-gray-800">
+                        <div class="flex flex-col gap-1 p-1 text-ink-gray-8">
                           <div class="text-base font-medium">
                             {{ getUsernameLabel(option.label) }}
                           </div>
-                          <div class="text-sm text-gray-600">
+                          <div class="text-sm text-ink-gray-6">
                             {{ option.value }}
                           </div>
                         </div>
