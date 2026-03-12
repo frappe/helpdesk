@@ -4,7 +4,7 @@
     :options="{
       title: __('Pending Invites'),
     }"
-    @close="confirmingRevoke = null"
+    @after-leave="confirmingRevoke = null"
   >
     <template #body-content>
       <div class="flex flex-col">
@@ -23,34 +23,32 @@
               </p>
             </div>
 
-            <div class="relative h-7 min-w-[9rem] overflow-hidden">
-              <Transition name="invite-row" mode="out-in">
-                <div
-                  v-if="confirmingRevoke !== invite.name"
-                  key="action"
-                  class="absolute inset-0 flex items-center justify-end"
-                >
-                  <Button
-                    variant="ghost"
-                    icon="trash-2"
-                    :tooltip="__('Revoke Invite')"
-                    @click="confirmingRevoke = invite.name"
-                  />
-                </div>
-                <div
-                  v-else
-                  key="confirm"
-                  class="absolute inset-0 flex items-center justify-end gap-2"
-                >
-                  <Button
-                    variant="subtle"
-                    theme="red"
-                    :label="__('Confirm')"
-                    :loading="cancelInviteResource.loading"
-                    @click="revokeInvite(invite.name)"
-                  />
-                </div>
-              </Transition>
+            <div class="flex justify-end min-w-[9rem]">
+              <div
+                class="invite-revoke-button"
+                :class="{
+                  'invite-revoke-button--expanded':
+                    confirmingRevoke === invite.name,
+                }"
+              >
+                <Button
+                  :variant="
+                    confirmingRevoke === invite.name ? 'subtle' : 'ghost'
+                  "
+                  :theme="confirmingRevoke === invite.name ? 'red' : 'gray'"
+                  :icon="confirmingRevoke !== invite.name && 'trash-2'"
+                  :icon-left="confirmingRevoke === invite.name && 'trash-2'"
+                  :label="confirmingRevoke === invite.name && __('Confirm')"
+                  :tooltip="__('Revoke Invite')"
+                  :loading="cancelInviteResource.loading"
+                  class="invite-revoke-button__control"
+                  @click="
+                    confirmingRevoke === invite.name
+                      ? revokeInvite(invite.name)
+                      : (confirmingRevoke = invite.name)
+                  "
+                />
+              </div>
             </div>
           </div>
           <div
@@ -122,17 +120,23 @@ watch(
 </script>
 
 <style scoped>
-.invite-row-enter-from {
-  opacity: 0;
-  transform: translateX(8px);
+.invite-revoke-button {
+  width: 1.75rem;
+  margin-left: auto;
+  overflow: hidden;
+  transition: width 0.22s ease;
 }
 
-.invite-row-enter-active,
-.invite-row-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+.invite-revoke-button--expanded {
+  width: 6.75rem;
 }
-.invite-row-leave-to {
-  opacity: 0;
-  transform: translateX(-8px);
+
+.invite-revoke-button :deep(button) {
+  width: 100%;
+  min-width: 100%;
+  justify-content: center;
+  white-space: nowrap;
+  transition: background-color 0.22s ease, color 0.22s ease,
+    border-color 0.22s ease;
 }
 </style>

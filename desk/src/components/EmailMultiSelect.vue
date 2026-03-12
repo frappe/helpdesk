@@ -156,10 +156,13 @@ const filterContacts = createResource({
 
 watchDebounced(
   query,
-  (val) => {
+  (newVal, oldVal) => {
     if (props.forAgents) return;
+    if (error.value && newVal !== oldVal) {
+      error.value = null;
+    }
     console.log("Updating contacts filter with", props.existingUsers);
-    filterContacts.update({ params: { txt: val || "" } });
+    filterContacts.update({ params: { txt: newVal || "" } });
     filterContacts.reload();
   },
   { debounce: 250, immediate: true }

@@ -37,7 +37,7 @@
                   <!-- remove button if state.image exists -->
                   <Button
                     v-if="state.image"
-                    label="Remove Picture"
+                    label="Remove Image"
                     variant="subtle"
                     theme="red"
                     @click.prevent="state.image = ''"

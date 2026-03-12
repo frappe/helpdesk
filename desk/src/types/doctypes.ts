@@ -1,18 +1,18 @@
 interface DocType {
-  name: string;
-  creation: string;
-  modified: string;
-  owner: string;
-  modified_by: string;
-}
+    name: string;
+    creation: string;
+    modified: string;
+    owner: string;
+    modified_by: string;
+  }
 
-interface ChildDocType extends DocType {
-  parent?: string;
-  parentfield?: string;
-  parenttype?: string;
-  idx?: number;
-}
-
+  interface ChildDocType extends DocType {
+    parent?: string;
+    parentfield?: string;
+    parenttype?: string;
+    idx?: number;
+  }
+  
 // Last updated: 2026-02-02 17:22:11.094897
 export interface HDTicketStatus extends DocType {
   /** Color: Select */
@@ -325,7 +325,7 @@ export interface HDCustomerMember extends ChildDocType {
   contact_name: string;
 }
 
-// Last updated: 2026-02-23 14:37:53.288126
+// Last updated: 2026-03-10 13:54:06.329471
 export interface HDCustomer extends DocType {
   /** Image: Attach Image */
   image?: string;
@@ -345,6 +345,4 @@ export interface HDCustomer extends DocType {
   primary_contact?: string;
   /** Country: Link (Country) */
   country?: string;
-  /** Website: Data */
-  website?: string;
 }

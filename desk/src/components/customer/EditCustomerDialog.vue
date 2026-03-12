@@ -3,6 +3,7 @@
     v-model="model"
     :options="{ title: __('Edit Customer'), size: 'md' }"
     :disableOutsideClickToClose="isDirty()"
+    @after-leave="revertChanges"
   >
     <template #body>
       <div class="bg-surface-modal px-4 pb-6 py-5 sm:px-6">
@@ -50,7 +51,7 @@
                   />
                   <Button
                     v-if="state.image"
-                    label="Remove Picture"
+                    label="Remove Image"
                     variant="subtle"
                     theme="red"
                     @click.prevent="onImageRemove()"
@@ -147,5 +148,13 @@ function onImageUpload(file: { file_url: string }) {
 
 function onImageRemove() {
   state.image = "";
+}
+
+function revertChanges() {
+  if (!isDirty()) return;
+  state.name = customer.doc.customer_name || "";
+  state.domain = customer.doc.domain || "";
+  state.country = customer.doc.country || "";
+  state.image = customer.doc.image || "";
 }
 </script>
