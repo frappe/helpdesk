@@ -334,6 +334,11 @@ function parseViews(views) {
 
 const customerPortalDropdown = computed(() => [
   {
+    label: __("Change Theme"),
+    icon: currentTheme.value === "Dark" ? "moon" : "sun",
+    onClick: toggleTheme,
+  },
+  {
     label: __("Log out"),
     icon: "log-out",
     onClick: () => authStore.logout(),
@@ -379,7 +384,7 @@ const agentPortalDropdown = computed(() => [
     onClick: () => (showSettingsModal.value = true),
   },
   {
-    label: __("Theme"),
+    label: __("Change Theme"),
     icon: currentTheme.value === "Dark" ? "moon" : "sun",
     onClick: toggleTheme,
   },
