@@ -445,7 +445,7 @@ def get_team_chart_data(
         return get_pie_chart_config(
             result,
             _("Tickets by Team"),
-            _("Percentage of total tickets by team"),
+            _("Percentage of Total tickets by team"),
             "team",
             "count",
         )
@@ -478,7 +478,7 @@ def get_ticket_type_chart_data(
         return get_pie_chart_config(
             result,
             _("Tickets by Type"),
-            _("Percentage of total tickets by type"),
+            _("Percentage of Total tickets by type"),
             "type",
             "count",
         )
@@ -511,7 +511,7 @@ def get_ticket_priority_chart_data(
         return get_pie_chart_config(
             result,
             _("Tickets by Priority"),
-            _("Percentage of total tickets by priority"),
+            _("Percentage of Total tickets by priority"),
             "priority",
             "count",
         )
@@ -551,7 +551,7 @@ def get_ticket_channel_chart_data(
     return get_pie_chart_config(
         result,
         _("Tickets by Channel"),
-        _("Percentage of total tickets by channel"),
+        _("Percentage of Total Tickets by channel"),
         "channel",
         "count",
     )
