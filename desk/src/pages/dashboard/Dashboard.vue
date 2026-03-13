@@ -16,32 +16,19 @@
       </template>
       <template #right-header>
         <!-- Segmented pill toggle: only visible to managers -->
-        <div
-          v-if="isManager"
-          class="relative flex items-center rounded-full bg-surface-gray-2 p-0.5 gap-0.5"
-          role="tablist"
-          :aria-label="__('Dashboard view')"
-        >
+        <div v-if="isManager">
           <TabButtons
             v-model="activeTab"
             :buttons="[
               {
                 value: 'organization',
-                class: '!w-auto !px-2',
-                icon: () =>
-                  h('div', { class: 'flex items-center gap-1.5' }, [
-                    h(LucideBuilding2, { class: 'size-3.5' }),
-                    h('span', { class: 'text-sm' }, __('Organization')),
-                  ]),
+                iconLeft: h(LucideBuilding2, { class: 'size-4' }),
+                label: 'My Organization',
               },
               {
                 value: 'my_stats',
-                class: '!w-auto !px-2',
-                icon: () =>
-                  h('div', { class: 'flex items-center gap-1.5' }, [
-                    h(LucideUser, { class: 'size-3.5' }),
-                    h('span', { class: 'text-sm' }, __('My Stats')),
-                  ]),
+                iconLeft: h(LucideUser, { class: 'size-4' }),
+                label: 'My Stats',
               },
             ]"
           />

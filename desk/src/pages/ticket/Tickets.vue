@@ -12,6 +12,7 @@
       </template>
       <template #right-header>
         <RouterLink
+          class="inline-flex"
           :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
         >
           <Button label="Create" theme="gray" variant="solid">
