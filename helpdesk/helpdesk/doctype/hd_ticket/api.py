@@ -750,9 +750,9 @@ def get_similar_tickets(ticket: str):
     tickets = frappe.db.sql(
         """
         SELECT `name`, `subject`, `status`, `creation`,
-            (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION)) as `raw_relevance`
+            (MATCH(subject, description) AGAINST(%(subject_search)s WITH QUERY EXPANSION)) as `raw_relevance`
         FROM `tabHD Ticket`
-        WHERE (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION))
+        WHERE (MATCH(subject, description) AGAINST(%(subject_search)s WITH QUERY EXPANSION))
             AND name != %(ticket)s
             AND creation > DATE_SUB(NOW(), INTERVAL 90 DAY)
         ORDER BY `raw_relevance` DESC, creation DESC

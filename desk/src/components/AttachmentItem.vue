@@ -1,6 +1,10 @@
 <template>
-  <span>
-    <a :href="isShowable ? null : url" target="_blank">
+  <span style="display: inline-flex; align-items: center; cursor: pointer;">
+    <component
+      :is="!isShowable && url ? 'a' : 'span'"
+      :href="!isShowable && url ? url : undefined"
+      target="_blank"
+    >
       <Button
         :label="label"
         theme="gray"
@@ -10,11 +14,9 @@
         <template #prefix>
           <component :is="getIcon()" class="h-4 w-4" />
         </template>
-        <template #suffix>
-          <slot name="suffix" />
-        </template>
       </Button>
-    </a>
+    </component>
+    <slot name="suffix" />
     <Dialog
       v-model="showDialog"
       :options="{

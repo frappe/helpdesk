@@ -17,3 +17,13 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
 
     ticket_doc.assign_agent(agent_id)
     return ticket_doc
+
+@frappe.whitelist()
+@agent_only
+def bulk_assign_ticket_to_agent(ticket_ids, agent_id=None):
+    if ticket_ids:
+        ticket_docs = []
+        for ticket_id in ticket_ids:
+            ticket_doc = assign_ticket_to_agent(ticket_id, agent_id)
+            ticket_docs.append(ticket_doc)
+        return ticket_docs

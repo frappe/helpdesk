@@ -76,16 +76,26 @@
       <div class="flex flex-wrap gap-2 px-10">
         <AttachmentItem
           v-for="a in attachments"
-          :key="a.file_url"
+          :key="a.name || a.file_url"
           :label="a.file_name"
-          :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
+          :url="(() => {
+            const ext = a.file_name?.split('.').pop()?.toLowerCase();
+            const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            return a.attached_to_name && imageExts.includes(ext) ? a.file_url : null;
+          })()"
         >
           <template #suffix>
-            <FeatherIcon
-              class="h-3.5"
-              name="x"
-              @click.prevent.stop="removeAttachment(a)"
-            />
+            <button
+              type="button"
+              class="cursor-pointer"
+              style="cursor: pointer;"
+              @click.stop.prevent="removeAttachment(a)"
+              @mousedown.stop.prevent
+              @pointerdown.stop.prevent
+              @touchstart.stop.prevent
+            >
+              <FeatherIcon class="h-3.5" name="x" />
+            </button>
           </template>
         </AttachmentItem>
       </div>
@@ -291,7 +301,7 @@ const sendMail = createResource({
     dn: props.ticketId,
     method: "reply_via_agent",
     args: {
-      attachments: attachments.value.map((x) => x.name),
+      attachments: attachments.value.map((x) => x.name || x.file_name),
       to: toEmailsClone.value.join(","),
       cc: ccEmailsClone.value?.join(","),
       bcc: bccEmailsClone.value?.join(","),
@@ -342,7 +352,9 @@ function toggleBCC() {
 
 async function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
-  await removeAttachmentFromServer(attachment.name);
+  if (attachment.name) {
+    await removeAttachmentFromServer(attachment.name);
+  }
 }
 
 function addToReply(
