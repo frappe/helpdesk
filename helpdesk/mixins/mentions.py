@@ -22,13 +22,38 @@ class HasMentions:
             ]
 
         for mention in current_mentions:
-            values = frappe._dict(
-                doctype="HD Notification",
-                user_from=self.owner,
-                user_to=mention.email,
-                notification_type="Mention",
-                message=self.content,
-            )
+            if mention.type == "group" and frappe.db.exists("User Group", mention.email):
+                users_to_notify = frappe.get_all(
+                    "User Group Member",
+                    filters={"parent": mention.email},
+                    pluck="user",
+                )
+            else:
+                users_to_notify = [mention.email]
+
+            for user_email in users_to_notify:
+                values = frappe._dict(
+                    doctype="HD Notification",
+                    user_from=self.owner,
+                    user_to=user_email,
+                    notification_type="Mention",
+                    message=self.content,
+                )
+                if values.user_from == values.user_to:
+                    continue
+                if self.doctype == "HD Ticket Comment":
+                    values.reference_comment = self.name
+                    values.reference_ticket = self.reference_ticket
+                if frappe.db.exists(
+                    "HD Notification",
+                    {
+                        "reference_comment": self.name,
+                        "user_to": user_email,
+                        "notification_type": "Mention",
+                    },
+                ):
+                    continue
+                frappe.get_doc(values).insert()
             # Why mention oneself?
             if values.user_from == values.user_to:
                 continue
