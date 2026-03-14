@@ -33,6 +33,6 @@ const styles = computed(() => {
   if (props.activity.feedback_rating <= 0.4) return ["bg-surface-red-1", "red"];
   if (props.activity.feedback_rating <= 0.6)
     return ["bg-surface-amber-1", "yellow"];
-  return ["bg-surface-green-1", "yellow"];
+  return ["bg-surface-green-2", "yellow"];
 });
 </script>

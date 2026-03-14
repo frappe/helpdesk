@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md border px-2 border-outline-gray-3 text-sm">
+  <div class="rounded-md border px-2 border-outline-gray-2 text-sm">
     <div
       class="grid p-2 px-4 items-center"
       style="grid-template-columns: 3fr 1fr"
@@ -7,7 +7,7 @@
       <div
         v-for="column in columns"
         :key="column.key"
-        class="text-ink-gray-6 overflow-hidden whitespace-nowrap text-ellipsis"
+        class="text-ink-gray-5 overflow-hidden whitespace-nowrap text-ellipsis"
       >
         {{ column.label }}
       </div>

@@ -19,11 +19,11 @@
           }"
         >
           <div class="w-full space-y-1.5">
-            <label v-if="$props.label" class="block text-xs text-ink-gray-6">
+            <label v-if="$props.label" class="block text-xs text-ink-gray-5">
               {{ $props.label }}
             </label>
             <button
-              class="flex h-7 w-full items-center justify-between gap-2 rounded bg-surface-gray-3 py-1 px-2 transition-colors hover:bg-surface-gray-4 focus:ring-2 focus:ring-gray-400"
+              class="flex h-7 w-full items-center justify-between gap-2 rounded bg-surface-gray-4 py-1 px-2 transition-colors hover:bg-surface-gray-4 focus:ring-2 focus:ring-gray-400"
               :class="[
                 isComboboxOpen ? 'bg-surface-gray-4' : '',
                 $props.buttonClasses,
@@ -43,7 +43,7 @@
                 >
                   {{ displayValue(selectedValue) }}
                 </span>
-                <span v-else class="text-base leading-5 text-ink-gray-6">
+                <span v-else class="text-base leading-5 text-ink-gray-5">
                   {{ placeholder || "" }}
                 </span>
                 <slot name="suffix" />
@@ -51,11 +51,11 @@
               <FeatherIcon
                 v-show="!loading"
                 name="chevron-down"
-                class="h-4 w-4 text-ink-gray-6"
+                class="h-4 w-4 text-ink-gray-5"
                 aria-hidden="true"
               />
               <LoadingIndicator
-                class="h-4 w-4 text-ink-gray-6"
+                class="h-4 w-4 text-ink-gray-5"
                 v-show="loading"
               />
             </button>
@@ -100,7 +100,7 @@
                 >
                   <div
                     v-if="group.group && !group.hideLabel"
-                    class="sticky top-0 truncate bg-surface-white px-2.5 py-1.5 text-sm font-medium text-ink-gray-6"
+                    class="sticky top-0 truncate bg-surface-white px-2.5 py-1.5 text-sm font-medium text-ink-gray-5"
                   >
                     {{ group.group }}
                   </div>
@@ -114,7 +114,7 @@
                     <li
                       :class="[
                         'flex h-7 cursor-pointer items-center justify-between rounded px-2.5 text-base',
-                        { 'bg-surface-gray-3': active },
+                        { 'bg-surface-gray-4': active },
                       ]"
                     >
                       <div
@@ -153,7 +153,7 @@
                         >
                           <div
                             v-if="option?.description"
-                            class="text-sm text-ink-gray-6"
+                            class="text-sm text-ink-gray-5"
                           >
                             {{ option.description }}
                           </div>
@@ -165,7 +165,7 @@
               </div>
               <li
                 v-if="groups.length == 0"
-                class="rounded-md px-2.5 py-1.5 text-base text-ink-gray-6"
+                class="rounded-md px-2.5 py-1.5 text-base text-ink-gray-5"
               >
                 No results found
               </li>

@@ -24,7 +24,7 @@
       >
         <Button
           icon="more-horizontal"
-          class="text-ink-gray-6"
+          class="text-ink-gray-5"
           variant="ghost"
         />
       </Dropdown>
@@ -37,7 +37,7 @@
     <!-- feedback component -->
     <TicketFeedback
       v-if="ticket.feedback_rating"
-      class="py-3 !px-6 !gap-3 text-base text-ink-gray-6"
+      class="py-3 !px-6 !gap-3 text-base text-ink-gray-5"
       :ticket="ticket"
     />
     <!-- ticket details -->

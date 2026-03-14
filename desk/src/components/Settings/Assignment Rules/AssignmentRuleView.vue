@@ -10,7 +10,7 @@
           "
           size="md"
           @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-lg hover:opacity-70 !pr-0 !max-w-96 !justify-start"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-4 font-semibold text-lg hover:opacity-70 !pr-0 !max-w-96 !justify-start"
         />
         <Badge
           variant="subtle"
@@ -75,7 +75,7 @@
             <Popover>
               <template #target="{ togglePopover }">
                 <div
-                  class="flex items-center justify-between text-base rounded h-7 py-1.5 pl-2 pr-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] cursor-default"
+                  class="flex items-center justify-between text-base rounded h-7 py-1.5 pl-2 pr-2 border border-[--surface-gray-2] bg-surface-gray-3 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-4 focus:bg-surface-white focus:border-outline-gray-3 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] cursor-default"
                   @click="togglePopover()"
                 >
                   <div>
@@ -90,12 +90,12 @@
               </template>
               <template #body="{ togglePopover }">
                 <div
-                  class="p-1 text-ink-gray-6 top-1 absolute bg-surface-white shadow-2xl rounded w-[--reka-popper-anchor-width]"
+                  class="p-1 text-ink-gray-5 top-1 absolute bg-surface-white shadow-2xl rounded w-[--reka-popper-anchor-width]"
                 >
                   <div
                     v-for="option in priorityOptions"
                     :key="option.value"
-                    class="p-2 cursor-pointer hover:bg-surface-gray-2 text-base flex items-center justify-between rounded"
+                    class="p-2 cursor-pointer hover:bg-surface-gray-3 text-base flex items-center justify-between rounded"
                     @click="
                       assignmentRuleData.priority = option.value;
                       togglePopover();
@@ -137,7 +137,7 @@
               __("Assignment condition")
             }}</span>
             <div class="flex items-center justify-between gap-6">
-              <span class="text-p-sm text-ink-gray-6">
+              <span class="text-p-sm text-ink-gray-5">
                 {{
                   __(
                     "Choose which tickets are affected by this assignment rule."
@@ -156,7 +156,7 @@
                 <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
                   <template #target>
                     <div
-                      class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
+                      class="text-sm text-ink-gray-5 flex gap-1 cursor-default text-nowrap flex items-center"
                     >
                       <span>{{ __("Old Condition") }}</span>
                       <FeatherIcon name="info" class="size-4" />
@@ -164,7 +164,7 @@
                   </template>
                   <template #body-main>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-5 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ assignmentRuleData.assignCondition }}</code>
                     </div>
@@ -175,7 +175,7 @@
           </div>
           <div class="mt-5">
             <div
-              class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-3 rounded-md p-3 py-4"
+              class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-2 rounded-md p-3 py-4"
               v-if="
                 !useNewUIForAssignCondition &&
                 assignmentRuleData.assignCondition
@@ -214,7 +214,7 @@
               __("Unassignment condition")
             }}</span>
             <div class="flex items-center justify-between gap-6">
-              <span class="text-p-sm text-ink-gray-6">
+              <span class="text-p-sm text-ink-gray-5">
                 {{
                   __(
                     "Choose which tickets are affected by this un-assignment rule."
@@ -237,7 +237,7 @@
                 <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
                   <template #target>
                     <div
-                      class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
+                      class="text-sm text-ink-gray-5 flex gap-1 cursor-default text-nowrap flex items-center"
                     >
                       <span> {{ __("Old Condition") }} </span>
                       <FeatherIcon name="info" class="size-4" />
@@ -245,7 +245,7 @@
                   </template>
                   <template #body-main>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-5 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ assignmentRuleData.unassignCondition }}</code>
                     </div>
@@ -256,7 +256,7 @@
           </div>
           <div class="mt-5">
             <div
-              class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-3 rounded-md p-3 py-4"
+              class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-2 rounded-md p-3 py-4"
               v-if="
                 !useNewUIForUnassignCondition &&
                 assignmentRuleData.unassignCondition
@@ -290,7 +290,7 @@
             <span class="text-lg font-semibold text-ink-gray-8">{{
               __("Assignment Schedule")
             }}</span>
-            <span class="text-p-sm text-ink-gray-6">
+            <span class="text-p-sm text-ink-gray-5">
               {{
                 __(
                   "Choose the days of the week when this rule should be active."

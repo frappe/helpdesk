@@ -12,7 +12,7 @@
             name="description"
             v-if="Boolean($slots['description']) || Boolean(description)"
           >
-            <p class="text-p-sm text-ink-gray-7 max-w-md text-ink-gray-6">
+            <p class="text-p-sm text-ink-gray-7 max-w-md text-ink-gray-5">
               {{ description }}
             </p>
           </slot>

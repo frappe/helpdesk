@@ -38,7 +38,7 @@
       </span>
       <span
         class="block break-words text-base font-medium text-ink-gray-9"
-        :class="!ticket.data[field.fieldname] && 'text-ink-gray-4'"
+        :class="!ticket.data[field.fieldname] && 'text-ink-gray-3'"
       >
         {{ ticket.data[field.fieldname] || "—" }}
       </span>

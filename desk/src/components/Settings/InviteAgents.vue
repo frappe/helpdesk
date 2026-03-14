@@ -39,13 +39,13 @@
           <li
             v-for="invite in pendingInvitesResource.data"
             :key="invite.name"
-            class="flex items-center justify-between px-3 py-1 rounded-lg bg-surface-gray-2"
+            class="flex items-center justify-between px-3 py-1 rounded-lg bg-surface-gray-3"
           >
             <div class="text-base">
               <span class="text-ink-gray-8">
                 {{ invite.email }}
               </span>
-              <span class="text-ink-gray-5">
+              <span class="text-ink-gray-4">
                 ({{ rolesToLabel(invite.roles) }})
               </span>
             </div>

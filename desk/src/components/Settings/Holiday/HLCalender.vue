@@ -6,7 +6,7 @@
     <div class="rounded-md text-sm">
       <div class="flex items-center text-xs uppercase">
         <div
-          class="flex size-7.5 items-center justify-center text-center text-ink-gray-6"
+          class="flex size-7.5 items-center justify-center text-center text-ink-gray-5"
           v-for="(d, i) in ['s', 'm', 't', 'w', 't', 'f', 's']"
           :key="i"
         >
@@ -20,7 +20,7 @@
               <div
                 class="flex size-7 cursor-pointer text-orange-700 bg-yellow-100 items-center justify-center rounded hover:bg-yellow-100 select-none m-[1px]"
                 :class="{
-                  '!text-ink-gray-4 !bg-surface-gray-3': isWeekOff(date),
+                  '!text-ink-gray-3 !bg-surface-gray-4': isWeekOff(date),
                 }"
                 @mouseover="handleMouseEnter(getFormattedDate(date), open)"
                 @mouseleave="handleMouseLeave(getFormattedDate(date), close)"
@@ -133,8 +133,8 @@
             v-else
             class="flex size-7 items-center justify-center rounded m-[1px] select-none"
             :class="{
-              'cursor-pointer hover:bg-surface-gray-2': isDateInRange(date),
-              'text-ink-gray-3':
+              'cursor-pointer hover:bg-surface-gray-3': isDateInRange(date),
+              'text-ink-gray-2':
                 // @ts-ignore
                 date.getMonth() !== currentMonth - 1 || !isDateInRange(date),
               'bg-black text-ink-white hover:!bg-black/80 hover:text-ink-white':

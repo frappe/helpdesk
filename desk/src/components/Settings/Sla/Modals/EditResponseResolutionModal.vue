@@ -23,12 +23,12 @@
             <template #target="{ togglePopover }" class="w-max">
               <div
                 @click="togglePopover()"
-                class="w-full bg-surface-gray-3 rounded p-1.5 px-2 text-base text-ink-gray-8"
+                class="w-full bg-surface-gray-4 rounded p-1.5 px-2 text-base text-ink-gray-8"
               >
                 <div v-if="priorityData.response_time">
                   {{ formatTimeHMS(priorityData.response_time) }}
                 </div>
-                <div v-else class="text-ink-gray-5">Select time</div>
+                <div v-else class="text-ink-gray-4">Select time</div>
               </div>
             </template>
             <template #body>
@@ -47,12 +47,12 @@
             <template #target="{ togglePopover }" class="w-max">
               <div
                 @click="togglePopover()"
-                class="w-full bg-surface-gray-3 rounded p-1.5 px-2 text-base text-ink-gray-8"
+                class="w-full bg-surface-gray-4 rounded p-1.5 px-2 text-base text-ink-gray-8"
               >
                 <div v-if="priorityData.resolution_time">
                   {{ formatTimeHMS(priorityData.resolution_time) }}
                 </div>
-                <div v-else class="text-ink-gray-5">Select time</div>
+                <div v-else class="text-ink-gray-4">Select time</div>
               </div>
             </template>
             <template #body>

@@ -9,7 +9,7 @@
         theme="gray"
         variant="subtle"
         :class="{
-          'rounded bg-surface-white hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
+          'rounded bg-surface-white hover:!bg-surface-gray-2 focus-visible:ring-outline-gray-4':
             variant === 'subtle',
         }"
         @keydown.delete.capture.stop="removeLastValue"
@@ -60,7 +60,7 @@
                       <li
                         :class="[
                           'flex cursor-pointer items-center rounded px-2 py-1 text-base',
-                          { 'bg-surface-gray-3': active },
+                          { 'bg-surface-gray-4': active },
                         ]"
                       >
                         <UserAvatar
@@ -72,7 +72,7 @@
                           <div class="text-base font-medium">
                             {{ getUsernameLabel(option.label) }}
                           </div>
-                          <div class="text-sm text-ink-gray-6">
+                          <div class="text-sm text-ink-gray-5">
                             {{ option.value }}
                           </div>
                         </div>

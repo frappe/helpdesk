@@ -2,7 +2,7 @@
   <div
     class="flex flex-col gap-2 my-2 w-[470px] rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black p-3 ring-opacity-5 focus:outline-none"
   >
-    <div class="text-base text-ink-gray-5">{{ __("Assign to") }}</div>
+    <div class="text-base text-ink-gray-4">{{ __("Assign to") }}</div>
     <Link
       class="form-control"
       value=""
@@ -17,7 +17,7 @@
     >
       <template #target="{ togglePopover }">
         <div
-          class="w-full min-h-12 flex flex-wrap items-center gap-1.5 p-1.5 pb-5 rounded-lg bg-surface-gray-2 cursor-text"
+          class="w-full min-h-12 flex flex-wrap items-center gap-1.5 p-1.5 pb-5 rounded-lg bg-surface-gray-3 cursor-text"
           @click.stop="togglePopover"
           ref="input"
         >
@@ -28,7 +28,7 @@
             @click.stop
           >
             <div
-              class="flex items-center text-sm p-0.5 text-ink-gray-6 border border-outline-gray-1 bg-surface-modal rounded-full cursor-pointer"
+              class="flex items-center text-sm p-0.5 text-ink-gray-5 border border-outline-gray-1 bg-surface-modal rounded-full cursor-pointer"
               @click.stop
             >
               <UserAvatar :name="assignee.name" size="sm" />
@@ -39,7 +39,7 @@
                 @click.stop="removeValue(assignee.name)"
               >
                 <template #icon>
-                  <FeatherIcon name="x" class="h-3 w-3 text-ink-gray-6" />
+                  <FeatherIcon name="x" class="h-3 w-3 text-ink-gray-5" />
                 </template>
               </Button>
             </div>
@@ -59,7 +59,7 @@
     </Link>
     <div class="flex items-center justify-between gap-2">
       <div
-        class="text-base text-ink-gray-5 cursor-pointer select-none"
+        class="text-base text-ink-gray-4 cursor-pointer select-none"
         @click="assignToMe = !assignToMe"
       >
         {{ __("Assign to me") }}

@@ -8,7 +8,7 @@
             ? 'w-auto px-0'
             : open
             ? 'w-full px-2 bg-surface-white shadow-sm'
-            : 'w-full px-2 hover:bg-surface-gray-3'
+            : 'w-full px-2 hover:bg-surface-gray-4'
         "
       >
         <BrandLogo />
@@ -39,7 +39,7 @@
         >
           <FeatherIcon
             name="chevron-down"
-            class="h-4 w-4 text-ink-gray-6"
+            class="h-4 w-4 text-ink-gray-5"
             aria-hidden="true"
           />
         </div>

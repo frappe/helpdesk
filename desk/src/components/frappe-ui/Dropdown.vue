@@ -34,7 +34,7 @@
             <div v-for="group in groups" :key="group.key" class="p-1.5">
               <div
                 v-if="group.group && !group.hideLabel"
-                class="flex h-7 items-center px-2 text-sm font-medium text-ink-gray-4"
+                class="flex h-7 items-center px-2 text-sm font-medium text-ink-gray-3"
               >
                 {{ group.group }}
               </div>
@@ -52,7 +52,7 @@
                   <button
                     v-else
                     :class="[
-                      active ? 'bg-surface-gray-3' : 'text-ink-gray-6',
+                      active ? 'bg-surface-gray-4' : 'text-ink-gray-5',
                       'group flex h-7 w-full items-center rounded px-2 text-base',
                     ]"
                     @click="item.onClick"

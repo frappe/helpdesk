@@ -13,7 +13,7 @@
                   'Search tickets, emails, comments, or #234 to navigate to ticket'
                 )
               "
-              class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-ink-gray-8 placeholder:text-ink-gray-5 focus:ring-0"
+              class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-ink-gray-8 placeholder:text-ink-gray-4 focus:ring-0"
               autocomplete="off"
               @input="onInput"
             />
@@ -30,7 +30,7 @@
             >
               <div
                 v-if="!group.hideTitle"
-                class="px-4.5 mb-2.5 text-base text-ink-gray-6"
+                class="px-4.5 mb-2.5 text-base text-ink-gray-5"
               >
                 {{ group.title }}
               </div>

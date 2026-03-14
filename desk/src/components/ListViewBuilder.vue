@@ -381,7 +381,7 @@ function getGroupedByRows(listRows, groupByField) {
       rows: filteredRows,
       icon: h(FeatherIcon, {
         name: "folder",
-        class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
+        class: "h-4 w-4 flex-shrink-0 text-ink-gray-5",
       }),
     };
     groupedRows.push(groupDetail);
@@ -456,7 +456,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   if (idx === 0) {
     return h("span", {
-      class: "truncate text-base text-ink-gray-6",
+      class: "truncate text-base text-ink-gray-5",
       textContent: item,
     });
   }

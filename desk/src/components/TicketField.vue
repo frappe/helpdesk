@@ -1,6 +1,6 @@
 <template>
   <div class="flex gap-2 px-5 pb-1 leading-5 first:mt-3 items-center">
-    <div class="w-[106px] shrink-0 truncate text-sm text-ink-gray-6">
+    <div class="w-[106px] shrink-0 truncate text-sm text-ink-gray-5">
       <Tooltip :text="field.label">
         <span>{{ field.label }}</span>
       </Tooltip>

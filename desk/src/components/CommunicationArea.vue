@@ -10,7 +10,7 @@
           label="Reply"
           :class="[
             showEmailBox
-              ? '!bg-surface-gray-4 hover:!bg-surface-gray-3  text-ink-gray-8 bg-transparent hover:bg-surface-gray-3 active:bg-surface-gray-4 focus-visible:ring focus-visible:ring-outline-gray-3'
+              ? '!bg-surface-gray-4 hover:!bg-surface-gray-4  text-ink-gray-8 bg-transparent hover:bg-surface-gray-4 active:bg-surface-gray-4 focus-visible:ring focus-visible:ring-outline-gray-3'
               : '',
           ]"
           @click="toggleEmailBox()"
@@ -24,7 +24,7 @@
           label="Comment"
           :class="[
             showCommentBox
-              ? '!bg-surface-gray-4 hover:!bg-surface-gray-3  text-ink-gray-8 bg-transparent hover:bg-surface-gray-3 active:bg-surface-gray-4 focus-visible:ring focus-visible:ring-outline-gray-3'
+              ? '!bg-surface-gray-4 hover:!bg-surface-gray-4  text-ink-gray-8 bg-transparent hover:bg-surface-gray-4 active:bg-surface-gray-4 focus-visible:ring focus-visible:ring-outline-gray-3'
               : '',
           ]"
           @click="toggleCommentBox()"

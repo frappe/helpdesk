@@ -9,7 +9,7 @@
             :label="teamName"
             size="md"
             @click="() => emit('update:step', 'team-list')"
-            class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
+            class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-4 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
           />
         </div>
       </div>
@@ -53,7 +53,7 @@
     <template #content>
       <div class="w-full h-full" v-if="teamMembers?.length > 0">
         <div
-          class="grid grid-cols-8 items-center gap-3 text-sm text-ink-gray-6"
+          class="grid grid-cols-8 items-center gap-3 text-sm text-ink-gray-5"
         >
           <div class="col-span-6 text-p-sm">
             {{ __("Members ({0})", teamMembers.length) }}
@@ -87,15 +87,15 @@
         class="flex flex-col items-center justify-center gap-4 h-full"
       >
         <div
-          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+          class="p-4 size-14.5 rounded-full bg-surface-gray-2 flex justify-center items-center"
         >
-          <UserIcon class="size-6 text-ink-gray-6" />
+          <UserIcon class="size-6 text-ink-gray-5" />
         </div>
         <div class="flex flex-col items-center gap-1">
-          <div class="text-base font-medium text-ink-gray-6">
+          <div class="text-base font-medium text-ink-gray-5">
             {{ __("No members found") }}
           </div>
-          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
+          <div class="text-p-sm text-ink-gray-4 max-w-60 text-center">
             {{ __("Add members to this team to get started.") }}
           </div>
         </div>
@@ -319,7 +319,7 @@ const options = [
               "div",
               {
                 class:
-                  "flex items-center gap-2 p-2 cursor-pointer hover:bg-surface-gray-3 rounded",
+                  "flex items-center gap-2 p-2 cursor-pointer hover:bg-surface-gray-4 rounded",
                 onClick: () =>
                   (ignoreRestrictions.value = !ignoreRestrictions.value),
               },

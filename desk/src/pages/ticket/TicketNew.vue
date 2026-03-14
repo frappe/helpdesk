@@ -47,7 +47,7 @@
                   ].description.trim()
                 "
               >
-                <lucide-circle-question-mark class="h-4 w-4 text-ink-gray-6" />
+                <lucide-circle-question-mark class="h-4 w-4 text-ink-gray-5" />
               </Tooltip>
             </template>
           </template>
@@ -77,7 +77,7 @@
         <div v-if="isCustomerPortal">
           <h4
             v-show="subject.length <= 2 && description.length === 0"
-            class="text-p-sm text-ink-gray-5 ml-1"
+            class="text-p-sm text-ink-gray-4 ml-1"
           >
             {{ __("Please enter a subject to continue") }}
           </h4>

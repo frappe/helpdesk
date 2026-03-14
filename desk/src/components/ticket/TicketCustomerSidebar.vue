@@ -36,10 +36,10 @@
         class="flex items-center text-base leading-5"
         v-for="field in ticketBasicInfo"
       >
-        <span class="w-[126px] text-sm text-ink-gray-6">{{ field.label }}</span>
+        <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
         <span
           class="text-base text-ink-gray-8 flex-1"
-          :class="!field.value && 'text-ink-gray-4'"
+          :class="!field.value && 'text-ink-gray-3'"
         >
           {{ field.value || "—" }}
         </span>
@@ -51,7 +51,7 @@
         :key="data.label"
         class="flex items-center text-base"
       >
-        <div class="w-[126px] text-ink-gray-6 text-sm">{{ data.title }}</div>
+        <div class="w-[126px] text-ink-gray-5 text-sm">{{ data.title }}</div>
         <div
           class="break-words text-base text-ink-gray-8 flex items-center gap-2"
         >
@@ -71,7 +71,7 @@
             "
           >
             <lucide-circle-question-mark
-              class="h-4 w-4 text-ink-gray-6 cursor-pointer"
+              class="h-4 w-4 text-ink-gray-5 cursor-pointer"
             />
           </Tooltip>
         </div>
@@ -80,7 +80,7 @@
     <!-- feedback component -->
     <TicketFeedback
       v-if="ticket.data.feedback_rating"
-      class="border-b text-base text-ink-gray-6"
+      class="border-b text-base text-ink-gray-5"
       :ticket="ticket.data"
     />
     <div class="flex flex-col gap-4 pt-0 px-5 py-3 overflow-y-scroll">
@@ -89,10 +89,10 @@
         v-for="field in ticketAdditionalInfo"
         :key="field.fieldname"
       >
-        <span class="w-[126px] text-sm text-ink-gray-6">{{ field.label }}</span>
+        <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
         <span
           class="text-base text-ink-gray-8 flex-1"
-          :class="!field.value && 'text-ink-gray-4'"
+          :class="!field.value && 'text-ink-gray-3'"
         >
           <template v-if="field.value && dayjs(field.value).isValid()">
             {{ dateFormat(field.value, dateTooltipFormat) }}

@@ -40,7 +40,7 @@
       <RouterLink
         v-for="n in notificationStore.data"
         :key="n.name"
-        class="flex cursor-pointer items-start gap-3.5 px-5 py-2.5 hover:bg-surface-gray-3"
+        class="flex cursor-pointer items-start gap-3.5 px-5 py-2.5 hover:bg-surface-gray-4"
         :to="getRoute(n)"
         @click="
           () => {
@@ -73,7 +73,7 @@
             </span>
           </div>
           <div class="flex items-center gap-2">
-            <div class="text-sm text-ink-gray-6">
+            <div class="text-sm text-ink-gray-5">
               {{ dayjs.tz(n.creation).fromNow() }}
             </div>
             <div v-if="!n.read" class="h-1.5 w-1.5 rounded-full bg-blue-400" />
@@ -82,7 +82,7 @@
       </RouterLink>
     </div>
     <div
-      class="p-5 text-center text-ink-gray-5 flex flex-col items-center justify-center gap-2 mt-20"
+      class="p-5 text-center text-ink-gray-4 flex flex-col items-center justify-center gap-2 mt-20"
       v-else
     >
       <LucideBell class="size-6" />

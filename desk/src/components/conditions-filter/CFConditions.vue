@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-lg border border-outline-gray-3 p-3 flex flex-col gap-4 w-full"
+    class="rounded-lg border border-outline-gray-2 p-3 flex flex-col gap-4 w-full"
   >
     <template v-for="(condition, i) in props.conditions" :key="condition.field">
       <CFCondition

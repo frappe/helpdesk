@@ -63,7 +63,7 @@
                     class="text-lg sm:text-xl !font-semibold text-ink-gray-8"
                     >{{ auth?.userName }}</span
                   >
-                  <span class="text-p-sm text-ink-gray-6">{{
+                  <span class="text-p-sm text-ink-gray-5">{{
                     auth?.user
                   }}</span>
                 </div>
@@ -120,7 +120,7 @@
             <span class="text-base font-medium text-ink-gray-8">
               {{ __("Password") }}
             </span>
-            <span class="text-p-sm text-ink-gray-6">{{
+            <span class="text-p-sm text-ink-gray-5">{{
               __("Change your account password for security.")
             }}</span>
           </div>
@@ -135,7 +135,7 @@
             <span class="text-base font-medium text-ink-gray-8">
               {{ __("Language") }}
             </span>
-            <span class="text-p-sm text-ink-gray-6">{{
+            <span class="text-p-sm text-ink-gray-5">{{
               __("Change language of the application.")
             }}</span>
           </div>
@@ -151,7 +151,7 @@
             <span class="text-base font-medium text-ink-gray-8">
               {{ __("Timezone") }}
             </span>
-            <span class="text-p-sm text-ink-gray-6">{{
+            <span class="text-p-sm text-ink-gray-5">{{
               __("Change timezone of the application.")
             }}</span>
           </div>

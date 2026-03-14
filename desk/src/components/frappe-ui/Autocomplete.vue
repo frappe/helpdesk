@@ -26,13 +26,13 @@
                 >
                   {{ displayValue(selectedValue) }}
                 </span>
-                <span class="text-base leading-5 text-ink-gray-5" v-else>
+                <span class="text-base leading-5 text-ink-gray-4" v-else>
                   {{ placeholder || "" }}
                 </span>
               </div>
               <FeatherIcon
                 name="chevron-down"
-                class="h-4 w-4 text-ink-gray-6"
+                class="h-4 w-4 text-ink-gray-5"
                 aria-hidden="true"
               />
             </button>
@@ -47,7 +47,7 @@
             <div class="relative px-1.5 pt-0.5">
               <ComboboxInput
                 ref="search"
-                class="form-input w-full focus:bg-surface-gray-3 hover:bg-surface-gray-4"
+                class="form-input w-full focus:bg-surface-gray-4 hover:bg-surface-gray-4"
                 type="text"
                 @change="
                   (e) => {
@@ -77,7 +77,7 @@
               >
                 <div
                   v-if="group.group && !group.hideLabel"
-                  class="px-2.5 py-1.5 text-sm font-medium text-ink-gray-5"
+                  class="px-2.5 py-1.5 text-sm font-medium text-ink-gray-4"
                 >
                   {{ group.group }}
                 </div>
@@ -91,7 +91,7 @@
                   <li
                     :class="[
                       'flex items-center rounded px-2.5 py-1.5 text-base',
-                      { 'bg-surface-gray-3': active },
+                      { 'bg-surface-gray-4': active },
                     ]"
                   >
                     <slot
@@ -109,7 +109,7 @@
               </div>
               <li
                 v-if="groups.length == 0"
-                class="mt-1.5 rounded-md px-2.5 py-1.5 text-base text-ink-gray-6"
+                class="mt-1.5 rounded-md px-2.5 py-1.5 text-base text-ink-gray-5"
               >
                 No results found
               </li>
@@ -248,7 +248,7 @@ watch(showOptions, (val) => {
 });
 
 const textColor = computed(() => {
-  return props.disabled ? "text-ink-gray-6" : "text-ink-gray-8";
+  return props.disabled ? "text-ink-gray-5" : "text-ink-gray-8";
 });
 
 const inputClasses = computed(() => {
@@ -269,13 +269,13 @@ const inputClasses = computed(() => {
   let variant = props.disabled ? "disabled" : props.variant;
   let variantClasses = {
     subtle:
-      "border border-outline-gray-1 bg-surface-gray-2 placeholder-ink-gray-5 hover:border-outline-gray-2 hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-5 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
+      "border border-outline-gray-1 bg-surface-gray-3 placeholder-ink-gray-5 hover:border-outline-gray-1 hover:bg-surface-gray-4 focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
     outline:
-      "border border-outline-gray-3 bg-surface-white placeholder-ink-gray-5 hover:border-outline-gray-4 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-5 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
+      "border border-outline-gray-2 bg-surface-white placeholder-ink-gray-5 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
     disabled: [
-      "border bg-surface-gray-2 placeholder-ink-gray-4",
+      "border bg-surface-gray-3 placeholder-ink-gray-4",
       props.variant === "outline"
-        ? "border-outline-gray-3"
+        ? "border-outline-gray-2"
         : "border-transparent",
     ],
   }[variant];

@@ -9,7 +9,7 @@
           <span class="text-base font-medium text-ink-gray-8">{{
             __("Make feedback mandatory")
           }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
+          <span class="text-p-sm text-ink-gray-5">{{
             __(
               "The feedback dialog will be shown, when a user tries to close a ticket from the customer portal."
             )
@@ -22,7 +22,7 @@
           <span class="text-base font-medium text-ink-gray-8">{{
             __("Enable comment reactions")
           }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
+          <span class="text-p-sm text-ink-gray-5">{{
             __("Allow users to react to comments with emojis")
           }}</span>
         </div>
@@ -34,7 +34,7 @@
             <span class="text-base font-medium text-ink-gray-8">{{
               __("Restrict tickets by team")
             }}</span>
-            <span class="text-p-sm text-ink-gray-6">{{
+            <span class="text-p-sm text-ink-gray-5">{{
               __(
                 "Restrict tickets to be viewed and managed by team members only."
               )
@@ -66,7 +66,7 @@
           <span class="text-base font-medium text-ink-gray-8">{{
             __("Disable global saved replies")
           }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
+          <span class="text-p-sm text-ink-gray-5">{{
             __(
               "Agents will no longer be able to view and create saved replies with global scope."
             )
@@ -79,7 +79,7 @@
           <span class="text-base font-medium text-ink-gray-8">{{
             __("Auto update status")
           }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
+          <span class="text-p-sm text-ink-gray-5">{{
             __(
               "The ticket status will automatically change whenever the agent respond to a ticket."
             )
@@ -108,7 +108,7 @@
           <span class="text-base font-medium text-ink-gray-8">{{
             __("Allow anyone to create tickets")
           }}</span>
-          <span class="text-p-sm text-ink-gray-6"
+          <span class="text-p-sm text-ink-gray-5"
             >{{
               __(
                 "Anyone will be able to create tickets without any permission. e.g. from webform."
@@ -128,7 +128,7 @@
           <span class="text-base font-medium text-ink-gray-8">{{
             __("Default ticket type")
           }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
+          <span class="text-p-sm text-ink-gray-5">{{
             __("Select what type all tickets get by default.")
           }}</span>
         </div>
@@ -144,7 +144,7 @@
           <span class="text-base font-medium text-ink-gray-8">{{
             __("Automatically close stale tickets")
           }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
+          <span class="text-p-sm text-ink-gray-5">{{
             __(
               "Auto-close tickets that remain in a status for the specified number of days."
             )
@@ -198,7 +198,7 @@
               <span class="text-base font-medium text-ink-gray-8">{{
                 __("Outside working hours notice")
               }}</span>
-              <span class="text-p-sm text-ink-gray-6"
+              <span class="text-p-sm text-ink-gray-5"
                 >{{
                   __(
                     "Display a customizable banner message when customers raise tickets outside your working hours."

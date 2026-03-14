@@ -1,6 +1,6 @@
 <template>
   <div v-if="typingUsers.length > 0" class="pl-2">
-    <div class="flex items-center gap-2 text-sm text-ink-gray-6">
+    <div class="flex items-center gap-2 text-sm text-ink-gray-5">
       <div class="flex items-center gap-1.5">
         <component :is="typingMessage" />
         <div class="typing-dots">
@@ -39,30 +39,30 @@ const typingMessage = computed(() => {
   if (count === 1) {
     return h("div", { class: "flex items-center gap-1" }, [
       h(UserAvatar, { name: typingUsers[0], size: "sm" }),
-      h("span", { class: "text-ink-gray-6 font-medium" }, firstUser),
-      h("span", { class: "text-ink-gray-5" }, " is typing"),
+      h("span", { class: "text-ink-gray-5 font-medium" }, firstUser),
+      h("span", { class: "text-ink-gray-4" }, " is typing"),
     ]);
   } else if (count === 2) {
     return h("div", { class: "flex items-center gap-1" }, [
-      h("span", { class: "text-ink-gray-6 font-medium" }, firstUser),
-      h("span", { class: "text-ink-gray-5" }, " and "),
+      h("span", { class: "text-ink-gray-5 font-medium" }, firstUser),
+      h("span", { class: "text-ink-gray-4" }, " and "),
       h(
         "span",
-        { class: "text-ink-gray-6 font-medium" },
+        { class: "text-ink-gray-5 font-medium" },
         getUser(typingUsers[1])?.full_name
       ),
-      h("span", { class: "text-ink-gray-5" }, " are typing"),
+      h("span", { class: "text-ink-gray-4" }, " are typing"),
     ]);
   } else {
     return h("div", { class: "flex items-center gap-1" }, [
-      h("span", { class: "text-ink-gray-6 font-medium" }, firstUser),
-      h("span", { class: "text-ink-gray-5" }, " and "),
+      h("span", { class: "text-ink-gray-5 font-medium" }, firstUser),
+      h("span", { class: "text-ink-gray-4" }, " and "),
       h(
         "span",
-        { class: "text-ink-gray-6 font-medium" },
+        { class: "text-ink-gray-5 font-medium" },
         `${count - 1} others`
       ),
-      h("span", { class: "text-ink-gray-5" }, " are typing"),
+      h("span", { class: "text-ink-gray-4" }, " are typing"),
     ]);
   }
 });

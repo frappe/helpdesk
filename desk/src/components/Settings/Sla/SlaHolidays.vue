@@ -4,7 +4,7 @@
       <div class="text-lg font-semibold text-ink-gray-8">
         {{ __("Work schedule and holidays") }}
       </div>
-      <div class="text-p-sm text-ink-gray-6 max-w-lg">
+      <div class="text-p-sm text-ink-gray-5 max-w-lg">
         {{
           __(
             "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one"
@@ -28,7 +28,7 @@
             <div
               v-for="holiday in holidayListData.data"
               :key="holiday.name"
-              class="flex items-center justify-between gap-4 rounded px-2 py-1.5 text-base text-ink-gray-8 cursor-pointer hover:bg-surface-gray-3"
+              class="flex items-center justify-between gap-4 rounded px-2 py-1.5 text-base text-ink-gray-8 cursor-pointer hover:bg-surface-gray-4"
               @click="slaData.holiday_list = holiday.name"
             >
               <div class="flex items-center gap-2 w-full">
@@ -52,7 +52,7 @@
             class="mt-1.5 flex flex-col gap-1 border-t border-outline-gray-modals pt-1.5 p-1"
           >
             <Button
-              class="w-full !justify-start !text-ink-gray-5"
+              class="w-full !justify-start !text-ink-gray-4"
               variant="ghost"
               :label="__('Create new business holiday')"
               @click="createNewHolidayList()"

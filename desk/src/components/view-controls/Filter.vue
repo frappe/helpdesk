@@ -41,7 +41,7 @@
           >
             <div v-if="isMobileView" class="flex flex-col gap-2">
               <div class="-mb-2 flex w-full items-center justify-between">
-                <div class="text-base text-ink-gray-6">
+                <div class="text-base text-ink-gray-5">
                   {{ i == 0 ? "Where" : "And" }}
                 </div>
                 <Button
@@ -80,7 +80,7 @@
             </div>
             <div v-else class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2 flex-1">
-                <div class="w-13 pl-2 text-end text-base text-ink-gray-6">
+                <div class="w-13 pl-2 text-end text-base text-ink-gray-5">
                   {{ i == 0 ? "Where" : "And" }}
                 </div>
                 <div id="fieldname" class="!min-w-[140px]">
@@ -122,7 +122,7 @@
           </div>
           <div
             v-else
-            class="mb-3 flex h-7 items-center px-3 text-sm text-ink-gray-6"
+            class="mb-3 flex h-7 items-center px-3 text-sm text-ink-gray-5"
           >
             {{ "Empty - Choose a field to filter by" }}
           </div>
@@ -134,7 +134,7 @@
             >
               <template #target="{ togglePopover }">
                 <Button
-                  class="!text-ink-gray-6"
+                  class="!text-ink-gray-5"
                   variant="ghost"
                   @click="togglePopover()"
                   :label="'Add Filter'"
@@ -147,7 +147,7 @@
             </Autocomplete>
             <Button
               v-if="filters?.size"
-              class="!text-ink-gray-6"
+              class="!text-ink-gray-5"
               variant="ghost"
               :label="'Clear all Filter'"
               @click="clearfilter(close)"

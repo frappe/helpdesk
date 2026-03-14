@@ -6,7 +6,7 @@
         class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 rounded"
       >
         <div class="flex items-center justify-between">
-          <span :class="{ 'text-ink-gray-6': !modelValue || disabled }">
+          <span :class="{ 'text-ink-gray-5': !modelValue || disabled }">
             {{ formattedValue }}
           </span>
         </div>
@@ -17,7 +17,7 @@
       <div class="absolute bg-surface-white top-2">
         <!-- Built-in Duration Picker -->
         <div
-          class="flex gap-2 border border-outline-gray-3 rounded w-fit min-w-max px-4 select-none shadow-sm"
+          class="flex gap-2 border border-outline-gray-2 rounded w-fit min-w-max px-4 select-none shadow-sm"
         >
           <!-- Hours -->
           <div
@@ -39,19 +39,19 @@
               >
                 <button
                   @click="increment('hours')"
-                  class="hover:bg-surface-gray-3 rounded-sm select-none px-1 py-0.5 text-xs"
+                  class="hover:bg-surface-gray-4 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
                   <FeatherIcon name="chevron-up" class="size-3.5" />
                 </button>
                 <button
                   @click="decrement('hours')"
-                  class="hover:bg-surface-gray-3 rounded-sm select-none px-1 py-0.5 text-xs"
+                  class="hover:bg-surface-gray-4 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
                   <FeatherIcon name="chevron-down" class="size-3.5" />
                 </button>
               </div>
             </div>
-            <div class="text-xs text-ink-gray-6 mt-1">Hrs</div>
+            <div class="text-xs text-ink-gray-5 mt-1">Hrs</div>
           </div>
 
           <!-- Minutes -->
@@ -74,19 +74,19 @@
               >
                 <button
                   @click="increment('minutes')"
-                  class="hover:bg-surface-gray-3 rounded-sm select-none px-1 py-0.5 text-xs"
+                  class="hover:bg-surface-gray-4 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
                   <FeatherIcon name="chevron-up" class="size-3.5" />
                 </button>
                 <button
                   @click="decrement('minutes')"
-                  class="hover:bg-surface-gray-3 rounded-sm select-none px-1 py-0.5 text-xs"
+                  class="hover:bg-surface-gray-4 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
                   <FeatherIcon name="chevron-down" class="size-3.5" />
                 </button>
               </div>
             </div>
-            <div class="text-xs text-ink-gray-6 mt-1">Min</div>
+            <div class="text-xs text-ink-gray-5 mt-1">Min</div>
           </div>
 
           <!-- Seconds -->
@@ -108,19 +108,19 @@
               >
                 <button
                   @click="increment('seconds')"
-                  class="hover:bg-surface-gray-3 rounded-sm select-none px-1 py-0.5 text-xs"
+                  class="hover:bg-surface-gray-4 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
                   <FeatherIcon name="chevron-up" class="size-3.5" />
                 </button>
                 <button
                   @click="decrement('seconds')"
-                  class="hover:bg-surface-gray-3 rounded-sm select-none px-1 py-0.5 text-xs"
+                  class="hover:bg-surface-gray-4 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
                   <FeatherIcon name="chevron-down" class="size-3.5" />
                 </button>
               </div>
             </div>
-            <div class="text-xs text-ink-gray-6 mt-1">Sec</div>
+            <div class="text-xs text-ink-gray-5 mt-1">Sec</div>
           </div>
         </div>
       </div>

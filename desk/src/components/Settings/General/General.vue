@@ -48,7 +48,7 @@
               <span class="text-base font-medium text-ink-gray-8">{{
                 __("Disable signup")
               }}</span>
-              <span class="text-p-sm text-ink-gray-6">{{
+              <span class="text-p-sm text-ink-gray-5">{{
                 __(
                   "New users will have to be manually registered by system managers."
                 )

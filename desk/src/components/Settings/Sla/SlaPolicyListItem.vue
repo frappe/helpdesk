@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-6 items-center gap-4 cursor-pointer hover:bg-surface-gray-2 rounded"
+    class="grid grid-cols-6 items-center gap-4 cursor-pointer hover:bg-surface-gray-3 rounded"
   >
     <div
       @click="slaActiveScreen = { screen: 'view', data: data, fetchData: true }"
@@ -14,7 +14,7 @@
       </div>
       <div
         v-if="data.description && data.description.length > 0"
-        class="text-sm w-full text-ink-gray-5 mt-1 truncate"
+        class="text-sm w-full text-ink-gray-4 mt-1 truncate"
       >
         {{ data.description }}
       </div>

@@ -15,7 +15,7 @@
           class="w-full px-6 md:px-10 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
-            class="relative flex justify-center after:absolute after:left-[50%] after:top-2 after:-z-10 after:border-l after:border-outline-gray-2"
+            class="relative flex justify-center after:absolute after:left-[50%] after:top-2 after:-z-10 after:border-l after:border-outline-gray-1"
             :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
           >
             <div
@@ -31,7 +31,7 @@
               />
               <CommentIcon
                 v-else-if="activity.type === 'comment'"
-                class="text-ink-gray-6 absolute left-[7.5px]"
+                class="text-ink-gray-5 absolute left-[7.5px]"
               />
               <FeatherIcon
                 v-else-if="activity.type === 'call'"
@@ -40,9 +40,9 @@
                     ? 'phone-incoming'
                     : 'phone-outgoing'
                 "
-                class="text-ink-gray-6 absolute left-[7.5px] size-4"
+                class="text-ink-gray-5 absolute left-[7.5px] size-4"
               />
-              <DotIcon v-else class="text-ink-gray-6 absolute left-[7.5px]" />
+              <DotIcon v-else class="text-ink-gray-5 absolute left-[7.5px]" />
             </div>
           </div>
           <div
@@ -78,7 +78,7 @@
     </div>
     <div
       v-else
-      class="h-full flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-5"
+      class="h-full flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-4"
     >
       <component :is="emptyTextIcon" class="h-10 w-10" />
       <span>{{ emptyText }}</span>
@@ -184,7 +184,7 @@ const emptyTextIcon = computed(() => {
   } else if (props.title == "Calls") {
     icon = PhoneIcon;
   }
-  return h(icon, { class: "text-ink-gray-5" });
+  return h(icon, { class: "text-ink-gray-4" });
 });
 
 function scrollToLatestActivity() {

@@ -2,11 +2,11 @@
   <div class="flex items-center -ml-0.5">
     <router-link
       :to="{ name: routeName }"
-      class="px-0.5 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
+      class="px-0.5 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-4 hover:text-ink-gray-7 flex items-center justify-center"
     >
       {{ isMobileView ? "..." : label }}
     </router-link>
-    <span class="mx-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
+    <span class="mx-0.5 text-base text-ink-gray-3" aria-hidden="true"> / </span>
     <Dropdown :options="options">
       <template #default="{ open }">
         <Button
@@ -30,7 +30,7 @@
       </template>
       <template #item="{ item }">
         <button
-          class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base hover:bg-surface-gray-3"
+          class="group flex text-ink-gray-5 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base hover:bg-surface-gray-4"
           @click="item.onClick"
         >
           <div class="flex items-center">

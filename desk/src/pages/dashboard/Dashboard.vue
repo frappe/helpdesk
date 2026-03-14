@@ -22,13 +22,13 @@
         >
           <template #default>
             <div
-              class="flex justify-between !w-48 items-center border border-outline-gray-2 rounded text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
+              class="flex justify-between !w-48 items-center border border-outline-gray-1 rounded text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-2 hover:shadow-sm focus:border-outline-gray-3 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
             >
               <div class="flex items-center">
-                <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
+                <LucideCalendar class="size-4 text-ink-gray-4 mr-2" />
                 <span class="text-base">{{ preset }}</span>
               </div>
-              <LucideChevronDown class="size-4 text-ink-gray-5" />
+              <LucideChevronDown class="size-4 text-ink-gray-4" />
             </div>
           </template>
         </Dropdown>
@@ -48,7 +48,7 @@
           :formatter="formatRange"
         >
           <template #prefix>
-            <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
+            <LucideCalendar class="size-4 text-ink-gray-4 mr-2" />
           </template>
         </DateRangePicker>
         <Link
@@ -61,7 +61,7 @@
           :hide-me="true"
         >
           <template #prefix>
-            <LucideUsers class="size-4 text-ink-gray-5 mr-2" />
+            <LucideUsers class="size-4 text-ink-gray-4 mr-2" />
           </template>
         </Link>
         <Link
@@ -75,7 +75,7 @@
           :hide-me="true"
         >
           <template #prefix>
-            <LucideUser class="size-4 text-ink-gray-5 mr-2" />
+            <LucideUser class="size-4 text-ink-gray-4 mr-2" />
           </template>
         </Link>
       </div>
@@ -400,7 +400,7 @@ usePageMeta(() => {
 
 <style scoped>
 :deep(.form-control button) {
-  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
+  @apply text-base rounded h-7 py-1.5 border border-outline-gray-1 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-2 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-3 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
 }
 :deep(.form-control button > div) {
   overflow: hidden;

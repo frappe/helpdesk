@@ -13,11 +13,11 @@
         <div class="leading-tight">
           <p>{{ sender.full_name || "Guest" }}</p>
           <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-            <p class="text-xs md:text-sm text-ink-gray-6">
+            <p class="text-xs md:text-sm text-ink-gray-5">
               {{ timeAgo(creation) }}
             </p>
           </Tooltip>
-          <p class="sm:flex hidden text-sm text-ink-gray-6" v-if="sender.name">
+          <p class="sm:flex hidden text-sm text-ink-gray-5" v-if="sender.name">
             {{ "<" + sender.name + ">" }}
           </p>
         </div>
@@ -26,7 +26,7 @@
       <div v-else class="flex items-center gap-1">
         <span>{{ sender.full_name || "Guest" }}</span>
         <span
-          class="sm:flex hidden text-sm text-ink-gray-6"
+          class="sm:flex hidden text-sm text-ink-gray-5"
           v-if="sender.name"
           >{{ "<" + sender.name + ">" }}</span
         >
@@ -44,7 +44,7 @@
           :text="dateFormat(creation, dateTooltipFormat)"
           v-if="!isMobileView"
         >
-          <p class="text-xs md:text-sm text-ink-gray-6">
+          <p class="text-xs md:text-sm text-ink-gray-5">
             {{ timeAgo(creation) }}
           </p>
         </Tooltip>
@@ -67,25 +67,25 @@
         >
           <Button
             icon="more-horizontal"
-            class="text-ink-gray-6"
+            class="text-ink-gray-5"
             variant="ghost"
           />
         </Dropdown>
       </div>
     </div>
-    <!-- <div class="text-sm leading-5 text-ink-gray-6">
+    <!-- <div class="text-sm leading-5 text-ink-gray-5">
       {{ subject }}
     </div> -->
-    <div class="text-sm leading-5 text-ink-gray-6">
-      <span v-if="to" class="text-2xs mr-1 font-bold text-ink-gray-5">TO:</span>
+    <div class="text-sm leading-5 text-ink-gray-5">
+      <span v-if="to" class="text-2xs mr-1 font-bold text-ink-gray-4">TO:</span>
       <span v-if="to"> {{ to }} </span>
       <span v-if="cc">, </span>
-      <span v-if="cc" class="text-2xs mr-1 font-bold text-ink-gray-5">
+      <span v-if="cc" class="text-2xs mr-1 font-bold text-ink-gray-4">
         CC:
       </span>
       <span v-if="cc">{{ cc }}</span>
       <span v-if="bcc">, </span>
-      <span v-if="bcc" class="text-2xs mr-1 font-bold text-ink-gray-5">
+      <span v-if="bcc" class="text-2xs mr-1 font-bold text-ink-gray-4">
         BCC:
       </span>
       <span v-if="bcc">{{ bcc }}</span>

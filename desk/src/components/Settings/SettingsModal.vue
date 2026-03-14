@@ -7,7 +7,7 @@
     <template #body>
       <div class="flex z-50" :style="{ height: 'calc(100vh - 8rem)' }">
         <div
-          class="flex w-52 shrink-0 flex-col bg-surface-gray-2 p-2 overflow-y-auto hide-scrollbar"
+          class="flex w-52 shrink-0 flex-col bg-surface-gray-3 p-2 overflow-y-auto hide-scrollbar"
         >
           <h1 class="px-2 pt-2 text-lg font-semibold mb-2">
             {{ __("Settings") }}
@@ -15,7 +15,7 @@
           <div v-for="tab in tabs">
             <div
               v-if="!tab.hideLabel"
-              class="mb-2 mt-3 flex gap-1.5 px-1 text-base font-medium text-ink-gray-5"
+              class="mb-2 mt-3 flex gap-1.5 px-1 text-base font-medium text-ink-gray-4"
             >
               <span>{{ __(tab.label) }}</span>
             </div>
@@ -27,7 +27,7 @@
                 :class="[
                   activeTab?.label == item.label
                     ? 'bg-surface-white shadow-sm'
-                    : 'hover:bg-surface-gray-3',
+                    : 'hover:bg-surface-gray-4',
                 ]"
                 @click="() => onTabChange(item)"
               >

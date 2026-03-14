@@ -34,7 +34,7 @@
           </Button>
         </form>
         <div
-          class="flex max-h-[300px] min-h-[100px] flex-col overflow-y-auto rounded border bg-surface-gray-3 px-2"
+          class="flex max-h-[300px] min-h-[100px] flex-col overflow-y-auto rounded border bg-surface-gray-4 px-2"
           v-if="inviteQueue.length"
         >
           <ul class="flex flex-wrap gap-2 py-2">

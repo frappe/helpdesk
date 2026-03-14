@@ -9,7 +9,7 @@
             maxLength="50"
           >
             <template #prefix>
-              <LockKeyhole class="size-4 text-ink-gray-4" />
+              <LockKeyhole class="size-4 text-ink-gray-3" />
             </template>
           </Password>
         </div>
@@ -20,7 +20,7 @@
             maxLength="50"
           >
             <template #prefix>
-              <LockKeyhole class="size-4 text-ink-gray-4" />
+              <LockKeyhole class="size-4 text-ink-gray-3" />
             </template>
           </Password>
         </div>
@@ -31,7 +31,7 @@
         <div>
           <p
             v-if="confirmPasswordMessage"
-            class="text-sm text-ink-gray-5"
+            class="text-sm text-ink-gray-4"
             :class="
               confirmPasswordMessage === __('Passwords match')
                 ? 'text-ink-green-3'

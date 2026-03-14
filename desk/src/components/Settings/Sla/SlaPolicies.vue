@@ -6,7 +6,7 @@
       </h1>
     </template>
     <template #description>
-      <p class="text-p-sm max-w-md text-ink-gray-6">
+      <p class="text-p-sm max-w-md text-ink-gray-5">
         {{
           __(
             "SLAs align your team and customers with defined timelines for a reliable experience."
@@ -39,7 +39,7 @@
           @input="slaSearchQuery = $event"
           :placeholder="__('Search')"
           type="text"
-          class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-2"
+          class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-1"
           icon-left="search"
           debounce="300"
           inputClass="p-4 pr-12"

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-gray-3 hover:bg-surface-gray-4"
+    class="flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-gray-4 hover:bg-surface-gray-4"
     :class="{ 'ring-2 ring-blue-500': selected }"
   >
     <img v-if="logoValue" :src="logoValue" class="size-4.5" />

@@ -8,7 +8,7 @@
           :label="slaData.service_level || __('New SLA Policy')"
           size="md"
           @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-4 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
         />
         <Badge
           :variant="'subtle'"
@@ -80,7 +80,7 @@
             <span class="text-lg font-semibold text-ink-gray-8">{{
               __("Assignment conditions")
             }}</span>
-            <span class="text-p-sm text-ink-gray-6">
+            <span class="text-p-sm text-ink-gray-5">
               {{ __("Choose which tickets are affected by this policy.") }}
             </span>
           </div>
@@ -90,7 +90,7 @@
                 :label="__('Set as default SLA')"
                 :model-value="slaData.default_sla"
                 @update:model-value="toggleDefaultSla"
-                class="text-ink-gray-6 text-base font-medium"
+                class="text-ink-gray-5 text-base font-medium"
               />
               <div
                 v-if="isOldSla && slaActiveScreen.data && !slaData.default_sla"
@@ -98,7 +98,7 @@
                 <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
                   <template #target>
                     <div
-                      class="text-sm text-ink-gray-6 flex gap-1 cursor-default"
+                      class="text-sm text-ink-gray-5 flex gap-1 cursor-default"
                     >
                       {{ __("Old Conditions") }}
                       <FeatherIcon name="info" class="size-4" />
@@ -106,7 +106,7 @@
                   </template>
                   <template #body-main>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-5 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ slaData.condition }}</code>
                     </div>
@@ -116,7 +116,7 @@
             </div>
             <div class="mt-5" v-if="!slaData.default_sla">
               <div
-                class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-3 rounded-md p-3 py-4"
+                class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-2 rounded-md p-3 py-4"
                 v-if="!useNewUI"
               >
                 <span class="text-p-sm">
@@ -146,7 +146,7 @@
             <span class="text-lg font-semibold text-ink-gray-8">
               {{ __("Valid from") }}
             </span>
-            <span class="text-p-sm text-ink-gray-6">
+            <span class="text-p-sm text-ink-gray-5">
               {{ __("Choose how long this SLA policy will be active.") }}
             </span>
           </div>
@@ -193,7 +193,7 @@
             <span class="text-lg font-semibold text-ink-gray-8">
               {{ __("Response and resolution") }}
             </span>
-            <span class="text-p-sm text-ink-gray-6">
+            <span class="text-p-sm text-ink-gray-5">
               {{
                 __(
                   "Add time targets around support milestones like first reply and resolution times"
@@ -212,7 +212,7 @@
               :checked="!slaData.apply_sla_for_resolution"
               type="radio"
             />
-            <div class="select-none text-ink-gray-6 text-sm font-medium">
+            <div class="select-none text-ink-gray-5 text-sm font-medium">
               Apply SLA for response time
             </div>
           </div>
@@ -225,7 +225,7 @@
               :checked="slaData.apply_sla_for_resolution"
               type="radio"
             />
-            <div class="select-none text-ink-gray-6 text-sm font-medium">
+            <div class="select-none text-ink-gray-5 text-sm font-medium">
               Apply SLA for response time and resolution time
             </div>
           </div>
@@ -241,7 +241,7 @@
             <span class="text-lg font-semibold text-ink-gray-8">
               {{ __("Status details") }}
             </span>
-            <span class="text-p-sm text-ink-gray-6">
+            <span class="text-p-sm text-ink-gray-5">
               {{
                 __(
                   "Set the default status assigned when a ticket is created, and the status to apply when a ticket is reopened. If not specified, the default status from HD Settings will be used."

@@ -26,7 +26,7 @@
     <RouterLink
       v-for="n in notificationStore.data"
       :key="n.name"
-      class="flex cursor-pointer items-start gap-3.5 px-5 py-2.5 hover:bg-surface-gray-3"
+      class="flex cursor-pointer items-start gap-3.5 px-5 py-2.5 hover:bg-surface-gray-4"
       :to="getRoute(n)"
       @click="
         () => {
@@ -54,7 +54,7 @@
           </span>
         </div>
         <div class="flex items-center gap-2">
-          <div class="text-sm text-ink-gray-6">
+          <div class="text-sm text-ink-gray-5">
             {{ dayjs.tz(n.creation).fromNow() }}
           </div>
           <div v-if="!n.read" class="h-1.5 w-1.5 rounded-full bg-blue-400" />
@@ -63,8 +63,8 @@
     </RouterLink>
   </div>
   <div v-else class="flex flex-1 flex-col items-center gap-2">
-    <LucideBell class="h-20 w-20 text-ink-gray-3" />
-    <div class="text-lg font-medium text-ink-gray-5">
+    <LucideBell class="h-20 w-20 text-ink-gray-2" />
+    <div class="text-lg font-medium text-ink-gray-4">
       {{ __("No new notifications") }}
     </div>
   </div>

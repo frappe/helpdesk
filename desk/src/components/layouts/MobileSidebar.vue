@@ -11,7 +11,7 @@
         leave-to="-translate-x-full"
       >
         <div
-          class="relative z-10 flex h-full w-[230px] flex-col border-r bg-surface-gray-2 transition-all duration-300 ease-in-out"
+          class="relative z-10 flex h-full w-[230px] flex-col border-r bg-surface-gray-3 transition-all duration-300 ease-in-out"
         >
           <!-- user dropwdown -->
           <div class="p-1">
@@ -62,7 +62,7 @@
               <template #header="{ opened, hide, toggle }">
                 <div
                   v-if="!hide"
-                  class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+                  class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-4 transition-all duration-300 ease-in-out"
                   :class="'ml-2 mt-4 h-7 w-auto opacity-100'"
                   @click="toggle()"
                 >

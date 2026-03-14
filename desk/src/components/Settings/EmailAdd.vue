@@ -129,7 +129,7 @@
                     :name="field.name"
                     :type="field.type"
                   />
-                  <p class="text-ink-gray-5 text-p-sm">
+                  <p class="text-ink-gray-4 text-p-sm">
                     {{ field.description }}
                   </p>
                 </div>

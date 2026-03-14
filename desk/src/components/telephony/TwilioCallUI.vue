@@ -2,7 +2,7 @@
   <div v-show="showCallPopup" v-bind="$attrs">
     <div
       ref="callPopup"
-      class="fixed z-20 flex w-60 cursor-move select-none flex-col rounded-lg bg-surface-gray-7 p-4 !text-ink-gray-2 shadow-2xl"
+      class="fixed z-20 flex w-60 cursor-move select-none flex-col rounded-lg bg-surface-gray-5 p-4 !text-ink-gray-1 shadow-2xl"
       :style="style"
     >
       <div class="flex flex-row-reverse items-center gap-1">
@@ -22,7 +22,7 @@
           <div class="text-xl font-medium">
             {{ contact?.full_name ?? "Unknown" }}
           </div>
-          <div class="text-sm text-ink-gray-5">
+          <div class="text-sm text-ink-gray-4">
             {{ contact?.mobile_no || contact?.phone }}
           </div>
         </div>
@@ -49,7 +49,7 @@
             @click="toggleMute"
           />
           <Button
-            class="rounded-full bg-surface-red-5 hover:bg-surface-red-6"
+            class="rounded-full bg-surface-red-5 hover:bg-surface-red-4"
             @click="hangUpCall"
           >
             <template #icon>
@@ -102,7 +102,7 @@
   </div>
   <div
     v-show="showSmallCallWindow"
-    class="ml-2 mt-1 flex cursor-pointer select-none items-center justify-between gap-3 rounded-lg bg-surface-gray-7 px-2 py-1 text-base !text-ink-gray-2"
+    class="ml-2 mt-1 flex cursor-pointer select-none items-center justify-between gap-3 rounded-lg bg-surface-gray-5 px-2 py-1 text-base !text-ink-gray-1"
     @click="toggleCallWindow"
     v-bind="$attrs"
   >

@@ -8,7 +8,7 @@
           :label="holidayData?.holiday_list_name || __('New Business Holiday')"
           size="md"
           @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-4 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
         />
         <Badge
           variant="subtle"
@@ -77,7 +77,7 @@
             <span class="text-lg font-semibold text-ink-gray-8">{{
               __("Valid from")
             }}</span>
-            <span class="text-p-sm text-ink-gray-6">
+            <span class="text-p-sm text-ink-gray-5">
               {{ __("Choose the duration of this holiday list.") }}
             </span>
           </div>
@@ -130,7 +130,7 @@
             <div class="text-lg font-semibold text-ink-gray-8">
               {{ __("Recurring holidays") }}
             </div>
-            <div class="text-p-sm text-ink-gray-6">
+            <div class="text-p-sm text-ink-gray-5">
               {{ __("Add recurring holidays such as weekends.") }}
             </div>
           </div>
@@ -148,7 +148,7 @@
               <span class="text-lg font-semibold text-ink-gray-8">
                 {{ __("Holidays") }}
               </span>
-              <div class="text-p-sm text-ink-gray-6">
+              <div class="text-p-sm text-ink-gray-5">
                 {{
                   __(
                     "Add holidays here to make sure they’re excluded from SLA calculations."
@@ -185,13 +185,13 @@
             <div class="flex gap-4" v-if="holidayListView === 'calendar'">
               <div class="gap-1 flex items-center">
                 <span class="bg-yellow-100 size-4 rounded-sm" />
-                <span class="text-sm text-ink-gray-6">{{
+                <span class="text-sm text-ink-gray-5">{{
                   __("Holidays")
                 }}</span>
               </div>
               <div class="gap-1 flex items-center">
-                <span class="bg-surface-gray-3 size-4 rounded-sm" />
-                <span class="text-sm text-ink-gray-6">{{
+                <span class="bg-surface-gray-4 size-4 rounded-sm" />
+                <span class="text-sm text-ink-gray-5">{{
                   __("Recurring holidays")
                 }}</span>
               </div>

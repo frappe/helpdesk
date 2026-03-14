@@ -37,7 +37,7 @@
               }}
             </span>
           </template>
-          <span v-else class="text-ink-gray-6">{{ placeholder }}</span>
+          <span v-else class="text-ink-gray-5">{{ placeholder }}</span>
         </div>
         <template #suffix>
           <LucideChevronDown
@@ -55,13 +55,13 @@
       <!-- Header -->
       <div class="py-1.5 px-1.5">
         <div
-          class="flex h-7 items-center text-sm font-medium text-ink-gray-6 justify-between"
+          class="flex h-7 items-center text-sm font-medium text-ink-gray-5 justify-between"
         >
           <input
             ref="inputRef"
             v-model="filterText"
             :placeholder="label"
-            class="px-2 flex-1 bg-transparent border-none outline-none text-sm focus:border-none focus:ring-0 text-ink-gray-6 placeholder-ink-gray-4"
+            class="px-2 flex-1 bg-transparent border-none outline-none text-sm focus:border-none focus:ring-0 text-ink-gray-5 placeholder-ink-gray-4"
             @click.stop
             @keydown="handleInputKeydown"
           />
@@ -85,8 +85,8 @@
           <button
             v-for="option in filteredIndividualOptions"
             :key="`individual-${option.value}`"
-            class="group flex h-7 w-full items-center rounded px-2 text-base hover:bg-surface-gray-3 text-ink-gray-6"
-            :class="{ 'bg-surface-gray-2': isHighlighted(option) }"
+            class="group flex h-7 w-full items-center rounded px-2 text-base hover:bg-surface-gray-4 text-ink-gray-5"
+            :class="{ 'bg-surface-gray-3': isHighlighted(option) }"
             @click="toggleOption(option)"
           >
             <Checkbox
@@ -110,7 +110,7 @@
 
             <span
               v-if="(option.count ?? 0) > 0"
-              class="text-xs text-ink-gray-5 ml-auto"
+              class="text-xs text-ink-gray-4 ml-auto"
             >
               {{ option.count }}
             </span>
@@ -121,7 +121,7 @@
         <div v-for="group in filteredGroups" :key="`group-${group.group}`">
           <!-- Group Header -->
           <div
-            class="flex h-7 pt-1.5 sticky top-0 bg-surface-white items-center px-2 text-sm font-medium text-ink-gray-6"
+            class="flex h-7 pt-1.5 sticky top-0 bg-surface-white items-center px-2 text-sm font-medium text-ink-gray-5"
           >
             {{ group.group }}
           </div>
@@ -130,8 +130,8 @@
           <button
             v-for="option in group.items"
             :key="`grouped-${option.value}`"
-            class="group flex h-7 w-full items-center rounded px-2 text-base hover:bg-surface-gray-3 text-ink-gray-6"
-            :class="{ 'bg-surface-gray-2': isHighlighted(option) }"
+            class="group flex h-7 w-full items-center rounded px-2 text-base hover:bg-surface-gray-4 text-ink-gray-5"
+            :class="{ 'bg-surface-gray-3': isHighlighted(option) }"
             @click="toggleOption(option)"
           >
             <Checkbox
@@ -161,7 +161,7 @@
 
             <span
               v-if="(option.count ?? 0) > 0"
-              class="text-xs text-ink-gray-5 ml-auto"
+              class="text-xs text-ink-gray-4 ml-auto"
             >
               {{ option.count }}
             </span>
@@ -171,7 +171,7 @@
         <!-- No options message -->
         <div
           v-if="filteredOptions.length === 0"
-          class="px-2 py-4 text-center text-sm text-ink-gray-5"
+          class="px-2 py-4 text-center text-sm text-ink-gray-4"
         >
           No options found
         </div>

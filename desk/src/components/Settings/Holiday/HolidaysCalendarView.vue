@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6.5 px-5 rounded-xl border border-outline-gray-3">
+  <div class="p-6.5 px-5 rounded-xl border border-outline-gray-2">
     <div class="mb-6.5 flex justify-between items-center">
       <div class="ml-1">
         <Popover v-if="startYear !== endYear">
@@ -19,7 +19,7 @@
                   v-for="year in yearsList"
                   :key="year"
                   ref="yearItems"
-                  class="cursor-pointer px-3 py-1.5 text-sm hover:bg-surface-gray-3 flex items-center justify-between"
+                  class="cursor-pointer px-3 py-1.5 text-sm hover:bg-surface-gray-4 flex items-center justify-between"
                   @click="onYearChange(togglePopover, year)"
                 >
                   {{ year }}

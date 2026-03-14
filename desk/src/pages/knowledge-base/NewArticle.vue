@@ -36,7 +36,7 @@
         </div>
         <!-- Title -->
         <textarea
-          class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-outline-gray-2 focus:ring-0 focus:border-outline-gray-2"
+          class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-outline-gray-1 focus:ring-0 focus:border-outline-gray-1"
           v-model="title"
           :placeholder="__('Title')"
           rows="1"

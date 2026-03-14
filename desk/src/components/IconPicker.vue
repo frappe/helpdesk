@@ -53,7 +53,7 @@
             </div>
             <div class="grid w-96 grid-cols-12 place-items-center">
               <button
-                class="h-8 w-8 rounded-md p-1 text-2xl hover:bg-surface-gray-2 focus:outline-none focus:ring focus:ring-blue-200"
+                class="h-8 w-8 rounded-md p-1 text-2xl hover:bg-surface-gray-3 focus:outline-none focus:ring focus:ring-blue-200"
                 v-for="_emoji in emojis"
                 :key="_emoji.description"
                 @click="() => (emoji = _emoji.emoji) && togglePopover()"

@@ -51,7 +51,7 @@
             >
               <li
                 class="flex items-center rounded p-1.5 w-full text-base"
-                :class="{ 'bg-surface-gray-3': active }"
+                :class="{ 'bg-surface-gray-4': active }"
               >
                 <div class="flex gap-2 items-center w-full select-none">
                   <Avatar
@@ -64,7 +64,7 @@
                     <div class="font-semibold text-ink-gray-7 truncate">
                       {{ user.agent_name }}
                     </div>
-                    <div class="text-ink-gray-6 truncate">
+                    <div class="text-ink-gray-5 truncate">
                       {{ user.user }}
                     </div>
                   </div>
@@ -73,7 +73,7 @@
             </ComboboxOption>
             <li
               v-if="users.length == 0"
-              class="mt-1.5 rounded-md p-1.5 text-base text-ink-gray-6"
+              class="mt-1.5 rounded-md p-1.5 text-base text-ink-gray-5"
             >
               {{ __("No results found") }}
             </li>

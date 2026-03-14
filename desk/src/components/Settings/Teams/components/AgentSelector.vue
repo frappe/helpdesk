@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-wrap gap-1 bg-surface-gray-2 p-0.5 border rounded w-full"
+    class="flex flex-wrap gap-1 bg-surface-gray-3 p-0.5 border rounded w-full"
   >
     <Button
       ref="emails"
@@ -10,7 +10,7 @@
       theme="gray"
       variant="outline"
       @keydown.delete.capture.stop="removeLastValue"
-      class="active:bg-surface-gray-1 active:border-outline-gray-2 hover:border-outline-gray-2 hover:bg-surface-gray-1"
+      class="active:bg-surface-gray-2 active:border-outline-gray-1 hover:border-outline-gray-1 hover:bg-surface-gray-2"
     >
       <template #prefix>
         <UserAvatar :name="value" size="xs" />
@@ -28,13 +28,13 @@
         @update:modelValue="onSelect"
       >
         <ComboboxAnchor
-          class="flex h-7 w-full items-center gap-2 rounded px-2 py-1 border border-transparent bg-surface-gray-2 hover:bg-surface-gray-2"
+          class="flex h-7 w-full items-center gap-2 rounded px-2 py-1 border border-transparent bg-surface-gray-3 hover:bg-surface-gray-3"
         >
           <ComboboxInput
             ref="search"
             :value="query"
             autocomplete="off"
-            class="bg-transparent p-0 outline-none border-0 text-base text-ink-gray-8 h-full placeholder:text-ink-gray-4 focus:outline-none focus:ring-0 focus:border-0 w-full select-none"
+            class="bg-transparent p-0 outline-none border-0 text-base text-ink-gray-8 h-full placeholder:text-ink-gray-3 focus:outline-none focus:ring-0 focus:border-0 w-full select-none"
             placeholder="Type agent name or email"
             @focus="showOptions = true"
             @click="showOptions = true"
@@ -53,7 +53,7 @@
           >
             <ComboboxViewport class="max-h-60 overflow-auto p-1.5">
               <ComboboxEmpty
-                class="flex gap-2 rounded px-2 py-1 text-base text-ink-gray-5"
+                class="flex gap-2 rounded px-2 py-1 text-base text-ink-gray-4"
               >
                 Agent not found
               </ComboboxEmpty>
@@ -61,14 +61,14 @@
                 v-for="agent in agentsList"
                 :key="agent.name"
                 :value="agent.name"
-                class="text-base leading-none text-ink-gray-7 rounded flex items-center px-2 py-1 relative select-none data-[highlighted]:outline-none data-[highlighted]:bg-surface-gray-3 cursor-pointer"
+                class="text-base leading-none text-ink-gray-7 rounded flex items-center px-2 py-1 relative select-none data-[highlighted]:outline-none data-[highlighted]:bg-surface-gray-4 cursor-pointer"
               >
                 <UserAvatar class="mr-1" :name="agent.agent_name" size="lg" />
                 <div class="flex flex-col gap-1 p-1 text-ink-gray-8">
                   <div class="text-base font-medium">
                     {{ agent.agent_name }}
                   </div>
-                  <div class="text-sm text-ink-gray-5">
+                  <div class="text-sm text-ink-gray-4">
                     {{ agent.name }}
                   </div>
                 </div>

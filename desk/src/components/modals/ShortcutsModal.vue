@@ -9,7 +9,7 @@
           v-for="group in shortcutGroups"
           :key="group.title"
           class="pb-4"
-          :class="!group.hideBorder && 'border-b border-outline-gray-2'"
+          :class="!group.hideBorder && 'border-b border-outline-gray-1'"
         >
           <h2 class="text-lg font-semibold text-ink-gray-9 mb-4">
             {{ group.title }}
@@ -27,7 +27,7 @@
                 <span
                   v-for="(key, kIndex) in shortcut.keys"
                   :key="kIndex"
-                  class="bg-surface-gray-2 border border-outline-gray-2 text-xs rounded-sm text-ink-gray-8 shadow-sm min-w-5 h-5 flex items-center justify-center"
+                  class="bg-surface-gray-3 border border-outline-gray-1 text-xs rounded-sm text-ink-gray-8 shadow-sm min-w-5 h-5 flex items-center justify-center"
                   :class="[
                     ![metaIcon, shiftKey].includes(key) && 'w-5 ',
                     key === shiftKey && '!px-2',
