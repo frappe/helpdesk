@@ -125,7 +125,7 @@ import { useStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());
+const { agents: agentsList, dropdown, userGroups } = storeToRefs(useAgentStore());
 const { isManager } = useAuthStore();
 
 const props = defineProps({
@@ -221,13 +221,13 @@ const editor = computed(() => editorRef.value?.editor);
 
 onMounted(() => {
   if (
-    agentsList.value.loading ||
-    agentsList.value.data?.length ||
-    agentsList.value.list.promise
+    !agentsList.value.loading &&
+    !agentsList.value.data?.length &&
+    !agentsList.value.list.promise
   ) {
-    return;
+    agentsList.value.fetch();
   }
-  agentsList.value.fetch();
+  userGroups.value.fetch();
 });
 
 defineExpose({
