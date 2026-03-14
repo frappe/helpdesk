@@ -7,9 +7,7 @@
             isManager
               ? viewMyStats
                 ? __("My Dashboard")
-                : !isMobileView
-                ? __("Organization Analytics")
-                : __("Organization")
+                : __("Organization Analytics")
               : __("Agent Dashboard")
           }}
         </div>
@@ -19,18 +17,31 @@
         <div v-if="isManager">
           <TabButtons
             v-model="activeTab"
-            :buttons="[
-              {
-                value: 'organization',
-                iconLeft: h(LucideBuilding2, { class: 'size-4' }),
-                label: 'My Organization',
-              },
-              {
-                value: 'my_stats',
-                iconLeft: h(LucideUser, { class: 'size-4' }),
-                label: 'My Stats',
-              },
-            ]"
+            :buttons="
+              isMobileView
+                ? [
+                    {
+                      value: 'organization',
+                      icon: h(LucideBuilding2, { class: 'size-4' }),
+                    },
+                    {
+                      value: 'my_stats',
+                      icon: h(LucideUser, { class: 'size-4' }),
+                    },
+                  ]
+                : [
+                    {
+                      value: 'organization',
+                      iconLeft: h(LucideBuilding2, { class: 'size-4' }),
+                      label: 'My Organization',
+                    },
+                    {
+                      value: 'my_stats',
+                      iconLeft: h(LucideUser, { class: 'size-4' }),
+                      label: 'My Stats',
+                    },
+                  ]
+            "
           />
         </div>
       </template>
@@ -49,7 +60,7 @@
         >
           <template #default>
             <div
-              class="flex justify-between !w-48 items-center border border-outline-gray-2 rounded text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
+              class="flex justify-between !min-w-48 items-center border border-outline-gray-2 rounded text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
             >
               <div class="flex items-center">
                 <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
@@ -107,7 +118,10 @@
         </Link>
       </div>
       <!-- Charts -->
-      <div v-if="!loading" class="transition-all animate-fade-in duration-300">
+      <div
+        v-if="!loading && !isEmpty"
+        class="transition-all animate-fade-in duration-300"
+      >
         <!-- Number Cards -->
         <div
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
@@ -151,12 +165,62 @@
           </div>
         </div>
       </div>
-      <!-- Loading State -->
+
+      <!-- Skeleton Loading State -->
       <div
-        v-else
-        class="flex items-center justify-center h-[240px] gap-2 rounded transition-all animate-fade-in"
+        v-if="loading || isEmpty"
+        class="transition-all animate-fade-in duration-300 relative"
       >
-        <Button :loading="true" size="2xl" variant="ghost" />
+        <!-- Number Cards Skeleton -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div
+            v-for="i in numberCards?.data?.length"
+            class="border rounded-md p-4 space-y-3 max-h-[140px]"
+          >
+            <div class="h-3 w-1/2 bg-surface-gray-1 rounded animate-pulse" />
+            <div class="h-7 w-2/3 bg-surface-gray-1 rounded animate-pulse" />
+            <div class="h-3 w-1/2 bg-surface-gray-1 rounded animate-pulse" />
+          </div>
+        </div>
+
+        <!-- Trend Charts Skeleton -->
+        <div
+          v-if="!isMobileView"
+          class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
+        >
+          <div
+            v-for="i in 4"
+            class="border rounded-md min-h-[300px] p-4 space-y-3"
+          >
+            <div class="h-4 w-1/3 bg-surface-gray-1 rounded animate-pulse" />
+            <div class="h-64 w-full bg-surface-gray-1 rounded animate-pulse" />
+          </div>
+        </div>
+
+        <!-- Empty State Overlay -->
+        <div
+          v-if="isEmpty && !loading"
+          class="absolute inset-0 flex items-center justify-center pointer-events-none"
+        >
+          <div
+            class="bg-surface-white rounded-xl shadow-sm p-6 w-9/12 md:w-4/12 text-center pointer-events-auto space-y-2"
+          >
+            <div class="text-ink-gray-7 font-medium text-center text-base">
+              {{ __("No tickets yet") }}
+            </div>
+            <div class="text-ink-gray-6 text-center text-base">
+              {{
+                hasAppliedFilter && activeTab !== "my_stats"
+                  ? __(
+                      "No data found for the selected filters. Try adjusting the date range or filters applied."
+                    )
+                  : __(
+                      "Dashboard charts will appear here once you start receiving or creating tickets."
+                    )
+              }}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -187,6 +251,23 @@ const filters = reactive({
   period: getLastXDays(),
   agent: null,
   team: null,
+});
+
+const hasAppliedFilter = computed(() => {
+  return (
+    filters.agent ||
+    filters.team ||
+    (filters.period && filters.period !== getLastXDays(30))
+  );
+});
+
+const isEmpty = computed(() => {
+  if (!numberCards.data || !trendData.data || !masterData.data) return false;
+  return (
+    numberCards.data.every((d: any) => d.value === 0) &&
+    trendData.data.every((d: any) => !d.data?.length) &&
+    masterData.data.every((d: any) => !d.data?.length)
+  );
 });
 
 const colors = [
@@ -237,7 +318,6 @@ const teamMembers = createResource({
     team: filters.team,
   },
   onSuccess: (data) => {
-    // Set Agent Filters
     agentFilter.value = { name: ["in", data] };
   },
 });
@@ -264,7 +344,7 @@ watch(activeTab, (val) => {
 watch(
   () => filters.team,
   (newVal) => {
-    filters.agent = null; // Reset agent when team is selected
+    filters.agent = null;
     if (newVal) {
       teamMembers.update({
         params: {
@@ -274,7 +354,7 @@ watch(
       teamMembers.reload();
     }
     if (!newVal) {
-      agentFilter.value = null; // Reset agent filter if no team is selected
+      agentFilter.value = null;
     }
   }
 );
@@ -361,7 +441,7 @@ const options = computed(() => [
         datePickerRef.value?.open();
       }, 0);
       preset.value = __("Custom Range");
-      filters.period = null; // Reset period to allow custom date selection
+      filters.period = null;
     },
   },
 ]);
@@ -430,11 +510,9 @@ watch(
 
 onMounted(() => {
   if (!isManager) {
-    // when filters are updated, resources are reloaded coz of the watcher
     filters.agent = userId;
     return;
   }
-  // If not managers call the resources
   numberCards.reload();
   masterData.reload();
   trendData.reload();
