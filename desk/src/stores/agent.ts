@@ -10,12 +10,22 @@ export const useAgentStore = defineStore("agent", () => {
     pageLength: 99999,
   });
 
-  const dropdown = computed(() =>
-    agents.data?.map((o) => ({
+  const userGroups = createListResource({
+    doctype: "User Group",
+    fields: ["name"],
+    pageLength: 99999,
+  });
+
+  const dropdown = computed(() => [
+    ...(agents.data?.map((o) => ({
       label: o.agent_name,
       value: o.name,
-    }))
-  );
+    })) ?? []),
+    ...(userGroups.data?.map((g) => ({
+      label: g.name,
+      value: g.name,
+    })) ?? []),
+  ]);
 
   function searchAgents(query: string) {
     return agents.data.filter((a) =>
@@ -26,6 +36,7 @@ export const useAgentStore = defineStore("agent", () => {
   return {
     dropdown,
     agents,
+    userGroups,
     searchAgents,
   };
 });
