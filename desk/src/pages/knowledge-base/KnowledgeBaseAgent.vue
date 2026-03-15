@@ -387,7 +387,7 @@ const options = computed(() => {
         prefix: () => {
           return h(FeatherIcon, {
             name: "file-text",
-            class: "h-4 w-4 flex-shrink-0 text-ink-gray-5",
+            class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
           });
         },
       },

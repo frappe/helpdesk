@@ -47,7 +47,7 @@
             <div class="relative px-1.5 pt-0.5">
               <ComboboxInput
                 ref="search"
-                class="form-input w-full focus:bg-surface-gray-4 hover:bg-surface-gray-4"
+                class="form-input w-full"
                 type="text"
                 @change="
                   (e) => {
@@ -91,7 +91,7 @@
                   <li
                     :class="[
                       'flex items-center rounded px-2.5 py-1.5 text-base',
-                      { 'bg-surface-gray-4': active },
+                      { 'bg-surface-gray-2': active },
                     ]"
                   >
                     <slot
@@ -269,11 +269,11 @@ const inputClasses = computed(() => {
   let variant = props.disabled ? "disabled" : props.variant;
   let variantClasses = {
     subtle:
-      "border border-outline-gray-1 bg-surface-gray-3 placeholder-ink-gray-5 hover:border-outline-gray-1 hover:bg-surface-gray-4 focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
+      "border border-outline-gray-1 bg-surface-gray-2 placeholder-ink-gray-5 hover:border-outline-gray-1 hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-3 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
     outline:
-      "border border-outline-gray-2 bg-surface-white placeholder-ink-gray-5 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
+      "border border-outline-gray-2 bg-surface-white placeholder-ink-gray-5 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-3 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
     disabled: [
-      "border bg-surface-gray-3 placeholder-ink-gray-4",
+      "border bg-surface-gray-1 placeholder-ink-gray-4",
       props.variant === "outline"
         ? "border-outline-gray-2"
         : "border-transparent",

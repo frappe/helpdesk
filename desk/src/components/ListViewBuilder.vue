@@ -456,7 +456,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   if (idx === 0) {
     return h("span", {
-      class: "truncate text-base text-ink-gray-5",
+      class: "truncate text-base text-ink-gray-6",
       textContent: item,
     });
   }

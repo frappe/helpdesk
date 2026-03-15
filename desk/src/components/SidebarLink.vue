@@ -66,7 +66,7 @@ const props = withDefaults(defineProps<P>(), {
   onClick: () => () => true,
   to: "",
   bgColor: "bg-surface-selected",
-  hvColor: "hover:bg-surface-gray-4",
+  hvColor: "hover:bg-surface-gray-2",
 });
 const router = useRouter();
 const { isMobileView } = useScreenSize();
