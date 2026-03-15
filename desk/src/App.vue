@@ -9,13 +9,16 @@
 import { Dialogs } from "@/components/dialogs";
 import { useConfigStore } from "@/stores/config";
 import { FrappeUIProvider, toast, setConfig } from "frappe-ui";
-import { computed, defineAsyncComponent, h, onMounted, onUnmounted } from "vue";
+import { computed, defineAsyncComponent, h, onMounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
 import { useAuthStore } from "./stores/auth";
+
 import { useFavicon } from "@vueuse/core";
 import { storeToRefs } from "pinia";
+import { useTheme } from "frappe-ui";
 import { __ } from "./translation";
+
 import { isCustomerPortal, getBrowserTimezone } from "./utils";
 
 const configStore = useConfigStore();
@@ -27,19 +30,30 @@ onMounted(() => {
   window.addEventListener("online", () => {
     toast.create({
       message: __("You are now online"),
-      icon: h(Wifi, { class: "text-white" }),
+      icon: h(Wifi, { class: "text-ink-white" }),
     });
   });
 
   window.addEventListener("offline", () => {
     toast.create({
       message: __("You are now offline"),
-      icon: h(WifiOff, { class: "text-white" }),
+      icon: h(WifiOff, { class: "text-ink-white" }),
     });
   });
   !isCustomerPortal.value && setConfig("localTimezone", window.timezone?.user);
   setConfig("systemTimezone", window.timezone?.system || null);
 });
+
+const { setTheme } = useTheme();
+
+// Initialize theme from localStorage
+const savedTheme = localStorage.getItem("desk_theme") || "Light";
+if (savedTheme === "Dark") {
+  setTheme("dark");
+}
+{
+  setTheme("light");
+}
 
 const AgentPortalRoot = defineAsyncComponent(
   () => import("@/pages/desk/AgentRoot.vue")

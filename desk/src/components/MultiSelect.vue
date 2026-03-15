@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-wrap gap-2 rounded-lg bg-gray-100 p-2">
+  <div class="flex flex-wrap gap-2 rounded-lg bg-surface-gray-4 p-2">
     <Pill
       v-for="item in items"
       :key="item.value"

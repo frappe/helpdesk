@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-between items-start flex-col gap-6">
-    <span class="text-sm text-ink-gray-5 pt-4 w-full"
+    <span class="text-sm text-ink-gray-4 pt-4 w-full"
       >Set visibility and mandatory criteria for
       {{ selections.childField || "child" }} field:</span
     >
@@ -10,13 +10,13 @@
         <div class="flex gap-3 items-center">
           <Switch v-model="fieldCriteriaState.display.enabled" />
           <div class="flex items-center gap-1">
-            <span class="text-sm text-ink-gray-5"
+            <span class="text-sm text-ink-gray-4"
               >Show {{ selections.childField }} if
               {{ selections.parentField }} is set to</span
             >
             <DocumentationButton
               url="https://docs.frappe.io/helpdesk/field-dependency#handling-visibility-of-child-field"
-              color="!text-ink-gray-6"
+              color="!text-ink-gray-5"
             />
           </div>
         </div>
@@ -36,13 +36,13 @@
         <div class="flex gap-3 items-center">
           <Switch v-model="fieldCriteriaState.mandatory.enabled" />
           <div class="flex items-center gap-1">
-            <span class="text-sm text-ink-gray-5"
+            <span class="text-sm text-ink-gray-4"
               >Make {{ selections.childField }} mandatory if
               {{ selections.parentField }} is set to</span
             >
             <DocumentationButton
               url="https://docs.frappe.io/helpdesk/field-dependency#handling-if-the-child-field-is-mandatory"
-              color="!text-ink-gray-6"
+              color="!text-ink-gray-5"
             />
           </div>
         </div>

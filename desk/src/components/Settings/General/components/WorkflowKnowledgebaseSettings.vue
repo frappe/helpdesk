@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-base font-semibold text-gray-900">
+    <div class="text-base font-semibold text-ink-gray-9">
       {{ __("Workflow & knowledge base settings") }}
     </div>
     <div class="mt-6 flex flex-col gap-6">
@@ -9,7 +9,7 @@
           <span class="text-base font-medium text-ink-gray-8">{{
             __("Prefer knowledge base")
           }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
+          <span class="text-p-sm text-ink-gray-5">{{
             __("Guide users to articles before tickets.")
           }}</span>
         </div>
@@ -25,7 +25,7 @@
           <span class="text-base font-medium text-ink-gray-8">{{
             __("Skip email workflow")
           }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
+          <span class="text-p-sm text-ink-gray-5">{{
             __(
               "Disables all email notifications for the ticket - including creation, updates, and alerts."
             )

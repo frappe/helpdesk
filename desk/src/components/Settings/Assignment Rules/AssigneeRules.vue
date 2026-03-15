@@ -4,7 +4,7 @@
       <span class="text-lg font-semibold text-ink-gray-8">{{
         __("Assignee Rules")
       }}</span>
-      <span class="text-p-sm text-ink-gray-6">
+      <span class="text-p-sm text-ink-gray-5">
         {{
           __(
             "Define who receives the tickets and how they’re distributed among agents."
@@ -17,7 +17,7 @@
         <div class="text-base font-medium text-ink-gray-8">
           {{ __("Ticket Routing") }}
         </div>
-        <div class="text-p-sm text-ink-gray-6 mt-1">
+        <div class="text-p-sm text-ink-gray-5 mt-1">
           {{
             __("Choose how tickets are distributed among selected assignees.")
           }}
@@ -27,7 +27,7 @@
         <Popover placement="bottom-end">
           <template #target="{ togglePopover }">
             <div
-              class="flex items-center justify-between text-base rounded h-7 py-1.5 pl-2 pr-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] select-none min-w-44"
+              class="flex items-center justify-between text-base rounded h-7 py-1.5 pl-2 pr-2 border border-[--surface-gray-2] bg-surface-gray-3 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-4 focus:bg-surface-white focus:border-outline-gray-3 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] select-none min-w-44"
               @click="togglePopover()"
             >
               <div>
@@ -42,12 +42,12 @@
           </template>
           <template #body="{ togglePopover }">
             <div
-              class="p-1 text-ink-gray-7 mt-1 bg-white shadow-xl rounded w-[--reka-popper-anchor-width]"
+              class="p-1 text-ink-gray-7 mt-1 bg-surface-white shadow-xl rounded w-[--reka-popper-anchor-width]"
             >
               <div
                 v-for="option in ticketRoutingOptions"
                 :key="option.value"
-                class="p-2 cursor-pointer hover:bg-surface-gray-3 text-sm flex items-center justify-between rounded"
+                class="p-2 cursor-pointer hover:bg-surface-gray-4 text-sm flex items-center justify-between rounded"
                 @click="
                   () => {
                     assignmentRuleData.rule = option.value;
@@ -74,7 +74,7 @@
         <div class="text-base font-medium text-ink-gray-8">
           {{ __("Assignees") }}
         </div>
-        <div class="text-p-sm text-ink-gray-6 mt-1">
+        <div class="text-p-sm text-ink-gray-5 mt-1">
           {{ __("Choose who receives the tickets.") }}
         </div>
       </div>
@@ -84,7 +84,7 @@
       <div
         v-for="user in users"
         :key="user.name"
-        class="flex items-center gap-2 text-sm bg-surface-gray-2 rounded-md p-1 w-max px-2 select-none"
+        class="flex items-center gap-2 text-sm bg-surface-gray-3 rounded-md p-1 w-max px-2 select-none"
       >
         <Avatar :image="user.user_image" :label="user.full_name" size="sm" />
         <div class="text-ink-gray-7">
@@ -97,7 +97,7 @@
           :placement="'top'"
         >
           <div
-            class="text-xs rounded-full select-none bg-blue-600 text-white p-0.5 px-2"
+            class="text-xs rounded-full select-none bg-surface-blue-3 text-ink-white p-0.5 px-2"
           >
             {{ __("Last") }}
           </div>

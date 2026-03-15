@@ -9,7 +9,7 @@
     <template #target="{ togglePopover }">
       <button
         :class="[
-          'group w-full flex h-7 items-center justify-between rounded px-2 text-base text-gray-800 hover:bg-gray-100',
+          'group w-full flex h-7 items-center justify-between rounded px-2 text-base text-ink-gray-8 hover:bg-surface-gray-4',
         ]"
         @click.prevent="togglePopover()"
       >
@@ -22,12 +22,12 @@
     </template>
     <template #body>
       <div
-        class="flex flex-col justify-between mx-3 p-1.5 rounded-lg border border-gray-100 bg-white shadow-xl"
+        class="flex flex-col justify-between mx-3 p-1.5 rounded-lg border border-outline-gray-1 bg-surface-white shadow-xl"
       >
         <div v-for="app in apps.data" key="name">
           <a
             :href="app.route"
-            class="flex gap-2 rounded items-center hover:bg-gray-100 p-1.5"
+            class="flex gap-2 rounded items-center hover:bg-surface-gray-4 p-1.5"
           >
             <img class="size-6" :src="app.logo" />
             <div class="text-sm" @click="app.onClick">

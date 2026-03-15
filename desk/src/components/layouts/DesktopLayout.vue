@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen w-screen">
+  <div class="flex h-screen w-screen bg-surface-white">
     <Sidebar />
     <div class="flex-1 flex flex-col h-full overflow-auto">
       <AppHeader />

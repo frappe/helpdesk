@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center cursor-pointer hover:bg-gray-50 rounded">
+  <div class="flex items-center cursor-pointer hover:bg-surface-gray-3 rounded">
     <div
       class="w-full pl-2 flex flex-col justify-center h-14"
       @click="holidayListActiveScreen = { screen: 'view', data: data }"
@@ -7,7 +7,7 @@
       <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
       <div
         v-if="data.description && data.description.length > 0"
-        class="text-sm text-ink-gray-5 mt-1 truncate"
+        class="text-sm text-ink-gray-4 mt-1 truncate"
       >
         {{ data.description }}
       </div>

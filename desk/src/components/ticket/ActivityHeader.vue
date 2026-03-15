@@ -2,7 +2,7 @@
   <div
     class="md:mx-10 md:my-4 flex items-center justify-between text-lg font-medium mx-6 mb-4 !mt-8"
   >
-    <div class="flex h-8 items-center text-xl font-semibold text-gray-800">
+    <div class="flex h-8 items-center text-xl font-semibold text-ink-gray-8">
       {{ title }}
     </div>
     <Button

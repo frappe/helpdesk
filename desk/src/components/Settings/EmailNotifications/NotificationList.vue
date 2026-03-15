@@ -21,7 +21,7 @@
               {{ notification.label }}
             </h2>
             <p
-              class="text-sm text-ink-gray-5 truncate relative z-10 pointer-events-none"
+              class="text-sm text-ink-gray-4 truncate relative z-10 pointer-events-none"
             >
               {{ notification.description }}
             </p>
@@ -32,7 +32,7 @@
           />
           <button
             type="button"
-            class="w-full h-full absolute top-0 left-0 hover:bg-gray-50 rounded-[inherit]"
+            class="w-full h-full absolute top-0 left-0 hover:bg-surface-gray-3 rounded-[inherit]"
             @click="
               () => {
                 props.onSelect(notification);

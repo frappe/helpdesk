@@ -11,7 +11,7 @@
             {{ contact.data.name || contact.data.email_id }}
           </p>
           <ExternalLinkIcon
-            class="size-4 text-ink-gray-6 cursor-pointer"
+            class="size-4 text-ink-gray-5 cursor-pointer"
             @click="openContact(contact.data.name)"
           />
         </div>

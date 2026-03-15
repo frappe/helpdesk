@@ -16,14 +16,14 @@
     </template>
     <template #body="{ togglePopover }">
       <div
-        class="p-1 text-ink-gray-6 top-1 absolute w-[--reka-popper-anchor-width] bg-white shadow-2xl rounded"
+        class="p-1 text-ink-gray-5 top-1 absolute w-[--reka-popper-anchor-width] bg-surface-white shadow-2xl rounded"
         :class="bodyClass"
       >
         <div class="max-h-52 overflow-y-auto">
           <div
             v-for="option in options"
             :key="option.value"
-            class="p-2 cursor-pointer hover:bg-surface-gray-3 text-base flex items-center justify-between rounded"
+            class="p-2 cursor-pointer hover:bg-surface-gray-4 text-base flex items-center justify-between rounded"
             @click="
               () => {
                 onChange(option.value);

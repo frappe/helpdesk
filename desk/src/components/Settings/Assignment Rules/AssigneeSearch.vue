@@ -10,7 +10,9 @@
         />
       </template>
       <template #body="{ togglePopover }">
-        <div class="mt-1 rounded-lg bg-white py-1 text-base shadow-2xl w-60">
+        <div
+          class="mt-1 rounded-lg bg-surface-white py-1 text-base shadow-2xl w-60"
+        >
           <div class="relative px-1.5 pt-0.5">
             <ComboboxInput
               ref="search"
@@ -49,7 +51,7 @@
             >
               <li
                 class="flex items-center rounded p-1.5 w-full text-base"
-                :class="{ 'bg-gray-100': active }"
+                :class="{ 'bg-surface-gray-4': active }"
               >
                 <div class="flex gap-2 items-center w-full select-none">
                   <Avatar
@@ -62,7 +64,7 @@
                     <div class="font-semibold text-ink-gray-7 truncate">
                       {{ user.agent_name }}
                     </div>
-                    <div class="text-ink-gray-6 truncate">
+                    <div class="text-ink-gray-5 truncate">
                       {{ user.user }}
                     </div>
                   </div>
@@ -71,7 +73,7 @@
             </ComboboxOption>
             <li
               v-if="users.length == 0"
-              class="mt-1.5 rounded-md p-1.5 text-base text-gray-600"
+              class="mt-1.5 rounded-md p-1.5 text-base text-ink-gray-5"
             >
               {{ __("No results found") }}
             </li>

@@ -59,7 +59,7 @@
             >
               <template #target="{ togglePopover }">
                 <Button
-                  class="w-full !justify-start !text-ink-gray-5"
+                  class="w-full !justify-start !text-ink-gray-4"
                   variant="ghost"
                   @click="togglePopover()"
                   label="Add Column"
@@ -72,7 +72,7 @@
             </Autocomplete>
             <!-- <Button
               v-if="columnsUpdated"
-              class="w-full !justify-start !text-ink-gray-5"
+              class="w-full !justify-start !text-ink-gray-4"
               variant="ghost"
               @click="reset(close)"
               label="Reset Changes"
@@ -83,7 +83,7 @@
             </Button> -->
             <Button
               v-if="!is_default"
-              class="w-full !justify-start !text-ink-gray-5"
+              class="w-full !justify-start !text-ink-gray-4"
               variant="ghost"
               @click="resetToDefault(close)"
               label="Reset to Default"

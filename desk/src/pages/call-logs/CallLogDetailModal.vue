@@ -48,7 +48,7 @@
                 </div>
                 <FeatherIcon
                   name="arrow-right"
-                  class="mx-1 h-4 w-4 text-ink-gray-5"
+                  class="mx-1 h-4 w-4 text-ink-gray-4"
                 />
                 <Avatar
                   :image="field.value.receiver.image"
@@ -76,7 +76,7 @@
                 >
                   #{{ field.value }}
                   <ArrowUpRightIcon
-                    class="h-4 w-4 shrink-0 cursor-pointer text-ink-gray-5 hover:text-ink-gray-8"
+                    class="h-4 w-4 shrink-0 cursor-pointer text-ink-gray-4 hover:text-ink-gray-8"
                   />
                 </div>
               </div>

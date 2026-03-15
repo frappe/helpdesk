@@ -12,7 +12,7 @@
     </div>
     <!-- Optional Text -->
     <div v-if="activity.feedback_extra">
-      <p class="mt-2 text-sm text-gray-700">{{ activity.feedback_extra }}</p>
+      <p class="mt-2 text-sm text-ink-gray-7">{{ activity.feedback_extra }}</p>
     </div>
   </div>
 </template>
@@ -33,6 +33,6 @@ const styles = computed(() => {
   if (props.activity.feedback_rating <= 0.4) return ["bg-surface-red-1", "red"];
   if (props.activity.feedback_rating <= 0.6)
     return ["bg-surface-amber-1", "yellow"];
-  return ["bg-surface-green-1", "yellow"];
+  return ["bg-surface-green-2", "yellow"];
 });
 </script>

@@ -22,7 +22,7 @@
           "
         >
           <template #prefix>
-            <LucideSearch class="size-4 text-ink-gray-4" />
+            <LucideSearch class="size-4 text-ink-gray-3" />
           </template>
         </FormControl>
       </div>

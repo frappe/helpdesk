@@ -17,7 +17,7 @@
             variant="subtle"
           />
         </div>
-        <div class="text-base text-ink-gray-6 mt-1">
+        <div class="text-base text-ink-gray-5 mt-1">
           {{ agent.name }}
         </div>
       </div>

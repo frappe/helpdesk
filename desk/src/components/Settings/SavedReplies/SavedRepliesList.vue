@@ -24,7 +24,7 @@
             @input="savedRepliesSearchQuery = $event"
             :placeholder="__('Search')"
             type="text"
-            class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+            class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-1"
             icon-left="search"
             debounce="300"
             inputClass="p-4 pr-12"
@@ -53,7 +53,7 @@
           </template>
           <template #item="{ item }">
             <button
-              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-3"
+              class="group flex text-ink-gray-5 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-4"
               @click="item.onSelect"
             >
               <div class="flex items-center justify-between flex-1">
@@ -86,15 +86,15 @@
         class="flex flex-col items-center justify-center gap-4 grow"
       >
         <div
-          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+          class="p-4 size-14.5 rounded-full bg-surface-gray-2 flex justify-center items-center"
         >
-          <SavedReplyIcon class="size-6 text-ink-gray-6" />
+          <SavedReplyIcon class="size-6 text-ink-gray-5" />
         </div>
         <div class="flex flex-col items-center gap-1">
-          <div class="text-base font-medium text-ink-gray-6">
+          <div class="text-base font-medium text-ink-gray-5">
             {{ __("No Saved reply found") }}
           </div>
-          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
+          <div class="text-p-sm text-ink-gray-4 max-w-60 text-center">
             {{ __("Add your first Saved reply to get started.") }}
           </div>
         </div>
@@ -113,7 +113,7 @@
         class="-ml-2"
       >
         <div
-          class="grid grid-cols-12 items-center gap-3 text-sm text-gray-600 ml-2"
+          class="grid grid-cols-12 items-center gap-3 text-sm text-ink-gray-5 ml-2"
         >
           <div class="col-span-7">{{ __("Title") }}</div>
           <div class="col-span-2">{{ __("Owner") }}</div>
@@ -125,7 +125,7 @@
           :key="savedReply.name"
         >
           <div
-            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-gray-3 rounded"
           >
             <div
               @click="

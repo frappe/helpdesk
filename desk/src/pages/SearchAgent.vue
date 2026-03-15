@@ -21,7 +21,7 @@
             @keydown.enter="() => submit()"
           >
             <template #prefix>
-              <LucideSearch class="w-4 text-ink-gray-5" />
+              <LucideSearch class="w-4 text-ink-gray-4" />
             </template>
             <template #suffix>
               <div class="flex items-center">
@@ -80,7 +80,7 @@
             <Button
               v-if="hasActiveFilters()"
               size="sm"
-              class="ml-auto text-ink-gray-5"
+              class="ml-auto text-ink-gray-4"
               variant="gray-ghost"
               @click="clearFilters"
               :label="__('Clear all filters')"
@@ -105,14 +105,14 @@
               />
             </template>
             <template v-else-if="newSearch && query.length > 2">
-              <p class="text-ink-gray-6">{{ __("Press enter to search") }}</p>
+              <p class="text-ink-gray-5">{{ __("Press enter to search") }}</p>
             </template>
             <template v-else-if="search.loading">
-              <p class="text-ink-gray-6">{{ __("Searching...") }}</p>
+              <p class="text-ink-gray-5">{{ __("Searching...") }}</p>
             </template>
             <template v-else-if="searchResponse?.summary">
               <div class="space-y-1">
-                <p class="text-ink-gray-6">
+                <p class="text-ink-gray-5">
                   {{
                     __("{0} matches", [searchResponse.summary.filtered_matches])
                   }}
@@ -132,9 +132,9 @@
                 </p>
                 <p
                   v-if="searchResponse.summary.corrected_query"
-                  class="text-ink-gray-6"
+                  class="text-ink-gray-5"
                 >
-                  <span class="text-ink-gray-5">{{ __("Searched for:") }}</span>
+                  <span class="text-ink-gray-4">{{ __("Searched for:") }}</span>
                   <span class="ml-1 font-medium text-primary">
                     {{ searchResponse.summary.corrected_query }}
                   </span>
@@ -148,21 +148,21 @@
           <template v-for="item in searchResponse?.results" :key="item.id">
             <router-link
               :to="getItemRoute(item)"
-              class="flex space-x-2 overflow-hidden rounded px-2.5 py-3 hover:bg-surface-gray-2"
+              class="flex space-x-2 overflow-hidden rounded px-2.5 py-3 hover:bg-surface-gray-3"
             >
               <div class="flex items-start space-x-2">
                 <div class="flex-shrink-0">
                   <LucideTicket
                     v-if="item.doctype === 'HD Ticket'"
-                    class="h-4 w-4 text-ink-gray-6"
+                    class="h-4 w-4 text-ink-gray-5"
                   />
                   <LucideMessageSquare
                     v-else-if="item.doctype === 'HD Ticket Comment'"
-                    class="h-4 w-4 text-ink-gray-6"
+                    class="h-4 w-4 text-ink-gray-5"
                   />
                   <LucideMail
                     v-else-if="item.doctype === 'Communication'"
-                    class="h-4 w-4 text-ink-gray-6"
+                    class="h-4 w-4 text-ink-gray-5"
                   />
                 </div>
                 <!-- <UserAvatar :name="item.raised_by || item.author || 'System'" /> -->
@@ -177,7 +177,7 @@
                   <div class="text-base font-medium" v-else>
                     {{ item.name }}
                   </div>
-                  <span class="px-1 leading-none text-sm text-ink-gray-5">
+                  <span class="px-1 leading-none text-sm text-ink-gray-4">
                     &middot;
                     {{
                       item.doctype == "Communication"
@@ -185,16 +185,16 @@
                         : item.doctype.replace("HD ", "")
                     }}
                   </span>
-                  <span class="px-1 leading-none text-sm text-ink-gray-5">
+                  <span class="px-1 leading-none text-sm text-ink-gray-4">
                     &middot; #{{ getTicketNumber(item) }}
                   </span>
-                  <div class="ml-auto text-sm text-ink-gray-5">
+                  <div class="ml-auto text-sm text-ink-gray-4">
                     {{ formatDate(item.modified) }}
                   </div>
                 </div>
                 <div
                   v-if="item.content"
-                  class="mt-1 text-p-base text-ink-gray-6"
+                  class="mt-1 text-p-base text-ink-gray-5"
                   v-html="item.content"
                 ></div>
               </div>

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+    class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-gray-3 rounded"
   >
     <div
       @click="assignmentRulesActiveScreen = { screen: 'view', data: data }"
@@ -9,14 +9,14 @@
       <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
       <div
         v-if="data.description && data.description.length > 0"
-        class="text-sm w-full text-ink-gray-5 mt-1 truncate"
+        class="text-sm w-full text-ink-gray-4 mt-1 truncate"
       >
         {{ data.description }}
       </div>
     </div>
     <div class="col-span-3">
       <select
-        class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-md p-0 pl-2 pr-5 bg-transparent -ml-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
+        class="w-full h-7 text-base hover:bg-surface-gray-4 rounded-md p-0 pl-2 pr-5 bg-transparent -ml-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
         v-model="data.priority"
         @update:modelValue="onPriorityChange"
         @change="onPriorityChange"

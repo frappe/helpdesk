@@ -14,7 +14,7 @@
   >
     <template #body-content>
       <div>
-        <div class="text-base text-ink-gray-6">
+        <div class="text-base text-ink-gray-5">
           {{
             __("{0} does not have a phone number, set one to call them.", [
               contactDetails.name,

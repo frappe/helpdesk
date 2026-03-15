@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-r bg-surface-menu-bar p-2 text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
@@ -16,7 +16,7 @@
       :is-expanded="isExpanded"
     >
       <template #right>
-        <span class="flex items-center gap-0.5 font-medium text-gray-600">
+        <span class="flex items-center gap-0.5 font-medium text-ink-gray-5">
           <component :is="device.modifierIcon" class="h-3 w-3" />
           <span>K</span>
         </span>
@@ -71,7 +71,7 @@
           <template #header="{ opened, hide, toggle }">
             <div
               v-if="!hide"
-              class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+              class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-4 transition-all duration-300 ease-in-out"
               :class="
                 !isExpanded
                   ? 'ml-0 h-0 overflow-hidden opacity-0'
@@ -209,6 +209,7 @@ import {
 import { useShortcut } from "@/composables/shortcuts";
 import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
+import { useTheme } from "frappe-ui";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
@@ -243,6 +244,34 @@ const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const showShortcutsModal = ref(false);
 const showCommandPalette = ref(false);
+
+// Theme management
+const { setTheme } = useTheme();
+const currentTheme = ref(localStorage.getItem("desk_theme") || "Light");
+
+const updateTheme = (theme: string) => {
+  currentTheme.value = theme;
+  localStorage.setItem("desk_theme", theme);
+
+  if (theme === "Dark") {
+    setTheme("dark");
+  } else {
+    setTheme("light");
+  }
+};
+
+const toggleTheme = () => {
+  const themes = ["Light", "Dark"];
+  const currentIndex = themes.indexOf(currentTheme.value);
+  const nextTheme = themes[(currentIndex + 1) % themes.length];
+  updateTheme(nextTheme);
+};
+
+// Initialize theme on mount
+onMounted(() => {
+  const savedTheme = localStorage.getItem("desk_theme") || "Light";
+  updateTheme(savedTheme);
+});
 
 const { pinnedViews, publicViews } = useView();
 
@@ -305,6 +334,11 @@ function parseViews(views) {
 
 const customerPortalDropdown = computed(() => [
   {
+    label: __("Change Theme"),
+    icon: currentTheme.value === "Dark" ? "moon" : "sun",
+    onClick: toggleTheme,
+  },
+  {
     label: __("Log out"),
     icon: "log-out",
     onClick: () => authStore.logout(),
@@ -348,6 +382,11 @@ const agentPortalDropdown = computed(() => [
     label: __("Settings"),
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
+  },
+  {
+    label: __("Change Theme"),
+    icon: currentTheme.value === "Dark" ? "moon" : "sun",
+    onClick: toggleTheme,
   },
   {
     group: __("Danger"),

@@ -6,7 +6,7 @@
     }"
   >
     <template #body-content>
-      <div class="mb-1.5 block text-base text-ink-gray-5">View Name</div>
+      <div class="mb-1.5 block text-base text-ink-gray-4">View Name</div>
       <div class="flex gap-2">
         <IconPicker v-model="view.icon" v-slot="{ togglePopover }">
           <Button

@@ -35,7 +35,7 @@
             <div class="flex-1 font-semibold truncate text-ink-gray-7">
               {{ option.label }}
             </div>
-            <div class="flex-1 text-sm truncate text-ink-gray-5">
+            <div class="flex-1 text-sm truncate text-ink-gray-4">
               {{ option.description }}
             </div>
           </div>
@@ -226,9 +226,9 @@ const labelClasses = computed(() => {
       sm: "text-xs",
       md: "text-base",
     }[attrs.size || "sm"],
-    "text-gray-600",
+    "text-ink-gray-5",
     ...(attrs.required
-      ? ["after:content-['*']", "after:ml-0.5", "after:text-red-500"]
+      ? ["after:content-['*']", "after:ml-0.5", "after:text-ink-red-3"]
       : []),
   ];
 });

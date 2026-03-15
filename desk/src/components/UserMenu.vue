@@ -8,7 +8,7 @@
             ? 'w-auto px-0'
             : open
             ? 'w-full px-2 bg-surface-white shadow-sm'
-            : 'w-full px-2 hover:bg-surface-gray-3'
+            : 'w-full px-2 hover:bg-surface-gray-4'
         "
       >
         <BrandLogo />
@@ -21,11 +21,11 @@
           "
         >
           <div
-            class="text-base font-medium leading-none text-gray-900 truncate"
+            class="text-base font-medium leading-none text-ink-gray-9 truncate"
           >
             {{ config.brandName || "Helpdesk" }}
           </div>
-          <div class="mt-1 text-sm leading-none text-gray-700">
+          <div class="mt-1 text-sm leading-none text-ink-gray-7">
             {{ authStore.userName }}
           </div>
         </div>
@@ -39,7 +39,7 @@
         >
           <FeatherIcon
             name="chevron-down"
-            class="h-4 w-4 text-gray-600"
+            class="h-4 w-4 text-ink-gray-5"
             aria-hidden="true"
           />
         </div>

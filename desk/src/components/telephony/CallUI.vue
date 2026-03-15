@@ -30,7 +30,7 @@
             :label="`Make ${callMedium} as default calling medium`"
           />
 
-          <div v-if="isDefaultMedium" class="text-sm text-ink-gray-4">
+          <div v-if="isDefaultMedium" class="text-sm text-ink-gray-3">
             {{
               __("You can change the default calling medium from the settings")
             }}

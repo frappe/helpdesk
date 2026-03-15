@@ -135,11 +135,11 @@ const htmlContent = computed(
     <base target="_blank" />
     <style>
       :root {
-        --bg-surface-gray-3: #ededed;
+        --bg-surface-gray-4: #ededed;
         --bg-surface-gray-4: #e2e2e2;
       }
       [data-theme='dark'] {
-        --bg-surface-gray-3: #343434;
+        --bg-surface-gray-4: #343434;
         --bg-surface-gray-4: #424242;
       }
       .replied-content .collapse {

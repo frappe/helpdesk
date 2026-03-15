@@ -13,11 +13,11 @@
           {{ contact.data.name }}
         </p>
       </div>
-      <div class="px-5 text-ink-gray-5 pb-2">
+      <div class="px-5 text-ink-gray-4 pb-2">
         <!-- Email Id -->
         <div class="flex gap-2 items-center p-1.5">
           <EmailIcon class="size-4" />
-          <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
+          <p class="text-p-sm text-ink-gray-5 hover:underline cursor-pointer">
             {{ contact.data.email_id }}
           </p>
           <CopyIcon
@@ -38,7 +38,7 @@
           "
         >
           <PhoneIcon class="size-4" />
-          <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
+          <p class="text-p-sm text-ink-gray-5 hover:underline cursor-pointer">
             {{ contact.data.mobile_no || contact.data.phone }}
           </p>
           <CopyIcon
@@ -77,7 +77,7 @@
                 </span>
               </Tooltip>
               <LucideChevronDown
-                class="size-4 text-ink-gray-6 cursor-pointer"
+                class="size-4 text-ink-gray-5 cursor-pointer"
                 :class="{ 'rotate-180': opened }"
                 @click="toggle"
               />
@@ -94,7 +94,7 @@
                 {{ ticket.subject }}
               </p>
               <div class="flex items-end justify-between">
-                <p class="text-base text-ink-gray-5">
+                <p class="text-base text-ink-gray-4">
                   {{ formatDate(ticket.creation) + " &#183; " }}
                   <span class="transition duration-400 hover:underline">
                     {{ "#" + ticket.name }}

@@ -22,7 +22,7 @@
             @input="search = $event"
             :placeholder="__('Search')"
             type="text"
-            class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+            class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-1"
             icon-left="search"
             debounce="300"
             inputClass="p-4 pr-12"
@@ -51,7 +51,7 @@
           </template>
           <template #item="{ item }">
             <button
-              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-3"
+              class="group flex text-ink-gray-5 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-4"
               @click="item.onClick"
             >
               <div class="flex items-center justify-between flex-1">
@@ -89,15 +89,15 @@
           class="flex flex-col items-center justify-center gap-4 h-full"
         >
           <div
-            class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex items-center justify-center"
+            class="p-4 size-14.5 rounded-full bg-surface-gray-2 flex items-center justify-center"
           >
-            <AgentIcon class="size-6 text-ink-gray-6" />
+            <AgentIcon class="size-6 text-ink-gray-5" />
           </div>
           <div class="flex flex-col items-center gap-1">
-            <div class="text-base font-medium text-ink-gray-6">
+            <div class="text-base font-medium text-ink-gray-5">
               {{ __("No agent found") }}
             </div>
-            <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
+            <div class="text-p-sm text-ink-gray-4 max-w-60 text-center">
               {{
                 activeFilter.length
                   ? __("Change your search terms or filters")
@@ -118,7 +118,7 @@
           v-if="!agents.loading && Boolean(agents.data?.length)"
         >
           <div
-            class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600"
+            class="grid grid-cols-8 items-center gap-3 text-sm text-ink-gray-5"
           >
             <div class="col-span-6 text-p-sm">{{ __("Agent Name") }}</div>
           </div>
@@ -143,7 +143,7 @@
                       variant="subtle"
                     />
                   </div>
-                  <div class="text-base text-ink-gray-6 mt-1">
+                  <div class="text-base text-ink-gray-5 mt-1">
                     {{ agent.name }}
                   </div>
                 </div>
@@ -254,9 +254,9 @@ function RoleOption({ active, role, onClick, selected, icon = null }) {
     "button",
     {
       class: [
-        active ? "bg-surface-gray-2" : "text-ink-gray-7",
+        active ? "bg-surface-gray-3" : "text-ink-gray-7",
 
-        "group flex w-full text-ink-gray-8 justify-between items-center rounded-md px-2 py-2 text-sm hover:bg-surface-gray-3",
+        "group flex w-full text-ink-gray-8 justify-between items-center rounded-md px-2 py-2 text-sm hover:bg-surface-gray-4",
       ],
       onClick: !selected ? onClick : null,
     },

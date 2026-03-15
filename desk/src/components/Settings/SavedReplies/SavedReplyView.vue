@@ -8,7 +8,7 @@
           :label="savedReplyData.title || __('New Saved Reply')"
           size="md"
           @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-4 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
         />
         <Badge
           variant="subtle"
@@ -103,7 +103,7 @@
             :placeholder="__('Select teams')"
             @update:modelValue="validateData('teams')"
           />
-          <div class="text-xs text-ink-gray-5 cursor-default">
+          <div class="text-xs text-ink-gray-4 cursor-default">
             {{ __("Restrict visibility to these teams") }}
           </div>
           <ErrorMessage class="text-p-sm" :message="errors.teams" />
@@ -117,7 +117,7 @@
           </div>
           <PreviewDialog v-model="previewDialog" />
           <TextEditor
-            editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5"
+            editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-3 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-3 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5"
             ref="content"
             :bubble-menu="false"
             :content="savedReplyData.message"

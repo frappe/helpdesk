@@ -4,7 +4,7 @@
   >
     <div class="flex flex-col sm:flex-row items-center gap-3.5">
       <div
-        class="flex items-center justify-center min-w-16 min-h-16 rounded-lg overflow-hidden border border-gray-100"
+        class="flex items-center justify-center min-w-16 min-h-16 rounded-lg overflow-hidden border border-outline-gray-1"
       >
         <Avatar
           v-if="props.image"
@@ -12,11 +12,11 @@
           :image="props.image"
           :label="props.title"
         />
-        <FeatherIcon v-else name="image" class="size-6 text-ink-gray-4" />
+        <FeatherIcon v-else name="image" class="size-6 text-ink-gray-3" />
       </div>
       <div class="flex flex-col gap-1 max-w-sm items-start">
         <span class="text-base font-medium text-ink-gray-8">{{ title }}</span>
-        <span class="text-p-sm text-ink-gray-6">{{ description }}</span>
+        <span class="text-p-sm text-ink-gray-5">{{ description }}</span>
       </div>
     </div>
     <div>

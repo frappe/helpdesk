@@ -40,7 +40,7 @@
         <WorkflowKnowledgebaseSettings />
         <hr class="my-8" />
         <div>
-          <div class="text-base font-semibold text-gray-900">
+          <div class="text-base font-semibold text-ink-gray-9">
             {{ __("User signup") }}
           </div>
           <div class="flex items-center justify-between mt-6">
@@ -48,7 +48,7 @@
               <span class="text-base font-medium text-ink-gray-8">{{
                 __("Disable signup")
               }}</span>
-              <span class="text-p-sm text-ink-gray-6">{{
+              <span class="text-p-sm text-ink-gray-5">{{
                 __(
                   "New users will have to be manually registered by system managers."
                 )

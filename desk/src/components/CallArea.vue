@@ -1,7 +1,7 @@
 <template>
   <div class="w-full">
     <div class="mb-1 flex items-center justify-stretch gap-2 py-1 text-base">
-      <div class="inline-flex items-center flex-wrap gap-1 text-ink-gray-5">
+      <div class="inline-flex items-center flex-wrap gap-1 text-ink-gray-4">
         <Avatar
           :image="activity?._caller?.image"
           :label="activity?._caller?.label"
@@ -18,7 +18,7 @@
       </div>
       <div class="ml-auto whitespace-nowrap">
         <Tooltip :text="dateFormat(activity.creation, 'MMM D, dddd')">
-          <div class="text-sm text-ink-gray-5">
+          <div class="text-sm text-ink-gray-4">
             {{ __(timeAgo(activity.creation)) }}
           </div>
         </Tooltip>

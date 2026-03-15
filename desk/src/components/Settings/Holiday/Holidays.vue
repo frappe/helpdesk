@@ -26,7 +26,7 @@
           @input="holidaySearchRef = $event"
           :placeholder="__('Search')"
           type="text"
-          class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+          class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-1"
           icon-left="search"
           debounce="300"
           inputClass="p-4 pr-12"

@@ -47,7 +47,7 @@
                   <div
                     class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full bg-black bg-opacity-40 opacity-0 duration-300 ease-in-out group-hover:opacity-100 !size-14"
                   >
-                    <CameraIcon class="size-4 cursor-pointer text-white" />
+                    <CameraIcon class="size-4 cursor-pointer text-ink-white" />
                   </div>
                 </component>
                 <div
@@ -63,7 +63,7 @@
                     class="text-lg sm:text-xl !font-semibold text-ink-gray-8"
                     >{{ auth?.userName }}</span
                   >
-                  <span class="text-p-sm text-ink-gray-6">{{
+                  <span class="text-p-sm text-ink-gray-5">{{
                     auth?.user
                   }}</span>
                 </div>
@@ -120,7 +120,7 @@
             <span class="text-base font-medium text-ink-gray-8">
               {{ __("Password") }}
             </span>
-            <span class="text-p-sm text-ink-gray-6">{{
+            <span class="text-p-sm text-ink-gray-5">{{
               __("Change your account password for security.")
             }}</span>
           </div>
@@ -135,7 +135,7 @@
             <span class="text-base font-medium text-ink-gray-8">
               {{ __("Language") }}
             </span>
-            <span class="text-p-sm text-ink-gray-6">{{
+            <span class="text-p-sm text-ink-gray-5">{{
               __("Change language of the application.")
             }}</span>
           </div>
@@ -151,7 +151,7 @@
             <span class="text-base font-medium text-ink-gray-8">
               {{ __("Timezone") }}
             </span>
-            <span class="text-p-sm text-ink-gray-6">{{
+            <span class="text-p-sm text-ink-gray-5">{{
               __("Change timezone of the application.")
             }}</span>
           </div>

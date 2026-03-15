@@ -1,12 +1,12 @@
 <template>
   <div class="w-max mx-auto">
-    <div class="text-base font-medium mb-2 text-gray-800 ml-2.5">
+    <div class="text-base font-medium mb-2 text-ink-gray-8 ml-2.5">
       {{ formattedMonth }}
     </div>
     <div class="rounded-md text-sm">
       <div class="flex items-center text-xs uppercase">
         <div
-          class="flex size-7.5 items-center justify-center text-center text-gray-600"
+          class="flex size-7.5 items-center justify-center text-center text-ink-gray-5"
           v-for="(d, i) in ['s', 'm', 't', 'w', 't', 'f', 's']"
           :key="i"
         >
@@ -20,7 +20,7 @@
               <div
                 class="flex size-7 cursor-pointer text-orange-700 bg-yellow-100 items-center justify-center rounded hover:bg-yellow-100 select-none m-[1px]"
                 :class="{
-                  '!text-ink-gray-4 !bg-gray-100': isWeekOff(date),
+                  '!text-ink-gray-3 !bg-surface-gray-4': isWeekOff(date),
                 }"
                 @mouseover="handleMouseEnter(getFormattedDate(date), open)"
                 @mouseleave="handleMouseLeave(getFormattedDate(date), close)"
@@ -37,7 +37,7 @@
             </template>
             <template #body-main="{ close: closePopover, open: openPopover }">
               <div
-                class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-gray-100 rounded-md"
+                class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-outline-gray-1 rounded-md"
                 @mouseover="
                   handleMouseEnter(getFormattedDate(date), openPopover)
                 "
@@ -77,7 +77,7 @@
                     #body-main="{ close: closeDropdown, open: openDropdown }"
                   >
                     <div
-                      class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-gray-100 rounded-md"
+                      class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-outline-gray-1 rounded-md"
                       @mouseover="
                         handleMouseEnter(getFormattedDate(date), openPopover);
                         handleMouseEnter(
@@ -133,8 +133,8 @@
             v-else
             class="flex size-7 items-center justify-center rounded m-[1px] select-none"
             :class="{
-              'cursor-pointer hover:bg-surface-gray-2': isDateInRange(date),
-              'text-ink-gray-3':
+              'cursor-pointer hover:bg-surface-gray-3': isDateInRange(date),
+              'text-ink-gray-2':
                 // @ts-ignore
                 date.getMonth() !== currentMonth - 1 || !isDateInRange(date),
               'bg-black text-ink-white hover:!bg-black/80 hover:text-ink-white':

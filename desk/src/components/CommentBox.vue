@@ -1,25 +1,25 @@
 <template>
   <div class="flex-col text-base flex-1" ref="commentBoxRef">
     <div class="mb-1 ml-0.5 flex items-center justify-between">
-      <div class="text-gray-600 flex items-center gap-2">
+      <div class="text-ink-gray-5 flex items-center gap-2">
         <Avatar
           size="md"
           :label="commenter"
           :image="getUser(commentedBy).user_image"
         />
         <p>
-          <span class="font-medium text-gray-800">
+          <span class="font-medium text-ink-gray-8">
             {{ commenter }}
           </span>
           <span> added a</span>
-          <span class="max-w-xs truncate font-medium text-gray-800">
+          <span class="max-w-xs truncate font-medium text-ink-gray-8">
             comment
           </span>
         </p>
       </div>
       <div class="flex items-center gap-1">
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-          <span class="pl-0.5 text-sm text-gray-600">
+          <span class="pl-0.5 text-sm text-ink-gray-5">
             {{ timeAgo(creation) }}
           </span>
         </Tooltip>
@@ -42,7 +42,7 @@
           >
             <Button
               icon="more-horizontal"
-              class="text-gray-600"
+              class="text-ink-gray-5"
               variant="ghost"
             />
           </Dropdown>
@@ -51,7 +51,7 @@
     </div>
     <div
       :id="`comment-${name}`"
-      class="rounded bg-gray-50 transition-colors px-4 py-3"
+      class="rounded bg-surface-gray-3 transition-colors px-4 py-3"
     >
       <TextEditor
         ref="editorRef"
@@ -104,7 +104,7 @@
         <Popover>
           <template #target="{ togglePopover }">
             <button
-              class="flex h-full items-center justify-center rounded-full bg-surface-gray-2 px-2 py-1 text-ink-gray-6 transition hover:bg-surface-gray-3"
+              class="flex h-full items-center justify-center rounded-full bg-surface-gray-3 px-2 py-1 text-ink-gray-5 transition hover:bg-surface-gray-4"
               @click="togglePopover()"
             >
               <ReactionIcon class="w-4 h-4" />
@@ -112,13 +112,13 @@
           </template>
           <template #body>
             <div
-              class="bg-surface-white rounded-lg shadow-lg p-2 border border-outline-gray-2"
+              class="bg-surface-white rounded-lg shadow-lg p-2 border border-outline-gray-1"
             >
               <div class="grid grid-cols-6 gap-2">
                 <button
                   v-for="emoji in emojiList"
                   :key="emoji"
-                  class="size-6 flex items-center justify-center rounded hover:bg-surface-gray-2 text-lg transition-colors"
+                  class="size-6 flex items-center justify-center rounded hover:bg-surface-gray-3 text-lg transition-colors"
                   @click="handleReaction(emoji)"
                 >
                   {{ emoji }}
@@ -132,7 +132,7 @@
           <Tooltip>
             <template #body>
               <div
-                class="bg-surface-gray-7 px-2 py-1 text-center text-p-xs text-ink-white shadow-xl rounded"
+                class="bg-surface-gray-5 px-2 py-1 text-center text-p-xs text-ink-white shadow-xl rounded"
               >
                 <span v-for="(user, idx) in reaction.users" :key="user.user"
                   >{{ user.full_name
@@ -144,8 +144,8 @@
               class="flex items-center gap-1 px-2 py-1 rounded-full text-sm transition-colors"
               :class="
                 reaction.current_user_reacted
-                  ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                  : 'bg-surface-gray-3 text-ink-gray-6 hover:bg-surface-gray-4'
+                  ? 'bg-surface-blue-2 text-blue-700 hover:bg-blue-200'
+                  : 'bg-surface-gray-4 text-ink-gray-5 hover:bg-surface-gray-4'
               "
               @click="handleReaction(reaction.emoji)"
             >

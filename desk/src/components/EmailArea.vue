@@ -2,7 +2,7 @@
   <div
     :id="`communication-${name}`"
     v-bind="$attrs"
-    class="grow cursor-pointer border-transparent bg-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
+    class="grow cursor-pointer border-transparent bg-surface-cards rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >
     <div
       class="flex items-center justify-between gap-2"
@@ -13,11 +13,11 @@
         <div class="leading-tight">
           <p>{{ sender.full_name || "Guest" }}</p>
           <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-            <p class="text-xs md:text-sm text-gray-600">
+            <p class="text-xs md:text-sm text-ink-gray-5">
               {{ timeAgo(creation) }}
             </p>
           </Tooltip>
-          <p class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">
+          <p class="sm:flex hidden text-sm text-ink-gray-5" v-if="sender.name">
             {{ "<" + sender.name + ">" }}
           </p>
         </div>
@@ -25,9 +25,11 @@
       <!-- email design for desktop -->
       <div v-else class="flex items-center gap-1">
         <span>{{ sender.full_name || "Guest" }}</span>
-        <span class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">{{
-          "<" + sender.name + ">"
-        }}</span>
+        <span
+          class="sm:flex hidden text-sm text-ink-gray-5"
+          v-if="sender.name"
+          >{{ "<" + sender.name + ">" }}</span
+        >
       </div>
 
       <div class="flex gap-0.5 items-center">
@@ -42,14 +44,14 @@
           :text="dateFormat(creation, dateTooltipFormat)"
           v-if="!isMobileView"
         >
-          <p class="text-xs md:text-sm text-gray-600">
+          <p class="text-xs md:text-sm text-ink-gray-5">
             {{ timeAgo(creation) }}
           </p>
         </Tooltip>
-        <Button variant="ghost" class="text-gray-700" @click="reply">
+        <Button variant="ghost" class="text-ink-gray-7" @click="reply">
           <ReplyIcon class="h-4 w-4" />
         </Button>
-        <Button variant="ghost" class="text-gray-700" @click="replyAll">
+        <Button variant="ghost" class="text-ink-gray-7" @click="replyAll">
           <ReplyAllIcon class="h-4 w-4" />
         </Button>
         <Dropdown
@@ -65,29 +67,31 @@
         >
           <Button
             icon="more-horizontal"
-            class="text-gray-600"
+            class="text-ink-gray-5"
             variant="ghost"
           />
         </Dropdown>
       </div>
     </div>
-    <!-- <div class="text-sm leading-5 text-gray-600">
+    <!-- <div class="text-sm leading-5 text-ink-gray-5">
       {{ subject }}
     </div> -->
-    <div class="text-sm leading-5 text-gray-600">
-      <span v-if="to" class="text-2xs mr-1 font-bold text-gray-500">TO:</span>
+    <div class="text-sm leading-5 text-ink-gray-5">
+      <span v-if="to" class="text-2xs mr-1 font-bold text-ink-gray-4">TO:</span>
       <span v-if="to"> {{ to }} </span>
       <span v-if="cc">, </span>
-      <span v-if="cc" class="text-2xs mr-1 font-bold text-gray-500"> CC: </span>
+      <span v-if="cc" class="text-2xs mr-1 font-bold text-ink-gray-4">
+        CC:
+      </span>
       <span v-if="cc">{{ cc }}</span>
       <span v-if="bcc">, </span>
-      <span v-if="bcc" class="text-2xs mr-1 font-bold text-gray-500">
+      <span v-if="bcc" class="text-2xs mr-1 font-bold text-ink-gray-4">
         BCC:
       </span>
       <span v-if="bcc">{{ bcc }}</span>
     </div>
     <div class="border-0 border-t my-3 border-outline-gray-modals" />
-    <EmailContent :content="content" />
+    <EmailContent :content="sanitizedContent" />
     <div class="flex flex-wrap gap-2">
       <AttachmentItem
         v-for="a in attachments"
@@ -147,6 +151,17 @@ const auth = storeToRefs(useAuthStore());
 const { isMobileView } = useScreenSize();
 
 const showSplitModal = ref(false);
+
+const sanitizedContent = computed(() => {
+  if (!content) return content;
+  // Create a temporary div to parse HTML
+  const div = document.createElement("div");
+  div.innerHTML = content;
+  // Remove all style attributes
+  const elementsWithStyle = div.querySelectorAll("[style]");
+  elementsWithStyle.forEach((el) => el.removeAttribute("style"));
+  return div.innerHTML;
+});
 
 const status = computed(() => {
   let _status = deliveryStatus;

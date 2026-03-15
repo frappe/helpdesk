@@ -1,10 +1,12 @@
 <template>
-  <div class="flex items-center justify-between mb-8 p-4 rounded-lg bg-gray-50">
+  <div
+    class="flex items-center justify-between mb-8 p-4 rounded-lg bg-surface-gray-3"
+  >
     <!-- Feedback Section -->
     <div>
       <!-- was this article helpful? -->
       <div class="flex items-center gap-2">
-        <span class="text-gray-800 text-sm"
+        <span class="text-ink-gray-8 text-sm"
           >Did this article solve your issue?</span
         >
         <div class="flex items-center gap-1">

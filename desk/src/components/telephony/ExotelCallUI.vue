@@ -2,7 +2,7 @@
   <div>
     <div
       v-show="showSmallCallPopup"
-      class="ml-2 flex cursor-pointer select-none items-center justify-between gap-1 rounded-full bg-surface-gray-7 px-2 py-1 mt-1 text-base !text-ink-gray-2"
+      class="ml-2 flex cursor-pointer select-none items-center justify-between gap-1 rounded-full bg-surface-gray-5 px-2 py-1 mt-1 text-base !text-ink-gray-1"
       @click="toggleCallPopup"
     >
       <div
@@ -42,20 +42,20 @@
     <div v-show="showCallPopup" v-bind="$attrs">
       <div
         ref="callPopupHeader"
-        class="fixed z-20 flex w-60 cursor-move select-none flex-col rounded-lg bg-surface-gray-7 p-2 !text-ink-gray-2 shadow-2xl"
+        class="fixed z-20 flex w-60 cursor-move select-none flex-col rounded-lg bg-surface-gray-5 p-2 !text-ink-gray-1 shadow-2xl"
         :style="style"
       >
         <div class="flex flex-row-reverse items-center">
           <Button
             @click="closeCallPopup"
-            class="bg-surface-gray-7 text-ink-white hover:bg-surface-gray-6 shrink-0"
+            class="bg-surface-gray-5 text-ink-white hover:bg-surface-gray-6 shrink-0"
             icon="x"
             size="md"
           />
           <Button
             @click="toggleCallPopup"
             variant="ghost"
-            class="bg-surface-gray-7 text-ink-white hover:bg-surface-gray-6 shrink-0"
+            class="bg-surface-gray-5 text-ink-white hover:bg-surface-gray-6 shrink-0"
           >
             <MinimizeIcon class="size-4 cursor-pointer" />
           </Button>
@@ -71,7 +71,7 @@
             <div class="text-xl font-medium">
               {{ contact?.full_name ?? "Unknown" }}
             </div>
-            <div class="text-sm text-ink-gray-5">
+            <div class="text-sm text-ink-gray-4">
               {{ contact?.mobile_no || contact?.phone }}
             </div>
           </div>

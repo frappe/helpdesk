@@ -4,7 +4,7 @@
   >
     <!-- left box -->
     <div class="flex-1 flex flex-col gap-1.5">
-      <span class="block text-xs text-ink-gray-5">
+      <span class="block text-xs text-ink-gray-4">
         Select parent field value
       </span>
       <div class="border flex-1 border-r-0 rounded-l p-2 flex flex-col gap-2">
@@ -16,7 +16,7 @@
             class="w-full"
           >
             <template #prefix>
-              <LucideSearch class="h-4 w-4 text-gray-500" />
+              <LucideSearch class="h-4 w-4 text-ink-gray-4" />
             </template>
           </FormControl>
           <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
@@ -24,18 +24,18 @@
               <li
                 v-for="value in filteredParentFieldValues"
                 :key="value"
-                class="py-2 mb-1 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1 overflow-hidden max-w-full"
+                class="py-2 mb-1 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-2 overflow-hidden max-w-full"
                 :class="{
-                  'bg-surface-gray-2 hover:bg-surface-gray-3':
+                  'bg-surface-gray-3 hover:bg-surface-gray-4':
                     state.currentParentSelection === value,
                 }"
                 @click="handleParentValueClick(value)"
               >
-                <span class="text-base text-ink-gray-6 max-w-[90%] truncate">{{
+                <span class="text-base text-ink-gray-5 max-w-[90%] truncate">{{
                   value
                 }}</span>
                 <LucideChevronRight
-                  class="h-4 w-4 text-ink-gray-6"
+                  class="h-4 w-4 text-ink-gray-5"
                   v-if="
                     getSelectedChildValueCount(value) === 0 ||
                     state.currentParentSelection === value
@@ -54,7 +54,7 @@
         </template>
         <template v-else>
           <div
-            class="flex flex-col items-center mt-20 h-full text-ink-gray-4 text-sm"
+            class="flex flex-col items-center mt-20 h-full text-ink-gray-3 text-sm"
           >
             Please select a parent field first
           </div>
@@ -63,7 +63,7 @@
     </div>
     <!-- right box -->
     <div class="flex-1 flex flex-col gap-1.5">
-      <span class="block text-xs text-ink-gray-5 pl-1.5">
+      <span class="block text-xs text-ink-gray-4 pl-1.5">
         Select child field value
       </span>
       <div class="border flex-1 rounded-r p-2 flex flex-col gap-2">
@@ -77,13 +77,13 @@
             class="w-full"
           >
             <template #prefix>
-              <LucideSearch class="h-4 w-4 text-gray-500" />
+              <LucideSearch class="h-4 w-4 text-ink-gray-4" />
             </template>
           </FormControl>
           <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
             <!-- Master Check box -->
             <li
-              class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center bg-surface-gray-1 hover:bg-surface-gray-2"
+              class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center bg-surface-gray-2 hover:bg-surface-gray-3"
               @click="handleSelectAllChildValues(!toggleAllChildValues)"
             >
               <FormControl
@@ -99,7 +99,7 @@
               <li
                 v-for="value in filteredChildFieldValues"
                 :key="value"
-                class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1 max-w-full truncate"
+                class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-2 max-w-full truncate"
                 @click="handleChildValueClick(value)"
               >
                 <FormControl
@@ -107,21 +107,21 @@
                   :model-value="isChildValueSelected(value)"
                   class="mr-2"
                 />
-                <span class="text-base text-ink-gray-6">{{ value }}</span>
+                <span class="text-base text-ink-gray-5">{{ value }}</span>
               </li>
             </ul>
           </div>
         </template>
         <template v-else-if="!state.selectedChildField">
           <div
-            class="flex flex-col items-center mt-20 h-full text-ink-gray-4 text-sm"
+            class="flex flex-col items-center mt-20 h-full text-ink-gray-3 text-sm"
           >
             Please select a child field first
           </div>
         </template>
         <template v-else>
           <div
-            class="flex flex-col items-center mt-20 h-full text-ink-gray-4 text-sm"
+            class="flex flex-col items-center mt-20 h-full text-ink-gray-3 text-sm"
           >
             Please select a parent value first
           </div>
