@@ -237,7 +237,7 @@ function handleMoveToCategory(category: string) {
         listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value.clear();
-        toast.success(__("Articles moved successfully."));
+        toast.success(__("Articles moved."));
       },
       onError: (error: Error) => {
         const title = error?.messages?.[0] || error.message;
@@ -268,7 +268,7 @@ function handleCategoryCreate() {
             isEdit: 1,
           },
         });
-        toast.success(__("Category created successfully."));
+        toast.success(__("Category created."));
         capture("category_created", {
           data: {
             category: category.title,
@@ -307,7 +307,7 @@ function handleCategoryUpdate() {
         showCategoryModal.value = false;
         editTitle.value = false;
 
-        toast.success(__("Category updated successfully."));
+        toast.success(__("Category updated."));
         resetState();
       },
       onError: (error: any) => {
@@ -339,7 +339,7 @@ function handleCategoryDelete(groupedRow) {
             },
             {
               onSuccess: () => {
-                toast.success(__("Category deleted successfully."));
+                toast.success(__("Category deleted."));
                 listViewRef.value.reload();
               },
             }
@@ -361,7 +361,7 @@ function handleDeleteArticles() {
         listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value?.clear();
-        toast.success(__("Articles deleted successfully."));
+        toast.success(__("Articles deleted."));
       },
     }
   );
@@ -376,7 +376,7 @@ function handleMergeCategory(source: string, target: string) {
     {
       onSuccess: () => {
         listViewRef.value.reload();
-        toast.success(__("Category merged successfully."));
+        toast.success(__("Category merged."));
         mergeModal.value = false;
         resetState();
       },

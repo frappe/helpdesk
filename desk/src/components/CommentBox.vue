@@ -158,7 +158,7 @@ import { useConfigStore } from "@/stores/config";
 import { updateRes as updateComment } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { CommentActivity } from "@/types";
-import { Editor } from "@tiptap/core";
+import { ConfirmDelete } from "@/utils";
 import {
   dateFormat,
   dateTooltipFormat,
@@ -208,6 +208,18 @@ const _content = ref(content);
 
 const emojiList = ["👍", "👎", "❤️", "🎉", "👀", "✅"];
 
+const dropdownOptions = computed(() => [
+  {
+    label: "Edit",
+    onClick: () => handleEditMode(),
+    icon: "edit-2",
+    condition: () => !isTicketMergedComment.value,
+  },
+  ...ConfirmDelete({
+    onConfirmDelete: () => deleteComment.submit(),
+    isConfirmingDelete,
+  }),
+]);
 // editor.commands.focus('end')
 
 const reactions = ref<
@@ -296,7 +308,7 @@ const deleteComment = createResource({
   }),
   onSuccess() {
     emit("update");
-    toast.success(__("Comment deleted sucessfully."));
+    toast.success("Comment deleted sucessfully.");
   },
 });
 
@@ -306,7 +318,7 @@ function handleSaveComment() {
     return;
   }
   if (isContentEmpty(_content.value)) {
-    toast.error(__("Comment cannot be empty."));
+    toast.error("Comment cannot be empty.");
     return;
   }
 
@@ -322,7 +334,7 @@ function handleSaveComment() {
         editable.value = false;
         lastSavedContent.value = _content.value;
         emit("update");
-        toast.success(__("Comment updated successfully."));
+        toast.success("Comment updated successfully.");
       },
     }
   );

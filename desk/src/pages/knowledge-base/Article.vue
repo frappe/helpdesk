@@ -5,6 +5,7 @@
         <div class="flex gap-2 items-center crumbs">
           <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
           <Badge
+            v-if="!article.loading"
             variant="subtle"
             :theme="article.data?.status === 'Draft' ? 'orange' : 'green'"
             size="md"
@@ -130,6 +131,7 @@
                 <Dropdown
                   :options="articleActions"
                   v-if="!editable && !isCustomerPortal"
+                  @click="isConfirmingDeleteArticle = false"
                 >
                   <Button size="md" variant="ghost">
                     <template #icon>
@@ -250,7 +252,7 @@ import {
   copyToClipboard,
   isCustomerPortal,
   textEditorMenuButtons,
-  timeAgo,
+  ConfirmDelete,
 } from "@/utils";
 import { newCategory } from "@/stores/knowledgeBase";
 import {
@@ -275,7 +277,6 @@ import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import { __ } from "@/translation";
-import { setFeedback } from "@/stores/knowledgeBase";
 import {
   ThumbsDownIcon,
   ThumbsUpIcon,
@@ -327,8 +328,6 @@ const category = reactive({
   title: "",
   id: "",
 });
-
-const { $dialog } = globalStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -526,7 +525,7 @@ function handleArticleUpdate() {
             category: props.articleId,
           },
         });
-        toast.success(__("Article updated successfully."));
+        toast.success(__("Article updated."));
         isDirty.value = false;
         article.reload();
       },
@@ -539,7 +538,7 @@ function handleDelete() {
     { doctype: "HD Article", name: article.data.name },
     {
       onSuccess: () => {
-        toast.success(__("Article deleted successfully."));
+        toast.success(__("Article deleted."));
         router.push({ name: "AgentKnowledgeBase" });
       },
     }

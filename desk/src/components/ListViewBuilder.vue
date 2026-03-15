@@ -8,7 +8,7 @@
     v-if="showViewControls"
   >
     <QuickFilters v-if="!isMobileView" />
-    <div v-if="!isMobileView" class="-ml-2 h-[70%] border-l"></div>
+    <div v-if="!isMobileView" class="-ml-2 h-5 border-l"></div>
     <div
       class="flex items-start gap-2 justify-end h-full py-1 pl-0.5"
       v-if="!isMobileView"
@@ -483,7 +483,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
     return h(MultipleAvatar, {
       avatars: item,
       hideName: false,
-      class: "flex items-center truncate flex-1 flex-row-reverse justify-end",
+      class: "flex items-center flex-1 min-w-0",
     });
   }
   if (column.type === "Rating") {

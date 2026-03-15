@@ -301,7 +301,7 @@ function showConfirmationDialog() {
             { fieldname: "status", value: "Closed" },
             {
               onSuccess: () => {
-                toast.success(__("Ticket closed successfully."));
+                toast.success(__("Ticket closed."));
               },
             }
           );

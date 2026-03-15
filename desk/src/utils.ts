@@ -269,7 +269,7 @@ export const isCustomerPortal = ref(false);
 
 export async function copyToClipboard(
   msg: string = "",
-  toastMessage: string = __("Copied to clipboard.")
+  toastMessage: string = "Copied to clipboard."
 ) {
   if (navigator.clipboard && window.isSecureContext) {
     await navigator.clipboard.writeText(msg);

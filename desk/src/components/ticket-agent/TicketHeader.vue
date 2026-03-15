@@ -64,6 +64,7 @@
           v-if="groupedActions[0]?.items?.length >= 1"
           :options="groupedActions"
           placement="right"
+          @click="isConfirmingDelete = false"
         >
           <Button icon="more-horizontal" />
         </Dropdown>
@@ -98,7 +99,7 @@ import {
 const { isAdmin } = useAuthStore();
 const { $dialog } = globalStore();
 import { HDTicketStatus } from "@/types/doctypes";
-import { getIcon } from "@/utils";
+import { getIcon, ConfirmDelete } from "@/utils";
 import {
   Breadcrumbs,
   call,
@@ -142,6 +143,7 @@ const ticketStatusStore = useTicketStatusStore();
 const ticket = inject(TicketSymbol);
 const customizations = inject(CustomizationSymbol);
 const activities = inject(ActivitiesSymbol);
+const isConfirmingDelete = ref(false);
 const showSubjectDialog = ref(false);
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
@@ -198,6 +200,20 @@ function updateField(fieldname: string, value: string, callback = () => {}) {
   callback();
 }
 
+function handleDeleteTicket() {
+  call("frappe.client.delete", {
+    doctype: "HD Ticket",
+    name: ticket.value.doc.name,
+  })
+    .then(() => {
+      toast.success(__("Ticket deleted successfully."));
+      router.push({ name: "TicketsAgent" });
+    })
+    .catch((err: any) => {
+      toast.error(err || __("Failed to delete ticket."));
+      isConfirmingDelete.value = false;
+    });
+}
 const ticketCount = createResource({
   url: "frappe.client.get_count",
   makeParams: () => ({
@@ -228,6 +244,12 @@ const defaultActions = computed(() => {
       onClick: () => (showMergeModal.value = true),
     });
   }
+  items.push(
+    ...ConfirmDelete({
+      onConfirmDelete: handleDeleteTicket,
+      isConfirmingDelete,
+    })
+  );
 
   return [
     {
