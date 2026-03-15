@@ -228,7 +228,7 @@ const labelClasses = computed(() => {
     }[attrs.size || "sm"],
     "text-ink-gray-5",
     ...(attrs.required
-      ? ["after:content-['*']", "after:ml-0.5", "after:text-red-500"]
+      ? ["after:content-['*']", "after:ml-0.5", "after:text-ink-red-3"]
       : []),
   ];
 });

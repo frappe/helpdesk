@@ -23,7 +23,7 @@
               {{ $props.label }}
             </label>
             <button
-              class="flex h-7 w-full items-center justify-between gap-2 rounded bg-surface-gray-4 py-1 px-2 transition-colors hover:bg-surface-gray-4 focus:ring-2 focus:ring-gray-400"
+              class="flex h-7 w-full items-center justify-between gap-2 rounded bg-surface-gray-4 py-1 px-2 transition-colors hover:bg-surface-gray-4 focus:ring-2 focus:ring-outline-gray-3"
               :class="[
                 isComboboxOpen ? 'bg-surface-gray-4' : '',
                 $props.buttonClasses,

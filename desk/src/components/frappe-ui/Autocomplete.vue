@@ -269,9 +269,9 @@ const inputClasses = computed(() => {
   let variant = props.disabled ? "disabled" : props.variant;
   let variantClasses = {
     subtle:
-      "border border-outline-gray-1 bg-surface-gray-2 placeholder-ink-gray-5 hover:border-outline-gray-1 hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-3 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
+      "border border-outline-gray-1 bg-surface-gray-2 placeholder-ink-gray-5 hover:border-outline-gray-1 hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-3 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3",
     outline:
-      "border border-outline-gray-2 bg-surface-white placeholder-ink-gray-5 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-3 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
+      "border border-outline-gray-2 bg-surface-white placeholder-ink-gray-5 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-3 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3",
     disabled: [
       "border bg-surface-gray-1 placeholder-ink-gray-4",
       props.variant === "outline"

@@ -26,7 +26,7 @@
       <div class="space-y-4 text-base text-ink-gray-7">
         <div class="space-y-2">
           <span> {{ __("Select a rating") }} </span>
-          <span class="text-red-500"> * </span>
+          <span class="text-ink-red-3"> * </span>
           <StarRating
             :static="false"
             :rating="rating"
@@ -36,7 +36,7 @@
         </div>
         <div v-if="options.data?.length" class="space-y-2">
           <span> {{ __("Pick an option") }} </span>
-          <span class="text-red-500"> * </span>
+          <span class="text-ink-red-3"> * </span>
           <div class="flex flex-wrap gap-2">
             <Button
               v-for="o in options.data"

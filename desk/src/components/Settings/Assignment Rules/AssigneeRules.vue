@@ -97,7 +97,7 @@
           :placement="'top'"
         >
           <div
-            class="text-xs rounded-full select-none bg-blue-600 text-white p-0.5 px-2"
+            class="text-xs rounded-full select-none bg-surface-blue-3 text-ink-white p-0.5 px-2"
           >
             {{ __("Last") }}
           </div>

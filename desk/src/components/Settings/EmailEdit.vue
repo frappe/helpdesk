@@ -13,7 +13,7 @@
             />
           </div>
           <div
-            class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200"
+            class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-gray-modals"
           >
             <CircleAlert
               class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-2"
@@ -405,7 +405,7 @@ function pullEmails() {
 
   toast.create({
     message: __("Pulling emails, this may take a few minutes."),
-    icon: h(CircleAlert, { class: "text-blue-500" }),
+    icon: h(CircleAlert, { class: "text-ink-blue-2" }),
   });
 
   call("frappe.email.doctype.email_account.email_account.pull_emails", {
