@@ -5,6 +5,7 @@
         <div class="flex gap-2 items-center crumbs">
           <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
           <Badge
+            v-if="!article.loading"
             variant="subtle"
             :theme="article.data?.status === 'Draft' ? 'orange' : 'green'"
             size="md"
@@ -130,6 +131,7 @@
                 <Dropdown
                   :options="articleActions"
                   v-if="!editable && !isCustomerPortal"
+                  @click="isConfirmingDeleteArticle = false"
                 >
                   <Button size="md" variant="ghost">
                     <template #icon>
@@ -250,7 +252,7 @@ import {
   copyToClipboard,
   isCustomerPortal,
   textEditorMenuButtons,
-  timeAgo,
+  ConfirmDelete,
 } from "@/utils";
 import { newCategory } from "@/stores/knowledgeBase";
 import {
@@ -275,7 +277,6 @@ import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import { __ } from "@/translation";
-import { setFeedback } from "@/stores/knowledgeBase";
 import {
   ThumbsDownIcon,
   ThumbsUpIcon,
@@ -327,8 +328,6 @@ const category = reactive({
   title: "",
   id: "",
 });
-
-const { $dialog } = globalStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -526,7 +525,7 @@ function handleArticleUpdate() {
             category: props.articleId,
           },
         });
-        toast.success(__("Article updated"));
+        toast.success(__("Article updated."));
         isDirty.value = false;
         article.reload();
       },
@@ -535,33 +534,15 @@ function handleArticleUpdate() {
 }
 
 function handleDelete() {
-  $dialog({
-    title: __("Delete Article"),
-    message: __("Are you sure you want to delete this article?"),
-    actions: [
-      {
-        label: __("Confirm"),
-        variant: "solid",
-        onClick({ close }) {
-          deleteArticle.submit(
-            {
-              doctype: "HD Article",
-              name: article.data.name,
-            },
-            {
-              onSuccess: () => {
-                toast.success(__("Article deleted"));
-                router.push({
-                  name: "AgentKnowledgeBase",
-                });
-              },
-            }
-          );
-          close();
-        },
+  deleteArticle.submit(
+    { doctype: "HD Article", name: article.data.name },
+    {
+      onSuccess: () => {
+        toast.success(__("Article deleted."));
+        router.push({ name: "AgentKnowledgeBase" });
       },
-    ],
-  });
+    }
+  );
 }
 const textEditorContentWithIDs = ref(null);
 watch(
@@ -621,6 +602,8 @@ const editorClass = computed(() => {
   ];
 });
 
+const isConfirmingDeleteArticle = ref(false);
+
 const articleActions = computed(() => [
   {
     label: __("Edit"),
@@ -658,17 +641,10 @@ const articleActions = computed(() => [
     group: __("Danger"),
     hideLabel: true,
     items: [
-      {
-        label: __("Delete"),
-        component: h(Button, {
-          label: __("Delete"),
-          variant: "ghost",
-          iconLeft: "trash-2",
-          theme: "red",
-          style: "width: 100%; justify-content: flex-start;",
-          onClick: handleDelete,
-        }),
-      },
+      ...ConfirmDelete({
+        onConfirmDelete: handleDelete,
+        isConfirmingDelete: isConfirmingDeleteArticle,
+      }),
     ],
   },
 ]);

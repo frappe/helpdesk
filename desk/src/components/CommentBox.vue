@@ -26,19 +26,8 @@
         <div v-if="authStore.userId === commentedBy && !editable">
           <Dropdown
             :placement="'right'"
-            :options="[
-              {
-                label: 'Edit',
-                onClick: () => handleEditMode(),
-                icon: 'edit-2',
-                condition: () => !isTicketMergedComment,
-              },
-              {
-                label: 'Delete',
-                onClick: () => (showDialog = true),
-                icon: 'trash-2',
-              },
-            ]"
+            :options="dropdownOptions"
+            @click="isConfirmingDelete = false"
           >
             <Button
               icon="more-horizontal"
@@ -144,21 +133,6 @@
       </div>
     </div>
   </div>
-  <Dialog
-    v-model="showDialog"
-    :options="{
-      title: 'Delete Comment',
-      message: 'Are you sure you want to confirm this action?',
-      actions: [
-        { label: 'Cancel', onClick: () => (showDialog = false) },
-        {
-          label: 'Delete',
-          onClick: () => deleteComment.submit(),
-          variant: 'solid',
-        },
-      ],
-    }"
-  />
 </template>
 
 <script setup lang="ts">
@@ -169,7 +143,7 @@ import { useConfigStore } from "@/stores/config";
 import { updateRes as updateComment } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { CommentActivity } from "@/types";
-import { Editor } from "@tiptap/core";
+import { ConfirmDelete } from "@/utils";
 import {
   dateFormat,
   dateTooltipFormat,
@@ -180,7 +154,6 @@ import {
 } from "@/utils";
 import {
   Avatar,
-  Dialog,
   Dropdown,
   Popover,
   TextEditor,
@@ -209,12 +182,24 @@ const isTicketMergedComment = computed(() => {
 });
 
 const emit = defineEmits(["update"]);
-const showDialog = ref(false);
+const isConfirmingDelete = ref(false);
 const editable = ref(false);
 const _content = ref(content);
 
 const emojiList = ["👍", "👎", "❤️", "🎉", "👀", "✅"];
 
+const dropdownOptions = computed(() => [
+  {
+    label: "Edit",
+    onClick: () => handleEditMode(),
+    icon: "edit-2",
+    condition: () => !isTicketMergedComment.value,
+  },
+  ...ConfirmDelete({
+    onConfirmDelete: () => deleteComment.submit(),
+    isConfirmingDelete,
+  }),
+]);
 // editor.commands.focus('end')
 
 const reactions = ref<
@@ -301,8 +286,7 @@ const deleteComment = createResource({
   }),
   onSuccess() {
     emit("update");
-    showDialog.value = false;
-    toast.success("Comment deleted");
+    toast.success("Comment deleted sucessfully.");
   },
 });
 
@@ -312,7 +296,7 @@ function handleSaveComment() {
     return;
   }
   if (isContentEmpty(_content.value)) {
-    toast.error("Comment cannot be empty");
+    toast.error("Comment cannot be empty.");
     return;
   }
 
@@ -327,7 +311,7 @@ function handleSaveComment() {
       onSuccess: () => {
         editable.value = false;
         emit("update");
-        toast.success("Comment updated");
+        toast.success("Comment updated successfully.");
       },
     }
   );

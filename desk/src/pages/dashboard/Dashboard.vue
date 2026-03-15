@@ -210,7 +210,7 @@
             </div>
             <div class="text-ink-gray-6 text-center text-base">
               {{
-                hasAppliedFilter && activeTab !== "my_stats"
+                hasAppliedFilter
                   ? __(
                       "No data found for the selected filters. Try adjusting the date range or filters applied."
                     )
@@ -246,6 +246,7 @@ import { __ } from "@/translation";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideUser from "~icons/lucide/user";
 import { useScreenSize } from "@/composables/screen";
+import { useStorage } from "@vueuse/core";
 
 const filters = reactive({
   period: getLastXDays(),
@@ -325,8 +326,7 @@ const teamMembers = createResource({
 const { isManager, userId } = useAuthStore();
 
 const viewMyStats = ref(false);
-const activeTab = ref("organization");
-
+const activeTab = useStorage("dashboard_active_tab", "organization");
 function setView(myStats: boolean) {
   viewMyStats.value = myStats;
   if (myStats) {
@@ -513,9 +513,7 @@ onMounted(() => {
     filters.agent = userId;
     return;
   }
-  numberCards.reload();
-  masterData.reload();
-  trendData.reload();
+  setView(activeTab.value === "my_stats");
 });
 
 usePageMeta(() => {

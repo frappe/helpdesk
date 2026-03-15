@@ -495,7 +495,7 @@ function updateTicket(fieldname: string, value: string) {
     onSuccess: () => {
       isLoading.value = false;
       ticket.reload();
-      toast.success(__("Ticket updated"));
+      toast.success(__("Ticket updated succesfully."));
     },
   });
 }
