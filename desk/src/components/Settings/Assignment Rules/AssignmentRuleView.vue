@@ -134,7 +134,7 @@
         <div>
           <div class="flex flex-col gap-1">
             <span class="text-lg font-semibold text-ink-gray-8">{{
-              __("Assignment condition")
+              __("Assignment Condition")
             }}</span>
             <div class="flex items-center justify-between gap-6">
               <span class="text-p-sm text-ink-gray-6">
@@ -211,7 +211,7 @@
         <div>
           <div class="flex flex-col gap-1">
             <span class="text-lg font-semibold text-ink-gray-8">{{
-              __("Unassignment condition")
+              __("Unassignment Condition")
             }}</span>
             <div class="flex items-center justify-between gap-6">
               <span class="text-p-sm text-ink-gray-6">

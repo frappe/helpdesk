@@ -1,11 +1,18 @@
 <template>
   <!-- View Controls -->
   <div
-    class="flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6"
+    :class="[
+      'flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6',
+      list?.data?.data?.length > 0 ? 'relative' : 'absolute w-[stretch]',
+    ]"
     v-if="showViewControls"
   >
-    <QuickFilters v-if="!isMobileView" class="flex-1" />
-    <div class="flex items-start gap-2 justify-end h-full" v-if="!isMobileView">
+    <QuickFilters v-if="!isMobileView" />
+    <div v-if="!isMobileView" class="-ml-2 h-5 border-l"></div>
+    <div
+      class="flex items-start gap-2 justify-end h-full py-1 pl-0.5"
+      v-if="!isMobileView"
+    >
       <Button
         :label="__('Save Changes')"
         v-if="isViewUpdated && canSaveView"
@@ -44,6 +51,7 @@
         params: { [options.rowRoute?.prop]: row.name },
         query: { view: route.query?.view },
       }),
+      onRowClick: (row) => emit('rowClick', row.name),
       emptyState,
     }"
   >
@@ -102,7 +110,7 @@
   <!-- Loading State -->
   <div
     v-else-if="list.loading"
-    class="w-full h-full flex items-center justify-center -mt-48"
+    class="w-full h-full flex items-center justify-center"
   >
     <LoadingIndicator :scale="10" />
   </div>
@@ -111,7 +119,7 @@
     v-else
     :title="emptyState.title"
     :icon="emptyState.icon"
-    @emptyStateAction="emit('emptyStateAction')"
+    :description="emptyState.description"
   />
 </template>
 
@@ -177,6 +185,7 @@ interface P {
       // type of a h componnt
       icon?: string | VNode;
       title: string;
+      description?: string;
     };
     hideViewControls?: boolean;
     hideColumnSetting?: boolean;
@@ -192,7 +201,6 @@ interface P {
 }
 
 interface E {
-  (event: "emptyStateAction"): void;
   (event: "rowClick", row: any): void;
 }
 const props = defineProps<P>();
@@ -469,8 +477,8 @@ function listCell(column: any, row: any, item: any, idx: number) {
   if (column.type === "MultipleAvatar") {
     return h(MultipleAvatar, {
       avatars: item,
-      hideName: true,
-      class: "flex items-center truncate flex-1 flex-row-reverse justify-end",
+      hideName: false,
+      class: "flex items-center flex-1 min-w-0",
     });
   }
   if (column.type === "Rating") {
@@ -511,7 +519,10 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
     } else {
       item = item[0].name;
     }
-    applyFilters({ ...defaultParams.filters, [column.key]: ["LIKE", item] });
+    applyFilters({
+      ...defaultParams.filters,
+      [column.key]: ["LIKE", `%${item}%`],
+    });
     return;
   }
   applyFilters({ ...defaultParams.filters, [column.key]: item });
@@ -557,6 +568,9 @@ function applySort(order_by: string) {
   isViewUpdated.value = true;
   defaultParams.order_by = order_by;
   list.submit({ ...defaultParams, order_by });
+  if (!defaultParams.is_default) return;
+  handleViewUpdate();
+  isViewUpdated.value = false;
 }
 
 function updateColumns(obj) {
@@ -614,9 +628,38 @@ function handleViewUpdate() {
     route_name: route.name,
     is_customer_portal: options.value.isCustomerPortal,
   };
-  updateView(view, () => {
-    isViewUpdated.value = false;
-  });
+  const currentView = findView(route.query.view as string).value;
+  if (currentView && currentView.public) {
+    $dialog({
+      title: __("Confirm Changes"),
+      message: __(
+        "This view is public. Changes made will be visible to everyone."
+      ),
+      actions: [
+        {
+          label: __("Save"),
+          variant: "solid",
+          onClick({ close }) {
+            updateView(view, () => {
+              isViewUpdated.value = false;
+            });
+            close();
+          },
+        },
+        {
+          label: __("Cancel"),
+          variant: "outline",
+          onClick({ close }) {
+            close();
+          },
+        },
+      ],
+    });
+  } else {
+    updateView(view, () => {
+      isViewUpdated.value = false;
+    });
+  }
 }
 
 const { findView, updateView, defaultView } = useView(options.value.doctype);

@@ -61,9 +61,10 @@
         </Dropdown>
         <!-- Core Actions + Custom Actions -->
         <Dropdown
-          v-if="groupedActions.length"
+          v-if="groupedActions[0]?.items?.length >= 1"
           :options="groupedActions"
           placement="right"
+          @click="isConfirmingDelete = false"
         >
           <Button icon="more-horizontal" />
         </Dropdown>
@@ -76,7 +77,7 @@
     v-model="showMergeModal"
     @update="ticket.reload()"
   />
-  <TicketSubjectModal v-if="showSubjectDialog" v-model="showSubjectDialog" />
+  <TicketSubjectModal v-model="showSubjectDialog" />
 </template>
 
 <script setup lang="ts">
@@ -96,8 +97,15 @@ import {
   View,
 } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
-import { getIcon } from "@/utils";
-import { Breadcrumbs, call, Dropdown, toast } from "frappe-ui";
+import { getIcon, ConfirmDelete } from "@/utils";
+import {
+  Breadcrumbs,
+  call,
+  Dropdown,
+  toast,
+  createListResource,
+  createResource,
+} from "frappe-ui";
 import { __ } from "@/translation";
 import {
   computed,
@@ -132,7 +140,7 @@ const ticketStatusStore = useTicketStatusStore();
 const ticket = inject(TicketSymbol);
 const customizations = inject(CustomizationSymbol);
 const activities = inject(ActivitiesSymbol);
-
+const isConfirmingDelete = ref(false);
 const showSubjectDialog = ref(false);
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
@@ -189,11 +197,37 @@ function updateField(fieldname: string, value: string, callback = () => {}) {
   callback();
 }
 
+function handleDeleteTicket() {
+  call("frappe.client.delete", {
+    doctype: "HD Ticket",
+    name: ticket.value.doc.name,
+  })
+    .then(() => {
+      toast.success(__("Ticket deleted successfully."));
+      router.push({ name: "TicketsAgent" });
+    })
+    .catch((err: any) => {
+      toast.error(err || __("Failed to delete ticket."));
+      isConfirmingDelete.value = false;
+    });
+}
+const ticketCount = createResource({
+  url: "frappe.client.get_count",
+  makeParams: () => ({
+    doctype: "HD Ticket",
+    filters: {
+      status_category: ["!=", "Resolved"],
+      is_merged: 0,
+    },
+  }),
+  auto: true,
+});
 const showMergeModal = ref(false);
 const showMergeOption = computed(() => {
   return (
-    !ticket.value.doc.is_merged &&
-    ["Open", "Paused"].includes(ticket.value.doc.status_category)
+    !ticket?.value?.doc?.is_merged &&
+    ["Open", "Paused"].includes(ticket?.value?.doc?.status_category) &&
+    ticketCount.data > 1
   );
 });
 const defaultActions = computed(() => {
@@ -207,6 +241,13 @@ const defaultActions = computed(() => {
       onClick: () => (showMergeModal.value = true),
     });
   }
+  items.push(
+    ...ConfirmDelete({
+      onConfirmDelete: handleDeleteTicket,
+      isConfirmingDelete,
+    })
+  );
+
   return [
     {
       group: __("Default actions"),
@@ -215,7 +256,7 @@ const defaultActions = computed(() => {
     },
   ];
 });
-const actions = ref([]);
+const actions = ref<any[]>([]);
 const normalActions = computed(() => {
   return actions.value.filter((action) => !action.group);
 });
@@ -246,6 +287,7 @@ const groupedActions = computed(() => {
   _actions = _actions.concat(
     actions.value.filter((action) => action.group && !action.buttonLabel)
   );
+  _actions = _actions.concat(defaultActions.value);
   return _actions;
 });
 
@@ -267,10 +309,7 @@ watchEffect(async () => {
       customizationCtx.value
     );
 
-    actions.value = [
-      ...defaultActions.value,
-      ...(customizations.value?.data?._customActions || []),
-    ];
+    actions.value = [...(customizations.value?.data?._customActions || [])];
   }
 });
 

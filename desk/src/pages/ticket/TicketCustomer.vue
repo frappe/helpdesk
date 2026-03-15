@@ -146,7 +146,7 @@ const ticket = createResource({
     });
   },
   onError: () => {
-    toast.error(__("Ticket not found"));
+    toast.error(__("Ticket not found."));
     router.replace("/my-tickets");
   },
 });
@@ -274,7 +274,7 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       ticket.reload();
-      toast.success(__("Ticket updated"));
+      toast.success(__("Ticket updated succesfully."));
     },
   });
 }
@@ -301,7 +301,7 @@ function showConfirmationDialog() {
             { fieldname: "status", value: "Closed" },
             {
               onSuccess: () => {
-                toast.success(__("Ticket closed"));
+                toast.success(__("Ticket closed."));
               },
             }
           );

@@ -8,7 +8,7 @@
       <div
         v-for="(activity, i) in activities"
         :key="activity.key"
-        class="activity"
+        class="activity mt-2"
       >
         <!-- single activity -->
         <div
@@ -20,7 +20,7 @@
           >
             <div
               class="z-1 flex h-7 w-7 items-center justify-center rounded-full bg-white"
-              :class="[['email', 'feedback'].includes(activity.type) && 'mt-2']"
+              :class="[['email', 'feedback'].includes(activity.type) && 'mt-3']"
             >
               <Avatar
                 v-if="activity.type === 'email' || activity.type === 'feedback'"
@@ -78,25 +78,10 @@
     </div>
     <div
       v-else
-      class="h-full flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
+      class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
     >
-      <component :is="emptyTextIcon" class="h-10 w-10" />
-      <span>{{ emptyText }}</span>
-      <Button
-        v-if="title == 'Emails'"
-        label="New Email"
-        @click="communicationAreaRef?.toggleEmailBox() ?? toggleEmailBox()"
-      />
-      <Button
-        v-else-if="title == 'Comments'"
-        label="New Comment"
-        @click="communicationAreaRef?.toggleCommentBox() ?? toggleCommentBox()"
-      />
-      <Button
-        v-else-if="title == 'Calls'"
-        label="Make a Call"
-        @click="makeCall()"
-      />
+      <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
+      <span class="text-lg font-medium text-ink-gray-8">{{ emptyText }}</span>
     </div>
   </FadedScrollableDiv>
 </template>
@@ -163,16 +148,11 @@ const communicationAreaRef: Ref = inject("communicationArea");
 const makeCall = inject<() => void>("makeCall");
 
 const emptyText = computed(() => {
-  let text = "No Activities";
-  if (props.title == "Emails") {
-    text = "No Email Communications";
-  } else if (props.title == "Comments") {
-    text = "No Comments";
-    return text;
-  } else if (props.title == "Calls") {
-    text = "No Calls";
-    return text;
-  }
+  if (props.title === "Emails") return "No email communications";
+  if (props.title === "Comments") return "No comments found";
+  if (props.title === "Calls") return "No calls made";
+
+  return "No activity found";
 });
 
 const emptyTextIcon = computed(() => {

@@ -27,6 +27,7 @@
       v-model:title="category.title"
       @update="handleCategoryUpdate"
       @create="handleCategoryCreate"
+      @general="handleGeneralCategory"
     />
     <MoveToCategoryModal v-model="moveToModal" @move="handleMoveToCategory" />
     <MergeCategoryModal
@@ -69,6 +70,7 @@ import { computed, h, onMounted, reactive, ref } from "vue";
 import { __ } from "@/translation";
 import { useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
+import LucideBookOpen from "~icons/lucide/book-open";
 
 const router = useRouter();
 const { $dialog } = globalStore();
@@ -86,7 +88,9 @@ const editTitle = ref(false);
 const showCategoryModal = ref(false);
 const moveToModal = ref(false);
 const mergeModal = ref(false);
-
+const hasActiveFilters = computed(
+  () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
+);
 const generalCategory = createResource({
   url: "helpdesk.api.knowledge_base.get_general_category",
   auto: true,
@@ -211,6 +215,14 @@ const selectBannerActions = [
   },
 ];
 
+function handleGeneralCategory() {
+  toast.error(
+    __(
+      "General is reserved category and cannot be used. Please use a different category name."
+    )
+  );
+}
+
 function handleMoveToCategory(category: string) {
   moveToCategory.submit(
     {
@@ -223,7 +235,7 @@ function handleMoveToCategory(category: string) {
         listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value.clear();
-        toast.success(__("Articles moved"));
+        toast.success(__("Articles moved."));
       },
       onError: (error: Error) => {
         const title = error?.messages?.[0] || error.message;
@@ -254,7 +266,7 @@ function handleCategoryCreate() {
             isEdit: 1,
           },
         });
-        toast.success(__("Category created"));
+        toast.success(__("Category created."));
         capture("category_created", {
           data: {
             category: category.title,
@@ -289,7 +301,7 @@ function handleCategoryUpdate() {
         showCategoryModal.value = false;
         editTitle.value = false;
 
-        toast.success(__("Category updated"));
+        toast.success(__("Category updated."));
         resetState();
       },
       onError: (error: string) => {
@@ -317,7 +329,7 @@ function handleCategoryDelete(groupedRow) {
             },
             {
               onSuccess: () => {
-                toast.success(__("Category deleted"));
+                toast.success(__("Category deleted."));
                 listViewRef.value.reload();
               },
             }
@@ -339,7 +351,7 @@ function handleDeleteArticles() {
         listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value?.clear();
-        toast.success(__("Articles deleted"));
+        toast.success(__("Articles deleted."));
       },
     }
   );
@@ -354,7 +366,7 @@ function handleMergeCategory(source: string, target: string) {
     {
       onSuccess: () => {
         listViewRef.value.reload();
-        toast.success(__("Category merged"));
+        toast.success(__("Category merged."));
         mergeModal.value = false;
         resetState();
       },
@@ -398,6 +410,17 @@ const options = computed(() => {
           });
         },
       },
+    },
+    emptyState: {
+      title: "No articles found",
+      icon: h(LucideBookOpen, {
+        class: "h-10 w-10",
+      }),
+      description: hasActiveFilters.value
+        ? __(
+            "No articles found for the applied filters. Try adjusting or clearing your filters."
+          )
+        : undefined,
     },
     rowRoute: {
       name: "Article",

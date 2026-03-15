@@ -13,10 +13,11 @@
     </div>
     <div class="gap-1 flex flex-col">
       <p class="text-base font-medium text-gray-800 truncate">
-        {{ category.category_name }}
+        {{ category?.category_name }}
       </p>
       <span class="truncate text-xs md:text-sm text-ink-gray-5">
-        {{ category.article_count }} articles
+        {{ category?.article_count }}
+        {{ category?.article_count % 2 === 1 ? "article" : "articles" }}
       </span>
     </div>
   </router-link>

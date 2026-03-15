@@ -6,12 +6,48 @@
     <template #body-content>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-8">
-          All comments and emails of the ticket
+          All comments and emails of the ticket will be moved to the
           <span class="whitespace-nowrap font-semibold"
             >#{{ ticket.name }}</span
           >
-          will be moved to the selected ticket.
+          <span class="inline-flex items-center gap-1">
+            selected ticket
+            <Popover trigger="hover" :hoverDelay="0.25" placement="right">
+              <template #target>
+                <FeatherIcon name="info" class="size-4 cursor-pointer" />
+              </template>
+
+              <template #body-main>
+                <div
+                  class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-98 whitespace-pre-wrap leading-5"
+                >
+                  <span class="text-p-base"
+                    >Tickets must meet the following conditions:</span
+                  >
+                  <ul class="list-disc pl-4 mt-1 space-y-1">
+                    <li>
+                      Ticket must be Open or Paused.
+                      <code class="bg-gray-100 rounded-md px-1 py-0.5"
+                        >status_category in ["Open", "Paused"]</code
+                      >
+                    </li>
+                    <li>
+                      Ticket must not already be merged.
+                      <code class="bg-gray-100 rounded-md px-1 py-0.5"
+                        >is_merged === 0</code
+                      >
+                    </li>
+                    <li>
+                      Source and target tickets which are to be merged cannot be
+                      the same.
+                    </li>
+                  </ul>
+                </div>
+              </template>
+            </Popover>
+          </span>
         </p>
+
         <Link
           class="form-control"
           doctype="HD Ticket"
@@ -62,7 +98,13 @@
 <script setup lang="ts">
 import { Link } from "@/components";
 import { HDTicket } from "@/types/doctypes";
-import { Dialog, createListResource, createResource, toast } from "frappe-ui";
+import {
+  Dialog,
+  createListResource,
+  createResource,
+  Popover,
+  toast,
+} from "frappe-ui";
 import { ref, watch } from "vue";
 import LucideMerge from "~icons/lucide/merge";
 import TriangleAlert from "~icons/lucide/triangle-alert";

@@ -78,7 +78,7 @@
         <div class="flex items-center justify-between">
           <div class="flex gap-2 items-center">
             <div class="text-base font-semibold text-ink-gray-9">
-              {{ __("Account info & security") }}
+              {{ __("Account & Security") }}
             </div>
             <Badge
               v-if="isAccountInfoDirty || isLanguageChanged"
@@ -90,6 +90,8 @@
           </div>
           <Button
             :label="__('Save')"
+            variant="solid"
+            class="transition-colors"
             @click="onSave"
             :loading="
               setAgent.loading ||
@@ -104,13 +106,13 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
           <FormControl
             class="w-full"
-            :label="__('First Name')"
+            :label="__('First name')"
             maxlength="40"
             v-model="profile.firstName"
           />
           <FormControl
             class="w-full"
-            :label="__('Last Name')"
+            :label="__('Last name')"
             maxlength="40"
             v-model="profile.lastName"
           />

@@ -16,6 +16,21 @@
       @onUpdate="ticket.reload"
     />
   </div>
+  <div
+    v-else
+    class="grid h-full place-items-center px-4 py-20 text-center text-lg text-gray-600"
+  >
+    <div class="space-y-4">
+      <div>
+        You don't have access to this ticket, or it no longer exists.
+        {{ ticket.doc?.name }}
+      </div>
+      <Button :route="{ name: 'TicketsAgent' }">
+        <template #suffix><TicketIcon class="w-4" /></template>
+        Back to Tickets
+      </Button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -42,6 +57,7 @@ import { createResource, toast, usePageMeta } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { showCommentBox, showEmailBox } from "./modalStates";
+import TicketIcon from "@/components/icons/TicketIcon.vue";
 
 const telephonyStore = useTelephonyStore();
 const { $socket } = globalStore();
@@ -165,10 +181,16 @@ onBeforeUnmount(() => {
   $socket.off("helpdesk:ticket-comment");
   $socket.off("helpdesk:ticket-update");
 });
-
 usePageMeta(() => {
+  if (!ticket.value?.doc?.name) {
+    return { title: "404 - Ticket not found" };
+  }
+
   return {
-    title: props.ticketId,
+    title:
+      props.ticketId +
+      " - " +
+      (ticketComposable.value.ticket?.doc?.subject ?? ""),
   };
 });
 </script>

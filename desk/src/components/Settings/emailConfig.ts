@@ -35,7 +35,7 @@ type EmailAccountFormState = {
 
 const fixedFields: RenderField[] = [
   {
-    label: "Account Name",
+    label: "Account name",
     name: "email_account_name",
     type: "text",
     placeholder: "Support / Sales",
@@ -91,7 +91,7 @@ export const popularProviderFields = [
 export const frappeMailFields = [
   ...fixedFields,
   {
-    label: "Frappe Mail Site",
+    label: "Frappe Mail site",
     name: "frappe_mail_site",
     type: "text",
     placeholder: "https://frappemail.com",

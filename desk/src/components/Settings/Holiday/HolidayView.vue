@@ -75,7 +75,7 @@
         <div>
           <div class="flex flex-col gap-1">
             <span class="text-lg font-semibold text-ink-gray-8">{{
-              __("Valid from")
+              __("Valid From")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">
               {{ __("Choose the duration of this holiday list.") }}
@@ -128,7 +128,7 @@
         <div>
           <div class="flex flex-col gap-1">
             <div class="text-lg font-semibold text-ink-gray-8">
-              {{ __("Recurring holidays") }}
+              {{ __("Recurring Holidays") }}
             </div>
             <div class="text-p-sm text-ink-gray-6">
               {{ __("Add recurring holidays such as weekends.") }}

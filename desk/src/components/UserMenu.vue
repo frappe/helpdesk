@@ -25,7 +25,7 @@
           >
             {{ config.brandName || "Helpdesk" }}
           </div>
-          <div class="mt-1 text-sm leading-none text-gray-700">
+          <div class="mt-1 text-sm text-gray-700">
             {{ authStore.userName }}
           </div>
         </div>
