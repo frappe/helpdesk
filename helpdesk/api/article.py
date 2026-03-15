@@ -34,10 +34,11 @@ def search_with_enough_results(
 
 
 def sanitize_query(query: str) -> str:
-    # Remove or escape characters that break search syntax
     q = query.strip().lower()
-    q = re.sub(r'[/\\+\-!(){}[\]^"~*?:&|]', " ", q)
-    return q
+    q = re.sub(r"[^a-z0-9\s]", " ", q)
+    # Collapse multiple spaces into one
+    q = re.sub(r"\s+", " ", q)
+    return q.strip()
 
 
 @frappe.whitelist()
@@ -51,7 +52,6 @@ def get_article_stats(article_name):
 @frappe.whitelist()
 def search(query: str) -> list:
     query = sanitize_query(query)
-    print("\n\n", query, "\n\n")
     ret, enough = search_with_enough_results([], query)
     if enough:
         return ret

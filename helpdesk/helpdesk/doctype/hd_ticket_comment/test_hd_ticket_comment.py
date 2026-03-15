@@ -2,13 +2,17 @@
 # See license.txt
 
 import frappe
+from frappe.desk.form.assign_to import remove
 from frappe.tests.utils import FrappeTestCase
 
+from helpdesk.api.ticket import assign_ticket_to_agent
 from helpdesk.helpdesk.doctype.hd_ticket_comment.hd_ticket_comment import (
     PRESET_EMOJIS,
     get_reactions,
     toggle_reaction,
 )
+from helpdesk.mixins.mentions import HasMentions
+from helpdesk.test_utils import create_agent
 
 
 class TestHDTicketComment(FrappeTestCase):
@@ -37,6 +41,12 @@ class TestHDTicketComment(FrappeTestCase):
                 }
             ).insert(ignore_permissions=True)
 
+        self.agent_emails = [f"agent{i}@example.com" for i in range(1, 13)]
+        for email in self.agent_emails:
+            create_agent(email)
+
+        self.assigned_agents = set()
+
         self.test_ticket = frappe.get_doc(
             {
                 "doctype": "HD Ticket",
@@ -56,8 +66,19 @@ class TestHDTicketComment(FrappeTestCase):
         )
         self.test_comment.insert(ignore_permissions=True)
 
+    def assign_agent(self, user: str):
+        assign_ticket_to_agent(self.test_ticket.name, user)
+        self.assigned_agents.add(user)
+
+    def unassign_agent(self, user: str):
+        remove("HD Ticket", self.test_ticket.name, user)
+
     def tearDown(self):
         frappe.set_user("Administrator")
+
+        for user in list(self.assigned_agents):
+            self.unassign_agent(user)
+        self.assigned_agents.clear()
 
         if hasattr(self, "test_comment") and self.test_comment:
             if frappe.db.exists("HD Ticket Comment", self.test_comment.name):
@@ -69,17 +90,23 @@ class TestHDTicketComment(FrappeTestCase):
             if frappe.db.exists("HD Ticket", self.test_ticket.name):
                 frappe.delete_doc("HD Ticket", self.test_ticket.name, force=True)
 
+        for email in self.agent_emails:
+            if frappe.db.exists("User", email):
+                frappe.delete_doc("User", email, force=True)
+
         frappe.db.set_single_value("HD Settings", "enable_comment_reactions", 0)
 
     def test_one_reaction_per_user(self):
-        frappe.set_user("test_user2@example.com")
+        agent = self.agent_emails[0]
+        frappe.set_user(agent)
+        self.assign_agent(agent)
 
         toggle_reaction(self.test_comment.name, "👍")
 
         doc = frappe.get_doc("HD Ticket Comment", self.test_comment.name)
         self.assertEqual(len(doc.reactions), 1)
         self.assertEqual(doc.reactions[0].emoji, "👍")
-        self.assertEqual(doc.reactions[0].user, "test_user2@example.com")
+        self.assertEqual(doc.reactions[0].user, agent)
 
         toggle_reaction(self.test_comment.name, "❤️")
 
@@ -95,23 +122,11 @@ class TestHDTicketComment(FrappeTestCase):
         frappe.set_user("Administrator")
 
     def test_reaction_count_accuracy(self):
-        users = []
-        for i in range(3, 13):
-            email = f"test_user{i}@example.com"
-            if not frappe.db.exists("User", email):
-                user = frappe.get_doc(
-                    {
-                        "doctype": "User",
-                        "email": email,
-                        "first_name": f"User{i}",
-                        "send_welcome_email": 0,
-                    }
-                )
-                user.insert(ignore_permissions=True)
-            users.append(email)
+        users = self.agent_emails[1:11]
 
         for user_email in users:
             frappe.set_user(user_email)
+            self.assign_agent(user_email)
             toggle_reaction(self.test_comment.name, "❤️")
 
         for user_email in users[:3]:
@@ -131,10 +146,6 @@ class TestHDTicketComment(FrappeTestCase):
         self.assertIsNotNone(thumbs_reaction)
         self.assertEqual(thumbs_reaction["count"], 3)
 
-        for email in users:
-            if frappe.db.exists("User", email):
-                frappe.delete_doc("User", email, force=True)
-
     def test_notification_created_on_reaction(self):
         frappe.set_user("test_user1@example.com")
 
@@ -147,7 +158,9 @@ class TestHDTicketComment(FrappeTestCase):
             },
         )
 
-        frappe.set_user("test_user2@example.com")
+        agent = self.agent_emails[0]
+        frappe.set_user(agent)
+        self.assign_agent(agent)
         toggle_reaction(self.test_comment.name, "👍")
 
         frappe.set_user("Administrator")
@@ -172,14 +185,16 @@ class TestHDTicketComment(FrappeTestCase):
             },
         )
 
-        self.assertEqual(notification.user_from, "test_user2@example.com")
+        self.assertEqual(notification.user_from, agent)
         self.assertEqual(notification.message, "1 person reacted to your comment")
         self.assertEqual(str(notification.reference_ticket), str(self.test_ticket.name))
 
         frappe.delete_doc("HD Notification", notification.name, force=True)
 
     def test_only_preset_emojis_allowed(self):
-        frappe.set_user("test_user2@example.com")
+        agent = self.agent_emails[0]
+        frappe.set_user(agent)
+        self.assign_agent(agent)
 
         invalid_emojis = ["🔥", "💯", "🚨", "😂"]
 
@@ -198,7 +213,9 @@ class TestHDTicketComment(FrappeTestCase):
         frappe.set_user("Administrator")
 
     def test_reaction_toggle_behavior(self):
-        frappe.set_user("test_user2@example.com")
+        agent = self.agent_emails[0]
+        frappe.set_user(agent)
+        self.assign_agent(agent)
 
         result = toggle_reaction(self.test_comment.name, "👍")
         self.assertEqual(result["action"], "added")
@@ -215,10 +232,14 @@ class TestHDTicketComment(FrappeTestCase):
         frappe.set_user("Administrator")
 
     def test_get_reactions_returns_correct_data(self):
-        frappe.set_user("test_user1@example.com")
+        agent_one = self.agent_emails[0]
+        agent_two = self.agent_emails[1]
+        frappe.set_user(agent_one)
+        self.assign_agent(agent_one)
         toggle_reaction(self.test_comment.name, "👍")
 
-        frappe.set_user("test_user2@example.com")
+        frappe.set_user(agent_two)
+        self.assign_agent(agent_two)
         toggle_reaction(self.test_comment.name, "❤️")
 
         frappe.set_user("Administrator")
@@ -239,48 +260,126 @@ class TestHDTicketComment(FrappeTestCase):
                 self.assertIn("full_name", user)
 
     def test_no_notification_for_self_reaction(self):
-        frappe.set_user("test_user1@example.com")
+        agent = self.agent_emails[2]
+        agent_comment = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Comment",
+                "reference_ticket": self.test_ticket.name,
+                "content": "<p>Agent self reaction test</p>",
+                "commented_by": agent,
+            }
+        )
+        agent_comment.insert(ignore_permissions=True)
+
+        frappe.set_user(agent)
+        self.assign_agent(agent)
 
         initial_count = frappe.db.count(
             "HD Notification",
             {
-                "user_to": "test_user1@example.com",
+                "user_to": agent,
                 "notification_type": "Reaction",
-                "reference_comment": self.test_comment.name,
+                "reference_comment": agent_comment.name,
             },
         )
 
-        toggle_reaction(self.test_comment.name, "👍")
+        toggle_reaction(agent_comment.name, "👍")
 
         frappe.set_user("Administrator")
 
         final_count = frappe.db.count(
             "HD Notification",
             {
-                "user_to": "test_user1@example.com",
+                "user_to": agent,
                 "notification_type": "Reaction",
-                "reference_comment": self.test_comment.name,
+                "reference_comment": agent_comment.name,
             },
         )
 
         self.assertEqual(final_count, initial_count)
 
-    def test_grouped_notifications(self):
-        test_users = []
-        for i in range(3, 6):
-            email = f"test_user{i}@example.com"
-            if not frappe.db.exists("User", email):
-                frappe.get_doc(
-                    {
-                        "doctype": "User",
-                        "email": email,
-                        "first_name": f"User{i}",
-                        "send_welcome_email": 0,
-                    }
-                ).insert(ignore_permissions=True)
-            test_users.append(email)
+        frappe.delete_doc("HD Ticket Comment", agent_comment.name, force=True)
 
-        frappe.set_user("test_user2@example.com")
+    def test_if_repeated_notification_sent_on_mention_add(self):
+        agent_one = self.agent_emails[0]
+        frappe.set_user(agent_one)
+        self.assign_agent(agent_one)
+
+        agent_comment = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Comment",
+                "reference_ticket": self.test_ticket.name,
+                "content": """
+                <p>
+                    Hello
+                    <span class="mention"
+                        data-type="mention"
+                        data-id="test_user2@example.com"
+                        data-label="Test User Two">
+                        @Test User Two
+                    </span>
+                </p>
+            """,
+                "commented_by": agent_one,
+                "owner": agent_one,
+            }
+        )
+
+        agent_comment.insert(ignore_permissions=True)
+
+        notifications = frappe.get_all(
+            "HD Notification",
+            filters={
+                "reference_comment": agent_comment.name,
+                "notification_type": "Mention",
+            },
+            fields=["name", "user_to"],
+        )
+        # notification one created should be equal to 1
+        self.assertEqual(len(notifications), 1)
+        self.assertEqual(notifications[0].user_to, "test_user2@example.com")
+
+        agent_comment.content = """
+            <p>
+                Hello
+                <span class="mention"
+                    data-type="mention"
+                    data-id="test_user2@example.com"
+                    data-label="Test User Two">
+                    @Test User Two
+                </span>
+                <span class="mention"
+                    data-type="mention"
+                    data-id="test_user1@example.com"
+                    data-label="Test User One">
+                    @Test User One
+                </span>
+            </p>
+        """
+
+        agent_comment.save(ignore_permissions=True)
+        agent_comment.reload()
+        notifications_updated = frappe.get_all(
+            "HD Notification",
+            filters={
+                "reference_comment": agent_comment.name,
+                "notification_type": "Mention",
+            },
+            fields=["user_to"],
+        )
+
+        user_emails = {n.user_to for n in notifications_updated}
+
+        self.assertEqual(len(notifications_updated), 2)
+        self.assertIn("test_user2@example.com", user_emails)
+        self.assertIn("test_user1@example.com", user_emails)
+
+    def test_grouped_notifications(self):
+        test_users = self.agent_emails[3:6]
+
+        agent = self.agent_emails[0]
+        frappe.set_user(agent)
+        self.assign_agent(agent)
         toggle_reaction(self.test_comment.name, "👍")
 
         frappe.set_user("Administrator")
@@ -296,6 +395,7 @@ class TestHDTicketComment(FrappeTestCase):
         self.assertEqual(len(notifications), 1)
 
         frappe.set_user(test_users[0])
+        self.assign_agent(test_users[0])
         toggle_reaction(self.test_comment.name, "❤️")
 
         frappe.set_user("Administrator")
@@ -314,6 +414,3 @@ class TestHDTicketComment(FrappeTestCase):
         self.assertEqual(notification.message, "2 people reacted to your comment")
 
         frappe.delete_doc("HD Notification", notification.name, force=True)
-        for email in test_users:
-            if frappe.db.exists("User", email):
-                frappe.delete_doc("User", email, force=True)

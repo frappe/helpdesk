@@ -102,6 +102,7 @@ import { FormControl, Button, Tooltip, createResource, toast } from "frappe-ui";
 import { computed, ref } from "vue";
 import { useOnboarding } from "frappe-ui/frappe";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 
 const authStore = useAuthStore();
@@ -215,6 +216,11 @@ const inviteByEmailResource = createResource({
     }
     pendingInvitesResource.reload();
     updateOnboardingStep("invite_your_team");
+    capture("agents_invited", {
+      data: {
+        role: role.value,
+      },
+    });
   },
 });
 

@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/stores/auth";
 import { ListResource, Notification } from "@/types";
+import { isCustomerPortal } from "@/utils";
 import { createListResource, createResource } from "frappe-ui";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
@@ -62,6 +63,7 @@ export const useNotificationStore = defineStore("notification", () => {
     { immediate: true }
   );
   $socket.on("helpdesk:comment-reaction-update", () => {
+    if (isCustomerPortal.value) return;
     resource.reload();
   });
 

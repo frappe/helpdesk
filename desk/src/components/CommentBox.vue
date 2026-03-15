@@ -51,12 +51,26 @@
         :content="_content"
         :editable="editable"
         :bubble-menu="textEditorMenuButtons"
-        :mentions="[]"
+        :mentions="userMentions"
         @change="(event:string) => {_content = event}"
+        @keydown.ctrl.enter.capture.stop="handleSaveComment"
+        @keydown.meta.enter.capture.stop="handleSaveComment"
       >
         <template #bottom v-if="editable">
           <div class="flex flex-row-reverse gap-2">
-            <Button label="Save" @click="handleSaveComment" variant="solid" />
+            <div>
+              <Button
+                :label="
+                  isMobileView
+                    ? 'Save'
+                    : isMac
+                    ? 'Save (⌘ + ⏎)'
+                    : 'Save (Ctrl + ⏎)'
+                "
+                @click="handleSaveComment"
+                variant="solid"
+              />
+            </div>
             <Button label="Discard" @click="handleDiscard" />
           </div>
         </template>
@@ -138,12 +152,15 @@
 <script setup lang="ts">
 import { AttachmentItem } from "@/components";
 import ReactionIcon from "@/components/icons/ReactionIcon.vue";
+import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { updateRes as updateComment } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { CommentActivity } from "@/types";
 import { ConfirmDelete } from "@/utils";
+import { useDevice } from "@/composables";
+import { useScreenSize } from "@/composables/screen";
 import {
   dateFormat,
   dateTooltipFormat,
@@ -176,10 +193,14 @@ const { enableCommentReactions } = useConfigStore();
 const { name, creation, content, commenter, commentedBy, attachments } =
   props.activity;
 
+const { isMac } = useDevice();
+const { isMobileView } = useScreenSize();
 const isTicketMergedComment = computed(() => {
   const regex = /has been merged with ticket #\d+/;
   return regex.test(content);
 });
+const agentStore = useAgentStore();
+const userMentions = computed(() => agentStore.dropdown ?? []);
 
 const emit = defineEmits(["update"]);
 const isConfirmingDelete = ref(false);
@@ -267,14 +288,17 @@ function handleReaction(emoji: string) {
 
 const commentBoxRef = ref(null);
 const editorRef = ref(null);
+const lastSavedContent = ref(content);
+const commentBoxState = ref(content);
 
 function handleEditMode() {
   editable.value = true;
+  commentBoxState.value = _content.value;
   editorRef.value?.editor.chain().focus("end").run();
 }
 
 function handleDiscard() {
-  _content.value = content;
+  _content.value = commentBoxState.value;
   editable.value = false;
 }
 
@@ -291,7 +315,7 @@ const deleteComment = createResource({
 });
 
 function handleSaveComment() {
-  if (content === _content.value) {
+  if (lastSavedContent.value === _content.value) {
     editable.value = false;
     return;
   }
@@ -310,13 +334,13 @@ function handleSaveComment() {
     {
       onSuccess: () => {
         editable.value = false;
+        lastSavedContent.value = _content.value;
         emit("update");
         toast.success("Comment updated successfully.");
       },
     }
   );
 }
-
 onMounted(() => {
   commentBoxRef.value.style.width = "0px";
 });

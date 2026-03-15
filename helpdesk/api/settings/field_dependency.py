@@ -5,23 +5,7 @@ from frappe import _
 
 
 @frappe.whitelist()
-def get_fields_meta(doctype="HD Ticket", fieldtypes=None):
-    """
-    Returns the metadata for the given doctype.
-    """
-
-    all_fields = frappe.get_meta(doctype).fields
-    if not fieldtypes:
-        return all_fields
-    fields = []
-    for field in all_fields:
-        if field.fieldtype in fieldtypes:
-            fields.append(field)
-    return fields
-
-
-@frappe.whitelist()
-def get_field_dependency(name):
+def get_field_dependency(name: str):
     """
     Returns the field dependency for the given name.
     """
@@ -51,7 +35,11 @@ def get_fields_criteria(script):
 
 @frappe.whitelist()
 def create_update_field_dependency(
-    parent_field, child_field, parent_child_mapping, enabled, fields_criteria
+    parent_field: str,
+    child_field: str,
+    parent_child_mapping: str,
+    enabled: bool,
+    fields_criteria: str,
 ):
     frappe.has_permission("HD Form Script", "create", throw=True)
     if not parent_field or not child_field or not parent_child_mapping:

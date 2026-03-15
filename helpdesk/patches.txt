@@ -35,3 +35,4 @@ helpdesk.patches.add_fulltext_index #v2
 helpdesk.patches.add_telephony_app
 helpdesk.patches.add_website_settings_permission
 helpdesk.patches.set_last_customer_agent_response
+helpdesk.patches.add_agent_manager_perms_in_assignment_rule
