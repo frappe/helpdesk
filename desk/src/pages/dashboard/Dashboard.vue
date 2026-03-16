@@ -327,7 +327,7 @@ const { isManager, userId } = useAuthStore();
 
 const viewMyStats = ref(false);
 const activeTab = useStorage("dashboard_active_tab", "organization");
-function setView(myStats: boolean) {
+function validateView(myStats: boolean) {
   viewMyStats.value = myStats;
   if (myStats) {
     filters.team = null;
@@ -338,7 +338,7 @@ function setView(myStats: boolean) {
 }
 
 watch(activeTab, (val) => {
-  setView(val === "my_stats");
+  validateView(val === "my_stats");
 });
 
 watch(
@@ -511,9 +511,12 @@ watch(
 onMounted(() => {
   if (!isManager) {
     filters.agent = userId;
-    return;
+  } else {
+    validateView(activeTab.value === "my_stats");
   }
-  setView(activeTab.value === "my_stats");
+  numberCards.reload();
+  masterData.reload();
+  trendData.reload();
 });
 
 usePageMeta(() => {
