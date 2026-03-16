@@ -72,10 +72,7 @@ doc_events = {
     "HD Ticket": {                                                       
         "validate": "helpdesk.overrides.assign.validate_hd_ticket_agent", 
     },
-    "ToDo": {
-        "before_insert": "helpdesk.overrides.assign.validate_agent_availability",
-    },
-   
+      
 }
 
 

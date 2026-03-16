@@ -43,8 +43,7 @@ def get_user():
         {"user": current_user},
         "signature"
     ) or ""
-    frappe.logger().debug(f"Signature for {current_user}: {signature}")  # 👈 add this
-    print(f"Signature for {current_user}: {signature}")  # 👈 add this
+
     return {
         "has_desk_access": has_desk_access,
         "is_admin": is_admin,

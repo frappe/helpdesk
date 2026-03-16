@@ -209,11 +209,16 @@ import {
   watch,
 } from "vue";
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
-import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
-
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";      
 const editorRef = ref(null);
 const showSavedRepliesSelectorModal = ref(false);
+<<<<<<< HEAD
 const quotedContentRef = ref<HTMLElement | null>(null);
+=======
+const auth = useAuthStore();                               
+const { updateOnboardingStep } = useOnboarding("helpdesk"); 
+const isManager = auth.isManager;
+>>>>>>> 340d9d4ab ( updated agent  signature and avalability status)
 
 const props = defineProps({
   ticketId: {
@@ -260,19 +265,23 @@ const newEmail = useStorage<null | string>(
   "emailBoxContent" + props.ticketId,
   null
 );
-const auth = useAuthStore();
 
 function setSignatureContent() {
   const signature = auth.userSignature;
+
   newEmail.value = null;
-  if (signature) {
-    nextTick(() => {
-      newEmail.value = `<p dir="ltr"><br/></p><p dir="ltr">${String(signature).trim()}</p>`;
+  nextTick(() => {
+    if (signature) {
+      const isHtml = /<[a-z][\s\S]*>/i.test(signature);
+      const formattedSig = isHtml
+        ? signature
+        : `<p>${String(signature).trim().replace(/\n/g, "<br/>")}</p>`;
+      newEmail.value = `<p></p>${formattedSig}`;
       nextTick(() => {
         editorRef.value?.editor?.commands.focus("start");
       });
-    });
-  }
+    }
+  });
 }
 
 const quotedContent = useStorage<null | string>(
@@ -345,6 +354,9 @@ const sendMail = createResource({
   onSuccess: () => {
     resetState();
     emit("submit");
+    if (isManager) {                                   
+      updateOnboardingStep("reply_on_ticket");
+    }
   },
   debounce: 300,
 });
@@ -400,15 +412,24 @@ async function removeAttachment(attachment) {
   await removeAttachmentFromServer(attachment.name);
 }
 
-function addToReply(body, toEmails, ccEmails, bccEmails) {
+function addToReply(
+  body: string,
+  toEmails: string[],
+  ccEmails: string[],
+  bccEmails: string[]
+) {
   toEmailsClone.value = toEmails;
   ccEmailsClone.value = ccEmails;
   bccEmailsClone.value = bccEmails;
 
   const signature = auth.userSignature || "";
+  const isHtml = /<[a-z][\s\S]*>/i.test(signature);
+  const formattedSignature = isHtml
+    ? signature
+    : `<p>${signature.trim().replace(/\n/g, "<br/>")}</p>`;
   const repliedMessage = `<blockquote class="reply-to-content">${body}</blockquote>`;
   const content = signature
-    ? `<p><br/></p><p>${signature}</p>${repliedMessage}`
+    ? `${formattedSignature}${repliedMessage}`
     : repliedMessage;
 
   editorRef.value.editor
@@ -530,23 +551,19 @@ const editor = computed(() => {
 
 
 watch(
-  () => auth.userSignature,
-  (signature) => {
-    if (props.editable && signature) setSignatureContent();
+  () => [auth.userSignature, props.editable],  
+  ([signature, isEditable]) => {
+    if (isEditable && signature) {
+      nextTick(() => setSignatureContent());
+    }
   },
   { immediate: true }
 );
 
-watch(
-  () => props.editable,
-  (isEditable) => {
-    if (isEditable) setSignatureContent();
-  }
-);
 
 defineExpose({
   addToReply,
   editor,
   submitMail,
 });
-</script>
+</script> 
