@@ -74,6 +74,8 @@ export const useAuthStore = defineStore("auth", () => {
     },
   });
 
+  
+
   function logout() {
     user.value = null;
     call(URI_LOGOUT).then(() => {

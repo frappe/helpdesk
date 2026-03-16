@@ -19,6 +19,7 @@ def _throw_if_agent_away(user: str):
         )
 
 
+
 def validate_agent_availability(doc, method=None):
     
     if doc.reference_type != "HD Ticket":

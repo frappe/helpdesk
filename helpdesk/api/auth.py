@@ -24,6 +24,7 @@ def get_user():
         as_dict=True,
     )
     
+    
     is_agent = _is_agent()
     is_admin = ("System Manager" or "Admistrator") in frappe.get_roles(current_user)
     has_desk_access = is_agent or is_admin
