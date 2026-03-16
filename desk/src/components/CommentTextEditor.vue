@@ -12,7 +12,7 @@
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
-    :mentions="dropdown"
+    :mentions="mentionsGetter"
     @change="editable ? (newComment = $event) : null"
     :extensions="[ComponentUtils, HandleExcelPaste]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
@@ -126,6 +126,7 @@ import { storeToRefs } from "pinia";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { agents: agentsList, dropdown, userGroups } = storeToRefs(useAgentStore());
+const mentionsGetter = () => dropdown.value ?? []
 const { isManager } = useAuthStore();
 
 const props = defineProps({

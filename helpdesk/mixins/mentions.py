@@ -21,8 +21,25 @@ class HasMentions:
                 m for m in current_mentions if m.email not in original_emails
             ]
 
+        if not current_mentions:
+            return
+
+        if self.doctype == "HD Ticket Comment":
+            already_notified = set(
+                frappe.get_all(
+                    "HD Notification",
+                    filters={
+                        "notification_type": "Mention",
+                        "reference_comment": self.name,
+                    },
+                    pluck="user_to",
+                )
+            )
+        else:
+            already_notified = set()
+
         for mention in current_mentions:
-            if mention.type == "group" and frappe.db.exists("User Group", mention.email):
+            if mention.type == "group":
                 users_to_notify = frappe.get_all(
                     "User Group Member",
                     filters={"parent": mention.email},
@@ -32,6 +49,12 @@ class HasMentions:
                 users_to_notify = [mention.email]
 
             for user_email in users_to_notify:
+                if self.owner == user_email:
+                    continue
+                
+                if user_email in already_notified:
+                    continue
+
                 values = frappe._dict(
                     doctype="HD Notification",
                     user_from=self.owner,
@@ -39,36 +62,8 @@ class HasMentions:
                     notification_type="Mention",
                     message=self.content,
                 )
-                if values.user_from == values.user_to:
-                    continue
                 if self.doctype == "HD Ticket Comment":
                     values.reference_comment = self.name
                     values.reference_ticket = self.reference_ticket
-                if frappe.db.exists(
-                    "HD Notification",
-                    {
-                        "reference_comment": self.name,
-                        "user_to": user_email,
-                        "notification_type": "Mention",
-                    },
-                ):
-                    continue
                 frappe.get_doc(values).insert()
-            # Why mention oneself?
-            if values.user_from == values.user_to:
-                continue
-            # Only comment (in tickets) has mentions as of now
-            if self.doctype == "HD Ticket Comment":
-                values.reference_comment = self.name
-                values.reference_ticket = self.reference_ticket
-            if frappe.db.exists(
-                "HD Notification",
-                {
-                    "reference_comment": self.name,
-                    "user_to": mention.email,
-                    "notification_type": "Mention",
-                },
-            ):
-                # avoid loop of notification to quit at first mention
-                continue
-            frappe.get_doc(values).insert()
+                already_notified.add(user_email)
