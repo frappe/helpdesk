@@ -15,6 +15,7 @@
     @change="editable ? (newEmail = $event) : null"
     :extensions="[ComponentUtils, HandleExcelPaste]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    @keydown.capture="handleKeydown"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">

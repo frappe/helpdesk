@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-22 10:40+0000\n"
-"PO-Revision-Date: 2026-03-04 18:54\n"
+"POT-Creation-Date: 2026-03-01 10:40+0000\n"
+"PO-Revision-Date: 2026-03-06 19:45\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -295,7 +295,7 @@ msgid "Agents will no longer be able to view and create saved replies with globa
 msgstr "Агенты больше не смогут просматривать и создавать сохраненные ответы с глобальным охватом."
 
 #. Name of a role
-#: desk/src/components/SavedRepliesSelectorModal.vue:158
+#: desk/src/components/SavedRepliesSelectorModal.vue:159
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:325
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
@@ -398,7 +398,7 @@ msgstr "Вы действительно хотите закрыть этот т�
 msgid "Are you sure you want to delete these articles?"
 msgstr "Вы уверены, что хотите удалить эти статьи?"
 
-#: desk/src/pages/knowledge-base/Article.vue:317
+#: desk/src/pages/knowledge-base/Article.vue:318
 msgid "Are you sure you want to delete this article?"
 msgstr "Вы уверены, что хотите удалить эту статью?"
 
@@ -450,19 +450,19 @@ msgstr "Статья"
 msgid "Article created"
 msgstr "Статья создана"
 
-#: desk/src/pages/knowledge-base/Article.vue:330
+#: desk/src/pages/knowledge-base/Article.vue:331
 msgid "Article deleted"
 msgstr "Статья удалена"
 
-#: desk/src/pages/knowledge-base/Article.vue:407
+#: desk/src/pages/knowledge-base/Article.vue:408
 msgid "Article link copied to clipboard"
 msgstr "Ссылка на статью скопирована в буфер обмена"
 
-#: desk/src/pages/knowledge-base/Article.vue:260
+#: desk/src/pages/knowledge-base/Article.vue:261
 msgid "Article moved"
 msgstr "Статья перемещена"
 
-#: desk/src/pages/knowledge-base/Article.vue:306
+#: desk/src/pages/knowledge-base/Article.vue:307
 msgid "Article updated"
 msgstr "Статья обновлена"
 
@@ -579,7 +579,7 @@ msgstr "Правило назначения {0} обновлено"
 msgid "At least one email is required"
 msgstr "Требуется как минимум один адрес электронной почты"
 
-#: desk/src/components/Settings/InviteAgents.vue:170
+#: desk/src/components/Settings/InviteAgents.vue:171
 msgid "At least one email required"
 msgstr "Требуется хотя бы один адрес электронной почты"
 
@@ -773,15 +773,15 @@ msgstr "Звонящий"
 msgid "Calls"
 msgstr "Звонки"
 
-#: desk/src/components/Settings/InviteAgents.vue:147
+#: desk/src/components/Settings/InviteAgents.vue:148
 msgid "Can invite new agents, manage tickets, create custom views and manage public views."
 msgstr "Может приглашать новых агентов, управлять тикетами, создавать пользовательские представления и управлять публичными представлениями."
 
-#: desk/src/components/Settings/InviteAgents.vue:155
+#: desk/src/components/Settings/InviteAgents.vue:156
 msgid "Can manage all aspects of Helpdesk."
 msgstr "Может управлять всеми аспектами работы службы поддержки."
 
-#: desk/src/components/Settings/InviteAgents.vue:139
+#: desk/src/components/Settings/InviteAgents.vue:140
 msgid "Can work on tickets, create custom views and manage private views."
 msgstr "Может работать с тикетами, создавать пользовательские представления и управлять частными представлениями."
 
@@ -793,7 +793,7 @@ msgstr "Отменить приглашение"
 msgid "Canceled"
 msgstr "Отменен"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:508
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:511
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr "Нельзя удалить SLA по умолчанию. Хотя бы одно SLA должно быть помечено как по умолчанию."
 
@@ -838,7 +838,7 @@ msgid "Category merged"
 msgstr "Категория объединена"
 
 #: helpdesk/api/knowledge_base.py:72
-#: helpdesk/helpdesk/doctype/hd_article/hd_article.py:64
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.py:65
 msgid "Category must have atleast one article"
 msgstr "Категория должна содержать хотя бы одну статью"
 
@@ -850,7 +850,7 @@ msgstr "Категория обновлена"
 msgid "Change"
 msgstr "Изменить"
 
-#: desk/src/components/Settings/Profile/Profile.vue:123
+#: desk/src/components/Settings/Profile/Profile.vue:129
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:2
 msgid "Change Password"
 msgstr "Изменить пароль"
@@ -859,7 +859,7 @@ msgstr "Изменить пароль"
 msgid "Change image"
 msgstr "Изменить изображение"
 
-#: desk/src/components/Settings/Profile/Profile.vue:133
+#: desk/src/components/Settings/Profile/Profile.vue:139
 msgid "Change language of the application."
 msgstr "Изменить язык приложения."
 
@@ -883,7 +883,11 @@ msgstr "Сменить команду"
 msgid "Change ticket type"
 msgstr "Изменить тип билета"
 
-#: desk/src/components/Settings/Profile/Profile.vue:118
+#: desk/src/components/Settings/Profile/Profile.vue:155
+msgid "Change timezone of the application."
+msgstr "Изменить часовой пояс приложения."
+
+#: desk/src/components/Settings/Profile/Profile.vue:124
 msgid "Change your account password for security."
 msgstr "В целях безопасности измените пароль своей учетной записи."
 
@@ -971,7 +975,7 @@ msgstr "Закрыть тикет"
 msgid "Closed"
 msgstr "Закрыт"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:336
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:354
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Закрытые или оцененные тикеты не могут обновляться не агентами"
 
@@ -1001,8 +1005,8 @@ msgstr "Разделенные запятыми электронные пись�
 msgid "Comment"
 msgstr "Комментарий"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:61
-#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:106
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:67
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:112
 msgid "Comment not found"
 msgstr "Комментарий не найден"
 
@@ -1044,7 +1048,7 @@ msgstr "Настройте параметры телефонии."
 #: desk/src/components/ListViewBuilder.vue:236
 #: desk/src/components/Settings/Teams/TeamEdit.vue:115
 #: desk/src/components/Settings/Teams/TeamEdit.vue:241
-#: desk/src/pages/knowledge-base/Article.vue:320
+#: desk/src/pages/knowledge-base/Article.vue:321
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:201
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:310
 #: desk/src/pages/knowledge-base/NewArticle.vue:149
@@ -1124,15 +1128,15 @@ msgstr "Скопировать URL-адрес билета"
 msgid "Copy ticket id"
 msgstr "Скопируйте идентификатор билета"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:632
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:650
 msgid "Could not an email due to: {0}"
 msgstr "Не удалось отправить email из-за: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:790
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:808
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "Не удалось отправить подтверждающее письмо из-за: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:173
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:172
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Не удалось отправить email обратной связи из-за: {0}"
 
@@ -1226,7 +1230,7 @@ msgid "Cyan"
 msgstr "Циан"
 
 #: desk/src/components/layouts/Sidebar.vue:353
-#: desk/src/pages/knowledge-base/Article.vue:411
+#: desk/src/pages/knowledge-base/Article.vue:412
 msgid "Danger"
 msgstr "Опасность"
 
@@ -1296,7 +1300,7 @@ msgstr "Действия по умолчанию"
 msgid "Default priority"
 msgstr "Приоритет по умолчанию"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:59
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:63
 msgid "Default template can not be deleted"
 msgstr "Шаблон по умолчанию нельзя удалить"
 
@@ -1319,15 +1323,15 @@ msgstr "Определите, кто получает тикеты и как о�
 #: desk/src/components/ListViewBuilder.vue:230
 #: desk/src/components/Settings/Teams/TeamEdit.vue:348
 #: desk/src/components/Settings/Teams/TeamEdit.vue:350
-#: desk/src/pages/knowledge-base/Article.vue:415
-#: desk/src/pages/knowledge-base/Article.vue:417
+#: desk/src/pages/knowledge-base/Article.vue:416
+#: desk/src/pages/knowledge-base/Article.vue:418
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:173
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:192
 #: desk/src/pages/ticket/Tickets.vue:438
 msgid "Delete"
 msgstr "Удалить"
 
-#: desk/src/pages/knowledge-base/Article.vue:316
+#: desk/src/pages/knowledge-base/Article.vue:317
 msgid "Delete Article"
 msgstr "Удалить статью"
 
@@ -1418,7 +1422,9 @@ msgid "Disable signup"
 msgstr "Отключить регистрацию"
 
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
+#. Label of the disabled (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Disabled"
 msgstr "Отключено"
 
@@ -1524,7 +1530,7 @@ msgstr "Требуется продолжительность"
 msgid "Easily invite new agents, managers, or admins."
 msgstr "Легко приглашайте новых агентов, менеджеров или администраторов."
 
-#: desk/src/pages/knowledge-base/Article.vue:390
+#: desk/src/pages/knowledge-base/Article.vue:391
 #: desk/src/pages/ticket/Tickets.vue:374
 msgid "Edit"
 msgstr "Редактировать"
@@ -1595,7 +1601,7 @@ msgstr "Email Id"
 msgid "Email Notifications"
 msgstr "Email-уведомления"
 
-#: desk/src/components/Settings/EmailAdd.vue:306
+#: desk/src/components/Settings/EmailAdd.vue:307
 msgid "Email account created"
 msgstr "Учетная запись электронной почты создана"
 
@@ -1756,7 +1762,7 @@ msgstr "Внешняя ссылка"
 msgid "Failed"
 msgstr "Не выполнено"
 
-#: desk/src/components/Settings/EmailAdd.vue:311
+#: desk/src/components/Settings/EmailAdd.vue:313
 msgid "Failed to create email account, Invalid credentials"
 msgstr "Не удалось создать учетную запись email, неверные учетные данные"
 
@@ -1828,7 +1834,7 @@ msgstr "Оценка обратной связи"
 msgid "Feedback Trend"
 msgstr "Тенденция обратной связи"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:171
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:170
 msgid "Feedback email has been sent to the customer"
 msgstr "Email обратной связи отправлен клиенту"
 
@@ -1849,11 +1855,11 @@ msgstr "Зависимость поля создана успешно"
 msgid "Field Dependency updated successfully"
 msgstr "Зависимость поля успешно обновлена"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:27
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:25
 msgid "Field `{0}` does not exist in Ticket"
 msgstr "Поле `{0}` не существует в тикете"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:43
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:41
 msgid "Field `{0}` is not allowed in Ticket Template"
 msgstr "Поле `{0}` не разрешено в шаблоне тикета"
 
@@ -1881,7 +1887,7 @@ msgstr "Фильтры"
 msgid "Find out all of the variables that can be used in the content"
 msgstr "Узнайте все переменные, которые можно использовать в содержимом"
 
-#: desk/src/components/Settings/Profile/Profile.vue:101
+#: desk/src/components/Settings/Profile/Profile.vue:107
 #: desk/src/components/desk/global/NewContactDialog.vue:118
 msgid "First Name"
 msgstr "Имя"
@@ -1976,7 +1982,7 @@ msgid "General category name can't be changed"
 msgstr "Название общей категории нельзя изменить"
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/SavedRepliesSelectorModal.vue:173
+#: desk/src/components/SavedRepliesSelectorModal.vue:174
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:346
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:380
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:233
@@ -2521,7 +2527,7 @@ msgstr "Горячие клавиши"
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/command-palette/CP.vue:104
-#: desk/src/pages/knowledge-base/Article.vue:432
+#: desk/src/pages/knowledge-base/Article.vue:433
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:6
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:434
 #: desk/src/pages/knowledge-base/NewArticle.vue:171
@@ -2545,11 +2551,11 @@ msgstr "Этикетка"
 msgid "Label (customer view)"
 msgstr "Метка (вид клиента)"
 
-#: desk/src/components/Settings/Profile/Profile.vue:130
+#: desk/src/components/Settings/Profile/Profile.vue:136
 msgid "Language"
 msgstr "Язык"
 
-#: desk/src/components/Settings/Profile/Profile.vue:257
+#: desk/src/components/Settings/Profile/Profile.vue:298
 msgid "Language updated"
 msgstr "Язык обновлен"
 
@@ -2589,7 +2595,7 @@ msgstr "Последний ответ агента"
 msgid "Last Customer Response"
 msgstr "Последний ответ клиента"
 
-#: desk/src/components/Settings/Profile/Profile.vue:107
+#: desk/src/components/Settings/Profile/Profile.vue:113
 #: desk/src/components/desk/global/NewContactDialog.vue:126
 msgid "Last Name"
 msgstr "Фамилия"
@@ -2787,12 +2793,12 @@ msgstr "Понедельник"
 msgid "Monthly"
 msgstr "Ежемесячно"
 
-#: desk/src/pages/knowledge-base/Article.vue:397
+#: desk/src/pages/knowledge-base/Article.vue:398
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:184
 msgid "Move To"
 msgstr "Переместить в"
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:168
+#: desk/src/components/SavedRepliesSelectorModal.vue:169
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:339
 msgid "My Team"
 msgstr "Моя команда"
@@ -2916,8 +2922,8 @@ msgstr "Новая тема"
 msgid "New Team"
 msgstr "Новая команда"
 
-#: desk/src/pages/ticket/TicketNew.vue:313
-#: desk/src/pages/ticket/TicketNew.vue:323
+#: desk/src/pages/ticket/TicketNew.vue:301
+#: desk/src/pages/ticket/TicketNew.vue:311
 msgid "New Ticket"
 msgstr "Новый тикет"
 
@@ -3168,7 +3174,7 @@ msgstr "Владелец"
 msgid "Parent field, child field, and parent-child mapping are required."
 msgstr "Требуются родительское поле, дочернее поле и сопоставление родитель-потомок."
 
-#: desk/src/components/Settings/Profile/Profile.vue:115
+#: desk/src/components/Settings/Profile/Profile.vue:121
 msgid "Password"
 msgstr "Пароль"
 
@@ -3226,7 +3232,7 @@ msgid "Period"
 msgstr "Период"
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/SavedRepliesSelectorModal.vue:163
+#: desk/src/components/SavedRepliesSelectorModal.vue:164
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:332
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:372
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:223
@@ -3287,7 +3293,7 @@ msgstr "Пожалуйста, введите тему, чтобы продолж
 msgid "Please enter a valid phone number"
 msgstr "Пожалуйста, введите действительный номер телефона"
 
-#: desk/src/components/Settings/Profile/Profile.vue:225
+#: desk/src/components/Settings/Profile/Profile.vue:266
 msgid "Please enter first name at least"
 msgstr "Пожалуйста, введите имя как минимум"
 
@@ -3420,7 +3426,7 @@ msgstr "Эксперты по продуктам"
 msgid "Profile"
 msgstr "Профиль"
 
-#: desk/src/components/Settings/Profile/Profile.vue:241
+#: desk/src/components/Settings/Profile/Profile.vue:282
 msgid "Profile updated"
 msgstr "Профиль обновлен"
 
@@ -4134,7 +4140,7 @@ msgstr "Настройка Email"
 msgid "Setup SLA"
 msgstr "Настройка SLA"
 
-#: desk/src/pages/knowledge-base/Article.vue:402
+#: desk/src/pages/knowledge-base/Article.vue:403
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:160
 msgid "Share"
 msgstr "Поделиться"
@@ -4611,7 +4617,7 @@ msgstr "Четверг"
 msgid "Ticket"
 msgstr "Заявка"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:777
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:795
 msgid "Ticket #{0}: We've received your request"
 msgstr "Заявка #{0}: Мы получили ваш запрос"
 
@@ -4695,7 +4701,7 @@ msgstr "Тикет закрыт"
 msgid "Ticket does not exist."
 msgstr "Тикет не существует."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:344
 msgid "Ticket must be resolved with a feedback"
 msgstr "Тикет должен быть решен с обратной связью"
 
@@ -4743,7 +4749,7 @@ msgstr "Анализ поиска тикетов"
 #: desk/src/pages/SearchAgent.vue:351
 #: desk/src/pages/ticket/MobileTicketAgent.vue:329
 #: desk/src/pages/ticket/TicketCustomer.vue:333
-#: desk/src/pages/ticket/TicketNew.vue:307 desk/src/pages/ticket/Tickets.vue:6
+#: desk/src/pages/ticket/TicketNew.vue:295 desk/src/pages/ticket/Tickets.vue:6
 #: desk/src/pages/ticket/Tickets.vue:587 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
 msgid "Tickets"
@@ -4768,6 +4774,14 @@ msgstr "Заявки по типу"
 #: helpdesk/api/ticket.py:16
 msgid "Tickets can only be assigned to agents"
 msgstr "Тикеты можно назначать только агентам"
+
+#: desk/src/components/Settings/Profile/Profile.vue:152
+msgid "Timezone"
+msgstr "Часовой пояс"
+
+#: desk/src/components/Settings/Profile/Profile.vue:317
+msgid "Timezone updated"
+msgstr "Часовой пояс обновлен"
 
 #. Label of the title (Data) field in DocType 'HD Article'
 #. Label of the title (Data) field in DocType 'HD Saved Reply'
@@ -4897,7 +4911,7 @@ msgstr "Требуется ввести текст"
 msgid "URL/Method"
 msgstr "URL/Метод"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:613
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:631
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr "Не удаётся отправить электронное письмо. Пожалуйста, настройте учётную запись для исходящей почты по умолчанию."
 
@@ -5002,7 +5016,7 @@ msgstr "Загрузка {0}%"
 msgid "User"
 msgstr "Пользователь"
 
-#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:132
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:141
 msgid "User Not found"
 msgstr "Пользователь не найден"
 
@@ -5140,7 +5154,7 @@ msgstr "Вам не разрешено просматривать данные �
 msgid "You are not permitted to access this resource."
 msgstr "Вы не имеете права доступа к этому ресурсу."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:535
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:553
 msgid "You are not permitted to add a comment"
 msgstr "Вам не разрешено добавлять комментарий"
 
