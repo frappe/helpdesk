@@ -5,11 +5,23 @@
 		"dev": "cd desk && yarn dev",
 		"build": "cd desk && yarn build",
 		"disable-workspaces": "sed -i '' 's/\"workspaces\"/\"aworkspaces\"/g' package.json",
-        "enable-workspaces": "sed -i '' 's/\"aworkspaces\"/\"workspaces\"/g' package.json && rm -rf node_modules ./desk/node_modules/ frappe-ui/node_modules/ && yarn install"
+		"enable-workspaces": "sed -i '' 's/\"aworkspaces\"/\"workspaces\"/g' package.json && rm -rf node_modules ./desk/node_modules/ frappe-ui/node_modules/ && yarn install"
 	},
-	"workspaces": ["desk", "frappe-ui"],
+	"workspaces": [
+		"desk",
+		"frappe-ui"
+	],
 	"resolutions": {
 		"cheerio": "1.0.0-rc.12",
 		"prosemirror-model": "1.25.1"
+	},
+	"dependencies": {
+		"@tiptap/extension-table": "^3.20.4",
+		"@tiptap/extension-table-cell": "^3.20.4",
+		"@tiptap/extension-table-header": "^3.20.4",
+		"@tiptap/extension-table-row": "^3.20.4",
+		"@tiptap/extension-text-align": "^3.20.4",
+		"@tiptap/extension-text-style": "^3.20.4",
+		"@tiptap/pm": "^3.20.4"
 	}
 }
