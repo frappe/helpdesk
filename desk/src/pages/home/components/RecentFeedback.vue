@@ -233,6 +233,7 @@ import {
 } from "frappe-ui";
 import LucideStar from "~icons/lucide/star";
 import { useRouter } from "vue-router";
+import { dayjsLocal } from "frappe-ui";
 import { __ } from "@/translation";
 import { timeAgo } from "@/utils";
 import type { EChartsOption } from "echarts";
@@ -503,11 +504,30 @@ const redirectToSeeAllReviews = () => {
   const viewName = "STD-VIEW-ALL-FEEDBACK";
   const view = views.data?.find((v: View) => v.name === viewName);
 
+  const query: any = {
+    view: view?.name,
+  };
+
+  if (currentPeriod.value !== "all_time") {
+    let dateFilter = "";
+    if (currentPeriod.value === "last_week") {
+      dateFilter = dayjsLocal().subtract(7, "day").format("YYYY-MM-DD HH:mm:ss");
+    } else if (currentPeriod.value === "last_month") {
+      dateFilter = dayjsLocal().subtract(30, "day").format("YYYY-MM-DD HH:mm:ss");
+    } else if (currentPeriod.value === "last_3_months") {
+      dateFilter = dayjsLocal().subtract(90, "day").format("YYYY-MM-DD HH:mm:ss");
+    }
+
+    if (dateFilter) {
+      query.filters = JSON.stringify({
+        modified: [">", dateFilter],
+      });
+    }
+  }
+
   const route = router.resolve({
     name: "TicketsAgent",
-    query: {
-      view: view?.name,
-    },
+    query,
   });
   window.open(route.href, "_blank");
 };

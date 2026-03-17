@@ -648,6 +648,20 @@ function handleViewChanges() {
   defaultParams.columns = currentView.columns;
   defaultParams.rows = currentView.rows;
 
+  if (route.query.filters) {
+    try {
+      const parsedFilters = JSON.parse(route.query.filters as string);
+      if (Object.keys(parsedFilters).length > 0) {
+        defaultParams.filters = {
+          ...defaultParams.filters,
+          ...parsedFilters,
+        };
+      }
+    } catch (e) {
+      console.error("Failed to parse filters from URL", e);
+    }
+  }
+
   list.submit({ ...defaultParams });
 }
 
