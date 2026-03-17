@@ -511,11 +511,17 @@ const redirectToSeeAllReviews = () => {
   if (currentPeriod.value !== "all_time") {
     let dateFilter = "";
     if (currentPeriod.value === "last_week") {
-      dateFilter = dayjsLocal().subtract(7, "day").format("YYYY-MM-DD HH:mm:ss");
+      dateFilter = dayjsLocal()
+        .subtract(7, "day")
+        .format("YYYY-MM-DD HH:mm:ss");
     } else if (currentPeriod.value === "last_month") {
-      dateFilter = dayjsLocal().subtract(30, "day").format("YYYY-MM-DD HH:mm:ss");
+      dateFilter = dayjsLocal()
+        .subtract(30, "day")
+        .format("YYYY-MM-DD HH:mm:ss");
     } else if (currentPeriod.value === "last_3_months") {
-      dateFilter = dayjsLocal().subtract(90, "day").format("YYYY-MM-DD HH:mm:ss");
+      dateFilter = dayjsLocal()
+        .subtract(90, "day")
+        .format("YYYY-MM-DD HH:mm:ss");
     }
 
     if (dateFilter) {
