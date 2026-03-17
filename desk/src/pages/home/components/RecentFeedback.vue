@@ -36,8 +36,12 @@
                   {{ chartConfig.averageRating }}
                 </div>
               </div>
-              <div class="text-sm text-ink-gray-5">
+              <div
+                class="flex items-center text-ink-gray-5 text-sm cursor-pointer"
+                @click="redirectToSeeAllReviews"
+              >
                 {{ __("{0} reviews", chartConfig.totalFeedbacks) }}
+                <FeatherIcon name="arrow-up-right" class="size-3.5" />
               </div>
             </div>
             <div v-if="chartConfig.totalFeedbacks > 0" class="text-sm">
@@ -115,11 +119,13 @@
           >
             <!-- Ticket Info -->
             <div class="flex items-center gap-1 text-base text-ink-gray-5">
-              <span
-                class="hover:text-ink-gray-7 cursor-pointer font-medium"
+              <div
+                class="flex items-center gap-0.5 hover:text-ink-gray-7 cursor-pointer font-medium"
                 @click="goToTicket(currentFeedback)"
-                ># {{ currentFeedback.name }}</span
               >
+                <FeatherIcon name="arrow-up-right" class="size-4" />
+                {{ currentFeedback.name }}
+              </div>
               <span class="text-ink-gray-4">·</span>
               <span class="truncate text-ink-gray-7 font-medium">{{
                 currentFeedback.subject
@@ -230,6 +236,8 @@ import { useRouter } from "vue-router";
 import { __ } from "@/translation";
 import { timeAgo } from "@/utils";
 import type { EChartsOption } from "echarts";
+import { useView } from "@/composables/useView";
+import { View } from "@/types";
 
 const router = useRouter();
 const chartTabs = [
@@ -237,6 +245,7 @@ const chartTabs = [
   { label: "Feedback", value: "feedback" },
 ];
 const currentTab = ref("rating");
+const { views } = useView("HD Ticket");
 
 interface Feedback {
   name: string;
@@ -489,6 +498,19 @@ const placeholderChartOptions = computed<EChartsOption>(() => {
     animation: false,
   };
 });
+
+const redirectToSeeAllReviews = () => {
+  const viewName = "STD-VIEW-ALL-FEEDBACK";
+  const view = views.data?.find((v: View) => v.name === viewName);
+
+  const route = router.resolve({
+    name: "TicketsAgent",
+    query: {
+      view: view?.name,
+    },
+  });
+  window.open(route.href, "_blank");
+};
 
 const getRatingColor = (rating: number) => {
   if (rating >= 4)

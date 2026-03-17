@@ -9,6 +9,7 @@ from frappe.query_builder.functions import Avg, Count, Function
 from helpdesk.api.agent_home.utils import (
     calculate_percentage_change,
     get_default_agent_dashboard,
+    get_ticket_count,
 )
 from helpdesk.utils import agent_only, format_time_difference
 
@@ -505,7 +506,7 @@ def _get_upcoming_sla_tickets(limit=10):
             "seconds_until_due": seconds_until_due,
         }
 
-    total_count = frappe.db.count("HD Ticket", filters=filters)
+    total_count = get_ticket_count(filters)
 
     return tickets, total_count
 
@@ -555,13 +556,12 @@ def _get_new_tickets(limit=10):
             "text": "Recently assigned",
         }
 
-    total_count = frappe.db.count(
-        "HD Ticket",
+    total_count = get_ticket_count(
         filters=[
             ["name", "in", ticket_names],
             ["_assign", "like", f"%{frappe.session.user}%"],
             ["status_category", "=", "Open"],
-        ],
+        ]
     )
 
     return tickets, total_count
@@ -592,7 +592,7 @@ def _get_pending_response_tickets(limit=10):
         limit=limit,
     )
 
-    total_count = frappe.db.count("HD Ticket", filters=filters)
+    total_count = get_ticket_count(filters)
 
     for t in tickets:
         time_ago = format_time_difference(t.get("last_customer_response"))

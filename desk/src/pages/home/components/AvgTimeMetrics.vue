@@ -46,7 +46,7 @@
           </div>
           <div class="text-base text-ink-gray-5 flex items-center gap-2 mt-1">
             <div class="size-2 bg-black rounded-full" />
-            {{ __("Avg. first response") }}
+            {{ __("Avg. first response time") }}
           </div>
         </div>
         <div>
@@ -146,7 +146,7 @@ const chartConfig = computed<EChartsOption>(() => {
         const [category, firstResponse, resolution] = p.data;
         if (p.seriesIndex === 0) {
           return `<span>${category}</span><br/>${__(
-            "Avg. First Response"
+            "Avg. first response time"
           )}: <b>${formatTime(firstResponse, {
             day: true,
             hour: true,
@@ -154,7 +154,7 @@ const chartConfig = computed<EChartsOption>(() => {
           })}</b>`;
         } else {
           return `<span>${category}</span><br/>${__(
-            "Avg. Resolution"
+            "Avg. resolution time"
           )}: <b>${formatTime(resolution, {
             day: true,
             hour: true,

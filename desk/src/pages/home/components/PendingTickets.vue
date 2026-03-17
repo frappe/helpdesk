@@ -129,10 +129,10 @@
           >
             <div class="bg-surface-white space-y-1 w-64 p-3 rounded">
               <div class="text-ink-gray-7 font-medium text-center text-base">
-                {{ __("No pending tickets") }}
+                {{ emptyStateTitle }}
               </div>
               <div class="text-ink-gray-6 text-center text-base">
-                {{ __("All tickets are resolved or in progress") }}
+                {{ emptyStateDescription }}
               </div>
             </div>
           </div>
@@ -200,7 +200,7 @@ const { views } = useView("HD Ticket");
 const currentTab = ref("upcoming_sla");
 const chartTabs = [
   {
-    label: __("SLA Due"),
+    label: __("SLA Alerts"),
     value: "upcoming_sla",
   },
   {
@@ -215,7 +215,7 @@ const chartTabs = [
 
 const title = computed(() => {
   const labels: Record<string, string> = {
-    upcoming_sla: __("SLA Due"),
+    upcoming_sla: __("SLA Alerts"),
     new_tickets: __("Recent Tickets"),
     pending: __("Pending Tickets"),
   };
@@ -224,11 +224,29 @@ const title = computed(() => {
 
 const tooltipText = computed(() => {
   const texts: Record<string, string> = {
-    upcoming_sla: __("Tickets where SLA is about to breach"),
+    upcoming_sla: __("Tickets approaching or breached SLA"),
     new_tickets: __("Tickets assigned to you in the last 24 hours"),
     pending: __("Tickets that you have not responded to yet"),
   };
   return texts[currentTab.value];
+});
+
+const emptyStateTitle = computed(() => {
+  const titles: Record<string, string> = {
+    upcoming_sla: __("No SLA due tickets"),
+    new_tickets: __("No recent tickets"),
+    pending: __("No pending tickets"),
+  };
+  return titles[currentTab.value];
+});
+
+const emptyStateDescription = computed(() => {
+  const descriptions: Record<string, string> = {
+    upcoming_sla: __("Great! All your tickets are within SLA"),
+    new_tickets: __("No new tickets assigned to you in the last 24 hours"),
+    pending: __("All your assigned tickets have been responded to"),
+  };
+  return descriptions[currentTab.value];
 });
 
 const chartConfig = computed(() => {

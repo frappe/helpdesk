@@ -346,6 +346,32 @@ const dropdownOptions = computed(() => {
 
 let selectedView: View | null = null;
 
+const toggleViewVisibility = (_view: any, title: string, message: string) => {
+  const newView: any = {
+    name: _view.name,
+    public: !_view.public,
+  };
+
+  if (_view.public) {
+    $dialog({
+      title,
+      message,
+      actions: [
+        {
+          label: __("Confirm"),
+          variant: "solid",
+          onClick({ close }: any) {
+            close();
+            updateView(newView);
+          },
+        },
+      ],
+    });
+  } else {
+    updateView(newView);
+  }
+};
+
 const viewActions = (view) => {
   const _view = findView(view.name).value;
 
@@ -370,17 +396,6 @@ const viewActions = (view) => {
     },
   ];
   if (!_view.public || isManager) {
-    actions[0].items.push({
-      label: __("Edit"),
-      icon: h(EditIcon, { class: "h-4 w-4" }),
-      onClick: () => {
-        viewDialog.view.label = _view.label;
-        viewDialog.view.icon = _view.icon;
-        viewDialog.view.name = _view.name;
-        viewDialog.mode = "edit";
-        viewDialog.show = true;
-      },
-    });
     if (!_view.public) {
       actions[0].items.push({
         label: _view?.pinned ? __("Unpin View") : __("Pin View"),
@@ -394,43 +409,54 @@ const viewActions = (view) => {
         },
       });
     }
-    if (isManager && !isCustomerPortal.value) {
+    if (_view?.is_standard) {
       actions[0].items.push({
-        label: _view?.public ? __("Make Private") : __("Make Public"),
+        label: _view?.public ? __("Hide from sidebar") : __("Show in sidebar"),
         icon: h(FeatherIcon, {
-          name: _view?.public ? "lock" : "unlock",
+          name: _view?.public ? "eye-off" : "eye",
           class: "h-4 w-4",
         }),
         onClick: () => {
-          const newView = {
-            name: _view.name,
-            public: !_view.public,
-          };
-
-          if (_view.public) {
-            $dialog({
-              title: __("Make {0} private?", [_view.label]),
-              message: __(
-                "This view is currently public. Changing it to private will hide it for all the users."
-              ),
-              actions: [
-                {
-                  label: __("Confirm"),
-                  variant: "solid",
-                  onClick({ close }) {
-                    close();
-                    updateView(newView);
-                  },
-                },
-              ],
-            });
-          } else {
-            updateView(newView);
-          }
+          toggleViewVisibility(
+            _view,
+            __("Hide {0} from sidebar?", [_view.label]),
+            __(
+              "This view is currently visible in the sidebar. Hiding it will remove it from the sidebar."
+            )
+          );
         },
       });
     }
     if (!_view.is_standard) {
+      if (isManager && !isCustomerPortal.value) {
+        actions[0].items.push({
+          label: _view?.public ? __("Make Private") : __("Make Public"),
+          icon: h(FeatherIcon, {
+            name: _view?.public ? "lock" : "unlock",
+            class: "h-4 w-4",
+          }),
+          onClick: () => {
+            toggleViewVisibility(
+              _view,
+              __("Make {0} private?", [_view.label]),
+              __(
+                "This view is currently public. Changing it to private will hide it for all the users."
+              )
+            );
+          },
+        });
+      }
+      actions[0].items.push({
+        label: __("Edit"),
+        icon: h(EditIcon, { class: "h-4 w-4" }),
+        onClick: () => {
+          viewDialog.view.label = _view.label;
+          viewDialog.view.icon = _view.icon;
+          viewDialog.view.name = _view.name;
+          viewDialog.mode = "edit";
+          viewDialog.show = true;
+        },
+      });
       actions.push({
         group: __("Delete View"),
         hideLabel: true,
@@ -474,7 +500,6 @@ const viewActions = (view) => {
       });
     }
   }
-
   return actions;
 };
 

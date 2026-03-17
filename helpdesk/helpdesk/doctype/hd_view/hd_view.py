@@ -32,10 +32,14 @@ class HDView(Document):
     def before_save(self):
         self.toggle_pinned_public_view()
 
-        if self.is_standard and not (
-            frappe.conf.developer_mode
-            or frappe.flags.in_migrate
-            or frappe.flags.in_install
+        if (
+            self.is_standard
+            and not (
+                frappe.conf.developer_mode
+                or frappe.flags.in_migrate
+                or frappe.flags.in_install
+            )
+            and self.is_new()
         ):
             self.is_standard = 0
 
