@@ -114,36 +114,6 @@
             maxlength="40"
             v-model="profile.lastName"
           />
-
-
-          <FormControl
-            class="w-full"
-            type="select"
-            :label="__('Availability Status')"
-            :options="['Available', 'Away']"
-            v-model="profile.availabilityStatus"
-          />
-          
-          
-          <div class="w-full md:col-span-2">
-            <div class="mb-2 text-sm font-medium text-ink-gray-7">
-              {{ __("Signature") }}
-            </div>
-
-            <TextEditor
-              :content="profile.signature"
-              @change="(val) => (profile.signature = val)"
-              :editable="true"
-              :editor-class="[
-                'prose-sm max-w-full',
-                'min-h-[7rem]',
-                'border rounded-md p-3'
-              ]"
-            />
-          </div>
-
-
-
         </div>
         <div class="flex items-center justify-between mt-6">
           <div class="flex flex-col gap-1">
@@ -193,6 +163,45 @@
             class="w-40"
           />
         </div>
+
+        <!-- Availability Status -->
+        <div class="flex items-center justify-between mt-6">
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-medium text-ink-gray-8">
+              {{ __("Availability Status") }}
+            </span>
+            <span class="text-p-sm text-ink-gray-6">
+              {{ __("Set your availability for ticket assignment.") }}
+            </span>
+          </div>
+          <FormControl
+            type="select"
+            :label="__('Availability Status')"
+            :options="['Available', 'Away']"
+            v-model="availabilityStatus"
+            class="w-40"
+          />
+        </div>
+
+        <!-- Signature -->
+        <div class="flex flex-col gap-2 mt-6">
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-medium text-ink-gray-8">
+              {{ __("Signature") }}
+            </span>
+            <span class="text-p-sm text-ink-gray-6">
+              {{ __("This signature will appear on your replies.") }}
+            </span>
+          </div>
+          <TextEditor
+            :content="signature"
+            @change="(val) => (signature = val)"
+            :editable="true"
+            :placeholder="__('Write your signature...')"
+            editor-class="min-h-[120px] prose-sm max-w-none border border-outline-gray-2 rounded-lg p-2"
+          />
+        </div>
+
       </div>
     </template>
   </SettingsLayoutBase>
@@ -211,6 +220,7 @@ import {
   createResource,
   Dropdown,
   FileUploader,
+  FormControl,
   LoadingIndicator,
   TextEditor,
   toast,
@@ -225,21 +235,19 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import Link from "@/components/frappe-ui/Link.vue";
 import { HDAgent } from "@/types/doctypes";
 
-
 const auth = useAuthStore();
 const profile = ref({
   fullName: auth.userName,
   userImage: auth.userImage,
   firstName: auth.userFirstName,
   lastName: auth.userLastName,
-  availabilityStatus: "Available",
-  signature: "",
 });
-
 const showChangePasswordModal = ref(false);
 const language = ref(auth.language);
 const timezone = ref(auth.timezone);
 const timezoneOptions = ref([]);
+const availabilityStatus = ref("Available");
+const signature = ref("");
 
 const isLanguageChanged = computed(() => {
   return language.value !== auth?.language;
@@ -250,20 +258,14 @@ const isTimezoneChanged = computed(() => {
 });
 
 const isAccountInfoDirty = computed(() => {
-  const data = agentData.data;
-  if (!data) return false;
-  const agentName = data.agent_name?.split(" ") || [];
-
+  const agentName = agentData.data?.agent_name?.split(" ");
+  if (!agentName) return false;
   const isDirty =
-    profile.value.firstName !== (agentName[0] || "") ||
-    profile.value.lastName !== (agentName[1] || "")  ||
-    profile.value.availabilityStatus !== agentData.data?.availability_status ||
-    (profile.value.signature?.trim() || "") !== (data.signature?.trim() || "")
-  if (isDirty) {
-    disableSettingModalOutsideClick.value = true;
-  } else {
-    disableSettingModalOutsideClick.value = false;
-  }
+    profile.value.firstName !== agentName[0] ||
+    profile.value.lastName !== (agentName[1] || "") ||
+    availabilityStatus.value !== (agentData.data?.availability_status || "Available") ||
+    signature.value !== (agentData.data?.signature || "");
+  disableSettingModalOutsideClick.value = isDirty;
   return isDirty;
 });
 
@@ -283,10 +285,9 @@ const agentData = createResource({
       firstName: fullName[0],
       lastName: fullName[1] || "",
       userImage: data.user_image,
-      availabilityStatus: data.availability_status,
-      signature: data.signature || "",
     };
-    
+    availabilityStatus.value = data.availability_status || "Available";
+    signature.value = data.signature || "";
   },
 });
 
@@ -315,8 +316,8 @@ const setAgent = createResource({
       fieldname: {
         agent_name: `${profile.value.firstName} ${profile.value.lastName}`,
         user_image: profile.value.userImage,
-        availability_status: profile.value.availabilityStatus,
-        signature: profile.value.signature || "",
+        availability_status: availabilityStatus.value,
+        signature: signature.value,
       },
     };
   },

@@ -47,11 +47,6 @@ export const useAuthStore = defineStore("auth", () => {
   );
   const language: ComputedRef<string> = computed(() => user__.value.language);
 
-  const userSignature: ComputedRef<string> = computed(() => {
-  return user__.value.signature || "";
-});
-
-
   function sessionUser() {
     const cookies = new URLSearchParams(document.cookie.split("; ").join("&"));
     let _sessionUser = cookies.get("user_id");
@@ -73,8 +68,6 @@ export const useAuthStore = defineStore("auth", () => {
       router.replace({ path: "/" });
     },
   });
-
-  
 
   function logout() {
     user.value = null;
@@ -100,7 +93,6 @@ export const useAuthStore = defineStore("auth", () => {
     timezone,
     userTeams,
     language,
-    userSignature, 
     user,
     logout,
   };
