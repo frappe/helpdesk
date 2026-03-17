@@ -11,7 +11,12 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.22",
     "@tailwindcss/typography": "^0.5.9",
-    "@tiptap/core": "^3.11.0",
+    "@tiptap/core": "^2.2.4",
+    "@tiptap/extension-table-cell": "^3.20.4",
+    "@tiptap/extension-table-header": "^3.20.4",
+    "@tiptap/extension-table-row": "^3.20.4",
+    "@tiptap/extension-text-align": "^3.20.4",
+    "@tiptap/extension-text-style": "^3.20.4",
     "@twilio/voice-sdk": "^2.15.0",
     "@vee-validate/zod": "^4.8.2",
     "@vitejs/plugin-vue": "^4.2.3",
