@@ -48,16 +48,16 @@
             <td class="p-2 py-3 w-full max-w-0 truncate">
               {{ ticket.subject }}
             </td>
-            <td class="p-2 py-3 min-w-20 truncate max-w-20">
+            <td class="p-2 py-3 min-w-20 truncate">
               {{ ticket.status }}
             </td>
-            <td class="p-2 py-3 min-w-20 truncate max-w-20">
+            <td class="p-2 py-3 min-w-20 truncate">
               <Badge
                 :label="ticket.priority"
                 :theme="getPriorityBadgeColor(ticket.priority_integer_value)"
               />
             </td>
-            <td class="p-2 py-3 w-36 truncate max-w-36">
+            <td class="p-2 py-3 min-w-36 truncate">
               {{ ticket.agent_group || __("Not Assigned") }}
             </td>
             <td class="p-2 py-3 min-w-40">
