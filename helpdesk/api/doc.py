@@ -540,18 +540,18 @@ def handle_assigned_on_filter(filters, doctype):
     assigned_on_filter = filters.pop("__assigned_on")
 
     # Build ToDo query based on the operator and value
-    todo = frappe.qb.DocType("ToDo")
+    ToDo = frappe.qb.DocType("ToDo")
     query = (
-        frappe.qb.from_(todo)
-        .select(todo.reference_name)
+        frappe.qb.from_(ToDo)
+        .select(ToDo.reference_name)
         .distinct()
-        .where(todo.reference_type == doctype)
-        .where(todo.allocated_to == frappe.session.user)
-        .where(todo.status == "Open")
+        .where(ToDo.reference_type == doctype)
+        .where(ToDo.allocated_to == frappe.session.user)
+        .where(ToDo.status == "Open")
     )
 
     # Apply date filter based on operator
-    query = apply_datetime_filter(query, todo.creation, assigned_on_filter)
+    query = apply_datetime_filter(query, ToDo.creation, assigned_on_filter)
 
     ticket_names = [row[0] for row in query.run()]
 

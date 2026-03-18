@@ -123,19 +123,11 @@
               <div class="h-4 w-full bg-surface-gray-1" />
             </td>
           </tr>
-          <div
+          <TableEmptyState
             v-if="chartConfig?.tickets?.length === 0"
-            class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
-          >
-            <div class="bg-surface-white space-y-1 w-64 p-3 rounded">
-              <div class="text-ink-gray-7 font-medium text-center text-base">
-                {{ emptyStateTitle }}
-              </div>
-              <div class="text-ink-gray-6 text-center text-base">
-                {{ emptyStateDescription }}
-              </div>
-            </div>
-          </div>
+            :title="emptyStateTitle"
+            :description="emptyStateDescription"
+          />
         </tbody>
       </table>
       <div
@@ -160,6 +152,7 @@ import TimerIcon from "~icons/lucide/timer";
 import TicketPlusIcon from "~icons/lucide/ticket-plus";
 import CalendarIcon from "~icons/lucide/calendar";
 import { View } from "@/types";
+import TableEmptyState from "@/components/TableEmptyState.vue";
 
 interface TicketReason {
   type: string;

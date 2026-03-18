@@ -68,9 +68,9 @@
         <div class="grow pb-12">
           <div
             v-if="agentDashboard.loading"
-            class="flex items-center justify-center h-full"
+            class="flex items-center justify-center mt-40 h-max"
           >
-            <LoadingIndicator class="size-6" />
+            <LoadingIndicator :scale="8" />
           </div>
           <div
             v-if="!agentDashboard.loading && layout.length > 0"

@@ -89,6 +89,7 @@ const {
   findView,
   updateView,
   deleteView,
+  standardViews,
 } = useView("HD Ticket");
 
 const { $dialog, $socket } = globalStore();
@@ -319,12 +320,20 @@ const dropdownOptions = computed(() => {
       items: parseViews(pinnedViews.value),
     });
   }
-  if (publicViews.value?.length !== 0) {
-    items.push({
-      group: __("Public Views"),
-      items: parseViews(publicViews.value),
-    });
-  }
+
+  const allPublicViews = [
+    ...(standardViews.value || []),
+    ...(publicViews.value || []),
+  ];
+
+  const uniquePublicViews = Array.from(
+    new Map(allPublicViews.map((v) => [v.name, v])).values()
+  );
+
+  items.push({
+    group: __("Public Views"),
+    items: parseViews(uniquePublicViews),
+  });
 
   items.push({
     group: __("Create View"),
@@ -396,7 +405,7 @@ const viewActions = (view) => {
     },
   ];
   if (!_view.public || isManager) {
-    if (!_view.public) {
+    if (!_view.public && !_view.is_standard) {
       actions[0].items.push({
         label: _view?.pinned ? __("Unpin View") : __("Pin View"),
         icon: h(_view?.pinned ? UnpinIcon : PinIcon, { class: "h-4 w-4" }),
@@ -409,7 +418,7 @@ const viewActions = (view) => {
         },
       });
     }
-    if (_view?.is_standard) {
+    if (_view?.is_standard && isManager) {
       actions[0].items.push({
         label: _view?.public ? __("Hide from sidebar") : __("Show in sidebar"),
         icon: h(FeatherIcon, {
@@ -419,9 +428,10 @@ const viewActions = (view) => {
         onClick: () => {
           toggleViewVisibility(
             _view,
-            __("Hide {0} from sidebar?", [_view.label]),
+            __("Hide view from sidebar"),
             __(
-              "This view is currently visible in the sidebar. Hiding it will remove it from the sidebar."
+              "{0} view is currently visible in the sidebar. Hiding it will remove it from the sidebar.",
+              [_view.label]
             )
           );
         },
@@ -438,9 +448,10 @@ const viewActions = (view) => {
           onClick: () => {
             toggleViewVisibility(
               _view,
-              __("Make {0} private?", [_view.label]),
+              __("Make view private"),
               __(
-                "This view is currently public. Changing it to private will hide it for all the users."
+                "{0} view is currently public. Changing it to private will hide it for all the users.",
+                [_view.label]
               )
             );
           },

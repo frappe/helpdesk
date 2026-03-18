@@ -67,7 +67,8 @@ export function useView(dt: string = null) {
           !view.is_default &&
           view.user === auth.userId &&
           !view.public &&
-          !view.pinned
+          !view.pinned &&
+          !view.is_standard
       )
       .map(parseView)
   );
@@ -117,6 +118,10 @@ export function useView(dt: string = null) {
     views.data?.find(
       (v: View) => v.is_default && v.user === auth.userId && v.dt === dt
     )
+  );
+
+  const standardViews = computed(() =>
+    views.data?.filter((view: View) => view.is_standard).map(parseView)
   );
 
   function updateView(view: any, successCB: Function = () => {}) {
@@ -188,6 +193,7 @@ export function useView(dt: string = null) {
     pinnedViews,
     publicViews,
     defaultView,
+    standardViews,
     findView,
     createView,
     updateView,

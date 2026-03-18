@@ -2,7 +2,7 @@
   <!-- View Controls -->
   <div
     class="flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6"
-    v-if="showViewControls"
+    v-if="showViewControls && list.data?.data.length > 0"
   >
     <QuickFilters v-if="!isMobileView" class="flex-1" />
     <div class="flex items-start gap-2 justify-end h-full" v-if="!isMobileView">
@@ -102,9 +102,9 @@
   <!-- Loading State -->
   <div
     v-else-if="list.loading"
-    class="w-full h-full flex items-center justify-center -mt-48"
+    class="w-full h-full flex items-center justify-center -mt-14"
   >
-    <LoadingIndicator :scale="10" />
+    <LoadingIndicator :scale="8" />
   </div>
   <!-- Empty State -->
   <EmptyState

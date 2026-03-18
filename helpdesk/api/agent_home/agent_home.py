@@ -63,23 +63,23 @@ def get_agent_tickets(period: str = "last month"):
     previous_to = frappe.utils.add_days(frappe.utils.nowdate(), -days)
 
     def get_ticket_data(from_date, to_date):
-        ticket = DocType("HD Ticket")
-        creation_date = Function("DATE", ticket.creation)
+        Ticket = DocType("HD Ticket")
+        creation_date = Function("DATE", Ticket.creation)
         to_date_plus_one = Function(
             "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
         )
 
         result = (
-            frappe.qb.from_(ticket)
+            frappe.qb.from_(Ticket)
             .select(
                 creation_date.as_("date"),
-                Count(ticket.name).as_("count"),
+                Count(Ticket.name).as_("count"),
             )
-            .where(ticket.creation >= from_date)
-            .where(ticket.creation < to_date_plus_one)
+            .where(Ticket.creation >= from_date)
+            .where(Ticket.creation < to_date_plus_one)
             .where(
                 Function(
-                    "JSON_SEARCH", ticket._assign, "one", frappe.session.user
+                    "JSON_SEARCH", Ticket._assign, "one", frappe.session.user
                 ).isnotnull()
             )
             .groupby(creation_date)
@@ -119,35 +119,35 @@ def get_agent_tickets(period: str = "last month"):
 
 
 def get_avg_time(from_date, to_date, time_field, group_by_date=False):
-    ticket = DocType("HD Ticket")
+    Ticket = DocType("HD Ticket")
     to_date_plus_one = Function(
         "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
     )
 
-    query = frappe.qb.from_(ticket)
+    query = frappe.qb.from_(Ticket)
 
     if group_by_date:
-        creation_date = Function("DATE", ticket.creation)
+        creation_date = Function("DATE", Ticket.creation)
         query = (
             query.select(
                 creation_date.as_("date"),
-                Avg(ticket[time_field]).as_("avg_time"),
+                Avg(Ticket[time_field]).as_("avg_time"),
             )
             .groupby(creation_date)
             .orderby(creation_date)
         )
     else:
-        query = query.select(Avg(ticket[time_field]).as_("avg_time"))
+        query = query.select(Avg(Ticket[time_field]).as_("avg_time"))
 
     result = (
-        query.where(ticket.creation >= from_date)
-        .where(ticket.creation < to_date_plus_one)
+        query.where(Ticket.creation >= from_date)
+        .where(Ticket.creation < to_date_plus_one)
         .where(
             Function(
-                "JSON_SEARCH", ticket._assign, "one", frappe.session.user
+                "JSON_SEARCH", Ticket._assign, "one", frappe.session.user
             ).isnotnull()
         )
-        .where(ticket[time_field].isnotnull())
+        .where(Ticket[time_field].isnotnull())
         .run(as_dict=True)
     )
 
@@ -216,8 +216,8 @@ def get_avg_resolution_time(period: str = "last month"):
 @agent_only
 def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_first"):
     agent = frappe.session.user
-    ticket = DocType("HD Ticket")
-    contact = DocType("Contact")
+    Ticket = DocType("HD Ticket")
+    Contact = DocType("Contact")
 
     # Build period filter
     period_filter = None
@@ -230,16 +230,16 @@ def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_fi
 
     # Base query conditions
     base_conditions = [
-        ticket.feedback_rating > 0,
-        Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull(),
+        Ticket.feedback_rating > 0,
+        Function("JSON_SEARCH", Ticket._assign, "one", agent).isnotnull(),
     ]
     if period_filter:
-        base_conditions.append(ticket.modified >= period_filter)
+        base_conditions.append(Ticket.modified >= period_filter)
 
     # Get average rating and total feedbacks
-    avg_query = frappe.qb.from_(ticket).select(
-        (Avg(ticket.feedback_rating) * 5).as_("average"),
-        Count(ticket.name).as_("total_feedbacks"),
+    avg_query = frappe.qb.from_(Ticket).select(
+        (Avg(Ticket.feedback_rating) * 5).as_("average"),
+        Count(Ticket.name).as_("total_feedbacks"),
     )
     for condition in base_conditions:
         avg_query = avg_query.where(condition)
@@ -258,12 +258,12 @@ def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_fi
 
     # Get rating distribution (1-5 stars)
     rating_dist_query = (
-        frappe.qb.from_(ticket)
+        frappe.qb.from_(Ticket)
         .select(
-            Function("ROUND", ticket.feedback_rating * 5).as_("star_rating"),
-            Count(ticket.name).as_("count"),
+            Function("ROUND", Ticket.feedback_rating * 5).as_("star_rating"),
+            Count(Ticket.name).as_("count"),
         )
-        .groupby(Function("ROUND", ticket.feedback_rating * 5))
+        .groupby(Function("ROUND", Ticket.feedback_rating * 5))
     )
     for condition in base_conditions:
         rating_dist_query = rating_dist_query.where(condition)
@@ -284,22 +284,22 @@ def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_fi
 
     # Get recent feedbacks
     feedback_query = (
-        frappe.qb.from_(ticket)
-        .left_join(contact)
-        .on(ticket.contact == contact.name)
+        frappe.qb.from_(Ticket)
+        .left_join(Contact)
+        .on(Ticket.contact == Contact.name)
         .select(
-            ticket.name,
-            ticket.subject,
-            ticket.feedback_rating,
-            ticket.feedback,
-            ticket.feedback_extra,
-            ticket.contact,
-            ticket.modified,
-            contact.full_name.as_("contact_name"),
-            contact.image.as_("contact_image"),
+            Ticket.name,
+            Ticket.subject,
+            Ticket.feedback_rating,
+            Ticket.feedback,
+            Ticket.feedback_extra,
+            Ticket.contact,
+            Ticket.modified,
+            Contact.full_name.as_("contact_name"),
+            Contact.image.as_("contact_image"),
         )
-        .orderby(ticket.feedback_rating, order=order_direction)
-        .orderby(ticket.modified, order=frappe.qb.desc)
+        .orderby(Ticket.feedback_rating, order=order_direction)
+        .orderby(Ticket.modified, order=frappe.qb.desc)
         .limit(20)
     )
     for condition in base_conditions:
@@ -333,30 +333,30 @@ def get_avg_time_metrics(period: str = "6m"):
     current_from = frappe.utils.add_days(frappe.utils.nowdate(), -days)
     current_to = frappe.utils.nowdate()
 
-    ticket = DocType("HD Ticket")
+    Ticket = DocType("HD Ticket")
     to_date_plus_one = Function(
         "DATE_ADD", current_to, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
     )
 
     # Monthly aggregation query using query builder
-    month_abbr = Function("DATE_FORMAT", ticket.creation, "%b")
-    year_val = Function("YEAR", ticket.creation)
-    month_val = Function("MONTH", ticket.creation)
+    month_abbr = Function("DATE_FORMAT", Ticket.creation, "%b")
+    year_val = Function("YEAR", Ticket.creation)
+    month_val = Function("MONTH", Ticket.creation)
 
     result = (
-        frappe.qb.from_(ticket)
+        frappe.qb.from_(Ticket)
         .select(
             month_abbr.as_("month"),
             year_val.as_("year"),
             month_val.as_("month_num"),
-            Avg(ticket.first_response_time).as_("avg_first_response"),
-            Avg(ticket.resolution_time).as_("avg_resolution"),
+            Avg(Ticket.first_response_time).as_("avg_first_response"),
+            Avg(Ticket.resolution_time).as_("avg_resolution"),
         )
-        .where(ticket.creation >= current_from)
-        .where(ticket.creation < to_date_plus_one)
-        .where(Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull())
+        .where(Ticket.creation >= current_from)
+        .where(Ticket.creation < to_date_plus_one)
+        .where(Function("JSON_SEARCH", Ticket._assign, "one", agent).isnotnull())
         .where(
-            ticket.first_response_time.isnotnull() | ticket.resolution_time.isnotnull()
+            Ticket.first_response_time.isnotnull() | Ticket.resolution_time.isnotnull()
         )
         .groupby(year_val, month_val)
         .orderby(year_val)
@@ -398,16 +398,16 @@ def get_avg_time_metrics(period: str = "6m"):
 
     # Calculate overall averages for the period using query builder
     overall_result = (
-        frappe.qb.from_(ticket)
+        frappe.qb.from_(Ticket)
         .select(
-            Avg(ticket.first_response_time).as_("avg_first_response"),
-            Avg(ticket.resolution_time).as_("avg_resolution"),
+            Avg(Ticket.first_response_time).as_("avg_first_response"),
+            Avg(Ticket.resolution_time).as_("avg_resolution"),
         )
-        .where(ticket.creation >= current_from)
-        .where(ticket.creation < to_date_plus_one)
-        .where(Function("JSON_SEARCH", ticket._assign, "one", agent).isnotnull())
+        .where(Ticket.creation >= current_from)
+        .where(Ticket.creation < to_date_plus_one)
+        .where(Function("JSON_SEARCH", Ticket._assign, "one", agent).isnotnull())
         .where(
-            ticket.first_response_time.isnotnull() | ticket.resolution_time.isnotnull()
+            Ticket.first_response_time.isnotnull() | Ticket.resolution_time.isnotnull()
         )
         .run(as_dict=True)
     )
@@ -514,15 +514,15 @@ def _get_upcoming_sla_tickets(limit=10):
 def _get_new_tickets(limit=10):
     one_day_ago = frappe.utils.add_to_date(frappe.utils.now_datetime(), hours=-24)
 
-    todo = DocType("ToDo")
+    ToDo = DocType("ToDo")
     assigned_tickets = (
-        frappe.qb.from_(todo)
-        .select(todo.reference_name)
+        frappe.qb.from_(ToDo)
+        .select(ToDo.reference_name)
         .distinct()
-        .where(todo.reference_type == "HD Ticket")
-        .where(todo.allocated_to == frappe.session.user)
-        .where(todo.creation >= one_day_ago)
-        .where(todo.status == "Open")
+        .where(ToDo.reference_type == "HD Ticket")
+        .where(ToDo.allocated_to == frappe.session.user)
+        .where(ToDo.creation >= one_day_ago)
+        .where(ToDo.status == "Open")
         .run(as_dict=False)
     )
     ticket_names = [row[0] for row in assigned_tickets]
