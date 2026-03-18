@@ -11,7 +11,7 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.22",
     "@tailwindcss/typography": "^0.5.9",
-    "@tiptap/core": "^3.11.0",    
+    "@tiptap/core": "^3.11.0",
     "@twilio/voice-sdk": "^2.15.0",
     "@vee-validate/zod": "^4.8.2",
     "@vitejs/plugin-vue": "^4.2.3",
@@ -41,6 +41,13 @@
   },
   "resolutions": {
     "cheerio": "1.0.0-rc.12",
-    "prosemirror-model": "1.25.1"
+    "prosemirror-model": "1.25.4",
+    "prosemirror-state": "1.4.4",
+    "prosemirror-view": "1.41.7",
+    "prosemirror-gapcursor": "1.4.1",
+    "prosemirror-commands": "1.7.1",
+    "prosemirror-keymap": "1.2.3",
+    "prosemirror-tables": "1.8.5",
+    "@tiptap/core": "^3.11.0"
   }
 }

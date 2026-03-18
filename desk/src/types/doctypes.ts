@@ -32,7 +32,11 @@ export interface HDTicketStatus extends DocType {
   parsed_color?: string;
 }
 
+<<<<<<< HEAD
 // Last updated: 2026-01-16 14:23:14.181727
+=======
+// Last updated: 2026-02-27 16:42:43.292656
+>>>>>>> f562911b (fix: dependency bug by deduping and resolving prosemirror packages)
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;
