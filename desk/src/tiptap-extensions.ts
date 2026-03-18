@@ -3,7 +3,7 @@ import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table
 import { TextAlign } from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
-import { StarterKit } from "@tiptap/starter-kit";
+import StarterKit from "@tiptap/starter-kit";
 import { createSuggestionExtension } from "frappe-ui";
 import FieldAutocompleteList from "./components/Settings/SavedReplies/components/FieldAutocompleteList.vue";
 import { userFields } from "./components/Settings/SavedReplies/savedReplies";
