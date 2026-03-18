@@ -2,7 +2,7 @@
   <!-- View Controls -->
   <div
     class="flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6"
-    v-if="showViewControls && list.data?.data.length > 0"
+    v-if="showViewControls"
   >
     <QuickFilters v-if="!isMobileView" class="flex-1" />
     <div class="flex items-start gap-2 justify-end h-full" v-if="!isMobileView">
@@ -132,16 +132,15 @@ import {
 } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 import { View, ViewType } from "@/types";
 import { formatTimeShort, getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { __ } from "@/translation";
 import {
   call,
   createResource,
-  dayjsLocal,
   Dropdown,
   FeatherIcon,
   ListFooter,
