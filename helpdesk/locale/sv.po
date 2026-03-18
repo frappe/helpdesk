@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-03-01 10:40+0000\n"
-"PO-Revision-Date: 2026-03-06 19:45\n"
+"PO-Revision-Date: 2026-03-12 19:34\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -20,12 +20,12 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:181
 msgid "% SLA Fulfilled"
-msgstr "Procentandel Uppfylld SLA"
+msgstr "% Uppfylld Service Nivå Avtal"
 
 #: helpdesk/api/dashboard.py:186
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
-msgstr "Procentandel av skapade ärenden som löstes inom SLA"
+msgstr "% av skapade ärenden som löstes inom Service Nivå Avtal"
 
 #: desk/src/pages/SearchAgent.vue:120
 msgid "({0}s)"
@@ -378,7 +378,7 @@ msgstr "Tillämpa utanför arbetstid"
 #. Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply to customer portal"
-msgstr "Tillämpa på kundportal"
+msgstr "Tillämpa på Kund Portal"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:423
@@ -1271,7 +1271,7 @@ msgstr "Standard Prioritet"
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Default SLA"
-msgstr "Standard SLA"
+msgstr "Standard Service Nivå Avtal"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:56
 msgid "Default Sending"
@@ -2063,7 +2063,7 @@ msgstr "Kund"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "HD Desk Account Request"
-msgstr "Helpdesk Konto Begäran"
+msgstr "Skrivbord Konto Begäran"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
@@ -2124,7 +2124,7 @@ msgstr "Service Dag"
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list_calendar.js:20
 msgid "HD Service Holiday List"
-msgstr "Tjänstgöring Helg Lista"
+msgstr "Service Helg Lista"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
@@ -2239,23 +2239,23 @@ msgstr "Hjälp"
 
 #: helpdesk/config/desktop.py:11
 msgid "HelpDesk"
-msgstr "Helpdesk"
+msgstr "Hjälpcentral"
 
 #. Name of a Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk"
-msgstr "Helpdesk"
+msgstr "Hjälpcentral"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Helpdesk Contact"
-msgstr "Helpdesk Kontakt"
+msgstr "Hjälpcentral Kontakt"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk Reports"
-msgstr "Helpdesk Rapporter"
+msgstr "Hjälpcentral Rapporter"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:53
 msgid "Here, your weekly offs are pre-populated based on the previous selections. You can add more rows to also add public and national holidays individually."
@@ -2299,7 +2299,7 @@ msgstr "Helglista borttagen"
 
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:124
 msgid "Holiday list duplicated"
-msgstr "Helgdagslista duplicerad"
+msgstr "Helglista duplicerad"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:435
 msgid "Holiday list updated"
@@ -2588,12 +2588,12 @@ msgstr "Senaste 90 Dagar"
 #. Label of the last_agent_response (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Last Agent Response"
-msgstr "Senaste handläggare svar"
+msgstr "Senaste Handläggare Svar"
 
 #. Label of the last_customer_response (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Last Customer Response"
-msgstr "Senaste kund svar"
+msgstr "Senaste Kund Svar"
 
 #: desk/src/components/Settings/Profile/Profile.vue:113
 #: desk/src/components/desk/global/NewContactDialog.vue:126
@@ -3238,7 +3238,7 @@ msgstr "Period"
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:223
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Personal"
-msgstr "Personal"
+msgstr "Personlig"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:88
 msgid "Personal mobile no"
@@ -3282,7 +3282,7 @@ msgstr "Lägg till prioritet i <a href='/app/hd-service-level-agreement'>erfordr
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:326
 msgid "Please add {0} priority in {1} SLA"
-msgstr "Lägg till {0} prioritet i {1} SLA"
+msgstr "Lägg till {0} prioritet i {1} Service Nivå Avtal"
 
 #: desk/src/pages/ticket/TicketNew.vue:82
 msgid "Please enter a subject to continue"
@@ -3354,7 +3354,7 @@ msgstr "Ange Benämning Nyckel"
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:10
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Prefer knowledge base"
-msgstr "Föredrar kunskapsbas"
+msgstr "Föredra kunskap bas"
 
 #: desk/src/pages/dashboard/Dashboard.vue:267
 msgid "Presets"
@@ -3401,7 +3401,7 @@ msgstr "Prioritet"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:84
 msgid "Priority <u>{0}</u> must be included in the SLA {1}."
-msgstr "Prioritet <u>{0}</u> måste ingå i SLA {1}."
+msgstr "Prioritet <u>{0}</u> måste ingå i Service Nivå Avtal {1}."
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:75
 msgid "Priority {0} has been repeated."
@@ -3410,7 +3410,7 @@ msgstr "Prioritet {0} har upprepats."
 #: desk/src/components/layouts/Sidebar.vue:278
 #: desk/src/pages/ticket/Tickets.vue:318
 msgid "Private Views"
-msgstr "Privata vyer"
+msgstr "Privata Vyer"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:37
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:7
@@ -4090,7 +4090,7 @@ msgstr "Ange Telefonnummer"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:56
 msgid "Set Resolution Time for Priority {0} in row {1}."
-msgstr "Ange lösningstid för prioritet {0} på rad {1}."
+msgstr "Ange Upplösning Tid för Prioritet {0} på rad {1}."
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:48
 msgid "Set Response Time for Priority {0} in row {1}."
@@ -4114,7 +4114,7 @@ msgstr "Ange ditt teams arbetsdagar, timmar och helgdagar med hjälp av en mall 
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:123
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
-msgstr "Att ange <strong>{0}</strong> som standard SLA tar bort <strong>{1}</strong> som standard SLA. Du måste lägga till villkor i <strong>{1}</strong> för att SLA ska fungera."
+msgstr "Att ange <strong>{0}</strong> som standard Service Nivå Avtal tar bort <strong>{1}</strong> som standard Service Nivå Avtal. Du måste lägga till villkor i <strong>{1}</strong> för att Service Nivå Avtal ska fungera."
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
 #: desk/src/components/Settings/SettingsModal.vue:13
@@ -4230,7 +4230,7 @@ msgstr "Källa och mål ärende kan inte vara samma"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:331
 msgid "Source ticket does not exist"
-msgstr "Ursprung ärende finns inte"
+msgstr "Ursprunglig ärende finns inte"
 
 #. Label of the split_and_merge_section (Section Break) field in DocType 'HD
 #. Ticket'
@@ -5122,7 +5122,7 @@ msgstr "Arbetsflöde"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:4
 msgid "Workflow & knowledge base settings"
-msgstr "Arbetsflöde och kunskapsbas inställningar"
+msgstr "Arbetsflöde och kunskap bas inställningar"
 
 #. Label of the support_and_resolution_section_break (Section Break) field in
 #. DocType 'HD Service Level Agreement'
