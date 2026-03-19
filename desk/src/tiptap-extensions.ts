@@ -1,10 +1,7 @@
 import { Extension, generateJSON } from "@tiptap/core";
-import {Table} from "@tiptap/extension-table";
-import {TableCell} from "@tiptap/extension-table-cell";
-import {TableHeader} from "@tiptap/extension-table-header";
-import {TableRow} from "@tiptap/extension-table-row";
-import {TextAlign} from "@tiptap/extension-text-align";
-import {TextStyle} from "@tiptap/extension-text-style";
+import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table'
+import { TextAlign } from "@tiptap/extension-text-align";
+import { TextStyle } from "@tiptap/extension-text-style";
 import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 import StarterKit from "@tiptap/starter-kit";
 import { createSuggestionExtension } from "frappe-ui";
