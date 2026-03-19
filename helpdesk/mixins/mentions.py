@@ -51,7 +51,7 @@ class HasMentions:
             for user_email in users_to_notify:
                 if self.owner == user_email:
                     continue
-                
+
                 if user_email in already_notified:
                     continue
 

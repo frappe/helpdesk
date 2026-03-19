@@ -125,8 +125,12 @@ import { useStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { agents: agentsList, dropdown, userGroups } = storeToRefs(useAgentStore());
-const mentionsGetter = () => dropdown.value ?? []
+const {
+  agents: agentsList,
+  dropdown,
+  userGroups,
+} = storeToRefs(useAgentStore());
+const mentionsGetter = () => dropdown.value ?? [];
 const { isManager } = useAuthStore();
 
 const props = defineProps({
