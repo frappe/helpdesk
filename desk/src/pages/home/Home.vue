@@ -143,6 +143,9 @@
 
 <script setup lang="ts">
 import { LayoutHeader } from "@/components";
+import { useAuthStore } from "@/stores/auth";
+import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 import {
   Button,
   createResource,
@@ -152,10 +155,8 @@ import {
   toast,
 } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { useAuthStore } from "@/stores/auth";
 import { computed, ref } from "vue";
 import ChartItem from "./components/ChartItem.vue";
-import { __ } from "@/translation";
 
 type Layout = {
   x: number;
@@ -411,6 +412,7 @@ const onSave = () => {
       editing.value = false;
     });
   }
+  capture("home_page_updated");
 };
 
 const onCancel = () => {
