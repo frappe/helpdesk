@@ -27,6 +27,7 @@ after_migrate = [
     "helpdesk.search.download_corpus",
 ]
 
+
 # Full Text Search
 # ------------------
 
