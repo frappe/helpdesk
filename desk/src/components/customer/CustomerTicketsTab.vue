@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col focus-visible:border-none" tabindex="0">
     <!-- Filter bar -->
     <div class="flex items-center justify-between gap-3 py-3">
       <FormControl
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Table -->
-    <div class="min-h-0 flex flex-1 flex-col">
+    <div class="min-h-0 flex flex-1 flex-col" tabindex="0">
       <!-- Loading -->
       <template v-if="ticketsListResource.loading">
         <div

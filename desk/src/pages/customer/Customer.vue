@@ -11,6 +11,7 @@
     >
       <!-- customer detail -->
       <CustomerInfo />
+      <TicketStats />
       <!-- Tabs -->
       <Tabs v-model="activeTab" :tabs="tabs">
         <template #tab-item="{ tab, selected }">
@@ -48,6 +49,7 @@
 <script setup lang="ts">
 import CustomerContactTab from "@/components/customer/CustomerContactTab.vue";
 import CustomerTicketsTab from "@/components/customer/CustomerTicketsTab.vue";
+import TicketStats from "@/components/customer/TicketStats.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { useCustomer } from "@/composables/customer";
@@ -57,7 +59,7 @@ import { Badge, Breadcrumbs, Tabs, usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, provide } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideSquareUser from "~icons/lucide/square-user";
-import CustomerInfo from "./CustomerInfo.vue";
+import CustomerInfo from "../../components/customer/CustomerInfo.vue";
 import { ticketsListResource } from "./tickets";
 // props with type set at string
 const props = defineProps<{
