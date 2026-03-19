@@ -168,6 +168,7 @@ export function useView(dt: string = null) {
       name: view.name,
       icon: getIcon(view.icon),
       route_name: view.route_name,
+      is_standard: view.is_standard || false,
       onClick: () => {
         router.push({
           name: view.route_name,

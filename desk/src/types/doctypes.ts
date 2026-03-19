@@ -120,10 +120,12 @@ export interface HDTicket extends DocType {
   raised_outside_working_hours: 0 | 1;
 }
 
-// Last updated: 2024-03-23 16:01:27.847608
+// Last updated: 2026-03-03 12:30:01.394107
 export interface AssignmentRuleUser extends ChildDocType {
   /** User: Link (User) */
   user: string;
+  /** Weight: Int */
+  weight?: number;
 }
 
 // Last updated: 2024-03-23 16:01:27.759155
@@ -132,7 +134,7 @@ export interface AssignmentRuleDay extends ChildDocType {
   day?: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
 }
 
-// Last updated: 2025-08-25 17:09:11.644603
+// Last updated: 2026-03-03 13:08:12.561504
 export interface AssignmentRule extends DocType {
   /** Document Type: Link (DocType) */
   document_type: string;
@@ -147,7 +149,7 @@ export interface AssignmentRule extends DocType {
   /** Unassign Condition: Code */
   unassign_condition?: string;
   /** Rule: Select */
-  rule: 'Round Robin' | 'Load Balancing' | 'Based on Field';
+  rule: 'Round Robin' | 'Load Balancing' | 'Based on Field' | 'Weighted Distribution';
   /** Users: Table MultiSelect (Assignment Rule User) */
   users: AssignmentRuleUser[];
   /** Last User: Link (User) */
@@ -160,6 +162,10 @@ export interface AssignmentRule extends DocType {
   due_date_based_on?: any;
   /** Field: Select */
   field?: any;
+  /** Current Index: Int */
+  current_index?: number;
+  /** Users: Table (Assignment Rule User) */
+  weighted_users: AssignmentRuleUser[];
 }
 
 // Last updated: 2021-12-23 19:03:23.507845
