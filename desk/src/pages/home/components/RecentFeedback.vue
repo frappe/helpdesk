@@ -29,7 +29,7 @@
           </div>
           <!-- Average Rating -->
           <div class="flex items-end justify-between gap-4">
-            <div class="flex flex-col gap-0.5">
+            <div class="flex flex-col gap-1">
               <div class="flex items-center gap-1">
                 <LucideStar class="size-4 fill-[#de9735] text-[#de9735]" />
                 <div class="text-2xl font-medium text-ink-gray-8">
@@ -37,11 +37,11 @@
                 </div>
               </div>
               <div
-                class="flex items-center text-ink-gray-5 text-sm cursor-pointer"
+                class="flex items-center text-ink-gray-5 text-sm cursor-pointer hover:text-ink-gray-7"
                 @click="redirectToSeeAllReviews"
               >
                 {{ __("{0} reviews", chartConfig.totalFeedbacks) }}
-                <FeatherIcon name="arrow-up-right" class="size-3.5" />
+                <FeatherIcon name="arrow-up-right" class="size-3.5 ml-0.5" />
               </div>
             </div>
             <div v-if="chartConfig.totalFeedbacks > 0" class="text-sm">
@@ -91,7 +91,7 @@
                 </div>
               </template>
             </Dropdown>
-            <Dropdown :options="sortOptions">
+            <Dropdown :options="sortOptions" placement="right">
               <template #default>
                 <Button :label="currentSortLabel" icon-right="chevron-down" />
               </template>
@@ -135,11 +135,8 @@
             <!-- Rating & Title -->
             <div class="flex items-center gap-2 mb-2">
               <div
-                class="flex items-center gap-1 p-1 px-1.5 rounded"
-                :class="[
-                  getRatingColor(currentFeedback.star_rating).text,
-                  getRatingColor(currentFeedback.star_rating).bg,
-                ]"
+                class="flex items-center gap-1 p-1 pl-0 rounded"
+                :class="[getRatingColor(currentFeedback.star_rating).text]"
               >
                 <LucideStar
                   class="size-3.5"
@@ -165,7 +162,7 @@
 
             <!-- Contact & Navigation -->
             <div class="flex items-center justify-between mt-auto">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1">
                 <Avatar
                   :image="currentFeedback.contact_image"
                   :label="
@@ -564,10 +561,11 @@ const getRecentFeedbackResource = createResource({
 });
 
 const goToTicket = (feedback: Feedback) => {
-  router.push({
+  const route = router.resolve({
     name: "TicketAgent",
     params: { ticketId: feedback.name },
   });
+  window.open(route.href, "_blank");
 };
 
 const nextFeedback = () => {
