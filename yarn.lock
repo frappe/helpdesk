@@ -2650,10 +2650,10 @@ fraction.js@^5.3.4:
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-5.3.4.tgz#8c0fcc6a9908262df4ed197427bdeef563e0699a"
   integrity sha512-1X1NTtiJphryn/uLQz3whtY6jK3fTqoE3ohKs0tT+Ujr1W59oopxmoEh7Lu5p6vBaPbgoM0bzveAW4Qi5RyWDQ==
 
-frappe-ui@0.1.265:
-  version "0.1.265"
-  resolved "https://registry.yarnpkg.com/frappe-ui/-/frappe-ui-0.1.265.tgz#3aee2dd5593fb36f9f2d7eeb3c92246abaa2a974"
-  integrity sha512-N/4LXMcFAzoTfMWqap9e2rxxMKShVWnX63+Q+48CBbt2sfjeqR/4P7HRjXi7DUCEMfRt4xkv/1eIuBdNAuIT1A==
+frappe-ui@0.1.267:
+  version "0.1.267"
+  resolved "https://registry.yarnpkg.com/frappe-ui/-/frappe-ui-0.1.267.tgz#7f1486e268ba615d23b6a46f8c9f63922066ecea"
+  integrity sha512-n6W8jcACe07/SPIV8flqQ2qzZjvSX8lmrAztK5+H5dmtyLEmOUf/oVe6IOmjzXFX6DT7FH3xlhGSPn0CvQcqlg==
   dependencies:
     "@floating-ui/dom" "^1.7.4"
     "@floating-ui/vue" "^1.1.6"
@@ -2696,7 +2696,7 @@ frappe-ui@0.1.265:
     highlight.js "^11.11.1"
     idb-keyval "^6.2.0"
     lowlight "^3.3.0"
-    lucide-static "^0.543.0"
+    lucide-static "^0.545.0"
     marked "^15.0.12"
     ora "5.4.1"
     prettier "^3.3.2"
@@ -3358,10 +3358,10 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-lucide-static@^0.543.0:
-  version "0.543.0"
-  resolved "https://registry.yarnpkg.com/lucide-static/-/lucide-static-0.543.0.tgz#054c14493993452084ed9968a3ad912c58fec90a"
-  integrity sha512-k9HUQncNuOThizzuuqvgjpYPHaE3Hae89l/i+Y7BRgOvzWeqQ9Sbllin8m4NO5BP+JaaRHTzn29o4oZJJi/5uQ==
+lucide-static@^0.545.0:
+  version "0.545.0"
+  resolved "https://registry.yarnpkg.com/lucide-static/-/lucide-static-0.545.0.tgz#69dad91d1bbd53b70df6c21f0877c16a1e69cea0"
+  integrity sha512-2i81WNw3y+sN17gG75DKZbd43pGJREyoAQRK5IG8djCWhISoK6Ri1ovbKwOjFR+St2LHTQhu+EJygmUIWMotew==
 
 magic-string@^0.25.0, magic-string@^0.25.7:
   version "0.25.9"
