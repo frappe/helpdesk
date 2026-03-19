@@ -4,7 +4,7 @@
       <div
         class="flex items-center gap-2 text-lg font-semibold text-ink-gray-8"
       >
-        {{ title }}
+        {{ currentTitle }}
         <Tooltip :text="tooltipText" placement="top">
           <FeatherIcon name="info" class="size-3" />
         </Tooltip>
@@ -125,8 +125,8 @@
           </tr>
           <TableEmptyState
             v-if="chartConfig?.tickets?.length === 0"
-            :title="emptyStateTitle"
-            :description="emptyStateDescription"
+            :title="emptyState.title"
+            :description="emptyState.description"
           />
         </tbody>
       </table>
@@ -206,40 +206,43 @@ const chartTabs = [
   },
 ];
 
-const title = computed(() => {
-  const labels: Record<string, string> = {
-    upcoming_sla: __("SLA Alerts"),
-    new_tickets: __("Recent Tickets"),
-    pending: __("Pending Tickets"),
-  };
-  return labels[currentTab.value] || __("Pending Tickets");
+const titles: Record<string, string> = {
+  upcoming_sla: __("SLA Alerts"),
+  new_tickets: __("Recent Tickets"),
+  pending: __("Pending Tickets"),
+};
+
+const currentTitle = computed(() => {
+  return titles[currentTab.value] || __("Pending Tickets");
 });
 
+const tooltipTexts: Record<string, string> = {
+  upcoming_sla: __("Tickets approaching or breached SLA"),
+  new_tickets: __("Tickets assigned to you in the last 24 hours"),
+  pending: __("Tickets that are awaiting your response"),
+};
 const tooltipText = computed(() => {
-  const texts: Record<string, string> = {
-    upcoming_sla: __("Tickets approaching or breached SLA"),
-    new_tickets: __("Tickets assigned to you in the last 24 hours"),
-    pending: __("Tickets that you have not responded to yet"),
-  };
-  return texts[currentTab.value];
+  return tooltipTexts[currentTab.value];
 });
 
-const emptyStateTitle = computed(() => {
-  const titles: Record<string, string> = {
-    upcoming_sla: __("No SLA due tickets"),
-    new_tickets: __("No recent tickets"),
-    pending: __("No pending tickets"),
+const emptyStateLabel: Record<string, { title: string; description: string }> =
+  {
+    upcoming_sla: {
+      title: __("All SLAs on track"),
+      description: __("Great! All your tickets are within SLA"),
+    },
+    new_tickets: {
+      title: __("No recently assigned tickets"),
+      description: __("No new tickets assigned to you in the last 24 hours"),
+    },
+    pending: {
+      title: __("No pending tickets"),
+      description: __("All your assigned tickets have been responded to"),
+    },
   };
-  return titles[currentTab.value];
-});
 
-const emptyStateDescription = computed(() => {
-  const descriptions: Record<string, string> = {
-    upcoming_sla: __("Great! All your tickets are within SLA"),
-    new_tickets: __("No new tickets assigned to you in the last 24 hours"),
-    pending: __("All your assigned tickets have been responded to"),
-  };
-  return descriptions[currentTab.value];
+const emptyState = computed(() => {
+  return emptyStateLabel[currentTab.value];
 });
 
 const chartConfig = computed(() => {
