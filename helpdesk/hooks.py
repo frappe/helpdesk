@@ -27,7 +27,6 @@ after_migrate = [
     "helpdesk.search.download_corpus",
 ]
 
-fixtures = [{"dt": "HD View", "filters": {"is_standard": 1}}]
 
 # Full Text Search
 # ------------------
