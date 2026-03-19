@@ -116,10 +116,6 @@ export interface HDTicket extends DocType {
   key?: string;
   /** Status Category: Data */
   status_category?: string;
-  /** Last Agent Response: Datetime */
-  last_agent_response?: string;
-  /** Last Customer Response: Datetime */
-  last_customer_response?: string;
   /** Ticket raised outside working hours: Check */
   raised_outside_working_hours: 0 | 1;
 }
