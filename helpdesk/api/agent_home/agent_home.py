@@ -11,6 +11,7 @@ from helpdesk.api.agent_home.utils import (
     get_default_agent_dashboard,
     get_ticket_count,
 )
+from helpdesk.api.analytics_utils import get_avg_time_metric
 from helpdesk.utils import agent_only, format_time_difference
 
 
@@ -118,98 +119,16 @@ def get_agent_tickets(period: str = "last month"):
     }
 
 
-def get_avg_time(from_date, to_date, time_field, group_by_date=False):
-    Ticket = DocType("HD Ticket")
-    to_date_plus_one = Function(
-        "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
-    )
-
-    query = frappe.qb.from_(Ticket)
-
-    if group_by_date:
-        creation_date = Function("DATE", Ticket.creation)
-        query = (
-            query.select(
-                creation_date.as_("date"),
-                Avg(Ticket[time_field]).as_("avg_time"),
-            )
-            .groupby(creation_date)
-            .orderby(creation_date)
-        )
-    else:
-        query = query.select(Avg(Ticket[time_field]).as_("avg_time"))
-
-    result = (
-        query.where(Ticket.creation >= from_date)
-        .where(Ticket.creation < to_date_plus_one)
-        .where(
-            Function(
-                "JSON_SEARCH", Ticket._assign, "one", frappe.session.user
-            ).isnotnull()
-        )
-        .where(Ticket[time_field].isnotnull())
-        .run(as_dict=True)
-    )
-
-    if group_by_date:
-        return result
-
-    return result[0]["avg_time"] if result and result[0]["avg_time"] is not None else 0
-
-
-def _get_avg_time_metric(period: str, time_field: str) -> dict:
-    periods = {"last week": 7, "last month": 30, "last 3 months": 90}
-    days = periods.get(period, 7)
-
-    current_from = frappe.utils.add_days(frappe.utils.nowdate(), -(days - 1))
-    current_to = frappe.utils.nowdate()
-    previous_from = frappe.utils.add_days(frappe.utils.nowdate(), -(2 * days - 1))
-    previous_to = frappe.utils.add_days(frappe.utils.nowdate(), -days)
-
-    current_result = get_avg_time(
-        current_from, current_to, time_field, group_by_date=True
-    )
-
-    current_avg = get_avg_time(current_from, current_to, time_field)
-    previous_avg = get_avg_time(previous_from, previous_to, time_field)
-
-    percentage_change = calculate_percentage_change(current_avg, previous_avg)
-
-    # Fill missing days with 0
-    from_date_obj = date.fromisoformat(current_from)
-    to_date_obj = date.fromisoformat(current_to)
-    date_dict = {}
-    current_date = from_date_obj
-    while current_date <= to_date_obj:
-        date_str = current_date.isoformat()
-        date_dict[date_str] = 0
-        current_date += timedelta(days=1)
-
-    for row in current_result:
-        date_dict[str(row["date"])] = round(row["avg_time"] or 0, 2)
-
-    data = [
-        {"date": date, "avg_time": avg_time}
-        for date, avg_time in sorted(date_dict.items())
-    ]
-
-    return {
-        "data": data,
-        "average": round(current_avg, 2),
-        "percentage_change": percentage_change,
-    }
-
-
 @frappe.whitelist()
 @agent_only
 def get_avg_first_response_time(period: str = "last month"):
-    return _get_avg_time_metric(period, "first_response_time")
+    return get_avg_time_metric(period, "first_response_time", scope="agent")
 
 
 @frappe.whitelist()
 @agent_only
 def get_avg_resolution_time(period: str = "last month"):
-    return _get_avg_time_metric(period, "resolution_time")
+    return get_avg_time_metric(period, "resolution_time", scope="agent")
 
 
 @frappe.whitelist()
@@ -227,6 +146,8 @@ def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_fi
         period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -30)
     elif period == "last_3_months":
         period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -90)
+    elif period == "last_6_months":
+        period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -180)
 
     # Base query conditions
     base_conditions = [

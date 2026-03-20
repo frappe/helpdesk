@@ -4,15 +4,15 @@
     <div class="flex items-center justify-between gap-3 py-3">
       <FormControl
         v-model="search"
-        :placeholder="__('Search tickets')"
-        class="w-56"
+        :placeholder="__('Search by ID or Subject')"
+        class="w-full md:w-56"
       >
         <template #prefix>
           <LucideSearch class="h-4 w-4 text-ink-gray-4" />
         </template>
       </FormControl>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2" v-if="!isMobileView">
         <Link
           class="w-48"
           v-for="filter in filterFields"
@@ -76,7 +76,10 @@
         </div>
         <!-- Rows -->
         <div
-          class="min-h-0 max-h-[65vh] overflow-y-auto overflow-x-hidden pb-6"
+          class="min-h-0 overflow-y-auto pb-6"
+          :class="
+            isMobileView ? 'max-h-[65vh]' : 'max-h-[65vh] overflow-x-hidden'
+          "
         >
           <div
             v-for="(ticket, i) in ticketsListResource.data"
@@ -84,6 +87,7 @@
             class="grid items-center px-4 py-3 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 transition-colors"
             :class="i !== ticketRowsCount - 1 && 'border-b border-gray-200'"
             :style="gridTemplateStyle"
+            @click="goToTicket(ticket.name)"
           >
             <!-- ID -->
             <div class="text-ink-gray-6 font-base">{{ ticket.name }}</div>
@@ -95,43 +99,42 @@
 
             <!-- Status -->
             <div class="flex items-center gap-1.5">
-              <IndicatorIcon :class="getStatus(ticket.status).parsed_color" />
+              <IndicatorIcon :class="getStatus(ticket.status)?.parsed_color" />
               <span>{{ ticket.status }}</span>
             </div>
 
             <!-- Priority -->
-            <div class="flex items-center gap-1.5">
+            <div v-if="!isMobileView" class="flex items-center gap-1.5">
               <span>{{ ticket.priority }}</span>
             </div>
 
             <!-- First Response -->
-            <div class="text-ink-gray-6">
+            <div v-if="!isMobileView" class="text-ink-gray-6">
               {{ dayjsLocal(ticket.response_by).fromNow() }}
             </div>
 
             <!-- Resolution -->
-            <div class="text-ink-gray-6">
+            <div v-if="!isMobileView" class="text-ink-gray-6">
               {{ dayjsLocal(ticket.resolution_by).fromNow() }}
             </div>
 
             <!-- Assigned To -->
-            <div class="flex items-center gap-2">
+            <div v-if="!isMobileView" class="flex items-center gap-2">
               <MultipleAvatar :avatars="ticket._assign" size="xs" />
             </div>
           </div>
           <!-- Load More -->
-          <div class="flex justify-center py-6">
+          <div
+            class="flex justify-center py-6"
+            v-if="ticketsListResource.hasNextPage"
+          >
             <Button
-              v-if="ticketsListResource.hasNextPage"
               :loading="ticketsListResource.loading"
               :label="__('Load More')"
               icon-left="refresh-cw"
               @click="
                 () => {
-                  ticketsListResource.update({
-                    pageLength: ticketsListResource.pageLength + 20,
-                  });
-                  ticketsListResource.reload();
+                  ticketsListResource.next();
                 }
               "
             />
@@ -145,17 +148,22 @@
 <script setup lang="ts">
 import Link from "@/components/frappe-ui/Link.vue";
 import { IndicatorIcon } from "@/components/icons";
+import { useScreenSize } from "@/composables/screen";
 import { ticketsListResource } from "@/pages/customer/tickets";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { CustomerResourceSymbol } from "@/types";
 import { watchDebounced } from "@vueuse/core";
 import { dayjsLocal, FormControl, LoadingIndicator } from "frappe-ui";
-import { computed, inject, reactive, ref } from "vue";
+import { computed, inject, onBeforeUnmount, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 
 const customer = inject(CustomerResourceSymbol)!;
+
+const router = useRouter();
+const { isMobileView } = useScreenSize();
 
 const search = ref("");
 const sort = reactive<{ field: string | null; order: "asc" | "desc" }>({
@@ -168,23 +176,45 @@ const filters = reactive<Record<string, string>>({
   contact: "",
 });
 
-const gridTemplateStyle =
-  "grid-template-columns: 6rem 1fr 8rem 7rem 8rem 8rem 9rem";
+const gridTemplateStyle = computed(() =>
+  isMobileView.value
+    ? "grid-template-columns: 5rem 1fr 7rem"
+    : "grid-template-columns: 6rem 1fr 8rem 7rem 8rem 8rem 9rem"
+);
 
 type Column = {
   key: string;
   label: string;
   sortable: boolean;
+  desktopOnly?: boolean;
 };
-const columns: Column[] = [
+const allColumns: Column[] = [
   { key: "name", label: __("Ticket ID"), sortable: true },
   { key: "subject", label: __("Subject"), sortable: true },
   { key: "status", label: __("Status"), sortable: true },
-  { key: "priority", label: __("Priority"), sortable: true },
-  { key: "response_by", label: __("First Response"), sortable: true },
-  { key: "resolution_by", label: __("Resolution"), sortable: true },
-  { key: "_assign", label: __("Assigned To"), sortable: false },
+  { key: "priority", label: __("Priority"), sortable: true, desktopOnly: true },
+  {
+    key: "response_by",
+    label: __("First Response"),
+    sortable: true,
+    desktopOnly: true,
+  },
+  {
+    key: "resolution_by",
+    label: __("Resolution"),
+    sortable: true,
+    desktopOnly: true,
+  },
+  {
+    key: "_assign",
+    label: __("Assigned To"),
+    sortable: false,
+    desktopOnly: true,
+  },
 ];
+const columns = computed(() =>
+  isMobileView.value ? allColumns.filter((c) => !c.desktopOnly) : allColumns
+);
 
 const contactNames = computed(
   () => customer.doc?.contacts?.map((c) => c.contact_name) ?? []
@@ -227,6 +257,14 @@ const ticketRowsCount = computed(() => ticketsListResource.data?.length ?? 0);
 
 const { getStatus } = useTicketStatusStore();
 
+const goToTicket = (ticket: string) => {
+  const route = router.resolve({
+    name: "TicketAgent",
+    params: { ticketId: String(ticket) },
+  });
+  window.open(route.href, "_blank");
+};
+
 watchDebounced(
   [search, () => sort.field, () => sort.order, () => ({ ...filters })],
   () => {
@@ -249,4 +287,14 @@ watchDebounced(
   },
   { debounce: 300 }
 );
+
+onBeforeUnmount(() => {
+  ticketsListResource.update({
+    filters: {
+      customer: customer.doc.name,
+    },
+    orFilters: {},
+  });
+  ticketsListResource.reload();
+});
 </script>

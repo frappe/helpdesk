@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center justify-between p-5 pb-0">
-    <div class="gap-x-3 flex">
+    <div class="gap-x-3 flex h-full">
       <Avatar
         size="3xl"
         shape="square"
@@ -8,11 +8,14 @@
         :image="customer.doc.image"
         class="h-[52px] w-[52px]"
       />
-      <div class="flex flex-col h-full">
-        <p class="font-medium text-ink-gray-8 text-xl mb-1.5">
+      <div
+        class="flex flex-col h-full gap-1.5"
+        :class="[isMobileView && 'flex-1 items-center justify-center']"
+      >
+        <p class="font-medium text-ink-gray-8 text-xl">
           {{ customer.doc.customer_name }}
         </p>
-        <div class="flex items-center gap-x-1.5">
+        <div class="flex items-center gap-x-1.5" v-if="!isMobileView">
           <template v-for="(item, index) in customerInfo" :key="index">
             <template v-if="item.condition">
               <span
@@ -43,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import { useScreenSize } from "@/composables/screen";
 import { __ } from "@/translation";
 import { CustomerResourceSymbol } from "@/types";
 import { hasPermission } from "@/utils";
@@ -56,6 +60,7 @@ import LucideSquarePen from "~icons/lucide/square-pen";
 import EditCustomerDialog from "../../components/customer/EditCustomerDialog.vue";
 
 const customer = inject(CustomerResourceSymbol)!;
+const { isMobileView } = useScreenSize();
 
 const customerDialog = ref(false);
 

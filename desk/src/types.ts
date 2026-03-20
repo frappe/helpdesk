@@ -760,3 +760,8 @@ export interface CustomerContact {
   modified: string;
   ticket_count: number;
 }
+export interface LineChart {
+  percentage_change: number;
+  total: number;
+  data: { date: string; count: number }[];
+}

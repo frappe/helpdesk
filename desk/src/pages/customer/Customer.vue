@@ -6,12 +6,16 @@
       </template>
     </LayoutHeader>
     <div
-      class="gap-5 flex flex-col overscroll-none overflow-hidden h-full"
+      class="gap-5 flex flex-col h-full"
       v-if="!customer.loading && customer.doc"
     >
       <!-- customer detail -->
       <CustomerInfo />
-      <TicketStats />
+      <TicketStats
+        :dt="'HD Customer'"
+        :dn="customer.doc.name"
+        v-if="!isMobileView"
+      />
       <!-- Tabs -->
       <Tabs v-model="activeTab" :tabs="tabs">
         <template #tab-item="{ tab, selected }">
@@ -53,6 +57,7 @@ import TicketStats from "@/components/customer/TicketStats.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { useCustomer } from "@/composables/customer";
+import { useScreenSize } from "@/composables/screen";
 import { __ } from "@/translation";
 import { CustomerResourceSymbol } from "@/types";
 import { Badge, Breadcrumbs, Tabs, usePageMeta } from "frappe-ui";
@@ -65,9 +70,10 @@ import { ticketsListResource } from "./tickets";
 const props = defineProps<{
   id: string;
 }>();
-
 const route = useRoute();
 const router = useRouter();
+
+const { isMobileView } = useScreenSize();
 
 const tabs = computed(() => [
   {
@@ -120,6 +126,11 @@ const breadcrumbs = [
 onMounted(() => {
   customer.getPendingInvites.fetch();
   customer.getContacts.fetch();
+  ticketsListResource.update({
+    filters: {
+      customer: props.id,
+    },
+  });
   ticketsListResource.fetch();
 });
 

@@ -12,21 +12,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, type PropType } from "vue";
-import CardBase from "./CardBase.vue";
-import { createResource } from "frappe-ui";
 import { __ } from "@/translation";
+import type { LineChart } from "@/types";
 import { EChartsOption } from "echarts";
-
-interface Data {
-  percentage_change: number;
-  total: number;
-  data: { date: string; count: number }[];
-}
+import { createResource } from "frappe-ui";
+import { computed, onMounted, ref, type PropType } from "vue";
+import CardBase from "../../../components/ChartCardBase.vue";
 
 const props = defineProps({
   data: {
-    type: Object as PropType<Data>,
+    type: Object as PropType<LineChart>,
     required: true,
   },
 });
@@ -39,7 +34,7 @@ const chartColor = {
 };
 
 const chartData = computed(() => {
-  const _data: Data = getAgentTicketsResource.fetched
+  const _data: LineChart = getAgentTicketsResource.fetched
     ? getAgentTicketsResource.data
     : props.data;
 

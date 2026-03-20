@@ -2,27 +2,30 @@
   <div class="w-full h-full overflow-hidden">
     <CardBase
       :title="title"
-      :text="chartData.average"
+      :text="chartData.text"
       :percentageChange="chartData.percentageChange"
       :chartConfig="chartConfig"
       :currentDuration="currentDuration"
+      :orientation="orientation"
       @changeDuration="changeDuration"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, type PropType } from "vue";
-import CardBase from "./CardBase.vue";
-import { createResource } from "frappe-ui";
-import { formatTime } from "@/utils";
 import { __ } from "@/translation";
+import { formatTime } from "@/utils";
 import { EChartsOption } from "echarts";
+import { createResource } from "frappe-ui";
+import { computed, onMounted, ref, type PropType } from "vue";
+import CardBase from "./ChartCardBase.vue";
 
 interface AverageResponseData {
   percentage_change: number;
-  average: number;
-  data: { date: string; avg_time: number }[];
+  average?: number;
+  total?: number;
+
+  data: { date: string; avg_time?: number; count?: number }[];
 }
 
 const props = defineProps({
@@ -45,6 +48,22 @@ const props = defineProps({
     }>,
     required: true,
   },
+  dt: {
+    type: String,
+    required: false,
+  },
+  dn: {
+    type: String,
+    required: false,
+  },
+  orientation: {
+    type: String as PropType<"vertical" | "horizontal">,
+    default: "vertical",
+  },
+  type: {
+    type: String as PropType<"Time" | "Count">,
+    default: "Time",
+  },
 });
 
 const currentDuration = ref(__("Last month"));
@@ -54,7 +73,10 @@ const chartData = computed(() => {
   const _data: AverageResponseData = isDataFetched ? resource.data : props.data;
 
   const dates = _data?.data?.map((item) => item.date) || [];
-  const avg_time = _data?.data?.map((item) => item.avg_time) || [];
+  const seriesData =
+    _data?.data?.map((item) =>
+      props.type === "Time" ? item.avg_time : item.count
+    ) || [];
   const _percentageChange = _data?.percentage_change || 0;
 
   const percentageChange = {
@@ -63,15 +85,21 @@ const chartData = computed(() => {
     color: _percentageChange > 0 ? "text-red-600" : "text-green-600",
   };
 
-  const average =
-    formatTime(_data?.average || 0, { day: true, hour: true, minute: true }) ||
-    "0m";
+  // for time take average and for count take total
+  const text =
+    props.type === "Time"
+      ? formatTime(_data?.average || 0, {
+          day: true,
+          hour: true,
+          minute: true,
+        }) || "0m"
+      : _data?.total || 0;
 
   return {
-    data: avg_time,
+    data: seriesData,
     dates,
     percentageChange,
-    average,
+    text,
   };
 });
 
@@ -134,9 +162,14 @@ const resource = createResource({
   url: props.apiUrl,
   type: "GET",
   makeParams: () => {
-    return {
+    const params: Record<string, any> = {
       period: currentDuration.value.toLowerCase(),
     };
+    if (props.dt && props.dn) {
+      params.dt = props.dt;
+      params.dn = props.dn;
+    }
+    return params;
   },
 });
 

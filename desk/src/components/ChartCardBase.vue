@@ -1,17 +1,25 @@
 <template>
-  <div class="flex flex-col w-full h-full rounded-md p-4">
+  <div
+    class="flex flex-col w-full h-full rounded-md p-4"
+    :class="[orientation == 'horizontal' && 'pt-3']"
+  >
     <slot name="title">
       <div class="text-ink-gray-5 text-base mb-2">
         {{ title }}
       </div>
     </slot>
-    <div class="flex flex-col gap-2 h-full w-full">
+    <div
+      class="flex flex-col gap-2 h-full w-full"
+      v-if="orientation === 'vertical'"
+    >
       <div class="flex items-end w-full gap-2">
-        <div
-          class="text-2xl font-medium text-center text-ink-gray-8 whitespace-nowrap"
-        >
-          {{ text }}
-        </div>
+        <slot name="text">
+          <div
+            class="text-2xl font-medium text-center text-ink-gray-8 whitespace-nowrap"
+          >
+            {{ text }}
+          </div>
+        </slot>
         <div class="flex items-center text-sm gap-1">
           <div class="flex items-center gap-1" :class="percentageChange.color">
             <FeatherIcon :name="percentageChange.icon" class="size-4" />
@@ -47,15 +55,58 @@
         </div>
       </slot>
     </div>
+    <div class="flex flex-col gap-2 h-full w-full" v-else>
+      <div class="flex items-end w-full gap-2 justify-between flex-1">
+        <slot name="text">
+          <span
+            class="text-2xl font-medium text-center text-ink-gray-8 whitespace-nowrap"
+          >
+            {{ text }}
+          </span>
+        </slot>
+        <slot name="chart">
+          <div v-if="chartConfig" class="h-full max-w-[50%] w-[50%]">
+            <ECharts :options="chartConfig" class="w-full h-full" />
+          </div>
+        </slot>
+      </div>
+      <div class="flex items-center text-sm gap-1">
+        <div class="flex items-center gap-1" :class="percentageChange.color">
+          <FeatherIcon :name="percentageChange.icon" class="size-4" />
+          <div>{{ percentageChange.value }}%</div>
+        </div>
+        <Dropdown :options="durationOptions">
+          <div
+            class="flex items-center gap-0.5 text-ink-gray-5 hover:text-ink-gray-6 cursor-pointer shrink-0"
+          >
+            vs {{ currentDuration.toLowerCase() }}
+            <FeatherIcon name="chevron-down" class="size-4" />
+          </div>
+          <template #item="{ item }">
+            <div
+              class="data-[disabled]:cursor-not-allowed group flex h-7 w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+            >
+              <span>
+                {{ item.label }}
+              </span>
+              <FeatherIcon
+                v-if="item.label == __(currentDuration)"
+                name="check"
+                class="size-4"
+              />
+            </div>
+          </template>
+        </Dropdown>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from "vue";
-import { Dropdown, FeatherIcon, ECharts } from "frappe-ui";
 import { __ } from "@/translation";
 import { EChartsOption } from "echarts";
-import { DropdownOption } from "@/types";
+import { Dropdown, ECharts, FeatherIcon } from "frappe-ui";
+import { computed, type PropType } from "vue";
 
 const props = defineProps({
   title: {
@@ -76,6 +127,10 @@ const props = defineProps({
   currentDuration: {
     type: String,
     default: __("Last month"),
+  },
+  orientation: {
+    type: String as PropType<"vertical" | "horizontal">,
+    default: "vertical",
   },
 });
 

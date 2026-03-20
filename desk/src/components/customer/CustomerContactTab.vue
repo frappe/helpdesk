@@ -40,7 +40,7 @@
       </div>
     </div>
     <!-- Contacts list -->
-    <div v-else class="grid grid-cols-3 gap-4">
+    <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <ContactCard
         v-for="contact in customer.getContacts?.data"
         :key="contact.contact_name"
