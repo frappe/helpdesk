@@ -37,7 +37,7 @@ import {
   DateTimePicker,
   FormControl,
 } from "frappe-ui";
-import { computed, h } from "vue";
+import { computed, getCurrentInstance, h } from "vue";
 
 type Value = string | number | boolean;
 
@@ -68,6 +68,7 @@ const component = computed(() => {
     return h(Link, {
       doctype: props.field.options,
       filters: props.field.filters,
+      pageLength: getCurrentInstance()?.parent?.type?.__name === 'TicketNew' ? 999 : 10,
     });
   } else if (props.field.fieldtype === "Select") {
     return h(Autocomplete, {
