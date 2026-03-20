@@ -37,7 +37,7 @@ import {
   DateTimePicker,
   FormControl,
 } from "frappe-ui";
-import { computed, getCurrentInstance, h } from "vue";
+import { computed, h } from "vue";
 
 type Value = string | number | boolean;
 
