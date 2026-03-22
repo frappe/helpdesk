@@ -1,5 +1,5 @@
 <template>
-  <div class="flex border-b pr-5">
+  <div class="flex border-b pr-5 rtl:pl-6">
     <div id="app-header" class="flex-1 w-full"></div>
     <div class="flex items-start justify-center">
       <CallUI :userEmail="user" />

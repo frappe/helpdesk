@@ -13,7 +13,7 @@
       >
         <BrandLogo />
         <div
-          class="flex flex-1 flex-col text-left duration-300 ease-in-out overflow-hidden"
+          class="flex flex-1 flex-col text-left duration-300 ease-in-out overflow-hidden rtl:items-start pr-2"
           :class="
             !sidebarStore.isExpanded
               ? 'ml-0 w-0 overflow-hidden opacity-0'

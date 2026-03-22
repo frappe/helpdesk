@@ -32,7 +32,7 @@
           </div>
         </template>
       </Button>
-      <div v-else class="flex items-center justify-center">
+      <div v-else class="flex items-center justify-center rtl:flex-row-reverse">
         <Button
           v-if="sortValues.size"
           class="rounded-r-none border-r"
@@ -82,7 +82,7 @@
               <div class="handle flex h-7 w-7 items-center justify-center">
                 <DragIcon class="h-4 w-4 cursor-grab text-gray-600" />
               </div>
-              <div class="flex">
+              <div class="flex rtl:flex-row-reverse">
                 <Button
                   size="md"
                   class="rounded-r-none border-r"
