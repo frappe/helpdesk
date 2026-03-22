@@ -11,7 +11,7 @@
           label="Category"
           :filters="defaultFilters"
           :page-length="100"
-          :open-on-focus="false"
+          :open-on-focus="true"
         />
       </div>
     </template>

@@ -269,6 +269,7 @@ import {
   Badge,
   dayjsLocal,
   LoadingIndicator,
+  usePageMeta,
 } from "frappe-ui";
 import { computed, h, onMounted, ref, watch, nextTick, reactive } from "vue";
 import { useScreenSize } from "@/composables/screen";
@@ -691,5 +692,11 @@ onMounted(() => {
   setTimeout(() => {
     scrollToHeading();
   }, 100);
+});
+
+usePageMeta(() => {
+  return {
+    title: article.data?.title + ` - ${article.data?.category_name} `,
+  };
 });
 </script>

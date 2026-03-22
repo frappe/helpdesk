@@ -3,46 +3,13 @@
     <LayoutHeader>
       <template #left-header>
         <div class="text-lg font-medium text-ink-gray-9">
-          {{
-            isManager
-              ? viewMyStats
-                ? __("My Dashboard")
-                : __("Organization Analytics")
-              : __("Agent Dashboard")
-          }}
+          {{ dashboardTitle }}
         </div>
       </template>
       <template #right-header>
         <!-- Segmented pill toggle: only visible to managers -->
         <div v-if="isManager">
-          <TabButtons
-            v-model="activeTab"
-            :buttons="
-              isMobileView
-                ? [
-                    {
-                      value: 'organization',
-                      icon: h(LucideBuilding2, { class: 'size-4' }),
-                    },
-                    {
-                      value: 'my_stats',
-                      icon: h(LucideUser, { class: 'size-4' }),
-                    },
-                  ]
-                : [
-                    {
-                      value: 'organization',
-                      iconLeft: h(LucideBuilding2, { class: 'size-4' }),
-                      label: 'My Organization',
-                    },
-                    {
-                      value: 'my_stats',
-                      iconLeft: h(LucideUser, { class: 'size-4' }),
-                      label: 'My Stats',
-                    },
-                  ]
-            "
-          />
+          <TabButtons v-model="activeTab" :buttons="tabButtons" />
         </div>
       </template>
     </LayoutHeader>
@@ -118,38 +85,52 @@
         </Link>
       </div>
       <!-- Charts -->
+
+      <!-- Number Cards -->
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4"
+        v-if="!numberCards.loading"
+      >
+        <Tooltip
+          v-for="(config, index) in numberCards.data"
+          :text="config.tooltip"
+        >
+          <NumberChart
+            :key="index"
+            class="border rounded-md"
+            :config="config"
+          />
+        </Tooltip>
+      </div>
       <div
         v-if="!loading && !isEmpty"
         class="transition-all animate-fade-in duration-300"
       >
-        <!-- Number Cards -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
-          v-if="!numberCards.loading"
-        >
-          <Tooltip
-            v-for="(config, index) in numberCards.data"
-            :text="config.tooltip"
-          >
-            <NumberChart
-              :key="index"
-              class="border rounded-md"
-              :config="config"
-            />
-          </Tooltip>
-        </div>
         <!-- Trend Charts -->
         <div
           class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
           v-if="!trendData.loading"
         >
-          <div
-            class="border rounded-md min-h-80"
-            v-for="(chart, index) in trendData.data"
-            :key="index"
-          >
-            <component :is="getChartType(chart)" />
-          </div>
+          <template v-for="(chart, index) in trendData.data" :key="index">
+            <!-- has data -->
+
+            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+              <component :is="getChartType(chart)" />
+            </div>
+
+            <!-- chart with no data -->
+            <SkeletonLoader
+              v-else
+              :variants="['bar-chart', 'empty-state']"
+              :bar-chart-count="1"
+              :has-applied-filter="hasAppliedFilter"
+              :empty-states="[
+                {
+                  title: `No ${(chart?.title).toLowerCase()} available.`,
+                },
+              ]"
+            />
+          </template>
         </div>
         <!-- Master Data Charts -->
         <div
@@ -167,59 +148,31 @@
       </div>
 
       <!-- Skeleton Loading State -->
+      <div class="flex flex-col gap-4">
+        <SkeletonLoader
+          v-if="numberCards.loading"
+          :variants="['number-cards']"
+          :number-cards-count="5"
+        />
+        <SkeletonLoader
+          v-if="trendData.loading"
+          :variants="['bar-chart']"
+          :bar-chart-count="4"
+        />
+      </div>
+
+      <!-- complete empty state -->
       <div
-        v-if="loading || isEmpty"
+        v-if="isEmpty"
         class="transition-all animate-fade-in duration-300 relative"
       >
-        <!-- Number Cards Skeleton -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div
-            v-for="i in numberCards?.data?.length"
-            class="border rounded-md p-4 space-y-3 max-h-[140px]"
-          >
-            <div class="h-3 w-1/2 bg-surface-gray-1 rounded animate-pulse" />
-            <div class="h-7 w-2/3 bg-surface-gray-1 rounded animate-pulse" />
-            <div class="h-3 w-1/2 bg-surface-gray-1 rounded animate-pulse" />
-          </div>
-        </div>
-
-        <!-- Trend Charts Skeleton -->
-        <div
-          v-if="!isMobileView"
-          class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
-        >
-          <div
-            v-for="i in 4"
-            class="border rounded-md min-h-[300px] p-4 space-y-3"
-          >
-            <div class="h-4 w-1/3 bg-surface-gray-1 rounded animate-pulse" />
-            <div class="h-64 w-full bg-surface-gray-1 rounded animate-pulse" />
-          </div>
-        </div>
-
-        <!-- Empty State Overlay -->
-        <div
-          v-if="isEmpty && !loading"
-          class="absolute inset-0 flex items-center justify-center pointer-events-none"
-        >
-          <div
-            class="bg-surface-white rounded-xl shadow-sm p-6 w-9/12 md:w-4/12 text-center pointer-events-auto space-y-2"
-          >
-            <div class="text-ink-gray-7 font-medium text-center text-base">
-              {{ __("No tickets yet") }}
-            </div>
-            <div class="text-ink-gray-6 text-center text-base">
-              {{
-                hasAppliedFilter
-                  ? __(
-                      "No data found for the selected filters. Try adjusting the date range or filters applied."
-                    )
-                  : __(
-                      "Dashboard charts will appear here once you start receiving or creating tickets."
-                    )
-              }}
-            </div>
-          </div>
+        <div>
+          <SkeletonLoader
+            :variants="['bar-chart', 'empty-state']"
+            :bar-chart-count="6"
+            :empty-states="emptyStates"
+            :has-applied-filter="hasAppliedFilter"
+          />
         </div>
       </div>
     </div>
@@ -248,6 +201,71 @@ import LucideUser from "~icons/lucide/user";
 import { useScreenSize } from "@/composables/screen";
 import { useStorage } from "@vueuse/core";
 
+const dashboardTitle = computed(() => {
+  if (!isManager) return __("Agent Dashboard");
+  return viewMyStats.value ? __("My Dashboard") : __("Organization Dashboard");
+});
+
+const colors = [
+  "#318AD8",
+  "#F683AE",
+  "#48BB74",
+  "#F56B6B",
+  "#FACF7A",
+  "#44427B",
+  "#5FD8C4",
+  "#F8814F",
+  "#15CCEF",
+  "#A6B1B9",
+];
+const emptyStates = [
+  {
+    title: "No ticket activity",
+    message: "Ticket trends will appear here once tickets are created.",
+  },
+  {
+    title: "No feedback data",
+    message: "Feedback insights will appear once responses are collected.",
+  },
+  {
+    title: "No team data",
+    message: "Tickets will be grouped by team once available.",
+  },
+  {
+    title: "No ticket type data",
+    message: "Tickets will be categorized by type once created.",
+  },
+  {
+    title: "No priority data",
+    message: "Ticket priorities will be reflected here once assigned.",
+  },
+  {
+    title: "No channel data",
+    message: "Tickets will be grouped by channel once received.",
+  },
+];
+
+const tabButtons = computed(() => {
+  if (isMobileView.value) {
+    return [
+      { value: "organization", icon: h(LucideBuilding2, { class: "size-4" }) },
+      { value: "my_stats", icon: h(LucideUser, { class: "size-4" }) },
+    ];
+  }
+  return [
+    {
+      value: "organization",
+      iconLeft: h(LucideBuilding2, { class: "size-4" }),
+      label: "My Organization",
+    },
+    {
+      value: "my_stats",
+      iconLeft: h(LucideUser, { class: "size-4" }),
+      label: "My Stats",
+    },
+  ];
+});
+
 const filters = reactive({
   period: getLastXDays(),
   agent: null,
@@ -270,19 +288,6 @@ const isEmpty = computed(() => {
     masterData.data.every((d: any) => !d.data?.length)
   );
 });
-
-const colors = [
-  "#318AD8",
-  "#F683AE",
-  "#48BB74",
-  "#F56B6B",
-  "#FACF7A",
-  "#44427B",
-  "#5FD8C4",
-  "#F8814F",
-  "#15CCEF",
-  "#A6B1B9",
-];
 
 const numberCards = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
@@ -358,6 +363,16 @@ watch(
     }
   }
 );
+
+//check empty for individual charts
+function isChartEmpty(chart: any) {
+  if (!chart.data?.length) return true;
+  return chart.data.every((row: any) =>
+    Object.entries(row)
+      .filter(([key]) => key !== "date")
+      .every(([, val]) => val === null || val === 0)
+  );
+}
 
 const loading = computed(() => {
   return numberCards.loading || masterData.loading || trendData.loading;

@@ -15,7 +15,7 @@
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
       :is-expanded="isExpanded"
-      class="mt-2.5"
+      class="mt-1.5"
     >
       <template #right>
         <span class="flex items-center gap-0.5 font-medium text-gray-600">
@@ -56,7 +56,7 @@
           v-if="!view.hideLabel && !isExpanded && view.views?.length"
           class="mx-2 my-2 h-1 border-b"
         /> -->
-        <div class="mx-2 my-1.5"></div>
+        <div :class="['mx-2', isCustomerPortal ? 'my-1' : 'my-2.5']"></div>
         <Section
           :label="view.label"
           :hideLabel="view.hideLabel"
@@ -98,16 +98,19 @@
       </div>
     </div>
     <div class="grow" />
-    <div class="flex flex-col gap-2 pb-2.5 p-2">
-      <TrialBanner
-        v-if="isFCSite && !isCustomerPortal"
-        :isSidebarCollapsed="!isExpanded"
-      />
-      <GettingStartedBanner
-        v-if="showOnboardingBanner"
-        :isSidebarCollapsed="!isExpanded"
-        appName="helpdesk"
-      />
+    <div class="flex flex-col gap-2 pb-2.5">
+      <div class="px-2">
+        <TrialBanner
+          v-if="isFCSite && !isCustomerPortal"
+          :isSidebarCollapsed="!isExpanded"
+        />
+        <GettingStartedBanner
+          v-if="showOnboardingBanner"
+          :isSidebarCollapsed="!isExpanded"
+          appName="helpdesk"
+        />
+      </div>
+
       <SidebarLink
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
         :icon="HelpIcon"
