@@ -22,21 +22,21 @@
           v-if="!ticket.doc.via_customer_portal"
           class="text-ink-gray-4 flex items-center"
         >
-          <span class="text-ink-gray-4 mr-[6px]">via</span>
+          <span class="text-ink-gray-4 mr-[6px] rtl:ml-[6px]">via</span>
           <EmailIcon class="size-4 inline-block mr-1" />
           <span class="">Email</span>
         </div>
         <!-- Via Portal -->
         <div v-else class="text-ink-gray-4 flex items-center">
-          <span class="text-ink-gray-4 mr-[6px]">via</span>
-          <GlobeIcon class="size-4 inline-block mr-1" />
+          <span class="text-ink-gray-4 mr-[6px] rtl:ml-[6px]">via</span>
+          <GlobeIcon class="size-4 inline-block mr-1 rtl:ml-1" />
           <span class="font-medium">Portal</span>
         </div>
       </div>
       <!-- divider -->
       <div class="border-l border-outline-gray-2 h-[13px]" />
       <!-- First Response -->
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-2">
         <span>First Response</span>
         <Tooltip
           :text="dateFormat(firstResponse.date, dateTooltipFormat)"
