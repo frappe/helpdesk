@@ -58,7 +58,7 @@
                 </div>
               </div>
               <div class="flex flex-col gap-1">
-                <div class="flex flex-col">
+                <div class="flex flex-col rtl:text-right">
                   <span
                     class="text-lg sm:text-xl !font-semibold text-ink-gray-8"
                     >{{ auth?.userName }}</span
@@ -74,7 +74,7 @@
         </FileUploader>
       </div>
       <hr class="my-6" />
-      <div>
+      <div class="rtl:text-right">
         <div class="flex items-center justify-between">
           <div class="flex gap-2 items-center">
             <div class="text-base font-semibold text-ink-gray-9">
