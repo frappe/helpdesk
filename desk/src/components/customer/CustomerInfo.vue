@@ -40,6 +40,7 @@
     </Button>
   </div>
   <EditCustomerDialog
+    v-if="customerDialog"
     v-model="customerDialog"
     @update="customerDialog = false"
   />

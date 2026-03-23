@@ -35,7 +35,7 @@ from helpdesk.search import HelpdeskSearch
 from helpdesk.utils import (
     capture_event,
     get_agents_team,
-    get_customer,
+    get_customers,
     get_doc_room,
     is_admin,
     is_agent,
@@ -268,20 +268,28 @@ class HDTicket(Document):
                     self.contact = contact
 
     def set_customer(self):
-        """
-        Update `Customer` if does not exist already. `Contact` is assumed
-        to be set beforehand.
-        """
-        # Skip if `Customer` is already set
+        contact_customers = get_customers(contact=self.contact) if self.contact else []
         if self.customer:
-            return
+            if self.customer not in contact_customers and not is_agent():
+                frappe.throw(
+                    _(
+                        "The selected customer {0} is not linked to the contact {1}."
+                        " Please select a valid customer or update the contact's linked customers."
+                    ).format(self.customer, self.contact),
+                    frappe.ValidationError,
+                )
+            return  # customer is set and valid, return early
 
         if self.contact:
-            customer = get_customer(self.contact)
-
-            # let agent assign the customer when one contact has more than one customer
-            if len(customer) == 1:
-                self.customer = customer[0]
+            if len(contact_customers) == 1:
+                self.customer = contact_customers[0]
+            elif len(contact_customers) > 1 and not is_agent():
+                frappe.throw(  # ← was msgprint, now throws
+                    _(
+                        "The contact {0} is linked to multiple customers. Please select the customer manually."
+                    ).format(self.contact),
+                    frappe.ValidationError,
+                )
 
     def set_priority(self):
         if self.priority:
@@ -1197,9 +1205,13 @@ def has_permission(doc, user=None):
         or doc.raised_by == user
         or doc.owner == user
         or is_admin(user)
-        or doc.customer in get_customer(user)
     ):
         return True
+
+    customers = get_customers(user, get_roles=True)
+    for c in customers:
+        if c.get("name") == doc.customer and (c.get("is_manager")):
+            return True
 
     if not is_agent(user):
         return False
@@ -1239,23 +1251,25 @@ def has_permission(doc, user=None):
 
 # Custom perms for list query. Only the `WHERE` part
 # https://frappeframework.com/docs/user/en/python-api/hooks#modify-list-query
-def permission_query(user):
+def permission_query(user: str):
     if not user:
         user = frappe.session.user
     if is_admin(user):
         return
 
     #  To handle the case for normal users i.e. not agents
-    customer = get_customer(user)
+    customers = get_customers(user, get_roles=True)
     query = "(`tabHD Ticket`.owner = {user} OR `tabHD Ticket`.contact = {user} OR `tabHD Ticket`.raised_by = {user})".format(
         user=frappe.db.escape(user)
     )
-    for c in customer:
-        query += " OR `tabHD Ticket`.customer={customer}".format(
-            customer=frappe.db.escape(c)
-        )
 
     if not is_agent(user):
+        for c in customers:
+            if not c.get("is_manager"):
+                continue
+            query += " OR `tabHD Ticket`.customer={customer}".format(
+                customer=frappe.db.escape(c.get("name"))
+            )
         return query
 
     enable_restrictions = frappe.db.get_single_value(
@@ -1268,14 +1282,13 @@ def permission_query(user):
         "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
     )
 
-    teams = get_agents_team()
-
     if show_tickets_without_team:
         query += " OR (`tabHD Ticket`.agent_group is null OR `tabHD Ticket`.agent_group = '')"
 
     # If agent belongs to the team which has ignore_permission set to 1.
     # that means this team can see all the tickets without any restriction,
     # Event the other team's tickets.
+    teams = get_agents_team()
     if any(team.get("ignore_restrictions") for team in teams):
         all_teams = frappe.get_all("HD Team", pluck="name")
         if not all_teams:

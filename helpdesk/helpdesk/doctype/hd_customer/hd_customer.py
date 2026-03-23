@@ -47,8 +47,13 @@ class HDCustomer(Document):
             # make the first contact primary if there is only one contact
             self.contacts[0].is_primary = True
 
+        old_contacts = (
+            self.get_doc_before_save().contacts if self.get_doc_before_save() else []
+        )
         primary_contacts = [contact for contact in self.contacts if contact.is_primary]
-        if len(primary_contacts) == 0:
+
+        print("\n\n", primary_contacts, "\n\n")
+        if len(primary_contacts) == 0 and len(old_contacts) > 0:
             frappe.throw(_("At least one primary contact is required"))
 
         if len(primary_contacts) > 1:
@@ -71,6 +76,8 @@ class HDCustomer(Document):
         primary_contact = [
             contact.contact_name for contact in self.contacts if contact.is_primary
         ]
+        if not primary_contact:
+            return
 
         self.primary_contact = primary_contact[0]
 
@@ -93,7 +100,10 @@ class HDCustomer(Document):
             return
         primary_contact = [
             contact.contact_name for contact in self.contacts if contact.is_primary
-        ][0]
+        ]
+        if not primary_contact:
+            return
+        primary_contact = primary_contact[0]
         for contact in self.contacts:
             contact.is_manager = contact.contact_name == primary_contact
 
