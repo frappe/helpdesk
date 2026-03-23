@@ -1,6 +1,6 @@
 <template>
   <div
-    class="p-5 flex gap-2.5 min-h-[160px]"
+    class="p-5 grid grid-cols-5 gap-2.5 min-h-[160px]"
     v-if="!analytics.loading && analytics.data"
   >
     <div
@@ -31,6 +31,7 @@
         :dt="props.dt"
         :dn="props.dn"
         orientation="horizontal"
+        :negativeIsBetter="false"
       >
         <template #text="{ text }">
           <div class="flex items-center gap-1">

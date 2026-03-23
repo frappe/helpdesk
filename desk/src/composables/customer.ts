@@ -2,7 +2,7 @@ import { __ } from "@/translation";
 import { DocumentResource } from "@/types";
 import { HDCustomer } from "@/types/doctypes";
 import { createDocumentResource } from "frappe-ui";
-import { h, markRaw, reactive, watch } from "vue";
+import { computed, h, markRaw, reactive, watch } from "vue";
 import LucideGlobe from "~icons/lucide/globe";
 import LucideMapPin from "~icons/lucide/map-pin";
 import { OrganizationsIcon } from "../components/icons";
@@ -85,18 +85,23 @@ export const useCustomer = (
       { immediate: true }
     );
   }
-  function isDirty() {
+  const isCustomerInfoChanged = computed(() => {
     return (
-      state.name !== doc.doc?.customer_name ||
       state.domain !== doc.doc?.domain ||
       state.image !== doc.doc?.image ||
       state.country !== doc.doc?.country
     );
-  }
+  });
+  const hasNameChanged = computed(() => state.name !== doc.doc?.customer_name);
+  const isDirty = computed(() => {
+    return isCustomerInfoChanged.value || hasNameChanged.value;
+  });
 
   return {
     doc,
     state,
+    isCustomerInfoChanged,
+    hasNameChanged,
     isDirty,
   };
 };

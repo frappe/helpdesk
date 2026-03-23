@@ -272,6 +272,7 @@ function removeContact() {
               onSuccess() {
                 emit("update");
                 close();
+                toast.success(__("Contact removed successfully"));
               },
               onError(error: any) {
                 getErrorMessage(error, true);

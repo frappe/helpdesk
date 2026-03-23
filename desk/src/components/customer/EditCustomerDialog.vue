@@ -2,7 +2,7 @@
   <Dialog
     v-model="model"
     :options="{ title: __('Edit Customer'), size: 'md' }"
-    :disableOutsideClickToClose="isDirty()"
+    :disableOutsideClickToClose="isDirty"
     @after-leave="revertChanges"
   >
     <template #body>
@@ -13,7 +13,7 @@
               Edit Customer
             </h3>
             <Badge
-              v-if="isDirty()"
+              v-if="isDirty"
               label="Unsaved"
               variant="subtle"
               theme="orange"
@@ -114,12 +114,14 @@ import {
   Avatar,
   Badge,
   Button,
+  call,
   Dialog,
   FileUploader,
   FormControl,
   toast,
 } from "frappe-ui";
 import { inject } from "vue";
+import { useRouter } from "vue-router";
 import Link from "../frappe-ui/Link.vue";
 import { OrganizationsIcon } from "../icons";
 
@@ -127,18 +129,39 @@ const model = defineModel<boolean>({ default: false });
 const emit = defineEmits(["update"]);
 
 const customer = inject(CustomerResourceSymbol)!;
-const { state, isDirty } = useCustomer(null, customer);
+
+const router = useRouter();
+const { state, isDirty, hasNameChanged, isCustomerInfoChanged } = useCustomer(
+  null,
+  customer
+);
 
 async function save() {
-  await customer.setValue.submit({
-    customer_name: state.name,
-    domain: state.domain,
-    country: state.country,
-    image: state.image,
-  });
+  if (!isDirty.value) {
+    return;
+  }
+  if (hasNameChanged.value) {
+    await callRenameDoc();
+    router.replace({ name: "Customer", params: { id: state.name } });
+  }
+  if (isCustomerInfoChanged.value) {
+    await customer.setValue.submit({
+      name: state.name,
+      domain: state.domain,
+      country: state.country,
+      image: state.image,
+    });
+  }
   toast.success(__("Customer updated"));
   emit("update");
-  model.value = false;
+}
+
+async function callRenameDoc() {
+  return call("frappe.client.rename_doc", {
+    doctype: "HD Customer",
+    old_name: customer.doc.customer_name,
+    new_name: state.name,
+  });
 }
 
 // Image saves immediately; all other fields wait for Save button
@@ -151,7 +174,7 @@ function onImageRemove() {
 }
 
 function revertChanges() {
-  if (!isDirty()) return;
+  if (!isDirty.value) return;
   state.name = customer.doc.customer_name || "";
   state.domain = customer.doc.domain || "";
   state.country = customer.doc.country || "";

@@ -63,7 +63,7 @@ const props = defineProps({
     type: String as PropType<"total" | "average">,
     default: "total",
   },
-  negativeisBetter: {
+  negativeIsBetter: {
     type: Boolean,
     default: true,
   },
@@ -79,11 +79,7 @@ const chartData = computed(() => {
   const counts = _data?.data?.map((item) => item.count) || [];
   const _percentageChange = _data?.percentage_change || 0;
 
-  const percentageChange = {
-    icon: _percentageChange > 0 ? "arrow-up-right" : "arrow-down-left",
-    value: _percentageChange > 0 ? `+${_percentageChange}` : _percentageChange,
-    color: _percentageChange > 0 ? "text-red-600" : "text-green-600",
-  };
+  const percentageChange = getPercentageChange(_percentageChange);
 
   return {
     labels,
@@ -92,6 +88,22 @@ const chartData = computed(() => {
     text: props.measure === "average" ? _data?.average ?? 0 : _data?.total ?? 0,
   };
 });
+
+function getPercentageChange(change: number) {
+  if (props.negativeIsBetter) {
+    return {
+      icon: change > 0 ? "arrow-up-right" : "arrow-down-left",
+      value: change > 0 ? `+${change}` : change,
+      color: change > 0 ? "text-red-600" : "text-green-600",
+    };
+  } else {
+    return {
+      icon: change > 0 ? "arrow-up-right" : "arrow-down-left",
+      value: change > 0 ? `+${change}` : change,
+      color: change > 0 ? "text-green-600" : "text-red-600",
+    };
+  }
+}
 
 const hasData = computed(() => {
   const counts = chartData.value.counts as number[];
