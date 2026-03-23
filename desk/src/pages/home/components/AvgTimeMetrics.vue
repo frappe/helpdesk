@@ -4,24 +4,42 @@
       <div class="text-lg font-semibold text-ink-gray-8">
         {{ __("Average Time Metrics") }}
       </div>
-      <TabButtons
-        :buttons="[
-          {
-            label: '3M',
-            value: '3m',
-          },
-          {
-            label: '6M',
-            value: '6m',
-          },
-          {
-            label: '1Y',
-            value: '1y',
-          },
-        ]"
-        :model-value="currentDuration"
-        @update:model-value="onDurationChange"
-      />
+      <div class="flex items-center gap-2">
+        <Dropdown
+          v-if="!showDatePicker && currentDuration !== 'custom_range'"
+          :options="durationOptions"
+          placement="right"
+        >
+          <template #default>
+            <Button :label="currentDurationLabel" icon-right="chevron-down" />
+          </template>
+          <template #item="{ item }">
+            <div
+              class="data-[disabled]:cursor-not-allowed group flex h-7 w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+            >
+              <span>
+                {{ item.label }}
+              </span>
+              <FeatherIcon
+                v-if="item.label == durationLabels[currentDuration]"
+                name="check"
+                class="size-4"
+              />
+            </div>
+          </template>
+        </Dropdown>
+        <DateRangePicker
+          v-else
+          ref="datePickerRef"
+          v-model="customDateRange"
+          :placeholder="__('Select range')"
+          @update:model-value="onCustomRangeSelected"
+          :formatter="formatDateRange"
+          @click="datePickerRef?.open()"
+          placement="bottom-end"
+          class="w-[228px]"
+        />
+      </div>
     </div>
     <div
       v-if="
@@ -34,7 +52,7 @@
           {{ __("No average metrics") }}
         </div>
         <div class="text-base text-ink-gray-6">
-          {{ __("Average response and resolution metrics not yet generated") }}
+          {{ __("Average response and resolution metrics not available") }}
         </div>
       </div>
     </div>
@@ -67,9 +85,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, type PropType } from "vue";
+import { computed, onMounted, ref, type PropType, nextTick } from "vue";
 import { EChartsOption } from "echarts";
-import { createResource, TabButtons, ECharts } from "frappe-ui";
+import {
+  createResource,
+  Dropdown,
+  DateRangePicker,
+  Button,
+  FeatherIcon,
+  ECharts,
+} from "frappe-ui";
 import { formatTime } from "@/utils";
 import { __ } from "@/translation";
 
@@ -89,14 +114,85 @@ const props = defineProps({
 });
 
 const currentDuration = ref("6m");
+const showDatePicker = ref(false);
+const datePickerRef = ref<{ open: () => void } | null>(null);
+const customDateRange = ref<string | undefined>(undefined);
+
+const durationLabels: Record<string, string> = {
+  "3m": __("3 Months"),
+  "6m": __("6 Months"),
+  "1y": __("1 Year"),
+  custom_range: __("Custom Range"),
+};
+
+const currentDurationLabel = computed(() => {
+  if (currentDuration.value === "custom_range" && customDateRange.value) {
+    const [from, to] = customDateRange.value.split(",");
+    return `${formatDateRange(from)} – ${formatDateRange(to)}`;
+  }
+  return durationLabels[currentDuration.value] || __("6 Months");
+});
+
+function formatDateRange(date: string) {
+  const d = new Date(date);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: d.getFullYear() === new Date().getFullYear() ? undefined : "numeric",
+  });
+}
+
+const durationOptions = computed(() => [
+  {
+    label: __("3 Months"),
+    onClick: () => onDurationChange("3m"),
+  },
+  {
+    label: __("6 Months"),
+    onClick: () => onDurationChange("6m"),
+  },
+  {
+    label: __("1 Year"),
+    onClick: () => onDurationChange("1y"),
+  },
+  {
+    label: __("Custom Range"),
+    onClick: () => {
+      showDatePicker.value = true;
+      nextTick(() => {
+        datePickerRef.value?.open();
+      });
+    },
+  },
+]);
+
+const onCustomRangeSelected = (range: string) => {
+  if (!range) {
+    showDatePicker.value = false;
+    currentDuration.value = "6m";
+    customDateRange.value = undefined;
+    getAvgTimeMetricsResource.submit();
+    return;
+  }
+  showDatePicker.value = false;
+  currentDuration.value = "custom_range";
+  customDateRange.value = range;
+  getAvgTimeMetricsResource.submit();
+};
 
 const getAvgTimeMetricsResource = createResource({
   url: "helpdesk.api.agent_home.agent_home.get_avg_time_metrics",
   type: "GET",
   makeParams: () => {
-    return {
+    const params: Record<string, string> = {
       period: currentDuration.value.toLowerCase(),
     };
+    if (currentDuration.value === "custom_range" && customDateRange.value) {
+      const [from, to] = customDateRange.value.split(",");
+      params.from_date = from;
+      params.to_date = to;
+    }
+    return params;
   },
 });
 
@@ -217,6 +313,9 @@ const chartConfig = computed<EChartsOption>(() => {
 });
 
 const onDurationChange = (duration: string) => {
+  if (currentDuration.value === duration) return;
+  showDatePicker.value = false;
+  customDateRange.value = undefined;
   currentDuration.value = duration;
   getAvgTimeMetricsResource.submit();
 };

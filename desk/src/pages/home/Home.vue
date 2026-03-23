@@ -63,7 +63,7 @@
     </LayoutHeader>
     <div class="flex-1 overflow-auto">
       <div
-        class="flex flex-col p-1 pt-4 md:p-5 mx-auto max-w-6xl w-full grow relative h-full"
+        class="flex flex-col p-1 pt-4 md:p-4 md:pl-3 mx-auto max-w-[1500px] w-full grow relative h-full"
       >
         <div class="grow pb-12">
           <div
@@ -92,7 +92,7 @@
               </div>
             </div>
           </div>
-          <div class="mt-5">
+          <div class="mt-3">
             <GridLayout
               v-if="!agentDashboard.loading && layout.length > 0"
               class="h-fit w-full"

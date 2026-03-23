@@ -87,16 +87,6 @@
               >
             </td>
           </tr>
-          <tr
-            v-if="chartConfig?.tickets?.length < 6"
-            v-for="i in Math.max(0, 7 - chartConfig?.tickets?.length)"
-            :key="'placeholder-' + i"
-            class="border-t border-gray-100"
-          >
-            <td v-for="j in 6" :key="j" class="p-2 py-3">
-              <div class="h-5 w-full bg-surface-gray-1" />
-            </td>
-          </tr>
         </tbody>
         <tbody class="relative" v-else>
           <tr
@@ -131,12 +121,30 @@
         </tbody>
       </table>
       <div
-        v-if="chartConfig?.totalPendingTickets > 6"
-        class="p-2 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none mt-3"
-        @click="redirectToSeeAllTickets"
+        class="flex justify-between items-center text-sm mt-auto text-ink-gray-5 pl-2 pb-2"
       >
-        {{ __("See all {0} tickets", chartConfig?.totalPendingTickets + "") }}
-        <FeatherIcon name="arrow-right" class="size-4" />
+        <div>
+          <div
+            v-if="chartConfig?.totalPendingTickets > 6"
+            class="flex items-center gap-1 cursor-pointer hover:text-ink-gray-7 w-max select-none mt-3"
+            @click="redirectToSeeAllTickets"
+          >
+            {{
+              __("See all {0} tickets", chartConfig?.totalPendingTickets + "")
+            }}
+            <FeatherIcon name="arrow-right" class="size-4" />
+          </div>
+        </div>
+        <div v-if="chartConfig?.tickets?.length > 0" class="mt-3 mb-0.5">
+          {{
+            __(
+              "Showing {0} of {1} {2}",
+              chartConfig?.tickets?.length + "",
+              chartConfig?.totalPendingTickets + "",
+              chartConfig?.tickets?.length > 1 ? "tickets" : "ticket"
+            )
+          }}
+        </div>
       </div>
     </div>
   </div>
@@ -312,7 +320,7 @@ const goToTicket = (ticket: PendingTicket) => {
 const redirectToSeeAllTickets = () => {
   const tabToViewMap: Record<string, string> = {
     pending: "STD-VIEW-PENDING-TICKETS",
-    upcoming_sla: "STD-VIEW-SLA-DUE",
+    upcoming_sla: "STD-VIEW-SLA-ALERTS",
     new_tickets: "STD-VIEW-RECENTLY-ASSIGNED-TICKETS",
   };
 

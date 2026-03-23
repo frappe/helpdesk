@@ -214,14 +214,23 @@ def get_avg_resolution_time(period: str = "last month"):
 
 @frappe.whitelist()
 @agent_only
-def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_first"):
+def get_recent_feedback(
+    period: str = "all_time",
+    sort_order: str = "positive_first",
+    from_date: str = None,
+    to_date: str = None,
+):
     agent = frappe.session.user
     Ticket = DocType("HD Ticket")
     Contact = DocType("Contact")
 
     # Build period filter
     period_filter = None
-    if period == "last_week":
+    period_end_filter = None
+    if period == "custom_range" and from_date and to_date:
+        period_filter = from_date
+        period_end_filter = to_date
+    elif period == "last_week":
         period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -7)
     elif period == "last_month":
         period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -30)
@@ -235,6 +244,13 @@ def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_fi
     ]
     if period_filter:
         base_conditions.append(Ticket.modified >= period_filter)
+    if period_end_filter:
+        to_date_plus_one = Function(
+            "DATE_ADD",
+            period_end_filter,
+            frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY"),
+        )
+        base_conditions.append(Ticket.modified < to_date_plus_one)
 
     # Get average rating and total feedbacks
     avg_query = frappe.qb.from_(Ticket).select(
@@ -320,18 +336,24 @@ def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_fi
 
 @frappe.whitelist()
 @agent_only
-def get_avg_time_metrics(period: str = "6m"):
+def get_avg_time_metrics(
+    period: str = "6m", from_date: str = None, to_date: str = None
+):
     periods = {
         "3m": 90,
         "6m": 180,
         "1y": 365,
     }
 
-    days = periods.get(period, 180)
     agent = frappe.session.user
 
-    current_from = frappe.utils.add_days(frappe.utils.nowdate(), -days)
-    current_to = frappe.utils.nowdate()
+    if period == "custom_range" and from_date and to_date:
+        current_from = from_date
+        current_to = to_date
+    else:
+        days = periods.get(period, 180)
+        current_from = frappe.utils.add_days(frappe.utils.nowdate(), -days)
+        current_to = frappe.utils.nowdate()
 
     Ticket = DocType("HD Ticket")
     to_date_plus_one = Function(
@@ -373,11 +395,18 @@ def get_avg_time_metrics(period: str = "6m"):
             "avg_resolution": round(row["avg_resolution"] or 0),
         }
 
-    now = datetime.now()
-    num_months = days // 30
+    current_to_date = frappe.utils.get_datetime(current_to)
+    current_from_date = frappe.utils.get_datetime(current_from)
+
+    num_months = (
+        (current_to_date.year - current_from_date.year) * 12
+        + (current_to_date.month - current_from_date.month)
+        + 1
+    )
+
     data = []
     for i in range(num_months - 1, -1, -1):
-        month_date = now - relativedelta(months=i)
+        month_date = current_to_date - relativedelta(months=i)
         key = f"{month_date.year}-{month_date.month:02d}"
         if key in data_dict:
             data.append(
@@ -451,6 +480,7 @@ def _get_upcoming_sla_tickets(limit=10):
         ["sla", "!=", ""],
         ["agreement_status", "in", ["First Response Due", "Resolution Due"]],
         ["status_category", "!=", "Resolved"],
+        ["status", "!=", "Closed"],
         ["_assign", "like", f"%{frappe.session.user}%"],
     ]
 
@@ -571,6 +601,7 @@ def _get_pending_response_tickets(limit=10):
     filters = [
         ["_assign", "like", f"%{frappe.session.user}%"],
         ["status_category", "!=", "Resolved"],
+        ["status", "!=", "Closed"],
         ["last_customer_response", "is", "set"],
         ["last_agent_response", "is", "not set"],
     ]

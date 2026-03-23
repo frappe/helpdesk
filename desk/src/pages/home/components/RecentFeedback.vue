@@ -71,8 +71,11 @@
           :class="{ 'hidden sm:flex': currentTab === 'rating' }"
         >
           <!-- Filters -->
-          <div class="flex items-center justify-between mb-3">
-            <Dropdown :options="periodOptions">
+          <div class="flex items-center gap-2 justify-between mb-3">
+            <Dropdown
+              v-if="!showDatePicker && currentPeriod !== 'custom_range'"
+              :options="periodOptions"
+            >
               <template #default>
                 <Button :label="currentPeriodLabel" icon-right="chevron-down" />
               </template>
@@ -91,6 +94,17 @@
                 </div>
               </template>
             </Dropdown>
+            <DateRangePicker
+              v-else
+              ref="datePickerRef"
+              v-model="customDateRange"
+              :placeholder="__('Select range')"
+              @update:model-value="onCustomRangeSelected"
+              :formatter="formatDateRange"
+              @click="datePickerRef?.open()"
+              placement="top"
+              class="w-[228px]"
+            />
             <Dropdown :options="sortOptions" placement="right">
               <template #default>
                 <Button :label="currentSortLabel" icon-right="chevron-down" />
@@ -218,11 +232,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, type PropType } from "vue";
+import { ref, computed, onMounted, nextTick, type PropType } from "vue";
 import {
   Avatar,
   Button,
   createResource,
+  DateRangePicker,
   Dropdown,
   FeatherIcon,
   TabButtons,
@@ -275,6 +290,9 @@ const props = defineProps({
 const currentIndex = ref(0);
 const currentPeriod = ref("all_time");
 const currentSort = ref("positive_first");
+const showDatePicker = ref(false);
+const datePickerRef = ref<{ open: () => void } | null>(null);
+const customDateRange = ref<string | undefined>(undefined);
 
 const periodOptions = computed(() => [
   {
@@ -292,6 +310,15 @@ const periodOptions = computed(() => [
   {
     label: __("Last 3 Months"),
     onClick: () => changePeriod("last_3_months"),
+  },
+  {
+    label: __("Custom Range"),
+    onClick: () => {
+      showDatePicker.value = true;
+      nextTick(() => {
+        datePickerRef.value?.open();
+      });
+    },
   },
 ]);
 
@@ -311,9 +338,14 @@ const periadLabels: Record<string, string> = {
   last_week: __("Last Week"),
   last_month: __("Last Month"),
   last_3_months: __("Last 3 Months"),
+  custom_range: __("Custom Range"),
 };
 
 const currentPeriodLabel = computed(() => {
+  if (currentPeriod.value === "custom_range" && customDateRange.value) {
+    const [from, to] = customDateRange.value.split(",");
+    return `${formatDateRange(from)} – ${formatDateRange(to)}`;
+  }
   return periadLabels[currentPeriod.value] || __("All Time");
 });
 
@@ -328,6 +360,8 @@ const currentSortLabel = computed(() => {
 
 const changePeriod = (period: string) => {
   if (currentPeriod.value == period) return;
+  showDatePicker.value = false;
+  customDateRange.value = undefined;
   currentPeriod.value = period;
   currentIndex.value = 0;
   getRecentFeedbackResource.fetch();
@@ -339,6 +373,31 @@ const changeSort = (sort: string) => {
   currentIndex.value = 0;
   getRecentFeedbackResource.fetch();
 };
+
+const onCustomRangeSelected = (range: string) => {
+  if (!range) {
+    showDatePicker.value = false;
+    currentPeriod.value = "all_time";
+    customDateRange.value = undefined;
+    currentIndex.value = 0;
+    getRecentFeedbackResource.fetch();
+    return;
+  }
+  showDatePicker.value = false;
+  currentPeriod.value = "custom_range";
+  customDateRange.value = range;
+  currentIndex.value = 0;
+  getRecentFeedbackResource.fetch();
+};
+
+function formatDateRange(date: string) {
+  const d = new Date(date);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: d.getFullYear() === new Date().getFullYear() ? undefined : "numeric",
+  });
+}
 
 const chartConfig = computed(() => {
   const _data = getRecentFeedbackResource.data ?? props.data;
@@ -507,24 +566,31 @@ const redirectToSeeAllReviews = () => {
 
   if (currentPeriod.value !== "all_time") {
     let dateFilter = "";
-    if (currentPeriod.value === "last_week") {
-      dateFilter = dayjsLocal()
-        .subtract(7, "day")
-        .format("YYYY-MM-DD HH:mm:ss");
-    } else if (currentPeriod.value === "last_month") {
-      dateFilter = dayjsLocal()
-        .subtract(30, "day")
-        .format("YYYY-MM-DD HH:mm:ss");
-    } else if (currentPeriod.value === "last_3_months") {
-      dateFilter = dayjsLocal()
-        .subtract(90, "day")
-        .format("YYYY-MM-DD HH:mm:ss");
-    }
-
-    if (dateFilter) {
+    if (currentPeriod.value === "custom_range" && customDateRange.value) {
+      const [from, to] = customDateRange.value.split(",");
       query.filters = JSON.stringify({
-        modified: [">", dateFilter],
+        modified: ["between", [`${from} 00:00:00`, `${to} 23:59:59`]],
       });
+    } else {
+      if (currentPeriod.value === "last_week") {
+        dateFilter = dayjsLocal()
+          .subtract(7, "day")
+          .format("YYYY-MM-DD HH:mm:ss");
+      } else if (currentPeriod.value === "last_month") {
+        dateFilter = dayjsLocal()
+          .subtract(30, "day")
+          .format("YYYY-MM-DD HH:mm:ss");
+      } else if (currentPeriod.value === "last_3_months") {
+        dateFilter = dayjsLocal()
+          .subtract(90, "day")
+          .format("YYYY-MM-DD HH:mm:ss");
+      }
+
+      if (dateFilter) {
+        query.filters = JSON.stringify({
+          modified: [">", dateFilter],
+        });
+      }
     }
   }
 
@@ -554,10 +620,18 @@ const getRatingColor = (rating: number) => {
 
 const getRecentFeedbackResource = createResource({
   url: "helpdesk.api.agent_home.agent_home.get_recent_feedback",
-  makeParams: () => ({
-    period: currentPeriod.value,
-    sort_order: currentSort.value,
-  }),
+  makeParams: () => {
+    const params: Record<string, string> = {
+      period: currentPeriod.value,
+      sort_order: currentSort.value,
+    };
+    if (currentPeriod.value === "custom_range" && customDateRange.value) {
+      const [from, to] = customDateRange.value.split(",");
+      params.from_date = from;
+      params.to_date = to;
+    }
+    return params;
+  },
 });
 
 const goToTicket = (feedback: Feedback) => {

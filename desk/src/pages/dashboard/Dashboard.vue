@@ -177,7 +177,12 @@ const numberCards = createResource({
   cache: ["Analytics", "NumberCards"],
   params: {
     dashboard_type: "number_card",
-    filters,
+    filters: {
+      from_date: filters.period.split(",")[0],
+      to_date: filters.period.split(",")[1],
+      team: filters.team,
+      agent: filters.agent,
+    },
   },
 });
 
@@ -186,7 +191,12 @@ const masterData = createResource({
   cache: ["Analytics", "MasterCharts"],
   params: {
     dashboard_type: "master",
-    filters,
+    filters: {
+      from_date: filters.period.split(",")[0],
+      to_date: filters.period.split(",")[1],
+      team: filters.team,
+      agent: filters.agent,
+    },
   },
 });
 
@@ -195,7 +205,12 @@ const trendData = createResource({
   cache: ["Analytics", "TrendCharts"],
   params: {
     dashboard_type: "trend",
-    filters,
+    filters: {
+      from_date: filters.period.split(",")[0],
+      to_date: filters.period.split(",")[1],
+      team: filters.team,
+      agent: filters.agent,
+    },
   },
 });
 
@@ -251,7 +266,8 @@ function getChartType(chart: any) {
 function getLastXDays(range: number = 30): string {
   const today = new Date();
   const lastXDate = new Date(today);
-  lastXDate.setDate(today.getDate() - range);
+
+  lastXDate.setDate(today.getDate() - (range > 0 ? range - 1 : 0));
 
   return `${dayjs(lastXDate).format("YYYY-MM-DD")},${dayjs(today).format(
     "YYYY-MM-DD"
