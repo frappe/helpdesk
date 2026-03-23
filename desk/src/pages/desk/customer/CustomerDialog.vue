@@ -69,7 +69,7 @@ const customer = createDocumentResource({
   auto: true,
   setValue: {
     onSuccess() {
-      toast.success("Customer updated");
+      toast.success("Customer updated successfully.");
     },
     onError() {
       toast.error("Error updating customer");

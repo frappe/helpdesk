@@ -186,7 +186,7 @@ const team = createDocumentResource({
   auto: true,
   delete: {
     onSuccess() {
-      toast.success(__("Team deleted"));
+      toast.success(__("Team deleted successfully."));
       emit("update:step", "team-list");
     },
   },
@@ -265,7 +265,7 @@ function renameTeam(close) {
     },
     onSuccess() {
       teamsList.reload();
-      toast.success(__("Team renamed"));
+      toast.success(__("Team renamed successfully."));
       close();
       emit("update:step", "team-list");
     },

@@ -61,7 +61,7 @@ const customerResource = createResource({
   onSuccess: () => {
     state.customer = "";
     state.domain = "";
-    toast.success("Customer created");
+    toast.success("Customer created successfully.");
     emit("customerCreated");
   },
   onError: (err) => {

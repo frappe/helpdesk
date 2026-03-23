@@ -98,7 +98,7 @@ function openContact(id: string): void {
 }
 
 function handleContactUpdated(): void {
-  toast.success("Contact updated");
+  toast.success("Contact updated successfully.");
   listViewRef.value?.reload();
 }
 usePageMeta(() => {

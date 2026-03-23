@@ -163,7 +163,7 @@ const mergeTicket = createResource({
     if (!target) throw { message: "Ticket to merged with is required" };
   },
   onSuccess: () => {
-    toast.success("Ticket merged successfully");
+    toast.success("Ticket merged successfully.");
     emit("update");
 
     showDialog.value = false;

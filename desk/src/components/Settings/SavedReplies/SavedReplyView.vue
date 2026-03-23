@@ -353,7 +353,7 @@ const createSavedReply = () => {
     },
     {
       onSuccess: (data) => {
-        toast.success(__("Saved reply saved"));
+        toast.success(__("Saved reply saved successfully."));
         savedReplyData.value = {
           ...savedReplyData.value,
           name: data.name,
@@ -416,7 +416,7 @@ const updateSavedReply = async () => {
 
   savedRepliesListResource?.reload();
   isDirty.value = false;
-  toast.success(__("Saved reply updated"));
+  toast.success(__("Saved reply updated successfully."));
 };
 
 const getScopeIcon = (scope: string) => {

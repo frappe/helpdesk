@@ -557,7 +557,7 @@ const createAssignmentRule = () => {
 const createAssignmentRuleResource = createResource({
   url: "frappe.client.insert",
   onSuccess(data) {
-    toast.success(__("Assignment rule created"));
+    toast.success(__("Assignment rule created successfully."));
     assignmentRulesActiveScreen.value = {
       screen: "view",
       data: data,
@@ -644,7 +644,7 @@ const updateAssignmentRule = async () => {
   }
 
   isLoading.value = false;
-  toast.success(__("Assignment rule updated"));
+  toast.success(__("Assignment rule updated successfully."));
 };
 
 watch(

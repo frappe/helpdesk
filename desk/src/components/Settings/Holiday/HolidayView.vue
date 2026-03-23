@@ -370,7 +370,7 @@ const createHoliday = () => {
     },
     {
       onSuccess(data) {
-        toast.success(__("Holiday list created"));
+        toast.success(__("Holiday list created successfully."));
         holidayListActiveScreen.value.data = data;
         holidayListActiveScreen.value.screen = "view";
         getHolidayData.submit({
@@ -432,7 +432,7 @@ const updateHoliday = async () => {
     await getHolidayData.reload();
   }
 
-  toast.success(__("Holiday list updated"));
+  toast.success(__("Holiday list updated successfully."));
   holidayList?.reload();
 };
 

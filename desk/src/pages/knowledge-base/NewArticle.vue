@@ -116,7 +116,7 @@ function handleCreateArticle() {
     { title: title.value, content: content.value, category: categoryId.value },
     {
       onSuccess: (article: Article) => {
-        toast.success(__("Article created"));
+        toast.success(__("Article created successfully."));
         if (isManager) {
           updateOnboardingStep("first_article");
         }

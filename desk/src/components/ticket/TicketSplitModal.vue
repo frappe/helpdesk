@@ -74,7 +74,7 @@ const splitTicket = createResource({
     if (!communication_id) throw { message: "Communication ID is required" };
   },
   onSuccess: (newTicket: string) => {
-    toast.success("Ticket split successfully");
+    toast.success("Ticket split successfully.");
     showDialog.value = false;
     window.open(
       window.location.origin + "/helpdesk/tickets/" + newTicket,

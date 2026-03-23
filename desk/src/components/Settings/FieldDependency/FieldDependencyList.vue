@@ -169,7 +169,7 @@ function getOptions(rowName: string) {
     onConfirmDelete: () => {
       fieldDependenciesList.delete.submit(rowName, {
         onSuccess: () => {
-          toast.success(__("Field dependency deleted successfully"));
+          toast.success(__("Field dependency deleted successfully."));
           fieldDependenciesList.reload();
         },
       });

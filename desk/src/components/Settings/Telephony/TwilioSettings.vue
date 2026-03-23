@@ -210,7 +210,7 @@ async function save() {
   const results = await Promise.all(promises);
 
   if (!results.some((result) => result == undefined)) {
-    toast.success(__("Telephony settings updated!"));
+    toast.success(__("Telephony settings updated successfully."));
   }
 
   // Reload twilio to prevent "doc has been modified" error, as an application is created and doc is updated on save

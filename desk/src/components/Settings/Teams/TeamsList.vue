@@ -187,7 +187,7 @@ const deleteTeam = (team: any) => {
 
   teams.delete.submit(team.name, {
     onSuccess: () => {
-      toast.success(__("Team deleted"));
+      toast.success(__("Team deleted successfully."));
     },
   });
 };

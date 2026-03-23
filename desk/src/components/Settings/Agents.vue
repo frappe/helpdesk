@@ -285,7 +285,7 @@ function updateRole(agent: string, newRole: string) {
     new_role: newRole,
   }).then(() => {
     updateUserRoleCache(agent, newRole);
-    toast.success(`Role updated to ${newRole}`);
+    toast.success(`Role updated to ${newRole} successfully.`);
   });
 }
 

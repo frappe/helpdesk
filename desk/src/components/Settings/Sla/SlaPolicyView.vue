@@ -442,7 +442,7 @@ const createSla = () => {
     },
     {
       onSuccess(data) {
-        toast.success(__("SLA policy created"));
+        toast.success(__("SLA policy created successfully."));
         slaActiveScreen.value.data = data;
         slaActiveScreen.value.screen = "view";
         getSlaData.submit({
@@ -481,7 +481,7 @@ const updateSla = () => {
     {
       onSuccess() {
         getSlaData.submit();
-        toast.success(__("SLA policy updated"));
+        toast.success(__("SLA policy updated successfully."));
         slaPolicyList.reload();
       },
     }

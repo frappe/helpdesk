@@ -255,7 +255,7 @@ const onSave = () => {
           ...workDayData,
         };
         props.workDaysList.splice(itemIndex, 1, updatedItem);
-        toast.success("Workday updated");
+        toast.success("Workday updated successfully.");
       }
     } else {
       const isDuplicate = props.workDaysList.some(
@@ -270,7 +270,7 @@ const onSave = () => {
 
       const newWorkDay = { ...workDayData };
       props.workDaysList.push(newWorkDay);
-      toast.success("Workday added");
+      toast.success("Workday added successfully.");
     }
     dialog.value.show = false;
   } catch (error) {

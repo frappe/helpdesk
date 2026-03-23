@@ -281,7 +281,7 @@ const setAgent = createResource({
   onSuccess: () => {
     auth.reloadUser();
     agentData.reload();
-    toast.success(__("Profile updated"));
+    toast.success(__("Profile updated successfully."));
   },
 });
 
@@ -297,7 +297,7 @@ const saveLanguageResource = createResource({
     };
   },
   onSuccess() {
-    toast.success(__("Language updated"));
+    toast.success(__("Language updated successfully."));
     setTimeout(() => {
       window.location.reload(true);
     }, 500);
@@ -316,7 +316,7 @@ const saveTimezoneResource = createResource({
     };
   },
   onSuccess() {
-    toast.success(__("Timezone updated"));
+    toast.success(__("Timezone updated successfully."));
     setTimeout(() => {
       window.location.reload(true);
     }, 500);

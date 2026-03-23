@@ -316,7 +316,7 @@ function handleCategoryCreate() {
         });
         //update category name in breadcrumb
         article.data.category_name = category.title;
-        toast.success(__("Category created"));
+        toast.success(__("Category created successfully."));
       },
       onError: (error: string) => {
         toast.error(error);
@@ -526,7 +526,7 @@ function handleArticleUpdate() {
             category: props.articleId,
           },
         });
-        toast.success(__("Article updated."));
+        toast.success(__("Article updated successfully."));
         isDirty.value = false;
         article.reload();
       },
@@ -539,7 +539,7 @@ function handleDelete() {
     { doctype: "HD Article", name: article.data.name },
     {
       onSuccess: () => {
-        toast.success(__("Article deleted."));
+        toast.success(__("Article deleted successfully."));
         router.push({ name: "AgentKnowledgeBase" });
       },
     }

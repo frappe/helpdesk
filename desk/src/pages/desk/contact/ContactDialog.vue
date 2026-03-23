@@ -301,7 +301,7 @@ async function inviteContact(): Promise<void> {
         contact: contact.doc.name,
       }
     );
-    toast.success(__("Contact invited successfully"));
+    toast.success(__("Contact invited successfully."));
     await contact.setValue.submit({
       user: user,
     });

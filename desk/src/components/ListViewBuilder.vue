@@ -262,7 +262,7 @@ function handleBulkDelete(hide: Function, selections: Set<string>) {
     items: JSON.stringify(Array.from(selections)),
     doctype: props.options.doctype,
   }).then(() => {
-    toast.success(__("Item(s) deleted successfully"));
+    toast.success(__("Item(s) deleted successfully."));
     hide();
     reset();
   });

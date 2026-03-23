@@ -285,7 +285,7 @@ const deleteSavedReply = (savedReply: SavedReply) => {
 
   savedRepliesListResource?.delete.submit(savedReply.name, {
     onSuccess: () => {
-      toast.success(__("Saved reply deleted"));
+      toast.success(__("Saved reply deleted successfully."));
     },
   });
 };
@@ -302,7 +302,7 @@ const duplicate = async () => {
       },
       {
         onSuccess: (data) => {
-          toast.success(__("Saved reply duplicated"));
+          toast.success(__("Saved reply duplicated successfully."));
           duplicateDialog.value = {
             show: false,
             name: "",
