@@ -70,15 +70,19 @@
               </div>
             </div>
 
-            <!-- per-card empty state -->
+            <!-- empty state -->
             <div
               v-if="showVariant('empty-state')"
-              class="bg-surface-cards rounded-xl shadow-sm p-6 w-2/3 text-center [mask-image:radial-gradient(ellipse_80%_60%_at_center,black_70%,transparent_100%)] pointer-events-auto space-y-2 relative z-10 bottom-6.5"
+              class="bg-surface-cards/80 backdrop-blur-sm rounded-xl p-6 w-2/3 text-center pointer-events-auto space-y-0.5 relative z-10 bottom-4.5"
             >
-              <div class="text-ink-gray-7 font-medium text-center text-p-base">
+              <div
+                class="relative z-10 text-ink-gray-7 font-medium text-center text-p-base leading-[1.15]"
+              >
                 {{ __(getEmptyState(i).title) }}
               </div>
-              <div class="text-ink-gray-6 text-center text-p-base">
+              <div
+                class="relative z-10 text-ink-gray-6 text-center text-p-base"
+              >
                 {{
                   hasAppliedFilter
                     ? __(getEmptyState(i).filterMessage)
@@ -86,28 +90,6 @@
                 }}
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </slot>
-
-    <slot name="empty-state">
-      <div
-        v-if="showVariant('empty-state') && !showVariant('bar-chart')"
-        class="absolute inset-0 flex items-center justify-center pointer-events-none"
-      >
-        <div
-          class="bg-surface-cards rounded-xl shadow-sm p-6 w-2/3 text-center [mask-image:radial-gradient(ellipse_80%_60%_at_center,black_70%,transparent_100%)] pointer-events-auto space-y-2 relative z-10"
-        >
-          <div class="text-ink-gray-7 font-medium text-center text-base">
-            {{ __(getEmptyState(0).title) }}
-          </div>
-          <div class="text-ink-gray-6 text-center text-p-base">
-            {{
-              hasAppliedFilter
-                ? __(getEmptyState(0).filterMessage)
-                : __(getEmptyState(0).message)
-            }}
           </div>
         </div>
       </div>
@@ -125,7 +107,7 @@ const props = defineProps({
   },
   numberCardsCount: { type: Number, default: 5 },
   barChartCount: { type: Number, default: 4 },
-  barHeights: { type: Array, default: () => [63, 92, 44, 37, 19] },
+  barHeights: { type: Array, default: () => [63, 98, 44, 37, 19] },
   hasAppliedFilter: { type: Boolean, default: false },
   emptyStates: {
     type: Array,

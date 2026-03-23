@@ -113,7 +113,6 @@
         >
           <template v-for="(chart, index) in trendData.data" :key="index">
             <!-- has data -->
-
             <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
               <component :is="getChartType(chart)" />
             </div>
@@ -137,13 +136,25 @@
           class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
           v-if="!masterData.loading"
         >
-          <div
-            class="border rounded-md"
-            v-for="(chart, index) in masterData.data"
-            :key="index"
-          >
-            <component :is="getChartType(chart)" />
-          </div>
+          <template v-for="(chart, index) in masterData.data" :key="index">
+            <!-- has data -->
+            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+              <component :is="getChartType(chart)" />
+            </div>
+
+            <!-- chart with no data -->
+            <SkeletonLoader
+              v-else
+              :variants="['bar-chart', 'empty-state']"
+              :bar-chart-count="1"
+              :has-applied-filter="hasAppliedFilter"
+              :empty-states="[
+                {
+                  title: `No ${(chart?.title).toLowerCase()} available.`,
+                },
+              ]"
+            />
+          </template>
         </div>
       </div>
 
@@ -283,7 +294,7 @@ const hasAppliedFilter = computed(() => {
 const isEmpty = computed(() => {
   if (!numberCards.data || !trendData.data || !masterData.data) return false;
   return (
-    numberCards.data.every((d: any) => d.value === 0) &&
+    numberCards.data.every((d: any) => !d.value || d.value === "N/A") &&
     trendData.data.every((d: any) => !d.data?.length) &&
     masterData.data.every((d: any) => !d.data?.length)
   );
