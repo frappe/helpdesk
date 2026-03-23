@@ -34,7 +34,7 @@
           :class="
             !sidebarStore.isExpanded
               ? 'ml-0 w-0 overflow-hidden opacity-0'
-              : 'ml-2 w-auto opacity-100'
+              : 'ml-2 relative left-[-2.5px] w-auto opacity-100'
           "
         >
           <FeatherIcon

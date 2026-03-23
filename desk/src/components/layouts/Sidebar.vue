@@ -6,8 +6,8 @@
       'max-width': width,
     }"
   >
-    <div class="p-2">
-      <UserMenu class="mb-2" :options="profileSettings" />
+    <div :class="isExpanded ? 'mx-0 p-2' : 'm-2'">
+      <UserMenu :options="profileSettings" />
     </div>
     <SidebarLink
       v-if="!isCustomerPortal"
