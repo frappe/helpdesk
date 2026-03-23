@@ -9,6 +9,7 @@
         v-for="(activity, i) in activities"
         :key="activity.key"
         class="activity mt-2"
+        tabindex="0"
       >
         <!-- single activity -->
         <div
@@ -108,6 +109,7 @@ import {
   h,
   inject,
   nextTick,
+  onMounted,
   watch,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -165,6 +167,12 @@ const emptyTextIcon = computed(() => {
     icon = PhoneIcon;
   }
   return h(icon, { class: "text-gray-500" });
+});
+
+onMounted(() => {
+  nextTick(() => {
+    document.querySelector(".activity")?.focus();
+  });
 });
 
 function scrollToLatestActivity() {
@@ -228,3 +236,8 @@ defineExpose({
   scrollToLatestActivity,
 });
 </script>
+<style scoped>
+.activity:focus {
+  outline: none;
+}
+</style>
