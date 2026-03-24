@@ -103,6 +103,12 @@ class HDArticle(Document):
             "HD Article Feedback", {"user": user, "article": self.name}
         )
         if feedback:
+            current_value = frappe.db.get_value(
+                "HD Article Feedback", feedback, "feedback"
+            )
+            if int(current_value) == value:
+                return
+            frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
             frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
         else:
             frappe.new_doc(
