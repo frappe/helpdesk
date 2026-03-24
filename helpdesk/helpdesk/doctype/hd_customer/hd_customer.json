@@ -94,7 +94,7 @@
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-03-10 13:54:06.329471",
+ "modified": "2026-03-24 10:35:49.715062",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Customer",
@@ -150,23 +150,13 @@
    "share": 1
   },
   {
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
    "role": "HD Customer Manager",
-   "select": 1,
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HD Customer",
    "select": 1,
    "share": 1,
    "write": 1

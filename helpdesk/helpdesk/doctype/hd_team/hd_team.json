@@ -48,7 +48,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-02 17:28:31.798544",
+ "modified": "2026-03-24 10:39:59.742369",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Team",
@@ -92,7 +92,7 @@
    "write": 1
   },
   {
-   "role": "All",
+   "role": "HD Customer",
    "select": 1
   }
  ],
