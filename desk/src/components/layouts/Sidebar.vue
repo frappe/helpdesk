@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 text-base duration-300 ease-in-out overflow-scroll"
+    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
@@ -50,7 +50,7 @@
         </template>
       </SidebarLink>
     </div>
-    <div>
+    <div class="overflow-y-auto overflow-x-hidden">
       <div v-for="view in allViews" :key="view.label">
         <!-- <div
           v-if="!view.hideLabel && !isExpanded && view.views?.length"

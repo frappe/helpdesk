@@ -40,7 +40,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update", "create", "general"]);
+const emit = defineEmits(["update", "create"]);
 
 const showDialog = defineModel<boolean>();
 const newTitle = defineModel<string>("title");
@@ -76,11 +76,7 @@ function getActionButton() {
       label: "Create",
       variant: "solid",
       onClick: () => {
-        if (newTitle.value?.toLocaleLowerCase().trim() === "general") {
-          emit("general");
-        } else {
-          emit("create");
-        }
+        emit("create");
       },
     });
   }

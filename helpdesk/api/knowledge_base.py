@@ -51,6 +51,10 @@ def delete_articles(articles: list[str]):
 
 @frappe.whitelist()
 def create_category(title: str):
+    if title.strip().lower() == "general":
+        frappe.throw(
+            _("'General' is a reserved category name. Please use a different name.")
+        )
     category = frappe.new_doc("HD Article Category", category_name=title).insert()
     article = frappe.new_doc(
         "HD Article", title="New Article", category=category.name

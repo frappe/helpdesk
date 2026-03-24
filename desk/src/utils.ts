@@ -27,7 +27,7 @@ import { __ } from "./translation";
  */
 export async function copy(s: string) {
   const { copy: c } = useClipboard();
-  c(s).then(() => toast.success("Copied to clipboard."));
+  c(s).then(() => toast.success(__("Copied to clipboard.")));
 }
 
 /**
@@ -254,7 +254,7 @@ export const isCustomerPortal = ref(false);
 
 export async function copyToClipboard(
   msg: string = "",
-  toastMessage: string = "Copied to clipboard."
+  toastMessage: string = __("Copied to clipboard.")
 ) {
   if (navigator.clipboard && window.isSecureContext) {
     await navigator.clipboard.writeText(msg);

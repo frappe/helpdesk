@@ -77,10 +77,10 @@ async function saveAssignees(
       if (addResult?.exc) throw new Error(addResult.exc);
     }
 
-    toast.success("Assignee's updated successfully.");
+    toast.success(__("Assignee's updated successfully."));
     activities.value.reload();
   } catch (error) {
-    toast.error("Failed to update Assignee's.");
+    toast.error(__("Failed to update Assignee's."));
   }
 }
 

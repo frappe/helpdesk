@@ -37,7 +37,7 @@
                 @click="() => onTabChange(item)"
               >
                 <component :is="item.icon" class="h-4 w-4 text-gray-700" />
-                <span class="text-sm text-gray-800">
+                <span class="text-p-sm text-gray-800">
                   {{ item.label }}
                 </span>
               </button>

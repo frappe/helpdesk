@@ -2,7 +2,8 @@
   <div class="flex gap-3 w-full justify-between flex-1">
     <div class="flex-1 flex flex-col gap-1.5">
       <span class="block text-xs text-ink-gray-5"
-        >Parent field <span class="text-ink-red-3 select-none">*</span>
+        >{{ __("Parent field") }}
+        <span class="text-ink-red-3 select-none">*</span>
       </span>
       <Combobox
         v-model="state.selectedParentField"
@@ -13,7 +14,8 @@
     </div>
     <div class="flex-1 flex flex-col gap-1.5">
       <span class="block text-xs text-ink-gray-5"
-        >Child field <span class="text-ink-red-3 select-none">*</span>
+        >{{ __("Child field") }}
+        <span class="text-ink-red-3 select-none">*</span>
       </span>
       <Combobox
         v-model="state.selectedChildField"

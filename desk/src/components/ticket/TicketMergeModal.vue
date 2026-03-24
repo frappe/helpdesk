@@ -6,7 +6,7 @@
     <template #body-content>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-8">
-          All comments and emails of the ticket will be moved to the
+          {{ __("All comments and emails of the ticket will be moved to the") }}
           <span class="whitespace-nowrap font-semibold"
             >#{{ ticket.name }}</span
           >
@@ -21,25 +21,30 @@
                 <div
                   class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-98 whitespace-pre-wrap leading-5"
                 >
-                  <span class="text-p-base"
-                    >Tickets must meet the following conditions:</span
+                  <span class="text-p-base">
+                    {{
+                      __("Tickets must meet the following conditions:")
+                    }}</span
                   >
                   <ul class="list-disc pl-4 mt-1 space-y-1">
                     <li>
-                      Ticket must be Open or Paused.
-                      <code class="bg-gray-100 rounded-md px-1 py-0.5"
-                        >status_category in ["Open", "Paused"]</code
+                      {{ __("Ticket must be Open or Paused.") }}
+                      <code class="bg-gray-100 rounded-md px-1 py-0.5">
+                        {{ __("status_category in ['Open', 'Paused']") }}</code
                       >
                     </li>
                     <li>
-                      Ticket must not already be merged.
-                      <code class="bg-gray-100 rounded-md px-1 py-0.5"
-                        >is_merged === 0</code
+                      {{ __("Ticket must not already be merged.") }}
+                      <code class="bg-gray-100 rounded-md px-1 py-0.5">
+                        {{ __("is_merged === 0") }}</code
                       >
                     </li>
                     <li>
-                      Source and target tickets which are to be merged cannot be
-                      the same.
+                      {{
+                        __(
+                          "Source and target tickets which are to be merged cannot be the same."
+                        )
+                      }}
                     </li>
                   </ul>
                 </div>
@@ -75,7 +80,7 @@
           />
 
           <div class="text-wrap text-sm text-gray-700">
-            This action is irreversible.
+            {{ __("This action is irreversible.") }}
           </div>
         </div>
       </div>

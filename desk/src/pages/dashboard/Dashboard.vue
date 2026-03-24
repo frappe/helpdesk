@@ -3,7 +3,7 @@
     <LayoutHeader>
       <template #left-header>
         <div class="text-lg font-medium text-ink-gray-9">
-          {{ dashboardTitle }}
+          {{ __(dashboardTitle) }}
         </div>
       </template>
       <template #right-header>
@@ -164,11 +164,13 @@
           v-if="numberCards.loading"
           :variants="['number-cards']"
           :number-cards-count="5"
+          :loading="true"
         />
         <SkeletonLoader
           v-if="trendData.loading"
           :variants="['bar-chart']"
           :bar-chart-count="4"
+          :loading="true"
         />
       </div>
 
@@ -311,9 +313,7 @@ const hasAppliedFilter = computed(() => {
 const isEmpty = computed(() => {
   if (!numberCards.data || !trendData.data || !masterData.data) return false;
   return (
-    (numberCards.data as NumberCardData[]).every(
-      (d) => d.value === 0 || d.value === "N/A"
-    ) &&
+    (numberCards.data as NumberCardData[]).every((d) => d.value === 0) &&
     (trendData.data as ChartData[]).every((d) => !d.data?.length) &&
     (masterData.data as ChartData[]).every((d) => !d.data?.length)
   );

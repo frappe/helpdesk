@@ -27,7 +27,6 @@
       v-model:title="category.title"
       @update="handleCategoryUpdate"
       @create="handleCategoryCreate"
-      @general="handleGeneralCategory"
     />
     <MoveToCategoryModal v-model="moveToModal" @move="handleMoveToCategory" />
     <MergeCategoryModal
@@ -215,14 +214,6 @@ const selectBannerActions = [
   },
 ];
 
-function handleGeneralCategory() {
-  toast.error(
-    __(
-      "General is reserved category and cannot be used. Please use a different category name."
-    )
-  );
-}
-
 function handleMoveToCategory(category: string) {
   moveToCategory.submit(
     {
@@ -274,8 +265,12 @@ function handleCategoryCreate() {
         });
         resetState();
       },
-      onError: (error: string) => {
-        toast.error(error);
+      onError: (error: any) => {
+        const message =
+          error?.messages?.[0] ||
+          error?.message ||
+          __("Failed to create category");
+        toast.error(message);
       },
     }
   );

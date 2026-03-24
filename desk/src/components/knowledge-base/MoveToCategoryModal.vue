@@ -11,7 +11,6 @@
           label="Category"
           :filters="defaultFilters"
           :page-length="100"
-          :open-on-focus="true"
         />
       </div>
     </template>
@@ -40,12 +39,12 @@ const defaultFilters = computed(() => {
     name: ["!=", props.excludeCategory],
   };
 });
-
 watch(showDialog, async (val) => {
-  if (val) {
-    await nextTick();
-    linkRef.value?.$el?.querySelector("input").focus();
-  }
+  if (!val) return;
+  await nextTick();
+  setTimeout(() => {
+    linkRef.value?.$el?.querySelector("input")?.focus();
+  }, 300);
 });
 
 const actions = [

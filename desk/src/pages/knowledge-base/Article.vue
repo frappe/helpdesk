@@ -284,7 +284,7 @@ import {
   ThumbsDownFilledIcon,
   ThumbsUpFilledIcon,
 } from "@/components/icons";
-import Icon from "@/components/Icon.vue";
+
 const props = defineProps({
   articleId: {
     type: String,

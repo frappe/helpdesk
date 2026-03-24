@@ -11,9 +11,9 @@
           <span class="font-medium text-gray-800">
             {{ commenter }}
           </span>
-          <span> added a</span>
+          <span> {{ __("added a") }}</span>
           <span class="max-w-xs truncate font-medium text-gray-800">
-            comment
+            {{ __("comment") }}
           </span>
         </p>
       </div>
@@ -179,6 +179,7 @@ import {
   toast,
 } from "frappe-ui";
 import { PropType, computed, onMounted, ref } from "vue";
+import { __ } from "@/translation";
 
 const authStore = useAuthStore();
 const props = defineProps({
@@ -310,7 +311,7 @@ const deleteComment = createResource({
   }),
   onSuccess() {
     emit("update");
-    toast.success("Comment deleted sucessfully.");
+    toast.success(__("Comment deleted sucessfully."));
   },
 });
 
@@ -320,7 +321,7 @@ function handleSaveComment() {
     return;
   }
   if (isContentEmpty(_content.value)) {
-    toast.error("Comment cannot be empty.");
+    toast.error(__("Comment cannot be empty."));
     return;
   }
 
@@ -336,7 +337,7 @@ function handleSaveComment() {
         editable.value = false;
         lastSavedContent.value = _content.value;
         emit("update");
-        toast.success("Comment updated successfully.");
+        toast.success(__("Comment updated successfully."));
       },
     }
   );

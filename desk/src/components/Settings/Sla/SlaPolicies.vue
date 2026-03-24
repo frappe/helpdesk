@@ -16,7 +16,7 @@
           href="https://docs.frappe.io/helpdesk/service-level-agreement"
           target="_blank"
           class="underline"
-          >{{ __("here") }}
+          >{{ __("here.") }}
         </a>
       </p>
     </template>

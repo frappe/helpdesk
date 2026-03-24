@@ -9,7 +9,7 @@
           icon-left="chevron-left"
           :label="__('Twilio')"
           size="md"
-          @click="$emit('updateStep', 'telephony-settings')"
+          @click="goBack"
           class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0 !pl-0 -ml-1.5"
         />
         <Badge
@@ -119,10 +119,18 @@
       </div>
     </template>
   </SettingsLayoutBase>
+  <ConfirmDialog
+    v-if="showConfirmDialog.show"
+    :title="showConfirmDialog.title"
+    :message="showConfirmDialog.message"
+    @confirm="showConfirmDialog.onConfirm"
+    @cancel="showConfirmDialog.onCancel"
+  />
 </template>
 <script setup>
 import Password from "@/components/Password.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
   Button,
   Checkbox,
@@ -178,6 +186,32 @@ const telephonyAgent = createDocumentResource({
     toast.error(er?.messages?.[0] || __("Failed to load telephony agent"));
   },
 });
+
+const showConfirmDialog = ref({ show: false });
+
+const goBack = () => {
+  if (isDirty.value.twilio || isDirty.value.telephonyAgent) {
+    if (!showConfirmDialog.value.show) {
+      showConfirmDialog.value = {
+        show: true,
+        title: __("Unsaved changes"),
+        message: __(
+          "Are you sure you want to go back? Unsaved changes will be lost."
+        ),
+        onConfirm: () => {
+          showConfirmDialog.value.show = false;
+          emit("updateStep", "telephony-settings");
+        },
+        onCancel: () => {
+          showConfirmDialog.value.show = false;
+        },
+      };
+    }
+    return;
+  }
+  emit("updateStep", "telephony-settings");
+};
+
 async function save() {
   validateTwilio(twilio.doc, telephonyAgent.doc, twilioErrors);
   if (Object.values(twilioErrors.value).some((v) => v)) {

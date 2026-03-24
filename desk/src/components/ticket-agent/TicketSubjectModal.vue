@@ -17,10 +17,10 @@
           :loading="isLoading"
           :label="
             isMobileView
-              ? 'Rename'
+              ? __('Rename')
               : isMac
-              ? 'Rename (⌘ + ⏎)'
-              : 'Rename (Ctrl + ⏎)'
+              ? __('Rename (⌘ + ⏎)')
+              : __('Rename (Ctrl + ⏎)')
           "
           @click="handleRename"
           :disabled="isDirty"

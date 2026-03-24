@@ -199,6 +199,7 @@ import { activeFilter, useAgents } from "./agents";
 import AgentIcon from "../icons/AgentIcon.vue";
 import { setActiveSettingsTab } from "./settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { __ } from "@/translation";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
@@ -285,7 +286,7 @@ function updateRole(agent: string, newRole: string) {
     new_role: newRole,
   }).then(() => {
     updateUserRoleCache(agent, newRole);
-    toast.success(`Role updated to ${newRole} successfully.`);
+    toast.success(__(`Role updated to ${newRole} successfully.`));
   });
 }
 

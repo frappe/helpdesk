@@ -171,7 +171,10 @@
               </Dropdown>
             </div>
           </div>
-          <hr v-if="index !== savedRepliesList.length - 1" class="mx-2" />
+          <hr
+            v-if="index !== savedRepliesListResource.data.length - 1"
+            class="mx-2"
+          />
         </div>
       </div>
     </template>

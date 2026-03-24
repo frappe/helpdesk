@@ -82,7 +82,9 @@
       class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
     >
       <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
-      <span class="text-lg font-medium text-ink-gray-8">{{ emptyText }}</span>
+      <span class="text-lg font-medium text-ink-gray-8">{{
+        __(emptyText)
+      }}</span>
     </div>
   </FadedScrollableDiv>
 </template>

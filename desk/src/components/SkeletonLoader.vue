@@ -1,5 +1,8 @@
 <template>
-  <div class="transition-all animate-fade-in duration-300 relative">
+  <div
+    class="transition-all animate-fade-in duration-300 relative"
+    :class="{ 'animate-pulse': loading }"
+  >
     <slot name="number-cards">
       <div
         v-if="showVariant('number-cards')"
@@ -107,8 +110,9 @@ const props = defineProps({
   },
   numberCardsCount: { type: Number, default: 5 },
   barChartCount: { type: Number, default: 4 },
-  barHeights: { type: Array, default: () => [63, 98, 44, 37, 19] },
+  barHeights: { type: Array, default: () => [63, 95, 44, 37, 19] },
   hasAppliedFilter: { type: Boolean, default: false },
+  loading: { type: Boolean, default: false },
   emptyStates: {
     type: Array,
     default: () => [],
