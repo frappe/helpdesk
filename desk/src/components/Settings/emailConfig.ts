@@ -204,7 +204,7 @@ export const services: EmailService[] = [
     name: "Sendgrid",
     icon: LogoSendgrid,
     info: __(`Setting up Sendgrid requires you to enable two factor authentication
-		  and app specific passwords. Read more `),
+		  and app specific passwords. Read more`),
     link: "https://sendgrid.com/docs/ui/account-and-settings/two-factor-authentication/",
     custom: false,
   },
@@ -212,7 +212,7 @@ export const services: EmailService[] = [
     name: "SparkPost",
     icon: LogoSparkpost,
     info: __(`Setting up SparkPost requires you to enable two factor authentication
-		  and app specific passwords. Read more `),
+		  and app specific passwords. Read more`),
     link: "https://support.sparkpost.com/docs/my-account-and-profile/enabling-two-factor-authentication",
     custom: false,
   },
@@ -220,7 +220,7 @@ export const services: EmailService[] = [
     name: "Yahoo",
     icon: LogoYahoo,
     info: __(`Setting up Yahoo requires you to enable two factor authentication
-		  and app specific passwords. Read more `),
+		  and app specific passwords. Read more`),
     link: "https://help.yahoo.com/kb/SLN15241.html",
     custom: false,
   },
@@ -228,14 +228,14 @@ export const services: EmailService[] = [
     name: "Yandex",
     icon: LogoYandex,
     info: __(`Setting up Yandex requires you to enable two factor authentication
-		  and app specific passwords. Read more `),
+		  and app specific passwords. Read more`),
     link: "https://yandex.com/support/id/authorization/app-passwords.html",
     custom: false,
   },
   {
     name: "Frappe Mail",
     icon: LogoFrappeMail,
-    info: __(`Setting up Frappe Mail requires you to have an API key and API Secret of your email account. Read more `),
+    info: __(`Setting up Frappe Mail requires you to have an API key and API Secret of your email account. Read more`),
     link: "https://github.com/frappe/mail",
     custom: true,
   },

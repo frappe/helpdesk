@@ -12,7 +12,8 @@ export const agentPortalSidebarOptions = [
     label: __("Dashboard"),
     icon: LucideLayoutDashboard,
     to: "Dashboard"
-  }
+  },
+  {
     label: __("Home"),
     icon: LucideHome,
     to: "Home",
