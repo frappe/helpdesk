@@ -110,9 +110,9 @@
   <!-- Loading State -->
   <div
     v-else-if="list.loading"
-    class="w-full h-full flex items-center justify-center"
+    class="w-full h-full flex items-center justify-center -mt-14"
   >
-    <LoadingIndicator :scale="10" />
+    <LoadingIndicator :scale="8" />
   </div>
   <!-- Empty State -->
   <EmptyState
@@ -140,16 +140,15 @@ import {
 } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 import { View, ViewType } from "@/types";
 import { formatTimeShort, getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { __ } from "@/translation";
 import {
   call,
   createResource,
-  dayjsLocal,
   Dropdown,
   FeatherIcon,
   ListFooter,
@@ -670,6 +669,7 @@ const { findView, updateView, defaultView } = useView(options.value.doctype);
 
 const canSaveView = computed(() => {
   let currentView: View = findView(route.query.view as string).value;
+  if (currentView?.is_standard) return false;
   if (!currentView || !currentView.public) return true;
   if (currentView.public && isManager) {
     return true;
@@ -693,6 +693,20 @@ function handleViewChanges() {
   defaultParams.order_by = currentView.order_by || "modified desc";
   defaultParams.columns = currentView.columns;
   defaultParams.rows = currentView.rows;
+
+  if (route.query.filters) {
+    try {
+      const parsedFilters = JSON.parse(route.query.filters as string);
+      if (Object.keys(parsedFilters).length > 0) {
+        defaultParams.filters = {
+          ...defaultParams.filters,
+          ...parsedFilters,
+        };
+      }
+    } catch (e) {
+      console.error("Failed to parse filters from URL", e);
+    }
+  }
 
   list.submit({ ...defaultParams });
 }

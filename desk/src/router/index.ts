@@ -23,8 +23,12 @@ const routes = [
   // Agent Portal Routes
   {
     path: "/",
+    redirect: "/home",
+  },
+  {
+    path: "/home",
     name: "Home",
-    redirect: "/tickets",
+    component: () => import("@/pages/home/Home.vue"),
   },
 
   {

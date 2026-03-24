@@ -84,6 +84,7 @@ const {
   findView,
   updateView,
   deleteView,
+  standardViews,
 } = useView("HD Ticket");
 
 const activeView = computed(() => findView(route.query.view as string).value);
@@ -329,12 +330,20 @@ const dropdownOptions = computed(() => {
       items: parseViews(pinnedViews.value),
     });
   }
-  if (publicViews.value?.length !== 0) {
-    items.push({
-      group: __("Public Views"),
-      items: parseViews(publicViews.value),
-    });
-  }
+
+  const allPublicViews = [
+    ...(standardViews.value || []),
+    ...(publicViews.value || []),
+  ];
+
+  const uniquePublicViews = Array.from(
+    new Map(allPublicViews.map((v) => [v.name, v])).values()
+  );
+
+  items.push({
+    group: __("Public Views"),
+    items: parseViews(uniquePublicViews),
+  });
 
   items.push({
     group: __("Create View"),
@@ -355,6 +364,32 @@ const dropdownOptions = computed(() => {
 });
 
 let selectedView: View | null = null;
+
+const toggleViewVisibility = (_view: any, title: string, message: string) => {
+  const newView: any = {
+    name: _view.name,
+    public: !_view.public,
+  };
+
+  if (_view.public) {
+    $dialog({
+      title,
+      message,
+      actions: [
+        {
+          label: __("Confirm"),
+          variant: "solid",
+          onClick({ close }: any) {
+            close();
+            updateView(newView);
+          },
+        },
+      ],
+    });
+  } else {
+    updateView(newView);
+  }
+};
 
 const viewActions = (view) => {
   const _view = findView(view.name).value;
@@ -380,18 +415,7 @@ const viewActions = (view) => {
     },
   ];
   if (!_view.public || isManager) {
-    actions[0].items.push({
-      label: __("Edit"),
-      icon: h(EditIcon, { class: "h-4 w-4" }),
-      onClick: () => {
-        viewDialog.view.label = _view.label;
-        viewDialog.view.icon = _view.icon;
-        viewDialog.view.name = _view.name;
-        viewDialog.mode = "edit";
-        viewDialog.show = true;
-      },
-    });
-    if (!_view.public) {
+    if (!_view.public && !_view.is_standard) {
       actions[0].items.push({
         label: _view?.pinned ? __("Unpin View") : __("Pin View"),
         icon: h(_view?.pinned ? UnpinIcon : PinIcon, { class: "h-4 w-4" }),
@@ -404,85 +428,99 @@ const viewActions = (view) => {
         },
       });
     }
-    if (isManager && !isCustomerPortal.value) {
+    if (_view?.is_standard && isManager) {
       actions[0].items.push({
-        label: _view?.public ? __("Make Private") : __("Make Public"),
+        label: _view?.public ? __("Hide from sidebar") : __("Show in sidebar"),
         icon: h(FeatherIcon, {
-          name: _view?.public ? "lock" : "unlock",
+          name: _view?.public ? "eye-off" : "eye",
           class: "h-4 w-4",
         }),
         onClick: () => {
-          const newView = {
-            name: _view.name,
-            public: !_view.public,
-          };
-
-          if (_view.public) {
-            $dialog({
-              title: __("Make {0} private?", [_view.label]),
-              message: __(
-                "This view is currently public. Changing it to private will hide it for all the users."
-              ),
-              actions: [
-                {
-                  label: __("Confirm"),
-                  variant: "solid",
-                  onClick({ close }) {
-                    close();
-                    updateView(newView);
-                  },
-                },
-              ],
-            });
-          } else {
-            updateView(newView);
-          }
+          toggleViewVisibility(
+            _view,
+            __("Hide view from sidebar"),
+            __(
+              "{0} view is currently visible in the sidebar. Hiding it will remove it from the sidebar.",
+              [_view.label]
+            )
+          );
         },
       });
     }
-    actions.push({
-      group: __("Delete View"),
-      hideLabel: true,
-      items: [
-        {
-          label: __("Delete"),
-          icon: "trash-2",
+    if (!_view.is_standard) {
+      if (isManager && !isCustomerPortal.value) {
+        actions[0].items.push({
+          label: _view?.public ? __("Make Private") : __("Make Public"),
+          icon: h(FeatherIcon, {
+            name: _view?.public ? "lock" : "unlock",
+            class: "h-4 w-4",
+          }),
           onClick: () => {
-            $dialog({
-              title: __("Delete {0}?", [_view.label]),
-              message:
-                __("Are you sure you want to delete this view?") +
-                (_view.public
-                  ? " " +
-                    __(
-                      "This view is public, and will be removed for all users."
-                    )
-                  : ""),
-              actions: [
-                {
-                  label: __("Confirm"),
-                  variant: "solid",
-                  onClick({ close }) {
-                    if (route.query.view === _view.name) {
-                      router.push({
-                        name: isCustomerPortal.value
-                          ? "TicketsCustomer"
-                          : "TicketsAgent",
-                      });
-                    }
-                    deleteView(_view.name);
-                    handleSuccess(__("deleted"));
-                    close();
-                  },
-                },
-              ],
-            });
+            toggleViewVisibility(
+              _view,
+              __("Make view private"),
+              __(
+                "{0} view is currently public. Changing it to private will hide it for all the users.",
+                [_view.label]
+              )
+            );
           },
+        });
+      }
+      actions[0].items.push({
+        label: __("Edit"),
+        icon: h(EditIcon, { class: "h-4 w-4" }),
+        onClick: () => {
+          viewDialog.view.label = _view.label;
+          viewDialog.view.icon = _view.icon;
+          viewDialog.view.name = _view.name;
+          viewDialog.mode = "edit";
+          viewDialog.show = true;
         },
-      ],
-    });
+      });
+      actions.push({
+        group: __("Delete View"),
+        hideLabel: true,
+        items: [
+          {
+            label: __("Delete"),
+            icon: "trash-2",
+            onClick: () => {
+              $dialog({
+                title: __("Delete {0}?", [_view.label]),
+                message:
+                  __("Are you sure you want to delete this view?") +
+                  (_view.public
+                    ? " " +
+                      __(
+                        "This view is public, and will be removed for all users."
+                      )
+                    : ""),
+                actions: [
+                  {
+                    label: __("Confirm"),
+                    variant: "solid",
+                    onClick({ close }) {
+                      if (route.query.view === _view.name) {
+                        router.push({
+                          name: isCustomerPortal.value
+                            ? "TicketsCustomer"
+                            : "TicketsAgent",
+                        });
+                      }
+                      deleteView(_view.name);
+                      handleSuccess(__("deleted"));
+                      close();
+                    },
+                  },
+                ],
+              });
+            },
+          },
+        ],
+      });
+    }
   }
-
   return actions;
 };
 

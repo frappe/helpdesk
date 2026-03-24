@@ -48,6 +48,12 @@
             <span class="whitespace-nowrap">
               {{ item.label }}
             </span>
+            <Badge
+              v-if="item.is_standard"
+              class="ml-1"
+              size="sm"
+              label="Standard"
+            />
           </div>
           <div
             v-if="item.name"
@@ -77,7 +83,7 @@
 
 <script setup>
 import { useScreenSize } from "@/composables/screen";
-import { Dropdown } from "frappe-ui";
+import { Badge, Dropdown } from "frappe-ui";
 import { useRoute } from "vue-router";
 
 const props = defineProps({

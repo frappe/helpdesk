@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-03-01 10:40+0000\n"
-"PO-Revision-Date: 2026-03-06 19:45\n"
+"PO-Revision-Date: 2026-03-15 21:48\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Portuguese, Brazilian\n"
 "MIME-Version: 1.0\n"
@@ -2275,7 +2275,7 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Hold"
-msgstr "Segurar"
+msgstr "Pendente"
 
 #. Label of the holiday_list (Link) field in DocType 'HD Service Level
 #. Agreement'

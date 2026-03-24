@@ -1,9 +1,20 @@
 import { useAuthStore } from "@/stores/auth";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
+import { useDebounceFn } from "@vueuse/core";
 import { call, createListResource, createResource } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+
+const debouncedSetValue = useDebounceFn(
+  (doctype: string, name: string, fieldname: any, cb?: Function) => {
+    call("frappe.client.set_value", { doctype, name, fieldname }).then(() => {
+      cb?.();
+      views.reload();
+    });
+  },
+  500
+);
 
 export const views = createListResource({
   doctype: "HD View",
@@ -56,7 +67,8 @@ export function useView(dt: string = null) {
           !view.is_default &&
           view.user === auth.userId &&
           !view.public &&
-          !view.pinned
+          !view.pinned &&
+          !view.is_standard
       )
       .map(parseView)
   );
@@ -108,17 +120,13 @@ export function useView(dt: string = null) {
     )
   );
 
+  const standardViews = computed(() =>
+    views.data?.filter((view: View) => view.is_standard).map(parseView)
+  );
+
   function updateView(view: any, successCB: Function = () => {}) {
     if (view.name !== "default") {
-      // handle custom view
-      call("frappe.client.set_value", {
-        doctype: "HD View",
-        name: view.name,
-        fieldname: view,
-      }).then(() => {
-        successCB();
-        views.reload();
-      });
+      debouncedSetValue("HD View", view.name, view, successCB);
     } else {
       // handle default view
       createOrUpdateDefaultView(view);
@@ -143,15 +151,7 @@ export function useView(dt: string = null) {
     if (defaultView) {
       delete view["name"];
 
-      call("frappe.client.set_value", {
-        doctype: "HD View",
-        name: defaultView.name,
-        fieldname: {
-          ...view,
-        },
-      }).then(() => {
-        views.reload();
-      });
+      debouncedSetValue("HD View", defaultView.name, view);
     } else {
       view["doctype"] = "HD View";
       // create default view
@@ -168,6 +168,7 @@ export function useView(dt: string = null) {
       name: view.name,
       icon: getIcon(view.icon),
       route_name: view.route_name,
+      is_standard: view.is_standard || false,
       onClick: () => {
         router.push({
           name: view.route_name,
@@ -193,6 +194,7 @@ export function useView(dt: string = null) {
     pinnedViews,
     publicViews,
     defaultView,
+    standardViews,
     findView,
     createView,
     updateView,

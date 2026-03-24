@@ -4,13 +4,18 @@ import LucideTicket from "~icons/lucide/ticket";
 import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import { OrganizationsIcon } from "../icons";
 import PhoneIcon from "../icons/PhoneIcon.vue";
+import LucideHome from "~icons/lucide/home";
 import { __ } from "@/translation";
 
 export const agentPortalSidebarOptions = [
   {
     label: __("Dashboard"),
     icon: LucideLayoutDashboard,
-    to: "Dashboard",
+    to: "Dashboard"
+  }
+    label: __("Home"),
+    icon: LucideHome,
+    to: "Home",
   },
   {
     label: __("Tickets"),
