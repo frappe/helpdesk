@@ -84,7 +84,6 @@ class HDTicket(Document):
         self.set_feedback_values()
         self.set_default_status()
         self.set_status_category()
-        # self.apply_escalation_rule()
         self.set_sla()
 
         self.set_contact()
@@ -827,61 +826,6 @@ class HDTicket(Document):
         )  # Document class method, no way to add unique_views via document settings, hence used force and unique_views=True
         self.add_seen()
         clear_notifications(ticket=self.name)
-
-    def get_escalation_rule(self):
-        filters = [
-            {
-                "priority": self.priority,
-                "team": self.agent_group,
-                "ticket_type": self.ticket_type,
-            },
-            {
-                "priority": self.priority,
-                "team": self.agent_group,
-            },
-            {
-                "priority": self.priority,
-                "ticket_type": self.ticket_type,
-            },
-            {
-                "team": self.agent_group,
-                "ticket_type": self.ticket_type,
-            },
-            {
-                "priority": self.priority,
-            },
-            {
-                "team": self.agent_group,
-            },
-            {
-                "ticket_type": self.ticket_type,
-            },
-        ]
-
-        for i in range(len(filters)):
-            try:
-                f = {
-                    **filters[i],
-                    "is_enabled": True,
-                }
-                rule = frappe.get_last_doc("HD Escalation Rule", filters=f)
-                if rule:
-                    return rule
-            except Exception:
-                pass
-
-    def apply_escalation_rule(self):
-        if not self.status_category == "Open" or self.is_new():
-            return
-        escalation_rule = self.get_escalation_rule()
-        if not escalation_rule:
-            return
-        self.agent_group = escalation_rule.to_team or self.agent_group
-        self.priority = escalation_rule.to_priority or self.priority
-        self.ticket_type = escalation_rule.to_ticket_type or self.ticket_type
-
-        if escalation_rule.to_agent:
-            self.assign_agent(escalation_rule.to_agent)
 
     def set_sla(self):
         """
