@@ -1,6 +1,17 @@
 <template>
   <div class="h-full w-full rounded border border-outline-gray-1">
-    <AgentTicketsCard v-if="item.chart == 'agent_tickets'" :data="item.data" />
+    <AgentCountCard
+      v-if="item.chart == 'agent_tickets'"
+      :title="__('My Tickets')"
+      api-url="helpdesk.api.agent_home.agent_home.get_agent_tickets"
+      :data="item.data"
+    />
+    <AgentCountCard
+      v-if="item.chart == 'agent_replies'"
+      :title="__('My Replies')"
+      api-url="helpdesk.api.agent_home.agent_home.get_agent_replies"
+      :data="item.data"
+    />
     <AvgTimeCard
       v-if="item.chart == 'avg_first_response_time'"
       :title="__('Average First Response')"
@@ -30,7 +41,7 @@
 <script setup lang="ts">
 import { type PropType } from "vue";
 import AvgTimeCard from "./AvgTimeCard.vue";
-import AgentTicketsCard from "./AgentTicketsCard.vue";
+import AgentCountCard from "./AgentCountCard.vue";
 import AvgTimeMetrics from "./AvgTimeMetrics.vue";
 import RecentFeedback from "./RecentFeedback.vue";
 import PendingTickets from "./PendingTickets.vue";

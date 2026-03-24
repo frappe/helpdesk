@@ -294,7 +294,19 @@ const chartsDropdown = computed(() => {
       chart: "agent_tickets",
       onClick: () =>
         addChart("agent_tickets", {
-          w: 17,
+          w: 16,
+          h: 10,
+          minW: 16,
+          minH: 10,
+          maxH: 11,
+        }),
+    },
+    {
+      label: __("My Replies"),
+      chart: "agent_replies",
+      onClick: () =>
+        addChart("agent_replies", {
+          w: 16,
           h: 10,
           minW: 16,
           minH: 10,
@@ -318,7 +330,7 @@ const chartsDropdown = computed(() => {
       chart: "avg_first_response_time",
       onClick: () =>
         addChart("avg_first_response_time", {
-          w: 17,
+          w: 16,
           h: 10,
           minW: 16,
           minH: 10,
@@ -330,7 +342,7 @@ const chartsDropdown = computed(() => {
       chart: "avg_resolution_time",
       onClick: () =>
         addChart("avg_resolution_time", {
-          w: 17,
+          w: 16,
           h: 10,
           minW: 16,
           minH: 10,
