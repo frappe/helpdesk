@@ -17,17 +17,30 @@
     />
   </div>
   <div
-    v-else
-    class="grid h-full place-items-center px-4 py-20 text-center text-lg text-gray-600"
+    v-else-if="!ticket.doc && !ticket.get?.error"
+    class="grid h-full place-items-center"
   >
-    <div class="space-y-4">
-      <div>
-        You don't have access to this ticket, or it no longer exists.
-        {{ ticket.doc?.name }}
+    <LoadingIndicator class="w-6 text-ink-gray-4" />
+  </div>
+
+  <div v-else class="grid h-full place-items-center px-4 py-20 text-center">
+    <div class="space-y-2">
+      <div class="flex justify-center items-center mx-auto">
+        <TicketIcon class="size-10 text-ink-gray-4" />
       </div>
-      <Button :route="{ name: 'TicketsAgent' }">
-        <template #suffix><TicketIcon class="w-4" /></template>
-        Back to Tickets
+      <div class="text-lg font-medium text-ink-gray-8">
+        {{ __("Ticket not found") }}
+      </div>
+      <div class="text-center text-p-base text-ink-gray-6 mt-1">
+        {{
+          __("You don't have access to this ticket, or it no longer exists.")
+        }}
+      </div>
+      <Button :route="{ name: 'TicketsAgent' }" variant="subtle">
+        <template #prefix
+          ><FeatherIcon name="arrow-left" class="size-4"
+        /></template>
+        {{ __("Back to Tickets") }}
       </Button>
     </div>
   </div>
