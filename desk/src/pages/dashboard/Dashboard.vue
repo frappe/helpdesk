@@ -203,6 +203,7 @@ import {
   createResource,
   dayjs,
   usePageMeta,
+  Tooltip,
 } from "frappe-ui";
 const { isMobileView } = useScreenSize();
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
@@ -211,6 +212,22 @@ import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideUser from "~icons/lucide/user";
 import { useScreenSize } from "@/composables/screen";
 import { useStorage } from "@vueuse/core";
+
+interface NumberCardData {
+  title: string;
+  value: number | "N/A";
+  delta: number | null;
+  deltaSuffix: string;
+  suffix?: string;
+  negativeIsBetter?: boolean;
+  tooltip: string;
+}
+
+interface ChartData {
+  data: any[];
+  title: string;
+  type: "axis" | "pie";
+}
 
 const dashboardTitle = computed(() => {
   if (!isManager) return __("Agent Dashboard");
@@ -294,9 +311,11 @@ const hasAppliedFilter = computed(() => {
 const isEmpty = computed(() => {
   if (!numberCards.data || !trendData.data || !masterData.data) return false;
   return (
-    numberCards.data.every((d: any) => !d.value || d.value === "N/A") &&
-    trendData.data.every((d: any) => !d.data?.length) &&
-    masterData.data.every((d: any) => !d.data?.length)
+    (numberCards.data as NumberCardData[]).every(
+      (d) => d.value === 0 || d.value === "N/A"
+    ) &&
+    (trendData.data as ChartData[]).every((d) => !d.data?.length) &&
+    (masterData.data as ChartData[]).every((d) => !d.data?.length)
   );
 });
 

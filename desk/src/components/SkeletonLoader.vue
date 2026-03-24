@@ -126,7 +126,7 @@ const defaultEmptyStateMsg = {
 };
 
 function getEmptyState(index) {
-  const entry = props.emptyStates[index] ?? {};
+  const entry = props.emptyStates[index - 1] ?? {};
   return { ...defaultEmptyStateMsg, ...entry };
 }
 function showVariant(slotName) {
