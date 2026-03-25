@@ -524,7 +524,6 @@ def handle_at_me_support(filters):
 
 @frappe.whitelist()
 def remove_assignments(doctype: str, name: str | int, assignees: list[str]):
-    ignore_permissions = False
     assignees = frappe.parse_json(assignees)
 
     if not assignees:
@@ -537,5 +536,4 @@ def remove_assignments(doctype: str, name: str | int, assignees: list[str]):
             todo=None,
             assign_to=assign_to,
             status="Cancelled",
-            ignore_permissions=ignore_permissions,
         )
