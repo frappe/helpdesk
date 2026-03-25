@@ -10,7 +10,6 @@
 	"workspaces": ["desk", "frappe-ui"],
 	"resolutions": {
 		"cheerio": "1.0.0-rc.12",
-		"prosemirror-model": "1.25.4",
-		"@tiptap/extension-gapcursor": "3.20.4"
+		"prosemirror-model": "1.25.4"
 	}
 }
