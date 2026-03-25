@@ -135,7 +135,7 @@ const saveTeam = () => {
     },
     {
       onSuccess: (data) => {
-        toast.success(__("Team created"));
+        toast.success(__("Team created successfully."));
         emit("update:step", "team-edit", data.name);
       },
     }

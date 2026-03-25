@@ -36,7 +36,7 @@
           size="sm"
           :label="__('Enabled')"
           v-model="enabled"
-          @update:model-value="setUnsavedChanges"
+          @update:model-value="(val) => setUnsavedChanges(val)"
           :style="{ background: 'transparent', padding: '0px' }"
           class="flex-row-reverse gap-x-2 pl-0"
         />
@@ -68,7 +68,7 @@
               :required="true"
               :rows="10"
               v-model="content"
-              :oninput="setUnsavedChanges"
+              :oninput="() => setUnsavedChanges()"
             />
             <div class="flex gap-x-1 items-start justify-between">
               <p class="text-sm text-gray-700 leading-5">
@@ -135,7 +135,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import type { NotificationName } from "./types";
-import { createResource, Switch, LoadingIndicator } from "frappe-ui";
+import { createResource, Switch, LoadingIndicator, Button } from "frappe-ui";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
@@ -169,14 +169,22 @@ const notificationDataResource = createResource({
   onSuccess: props.onGetDataSuccess,
 });
 
-function setUnsavedChanges() {
-  unsavedChanges.value = true;
+function setUnsavedChanges(
+  newEnabled = enabled.value,
+  newContent = content.value
+) {
+  unsavedChanges.value =
+    newEnabled !== notificationDataResource.data.enabled ||
+    newContent !== notificationDataResource.data.content;
 }
-
 function resetUnsavedChanges() {
+  notificationDataResource.data = {
+    ...notificationDataResource.data,
+    enabled: enabled.value,
+    content: content.value,
+  };
   unsavedChanges.value = false;
 }
-
 function resetContent() {
   content.value = props.defaultContent;
   setUnsavedChanges();

@@ -134,7 +134,7 @@
         <div>
           <div class="flex flex-col gap-1">
             <span class="text-lg font-semibold text-ink-gray-8">{{
-              __("Assignment condition")
+              __("Assignment Condition")
             }}</span>
             <div class="flex items-center justify-between gap-6">
               <span class="text-p-sm text-ink-gray-6">
@@ -211,7 +211,7 @@
         <div>
           <div class="flex flex-col gap-1">
             <span class="text-lg font-semibold text-ink-gray-8">{{
-              __("Unassignment condition")
+              __("Unassignment Condition")
             }}</span>
             <div class="flex items-center justify-between gap-6">
               <span class="text-p-sm text-ink-gray-6">
@@ -557,7 +557,7 @@ const createAssignmentRule = () => {
 const createAssignmentRuleResource = createResource({
   url: "frappe.client.insert",
   onSuccess(data) {
-    toast.success(__("Assignment rule created"));
+    toast.success(__("Assignment rule created successfully."));
     assignmentRulesActiveScreen.value = {
       screen: "view",
       data: data,
@@ -644,7 +644,7 @@ const updateAssignmentRule = async () => {
   }
 
   isLoading.value = false;
-  toast.success(__("Assignment rule updated"));
+  toast.success(__("Assignment rule updated successfully."));
 };
 
 watch(

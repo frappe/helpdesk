@@ -25,7 +25,7 @@
           >
             {{ config.brandName || "Helpdesk" }}
           </div>
-          <div class="mt-1 text-sm leading-none text-gray-700">
+          <div class="mt-1 text-sm text-gray-700">
             {{ authStore.userName }}
           </div>
         </div>
@@ -34,7 +34,7 @@
           :class="
             !sidebarStore.isExpanded
               ? 'ml-0 w-0 overflow-hidden opacity-0'
-              : 'ml-2 w-auto opacity-100'
+              : 'ml-2 relative left-[-2.5px] w-auto opacity-100'
           "
         >
           <FeatherIcon

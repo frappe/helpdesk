@@ -1,6 +1,10 @@
 <template>
   <FadedScrollableDiv
+<<<<<<< HEAD
     class="quick-filters flex flex-1 items-center -ml-1 overflow-x-auto py-1 gap-2 pr-4"
+=======
+    class="flex flex-1 items-center -ml-1 overflow-x-scroll py-1 gap-2"
+>>>>>>> 15b246e3 (Merge pull request #2969 from aerodeval/fix/-fix-ui-inconsistency)
     orientation="horizontal"
     v-if="!quickFilters.loading"
   >

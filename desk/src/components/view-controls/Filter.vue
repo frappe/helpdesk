@@ -92,6 +92,7 @@
                 <div id="operator">
                   <FormControl
                     type="select"
+                    class="!min-w-[140px]"
                     v-model="f.operator"
                     @change="(e) => updateOperator(e, f)"
                     :options="
@@ -485,7 +486,9 @@ function clearfilter(close) {
 
 function updateValue(value, filter) {
   value = value.target ? value.target.value : value;
-  if (filter.operator === "between") {
+  if (filter.operator === "in" || filter.operator === "not in") {
+    filter.value = value.split(",").map((v) => v.trim());
+  } else if (filter.operator === "between") {
     filter.value = [value.split(",")[0], value.split(",")[1]];
   } else {
     filter.value = value;

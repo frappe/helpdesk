@@ -34,6 +34,7 @@
       class="flex gap-1.5 flex-1"
       @keydown.ctrl.enter.capture.stop="submitEmail"
       @keydown.meta.enter.capture.stop="submitEmail"
+      @keydown.esc.capture.stop="showEmailBox = false"
     >
       <EmailEditor
         ref="emailEditorRef"
@@ -64,6 +65,7 @@
       v-show="showCommentBox"
       @keydown.ctrl.enter.capture.stop="submitComment"
       @keydown.meta.enter.capture.stop="submitComment"
+      @keydown.esc.capture.stop="showCommentBox = false"
     >
       <CommentTextEditor
         ref="commentTextEditorRef"
@@ -222,7 +224,7 @@ onClickOutside(
     }
   },
   {
-    ignore: [".tippy-box", ".tippy-content"],
+    ignore: [".tippy-box", ".tippy-content", ".PopoverContent"],
   }
 );
 
@@ -234,7 +236,7 @@ onClickOutside(
     }
   },
   {
-    ignore: [".tippy-box", ".tippy-content"],
+    ignore: [".tippy-box", ".tippy-content", ".PopoverContent"],
   }
 );
 </script>
