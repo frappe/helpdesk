@@ -47,6 +47,7 @@ import {
 import { setFeedback } from "@/stores/knowledgeBase";
 import { ref } from "vue";
 import { toast } from "frappe-ui";
+import { __ } from "@/translation";
 
 interface P {
   feedback: FeedbackAction;
@@ -73,7 +74,7 @@ function handleFeedbackClick(action: FeedbackAction) {
         if (_feedback.value === 0) {
           return;
         }
-        toast.success("Feedback submitted successfully.");
+        toast.success(__("Feedback submitted successfully."));
       },
     }
   );
