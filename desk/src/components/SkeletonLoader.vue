@@ -22,7 +22,9 @@
     <slot name="bar-chart">
       <div
         v-if="showVariant('bar-chart')"
-        class="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-4"
+        :class="
+          barChartCount !== 1 ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''
+        "
       >
         <div
           v-for="i in barChartCount"

@@ -91,6 +91,7 @@
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4"
         v-if="!numberCards.loading"
       >
+        {{ trendData.data[0] }}
         <Tooltip
           v-for="(config, index) in numberCards.data"
           :text="config.tooltip"
@@ -217,7 +218,7 @@ import { useStorage } from "@vueuse/core";
 
 interface NumberCardData {
   title: string;
-  value: number | "N/A";
+  value: number;
   delta: number | null;
   deltaSuffix: string;
   suffix?: string;
@@ -226,9 +227,16 @@ interface NumberCardData {
 }
 
 interface ChartData {
-  data: any[];
+  data: ChartValues;
   title: string;
   type: "axis" | "pie";
+}
+
+interface ChartValues {
+  date: Date;
+  Open: number;
+  Closed: number;
+  "SLA Fulfilled": number;
 }
 
 const dashboardTitle = computed(() => {
