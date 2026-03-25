@@ -12,6 +12,7 @@
       </template>
       <template #right-header>
         <RouterLink
+          class="inline-flex"
           :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
         >
           <Button label="Create" theme="gray" variant="solid">
@@ -25,12 +26,6 @@
     <ListViewBuilder
       ref="listViewRef"
       :options="options"
-      @empty-state-action="
-        () =>
-          $router.push({
-            name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew',
-          })
-      "
       @row-click="
         (row) =>
           $router.push({
@@ -92,6 +87,11 @@ const {
   standardViews,
 } = useView("HD Ticket");
 
+const activeView = computed(() => findView(route.query.view as string).value);
+const hasActiveFilters = computed(
+  () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
+);
+
 const { $dialog, $socket } = globalStore();
 const { isManager, userId } = useAuthStore();
 
@@ -112,7 +112,7 @@ const selectBannerActions = [
   },
 ];
 
-const options = {
+const options = computed(() => ({
   doctype: "HD Ticket",
   columnConfig: {
     subject: {
@@ -165,17 +165,27 @@ const options = {
   showSelectBanner: true,
   selectBannerActions,
   emptyState: {
-    title: __("No Tickets Found"),
+    title: __("No tickets found"),
     icon: h(TicketIcon, {
       class: "h-10 w-10",
     }),
+    description:
+      activeView.value?.public || activeView.value?.pinned
+        ? __(
+            "No tickets found for this view. Try adjusting your filters or creating a new view."
+          )
+        : hasActiveFilters.value
+        ? __(
+            "No tickets found for the applied filters. Try adjusting or clearing your filters."
+          )
+        : undefined,
   },
   rowRoute: {
     name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
     prop: "ticketId",
   },
   hideColumnSetting: false,
-};
+}));
 
 function handle_response_by_field(row: any, item: string) {
   if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
@@ -475,9 +485,10 @@ const viewActions = (view) => {
           {
             label: __("Delete"),
             icon: "trash-2",
+            theme: "red",
             onClick: () => {
               $dialog({
-                title: __("Delete {0}?", [_view.label]),
+                title: __("Delete {0}", [_view.label]),
                 message:
                   __("Are you sure you want to delete this view?") +
                   (_view.public
@@ -490,6 +501,8 @@ const viewActions = (view) => {
                   {
                     label: __("Confirm"),
                     variant: "solid",
+                    iconLeft: "trash-2",
+                    theme: "red",
                     onClick({ close }) {
                       if (route.query.view === _view.name) {
                         router.push({

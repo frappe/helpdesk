@@ -63,26 +63,26 @@ const notifications: AtLeastOneNotifcation = [
     name: "share_feedback",
     label: __("Share feedback"),
     description: __(
-      "Sent to the user who has raised the ticket after the ticket is closed or resolved"
+      "Sent to the user who has raised the ticket after the ticket is closed or resolved."
     ),
   },
   {
     name: "acknowledgement",
     label: __("Acknowledgement"),
-    description: __("Sent to the user right after creating an email ticket"),
+    description: __("Sent to the user right after creating an email ticket."),
   },
   {
     name: "reply_to_agents",
     label: __("Reply from contact"),
     description: __(
-      "Sent to all of the assigned agents after a reply from one of the contacts"
+      "Sent to all of the agents assigned to the ticket whenever a contact has replied."
     ),
   },
   {
     name: "reply_via_agent",
     label: __("Reply from agent"),
     description: __(
-      "Sent to all of the recipients associated with an agent's reply"
+      "Sent to all of the recipients associated with the ticket whenever an agent has replied."
     ),
   },
 ];

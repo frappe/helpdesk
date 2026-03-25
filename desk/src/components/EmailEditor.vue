@@ -269,6 +269,8 @@ const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
 const isUploading = ref(false);
+const contentEmpty = computed(() => isContentEmpty(newEmail.value));
+
 const isDisabled = computed(() => {
   return (
     (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
