@@ -485,9 +485,10 @@ const viewActions = (view) => {
           {
             label: __("Delete"),
             icon: "trash-2",
+            theme: "red",
             onClick: () => {
               $dialog({
-                title: __("Delete {0}?", [_view.label]),
+                title: __("Delete {0}", [_view.label]),
                 message:
                   __("Are you sure you want to delete this view?") +
                   (_view.public
@@ -500,6 +501,8 @@ const viewActions = (view) => {
                   {
                     label: __("Confirm"),
                     variant: "solid",
+                    iconLeft: "trash-2",
+                    theme: "red",
                     onClick({ close }) {
                       if (route.query.view === _view.name) {
                         router.push({

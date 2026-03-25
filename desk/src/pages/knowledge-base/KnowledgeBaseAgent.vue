@@ -197,11 +197,13 @@ const selectBannerActions = [
     onClick: (selections: Set<string>) => {
       listSelections.value = selections;
       $dialog({
-        title: __("Delete articles?"),
+        title: __("Delete articles"),
         message: __("Are you sure you want to delete these articles?"),
         actions: [
           {
-            label: __("Confirm"),
+            label: __("Delete"),
+            theme: "red",
+            iconLeft: "trash-2",
             variant: "solid",
             onClick({ close }) {
               handleDeleteArticles();
@@ -299,8 +301,12 @@ function handleCategoryUpdate() {
         toast.success(__("Category updated successfully."));
         resetState();
       },
-      onError: (error: string) => {
-        toast.error(error);
+      onError: (error: any) => {
+        const title =
+          error?.messages?.[0] ||
+          error?.message ||
+          __("Failed to update category.");
+        toast.error(title);
       },
     }
   );
@@ -415,7 +421,7 @@ const options = computed(() => {
         ? __(
             "No articles found for the applied filters. Try adjusting or clearing your filters."
           )
-        : "No articles found in the following category.",
+        : __("No articles found in the following category."),
     },
     rowRoute: {
       name: "Article",

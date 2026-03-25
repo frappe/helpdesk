@@ -241,8 +241,10 @@ const defaultOptions = reactive({
           ]),
           actions: [
             {
-              label: __("Confirm"),
+              label: __("Delete"),
               variant: "solid",
+              theme: "red",
+              iconLeft: "trash-2",
               onClick({ close }) {
                 handleBulkDelete(close, selections);
               },
