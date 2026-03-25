@@ -92,7 +92,7 @@
                 <div id="operator">
                   <FormControl
                     type="select"
-                    class="min-w-24"
+                    class="!min-w-[140px]"
                     v-model="f.operator"
                     @change="(e) => updateOperator(e, f)"
                     :options="
