@@ -36,16 +36,16 @@ type EmailAccountFormState = {
 
 const fixedFields: RenderField[] = [
   {
-    label: "Account name",
+    label: __("Account name"),
     name: "email_account_name",
     type: "text",
-    placeholder: "Support / Sales",
+    placeholder: __("Support / Sales"),
   },
   {
-    label: "Email ID",
+    label: __("Email ID"),
     name: "email_id",
     type: "email",
-    placeholder: "johndoe@example.com",
+    placeholder: __("johndoe@example.com"),
   },
 ];
 
@@ -54,28 +54,33 @@ export const incomingOutgoingFields: RenderField[] = [
     label: __("Enable Incoming"),
     name: "enable_incoming",
     type: "checkbox",
-    description:
-      __("If enabled, tickets can be created from the incoming emails on this account."),
+    description: __(
+      "If enabled, tickets can be created from the incoming emails on this account."
+    ),
   },
   {
     label: __("Enable Outgoing"),
     name: "enable_outgoing",
     type: "checkbox",
-    description: __("If enabled, outgoing emails can be sent from this account."),
+    description: __(
+      "If enabled, outgoing emails can be sent from this account."
+    ),
   },
   {
     label: __("Default Incoming"),
     name: "default_incoming",
     type: "checkbox",
-    description:
-      __("If enabled, all replies to your company (eg: replies@yourcompany.com) will come to this account. Note: Only one account can be default incoming."),
+    description: __(
+      "If enabled, all replies to your company (eg: replies@yourcompany.com) will come to this account. Note: Only one account can be default incoming."
+    ),
   },
   {
     label: __("Default Outgoing"),
     name: "default_outgoing",
     type: "checkbox",
-    description:
-      __("If enabled, all outgoing emails will be sent from this account. Note: Only one account can be default outgoing."),
+    description: __(
+      "If enabled, all outgoing emails will be sent from this account. Note: Only one account can be default outgoing."
+    ),
   },
 ];
 
@@ -235,7 +240,9 @@ export const services: EmailService[] = [
   {
     name: "Frappe Mail",
     icon: LogoFrappeMail,
-    info: __(`Setting up Frappe Mail requires you to have an API key and API Secret of your email account. Read more`),
+    info: __(
+      `Setting up Frappe Mail requires you to have an API key and API Secret of your email account. Read more`
+    ),
     link: "https://github.com/frappe/mail",
     custom: true,
   },
@@ -279,14 +286,17 @@ export function validateInputs(
       return __("API Key is required");
     }
     if (!state.api_secret) {
-      return __("API Secret is required");;
+      return __("API Secret is required");
     }
     return "";
   }
   if (service === "Custom") {
     const hasDomain = Boolean(state.domain);
     const hasManualServers =
-      state.email_server && state.incoming_port && state.smtp_server && state.smtp_port;
+      state.email_server &&
+      state.incoming_port &&
+      state.smtp_server &&
+      state.smtp_port;
     if (!hasDomain && !hasManualServers) {
       return __("Email Domain or manual server settings are required");
     }

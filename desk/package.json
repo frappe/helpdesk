@@ -18,7 +18,7 @@
     "@vueuse/core": "^13.8.0",
     "@vueuse/integrations": "^13.8.0",
     "dayjs": "^1.11.7",
-    "frappe-ui": "0.1.268",
+    "frappe-ui": "0.1.269",
     "gemoji": "^8.1.0",
     "mime": "^3.0.0",
     "pinia": "^2.0.33",
@@ -42,12 +42,6 @@
   "resolutions": {
     "cheerio": "1.0.0-rc.12",
     "prosemirror-model": "1.25.4",
-    "prosemirror-state": "1.4.4",
-    "prosemirror-view": "1.41.7",
-    "prosemirror-gapcursor": "1.4.1",
-    "prosemirror-commands": "1.7.1",
-    "prosemirror-keymap": "1.2.3",
-    "prosemirror-tables": "1.8.5",
-    "@tiptap/core": "^3.11.0"
+    "@tiptap/extension-gapcursor": "3.20.4"
   }
 }
