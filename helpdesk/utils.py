@@ -99,15 +99,15 @@ def get_customers(user: str = "", contact: str = "", get_roles=False):
     if not contact:
         contact = frappe.db.get_value("Contact", {"user": user})
 
-    HD_Customer = frappe.qb.DocType("HD Customer")
-    HD_Customer_Member = frappe.qb.DocType("HD Customer Member")
+    HDCustomer = frappe.qb.DocType("HD Customer")
+    HDCustomerMember = frappe.qb.DocType("HD Customer Member")
 
     query = (
-        frappe.qb.from_(HD_Customer_Member)
-        .where(HD_Customer_Member.contact_name == contact)
-        .join(HD_Customer)
-        .on(HD_Customer.name == HD_Customer_Member.parent)
-        .select(HD_Customer.name, HD_Customer_Member.is_manager)
+        frappe.qb.from_(HDCustomerMember)
+        .where(HDCustomerMember.contact_name == contact)
+        .join(HDCustomer)
+        .on(HDCustomer.name == HDCustomerMember.parent)
+        .select(HDCustomer.name, HDCustomerMember.is_manager)
         .distinct()
     ).run(as_dict=True)
     customers = [d.get("name") for d in query]

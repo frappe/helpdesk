@@ -23,7 +23,7 @@
       />
       <BarChartCard
         v-if="key === 'feedback_received'"
-        :title="__('Avg. Feedback')"
+        :title="__('Avg. Feedback Received')"
         :data="chartData"
         bar-color="#de9736"
         measure="average"

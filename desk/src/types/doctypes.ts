@@ -1,35 +1,22 @@
 interface DocType {
-  name: string;
-  creation: string;
-  modified: string;
-  owner: string;
-  modified_by: string;
-}
+    name: string;
+    creation: string;
+    modified: string;
+    owner: string;
+    modified_by: string;
+  }
 
-interface ChildDocType extends DocType {
-  parent?: string;
-  parentfield?: string;
-  parenttype?: string;
-  idx?: number;
-}
-
-// Last updated: 2026-02-02 17:22:11.094897
+  interface ChildDocType extends DocType {
+    parent?: string;
+    parentfield?: string;
+    parenttype?: string;
+    idx?: number;
+  }
+  
+// Last updated: 2026-03-24 10:41:46.489051
 export interface HDTicketStatus extends DocType {
   /** Color: Select */
-  color?:
-    | "Black"
-    | "Gray"
-    | "Blue"
-    | "Green"
-    | "Red"
-    | "Pink"
-    | "Orange"
-    | "Amber"
-    | "Yellow"
-    | "Cyan"
-    | "Teal"
-    | "Violet"
-    | "purple";
+  color?: 'Black' | 'Gray' | 'Blue' | 'Green' | 'Red' | 'Pink' | 'Orange' | 'Amber' | 'Yellow' | 'Cyan' | 'Teal' | 'Violet' | 'purple';
   /** Label: Data */
   label_agent: string;
   /** Show end users a different view: Check */
@@ -37,12 +24,11 @@ export interface HDTicketStatus extends DocType {
   /** Label (customer view): Data */
   label_customer?: string;
   /** Category: Select */
-  category: "Open" | "Paused" | "Resolved";
+  category: 'Open' | 'Paused' | 'Resolved';
   /** Order: Int */
   order?: number;
   /** Enabled: Check */
   enabled: 0 | 1;
-  parsed_color?: string;
 }
 
 // Last updated: 2026-02-27 16:42:43.292656
@@ -141,7 +127,6 @@ export interface HDTicket extends DocType {
   _assign: string;
 }
 
-// Last updated: 2026-03-03 12:30:01.394107
 // Last updated: 2026-03-03 12:30:01.394107
 export interface AssignmentRuleUser extends ChildDocType {
   /** User: Link (User) */
@@ -328,7 +313,7 @@ export interface HDCustomerMember extends ChildDocType {
   contact_name: string;
 }
 
-// Last updated: 2026-03-10 13:54:06.329471
+// Last updated: 2026-03-24 10:35:49.715062
 export interface HDCustomer extends DocType {
   /** Image: Attach Image */
   image?: string;
@@ -336,8 +321,6 @@ export interface HDCustomer extends DocType {
   customer_name?: string;
   /** Domain: Data */
   domain?: string;
-  /** Contacts: Table (HD Customer Member) */
-  contacts: HDCustomerMember[];
   /** Contacts: Table (HD Customer Member) */
   contacts: HDCustomerMember[];
   /** Mobile No: Data */
