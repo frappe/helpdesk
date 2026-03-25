@@ -226,7 +226,7 @@ interface NumberCardData {
 }
 
 interface ChartData {
-  data: ChartValues;
+  data: ChartValues[];
   title: string;
   type: "axis" | "pie";
 }

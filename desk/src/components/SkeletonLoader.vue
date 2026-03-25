@@ -112,7 +112,7 @@ const props = defineProps({
   },
   numberCardsCount: { type: Number, default: 5 },
   barChartCount: { type: Number, default: 4 },
-  barHeights: { type: Array, default: () => [63, 95, 44, 37, 19] },
+  barHeights: { type: Array, default: () => [63, 95, 44, 37, 70] },
   hasAppliedFilter: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
   emptyStates: {
