@@ -91,7 +91,6 @@
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4"
         v-if="!numberCards.loading"
       >
-        {{ trendData.data[0] }}
         <Tooltip
           v-for="(config, index) in numberCards.data"
           :text="config.tooltip"
@@ -387,7 +386,7 @@ watch(activeTab, (val) => {
 watch(
   () => filters.team,
   (newVal) => {
-    filters.agent = null;
+    filters.agent = null; // Reset agent when team is selected
     if (newVal) {
       teamMembers.update({
         params: {
@@ -397,7 +396,7 @@ watch(
       teamMembers.reload();
     }
     if (!newVal) {
-      agentFilter.value = null;
+      agentFilter.value = null; // Reset agent filter if no team is selected
     }
   }
 );
@@ -494,7 +493,7 @@ const options = computed(() => [
         datePickerRef.value?.open();
       }, 0);
       preset.value = __("Custom Range");
-      filters.period = null;
+      filters.period = null; // Reset period to allow custom date selection
     },
   },
 ]);

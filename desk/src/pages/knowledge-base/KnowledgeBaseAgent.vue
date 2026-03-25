@@ -415,7 +415,7 @@ const options = computed(() => {
         ? __(
             "No articles found for the applied filters. Try adjusting or clearing your filters."
           )
-        : undefined,
+        : "No articles found in the following category.",
     },
     rowRoute: {
       name: "Article",
