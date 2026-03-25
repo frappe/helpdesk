@@ -163,8 +163,6 @@
             class="w-40"
           />
         </div>
-
-        <!-- Availability Status -->
         <div class="flex items-center justify-between mt-6">
           <div class="flex flex-col gap-1">
             <span class="text-base font-medium text-ink-gray-8">
@@ -182,8 +180,6 @@
             class="w-40"
           />
         </div>
-
-        <!-- Signature -->
         <div class="flex flex-col gap-2 mt-6">
           <div class="flex flex-col gap-1">
             <span class="text-base font-medium text-ink-gray-8">

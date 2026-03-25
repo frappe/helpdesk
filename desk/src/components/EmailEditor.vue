@@ -339,7 +339,7 @@ const sendMail = createResource({
       to: toEmailsClone.value.join(","),
       cc: ccEmailsClone.value?.join(","),
       bcc: bccEmailsClone.value?.join(","),
-      // Append signature to the actual sent message
+      // Append signature 
       message:
         newEmail.value +
         (quotedContentRef.value
