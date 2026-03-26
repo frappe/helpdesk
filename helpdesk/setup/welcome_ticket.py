@@ -16,13 +16,13 @@ Here's how to read this screen:<br>
 <b>Reply:</b> Respond to the customer (sends an email)<br>
 <b>Comment:</b> Internal notes for your team (not visible to customers)<br>
 <br><br>
-<img src="/src/assets/images/demo1.gif" style="width: 100%; max-width: 560px; border-radius: 10px; margin: 16px 0; display: block;">
+<img src="/assets/helpdesk/desk/demo1.gif" style="width: 100%; max-width: 560px; border-radius: 10px; margin: 16px 0; display: block;">
 <br><br>
 <b>Right side:</b> Manage the ticket — Assign to yourself or a teammate, Set priority, type, and customer, Update status<br>
-<img src="/src/assets/images/demo2.gif" style="width: 100%; max-width: 560px; border-radius: 10px; margin: 16px 0; display: block;">
+<img src="/assets/helpdesk/desk/demo2.gif" style="width: 100%; max-width: 560px; border-radius: 10px; margin: 16px 0; display: block;">
 <br><br>
 <b>Top:</b> SLA tracking + source — First response and resolution timers, See where the ticket came from (email or portal)
-<img src="/src/assets/images/timers.png" style="width: 100%; max-width: 560px; border-radius: 10px; margin: 16px 0; display: block;">
+<img src="/assets/helpdesk/desk/timers.png" style="width: 100%; max-width: 560px; border-radius: 10px; margin: 16px 0; display: block;">
 <br><br>
 What you can do next:<br>
 <ul style="padding-left: 20px; margin: 0;">
