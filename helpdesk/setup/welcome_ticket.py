@@ -4,7 +4,7 @@ from frappe.desk.form.assign_to import add as add_assign
 AUTHOR_EMAIl = "john@example.com"
 AUTHOR_NAME = "John Doe"
 CONTENT = """
-<p style="font-family: 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.8; color: #374151; max-width: 560px; margin: 0 auto;">
+<div style="font-family: 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.8; color: #374151; max-width: 560px; margin: 0 auto;">
 Hi 👋
 <br><br>
 We thought we'd use this space to give you a quick walkthrough while you're here 🙂
@@ -36,10 +36,10 @@ What you can do next:<br>
 You can explore on your own, or just reply to this ticket to see how it works.
 <br><br>
 If you need help, reach out to us here: <a href="https://support.frappe.io/helpdesk" style="color: #3b82f6;">https://support.frappe.io/helpdesk</a>
-<br><br>
+<img src="/path/to/logo.png" alt="Frappe" style="width: 120px; display: block; margin-bottom: 12px;">
 Best,<br>
 Team Frappe
-</p>
+</div>
 """
 
 
