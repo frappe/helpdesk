@@ -24,8 +24,6 @@ class TestHDAgent(FrappeTestCase):
     def test_unauthorized_role_update(self):
         frappe.set_user(self.test_user)
 
-        frappe.flags.in_test = False
-
         with self.assertRaises(frappe.PermissionError):
             update_agent_role(self.test_user, "System Manager")
 
