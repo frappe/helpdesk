@@ -141,7 +141,7 @@
               "Showing {0} of {1} {2}",
               chartConfig?.tickets?.length + "",
               chartConfig?.totalPendingTickets + "",
-              chartConfig?.tickets?.length > 1 ? "tickets" : "ticket"
+              chartConfig?.tickets?.length > 1 ? __("tickets") : __("ticket")
             )
           }}
         </div>
