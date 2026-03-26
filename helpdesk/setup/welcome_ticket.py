@@ -25,7 +25,7 @@ Need to share thoughts or updates with your team instead? Use the <b>Comment</b>
 <br>
 In the <b>Ticket Sidebar</b>, you can manage the ticket. You can assign it to yourself or a teammate, set the priority, type, and customer, and update the status.
 <br>
-<img src="/assets/helpdesk/desk/demo2.gif" style="width: 100%; max-width: 560px;  margin: 16px 0; display: block;">
+<img src="/assets/helpdesk/desk/sidebar.gif" style="width: 100%; max-width: 560px;  margin: 16px 0; display: block;">
 <br>
 <b>SLA tracking + source</b> — first response and resolution timers, See where the ticket came from (email or portal)
 <br>
