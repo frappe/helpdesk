@@ -1,6 +1,10 @@
 <template>
   <div
-    class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,1)_30%,_rgba(255,255,255,0.8)_30%,_rgba(255,255,255,0)_70%)]"
+    class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
+    :style="{
+      backgroundImage:
+        'radial-gradient(ellipse at center, rgba(255, 255, 255, 1) 30%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 0) 70%)',
+    }"
   >
     <div class="space-y-1.5 w-64 p-2 rounded-2xl border-0">
       <div class="text-ink-gray-9 font-semibold text-center text-base">

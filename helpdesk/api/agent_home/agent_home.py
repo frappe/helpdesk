@@ -543,9 +543,9 @@ def _get_upcoming_sla_tickets(limit=10):
     filters = [
         ["sla", "!=", ""],
         ["agreement_status", "in", ["First Response Due", "Resolution Due"]],
-        ["status_category", "!=", "Resolved"],
-        ["status", "!=", "Closed"],
+        ["status_category", "=", "Open"],
         ["_assign", "like", f"%{frappe.session.user}%"],
+        ["creation", ">", "2025-05-20 00:00:00"],
     ]
 
     tickets = frappe.get_list(
@@ -624,6 +624,13 @@ def _get_new_tickets(limit=10):
     if not ticket_names:
         return [], 0
 
+    filters = [
+        ["name", "in", ticket_names],
+        ["_assign", "like", f"%{frappe.session.user}%"],
+        ["status_category", "=", "Open"],
+        ["creation", ">", "2025-05-20 00:00:00"],
+    ]
+
     tickets = frappe.get_list(
         "HD Ticket",
         fields=[
@@ -635,11 +642,7 @@ def _get_new_tickets(limit=10):
             "agent_group",
             "creation",
         ],
-        filters=[
-            ["name", "in", ticket_names],
-            ["_assign", "like", f"%{frappe.session.user}%"],
-            ["status_category", "=", "Open"],
-        ],
+        filters=filters,
         order_by="creation desc",
         limit=limit,
     )
@@ -650,13 +653,7 @@ def _get_new_tickets(limit=10):
             "text": "Recently assigned",
         }
 
-    total_count = get_ticket_count(
-        filters=[
-            ["name", "in", ticket_names],
-            ["_assign", "like", f"%{frappe.session.user}%"],
-            ["status_category", "=", "Open"],
-        ]
-    )
+    total_count = get_ticket_count(filters=filters)
 
     return tickets, total_count
 
@@ -664,10 +661,10 @@ def _get_new_tickets(limit=10):
 def _get_pending_response_tickets(limit=10):
     filters = [
         ["_assign", "like", f"%{frappe.session.user}%"],
-        ["status_category", "!=", "Resolved"],
-        ["status", "!=", "Closed"],
+        ["status_category", "=", "Open"],
         ["last_customer_response", "is", "set"],
         ["last_agent_response", "is", "not set"],
+        ["creation", ">", "2025-05-20 00:00:00"],
     ]
 
     tickets = frappe.get_list(
