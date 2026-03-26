@@ -87,14 +87,14 @@ export const useCustomer = (
   }
   const isCustomerInfoChanged = computed(() => {
     return (
-      state.domain !== doc.doc?.domain ||
-      state.image !== doc.doc?.image ||
-      state.country !== doc.doc?.country
+      state.domain !== (doc.doc?.domain || "") ||
+      state.image !== (doc.doc?.image || "") ||
+      state.country !== (doc.doc?.country || "")
     );
   });
   const hasNameChanged = computed(() => state.name !== doc.doc?.customer_name);
   const isDirty = computed(() => {
-    return isCustomerInfoChanged.value || hasNameChanged.value;
+    return isCustomerInfoChanged.value || hasNameChanged.value || false;
   });
 
   return {

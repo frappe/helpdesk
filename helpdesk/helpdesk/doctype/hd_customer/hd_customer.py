@@ -52,9 +52,8 @@ class HDCustomer(Document):
         )
         primary_contacts = [contact for contact in self.contacts if contact.is_primary]
 
-        print("\n\n", primary_contacts, "\n\n")
-        if len(primary_contacts) == 0 and len(old_contacts) > 0:
-            frappe.throw(_("At least one primary contact is required"))
+        # if len(primary_contacts) == 0 and len(old_contacts) > 0:
+        #     frappe.throw(_("At least one primary contact is required"))
 
         if len(primary_contacts) > 1:
             frappe.throw(_("Only one primary contact is allowed"))
@@ -67,6 +66,7 @@ class HDCustomer(Document):
     def before_save(self):
         self.set_primary_contact_details()
         self.set_manager_if_not_exists()
+        self.link_contact_to_user()
         self.handle_roles()
 
     def set_primary_contact_details(self):
@@ -107,6 +107,10 @@ class HDCustomer(Document):
         for contact in self.contacts:
             contact.is_manager = contact.contact_name == primary_contact
 
+    def link_contact_to_user(self):
+        for contact in self.contacts:
+            self.create_user_if_not_exist(contact.get("contact_name"))
+
     def handle_roles(self):
         # if any contact has is_manager set to true, then set the role of that contact to Customer Manager, and remove the role from other contacts
         if frappe.flags.ignore_customer_role:
@@ -127,8 +131,8 @@ class HDCustomer(Document):
                 user_doc.remove_roles("HD Customer Manager")
             user_doc.save()
 
-    def get_user(self, contact_name, throw=True):
-        user = frappe.get_value("Contact", contact_name, "user")
+    def get_user(self, contact_name, throw_error=True):
+        user = frappe.db.get_value("Contact", contact_name, "user")
         if user:
             return user
 
@@ -138,7 +142,7 @@ class HDCustomer(Document):
             if user := frappe.db.exists("User", email):
                 frappe.db.set_value("Contact", contact_name, "user", user)
             return user
-        elif throw:
+        elif throw_error:
             frappe.throw(_("No user linked to contact {0}").format(contact_name))
         else:
             return None
@@ -202,7 +206,6 @@ class HDCustomer(Document):
             contacts = frappe.parse_json(contacts)
             is_manager = role == "HD Customer Manager"
             for contact in contacts:
-                self.create_user_if_not_exist(contact)
                 self.append(
                     "contacts", {"contact_name": contact, "is_manager": is_manager}
                 )
@@ -211,14 +214,15 @@ class HDCustomer(Document):
             frappe.throw(_("Invalid users data"))
 
     def create_user_if_not_exist(self, contact):
-        user_linked = self.get_user(contact, throw=False)
+        user_linked = self.get_user(contact, throw_error=False)
         if user_linked:
             return
         invite_user(contact)
 
     @frappe.whitelist()
-    @agent_only
     def get_pending_invites(self):
+        if "Agent Manager" not in frappe.get_roles():
+            frappe.throw(_("You do not have permission to access this resource."))
         pending_invites = frappe.db.get_all(
             "User Invitation",
             filters={

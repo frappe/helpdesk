@@ -17,12 +17,7 @@
         </Button>
       </template>
     </LayoutHeader>
-    <ListViewBuilder
-      ref="listViewRef"
-      :options="options"
-      @row-click="openCustomer"
-      @empty-state-action="isDialogVisible = true"
-    />
+    <ListViewBuilder :options="options" />
     <NewCustomerDialog v-model="isDialogVisible" />
   </div>
 </template>
@@ -30,27 +25,18 @@
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import NewCustomerDialog from "@/components/customer/NewCustomerDialog.vue";
+import OrganizationsIcon from "@/components/icons/OrganizationsIcon.vue";
+import { __ } from "@/translation";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
-import { useRouter } from "vue-router";
-
-const router = useRouter();
 
 const isDialogVisible = ref(false);
-const isCustomerDialogVisible = ref(false);
-const selectedCustomer = ref(null);
 const listViewRef = ref(null);
 // const emptyMessage = "No Customers Found";
 const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
 );
 
-function openCustomer(id: string) {
-  // move to route named "Customer" with id as param
-  router.push({ name: "Customer", params: { id } });
-  // selectedCustomer.value = id;
-  // isCustomerDialogVisible.value = true;
-}
 const options = computed(() => {
   return {
     doctype: "HD Customer",
@@ -79,6 +65,10 @@ const options = computed(() => {
       icon: h(OrganizationsIcon, {
         class: "h-10 w-10",
       }),
+    },
+    rowRoute: {
+      name: "Customer",
+      prop: "id",
     },
   };
 });

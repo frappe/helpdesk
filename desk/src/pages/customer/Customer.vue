@@ -136,7 +136,7 @@ onMounted(() => {
 
 usePageMeta(() => {
   return {
-    title: props.id,
+    title: `Customer: ${props.id}`,
   };
 });
 </script>

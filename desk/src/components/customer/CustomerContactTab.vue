@@ -4,7 +4,7 @@
       <p class="mt-2.5 mb-4.5 font-semibold text-lg">{{ __("Contacts") }}</p>
       <div class="flex items-center gap-1">
         <Button
-          v-if="pendingInvitesLabel"
+          v-if="pendingInvitesLabel && hasPermission()"
           variant="ghost"
           @click="showPendingInvites = true"
         >

@@ -96,8 +96,8 @@
               label="Save"
               theme="gray"
               variant="solid"
-              :loading="customer.setValue.loading"
-              @click.prevent="save"
+              :loading="loading || customer.setValue.loading"
+              @click.prevent="save()"
             />
           </div>
         </div>
@@ -120,7 +120,7 @@ import {
   FormControl,
   toast,
 } from "frappe-ui";
-import { inject } from "vue";
+import { inject, ref } from "vue";
 import { useRouter } from "vue-router";
 import Link from "../frappe-ui/Link.vue";
 import { OrganizationsIcon } from "../icons";
@@ -136,26 +136,47 @@ const { state, isDirty, hasNameChanged, isCustomerInfoChanged } = useCustomer(
   customer
 );
 
+const loading = ref(false);
+
 async function save() {
   if (!isDirty.value) {
     return;
   }
-  if (hasNameChanged.value) {
-    await callRenameDoc();
-    router.replace({ name: "Customer", params: { id: state.name } });
+  loading.value = true;
+  try {
+    if (hasNameChanged.value) {
+      const newName = await callRenameDoc();
+      if (isCustomerInfoChanged.value) {
+        // Use raw call after rename since the `createDocumentResource` still holds the old name
+        await call("frappe.client.set_value", {
+          doctype: "HD Customer",
+          name: newName,
+          fieldname: {
+            domain: state.domain,
+            country: state.country,
+            image: state.image,
+          },
+        });
+      }
+      toast.success(__("Customer updated"));
+      await router.replace({ name: "Customer", params: { id: newName } });
+      window.location.reload();
+      return;
+    }
+    if (isCustomerInfoChanged.value) {
+      await customer.setValue.submit({
+        name: state.name,
+        domain: state.domain,
+        country: state.country,
+        image: state.image,
+      });
+    }
+    toast.success(__("Customer updated"));
+    emit("update");
+  } finally {
+    loading.value = false;
   }
-  if (isCustomerInfoChanged.value) {
-    await customer.setValue.submit({
-      name: state.name,
-      domain: state.domain,
-      country: state.country,
-      image: state.image,
-    });
-  }
-  toast.success(__("Customer updated"));
-  emit("update");
 }
-
 async function callRenameDoc() {
   return call("frappe.client.rename_doc", {
     doctype: "HD Customer",

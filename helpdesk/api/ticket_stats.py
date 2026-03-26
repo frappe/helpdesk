@@ -356,7 +356,7 @@ def get_ticket_stats(
     scope = _resolve_scope(dt)
 
     return {
-        "total_tickets": _get_total_tickets(scope, dn, period),
+        # "total_tickets": _get_total_tickets(scope, dn, period),
         "feedback_received": _get_feedback_received(scope, dn, period),
         "sla_violations": _get_sla_violations(scope, dn, period),
         "avg_first_response_time": get_avg_time_metric(
