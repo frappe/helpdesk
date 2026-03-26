@@ -606,7 +606,7 @@ def _get_upcoming_sla_tickets(limit=10):
 
 
 def _get_new_tickets(limit=10):
-    one_day_ago = frappe.utils.add_to_date(frappe.utils.now_datetime(), hours=-24)
+    one_week_ago = frappe.utils.add_to_date(frappe.utils.now_datetime(), days=-7)
 
     ToDo = DocType("ToDo")
     assigned_tickets = (
@@ -615,7 +615,7 @@ def _get_new_tickets(limit=10):
         .distinct()
         .where(ToDo.reference_type == "HD Ticket")
         .where(ToDo.allocated_to == frappe.session.user)
-        .where(ToDo.creation >= one_day_ago)
+        .where(ToDo.creation >= one_week_ago)
         .where(ToDo.status == "Open")
         .run(as_dict=False)
     )

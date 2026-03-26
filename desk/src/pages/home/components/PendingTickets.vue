@@ -226,7 +226,7 @@ const currentTitle = computed(() => {
 
 const tooltipTexts: Record<string, string> = {
   upcoming_sla: __("Tickets approaching or breached SLA"),
-  new_tickets: __("Tickets assigned to you in the last 24 hours"),
+  new_tickets: __("Tickets assigned to you in the last 7 days"),
   pending: __("Tickets that are awaiting your response"),
 };
 const tooltipText = computed(() => {
@@ -241,7 +241,7 @@ const emptyStateLabel: Record<string, { title: string; description: string }> =
     },
     new_tickets: {
       title: __("No recently assigned tickets"),
-      description: __("No new tickets assigned to you in the last 24 hours"),
+      description: __("No new tickets assigned to you in the last 7 days"),
     },
     pending: {
       title: __("No pending tickets"),
