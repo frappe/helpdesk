@@ -153,7 +153,13 @@ import { __ } from "@/translation";
 
 const { isManager, userId } = useAuthStore();
 
-const filters = reactive({
+type Filters = {
+  period: string;
+  agent: null | string;
+  team: null | string;
+};
+
+const filters = reactive<Filters>({
   period: getLastXDays(),
   agent: null,
   team: null,
@@ -172,17 +178,21 @@ const colors = [
   "#A6B1B9",
 ];
 
+const parseFilters = (filters: Filters) => {
+  return {
+    from_date: filters.period.split(",")[0],
+    to_date: filters.period.split(",")[1],
+    team: filters.team,
+    agent: filters.agent,
+  };
+};
+
 const numberCards = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   cache: ["Analytics", "NumberCards"],
   params: {
     dashboard_type: "number_card",
-    filters: {
-      from_date: filters.period.split(",")[0],
-      to_date: filters.period.split(",")[1],
-      team: filters.team,
-      agent: filters.agent,
-    },
+    filters: parseFilters(filters),
   },
 });
 
@@ -191,12 +201,7 @@ const masterData = createResource({
   cache: ["Analytics", "MasterCharts"],
   params: {
     dashboard_type: "master",
-    filters: {
-      from_date: filters.period.split(",")[0],
-      to_date: filters.period.split(",")[1],
-      team: filters.team,
-      agent: filters.agent,
-    },
+    filters: parseFilters(filters),
   },
 });
 
@@ -205,12 +210,7 @@ const trendData = createResource({
   cache: ["Analytics", "TrendCharts"],
   params: {
     dashboard_type: "trend",
-    filters: {
-      from_date: filters.period.split(",")[0],
-      to_date: filters.period.split(",")[1],
-      team: filters.team,
-      agent: filters.agent,
-    },
+    filters: parseFilters(filters),
   },
 });
 

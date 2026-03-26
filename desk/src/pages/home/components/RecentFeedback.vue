@@ -9,7 +9,7 @@
           <TabButtons
             :buttons="chartTabs"
             v-model="currentTab"
-            class="sm:hidden"
+            class="sm:hidden z-20"
           />
         </div>
         <!-- Left Panel: Summary Stats -->
@@ -85,7 +85,7 @@
           :class="{ 'hidden sm:flex': currentTab === 'rating' }"
         >
           <!-- Filters -->
-          <div class="flex items-center gap-2 justify-between mb-3">
+          <div class="flex items-center gap-2 justify-between mb-3 z-20">
             <Dropdown
               v-if="!showDatePicker && currentPeriod !== 'custom_range'"
               :options="periodOptions"
@@ -114,7 +114,7 @@
               v-model="customDateRange"
               :placeholder="__('Select range')"
               @update:model-value="onCustomRangeSelected"
-              :formatter="formatDateRange"
+              :format="dateFormat"
               @click="datePickerRef?.open()"
               placement="top-start"
               class="w-[228px]"
@@ -326,6 +326,7 @@ const currentSort = ref("positive_first");
 const showDatePicker = ref(false);
 const datePickerRef = ref<{ open: () => void } | null>(null);
 const customDateRange = ref<string | undefined>(undefined);
+const dateFormat = window.date_format.toUpperCase();
 
 const periodOptions = computed(() => [
   {
@@ -375,10 +376,6 @@ const periadLabels: Record<string, string> = {
 };
 
 const currentPeriodLabel = computed(() => {
-  if (currentPeriod.value === "custom_range" && customDateRange.value) {
-    const [from, to] = customDateRange.value.split(",");
-    return `${formatDateRange(from)} – ${formatDateRange(to)}`;
-  }
   return periadLabels[currentPeriod.value] || __("All Time");
 });
 
@@ -422,15 +419,6 @@ const onCustomRangeSelected = (range: string) => {
   currentIndex.value = 0;
   getRecentFeedbackResource.fetch();
 };
-
-function formatDateRange(date: string) {
-  const d = new Date(date);
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: d.getFullYear() === new Date().getFullYear() ? undefined : "numeric",
-  });
-}
 
 const chartConfig = computed(() => {
   const _data = getRecentFeedbackResource.data ?? props.data;

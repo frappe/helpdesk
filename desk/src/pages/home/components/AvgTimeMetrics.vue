@@ -34,7 +34,7 @@
           v-model="customDateRange"
           :placeholder="__('Select range')"
           @update:model-value="onCustomRangeSelected"
-          :formatter="formatDateRange"
+          :format="dateFormat"
           @click="datePickerRef?.open()"
           placement="bottom-end"
           class="w-[228px]"
@@ -167,6 +167,7 @@ const props = defineProps({
 const currentDuration = ref("6m");
 const datePickerRef = ref<{ open: () => void } | null>(null);
 const customDateRange = ref<string | undefined>(undefined);
+const dateFormat = window.date_format.toUpperCase();
 
 const durationLabels: Record<string, string> = {
   "3m": __("3 Months"),
@@ -176,21 +177,8 @@ const durationLabels: Record<string, string> = {
 };
 
 const currentDurationLabel = computed(() => {
-  if (currentDuration.value === "custom_range" && customDateRange.value) {
-    const [from, to] = customDateRange.value.split(",");
-    return `${formatDateRange(from)} – ${formatDateRange(to)}`;
-  }
   return durationLabels[currentDuration.value] || __("6 Months");
 });
-
-function formatDateRange(date: string) {
-  const d = new Date(date);
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: d.getFullYear() === new Date().getFullYear() ? undefined : "numeric",
-  });
-}
 
 const durationOptions = computed(() => [
   {
