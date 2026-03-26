@@ -78,7 +78,7 @@
                   v-else-if="ticket.reason.type === 'pending'"
                   class="size-4 flex-shrink-0"
                 />
-                <span class="truncate">{{ ticket.reason.text }}</span>
+                <span class="truncate pr-2">{{ ticket.reason.text }}</span>
               </div>
               <span
                 v-else
@@ -95,25 +95,25 @@
             :class="i > 1 ? 'border-t border-gray-200' : ''"
           >
             <td class="p-2 py-3 min-w-8">
-              <div class="h-4 w-full bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 w-full max-w-0">
-              <div class="h-4 w-full bg-surface-gray-1 max-w-full" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1 max-w-full" />
             </td>
             <td class="p-2 py-3 min-w-14">
-              <div class="h-4 w-full bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-21">
-              <div class="h-4 w-full bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-28">
-              <div class="h-4 w-full bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-40">
-              <div class="h-4 w-full bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
             </td>
           </tr>
-          <TableEmptyState
+          <EmptyState2
             v-if="chartConfig?.tickets?.length === 0"
             :title="emptyState.title"
             :description="emptyState.description"
@@ -160,7 +160,7 @@ import TimerIcon from "~icons/lucide/timer";
 import TicketPlusIcon from "~icons/lucide/ticket-plus";
 import CalendarIcon from "~icons/lucide/calendar";
 import { View } from "@/types";
-import TableEmptyState from "@/components/TableEmptyState.vue";
+import EmptyState2 from "@/components/EmptyState2.vue";
 
 interface TicketReason {
   type: string;
@@ -201,7 +201,7 @@ const { views } = useView("HD Ticket");
 const currentTab = ref("upcoming_sla");
 const chartTabs = [
   {
-    label: __("SLA Alerts"),
+    label: __("SLA"),
     value: "upcoming_sla",
   },
   {

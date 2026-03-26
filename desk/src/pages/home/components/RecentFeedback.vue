@@ -28,7 +28,10 @@
             />
           </div>
           <!-- Average Rating -->
-          <div class="flex items-end justify-between gap-4">
+          <div
+            v-if="chartConfig.totalFeedbacks > 0"
+            class="flex items-end justify-between gap-4"
+          >
             <div class="flex flex-col gap-1">
               <div class="flex items-center gap-1">
                 <LucideStar class="size-4 fill-[#de9735] text-[#de9735]" />
@@ -49,6 +52,17 @@
               {{ performance }}!
             </div>
           </div>
+          <div v-else>
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-1">
+                <div class="size-4 bg-surface-gray-1 rounded-sm" />
+                <div class="w-12 h-4 bg-surface-gray-1 rounded-sm" />
+              </div>
+            </div>
+            <div class="text-sm mt-3">
+              <div class="w-24 h-4 bg-surface-gray-1 rounded-sm" />
+            </div>
+          </div>
           <!-- Bar Chart -->
           <div class="h-32 mt-2 w-full px-4">
             <ECharts
@@ -63,7 +77,7 @@
             />
           </div>
         </div>
-        <div class="hidden sm:block h-full w-[1px] bg-surface-gray-2"></div>
+        <div class="hidden sm:block h-full w-[1px] bg-surface-gray-1" />
 
         <!-- Right Panel: Feedback Card -->
         <div
@@ -102,7 +116,7 @@
               @update:model-value="onCustomRangeSelected"
               :formatter="formatDateRange"
               @click="datePickerRef?.open()"
-              placement="top"
+              placement="top-start"
               class="w-[228px]"
             />
             <Dropdown :options="sortOptions" placement="right">
@@ -126,105 +140,123 @@
             </Dropdown>
           </div>
 
-          <!-- Feedback Card -->
-          <div
-            v-if="currentFeedback && chartConfig.totalFeedbacks > 0"
-            class="flex-1 flex flex-col rounded-lg mt-2"
-          >
-            <!-- Ticket Info -->
-            <div class="flex items-center gap-1 text-base text-ink-gray-5">
-              <div
-                class="flex items-center gap-0.5 hover:text-ink-gray-7 cursor-pointer font-medium"
-                @click="goToTicket(currentFeedback)"
-              >
-                <FeatherIcon name="arrow-up-right" class="size-4" />
-                {{ currentFeedback.name }}
-              </div>
-              <span class="text-ink-gray-4">·</span>
-              <span class="truncate text-ink-gray-7 font-medium">{{
-                currentFeedback.subject
-              }}</span>
-            </div>
-            <hr class="my-2" />
-            <!-- Rating & Title -->
-            <div class="flex items-center gap-2 mb-2">
-              <div
-                class="flex items-center gap-1 p-1 pl-0 rounded"
-                :class="[getRatingColor(currentFeedback.star_rating).text]"
-              >
-                <LucideStar
-                  class="size-3.5"
-                  :class="getRatingColor(currentFeedback.star_rating).text"
-                />
-                <span
-                  class="text-base font-medium text-ink-gray-7"
-                  :class="getRatingColor(currentFeedback.star_rating).text"
-                  >{{ currentFeedback.star_rating }}</span
+          <div class="flex-1 flex flex-col min-h-0">
+            <!-- Feedback Card -->
+            <div
+              v-if="currentFeedback && chartConfig.totalFeedbacks > 0"
+              class="flex-1 flex flex-col rounded-lg mt-2 relative z-20"
+            >
+              <!-- Ticket Info -->
+              <div class="flex items-center gap-1 text-base text-ink-gray-5">
+                <div
+                  class="flex items-center gap-0.5 hover:text-ink-gray-7 cursor-pointer font-medium"
+                  @click="goToTicket(currentFeedback)"
                 >
+                  <FeatherIcon name="arrow-up-right" class="size-4" />
+                  {{ currentFeedback.name }}
+                </div>
+                <span class="text-ink-gray-4">·</span>
+                <span class="truncate text-ink-gray-7 font-medium">{{
+                  currentFeedback.subject
+                }}</span>
               </div>
-              <span class="text-base text-ink-gray-7 font-medium">{{
-                currentFeedback.feedback || __("Feedback")
-              }}</span>
-            </div>
+              <hr class="my-2" />
+              <!-- Rating & Title -->
+              <div class="flex items-center gap-2 mb-2">
+                <div
+                  class="flex items-center gap-1 p-1 pl-0 rounded"
+                  :class="[getRatingColor(currentFeedback.star_rating).text]"
+                >
+                  <LucideStar
+                    class="size-3.5"
+                    :class="getRatingColor(currentFeedback.star_rating).text"
+                  />
+                  <span
+                    class="text-base font-medium text-ink-gray-7"
+                    :class="getRatingColor(currentFeedback.star_rating).text"
+                    >{{ currentFeedback.star_rating }}</span
+                  >
+                </div>
+                <span class="text-base text-ink-gray-7 font-medium">{{
+                  currentFeedback.feedback || __("Feedback")
+                }}</span>
+              </div>
 
-            <!-- Feedback Text -->
-            <div class="text-p-base text-ink-gray-7 mb-3 line-clamp-3">
-              {{
-                currentFeedback.feedback_extra || __("No additional comments")
-              }}
-            </div>
+              <!-- Feedback Text -->
+              <div class="text-p-base text-ink-gray-7 mb-3 line-clamp-3">
+                {{
+                  currentFeedback.feedback_extra || __("No additional comments")
+                }}
+              </div>
 
-            <!-- Contact & Navigation -->
-            <div class="flex items-center justify-between mt-auto">
-              <div class="flex items-center gap-1">
-                <Avatar
-                  :image="currentFeedback.contact_image"
-                  :label="
+              <!-- Contact & Navigation -->
+              <div class="flex items-center justify-between mt-auto">
+                <div class="flex items-center gap-1">
+                  <Avatar
+                    :image="currentFeedback.contact_image"
+                    :label="
+                      currentFeedback.contact_name || currentFeedback.contact
+                    "
+                    size="sm"
+                  />
+                  <span class="text-sm text-ink-gray-6">{{
                     currentFeedback.contact_name || currentFeedback.contact
-                  "
-                  size="sm"
-                />
-                <span class="text-sm text-ink-gray-6">{{
-                  currentFeedback.contact_name || currentFeedback.contact
-                }}</span>
-                <span class="text-sm text-ink-gray-4">·</span>
-                <span class="text-sm text-ink-gray-5">{{
-                  timeAgo(currentFeedback.modified)
-                }}</span>
+                  }}</span>
+                  <span class="text-sm text-ink-gray-4">·</span>
+                  <span class="text-sm text-ink-gray-5">{{
+                    timeAgo(currentFeedback.modified)
+                  }}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    @click="prevFeedback"
+                    :disabled="currentIndex === 0"
+                  >
+                    <FeatherIcon name="chevron-left" class="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    @click="nextFeedback"
+                    :disabled="currentIndex >= chartConfig.feedbacks.length - 1"
+                  >
+                    <FeatherIcon name="chevron-right" class="size-4" />
+                  </Button>
+                </div>
               </div>
-              <div class="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  @click="prevFeedback"
-                  :disabled="currentIndex === 0"
-                >
-                  <FeatherIcon name="chevron-left" class="size-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  @click="nextFeedback"
-                  :disabled="currentIndex >= chartConfig.feedbacks.length - 1"
-                >
-                  <FeatherIcon name="chevron-right" class="size-4" />
-                </Button>
+            </div>
+            <div
+              v-else
+              class="flex-1 flex flex-col rounded-lg mt-2 select-none pointer-events-none"
+            >
+              <div class="flex items-center gap-1 py-1">
+                <div class="w-64 h-4 bg-surface-gray-1 rounded-sm" />
+              </div>
+              <hr class="my-2 border-surface-gray-2" />
+              <div class="flex items-center gap-2 mb-3 mt-1">
+                <div class="w-12 h-5 bg-surface-gray-1 rounded-sm" />
+                <div class="w-56 h-5 bg-surface-gray-1 rounded-sm" />
+              </div>
+              <div class="w-48 h-4 bg-surface-gray-1 rounded-sm mb-3" />
+              <div class="flex items-center justify-between mt-auto">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-surface-gray-1" />
+                  <div class="w-32 h-3 bg-surface-gray-1 rounded-sm" />
+                </div>
+                <div class="flex items-center gap-1">
+                  <div class="w-16 h-6 bg-surface-gray-1 rounded-sm" />
+                </div>
               </div>
             </div>
           </div>
-          <div
-            v-else
-            class="flex flex-col justify-center items-center text-center gap-2 h-full w-full"
-          >
-            <div class="flex flex-col gap-2 max-w-60">
-              <div class="text-base font-medium text-ink-gray-7">
-                {{ __("No feedback") }}
-              </div>
-              <div class="text-base text-ink-gray-6">
-                {{ __("You haven't received any feedback yet") }}
-              </div>
-            </div>
-          </div>
+        </div>
+        <div class="z-10" v-if="chartConfig.totalFeedbacks === 0">
+          <EmptyState2
+            :title="__('No feedback')"
+            :description="__('You haven\'t received any feedback yet')"
+          />
         </div>
       </div>
     </div>
@@ -251,6 +283,7 @@ import { timeAgo } from "@/utils";
 import type { EChartsOption } from "echarts";
 import { useView } from "@/composables/useView";
 import { View } from "@/types";
+import EmptyState2 from "@/components/EmptyState2.vue";
 
 const router = useRouter();
 const chartTabs = [
@@ -515,7 +548,7 @@ const placeholderChartOptions = computed<EChartsOption>(() => {
   const data = placeholderValues.map((value) => ({
     value,
     itemStyle: {
-      color: "#f1f1f1",
+      color: "#F8F8F8",
       borderRadius: [4, 4, 0, 0],
     },
   }));
@@ -531,10 +564,10 @@ const placeholderChartOptions = computed<EChartsOption>(() => {
     xAxis: {
       type: "category",
       data: ["1", "2", "3", "4", "5"],
-      axisLine: { show: true, lineStyle: { color: "#e2e2e2" } },
+      axisLine: { show: true, lineStyle: { color: "#F8F8F8" } },
       axisTick: { show: false },
       axisLabel: {
-        color: "#e2e2e2",
+        color: "#F8F8F8",
         fontSize: 12,
       },
     },

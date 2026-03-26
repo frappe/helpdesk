@@ -6,7 +6,7 @@
       </div>
       <div class="flex items-center gap-2">
         <Dropdown
-          v-if="!showDatePicker && currentDuration !== 'custom_range'"
+          v-if="currentDuration !== 'custom_range'"
           :options="durationOptions"
           placement="right"
         >
@@ -45,15 +45,65 @@
       v-if="
         timeAverages.first_response == '0m' && timeAverages.resolution == '0m'
       "
-      class="flex flex-col justify-center items-center text-center gap-2 h-full w-full"
+      class="relative flex flex-col mt-5 grow w-full select-none"
     >
-      <div class="flex flex-col gap-2 max-w-60">
-        <div class="text-base font-medium text-ink-gray-7">
-          {{ __("No average metrics") }}
+      <div class="flex items-center gap-12">
+        <div>
+          <div
+            class="text-lg font-medium text-ink-gray-8 w-20 rounded-sm h-4 bg-surface-gray-1"
+          />
+          <div
+            class="w-40 rounded-sm h-4 bg-surface-gray-1 text-base flex items-center gap-2 mt-1"
+          />
         </div>
-        <div class="text-base text-ink-gray-6">
-          {{ __("Average response and resolution metrics not available") }}
+        <div>
+          <div
+            class="text-lg font-medium text-ink-gray-8 w-20 rounded-sm h-4 bg-surface-gray-1"
+          />
+          <div
+            class="w-40 rounded-sm h-4 bg-surface-gray-1 text-base flex items-center gap-2 mt-1"
+          />
         </div>
+      </div>
+      <div class="w-full grow pointer-events-none mt-6 relative flex flex-col">
+        <div class="flex-1 relative flex items-end justify-around px-4">
+          <div class="absolute inset-0 flex flex-col justify-between z-0">
+            <div
+              v-for="idx in 5"
+              :key="idx"
+              class="border-t border-dashed border-surface-gray-2 w-full"
+            />
+          </div>
+          <div
+            v-for="idx in 6"
+            :key="idx"
+            class="relative z-10 flex gap-2 h-full items-end pb-0"
+          >
+            <div
+              class="w-[12px] bg-surface-gray-2 rounded-t-sm"
+              :style="{ height: [20, 20, 30, 15, 10, 10][idx - 1] + '%' }"
+            />
+            <div
+              class="w-[12px] bg-surface-gray-2 rounded-t-sm"
+              :style="{ height: [60, 55, 85, 45, 30, 20][idx - 1] + '%' }"
+            />
+          </div>
+        </div>
+        <div class="flex justify-around mt-3 mb-2 px-6">
+          <div
+            class="w-6 h-2 bg-surface-gray-2 rounded"
+            v-for="i in 6"
+            :key="i"
+          />
+        </div>
+      </div>
+      <div class="z-10">
+        <EmptyState2
+          :title="__('No average metrics')"
+          :description="
+            __('Average response and resolution metrics not available')
+          "
+        />
       </div>
     </div>
     <div v-else class="flex flex-col mt-5 grow w-full">
@@ -97,6 +147,7 @@ import {
 } from "frappe-ui";
 import { formatTime } from "@/utils";
 import { __ } from "@/translation";
+import EmptyState2 from "@/components/EmptyState2.vue";
 
 type MetricsData = {
   averages: {
@@ -114,7 +165,6 @@ const props = defineProps({
 });
 
 const currentDuration = ref("6m");
-const showDatePicker = ref(false);
 const datePickerRef = ref<{ open: () => void } | null>(null);
 const customDateRange = ref<string | undefined>(undefined);
 
@@ -158,7 +208,7 @@ const durationOptions = computed(() => [
   {
     label: __("Custom Range"),
     onClick: () => {
-      showDatePicker.value = true;
+      currentDuration.value = "custom_range";
       nextTick(() => {
         datePickerRef.value?.open();
       });
@@ -168,13 +218,11 @@ const durationOptions = computed(() => [
 
 const onCustomRangeSelected = (range: string) => {
   if (!range) {
-    showDatePicker.value = false;
     currentDuration.value = "6m";
     customDateRange.value = undefined;
     getAvgTimeMetricsResource.submit();
     return;
   }
-  showDatePicker.value = false;
   currentDuration.value = "custom_range";
   customDateRange.value = range;
   getAvgTimeMetricsResource.submit();
@@ -314,7 +362,6 @@ const chartConfig = computed<EChartsOption>(() => {
 
 const onDurationChange = (duration: string) => {
   if (currentDuration.value === duration) return;
-  showDatePicker.value = false;
   customDateRange.value = undefined;
   currentDuration.value = duration;
   getAvgTimeMetricsResource.submit();
