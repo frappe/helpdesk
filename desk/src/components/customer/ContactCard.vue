@@ -1,6 +1,7 @@
 <template>
   <div
-    class="rounded-md bg-surface-white border border-gray-200 px-3 py-2.5 flex flex-col gap-2.5"
+    class="rounded-md bg-surface-white border border-gray-200 px-3 py-2.5 flex flex-col gap-2.5 hover:shadow-md hover:cursor-pointer"
+    @click="goToContact"
   >
     <div class="flex items-center justify-between">
       <div class="flex gap-2 items-center min-w-0">
@@ -35,7 +36,7 @@
         :options="dropdownOptions"
         v-if="hasPermission()"
       >
-        <Button class="h-6 w-6 p-0" variant="ghost">
+        <Button class="h-6 w-6 p-0" variant="ghost" @click.stop>
           <LucideMoreHorizontal class="h-4 w-4 text-ink-gray-6" />
         </Button>
       </Dropdown>
@@ -80,6 +81,7 @@ import {
   toast,
 } from "frappe-ui";
 import { computed, inject, markRaw } from "vue";
+import { useRouter } from "vue-router";
 import LucideMail from "~icons/lucide/mail";
 import LucideMoreHorizontal from "~icons/lucide/more-horizontal";
 import LucidePhone from "~icons/lucide/phone";
@@ -90,6 +92,8 @@ const props = defineProps<{
   contact: CustomerContact;
 }>();
 const emit = defineEmits(["update"]);
+const router = useRouter();
+
 const { $dialog } = globalStore();
 const customer = inject(CustomerResourceSymbol)!;
 
@@ -98,6 +102,10 @@ const ticketCountLabel = computed(() => {
   if (count === 0) return __("No active tickets");
   return `${count} ${count === 1 ? __("active ticket") : __("active tickets")}`;
 });
+
+function goToContact() {
+  router.push({ name: "Contact", params: { id: props.contact.contact_name } });
+}
 
 function findPrimaryContact(): HDCustomerMember | undefined {
   return customer.doc.contacts?.find((c) => c.is_primary === 1);

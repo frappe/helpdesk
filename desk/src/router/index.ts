@@ -98,6 +98,12 @@ const routes = [
     component: () => import("@/pages/contact/Contacts.vue"),
   },
   {
+    path: "/contacts/:id",
+    name: "Contact",
+    component: () => import("@/pages/contact/Contact.vue"),
+    props: true,
+  },
+  {
     path: "/agents",
     name: "AgentList",
     redirect: "/tickets",

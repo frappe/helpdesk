@@ -332,3 +332,85 @@ export interface HDCustomer extends DocType {
   /** Country: Link (Country) */
   country?: string;
 }
+
+// Last updated: 2024-03-23 16:03:23.469424
+export interface DynamicLink extends ChildDocType {
+  /** Link Document Type: Link (DocType) */
+  link_doctype: string;
+  /** Link Name: Dynamic Link (link_doctype) */
+  link_name: string;
+  /** Link Title: Read Only */
+  link_title?: string;
+}
+
+// Last updated: 2024-03-23 16:01:31.173691
+export interface ContactEmail extends ChildDocType {
+  /** Email ID: Data */
+  email_id: string;
+  /** Is Primary: Check */
+  is_primary: 0 | 1;
+}
+
+// Last updated: 2024-03-23 16:01:31.293047
+export interface ContactPhone extends ChildDocType {
+  /** Number: Data */
+  phone: string;
+  /** Is Primary Phone: Check */
+  is_primary_phone: 0 | 1;
+  /** Is Primary Mobile: Check */
+  is_primary_mobile_no: 0 | 1;
+}
+
+// Last updated: 2024-03-23 16:01:30.937045
+export interface Contact extends DocType {
+  /** First Name: Data */
+  first_name?: string;
+  /** Last Name: Data */
+  last_name?: string;
+  /** Email Address: Data */
+  email_id?: string;
+  /** User Id: Link (User) */
+  user?: string;
+  /** Status: Select */
+  status?: 'Passive' | 'Open' | 'Replied';
+  /** Salutation: Link (Salutation) */
+  salutation?: string;
+  /** Gender: Link (Gender) */
+  gender?: string;
+  /** Phone: Data */
+  phone?: string;
+  /** Image: Attach Image */
+  image?: string;
+  /** Is Primary Contact: Check */
+  is_primary_contact: 0 | 1;
+  /** Links: Table (Dynamic Link) */
+  links: DynamicLink[];
+  /** Department: Data */
+  department?: string;
+  /** Designation: Data */
+  designation?: string;
+  /** Unsubscribed: Check */
+  unsubscribed: 0 | 1;
+  /** Middle Name: Data */
+  middle_name?: string;
+  /** Email IDs: Table (Contact Email) */
+  email_ids: ContactEmail[];
+  /** Address: Link (Address) */
+  address?: string;
+  /** Contact Numbers: Table (Contact Phone) */
+  phone_nos: ContactPhone[];
+  /** Mobile No: Data */
+  mobile_no?: string;
+  /** Pulled from Google Contacts: Check */
+  pulled_from_google_contacts: 0 | 1;
+  /** Sync with Google Contacts: Check */
+  sync_with_google_contacts: 0 | 1;
+  /** Google Contacts: Link (Google Contacts) */
+  google_contacts?: string;
+  /** Google Contacts Id: Data */
+  google_contacts_id?: string;
+  /** Company Name: Data */
+  company_name?: string;
+  /** Full Name: Data */
+  full_name?: string;
+}

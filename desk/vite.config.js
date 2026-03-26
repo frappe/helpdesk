@@ -36,7 +36,7 @@ export default defineConfig(async ({ mode }) => {
               "hd_agent",
               "hd_customer",
             ],
-            frappe: ["assignment_rule"],
+            frappe: ["assignment_rule", "contact"],
           },
         },
       }),
