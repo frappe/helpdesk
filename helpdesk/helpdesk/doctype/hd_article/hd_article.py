@@ -98,16 +98,22 @@ class HDArticle(Document):
     def set_feedback(self, value: int):
         # 0 empty, 1 like, 2 dislike
         user = frappe.session.user
+
         feedback = frappe.db.exists(
             "HD Article Feedback", {"user": user, "article": self.name}
         )
         if feedback:
+            current_value = frappe.db.get_value(
+                "HD Article Feedback", feedback, "feedback"
+            )
+            if int(current_value) == value:
+                return
             frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
-            return
-
-        frappe.new_doc(
-            "HD Article Feedback", user=user, article=self.name, feedback=value
-        ).insert()
+            frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
+        else:
+            frappe.new_doc(
+                "HD Article Feedback", user=user, article=self.name, feedback=value
+            ).insert()
 
     @property
     def title_slug(self) -> str:

@@ -23,19 +23,13 @@
           {{ __("Add one to get started.") }}
         </div>
       </div>
-      <Button
-        :label="__('New')"
-        variant="outline"
-        icon-left="plus"
-        @click="goToNew()"
-      />
     </div>
     <div v-else class="-ml-2">
       <div
         class="grid grid-cols-6 items-center gap-3 text-sm text-gray-600 ml-2"
       >
         <div class="col-span-5">
-          {{ __("Policy Name") }}
+          {{ __("Policy name") }}
         </div>
         <div class="col-span-1">{{ __("Enabled") }}</div>
       </div>

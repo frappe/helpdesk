@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="text-base font-semibold text-gray-900">
-      {{ __("Ticket settings") }}
+      {{ __("Ticket Settings") }}
     </div>
     <div class="mt-6 flex flex-col gap-6">
       <div class="flex items-center justify-between">
@@ -23,7 +23,7 @@
             __("Enable comment reactions")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
-            __("Allow users to react to comments with emojis")
+            __("Allow users to react to comments with emojis.")
           }}</span>
         </div>
         <Switch v-model="settingsData.enableCommentReactions" />
@@ -95,7 +95,7 @@
                 settingsData.autoUpdateStatus = true;
               } else {
                 settingsData.updateStatusTo = null;
-                settingsData.autoUpdateStatus = false;
+                settingsData.autoUpdateStatus = 0;
               }
             }
           "
@@ -163,7 +163,7 @@
                     settingsData.autoCloseTickets = true;
                   } else {
                     settingsData.autoCloseStatus = null;
-                    settingsData.autoCloseTickets = false;
+                    settingsData.autoCloseTickets = 0;
                   }
                 }
               "

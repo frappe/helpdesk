@@ -42,6 +42,33 @@ def sanitize_query(query: str) -> str:
 
 
 @frappe.whitelist()
+def get_article_stats(article_name: str):
+    views = frappe.db.get_value("HD Article", article_name, "views")
+
+    likes = frappe.db.count(
+        "HD Article Feedback",
+        filters={
+            "article": article_name,
+            "feedback": 1,
+        },
+    )
+
+    dislikes = frappe.db.count(
+        "HD Article Feedback",
+        filters={
+            "article": article_name,
+            "feedback": 2,
+        },
+    )
+
+    return {
+        "views": views,
+        "likes": likes,
+        "dislikes": dislikes,
+    }
+
+
+@frappe.whitelist()
 def search(query: str) -> list:
     query = sanitize_query(query)
     ret, enough = search_with_enough_results([], query)

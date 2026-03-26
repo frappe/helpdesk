@@ -16,6 +16,34 @@
       @onUpdate="ticket.reload"
     />
   </div>
+  <div
+    v-else-if="!ticket.doc && !ticket.get?.error"
+    class="grid h-full place-items-center"
+  >
+    <LoadingIndicator class="w-6 text-ink-gray-4" />
+  </div>
+
+  <div v-else class="grid h-full place-items-center px-4 py-20 text-center">
+    <div class="space-y-2">
+      <div class="flex justify-center items-center mx-auto">
+        <TicketIcon class="size-10 text-ink-gray-4" />
+      </div>
+      <div class="text-lg font-medium text-ink-gray-8">
+        {{ __("Ticket not found") }}
+      </div>
+      <div class="text-center text-p-base text-ink-gray-6 mt-1">
+        {{
+          __("You don't have access to this ticket, or it no longer exists.")
+        }}
+      </div>
+      <Button :route="{ name: 'TicketsAgent' }" variant="subtle">
+        <template #prefix
+          ><FeatherIcon name="arrow-left" class="size-4"
+        /></template>
+        {{ __("Back to Tickets") }}
+      </Button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -42,6 +70,7 @@ import { createResource, toast, usePageMeta } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { showCommentBox, showEmailBox } from "./modalStates";
+import TicketIcon from "@/components/icons/TicketIcon.vue";
 
 const telephonyStore = useTelephonyStore();
 const { $socket } = globalStore();
@@ -165,10 +194,13 @@ onBeforeUnmount(() => {
   $socket.off("helpdesk:ticket-comment");
   $socket.off("helpdesk:ticket-update");
 });
-
 usePageMeta(() => {
+  if (!ticket.value?.doc?.name) {
+    return { title: "404 - Ticket not found" };
+  }
+
   return {
-    title: props.ticketId,
+    title: props.ticketId + " - " + (ticket.value?.doc?.subject ?? ""),
   };
 });
 </script>

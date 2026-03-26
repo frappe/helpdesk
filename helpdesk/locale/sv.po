@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-03-01 10:40+0000\n"
-"PO-Revision-Date: 2026-03-12 19:34\n"
+"PO-Revision-Date: 2026-03-23 07:56\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -69,12 +69,12 @@ msgstr "<div class=\"ql-editor read-mode\"><p>Låt oss veta om vi löste ditt pr
 #. Header text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Visit Helpdesk</a></span>"
-msgstr "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Besök Helpdesk</a></span>"
+msgstr "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Besök Support</a></span>"
 
 #. Paragraph text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "<span class=\"h4\">Helpdesk Configuration<br></span>"
-msgstr "<span class=\"h4\">Helpdesk Konfiguration<br></span>"
+msgstr "<span class=\"h4\">Support Konfiguration<br></span>"
 
 #: desk/src/pages/ticket/TicketNew.vue:69
 msgid "A short description"
@@ -779,7 +779,7 @@ msgstr "Kan bjuda in nya handläggare, hantera ärenden, skapa anpassade vyer oc
 
 #: desk/src/components/Settings/InviteAgents.vue:156
 msgid "Can manage all aspects of Helpdesk."
-msgstr "Kan hantera alla aspekter av Helpdesk."
+msgstr "Kan hantera alla aspekter av Support."
 
 #: desk/src/components/Settings/InviteAgents.vue:140
 msgid "Can work on tickets, create custom views and manage private views."
@@ -2239,23 +2239,23 @@ msgstr "Hjälp"
 
 #: helpdesk/config/desktop.py:11
 msgid "HelpDesk"
-msgstr "Hjälpcentral"
+msgstr "Support"
 
 #. Name of a Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk"
-msgstr "Hjälpcentral"
+msgstr "Support"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Helpdesk Contact"
-msgstr "Hjälpcentral Kontakt"
+msgstr "Support Kontakt"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk Reports"
-msgstr "Hjälpcentral Rapporter"
+msgstr "Support Rapporter"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:53
 msgid "Here, your weekly offs are pre-populated based on the previous selections. You can add more rows to also add public and national holidays individually."
@@ -4102,7 +4102,7 @@ msgstr "Ange som standard Service Nivå Avtal"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:246
 msgid "Set the default status assigned when a ticket is created, and the status to apply when a ticket is reopened. If not specified, the default status from HD Settings will be used."
-msgstr "Ange standard status som tilldelas när ett ärende skapas och status som ska gälla när ett ärende öppnas igen. Om inget annat anges används standardstatus från Helpdesk Inställningar."
+msgstr "Ange standard status som tilldelas när ett ärende skapas och status som ska gälla när ett ärende öppnas igen. Om inget annat anges används standardstatus från Support Inställningar."
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:9
 msgid "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one"
@@ -4579,7 +4579,7 @@ msgstr "Denna metod är endast avsedd för utvecklarläge"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:369
 msgid "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
-msgstr "Detta ärende (#{0}) har slagits samman med ärende <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
+msgstr "Detta ärende (#{0}) är sammanslagen med <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:510
 msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
