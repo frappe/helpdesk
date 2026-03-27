@@ -61,9 +61,10 @@ def create_ticket():
 
     # Render template with the current user's information
     user_doc = frappe.get_doc("User", frappe.session.user)
-    first_name = (user_doc.first_name or "").strip() or (
-        "Administrator" if user_doc.name == "Administrator" else "there"
-    )
+    if (user_doc.name or "").strip().lower() == "administrator":
+        first_name = "there"
+    else:
+        first_name = (user_doc.first_name or "").strip() or "there"
     rendered_content = frappe.render_template(
         CONTENT,
         {
