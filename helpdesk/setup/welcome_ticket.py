@@ -5,13 +5,13 @@ AUTHOR_EMAIl = "john@example.com"
 AUTHOR_NAME = "John Doe"
 CONTENT = """
 <div style="font-family: 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.8; color: #374151; max-width: 560px; margin: 0 auto;">
-Hey {{ user.first_name }} 👋,
+Hey {{ first_name }} 👋,
 <br><br>
 We thought we'd use this space to give you a quick walkthrough while you're here 🙂
 <br><br>
 This is a sample ticket we created to show you how Frappe Helpdesk works.
-<br>
-Getting started is easy. In the main <b>Ticket activity area</b>, when you reply to a ticket your response will show up directly below in the same thread. You can keep track of your ticket activities all in one place. ✨
+<br><br>
+Getting started is easy. In the main <b>Ticket activity area</b>, when you reply to a ticket your response shows up directly below in the activity thread. This way you can keep track of all your ticket activities in one single place. ✨
 <br>
 <img src="/assets/helpdesk/desk/ticketActivity.png" style="width: 100%; max-width: 560px;  margin: 16px 0; border-radius: 10px; display: block;">
 <br>
@@ -31,7 +31,7 @@ Inside the <b>Ticket Header</b>, you can view the first response and resolution 
 <img src="/assets/helpdesk/desk/timers.png" style="width: 100%; max-width: 560px;  margin: 16px 0; border-radius: 10px; display: block;">
 <br><br>
 That's pretty much how it works.
-<br>
+<br><br>
 What you can do next:<br>
 <ul style="padding-left: 20px; margin: 0;">
   <li>Connect your support email to start receiving real tickets.</li>
@@ -44,7 +44,7 @@ Feel free to click around and explore our product.
 <br>
 If you need help, reach out to us here: <a href="https://support.frappe.io/helpdesk" style="color: #3b82f6;">https://support.frappe.io/helpdesk</a>
 <br><br>
-Best,<br>
+Cheers,<br>
 Team Frappe
 </div>
 """
@@ -61,9 +61,15 @@ def create_ticket():
 
     # Render template with the current user's information
     user_doc = frappe.get_doc("User", frappe.session.user)
-    first_name = (user_doc.first_name or "").strip() or "there"
+    first_name = (user_doc.first_name or "").strip() or (
+        "Administrator" if user_doc.name == "Administrator" else "there"
+    )
     rendered_content = frappe.render_template(
-        CONTENT, {"user": first_name}, safe_render=True
+        CONTENT,
+        {
+            "first_name": first_name,
+        },
+        safe_render=True,
     )
 
     d = frappe.new_doc("HD Ticket")
