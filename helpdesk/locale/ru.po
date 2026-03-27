@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-03-22 10:41+0000\n"
-"PO-Revision-Date: 2026-03-26 08:17\n"
+"PO-Revision-Date: 2026-03-27 08:45\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -170,7 +170,7 @@ msgstr "Добавить пользовательское условие"
 
 #: desk/src/pages/home/Home.vue:91
 msgid "Add charts to get started"
-msgstr ""
+msgstr "Добавьте диаграммы, чтобы начать"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:66
@@ -319,13 +319,13 @@ msgstr "Все"
 
 #: desk/src/pages/home/components/PendingTickets.vue:231
 msgid "All SLAs on track"
-msgstr ""
+msgstr "Все соглашения об уровне обслуживания выполняются в срок"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:281
 #: desk/src/pages/home/components/RecentFeedback.vue:310
 #: desk/src/pages/home/components/RecentFeedback.vue:317
 msgid "All Time"
-msgstr ""
+msgstr "За все время"
 
 #: desk/src/components/layouts/Sidebar.vue:262
 msgid "All Views"
@@ -337,7 +337,7 @@ msgstr "Все статьи из этой категории будут пере
 
 #: desk/src/pages/home/components/PendingTickets.vue:240
 msgid "All your assigned tickets have been responded to"
-msgstr ""
+msgstr "На все ваши заявки был дан ответ"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
@@ -669,19 +669,19 @@ msgstr "Автоматизация"
 
 #: desk/src/pages/home/components/ChartItem.vue:6
 msgid "Average First Response"
-msgstr ""
+msgstr "Средний первый ответ"
 
 #: desk/src/pages/home/Home.vue:317
 msgid "Average First Response Time"
-msgstr ""
+msgstr "Среднее время первого ответа"
 
 #: desk/src/pages/home/components/ChartItem.vue:16
 msgid "Average Resolution"
-msgstr ""
+msgstr "Среднее разрешение"
 
 #: desk/src/pages/home/Home.vue:329
 msgid "Average Resolution Time"
-msgstr ""
+msgstr "Среднее время разрешения"
 
 #. Label of the avg_response_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -691,7 +691,7 @@ msgstr "Среднее время ответа"
 #: desk/src/pages/home/Home.vue:305
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:5
 msgid "Average Time Metrics"
-msgstr ""
+msgstr "Показатели среднего времени"
 
 #: helpdesk/api/dashboard.py:364
 msgid "Average feedback rating per day is around {0} stars"
@@ -699,7 +699,7 @@ msgstr "Средняя оценка отзывов в день составля�
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:37
 msgid "Average response and resolution metrics not yet generated"
-msgstr ""
+msgstr "Средние показатели времени отклика и разрешения пока не сгенерированы"
 
 #: helpdesk/api/dashboard.py:286
 msgid "Average tickets per day is around {0}"
@@ -724,12 +724,12 @@ msgstr "Средний рейтинг отзыва для решенных за�
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:49
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:148
 msgid "Avg. first response time"
-msgstr ""
+msgstr "Среднее время первого ответа"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:58
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:156
 msgid "Avg. resolution time"
-msgstr ""
+msgstr "Среднее время разрешения"
 
 #: helpdesk/api/dashboard.py:202
 msgid "Avg. time taken to first respond to a ticket"
@@ -1301,7 +1301,7 @@ msgstr "Дашборд"
 
 #: desk/src/pages/home/Home.vue:264 desk/src/pages/home/Home.vue:286
 msgid "Dashboard saved"
-msgstr ""
+msgstr "Панель управления сохранена"
 
 #. Label of the holiday_date (Date) field in DocType 'HD Holiday'
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
@@ -2071,7 +2071,7 @@ msgstr "Серый"
 
 #: desk/src/pages/home/components/PendingTickets.vue:232
 msgid "Great! All your tickets are within SLA"
-msgstr ""
+msgstr "Отлично! Все тикеты соответствуют SLA"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -2152,7 +2152,7 @@ msgstr "Правило эскалации HD"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "HD Field Layout"
-msgstr ""
+msgstr "Схема расположения полей HD"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -2357,11 +2357,11 @@ msgstr "Скрыть от клиента"
 
 #: desk/src/pages/ticket/Tickets.vue:423
 msgid "Hide from sidebar"
-msgstr ""
+msgstr "Скрыть из боковой панели"
 
 #: desk/src/pages/ticket/Tickets.vue:431
 msgid "Hide view from sidebar"
-msgstr ""
+msgstr "Скрыть представление из боковой панели"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -2587,7 +2587,7 @@ msgstr "Стандартный"
 #. Label of the apply_to_system (Check) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Is applied to system"
-msgstr ""
+msgstr "Применяется к системе"
 
 #. Label of the initial_helpdesk_name_setup_skipped (Check) field in DocType
 #. 'HD Settings'
@@ -2683,7 +2683,7 @@ msgstr "За 3 месяцев"
 #: desk/src/pages/home/components/CardBase.vue:106
 #: desk/src/pages/home/components/CardBase.vue:107
 msgid "Last 3 months"
-msgstr ""
+msgstr "Последние 3 месяца"
 
 #: desk/src/pages/dashboard/Dashboard.vue:263
 #: desk/src/pages/dashboard/Dashboard.vue:285
@@ -2739,7 +2739,7 @@ msgstr "Последняя неделя"
 #: desk/src/pages/home/components/CardBase.vue:99
 #: desk/src/pages/home/components/CardBase.vue:100
 msgid "Last month"
-msgstr ""
+msgstr "В прошлом месяце"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
 msgid "Last user assigned by this rule"
@@ -2749,7 +2749,7 @@ msgstr "Последний пользователь, назначенный эт
 #: desk/src/pages/home/components/CardBase.vue:92
 #: desk/src/pages/home/components/CardBase.vue:93
 msgid "Last week"
-msgstr ""
+msgstr "На прошлой неделе"
 
 #. Label of the layout (Code) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
@@ -2863,7 +2863,7 @@ msgstr "Сделать обратную связь обязательной"
 
 #: desk/src/pages/ticket/Tickets.vue:451
 msgid "Make view private"
-msgstr ""
+msgstr "Сделать просмотр приватным"
 
 #: desk/src/components/Settings/General/General.vue:2
 msgid "Manage general settings of your app."
@@ -2958,7 +2958,7 @@ msgstr "Моя команда"
 #: desk/src/pages/home/Home.vue:293
 #: desk/src/pages/home/components/AgentTicketsCard.vue:4
 msgid "My Tickets"
-msgstr ""
+msgstr "Мои билеты"
 
 #. Label of the category_name (Data) field in DocType 'HD Article Category'
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
@@ -2997,7 +2997,7 @@ msgstr "Навигация"
 #: desk/src/pages/home/components/RecentFeedback.vue:304
 #: desk/src/pages/home/components/RecentFeedback.vue:321
 msgid "Negative first"
-msgstr ""
+msgstr "Сначала отрицательный"
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:16
 #: desk/src/components/Settings/Agents.vue:109
@@ -3146,7 +3146,7 @@ msgstr "Билеты не найдены"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:159
 msgid "No additional comments"
-msgstr ""
+msgstr "Никаких дополнительных комментариев"
 
 #: desk/src/components/Settings/Agents.vue:98
 msgid "No agent found"
@@ -3162,7 +3162,7 @@ msgstr "Правило назначения не найдено"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:34
 msgid "No average metrics"
-msgstr ""
+msgstr "Нет усредненных показателей"
 
 #: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
@@ -3174,7 +3174,7 @@ msgstr "Изменений для сохранения нет"
 
 #: desk/src/pages/home/Home.vue:88
 msgid "No charts added"
-msgstr ""
+msgstr "Диаграммы не добавлены"
 
 #: desk/src/components/Settings/EmailAccountList.vue:52
 msgid "No email account found"
@@ -3182,7 +3182,7 @@ msgstr "Учетная запись электронной почты не на�
 
 #: desk/src/pages/home/components/RecentFeedback.vue:207
 msgid "No feedback"
-msgstr ""
+msgstr "Нет обратной связи"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:57
 msgid "No field dependency found"
@@ -3198,19 +3198,19 @@ msgstr "Нет новых уведомлений"
 
 #: desk/src/pages/home/components/PendingTickets.vue:236
 msgid "No new tickets assigned to you in the last 24 hours"
-msgstr ""
+msgstr "За последние 24 часа вам не было назначено новых тикетов"
 
 #: desk/src/pages/home/components/PendingTickets.vue:239
 msgid "No pending tickets"
-msgstr ""
+msgstr "Нет незавершенных заявок"
 
 #: desk/src/pages/home/components/PendingTickets.vue:86
 msgid "No reason"
-msgstr ""
+msgstr "Нет причин"
 
 #: desk/src/pages/home/components/PendingTickets.vue:235
 msgid "No recently assigned tickets"
-msgstr ""
+msgstr "Недавно назначенных тикетов нет"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:76
 msgid "No results found"
@@ -3230,7 +3230,7 @@ msgstr "Не разрешено"
 
 #: desk/src/pages/home/components/PendingTickets.vue:61
 msgid "Not Assigned"
-msgstr ""
+msgstr "Не назначено"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:10
 msgid "Not Saved"
@@ -3418,7 +3418,7 @@ msgstr "Ожидающие приглашения"
 #: desk/src/pages/home/components/PendingTickets.vue:212
 #: desk/src/pages/home/components/PendingTickets.vue:216
 msgid "Pending Tickets"
-msgstr ""
+msgstr "Ожидающие билеты"
 
 #: helpdesk/api/dashboard.py:554
 msgid "Percentage of Total Tickets by Channel"
@@ -3540,7 +3540,7 @@ msgstr "Название политики"
 #: desk/src/pages/home/components/RecentFeedback.vue:322
 #: desk/src/pages/home/components/RecentFeedback.vue:326
 msgid "Positive first"
-msgstr ""
+msgstr "Сначала положительные"
 
 #. Label of the post_description_key (Data) field in DocType 'HD Support Search
 #. Source'
@@ -3761,11 +3761,11 @@ msgstr "Причина"
 
 #: desk/src/pages/home/components/PendingTickets.vue:204
 msgid "Recent"
-msgstr ""
+msgstr "Недавний"
 
 #: desk/src/pages/home/components/PendingTickets.vue:211
 msgid "Recent Tickets"
-msgstr ""
+msgstr "Последние тикеты"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:107
 #: desk/src/components/Settings/Telephony/Telephony.vue:182
@@ -4058,7 +4058,7 @@ msgstr "SLA"
 #: desk/src/pages/home/components/PendingTickets.vue:196
 #: desk/src/pages/home/components/PendingTickets.vue:210
 msgid "SLA Alerts"
-msgstr ""
+msgstr "Оповещения SLA"
 
 #. Label of the service_level_agreement_creation (Datetime) field in DocType
 #. 'HD Ticket'
@@ -4244,7 +4244,7 @@ msgstr "Идет поиск..."
 
 #: desk/src/pages/home/components/PendingTickets.vue:138
 msgid "See all {0} tickets"
-msgstr ""
+msgstr "Посмотреть все {0} билеты"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:28
 #: desk/src/pages/call-logs/CallLogModal.vue:57
@@ -4413,7 +4413,7 @@ msgstr "Показывать конечным пользователям дру�
 
 #: desk/src/pages/ticket/Tickets.vue:423
 msgid "Show in sidebar"
-msgstr ""
+msgstr "Показать в боковой панели"
 
 #: desk/src/components/modals/ShortcutsModal.vue:83
 msgid "Show keyboard shortcuts"
@@ -4495,7 +4495,7 @@ msgstr "Стандартные скрипты форм нельзя изменя
 
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.py:55
 msgid "Standard Views cannot be deleted."
-msgstr ""
+msgstr "Стандартные представления удалить нельзя."
 
 #. Label of the start_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
@@ -5012,11 +5012,11 @@ msgstr "Заявки"
 
 #: desk/src/pages/home/components/PendingTickets.vue:220
 msgid "Tickets approaching or breached SLA"
-msgstr ""
+msgstr "Тикеты, приближающиеся к SLA или нарушающие его"
 
 #: desk/src/pages/home/components/PendingTickets.vue:221
 msgid "Tickets assigned to you in the last 24 hours"
-msgstr ""
+msgstr "Тикеты, назначенные вам за последние 24 часа"
 
 #: helpdesk/api/dashboard.py:553
 msgid "Tickets by Channel"
@@ -5040,7 +5040,7 @@ msgstr "Тикеты можно назначать только агентам"
 
 #: desk/src/pages/home/components/PendingTickets.vue:222
 msgid "Tickets that are awaiting your response"
-msgstr ""
+msgstr "Тикеты, ожидающие вашего ответа"
 
 #: desk/src/components/Settings/Profile/Profile.vue:152
 msgid "Timezone"
@@ -5459,7 +5459,7 @@ msgstr "Вы уже предоставили обратную связь для 
 
 #: desk/src/pages/home/components/RecentFeedback.vue:210
 msgid "You haven't received any feedback yet"
-msgstr ""
+msgstr "Вы пока не получили никаких отзывов"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:130
 msgid "You must set one SLA as Default. Please check the Default SLA option."
@@ -5471,7 +5471,7 @@ msgstr "Ваше старое условие будет перезаписано
 
 #: desk/src/pages/home/components/RecentFeedback.vue:48
 msgid "Your performance is"
-msgstr ""
+msgstr "Ваша производительность"
 
 #: desk/src/pages/MobileNotifications.vue:46
 msgid "assigned you a ticket"
@@ -5507,7 +5507,7 @@ msgstr "отлично"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:368
 msgid "good"
-msgstr ""
+msgstr "хорошо"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -5555,7 +5555,7 @@ msgstr "Я упомянул вас в заявке"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:372
 msgid "poor"
-msgstr ""
+msgstr "плохо"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -5581,13 +5581,13 @@ msgstr "{0} совпадений"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:43
 msgid "{0} reviews"
-msgstr ""
+msgstr "{0} отзывы"
 
 #: desk/src/pages/ticket/Tickets.vue:452
 msgid "{0} view is currently public. Changing it to private will hide it for all the users."
-msgstr ""
+msgstr "{0} В данный момент представление общедоступно. Изменение его на приватное скроет его для всех пользователей."
 
 #: desk/src/pages/ticket/Tickets.vue:432
 msgid "{0} view is currently visible in the sidebar. Hiding it will remove it from the sidebar."
-msgstr ""
+msgstr "{0} В настоящее время вид виден на боковой панели. Скрыв его, Вы уберете его из боковой панели."
 
