@@ -476,3 +476,10 @@ def format_time_difference(dt, context="ago"):
         return f"{int(total_seconds // 3600)}h"
     else:
         return f"{int(total_seconds // 86400)}d"
+
+
+def get_country_from_timezone(time_zone: str):
+    country = frappe.db.get_value(
+        "Country", {"time_zones": ["like", f"%{time_zone}%"]}, "name"
+    )
+    return country or None

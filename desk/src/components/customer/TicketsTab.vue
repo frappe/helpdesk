@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col focus-visible:border-none" tabindex="0">
     <!-- Filter bar -->
-    <div class="flex items-center justify-between gap-3 py-3">
+    <div class="flex items-center justify-between gap-3 pb-3">
       <FormControl
         v-model="search"
         :placeholder="__('Search by ID or Subject')"
@@ -145,27 +145,43 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script
+  setup
+  lang="ts"
+  generic="T extends Record<string, any> = Record<string, any>"
+>
 import Link from "@/components/frappe-ui/Link.vue";
 import { IndicatorIcon } from "@/components/icons";
 import { useScreenSize } from "@/composables/screen";
-import { getTicketListResource } from "@/pages/customer/tickets";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
-import { CustomerResourceSymbol } from "@/types";
+import type { DocumentResource, ListResource } from "@/types";
+import type { HDTicket } from "@/types/doctypes";
 import { watchDebounced } from "@vueuse/core";
 import { dayjsLocal, FormControl, LoadingIndicator } from "frappe-ui";
-import { computed, inject, onBeforeUnmount, reactive, ref } from "vue";
+import { computed, onBeforeUnmount, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 
-const customer = inject(CustomerResourceSymbol)!;
+type TicketFilterField = {
+  key: string;
+  placeholder: string;
+  doctype: string;
+  filters?: Record<string, any>;
+};
+
+const props = defineProps<{
+  doc: DocumentResource<T>;
+  ticketsListResource: ListResource<HDTicket>;
+  baseFilter: Record<string, string>;
+  additionalFilter?: TicketFilterField;
+}>();
+
+const { doc, ticketsListResource, baseFilter } = props;
 
 const router = useRouter();
 const { isMobileView } = useScreenSize();
-
-const { ticketsListResource } = getTicketListResource();
 
 const search = ref("");
 const sort = reactive<{ field: string | null; order: "asc" | "desc" }>({
@@ -175,7 +191,6 @@ const sort = reactive<{ field: string | null; order: "asc" | "desc" }>({
 const filters = reactive<Record<string, string>>({
   status: "",
   priority: "",
-  contact: "",
 });
 
 const gridTemplateStyle = computed(() =>
@@ -218,9 +233,24 @@ const columns = computed(() =>
   isMobileView.value ? allColumns.filter((c) => !c.desktopOnly) : allColumns
 );
 
-const contactNames = computed(
-  () => customer.doc?.contacts?.map((c) => c.contact_name) ?? []
-);
+const filterFields = computed(() => {
+  const base: TicketFilterField[] = [
+    {
+      key: "status",
+      placeholder: __("Status"),
+      doctype: "HD Ticket Status",
+    },
+    {
+      key: "priority",
+      placeholder: __("Priority"),
+      doctype: "HD Ticket Priority",
+    },
+  ];
+  if (props.additionalFilter) {
+    base.push(props.additionalFilter);
+  }
+  return base;
+});
 
 function handleSortClick(column: Column) {
   if (!column.sortable) return;
@@ -231,29 +261,6 @@ function handleSortClick(column: Column) {
     sort.order = "desc";
   }
 }
-
-const filterFields = computed(() => [
-  {
-    key: "status",
-    placeholder: __("Status"),
-    doctype: "HD Ticket Status",
-    filters: undefined,
-  },
-  {
-    key: "priority",
-    placeholder: __("Priority"),
-    doctype: "HD Ticket Priority",
-    filters: undefined,
-  },
-  {
-    key: "contact",
-    placeholder: __("Contact"),
-    doctype: "Contact",
-    filters: contactNames.value.length
-      ? { name: ["in", contactNames.value] }
-      : undefined,
-  },
-]);
 
 const ticketRowsCount = computed(() => ticketsListResource.data?.length ?? 0);
 
@@ -272,10 +279,15 @@ watchDebounced(
   () => {
     ticketsListResource.update({
       filters: {
-        customer: customer.doc?.name,
+        ...baseFilter,
         status: filters.status || undefined,
         priority: filters.priority || undefined,
-        contact: filters.contact || undefined,
+        ...(props.additionalFilter
+          ? {
+              [props.additionalFilter.key]:
+                filters[props.additionalFilter.key] || undefined,
+            }
+          : {}),
       },
       orderBy: sort.field ? `${sort.field} ${sort.order}` : undefined,
       orFilters: search.value
@@ -292,9 +304,7 @@ watchDebounced(
 
 onBeforeUnmount(() => {
   ticketsListResource.update({
-    filters: {
-      customer: customer.doc.name,
-    },
+    filters: { ...baseFilter },
     orFilters: {},
   });
   ticketsListResource.reload();

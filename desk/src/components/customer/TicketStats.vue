@@ -9,7 +9,7 @@
           v-if="key === 'feedback_received'"
           :title="__('Avg. Feedback Received')"
           :data="chartData"
-          bar-color="#de9736"
+          bar-color="#E79913"
           measure="average"
           api-url="helpdesk.api.ticket_stats.get_feedback_received"
           :dt="props.dt"
@@ -22,7 +22,7 @@
               <span class="text-2xl font-medium text-ink-gray-8">
                 {{ text }}
               </span>
-              <LucideStar class="size-4 fill-[#de9735] text-[#de9735]" />
+              <LucideStar class="size-4 fill-ink-amber-2 text-ink-amber-2" />
             </div>
           </template>
         </BarChartCard>
