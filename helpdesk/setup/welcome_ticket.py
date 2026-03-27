@@ -38,10 +38,11 @@ What you can do next:<br>
   <li>Invite your team and auto-assign tickets using assignment rules.</li>
   <li>Set up SLAs to manage response times for your agents.</li>
   <li>Add a Knowledge Base for self-serve support.</li>
+  <li>Check out our awesome documentation at <a href="https://docs.frappe.io/helpdesk" style="color: #3b82f6;">https://docs.frappe.io/helpdesk</a> </li>
 </ul>
 <br>
 Feel free to click around and explore our product.
-<br>
+<br><br>
 If you need help, reach out to us here: <a href="https://support.frappe.io/helpdesk" style="color: #3b82f6;">https://support.frappe.io/helpdesk</a>
 <br><br>
 Cheers,<br>
