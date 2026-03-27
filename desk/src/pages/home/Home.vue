@@ -302,18 +302,6 @@ const chartsDropdown = computed(() => {
         }),
     },
     {
-      label: __("My Replies"),
-      chart: "agent_replies",
-      onClick: () =>
-        addChart("agent_replies", {
-          w: 16,
-          h: 10,
-          minW: 16,
-          minH: 10,
-          maxH: 11,
-        }),
-    },
-    {
       label: __("Average Time Metrics"),
       chart: "avg_time_metrics",
       onClick: () =>
