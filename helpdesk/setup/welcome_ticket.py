@@ -5,42 +5,42 @@ AUTHOR_EMAIl = "john@example.com"
 AUTHOR_NAME = "John Doe"
 CONTENT = """
 <div style="font-family: 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.8; color: #374151; max-width: 560px; margin: 0 auto;">
-Hey {{user.first_name}} 👋,
+Hey {{ user.first_name }} 👋,
 <br><br>
 We thought we'd use this space to give you a quick walkthrough while you're here 🙂
 <br><br>
-This is a sample ticket we created so you can see how Frappe Helpdesk works.
+This is a sample ticket we created to show you how Frappe Helpdesk works.
 <br>
-Getting started is simple. In the main <b>Ticket activity area</b>, you'll find the complete conversation history—every email, every user response, all in one place ✨
+Getting started is easy. In the main <b>Ticket activity area</b>, when you reply to a ticket your response will show up directly below in the same thread. You can keep track of your ticket activities all in one place. ✨
 <br>
-<img src="/assets/helpdesk/desk/ticketActivity.png" style="width: 100%; max-width: 560px;  margin: 16px 0; display: block;">
+<img src="/assets/helpdesk/desk/ticketActivity.png" style="width: 100%; max-width: 560px;  margin: 16px 0; border-radius: 10px; display: block;">
 <br>
 When it's time to follow up with a user, just click <b>Reply</b>. Your message will be sent directly to their inbox, keeping the conversation flowing smoothly.
 <br>
-<img src="/assets/helpdesk/desk/reply.gif" style="width: 100%; max-width: 560px;  margin: 16px 0; display: block;">
+<video autoplay loop muted  src="/assets/helpdesk/desk/videos/mailVideo.mp4" style="width: 100%; max-width: 560px;  margin: 16px 0; border-radius: 10px; display: block;"></video>
 <br>
-Need to share thoughts or updates with your team instead? Use the <b>Comment</b> feature to leave notes that only your colleagues can see, keeping internal communication clear and organized.
+Want to discuss a ticket with your team internally? Utilize the <b>Comment</b> feature to leave notes that are visible only to your colleagues, ensuring that internal communication remains clear, organized, and private.<br>
+<video autoplay loop muted src="/assets/helpdesk/desk/videos/commentVideo.mp4" style="width: 100%; max-width: 560px;  margin: 16px 0; border-radius: 10px; display: block;"></video>
 <br>
-<img src="/assets/helpdesk/desk/comment.gif" style="width: 100%; max-width: 560px;  margin: 16px 0; display: block;">
+In the <b>Ticket Sidebar</b>, you can manage the ticket. You can assign it to yourself or a teammate, set the priority, ticket type and also update the ticket status.
 <br>
-In the <b>Ticket Sidebar</b>, you can manage the ticket. You can assign it to yourself or a teammate, set the priority, type, and customer, and update the status.
+<video autoplay loop muted  src="/assets/helpdesk/desk/videos/sidebarVideo.mp4" style="width: 100%; max-width: 560px;  margin: 16px 0; border-radius: 10px; display: block;"></video>
 <br>
-<img src="/assets/helpdesk/desk/sidebar.gif" style="width: 100%; max-width: 560px;  margin: 16px 0; display: block;">
+Inside the <b>Ticket Header</b>, you can view the first response and resolution timers. Additionally, you can also see the source of the ticket, whether it came from email or the support portal.
 <br>
-<b>SLA tracking + source</b> — first response and resolution timers, See where the ticket came from (email or portal)
-<br>
-<img src="/assets/helpdesk/desk/timers.png" style="width: 100%; max-width: 560px;  margin: 16px 0; display: block;">
+<img src="/assets/helpdesk/desk/timers.png" style="width: 100%; max-width: 560px;  margin: 16px 0; border-radius: 10px; display: block;">
 <br><br>
+That's pretty much how it works.
+<br>
 What you can do next:<br>
 <ul style="padding-left: 20px; margin: 0;">
-  <li>Connect your support email to start receiving real tickets</li>
-  <li>Invite your team and auto-assign tickets</li>
-  <li>Set up SLAs to manage response times</li>
-  <li>Add a Knowledge Base for self-serve support</li>
-  <li>Enable the customer portal for ticket tracking</li>
+  <li>Connect your support email to start receiving real tickets.</li>
+  <li>Invite your team and auto-assign tickets using assignment rules.</li>
+  <li>Set up SLAs to manage response times for your agents.</li>
+  <li>Add a Knowledge Base for self-serve support.</li>
 </ul>
 <br>
-You can explore on your own, or just reply to this ticket to see how it works.
+Feel free to click around and explore our product.
 <br>
 If you need help, reach out to us here: <a href="https://support.frappe.io/helpdesk" style="color: #3b82f6;">https://support.frappe.io/helpdesk</a>
 <br><br>
@@ -61,7 +61,10 @@ def create_ticket():
 
     # Render template with the current user's information
     user_doc = frappe.get_doc("User", frappe.session.user)
-    rendered_content = frappe.render_template(CONTENT, {"user": user_doc})
+    first_name = (user_doc.first_name or "").strip() or "there"
+    rendered_content = frappe.render_template(
+        CONTENT, {"user": first_name}, safe_render=True
+    )
 
     d = frappe.new_doc("HD Ticket")
     d.subject = "Welcome to Helpdesk"
