@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-03-22 10:41+0000\n"
-"PO-Revision-Date: 2026-03-26 08:17\n"
+"PO-Revision-Date: 2026-03-28 09:37\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Latin)\n"
 "MIME-Version: 1.0\n"
@@ -170,7 +170,7 @@ msgstr "Dodaj prilagođeni uslov"
 
 #: desk/src/pages/home/Home.vue:91
 msgid "Add charts to get started"
-msgstr ""
+msgstr "Dodajte grafikone da biste započeli"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:66
@@ -319,13 +319,13 @@ msgstr "Sve"
 
 #: desk/src/pages/home/components/PendingTickets.vue:231
 msgid "All SLAs on track"
-msgstr ""
+msgstr "Svi sporazumi o nivou usluge su u okviru cilja"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:281
 #: desk/src/pages/home/components/RecentFeedback.vue:310
 #: desk/src/pages/home/components/RecentFeedback.vue:317
 msgid "All Time"
-msgstr ""
+msgstr "Svi vremenski periodi"
 
 #: desk/src/components/layouts/Sidebar.vue:262
 msgid "All Views"
@@ -337,7 +337,7 @@ msgstr "Svi članci iz ove kategorije biće premešteni u opštu kategoriju."
 
 #: desk/src/pages/home/components/PendingTickets.vue:240
 msgid "All your assigned tickets have been responded to"
-msgstr ""
+msgstr "Odgovoreno je na sve Vaše dodeljene tikete"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
@@ -669,19 +669,19 @@ msgstr "Automatizacija"
 
 #: desk/src/pages/home/components/ChartItem.vue:6
 msgid "Average First Response"
-msgstr ""
+msgstr "Prosečan prvi odgovor"
 
 #: desk/src/pages/home/Home.vue:317
 msgid "Average First Response Time"
-msgstr ""
+msgstr "Prosečno vreme prvog odgovora"
 
 #: desk/src/pages/home/components/ChartItem.vue:16
 msgid "Average Resolution"
-msgstr ""
+msgstr "Prosečna rezolucija"
 
 #: desk/src/pages/home/Home.vue:329
 msgid "Average Resolution Time"
-msgstr ""
+msgstr "Prosečno vreme rešavanja"
 
 #. Label of the avg_response_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -691,7 +691,7 @@ msgstr "Prosečno vreme odgovora"
 #: desk/src/pages/home/Home.vue:305
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:5
 msgid "Average Time Metrics"
-msgstr ""
+msgstr "Prosečne vremenske metrike"
 
 #: helpdesk/api/dashboard.py:364
 msgid "Average feedback rating per day is around {0} stars"
@@ -699,7 +699,7 @@ msgstr "Prosečna ocena povratnih informacija po danu je oko {0} zvezda"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:37
 msgid "Average response and resolution metrics not yet generated"
-msgstr ""
+msgstr "Prosečne metrike odgovora i rezolucije još nisu generisane"
 
 #: helpdesk/api/dashboard.py:286
 msgid "Average tickets per day is around {0}"
@@ -724,12 +724,12 @@ msgstr "Prosečna ocena povratnih informacija za rešene tikete"
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:49
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:148
 msgid "Avg. first response time"
-msgstr ""
+msgstr "Prosečno vreme prvog odgovora"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:58
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:156
 msgid "Avg. resolution time"
-msgstr ""
+msgstr "Prosečno vreme rešavanja"
 
 #: helpdesk/api/dashboard.py:202
 msgid "Avg. time taken to first respond to a ticket"
@@ -1301,7 +1301,7 @@ msgstr "Kontrolna tabla"
 
 #: desk/src/pages/home/Home.vue:264 desk/src/pages/home/Home.vue:286
 msgid "Dashboard saved"
-msgstr ""
+msgstr "Kontrolna tabla je sačuvana"
 
 #. Label of the holiday_date (Date) field in DocType 'HD Holiday'
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
@@ -2071,7 +2071,7 @@ msgstr "Siva"
 
 #: desk/src/pages/home/components/PendingTickets.vue:232
 msgid "Great! All your tickets are within SLA"
-msgstr ""
+msgstr "Odlično! Svi Vaš tiketi su u okviru sporazuma o nivou usluge"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -2152,7 +2152,7 @@ msgstr "HD pravilo eskalacije"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "HD Field Layout"
-msgstr ""
+msgstr "Raspored polja"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -2357,11 +2357,11 @@ msgstr "Sakrij od klijenta"
 
 #: desk/src/pages/ticket/Tickets.vue:423
 msgid "Hide from sidebar"
-msgstr ""
+msgstr "Sakrij sa bočne trake"
 
 #: desk/src/pages/ticket/Tickets.vue:431
 msgid "Hide view from sidebar"
-msgstr ""
+msgstr "Sakrij prikaz sa bočne trake"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -2587,7 +2587,7 @@ msgstr "Standardno"
 #. Label of the apply_to_system (Check) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Is applied to system"
-msgstr ""
+msgstr "Primenjeno na sistem"
 
 #. Label of the initial_helpdesk_name_setup_skipped (Check) field in DocType
 #. 'HD Settings'
@@ -2683,7 +2683,7 @@ msgstr "Poslednjih 3 meseci"
 #: desk/src/pages/home/components/CardBase.vue:106
 #: desk/src/pages/home/components/CardBase.vue:107
 msgid "Last 3 months"
-msgstr ""
+msgstr "Prethodna 3 meseca"
 
 #: desk/src/pages/dashboard/Dashboard.vue:263
 #: desk/src/pages/dashboard/Dashboard.vue:285
@@ -2739,7 +2739,7 @@ msgstr "Prošla nedelja"
 #: desk/src/pages/home/components/CardBase.vue:99
 #: desk/src/pages/home/components/CardBase.vue:100
 msgid "Last month"
-msgstr ""
+msgstr "Prethodni mesec"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
 msgid "Last user assigned by this rule"
@@ -2749,7 +2749,7 @@ msgstr "Poslednji korisnik kojem je tiket dodeljen po ovom pravilu"
 #: desk/src/pages/home/components/CardBase.vue:92
 #: desk/src/pages/home/components/CardBase.vue:93
 msgid "Last week"
-msgstr ""
+msgstr "Prethodna nedelja"
 
 #. Label of the layout (Code) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
@@ -2863,7 +2863,7 @@ msgstr "Učinite povratnu informaciju obaveznom"
 
 #: desk/src/pages/ticket/Tickets.vue:451
 msgid "Make view private"
-msgstr ""
+msgstr "Učini prikaz privatnim"
 
 #: desk/src/components/Settings/General/General.vue:2
 msgid "Manage general settings of your app."
@@ -2958,7 +2958,7 @@ msgstr "Moj tim"
 #: desk/src/pages/home/Home.vue:293
 #: desk/src/pages/home/components/AgentTicketsCard.vue:4
 msgid "My Tickets"
-msgstr ""
+msgstr "Moji tiketi"
 
 #. Label of the category_name (Data) field in DocType 'HD Article Category'
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
@@ -2997,7 +2997,7 @@ msgstr "Navigacija"
 #: desk/src/pages/home/components/RecentFeedback.vue:304
 #: desk/src/pages/home/components/RecentFeedback.vue:321
 msgid "Negative first"
-msgstr ""
+msgstr "Prvo negativno"
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:16
 #: desk/src/components/Settings/Agents.vue:109
@@ -3146,7 +3146,7 @@ msgstr "Nema pronađenih tiketa"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:159
 msgid "No additional comments"
-msgstr ""
+msgstr "Nema dodatnih komentara"
 
 #: desk/src/components/Settings/Agents.vue:98
 msgid "No agent found"
@@ -3162,7 +3162,7 @@ msgstr "Nije pronađeno pravilo dodele"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:34
 msgid "No average metrics"
-msgstr ""
+msgstr "Nema prosečnih metrika"
 
 #: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
@@ -3174,7 +3174,7 @@ msgstr "Nema izmena za čuvanje"
 
 #: desk/src/pages/home/Home.vue:88
 msgid "No charts added"
-msgstr ""
+msgstr "Nema dodatih grafikona"
 
 #: desk/src/components/Settings/EmailAccountList.vue:52
 msgid "No email account found"
@@ -3182,7 +3182,7 @@ msgstr "Nije pronađen imejl nalog"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:207
 msgid "No feedback"
-msgstr ""
+msgstr "Nema povratnih informacija"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:57
 msgid "No field dependency found"
@@ -3198,19 +3198,19 @@ msgstr "Nema novih obaveštenja"
 
 #: desk/src/pages/home/components/PendingTickets.vue:236
 msgid "No new tickets assigned to you in the last 24 hours"
-msgstr ""
+msgstr "Nema novih tiketa dodeljenih Vama u prethodna 24 časa"
 
 #: desk/src/pages/home/components/PendingTickets.vue:239
 msgid "No pending tickets"
-msgstr ""
+msgstr "Nema tiketa na čekanju"
 
 #: desk/src/pages/home/components/PendingTickets.vue:86
 msgid "No reason"
-msgstr ""
+msgstr "Nema razloga"
 
 #: desk/src/pages/home/components/PendingTickets.vue:235
 msgid "No recently assigned tickets"
-msgstr ""
+msgstr "Nema nedavno dodeljenih tiketa"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:76
 msgid "No results found"
@@ -3230,7 +3230,7 @@ msgstr "Nije dozvoljeno"
 
 #: desk/src/pages/home/components/PendingTickets.vue:61
 msgid "Not Assigned"
-msgstr ""
+msgstr "Nije dodeljeno"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:10
 msgid "Not Saved"
@@ -3418,7 +3418,7 @@ msgstr "Pozivi na čekanju"
 #: desk/src/pages/home/components/PendingTickets.vue:212
 #: desk/src/pages/home/components/PendingTickets.vue:216
 msgid "Pending Tickets"
-msgstr ""
+msgstr "Tiketi na čekanju"
 
 #: helpdesk/api/dashboard.py:554
 msgid "Percentage of Total Tickets by Channel"
@@ -3540,7 +3540,7 @@ msgstr "Naziv politike"
 #: desk/src/pages/home/components/RecentFeedback.vue:322
 #: desk/src/pages/home/components/RecentFeedback.vue:326
 msgid "Positive first"
-msgstr ""
+msgstr "Prvo pozitivno"
 
 #. Label of the post_description_key (Data) field in DocType 'HD Support Search
 #. Source'
@@ -3761,11 +3761,11 @@ msgstr "Razlog"
 
 #: desk/src/pages/home/components/PendingTickets.vue:204
 msgid "Recent"
-msgstr ""
+msgstr "Nedavno"
 
 #: desk/src/pages/home/components/PendingTickets.vue:211
 msgid "Recent Tickets"
-msgstr ""
+msgstr "Nedavni tiketi"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:107
 #: desk/src/components/Settings/Telephony/Telephony.vue:182
@@ -4028,7 +4028,7 @@ msgstr "Polje za naslov rezultata"
 #: desk/src/pages/home/components/RecentFeedback.vue:7
 #: desk/src/pages/home/components/RecentFeedback.vue:22
 msgid "Reviews"
-msgstr "Pregledi"
+msgstr "Recenzije"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:215
 msgid "Ringing"
@@ -4058,7 +4058,7 @@ msgstr "Sporazum o nivou usluge"
 #: desk/src/pages/home/components/PendingTickets.vue:196
 #: desk/src/pages/home/components/PendingTickets.vue:210
 msgid "SLA Alerts"
-msgstr ""
+msgstr "Upozorenja sporazuma o nivou usluge"
 
 #. Label of the service_level_agreement_creation (Datetime) field in DocType
 #. 'HD Ticket'
@@ -4244,7 +4244,7 @@ msgstr "Pretraživanje..."
 
 #: desk/src/pages/home/components/PendingTickets.vue:138
 msgid "See all {0} tickets"
-msgstr ""
+msgstr "Pregledaj svih {0} tiketa"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:28
 #: desk/src/pages/call-logs/CallLogModal.vue:57
@@ -4413,7 +4413,7 @@ msgstr "Prikaži krajnjim korisnicima drugačiji prikaz"
 
 #: desk/src/pages/ticket/Tickets.vue:423
 msgid "Show in sidebar"
-msgstr ""
+msgstr "Prikaži u bočnoj traci"
 
 #: desk/src/components/modals/ShortcutsModal.vue:83
 msgid "Show keyboard shortcuts"
@@ -4495,7 +4495,7 @@ msgstr "Standardne skripte obrazaca nije moguće menjati, umesto toga napravite 
 
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.py:55
 msgid "Standard Views cannot be deleted."
-msgstr ""
+msgstr "Standardni prikazi se ne mogu obrisati."
 
 #. Label of the start_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
@@ -5011,11 +5011,11 @@ msgstr "Tiketi"
 
 #: desk/src/pages/home/components/PendingTickets.vue:220
 msgid "Tickets approaching or breached SLA"
-msgstr ""
+msgstr "Tiketi koji se približavaju ili su prekršili sporazum o nivou usluge"
 
 #: desk/src/pages/home/components/PendingTickets.vue:221
 msgid "Tickets assigned to you in the last 24 hours"
-msgstr ""
+msgstr "Tiketi dodeljeni Vama u prethodna 24 časa"
 
 #: helpdesk/api/dashboard.py:553
 msgid "Tickets by Channel"
@@ -5039,7 +5039,7 @@ msgstr "Tiketi mogu biti dodeljeni isključivo agentima"
 
 #: desk/src/pages/home/components/PendingTickets.vue:222
 msgid "Tickets that are awaiting your response"
-msgstr ""
+msgstr "Tiketi koji čekaju Vaš odgovor"
 
 #: desk/src/components/Settings/Profile/Profile.vue:152
 msgid "Timezone"
@@ -5458,7 +5458,7 @@ msgstr "Već ste dali povratnu informaciju za ovaj tiket."
 
 #: desk/src/pages/home/components/RecentFeedback.vue:210
 msgid "You haven't received any feedback yet"
-msgstr ""
+msgstr "Još uvek niste dobili povratne informacije"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:130
 msgid "You must set one SLA as Default. Please check the Default SLA option."
@@ -5470,7 +5470,7 @@ msgstr "Vaši stari uslovi će biti prepisani. Da li ste sigurni da želite da s
 
 #: desk/src/pages/home/components/RecentFeedback.vue:48
 msgid "Your performance is"
-msgstr ""
+msgstr "Vaš učinak je"
 
 #: desk/src/pages/MobileNotifications.vue:46
 msgid "assigned you a ticket"
@@ -5506,7 +5506,7 @@ msgstr "odlično"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:368
 msgid "good"
-msgstr ""
+msgstr "dobro"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -5554,7 +5554,7 @@ msgstr "Vas je pomenuo u tiketu"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:372
 msgid "poor"
-msgstr ""
+msgstr "loše"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -5580,13 +5580,13 @@ msgstr "{0} podudaranja"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:43
 msgid "{0} reviews"
-msgstr ""
+msgstr "{0} recenzije"
 
 #: desk/src/pages/ticket/Tickets.vue:452
 msgid "{0} view is currently public. Changing it to private will hide it for all the users."
-msgstr ""
+msgstr "Prikaz {0} je trenutno javan. Promenom u privatni prikaz biće sakriven za sve korisnike."
 
 #: desk/src/pages/ticket/Tickets.vue:432
 msgid "{0} view is currently visible in the sidebar. Hiding it will remove it from the sidebar."
-msgstr ""
+msgstr "Prikaz {0} je trenutno vidljiv u bočnoj traci. Sakrivanjem će biti uklonjen iz bočne trake."
 
