@@ -2,7 +2,9 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
+from jinja2.sandbox import SandboxedEnvironment
 
 from helpdesk.utils import capture_event, get_agents_team
 
@@ -10,6 +12,14 @@ from helpdesk.utils import capture_event, get_agents_team
 class HDSavedReply(Document):
     def after_insert(self):
         capture_event("saved_reply_created")
+
+    def validate(self):
+        if not self.message:
+            return
+        try:
+            SandboxedEnvironment().from_string(self.message).render({})
+        except Exception as e:
+            frappe.throw(_("Invalid template: {0}").format(str(e)))
 
 
 def has_permission(doc, user=None):
