@@ -257,7 +257,7 @@ class HDTicket(Document):
         self.ticket_type = ticket_type
 
     def set_raised_by(self):
-        self.raised_by = self.raised_by or frappe.session.user
+        self.raised_by = self.raised_by if is_agent() else frappe.session.user
 
     def set_contact(self):
         email_id = parseaddr(self.raised_by)[1]
