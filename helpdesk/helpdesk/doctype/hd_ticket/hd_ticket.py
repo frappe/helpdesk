@@ -566,6 +566,7 @@ class HDTicket(Document):
             )
 
     @frappe.whitelist()
+    @agent_only
     def reply_via_agent(
         self,
         message: str,
