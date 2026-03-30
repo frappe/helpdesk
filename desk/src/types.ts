@@ -1,5 +1,4 @@
 import { Dayjs } from "dayjs";
-import { BadgeProps } from "frappe-ui";
 import { Component, ComputedRef, InjectionKey, Ref } from "vue";
 import type { AssignmentRule, HDTicket } from "./types/doctypes";
 
@@ -398,6 +397,7 @@ export interface View {
   group_by_field?: string;
   name?: string;
   is_customer_portal?: boolean;
+  is_standard?: boolean;
 }
 
 export interface ViewType {
@@ -575,7 +575,6 @@ export interface Customizations {
   _form_script: string[];
   _customActions?: any;
   _customOnChange?: any;
-  _customBadges?: BadgeProps[];
 }
 
 export interface TicketContact {

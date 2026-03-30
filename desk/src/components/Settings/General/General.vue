@@ -41,7 +41,7 @@
         <hr class="my-8" />
         <div>
           <div class="text-base font-semibold text-gray-900">
-            {{ __("User signup") }}
+            {{ __("User Signup") }}
           </div>
           <div class="flex items-center justify-between mt-6">
             <div class="flex flex-col gap-1">

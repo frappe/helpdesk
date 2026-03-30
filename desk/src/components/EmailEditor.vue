@@ -2,10 +2,8 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-full mx-6 md:mx-10 max-h-[50vh] py-3',
-      'min-h-[7rem]',
+      'prose-sm max-w-full mx-6 md:mx-10 py-3',
       getFontFamily(newEmail),
-      editable && '!max-h-[35vh] overflow-y-auto',
       '[&_p.reply-to-content]:hidden',
     ]"
     :content="newEmail"
@@ -15,6 +13,7 @@
     @change="editable ? (newEmail = $event) : null"
     :extensions="[ComponentUtils, HandleExcelPaste]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    @keydown.capture="handleKeydown"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
@@ -65,12 +64,19 @@
         />
       </div>
     </template>
-    <!-- <template v-slot:editor="{ _editor }">
-      <EditorContent
-        :class="[editable && 'max-h-[35vh] overflow-y-auto']"
-        :editor="_editor"
-      />
-    </template> -->
+
+    <template #editor>
+      <div class="overflow-y-auto min-h-[7rem] max-h-[30vh]">
+        <EditorContent :editor="editor" />
+        <div
+          v-if="quotedContent"
+          ref="quotedContentRef"
+          contenteditable="true"
+          class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
+          @input="onQuotedInput"
+        />
+      </div>
+    </template>
     <template #bottom>
       <!-- Attachments -->
       <div class="flex flex-wrap gap-2 px-10">
@@ -168,6 +174,7 @@ import {
   MultiSelectInput,
   SavedRepliesSelectorModal,
 } from "@/components";
+import { EditorContent } from "@tiptap/vue-3";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
@@ -180,7 +187,6 @@ import {
   uploadFunction,
   validateEmailWithZod,
 } from "@/utils";
-// import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,
@@ -190,11 +196,19 @@ import {
   toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 
 const editorRef = ref(null);
 const showSavedRepliesSelectorModal = ref(false);
+const quotedContentRef = ref<HTMLElement | null>(null);
 
 const props = defineProps({
   ticketId: {
@@ -241,6 +255,12 @@ const newEmail = useStorage<null | string>(
   "emailBoxContent" + props.ticketId,
   null
 );
+
+const quotedContent = useStorage<null | string>(
+  "quotedEmailBoxContent" + props.ticketId,
+  null
+);
+
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 
@@ -249,10 +269,13 @@ const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
 const isUploading = ref(false);
+const contentEmpty = computed(() => isContentEmpty(newEmail.value));
 
 const isDisabled = computed(() => {
   return (
-    isContentEmpty(newEmail.value) || sendMail.loading || isUploading.value
+    (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
+    sendMail.loading ||
+    isUploading.value
   );
 });
 
@@ -295,7 +318,11 @@ const sendMail = createResource({
       to: toEmailsClone.value.join(","),
       cc: ccEmailsClone.value?.join(","),
       bcc: bccEmailsClone.value?.join(","),
-      message: newEmail.value,
+      message:
+        newEmail.value +
+        (quotedContentRef.value
+          ? `<p class="reply-to-content"><p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
+          : ""),
     },
   }),
   onSuccess: () => {
@@ -310,7 +337,7 @@ const sendMail = createResource({
 });
 
 function submitMail() {
-  if (isContentEmpty(newEmail.value)) {
+  if (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) {
     return false;
   }
   if (!toEmailsClone.value.length) {
@@ -321,6 +348,21 @@ function submitMail() {
   }
 
   sendMail.submit();
+}
+
+watch(quotedContent, (newVal, oldVal) => {
+  if (!oldVal && newVal) {
+    nextTick(() => {
+      if (quotedContentRef.value) {
+        quotedContentRef.value.innerHTML = newVal;
+      }
+    });
+  }
+});
+function onQuotedInput() {
+  const el = quotedContentRef.value;
+  if (!el) return;
+  quotedContent.value = el.innerHTML || null;
 }
 
 function toggleCC() {
@@ -354,15 +396,16 @@ function addToReply(
   toEmailsClone.value = toEmails;
   ccEmailsClone.value = ccEmails;
   bccEmailsClone.value = bccEmails;
-  const repliedMessage = `<p class="reply-to-content"><p><blockquote>${body}</blockquote>`;
-  editorRef.value.editor
-    .chain()
-    .clearContent()
-    .insertContent(repliedMessage)
-    .focus("all")
-    .insertContentAt(0, { type: "paragraph" })
-    .focus("start")
-    .run();
+
+  if (body !== quotedContent.value) {
+    //trigger change for watch when replied to body data is different from current quoted content
+    quotedContent.value = null;
+    nextTick(() => {
+      quotedContent.value = body;
+    });
+  }
+
+  editorRef.value.editor.chain().clearContent().focus("start").run();
   nextTick(() => {
     newEmail.value = editorRef.value.editor.getHTML();
   });
@@ -371,19 +414,92 @@ function addToReply(
 function resetState() {
   newEmail.value = null;
   attachments.value = [];
+  quotedContent.value = null;
 }
 
 function handleDiscard() {
   attachments.value = [];
   newEmail.value = null;
-
+  quotedContent.value = null;
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
-  ccEmailsClone.value = [];
   showCC.value = false;
   showBCC.value = false;
 
   emit("discard");
+}
+
+//on load set quoted content from storage
+onMounted(() => {
+  if (quotedContent.value) {
+    nextTick(() => {
+      if (quotedContentRef.value) {
+        quotedContentRef.value.innerHTML = quotedContent.value;
+      }
+    });
+  }
+});
+
+function handleSelectAll(e: KeyboardEvent) {
+  const active = document.activeElement;
+  const editorDom = editorRef.value?.editor?.view?.dom as
+    | HTMLElement
+    | undefined;
+  const quotedEl = quotedContentRef.value;
+  const sel = window.getSelection();
+  if (!sel || !editorDom) return;
+  if (!editorDom.contains(active) && !(quotedEl && quotedEl.contains(active))) {
+    return;
+  }
+  e.preventDefault();
+  sel.removeAllRanges();
+  const range = document.createRange();
+
+  if (quotedEl) {
+    range.setStartBefore(editorDom);
+    range.setEndAfter(quotedEl);
+  } else {
+    range.selectNodeContents(editorDom);
+  }
+  sel.addRange(range);
+}
+
+function handleDelete(e: KeyboardEvent) {
+  const sel = window.getSelection();
+  const quotedEl = quotedContentRef.value;
+  const editorDom = editorRef.value?.editor?.view?.dom as
+    | HTMLElement
+    | undefined;
+
+  if (!sel || sel.isCollapsed || !quotedEl || !editorDom) return;
+
+  const isSelectingEntireEditor = sel.containsNode(editorDom, true);
+
+  const isSelectingEntireQuote = sel.containsNode(quotedEl, true);
+
+  if (isSelectingEntireEditor && isSelectingEntireQuote) {
+    e.preventDefault();
+
+    editorRef.value?.editor?.commands?.clearContent();
+    newEmail.value = null;
+    quotedContent.value = null;
+
+    sel.removeAllRanges();
+  }
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  const key = e.key.toLowerCase();
+
+  if ((e.metaKey || e.ctrlKey) && key === "a") {
+    handleSelectAll(e);
+    return;
+  }
+
+  if (key === "backspace" || key === "delete") {
+    handleDelete(e);
+    return;
+  }
 }
 
 const editor = computed(() => {

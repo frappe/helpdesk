@@ -64,14 +64,16 @@ interface Props {
   targetClass?: string;
   bodyClass?: string;
   placement?: string;
+  defaultValue?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   placement: "bottom-start",
+  defaultValue: undefined,
 });
 
 const onReset = (togglePopover: () => void) => {
-  model.value = null;
+  model.value = props.defaultValue !== undefined ? props.defaultValue : null;
   togglePopover();
 };
 

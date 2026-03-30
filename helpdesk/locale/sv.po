@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-02-22 10:40+0000\n"
-"PO-Revision-Date: 2026-02-26 17:30\n"
+"POT-Creation-Date: 2026-03-01 10:40+0000\n"
+"PO-Revision-Date: 2026-03-23 07:56\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -20,12 +20,12 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:181
 msgid "% SLA Fulfilled"
-msgstr "Procentandel Uppfylld SLA"
+msgstr "% Uppfylld Service Nivå Avtal"
 
 #: helpdesk/api/dashboard.py:186
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
-msgstr "Procentandel av skapade ärenden som löstes inom SLA"
+msgstr "% av skapade ärenden som löstes inom Service Nivå Avtal"
 
 #: desk/src/pages/SearchAgent.vue:120
 msgid "({0}s)"
@@ -69,12 +69,12 @@ msgstr "<div class=\"ql-editor read-mode\"><p>Låt oss veta om vi löste ditt pr
 #. Header text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Visit Helpdesk</a></span>"
-msgstr "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Besök Helpdesk</a></span>"
+msgstr "<span class=\"h3\" style=\"\"><a href=\"/helpdesk\">Besök Support</a></span>"
 
 #. Paragraph text in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "<span class=\"h4\">Helpdesk Configuration<br></span>"
-msgstr "<span class=\"h4\">Helpdesk Konfiguration<br></span>"
+msgstr "<span class=\"h4\">Support Konfiguration<br></span>"
 
 #: desk/src/pages/ticket/TicketNew.vue:69
 msgid "A short description"
@@ -295,7 +295,7 @@ msgid "Agents will no longer be able to view and create saved replies with globa
 msgstr "Handläggare kommer inte längre att kunna visa och skapa sparade svar med global omfattning."
 
 #. Name of a role
-#: desk/src/components/SavedRepliesSelectorModal.vue:158
+#: desk/src/components/SavedRepliesSelectorModal.vue:159
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:325
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
@@ -378,7 +378,7 @@ msgstr "Tillämpa utanför arbetstid"
 #. Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply to customer portal"
-msgstr "Tillämpa på kundportal"
+msgstr "Tillämpa på Kund Portal"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:423
@@ -398,7 +398,7 @@ msgstr "Är du säker på att du vill stänga detta ärende?"
 msgid "Are you sure you want to delete these articles?"
 msgstr "Är du säker på att du vill ta bort dessa artiklar?"
 
-#: desk/src/pages/knowledge-base/Article.vue:317
+#: desk/src/pages/knowledge-base/Article.vue:318
 msgid "Are you sure you want to delete this article?"
 msgstr "Är du säker på att du vill ta bort denna artikel?"
 
@@ -450,19 +450,19 @@ msgstr "Artikel"
 msgid "Article created"
 msgstr "Artikel skapad"
 
-#: desk/src/pages/knowledge-base/Article.vue:330
+#: desk/src/pages/knowledge-base/Article.vue:331
 msgid "Article deleted"
 msgstr "Artikel borttagen"
 
-#: desk/src/pages/knowledge-base/Article.vue:407
+#: desk/src/pages/knowledge-base/Article.vue:408
 msgid "Article link copied to clipboard"
 msgstr "Artikel länk kopierad till urklipp"
 
-#: desk/src/pages/knowledge-base/Article.vue:260
+#: desk/src/pages/knowledge-base/Article.vue:261
 msgid "Article moved"
 msgstr "Artikel flyttad"
 
-#: desk/src/pages/knowledge-base/Article.vue:306
+#: desk/src/pages/knowledge-base/Article.vue:307
 msgid "Article updated"
 msgstr "Artikel uppdaterad"
 
@@ -579,7 +579,7 @@ msgstr "Tilldelning regel {0} uppdaterad"
 msgid "At least one email is required"
 msgstr "Åtminstone en e-post erfordras"
 
-#: desk/src/components/Settings/InviteAgents.vue:170
+#: desk/src/components/Settings/InviteAgents.vue:171
 msgid "At least one email required"
 msgstr "Minst en e-postadress erfordras"
 
@@ -773,15 +773,15 @@ msgstr "Uppringare"
 msgid "Calls"
 msgstr "Samtal"
 
-#: desk/src/components/Settings/InviteAgents.vue:147
+#: desk/src/components/Settings/InviteAgents.vue:148
 msgid "Can invite new agents, manage tickets, create custom views and manage public views."
 msgstr "Kan bjuda in nya handläggare, hantera ärenden, skapa anpassade vyer och hantera offentliga vyer."
 
-#: desk/src/components/Settings/InviteAgents.vue:155
+#: desk/src/components/Settings/InviteAgents.vue:156
 msgid "Can manage all aspects of Helpdesk."
-msgstr "Kan hantera alla aspekter av Helpdesk."
+msgstr "Kan hantera alla aspekter av Support."
 
-#: desk/src/components/Settings/InviteAgents.vue:139
+#: desk/src/components/Settings/InviteAgents.vue:140
 msgid "Can work on tickets, create custom views and manage private views."
 msgstr "Kan arbeta med ärenden, skapa anpassade vyer och hantera privata vyer."
 
@@ -793,7 +793,7 @@ msgstr "Avbryt Inbjudan"
 msgid "Canceled"
 msgstr "Annullerad"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:508
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:511
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr "Det går inte att ta bort standard SLA. En SLA måste vara vald som standard."
 
@@ -838,7 +838,7 @@ msgid "Category merged"
 msgstr "Kategori sammanslagen"
 
 #: helpdesk/api/knowledge_base.py:72
-#: helpdesk/helpdesk/doctype/hd_article/hd_article.py:64
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.py:65
 msgid "Category must have atleast one article"
 msgstr "Kategorin måste ha minst en artikel"
 
@@ -850,7 +850,7 @@ msgstr "Kategori uppdaterad"
 msgid "Change"
 msgstr "Ändra"
 
-#: desk/src/components/Settings/Profile/Profile.vue:123
+#: desk/src/components/Settings/Profile/Profile.vue:129
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:2
 msgid "Change Password"
 msgstr "Ändra Lösenord"
@@ -859,7 +859,7 @@ msgstr "Ändra Lösenord"
 msgid "Change image"
 msgstr "Ändra Bild"
 
-#: desk/src/components/Settings/Profile/Profile.vue:133
+#: desk/src/components/Settings/Profile/Profile.vue:139
 msgid "Change language of the application."
 msgstr "Ändra språk för ansökan."
 
@@ -883,7 +883,11 @@ msgstr "Ändra team"
 msgid "Change ticket type"
 msgstr "Ändra ärende typ"
 
-#: desk/src/components/Settings/Profile/Profile.vue:118
+#: desk/src/components/Settings/Profile/Profile.vue:155
+msgid "Change timezone of the application."
+msgstr "Ändra språk för ansökan."
+
+#: desk/src/components/Settings/Profile/Profile.vue:124
 msgid "Change your account password for security."
 msgstr "Ändra lösenord för ditt konto för säkerhets skull."
 
@@ -971,7 +975,7 @@ msgstr "Stäng ärende"
 msgid "Closed"
 msgstr "Stängd"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:336
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:354
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Stängda eller betygsatta ärenden kan bara uppdateras av handläggare"
 
@@ -1001,8 +1005,8 @@ msgstr "Kommaseparerade e-postmeddelanden att bjuda in"
 msgid "Comment"
 msgstr "Kommentar"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:61
-#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:106
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:67
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:112
 msgid "Comment not found"
 msgstr "Kommentar hittades inte"
 
@@ -1044,7 +1048,7 @@ msgstr "Konfigurera dina telefoni inställningar."
 #: desk/src/components/ListViewBuilder.vue:236
 #: desk/src/components/Settings/Teams/TeamEdit.vue:115
 #: desk/src/components/Settings/Teams/TeamEdit.vue:241
-#: desk/src/pages/knowledge-base/Article.vue:320
+#: desk/src/pages/knowledge-base/Article.vue:321
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:201
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:310
 #: desk/src/pages/knowledge-base/NewArticle.vue:149
@@ -1124,15 +1128,15 @@ msgstr "Kopiera ärende URL"
 msgid "Copy ticket id"
 msgstr "Kopiera ärende ID"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:632
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:650
 msgid "Could not an email due to: {0}"
 msgstr "Kunde inte skicka e-post på grund av: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:790
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:808
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "Kunde inte skicka bekräftelse e-post på grund av: {0}"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:173
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:172
 msgid "Could not send feedback email,due to: {0}"
 msgstr "Kunde inte skicka återkoppling e-post, på grund av: {0}"
 
@@ -1226,7 +1230,7 @@ msgid "Cyan"
 msgstr "Cyan"
 
 #: desk/src/components/layouts/Sidebar.vue:353
-#: desk/src/pages/knowledge-base/Article.vue:411
+#: desk/src/pages/knowledge-base/Article.vue:412
 msgid "Danger"
 msgstr "Fara"
 
@@ -1267,7 +1271,7 @@ msgstr "Standard Prioritet"
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Default SLA"
-msgstr "Standard SLA"
+msgstr "Standard Service Nivå Avtal"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:56
 msgid "Default Sending"
@@ -1296,7 +1300,7 @@ msgstr "Standard Åtgärder"
 msgid "Default priority"
 msgstr "Standard prioritet"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:59
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:63
 msgid "Default template can not be deleted"
 msgstr "Standard mall kan inte tas bort"
 
@@ -1319,15 +1323,15 @@ msgstr "Definiera vem som får ärendena och hur de fördelas mellan handläggar
 #: desk/src/components/ListViewBuilder.vue:230
 #: desk/src/components/Settings/Teams/TeamEdit.vue:348
 #: desk/src/components/Settings/Teams/TeamEdit.vue:350
-#: desk/src/pages/knowledge-base/Article.vue:415
-#: desk/src/pages/knowledge-base/Article.vue:417
+#: desk/src/pages/knowledge-base/Article.vue:416
+#: desk/src/pages/knowledge-base/Article.vue:418
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:173
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:192
 #: desk/src/pages/ticket/Tickets.vue:438
 msgid "Delete"
 msgstr "Ta bort"
 
-#: desk/src/pages/knowledge-base/Article.vue:316
+#: desk/src/pages/knowledge-base/Article.vue:317
 msgid "Delete Article"
 msgstr "Ta bort Artikel"
 
@@ -1418,7 +1422,9 @@ msgid "Disable signup"
 msgstr "Inaktivera Registrering"
 
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
+#. Label of the disabled (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Disabled"
 msgstr "Inaktiverad"
 
@@ -1524,7 +1530,7 @@ msgstr "Varaktighet erfordras"
 msgid "Easily invite new agents, managers, or admins."
 msgstr "Bjud enkelt in nya handläggare, ansvariga eller administratörer."
 
-#: desk/src/pages/knowledge-base/Article.vue:390
+#: desk/src/pages/knowledge-base/Article.vue:391
 #: desk/src/pages/ticket/Tickets.vue:374
 msgid "Edit"
 msgstr "Redigera"
@@ -1595,7 +1601,7 @@ msgstr "E-post"
 msgid "Email Notifications"
 msgstr "E-post Aviseringar"
 
-#: desk/src/components/Settings/EmailAdd.vue:306
+#: desk/src/components/Settings/EmailAdd.vue:307
 msgid "Email account created"
 msgstr "E-postkonto Skapad"
 
@@ -1756,7 +1762,7 @@ msgstr "Extern länk"
 msgid "Failed"
 msgstr "Misslyckad"
 
-#: desk/src/components/Settings/EmailAdd.vue:311
+#: desk/src/components/Settings/EmailAdd.vue:313
 msgid "Failed to create email account, Invalid credentials"
 msgstr "Misslyckades med att skapa e-post konto, ogiltiga inloggningsuppgifter"
 
@@ -1828,7 +1834,7 @@ msgstr "Återkoppling Betyg"
 msgid "Feedback Trend"
 msgstr "Återkoppling Trend"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:171
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:170
 msgid "Feedback email has been sent to the customer"
 msgstr "Återkoppling e-post skickad till kund"
 
@@ -1849,11 +1855,11 @@ msgstr "Fältberoende skapad"
 msgid "Field Dependency updated successfully"
 msgstr "Fältberoende uppdaterad"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:27
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:25
 msgid "Field `{0}` does not exist in Ticket"
 msgstr "Fält `{0}` finns inte i Ärende"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:43
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:41
 msgid "Field `{0}` is not allowed in Ticket Template"
 msgstr "Fält `{0}` är inte tillåtet i Ärende Mallen"
 
@@ -1881,7 +1887,7 @@ msgstr "Filter"
 msgid "Find out all of the variables that can be used in the content"
 msgstr "Ta reda på alla variabler som kan användas i innehållet"
 
-#: desk/src/components/Settings/Profile/Profile.vue:101
+#: desk/src/components/Settings/Profile/Profile.vue:107
 #: desk/src/components/desk/global/NewContactDialog.vue:118
 msgid "First Name"
 msgstr "Förnamn"
@@ -1960,7 +1966,7 @@ msgstr "Uppfylld"
 #: desk/src/components/layouts/Sidebar.vue:487
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
-msgstr "Allmän"
+msgstr "Allmänt"
 
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -1976,7 +1982,7 @@ msgid "General category name can't be changed"
 msgstr "Allmän kategori namn kan inte ändras"
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/SavedRepliesSelectorModal.vue:173
+#: desk/src/components/SavedRepliesSelectorModal.vue:174
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:346
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:380
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:233
@@ -2057,7 +2063,7 @@ msgstr "Kund"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "HD Desk Account Request"
-msgstr "Helpdesk Konto Begäran"
+msgstr "Skrivbord Konto Begäran"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
@@ -2118,7 +2124,7 @@ msgstr "Service Dag"
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list_calendar.js:20
 msgid "HD Service Holiday List"
-msgstr "Tjänstgöring Helg Lista"
+msgstr "Service Helg Lista"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
@@ -2233,23 +2239,23 @@ msgstr "Hjälp"
 
 #: helpdesk/config/desktop.py:11
 msgid "HelpDesk"
-msgstr "Helpdesk"
+msgstr "Support"
 
 #. Name of a Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk"
-msgstr "Helpdesk"
+msgstr "Support"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Helpdesk Contact"
-msgstr "Helpdesk Kontakt"
+msgstr "Support Kontakt"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk Reports"
-msgstr "Helpdesk Rapporter"
+msgstr "Support Rapporter"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:53
 msgid "Here, your weekly offs are pre-populated based on the previous selections. You can add more rows to also add public and national holidays individually."
@@ -2293,7 +2299,7 @@ msgstr "Helglista borttagen"
 
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:124
 msgid "Holiday list duplicated"
-msgstr "Helgdagslista duplicerad"
+msgstr "Helglista duplicerad"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:435
 msgid "Holiday list updated"
@@ -2521,7 +2527,7 @@ msgstr "Kort Kommando"
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/command-palette/CP.vue:104
-#: desk/src/pages/knowledge-base/Article.vue:432
+#: desk/src/pages/knowledge-base/Article.vue:433
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:6
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:434
 #: desk/src/pages/knowledge-base/NewArticle.vue:171
@@ -2545,11 +2551,11 @@ msgstr "Etikett"
 msgid "Label (customer view)"
 msgstr "Benämning (kund vy)"
 
-#: desk/src/components/Settings/Profile/Profile.vue:130
+#: desk/src/components/Settings/Profile/Profile.vue:136
 msgid "Language"
 msgstr "Språk"
 
-#: desk/src/components/Settings/Profile/Profile.vue:257
+#: desk/src/components/Settings/Profile/Profile.vue:298
 msgid "Language updated"
 msgstr "Språk uppdaterad"
 
@@ -2582,14 +2588,14 @@ msgstr "Senaste 90 Dagar"
 #. Label of the last_agent_response (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Last Agent Response"
-msgstr "Senaste handläggare svar"
+msgstr "Senaste Handläggare Svar"
 
 #. Label of the last_customer_response (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Last Customer Response"
-msgstr "Senaste kund svar"
+msgstr "Senaste Kund Svar"
 
-#: desk/src/components/Settings/Profile/Profile.vue:107
+#: desk/src/components/Settings/Profile/Profile.vue:113
 #: desk/src/components/desk/global/NewContactDialog.vue:126
 msgid "Last Name"
 msgstr "Efternamn"
@@ -2787,12 +2793,12 @@ msgstr "Måndag"
 msgid "Monthly"
 msgstr "Månadsvis"
 
-#: desk/src/pages/knowledge-base/Article.vue:397
+#: desk/src/pages/knowledge-base/Article.vue:398
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:184
 msgid "Move To"
 msgstr "Flytta till"
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:168
+#: desk/src/components/SavedRepliesSelectorModal.vue:169
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:339
 msgid "My Team"
 msgstr "Mitt Team"
@@ -2916,8 +2922,8 @@ msgstr "Ny Ämne"
 msgid "New Team"
 msgstr "Ny Team"
 
-#: desk/src/pages/ticket/TicketNew.vue:313
-#: desk/src/pages/ticket/TicketNew.vue:323
+#: desk/src/pages/ticket/TicketNew.vue:301
+#: desk/src/pages/ticket/TicketNew.vue:311
 msgid "New Ticket"
 msgstr "Ny Ärende"
 
@@ -3168,7 +3174,7 @@ msgstr "Ansvarig"
 msgid "Parent field, child field, and parent-child mapping are required."
 msgstr "Överordnad fält, underordnad fält och överordnad-underordnad mappning erfordras."
 
-#: desk/src/components/Settings/Profile/Profile.vue:115
+#: desk/src/components/Settings/Profile/Profile.vue:121
 msgid "Password"
 msgstr "Lösenord"
 
@@ -3226,13 +3232,13 @@ msgid "Period"
 msgstr "Period"
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/SavedRepliesSelectorModal.vue:163
+#: desk/src/components/SavedRepliesSelectorModal.vue:164
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:332
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:372
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:223
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Personal"
-msgstr "Personal"
+msgstr "Personlig"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:88
 msgid "Personal mobile no"
@@ -3276,7 +3282,7 @@ msgstr "Lägg till prioritet i <a href='/app/hd-service-level-agreement'>erfordr
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:326
 msgid "Please add {0} priority in {1} SLA"
-msgstr "Lägg till {0} prioritet i {1} SLA"
+msgstr "Lägg till {0} prioritet i {1} Service Nivå Avtal"
 
 #: desk/src/pages/ticket/TicketNew.vue:82
 msgid "Please enter a subject to continue"
@@ -3287,7 +3293,7 @@ msgstr "Ange ämne att fortsätta"
 msgid "Please enter a valid phone number"
 msgstr "Ange giltigt telefonnummer"
 
-#: desk/src/components/Settings/Profile/Profile.vue:225
+#: desk/src/components/Settings/Profile/Profile.vue:266
 msgid "Please enter first name at least"
 msgstr "Ange åtminstone förnamn"
 
@@ -3348,7 +3354,7 @@ msgstr "Ange Benämning Nyckel"
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:10
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Prefer knowledge base"
-msgstr "Föredrar kunskapsbas"
+msgstr "Föredra kunskap bas"
 
 #: desk/src/pages/dashboard/Dashboard.vue:267
 msgid "Presets"
@@ -3395,7 +3401,7 @@ msgstr "Prioritet"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:84
 msgid "Priority <u>{0}</u> must be included in the SLA {1}."
-msgstr "Prioritet <u>{0}</u> måste ingå i SLA {1}."
+msgstr "Prioritet <u>{0}</u> måste ingå i Service Nivå Avtal {1}."
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:75
 msgid "Priority {0} has been repeated."
@@ -3404,7 +3410,7 @@ msgstr "Prioritet {0} har upprepats."
 #: desk/src/components/layouts/Sidebar.vue:278
 #: desk/src/pages/ticket/Tickets.vue:318
 msgid "Private Views"
-msgstr "Privata vyer"
+msgstr "Privata Vyer"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:37
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:7
@@ -3420,14 +3426,14 @@ msgstr "Produkt experter"
 msgid "Profile"
 msgstr "Profil"
 
-#: desk/src/components/Settings/Profile/Profile.vue:241
+#: desk/src/components/Settings/Profile/Profile.vue:282
 msgid "Profile updated"
 msgstr "Profil uppdaterad"
 
 #. Label of the public (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Public"
-msgstr "Allmän"
+msgstr "Publik"
 
 #: desk/src/components/layouts/Sidebar.vue:270
 #: desk/src/pages/ticket/Tickets.vue:324
@@ -4084,7 +4090,7 @@ msgstr "Ange Telefonnummer"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:56
 msgid "Set Resolution Time for Priority {0} in row {1}."
-msgstr "Ange lösningstid för prioritet {0} på rad {1}."
+msgstr "Ange Upplösning Tid för Prioritet {0} på rad {1}."
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:48
 msgid "Set Response Time for Priority {0} in row {1}."
@@ -4096,7 +4102,7 @@ msgstr "Ange som standard Service Nivå Avtal"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:246
 msgid "Set the default status assigned when a ticket is created, and the status to apply when a ticket is reopened. If not specified, the default status from HD Settings will be used."
-msgstr "Ange standard status som tilldelas när ett ärende skapas och status som ska gälla när ett ärende öppnas igen. Om inget annat anges används standardstatus från Helpdesk Inställningar."
+msgstr "Ange standard status som tilldelas när ett ärende skapas och status som ska gälla när ett ärende öppnas igen. Om inget annat anges används standardstatus från Support Inställningar."
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:9
 msgid "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one"
@@ -4108,7 +4114,7 @@ msgstr "Ange ditt teams arbetsdagar, timmar och helgdagar med hjälp av en mall 
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:123
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
-msgstr "Att ange <strong>{0}</strong> som standard SLA tar bort <strong>{1}</strong> som standard SLA. Du måste lägga till villkor i <strong>{1}</strong> för att SLA ska fungera."
+msgstr "Att ange <strong>{0}</strong> som standard Service Nivå Avtal tar bort <strong>{1}</strong> som standard Service Nivå Avtal. Du måste lägga till villkor i <strong>{1}</strong> för att Service Nivå Avtal ska fungera."
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
 #: desk/src/components/Settings/SettingsModal.vue:13
@@ -4134,7 +4140,7 @@ msgstr "Konfigurera e-post"
 msgid "Setup SLA"
 msgstr "Konfigurera Service Nivå Avtal"
 
-#: desk/src/pages/knowledge-base/Article.vue:402
+#: desk/src/pages/knowledge-base/Article.vue:403
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:160
 msgid "Share"
 msgstr "Dela "
@@ -4224,7 +4230,7 @@ msgstr "Källa och mål ärende kan inte vara samma"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:331
 msgid "Source ticket does not exist"
-msgstr "Ursprung ärende finns inte"
+msgstr "Ursprunglig ärende finns inte"
 
 #. Label of the split_and_merge_section (Section Break) field in DocType 'HD
 #. Ticket'
@@ -4573,7 +4579,7 @@ msgstr "Denna metod är endast avsedd för utvecklarläge"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:369
 msgid "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
-msgstr "Detta ärende (#{0}) har slagits samman med ärende <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
+msgstr "Detta ärende (#{0}) är sammanslagen med <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:510
 msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
@@ -4611,7 +4617,7 @@ msgstr "Torsdag"
 msgid "Ticket"
 msgstr "Ärende"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:777
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:795
 msgid "Ticket #{0}: We've received your request"
 msgstr "Ärende #{0}: Vi har mottagit begäran"
 
@@ -4695,7 +4701,7 @@ msgstr "Ärende avslutat"
 msgid "Ticket does not exist."
 msgstr "Ärende finns inte."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:326
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:344
 msgid "Ticket must be resolved with a feedback"
 msgstr "Ärende måste lösas med återkoppling"
 
@@ -4743,7 +4749,7 @@ msgstr "Ärendesökning Analys"
 #: desk/src/pages/SearchAgent.vue:351
 #: desk/src/pages/ticket/MobileTicketAgent.vue:329
 #: desk/src/pages/ticket/TicketCustomer.vue:333
-#: desk/src/pages/ticket/TicketNew.vue:307 desk/src/pages/ticket/Tickets.vue:6
+#: desk/src/pages/ticket/TicketNew.vue:295 desk/src/pages/ticket/Tickets.vue:6
 #: desk/src/pages/ticket/Tickets.vue:587 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
 msgid "Tickets"
@@ -4768,6 +4774,14 @@ msgstr "Ärenden per Typ"
 #: helpdesk/api/ticket.py:16
 msgid "Tickets can only be assigned to agents"
 msgstr "Ärenden kan endast tilldelas handläggare"
+
+#: desk/src/components/Settings/Profile/Profile.vue:152
+msgid "Timezone"
+msgstr "Tidszon"
+
+#: desk/src/components/Settings/Profile/Profile.vue:317
+msgid "Timezone updated"
+msgstr "Tidszon uppdaterad"
 
 #. Label of the title (Data) field in DocType 'HD Article'
 #. Label of the title (Data) field in DocType 'HD Saved Reply'
@@ -4897,7 +4911,7 @@ msgstr "Typ erfordras"
 msgid "URL/Method"
 msgstr "URL/Metod"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:613
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:631
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr "Kunde inte skicka e-post. Konfigurera standard konto för utgående e-post."
 
@@ -5002,7 +5016,7 @@ msgstr "Ladda Upp {0}%"
 msgid "User"
 msgstr "Användare"
 
-#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:132
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:141
 msgid "User Not found"
 msgstr "Användaren hittades inte"
 
@@ -5108,7 +5122,7 @@ msgstr "Arbetsflöde"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:4
 msgid "Workflow & knowledge base settings"
-msgstr "Arbetsflöde och kunskapsbas inställningar"
+msgstr "Arbetsflöde och kunskap bas inställningar"
 
 #. Label of the support_and_resolution_section_break (Section Break) field in
 #. DocType 'HD Service Level Agreement'
@@ -5140,7 +5154,7 @@ msgstr "Du har inte behörighet att visa översikt panel data."
 msgid "You are not permitted to access this resource."
 msgstr "Du har inte behörighet att komma åt denna resurs."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:535
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:553
 msgid "You are not permitted to add a comment"
 msgstr "Du har inte behörighet att lägga till kommentar"
 

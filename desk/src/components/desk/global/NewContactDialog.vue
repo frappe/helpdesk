@@ -182,7 +182,7 @@ const contactResource = createResource({
       phone: "",
       selectedCustomer: null,
     };
-    toast.success(__("Contact created"));
+    toast.success(__("Contact created successfully."));
     emit("contactCreated");
   },
 });
