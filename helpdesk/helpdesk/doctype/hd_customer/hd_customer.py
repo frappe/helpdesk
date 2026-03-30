@@ -6,7 +6,7 @@ from frappe import _
 from frappe.contacts.doctype.contact.contact import invite_user
 from frappe.model.document import Document
 
-from helpdesk.utils import agent_only
+from helpdesk.utils import agent_only, get_customers, is_agent
 
 
 class HDCustomer(Document):
@@ -254,3 +254,17 @@ class HDCustomer(Document):
                 }
             )
         return res
+
+
+# Custom perms for list query. Only the `WHERE` part
+# Used so that contact raising the ticket can see the customers they are part of
+def permission_query(user):
+    if is_agent(user):
+        return ""
+
+    customers = get_customers(user, get_roles=True)
+    query = ""
+    for i, c in enumerate(customers):
+        prefix = " OR " if i > 0 else ""
+        query += f"{prefix}`tabHD Customer`.name = '{c.get('name')}'"
+    return query

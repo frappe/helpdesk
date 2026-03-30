@@ -7,6 +7,7 @@
       :chartConfig="hasData ? chartConfig : placeholderChartConfig"
       :currentDuration="currentDuration"
       :orientation="orientation"
+      :timelineFilter="timelineFilter"
       @changeDuration="changeDuration"
     >
       <template v-if="$slots.text" #text>
@@ -24,10 +25,11 @@ import { computed, onMounted, ref, type PropType } from "vue";
 import CardBase from "./ChartCardBase.vue";
 
 interface BarChartData {
-  percentage_change: number;
+  percentage_change?: number;
   total?: number;
   average?: number;
-  data: { date: string; count: number }[];
+  data: { date: string; count: number }[] | Record<number, number>;
+  total_reviews?: number;
 }
 
 const props = defineProps({
@@ -37,7 +39,7 @@ const props = defineProps({
   },
   apiUrl: {
     type: String,
-    required: true,
+    required: false,
   },
   data: {
     type: Object as PropType<BarChartData>,
@@ -67,6 +69,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  timelineFilter: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const currentDuration = ref(__("Last month"));
@@ -75,10 +81,26 @@ const chartData = computed(() => {
   const isDataFetched = resource.fetched;
   const _data: BarChartData = isDataFetched ? resource.data : props.data;
 
-  const labels = _data?.data?.map((item) => item.date) || [];
-  const counts = _data?.data?.map((item) => item.count) || [];
-  const _percentageChange = _data?.percentage_change || 0;
+  // Star-distribution shape: data is { 1: n, 2: n, ... }
+  if (!props.timelineFilter && _data?.data && !Array.isArray(_data.data)) {
+    const distribution = _data.data as Record<number, number>;
+    const values = [1, 2, 3, 4, 5].map((s) => distribution[s] ?? 0);
+    return {
+      labels: ["1", "2", "3", "4", "5"],
+      counts: values,
+      percentageChange: getPercentageChange(0),
+      text: _data?.average ?? 0,
+      isStarDistribution: true,
+    };
+  }
 
+  // Time-series shape: data is [{ date, count }, ...]
+  const timeData = Array.isArray(_data?.data)
+    ? (_data.data as { date: string; count: number }[])
+    : [];
+  const labels = timeData.map((item) => item.date);
+  const counts = timeData.map((item) => item.count);
+  const _percentageChange = _data?.percentage_change || 0;
   const percentageChange = getPercentageChange(_percentageChange);
 
   return {
@@ -86,6 +108,7 @@ const chartData = computed(() => {
     counts,
     percentageChange,
     text: props.measure === "average" ? _data?.average ?? 0 : _data?.total ?? 0,
+    isStarDistribution: false,
   };
 });
 
@@ -112,6 +135,63 @@ const hasData = computed(() => {
 
 const chartConfig = computed<EChartsOption>(() => {
   const color = props.barColor;
+
+  if (chartData.value.isStarDistribution) {
+    const values = chartData.value.counts as number[];
+    // rank by value descending: index 0 = highest, 4 = lowest
+    const opacities = [1, 0.7, 0.5, 0.3, 0.2];
+    const baseColor = props.barColor; // #E79913
+
+    // unique sorted counts descending (for tie-aware rank lookup)
+    const uniqueSorted = [...new Set(values)].sort((a, b) => b - a);
+
+    const opacityByIndex: number[] = values.map((v) => {
+      const rank = uniqueSorted.indexOf(v); // same count → same rank
+      return opacities[Math.min(rank, opacities.length - 1)];
+    });
+
+    // helper: hex + opacity → rgba
+    const hexToRgba = (hex: string, alpha: number) => {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r},${g},${b},${alpha})`;
+    };
+
+    return {
+      grid: { left: 4, right: 4, top: 16, bottom: 20, containLabel: false },
+      xAxis: {
+        type: "category",
+        data: ["1", "2", "3", "4", "5"],
+        axisLine: { show: true, lineStyle: { color: "#ededed" } },
+        axisTick: { show: false },
+        axisLabel: { color: "#6b7280", fontSize: 11 },
+      },
+      yAxis: { type: "value", show: false, min: 0 },
+      series: [
+        {
+          type: "bar",
+          data: values.map((value, i) => ({
+            value: value === 0 ? 0 : value,
+            itemStyle: {
+              color: hexToRgba(baseColor, opacityByIndex[i]),
+              borderRadius: [4, 4, 0, 0],
+            },
+            label: {
+              show: true,
+              position: "top" as const,
+              formatter: value > 0 ? String(value) : "",
+              color: "#6b7280",
+              fontSize: 11,
+            },
+          })),
+          barWidth: 16,
+          emphasis: { disabled: true },
+        },
+      ],
+      tooltip: { show: false },
+    };
+  }
 
   return {
     xAxis: {
@@ -187,7 +267,7 @@ const placeholderChartConfig = computed<EChartsOption>(() => {
 });
 
 const resource = createResource({
-  url: props.apiUrl,
+  url: props.apiUrl || "",
   type: "GET",
   makeParams: () => {
     const params: Record<string, any> = {
@@ -203,11 +283,11 @@ const resource = createResource({
 
 const changeDuration = (period: string) => {
   currentDuration.value = period;
-  resource.submit();
+  if (props.apiUrl) resource.submit();
 };
 
 onMounted(() => {
-  if (!props.data?.data) {
+  if (props.timelineFilter && props.apiUrl && !props.data?.data) {
     resource.submit();
   }
 });

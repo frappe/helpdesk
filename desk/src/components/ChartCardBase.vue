@@ -20,7 +20,7 @@
             {{ text }}
           </div>
         </slot>
-        <div class="flex items-center text-sm gap-1">
+        <div v-if="timelineFilter" class="flex items-center text-sm gap-1">
           <div class="flex items-center gap-1" :class="percentageChange.color">
             <FeatherIcon :name="percentageChange.icon" class="size-4" />
             <div>{{ percentageChange.value }}%</div>
@@ -70,7 +70,7 @@
           </div>
         </slot>
       </div>
-      <div class="flex items-center text-sm gap-1">
+      <div v-if="timelineFilter" class="flex items-center text-sm gap-1">
         <div class="flex items-center gap-1" :class="percentageChange.color">
           <FeatherIcon :name="percentageChange.icon" class="size-4" />
           <div>{{ percentageChange.value }}%</div>
@@ -131,6 +131,10 @@ const props = defineProps({
   orientation: {
     type: String as PropType<"vertical" | "horizontal">,
     default: "vertical",
+  },
+  timelineFilter: {
+    type: Boolean,
+    default: true,
   },
 });
 

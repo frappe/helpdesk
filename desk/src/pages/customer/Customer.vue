@@ -16,10 +16,21 @@
           image: customer.doc.image,
           shape: 'square',
         }"
-        :showEdit="hasPermission()"
         :docInfo="customerInfo"
-        @edit="customerDialog = true"
-      />
+      >
+        <template #actions>
+          <Button
+            v-if="hasPermission()"
+            variant="subtle"
+            @click="customerDialog = true"
+          >
+            <div class="flex gap-1 items-center">
+              <LucideSquarePen class="h-4 w-4" />
+              <span>{{ __("Edit") }}</span>
+            </div>
+          </Button>
+        </template>
+      </PageInfo>
       <div class="overflow-y-auto flex-1">
         <TicketStats
           :dt="'HD Customer'"
@@ -94,15 +105,16 @@ import { useScreenSize } from "@/composables/screen";
 import { __ } from "@/translation";
 import { CustomerResourceSymbol } from "@/types";
 import { hasPermission } from "@/utils";
-import { Badge, Breadcrumbs, Tabs, usePageMeta } from "frappe-ui";
+import { Badge, Breadcrumbs, Button, Tabs, usePageMeta } from "frappe-ui";
 import { computed, h, markRaw, onMounted, provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideGlobe from "~icons/lucide/globe";
 import LucideMail from "~icons/lucide/mail";
 import LucideMapPin from "~icons/lucide/map-pin";
 import LucidePhone from "~icons/lucide/phone";
+import LucideSquarePen from "~icons/lucide/square-pen";
 import LucideSquareUser from "~icons/lucide/square-user";
-import { getTicketListResource } from "./tickets";
+import { getTicketListResource } from "../../stores/docTickets";
 // props with type set at string
 const props = defineProps<{
   id: string;

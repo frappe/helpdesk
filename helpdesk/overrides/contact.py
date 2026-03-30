@@ -5,19 +5,6 @@ from frappe.query_builder.functions import Avg
 from helpdesk.utils import get_country_from_timezone, get_customers
 
 
-def before_insert(doc, method=None):
-    if doc.email_id:
-        domain = doc.email_id.split("@")[1]
-        hd_customers = frappe.get_all(
-            "HD Customer", filters={"domain": domain}, fields=["name"]
-        )
-        if hd_customers:
-            doc.append(
-                "links",
-                {"link_doctype": "HD Customer", "link_name": hd_customers[0].name},
-            )
-
-
 class CustomContact(Contact):
     @frappe.whitelist()
     def get_info(self):

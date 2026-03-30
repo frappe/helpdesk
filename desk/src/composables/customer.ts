@@ -41,9 +41,6 @@ export const customerFields: FieldConfig[] = [
     type: "text",
     label: __("Domain"),
     placeholder: "frappe.io",
-    description: __(
-      "Domain of the customer, eg: tesla.com. This will be used to auto-assign tickets to this customer based on the sender's email domain."
-    ),
     prefix: h(LucideGlobe, { class: "size-4" }),
   },
 ];

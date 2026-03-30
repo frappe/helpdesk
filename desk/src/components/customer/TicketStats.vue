@@ -11,18 +11,23 @@
           :data="chartData"
           bar-color="#E79913"
           measure="average"
-          api-url="helpdesk.api.ticket_stats.get_feedback_received"
+          :timelineFilter="false"
           :dt="props.dt"
           :dn="props.dn"
           orientation="horizontal"
           :negativeIsBetter="false"
         >
           <template #text="{ text }">
-            <div class="flex items-center gap-1">
-              <span class="text-2xl font-medium text-ink-gray-8">
-                {{ text }}
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <LucideStar class="size-4 fill-ink-amber-2 text-ink-amber-2" />
+                <span class="text-2xl font-medium text-ink-gray-8">
+                  {{ text }}
+                </span>
+              </div>
+              <span class="text-sm text-ink-gray-5">
+                {{ (chartData as any).total ?? 0 }} {{ __("reviews") }}
               </span>
-              <LucideStar class="size-4 fill-ink-amber-2 text-ink-amber-2" />
             </div>
           </template>
         </BarChartCard>

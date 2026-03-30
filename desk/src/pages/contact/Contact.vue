@@ -9,6 +9,7 @@
       class="gap-5 flex flex-col h-full"
       v-if="!contact.loading && contact.doc"
     >
+      <!-- ContactInfo -->
       <PageInfo
         :avatar="{
           label: `${contact.doc.first_name} ${
@@ -18,35 +19,54 @@
           shape: 'circle',
         }"
         :doc-info="contactInfo"
-        :showEdit="hasPermission()"
-      />
-      <Tabs v-model="activeTab" :tabs="tabs">
-        <template #tab-item="{ tab, selected }: any">
-          <button
-            class="group flex items-center gap-2 border-b border-transparent py-2 text-base text-ink-gray-5 duration-300 ease-in-out hover:text-ink-gray-9"
-            :class="{ 'text-ink-gray-9': selected }"
-          >
-            <component :is="tab.icon" v-if="tab.icon" class="h-5" />
-            {{ __(tab.label) }}
-            <Badge
-              class="group-hover:bg-surface-gray-7"
-              :class="[selected ? '!bg-surface-gray-7' : '!bg-gray-600']"
-              variant="solid"
-              theme="gray"
-              size="sm"
+      >
+        <template #actions>
+          <div class="flex gap-2 items-center">
+            <Button variant="subtle">
+              <div class="flex gap-1 items-center">
+                <LucideSquarePen class="h-4 w-4" />
+                <span>{{ __("Edit") }}</span>
+              </div>
+            </Button>
+            <Dropdown
+              :options="moreOptions"
+              placement="right"
+              v-if="hasPermission()"
             >
-              {{ tab.count }}
-            </Badge>
-          </button>
+              <Button icon="more-horizontal" variant="subtle" />
+            </Dropdown>
+          </div>
         </template>
-        <template #tab-panel="{ tab }">
-          <div class="p-5 overflow-hidden">
-            <TicketsTab
-              v-if="tab.label === __('Tickets')"
-              :doc="contact"
-              :ticketsListResource="ticketsListResource"
-              :baseFilter="{ contact: props.id }"
-              :additionalFilter="
+      </PageInfo>
+      <div class="overflow-y-auto flex-1">
+        <TicketStats :dt="'Contact'" :dn="id" v-if="!isMobileView" />
+        <Tabs v-model="activeTab" :tabs="tabs">
+          <template #tab-item="{ tab, selected }: any">
+            <button
+              class="group flex items-center gap-2 border-b border-transparent py-2 text-base text-ink-gray-5 duration-300 ease-in-out hover:text-ink-gray-9"
+              :class="{ 'text-ink-gray-9': selected }"
+            >
+              <component :is="tab.icon" v-if="tab.icon" class="h-5" />
+              {{ __(tab.label) }}
+              <Badge
+                class="group-hover:bg-surface-gray-7"
+                :class="[selected ? '!bg-surface-gray-7' : '!bg-gray-600']"
+                variant="solid"
+                theme="gray"
+                size="sm"
+              >
+                {{ tab.count }}
+              </Badge>
+            </button>
+          </template>
+          <template #tab-panel="{ tab }">
+            <div class="p-5 overflow-hidden">
+              <TicketsTab
+                v-if="tab.label === __('Tickets')"
+                :doc="contact"
+                :ticketsListResource="ticketsListResource"
+                :baseFilter="{ contact: props.id }"
+                :additionalFilter="
                 (contact.getInfo.data?.customers?.length ?? 0) > 1
                   ? {
                       key: 'customer',
@@ -58,30 +78,36 @@
                     }
                   : undefined
               "
-            />
-            <div v-if="tab.label === __('Feedback')">
-              <!-- Feedback tab content -->
+              />
+              <div v-if="tab.label === __('Feedback')">
+                <!-- Feedback tab content -->
+                <ContactFeedback :name="props.id" />
+              </div>
             </div>
-          </div>
-        </template>
-      </Tabs>
+          </template>
+        </Tabs>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import ContactFeedback from "@/components/contact/ContactFeedback.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
 import TicketFeedbackIcon from "@/components/icons/TicketFeedbackIcon.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import PageInfo from "@/components/PageInfo.vue";
+import { useScreenSize } from "@/composables/screen";
 import { __ } from "@/translation";
 import type { DocumentResource } from "@/types";
 import type { Contact } from "@/types/doctypes";
 import { hasPermission } from "@/utils";
 import {
   Breadcrumbs,
+  Button,
   createDocumentResource,
+  Dropdown,
   Tabs,
   usePageMeta,
 } from "frappe-ui";
@@ -91,11 +117,16 @@ import LucideMail from "~icons/lucide/mail";
 import LucideMapPin from "~icons/lucide/map-pin";
 import LucidePhone from "~icons/lucide/phone";
 import LucideStar from "~icons/lucide/star";
-import { getTicketListResource } from "../customer/tickets";
+import LucideTrash2 from "~icons/lucide/trash-2";
+import { getTicketListResource } from "../../stores/docTickets";
 
 const props = defineProps<{
   id: string;
 }>();
+
+const route = useRoute();
+const router = useRouter();
+const { isMobileView } = useScreenSize();
 
 const contact: DocumentResource<Contact> = createDocumentResource({
   doctype: "Contact",
@@ -104,9 +135,6 @@ const contact: DocumentResource<Contact> = createDocumentResource({
     getInfo: "get_info",
   },
 });
-
-const route = useRoute();
-const router = useRouter();
 
 const { ticketsListResource } = getTicketListResource();
 
@@ -167,6 +195,45 @@ const contactInfo = computed(() => {
   ];
   return info;
 });
+
+const moreOptions = computed(() => [
+  {
+    group: __("Actions"),
+    hideLabel: true,
+    items: [
+      {
+        label: __("Invite as User"),
+        icon: "user-plus",
+        condition: () => !contact.doc?.user,
+        onClick: () => {
+          // TODO: invite as user
+        },
+      },
+      {
+        label: __("Send Reset Password Email"),
+        icon: "mail",
+        onClick: () => {
+          // TODO: send reset password email
+        },
+      },
+    ],
+  },
+  {
+    group: __("Danger"),
+    hideLabel: true,
+    items: [
+      {
+        label: __("Delete"),
+        icon: LucideTrash2,
+        theme: "red",
+        onClick: () => {
+          // TODO: delete contact
+        },
+      },
+    ],
+  },
+]);
+
 const breadcrumbs = [
   {
     label: __("Contacts"),

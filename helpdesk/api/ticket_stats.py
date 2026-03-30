@@ -3,7 +3,7 @@ from datetime import date, timedelta
 import frappe
 from frappe import _
 from frappe.query_builder import DocType
-from frappe.query_builder.functions import Avg, Count, Function
+from frappe.query_builder.functions import Count, Function
 from frappe.utils import add_days, nowdate
 
 from helpdesk.api.agent_home.utils import calculate_percentage_change
@@ -95,119 +95,40 @@ def _get_total_tickets(
     }
 
 
-@frappe.whitelist()
-@agent_only
-def get_feedback_received(
-    dt: str,
-    dn: str,
-    period: str = "last month",
-) -> dict:
-    return _get_feedback_received(_resolve_scope(dt), dn, period)
-
-
 def _get_feedback_received(
     scope: Scope,
     value: str,
-    period: str = "last month",
 ) -> dict:
-    from datetime import datetime
+    Ticket = DocType("HD Ticket")
 
-    from dateutil.relativedelta import relativedelta
+    # Rating distribution grouped by star (1–5)
+    rows = (
+        frappe.qb.from_(Ticket)
+        .select(Ticket.feedback_rating.as_("rating"), Count(Ticket.name).as_("count"))
+        .where(Ticket.feedback_rating > 0)
+        .groupby(Ticket.feedback_rating)
+        .orderby(Ticket.feedback_rating)
+    )
+    rows = _apply_scope(rows, Ticket, scope, value)
+    rows = rows.run(as_dict=True)
 
-    days = periods.get(period, 7)
+    # Build {1:n, 2:n, 3:n, 4:n, 5:n} — fill missing stars with 0
+    distribution: dict[int, int] = dict.fromkeys(range(1, 6), 0)
+    total_reviews = 0
+    weighted_sum = 0
+    for row in rows:
+        star = int(round(float(row["rating"]) * 5))
+        star = max(1, min(5, star))
+        distribution[star] = distribution.get(star, 0) + int(row["count"])
+        total_reviews += int(row["count"])
+        weighted_sum += star * int(row["count"])
 
-    if days <= 7:
-        bucket = "daily"
-    elif days <= 90:
-        bucket = "weekly"
-    else:
-        bucket = "monthly"
-
-    current_from = add_days(nowdate(), -(days - 1))
-    current_to = nowdate()
-    previous_from = add_days(nowdate(), -(2 * days - 1))
-    previous_to = add_days(nowdate(), -days)
-
-    def _query(from_date, to_date, grouped=False):
-        Ticket = DocType("HD Ticket")
-        to_date_plus_one = Function(
-            "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
-        )
-        if grouped:
-            if bucket == "daily":
-                key = Function("DATE", Ticket.creation)
-                sort = key
-            elif bucket == "weekly":
-                key = Function("DATE_FORMAT", Ticket.creation, "%x-%v")
-                sort = key
-            else:
-                key = Function("DATE_FORMAT", Ticket.creation, "%b %Y")
-                sort = Function("DATE_FORMAT", Ticket.creation, "%Y%m")
-            q = (
-                frappe.qb.from_(Ticket)
-                .select(key.as_("date"), Count(Ticket.name).as_("count"))
-                .groupby(sort)
-                .orderby(sort)
-            )
-        else:
-            q = frappe.qb.from_(Ticket).select(
-                Count(Ticket.name).as_("count"),
-                (Avg(Ticket.feedback_rating) * 5).as_("average_rating"),
-            )
-
-        q = (
-            q.where(Ticket.creation >= from_date)
-            .where(Ticket.creation < to_date_plus_one)
-            .where(Ticket.feedback_rating > 0)
-        )
-        q = _apply_scope(q, Ticket, scope, value)
-        return q.run(as_dict=True, debug=True)
-
-    current_rows = _query(current_from, current_to, grouped=True)
-
-    summary = (_query(current_from, current_to) or [{"count": 0, "average_rating": 0}])[
-        0
-    ]
-    average_rating = round(float(summary.get("average_rating") or 0), 1)
-
-    now = datetime.now()
-    if bucket == "daily":
-        data = _fill_date_series(current_from, current_to, current_rows)
-    elif bucket == "weekly":
-        week_dict: dict[str, dict] = {}
-        cur = date.fromisoformat(str(current_from))
-        end = date.fromisoformat(str(current_to))
-        cur -= timedelta(days=cur.weekday())
-        while cur <= end:
-            iso = cur.strftime("%G-%V")
-            label = f"{cur.strftime('%b %-d')} – {(cur + timedelta(days=6)).strftime('%b %-d')}"
-            week_dict[iso] = {"label": label, "count": 0}
-            cur += timedelta(weeks=1)
-        for row in current_rows:
-            k = str(row["date"])
-            if k in week_dict:
-                week_dict[k]["count"] = row["count"]
-        data = [{"date": v["label"], "count": v["count"]} for v in week_dict.values()]
-    else:
-        num_months = days // 30
-        month_dict: dict[str, int] = {}
-        for i in range(num_months - 1, -1, -1):
-            m = now - relativedelta(months=i)
-            month_dict[m.strftime("%b %Y")] = 0
-        for row in current_rows:
-            k = str(row["date"])
-            if k in month_dict:
-                month_dict[k] = row["count"]
-        data = [{"date": label, "count": count} for label, count in month_dict.items()]
-
-    current_total = sum(row["count"] for row in current_rows)
-    previous_total = (_query(previous_from, previous_to) or [{"count": 0}])[0]["count"]
-    percentage_change = calculate_percentage_change(current_total, previous_total)
+    average_rating = round(weighted_sum / total_reviews, 1) if total_reviews else 0.0
 
     return {
-        "data": data,
+        "data": distribution,
         "average": average_rating,
-        "percentage_change": percentage_change,
+        "total": total_reviews,
     }
 
 
@@ -357,7 +278,7 @@ def get_ticket_stats(
 
     return {
         # "total_tickets": _get_total_tickets(scope, dn, period),
-        "feedback_received": _get_feedback_received(scope, dn, period),
+        "feedback_received": _get_feedback_received(scope, dn),
         "sla_violations": _get_sla_violations(scope, dn, period),
         "avg_first_response_time": get_avg_time_metric(
             period, "first_response_time", scope, dn

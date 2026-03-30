@@ -49,20 +49,13 @@
         </div>
       </div>
     </div>
-    <Button v-if="showEdit" variant="subtle" @click="emit('edit')">
-      <div class="flex gap-1 items-center">
-        <LucideSquarePen class="h-4 w-4" />
-        <span>{{ __("Edit") }}</span>
-      </div>
-    </Button>
+    <slot name="actions" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useScreenSize } from "@/composables/screen";
-import { __ } from "@/translation";
-import { Avatar, type AvatarProps, Button } from "frappe-ui";
-import LucideSquarePen from "~icons/lucide/square-pen";
+import { Avatar, type AvatarProps } from "frappe-ui";
 
 interface DocInfoItem {
   icon?: any;
@@ -74,18 +67,12 @@ interface DocInfoItem {
 const props = withDefaults(
   defineProps<{
     avatar: AvatarProps;
-    showEdit?: boolean;
     docInfo?: DocInfoItem[];
   }>(),
   {
-    showEdit: false,
     docInfo: () => [],
   }
 );
-
-const emit = defineEmits<{
-  edit: [];
-}>();
 
 const { isMobileView } = useScreenSize();
 </script>
