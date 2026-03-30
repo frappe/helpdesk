@@ -24,3 +24,11 @@ def search_contacts(
         ignore_permissions=False,
         strict=False,
     )
+
+
+@frappe.whitelist()
+def delete_contact(name: str):
+    frappe.has_permission("Contact", "delete", throw=True)
+    tickets = frappe.get_list("HD Ticket", filters={"contact": name}, pluck="name")
+    for ticket in tickets:
+        frappe.delete_doc("HD Ticket", ticket)

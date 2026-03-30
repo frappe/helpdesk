@@ -89,15 +89,26 @@
       </div>
     </div>
   </div>
+  <ContactDeleteDialog
+    v-model:open="showDeleteDialog"
+    :name="id"
+    @delete="handleDelete"
+  />
 </template>
 
 <script setup lang="ts">
+import ContactDeleteDialog from "@/components/contact/ContactDeleteDialog.vue";
 import ContactFeedback from "@/components/contact/ContactFeedback.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
 import TicketFeedbackIcon from "@/components/icons/TicketFeedbackIcon.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
+//@ts-ignore
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import PageInfo from "@/components/PageInfo.vue";
+import {
+  useContactInvite,
+  useContactResetPassword,
+} from "@/composables/contact";
 import { useScreenSize } from "@/composables/screen";
 import { __ } from "@/translation";
 import type { DocumentResource } from "@/types";
@@ -106,12 +117,13 @@ import { hasPermission } from "@/utils";
 import {
   Breadcrumbs,
   Button,
+  call,
   createDocumentResource,
   Dropdown,
   Tabs,
   usePageMeta,
 } from "frappe-ui";
-import { computed, h, markRaw, onMounted } from "vue";
+import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideMail from "~icons/lucide/mail";
 import LucideMapPin from "~icons/lucide/map-pin";
@@ -196,6 +208,12 @@ const contactInfo = computed(() => {
   return info;
 });
 
+const { inviteContact, isLoading: isContactInvitationLoading } =
+  useContactInvite(contact);
+const { resetPassword, isLoading: isResetPasswordLoading } =
+  useContactResetPassword(() => contact.doc?.user);
+
+const showDeleteDialog = ref(false);
 const moreOptions = computed(() => [
   {
     group: __("Actions"),
@@ -206,14 +224,14 @@ const moreOptions = computed(() => [
         icon: "user-plus",
         condition: () => !contact.doc?.user,
         onClick: () => {
-          // TODO: invite as user
+          inviteContact();
         },
       },
       {
         label: __("Send Reset Password Email"),
         icon: "mail",
         onClick: () => {
-          // TODO: send reset password email
+          resetPassword();
         },
       },
     ],
@@ -228,11 +246,24 @@ const moreOptions = computed(() => [
         theme: "red",
         onClick: () => {
           // TODO: delete contact
+          showDeleteDialog.value = true;
         },
       },
     ],
   },
 ]);
+function handleDelete({
+  deleteLinkedTickets,
+}: {
+  deleteLinkedTickets: boolean;
+}) {
+  call("helpdesk.api.contact.delete_contact", {
+    name: props.id,
+    delete_linked_tickets: deleteLinkedTickets,
+  }).then(() => {
+    router.push({ name: "ContactList" });
+  });
+}
 
 const breadcrumbs = [
   {

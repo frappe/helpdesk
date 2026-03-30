@@ -1153,8 +1153,10 @@ def has_permission(doc, user=None):
         return True
 
     customers = get_customers(user, get_roles=True)
+    customer = frappe.db.get_value("HD Ticket", {"name": doc.name}, "customer")
     for c in customers:
-        if c.get("name") == doc.customer and (c.get("is_manager")):
+        # breakpoint()
+        if c.get("name") == customer and (c.get("is_manager")):
             return True
 
     if not is_agent(user):
