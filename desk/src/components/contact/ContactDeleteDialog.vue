@@ -9,6 +9,10 @@
             )
           }}
         </p>
+        <p class="text-p-base text-ink-gray-7">
+          Confirming this action will remove the contact with the associated
+          customers.
+        </p>
         <div class="flex flex-col gap-1">
           <p class="text-p-base text-ink-gray-7">
             {{

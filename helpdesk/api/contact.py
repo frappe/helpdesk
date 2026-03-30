@@ -1,6 +1,7 @@
 from typing import Literal
 
 import frappe
+from frappe.desk.reportview import delete_bulk
 
 
 @frappe.whitelist(methods=["GET"])
@@ -30,5 +31,11 @@ def search_contacts(
 def delete_contact(name: str):
     frappe.has_permission("Contact", "delete", throw=True)
     tickets = frappe.get_list("HD Ticket", filters={"contact": name}, pluck="name")
-    for ticket in tickets:
-        frappe.delete_doc("HD Ticket", ticket)
+    delete_bulk("HD Ticket", tickets)
+    customers = frappe.get_all(
+        "HD Customer Member",
+        filters={"contact_name": name},
+        pluck="parent",
+    )
+    delete_bulk("HD Customer Member", customers)
+    frappe.delete_doc("Contact", name)
