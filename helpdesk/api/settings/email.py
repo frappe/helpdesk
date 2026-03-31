@@ -1,14 +1,17 @@
+from typing import Any
+
 import frappe
+from frappe import _
 
 
 @frappe.whitelist()
-def create_email_account(data):
+def create_email_account(data: dict[str, Any]):    
     frappe.has_permission("Email Account", "create", throw=True)
 
-    service = data.get("service")
+    service: str = data.get("service", "")    
     service_config = email_service_config.get(service)
-    if not service_config:
-        return "Service not supported"
+    if not service_config and service != "Custom":
+        return frappe.throw(_("Service not supported"))
 
     try:
         email_doc = frappe.get_doc(
@@ -28,8 +31,7 @@ def create_email_account(data):
                 "use_tls": 1,
                 "use_imap": 1,
                 "smtp_port": 587,
-                **service_config,
-            }
+                **(service_config or {}),            }
         )
         if service == "Frappe Mail":
             email_doc.api_key = data.get("api_key")
@@ -37,15 +39,27 @@ def create_email_account(data):
             email_doc.frappe_mail_site = data.get("frappe_mail_site")
             email_doc.append_to = "HD Ticket"
         else:
-            email_doc.append(
-                "imap_folder", {"append_to": "HD Ticket", "folder_name": "INBOX"}
-            )
-            email_doc.password = data.get("password")
-            # validate whether the credentials are correct
-            email_doc.get_incoming_server()
+            if service == "Custom":
+                            email_doc.service = ""
+                            email_doc.domain = data.get("domain")
+                            email_doc.email_server = data.get("email_server")
+                            email_doc.incoming_port = data.get("incoming_port")
+                            email_doc.smtp_server = data.get("smtp_server")
+                            email_doc.smtp_port = data.get("smtp_port") or 587
+                            email_doc.use_ssl = data.get("use_ssl") or 0
+                            email_doc.use_starttls = data.get("use_starttls") or 0
+                            email_doc.use_tls = data.get("use_tls") or 0
+                            email_doc.use_ssl_for_outgoing = data.get("use_ssl_for_outgoing") or 0
+                            email_doc.validate_ssl_certificate = data.get(
+                                "validate_ssl_certificate", 1
+                            )
+                            email_doc.validate_ssl_certificate_for_outgoing = data.get(
+                                "validate_ssl_certificate_for_outgoing", 1
+                            )
 
         # if correct credentials, save the email account
         email_doc.save()
+        return email_doc.name
     except Exception as e:
         frappe.throw(str(e))
 
@@ -100,4 +114,5 @@ email_service_config = {
         "smtp_server": "smtp.yandex.com",
         "smtp_port": 587,
     },
+    "Custom": {},
 }
