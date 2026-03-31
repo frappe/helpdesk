@@ -83,7 +83,7 @@
                   :value="query"
                   @change="query = $event.target.value"
                   autocomplete="off"
-                  placeholder="Search"
+                  :placeholder="__('Search')"
                 />
                 <button
                   class="absolute right-0 inline-flex h-7 w-7 items-center justify-center"
@@ -167,7 +167,7 @@
                 v-if="groups.length == 0"
                 class="rounded-md px-2.5 py-1.5 text-base text-gray-600"
               >
-                No results found
+                {{ __('No results found') }}
               </li>
             </ComboboxOptions>
 
@@ -182,12 +182,12 @@
                 >
                   <Button
                     v-if="!areAllOptionsSelected"
-                    label="Select All"
+                    :label="__('Select All')"
                     @click.stop="selectAll"
                   />
                 </div>
                 <div v-else class="flex items-center justify-end">
-                  <Button label="Clear" @click.stop="selectedValue = null" />
+                  <Button :label="__('Clear')" @click.stop="selectedValue = null" />
                 </div>
               </slot>
             </div>
@@ -353,7 +353,7 @@ export default {
     },
     getLabel(option) {
       if (typeof option !== "object") return option;
-      return option?.label || option?.value || "No label";
+      return option?.label || option?.value || this.__("No label");
     },
     sanitizeOptions(options) {
       if (!options) return [];

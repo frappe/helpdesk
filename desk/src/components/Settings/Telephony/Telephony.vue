@@ -200,8 +200,8 @@ const twilioAppsResource = createResource({
 });
 
 const telephonyProviders = [
-  { label: "Twilio", value: "Twilio" },
-  { label: "Exotel", value: "Exotel" },
+  { label: __("Twilio"), value: "Twilio" },
+  { label: __("Exotel"), value: "Exotel" },
 ];
 
 async function save() {
@@ -222,7 +222,7 @@ async function save() {
   if (isDirty.value.twilio) {
     promises.push(
       twilio.save.submit().catch((er) => {
-        const error = __(`Twilio error: {0}`, er?.messages?.[0]);
+        const error = __("Twilio error: {0}", er?.messages?.[0]);
         toast.error(error || __("Failed to save Twilio settings"));
       })
     );
@@ -230,7 +230,7 @@ async function save() {
   if (isDirty.value.exotel) {
     promises.push(
       exotel.save.submit().catch((er) => {
-        const error = __(`Exotel error: {0}`, er?.messages?.[0]);
+        const error = __("Exotel error: {0}", er?.messages?.[0]);
         toast.error(error || __("Failed to save Exotel settings"));
       })
     );

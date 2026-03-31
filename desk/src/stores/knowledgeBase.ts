@@ -1,4 +1,5 @@
 import { createResource } from "frappe-ui";
+import { __ } from "@/translation";
 
 // Title
 export const newArticle = createResource({
@@ -14,8 +15,8 @@ export const newArticle = createResource({
     };
   },
   validate({ doc }) {
-    if (!doc.title) throw "Title is required";
-    if (!doc.content) throw "Content is required";
+    if (!doc.title) throw __("Title is required");
+    if (!doc.content) throw __("Content is required");
   },
 });
 
@@ -35,7 +36,7 @@ export const deleteArticles = createResource({
     };
   },
   validate({ articles }) {
-    if (!articles) throw "Articles are required";
+    if (!articles) throw __("Articles are required");
   },
 });
 
@@ -48,7 +49,7 @@ export const newCategory = createResource({
     };
   },
   validate({ title }) {
-    if (!title) throw "Title is required";
+    if (!title) throw __("Title is required");
   },
 });
 
@@ -68,8 +69,8 @@ export const moveToCategory = createResource({
     };
   },
   validate({ category, articles }) {
-    if (!category) throw { message: "Category is required" };
-    if (!articles) throw { message: "Articles are required" };
+    if (!category) throw { message: __("Category is required") };
+    if (!articles) throw { message: __("Articles are required") };
   },
 });
 
@@ -82,8 +83,8 @@ export const mergeCategory = createResource({
     };
   },
   validate({ source, target }) {
-    if (!source) throw { message: "Category is required" };
-    if (!target) throw { message: "Target is required" };
+    if (!source) throw { message: __("Category is required") };
+    if (!target) throw { message: __("Target is required") };
   },
 });
 

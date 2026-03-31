@@ -1,6 +1,7 @@
 import { globalStore } from "@/stores/globalStore";
 import { createResource } from "frappe-ui";
 import { ref } from "vue";
+import { __ } from "@/translation";
 
 const baseEndpoint = ref("https://frappecloud.com");
 const siteName = ref("");
@@ -20,11 +21,11 @@ export const confirmLoginToFrappeCloud = () => {
   const { $dialog } = globalStore();
 
   $dialog({
-    title: "Login to Frappe Cloud?",
-    message: "Are you sure you want to login to your Frappe Cloud dashboard?",
+    title: __("Login to Frappe Cloud?"),
+    message: __("Are you sure you want to login to your Frappe Cloud dashboard?"),
     actions: [
       {
-        label: "Confirm",
+        label: __("Confirm"),
         variant: "solid",
         onClick(close: Function) {
           loginToFrappeCloud();

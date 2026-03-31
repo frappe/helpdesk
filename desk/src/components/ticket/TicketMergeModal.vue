@@ -113,6 +113,7 @@ import {
 import { ref, watch } from "vue";
 import LucideMerge from "~icons/lucide/merge";
 import TriangleAlert from "~icons/lucide/triangle-alert";
+import { __ } from "@/translation";
 // interface P
 interface Props {
   ticket: HDTicket;
@@ -168,7 +169,7 @@ const mergeTicket = createResource({
     if (!target) throw { message: "Ticket to merged with is required" };
   },
   onSuccess: () => {
-    toast.success("Ticket merged successfully.");
+    toast.success(__("Ticket merged successfully."));
     emit("update");
 
     showDialog.value = false;

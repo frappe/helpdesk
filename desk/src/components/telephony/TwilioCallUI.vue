@@ -180,6 +180,7 @@ import { inject, ref, watch } from "vue";
 import LucidePhone from "~icons/lucide/phone";
 import CountUpTimer from "./CountUpTimer.vue";
 import MinimizeIcon from "./Icons/MinimizeIcon.vue";
+import { __ } from "@/translation";
 
 const telephonyStore = useTelephonyStore();
 
@@ -420,7 +421,7 @@ async function makeOutgoingCall(number) {
   } else {
     onCallFailed && onCallFailed();
     log.value = "Unable to make call.";
-    toast.error("Unable to make call.");
+    toast.error(__("Unable to make call."));
   }
 }
 

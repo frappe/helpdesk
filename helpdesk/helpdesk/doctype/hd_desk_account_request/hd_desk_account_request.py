@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 from frappe.model.document import Document
 from frappe.utils import get_url, random_string
 
@@ -35,6 +36,8 @@ class HDDeskAccountRequest(Document):
             )
         except Exception:
             frappe.throw(
-                "Either setup up Support email account or there should be a default"
-                " outgoing email account"
+                _(
+                    "Either setup up Support email account or there should be a default"
+                    " outgoing email account"
+                )
             )

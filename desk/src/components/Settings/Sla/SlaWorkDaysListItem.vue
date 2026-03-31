@@ -51,6 +51,7 @@ import { Button, Dropdown } from "frappe-ui";
 import WorkDayModal from "./Modals/WorkDayModal.vue";
 import { ConfirmDelete, getGridTemplateColumnsForTable } from "@/utils";
 import { slaData } from "@/stores/sla";
+import { __ } from "@/translation";
 
 interface Column {
   key: string;
@@ -72,13 +73,13 @@ const props = defineProps<{
 }>();
 
 const workDayOptions = [
-  { label: "Monday", value: "Monday" },
-  { label: "Tuesday", value: "Tuesday" },
-  { label: "Wednesday", value: "Wednesday" },
-  { label: "Thursday", value: "Thursday" },
-  { label: "Friday", value: "Friday" },
-  { label: "Saturday", value: "Saturday" },
-  { label: "Sunday", value: "Sunday" },
+  { label: __("Monday"), value: "Monday" },
+  { label: __("Tuesday"), value: "Tuesday" },
+  { label: __("Wednesday"), value: "Wednesday" },
+  { label: __("Thursday"), value: "Thursday" },
+  { label: __("Friday"), value: "Friday" },
+  { label: __("Saturday"), value: "Saturday" },
+  { label: __("Sunday"), value: "Sunday" },
 ];
 
 const dialog = ref({
@@ -91,7 +92,7 @@ const isConfirmingDelete = ref(false);
 
 const dropdownOptions = [
   {
-    label: "Edit",
+    label: __("Edit"),
     onClick: () => editWorkDay(),
     icon: "edit",
   },

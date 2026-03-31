@@ -80,6 +80,7 @@ import { useAuthStore } from "@/stores/auth";
 import { createResource, Dialog, FeatherIcon, Input, toast } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { ref } from "vue";
+import { __ } from "@/translation";
 
 const props = defineProps({
   show: Boolean,
@@ -177,7 +178,7 @@ const sentInvitesResource = createResource({
       updateOnboardingStep("invite_agents");
     }
 
-    toast.success("Invites sent successfully!");
+    toast.success(__("Invites sent successfully!"));
 
     close();
   },

@@ -431,8 +431,8 @@ const toggleStatus = debounce(() => {
     {
       onSuccess: () => {
         if (status === "Published")
-          toast.success("Article published successfully.");
-        else toast.success("Article unpublished successfully.");
+          toast.success(__("Article published successfully."));
+        else toast.success(__("Article unpublished successfully."));
         article.reload();
       },
     }
@@ -452,7 +452,7 @@ function handleMoveToCategory(category: string) {
       onSuccess: () => {
         article.reload();
         moveToModal.value = false;
-        toast.success(__(`Article has been successfully moved.`));
+        toast.success(__("Article has been successfully moved."));
       },
       onError: (error: Error) => {
         let msg = error?.messages?.[0] || error.message;

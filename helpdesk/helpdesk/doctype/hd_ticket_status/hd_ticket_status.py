@@ -53,8 +53,8 @@ class HDTicketStatus(Document):
             if count == 0:
                 frappe.throw(
                     _(
-                        f"At least one ticket status with category '{old_category}' must exist in the system."
-                    )
+                        "At least one ticket status with category '{0}' must exist in the system."
+                    ).format(old_category)
                 )
 
     def validate_disabling_status(self):
