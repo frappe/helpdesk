@@ -50,7 +50,12 @@
         </template>
       </SidebarLink>
     </div>
-    <div class="overflow-y-auto overflow-x-hidden">
+    <div
+      :class="[
+        'overflow-y-auto overflow-x-hidden',
+        !isExpanded && 'hide-scrollbar',
+      ]"
+    >
       <div v-for="view in allViews" :key="view.label">
         <!-- <div
           v-if="!view.hideLabel && !isExpanded && view.views?.length"
@@ -60,9 +65,9 @@
         <Section
           :label="view.label"
           :hideLabel="view.hideLabel"
-          :opened="view.opened"
+          :opened="isSectionOpen(view.label, view.opened)"
         >
-          <template #header="{ opened, hide, toggle }">
+          <template #header="{ opened, hide }">
             <div
               v-if="!hide"
               class="flex cursor-pointer gap-1.5 px-2 text-base mx-2 font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
@@ -71,12 +76,12 @@
                   ? 'ml-0 h-0 overflow-hidden opacity-0'
                   : 'pt-[11px] pb-2.5 w-auto opacity-100 '
               "
-              @click="toggle()"
+              @click="toggleSection(view.label, view.opened)"
             >
               <FeatherIcon
                 name="chevron-right"
                 class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
-                :class="{ 'rotate-90': opened }"
+                :class="{ 'rotate-90': isSectionOpen(view.label, view.opened) }"
               />
               <span>{{ __(view.label) }}</span>
             </div>
@@ -212,7 +217,6 @@ import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
-import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
@@ -244,6 +248,21 @@ const showCommandPalette = ref(false);
 const { pinnedViews, publicViews } = useView();
 
 const isFCSite = ref(window.is_fc_site);
+
+// Track open/closed state per section label so collapsing sidebar can force-open
+// all sections without losing the user's per-section preference.
+const sectionOpenState = ref<Record<string, boolean>>({});
+
+function isSectionOpen(label: string, defaultOpen: boolean): boolean {
+  if (!isExpanded.value) return true;
+  if (label in sectionOpenState.value) return sectionOpenState.value[label];
+  return defaultOpen;
+}
+
+function toggleSection(label: string, defaultOpen: boolean) {
+  const current = isSectionOpen(label, defaultOpen);
+  sectionOpenState.value[label] = !current;
+}
 
 const allViews = computed(() => {
   let items = isCustomerPortal.value
