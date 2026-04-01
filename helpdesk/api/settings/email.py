@@ -136,5 +136,13 @@ email_service_config = {
         "smtp_server": "smtp.yandex.com",
         "smtp_port": 587,
     },
+    # Alias for service values already stored by Desk/Email Account in older installs
+    # (e.g. Yandex.Mail) to preserve backwards compatibility without migrations.
+    "Yandex.Mail": {
+        "email_server": "imap.yandex.com",
+        "use_ssl": 1,
+        "smtp_server": "smtp.yandex.com",
+        "smtp_port": 587,
+    },
     "Custom": {},
 }

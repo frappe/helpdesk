@@ -168,10 +168,10 @@ import { call, toast } from "frappe-ui";
 import { computed, h, reactive, ref, watch } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
+import { Link } from "@/components";
 import {
   customIncomingFields,
   customOutgoingFields,
-  customProviderFields,
   customProviderTopFields,
   emailIcon,
   frappeMailFields,
