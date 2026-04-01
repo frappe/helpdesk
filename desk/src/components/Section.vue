@@ -45,7 +45,7 @@
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 const props = defineProps({
   label: {
@@ -80,6 +80,13 @@ const props = defineProps({
 
 const hide = ref(props.hideLabel);
 const opened = ref(props.opened);
+
+watch(
+  () => props.opened,
+  (val) => {
+    opened.value = val;
+  }
+);
 
 function toggle() {
   opened.value = !opened.value;
