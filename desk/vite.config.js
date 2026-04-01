@@ -92,6 +92,8 @@ export default defineConfig({
       "tailwind.config.js",
       "prosemirror-state",
       "prosemirror-view",
+      "prosemirror-gapcursor",
+      "prosemirror-tables",
       "lowlight",
       "interactjs",
     ],

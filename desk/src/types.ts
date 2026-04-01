@@ -308,8 +308,18 @@ export interface RenderField {
   description?: string;
 }
 
+export type EmailServiceName =
+  | "GMail"
+  | "Outlook"
+  | "Sendgrid"
+  | "SparkPost"
+  | "Yahoo"
+  | "Yandex"
+  | "Frappe Mail"
+  | "Custom";
+
 export interface EmailService {
-  name: string;
+  name: EmailServiceName;
   icon: string;
   info: string;
   link: string;
@@ -319,6 +329,16 @@ export interface EmailService {
 export type EmailStep = "email-list" | "email-add" | "email-edit";
 
 export interface EmailAccount {
+  smtp_server: string;
+  incoming_port: string;
+  smtp_port: string;
+  use_ssl: boolean;
+  use_starttls: boolean;
+  use_tls: boolean;
+  use_ssl_for_outgoing: boolean;
+  validate_ssl_certificate: boolean;
+  email_server: string;
+  domain: string;
   email_account_name: string;
   email_id: string;
   service: string;
@@ -330,7 +350,33 @@ export interface EmailAccount {
   enable_incoming?: boolean;
   default_outgoing?: boolean;
   default_incoming?: boolean;
+  validate_ssl_certificate_for_outgoing: boolean;
 }
+
+
+export type EmailAccountFormState = {
+  email_account_name?: string;
+  email_id?: string;
+  service?: string;
+  password?: string;
+  api_key?: string;
+  api_secret?: string;
+  frappe_mail_site?: string;
+  domain?: string;
+  email_server?: string;
+  incoming_port?: string | number;
+  smtp_server?: string;
+  smtp_port?: string | number;
+  use_ssl?: boolean | number;
+  use_starttls?: boolean | number;
+  use_tls?: boolean | number;
+  use_ssl_for_outgoing?: boolean | number;
+  validate_ssl_certificate?: boolean | number;
+  validate_ssl_certificate_for_outgoing?: boolean | number;
+  attachment_limit?: string | number;
+  append_emails_to_sent_folder?: boolean | number;
+  sent_folder_name?: string;
+};
 
 export type TicketTab = "activity" | "email" | "comment" | "details" | "call";
 
