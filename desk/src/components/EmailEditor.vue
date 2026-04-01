@@ -440,9 +440,11 @@ onMounted(() => {
 
 function handleSelectAll(e: KeyboardEvent) {
   const active = document.activeElement;
-  const editorDom = editorRef.value?.editor?.view?.dom as
-    | HTMLElement
-    | undefined;
+  const editorContext = editorRef.value?.editor;
+  if (editorContext) {
+    editorContext.commands.selectAll();
+  }
+  const editorDom = editorContext?.view?.dom as HTMLElement | undefined;
   const quotedEl = quotedContentRef.value;
   const sel = window.getSelection();
   if (!sel || !editorDom) return;
