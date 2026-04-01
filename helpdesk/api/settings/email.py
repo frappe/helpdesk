@@ -57,6 +57,12 @@ def create_email_account(data: dict[str, Any]):
                 email_doc.validate_ssl_certificate_for_outgoing = data.get(
                     "validate_ssl_certificate_for_outgoing", 1
                 )
+            email_doc.append(
+                "imap_folder", {"append_to": "HD Ticket", "folder_name": "INBOX"}
+            )
+            email_doc.password = data.get("password")
+            # validate whether the credentials are correct
+            email_doc.get_incoming_server()
 
         # if correct credentials, save the email account
         email_doc.save()
@@ -96,6 +102,13 @@ email_service_config = {
         "use_ssl": 1,
         "smtp_server": "smtp-mail.outlook.com",
     },
+    # Alias for service values already stored by Desk/Email Account in older installs
+    # (e.g. Outlook.com) to preserve backwards compatibility without migrations.
+    "Outlook.com": {
+        "email_server": "imap-mail.outlook.com",
+        "use_ssl": 1,
+        "smtp_server": "smtp-mail.outlook.com",
+    },
     "Sendgrid": {
         "smtp_server": "smtp.sendgrid.net",
         "smtp_port": 587,
@@ -104,6 +117,14 @@ email_service_config = {
         "smtp_server": "smtp.sparkpostmail.com",
     },
     "Yahoo": {
+        "email_server": "imap.mail.yahoo.com",
+        "use_ssl": 1,
+        "smtp_server": "smtp.mail.yahoo.com",
+        "smtp_port": 587,
+    },
+    # Alias for service values already stored by Desk/Email Account in older installs
+    # (e.g. Yahoo Mail) to preserve backwards compatibility without migrations.
+    "Yahoo Mail": {
         "email_server": "imap.mail.yahoo.com",
         "use_ssl": 1,
         "smtp_server": "smtp.mail.yahoo.com",
