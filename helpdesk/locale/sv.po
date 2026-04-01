@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-03-01 10:40+0000\n"
-"PO-Revision-Date: 2026-03-23 07:56\n"
+"POT-Creation-Date: 2026-03-22 10:41+0000\n"
+"PO-Revision-Date: 2026-03-26 08:17\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -86,7 +86,7 @@ msgstr "Kort beskrivning"
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "API"
-msgstr "Single sign on"
+msgstr "API"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:338
 msgid "Access all team tickets"
@@ -168,6 +168,10 @@ msgstr "Lägg till villkor"
 msgid "Add a custom condition"
 msgstr "Lägg till anpassad villkor"
 
+#: desk/src/pages/home/Home.vue:91
+msgid "Add charts to get started"
+msgstr "Lägg till diagram för att komma igång"
+
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:29
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:66
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
@@ -243,6 +247,7 @@ msgstr "Administratör"
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
+#: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -265,6 +270,7 @@ msgid "Agent Configuration"
 msgstr "Handläggare Konfiguration"
 
 #. Name of a role
+#: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -311,6 +317,16 @@ msgstr "Handläggare kommer inte längre att kunna visa och skapa sparade svar m
 msgid "All"
 msgstr "Alla"
 
+#: desk/src/pages/home/components/PendingTickets.vue:231
+msgid "All SLAs on track"
+msgstr "Alla Service Nivå Avtal är på rätt spår"
+
+#: desk/src/pages/home/components/RecentFeedback.vue:281
+#: desk/src/pages/home/components/RecentFeedback.vue:310
+#: desk/src/pages/home/components/RecentFeedback.vue:317
+msgid "All Time"
+msgstr "Alltid"
+
 #: desk/src/components/layouts/Sidebar.vue:262
 msgid "All Views"
 msgstr "Alla Vyer"
@@ -318,6 +334,10 @@ msgstr "Alla Vyer"
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:305
 msgid "All articles from this category will move to General category."
 msgstr "Alla artiklar från denna kategori kommer att flyttas till Allmän kategori."
+
+#: desk/src/pages/home/components/PendingTickets.vue:240
+msgid "All your assigned tickets have been responded to"
+msgstr "Alla dina tilldelade ärenden är besvarade"
 
 #. Label of the allow_anyone_to_create_tickets (Check) field in DocType 'HD
 #. Settings'
@@ -406,7 +426,7 @@ msgstr "Är du säker på att du vill ta bort denna artikel?"
 msgid "Are you sure you want to delete this team? This action cannot be reversed!"
 msgstr "Är du säker på att du vill ta bort detta team? Denna åtgärd kan inte återkallas!"
 
-#: desk/src/pages/ticket/Tickets.vue:444
+#: desk/src/pages/ticket/Tickets.vue:482
 msgid "Are you sure you want to delete this view?"
 msgstr "Är du säker på att du vill ta bort denna vy?"
 
@@ -647,14 +667,39 @@ msgstr "Stäng automatiskt inaktuella ärenden"
 msgid "Automation"
 msgstr "Automatisering"
 
+#: desk/src/pages/home/components/ChartItem.vue:6
+msgid "Average First Response"
+msgstr "Genomsnittlig Första Svar"
+
+#: desk/src/pages/home/Home.vue:317
+msgid "Average First Response Time"
+msgstr "Genomsnittlig Första Svar Tid"
+
+#: desk/src/pages/home/components/ChartItem.vue:16
+msgid "Average Resolution"
+msgstr "Genomsnittlig Upplösning"
+
+#: desk/src/pages/home/Home.vue:329
+msgid "Average Resolution Time"
+msgstr "Genomsnittlig Upplösning Tid"
+
 #. Label of the avg_response_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Average Response Time"
 msgstr "Genomsnittlig Svarstid"
 
+#: desk/src/pages/home/Home.vue:305
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:5
+msgid "Average Time Metrics"
+msgstr "Genomsnittlig Tid Mätvärde"
+
 #: helpdesk/api/dashboard.py:364
 msgid "Average feedback rating per day is around {0} stars"
 msgstr "Genomsnittlig betygsatt återkoppling per dag är runt {0} stjärnor"
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:37
+msgid "Average response and resolution metrics not yet generated"
+msgstr "Genomsnittlig svar och upplösning mätvärde är inte skapad än"
 
 #: helpdesk/api/dashboard.py:286
 msgid "Average tickets per day is around {0}"
@@ -675,6 +720,16 @@ msgstr "Genomsnittlig Upplösning"
 #: helpdesk/api/dashboard.py:236
 msgid "Avg. feedback rating for the tickets resolved"
 msgstr "Genomsnittlig återkoppling betyg för lösta ärenden"
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:49
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:148
+msgid "Avg. first response time"
+msgstr "Genomsnittlig Första Svar Tid"
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:58
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:156
+msgid "Avg. resolution time"
+msgstr "Genomsnittlig upplösning tid"
 
 #: helpdesk/api/dashboard.py:202
 msgid "Avg. time taken to first respond to a ticket"
@@ -784,6 +839,10 @@ msgstr "Kan hantera alla aspekter av Support."
 #: desk/src/components/Settings/InviteAgents.vue:140
 msgid "Can work on tickets, create custom views and manage private views."
 msgstr "Kan arbeta med ärenden, skapa anpassade vyer och hantera privata vyer."
+
+#: desk/src/pages/home/Home.vue:44
+msgid "Cancel"
+msgstr "Annullera"
 
 #: desk/src/components/Settings/InviteAgents.vue:57
 msgid "Cancel Invitation"
@@ -1045,7 +1104,7 @@ msgstr "Konfigurera handläggare detaljer."
 msgid "Configure your telephony settings."
 msgstr "Konfigurera dina telefoni inställningar."
 
-#: desk/src/components/ListViewBuilder.vue:236
+#: desk/src/components/ListViewBuilder.vue:235
 #: desk/src/components/Settings/Teams/TeamEdit.vue:115
 #: desk/src/components/Settings/Teams/TeamEdit.vue:241
 #: desk/src/pages/knowledge-base/Article.vue:321
@@ -1054,7 +1113,7 @@ msgstr "Konfigurera dina telefoni inställningar."
 #: desk/src/pages/knowledge-base/NewArticle.vue:149
 #: desk/src/pages/ticket/MobileTicketAgent.vue:180
 #: desk/src/pages/ticket/TicketCustomer.vue:296
-#: desk/src/pages/ticket/Tickets.vue:418 desk/src/pages/ticket/Tickets.vue:453
+#: desk/src/pages/ticket/Tickets.vue:370 desk/src/pages/ticket/Tickets.vue:491
 msgid "Confirm"
 msgstr "Bekräfta"
 
@@ -1159,7 +1218,7 @@ msgstr "Skapa och bjud in kontakt"
 msgid "Create New Contact"
 msgstr "Skapa Ny Kontakt"
 
-#: desk/src/pages/ticket/Tickets.vue:330 desk/src/pages/ticket/Tickets.vue:334
+#: desk/src/pages/ticket/Tickets.vue:339 desk/src/pages/ticket/Tickets.vue:343
 msgid "Create View"
 msgstr "Skapa Vy"
 
@@ -1240,6 +1299,10 @@ msgstr "Fara"
 msgid "Dashboard"
 msgstr "Översikt Panel"
 
+#: desk/src/pages/home/Home.vue:264 desk/src/pages/home/Home.vue:286
+msgid "Dashboard saved"
+msgstr "Översikt Panel Skapad"
+
 #. Label of the holiday_date (Date) field in DocType 'HD Holiday'
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.py:77
@@ -1287,7 +1350,7 @@ msgstr "Standard Utgående/Inkommande E-post Konto"
 msgid "Default Ticket Status"
 msgstr "Standard Ärende Status"
 
-#: desk/src/pages/ticket/Tickets.vue:295 desk/src/pages/ticket/Tickets.vue:354
+#: desk/src/pages/ticket/Tickets.vue:296 desk/src/pages/ticket/Tickets.vue:389
 msgid "Default Views"
 msgstr "Standard Vyer"
 
@@ -1319,15 +1382,15 @@ msgstr "Standard ärende typ"
 msgid "Define who receives the tickets and how they’re distributed among agents."
 msgstr "Definiera vem som får ärendena och hur de fördelas mellan handläggare."
 
-#: desk/src/components/ListViewBuilder.vue:226
-#: desk/src/components/ListViewBuilder.vue:230
+#: desk/src/components/ListViewBuilder.vue:225
+#: desk/src/components/ListViewBuilder.vue:229
 #: desk/src/components/Settings/Teams/TeamEdit.vue:348
 #: desk/src/components/Settings/Teams/TeamEdit.vue:350
 #: desk/src/pages/knowledge-base/Article.vue:416
 #: desk/src/pages/knowledge-base/Article.vue:418
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:173
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:192
-#: desk/src/pages/ticket/Tickets.vue:438
+#: desk/src/pages/ticket/Tickets.vue:476
 msgid "Delete"
 msgstr "Ta bort"
 
@@ -1335,7 +1398,7 @@ msgstr "Ta bort"
 msgid "Delete Article"
 msgstr "Ta bort Artikel"
 
-#: desk/src/pages/ticket/Tickets.vue:434
+#: desk/src/pages/ticket/Tickets.vue:472
 msgid "Delete View"
 msgstr "Ta bort Vy"
 
@@ -1347,7 +1410,7 @@ msgstr "Ta bort artiklar?"
 msgid "Delete category?"
 msgstr "Ta bort kategori?"
 
-#: desk/src/pages/ticket/Tickets.vue:442
+#: desk/src/pages/ticket/Tickets.vue:480
 msgid "Delete {0}?"
 msgstr "Ta bort {0}?"
 
@@ -1474,6 +1537,11 @@ msgstr "DocType"
 msgid "Docs"
 msgstr "Dokument"
 
+#. Label of the document_type (Link) field in DocType 'HD Field Layout'
+#: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
+msgid "Document Type"
+msgstr "DocType"
+
 #. Label of the domain (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Domain"
@@ -1497,7 +1565,7 @@ msgstr "Utkast"
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:263
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:61
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:102
-#: desk/src/pages/ticket/Tickets.vue:358
+#: desk/src/pages/ticket/Tickets.vue:393
 msgid "Duplicate"
 msgstr "Kopiera"
 
@@ -1530,8 +1598,9 @@ msgstr "Varaktighet erfordras"
 msgid "Easily invite new agents, managers, or admins."
 msgstr "Bjud enkelt in nya handläggare, ansvariga eller administratörer."
 
+#: desk/src/pages/home/Home.vue:36
 #: desk/src/pages/knowledge-base/Article.vue:391
-#: desk/src/pages/ticket/Tickets.vue:374
+#: desk/src/pages/ticket/Tickets.vue:461
 msgid "Edit"
 msgstr "Redigera"
 
@@ -1737,7 +1806,7 @@ msgid "Explore customer portal"
 msgstr "Utforska kundportal"
 
 #: desk/src/components/ticket/ExportModal.vue:2
-#: desk/src/pages/ticket/Tickets.vue:105
+#: desk/src/pages/ticket/Tickets.vue:106
 msgid "Export"
 msgstr "Export"
 
@@ -1756,8 +1825,8 @@ msgstr "Extern länk"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: desk/src/pages/call-logs/CallLogModal.vue:211
-#: desk/src/pages/ticket/Tickets.vue:182 desk/src/pages/ticket/Tickets.vue:195
-#: desk/src/pages/ticket/Tickets.vue:226
+#: desk/src/pages/ticket/Tickets.vue:183 desk/src/pages/ticket/Tickets.vue:196
+#: desk/src/pages/ticket/Tickets.vue:227
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
 msgstr "Misslyckad"
@@ -1795,6 +1864,7 @@ msgstr "Favicon"
 #. Label of the feedback (Select) field in DocType 'HD Article Feedback'
 #. Label of the feedback_section (Section Break) field in DocType 'HD Settings'
 #. Label of the feedback_tab (Tab Break) field in DocType 'HD Ticket'
+#: desk/src/pages/home/components/RecentFeedback.vue:152
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1957,7 +2027,7 @@ msgid "From is required"
 msgstr "Från erfordras"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
-#: desk/src/pages/ticket/Tickets.vue:189 desk/src/pages/ticket/Tickets.vue:220
+#: desk/src/pages/ticket/Tickets.vue:190 desk/src/pages/ticket/Tickets.vue:221
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Fulfilled"
 msgstr "Uppfylld"
@@ -1998,6 +2068,10 @@ msgstr "Gå till Ärende #{0}"
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Gray"
 msgstr "grå"
+
+#: desk/src/pages/home/components/PendingTickets.vue:232
+msgid "Great! All your tickets are within SLA"
+msgstr "Jättebra! Alla dina ärenden är inom Service Nivå Avtal ram"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -2074,6 +2148,11 @@ msgstr "E-post Återkoppling"
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "HD Escalation Rule"
 msgstr "Eskalering Regel"
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
+msgid "HD Field Layout"
+msgstr "Fält Upplägg"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -2261,6 +2340,10 @@ msgstr "Support Rapporter"
 msgid "Here, your weekly offs are pre-populated based on the previous selections. You can add more rows to also add public and national holidays individually."
 msgstr "Här är dina veckoledigheter förifyllda baserat på tidigare val. Du kan lägga till fler rader för att även lägga till allmänna och nationella helgdagar individuellt."
 
+#: desk/src/pages/home/Home.vue:79
+msgid "Hey"
+msgstr "Hej"
+
 #. Label of the cond_hidden (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Hide condition"
@@ -2271,6 +2354,14 @@ msgstr "Dölj villkor"
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Hide from customer"
 msgstr "Dölj från kund"
+
+#: desk/src/pages/ticket/Tickets.vue:423
+msgid "Hide from sidebar"
+msgstr "Dölj från sidofält"
+
+#: desk/src/pages/ticket/Tickets.vue:431
+msgid "Hide view from sidebar"
+msgstr "Dölj vy från sidofält"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -2287,7 +2378,7 @@ msgstr "Helg Lista"
 #. List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Holiday List Name"
-msgstr "Helg Lista Namn"
+msgstr "Helglista Namn"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:373
 msgid "Holiday list created"
@@ -2314,9 +2405,17 @@ msgstr "Helglista uppdaterad"
 msgid "Holidays"
 msgstr "Helger"
 
+#: desk/src/pages/home/Home.vue:5
+msgid "Home"
+msgstr "Hem"
+
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:130
 msgid "I understand, add conditions"
 msgstr "Jag förstår, lägg till villkor"
+
+#: desk/src/pages/home/components/PendingTickets.vue:21
+msgid "ID"
+msgstr "ID"
 
 #. Label of the ip_address (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
@@ -2479,9 +2578,16 @@ msgid "Is Default"
 msgstr "Är Standard"
 
 #. Label of the is_standard (Check) field in DocType 'HD Form Script'
+#. Label of the is_standard (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Is Standard"
 msgstr "Är Standard"
+
+#. Label of the apply_to_system (Check) field in DocType 'HD Field Layout'
+#: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
+msgid "Is applied to system"
+msgstr "Är Tillämpa på system"
 
 #. Label of the initial_helpdesk_name_setup_skipped (Check) field in DocType
 #. 'HD Settings'
@@ -2499,7 +2605,7 @@ msgstr "Är fäst"
 msgid "Is setup complete"
 msgstr "Är installationen klar"
 
-#: desk/src/components/ListViewBuilder.vue:256
+#: desk/src/components/ListViewBuilder.vue:255
 msgid "Item(s) deleted successfully"
 msgstr "Artikel(ar) har tagits bort"
 
@@ -2533,7 +2639,7 @@ msgstr "Kort Kommando"
 #: desk/src/pages/knowledge-base/NewArticle.vue:171
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Knowledge Base"
-msgstr "Kunskapsbas"
+msgstr "Kunskap Bas"
 
 #. Label of the button_label (Data) field in DocType 'HD Action'
 #. Label of the label (Data) field in DocType 'HD Ticket Feedback Option'
@@ -2551,6 +2657,11 @@ msgstr "Etikett"
 msgid "Label (customer view)"
 msgstr "Benämning (kund vy)"
 
+#. Option for the 'Type' (Select) field in DocType 'HD Field Layout'
+#: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
+msgid "Landing Page"
+msgstr "Webbplats"
+
 #: desk/src/components/Settings/Profile/Profile.vue:136
 msgid "Language"
 msgstr "Språk"
@@ -2562,6 +2673,17 @@ msgstr "Språk uppdaterad"
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
 msgstr "Senaste"
+
+#: desk/src/pages/home/components/RecentFeedback.vue:293
+#: desk/src/pages/home/components/RecentFeedback.vue:313
+msgid "Last 3 Months"
+msgstr "Senaste 3 Månader"
+
+#: desk/src/pages/home/components/CardBase.vue:104
+#: desk/src/pages/home/components/CardBase.vue:106
+#: desk/src/pages/home/components/CardBase.vue:107
+msgid "Last 3 months"
+msgstr "Senaste 3 månader"
 
 #: desk/src/pages/dashboard/Dashboard.vue:263
 #: desk/src/pages/dashboard/Dashboard.vue:285
@@ -2595,14 +2717,44 @@ msgstr "Senaste Handläggare Svar"
 msgid "Last Customer Response"
 msgstr "Senaste Kund Svar"
 
+#: desk/src/pages/home/components/RecentFeedback.vue:289
+#: desk/src/pages/home/components/RecentFeedback.vue:312
+msgid "Last Month"
+msgstr "Förra Månad"
+
 #: desk/src/components/Settings/Profile/Profile.vue:113
 #: desk/src/components/desk/global/NewContactDialog.vue:126
 msgid "Last Name"
 msgstr "Efternamn"
 
+#: desk/src/pages/home/components/RecentFeedback.vue:285
+#: desk/src/pages/home/components/RecentFeedback.vue:311
+msgid "Last Week"
+msgstr "Förra Vecka"
+
+#: desk/src/pages/home/components/AgentTicketsCard.vue:34
+#: desk/src/pages/home/components/AvgTimeCard.vue:50
+#: desk/src/pages/home/components/CardBase.vue:78
+#: desk/src/pages/home/components/CardBase.vue:97
+#: desk/src/pages/home/components/CardBase.vue:99
+#: desk/src/pages/home/components/CardBase.vue:100
+msgid "Last month"
+msgstr "Förra månaden"
+
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
 msgid "Last user assigned by this rule"
 msgstr "Senaste användare tilldelad av denna regel"
+
+#: desk/src/pages/home/components/CardBase.vue:90
+#: desk/src/pages/home/components/CardBase.vue:92
+#: desk/src/pages/home/components/CardBase.vue:93
+msgid "Last week"
+msgstr "Förra veckan"
+
+#. Label of the layout (Code) field in DocType 'HD Field Layout'
+#: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
+msgid "Layout"
+msgstr "Upplägg"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:150
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:227
@@ -2641,16 +2793,16 @@ msgstr "Länk till kund post"
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #. Label of the list_tab (Tab Break) field in DocType 'HD View'
-#: desk/src/components/ListViewBuilder.vue:671
-#: desk/src/components/ListViewBuilder.vue:705
-#: desk/src/pages/ticket/Tickets.vue:524 desk/src/pages/ticket/Tickets.vue:538
-#: desk/src/pages/ticket/Tickets.vue:568
+#: desk/src/components/ListViewBuilder.vue:685
+#: desk/src/components/ListViewBuilder.vue:719
+#: desk/src/pages/ticket/Tickets.vue:562 desk/src/pages/ticket/Tickets.vue:576
+#: desk/src/pages/ticket/Tickets.vue:606
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
 msgstr "Lista"
 
-#: desk/src/pages/ticket/Tickets.vue:298
+#: desk/src/pages/ticket/Tickets.vue:299
 msgid "List View"
 msgstr "List Vy"
 
@@ -2693,11 +2845,11 @@ msgstr "Logotyp"
 msgid "Lower the Integer value, higher is the priority of the issue"
 msgstr "Lägre heltalsvärde, ger högre prioritet för ärende"
 
-#: desk/src/pages/ticket/Tickets.vue:399
+#: desk/src/pages/ticket/Tickets.vue:443
 msgid "Make Private"
 msgstr "Gör Privat"
 
-#: desk/src/pages/ticket/Tickets.vue:399
+#: desk/src/pages/ticket/Tickets.vue:443
 msgid "Make Public"
 msgstr "Gör Offentligt"
 
@@ -2709,9 +2861,9 @@ msgstr "Ring Samtal"
 msgid "Make feedback mandatory"
 msgstr "Återkoppling erfordras"
 
-#: desk/src/pages/ticket/Tickets.vue:412
-msgid "Make {0} private?"
-msgstr "Ändra {0} till privat?"
+#: desk/src/pages/ticket/Tickets.vue:451
+msgid "Make view private"
+msgstr "Ange vyn som privat"
 
 #: desk/src/components/Settings/General/General.vue:2
 msgid "Manage general settings of your app."
@@ -2803,6 +2955,11 @@ msgstr "Flytta till"
 msgid "My Team"
 msgstr "Mitt Team"
 
+#: desk/src/pages/home/Home.vue:293
+#: desk/src/pages/home/components/AgentTicketsCard.vue:4
+msgid "My Tickets"
+msgstr "Mina Ärenden"
+
 #. Label of the category_name (Data) field in DocType 'HD Article Category'
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
 #. Label of the brand_name (Data) field in DocType 'HD Settings'
@@ -2837,6 +2994,11 @@ msgstr "Namn som visas på kundportalen<br> (t.ex., Svarade → Väntar på svar
 msgid "Navigation"
 msgstr "Navigering"
 
+#: desk/src/pages/home/components/RecentFeedback.vue:304
+#: desk/src/pages/home/components/RecentFeedback.vue:321
+msgid "Negative first"
+msgstr "Negativt först"
+
 #: desk/src/components/SavedRepliesSelectorModal.vue:16
 #: desk/src/components/Settings/Agents.vue:109
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:19
@@ -2854,6 +3016,7 @@ msgstr "Navigering"
 #: desk/src/components/Settings/Teams/TeamsList.vue:124
 #: desk/src/components/ticket/ActivityHeader.vue:34
 #: desk/src/components/ticket/ActivityHeader.vue:50
+#: desk/src/pages/home/Home.vue:55
 msgid "New"
 msgstr "Ny"
 
@@ -2953,7 +3116,7 @@ msgstr "Nästa ärende"
 msgid "No Answer"
 msgstr "Ingen Svar"
 
-#: desk/src/components/ListViewBuilder.vue:278
+#: desk/src/components/ListViewBuilder.vue:277
 msgid "No Data Found"
 msgstr "Ingen data hittades"
 
@@ -2977,9 +3140,13 @@ msgstr "Inga Fördefinierade Svar hittades"
 msgid "No Team"
 msgstr "Inget Team"
 
-#: desk/src/pages/ticket/Tickets.vue:167
+#: desk/src/pages/ticket/Tickets.vue:168
 msgid "No Tickets Found"
 msgstr "Inga Ärenden Hittades"
+
+#: desk/src/pages/home/components/RecentFeedback.vue:159
+msgid "No additional comments"
+msgstr "Inga ytterligare kommentarer"
 
 #: desk/src/components/Settings/Agents.vue:98
 msgid "No agent found"
@@ -2993,6 +3160,10 @@ msgstr "Inga tilldelade"
 msgid "No assignment rule found"
 msgstr "Ingen tilldelningsregel hittades"
 
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:34
+msgid "No average metrics"
+msgstr "Inga genomsnittliga mätvärden"
+
 #: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
 msgstr "Inga ändringar gjorda"
@@ -3001,9 +3172,17 @@ msgstr "Inga ändringar gjorda"
 msgid "No changes to save"
 msgstr "Inga ändringar att spara"
 
+#: desk/src/pages/home/Home.vue:88
+msgid "No charts added"
+msgstr "Inga diagram tillagda"
+
 #: desk/src/components/Settings/EmailAccountList.vue:52
 msgid "No email account found"
 msgstr "Inget e-postkonto hittades"
+
+#: desk/src/pages/home/components/RecentFeedback.vue:207
+msgid "No feedback"
+msgstr "Ingen återkoppling"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:57
 msgid "No field dependency found"
@@ -3016,6 +3195,22 @@ msgstr "Inga medlemmar hittades"
 #: desk/src/pages/MobileNotifications.vue:68
 msgid "No new notifications"
 msgstr "Inga nya aviseringar"
+
+#: desk/src/pages/home/components/PendingTickets.vue:236
+msgid "No new tickets assigned to you in the last 24 hours"
+msgstr "Inga nya ärenden har tilldelats dig under de senaste 24 timmarna"
+
+#: desk/src/pages/home/components/PendingTickets.vue:239
+msgid "No pending tickets"
+msgstr "Inga pågående ärenden"
+
+#: desk/src/pages/home/components/PendingTickets.vue:86
+msgid "No reason"
+msgstr "Ingen anledning"
+
+#: desk/src/pages/home/components/PendingTickets.vue:235
+msgid "No recently assigned tickets"
+msgstr "Inga nyligen tilldelade ärenden"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:76
 msgid "No results found"
@@ -3032,6 +3227,10 @@ msgstr "Inga ärenden hittades att förhandsgranska."
 #: helpdesk/utils.py:168
 msgid "Not Allowed"
 msgstr "Ej Tillåtet"
+
+#: desk/src/pages/home/components/PendingTickets.vue:61
+msgid "Not Assigned"
+msgstr "Ej Tilldelad"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:10
 msgid "Not Saved"
@@ -3201,15 +3400,25 @@ msgstr "Lösenorden stämmer"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
-#: desk/src/pages/ticket/Tickets.vue:214
+#: desk/src/pages/ticket/Tickets.vue:215
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Paused"
 msgstr "Pausad"
 
+#: desk/src/pages/home/components/PendingTickets.vue:200
+msgid "Pending"
+msgstr "Pågående"
+
 #: desk/src/components/Settings/InviteAgents.vue:36
 msgid "Pending Invites"
 msgstr "Väntande Inbjudningar"
+
+#: desk/src/pages/home/Home.vue:353
+#: desk/src/pages/home/components/PendingTickets.vue:212
+#: desk/src/pages/home/components/PendingTickets.vue:216
+msgid "Pending Tickets"
+msgstr "Väntande ärenden"
 
 #: helpdesk/api/dashboard.py:554
 msgid "Percentage of Total Tickets by Channel"
@@ -3257,7 +3466,7 @@ msgstr "Telefonnummer"
 msgid "Pick an option"
 msgstr "Välj alternativ"
 
-#: desk/src/pages/ticket/Tickets.vue:386
+#: desk/src/pages/ticket/Tickets.vue:410
 msgid "Pin View"
 msgstr "Fäst Vy"
 
@@ -3327,6 +3536,12 @@ msgstr "Välj Ledig Veckodag"
 msgid "Policy Name"
 msgstr "Princip Benämning"
 
+#: desk/src/pages/home/components/RecentFeedback.vue:300
+#: desk/src/pages/home/components/RecentFeedback.vue:322
+#: desk/src/pages/home/components/RecentFeedback.vue:326
+msgid "Positive first"
+msgstr "Positiv först"
+
 #. Label of the post_description_key (Data) field in DocType 'HD Support Search
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
@@ -3390,6 +3605,7 @@ msgstr "Prioriteringar"
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:74
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:36
 #: desk/src/pages/SearchAgent.vue:68 desk/src/pages/SearchAgent.vue:69
+#: desk/src/pages/home/components/PendingTickets.vue:30
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -3408,7 +3624,7 @@ msgid "Priority {0} has been repeated."
 msgstr "Prioritet {0} har upprepats."
 
 #: desk/src/components/layouts/Sidebar.vue:278
-#: desk/src/pages/ticket/Tickets.vue:318
+#: desk/src/pages/ticket/Tickets.vue:319
 msgid "Private Views"
 msgstr "Privata Vyer"
 
@@ -3436,7 +3652,7 @@ msgid "Public"
 msgstr "Publik"
 
 #: desk/src/components/layouts/Sidebar.vue:270
-#: desk/src/pages/ticket/Tickets.vue:324
+#: desk/src/pages/ticket/Tickets.vue:334
 msgid "Public Views"
 msgstr "Offentliga Vyer"
 
@@ -3514,7 +3730,7 @@ msgstr "Betygsatta Ärende"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
-msgstr "Bedömning"
+msgstr "Betygsättning"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
@@ -3538,6 +3754,18 @@ msgstr "Reaktioner"
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Read"
 msgstr "Läsa"
+
+#: desk/src/pages/home/components/PendingTickets.vue:36
+msgid "Reason"
+msgstr "Anledning"
+
+#: desk/src/pages/home/components/PendingTickets.vue:204
+msgid "Recent"
+msgstr "Senaste"
+
+#: desk/src/pages/home/components/PendingTickets.vue:211
+msgid "Recent Tickets"
+msgstr "Senaste ärenden"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:107
 #: desk/src/components/Settings/Telephony/Telephony.vue:182
@@ -3574,6 +3802,10 @@ msgstr "Referens Ärende"
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "References"
 msgstr "Referenser"
+
+#: desk/src/pages/home/Home.vue:11
+msgid "Refresh"
+msgstr "Uppdatera"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:153
 msgid "Refresh Apps"
@@ -3655,7 +3887,7 @@ msgstr "Erfordras"
 msgid "Required for exotel integration"
 msgstr "Erfordras för exotel integration"
 
-#: desk/src/components/SelectDropdown.vue:47
+#: desk/src/components/SelectDropdown.vue:47 desk/src/pages/home/Home.vue:19
 msgid "Reset"
 msgstr "Återställ"
 
@@ -3792,6 +4024,12 @@ msgstr "Resultat Sökväg Fält"
 msgid "Result Title Field"
 msgstr "Resultat Benämning Fält"
 
+#: desk/src/pages/home/Home.vue:341
+#: desk/src/pages/home/components/RecentFeedback.vue:7
+#: desk/src/pages/home/components/RecentFeedback.vue:22
+msgid "Reviews"
+msgstr "Recensioner"
+
 #: desk/src/pages/call-logs/CallLogModal.vue:215
 msgid "Ringing"
 msgstr "Ringer"
@@ -3817,11 +4055,16 @@ msgstr "Rader"
 msgid "SLA"
 msgstr "Service Nivå Avtal"
 
+#: desk/src/pages/home/components/PendingTickets.vue:196
+#: desk/src/pages/home/components/PendingTickets.vue:210
+msgid "SLA Alerts"
+msgstr "Service Nivå Avtal Aviseringar"
+
 #. Label of the service_level_agreement_creation (Datetime) field in DocType
 #. 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA Creation"
-msgstr "Skapande av Service Nivå Avtal"
+msgstr "Service Nivå Avtal Registrering"
 
 #. Label of the sla_mapping_section (Section Break) field in DocType 'HD Ticket
 #. Status'
@@ -3884,7 +4127,7 @@ msgstr "Lördag"
 #: desk/src/components/Settings/Telephony/Telephony.vue:22
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/desk/contact/ContactDialog.vue:235
-#: desk/src/pages/knowledge-base/Article.vue:71
+#: desk/src/pages/home/Home.vue:27 desk/src/pages/knowledge-base/Article.vue:71
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Save"
 msgstr "Spara"
@@ -3898,7 +4141,7 @@ msgstr "Spara Ändringar"
 msgid "Saved Replies"
 msgstr "Fördefinierade Svar"
 
-#: desk/src/pages/ticket/Tickets.vue:312
+#: desk/src/pages/ticket/Tickets.vue:313
 msgid "Saved Views"
 msgstr "Sparade Vyer"
 
@@ -3998,6 +4241,10 @@ msgstr "Sökte efter:"
 #: desk/src/pages/SearchAgent.vue:111
 msgid "Searching..."
 msgstr "Söker..."
+
+#: desk/src/pages/home/components/PendingTickets.vue:138
+msgid "See all {0} tickets"
+msgstr "Se alla {0} ärenden"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:28
 #: desk/src/pages/call-logs/CallLogModal.vue:57
@@ -4164,6 +4411,10 @@ msgstr "Genvägar"
 msgid "Show end users a different view"
 msgstr "Visa en annan vy för slutanvändare"
 
+#: desk/src/pages/ticket/Tickets.vue:423
+msgid "Show in sidebar"
+msgstr "Visa i sidofältet"
+
 #: desk/src/components/modals/ShortcutsModal.vue:83
 msgid "Show keyboard shortcuts"
 msgstr "Visa kortkommando"
@@ -4242,6 +4493,10 @@ msgstr "Dela och Slå Samman"
 msgid "Standard Form Scripts can't be modified, duplicate the script instead."
 msgstr "Standard formulär skript kan inte ändras, duplicera skript istället."
 
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.py:55
+msgid "Standard Views cannot be deleted."
+msgstr "Standardvyer kan inte tas bort."
+
 #. Label of the start_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Start Date"
@@ -4262,6 +4517,7 @@ msgstr "Starttiden kan inte vara senare än eller lika med sluttid på rad <u>{0
 #. Label of a field in the tickets Web Form
 #: desk/src/pages/SearchAgent.vue:59 desk/src/pages/SearchAgent.vue:60
 #: desk/src/pages/call-logs/CallLogModal.vue:53
+#: desk/src/pages/home/components/PendingTickets.vue:27
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -4325,6 +4581,7 @@ msgstr "Status för ärende när det skapas i system."
 
 #. Label of the subject (Data) field in DocType 'HD Ticket'
 #. Label of a field in the tickets Web Form
+#: desk/src/pages/home/components/PendingTickets.vue:24
 #: desk/src/pages/ticket/TicketNew.vue:63
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:30
@@ -4396,6 +4653,7 @@ msgstr "System"
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
+#: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
@@ -4446,6 +4704,7 @@ msgstr "Turkos"
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:228
 #: desk/src/pages/SearchAgent.vue:50 desk/src/pages/SearchAgent.vue:51
 #: desk/src/pages/dashboard/Dashboard.vue:58
+#: desk/src/pages/home/components/PendingTickets.vue:33
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 #: helpdesk/helpdesk/doctype/hd_saved_reply_team/hd_saved_reply_team.json
@@ -4585,11 +4844,7 @@ msgstr "Detta ärende (#{0}) är sammanslagen med <a href = '/helpdesk/tickets/{
 msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
 msgstr "Detta ärende har delats till ett nytt ärende. Följ upp ärende <a href={0}>#{1}</a>."
 
-#: desk/src/pages/ticket/Tickets.vue:413
-msgid "This view is currently public. Changing it to private will hide it for all the users."
-msgstr "Denna vy är för närvarande offentlig. Om du ändrar den till privat kommer den att döljas för alla användare."
-
-#: desk/src/pages/ticket/Tickets.vue:447
+#: desk/src/pages/ticket/Tickets.vue:485
 msgid "This view is public, and will be removed for all users."
 msgstr "Denna vy är offentlig och kommer att tas bort för alla användare."
 
@@ -4750,10 +5005,18 @@ msgstr "Ärendesökning Analys"
 #: desk/src/pages/ticket/MobileTicketAgent.vue:329
 #: desk/src/pages/ticket/TicketCustomer.vue:333
 #: desk/src/pages/ticket/TicketNew.vue:295 desk/src/pages/ticket/Tickets.vue:6
-#: desk/src/pages/ticket/Tickets.vue:587 helpdesk/api/dashboard.py:154
+#: desk/src/pages/ticket/Tickets.vue:625 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
 msgid "Tickets"
 msgstr "Ärende"
+
+#: desk/src/pages/home/components/PendingTickets.vue:220
+msgid "Tickets approaching or breached SLA"
+msgstr "Ärenden som närmar sig eller brutit mot Service Nivå Avtal"
+
+#: desk/src/pages/home/components/PendingTickets.vue:221
+msgid "Tickets assigned to you in the last 24 hours"
+msgstr "Ärenden som tilldelats dig under de senaste 24 timmarna"
 
 #: helpdesk/api/dashboard.py:553
 msgid "Tickets by Channel"
@@ -4774,6 +5037,10 @@ msgstr "Ärenden per Typ"
 #: helpdesk/api/ticket.py:16
 msgid "Tickets can only be assigned to agents"
 msgstr "Ärenden kan endast tilldelas handläggare"
+
+#: desk/src/pages/home/components/PendingTickets.vue:222
+msgid "Tickets that are awaiting your response"
+msgstr "Ärenden som väntar på ditt svar"
 
 #: desk/src/components/Settings/Profile/Profile.vue:152
 msgid "Timezone"
@@ -4889,10 +5156,12 @@ msgstr "Totalt antal skapade ärenden"
 msgid "Tuesday"
 msgstr "Tisdag"
 
+#. Label of the type (Select) field in DocType 'HD Field Layout'
 #. Label of the notification_type (Select) field in DocType 'HD Notification'
 #. Label of the type (Select) field in DocType 'HD View'
 #: desk/src/pages/SearchAgent.vue:77 desk/src/pages/SearchAgent.vue:78
 #: desk/src/pages/call-logs/CallLogModal.vue:24
+#: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Type"
@@ -4927,7 +5196,7 @@ msgstr "Obehörig Åtkomst"
 msgid "Unauthorized access."
 msgstr "Obehörig Åtkomst."
 
-#: desk/src/pages/ticket/Tickets.vue:386
+#: desk/src/pages/ticket/Tickets.vue:410
 msgid "Unpin View"
 msgstr "Lossa Vy"
 
@@ -5001,6 +5270,7 @@ msgstr "Ladda Upp {0}%"
 #. Label of the user (Link) field in DocType 'HD Article Feedback'
 #. Label of the user (Data) field in DocType 'HD Comment Reaction'
 #. Label of the user (Link) field in DocType 'HD Desk Account Request'
+#. Label of the user (Link) field in DocType 'HD Field Layout'
 #. Label of the user (Link) field in DocType 'HD Portal Signup Request'
 #. Label of the user (Link) field in DocType 'HD Team Member'
 #. Label of the user (Link) field in DocType 'HD View'
@@ -5008,6 +5278,7 @@ msgstr "Ladda Upp {0}%"
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 #: helpdesk/helpdesk/doctype/hd_comment_reaction/hd_comment_reaction.json
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
+#: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 #: helpdesk/helpdesk/doctype/hd_portal_signup_request/hd_portal_signup_request.json
 #: helpdesk/helpdesk/doctype/hd_team_member/hd_team_member.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -5056,7 +5327,7 @@ msgstr "Via Kund Portal"
 msgid "View Assignment rule"
 msgstr "Visa Tilldelningsregel"
 
-#: desk/src/pages/ticket/Tickets.vue:553
+#: desk/src/pages/ticket/Tickets.vue:591
 msgid "View {0}"
 msgstr "Visa {0}"
 
@@ -5186,6 +5457,10 @@ msgstr "Du har inte behörighet att komma åt Tilldelning Regler"
 msgid "You have already provided feedback for this ticket."
 msgstr "Du har redan lämnat återkoppling för detta ärende."
 
+#: desk/src/pages/home/components/RecentFeedback.vue:210
+msgid "You haven't received any feedback yet"
+msgstr "Du har inte fått någon återkoppling ännu"
+
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:130
 msgid "You must set one SLA as Default. Please check the Default SLA option."
 msgstr "Du måste ange ett SLA som standard. Välj alternativet för Standard SLA."
@@ -5194,15 +5469,23 @@ msgstr "Du måste ange ett SLA som standard. Välj alternativet för Standard SL
 msgid "Your old conditions will be overwritten. Are you sure you want to save?"
 msgstr "Dina gamla villkor kommer att skrivas över. Är du säker på att du vill spara?"
 
+#: desk/src/pages/home/components/RecentFeedback.vue:48
+msgid "Your performance is"
+msgstr "Din prestation är"
+
 #: desk/src/pages/MobileNotifications.vue:46
 msgid "assigned you a ticket"
 msgstr "tilldelade dig ärende"
+
+#: desk/src/pages/home/components/RecentFeedback.vue:370
+msgid "average"
+msgstr "medel"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:13
 msgid "back to email event list"
 msgstr "tillbaka till händelse e-post lista"
 
-#: desk/src/pages/ticket/Tickets.vue:552
+#: desk/src/pages/ticket/Tickets.vue:590
 msgid "created"
 msgstr "skapad"
 
@@ -5214,9 +5497,17 @@ msgstr "anpassa {0}"
 msgid "days"
 msgstr "dagar"
 
-#: desk/src/pages/ticket/Tickets.vue:464
+#: desk/src/pages/ticket/Tickets.vue:502
 msgid "deleted"
 msgstr "borttagen"
+
+#: desk/src/pages/home/components/RecentFeedback.vue:366
+msgid "excellent"
+msgstr "utmärkt"
+
+#: desk/src/pages/home/components/RecentFeedback.vue:368
+msgid "good"
+msgstr "bra"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -5262,6 +5553,10 @@ msgstr "lista"
 msgid "mentioned you in ticket"
 msgstr "nämnde dig i ärende"
 
+#: desk/src/pages/home/components/RecentFeedback.vue:372
+msgid "poor"
+msgstr "dålig"
+
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "purple"
@@ -5283,4 +5578,16 @@ msgstr "visade detta"
 #: desk/src/pages/SearchAgent.vue:117
 msgid "{0} matches"
 msgstr "{0} träffar"
+
+#: desk/src/pages/home/components/RecentFeedback.vue:43
+msgid "{0} reviews"
+msgstr "{0} recensioner"
+
+#: desk/src/pages/ticket/Tickets.vue:452
+msgid "{0} view is currently public. Changing it to private will hide it for all the users."
+msgstr "{0} vyn är för närvarande publik. Om du ändrar den till privat döljs den för alla användare."
+
+#: desk/src/pages/ticket/Tickets.vue:432
+msgid "{0} view is currently visible in the sidebar. Hiding it will remove it from the sidebar."
+msgstr "{0} vyn är för närvarande synlig i sidofältet. Om du döljer den tas den bort från sidofältet."
 
