@@ -441,9 +441,6 @@ onMounted(() => {
 function handleSelectAll(e: KeyboardEvent) {
   const active = document.activeElement;
   const editorContext = editorRef.value?.editor;
-  if (editorContext) {
-    editorContext.commands.selectAll();
-  }
   const editorDom = editorContext?.view?.dom as HTMLElement | undefined;
   const quotedEl = quotedContentRef.value;
   const sel = window.getSelection();
@@ -452,6 +449,7 @@ function handleSelectAll(e: KeyboardEvent) {
     return;
   }
   e.preventDefault();
+  editorContext?.commands.selectAll();
   sel.removeAllRanges();
   const range = document.createRange();
 
