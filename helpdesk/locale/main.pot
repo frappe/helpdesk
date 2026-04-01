@@ -1742,15 +1742,11 @@ msgstr ""
 msgid "Email account created"
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/Settings/EmailEdit.vue:267
-=======
 #: desk/src/components/Settings/EmailAccountList.vue:26
 msgid "Email account name"
 msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:471
->>>>>>> 8beed8cb (chore: update POT file)
 msgid "Email account updated successfully"
 msgstr ""
 
@@ -1916,15 +1912,11 @@ msgstr ""
 msgid "Failed"
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/Settings/EmailAdd.vue:167
-=======
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:274
 msgid "Failed to create category"
 msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:313
->>>>>>> 8beed8cb (chore: update POT file)
 msgid "Failed to create email account, Invalid credentials"
 msgstr ""
 
@@ -1953,9 +1945,6 @@ msgstr ""
 msgid "Failed to save Twilio settings"
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/Settings/EmailEdit.vue:272
-=======
 #: desk/src/components/ticket-agent/AssignTo.vue:83
 msgid "Failed to update Assignee's."
 msgstr ""
@@ -1965,7 +1954,6 @@ msgid "Failed to update category."
 msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:476
->>>>>>> 8beed8cb (chore: update POT file)
 msgid "Failed to update email account, Invalid credentials"
 msgstr ""
 
@@ -3298,9 +3286,7 @@ msgstr ""
 msgid "No assignment rule found"
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/Settings/EmailEdit.vue:184
-=======
+
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:34
 msgid "No average metrics"
 msgstr ""
@@ -3310,7 +3296,6 @@ msgid "No categories available"
 msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:344
->>>>>>> b115e087 (chore: update POT file)
 msgid "No changes made"
 msgstr ""
 
