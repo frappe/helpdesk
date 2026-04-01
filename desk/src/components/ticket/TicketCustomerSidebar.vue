@@ -98,8 +98,8 @@
           <template
             v-if="
               field.value &&
-              dayjs(field.value).isValid() &&
-              (field.fieldtype === 'Date' || field.fieldtype === 'Datetime')
+              (field.fieldtype === 'Date' || field.fieldtype === 'Datetime') &&
+              dayjs(field.value).isValid()
             "
           >
             {{ dateFormat(field.value, dateTooltipFormat) }}
