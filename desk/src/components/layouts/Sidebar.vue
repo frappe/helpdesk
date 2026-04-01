@@ -251,8 +251,6 @@ const { pinnedViews, publicViews } = useView();
 
 const isFCSite = ref(window.is_fc_site);
 
-// Track open/closed state per section label so collapsing sidebar can force-open
-// all sections without losing the user's per-section preference.
 const sectionOpenState = ref<Record<string, boolean>>({});
 
 function isSectionOpen(label: string, defaultOpen: boolean): boolean {

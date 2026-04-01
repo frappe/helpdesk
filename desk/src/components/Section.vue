@@ -84,8 +84,6 @@ const opened = ref(props.opened);
 watch(
   () => props.opened,
   (val) => {
-    console.log(val);
-
     opened.value = val;
   }
 );
