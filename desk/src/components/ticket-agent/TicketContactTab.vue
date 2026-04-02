@@ -62,7 +62,7 @@
       <div class="px-5 border-t pb-2.5" v-for="section in sections">
         <Section
           :key="section.label"
-          :label="section.label"
+          :label="__(section.label)"
           :hideLabel="section.hideLabel"
           :opened="section.opened"
         >
@@ -73,7 +73,7 @@
                   class="text-ink-gray-8 font-medium text-base cursor-pointer select-none"
                   @click="toggle"
                 >
-                  {{ section.label }}
+                  {{ __(section.label) }}
                 </span>
               </Tooltip>
               <LucideChevronDown
@@ -104,7 +104,7 @@
                   class="px-1.5 py-[3px] text-sm rounded-sm max-w-[80px] text-center truncate h-5"
                   :class="getStatusColor(ticket.status)"
                 >
-                  {{ ticket.status }}
+                  {{ __(ticket.status) }}
                 </p>
               </div>
             </li>
@@ -128,6 +128,7 @@ import { CopyIcon } from "../icons";
 import EmailIcon from "../icons/EmailIcon.vue";
 import PhoneIcon from "../icons/PhoneIcon.vue";
 import Section from "../Section.vue";
+import { __ } from "@/translation";
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
@@ -157,7 +158,7 @@ const sections = computed(() => {
   const _sections = [];
   if (recentTickets.length) {
     _sections.push({
-      label: "Recent Tickets",
+      label: __("Recent Tickets"),
       tooltipMessage: "Tickets recently raised by this contact/customer",
       hideLabel: false,
       opened: true,
@@ -166,7 +167,7 @@ const sections = computed(() => {
   }
   if (similarTickets.length) {
     _sections.push({
-      label: "Similar Tickets",
+      label: __("Similar Tickets"),
       tooltipMessage: "Tickets with similar queries",
       hideLabel: false,
       opened: true,

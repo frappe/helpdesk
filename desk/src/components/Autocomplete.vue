@@ -19,10 +19,10 @@
                   v-if="selectedValue"
                   class="overflow-hidden text-ellipsis whitespace-nowrap text-base leading-5"
                 >
-                  {{ displayValue(selectedValue) }}
+                  {{ __(displayValue(selectedValue)) }}
                 </span>
                 <span v-else class="text-base leading-5 text-gray-500">
-                  {{ placeholder || "" }}
+                  {{ __(placeholder) || "" }}
                 </span>
               </div>
               <FeatherIcon

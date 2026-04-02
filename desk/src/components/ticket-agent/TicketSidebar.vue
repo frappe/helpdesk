@@ -21,15 +21,16 @@ import { ref } from "vue";
 import Resizer from "../Resizer.vue";
 import TicketContactTab from "./TicketContactTab.vue";
 import TicketDetailsTab from "./TicketDetailsTab.vue";
+import { __ } from "@/translation";
 
 const currentTab = ref("details");
 const tabs = [
   {
-    label: "Details",
+    label: __("Details"),
     value: "details",
   },
   {
-    label: "Contact",
+    label: __("Contact"),
     value: "contact",
   },
 ];

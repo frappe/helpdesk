@@ -63,7 +63,7 @@
         /> -->
         <div :class="['mx-2', isCustomerPortal ? 'my-1' : 'my-2.5']"></div>
         <Section
-          :label="view.label"
+          :label="__(view.label)"
           :hideLabel="view.hideLabel"
           :opened="isSectionOpen(view.label, view.opened)"
         >

@@ -97,7 +97,7 @@
       </div>
       <!-- TextEditor Fixed Menu -->
       <div
-        class="flex justify-between overflow-scroll pl-10 py-2.5 items-center"
+        class="flex justify-between overflow-scroll pl-10 rtl:pr-10 py-2.5 items-center"
       >
         <div class="flex items-center overflow-x-auto w-[60%]">
           <div class="flex gap-1">
@@ -141,7 +141,7 @@
           <TextEditorFixedMenu class="ml-1" :buttons="textEditorMenuButtons" />
         </div>
         <div
-          class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%] mr-9"
+          class="flex items-center justify-end space-x-2 rtl:gap-2 sm:mt-0 w-[40%] mr-9"
         >
           <Button label="Discard" @click="handleDiscard" />
           <Button

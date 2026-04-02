@@ -239,8 +239,8 @@ import { View } from "@/types";
 
 const router = useRouter();
 const chartTabs = [
-  { label: "Rating", value: "rating" },
-  { label: "Feedback", value: "feedback" },
+  { label: __("Rating"), value: "rating" },
+  { label: __("Feedback"), value: "feedback" },
 ];
 const currentTab = ref("rating");
 const { views } = useView("HD Ticket");

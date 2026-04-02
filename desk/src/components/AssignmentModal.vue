@@ -2,7 +2,7 @@
   <Dialog
     v-model="show"
     :options="{
-      title: 'Assign To',
+      title: __('Assign To'),
       size: 'xl',
     }"
   >
