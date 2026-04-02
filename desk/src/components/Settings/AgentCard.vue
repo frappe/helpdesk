@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center justify-between py-2" v-bind:class="$attrs">
-    <div class="flex items-center space-x-3 w-4/5">
+    <div class="flex items-center space-x-3 w-4/5 rtl:space-x-reverse">
       <Avatar :image="agent.user_image" :label="agent.agent_name" size="xl" />
       <div>
         <div class="flex items-center gap-2">

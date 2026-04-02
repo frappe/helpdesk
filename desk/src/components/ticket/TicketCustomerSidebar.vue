@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-[382px] flex-col border-l gap-4">
+  <div class="flex w-[382px] flex-col border-l gap-4 rtl:border-r">
     <!-- Ticket ID -->
     <div class="flex items-center justify-between border-b px-5 py-3">
       <span class="cursor-copy text-lg font-semibold">Ticket details</span>

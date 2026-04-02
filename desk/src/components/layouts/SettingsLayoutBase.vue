@@ -23,7 +23,7 @@
         <slot name="header-bottom" />
       </div>
     </div>
-    <div class="px-10 pb-8 overflow-y-auto h-full flex flex-col">
+    <div class="px-10 pb-8 overflow-y-auto h-full flex flex-col rtl:text-right">
       <slot name="content" />
     </div>
   </div>

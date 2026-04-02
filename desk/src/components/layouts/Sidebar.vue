@@ -540,11 +540,11 @@ const steps = [
 
 const articles = ref([
   {
-    title: "Introduction",
+    title: __("Introduction"),
     opened: false,
     subArticles: [
-      { name: "introduction", title: "Introduction" },
-      { name: "setting-up", title: "Setting up" },
+      { name: "introduction", title: __("Introduction") },
+      { name: "setting-up", title: __("Setting up") },
     ],
   },
   {
@@ -553,27 +553,27 @@ const articles = ref([
     subArticles: [
       {
         name: "lesson-1-your-first-ticket",
-        title: "Creating a ticket",
+        title: __("Creating a ticket"),
       },
       {
         name: "lesson-2understanding-ticket-view",
-        title: "Understanding ticket view",
+        title: __("Understanding ticket view"),
       },
       {
         name: "lesson-3-agents-teams",
-        title: "Agents & Teams",
+        title: __("Agents & Teams"),
       },
       {
         name: "customers-contacts",
-        title: "Customers & Contacts",
+        title: __("Customers & Contacts"),
       },
       {
         name: "lesson-4-knowledge-base",
-        title: "Knowledge Base",
+        title: __("Knowledge Base"),
       },
       {
         name: "customer-portal",
-        title: "Customer Portal",
+        title: __("Customer Portal"),
       },
     ],
   },
@@ -581,36 +581,36 @@ const articles = ref([
     title: "Masters",
     opened: false,
     subArticles: [
-      { name: "ticket", title: "Ticket" },
-      { name: "agent", title: "Agent" },
-      { name: "team", title: "Team" },
-      { name: "contact", title: "Contact" },
-      { name: "customer", title: "Customer" },
-      { name: "knowledge-base", title: "Knowledge Base" },
-      { name: "saved-replies", title: "Saved Replies" },
-      { name: "service-level-agreement", title: "Service Level Agreement" },
-      { name: "ticket-type", title: "Ticket Type" },
-      { name: "ticket-priority", title: "Ticket Priority" },
+      { name: "ticket", title: __("Ticket") },
+      { name: "agent", title: __("Agent") },
+      { name: "team", title: __("Team") },
+      { name: "contact", title: __("Contact") },
+      { name: "customer", title: __("Customer") },
+      { name: "knowledge-base", title: __("Knowledge Base") },
+      { name: "saved-replies", title: __(" Saved Replies") },
+      { name: "service-level-agreement", title: __("Service Level Agreement") },
+      { name: "ticket-type", title: __("Ticket Type") },
+      { name: "ticket-priority", title: __("Ticket Priority") },
     ],
   },
   {
     title: "Customizations",
     opened: false,
     subArticles: [
-      { name: "custom-actions", title: "Custom Actions" },
-      { name: "field-dependency", title: "Field Dependency" },
-      { name: "custom-views", title: "Custom Views" },
+      { name: "custom-actions", title: __("Custom Actions") },
+      { name: "field-dependency", title: __("Field Dependency") },
+      { name: "custom-views", title: __("Custom Views") },
       {
         name: "settings",
-        title: "Settings",
+        title: __("Settings"),
       },
     ],
   },
   {
-    title: "Frappe Helpdesk Mobile",
+    title: __("Frappe Helpdesk Mobile"),
     opened: false,
     subArticles: [
-      { name: "pwa-installation", title: "Mobile App Installation" },
+      { name: "pwa-installation", title: __("Mobile App Installation") },
     ],
   },
 ]);
