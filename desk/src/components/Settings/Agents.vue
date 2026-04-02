@@ -119,7 +119,7 @@
           <hr class="mt-2" />
           <div v-for="(agent, index) in agents.data" :key="agent.agent_name">
             <div class="flex items-center justify-between h-14 group rounded">
-              <div class="flex items-center space-x-3 grow">
+              <div class="flex items-center space-x-3 grow rtl:space-x-reverse">
                 <Avatar
                   :image="agent.user_image"
                   :label="agent.agent_name"

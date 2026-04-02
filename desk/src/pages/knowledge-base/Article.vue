@@ -82,7 +82,7 @@
                 v-if="!editable && !isCustomerPortal && !isMobileView"
                 class="text-p-sm text-gray-500 items-center"
               >
-                <span>{{ views }} views</span>
+                <span>{{ views }} {{ __("views") }}</span>
               </div>
             </div>
             <div class="flex gap-4 justify-between sm:items-start">
@@ -193,7 +193,9 @@
               <p
                 class="truncate capitalize text-p-base text-ink-gray-9 font-medium"
               >
-                <span class="text-base text-gray-600">published by </span>
+                <span class="text-base text-gray-600"
+                  >{{ __("published by") }}
+                </span>
                 {{ article.data.author.name }}
               </p>
               <div class="flex items-center gap-1">
