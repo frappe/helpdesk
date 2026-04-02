@@ -260,7 +260,6 @@ const ticketAdditionalInfo = computed(() => {
       }
       return option;
     });
-  console.log("this is", custom_fields);
 
   return [...fields, ...custom_fields];
 });
