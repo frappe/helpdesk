@@ -34,7 +34,7 @@
         <div v-if="groupedWithLabelActions.length">
           <div v-for="g in groupedWithLabelActions" :key="g.label">
             <Dropdown v-slot="{ open }" :options="g.action">
-              <Button :label="g.label">
+              <Button :label="__(g.label)">
                 <template #suffix>
                   <FeatherIcon
                     :name="open ? 'chevron-up' : 'chevron-down'"
@@ -48,7 +48,7 @@
         <!-- Status -->
         <Dropdown :options="statusDropdown" placement="right">
           <template #default="{ open }">
-            <Button :label="ticket.doc.status" ref="statusRef">
+            <Button :label="__(ticket.doc.status)" ref="statusRef">
               <template #prefix>
                 <IndicatorIcon
                   :class="
@@ -149,7 +149,7 @@ const statusDropdown = computed(() => {
   const statuses =
     ticketStatusStore.statuses.data?.filter((s) => s.enabled) || [];
   return statuses.map((o: HDTicketStatus) => ({
-    label: o.label_agent,
+    label: __(o.label_agent),
     value: o.label_agent,
     onClick: () => {
       notifyTicketUpdate("Status", o.label_agent);
@@ -175,7 +175,7 @@ const breadcrumbs = computed(() => {
     const currView: ComputedRef<View> = findView(route.query.view as string);
     if (currView) {
       items.push({
-        label: currView.value?.label,
+        label: __(currView.value?.label),
         icon: getIcon(currView.value?.icon),
         route: { name: "TicketsAgent", query: { view: currView.value?.name } },
       });
@@ -310,7 +310,7 @@ const groupedWithLabelActions = computed(() => {
         _actions[groupIndex].action.push(action);
       } else {
         _actions.push({
-          label: action.buttonLabel,
+          label: __(action.buttonLabel),
           action: [action],
         });
       }
@@ -322,7 +322,7 @@ const groupedActions = computed(() => {
   let _actions = [];
   _actions = _actions.concat(defaultActions.value);
   _actions = _actions.concat(
-    actions.value.filter((action) => action.group && !action.buttonLabel)
+    actions.value.filter((action) => action.group && !__(action.buttonLabel))
   );
   _actions = _actions.concat(deleteAction.value);
   return _actions;

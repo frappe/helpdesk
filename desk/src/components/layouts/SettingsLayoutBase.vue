@@ -5,7 +5,7 @@
         <div class="flex flex-col gap-1 rtl:text-right">
           <slot name="title">
             <h1 class="text-lg font-semibold text-ink-gray-8">
-              {{ title }}
+              {{ __(title) }}
             </h1>
           </slot>
           <slot
@@ -13,7 +13,7 @@
             v-if="Boolean($slots['description']) || Boolean(description)"
           >
             <p class="text-p-sm text-gray-700 max-w-md text-ink-gray-6">
-              {{ description }}
+              {{ __(description) }}
             </p>
           </slot>
         </div>

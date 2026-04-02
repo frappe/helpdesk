@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    :options="{ title: `Merge with another ticket` }"
+    :options="{ title: __('Merge with another ticket') }"
     v-model="showDialog"
   >
     <template #body-content>
@@ -56,7 +56,7 @@
         <Link
           class="form-control"
           doctype="HD Ticket"
-          placeholder="Select Ticket"
+          :placeholder="__('Select Ticket')"
           :filters="getDefaultFilters()"
           label="Ticket"
           :page-length="10"
