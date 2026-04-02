@@ -1,8 +1,20 @@
 <template>
+<<<<<<< HEAD
   <div v-if="!quickFilters.loading">
     <FadedScrollableDiv
       class="flex flex-1 items-center -ml-1 flex-wrap gap-2"
       orientation="horizontal"
+=======
+  <FadedScrollableDiv
+    class="quick-filters flex flex-1 items-center -ml-1 overflow-x-auto py-1 gap-2 pr-4"
+    orientation="horizontal"
+    v-if="!quickFilters.loading"
+  >
+    <div
+      v-for="filter in quickFilters.data"
+      :key="filter.name"
+      class="min-w-36 pl-0.5"
+>>>>>>> 7c3088de (fix: improve sidepanel scrollbar  and fix quick filters)
     >
       <div
         v-for="filter in quickFilters.data"
@@ -80,4 +92,12 @@ function getValue(quickFilter, filters) {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.quick-filters {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.quick-filters::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+</style>
