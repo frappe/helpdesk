@@ -9,15 +9,24 @@
         <div
           class="flex w-52 shrink-0 flex-col bg-gray-50 p-2 overflow-y-auto hide-scrollbar"
         >
+<<<<<<< HEAD
           <h1 class="px-2 pt-2 text-lg font-semibold mb-2">
             {{ __("Settings") }}
+=======
+          <h1
+            class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-base text-ink-gray-5 transition-all duration-300 ease-in-out truncate"
+          >
+            {{ __("My Settings") }}
+>>>>>>> 2d583532 (fix: truncate text for translations in settings menu)
           </h1>
           <div v-for="tab in tabs">
             <div
               v-if="!tab.hideLabel"
               class="mb-2 mt-3 flex gap-1.5 px-1 text-base font-medium text-ink-gray-5"
             >
-              <span>{{ __(tab.label) }}</span>
+              <Tooltip :text="tab.label">
+                <span class="truncate">{{ __(tab.label) }}</span>
+              </Tooltip>
             </div>
             <nav class="space-y-1">
               <button
@@ -32,9 +41,17 @@
                 @click="() => onTabChange(item)"
               >
                 <component :is="item.icon" class="h-4 w-4 text-gray-700" />
+<<<<<<< HEAD
                 <span class="text-base text-gray-800">
                   {{ item.label }}
                 </span>
+=======
+                <Tooltip :text="item.label">
+                  <span class="text-p-sm text-gray-800 truncate">
+                    {{ item.label }}
+                  </span>
+                </Tooltip>
+>>>>>>> 2d583532 (fix: truncate text for translations in settings menu)
               </button>
             </nav>
           </div>
