@@ -10,7 +10,7 @@
           class="flex w-52 shrink-0 flex-col bg-gray-50 p-1 overflow-y-auto hide-scrollbar"
         >
           <h1
-            class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-base text-ink-gray-5 transition-all duration-300 ease-in-out"
+            class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-base text-ink-gray-5 transition-all duration-300 ease-in-out truncate"
           >
             {{ __("My Settings") }}
           </h1>
@@ -21,7 +21,9 @@
               v-if="!tab.hideLabel"
               class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-base text-ink-gray-5 transition-all duration-300 ease-in-out"
             >
-              <span>{{ __(tab.label) }}</span>
+              <Tooltip :text="tab.label">
+                <span class="truncate">{{ __(tab.label) }}</span>
+              </Tooltip>
             </div>
 
             <nav class="space-y-[3px] px-1">
@@ -37,9 +39,11 @@
                 @click="() => onTabChange(item)"
               >
                 <component :is="item.icon" class="h-4 w-4 text-gray-700" />
-                <span class="text-p-sm text-gray-800">
-                  {{ item.label }}
-                </span>
+                <Tooltip :text="item.label">
+                  <span class="text-p-sm text-gray-800 truncate">
+                    {{ item.label }}
+                  </span>
+                </Tooltip>
               </button>
             </nav>
           </div>
