@@ -10,6 +10,7 @@
   "image",
   "customer_name",
   "domain",
+  "organization",
   "references_tab",
   "contact_html"
  ],
@@ -31,6 +32,12 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Domain"
+  },
+  {
+   "fieldname": "organization",
+   "fieldtype": "Link",
+   "label": "Organization",
+   "options": "HD Organization"
   },
   {
    "fieldname": "references_tab",

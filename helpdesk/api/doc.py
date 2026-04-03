@@ -163,19 +163,28 @@ def get_list_data(
                 return [option for option in options.split("\n")]
             else:
                 has_empty_values = any([not d.get(group_by_field) for d in data])
-                options = list(set([d.get(group_by_field) for d in data]))
-                options = [u for u in options if u]
-                options = [category_name for category_name in options if category_name]
+                option_values = list(set([d.get(group_by_field) for d in data]))
+                option_values = [o for o in option_values if o]
+
+                # Batch fetch labels to avoid N+1 queries
+                target_doc = label_doc if label_doc else doctype
+                target_field = label_field if label_field else group_by_field
+                if option_values:
+                    label_records = frappe.get_all(
+                        target_doc,
+                        filters={"name": ["in", option_values]},
+                        fields=["name", target_field],
+                    )
+                    label_map = {r["name"]: r[target_field] for r in label_records}
+                else:
+                    label_map = {}
+
                 options = [
                     {
-                        "label": frappe.db.get_value(
-                            label_doc if label_doc else doctype,
-                            option,
-                            label_field if label_field else group_by_field,
-                        ),
+                        "label": label_map.get(option, option),
                         "value": option,
                     }
-                    for option in options
+                    for option in option_values
                     if option
                 ]
                 if has_empty_values:
@@ -222,9 +231,9 @@ def get_list_data(
         "columns": columns,
         "rows": rows,
         "fields": fields if doctype == "HD Ticket" else [],
-        "total_count": frappe.get_list(doctype, fields=[COUNT_NAME], filters=filters)[
-            0
-        ].get("count", 0),
+        "total_count": (
+            frappe.get_list(doctype, fields=[COUNT_NAME], filters=filters) or [{}]
+        )[0].get("count", 0),
         "row_count": len(data),
         "group_by_field": group_by_field,
         "view_type": view_type,

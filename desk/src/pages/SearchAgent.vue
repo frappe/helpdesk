@@ -172,8 +172,7 @@
                   <div
                     v-if="item.title"
                     class="text-base font-medium truncate max-w-[60%]"
-                    v-html="item.title"
-                  />
+                  >{{ stripHtml(item.title) }}</div>
                   <div class="text-base font-medium" v-else>
                     {{ item.name }}
                   </div>
@@ -195,8 +194,7 @@
                 <div
                   v-if="item.content"
                   class="mt-1 text-p-base text-ink-gray-6"
-                  v-html="item.content"
-                ></div>
+                >{{ stripHtml(item.content) }}</div>
               </div>
             </router-link>
             <div class="border-b mx-2"></div>
@@ -276,6 +274,13 @@ interface FilterOptions {
   statuses: Record<string, number>;
   priorities: Record<string, number>;
   doctypes: Record<string, number>;
+}
+
+// Helpers
+function stripHtml(html: string): string {
+  if (!html) return "";
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || "";
 }
 
 // Constants and Configuration

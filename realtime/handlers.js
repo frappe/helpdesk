@@ -4,7 +4,7 @@ function helpdesk_handlers(socket) {
   });
 
   socket.on("view_ticket", (ticket_id) => {
-    if (!ticket_id) return;
+    if (!ticket_id || !socket.user) return;
     const room = open_doc_room("HD Ticket", ticket_id);
     socket.join(room);
 
@@ -16,7 +16,7 @@ function helpdesk_handlers(socket) {
   });
 
   socket.on("stop_view_ticket", (ticket_id) => {
-    if (!ticket_id) return;
+    if (!ticket_id || !socket.user) return;
     const room = open_doc_room("HD Ticket", ticket_id);
     socket.leave(room);
 
@@ -28,18 +28,23 @@ function helpdesk_handlers(socket) {
   });
 
   socket.on("ticket_get_viewers", (ticket_id) => {
-    if (!ticket_id) return;
+    if (!ticket_id || !socket.user) return;
     // Send current viewers list to the requesting user only
     notify_ticket_viewers({
       socket: socket,
       ticket_id: ticket_id,
-      toUser: true, // saying that whenever we ask for viewers, send only to the user who asked
+      toUser: true,
     });
   });
 
   socket.on("notify_ticket_update", (ticket_id, field, value) => {
-    if (!(ticket_id && field)) return;
+    if (!(ticket_id && field && socket.user)) return;
+
+    // Only broadcast if the user is actually in the ticket room
     const ticket_room = open_doc_room("HD Ticket", ticket_id);
+    const rooms = socket.rooms;
+    if (!rooms.has(ticket_room)) return;
+
     socket.to(ticket_room).emit("ticket_update", {
       ticket_id,
       user: socket.user,
@@ -50,10 +55,12 @@ function helpdesk_handlers(socket) {
 
   // Typing indicators
   socket.on("helpdesk_ticket_typing", (ticket_id) => {
-    if (!ticket_id) return;
+    if (!ticket_id || !socket.user) return;
     const ticket_room = open_doc_room("HD Ticket", ticket_id);
 
-    // Broadcast to all other users in the ticket room that this user is typing
+    // Only broadcast if the user is in the ticket room
+    if (!socket.rooms.has(ticket_room)) return;
+
     socket.to(ticket_room).emit("helpdesk_ticket_typing", {
       ticket_id,
       user: socket.user,
@@ -61,10 +68,12 @@ function helpdesk_handlers(socket) {
   });
 
   socket.on("helpdesk_ticket_typing_stopped", (ticket_id) => {
-    if (!ticket_id) return;
+    if (!ticket_id || !socket.user) return;
     const ticket_room = open_doc_room("HD Ticket", ticket_id);
 
-    // Broadcast to all other users in the ticket room that this user stopped typing
+    // Only broadcast if the user is in the ticket room
+    if (!socket.rooms.has(ticket_room)) return;
+
     socket.to(ticket_room).emit("helpdesk_ticket_typing_stopped", {
       ticket_id,
       user: socket.user,
@@ -86,10 +95,12 @@ function notify_ticket_viewers(args) {
 
   // Extract user information for each socket in the room
   socket.nsp.sockets.forEach((sock) => {
-    if (clients.includes(sock.id)) {
+    if (clients.includes(sock.id) && sock.user) {
       users.push(sock.user);
     }
   });
+
+  const uniqueUsers = Array.from(new Set(users));
 
   const target_room = args.toUser
     ? user_room(args.socket.user) // Send to specific user only
@@ -98,8 +109,8 @@ function notify_ticket_viewers(args) {
   // Emit the notification with current viewers list
   socket.nsp.to(target_room).emit("ticket_viewers", {
     ticket_id,
-    users: JSON.stringify(Array.from(new Set(users))), // Remove duplicate users
-    total_viewers: Array.from(new Set(users)).length,
+    users: JSON.stringify(uniqueUsers),
+    total_viewers: uniqueUsers.length,
   });
 }
 
@@ -107,6 +118,5 @@ function notify_ticket_viewers(args) {
 const open_doc_room = (doctype, docname) =>
   "open_doc:" + doctype + "/" + docname;
 const user_room = (user) => "user:" + user;
-const ticket_response_room = (ticket_id) => "ticket_response:" + ticket_id;
 
 module.exports = helpdesk_handlers;

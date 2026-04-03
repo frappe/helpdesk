@@ -19,7 +19,11 @@ export function getMeta(doctype: string) {
         doctypeMeta[dtMeta.name] = dtMeta;
       }
 
-      userSettings[doctype] = JSON.parse(res.user_settings);
+      try {
+        userSettings[doctype] = JSON.parse(res.user_settings);
+      } catch {
+        userSettings[doctype] = {};
+      }
     },
   });
   if (!doctypeMeta[doctype] && !meta.loading) {

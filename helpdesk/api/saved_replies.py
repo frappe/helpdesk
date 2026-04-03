@@ -9,6 +9,7 @@ from helpdesk.utils import agent_only
 def get_rendered_saved_reply(ticket_id: str | int, saved_reply_id: str | None = None):
     if not saved_reply_id:
         frappe.throw(_("Please provide saved_reply_id"))
+    frappe.has_permission("HD Ticket", "read", ticket_id, throw=True)
     saved_reply = frappe.get_doc("HD Saved Reply", saved_reply_id).message
     ticket = frappe.get_doc("HD Ticket", ticket_id).as_dict()
     user = frappe.get_doc("User", frappe.session.user).as_dict()

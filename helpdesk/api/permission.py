@@ -7,9 +7,12 @@ def has_app_permission():
         return True
 
     roles = frappe.get_roles()
-    helpdesk_roles = ["Agent"]
-    if any(role in roles for role in helpdesk_roles):
+    allowed_roles = ["Agent", "System Manager"]
+    if any(role in roles for role in allowed_roles):
         return True
 
-    # TODO: Check for Customer permission once the role is added
-    return True
+    # Customers can access the portal but not the agent desk
+    if frappe.db.exists("HD Customer", {"email_id": frappe.session.user}):
+        return True
+
+    return False

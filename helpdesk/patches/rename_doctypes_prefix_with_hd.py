@@ -53,4 +53,3 @@ def execute():
             continue
 
         frappe.rename_doc("DocType", old, new)
-        print("Migrated", old, "to", new)

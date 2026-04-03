@@ -30,11 +30,17 @@ from helpdesk.utils import (
 
 
 @frappe.whitelist()
-# flake8: noqa
 def new(doc: dict, attachments: list[dict] = []):
+    """Create a new HD Ticket."""
     doc["doctype"] = "HD Ticket"
-    doc["via_customer_portal"] = bool(frappe.session.user)
+
+    # Detect if the user is a customer (not an agent) to set portal flag
+    doc["via_customer_portal"] = not is_agent()
     doc["attachments"] = attachments
+
+    if not doc.get("subject"):
+        frappe.throw(_("Subject is required"))
+
     d = frappe.get_doc(doc).insert()
     return d
 

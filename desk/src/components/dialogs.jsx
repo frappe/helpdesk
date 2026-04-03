@@ -18,7 +18,7 @@ export let Dialogs = {
               dialog.message && (
                 <p class="text-p-base text-ink-gray-7">{dialog.message}</p>
               ),
-              dialog.html && <div v-html={dialog.html} />,
+              dialog.html && <p class="text-p-base text-ink-gray-7">{dialog.html}</p>,
               <ErrorMessage class="mt-2" message={dialog.error} />,
             ];
           },

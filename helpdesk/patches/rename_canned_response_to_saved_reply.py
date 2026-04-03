@@ -12,4 +12,3 @@ def execute():
         return
 
     frappe.rename_doc("DocType", old, new, ignore_if_exists=True)
-    print("Migrated", old, "to", new)

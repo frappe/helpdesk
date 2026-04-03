@@ -1,7 +1,7 @@
 import frappe
 from frappe.desk.form.assign_to import add as add_assign
 
-AUTHOR_EMAIl = "john@example.com"
+AUTHOR_EMAIL = "john@example.com"
 AUTHOR_NAME = "John Doe"
 CONTENT = """
 <div style="font-family: 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.8; color: #374151; max-width: 560px; margin: 0 auto;">
@@ -77,7 +77,7 @@ def create_ticket():
     d = frappe.new_doc("HD Ticket")
     d.subject = "Welcome to Helpdesk"
     d.description = rendered_content
-    d.raised_by = AUTHOR_EMAIl
+    d.raised_by = AUTHOR_EMAIL
     d.contact = AUTHOR_NAME
     d.via_customer_portal = True
     d.insert()
@@ -95,6 +95,6 @@ def create_contact():
         {
             "doctype": "Contact",
             "first_name": AUTHOR_NAME,
-            "email_ids": [{"email_id": AUTHOR_EMAIl, "is_primary": 1}],
+            "email_ids": [{"email_id": AUTHOR_EMAIL, "is_primary": 1}],
         }
     ).insert()
