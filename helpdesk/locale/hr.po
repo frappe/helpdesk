@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-03-29 10:43+0000\n"
-"PO-Revision-Date: 2026-04-02 11:02\n"
+"PO-Revision-Date: 2026-04-03 11:53\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Croatian\n"
 "MIME-Version: 1.0\n"
@@ -329,7 +329,7 @@ msgstr "Svi"
 
 #: desk/src/pages/home/components/PendingTickets.vue:231
 msgid "All SLAs on track"
-msgstr "Svi Ugovori o Nivou Usluge su u skladu s planom"
+msgstr "Svi Ugovori o Razini Usluge su u skladu s planom"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:281
 #: desk/src/pages/home/components/RecentFeedback.vue:310
@@ -683,7 +683,7 @@ msgstr "Automatski generirano iz prikaza portala — nemojte izravno uređivati 
 #. Label of the auto_close_tickets (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Automatically Close Tickets when"
-msgstr "Automatski zatvori tikete kada"
+msgstr "Automatski zatvori zahtjeve kada"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:145
 msgid "Automatically close stale tickets"
@@ -730,7 +730,7 @@ msgstr "Prosječni pokazatelji odgovora i rješenja još nisu generirani"
 
 #: helpdesk/api/dashboard.py:286
 msgid "Average tickets per day is around {0}"
-msgstr "Prosječan broj slučajeva dnevno je oko {0}"
+msgstr "Prosječan broj zahtjeva dnevno je oko {0}"
 
 #: helpdesk/api/dashboard.py:231
 msgid "Avg. Feedback Rating"
@@ -3960,7 +3960,7 @@ msgstr "Nedavno"
 
 #: desk/src/pages/home/components/PendingTickets.vue:211
 msgid "Recent Tickets"
-msgstr "Nedavni Slučajevi"
+msgstr "Nedavni Zahtjevi"
 
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:54
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:43
@@ -4097,7 +4097,7 @@ msgstr "Poništi"
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:95
 #: desk/src/components/Settings/General/components/TicketSettings.vue:252
 msgid "Reset Content"
-msgstr "Poništi sadržaj"
+msgstr "Poništi Sadržaj"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:120
 msgid "Reset content"
@@ -4258,7 +4258,7 @@ msgstr "Ugovor o Razini Usluge"
 #: desk/src/pages/home/components/PendingTickets.vue:196
 #: desk/src/pages/home/components/PendingTickets.vue:210
 msgid "SLA Alerts"
-msgstr "Upozorenja Ugovora o Nivou Usluge"
+msgstr "Upozorenja Ugovora o Razini Usluge"
 
 #. Label of the service_level_agreement_creation (Datetime) field in DocType
 #. 'HD Ticket'
@@ -5194,7 +5194,7 @@ msgstr "Zahtjev uspješno zatvoren."
 
 #: desk/src/components/ticket-agent/TicketHeader.vue:219
 msgid "Ticket deleted successfully."
-msgstr "Slučaj uspješno izbrisan."
+msgstr "Zahtjev uspješno izbrisan."
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:21
 msgid "Ticket does not exist."
@@ -5406,7 +5406,7 @@ msgstr "Ukupan broj zahtjeva po timu"
 
 #: helpdesk/api/dashboard.py:489
 msgid "Total tickets by type"
-msgstr "Ukupan broj zhtjeva po tipu"
+msgstr "Ukupan broj zahtjeva po tipu"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
