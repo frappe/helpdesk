@@ -84,6 +84,10 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "src"),
       "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
+      "../../../frappe": path.resolve(
+        process.env.HOME || "/home/codespace",
+        "frappe-bench/apps/frappe"
+      ),
     },
   },
   optimizeDeps: {
