@@ -6,8 +6,9 @@
     class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0"
   >
     <template #tab-panel="{ tab }">
+      <TimeLogSection v-if="tab.name === 'timelog'" />
       <TicketAgentActivities
-        v-if="Boolean(activities.data)"
+        v-else-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
         :activities="filterActivities(tab.name as TicketTab)"
         :title="tab.label"
@@ -53,9 +54,11 @@
 import {
   ActivityIcon,
   CommentIcon,
+  DurationIcon,
   EmailIcon,
   PhoneIcon,
 } from "@/components/icons";
+import TimeLogSection from "./TimeLogSection.vue";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
@@ -100,6 +103,12 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       icon: CommentIcon,
     },
   ];
+
+  _tabs.push({
+    name: "timelog",
+    label: "Time Logs",
+    icon: DurationIcon,
+  });
 
   if (isCallingEnabled.value) {
     _tabs.push({
