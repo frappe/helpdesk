@@ -81,7 +81,7 @@
               {{ __("Account & Security") }}
             </div>
             <Badge
-              v-if="isAccountInfoDirty || isLanguageChanged"
+              v-if="isProfileDirty"
               :variant="'subtle'"
               :theme="'orange'"
               size="sm"
@@ -93,14 +93,8 @@
             variant="solid"
             class="transition-colors"
             @click="onSave"
-            :loading="
-              setAgent.loading ||
-              saveLanguageResource.loading ||
-              saveTimezoneResource.loading
-            "
-            :disabled="
-              !isAccountInfoDirty && !isLanguageChanged && !isTimezoneChanged
-            "
+            :loading="isProfileLoading"
+            :disabled="!isProfileDirty"
           />
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
@@ -165,6 +159,63 @@
             class="w-40"
           />
         </div>
+
+        <div class="flex flex-col gap-2 mt-6">
+          <div class="flex items-center justify-between">
+            <div class="flex flex-col gap-1">
+              <span class="text-base font-medium text-ink-gray-8">{{
+                __("Email Signature")
+              }}</span>
+              <span class="text-p-sm text-ink-gray-6">{{
+                __(
+                  "Set a personalized email signature that appears at the end of your replies."
+                )
+              }}</span>
+            </div>
+            <Switch v-model="enableSignature" />
+          </div>
+          <div v-if="enableSignature">
+            <TextEditor
+              ref="signatureEditorRef"
+              editor-class="prose-sm max-w-none min-h-[4rem]"
+              :starterkit-options="{ heading: { levels: [2, 3, 4] } }"
+              :placeholder="__('Write your email signature here')"
+              :content="signatureContent"
+              @change="(val) => (signatureContent = val)"
+            >
+              <template #editor="{ editor }">
+                <EditorContent
+                  class="max-h-[30vh] overflow-y-auto rounded-lg border p-4"
+                  :editor="editor"
+                />
+              </template>
+              <template #bottom>
+                <div
+                  class="mt-2 flex flex-col justify-between sm:flex-row sm:items-center"
+                >
+                  <TextEditorFixedMenu
+                    class="-ml-1 overflow-x-auto"
+                    :buttons="signatureButtons"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="subtle"
+                    class="w-fit"
+                    :disabled="!isSignatureDirty"
+                    @click="resetSignatureContent"
+                    :tooltip="
+                      isSignatureDirty &&
+                      __('This will reset the content to the default message.')
+                    "
+                  >
+                    {{ __("Reset Content") }}
+                  </Button>
+                </div>
+              </template>
+            </TextEditor>
+          </div>
+        </div>
       </div>
     </template>
   </SettingsLayoutBase>
@@ -175,7 +226,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import {
   Avatar,
   Badge,
@@ -185,10 +236,16 @@ import {
   FileUploader,
   LoadingIndicator,
   toast,
+  TextEditor,
+  TextEditorFixedMenu,
+  Switch,
 } from "frappe-ui";
+import { EditorContent } from "@tiptap/vue-3";
 import { Autocomplete } from "@/components";
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
+import { updateRes as updateSignature } from "@/stores/knowledgeBase";
+
 import CameraIcon from "~icons/lucide/camera";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
@@ -208,6 +265,25 @@ const language = ref(auth.language);
 const timezone = ref(auth.timezone);
 const timezoneOptions = ref([]);
 
+// Signature state
+const signatureEditorRef = ref(null);
+const enableSignature = ref(false);
+const signatureContent = ref("");
+const originalSignature = ref("");
+const originalEnableSignature = ref(false);
+
+const isSignatureDirty = computed(() => {
+  return (
+    signatureContent.value !== originalSignature.value ||
+    enableSignature.value !== originalEnableSignature.value
+  );
+});
+
+function resetSignatureContent() {
+  signatureContent.value = originalSignature.value;
+  enableSignature.value = originalEnableSignature.value;
+}
+
 const isLanguageChanged = computed(() => {
   return language.value !== auth?.language;
 });
@@ -219,16 +295,41 @@ const isTimezoneChanged = computed(() => {
 const isAccountInfoDirty = computed(() => {
   const agentName = agentData.data?.agent_name?.split(" ");
   if (!agentName) return false;
-  const isDirty =
+  return (
     profile.value.firstName !== agentName[0] ||
-    profile.value.lastName !== (agentName[1] || "");
-  if (isDirty) {
-    disableSettingModalOutsideClick.value = true;
-  } else {
-    disableSettingModalOutsideClick.value = false;
-  }
-  return isDirty;
+    profile.value.lastName !== (agentName[1] || "")
+  );
 });
+
+const isProfileLoading = computed(() => {
+  return (
+    setAgent.loading ||
+    saveLanguageResource.loading ||
+    saveTimezoneResource.loading ||
+    updateSignature.loading
+  );
+});
+
+const isProfileDirty = computed(
+  () =>
+    isAccountInfoDirty.value ||
+    isLanguageChanged.value ||
+    isTimezoneChanged.value ||
+    isSignatureDirty.value
+);
+const signatureButtons = [
+  "Paragraph",
+  ["Heading 2", "Heading 3", "Heading 4"],
+  "Separator",
+  "Bold",
+  "Italic",
+  "Separator",
+  "Bullet List",
+  "Numbered List",
+  "Separator",
+  "Link",
+  "Image",
+];
 
 const agentData = createResource({
   url: "frappe.client.get",
@@ -247,6 +348,26 @@ const agentData = createResource({
       lastName: fullName[1] || "",
       userImage: data.user_image,
     };
+  },
+});
+
+// Fetch the user's email_signature from the User doctype
+const userData = createResource({
+  url: "frappe.client.get",
+  auto: true,
+  makeParams() {
+    return {
+      doctype: "User",
+      name: auth.userId,
+      fields: ["email_signature"],
+    };
+  },
+  onSuccess: (data: { email_signature?: string }) => {
+    const sig = data.email_signature || "";
+    signatureContent.value = sig;
+    originalSignature.value = sig;
+    enableSignature.value = !!sig;
+    originalEnableSignature.value = !!sig;
   },
 });
 
@@ -323,6 +444,27 @@ const saveTimezoneResource = createResource({
   },
 });
 
+function handleSignatureUpdate() {
+  updateSignature.submit(
+    {
+      doctype: "User",
+      name: auth.userId,
+      fieldname: {
+        email_signature: enableSignature.value ? signatureContent.value : "",
+      },
+    },
+    {
+      onSuccess() {
+        originalSignature.value = enableSignature.value
+          ? signatureContent.value
+          : "";
+        originalEnableSignature.value = enableSignature.value;
+        toast.success(__("Email signature updated successfully."));
+      },
+    }
+  );
+}
+
 const onSave = () => {
   if (isAccountInfoDirty.value) {
     setAgent.submit();
@@ -335,7 +477,15 @@ const onSave = () => {
   if (isTimezoneChanged.value) {
     saveTimezoneResource.submit();
   }
+
+  if (isSignatureDirty.value) {
+    handleSignatureUpdate();
+  }
 };
+
+watch(isProfileDirty, (val) => {
+  disableSettingModalOutsideClick.value = val;
+});
 
 const updateImage = (file: string | null) => {
   profile.value.userImage = file;
