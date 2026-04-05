@@ -10,7 +10,7 @@
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
-    @change="editable ? (newEmail = $event) : null"
+    @change="onEditorChange"
     :extensions="[ComponentUtils, HandleExcelPaste]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
     @keydown.capture="handleKeydown"
@@ -263,6 +263,32 @@ const quotedContent = useStorage<null | string>(
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
+const auth = useAuthStore();
+
+// email signature
+const emailSignature = ref<string | null>(null);
+
+const userSignatureResource = createResource({
+  url: "frappe.client.get",
+  auto: true,
+  makeParams() {
+    return {
+      doctype: "User",
+      name: auth.userId,
+      fields: ["email_signature"],
+    };
+  },
+  onSuccess: (data: { email_signature?: string }) => {
+    if (data.email_signature) {
+      emailSignature.value = `<br>${data.email_signature}`;
+      if (isContentEmpty(newEmail.value) && !quotedContent.value) {
+        newEmail.value = emailSignature.value;
+      } else if (newEmail.value === null) {
+        newEmail.value = emailSignature.value;
+      }
+    }
+  },
+});
 
 // Initialize typing composable
 const { onUserType, cleanup } = useTyping(props.ticketId);
@@ -305,6 +331,12 @@ function applySavedReplies(template: string) {
     ? (newEmail.value = template)
     : (newEmail.value = newEmail.value + "\n" + template);
   showSavedRepliesSelectorModal.value = false;
+}
+
+function onEditorChange(val: string) {
+  if (props.editable) {
+    newEmail.value = val;
+  }
 }
 
 const sendMail = createResource({
@@ -407,19 +439,21 @@ function addToReply(
 
   editorRef.value.editor.chain().clearContent().focus("start").run();
   nextTick(() => {
-    newEmail.value = editorRef.value.editor.getHTML();
+    newEmail.value = emailSignature.value
+      ? emailSignature.value
+      : editorRef.value.editor.getHTML();
   });
 }
 
 function resetState() {
-  newEmail.value = null;
+  newEmail.value = emailSignature.value ? emailSignature.value : null;
   attachments.value = [];
   quotedContent.value = null;
 }
 
 function handleDiscard() {
   attachments.value = [];
-  newEmail.value = null;
+  newEmail.value = emailSignature.value ? emailSignature.value : null;
   quotedContent.value = null;
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
