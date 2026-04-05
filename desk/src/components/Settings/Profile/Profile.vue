@@ -244,7 +244,11 @@ import { EditorContent } from "@tiptap/vue-3";
 import { Autocomplete } from "@/components";
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
-import { updateRes as updateSignature } from "@/stores/knowledgeBase";
+import {
+  updateRes as updateSignature,
+  updateRes as updateTimezone,
+  updateRes as updateLanguage,
+} from "@/stores/knowledgeBase";
 
 import CameraIcon from "~icons/lucide/camera";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
@@ -304,8 +308,8 @@ const isAccountInfoDirty = computed(() => {
 const isProfileLoading = computed(() => {
   return (
     setAgent.loading ||
-    saveLanguageResource.loading ||
-    saveTimezoneResource.loading ||
+    updateLanguage.loading ||
+    updateTimezone.loading ||
     updateSignature.loading
   );
 });
@@ -406,43 +410,45 @@ const setAgent = createResource({
   },
 });
 
-const saveLanguageResource = createResource({
-  url: "frappe.client.set_value",
-  makeParams() {
-    return {
+function handleLanguageChange() {
+  updateLanguage.submit(
+    {
       doctype: "User",
       name: auth.userId,
       fieldname: {
         language: language.value,
       },
-    };
-  },
-  onSuccess() {
-    toast.success(__("Language updated successfully."));
-    setTimeout(() => {
-      window.location.reload(true);
-    }, 500);
-  },
-});
+    },
+    {
+      onSuccess() {
+        toast.success(__("Language updated successfully."));
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 500);
+      },
+    }
+  );
+}
 
-const saveTimezoneResource = createResource({
-  url: "frappe.client.set_value",
-  makeParams() {
-    return {
+function handleTimezoneChange() {
+  updateTimezone.submit(
+    {
       doctype: "User",
       name: auth.userId,
       fieldname: {
         time_zone: timezone.value,
       },
-    };
-  },
-  onSuccess() {
-    toast.success(__("Timezone updated successfully."));
-    setTimeout(() => {
-      window.location.reload(true);
-    }, 500);
-  },
-});
+    },
+    {
+      onSuccess() {
+        toast.success(__("Timezone updated successfully."));
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 500);
+      },
+    }
+  );
+}
 
 function handleSignatureUpdate() {
   updateSignature.submit(
@@ -471,11 +477,11 @@ const onSave = () => {
   }
 
   if (isLanguageChanged.value) {
-    saveLanguageResource.submit();
+    handleLanguageChange();
   }
 
   if (isTimezoneChanged.value) {
-    saveTimezoneResource.submit();
+    handleTimezoneChange();
   }
 
   if (isSignatureDirty.value) {
