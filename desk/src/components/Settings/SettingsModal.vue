@@ -24,7 +24,7 @@
               v-if="!tab.hideLabel"
               class="mb-2 mt-3 flex gap-1.5 px-1 text-base font-medium text-ink-gray-5"
             >
-              <Tooltip :text="tab.label">
+              <Tooltip :text="tab.label" placement="right">
                 <span class="truncate">{{ __(tab.label) }}</span>
               </Tooltip>
             </div>
@@ -40,6 +40,7 @@
                 ]"
                 @click="() => onTabChange(item)"
               >
+<<<<<<< HEAD
                 <component :is="item.icon" class="h-4 w-4 text-gray-700" />
 <<<<<<< HEAD
                 <span class="text-base text-gray-800">
@@ -47,6 +48,13 @@
                 </span>
 =======
                 <Tooltip :text="item.label">
+=======
+                <component
+                  :is="item.icon"
+                  class="h-4 w-4 text-gray-700 shrink-0"
+                />
+                <Tooltip :text="item.label" placement="right">
+>>>>>>> c3079c90 (fix: truncation bugs for mobile and sidebar)
                   <span class="text-p-sm text-gray-800 truncate">
                     {{ item.label }}
                   </span>
@@ -90,7 +98,7 @@
   />
 </template>
 <script setup lang="ts">
-import { Dialog } from "frappe-ui";
+import { Dialog, Tooltip } from "frappe-ui";
 import { ModelRef, ref, watch } from "vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
