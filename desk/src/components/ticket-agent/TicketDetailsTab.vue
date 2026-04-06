@@ -1,8 +1,6 @@
 <template>
-  <div
-    class="h-full overflow-y-hidden flex flex-1 flex-col justify-between overflow-hidden max-h-full"
-  >
-    <div class="px-5 pb-4 flex flex-col">
+  <div class="flex h-full flex-col">
+    <div class="shrink-0 px-5 pb-4 flex flex-col">
       <!-- User avatar with buttons -->
       <TicketContact />
       <!-- Core Fields -->
@@ -11,7 +9,7 @@
           v-for="(section, index) in coreFields"
           :key="index"
           :class="
-            section.group ? 'flex gap-2 items-center w-full mb-3' : 'mb-3'
+            section.group ? 'flex gap-2 items-center max-w-full mb-3' : 'mb-3'
           "
         >
           <template v-for="field in section.fields">
@@ -41,21 +39,18 @@
     </div>
 
     <!-- Additional Fields -->
-    <div class="border-t flex flex-col flex-1 h-full pb-3 overflow-y-hidden">
-      <!-- TODO: Hack of 80 % for now, will refactor -->
-      <div class="overflow-y-scroll max-h-[80%]">
-        <template v-for="field in customFields">
-          <TicketField
-            v-if="field.visible"
-            :key="field.fieldname"
-            :field="field"
-            :value="field.value"
-            @change="
-              ({ fieldname, value }) => handleFieldUpdate(fieldname, value)
-            "
-          />
-        </template>
-      </div>
+    <div class="border-t flex-1 min-h-0 overflow-y-auto pb-3">
+      <template v-for="field in customFields">
+        <TicketField
+          v-if="field.visible"
+          :key="field.fieldname"
+          :field="field"
+          :value="field.value"
+          @change="
+            ({ fieldname, value }) => handleFieldUpdate(fieldname, value)
+          "
+        />
+      </template>
     </div>
   </div>
 </template>

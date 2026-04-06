@@ -1,13 +1,15 @@
 <template>
-  <Resizer class="flex flex-col justify-between border-l" side="right">
-    <TabButtons
-      :buttons="tabs"
-      v-model="currentTab"
-      class="tab-buttons mb-1 px-5 mt-3.5"
-    />
-    <div class="flex-1 max-h-full">
-      <TicketDetailsTab v-if="currentTab === 'details'" />
-      <TicketContactTab v-else />
+  <Resizer class="border-l h-full" side="right">
+    <div class="flex flex-col h-full overflow-hidden">
+      <TabButtons
+        :buttons="tabs"
+        v-model="currentTab"
+        class="tab-buttons mb-1 px-5 mt-3.5 shrink-0"
+      />
+      <div class="flex-1 min-h-0">
+        <TicketDetailsTab v-if="currentTab === 'details'" />
+        <TicketContactTab v-else />
+      </div>
     </div>
   </Resizer>
 </template>
