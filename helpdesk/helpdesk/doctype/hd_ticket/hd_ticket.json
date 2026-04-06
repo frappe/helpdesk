@@ -55,6 +55,9 @@
   "time_logs",
   "total_hours_section",
   "total_hours",
+  "stuck_section",
+  "is_stuck",
+  "stuck_reason",
   "reference_tab",
   "additional_info",
   "contact",
@@ -341,6 +344,27 @@
    "fieldtype": "Float",
    "label": "Total Hours",
    "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stuck_section",
+   "fieldtype": "Section Break",
+   "label": "Stuck Detection"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_stuck",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Is Stuck",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.is_stuck",
+   "fieldname": "stuck_reason",
+   "fieldtype": "Small Text",
+   "label": "Stuck Reason",
    "read_only": 1
   },
   {

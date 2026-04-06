@@ -97,6 +97,7 @@ class HDTicket(Document):
         self.apply_sla()
         if not self.is_new():
             self.handle_ticket_activity_update()
+            self.clear_stuck_if_progressed()
 
         self.handle_email_feedback()
         self.calculate_time_log_hours()
@@ -118,6 +119,14 @@ class HDTicket(Document):
                 row.hours = round(hours, 2)
             total += row.hours or 0
         self.total_hours = round(total, 2)
+
+    def clear_stuck_if_progressed(self):
+        """Clear stuck flag when ticket status or assignment changes."""
+        if not self.is_stuck:
+            return
+        if self.has_value_changed("status") or self.has_value_changed("_assign"):
+            self.is_stuck = 0
+            self.stuck_reason = ""
 
     def _get_rendered_template(
         self, content: str, default_content: str, args: dict[str, str] | None = None
@@ -1380,3 +1389,61 @@ def close_tickets_after_n_days():
         doc.flags.ignore_validate = True
         doc.save(ignore_permissions=True)
         frappe.db.commit()  # nosemgrep
+
+
+def detect_stuck_tickets():
+    """Run every 4 hours. Flag tickets that appear stuck based on detection rules."""
+    open_tickets = frappe.get_all(
+        "HD Ticket",
+        filters={"status": ["not in", ["Resolved", "Closed"]]},
+        fields=["name", "creation", "modified", "status", "status_category", "is_stuck"],
+    )
+
+    paused_statuses = frappe.get_all(
+        "HD Ticket Status", filters={"category": "Paused"}, pluck="name"
+    )
+
+    for ticket in open_tickets:
+        reasons = []
+        age_days = frappe.utils.date_diff(frappe.utils.today(), ticket.creation)
+
+        # Rule 1: Open for more than 3 days
+        if age_days > 3:
+            reasons.append(f"Open for {age_days} days")
+
+        # Rule 2: In waiting/paused status for more than 3 days without modification
+        if ticket.status in paused_statuses:
+            paused_days = frappe.utils.date_diff(frappe.utils.today(), ticket.modified)
+            if paused_days > 3:
+                reasons.append(
+                    f"In \"{ticket.status}\" status for {paused_days} days"
+                )
+
+        # Rule 3: Status changed 4+ times without resolution
+        status_change_count = frappe.db.count(
+            "HD Ticket Activity",
+            filters={
+                "ticket": ticket.name,
+                "action": ["like", "set status to%"],
+            },
+        )
+        if status_change_count >= 4:
+            reasons.append(f"Status changed {status_change_count} times without resolution")
+
+        if reasons:
+            frappe.db.set_value(
+                "HD Ticket",
+                ticket.name,
+                {"is_stuck": 1, "stuck_reason": "; ".join(reasons)},
+                update_modified=False,
+            )
+        elif ticket.is_stuck:
+            # Clear stuck flag if no longer matching any rule
+            frappe.db.set_value(
+                "HD Ticket",
+                ticket.name,
+                {"is_stuck": 0, "stuck_reason": ""},
+                update_modified=False,
+            )
+
+    frappe.db.commit()  # nosemgrep
