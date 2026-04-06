@@ -17,8 +17,6 @@
 html,
 body {
   color: var(--ink-gray-9);
-<<<<<<< HEAD
-=======
 }
 
 /* Modern slim scrollbars */
@@ -47,5 +45,4 @@ body {
 
 *::-webkit-scrollbar-corner {
   background: transparent;
->>>>>>> 7c3088de (fix: improve sidepanel scrollbar  and fix quick filters)
 }

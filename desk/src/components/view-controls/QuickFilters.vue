@@ -1,10 +1,4 @@
 <template>
-<<<<<<< HEAD
-  <div v-if="!quickFilters.loading">
-    <FadedScrollableDiv
-      class="flex flex-1 items-center -ml-1 flex-wrap gap-2"
-      orientation="horizontal"
-=======
   <FadedScrollableDiv
     class="quick-filters flex flex-1 items-center -ml-1 overflow-x-auto py-1 gap-2 pr-4"
     orientation="horizontal"
@@ -14,21 +8,14 @@
       v-for="filter in quickFilters.data"
       :key="filter.name"
       class="min-w-36 pl-0.5"
->>>>>>> 7c3088de (fix: improve sidepanel scrollbar  and fix quick filters)
     >
-      <div
-        v-for="filter in quickFilters.data"
-        :key="filter.name"
-        class="min-w-36"
-      >
-        <QuickFilterField
-          :filter="filter"
-          :value="getValue(filter, list.params?.filters)"
-          @applyQuickFilter="(f, v) => applyQuickFilter(f, v)"
-        />
-      </div>
-    </FadedScrollableDiv>
-  </div>
+      <QuickFilterField
+        :filter="filter"
+        :value="getValue(filter, list.params?.filters)"
+        @applyQuickFilter="(f, v) => applyQuickFilter(f, v)"
+      />
+    </div>
+  </FadedScrollableDiv>
 </template>
 
 <script setup>
