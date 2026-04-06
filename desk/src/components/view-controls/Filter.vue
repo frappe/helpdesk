@@ -1,9 +1,9 @@
 <template>
   <Popover placement="bottom-end">
     <template #target="{ togglePopover, close }">
-      <div class="flex items-center w-fit">
+      <div class="flex items-center w-fit rtl:flex-row-reverse">
         <Button
-          :label="'Filter'"
+          :label="__('Filter')"
           :class="filters?.size ? 'rounded-r-none' : ''"
           @click="togglePopover"
         >
@@ -123,7 +123,7 @@
             v-else
             class="mb-3 flex h-7 items-center px-3 text-sm text-gray-600"
           >
-            {{ "Empty - Choose a field to filter by" }}
+            {{ __("Empty - Choose a field to filter by") }}
           </div>
           <div class="flex items-center justify-between gap-2">
             <Autocomplete
@@ -136,7 +136,7 @@
                   class="!text-gray-600"
                   variant="ghost"
                   @click="togglePopover()"
-                  :label="'Add Filter'"
+                  :label="__('Add Filter')"
                 >
                   <template #prefix>
                     <FeatherIcon name="plus" class="h-4" />
@@ -162,7 +162,6 @@ import { Link, StarRating } from "@/components";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { useScreenSize } from "@/composables/screen";
 import {
-  Autocomplete,
   Button,
   DatePicker,
   DateRangePicker,
@@ -172,6 +171,7 @@ import {
   Popover,
   Tooltip,
 } from "frappe-ui";
+import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
 import { computed, h, inject } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 

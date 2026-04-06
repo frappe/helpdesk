@@ -20,24 +20,28 @@
         <!-- Via Email -->
         <div
           v-if="!ticket.doc.via_customer_portal"
-          class="text-ink-gray-4 flex items-center"
+          class="text-ink-gray-4 rtl:gap-1 flex items-center"
         >
-          <span class="text-ink-gray-4 mr-[6px]">via</span>
-          <EmailIcon class="size-4 inline-block mr-1" />
-          <span class="">Email</span>
+          <span class="text-ink-gray-4 mr-[6px] rtl:ml-[6px] rtl:mr-0">
+            {{ __("via") }}</span
+          >
+          <EmailIcon class="size-4 inline-block mr-1 rtl:ml-1 rtl:mr-0" />
+          <span class="">{{ __("Email") }}</span>
         </div>
         <!-- Via Portal -->
         <div v-else class="text-ink-gray-4 flex items-center">
-          <span class="text-ink-gray-4 mr-[6px]">via</span>
-          <GlobeIcon class="size-4 inline-block mr-1" />
-          <span class="font-medium">Portal</span>
+          <span class="text-ink-gray-4 mr-[6px] rtl:ml-[6px] rtl:mr-0">
+            {{ __("via") }}</span
+          >
+          <GlobeIcon class="size-4 inline-block mr-1 rtl:ml-1 rtl:mr-0" />
+          <span class="font-medium"> {{ __("Portal") }}</span>
         </div>
       </div>
       <!-- divider -->
       <div class="border-l border-outline-gray-2 h-[13px]" />
       <!-- First Response -->
-      <div class="flex items-center gap-1">
-        <span>First Response</span>
+      <div class="flex items-center gap-2">
+        <span>{{ __("First Response") }}</span>
         <Tooltip
           :text="dateFormat(firstResponse.date, dateTooltipFormat)"
           :hover-delay="0.25"
@@ -54,7 +58,7 @@
       <div class="border-l border-outline-gray-2 h-[13px]" />
       <!-- Resolution by -->
       <div class="flex items-center gap-1">
-        <span>Resolution </span>
+        <span>{{ __("Resolution") }} </span>
         <Tooltip
           :text="dateFormat(resolutionBy.date, dateTooltipFormat)"
           :hover-delay="0.25"

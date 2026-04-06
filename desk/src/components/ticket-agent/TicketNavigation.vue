@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-1">
+  <div class="flex gap-1 rtl:flex-row-reverse">
     <Tooltip
       :text="
         getPreviousTicket()

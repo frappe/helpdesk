@@ -24,10 +24,10 @@
                   class="overflow-hidden text-ellipsis whitespace-nowrap text-base leading-5"
                   v-if="selectedValue"
                 >
-                  {{ displayValue(selectedValue) }}
+                  {{ __(displayValue(selectedValue)) }}
                 </span>
                 <span class="text-base leading-5 text-gray-500" v-else>
-                  {{ placeholder || "" }}
+                  {{ __(placeholder) || "" }}
                 </span>
               </div>
               <FeatherIcon
@@ -57,7 +57,7 @@
                 placeholder="Search"
               />
               <button
-                class="absolute right-1.5 inline-flex h-7 w-7 items-center justify-center"
+                class="absolute right-1.5 rtl:right-auto rtl:left-1.5 inline-flex h-7 w-7 items-center justify-center"
                 @click="selectedValue = null"
               >
                 <FeatherIcon name="x" class="w-4" />
@@ -77,7 +77,7 @@
                   v-if="group.group && !group.hideLabel"
                   class="px-2.5 py-1.5 text-sm font-medium text-gray-500"
                 >
-                  {{ group.group }}
+                  {{ __(group.group) }}
                 </div>
                 <ComboboxOption
                   as="template"
@@ -100,7 +100,7 @@
                       name="item-label"
                       v-bind="{ active, selected, option }"
                     >
-                      {{ option.label }}
+                      {{ __(option.label) }}
                     </slot>
                   </li>
                 </ComboboxOption>

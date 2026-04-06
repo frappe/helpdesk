@@ -1,9 +1,12 @@
 <template>
-  <Resizer class="flex flex-col justify-between border-l" side="right">
+  <Resizer
+    class="flex flex-col justify-between border-l rtl:border-r"
+    side="right"
+  >
     <TabButtons
       :buttons="tabs"
       v-model="currentTab"
-      class="tab-buttons mb-1 px-5 mt-3.5"
+      class="tab-buttons mb-1 px-5 mt-3.5 [&>div:first-child]:rtl:flex-row-reverse"
     />
     <div class="flex-1 max-h-full">
       <TicketDetailsTab v-if="currentTab === 'details'" />
@@ -18,15 +21,16 @@ import { ref } from "vue";
 import Resizer from "../Resizer.vue";
 import TicketContactTab from "./TicketContactTab.vue";
 import TicketDetailsTab from "./TicketDetailsTab.vue";
+import { __ } from "@/translation";
 
 const currentTab = ref("details");
 const tabs = [
   {
-    label: "Details",
+    label: __("Details"),
     value: "details",
   },
   {
-    label: "Contact",
+    label: __("Contact"),
     value: "contact",
   },
 ];

@@ -148,9 +148,9 @@
           <template v-for="item in searchResponse?.results" :key="item.id">
             <router-link
               :to="getItemRoute(item)"
-              class="flex space-x-2 overflow-hidden rounded px-2.5 py-3 hover:bg-surface-gray-2"
+              class="flex space-x-2 rtl:gap-2 overflow-hidden rounded px-2.5 py-3 hover:bg-surface-gray-2"
             >
-              <div class="flex items-start space-x-2">
+              <div class="flex items-start space-x-2 rtl:gap-2">
                 <div class="flex-shrink-0">
                   <LucideTicket
                     v-if="item.doctype === 'HD Ticket'"

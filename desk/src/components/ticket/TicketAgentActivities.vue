@@ -116,6 +116,7 @@ import {
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
+import { __ } from "@/translation";
 
 const props = defineProps({
   activities: {
@@ -152,20 +153,20 @@ const communicationAreaRef: Ref = inject("communicationArea");
 const makeCall = inject<() => void>("makeCall");
 
 const emptyText = computed(() => {
-  if (props.title === "Emails") return "No email communications";
-  if (props.title === "Comments") return "No comments found";
-  if (props.title === "Calls") return "No calls made";
+  if (__(props.title) === __("Emails")) return __("No email communications");
+  if (__(props.title) === __("Comments")) return __("No comments found");
+  if (__(props.title) === __("Calls")) return __("No calls made");
 
-  return "No activity found";
+  return __("No activity found");
 });
 
 const emptyTextIcon = computed(() => {
   let icon = ActivityIcon;
-  if (props.title == "Emails") {
+  if (props.title == __("Emails")) {
     icon = EmailIcon;
-  } else if (props.title == "Comments") {
+  } else if (props.title == __("Comments")) {
     icon = CommentIcon;
-  } else if (props.title == "Calls") {
+  } else if (props.title == __("Calls")) {
     icon = PhoneIcon;
   }
   return h(icon, { class: "text-gray-500" });

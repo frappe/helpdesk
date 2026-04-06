@@ -6,10 +6,10 @@
     <component
       :is="item.icon"
       v-if="item.icon"
-      class="mr-3 h-4 w-4 text-gray-700"
+      class="mr-3 rtl:ml-3 rtl:mr-0 h-4 w-4 text-gray-700"
     />
     <span class="overflow-hidden text-ellipsis whitespace-nowrap">
-      {{ item.title }}&nbsp;
+      {{ __(item.title) }}&nbsp;
     </span>
     <span
       v-if="item.modified"

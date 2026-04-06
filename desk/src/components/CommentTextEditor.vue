@@ -68,7 +68,9 @@
               :buttons="textEditorMenuButtons"
             />
           </div>
-          <div class="flex items-center justify-end space-x-2 w-[40%]">
+          <div
+            class="flex items-center justify-end space-x-2 rtl:gap-2 w-[40%]"
+          >
             <Button
               label="Discard"
               @click="

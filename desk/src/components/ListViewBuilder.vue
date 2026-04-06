@@ -2,7 +2,7 @@
   <!-- View Controls -->
   <div
     :class="[
-      'flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6',
+      'flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6 rtl:pr-6',
       list?.data?.data?.length > 0 ? 'relative' : 'absolute w-[stretch]',
     ]"
     v-if="showViewControls"
@@ -10,7 +10,7 @@
     <QuickFilters v-if="!isMobileView" />
     <div v-if="!isMobileView" class="-ml-2 h-5 border-l"></div>
     <div
-      class="flex items-start gap-2 justify-end h-full py-1 pl-0.5"
+      class="flex items-start gap-2 justify-end h-full py-1 pl-0.5 rtl:pl-0"
       v-if="!isMobileView"
     >
       <Button
