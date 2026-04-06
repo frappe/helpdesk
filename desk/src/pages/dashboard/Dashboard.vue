@@ -211,14 +211,11 @@ import {
 } from "frappe-ui";
 const { isMobileView } = useScreenSize();
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
-<<<<<<< HEAD
-=======
 import { __ } from "@/translation";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideUser from "~icons/lucide/user";
 import { useScreenSize } from "@/composables/screen";
 import { useStorage } from "@vueuse/core";
->>>>>>> 15b246e3 (Merge pull request #2969 from aerodeval/fix/-fix-ui-inconsistency)
 
 interface NumberCardData {
   title: string;

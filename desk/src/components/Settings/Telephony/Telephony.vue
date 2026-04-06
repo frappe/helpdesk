@@ -38,60 +38,6 @@
         <div class="flex-1 flex flex-col">
           <!-- General -->
           <div
-<<<<<<< HEAD
-            class="flex flex-col gap-1.5"
-            v-if="telephonyAgent.doc && twilio.doc.enabled"
-          >
-            <FormControl
-              label="Twilio number"
-              type="text"
-              required
-              v-model="telephonyAgent.doc.twilio_number"
-            />
-            <ErrorMessage :message="twilioErrors.number" />
-          </div>
-          <div
-            class="flex flex-col gap-1.5"
-            v-if="telephonyAgent.doc && exotel.doc.enabled"
-          >
-            <FormControl
-              label="Exotel number"
-              type="text"
-              required
-              v-model="telephonyAgent.doc.exotel_number"
-            />
-            <ErrorMessage :message="exotelErrors.number" />
-          </div>
-          <div
-            class="flex flex-col gap-1.5"
-            v-if="telephonyAgent.doc && exotel.doc.enabled"
-          >
-            <FormControl
-              :label="__('Personal mobile no')"
-              type="text"
-              required
-              v-model="telephonyAgent.doc.mobile_no"
-              :description="__('Required for exotel integration')"
-            />
-            <ErrorMessage :message="exotelErrors.mobileNo" />
-          </div>
-        </div>
-        <div class="mt-6" v-if="twilio?.doc">
-          <div class="text-base font-semibold text-ink-gray-8">Twilio</div>
-          <div class="mt-4">
-            <div class="grid grid-cols-2 gap-4">
-              <Checkbox
-                :label="__('Enabled')"
-                v-model="twilio.doc.enabled"
-                @update:modelValue="twilio.doc.enabled = $event ? 1 : 0"
-              />
-              <Checkbox
-                :label="__('Record Calls')"
-                v-model="twilio.doc.record_calls"
-                v-if="twilio.doc.enabled"
-                @update:modelValue="twilio.doc.record_calls = $event ? 1 : 0"
-              />
-=======
             class="flex items-center justify-between gap-8 py-3 hover:bg-gray-50 rounded px-2"
           >
             <div class="flex flex-col">
@@ -101,7 +47,6 @@
               <div class="text-p-sm text-ink-gray-5">
                 {{ __("Default calling medium for logged in user") }}
               </div>
->>>>>>> 15b246e3 (Merge pull request #2969 from aerodeval/fix/-fix-ui-inconsistency)
             </div>
             <div class="flex items-center gap-2">
               <!-- <Select

@@ -412,26 +412,6 @@ const viewActions = (view) => {
           class: "h-4 w-4",
         }),
         onClick: () => {
-<<<<<<< HEAD
-          const newView = {
-            name: _view.name,
-            public: !_view.public,
-          };
-
-          if (_view.public) {
-            $dialog({
-              title: __("Make {0} private?", [_view.label]),
-              message: __(
-                "This view is currently public. Changing it to private will hide it for all the users."
-              ),
-              actions: [
-                {
-                  label: __("Confirm"),
-                  variant: "solid",
-                  onClick({ close }) {
-                    close();
-                    updateView(newView);
-=======
           toggleViewVisibility(
             _view,
             __("Hide view from sidebar"),
@@ -511,7 +491,6 @@ const viewActions = (view) => {
                       handleSuccess(__("deleted"));
                       close();
                     },
->>>>>>> 15b246e3 (Merge pull request #2969 from aerodeval/fix/-fix-ui-inconsistency)
                   },
                 },
               ],

@@ -8,8 +8,6 @@ import { __ } from "@/translation";
 
 export const agentPortalSidebarOptions = [
   {
-<<<<<<< HEAD
-=======
     label: __("Home"),
     icon: LucideHome,
     to: "Home",
@@ -20,7 +18,6 @@ export const agentPortalSidebarOptions = [
     to: "Dashboard"
   },
   {
->>>>>>> 15b246e3 (Merge pull request #2969 from aerodeval/fix/-fix-ui-inconsistency)
     label: __("Tickets"),
     icon: LucideTicket,
     to: "TicketsAgent",

@@ -70,11 +70,8 @@ import { createResource, toast, usePageMeta } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { showCommentBox, showEmailBox } from "./modalStates";
-<<<<<<< HEAD
-=======
 import TicketIcon from "@/components/icons/TicketIcon.vue";
 
->>>>>>> 15b246e3 (Merge pull request #2969 from aerodeval/fix/-fix-ui-inconsistency)
 const telephonyStore = useTelephonyStore();
 
 const { $socket } = globalStore();
