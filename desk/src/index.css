@@ -9,6 +9,7 @@
     @apply break-normal max-w-none prose prose-code:break-all prose-code:whitespace-pre-wrap prose-img:border prose-img:rounded-lg prose-sm;
   }
 }
+
 .tiptap input[placeholder="Add caption"] {
   display: none !important;
 }
@@ -16,4 +17,35 @@
 html,
 body {
   color: var(--ink-gray-9);
+<<<<<<< HEAD
+=======
+}
+
+/* Modern slim scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--outline-gray-3) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--outline-gray-3);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--outline-gray-4);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+>>>>>>> 7c3088de (fix: improve sidepanel scrollbar  and fix quick filters)
 }
