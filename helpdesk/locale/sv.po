@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-03-29 10:43+0000\n"
-"PO-Revision-Date: 2026-04-02 11:02\n"
+"POT-Creation-Date: 2026-04-05 10:43+0000\n"
+"PO-Revision-Date: 2026-04-06 13:11\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -168,7 +168,7 @@ msgstr "Lägg till ny Artikel"
 msgid "Add Weekly Holidays"
 msgstr "Lägg till Veckovisa Helger"
 
-#: desk/src/components/layouts/Sidebar.vue:464
+#: desk/src/components/layouts/Sidebar.vue:481
 msgid "Add a comment on a ticket"
 msgstr "Lägga kommentar till ärende"
 
@@ -337,7 +337,7 @@ msgstr "Alla Service Nivå Avtal är på rätt spår"
 msgid "All Time"
 msgstr "Alltid"
 
-#: desk/src/components/layouts/Sidebar.vue:259
+#: desk/src/components/layouts/Sidebar.vue:276
 msgid "All Views"
 msgstr "Alla Vyer"
 
@@ -524,7 +524,7 @@ msgstr "Artiklar flyttade."
 msgid "Assign"
 msgstr "Tilldela"
 
-#: desk/src/components/layouts/Sidebar.vue:441
+#: desk/src/components/layouts/Sidebar.vue:458
 msgid "Assign a ticket to an agent"
 msgstr "Tilldela ärende till handläggare"
 
@@ -839,7 +839,7 @@ msgstr "CSV"
 msgid "Call Details"
 msgstr "Samtal Information"
 
-#: desk/src/components/layouts/Sidebar.vue:254
+#: desk/src/components/layouts/Sidebar.vue:271
 msgid "Call Logs"
 msgstr "Samtal Loggar"
 
@@ -1074,7 +1074,7 @@ msgstr "Stängd"
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Stängda eller betygsatta ärenden kan bara uppdateras av handläggare"
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Collapse"
 msgstr "Fäll In"
 
@@ -1190,7 +1190,7 @@ msgstr "Bekräfta Lösenord"
 msgid "Confirm overwrite"
 msgstr "Bekräfta överskrivning"
 
-#: desk/src/components/layouts/Sidebar.vue:398
+#: desk/src/components/layouts/Sidebar.vue:415
 msgid "Connect your support email"
 msgstr "Koppla support e-postadress"
 
@@ -1267,15 +1267,15 @@ msgstr "Kunde inte skicka återkoppling e-post, på grund av: {0}"
 #: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
-#: desk/src/components/layouts/Sidebar.vue:500
+#: desk/src/components/layouts/Sidebar.vue:517
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
 #: desk/src/pages/knowledge-base/NewArticle.vue:31
 msgid "Create"
 msgstr "Skapa"
 
-#: desk/src/components/layouts/Sidebar.vue:493
-#: desk/src/components/layouts/Sidebar.vue:499
+#: desk/src/components/layouts/Sidebar.vue:510
+#: desk/src/components/layouts/Sidebar.vue:516
 msgid "Create & invite a contact"
 msgstr "Skapa och bjud in kontakt"
 
@@ -1287,11 +1287,11 @@ msgstr "Skapa Ny Kontakt"
 msgid "Create View"
 msgstr "Skapa Vy"
 
-#: desk/src/components/layouts/Sidebar.vue:431
+#: desk/src/components/layouts/Sidebar.vue:448
 msgid "Create a ticket"
 msgstr "Skapa ärende"
 
-#: desk/src/components/layouts/Sidebar.vue:476
+#: desk/src/components/layouts/Sidebar.vue:493
 msgid "Create an article"
 msgstr "Skapa artikel"
 
@@ -1344,7 +1344,7 @@ msgstr "Kund Namn"
 msgid "Customer created successfully."
 msgstr "Kund skapad."
 
-#: desk/src/components/layouts/Sidebar.vue:316
+#: desk/src/components/layouts/Sidebar.vue:333
 msgid "Customer portal"
 msgstr "Kundportal"
 
@@ -1361,7 +1361,7 @@ msgstr "Anpassa e-post avisering inställningar för att hålla dig informerad o
 msgid "Cyan"
 msgstr "Cyan"
 
-#: desk/src/components/layouts/Sidebar.vue:350
+#: desk/src/components/layouts/Sidebar.vue:367
 #: desk/src/pages/knowledge-base/Article.vue:642
 msgid "Danger"
 msgstr "Fara"
@@ -1612,7 +1612,7 @@ msgstr "Begränsa inte ärenden utan Team"
 msgid "DocType"
 msgstr "DocType"
 
-#: desk/src/components/layouts/Sidebar.vue:330
+#: desk/src/components/layouts/Sidebar.vue:347
 msgid "Docs"
 msgstr "Dokument"
 
@@ -1885,11 +1885,11 @@ msgstr "Excel"
 msgid "Exotel"
 msgstr "Exotel"
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Expand"
 msgstr "Expandera"
 
-#: desk/src/components/layouts/Sidebar.vue:513
+#: desk/src/components/layouts/Sidebar.vue:530
 msgid "Explore customer portal"
 msgstr "Utforska kundportal"
 
@@ -2149,7 +2149,7 @@ msgid "Fulfilled"
 msgstr "Uppfylld"
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/layouts/Sidebar.vue:484
+#: desk/src/components/layouts/Sidebar.vue:501
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
 msgstr "Allmänt"
@@ -2433,7 +2433,7 @@ msgstr "Rubrik Vikt"
 msgid "Hello {{ contact }}, \\n\\nWe are sorry for the inconvenience, we will get back to you soon. \\n\\nRegards, \\n{{ full_name }}"
 msgstr "Hej {{ contact }}, \\n\\nVi beklagar besväret, vi återkommer till dig inom kort. \\n\\nMed vänliga hälsningar, \\n{{ full_name }}"
 
-#: desk/src/components/layouts/Sidebar.vue:117
+#: desk/src/components/layouts/Sidebar.vue:122
 msgid "Help"
 msgstr "Hjälp"
 
@@ -2683,7 +2683,7 @@ msgstr "Bjud in handläggare"
 msgid "Invite agent"
 msgstr "Bjud in handläggare"
 
-#: desk/src/components/layouts/Sidebar.vue:409
+#: desk/src/components/layouts/Sidebar.vue:426
 msgid "Invite agents"
 msgstr "Bjud in handläggare"
 
@@ -2960,12 +2960,12 @@ msgstr "Ladda Mer"
 msgid "Log a Call"
 msgstr "Logga Samtal"
 
-#: desk/src/components/layouts/Sidebar.vue:305
-#: desk/src/components/layouts/Sidebar.vue:354
+#: desk/src/components/layouts/Sidebar.vue:322
+#: desk/src/components/layouts/Sidebar.vue:371
 msgid "Log out"
 msgstr "Logga Ut"
 
-#: desk/src/components/layouts/Sidebar.vue:334
+#: desk/src/components/layouts/Sidebar.vue:351
 msgid "Login to Frappe Cloud"
 msgstr "Logga in på Frappe Cloud"
 
@@ -3818,7 +3818,7 @@ msgstr "Prioritet <u>{0}</u> måste ingå i Service Nivå Avtal {1}."
 msgid "Priority {0} has been repeated."
 msgstr "Prioritet {0} har upprepats."
 
-#: desk/src/components/layouts/Sidebar.vue:275
+#: desk/src/components/layouts/Sidebar.vue:292
 #: desk/src/pages/ticket/Tickets.vue:329
 msgid "Private Views"
 msgstr "Privata Vyer"
@@ -3846,7 +3846,7 @@ msgstr "Profil uppdaterad."
 msgid "Public"
 msgstr "Publik"
 
-#: desk/src/components/layouts/Sidebar.vue:267
+#: desk/src/components/layouts/Sidebar.vue:284
 #: desk/src/pages/ticket/Tickets.vue:344
 msgid "Public Views"
 msgstr "Offentliga Vyer"
@@ -4074,7 +4074,7 @@ msgstr "Svar från handläggare"
 msgid "Reply from contact"
 msgstr "Svar från kontakt"
 
-#: desk/src/components/layouts/Sidebar.vue:452
+#: desk/src/components/layouts/Sidebar.vue:469
 msgid "Reply on a ticket"
 msgstr "Svara på ärende"
 
@@ -4571,7 +4571,7 @@ msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</stro
 msgstr "Att ange <strong>{0}</strong> som standard Service Nivå Avtal tar bort <strong>{1}</strong> som standard Service Nivå Avtal. Du måste lägga till villkor i <strong>{1}</strong> för att Service Nivå Avtal ska fungera."
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
-#: desk/src/components/layouts/Sidebar.vue:345
+#: desk/src/components/layouts/Sidebar.vue:362
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Settings"
 msgstr "Inställningar"
@@ -4596,7 +4596,7 @@ msgstr "Inställningar"
 msgid "Setup Email"
 msgstr "Konfigurera e-post"
 
-#: desk/src/components/layouts/Sidebar.vue:420
+#: desk/src/components/layouts/Sidebar.vue:437
 msgid "Setup SLA"
 msgstr "Konfigurera Service Nivå Avtal"
 
@@ -4615,7 +4615,7 @@ msgstr "Dela Återkoppling"
 msgid "Share feedback"
 msgstr "Dela återkoppling"
 
-#: desk/src/components/layouts/Sidebar.vue:340
+#: desk/src/components/layouts/Sidebar.vue:357
 msgid "Shortcuts"
 msgstr "Genvägar"
 
@@ -4831,7 +4831,7 @@ msgstr "Översikt"
 msgid "Sunday"
 msgstr "Söndag"
 
-#: desk/src/components/layouts/Sidebar.vue:325
+#: desk/src/components/layouts/Sidebar.vue:342
 msgid "Support"
 msgstr "Support"
 
