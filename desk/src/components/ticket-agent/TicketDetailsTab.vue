@@ -9,7 +9,7 @@
           v-for="(section, index) in coreFields"
           :key="index"
           :class="
-            section.group ? 'flex gap-2 items-center max-w-full mb-3' : 'mb-3'
+            section.group ? 'flex gap-2 items-start max-w-full mb-3' : 'mb-3'
           "
         >
           <template v-for="field in section.fields">
@@ -19,7 +19,7 @@
               :ref="(el) => setFieldRef(field.fieldname, el)"
               class="form-control-core"
               :id="field.fieldname"
-              :class="section.group ? 'flex-1' : 'w-full'"
+              :class="section.group ? 'flex-1 min-w-0' : 'w-full'"
               :page-length="10"
               :label="field.label"
               :placeholder="field.placeholder"
