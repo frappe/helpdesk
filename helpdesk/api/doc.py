@@ -521,7 +521,14 @@ def handle_at_me_support(filters):
 
 
 @frappe.whitelist()
-def remove_assignments(doctype, name, assignees, ignore_permissions=False):
+def remove_assignments(
+    doctype: str,
+    name: str | int,
+    assignees: list[str],
+    ignore_permissions: bool = False,
+):
+    if not can_assign_ticket():
+        frappe.throw("You are not allowed to modify ticket assignments")
     assignees = frappe.parse_json(assignees)
 
     if not assignees:
@@ -536,3 +543,12 @@ def remove_assignments(doctype, name, assignees, ignore_permissions=False):
             status="Cancelled",
             ignore_permissions=ignore_permissions,
         )
+
+@frappe.whitelist()
+def can_assign_ticket():
+    roles = frappe.get_roles(frappe.session.user)
+    return (
+        "Ticket Assigner" in roles
+        or "Agent Manager" in roles
+        or "System Manager" in roles
+    )
