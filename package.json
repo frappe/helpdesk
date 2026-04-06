@@ -3,11 +3,16 @@
 	"scripts": {
 		"postinstall": "cd desk && yarn install",
 		"dev": "cd desk && yarn dev",
+<<<<<<< HEAD
 		"build": "cd desk && yarn build",
 		"disable-workspaces": "sed -i '' 's/\"workspaces\"/\"aworkspaces\"/g' package.json",
         "enable-workspaces": "sed -i '' 's/\"aworkspaces\"/\"workspaces\"/g' package.json && rm -rf node_modules ./desk/node_modules/ frappe-ui/node_modules/ && yarn install"
 	},
 	"workspaces": ["desk", "frappe-ui"],
+=======
+		"build": "cd desk && yarn build"
+	},
+>>>>>>> b2ae6d8f (fix: new submodule setup)
 	"resolutions": {
 		"cheerio": "1.0.0-rc.12",
 		"prosemirror-model": "1.25.4"
