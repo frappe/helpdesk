@@ -209,6 +209,13 @@ watch(iframeRef, (iframe) => {
 
       iframe.style.height = parent.offsetHeight + 1 + "px";
 
+      // Clicks inside the iframe don't bubble to the parent document, popovers/dropdowns that close on outside-click never fire.
+      iframe.contentDocument?.addEventListener("pointerdown", () => {
+        document.dispatchEvent(
+          new PointerEvent("pointerdown", { bubbles: true })
+        );
+      });
+
       const replyCollapsers = emailContent.querySelectorAll(".replyCollapser");
       if (replyCollapsers.length) {
         replyCollapsers.forEach((replyCollapser) => {
