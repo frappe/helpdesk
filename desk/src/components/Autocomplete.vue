@@ -40,7 +40,7 @@
             <div class="relative px-1.5 pt-0.5">
               <ComboboxInput
                 ref="search"
-                class="form-input w-full"
+                class="form-input w-full pr-6"
                 type="text"
                 :value="query"
                 autocomplete="off"
@@ -52,10 +52,10 @@
                 "
               />
               <button
-                class="absolute right-1.5 inline-flex h-7 w-7 items-center justify-center"
+                class="absolute inset-y-0 right-3 top-px flex items-center"
                 @click="selectedValue = null"
               >
-                <FeatherIcon name="x" class="w-4" />
+                <FeatherIcon name="x" class="size-4" />
               </button>
             </div>
             <ComboboxOptions
