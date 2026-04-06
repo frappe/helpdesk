@@ -1,4 +1,5 @@
 <template>
+  <template v-if="canAssign">
   <Popover class="flex w-full" placement="bottom-end">
     <template #target="{ open, close, togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
@@ -47,19 +48,39 @@
       />
     </template>
   </Popover>
+  </template>
+  <template v-else>
+    <div class="flex flex-col gap-1.5 w-full">
+      <span class="block text-xs text-gray-600">{{ __("Assignee") }}</span>
+      <div class="text-sm text-ink-gray-6 py-1 px-1">
+        <span v-if="assignees.data?.length">
+          {{ assignees.data.map((a) => a.name).join(", ") }}
+        </span>
+        <span v-else class="text-ink-gray-4">{{ __("No assignees") }}</span>
+      </div>
+    </div>
+  </template>
 </template>
 
 <script setup lang="ts">
 import { useShortcut } from "@/composables/shortcuts";
 import { ActivitiesSymbol, AssigneeSymbol, TicketSymbol } from "@/types";
 import { Popover } from "frappe-ui";
-import { inject, useTemplateRef } from "vue";
+import { computed, inject, useTemplateRef } from "vue";
+import { createResource } from "frappe-ui";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import AssignToBody from "./AssignToBody.vue";
 const ticket = inject(TicketSymbol);
 const assignees = inject(AssigneeSymbol);
 const activities = inject(ActivitiesSymbol);
+
+const assignPermission = createResource({
+  url: "helpdesk.api.doc.can_assign_ticket",
+  auto: true,
+});
+
+const canAssign = computed(() => assignPermission.data === true);
 async function saveAssignees(
   addedAssignees,
   removedAssignees,
