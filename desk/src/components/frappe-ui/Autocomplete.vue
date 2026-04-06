@@ -18,12 +18,9 @@
               :class="inputClasses"
               @click="() => !disabled && togglePopover()"
             >
-              <div class="flex items-center">
+              <div class="flex items-center min-w-0 flex-1">
                 <slot name="prefix" />
-                <span
-                  class="overflow-hidden text-ellipsis whitespace-nowrap text-base leading-5"
-                  v-if="selectedValue"
-                >
+                <span class="text-base leading-5 truncate" v-if="selectedValue">
                   {{ displayValue(selectedValue) }}
                 </span>
                 <span class="text-base leading-5 text-gray-500" v-else>
