@@ -16,7 +16,7 @@
           class="w-full px-6 md:px-10 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
-            class="relative flex justify-center after:absolute after:left-[50%] after:top-2 after:-z-10 after:border-l after:border-gray-200"
+            class="relative flex justify-center after:absolute after:left-[50%] after:top-3 after:-z-10 after:border-l after:border-gray-200"
             :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
           >
             <div
@@ -98,7 +98,6 @@ import {
   EmailIcon,
   PhoneIcon,
 } from "@/components/icons";
-import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
 import { isElementInViewport } from "@/utils";
