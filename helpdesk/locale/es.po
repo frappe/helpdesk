@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-03-29 10:43+0000\n"
-"PO-Revision-Date: 2026-04-02 11:01\n"
+"POT-Creation-Date: 2026-04-05 10:43+0000\n"
+"PO-Revision-Date: 2026-04-06 13:10\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -168,7 +168,7 @@ msgstr "Agregar nuevo artículo"
 msgid "Add Weekly Holidays"
 msgstr "Añadir Vacaciones Semanales"
 
-#: desk/src/components/layouts/Sidebar.vue:464
+#: desk/src/components/layouts/Sidebar.vue:481
 msgid "Add a comment on a ticket"
 msgstr "Agregar un comentario en un ticket"
 
@@ -337,7 +337,7 @@ msgstr ""
 msgid "All Time"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:259
+#: desk/src/components/layouts/Sidebar.vue:276
 msgid "All Views"
 msgstr "Todas las vistas"
 
@@ -524,7 +524,7 @@ msgstr ""
 msgid "Assign"
 msgstr "Asignar"
 
-#: desk/src/components/layouts/Sidebar.vue:441
+#: desk/src/components/layouts/Sidebar.vue:458
 msgid "Assign a ticket to an agent"
 msgstr "Asignar un ticket a un agente"
 
@@ -839,7 +839,7 @@ msgstr "CSV"
 msgid "Call Details"
 msgstr "Detalles de la llamada"
 
-#: desk/src/components/layouts/Sidebar.vue:254
+#: desk/src/components/layouts/Sidebar.vue:271
 msgid "Call Logs"
 msgstr "Registros de llamadas"
 
@@ -1074,7 +1074,7 @@ msgstr "Cerrado"
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Los tickets cerrados o calificados no pueden ser actualizados por personas que no sean agentes"
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Collapse"
 msgstr "Colapso"
 
@@ -1190,7 +1190,7 @@ msgstr "Confirmar Contraseña"
 msgid "Confirm overwrite"
 msgstr "Confirmar sobrescritura"
 
-#: desk/src/components/layouts/Sidebar.vue:398
+#: desk/src/components/layouts/Sidebar.vue:415
 msgid "Connect your support email"
 msgstr "Conectar el correo de soporte"
 
@@ -1267,15 +1267,15 @@ msgstr "No se pudo enviar un correo electrónico de comentarios debido a: {0}"
 #: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
-#: desk/src/components/layouts/Sidebar.vue:500
+#: desk/src/components/layouts/Sidebar.vue:517
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
 #: desk/src/pages/knowledge-base/NewArticle.vue:31
 msgid "Create"
 msgstr "Crear"
 
-#: desk/src/components/layouts/Sidebar.vue:493
-#: desk/src/components/layouts/Sidebar.vue:499
+#: desk/src/components/layouts/Sidebar.vue:510
+#: desk/src/components/layouts/Sidebar.vue:516
 msgid "Create & invite a contact"
 msgstr "Crear e invitar a un contacto"
 
@@ -1287,11 +1287,11 @@ msgstr "Crear Nuevo Contacto"
 msgid "Create View"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:431
+#: desk/src/components/layouts/Sidebar.vue:448
 msgid "Create a ticket"
 msgstr "Crear un ticket"
 
-#: desk/src/components/layouts/Sidebar.vue:476
+#: desk/src/components/layouts/Sidebar.vue:493
 msgid "Create an article"
 msgstr "Crear un artículo"
 
@@ -1344,7 +1344,7 @@ msgstr "Nombre del cliente"
 msgid "Customer created successfully."
 msgstr "Cliente creado con éxito."
 
-#: desk/src/components/layouts/Sidebar.vue:316
+#: desk/src/components/layouts/Sidebar.vue:333
 msgid "Customer portal"
 msgstr "Portal del cliente"
 
@@ -1361,7 +1361,7 @@ msgstr "Personalice sus preferencias de notificación por correo electrónico pa
 msgid "Cyan"
 msgstr "Cian"
 
-#: desk/src/components/layouts/Sidebar.vue:350
+#: desk/src/components/layouts/Sidebar.vue:367
 #: desk/src/pages/knowledge-base/Article.vue:642
 msgid "Danger"
 msgstr "Peligro"
@@ -1612,7 +1612,7 @@ msgstr "No restringir tickets sin un equipo"
 msgid "DocType"
 msgstr "DocType"
 
-#: desk/src/components/layouts/Sidebar.vue:330
+#: desk/src/components/layouts/Sidebar.vue:347
 msgid "Docs"
 msgstr "Documentación"
 
@@ -1885,11 +1885,11 @@ msgstr "Excel"
 msgid "Exotel"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Expand"
 msgstr "Expandir"
 
-#: desk/src/components/layouts/Sidebar.vue:513
+#: desk/src/components/layouts/Sidebar.vue:530
 msgid "Explore customer portal"
 msgstr "Explorar el portal del cliente"
 
@@ -2149,7 +2149,7 @@ msgid "Fulfilled"
 msgstr "Cumplido"
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/layouts/Sidebar.vue:484
+#: desk/src/components/layouts/Sidebar.vue:501
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
 msgstr "General"
@@ -2433,7 +2433,7 @@ msgstr "Peso de los encabezados"
 msgid "Hello {{ contact }}, \\n\\nWe are sorry for the inconvenience, we will get back to you soon. \\n\\nRegards, \\n{{ full_name }}"
 msgstr "Hola {{ contact }}, \\n\\nLamentamos las molestias, nos pondremos en contacto con usted pronto. \\n\\nSaludos, \\n{{ full_name }}"
 
-#: desk/src/components/layouts/Sidebar.vue:117
+#: desk/src/components/layouts/Sidebar.vue:122
 msgid "Help"
 msgstr "Ayuda"
 
@@ -2683,7 +2683,7 @@ msgstr "Invitar agentes"
 msgid "Invite agent"
 msgstr "Invitar agente"
 
-#: desk/src/components/layouts/Sidebar.vue:409
+#: desk/src/components/layouts/Sidebar.vue:426
 msgid "Invite agents"
 msgstr "Invitar agentes"
 
@@ -2960,12 +2960,12 @@ msgstr "Carga más"
 msgid "Log a Call"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:305
-#: desk/src/components/layouts/Sidebar.vue:354
+#: desk/src/components/layouts/Sidebar.vue:322
+#: desk/src/components/layouts/Sidebar.vue:371
 msgid "Log out"
 msgstr "Cerrar sesión"
 
-#: desk/src/components/layouts/Sidebar.vue:334
+#: desk/src/components/layouts/Sidebar.vue:351
 msgid "Login to Frappe Cloud"
 msgstr "Iniciar sesión en Frappe Cloud"
 
@@ -3818,7 +3818,7 @@ msgstr "La prioridad <u>{0}</u> debe incluirse en el ANS{1}."
 msgid "Priority {0} has been repeated."
 msgstr "La prioridad {0} se ha repetido."
 
-#: desk/src/components/layouts/Sidebar.vue:275
+#: desk/src/components/layouts/Sidebar.vue:292
 #: desk/src/pages/ticket/Tickets.vue:329
 msgid "Private Views"
 msgstr "Vistas privadas"
@@ -3846,7 +3846,7 @@ msgstr "Perfil actualizado con éxito."
 msgid "Public"
 msgstr "Público"
 
-#: desk/src/components/layouts/Sidebar.vue:267
+#: desk/src/components/layouts/Sidebar.vue:284
 #: desk/src/pages/ticket/Tickets.vue:344
 msgid "Public Views"
 msgstr ""
@@ -4074,7 +4074,7 @@ msgstr "Respuesta del agente"
 msgid "Reply from contact"
 msgstr "Respuesta del contacto"
 
-#: desk/src/components/layouts/Sidebar.vue:452
+#: desk/src/components/layouts/Sidebar.vue:469
 msgid "Reply on a ticket"
 msgstr "Responder a un ticket"
 
@@ -4571,7 +4571,7 @@ msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</stro
 msgstr "Al establecer <strong>{0}</strong> como ANS predeterminado, se elimina <strong>{1}</strong> como ANS predeterminado. Deberá agregar una condición en <strong>{1}</strong> para que el ANS funcione."
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
-#: desk/src/components/layouts/Sidebar.vue:345
+#: desk/src/components/layouts/Sidebar.vue:362
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Settings"
 msgstr "Configuración"
@@ -4596,7 +4596,7 @@ msgstr "Configuración"
 msgid "Setup Email"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:420
+#: desk/src/components/layouts/Sidebar.vue:437
 msgid "Setup SLA"
 msgstr ""
 
@@ -4615,7 +4615,7 @@ msgstr "Compartir Comentarios"
 msgid "Share feedback"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:340
+#: desk/src/components/layouts/Sidebar.vue:357
 msgid "Shortcuts"
 msgstr "Atajos"
 
@@ -4831,7 +4831,7 @@ msgstr "Resumen"
 msgid "Sunday"
 msgstr "Domingo"
 
-#: desk/src/components/layouts/Sidebar.vue:325
+#: desk/src/components/layouts/Sidebar.vue:342
 msgid "Support"
 msgstr "Soporte"
 
