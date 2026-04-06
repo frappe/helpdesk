@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-03-29 10:43+0000\n"
-"PO-Revision-Date: 2026-04-02 11:02\n"
+"POT-Creation-Date: 2026-04-05 10:43+0000\n"
+"PO-Revision-Date: 2026-04-06 13:11\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Esperanto\n"
 "MIME-Version: 1.0\n"
@@ -168,7 +168,7 @@ msgstr "crwdns195214:0crwdne195214:0"
 msgid "Add Weekly Holidays"
 msgstr "crwdns157520:0crwdne157520:0"
 
-#: desk/src/components/layouts/Sidebar.vue:464
+#: desk/src/components/layouts/Sidebar.vue:481
 msgid "Add a comment on a ticket"
 msgstr "crwdns195218:0crwdne195218:0"
 
@@ -337,7 +337,7 @@ msgstr "crwdns199376:0crwdne199376:0"
 msgid "All Time"
 msgstr "crwdns199378:0crwdne199378:0"
 
-#: desk/src/components/layouts/Sidebar.vue:259
+#: desk/src/components/layouts/Sidebar.vue:276
 msgid "All Views"
 msgstr "crwdns195224:0crwdne195224:0"
 
@@ -524,7 +524,7 @@ msgstr "crwdns199694:0crwdne199694:0"
 msgid "Assign"
 msgstr "crwdns195258:0crwdne195258:0"
 
-#: desk/src/components/layouts/Sidebar.vue:441
+#: desk/src/components/layouts/Sidebar.vue:458
 msgid "Assign a ticket to an agent"
 msgstr "crwdns195260:0crwdne195260:0"
 
@@ -839,7 +839,7 @@ msgstr "crwdns195270:0crwdne195270:0"
 msgid "Call Details"
 msgstr "crwdns159214:0crwdne159214:0"
 
-#: desk/src/components/layouts/Sidebar.vue:254
+#: desk/src/components/layouts/Sidebar.vue:271
 msgid "Call Logs"
 msgstr "crwdns195272:0crwdne195272:0"
 
@@ -1074,7 +1074,7 @@ msgstr "crwdns160186:0crwdne160186:0"
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "crwdns157618:0crwdne157618:0"
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Collapse"
 msgstr "crwdns195310:0crwdne195310:0"
 
@@ -1190,7 +1190,7 @@ msgstr "crwdns161632:0crwdne161632:0"
 msgid "Confirm overwrite"
 msgstr "crwdns161634:0crwdne161634:0"
 
-#: desk/src/components/layouts/Sidebar.vue:398
+#: desk/src/components/layouts/Sidebar.vue:415
 msgid "Connect your support email"
 msgstr "crwdns195320:0crwdne195320:0"
 
@@ -1267,15 +1267,15 @@ msgstr "crwdns157642:0{0}crwdne157642:0"
 #: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
-#: desk/src/components/layouts/Sidebar.vue:500
+#: desk/src/components/layouts/Sidebar.vue:517
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
 #: desk/src/pages/knowledge-base/NewArticle.vue:31
 msgid "Create"
 msgstr "crwdns161636:0crwdne161636:0"
 
-#: desk/src/components/layouts/Sidebar.vue:493
-#: desk/src/components/layouts/Sidebar.vue:499
+#: desk/src/components/layouts/Sidebar.vue:510
+#: desk/src/components/layouts/Sidebar.vue:516
 msgid "Create & invite a contact"
 msgstr "crwdns195334:0crwdne195334:0"
 
@@ -1287,11 +1287,11 @@ msgstr "crwdns195336:0crwdne195336:0"
 msgid "Create View"
 msgstr "crwdns195338:0crwdne195338:0"
 
-#: desk/src/components/layouts/Sidebar.vue:431
+#: desk/src/components/layouts/Sidebar.vue:448
 msgid "Create a ticket"
 msgstr "crwdns195340:0crwdne195340:0"
 
-#: desk/src/components/layouts/Sidebar.vue:476
+#: desk/src/components/layouts/Sidebar.vue:493
 msgid "Create an article"
 msgstr "crwdns195342:0crwdne195342:0"
 
@@ -1344,7 +1344,7 @@ msgstr "crwdns157648:0crwdne157648:0"
 msgid "Customer created successfully."
 msgstr "crwdns199754:0crwdne199754:0"
 
-#: desk/src/components/layouts/Sidebar.vue:316
+#: desk/src/components/layouts/Sidebar.vue:333
 msgid "Customer portal"
 msgstr "crwdns195348:0crwdne195348:0"
 
@@ -1361,7 +1361,7 @@ msgstr "crwdns159056:0crwdne159056:0"
 msgid "Cyan"
 msgstr "crwdns159058:0crwdne159058:0"
 
-#: desk/src/components/layouts/Sidebar.vue:350
+#: desk/src/components/layouts/Sidebar.vue:367
 #: desk/src/pages/knowledge-base/Article.vue:642
 msgid "Danger"
 msgstr "crwdns195350:0crwdne195350:0"
@@ -1612,7 +1612,7 @@ msgstr "crwdns161662:0crwdne161662:0"
 msgid "DocType"
 msgstr "crwdns157676:0crwdne157676:0"
 
-#: desk/src/components/layouts/Sidebar.vue:330
+#: desk/src/components/layouts/Sidebar.vue:347
 msgid "Docs"
 msgstr "crwdns195382:0crwdne195382:0"
 
@@ -1885,11 +1885,11 @@ msgstr "crwdns195412:0crwdne195412:0"
 msgid "Exotel"
 msgstr "crwdns199770:0crwdne199770:0"
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Expand"
 msgstr "crwdns195414:0crwdne195414:0"
 
-#: desk/src/components/layouts/Sidebar.vue:513
+#: desk/src/components/layouts/Sidebar.vue:530
 msgid "Explore customer portal"
 msgstr "crwdns195416:0crwdne195416:0"
 
@@ -2149,7 +2149,7 @@ msgid "Fulfilled"
 msgstr "crwdns157748:0crwdne157748:0"
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/layouts/Sidebar.vue:484
+#: desk/src/components/layouts/Sidebar.vue:501
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
 msgstr "crwdns161718:0crwdne161718:0"
@@ -2433,7 +2433,7 @@ msgstr "crwdns157838:0crwdne157838:0"
 msgid "Hello {{ contact }}, \\n\\nWe are sorry for the inconvenience, we will get back to you soon. \\n\\nRegards, \\n{{ full_name }}"
 msgstr "crwdns195438:0{{ contact }}crwdnd195438:0{{ full_name }}crwdne195438:0"
 
-#: desk/src/components/layouts/Sidebar.vue:117
+#: desk/src/components/layouts/Sidebar.vue:122
 msgid "Help"
 msgstr "crwdns195440:0crwdne195440:0"
 
@@ -2683,7 +2683,7 @@ msgstr "crwdns161738:0crwdne161738:0"
 msgid "Invite agent"
 msgstr "crwdns158458:0crwdne158458:0"
 
-#: desk/src/components/layouts/Sidebar.vue:409
+#: desk/src/components/layouts/Sidebar.vue:426
 msgid "Invite agents"
 msgstr "crwdns195454:0crwdne195454:0"
 
@@ -2960,12 +2960,12 @@ msgstr "crwdns161750:0crwdne161750:0"
 msgid "Log a Call"
 msgstr "crwdns195484:0crwdne195484:0"
 
-#: desk/src/components/layouts/Sidebar.vue:305
-#: desk/src/components/layouts/Sidebar.vue:354
+#: desk/src/components/layouts/Sidebar.vue:322
+#: desk/src/components/layouts/Sidebar.vue:371
 msgid "Log out"
 msgstr "crwdns195486:0crwdne195486:0"
 
-#: desk/src/components/layouts/Sidebar.vue:334
+#: desk/src/components/layouts/Sidebar.vue:351
 msgid "Login to Frappe Cloud"
 msgstr "crwdns195488:0crwdne195488:0"
 
@@ -3816,7 +3816,7 @@ msgstr "crwdns157982:0{0}crwdnd157982:0{1}crwdne157982:0"
 msgid "Priority {0} has been repeated."
 msgstr "crwdns157984:0{0}crwdne157984:0"
 
-#: desk/src/components/layouts/Sidebar.vue:275
+#: desk/src/components/layouts/Sidebar.vue:292
 #: desk/src/pages/ticket/Tickets.vue:329
 msgid "Private Views"
 msgstr "crwdns195598:0crwdne195598:0"
@@ -3844,7 +3844,7 @@ msgstr "crwdns199862:0crwdne199862:0"
 msgid "Public"
 msgstr "crwdns157986:0crwdne157986:0"
 
-#: desk/src/components/layouts/Sidebar.vue:267
+#: desk/src/components/layouts/Sidebar.vue:284
 #: desk/src/pages/ticket/Tickets.vue:344
 msgid "Public Views"
 msgstr "crwdns195602:0crwdne195602:0"
@@ -4072,7 +4072,7 @@ msgstr "crwdns161864:0crwdne161864:0"
 msgid "Reply from contact"
 msgstr "crwdns161866:0crwdne161866:0"
 
-#: desk/src/components/layouts/Sidebar.vue:452
+#: desk/src/components/layouts/Sidebar.vue:469
 msgid "Reply on a ticket"
 msgstr "crwdns195614:0crwdne195614:0"
 
@@ -4569,7 +4569,7 @@ msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</stro
 msgstr "crwdns158104:0{0}crwdnd158104:0{1}crwdnd158104:0{1}crwdne158104:0"
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
-#: desk/src/components/layouts/Sidebar.vue:345
+#: desk/src/components/layouts/Sidebar.vue:362
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Settings"
 msgstr "crwdns158106:0crwdne158106:0"
@@ -4594,7 +4594,7 @@ msgstr "crwdns158108:0crwdne158108:0"
 msgid "Setup Email"
 msgstr "crwdns161912:0crwdne161912:0"
 
-#: desk/src/components/layouts/Sidebar.vue:420
+#: desk/src/components/layouts/Sidebar.vue:437
 msgid "Setup SLA"
 msgstr "crwdns195668:0crwdne195668:0"
 
@@ -4613,7 +4613,7 @@ msgstr "crwdns159122:0crwdne159122:0"
 msgid "Share feedback"
 msgstr "crwdns161914:0crwdne161914:0"
 
-#: desk/src/components/layouts/Sidebar.vue:340
+#: desk/src/components/layouts/Sidebar.vue:357
 msgid "Shortcuts"
 msgstr "crwdns195672:0crwdne195672:0"
 
@@ -4827,7 +4827,7 @@ msgstr "crwdns158146:0crwdne158146:0"
 msgid "Sunday"
 msgstr "crwdns158148:0crwdne158148:0"
 
-#: desk/src/components/layouts/Sidebar.vue:325
+#: desk/src/components/layouts/Sidebar.vue:342
 msgid "Support"
 msgstr "crwdns195686:0crwdne195686:0"
 
