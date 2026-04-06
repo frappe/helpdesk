@@ -89,7 +89,7 @@
               </template>
             </Select>
             <FormLabel
-              :label="__('Choose who can view and use this response')"
+              :label="__('Choose who can view and use this response.')"
             />
           </div>
         </div>
@@ -204,7 +204,7 @@ const { userTeams, isAdmin } = storeToRefs(useAuthStore());
 const savedReplyData = ref({
   name: "",
   title: "",
-  scope: "Personal",
+  scope: savedRepliesActiveScreen.value.data?.scope || "Personal",
   message: "",
   teams: [],
 });
@@ -349,7 +349,7 @@ const createSavedReply = () => {
     },
     {
       onSuccess: (data) => {
-        toast.success(__("Saved reply saved"));
+        toast.success(__("Saved reply saved successfully."));
         savedReplyData.value = {
           ...savedReplyData.value,
           name: data.name,
@@ -412,7 +412,7 @@ const updateSavedReply = async () => {
 
   savedRepliesListResource?.reload();
   isDirty.value = false;
-  toast.success(__("Saved reply updated"));
+  toast.success(__("Saved reply updated successfully."));
 };
 
 const getScopeIcon = (scope: string) => {

@@ -131,15 +131,18 @@ const customFields = computed(() => {
     "status",
   ];
   customFields = customFields.filter((f) => !_coreFields.includes(f.fieldname));
-  let _customFields = customFields.map((f) => {
-    let fieldMeta = getField(f.fieldname);
+  let _customFields = customFields
+    .map((f) => {
+      let fieldMeta = getField(f.fieldname);
+      if (!fieldMeta) return null;
 
-    fieldMeta = parseField(fieldMeta, ticket.value.doc);
-    // cant handle required depends on as we directly set the value in DB
-    fieldMeta["required"] = fieldMeta.reqd || f.required;
+      fieldMeta = parseField(fieldMeta, ticket.value.doc);
+      // cant handle required depends on as we directly set the value in DB
+      fieldMeta["required"] = fieldMeta.reqd || f.required;
 
-    return getFieldInFormat(f, fieldMeta);
-  });
+      return getFieldInFormat(f, fieldMeta);
+    })
+    .filter(Boolean);
   return _customFields;
 });
 

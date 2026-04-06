@@ -127,7 +127,7 @@ const deleteAssignmentRule = () => {
     onSuccess: () => {
       assignmentRulesListData?.reload();
       isConfirmingDelete.value = false;
-      toast.success(__("Assignment rule deleted"));
+      toast.success(__("Assignment rule deleted successfully."));
     },
     auto: true,
   });
@@ -170,7 +170,7 @@ const duplicate = () => {
         auto: true,
         onSuccess(newAssignmentRuleData: AssignmentRule) {
           assignmentRulesListData?.reload();
-          toast.success(__("Assignment rule duplicated"));
+          toast.success(__("Assignment rule duplicated successfully."));
           duplicateDialog.value = {
             show: false,
             newName: "",
@@ -216,7 +216,9 @@ const setAssignmentRuleValue = (
     },
     onSuccess: () => {
       assignmentRulesListData?.reload();
-      toast.success(__("Assignment rule {0} updated", fieldName || key));
+      toast.success(
+        __("Assignment rule {0} updated successfully.", fieldName || key)
+      );
     },
     auto: true,
   });

@@ -1,6 +1,9 @@
 <template>
   <div v-if="_avatars?.length" class="mr-1.5 flex cursor-pointer items-center">
-    <div v-if="_avatars?.length == 1" class="flex items-center gap-2 text-base">
+    <div
+      v-if="_avatars?.length == 1"
+      class="flex items-center gap-2 text-base line-clamp-1"
+    >
       <Tooltip :text="_avatars[0].name">
         <Avatar
           shape="circle"
@@ -39,7 +42,7 @@ const props = defineProps({
   },
   size: {
     type: String,
-    default: "md",
+    default: "sm",
   },
   hideName: {
     type: Boolean,

@@ -12,6 +12,7 @@
       </template>
       <template #right-header>
         <RouterLink
+          class="inline-flex"
           :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
         >
           <Button label="Create" theme="gray" variant="solid">
@@ -25,12 +26,6 @@
     <ListViewBuilder
       ref="listViewRef"
       :options="options"
-      @empty-state-action="
-        () =>
-          $router.push({
-            name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew',
-          })
-      "
       @row-click="
         (row) =>
           $router.push({
@@ -91,6 +86,11 @@ const {
   deleteView,
 } = useView("HD Ticket");
 
+const activeView = computed(() => findView(route.query.view as string).value);
+const hasActiveFilters = computed(
+  () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
+);
+
 const { $dialog, $socket } = globalStore();
 const { isManager, userId } = useAuthStore();
 
@@ -111,7 +111,7 @@ const selectBannerActions = [
   },
 ];
 
-const options = {
+const options = computed(() => ({
   doctype: "HD Ticket",
   columnConfig: {
     subject: {
@@ -164,17 +164,27 @@ const options = {
   showSelectBanner: true,
   selectBannerActions,
   emptyState: {
-    title: __("No Tickets Found"),
+    title: __("No tickets found"),
     icon: h(TicketIcon, {
       class: "h-10 w-10",
     }),
+    description:
+      activeView.value?.public || activeView.value?.pinned
+        ? __(
+            "No tickets found for this view. Try adjusting your filters or creating a new view."
+          )
+        : hasActiveFilters.value
+        ? __(
+            "No tickets found for the applied filters. Try adjusting or clearing your filters."
+          )
+        : undefined,
   },
   rowRoute: {
     name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
     prop: "ticketId",
   },
   hideColumnSetting: false,
-};
+}));
 
 function handle_response_by_field(row: any, item: string) {
   if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
@@ -402,24 +412,85 @@ const viewActions = (view) => {
           class: "h-4 w-4",
         }),
         onClick: () => {
-          const newView = {
-            name: _view.name,
-            public: !_view.public,
-          };
-
-          if (_view.public) {
-            $dialog({
-              title: __("Make {0} private?", [_view.label]),
-              message: __(
-                "This view is currently public. Changing it to private will hide it for all the users."
-              ),
-              actions: [
-                {
-                  label: __("Confirm"),
-                  variant: "solid",
-                  onClick({ close }) {
-                    close();
-                    updateView(newView);
+          toggleViewVisibility(
+            _view,
+            __("Hide view from sidebar"),
+            __(
+              "{0} view is currently visible in the sidebar. Hiding it will remove it from the sidebar.",
+              [_view.label]
+            )
+          );
+        },
+      });
+    }
+    if (!_view.is_standard) {
+      if (isManager && !isCustomerPortal.value) {
+        actions[0].items.push({
+          label: _view?.public ? __("Make Private") : __("Make Public"),
+          icon: h(FeatherIcon, {
+            name: _view?.public ? "lock" : "unlock",
+            class: "h-4 w-4",
+          }),
+          onClick: () => {
+            toggleViewVisibility(
+              _view,
+              __("Make view private"),
+              __(
+                "{0} view is currently public. Changing it to private will hide it for all the users.",
+                [_view.label]
+              )
+            );
+          },
+        });
+      }
+      actions[0].items.push({
+        label: __("Edit"),
+        icon: h(EditIcon, { class: "h-4 w-4" }),
+        onClick: () => {
+          viewDialog.view.label = _view.label;
+          viewDialog.view.icon = _view.icon;
+          viewDialog.view.name = _view.name;
+          viewDialog.mode = "edit";
+          viewDialog.show = true;
+        },
+      });
+      actions.push({
+        group: __("Delete View"),
+        hideLabel: true,
+        items: [
+          {
+            label: __("Delete"),
+            icon: "trash-2",
+            theme: "red",
+            onClick: () => {
+              $dialog({
+                title: __("Delete {0}", [_view.label]),
+                message:
+                  __("Are you sure you want to delete this view?") +
+                  (_view.public
+                    ? " " +
+                      __(
+                        "This view is public, and will be removed for all users."
+                      )
+                    : ""),
+                actions: [
+                  {
+                    label: __("Confirm"),
+                    variant: "solid",
+                    iconLeft: "trash-2",
+                    theme: "red",
+                    onClick({ close }) {
+                      if (route.query.view === _view.name) {
+                        router.push({
+                          name: isCustomerPortal.value
+                            ? "TicketsCustomer"
+                            : "TicketsAgent",
+                        });
+                      }
+                      deleteView(_view.name);
+                      handleSuccess(__("deleted"));
+                      close();
+                    },
                   },
                 },
               ],

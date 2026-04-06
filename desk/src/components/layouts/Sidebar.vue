@@ -1,19 +1,21 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
     }"
   >
-    <UserMenu class="mb-2" :options="profileSettings" />
+    <div :class="isExpanded ? 'mx-0 p-2' : 'm-2'">
+      <UserMenu :options="profileSettings" />
+    </div>
     <SidebarLink
       v-if="!isCustomerPortal"
       :label="__('Search')"
-      class="my-0.5"
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
       :is-expanded="isExpanded"
+      class="mt-1.5"
     >
       <template #right>
         <span class="flex items-center gap-0.5 font-medium text-gray-600">
@@ -22,16 +24,7 @@
         </span>
       </template>
     </SidebarLink>
-    <SidebarLink
-      v-if="!isCustomerPortal"
-      class="relative my-0.5 min-h-7"
-      :label="__('Dashboard')"
-      :icon="LucideLayoutDashboard"
-      :to="'Dashboard'"
-      :is-active="isActiveTab('Dashboard')"
-      :is-expanded="isExpanded"
-    />
-    <div class="mb-4" v-if="!isCustomerPortal">
+    <div v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
         class="absolute size-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400 left-1"
@@ -64,10 +57,11 @@
       ]"
     >
       <div v-for="view in allViews" :key="view.label">
-        <div
+        <!-- <div
           v-if="!view.hideLabel && !isExpanded && view.views?.length"
           class="mx-2 my-2 h-1 border-b"
-        />
+        /> -->
+        <div :class="['mx-2', isCustomerPortal ? 'my-1' : 'my-2.5']"></div>
         <Section
           :label="view.label"
           :hideLabel="view.hideLabel"
@@ -76,11 +70,11 @@
           <template #header="{ opened, hide }">
             <div
               v-if="!hide"
-              class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+              class="flex cursor-pointer gap-1.5 px-2 text-base mx-2 font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
               :class="
                 !isExpanded
                   ? 'ml-0 h-0 overflow-hidden opacity-0'
-                  : 'mt-4 h-7 w-auto opacity-100'
+                  : 'pt-[11px] pb-2.5 w-auto opacity-100 '
               "
               @click="toggleSection(view.label, view.opened)"
             >
@@ -109,16 +103,19 @@
       </div>
     </div>
     <div class="grow" />
-    <div class="flex flex-col gap-2">
-      <TrialBanner
-        v-if="isFCSite && !isCustomerPortal"
-        :isSidebarCollapsed="!isExpanded"
-      />
-      <GettingStartedBanner
-        v-if="showOnboardingBanner"
-        :isSidebarCollapsed="!isExpanded"
-        appName="helpdesk"
-      />
+    <div class="flex flex-col gap-2 pb-2.5">
+      <div class="px-2">
+        <TrialBanner
+          v-if="isFCSite && !isCustomerPortal"
+          :isSidebarCollapsed="!isExpanded"
+        />
+        <GettingStartedBanner
+          v-if="showOnboardingBanner"
+          :isSidebarCollapsed="!isExpanded"
+          appName="helpdesk"
+        />
+      </div>
+
       <SidebarLink
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
         :icon="HelpIcon"
