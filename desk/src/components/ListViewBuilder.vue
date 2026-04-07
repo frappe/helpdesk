@@ -163,7 +163,6 @@ import {
 import {
   computed,
   h,
-  nextTick,
   onMounted,
   provide,
   reactive,
@@ -326,9 +325,6 @@ const list = createResource({
   onSuccess: (data) => {
     list.params = defaultParams;
     columns.value = data.columns;
-    nextTick(() => {
-      document.querySelector(".list-rows")?.focus();
-    });
   },
 });
 
@@ -774,8 +770,3 @@ onMounted(async () => {
 
 defineExpose(exposeFunctions);
 </script>
-<style scoped>
-.list-rows:focus {
-  outline: none;
-}
-</style>
