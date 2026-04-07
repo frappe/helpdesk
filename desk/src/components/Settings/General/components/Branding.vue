@@ -15,25 +15,25 @@
       :title="__('Logo')"
       :description="
         __(
-          'Appears in the left sidebar. Recommended size is minimum 32x32 px in PNG or SVG'
+          'Appears in the left sidebar. Recommended size is minimum 32x32 px in PNG or SVG.'
         )
       "
       :image="brandLogo"
       @onUpload="update($event, 'HD Settings', 'brand_logo')"
       @onRemove="onRemove('HD Settings', 'brand_logo')"
-      :isLoading="isLoading"
+      :isLoading="isLogoLoading"
     />
     <LogoUpload
       :title="__('Favicon')"
       :description="
         __(
-          'Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO'
+          'Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO.'
         )
       "
       :image="favicon"
       @onUpload="update($event, 'HD Settings', 'favicon')"
       @onRemove="onRemove('HD Settings', 'favicon')"
-      :isLoading="isLoading"
+      :isLoading="isFaviconLoading"
     />
   </div>
   <ConfirmDialog
@@ -55,7 +55,9 @@ import { HDSettingsSymbol } from "@/types";
 
 const configStore = useConfigStore();
 const settingsData = inject(HDSettingsSymbol);
-const isLoading = ref(false);
+const isLogoLoading = ref(false);
+const isFaviconLoading = ref(false);
+const isRemoving = ref(false);
 const brandLogo = ref(settingsData.value?.brandLogo);
 const favicon = ref(settingsData.value?.favicon);
 
@@ -71,17 +73,29 @@ const settingsResource = createResource({
   onSuccess(data) {
     brandLogo.value = data.brand_logo;
     favicon.value = data.favicon;
-    isLoading.value = false;
+    isLogoLoading.value = false;
+    isFaviconLoading.value = false;
     configStore.configResource.reload();
-    toast.success(__("Updated successfully"));
+    if (isRemoving.value) {
+      toast.success(__("Image removed successfully."));
+      isRemoving.value = false;
+    } else {
+      toast.success(__("Image updated successfully."));
+    }
   },
   onError() {
-    isLoading.value = false;
+    isLogoLoading.value = false;
+    isFaviconLoading.value = false;
+    isRemoving.value = false;
   },
 });
 
 function update(file: string, doctype: string, fieldname: string) {
-  isLoading.value = true;
+  if (fieldname === "brand_logo") {
+    isLogoLoading.value = true;
+  } else if (fieldname === "favicon") {
+    isFaviconLoading.value = true;
+  }
   settingsResource.submit({
     doctype: doctype,
     name: doctype,
@@ -96,6 +110,7 @@ const onRemove = (doctype: string, fieldname: string) => {
     title: __("Remove Logo"),
     message: __("Are you sure you want to remove the logo?"),
     onConfirm: () => {
+      isRemoving.value = true;
       update("", doctype, fieldname);
       showConfirmDialog.value.show = false;
     },

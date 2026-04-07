@@ -78,7 +78,7 @@
         <div>
           <div class="flex flex-col gap-1">
             <span class="text-lg font-semibold text-ink-gray-8">{{
-              __("Assignment conditions")
+              __("Assignment Conditions")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">
               {{ __("Choose which tickets are affected by this policy.") }}
@@ -144,7 +144,7 @@
         <div>
           <div class="flex flex-col gap-1">
             <span class="text-lg font-semibold text-ink-gray-8">
-              {{ __("Valid from") }}
+              {{ __("Valid From") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
               {{ __("Choose how long this SLA policy will be active.") }}
@@ -191,12 +191,12 @@
         <div>
           <div class="flex flex-col gap-1">
             <span class="text-lg font-semibold text-ink-gray-8">
-              {{ __("Response and resolution") }}
+              {{ __("Response and Resolution") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
               {{
                 __(
-                  "Add time targets around support milestones like first reply and resolution times"
+                  "Add time targets around support milestones like first reply and resolution times."
                 )
               }}
             </span>
@@ -239,7 +239,7 @@
         <div>
           <div class="flex flex-col gap-1">
             <span class="text-lg font-semibold text-ink-gray-8">
-              {{ __("Status details") }}
+              {{ __("Status Details") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
               {{
@@ -442,7 +442,7 @@ const createSla = () => {
     },
     {
       onSuccess(data) {
-        toast.success(__("SLA policy created"));
+        toast.success(__("SLA policy created successfully."));
         slaActiveScreen.value.data = data;
         slaActiveScreen.value.screen = "view";
         getSlaData.submit({
@@ -481,7 +481,7 @@ const updateSla = () => {
     {
       onSuccess() {
         getSlaData.submit();
-        toast.success(__("SLA policy updated"));
+        toast.success(__("SLA policy updated successfully."));
         slaPolicyList.reload();
       },
     }

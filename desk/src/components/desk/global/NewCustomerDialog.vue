@@ -37,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { Dialog, Input, createResource, toast } from "frappe-ui";
 import { reactive } from "vue";
 
@@ -61,7 +62,7 @@ const customerResource = createResource({
   onSuccess: () => {
     state.customer = "";
     state.domain = "";
-    toast.success("Customer created");
+    toast.success(__("Customer created successfully."));
     emit("customerCreated");
   },
   onError: (err) => {

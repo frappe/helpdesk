@@ -1,8 +1,8 @@
 <template>
   <div
-    class="-all flex h-7 cursor-pointer items-center rounded pl-2 pr-1 text-gray-800 duration-300 ease-in-out"
+    class="-all flex py-[7px] mx-2 h-7.5 cursor-pointer items-center rounded pl-2 pr-2 text-gray-800 duration-300 ease-in-out"
     :class="{
-      'w-full': isExpanded,
+      'w-auto': isExpanded,
       'w-8': !isExpanded,
       'shadow-sm': isActive,
       [bgColor]: isActive,
@@ -33,14 +33,16 @@
     </span>
 
     <div
-      class="-all ml-2 flex shrink-0 grow items-center justify-between text-sm duration-300 ease-in-out"
+      class="-all ml-2 flex min-w-0 items-center justify-between text-sm duration-300 ease-in-out w-full"
       :class="{
         'opacity-100': isExpanded,
         'opacity-0': !isExpanded,
         '-z-50': !isExpanded,
       }"
     >
-      {{ __(label) }}
+      <Tooltip :text="__(label)" placement="right">
+        <span class="truncate"> {{ __(label) }}</span>
+      </Tooltip>
       <slot name="right" />
     </div>
   </div>

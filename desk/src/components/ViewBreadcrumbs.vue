@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center -ml-0.5">
+  <div class="flex items-center">
     <router-link
       :to="{ name: routeName }"
       class="px-0.5 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
@@ -11,7 +11,7 @@
       <template #default="{ open }">
         <Button
           variant="ghost"
-          class="text-lg font-medium text-nowrap"
+          class="text-lg font-medium text-nowrap truncate max-w-[200px] sm:max-w-none"
           :label="currentView.label"
         >
           <template #prefix>
@@ -48,6 +48,12 @@
             <span class="whitespace-nowrap">
               {{ item.label }}
             </span>
+            <Badge
+              v-if="item.is_standard"
+              class="ml-1"
+              size="sm"
+              label="Standard"
+            />
           </div>
           <div
             v-if="item.name"
@@ -77,7 +83,7 @@
 
 <script setup>
 import { useScreenSize } from "@/composables/screen";
-import { Dropdown } from "frappe-ui";
+import { Badge, Dropdown } from "frappe-ui";
 import { useRoute } from "vue-router";
 
 const props = defineProps({

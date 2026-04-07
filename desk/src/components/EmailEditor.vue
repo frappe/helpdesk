@@ -292,6 +292,8 @@ const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
 const isUploading = ref(false);
+const contentEmpty = computed(() => isContentEmpty(newEmail.value));
+
 const isDisabled = computed(() => {
   return (
     (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
@@ -466,9 +468,8 @@ onMounted(() => {
 
 function handleSelectAll(e: KeyboardEvent) {
   const active = document.activeElement;
-  const editorDom = editorRef.value?.editor?.view?.dom as
-    | HTMLElement
-    | undefined;
+  const editorContext = editorRef.value?.editor;
+  const editorDom = editorContext?.view?.dom as HTMLElement | undefined;
   const quotedEl = quotedContentRef.value;
   const sel = window.getSelection();
   if (!sel || !editorDom) return;
@@ -476,6 +477,7 @@ function handleSelectAll(e: KeyboardEvent) {
     return;
   }
   e.preventDefault();
+  editorContext?.commands.selectAll();
   sel.removeAllRanges();
   const range = document.createRange();
 

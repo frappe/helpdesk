@@ -92,18 +92,12 @@
         </div>
         <div class="flex flex-col items-center gap-1">
           <div class="text-base font-medium text-ink-gray-6">
-            {{ __("No Saved reply found") }}
+            {{ __("No saved replies found") }}
           </div>
           <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-            {{ __("Add your first Saved reply to get started.") }}
+            {{ __("Add one to get started.") }}
           </div>
         </div>
-        <Button
-          :label="__('Add Saved reply')"
-          variant="outline"
-          icon-left="plus"
-          @click="goToNew()"
-        />
       </div>
       <div
         v-if="
@@ -177,7 +171,10 @@
               </Dropdown>
             </div>
           </div>
-          <hr v-if="index !== savedRepliesList.length - 1" class="mx-2" />
+          <hr
+            v-if="index !== savedRepliesListResource.data.length - 1"
+            class="mx-2"
+          />
         </div>
       </div>
     </template>
@@ -250,7 +247,13 @@ const savedRepliesList = ref([]);
 const goToNew = () => {
   savedRepliesActiveScreen.value = {
     screen: "view",
-    data: null,
+    data: {
+      scope: activeFilter.value
+        ? activeFilter.value === "All"
+          ? "Personal"
+          : activeFilter.value
+        : "Personal",
+    },
   };
 };
 
@@ -285,7 +288,7 @@ const deleteSavedReply = (savedReply: SavedReply) => {
 
   savedRepliesListResource?.delete.submit(savedReply.name, {
     onSuccess: () => {
-      toast.success(__("Saved reply deleted"));
+      toast.success(__("Saved reply deleted successfully."));
     },
   });
 };
@@ -302,7 +305,7 @@ const duplicate = async () => {
       },
       {
         onSuccess: (data) => {
-          toast.success(__("Saved reply duplicated"));
+          toast.success(__("Saved reply duplicated successfully."));
           duplicateDialog.value = {
             show: false,
             name: "",

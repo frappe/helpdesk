@@ -18,8 +18,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import Notification from "./Notification.vue";
-import { createResource } from "frappe-ui";
+import { createResource, toast } from "frappe-ui";
 import type { BaseSettings, Notification as NotificationType } from "./types";
+import { __ } from "@/translation";
 
 const props = defineProps<{
   onBack: () => void;
@@ -43,6 +44,7 @@ const updateSettings = createResource({
 });
 
 function onSubmit() {
+  toast.success(__("Settings updated successfully."));
   return updateSettings.submit({
     enabled: enabled.value,
     content: content.value,
