@@ -51,7 +51,6 @@
         params: { [options.rowRoute?.prop]: row.name },
         query: { view: route.query?.view },
       }),
-      onRowClick: (row) => emit('rowClick', row.name),
       emptyState,
     }"
   >
