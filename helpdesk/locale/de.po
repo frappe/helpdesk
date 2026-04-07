@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-06 13:10\n"
+"PO-Revision-Date: 2026-04-07 13:29\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -373,7 +373,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Amber"
-msgstr ""
+msgstr "Bernstein"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:113
 msgid "Anyone will be able to create tickets without any permission. e.g. from webform."
@@ -2748,7 +2748,7 @@ msgstr "Max Mustermann"
 
 #: desk/src/components/command-palette/CP.vue:114
 msgid "Jump to"
-msgstr ""
+msgstr "Springen zu"
 
 #: desk/src/pages/knowledge-base/Article.vue:656
 msgid "KB"
@@ -3770,7 +3770,7 @@ msgstr ""
 
 #: desk/src/pages/SearchAgent.vue:108
 msgid "Press enter to search"
-msgstr ""
+msgstr "Drücken Sie die Eingabetaste zum Suchen"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:26
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:4
@@ -4529,7 +4529,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
-msgstr ""
+msgstr "Name des Service Levels"
 
 #: helpdesk/api/settings/email.py:14
 msgid "Service not supported"
@@ -4806,7 +4806,7 @@ msgstr ""
 
 #: desk/src/components/ticket/TicketSplitModal.vue:74
 msgid "Subject is required"
-msgstr ""
+msgstr "Betreff ist erforderlich"
 
 #: desk/src/pages/ticket/TicketFeedback.vue:9
 #: desk/src/pages/ticket/TicketNew.vue:95
@@ -4906,7 +4906,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Teal"
-msgstr ""
+msgstr "Blaugrün"
 
 #. Label of the team (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_team (Link) field in DocType 'HD Escalation Rule'
@@ -5327,7 +5327,7 @@ msgstr ""
 #: desk/src/components/Settings/NewTeamModal.vue:50
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:431
 msgid "Title is required"
-msgstr ""
+msgstr "Titel ist erforderlich"
 
 #. Label of the user_to (Link) field in DocType 'HD Notification'
 #: desk/src/pages/call-logs/CallLogModal.vue:33
