@@ -2,16 +2,8 @@
 # See license.txt
 from datetime import timedelta
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 import frappe
 from frappe.tests.utils import FrappeTestCase
-=======
-=======
-import frappe
->>>>>>> 03fb98df (fix: isort ordering for frappe imports)
-from frappe.tests import IntegrationTestCase
->>>>>>> 90a33198 (chore(format): fix linting and formatting for CI)
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
@@ -716,8 +708,6 @@ class TestHDTicket(FrappeTestCase):
         with self.freeze_time(next_working_day):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
-<<<<<<< HEAD
-=======
 
     def tearDown(self):
         remove_holidays()
@@ -753,4 +743,4 @@ class TestHDTicket(FrappeTestCase):
             get_recent_similar_tickets(ticket.name)
 
         frappe.set_user("Administrator")
->>>>>>> 345c34a6 (test(hd_ticket): add security tests for unauthorized actions and info disclosure)
+
