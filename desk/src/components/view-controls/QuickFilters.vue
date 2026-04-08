@@ -1,6 +1,6 @@
 <template>
   <FadedScrollableDiv
-    class="flex flex-1 items-center -ml-1 overflow-x-scroll py-1 gap-2"
+    class="quick-filters flex flex-1 items-center -ml-1 overflow-x-auto py-1 gap-2 pr-4"
     orientation="horizontal"
     v-if="!quickFilters.loading"
   >
@@ -79,4 +79,12 @@ function getValue(quickFilter, filters) {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.quick-filters {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.quick-filters::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+</style>
