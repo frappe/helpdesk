@@ -40,7 +40,6 @@
       class="rounded-md bg-surface-gray-1 transition-colors px-3 py-[6px] pt-1"
     >
       <TextEditor
-        ref="editorRef"
         :editor-class="[
           'prose-f shrink text-p-sm transition-all duration-300 ease-in-out block w-full content',
           getFontFamily(_content),
@@ -285,14 +284,12 @@ function handleReaction(emoji: string) {
 }
 
 const commentBoxRef = ref(null);
-const editorRef = ref(null);
 const lastSavedContent = ref(content);
 const commentBoxState = ref(content);
 
 function handleEditMode() {
   editable.value = true;
   commentBoxState.value = _content.value;
-  editorRef.value?.editor.chain().focus("end").run();
 }
 
 function handleDiscard() {
