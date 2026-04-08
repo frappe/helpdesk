@@ -29,11 +29,11 @@
         <span> {{ content }}</span>
       </div>
 
-      <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-        <div class="text-gray-600 text-sm w-2/6 flex justify-end">
-          {{ timeAgo(creation) }}
-        </div>
-      </Tooltip>
+      <div class="text-gray-600 text-sm w-2/6 flex justify-end">
+        <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
+          <span>{{ timeAgo(creation) }}</span>
+        </Tooltip>
+      </div>
     </div>
     <div v-if="show_others">
       <div

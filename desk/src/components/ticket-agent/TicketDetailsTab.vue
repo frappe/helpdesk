@@ -34,7 +34,7 @@
         </div>
 
         <!-- Assignee component -->
-        <AssigneeSelect />
+        <AssignTo />
       </div>
     </div>
 
@@ -73,7 +73,7 @@ import {
 } from "@/types";
 import { computed, inject, ref } from "vue";
 import TicketField from "../TicketField.vue";
-import AssigneeSelect from "./AssigneeSelect.vue";
+import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
 
 const ticket = inject(TicketSymbol);

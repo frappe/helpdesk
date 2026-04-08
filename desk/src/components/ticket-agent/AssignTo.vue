@@ -90,7 +90,7 @@
               <button
                 v-for="(agent, index) in sortedAgentOptions"
                 :key="agent.value"
-                :ref="(el) => { if (index === highlightedIndex) scrollToHighlighted(el as Element) }"
+                :ref="(el) => setOptionRef(index, el as Element)"
                 class="group flex h-7 w-full items-center rounded px-2 text-base text-ink-gray-6 gap-2"
                 :class="
                   index === highlightedIndex
@@ -333,9 +333,22 @@ function toggleAgent(agent: AgentOption) {
 }
 
 // --- Keyboard navigation ---
-function scrollToHighlighted(el: Element | null) {
-  el?.scrollIntoView({ block: "nearest" });
+const optionRefs = ref<Map<number, Element>>(new Map());
+
+function setOptionRef(index: number, el: Element | null) {
+  if (el) {
+    optionRefs.value.set(index, el);
+  } else {
+    optionRefs.value.delete(index);
+  }
 }
+
+// Only scroll when highlightedIndex changes (keyboard nav), not on every re-render
+watch(highlightedIndex, (index) => {
+  nextTick(() => {
+    optionRefs.value.get(index)?.scrollIntoView({ block: "nearest" });
+  });
+});
 
 function handleInputKeydown(event: KeyboardEvent) {
   if (
@@ -362,6 +375,17 @@ watch(searchText, () => {
   highlightedIndex.value = 0;
 });
 
+// --- Helpers ---
+async function logActivity(action: string) {
+  await call("frappe.client.insert", {
+    doc: {
+      doctype: "HD Ticket Activity",
+      ticket: ticket.value?.name,
+      action,
+    },
+  });
+}
+
 // --- Assign self instantly (empty state action) ---
 async function assignSelf() {
   if (!currentAgentName) return;
@@ -377,13 +401,7 @@ async function assignSelf() {
 
   try {
     await addAssigneesResource.submit([currentAgentName]);
-    call("frappe.client.insert", {
-      doc: {
-        doctype: "HD Ticket Activity",
-        ticket: ticket.value?.name,
-        action: `assigned ${currentAgentName}`,
-      },
-    });
+    await logActivity(`assigned ${currentAgentName}`);
     capture("ticket_assigned", { doctype: "HD Ticket" });
     toast.success(__("Assignee's updated successfully."));
     assignees.value.reload();
@@ -435,13 +453,7 @@ async function saveAssignees(added: string[], removed: string[]) {
     const logParts: string[] = [];
     if (added.length) logParts.push(`assigned ${added.join(", ")}`);
     if (removed.length) logParts.push(`unassigned ${removed.join(", ")}`);
-    call("frappe.client.insert", {
-      doc: {
-        doctype: "HD Ticket Activity",
-        ticket: ticket.value?.name,
-        action: logParts.join(" & "),
-      },
-    });
+    await logActivity(logParts.join(" & "));
 
     toast.success(__("Assignees updated successfully."));
     assignees.value.reload();

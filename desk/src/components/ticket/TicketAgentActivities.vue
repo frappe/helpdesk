@@ -18,7 +18,7 @@
           <div
             class="relative flex justify-center after:absolute after:left-[50%] after:top-3 after:-z-10 after:border-l after:border-gray-200"
             :class="[
-              i != activities.length - 1 ? 'after:h-full' : 'after:h-5',
+              i != activities.length - 1 && 'after:h-full',
               !['email', 'feedback', 'call', 'comment'].includes(
                 activity.type
               ) && 'after:top-6',
