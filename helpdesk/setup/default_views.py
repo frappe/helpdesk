@@ -110,8 +110,9 @@ def add_default_views(for_existing_sites=False):
 def update_default_views():
     """Update standard views with latest definitions."""
     for view in default_views:
-        if frappe.db.exists("HD View", view["name"]):
-            doc = frappe.get_doc("HD View", view)
+        view_name = view["name"]
+        if frappe.db.exists("HD View", view_name):
+            doc = frappe.get_doc("HD View", view_name)
             doc.update(
                 {
                     "columns": view["columns"],
