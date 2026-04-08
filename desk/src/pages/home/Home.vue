@@ -83,11 +83,11 @@
             class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
             <div class="flex flex-col items-center justify-center gap-1">
-              <FeatherIcon name="layout" class="size-12 text-ink-gray-8" />
-              <div class="text-xl font-semibold text-ink-gray-8">
+              <FeatherIcon name="layout" class="size-12 text-ink-gray-4" />
+              <div class="text-lg font-medium text-ink-gray-8">
                 {{ __("No charts added") }}
               </div>
-              <div class="text-sm text-ink-gray-5">
+              <div class="text-p-base text-ink-gray-6">
                 {{ __("Add charts to get started") }}
               </div>
             </div>

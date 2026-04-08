@@ -7,10 +7,10 @@
     }"
   >
     <div class="space-y-1.5 w-64 p-2 rounded-2xl border-0">
-      <div class="text-ink-gray-9 font-semibold text-center text-base">
+      <div class="text-ink-gray-8 font-semibold text-center text-base">
         {{ title }}
       </div>
-      <div class="text-ink-gray-5 text-center text-p-sm">
+      <div class="text-ink-gray-6 text-center text-p-sm">
         {{ description }}
       </div>
     </div>
