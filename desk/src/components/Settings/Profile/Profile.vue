@@ -177,36 +177,28 @@
           <div v-if="enableSignature">
             <TextEditor
               ref="signatureEditorRef"
-              editor-class="prose-sm max-w-none min-h-[4rem]"
+              editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5"
+              :bubble-menu="false"
+              :fixed-menu="signatureButtons"
               :starterkit-options="{ heading: { levels: [2, 3, 4] } }"
               :placeholder="__('Write your email signature here')"
               :content="signatureContent"
               @change="(val) => (signatureContent = val)"
             >
-              <template #editor="{ editor }">
-                <EditorContent
-                  class="max-h-[30vh] overflow-y-auto rounded-lg border p-4"
-                  :editor="editor"
-                />
-              </template>
               <template #bottom>
-                <div
-                  class="mt-2 flex flex-col justify-between sm:flex-row sm:items-center"
-                >
-                  <TextEditorFixedMenu
-                    class="-ml-1 overflow-x-auto"
-                    :buttons="signatureButtons"
-                  />
+                <div class="mt-2 flex justify-end">
                   <Button
                     type="button"
                     size="sm"
                     variant="subtle"
                     class="w-fit"
-                    :disabled="!isSignatureDirty"
+                    :disabled="!isSignatureContentDirty"
                     @click="resetSignatureContent"
                     :tooltip="
-                      isSignatureDirty &&
-                      __('This will reset the content to the default message.')
+                      isSignatureContentDirty &&
+                      __(
+                        'This will reset the content to the last saved version.'
+                      )
                     "
                   >
                     {{ __("Reset Content") }}
@@ -256,6 +248,7 @@ import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import Link from "@/components/frappe-ui/Link.vue";
 import { HDAgent } from "@/types/doctypes";
+import { isContentEmpty } from "@/utils";
 
 const auth = useAuthStore();
 const profile = ref({
@@ -276,16 +269,29 @@ const signatureContent = ref("");
 const originalSignature = ref("");
 const originalEnableSignature = ref(false);
 
+const isSignatureContentDirty = computed(() => {
+  const isCurrentEmpty = isContentEmpty(signatureContent.value);
+  const isOriginalEmpty = isContentEmpty(originalSignature.value);
+
+  if (isCurrentEmpty && isOriginalEmpty) {
+    return false;
+  }
+
+  return signatureContent.value !== originalSignature.value;
+});
+
 const isSignatureDirty = computed(() => {
-  return (
-    signatureContent.value !== originalSignature.value ||
-    enableSignature.value !== originalEnableSignature.value
-  );
+  if (enableSignature.value !== originalEnableSignature.value) {
+    return true;
+  }
+  if (!enableSignature.value) {
+    return false;
+  }
+  return signatureContent.value !== originalSignature.value;
 });
 
 function resetSignatureContent() {
   signatureContent.value = originalSignature.value;
-  enableSignature.value = originalEnableSignature.value;
 }
 
 const isLanguageChanged = computed(() => {
@@ -472,6 +478,12 @@ function handleSignatureUpdate() {
 }
 
 const onSave = () => {
+  if (enableSignature.value) {
+    if (isContentEmpty(signatureContent.value)) {
+      toast.error(__("Email signature is required"));
+      return;
+    }
+  }
   if (isAccountInfoDirty.value) {
     setAgent.submit();
   }
