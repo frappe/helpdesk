@@ -97,7 +97,7 @@
       </div>
       <!-- TextEditor Fixed Menu -->
       <div
-        class="flex justify-between overflow-scroll pl-10 py-2.5 items-center"
+        class="flex justify-between overflow-scroll px-5 py-2.5 items-center border-t"
       >
         <div class="flex items-center overflow-x-auto w-[60%]">
           <div class="flex gap-1">
@@ -140,9 +140,7 @@
           </div>
           <TextEditorFixedMenu class="ml-1" :buttons="textEditorMenuButtons" />
         </div>
-        <div
-          class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%] mr-9"
-        >
+        <div class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%]">
           <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
@@ -174,7 +172,6 @@ import {
   MultiSelectInput,
   SavedRepliesSelectorModal,
 } from "@/components";
-import { EditorContent } from "@tiptap/vue-3";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
@@ -187,6 +184,7 @@ import {
   uploadFunction,
   validateEmailWithZod,
 } from "@/utils";
+import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,

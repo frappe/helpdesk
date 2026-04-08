@@ -5,7 +5,7 @@
     :editor-class="[
       'prose-sm max-w-none',
       editable &&
-        'min-h-[7rem] mx-6 md:ml-10 md:mr-9 max-h-[50vh] overflow-y-auto border-t py-3',
+        'min-h-[7rem]  mx-5 max-h-[50vh] overflow-y-auto border-t py-3',
       getFontFamily(newComment),
     ]"
     :content="newComment"
@@ -18,80 +18,82 @@
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #bottom>
-      <div v-if="editable" class="flex flex-col gap-2 px-6 md:pl-10 md:pr-9">
-        <!-- Attachments -->
-        <div class="flex flex-wrap gap-2">
-          <AttachmentItem
-            v-for="a in attachments"
-            :key="a.file_url"
-            :label="a.file_name"
-            :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
-          >
-            <template #suffix>
-              <FeatherIcon
-                class="h-3.5"
-                name="x"
-                @click.stop="removeAttachment(a)"
-              />
-            </template>
-          </AttachmentItem>
-        </div>
-        <!-- Fixed Menu -->
-        <div class="flex justify-between overflow-hidden border-t py-2.5">
-          <div class="flex items-center overflow-x-auto w-[60%]">
-            <FileUploader
-              :upload-args="{
-                doctype: doctype,
-                docname: ticketId,
-                private: true,
-              }"
-              @success="(f) => attachments.push(f)"
+      <div v-if="editable" class="flex flex-col gap-2 border-t">
+        <div class="px-5">
+          <!-- Attachments -->
+          <div class="flex flex-wrap gap-2">
+            <AttachmentItem
+              v-for="a in attachments"
+              :key="a.file_url"
+              :label="a.file_name"
+              :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
             >
-              <template #default="{ openFileSelector, uploading }">
-                {{ void (loading = uploading) }}
-                <Button
-                  theme="gray"
-                  variant="ghost"
-                  @click="openFileSelector()"
-                >
-                  <template #icon>
-                    <AttachmentIcon
-                      class="h-4"
-                      style="color: #000000; stroke-width: 1.5 !important"
-                    />
-                  </template>
-                </Button>
+              <template #suffix>
+                <FeatherIcon
+                  class="h-3.5"
+                  name="x"
+                  @click.stop="removeAttachment(a)"
+                />
               </template>
-            </FileUploader>
-            <TextEditorFixedMenu
-              class="-ml-0.5"
-              :buttons="textEditorMenuButtons"
-            />
+            </AttachmentItem>
           </div>
-          <div class="flex items-center justify-end space-x-2 w-[40%]">
-            <Button
-              label="Discard"
-              @click="
-                () => {
-                  newComment = '';
-                  attachments = [];
-                  emit('discard');
-                }
-              "
-            />
-            <Button
-              variant="solid"
-              :label="label"
-              :disabled="isDisabled"
-              :loading="loading"
-              @click="
-                () => {
-                  loading = true;
-                  submitComment();
-                  newComment = '';
-                }
-              "
-            />
+          <!-- Fixed Menu -->
+          <div class="flex justify-between overflow-hidden py-2.5">
+            <div class="flex items-center overflow-x-auto w-[60%]">
+              <FileUploader
+                :upload-args="{
+                  doctype: doctype,
+                  docname: ticketId,
+                  private: true,
+                }"
+                @success="(f) => attachments.push(f)"
+              >
+                <template #default="{ openFileSelector, uploading }">
+                  {{ void (loading = uploading) }}
+                  <Button
+                    theme="gray"
+                    variant="ghost"
+                    @click="openFileSelector()"
+                  >
+                    <template #icon>
+                      <AttachmentIcon
+                        class="h-4"
+                        style="color: #000000; stroke-width: 1.5 !important"
+                      />
+                    </template>
+                  </Button>
+                </template>
+              </FileUploader>
+              <TextEditorFixedMenu
+                class="-ml-0.5"
+                :buttons="textEditorMenuButtons"
+              />
+            </div>
+            <div class="flex items-center justify-end space-x-2 w-[40%]">
+              <Button
+                label="Discard"
+                @click="
+                  () => {
+                    newComment = '';
+                    attachments = [];
+                    emit('discard');
+                  }
+                "
+              />
+              <Button
+                variant="solid"
+                :label="label"
+                :disabled="isDisabled"
+                :loading="loading"
+                @click="
+                  () => {
+                    loading = true;
+                    submitComment();
+                    newComment = '';
+                  }
+                "
+              />
+            </div>
           </div>
         </div>
       </div>
