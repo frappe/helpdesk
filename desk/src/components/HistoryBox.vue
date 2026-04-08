@@ -1,7 +1,7 @@
 <template>
   <div class="flex-1">
     <div
-      class="mt-1.5 flex justify-between text-base items-start md:items-center"
+      class="mt-1 flex justify-between text-base items-start md:items-center"
     >
       <div
         v-if="relatedActivities.length > 1"
