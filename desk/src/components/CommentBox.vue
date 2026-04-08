@@ -37,7 +37,7 @@
     </div>
     <div
       :id="`comment-${name}`"
-      class="rounded-xl bg-gray-50 transition-colors px-3 py-[12.5px] pt-[5.25px]"
+      class="rounded-md bg-surface-gray-1 transition-colors px-3 py-[6px] pt-1"
     >
       <TextEditor
         ref="editorRef"

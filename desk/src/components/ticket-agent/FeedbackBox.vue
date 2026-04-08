@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full p-4 rounded" :class="styles[0]">
+  <div class="w-full p-4 rounded-md" :class="styles[0]">
     <!-- Header -->
     <div
       class="flex mb-1.5 items-center"

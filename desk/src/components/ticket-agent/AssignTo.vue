@@ -22,7 +22,7 @@
             />
             <p
               v-if="assignees.data?.length > 1"
-              class="ml-2 text-sm text-ink-gray-8"
+              class="text-sm text-ink-gray-8"
             >
               {{ assignees.data?.length }} assignees
             </p>

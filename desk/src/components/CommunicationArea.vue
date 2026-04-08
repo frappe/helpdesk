@@ -1,7 +1,7 @@
 <template>
   <div class="comm-area">
     <div
-      class="flex justify-between gap-3 border-t px-6 md:px-10 py-4 md:py-2.5"
+      class="flex justify-between gap-3 border-t px-6 md:px-5 py-4 md:py-2.5"
     >
       <div class="flex gap-1.5 items-center">
         <Button
@@ -103,8 +103,8 @@ import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
-import { ref, watch } from "vue";
 import { onClickOutside } from "@vueuse/core";
+import { ref, watch } from "vue";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");

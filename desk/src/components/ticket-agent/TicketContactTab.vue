@@ -3,19 +3,25 @@
   <div>
     <!-- Contact -->
     <div v-if="!contact.loading">
-      <div class="flex gap-3 items-center px-5 py-2.5">
+      <div class="flex gap-2.5 items-center px-5 py-2.5 pt-4">
         <Avatar
           :label="contact.data.name"
           :image="contact.data.image"
           size="2xl"
         />
-        <p class="text-ink-gray-8 font-medium text-xl max-w-full truncate">
-          {{ contact.data.name }}
-        </p>
+        <div class="flex gap-2 items-center">
+          <p class="text-ink-gray-8 font-medium text-xl max-w-full truncate">
+            {{ contact.data.name }}
+          </p>
+          <ExternalLinkIcon
+            class="size-4 text-ink-gray-6 cursor-pointer"
+            @click="openContact(contact.data.name)"
+          />
+        </div>
       </div>
       <div class="px-5 text-ink-gray-5 pb-2">
         <!-- Email Id -->
-        <div class="flex gap-2 items-center p-1.5">
+        <div class="flex gap-2 items-center py-1.5">
           <EmailIcon class="size-4" />
           <p class="text-p-sm text-ink-gray-6 hover:underline cursor-pointer">
             {{ contact.data.email_id }}
@@ -32,7 +38,7 @@
         </div>
         <!-- Mobile Number -->
         <div
-          class="flex gap-2 items-center p-1.5"
+          class="flex gap-2 items-center py-1.5"
           v-if="
             isCallingEnabled && (contact.data.mobile_no || contact.data.phone)
           "
@@ -67,7 +73,10 @@
           :opened="section.opened"
         >
           <template #header="{ opened, hide, toggle }">
-            <div class="flex gap-2.5 items-center py-[13px] justify-between">
+            <div
+              class="flex gap-2.5 items-center py-[13px] justify-between"
+              :class="[!opened && 'pb-0']"
+            >
               <Tooltip :text="section.tooltipMessage">
                 <span
                   class="text-ink-gray-8 font-medium text-base cursor-pointer select-none"

@@ -39,7 +39,10 @@
     </div>
 
     <!-- Additional Fields -->
-    <div class="border-t flex-1 min-h-0 overflow-y-auto pb-3">
+    <div
+      class="border-t flex-1 min-h-0 overflow-y-auto pb-3"
+      v-if="Boolean(customFields.length)"
+    >
       <template v-for="field in customFields">
         <TicketField
           v-if="field.visible"

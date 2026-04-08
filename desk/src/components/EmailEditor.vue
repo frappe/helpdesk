@@ -2,7 +2,7 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-full mx-6 md:mx-10 py-3',
+      'prose-sm max-w-full mx-6 md:mx-5 py-3',
       getFontFamily(newEmail),
       '[&_p.reply-to-content]:hidden',
     ]"
@@ -16,7 +16,7 @@
     @keydown.capture="handleKeydown"
   >
     <template #top>
-      <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
+      <div class="mx-6 md:mx-5 flex items-center gap-2 border-y py-2.5">
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
