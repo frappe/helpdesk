@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 
 
 def execute():
@@ -24,7 +25,7 @@ def alter_new_column():
     current_type = get_current_column_type()
 
     if current_type is None:
-        frappe.throw("Could not find the `name` column in tabHD Ticket")
+        frappe.throw(_("Cou`ld not find the `name` column in tabHD Ticket"))
 
     if current_type == "varchar":
         print("alter_hd_ticket_name_to_varchar: column is already VARCHAR, skipping")
