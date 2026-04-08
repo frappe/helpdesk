@@ -1,7 +1,9 @@
 <template>
   <Teleport to="#app-header" v-if="showHeader">
     <slot>
-      <header class="flex h-10.5 items-center justify-between mx-4 md:mr-0">
+      <header
+        class="flex h-10.5 items-center justify-between mx-4 md:mx-5 md:mr-0"
+      >
         <div class="flex items-center gap-2 max-w-[70%] md:max-w-[50%]">
           <slot name="left-header" />
         </div>
@@ -13,7 +15,7 @@
   </Teleport>
 </template>
 <script setup>
-import { ref, nextTick } from "vue";
+import { nextTick, ref } from "vue";
 const showHeader = ref(false);
 
 nextTick(() => {

@@ -2,7 +2,7 @@
   <!-- View Controls -->
   <div
     :class="[
-      'flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6',
+      'flex items-center justify-between gap-2 px-5 pb-4 pt-3 ',
       list?.data?.data?.length > 0 ? 'relative' : 'absolute w-[stretch]',
     ]"
     v-if="showViewControls"
