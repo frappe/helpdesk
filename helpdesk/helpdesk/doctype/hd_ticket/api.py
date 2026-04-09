@@ -325,7 +325,7 @@ def get_attachments(doctype, name):
 
 @frappe.whitelist()
 @agent_only
-def merge_ticket(source: int, target: int):
+def merge_ticket(source: str, target: str):
     # check if source and target exists
     if not frappe.db.exists("HD Ticket", source):
         frappe.throw(_("Source ticket does not exist"))
@@ -386,7 +386,7 @@ def merge_ticket(source: int, target: int):
     c.save()
 
 
-def duplicate_list_retain_timestamp(doctype, activities: list, target: int, controller):
+def duplicate_list_retain_timestamp(doctype, activities: list, target: str, controller):
     for activity in activities:
         attachments = get_attachments(
             "HD Ticket Comment",
@@ -587,7 +587,7 @@ def get_navigation_tickets(ticket: str | int, current_view: str | None = None):
         )
 
         # Extract just the ticket IDs
-        ticket_ids = [int(ticket), *tickets]
+        ticket_ids = [str(ticket), *tickets]
         # print("\n\n", ticket_ids, "\n\n")
         return ticket_ids
 
