@@ -54,14 +54,19 @@
           <div
             class="flex h-7 items-center text-sm font-medium text-ink-gray-6 justify-between"
           >
-            <input
+            <TextInput
               ref="inputRef"
               v-model="searchText"
               :placeholder="__('Search agents...')"
-              class="px-2 flex-1 bg-transparent border-none outline-none text-sm focus:border-none focus:ring-0 text-ink-gray-6 placeholder-ink-gray-4"
+              variant="ghost"
+              class="flex-1"
               @click.stop
               @keydown="handleInputKeydown"
-            />
+            >
+              <template #prefix>
+                <LucideSearch class="size-4 text-ink-gray-4" />
+              </template>
+            </TextInput>
             <Button
               v-if="searchText.length > 0"
               variant="ghost"
@@ -137,12 +142,14 @@ import {
   Button,
   Checkbox,
   Popover,
+  TextInput,
   call,
   createListResource,
   createResource,
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
+import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
 
@@ -156,7 +163,7 @@ const currentAgentName = (window as any).agent as string | null;
 
 const searchText = ref("");
 const highlightedIndex = ref(0);
-const inputRef = useTemplateRef<HTMLInputElement>("inputRef");
+const inputRef = useTemplateRef<InstanceType<typeof TextInput>>("inputRef");
 const triggerRef = useTemplateRef("triggerRef");
 
 const popoverIsOpen = ref(false);
@@ -193,7 +200,7 @@ watch(popoverIsOpen, (isOpen) => {
     searchText.value = "";
     highlightedIndex.value = 0;
     nextTick(() => {
-      inputRef.value?.focus();
+      inputRef.value?.el?.focus();
     });
   } else if (hasBeenOpened.value) {
     // Closing after a real open: compute diff and save
@@ -243,7 +250,7 @@ watch(searchText, (text) => {
 
 const agentOptions = computed<AgentOption[]>(() => {
   const agents: AgentOption[] = [];
-  const options = new Set<string>();
+  const seen = new Set<string>();
 
   // Include current agent only when not searching
   if (!searchText.value && currentAgentResource?.data) {
@@ -253,18 +260,18 @@ const agentOptions = computed<AgentOption[]>(() => {
       label: a.agent_name || getUser(a.name).full_name,
       image: a.user_image || getUser(a.name).user_image,
     });
-    options.add(a.name);
+    seen.add(a.name);
   }
 
   if (agentResource.data) {
     for (const agent of agentResource.data) {
-      if (!options.has(agent.name)) {
+      if (!seen.has(agent.name)) {
         agents.push({
           value: agent.name,
           label: agent.agent_name || getUser(agent.name).full_name,
           image: agent.user_image || getUser(agent.name).user_image,
         });
-        options.add(agent.name);
+        seen.add(agent.name);
       }
     }
   }
@@ -286,7 +293,12 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   if (!isSearching) {
     for (const a of localAssignees.value) {
       if (!seen.has(a.name)) {
-        options.push({ value: a.name, label: a.label, image: a.image });
+        const user = getUser(a.name);
+        options.push({
+          value: a.name,
+          label: a.label || user.full_name || a.name,
+          image: a.image || user.user_image,
+        });
         seen.add(a.name);
       }
     }
@@ -312,6 +324,7 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   if (assigned.length > 0) {
     return [...assigned, ...selfOption, ...rest];
   }
+
   return [...selfOption, ...rest];
 });
 

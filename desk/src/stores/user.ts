@@ -15,7 +15,7 @@ export const useUserStore = defineStore("user", () => {
     initialData: [],
     transform(users) {
       for (const user of users) {
-        user.full_name = formatFullName(user.email);
+        user.full_name = user.full_name || formatFullName(user.email);
         usersByName[user.name] = user;
       }
       return users;
@@ -32,6 +32,9 @@ export const useUserStore = defineStore("user", () => {
   function getUser(email) {
     if (!email || email === "sessionUser") {
       email = window.session_user;
+    }
+    if (email === "rushabh@erpnext.com") {
+      debugger;
     }
     if (!usersByName[email]) {
       usersByName[email] = {
