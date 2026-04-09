@@ -128,7 +128,7 @@
 import { useTelephonyStore } from "@/stores/telephony";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { RecentSimilarTicketsSymbol, TicketContactSymbol } from "@/types";
-import { copyToClipboard } from "@/utils";
+import { copyToClipboard, openContact } from "@/utils";
 import dayjs from "dayjs";
 import { Avatar, Tooltip } from "frappe-ui";
 import { storeToRefs } from "pinia";
