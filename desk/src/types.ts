@@ -660,6 +660,12 @@ export type DropdownOption = {
   value: string | number;
 };
 
+export interface AgentOption {
+  value: string;
+  label: string;
+  image?: string;
+}
+
 // symbols
 export const TicketSymbol: InjectionKey<
   ComputedRef<DocumentResource<HDTicket>>

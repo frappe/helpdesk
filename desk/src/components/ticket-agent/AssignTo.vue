@@ -126,7 +126,12 @@ import { useShortcut } from "@/composables/shortcuts";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { ActivitiesSymbol, AssigneeSymbol, TicketSymbol } from "@/types";
+import {
+  ActivitiesSymbol,
+  AgentOption,
+  AssigneeSymbol,
+  TicketSymbol,
+} from "@/types";
 import { useDebounceFn } from "@vueuse/core";
 import {
   Button,
@@ -138,32 +143,26 @@ import {
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
-import LucideChevronDown from "~icons/lucide/chevron-down";
-import LucideX from "~icons/lucide/x";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
 
-// --- Injected context ---
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
 const activities = inject(ActivitiesSymbol)!;
 
-// --- User store ---
 const { getUser } = useUserStore();
 const currentUser = computed(() => getUser("")); // empty string returns current user
 const currentAgentName = (window as any).agent as string | null;
 
-// --- Local state ---
 const searchText = ref("");
 const highlightedIndex = ref(0);
 const inputRef = useTemplateRef<HTMLInputElement>("inputRef");
 const triggerRef = useTemplateRef("triggerRef");
 
-// Track popover open state for deferred save
 const popoverIsOpen = ref(false);
 const hasBeenOpened = ref(false);
 
-// Local copy of assignees for deferred save
+// Local copy of assignees
 const localAssignees = ref<{ name: string; image: string; label: string }[]>(
   []
 );
@@ -208,13 +207,6 @@ watch(popoverIsOpen, (isOpen) => {
   }
 });
 
-// --- Agent fetching (server-side search) ---
-interface AgentOption {
-  value: string;
-  label: string;
-  image?: string;
-}
-
 const agentResource = createListResource({
   doctype: "HD Agent",
   fields: ["name", "agent_name", "user_image"],
@@ -249,10 +241,9 @@ watch(searchText, (text) => {
   debouncedSearch(text);
 });
 
-// --- Build agent options ---
 const agentOptions = computed<AgentOption[]>(() => {
   const agents: AgentOption[] = [];
-  const seen = new Set<string>();
+  const options = new Set<string>();
 
   // Include current agent only when not searching
   if (!searchText.value && currentAgentResource?.data) {
@@ -262,18 +253,18 @@ const agentOptions = computed<AgentOption[]>(() => {
       label: a.agent_name || getUser(a.name).full_name,
       image: a.user_image || getUser(a.name).user_image,
     });
-    seen.add(a.name);
+    options.add(a.name);
   }
 
   if (agentResource.data) {
     for (const agent of agentResource.data) {
-      if (!seen.has(agent.name)) {
+      if (!options.has(agent.name)) {
         agents.push({
           value: agent.name,
           label: agent.agent_name || getUser(agent.name).full_name,
           image: agent.user_image || getUser(agent.name).user_image,
         });
-        seen.add(agent.name);
+        options.add(agent.name);
       }
     }
   }
@@ -289,7 +280,18 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   const options = [...agentOptions.value];
   const isSearching = searchText.value.length > 0;
 
-  // Use the snapshot taken at open time, not live localAssignees
+  // Merge in any locally-selected agents not present in the fetched list
+  // (e.g. agents found via search who aren't in the default top 20)
+  const seen = new Set(options.map((o) => o.value));
+  if (!isSearching) {
+    for (const a of localAssignees.value) {
+      if (!seen.has(a.name)) {
+        options.push({ value: a.name, label: a.label, image: a.image });
+        seen.add(a.name);
+      }
+    }
+  }
+
   const pinned = pinnedSelectedNames.value;
 
   const selfOption: AgentOption[] = [];
@@ -313,26 +315,34 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   return [...selfOption, ...rest];
 });
 
-// --- Selection helpers ---
 function isSelected(agentName: string): boolean {
   return localAssignees.value.some((a) => a.name === agentName);
 }
 
 function toggleAgent(agent: AgentOption) {
+  const isSearching = searchText.value.length > 0;
   if (isSelected(agent.value)) {
     localAssignees.value = localAssignees.value.filter(
       (a) => a.name !== agent.value
     );
+    // Only unpin if it was pinned during search, keep original pins stable
+    if (isSearching) {
+      pinnedSelectedNames.value.delete(agent.value);
+    }
   } else {
     localAssignees.value.push({
       name: agent.value,
       image: agent.image || "",
       label: agent.label,
     });
+    // Pin only when selecting during search so they stay visible when search clears
+    if (isSearching) {
+      pinnedSelectedNames.value.add(agent.value);
+    }
   }
 }
 
-// --- Keyboard navigation ---
+// Keyboard navigation, ref forwarding to scroll highlighted option into view
 const optionRefs = ref<Map<number, Element>>(new Map());
 
 function setOptionRef(index: number, el: Element | null) {
@@ -375,7 +385,6 @@ watch(searchText, () => {
   highlightedIndex.value = 0;
 });
 
-// --- Helpers ---
 async function logActivity(action: string) {
   await call("frappe.client.insert", {
     doc: {
@@ -386,7 +395,6 @@ async function logActivity(action: string) {
   });
 }
 
-// --- Assign self instantly (empty state action) ---
 async function assignSelf() {
   if (!currentAgentName) return;
 
@@ -414,7 +422,7 @@ async function assignSelf() {
   }
 }
 
-// --- Deferred save on close ---
+// triggered when the popover is closed
 const addAssigneesResource = createResource({
   url: "frappe.desk.form.assign_to.add",
   makeParams: (addedAssignees: string[]) => ({
@@ -464,7 +472,6 @@ async function saveAssignees(added: string[], removed: string[]) {
   }
 }
 
-// --- Keyboard shortcut ---
 useShortcut("a", () => {
   (triggerRef.value?.$el as HTMLElement)?.nextElementSibling?.click();
 });
