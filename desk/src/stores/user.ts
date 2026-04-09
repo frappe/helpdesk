@@ -33,9 +33,6 @@ export const useUserStore = defineStore("user", () => {
     if (!email || email === "sessionUser") {
       email = window.session_user;
     }
-    if (email === "rushabh@erpnext.com") {
-      debugger;
-    }
     if (!usersByName[email]) {
       usersByName[email] = {
         name: email,
