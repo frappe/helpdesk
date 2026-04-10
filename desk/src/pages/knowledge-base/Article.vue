@@ -164,7 +164,7 @@
           ref="editorRef"
           :editor-class="editorClass"
           :content="textEditorContentWithIDs"
-          :extensions="[ComponentUtils]"
+          :extensions="[ComponentUtils, CleanStyles]"
           :editable="editable"
           @change="(event:string) => {
 			      content = event;
@@ -246,7 +246,7 @@ import {
   likeArticle,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
-import { ComponentUtils } from "@/tiptap-extensions";
+import { CleanStyles, ComponentUtils } from "@/tiptap-extensions";
 import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
 import {
   copyToClipboard,
