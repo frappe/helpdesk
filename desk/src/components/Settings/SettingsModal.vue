@@ -9,15 +9,10 @@
         <div
           class="flex w-52 shrink-0 flex-col bg-gray-50 p-2 overflow-y-auto hide-scrollbar"
         >
-<<<<<<< HEAD
-          <h1 class="px-2 pt-2 text-lg font-semibold mb-2">
-            {{ __("Settings") }}
-=======
           <h1
             class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-base text-ink-gray-5 transition-all duration-300 ease-in-out truncate"
           >
             {{ __("My Settings") }}
->>>>>>> 2d583532 (fix: truncate text for translations in settings menu)
           </h1>
           <div v-for="tab in tabs">
             <div
@@ -40,30 +35,15 @@
                 ]"
                 @click="() => onTabChange(item)"
               >
-<<<<<<< HEAD
-                <component :is="item.icon" class="h-4 w-4 text-gray-700" />
-<<<<<<< HEAD
-                <span class="text-base text-gray-800">
-                  {{ item.label }}
-                </span>
-=======
-                <Tooltip :text="item.label">
-=======
                 <component
                   :is="item.icon"
                   class="h-4 w-4 text-gray-700 shrink-0"
                 />
-<<<<<<< HEAD
-                <Tooltip :text="item.label" placement="right">
->>>>>>> c3079c90 (fix: truncation bugs for mobile and sidebar)
-=======
                 <Tooltip :text="__(item.label)" placement="right">
->>>>>>> 4b458035 (fix: add translation for tooltip labels)
                   <span class="text-p-sm text-gray-800 truncate">
                     {{ __(item.label) }}
                   </span>
                 </Tooltip>
->>>>>>> 2d583532 (fix: truncate text for translations in settings menu)
               </button>
             </nav>
           </div>
