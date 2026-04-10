@@ -4,6 +4,7 @@ import { FeatherIcon, call, dayjsLocal, toast, useFileUpload, getConfig, } from 
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
+import LucideBrushCleaning from '~icons/lucide/brush-cleaning'
 import TicketIcon from "./components/icons/TicketIcon.vue";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
@@ -266,6 +267,19 @@ export async function copyToClipboard(
 export const textEditorMenuButtons = [
   "Paragraph",
   ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
+    {
+      label: 'Clear formatting',
+      icon: LucideBrushCleaning,
+      action: (editor) => {
+        editor.chain()
+          .focus()
+          .unsetAllMarks()
+          .clearNodes()
+          .cleanStyles()
+          .run()
+      },
+      isActive: () => false,
+    },
   "Separator",
   "Bold",
   "Italic",
