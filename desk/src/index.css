@@ -8,12 +8,13 @@
   .prose-f {
     @apply break-normal max-w-none prose prose-code:break-all prose-code:whitespace-pre-wrap prose-img:border prose-img:rounded-lg prose-sm;
   }
-  .prose-f *{
+  .prose-f * {
     unicode-bidi: plaintext;
   }
   .prose-f:not(.not-prose):not(.not-prose *) pre {
     background-color: var(--surface-gray-2);
-    color: var(--ink-gray-9);}
+    color: var(--ink-gray-9);
+  }
 }
 
 .tiptap input[placeholder="Add caption"] {
