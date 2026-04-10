@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-06 13:11\n"
+"PO-Revision-Date: 2026-04-10 14:04\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -2011,7 +2011,7 @@ msgstr "Återkoppling Betyg"
 
 #: helpdesk/api/dashboard.py:370
 msgid "Feedback Trend"
-msgstr "Återkoppling Trend"
+msgstr "Återkoppling Statistik"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:170
 msgid "Feedback email has been sent to the customer"
@@ -5117,7 +5117,7 @@ msgstr "Ärende #{0}: Vi har mottagit begäran"
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Analytics"
-msgstr "Ärende Analys"
+msgstr "Ärende Statistik"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -5174,7 +5174,7 @@ msgstr "Ärende Sammanfattning"
 
 #: helpdesk/api/dashboard.py:292
 msgid "Ticket Trend"
-msgstr "Ärende Trend"
+msgstr "Ärende Statistik"
 
 #. Label of the ticket_type_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -5253,7 +5253,7 @@ msgstr "Ärende uppdaterad."
 #. Name of a report
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
 msgid "Ticket-Search Analysis"
-msgstr "Ärendesökning Analys"
+msgstr "Ärendesökning Statistik"
 
 #: desk/src/components/command-palette/CP.vue:98
 #: desk/src/components/ticket-agent/TicketHeader.vue:173
@@ -5372,7 +5372,7 @@ msgstr "Idag"
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:35
 msgid "Top Result"
-msgstr "Högst Resultat"
+msgstr "Högsta Resultat"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:98
 msgid "Total"
