@@ -11,10 +11,9 @@
   .prose-f *{
     unicode-bidi: plaintext;
   }
-  .prose-f pre {
+  .prose-f:not(.not-prose):not(.not-prose *) pre {
     background-color: var(--surface-gray-2);
-    color: var(--ink-gray-9);
-  }
+    color: var(--ink-gray-9);}
 }
 
 .tiptap input[placeholder="Add caption"] {
