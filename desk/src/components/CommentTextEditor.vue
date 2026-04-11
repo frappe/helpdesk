@@ -36,38 +36,36 @@
         </AttachmentItem>
       </div>
       <div v-if="editable" class="flex flex-col gap-2 border-t">
-        <div class="px-5">
+        <div class="px-4">
           <!-- Fixed Menu -->
           <div class="flex justify-between overflow-hidden py-2.5">
             <div class="flex items-center overflow-x-auto w-[60%]">
-              <FileUploader
-                :upload-args="{
-                  doctype: doctype,
-                  docname: ticketId,
-                  private: true,
-                }"
-                @success="(f) => attachments.push(f)"
-              >
-                <template #default="{ openFileSelector, uploading }">
-                  {{ void (loading = uploading) }}
-                  <Button
-                    theme="gray"
-                    variant="ghost"
-                    @click="openFileSelector()"
-                  >
-                    <template #icon>
+              <div class="inline-flex items-center gap-1.5 p-1">
+                <FileUploader
+                  :upload-args="{
+                    doctype: doctype,
+                    docname: ticketId,
+                    private: true,
+                  }"
+                  @success="(f) => attachments.push(f)"
+                >
+                  <template #default="{ openFileSelector, uploading }">
+                    {{ void (loading = uploading) }}
+                    <button
+                      class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
+                      @click="openFileSelector()"
+                      :disabled="uploading"
+                    >
                       <AttachmentIcon
-                        class="h-4"
-                        style="color: #000000; stroke-width: 1.5 !important"
+                        class="h-4 w-4"
+                        style="stroke-width: 1.5 !important"
                       />
-                    </template>
-                  </Button>
-                </template>
-              </FileUploader>
-              <TextEditorFixedMenu
-                class="-ml-0.5"
-                :buttons="textEditorMenuButtons"
-              />
+                    </button>
+                  </template>
+                </FileUploader>
+                <div class="h-4 w-[2px] border-l" />
+              </div>
+              <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
             </div>
             <div class="flex items-center justify-end space-x-2 w-[40%]">
               <Button

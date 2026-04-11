@@ -97,10 +97,10 @@
       </div>
       <!-- TextEditor Fixed Menu -->
       <div
-        class="flex justify-between overflow-scroll px-5 py-2.5 items-center border-t"
+        class="flex justify-between overflow-scroll px-4 py-2.5 items-center border-t"
       >
         <div class="flex items-center overflow-x-auto w-[60%]">
-          <div class="flex gap-1">
+          <div class="inline-flex items-center gap-1.5 p-1">
             <FileUploader
               :upload-args="{
                 doctype: doctype,
@@ -115,30 +115,27 @@
             >
               <template #default="{ openFileSelector, uploading }">
                 {{ void (isUploading = uploading) }}
-                <Button
-                  variant="ghost"
+                <button
+                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
                   @click="openFileSelector()"
-                  :loading="uploading"
+                  :disabled="uploading"
                 >
-                  <template #icon>
-                    <AttachmentIcon
-                      class="h-4"
-                      style="color: #000000; stroke-width: 1.5 !important"
-                    />
-                  </template>
-                </Button>
+                  <AttachmentIcon
+                    class="h-4 w-4"
+                    style="stroke-width: 1.5 !important"
+                  />
+                </button>
               </template>
             </FileUploader>
-            <Button
-              variant="ghost"
+            <button
+              class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
               @click="showSavedRepliesSelectorModal = true"
             >
-              <template #icon>
-                <SavedReplyIcon class="h-4" />
-              </template>
-            </Button>
+              <SavedReplyIcon class="h-4 w-4" />
+            </button>
+            <div class="h-4 w-[2px] border-l" />
           </div>
-          <TextEditorFixedMenu class="ml-1" :buttons="textEditorMenuButtons" />
+          <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
         </div>
         <div class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%]">
           <Button label="Discard" @click="handleDiscard" />
