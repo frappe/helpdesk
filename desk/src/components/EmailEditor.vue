@@ -24,16 +24,28 @@
           :validate="validateEmailWithZod"
           :error-message="(value) => `${value} is an invalid email address`"
         />
-        <Button
-          :label="'CC'"
-          :class="[cc ? 'bg-gray-300 hover:bg-gray-200' : '']"
-          @click="toggleCC()"
-        />
-        <Button
-          :label="'BCC'"
-          :class="[bcc ? 'bg-gray-300 hover:bg-gray-200' : '']"
-          @click="toggleBCC()"
-        />
+        <div class="flex gap-1.5">
+          <Button
+            :label="'CC'"
+            variant="ghost"
+            :class="[
+              cc || showCC
+                ? '!bg-surface-gray-4 hover:bg-surface-gray-3'
+                : '!text-ink-gray-4',
+            ]"
+            @click="toggleCC()"
+          />
+          <Button
+            :label="'BCC'"
+            variant="ghost"
+            :class="[
+              bcc || showBCC
+                ? '!bg-surface-gray-4 hover:bg-surface-gray-3'
+                : '!text-ink-gray-4',
+            ]"
+            @click="toggleBCC()"
+          />
+        </div>
       </div>
       <div
         v-if="showCC || cc"
