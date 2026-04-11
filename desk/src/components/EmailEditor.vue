@@ -68,13 +68,16 @@
     <template #editor>
       <div class="overflow-y-auto min-h-[7rem] max-h-[30vh]">
         <EditorContent :editor="editor" />
-        <div
-          v-if="quotedContent"
-          ref="quotedContentRef"
-          contenteditable="true"
-          class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
-          @input="onQuotedInput"
-        />
+        <div v-if="quotedContent" class="replied-content mx-6 md:mx-10 mb-2">
+          <label class="collapse" for="quoted-toggle">...</label>
+          <input id="quoted-toggle" class="replyCollapser" type="checkbox" />
+          <div
+            ref="quotedContentRef"
+            contenteditable="true"
+            class="prose !max-w-full mx-1 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
+            @input="onQuotedInput"
+          />
+        </div>
       </div>
     </template>
     <template #bottom>
@@ -419,6 +422,12 @@ async function removeAttachment(attachment) {
   await removeAttachmentFromServer(attachment.name);
 }
 
+function focusEditorAtStart() {
+  setTimeout(() => {
+    editorRef.value?.editor?.commands?.focus("start");
+  }, 0);
+}
+
 function addToReply(
   body: string,
   toEmails: string[],
@@ -437,18 +446,19 @@ function addToReply(
     });
   }
 
-  editorRef.value.editor.chain().clearContent().focus("start").run();
   nextTick(() => {
     newEmail.value = emailSignature.value
       ? emailSignature.value
       : editorRef.value.editor.getHTML();
   });
+  focusEditorAtStart();
 }
 
 function resetState() {
   newEmail.value = emailSignature.value ? emailSignature.value : null;
   attachments.value = [];
   quotedContent.value = null;
+  focusEditorAtStart();
 }
 
 function handleDiscard() {
@@ -460,6 +470,7 @@ function handleDiscard() {
   showCC.value = false;
   showBCC.value = false;
 
+  focusEditorAtStart();
   emit("discard");
 }
 
@@ -546,3 +557,32 @@ defineExpose({
   submitMail,
 });
 </script>
+
+<style scoped>
+.replied-content .collapse {
+  margin: 6px 0;
+  visibility: visible;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: larger;
+  font-weight: 700;
+  height: 12px;
+  line-height: 0.1;
+  background: #e8eaed;
+  width: 23px;
+  justify-content: center;
+  border-radius: 5px;
+}
+.replied-content .collapse:hover {
+  background: #dadce0;
+}
+.replied-content .collapse + input {
+  display: none;
+}
+.replied-content .collapse + input + div {
+  display: none;
+}
+.replied-content .collapse + input:checked + div {
+  display: block;
+}
+</style>

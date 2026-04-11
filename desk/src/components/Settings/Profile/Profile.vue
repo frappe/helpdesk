@@ -218,7 +218,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import {
   Avatar,
   Badge,
@@ -378,6 +378,9 @@ const userData = createResource({
     originalSignature.value = sig;
     enableSignature.value = !!sig;
     originalEnableSignature.value = !!sig;
+    nextTick(() => {
+      signatureEditorRef.value?.editor?.commands?.focus("end");
+    });
   },
 });
 
