@@ -193,17 +193,17 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import {
   Breadcrumbs,
+  call,
+  createResource,
   Dialog,
   Dropdown,
   FormControl,
   Tabs,
-  call,
-  createResource,
   toast,
 } from "frappe-ui";
-import { __ } from "@/translation";
 import {
   computed,
   ComputedRef,
@@ -231,19 +231,19 @@ import {
 } from "@/components/icons";
 import { TicketAgentActivities } from "@/components/ticket";
 
+import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import TicketAgentDetails from "@/components/ticket/TicketAgentDetails.vue";
 import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
 import { setupCustomizations } from "@/composables/formCustomisation";
 import { useScreenSize } from "@/composables/screen";
+import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { globalStore } from "@/stores/globalStore";
+import { useTelephonyStore } from "@/stores/telephony";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { TabObject, TicketTab } from "@/types";
-import { useActiveTabManager } from "@/composables/useActiveTabManager";
-import { useTelephonyStore } from "@/stores/telephony";
-import { storeToRefs } from "pinia";
 import { HDTicketStatus } from "@/types/doctypes";
-import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
+import { storeToRefs } from "pinia";
 
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
@@ -495,7 +495,7 @@ function updateTicket(fieldname: string, value: string) {
     onSuccess: () => {
       isLoading.value = false;
       ticket.reload();
-      toast.success(__("Ticket updated succesfully."));
+      toast.success(__("Ticket updated successfully."));
     },
   });
 }

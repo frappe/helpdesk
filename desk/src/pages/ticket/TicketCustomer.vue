@@ -274,7 +274,7 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       ticket.reload();
-      toast.success(__("Ticket updated succesfully."));
+      toast.success(__("Ticket updated successfully."));
     },
   });
 }

@@ -40,7 +40,7 @@
 
     <!-- Additional Fields -->
     <div
-      class="border-t flex-1 min-h-0 overflow-y-auto pb-3"
+      class="border-t flex-1 min-h-0 overflow-y-auto pb-3 space-y-1.5"
       v-if="Boolean(customFields.length)"
     >
       <template v-for="field in customFields">

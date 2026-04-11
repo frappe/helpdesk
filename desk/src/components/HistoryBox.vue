@@ -35,7 +35,7 @@
         </Tooltip>
       </div>
     </div>
-    <div v-if="show_others" class="space-y-2 mt-2">
+    <div v-if="show_others" class="space-y-2.5 mt-3.5">
       <div
         v-for="relatedActivity in relatedActivities"
         :key="relatedActivity.creation"

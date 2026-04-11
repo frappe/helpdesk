@@ -1,6 +1,6 @@
 <template>
   <div class="flex-col text-base flex-1" ref="commentBoxRef">
-    <div class="mb-2 ml-0.5 flex items-center justify-between">
+    <div class="mb-2 flex items-center justify-between">
       <div class="text-gray-600 flex items-center gap-2">
         <Avatar
           size="md"
@@ -72,7 +72,7 @@
         </template>
       </TextEditor>
       <div
-        class="flex flex-wrap gap-2"
+        class="flex flex-wrap gap-2 mb-2"
         v-if="!editable && Boolean(attachments.length)"
       >
         <AttachmentItem
@@ -83,7 +83,7 @@
         />
       </div>
       <div
-        class="flex items-center gap-2 mt-2"
+        class="flex items-center gap-2 my-2"
         v-if="!editable && enableCommentReactions"
       >
         <Popover>
