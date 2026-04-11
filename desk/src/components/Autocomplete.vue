@@ -21,7 +21,7 @@
                 >
                   {{ displayValue(selectedValue) }}
                 </span>
-                <span v-else class="text-base leading-5 text-gray-500">
+                <span v-else class="text-base leading-5 text-gray-600">
                   {{ placeholder || "" }}
                 </span>
               </div>
@@ -124,11 +124,11 @@
 import {
   Combobox,
   ComboboxInput,
-  ComboboxOptions,
   ComboboxOption,
+  ComboboxOptions,
 } from "@headlessui/vue";
-import { Popover, Button, FeatherIcon } from "frappe-ui";
-import { ref, computed, useAttrs, useSlots, watch, nextTick } from "vue";
+import { FeatherIcon, Popover } from "frappe-ui";
+import { computed, nextTick, ref, useAttrs, useSlots, watch } from "vue";
 
 const props = defineProps({
   modelValue: {

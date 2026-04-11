@@ -1,5 +1,5 @@
 <template>
-  <div class="comm-area">
+  <div class="comm-area" resizable="true">
     <div
       class="flex justify-between gap-3 border-t px-6 md:px-5 py-4 md:py-2.5"
     >
