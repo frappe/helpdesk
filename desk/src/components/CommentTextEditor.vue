@@ -5,7 +5,7 @@
     :editor-class="[
       'prose-sm max-w-none',
       editable &&
-        'min-h-[7rem]  mx-5 max-h-[50vh] overflow-y-auto border-t py-3',
+        'min-h-[7rem]  mx-5 max-h-[44vh] overflow-y-auto border-t py-3',
       getFontFamily(newComment),
     ]"
     :content="newComment"
@@ -18,25 +18,25 @@
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #bottom>
+      <!-- Attachments -->
+      <div class="flex flex-wrap gap-2 my-2 ml-5">
+        <AttachmentItem
+          v-for="a in attachments"
+          :key="a.file_url"
+          :label="a.file_name"
+          :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
+        >
+          <template #suffix>
+            <FeatherIcon
+              class="h-3.5"
+              name="x"
+              @click.stop="removeAttachment(a)"
+            />
+          </template>
+        </AttachmentItem>
+      </div>
       <div v-if="editable" class="flex flex-col gap-2 border-t">
         <div class="px-5">
-          <!-- Attachments -->
-          <div class="flex flex-wrap gap-2">
-            <AttachmentItem
-              v-for="a in attachments"
-              :key="a.file_url"
-              :label="a.file_name"
-              :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
-            >
-              <template #suffix>
-                <FeatherIcon
-                  class="h-3.5"
-                  name="x"
-                  @click.stop="removeAttachment(a)"
-                />
-              </template>
-            </AttachmentItem>
-          </div>
           <!-- Fixed Menu -->
           <div class="flex justify-between overflow-hidden py-2.5">
             <div class="flex items-center overflow-x-auto w-[60%]">

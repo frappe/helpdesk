@@ -62,7 +62,7 @@
             </div>
           </div>
           <div
-            class="mb-4 flex flex-1"
+            class="mb-4 flex flex-1 -mt-0.5"
             :class="[
               i == activities.length - 1 && 'mb-5',
               !['email', 'feedback', 'call', 'comment'].includes(

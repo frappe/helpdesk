@@ -46,6 +46,7 @@
           <Badge
             :label="firstResponse.label"
             variant="subtle"
+            class="mt-[1px]"
             :theme="firstResponse.color"
           />
         </Tooltip>
@@ -64,6 +65,7 @@
             v-if="resolutionBy"
             :label="resolutionBy.label"
             variant="subtle"
+            class="mt-[1px]"
             :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
             :class="
               resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'

@@ -37,7 +37,7 @@
       </div>
       <div
         v-if="showCC || cc"
-        class="mx-10 flex items-center gap-2 py-2.5"
+        class="mx-5 flex items-center gap-2 py-2.5"
         :class="cc || showCC ? 'border-b' : ''"
       >
         <span class="text-xs text-gray-500">CC:</span>
@@ -51,7 +51,7 @@
       </div>
       <div
         v-if="showBCC || bcc"
-        class="mx-10 flex items-center gap-2 py-2.5"
+        class="mx-5 flex items-center gap-2 py-2.5"
         :class="bcc || showBCC ? 'border-b' : ''"
       >
         <span class="text-xs text-gray-500">BCC:</span>
@@ -72,14 +72,14 @@
           v-if="quotedContent"
           ref="quotedContentRef"
           contenteditable="true"
-          class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
+          class="prose !max-w-full mx-6 md:mx-5 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
           @input="onQuotedInput"
         />
       </div>
     </template>
     <template #bottom>
       <!-- Attachments -->
-      <div class="flex flex-wrap gap-2 px-10">
+      <div class="flex flex-wrap gap-2 px-5 my-2">
         <AttachmentItem
           v-for="a in attachments"
           :key="a.file_url"

@@ -1,6 +1,6 @@
 <template>
   <div class="flex-col text-base flex-1" ref="commentBoxRef">
-    <div class="mb-1 ml-0.5 flex items-center justify-between">
+    <div class="mb-2 ml-0.5 flex items-center justify-between">
       <div class="text-gray-600 flex items-center gap-2">
         <Avatar
           size="md"
@@ -37,7 +37,7 @@
     </div>
     <div
       :id="`comment-${name}`"
-      class="rounded-md bg-surface-gray-1 transition-colors px-3 py-[6px] pt-1"
+      class="rounded-md bg-surface-gray-1 transition-colors px-3 py-1.5"
     >
       <TextEditor
         :editor-class="[
@@ -337,6 +337,7 @@ function handleSaveComment() {
   );
 }
 onMounted(() => {
+  // hack to persist the width of comment box to prevent it from resizing when the content is updated
   commentBoxRef.value.style.width = "0px";
 });
 </script>

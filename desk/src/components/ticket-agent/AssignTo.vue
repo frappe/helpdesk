@@ -14,7 +14,7 @@
           class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full"
           @click="togglePopover()"
         >
-          <div class="flex items-center min-h-[20px] gap-2 w-full">
+          <div class="flex items-center min-h-5 gap-2 w-full">
             <template v-if="localAssignees.length > 0">
               <MultipleAvatar
                 :avatars="localAssignees.map((a) => a.name)"
@@ -29,13 +29,13 @@
             </template>
             <template v-else>
               <span class="text-ink-gray-5">{{ __("No one") }}</span>
-              <span
+              <!-- <span
                 v-if="!popoverIsOpen"
                 class="text-xs text-ink-gray-6 hover:text-ink-gray-8 cursor-pointer underline ml-auto"
                 @click.stop="assignSelf"
               >
                 {{ __("Assign yourself") }}
-              </span>
+              </span> -->
             </template>
           </div>
           <template #suffix>
