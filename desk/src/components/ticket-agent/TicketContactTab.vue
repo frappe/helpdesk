@@ -81,9 +81,9 @@
                   {{ section.label }}
                 </span>
               </Tooltip>
-              <LucideChevronDown
+              <LucideChevronRight
                 class="size-4 text-ink-gray-6 cursor-pointer"
-                :class="{ 'rotate-180': opened }"
+                :class="{ 'rotate-90': opened }"
                 @click="toggle"
               />
             </div>

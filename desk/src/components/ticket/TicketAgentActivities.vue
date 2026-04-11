@@ -62,7 +62,7 @@
             </div>
           </div>
           <div
-            class="mb-4 flex flex-1 -mt-0.5"
+            class="mb-4 flex flex-1"
             :class="[
               i == activities.length - 1 && 'mb-5',
               !['email', 'feedback', 'call', 'comment'].includes(
@@ -202,14 +202,13 @@ function scrollToLatestActivity() {
     return;
   }
   setTimeout(() => {
-    let el;
+    let el: HTMLElement | null;
     let e = document.getElementsByClassName("activity");
-    el = e[e.length - 1];
+    el = e[e.length - 1] as HTMLElement;
     if (el && !isElementInViewport(el)) {
-      el.scrollIntoViewIfNeeded();
       el.focus();
     }
-  }, 500);
+  }, 200);
 }
 function scrollToHash() {
   const hash = route.hash;

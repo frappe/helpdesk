@@ -70,7 +70,6 @@ function getIcon() {
   else if (isSpreadsheet) return LucideFileSpreadsheet;
   else return LucideFile;
 }
-console.log(props.url);
 
 function toggleDialog() {
   if (!isShowable) return;
