@@ -378,9 +378,6 @@ const userData = createResource({
     originalSignature.value = sig;
     enableSignature.value = !!sig;
     originalEnableSignature.value = !!sig;
-    nextTick(() => {
-      signatureEditorRef.value?.editor?.commands?.focus("end");
-    });
   },
 });
 
