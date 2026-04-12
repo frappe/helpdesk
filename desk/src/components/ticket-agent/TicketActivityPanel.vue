@@ -7,7 +7,7 @@
   >
     <template #tab-panel="{ tab }">
       <TicketAgentActivities
-        v-if="Boolean(activities.data)"
+        v-if="Boolean(activities.data) && !activities.loading"
         ref="ticketAgentActivitiesRef"
         :activities="filterActivities(tab.name as TicketTab)"
         :title="tab.label"
@@ -74,8 +74,8 @@ const CommunicationArea = defineAsyncComponent(
   () => import("@/components/CommunicationArea.vue")
 );
 
-const ticket = inject(TicketSymbol);
-const activities = inject(ActivitiesSymbol);
+const ticket = inject(TicketSymbol)!;
+const activities = inject(ActivitiesSymbol)!;
 
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
