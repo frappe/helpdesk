@@ -20,11 +20,24 @@ class TestHDAgent(FrappeTestCase):
                     "send_welcome_email": 0,
                 }
             ).insert(ignore_permissions=True)
+        else:
+            frappe.get_doc("User", self.test_user)
+            
+        frappe.get_doc("User", self.test_user).remove_roles("System Manager", "Agent Manager")
+            
+    def tearDown(self):
+        frappe.set_user("Administrator")
+        frappe.delete_doc("User", self.test_user, force=True, ignore_missing=True)
 
     def test_unauthorized_role_update(self):
         frappe.set_user(self.test_user)
+        
+        frappe.flags.in_test = False
 
-        with self.assertRaises(frappe.PermissionError):
-            update_agent_role(self.test_user, "System Manager")
+        try:
+            with self.assertRaises(frappe.PermissionError):
+                update_agent_role(self.test_user, "System Manager")
+        finally:
+            frappe.flags.in_test = True
 
         frappe.set_user("Administrator")
