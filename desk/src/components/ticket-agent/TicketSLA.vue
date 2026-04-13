@@ -2,7 +2,7 @@
   <!-- Teleport to App Header -->
   <teleport to="#app-header">
     <div
-      class="flex items-center mx-5 md:mr-0 text-p-sm gap-3 text-[14px] mb-[13px]"
+      class="flex items-center mx-5 md:mr-0 text-p-sm gap-3 text-[14px] mb-2"
     >
       <!-- Source -->
       <div class="flex items-center gap-1">
