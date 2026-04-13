@@ -1166,8 +1166,6 @@ class HDTicket(Document):
         for tag in soup.find_all(["img", "video"]):
             if tag.name == "img":
                 tag["embed"] = tag.get("src")
-                tag["width"] = "80%"
-                tag["height"] = "80%"
             elif tag.name == "video":
                 tag["embed"] = tag.get("src")
 
