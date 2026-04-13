@@ -39,7 +39,7 @@ class HasMentions:
             already_notified = set()
 
         for mention in current_mentions:
-            if mention.type == "group":
+            if mention.type == "team":
                 users_to_notify = frappe.get_all(
                     "HD Team Member",
                     filters={"parent": mention.email},

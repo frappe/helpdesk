@@ -121,7 +121,7 @@ def extract_mentions(html):
     mentions = []
     for d in soup.find_all("span", attrs={"data-type": "mention"}):
         email = d.get("data-id")
-        mention_type = "user" if "@" in email else "group"
+        mention_type = "user" if "@" in email else "team"
         mentions.append(
             frappe._dict(full_name=d.get("data-label"), email=email, type=mention_type)
         )
