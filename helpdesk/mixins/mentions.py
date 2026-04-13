@@ -41,7 +41,7 @@ class HasMentions:
         for mention in current_mentions:
             if mention.type == "group":
                 users_to_notify = frappe.get_all(
-                    "User Group Member",
+                    "HD Team Member",
                     filters={"parent": mention.email},
                     pluck="user",
                 )

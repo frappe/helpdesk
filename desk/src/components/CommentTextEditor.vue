@@ -1,6 +1,6 @@
 <template>
   <TextEditor
-    v-if="agentsList.data"
+    v-if="agentsList.data && hdTeams.data"
     ref="editorRef"
     :editor-class="[
       'prose-sm max-w-none',
@@ -128,9 +128,9 @@ const { updateOnboardingStep } = useOnboarding("helpdesk");
 const {
   agents: agentsList,
   dropdown,
-  userGroups,
+  hdTeams,
 } = storeToRefs(useAgentStore());
-const mentionsGetter = () => dropdown.value ?? [];
+const mentionsGetter = computed(() => dropdown.value ?? []);
 const { isManager } = useAuthStore();
 
 const props = defineProps({
@@ -232,7 +232,7 @@ onMounted(() => {
   ) {
     agentsList.value.fetch();
   }
-  userGroups.value.fetch();
+  hdTeams.value.fetch();
 });
 
 defineExpose({

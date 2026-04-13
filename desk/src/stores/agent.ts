@@ -10,8 +10,8 @@ export const useAgentStore = defineStore("agent", () => {
     pageLength: 99999,
   });
 
-  const userGroups = createListResource({
-    doctype: "User Group",
+  const hdTeams = createListResource({
+    doctype: "HD Team",
     fields: ["name"],
     pageLength: 99999,
   });
@@ -21,7 +21,7 @@ export const useAgentStore = defineStore("agent", () => {
       label: o.agent_name,
       value: o.name,
     })) ?? []),
-    ...(userGroups.data?.map((g) => ({
+    ...(hdTeams.data?.map((g) => ({
       label: g.name,
       value: g.name,
     })) ?? []),
@@ -36,7 +36,7 @@ export const useAgentStore = defineStore("agent", () => {
   return {
     dropdown,
     agents,
-    userGroups,
+    hdTeams,
     searchAgents,
   };
 });
