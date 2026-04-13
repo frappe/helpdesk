@@ -63,10 +63,6 @@ export function timeAgo(date) {
   return prettyDate(date);
 }
 
-export function getBrowserTimezone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-
 export function prettyDate(date, mini = false) {
   if (!date) return "";
 
