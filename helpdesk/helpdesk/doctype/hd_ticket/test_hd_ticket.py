@@ -743,4 +743,3 @@ class TestHDTicket(FrappeTestCase):
             get_recent_similar_tickets(ticket.name)
 
         frappe.set_user("Administrator")
-
