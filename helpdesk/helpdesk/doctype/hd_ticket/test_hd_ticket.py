@@ -633,11 +633,6 @@ class TestHDTicket(FrappeTestCase):
             ticket2_doc.name,
         )
 
-    def tearDown(self):
-        remove_holidays()
-        frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
-        frappe.delete_doc("HD Ticket Status", "New", force=True)
-
     def test_ticket_inside_working_hours(self):
         inside_working_hour = get_current_week_monday(hours=14)
         with self.freeze_time(inside_working_hour):
@@ -710,6 +705,7 @@ class TestHDTicket(FrappeTestCase):
             self.assertFalse(banner_shown)
 
     def tearDown(self):
+        frappe.set_user("Administrator")
         remove_holidays()
         frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
         frappe.delete_doc("HD Ticket Status", "New", force=True)
