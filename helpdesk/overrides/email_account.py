@@ -13,8 +13,7 @@ class CustomInboundMail(InboundMail):
     """
     Extend InboundMail with robust thread stitching for forwarded emails.
        1. Run the standard Frappe parent_communication lookups first (In-Reply-To → Communication, EmailQueue, communication-name fallback)
-       2. If no parent found, probe In-Reply-To against EmailQueue directly (catches replies to agent-sent emails when site name != email domain)
-       3. If still no parent, use the References header from emails, which may contain multiple message IDs in a thread
+       2. If still no parent, use the References header from emails, which may contain multiple message IDs in a thread
     """
 
     def _find_communication_by_message_id(self, msg_id: str):
@@ -38,29 +37,22 @@ class CustomInboundMail(InboundMail):
         if self._parent_communication is not None:
             return self._parent_communication
 
-        # Run the standard Frappe lookups first (In-Reply-To → Communication,
-        # EmailQueue, communication-name fallback)
+        # Run the standard Frappe lookup method first. Checks for finding in reply to in Communication then if not found it looks in EmailQueue
         result = super().parent_communication()
         if result:
             return result
 
-        # set parent communication to empty string if no parent found, to avoid repeated lookups on subsequent calls
-        self._parent_communication = None
+        # fallback: use the References header from emails
+        references_raw = self.mail.get("References") or ""
+        ref_ids = re.findall(r"<([^>]+)>", references_raw)
 
-        # fallback 1: compare In-Reply-To against sent emails in EmailQueue directly
-        communication = self._find_communication_by_message_id(self.in_reply_to)
+        for ref_id in reversed(ref_ids):
+            communication = self._find_communication_by_message_id(ref_id)
+            if communication:
+                self._parent_communication = communication
+                return self._parent_communication
 
-        # fallback 2: use the References header from emails
-        if not communication:
-            references_raw = self.mail.get("References") or ""
-            ref_ids = re.findall(r"<([^>]+)>", references_raw)
-
-            for ref_id in reversed(ref_ids):
-                communication = self._find_communication_by_message_id(ref_id)
-                if communication:
-                    break
-
-        self._parent_communication = communication or ""
+        self._parent_communication = ""
         return self._parent_communication
 
 
