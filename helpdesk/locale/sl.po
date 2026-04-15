@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-06 13:11\n"
+"PO-Revision-Date: 2026-04-15 14:31\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Slovenian\n"
 "MIME-Version: 1.0\n"
@@ -401,7 +401,7 @@ msgstr "Uporabi SLA za čas reševanja"
 #. Label of the apply_to (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply To"
-msgstr ""
+msgstr "Uporabi za"
 
 #. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -1076,7 +1076,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:136
 msgid "Collapse"
-msgstr ""
+msgstr "Strni"
 
 #. Label of the color (Color) field in DocType 'HD Service Holiday List'
 #. Label of the color (Select) field in DocType 'HD Ticket Status'
@@ -1127,11 +1127,11 @@ msgstr "Komentiral"
 #: desk/src/pages/ticket/MobileTicketAgent.vue:369
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Comments"
-msgstr ""
+msgstr "Komentarji"
 
 #: desk/src/components/modals/ShortcutsModal.vue:100
 msgid "Communication"
-msgstr ""
+msgstr "Komunikacija"
 
 #: desk/src/components/ticket/TicketSplitModal.vue:76
 msgid "Communication ID is required"
@@ -1139,7 +1139,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:209
 msgid "Completed"
-msgstr ""
+msgstr "Dokončano"
 
 #. Label of the condition (Code) field in DocType 'HD Service Level Agreement'
 #. Label of the condition_json (Code) field in DocType 'HD Service Level
@@ -1184,7 +1184,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:19
 msgid "Confirm Password"
-msgstr ""
+msgstr "Potrdite geslo"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:408
 msgid "Confirm overwrite"
@@ -1364,11 +1364,11 @@ msgstr "Cian"
 #: desk/src/components/layouts/Sidebar.vue:367
 #: desk/src/pages/knowledge-base/Article.vue:642
 msgid "Danger"
-msgstr ""
+msgstr "Nevarnost"
 
 #: desk/src/pages/dashboard/Dashboard.vue:576
 msgid "Dashboard"
-msgstr ""
+msgstr "Nadzorna plošča"
 
 #: desk/src/pages/home/Home.vue:264 desk/src/pages/home/Home.vue:286
 msgid "Dashboard saved"
@@ -1390,7 +1390,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAccountCard.vue:53
 msgid "Default Inbox"
-msgstr ""
+msgstr "Privzeto Prejeto"
 
 #. Label of the default_priority (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -1409,11 +1409,11 @@ msgstr "Privzeti Sporazum o Ravni Storitev (SLA)"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:56
 msgid "Default Sending"
-msgstr ""
+msgstr "Privzeto pošiljanje"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:50
 msgid "Default Sending and Inbox"
-msgstr ""
+msgstr "Privzeto pošiljanje in Prejeto"
 
 #. Label of the default_ticket_status (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -1619,7 +1619,7 @@ msgstr ""
 #. Label of the document_type (Link) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Document Type"
-msgstr ""
+msgstr "Tip Dokumenta"
 
 #. Label of the domain (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -1667,7 +1667,7 @@ msgstr ""
 #: desk/src/pages/call-logs/CallLogModal.vue:64
 #: desk/src/pages/call-logs/CallLogModal.vue:68
 msgid "Duration"
-msgstr ""
+msgstr "Trajanje"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:388
 msgid "Duration is required"
