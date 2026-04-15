@@ -11,6 +11,7 @@ helpdesk.patches.rename_canned_response_to_saved_reply
 helpdesk.patches.alter_hd_ticket_name_to_varchar
 
 [post_model_sync]
+helpdesk.patches.backfill_legacy_hd_tickets
 execute:frappe.delete_doc("Workspace", "Frappe Desk", force=True)
 helpdesk.patches.add_priority_integer
 helpdesk.patches.template_remove_default_fields
