@@ -1,6 +1,6 @@
 <template>
   <div
-    class="md:mx-10 md:my-4 flex items-center justify-between text-lg font-medium mx-6 mb-4 !mt-8"
+    class="md:mx-5 md:my-4 flex items-center justify-between text-lg font-medium mx-6 !mb-0 !my-3"
   >
     <div class="flex h-8 items-center text-xl font-semibold text-gray-800">
       {{ title }}
@@ -68,12 +68,12 @@
 <script setup lang="ts">
 import { CommentIcon, EmailIcon, PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
-import { useTelephonyStore } from "@/stores/telephony";
 import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
+import { useTelephonyStore } from "@/stores/telephony";
+import { __ } from "@/translation";
 import { Dropdown } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, h, inject, ref, Ref } from "vue";
-import { __ } from "@/translation";
 defineProps({
   title: {
     type: String,

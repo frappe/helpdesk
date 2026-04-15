@@ -660,6 +660,12 @@ export type DropdownOption = {
   value: string | number;
 };
 
+export interface AgentOption {
+  value: string;
+  label: string;
+  image?: string;
+}
+
 // symbols
 export const TicketSymbol: InjectionKey<
   ComputedRef<DocumentResource<HDTicket>>
@@ -713,5 +719,6 @@ declare global {
     time_format: string;
     session_user: string;
     timezone: Record<"user" | "system", string>;
+    agent: string | null;
   }
 }

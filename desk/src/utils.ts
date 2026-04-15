@@ -1,13 +1,6 @@
 import type { DropdownOption } from "@/types";
-import { useClipboard, useDateFormat } from "@vueuse/core";
-import {
-  FeatherIcon,
-  call,
-  dayjsLocal,
-  toast,
-  useFileUpload,
-  getConfig,
-} from "frappe-ui";
+import { useClipboard } from "@vueuse/core";
+import { FeatherIcon, call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
@@ -68,10 +61,6 @@ export function dateFormat(date, format?: string) {
 
 export function timeAgo(date) {
   return prettyDate(date);
-}
-
-export function getBrowserTimezone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
 export function prettyDate(date, mini = false) {
@@ -761,4 +750,9 @@ export function parseApiOptions(
         }
       }) || []
   );
+}
+
+export function openContact(name: string) {
+  const url = window.location.origin + "/app/contact/" + name;
+  window.open(url, "_blank");
 }

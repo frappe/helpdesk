@@ -9,14 +9,14 @@
 import { Dialogs } from "@/components/dialogs";
 import { useConfigStore } from "@/stores/config";
 import { FrappeUIProvider, toast, setConfig } from "frappe-ui";
-import { computed, defineAsyncComponent, h, onMounted, onUnmounted } from "vue";
+import { computed, defineAsyncComponent, h, onMounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
 import { useAuthStore } from "./stores/auth";
 import { useFavicon } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { __ } from "./translation";
-import { isCustomerPortal, getBrowserTimezone } from "./utils";
+import { isCustomerPortal } from "./utils";
 
 const configStore = useConfigStore();
 const { favicon } = storeToRefs(configStore);

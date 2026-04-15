@@ -34,6 +34,7 @@ def get_boot():
             "setup_complete": cint(frappe.get_system_settings("setup_complete")),
             "is_fc_site": is_fc_site(),
             "session_user": frappe.session.user,
+            "agent": get_agent_name(),
             "date_format": frappe.get_system_settings("date_format"),
             "time_format": frappe.get_system_settings("time_format"),
             "timezone": {
@@ -47,3 +48,10 @@ def get_boot():
 
 def get_default_route():
     return "/helpdesk"
+
+
+def get_agent_name():
+    agent = frappe.db.get_value("HD Agent", {"user": frappe.session.user}, "name")
+    if not agent:
+        return None
+    return agent

@@ -2,7 +2,7 @@
   <div v-if="ticket.data" class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" />
+        <Breadcrumbs :items="breadcrumbs" class="-ml-0.5" />
       </template>
       <template #right-header>
         <CustomActions
@@ -274,7 +274,7 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       ticket.reload();
-      toast.success(__("Ticket updated succesfully."));
+      toast.success(__("Ticket updated successfully."));
     },
   });
 }

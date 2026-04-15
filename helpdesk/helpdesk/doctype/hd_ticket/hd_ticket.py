@@ -1012,7 +1012,7 @@ class HDTicket(Document):
                 "width": "8rem",
             },
             {
-                "label": "First response",
+                "label": "First Response",
                 "type": "Datetime",
                 "key": "response_by",
                 "width": "8rem",
