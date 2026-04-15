@@ -75,8 +75,18 @@
           class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
           @input="onQuotedInput"
         />
+        <div
+          v-if="agentSignature.data?.signature"
+          class="mx-6 md:mx-10 mt-2 pt-2 border-t border-gray-200"
+        >
+          <div
+            class="prose-sm text-ink-gray-6 text-sm pointer-events-none select-none opacity-70"
+            v-html="agentSignature.data.signature"
+          />
+        </div>
       </div>
     </template>
+
     <template #bottom>
       <!-- Attachments -->
       <div class="flex flex-wrap gap-2 px-10">
@@ -262,7 +272,20 @@ const quotedContent = useStorage<null | string>(
 );
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { isManager } = useAuthStore();
+const { isManager, userId } = useAuthStore();
+
+// Fetch current agent's signature
+const agentSignature = createResource({
+  url: "frappe.client.get",
+  auto: true,
+  makeParams() {
+    return {
+      doctype: "HD Agent",
+      name: userId,
+      fields: ["signature"],
+    };
+  },
+});
 
 // Initialize typing composable
 const { onUserType, cleanup } = useTyping(props.ticketId);
@@ -318,10 +341,14 @@ const sendMail = createResource({
       to: toEmailsClone.value.join(","),
       cc: ccEmailsClone.value?.join(","),
       bcc: bccEmailsClone.value?.join(","),
+      // Append signature 
       message:
         newEmail.value +
         (quotedContentRef.value
           ? `<p class="reply-to-content"><p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
+          : "") +
+        (agentSignature.data?.signature
+          ? `<br/>${agentSignature.data.signature}`
           : ""),
     },
   }),
@@ -428,7 +455,6 @@ function handleDiscard() {
 
   emit("discard");
 }
-
 //on load set quoted content from storage
 onMounted(() => {
   if (quotedContent.value) {

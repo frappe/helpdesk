@@ -165,6 +165,41 @@
             class="w-40"
           />
         </div>
+        <div class="flex items-center justify-between mt-6">
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-medium text-ink-gray-8">
+              {{ __("Availability Status") }}
+            </span>
+            <span class="text-p-sm text-ink-gray-6">
+              {{ __("Set your availability for ticket assignment.") }}
+            </span>
+          </div>
+          <FormControl
+            type="select"
+            :label="__('Availability Status')"
+            :options="['Available', 'Away']"
+            v-model="availabilityStatus"
+            class="w-40"
+          />
+        </div>
+        <div class="flex flex-col gap-2 mt-6">
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-medium text-ink-gray-8">
+              {{ __("Signature") }}
+            </span>
+            <span class="text-p-sm text-ink-gray-6">
+              {{ __("This signature will appear on your replies.") }}
+            </span>
+          </div>
+          <TextEditor
+            :content="signature"
+            @change="(val) => (signature = val)"
+            :editable="true"
+            :placeholder="__('Write your signature...')"
+            editor-class="min-h-[120px] prose-sm max-w-none border border-outline-gray-2 rounded-lg p-2"
+          />
+        </div>
+
       </div>
     </template>
   </SettingsLayoutBase>
@@ -183,7 +218,9 @@ import {
   createResource,
   Dropdown,
   FileUploader,
+  FormControl,
   LoadingIndicator,
+  TextEditor,
   toast,
 } from "frappe-ui";
 import { Autocomplete } from "@/components";
@@ -207,6 +244,8 @@ const showChangePasswordModal = ref(false);
 const language = ref(auth.language);
 const timezone = ref(auth.timezone);
 const timezoneOptions = ref([]);
+const availabilityStatus = ref("Available");
+const signature = ref("");
 
 const isLanguageChanged = computed(() => {
   return language.value !== auth?.language;
@@ -221,12 +260,10 @@ const isAccountInfoDirty = computed(() => {
   if (!agentName) return false;
   const isDirty =
     profile.value.firstName !== agentName[0] ||
-    profile.value.lastName !== (agentName[1] || "");
-  if (isDirty) {
-    disableSettingModalOutsideClick.value = true;
-  } else {
-    disableSettingModalOutsideClick.value = false;
-  }
+    profile.value.lastName !== (agentName[1] || "") ||
+    availabilityStatus.value !== (agentData.data?.availability_status || "Available") ||
+    signature.value !== (agentData.data?.signature || "");
+  disableSettingModalOutsideClick.value = isDirty;
   return isDirty;
 });
 
@@ -247,6 +284,8 @@ const agentData = createResource({
       lastName: fullName[1] || "",
       userImage: data.user_image,
     };
+    availabilityStatus.value = data.availability_status || "Available";
+    signature.value = data.signature || "";
   },
 });
 
@@ -275,6 +314,8 @@ const setAgent = createResource({
       fieldname: {
         agent_name: `${profile.value.firstName} ${profile.value.lastName}`,
         user_image: profile.value.userImage,
+        availability_status: availabilityStatus.value,
+        signature: signature.value,
       },
     };
   },

@@ -11,6 +11,7 @@
       :placeholder="__('John Doe')"
       :filters="{
         is_active: true,
+        availability_status: 'Available',
         name: ['not in', assignees.map((a) => a.name)],
       }"
       :hideMe="true"
