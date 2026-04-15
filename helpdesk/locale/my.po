@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-06 13:11\n"
+"PO-Revision-Date: 2026-04-15 14:31\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Burmese\n"
 "MIME-Version: 1.0\n"
@@ -106,7 +106,7 @@ msgstr ""
 
 #: helpdesk/api/knowledge_base.py:15
 msgid "Access denied"
-msgstr ""
+msgstr "အသုံးပြုခွင့်ကို ငြင်းပယ်ထားသည်။"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:337
 msgid "Access only this team's tickets"
@@ -121,16 +121,16 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:71
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Acknowledgement"
-msgstr ""
+msgstr "အသိအမှတ်ပြုခြင်း"
 
 #. Label of the action (Data) field in DocType 'HD Ticket Activity'
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "Action"
-msgstr ""
+msgstr "လုပ်ဆောင်ချက်"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:22
 msgid "Action Required"
-msgstr ""
+msgstr "လုပ်ဆောင်ရန် လိုအပ်ပါသည်။"
 
 #. Description of the 'On click (Javascript)' (Code) field in DocType 'HD
 #. Action'
@@ -140,11 +140,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentSchedule.vue:42
 msgid "Active"
-msgstr ""
+msgstr "အသက်ဝင်နေသည်"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:359
 msgid "Activity"
-msgstr ""
+msgstr "လှုပ်ရှားမှု"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:9
 msgid "Add Assignee"
@@ -166,7 +166,7 @@ msgstr ""
 #. Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add Weekly Holidays"
-msgstr ""
+msgstr "အပါတ်စဉ် ပိတ်ရက်များထည့်ပါ။"
 
 #: desk/src/components/layouts/Sidebar.vue:481
 msgid "Add a comment on a ticket"
@@ -174,11 +174,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:17
 msgid "Add a condition"
-msgstr ""
+msgstr "အခြေအနေတစ်ခုထည့်ပါ။"
 
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:14
 msgid "Add a custom condition"
-msgstr ""
+msgstr "စိတ်ကြိုက်အခြေအနေတစ်ခုထည့်ပါ။"
 
 #: desk/src/pages/home/Home.vue:91
 msgid "Add charts to get started"
@@ -188,7 +188,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:66
 #: desk/src/components/Settings/Sla/SlaAssignmentConditions.vue:25
 msgid "Add condition"
-msgstr ""
+msgstr "အခြေအနေထည့်ပါ။"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesSection.vue:72
 msgid "Add condition group"
@@ -225,23 +225,23 @@ msgstr ""
 #. Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add to Holidays"
-msgstr ""
+msgstr "ပိတ်ရက် ထည့်သွင်းမည်"
 
 #: desk/src/components/Settings/Agents.vue:4
 msgid "Add, manage agents and assign roles to them."
-msgstr ""
+msgstr " ကိုယ်စားလှယ်များထည့်သွင်းပြီး၊ လုပ်ပိုင်ခွင့်များသတ်မှတ်ပါ။"
 
 #. Label of the about (Code) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Additional Information"
-msgstr ""
+msgstr "နောက်ထပ်အချက်အလက်များ"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Administrator"
-msgstr ""
+msgstr "စီမံခန့်ခွဲသူ"
 
 #. Name of a role
 #. Label of the to_agent (Link) field in DocType 'HD Escalation Rule'
@@ -268,7 +268,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Agent"
-msgstr ""
+msgstr "ကိုယ်စားလှယ်"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -290,12 +290,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Agent Manager"
-msgstr ""
+msgstr "ကိုယ်စားလှယ် မန်နေဂျာ"
 
 #. Label of the agent_name (Data) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Agent Name"
-msgstr ""
+msgstr "ကိုယ်စားလှယ်အမည်"
 
 #: desk/src/components/Settings/Agents.vue:117
 msgid "Agent name"
@@ -303,7 +303,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Agents.vue:3
 msgid "Agents"
-msgstr ""
+msgstr "ကိုယ်စားလှယ်များ"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:70
 msgid "Agents will no longer be able to view and create saved replies with global scope."
@@ -358,7 +358,7 @@ msgstr ""
 #: desk/src/components/Settings/General/components/TicketSettings.vue:109
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Allow anyone to create tickets"
-msgstr ""
+msgstr "မည်သူမဆို လက်မှတ်ဖန်တီးခွင့်ပြုမည်။"
 
 #. Description of the 'Enable comment reactions' (Check) field in DocType 'HD
 #. Settings'
@@ -401,12 +401,12 @@ msgstr ""
 #. Label of the apply_to (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply To"
-msgstr ""
+msgstr "သို့ လျှောက်ထားပါ။"
 
 #. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply on new page"
-msgstr ""
+msgstr "စာမျက်နှာအသစ်တွင်လျှောက်ထားပါ။"
 
 #. Label of the enable_outside_hours_banner (Check) field in DocType 'HD
 #. Settings'
@@ -424,7 +424,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:447
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Archived"
-msgstr ""
+msgstr "မှတ်တမ်းတင်ပြီး"
 
 #: desk/src/components/Settings/SettingsModal.vue:61
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
@@ -468,7 +468,7 @@ msgstr ""
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:239
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:198
 msgid "Are you sure you want to go back? Unsaved changes will be lost."
-msgstr ""
+msgstr "မူလအခြေအနေသို့ပြန်သွားလိုပါသလား။ လက်ရှိမသိမ်းဆည်းရသေးသော အပြောင်းအလဲများ ပျောက်ဆုံးသွားမည်ဖြစ်ပါသည်။"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:162
 msgid "Are you sure you want to leave? Unsaved changes will be lost."
@@ -486,7 +486,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:110
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "Article"
-msgstr ""
+msgstr "ဆောင်းပါး"
 
 #: desk/src/pages/knowledge-base/Article.vue:503
 msgid "Article body cannot be set as empty."
@@ -537,20 +537,20 @@ msgstr ""
 #: desk/src/components/ticket-agent/AssignToBody.vue:5
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Assign to"
-msgstr ""
+msgstr "တာဝန်ပေးရန်"
 
 #: desk/src/components/ticket-agent/AssignToBody.vue:65
 msgid "Assign to me"
-msgstr ""
+msgstr "ကိုယ့်ကိုကိုယ် တာဝန်ပေးပါ။"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:62
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:49
 msgid "Assigned To"
-msgstr ""
+msgstr "တာဝန်ပေးရန်"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
 msgid "Assignee Rules"
-msgstr ""
+msgstr "တာဝန်ပေးမည့် သတ်မှတ်ချက်များ"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:80
 msgid "Assignee's updated successfully."
@@ -563,7 +563,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Assignment"
-msgstr ""
+msgstr "တာဝန်ပေးခြင်း"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:137
 msgid "Assignment Condition"
@@ -581,14 +581,14 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Assignment Rule"
-msgstr ""
+msgstr "တာဝန်ပေးခြင်း စည်းမျဉ်း"
 
 #. Label of the assignment_rules_section (Section Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:5
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Assignment Rules"
-msgstr ""
+msgstr "တာဝန်ပေးခြင်း စည်းမျဉ်းများ"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:11
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
@@ -651,12 +651,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Attachment"
-msgstr ""
+msgstr "ပူးတွဲပါ"
 
 #. Label of the author (Link) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Author"
-msgstr ""
+msgstr "စာရေးသူ"
 
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:80
@@ -783,12 +783,12 @@ msgstr ""
 #. Label of the base_url (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Base URL"
-msgstr ""
+msgstr "အခြေခံ URL"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:9
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:9
 msgid "Based On"
-msgstr ""
+msgstr "အခြေခံထားသော"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:34
 msgid "Based on your HR Policy, select your leave allocation period's end date"
@@ -806,17 +806,17 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Blue"
-msgstr ""
+msgstr "အပြာ"
 
 #: desk/src/components/Settings/General/components/Branding.vue:10
 msgid "Brand name"
-msgstr ""
+msgstr "အမှတ်တံဆိပ်အမည်"
 
 #. Label of the branding_tab (Tab Break) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:4
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Branding"
-msgstr ""
+msgstr "အမှတ်တံဆိပ်တည်ဆောက်ခြင်း"
 
 #: desk/src/components/Settings/Holiday/Holidays.vue:3
 msgid "Business Holidays"
@@ -829,7 +829,7 @@ msgstr ""
 #. Label of the button_section (Section Break) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Button"
-msgstr ""
+msgstr "ခလုတ်"
 
 #: desk/src/components/ticket/ExportModal.vue:15
 msgid "CSV"
@@ -873,7 +873,7 @@ msgstr ""
 
 #: desk/src/components/ListViewBuilder.vue:655 desk/src/pages/home/Home.vue:44
 msgid "Cancel"
-msgstr ""
+msgstr "မလုပ်တော့ပါ"
 
 #: desk/src/components/Settings/InviteAgents.vue:57
 msgid "Cancel Invitation"
@@ -881,7 +881,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:214
 msgid "Canceled"
-msgstr ""
+msgstr "ပယ်ဖျက်ခဲ့သည်"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:511
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
@@ -909,7 +909,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Category"
-msgstr ""
+msgstr "အမျိုးအစား"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:171
 msgid "Category '{0}' link copied to clipboard"
@@ -939,7 +939,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:40
 msgid "Change"
-msgstr ""
+msgstr "အကြွေစေ့"
 
 #: desk/src/components/Settings/Profile/Profile.vue:131
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:2
@@ -1059,7 +1059,7 @@ msgstr ""
 #: desk/src/pages/ticket/MobileTicketAgent.vue:183
 #: desk/src/pages/ticket/TicketCustomer.vue:14
 msgid "Close"
-msgstr ""
+msgstr "ပိတ်မည်"
 
 #: desk/src/pages/ticket/TicketCustomer.vue:292
 msgid "Close Ticket"
@@ -1076,7 +1076,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:136
 msgid "Collapse"
-msgstr ""
+msgstr "ခေါက်သိမ်းရန်"
 
 #. Label of the color (Color) field in DocType 'HD Service Holiday List'
 #. Label of the color (Select) field in DocType 'HD Ticket Status'
@@ -1088,7 +1088,7 @@ msgstr "အရောင်"
 #. Label of the columns (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Columns"
-msgstr ""
+msgstr "ကော်လံများ"
 
 #: desk/src/components/Settings/InviteAgents.vue:15
 msgid "Comma separated emails to invite."
@@ -1098,7 +1098,7 @@ msgstr ""
 #: desk/src/components/ticket/ActivityHeader.vue:101
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Comment"
-msgstr ""
+msgstr "မှတ်ချက်"
 
 #: desk/src/components/CommentBox.vue:324
 msgid "Comment cannot be empty."
@@ -1127,11 +1127,11 @@ msgstr ""
 #: desk/src/pages/ticket/MobileTicketAgent.vue:369
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Comments"
-msgstr ""
+msgstr "မှတ်ချက်များ"
 
 #: desk/src/components/modals/ShortcutsModal.vue:100
 msgid "Communication"
-msgstr ""
+msgstr "ဆက်သွယ်ရေး"
 
 #: desk/src/components/ticket/TicketSplitModal.vue:76
 msgid "Communication ID is required"
@@ -1139,14 +1139,14 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:209
 msgid "Completed"
-msgstr ""
+msgstr "ပြီးဆုံးပြီ"
 
 #. Label of the condition (Code) field in DocType 'HD Service Level Agreement'
 #. Label of the condition_json (Code) field in DocType 'HD Service Level
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Condition"
-msgstr ""
+msgstr "အခြေအနေ"
 
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:3
 msgid "Configure your Exotel settings for Helpdesk."
@@ -1176,7 +1176,7 @@ msgstr ""
 #: desk/src/pages/ticket/TicketCustomer.vue:296
 #: desk/src/pages/ticket/Tickets.vue:380 desk/src/pages/ticket/Tickets.vue:502
 msgid "Confirm"
-msgstr ""
+msgstr "အတည်ပြုပါ"
 
 #: desk/src/components/ListViewBuilder.vue:639
 msgid "Confirm Changes"
@@ -1184,7 +1184,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:19
 msgid "Confirm Password"
-msgstr ""
+msgstr "စကားဝှက်ကို အတည်ပြုပါ"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:408
 msgid "Confirm overwrite"
@@ -1203,7 +1203,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:43
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:72
 msgid "Contact"
-msgstr ""
+msgstr "အဆက်အသွယ်"
 
 #. Label of the contact_html (HTML) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -1272,7 +1272,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
 #: desk/src/pages/knowledge-base/NewArticle.vue:31
 msgid "Create"
-msgstr ""
+msgstr "ဖန်တီးရန်"
 
 #: desk/src/components/layouts/Sidebar.vue:510
 #: desk/src/components/layouts/Sidebar.vue:516
@@ -1333,12 +1333,12 @@ msgstr ""
 #: desk/src/pages/desk/contact/ContactDialog.vue:59
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Customer"
-msgstr ""
+msgstr "ဝယ်သူ"
 
 #. Label of the customer_name (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Customer Name"
-msgstr ""
+msgstr "ဝယ်သူအမည်"
 
 #: desk/src/components/desk/global/NewCustomerDialog.vue:65
 msgid "Customer created successfully."
@@ -1359,16 +1359,16 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Cyan"
-msgstr ""
+msgstr "စိမ်းပြာရောင်"
 
 #: desk/src/components/layouts/Sidebar.vue:367
 #: desk/src/pages/knowledge-base/Article.vue:642
 msgid "Danger"
-msgstr ""
+msgstr "အန္တရာယ်"
 
 #: desk/src/pages/dashboard/Dashboard.vue:576
 msgid "Dashboard"
-msgstr ""
+msgstr "ဒက်ရှ်ဘုတ်"
 
 #: desk/src/pages/home/Home.vue:264 desk/src/pages/home/Home.vue:286
 msgid "Dashboard saved"
@@ -1390,7 +1390,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAccountCard.vue:53
 msgid "Default Inbox"
-msgstr ""
+msgstr "မူရင်း ဝင်စာပုံး"
 
 #. Label of the default_priority (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -1409,11 +1409,11 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAccountCard.vue:56
 msgid "Default Sending"
-msgstr ""
+msgstr "ပုံသေ ပို့ခြင်း"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:50
 msgid "Default Sending and Inbox"
-msgstr ""
+msgstr "ပုံသေ ပို့ခြင်းနှင့် ဝင်စာပုံး"
 
 #. Label of the default_ticket_status (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -1475,7 +1475,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:204
 #: desk/src/pages/ticket/Tickets.vue:486
 msgid "Delete"
-msgstr ""
+msgstr "ဖျက်မည်"
 
 #: desk/src/pages/ticket/Tickets.vue:482
 msgid "Delete View"
@@ -1517,7 +1517,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Description"
-msgstr ""
+msgstr "ဖော်ပြချက်"
 
 #. Label of the description_template (Text Editor) field in DocType 'HD Ticket
 #. Template'
@@ -1568,7 +1568,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Disabled"
-msgstr ""
+msgstr "ပိတ်ထားသည်"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:29
 msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
@@ -1576,7 +1576,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:29
 msgid "Discard"
-msgstr ""
+msgstr "ပယ်ရန်"
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:145
 msgid "Discard Article"
@@ -1619,7 +1619,7 @@ msgstr ""
 #. Label of the document_type (Link) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Document Type"
-msgstr ""
+msgstr "စာရွက်စာတမ်း အမျိုးအစား"
 
 #. Label of the domain (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -1628,7 +1628,7 @@ msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:32
 msgid "Download"
-msgstr ""
+msgstr "ဒေါင်းလုဒ်"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:443
@@ -1646,7 +1646,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:102
 #: desk/src/pages/ticket/Tickets.vue:403
 msgid "Duplicate"
-msgstr ""
+msgstr "ပွားယူမည်"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:53
 msgid "Duplicate Assignment Rule"
@@ -1667,7 +1667,7 @@ msgstr ""
 #: desk/src/pages/call-logs/CallLogModal.vue:64
 #: desk/src/pages/call-logs/CallLogModal.vue:68
 msgid "Duration"
-msgstr ""
+msgstr "ကြာချိန်"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:388
 msgid "Duration is required"
@@ -1681,7 +1681,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/Article.vue:610
 #: desk/src/pages/ticket/Tickets.vue:471
 msgid "Edit"
-msgstr ""
+msgstr "တည်းဖြတ်"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:221
 msgid "Edit Call Log"
@@ -1709,14 +1709,14 @@ msgstr ""
 #: desk/src/pages/SearchAgent.vue:184
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "Email"
-msgstr ""
+msgstr "အီးမေးလ်"
 
 #. Label of the email_account (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Email Account"
-msgstr ""
+msgstr "အီးမေးလ် အကောင့်"
 
 #: desk/src/components/Settings/EmailAccountList.vue:3
 msgid "Email Accounts"
@@ -1736,7 +1736,7 @@ msgstr ""
 
 #: desk/src/components/desk/global/NewContactDialog.vue:110
 msgid "Email Id"
-msgstr ""
+msgstr "အီးမေးလ် Id"
 
 #. Label of the email_customisations_tab (Tab Break) field in DocType 'HD
 #. Settings'
@@ -1827,7 +1827,7 @@ msgstr ""
 #. Label of the end_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "End Date"
-msgstr ""
+msgstr "ပြီးဆုံးရက်"
 
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
@@ -1896,7 +1896,7 @@ msgstr ""
 #: desk/src/components/ticket/ExportModal.vue:2
 #: desk/src/pages/ticket/Tickets.vue:106
 msgid "Export"
-msgstr ""
+msgstr "ထုတ်ယူမည်"
 
 #: desk/src/components/ticket/ExportModal.vue:26
 msgid "Export All {0} Record(s)"
@@ -1904,7 +1904,7 @@ msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:7
 msgid "Export Type"
-msgstr ""
+msgstr "ထုတ်ယူမှုအမျိုးအစား"
 
 #. Label of the is_external_link (Check) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -2057,13 +2057,13 @@ msgstr ""
 #. Label of the fields (Table) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Fields"
-msgstr ""
+msgstr "အကွက်များ"
 
 #. Label of the filters_tab (Tab Break) field in DocType 'HD View'
 #. Label of the filters (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
-msgstr ""
+msgstr "စစ်ထုတ်မှုများ"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:76
 #: desk/src/components/Settings/General/components/TicketSettings.vue:229
@@ -2072,7 +2072,7 @@ msgstr ""
 
 #: desk/src/components/desk/global/NewContactDialog.vue:118
 msgid "First Name"
-msgstr ""
+msgstr "အမည်"
 
 #. Label of the first_responded_on (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2116,7 +2116,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Friday"
-msgstr ""
+msgstr "သောကြာ"
 
 #. Label of the user_from (Link) field in DocType 'HD Notification'
 #: desk/src/pages/call-logs/CallLogModal.vue:44
@@ -2131,7 +2131,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:17
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:17
 msgid "From Date"
-msgstr ""
+msgstr "ရက်စွဲမှ"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:86
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:155
@@ -2202,7 +2202,7 @@ msgstr ""
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Group By"
-msgstr ""
+msgstr "အုပ်စုအလိုက်"
 
 #. Label of the group_by_field (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2435,7 +2435,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:122
 msgid "Help"
-msgstr ""
+msgstr "အကူအညီ"
 
 #: helpdesk/config/desktop.py:11
 msgid "HelpDesk"
@@ -2499,7 +2499,7 @@ msgstr ""
 #. List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Holiday List Name"
-msgstr ""
+msgstr "ပိတ်ရက်အမည်များ"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:373
 msgid "Holiday list created successfully."
@@ -2598,7 +2598,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Image"
-msgstr ""
+msgstr "ပုံ"
 
 #: desk/src/components/Settings/General/components/Branding.vue:80
 msgid "Image removed successfully."
@@ -3458,7 +3458,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Open"
-msgstr ""
+msgstr "ဖွင့်မည်။"
 
 #: desk/src/components/modals/ShortcutsModal.vue:81
 msgid "Open command palette"
@@ -4812,7 +4812,7 @@ msgstr ""
 #: desk/src/pages/ticket/TicketNew.vue:95
 #: desk/src/pages/ticket/TicketNew.vue:119
 msgid "Submit"
-msgstr ""
+msgstr "အတည်ပြုမည်။"
 
 #. Label of the summary (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
