@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-06 13:11\n"
+"PO-Revision-Date: 2026-04-15 14:31\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Indonesian\n"
 "MIME-Version: 1.0\n"
@@ -401,7 +401,7 @@ msgstr ""
 #. Label of the apply_to (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply To"
-msgstr ""
+msgstr "Terapkan Pada"
 
 #. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -424,7 +424,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:447
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Archived"
-msgstr ""
+msgstr "Diarsipkan"
 
 #: desk/src/components/Settings/SettingsModal.vue:61
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
@@ -563,7 +563,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Assignment"
-msgstr ""
+msgstr "Penugasan"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:137
 msgid "Assignment Condition"
@@ -588,7 +588,7 @@ msgstr "Aturan Penugasan"
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:5
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Assignment Rules"
-msgstr ""
+msgstr "Aturan Penugasan"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:11
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
@@ -651,12 +651,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Attachment"
-msgstr ""
+msgstr "Lampiran"
 
 #. Label of the author (Link) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Author"
-msgstr ""
+msgstr "Penulis"
 
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:80
@@ -769,7 +769,7 @@ msgstr ""
 #: desk/src/components/Settings/EmailAdd.vue:143
 #: desk/src/components/Settings/EmailEdit.vue:134
 msgid "Back"
-msgstr ""
+msgstr "Kembali"
 
 #: desk/src/pages/InvalidPage.vue:25 desk/src/pages/ticket/TicketAgent.vue:43
 msgid "Back to Tickets"
@@ -783,7 +783,7 @@ msgstr ""
 #. Label of the base_url (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Base URL"
-msgstr ""
+msgstr "URL Dasar"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:9
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:9
@@ -806,7 +806,7 @@ msgstr "Hitam"
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Blue"
-msgstr ""
+msgstr "Biru"
 
 #: desk/src/components/Settings/General/components/Branding.vue:10
 msgid "Brand name"
@@ -829,7 +829,7 @@ msgstr ""
 #. Label of the button_section (Section Break) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Button"
-msgstr ""
+msgstr "Tombol"
 
 #: desk/src/components/ticket/ExportModal.vue:15
 msgid "CSV"
@@ -944,7 +944,7 @@ msgstr "Perubahan"
 #: desk/src/components/Settings/Profile/Profile.vue:131
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:2
 msgid "Change Password"
-msgstr ""
+msgstr "Ubah Kata sandi"
 
 #: desk/src/components/Settings/Profile/Profile.vue:33
 msgid "Change image"
@@ -1068,7 +1068,7 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Closed"
-msgstr ""
+msgstr "Ditutup"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:354
 msgid "Closed or rated tickets cannot be updated by non-agents"
@@ -1088,7 +1088,7 @@ msgstr "Warna"
 #. Label of the columns (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Columns"
-msgstr ""
+msgstr "Kolom"
 
 #: desk/src/components/Settings/InviteAgents.vue:15
 msgid "Comma separated emails to invite."
@@ -1146,7 +1146,7 @@ msgstr "Selesai"
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Condition"
-msgstr ""
+msgstr "Kondisi"
 
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:3
 msgid "Configure your Exotel settings for Helpdesk."
@@ -1184,7 +1184,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:19
 msgid "Confirm Password"
-msgstr ""
+msgstr "Konfirmasi kata sandi"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:408
 msgid "Confirm overwrite"
@@ -1359,12 +1359,12 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Cyan"
-msgstr ""
+msgstr "Sian"
 
 #: desk/src/components/layouts/Sidebar.vue:367
 #: desk/src/pages/knowledge-base/Article.vue:642
 msgid "Danger"
-msgstr ""
+msgstr "Bahaya"
 
 #: desk/src/pages/dashboard/Dashboard.vue:576
 msgid "Dashboard"
@@ -1610,7 +1610,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "DocType"
-msgstr ""
+msgstr "DOCTYPE"
 
 #: desk/src/components/layouts/Sidebar.vue:347
 msgid "Docs"
@@ -1667,7 +1667,7 @@ msgstr ""
 #: desk/src/pages/call-logs/CallLogModal.vue:64
 #: desk/src/pages/call-logs/CallLogModal.vue:68
 msgid "Duration"
-msgstr ""
+msgstr "Durasi"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:388
 msgid "Duration is required"
@@ -1681,7 +1681,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/Article.vue:610
 #: desk/src/pages/ticket/Tickets.vue:471
 msgid "Edit"
-msgstr ""
+msgstr "Sunting"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:221
 msgid "Edit Call Log"
