@@ -4,7 +4,7 @@
     :description="__('Manage your profile information.')"
   >
     <template #content>
-      <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center justify-between gap-2 pt-1.5 pb-8">
         <FileUploader
           :fileTypes="['image/*']"
           @success="
@@ -18,38 +18,31 @@
               <div class="group relative !size-14">
                 <Avatar
                   class="!size-14"
-                  :image="profile.userImage"
-                  :label="profile.fullName"
+                  :image="user.doc.user_image"
+                  :label="fullName"
                 />
-                <component
-                  :is="profile.userImage ? Dropdown : 'div'"
-                  v-bind="
-                    profile.userImage
-                      ? {
-                          options: [
-                            {
-                              icon: 'upload',
-                              label: profile.userImage
-                                ? __('Change image')
-                                : __('Upload image'),
-                              onClick: openFileSelector,
-                            },
-                            {
-                              icon: 'trash-2',
-                              label: __('Remove image'),
-                              onClick: () => updateImage(null),
-                            },
-                          ],
-                        }
-                      : { onClick: openFileSelector }
-                  "
+                <Tooltip
+                  :hoverDelay="0"
+                  placement="bottom"
+                  :text="profileTooltipText"
                 >
                   <div
-                    class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full bg-black bg-opacity-40 opacity-0 duration-300 ease-in-out group-hover:opacity-100 !size-14"
+                    class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full !size-14"
+                    @click.stop="openFileSelector"
+                  />
+                  <div
+                    v-if="user.doc.user_image"
+                    class="z-1 size-4 absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-surface-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2 outline outline-black-overlay-50"
+                    @click.stop="updateImage()"
+                    @mouseenter="isHoveringRemove = true"
+                    @mouseleave="isHoveringRemove = false"
                   >
-                    <CameraIcon class="size-4 cursor-pointer text-white" />
+                    <FeatherIcon
+                      name="x"
+                      class="size-3.5 cursor-pointer text-ink-gray-4"
+                    />
                   </div>
-                </component>
+                </Tooltip>
                 <div
                   v-if="uploading"
                   class="w-full h-full top-0 left-0 absolute bg-black bg-opacity-20 rounded-full flex items-center justify-center"
@@ -58,14 +51,33 @@
                 </div>
               </div>
               <div class="flex flex-col gap-1">
-                <div class="flex flex-col">
-                  <span
-                    class="text-lg sm:text-xl !font-semibold text-ink-gray-8"
-                    >{{ auth?.userName }}</span
-                  >
-                  <span class="text-p-sm text-ink-gray-6">{{
-                    auth?.user
-                  }}</span>
+                <div class="flex flex-col gap-1">
+                  <div v-if="!editName" class="flex items-end gap-1">
+                    <span
+                      class="text-lg sm:text-xl !font-semibold text-ink-gray-8"
+                    >
+                      {{ user?.doc?.full_name }}
+                    </span>
+                    <Button
+                      class="!px-1 !h-5"
+                      variant="ghost"
+                      @click="editFullName"
+                    >
+                      <EditIcon class="size-3.5" />
+                    </Button>
+                  </div>
+                  <div v-else class="flex items-center gap-1">
+                    <TextInput
+                      ref="fullNameRef"
+                      v-model="fullName"
+                      @keydown.enter="save"
+                      @keydown.esc.stop="editName = false"
+                    />
+                    <Button variant="outline" icon="check" @click="save" />
+                  </div>
+                  <span class="text-p-sm text-ink-gray-6">
+                    {{ user?.doc?.email }}
+                  </span>
                 </div>
                 <ErrorMessage :message="__(_error)" />
               </div>
@@ -73,12 +85,11 @@
           </template>
         </FileUploader>
       </div>
-      <hr class="my-6" />
       <div>
         <div class="flex items-center justify-between">
           <div class="flex gap-2 items-center">
             <div class="text-base font-semibold text-ink-gray-9">
-              {{ __("Account & Security") }}
+              {{ __("Account Info & Security") }}
             </div>
             <Badge
               v-if="isProfileDirty"
@@ -88,27 +99,23 @@
               :label="__('Unsaved')"
             />
           </div>
-          <Button
-            :label="__('Save')"
-            variant="solid"
-            class="transition-colors"
-            @click="onSave"
-            :loading="isProfileLoading"
-            :disabled="!isProfileDirty"
-          />
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
-          <FormControl
-            class="w-full"
-            :label="__('First name')"
-            maxlength="40"
-            v-model="profile.firstName"
-          />
-          <FormControl
-            class="w-full"
-            :label="__('Last name')"
-            maxlength="40"
-            v-model="profile.lastName"
+        <div class="flex items-center justify-between mt-6">
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-medium text-ink-gray-8">
+              {{ __("Emails & Signature") }}
+            </span>
+            <span class="text-p-sm text-ink-gray-6">
+              {{
+                __(
+                  "Manage your account emails and email signature for communication."
+                )
+              }}
+            </span>
+          </div>
+          <Button
+            :label="__('Configure')"
+            @click="emit('updateStep', 'user-email-settings')"
           />
         </div>
         <div class="flex items-center justify-between mt-6">
@@ -126,87 +133,6 @@
             @click="showChangePasswordModal = true"
           />
         </div>
-        <div class="flex items-center justify-between mt-6">
-          <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-ink-gray-8">
-              {{ __("Language") }}
-            </span>
-            <span class="text-p-sm text-ink-gray-6">{{
-              __("Change language of the application.")
-            }}</span>
-          </div>
-          <Link
-            :model-value="language"
-            @update:modelValue="language = $event || auth.language"
-            doctype="Language"
-            class="w-40"
-          />
-        </div>
-        <div class="flex items-center justify-between mt-6">
-          <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-ink-gray-8">
-              {{ __("Timezone") }}
-            </span>
-            <span class="text-p-sm text-ink-gray-6">{{
-              __("Change timezone of the application.")
-            }}</span>
-          </div>
-          <Autocomplete
-            :options="timezoneOptions"
-            :model-value="timezone"
-            @update:modelValue="timezone = $event?.value"
-            placeholder="Select Timezone"
-            class="w-40"
-          />
-        </div>
-
-        <div class="flex flex-col gap-2 mt-6">
-          <div class="flex items-center justify-between">
-            <div class="flex flex-col gap-1">
-              <span class="text-base font-medium text-ink-gray-8">{{
-                __("Email Signature")
-              }}</span>
-              <span class="text-p-sm text-ink-gray-6">{{
-                __(
-                  "Set a personalized email signature that appears at the end of your replies."
-                )
-              }}</span>
-            </div>
-            <Switch v-model="enableSignature" />
-          </div>
-          <div v-if="enableSignature">
-            <TextEditor
-              ref="signatureEditorRef"
-              editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5"
-              :bubbleMenu="true"
-              :fixed-menu="true"
-              :placeholder="__('Write your email signature here')"
-              :content="signatureContent"
-              @change="(val) => (signatureContent = val)"
-            >
-              <template #bottom>
-                <div class="mt-2 flex justify-end">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="subtle"
-                    class="w-fit"
-                    :disabled="!isSignatureContentDirty"
-                    @click="resetSignatureContent"
-                    :tooltip="
-                      isSignatureContentDirty &&
-                      __(
-                        'This will reset the content to the last saved version.'
-                      )
-                    "
-                  >
-                    {{ __("Reset Content") }}
-                  </Button>
-                </div>
-              </template>
-            </TextEditor>
-          </div>
-        </div>
       </div>
     </template>
   </SettingsLayoutBase>
@@ -217,282 +143,82 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, nextTick, ref, watch, useTemplateRef } from "vue";
 import {
   Avatar,
   Badge,
   Button,
-  createResource,
-  Dropdown,
   FileUploader,
   LoadingIndicator,
   toast,
-  TextEditor,
-  TextEditorFixedMenu,
-  Switch,
+  createDocumentResource,
 } from "frappe-ui";
-import { EditorContent } from "@tiptap/vue-3";
-import { Autocomplete } from "@/components";
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
-import {
-  updateRes as updateSignature,
-  updateRes as updateTimezone,
-  updateRes as updateLanguage,
-} from "@/stores/knowledgeBase";
+import EditIcon from "~icons/lucide/edit";
+const emit = defineEmits(["updateStep"]);
 
-import CameraIcon from "~icons/lucide/camera";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import Link from "@/components/frappe-ui/Link.vue";
-import { HDAgent } from "@/types/doctypes";
-import { isContentEmpty } from "@/utils";
-
-const auth = useAuthStore();
-const profile = ref({
-  fullName: auth.userName,
-  userImage: auth.userImage,
-  firstName: auth.userFirstName,
-  lastName: auth.userLastName,
-});
 const showChangePasswordModal = ref(false);
-const language = ref(auth.language);
-const timezone = ref(auth.timezone);
-const timezoneOptions = ref([]);
 
-// Signature state
-const signatureEditorRef = ref(null);
-const enableSignature = ref(false);
-const signatureContent = ref("");
-const originalSignature = ref("");
-const originalEnableSignature = ref(false);
+const { userId } = useAuthStore();
+const user = createDocumentResource({ doctype: "User", name: userId });
 
-const isSignatureContentDirty = computed(() => {
-  const isCurrentEmpty = isContentEmpty(signatureContent.value);
-  const isOriginalEmpty = isContentEmpty(originalSignature.value);
+const isHoveringRemove = ref(false);
+const editName = ref(false);
 
-  if (isCurrentEmpty && isOriginalEmpty) {
-    return false;
-  }
-
-  return signatureContent.value !== originalSignature.value;
+const profileTooltipText = computed(() => {
+  if (isHoveringRemove.value) return __("Remove Photo");
+  return user.doc.user_image ? __("Change Photo") : __("Upload Photo");
 });
 
-const isSignatureDirty = computed(() => {
-  if (enableSignature.value !== originalEnableSignature.value) {
-    return true;
-  }
-  if (!enableSignature.value) {
-    return false;
-  }
-  return signatureContent.value !== originalSignature.value;
+const fullNameRef = useTemplateRef("fullNameRef");
+const fullName = computed({
+  get: () => {
+    return user.doc.full_name;
+  },
+  set: (val) => {
+    const [firstName, ...lastName] = val.split(" ");
+    user.doc.first_name = firstName;
+    user.doc.last_name = lastName.join(" ");
+  },
 });
 
-function resetSignatureContent() {
-  signatureContent.value = originalSignature.value;
+function editFullName() {
+  editName.value = true;
+  nextTick(() => fullNameRef.value?.el?.focus());
 }
 
-const isLanguageChanged = computed(() => {
-  return language.value !== auth?.language;
+const isDirty = computed(() => {
+  return JSON.stringify(user.doc) !== JSON.stringify(user.originalDoc);
 });
 
-const isTimezoneChanged = computed(() => {
-  return timezone.value !== auth?.timezone;
-});
+function save() {
+  if (!isDirty.value) {
+    editName.value = false;
+    return;
+  }
 
-const isAccountInfoDirty = computed(() => {
-  const agentName = agentData.data?.agent_name?.split(" ");
-  if (!agentName) return false;
-  return (
-    profile.value.firstName !== agentName[0] ||
-    profile.value.lastName !== (agentName[1] || "")
-  );
-});
-
-const isProfileLoading = computed(() => {
-  return (
-    setAgent.loading ||
-    updateLanguage.loading ||
-    updateTimezone.loading ||
-    updateSignature.loading
-  );
-});
-
-const isProfileDirty = computed(
-  () =>
-    isAccountInfoDirty.value ||
-    isLanguageChanged.value ||
-    isTimezoneChanged.value ||
-    isSignatureDirty.value
-);
-
-const agentData = createResource({
-  url: "frappe.client.get",
-  auto: true,
-  makeParams() {
-    return {
-      doctype: "HD Agent",
-      name: auth.userId,
-    };
-  },
-  onSuccess: (data: HDAgent) => {
-    const fullName = data.agent_name.split(" ");
-    profile.value = {
-      fullName: data.agent_name,
-      firstName: fullName[0],
-      lastName: fullName[1] || "",
-      userImage: data.user_image,
-    };
-  },
-});
-
-// Fetch the user's email_signature from the User doctype
-const userData = createResource({
-  url: "frappe.client.get",
-  auto: true,
-  makeParams() {
-    return {
-      doctype: "User",
-      name: auth.userId,
-      fields: ["email_signature"],
-    };
-  },
-  onSuccess: (data: { email_signature?: string }) => {
-    const sig = data.email_signature || "";
-    signatureContent.value = sig;
-    originalSignature.value = sig;
-    enableSignature.value = !!sig;
-    originalEnableSignature.value = !!sig;
-  },
-});
-
-const timezoneData = createResource({
-  url: "frappe.core.doctype.user.user.get_timezones",
-  auto: true,
-  onSuccess(data) {
-    timezoneOptions.value = data.timezones.map((tz: any) => ({
-      label: tz,
-      value: tz,
-    }));
-  },
-});
-
-const setAgent = createResource({
-  url: "frappe.client.set_value",
-  validate: () => {
-    if (!profile.value.firstName.trim()) {
-      return __("Please enter first name at least");
-    }
-  },
-  makeParams() {
-    return {
-      doctype: "HD Agent",
-      name: agentData.data?.name,
-      fieldname: {
-        agent_name: `${profile.value.firstName} ${profile.value.lastName}`,
-        user_image: profile.value.userImage,
-      },
-    };
-  },
-  onSuccess: () => {
-    auth.reloadUser();
-    agentData.reload();
-    toast.success(__("Profile updated successfully."));
-  },
-});
-
-function handleLanguageChange() {
-  updateLanguage.submit(
-    {
-      doctype: "User",
-      name: auth.userId,
-      fieldname: {
-        language: language.value,
-      },
+  user.save.submit(null, {
+    onSuccess: () => {
+      editName.value = false;
+      toast.success(__("Profile Updated Successfully"));
     },
-    {
-      onSuccess() {
-        toast.success(__("Language updated successfully."));
-        setTimeout(() => {
-          window.location.reload(true);
-        }, 500);
-      },
-    }
-  );
-}
-
-function handleTimezoneChange() {
-  updateTimezone.submit(
-    {
-      doctype: "User",
-      name: auth.userId,
-      fieldname: {
-        time_zone: timezone.value,
-      },
+    onError: (err: { message: string; messages: string[] }) => {
+      toast.error(err.message + ": " + err.messages[0]);
     },
-    {
-      onSuccess() {
-        toast.success(__("Timezone updated successfully."));
-        setTimeout(() => {
-          window.location.reload(true);
-        }, 500);
-      },
-    }
-  );
+  });
 }
 
-function handleSignatureUpdate() {
-  updateSignature.submit(
-    {
-      doctype: "User",
-      name: auth.userId,
-      fieldname: {
-        email_signature: enableSignature.value ? signatureContent.value : "",
-      },
-    },
-    {
-      onSuccess() {
-        originalSignature.value = enableSignature.value
-          ? signatureContent.value
-          : "";
-        originalEnableSignature.value = enableSignature.value;
-        toast.success(__("Email signature updated successfully."));
-      },
-    }
-  );
+function updateImage(fileUrl = "") {
+  isHoveringRemove.value = false;
+  user.doc.user_image = fileUrl;
+  save();
 }
 
-const onSave = () => {
-  if (enableSignature.value) {
-    if (isContentEmpty(signatureContent.value)) {
-      toast.error(__("Email signature is required"));
-      return;
-    }
-  }
-  if (isAccountInfoDirty.value) {
-    setAgent.submit();
-  }
-
-  if (isLanguageChanged.value) {
-    handleLanguageChange();
-  }
-
-  if (isTimezoneChanged.value) {
-    handleTimezoneChange();
-  }
-
-  if (isSignatureDirty.value) {
-    handleSignatureUpdate();
-  }
-};
-
-watch(isProfileDirty, (val) => {
+watch(isDirty, (val) => {
   disableSettingModalOutsideClick.value = val;
 });
-
-const updateImage = (file: string | null) => {
-  profile.value.userImage = file;
-  setAgent.submit();
-};
 </script>

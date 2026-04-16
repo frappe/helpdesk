@@ -16,6 +16,20 @@
     @keydown.capture="handleKeydown"
   >
     <template #top>
+      <div
+        v-if="from.length"
+        class="mx-6 md:mx-10 flex items-center gap-2 border-t py-2.5"
+      >
+        <span class="text-xs text-ink-gray-4">{{ __("FROM") }}:</span>
+        <FormControl
+          v-model="fromEmail"
+          type="select"
+          variant="ghost"
+          class="w-full"
+          :placeholder="__('')"
+          :options="from"
+        />
+      </div>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
@@ -195,6 +209,7 @@ import {
   FileUploader,
   TextEditor,
   TextEditorFixedMenu,
+  createDocumentResource,
   createResource,
   toast,
 } from "frappe-ui";
@@ -212,6 +227,7 @@ import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 const editorRef = ref(null);
 const showSavedRepliesSelectorModal = ref(false);
 const quotedContentRef = ref<HTMLElement | null>(null);
+const fromEmail = ref("");
 
 const props = defineProps({
   ticketId: {
@@ -267,6 +283,7 @@ const quotedContent = useStorage<null | string>(
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 const auth = useAuthStore();
+const { userId } = useAuthStore();
 
 // email signature
 const emailSignature = ref<string | null>(null);
@@ -369,6 +386,22 @@ const sendMail = createResource({
     }
   },
   debounce: 300,
+});
+
+const user = createDocumentResource({ doctype: "User", name: userId });
+
+const from = computed(() => {
+  if (!user.doc || !user.doc.user_emails?.length) return [];
+  let emails = user.doc.user_emails.map((e) => {
+    return {
+      label: e.email_account + " <" + e.email_id + ">",
+      value: e.email_id,
+    };
+  });
+
+  if (emails.length == 1 && emails[0].email_id === userId) return [];
+
+  return emails;
 });
 
 function submitMail() {
@@ -550,6 +583,18 @@ function handleKeydown(e: KeyboardEvent) {
 const editor = computed(() => {
   return editorRef.value.editor;
 });
+
+watch(
+  from,
+  (fromOptions) => {
+    if (
+      !fromOptions.find((f: { value: string }) => f.value === fromEmail.value)
+    ) {
+      fromEmail.value = fromOptions.length ? fromOptions[0].value : "";
+    }
+  },
+  { immediate: true }
+);
 
 defineExpose({
   addToReply,

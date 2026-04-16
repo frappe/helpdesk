@@ -13,6 +13,7 @@ import LucideUserPlus from "~icons/lucide/user-plus";
 import LucideUsers from "~icons/lucide/users";
 import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
+import SlidersIcon from '@/components/icons/SlidersIcon.vue'
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
 import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
@@ -20,12 +21,13 @@ import TelephonyPage from "./Telephony/TelephonyPage.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
 import SavedReplies from "./SavedReplies/SavedReplies.vue";
-import Profile from "./Profile/Profile.vue";
 import { Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import General from "./General/General.vue";
 import SettingsGear from "~icons/lucide/settings";
 import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
+import ProfilePage from "./Profile/ProfilePage.vue";
+import PreferenceSettings from "./PreferenceSettings.vue";
 
 export const showSettingsModal = ref(false);
 
@@ -45,7 +47,12 @@ export const tabs = computed(() => {
             label: auth.userName,
             size: "xs",
           }),
-          component: markRaw(Profile),
+          component: markRaw(ProfilePage),
+        },
+        {
+          label: __('Preferences'),
+          icon: SlidersIcon,
+          component: markRaw(PreferenceSettings),
         },
       ],
     },

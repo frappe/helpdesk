@@ -93,6 +93,27 @@ export const ComponentUtils: Extension = Extension.create({
         },
       },
       {
+        types: ["image"],
+        attributes: {
+          height: {
+            default: null,
+            parseHTML: (element) => element.getAttribute("height"),
+            renderHTML: (attributes) => {
+              if (!attributes.height) return {};
+              return { height: attributes.height };
+            },
+          },
+          width: {
+            default: null,
+            parseHTML: (element) => element.getAttribute("width"),
+            renderHTML: (attributes) => {
+              if (!attributes.width) return {};
+              return { width: attributes.width };
+            },
+          },
+        },
+      },
+      {
         types: ["heading"],
         attributes: {
           id: {
