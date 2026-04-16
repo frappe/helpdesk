@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-06 13:10\n"
+"PO-Revision-Date: 2026-04-16 14:40\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -2936,7 +2936,7 @@ msgstr "Vincular con un registro de cliente"
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
-msgstr ""
+msgstr "Lista"
 
 #: desk/src/pages/ticket/Tickets.vue:309
 msgid "List View"
@@ -3458,7 +3458,7 @@ msgstr "Sólo se pueden modificar los campos ‘color’ y ‘orden’ del estad
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Open"
-msgstr ""
+msgstr "Abrir"
 
 #: desk/src/components/modals/ShortcutsModal.vue:81
 msgid "Open command palette"
