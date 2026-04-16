@@ -55,10 +55,13 @@
               {{ __("Change timezone of the application.") }}
             </span>
           </div>
-          <Combobox
-            v-model="user.doc.time_zone"
+          <Autocomplete
+            :model-value="user.doc.time_zone"
+            @update:modelValue="user.doc.time_zone = $event?.value"
             class="w-40"
             :options="timezoneOptions"
+            size="sm"
+            placeholder="Select Timezone"
           />
         </div>
       </div>
@@ -79,6 +82,7 @@ import Link from "../frappe-ui/Link.vue";
 import { useAuthStore } from "@/stores/auth";
 
 import { ref, computed } from "vue";
+import Autocomplete from "../Autocomplete.vue";
 
 const { userId } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
