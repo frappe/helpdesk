@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-15 14:31\n"
+"PO-Revision-Date: 2026-04-16 14:41\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -1736,7 +1736,7 @@ msgstr "محتوای ایمیل"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:110
 msgid "Email Id"
-msgstr ""
+msgstr "شناسه ایمیل"
 
 #. Label of the email_customisations_tab (Tab Break) field in DocType 'HD
 #. Settings'
@@ -2063,7 +2063,7 @@ msgstr "فیلدها"
 #. Label of the filters (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
-msgstr ""
+msgstr "فیلترها"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:76
 #: desk/src/components/Settings/General/components/TicketSettings.vue:229
@@ -2631,7 +2631,7 @@ msgstr "صندوق ورودی"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:203
 msgid "Incoming"
-msgstr ""
+msgstr "ورودی"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:212
 msgid "Initiated"
@@ -2761,7 +2761,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Key"
-msgstr ""
+msgstr "کلید"
 
 #: desk/src/components/modals/ShortcutsModal.vue:4
 msgid "Keyboard Shortcuts"
@@ -2797,7 +2797,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Landing Page"
-msgstr ""
+msgstr "صفحه فرود"
 
 #: desk/src/components/Settings/Profile/Profile.vue:138
 msgid "Language"
@@ -2911,7 +2911,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Link"
-msgstr ""
+msgstr "پیوند"
 
 #. Label of the link_options_sb (Section Break) field in DocType 'HD Support
 #. Search Source'
@@ -2936,7 +2936,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
-msgstr ""
+msgstr "فهرست"
 
 #: desk/src/pages/ticket/Tickets.vue:309
 msgid "List View"
@@ -3041,7 +3041,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Mention"
-msgstr ""
+msgstr "اشاره"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:154
 msgid "Merge"
@@ -3243,7 +3243,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:52
 msgid "New users will have to be manually registered by system managers."
-msgstr ""
+msgstr "کاربران جدید باید به صورت دستی توسط مدیران سیستم ثبت شوند."
 
 #: desk/src/components/modals/ShortcutsModal.vue:110
 msgid "Next ticket"
@@ -3509,7 +3509,7 @@ msgstr "نارنجی"
 #. Label of the order (Int) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Order"
-msgstr ""
+msgstr "ترتیب"
 
 #. Label of the order_by_tab (Tab Break) field in DocType 'HD View'
 #. Label of the order_by (Code) field in DocType 'HD View'
@@ -3531,7 +3531,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:204
 msgid "Outgoing"
-msgstr ""
+msgstr "خروجی"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:199
 msgid "Outside working hours notice"
@@ -3618,7 +3618,7 @@ msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:46
 msgid "Period"
-msgstr ""
+msgstr "دوره"
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
 #: desk/src/components/SavedRepliesSelectorModal.vue:164
