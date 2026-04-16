@@ -72,14 +72,14 @@
     <template v-else-if="analytics.loading">
       <!-- TODO: add skeleton here when we pull latest changes -->
       <div class="col-span-4 flex items-center justify-center h-full">
-        <LoadingIndicator />
+        <LoadingIndicator :scale="10" />
       </div>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { createResource } from "frappe-ui";
+import { createResource, LoadingIndicator } from "frappe-ui";
 import BarChartCard from "../BarChartCard.vue";
 import LineChartCard from "../LineChartCard.vue";
 

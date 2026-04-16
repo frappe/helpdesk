@@ -66,9 +66,9 @@ const resource = createListResource({
   fields: ["name"],
   auto: true,
 });
-const count = computed(() => {
+const count = computed<number>(() => {
   if (resource.loading) return 0;
-  return resource.data?.length || 0;
+  return resource.data?.length ?? 0;
 });
 
 const deleteLinkedTickets = ref(false);

@@ -7,59 +7,13 @@ import LucideGlobe from "~icons/lucide/globe";
 import LucideMapPin from "~icons/lucide/map-pin";
 import { OrganizationsIcon } from "../components/icons";
 
-type StateKey = "name" | "domain" | "image" | "country";
-
-interface FieldConfig {
-  key: StateKey;
-  type: "text" | "select" | "textarea" | "checkbox" | "autocomplete" | "Link";
-  label: string;
-  required?: boolean;
-  placeholder?: string;
-  description?: string;
-  prefix?: ReturnType<typeof markRaw> | ReturnType<typeof h>;
-  doctype?: string; // only for Link type
-}
-
-export const customerFields: FieldConfig[] = [
-  {
-    key: "name",
-    type: "text",
-    label: __("Name"),
-    required: true,
-    prefix: markRaw(OrganizationsIcon),
-  },
-  {
-    key: "country",
-    type: "Link",
-    label: __("Country"),
-    placeholder: __("Select Country"),
-    prefix: h(LucideMapPin, { class: "size-4 mr-1.5" }),
-    doctype: "Country",
-  },
-  {
-    key: "domain",
-    type: "text",
-    label: __("Domain"),
-    placeholder: "frappe.io",
-    prefix: h(LucideGlobe, { class: "size-4" }),
-  },
-];
+const customerCache: Record<string, DocumentResource<HDCustomer>> = {};
 
 export const useCustomer = (
   name: string | null = null,
   existingDoc: DocumentResource<HDCustomer> | null = null
 ) => {
-  const doc: DocumentResource<HDCustomer> = existingDoc
-    ? existingDoc
-    : createDocumentResource({
-        doctype: "HD Customer",
-        name: name,
-        whitelistedMethods: {
-          getContacts: "get_contacts",
-          updateContacts: "update_contacts",
-          getPendingInvites: "get_pending_invites",
-        },
-      });
+  const doc = findCustomerDoc();
 
   const state = reactive<Record<StateKey, string>>({
     name: name ? name : "",
@@ -93,6 +47,24 @@ export const useCustomer = (
   const isDirty = computed(() => {
     return isCustomerInfoChanged.value || hasNameChanged.value || false;
   });
+  function findCustomerDoc(): DocumentResource<HDCustomer> {
+    if (existingDoc) return existingDoc;
+    else if (name && customerCache.hasOwnProperty(name))
+      return customerCache[name];
+    else {
+      const newDoc = createDocumentResource({
+        doctype: "HD Customer",
+        name: name,
+        whitelistedMethods: {
+          getContacts: "get_contacts",
+          updateContacts: "update_contacts",
+          getPendingInvites: "get_pending_invites",
+        },
+      });
+      if (name) customerCache[name] = newDoc;
+      return newDoc;
+    }
+  }
 
   return {
     doc,
@@ -102,3 +74,40 @@ export const useCustomer = (
     isDirty,
   };
 };
+
+type StateKey = "name" | "domain" | "image" | "country";
+
+interface FieldConfig {
+  key: StateKey;
+  type: "text" | "select" | "textarea" | "checkbox" | "autocomplete" | "Link";
+  label: string;
+  required?: boolean;
+  placeholder?: string;
+  description?: string;
+  prefix?: ReturnType<typeof markRaw> | ReturnType<typeof h>;
+  doctype?: string; // only for Link type
+}
+export const customerFields: FieldConfig[] = [
+  {
+    key: "name",
+    type: "text",
+    label: __("Name"),
+    required: true,
+    prefix: markRaw(OrganizationsIcon),
+  },
+  {
+    key: "country",
+    type: "Link",
+    label: __("Country"),
+    placeholder: __("Select Country"),
+    prefix: h(LucideMapPin, { class: "size-4 mr-1.5" }),
+    doctype: "Country",
+  },
+  {
+    key: "domain",
+    type: "text",
+    label: __("Domain"),
+    placeholder: "frappe.io",
+    prefix: h(LucideGlobe, { class: "size-4" }),
+  },
+];
