@@ -22,7 +22,7 @@
             </div>
             <FileUploader
               :fileTypes="['image/*']"
-              @success="(file) => (state.image = file.file_url)"
+              @success="(file: File) => (state.image = file.file_url)"
             >
               <template
                 #default="{ openFileSelector, error: _error, uploading }"
@@ -92,9 +92,12 @@
 </template>
 
 <script setup lang="ts">
-import { customerFields as fields, useCustomer } from "@/composables/customer";
+import {
+  customerFields as fields,
+  useCustomerState,
+} from "@/composables/customer";
 import { __ } from "@/translation";
-import type { Resource } from "@/types";
+import type { File, Resource } from "@/types";
 import {
   Avatar,
   Button,
@@ -112,7 +115,7 @@ import { OrganizationsIcon } from "../icons";
 const model = defineModel<boolean>({ default: false });
 const router = useRouter();
 
-const { state } = useCustomer();
+const state = useCustomerState();
 
 const customerResource: Resource = createResource({
   url: "frappe.client.insert",

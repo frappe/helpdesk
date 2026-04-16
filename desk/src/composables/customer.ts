@@ -9,33 +9,23 @@ import { OrganizationsIcon } from "../components/icons";
 
 const customerCache: Record<string, DocumentResource<HDCustomer>> = {};
 
-export const useCustomer = (
-  name: string | null = null,
-  existingDoc: DocumentResource<HDCustomer> | null = null
-) => {
+export function useCustomer(name: string) {
+  const state = useCustomerState(name);
   const doc = findCustomerDoc();
 
-  const state = reactive<Record<StateKey, string>>({
-    name: name ? name : "",
-    domain: "",
-    image: "",
-    country: "",
-  });
+  watch(
+    () => doc.doc,
+    (data) => {
+      if (data) {
+        state.name = data.customer_name || "";
+        state.domain = data.domain || "";
+        state.image = data.image || "";
+        state.country = data.country || "";
+      }
+    },
+    { immediate: true }
+  );
 
-  if (name || existingDoc) {
-    watch(
-      () => doc.doc,
-      (data) => {
-        if (data) {
-          state.name = data.customer_name || "";
-          state.domain = data.domain || "";
-          state.image = data.image || "";
-          state.country = data.country || "";
-        }
-      },
-      { immediate: true }
-    );
-  }
   const isCustomerInfoChanged = computed(() => {
     return (
       state.domain !== (doc.doc?.domain || "") ||
@@ -47,10 +37,10 @@ export const useCustomer = (
   const isDirty = computed(() => {
     return isCustomerInfoChanged.value || hasNameChanged.value || false;
   });
+
   function findCustomerDoc(): DocumentResource<HDCustomer> {
-    if (existingDoc) return existingDoc;
-    else if (name && customerCache.hasOwnProperty(name))
-      return customerCache[name];
+    const key = name as string;
+    if (customerCache.hasOwnProperty(key)) return customerCache[key];
     else {
       const newDoc = createDocumentResource({
         doctype: "HD Customer",
@@ -61,7 +51,7 @@ export const useCustomer = (
           getPendingInvites: "get_pending_invites",
         },
       });
-      if (name) customerCache[name] = newDoc;
+      customerCache[key] = newDoc;
       return newDoc;
     }
   }
@@ -73,7 +63,15 @@ export const useCustomer = (
     hasNameChanged,
     isDirty,
   };
-};
+}
+export function useCustomerState(name?: string | null) {
+  return reactive<Record<StateKey, string>>({
+    name: name ? name : "",
+    domain: "",
+    image: "",
+    country: "",
+  });
+}
 
 type StateKey = "name" | "domain" | "image" | "country";
 

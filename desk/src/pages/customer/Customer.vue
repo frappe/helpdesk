@@ -90,6 +90,7 @@
     v-if="customerDialog"
     v-model="customerDialog"
     @update="customerDialog = false"
+    :id="id"
   />
 </template>
 
@@ -142,7 +143,6 @@ const tabs = computed(() => [
   },
 ]);
 const { doc: customer } = useCustomer(props.id);
-
 provide(CustomerResourceSymbol, customer);
 
 const activeTab = computed<number>({

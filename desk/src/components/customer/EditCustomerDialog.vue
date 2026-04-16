@@ -97,7 +97,7 @@
               theme="gray"
               variant="solid"
               :loading="loading || customer.setValue.loading"
-              @click.prevent="save()"
+              @click.prevent="save"
             />
           </div>
         </div>
@@ -109,7 +109,6 @@
 <script setup lang="ts">
 import { customerFields, useCustomer } from "@/composables/customer";
 import { __ } from "@/translation";
-import { CustomerResourceSymbol } from "@/types";
 import {
   Avatar,
   Badge,
@@ -120,7 +119,7 @@ import {
   FormControl,
   toast,
 } from "frappe-ui";
-import { inject, ref } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import Link from "../frappe-ui/Link.vue";
 import { OrganizationsIcon } from "../icons";
@@ -128,13 +127,15 @@ import { OrganizationsIcon } from "../icons";
 const model = defineModel<boolean>({ default: false });
 const emit = defineEmits(["update"]);
 
-const customer = inject(CustomerResourceSymbol)!;
-
 const router = useRouter();
-const { state, isDirty, hasNameChanged, isCustomerInfoChanged } = useCustomer(
-  null,
-  customer
-);
+const id = router.currentRoute.value.params.id as string;
+const {
+  doc: customer,
+  state,
+  isDirty,
+  hasNameChanged,
+  isCustomerInfoChanged,
+} = useCustomer(id);
 
 const loading = ref(false);
 
@@ -145,6 +146,10 @@ async function save() {
   loading.value = true;
   try {
     if (hasNameChanged.value) {
+      if (!state.name.trim()) {
+        toast.error(__("Customer name cannot be empty"));
+        return;
+      }
       const newName = await callRenameDoc();
       if (isCustomerInfoChanged.value) {
         // Use raw call after rename since the `createDocumentResource` still holds the old name
