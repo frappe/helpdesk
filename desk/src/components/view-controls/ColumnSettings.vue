@@ -30,20 +30,24 @@
                   <DragIcon class="h-3.5" />
                   <div>{{ element.label }}</div>
                 </div>
-                <div class="flex cursor-pointer items-center gap-1">
+                <div class="flex cursor-pointer items-center gap-0.5">
                   <Button
                     variant="ghost"
                     class="!h-5 w-5 !p-1"
                     @click="editColumn(element)"
                   >
-                    <EditIcon class="h-3.5" />
+                    <template #icon>
+                      <EditIcon class="h-3.5" />
+                    </template>
                   </Button>
                   <Button
                     variant="ghost"
                     class="!h-5 w-5 !p-1"
                     @click="removeColumn(element)"
                   >
-                    <FeatherIcon name="x" class="h-3.5" />
+                    <template #icon>
+                      <LucideX class="h-3.5" />
+                    </template>
                   </Button>
                 </div>
               </div>
@@ -140,18 +144,19 @@
 </template>
 
 <script setup>
+import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
 import {
-  DragIcon,
-  ReloadIcon,
-  EditIcon,
   ColumnsIcon,
+  DragIcon,
+  EditIcon,
+  ReloadIcon,
 } from "@/components/icons";
 import NestedPopover from "@/components/NestedPopover.vue";
-import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
 import { isTouchScreenDevice } from "@/utils";
-import Draggable from "vuedraggable";
-import { computed, ref, inject } from "vue";
 import { watchOnce } from "@vueuse/core";
+import { Button, FormControl } from "frappe-ui";
+import { computed, inject, ref } from "vue";
+import Draggable from "vuedraggable";
 
 const props = defineProps({
   hideLabel: {

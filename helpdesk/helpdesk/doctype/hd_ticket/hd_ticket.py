@@ -572,6 +572,10 @@ class HDTicket(Document):
         bcc: str | None = None,
         attachments: list[str] = [],
     ):
+        if not is_agent():
+            frappe.throw(
+                _("You are not permitted to reply as an agent"), frappe.PermissionError
+            )
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject}"
@@ -1008,7 +1012,7 @@ class HDTicket(Document):
                 "width": "8rem",
             },
             {
-                "label": "First response",
+                "label": "First Response",
                 "type": "Datetime",
                 "key": "response_by",
                 "width": "8rem",

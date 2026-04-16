@@ -2,7 +2,7 @@
   <!-- View Controls -->
   <div
     :class="[
-      'flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6',
+      'flex items-center justify-between gap-2 px-5 pb-4 pt-4',
       list?.data?.data?.length > 0 ? 'relative' : 'absolute w-[stretch]',
     ]"
     v-if="showViewControls"
@@ -51,7 +51,6 @@
         params: { [options.rowRoute?.prop]: row.name },
         query: { view: route.query?.view },
       }),
-      onRowClick: (row) => emit('rowClick', row.name),
       emptyState,
     }"
   >
@@ -144,7 +143,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { View, ViewType } from "@/types";
-import { formatTimeShort, getIcon } from "@/utils";
+import { getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
   call,
@@ -163,7 +162,6 @@ import {
 import {
   computed,
   h,
-  nextTick,
   onMounted,
   provide,
   reactive,
@@ -173,6 +171,7 @@ import {
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+import dayjs from "dayjs";
 import EmptyState from "./EmptyState.vue";
 import ListRows from "./ListRows.vue";
 
@@ -326,9 +325,6 @@ const list = createResource({
   onSuccess: (data) => {
     list.params = defaultParams;
     columns.value = data.columns;
-    nextTick(() => {
-      document.querySelector(".list-rows")?.focus();
-    });
   },
 });
 
@@ -475,8 +471,8 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   if (column.type === "Datetime") {
     return h("span", {
-      class: "text-p-xs",
-      textContent: formatTimeShort(item),
+      class: "text-base",
+      textContent: dayjs(item).fromNow(),
     });
   }
   if (column.type === "MultipleAvatar") {
@@ -774,8 +770,3 @@ onMounted(async () => {
 
 defineExpose(exposeFunctions);
 </script>
-<style scoped>
-.list-rows:focus {
-  outline: none;
-}
-</style>

@@ -21,7 +21,7 @@
                 >
                   {{ displayValue(selectedValue) }}
                 </span>
-                <span v-else class="text-base leading-5 text-gray-500">
+                <span v-else class="text-base leading-5 text-gray-600">
                   {{ placeholder || "" }}
                 </span>
               </div>
@@ -40,7 +40,7 @@
             <div class="relative px-1.5 pt-0.5">
               <ComboboxInput
                 ref="search"
-                class="form-input w-full"
+                class="form-input w-full pr-6"
                 type="text"
                 :value="query"
                 autocomplete="off"
@@ -52,10 +52,10 @@
                 "
               />
               <button
-                class="absolute right-1.5 inline-flex h-7 w-7 items-center justify-center"
+                class="absolute inset-y-0 right-3 top-px flex items-center"
                 @click="selectedValue = null"
               >
-                <FeatherIcon name="x" class="w-4" />
+                <FeatherIcon name="x" class="size-4" />
               </button>
             </div>
             <ComboboxOptions
@@ -124,11 +124,11 @@
 import {
   Combobox,
   ComboboxInput,
-  ComboboxOptions,
   ComboboxOption,
+  ComboboxOptions,
 } from "@headlessui/vue";
-import { Popover, Button, FeatherIcon } from "frappe-ui";
-import { ref, computed, useAttrs, useSlots, watch, nextTick } from "vue";
+import { FeatherIcon, Popover } from "frappe-ui";
+import { computed, nextTick, ref, useAttrs, useSlots, watch } from "vue";
 
 const props = defineProps({
   modelValue: {

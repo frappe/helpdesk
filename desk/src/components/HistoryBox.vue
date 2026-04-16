@@ -1,7 +1,7 @@
 <template>
   <div class="flex-1">
     <div
-      class="mt-1.5 flex justify-between text-base items-start md:items-center"
+      class="mt-0.5 flex justify-between text-base items-start md:items-center"
     >
       <div
         v-if="relatedActivities.length > 1"
@@ -29,17 +29,17 @@
         <span> {{ content }}</span>
       </div>
 
-      <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-        <div class="text-gray-600 text-sm w-2/6 flex justify-end">
-          {{ timeAgo(creation) }}
-        </div>
-      </Tooltip>
+      <div class="text-gray-600 text-sm w-2/6 flex justify-end">
+        <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
+          <span>{{ timeAgo(creation) }}</span>
+        </Tooltip>
+      </div>
     </div>
-    <div v-if="show_others">
+    <div v-if="show_others" class="space-y-2.5 mt-3.5">
       <div
         v-for="relatedActivity in relatedActivities"
         :key="relatedActivity.creation"
-        class="mt-2 flex justify-between text-base"
+        class="flex justify-between text-base"
       >
         <div class="text-gray-600 w-4/6">
           <span class="font-medium text-gray-800">
@@ -50,7 +50,7 @@
         <Tooltip
           :text="dateFormat(relatedActivity.creation, dateTooltipFormat)"
         >
-          <div class="text-gray-600 text-sm w-2/6 flex justify-end">
+          <div class="text-gray-600 text-sm flex justify-end">
             {{ timeAgo(relatedActivity.creation) }}
           </div>
         </Tooltip>

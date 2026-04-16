@@ -2,7 +2,7 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-full mx-6 md:mx-10 py-3',
+      'prose-sm max-w-full mx-6 md:mx-5 py-3',
       getFontFamily(newEmail),
       '[&_p.reply-to-content]:hidden',
     ]"
@@ -18,7 +18,7 @@
     <template #top>
       <div
         v-if="from.length"
-        class="mx-6 md:mx-10 flex items-center gap-2 border-t py-2.5"
+        class="mx-6 md:mx-5 flex items-center gap-2 border-t py-2.5"
       >
         <span class="text-xs text-ink-gray-4">{{ __("FROM") }}:</span>
         <FormControl
@@ -38,20 +38,32 @@
           :validate="validateEmailWithZod"
           :error-message="(value) => `${value} is an invalid email address`"
         />
-        <Button
-          :label="'CC'"
-          :class="[cc ? 'bg-gray-300 hover:bg-gray-200' : '']"
-          @click="toggleCC()"
-        />
-        <Button
-          :label="'BCC'"
-          :class="[bcc ? 'bg-gray-300 hover:bg-gray-200' : '']"
-          @click="toggleBCC()"
-        />
+        <div class="flex gap-1.5">
+          <Button
+            :label="'CC'"
+            variant="ghost"
+            :class="[
+              cc || showCC
+                ? '!bg-surface-gray-4 hover:bg-surface-gray-3'
+                : '!text-ink-gray-4',
+            ]"
+            @click="toggleCC()"
+          />
+          <Button
+            :label="'BCC'"
+            variant="ghost"
+            :class="[
+              bcc || showBCC
+                ? '!bg-surface-gray-4 hover:bg-surface-gray-3'
+                : '!text-ink-gray-4',
+            ]"
+            @click="toggleBCC()"
+          />
+        </div>
       </div>
       <div
         v-if="showCC || cc"
-        class="mx-10 flex items-center gap-2 py-2.5"
+        class="mx-5 flex items-center gap-2 py-2.5"
         :class="cc || showCC ? 'border-b' : ''"
       >
         <span class="text-xs text-gray-500">CC:</span>
@@ -65,7 +77,7 @@
       </div>
       <div
         v-if="showBCC || bcc"
-        class="mx-10 flex items-center gap-2 py-2.5"
+        class="mx-5 flex items-center gap-2 py-2.5"
         :class="bcc || showBCC ? 'border-b' : ''"
       >
         <span class="text-xs text-gray-500">BCC:</span>
@@ -96,7 +108,7 @@
     </template>
     <template #bottom>
       <!-- Attachments -->
-      <div class="flex flex-wrap gap-2 px-10">
+      <div class="flex flex-wrap gap-2 px-5 my-2">
         <AttachmentItem
           v-for="a in attachments"
           :key="a.file_url"
@@ -114,10 +126,10 @@
       </div>
       <!-- TextEditor Fixed Menu -->
       <div
-        class="flex justify-between overflow-scroll pl-10 py-2.5 items-center"
+        class="flex justify-between overflow-scroll px-4 py-2.5 items-center border-t"
       >
         <div class="flex items-center overflow-x-auto w-[60%]">
-          <div class="flex gap-1">
+          <div class="inline-flex items-center gap-1.5 p-1">
             <FileUploader
               :upload-args="{
                 doctype: doctype,
@@ -132,34 +144,29 @@
             >
               <template #default="{ openFileSelector, uploading }">
                 {{ void (isUploading = uploading) }}
-                <Button
-                  variant="ghost"
+                <button
+                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
                   @click="openFileSelector()"
-                  :loading="uploading"
+                  :disabled="uploading"
                 >
-                  <template #icon>
-                    <AttachmentIcon
-                      class="h-4"
-                      style="color: #000000; stroke-width: 1.5 !important"
-                    />
-                  </template>
-                </Button>
+                  <AttachmentIcon
+                    class="h-4 w-4"
+                    style="stroke-width: 1.5 !important"
+                  />
+                </button>
               </template>
             </FileUploader>
-            <Button
-              variant="ghost"
+            <button
+              class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
               @click="showSavedRepliesSelectorModal = true"
             >
-              <template #icon>
-                <SavedReplyIcon class="h-4" />
-              </template>
-            </Button>
+              <SavedReplyIcon class="h-4 w-4" />
+            </button>
+            <div class="h-4 w-[2px] border-l" />
           </div>
-          <TextEditorFixedMenu class="ml-1" :buttons="textEditorMenuButtons" />
+          <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
         </div>
-        <div
-          class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%] mr-9"
-        >
+        <div class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%]">
           <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
@@ -191,7 +198,6 @@ import {
   MultiSelectInput,
   SavedRepliesSelectorModal,
 } from "@/components";
-import { EditorContent } from "@tiptap/vue-3";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
@@ -204,6 +210,7 @@ import {
   uploadFunction,
   validateEmailWithZod,
 } from "@/utils";
+import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,

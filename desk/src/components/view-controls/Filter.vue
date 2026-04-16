@@ -173,6 +173,7 @@ import {
   Tooltip,
 } from "frappe-ui";
 import { computed, h, inject } from "vue";
+import { useDebounceFn } from "@vueuse/core";
 
 const props = defineProps({
   default_filters: {
@@ -492,7 +493,7 @@ function updateValue(value, filter) {
   } else {
     filter.value = value;
   }
-  apply();
+  debouncedApply();
 }
 
 function updateOperator(event, filter) {
@@ -672,4 +673,8 @@ const timespanOptions = [
     value: "next year",
   },
 ];
+
+const debouncedApply = useDebounceFn(() => {
+  apply();
+}, 500);
 </script>

@@ -1,12 +1,12 @@
 <template>
   <div
     v-if="!contact.loading"
-    class="my-4 flex items-center justify-start gap-5"
+    class="my-4 flex items-center justify-start gap-2.5"
   >
     <Avatar :label="contact.data.name" :image="contactImage" size="2xl" />
     <div class="flex flex-col gap-1.5">
       <Tooltip :text="contact.data.name || contact.data.email_id">
-        <div class="flex gap-2.5 items-center">
+        <div class="flex gap-2 items-center">
           <p class="text-ink-gray-8 font-medium text-xl max-w-[170px] truncate">
             {{ contact.data.name || contact.data.email_id }}
           </p>
@@ -16,7 +16,7 @@
           />
         </div>
       </Tooltip>
-      <div class="flex gap-1.5">
+      <div class="flex gap-1.5" v-if="isCallingEnabled">
         <Tooltip :text="contact.data.email_id">
           <!-- Email Button -->
           <Button size="sm" @click="toggleEmailBox()">
@@ -46,6 +46,7 @@ import { toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useTelephonyStore } from "@/stores/telephony";
 import { useUserStore } from "@/stores/user";
 import { TicketContactSymbol, TicketSymbol } from "@/types";
+import { openContact } from "@/utils";
 import { Avatar, Button, Tooltip } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, inject, ref } from "vue";
@@ -59,9 +60,9 @@ const { getUser } = useUserStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 const showPhoneModal = ref(false);
 
-const ticket = inject(TicketSymbol);
+const ticket = inject(TicketSymbol)!;
 
-const contact = inject(TicketContactSymbol);
+const contact = inject(TicketContactSymbol)!;
 const contactImage = computed(() => {
   return (
     contact.value?.data?.image ||
@@ -69,11 +70,6 @@ const contactImage = computed(() => {
     null
   );
 });
-
-function openContact(name: string) {
-  let url = window.location.origin + "/app/contact/" + name;
-  window.open(url, "_blank");
-}
 
 const callContact = () => {
   if (!contact.value.data.mobile_no && !contact.value.data.phone) {

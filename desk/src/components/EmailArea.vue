@@ -2,7 +2,7 @@
   <div
     :id="`communication-${name}`"
     v-bind="$attrs"
-    class="grow cursor-pointer border-transparent bg-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
+    class="grow cursor-pointer bg-white rounded-md text-base leading-6 transition-all duration-300 ease-in-out border border-outline-gray-2"
   >
     <div
       class="flex items-center justify-between gap-2"
@@ -13,11 +13,11 @@
         <div class="leading-tight">
           <p>{{ sender.full_name || "Guest" }}</p>
           <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-            <p class="text-xs md:text-sm text-gray-600">
+            <p class="text-xs md:text-sm text-ink-gray-5">
               {{ timeAgo(creation) }}
             </p>
           </Tooltip>
-          <p class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">
+          <p class="sm:flex hidden text-sm text-ink-gray-5" v-if="sender.name">
             {{ "<" + sender.name + ">" }}
           </p>
         </div>
@@ -25,68 +25,72 @@
       <!-- email design for desktop -->
       <div v-else class="flex items-center gap-1">
         <span>{{ sender.full_name || "Guest" }}</span>
-        <span class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">{{
-          "<" + sender.name + ">"
-        }}</span>
+        <span
+          class="sm:flex hidden text-sm text-ink-gray-5"
+          v-if="sender.name"
+          >{{ "<" + sender.name + ">" }}</span
+        >
       </div>
 
-      <div class="flex gap-0.5 items-center">
-        <Badge
-          v-if="status.label"
-          :label="__(status.label)"
-          variant="subtle"
-          :theme="status.color"
-          class="mr-1.5"
-        />
-        <Tooltip
-          :text="dateFormat(creation, dateTooltipFormat)"
-          v-if="!isMobileView"
-        >
-          <p class="text-xs md:text-sm text-gray-600">
-            {{ timeAgo(creation) }}
-          </p>
-        </Tooltip>
-        <Button variant="ghost" class="text-gray-700" @click="reply">
-          <ReplyIcon class="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" class="text-gray-700" @click="replyAll">
-          <ReplyAllIcon class="h-4 w-4" />
-        </Button>
-        <Dropdown
-          v-if="showSplitOption"
-          :placement="'right'"
-          :options="[
-            {
-              label: 'Split Ticket',
-              icon: LucideSplit,
-              onClick: () => (showSplitModal = true),
-            },
-          ]"
-        >
-          <Button
-            icon="more-horizontal"
-            class="text-gray-600"
-            variant="ghost"
+      <div class="flex gap-2 items-center">
+        <div class="gap-0.5 flex items-center">
+          <Badge
+            v-if="status.label && !ticket.doc.via_customer_portal"
+            :label="__(status.label)"
+            variant="subtle"
+            :theme="status.color"
+            class="mr-1.5"
           />
-        </Dropdown>
+          <Tooltip
+            :text="dateFormat(creation, dateTooltipFormat)"
+            v-if="!isMobileView"
+          >
+            <p class="text-xs md:text-sm text-ink-gray-5">
+              {{ timeAgo(creation) }}
+            </p>
+          </Tooltip>
+        </div>
+        <div class="flex items-center">
+          <Button variant="ghost" @click="reply">
+            <ReplyIcon class="h-4 w-4 text-ink-gray-5" />
+          </Button>
+          <Button variant="ghost" @click="replyAll">
+            <ReplyAllIcon class="h-4 w-6 text-ink-gray-5" />
+          </Button>
+          <Dropdown
+            v-if="showSplitOption"
+            :placement="'right'"
+            :options="[
+              {
+                label: 'Split Ticket',
+                icon: LucideSplit,
+                onClick: () => (showSplitModal = true),
+              },
+            ]"
+          >
+            <Button
+              icon="more-horizontal"
+              class="text-ink-gray-5 ml-0.5"
+              variant="ghost"
+            />
+          </Dropdown>
+        </div>
       </div>
     </div>
-    <!-- <div class="text-sm leading-5 text-gray-600">
+    <!-- <div class="text-sm leading-5 text-ink-gray-5">
       {{ subject }}
     </div> -->
-    <div class="text-sm leading-5 text-gray-600">
-      <span v-if="to" class="text-2xs mr-1 font-bold text-gray-500">TO:</span>
+    <div class="text-sm leading-5 text-ink-gray-5">
+      <span v-if="to" class="mr-1">To:</span>
       <span v-if="to"> {{ to }} </span>
       <span v-if="cc">, </span>
-      <span v-if="cc" class="text-2xs mr-1 font-bold text-gray-500"> CC: </span>
+      <span v-if="cc"> Cc: </span>
       <span v-if="cc">{{ cc }}</span>
       <span v-if="bcc">, </span>
-      <span v-if="bcc" class="text-2xs mr-1 font-bold text-gray-500">
-        BCC:
-      </span>
+      <span v-if="bcc"> Bcc: </span>
       <span v-if="bcc">{{ bcc }}</span>
     </div>
-    <div class="border-0 border-t my-3 border-outline-gray-modals" />
+    <div class="border-0 border-t my-3 border-outline-gray-modals !-mx-3" />
     <EmailContent :content="content" />
     <div class="flex flex-wrap gap-2">
       <AttachmentItem
@@ -107,14 +111,15 @@
 <script setup lang="ts">
 import { AttachmentItem } from "@/components";
 import { useScreenSize } from "@/composables/screen";
+import { useAuthStore } from "@/stores/auth";
+import { TicketSymbol } from "@/types";
 import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
 import { Dropdown } from "frappe-ui";
-import { computed, ref } from "vue";
+import { storeToRefs } from "pinia";
+import { computed, inject, ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
 import { ReplyAllIcon, ReplyIcon } from "./icons";
 import TicketSplitModal from "./ticket/TicketSplitModal.vue";
-import { useAuthStore } from "@/stores/auth";
-import { storeToRefs } from "pinia";
 
 const props = defineProps({
   activity: {
@@ -141,6 +146,7 @@ const {
 } = props.activity;
 
 const emit = defineEmits(["reply"]);
+const ticket = inject(TicketSymbol)!;
 
 const auth = storeToRefs(useAuthStore());
 

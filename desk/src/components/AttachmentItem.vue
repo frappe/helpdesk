@@ -36,14 +36,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { Button, Dialog } from "frappe-ui";
 import { getType as getMime } from "mime";
-import LucideFileType from "~icons/lucide/file-type";
-import LucideFileImage from "~icons/lucide/file-image";
-import LucideFileText from "~icons/lucide/file-text";
-import LucideFileSpreadsheet from "~icons/lucide/file-spreadsheet";
+import { ref } from "vue";
 import LucideFile from "~icons/lucide/file";
+import LucideFileImage from "~icons/lucide/file-image";
+import LucideFileSpreadsheet from "~icons/lucide/file-spreadsheet";
+import LucideFileText from "~icons/lucide/file-text";
+import LucideFileType from "~icons/lucide/file-type";
 
 interface P {
   label: string;

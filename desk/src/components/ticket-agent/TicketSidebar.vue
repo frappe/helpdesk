@@ -1,11 +1,11 @@
 <template>
-  <Resizer class="flex flex-col justify-between border-l" side="right">
+  <Resizer class="flex flex-col border-l h-full" side="right">
     <TabButtons
       :buttons="tabs"
       v-model="currentTab"
-      class="tab-buttons mb-1 px-5 mt-3.5"
+      class="tab-buttons mb-1 px-5 mt-3.5 shrink-0"
     />
-    <div class="flex-1 max-h-full">
+    <div class="flex-1 min-h-0">
       <TicketDetailsTab v-if="currentTab === 'details'" />
       <TicketContactTab v-else />
     </div>

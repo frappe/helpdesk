@@ -33,14 +33,16 @@
     </span>
 
     <div
-      class="-all ml-2 flex shrink-0 grow items-center justify-between text-sm duration-300 ease-in-out"
+      class="-all ml-2 flex min-w-0 items-center justify-between text-sm duration-300 ease-in-out w-full"
       :class="{
         'opacity-100': isExpanded,
         'opacity-0': !isExpanded,
         '-z-50': !isExpanded,
       }"
     >
-      {{ __(label) }}
+      <Tooltip :text="__(label)" placement="right">
+        <span class="truncate"> {{ __(label) }}</span>
+      </Tooltip>
       <slot name="right" />
     </div>
   </div>
