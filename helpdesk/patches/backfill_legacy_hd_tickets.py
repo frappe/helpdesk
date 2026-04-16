@@ -3,6 +3,11 @@ from frappe.utils import getdate
 
 
 def execute():
+    migrate_ticket_names()
+    seed_series
+
+
+def migrate_ticket_names():
     legacy_tickets = frappe.db.sql(
         """
         SELECT name, creation 
@@ -33,6 +38,10 @@ def execute():
 
         frappe.db.commit()
 
+
+def seed_series():
+    # Extract year and sequence from names like:
+    # HD-TKT-2026-00001
     yearly_max_data = frappe.db.sql(
         """
         SELECT 
