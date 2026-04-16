@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-15 14:31\n"
+"PO-Revision-Date: 2026-04-16 14:40\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Slovenian\n"
 "MIME-Version: 1.0\n"
@@ -1543,7 +1543,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Details"
-msgstr ""
+msgstr "Podrobnosti"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:299
 msgid "Disable Bypass Restrictions"
@@ -1568,7 +1568,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Disabled"
-msgstr ""
+msgstr "Onemogočeno"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:29
 msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
@@ -1576,7 +1576,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:29
 msgid "Discard"
-msgstr ""
+msgstr "Zavrzi"
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:145
 msgid "Discard Article"
@@ -1624,17 +1624,17 @@ msgstr "Tip Dokumenta"
 #. Label of the domain (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Domain"
-msgstr ""
+msgstr "Domena"
 
 #: desk/src/components/ticket/ExportModal.vue:32
 msgid "Download"
-msgstr ""
+msgstr "Prenesi"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:443
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Draft"
-msgstr ""
+msgstr "Osnutek"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:72
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:138
@@ -1716,7 +1716,7 @@ msgstr "E-pošta"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Email Account"
-msgstr ""
+msgstr "E-poštni račun"
 
 #: desk/src/components/Settings/EmailAccountList.vue:3
 msgid "Email Accounts"
@@ -1765,7 +1765,7 @@ msgstr ""
 #: desk/src/pages/desk/contact/ContactDialog.vue:43
 #: desk/src/pages/ticket/MobileTicketAgent.vue:364
 msgid "Emails"
-msgstr ""
+msgstr "E-poštna sporočila"
 
 #: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
@@ -1887,7 +1887,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:136
 msgid "Expand"
-msgstr ""
+msgstr "Razširi"
 
 #: desk/src/components/layouts/Sidebar.vue:530
 msgid "Explore customer portal"
@@ -1896,7 +1896,7 @@ msgstr ""
 #: desk/src/components/ticket/ExportModal.vue:2
 #: desk/src/pages/ticket/Tickets.vue:106
 msgid "Export"
-msgstr ""
+msgstr "Izvozi"
 
 #: desk/src/components/ticket/ExportModal.vue:26
 msgid "Export All {0} Record(s)"
@@ -1904,7 +1904,7 @@ msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:7
 msgid "Export Type"
-msgstr ""
+msgstr "Vrsta izvoza"
 
 #. Label of the is_external_link (Check) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -1978,7 +1978,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback"
-msgstr ""
+msgstr "Povratna informacija"
 
 #. Label of the feedback_extra (Small Text) field in DocType 'HD Email
 #. Feedback'
@@ -2063,7 +2063,7 @@ msgstr "Polja"
 #. Label of the filters (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
-msgstr ""
+msgstr "Filtri"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:76
 #: desk/src/components/Settings/General/components/TicketSettings.vue:229
@@ -2108,7 +2108,7 @@ msgstr ""
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Form"
-msgstr ""
+msgstr "Obrazec"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2116,13 +2116,13 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Friday"
-msgstr ""
+msgstr "Petek"
 
 #. Label of the user_from (Link) field in DocType 'HD Notification'
 #: desk/src/pages/call-logs/CallLogModal.vue:44
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "From"
-msgstr ""
+msgstr "Od"
 
 #. Label of the from_date (Date) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -2131,7 +2131,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:17
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:17
 msgid "From Date"
-msgstr ""
+msgstr "Od datuma"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:86
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:155
@@ -2188,7 +2188,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Gray"
-msgstr ""
+msgstr "Siva"
 
 #: desk/src/pages/home/components/PendingTickets.vue:232
 msgid "Great! All your tickets are within SLA"
@@ -2197,12 +2197,12 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Green"
-msgstr ""
+msgstr "Zelena"
 
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Group By"
-msgstr ""
+msgstr "Razvrsti po"
 
 #. Label of the group_by_field (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2435,7 +2435,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:122
 msgid "Help"
-msgstr ""
+msgstr "Pomoč"
 
 #: helpdesk/config/desktop.py:11
 msgid "HelpDesk"
@@ -2528,7 +2528,7 @@ msgstr ""
 
 #: desk/src/pages/home/Home.vue:5
 msgid "Home"
-msgstr ""
+msgstr "Domov"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:130
 msgid "I understand, add conditions"
@@ -2541,7 +2541,7 @@ msgstr ""
 #. Label of the ip_address (Data) field in DocType 'HD Desk Account Request'
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "IP Address"
-msgstr ""
+msgstr "IP naslov"
 
 #. Label of the button_icon (Data) field in DocType 'HD Action'
 #. Label of the icon (Data) field in DocType 'HD Article Category'
@@ -2550,7 +2550,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Icon"
-msgstr ""
+msgstr "Ikona"
 
 #. Description of the 'Enabled' (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2598,7 +2598,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Image"
-msgstr ""
+msgstr "Slika"
 
 #: desk/src/components/Settings/General/components/Branding.vue:80
 msgid "Image removed successfully."
@@ -2615,11 +2615,11 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:217
 msgid "In Progress"
-msgstr ""
+msgstr "V izvajanju"
 
 #: desk/src/components/Settings/Agents.vue:134
 msgid "Inactive"
-msgstr ""
+msgstr "Neaktivno"
 
 #: desk/src/components/CallArea.vue:36
 msgid "Inbound Call"
@@ -2631,7 +2631,7 @@ msgstr "Prejeto"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:203
 msgid "Incoming"
-msgstr ""
+msgstr "Dohodno"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:212
 msgid "Initiated"
@@ -2644,7 +2644,7 @@ msgstr ""
 
 #: helpdesk/utils.py:32
 msgid "Insufficient Permission for {0}"
-msgstr ""
+msgstr "Nezadostno dovoljenje za {0}"
 
 #. Label of the integer_value (Int) field in DocType 'HD Ticket Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
@@ -2708,7 +2708,7 @@ msgstr ""
 #. Label of the is_default (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Is Default"
-msgstr ""
+msgstr "Je Privzeto"
 
 #. Label of the is_standard (Check) field in DocType 'HD Form Script'
 #. Label of the is_standard (Check) field in DocType 'HD View'
@@ -2765,7 +2765,7 @@ msgstr "Ključ"
 
 #: desk/src/components/modals/ShortcutsModal.vue:4
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Bližnjice na tipkovnici"
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -2797,11 +2797,11 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Landing Page"
-msgstr ""
+msgstr "Ciljna stran"
 
 #: desk/src/components/Settings/Profile/Profile.vue:138
 msgid "Language"
-msgstr ""
+msgstr "Jezik"
 
 #: desk/src/components/Settings/Profile/Profile.vue:300
 msgid "Language updated successfully."
@@ -2827,7 +2827,7 @@ msgstr ""
 #: desk/src/pages/dashboard/Dashboard.vue:468
 #: desk/src/pages/dashboard/Dashboard.vue:504
 msgid "Last 30 Days"
-msgstr ""
+msgstr "Zadnjih 30 dni"
 
 #: desk/src/pages/dashboard/Dashboard.vue:473
 #: desk/src/pages/dashboard/Dashboard.vue:475
@@ -2837,12 +2837,12 @@ msgstr ""
 #: desk/src/pages/dashboard/Dashboard.vue:459
 #: desk/src/pages/dashboard/Dashboard.vue:461
 msgid "Last 7 Days"
-msgstr ""
+msgstr "Zadnjih 7 dni"
 
 #: desk/src/pages/dashboard/Dashboard.vue:480
 #: desk/src/pages/dashboard/Dashboard.vue:482
 msgid "Last 90 Days"
-msgstr ""
+msgstr "Zadnjih 90 dni"
 
 #. Label of the last_agent_response (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2857,7 +2857,7 @@ msgstr ""
 #: desk/src/pages/home/components/RecentFeedback.vue:289
 #: desk/src/pages/home/components/RecentFeedback.vue:312
 msgid "Last Month"
-msgstr ""
+msgstr "Prejšnji mesec"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:126
 msgid "Last Name"
@@ -2866,7 +2866,7 @@ msgstr "Priimek"
 #: desk/src/pages/home/components/RecentFeedback.vue:285
 #: desk/src/pages/home/components/RecentFeedback.vue:311
 msgid "Last Week"
-msgstr ""
+msgstr "Prejšnji teden"
 
 #: desk/src/pages/home/components/AgentTicketsCard.vue:34
 #: desk/src/pages/home/components/AvgTimeCard.vue:50
@@ -2940,7 +2940,7 @@ msgstr "Seznam"
 
 #: desk/src/pages/ticket/Tickets.vue:309
 msgid "List View"
-msgstr ""
+msgstr "Pogled seznama"
 
 #: desk/src/components/CallArea.vue:72
 msgid "Listen"
@@ -2963,7 +2963,7 @@ msgstr ""
 #: desk/src/components/layouts/Sidebar.vue:322
 #: desk/src/components/layouts/Sidebar.vue:371
 msgid "Log out"
-msgstr ""
+msgstr "Odjava"
 
 #: desk/src/components/layouts/Sidebar.vue:351
 msgid "Login to Frappe Cloud"
@@ -3020,7 +3020,7 @@ msgstr ""
 #: desk/src/pages/MobileNotifications.vue:11
 #: desk/src/pages/MobileNotifications.vue:14
 msgid "Mark all as read"
-msgstr ""
+msgstr "Označi vse kot prebrano"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:45
 msgid "Members"
@@ -3084,7 +3084,7 @@ msgstr "Mesečno"
 #: desk/src/pages/knowledge-base/Article.vue:620
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:187
 msgid "Move To"
-msgstr ""
+msgstr "Premakni v"
 
 #: desk/src/pages/dashboard/Dashboard.vue:243
 msgid "My Dashboard"
@@ -3184,7 +3184,7 @@ msgstr ""
 
 #: desk/src/components/ticket/ActivityHeader.vue:16
 msgid "New Email"
-msgstr ""
+msgstr "Nova e-pošta"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:109
 msgid "New Field Dependency"
@@ -3196,7 +3196,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:8
 msgid "New Password"
-msgstr ""
+msgstr "Novo Geslo"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:8
 msgid "New SLA Policy"
@@ -3243,7 +3243,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:52
 msgid "New users will have to be manually registered by system managers."
-msgstr ""
+msgstr "Nove uporabnike bodo morali ročno registrirati sistemski upravitelji."
 
 #: desk/src/components/modals/ShortcutsModal.vue:110
 msgid "Next ticket"
@@ -3404,7 +3404,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:10
 msgid "Not Saved"
-msgstr ""
+msgstr "Ni shranjeno"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:250
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:270
@@ -3415,12 +3415,12 @@ msgstr "Ni določeno"
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Notification Settings"
-msgstr ""
+msgstr "Nastavitve obvestil"
 
 #: desk/src/components/layouts/Sidebar.vue:36
 #: desk/src/pages/MobileNotifications.vue:6
 msgid "Notifications"
-msgstr ""
+msgstr "Obvestila"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:161
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:242
@@ -3458,7 +3458,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Open"
-msgstr ""
+msgstr "Odpri"
 
 #: desk/src/components/modals/ShortcutsModal.vue:81
 msgid "Open command palette"
@@ -3506,12 +3506,12 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Orange"
-msgstr ""
+msgstr "Oranžna"
 
 #. Label of the order (Int) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Order"
-msgstr ""
+msgstr "Vrstni red"
 
 #. Label of the order_by_tab (Tab Break) field in DocType 'HD View'
 #. Label of the order_by (Code) field in DocType 'HD View'
@@ -3525,7 +3525,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/TicketFeedback.vue:52
 msgid "Other"
-msgstr ""
+msgstr "Drugo"
 
 #: desk/src/components/CallArea.vue:37
 msgid "Outbound Call"
@@ -3533,7 +3533,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:204
 msgid "Outgoing"
-msgstr ""
+msgstr "Odhodno"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:199
 msgid "Outside working hours notice"
@@ -3545,7 +3545,7 @@ msgstr ""
 
 #: desk/src/pages/InvalidPage.vue:11
 msgid "Page not found"
-msgstr ""
+msgstr "Stran ni najdena"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyFieldsSelection.vue:5
 msgid "Parent field"
@@ -3557,7 +3557,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:123
 msgid "Password"
-msgstr ""
+msgstr "Geslo"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:104
 msgid "Password must be at least 8 characters"
@@ -3573,7 +3573,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:117
 msgid "Passwords do not match"
-msgstr ""
+msgstr "Gesli se ne ujemata"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:36
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:123
@@ -3590,7 +3590,7 @@ msgstr "Pauzirano"
 
 #: desk/src/pages/home/components/PendingTickets.vue:200
 msgid "Pending"
-msgstr ""
+msgstr "V teku"
 
 #: desk/src/components/Settings/InviteAgents.vue:36
 msgid "Pending Invites"
@@ -3620,7 +3620,7 @@ msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:46
 msgid "Period"
-msgstr ""
+msgstr "Obdobje"
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
 #: desk/src/components/SavedRepliesSelectorModal.vue:164
@@ -3629,7 +3629,7 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:223
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Personal"
-msgstr ""
+msgstr "Osebno"
 
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:78
 msgid "Personal mobile no"
@@ -3638,7 +3638,7 @@ msgstr ""
 #: desk/src/components/desk/global/NewContactDialog.vue:133
 #: desk/src/components/ticket/SetContactPhoneModal.vue:27
 msgid "Phone"
-msgstr ""
+msgstr "Telefon"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:51
 msgid "Phone Nos"
@@ -3655,7 +3655,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Pink"
-msgstr ""
+msgstr "Roza"
 
 #. Label of the pinned (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -3665,7 +3665,7 @@ msgstr ""
 #. Label of the placeholder (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Placeholder"
-msgstr ""
+msgstr "Nadomestno besedilo"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:19
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
