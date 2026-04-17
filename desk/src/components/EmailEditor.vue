@@ -17,7 +17,7 @@
   >
     <template #top>
       <div
-        v-if="from.length"
+        v-if="hasMultipleSenders"
         class="mx-6 md:mx-5 flex items-center gap-2 border-t py-2.5"
       >
         <span class="text-xs text-ink-gray-4">{{ __("FROM") }}:</span>
@@ -30,7 +30,7 @@
           :options="from"
         />
       </div>
-      <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
+      <div class="mx-6 md:mx-5 flex items-center gap-2 border-y py-2.5">
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
@@ -323,7 +323,7 @@ const { onUserType, cleanup } = useTyping(props.ticketId);
 const attachments = ref([]);
 const isUploading = ref(false);
 const contentEmpty = computed(() => isContentEmpty(newEmail.value));
-
+const hasMultipleSenders = computed(() => (from?.length ?? 0) > 1);
 const isDisabled = computed(() => {
   return (
     (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
@@ -395,7 +395,11 @@ const sendMail = createResource({
   debounce: 300,
 });
 
-const user = createDocumentResource({ doctype: "User", name: userId });
+const user = createDocumentResource({
+  doctype: "User",
+  name: userId,
+  cache: "user",
+});
 
 const from = computed(() => {
   if (!user.doc || !user.doc.user_emails?.length) return [];

@@ -13,7 +13,6 @@ import LucideUserPlus from "~icons/lucide/user-plus";
 import LucideUsers from "~icons/lucide/users";
 import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
-import SlidersIcon from '@/components/icons/SlidersIcon.vue'
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
 import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
@@ -27,7 +26,6 @@ import General from "./General/General.vue";
 import SettingsGear from "~icons/lucide/settings";
 import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
 import ProfilePage from "./Profile/ProfilePage.vue";
-import PreferenceSettings from "./PreferenceSettings.vue";
 
 export const showSettingsModal = ref(false);
 
@@ -48,12 +46,7 @@ export const tabs = computed(() => {
             size: "xs",
           }),
           component: markRaw(ProfilePage),
-        },
-        {
-          label: __('Preferences'),
-          icon: SlidersIcon,
-          component: markRaw(PreferenceSettings),
-        },
+        }
       ],
     },
     {

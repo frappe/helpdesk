@@ -10,21 +10,20 @@
           class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-xl hover:opacity-70 !pr-0 !max-w-96 !justify-start"
           @click="emit('updateStep', 'profile')"
         />
-        <Badge
-          v-if="isDirty"
-          :label="__('Not Saved')"
-          variant="subtle"
-          theme="orange"
-        />
+        <Transition name="fade">
+          <Badge
+            v-if="isDirty"
+            :label="__('Not Saved')"
+            variant="subtle"
+            theme="orange"
+        /></Transition>
       </div>
     </template>
     <template #header-actions>
-      <Button
-        v-if="isDirty"
-        variant="solid"
-        :label="__('Update')"
-        @click="update"
-      />
+      <Transition name="fade">
+        <div v-if="isDirty">
+          <Button variant="solid" :label="__('Update')" @click="update" /></div
+      ></Transition>
     </template>
     <template #content>
       <div class="flex flex-col gap-4">

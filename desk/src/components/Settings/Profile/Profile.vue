@@ -86,51 +86,98 @@
         </FileUploader>
       </div>
       <div>
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between h-7">
           <div class="flex gap-2 items-center">
-            <div class="text-base font-semibold text-ink-gray-9">
+            <span class="text-base font-semibold text-ink-gray-9">
               {{ __("Account Info & Security") }}
-            </div>
-            <Badge
-              v-if="isProfileDirty"
-              :variant="'subtle'"
-              :theme="'orange'"
-              size="sm"
-              :label="__('Unsaved')"
-            />
+            </span>
+            <Transition name="fade">
+              <Badge
+                v-if="isDirty"
+                :variant="'subtle'"
+                :theme="'orange'"
+                size="sm"
+                :label="__('Unsaved')"
+              />
+            </Transition>
           </div>
+
+          <Transition name="fade">
+            <Button
+              variant="solid"
+              v-if="isDirty"
+              :label="__('Save')"
+              :loading="user.save.loading"
+              @click="save()"
+          /></Transition>
         </div>
+      </div>
+      <div class="flex items-center justify-between mt-6">
+        <div class="flex flex-col gap-1">
+          <span class="text-base font-medium text-ink-gray-8">
+            {{ __("Emails & Signature") }}
+          </span>
+          <span class="text-p-sm text-ink-gray-6">
+            {{
+              __(
+                "Manage your account emails and email signature for communication."
+              )
+            }}
+          </span>
+        </div>
+        <Button
+          :label="__('Configure')"
+          @click="emit('updateStep', 'user-email-settings')"
+        />
+      </div>
+      <div class="flex items-center justify-between mt-6">
+        <div class="flex flex-col gap-1">
+          <span class="text-base font-medium text-ink-gray-8">
+            {{ __("Password") }}
+          </span>
+          <span class="text-p-sm text-ink-gray-6">{{
+            __("Change your account password for security.")
+          }}</span>
+        </div>
+        <Button
+          icon-left="lock"
+          :label="__('Change Password')"
+          @click="showChangePasswordModal = true"
+        />
+      </div>
+      <div>
         <div class="flex items-center justify-between mt-6">
           <div class="flex flex-col gap-1">
             <span class="text-base font-medium text-ink-gray-8">
-              {{ __("Emails & Signature") }}
+              {{ __("Language") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
-              {{
-                __(
-                  "Manage your account emails and email signature for communication."
-                )
-              }}
+              {{ __("Change language of the application.") }}
             </span>
           </div>
-          <Button
-            :label="__('Configure')"
-            @click="emit('updateStep', 'user-email-settings')"
+          <Link
+            v-model="user.doc.language"
+            @update:modelValue="user.doc.language = $event || language"
+            doctype="Language"
+            class="w-40"
           />
         </div>
         <div class="flex items-center justify-between mt-6">
           <div class="flex flex-col gap-1">
             <span class="text-base font-medium text-ink-gray-8">
-              {{ __("Password") }}
+              {{ __("Timezone") }}
             </span>
-            <span class="text-p-sm text-ink-gray-6">{{
-              __("Change your account password for security.")
-            }}</span>
+            <span class="text-p-sm text-ink-gray-6">
+              {{ __("Change timezone of the application.") }}
+            </span>
           </div>
-          <Button
-            icon-left="lock"
-            :label="__('Change Password')"
-            @click="showChangePasswordModal = true"
+          <Autocomplete
+            :model-value="user.doc.time_zone"
+            @update:modelValue="user.doc.time_zone = $event?.value || timezone"
+            class="w-40"
+            :options="timezoneOptions"
+            size="sm"
+            placeholder="Select Timezone"
           />
         </div>
       </div>
@@ -152,6 +199,7 @@ import {
   LoadingIndicator,
   toast,
   createDocumentResource,
+  createResource,
 } from "frappe-ui";
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
@@ -192,19 +240,24 @@ function editFullName() {
 }
 
 const isDirty = computed(() => {
-  return JSON.stringify(user.doc) !== JSON.stringify(user.originalDoc);
+  return user.doc?.time_zone !== user.originalDoc?.time_zone ||
+    user.doc.language !== user.originalDoc?.language
+    ? true
+    : false;
 });
 
 function save() {
-  if (!isDirty.value) {
-    editName.value = false;
-    return;
-  }
+  refreshRequired.value =
+    user.doc.language !== user.originalDoc?.language ||
+    user.doc.time_zone !== user.originalDoc?.time_zone;
 
   user.save.submit(null, {
     onSuccess: () => {
       editName.value = false;
       toast.success(__("Profile Updated Successfully"));
+      if (refreshRequired.value) {
+        window.location.reload();
+      }
     },
     onError: (err: { message: string; messages: string[] }) => {
       toast.error(err.message + ": " + err.messages[0]);
@@ -217,6 +270,22 @@ function updateImage(fileUrl = "") {
   user.doc.user_image = fileUrl;
   save();
 }
+
+const timezoneOptions = ref([]);
+const timezoneData = createResource({
+  url: "frappe.core.doctype.user.user.get_timezones",
+  auto: true,
+  onSuccess(data) {
+    timezoneOptions.value = data.timezones.map((tz) => ({
+      label: tz,
+      value: tz,
+    }));
+  },
+});
+
+const language = ref(user?.doc?.language);
+const timezone = ref(user?.doc?.time_zone);
+const refreshRequired = ref(false);
 
 watch(isDirty, (val) => {
   disableSettingModalOutsideClick.value = val;
