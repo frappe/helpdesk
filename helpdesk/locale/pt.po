@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-16 14:40\n"
+"PO-Revision-Date: 2026-04-17 14:51\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Portuguese\n"
 "MIME-Version: 1.0\n"
@@ -1869,7 +1869,7 @@ msgstr ""
 
 #: helpdesk/overrides/email_account.py:92
 msgid "Error while connecting to email account {0}"
-msgstr ""
+msgstr "Erro ao conectar à conta de e-mail {0}"
 
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:43
 msgid "Escalation rule already exists for this criteria"
@@ -3851,7 +3851,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:21
 msgid "Publish"
-msgstr ""
+msgstr "Publicar"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:439
@@ -3870,7 +3870,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
-msgstr ""
+msgstr "Obter e-mails"
 
 #: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
@@ -3923,7 +3923,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
-msgstr ""
+msgstr "Classificação"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
@@ -4143,7 +4143,7 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:113
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Response"
-msgstr ""
+msgstr "Resposta"
 
 #. Label of the response_by (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -4230,7 +4230,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:215
 msgid "Ringing"
-msgstr ""
+msgstr "A Tocar"
 
 #: desk/src/components/Settings/InviteAgents.vue:18
 msgid "Role"
@@ -4588,7 +4588,7 @@ msgstr ""
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Setup"
-msgstr ""
+msgstr "Configuração"
 
 #: desk/src/components/Settings/EmailAdd.vue:3
 msgid "Setup Email"
@@ -5463,7 +5463,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:21
 msgid "Unpublish"
-msgstr ""
+msgstr "Cancelar publicação"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:19
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:25
