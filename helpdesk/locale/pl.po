@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-16 14:40\n"
+"PO-Revision-Date: 2026-04-17 14:51\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Polish\n"
 "MIME-Version: 1.0\n"
@@ -3870,7 +3870,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
-msgstr ""
+msgstr "Pobierz e-maile"
 
 #: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
@@ -3923,7 +3923,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
-msgstr ""
+msgstr "Ocena"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
@@ -4143,7 +4143,7 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:113
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Response"
-msgstr ""
+msgstr "Odpowiedź"
 
 #. Label of the response_by (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -4230,7 +4230,7 @@ msgstr "Recenzje"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:215
 msgid "Ringing"
-msgstr ""
+msgstr "Dzwonienie"
 
 #: desk/src/components/Settings/InviteAgents.vue:18
 msgid "Role"
@@ -4375,7 +4375,7 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:72
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Scope"
-msgstr ""
+msgstr "Zakres"
 
 #. Label of the script (Code) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -5463,7 +5463,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:21
 msgid "Unpublish"
-msgstr ""
+msgstr "Cofnij publikację"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:19
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:25
