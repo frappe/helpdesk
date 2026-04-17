@@ -38,7 +38,7 @@
 </template>
 <script setup lang="ts">
 import { LayoutHeader, ListViewBuilder } from "@/components";
-import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
+import NewContactDialog from "@/components/contact/NewContactDialog.vue";
 import { PhoneIcon } from "@/components/icons";
 import { Avatar, toast, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";

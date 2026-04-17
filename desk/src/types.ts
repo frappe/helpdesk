@@ -760,6 +760,26 @@ export interface CustomerContact {
   modified: string;
   ticket_count: number;
 }
+export interface NewContactState {
+  firstName: string;
+  lastName: string;
+  image: string;
+  email: string;
+  phone: string;
+  timezone: string | AutoCompleteItem;
+  customer: string;
+}
+
+export interface EditContactState {
+  firstName: string;
+  lastName: string;
+  image: string;
+  emails: { email_id: string; isPrimary: boolean }[];
+  phones: { phone: string; isPrimary: boolean }[];
+  customers: string[];
+  timezone: string | AutoCompleteItem;
+}
+
 export interface LineChart {
   percentage_change: number;
   total: number;

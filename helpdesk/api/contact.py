@@ -29,6 +29,7 @@ def search_contacts(
 
 @frappe.whitelist()
 def delete_contact(name: str):
+    # TODO: add as on_trash hook in hooks to handle this at the DocType level
     frappe.has_permission("Contact", "delete", throw=True)
     tickets = frappe.get_list("HD Ticket", filters={"contact": name}, pluck="name")
     delete_bulk("HD Ticket", tickets)
@@ -39,3 +40,46 @@ def delete_contact(name: str):
     )
     delete_bulk("HD Customer Member", customers)
     frappe.delete_doc("Contact", name)
+
+
+@frappe.whitelist()
+def create_contact(doc: dict) -> str:
+    print(doc.get("image"))
+
+    frappe.has_permission("Contact", "create", throw=True)
+    contact_doc = frappe.get_doc(
+        {
+            "doctype": "Contact",
+            "first_name": doc.get("first_name"),
+            "last_name": doc.get("last_name"),
+            "image": doc.get("image"),
+        }
+    )
+
+    if email := doc.get("email"):
+        contact_doc.append("email_ids", {"email_id": email, "is_primary": True})
+
+    if phone := doc.get("phone"):
+        contact_doc.append(
+            "phone_nos",
+            {"phone": phone, "is_primary_phone": True, "is_primary_mobile_no": True},
+        )
+
+    contact_doc.insert()
+
+    # Link contact to customer if customer is provided, creates user of contact and assign HD Customer role to the user
+    if customer := doc.get("customer"):
+        customer_doc = frappe.get_doc("HD Customer", customer)
+        customer_doc.append("contacts", {"contact_name": contact_doc.name})
+        customer_doc.save()
+
+        contact_doc.reload()  # reload to get the linked user
+
+        # If contact is linked to a customer, then they should have a user.
+        user = contact_doc.get("user")
+        user_doc = frappe.get_doc("User", user)
+        user_doc.image = doc.get("image", "")
+        user_doc.timezone = doc.get("timezone", "")
+        user_doc.save()
+
+    return contact_doc.get("name")
