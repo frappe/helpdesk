@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-16 14:40\n"
+"PO-Revision-Date: 2026-04-17 14:51\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Slovenian\n"
 "MIME-Version: 1.0\n"
@@ -1869,7 +1869,7 @@ msgstr ""
 
 #: helpdesk/overrides/email_account.py:92
 msgid "Error while connecting to email account {0}"
-msgstr ""
+msgstr "Napaka pri povezovanju z e-poštnim računom {0}"
 
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.py:43
 msgid "Escalation rule already exists for this criteria"
@@ -3853,7 +3853,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:21
 msgid "Publish"
-msgstr ""
+msgstr "Objavi"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:439
@@ -3872,7 +3872,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
-msgstr ""
+msgstr "Pridobi e-pošto"
 
 #: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
@@ -3925,7 +3925,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
-msgstr ""
+msgstr "Ocena"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
@@ -4015,7 +4015,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:48
 msgid "Remove"
-msgstr ""
+msgstr "Odstrani"
 
 #: desk/src/components/Settings/General/components/Branding.vue:110
 msgid "Remove Logo"
@@ -4145,7 +4145,7 @@ msgstr "Rešeno"
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:113
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Response"
-msgstr ""
+msgstr "Odgovor"
 
 #. Label of the response_by (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -4377,12 +4377,12 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:72
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Scope"
-msgstr ""
+msgstr "Obseg"
 
 #. Label of the script (Code) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Script"
-msgstr ""
+msgstr "Skript"
 
 #. Label of the search_tab (Tab Break) field in DocType 'HD Settings'
 #: desk/src/components/SavedRepliesSelectorModal.vue:27
@@ -4590,7 +4590,7 @@ msgstr ""
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Setup"
-msgstr ""
+msgstr "Namestitev"
 
 #: desk/src/components/Settings/EmailAdd.vue:3
 msgid "Setup Email"
@@ -4722,7 +4722,7 @@ msgstr ""
 #. Label of the start_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "Start Time"
-msgstr ""
+msgstr "Čas začetka"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:98
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
@@ -5465,7 +5465,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:21
 msgid "Unpublish"
-msgstr ""
+msgstr "Razveljavi objavo"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:19
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:25
@@ -5594,7 +5594,7 @@ msgstr ""
 #. Label of the views (Int) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Views"
-msgstr ""
+msgstr "Pogledi"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
