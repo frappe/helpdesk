@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-17 14:51\n"
+"PO-Revision-Date: 2026-04-18 15:33\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Polish\n"
 "MIME-Version: 1.0\n"
@@ -3851,7 +3851,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:21
 msgid "Publish"
-msgstr ""
+msgstr "Opublikuj"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:439
