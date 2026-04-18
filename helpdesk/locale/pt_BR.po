@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-17 14:52\n"
+"PO-Revision-Date: 2026-04-18 15:33\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Portuguese, Brazilian\n"
 "MIME-Version: 1.0\n"
@@ -2894,7 +2894,7 @@ msgstr ""
 #. Label of the layout (Code) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Layout"
-msgstr ""
+msgstr "Disposição"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:150
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:227
@@ -3527,7 +3527,7 @@ msgstr "Outro"
 
 #: desk/src/components/CallArea.vue:37
 msgid "Outbound Call"
-msgstr ""
+msgstr "Chamada de saída"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:204
 msgid "Outgoing"
@@ -3851,7 +3851,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:21
 msgid "Publish"
-msgstr ""
+msgstr "Publicar"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:439
@@ -4013,7 +4013,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:48
 msgid "Remove"
-msgstr ""
+msgstr "Remover"
 
 #: desk/src/components/Settings/General/components/Branding.vue:110
 msgid "Remove Logo"
@@ -4588,7 +4588,7 @@ msgstr ""
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Setup"
-msgstr ""
+msgstr "Configuração"
 
 #: desk/src/components/Settings/EmailAdd.vue:3
 msgid "Setup Email"
@@ -4817,7 +4817,7 @@ msgstr ""
 #. Label of the summary (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Summary"
-msgstr ""
+msgstr "Resumo"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
