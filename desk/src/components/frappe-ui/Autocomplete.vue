@@ -23,7 +23,7 @@
                 <span class="text-base leading-5 truncate" v-if="selectedValue">
                   {{ displayValue(selectedValue) }}
                 </span>
-                <span class="text-base leading-5 text-gray-600" v-else>
+                <span class="text-base leading-5 text-ink-gray-4" v-else>
                   {{ placeholder || "" }}
                 </span>
               </div>
