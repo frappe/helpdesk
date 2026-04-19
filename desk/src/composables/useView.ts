@@ -26,7 +26,7 @@ export const views = createListResource({
       view.rows = JSON.parse(view.rows) || [];
     });
   },
-  pageLength: 1000,
+  pageLength: 100,
 });
 
 export const currentView = ref({

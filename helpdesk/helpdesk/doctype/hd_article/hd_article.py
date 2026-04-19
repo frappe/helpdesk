@@ -13,6 +13,7 @@ class HDArticle(Document):
     def validate(self):
         self.validate_article_category()
         self.validate_published_content()
+        self.validate_visibility()
 
     def validate_article_category(self):
         if self.has_value_changed("category") and not self.is_new():
@@ -22,6 +23,12 @@ class HDArticle(Document):
     def validate_published_content(self):
         if self.status == "Published" and not self.content:
             frappe.throw(_("Published articles must have content."))
+
+    def validate_visibility(self):
+        if self.visibility == "Restricted" and not self.visible_to:
+            frappe.throw(
+                _("Please specify at least one organization when visibility is set to Restricted")
+            )
 
     def before_insert(self):
         self.author = frappe.session.user

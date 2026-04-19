@@ -1,4 +1,5 @@
-#!bin/bash
+#!/bin/bash
+set -e
 
 if [ -d "/home/frappe/frappe-bench/apps/frappe" ]; then
     echo "Bench already exists, skipping init"

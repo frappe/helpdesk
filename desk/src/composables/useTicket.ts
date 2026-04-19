@@ -49,10 +49,14 @@ export const useTicket = (ticketId: string): MapValue => {
         params: { ticket: ticketId },
         auto: true,
         transform: (data: string) => {
-          return JSON.parse(data).map((name: string) => ({ name })) as Record<
-            "name",
-            string
-          >[];
+          try {
+            return JSON.parse(data).map((name: string) => ({ name })) as Record<
+              "name",
+              string
+            >[];
+          } catch {
+            return [];
+          }
         },
       }),
       contact: createResource({

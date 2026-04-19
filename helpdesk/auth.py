@@ -127,6 +127,6 @@ def is_custom_app_endpoint(path):
             allowed_custom_endpoints = [allowed_custom_endpoints]
 
     for endpoint in allowed_custom_endpoints:  # noqa: SIM110
-        if endpoint in path:
+        if path == endpoint or path.startswith(endpoint + "/"):
             return True
     return False

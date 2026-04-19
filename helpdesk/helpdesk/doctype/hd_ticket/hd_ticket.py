@@ -84,7 +84,7 @@ class HDTicket(Document):
         self.set_feedback_values()
         self.set_default_status()
         self.set_status_category()
-        # self.apply_escalation_rule()
+        # TODO: Re-enable escalation rules once the feature is complete
         self.set_sla()
 
         self.set_contact()
@@ -1220,7 +1220,7 @@ def has_permission(doc, user=None):
             assignees = json.loads(doc._assign)
             if user in assignees:
                 return True
-        except:
+        except (json.JSONDecodeError, TypeError):
             return False
 
     teams = get_agents_team()
@@ -1281,9 +1281,7 @@ def permission_query(user):
         if not all_teams:
             return query
         all_teams = ", ".join(f"'{team}'" for team in all_teams)
-        query += f" OR (`tabHD Ticket`.agent_group in ({all_teams}))".format(
-            all_teams=all_teams
-        )
+        query += f" OR (`tabHD Ticket`.agent_group in ({all_teams}))"
         if not show_tickets_without_team:
             query += " OR (`tabHD Ticket`.agent_group is null)"
         return query
@@ -1301,9 +1299,7 @@ def permission_query(user):
 
     # Here we will apply the restriction based on the teams the agent belongs to.
     team_names = ", ".join(f"'{team}'" for team in team_names)
-    query += f" OR (`tabHD Ticket`.agent_group in ({team_names}))".format(
-        team_names=team_names
-    )
+    query += f" OR (`tabHD Ticket`.agent_group in ({team_names}))"
     return query
 
 

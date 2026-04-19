@@ -1,3 +1,4 @@
+import json
 import re
 
 import frappe
@@ -96,12 +97,13 @@ def generate_on_change_function(parent_child_mapping, parent_field, child_field)
     script = f"function update_{child_field}(value){{\n"
     first = True
     for parent, children in parent_child_mapping.items():
-        options = ",".join([f'"{child}"' for child in children])
+        options = ",".join([json.dumps(child) for child in children])
+        escaped_parent = json.dumps(parent)
         if first:
-            script += f'        if(value=="{parent}") {{\n'
+            script += f"        if(value=={escaped_parent}) {{\n"
             first = False
         else:
-            script += f'        else if(value=="{parent}") {{\n'
+            script += f"        else if(value=={escaped_parent}) {{\n"
 
         script += f"            options = [{options}]\n"
         script += f'            applyFilters("{child_field}",options)\n'

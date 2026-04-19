@@ -43,7 +43,11 @@ setConfig("serverMessagesHandler", (msgs) => {
     return;
   }
   msgs.forEach((msg) => {
-    msg = JSON.parse(msg);
+    try {
+      msg = JSON.parse(msg);
+    } catch {
+      return;
+    }
     if (msg && msg.message == "Feedback email has been sent to the customer.") {
       toast.success(msg.message);
       return;
@@ -81,8 +85,11 @@ if (import.meta.env.DEV) {
   frappeRequest({
     url: "/api/method/helpdesk.www.helpdesk.index.get_context_for_dev",
   }).then((values) => {
-    for (let key in values) {
-      window[key] = values[key];
+    const allowedKeys = ["site_name", "csrf_token", "socketio_port"];
+    for (let key of allowedKeys) {
+      if (key in values) {
+        window[key] = values[key];
+      }
     }
     socket = initSocket();
     app.config.globalProperties.$socket = socket;
