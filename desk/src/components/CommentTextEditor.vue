@@ -14,7 +14,7 @@
     :editable="editable"
     :mentions="dropdown"
     @change="editable ? (newComment = $event) : null"
-    :extensions="[ComponentUtils, HandleExcelPaste]"
+    :extensions="[ComponentUtils, HandleExcelPaste, CleanStyles]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #bottom>
@@ -113,7 +113,11 @@ import { AttachmentIcon } from "@/components/icons/";
 import { useTyping } from "@/composables/realtime";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
-import { ComponentUtils, HandleExcelPaste } from "@/tiptap-extensions";
+import {
+  ComponentUtils,
+  HandleExcelPaste,
+  CleanStyles,
+} from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,
