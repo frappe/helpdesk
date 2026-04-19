@@ -18,7 +18,7 @@
               <div class="group relative !size-14">
                 <Avatar
                   class="!size-14"
-                  :image="user.doc.user_image"
+                  :image="user.doc?.user_image"
                   :label="fullName"
                 />
                 <Tooltip
@@ -31,7 +31,7 @@
                     @click.stop="openFileSelector"
                   />
                   <div
-                    v-if="user.doc.user_image"
+                    v-if="user.doc?.user_image"
                     class="z-1 size-4 absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-surface-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2 outline outline-black-overlay-50"
                     @click.stop="updateImage()"
                     @mouseenter="isHoveringRemove = true"
@@ -107,7 +107,7 @@
               variant="solid"
               v-if="isDirty"
               :label="__('Save')"
-              :loading="user.save.loading"
+              :loading="user?.save?.loading"
               @click="save()"
           /></Transition>
         </div>
@@ -156,8 +156,8 @@
             </span>
           </div>
           <Link
-            v-model="user.doc.language"
-            @update:modelValue="user.doc.language = $event || language"
+            :model-value="user.doc?.language"
+            @update:modelValue="updateLanguage"
             doctype="Language"
             class="w-40"
           />
@@ -172,8 +172,8 @@
             </span>
           </div>
           <Autocomplete
-            :model-value="user.doc.time_zone"
-            @update:modelValue="user.doc.time_zone = $event?.value || timezone"
+            :model-value="user.doc?.time_zone"
+            @update:modelValue="updateTimezone"
             class="w-40"
             :options="timezoneOptions"
             size="sm"
@@ -219,15 +219,14 @@ const editName = ref(false);
 
 const profileTooltipText = computed(() => {
   if (isHoveringRemove.value) return __("Remove Photo");
-  return user.doc.user_image ? __("Change Photo") : __("Upload Photo");
+  return user.doc?.user_image ? __("Change Photo") : __("Upload Photo");
 });
 
 const fullNameRef = useTemplateRef("fullNameRef");
 const fullName = computed({
-  get: () => {
-    return user.doc.full_name;
-  },
+  get: () => user.doc?.full_name ?? "",
   set: (val) => {
+    if (!user.doc) return;
     const [firstName, ...lastName] = val.split(" ");
     user.doc.first_name = firstName;
     user.doc.last_name = lastName.join(" ");
@@ -241,15 +240,15 @@ function editFullName() {
 
 const isDirty = computed(() => {
   return user.doc?.time_zone !== user.originalDoc?.time_zone ||
-    user.doc.language !== user.originalDoc?.language
+    user.doc?.language !== user.originalDoc?.language
     ? true
     : false;
 });
 
 function save() {
   refreshRequired.value =
-    user.doc.language !== user.originalDoc?.language ||
-    user.doc.time_zone !== user.originalDoc?.time_zone;
+    user.doc?.language !== user.originalDoc?.language ||
+    user.doc?.time_zone !== user.originalDoc?.time_zone;
 
   user.save.submit(null, {
     onSuccess: () => {
@@ -271,6 +270,16 @@ function updateImage(fileUrl = "") {
   save();
 }
 
+function updateLanguage(val: string | null) {
+  if (!user.doc) return;
+  user.doc.language = val || language.value;
+}
+
+function updateTimezone(val: { label: string; value: string } | null) {
+  if (!user.doc) return;
+  user.doc.time_zone = val?.value || timezone.value;
+}
+
 const timezoneOptions = ref([]);
 const timezoneData = createResource({
   url: "frappe.core.doctype.user.user.get_timezones",
@@ -283,9 +292,20 @@ const timezoneData = createResource({
   },
 });
 
-const language = ref(user?.doc?.language);
-const timezone = ref(user?.doc?.time_zone);
+const language = ref(null);
+const timezone = ref(null);
+
 const refreshRequired = ref(false);
+
+watch(
+  () => user.doc,
+  (doc) => {
+    if (!doc) return;
+    if (!language.value) language.value = doc.language;
+    if (!timezone.value) timezone.value = doc.time_zone;
+  },
+  { immediate: true }
+);
 
 watch(isDirty, (val) => {
   disableSettingModalOutsideClick.value = val;

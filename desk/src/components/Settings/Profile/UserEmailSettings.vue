@@ -32,13 +32,13 @@
             {{ __("Signature") }}
           </span>
           <span class="text-p-sm text-ink-gray-6">
-            {{ __("Manage your email signature") }}
+            {{ __("Manage your email signature.") }}
           </span>
         </div>
         <TextEditor
-          editor-class="prose-sm min-h-28 max-w-full border rounded-b-lg border-t-0 p-2 border-outline-gray-modals"
+          editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5"
           :content="user?.doc?.email_signature"
-          :placeholder="__('Write your email signature here')"
+          :placeholder="__('Write your email signature here.')"
           :bubbleMenu="true"
           :fixed-menu="true"
           @change="(val) => (user.doc.email_signature = val)"
@@ -51,7 +51,9 @@
           </span>
           <span class="text-p-sm text-ink-gray-6">
             {{
-              __("Switch between outgoing email accounts when sending emails")
+              __(
+                "Switch between outgoing email accounts when sending emails from your configured accounts."
+              )
             }}
           </span>
         </div>
