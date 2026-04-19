@@ -43,7 +43,7 @@
                 >
                   {{ displayValue(selectedValue) }}
                 </span>
-                <span v-else class="text-base leading-5 text-gray-600">
+                <span v-else class="text-base leading-5 text-ink-gray-4">
                   {{ placeholder || "" }}
                 </span>
                 <slot name="suffix" />

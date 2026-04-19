@@ -21,7 +21,11 @@
                 >
                   {{ displayValue(selectedValue) }}
                 </span>
+<<<<<<< HEAD
                 <span v-else class="text-base leading-5 text-gray-500">
+=======
+                <span v-else class="text-base leading-5 text-ink-gray-4">
+>>>>>>> 09327445 (fix: placeholder color)
                   {{ placeholder || "" }}
                 </span>
               </div>
