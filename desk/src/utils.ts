@@ -264,10 +264,7 @@ export async function copyToClipboard(
   toast.success(toastMessage);
 }
 
-export const textEditorMenuButtons = [
-  "Paragraph",
-  ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
-    {
+export const ClearFormattingUtility = {
       label: 'Clear formatting',
       icon: LucideBrushCleaning,
       action: (editor) => {
@@ -278,19 +275,22 @@ export const textEditorMenuButtons = [
           .cleanStyles()
           .run()
       },
-      isActive: () => false,
-    },
+      isActive: () => false,  
+}
+
+export const textEditorMenuButtons = [
+  "Paragraph",
+  ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
   "Separator",
   "Bold",
   "Italic",
+  "FontColor",
   "Separator",
+  ["Align Left",
+  "Align Center",
+  "Align Right"],
   "Bullet List",
   "Numbered List",
-  "Separator",
-  "Align Left",
-  "Align Center",
-  "Align Right",
-  "FontColor",
   "Separator",
   "Image",
   "Video",
@@ -313,6 +313,9 @@ export const textEditorMenuButtons = [
     "ToggleHeaderCell",
     "DeleteTable",
   ],
+  "Separator",
+  ClearFormattingUtility,
+
 ];
 
 export function isContentEmpty(content: string) {

@@ -60,7 +60,7 @@
 import { UserAvatar } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import { ComponentUtils, HandleExcelPaste } from "@/tiptap-extensions";
-import { getFontFamily } from "@/utils";
+import { ClearFormattingUtility, getFontFamily } from "@/utils";
 import { TextEditor as FTextEditor, TextEditorFixedMenu } from "frappe-ui";
 import { computed, nextTick, ref } from "vue";
 
@@ -86,13 +86,19 @@ const authStore = useAuthStore();
 const fixedMenu = [
   "Paragraph",
   ["Heading 2", "Heading 3", "Heading 4", "Heading 5"],
+  "Separator",
+  "Bold",
+  "Italic",
+  "Separator",
   "Bullet List",
   "Numbered List",
+  "Separator",
   "Image",
   "Video",
   "Link",
   "Blockquote",
   "Code",
+  ClearFormattingUtility,
 ];
 
 defineExpose({
