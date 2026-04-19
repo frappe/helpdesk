@@ -7,8 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2026-04-12 10:43+0000\n"
 "PO-Revision-Date: 2026-04-12 10:43+0000\n"
+=======
+"POT-Creation-Date: 2026-04-19 10:44+0000\n"
+"PO-Revision-Date: 2026-04-19 10:44+0000\n"
+>>>>>>> 5ee0d85d (chore: update POT file)
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -17,11 +22,7 @@ msgstr ""
 "Generated-By: Babel 2.16.0\n"
 
 #: desk/src/components/CommentBox.vue:14
-msgid " added a"
-msgstr ""
-
-#: desk/src/components/CommentBox.vue:16
-msgid " comment"
+msgid " commented"
 msgstr ""
 
 #: helpdesk/api/dashboard.py:181
@@ -121,7 +122,7 @@ msgstr ""
 msgid "Acknowledgement"
 msgstr ""
 
-#. Label of the action (Data) field in DocType 'HD Ticket Activity'
+#. Label of the action (Small Text) field in DocType 'HD Ticket Activity'
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "Action"
 msgstr ""
@@ -532,13 +533,12 @@ msgstr ""
 
 #. Label of the assign_to_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
-#: desk/src/components/ticket-agent/AssignToBody.vue:5
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Assign to"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignToBody.vue:65
-msgid "Assign to me"
+#: desk/src/components/ticket-agent/AssignTo.vue:37
+msgid "Assign yourself"
 msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:62
@@ -546,16 +546,24 @@ msgstr ""
 msgid "Assigned To"
 msgstr ""
 
+#: desk/src/components/ticket-agent/AssignTo.vue:10
+msgid "Assignee"
+msgstr ""
+
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
 msgid "Assignee Rules"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:80
+#: desk/src/components/ticket-agent/AssignTo.vue:427
 msgid "Assignee's updated successfully."
 msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:75
 msgid "Assignees"
+msgstr ""
+
+#: desk/src/components/ticket-agent/AssignTo.vue:479
+msgid "Assignees updated successfully."
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
@@ -869,7 +877,11 @@ msgstr ""
 msgid "Can work on tickets, create custom views and manage private views."
 msgstr ""
 
+<<<<<<< HEAD
 #: desk/src/components/ListViewBuilder.vue:650 desk/src/pages/home/Home.vue:44
+=======
+#: desk/src/components/ListViewBuilder.vue:651 desk/src/pages/home/Home.vue:44
+>>>>>>> 5ee0d85d (chore: update POT file)
 msgid "Cancel"
 msgstr ""
 
@@ -1098,11 +1110,11 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
-#: desk/src/components/CommentBox.vue:324
+#: desk/src/components/CommentBox.vue:318
 msgid "Comment cannot be empty."
 msgstr ""
 
-#: desk/src/components/CommentBox.vue:314
+#: desk/src/components/CommentBox.vue:308
 msgid "Comment deleted sucessfully."
 msgstr ""
 
@@ -1111,7 +1123,7 @@ msgstr ""
 msgid "Comment not found"
 msgstr ""
 
-#: desk/src/components/CommentBox.vue:340
+#: desk/src/components/CommentBox.vue:334
 msgid "Comment updated successfully."
 msgstr ""
 
@@ -1176,7 +1188,11 @@ msgstr ""
 msgid "Confirm"
 msgstr ""
 
+<<<<<<< HEAD
 #: desk/src/components/ListViewBuilder.vue:634
+=======
+#: desk/src/components/ListViewBuilder.vue:635
+>>>>>>> 5ee0d85d (chore: update POT file)
 msgid "Confirm Changes"
 msgstr ""
 
@@ -1460,9 +1476,15 @@ msgstr ""
 msgid "Define who receives the tickets and how they’re distributed among agents."
 msgstr ""
 
+<<<<<<< HEAD
 #: desk/src/components/ListViewBuilder.vue:232
 #: desk/src/components/ListViewBuilder.vue:236
 #: desk/src/components/ListViewBuilder.vue:242
+=======
+#: desk/src/components/ListViewBuilder.vue:233
+#: desk/src/components/ListViewBuilder.vue:237
+#: desk/src/components/ListViewBuilder.vue:243
+>>>>>>> 5ee0d85d (chore: update POT file)
 #: desk/src/components/Settings/Teams/TeamEdit.vue:348
 #: desk/src/components/Settings/Teams/TeamEdit.vue:350
 #: desk/src/components/ticket-agent/TicketHeader.vue:209
@@ -1528,8 +1550,8 @@ msgstr ""
 msgid "Description Weight"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketNew.vue:89
-#: desk/src/pages/ticket/TicketNew.vue:114
+#: desk/src/pages/ticket/TicketNew.vue:90
+#: desk/src/pages/ticket/TicketNew.vue:115
 msgid "Detailed explanation"
 msgstr ""
 
@@ -1852,7 +1874,7 @@ msgstr ""
 msgid "Error moving article to category"
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:43
+#: helpdesk/overrides/email_account.py:93
 msgid "Error processing email at index {0}, message: {1}"
 msgstr ""
 
@@ -1860,7 +1882,7 @@ msgstr ""
 msgid "Error updating customer"
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:92
+#: helpdesk/overrides/email_account.py:142
 msgid "Error while connecting to email account {0}"
 msgstr ""
 
@@ -1945,8 +1967,12 @@ msgstr ""
 msgid "Failed to save Twilio settings"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:83
+#: desk/src/components/ticket-agent/AssignTo.vue:431
 msgid "Failed to update Assignee's."
+msgstr ""
+
+#: desk/src/components/ticket-agent/AssignTo.vue:483
+msgid "Failed to update Assignees."
 msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:308
@@ -2731,12 +2757,12 @@ msgstr ""
 msgid "Is setup complete"
 msgstr ""
 
+<<<<<<< HEAD
 #: desk/src/components/ListViewBuilder.vue:264
+=======
+#: desk/src/components/ListViewBuilder.vue:265
+>>>>>>> 5ee0d85d (chore: update POT file)
 msgid "Item(s) deleted successfully."
-msgstr ""
-
-#: desk/src/components/ticket-agent/AssignToBody.vue:11
-msgid "John Doe"
 msgstr ""
 
 #: desk/src/components/command-palette/CP.vue:114
@@ -2922,8 +2948,13 @@ msgstr ""
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #. Label of the list_tab (Tab Break) field in DocType 'HD View'
+<<<<<<< HEAD
 #: desk/src/components/ListViewBuilder.vue:729
 #: desk/src/components/ListViewBuilder.vue:763
+=======
+#: desk/src/components/ListViewBuilder.vue:730
+#: desk/src/components/ListViewBuilder.vue:764
+>>>>>>> 5ee0d85d (chore: update POT file)
 #: desk/src/pages/ticket/Tickets.vue:575 desk/src/pages/ticket/Tickets.vue:589
 #: desk/src/pages/ticket/Tickets.vue:619
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -2947,6 +2978,10 @@ msgstr ""
 #: desk/src/components/Settings/Agents.vue:182
 #: desk/src/components/Settings/Teams/TeamsList.vue:84
 msgid "Load More"
+msgstr ""
+
+#: desk/src/components/ticket-agent/AssignTo.vue:91
+msgid "Loading..."
 msgstr ""
 
 #: desk/src/components/ticket/ActivityHeader.vue:123
@@ -3215,8 +3250,8 @@ msgstr ""
 msgid "New Team"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketNew.vue:301
-#: desk/src/pages/ticket/TicketNew.vue:311
+#: desk/src/pages/ticket/TicketNew.vue:302
+#: desk/src/pages/ticket/TicketNew.vue:312
 msgid "New Ticket"
 msgstr ""
 
@@ -3246,7 +3281,11 @@ msgstr ""
 msgid "No Answer"
 msgstr ""
 
+<<<<<<< HEAD
 #: desk/src/components/ListViewBuilder.vue:286
+=======
+#: desk/src/components/ListViewBuilder.vue:287
+>>>>>>> 5ee0d85d (chore: update POT file)
 msgid "No Data Found"
 msgstr ""
 
@@ -3270,16 +3309,16 @@ msgstr ""
 msgid "No agent found"
 msgstr ""
 
+#: desk/src/components/ticket-agent/AssignTo.vue:120
+msgid "No agents found"
+msgstr ""
+
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:421
 msgid "No articles found for the applied filters. Try adjusting or clearing your filters."
 msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:424
 msgid "No articles found in the following category."
-msgstr ""
-
-#: desk/src/components/ticket-agent/AssignTo.vue:13
-msgid "No assignees"
 msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:20
@@ -3341,6 +3380,10 @@ msgstr ""
 
 #: desk/src/components/ticket-agent/TicketNavigation.vue:22
 msgid "No next ticket"
+msgstr ""
+
+#: desk/src/components/ticket-agent/AssignTo.vue:31
+msgid "No one"
 msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:239
@@ -3672,7 +3715,7 @@ msgstr ""
 msgid "Please configure your Twilio settings correctly"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketNew.vue:82
+#: desk/src/pages/ticket/TicketNew.vue:83
 msgid "Please enter a subject to continue"
 msgstr ""
 
@@ -4020,16 +4063,16 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:292
 #: desk/src/components/Settings/Teams/TeamsList.vue:166
-#: desk/src/components/ticket-agent/TicketSubjectModal.vue:20
+#: desk/src/components/ticket-agent/TicketSubjectModal.vue:21
 #: desk/src/pages/ticket/MobileTicketAgent.vue:156
 msgid "Rename"
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketSubjectModal.vue:23
+#: desk/src/components/ticket-agent/TicketSubjectModal.vue:24
 msgid "Rename (Ctrl + ⏎)"
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketSubjectModal.vue:22
+#: desk/src/components/ticket-agent/TicketSubjectModal.vue:23
 msgid "Rename (⌘ + ⏎)"
 msgstr ""
 
@@ -4307,7 +4350,11 @@ msgid "Saturday"
 msgstr ""
 
 #. Button label of the email-feedback Web Form
+<<<<<<< HEAD
 #: desk/src/components/ListViewBuilder.vue:640
+=======
+#: desk/src/components/ListViewBuilder.vue:641
+>>>>>>> 5ee0d85d (chore: update POT file)
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:35
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:45
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:28
@@ -4400,6 +4447,10 @@ msgstr ""
 #. Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Search Term Param Name"
+msgstr ""
+
+#: desk/src/components/ticket-agent/AssignTo.vue:60
+msgid "Search agents..."
 msgstr ""
 
 #: desk/src/components/command-palette/CP.vue:126
@@ -4799,8 +4850,8 @@ msgid "Subject is required"
 msgstr ""
 
 #: desk/src/pages/ticket/TicketFeedback.vue:9
-#: desk/src/pages/ticket/TicketNew.vue:95
-#: desk/src/pages/ticket/TicketNew.vue:119
+#: desk/src/pages/ticket/TicketNew.vue:96
+#: desk/src/pages/ticket/TicketNew.vue:120
 msgid "Submit"
 msgstr ""
 
@@ -5066,7 +5117,11 @@ msgstr ""
 msgid "This view is public, and will be removed for all users."
 msgstr ""
 
+<<<<<<< HEAD
 #: desk/src/components/ListViewBuilder.vue:635
+=======
+#: desk/src/components/ListViewBuilder.vue:636
+>>>>>>> 5ee0d85d (chore: update POT file)
 msgid "This view is public. Changes made will be visible to everyone."
 msgstr ""
 
@@ -5233,7 +5288,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:498
 #: desk/src/pages/ticket/TicketCustomer.vue:277
-msgid "Ticket updated succesfully."
+msgid "Ticket updated successfully."
 msgstr ""
 
 #. Name of a report
@@ -5246,7 +5301,7 @@ msgstr ""
 #: desk/src/pages/SearchAgent.vue:351
 #: desk/src/pages/ticket/MobileTicketAgent.vue:329
 #: desk/src/pages/ticket/TicketCustomer.vue:333
-#: desk/src/pages/ticket/TicketNew.vue:295 desk/src/pages/ticket/Tickets.vue:6
+#: desk/src/pages/ticket/TicketNew.vue:296 desk/src/pages/ticket/Tickets.vue:6
 #: desk/src/pages/ticket/Tickets.vue:638 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
 msgid "Tickets"
@@ -5747,6 +5802,10 @@ msgstr ""
 
 #: desk/src/pages/MobileNotifications.vue:46
 msgid "assigned you a ticket"
+msgstr ""
+
+#: desk/src/components/ticket-agent/AssignTo.vue:27
+msgid "assignees"
 msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:370
