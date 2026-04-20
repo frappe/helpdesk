@@ -142,6 +142,32 @@ const htmlContent = computed(
         --bg-surface-gray-3: #343434;
         --bg-surface-gray-4: #424242;
       }
+      .replied-content .collapse {
+        margin: 10px 0 10px 0;
+        visibility: visible;
+        cursor: pointer;
+        display: flex;
+        font-size: larger;
+        font-weight: 700;
+        height: 12px;
+        line-height: 0.1;
+        background: #e8eaed;
+        width: 23px;
+        justify-content: center;
+        border-radius: 5px;
+      }
+      .replied-content .collapse:hover {
+        background: #dadce0;
+      }
+      .replied-content .collapse + input {
+        display: none;
+      }
+      .replied-content .collapse + input + div {
+        display: none;
+      }
+      .replied-content .collapse + input:checked + div {
+        display: block;
+      }
       .email-content {
         word-break: break-word;
       }
