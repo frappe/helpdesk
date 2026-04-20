@@ -401,11 +401,14 @@ const logo = h(
   null
 );
 
+const canShowOnboarding = ref(true);
+
 const showOnboardingBanner = computed(() => {
   return (
     !isCustomerPortal.value &&
     !isOnboardingStepsCompleted.value &&
-    authStore.isManager
+    authStore.isManager &&
+    canShowOnboarding.value
   );
 });
 
@@ -652,8 +655,16 @@ async function getGeneralCategory() {
   return generalCategory;
 }
 
-function setUpOnboarding() {
+async function setUpOnboarding() {
   if (!authStore.isManager) return;
+  try {
+    canShowOnboarding.value = await call(
+      "helpdesk.api.onboarding.should_show_onboarding"
+    );
+  } catch {
+    canShowOnboarding.value = true;
+  }
+  if (!canShowOnboarding.value) return;
   setUp(steps);
   useShortcut({ key: "h", meta: true }, () => {
     showHelpModal.value = !showHelpModal.value;
