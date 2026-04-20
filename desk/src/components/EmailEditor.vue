@@ -96,7 +96,12 @@
         <EditorContent :editor="editor" />
         <div v-if="quotedContent" class="replied-content mx-6 md:mx-5 mb-2">
           <label class="collapse" for="quoted-toggle">...</label>
-          <input id="quoted-toggle" class="replyCollapser" type="checkbox" />
+          <input
+            id="quoted-toggle"
+            class="replyCollapser"
+            type="checkbox"
+            :checked="isQuoteExpanded"
+          />
           <div
             ref="quotedContentRef"
             contenteditable="true"
@@ -490,6 +495,7 @@ function addToReply(
   if (body !== quotedContent.value) {
     //trigger change for watch when replied to body data is different from current quoted content
     quotedContent.value = null;
+    isQuoteExpanded.value = false;
     nextTick(() => {
       quotedContent.value = body;
     });
@@ -507,6 +513,7 @@ function resetState() {
   newEmail.value = emailSignature.value ? emailSignature.value : null;
   attachments.value = [];
   quotedContent.value = null;
+  isQuoteExpanded.value = false;
   focusEditorAtStart();
 }
 
@@ -518,6 +525,7 @@ function handleDiscard() {
   bccEmailsClone.value = [];
   showCC.value = false;
   showBCC.value = false;
+  isQuoteExpanded.value = false;
 
   focusEditorAtStart();
   emit("discard");
@@ -533,6 +541,8 @@ onMounted(() => {
     });
   }
 });
+
+const isQuoteExpanded = ref(false);
 
 function handleSelectAll(e: KeyboardEvent) {
   const active = document.activeElement;
@@ -586,6 +596,7 @@ function handleKeydown(e: KeyboardEvent) {
   const key = e.key.toLowerCase();
 
   if ((e.metaKey || e.ctrlKey) && key === "a") {
+    isQuoteExpanded.value = true;
     handleSelectAll(e);
     return;
   }
