@@ -58,7 +58,7 @@ def execute():
             (DynamicLink.link_doctype == "HD Customer")
             & (DynamicLink.parenttype == "Contact")
         )
-    ).run(as_dict=True, debug=True)
+    ).run(as_dict=True)
 
     # group by customer_name:
     contacts_by_customer: dict[str, list[str]] = {}
