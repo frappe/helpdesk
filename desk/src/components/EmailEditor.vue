@@ -94,7 +94,7 @@
     <template #editor>
       <div class="overflow-y-auto min-h-[7rem] max-h-[30vh]">
         <EditorContent :editor="editor" />
-        <div v-if="quotedContent" class="replied-content mx-6 md:mx-10 mb-2">
+        <div v-if="quotedContent" class="replied-content mx-6 md:mx-5 mb-2">
           <label class="collapse" for="quoted-toggle">...</label>
           <input id="quoted-toggle" class="replyCollapser" type="checkbox" />
           <div
@@ -613,32 +613,3 @@ defineExpose({
   submitMail,
 });
 </script>
-
-<style scoped>
-.replied-content .collapse {
-  margin: 6px 0;
-  visibility: visible;
-  cursor: pointer;
-  display: inline-flex;
-  font-size: larger;
-  font-weight: 700;
-  height: 12px;
-  line-height: 0.1;
-  background: #e8eaed;
-  width: 23px;
-  justify-content: center;
-  border-radius: 5px;
-}
-.replied-content .collapse:hover {
-  background: #dadce0;
-}
-.replied-content .collapse + input {
-  display: none;
-}
-.replied-content .collapse + input + div {
-  display: none;
-}
-.replied-content .collapse + input:checked + div {
-  display: block;
-}
-</style>
