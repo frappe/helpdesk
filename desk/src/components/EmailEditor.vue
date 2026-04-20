@@ -10,8 +10,8 @@
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
-    @change="onEditorChange"
-    :extensions="[ComponentUtils, HandleExcelPaste]"
+    @change="editable ? (newEmail = $event) : null"
+    :extensions="[ComponentUtils, HandleExcelPaste, CleanStyles]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
     @keydown.capture="handleKeydown"
   >
@@ -201,7 +201,11 @@ import {
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
-import { ComponentUtils, HandleExcelPaste } from "@/tiptap-extensions";
+import {
+  ComponentUtils,
+  HandleExcelPaste,
+  CleanStyles,
+} from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,

@@ -4,6 +4,7 @@ import { FeatherIcon, call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
+import LucideBrushCleaning from '~icons/lucide/brush-cleaning'
 import TicketIcon from "./components/icons/TicketIcon.vue";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
@@ -275,20 +276,33 @@ export async function copyToClipboard(
   toast.success(toastMessage);
 }
 
+export const ClearFormattingUtility = {
+      label: 'Clear formatting',
+      icon: LucideBrushCleaning,
+      action: (editor) => {
+        editor.chain()
+          .focus()
+          .unsetAllMarks()
+          .clearNodes()
+          .cleanStyles()
+          .run()
+      },
+      isActive: () => false,  
+}
+
 export const textEditorMenuButtons = [
   "Paragraph",
   ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
   "Separator",
   "Bold",
   "Italic",
+  "FontColor",
   "Separator",
+  ["Align Left",
+  "Align Center",
+  "Align Right"],
   "Bullet List",
   "Numbered List",
-  "Separator",
-  "Align Left",
-  "Align Center",
-  "Align Right",
-  "FontColor",
   "Separator",
   "Image",
   "Video",
@@ -311,6 +325,9 @@ export const textEditorMenuButtons = [
     "ToggleHeaderCell",
     "DeleteTable",
   ],
+  "Separator",
+  ClearFormattingUtility,
+
 ];
 
 export function isContentEmpty(content: string) {
