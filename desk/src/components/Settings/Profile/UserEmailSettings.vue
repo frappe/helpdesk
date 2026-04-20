@@ -176,7 +176,7 @@ function removeEmail(email) {
 function update() {
   user.save.submit(null, {
     onSuccess: () => {
-      toast.success(__("Email settings updated successfully"));
+      toast.success(__("Email settings updated successfully."));
     },
   });
 }
