@@ -327,7 +327,7 @@ const { onUserType, cleanup } = useTyping(props.ticketId);
 const attachments = ref([]);
 const isUploading = ref(false);
 const contentEmpty = computed(() => isContentEmpty(newEmail.value));
-const hasMultipleSenders = computed(() => (from?.length ?? 0) > 1);
+const hasMultipleSenders = computed(() => (from?.value.length ?? 0) > 1);
 const isDisabled = computed(() => {
   return (
     (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
@@ -378,6 +378,7 @@ const sendMail = createResource({
     method: "reply_via_agent",
     args: {
       attachments: attachments.value.map((x) => x.name),
+      from_email: fromEmail.value,
       to: toEmailsClone.value.join(","),
       cc: ccEmailsClone.value?.join(","),
       bcc: bccEmailsClone.value?.join(","),

@@ -567,6 +567,7 @@ class HDTicket(Document):
     def reply_via_agent(
         self,
         message: str,
+        from_email: str | None = None,
         to: str | None = None,
         cc: str | None = None,
         bcc: str | None = None,
@@ -579,10 +580,19 @@ class HDTicket(Document):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject}"
-        sender = frappe.session.user
+        sender = from_email
         recipients = to or self.raised_by
-        sender_email = None if skip_email_workflow else self.sender_email()
+        email_account = None
+        if from_email:
+            email_account_name = frappe.db.get_value(
+                "Email Account", {"email_id": from_email}, "name"
+            )
 
+            if email_account_name:
+                email_account = frappe.get_doc("Email Account", email_account_name)
+        sender_email = (
+            None if skip_email_workflow else (email_account or self.sender_email())
+        )
         if recipients == "Administrator":
             admin_email = frappe.get_value("User", "Administrator", "email")
             recipients = admin_email
@@ -595,7 +605,11 @@ class HDTicket(Document):
                 "communication_type": "Communication",
                 "content": message,
                 "doctype": "Communication",
-                "email_account": sender_email.name if sender_email else None,
+                "email_account": (
+                    email_account_name
+                    if email_account_name
+                    else sender_email.name if sender_email else None
+                ),
                 "email_status": "Open",
                 "recipients": recipients,
                 "reference_doctype": "HD Ticket",

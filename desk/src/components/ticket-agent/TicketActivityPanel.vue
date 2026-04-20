@@ -20,7 +20,7 @@
         @update="
           () => {
             activities.reload();
-            ticketAgentActivitiesRef.scrollToLatestActivity();
+            ticketAgentActivitiesRef?.scrollToLatestActivity();
           }
         "
       />
@@ -43,7 +43,7 @@
     @update="
       () => {
         activities.reload();
-        ticketAgentActivitiesRef.scrollToLatestActivity();
+        ticketAgentActivitiesRef?.scrollToLatestActivity();
       }
     "
   />
@@ -77,8 +77,12 @@ const CommunicationArea = defineAsyncComponent(
 const ticket = inject(TicketSymbol)!;
 const activities = inject(ActivitiesSymbol)!;
 
-const ticketAgentActivitiesRef = ref(null);
-const communicationAreaRef = ref(null);
+const ticketAgentActivitiesRef = ref<InstanceType<
+  typeof TicketAgentActivities
+> | null>(null);
+const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
+  null
+);
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
@@ -119,7 +123,6 @@ const _activities = computed(() => {
   if (!activities.value?.data) {
     return [];
   }
-
   const emailProps = activities.value?.data?.communications.map(
     (email, idx: number) => {
       return {
