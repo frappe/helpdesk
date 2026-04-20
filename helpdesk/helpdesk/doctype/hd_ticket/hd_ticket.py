@@ -592,9 +592,7 @@ class HDTicket(Document):
             if email_account_name:
                 email_account = frappe.get_doc("Email Account", email_account_name)
             else:
-                frappe.throw(
-                    _("No Email Account found for {0}").format(from_email)
-                )
+                frappe.throw(_("No Email Account found for {0}").format(from_email))
         sender_email = (
             None if skip_email_workflow else (email_account or self.sender_email())
         )

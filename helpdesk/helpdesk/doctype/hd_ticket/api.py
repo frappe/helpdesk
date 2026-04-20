@@ -205,12 +205,15 @@ def get_communications(ticket: str):
         if c.sent_or_received == "Sent" and c.email_account:
             account = email_accounts.get(c.email_account)
             if account is None:
-                account = frappe.db.get_value(
-                    "Email Account",
-                    c.email_account,
-                    ["email_account_name", "email_id"],
-                    as_dict=True,
-                ) or {}
+                account = (
+                    frappe.db.get_value(
+                        "Email Account",
+                        c.email_account,
+                        ["email_account_name", "email_id"],
+                        as_dict=True,
+                    )
+                    or {}
+                )
                 email_accounts[c.email_account] = account
             if account.get("email_id"):
                 c.sender_full_name = account.get("email_account_name") or account.get(
