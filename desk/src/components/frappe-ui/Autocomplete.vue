@@ -23,11 +23,7 @@
                 <span class="text-base leading-5 truncate" v-if="selectedValue">
                   {{ displayValue(selectedValue) }}
                 </span>
-<<<<<<< HEAD
-                <span class="text-base leading-5 text-gray-500" v-else>
-=======
                 <span class="text-base leading-5 text-ink-gray-4" v-else>
->>>>>>> 09327445 (fix: placeholder color)
                   {{ placeholder || "" }}
                 </span>
               </div>
