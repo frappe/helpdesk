@@ -319,8 +319,7 @@ const userSignatureResource = createResource({
       emailSignature.value = `<br>${data.email_signature}`;
       if (isContentEmpty(newEmail.value) && !quotedContent.value) {
         newEmail.value = emailSignature.value;
-      } else if (newEmail.value === null) {
-        newEmail.value = emailSignature.value;
+        focusEditorAtStart();
       }
     }
   },
@@ -369,12 +368,6 @@ function applySavedReplies(template: string) {
   showSavedRepliesSelectorModal.value = false;
 }
 
-function onEditorChange(val: string) {
-  if (props.editable) {
-    newEmail.value = val;
-  }
-}
-
 const sendMail = createResource({
   url: "run_doc_method",
   makeParams: () => ({
@@ -390,7 +383,7 @@ const sendMail = createResource({
       message:
         newEmail.value +
         (quotedContentRef.value
-          ? `<p class="reply-to-content"><p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
+          ? `<p class="reply-to-content"></p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
           : ""),
     },
   }),
@@ -420,7 +413,7 @@ const from = computed(() => {
     };
   });
 
-  if (emails.length == 1 && emails[0].email_id === userId) return [];
+  if (emails.length == 1 && emails[0].value === user.doc.email) return [];
 
   return emails;
 });

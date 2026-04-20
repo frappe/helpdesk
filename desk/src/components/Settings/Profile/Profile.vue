@@ -272,12 +272,12 @@ function updateImage(fileUrl = "") {
 
 function updateLanguage(val: string | null) {
   if (!user.doc) return;
-  user.doc.language = val || language.value;
+  user.doc.language = val || user.originalDoc?.language;
 }
 
 function updateTimezone(val: { label: string; value: string } | null) {
   if (!user.doc) return;
-  user.doc.time_zone = val?.value || timezone.value;
+  user.doc.time_zone = val?.value || user.originalDoc?.time_zone;
 }
 
 const timezoneOptions = ref([]);
