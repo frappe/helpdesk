@@ -580,7 +580,7 @@ class HDTicket(Document):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject}"
-        sender = frappe.session.user
+        sender = from_email or frappe.session.user
         recipients = to or self.raised_by
         email_account = None
         email_account_name = None
