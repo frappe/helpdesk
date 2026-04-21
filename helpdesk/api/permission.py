@@ -1,6 +1,5 @@
 import frappe
 
-
 ALLOWED_APP_ROLES = {"Agent", "Agent Manager", "System Manager"}
 
 
