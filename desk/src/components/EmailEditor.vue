@@ -18,7 +18,7 @@
     <template #top>
       <div
         v-if="hasMultipleSenders"
-        class="mx-6 md:mx-5 flex items-center gap-2 border-t py-2.5"
+        class="mx-6 md:mx-5 flex items-center gap-2 border-t py-2.5 pr-2 h-12.5"
       >
         <span class="text-xs text-ink-gray-4">{{ __("FROM") }}:</span>
         <FormControl
