@@ -54,7 +54,7 @@
           <Button
             :tooltip="__('Reply')"
             variant="ghost"
-            class="text-ink-gray-7"
+            class="!text-ink-gray-7"
             :icon="ReplyIcon"
             @click="reply"
           />
@@ -62,7 +62,7 @@
             :tooltip="__('Reply All')"
             variant="ghost"
             :icon="ReplyAllIcon"
-            class="text-ink-gray-7"
+            class="!text-ink-gray-7"
             @click="replyAll"
           />
           <Dropdown
@@ -78,7 +78,7 @@
           >
             <Button
               icon="more-horizontal"
-              class="text-ink-gray-5"
+              class="!text-ink-gray-7"
               variant="ghost"
             />
           </Dropdown>
