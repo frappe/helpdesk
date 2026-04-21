@@ -58,7 +58,7 @@
             </div>
           </template>
           <div
-            class="space-y-1.5 px-5 last:mb-4"
+            class="space-y-1.5 px-5 last:mb-2"
             v-if="Boolean(customFields.length)"
           >
             <template v-for="field in customFields">
@@ -102,29 +102,30 @@
                 />
               </div>
             </template>
-            <ul class="pb-3 pt-0 px-5">
+            <ul class="pt-0 px-5 divide-y divide-outline-gray-1 pb-4">
               <li
                 v-for="t in section.tickets"
                 :key="t.name"
-                class="py-2.5 cursor-pointer"
                 @click="openTicket(t.name)"
               >
-                <p class="text-base text-ink-gray-8 max-w-[60%] truncate">
-                  {{ t.subject }}
-                </p>
-                <div class="flex items-end justify-between">
-                  <p class="text-base text-ink-gray-5">
-                    {{ formatDate(t.creation as string) + " · " }}
-                    <span class="transition duration-400 hover:underline">
-                      {{ "#" + t.name }}
+                <div
+                  class="-mx-2 px-2 py-3 cursor-pointer rounded hover:bg-surface-gray-2 transition-colors"
+                >
+                  <p class="text-sm font-medium text-ink-gray-9 truncate mb-1">
+                    {{ t.subject }}
+                  </p>
+                  <div class="flex items-center justify-between gap-2">
+                    <p class="text-sm text-ink-gray-5 shrink-0">
+                      {{ formatDate(t.creation as string) + " · " }}
+                      <span class="">{{ "#" + t.name }}</span>
+                    </p>
+                    <span
+                      class="text-xs px-2 py-0.5 font-medium shrink-0 rounded-sm"
+                      :class="getStatusColor(t.status as string)"
+                    >
+                      {{ t.status }}
                     </span>
-                  </p>
-                  <p
-                    class="px-1.5 py-[3px] text-sm rounded-sm max-w-[80px] text-center truncate h-5"
-                    :class="getStatusColor(t.status as string)"
-                  >
-                    {{ t.status }}
-                  </p>
+                  </div>
                 </div>
               </li>
             </ul>
@@ -292,7 +293,7 @@ function getFieldInFormat(fieldTemplate, fieldMeta) {
     visible:
       fieldMeta.display_via_depends_on &&
       !fieldMeta.hidden &&
-      ticket.value.doc[fieldTemplate.fieldname],
+      (!!ticket.value.doc[fieldTemplate.fieldname] || !fieldMeta.read_only),
   };
 }
 
