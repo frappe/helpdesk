@@ -23,7 +23,6 @@
         <span class="text-xs text-ink-gray-4">{{ __("FROM") }}:</span>
         <FormControl
           v-model="fromEmail"
-          type="select"
           variant="ghost"
           class="w-full"
           :placeholder="__('')"
@@ -242,7 +241,7 @@ import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 const editorRef = ref(null);
 const showSavedRepliesSelectorModal = ref(false);
 const quotedContentRef = ref<HTMLElement | null>(null);
-const fromEmail = ref("");
+const fromEmail = useStorage<string | "">("from-email", "");
 
 const props = defineProps({
   ticketId: {
@@ -295,12 +294,9 @@ const quotedContent = useStorage<null | string>(
   null
 );
 
-const lastFromEmail = useStorage<null | string>("last-from-email", null);
-
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 const auth = useAuthStore();
-const { userId } = useAuthStore();
 
 // email signature
 const emailSignature = ref<string | null>(null);
@@ -402,7 +398,10 @@ const from = computed(() => {
     value: e.email_id,
   }));
 
-  if (emailsMapped.length === 1 && emailsMapped[0].value === auth.userId)
+  if (
+    emailsMapped.length === 1 &&
+    emailsMapped[0].value === userResource.data?.email
+  )
     return [];
   return emailsMapped;
 });
@@ -596,22 +595,12 @@ const editor = computed(() => {
 watch(
   from,
   (fromOptions) => {
-    if (!fromOptions.length) {
-      fromEmail.value = "";
-      return;
+    if (!fromOptions.find((f) => f.value === fromEmail.value)) {
+      fromEmail.value = fromOptions.length ? fromOptions[0].value : "";
     }
-    const restored = fromOptions.find(
-      (f: { value: string }) => f.value === lastFromEmail.value
-    );
-    fromEmail.value = restored ? restored.value : fromOptions[0].value;
   },
   { immediate: true }
 );
-
-watch(fromEmail, (val) => {
-  if (val) lastFromEmail.value = val;
-});
-
 defineExpose({
   addToReply,
   editor,

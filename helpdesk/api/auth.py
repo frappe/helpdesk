@@ -63,8 +63,9 @@ def get_current_user_email_info():
     """
     user = frappe.session.user
 
-    email_signature = frappe.db.get_value("User", user, "email_signature")
-
+    email_signature, email = frappe.db.get_value(
+        "User", user, ["email_signature", "email"]
+    )
     user_emails = frappe.db.get_all(
         "User Email",
         filters={"parent": user},
@@ -73,5 +74,6 @@ def get_current_user_email_info():
 
     return {
         "email_signature": email_signature,
+        "email": email,
         "user_emails": user_emails,
     }
