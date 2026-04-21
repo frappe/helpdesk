@@ -296,6 +296,8 @@ const quotedContent = useStorage<null | string>(
   null
 );
 
+const lastFromEmail = useStorage<null | string>("last-from-email", null);
+
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 const auth = useAuthStore();
@@ -607,14 +609,21 @@ const editor = computed(() => {
 watch(
   from,
   (fromOptions) => {
-    if (
-      !fromOptions.find((f: { value: string }) => f.value === fromEmail.value)
-    ) {
-      fromEmail.value = fromOptions.length ? fromOptions[0].value : "";
+    if (!fromOptions.length) {
+      fromEmail.value = "";
+      return;
     }
+    const restored = fromOptions.find(
+      (f: { value: string }) => f.value === lastFromEmail.value
+    );
+    fromEmail.value = restored ? restored.value : fromOptions[0].value;
   },
   { immediate: true }
 );
+
+watch(fromEmail, (val) => {
+  if (val) lastFromEmail.value = val;
+});
 
 defineExpose({
   addToReply,
