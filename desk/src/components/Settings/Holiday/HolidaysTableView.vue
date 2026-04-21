@@ -62,6 +62,7 @@ import { ConfirmDelete, getFormattedDate } from "@/utils";
 import { holidayData } from "@/stores/holidayList";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 import { Dropdown } from "frappe-ui";
+import { __ } from "@/translation";
 
 const isConfirmingDelete = ref(false);
 
@@ -73,7 +74,7 @@ interface Holiday {
 
 const dropdownOptions = (holiday: Holiday) => [
   {
-    label: "Edit",
+    label: __("Edit"),
     onClick: () => editHoliday(holiday),
     icon: "edit",
   },
@@ -98,11 +99,11 @@ const holidays = computed(() => {
 
 const columns = [
   {
-    label: "Date",
+    label: __("Date"),
     key: "holiday_date",
   },
   {
-    label: "Description",
+    label: __("Description"),
     key: "description",
   },
 ];

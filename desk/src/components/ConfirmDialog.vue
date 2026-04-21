@@ -8,7 +8,7 @@
     <template #actions>
       <Button
         class="w-full"
-        label="Confirm"
+        :label="__('Confirm')"
         variant="solid"
         :loading="isLoading"
         @click="onConfirm"

@@ -9,7 +9,7 @@
         <MenuButton as="template">
           <slot v-if="$slots.default" v-bind="{ open, togglePopover }" />
           <Button v-else :active="open" v-bind="button">
-            {{ button ? button?.label || null : "Options" }}
+            {{ button ? button?.label || null : __('Options') }}
           </Button>
         </MenuButton>
       </template>

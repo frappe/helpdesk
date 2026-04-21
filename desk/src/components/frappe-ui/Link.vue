@@ -50,7 +50,7 @@
           <Button
             variant="ghost"
             class="w-full !justify-start"
-            :label="'Create New'"
+            :label="__('Create New')"
             @click="attrs.onCreate(value, close)"
           >
             <template #prefix>
@@ -62,7 +62,7 @@
           <Button
             variant="ghost"
             class="w-full !justify-start"
-            :label="'Clear'"
+            :label="__('Clear')"
             @click="() => clearValue(close)"
           >
             <template #prefix>

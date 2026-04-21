@@ -72,7 +72,7 @@ const customerResource = createResource({
 
 function addCustomer() {
   if (!state.customer) {
-    toast.error("Customer name is required");
+    toast.error(__("Customer name is required"));
     return;
   }
   customerResource.submit({

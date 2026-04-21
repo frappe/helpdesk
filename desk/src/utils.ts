@@ -677,7 +677,7 @@ export function getFieldDependencyLabel(name: string) {
 export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   return [
     {
-      label: "Delete",
+      label: __("Delete"),
       component: (props) =>
         TemplateOption({
           option: "Delete",
@@ -693,7 +693,7 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       condition: () => !isConfirmingDelete.value,
     },
     {
-      label: "Confirm Delete",
+      label: __("Confirm Delete"),
       component: (props) =>
         TemplateOption({
           option: "Confirm Delete",

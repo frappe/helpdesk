@@ -9,7 +9,7 @@ def on_assignment_rule_trash(doc, event):
         "Assignment Rule",
         filters={"document_type": "HD Ticket", "name": ["!=", doc.name]},
     ):
-        frappe.throw("There should atleast be 1 assignment rule for ticket")
+        frappe.throw(_("There should atleast be 1 assignment rule for ticket"))
 
 
 def on_assignment_rule_validate(doc, event):
@@ -17,7 +17,7 @@ def on_assignment_rule_validate(doc, event):
         frappe.throw(
             _("The Assign Condition JSON '{0}' is invalid: </br> {1}").format(
                 doc.assign_condition_json,
-                "Condition format should be like this e.g [['status','==','open']], it's recommended to use portal view to create conditions.",
+                _("Condition format should be like this e.g [['status','==','open']], it's recommended to use portal view to create conditions."),
             )
         )
 
@@ -25,6 +25,6 @@ def on_assignment_rule_validate(doc, event):
         frappe.throw(
             _("The Unassign Condition JSON '{0}' is invalid: </br> {1}").format(
                 doc.unassign_condition_json,
-                "Condition format should be like this e.g [['status','==','open']], it's recommended to use portal view to create conditions.",
+                _("Condition format should be like this e.g [['status','==','open']], it's recommended to use portal view to create conditions."),
             )
         )

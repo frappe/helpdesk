@@ -51,6 +51,7 @@ import { Button } from "frappe-ui";
 import SlaWorkDaysListItem from "./SlaWorkDaysListItem.vue";
 import { slaData, slaDataErrors } from "@/stores/sla";
 import { getGridTemplateColumnsForTable } from "@/utils";
+import { __ } from "@/translation";
 
 interface Column {
   key: string;
@@ -84,17 +85,17 @@ const addWorkDay = () => {
 
 const columns: Column[] = [
   {
-    label: "Day",
+    label: __("Day"),
     key: "workday",
     isRequired: true,
   },
   {
-    label: "Start time",
+    label: __("Start time"),
     key: "start_time",
     isRequired: true,
   },
   {
-    label: "End time",
+    label: __("End time"),
     key: "end_time",
     isRequired: true,
   },

@@ -72,6 +72,7 @@ import {
 } from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
 import { getGridTemplateColumnsForTable } from "@/utils";
+import { __ } from "@/translation";
 
 createResource({
   url: "frappe.client.get_list",
@@ -114,7 +115,7 @@ const addRow = () => {
   );
 
   if (availablePriorities.length === 0) {
-    toast.error("All available priorities have already been added");
+    toast.error(__("All available priorities have already been added"));
     return;
   }
 
@@ -130,22 +131,22 @@ const addRow = () => {
 
 const columns = computed(() => [
   {
-    label: "Priority",
+    label: __("Priority"),
     key: "priority",
     isRequired: true,
   },
   {
-    label: "Default priority",
+    label: __("Default priority"),
     key: "default_priority",
     isRequired: true,
   },
   {
-    label: "First response time",
+    label: __("First response time"),
     key: "response_time",
     isRequired: true,
   },
   {
-    label: "Resolution time",
+    label: __("Resolution time"),
     key: "resolution_time",
     isRequired: true,
   },

@@ -47,6 +47,7 @@ import TwilioCallUI from "./TwilioCallUI.vue";
 import ExotelCallUI from "./ExotelCallUI.vue";
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
+import { __ } from "@/translation";
 
 const telephonyStore = useTelephonyStore();
 const { defaultCallingMedium, isExotelEnabled, isTwilioEnabled } =
@@ -117,7 +118,7 @@ async function setCallingMedium() {
   telephonyStore.setDefaultCallingMedium(callMedium.value);
   telephonyStore.fetchCallIntegrationStatus();
   toast.success(
-    `Default calling medium set successfully to ${callMedium.value}`
+    __("Default calling medium set successfully to {0}", [callMedium.value])
   );
 }
 

@@ -200,7 +200,7 @@ function updateField(fieldname: string, value: string, callback = () => {}) {
 
 function handleDeleteTicket() {
   $dialog({
-    title: __(`Delete ticket #${ticket?.value?.name}`),
+    title: __("Delete ticket #{0}", [ticket?.value?.name]),
     message: __(
       "Are you sure you want to delete this ticket? This is an irreversible action and cannot be undone."
     ),
