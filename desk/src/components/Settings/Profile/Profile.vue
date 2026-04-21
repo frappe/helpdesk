@@ -73,7 +73,13 @@
                       @keydown.enter="save"
                       @keydown.esc.stop="editName = false"
                     />
-                    <Button variant="outline" icon="check" @click="save" />
+                    <Button
+                      variant="outline"
+                      icon="check"
+                      :loading="user?.save?.loading"
+                      :disabled="user?.save?.loading"
+                      @click="save"
+                    />
                   </div>
                   <span class="text-p-sm text-ink-gray-6">
                     {{ user?.doc?.email }}

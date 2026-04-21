@@ -22,7 +22,12 @@
     <template #header-actions>
       <Transition name="fade">
         <div v-if="isDirty">
-          <Button variant="solid" :label="__('Update')" @click="update" /></div
+          <Button
+            variant="solid"
+            :label="__('Update')"
+            :loading="user?.save?.loading"
+            @click="update"
+          /></div
       ></Transition>
     </template>
     <template #content>
