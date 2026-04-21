@@ -153,6 +153,17 @@ const _activities = computed(() => {
     };
   });
 
+  activities.value.data.history.map((h) => {
+    // }
+    h.action;
+    h.owner;
+    // if h.actions includes h.owner, replace it with 'themselves'
+    if (h.action && h.owner && h.action.includes(h.owner)) {
+      h.action = h.action.replace(h.owner, "themselves");
+    }
+    return h;
+  });
+
   const historyProps = [
     ...activities.value.data.history,
     ...activities.value.data.views,
