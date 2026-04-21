@@ -38,21 +38,95 @@
       </div>
     </div>
 
-    <!-- Additional Fields -->
-    <div
-      class="border-t flex-1 min-h-0 overflow-y-auto pb-3 space-y-1.5"
-      v-if="Boolean(customFields.length)"
-    >
-      <template v-for="field in customFields">
-        <TicketField
-          v-if="field.visible"
-          :key="field.fieldname"
-          :field="field"
-          :value="field.value"
-          @change="
-            ({ fieldname, value }) => handleFieldUpdate(fieldname, value)
-          "
-        />
+    <!-- Scrollable sections: Ticket Info + Recent / Similar Tickets -->
+    <div class="border-t flex-1 min-h-0 overflow-y-auto divide-y-[1px]">
+      <!-- Ticket Info (custom fields) -->
+      <div v-if="Boolean(customFields.length)">
+        <Section label="Ticket Info" :opened="true">
+          <template #header="{ opened, toggle }">
+            <div
+              class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-white z-10 px-5 py-4 cursor-pointer"
+              @click="toggle"
+            >
+              <span class="text-ink-gray-8 font-medium text-base select-none">
+                Ticket Info
+              </span>
+              <LucideChevronRight
+                class="size-4 text-ink-gray-6"
+                :class="{ 'rotate-90': opened }"
+              />
+            </div>
+          </template>
+          <div class="space-y-1.5 px-5 last:mb-3">
+            <template v-for="field in customFields">
+              <TicketField
+                v-if="field.visible"
+                :key="field.fieldname"
+                :field="field"
+                :value="field.value"
+                @change="
+                  ({ fieldname, value }) => handleFieldUpdate(fieldname, value)
+                "
+              />
+            </template>
+          </div>
+        </Section>
+      </div>
+
+      <!-- Recent / Similar Tickets -->
+      <template v-if="!recentSimilarTickets.loading">
+        <div v-for="section in sections" :key="section.label">
+          <Section
+            :label="section.label"
+            :hideLabel="section.hideLabel"
+            :opened="section.opened"
+          >
+            <template #header="{ opened, toggle }">
+              <div
+                class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-white z-10 px-5 py-4 cursor-pointer"
+                @click="toggle"
+              >
+                <Tooltip :text="section.tooltipMessage">
+                  <span
+                    class="text-ink-gray-8 font-medium text-base select-none"
+                  >
+                    {{ section.label }}
+                  </span>
+                </Tooltip>
+                <LucideChevronRight
+                  class="size-4 text-ink-gray-6"
+                  :class="{ 'rotate-90': opened }"
+                />
+              </div>
+            </template>
+            <ul class="pb-3 pt-0 px-5">
+              <li
+                v-for="t in section.tickets"
+                :key="t.name"
+                class="py-2.5 cursor-pointer"
+                @click="openTicket(t.name)"
+              >
+                <p class="text-base text-ink-gray-8 max-w-[60%] truncate">
+                  {{ t.subject }}
+                </p>
+                <div class="flex items-end justify-between">
+                  <p class="text-base text-ink-gray-5">
+                    {{ formatDate(t.creation) + " · " }}
+                    <span class="transition duration-400 hover:underline">
+                      {{ "#" + t.name }}
+                    </span>
+                  </p>
+                  <p
+                    class="px-1.5 py-[3px] text-sm rounded-sm max-w-[80px] text-center truncate h-5"
+                    :class="getStatusColor(t.status)"
+                  >
+                    {{ t.status }}
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </Section>
+        </div>
       </template>
     </div>
   </div>
@@ -64,14 +138,20 @@ import { parseField } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
 import { getMeta } from "@/stores/meta";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import {
   ActivitiesSymbol,
   AssigneeSymbol,
   CustomizationSymbol,
   FieldValue,
+  RecentSimilarTicketsSymbol,
   TicketSymbol,
 } from "@/types";
+import dayjs from "dayjs";
+import { Tooltip } from "frappe-ui";
 import { computed, inject, ref } from "vue";
+import LucideChevronRight from "~icons/lucide/chevron-right";
+import Section from "../Section.vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
@@ -80,8 +160,12 @@ const ticket = inject(TicketSymbol);
 const assignees = inject(AssigneeSymbol);
 const customizations = inject(CustomizationSymbol);
 const activities = inject(ActivitiesSymbol);
+const recentSimilarTickets = inject(RecentSimilarTicketsSymbol)!;
 const { getFields, getField } = getMeta("HD Ticket");
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
+
+const dateFormat = window.date_format;
+const { getStatus, colorMap } = useTicketStatusStore();
 
 // ticket_type, priority, customer, agent_group
 const coreFields = computed(() => {
@@ -143,6 +227,49 @@ const customFields = computed(() => {
     .filter(Boolean);
   return _customFields;
 });
+
+const sections = computed(() => {
+  if (recentSimilarTickets.value.loading || !recentSimilarTickets.value.data) {
+    return [];
+  }
+  const recentTickets = recentSimilarTickets.value?.data?.recent_tickets || [];
+  const similarTickets =
+    recentSimilarTickets.value?.data?.similar_tickets || [];
+  const _sections = [];
+  if (recentTickets.length) {
+    _sections.push({
+      label: "Recent Tickets",
+      tooltipMessage: "Tickets recently raised by this contact/customer",
+      hideLabel: false,
+      opened: true,
+      tickets: recentTickets,
+    });
+  }
+  if (similarTickets.length) {
+    _sections.push({
+      label: "Similar Tickets",
+      tooltipMessage: "Tickets with similar queries",
+      hideLabel: false,
+      opened: true,
+      tickets: similarTickets,
+    });
+  }
+  return _sections;
+});
+
+function getStatusColor(status: string) {
+  let { color } = getStatus(status);
+  return colorMap[color] ?? colorMap["Default"];
+}
+
+function formatDate(date: string) {
+  return dayjs(date).format(dateFormat.toUpperCase());
+}
+
+function openTicket(name: string) {
+  let url = window.location.origin + "/helpdesk/tickets/" + name;
+  window.open(url, "_blank");
+}
 
 function getFieldInFormat(fieldTemplate, fieldMeta) {
   return {
