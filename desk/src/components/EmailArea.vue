@@ -50,7 +50,7 @@
             </p>
           </Tooltip>
         </div>
-        <div class="flex items-center gap-0.5">
+        <div class="flex items-center gap-1">
           <Button
             :tooltip="__('Reply')"
             variant="ghost"
@@ -78,7 +78,7 @@
           >
             <Button
               icon="more-horizontal"
-              class="text-ink-gray-5 ml-0.5"
+              class="text-ink-gray-5"
               variant="ghost"
             />
           </Dropdown>
