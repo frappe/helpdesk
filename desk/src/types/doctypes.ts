@@ -13,7 +13,7 @@ interface DocType {
     idx?: number;
   }
   
-// Last updated: 2026-02-02 17:22:11.094897
+// Last updated: 2026-03-24 10:41:46.489051
 export interface HDTicketStatus extends DocType {
   /** Color: Select */
   color?: 'Black' | 'Gray' | 'Blue' | 'Green' | 'Red' | 'Pink' | 'Orange' | 'Amber' | 'Yellow' | 'Cyan' | 'Teal' | 'Violet' | 'purple';
@@ -29,7 +29,6 @@ export interface HDTicketStatus extends DocType {
   order?: number;
   /** Enabled: Check */
   enabled: 0 | 1;
-  parsed_color?: string;
 }
 
 // Last updated: 2026-02-27 16:42:43.292656
@@ -57,7 +56,13 @@ export interface HDTicket extends DocType {
   /** Response By: Datetime */
   response_by?: string;
   /** SLA Status: Select */
-  agreement_status?: '' | 'First Response Due' | 'Resolution Due' | 'Failed' | 'Fulfilled' | 'Paused';
+  agreement_status?:
+    | ""
+    | "First Response Due"
+    | "Resolution Due"
+    | "Failed"
+    | "Fulfilled"
+    | "Paused";
   /** Resolution By: Datetime */
   resolution_by?: string;
   /** SLA Creation: Datetime */
@@ -118,6 +123,8 @@ export interface HDTicket extends DocType {
   last_customer_response?: string;
   /** Ticket raised outside working hours: Check */
   raised_outside_working_hours: 0 | 1;
+  /** Assignees: JSON */
+  _assign: string;
 }
 
 // Last updated: 2026-03-03 12:30:01.394107
@@ -126,12 +133,21 @@ export interface AssignmentRuleUser extends ChildDocType {
   user: string;
   /** Weight: Int */
   weight?: number;
+  /** Weight: Int */
+  weight?: number;
 }
 
 // Last updated: 2024-03-23 16:01:27.759155
 export interface AssignmentRuleDay extends ChildDocType {
   /** Day: Select */
-  day?: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  day?:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
 }
 
 // Last updated: 2026-03-03 13:08:12.561504
@@ -149,7 +165,11 @@ export interface AssignmentRule extends DocType {
   /** Unassign Condition: Code */
   unassign_condition?: string;
   /** Rule: Select */
-  rule: 'Round Robin' | 'Load Balancing' | 'Based on Field' | 'Weighted Distribution';
+  rule:
+    | "Round Robin"
+    | "Load Balancing"
+    | "Based on Field"
+    | "Weighted Distribution";
   /** Users: Table MultiSelect (Assignment Rule User) */
   users: AssignmentRuleUser[];
   /** Last User: Link (User) */
@@ -189,7 +209,15 @@ export interface HDServiceHolidayList extends DocType {
   /** Total Holidays: Int */
   total_holidays?: number;
   /** Weekly Off: Select */
-  weekly_off?: '' | 'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';
+  weekly_off?:
+    | ""
+    | "Sunday"
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday";
   /** Holidays: Table (HD Holiday) */
   holidays: HDHoliday[];
   /** Color: Color */
@@ -203,7 +231,14 @@ export interface HDServiceHolidayList extends DocType {
 // Last updated: 2021-10-21 14:27:08.190239
 export interface HDServiceDay extends ChildDocType {
   /** Workday: Select */
-  workday: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  workday:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
   /** Start Time: Time */
   start_time: any;
   /** End Time: Time */
@@ -266,4 +301,116 @@ export interface HDAgent extends DocType {
   is_active: 0 | 1;
   /** Image: Attach Image */
   user_image?: string;
+}
+
+// Last updated: 2026-02-20 17:04:23.230132
+export interface HDCustomerMember extends ChildDocType {
+  /** Is Manager: Check */
+  is_manager: 0 | 1;
+  /** Is Primary: Check */
+  is_primary: 0 | 1;
+  /** Name: Link (Contact) */
+  contact_name: string;
+}
+
+// Last updated: 2026-03-28 02:33:49.340400
+export interface HDCustomer extends DocType {
+  /** Image: Attach Image */
+  image?: string;
+  /** Customer Name: Data */
+  customer_name?: string;
+  /** Domain: Data */
+  domain?: string;
+  /** Contacts: Table (HD Customer Member) */
+  contacts: HDCustomerMember[];
+  /** Mobile No: Data */
+  mobile_no?: string;
+  /** Email ID: Data */
+  email_id?: string;
+  /** Primary Contact: Data */
+  primary_contact?: string;
+  /** Country: Link (Country) */
+  country?: string;
+}
+
+// Last updated: 2024-03-23 16:03:23.469424
+export interface DynamicLink extends ChildDocType {
+  /** Link Document Type: Link (DocType) */
+  link_doctype: string;
+  /** Link Name: Dynamic Link (link_doctype) */
+  link_name: string;
+  /** Link Title: Read Only */
+  link_title?: string;
+}
+
+// Last updated: 2024-03-23 16:01:31.173691
+export interface ContactEmail extends ChildDocType {
+  /** Email ID: Data */
+  email_id: string;
+  /** Is Primary: Check */
+  is_primary: 0 | 1;
+}
+
+// Last updated: 2024-03-23 16:01:31.293047
+export interface ContactPhone extends ChildDocType {
+  /** Number: Data */
+  phone: string;
+  /** Is Primary Phone: Check */
+  is_primary_phone: 0 | 1;
+  /** Is Primary Mobile: Check */
+  is_primary_mobile_no: 0 | 1;
+}
+
+// Last updated: 2024-03-23 16:01:30.937045
+export interface Contact extends DocType {
+  /** First Name: Data */
+  first_name?: string;
+  /** Last Name: Data */
+  last_name?: string;
+  /** Email Address: Data */
+  email_id?: string;
+  /** User Id: Link (User) */
+  user?: string;
+  /** Status: Select */
+  status?: 'Passive' | 'Open' | 'Replied';
+  /** Salutation: Link (Salutation) */
+  salutation?: string;
+  /** Gender: Link (Gender) */
+  gender?: string;
+  /** Phone: Data */
+  phone?: string;
+  /** Image: Attach Image */
+  image?: string;
+  /** Is Primary Contact: Check */
+  is_primary_contact: 0 | 1;
+  /** Links: Table (Dynamic Link) */
+  links: DynamicLink[];
+  /** Department: Data */
+  department?: string;
+  /** Designation: Data */
+  designation?: string;
+  /** Unsubscribed: Check */
+  unsubscribed: 0 | 1;
+  /** Middle Name: Data */
+  middle_name?: string;
+  /** Email IDs: Table (Contact Email) */
+  email_ids: ContactEmail[];
+  /** Address: Link (Address) */
+  address?: string;
+  /** Contact Numbers: Table (Contact Phone) */
+  phone_nos: ContactPhone[];
+  /** Mobile No: Data */
+  mobile_no?: string;
+  /** Pulled from Google Contacts: Check */
+  pulled_from_google_contacts: 0 | 1;
+  /** Sync with Google Contacts: Check */
+  sync_with_google_contacts: 0 | 1;
+  /** Google Contacts: Link (Google Contacts) */
+  google_contacts?: string;
+  /** Google Contacts Id: Data */
+  google_contacts_id?: string;
+  /** Company Name: Data */
+  company_name?: string;
+  /** Full Name: Data */
+  full_name?: string;
 }

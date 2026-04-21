@@ -1,7 +1,7 @@
 <template>
   <div class="h-full w-full rounded border border-outline-gray-1">
     <AgentTicketsCard v-if="item.chart == 'agent_tickets'" :data="item.data" />
-    <AvgTimeCard
+    <LineChartCard
       v-if="item.chart == 'avg_first_response_time'"
       :title="__('Average First Response')"
       api-url="helpdesk.api.agent_home.agent_home.get_avg_first_response_time"
@@ -11,7 +11,7 @@
         gradientColor: { start: '#ee9d9f', end: 'rgba(251,232,233,0)' },
       }"
     />
-    <AvgTimeCard
+    <LineChartCard
       v-if="item.chart == 'avg_resolution_time'"
       :title="__('Average Resolution')"
       api-url="helpdesk.api.agent_home.agent_home.get_avg_resolution_time"
@@ -28,13 +28,13 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { type PropType } from "vue";
-import AvgTimeCard from "./AvgTimeCard.vue";
+import LineChartCard from "../../../components/LineChartCard.vue";
 import AgentTicketsCard from "./AgentTicketsCard.vue";
 import AvgTimeMetrics from "./AvgTimeMetrics.vue";
-import RecentFeedback from "./RecentFeedback.vue";
 import PendingTickets from "./PendingTickets.vue";
-import { __ } from "@/translation";
+import RecentFeedback from "./RecentFeedback.vue";
 
 interface Item {
   chart: string;

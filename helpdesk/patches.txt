@@ -34,6 +34,8 @@ helpdesk.patches.enable_new_email_notifications
 helpdesk.patches.add_fulltext_index #v2
 helpdesk.patches.add_telephony_app
 helpdesk.patches.add_website_settings_permission
-helpdesk.patches.set_last_customer_agent_response
 helpdesk.patches.add_agent_manager_perms_in_assignment_rule
 helpdesk.patches.set_std_views_non_public
+helpdesk.patches.add_customer_field_in_user_invitation
+helpdesk.patches.add_customer_and_customer_manager_role
+helpdesk.patches.move_contact_dynamic_link_to_hd_customer

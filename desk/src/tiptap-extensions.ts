@@ -1,6 +1,11 @@
 import { Extension, generateJSON } from "@tiptap/core";
-import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table'
-import { TextAlign } from "@tiptap/extension-text-align";
+import {
+  Table,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "@tiptap/extension-table";
+import TextAlign from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 import StarterKit from "@tiptap/starter-kit";

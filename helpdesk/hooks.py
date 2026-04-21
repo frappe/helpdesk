@@ -53,20 +53,36 @@ website_route_rules = [
 
 user_invitation = {
     "allowed_roles": {
-        "Agent Manager": ["Agent", "Agent Manager"],
-        "System Manager": ["Agent", "Agent Manager", "System Manager"],
+        "Agent Manager": [
+            "Agent",
+            "Agent Manager",
+            "HD Customer",
+            "HD Customer Manager",
+        ],
+        "System Manager": [
+            "Agent",
+            "Agent Manager",
+            "System Manager",
+            "HD Customer",
+            "HD Customer Manager",
+        ],
     },
     "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
+    "extra_invite_params": ["customer"],
 }
 
 doc_events = {
-    "Contact": {
-        "before_insert": "helpdesk.overrides.contact.before_insert",
-    },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
+}
+
+# For List View
+permission_query_conditions = {
+    "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
+    "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
+    "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.permission_query",
 }
 
 has_permission = {
@@ -74,16 +90,13 @@ has_permission = {
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
 }
 
-permission_query_conditions = {
-    "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
-    "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
-}
 
 # DocType Class
 # ---------------
 # Override standard doctype classes
 override_doctype_class = {
     "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
+    "Contact": "helpdesk.overrides.contact.CustomContact",
 }
 
 ignore_links_on_delete = [

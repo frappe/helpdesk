@@ -14,7 +14,6 @@ from frappe.utils.safe_exec import get_safe_globals
 from frappe.utils.telemetry import capture as _capture
 from phonenumbers import NumberParseException
 from phonenumbers import PhoneNumberFormat as PNF
-from pypika import Criterion
 from pypika.functions import Replace
 
 
@@ -88,30 +87,36 @@ def capture_event(event: str):
     return _capture(event, "helpdesk")
 
 
-def get_customer(contact: str) -> tuple[str]:
+def get_customers(user: str = "", contact: str = "", get_roles=False):
     """
     Get `Customer` from `Contact`
 
     :param contact: Contact which belongs to a customer
+    :param user: User to check against, defaults to current user
     :return: Customer `name` if available
     """
-    QBDynamicLink = frappe.qb.DocType("Dynamic Link")
-    QBContact = frappe.qb.DocType("Contact")
-    conditions = [QBDynamicLink.parent == contact, QBContact.email_id == contact]
-    return [
-        i[0]
-        for i in (
-            frappe.qb.from_(QBDynamicLink)
-            .select(QBDynamicLink.link_name)
-            .where(QBDynamicLink.parentfield == "links")
-            .where(QBDynamicLink.parenttype == "Contact")
-            .where(QBDynamicLink.link_doctype == "HD Customer")
-            .join(QBContact)
-            .on(QBDynamicLink.parent == QBContact.name)
-            .where(Criterion.any(conditions))
-            .run()
-        )
-    ]
+    user = user or frappe.session.user
+    if not contact:
+        contact = frappe.db.get_value("Contact", {"user": user})
+
+    HDCustomer = frappe.qb.DocType("HD Customer")
+    HDCustomerMember = frappe.qb.DocType("HD Customer Member")
+
+    query = (
+        frappe.qb.from_(HDCustomerMember)
+        .where(HDCustomerMember.contact_name == contact)
+        .join(HDCustomer)
+        .on(HDCustomer.name == HDCustomerMember.parent)
+        .select(HDCustomer.name, HDCustomerMember.is_manager)
+        .distinct()
+    ).run(as_dict=True)
+    customers = [d.get("name") for d in query]
+    if get_roles:
+        customers = [
+            {"name": d.get("name"), "is_manager": d.get("is_manager")} for d in query
+        ]
+
+    return tuple(customers)
 
 
 def extract_mentions(html):
@@ -471,3 +476,10 @@ def format_time_difference(dt, context="ago"):
         return f"{int(total_seconds // 3600)}h"
     else:
         return f"{int(total_seconds // 86400)}d"
+
+
+def get_country_from_timezone(time_zone: str):
+    country = frappe.db.get_value(
+        "Country", {"time_zones": ["like", f"%{time_zone}%"]}, "name"
+    )
+    return country or None

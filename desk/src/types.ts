@@ -1,6 +1,6 @@
 import { Dayjs } from "dayjs";
 import { Component, ComputedRef, InjectionKey, Ref } from "vue";
-import type { AssignmentRule, HDTicket } from "./types/doctypes";
+import type { AssignmentRule, HDCustomer, HDTicket } from "./types/doctypes";
 
 interface ResourceOptions<T = any> {
   method?: string;
@@ -21,7 +21,7 @@ interface ResourceOptions<T = any> {
   resourceFetcher?: (options: any) => Promise<any>;
 }
 
-interface Resource<T = any> {
+export interface Resource<T = any> {
   method: string | undefined;
   url: string;
   data: T | null;
@@ -118,6 +118,7 @@ export interface ListResource<T = any> {
   setValue: Resource<T>;
   delete: Resource<T>;
   runDocMethod: Resource<T>;
+  loading: boolean;
   update: (updatedOptions: Partial<ListResourceOptions>) => void;
   fetch: () => void;
   reload: () => Promise<T[]>;
@@ -397,7 +398,6 @@ export interface View {
   group_by_field?: string;
   name?: string;
   is_customer_portal?: boolean;
-  is_standard?: boolean;
 }
 
 export interface ViewType {
@@ -712,6 +712,10 @@ export const SavedReplyListResourceSymbol: InjectionKey<
   ListResource<SavedReply>
 > = Symbol("savedReplyListResource");
 
+export const CustomerResourceSymbol: InjectionKey<
+  DocumentResource<HDCustomer>
+> = Symbol("customerResource");
+
 declare global {
   interface Window {
     is_fc_site: boolean;
@@ -720,5 +724,64 @@ declare global {
     session_user: string;
     timezone: Record<"user" | "system", string>;
     agent: string | null;
+    default_country: string;
   }
+}
+
+export interface CustomerContact {
+  contact_name: string;
+  is_primary: 0 | 1;
+  is_manager: 0 | 1;
+  email_id: string | null;
+  mobile_no: string | null;
+  image: string | null;
+  last_active: string;
+  ticket_count: number;
+}
+
+export interface CustomerContact {
+  contact_name: string;
+  is_primary: 0 | 1;
+  is_manager: 0 | 1;
+  email_id: string | null;
+  mobile_no: string | null;
+  image: string | null;
+  modified: string;
+  ticket_count: number;
+}
+
+export interface CustomerContact {
+  contact_name: string;
+  is_primary: 0 | 1;
+  is_manager: 0 | 1;
+  email_id: string | null;
+  mobile_no: string | null;
+  image: string | null;
+  modified: string;
+  ticket_count: number;
+}
+export interface NewContactState {
+  firstName: string;
+  lastName: string;
+  image: string;
+  email: string;
+  phone: string;
+  timezone: string | AutoCompleteItem;
+  customer: string;
+}
+
+export interface EditContactState {
+  firstName: string;
+  lastName: string;
+  image: string;
+  emails: { email_id: string; isPrimary: boolean }[];
+  phones: { phone: string; isPrimary: boolean }[];
+  customers: string[];
+  timezone: string | AutoCompleteItem;
+}
+
+export interface LineChart {
+  percentage_change: number;
+  total: number;
+  data: { date: string; count: number }[];
 }

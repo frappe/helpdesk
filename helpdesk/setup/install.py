@@ -201,7 +201,7 @@ def add_agent_manager_permissions():
     doc_to_permissions = {
         "Email Account": ["create", "delete", "write"],
         "File": ["create", "delete", "write"],
-        "Contact": ["create", "delete", "write"],
+        "Contact": ["create", "delete", "write", "select"],
         "Communication": ["create", "delete", "write"],
         "User Invitation": ["create", "write"],
         "Role": [],
@@ -261,6 +261,15 @@ def get_custom_fields():
                 "insert_after": "unassign_condition",
                 "depends_on": "eval: doc.unassign_condition_json",
             },
+        ],
+        "User Invitation": [
+            {
+                "fieldname": "customer",
+                "label": "Customer",
+                "fieldtype": "Link",
+                "options": "HD Customer",
+                "insert_after": "roles",
+            }
         ],
     }
 

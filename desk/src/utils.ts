@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/stores/auth";
 import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
 import { FeatherIcon, call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
@@ -770,6 +771,52 @@ export function parseApiOptions(
 }
 
 export function openContact(name: string) {
-  const url = window.location.origin + "/app/contact/" + name;
+  const url = window.location.origin + "/helpdesk/contacts/" + name;
   window.open(url, "_blank");
+}
+
+export function hasPermission() {
+  const authStore = useAuthStore();
+  return authStore.isAdmin || authStore.isManager;
+}
+
+export function getErrorMessage(
+  error: any,
+  showToast: boolean = false
+): string {
+  const msg = error.exc_type
+    ? (error.messages || error.message || []).join(", ")
+    : error.message;
+  if (showToast) {
+    toast.error(msg);
+  }
+  return msg;
+}
+const emailsToStr = (emails: readonly string[]) => emails.join(", ");
+
+export function handleInviteUserSuccess(
+  data: Record<
+    | "disabled_user_emails"
+    | "accepted_invite_emails"
+    | "pending_invite_emails"
+    | "invited_emails",
+    string[]
+  >
+) {
+  let emailsStr = emailsToStr(data.invited_emails);
+  if (emailsStr.trim() !== "") {
+    toast.success(`${emailsStr} invited successfully`);
+  }
+  emailsStr = emailsToStr(data.disabled_user_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already present and disabled`);
+  }
+  emailsStr = emailsToStr(data.pending_invite_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already invited`);
+  }
+  emailsStr = emailsToStr(data.accepted_invite_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already present`);
+  }
 }

@@ -23,7 +23,7 @@ from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_temp
 from helpdesk.utils import (
     agent_only,
     check_permissions,
-    get_customer,
+    get_customers,
     is_agent,
     parse_call_logs,
 )
@@ -157,7 +157,7 @@ def get_customer_criteria():
         QBTicket.raised_by == user,
         QBTicket.owner == user,
     ]
-    customer = get_customer(user)
+    customer = get_customers(user)
     for c in customer:
         conditions.append(QBTicket.customer == c)
     return Criterion.any(conditions)
