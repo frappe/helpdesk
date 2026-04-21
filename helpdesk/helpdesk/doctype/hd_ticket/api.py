@@ -188,38 +188,17 @@ def get_communications(ticket: str):
             QBCommunication.subject,
             QBCommunication.delivery_status,
             QBCommunication.sent_or_received,
-            QBCommunication.email_account,
+            QBCommunication.user,
         )
         .where(QBCommunication.reference_doctype == "HD Ticket")
         .where(QBCommunication.reference_name == ticket)
         .orderby(QBCommunication.creation, order=Order.asc)
         .run(as_dict=True)
     )
-    email_accounts: dict[str, dict] = {}
     for c in communications:
         c.attachments = get_attachments("Communication", c.name)
-        c.user = get_user_info_for_avatar(c.sender)
-
-        # For sent communications (in our control) use selected email properties, i.e display name (doctype name) and email id
-        # example: support <support.frappe.io>
-        if c.sent_or_received == "Sent" and c.email_account:
-            account = email_accounts.get(c.email_account)
-            if account is None:
-                account = (
-                    frappe.db.get_value(
-                        "Email Account",
-                        c.email_account,
-                        ["email_account_name", "email_id"],
-                        as_dict=True,
-                    )
-                    or {}
-                )
-                email_accounts[c.email_account] = account
-            if account.get("email_id"):
-                c.sender_full_name = account.get("email_account_name") or account.get(
-                    "email_id"
-                )
-                c.sender_mail_id = account.get("email_id")
+        user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
+        c.user = get_user_info_for_avatar(user_id)
     return communications
 
 
