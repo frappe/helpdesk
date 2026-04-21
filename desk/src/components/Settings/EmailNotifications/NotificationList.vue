@@ -30,8 +30,7 @@
               name="chevron-right"
               class="text-ink-gray-7 size-4 relative z-10 pointer-events-none"
             />
-            <button
-              type="button"
+            <div
               class="w-full h-full absolute top-0 left-0 hover:bg-gray-50 rounded-[inherit]"
               @click="
                 () => {
@@ -42,7 +41,7 @@
               <span class="sr-only">{{
                 __("customize {0}", notification.name)
               }}</span>
-            </button>
+            </div>
           </li>
           <hr v-if="index < notifications.length - 1" class="mx-2" />
         </div>
