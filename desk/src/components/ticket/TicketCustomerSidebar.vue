@@ -95,7 +95,13 @@
           class="text-base text-gray-800 flex-1"
           :class="!field.value && 'text-ink-gray-4'"
         >
-          <template v-if="field.value && dayjs(field.value).isValid()">
+          <template
+            v-if="
+              field.value &&
+              (field.fieldtype === 'Date' || field.fieldtype === 'Datetime') &&
+              dayjs(field.value).isValid()
+            "
+          >
             {{ dateFormat(field.value, dateTooltipFormat) }}
           </template>
           <template v-else>
