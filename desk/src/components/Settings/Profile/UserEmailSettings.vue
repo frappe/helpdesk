@@ -132,6 +132,7 @@ import {
   TextEditor,
   toast,
 } from "frappe-ui";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
 const { userId } = useAuthStore();

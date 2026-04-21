@@ -5,7 +5,10 @@
     :disableOutsideClickToClose="disableSettingModalOutsideClick"
   >
     <template #body>
-      <div class="flex z-50" :style="{ height: 'calc(100vh - 8rem)' }">
+      <div
+        class="flex z-50 overflow-hidden"
+        :style="{ height: 'calc(100vh - 8rem)' }"
+      >
         <div
           class="flex-col rounded-l-lg w-56 shrink-0 bg-gray-50 m-1 bg-surface-menu-bar overflow-y-auto hide-scrollbar"
         >
@@ -51,7 +54,9 @@
             </nav>
           </div>
         </div>
-        <div class="flex flex-1 flex-col bg-surface-modal max-w-[816px]">
+        <div
+          class="flex flex-1 flex-col bg-surface-modal max-w-[816px] overflow-hidden"
+        >
           <component
             :is="activeTab.component"
             v-if="activeTab"

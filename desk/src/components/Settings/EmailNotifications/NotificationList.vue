@@ -18,12 +18,12 @@
               <h2
                 class="text-base font-medium text-ink-gray-7 relative z-10 pointer-events-none"
               >
-                {{ notification.label }}
+                {{ __(notification.label) }}
               </h2>
               <p
                 class="text-sm text-ink-gray-5 truncate relative z-10 pointer-events-none"
               >
-                {{ notification.description }}
+                {{ __(notification.description) }}
               </p>
             </div>
             <FeatherIcon

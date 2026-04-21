@@ -225,7 +225,6 @@ import {
   FileUploader,
   TextEditor,
   TextEditorFixedMenu,
-  createDocumentResource,
   createResource,
   toast,
 } from "frappe-ui";
@@ -306,16 +305,10 @@ const { userId } = useAuthStore();
 // email signature
 const emailSignature = ref<string | null>(null);
 
-const userSignatureResource = createResource({
-  url: "frappe.client.get",
+const userResource = createResource({
+  url: "helpdesk.api.auth.get_current_user_email_info",
+  cache: "current-user-email-info",
   auto: true,
-  makeParams() {
-    return {
-      doctype: "User",
-      name: auth.userId,
-      fields: ["email_signature"],
-    };
-  },
   onSuccess: (data: { email_signature?: string }) => {
     if (data.email_signature) {
       emailSignature.value = `<br>${data.email_signature}`;
@@ -332,7 +325,6 @@ const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
 const isUploading = ref(false);
-const contentEmpty = computed(() => isContentEmpty(newEmail.value));
 const hasMultipleSenders = computed(() => (from?.value.length ?? 0) > 1);
 const isDisabled = computed(() => {
   return (
@@ -400,24 +392,19 @@ const sendMail = createResource({
   debounce: 300,
 });
 
-const user = createDocumentResource({
-  doctype: "User",
-  name: userId,
-  cache: "user",
-});
-
 const from = computed(() => {
-  if (!user.doc || !user.doc.user_emails?.length) return [];
-  let emails = user.doc.user_emails.map((e) => {
-    return {
-      label: e.email_account + " <" + e.email_id + ">",
-      value: e.email_id,
-    };
-  });
+  const userEmails: { email_account: string; email_id: string }[] =
+    userResource.data?.user_emails ?? [];
+  if (!userEmails.length) return [];
 
-  if (emails.length == 1 && emails[0].value === user.doc.email) return [];
+  const emailsMapped = userEmails.map((e) => ({
+    label: e.email_account + " <" + e.email_id + ">",
+    value: e.email_id,
+  }));
 
-  return emails;
+  if (emailsMapped.length === 1 && emailsMapped[0].value === auth.userId)
+    return [];
+  return emailsMapped;
 });
 
 function submitMail() {

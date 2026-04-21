@@ -128,10 +128,7 @@ const _activities = computed(() => {
       return {
         subject: email.subject,
         content: email.content,
-        sender: {
-          name: email.sender_mail_id || email.user.email,
-          full_name: email.sender_full_name || email.user.name,
-        },
+        sender: { name: email.user.email, full_name: email.user.name },
         to: email.recipients,
         type: "email",
         key: email.creation,

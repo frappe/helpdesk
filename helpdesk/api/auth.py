@@ -1,6 +1,6 @@
 import frappe
 
-from helpdesk.utils import get_agents_team
+from helpdesk.utils import agent_only, get_agents_team
 from helpdesk.utils import is_agent as _is_agent
 
 
@@ -52,4 +52,26 @@ def get_user():
         "time_zone": user.time_zone,
         "user_teams": user_team_names,
         "language": language,
+    }
+
+
+@frappe.whitelist()
+@agent_only
+def get_current_user_email_info():
+    """
+    Return the current user's email signature and linked email accounts.
+    """
+    user = frappe.session.user
+
+    email_signature = frappe.db.get_value("User", user, "email_signature")
+
+    user_emails = frappe.db.get_all(
+        "User Email",
+        filters={"parent": user},
+        fields=["email_account", "email_id"],
+    )
+
+    return {
+        "email_signature": email_signature,
+        "user_emails": user_emails,
     }
