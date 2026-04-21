@@ -25,7 +25,12 @@
       </template>
       <span>{{ __("New Comment") }}</span>
     </Button>
-    <Dropdown v-else-if="title == 'Calls'" :options="callActions" @click.stop>
+    <Dropdown
+      v-else-if="title == 'Calls'"
+      :options="callActions"
+      @click.stop
+      placement="right"
+    >
       <template v-slot="{ open }">
         <Button variant="solid" class="flex items-center gap-1">
           <template #prefix>
@@ -41,7 +46,7 @@
         </Button>
       </template>
     </Dropdown>
-    <Dropdown v-else :options="defaultActions" @click.stop>
+    <Dropdown v-else :options="defaultActions" @click.stop placement="right">
       <template v-slot="{ open }">
         <Button variant="solid" class="flex items-center gap-1">
           <template #prefix>
