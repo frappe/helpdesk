@@ -129,6 +129,7 @@ import {
   Button,
   createDocumentResource,
   createListResource,
+  createResource,
   TextEditor,
   toast,
 } from "frappe-ui";
@@ -145,6 +146,11 @@ const emails = createListResource({
   fields: ["name", "email_id"],
   filters: { enable_outgoing: 1 },
   auto: true,
+});
+
+const currentUserEmailInfo = createResource({
+  url: "helpdesk.api.auth.get_current_user_email_info",
+  cache: "current-user-email-info",
 });
 
 const filteredEmails = computed(() => {
@@ -183,6 +189,7 @@ function update() {
   user.save.submit(null, {
     onSuccess: () => {
       toast.success(__("Email settings updated successfully."));
+      currentUserEmailInfo.reload();
     },
   });
 }

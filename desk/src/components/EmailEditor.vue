@@ -239,11 +239,7 @@ import {
 } from "vue";
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 
-const editorRef = ref(null);
-const showSavedRepliesSelectorModal = ref(false);
-const quotedContentRef = ref<HTMLElement | null>(null);
-const fromEmail = useStorage<string | "">("from-email", "");
-
+// ─── Props & Emits ────────────────────────────────────────────
 const props = defineProps({
   ticketId: {
     type: String,
@@ -279,27 +275,26 @@ const props = defineProps({
   },
 });
 
-const label = computed(() => {
-  return sendMail.loading ? "Sending..." : props.label;
-});
-
 const emit = defineEmits(["submit", "discard"]);
+
+const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { isManager } = useAuthStore();
+const auth = useAuthStore();
+const { onUserType, cleanup } = useTyping(props.ticketId);
+
+const editorRef = ref(null);
+const editor = computed(() => editorRef.value.editor);
+
+function focusEditorAtStart() {
+  setTimeout(() => {
+    editorRef.value?.editor?.commands?.focus("start");
+  }, 0);
+}
 
 const newEmail = useStorage<null | string>(
   "emailBoxContent" + props.ticketId,
   null
 );
-
-const quotedContent = useStorage<null | string>(
-  "quotedEmailBoxContent" + props.ticketId,
-  null
-);
-
-const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { isManager } = useAuthStore();
-const auth = useAuthStore();
-
-// email signature
 const emailSignature = ref<string | null>(null);
 
 const userResource = createResource({
@@ -317,29 +312,43 @@ const userResource = createResource({
   },
 });
 
-// Initialize typing composable
-const { onUserType, cleanup } = useTyping(props.ticketId);
-
-const attachments = ref([]);
-const isUploading = ref(false);
-const hasMultipleSenders = computed(() => (from?.value.length ?? 0) > 1);
-const isDisabled = computed(() => {
-  return (
-    (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
-    sendMail.loading ||
-    isUploading.value
-  );
-});
-
-// Watch for changes in email content to trigger typing events
 watch(newEmail, (newValue, oldValue) => {
   if (newValue !== oldValue && newValue) {
     onUserType();
   }
 });
 
-onBeforeUnmount(() => {
-  cleanup();
+const quotedContent = useStorage<null | string>(
+  "quotedEmailBoxContent" + props.ticketId,
+  null
+);
+const quotedContentRef = ref<HTMLElement | null>(null);
+const isQuoteExpanded = ref(false);
+
+function onQuotedInput() {
+  const el = quotedContentRef.value;
+  if (!el) return;
+  quotedContent.value = el.innerHTML || null;
+}
+
+watch(quotedContent, (newVal, oldVal) => {
+  if (!oldVal && newVal) {
+    nextTick(() => {
+      if (quotedContentRef.value) {
+        quotedContentRef.value.innerHTML = newVal;
+      }
+    });
+  }
+});
+
+onMounted(() => {
+  if (quotedContent.value) {
+    nextTick(() => {
+      if (quotedContentRef.value) {
+        quotedContentRef.value.innerHTML = quotedContent.value;
+      }
+    });
+  }
 });
 
 const toEmailsClone = ref([...props.toEmails]);
@@ -351,6 +360,64 @@ const cc = computed(() => (ccEmailsClone.value?.length ? true : false));
 const bcc = computed(() => (bccEmailsClone.value?.length ? true : false));
 const ccInput = ref(null);
 const bccInput = ref(null);
+
+function toggleCC() {
+  showCC.value = !showCC.value;
+  showCC.value &&
+    nextTick(() => {
+      ccInput.value.setFocus();
+    });
+}
+
+function toggleBCC() {
+  showBCC.value = !showBCC.value;
+  showBCC.value &&
+    nextTick(() => {
+      bccInput.value.setFocus();
+    });
+}
+
+const fromEmail = useStorage<string | "">("from-email", "");
+
+const from = computed(() => {
+  const userEmails: { email_account: string; email_id: string }[] =
+    userResource.data?.user_emails ?? [];
+  if (!userEmails.length) return [];
+
+  const emailsMapped = userEmails.map((e) => ({
+    label: e.email_account + " <" + e.email_id + ">",
+    value: e.email_id,
+  }));
+
+  if (
+    emailsMapped.length === 1 &&
+    emailsMapped[0].value === userResource.data?.email
+  )
+    return [];
+  return emailsMapped;
+});
+
+const hasMultipleSenders = computed(() => (from?.value.length ?? 0) > 1);
+
+watch(
+  from,
+  (fromOptions) => {
+    if (!fromOptions.find((f) => f.value === fromEmail.value)) {
+      fromEmail.value = fromOptions.length ? fromOptions[0].value : "";
+    }
+  },
+  { immediate: true }
+);
+
+const attachments = ref([]);
+const isUploading = ref(false);
+
+async function removeAttachment(attachment) {
+  attachments.value = attachments.value.filter((a) => a !== attachment);
+  await removeAttachmentFromServer(attachment.name);
+}
+
+const showSavedRepliesSelectorModal = ref(false);
 
 function applySavedReplies(template: string) {
   isContentEmpty(newEmail.value)
@@ -389,23 +456,16 @@ const sendMail = createResource({
   debounce: 300,
 });
 
-const from = computed(() => {
-  const userEmails: { email_account: string; email_id: string }[] =
-    userResource.data?.user_emails ?? [];
-  if (!userEmails.length) return [];
+const label = computed(() =>
+  sendMail.loading ? "Sending..." : props.label
+);
 
-  const emailsMapped = userEmails.map((e) => ({
-    label: e.email_account + " <" + e.email_id + ">",
-    value: e.email_id,
-  }));
-
-  if (
-    emailsMapped.length === 1 &&
-    emailsMapped[0].value === userResource.data?.email
-  )
-    return [];
-  return emailsMapped;
-});
+const isDisabled = computed(
+  () =>
+    (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
+    sendMail.loading ||
+    isUploading.value
+);
 
 function submitMail() {
   if (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) {
@@ -419,49 +479,6 @@ function submitMail() {
   }
 
   sendMail.submit();
-}
-
-watch(quotedContent, (newVal, oldVal) => {
-  if (!oldVal && newVal) {
-    nextTick(() => {
-      if (quotedContentRef.value) {
-        quotedContentRef.value.innerHTML = newVal;
-      }
-    });
-  }
-});
-function onQuotedInput() {
-  const el = quotedContentRef.value;
-  if (!el) return;
-  quotedContent.value = el.innerHTML || null;
-}
-
-function toggleCC() {
-  showCC.value = !showCC.value;
-
-  showCC.value &&
-    nextTick(() => {
-      ccInput.value.setFocus();
-    });
-}
-
-function toggleBCC() {
-  showBCC.value = !showBCC.value;
-  showBCC.value &&
-    nextTick(() => {
-      bccInput.value.setFocus();
-    });
-}
-
-async function removeAttachment(attachment) {
-  attachments.value = attachments.value.filter((a) => a !== attachment);
-  await removeAttachmentFromServer(attachment.name);
-}
-
-function focusEditorAtStart() {
-  setTimeout(() => {
-    editorRef.value?.editor?.commands?.focus("start");
-  }, 0);
 }
 
 function addToReply(
@@ -513,19 +530,6 @@ function handleDiscard() {
   emit("discard");
 }
 
-//on load set quoted content from storage
-onMounted(() => {
-  if (quotedContent.value) {
-    nextTick(() => {
-      if (quotedContentRef.value) {
-        quotedContentRef.value.innerHTML = quotedContent.value;
-      }
-    });
-  }
-});
-
-const isQuoteExpanded = ref(false);
-
 function handleSelectAll(e: KeyboardEvent) {
   const active = document.activeElement;
   const editorContext = editorRef.value?.editor;
@@ -560,7 +564,6 @@ function handleDelete(e: KeyboardEvent) {
   if (!sel || sel.isCollapsed || !quotedEl || !editorDom) return;
 
   const isSelectingEntireEditor = sel.containsNode(editorDom, true);
-
   const isSelectingEntireQuote = sel.containsNode(quotedEl, true);
 
   if (isSelectingEntireEditor && isSelectingEntireQuote) {
@@ -589,19 +592,10 @@ function handleKeydown(e: KeyboardEvent) {
   }
 }
 
-const editor = computed(() => {
-  return editorRef.value.editor;
+onBeforeUnmount(() => {
+  cleanup();
 });
 
-watch(
-  from,
-  (fromOptions) => {
-    if (!fromOptions.find((f) => f.value === fromEmail.value)) {
-      fromEmail.value = fromOptions.length ? fromOptions[0].value : "";
-    }
-  },
-  { immediate: true }
-);
 defineExpose({
   addToReply,
   editor,
