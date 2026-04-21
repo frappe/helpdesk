@@ -23,6 +23,7 @@
         <span class="text-xs text-ink-gray-4">{{ __("FROM") }}:</span>
         <FormControl
           v-model="fromEmail"
+          type="select"
           variant="ghost"
           class="w-full"
           :placeholder="__('')"
