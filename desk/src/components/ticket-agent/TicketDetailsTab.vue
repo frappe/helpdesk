@@ -57,7 +57,10 @@
               />
             </div>
           </template>
-          <div class="space-y-1.5 px-5 last:mb-3">
+          <div
+            class="space-y-1.5 px-5 last:mb-3"
+            v-if="Boolean(customFields.length)"
+          >
             <template v-for="field in customFields">
               <TicketField
                 v-if="field.visible"
@@ -156,10 +159,10 @@ import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
 
-const ticket = inject(TicketSymbol);
-const assignees = inject(AssigneeSymbol);
-const customizations = inject(CustomizationSymbol);
-const activities = inject(ActivitiesSymbol);
+const ticket = inject(TicketSymbol)!;
+const assignees = inject(AssigneeSymbol)!;
+const customizations = inject(CustomizationSymbol)!;
+const activities = inject(ActivitiesSymbol)!;
 const recentSimilarTickets = inject(RecentSimilarTicketsSymbol)!;
 const { getFields, getField } = getMeta("HD Ticket");
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
@@ -286,7 +289,10 @@ function getFieldInFormat(fieldTemplate, fieldMeta) {
     url_method: fieldTemplate.url_method || "",
     fieldname: fieldTemplate.fieldname,
     required: fieldTemplate.required || fieldMeta?.required || false,
-    visible: fieldMeta.display_via_depends_on && !fieldMeta.hidden,
+    visible:
+      fieldMeta.display_via_depends_on &&
+      !fieldMeta.hidden &&
+      ticket.value.doc[fieldTemplate.fieldname],
   };
 }
 
