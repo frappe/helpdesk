@@ -151,6 +151,7 @@ const emails = createListResource({
 const currentUserEmailInfo = createResource({
   url: "helpdesk.api.auth.get_current_user_email_info",
   cache: "current-user-email-info",
+  auto: true,
 });
 
 const filteredEmails = computed(() => {
@@ -165,8 +166,23 @@ const filteredEmails = computed(() => {
     .filter((e) => !linkedEmails.includes(e.email));
 });
 
+const isSignatureDirty = computed(() => {
+  return (
+    currentUserEmailInfo.data.email_signature !== user?.doc?.email_signature
+  );
+});
+
+const isUserEmailListDirty = computed(() => {
+  const emails = (list = []) =>
+    list.map(({ email_account, email_id }) => ({ email_account, email_id }));
+  return (
+    JSON.stringify(emails(currentUserEmailInfo.data.user_emails)) !==
+    JSON.stringify(emails(user.doc.user_emails))
+  );
+});
+
 const isDirty = computed(() => {
-  return JSON.stringify(user.doc) !== JSON.stringify(user.originalDoc);
+  return isSignatureDirty.value || isUserEmailListDirty.value;
 });
 
 function addEmail(email) {
