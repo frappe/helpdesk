@@ -28,71 +28,78 @@
         <TypingIndicator :ticketId="ticketId" />
       </div>
     </div>
-    <div
-      ref="emailBoxRef"
-      v-show="showEmailBox"
-      class="flex gap-1.5 flex-1"
-      @keydown.ctrl.enter.capture.stop="submitEmail"
-      @keydown.meta.enter.capture.stop="submitEmail"
-      @keydown.esc.capture.stop="showEmailBox = false"
-    >
-      <EmailEditor
-        ref="emailEditorRef"
-        :label="
-          isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
-        "
-        v-model:content="content"
-        placeholder="Hi John, we are looking into this issue."
-        :ticketId="ticketId"
-        :to-emails="toEmails"
-        :cc-emails="ccEmails"
-        :bcc-emails="bccEmails"
-        @submit="
-          () => {
-            showEmailBox = false;
-            emit('update');
-          }
-        "
-        @discard="
-          () => {
-            showEmailBox = false;
-          }
-        "
-      />
-    </div>
-    <div
-      ref="commentBoxRef"
-      v-show="showCommentBox"
-      @keydown.ctrl.enter.capture.stop="submitComment"
-      @keydown.meta.enter.capture.stop="submitComment"
-      @keydown.esc.capture.stop="showCommentBox = false"
-    >
-      <CommentTextEditor
-        ref="commentTextEditorRef"
-        :label="
-          isMobileView
-            ? 'Comment'
-            : isMac
-            ? 'Comment (⌘ + ⏎)'
-            : 'Comment (Ctrl + ⏎)'
-        "
-        :ticketId="ticketId"
-        :editable="showCommentBox"
-        :doctype="doctype"
-        placeholder="@John could you please look into this?"
-        @submit="
-          () => {
-            showCommentBox = false;
-            emit('update');
-          }
-        "
-        @discard="
-          () => {
-            showCommentBox = false;
-          }
-        "
-      />
-    </div>
+    <Transition name="slide">
+      <div
+        v-if="showEmailBox"
+        ref="emailBoxRef"
+        @keydown.ctrl.enter.capture.stop="submitEmail"
+        @keydown.meta.enter.capture.stop="submitEmail"
+        @keydown.esc.capture.stop="showEmailBox = false"
+      >
+        <div class="overflow-hidden">
+          <EmailEditor
+            ref="emailEditorRef"
+            :label="
+              isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
+            "
+            v-model:content="content"
+            placeholder="Hi John, we are looking into this issue."
+            :ticketId="ticketId"
+            :to-emails="toEmails"
+            :cc-emails="ccEmails"
+            :bcc-emails="bccEmails"
+            @submit="
+              () => {
+                showEmailBox = false;
+                emit('update');
+              }
+            "
+            @discard="
+              () => {
+                showEmailBox = false;
+              }
+            "
+          />
+        </div>
+      </div>
+    </Transition>
+    <Transition name="slide">
+      <div
+        v-if="showCommentBox"
+        ref="commentBoxRef"
+        @keydown.ctrl.enter.capture.stop="submitComment"
+        @keydown.meta.enter.capture.stop="submitComment"
+        @keydown.esc.capture.stop="showCommentBox = false"
+      >
+        <div class="overflow-hidden">
+          <CommentTextEditor
+            ref="commentTextEditorRef"
+            :label="
+              isMobileView
+                ? 'Comment'
+                : isMac
+                ? 'Comment (⌘ + ⏎)'
+                : 'Comment (Ctrl + ⏎)'
+            "
+            :ticketId="ticketId"
+            :editable="showCommentBox"
+            :doctype="doctype"
+            placeholder="@John could you please look into this?"
+            @submit="
+              () => {
+                showCommentBox = false;
+                emit('update');
+              }
+            "
+            @discard="
+              () => {
+                showCommentBox = false;
+              }
+            "
+          />
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -246,5 +253,19 @@ onClickOutside(
   .comm-area {
     width: 100vw;
   }
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  display: grid;
+  transition: grid-template-rows 0.25s ease;
+}
+.slide-enter-from,
+.slide-leave-to {
+  grid-template-rows: 0fr;
+}
+.slide-enter-to,
+.slide-leave-from {
+  grid-template-rows: 1fr;
 }
 </style>
