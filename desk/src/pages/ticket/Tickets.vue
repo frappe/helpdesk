@@ -51,13 +51,8 @@
 
 <script setup lang="ts">
 import { LayoutHeader, ListViewBuilder } from "@/components";
-import {
-  EditIcon,
-  IndicatorIcon,
-  PinIcon,
-  TicketIcon,
-  UnpinIcon,
-} from "@/components/icons";
+import { EditIcon, PinIcon, TicketIcon, UnpinIcon } from "@/components/icons";
+import IndicatorIcon from "@/components/icons/IndicatorIcon.vue";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
@@ -138,7 +133,7 @@ const options = computed(() => ({
           "div",
           { class: "flex items-center space-x-2 justify-start w-full" },
           [
-            h(IndicatorIcon, { class: status?.["parsed_color"] }),
+            h(IndicatorIcon, { class: status?.["parsed_color"], fill: true }),
             h("span", { class: "truncate flex-1" }, label),
           ]
         );

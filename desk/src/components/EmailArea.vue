@@ -50,12 +50,16 @@
             </p>
           </Tooltip>
         </div>
-        <div class="flex items-center">
-          <Button variant="ghost" @click="reply">
-            <ReplyIcon class="h-4 w-4 text-ink-gray-5" />
+        <div class="flex items-center gap-1">
+          <Button :tooltip="__('Reply')" variant="ghost" @click="reply">
+            <template #icon>
+              <ReplyIcon class="text-ink-gray-7" />
+            </template>
           </Button>
-          <Button variant="ghost" @click="replyAll">
-            <ReplyAllIcon class="h-4 w-6 text-ink-gray-5" />
+          <Button :tooltip="__('Reply All')" variant="ghost" @click="replyAll">
+            <template #icon>
+              <ReplyAllIcon class="text-ink-gray-7" />
+            </template>
           </Button>
           <Dropdown
             v-if="showSplitOption"
@@ -70,7 +74,7 @@
           >
             <Button
               icon="more-horizontal"
-              class="text-ink-gray-5 ml-0.5"
+              class="!text-ink-gray-7"
               variant="ghost"
             />
           </Dropdown>

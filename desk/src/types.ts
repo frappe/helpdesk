@@ -586,11 +586,11 @@ export interface TicketContact {
 }
 
 export type RecentTicket = Record<
-  "subject" | "status" | "priority" | "name",
+  "subject" | "status" | "priority" | "name" | "creation",
   string | number
 >;
 export type SimilarTicket = Record<
-  "subject" | "status" | "priority" | "name",
+  "subject" | "status" | "priority" | "name" | "creation",
   string | number
 >;
 export interface RecentSimilarTicket {

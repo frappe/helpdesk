@@ -45,7 +45,7 @@
         >
           <Badge
             :label="firstResponse.label"
-            variant="subtle"
+            variant="ghost"
             class="mt-[1px]"
             :theme="firstResponse.color"
           />
@@ -64,12 +64,10 @@
           <Badge
             v-if="resolutionBy"
             :label="resolutionBy.label"
-            variant="subtle"
+            variant="ghost"
             class="mt-[1px]"
             :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
-            :class="
-              resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'
-            "
+            :class="resolutionBy.color === 'purple' && '!text-[#6B46C1] '"
           />
         </Tooltip>
       </div>

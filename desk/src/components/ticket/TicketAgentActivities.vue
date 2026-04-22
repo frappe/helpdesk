@@ -126,7 +126,6 @@ import {
   PropType,
   Ref,
   computed,
-  defineAsyncComponent,
   h,
   inject,
   nextTick,
@@ -135,6 +134,9 @@ import {
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
+import CommentBox from "@/components/CommentBox.vue";
+import EmailArea from "@/components/EmailArea.vue";
+import HistoryBox from "@/components/HistoryBox.vue";
 
 const props = defineProps({
   activities: {
@@ -152,16 +154,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["email:reply", "update"]);
-
-const CommentBox = defineAsyncComponent(
-  () => import("@/components/CommentBox.vue")
-);
-const EmailArea = defineAsyncComponent(
-  () => import("@/components/EmailArea.vue")
-);
-const HistoryBox = defineAsyncComponent(
-  () => import("@/components/HistoryBox.vue")
-);
 
 const route = useRoute();
 const router = useRouter();

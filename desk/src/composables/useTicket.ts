@@ -1,3 +1,4 @@
+import { __ } from "@/translation";
 import type {
   DocumentResource,
   RecentSimilarTicket,
