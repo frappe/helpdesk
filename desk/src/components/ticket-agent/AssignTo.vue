@@ -50,7 +50,7 @@
         class="my-2 divide-y divide-outline-gray-modals rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
       >
         <!-- Search Header -->
-        <div class="py-1.5 px-1.5">
+        <div class="p-1">
           <div
             class="flex h-7 items-center text-sm font-medium text-ink-gray-6 justify-between"
           >

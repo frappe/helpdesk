@@ -114,7 +114,7 @@
                 <div
                   class="-mx-2 px-2 py-3 cursor-pointer rounded hover:bg-surface-gray-2 transition-colors"
                 >
-                  <p class="text-sm font-medium text-ink-gray-9 truncate mb-1">
+                  <p class="text-sm font-base text-ink-gray-9 truncate mb-1">
                     {{ t.subject }}
                   </p>
                   <div class="flex items-center justify-between gap-2">
@@ -123,7 +123,7 @@
                       <span class="">{{ "#" + t.name }}</span>
                     </p>
                     <span
-                      class="text-xs px-2 py-0.5 font-medium shrink-0 rounded-sm"
+                      class="text-xs px-2 py-0.5 font-base shrink-0 rounded-sm"
                       :class="getStatusColor(t.status as string)"
                     >
                       {{ t.status }}
