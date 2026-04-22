@@ -5,6 +5,7 @@
       size: '4xl',
     }"
     @vue:unmounted="resetFilter"
+    @after-leave="onAfterLeave"
   >
     <template #body>
       <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
@@ -130,8 +131,7 @@ import {
   TextEditor,
 } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, nextTick, onUnmounted, ref, watch } from "vue";
-import { showEmailBox } from "../pages/ticket/modalStates";
+import { computed, nextTick, ref, watch } from "vue";
 import {
   setActiveSettingsTab,
   showSettingsModal,
@@ -199,6 +199,14 @@ const selectedTemplate = ref({
   name: "",
   isLoading: false,
 });
+const pendingTemplate = ref<string | null>(null);
+
+function onAfterLeave() {
+  if (pendingTemplate.value !== null) {
+    emit("apply", pendingTemplate.value);
+    pendingTemplate.value = null;
+  }
+}
 
 const scope = computed(() => {
   return filters.value.find((f) => f.value === activeFilter.value)?.value;
@@ -215,10 +223,6 @@ const savedReplyListResource = createListResource({
   orderBy: "modified desc",
   start: 0,
   pageLength: 999,
-});
-
-onUnmounted(() => {
-  showEmailBox.value = true;
 });
 
 const onTemplateSelect = (template: SavedReply) => {
@@ -238,7 +242,10 @@ const onTemplateSelect = (template: SavedReply) => {
         name: "",
         isLoading: false,
       };
-      emit("apply", data);
+      // If user cancelled (Escape/outside click) while API was in flight, discard
+      if (!show.value) return;
+      pendingTemplate.value = data;
+      show.value = false;
       capture("saved_reply_applied");
     },
   });
