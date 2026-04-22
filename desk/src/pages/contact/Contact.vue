@@ -12,9 +12,7 @@
       <!-- ContactInfo -->
       <PageInfo
         :avatar="{
-          label: `${contact.doc.first_name} ${
-            contact.doc.last_name ?? ''
-          }`.trim(),
+          label: `${contact.doc.full_name}`.trim(),
           image: contact.doc.image ?? undefined,
           shape: 'circle',
         }"
@@ -22,7 +20,11 @@
       >
         <template #actions>
           <div class="flex gap-2 items-center">
-            <Button variant="subtle">
+            <Button
+              variant="subtle"
+              @click="showEditDialog = true"
+              v-if="hasPermission()"
+            >
               <div class="flex gap-1 items-center">
                 <LucideSquarePen class="h-4 w-4" />
                 <span>{{ __("Edit") }}</span>
@@ -89,36 +91,40 @@
       </div>
     </div>
   </div>
-  <ContactDeleteDialog
-    v-model:open="showDeleteDialog"
+  <DeleteContactDialog
+    v-model="showDeleteDialog"
     :name="id"
     @delete="handleDelete"
+  />
+  <EditContactDialog
+    v-if="showEditDialog"
+    v-model="showEditDialog"
+    :name="id"
   />
 </template>
 
 <script setup lang="ts">
-import ContactDeleteDialog from "@/components/contact/ContactDeleteDialog.vue";
 import ContactFeedback from "@/components/contact/ContactFeedback.vue";
+import DeleteContactDialog from "@/components/contact/DeleteContactDialog.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
 import TicketFeedbackIcon from "@/components/icons/TicketFeedbackIcon.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
 //@ts-ignore
+import EditContactDialog from "@/components/contact/EditContactDialog.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import PageInfo from "@/components/PageInfo.vue";
 import {
+  useContact,
   useContactInvite,
   useContactResetPassword,
 } from "@/composables/contact";
 import { useScreenSize } from "@/composables/screen";
 import { __ } from "@/translation";
-import type { DocumentResource } from "@/types";
-import type { Contact } from "@/types/doctypes";
 import { hasPermission } from "@/utils";
 import {
   Breadcrumbs,
   Button,
   call,
-  createDocumentResource,
   Dropdown,
   Tabs,
   usePageMeta,
@@ -128,7 +134,6 @@ import { useRoute, useRouter } from "vue-router";
 import LucideMail from "~icons/lucide/mail";
 import LucideMapPin from "~icons/lucide/map-pin";
 import LucidePhone from "~icons/lucide/phone";
-import LucideStar from "~icons/lucide/star";
 import LucideTrash2 from "~icons/lucide/trash-2";
 import { getTicketListResource } from "../../stores/docTickets";
 
@@ -140,13 +145,7 @@ const route = useRoute();
 const router = useRouter();
 const { isMobileView } = useScreenSize();
 
-const contact: DocumentResource<Contact> = createDocumentResource({
-  doctype: "Contact",
-  name: props.id,
-  whitelistedMethods: {
-    getInfo: "get_info",
-  },
-});
+const { doc: contact, state } = useContact(props.id);
 
 const { ticketsListResource } = getTicketListResource();
 
@@ -181,15 +180,6 @@ const contactInfo = computed(() => {
   }
   const info = [
     {
-      icon: h(LucideStar, {
-        class: "size-4 !fill-ink-amber-2 !text-ink-amber-2",
-      }),
-      value: `${String(
-        contact.getInfo?.data?.rating ?? 0
-      )} Customers's Avg. Rating`,
-      condition: !!contact.getInfo?.data?.rating,
-    },
-    {
       icon: markRaw(LucideMapPin),
       value: contact.getInfo?.data?.country,
       condition: !!contact.getInfo?.data?.country,
@@ -212,6 +202,8 @@ const { inviteContact, isLoading: isContactInvitationLoading } =
   useContactInvite(contact);
 const { resetPassword, isLoading: isResetPasswordLoading } =
   useContactResetPassword(() => contact.doc?.user);
+
+const showEditDialog = ref(false);
 
 const showDeleteDialog = ref(false);
 const moreOptions = computed(() => [

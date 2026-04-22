@@ -15,7 +15,7 @@ class CustomContact(Contact):
         if self.user:
             time_zone = frappe.db.get_value("User", self.user, "time_zone")
             if time_zone:
-                result["time_zone"] = time_zone
+                result["timezone"] = time_zone
                 result["country"] = get_country_from_timezone(time_zone)
         return result
 

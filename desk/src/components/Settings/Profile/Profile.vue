@@ -157,13 +157,7 @@
               __("Change timezone of the application.")
             }}</span>
           </div>
-          <Autocomplete
-            :options="timezoneOptions"
-            :model-value="timezone"
-            @update:modelValue="timezone = $event?.value"
-            placeholder="Select Timezone"
-            class="w-40"
-          />
+          <TimezoneControl label="Timezone" v-model="timezone" class="!w-40" />
         </div>
       </div>
     </template>
@@ -175,7 +169,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import Link from "@/components/frappe-ui/Link.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import TimezoneControl from "@/components/TimezoneControl.vue";
+import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
+import { HDAgent } from "@/types/doctypes";
 import {
   Avatar,
   Badge,
@@ -186,15 +185,10 @@ import {
   LoadingIndicator,
   toast,
 } from "frappe-ui";
-import { Autocomplete } from "@/components";
-import { __ } from "@/translation";
-import { useAuthStore } from "@/stores/auth";
+import { computed, ref } from "vue";
 import CameraIcon from "~icons/lucide/camera";
-import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import Link from "@/components/frappe-ui/Link.vue";
-import { HDAgent } from "@/types/doctypes";
+import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 
 const auth = useAuthStore();
 const profile = ref({
@@ -206,7 +200,6 @@ const profile = ref({
 const showChangePasswordModal = ref(false);
 const language = ref(auth.language);
 const timezone = ref(auth.timezone);
-const timezoneOptions = ref([]);
 
 const isLanguageChanged = computed(() => {
   return language.value !== auth?.language;
@@ -247,17 +240,6 @@ const agentData = createResource({
       lastName: fullName[1] || "",
       userImage: data.user_image,
     };
-  },
-});
-
-const timezoneData = createResource({
-  url: "frappe.core.doctype.user.user.get_timezones",
-  auto: true,
-  onSuccess(data) {
-    timezoneOptions.value = data.timezones.map((tz: any) => ({
-      label: tz,
-      value: tz,
-    }));
   },
 });
 

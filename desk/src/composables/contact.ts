@@ -29,39 +29,46 @@ type FieldType =
   | "Link"
   | "autocomplete"
   | "email_ids"
-  | "phone_nos";
+  | "phone_nos"
+  | "timezone";
 
-type AutocompleteOption = string | { label: string; value: string };
+type AutocompleteOption = string;
 
 // Local Cache to store contact document resources to avoid multiple DB calls in a single session.
 const contactCache: Record<string, DocumentResource<Contact>> = {};
 
 export function useContact(name: string) {
-  const { state, resetState } = useContactState(false);
   const doc = findContactDoc();
-
+  const { state, resetState } = useContactState(false, doc);
   watch(
     () => doc.doc,
     (data) => {
-      if (data) {
-        state.firstName = data.first_name || "";
-        state.lastName = data.last_name || "";
-        state.image = data.image || "";
-        state.emails =
-          data.email_ids?.map((e: any) => ({
-            email_id: e.email_id,
-            isPrimary: e.is_primary,
-          })) || [];
-        state.phones =
-          data.phone_nos?.map((p: any) => ({
-            phone: p.phone,
-            isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
-          })) || [];
-        state.customers =
-          data.links?.map((l: any) => l.link_name as string) || [];
-      }
+      if (!data) return;
+      state.firstName = data.first_name || "";
+      state.lastName = data.last_name || "";
+      state.image = data.image || "";
+      state.emails =
+        data.email_ids?.map((e: any) => ({
+          email_id: e.email_id,
+          isPrimary: e.is_primary,
+        })) || [];
+      state.phones =
+        data.phone_nos?.map((p: any) => ({
+          phone: p.phone,
+          isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
+        })) || [];
+      state.customers =
+        data.links?.map((l: any) => l.link_name as string) || [];
     },
     { immediate: true }
+  );
+
+  watch(
+    () => doc.getInfo?.data,
+    (data) => {
+      state.timezone = { value: data?.timezone, label: data?.timezone };
+    },
+    { immediate: true, deep: true }
   );
 
   const isContactInfoChanged = computed(() => {
@@ -72,16 +79,38 @@ export function useContact(name: string) {
   });
 
   const isDirty = computed(() => {
-    return isContactInfoChanged.value || false;
+    return (
+      state.firstName !== (doc.doc?.first_name || "") ||
+      state.lastName !== (doc.doc?.last_name || "") ||
+      state.image !== (doc.doc?.image || "") ||
+      // state.timezone !== doc.getInfo.data?.timezone ||
+      JSON.stringify(state.emails) !==
+        JSON.stringify(
+          doc.doc?.email_ids?.map((e: any) => ({
+            email_id: e.email_id,
+            isPrimary: e.is_primary,
+          })) || []
+        ) ||
+      JSON.stringify(state.phones) !==
+        JSON.stringify(
+          doc.doc?.phone_nos?.map((p: any) => ({
+            phone: p.phone,
+            isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
+          })) || []
+        )
+    );
   });
 
   function findContactDoc(): DocumentResource<Contact> {
-    const key = name as string;
+    const key: string = name;
     if (contactCache.hasOwnProperty(key)) return contactCache[key];
     else {
       const newDoc = createDocumentResource({
         doctype: "Contact",
         name: name,
+        whitelistedMethods: {
+          getInfo: "get_info",
+        },
       });
       contactCache[key] = newDoc;
       return newDoc;
@@ -102,12 +131,39 @@ export function useContact(name: string) {
         is_primary_phone: p.isPrimary,
         is_primary_mobile_no: p.isPrimary,
       })),
-      links: state.customers.map((name) => ({
-        link_doctype: "HD Customer",
-        link_name: name,
-      })),
+      timezone:
+        typeof state.timezone === "string"
+          ? state.timezone
+          : state.timezone?.value || "",
     };
   }
+
+  const editContactResource = createResource({
+    url: "helpdesk.api.contact.edit_contact",
+    method: "POST",
+    validate(data: { name: string; doc: ReturnType<typeof parseContactData> }) {
+      if (!data.doc.first_name?.trim()) {
+        throw new Error(__("First name is required"));
+      }
+      if (!data.doc.email_ids.length) {
+        throw new Error(__("At least one email address is required"));
+      }
+      for (const e of data.doc.email_ids) {
+        if (!validateEmailWithZod(e.email_id)) {
+          throw new Error(__(`Invalid email address: ${e.email_id}`));
+        }
+      }
+      if (!data.doc.email_ids.some((e) => e.is_primary)) {
+        throw new Error(
+          __("At least one email address must be marked as primary")
+        );
+      }
+    },
+    onSuccess() {
+      resetState();
+      toast.success(__("Contact updated"));
+    },
+  });
 
   return {
     doc,
@@ -116,64 +172,8 @@ export function useContact(name: string) {
     isContactInfoChanged,
     isDirty,
     parseContactData,
+    editContactResource,
   };
-}
-
-// Function overloads to provide conditonal types for new vs existing contact states.
-export function useContactState(newDoc: true): {
-  state: NewContactState;
-  resetState: () => void;
-};
-export function useContactState(newDoc?: false): {
-  state: EditContactState;
-  resetState: () => void;
-};
-export function useContactState(newDoc: boolean = false) {
-  if (newDoc) {
-    const state = reactive<NewContactState>({
-      firstName: "",
-      lastName: "",
-      image: "",
-      email: "",
-      phone: "",
-      timezone: "",
-      customer: "",
-    });
-
-    function resetState() {
-      state.firstName = "";
-      state.lastName = "";
-      state.image = "";
-      state.email = "";
-      state.phone = "";
-      state.timezone = "";
-      state.customer = "";
-    }
-
-    return { state, resetState };
-  } else {
-    const state = reactive<EditContactState>({
-      firstName: "",
-      lastName: "",
-      image: "",
-      emails: [{ email_id: "", isPrimary: true }],
-      phones: [{ phone: "", isPrimary: true }],
-      customers: [],
-      timezone: "",
-    });
-
-    function resetState() {
-      state.firstName = "";
-      state.lastName = "";
-      state.image = "";
-      state.emails = [{ email_id: "", isPrimary: true }];
-      state.phones = [{ phone: "", isPrimary: true }];
-      state.customers = [];
-      state.timezone = "";
-    }
-
-    return { state, resetState };
-  }
 }
 
 export function useNewContact() {
@@ -214,6 +214,7 @@ export function useNewContact() {
 
   const isLoading = ref(false);
   async function addContact() {
+    debugger;
     isLoading.value = true;
     addContactResource.submit(
       { doc: parseContactData() },
@@ -229,6 +230,77 @@ export function useNewContact() {
   }
 
   return { state, fieldConfig, addContact, isLoading };
+}
+
+// Function overloads to provide conditonal types for new vs existing contact states.
+export function useContactState(newDoc: true): {
+  state: NewContactState;
+  resetState: () => void;
+};
+export function useContactState(
+  newDoc: false,
+  doc: DocumentResource<Contact>
+): {
+  state: EditContactState;
+  resetState: () => void;
+};
+export function useContactState(
+  newDoc: boolean = false,
+  doc?: DocumentResource<Contact>
+) {
+  if (newDoc) {
+    const state = reactive<NewContactState>({
+      firstName: "",
+      lastName: "",
+      image: "",
+      email: "",
+      phone: "",
+      timezone: "",
+      customer: "",
+    });
+
+    function resetState() {
+      state.firstName = "";
+      state.lastName = "";
+      state.image = "";
+      state.email = "";
+      state.phone = "";
+      state.timezone = "";
+      state.customer = "";
+    }
+
+    return { state, resetState };
+  } else {
+    const state = reactive<EditContactState>({
+      firstName: "",
+      lastName: "",
+      image: "",
+      emails: [{ email_id: "", isPrimary: true }],
+      phones: [{ phone: "", isPrimary: true }],
+      customers: [],
+      timezone: "",
+    });
+
+    function resetState() {
+      const data = doc?.doc;
+      state.firstName = data?.first_name || "";
+      state.lastName = data?.last_name || "";
+      state.image = data?.image || "";
+      state.emails = data?.email_ids?.map((e: any) => ({
+        email_id: e.email_id,
+        isPrimary: e.is_primary,
+      })) || [{ email_id: "", isPrimary: true }];
+      state.phones = data?.phone_nos?.map((p: any) => ({
+        phone: p.phone,
+        isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
+      })) || [{ phone: "", isPrimary: true }];
+      state.customers =
+        data?.links?.map((l: any) => l.link_name as string) || [];
+      state.timezone = data?.timezone || "";
+    }
+
+    return { state, resetState };
+  }
 }
 
 interface FieldConfig {
@@ -303,11 +375,10 @@ export function getContactFieldConfig(
   const restFields: FieldConfigRow[] = [
     {
       key: "timezone",
-      type: "autocomplete",
+      type: "timezone",
       label: __("Timezone"),
       placeholder: __("Select timezone"),
-      options:
-        (Intl.supportedValuesOf("timeZone") as AutocompleteOption[]) || [],
+      options: [],
     },
     {
       key: "customer",

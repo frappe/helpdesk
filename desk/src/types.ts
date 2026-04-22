@@ -766,7 +766,7 @@ export interface NewContactState {
   image: string;
   email: string;
   phone: string;
-  timezone: string | AutoCompleteItem;
+  timezone: string;
   customer: string;
 }
 
@@ -777,7 +777,7 @@ export interface EditContactState {
   emails: { email_id: string; isPrimary: boolean }[];
   phones: { phone: string; isPrimary: boolean }[];
   customers: string[];
-  timezone: string | AutoCompleteItem;
+  timezone: string;
 }
 
 export interface LineChart {

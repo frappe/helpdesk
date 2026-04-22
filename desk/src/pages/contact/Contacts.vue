@@ -20,19 +20,11 @@
     <ListViewBuilder
       ref="listViewRef"
       :options="options"
-      @row-click="openContact"
       @empty-state-action="showNewContactModal = true"
     />
     <NewContactDialog
       v-model="showNewContactModal"
       @contact-created="handleContactCreated"
-    />
-    <ContactDialog
-      v-if="isContactDialogVisible"
-      :key="selectedContact"
-      v-model="isContactDialogVisible"
-      :name="selectedContact"
-      @contact-updated="handleContactUpdated"
     />
   </div>
 </template>
@@ -40,15 +32,12 @@
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import NewContactDialog from "@/components/contact/NewContactDialog.vue";
 import { PhoneIcon } from "@/components/icons";
-import { Avatar, toast, usePageMeta } from "frappe-ui";
-import { computed, h, ref } from "vue";
-import ContactDialog from "./ContactDialog.vue";
-import { showNewContactModal } from "./dialogState";
-import LucideContact2 from "~icons/lucide/contact-2";
 import { __ } from "@/translation";
+import { Avatar, usePageMeta } from "frappe-ui";
+import { computed, h, ref } from "vue";
+import LucideContact2 from "~icons/lucide/contact-2";
+import { showNewContactModal } from "./dialogState";
 
-const isContactDialogVisible = ref(false);
-const selectedContact = ref(null);
 const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
 );
@@ -84,6 +73,10 @@ const options = computed(() => {
           )
         : undefined,
     },
+    rowRoute: {
+      name: "Contact",
+      prop: "id",
+    },
   };
 });
 
@@ -92,15 +85,6 @@ function handleContactCreated(): void {
   listViewRef.value?.reload();
 }
 
-function openContact(id: string): void {
-  selectedContact.value = id;
-  isContactDialogVisible.value = true;
-}
-
-function handleContactUpdated(): void {
-  toast.success("Contact updated successfully.");
-  listViewRef.value?.reload();
-}
 usePageMeta(() => {
   return {
     title: "Contacts",

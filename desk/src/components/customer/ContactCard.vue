@@ -36,7 +36,11 @@
         :options="dropdownOptions"
         v-if="hasPermission()"
       >
-        <Button class="h-6 w-6 p-0" variant="ghost" @click.stop>
+        <Button
+          class="h-6 w-6 p-0 min-w-fit shrink-0"
+          variant="ghost"
+          @click.stop
+        >
           <LucideMoreHorizontal class="h-4 w-4 text-ink-gray-6" />
         </Button>
       </Dropdown>

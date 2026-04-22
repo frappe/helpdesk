@@ -13,7 +13,7 @@
           Confirming this action will remove the contact with the associated
           customers.
         </p>
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1" v-if="count">
           <p class="text-p-base text-ink-gray-7">
             {{
               __(
@@ -56,7 +56,7 @@ const props = defineProps<{
   name: string;
 }>();
 
-const open = defineModel<boolean>("open", { default: false });
+const open = defineModel<boolean>({ default: false });
 
 const resource = createListResource({
   doctype: "HD Ticket",

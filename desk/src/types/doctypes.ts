@@ -413,4 +413,6 @@ export interface Contact extends DocType {
   company_name?: string;
   /** Full Name: Data */
   full_name?: string;
+  /** Timezone: Data (from linked User) */
+  timezone?: string;
 }

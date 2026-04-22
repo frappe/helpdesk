@@ -1,6 +1,7 @@
 from typing import Literal
 
 import frappe
+from frappe.contacts.doctype.contact.contact import invite_user
 from frappe.desk.reportview import delete_bulk
 
 
@@ -44,8 +45,6 @@ def delete_contact(name: str):
 
 @frappe.whitelist()
 def create_contact(doc: dict) -> str:
-    print(doc.get("image"))
-
     frappe.has_permission("Contact", "create", throw=True)
     contact_doc = frappe.get_doc(
         {
@@ -66,20 +65,60 @@ def create_contact(doc: dict) -> str:
         )
 
     contact_doc.insert()
+    invite_user(contact_doc.name)
+    contact_doc.reload()
 
-    # Link contact to customer if customer is provided, creates user of contact and assign HD Customer role to the user
+    # Link contact to customer if customer is provided
     if customer := doc.get("customer"):
         customer_doc = frappe.get_doc("HD Customer", customer)
         customer_doc.append("contacts", {"contact_name": contact_doc.name})
         customer_doc.save()
 
-        contact_doc.reload()  # reload to get the linked user
-
-        # If contact is linked to a customer, then they should have a user.
-        user = contact_doc.get("user")
+    if user := contact_doc.get("user"):
         user_doc = frappe.get_doc("User", user)
-        user_doc.image = doc.get("image", "")
-        user_doc.timezone = doc.get("timezone", "")
+        user_doc.user_image = doc.get("image", "")
+        user_doc.time_zone = doc.get("timezone", "")
         user_doc.save()
 
     return contact_doc.get("name")
+
+
+@frappe.whitelist(methods=["POST"])
+def edit_contact(name: str, doc: dict):
+    frappe.has_permission("Contact", "write", throw=True)
+    contact_doc = frappe.get_doc("Contact", name)
+
+    contact_doc.first_name = doc.get("first_name", contact_doc.first_name)
+    contact_doc.last_name = doc.get("last_name", contact_doc.last_name)
+    contact_doc.image = doc.get("image", contact_doc.image)
+
+    if email_ids := doc.get("email_ids"):
+        contact_doc.email_ids = []
+        for e in email_ids:
+            contact_doc.append(
+                "email_ids",
+                {"email_id": e.get("email_id"), "is_primary": e.get("is_primary")},
+            )
+
+    if phone_nos := doc.get("phone_nos"):
+        contact_doc.phone_nos = []
+        for p in phone_nos:
+            contact_doc.append(
+                "phone_nos",
+                {
+                    "phone": p.get("phone"),
+                    "is_primary_phone": p.get("is_primary"),
+                    "is_primary_mobile_no": p.get("is_primary"),
+                },
+            )
+
+    contact_doc.save()
+
+    if user := contact_doc.get("user"):
+        print("\n\n", doc.get("timezone"), "\n\n")
+        user_doc = frappe.get_doc("User", user)
+        user_doc.user_image = doc.get("image", "")
+        user_doc.time_zone = doc.get("timezone", "")
+        user_doc.save()
+
+    return contact_doc.name

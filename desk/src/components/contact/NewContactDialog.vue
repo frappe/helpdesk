@@ -54,12 +54,14 @@
                     <div class="space-x-2">
                       <Button
                         variant="subtle"
-                        label="Upload Image"
+                        :label="
+                          state.image ? __('Replace Image') : __('Upload Image')
+                        "
                         @click.prevent="openFileSelector()"
                       />
                       <Button
                         v-if="state.image"
-                        label="Remove Image"
+                        :label="__('Remove Image')"
                         variant="subtle"
                         theme="red"
                         @click.prevent="state.image = ''"
@@ -101,16 +103,11 @@
               </FormControl>
             </template>
 
-            <template v-else-if="fieldOrRow.type === 'autocomplete'">
-              <div class="space-y-1.5">
-                <Autocomplete
-                  :options="fieldOrRow.options || []"
-                  :placeholder="fieldOrRow.placeholder"
-                  v-model="state.timezone"
-                  :loading="false"
-                  :label="fieldOrRow.label"
-                />
-              </div>
+            <template v-else-if="fieldOrRow.type === 'timezone'">
+              <TimezoneControl
+                :label="fieldOrRow.label"
+                v-model="state.timezone"
+              />
             </template>
 
             <template v-else-if="fieldOrRow.type === 'Link'">
@@ -160,24 +157,19 @@
 import { useNewContact } from "@/composables/contact";
 import { __ } from "@/translation";
 import type { File as FileType } from "@/types";
-import {
-  Autocomplete,
-  Avatar,
-  Button,
-  Dialog,
-  FileUploader,
-  FormControl,
-} from "frappe-ui";
+import { Avatar, Button, Dialog, FileUploader, FormControl } from "frappe-ui";
 import LucideMail from "~icons/lucide/mail";
 import LucidePhone from "~icons/lucide/phone";
 import UserIcon from "~icons/lucide/user";
 import Link from "../frappe-ui/Link.vue";
+import TimezoneControl from "../TimezoneControl.vue";
 
 const open = defineModel<boolean>({ default: false });
 
 const { state, fieldConfig, addContact, isLoading } = useNewContact();
 
 async function handleAdd() {
+  console.log();
   try {
     await addContact();
     open.value = false;

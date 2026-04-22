@@ -1,5 +1,5 @@
 <template>
-  <div class="p-5 grid grid-cols-4 gap-2.5 min-h-[160px]">
+  <div class="p-5 grid grid-cols-4 gap-2.5 min-h-[160px] pt-0">
     <template v-if="!analytics.loading && analytics.data">
       <div
         v-for="(chartData, key) in analytics.data"
