@@ -133,7 +133,7 @@ const options = computed(() => ({
           "div",
           { class: "flex items-center space-x-2 justify-start w-full" },
           [
-            h(IndicatorIcon, { class: status?.["parsed_color"], fill: true }),
+            h(IndicatorIcon, { class: status?.["parsed_color"] }),
             h("span", { class: "truncate flex-1" }, label),
           ]
         );
