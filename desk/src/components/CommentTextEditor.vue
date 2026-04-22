@@ -1,6 +1,6 @@
 <template>
   <TextEditor
-    v-if="agentsList.data"
+    v-if="agentsList.data && hdTeams.data"
     ref="editorRef"
     :editor-class="[
       'prose-sm max-w-none',
@@ -12,7 +12,7 @@
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
-    :mentions="dropdown"
+    :mentions="mentionsGetter"
     @change="editable ? (newComment = $event) : null"
     :extensions="[ComponentUtils, HandleExcelPaste, CleanStyles]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
@@ -129,7 +129,12 @@ import { useStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());
+const {
+  agents: agentsList,
+  dropdown,
+  hdTeams,
+} = storeToRefs(useAgentStore());
+const mentionsGetter = computed(() => dropdown.value ?? []);
 const { isManager } = useAuthStore();
 
 const props = defineProps({
@@ -225,13 +230,13 @@ const editor = computed(() => editorRef.value?.editor);
 
 onMounted(() => {
   if (
-    agentsList.value.loading ||
-    agentsList.value.data?.length ||
-    agentsList.value.list.promise
+    !agentsList.value.loading &&
+    !agentsList.value.data?.length &&
+    !agentsList.value.list.promise
   ) {
-    return;
+    agentsList.value.fetch();
   }
-  agentsList.value.fetch();
+  hdTeams.value.fetch();
 });
 
 defineExpose({
