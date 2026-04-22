@@ -297,12 +297,15 @@ function getFieldInFormat(fieldTemplate, fieldMeta) {
   };
 }
 
+const normalize = (v: string | FieldValue) =>
+  v === null || v === undefined ? "" : v;
+
 function handleFieldUpdate(
   fieldname: string,
   value: FieldValue,
   isCoreFieldUpdated = false
 ) {
-  if (ticket.value.doc[fieldname] == value) return;
+  if (normalize(ticket.value.doc[fieldname]) == normalize(value)) return;
   if (isCoreFieldUpdated) {
     const label = getField(fieldname)?.label || fieldname;
     notifyTicketUpdate(label, value as string);
