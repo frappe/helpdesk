@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-17 14:51\n"
+"PO-Revision-Date: 2026-04-22 17:18\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Czech\n"
 "MIME-Version: 1.0\n"
@@ -3303,7 +3303,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
-msgstr ""
+msgstr "Nebyly provedeny žádné změny"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:245
 msgid "No changes to save"
@@ -3776,7 +3776,7 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:4
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:25
 msgid "Preview"
-msgstr ""
+msgstr "Náhled"
 
 #: desk/src/components/modals/ShortcutsModal.vue:111
 msgid "Previous ticket"
@@ -3878,13 +3878,13 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:36
 msgid "Quarterly"
-msgstr ""
+msgstr "Čtvrtletně"
 
 #. Label of the query_options_sb (Section Break) field in DocType 'HD Support
 #. Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Query Options"
-msgstr ""
+msgstr "Možnosti dotazu"
 
 #. Label of the query_route (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
@@ -3893,7 +3893,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:213
 msgid "Queued"
-msgstr ""
+msgstr "Ve frontě"
 
 #. Label of the raised_by (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -3902,7 +3902,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:31
 msgid "Range"
-msgstr ""
+msgstr "Rozsah"
 
 #. Title of the email-feedback Web Form
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
@@ -3950,7 +3950,7 @@ msgstr "Číst"
 
 #: desk/src/pages/home/components/PendingTickets.vue:36
 msgid "Reason"
-msgstr ""
+msgstr "Důvod"
 
 #: desk/src/pages/home/components/PendingTickets.vue:204
 msgid "Recent"
@@ -3979,12 +3979,12 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Red"
-msgstr ""
+msgstr "Červená"
 
 #. Label of the reference_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Reference"
-msgstr ""
+msgstr "Referenční"
 
 #. Label of the reference_ticket (Link) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
@@ -4001,7 +4001,7 @@ msgstr ""
 
 #: desk/src/pages/home/Home.vue:11
 msgid "Refresh"
-msgstr ""
+msgstr "Obnovit"
 
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:89
 msgid "Refresh Apps"
@@ -4032,7 +4032,7 @@ msgstr ""
 #: desk/src/components/ticket-agent/TicketSubjectModal.vue:20
 #: desk/src/pages/ticket/MobileTicketAgent.vue:156
 msgid "Rename"
-msgstr ""
+msgstr "Přejmenovat"
 
 #: desk/src/components/ticket-agent/TicketSubjectModal.vue:23
 msgid "Rename (Ctrl + ⏎)"
@@ -4050,7 +4050,7 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Replied"
-msgstr ""
+msgstr "Odpovězeno"
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -4457,7 +4457,7 @@ msgstr ""
 #: desk/src/pages/call-logs/CallLogModal.vue:92
 #: desk/src/pages/call-logs/CallLogModal.vue:101
 msgid "Select"
-msgstr ""
+msgstr "Vyberte"
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:21
 msgid "Select Category"
@@ -4493,7 +4493,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/TicketCustomer.vue:65
 msgid "Send"
-msgstr ""
+msgstr "Odeslat"
 
 #: desk/src/components/Settings/InviteAgents.vue:31
 msgid "Send Invites"
@@ -4601,7 +4601,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/Article.vue:633
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:163
 msgid "Share"
-msgstr ""
+msgstr "Sdílet"
 
 #. Label of the share_feedback_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -4615,7 +4615,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:357
 msgid "Shortcuts"
-msgstr ""
+msgstr "Zkratky"
 
 #. Label of the different_view (Check) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -4812,7 +4812,7 @@ msgstr ""
 #: desk/src/pages/ticket/TicketNew.vue:95
 #: desk/src/pages/ticket/TicketNew.vue:119
 msgid "Submit"
-msgstr ""
+msgstr "Odeslat"
 
 #. Label of the summary (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -4855,7 +4855,7 @@ msgstr ""
 #. Label of the is_system (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "System"
-msgstr ""
+msgstr "Systém"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -5364,7 +5364,7 @@ msgstr ""
 #: desk/src/pages/dashboard/Dashboard.vue:452
 #: desk/src/pages/dashboard/Dashboard.vue:454
 msgid "Today"
-msgstr ""
+msgstr "Dnes"
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:35
 msgid "Top Result"
@@ -5587,12 +5587,12 @@ msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:604
 msgid "View {0}"
-msgstr ""
+msgstr "Zobrazit {0}"
 
 #. Label of the views (Int) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Views"
-msgstr ""
+msgstr "Zobrazení"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -5613,7 +5613,7 @@ msgstr "Středa"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:34
 msgid "Weekly"
-msgstr ""
+msgstr "Týdně"
 
 #. Label of the weekly_off (Check) field in DocType 'HD Holiday'
 #. Label of the weekly_off (Select) field in DocType 'HD Service Holiday List'
@@ -5659,7 +5659,7 @@ msgstr ""
 #. Label of the workflow_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Workflow"
-msgstr ""
+msgstr "Pracovní postup"
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:4
 msgid "Workflow & Knowledge Base Settings"
@@ -5685,7 +5685,7 @@ msgstr "Ročně"
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Yellow"
-msgstr ""
+msgstr "Žlutá"
 
 #: helpdesk/api/dashboard.py:36
 msgid "You are not allowed to view this dashboard data."
