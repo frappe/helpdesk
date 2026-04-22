@@ -47,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import TicketIcon from "@/components/icons/TicketIcon.vue";
 import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";
 import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
@@ -70,7 +71,6 @@ import { createResource, toast, usePageMeta } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { showCommentBox, showEmailBox } from "./modalStates";
-import TicketIcon from "@/components/icons/TicketIcon.vue";
 
 const telephonyStore = useTelephonyStore();
 const { $socket } = globalStore();
@@ -196,7 +196,7 @@ onBeforeUnmount(() => {
 });
 usePageMeta(() => {
   if (!ticket.value?.doc?.name) {
-    return { title: "404 - Ticket not found" };
+    return { title: props.ticketId };
   }
 
   return {
