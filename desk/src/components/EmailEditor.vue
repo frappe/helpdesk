@@ -167,7 +167,6 @@
     </template>
   </TextEditor>
   <SavedRepliesSelectorModal
-    v-if="showSavedRepliesSelectorModal"
     v-model="showSavedRepliesSelectorModal"
     :doctype="doctype"
     @apply="applySavedReplies"
@@ -185,9 +184,9 @@ import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
 import {
+  CleanStyles,
   ComponentUtils,
   HandleExcelPaste,
-  CleanStyles,
 } from "@/tiptap-extensions";
 import {
   getFontFamily,
@@ -315,7 +314,10 @@ function applySavedReplies(template: string) {
   isContentEmpty(newEmail.value)
     ? (newEmail.value = template)
     : (newEmail.value = newEmail.value + "\n" + template);
-  showSavedRepliesSelectorModal.value = false;
+  newEmail.value += "<p></p>";
+  nextTick(() => {
+    editorRef.value?.editor?.commands?.focus("end");
+  });
 }
 
 const sendMail = createResource({
