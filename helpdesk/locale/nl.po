@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-04-05 10:43+0000\n"
-"PO-Revision-Date: 2026-04-16 14:40\n"
+"PO-Revision-Date: 2026-04-22 17:18\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Dutch\n"
 "MIME-Version: 1.0\n"
@@ -3303,7 +3303,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
-msgstr ""
+msgstr "Geen wijzigingen aangebracht"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:245
 msgid "No changes to save"
