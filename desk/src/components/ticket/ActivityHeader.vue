@@ -5,50 +5,14 @@
     <div class="flex h-8 items-center text-xl font-semibold text-gray-800">
       {{ title }}
     </div>
-    <Button
-      v-if="title == 'Emails'"
-      variant="solid"
-      @click="communicationAreaRef?.toggleEmailBox() ?? toggleEmailBox()"
-    >
-      <template #prefix>
-        <FeatherIcon name="plus" class="h-4 w-4" />
-      </template>
-      <span>{{ __("New Email") }}</span>
-    </Button>
-    <Button
-      v-else-if="title == 'Comments'"
-      variant="solid"
-      @click="communicationAreaRef?.toggleCommentBox() ?? toggleCommentBox()"
-    >
-      <template #prefix>
-        <FeatherIcon name="plus" class="h-4 w-4" />
-      </template>
-      <span>{{ __("New Comment") }}</span>
-    </Button>
     <Dropdown
-      v-else-if="title == 'Calls'"
+      v-if="title == 'Calls'"
       :options="callActions"
       @click.stop
       placement="right"
     >
       <template v-slot="{ open }">
-        <Button variant="solid" class="flex items-center gap-1">
-          <template #prefix>
-            <FeatherIcon name="plus" class="h-4 w-4" />
-          </template>
-          <span>{{ __("New") }}</span>
-          <template #suffix>
-            <FeatherIcon
-              :name="open ? 'chevron-up' : 'chevron-down'"
-              class="h-4 w-4"
-            />
-          </template>
-        </Button>
-      </template>
-    </Dropdown>
-    <Dropdown v-else :options="defaultActions" @click.stop placement="right">
-      <template v-slot="{ open }">
-        <Button variant="solid" class="flex items-center gap-1">
+        <Button variant="subtle" class="flex items-center gap-1">
           <template #prefix>
             <FeatherIcon name="plus" class="h-4 w-4" />
           </template>
@@ -71,14 +35,11 @@
 </template>
 
 <script setup lang="ts">
-import { CommentIcon, EmailIcon, PhoneIcon } from "@/components/icons";
+import { PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
-import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
-import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
 import { Dropdown } from "frappe-ui";
-import { storeToRefs } from "pinia";
-import { computed, h, inject, ref, Ref } from "vue";
+import { computed, h, inject, ref } from "vue";
 defineProps({
   title: {
     type: String,
@@ -86,35 +47,10 @@ defineProps({
   },
 });
 
-const communicationAreaRef: Ref = inject("communicationArea");
 const makeCall = inject<() => void>("makeCall");
 const refreshTicket = inject<() => void>("refreshTicket");
 const showCallLogModal = ref(false);
-const { isCallingEnabled } = storeToRefs(useTelephonyStore());
 const ticketId = inject<string>("ticketId");
-
-const defaultActions = computed(() => {
-  let actions = [
-    {
-      icon: h(EmailIcon, { class: "h-4 w-4" }),
-      label: __("Email"),
-      onClick: () =>
-        communicationAreaRef?.value?.toggleEmailBox() ?? toggleEmailBox(),
-    },
-    {
-      icon: h(CommentIcon, { class: "h-4 w-4" }),
-      label: __("Comment"),
-      onClick: () =>
-        communicationAreaRef?.value?.toggleCommentBox() ?? toggleCommentBox(),
-    },
-  ];
-
-  if (isCallingEnabled.value) {
-    actions.push(...callActions.value);
-  }
-
-  return actions;
-});
 
 const callActions = computed(() => {
   let actions = [
