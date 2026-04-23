@@ -85,7 +85,7 @@
         :class="[
           'size-1.5 rounded-full cursor-pointer',
           {
-            'bg-black': visibleMonths === 'first-half',
+            'bg-surface-gray-7': visibleMonths === 'first-half',
             'bg-surface-gray-4': visibleMonths === 'second-half',
           },
         ]"
@@ -95,7 +95,7 @@
         :class="[
           'size-1.5 rounded-full cursor-pointer',
           {
-            'bg-black': visibleMonths === 'second-half',
+            'bg-surface-gray-7': visibleMonths === 'second-half',
             'bg-surface-gray-4': visibleMonths === 'first-half',
           },
         ]"

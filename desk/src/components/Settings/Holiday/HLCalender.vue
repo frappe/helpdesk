@@ -137,7 +137,7 @@
               'text-ink-gray-3':
                 // @ts-ignore
                 date.getMonth() !== currentMonth - 1 || !isDateInRange(date),
-              'bg-black text-ink-white hover:!bg-black/80 hover:text-ink-white':
+              'bg-surface-gray-7 text-ink-white hover:!bg-surface-gray-7/80 hover:text-ink-white':
                 getFormattedDate(date) === dateValue && isDateInRange(date),
               'opacity-50 cursor-not-allowed': !isDateInRange(date),
             }"

@@ -45,7 +45,7 @@
             {{ timeAverages.first_response }}
           </div>
           <div class="text-base text-ink-gray-5 flex items-center gap-2 mt-1">
-            <div class="size-2 bg-black rounded-full" />
+            <div class="size-2 bg-surface-gray-7 rounded-full" />
             {{ __("Avg. first response time") }}
           </div>
         </div>

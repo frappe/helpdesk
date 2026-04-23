@@ -89,7 +89,7 @@
                   selectedTemplate.name === template.name &&
                   selectedTemplate.isLoading
                 "
-                class="flex items-center justify-center absolute top-0 left-0 w-full h-full bg-black/20 rounded-lg"
+                class="flex items-center justify-center absolute top-0 left-0 w-full h-full bg-surface-gray-7/20 rounded-lg"
               >
                 <LoadingIndicator class="size-4" />
               </div>
