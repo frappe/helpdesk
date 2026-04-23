@@ -29,7 +29,7 @@
     </template>
     <template #body="{ close }">
       <div
-        class="my-2 rounded-lg border border-gray-100 bg-surface-white shadow-xl"
+        class="my-2 rounded-lg border border-outline-gray-1 bg-surface-white shadow-xl"
       >
         <div class="min-w-72 p-2 sm:min-w-[400px]">
           <div

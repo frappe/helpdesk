@@ -37,7 +37,7 @@
             </template>
             <template #body-main="{ close: closePopover, open: openPopover }">
               <div
-                class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-gray-100 rounded-md"
+                class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-outline-gray-1 rounded-md"
                 @mouseover="
                   handleMouseEnter(getFormattedDate(date), openPopover)
                 "
@@ -77,7 +77,7 @@
                     #body-main="{ close: closeDropdown, open: openDropdown }"
                   >
                     <div
-                      class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-gray-100 rounded-md"
+                      class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-outline-gray-1 rounded-md"
                       @mouseover="
                         handleMouseEnter(getFormattedDate(date), openPopover);
                         handleMouseEnter(

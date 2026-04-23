@@ -91,7 +91,7 @@
             v-if="chartConfig?.tickets?.length < 6"
             v-for="i in Math.max(0, 7 - chartConfig?.tickets?.length)"
             :key="'placeholder-' + i"
-            class="border-t border-gray-100"
+            class="border-t border-outline-gray-1"
           >
             <td v-for="j in 6" :key="j" class="p-2 py-3">
               <div class="h-5 w-full bg-surface-gray-1" />

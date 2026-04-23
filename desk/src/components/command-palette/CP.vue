@@ -19,7 +19,7 @@
             />
           </div>
           <ComboboxOptions
-            class="max-h-96 overflow-auto border-t border-gray-100"
+            class="max-h-96 overflow-auto border-t border-outline-gray-1"
             static
             :hold="true"
           >
