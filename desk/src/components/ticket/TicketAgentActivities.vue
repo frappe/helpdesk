@@ -33,33 +33,39 @@
       <div
         v-for="(activity, i) in localActivities"
         :key="activity.key"
-        class="activity mt-2"
+        class="activity"
         tabindex="0"
         :id="activity.key"
       >
         <div
-          class="w-full px-6 md:px-5"
-          :class="activity.type === 'task' ? 'flex' : 'grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4'"
+          v-if="activity.type === 'task'"
+         class="w-full px-6 md:px-5"
+        >
+          <Taskbox
+            :activity="activity"
+            :reload-tasks="() => emit('update')"
+            @update="() => emit('update')"
+            class="w-full"
+          />
+        </div>
+
+        <!-- Non-task: timeline layout -->
+        <div
+          v-else
+          class="w-full px-6 md:px-5 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
-            v-if="activity.type !== 'task'"
             class="relative flex justify-center after:absolute after:start-[50%] after:top-3 after:-z-10 after:border-s after:border-outline-gray-modals"
             :class="[
               i != localActivities.length - 1 && 'after:h-full',
-              !['email', 'feedback', 'call', 'comment', 'task'].includes(
-                activity.type
-              ) && 'after:top-6',
+              !['email', 'feedback', 'call', 'comment'].includes(activity.type) && 'after:top-6',
             ]"
           >
             <div
               class="z-1 flex items-center justify-center rounded-full bg-surface-white"
               :class="[
-                ['email', 'feedback'].includes(activity.type)
-                  ? 'my-1 h-9 w-9'
-                  : 'h-6 w-6',
-                !['email', 'feedback', 'call', 'comment', 'task'].includes(
-                  activity.type
-                ) && 'mt-[2px]',
+                ['email', 'feedback'].includes(activity.type) ? 'my-1 h-9 w-9' : 'h-6 w-6',
+                !['email', 'feedback', 'call', 'comment'].includes(activity.type) && 'mt-[2px]',
               ]"
             >
               <Avatar
@@ -75,11 +81,7 @@
               />
               <FeatherIcon
                 v-else-if="activity.type === 'call'"
-                :name="
-                  activity.call_type === 'Incoming'
-                    ? 'phone-incoming'
-                    : 'phone-outgoing'
-                "
+                :name="activity.call_type === 'Incoming' ? 'phone-incoming' : 'phone-outgoing'"
                 class="text-ink-gray-5 start-[7.5px] size-4"
               />
               <DotIcon
@@ -88,22 +90,18 @@
               />
             </div>
           </div>
-          
+
           <div
-            class="mb-4 flex flex-1"
+            class="flex flex-1 mb-4"
             :class="[
               i == localActivities.length - 1 && 'mb-5',
-              !['email', 'feedback', 'call', 'comment', 'task'].includes(
-                activity.type
-              ) && 'mt-[2px]',
+              !['email', 'feedback', 'call', 'comment'].includes(activity.type) && 'mt-[2px]',
             ]"
           >
             <EmailArea
               v-if="activity.type === 'email'"
               :activity="activity"
-              :show-split-option="
-                !activity.isFirstEmail && ticketStatus !== 'Closed'
-              "
+              :show-split-option="!activity.isFirstEmail && ticketStatus !== 'Closed'"
               class="py-2 px-3 flex-1 w-full"
               @reply="(e) => emit('email:reply', e)"
             />
@@ -113,40 +111,33 @@
               class="flex-1 w-full"
               @update="() => emit('update')"
             />
-            <Taskbox
-              v-else-if="activity.type === 'task'"
-              :activity="activity"
-              :reload-tasks="() => emit('update')"
-              @update="() => emit('update')"
-              class="flex-1 w-full"
-            />
             <CallArea
               v-else-if="activity.type === 'call'"
               :activity="activity"
               class="flex-1 w-full"
             />
             <FeedbackBox
-              :activity="activity"
               v-else-if="activity.type === 'feedback'"
+              :activity="activity"
               class="flex-1 w-full"
             />
-            <HistoryBox 
-              v-else 
-              :activity="activity" 
-              class="flex-1 w-full" 
+            <HistoryBox
+              v-else
+              :activity="activity"
+              class="flex-1 w-full"
             />
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Empty state -->
     <div
       v-else
       class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-4"
     >
       <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
-      <span class="text-lg font-medium text-ink-gray-8">{{
-        __(emptyText)
-      }}</span>
+      <span class="text-lg font-medium text-ink-gray-8">{{ __(emptyText) }}</span>
     </div>
   </FadedScrollableDiv>
 </template>
@@ -168,6 +159,7 @@ import { Avatar, FeatherIcon, Button } from "frappe-ui";
 import { PropType, computed, h, inject, nextTick, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { __ } from "@/translation";
+import ActivityHeader from "@/components/ticket/ActivityHeader.vue";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
 import CommentBox from "@/components/CommentBox.vue";
 import EmailArea from "@/components/EmailArea.vue";
@@ -218,11 +210,10 @@ const localActivities = computed(() => {
 });
 
 const emptyText = computed(() => {
-  if (props.title === "Emails") return "No email communications";
-  if (props.title === "Comments") return "No comments found";
-  if (props.title === "Calls") return "No calls made";
-  if (props.title === "Tasks") return "No tasks found";
-
+  if (props.title === __("Emails")) return "No email communications";
+  if (props.title === __("Comments")) return "No comments found";
+  if (props.title === __("Calls")) return "No calls made";
+  if (props.title === __("Tasks")) return "No tasks found";
   return "No activity found";
 });
 
@@ -264,20 +255,13 @@ function scrollToLatestActivity() {
 function scrollToHash() {
   const hash = route.hash;
   if (hash) {
-    // Remove the # symbol
     const elementId = hash.substring(1);
-
     nextTick(() => {
-      // Wait for activities to be rendered
       setTimeout(() => {
         const element = document.getElementById(elementId);
         if (element) {
           (element as any).scrollIntoViewIfNeeded();
-
-          // Add highlight effect using Tailwind class
           element.classList.add("bg-yellow-100");
-
-          // Remove highlight after 2 seconds
           setTimeout(() => {
             element.classList.remove("bg-yellow-100");
             router.replace({ hash: "" });
@@ -307,6 +291,7 @@ defineExpose({
   scrollToLatestActivity,
 });
 </script>
+
 <style scoped>
 .activity:focus {
   outline: none;

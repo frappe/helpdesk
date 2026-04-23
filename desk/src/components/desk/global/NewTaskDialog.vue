@@ -11,13 +11,12 @@
     <template #body-content>
       <div class="flex flex-col gap-5 mt-2">
 
-        <!-- Title Field -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
             <div class="text-sm text-ink-gray-5 flex items-center gap-1">
               {{ __('Title') }} <span class="text-red-500">*</span>
             </div>
-            <span 
+            <span
               class="text-xs transition-colors"
               :class="form.title.length > 140 ? 'text-red-500 font-semibold' : 'text-ink-gray-4'"
             >
@@ -40,13 +39,12 @@
           </p>
         </div>
 
-        <!-- Description Field -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
             <div class="text-sm text-ink-gray-5 flex items-center gap-1">
               {{ __("Description") }} <span class="text-red-500">*</span>
             </div>
-            <span 
+            <span
               class="text-xs transition-colors"
               :class="getDescriptionLength > 4000 ? 'text-red-500 font-semibold' : 'text-ink-gray-4'"
             >
@@ -56,7 +54,7 @@
           <TextEditor
             :editor-class="`!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border bg-surface-gray-2 placeholder-ink-gray-4 hover:shadow-sm focus:bg-surface-white focus:shadow-sm focus:ring-0 focus-visible:ring-2 text-ink-gray-8 transition-colors -mt-0.5 ${
               (errors.description || errors.descriptionLength)
-                ? 'border-red-500 focus-visible:ring-red-500' 
+                ? 'border-red-500 focus-visible:ring-red-500'
                 : 'border-[--surface-gray-2] hover:border-outline-gray-modals focus:border-outline-gray-4 focus-visible:ring-outline-gray-3'
             }`"
             :bubble-menu="false"
@@ -73,21 +71,26 @@
           </p>
         </div>
 
-        <!-- Meta Controls Configuration Grid -->
         <div class="grid grid-cols-2 gap-4">
 
-          <!-- Priority Dropdown -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __('Priority') }}</div>
             <FormControl
               type="select"
               variant="subtle"
-              :options="priorityDropdownOptions"
+              :options="priorityOptions"
               v-model="form.priority"
-            />
+            >
+              <template #prefix>
+                <TaskPriorityIcon
+                  v-if="form.priority"
+                  :priority="form.priority"
+                  class="h-4 w-4 mr-1"
+                />
+              </template>
+            </FormControl>
           </div>
 
-          <!-- Store-driven Assignee Autocomplete -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __('Assigned To') }}</div>
             <Autocomplete
@@ -108,10 +111,10 @@
                       v-if="form.assigned"
                       class="!h-4 !w-4 flex-shrink-0"
                       shape="circle"
-                      :label="userInfo.full_name || form.assigned"
-                      :image="userInfo.user_image || ''"
+                      :label="assigneeLabel"
+                      :image="getAssigneeImage(form.assigned)"
                     />
-                    <span class="truncate">{{ userInfo.full_name || form.assigned || __('Assigned To') }}</span>
+                    <span class="truncate">{{ assigneeLabel || __('Assigned To') }}</span>
                   </div>
                   <template #suffix>
                     <FeatherIcon name="chevron-down" class="h-4 w-4 text-ink-gray-5" />
@@ -129,29 +132,33 @@
             </Autocomplete>
           </div>
 
-          <!-- Due Date Field via direct Utility references -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __('Due Date') }}</div>
-            <DateTimePicker
-              v-model="form.due_date"
-              :placeholder="__('Due Date')"
-              format="YYYY-MM-DD HH:mm:ss"
-              :formatter="getFormattedDate"
-              :output-format="dateFormat"
-              class="w-full"
-              input-class="!bg-[var(--surface-gray-2)] border-none shadow-none focus:!bg-white focus:border-[#d1d5db] focus:ring-1 focus:ring-[#d1d5db]"
-            />
+            <div class="w-full date-picker-wrapper">
+              <DateTimePicker
+                v-model="form.due_date"
+                :placeholder="__('Due Date')"
+                format="DD-MM-YYYY HH:mm"
+              />
+            </div>
           </div>
 
-          <!-- Status Dropdown -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __('Status') }}</div>
             <FormControl
               type="select"
               variant="subtle"
-              :options="statusDropdownOptions"
+              :options="statusOptions"
               v-model="form.status"
-            />
+            >
+              <template #prefix>
+                <TaskStatusIcon
+                  v-if="form.status"
+                  :status="form.status"
+                  class="h-4 w-4 mr-1"
+                />
+              </template>
+            </FormControl>
           </div>
 
         </div>
@@ -189,14 +196,10 @@ import {
   toast,
 } from "frappe-ui";
 import { __ } from "@/translation";
+import { isContentEmpty } from "@/utils";
 import { useUserStore } from "@/stores/user";
-import { 
-  isContentEmpty, 
-  dateFormat, 
-  getFormattedDate,
-  taskStatusOptions, 
-  taskPriorityOptions 
-} from "@/utils";
+import TaskStatusIcon   from "@/components/icons/TaskStatusIcon.vue";
+import TaskPriorityIcon from "@/components/icons/TaskPriorityIcon.vue";
 
 // --- Props & Emits ---
 const props = defineProps({
@@ -208,7 +211,7 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue", "submit"]);
 
 // --- Store ---
-const userStore = useUserStore();
+const { getUser, agentOptions } = useUserStore();
 
 // --- State ---
 const show = computed({
@@ -233,42 +236,43 @@ const defaultForm = () => ({
 
 const form = ref(defaultForm());
 
-// --- Validation States ---
+// --- Validation ---
 const errors = ref({
-  title: false,
-  titleLength: false,
-  description: false,
+  title:             false,
+  titleLength:       false,
+  description:       false,
   descriptionLength: false,
 });
 
-const getDescriptionLength = computed(() => {
-  return form.value.description ? form.value.description.length : 0;
-});
+const getDescriptionLength = computed(() =>
+  form.value.description ? form.value.description.length : 0
+);
 
-// Scrub styling warnings on mutation values
 watch(() => form.value.title, (val) => {
-  if (val?.trim()) errors.value.title = false;
+  if (val?.trim())        errors.value.title       = false;
   if (val?.length <= 140) errors.value.titleLength = false;
 });
 
 watch(() => form.value.description, (val) => {
-  if (!isContentEmpty(val)) errors.value.description = false;
+  if (!isContentEmpty(val))       errors.value.description       = false;
   if (!val || val.length <= 4000) errors.value.descriptionLength = false;
 });
 
-// --- Store-Driven User Extraction ---
-const agentOptions = computed(() => {
-  return (userStore.users || []).map((u: any) => ({
-    label: u.full_name || u.name || u.email,
-    value: u.name || u.email,
-    image: u.user_image || "",
-  }));
+// --- Assignee ---
+const assigneeLabel = computed(() => {
+  if (!form.value.assigned) return "";
+  const fromList = agentOptions.find((o) => o.value === form.value.assigned);
+  if (fromList?.label) return fromList.label;
+  const storeUser = getUser(form.value.assigned);
+  if (storeUser?.full_name) return storeUser.full_name;
+  return form.value.assigned;
 });
 
-const userInfo = computed(() => {
-  if (!form.value.assigned) return { full_name: "", user_image: "" };
-  return userStore.getUser(form.value.assigned) || { full_name: "", user_image: "" };
-});
+function getAssigneeImage(assigned: string): string {
+  const fromList = agentOptions.find((o) => o.value === assigned);
+  if (fromList?.image) return fromList.image;
+  return getUser(assigned)?.user_image || "";
+}
 
 function handleAssigneeChange(option: any) {
   if (!option)                         form.value.assigned = "";
@@ -282,54 +286,34 @@ function resolveAssigned(): string {
   return sessionUser && sessionUser !== "Guest" ? sessionUser : "";
 }
 
-// --- Dynamic Fields options maps via dynamic DocType schemas ---
-const statusDropdownOptions = computed(() => {
-  return taskStatusOptions().map((opt) => ({ label: opt.label, value: opt.label }));
-});
-
-const priorityDropdownOptions = computed(() => {
-  return taskPriorityOptions().map((opt) => ({ label: opt.label, value: opt.label }));
-});
 
 // --- Watchers ---
 watch(
   () => props.task,
   (task) => {
-    errors.value.title = false;
-    errors.value.titleLength = false;
-    errors.value.description = false;
-    errors.value.descriptionLength = false;
-
-    if (task) {
-      form.value = {
-        title:       task.title       || "",
-        description: task.description || "",
-        due_date:    task.due_date    || "",
-        status:      task.status      || "Backlog",
-        priority:    task.priority    || "Low",
-        assigned:    task.assigned    || "",
-      };
-    } else {
-      form.value = defaultForm();
-    }
+    errors.value = { title: false, titleLength: false, description: false, descriptionLength: false };
+    form.value = task ? {
+      title:       task.title       || "",
+      description: task.description || "",
+      due_date:    task.due_date    || "",
+      status:      task.status      || "Backlog",
+      priority:    task.priority    || "Low",
+      assigned:    task.assigned    || "",
+    } : defaultForm();
   },
   { immediate: true, deep: true },
 );
 
 watch(show, async (val) => {
-  errors.value.title = false;
-  errors.value.titleLength = false;
-  errors.value.description = false;
-  errors.value.descriptionLength = false;
+  errors.value = { title: false, titleLength: false, description: false, descriptionLength: false };
 
   if (!val) {
-    // CRITICAL FIX: Reset explicit state tracking properties when dialog closes 
     activeTask.value = null;
     form.value = defaultForm();
     return;
   }
 
-  if (!props.task) {
+  if (!props.task && !activeTask.value) {
     form.value = defaultForm();
     form.value.assigned = resolveAssigned();
   }
@@ -337,13 +321,25 @@ watch(show, async (val) => {
   nextTick(() => setTimeout(() => (titleRef.value as any)?.el?.focus?.(), 100));
 });
 
-// --- Exposed Methods ---
-function showTask(task: any) {
-  errors.value.title = false;
-  errors.value.titleLength = false;
-  errors.value.description = false;
-  errors.value.descriptionLength = false;
 
+
+const statusOptions = [
+  { label: __("Backlog"),     value: "Backlog"     },
+  { label: __("Todo"),        value: "Todo"        },
+  { label: __("In Progress"), value: "In Progress" },
+  { label: __("Done"),        value: "Done"        },
+  { label: __("Canceled"),    value: "Canceled"    },
+];
+
+const priorityOptions = [
+  { label: __("Low"),    value: "Low"    },
+  { label: __("Medium"), value: "Medium" },
+  { label: __("High"),   value: "High"   },
+];
+
+// --- Exposed ---
+function showTask(task: any) {
+  errors.value = { title: false, titleLength: false, description: false, descriptionLength: false };
   activeTask.value = task;
   form.value = {
     title:       task.title       || "",
@@ -371,31 +367,12 @@ async function updateTaskStatus(task: any, newStatus: string) {
   }
 }
 
-async function deleteTask(taskName: string) {
-  if (!taskName || !taskName.trim()) {
-    toast.error(__("Task not found"));
-    return;
-  }
-  try {
-    await call("helpdesk.helpdesk.doctype.hd_task.hd_task.delete_task", {
-      task: taskName,
-    });
-    toast.success(__("Task deleted"));
-    emit("submit", null);
-  } catch (e: any) {
-    const msg = e?.message || e?.exc?.split("\n").filter(Boolean).pop() || __("Something went wrong");
-    toast.error(msg);
-  }
-}
 
-defineExpose({ showTask, updateTaskStatus, deleteTask });
+defineExpose({ showTask, updateTaskStatus});
 
-// --- Submission Control ---
+// --- Submit ---
 async function handleSubmit() {
-  errors.value.title = false;
-  errors.value.titleLength = false;
-  errors.value.description = false;
-  errors.value.descriptionLength = false;
+  errors.value = { title: false, titleLength: false, description: false, descriptionLength: false };
 
   let formsAreInvalid = false;
 
@@ -406,7 +383,7 @@ async function handleSubmit() {
     errors.value.titleLength = true;
     formsAreInvalid = true;
   }
-  
+
   if (isContentEmpty(form.value.description)) {
     errors.value.description = true;
     formsAreInvalid = true;
@@ -425,7 +402,7 @@ async function handleSubmit() {
 
   try {
     let result: any;
-    const dbDate    = form.value.due_date || null;
+    const dbDate     = form.value.due_date || null;
     const assignedTo = resolveAssigned();
 
     if (isEditing.value) {
@@ -456,7 +433,7 @@ async function handleSubmit() {
     }
 
     emit("submit", result);
-    show.value   = false;
+    show.value       = false;
     activeTask.value = null;
   } catch (e: any) {
     const msg = e?.message || e?.exc?.split("\n").filter(Boolean).pop() || __("Something went wrong");

@@ -40,11 +40,10 @@
     />
   </div>
 </template>
-
 <script setup lang="ts">
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import NewTaskDialog from "@/components/desk/global/NewTaskDialog.vue";
-import { toast, usePageMeta, call, Avatar, createResource } from "frappe-ui";
+import { toast, usePageMeta, call, Avatar } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import TaskboxEditor from "@/components/TaskboxEditor.vue";
 import { showNewTaskModal } from "./dialogState";
@@ -54,36 +53,20 @@ import TaskPriorityIcon from "@/components/icons/TaskPriorityIcon.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import { dateFormat } from "@/utils";
 import { __ } from "@/translation";
+import { useUserStore } from "@/stores/user"; 
+
+const { agentOptions } = useUserStore();
 
 const isTaskDialogVisible = ref(false);
 const selectedTask        = ref<any>(null);
 const listViewRef         = ref<any>(null);
 
-// Incrementing this remounts ListViewBuilder completely, forcing a fresh fetch.
 const reloadKey = ref(0);
 function forceReload() {
   reloadKey.value++;
 }
 
-const agentsList = createResource({
-  url: "frappe.client.get_list",
-  params: {
-    doctype:     "User",
-    fields:      ["name", "full_name", "user_image"],
-    filters:     { enabled: 1, user_type: "System User" },
-    page_length: 200,
-  },
-  auto: true,
-});
 
-const agentOptions = computed(() => {
-  if (!agentsList.data) return [];
-  return (agentsList.data as any[]).map((u: any) => ({
-    label: u.full_name || u.name,
-    value: u.name,
-    image: u.user_image || "",
-  }));
-});
 
 const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
@@ -103,16 +86,15 @@ const options = computed(() => {
       },
       assigned: {
         custom: ({ item }: { item: any }) => {
-          // FIX: Return a placeholder instead of null so the cell remains clickable
           if (!item) return h("span", { class: "text-ink-gray-4" }, "-");
-          
+
           const email = typeof item === "string"
             ? item
             : (item.assigned || item.assigned_to || item.email || item.name || item.full_name);
-            
+
           if (!email) return h("span", { class: "text-ink-gray-4" }, "-");
 
-          const agent = agentOptions.value.find((a) => a.value === email);
+          const agent = agentOptions.find((a) => a.value === email);
           return h("div", { class: "flex items-center gap-2 min-w-0" }, [
             h(Avatar, {
               shape: "circle",
@@ -132,9 +114,8 @@ const options = computed(() => {
       },
       due_date: {
         custom: ({ item }: { item: any }) => {
-          // FIX: Return a placeholder instead of null so the cell remains clickable
           if (!item) return h("span", { class: "text-ink-gray-4" }, "-");
-          
+
           return h(
             "div",
             { class: "flex items-center gap-2 truncate text-base" },
@@ -155,6 +136,7 @@ const options = computed(() => {
     },
   };
 });
+
 function handleTaskCreated(): void {
   showNewTaskModal.value = false;
   forceReload();

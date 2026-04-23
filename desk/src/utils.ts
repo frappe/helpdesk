@@ -8,8 +8,6 @@ import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
 import TicketIcon from "./components/icons/TicketIcon.vue";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
-import  TaskStatusIcon  from "@/components/icons/TaskStatusIcon.vue";
-import  TaskPriorityIcon from "@/components/icons/TaskPriorityIcon.vue";
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
@@ -845,45 +843,4 @@ export function buildPercentageChange(value: number | null) {
 
 function getBrowserTimezone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone
-}
-
-
-export function taskStatusOptions(action?, data?) {
-  let options = ['Backlog', 'Todo', 'In Progress', 'Done', 'Canceled']
-
-  const statusMeta = getMeta('HD Task')
-    .getFields()
-    ?.find((field) => field.fieldname === 'status')
-
-  if (statusMeta) {
-    options = statusMeta.options
-      .map((option) => option.value)
-      .filter((option) => option)
-  }
-
-  return options.map((status) => ({
-    icon: () => h(TaskStatusIcon, { status }),
-    label: status,
-    onClick: () => action && action(status, data),
-  }))
-}
-
-export function taskPriorityOptions(action?, data?) {
-  let options = ['Low', 'Medium', 'High']
-
-  const priorityMeta = getMeta('HD Task')
-    .getFields()
-    ?.find((field) => field.fieldname === 'priority')
-
-  if (priorityMeta) {
-    options = priorityMeta.options
-      .map((option) => option.value)
-      .filter((option) => option)
-  }
-
-  return options.map((priority) => ({
-    label: priority,
-    icon: () => h(TaskPriorityIcon, { priority }),
-    onClick: () => action && action(priority, data),
-  }))
 }

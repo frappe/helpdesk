@@ -1,17 +1,15 @@
 <template>
   <div class="w-full">
     <div
-      class="activity flex cursor-pointer items-start justify-between gap-4 pl-3 pr-3 py-1.5 rounded-md hover:bg-surface-gray-1 transition-colors duration-200"
+      class="activity flex cursor-pointer items-start justify-between gap-4 px-4 py-3 rounded-xl hover:bg-surface-gray-1 transition-colors duration-200 w-full"
       @click="showModal = true"
     >
-      <div class="flex flex-1 flex-col gap-1 min-w-0">
-        
+      <div class="flex flex-1 flex-col gap-2 min-w-0">
         <div class="truncate text-sm font-medium text-ink-gray-9">
           {{ activity.title || __('Untitled Task') }}
         </div>
 
         <div class="flex flex-wrap items-center gap-1.5 text-[13px] text-[#383838]">
-
           <div v-if="assignedId" class="flex items-center gap-1.5">
             <Avatar
               shape="circle"
@@ -27,17 +25,16 @@
           </div>
 
           <Tooltip
-           v-if="activity.due_date"
-          :key="activity.due_date"
-          :text="dateFormat(activity.due_date, dateTooltipFormat)"
+            v-if="activity.due_date"
+            :key="activity.due_date"
+            :text="dateFormat(activity.due_date, dateTooltipFormat)"
           >
             <div class="flex items-center gap-1.5">
-            <CalendarIcon class="h-3.5 w-3.5 text-ink-gray-5" />
-          <span>{{ dateFormat(activity.due_date, 'D MMM, h:mm A') }}</span>
-         </div>
+              <CalendarIcon class="h-3.5 w-3.5 text-ink-gray-5" />
+              <span>{{ dateFormat(activity.due_date, 'D MMM, h:mm A') }}</span>
+            </div>
           </Tooltip>
 
-          
           <div v-if="(assignedId || activity.due_date) && activity.priority" class="flex items-center justify-center">
             <DotIcon class="h-1.5 w-1.5 text-ink-gray-4" />
           </div>
@@ -45,16 +42,11 @@
           <div v-if="activity.priority" class="flex items-center">
             <span>{{ activity.priority }}</span>
           </div>
-
         </div>
       </div>
 
       <div class="flex items-center gap-1 shrink-0" @click.stop>
-
-        <Dropdown
-          :options="statusDropdownOptions"
-          placement="bottom-end"
-        >
+        <Dropdown :options="statusDropdownOptions" placement="bottom-end">
           <template #default>
             <Button
               :tooltip="__('Change Status')"
@@ -79,10 +71,7 @@
           </template>
         </Dropdown>
 
-        <Dropdown
-          :options="dropdownOptions"
-          placement="bottom-end"
-        >
+        <Dropdown :options="dropdownOptions" placement="bottom-end">
           <Button
             icon="more-horizontal"
             variant="ghost"
@@ -90,7 +79,6 @@
             @click.stop.prevent
           />
         </Dropdown>
-
       </div>
     </div>
 
@@ -155,11 +143,7 @@ const assigneeLabel = computed((): string => {
   const assigned = assignedId.value
   if (!assigned) return ''
   if (!assigned.includes('@')) return assigned
-  return assigned
-    .split('@')[0]
-    .split(/[._-]/)
-    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
+  return assigned 
 })
 
 function handleReload(payload?: any) {
@@ -187,7 +171,6 @@ function handleReload(payload?: any) {
   if (props.reloadTasks) {
     props.reloadTasks()
   }
-
 
 async function changeStatus(newStatus: string) {
   if (isUpdating.value) return
@@ -247,25 +230,19 @@ function handleTaskDeleted(taskName: string) {
     props.reloadTasks()
   }
 }
+
 const dropdownOptions = computed(() => [
   {
     label: __('Delete'),
     icon: 'trash',
     onClick: async () => {
       if (isUpdating.value) return
-
       isUpdating.value = true
-
       try {
-        await call(
-          'helpdesk.helpdesk.doctype.hd_task.hd_task.delete_task',
-          {
-            task: props.activity.name,
-          }
-        )
-
+        await call('helpdesk.helpdesk.doctype.hd_task.hd_task.delete_task', {
+          task: props.activity.name,
+        })
         handleTaskDeleted(props.activity.name)
-
         toast.success(__('Task deleted successfully'))
       } catch (e: any) {
         toast.error(e?.message || __('Failed to delete task'))

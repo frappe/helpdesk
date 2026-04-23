@@ -1,7 +1,7 @@
 import { LOGIN_PAGE } from "@/router";
 import { createResource } from "frappe-ui";
 import { defineStore } from "pinia";
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useAuthStore } from "./auth";
 
 export const useUserStore = defineStore("user", () => {
@@ -29,6 +29,15 @@ export const useUserStore = defineStore("user", () => {
 
   const init = users.fetch;
 
+  const agentOptions = computed(() => {
+    if (!users.data) return [];
+    return (users.data as any[]).map((u: any) => ({
+      label: u.full_name || u.name,
+      value: u.name,
+      image: u.user_image || "",
+    }));
+  });
+
   function getUser(email) {
     if (!email || email === "sessionUser") {
       email = window.session_user;
@@ -44,10 +53,14 @@ export const useUserStore = defineStore("user", () => {
     }
     return usersByName[email];
   }
-  function formatFullName(email) {
-    let name = email.split("@")[0];
-    name = name.charAt(0).toUpperCase() + name.slice(1);
-    return name;
+
+  function formatFullName(email: string) {
+    if (!email) return "";
+    const local = email.split("@")[0];
+    return local
+      .split(/[._-]/)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
   }
 
   function getUserRole(email: string) {
@@ -73,5 +86,6 @@ export const useUserStore = defineStore("user", () => {
     getUser,
     getUserRole,
     updateUserRoleCache,
+    agentOptions,
   };
 });

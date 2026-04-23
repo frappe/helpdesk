@@ -163,7 +163,6 @@
     </template>
   </Dialog>
 </template>
-
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
 import {
@@ -176,13 +175,14 @@ import {
   FeatherIcon,
   TextEditor,
   TextInput,
-  createResource,
   call,
   toast,
 } from "frappe-ui";
 import { __ } from "@/translation";
 import { isContentEmpty } from "@/utils";
 import { useUserStore } from "@/stores/user";
+import TaskStatusIcon   from "@/components/icons/TaskStatusIcon.vue";
+import TaskPriorityIcon from "@/components/icons/TaskPriorityIcon.vue";
 
 // --- Props & Emits ---
 const props = defineProps({
@@ -194,7 +194,7 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue", "submit"]);
 
 // --- Store ---
-const { getUser } = useUserStore();
+const { getUser, agentOptions } = useUserStore();
 
 // --- State ---
 const show = computed({
@@ -219,21 +219,19 @@ const defaultForm = () => ({
 
 const form = ref(defaultForm());
 
-// --- Validation States ---
+
 const errors = ref({
-  title: false,
-  titleLength: false,
-  description: false,
+  title:             false,
+  titleLength:       false,
+  description:       false,
   descriptionLength: false,
 });
 
-// Safe counter fallback helper for Description string length evaluation
 const getDescriptionLength = computed(() => {
   if (!form.value.description) return 0;
   return form.value.description.length;
 });
 
-// Instantly scrub warning nodes when criteria are successfully met while editing
 watch(() => form.value.title, (val) => {
   if (val?.trim()) errors.value.title = false;
   if (val?.length <= 140) errors.value.titleLength = false;
@@ -244,46 +242,18 @@ watch(() => form.value.description, (val) => {
   if (!val || val.length <= 4000) errors.value.descriptionLength = false;
 });
 
-// --- Agents Logic ---
-const agentsList = createResource({
-  url: "frappe.client.get_list",
-  cache: "SystemUsers", // Caches this request globally within Frappe UI
-  params: {
-    doctype:     "User",
-    fields:      ["name", "full_name", "user_image"],
-    filters:     { enabled: 1, user_type: "System User" },
-    page_length: 200,
-  },
-  auto: true,
-});
-
-const agentOptions = computed(() => {
-  if (!agentsList.data) return [];
-  return (agentsList.data as any[]).map((u: any) => ({
-    label: u.full_name || u.name,
-    value: u.name,
-    image: u.user_image || "",
-  }));
-});
 
 const assigneeLabel = computed(() => {
   if (!form.value.assigned) return "";
-
-  const fromList = agentOptions.value.find((o) => o.value === form.value.assigned);
+  const fromList = agentOptions.find((o) => o.value === form.value.assigned);
   if (fromList?.label) return fromList.label;
-
   const storeUser = getUser(form.value.assigned);
   if (storeUser?.full_name) return storeUser.full_name;
-
-  return form.value.assigned
-    .split("@")[0]
-    .split(/[._-]/)
-    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
+  return form.value.assigned;
 });
 
 function getAssigneeImage(assigned: string): string {
-  const fromList = agentOptions.value.find((o) => o.value === assigned);
+  const fromList = agentOptions.find((o) => o.value === assigned);
   if (fromList?.image) return fromList.image;
   return getUser(assigned)?.user_image || "";
 }
@@ -300,27 +270,22 @@ function resolveAssigned(): string {
   return sessionUser && sessionUser !== "Guest" ? sessionUser : "";
 }
 
-// --- Watchers ---
 watch(
   () => props.task,
   (task) => {
-    errors.value.title = false;
-    errors.value.titleLength = false;
-    errors.value.description = false;
+    errors.value.title             = false;
+    errors.value.titleLength       = false;
+    errors.value.description       = false;
     errors.value.descriptionLength = false;
 
-    if (task) {
-      form.value = {
-        title:       task.title       || "",
-        description: task.description || "",
-        due_date:    task.due_date    || "",
-        status:      task.status      || "Backlog",
-        priority:    task.priority    || "Low",
-        assigned:    task.assigned    || "",
-      };
-    } else {
-      form.value = defaultForm();
-    }
+    form.value = task ? {
+      title:       task.title       || "",
+      description: task.description || "",
+      due_date:    task.due_date    || "",
+      status:      task.status      || "Backlog",
+      priority:    task.priority    || "Low",
+      assigned:    task.assigned    || "",
+    } : defaultForm();
   },
   { immediate: true, deep: true },
 );
@@ -328,14 +293,10 @@ watch(
 watch(show, async (val) => {
   if (!val) return;
 
-  errors.value.title = false;
-  errors.value.titleLength = false;
-  errors.value.description = false;
+  errors.value.title             = false;
+  errors.value.titleLength       = false;
+  errors.value.description       = false;
   errors.value.descriptionLength = false;
-  
-  if (!agentsList.data) {
-    await agentsList.fetch();
-  }
 
   if (!props.task && !activeTask.value) {
     form.value = defaultForm();
@@ -345,13 +306,12 @@ watch(show, async (val) => {
   nextTick(() => setTimeout(() => (titleRef.value as any)?.el?.focus?.(), 100));
 });
 
-// --- Options ---
 const statusOptions = [
-  { label: __("Backlog"),     value: "Backlog"      },
-  { label: __("Todo"),        value: "Todo"         },
-  { label: __("In Progress"), value: "In Progress"  },
-  { label: __("Done"),        value: "Done"         },
-  { label: __("Canceled"),    value: "Canceled"     },
+  { label: __("Backlog"),     value: "Backlog"     },
+  { label: __("Todo"),        value: "Todo"        },
+  { label: __("In Progress"), value: "In Progress" },
+  { label: __("Done"),        value: "Done"        },
+  { label: __("Canceled"),    value: "Canceled"    },
 ];
 
 const priorityOptions = [
@@ -360,11 +320,10 @@ const priorityOptions = [
   { label: __("High"),   value: "High"   },
 ];
 
-// --- Exposed methods ---
 function showTask(task: any) {
-  errors.value.title = false;
-  errors.value.titleLength = false;
-  errors.value.description = false;
+  errors.value.title             = false;
+  errors.value.titleLength       = false;
+  errors.value.description       = false;
   errors.value.descriptionLength = false;
 
   form.value = {
@@ -394,35 +353,16 @@ async function updateTaskStatus(task: any, newStatus: string) {
   }
 }
 
-async function deleteTask(taskName: string) {
-  if (!taskName || typeof taskName !== "string" || !taskName.trim()) {
-    toast.error(__("Task not found"));
-    return;
-  }
-  try {
-    await call("helpdesk.helpdesk.doctype.hd_task.hd_task.delete_task", {
-      task: taskName,
-    });
-    toast.success(__("Task deleted"));
-    emit("submit", null);
-  } catch (e: any) {
-    const msg = e?.message || e?.exc?.split("\n").filter(Boolean).pop() || __("Something went wrong");
-    toast.error(msg);
-  }
-}
+defineExpose({ showTask, updateTaskStatus});
 
-defineExpose({ showTask, updateTaskStatus, deleteTask });
-
-// --- Actions ---
 async function handleSubmit() {
-  errors.value.title = false;
-  errors.value.titleLength = false;
-  errors.value.description = false;
+  errors.value.title             = false;
+  errors.value.titleLength       = false;
+  errors.value.description       = false;
   errors.value.descriptionLength = false;
 
   let formsAreInvalid = false;
 
-  // 1. Check Title Empty & Length States
   if (!form.value.title?.trim()) {
     errors.value.title = true;
     formsAreInvalid = true;
@@ -430,8 +370,7 @@ async function handleSubmit() {
     errors.value.titleLength = true;
     formsAreInvalid = true;
   }
-  
-  // 2. Check Description Empty & Length States
+
   if (isContentEmpty(form.value.description)) {
     errors.value.description = true;
     formsAreInvalid = true;
@@ -440,7 +379,6 @@ async function handleSubmit() {
     formsAreInvalid = true;
   }
 
-  // 3. Stop submission execution instantly on validation faults
   if (formsAreInvalid) {
     toast.error(__("Please fix validation issues before updating."));
     return;
@@ -451,7 +389,7 @@ async function handleSubmit() {
 
   try {
     let result: any;
-    const dbDate    = form.value.due_date || null;
+    const dbDate     = form.value.due_date || null;
     const assignedTo = resolveAssigned();
 
     if (isEditing.value) {
@@ -482,7 +420,7 @@ async function handleSubmit() {
     }
 
     emit("submit", result);
-    show.value   = false;
+    show.value       = false;
     activeTask.value = null;
   } catch (e: any) {
     const msg = e?.message || e?.exc?.split("\n").filter(Boolean).pop() || __("Something went wrong");
