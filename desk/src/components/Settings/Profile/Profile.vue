@@ -165,6 +165,25 @@
             class="w-40"
           />
         </div>
+        <div class="flex items-center justify-between mt-6">
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-medium text-ink-gray-8">
+              {{ __("Theme") }}
+            </span>
+            <span class="text-p-sm text-ink-gray-6">{{
+              __("Choose your preferred appearance.")
+            }}</span>
+          </div>
+          <TabButtons
+            :buttons="[
+              { label: __('Light'), value: 'light' },
+              { label: __('Dark'), value: 'dark' },
+              { label: __('System'), value: 'system' },
+            ]"
+            :model-value="currentTheme"
+            @update:model-value="setTheme"
+          />
+        </div>
       </div>
     </template>
   </SettingsLayoutBase>
@@ -184,7 +203,9 @@ import {
   Dropdown,
   FileUploader,
   LoadingIndicator,
+  TabButtons,
   toast,
+  useTheme,
 } from "frappe-ui";
 import { Autocomplete } from "@/components";
 import { __ } from "@/translation";
@@ -197,6 +218,7 @@ import Link from "@/components/frappe-ui/Link.vue";
 import { HDAgent } from "@/types/doctypes";
 
 const auth = useAuthStore();
+const { currentTheme, setTheme } = useTheme();
 const profile = ref({
   fullName: auth.userName,
   userImage: auth.userImage,
