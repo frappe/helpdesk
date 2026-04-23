@@ -39,8 +39,8 @@
         <!-- Top Element -->
         <div class="flex flex-col gap-3">
           <!-- Title -->
-          <div class="flex justify-between">
-            <div>
+          <div class="flex sm:flex-row flex-col justify-between">
+            <div class="w-full">
               <textarea
                 ref="titleRef"
                 class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
@@ -79,22 +79,22 @@
                 </div>
               </div>
               <div
-                v-if="!editable && !isCustomerPortal"
-                class="text-sm text-gray-500 items-center"
+                v-if="!editable && !isCustomerPortal && !isMobileView"
+                class="text-p-sm text-gray-500 items-center"
               >
                 <span>{{ views }} views</span>
               </div>
             </div>
-            <div class="flex gap-4 items-start">
-              <div class="flex items-start gap-4 text-sm">
+            <div class="flex gap-4 justify-between sm:items-start">
+              <div class="flex gap-4 text-p-sm items-center">
                 <div
-                  class="flex items-center gap-1"
+                  class="flex items-center gap-2"
                   v-if="!editable && !isCustomerPortal"
                 >
                   <Button
                     variant="ghost"
                     size="md"
-                    class="flex"
+                    class="flex shrink-0 !w-auto"
                     :disabled="!isCustomerPortal"
                   >
                     <template #suffix>
@@ -111,7 +111,7 @@
                   <Button
                     variant="ghost"
                     size="md"
-                    class="flex"
+                    class="flex shrink-0 !w-auto"
                     :disabled="!isCustomerPortal"
                   >
                     <template #suffix>
@@ -191,13 +191,27 @@
             />
             <div class="flex flex-col justify-start gap-1">
               <p
-                class="truncate capitalize text-base text-ink-gray-9 font-medium"
+                class="truncate capitalize text-p-base text-ink-gray-9 font-medium"
               >
                 <span class="text-base text-gray-600">published by </span>
                 {{ article.data.author.name }}
               </p>
-              <div class="text-xs text-gray-700">
-                {{ dayjsLocal(article.data.modified).format("MMM D, h:mm A") }}
+              <div class="flex items-center gap-1">
+                <span class="text-p-xs text-gray-700">
+                  {{
+                    dayjsLocal(article.data.modified).format("MMM D, h:mm A")
+                  }}
+                </span>
+                <IconDot
+                  v-if="!editable && !isCustomerPortal && isMobileView"
+                  class="h-4 w-4 text-gray-600"
+                />
+
+                <span
+                  v-if="!editable && !isCustomerPortal && isMobileView"
+                  class="text-p-xs text-gray-500 items-center"
+                  >{{ views }} views</span
+                >
               </div>
             </div>
           </div>
