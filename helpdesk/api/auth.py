@@ -58,9 +58,6 @@ def get_user():
 @frappe.whitelist()
 @agent_only
 def get_current_user_email_info():
-    """
-    Return the current user's email signature and linked email accounts.
-    """
     user = frappe.session.user
 
     email_signature, email = frappe.db.get_value(
@@ -71,9 +68,25 @@ def get_current_user_email_info():
         filters={"parent": user},
         fields=["email_account", "email_id"],
     )
+    outgoing_account_names = frappe.db.get_all(
+        "Email Account",
+        filters={"enable_outgoing": 1},
+        pluck="name",
+    )
+
+    outgoing_emails = [
+        row for row in user_emails if row.email_account in outgoing_account_names
+    ]
+
+    available_emails = frappe.db.get_all(
+        "Email Account",
+        filters={"enable_outgoing": 1},
+        fields=["name", "email_id"],
+    )
 
     return {
         "email_signature": email_signature,
         "email": email,
-        "user_emails": user_emails,
+        "outgoing_emails": outgoing_emails,
+        "available_emails": available_emails,
     }

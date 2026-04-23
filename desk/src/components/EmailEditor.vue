@@ -381,7 +381,7 @@ const fromEmail = useStorage<string | "">("from-email", "");
 
 const from = computed(() => {
   const userEmails: { email_account: string; email_id: string }[] =
-    userResource.data?.user_emails ?? [];
+    userResource.data?.outgoing_emails ?? [];
   if (!userEmails.length) return [];
 
   const emailsMapped = userEmails.map((e) => ({

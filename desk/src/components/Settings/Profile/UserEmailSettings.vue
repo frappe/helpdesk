@@ -128,7 +128,6 @@ import {
   Badge,
   Button,
   createDocumentResource,
-  createListResource,
   createResource,
   TextEditor,
   toast,
@@ -140,14 +139,6 @@ const { userId } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
 const emit = defineEmits(["updateStep"]);
 
-const emails = createListResource({
-  doctype: "Email Account",
-  cache: "Outgoing Email Accounts",
-  fields: ["name", "email_id"],
-  filters: { enable_outgoing: 1 },
-  auto: true,
-});
-
 const currentUserEmailInfo = createResource({
   url: "helpdesk.api.auth.get_current_user_email_info",
   cache: "current-user-email-info",
@@ -155,9 +146,9 @@ const currentUserEmailInfo = createResource({
 });
 
 const filteredEmails = computed(() => {
-  if (!emails.data) return [];
+  if (!currentUserEmailInfo.data?.available_emails) return [];
   const linkedEmails = user.doc.user_emails?.map((e) => e.email_id) || [];
-  return emails.data
+  return currentUserEmailInfo.data.available_emails
     .map((doc) => ({
       label: doc.name,
       value: doc.name,
@@ -168,27 +159,24 @@ const filteredEmails = computed(() => {
 
 const isSignatureDirty = computed(() => {
   return (
-    currentUserEmailInfo.data.email_signature !== user?.doc?.email_signature
+    currentUserEmailInfo.data?.email_signature !== user?.doc?.email_signature
   );
 });
 
 const isUserEmailListDirty = computed(() => {
-  const emails = (list = []) =>
-    list.map(({ email_account, email_id }) => ({ email_account, email_id }));
+  const emailIds = (list = []) => list.map((e) => e.email_id).sort();
   return (
-    JSON.stringify(emails(currentUserEmailInfo.data.user_emails)) !==
-    JSON.stringify(emails(user.doc.user_emails))
+    JSON.stringify(emailIds(currentUserEmailInfo.data?.outgoing_emails)) !==
+    JSON.stringify(emailIds(user.doc.user_emails))
   );
 });
 
-const isDirty = computed(() => {
-  return isSignatureDirty.value || isUserEmailListDirty.value;
-});
+const isDirty = computed(
+  () => isSignatureDirty.value || isUserEmailListDirty.value
+);
 
 function addEmail(email) {
-  if (!user.doc.user_emails) {
-    user.doc.user_emails = [];
-  }
+  if (!user.doc.user_emails) user.doc.user_emails = [];
   user.doc.user_emails.push({
     email_account: email.label,
     email_id: email.email,
