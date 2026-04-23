@@ -31,6 +31,7 @@
       >
         <!-- Top Element -->
         <div class="flex flex-col gap-3">
+<<<<<<< HEAD
           <div class="flex gap-1 items-center justify-between">
             <div class="flex gap-1 items-center">
               <!-- Avatar -->
@@ -67,6 +68,117 @@
                 :message="__('Are you sure you want to discard changes?')"
                 @discard="handleDiscard"
               />
+=======
+          <!-- Title -->
+          <div class="flex sm:flex-row flex-col justify-between">
+            <div class="w-full">
+              <textarea
+                ref="titleRef"
+                class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+                v-model="title"
+                :placeholder="__('Title')"
+                rows="1"
+                wrap="soft"
+                maxlength="140"
+                autofocus
+                :disabled="!editable"
+              />
+              <div
+                v-if="!editable && isCustomerPortal"
+                class="flex gap-1 items-center pt-1.5"
+              >
+                <!-- Avatar -->
+                <div class="flex gap-2 pb-1.5 items-center justify-center">
+                  <Avatar
+                    :image="article.data.author.image"
+                    :label="article.data.author.name"
+                    size="md"
+                  />
+                  <div class="flex gap-1 items-end">
+                    <p class="truncate capitalize text-base text-ink-gray-7">
+                      {{ article.data.author.name }}
+                    </p>
+                    <IconDot class="h-4 w-4 text-gray-600" />
+                    <div class="text-base text-ink-gray-7">
+                      {{
+                        dayjsLocal(article.data.modified).format(
+                          "MMM D, h:mm A"
+                        )
+                      }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                v-if="!editable && !isCustomerPortal && !isMobileView"
+                class="text-p-sm text-gray-500 items-center"
+              >
+                <span>{{ views }} views</span>
+              </div>
+            </div>
+            <div class="flex gap-4 justify-between sm:items-start">
+              <div class="flex gap-4 text-p-sm items-center">
+                <div
+                  class="flex items-center gap-1"
+                  v-if="!editable && !isCustomerPortal"
+                >
+                  <Button
+                    variant="ghost"
+                    size="md"
+                    class="flex shrink-0 !w-auto"
+                    :disabled="!isCustomerPortal"
+                  >
+                    <template #suffix>
+                      {{ likes }}
+                    </template>
+                    <template #icon>
+                      <ThumbsUpFilledIcon
+                        v-if="feedback === 1 && isCustomerPortal"
+                        class="size-4"
+                      />
+                      <ThumbsUpIcon v-else class="size-4" />
+                    </template>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="md"
+                    class="flex shrink-0 !w-auto"
+                    :disabled="!isCustomerPortal"
+                  >
+                    <template #suffix>
+                      {{ dislikes }}
+                    </template>
+                    <template #icon>
+                      <ThumbsDownFilledIcon
+                        v-if="feedback === 2 && isCustomerPortal"
+                        class="size-4"
+                      />
+                      <ThumbsDownIcon v-else class="size-4" />
+                    </template>
+                  </Button>
+                </div>
+              </div>
+              <div class="flex gap-1 items-start justify-between">
+                <Dropdown
+                  :options="articleActions"
+                  v-if="!editable && !isCustomerPortal"
+                  @click="isConfirmingDeleteArticle = false"
+                >
+                  <Button size="md" variant="ghost">
+                    <template #icon>
+                      <IconMoreHorizontal class="h-4 w-4" />
+                    </template>
+                  </Button>
+                </Dropdown>
+                <div class="flex gap-2" v-if="editable">
+                  <DiscardButton
+                    :disabled="!isDirty"
+                    :hide-dialog="!isDirty"
+                    :title="__('Discard changes?')"
+                    :message="__('Are you sure you want to discard changes?')"
+                    @discard="handleDiscard"
+                  />
+>>>>>>> 38e5f069 (fix: article layouting)
 
               <Button :label="__('Save')" @click="handleSave" variant="solid" />
             </div>
@@ -103,6 +215,47 @@
             />
           </template>
         </TextEditor>
+<<<<<<< HEAD
+=======
+        <div
+          v-if="!editable && !isCustomerPortal"
+          class="flex gap-1 items-center pt-1.5 mt-4"
+        >
+          <!-- Avatar -->
+          <div class="flex gap-2 items-center justify-center">
+            <Avatar
+              :image="article.data.author.image"
+              :label="article.data.author.name"
+              size="lg"
+            />
+            <div class="flex flex-col justify-start gap-1">
+              <p
+                class="truncate capitalize text-p-base text-ink-gray-9 font-medium"
+              >
+                <span class="text-base text-gray-600">published by </span>
+                {{ article.data.author.name }}
+              </p>
+              <div class="flex items-center gap-1">
+                <span class="text-p-xs text-gray-700">
+                  {{
+                    dayjsLocal(article.data.modified).format("MMM D, h:mm A")
+                  }}
+                </span>
+                <IconDot
+                  v-if="!editable && !isCustomerPortal && isMobileView"
+                  class="h-4 w-4 text-gray-600"
+                />
+
+                <span
+                  v-if="!editable && !isCustomerPortal && isMobileView"
+                  class="text-p-xs text-gray-500 items-center"
+                  >{{ views }} views</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+>>>>>>> 38e5f069 (fix: article layouting)
       </div>
       <div class="p-4" v-if="isCustomerPortal">
         <ArticleFeedback :feedback="feedback" :article-id="articleId" />
