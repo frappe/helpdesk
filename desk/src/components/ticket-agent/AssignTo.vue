@@ -7,7 +7,7 @@
   >
     <template #target="{ togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span class="block text-xs text-gray-600">{{ __("Assignee") }}</span>
+        <span class="block text-xs text-ink-gray-5">{{ __("Assignee") }}</span>
         <Button
           ref="triggerRef"
           variant="outline"

@@ -22,14 +22,14 @@
           </template>
         </Button>
       </div>
-      <div class="text-gray-600 w-4/6 text-p-base" v-else>
-        <span class="font-medium text-gray-800">
+      <div class="text-ink-gray-5 w-4/6 text-p-base" v-else>
+        <span class="font-medium text-ink-gray-8">
           {{ user }}
         </span>
         <span> {{ content }}</span>
       </div>
 
-      <div class="text-gray-600 text-sm w-2/6 flex justify-end">
+      <div class="text-ink-gray-5 text-sm w-2/6 flex justify-end">
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
           <span>{{ timeAgo(creation) }}</span>
         </Tooltip>
@@ -41,8 +41,8 @@
         :key="relatedActivity.creation"
         class="flex justify-between text-base"
       >
-        <div class="text-gray-600 w-4/6">
-          <span class="font-medium text-gray-800">
+        <div class="text-ink-gray-5 w-4/6">
+          <span class="font-medium text-ink-gray-8">
             {{ relatedActivity.user }}
           </span>
           <span> {{ relatedActivity.content }}</span>
@@ -50,7 +50,7 @@
         <Tooltip
           :text="dateFormat(relatedActivity.creation, dateTooltipFormat)"
         >
-          <div class="text-gray-600 text-sm flex justify-end">
+          <div class="text-ink-gray-5 text-sm flex justify-end">
             {{ timeAgo(relatedActivity.creation) }}
           </div>
         </Tooltip>

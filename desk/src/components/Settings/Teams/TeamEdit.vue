@@ -52,7 +52,9 @@
     </template>
     <template #content>
       <div class="w-full h-full" v-if="teamMembers?.length > 0">
-        <div class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600">
+        <div
+          class="grid grid-cols-8 items-center gap-3 text-sm text-ink-gray-5"
+        >
           <div class="col-span-6 text-p-sm">
             {{ __("Members ({0})", teamMembers.length) }}
           </div>
@@ -317,13 +319,13 @@ const options = [
               "div",
               {
                 class:
-                  "flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 rounded",
+                  "flex items-center gap-2 p-2 cursor-pointer hover:bg-surface-gray-2 rounded",
                 onClick: () =>
                   (ignoreRestrictions.value = !ignoreRestrictions.value),
               },
               [
                 h(team.doc?.ignore_restrictions ? LucideLock : LucideUnlock, {
-                  class: "h-4 w-4 text-gray-700",
+                  class: "h-4 w-4 text-ink-gray-7",
                   stroke: "currentColor",
                   "aria-hidden": "true",
                 }),

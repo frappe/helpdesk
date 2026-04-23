@@ -40,7 +40,7 @@
         <WorkflowKnowledgebaseSettings />
         <hr class="my-8" />
         <div>
-          <div class="text-base font-semibold text-gray-900">
+          <div class="text-base font-semibold text-ink-gray-9">
             {{ __("User Signup") }}
           </div>
           <div class="flex items-center justify-between mt-6">

@@ -16,7 +16,7 @@
           class="w-full px-6 md:px-5 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
-            class="relative flex justify-center after:absolute after:left-[50%] after:top-3 after:-z-10 after:border-l after:border-gray-200"
+            class="relative flex justify-center after:absolute after:left-[50%] after:top-3 after:-z-10 after:border-l after:border-outline-gray-modals"
             :class="[
               i != activities.length - 1 && 'after:h-full',
               !['email', 'feedback', 'call', 'comment'].includes(
@@ -44,7 +44,7 @@
               />
               <CommentIcon
                 v-else-if="activity.type === 'comment'"
-                class="text-gray-600 absolute left-[7.5px]"
+                class="text-ink-gray-5 absolute left-[7.5px]"
               />
               <FeatherIcon
                 v-else-if="activity.type === 'call'"
@@ -53,11 +53,11 @@
                     ? 'phone-incoming'
                     : 'phone-outgoing'
                 "
-                class="text-gray-600 left-[7.5px] size-4"
+                class="text-ink-gray-5 left-[7.5px] size-4"
               />
               <DotIcon
                 v-else
-                class="text-gray-600 absolute left-[7.5px] top-[6px]"
+                class="text-ink-gray-5 absolute left-[7.5px] top-[6px]"
               />
             </div>
           </div>
@@ -99,7 +99,7 @@
     </div>
     <div
       v-else
-      class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
+      class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-4"
     >
       <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
       <span class="text-lg font-medium text-ink-gray-8">{{
@@ -179,7 +179,7 @@ const emptyTextIcon = computed(() => {
   } else if (props.title == "Calls") {
     icon = PhoneIcon;
   }
-  return h(icon, { class: "text-gray-500" });
+  return h(icon, { class: "text-ink-gray-4" });
 });
 
 onMounted(() => {

@@ -51,7 +51,7 @@ const chartData = computed(() => {
   const percentageChange = {
     icon: _percentageChange > 0 ? "arrow-up-right" : "arrow-down-left",
     value: _percentageChange > 0 ? `+${_percentageChange}` : _percentageChange,
-    color: _percentageChange > 0 ? "text-red-600" : "text-green-600",
+    color: _percentageChange > 0 ? "text-ink-red-4" : "text-ink-green-3",
   };
 
   return {

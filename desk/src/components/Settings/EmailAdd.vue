@@ -27,17 +27,17 @@
             <!-- email service provider info -->
             <div>
               <div
-                class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200"
+                class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-gray-modals"
               >
                 <CircleAlert
-                  class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-blue-500"
+                  class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-2"
                 />
-                <div class="text-wrap text-xs text-gray-700">
+                <div class="text-wrap text-xs text-ink-gray-7">
                   {{ selectedService.info }}
                   <a
                     :href="selectedService.link"
                     target="_blank"
-                    class="text-blue-500 underline"
+                    class="text-ink-blue-2 underline"
                     >here</a
                   >.
                 </div>
@@ -129,7 +129,9 @@
                     :name="field.name"
                     :type="field.type"
                   />
-                  <p class="text-gray-500 text-p-sm">{{ field.description }}</p>
+                  <p class="text-ink-gray-4 text-p-sm">
+                    {{ field.description }}
+                  </p>
                 </div>
               </div>
               <ErrorMessage v-if="error" class="ml-1" :message="error" />

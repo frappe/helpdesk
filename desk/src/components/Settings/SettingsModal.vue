@@ -7,7 +7,7 @@
     <template #body>
       <div class="flex z-50" :style="{ height: 'calc(100vh - 8rem)' }">
         <div
-          class="flex w-52 shrink-0 flex-col bg-gray-50 p-1 overflow-y-auto hide-scrollbar"
+          class="flex w-52 shrink-0 flex-col bg-surface-menu-bar p-1 overflow-y-auto hide-scrollbar"
         >
           <h1
             class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-base text-ink-gray-5 transition-all duration-300 ease-in-out truncate"
@@ -33,17 +33,17 @@
                 class="flex h-7 w-full items-center gap-2 rounded px-2 py-[7px]"
                 :class="[
                   activeTab?.label == item.label
-                    ? 'bg-white shadow-sm'
-                    : 'hover:bg-gray-100',
+                    ? 'bg-surface-white shadow-sm'
+                    : 'hover:bg-surface-gray-2',
                 ]"
                 @click="() => onTabChange(item)"
               >
                 <component
                   :is="item.icon"
-                  class="h-4 w-4 text-gray-700 shrink-0"
+                  class="h-4 w-4 text-ink-gray-7 shrink-0"
                 />
                 <Tooltip :text="__(item.label)" placement="right">
-                  <span class="text-p-sm text-gray-800 truncate">
+                  <span class="text-p-sm text-ink-gray-8 truncate">
                     {{ __(item.label) }}
                   </span>
                 </Tooltip>
