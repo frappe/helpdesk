@@ -86,7 +86,7 @@
           'size-1.5 rounded-full cursor-pointer',
           {
             'bg-black': visibleMonths === 'first-half',
-            'bg-gray-400': visibleMonths === 'second-half',
+            'bg-surface-gray-4': visibleMonths === 'second-half',
           },
         ]"
         @click="visibleMonths = 'first-half'"
@@ -96,7 +96,7 @@
           'size-1.5 rounded-full cursor-pointer',
           {
             'bg-black': visibleMonths === 'second-half',
-            'bg-gray-400': visibleMonths === 'first-half',
+            'bg-surface-gray-4': visibleMonths === 'first-half',
           },
         ]"
         @click="visibleMonths = 'second-half'"

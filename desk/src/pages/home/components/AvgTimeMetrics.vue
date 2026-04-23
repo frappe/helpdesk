@@ -54,7 +54,7 @@
             {{ timeAverages.resolution }}
           </div>
           <div class="text-base text-ink-gray-5 flex items-center gap-2 mt-1">
-            <div class="size-2 bg-gray-400 rounded-full" />
+            <div class="size-2 bg-surface-gray-4 rounded-full" />
             {{ __("Avg. resolution time") }}
           </div>
         </div>
