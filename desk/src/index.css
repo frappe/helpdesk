@@ -24,6 +24,15 @@
 html,
 body {
   color: var(--ink-gray-9);
+  background-color: var(--surface-white);
+}
+
+:root {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 /* Modern slim scrollbars */
