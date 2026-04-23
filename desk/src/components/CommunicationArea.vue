@@ -30,7 +30,7 @@
     </div>
     <Transition name="slide">
       <div
-        v-if="showEmailBox"
+        v-show="showEmailBox"
         ref="emailBoxRef"
         @keydown.ctrl.enter.capture.stop="submitEmail"
         @keydown.meta.enter.capture.stop="submitEmail"
@@ -65,7 +65,7 @@
     </Transition>
     <Transition name="slide">
       <div
-        v-if="showCommentBox"
+        v-show="showCommentBox"
         ref="commentBoxRef"
         @keydown.ctrl.enter.capture.stop="submitComment"
         @keydown.meta.enter.capture.stop="submitComment"

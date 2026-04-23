@@ -14,13 +14,13 @@
         :ticket-status="ticket.doc.status"
         @email:reply="
           (e) => {
-            communicationAreaRef.replyToEmail(e);
+            communicationAreaRef?.replyToEmail(e);
           }
         "
         @update="
           () => {
             activities.reload();
-            ticketAgentActivitiesRef.scrollToLatestActivity();
+            ticketAgentActivitiesRef?.scrollToLatestActivity();
           }
         "
       />
@@ -41,7 +41,7 @@
     @update="
       () => {
         activities.reload();
-        ticketAgentActivitiesRef.scrollToLatestActivity();
+        ticketAgentActivitiesRef?.scrollToLatestActivity();
       }
     "
   />
@@ -67,12 +67,17 @@ import {
 import { Button, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref } from "vue";
+import { TicketAgentActivities } from "../ticket";
 
 const ticket = inject(TicketSymbol)!;
 const activities = inject(ActivitiesSymbol)!;
 
-const ticketAgentActivitiesRef = ref(null);
-const communicationAreaRef = ref(null);
+const ticketAgentActivitiesRef = ref<InstanceType<
+  typeof TicketAgentActivities
+> | null>(null);
+const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
+  null
+);
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
