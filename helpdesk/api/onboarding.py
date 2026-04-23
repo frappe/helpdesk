@@ -2,7 +2,7 @@ import frappe
 from frappe.utils import add_days, get_datetime, now_datetime
 
 # Hide the onboarding popup once user is familiar with product
-ONBOARDING_TICKET_THRESHOLD = 100
+ONBOARDING_TICKET_THRESHOLD = 50
 ONBOARDING_AGE_DAYS = 30
 
 
@@ -12,7 +12,7 @@ def should_show_onboarding() -> bool:
     Decide whether the onboarding banner + auto-popup should still be shown.
 
     Returns False when:
-      - there are more than ``ONBOARDING_TICKET_THRESHOLD`` tickets, or
+      - there are more than ``ONBOARDING_TICKET_THRESHOLD`` tickets, and
       - the current user's account is older than ``ONBOARDING_AGE_DAYS`` days.
 
     Step completion is already tracked on the client via
@@ -20,15 +20,14 @@ def should_show_onboarding() -> bool:
     re-checked here.
     """
     ticket_count = frappe.db.count("HD Ticket")
-    if ticket_count > ONBOARDING_TICKET_THRESHOLD:
-        return False
+    count_condition = ticket_count > ONBOARDING_TICKET_THRESHOLD
 
     user_creation = frappe.db.get_value("User", frappe.session.user, "creation")
-    if user_creation and get_datetime(user_creation) < add_days(
+    user_age_condition = user_creation and get_datetime(user_creation) < add_days(
         now_datetime(), -ONBOARDING_AGE_DAYS
-    ):
+    )
+    if count_condition and user_age_condition:
         return False
-
     return True
 
 
