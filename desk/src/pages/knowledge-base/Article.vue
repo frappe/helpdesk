@@ -88,7 +88,7 @@
             <div class="flex gap-4 justify-between sm:items-start">
               <div class="flex gap-4 text-p-sm items-center">
                 <div
-                  class="flex items-center gap-1"
+                  class="flex items-center gap-2"
                   v-if="!editable && !isCustomerPortal"
                 >
                   <Button
