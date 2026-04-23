@@ -35,7 +35,7 @@
       <div class="flex gap-2 items-center">
         <div class="gap-0.5 flex items-center">
           <Badge
-            v-if="status.label && !ticket.doc.via_customer_portal"
+            v-if="status.label && !ticket?.doc?.via_customer_portal"
             :label="__(status.label)"
             variant="subtle"
             :theme="status.color"
