@@ -23,6 +23,9 @@ const { favicon } = storeToRefs(configStore);
 
 useFavicon(favicon);
 
+if (!localStorage.getItem("theme")) {
+  localStorage.setItem("theme", "light");
+}
 useTheme();
 
 onMounted(() => {

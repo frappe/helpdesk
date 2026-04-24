@@ -117,6 +117,9 @@ import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { currentView, useView } from "@/composables/useView";
 
 import LucideBell from "~icons/lucide/bell";
+import LucideMoon from "~icons/lucide/moon";
+import LucideSun from "~icons/lucide/sun";
+import { useTheme } from "frappe-ui";
 
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
@@ -128,6 +131,13 @@ import {
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 const { pinnedViews, publicViews } = useView();
+const { currentTheme, toggleTheme } = useTheme();
+
+const themeMenuItem = computed(() => ({
+  label: "Toggle theme",
+  icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
+  onClick: () => toggleTheme(),
+}));
 
 const notificationStore = useNotificationStore();
 const route = useRoute();
@@ -191,6 +201,7 @@ function parseViews(views) {
 }
 
 const customerPortalDropdown = computed(() => [
+  themeMenuItem.value,
   {
     label: "Log out",
     icon: "log-out",
@@ -220,6 +231,7 @@ const agentPortalDropdown = computed(() => [
     label: "Docs",
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
+  themeMenuItem.value,
   {
     label: "Log out",
     icon: "log-out",
