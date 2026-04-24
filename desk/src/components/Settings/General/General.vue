@@ -5,25 +5,31 @@
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("General") }}
         </h1>
-        <Badge
-          variant="subtle"
-          theme="orange"
-          size="sm"
-          :label="__('Unsaved')"
-          v-if="isDirty || isWebsiteSettingsChanged"
-        />
+        <Transition name="fade">
+          <Badge
+            variant="subtle"
+            theme="orange"
+            size="sm"
+            :label="__('Unsaved')"
+            v-if="isDirty || isWebsiteSettingsChanged"
+          />
+        </Transition>
       </div>
     </template>
     <template #header-actions>
-      <Button
-        :label="__('Save')"
-        variant="solid"
-        @click="saveSettings"
-        :loading="
-          saveSettingsResource.loading || saveWebsiteSettingsResource.loading
-        "
-        :disabled="!isDirty && !isWebsiteSettingsChanged"
-      />
+      <Transition name="fade">
+        <div v-if="isDirty || isWebsiteSettingsChanged">
+          <Button
+            :label="__('Save')"
+            variant="solid"
+            @click="saveSettings"
+            :loading="
+              saveSettingsResource.loading ||
+              saveWebsiteSettingsResource.loading
+            "
+          />
+        </div>
+      </Transition>
     </template>
     <template #content>
       <div

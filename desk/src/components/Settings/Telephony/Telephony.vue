@@ -1,37 +1,38 @@
 <template>
   <SettingsLayoutBase :description="__('Configure your telephony settings.')">
     <template #title>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 h-6">
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("Telephony") }}
         </h1>
-        <Badge
-          :class="[
-            isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent
-              ? 'opacity-100'
-              : 'opacity-0',
-          ]"
-          :label="__('Unsaved')"
-          theme="orange"
-          variant="subtle"
-        />
+        <Transition name="fade">
+          <Badge
+            v-if="isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent"
+            :label="__('Unsaved')"
+            theme="orange"
+            variant="subtle"
+        /></Transition>
       </div>
     </template>
     <template #header-actions>
-      <Button
-        :label="__('Save')"
-        theme="gray"
-        variant="solid"
-        @click="save"
-        :disabled="
-          !isDirty.twilio && !isDirty.exotel && !isDirty.telephonyAgent
-        "
-        :loading="
-          twilio.save.loading ||
-          exotel.save.loading ||
-          telephonyAgent.save.loading
-        "
-      />
+      <Transition name="fade">
+        <div v-if="isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent">
+          <Button
+            :label="__('Save')"
+            theme="gray"
+            variant="solid"
+            @click="save"
+            :disabled="
+              !isDirty.twilio && !isDirty.exotel && !isDirty.telephonyAgent
+            "
+            :loading="
+              twilio.save.loading ||
+              exotel.save.loading ||
+              telephonyAgent.save.loading
+            "
+          />
+        </div>
+      </Transition>
     </template>
     <template #content>
       <div class="-ml-2 grow">

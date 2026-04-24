@@ -17,13 +17,14 @@
             {{ props.title }}
           </h1>
         </div>
-        <Badge
-          v-if="unsavedChanges"
-          :variant="'subtle'"
-          :theme="'orange'"
-          size="sm"
-          :label="__('Unsaved')"
-        />
+        <Transition name="fade">
+          <Badge
+            v-if="unsavedChanges"
+            :variant="'subtle'"
+            :theme="'orange'"
+            size="sm"
+            :label="__('Unsaved')"
+        /></Transition>
       </div>
     </template>
     <template #header-actions>

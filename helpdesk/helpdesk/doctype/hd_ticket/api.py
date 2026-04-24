@@ -187,6 +187,8 @@ def get_communications(ticket: str):
             QBCommunication.recipients,
             QBCommunication.subject,
             QBCommunication.delivery_status,
+            QBCommunication.sent_or_received,
+            QBCommunication.user,
         )
         .where(QBCommunication.reference_doctype == "HD Ticket")
         .where(QBCommunication.reference_name == ticket)
@@ -195,7 +197,8 @@ def get_communications(ticket: str):
     )
     for c in communications:
         c.attachments = get_attachments("Communication", c.name)
-        c.user = get_user_info_for_avatar(c.sender)
+        user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
+        c.user = get_user_info_for_avatar(user_id)
     return communications
 
 
