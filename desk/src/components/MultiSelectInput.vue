@@ -8,10 +8,6 @@
         :label="value"
         theme="gray"
         variant="subtle"
-        :class="{
-          'rounded bg-surface-white hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
-            variant === 'subtle',
-        }"
         @keydown.delete.capture.stop="removeLastValue"
       >
         <template #suffix>

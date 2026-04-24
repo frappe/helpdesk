@@ -66,7 +66,9 @@
             :label="resolutionBy.label"
             variant="ghost"
             class="mt-[1px]"
-            :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
+            :theme="
+              resolutionBy.color !== 'purple' ? resolutionBy.color : undefined
+            "
             :class="resolutionBy.color === 'purple' && '!text-[#6B46C1] '"
           />
         </Tooltip>
