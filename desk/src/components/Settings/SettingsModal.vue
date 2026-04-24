@@ -10,7 +10,7 @@
         :style="{ height: 'calc(100vh - 8rem)' }"
       >
         <div
-          class="flex-col rounded-l-lg w-56 shrink-0 bg-gray-50 m-1 bg-surface-menu-bar overflow-y-auto hide-scrollbar"
+          class="flex-col rounded-l-lg w-56 shrink-0 bg-surface-menu-bar m-1 bg-surface-menu-bar overflow-y-auto hide-scrollbar"
         >
           <h1
             class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs font-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-menu-bar"
@@ -36,17 +36,17 @@
                 class="flex h-7 w-full items-center gap-2 rounded px-2 py-[7px]"
                 :class="[
                   activeTab?.label == item.label
-                    ? 'bg-white shadow-sm'
-                    : 'hover:bg-gray-100',
+                    ? 'bg-surface-selected shadow-sm'
+                    : 'hover:bg-surface-gray-2',
                 ]"
                 @click="() => onTabChange(item)"
               >
                 <component
                   :is="item.icon"
-                  class="h-4 w-4 text-gray-700 shrink-0"
+                  class="h-4 w-4 text-ink-gray-7 shrink-0"
                 />
                 <Tooltip :text="__(item.label)" placement="right">
-                  <span class="text-p-sm text-gray-800 truncate">
+                  <span class="text-p-sm text-ink-gray-8 truncate">
                     {{ __(item.label) }}
                   </span>
                 </Tooltip>

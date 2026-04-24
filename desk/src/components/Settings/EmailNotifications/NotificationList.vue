@@ -31,7 +31,7 @@
               class="text-ink-gray-7 size-4 relative z-10 pointer-events-none"
             />
             <div
-              class="w-full h-full absolute top-0 left-0 hover:bg-gray-50 rounded-[inherit]"
+              class="w-full h-full absolute top-0 left-0 hover:bg-surface-menu-bar rounded-[inherit]"
               @click="
                 () => {
                   props.onSelect(notification);

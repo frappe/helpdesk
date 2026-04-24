@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-base font-semibold text-gray-900">
+    <div class="text-base font-semibold text-ink-gray-9">
       {{ __("Ticket Settings") }}
     </div>
     <div class="mt-6 flex flex-col gap-6">
@@ -224,7 +224,7 @@
           v-if="settingsData.enableOutsideHoursBanner"
           class="flex gap-x-1 items-start justify-between"
         >
-          <p class="text-sm text-gray-700 leading-5">
+          <p class="text-sm text-ink-gray-7 leading-5">
             {{
               __(
                 "Find out all of the variables that can be used in the content"

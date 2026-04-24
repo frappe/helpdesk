@@ -6,7 +6,7 @@
     <div class="mb-2 font-medium pl-2" v-if="!hideViewAll">
       These articles may already cover what you are looking for
       <RouterLink
-        class="group cursor-pointer space-x-1 hover:text-gray-900"
+        class="group cursor-pointer space-x-1 hover:text-ink-gray-9"
         :to="{
           name: 'CustomerKnowledgeBase',
         }"
@@ -25,7 +25,7 @@
         class="rounded-md border-2 p-2 border-hidden hover:bg-surface-gray-2"
       >
         <RouterLink
-          class="group cursor-pointer hover:text-gray-900 flex flex-col gap-1"
+          class="group cursor-pointer hover:text-ink-gray-9 flex flex-col gap-1"
           :to="{
             name: 'ArticlePublic',
             params: {
@@ -39,7 +39,7 @@
           <dt class="font-base">{{ a.subject }} - {{ a.headings }}</dt>
           <!-- eslint-disable-next-line vue/no-v-html -->
           <dd
-            class="font-base text-p-sm text-gray-600 line-clamp-1"
+            class="font-base text-p-sm text-ink-gray-5 line-clamp-1"
             v-html="a.description"
           ></dd>
         </RouterLink>
@@ -55,7 +55,7 @@
     <LucideSearch class="size-8 text-ink-gray-3" />
     <div class="flex items-center flex-col justify-center">
       <p class="font-base">No answers found</p>
-      <span class="font-base text-p-sm text-gray-600 text-center"
+      <span class="font-base text-p-sm text-ink-gray-5 text-center"
         >Rephrase the question and try again with some keywords</span
       >
     </div>
@@ -67,7 +67,7 @@
     <LucideSearch class="size-8 text-ink-gray-3" />
     <div class="flex items-center flex-col justify-center">
       <p class="font-base">Searching...</p>
-      <span class="font-base text-p-sm text-gray-600 text-center"
+      <span class="font-base text-p-sm text-ink-gray-5 text-center"
         >Please wait while we search for the answers</span
       >
     </div>

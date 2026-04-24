@@ -13,13 +13,13 @@
                   'Search tickets, emails, comments, or #234 to navigate to ticket'
                 )
               "
-              class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-gray-800 placeholder:text-gray-500 focus:ring-0"
+              class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-ink-gray-8 placeholder:text-ink-gray-4 focus:ring-0"
               autocomplete="off"
               @input="onInput"
             />
           </div>
           <ComboboxOptions
-            class="max-h-96 overflow-auto border-t border-gray-100"
+            class="max-h-96 overflow-auto border-t border-outline-gray-1"
             static
             :hold="true"
           >
@@ -30,7 +30,7 @@
             >
               <div
                 v-if="!group.hideTitle"
-                class="px-4.5 mb-2.5 text-base text-gray-600"
+                class="px-4.5 mb-2.5 text-base text-ink-gray-5"
               >
                 {{ group.title }}
               </div>

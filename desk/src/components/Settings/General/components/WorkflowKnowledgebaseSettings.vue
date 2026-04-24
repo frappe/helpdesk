@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-base font-semibold text-gray-900">
+    <div class="text-base font-semibold text-ink-gray-9">
       {{ __("Workflow & Knowledge Base Settings") }}
     </div>
     <div class="mt-6 flex flex-col gap-6">

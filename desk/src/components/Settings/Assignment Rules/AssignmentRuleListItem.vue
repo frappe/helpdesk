@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+    class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded"
   >
     <div
       @click="assignmentRulesActiveScreen = { screen: 'view', data: data }"

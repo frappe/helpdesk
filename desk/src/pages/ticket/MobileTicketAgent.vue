@@ -45,7 +45,7 @@
         </div>
         <button
           v-else
-          class="rounded bg-gray-100 px-2 py-1.5 text-base text-gray-800"
+          class="rounded bg-surface-gray-2 px-2 py-1.5 text-base text-ink-gray-8"
           @click="showAssignmentModal = true"
         >
           {{ __("Assign") }}
@@ -79,7 +79,7 @@
                 <!-- feedback component -->
                 <TicketFeedback
                   v-if="ticket.data.feedback_rating"
-                  class="border-b px-6 py-3 text-base text-gray-600"
+                  class="border-b px-6 py-3 text-base text-ink-gray-5"
                   :ticket="ticket.data"
                 />
                 <!-- SLA Section -->
@@ -119,7 +119,7 @@
             </template>
           </Tabs>
           <CommunicationArea
-            class="sticky bottom-0 z-50 bg-white"
+            class="sticky bottom-0 z-50 bg-surface-white"
             ref="communicationAreaRef"
             v-model="ticket.data"
             :ticketId="ticket.data?.name"

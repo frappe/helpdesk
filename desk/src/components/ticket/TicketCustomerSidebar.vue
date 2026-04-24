@@ -36,9 +36,9 @@
         class="flex items-center text-base leading-5"
         v-for="field in ticketBasicInfo"
       >
-        <span class="w-[126px] text-sm text-gray-600">{{ field.label }}</span>
+        <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
         <span
-          class="text-base text-gray-800 flex-1"
+          class="text-base text-ink-gray-8 flex-1"
           :class="!field.value && 'text-ink-gray-4'"
         >
           {{ field.value || "—" }}
@@ -51,9 +51,9 @@
         :key="data.label"
         class="flex items-center text-base"
       >
-        <div class="w-[126px] text-gray-600 text-sm">{{ data.title }}</div>
+        <div class="w-[126px] text-ink-gray-5 text-sm">{{ data.title }}</div>
         <div
-          class="break-words text-base text-gray-800 flex items-center gap-2"
+          class="break-words text-base text-ink-gray-8 flex items-center gap-2"
         >
           <Tooltip :text="dateFormat(data.value, dateTooltipFormat)">
             <Badge :label="data.label" :theme="data.theme" variant="subtle" />
@@ -80,7 +80,7 @@
     <!-- feedback component -->
     <TicketFeedback
       v-if="ticket.data.feedback_rating"
-      class="border-b text-base text-gray-600"
+      class="border-b text-base text-ink-gray-5"
       :ticket="ticket.data"
     />
     <div class="flex flex-col gap-4 pt-0 px-5 py-3 overflow-y-scroll">
@@ -89,9 +89,9 @@
         v-for="field in ticketAdditionalInfo"
         :key="field.fieldname"
       >
-        <span class="w-[126px] text-sm text-gray-600">{{ field.label }}</span>
+        <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
         <span
-          class="text-base text-gray-800 flex-1"
+          class="text-base text-ink-gray-8 flex-1"
           :class="!field.value && 'text-ink-gray-4'"
         >
           <template

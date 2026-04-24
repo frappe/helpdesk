@@ -780,3 +780,59 @@ export function openContact(name: string) {
   const url = window.location.origin + "/app/contact/" + name;
   window.open(url, "_blank");
 }
+
+const COLOR_PROPS = new Set([
+  "color",
+  "background",
+  "background-color",
+  "border-color",
+]);
+
+// Strip color-related inline styles + bgcolor/color attrs so iframe CSS controls colors.
+export function stripEmailColors(html: string): string {
+  if (!html) return html;
+  const div = document.createElement("div");
+  div.innerHTML = html;
+
+  div.querySelectorAll("[style]").forEach((el) => {
+    const styles = el.getAttribute("style") || "";
+    const filtered = styles
+      .split(";")
+      .map((s) => s.trim())
+      .filter((s) => {
+        if (!s) return false;
+        const prop = s.split(":")[0].trim().toLowerCase();
+        return !COLOR_PROPS.has(prop);
+      })
+      .join("; ");
+    if (filtered) el.setAttribute("style", filtered);
+    else el.removeAttribute("style");
+  });
+
+  div.querySelectorAll("[bgcolor]").forEach((el) =>
+    el.removeAttribute("bgcolor")
+  );
+  div.querySelectorAll("font[color]").forEach((el) =>
+    el.removeAttribute("color")
+  );
+
+  return div.innerHTML;
+}
+
+// Shared reactive mirror of <html data-theme> for JS-driven theme-aware components
+export const dataTheme = ref<string>(
+  (typeof document !== "undefined" &&
+    document.documentElement.getAttribute("data-theme")) ||
+    "light"
+);
+
+if (typeof window !== "undefined") {
+  new MutationObserver(() => {
+    const next =
+      document.documentElement.getAttribute("data-theme") || "light";
+    if (next !== dataTheme.value) dataTheme.value = next;
+  }).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+}

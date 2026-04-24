@@ -24,7 +24,7 @@
           @input="teamsSearchQuery = $event"
           :placeholder="__('Search')"
           type="text"
-          class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+          class="focus:ring-0 border-outline-gray-2"
           icon-left="search"
           debounce="300"
           inputClass="p-4 pr-12"
@@ -44,13 +44,13 @@
         v-if="!teams.loading && teams.data?.length > 0"
         class="w-full h-full -ml-2"
       >
-        <div class="flex text-sm text-gray-600">
+        <div class="flex text-sm text-ink-gray-5">
           <div class="ml-2">{{ __("Team name") }}</div>
         </div>
         <hr class="mx-2 mt-2" />
         <div v-for="(team, index) in teams.data" :key="team.name">
           <div
-            class="flex items-center cursor-pointer hover:bg-gray-50 rounded h-12.5"
+            class="flex items-center cursor-pointer hover:bg-surface-menu-bar rounded h-12.5"
           >
             <div
               class="w-full py-3 pl-2"
