@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { getFontFamily } from "@/utils";
+import { getFontFamily, stripEmailColors } from "@/utils";
 import { computed, ref, watch } from "vue";
 
 const props = defineProps({
@@ -18,7 +18,7 @@ const props = defineProps({
 });
 
 const iframeRef = ref<HTMLIFrameElement | null>(null);
-const _content = ref(props.content);
+const _content = ref(stripEmailColors(props.content));
 
 // Get CSS path - in dev Vite serves it directly, in prod we need the built path
 const cssHref = computed(() => {
