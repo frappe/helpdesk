@@ -422,16 +422,6 @@ async function removeAttachment(attachment) {
 
 const showSavedRepliesSelectorModal = ref(false);
 
-// function applySavedReplies(template: string) {
-//   isContentEmpty(newEmail.value)
-//     ? (newEmail.value = template)
-//     : (newEmail.value =  template + newEmail.value);
-//   newEmail.value += "<p></p>";
-//   nextTick(() => {
-//     editorRef.value?.editor?.commands?.focus("end");
-//   });
-// }
-
 function applySavedReplies(template: string) {
   const textEditor = editorRef.value?.editor;
   if (!textEditor) return;
