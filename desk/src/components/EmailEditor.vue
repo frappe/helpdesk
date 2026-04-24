@@ -20,7 +20,7 @@
         v-if="hasMultipleSenders"
         class="mx-6 md:mx-5 flex items-center gap-2 border-t py-2.5 h-12.5"
       >
-        <span class="text-xs text-ink-gray-4">{{ __("FROM") }}:</span>
+        <span class="text-p-xs text-ink-gray-4">{{ __("From") }}:</span>
         <FormControl
           v-model="fromEmail"
           type="select"
@@ -31,7 +31,7 @@
         />
       </div>
       <div class="mx-6 md:mx-5 flex items-center gap-2 border-y py-2.5">
-        <span class="text-xs text-gray-500">TO:</span>
+        <span class="text-p-xs text-gray-500">{{ __("To") }}:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
           class="flex-1"

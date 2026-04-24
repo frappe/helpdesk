@@ -8,7 +8,7 @@
           :label="__('Email Settings')"
           size="md"
           class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-xl hover:opacity-70 !pr-0 !max-w-96 !justify-start"
-          @click="emit('updateStep', 'profile')"
+          @click="goBack"
         />
         <Transition name="fade">
           <Badge
@@ -121,8 +121,24 @@
       </div>
     </template>
   </SettingsLayoutBase>
+  <ConfirmDialog
+    v-model="showConfirmDialog.show"
+    :title="showConfirmDialog.title"
+    :message="showConfirmDialog.message"
+    :onConfirm="showConfirmDialog.onConfirm"
+    :onCancel="
+      () => {
+        if (showConfirmDialog.onCancel) {
+          showConfirmDialog.onCancel();
+        } else {
+          showConfirmDialog.show = false;
+        }
+      }
+    "
+  />
 </template>
 <script setup>
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
 import {
   Badge,
@@ -133,11 +149,14 @@ import {
   toast,
 } from "frappe-ui";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { disableSettingModalOutsideClick } from "../settingsModal";
 const { userId } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
 const emit = defineEmits(["updateStep"]);
+import { __ } from "@/translation";
+import { normalize } from "@/utils";
 
 const currentUserEmailInfo = createResource({
   url: "helpdesk.api.auth.get_current_user_email_info",
@@ -159,7 +178,8 @@ const filteredEmails = computed(() => {
 
 const isSignatureDirty = computed(() => {
   return (
-    currentUserEmailInfo.data?.email_signature !== user?.doc?.email_signature
+    normalize(currentUserEmailInfo.data?.email_signature) !==
+    normalize(user?.doc?.email_signature)
   );
 });
 
@@ -171,9 +191,15 @@ const isUserEmailListDirty = computed(() => {
   );
 });
 
-const isDirty = computed(
-  () => isSignatureDirty.value || isUserEmailListDirty.value
-);
+const isDirty = computed(() => {
+  return isSignatureDirty.value || isUserEmailListDirty.value;
+});
+
+if (isDirty.value) {
+  disableSettingModalOutsideClick.value = true;
+} else {
+  disableSettingModalOutsideClick.value = false;
+}
 
 function addEmail(email) {
   if (!user.doc.user_emails) user.doc.user_emails = [];
@@ -194,7 +220,37 @@ function update() {
     onSuccess: () => {
       toast.success(__("Email settings updated successfully."));
       currentUserEmailInfo.reload();
+      user.reload();
     },
   });
 }
+
+watch(isDirty, (val) => {
+  disableSettingModalOutsideClick.value = val;
+});
+
+const showConfirmDialog = ref({
+  show: false,
+  title: "",
+  message: "",
+  onConfirm: () => {},
+});
+
+const goBack = () => {
+  const confirmDialogInfo = {
+    show: true,
+    title: __("Unsaved changes"),
+    message: __(
+      "Are you sure you want to go back? Unsaved changes will be lost."
+    ),
+    onConfirm: goBack,
+  };
+  if (isDirty.value && !showConfirmDialog.value.show) {
+    showConfirmDialog.value = confirmDialogInfo;
+    return;
+  }
+
+  showConfirmDialog.value.show = false;
+  emit("updateStep", "profile");
+};
 </script>
