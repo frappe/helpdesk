@@ -423,13 +423,9 @@ async function removeAttachment(attachment) {
 const showSavedRepliesSelectorModal = ref(false);
 
 function applySavedReplies(template: string) {
-  isContentEmpty(newEmail.value)
-    ? (newEmail.value = template)
-    : (newEmail.value = newEmail.value + "\n" + template);
-  newEmail.value += "<p></p>";
-  nextTick(() => {
-    editorRef.value?.editor?.commands?.focus("end");
-  });
+  const textEditor = editorRef.value?.editor;
+  if (!textEditor) return;
+  textEditor.chain().focus("start").insertContent(template).run();
 }
 
 const sendMail = createResource({
@@ -485,6 +481,10 @@ function submitMail() {
   sendMail.submit();
 }
 
+function getInitialContent() {
+  return emailSignature.value ? emailSignature.value : "<p></p>";
+}
+
 function addToReply(
   body: string,
   toEmails: string[],
@@ -505,9 +505,7 @@ function addToReply(
   }
 
   nextTick(() => {
-    newEmail.value = emailSignature.value
-      ? emailSignature.value
-      : editorRef.value.editor.getHTML();
+    newEmail.value = getInitialContent();
   });
   focusEditorAtStart();
 }
@@ -522,7 +520,7 @@ function resetState() {
 
 function handleDiscard() {
   attachments.value = [];
-  newEmail.value = emailSignature.value ? emailSignature.value : null;
+  newEmail.value = getInitialContent();
   quotedContent.value = null;
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
@@ -595,6 +593,12 @@ function handleKeydown(e: KeyboardEvent) {
     return;
   }
 }
+
+watch(emailSignature, (sig) => {
+  if (sig && isContentEmpty(newEmail.value)) {
+    newEmail.value = sig;
+  }
+});
 
 onBeforeUnmount(() => {
   cleanup();
