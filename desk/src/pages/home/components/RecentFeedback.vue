@@ -227,6 +227,7 @@ import {
   FeatherIcon,
   TabButtons,
   ECharts,
+  useTheme,
 } from "frappe-ui";
 import LucideStar from "~icons/lucide/star";
 import { useRouter } from "vue-router";
@@ -448,7 +449,18 @@ const barChartOptions = computed<EChartsOption>(() => {
   };
 });
 
+const { currentTheme } = useTheme();
+const cssVar = (name: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
 const placeholderChartOptions = computed<EChartsOption>(() => {
+  // re-compute on theme change
+  currentTheme.value;
+
+  const placeholderColor = cssVar("--surface-gray-3");
+  const axisLineColor = cssVar("--outline-gray-2");
+  const axisLabelColor = cssVar("--ink-gray-5");
+
   const placeholderValues = Array.from(
     { length: 5 },
     () => Math.floor(Math.random() * 11) + 3
@@ -456,7 +468,7 @@ const placeholderChartOptions = computed<EChartsOption>(() => {
   const data = placeholderValues.map((value) => ({
     value,
     itemStyle: {
-      color: "#f1f1f1",
+      color: placeholderColor,
       borderRadius: [4, 4, 0, 0],
     },
   }));
@@ -472,10 +484,10 @@ const placeholderChartOptions = computed<EChartsOption>(() => {
     xAxis: {
       type: "category",
       data: ["1", "2", "3", "4", "5"],
-      axisLine: { show: true, lineStyle: { color: "#e2e2e2" } },
+      axisLine: { show: true, lineStyle: { color: axisLineColor } },
       axisTick: { show: false },
       axisLabel: {
-        color: "#e2e2e2",
+        color: axisLabelColor,
         fontSize: 12,
       },
     },
