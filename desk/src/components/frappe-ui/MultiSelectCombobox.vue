@@ -78,7 +78,7 @@
               >
                 <ComboboxInput
                   ref="searchInput"
-                  class="form-input w-full"
+                  class="form-input w-full bg-transparent"
                   type="text"
                   :value="query"
                   @change="query = $event.target.value"

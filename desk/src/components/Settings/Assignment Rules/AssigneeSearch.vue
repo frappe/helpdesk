@@ -16,7 +16,7 @@
           <div class="relative px-1.5 pt-0.5">
             <ComboboxInput
               ref="search"
-              class="form-input w-full"
+              class="form-input w-full bg-transparent"
               type="text"
               @change="
                 (e) => {
