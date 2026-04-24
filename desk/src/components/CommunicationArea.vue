@@ -195,7 +195,7 @@ watch(
   () => showEmailBox.value,
   (value) => {
     if (value) {
-      emailEditorRef.value?.editor?.commands?.focus();
+      emailEditorRef.value?.editor?.commands?.focus("start");
     }
   }
 );

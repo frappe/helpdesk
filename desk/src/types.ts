@@ -153,6 +153,10 @@ export interface Communication {
   sender: string;
   bcc?: string;
   cc?: string;
+  sent_or_received?: "Sent" | "Received";
+  email_account?: string;
+  sender_full_name?: string;
+  sender_mail_id?: string;
 }
 
 export interface Activity {

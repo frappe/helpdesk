@@ -114,17 +114,20 @@ const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend
+// sender mail will be  user using portal
 const _activities = computed(() => {
   if (!activities.value?.data) {
     return [];
   }
-
   const emailProps = activities.value?.data?.communications.map(
     (email, idx: number) => {
       return {
         subject: email.subject,
         content: email.content,
-        sender: { name: email.user.email, full_name: email.user.name },
+        sender: {
+          name: email.user.email,
+          full_name: email.user.name,
+        },
         to: email.recipients,
         type: "email",
         key: email.creation,
