@@ -227,8 +227,8 @@ import {
   FeatherIcon,
   TabButtons,
   ECharts,
-  useTheme,
 } from "frappe-ui";
+import { dataTheme } from "@/utils";
 import LucideStar from "~icons/lucide/star";
 import { useRouter } from "vue-router";
 import { dayjsLocal } from "frappe-ui";
@@ -449,13 +449,12 @@ const barChartOptions = computed<EChartsOption>(() => {
   };
 });
 
-const { currentTheme } = useTheme();
 const cssVar = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
 const placeholderChartOptions = computed<EChartsOption>(() => {
   // re-compute on theme change
-  currentTheme.value;
+  dataTheme.value;
 
   const placeholderColor = cssVar("--surface-gray-3");
   const axisLineColor = cssVar("--outline-gray-2");

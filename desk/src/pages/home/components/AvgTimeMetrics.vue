@@ -69,8 +69,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, type PropType } from "vue";
 import { EChartsOption } from "echarts";
-import { createResource, TabButtons, ECharts, useTheme } from "frappe-ui";
-import { formatTime } from "@/utils";
+import { createResource, TabButtons, ECharts } from "frappe-ui";
+import { dataTheme, formatTime } from "@/utils";
 import { __ } from "@/translation";
 
 type MetricsData = {
@@ -123,14 +123,12 @@ const timeAverages = computed(() => {
   };
 });
 
-const { currentTheme } = useTheme();
-
 const cssVar = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
 const chartConfig = computed<EChartsOption>(() => {
   // re-compute on theme change
-  currentTheme.value;
+  dataTheme.value;
 
   let data = getAvgTimeMetricsResource.fetched
     ? getAvgTimeMetricsResource.data?.data
