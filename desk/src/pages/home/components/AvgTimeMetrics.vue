@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, type PropType } from "vue";
 import { EChartsOption } from "echarts";
-import { createResource, TabButtons, ECharts } from "frappe-ui";
+import { createResource, TabButtons, ECharts, useTheme } from "frappe-ui";
 import { formatTime } from "@/utils";
 import { __ } from "@/translation";
 
@@ -123,7 +123,15 @@ const timeAverages = computed(() => {
   };
 });
 
+const { currentTheme } = useTheme();
+
+const cssVar = (name: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
 const chartConfig = computed<EChartsOption>(() => {
+  // re-compute on theme change
+  currentTheme.value;
+
   let data = getAvgTimeMetricsResource.fetched
     ? getAvgTimeMetricsResource.data?.data
     : props.data?.data || [];
@@ -132,11 +140,12 @@ const chartConfig = computed<EChartsOption>(() => {
     legend: {},
     tooltip: {
       trigger: "item",
-      borderColor: "#eee",
+      backgroundColor: cssVar("--surface-white"),
+      borderColor: cssVar("--outline-gray-2"),
       borderWidth: 1,
       padding: 10,
       textStyle: {
-        color: "#000",
+        color: cssVar("--ink-gray-9"),
       },
       formatter: (params) => {
         const p = params as unknown as {
@@ -188,7 +197,7 @@ const chartConfig = computed<EChartsOption>(() => {
       splitLine: {
         lineStyle: {
           type: "dashed",
-          color: "#ddd",
+          color: cssVar("--outline-gray-2"),
           width: 0.8,
         },
       },
@@ -196,13 +205,13 @@ const chartConfig = computed<EChartsOption>(() => {
     series: [
       {
         type: "bar",
-        color: "black",
+        color: cssVar("--surface-gray-7"),
         barWidth: "12%",
         itemStyle: { borderRadius: [4, 4, 0, 0] },
       },
       {
         type: "bar",
-        color: "#E2E2E2",
+        color: cssVar("--surface-gray-4"),
         barWidth: "12%",
         itemStyle: { borderRadius: [4, 4, 0, 0] },
       },
