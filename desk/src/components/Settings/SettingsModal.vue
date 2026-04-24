@@ -33,7 +33,7 @@
                 class="flex h-7 w-full items-center gap-2 rounded px-2 py-[7px]"
                 :class="[
                   activeTab?.label == item.label
-                    ? 'bg-surface-white shadow-sm'
+                    ? 'bg-surface-selected shadow-sm'
                     : 'hover:bg-surface-gray-2',
                 ]"
                 @click="() => onTabChange(item)"
