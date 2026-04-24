@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { getFontFamily, stripEmailColors } from "@/utils";
+import { dataTheme, getFontFamily, stripEmailColors } from "@/utils";
 import { computed, ref, watch } from "vue";
 
 const props = defineProps({
@@ -197,8 +197,7 @@ watch(iframeRef, (iframe) => {
 
       const parent = emailContent.closest("html");
       if (!parent) return;
-      let theme = document.documentElement.getAttribute("data-theme");
-      parent.setAttribute("data-theme", theme);
+      parent.setAttribute("data-theme", dataTheme.value);
 
       const font = getFontFamily(_content.value);
       if (font) emailContent.classList.add(font);
@@ -222,5 +221,10 @@ watch(iframeRef, (iframe) => {
       }
     };
   }
+});
+
+watch(dataTheme, (theme) => {
+  const html = iframeRef.value?.contentDocument?.documentElement;
+  if (html) html.setAttribute("data-theme", theme);
 });
 </script>
