@@ -40,7 +40,7 @@
         />
         <div class="flex gap-1.5">
           <Button
-            :label="'CC'"
+            :label="__('Cc')"
             variant="ghost"
             :class="[
               cc || showCC
@@ -50,7 +50,7 @@
             @click="toggleCC()"
           />
           <Button
-            :label="'BCC'"
+            :label="__('Bcc')"
             variant="ghost"
             :class="[
               bcc || showBCC
@@ -66,7 +66,7 @@
         class="mx-5 flex items-center gap-2 py-2.5"
         :class="cc || showCC ? 'border-b' : ''"
       >
-        <span class="text-xs text-gray-500">CC:</span>
+        <span class="text-xs text-gray-500">{{ __("Cc:") }}</span>
         <MultiSelectInput
           ref="ccInput"
           v-model="ccEmailsClone"
@@ -80,7 +80,7 @@
         class="mx-5 flex items-center gap-2 py-2.5"
         :class="bcc || showBCC ? 'border-b' : ''"
       >
-        <span class="text-xs text-gray-500">BCC:</span>
+        <span class="text-xs text-gray-500">{{ __("Bcc:") }}</span>
         <MultiSelectInput
           ref="bccInput"
           v-model="bccEmailsClone"
@@ -379,22 +379,26 @@ function toggleBCC() {
 
 const fromEmail = useStorage<string | "">("from-email", "");
 
-const from = computed(() => {
-  const userEmails: { email_account: string; email_id: string }[] =
-    userResource.data?.outgoing_emails ?? [];
-  if (!userEmails.length) return [];
+const outgoingEmails = computed<{ email_account: string; email_id: string }[]>(
+  () => userResource.data?.outgoing_emails ?? []
+);
 
-  const emailsMapped = userEmails.map((e) => ({
+// selected mail from the outgoing emails list
+const selectedFromEmail = computed(() =>
+  outgoingEmails.value.find((e) => e.email_id === fromEmail.value)
+);
+
+const from = computed(() => {
+  if (!outgoingEmails.value.length) return [];
+  if (
+    outgoingEmails.value.length === 1 &&
+    outgoingEmails.value[0].email_id === userResource.data?.email
+  )
+    return [];
+  return outgoingEmails.value.map((e) => ({
     label: e.email_account + " <" + e.email_id + ">",
     value: e.email_id,
   }));
-
-  if (
-    emailsMapped.length === 1 &&
-    emailsMapped[0].value === userResource.data?.email
-  )
-    return [];
-  return emailsMapped;
 });
 
 const hasMultipleSenders = computed(() => (from?.value.length ?? 0) > 1);
@@ -434,7 +438,7 @@ const sendMail = createResource({
     method: "reply_via_agent",
     args: {
       attachments: attachments.value.map((x) => x.name),
-      from_email: fromEmail.value,
+      from_email: selectedFromEmail.value,
       to: toEmailsClone.value.join(","),
       cc: ccEmailsClone.value?.join(","),
       bcc: bccEmailsClone.value?.join(","),
