@@ -569,6 +569,7 @@ class HDTicket(Document):
     def reply_via_agent(
         self,
         message: str,
+        from_email: dict | None = None,
         to: str | None = None,
         cc: str | None = None,
         bcc: str | None = None,
@@ -581,10 +582,24 @@ class HDTicket(Document):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject}"
-        sender = frappe.session.user
+        from_email_id = from_email.get("email_id") if from_email else None
+        email_account_name = from_email.get("email_account") if from_email else None
+        sender = from_email_id or frappe.session.user
         recipients = to or self.raised_by
-        sender_email = None if skip_email_workflow else self.sender_email()
 
+        sender_email = None
+        if not skip_email_workflow:
+            if email_account_name:
+                if not frappe.db.exists("Email Account", email_account_name):
+                    frappe.throw(
+                        _("No Email Account found for {0}").format(from_email_id)
+                    )
+                sender_email = frappe._dict(
+                    name=email_account_name, email_id=from_email_id
+                )
+            else:
+                sender_email = self.sender_email()
+                email_account_name = sender_email.name if sender_email else None
         if recipients == "Administrator":
             admin_email = frappe.get_value("User", "Administrator", "email")
             recipients = admin_email
@@ -597,7 +612,7 @@ class HDTicket(Document):
                 "communication_type": "Communication",
                 "content": message,
                 "doctype": "Communication",
-                "email_account": sender_email.name if sender_email else None,
+                "email_account": email_account_name,
                 "email_status": "Open",
                 "recipients": recipients,
                 "reference_doctype": "HD Ticket",

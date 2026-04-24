@@ -342,6 +342,13 @@ export function isContentEmpty(content: string) {
   return doc.body.textContent.trim() === "";
 }
 
+export function normalize(value: any) {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  return value;
+}
+
 export function isTouchScreenDevice() {
   return "ontouchstart" in document.documentElement;
 }

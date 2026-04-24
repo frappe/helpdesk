@@ -1,6 +1,6 @@
 import frappe
 
-from helpdesk.utils import get_agents_team
+from helpdesk.utils import agent_only, get_agents_team
 from helpdesk.utils import is_agent as _is_agent
 
 
@@ -52,4 +52,41 @@ def get_user():
         "time_zone": user.time_zone,
         "user_teams": user_team_names,
         "language": language,
+    }
+
+
+@frappe.whitelist()
+@agent_only
+def get_current_user_email_info():
+    user = frappe.session.user
+
+    email_signature, email = frappe.db.get_value(
+        "User", user, ["email_signature", "email"]
+    )
+    user_emails = frappe.db.get_all(
+        "User Email",
+        filters={"parent": user},
+        fields=["email_account", "email_id"],
+    )
+    outgoing_account_names = frappe.db.get_all(
+        "Email Account",
+        filters={"enable_outgoing": 1},
+        pluck="name",
+    )
+
+    outgoing_emails = [
+        row for row in user_emails if row.email_account in outgoing_account_names
+    ]
+
+    available_emails = frappe.db.get_all(
+        "Email Account",
+        filters={"enable_outgoing": 1},
+        fields=["name", "email_id"],
+    )
+
+    return {
+        "email_signature": email_signature,
+        "email": email,
+        "outgoing_emails": outgoing_emails,
+        "available_emails": available_emails,
     }
