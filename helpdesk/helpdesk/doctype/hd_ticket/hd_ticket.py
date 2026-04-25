@@ -1370,7 +1370,7 @@ def close_tickets_after_n_days():
             # activity log for auto closing the ticket
             log_ticket_activity(
                 doc.name,
-                f"automatically closed after {days_threshold} day{'s' if days_threshold > 1 else ''} of inactivity",
+                f"automatically closed the ticket after {days_threshold} day{'s' if days_threshold > 1 else ''} of inactivity",
             )
         except Exception as e:
             frappe.log_error(
