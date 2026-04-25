@@ -2,7 +2,6 @@ import json
 import uuid
 from datetime import timedelta
 from email.utils import parseaddr
-from functools import lru_cache
 
 import frappe
 from bs4 import BeautifulSoup
