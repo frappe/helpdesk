@@ -1375,7 +1375,6 @@ def close_tickets_after_n_days():
     tickets_to_close = list(set(tickets_to_close))
 
     # cant do set_value because SLA will not be applied as setting directly to db and doc is not running.
-    tickets_to_close = ["24152"]
     for ticket in tickets_to_close:
         doc = frappe.get_doc("HD Ticket", ticket)
         doc.status = "Closed"
