@@ -203,6 +203,7 @@ import {
   h,
   onMounted,
   onUnmounted,
+  PropType,
   provide,
   ref,
   watchEffect,
@@ -275,9 +276,11 @@ const subjectInput = ref(null);
 const showPhoneModal = ref(false);
 const customActions = ref([]);
 
+type ticketId = string | number;
+
 const props = defineProps({
   ticketId: {
-    type: String,
+    type: [String, Number] as PropType<ticketId>,
     required: true,
   },
 });
