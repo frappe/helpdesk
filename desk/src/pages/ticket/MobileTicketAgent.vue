@@ -264,8 +264,13 @@ const { getUser } = useUserStore();
 const router = useRouter();
 const { $dialog } = globalStore();
 
-const ticketAgentActivitiesRef = ref(null);
-const communicationAreaRef = ref(null);
+const ticketAgentActivitiesRef = ref<InstanceType<
+  typeof TicketAgentActivities
+> | null>(null);
+const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
+  null
+);
+
 const subjectInput = ref(null);
 const showPhoneModal = ref(false);
 const customActions = ref([]);
