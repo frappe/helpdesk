@@ -365,6 +365,7 @@ class HDTicket(Document):
             "agent_group": "team",
             "ticket_type": "type",
             "contact": "contact",
+            "sla": "SLA",
         }
         for field in [
             "status",
@@ -372,6 +373,7 @@ class HDTicket(Document):
             "agent_group",
             "contact",
             "ticket_type",
+            "sla",
         ]:
             if self.has_value_changed(field):
                 log_ticket_activity(
@@ -1170,8 +1172,6 @@ class HDTicket(Document):
         for tag in soup.find_all(["img", "video"]):
             if tag.name == "img":
                 tag["embed"] = tag.get("src")
-                tag["width"] = "80%"
-                tag["height"] = "80%"
             elif tag.name == "video":
                 tag["embed"] = tag.get("src")
 
@@ -1360,9 +1360,22 @@ def close_tickets_after_n_days():
     tickets_to_close = list(set(tickets_to_close))
 
     # cant do set_value because SLA will not be applied as setting directly to db and doc is not running.
+    tickets_to_close = ["24152"]
     for ticket in tickets_to_close:
         doc = frappe.get_doc("HD Ticket", ticket)
         doc.status = "Closed"
         doc.flags.ignore_validate = True
-        doc.save(ignore_permissions=True)
+        try:
+            doc.save(ignore_permissions=True)
+            # activity log for auto closing the ticket
+            log_ticket_activity(
+                doc.name,
+                f"automatically closed after {days_threshold} day{'s' if days_threshold > 1 else ''} of inactivity",
+            )
+        except Exception as e:
+            frappe.log_error(
+                message=f"Failed to auto close ticket {doc.name} after {days_threshold} days. Error: {e}",
+                title="Auto Close Ticket Failed",
+            )
+
         frappe.db.commit()  # nosemgrep
