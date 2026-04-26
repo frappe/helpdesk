@@ -2,7 +2,6 @@ import json
 import uuid
 from datetime import timedelta
 from email.utils import parseaddr
-from functools import lru_cache
 
 import frappe
 from bs4 import BeautifulSoup
@@ -365,6 +364,7 @@ class HDTicket(Document):
             "agent_group": "team",
             "ticket_type": "type",
             "contact": "contact",
+            "sla": "SLA",
         }
         for field in [
             "status",
@@ -372,6 +372,7 @@ class HDTicket(Document):
             "agent_group",
             "contact",
             "ticket_type",
+            "sla",
         ]:
             if self.has_value_changed(field):
                 log_ticket_activity(
@@ -1377,5 +1378,17 @@ def close_tickets_after_n_days():
         doc = frappe.get_doc("HD Ticket", ticket)
         doc.status = "Closed"
         doc.flags.ignore_validate = True
-        doc.save(ignore_permissions=True)
+        try:
+            doc.save(ignore_permissions=True)
+            # activity log for auto closing the ticket
+            log_ticket_activity(
+                doc.name,
+                f"automatically closed the ticket after {days_threshold} day{'s' if days_threshold > 1 else ''} of inactivity",
+            )
+        except Exception as e:
+            frappe.log_error(
+                message=f"Failed to auto close ticket {doc.name} after {days_threshold} days. Error: {e}",
+                title="Auto Close Ticket Failed",
+            )
+
         frappe.db.commit()  # nosemgrep

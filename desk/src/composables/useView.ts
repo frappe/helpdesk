@@ -13,7 +13,7 @@ const debouncedSetValue = useDebounceFn(
       views.reload();
     });
   },
-  500
+  300
 );
 
 export const views = createListResource({
