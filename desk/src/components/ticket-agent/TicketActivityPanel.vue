@@ -7,7 +7,7 @@
   >
     <template #tab-panel="{ tab }">
       <TicketAgentActivities
-        v-if="Boolean(activities.data) && !activities.loading"
+        v-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
         :activities="filterActivities(tab.name as TicketTab)"
         :title="tab.label"
