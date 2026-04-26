@@ -1,10 +1,6 @@
 import frappe
 from frappe.utils import add_days, get_datetime, now_datetime
 
-# Hide the onboarding popup once user is familiar with product
-ONBOARDING_TICKET_THRESHOLD = 50
-ONBOARDING_AGE_DAYS = 30
-
 
 @frappe.whitelist()
 def should_show_onboarding() -> bool:
@@ -19,12 +15,22 @@ def should_show_onboarding() -> bool:
     ``useOnboarding("helpdesk").isOnboardingStepsCompleted``, so it's not
     re-checked here.
     """
+
+    settings = frappe.db.get_value(
+        "HD Settings",
+        "HD Settings",
+        ["ticket_count_limit", "user_age_limit"],
+        as_dict=True,
+    )
+
+    ticket_threshold = settings.ticket_count_limit or 50
+    age_days = settings.user_age_limit or 30
     ticket_count = frappe.db.count("HD Ticket")
-    count_condition = ticket_count > ONBOARDING_TICKET_THRESHOLD
+    count_condition = ticket_count > ticket_threshold
 
     user_creation = frappe.db.get_value("User", frappe.session.user, "creation")
     user_age_condition = user_creation and get_datetime(user_creation) < add_days(
-        now_datetime(), -ONBOARDING_AGE_DAYS
+        now_datetime(), -age_days
     )
     if count_condition and user_age_condition:
         return False
