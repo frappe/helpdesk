@@ -35,25 +35,14 @@
     >
       <!-- left side -->
       <div class="flex items-center gap-2 max-w-[50%]">
-        <div v-if="parseAssignees.length">
-          <component :is="parseAssignees.length == 1 ? 'Button' : 'div'">
-            <MultipleAvatar
-              :avatars="parseAssignees"
-              @click="showAssignmentModal = true"
-            />
-          </component>
-        </div>
-        <button
-          v-else
-          class="rounded bg-gray-100 px-2 py-1.5 text-base text-gray-800"
-          @click="showAssignmentModal = true"
-        >
-          {{ __("Assign") }}
-        </button>
+        <AssignTo :hide-label="true" />
       </div>
       <!-- right side -->
       <div class="flex items-center gap-2">
-        <CustomActions v-if="customActions.length" :actions="customActions" />
+        <CustomActions
+          v-if="mobileCustomActions.length"
+          :actions="mobileCustomActions"
+        />
       </div>
     </header>
     <div v-if="ticket.doc?.name" class="flex flex-1 overflow-x-hidden">
@@ -135,15 +124,7 @@
         </div>
       </div>
     </div>
-    <AssignmentModal
-      v-if="ticket.doc?.name"
-      v-model="showAssignmentModal"
-      :assignees="parseAssignees"
-      :docname="ticketId"
-      :team="ticket.doc?.agent_group"
-      doctype="HD Ticket"
-      @update="() => reloadTicket(props.ticketId)"
-    />
+
     <Dialog v-model="showSubjectDialog">
       <template #body-title>
         <h3>{{ __("Rename") }}</h3>
@@ -209,12 +190,7 @@ import {
   watchEffect,
 } from "vue";
 
-import {
-  AssignmentModal,
-  CommunicationArea,
-  LayoutHeader,
-  MultipleAvatar,
-} from "@/components";
+import { CommunicationArea, LayoutHeader } from "@/components";
 import {
   ActivityIcon,
   CommentIcon,
@@ -225,6 +201,8 @@ import {
 } from "@/components/icons";
 import { TicketAgentActivities } from "@/components/ticket";
 
+import CustomActions from "@/components/CustomActions.vue";
+import AssignTo from "@/components/ticket-agent/AssignTo.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import TicketAgentDetails from "@/components/ticket/TicketAgentDetails.vue";
 import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
@@ -288,16 +266,6 @@ const props = defineProps({
 const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
 const assignees = computed(() => ticketComposable.value.assignees);
-const parseAssignees = computed(() =>
-  (assignees.value.data || []).map(({ name }) => {
-    const user = getUser(name);
-    return {
-      name,
-      label: user.full_name || name,
-      image: user.user_image || "",
-    };
-  })
-);
 const contact = computed(() => ticketComposable.value.contact);
 const activities = computed(() => ticketComposable.value.activities);
 
@@ -329,6 +297,29 @@ watchEffect(async () => {
     await setupCustomizations(customizations.data, customizationCtx.value);
     customActions.value = [...(customizations.data?._customActions || [])];
   }
+});
+
+// On mobile, collapse all custom actions into a single three-dot group
+const mobileCustomActions = computed(() => {
+  if (!customActions.value.length) return [];
+
+  const items: { label: string; onClick: () => void }[] = [];
+
+  for (const action of customActions.value) {
+    if (action.group) {
+      // Grouped action (with or without buttonLabel) — flatten its items
+      for (const item of action.items || []) {
+        items.push({ label: item.label, onClick: item.onClick });
+      }
+    } else {
+      // Normal standalone button
+      items.push({ label: action.label, onClick: action.onClick });
+    }
+  }
+
+  if (!items.length) return [];
+
+  return [{ group: "Actions", hideLabel: true, items }];
 });
 
 const ticketFields = computed(() => {
@@ -419,7 +410,6 @@ provide("onCallEnded", () => reloadTicket(props.ticketId));
 
 const { isMobileView } = useScreenSize();
 
-const showAssignmentModal = ref(false);
 const showSubjectDialog = ref(false);
 
 const breadcrumbs = computed(() => {
