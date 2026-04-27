@@ -37,7 +37,19 @@ def get_default_email_content(type: str) -> str:
   <p><strong>Subject:</strong> {{ doc.subject }}</p>
   <p><strong>Raised By:</strong> {{ doc.raised_by }}</p>
   <p><strong>Priority:</strong> {{ doc.priority }}</p>
-
+   <div style="margin-bottom: 10px">
+    <h3 style="margin-bottom: 20px">Message</h3>
+    <div
+      style="
+        background: #f3f5f8;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #e5e9ee;
+      "
+    >
+      {{ message }}
+    </div>
+  </div>
   <br />
   <p>
     You can view and respond to this ticket by

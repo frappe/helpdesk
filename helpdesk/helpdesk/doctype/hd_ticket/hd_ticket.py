@@ -694,7 +694,7 @@ class HDTicket(Document):
             "HD Settings", "enable_reply_email_to_agent"
         ):
             # send email to assigned agents
-            self.send_reply_email_to_agent()
+            self.send_reply_email_to_agent(message)
 
         # if self.status_category == "Paused" and not new_ticket:
         if not new_ticket:
@@ -754,7 +754,9 @@ class HDTicket(Document):
                 doc.attached_to_name = self.name
                 doc.save()
 
-    def send_reply_email_to_agent(self):
+    def send_reply_email_to_agent(
+        self, message: str = "Please check the latest update on the portal."
+    ):
         assigned_agents = self.get_assigned_agents()
         if not assigned_agents:
             return
@@ -775,7 +777,8 @@ class HDTicket(Document):
                     {
                         "ticket_url": frappe.utils.get_url(
                             "/helpdesk/tickets/" + str(self.name)
-                        )
+                        ),
+                        "message": message,
                     },
                 ),
                 reference_doctype="HD Ticket",
