@@ -212,6 +212,7 @@ import {
 } from "@/tiptap-extensions";
 import {
   getFontFamily,
+  htmlToText,
   isContentEmpty,
   removeAttachmentFromServer,
   textEditorMenuButtons,
@@ -278,7 +279,6 @@ const emit = defineEmits(["submit", "discard"]);
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
-const auth = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const editorRef = ref(null);
@@ -290,11 +290,19 @@ function focusEditorAtStart() {
   }, 0);
 }
 
-const newEmail = useStorage<null | string>(
+const cachedEmail = useStorage<null | string>(
   "emailBoxContent" + props.ticketId,
   null
 );
+
+const newEmail = ref<null | string>(cachedEmail.value);
+
 const emailSignature = ref<string | null>(null);
+
+function isOnlySignature(content: string | null) {
+  if (!content || !emailSignature.value) return false;
+  return htmlToText(content) === htmlToText(emailSignature.value);
+}
 
 const userResource = createResource({
   url: "helpdesk.api.auth.get_current_user_email_info",
@@ -307,6 +315,9 @@ const userResource = createResource({
         newEmail.value = emailSignature.value;
         focusEditorAtStart();
       }
+      if (isOnlySignature(cachedEmail.value)) {
+        cachedEmail.value = null;
+      }
     }
   },
 });
@@ -315,6 +326,7 @@ watch(newEmail, (newValue, oldValue) => {
   if (newValue !== oldValue && newValue) {
     onUserType();
   }
+  cachedEmail.value = isOnlySignature(newValue) ? null : newValue;
 });
 
 const quotedContent = useStorage<null | string>(
