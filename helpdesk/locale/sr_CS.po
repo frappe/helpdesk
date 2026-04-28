@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-03-29 10:43+0000\n"
-"PO-Revision-Date: 2026-04-02 11:02\n"
+"POT-Creation-Date: 2026-04-05 10:43+0000\n"
+"PO-Revision-Date: 2026-04-06 13:11\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Serbian (Latin)\n"
 "MIME-Version: 1.0\n"
@@ -168,7 +168,7 @@ msgstr "Dodaj novi članak"
 msgid "Add Weekly Holidays"
 msgstr "Dodaj nedeljne praznike"
 
-#: desk/src/components/layouts/Sidebar.vue:464
+#: desk/src/components/layouts/Sidebar.vue:481
 msgid "Add a comment on a ticket"
 msgstr "Dodaj komentar na tiket"
 
@@ -337,7 +337,7 @@ msgstr "Svi sporazumi o nivou usluge su u okviru cilja"
 msgid "All Time"
 msgstr "Svi vremenski periodi"
 
-#: desk/src/components/layouts/Sidebar.vue:259
+#: desk/src/components/layouts/Sidebar.vue:276
 msgid "All Views"
 msgstr "Svi prikazi"
 
@@ -524,7 +524,7 @@ msgstr "Članci su uspešno premešteni."
 msgid "Assign"
 msgstr "Dodeli"
 
-#: desk/src/components/layouts/Sidebar.vue:441
+#: desk/src/components/layouts/Sidebar.vue:458
 msgid "Assign a ticket to an agent"
 msgstr "Dodeli tiket agentu"
 
@@ -839,7 +839,7 @@ msgstr "CSV"
 msgid "Call Details"
 msgstr "Detalji poziva"
 
-#: desk/src/components/layouts/Sidebar.vue:254
+#: desk/src/components/layouts/Sidebar.vue:271
 msgid "Call Logs"
 msgstr "Evidencija poziva"
 
@@ -1074,7 +1074,7 @@ msgstr "Zatvoreno"
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "Zatvoreni ili ocenjeni tiketi ne mogu biti ažurirani od strane osoba koje nisu agenti"
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Collapse"
 msgstr "Sažmi"
 
@@ -1190,7 +1190,7 @@ msgstr "Potvrdi lozinku"
 msgid "Confirm overwrite"
 msgstr "Potvrdi izmenu"
 
-#: desk/src/components/layouts/Sidebar.vue:398
+#: desk/src/components/layouts/Sidebar.vue:415
 msgid "Connect your support email"
 msgstr "Povežite svoj imejl za podršku"
 
@@ -1267,15 +1267,15 @@ msgstr "Neuspešno slanje imejla sa povratnom informacijom zbog: {0}"
 #: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
-#: desk/src/components/layouts/Sidebar.vue:500
+#: desk/src/components/layouts/Sidebar.vue:517
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
 #: desk/src/pages/knowledge-base/NewArticle.vue:31
 msgid "Create"
 msgstr "Kreiraj"
 
-#: desk/src/components/layouts/Sidebar.vue:493
-#: desk/src/components/layouts/Sidebar.vue:499
+#: desk/src/components/layouts/Sidebar.vue:510
+#: desk/src/components/layouts/Sidebar.vue:516
 msgid "Create & invite a contact"
 msgstr "Kreiraj i pozovi kontakt"
 
@@ -1287,11 +1287,11 @@ msgstr "Kreiraj novi kontakt"
 msgid "Create View"
 msgstr "Kreiraj prikaz"
 
-#: desk/src/components/layouts/Sidebar.vue:431
+#: desk/src/components/layouts/Sidebar.vue:448
 msgid "Create a ticket"
 msgstr "Kreiraj tiket"
 
-#: desk/src/components/layouts/Sidebar.vue:476
+#: desk/src/components/layouts/Sidebar.vue:493
 msgid "Create an article"
 msgstr "Kreiraj članak"
 
@@ -1344,7 +1344,7 @@ msgstr "Naziv klijenta"
 msgid "Customer created successfully."
 msgstr "Klijent je uspešno kreiran."
 
-#: desk/src/components/layouts/Sidebar.vue:316
+#: desk/src/components/layouts/Sidebar.vue:333
 msgid "Customer portal"
 msgstr "Portal za klijente"
 
@@ -1361,7 +1361,7 @@ msgstr "Prilagodite podešavanja imejl obaveštenja kako biste ostali informisan
 msgid "Cyan"
 msgstr "Cijan"
 
-#: desk/src/components/layouts/Sidebar.vue:350
+#: desk/src/components/layouts/Sidebar.vue:367
 #: desk/src/pages/knowledge-base/Article.vue:642
 msgid "Danger"
 msgstr "Opasno"
@@ -1612,7 +1612,7 @@ msgstr "Ne ograničavaj tikete bez tima"
 msgid "DocType"
 msgstr "DocType"
 
-#: desk/src/components/layouts/Sidebar.vue:330
+#: desk/src/components/layouts/Sidebar.vue:347
 msgid "Docs"
 msgstr "Dokumenta"
 
@@ -1885,11 +1885,11 @@ msgstr "Excel"
 msgid "Exotel"
 msgstr "Exotel"
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Expand"
 msgstr "Proširi"
 
-#: desk/src/components/layouts/Sidebar.vue:513
+#: desk/src/components/layouts/Sidebar.vue:530
 msgid "Explore customer portal"
 msgstr "Istražite portal za klijente"
 
@@ -2149,7 +2149,7 @@ msgid "Fulfilled"
 msgstr "Ispunjeno"
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/layouts/Sidebar.vue:484
+#: desk/src/components/layouts/Sidebar.vue:501
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
 msgstr "Opšte"
@@ -2433,7 +2433,7 @@ msgstr "Ponder naslova"
 msgid "Hello {{ contact }}, \\n\\nWe are sorry for the inconvenience, we will get back to you soon. \\n\\nRegards, \\n{{ full_name }}"
 msgstr "Zdravo {{ contact }}, \\n\\nŽao nam je zbog neprijatnosti, uskoro ćemo Vam odgovoriti. \\n\\nSrdačan pozdrav, \\n{{ full_name }}"
 
-#: desk/src/components/layouts/Sidebar.vue:117
+#: desk/src/components/layouts/Sidebar.vue:122
 msgid "Help"
 msgstr "Pomoć"
 
@@ -2683,7 +2683,7 @@ msgstr "Pozovi agente"
 msgid "Invite agent"
 msgstr "Pozovi agenta"
 
-#: desk/src/components/layouts/Sidebar.vue:409
+#: desk/src/components/layouts/Sidebar.vue:426
 msgid "Invite agents"
 msgstr "Pozovi agente"
 
@@ -2960,12 +2960,12 @@ msgstr "Učitaj više"
 msgid "Log a Call"
 msgstr "Evidentiraj poziv"
 
-#: desk/src/components/layouts/Sidebar.vue:305
-#: desk/src/components/layouts/Sidebar.vue:354
+#: desk/src/components/layouts/Sidebar.vue:322
+#: desk/src/components/layouts/Sidebar.vue:371
 msgid "Log out"
 msgstr "Odjavite se"
 
-#: desk/src/components/layouts/Sidebar.vue:334
+#: desk/src/components/layouts/Sidebar.vue:351
 msgid "Login to Frappe Cloud"
 msgstr "Prijava na Frappe Cloud"
 
@@ -3818,7 +3818,7 @@ msgstr "Prioritet <u>{0}</u> mora biti uključen u sporazum o nivou usluge {1}."
 msgid "Priority {0} has been repeated."
 msgstr "Prioritet {0} je ponovljen."
 
-#: desk/src/components/layouts/Sidebar.vue:275
+#: desk/src/components/layouts/Sidebar.vue:292
 #: desk/src/pages/ticket/Tickets.vue:329
 msgid "Private Views"
 msgstr "Privatni prikazi"
@@ -3846,7 +3846,7 @@ msgstr "Profil je uspešno ažuriran."
 msgid "Public"
 msgstr "Javni"
 
-#: desk/src/components/layouts/Sidebar.vue:267
+#: desk/src/components/layouts/Sidebar.vue:284
 #: desk/src/pages/ticket/Tickets.vue:344
 msgid "Public Views"
 msgstr "Javni prikazi"
@@ -4074,7 +4074,7 @@ msgstr "Odgovor agenta"
 msgid "Reply from contact"
 msgstr "Odgovor kontakta"
 
-#: desk/src/components/layouts/Sidebar.vue:452
+#: desk/src/components/layouts/Sidebar.vue:469
 msgid "Reply on a ticket"
 msgstr "Odgovorite na tiket"
 
@@ -4571,7 +4571,7 @@ msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</stro
 msgstr "Postavljanje <strong>{0}</strong> kao podrazumevani sporazum o nivou usluge uklanja <strong>{1}</strong> kao podrazumevani sporazum. Neophodno je da dodate uslov u <strong>{1}</strong> da bi sporazum o nivou usluge mogao da funkcioniše."
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
-#: desk/src/components/layouts/Sidebar.vue:345
+#: desk/src/components/layouts/Sidebar.vue:362
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Settings"
 msgstr "Podešavanja"
@@ -4596,7 +4596,7 @@ msgstr "Postavke"
 msgid "Setup Email"
 msgstr "Podesite imejl"
 
-#: desk/src/components/layouts/Sidebar.vue:420
+#: desk/src/components/layouts/Sidebar.vue:437
 msgid "Setup SLA"
 msgstr "Postavke sporazuma o nivou usluge"
 
@@ -4615,7 +4615,7 @@ msgstr "Podeli povratnu informaciju"
 msgid "Share feedback"
 msgstr "Podeli povratnu informaciju"
 
-#: desk/src/components/layouts/Sidebar.vue:340
+#: desk/src/components/layouts/Sidebar.vue:357
 msgid "Shortcuts"
 msgstr "Prečice"
 
@@ -4830,7 +4830,7 @@ msgstr "Rezime"
 msgid "Sunday"
 msgstr "Nedelja"
 
-#: desk/src/components/layouts/Sidebar.vue:325
+#: desk/src/components/layouts/Sidebar.vue:342
 msgid "Support"
 msgstr "Podrška"
 

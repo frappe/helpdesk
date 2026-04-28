@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-03-29 10:43+0000\n"
-"PO-Revision-Date: 2026-04-02 11:02\n"
+"POT-Creation-Date: 2026-04-05 10:43+0000\n"
+"PO-Revision-Date: 2026-04-22 17:19\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -168,7 +168,7 @@ msgstr ""
 msgid "Add Weekly Holidays"
 msgstr "افزودن تعطیلات هفتگی"
 
-#: desk/src/components/layouts/Sidebar.vue:464
+#: desk/src/components/layouts/Sidebar.vue:481
 msgid "Add a comment on a ticket"
 msgstr ""
 
@@ -337,7 +337,7 @@ msgstr ""
 msgid "All Time"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:259
+#: desk/src/components/layouts/Sidebar.vue:276
 msgid "All Views"
 msgstr ""
 
@@ -401,7 +401,7 @@ msgstr "اعمال SLA برای زمان حل و فصل"
 #. Label of the apply_to (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply To"
-msgstr ""
+msgstr "اعمال بر"
 
 #. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -424,7 +424,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:447
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Archived"
-msgstr ""
+msgstr "بایگانی شده"
 
 #: desk/src/components/Settings/SettingsModal.vue:61
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
@@ -524,7 +524,7 @@ msgstr ""
 msgid "Assign"
 msgstr "اختصاص دادن"
 
-#: desk/src/components/layouts/Sidebar.vue:441
+#: desk/src/components/layouts/Sidebar.vue:458
 msgid "Assign a ticket to an agent"
 msgstr ""
 
@@ -563,7 +563,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Assignment"
-msgstr ""
+msgstr "تخصیص"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:137
 msgid "Assignment Condition"
@@ -588,7 +588,7 @@ msgstr "قانون تخصیص"
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:5
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Assignment Rules"
-msgstr ""
+msgstr "قوانین تخصیص"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:11
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
@@ -656,7 +656,7 @@ msgstr "پیوست"
 #. Label of the author (Link) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Author"
-msgstr ""
+msgstr "نویسنده"
 
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:80
@@ -839,7 +839,7 @@ msgstr "CSV"
 msgid "Call Details"
 msgstr "جزئیات تماس"
 
-#: desk/src/components/layouts/Sidebar.vue:254
+#: desk/src/components/layouts/Sidebar.vue:271
 msgid "Call Logs"
 msgstr "لاگ تماس"
 
@@ -1068,13 +1068,13 @@ msgstr "بستن تیکت"
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Closed"
-msgstr ""
+msgstr "بسته شده"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:354
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Collapse"
 msgstr "جمع شدن"
 
@@ -1190,7 +1190,7 @@ msgstr "گذرواژه را تأیید کنید"
 msgid "Confirm overwrite"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:398
+#: desk/src/components/layouts/Sidebar.vue:415
 msgid "Connect your support email"
 msgstr ""
 
@@ -1267,15 +1267,15 @@ msgstr ""
 #: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
-#: desk/src/components/layouts/Sidebar.vue:500
+#: desk/src/components/layouts/Sidebar.vue:517
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
 #: desk/src/pages/knowledge-base/NewArticle.vue:31
 msgid "Create"
 msgstr "ایجاد کردن"
 
-#: desk/src/components/layouts/Sidebar.vue:493
-#: desk/src/components/layouts/Sidebar.vue:499
+#: desk/src/components/layouts/Sidebar.vue:510
+#: desk/src/components/layouts/Sidebar.vue:516
 msgid "Create & invite a contact"
 msgstr ""
 
@@ -1287,11 +1287,11 @@ msgstr "ایجاد مخاطب جدید"
 msgid "Create View"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:431
+#: desk/src/components/layouts/Sidebar.vue:448
 msgid "Create a ticket"
 msgstr "ایجاد تیکت"
 
-#: desk/src/components/layouts/Sidebar.vue:476
+#: desk/src/components/layouts/Sidebar.vue:493
 msgid "Create an article"
 msgstr "ایجاد یک مقاله"
 
@@ -1344,7 +1344,7 @@ msgstr "نام مشتری"
 msgid "Customer created successfully."
 msgstr "مشتری با موفقیت ایجاد شد."
 
-#: desk/src/components/layouts/Sidebar.vue:316
+#: desk/src/components/layouts/Sidebar.vue:333
 msgid "Customer portal"
 msgstr "پورتال مشتری"
 
@@ -1361,7 +1361,7 @@ msgstr ""
 msgid "Cyan"
 msgstr "فیروزه‌ای"
 
-#: desk/src/components/layouts/Sidebar.vue:350
+#: desk/src/components/layouts/Sidebar.vue:367
 #: desk/src/pages/knowledge-base/Article.vue:642
 msgid "Danger"
 msgstr "خطر"
@@ -1612,7 +1612,7 @@ msgstr ""
 msgid "DocType"
 msgstr "DocType"
 
-#: desk/src/components/layouts/Sidebar.vue:330
+#: desk/src/components/layouts/Sidebar.vue:347
 msgid "Docs"
 msgstr ""
 
@@ -1736,7 +1736,7 @@ msgstr "محتوای ایمیل"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:110
 msgid "Email Id"
-msgstr ""
+msgstr "شناسه ایمیل"
 
 #. Label of the email_customisations_tab (Tab Break) field in DocType 'HD
 #. Settings'
@@ -1885,11 +1885,11 @@ msgstr "اکسل"
 msgid "Exotel"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Expand"
 msgstr "بسط دادن"
 
-#: desk/src/components/layouts/Sidebar.vue:513
+#: desk/src/components/layouts/Sidebar.vue:530
 msgid "Explore customer portal"
 msgstr ""
 
@@ -2063,7 +2063,7 @@ msgstr "فیلدها"
 #. Label of the filters (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
-msgstr ""
+msgstr "فیلترها"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:76
 #: desk/src/components/Settings/General/components/TicketSettings.vue:229
@@ -2149,7 +2149,7 @@ msgid "Fulfilled"
 msgstr "برآورده شد"
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/layouts/Sidebar.vue:484
+#: desk/src/components/layouts/Sidebar.vue:501
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
 msgstr "عمومی"
@@ -2433,7 +2433,7 @@ msgstr ""
 msgid "Hello {{ contact }}, \\n\\nWe are sorry for the inconvenience, we will get back to you soon. \\n\\nRegards, \\n{{ full_name }}"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:117
+#: desk/src/components/layouts/Sidebar.vue:122
 msgid "Help"
 msgstr "کمک"
 
@@ -2631,7 +2631,7 @@ msgstr "صندوق ورودی"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:203
 msgid "Incoming"
-msgstr ""
+msgstr "ورودی"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:212
 msgid "Initiated"
@@ -2683,7 +2683,7 @@ msgstr ""
 msgid "Invite agent"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:409
+#: desk/src/components/layouts/Sidebar.vue:426
 msgid "Invite agents"
 msgstr ""
 
@@ -2761,7 +2761,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Key"
-msgstr ""
+msgstr "کلید"
 
 #: desk/src/components/modals/ShortcutsModal.vue:4
 msgid "Keyboard Shortcuts"
@@ -2797,7 +2797,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Landing Page"
-msgstr ""
+msgstr "صفحه فرود"
 
 #: desk/src/components/Settings/Profile/Profile.vue:138
 msgid "Language"
@@ -2911,7 +2911,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Link"
-msgstr ""
+msgstr "پیوند"
 
 #. Label of the link_options_sb (Section Break) field in DocType 'HD Support
 #. Search Source'
@@ -2936,7 +2936,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
-msgstr ""
+msgstr "فهرست"
 
 #: desk/src/pages/ticket/Tickets.vue:309
 msgid "List View"
@@ -2960,12 +2960,12 @@ msgstr "بارگذاری بیشتر"
 msgid "Log a Call"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:305
-#: desk/src/components/layouts/Sidebar.vue:354
+#: desk/src/components/layouts/Sidebar.vue:322
+#: desk/src/components/layouts/Sidebar.vue:371
 msgid "Log out"
 msgstr "خروج"
 
-#: desk/src/components/layouts/Sidebar.vue:334
+#: desk/src/components/layouts/Sidebar.vue:351
 msgid "Login to Frappe Cloud"
 msgstr "ورود به Frappe Cloud"
 
@@ -3041,7 +3041,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Mention"
-msgstr ""
+msgstr "اشاره"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:154
 msgid "Merge"
@@ -3243,7 +3243,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:52
 msgid "New users will have to be manually registered by system managers."
-msgstr ""
+msgstr "کاربران جدید باید به صورت دستی توسط مدیران سیستم ثبت شوند."
 
 #: desk/src/components/modals/ShortcutsModal.vue:110
 msgid "Next ticket"
@@ -3509,7 +3509,7 @@ msgstr "نارنجی"
 #. Label of the order (Int) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Order"
-msgstr ""
+msgstr "ترتیب"
 
 #. Label of the order_by_tab (Tab Break) field in DocType 'HD View'
 #. Label of the order_by (Code) field in DocType 'HD View'
@@ -3531,7 +3531,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:204
 msgid "Outgoing"
-msgstr ""
+msgstr "خروجی"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:199
 msgid "Outside working hours notice"
@@ -3618,7 +3618,7 @@ msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:46
 msgid "Period"
-msgstr ""
+msgstr "دوره"
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
 #: desk/src/components/SavedRepliesSelectorModal.vue:164
@@ -3816,7 +3816,7 @@ msgstr ""
 msgid "Priority {0} has been repeated."
 msgstr "اولویت {0} تکرار شده است."
 
-#: desk/src/components/layouts/Sidebar.vue:275
+#: desk/src/components/layouts/Sidebar.vue:292
 #: desk/src/pages/ticket/Tickets.vue:329
 msgid "Private Views"
 msgstr ""
@@ -3844,7 +3844,7 @@ msgstr "نمایه با موفقیت به‌روزرسانی شد."
 msgid "Public"
 msgstr "عمومی"
 
-#: desk/src/components/layouts/Sidebar.vue:267
+#: desk/src/components/layouts/Sidebar.vue:284
 #: desk/src/pages/ticket/Tickets.vue:344
 msgid "Public Views"
 msgstr ""
@@ -3870,7 +3870,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
-msgstr ""
+msgstr "دریافت ایمیل‌ها"
 
 #: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
@@ -3923,7 +3923,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
-msgstr ""
+msgstr "امتیازدهی"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
@@ -4050,7 +4050,7 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Replied"
-msgstr ""
+msgstr "پاسخ داده شده"
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -4072,7 +4072,7 @@ msgstr ""
 msgid "Reply from contact"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:452
+#: desk/src/components/layouts/Sidebar.vue:469
 msgid "Reply on a ticket"
 msgstr ""
 
@@ -4143,7 +4143,7 @@ msgstr "حل شد"
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:113
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Response"
-msgstr ""
+msgstr "پاسخ"
 
 #. Label of the response_by (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -4375,12 +4375,12 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:72
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Scope"
-msgstr ""
+msgstr "دامنه"
 
 #. Label of the script (Code) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Script"
-msgstr ""
+msgstr "اسکریپت"
 
 #. Label of the search_tab (Tab Break) field in DocType 'HD Settings'
 #: desk/src/components/SavedRepliesSelectorModal.vue:27
@@ -4569,7 +4569,7 @@ msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</stro
 msgstr ""
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
-#: desk/src/components/layouts/Sidebar.vue:345
+#: desk/src/components/layouts/Sidebar.vue:362
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Settings"
 msgstr "تنظیمات"
@@ -4594,7 +4594,7 @@ msgstr "تنظیمات"
 msgid "Setup Email"
 msgstr "تنظیم ایمیل"
 
-#: desk/src/components/layouts/Sidebar.vue:420
+#: desk/src/components/layouts/Sidebar.vue:437
 msgid "Setup SLA"
 msgstr ""
 
@@ -4613,7 +4613,7 @@ msgstr "اشتراک گذاری بازخورد"
 msgid "Share feedback"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:340
+#: desk/src/components/layouts/Sidebar.vue:357
 msgid "Shortcuts"
 msgstr "میانبرها"
 
@@ -4720,7 +4720,7 @@ msgstr "تاریخ شروع"
 #. Label of the start_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "Start Time"
-msgstr ""
+msgstr "زمان شروع"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:98
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
@@ -4827,7 +4827,7 @@ msgstr "خلاصه"
 msgid "Sunday"
 msgstr "یک‌شنبه"
 
-#: desk/src/components/layouts/Sidebar.vue:325
+#: desk/src/components/layouts/Sidebar.vue:342
 msgid "Support"
 msgstr "پشتیبانی"
 
@@ -4855,7 +4855,7 @@ msgstr "مترادف‌ها"
 #. Label of the is_system (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "System"
-msgstr ""
+msgstr "سیستم"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
