@@ -61,7 +61,7 @@
             <template #default>
               <Button
                 variant="ghost"
-                class="kebab-btn hidden !size-4 ml-0"
+                class="kebab-btn hidden !size-4 ml-0 rounded-sm"
                 icon="more-horizontal"
                 @click.stop
               />
