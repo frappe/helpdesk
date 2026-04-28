@@ -28,54 +28,52 @@
           </template>
         </Button>
       </template>
-      <template #item="{ item }">
-        <button
-          class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base hover:bg-surface-gray-3"
-          @click="item.onClick"
+
+      <template #item-prefix="{ item }">
+        <FeatherIcon
+          v-if="item.icon && typeof item.icon === 'string'"
+          :name="item.icon"
+          class="h-4 w-4 flex-shrink-0 text-ink-gray-7"
+          aria-hidden="true"
+        />
+        <component
+          class="h-4 w-4 flex-shrink-0 text-ink-gray-7"
+          v-else-if="item.icon"
+          :is="item.icon"
+        />
+      </template>
+
+      <template #item-label="{ item }">
+        <span class="whitespace-nowrap">{{ item.label }}</span>
+        <Badge
+          v-if="item.is_standard"
+          class="ml-1"
+          size="sm"
+          label="Standard"
+        />
+      </template>
+      <template #item-suffix="{ item }">
+        <div
+          v-if="item.name"
+          class="flex flex-row-reverse gap-2 items-center min-w-11"
         >
-          <div class="flex items-center">
-            <FeatherIcon
-              v-if="item.icon && typeof item.icon === 'string'"
-              :name="item.icon"
-              class="mr-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
-              aria-hidden="true"
-            />
-            <component
-              class="mr-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
-              v-else-if="item.icon"
-              :is="item.icon"
-            />
-            <span class="whitespace-nowrap">
-              {{ item.label }}
-            </span>
-            <Badge
-              v-if="item.is_standard"
-              class="ml-1"
-              size="sm"
-              label="Standard"
-            />
-          </div>
-          <div
-            v-if="item.name"
-            class="flex flex-row-reverse gap-2 items-center min-w-11"
-          >
-            <Dropdown placement="right-start" :options="dropdownActions(item)">
-              <template #default>
-                <Button
-                  variant="ghost"
-                  class="group-hover:!size-5 !size-0 group-hover:opacity-100 opacity-0 group-hover:ml-0 -ml-2"
-                  icon="more-horizontal"
-                  @click.stop
-                />
-              </template>
-            </Dropdown>
-            <FeatherIcon
-              v-if="isCurrentView(item)"
-              name="check"
-              class="size-4 text-ink-gray-7"
-            />
-          </div>
-        </button>
+          <Dropdown align="end" :options="dropdownActions(item)">
+            <template #default>
+              <Button
+                variant="ghost"
+                class="kebab-btn hidden !size-4 ml-0 rounded-sm"
+                icon="more-horizontal"
+                @click.stop
+              />
+            </template>
+          </Dropdown>
+
+          <FeatherIcon
+            v-if="isCurrentView(item)"
+            name="check"
+            class="size-4 text-ink-gray-7"
+          />
+        </div>
       </template>
     </Dropdown>
   </div>
@@ -116,3 +114,10 @@ const isCurrentView = (item) => {
   return item.name === route.query.view;
 };
 </script>
+
+<style>
+[data-slot="item"][data-highlighted] .kebab-btn,
+[data-slot="item"][data-state="checked"] .kebab-btn {
+  display: block;
+}
+</style>
