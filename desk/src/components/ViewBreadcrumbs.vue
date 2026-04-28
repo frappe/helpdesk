@@ -28,6 +28,7 @@
           </template>
         </Button>
       </template>
+
       <template #item-prefix="{ item }">
         <FeatherIcon
           v-if="item.icon && typeof item.icon === 'string'"
@@ -60,12 +61,13 @@
             <template #default>
               <Button
                 variant="ghost"
-                class="group-hover:!size-5 !size-0 group-hover:opacity-100 opacity-0 group-hover:ml-0 -ml-2"
+                class="kebab-btn hidden !size-4 ml-0"
                 icon="more-horizontal"
                 @click.stop
               />
             </template>
           </Dropdown>
+
           <FeatherIcon
             v-if="isCurrentView(item)"
             name="check"
@@ -112,3 +114,10 @@ const isCurrentView = (item) => {
   return item.name === route.query.view;
 };
 </script>
+
+<style>
+[data-slot="item"][data-highlighted] .kebab-btn,
+[data-slot="item"][data-state="checked"] .kebab-btn {
+  display: block;
+}
+</style>
