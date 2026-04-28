@@ -98,11 +98,25 @@ class HDTicket(Document):
             self.handle_ticket_activity_update()
 
         self.handle_email_feedback()
+        self.calculate_time_log_hours()
 
         if self.is_new():
             self.raised_outside_working_hours = (
                 self.is_currently_outside_working_hours()
             )
+
+    def calculate_time_log_hours(self):
+        total = 0
+        for row in self.time_logs or []:
+            if row.start_time and row.end_time:
+                from frappe.utils import time_diff_in_hours
+
+                hours = time_diff_in_hours(row.end_time, row.start_time)
+                if hours < 0:
+                    hours += 24  # crossed midnight
+                row.hours = round(hours, 2)
+            total += row.hours or 0
+        self.total_hours = round(total, 2)
 
     def _get_rendered_template(
         self, content: str, default_content: str, args: dict[str, str] | None = None
