@@ -16,25 +16,21 @@ def should_show_onboarding() -> bool:
     re-checked here.
     """
 
-    settings = frappe.db.get_value(
-        "HD Settings",
-        "HD Settings",
-        ["ticket_count_limit", "user_age_limit"],
-        as_dict=True,
-    )
+    ticket_count_limit = frappe.db.get_single_value("HD Settings", "ticket_count_limit")
+    user_age_limit = frappe.db.get_single_value("HD Settings", "user_age_limit")
 
-    ticket_threshold = settings.ticket_count_limit or 50
-    age_days = settings.user_age_limit or 30
+    ticket_threshold = ticket_count_limit or 50
+    age_days = user_age_limit or 30
     ticket_count = frappe.db.count("HD Ticket")
     count_condition = ticket_count > ticket_threshold
 
     user_creation = frappe.db.get_value("User", frappe.session.user, "creation")
-    user_age_condition = user_creation and get_datetime(user_creation) < add_days(
-        now_datetime(), -age_days
-    )
-    if count_condition and user_age_condition:
-        return False
-    return True
+    user_age_condition = False
+    if user_age_condition:
+        user_age_condition = user_creation and get_datetime(user_creation) < add_days(
+            now_datetime(), -age_days
+        )
+    return not (count_condition and user_age_condition)
 
 
 @frappe.whitelist()
