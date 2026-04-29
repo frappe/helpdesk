@@ -144,6 +144,7 @@ class HelpdeskDashboard:
             self.get_avg_first_response_time(),
             self.get_avg_resolution_time(),
             self.get_avg_feedback_score(),
+            self.get_stuck_ticket_count(),
         ]
 
     def get_ticket_count(self):
@@ -234,6 +235,30 @@ class HelpdeskDashboard:
             "delta": (current - prev) * 5,
             "deltaSuffix": " " + _("stars"),
             "tooltip": _("Avg. feedback rating for the tickets resolved"),
+        }
+
+    def get_stuck_ticket_count(self):
+        """Count currently stuck tickets (not period-based — shows live count)."""
+        conds = [self.ticket.is_stuck == 1]
+        if self.combined_cond:
+            conds.append(self.combined_cond)
+
+        combined = reduce(operator.and_, conds)
+        query = (
+            frappe.qb.from_(self.ticket)
+            .select(Count(self.ticket.name).as_("count"))
+            .where(combined)
+        )
+        result = query.run(as_dict=True)
+        count = result[0].count if result else 0
+
+        return {
+            "title": _("Stuck Tickets"),
+            "value": count,
+            "delta": None,
+            "deltaSuffix": "",
+            "negativeIsBetter": True,
+            "tooltip": _("Tickets flagged as stuck (open > 3 days, paused > 3 days, or 4+ status changes)"),
         }
 
     def get_trend_data(self):

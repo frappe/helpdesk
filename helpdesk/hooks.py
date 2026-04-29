@@ -41,6 +41,11 @@ scheduler_events = {
     "daily": [
         "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
     ],
+    "cron": {
+        "0 */4 * * *": [
+            "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.detect_stuck_tickets"
+        ]
+    },
 }
 
 

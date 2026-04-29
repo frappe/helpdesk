@@ -849,3 +849,42 @@ def show_outside_hours_banner(ticket_name: str | int):
         return {"msg": banner_data.get("banner_msg"), "show": True}
 
     return {"show": False}
+
+
+@frappe.whitelist()
+def add_time_log(ticket_id: str, date: str, start_time: str = None, end_time: str = None, hours: float = 0, note: str = None):
+    from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import log_ticket_activity
+
+    frappe.has_permission("HD Ticket", "write", ticket_id, throw=True)
+    ticket = frappe.get_doc("HD Ticket", ticket_id)
+    ticket.append("time_logs", {
+        "date": date,
+        "start_time": start_time,
+        "end_time": end_time,
+        "hours": hours,
+        "note": note,
+        "user": frappe.session.user,
+    })
+    ticket.save()
+
+    logged_hours = ticket.time_logs[-1].hours
+    action = f"logged {logged_hours}h"
+    if note:
+        action += f": {note}"
+    log_ticket_activity(ticket_id, action)
+
+    return ticket.as_dict()
+
+
+@frappe.whitelist()
+def delete_time_log(ticket_id: str, row_name: str):
+    from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import log_ticket_activity
+
+    frappe.has_permission("HD Ticket", "write", ticket_id, throw=True)
+    ticket = frappe.get_doc("HD Ticket", ticket_id)
+    ticket.time_logs = [row for row in ticket.time_logs if str(row.name) != str(row_name)]
+    ticket.save()
+
+    log_ticket_activity(ticket_id, f"removed a time log (total now {ticket.total_hours}h)")
+
+    return ticket.as_dict()

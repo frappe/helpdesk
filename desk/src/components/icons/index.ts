@@ -8,6 +8,7 @@ export { default as DescendingIcon } from "./DescendingIcon.vue";
 export { default as DetailsIcon } from "./DetailsIcon.vue";
 export { default as DotIcon } from "./DotIcon.vue";
 export { default as DragIcon } from "./DragIcon.vue";
+export { default as DurationIcon } from "./DurationIcon.vue";
 export { default as EditIcon } from "./EditIcon.vue";
 export { default as EmailAtIcon } from "./EmailAtIcon.vue";
 export { default as EmailIcon } from "./EmailIcon.vue";
