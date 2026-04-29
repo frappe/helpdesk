@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_import": 1,
- "autoname": "autoincrement",
+ "autoname": "HD-TKT-.YYYY.-.#####",
  "creation": "2023-10-17 14:27:11.078679",
  "doctype": "DocType",
  "document_type": "Setup",
@@ -473,7 +473,7 @@
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

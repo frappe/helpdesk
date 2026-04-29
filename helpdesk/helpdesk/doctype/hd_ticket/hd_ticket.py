@@ -68,9 +68,6 @@ class HDTicket(Document):
             "helpdesk:ticket-update", room=room, data={"ticket_id": self.name}
         )
 
-    def autoname(self):
-        return self.name
-
     def before_insert(self):
         self.generate_key()
 
@@ -1014,7 +1011,7 @@ class HDTicket(Document):
         columns = [
             {
                 "label": "ID",
-                "type": "Int",
+                "type": "Data",
                 "key": "name",
                 "width": "5rem",
             },
@@ -1100,7 +1097,7 @@ class HDTicket(Document):
         customer_portal_columns = [
             {
                 "label": "ID",
-                "type": "Int",
+                "type": "Data",
                 "key": "name",
                 "width": "5rem",
             },
