@@ -32,6 +32,7 @@ from helpdesk.helpdesk.utils.email import (
 )
 from helpdesk.search import HelpdeskSearch
 from helpdesk.utils import (
+    agent_only,
     capture_event,
     get_agents_team,
     get_customer,
@@ -255,7 +256,7 @@ class HDTicket(Document):
         self.ticket_type = ticket_type
 
     def set_raised_by(self):
-        self.raised_by = self.raised_by or frappe.session.user
+        self.raised_by = self.raised_by if is_agent() else frappe.session.user
 
     def set_contact(self):
         email_id = parseaddr(self.raised_by)[1]
@@ -443,6 +444,7 @@ class HDTicket(Document):
         return True
 
     @frappe.whitelist()
+    @agent_only
     def assign_agent(self, agent: str):
         assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
 
@@ -565,6 +567,7 @@ class HDTicket(Document):
             )
 
     @frappe.whitelist()
+    @agent_only
     def reply_via_agent(
         self,
         message: str,
