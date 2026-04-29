@@ -401,11 +401,14 @@ const logo = h(
   null
 );
 
+const canShowOnboarding = ref(false);
+
 const showOnboardingBanner = computed(() => {
   return (
     !isCustomerPortal.value &&
     !isOnboardingStepsCompleted.value &&
-    authStore.isManager
+    authStore.isManager &&
+    canShowOnboarding.value
   );
 });
 
@@ -618,7 +621,7 @@ const articles = ref([
 const showIntermediateModal = ref(false);
 const currentStep = ref({});
 
-const { isOnboardingStepsCompleted, setUp, updateOnboardingStep } =
+const { isOnboardingStepsCompleted, setUp, updateOnboardingStep, skipAll } =
   useOnboarding("helpdesk");
 
 async function handleFirstTicketNavigation() {
@@ -652,9 +655,20 @@ async function getGeneralCategory() {
   return generalCategory;
 }
 
-function setUpOnboarding() {
+async function setUpOnboarding() {
   if (!authStore.isManager) return;
+  try {
+    canShowOnboarding.value = await call(
+      "helpdesk.api.onboarding.should_show_onboarding"
+    );
+  } catch {
+    canShowOnboarding.value = true;
+  }
   setUp(steps);
+  if (!canShowOnboarding.value) {
+    skipAll();
+    return;
+  }
   useShortcut({ key: "h", meta: true }, () => {
     showHelpModal.value = !showHelpModal.value;
   });
