@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex flex-col h-full">
     <LayoutHeader>
       <template #left-header>
         <ViewBreadcrumbs
@@ -57,6 +57,7 @@ import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
+import { useListScroll } from "@/composables/useListScroll";
 import { dayjs } from "@/dayjs";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
@@ -70,6 +71,9 @@ import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
 const route = useRoute();
+
+// Enable keyboard navigation for list scrolling
+useListScroll();
 
 const {
   getCurrentUserViews,
