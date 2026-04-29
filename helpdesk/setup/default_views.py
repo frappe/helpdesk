@@ -6,16 +6,16 @@ default_views = [
         "docstatus": 0,
         "doctype": "HD View",
         "dt": "HD Ticket",
-        "filters": '{"sla":["is","set"],"agreement_status":["in","First Response Due, Resolution Due"],"status_category":["!=","Resolved"],"_assign":["LIKE","%@me%"]}',
+        "filters": '{"sla":["is","set"],"agreement_status":["in","First Response Due,Resolution Due"],"status_category":"Open","_assign":["LIKE","%@me%"],"creation":["timespan","last 6 months"]}',
         "group_by_field": None,
         "icon": "⏳",
         "is_customer_portal": 0,
         "is_default": 0,
         "is_standard": 1,
-        "label": "SLA Due",
+        "label": "SLA Alerts",
         "load_default_columns": 0,
         "modified": "2026-03-12 11:24:26.568571",
-        "name": "STD-VIEW-SLA-DUE",
+        "name": "STD-VIEW-SLA-ALERTS",
         "order_by": "response_by asc",
         "pinned": 0,
         "public": 1,
@@ -29,7 +29,7 @@ default_views = [
         "docstatus": 0,
         "doctype": "HD View",
         "dt": "HD Ticket",
-        "filters": '{"__assigned_on":["timespan","last week"],"status_category":"Open","_assign":["LIKE","%@me%"]}',
+        "filters": '{"__assigned_on":["timespan","this week"],"status_category":"Open","_assign":["LIKE","%@me%"],"creation":["timespan","last 6 months"]}',
         "group_by_field": None,
         "icon": "🆕",
         "is_customer_portal": 0,
@@ -52,7 +52,7 @@ default_views = [
         "docstatus": 0,
         "doctype": "HD View",
         "dt": "HD Ticket",
-        "filters": '{"_assign":["LIKE","%@me%"],"status_category":["!=","Resolved"],"last_customer_response":["is","set"],"last_agent_response":["is","not set"]}',
+        "filters": '{"_assign":["LIKE","%@me%"],"status_category":"Open","last_customer_response":["is","set"],"creation":["timespan","last 6 months"]}',
         "group_by_field": None,
         "icon": "📋",
         "is_customer_portal": 0,
@@ -105,3 +105,25 @@ def add_default_views(for_existing_sites=False):
             if for_existing_sites:
                 doc.public = 0
             doc.insert(ignore_permissions=True)
+
+
+def update_default_views():
+    """Update standard views with latest definitions."""
+    for view in default_views:
+        view_name = view["name"]
+        if frappe.db.exists("HD View", view_name):
+            doc = frappe.get_doc("HD View", view_name)
+            doc.update(
+                {
+                    "columns": view["columns"],
+                    "filters": view["filters"],
+                    "icon": view["icon"],
+                    "label": view["label"],
+                    "order_by": view["order_by"],
+                    "rows": view["rows"],
+                    "dt": view["dt"],
+                    "route_name": view["route_name"],
+                    "type": view["type"],
+                }
+            )
+            doc.save(ignore_permissions=True)

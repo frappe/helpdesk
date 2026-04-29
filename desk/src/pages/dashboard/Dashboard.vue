@@ -225,6 +225,18 @@ interface NumberCardData {
   tooltip: string;
 }
 
+type Filters = {
+  period: string;
+  agent: null | string;
+  team: null | string;
+};
+
+const filters = reactive<Filters>({
+  period: getLastXDays(),
+  agent: null,
+  team: null,
+});
+
 interface ChartData {
   data: ChartValues[];
   title: string;
@@ -303,12 +315,6 @@ const tabButtons = computed(() => {
   ];
 });
 
-const filters = reactive({
-  period: getLastXDays(),
-  agent: null,
-  team: null,
-});
-
 const hasAppliedFilter = computed(() => {
   return (
     filters.agent ||
@@ -326,12 +332,21 @@ const isEmpty = computed(() => {
   );
 });
 
+const parseFilters = (filters: Filters) => {
+  return {
+    from_date: filters.period.split(",")[0],
+    to_date: filters.period.split(",")[1],
+    team: filters.team,
+    agent: filters.agent,
+  };
+};
+
 const numberCards = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   cache: ["Analytics", "NumberCards"],
   params: {
     dashboard_type: "number_card",
-    filters,
+    filters: parseFilters(filters),
   },
 });
 
@@ -340,7 +355,7 @@ const masterData = createResource({
   cache: ["Analytics", "MasterCharts"],
   params: {
     dashboard_type: "master",
-    filters,
+    filters: parseFilters(filters),
   },
 });
 
@@ -349,7 +364,7 @@ const trendData = createResource({
   cache: ["Analytics", "TrendCharts"],
   params: {
     dashboard_type: "trend",
-    filters,
+    filters: parseFilters(filters),
   },
 });
 
@@ -432,7 +447,8 @@ function getChartType(chart: any) {
 function getLastXDays(range: number = 30): string {
   const today = new Date();
   const lastXDate = new Date(today);
-  lastXDate.setDate(today.getDate() - range);
+
+  lastXDate.setDate(today.getDate() - (range > 0 ? range - 1 : 0));
 
   return `${dayjs(lastXDate).format("YYYY-MM-DD")},${dayjs(today).format(
     "YYYY-MM-DD"
