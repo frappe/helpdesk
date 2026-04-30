@@ -111,6 +111,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Priority",
+   "link_filters": "[[\"HD Ticket Priority\",\"disabled\",\"=\",0]]",
    "options": "HD Ticket Priority"
   },
   {
@@ -469,7 +470,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-02-27 16:42:43.292656",
+ "modified": "2026-04-30 19:58:44.919596",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
