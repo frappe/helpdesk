@@ -114,9 +114,9 @@ import { useTyping } from "@/composables/realtime";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import {
+  CleanStyles,
   ComponentUtils,
   HandleExcelPaste,
-  CleanStyles,
 } from "@/tiptap-extensions";
 import {
   getFontFamily,
@@ -232,6 +232,12 @@ onMounted(() => {
     return;
   }
   agentsList.value.fetch();
+});
+
+onBeforeUnmount(() => {
+  if (isContentEmpty(newComment.value)) {
+    localStorage.removeItem("commentBoxContent" + props.ticketId);
+  }
 });
 
 defineExpose({

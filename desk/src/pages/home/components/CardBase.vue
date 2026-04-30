@@ -24,19 +24,21 @@
               vs {{ currentDuration.toLowerCase() }}
               <FeatherIcon name="chevron-down" class="size-4" />
             </div>
-            <template #item="{ item }">
+            <template #item-label="{ item }">
               <div
-                class="data-[disabled]:cursor-not-allowed group flex h-7 w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+                class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
               >
                 <span>
                   {{ item.label }}
                 </span>
-                <FeatherIcon
-                  v-if="item.label == __(currentDuration)"
-                  name="check"
-                  class="size-4"
-                />
               </div>
+            </template>
+            <template #item-suffix="{ item }">
+              <FeatherIcon
+                v-if="item.label == __(currentDuration)"
+                name="check"
+                class="size-4"
+              />
             </template>
           </Dropdown>
         </div>
