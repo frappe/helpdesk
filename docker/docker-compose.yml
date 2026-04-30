@@ -9,11 +9,15 @@ services:
       - --skip-innodb-read-only-compressed # Temporary fix for MariaDB 10.6
     environment:
       MYSQL_ROOT_PASSWORD: 123
+    ports:
+      - 3306:3306
     volumes:
       - mariadb-data:/var/lib/mysql
 
   redis:
     image: redis:alpine
+    ports:
+      - 6379:6379
 
   frappe:
     image: frappe/bench:latest

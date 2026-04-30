@@ -50,6 +50,11 @@
   "resolution_date",
   "resolution_time",
   "user_resolution_time",
+  "estimated_hours",
+  "time_logs_section",
+  "time_logs",
+  "total_hours_section",
+  "total_hours",
   "reference_tab",
   "additional_info",
   "contact",
@@ -307,6 +312,35 @@
    "fieldname": "user_resolution_time",
    "fieldtype": "Duration",
    "label": "User Resolution Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "estimated_hours",
+   "fieldtype": "Float",
+   "label": "Estimated Hours",
+   "precision": "2"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "time_logs_section",
+   "fieldtype": "Section Break",
+   "label": "Time Logs"
+  },
+  {
+   "fieldname": "time_logs",
+   "fieldtype": "Table",
+   "label": "Time Logs",
+   "options": "HD Ticket Time Log"
+  },
+  {
+   "fieldname": "total_hours_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_hours",
+   "fieldtype": "Float",
+   "label": "Total Hours",
+   "precision": "2",
    "read_only": 1
   },
   {
