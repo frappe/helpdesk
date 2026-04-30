@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_rename": 1,
  "autoname": "field:service_level",
  "creation": "2023-08-22 11:14:25.683372",
  "doctype": "DocType",
@@ -179,7 +180,7 @@
   }
  ],
  "links": [],
- "modified": "2026-02-02 11:54:59.519053",
+ "modified": "2026-04-30 20:00:06.247098",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Service Level Agreement",
