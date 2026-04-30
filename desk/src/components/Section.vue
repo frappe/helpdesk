@@ -33,8 +33,8 @@
     <transition
       enter-active-class="duration-300 ease-in"
       leave-active-class="duration-300 ease-[cubic-bezier(0, 1, 0.5, 1)]"
-      enter-to-class="max-h-[200px] overflow-hidden"
-      leave-from-class="max-h-[200px] overflow-hidden"
+      enter-to-class="max-h-[2000px] overflow-hidden"
+      leave-from-class="max-h-[2000px] overflow-hidden"
       enter-from-class="max-h-0 opacity-0"
       leave-to-class="max-h-0 opacity-0"
     >

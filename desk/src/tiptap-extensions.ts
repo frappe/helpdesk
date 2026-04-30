@@ -93,6 +93,27 @@ export const ComponentUtils: Extension = Extension.create({
         },
       },
       {
+        types: ["image"],
+        attributes: {
+          height: {
+            default: null,
+            parseHTML: (element) => element.getAttribute("height"),
+            renderHTML: (attributes) => {
+              if (!attributes.height) return {};
+              return { height: attributes.height };
+            },
+          },
+          width: {
+            default: null,
+            parseHTML: (element) => element.getAttribute("width"),
+            renderHTML: (attributes) => {
+              if (!attributes.width) return {};
+              return { width: attributes.width };
+            },
+          },
+        },
+      },
+      {
         types: ["heading"],
         attributes: {
           id: {
@@ -742,5 +763,91 @@ export const HandleExcelPaste = Extension.create({
         },
       }),
     ];
+  },
+});
+
+
+// Handle formatting cleanup
+type StyleValidator = (value: string) => boolean;
+type StyleNormalizer = (value: string) => string | null;
+
+export interface CleanStylesOptions {
+  validators?: Record<string, StyleValidator>;
+  normalizers?: Record<string, StyleNormalizer>;
+  allowProperty?: (property: string, value: string) => boolean;
+}
+
+export const CleanStyles = Extension.create<CleanStylesOptions>({
+  name: "cleanStyles",
+
+  addOptions() {
+    return {
+      validators: {},
+      normalizers: {},
+      allowProperty: () => true,
+    };
+  },
+
+  addCommands() {
+    return {
+      cleanStyles:
+        () =>
+        ({ state, tr, dispatch }) => {
+          const { doc, schema } = state;
+          const textStyleType = schema.marks.textStyle;
+
+          if (!textStyleType) return true;
+
+          const {
+            validators = {},
+            normalizers = {},
+            allowProperty = () => true,
+          } = this.options;
+
+          doc.descendants((node, pos) => {
+            if (!node.isText) return;
+
+            const styleMark = node.marks.find((m) => m.type === textStyleType);
+            if (!styleMark) return;
+
+            const oldAttrs: Record<string, any> = styleMark.attrs ?? {};
+            const newAttrs: Record<string, any> = {};
+
+            for (const [key, rawValue] of Object.entries(oldAttrs)) {
+              if (rawValue == null) continue;
+              const value = String(rawValue);
+
+              if (!allowProperty(key, value)) continue;
+
+              const validator = validators[key];
+              if (validator && !validator(value)) continue;
+
+              const normalizer = normalizers[key];
+              if (normalizer) {
+                const normalized = normalizer(value);
+                if (normalized === null) continue;
+                newAttrs[key] = normalized;
+              } else {
+                newAttrs[key] = rawValue;
+              }
+            }
+
+            const from = pos;
+            const to = pos + node.nodeSize;
+
+            tr.removeMark(from, to, textStyleType);
+
+            if (Object.keys(newAttrs).length > 0) {
+              tr.addMark(from, to, textStyleType.create(newAttrs));
+            }
+          });
+
+          if (tr.steps.length && dispatch) {
+            dispatch(tr);
+          }
+
+          return true;
+        },
+    } as any;
   },
 });
