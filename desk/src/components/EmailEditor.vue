@@ -483,9 +483,13 @@ function submitMail() {
   if (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) {
     return false;
   }
-  if (!toEmailsClone.value.length) {
+  if (
+    !toEmailsClone.value.length &&
+    !ccEmailsClone.value.length &&
+    !bccEmailsClone.value.length
+  ) {
     toast.warning(
-      "Email has no recipients. Please add at least one email address in the 'TO' field."
+      "Email has no recipients. Please add at least one recipient (To, Cc, or Bcc) before sending."
     );
     return false;
   }
