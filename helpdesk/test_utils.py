@@ -22,6 +22,7 @@ def before_tests():
     frappe.db.set_single_value(
         "HD Settings", "enable_email_ticket_feedback", 0
     )  # nosemgrep
+    frappe.db.set_single_value("HD Settings", "default_priority", None)
     # frappe.flags.mute_emails = True
     make_holiday_list()
     make_new_sla()
