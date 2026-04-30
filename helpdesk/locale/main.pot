@@ -7,13 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2026-04-12 10:43+0000\n"
-"PO-Revision-Date: 2026-04-12 10:43+0000\n"
-=======
 "POT-Creation-Date: 2026-04-19 10:44+0000\n"
 "PO-Revision-Date: 2026-04-19 10:44+0000\n"
->>>>>>> 5ee0d85d (chore: update POT file)
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -877,11 +872,7 @@ msgstr ""
 msgid "Can work on tickets, create custom views and manage private views."
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/ListViewBuilder.vue:650 desk/src/pages/home/Home.vue:44
-=======
 #: desk/src/components/ListViewBuilder.vue:651 desk/src/pages/home/Home.vue:44
->>>>>>> 5ee0d85d (chore: update POT file)
 msgid "Cancel"
 msgstr ""
 
@@ -1188,11 +1179,7 @@ msgstr ""
 msgid "Confirm"
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/ListViewBuilder.vue:634
-=======
 #: desk/src/components/ListViewBuilder.vue:635
->>>>>>> 5ee0d85d (chore: update POT file)
 msgid "Confirm Changes"
 msgstr ""
 
@@ -1476,15 +1463,9 @@ msgstr ""
 msgid "Define who receives the tickets and how they’re distributed among agents."
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/ListViewBuilder.vue:232
-#: desk/src/components/ListViewBuilder.vue:236
-#: desk/src/components/ListViewBuilder.vue:242
-=======
 #: desk/src/components/ListViewBuilder.vue:233
 #: desk/src/components/ListViewBuilder.vue:237
 #: desk/src/components/ListViewBuilder.vue:243
->>>>>>> 5ee0d85d (chore: update POT file)
 #: desk/src/components/Settings/Teams/TeamEdit.vue:348
 #: desk/src/components/Settings/Teams/TeamEdit.vue:350
 #: desk/src/components/ticket-agent/TicketHeader.vue:209
@@ -2757,11 +2738,7 @@ msgstr ""
 msgid "Is setup complete"
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/ListViewBuilder.vue:264
-=======
 #: desk/src/components/ListViewBuilder.vue:265
->>>>>>> 5ee0d85d (chore: update POT file)
 msgid "Item(s) deleted successfully."
 msgstr ""
 
@@ -2948,13 +2925,8 @@ msgstr ""
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #. Label of the list_tab (Tab Break) field in DocType 'HD View'
-<<<<<<< HEAD
-#: desk/src/components/ListViewBuilder.vue:729
-#: desk/src/components/ListViewBuilder.vue:763
-=======
 #: desk/src/components/ListViewBuilder.vue:730
 #: desk/src/components/ListViewBuilder.vue:764
->>>>>>> 5ee0d85d (chore: update POT file)
 #: desk/src/pages/ticket/Tickets.vue:575 desk/src/pages/ticket/Tickets.vue:589
 #: desk/src/pages/ticket/Tickets.vue:619
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -3281,11 +3253,7 @@ msgstr ""
 msgid "No Answer"
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/ListViewBuilder.vue:286
-=======
 #: desk/src/components/ListViewBuilder.vue:287
->>>>>>> 5ee0d85d (chore: update POT file)
 msgid "No Data Found"
 msgstr ""
 
@@ -4350,11 +4318,7 @@ msgid "Saturday"
 msgstr ""
 
 #. Button label of the email-feedback Web Form
-<<<<<<< HEAD
-#: desk/src/components/ListViewBuilder.vue:640
-=======
 #: desk/src/components/ListViewBuilder.vue:641
->>>>>>> 5ee0d85d (chore: update POT file)
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:35
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:45
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:28
@@ -5117,11 +5081,7 @@ msgstr ""
 msgid "This view is public, and will be removed for all users."
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/ListViewBuilder.vue:635
-=======
 #: desk/src/components/ListViewBuilder.vue:636
->>>>>>> 5ee0d85d (chore: update POT file)
 msgid "This view is public. Changes made will be visible to everyone."
 msgstr ""
 
