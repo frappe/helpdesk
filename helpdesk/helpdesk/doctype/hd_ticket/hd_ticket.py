@@ -84,7 +84,6 @@ class HDTicket(Document):
         self.set_feedback_values()
         self.set_default_status()
         self.set_status_category()
-        # self.apply_escalation_rule()
         self.set_sla()
 
         self.set_contact()
@@ -286,11 +285,9 @@ class HDTicket(Document):
     def set_priority(self):
         if self.priority:
             return
-        self.priority = (
-            frappe.get_cached_value("HD Ticket Type", self.ticket_type, "priority")
-            or frappe.get_cached_value("HD Settings", "HD Settings", "default_priority")
-            or DEFAULT_TICKET_PRIORITY
-        )
+        self.priority = frappe.get_cached_value(
+            "HD Ticket Type", self.ticket_type, "priority"
+        ) or frappe.get_cached_value("HD Settings", "HD Settings", "default_priority")
 
     def set_first_responded_on(self):
         if self.is_new():
@@ -404,11 +401,6 @@ class HDTicket(Document):
                 not is_agent_in_assigned_team
             ) and self.users_present_in_team_assignment_rule():
                 clear_all_assignments("HD Ticket", self.name)
-                frappe.publish_realtime(
-                    "helpdesk:update-ticket-assignee",
-                    {"ticket_id": self.name},
-                    after_commit=True,
-                )
 
     def agent_in_assigned_team(self, agent, team):
         return frappe.db.exists(
@@ -883,19 +875,6 @@ class HDTicket(Document):
                     return rule
             except Exception:
                 pass
-
-    def apply_escalation_rule(self):
-        if not self.status_category == "Open" or self.is_new():
-            return
-        escalation_rule = self.get_escalation_rule()
-        if not escalation_rule:
-            return
-        self.agent_group = escalation_rule.to_team or self.agent_group
-        self.priority = escalation_rule.to_priority or self.priority
-        self.ticket_type = escalation_rule.to_ticket_type or self.ticket_type
-
-        if escalation_rule.to_agent:
-            self.assign_agent(escalation_rule.to_agent)
 
     def set_sla(self):
         """
