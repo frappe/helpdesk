@@ -13,6 +13,8 @@ class TestHDTeam(FrappeTestCase):
     def test_assignment_rule_creation(self):
         team = make_team("Test Team")
         self.assertTrue(team.assignment_rule)
+        ar_name = f"{team.name} - Support Rotation"
+        self.assertTrue(frappe.db.exists("Assignment Rule", ar_name))
 
     def test_team_rename_updates_assignment_rule(self):
         team = make_team("Test Team Rename")
