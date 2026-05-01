@@ -15,11 +15,9 @@ class HDTeam(Document):
     def after_insert(self):
         self.create_assignment_rule()
         assignment_rule_doc = frappe.get_doc("Assignment Rule", self.assignment_rule)
-        print("\n\n", "HERE", "\n\n")
 
         for user in self.users:
             _user = user.get("user")
-            print("\n\n", _user, "\n\n")
             if not _user:
                 continue
             assignment_rule_doc.append("users", {"user": _user})
