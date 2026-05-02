@@ -4,7 +4,7 @@
       <!-- User avatar with buttons -->
       <TicketContact />
       <!-- Core Fields -->
-      <div>
+      <div class="mt-4">
         <div
           v-for="(section, index) in coreFields"
           :key="index"
