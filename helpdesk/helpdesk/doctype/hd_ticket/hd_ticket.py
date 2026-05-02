@@ -254,6 +254,8 @@ class HDTicket(Document):
         )
 
     def set_raised_by(self):
+        if self.raised_by:
+            return
         self.raised_by = frappe.session.user
 
     def set_contact(self):
