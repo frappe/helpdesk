@@ -433,7 +433,9 @@ def get_avg_time_metrics(period: str = "6m"):
 
 
 def _get_priority_range():
-    priorities = frappe.get_all("HD Ticket Priority", fields="integer_value")
+    priorities = frappe.get_all(
+        "HD Ticket Priority", fields="integer_value", filters={"disabled": 0}
+    )
     if priorities:
         min_priority = min(priorities, key=lambda x: x["integer_value"])[
             "integer_value"

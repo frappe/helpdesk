@@ -1,23 +1,21 @@
 <template>
-  <div
-    v-if="!contact.loading"
-    class="my-4 flex items-center justify-start gap-2.5"
-  >
-    <Avatar :label="contact.data.name" :image="contactImage" size="2xl" />
+  <div class="mt-4 flex items-center justify-start gap-2.5">
+    <Avatar :label="contact.data?.name" :image="contactImage" size="2xl" />
     <div class="flex flex-col gap-1.5">
-      <Tooltip :text="contact.data.name || contact.data.email_id">
+      <Tooltip :text="contact.data?.name || contact.data?.email_id">
         <div class="flex gap-2 items-center">
           <p class="text-ink-gray-8 font-medium text-xl max-w-[170px] truncate">
-            {{ contact.data.name || contact.data.email_id }}
+            {{ contact.data?.name || contact.data?.email_id }}
           </p>
           <ExternalLinkIcon
+            v-if="!contact.loading"
             class="size-4 text-ink-gray-6 cursor-pointer"
             @click="openContact(contact.data.name)"
           />
         </div>
       </Tooltip>
       <div class="flex gap-1.5" v-if="isCallingEnabled">
-        <Tooltip :text="contact.data.email_id">
+        <Tooltip :text="contact.data?.email_id">
           <!-- Email Button -->
           <Button size="sm" @click="toggleEmailBox()">
             <template #icon>
@@ -35,7 +33,7 @@
     </div>
     <SetContactPhoneModal
       v-model="showPhoneModal"
-      :name="contact.data.name"
+      :name="contact.data?.name ?? ''"
       @onUpdate="contact.reload"
     />
   </div>

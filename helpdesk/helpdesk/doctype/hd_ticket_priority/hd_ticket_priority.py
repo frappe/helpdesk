@@ -10,6 +10,8 @@ from frappe.model.document import Document
 
 class HDTicketPriority(Document):
     def before_save(self):
+        if self.disabled:
+            return
         priority_in_sla = frappe.db.get_value(
             "HD Service Level Priority", {"priority": self.name}
         )
