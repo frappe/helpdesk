@@ -32,7 +32,7 @@ export interface HDTicketStatus extends DocType {
   parsed_color?: string;
 }
 
-// Last updated: 2026-02-27 16:42:43.292656
+// Last updated: 2026-04-30 19:58:44.919596
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;
@@ -222,7 +222,7 @@ export interface HDServiceLevelPriority extends ChildDocType {
   response_time: any;
 }
 
-// Last updated: 2026-02-02 11:54:59.519053
+// Last updated: 2026-04-30 20:00:06.247098
 export interface HDServiceLevelAgreement extends DocType {
   /** Service Level Name: Data */
   service_level: string;

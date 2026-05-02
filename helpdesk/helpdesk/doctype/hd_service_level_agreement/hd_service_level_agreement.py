@@ -75,7 +75,9 @@ class HDServiceLevelAgreement(Document):
             frappe.throw(_("Priority {0} has been repeated.").format(repeated_priority))
 
     def validate_all_priorities(self):
-        all_priorities = frappe.get_all("HD Ticket Priority", pluck="name")
+        all_priorities = frappe.get_all(
+            "HD Ticket Priority", pluck="name", filters={"disabled": 0}
+        )
         sla_priorities = [p.priority for p in self.priorities]
 
         for priority in all_priorities:

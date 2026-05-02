@@ -114,7 +114,7 @@
                 <div
                   class="-mx-2 px-2 py-3 cursor-pointer rounded hover:bg-surface-gray-2 transition-colors"
                 >
-                  <p class="text-sm font-base text-ink-gray-9 truncate mb-1">
+                  <p class="text-sm font-base text-ink-gray-9 truncate mb-2">
                     {{ t.subject }}
                   </p>
                   <div class="flex items-center justify-between gap-2">
