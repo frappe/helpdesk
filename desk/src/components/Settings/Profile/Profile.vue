@@ -77,7 +77,7 @@
                       variant="outline"
                       icon="check"
                       :loading="user?.save?.loading"
-                      :disabled="user?.save?.loading"
+                      :disabled="user?.save?.loading || !isNameDirty"
                       @click="save"
                     />
                   </div>
@@ -249,6 +249,13 @@ const isDirty = computed(() => {
     user.doc?.language !== user.originalDoc?.language
     ? true
     : false;
+});
+
+const isNameDirty = computed(() => {
+  return (
+    user.doc?.first_name !== user.originalDoc?.first_name ||
+    user.doc?.last_name !== user.originalDoc?.last_name
+  );
 });
 
 function save() {
