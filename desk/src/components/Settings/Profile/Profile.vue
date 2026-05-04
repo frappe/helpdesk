@@ -245,6 +245,7 @@ function editFullName() {
 }
 
 const isDirty = computed(() => {
+  if (!user.originalDoc) return false;
   return user.doc?.time_zone !== user.originalDoc?.time_zone ||
     user.doc?.language !== user.originalDoc?.language
     ? true
