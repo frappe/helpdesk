@@ -773,3 +773,125 @@ class TestHDTicket(IntegrationTestCase):
         # ticket created without any type or priority should pick up priority from applied SLA's default
         ticket5 = make_ticket()
         self.assertEqual(ticket5.priority, "Low")
+
+    # Test cases for agreement_status field which is computed based on response_by, resolution_by, first_responded_on, on_hold_since and resolution_date fields
+    # In total there are 7 scenarios for agreement_status which are covered in the below test cases:
+    def test_agreement_status_first_response_failed(self):
+        # Case 1: No reply before response_by (T+30min) → Failed
+        # At T+1h, response_by (T+30min) < now (T+1h) → first response failed
+        # resolution_by (T+2h) > now (T+1h) → resolution not yet failed
+        # is_failed = True → "Failed"
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, hours=1)):
+            ticket.reload()
+            ticket.save()
+            self.assertEqual(ticket.agreement_status, "Failed")
+
+    def test_agreement_status_resolution_failed(self):
+        # Case 2: First response in time, resolution misses deadline → Failed
+        #
+        # Timeline (Urgent: response_by=T+30min, resolution_by=T+2h):
+        #   T+10min  → Replied (Paused): first_responded_on set, on_hold_since=T+10min
+        #   T+20min  → Open: off hold, hold_time=10min(600s),
+        #              new resolution_by = T + 2h + 10min = T+2h10min
+        #   T+2h15min → save: resolution_by (T+2h10min) < now (T+2h15min) → Failed
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, minutes=10)):
+            ticket.reload()
+            ticket.status = "Replied"
+            ticket.save()
+
+        with self.freeze_time(add_to_date(date, minutes=20)):
+            ticket.reload()
+            ticket.status = "Open"
+            ticket.save()
+            self.assertEqual(ticket.agreement_status, "Resolution Due")
+
+        # Re-save past the extended resolution_by (T+2h10min) without changing status
+        with self.freeze_time(add_to_date(date, hours=2, minutes=15)):
+            ticket.reload()
+            ticket.save()
+            self.assertEqual(ticket.agreement_status, "Failed")
+
+    def test_agreement_status_both_failed(self):
+        # Case 3: No reply given, past both response_by (T+30min) and resolution_by (T+2h)
+        # At T+3h: response_by < now AND resolution_by < now → is_failed = True → "Failed"
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, hours=3)):
+            ticket.reload()
+            ticket.save()
+            self.assertEqual(ticket.agreement_status, "Failed")
+
+    def test_agreement_status_resolution_due_on_hold(self):
+        # Case 4: First response given, resolution due, ticket on hold → Paused
+        # "Replied" is a Paused-category status — sets first_responded_on AND on_hold_since
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, minutes=10)):
+            ticket.reload()
+            ticket.status = "Replied"
+            ticket.save()
+            self.assertTrue(ticket.first_responded_on)
+            self.assertTrue(ticket.on_hold_since)
+            self.assertIsNone(ticket.resolution_date)
+            self.assertEqual(ticket.agreement_status, "Paused")
+
+    def test_agreement_status_first_response_due(self):
+        # Case 5: Fresh ticket — no reply, not on hold → First Response Due
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+            self.assertIsNone(ticket.first_responded_on)
+            self.assertIsNone(ticket.on_hold_since)
+            self.assertEqual(ticket.agreement_status, "First Response Due")
+
+    def test_agreement_status_resolution_due(self):
+        # Case 6: First response given, came off hold, resolution still pending → Resolution Due
+        #
+        # Timeline:
+        #   T+10min → Replied (Paused): first_responded_on set, on_hold_since set
+        #   T+20min → Open: off hold, hold_time=10min, resolution_by extended to T+2h10min
+        #   At T+20min: first_responded_on set, on_hold_since=None,
+        #               resolution_date=None, now < resolution_by → Resolution Due
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, minutes=10)):
+            ticket.reload()
+            ticket.status = "Replied"
+            ticket.save()
+
+        with self.freeze_time(add_to_date(date, minutes=20)):
+            ticket.reload()
+            ticket.status = "Open"
+            ticket.save()
+            self.assertTrue(ticket.first_responded_on)
+            self.assertIsNone(ticket.on_hold_since)
+            self.assertIsNone(ticket.resolution_date)
+            self.assertEqual(ticket.agreement_status, "Resolution Due")
+
+    def test_agreement_status_fulfilled(self):
+        # Case 7: Resolved within both deadlines → Fulfilled
+        # Resolved at T+10min: first_responded_on=T+10min < response_by=T+30min ✓
+        # resolution_date=T+10min < resolution_by=T+2h ✓ → Fulfilled
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, minutes=10)):
+            ticket.reload()
+            ticket.status = "Resolved"
+            ticket.save()
+            self.assertEqual(ticket.agreement_status, "Fulfilled")
