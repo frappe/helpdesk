@@ -585,6 +585,8 @@ class HDTicket(Document):
         email_account_name = from_email.get("email_account") if from_email else None
         sender = from_email_id or frappe.session.user
         recipients = to
+        if not (cc or bcc or to):
+            frappe.throw(_("Recipient email address is required to send email."))
 
         sender_email = None
         if not skip_email_workflow:
