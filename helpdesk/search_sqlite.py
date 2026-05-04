@@ -84,7 +84,7 @@ class HelpdeskSearch(SQLiteSearch):
             and doc.reference_ticket
             and type(doc.reference_ticket) is str
         ):
-            document["reference_ticket"] = int(doc.reference_ticket)
+            document["reference_ticket"] = str(doc.reference_ticket)
 
         if doc.doctype == "Communication":
             # For communications, ensure reference fields are set for ticket doctype
@@ -94,10 +94,10 @@ class HelpdeskSearch(SQLiteSearch):
                 and doc.reference_name
                 and type(doc.reference_name) is str
             ):
-                document["reference_name"] = int(doc.reference_name)
+                document["reference_name"] = str(doc.reference_name)
 
         if doc.doctype == "HD Ticket":
-            document["reference_ticket"] = int(doc.name)
+            document["reference_ticket"] = str(doc.name)
 
         # Map commented_by to owner for HD Ticket Comment
         if doc.doctype == "HD Ticket Comment":
