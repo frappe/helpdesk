@@ -612,7 +612,8 @@ class TestHDTicket(IntegrationTestCase):
 
     def test_ticket_split(self):
         ticket1 = make_ticket(description="Test Desc for split")
-        ticket1.reply_via_agent(message="Test reply to split", to=self.agent)
+
+        ticket1.reply_via_agent(message="Test reply to split")
         communcation_name = frappe.get_all(
             "Communication",
             filters={
@@ -689,7 +690,7 @@ class TestHDTicket(IntegrationTestCase):
         outside_working_hour = get_current_week_monday(hours=8)
         with self.freeze_time(outside_working_hour):
             ticket = make_ticket(priority="High")
-            ticket.reply_via_agent(message="Test reply to split", to=self.agent)
+            ticket.reply_via_agent(message="Test reply to split")
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertTrue(ticket.raised_outside_working_hours)
             self.assertFalse(banner_shown)
@@ -753,15 +754,6 @@ class TestHDTicket(IntegrationTestCase):
             sent = False
 
         self.assertTrue(sent)
-
-    def test_reply_via_agent_no_recipients_raises(self):
-        """
-        reply_via_agent should raise or fail gracefully when to, cc, and bcc are all None/empty
-        """
-        ticket = make_ticket()
-
-        with self.assertRaises(Exception):
-            ticket.reply_via_agent(message="Test reply", to=None, cc=None, bcc=None)
 
     def tearDown(self):
         remove_holidays()
