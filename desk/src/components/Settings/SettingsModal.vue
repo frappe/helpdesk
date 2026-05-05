@@ -10,7 +10,7 @@
         :style="{ height: 'calc(100vh - 8rem)' }"
       >
         <div
-          class="flex-col rounded-l-lg w-56 shrink-0 bg-surface-menu-bar m-1 bg-surface-menu-bar overflow-y-auto hide-scrollbar"
+          class="flex-col rounded-l-lg w-56 shrink-0 bg-surface-menu-bar m-1 overflow-y-auto hide-scrollbar"
         >
           <h1
             class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs font-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-menu-bar"
