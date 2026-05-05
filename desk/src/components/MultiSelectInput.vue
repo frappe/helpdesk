@@ -85,16 +85,16 @@
 </template>
 
 <script setup lang="ts">
+import { UserAvatar } from "@/components/";
 import {
   Combobox,
   ComboboxInput,
-  ComboboxOptions,
   ComboboxOption,
+  ComboboxOptions,
 } from "@headlessui/vue";
-import { UserAvatar } from "@/components/";
-import { Popover, createResource } from "frappe-ui";
-import { ref, computed, nextTick } from "vue";
 import { watchDebounced } from "@vueuse/core";
+import { Popover, createResource } from "frappe-ui";
+import { computed, nextTick, ref } from "vue";
 
 const props = defineProps({
   validate: {
@@ -135,7 +135,7 @@ watchDebounced(
     text.value = val;
     reload(val);
   },
-  { debounce: 50, immediate: true }
+  { debounce: 400, immediate: true }
 );
 
 const filterOptions = createResource({
