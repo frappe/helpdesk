@@ -129,7 +129,7 @@
               class="flex items-center gap-1 px-2 py-1 rounded-full text-sm transition-colors"
               :class="
                 reaction.current_user_reacted
-                  ? 'bg-surface-blue-2 text-blue-700 hover:bg-blue-200'
+                  ? 'bg-surface-blue-2 text-ink-blue-3 hover:bg-surface-blue-3'
                   : 'bg-surface-gray-3 text-ink-gray-6 hover:bg-surface-gray-4'
               "
               v-if="reaction.count !== 0"

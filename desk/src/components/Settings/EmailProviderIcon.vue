@@ -1,7 +1,7 @@
 <template>
   <div
     class="flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-gray-2 hover:bg-surface-gray-3"
-    :class="{ 'ring-2 ring-blue-500': selected }"
+    :class="{ 'ring-2 ring-outline-blue-3': selected }"
   >
     <img v-if="logoValue" :src="logoValue" class="size-4.5" />
     <LucideMail v-else class="size-4.5 text-ink-gray-7" />
