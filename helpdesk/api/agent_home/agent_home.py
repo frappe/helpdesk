@@ -5,6 +5,7 @@ import frappe
 from dateutil.relativedelta import relativedelta
 from frappe.query_builder import DocType
 from frappe.query_builder.functions import Avg, Count, Function
+from frappe.utils import add_to_date, now_datetime
 
 from helpdesk.api.agent_home.utils import (
     calculate_percentage_change,
@@ -481,7 +482,7 @@ def _get_upcoming_sla_tickets(limit=10):
         ["agreement_status", "in", ["First Response Due", "Resolution Due"]],
         ["status_category", "=", "Open"],
         ["_assign", "like", f"%{frappe.session.user}%"],
-        ["creation", ">", "2025-05-20 00:00:00"],
+        ["creation", ">", add_to_date(now_datetime(), days=-180)],
     ]
 
     tickets = frappe.get_list(
@@ -564,7 +565,7 @@ def _get_new_tickets(limit=10):
         ["name", "in", ticket_names],
         ["_assign", "like", f"%{frappe.session.user}%"],
         ["status_category", "=", "Open"],
-        ["creation", ">", "2025-05-20 00:00:00"],
+        ["creation", ">", add_to_date(now_datetime(), days=-180)],
     ]
 
     tickets = frappe.get_list(
@@ -600,7 +601,7 @@ def _get_pending_response_tickets(limit=10):
         ["status_category", "=", "Open"],
         ["last_customer_response", "is", "set"],
         ["last_agent_response", "is", "not set"],
-        ["creation", ">", "2025-05-20 00:00:00"],
+        ["creation", ">", add_to_date(now_datetime(), days=-180)],
     ]
 
     tickets = frappe.get_list(
