@@ -6,9 +6,9 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "integer_value",
-  "column_break_fzcl",
-  "description"
+  "disabled",
+  "description",
+  "integer_value"
  ],
  "fields": [
   {
@@ -26,13 +26,15 @@
    "reqd": 1
   },
   {
-   "fieldname": "column_break_fzcl",
-   "fieldtype": "Column Break"
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
   }
  ],
  "grid_page_length": 50,
  "links": [],
- "modified": "2026-02-02 17:01:58.293256",
+ "modified": "2026-04-30 19:56:12.860954",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Priority",

@@ -4,7 +4,7 @@ import { FeatherIcon, call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
-import LucideBrushCleaning from '~icons/lucide/brush-cleaning'
+import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
 import TicketIcon from "./components/icons/TicketIcon.vue";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
@@ -277,18 +277,13 @@ export async function copyToClipboard(
 }
 
 export const ClearFormattingUtility = {
-      label: 'Clear formatting',
-      icon: LucideBrushCleaning,
-      action: (editor) => {
-        editor.chain()
-          .focus()
-          .unsetAllMarks()
-          .clearNodes()
-          .cleanStyles()
-          .run()
-      },
-      isActive: () => false,  
-}
+  label: "Clear formatting",
+  icon: LucideBrushCleaning,
+  action: (editor) => {
+    editor.chain().focus().unsetAllMarks().clearNodes().cleanStyles().run();
+  },
+  isActive: () => false,
+};
 
 export const textEditorMenuButtons = [
   "Paragraph",
@@ -298,9 +293,7 @@ export const textEditorMenuButtons = [
   "Italic",
   "FontColor",
   "Separator",
-  ["Align Left",
-  "Align Center",
-  "Align Right"],
+  ["Align Left", "Align Center", "Align Right"],
   "Bullet List",
   "Numbered List",
   "Separator",
@@ -327,7 +320,6 @@ export const textEditorMenuButtons = [
   ],
   "Separator",
   ClearFormattingUtility,
-
 ];
 
 export function isContentEmpty(content: string) {
@@ -344,7 +336,7 @@ export function isContentEmpty(content: string) {
 
 export function normalize(value: any) {
   if (value === null || value === undefined) {
-    return '';
+    return "";
   }
   return value;
 }

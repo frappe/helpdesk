@@ -22,6 +22,7 @@ def before_tests():
     frappe.db.set_single_value(
         "HD Settings", "enable_email_ticket_feedback", 0
     )  # nosemgrep
+    frappe.db.set_single_value("HD Settings", "default_priority", None)
     # frappe.flags.mute_emails = True
     make_holiday_list()
     make_new_sla()
@@ -298,3 +299,27 @@ def add_comment(
     if save:
         return comment.insert()
     return comment
+
+
+def make_team(team_name, members=[]):
+    """Create an HD Team with optional members."""
+    if frappe.db.exists("HD Team", team_name):
+        # Delete existing team members
+        team = frappe.get_doc("HD Team", team_name)
+        team.users = []
+        for member in members:
+            team.append("users", {"user": member})
+        team.save(ignore_permissions=True)
+        return team
+
+    # Create new team - this will trigger after_insert which creates assignment rule
+    team = frappe.get_doc(
+        {
+            "doctype": "HD Team",
+            "team_name": team_name,
+        }
+    )
+    for member in members:
+        team.append("users", {"user": member})
+    team.insert(ignore_permissions=True)
+    return team

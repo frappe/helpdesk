@@ -610,7 +610,7 @@ def get_navigation_filters(ticket: str, current_view: str = None):
                 filters = (
                     json.loads(_filters) if isinstance(_filters, str) else _filters
                 )
-            except (json.JSONDecodeError, TypeError):
+            except json.JSONDecodeError, TypeError:
                 filters = []
 
     if not filters:
@@ -627,7 +627,7 @@ def get_navigation_filters(ticket: str, current_view: str = None):
                     if isinstance(default_view, str)
                     else default_view
                 )
-            except (json.JSONDecodeError, TypeError):
+            except json.JSONDecodeError, TypeError:
                 filters = []
 
     # Base filters - exclude the current ticket
@@ -694,7 +694,8 @@ def get_recent_similar_tickets(ticket: str | int):
         return {"recent_tickets": [], "similar_tickets": []}
 
     recent_tickets = get_recent_tickets(ticket)
-    similar_tickets = get_similar_tickets(ticket)
+    # Update this with TextBlob or SQLite Vector Search
+    similar_tickets = []
     # print('\n\n',recent_tickets,'\n\n')
     return {"recent_tickets": recent_tickets, "similar_tickets": similar_tickets}
 
@@ -735,58 +736,6 @@ def get_recent_tickets(ticket: str):
             or []
         )
     return org_tickets + user_tickets
-
-
-def get_similar_tickets(ticket: str):
-    doc = frappe.get_doc("HD Ticket", ticket)
-
-    # Separate search terms
-    subject_search = ""
-    desc_search = ""
-    relevance_threshold = 70  # Minimum relevance percentage to consider
-
-    if doc.subject:
-        subject_search = doc.subject.strip()
-
-    if doc.description:
-        soup = BeautifulSoup(doc.description, "html.parser")
-        text = soup.get_text()
-        if text:
-            desc_search = text.strip()
-
-    tickets = frappe.db.sql(
-        """
-        SELECT `name`, `subject`, `status`, `creation`,
-            (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION)) as `raw_relevance`
-        FROM `tabHD Ticket`
-        WHERE (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION))
-            AND name != %(ticket)s
-            AND creation > DATE_SUB(NOW(), INTERVAL 90 DAY)
-        ORDER BY `raw_relevance` DESC, creation DESC
-        LIMIT 4
-        """,
-        {
-            "subject_search": subject_search,
-            "ticket": ticket,
-        },
-        as_dict=1,
-    )
-    tickets = [
-        t for t in tickets if frappe.has_permission("HD Ticket", "read", doc=t["name"])
-    ]
-
-    if not tickets:
-        return []
-
-    max_relevance = max((t["raw_relevance"] for t in tickets), default=0)
-    for t in tickets:
-        t["relevance"] = (
-            round((t["raw_relevance"] / max_relevance) * 100) if max_relevance else 0
-        )
-
-    tickets = [t for t in tickets if t["relevance"] > relevance_threshold]
-
-    return tickets
 
 
 @frappe.whitelist()

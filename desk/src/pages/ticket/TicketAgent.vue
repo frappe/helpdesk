@@ -11,8 +11,9 @@
       <TicketSidebar />
     </div>
     <SetContactPhoneModal
+      v-if="ticket.doc.contact"
       v-model="showPhoneModal"
-      :name="ticket.data?.contact?.name"
+      :name="ticket.doc?.contact"
       @onUpdate="ticket.reload"
     />
   </div>
@@ -67,7 +68,12 @@ import {
   TicketContactSymbol,
   TicketSymbol,
 } from "@/types";
-import { createResource, toast, usePageMeta } from "frappe-ui";
+import {
+  createResource,
+  LoadingIndicator,
+  toast,
+  usePageMeta,
+} from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { showCommentBox, showEmailBox } from "./modalStates";
@@ -130,6 +136,9 @@ provide("makeCall", () => {
     docname: props.ticketId,
   });
 });
+provide("refreshTicket", () => reloadTicket(props.ticketId));
+provide("onCallEnded", () => reloadTicket(props.ticketId));
+
 const viewerComposable = computed(() => useActiveViewers(ticket.value.name));
 const viewers = computed(
   () => viewerComposable.value.currentViewers[props.ticketId] || []

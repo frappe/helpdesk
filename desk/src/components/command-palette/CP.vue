@@ -78,7 +78,7 @@ const router = useRouter();
 const { isMac } = useDevice();
 
 // Reactive data
-const show = defineModel();
+const show = defineModel({ default: false });
 const query = ref("");
 
 // Computed properties

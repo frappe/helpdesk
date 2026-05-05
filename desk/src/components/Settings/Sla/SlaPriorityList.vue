@@ -61,23 +61,26 @@
 </template>
 
 <script setup lang="ts">
-import { Button, createResource, toast } from "frappe-ui";
-import SlaPriorityListItem from "./SlaPriorityListItem.vue";
-import { computed, provide, reactive } from "vue";
 import {
   slaActiveScreen,
   slaData,
   slaDataErrors,
   validateSlaData,
 } from "@/stores/sla";
-import { watchDebounced } from "@vueuse/core";
 import { getGridTemplateColumnsForTable } from "@/utils";
+import { watchDebounced } from "@vueuse/core";
+import { Button, createResource, toast } from "frappe-ui";
+import { computed, provide, reactive } from "vue";
+import SlaPriorityListItem from "./SlaPriorityListItem.vue";
 
 createResource({
   url: "frappe.client.get_list",
   params: {
     doctype: "HD Ticket Priority",
     fields: ["name"],
+    filters: {
+      disabled: 0,
+    },
     order_by: "integer_value desc",
   },
   auto: true,

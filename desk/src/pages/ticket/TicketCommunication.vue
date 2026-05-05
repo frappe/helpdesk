@@ -60,7 +60,7 @@ function sanitize(html: string) {
     allowedAttributes: {
       a: ["href"],
       video: ["src", "controls"],
-      img: ["src"],
+      img: ["src", "width", "height"],
       table: ["border", "cellpadding", "cellspacing", "width", "data-type"],
       td: ["colspan", "rowspan", "width", "align", "valign"],
       th: ["colspan", "rowspan", "width", "align", "valign"],

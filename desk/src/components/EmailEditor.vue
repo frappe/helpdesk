@@ -212,6 +212,7 @@ import {
 } from "@/tiptap-extensions";
 import {
   getFontFamily,
+  htmlToText,
   isContentEmpty,
   removeAttachmentFromServer,
   textEditorMenuButtons,
@@ -278,7 +279,6 @@ const emit = defineEmits(["submit", "discard"]);
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
-const auth = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const editorRef = ref(null);
@@ -290,11 +290,19 @@ function focusEditorAtStart() {
   }, 0);
 }
 
-const newEmail = useStorage<null | string>(
+const cachedEmail = useStorage<null | string>(
   "emailBoxContent" + props.ticketId,
   null
 );
+
+const newEmail = ref<null | string>(cachedEmail.value);
+
 const emailSignature = ref<string | null>(null);
+
+function isOnlySignature(content: string | null) {
+  if (!content || !emailSignature.value) return false;
+  return htmlToText(content) === htmlToText(emailSignature.value);
+}
 
 const userResource = createResource({
   url: "helpdesk.api.auth.get_current_user_email_info",
@@ -307,6 +315,9 @@ const userResource = createResource({
         newEmail.value = emailSignature.value;
         focusEditorAtStart();
       }
+      if (isOnlySignature(cachedEmail.value)) {
+        cachedEmail.value = null;
+      }
     }
   },
 });
@@ -315,6 +326,7 @@ watch(newEmail, (newValue, oldValue) => {
   if (newValue !== oldValue && newValue) {
     onUserType();
   }
+  cachedEmail.value = isOnlySignature(newValue) ? null : newValue;
 });
 
 const quotedContent = useStorage<null | string>(
@@ -423,13 +435,9 @@ async function removeAttachment(attachment) {
 const showSavedRepliesSelectorModal = ref(false);
 
 function applySavedReplies(template: string) {
-  isContentEmpty(newEmail.value)
-    ? (newEmail.value = template)
-    : (newEmail.value = newEmail.value + "\n" + template);
-  newEmail.value += "<p></p>";
-  nextTick(() => {
-    editorRef.value?.editor?.commands?.focus("end");
-  });
+  const textEditor = editorRef.value?.editor;
+  if (!textEditor) return;
+  textEditor.chain().focus("start").insertContent(template).run();
 }
 
 const sendMail = createResource({
@@ -485,6 +493,10 @@ function submitMail() {
   sendMail.submit();
 }
 
+function getInitialContent() {
+  return emailSignature.value ? emailSignature.value : "<p></p>";
+}
+
 function addToReply(
   body: string,
   toEmails: string[],
@@ -505,9 +517,7 @@ function addToReply(
   }
 
   nextTick(() => {
-    newEmail.value = emailSignature.value
-      ? emailSignature.value
-      : editorRef.value.editor.getHTML();
+    newEmail.value = getInitialContent();
   });
   focusEditorAtStart();
 }
@@ -522,7 +532,7 @@ function resetState() {
 
 function handleDiscard() {
   attachments.value = [];
-  newEmail.value = emailSignature.value ? emailSignature.value : null;
+  newEmail.value = getInitialContent();
   quotedContent.value = null;
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
@@ -595,6 +605,12 @@ function handleKeydown(e: KeyboardEvent) {
     return;
   }
 }
+
+watch(emailSignature, (sig) => {
+  if (sig && isContentEmpty(newEmail.value)) {
+    newEmail.value = sig;
+  }
+});
 
 onBeforeUnmount(() => {
   cleanup();
