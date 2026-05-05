@@ -1375,5 +1375,37 @@ def close_tickets_after_n_days():
                 message=f"Failed to auto close ticket {doc.name} after {days_threshold} days. Error: {e}",
                 title="Auto Close Ticket Failed",
             )
+            continue
 
+        frappe.db.commit()  # nosemgrep
+
+
+def update_sla_status_in_ticket():
+    stale_tickets = frappe.get_all(
+        "HD Ticket",
+        filters={
+            "status_category": ["=", "Open"],
+            "sla": ["is", "set"],
+        },
+        pluck="name",
+    )
+    for ticket in stale_tickets:
+        doc = frappe.get_doc("HD Ticket", ticket)
+        sla = frappe.get_doc("HD Service Level Agreement", doc.sla)
+        sla.handle_agreement_status(doc)
+        try:
+            frappe.db.set_value(
+                "HD Ticket",
+                doc.name,
+                "agreement_status",
+                doc.agreement_status,
+                update_modified=False,
+            )
+
+        except Exception as e:
+            frappe.log_error(
+                message=f"Failed to update agreement status for ticket {doc.name}. Error: {e}",
+                title="Update SLA Status Failed",
+            )
+            continue
         frappe.db.commit()  # nosemgrep
