@@ -633,11 +633,6 @@ class TestHDTicket(FrappeTestCase):
             ticket2_doc.name,
         )
 
-    def tearDown(self):
-        remove_holidays()
-        frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
-        frappe.delete_doc("HD Ticket Status", "New", force=True)
-
     def test_ticket_inside_working_hours(self):
         inside_working_hour = get_current_week_monday(hours=14)
         with self.freeze_time(inside_working_hour):
@@ -708,3 +703,39 @@ class TestHDTicket(FrappeTestCase):
         with self.freeze_time(next_working_day):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
+
+    def tearDown(self):
+        frappe.set_user("Administrator")
+        remove_holidays()
+        frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
+        frappe.delete_doc("HD Ticket Status", "New", force=True)
+
+    def test_security_unauthorized_reply_via_agent(self):
+        ticket = make_ticket()
+        frappe.set_user(non_agent)
+
+        with self.assertRaises(frappe.PermissionError):
+            ticket.reply_via_agent(message="Test unauthorized reply")
+
+        frappe.set_user("Administrator")
+
+    def test_security_unauthorized_assign_agent(self):
+        ticket = make_ticket()
+        frappe.set_user(non_agent)
+
+        with self.assertRaises(frappe.PermissionError):
+            ticket.assign_agent(agent)
+
+        frappe.set_user("Administrator")
+
+    def test_security_info_disclosure_similar_tickets(self):
+        from helpdesk.helpdesk.doctype.hd_ticket.api import get_recent_similar_tickets
+
+        ticket = make_ticket()
+
+        frappe.set_user(non_agent)
+
+        with self.assertRaises(frappe.PermissionError):
+            get_recent_similar_tickets(ticket.name)
+
+        frappe.set_user("Administrator")
