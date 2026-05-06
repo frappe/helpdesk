@@ -590,7 +590,7 @@ def get_navigation_tickets(ticket: str, current_view: str | None = None):
         )
 
         # Extract just the ticket IDs
-        ticket_ids = [(ticket), *tickets]
+        ticket_ids = [ticket, *tickets]
         # print("\n\n", ticket_ids, "\n\n")
         return ticket_ids
 
