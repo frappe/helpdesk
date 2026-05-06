@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-03-29 10:43+0000\n"
-"PO-Revision-Date: 2026-04-02 11:02\n"
+"POT-Creation-Date: 2026-05-03 10:46+0000\n"
+"PO-Revision-Date: 2026-05-04 05:15\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Esperanto\n"
 "MIME-Version: 1.0\n"
@@ -19,12 +19,8 @@ msgstr ""
 "Language: eo_UY\n"
 
 #: desk/src/components/CommentBox.vue:14
-msgid " added a"
-msgstr "crwdns199656:0crwdne199656:0"
-
-#: desk/src/components/CommentBox.vue:16
-msgid " comment"
-msgstr "crwdns199658:0crwdne199658:0"
+msgid " commented"
+msgstr "crwdns200630:0crwdne200630:0"
 
 #: helpdesk/api/dashboard.py:181
 msgid "% SLA Fulfilled"
@@ -112,23 +108,27 @@ msgstr "crwdns157512:0crwdne157512:0"
 msgid "Access only this team's tickets"
 msgstr "crwdns161536:0crwdne161536:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:81
-msgid "Account & Security"
-msgstr "crwdns199662:0crwdne199662:0"
+#: desk/src/components/Settings/SettingsModal.vue:18
+msgid "Account"
+msgstr "crwdns200654:0crwdne200654:0"
+
+#: desk/src/components/Settings/Profile/Profile.vue:98
+msgid "Account Info & Security"
+msgstr "crwdns200656:0crwdne200656:0"
 
 #. Label of the acknowledgement_section (Section Break) field in DocType 'HD
 #. Settings'
-#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:71
+#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:72
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Acknowledgement"
 msgstr "crwdns159030:0crwdne159030:0"
 
-#. Label of the action (Data) field in DocType 'HD Ticket Activity'
+#. Label of the action (Small Text) field in DocType 'HD Ticket Activity'
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "Action"
 msgstr "crwdns157514:0crwdne157514:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:22
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:24
 msgid "Action Required"
 msgstr "crwdns157516:0crwdne157516:0"
 
@@ -142,7 +142,7 @@ msgstr "crwdns157518:0crwdne157518:0"
 msgid "Active"
 msgstr "crwdns161540:0crwdne161540:0"
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:359
+#: desk/src/pages/ticket/MobileTicketAgent.vue:446
 msgid "Activity"
 msgstr "crwdns195212:0crwdne195212:0"
 
@@ -150,11 +150,15 @@ msgstr "crwdns195212:0crwdne195212:0"
 msgid "Add Assignee"
 msgstr "crwdns158416:0crwdne158416:0"
 
-#: desk/src/pages/knowledge-base/Article.vue:627
+#: desk/src/pages/knowledge-base/Article.vue:641
 msgid "Add Category"
 msgstr "crwdns199664:0crwdne199664:0"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:180
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:106
+msgid "Add Email"
+msgstr "crwdns200658:0crwdne200658:0"
+
+#: desk/src/components/Settings/Holiday/HolidayView.vue:181
 msgid "Add Holiday"
 msgstr "crwdns161542:0crwdne161542:0"
 
@@ -168,7 +172,7 @@ msgstr "crwdns195214:0crwdne195214:0"
 msgid "Add Weekly Holidays"
 msgstr "crwdns157520:0crwdne157520:0"
 
-#: desk/src/components/layouts/Sidebar.vue:464
+#: desk/src/components/layouts/Sidebar.vue:481
 msgid "Add a comment on a ticket"
 msgstr "crwdns195218:0crwdne195218:0"
 
@@ -194,7 +198,7 @@ msgstr "crwdns158422:0crwdne158422:0"
 msgid "Add condition group"
 msgstr "crwdns161544:0crwdne161544:0"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:153
+#: desk/src/components/Settings/Holiday/HolidayView.vue:154
 msgid "Add holidays here to make sure they’re excluded from SLA calculations."
 msgstr "crwdns161546:0crwdne161546:0"
 
@@ -213,11 +217,11 @@ msgstr "crwdns161548:0crwdne161548:0"
 msgid "Add one to get started."
 msgstr "crwdns161552:0crwdne161552:0"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:134
+#: desk/src/components/Settings/Holiday/HolidayView.vue:135
 msgid "Add recurring holidays such as weekends."
 msgstr "crwdns161554:0crwdne161554:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:198
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:199
 msgid "Add time targets around support milestones like first reply and resolution times."
 msgstr "crwdns199666:0crwdne199666:0"
 
@@ -331,13 +335,13 @@ msgstr "crwdns157540:0crwdne157540:0"
 msgid "All SLAs on track"
 msgstr "crwdns199376:0crwdne199376:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:281
-#: desk/src/pages/home/components/RecentFeedback.vue:310
-#: desk/src/pages/home/components/RecentFeedback.vue:317
+#: desk/src/pages/home/components/RecentFeedback.vue:285
+#: desk/src/pages/home/components/RecentFeedback.vue:314
+#: desk/src/pages/home/components/RecentFeedback.vue:321
 msgid "All Time"
 msgstr "crwdns199378:0crwdne199378:0"
 
-#: desk/src/components/layouts/Sidebar.vue:259
+#: desk/src/components/layouts/Sidebar.vue:276
 msgid "All Views"
 msgstr "crwdns195224:0crwdne195224:0"
 
@@ -426,7 +430,7 @@ msgstr "crwdns157550:0crwdne157550:0"
 msgid "Archived"
 msgstr "crwdns157552:0crwdne157552:0"
 
-#: desk/src/components/Settings/SettingsModal.vue:61
+#: desk/src/components/Settings/SettingsModal.vue:73
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
 msgstr "crwdns159034:0crwdne159034:0"
 
@@ -446,7 +450,7 @@ msgstr "crwdns161564:0crwdne161564:0"
 msgid "Are you sure you want to delete this ticket? This is an irreversible action and cannot be undone."
 msgstr "crwdns199680:0crwdne199680:0"
 
-#: desk/src/pages/ticket/Tickets.vue:493
+#: desk/src/pages/ticket/Tickets.vue:488
 msgid "Are you sure you want to delete this view?"
 msgstr "crwdns195238:0crwdne195238:0"
 
@@ -458,15 +462,16 @@ msgstr "crwdns195240:0crwdne195240:0"
 msgid "Are you sure you want to discard this article?"
 msgstr "crwdns195242:0crwdne195242:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:465
-#: desk/src/components/Settings/EmailNotifications/Notification.vue:109
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:77
-#: desk/src/components/Settings/Holiday/HolidayView.vue:209
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:310
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:370
-#: desk/src/components/Settings/Teams/NewTeam.vue:108
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:239
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:198
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:466
+#: desk/src/components/Settings/EmailNotifications/Notification.vue:110
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:81
+#: desk/src/components/Settings/Holiday/HolidayView.vue:210
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:243
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:311
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:371
+#: desk/src/components/Settings/Teams/NewTeam.vue:109
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:230
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:199
 msgid "Are you sure you want to go back? Unsaved changes will be lost."
 msgstr "crwdns159036:0crwdne159036:0"
 
@@ -478,7 +483,7 @@ msgstr "crwdns161566:0crwdne161566:0"
 msgid "Are you sure you want to remove the logo?"
 msgstr "crwdns161568:0crwdne161568:0"
 
-#: desk/src/components/Settings/EmailNotifications/Notification.vue:122
+#: desk/src/components/Settings/EmailNotifications/Notification.vue:123
 msgid "Are you sure you want to reset the content? Current content will be overridden."
 msgstr "crwdns159038:0crwdne159038:0"
 
@@ -488,7 +493,7 @@ msgstr "crwdns159038:0crwdne159038:0"
 msgid "Article"
 msgstr "crwdns157554:0crwdne157554:0"
 
-#: desk/src/pages/knowledge-base/Article.vue:503
+#: desk/src/pages/knowledge-base/Article.vue:517
 msgid "Article body cannot be set as empty."
 msgstr "crwdns199682:0crwdne199682:0"
 
@@ -496,19 +501,19 @@ msgstr "crwdns199682:0crwdne199682:0"
 msgid "Article created successfully."
 msgstr "crwdns199684:0crwdne199684:0"
 
-#: desk/src/pages/knowledge-base/Article.vue:542
+#: desk/src/pages/knowledge-base/Article.vue:556
 msgid "Article deleted successfully."
 msgstr "crwdns199686:0crwdne199686:0"
 
-#: desk/src/pages/knowledge-base/Article.vue:638
+#: desk/src/pages/knowledge-base/Article.vue:652
 msgid "Article link copied to clipboard"
 msgstr "crwdns195248:0crwdne195248:0"
 
-#: desk/src/pages/knowledge-base/Article.vue:498
+#: desk/src/pages/knowledge-base/Article.vue:512
 msgid "Article title cannot be set as empty"
 msgstr "crwdns199688:0crwdne199688:0"
 
-#: desk/src/pages/knowledge-base/Article.vue:529
+#: desk/src/pages/knowledge-base/Article.vue:543
 msgid "Article updated successfully."
 msgstr "crwdns199690:0crwdne199690:0"
 
@@ -520,11 +525,7 @@ msgstr "crwdns199692:0crwdne199692:0"
 msgid "Articles moved successfully."
 msgstr "crwdns199694:0crwdne199694:0"
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:51
-msgid "Assign"
-msgstr "crwdns195258:0crwdne195258:0"
-
-#: desk/src/components/layouts/Sidebar.vue:441
+#: desk/src/components/layouts/Sidebar.vue:458
 msgid "Assign a ticket to an agent"
 msgstr "crwdns195260:0crwdne195260:0"
 
@@ -534,25 +535,28 @@ msgstr "crwdns195262:0crwdne195262:0"
 
 #. Label of the assign_to_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
-#: desk/src/components/ticket-agent/AssignToBody.vue:5
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Assign to"
 msgstr "crwdns157556:0crwdne157556:0"
 
-#: desk/src/components/ticket-agent/AssignToBody.vue:65
-msgid "Assign to me"
-msgstr "crwdns159212:0crwdne159212:0"
+#: desk/src/components/ticket-agent/AssignTo.vue:39
+msgid "Assign yourself"
+msgstr "crwdns200632:0crwdne200632:0"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:62
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:49
 msgid "Assigned To"
 msgstr "crwdns157558:0crwdne157558:0"
 
+#: desk/src/components/ticket-agent/AssignTo.vue:11
+msgid "Assignee"
+msgstr "crwdns200634:0crwdne200634:0"
+
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
 msgid "Assignee Rules"
 msgstr "crwdns158424:0crwdne158424:0"
 
-#: desk/src/components/ticket-agent/AssignTo.vue:80
+#: desk/src/components/ticket-agent/AssignTo.vue:439
 msgid "Assignee's updated successfully."
 msgstr "crwdns199696:0crwdne199696:0"
 
@@ -560,18 +564,22 @@ msgstr "crwdns199696:0crwdne199696:0"
 msgid "Assignees"
 msgstr "crwdns158426:0crwdne158426:0"
 
+#: desk/src/components/ticket-agent/AssignTo.vue:491
+msgid "Assignees updated successfully."
+msgstr "crwdns200636:0crwdne200636:0"
+
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Assignment"
 msgstr "crwdns157560:0crwdne157560:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:137
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:138
 msgid "Assignment Condition"
 msgstr "crwdns199698:0crwdne199698:0"
 
 #. Label of the filters_section (Section Break) field in DocType 'HD Service
 #. Level Agreement'
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:81
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:82
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Assignment Conditions"
 msgstr "crwdns157562:0crwdne157562:0"
@@ -594,7 +602,7 @@ msgstr "crwdns157566:0crwdne157566:0"
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
 msgstr "crwdns158428:0crwdne158428:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:291
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:292
 msgid "Assignment Schedule"
 msgstr "crwdns158430:0crwdne158430:0"
 
@@ -602,7 +610,7 @@ msgstr "crwdns158430:0crwdne158430:0"
 msgid "Assignment rule"
 msgstr "crwdns158434:0crwdne158434:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:560
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:561
 msgid "Assignment rule created successfully."
 msgstr "crwdns199700:0crwdne199700:0"
 
@@ -614,7 +622,7 @@ msgstr "crwdns199702:0crwdne199702:0"
 msgid "Assignment rule duplicated successfully."
 msgstr "crwdns199704:0crwdne199704:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:647
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:648
 msgid "Assignment rule updated successfully."
 msgstr "crwdns199706:0crwdne199706:0"
 
@@ -638,7 +646,7 @@ msgstr "crwdns159040:0{0}crwdne159040:0"
 msgid "At least one feedback option must be enabled for rating {0}"
 msgstr "crwdns160042:0{0}crwdne160042:0"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:450
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:451
 msgid "At least one team is required"
 msgstr "crwdns195266:0crwdne195266:0"
 
@@ -771,7 +779,7 @@ msgstr "crwdns160536:0crwdne160536:0"
 msgid "Back"
 msgstr "crwdns161588:0crwdne161588:0"
 
-#: desk/src/pages/InvalidPage.vue:25 desk/src/pages/ticket/TicketAgent.vue:43
+#: desk/src/pages/InvalidPage.vue:25 desk/src/pages/ticket/TicketAgent.vue:44
 msgid "Back to Tickets"
 msgstr "crwdns199710:0crwdne199710:0"
 
@@ -797,6 +805,14 @@ msgstr "crwdns157592:0crwdne157592:0"
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:27
 msgid "Based on your HR Policy, select your leave allocation period's start date"
 msgstr "crwdns157594:0crwdne157594:0"
+
+#: desk/src/components/EmailEditor.vue:53
+msgid "Bcc"
+msgstr "crwdns200660:0crwdne200660:0"
+
+#: desk/src/components/EmailEditor.vue:83
+msgid "Bcc:"
+msgstr "crwdns200662:0crwdne200662:0"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -839,7 +855,7 @@ msgstr "crwdns195270:0crwdne195270:0"
 msgid "Call Details"
 msgstr "crwdns159214:0crwdne159214:0"
 
-#: desk/src/components/layouts/Sidebar.vue:254
+#: desk/src/components/layouts/Sidebar.vue:271
 msgid "Call Logs"
 msgstr "crwdns195272:0crwdne195272:0"
 
@@ -855,7 +871,7 @@ msgstr "crwdns195276:0crwdne195276:0"
 msgid "Caller"
 msgstr "crwdns195278:0crwdne195278:0"
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:377
+#: desk/src/pages/ticket/MobileTicketAgent.vue:464
 msgid "Calls"
 msgstr "crwdns195280:0crwdne195280:0"
 
@@ -871,7 +887,7 @@ msgstr "crwdns161596:0crwdne161596:0"
 msgid "Can work on tickets, create custom views and manage private views."
 msgstr "crwdns161598:0crwdne161598:0"
 
-#: desk/src/components/ListViewBuilder.vue:655 desk/src/pages/home/Home.vue:44
+#: desk/src/components/ListViewBuilder.vue:651 desk/src/pages/home/Home.vue:44
 msgid "Cancel"
 msgstr "crwdns199398:0crwdne199398:0"
 
@@ -883,7 +899,7 @@ msgstr "crwdns161600:0crwdne161600:0"
 msgid "Canceled"
 msgstr "crwdns195282:0crwdne195282:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:511
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:513
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr "crwdns157602:0crwdne157602:0"
 
@@ -915,7 +931,7 @@ msgstr "crwdns157606:0crwdne157606:0"
 msgid "Category '{0}' link copied to clipboard"
 msgstr "crwdns195284:0{0}crwdne195284:0"
 
-#: desk/src/pages/knowledge-base/Article.vue:319
+#: desk/src/pages/knowledge-base/Article.vue:333
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:262
 msgid "Category created successfully."
 msgstr "crwdns199712:0crwdne199712:0"
@@ -937,20 +953,28 @@ msgstr "crwdns157608:0crwdne157608:0"
 msgid "Category updated successfully."
 msgstr "crwdns199718:0crwdne199718:0"
 
+#: desk/src/components/EmailEditor.vue:43
+msgid "Cc"
+msgstr "crwdns200664:0crwdne200664:0"
+
+#: desk/src/components/EmailEditor.vue:69
+msgid "Cc:"
+msgstr "crwdns200666:0crwdne200666:0"
+
 #: desk/src/components/Settings/General/components/LogoUpload.vue:40
 msgid "Change"
 msgstr "crwdns161604:0crwdne161604:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:131
+#: desk/src/components/Settings/Profile/Profile.vue:150
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:2
 msgid "Change Password"
 msgstr "crwdns161606:0crwdne161606:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:33
-msgid "Change image"
-msgstr "crwdns161608:0crwdne161608:0"
+#: desk/src/components/Settings/Profile/Profile.vue:228
+msgid "Change Photo"
+msgstr "crwdns200668:0crwdne200668:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:141
+#: desk/src/components/Settings/Profile/Profile.vue:161
 msgid "Change language of the application."
 msgstr "crwdns161610:0crwdne161610:0"
 
@@ -974,11 +998,11 @@ msgstr "crwdns195300:0crwdne195300:0"
 msgid "Change ticket type"
 msgstr "crwdns195302:0crwdne195302:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:157
+#: desk/src/components/Settings/Profile/Profile.vue:177
 msgid "Change timezone of the application."
 msgstr "crwdns197088:0crwdne197088:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:126
+#: desk/src/components/Settings/Profile/Profile.vue:145
 msgid "Change your account password for security."
 msgstr "crwdns161612:0crwdne161612:0"
 
@@ -999,7 +1023,7 @@ msgstr "crwdns157610:0crwdne157610:0"
 msgid "Child field"
 msgstr "crwdns199720:0crwdne199720:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:150
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:151
 msgid "Choose how long this SLA policy will be active."
 msgstr "crwdns161618:0crwdne161618:0"
 
@@ -1007,11 +1031,11 @@ msgstr "crwdns161618:0crwdne161618:0"
 msgid "Choose how tickets are distributed among selected assignees."
 msgstr "crwdns158438:0crwdne158438:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:295
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:296
 msgid "Choose the days of the week when this rule should be active."
 msgstr "crwdns158440:0crwdne158440:0"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:81
+#: desk/src/components/Settings/Holiday/HolidayView.vue:82
 msgid "Choose the duration of this holiday list."
 msgstr "crwdns161620:0crwdne161620:0"
 
@@ -1019,19 +1043,19 @@ msgstr "crwdns161620:0crwdne161620:0"
 msgid "Choose the email service provider you want to configure."
 msgstr "crwdns161622:0crwdne161622:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:142
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:143
 msgid "Choose which tickets are affected by this assignment rule."
 msgstr "crwdns158442:0crwdne158442:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:84
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:85
 msgid "Choose which tickets are affected by this policy."
 msgstr "crwdns161624:0crwdne161624:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:219
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:220
 msgid "Choose which tickets are affected by this un-assignment rule."
 msgstr "crwdns158444:0crwdne158444:0"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:94
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:95
 msgid "Choose who can view and use this response."
 msgstr "crwdns199722:0crwdne199722:0"
 
@@ -1056,7 +1080,7 @@ msgstr "crwdns157614:0crwdne157614:0"
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:45
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:199
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:58
-#: desk/src/pages/ticket/MobileTicketAgent.vue:183
+#: desk/src/pages/ticket/MobileTicketAgent.vue:157
 #: desk/src/pages/ticket/TicketCustomer.vue:14
 msgid "Close"
 msgstr "crwdns158448:0crwdne158448:0"
@@ -1070,11 +1094,11 @@ msgstr "crwdns195308:0crwdne195308:0"
 msgid "Closed"
 msgstr "crwdns160186:0crwdne160186:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:354
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:352
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr "crwdns157618:0crwdne157618:0"
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Collapse"
 msgstr "crwdns195310:0crwdne195310:0"
 
@@ -1095,16 +1119,15 @@ msgid "Comma separated emails to invite."
 msgstr "crwdns199724:0crwdne199724:0"
 
 #. Label of the reference_comment (Link) field in DocType 'HD Notification'
-#: desk/src/components/ticket/ActivityHeader.vue:101
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Comment"
 msgstr "crwdns157624:0crwdne157624:0"
 
-#: desk/src/components/CommentBox.vue:324
+#: desk/src/components/CommentBox.vue:318
 msgid "Comment cannot be empty."
 msgstr "crwdns199726:0crwdne199726:0"
 
-#: desk/src/components/CommentBox.vue:314
+#: desk/src/components/CommentBox.vue:308
 msgid "Comment deleted sucessfully."
 msgstr "crwdns199728:0crwdne199728:0"
 
@@ -1113,7 +1136,7 @@ msgstr "crwdns199728:0crwdne199728:0"
 msgid "Comment not found"
 msgstr "crwdns195312:0crwdne195312:0"
 
-#: desk/src/components/CommentBox.vue:340
+#: desk/src/components/CommentBox.vue:334
 msgid "Comment updated successfully."
 msgstr "crwdns199730:0crwdne199730:0"
 
@@ -1124,7 +1147,7 @@ msgstr "crwdns157626:0crwdne157626:0"
 
 #. Label of the comments_section (Section Break) field in DocType 'HD Settings'
 #: desk/src/pages/SearchAgent.vue:353
-#: desk/src/pages/ticket/MobileTicketAgent.vue:369
+#: desk/src/pages/ticket/MobileTicketAgent.vue:456
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Comments"
 msgstr "crwdns195314:0crwdne195314:0"
@@ -1148,11 +1171,15 @@ msgstr "crwdns195318:0crwdne195318:0"
 msgid "Condition"
 msgstr "crwdns157628:0crwdne157628:0"
 
+#: desk/src/components/Settings/Profile/Profile.vue:135
+msgid "Configure"
+msgstr "crwdns200670:0crwdne200670:0"
+
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:3
 msgid "Configure your Exotel settings for Helpdesk."
 msgstr "crwdns199734:0crwdne199734:0"
 
-#: desk/src/components/Settings/Telephony/Telephony.vue:100
+#: desk/src/components/Settings/Telephony/Telephony.vue:101
 msgid "Configure your Exotel telephony integration settings here"
 msgstr "crwdns199736:0crwdne199736:0"
 
@@ -1160,7 +1187,7 @@ msgstr "crwdns199736:0crwdne199736:0"
 msgid "Configure your Twilio settings for Helpdesk."
 msgstr "crwdns199738:0crwdne199738:0"
 
-#: desk/src/components/Settings/Telephony/Telephony.vue:79
+#: desk/src/components/Settings/Telephony/Telephony.vue:80
 msgid "Configure your Twilio telephony integration settings here"
 msgstr "crwdns199740:0crwdne199740:0"
 
@@ -1172,13 +1199,13 @@ msgstr "crwdns161628:0crwdne161628:0"
 #: desk/src/components/Settings/Teams/TeamEdit.vue:241
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:323
 #: desk/src/pages/knowledge-base/NewArticle.vue:149
-#: desk/src/pages/ticket/MobileTicketAgent.vue:180
+#: desk/src/pages/ticket/MobileTicketAgent.vue:154
 #: desk/src/pages/ticket/TicketCustomer.vue:296
-#: desk/src/pages/ticket/Tickets.vue:380 desk/src/pages/ticket/Tickets.vue:502
+#: desk/src/pages/ticket/Tickets.vue:375 desk/src/pages/ticket/Tickets.vue:497
 msgid "Confirm"
 msgstr "crwdns161630:0crwdne161630:0"
 
-#: desk/src/components/ListViewBuilder.vue:639
+#: desk/src/components/ListViewBuilder.vue:635
 msgid "Confirm Changes"
 msgstr "crwdns199742:0crwdne199742:0"
 
@@ -1186,11 +1213,11 @@ msgstr "crwdns199742:0crwdne199742:0"
 msgid "Confirm Password"
 msgstr "crwdns161632:0crwdne161632:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:408
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:409
 msgid "Confirm overwrite"
 msgstr "crwdns161634:0crwdne161634:0"
 
-#: desk/src/components/layouts/Sidebar.vue:398
+#: desk/src/components/layouts/Sidebar.vue:415
 msgid "Connect your support email"
 msgstr "crwdns195320:0crwdne195320:0"
 
@@ -1252,30 +1279,30 @@ msgstr "crwdns195330:0crwdne195330:0"
 msgid "Copy ticket id"
 msgstr "crwdns195332:0crwdne195332:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:650
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:666
 msgid "Could not an email due to: {0}"
 msgstr "crwdns159052:0{0}crwdne159052:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:808
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:827
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr "crwdns159054:0{0}crwdne159054:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:172
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:170
 msgid "Could not send feedback email,due to: {0}"
 msgstr "crwdns157642:0{0}crwdne157642:0"
 
 #: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
-#: desk/src/components/layouts/Sidebar.vue:500
+#: desk/src/components/layouts/Sidebar.vue:517
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
 #: desk/src/pages/knowledge-base/NewArticle.vue:31
 msgid "Create"
 msgstr "crwdns161636:0crwdne161636:0"
 
-#: desk/src/components/layouts/Sidebar.vue:493
-#: desk/src/components/layouts/Sidebar.vue:499
+#: desk/src/components/layouts/Sidebar.vue:510
+#: desk/src/components/layouts/Sidebar.vue:516
 msgid "Create & invite a contact"
 msgstr "crwdns195334:0crwdne195334:0"
 
@@ -1283,15 +1310,15 @@ msgstr "crwdns195334:0crwdne195334:0"
 msgid "Create New Contact"
 msgstr "crwdns195336:0crwdne195336:0"
 
-#: desk/src/pages/ticket/Tickets.vue:349 desk/src/pages/ticket/Tickets.vue:353
+#: desk/src/pages/ticket/Tickets.vue:344 desk/src/pages/ticket/Tickets.vue:348
 msgid "Create View"
 msgstr "crwdns195338:0crwdne195338:0"
 
-#: desk/src/components/layouts/Sidebar.vue:431
+#: desk/src/components/layouts/Sidebar.vue:448
 msgid "Create a ticket"
 msgstr "crwdns195340:0crwdne195340:0"
 
-#: desk/src/components/layouts/Sidebar.vue:476
+#: desk/src/components/layouts/Sidebar.vue:493
 msgid "Create an article"
 msgstr "crwdns195342:0crwdne195342:0"
 
@@ -1344,7 +1371,7 @@ msgstr "crwdns157648:0crwdne157648:0"
 msgid "Customer created successfully."
 msgstr "crwdns199754:0crwdne199754:0"
 
-#: desk/src/components/layouts/Sidebar.vue:316
+#: desk/src/components/layouts/Sidebar.vue:333
 msgid "Customer portal"
 msgstr "crwdns195348:0crwdne195348:0"
 
@@ -1361,8 +1388,8 @@ msgstr "crwdns159056:0crwdne159056:0"
 msgid "Cyan"
 msgstr "crwdns159058:0crwdne159058:0"
 
-#: desk/src/components/layouts/Sidebar.vue:350
-#: desk/src/pages/knowledge-base/Article.vue:642
+#: desk/src/components/layouts/Sidebar.vue:367
+#: desk/src/pages/knowledge-base/Article.vue:656
 msgid "Danger"
 msgstr "crwdns195350:0crwdne195350:0"
 
@@ -1421,7 +1448,7 @@ msgstr "crwdns161652:0crwdne161652:0"
 msgid "Default Ticket Status"
 msgstr "crwdns159060:0crwdne159060:0"
 
-#: desk/src/pages/ticket/Tickets.vue:306 desk/src/pages/ticket/Tickets.vue:399
+#: desk/src/pages/ticket/Tickets.vue:301 desk/src/pages/ticket/Tickets.vue:394
 msgid "Default Views"
 msgstr "crwdns195354:0crwdne195354:0"
 
@@ -1430,11 +1457,11 @@ msgstr "crwdns195354:0crwdne195354:0"
 msgid "Default actions"
 msgstr "crwdns195356:0crwdne195356:0"
 
-#: desk/src/components/Settings/Telephony/Telephony.vue:48
+#: desk/src/components/Settings/Telephony/Telephony.vue:49
 msgid "Default calling medium for logged in user"
 msgstr "crwdns199758:0crwdne199758:0"
 
-#: desk/src/components/Settings/Telephony/Telephony.vue:45
+#: desk/src/components/Settings/Telephony/Telephony.vue:46
 msgid "Default medium"
 msgstr "crwdns199760:0crwdne199760:0"
 
@@ -1462,9 +1489,9 @@ msgstr "crwdns157662:0crwdne157662:0"
 msgid "Define who receives the tickets and how they’re distributed among agents."
 msgstr "crwdns158452:0crwdne158452:0"
 
-#: desk/src/components/ListViewBuilder.vue:234
-#: desk/src/components/ListViewBuilder.vue:238
-#: desk/src/components/ListViewBuilder.vue:244
+#: desk/src/components/ListViewBuilder.vue:233
+#: desk/src/components/ListViewBuilder.vue:237
+#: desk/src/components/ListViewBuilder.vue:243
 #: desk/src/components/Settings/Teams/TeamEdit.vue:348
 #: desk/src/components/Settings/Teams/TeamEdit.vue:350
 #: desk/src/components/ticket-agent/TicketHeader.vue:209
@@ -1473,11 +1500,11 @@ msgstr "crwdns158452:0crwdne158452:0"
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:176
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:195
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:204
-#: desk/src/pages/ticket/Tickets.vue:486
+#: desk/src/pages/ticket/Tickets.vue:481
 msgid "Delete"
 msgstr "crwdns161654:0crwdne161654:0"
 
-#: desk/src/pages/ticket/Tickets.vue:482
+#: desk/src/pages/ticket/Tickets.vue:477
 msgid "Delete View"
 msgstr "crwdns195360:0crwdne195360:0"
 
@@ -1489,7 +1516,7 @@ msgstr "crwdns199762:0crwdne199762:0"
 msgid "Delete category?"
 msgstr "crwdns195364:0crwdne195364:0"
 
-#: desk/src/pages/ticket/Tickets.vue:491
+#: desk/src/pages/ticket/Tickets.vue:486
 msgid "Delete {0}"
 msgstr "crwdns199764:0{0}crwdne199764:0"
 
@@ -1502,12 +1529,12 @@ msgstr "crwdns199764:0{0}crwdne199764:0"
 #. Label of the description (Small Text) field in DocType 'HD Ticket Priority'
 #. Label of the description (Small Text) field in DocType 'HD Ticket Type'
 #. Label of a field in the tickets Web Form
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:120
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:121
-#: desk/src/components/Settings/Holiday/HolidayView.vue:68
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:122
 #: desk/src/components/Settings/Holiday/HolidayView.vue:69
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:71
+#: desk/src/components/Settings/Holiday/HolidayView.vue:70
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:72
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:73
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -1530,16 +1557,16 @@ msgstr "crwdns157666:0crwdne157666:0"
 msgid "Description Weight"
 msgstr "crwdns157668:0crwdne157668:0"
 
-#: desk/src/pages/ticket/TicketNew.vue:89
-#: desk/src/pages/ticket/TicketNew.vue:114
+#: desk/src/pages/ticket/TicketNew.vue:90
+#: desk/src/pages/ticket/TicketNew.vue:115
 msgid "Detailed explanation"
 msgstr "crwdns195368:0crwdne195368:0"
 
 #. Label of the details_section (Section Break) field in DocType 'HD
 #. Notification'
 #. Label of the sb_details (Section Break) field in DocType 'HD Ticket'
-#: desk/src/pages/ticket/MobileTicketAgent.vue:92
-#: desk/src/pages/ticket/MobileTicketAgent.vue:353
+#: desk/src/pages/ticket/MobileTicketAgent.vue:79
+#: desk/src/pages/ticket/MobileTicketAgent.vue:440
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Details"
@@ -1559,13 +1586,15 @@ msgstr "crwdns195370:0crwdne195370:0"
 msgid "Disable saved replies with scope 'Global'"
 msgstr "crwdns195372:0crwdne195372:0"
 
-#: desk/src/components/Settings/General/General.vue:49
+#: desk/src/components/Settings/General/General.vue:55
 msgid "Disable signup"
 msgstr "crwdns161658:0crwdne161658:0"
 
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
+#. Label of the disabled (Check) field in DocType 'HD Ticket Priority'
 #. Label of the disabled (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Disabled"
 msgstr "crwdns160044:0crwdne160044:0"
@@ -1612,7 +1641,7 @@ msgstr "crwdns161662:0crwdne161662:0"
 msgid "DocType"
 msgstr "crwdns157676:0crwdne157676:0"
 
-#: desk/src/components/layouts/Sidebar.vue:330
+#: desk/src/components/layouts/Sidebar.vue:347
 msgid "Docs"
 msgstr "crwdns195382:0crwdne195382:0"
 
@@ -1644,7 +1673,7 @@ msgstr "crwdns157680:0crwdne157680:0"
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:266
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:61
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:102
-#: desk/src/pages/ticket/Tickets.vue:403
+#: desk/src/pages/ticket/Tickets.vue:398
 msgid "Duplicate"
 msgstr "crwdns158454:0crwdne158454:0"
 
@@ -1678,8 +1707,8 @@ msgid "Easily invite new agents, managers, or admins."
 msgstr "crwdns161668:0crwdne161668:0"
 
 #: desk/src/pages/home/Home.vue:36
-#: desk/src/pages/knowledge-base/Article.vue:610
-#: desk/src/pages/ticket/Tickets.vue:471
+#: desk/src/pages/knowledge-base/Article.vue:624
+#: desk/src/pages/ticket/Tickets.vue:466
 msgid "Edit"
 msgstr "crwdns195392:0crwdne195392:0"
 
@@ -1705,7 +1734,7 @@ msgid "Edit your email account"
 msgstr "crwdns161672:0crwdne161672:0"
 
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
-#: desk/src/components/ticket/ActivityHeader.vue:95
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:74
 #: desk/src/pages/SearchAgent.vue:184
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "Email"
@@ -1713,6 +1742,7 @@ msgstr "crwdns157682:0crwdne157682:0"
 
 #. Label of the email_account (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:73
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Email Account"
@@ -1729,7 +1759,7 @@ msgstr "crwdns161676:0crwdne161676:0"
 #. Settings'
 #. Label of the reply_via_agent_email_content (Text) field in DocType 'HD
 #. Settings'
-#: desk/src/components/Settings/EmailNotifications/Notification.vue:67
+#: desk/src/components/Settings/EmailNotifications/Notification.vue:68
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Email Content"
 msgstr "crwdns159064:0crwdne159064:0"
@@ -1745,6 +1775,10 @@ msgstr "crwdns195398:0crwdne195398:0"
 msgid "Email Notifications"
 msgstr "crwdns159066:0crwdne159066:0"
 
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:8
+msgid "Email Settings"
+msgstr "crwdns200672:0crwdne200672:0"
+
 #: desk/src/components/Settings/EmailAdd.vue:307
 msgid "Email account created"
 msgstr "crwdns161678:0crwdne161678:0"
@@ -1757,15 +1791,24 @@ msgstr "crwdns199766:0crwdne199766:0"
 msgid "Email account updated successfully"
 msgstr "crwdns161680:0crwdne161680:0"
 
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:221
+msgid "Email settings updated successfully."
+msgstr "crwdns200674:0crwdne200674:0"
+
 #: desk/src/components/desk/global/NewContactDialog.vue:234
 msgid "Email should not be empty"
 msgstr "crwdns195400:0crwdne195400:0"
 
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:55
 #: desk/src/pages/SearchAgent.vue:352
 #: desk/src/pages/desk/contact/ContactDialog.vue:43
-#: desk/src/pages/ticket/MobileTicketAgent.vue:364
+#: desk/src/pages/ticket/MobileTicketAgent.vue:451
 msgid "Emails"
 msgstr "crwdns195402:0crwdne195402:0"
+
+#: desk/src/components/Settings/Profile/Profile.vue:124
+msgid "Emails & Signature"
+msgstr "crwdns200676:0crwdne200676:0"
 
 #: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
@@ -1805,15 +1848,15 @@ msgstr "crwdns157686:0crwdne157686:0"
 #. Settings'
 #. Label of the enabled (Check) field in DocType 'HD Stopword'
 #. Label of the enabled (Check) field in DocType 'HD Ticket Status'
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:31
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:32
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:31
-#: desk/src/components/Settings/EmailNotifications/Notification.vue:37
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:22
+#: desk/src/components/Settings/EmailNotifications/Notification.vue:38
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:26
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:80
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:34
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:30
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:49
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:38
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:31
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:40
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:39
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -1859,7 +1902,7 @@ msgstr "crwdns161688:0crwdne161688:0"
 msgid "Error moving article to category"
 msgstr "crwdns157698:0crwdne157698:0"
 
-#: helpdesk/overrides/email_account.py:43
+#: helpdesk/overrides/email_account.py:93
 msgid "Error processing email at index {0}, message: {1}"
 msgstr "crwdns160636:0{0}crwdnd160636:0{1}crwdne160636:0"
 
@@ -1867,7 +1910,7 @@ msgstr "crwdns160636:0{0}crwdnd160636:0{1}crwdne160636:0"
 msgid "Error updating customer"
 msgstr "crwdns199768:0crwdne199768:0"
 
-#: helpdesk/overrides/email_account.py:92
+#: helpdesk/overrides/email_account.py:142
 msgid "Error while connecting to email account {0}"
 msgstr "crwdns157700:0{0}crwdne157700:0"
 
@@ -1881,20 +1924,20 @@ msgid "Excel"
 msgstr "crwdns195412:0crwdne195412:0"
 
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:10
-#: desk/src/components/Settings/Telephony/Telephony.vue:96
+#: desk/src/components/Settings/Telephony/Telephony.vue:97
 msgid "Exotel"
 msgstr "crwdns199770:0crwdne199770:0"
 
-#: desk/src/components/layouts/Sidebar.vue:131
+#: desk/src/components/layouts/Sidebar.vue:136
 msgid "Expand"
 msgstr "crwdns195414:0crwdne195414:0"
 
-#: desk/src/components/layouts/Sidebar.vue:513
+#: desk/src/components/layouts/Sidebar.vue:530
 msgid "Explore customer portal"
 msgstr "crwdns195416:0crwdne195416:0"
 
 #: desk/src/components/ticket/ExportModal.vue:2
-#: desk/src/pages/ticket/Tickets.vue:106
+#: desk/src/pages/ticket/Tickets.vue:101
 msgid "Export"
 msgstr "crwdns195418:0crwdne195418:0"
 
@@ -1913,8 +1956,8 @@ msgstr "crwdns157704:0crwdne157704:0"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: desk/src/pages/call-logs/CallLogModal.vue:211
-#: desk/src/pages/ticket/Tickets.vue:193 desk/src/pages/ticket/Tickets.vue:206
-#: desk/src/pages/ticket/Tickets.vue:237
+#: desk/src/pages/ticket/Tickets.vue:188 desk/src/pages/ticket/Tickets.vue:201
+#: desk/src/pages/ticket/Tickets.vue:232
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
 msgstr "crwdns157706:0crwdne157706:0"
@@ -1931,9 +1974,9 @@ msgstr "crwdns161690:0crwdne161690:0"
 msgid "Failed to delete ticket."
 msgstr "crwdns199774:0crwdne199774:0"
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:218
-#: desk/src/components/Settings/Telephony/Telephony.vue:191
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:186
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:209
+#: desk/src/components/Settings/Telephony/Telephony.vue:192
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:187
 msgid "Failed to load telephony agent"
 msgstr "crwdns161692:0crwdne161692:0"
 
@@ -1941,20 +1984,24 @@ msgstr "crwdns161692:0crwdne161692:0"
 msgid "Failed to pull emails"
 msgstr "crwdns161694:0crwdne161694:0"
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:283
-#: desk/src/components/Settings/Telephony/Telephony.vue:234
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:274
+#: desk/src/components/Settings/Telephony/Telephony.vue:235
 msgid "Failed to save Exotel settings"
 msgstr "crwdns161696:0crwdne161696:0"
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:275
-#: desk/src/components/Settings/Telephony/Telephony.vue:226
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:229
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:266
+#: desk/src/components/Settings/Telephony/Telephony.vue:227
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:230
 msgid "Failed to save Twilio settings"
 msgstr "crwdns161698:0crwdne161698:0"
 
-#: desk/src/components/ticket-agent/AssignTo.vue:83
+#: desk/src/components/ticket-agent/AssignTo.vue:443
 msgid "Failed to update Assignee's."
 msgstr "crwdns199776:0crwdne199776:0"
+
+#: desk/src/components/ticket-agent/AssignTo.vue:495
+msgid "Failed to update Assignees."
+msgstr "crwdns200638:0crwdne200638:0"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:308
 msgid "Failed to update category."
@@ -1973,7 +2020,7 @@ msgstr "crwdns161702:0crwdne161702:0"
 #. Label of the feedback (Select) field in DocType 'HD Article Feedback'
 #. Label of the feedback_section (Section Break) field in DocType 'HD Settings'
 #. Label of the feedback_tab (Tab Break) field in DocType 'HD Ticket'
-#: desk/src/pages/home/components/RecentFeedback.vue:152
+#: desk/src/pages/home/components/RecentFeedback.vue:156
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2013,7 +2060,7 @@ msgstr "crwdns157718:0crwdne157718:0"
 msgid "Feedback Trend"
 msgstr "crwdns160538:0crwdne160538:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:170
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:168
 msgid "Feedback email has been sent to the customer"
 msgstr "crwdns157720:0crwdne157720:0"
 
@@ -2030,11 +2077,11 @@ msgstr "crwdns157722:0crwdne157722:0"
 msgid "Field Dependencies"
 msgstr "crwdns161704:0crwdne161704:0"
 
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:308
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:312
 msgid "Field Dependency created successfully"
 msgstr "crwdns161706:0crwdne161706:0"
 
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:309
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:313
 msgid "Field Dependency updated successfully"
 msgstr "crwdns161708:0crwdne161708:0"
 
@@ -2065,7 +2112,7 @@ msgstr "crwdns157728:0crwdne157728:0"
 msgid "Filters"
 msgstr "crwdns157730:0crwdne157730:0"
 
-#: desk/src/components/Settings/EmailNotifications/Notification.vue:76
+#: desk/src/components/Settings/EmailNotifications/Notification.vue:77
 #: desk/src/components/Settings/General/components/TicketSettings.vue:229
 msgid "Find out all of the variables that can be used in the content"
 msgstr "crwdns159068:0crwdne159068:0"
@@ -2097,10 +2144,6 @@ msgstr "crwdns157736:0crwdne157736:0"
 msgid "First Response Time for Tickets"
 msgstr "crwdns157738:0crwdne157738:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:109
-msgid "First name"
-msgstr "crwdns199784:0crwdne199784:0"
-
 #: desk/src/components/desk/global/NewContactDialog.vue:246
 msgid "First name should not be empty"
 msgstr "crwdns195424:0crwdne195424:0"
@@ -2119,6 +2162,7 @@ msgid "Friday"
 msgstr "crwdns157742:0crwdne157742:0"
 
 #. Label of the user_from (Link) field in DocType 'HD Notification'
+#: desk/src/components/EmailEditor.vue:23
 #: desk/src/pages/call-logs/CallLogModal.vue:44
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "From"
@@ -2133,8 +2177,8 @@ msgstr "crwdns157744:0crwdne157744:0"
 msgid "From Date"
 msgstr "crwdns157746:0crwdne157746:0"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:86
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:155
+#: desk/src/components/Settings/Holiday/HolidayView.vue:87
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:156
 msgid "From date"
 msgstr "crwdns161716:0crwdne161716:0"
 
@@ -2143,13 +2187,13 @@ msgid "From is required"
 msgstr "crwdns195426:0crwdne195426:0"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
-#: desk/src/pages/ticket/Tickets.vue:200 desk/src/pages/ticket/Tickets.vue:231
+#: desk/src/pages/ticket/Tickets.vue:195 desk/src/pages/ticket/Tickets.vue:226
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Fulfilled"
 msgstr "crwdns157748:0crwdne157748:0"
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/layouts/Sidebar.vue:484
+#: desk/src/components/layouts/Sidebar.vue:501
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
 msgstr "crwdns161718:0crwdne161718:0"
@@ -2176,7 +2220,7 @@ msgstr "crwdns199786:0crwdne199786:0"
 #: desk/src/components/SavedRepliesSelectorModal.vue:174
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:349
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:383
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:233
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:234
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Global"
 msgstr "crwdns195428:0crwdne195428:0"
@@ -2429,11 +2473,11 @@ msgstr "crwdns157836:0crwdne157836:0"
 msgid "Headings Weight"
 msgstr "crwdns157838:0crwdne157838:0"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:133
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:134
 msgid "Hello {{ contact }}, \\n\\nWe are sorry for the inconvenience, we will get back to you soon. \\n\\nRegards, \\n{{ full_name }}"
 msgstr "crwdns195438:0{{ contact }}crwdnd195438:0{{ full_name }}crwdne195438:0"
 
-#: desk/src/components/layouts/Sidebar.vue:117
+#: desk/src/components/layouts/Sidebar.vue:122
 msgid "Help"
 msgstr "crwdns195440:0crwdne195440:0"
 
@@ -2476,11 +2520,11 @@ msgstr "crwdns157850:0crwdne157850:0"
 msgid "Hide from customer"
 msgstr "crwdns157852:0crwdne157852:0"
 
-#: desk/src/pages/ticket/Tickets.vue:433
+#: desk/src/pages/ticket/Tickets.vue:428
 msgid "Hide from sidebar"
 msgstr "crwdns199410:0crwdne199410:0"
 
-#: desk/src/pages/ticket/Tickets.vue:441
+#: desk/src/pages/ticket/Tickets.vue:436
 msgid "Hide view from sidebar"
 msgstr "crwdns199412:0crwdne199412:0"
 
@@ -2501,7 +2545,7 @@ msgstr "crwdns157854:0crwdne157854:0"
 msgid "Holiday List Name"
 msgstr "crwdns157856:0crwdne157856:0"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:373
+#: desk/src/components/Settings/Holiday/HolidayView.vue:374
 msgid "Holiday list created successfully."
 msgstr "crwdns199788:0crwdne199788:0"
 
@@ -2513,15 +2557,15 @@ msgstr "crwdns199790:0crwdne199790:0"
 msgid "Holiday list duplicated successfully."
 msgstr "crwdns199792:0crwdne199792:0"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:435
+#: desk/src/components/Settings/Holiday/HolidayView.vue:436
 msgid "Holiday list updated successfully."
 msgstr "crwdns199794:0crwdne199794:0"
 
 #. Label of the holidays_section (Section Break) field in DocType 'HD Service
 #. Holiday List'
 #. Label of the holidays (Table) field in DocType 'HD Service Holiday List'
-#: desk/src/components/Settings/Holiday/HolidayView.vue:149
-#: desk/src/components/Settings/Holiday/HolidayView.vue:189
+#: desk/src/components/Settings/Holiday/HolidayView.vue:150
+#: desk/src/components/Settings/Holiday/HolidayView.vue:190
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Holidays"
 msgstr "crwdns157858:0crwdne157858:0"
@@ -2530,7 +2574,7 @@ msgstr "crwdns157858:0crwdne157858:0"
 msgid "Home"
 msgstr "crwdns199414:0crwdne199414:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:130
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:131
 msgid "I understand, add conditions"
 msgstr "crwdns161730:0crwdne161730:0"
 
@@ -2655,9 +2699,9 @@ msgstr "crwdns157882:0crwdne157882:0"
 msgid "Invalid email"
 msgstr "crwdns195448:0crwdne195448:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:493
-#: desk/src/components/Settings/Holiday/HolidayView.vue:343
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:399
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:494
+#: desk/src/components/Settings/Holiday/HolidayView.vue:344
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:400
 msgid "Invalid fields, check if all are filled in and values are correct."
 msgstr "crwdns161736:0crwdne161736:0"
 
@@ -2683,7 +2727,7 @@ msgstr "crwdns161738:0crwdne161738:0"
 msgid "Invite agent"
 msgstr "crwdns158458:0crwdne158458:0"
 
-#: desk/src/components/layouts/Sidebar.vue:409
+#: desk/src/components/layouts/Sidebar.vue:426
 msgid "Invite agents"
 msgstr "crwdns195454:0crwdne195454:0"
 
@@ -2738,19 +2782,15 @@ msgstr "crwdns157894:0crwdne157894:0"
 msgid "Is setup complete"
 msgstr "crwdns157896:0crwdne157896:0"
 
-#: desk/src/components/ListViewBuilder.vue:266
+#: desk/src/components/ListViewBuilder.vue:265
 msgid "Item(s) deleted successfully."
 msgstr "crwdns199802:0crwdne199802:0"
-
-#: desk/src/components/ticket-agent/AssignToBody.vue:11
-msgid "John Doe"
-msgstr "crwdns159220:0crwdne159220:0"
 
 #: desk/src/components/command-palette/CP.vue:114
 msgid "Jump to"
 msgstr "crwdns195460:0crwdne195460:0"
 
-#: desk/src/pages/knowledge-base/Article.vue:656
+#: desk/src/pages/knowledge-base/Article.vue:670
 msgid "KB"
 msgstr "crwdns199804:0crwdne199804:0"
 
@@ -2770,7 +2810,7 @@ msgstr "crwdns195462:0crwdne195462:0"
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/command-palette/CP.vue:104
-#: desk/src/pages/knowledge-base/Article.vue:656
+#: desk/src/pages/knowledge-base/Article.vue:670
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:6
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:458
 #: desk/src/pages/knowledge-base/NewArticle.vue:171
@@ -2799,26 +2839,22 @@ msgstr "crwdns159086:0crwdne159086:0"
 msgid "Landing Page"
 msgstr "crwdns199420:0crwdne199420:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:138
+#: desk/src/components/Settings/Profile/Profile.vue:158
 msgid "Language"
 msgstr "crwdns161742:0crwdne161742:0"
-
-#: desk/src/components/Settings/Profile/Profile.vue:300
-msgid "Language updated successfully."
-msgstr "crwdns199806:0crwdne199806:0"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
 msgstr "crwdns158460:0crwdne158460:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:293
-#: desk/src/pages/home/components/RecentFeedback.vue:313
+#: desk/src/pages/home/components/RecentFeedback.vue:297
+#: desk/src/pages/home/components/RecentFeedback.vue:317
 msgid "Last 3 Months"
 msgstr "crwdns199422:0crwdne199422:0"
 
-#: desk/src/pages/home/components/CardBase.vue:104
 #: desk/src/pages/home/components/CardBase.vue:106
-#: desk/src/pages/home/components/CardBase.vue:107
+#: desk/src/pages/home/components/CardBase.vue:108
+#: desk/src/pages/home/components/CardBase.vue:109
 msgid "Last 3 months"
 msgstr "crwdns199424:0crwdne199424:0"
 
@@ -2854,8 +2890,8 @@ msgstr "crwdns195472:0crwdne195472:0"
 msgid "Last Customer Response"
 msgstr "crwdns195474:0crwdne195474:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:289
-#: desk/src/pages/home/components/RecentFeedback.vue:312
+#: desk/src/pages/home/components/RecentFeedback.vue:293
+#: desk/src/pages/home/components/RecentFeedback.vue:316
 msgid "Last Month"
 msgstr "crwdns199426:0crwdne199426:0"
 
@@ -2863,31 +2899,27 @@ msgstr "crwdns199426:0crwdne199426:0"
 msgid "Last Name"
 msgstr "crwdns161746:0crwdne161746:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:285
-#: desk/src/pages/home/components/RecentFeedback.vue:311
+#: desk/src/pages/home/components/RecentFeedback.vue:289
+#: desk/src/pages/home/components/RecentFeedback.vue:315
 msgid "Last Week"
 msgstr "crwdns199428:0crwdne199428:0"
 
 #: desk/src/pages/home/components/AgentTicketsCard.vue:34
 #: desk/src/pages/home/components/AvgTimeCard.vue:50
-#: desk/src/pages/home/components/CardBase.vue:78
-#: desk/src/pages/home/components/CardBase.vue:97
+#: desk/src/pages/home/components/CardBase.vue:80
 #: desk/src/pages/home/components/CardBase.vue:99
-#: desk/src/pages/home/components/CardBase.vue:100
+#: desk/src/pages/home/components/CardBase.vue:101
+#: desk/src/pages/home/components/CardBase.vue:102
 msgid "Last month"
 msgstr "crwdns199430:0crwdne199430:0"
-
-#: desk/src/components/Settings/Profile/Profile.vue:115
-msgid "Last name"
-msgstr "crwdns199808:0crwdne199808:0"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
 msgid "Last user assigned by this rule"
 msgstr "crwdns158462:0crwdne158462:0"
 
-#: desk/src/pages/home/components/CardBase.vue:90
 #: desk/src/pages/home/components/CardBase.vue:92
-#: desk/src/pages/home/components/CardBase.vue:93
+#: desk/src/pages/home/components/CardBase.vue:94
+#: desk/src/pages/home/components/CardBase.vue:95
 msgid "Last week"
 msgstr "crwdns199432:0crwdne199432:0"
 
@@ -2896,8 +2928,8 @@ msgstr "crwdns199432:0crwdne199432:0"
 msgid "Layout"
 msgstr "crwdns199434:0crwdne199434:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:150
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:227
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:151
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:228
 msgid "Learn about conditions"
 msgstr "crwdns158464:0crwdne158464:0"
 
@@ -2929,16 +2961,16 @@ msgstr "crwdns195480:0crwdne195480:0"
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #. Label of the list_tab (Tab Break) field in DocType 'HD View'
-#: desk/src/components/ListViewBuilder.vue:734
-#: desk/src/components/ListViewBuilder.vue:768
-#: desk/src/pages/ticket/Tickets.vue:575 desk/src/pages/ticket/Tickets.vue:589
-#: desk/src/pages/ticket/Tickets.vue:619
+#: desk/src/components/ListViewBuilder.vue:730
+#: desk/src/components/ListViewBuilder.vue:772
+#: desk/src/pages/ticket/Tickets.vue:570 desk/src/pages/ticket/Tickets.vue:584
+#: desk/src/pages/ticket/Tickets.vue:614
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
 msgstr "crwdns157908:0crwdne157908:0"
 
-#: desk/src/pages/ticket/Tickets.vue:309
+#: desk/src/pages/ticket/Tickets.vue:304
 msgid "List View"
 msgstr "crwdns195482:0crwdne195482:0"
 
@@ -2956,16 +2988,20 @@ msgstr "crwdns157910:0crwdne157910:0"
 msgid "Load More"
 msgstr "crwdns161750:0crwdne161750:0"
 
-#: desk/src/components/ticket/ActivityHeader.vue:123
+#: desk/src/components/ticket-agent/AssignTo.vue:93
+msgid "Loading..."
+msgstr "crwdns200640:0crwdne200640:0"
+
+#: desk/src/components/ticket/ActivityHeader.vue:65
 msgid "Log a Call"
 msgstr "crwdns195484:0crwdne195484:0"
 
-#: desk/src/components/layouts/Sidebar.vue:305
-#: desk/src/components/layouts/Sidebar.vue:354
+#: desk/src/components/layouts/Sidebar.vue:322
+#: desk/src/components/layouts/Sidebar.vue:371
 msgid "Log out"
 msgstr "crwdns195486:0crwdne195486:0"
 
-#: desk/src/components/layouts/Sidebar.vue:334
+#: desk/src/components/layouts/Sidebar.vue:351
 msgid "Login to Frappe Cloud"
 msgstr "crwdns195488:0crwdne195488:0"
 
@@ -2981,15 +3017,15 @@ msgstr "crwdns157912:0crwdne157912:0"
 msgid "Lower the Integer value, higher is the priority of the issue"
 msgstr "crwdns157914:0crwdne157914:0"
 
-#: desk/src/pages/ticket/Tickets.vue:453
+#: desk/src/pages/ticket/Tickets.vue:448
 msgid "Make Private"
 msgstr "crwdns195490:0crwdne195490:0"
 
-#: desk/src/pages/ticket/Tickets.vue:453
+#: desk/src/pages/ticket/Tickets.vue:448
 msgid "Make Public"
 msgstr "crwdns195492:0crwdne195492:0"
 
-#: desk/src/components/ticket/ActivityHeader.vue:118
+#: desk/src/components/ticket/ActivityHeader.vue:60
 msgid "Make a Call"
 msgstr "crwdns195494:0crwdne195494:0"
 
@@ -2997,7 +3033,7 @@ msgstr "crwdns195494:0crwdne195494:0"
 msgid "Make feedback mandatory"
 msgstr "crwdns161752:0crwdne161752:0"
 
-#: desk/src/pages/ticket/Tickets.vue:461
+#: desk/src/pages/ticket/Tickets.vue:456
 msgid "Make view private"
 msgstr "crwdns199436:0crwdne199436:0"
 
@@ -3009,9 +3045,17 @@ msgstr "crwdns161754:0crwdne161754:0"
 msgid "Manage pre-defined responses that can be used to respond to customer queries."
 msgstr "crwdns195498:0crwdne195498:0"
 
+#: desk/src/components/Settings/Profile/Profile.vue:128
+msgid "Manage your account emails and email signature for communication."
+msgstr "crwdns200678:0crwdne200678:0"
+
 #: desk/src/components/Settings/EmailAccountList.vue:5
 msgid "Manage your email accounts and configure incoming and outgoing settings."
 msgstr "crwdns161756:0crwdne161756:0"
+
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:40
+msgid "Manage your email signature."
+msgstr "crwdns200680:0crwdne200680:0"
 
 #: desk/src/components/Settings/Profile/Profile.vue:4
 msgid "Manage your profile information."
@@ -3022,7 +3066,7 @@ msgstr "crwdns161758:0crwdne161758:0"
 msgid "Mark all as read"
 msgstr "crwdns195500:0crwdne195500:0"
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:45
+#: desk/src/components/Settings/Teams/NewTeam.vue:46
 msgid "Members"
 msgstr "crwdns161760:0crwdne161760:0"
 
@@ -3081,7 +3125,7 @@ msgstr "crwdns157926:0crwdne157926:0"
 msgid "Monthly"
 msgstr "crwdns157928:0crwdne157928:0"
 
-#: desk/src/pages/knowledge-base/Article.vue:620
+#: desk/src/pages/knowledge-base/Article.vue:634
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:187
 msgid "Move To"
 msgstr "crwdns195506:0crwdne195506:0"
@@ -3089,10 +3133,6 @@ msgstr "crwdns195506:0crwdne195506:0"
 #: desk/src/pages/dashboard/Dashboard.vue:243
 msgid "My Dashboard"
 msgstr "crwdns199810:0crwdne199810:0"
-
-#: desk/src/components/Settings/SettingsModal.vue:15
-msgid "My Settings"
-msgstr "crwdns199812:0crwdne199812:0"
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:169
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:342
@@ -3108,14 +3148,14 @@ msgstr "crwdns199438:0crwdne199438:0"
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
 #. Label of the brand_name (Data) field in DocType 'HD Settings'
 #. Label of the team_name (Data) field in DocType 'HD Team'
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:61
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:62
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:63
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:78
-#: desk/src/components/Settings/Holiday/HolidayView.vue:52
 #: desk/src/components/Settings/Holiday/HolidayView.vue:53
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:62
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:57
+#: desk/src/components/Settings/Holiday/HolidayView.vue:54
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:63
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:58
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:59
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -3138,12 +3178,12 @@ msgstr "crwdns159088:0crwdne159088:0"
 msgid "Navigation"
 msgstr "crwdns195510:0crwdne195510:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:304
-#: desk/src/pages/home/components/RecentFeedback.vue:321
+#: desk/src/pages/home/components/RecentFeedback.vue:308
+#: desk/src/pages/home/components/RecentFeedback.vue:325
 msgid "Negative first"
 msgstr "crwdns199440:0crwdne199440:0"
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:16
+#: desk/src/components/SavedRepliesSelectorModal.vue:17
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:19
 #: desk/src/components/Settings/EmailAccountList.vue:12
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:27
@@ -3151,8 +3191,7 @@ msgstr "crwdns199440:0crwdne199440:0"
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:12
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:25
 #: desk/src/components/Settings/Teams/TeamsList.vue:10
-#: desk/src/components/ticket/ActivityHeader.vue:34
-#: desk/src/components/ticket/ActivityHeader.vue:50
+#: desk/src/components/ticket/ActivityHeader.vue:19
 #: desk/src/pages/home/Home.vue:55
 msgid "New"
 msgstr "crwdns161768:0crwdne161768:0"
@@ -3178,15 +3217,7 @@ msgstr "crwdns161772:0crwdne161772:0"
 msgid "New Call Log"
 msgstr "crwdns195514:0crwdne195514:0"
 
-#: desk/src/components/ticket/ActivityHeader.vue:26
-msgid "New Comment"
-msgstr "crwdns195516:0crwdne195516:0"
-
-#: desk/src/components/ticket/ActivityHeader.vue:16
-msgid "New Email"
-msgstr "crwdns195518:0crwdne195518:0"
-
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:109
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:113
 msgid "New Field Dependency"
 msgstr "crwdns161774:0crwdne161774:0"
 
@@ -3214,7 +3245,7 @@ msgstr "crwdns195520:0crwdne195520:0"
 msgid "New Saved reply Name"
 msgstr "crwdns195522:0crwdne195522:0"
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:165
+#: desk/src/pages/ticket/MobileTicketAgent.vue:139
 msgid "New Subject"
 msgstr "crwdns195524:0crwdne195524:0"
 
@@ -3222,8 +3253,8 @@ msgstr "crwdns195524:0crwdne195524:0"
 msgid "New Team"
 msgstr "crwdns161784:0crwdne161784:0"
 
-#: desk/src/pages/ticket/TicketNew.vue:301
-#: desk/src/pages/ticket/TicketNew.vue:311
+#: desk/src/pages/ticket/TicketNew.vue:302
+#: desk/src/pages/ticket/TicketNew.vue:312
 msgid "New Ticket"
 msgstr "crwdns195526:0crwdne195526:0"
 
@@ -3241,7 +3272,7 @@ msgstr "crwdns195528:0crwdne195528:0"
 msgid "New title is required"
 msgstr "crwdns161788:0crwdne161788:0"
 
-#: desk/src/components/Settings/General/General.vue:52
+#: desk/src/components/Settings/General/General.vue:58
 msgid "New users will have to be manually registered by system managers."
 msgstr "crwdns161790:0crwdne161790:0"
 
@@ -3253,9 +3284,13 @@ msgstr "crwdns195530:0crwdne195530:0"
 msgid "No Answer"
 msgstr "crwdns195532:0crwdne195532:0"
 
-#: desk/src/components/ListViewBuilder.vue:288
+#: desk/src/components/ListViewBuilder.vue:287
 msgid "No Data Found"
 msgstr "crwdns195534:0crwdne195534:0"
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:590
+msgid "No Email Account found for {0}"
+msgstr "crwdns200682:0{0}crwdne200682:0"
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:20
 msgid "No Holiday list found"
@@ -3269,13 +3304,17 @@ msgstr "crwdns161794:0crwdne161794:0"
 msgid "No Team"
 msgstr "crwdns160540:0crwdne160540:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:159
+#: desk/src/pages/home/components/RecentFeedback.vue:163
 msgid "No additional comments"
 msgstr "crwdns199442:0crwdne199442:0"
 
 #: desk/src/components/Settings/Agents.vue:98
 msgid "No agent found"
 msgstr "crwdns161796:0crwdne161796:0"
+
+#: desk/src/components/ticket-agent/AssignTo.vue:122
+msgid "No agents found"
+msgstr "crwdns200642:0crwdne200642:0"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:421
 msgid "No articles found for the applied filters. Try adjusting or clearing your filters."
@@ -3284,10 +3323,6 @@ msgstr "crwdns199814:0crwdne199814:0"
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:424
 msgid "No articles found in the following category."
 msgstr "crwdns199816:0crwdne199816:0"
-
-#: desk/src/components/ticket-agent/AssignTo.vue:13
-msgid "No assignees"
-msgstr "crwdns159224:0crwdne159224:0"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:20
 msgid "No assignment rule found"
@@ -3325,7 +3360,7 @@ msgstr "crwdns199822:0crwdne199822:0"
 msgid "No email account found"
 msgstr "crwdns161802:0crwdne161802:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:207
+#: desk/src/pages/home/components/RecentFeedback.vue:211
 msgid "No feedback"
 msgstr "crwdns199448:0crwdne199448:0"
 
@@ -3349,6 +3384,10 @@ msgstr "crwdns199450:0crwdne199450:0"
 msgid "No next ticket"
 msgstr "crwdns199824:0crwdne199824:0"
 
+#: desk/src/components/ticket-agent/AssignTo.vue:33
+msgid "No one"
+msgstr "crwdns200644:0crwdne200644:0"
+
 #: desk/src/pages/home/components/PendingTickets.vue:239
 msgid "No pending tickets"
 msgstr "crwdns199452:0crwdne199452:0"
@@ -3369,7 +3408,7 @@ msgstr "crwdns199456:0crwdne199456:0"
 msgid "No results found"
 msgstr "crwdns158470:0crwdne158470:0"
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:106
+#: desk/src/components/SavedRepliesSelectorModal.vue:107
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:95
 msgid "No saved replies found"
 msgstr "crwdns199828:0crwdne199828:0"
@@ -3378,15 +3417,15 @@ msgstr "crwdns199828:0crwdne199828:0"
 msgid "No team found"
 msgstr "crwdns161808:0crwdne161808:0"
 
-#: desk/src/pages/ticket/Tickets.vue:168
+#: desk/src/pages/ticket/Tickets.vue:163
 msgid "No tickets found"
 msgstr "crwdns199830:0crwdne199830:0"
 
-#: desk/src/pages/ticket/Tickets.vue:178
+#: desk/src/pages/ticket/Tickets.vue:173
 msgid "No tickets found for the applied filters. Try adjusting or clearing your filters."
 msgstr "crwdns199832:0crwdne199832:0"
 
-#: desk/src/pages/ticket/Tickets.vue:174
+#: desk/src/pages/ticket/Tickets.vue:169
 msgid "No tickets found for this view. Try adjusting your filters or creating a new view."
 msgstr "crwdns199834:0crwdne199834:0"
 
@@ -3402,6 +3441,7 @@ msgstr "crwdns157934:0crwdne157934:0"
 msgid "Not Assigned"
 msgstr "crwdns199458:0crwdne199458:0"
 
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:16
 #: desk/src/pages/call-logs/CallLogModal.vue:10
 msgid "Not Saved"
 msgstr "crwdns195548:0crwdne195548:0"
@@ -3422,12 +3462,12 @@ msgstr "crwdns157938:0crwdne157938:0"
 msgid "Notifications"
 msgstr "crwdns195550:0crwdne195550:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:161
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:242
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:162
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:243
 msgid "Old Condition"
 msgstr "crwdns158472:0crwdne158472:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:103
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:104
 msgid "Old Conditions"
 msgstr "crwdns161810:0crwdne161810:0"
 
@@ -3553,7 +3593,7 @@ msgstr "crwdns199842:0crwdne199842:0"
 msgid "Parent field, child field, and parent-child mapping are required."
 msgstr "crwdns157954:0crwdne157954:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:123
+#: desk/src/components/Settings/Profile/Profile.vue:142
 msgid "Password"
 msgstr "crwdns161812:0crwdne161812:0"
 
@@ -3580,7 +3620,7 @@ msgstr "crwdns161822:0crwdne161822:0"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
-#: desk/src/pages/ticket/Tickets.vue:225
+#: desk/src/pages/ticket/Tickets.vue:220
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Paused"
@@ -3624,12 +3664,12 @@ msgstr "crwdns195570:0crwdne195570:0"
 #: desk/src/components/SavedRepliesSelectorModal.vue:164
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:335
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:375
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:223
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:224
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Personal"
 msgstr "crwdns195572:0crwdne195572:0"
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:78
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:69
 msgid "Personal mobile no"
 msgstr "crwdns161826:0crwdne161826:0"
 
@@ -3646,7 +3686,7 @@ msgstr "crwdns195576:0crwdne195576:0"
 msgid "Pick an option"
 msgstr "crwdns195578:0crwdne195578:0"
 
-#: desk/src/pages/ticket/Tickets.vue:420
+#: desk/src/pages/ticket/Tickets.vue:415
 msgid "Pin View"
 msgstr "crwdns195580:0crwdne195580:0"
 
@@ -3665,23 +3705,23 @@ msgstr "crwdns157958:0crwdne157958:0"
 msgid "Placeholder"
 msgstr "crwdns157960:0crwdne157960:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:19
+#: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:21
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
 msgstr "crwdns157962:0crwdne157962:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:326
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:328
 msgid "Please add {0} priority in {1} SLA"
 msgstr "crwdns157964:0{0}crwdnd157964:0{1}crwdne157964:0"
 
-#: desk/src/components/Settings/Telephony/Telephony.vue:215
+#: desk/src/components/Settings/Telephony/Telephony.vue:216
 msgid "Please configure your Exotel settings correctly"
 msgstr "crwdns199854:0crwdne199854:0"
 
-#: desk/src/components/Settings/Telephony/Telephony.vue:211
+#: desk/src/components/Settings/Telephony/Telephony.vue:212
 msgid "Please configure your Twilio settings correctly"
 msgstr "crwdns199856:0crwdne199856:0"
 
-#: desk/src/pages/ticket/TicketNew.vue:82
+#: desk/src/pages/ticket/TicketNew.vue:83
 msgid "Please enter a subject to continue"
 msgstr "crwdns195582:0crwdne195582:0"
 
@@ -3690,26 +3730,22 @@ msgstr "crwdns195582:0crwdne195582:0"
 msgid "Please enter a valid phone number"
 msgstr "crwdns195584:0crwdne195584:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:268
-msgid "Please enter first name at least"
-msgstr "crwdns161828:0crwdne161828:0"
-
-#: desk/src/components/Settings/Teams/NewTeam.vue:128
+#: desk/src/components/Settings/Teams/NewTeam.vue:129
 #: desk/src/pages/call-logs/CallLogModal.vue:264
 #: desk/src/pages/call-logs/CallLogModal.vue:310
 msgid "Please fill all required fields"
 msgstr "crwdns161830:0crwdne161830:0"
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:264
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:255
 msgid "Please fill all required fields for Exotel"
 msgstr "crwdns161832:0crwdne161832:0"
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:260
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:218
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:251
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:219
 msgid "Please fill all required fields for Twilio"
 msgstr "crwdns161834:0crwdne161834:0"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:333
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:334
 msgid "Please fill all the required fields"
 msgstr "crwdns195586:0crwdne195586:0"
 
@@ -3729,9 +3765,9 @@ msgstr "crwdns157966:0crwdne157966:0"
 msgid "Policy name"
 msgstr "crwdns199860:0crwdne199860:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:300
-#: desk/src/pages/home/components/RecentFeedback.vue:322
+#: desk/src/pages/home/components/RecentFeedback.vue:304
 #: desk/src/pages/home/components/RecentFeedback.vue:326
+#: desk/src/pages/home/components/RecentFeedback.vue:330
 msgid "Positive first"
 msgstr "crwdns199464:0crwdne199464:0"
 
@@ -3772,7 +3808,7 @@ msgstr "crwdns195590:0crwdne195590:0"
 msgid "Press enter to search"
 msgstr "crwdns195592:0crwdne195592:0"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:26
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:27
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:4
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:25
 msgid "Preview"
@@ -3795,7 +3831,7 @@ msgstr "crwdns157978:0crwdne157978:0"
 #. Label of the priority (Link) field in DocType 'HD Ticket'
 #. Label of the priority (Link) field in DocType 'HD Ticket Type'
 #. Label of a field in the tickets Web Form
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:74
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:75
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:30
 #: desk/src/pages/SearchAgent.vue:68 desk/src/pages/SearchAgent.vue:69
 #: desk/src/pages/home/components/PendingTickets.vue:30
@@ -3808,7 +3844,7 @@ msgstr "crwdns157978:0crwdne157978:0"
 msgid "Priority"
 msgstr "crwdns157980:0crwdne157980:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:84
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:86
 msgid "Priority <u>{0}</u> must be included in the SLA {1}."
 msgstr "crwdns157982:0{0}crwdnd157982:0{1}crwdne157982:0"
 
@@ -3816,12 +3852,12 @@ msgstr "crwdns157982:0{0}crwdnd157982:0{1}crwdne157982:0"
 msgid "Priority {0} has been repeated."
 msgstr "crwdns157984:0{0}crwdne157984:0"
 
-#: desk/src/components/layouts/Sidebar.vue:275
-#: desk/src/pages/ticket/Tickets.vue:329
+#: desk/src/components/layouts/Sidebar.vue:292
+#: desk/src/pages/ticket/Tickets.vue:324
 msgid "Private Views"
 msgstr "crwdns195598:0crwdne195598:0"
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:37
+#: desk/src/components/Settings/Teams/NewTeam.vue:38
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:7
 #: desk/src/components/Settings/Teams/TeamEdit.vue:132
 msgid "Product Experts"
@@ -3835,17 +3871,17 @@ msgstr "crwdns195600:0crwdne195600:0"
 msgid "Profile"
 msgstr "crwdns161840:0crwdne161840:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:284
-msgid "Profile updated successfully."
-msgstr "crwdns199862:0crwdne199862:0"
+#: desk/src/components/Settings/Profile/Profile.vue:262
+msgid "Profile Updated Successfully"
+msgstr "crwdns200684:0crwdne200684:0"
 
 #. Label of the public (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Public"
 msgstr "crwdns157986:0crwdne157986:0"
 
-#: desk/src/components/layouts/Sidebar.vue:267
-#: desk/src/pages/ticket/Tickets.vue:344
+#: desk/src/components/layouts/Sidebar.vue:284
+#: desk/src/pages/ticket/Tickets.vue:339
 msgid "Public Views"
 msgstr "crwdns195602:0crwdne195602:0"
 
@@ -3960,18 +3996,18 @@ msgstr "crwdns199468:0crwdne199468:0"
 msgid "Recent Tickets"
 msgstr "crwdns199470:0crwdne199470:0"
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:54
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:43
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:45
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:44
 msgid "Record Calls"
 msgstr "crwdns161850:0crwdne161850:0"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:131
+#: desk/src/components/Settings/Holiday/HolidayView.vue:132
 msgid "Recurring Holidays"
 msgstr "crwdns199864:0crwdne199864:0"
 
 #. Label of the recurring_holidays (JSON) field in DocType 'HD Service Holiday
 #. List'
-#: desk/src/components/Settings/Holiday/HolidayView.vue:195
+#: desk/src/components/Settings/Holiday/HolidayView.vue:196
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Recurring holidays"
 msgstr "crwdns158012:0crwdne158012:0"
@@ -4003,7 +4039,7 @@ msgstr "crwdns158018:0crwdne158018:0"
 msgid "Refresh"
 msgstr "crwdns199472:0crwdne199472:0"
 
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:89
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:90
 msgid "Refresh Apps"
 msgstr "crwdns161852:0crwdne161852:0"
 
@@ -4012,6 +4048,7 @@ msgid "Regenerate Search Index"
 msgstr "crwdns158020:0crwdne158020:0"
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:48
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:90
 msgid "Remove"
 msgstr "crwdns161854:0crwdne161854:0"
 
@@ -4019,9 +4056,9 @@ msgstr "crwdns161854:0crwdne161854:0"
 msgid "Remove Logo"
 msgstr "crwdns161856:0crwdne161856:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:39
-msgid "Remove image"
-msgstr "crwdns161858:0crwdne161858:0"
+#: desk/src/components/Settings/Profile/Profile.vue:227
+msgid "Remove Photo"
+msgstr "crwdns200686:0crwdne200686:0"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:31
 msgid "Remove photo"
@@ -4029,16 +4066,16 @@ msgstr "crwdns195612:0crwdne195612:0"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:292
 #: desk/src/components/Settings/Teams/TeamsList.vue:166
-#: desk/src/components/ticket-agent/TicketSubjectModal.vue:20
-#: desk/src/pages/ticket/MobileTicketAgent.vue:156
+#: desk/src/components/ticket-agent/TicketSubjectModal.vue:21
+#: desk/src/pages/ticket/MobileTicketAgent.vue:130
 msgid "Rename"
 msgstr "crwdns161860:0crwdne161860:0"
 
-#: desk/src/components/ticket-agent/TicketSubjectModal.vue:23
+#: desk/src/components/ticket-agent/TicketSubjectModal.vue:24
 msgid "Rename (Ctrl + ⏎)"
 msgstr "crwdns199866:0crwdne199866:0"
 
-#: desk/src/components/ticket-agent/TicketSubjectModal.vue:22
+#: desk/src/components/ticket-agent/TicketSubjectModal.vue:23
 msgid "Rename (⌘ + ⏎)"
 msgstr "crwdns199868:0crwdne199868:0"
 
@@ -4052,6 +4089,14 @@ msgstr "crwdns161862:0crwdne161862:0"
 msgid "Replied"
 msgstr "crwdns160192:0crwdne160192:0"
 
+#: desk/src/components/EmailArea.vue:54
+msgid "Reply"
+msgstr "crwdns200688:0crwdne200688:0"
+
+#: desk/src/components/EmailArea.vue:59
+msgid "Reply All"
+msgstr "crwdns200690:0crwdne200690:0"
+
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -4064,15 +4109,15 @@ msgstr "crwdns159104:0crwdne159104:0"
 msgid "Reply From Contact"
 msgstr "crwdns159106:0crwdne159106:0"
 
-#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:83
+#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:84
 msgid "Reply from agent"
 msgstr "crwdns161864:0crwdne161864:0"
 
-#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:76
+#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:77
 msgid "Reply from contact"
 msgstr "crwdns161866:0crwdne161866:0"
 
-#: desk/src/components/layouts/Sidebar.vue:452
+#: desk/src/components/layouts/Sidebar.vue:469
 msgid "Reply on a ticket"
 msgstr "crwdns195614:0crwdne195614:0"
 
@@ -4092,12 +4137,12 @@ msgstr "crwdns158026:0crwdne158026:0"
 msgid "Reset"
 msgstr "crwdns161868:0crwdne161868:0"
 
-#: desk/src/components/Settings/EmailNotifications/Notification.vue:95
+#: desk/src/components/Settings/EmailNotifications/Notification.vue:96
 #: desk/src/components/Settings/General/components/TicketSettings.vue:252
 msgid "Reset Content"
 msgstr "crwdns159108:0crwdne159108:0"
 
-#: desk/src/components/Settings/EmailNotifications/Notification.vue:120
+#: desk/src/components/Settings/EmailNotifications/Notification.vue:121
 msgid "Reset content"
 msgstr "crwdns159110:0crwdne159110:0"
 
@@ -4140,7 +4185,7 @@ msgid "Resolved"
 msgstr "crwdns158040:0crwdne158040:0"
 
 #. Label of the response_tab (Tab Break) field in DocType 'HD Ticket'
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:113
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:114
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Response"
 msgstr "crwdns158042:0crwdne158042:0"
@@ -4168,12 +4213,12 @@ msgstr "crwdns158050:0{0}crwdnd158050:0{1}crwdne158050:0"
 
 #. Label of the response_and_resolution_time_section (Section Break) field in
 #. DocType 'HD Service Level Agreement'
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:194
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:195
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Response and Resolution"
 msgstr "crwdns158052:0crwdne158052:0"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:439
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:440
 msgid "Response is required"
 msgstr "crwdns195616:0crwdne195616:0"
 
@@ -4200,7 +4245,7 @@ msgstr "crwdns161874:0crwdne161874:0"
 msgid "Restrict tickets to be viewed and managed by team members only."
 msgstr "crwdns161876:0crwdne161876:0"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:107
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:108
 msgid "Restrict visibility to these teams"
 msgstr "crwdns195618:0crwdne195618:0"
 
@@ -4248,7 +4293,7 @@ msgstr "crwdns158066:0crwdne158066:0"
 
 #. Label of the sla (Link) field in DocType 'HD Ticket'
 #. Label of the sla_tab (Tab Break) field in DocType 'HD Ticket'
-#: desk/src/pages/ticket/MobileTicketAgent.vue:87
+#: desk/src/pages/ticket/MobileTicketAgent.vue:74
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA"
 msgstr "crwdns158068:0crwdne158068:0"
@@ -4275,7 +4320,7 @@ msgstr "crwdns159112:0crwdne159112:0"
 msgid "SLA Status"
 msgstr "crwdns158076:0crwdne158076:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:445
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:446
 msgid "SLA policy created successfully."
 msgstr "crwdns199870:0crwdne199870:0"
 
@@ -4291,11 +4336,11 @@ msgstr "crwdns199874:0crwdne199874:0"
 msgid "SLA policy status updated successfully."
 msgstr "crwdns199876:0crwdne199876:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:484
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:485
 msgid "SLA policy updated successfully."
 msgstr "crwdns199878:0crwdne199878:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:493
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:494
 msgid "SLA set as default cannot be disabled"
 msgstr "crwdns161890:0crwdne161890:0"
 
@@ -4316,19 +4361,19 @@ msgid "Saturday"
 msgstr "crwdns158078:0crwdne158078:0"
 
 #. Button label of the email-feedback Web Form
-#: desk/src/components/ListViewBuilder.vue:645
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:35
-#: desk/src/components/Settings/EmailNotifications/Notification.vue:45
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:28
-#: desk/src/components/Settings/General/General.vue:19
-#: desk/src/components/Settings/Holiday/HolidayView.vue:24
-#: desk/src/components/Settings/Profile/Profile.vue:92
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:37
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:34
-#: desk/src/components/Settings/Teams/NewTeam.vue:24
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:29
-#: desk/src/components/Settings/Telephony/Telephony.vue:22
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:25
+#: desk/src/components/ListViewBuilder.vue:641
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:36
+#: desk/src/components/Settings/EmailNotifications/Notification.vue:46
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:32
+#: desk/src/components/Settings/General/General.vue:23
+#: desk/src/components/Settings/Holiday/HolidayView.vue:25
+#: desk/src/components/Settings/Profile/Profile.vue:115
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:38
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:35
+#: desk/src/components/Settings/Teams/NewTeam.vue:25
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:26
+#: desk/src/components/Settings/Telephony/Telephony.vue:21
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:26
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/desk/contact/ContactDialog.vue:235
 #: desk/src/pages/home/Home.vue:27
@@ -4341,12 +4386,12 @@ msgstr "crwdns158474:0crwdne158474:0"
 msgid "Save Changes"
 msgstr "crwdns195622:0crwdne195622:0"
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:12
+#: desk/src/components/SavedRepliesSelectorModal.vue:13
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:3
 msgid "Saved Replies"
 msgstr "crwdns195624:0crwdne195624:0"
 
-#: desk/src/pages/ticket/Tickets.vue:323
+#: desk/src/pages/ticket/Tickets.vue:318
 msgid "Saved Views"
 msgstr "crwdns195626:0crwdne195626:0"
 
@@ -4358,11 +4403,11 @@ msgstr "crwdns199884:0crwdne199884:0"
 msgid "Saved reply duplicated successfully."
 msgstr "crwdns199886:0crwdne199886:0"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:356
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:357
 msgid "Saved reply saved successfully."
 msgstr "crwdns199888:0crwdne199888:0"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:419
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:420
 msgid "Saved reply updated successfully."
 msgstr "crwdns199890:0crwdne199890:0"
 
@@ -4372,7 +4417,7 @@ msgstr "crwdns161894:0crwdne161894:0"
 
 #. Label of the scope (Select) field in DocType 'HD Saved Reply'
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:114
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:72
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:73
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Scope"
 msgstr "crwdns195636:0crwdne195636:0"
@@ -4383,7 +4428,7 @@ msgid "Script"
 msgstr "crwdns158080:0crwdne158080:0"
 
 #. Label of the search_tab (Tab Break) field in DocType 'HD Settings'
-#: desk/src/components/SavedRepliesSelectorModal.vue:27
+#: desk/src/components/SavedRepliesSelectorModal.vue:28
 #: desk/src/components/Settings/Agents.vue:23
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:26
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:37
@@ -4410,6 +4455,10 @@ msgstr "crwdns158086:0crwdne158086:0"
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Search Term Param Name"
 msgstr "crwdns158088:0crwdne158088:0"
+
+#: desk/src/components/ticket-agent/AssignTo.vue:62
+msgid "Search agents..."
+msgstr "crwdns200646:0crwdne200646:0"
 
 #: desk/src/components/command-palette/CP.vue:126
 msgid "Search for \"{0}\""
@@ -4467,7 +4516,7 @@ msgstr "crwdns195654:0crwdne195654:0"
 msgid "Select Range"
 msgstr "crwdns195656:0crwdne195656:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:165
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:167
 msgid "Select a Default Priority."
 msgstr "crwdns158090:0crwdne158090:0"
 
@@ -4475,7 +4524,7 @@ msgstr "crwdns158090:0crwdne158090:0"
 msgid "Select a rating"
 msgstr "crwdns195658:0crwdne195658:0"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:103
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:104
 msgid "Select teams"
 msgstr "crwdns195660:0crwdne195660:0"
 
@@ -4505,19 +4554,19 @@ msgstr "crwdns161898:0crwdne161898:0"
 msgid "Send feedback when"
 msgstr "crwdns158096:0crwdne158096:0"
 
-#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:77
+#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:78
 msgid "Sent to all of the agents assigned to the ticket whenever a contact has replied."
 msgstr "crwdns199892:0crwdne199892:0"
 
-#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:84
+#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:85
 msgid "Sent to all of the recipients associated with the ticket whenever an agent has replied."
 msgstr "crwdns199894:0crwdne199894:0"
 
-#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:72
+#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:73
 msgid "Sent to the user right after creating an email ticket."
 msgstr "crwdns199896:0crwdne199896:0"
 
-#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:65
+#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:66
 msgid "Sent to the user who has raised the ticket after the ticket is closed or resolved."
 msgstr "crwdns199898:0crwdne199898:0"
 
@@ -4548,11 +4597,11 @@ msgstr "crwdns158100:0{0}crwdnd158100:0{1}crwdne158100:0"
 msgid "Set Response Time for Priority {0} in row {1}."
 msgstr "crwdns158102:0{0}crwdnd158102:0{1}crwdne158102:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:90
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:91
 msgid "Set as default SLA"
 msgstr "crwdns161902:0crwdne161902:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:246
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:247
 msgid "Set the default status assigned when a ticket is created, and the status to apply when a ticket is reopened. If not specified, the default status from HD Settings will be used."
 msgstr "crwdns161904:0crwdne161904:0"
 
@@ -4564,17 +4613,17 @@ msgstr "crwdns199900:0crwdne199900:0"
 msgid "Set your team’s working days, hours, and holidays using a template or custom schedule."
 msgstr "crwdns161908:0crwdne161908:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:123
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:125
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
 msgstr "crwdns158104:0{0}crwdnd158104:0{1}crwdnd158104:0{1}crwdne158104:0"
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
-#: desk/src/components/layouts/Sidebar.vue:345
+#: desk/src/components/layouts/Sidebar.vue:362
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Settings"
 msgstr "crwdns158106:0crwdne158106:0"
 
-#: desk/src/components/Settings/General/General.vue:239
+#: desk/src/components/Settings/General/General.vue:245
 msgid "Settings updated"
 msgstr "crwdns161910:0crwdne161910:0"
 
@@ -4594,11 +4643,11 @@ msgstr "crwdns158108:0crwdne158108:0"
 msgid "Setup Email"
 msgstr "crwdns161912:0crwdne161912:0"
 
-#: desk/src/components/layouts/Sidebar.vue:420
+#: desk/src/components/layouts/Sidebar.vue:437
 msgid "Setup SLA"
 msgstr "crwdns195668:0crwdne195668:0"
 
-#: desk/src/pages/knowledge-base/Article.vue:633
+#: desk/src/pages/knowledge-base/Article.vue:647
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:163
 msgid "Share"
 msgstr "crwdns195670:0crwdne195670:0"
@@ -4609,11 +4658,11 @@ msgstr "crwdns195670:0crwdne195670:0"
 msgid "Share Feedback"
 msgstr "crwdns159122:0crwdne159122:0"
 
-#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:64
+#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:65
 msgid "Share feedback"
 msgstr "crwdns161914:0crwdne161914:0"
 
-#: desk/src/components/layouts/Sidebar.vue:340
+#: desk/src/components/layouts/Sidebar.vue:357
 msgid "Shortcuts"
 msgstr "crwdns195672:0crwdne195672:0"
 
@@ -4622,13 +4671,17 @@ msgstr "crwdns195672:0crwdne195672:0"
 msgid "Show end users a different view"
 msgstr "crwdns159124:0crwdne159124:0"
 
-#: desk/src/pages/ticket/Tickets.vue:433
+#: desk/src/pages/ticket/Tickets.vue:428
 msgid "Show in sidebar"
 msgstr "crwdns199480:0crwdne199480:0"
 
 #: desk/src/components/modals/ShortcutsModal.vue:83
 msgid "Show keyboard shortcuts"
 msgstr "crwdns195674:0crwdne195674:0"
+
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:37
+msgid "Signature"
+msgstr "crwdns200692:0crwdne200692:0"
 
 #. Description of the 'Condition' (Code) field in DocType 'HD Service Level
 #. Agreement'
@@ -4645,23 +4698,23 @@ msgstr "crwdns158112:0crwdne158112:0"
 msgid "Skip email workflow"
 msgstr "crwdns161916:0crwdne161916:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:632
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:633
 msgid "Some error occurred while renaming assignment rule"
 msgstr "crwdns161918:0crwdne161918:0"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:417
+#: desk/src/components/Settings/Holiday/HolidayView.vue:418
 msgid "Some error occurred while renaming holiday list"
 msgstr "crwdns195676:0crwdne195676:0"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:398
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:399
 msgid "Some error occurred while renaming saved reply"
 msgstr "crwdns195678:0crwdne195678:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:616
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:617
 msgid "Some error occurred while updating assignment rule"
 msgstr "crwdns161920:0crwdne161920:0"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:407
+#: desk/src/components/Settings/Holiday/HolidayView.vue:408
 msgid "Some error occurred while updating holiday list"
 msgstr "crwdns195680:0crwdne195680:0"
 
@@ -4686,7 +4739,7 @@ msgstr "crwdns158118:0crwdne158118:0"
 msgid "Source and target category cannot be same"
 msgstr "crwdns158120:0crwdne158120:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:335
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:338
 msgid "Source and target ticket cannot be same"
 msgstr "crwdns158122:0crwdne158122:0"
 
@@ -4694,7 +4747,7 @@ msgstr "crwdns158122:0crwdne158122:0"
 msgid "Source and target tickets which are to be merged cannot be the same."
 msgstr "crwdns199904:0crwdne199904:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:331
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:334
 msgid "Source ticket does not exist"
 msgstr "crwdns158124:0crwdne158124:0"
 
@@ -4722,7 +4775,7 @@ msgstr "crwdns158130:0crwdne158130:0"
 msgid "Start Time"
 msgstr "crwdns158132:0crwdne158132:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:98
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:100
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
 msgstr "crwdns158134:0{0}crwdne158134:0"
 
@@ -4754,7 +4807,7 @@ msgstr "crwdns159128:0crwdne159128:0"
 
 #. Label of the status_details (Section Break) field in DocType 'HD Service
 #. Level Agreement'
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:242
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:243
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status Details"
 msgstr "crwdns158138:0crwdne158138:0"
@@ -4809,8 +4862,8 @@ msgid "Subject is required"
 msgstr "crwdns199906:0crwdne199906:0"
 
 #: desk/src/pages/ticket/TicketFeedback.vue:9
-#: desk/src/pages/ticket/TicketNew.vue:95
-#: desk/src/pages/ticket/TicketNew.vue:119
+#: desk/src/pages/ticket/TicketNew.vue:96
+#: desk/src/pages/ticket/TicketNew.vue:120
 msgid "Submit"
 msgstr "crwdns195684:0crwdne195684:0"
 
@@ -4827,7 +4880,7 @@ msgstr "crwdns158146:0crwdne158146:0"
 msgid "Sunday"
 msgstr "crwdns158148:0crwdne158148:0"
 
-#: desk/src/components/layouts/Sidebar.vue:325
+#: desk/src/components/layouts/Sidebar.vue:342
 msgid "Support"
 msgstr "crwdns195686:0crwdne195686:0"
 
@@ -4846,6 +4899,10 @@ msgstr "crwdns158152:0crwdne158152:0"
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Support Team"
 msgstr "crwdns158154:0crwdne158154:0"
+
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:59
+msgid "Switch between outgoing email accounts when sending emails from your configured accounts."
+msgstr "crwdns200694:0crwdne200694:0"
 
 #. Label of the synonyms (Table) field in DocType 'HD Synonyms'
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
@@ -4899,7 +4956,7 @@ msgstr "crwdns158162:0crwdne158162:0"
 msgid "Tampered Access"
 msgstr "crwdns158164:0crwdne158164:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:333
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:336
 msgid "Target ticket does not exist"
 msgstr "crwdns158166:0crwdne158166:0"
 
@@ -4915,7 +4972,7 @@ msgstr "crwdns159138:0crwdne159138:0"
 #. Label of the agent_group (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:379
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:228
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:229
 #: desk/src/pages/SearchAgent.vue:50 desk/src/pages/SearchAgent.vue:51
 #: desk/src/pages/dashboard/Dashboard.vue:63
 #: desk/src/pages/home/components/PendingTickets.vue:33
@@ -4927,7 +4984,7 @@ msgstr "crwdns159138:0crwdne159138:0"
 msgid "Team"
 msgstr "crwdns158168:0crwdne158168:0"
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:36
+#: desk/src/components/Settings/Teams/NewTeam.vue:37
 msgid "Team Name"
 msgstr "crwdns161924:0crwdne161924:0"
 
@@ -4941,7 +4998,7 @@ msgstr "crwdns158170:0crwdne158170:0"
 msgid "Team created"
 msgstr "crwdns161926:0crwdne161926:0"
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:138
+#: desk/src/components/Settings/Teams/NewTeam.vue:139
 msgid "Team created successfully."
 msgstr "crwdns199908:0crwdne199908:0"
 
@@ -4960,7 +5017,7 @@ msgid "Team renamed successfully."
 msgstr "crwdns199912:0crwdne199912:0"
 
 #. Label of the teams (Table MultiSelect) field in DocType 'HD Saved Reply'
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:99
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:100
 #: desk/src/components/Settings/Teams/TeamsList.vue:3
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Teams"
@@ -4970,9 +5027,9 @@ msgstr "crwdns161934:0crwdne161934:0"
 msgid "Telephony"
 msgstr "crwdns161936:0crwdne161936:0"
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:305
-#: desk/src/components/Settings/Telephony/Telephony.vue:256
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:247
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:296
+#: desk/src/components/Settings/Telephony/Telephony.vue:257
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:248
 msgid "Telephony settings updated successfully."
 msgstr "crwdns199914:0crwdne199914:0"
 
@@ -5002,11 +5059,11 @@ msgstr "crwdns160638:0{0}crwdnd160638:0{1}crwdne160638:0"
 msgid "The Unassign Condition JSON '{0}' is invalid: </br> {1}"
 msgstr "crwdns160640:0{0}crwdnd160640:0{1}crwdne160640:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:145
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:147
 msgid "The assignment condition '{0}' is invalid: {1}"
 msgstr "crwdns160642:0{0}crwdnd160642:0{1}crwdne160642:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:152
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:154
 msgid "The assignment condition json '{0}' is invalid: {1}"
 msgstr "crwdns160644:0{0}crwdnd160644:0{1}crwdne160644:0"
 
@@ -5064,19 +5121,19 @@ msgstr "crwdns158184:0crwdne158184:0"
 msgid "This method is only meant for developer mode"
 msgstr "crwdns158186:0crwdne158186:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:369
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:372
 msgid "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
 msgstr "crwdns158188:0#{0}crwdnd158188:0{1}crwdnd158188:0#{1}crwdne158188:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:510
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:513
 msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
 msgstr "crwdns158190:0{0}crwdnd158190:0#{1}crwdne158190:0"
 
-#: desk/src/pages/ticket/Tickets.vue:496
+#: desk/src/pages/ticket/Tickets.vue:491
 msgid "This view is public, and will be removed for all users."
 msgstr "crwdns195694:0crwdne195694:0"
 
-#: desk/src/components/ListViewBuilder.vue:640
+#: desk/src/components/ListViewBuilder.vue:636
 msgid "This view is public. Changes made will be visible to everyone."
 msgstr "crwdns199920:0crwdne199920:0"
 
@@ -5104,7 +5161,7 @@ msgstr "crwdns158192:0crwdne158192:0"
 msgid "Ticket"
 msgstr "crwdns158194:0crwdne158194:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:795
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:814
 msgid "Ticket #{0}: We've received your request"
 msgstr "crwdns195698:0#{0}crwdne195698:0"
 
@@ -5119,6 +5176,10 @@ msgstr "crwdns158196:0crwdne158196:0"
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Configuration"
 msgstr "crwdns158198:0crwdne158198:0"
+
+#: desk/src/components/ticket-agent/TicketDetailsTab.vue:55
+msgid "Ticket Info"
+msgstr "crwdns200696:0crwdne200696:0"
 
 #: desk/src/components/modals/ShortcutsModal.vue:88
 msgid "Ticket Management"
@@ -5200,7 +5261,7 @@ msgstr "crwdns158212:0crwdne158212:0"
 msgid "Ticket must be Open or Paused."
 msgstr "crwdns199928:0crwdne199928:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:344
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:342
 msgid "Ticket must be resolved with a feedback"
 msgstr "crwdns158214:0crwdne158214:0"
 
@@ -5208,7 +5269,7 @@ msgstr "crwdns158214:0crwdne158214:0"
 msgid "Ticket must not already be merged."
 msgstr "crwdns199930:0crwdne199930:0"
 
-#: desk/src/pages/ticket/TicketAgent.vue:32
+#: desk/src/pages/ticket/TicketAgent.vue:33
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:62
 msgid "Ticket not found"
 msgstr "crwdns158216:0crwdne158216:0"
@@ -5241,10 +5302,9 @@ msgstr "crwdns161948:0crwdne161948:0"
 msgid "Ticket type"
 msgstr "crwdns158220:0crwdne158220:0"
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:498
 #: desk/src/pages/ticket/TicketCustomer.vue:277
-msgid "Ticket updated succesfully."
-msgstr "crwdns199936:0crwdne199936:0"
+msgid "Ticket updated successfully."
+msgstr "crwdns200648:0crwdne200648:0"
 
 #. Name of a report
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
@@ -5254,10 +5314,10 @@ msgstr "crwdns158224:0crwdne158224:0"
 #: desk/src/components/command-palette/CP.vue:98
 #: desk/src/components/ticket-agent/TicketHeader.vue:173
 #: desk/src/pages/SearchAgent.vue:351
-#: desk/src/pages/ticket/MobileTicketAgent.vue:329
+#: desk/src/pages/ticket/MobileTicketAgent.vue:416
 #: desk/src/pages/ticket/TicketCustomer.vue:333
-#: desk/src/pages/ticket/TicketNew.vue:295 desk/src/pages/ticket/Tickets.vue:6
-#: desk/src/pages/ticket/Tickets.vue:638 helpdesk/api/dashboard.py:154
+#: desk/src/pages/ticket/TicketNew.vue:296 desk/src/pages/ticket/Tickets.vue:6
+#: desk/src/pages/ticket/Tickets.vue:633 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
 msgid "Tickets"
 msgstr "crwdns160556:0crwdne160556:0"
@@ -5298,13 +5358,9 @@ msgstr "crwdns199938:0crwdne199938:0"
 msgid "Tickets that are awaiting your response"
 msgstr "crwdns199488:0crwdne199488:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:154
+#: desk/src/components/Settings/Profile/Profile.vue:174
 msgid "Timezone"
 msgstr "crwdns197090:0crwdne197090:0"
-
-#: desk/src/components/Settings/Profile/Profile.vue:319
-msgid "Timezone updated successfully."
-msgstr "crwdns199940:0crwdne199940:0"
 
 #. Label of the title (Data) field in DocType 'HD Article'
 #. Label of the title (Data) field in DocType 'HD Saved Reply'
@@ -5325,11 +5381,12 @@ msgid "Title Slug"
 msgstr "crwdns158230:0crwdne158230:0"
 
 #: desk/src/components/Settings/NewTeamModal.vue:50
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:431
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:432
 msgid "Title is required"
 msgstr "crwdns195708:0crwdne195708:0"
 
 #. Label of the user_to (Link) field in DocType 'HD Notification'
+#: desk/src/components/EmailEditor.vue:34
 #: desk/src/pages/call-logs/CallLogModal.vue:33
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "To"
@@ -5348,8 +5405,8 @@ msgstr "crwdns158234:0crwdne158234:0"
 msgid "To Date cannot be before From Date"
 msgstr "crwdns158236:0crwdne158236:0"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:108
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:172
+#: desk/src/components/Settings/Holiday/HolidayView.vue:109
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:173
 msgid "To date"
 msgstr "crwdns161950:0crwdne161950:0"
 
@@ -5412,7 +5469,7 @@ msgstr "crwdns199946:0crwdne199946:0"
 msgid "Tuesday"
 msgstr "crwdns158248:0crwdne158248:0"
 
-#: desk/src/components/Settings/Telephony/Telephony.vue:75
+#: desk/src/components/Settings/Telephony/Telephony.vue:76
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:10
 msgid "Twilio"
 msgstr "crwdns199948:0crwdne199948:0"
@@ -5441,11 +5498,11 @@ msgstr "crwdns195716:0crwdne195716:0"
 msgid "URL/Method"
 msgstr "crwdns158252:0crwdne158252:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:631
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:647
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr "crwdns195718:0crwdne195718:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:214
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:215
 msgid "Unassignment Condition"
 msgstr "crwdns199950:0crwdne199950:0"
 
@@ -5457,7 +5514,7 @@ msgstr "crwdns158254:0crwdne158254:0"
 msgid "Unauthorized access."
 msgstr "crwdns158256:0crwdne158256:0"
 
-#: desk/src/pages/ticket/Tickets.vue:420
+#: desk/src/pages/ticket/Tickets.vue:415
 msgid "Unpin View"
 msgstr "crwdns195720:0crwdne195720:0"
 
@@ -5465,32 +5522,33 @@ msgstr "crwdns195720:0crwdne195720:0"
 msgid "Unpublish"
 msgstr "crwdns195722:0crwdne195722:0"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:19
-#: desk/src/components/Settings/EmailNotifications/Notification.vue:25
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:13
-#: desk/src/components/Settings/General/General.vue:12
-#: desk/src/components/Settings/Holiday/HolidayView.vue:17
-#: desk/src/components/Settings/Profile/Profile.vue:88
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:17
-#: desk/src/components/Settings/Teams/NewTeam.vue:17
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:21
-#: desk/src/components/Settings/Telephony/Telephony.vue:14
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:17
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:20
+#: desk/src/components/Settings/EmailNotifications/Notification.vue:26
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:15
+#: desk/src/components/Settings/General/General.vue:13
+#: desk/src/components/Settings/Holiday/HolidayView.vue:18
+#: desk/src/components/Settings/Profile/Profile.vue:106
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:18
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:18
+#: desk/src/components/Settings/Teams/NewTeam.vue:18
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:18
+#: desk/src/components/Settings/Telephony/Telephony.vue:11
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:18
 msgid "Unsaved"
 msgstr "crwdns158480:0crwdne158480:0"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:161
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:464
-#: desk/src/components/Settings/EmailNotifications/Notification.vue:107
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:75
-#: desk/src/components/Settings/Holiday/HolidayView.vue:207
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:17
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:309
-#: desk/src/components/Settings/SettingsModal.vue:59
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:369
-#: desk/src/components/Settings/Teams/NewTeam.vue:107
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:238
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:197
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:465
+#: desk/src/components/Settings/EmailNotifications/Notification.vue:108
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:79
+#: desk/src/components/Settings/Holiday/HolidayView.vue:208
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:242
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:310
+#: desk/src/components/Settings/SettingsModal.vue:71
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:370
+#: desk/src/components/Settings/Teams/NewTeam.vue:108
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:229
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:198
 msgid "Unsaved changes"
 msgstr "crwdns159146:0crwdne159146:0"
 
@@ -5498,6 +5556,7 @@ msgstr "crwdns159146:0crwdne159146:0"
 msgid "Untitled"
 msgstr "crwdns159230:0crwdne159230:0"
 
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:27
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:47
 msgid "Update"
 msgstr "crwdns161954:0crwdne161954:0"
@@ -5515,9 +5574,9 @@ msgstr "crwdns159148:0crwdne159148:0"
 msgid "Upload"
 msgstr "crwdns161960:0crwdne161960:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:34
-msgid "Upload image"
-msgstr "crwdns161962:0crwdne161962:0"
+#: desk/src/components/Settings/Profile/Profile.vue:228
+msgid "Upload Photo"
+msgstr "crwdns200698:0crwdne200698:0"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:22
 msgid "Upload photo"
@@ -5548,7 +5607,7 @@ msgstr "crwdns161964:0{0}crwdne161964:0"
 msgid "User"
 msgstr "crwdns158258:0crwdne158258:0"
 
-#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:141
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:137
 msgid "User Not found"
 msgstr "crwdns158260:0crwdne158260:0"
 
@@ -5557,7 +5616,7 @@ msgstr "crwdns158260:0crwdne158260:0"
 msgid "User Resolution Time"
 msgstr "crwdns158262:0crwdne158262:0"
 
-#: desk/src/components/Settings/General/General.vue:44
+#: desk/src/components/Settings/General/General.vue:50
 msgid "User Signup"
 msgstr "crwdns199952:0crwdne199952:0"
 
@@ -5568,8 +5627,8 @@ msgstr "crwdns158264:0crwdne158264:0"
 
 #. Label of the agreement_details_section (Section Break) field in DocType 'HD
 #. Service Level Agreement'
-#: desk/src/components/Settings/Holiday/HolidayView.vue:78
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:147
+#: desk/src/components/Settings/Holiday/HolidayView.vue:79
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:148
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Valid From"
 msgstr "crwdns158266:0crwdne158266:0"
@@ -5585,7 +5644,7 @@ msgstr "crwdns158268:0crwdne158268:0"
 msgid "View Assignment rule"
 msgstr "crwdns161970:0crwdne161970:0"
 
-#: desk/src/pages/ticket/Tickets.vue:604
+#: desk/src/pages/ticket/Tickets.vue:599
 msgid "View {0}"
 msgstr "crwdns195726:0{0}crwdne195726:0"
 
@@ -5652,7 +5711,7 @@ msgstr "crwdns199958:0crwdne199958:0"
 msgid "Workday updated successfully."
 msgstr "crwdns199960:0crwdne199960:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:109
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:111
 msgid "Workday {0} has been repeated."
 msgstr "crwdns158284:0{0}crwdne158284:0"
 
@@ -5678,6 +5737,10 @@ msgstr "crwdns158288:0crwdne158288:0"
 msgid "Write your article here..."
 msgstr "crwdns195728:0crwdne195728:0"
 
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:46
+msgid "Write your email signature here."
+msgstr "crwdns200700:0crwdne200700:0"
+
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:37
 msgid "Yearly"
 msgstr "crwdns158290:0crwdne158290:0"
@@ -5695,9 +5758,13 @@ msgstr "crwdns158292:0crwdne158292:0"
 msgid "You are not permitted to access this resource."
 msgstr "crwdns158294:0crwdne158294:0"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:553
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:549
 msgid "You are not permitted to add a comment"
 msgstr "crwdns158296:0crwdne158296:0"
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:575
+msgid "You are not permitted to reply as an agent"
+msgstr "crwdns200650:0crwdne200650:0"
 
 #: desk/src/App.vue:36
 msgid "You are now offline."
@@ -5711,7 +5778,7 @@ msgstr "crwdns199966:0crwdne199966:0"
 msgid "You can change the default calling medium from the settings"
 msgstr "crwdns159232:0crwdne159232:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:136
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:138
 msgid "You cannot disable the default SLA."
 msgstr "crwdns158298:0crwdne158298:0"
 
@@ -5723,7 +5790,7 @@ msgstr "crwdns158300:0crwdne158300:0"
 msgid "You do not have permission to access Assignment Rules"
 msgstr "crwdns195730:0crwdne195730:0"
 
-#: desk/src/pages/ticket/TicketAgent.vue:36
+#: desk/src/pages/ticket/TicketAgent.vue:37
 msgid "You don't have access to this ticket, or it no longer exists."
 msgstr "crwdns199968:0crwdne199968:0"
 
@@ -5735,15 +5802,15 @@ msgstr "crwdns199970:0crwdne199970:0"
 msgid "You have already provided feedback for this ticket."
 msgstr "crwdns158302:0crwdne158302:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:210
+#: desk/src/pages/home/components/RecentFeedback.vue:214
 msgid "You haven't received any feedback yet"
 msgstr "crwdns199490:0crwdne199490:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:130
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:132
 msgid "You must set one SLA as Default. Please check the Default SLA option."
 msgstr "crwdns158304:0crwdne158304:0"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:409
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:410
 msgid "Your old conditions will be overwritten. Are you sure you want to save?"
 msgstr "crwdns161980:0crwdne161980:0"
 
@@ -5755,7 +5822,11 @@ msgstr "crwdns199492:0crwdne199492:0"
 msgid "assigned you a ticket"
 msgstr "crwdns195732:0crwdne195732:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:370
+#: desk/src/components/ticket-agent/AssignTo.vue:29
+msgid "assignees"
+msgstr "crwdns200652:0crwdne200652:0"
+
+#: desk/src/pages/home/components/RecentFeedback.vue:374
 msgid "average"
 msgstr "crwdns199494:0crwdne199494:0"
 
@@ -5763,11 +5834,11 @@ msgstr "crwdns199494:0crwdne199494:0"
 msgid "back to email event list"
 msgstr "crwdns159156:0crwdne159156:0"
 
-#: desk/src/pages/ticket/Tickets.vue:603
+#: desk/src/pages/ticket/Tickets.vue:598
 msgid "created"
 msgstr "crwdns195734:0crwdne195734:0"
 
-#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:43
+#: desk/src/components/Settings/EmailNotifications/NotificationList.vue:42
 msgid "customize {0}"
 msgstr "crwdns159158:0{0}crwdne159158:0"
 
@@ -5775,7 +5846,7 @@ msgstr "crwdns159158:0{0}crwdne159158:0"
 msgid "days"
 msgstr "crwdns160576:0crwdne160576:0"
 
-#: desk/src/pages/ticket/Tickets.vue:515
+#: desk/src/pages/ticket/Tickets.vue:510
 msgid "deleted"
 msgstr "crwdns195736:0crwdne195736:0"
 
@@ -5783,7 +5854,7 @@ msgstr "crwdns195736:0crwdne195736:0"
 msgid "emails/ comments"
 msgstr "crwdns199972:0crwdne199972:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:366
+#: desk/src/pages/home/components/RecentFeedback.vue:370
 msgid "excellent"
 msgstr "crwdns199496:0crwdne199496:0"
 
@@ -5791,7 +5862,7 @@ msgstr "crwdns199496:0crwdne199496:0"
 msgid "from this email onwards will be moved to new ticket."
 msgstr "crwdns199974:0crwdne199974:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:368
+#: desk/src/pages/home/components/RecentFeedback.vue:372
 msgid "good"
 msgstr "crwdns199498:0crwdne199498:0"
 
@@ -5812,7 +5883,7 @@ msgstr "crwdns159236:0crwdne159236:0"
 msgid "has reopened the ticket"
 msgstr "crwdns195738:0crwdne195738:0"
 
-#: desk/src/components/Settings/EmailNotifications/Notification.vue:84
+#: desk/src/components/Settings/EmailNotifications/Notification.vue:85
 #: desk/src/components/Settings/General/components/TicketSettings.vue:237
 msgid "here"
 msgstr "crwdns159160:0crwdne159160:0"
@@ -5848,7 +5919,7 @@ msgstr "crwdns158310:0crwdne158310:0"
 msgid "mentioned you in ticket"
 msgstr "crwdns195742:0crwdne195742:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:372
+#: desk/src/pages/home/components/RecentFeedback.vue:376
 msgid "poor"
 msgstr "crwdns199500:0crwdne199500:0"
 
@@ -5870,7 +5941,7 @@ msgstr "crwdns199980:0crwdne199980:0"
 msgid "synonym"
 msgstr "crwdns158312:0crwdne158312:0"
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:423
+#: desk/src/pages/ticket/MobileTicketAgent.vue:525
 msgid "viewed this"
 msgstr "crwdns195744:0crwdne195744:0"
 
@@ -5882,11 +5953,11 @@ msgstr "crwdns196018:0{0}crwdne196018:0"
 msgid "{0} reviews"
 msgstr "crwdns199502:0{0}crwdne199502:0"
 
-#: desk/src/pages/ticket/Tickets.vue:462
+#: desk/src/pages/ticket/Tickets.vue:457
 msgid "{0} view is currently public. Changing it to private will hide it for all the users."
 msgstr "crwdns199504:0{0}crwdne199504:0"
 
-#: desk/src/pages/ticket/Tickets.vue:442
+#: desk/src/pages/ticket/Tickets.vue:437
 msgid "{0} view is currently visible in the sidebar. Hiding it will remove it from the sidebar."
 msgstr "crwdns199506:0{0}crwdne199506:0"
 

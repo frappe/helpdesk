@@ -11,7 +11,7 @@
     :placeholder="placeholder"
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
-    :extensions="[ComponentUtils, HandleExcelPaste]"
+    :extensions="[ComponentUtils, HandleExcelPaste, CleanStyles]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
     @keydown.capture="handleKeydown"
   >
@@ -178,7 +178,11 @@ import { EditorContent } from "@tiptap/vue-3";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
-import { ComponentUtils, HandleExcelPaste } from "@/tiptap-extensions";
+import {
+  ComponentUtils,
+  HandleExcelPaste,
+  CleanStyles,
+} from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,
