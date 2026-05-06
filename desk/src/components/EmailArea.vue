@@ -84,15 +84,16 @@
     <!-- <div class="text-sm leading-5 text-ink-gray-5">
       {{ subject }}
     </div> -->
-    <div class="text-sm leading-5 text-ink-gray-5">
-      <span v-if="to" class="mr-1">To:</span>
-      <span v-if="to"> {{ to }} </span>
-      <span v-if="cc">, </span>
-      <span v-if="cc"> Cc: </span>
-      <span v-if="cc">{{ cc }}</span>
-      <span v-if="bcc">, </span>
-      <span v-if="bcc"> Bcc: </span>
-      <span v-if="bcc">{{ bcc }}</span>
+    <div class="text-p-sm text-ink-gray-5">
+      <template
+        v-for="(val, label) in { To: to, cc: cc, bcc: bcc }"
+        :key="label"
+      >
+        <span v-if="val" class="mr-1.5">
+          <span class="mr-1 text-ink-gray-7">{{ label }}:</span>
+          <span> {{ normalizeAndFilter(val).join(", ") }}</span>
+        </span>
+      </template>
     </div>
     <div class="border-0 border-t my-3 border-outline-gray-modals !-mx-3" />
     <EmailContent :content="content" />
@@ -173,6 +174,32 @@ const status = computed(() => {
   return { label: _status, color: indicator_color };
 });
 
+const normalizeAndFilter = (
+  field: string | string[],
+  filterOut: string[] = []
+) => {
+  let arr = [];
+  let current = "";
+  let inQuotes = false;
+  if (typeof field === "string") {
+    for (let char of field) {
+      if (char === '"') {
+        inQuotes = !inQuotes;
+        current += char;
+      } else if (char === "," && !inQuotes) {
+        arr.push(current.trim());
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+    if (current) arr.push(current.trim());
+  } else {
+    arr = field || [];
+  }
+  return arr.filter(Boolean).filter((item) => !filterOut.includes(item));
+};
+
 const reply = () => {
   const user = auth.user.value;
   emit("reply", {
@@ -183,33 +210,10 @@ const reply = () => {
 
 const replyAll = () => {
   const user = auth.user.value;
-
-  const normalizeAndFilter = (field) => {
-    let arr = [];
-    let current = "";
-    let inQuotes = false;
-    if (typeof field === "string") {
-      for (let char of field) {
-        if (char === '"') {
-          inQuotes = !inQuotes;
-          current += char;
-        } else if (char === "," && !inQuotes) {
-          arr.push(current.trim());
-          current = "";
-        } else {
-          current += char;
-        }
-      }
-      if (current) arr.push(current.trim());
-    } else {
-      arr = field || [];
-    }
-    return arr.filter((item) => item !== user && item !== sender.name);
-  };
-
-  const filteredTo = normalizeAndFilter(to);
-  const filteredCc = normalizeAndFilter(cc);
-  const filteredBcc = normalizeAndFilter(bcc);
+  const exclude = [user, sender.name];
+  const filteredTo = normalizeAndFilter(to, exclude);
+  const filteredCc = normalizeAndFilter(cc, exclude);
+  const filteredBcc = normalizeAndFilter(bcc, exclude);
 
   let _to, _cc, _bcc;
 

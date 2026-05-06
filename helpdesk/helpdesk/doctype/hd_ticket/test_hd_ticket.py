@@ -612,6 +612,7 @@ class TestHDTicket(IntegrationTestCase):
 
     def test_ticket_split(self):
         ticket1 = make_ticket(description="Test Desc for split")
+
         ticket1.reply_via_agent(message="Test reply to split")
         communcation_name = frappe.get_all(
             "Communication",
@@ -704,6 +705,55 @@ class TestHDTicket(IntegrationTestCase):
         with self.freeze_time(next_working_day):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
+
+    def test_reply_via_agent_with_only_cc(self):
+        """
+        reply_via_agent should succeed when only cc is provided and to is empty/None
+        """
+        ticket = make_ticket()
+        cc_recipient = "cc_only@test.com"
+
+        # Should not raise a validation error
+        try:
+            ticket.reply_via_agent(message="Test reply", to=None, cc=cc_recipient)
+            sent = True
+        except Exception:
+            sent = False
+
+        self.assertTrue(sent)
+
+    def test_reply_via_agent_with_only_bcc(self):
+        """
+        reply_via_agent should succeed when only bcc is provided and to is empty/None
+        """
+        ticket = make_ticket()
+        bcc_recipient = "bcc_only@test.com"
+
+        try:
+            ticket.reply_via_agent(message="Test reply", to=None, bcc=bcc_recipient)
+            sent = True
+        except Exception:
+            sent = False
+
+        self.assertTrue(sent)
+
+    def test_reply_via_agent_with_cc_and_bcc_no_to(self):
+        """
+        reply_via_agent should succeed when both cc and bcc are provided but to is empty
+        """
+        ticket = make_ticket()
+        cc_recipient = "cc_combo@test.com"
+        bcc_recipient = "bcc_combo@test.com"
+
+        try:
+            ticket.reply_via_agent(
+                message="Test reply", to=None, cc=cc_recipient, bcc=bcc_recipient
+            )
+            sent = True
+        except Exception:
+            sent = False
+
+        self.assertTrue(sent)
 
     def tearDown(self):
         remove_holidays()

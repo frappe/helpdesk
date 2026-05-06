@@ -580,7 +580,7 @@ class HDTicket(Document):
         from_email_id = from_email.get("email_id") if from_email else None
         email_account_name = from_email.get("email_account") if from_email else None
         sender = from_email_id or frappe.session.user
-        recipients = to or self.raised_by
+        recipients = to
 
         sender_email = None
         if not skip_email_workflow:
