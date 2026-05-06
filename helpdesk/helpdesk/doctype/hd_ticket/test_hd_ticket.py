@@ -596,7 +596,7 @@ class TestHDTicket(IntegrationTestCase):
         ticket1.reload()
         self.assertEqual(ticket1.status, "Closed")
         self.assertTrue(ticket1.is_merged)
-        self.assertEqual(str(ticket1.merged_with), str(ticket2.name))
+        self.assertEqual((ticket1.merged_with), (ticket2.name))
 
         ticket2.reload()
         comments = frappe.get_all(
