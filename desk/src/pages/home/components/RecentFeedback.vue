@@ -86,9 +86,37 @@
         >
           <!-- Filters -->
           <div class="flex items-center gap-2 justify-between mb-3 z-20">
+            <!-- Sort dropdown first -->
+            <Dropdown
+              v-if="chartConfig.totalFeedbacks !== 0"
+              :options="sortOptions"
+              placement="left"
+            >
+              <template #default>
+                <Button :label="currentSortLabel" icon-right="chevron-down" />
+              </template>
+              <template #item-label="{ item }">
+                <div
+                  class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+                >
+                  <span>{{ item.label }}</span>
+                </div>
+              </template>
+              <template #item-suffix="{ item }">
+                <FeatherIcon
+                  v-if="item.label == __(sortLabels[currentSort])"
+                  name="check"
+                  class="size-4"
+                />
+              </template>
+            </Dropdown>
+
+            <!-- Period dropdown second -->
             <Dropdown
               v-if="!showDatePicker && currentPeriod !== 'custom_range'"
               :options="periodOptions"
+              placement="right"
+              class="ml-auto"
             >
               <template #default>
                 <Button :label="currentPeriodLabel" icon-right="chevron-down" />
@@ -111,39 +139,17 @@
               </template>
             </Dropdown>
             <DateRangePicker
-              v-else
+              v-if="showDatePicker || currentPeriod === 'custom_range'"
               ref="datePickerRef"
               v-model="customDateRange"
               :placeholder="__('Select range')"
               @update:model-value="onCustomRangeSelected"
-              :format="dateFormat"
+              :format="'MMM D'"
               @click="datePickerRef?.open()"
               placement="top-start"
-              class="w-[228px]"
+              class="!w-48 ml-auto"
             />
-            <Dropdown :options="sortOptions" placement="right">
-              <template #default>
-                <Button :label="currentSortLabel" icon-right="chevron-down" />
-              </template>
-              <template #item-label="{ item }">
-                <div
-                  class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
-                >
-                  <span>
-                    {{ item.label }}
-                  </span>
-                </div>
-              </template>
-              <template #item-suffix="{ item }">
-                <FeatherIcon
-                  v-if="item.label == __(sortLabels[currentSort])"
-                  name="check"
-                  class="size-4"
-                />
-              </template>
-            </Dropdown>
           </div>
-
           <div class="flex-1 flex flex-col min-h-0">
             <!-- Feedback Card -->
             <div
@@ -257,9 +263,12 @@
           </div>
         </div>
         <div class="z-10" v-if="chartConfig.totalFeedbacks === 0">
-          <EmptyState2
+          <EmptyState
+            class="absolute inset-0 z-10"
+            variant="overlay"
             :title="__('No feedback')"
             :description="__('You haven\'t received any feedback yet')"
+            subtle
           />
         </div>
       </div>
@@ -287,7 +296,7 @@ import { timeAgo } from "@/utils";
 import type { EChartsOption } from "echarts";
 import { useView } from "@/composables/useView";
 import { View } from "@/types";
-import EmptyState2 from "@/components/EmptyState2.vue";
+import EmptyState from "@/components/EmptyState.vue";
 
 const router = useRouter();
 const chartTabs = [
@@ -330,7 +339,6 @@ const currentSort = ref("positive_first");
 const showDatePicker = ref(false);
 const datePickerRef = ref<{ open: () => void } | null>(null);
 const customDateRange = ref<string | undefined>(undefined);
-const dateFormat = window.date_format.toUpperCase();
 
 const periodOptions = computed(() => [
   {

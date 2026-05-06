@@ -13,19 +13,18 @@
           <template #default>
             <Button :label="currentDurationLabel" icon-right="chevron-down" />
           </template>
-          <template #item="{ item }">
-            <div
-              class="data-[disabled]:cursor-not-allowed group flex h-7 w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
-            >
-              <span>
-                {{ item.label }}
-              </span>
-              <FeatherIcon
-                v-if="item.label == durationLabels[currentDuration]"
-                name="check"
-                class="size-4"
-              />
-            </div>
+          <template #item-label="{ item }">
+            <span>
+              {{ item.label }}
+            </span>
+          </template>
+
+          <template #item-suffix="{ item }">
+            <FeatherIcon
+              v-if="item.label == durationLabels[currentDuration]"
+              name="check"
+              class="size-4"
+            />
           </template>
         </Dropdown>
         <DateRangePicker
@@ -34,10 +33,10 @@
           v-model="customDateRange"
           :placeholder="__('Select range')"
           @update:model-value="onCustomRangeSelected"
-          :format="dateFormat"
+          :format="'MMM D'"
           @click="datePickerRef?.open()"
           placement="bottom-end"
-          class="w-[228px]"
+          class="!w-48"
         />
       </div>
     </div>
@@ -97,14 +96,15 @@
           />
         </div>
       </div>
-      <div class="z-10">
-        <EmptyState2
-          :title="__('No average metrics')"
-          :description="
-            __('Average response and resolution metrics not available')
-          "
-        />
-      </div>
+      <EmptyState
+        class="absolute inset-0 z-10"
+        :title="__('No average metrics')"
+        :description="
+          __('Average response and resolution metrics not available')
+        "
+        variant="overlay"
+        subtle
+      />
     </div>
     <div v-else class="flex flex-col mt-5 grow w-full">
       <div class="flex items-center gap-12">
@@ -147,7 +147,7 @@ import {
 } from "frappe-ui";
 import { formatTime } from "@/utils";
 import { __ } from "@/translation";
-import EmptyState2 from "@/components/EmptyState2.vue";
+import EmptyState from "@/components/EmptyState.vue";
 
 type MetricsData = {
   averages: {
@@ -167,7 +167,6 @@ const props = defineProps({
 const currentDuration = ref("6m");
 const datePickerRef = ref<{ open: () => void } | null>(null);
 const customDateRange = ref<string | undefined>(undefined);
-const dateFormat = window.date_format.toUpperCase();
 
 const durationLabels: Record<string, string> = {
   "3m": __("3 Months"),

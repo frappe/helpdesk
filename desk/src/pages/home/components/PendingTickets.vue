@@ -113,10 +113,13 @@
               <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
             </td>
           </tr>
-          <EmptyState2
+          <EmptyState
+            class="absolute inset-0 z-10"
             v-if="chartConfig?.tickets?.length === 0"
             :title="emptyState.title"
             :description="emptyState.description"
+            variant="overlay"
+            subtle
           />
         </tbody>
       </table>
@@ -160,7 +163,7 @@ import TimerIcon from "~icons/lucide/timer";
 import TicketPlusIcon from "~icons/lucide/ticket-plus";
 import CalendarIcon from "~icons/lucide/calendar";
 import { View } from "@/types";
-import EmptyState2 from "@/components/EmptyState2.vue";
+import EmptyState from "@/components/EmptyState.vue";
 
 interface TicketReason {
   type: string;
