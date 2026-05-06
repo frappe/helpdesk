@@ -4,6 +4,8 @@
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
+from helpdesk.test_utils import make_team
+
 # Test user emails
 AGENT1 = "saved_reply_agent1@test.com"
 AGENT2 = "saved_reply_agent2@test.com"
@@ -46,38 +48,6 @@ def make_agent(user_email):
     )
     agent.insert(ignore_permissions=True)
     return agent
-
-
-def make_team(team_name, members=None):
-    """Create an HD Team with optional members."""
-    if frappe.db.exists("HD Team", team_name):
-        # Delete existing team members
-        frappe.db.delete("HD Team Member", {"parent": team_name})
-        # Add new members directly to DB
-        if members:
-            for idx, member in enumerate(members):
-                frappe.get_doc(
-                    {
-                        "doctype": "HD Team Member",
-                        "parent": team_name,
-                        "parenttype": "HD Team",
-                        "parentfield": "users",
-                        "user": member,
-                        "idx": idx + 1,
-                    }
-                ).db_insert()
-        return frappe.get_doc("HD Team", team_name)
-
-    # Create new team - this will trigger after_insert which creates assignment rule
-    team = frappe.get_doc(
-        {
-            "doctype": "HD Team",
-            "team_name": team_name,
-            "users": [{"user": m} for m in (members or [])],
-        }
-    )
-    team.insert(ignore_permissions=True)
-    return team
 
 
 def make_saved_reply(title, message, scope="Global", teams=None, owner=ADMIN_AGENT):

@@ -739,3 +739,37 @@ class TestHDTicket(FrappeTestCase):
             get_recent_similar_tickets(ticket.name)
 
         frappe.set_user("Administrator")
+
+    def test_ticket_priority(self):
+        # if priority is set, ticket will have the applied priority
+        ticket1 = make_ticket(priority="High")
+        self.assertEqual(ticket1.priority, "High")
+
+        # if ticket type is set, and ticket type has a priority, the ticket's priority will be the same as type's priority
+        ticket_type = frappe.get_doc("HD Ticket Type", "Bug")
+        ticket_type.priority = "High"
+        ticket_type.save()
+        ticket2 = make_ticket(ticket_type="Bug")
+        self.assertEqual(ticket2.priority, "High")
+
+        # if ticket type and priority is set, applied priority is given preference
+        ticket3 = make_ticket(priority="Low", ticket_type="Bug")
+        self.assertEqual(ticket3.priority, "Low")
+
+        # if ticket type is set, and ticket type does not has a priority, the ticket's priority will be the same as applied sla's default priority
+        sla_doc = frappe.get_doc("HD Service Level Agreement", "Default")
+        for p in sla_doc.priorities:
+            if p.priority == "Low":
+                p.default_priority = 1
+            else:
+                p.default_priority = 0
+        sla_doc.save()
+
+        ticket4 = make_ticket(ticket_type="Incident")  # type with no priority
+        self.assertEqual(
+            ticket4.priority, "Low"
+        )  # applied SLA's default priority is assigned
+
+        # ticket created without any type or priority should pick up priority from applied SLA's default
+        ticket5 = make_ticket()
+        self.assertEqual(ticket5.priority, "Low")
