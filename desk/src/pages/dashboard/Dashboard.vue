@@ -207,11 +207,9 @@ import {
   NumberChart,
   Tooltip,
   usePageMeta,
-  Tooltip,
 } from "frappe-ui";
 const { isMobileView } = useScreenSize();
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
-import { __ } from "@/translation";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideUser from "~icons/lucide/user";
 import { useScreenSize } from "@/composables/screen";
