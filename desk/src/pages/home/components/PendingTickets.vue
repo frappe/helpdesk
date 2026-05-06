@@ -172,7 +172,7 @@ interface TicketReason {
 }
 
 interface PendingTicket {
-  name: string | number;
+  name: string;
   subject: string;
   status: string;
   priority: string;
