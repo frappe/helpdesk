@@ -17,7 +17,6 @@ build-backend = "flit_core.buildapi"
 
 [tool.bench.frappe-dependencies]
 frappe = ">=15.40.4,<17.0.0"
-telephony = ">=14.0.0,<=17.0.0-dev"
 
 [tool.bench.assets]
 build_dir = "./desk"
