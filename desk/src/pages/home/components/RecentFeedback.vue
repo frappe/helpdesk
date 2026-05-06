@@ -232,6 +232,7 @@ import {
   TabButtons,
   ECharts,
 } from "frappe-ui";
+import { dataTheme } from "@/utils";
 import LucideStar from "~icons/lucide/star";
 import { useRouter } from "vue-router";
 import { dayjsLocal } from "frappe-ui";
@@ -382,6 +383,14 @@ const currentFeedback = computed(() => {
 });
 
 const barChartOptions = computed<EChartsOption>(() => {
+  // re-compute on theme change
+  dataTheme.value;
+
+  const mutedBarColor = cssVar("--surface-gray-4");
+  const axisLineColor = cssVar("--outline-gray-1");
+  const axisLabelColor = cssVar("--ink-gray-5");
+  const goldBarColor = "#de9735"; // brand rating gold, intentional
+
   const distribution = chartConfig.value.ratingDistribution;
   const values = [1, 2, 3, 4, 5].map((star) => distribution[star] || 0);
   const maxValue = Math.max(...values);
@@ -392,14 +401,14 @@ const barChartOptions = computed<EChartsOption>(() => {
     return {
       value,
       itemStyle: {
-        color: isMax ? "#de9735" : "#d1d5db",
+        color: isMax ? goldBarColor : mutedBarColor,
         borderRadius: [4, 4, 0, 0],
       },
       label: {
         show: isMax,
         position: "top" as const,
         formatter: value > 0 ? String(value) : "",
-        color: "#6b7280",
+        color: axisLabelColor,
         fontSize: 12,
       },
       emphasis: {
@@ -421,10 +430,10 @@ const barChartOptions = computed<EChartsOption>(() => {
     xAxis: {
       type: "category",
       data: ["1", "2", "3", "4", "5"],
-      axisLine: { show: true, lineStyle: { color: "#ededed" } },
+      axisLine: { show: true, lineStyle: { color: axisLineColor } },
       axisTick: { show: false },
       axisLabel: {
-        color: "#6b7280",
+        color: axisLabelColor,
         fontSize: 12,
       },
     },
@@ -439,7 +448,7 @@ const barChartOptions = computed<EChartsOption>(() => {
         barWidth: 24,
         label: {
           position: "top",
-          color: "#6b7280",
+          color: axisLabelColor,
           fontSize: 12,
           formatter: (params: any) => (params.value > 0 ? params.value : ""),
         },
@@ -452,7 +461,17 @@ const barChartOptions = computed<EChartsOption>(() => {
   };
 });
 
+const cssVar = (name: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
 const placeholderChartOptions = computed<EChartsOption>(() => {
+  // re-compute on theme change
+  dataTheme.value;
+
+  const placeholderColor = cssVar("--surface-gray-3");
+  const axisLineColor = cssVar("--outline-gray-2");
+  const axisLabelColor = cssVar("--ink-gray-5");
+
   const placeholderValues = Array.from(
     { length: 5 },
     () => Math.floor(Math.random() * 11) + 3
@@ -460,7 +479,7 @@ const placeholderChartOptions = computed<EChartsOption>(() => {
   const data = placeholderValues.map((value) => ({
     value,
     itemStyle: {
-      color: "#f1f1f1",
+      color: placeholderColor,
       borderRadius: [4, 4, 0, 0],
     },
   }));
@@ -476,10 +495,10 @@ const placeholderChartOptions = computed<EChartsOption>(() => {
     xAxis: {
       type: "category",
       data: ["1", "2", "3", "4", "5"],
-      axisLine: { show: true, lineStyle: { color: "#e2e2e2" } },
+      axisLine: { show: true, lineStyle: { color: axisLineColor } },
       axisTick: { show: false },
       axisLabel: {
-        color: "#e2e2e2",
+        color: axisLabelColor,
         fontSize: 12,
       },
     },

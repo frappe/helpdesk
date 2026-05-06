@@ -44,7 +44,7 @@
                 value: 'Sunday',
               },
             ]"
-            :class="{ 'border-red-500': errors.workday }"
+            :class="{ 'border-outline-red-3': errors.workday }"
             @blur="validateField('workday')"
           />
           <ErrorMessage :message="errors.workday" class="mt-2" />
@@ -58,7 +58,7 @@
             placeholder="Start Time"
             label="Start Time"
             v-model="workDayData.start_time"
-            :class="{ 'border-red-500': errors.start_time }"
+            :class="{ 'border-outline-red-3': errors.start_time }"
             @blur="validateField('start_time')"
           />
           <ErrorMessage :message="errors.start_time" class="mt-2" />
@@ -72,7 +72,7 @@
             placeholder="End Time"
             label="End Time"
             v-model="workDayData.end_time"
-            :class="{ 'border-red-500': errors.end_time }"
+            :class="{ 'border-outline-red-3': errors.end_time }"
             @blur="validateTimeRange"
           />
           <ErrorMessage :message="errors.end_time" class="mt-2" />

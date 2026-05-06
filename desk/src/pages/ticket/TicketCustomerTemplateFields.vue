@@ -1,22 +1,22 @@
 <template>
   <div class="grid grid-cols-3 md:grid-cols-1 gap-4 border-b px-5 py-2.5">
     <div class="space-y-1.5">
-      <span class="block text-sm text-gray-700"> Status </span>
-      <span class="block break-words text-base font-medium text-gray-900">
+      <span class="block text-sm text-ink-gray-7"> Status </span>
+      <span class="block break-words text-base font-medium text-ink-gray-9">
         {{ ticket.data.status }}
       </span>
     </div>
     <div class="space-y-1.5">
-      <span class="block text-sm text-gray-700"> Priority </span>
-      <span class="block break-words text-base font-medium text-gray-900">
+      <span class="block text-sm text-ink-gray-7"> Priority </span>
+      <span class="block break-words text-base font-medium text-ink-gray-9">
         {{ ticket.data.priority }}
       </span>
     </div>
     <div v-for="data in slaData" :key="data.label" class="space-y-1.5">
       <Tooltip :text="dayjs(data.value).long()">
-        <span class="block text-sm text-gray-700">{{ data.title }}</span>
+        <span class="block text-sm text-ink-gray-7">{{ data.title }}</span>
       </Tooltip>
-      <span class="block break-words text-base font-medium text-gray-900">
+      <span class="block break-words text-base font-medium text-ink-gray-9">
         <Badge
           v-if="data.showSla"
           :label="data.label"
@@ -33,11 +33,11 @@
       :key="field.fieldname"
       class="space-y-1.5"
     >
-      <span class="block text-sm text-gray-700">
+      <span class="block text-sm text-ink-gray-7">
         {{ field.label }}
       </span>
       <span
-        class="block break-words text-base font-medium text-gray-900"
+        class="block break-words text-base font-medium text-ink-gray-9"
         :class="!ticket.data[field.fieldname] && 'text-ink-gray-4'"
       >
         {{ ticket.data[field.fieldname] || "—" }}

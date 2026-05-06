@@ -1,6 +1,6 @@
 <template>
   <div v-if="settingsData">
-    <div class="text-base font-semibold text-gray-900">
+    <div class="text-base font-semibold text-ink-gray-9">
       {{ __("Branding") }}
     </div>
     <FormControl

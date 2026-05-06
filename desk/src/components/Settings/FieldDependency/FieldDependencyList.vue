@@ -73,7 +73,7 @@
         >
           <div>
             <div
-              class="grid grid-cols-11 items-center gap-4 text-sm text-gray-600"
+              class="grid grid-cols-11 items-center gap-4 text-sm text-ink-gray-5"
             >
               <div class="col-span-7 ml-2">{{ __("Name") }}</div>
               <div class="col-span-2">{{ __("Created by") }}</div>
@@ -85,7 +85,7 @@
               :key="row.name"
             >
               <div
-                class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded h-12.5"
+                class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded h-12.5"
               >
                 <div
                   @click.stop="$emit('update:step', 'fd', row.name)"

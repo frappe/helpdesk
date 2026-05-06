@@ -22,7 +22,7 @@
         class="-ml-2 grow"
         v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
       >
-        <div class="flex text-sm text-gray-600">
+        <div class="flex text-sm text-ink-gray-5">
           <div class="ml-2">{{ __("Email account name") }}</div>
         </div>
         <hr class="mx-2 mt-2" />

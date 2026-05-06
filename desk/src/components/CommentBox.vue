@@ -1,14 +1,14 @@
 <template>
   <div class="flex-col text-base flex-1" ref="commentBoxRef">
     <div class="mb-2 flex items-center justify-between">
-      <div class="text-gray-600 flex items-center gap-2">
+      <div class="text-ink-gray-5 flex items-center gap-2">
         <Avatar
           size="md"
           :label="commenter"
           :image="getUser(commentedBy).user_image"
         />
         <p>
-          <span class="font-medium text-gray-800">
+          <span class="font-medium text-ink-gray-8">
             {{ commenter }}
           </span>
           <span> {{ __(" commented") }}</span>
@@ -16,7 +16,7 @@
       </div>
       <div class="flex items-center gap-1">
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-          <span class="pl-0.5 text-sm text-gray-600">
+          <span class="pl-0.5 text-sm text-ink-gray-5">
             {{ timeAgo(creation) }}
           </span>
         </Tooltip>
@@ -28,7 +28,7 @@
           >
             <Button
               icon="more-horizontal"
-              class="text-gray-600"
+              class="text-ink-gray-5"
               variant="ghost"
             />
           </Dropdown>
@@ -129,7 +129,7 @@
               class="flex items-center gap-1 px-2 py-1 rounded-full text-sm transition-colors"
               :class="
                 reaction.current_user_reacted
-                  ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                  ? 'bg-surface-blue-2 text-ink-blue-3 hover:bg-surface-blue-3'
                   : 'bg-surface-gray-3 text-ink-gray-6 hover:bg-surface-gray-4'
               "
               v-if="reaction.count !== 0"

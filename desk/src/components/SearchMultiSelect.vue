@@ -23,7 +23,7 @@
                   v-if="option.image"
                   :image="option.image"
                   :label="option.label"
-                  class="border-2 border-white flex-shrink-0"
+                  class="border-2 border-[var(--surface-white)] flex-shrink-0"
                   size="sm"
                 />
               </div>

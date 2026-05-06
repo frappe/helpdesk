@@ -16,7 +16,7 @@
             class="w-full"
           >
             <template #prefix>
-              <LucideSearch class="h-4 w-4 text-gray-500" />
+              <LucideSearch class="h-4 w-4 text-ink-gray-4" />
             </template>
           </FormControl>
           <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
@@ -77,7 +77,7 @@
             class="w-full"
           >
             <template #prefix>
-              <LucideSearch class="h-4 w-4 text-gray-500" />
+              <LucideSearch class="h-4 w-4 text-ink-gray-4" />
             </template>
           </FormControl>
           <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
