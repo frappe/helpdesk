@@ -254,7 +254,7 @@ const subjectInput = ref(null);
 const showPhoneModal = ref(false);
 const customActions = ref([]);
 
-type ticketId = string | number;
+type ticketId = string;
 
 const props = defineProps({
   ticketId: {
