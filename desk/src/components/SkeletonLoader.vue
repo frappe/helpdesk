@@ -11,7 +11,7 @@
         <div
           v-for="i in numberCardsCount"
           :key="`card-${i}`"
-          class="border rounded-md p-4 space-y-3 max-h-[140px]"
+          class="border rounded-md p-4 space-y-3 max-h-[140px] min-h-[114px]"
         >
           <div class="h-3 w-1/2 bg-surface-gray-3 rounded" />
           <div class="h-7 w-2/3 bg-surface-gray-1 rounded" />
@@ -78,7 +78,11 @@
             <!-- empty state -->
             <div
               v-if="showVariant('empty-state')"
-              class="bg-surface-cards/80 backdrop-blur-sm rounded-xl p-6 w-2/3 text-center pointer-events-auto space-y-0.5 relative z-10 bottom-4.5"
+              :style="{
+                backgroundImage:
+                  'radial-gradient(ellipse at center, rgba(255, 255, 255, 1) 30%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 0) 70%)',
+              }"
+              class="rounded-xl p-6 w-2/3 text-center pointer-events-auto space-y-0.5 relative z-10 bottom-4.5"
             >
               <div
                 class="relative z-10 text-ink-gray-7 font-medium text-center text-p-base leading-[1.15]"

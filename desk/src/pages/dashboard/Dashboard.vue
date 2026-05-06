@@ -97,7 +97,7 @@
         >
           <NumberChart
             :key="index"
-            class="border rounded-md"
+            class="border rounded-md min-h-[114px]"
             :config="config"
           />
         </Tooltip>
@@ -332,40 +332,31 @@ const isEmpty = computed(() => {
   );
 });
 
-const parseFilters = (filters: Filters) => {
-  return {
-    from_date: filters.period.split(",")[0],
-    to_date: filters.period.split(",")[1],
-    team: filters.team,
-    agent: filters.agent,
-  };
-};
-
 const numberCards = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   cache: ["Analytics", "NumberCards"],
-  params: {
+  makeParams: () => ({
     dashboard_type: "number_card",
-    filters: parseFilters(filters),
-  },
+    filters,
+  }),
 });
 
 const masterData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   cache: ["Analytics", "MasterCharts"],
-  params: {
+  makeParams: () => ({
     dashboard_type: "master",
-    filters: parseFilters(filters),
-  },
+    filters,
+  }),
 });
 
 const trendData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   cache: ["Analytics", "TrendCharts"],
-  params: {
+  makeParams: () => ({
     dashboard_type: "trend",
-    filters: parseFilters(filters),
-  },
+    filters,
+  }),
 });
 
 const agentFilter = ref(null);
@@ -448,8 +439,7 @@ function getLastXDays(range: number = 30): string {
   const today = new Date();
   const lastXDate = new Date(today);
 
-  lastXDate.setDate(today.getDate() - (range > 0 ? range - 1 : 0));
-
+  lastXDate.setDate(today.getDate() - range);
   return `${dayjs(lastXDate).format("YYYY-MM-DD")},${dayjs(today).format(
     "YYYY-MM-DD"
   )}`;
