@@ -12,7 +12,7 @@
           placeholder="user1@example.com, user2@example.com, ..."
           v-model="emails"
           :debounce="100"
-          :description="__('Comma separated emails to invite')"
+          :description="__('Comma separated emails to invite.')"
         />
         <FormControl
           :label="__('Role')"

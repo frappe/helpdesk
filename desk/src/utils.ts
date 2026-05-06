@@ -1,6 +1,13 @@
 import type { DropdownOption } from "@/types";
 import { useClipboard, useDateFormat } from "@vueuse/core";
-import { FeatherIcon, call, dayjsLocal, toast, useFileUpload, getConfig, } from "frappe-ui";
+import {
+  FeatherIcon,
+  call,
+  dayjsLocal,
+  toast,
+  useFileUpload,
+  getConfig,
+} from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
@@ -21,7 +28,7 @@ import { __ } from "./translation";
  */
 export async function copy(s: string) {
   const { copy: c } = useClipboard();
-  c(s).then(() => toast.success("Copied to clipboard"));
+  c(s).then(() => toast.success(__("Copied to clipboard.")));
 }
 
 /**
@@ -37,7 +44,8 @@ export function getAssign(s: string): string | undefined {
 }
 
 export function validateEmail(email) {
-  const regExp = /^((?:"[\p{L}\p{M}\d .,_%+-]+"|[\p{L}\d._%+-]+)\s)?<([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})>$|^([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})$/u;
+  const regExp =
+    /^((?:"[\p{L}\p{M}\d .,_%+-]+"|[\p{L}\d._%+-]+)\s)?<([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})>$|^([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})$/u;
   return regExp.test(email);
 }
 
@@ -54,74 +62,74 @@ export function validateEmailWithZod(email: string) {
 
 export function dateFormat(date, format?: string) {
   const _format = format || "DD-MM-YYYY HH:mm:ss";
-  if (!date) return '';
+  if (!date) return "";
   const tzDate = dayjsLocal(date);
   return tzDate.format(_format);
 }
 
 export function timeAgo(date) {
-  return prettyDate(date)
+  return prettyDate(date);
 }
 
 export function getBrowserTimezone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
 export function prettyDate(date, mini = false) {
-  if (!date) return ''
+  if (!date) return "";
 
-  if (typeof date == 'string') {
-    date = dayjsLocal(date)
+  if (typeof date == "string") {
+    date = dayjsLocal(date);
   }
 
-  let nowDatetime = dayjsLocal()
-  let diff = nowDatetime.diff(date, 'seconds')
+  let nowDatetime = dayjsLocal();
+  let diff = nowDatetime.diff(date, "seconds");
 
-  let dayDiff = diff / 86400
+  let dayDiff = diff / 86400;
 
-  if (isNaN(dayDiff)) return ''
+  if (isNaN(dayDiff)) return "";
 
   if (mini) {
     // Return short format of time difference
     if (dayDiff < 0) {
       if (Math.abs(dayDiff) < 1) {
         if (Math.abs(diff) < 60) {
-          return __('now')
+          return __("Now");
         } else if (Math.abs(diff) < 3600) {
-          return __('in {0} m', [Math.floor(Math.abs(diff) / 60)])
+          return __("in {0} m", [Math.floor(Math.abs(diff) / 60)]);
         } else if (Math.abs(diff) < 86400) {
-          return __('in {0} h', [Math.floor(Math.abs(diff) / 3600)])
+          return __("in {0} h", [Math.floor(Math.abs(diff) / 3600)]);
         }
       }
       if (Math.abs(dayDiff) >= 1 && Math.abs(dayDiff) < 1.5) {
-        return __('tomorrow')
+        return __("Tomorrow");
       } else if (Math.abs(dayDiff) < 7) {
-        return __('in {0} d', [Math.floor(Math.abs(dayDiff))])
+        return __("in {0} d", [Math.floor(Math.abs(dayDiff))]);
       } else if (Math.abs(dayDiff) < 31) {
-        return __('in {0} w', [Math.floor(Math.abs(dayDiff) / 7)])
+        return __("in {0} w", [Math.floor(Math.abs(dayDiff) / 7)]);
       } else if (Math.abs(dayDiff) < 365) {
-        return __('in {0} M', [Math.floor(Math.abs(dayDiff) / 30)])
+        return __("in {0} M", [Math.floor(Math.abs(dayDiff) / 30)]);
       } else {
-        return __('in {0} y', [Math.floor(Math.abs(dayDiff) / 365)])
+        return __("in {0} y", [Math.floor(Math.abs(dayDiff) / 365)]);
       }
     } else if (dayDiff >= 0 && dayDiff < 1) {
       if (diff < 60) {
-        return __('now')
+        return __("Now");
       } else if (diff < 3600) {
-        return __('{0} m', [Math.floor(diff / 60)])
+        return __("{0} m", [Math.floor(diff / 60)]);
       } else if (diff < 86400) {
-        return __('{0} h', [Math.floor(diff / 3600)])
+        return __("{0} h", [Math.floor(diff / 3600)]);
       }
     } else {
-      dayDiff = Math.floor(dayDiff)
+      dayDiff = Math.floor(dayDiff);
       if (dayDiff < 7) {
-        return __('{0} d', [dayDiff])
+        return __("{0} d", [dayDiff]);
       } else if (dayDiff < 31) {
-        return __('{0} w', [Math.floor(dayDiff / 7)])
+        return __("{0} w", [Math.floor(dayDiff / 7)]);
       } else if (dayDiff < 365) {
-        return __('{0} M', [Math.floor(dayDiff / 30)])
+        return __("{0} M", [Math.floor(dayDiff / 30)]);
       } else {
-        return __('{0} y', [Math.floor(dayDiff / 365)])
+        return __("{0} y", [Math.floor(dayDiff / 365)]);
       }
     }
   } else {
@@ -129,60 +137,60 @@ export function prettyDate(date, mini = false) {
     if (dayDiff < 0) {
       if (Math.abs(dayDiff) < 1) {
         if (Math.abs(diff) < 60) {
-          return __('just now')
+          return __("Just now");
         } else if (Math.abs(diff) < 120) {
-          return __('in 1 minute')
+          return __("In 1 minute");
         } else if (Math.abs(diff) < 3600) {
-          return __('in {0} minutes', [Math.floor(Math.abs(diff) / 60)])
+          return __("In {0} minutes", [Math.floor(Math.abs(diff) / 60)]);
         } else if (Math.abs(diff) < 7200) {
-          return __('in 1 hour')
+          return __("In 1 hour");
         } else if (Math.abs(diff) < 86400) {
-          return __('in {0} hours', [Math.floor(Math.abs(diff) / 3600)])
+          return __("In {0} hours", [Math.floor(Math.abs(diff) / 3600)]);
         }
       }
       if (Math.abs(dayDiff) >= 1 && Math.abs(dayDiff) < 1.5) {
-        return __('tomorrow')
+        return __("Tomorrow");
       } else if (Math.abs(dayDiff) < 7) {
-        return __('in {0} days', [Math.floor(Math.abs(dayDiff))])
+        return __("In {0} days", [Math.floor(Math.abs(dayDiff))]);
       } else if (Math.abs(dayDiff) < 31) {
-        return __('in {0} weeks', [Math.floor(Math.abs(dayDiff) / 7)])
+        return __("In {0} weeks", [Math.floor(Math.abs(dayDiff) / 7)]);
       } else if (Math.abs(dayDiff) < 365) {
-        return __('in {0} months', [Math.floor(Math.abs(dayDiff) / 30)])
+        return __("In {0} months", [Math.floor(Math.abs(dayDiff) / 30)]);
       } else if (Math.abs(dayDiff) < 730) {
-        return __('in 1 year')
+        return __("In 1 year");
       } else {
-        return __('in {0} years', [Math.floor(Math.abs(dayDiff) / 365)])
+        return __("In {0} years", [Math.floor(Math.abs(dayDiff) / 365)]);
       }
     } else if (dayDiff >= 0 && dayDiff < 1) {
       if (diff < 60) {
-        return __('just now')
+        return __("Just now");
       } else if (diff < 120) {
-        return __('1 minute ago')
+        return __("1 minute ago");
       } else if (diff < 3600) {
-        return __('{0} minutes ago', [Math.floor(diff / 60)])
+        return __("{0} minutes ago", [Math.floor(diff / 60)]);
       } else if (diff < 7200) {
-        return __('1 hour ago')
+        return __("1 hour ago");
       } else if (diff < 86400) {
-        return __('{0} hours ago', [Math.floor(diff / 3600)])
+        return __("{0} hours ago", [Math.floor(diff / 3600)]);
       }
     } else {
-      dayDiff = Math.floor(dayDiff)
-      if (dayDiff == 1) {
-        return __('yesterday')
+      dayDiff = Math.floor(dayDiff);
+      if (dayDiff >= 1 && dayDiff < 2) {
+        return __("Yesterday");
       } else if (dayDiff < 7) {
-        return __('{0} days ago', [dayDiff])
+        return __("{0} days ago", [dayDiff]);
       } else if (dayDiff < 14) {
-        return __('1 week ago')
+        return __("1 week ago");
       } else if (dayDiff < 31) {
-        return __('{0} weeks ago', [Math.floor(dayDiff / 7)])
+        return __("{0} weeks ago", [Math.floor(dayDiff / 7)]);
       } else if (dayDiff < 62) {
-        return __('1 month ago')
+        return __("1 month ago");
       } else if (dayDiff < 365) {
-        return __('{0} months ago', [Math.floor(dayDiff / 30)])
+        return __("{0} months ago", [Math.floor(dayDiff / 30)]);
       } else if (dayDiff < 730) {
-        return __('1 year ago')
+        return __("1 year ago");
       } else {
-        return __('{0} years ago', [Math.floor(dayDiff / 365)])
+        return __("{0} years ago", [Math.floor(dayDiff / 365)]);
       }
     }
   }
@@ -247,7 +255,7 @@ export const isCustomerPortal = ref(false);
 
 export async function copyToClipboard(
   msg: string = "",
-  toastMessage: string = "Copied to clipboard"
+  toastMessage: string = __("Copied to clipboard.")
 ) {
   if (navigator.clipboard && window.isSecureContext) {
     await navigator.clipboard.writeText(msg);
@@ -413,7 +421,7 @@ export function htmlToText(html: string): string {
  * @returns {string} Formatted date string in the user's locale and preferences
  */
 export function getFormattedDate(date) {
-  if (!date) return ""; 
+  if (!date) return "";
   const dateObj = dayjsLocal(date);
   if (!dateObj.isValid()) return "";
 

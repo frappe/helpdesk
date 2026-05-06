@@ -3,32 +3,35 @@
     <!-- Feedback Section -->
     <div>
       <!-- was this article helpful? -->
-      <div class="flex items-center gap-2">
-        <span class="text-gray-800 text-sm"
-          >Did this article solve your issue?</span
-        >
-        <div class="flex items-center gap-1">
-          <component
-            :is="_feedback === 1 ? ThumbsUpFilledIcon : ThumbsUpIcon"
-            class="w-4 h-4 cursor-pointer"
-            @click="handleFeedbackClick(1)"
-          />
-          <component
-            :is="_feedback === 2 ? ThumbsDownFilledIcon : ThumbsDownIcon"
-            class="w-4 h-4 cursor-pointer"
-            @click="handleFeedbackClick(2)"
-          />
+      <div class="flex flex-col gap-2">
+        <span class="text-gray-800 text-sm !text-[14px]">{{
+          __("Was this article Helpful?")
+        }}</span>
+
+        <div class="flex gap-1 text-gray-600">
+          <span class="text-sm">
+            {{ __("If your issue isn't resolved, raise a support ticket") }}
+          </span>
+          <router-link :to="{ name: 'TicketNew' }">
+            <p class="underline font-base text-sm">here</p>
+          </router-link>
         </div>
       </div>
     </div>
     <!-- Create a ticket CTA -->
     <div class="flex items-center justify-center gap-2">
-      <span class="font-normal text-sm">
-        Can’t find what you’re looking for?
-      </span>
-      <router-link :to="{ name: 'TicketNew' }">
-        <p class="underline font-base text-sm">Create a ticket &rightarrow;</p>
-      </router-link>
+      <div class="flex items-center gap-1">
+        <component
+          :is="_feedback === 1 ? ThumbsUpFilledIcon : ThumbsUpIcon"
+          class="w-4 h-4 m-1.5 cursor-pointer"
+          @click="handleFeedbackClick(1)"
+        />
+        <component
+          :is="_feedback === 2 ? ThumbsDownFilledIcon : ThumbsDownIcon"
+          class="w-4 h-4 m-1.5 cursor-pointer"
+          @click="handleFeedbackClick(2)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -43,6 +46,8 @@ import {
 } from "@/components/icons";
 import { setFeedback } from "@/stores/knowledgeBase";
 import { ref } from "vue";
+import { toast } from "frappe-ui";
+import { __ } from "@/translation";
 
 interface P {
   feedback: FeedbackAction;
@@ -54,11 +59,25 @@ const props = withDefaults(defineProps<P>(), {
 });
 
 const _feedback = ref(props.feedback);
+const emit = defineEmits(["articleReaction"]);
 
 function handleFeedbackClick(action: FeedbackAction) {
+  if (action === _feedback.value) {
+    return;
+  }
   _feedback.value = action;
-  if (action === props.feedback) return;
-  setFeedback.submit({ articleId: props.articleId, action });
+  setFeedback.submit(
+    { articleId: props.articleId, action },
+    {
+      onSuccess: () => {
+        emit("articleReaction", _feedback.value);
+        if (_feedback.value === 0) {
+          return;
+        }
+        toast.success(__("Feedback submitted successfully."));
+      },
+    }
+  );
 }
 </script>
 

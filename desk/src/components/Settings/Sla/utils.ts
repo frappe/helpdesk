@@ -7,19 +7,19 @@ export function formatTimeHMS(seconds) {
   let formattedTime = "";
 
   if (days > 0) {
-    formattedTime += `${days} days `;
+    formattedTime += ` ${days} ${days === 1 ? "day" : "days"}`;
   }
 
   if (hours > 0) {
-    formattedTime += `${hours} hours `;
+    formattedTime += ` ${hours} ${hours === 1 ? "hour" : "hours"}`;
   }
 
   if (minutes > 0) {
-    formattedTime += `${minutes} minutes `;
+    formattedTime += ` ${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
   }
 
   if (remainingSeconds > 0) {
-    formattedTime += `${remainingSeconds} seconds`;
+    formattedTime += ` ${remainingSeconds} ${remainingSeconds === 1 ? "second" : "seconds"}`;
   }
 
   return formattedTime.trim();

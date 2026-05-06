@@ -16,7 +16,7 @@ import Briefcase from "~icons/lucide/briefcase";
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
 import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
-import Telephony from "./Telephony/Telephony.vue";
+import TelephonyPage from "./Telephony/TelephonyPage.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
 import SavedReplies from "./SavedReplies/SavedReplies.vue";
@@ -34,8 +34,9 @@ const auth = useAuthStore();
 export const tabs = computed(() => {
   const _tabs = [
     {
-      label: __("User Settings"),
+      label: __("My settings"),
       hideLabel: true,
+      noborder: true,
       items: [
         {
           label: __("Profile"),
@@ -128,7 +129,7 @@ export const tabs = computed(() => {
         {
           label: __("Telephony"),
           icon: markRaw(PhoneIcon),
-          component: markRaw(Telephony),
+          component: markRaw(TelephonyPage),
         },
       ],
     },

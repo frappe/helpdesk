@@ -105,12 +105,6 @@
               }}
             </div>
           </div>
-          <Button
-            :label="__('New')"
-            variant="outline"
-            icon-left="plus"
-            @click="setActiveSettingsTab('Invite Agents')"
-          />
         </div>
         <!-- Agent List -->
         <div
@@ -120,7 +114,7 @@
           <div
             class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600"
           >
-            <div class="col-span-6 text-p-sm">{{ __("Agent Name") }}</div>
+            <div class="col-span-6 text-p-sm">{{ __("Agent name") }}</div>
           </div>
           <hr class="mt-2" />
           <div v-for="(agent, index) in agents.data" :key="agent.agent_name">
@@ -205,6 +199,7 @@ import { activeFilter, useAgents } from "./agents";
 import AgentIcon from "../icons/AgentIcon.vue";
 import { setActiveSettingsTab } from "./settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { __ } from "@/translation";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
@@ -291,7 +286,7 @@ function updateRole(agent: string, newRole: string) {
     new_role: newRole,
   }).then(() => {
     updateUserRoleCache(agent, newRole);
-    toast.success(`Role updated to ${newRole}`);
+    toast.success(__(`Role updated to ${newRole} successfully.`));
   });
 }
 

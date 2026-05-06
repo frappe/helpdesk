@@ -1,8 +1,8 @@
 <template>
   <div
-    class="-all flex h-7 cursor-pointer items-center rounded pl-2 pr-1 text-gray-800 duration-300 ease-in-out"
+    class="-all flex py-[7px] mx-2 h-7.5 cursor-pointer items-center rounded pl-2 pr-2 text-gray-800 duration-300 ease-in-out"
     :class="{
-      'w-full': isExpanded,
+      'w-auto': isExpanded,
       'w-8': !isExpanded,
       'shadow-sm': isActive,
       [bgColor]: isActive,

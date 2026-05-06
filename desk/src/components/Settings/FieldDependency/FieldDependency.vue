@@ -63,6 +63,7 @@
               :parent-field-values="state.parentFieldValues"
               v-model="fieldCriteriaState"
               v-model:selections="state"
+              v-if="state.selectedParentField && state.selectedChildField"
             />
           </div>
         </div>

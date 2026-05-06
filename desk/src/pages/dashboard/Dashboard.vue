@@ -2,11 +2,16 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">
-          {{ __("Dashboard") }}
+        <div class="text-lg font-medium text-ink-gray-9">
+          {{ __(dashboardTitle) }}
         </div>
       </template>
-      <template #right-header> </template>
+      <template #right-header>
+        <!-- Segmented pill toggle: only visible to managers -->
+        <div v-if="isManager">
+          <TabButtons v-model="activeTab" :buttons="tabButtons" />
+        </div>
+      </template>
     </LayoutHeader>
 
     <div class="p-5 w-full overflow-y-scroll">
@@ -22,11 +27,11 @@
         >
           <template #default>
             <div
-              class="flex justify-between !w-48 items-center border border-outline-gray-2 rounded text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
+              class="flex justify-between !min-w-48 items-center border border-outline-gray-2 rounded text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
             >
               <div class="flex items-center">
                 <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
-                <span class="text-base">{{ preset }}</span>
+                <span class="text-base whitespace-nowrap">{{ preset }}</span>
               </div>
               <LucideChevronDown class="size-4 text-ink-gray-5" />
             </div>
@@ -52,7 +57,7 @@
           </template>
         </DateRangePicker>
         <Link
-          v-if="isManager"
+          v-if="isManager && !viewMyStats"
           class="form-control w-48"
           doctype="HD Team"
           :placeholder="__('Team')"
@@ -65,7 +70,7 @@
           </template>
         </Link>
         <Link
-          v-if="isManager"
+          v-if="isManager && !viewMyStats"
           class="form-control w-48"
           doctype="HD Agent"
           :placeholder="__('Agent')"
@@ -80,56 +85,108 @@
         </Link>
       </div>
       <!-- Charts -->
-      <div v-if="!loading" class="transition-all animate-fade-in duration-300">
-        <!-- Number Cards -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
-          v-if="!numberCards.loading"
+
+      <!-- Number Cards -->
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4"
+        v-if="!numberCards.loading"
+      >
+        <Tooltip
+          v-for="(config, index) in numberCards.data"
+          :text="config.tooltip"
         >
-          <Tooltip
-            v-for="(config, index) in numberCards.data"
-            :text="config.tooltip"
-          >
-            <NumberChart
-              :key="index"
-              class="border rounded-md"
-              :config="config"
-            />
-          </Tooltip>
-        </div>
+          <NumberChart
+            :key="index"
+            class="border rounded-md"
+            :config="config"
+          />
+        </Tooltip>
+      </div>
+      <div
+        v-if="!loading && !isEmpty"
+        class="transition-all animate-fade-in duration-300"
+      >
         <!-- Trend Charts -->
         <div
           class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
           v-if="!trendData.loading"
         >
-          <div
-            class="border rounded-md min-h-80"
-            v-for="(chart, index) in trendData.data"
-            :key="index"
-          >
-            <component :is="getChartType(chart)" />
-          </div>
+          <template v-for="(chart, index) in trendData.data" :key="index">
+            <!-- has data -->
+            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+              <component :is="getChartType(chart)" />
+            </div>
+
+            <!-- chart with no data -->
+            <SkeletonLoader
+              v-else
+              :variants="['bar-chart', 'empty-state']"
+              :bar-chart-count="1"
+              :has-applied-filter="hasAppliedFilter"
+              :empty-states="[
+                {
+                  title: `No ${(chart?.title).toLowerCase()} available.`,
+                },
+              ]"
+            />
+          </template>
         </div>
         <!-- Master Data Charts -->
         <div
           class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
           v-if="!masterData.loading"
         >
-          <div
-            class="border rounded-md"
-            v-for="(chart, index) in masterData.data"
-            :key="index"
-          >
-            <component :is="getChartType(chart)" />
-          </div>
+          <template v-for="(chart, index) in masterData.data" :key="index">
+            <!-- has data -->
+            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+              <component :is="getChartType(chart)" />
+            </div>
+
+            <!-- chart with no data -->
+            <SkeletonLoader
+              v-else
+              :variants="['bar-chart', 'empty-state']"
+              :bar-chart-count="1"
+              :has-applied-filter="hasAppliedFilter"
+              :empty-states="[
+                {
+                  title: `No ${(chart?.title).toLowerCase()} available.`,
+                },
+              ]"
+            />
+          </template>
         </div>
       </div>
-      <!-- Loading State -->
+
+      <!-- Skeleton Loading State -->
+      <div class="flex flex-col gap-4">
+        <SkeletonLoader
+          v-if="numberCards.loading"
+          :variants="['number-cards']"
+          :number-cards-count="5"
+          :loading="true"
+        />
+        <SkeletonLoader
+          v-if="trendData.loading"
+          :variants="['bar-chart']"
+          :bar-chart-count="4"
+          :loading="true"
+        />
+      </div>
+
+      <!-- complete empty state -->
       <div
-        v-else
-        class="flex items-center justify-center h-[240px] gap-2 rounded transition-all animate-fade-in"
+        v-if="isEmpty"
+        class="transition-all animate-fade-in duration-300 relative"
       >
-        <Button :loading="true" size="2xl" variant="ghost" />
+        <div>
+          <SkeletonLoader
+            :variants="['bar-chart', 'empty-state']"
+            :bar-chart-count="6"
+            :empty-states="emptyStates"
+            :has-applied-filter="hasAppliedFilter"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -146,18 +203,44 @@ import {
   dayjs,
   DonutChart,
   Dropdown,
+  TabButtons,
   NumberChart,
   Tooltip,
   usePageMeta,
 } from "frappe-ui";
+const { isMobileView } = useScreenSize();
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
+import LucideBuilding2 from "~icons/lucide/building-2";
+import LucideUser from "~icons/lucide/user";
+import { useScreenSize } from "@/composables/screen";
+import { useStorage } from "@vueuse/core";
 
-const { isManager, userId } = useAuthStore();
+interface NumberCardData {
+  title: string;
+  value: number;
+  delta: number | null;
+  deltaSuffix: string;
+  suffix?: string;
+  negativeIsBetter?: boolean;
+  tooltip: string;
+}
 
-const filters = reactive({
-  period: getLastXDays(),
-  agent: null,
-  team: null,
+interface ChartData {
+  data: ChartValues[];
+  title: string;
+  type: "axis" | "pie";
+}
+
+interface ChartValues {
+  date: Date;
+  Open: number;
+  Closed: number;
+  "SLA Fulfilled": number;
+}
+
+const dashboardTitle = computed(() => {
+  if (!isManager) return __("Agent Dashboard");
+  return viewMyStats.value ? __("My Dashboard") : __("Organization Dashboard");
 });
 
 const colors = [
@@ -172,6 +255,76 @@ const colors = [
   "#15CCEF",
   "#A6B1B9",
 ];
+const emptyStates = [
+  {
+    title: "No ticket activity",
+    message: "Ticket trends will appear here once tickets are created.",
+  },
+  {
+    title: "No feedback data",
+    message: "Feedback insights will appear once responses are collected.",
+  },
+  {
+    title: "No team data",
+    message: "Tickets will be grouped by team once available.",
+  },
+  {
+    title: "No ticket type data",
+    message: "Tickets will be categorized by type once created.",
+  },
+  {
+    title: "No priority data",
+    message: "Ticket priorities will be reflected here once assigned.",
+  },
+  {
+    title: "No channel data",
+    message: "Tickets will be grouped by channel once received.",
+  },
+];
+
+const tabButtons = computed(() => {
+  if (isMobileView.value) {
+    return [
+      { value: "organization", icon: h(LucideBuilding2, { class: "size-4" }) },
+      { value: "my_stats", icon: h(LucideUser, { class: "size-4" }) },
+    ];
+  }
+  return [
+    {
+      value: "organization",
+      iconLeft: h(LucideBuilding2, { class: "size-4" }),
+      label: "My Organization",
+    },
+    {
+      value: "my_stats",
+      iconLeft: h(LucideUser, { class: "size-4" }),
+      label: "My Stats",
+    },
+  ];
+});
+
+const filters = reactive({
+  period: getLastXDays(),
+  agent: null,
+  team: null,
+});
+
+const hasAppliedFilter = computed(() => {
+  return (
+    filters.agent ||
+    filters.team ||
+    (filters.period && filters.period !== getLastXDays(30))
+  );
+});
+
+const isEmpty = computed(() => {
+  if (!numberCards.data || !trendData.data || !masterData.data) return false;
+  return (
+    (numberCards.data as NumberCardData[]).every((d) => d.value === 0) &&
+    (trendData.data as ChartData[]).every((d) => !d.data?.length) &&
+    (masterData.data as ChartData[]).every((d) => !d.data?.length)
+  );
+});
 
 const numberCards = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
@@ -208,9 +361,26 @@ const teamMembers = createResource({
     team: filters.team,
   },
   onSuccess: (data) => {
-    // Set Agent Filters
     agentFilter.value = { name: ["in", data] };
   },
+});
+
+const { isManager, userId } = useAuthStore();
+
+const viewMyStats = ref(false);
+const activeTab = useStorage("dashboard_active_tab", "organization");
+function validateView(myStats: boolean) {
+  viewMyStats.value = myStats;
+  if (myStats) {
+    filters.team = null;
+    filters.agent = userId;
+  } else {
+    filters.agent = null;
+  }
+}
+
+watch(activeTab, (val) => {
+  validateView(val === "my_stats");
 });
 
 watch(
@@ -230,6 +400,16 @@ watch(
     }
   }
 );
+
+//check empty for individual charts
+function isChartEmpty(chart: any) {
+  if (!chart.data?.length) return true;
+  return chart.data.every((row: any) =>
+    Object.entries(row)
+      .filter(([key]) => key !== "date")
+      .every(([, val]) => val === null || val === 0)
+  );
+}
 
 const loading = computed(() => {
   return numberCards.loading || masterData.loading || trendData.loading;
@@ -382,11 +562,10 @@ watch(
 
 onMounted(() => {
   if (!isManager) {
-    // when filters are updated, resources are reloaded coz of the watcher
     filters.agent = userId;
-    return;
+  } else {
+    validateView(activeTab.value === "my_stats");
   }
-  // If not managers call the resources
   numberCards.reload();
   masterData.reload();
   trendData.reload();
