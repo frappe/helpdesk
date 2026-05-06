@@ -69,6 +69,7 @@ doc_events = {
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
+        "before_save": "helpdesk.extends.assignment_rule.on_assignment_rule_before_save",
     },
 }
 

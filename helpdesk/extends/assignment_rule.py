@@ -28,3 +28,32 @@ def on_assignment_rule_validate(doc, event):
                 "Condition format should be like this e.g [['status','==','open']], it's recommended to use portal view to create conditions.",
             )
         )
+
+
+def on_assignment_rule_before_save(doc, event):
+    """
+    When AR's users or weighted_users change, sync back to the linked HD Team.
+    Skips if already in sync.
+    """
+    team_name = frappe.db.get_value("HD Team", {"assignment_rule": doc.name}, "name")
+    if not team_name:
+        return
+
+    seen = set()
+    members = []
+    for row in list(doc.users) + list(doc.weighted_users):
+        if row.user and row.user not in seen:
+            seen.add(row.user)
+            members.append(row.user)
+
+    team = frappe.get_doc("HD Team", team_name)
+    team_user_set = {u.user for u in team.users if u.user}
+
+    if set(members) == team_user_set:
+        return
+
+    team.users = []
+    for user in members:
+        team.append("users", {"user": user})
+
+    team.save(ignore_permissions=True)
