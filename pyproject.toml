@@ -16,8 +16,12 @@ requires = ["flit_core >=3.4,<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.bench.frappe-dependencies]
+<<<<<<< HEAD
 frappe = ">=15.40.4,<17.0.0"
 telephony = ">=14.0.0,<=17.0.0-dev"
+=======
+frappe = ">=16.0.0-dev,<=17.0.0-dev"
+>>>>>>> f56b112c (Revert "chore: add telephony dependency")
 
 [tool.bench.assets]
 build_dir = "./desk"
