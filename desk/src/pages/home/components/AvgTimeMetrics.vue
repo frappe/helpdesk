@@ -103,7 +103,7 @@
           __('Average response and resolution metrics not available')
         "
         variant="overlay"
-        subtle
+        text="md"
       />
     </div>
     <div v-else class="flex flex-col mt-5 grow w-full">

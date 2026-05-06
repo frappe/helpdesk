@@ -17,21 +17,21 @@
       <!-- title -->
       <div class="flex flex-col items-center justify-center">
         <span
-          :class="
-            subtle
-              ? 'text-base font-medium text-ink-gray-8'
-              : 'text-lg font-medium text-ink-gray-8'
-          "
+          :class="{
+            'text-sm font-medium text-ink-gray-8': text === 'sm',
+            'text-base font-medium text-ink-gray-8': text === 'md' || !text,
+            'text-lg font-medium text-ink-gray-8': text === 'lg',
+          }"
         >
           {{ __(title) }}
         </span>
         <span
           v-if="descriptionText"
-          :class="
-            subtle
-              ? 'text-center text-p-sm text-ink-gray-6 mt-1'
-              : 'text-center text-p-base text-ink-gray-6 mt-1'
-          "
+          :class="{
+            'text-center text-xs text-ink-gray-6 mt-1': text === 'sm',
+            'text-center text-sm text-ink-gray-6 mt-1': text === 'md' || !text,
+            'text-center text-base text-ink-gray-6 mt-1': text === 'lg',
+          }"
         >
           {{ __(descriptionText) }}
         </span>
@@ -47,14 +47,14 @@ interface Props {
   icon?: VNode | string;
   description?: string;
   variant?: "default" | "overlay";
-  subtle?: boolean;
+  text?: "sm" | "md" | "lg";
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: "No Data Found",
   icon: "",
   variant: "default",
-  subtle: false,
+  text: "lg",
 });
 
 const descriptionText = computed(() =>

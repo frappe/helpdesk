@@ -119,7 +119,7 @@
             :title="emptyState.title"
             :description="emptyState.description"
             variant="overlay"
-            subtle
+            text="md"
           />
         </tbody>
       </table>

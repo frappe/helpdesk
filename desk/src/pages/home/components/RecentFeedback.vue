@@ -112,43 +112,47 @@
             </Dropdown>
 
             <!-- Period dropdown second -->
-            <Dropdown
-              v-if="!showDatePicker && currentPeriod !== 'custom_range'"
-              :options="periodOptions"
-              placement="right"
-              class="ml-auto"
-            >
-              <template #default>
-                <Button :label="currentPeriodLabel" icon-right="chevron-down" />
-              </template>
-              <template #item-label="{ item }">
-                <div
-                  class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
-                >
-                  <span>
-                    {{ item.label }}
-                  </span>
-                </div>
-              </template>
-              <template #item-suffix="{ item }">
-                <FeatherIcon
-                  v-if="item.label == __(periodLabels[currentPeriod])"
-                  name="check"
-                  class="size-4"
-                />
-              </template>
-            </Dropdown>
-            <DateRangePicker
-              v-if="showDatePicker || currentPeriod === 'custom_range'"
-              ref="datePickerRef"
-              v-model="customDateRange"
-              :placeholder="__('Select range')"
-              @update:model-value="onCustomRangeSelected"
-              :format="'MMM D'"
-              @click="datePickerRef?.open()"
-              placement="top-start"
-              class="!w-48 ml-auto"
-            />
+            <div class="flex items-center gap-2 ml-auto">
+              <Dropdown
+                v-if="!showDatePicker && currentPeriod !== 'custom_range'"
+                :options="periodOptions"
+                placement="right"
+              >
+                <template #default>
+                  <Button
+                    :label="currentPeriodLabel"
+                    icon-right="chevron-down"
+                  />
+                </template>
+                <template #item-label="{ item }">
+                  <div
+                    class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+                  >
+                    <span>
+                      {{ item.label }}
+                    </span>
+                  </div>
+                </template>
+                <template #item-suffix="{ item }">
+                  <FeatherIcon
+                    v-if="item.label == __(periodLabels[currentPeriod])"
+                    name="check"
+                    class="size-4"
+                  />
+                </template>
+              </Dropdown>
+              <DateRangePicker
+                v-if="showDatePicker || currentPeriod === 'custom_range'"
+                ref="datePickerRef"
+                v-model="customDateRange"
+                :placeholder="__('Select range')"
+                @update:model-value="onCustomRangeSelected"
+                :format="'MMM D'"
+                @click="datePickerRef?.open()"
+                placement="top-start"
+                class="!w-48"
+              />
+            </div>
           </div>
           <div class="flex-1 flex flex-col min-h-0">
             <!-- Feedback Card -->
@@ -268,7 +272,7 @@
             variant="overlay"
             :title="__('No feedback')"
             :description="__('You haven\'t received any feedback yet')"
-            subtle
+            text="md"
           />
         </div>
       </div>

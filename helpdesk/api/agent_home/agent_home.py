@@ -480,7 +480,7 @@ def _get_priority_range():
 
 def _get_upcoming_sla_tickets(limit=10):
     filters = [
-        ["sla", "!=", ""],
+        ["sla", "is", "set"],
         ["agreement_status", "in", ["First Response Due", "Resolution Due"]],
         ["status_category", "=", "Open"],
         ["_assign", "like", f"%{frappe.session.user}%"],

@@ -105,25 +105,3 @@ def add_default_views(for_existing_sites=False):
             if for_existing_sites:
                 doc.public = 0
             doc.insert(ignore_permissions=True)
-
-
-def update_default_views():
-    """Update standard views with latest definitions."""
-    for view in default_views:
-        view_name = view["name"]
-        if frappe.db.exists("HD View", view_name):
-            doc = frappe.get_doc("HD View", view_name)
-            doc.update(
-                {
-                    "columns": view["columns"],
-                    "filters": view["filters"],
-                    "icon": view["icon"],
-                    "label": view["label"],
-                    "order_by": view["order_by"],
-                    "rows": view["rows"],
-                    "dt": view["dt"],
-                    "route_name": view["route_name"],
-                    "type": view["type"],
-                }
-            )
-            doc.save(ignore_permissions=True)
