@@ -223,6 +223,7 @@ def add_website_settings_permission():
         update_permission_property(doctype, role, 0, p, 1)
 
 
+# TODO: why?
 def add_default_assignment_rule():
     support_settings = frappe.get_doc("HD Settings")
     support_settings.create_base_support_rotation()
