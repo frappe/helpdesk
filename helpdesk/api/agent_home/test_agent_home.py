@@ -45,11 +45,19 @@ def set_ticket_timestamps(
         frappe.db.set_value(
             "HD Ticket", ticket_name, "first_response_time", first_response_time
         )
+        frappe.db.set_value(
+            "HD Ticket", ticket_name, "first_responded_on", frappe.utils.now_datetime()
+        )
 
     if resolution_time:
         frappe.db.set_value(
             "HD Ticket", ticket_name, "resolution_time", resolution_time
         )
+        resolved_status = frappe.get_all(
+            "HD Ticket Status", filters={"category": "Resolved"}, pluck="name", limit=1
+        )
+        if resolved_status:
+            frappe.db.set_value("HD Ticket", ticket_name, "status", resolved_status[0])
 
 
 def create_ticket_with_agent(
@@ -311,21 +319,21 @@ class TestAgentHome(FrappeTestCase):
         now = frappe.utils.now_datetime()
 
         # T1: Today (matches all periods)
-        self._create_ticket(feedback_rating=1.0, modified=now)
+        self._create_ticket(feedback_rating=1.0)
 
         # T2: 10 days ago (matches last month, last 3 months, all time)
         self._create_ticket(
-            feedback_rating=0.8, modified=frappe.utils.add_days(now, -10)
+            feedback_rating=0.8, creation=frappe.utils.add_days(now, -10)
         )
 
         # T3: 40 days ago (matches last 3 months, all time)
         self._create_ticket(
-            feedback_rating=0.6, modified=frappe.utils.add_days(now, -40)
+            feedback_rating=0.6, creation=frappe.utils.add_days(now, -40)
         )
 
         # T4: 100 days ago (only matches all time)
         self._create_ticket(
-            feedback_rating=0.4, modified=frappe.utils.add_days(now, -100)
+            feedback_rating=0.4, creation=frappe.utils.add_days(now, -100)
         )
 
         # Test last_week (7 days) - Should see 1 ticket
