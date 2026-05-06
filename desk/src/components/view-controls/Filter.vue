@@ -604,74 +604,35 @@ const oppositeOperatorMap = {
 };
 
 const timespanOptions = [
-  {
-    label: "Last Week",
-    value: "last week",
-  },
-  {
-    label: "Last Month",
-    value: "last month",
-  },
-  {
-    label: "Last Quarter",
-    value: "last quarter",
-  },
-  {
-    label: "Last 6 Months",
-    value: "last 6 months",
-  },
-  {
-    label: "Last Year",
-    value: "last year",
-  },
-  {
-    label: "Yesterday",
-    value: "yesterday",
-  },
-  {
-    label: "Today",
-    value: "today",
-  },
-  {
-    label: "Tomorrow",
-    value: "tomorrow",
-  },
-  {
-    label: "This Week",
-    value: "this week",
-  },
-  {
-    label: "This Month",
-    value: "this month",
-  },
-  {
-    label: "This Quarter",
-    value: "this quarter",
-  },
-  {
-    label: "This Year",
-    value: "this year",
-  },
-  {
-    label: "Next Week",
-    value: "next week",
-  },
-  {
-    label: "Next Month",
-    value: "next month",
-  },
-  {
-    label: "Next Quarter",
-    value: "next quarter",
-  },
-  {
-    label: "Next 6 Months",
-    value: "next 6 months",
-  },
-  {
-    label: "Next Year",
-    value: "next year",
-  },
+  { label: "Last 7 Days", value: "last 7 days" },
+  { label: "Last 14 Days", value: "last 14 days" },
+  { label: "Last 30 Days", value: "last 30 days" },
+  { label: "Last 90 Days", value: "last 90 days" },
+
+  { label: "Last Week", value: "last week" },
+  { label: "Last Month", value: "last month" },
+  { label: "Last Quarter", value: "last quarter" },
+  { label: "Last 6 Months", value: "last 6 months" },
+  { label: "Last Year", value: "last year" },
+
+  { label: "Yesterday", value: "yesterday" },
+  { label: "Today", value: "today" },
+  { label: "Tomorrow", value: "tomorrow" },
+
+  { label: "This Week", value: "this week" },
+  { label: "This Month", value: "this month" },
+  { label: "This Quarter", value: "this quarter" },
+  { label: "This Year", value: "this year" },
+
+  { label: "Next 7 Days", value: "next 7 days" },
+  { label: "Next 14 Days", value: "next 14 days" },
+  { label: "Next 30 Days", value: "next 30 days" },
+
+  { label: "Next Week", value: "next week" },
+  { label: "Next Month", value: "next month" },
+  { label: "Next Quarter", value: "next quarter" },
+  { label: "Next 6 Months", value: "next 6 months" },
+  { label: "Next Year", value: "next year" },
 ];
 
 const debouncedApply = useDebounceFn(() => {

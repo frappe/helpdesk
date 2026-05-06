@@ -37,3 +37,4 @@ helpdesk.patches.add_website_settings_permission
 helpdesk.patches.set_last_customer_agent_response
 helpdesk.patches.add_agent_manager_perms_in_assignment_rule
 helpdesk.patches.set_std_views_non_public
+helpdesk.patches.rename_and_update_std_views #v2

@@ -4,39 +4,107 @@
       <div class="text-lg font-semibold text-ink-gray-8">
         {{ __("Average Time Metrics") }}
       </div>
-      <TabButtons
-        :buttons="[
-          {
-            label: '3M',
-            value: '3m',
-          },
-          {
-            label: '6M',
-            value: '6m',
-          },
-          {
-            label: '1Y',
-            value: '1y',
-          },
-        ]"
-        :model-value="currentDuration"
-        @update:model-value="onDurationChange"
-      />
+      <div class="flex items-center gap-2">
+        <Dropdown
+          v-if="currentDuration !== 'custom_range'"
+          :options="durationOptions"
+          placement="right"
+        >
+          <template #default>
+            <Button :label="currentDurationLabel" icon-right="chevron-down" />
+          </template>
+          <template #item-label="{ item }">
+            <span>
+              {{ item.label }}
+            </span>
+          </template>
+
+          <template #item-suffix="{ item }">
+            <FeatherIcon
+              v-if="item.label == durationLabels[currentDuration]"
+              name="check"
+              class="size-4"
+            />
+          </template>
+        </Dropdown>
+        <DateRangePicker
+          v-else
+          ref="datePickerRef"
+          v-model="customDateRange"
+          :placeholder="__('Select range')"
+          @update:model-value="onCustomRangeSelected"
+          :format="'MMM D'"
+          @click="datePickerRef?.open()"
+          placement="bottom-end"
+          class="!w-48"
+        />
+      </div>
     </div>
     <div
       v-if="
         timeAverages.first_response == '0m' && timeAverages.resolution == '0m'
       "
-      class="flex flex-col justify-center items-center text-center gap-2 h-full w-full"
+      class="relative flex flex-col mt-5 grow w-full select-none"
     >
-      <div class="flex flex-col gap-2 max-w-60">
-        <div class="text-base font-medium text-ink-gray-7">
-          {{ __("No average metrics") }}
+      <div class="flex items-center gap-12">
+        <div>
+          <div
+            class="text-lg font-medium text-ink-gray-8 w-20 rounded-sm h-4 bg-surface-gray-1"
+          />
+          <div
+            class="w-40 rounded-sm h-4 bg-surface-gray-1 text-base flex items-center gap-2 mt-1"
+          />
         </div>
-        <div class="text-base text-ink-gray-6">
-          {{ __("Average response and resolution metrics not yet generated") }}
+        <div>
+          <div
+            class="text-lg font-medium text-ink-gray-8 w-20 rounded-sm h-4 bg-surface-gray-1"
+          />
+          <div
+            class="w-40 rounded-sm h-4 bg-surface-gray-1 text-base flex items-center gap-2 mt-1"
+          />
         </div>
       </div>
+      <div class="w-full grow pointer-events-none mt-6 relative flex flex-col">
+        <div class="flex-1 relative flex items-end justify-around px-4">
+          <div class="absolute inset-0 flex flex-col justify-between z-0">
+            <div
+              v-for="idx in 5"
+              :key="idx"
+              class="border-t border-dashed border-surface-gray-2 w-full"
+            />
+          </div>
+          <div
+            v-for="idx in 6"
+            :key="idx"
+            class="relative z-10 flex gap-2 h-full items-end pb-0"
+          >
+            <div
+              class="w-[12px] bg-surface-gray-2 rounded-t-sm"
+              :style="{ height: [20, 20, 30, 15, 10, 10][idx - 1] + '%' }"
+            />
+            <div
+              class="w-[12px] bg-surface-gray-2 rounded-t-sm"
+              :style="{ height: [60, 55, 85, 45, 30, 20][idx - 1] + '%' }"
+            />
+          </div>
+        </div>
+        <div class="flex justify-around mt-3 mb-2 px-6">
+          <div
+            class="w-6 h-2 bg-surface-gray-2 rounded"
+            v-for="i in 6"
+            :key="i"
+          />
+        </div>
+      </div>
+      <EmptyState
+        class="absolute inset-0 z-10"
+        :title="__('No average metrics')"
+        :description="
+          __('Average response and resolution metrics not available')
+        "
+        variant="overlay"
+        text="md"
+      />
     </div>
     <div v-else class="flex flex-col mt-5 grow w-full">
       <div class="flex items-center gap-12">
@@ -67,11 +135,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, type PropType } from "vue";
+import { computed, onMounted, ref, type PropType, nextTick } from "vue";
 import { EChartsOption } from "echarts";
-import { createResource, TabButtons, ECharts } from "frappe-ui";
+import {
+  createResource,
+  Dropdown,
+  DateRangePicker,
+  Button,
+  FeatherIcon,
+  ECharts,
+} from "frappe-ui";
 import { formatTime } from "@/utils";
 import { __ } from "@/translation";
+import EmptyState from "@/components/EmptyState.vue";
 
 type MetricsData = {
   averages: {
@@ -89,14 +165,69 @@ const props = defineProps({
 });
 
 const currentDuration = ref("6m");
+const datePickerRef = ref<{ open: () => void } | null>(null);
+const customDateRange = ref<string | undefined>(undefined);
+
+const durationLabels: Record<string, string> = {
+  "3m": __("3 Months"),
+  "6m": __("6 Months"),
+  "1y": __("1 Year"),
+  custom_range: __("Custom Range"),
+};
+
+const currentDurationLabel = computed(() => {
+  return durationLabels[currentDuration.value] || __("6 Months");
+});
+
+const durationOptions = computed(() => [
+  {
+    label: __("3 Months"),
+    onClick: () => onDurationChange("3m"),
+  },
+  {
+    label: __("6 Months"),
+    onClick: () => onDurationChange("6m"),
+  },
+  {
+    label: __("1 Year"),
+    onClick: () => onDurationChange("1y"),
+  },
+  {
+    label: __("Custom Range"),
+    onClick: () => {
+      currentDuration.value = "custom_range";
+      nextTick(() => {
+        datePickerRef.value?.open();
+      });
+    },
+  },
+]);
+
+const onCustomRangeSelected = (range: string) => {
+  if (!range) {
+    currentDuration.value = "6m";
+    customDateRange.value = undefined;
+    getAvgTimeMetricsResource.submit();
+    return;
+  }
+  currentDuration.value = "custom_range";
+  customDateRange.value = range;
+  getAvgTimeMetricsResource.submit();
+};
 
 const getAvgTimeMetricsResource = createResource({
   url: "helpdesk.api.agent_home.agent_home.get_avg_time_metrics",
   type: "GET",
   makeParams: () => {
-    return {
+    const params: Record<string, string> = {
       period: currentDuration.value.toLowerCase(),
     };
+    if (currentDuration.value === "custom_range" && customDateRange.value) {
+      const [from, to] = customDateRange.value.split(",");
+      params.from_date = from;
+      params.to_date = to;
+    }
+    return params;
   },
 });
 
@@ -217,6 +348,8 @@ const chartConfig = computed<EChartsOption>(() => {
 });
 
 const onDurationChange = (duration: string) => {
+  if (currentDuration.value === duration) return;
+  customDateRange.value = undefined;
   currentDuration.value = duration;
   getAvgTimeMetricsResource.submit();
 };

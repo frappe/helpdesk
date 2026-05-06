@@ -1,10 +1,12 @@
 import json
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 import frappe
 from dateutil.relativedelta import relativedelta
 from frappe.query_builder import DocType
 from frappe.query_builder.functions import Avg, Count, Function
+from frappe.utils import add_months, today
+from pypika import Case
 
 from helpdesk.api.agent_home.utils import (
     calculate_percentage_change,
@@ -54,13 +56,7 @@ def get_dashboard(reset_layout: bool = False):
 @frappe.whitelist()
 @agent_only
 def get_agent_tickets(period: str = "last month"):
-    periods = {"last week": 7, "last month": 30, "last 3 months": 90}
-    days = periods.get(period, 7)
-
-    current_from = frappe.utils.add_days(frappe.utils.nowdate(), -(days - 1))
-    current_to = frappe.utils.nowdate()
-    previous_from = frappe.utils.add_days(frappe.utils.nowdate(), -(2 * days - 1))
-    previous_to = frappe.utils.add_days(frappe.utils.nowdate(), -days)
+    current_from, current_to, previous_from, previous_to = _resolve_window(period)
 
     def get_ticket_data(from_date, to_date):
         Ticket = DocType("HD Ticket")
@@ -118,7 +114,7 @@ def get_agent_tickets(period: str = "last month"):
     }
 
 
-def get_avg_time(from_date, to_date, time_field, group_by_date=False):
+def get_avg_time(from_date, to_date, value_expr, extra_cond, group_by_date=False):
     Ticket = DocType("HD Ticket")
     to_date_plus_one = Function(
         "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
@@ -131,15 +127,15 @@ def get_avg_time(from_date, to_date, time_field, group_by_date=False):
         query = (
             query.select(
                 creation_date.as_("date"),
-                Avg(Ticket[time_field]).as_("avg_time"),
+                Avg(value_expr).as_("avg_time"),
             )
             .groupby(creation_date)
             .orderby(creation_date)
         )
     else:
-        query = query.select(Avg(Ticket[time_field]).as_("avg_time"))
+        query = query.select(Avg(value_expr).as_("avg_time"))
 
-    result = (
+    query = (
         query.where(Ticket.creation >= from_date)
         .where(Ticket.creation < to_date_plus_one)
         .where(
@@ -147,9 +143,11 @@ def get_avg_time(from_date, to_date, time_field, group_by_date=False):
                 "JSON_SEARCH", Ticket._assign, "one", frappe.session.user
             ).isnotnull()
         )
-        .where(Ticket[time_field].isnotnull())
-        .run(as_dict=True)
     )
+    if extra_cond is not None:
+        query = query.where(extra_cond)
+
+    result = query.run(as_dict=True)
 
     if group_by_date:
         return result
@@ -157,21 +155,38 @@ def get_avg_time(from_date, to_date, time_field, group_by_date=False):
     return result[0]["avg_time"] if result and result[0]["avg_time"] is not None else 0
 
 
-def _get_avg_time_metric(period: str, time_field: str) -> dict:
-    periods = {"last week": 7, "last month": 30, "last 3 months": 90}
-    days = periods.get(period, 7)
+def _resolve_window(period: str):
+    """Returns (current_from, current_to, prev_from, prev_to) using a rolling
+    window via date_diff (matches dashboard.py)."""
+    periods = {
+        "last 7 days": 7,
+        "last week": 7,
+        "last month": 30,
+        "last 3 months": 90,
+    }
+    days = periods.get((period or "").lower(), 30)
 
-    current_from = frappe.utils.add_days(frappe.utils.nowdate(), -(days - 1))
     current_to = frappe.utils.nowdate()
-    previous_from = frappe.utils.add_days(frappe.utils.nowdate(), -(2 * days - 1))
-    previous_to = frappe.utils.add_days(frappe.utils.nowdate(), -days)
+    current_from = frappe.utils.add_days(current_to, -(days - 1))
+
+    diff = frappe.utils.date_diff(current_to, current_from)
+    if diff == 0:
+        diff = 1
+    previous_from = frappe.utils.add_days(current_from, -diff)
+    previous_to = frappe.utils.add_days(current_from, -1)
+
+    return current_from, current_to, previous_from, previous_to
+
+
+def _get_avg_time_metric(period: str, value_expr, extra_cond) -> dict:
+    current_from, current_to, previous_from, previous_to = _resolve_window(period)
 
     current_result = get_avg_time(
-        current_from, current_to, time_field, group_by_date=True
+        current_from, current_to, value_expr, extra_cond, group_by_date=True
     )
 
-    current_avg = get_avg_time(current_from, current_to, time_field)
-    previous_avg = get_avg_time(previous_from, previous_to, time_field)
+    current_avg = get_avg_time(current_from, current_to, value_expr, extra_cond)
+    previous_avg = get_avg_time(previous_from, previous_to, value_expr, extra_cond)
 
     percentage_change = calculate_percentage_change(current_avg, previous_avg)
 
@@ -203,25 +218,50 @@ def _get_avg_time_metric(period: str, time_field: str) -> dict:
 @frappe.whitelist()
 @agent_only
 def get_avg_first_response_time(period: str = "last month"):
-    return _get_avg_time_metric(period, "first_response_time")
+    Ticket = DocType("HD Ticket")
+    return _get_avg_time_metric(
+        period,
+        value_expr=Ticket.first_response_time,
+        extra_cond=Ticket.first_responded_on.isnotnull(),
+    )
 
 
 @frappe.whitelist()
 @agent_only
 def get_avg_resolution_time(period: str = "last month"):
-    return _get_avg_time_metric(period, "resolution_time")
+    Ticket = DocType("HD Ticket")
+    resolved_statuses = frappe.get_all(
+        "HD Ticket Status",
+        filters={"category": "Resolved"},
+        pluck="name",
+    )
+    extra_cond = Ticket.status.isin(resolved_statuses) if resolved_statuses else None
+    return _get_avg_time_metric(
+        period,
+        value_expr=Ticket.resolution_time,
+        extra_cond=extra_cond,
+    )
 
 
 @frappe.whitelist()
 @agent_only
-def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_first"):
+def get_recent_feedback(
+    period: str = "all_time",
+    sort_order: str = "positive_first",
+    from_date: str = None,
+    to_date: str = None,
+):
     agent = frappe.session.user
     Ticket = DocType("HD Ticket")
     Contact = DocType("Contact")
 
     # Build period filter
     period_filter = None
-    if period == "last_week":
+    period_end_filter = None
+    if period == "custom_range" and from_date and to_date:
+        period_filter = from_date
+        period_end_filter = to_date
+    elif period == "last_week":
         period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -7)
     elif period == "last_month":
         period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -30)
@@ -234,7 +274,14 @@ def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_fi
         Function("JSON_SEARCH", Ticket._assign, "one", agent).isnotnull(),
     ]
     if period_filter:
-        base_conditions.append(Ticket.modified >= period_filter)
+        base_conditions.append(Ticket.creation >= period_filter)
+    if period_end_filter:
+        to_date_plus_one = Function(
+            "DATE_ADD",
+            period_end_filter,
+            frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY"),
+        )
+        base_conditions.append(Ticket.creation < to_date_plus_one)
 
     # Get average rating and total feedbacks
     avg_query = frappe.qb.from_(Ticket).select(
@@ -320,28 +367,56 @@ def get_recent_feedback(period: str = "all_time", sort_order: str = "positive_fi
 
 @frappe.whitelist()
 @agent_only
-def get_avg_time_metrics(period: str = "6m"):
+def get_avg_time_metrics(
+    period: str = "6m", from_date: str = None, to_date: str = None
+):
     periods = {
         "3m": 90,
         "6m": 180,
         "1y": 365,
     }
 
-    days = periods.get(period, 180)
     agent = frappe.session.user
 
-    current_from = frappe.utils.add_days(frappe.utils.nowdate(), -days)
-    current_to = frappe.utils.nowdate()
+    if period == "custom_range" and from_date and to_date:
+        current_from = from_date
+        current_to = to_date
+    else:
+        days = periods.get(period, 180)
+        current_from = frappe.utils.add_days(frappe.utils.nowdate(), -days)
+        current_to = frappe.utils.nowdate()
 
     Ticket = DocType("HD Ticket")
     to_date_plus_one = Function(
         "DATE_ADD", current_to, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
     )
 
-    # Monthly aggregation query using query builder
+    resolved_statuses = frappe.get_all(
+        "HD Ticket Status",
+        filters={"category": "Resolved"},
+        pluck="name",
+    )
+
+    # Monthly aggregation query using query builder. Per-series gating mirrors
+    # dashboard.py: first-response avg requires first_responded_on; resolution
+    # avg requires status IN resolved_statuses.
     month_abbr = Function("DATE_FORMAT", Ticket.creation, "%b")
     year_val = Function("YEAR", Ticket.creation)
     month_val = Function("MONTH", Ticket.creation)
+
+    first_response_value = (
+        Case()
+        .when(Ticket.first_responded_on.isnotnull(), Ticket.first_response_time)
+        .else_(None)
+    )
+    resolution_gate = (
+        Ticket.status.isin(resolved_statuses) if resolved_statuses else None
+    )
+    resolution_value = (
+        Case().when(resolution_gate, Ticket.resolution_time).else_(None)
+        if resolution_gate is not None
+        else Ticket.resolution_time
+    )
 
     result = (
         frappe.qb.from_(Ticket)
@@ -349,15 +424,12 @@ def get_avg_time_metrics(period: str = "6m"):
             month_abbr.as_("month"),
             year_val.as_("year"),
             month_val.as_("month_num"),
-            Avg(Ticket.first_response_time).as_("avg_first_response"),
-            Avg(Ticket.resolution_time).as_("avg_resolution"),
+            Avg(first_response_value).as_("avg_first_response"),
+            Avg(resolution_value).as_("avg_resolution"),
         )
         .where(Ticket.creation >= current_from)
         .where(Ticket.creation < to_date_plus_one)
         .where(Function("JSON_SEARCH", Ticket._assign, "one", agent).isnotnull())
-        .where(
-            Ticket.first_response_time.isnotnull() | Ticket.resolution_time.isnotnull()
-        )
         .groupby(year_val, month_val)
         .orderby(year_val)
         .orderby(month_val)
@@ -373,11 +445,18 @@ def get_avg_time_metrics(period: str = "6m"):
             "avg_resolution": round(row["avg_resolution"] or 0),
         }
 
-    now = datetime.now()
-    num_months = days // 30
+    current_to_date = frappe.utils.get_datetime(current_to)
+    current_from_date = frappe.utils.get_datetime(current_from)
+
+    num_months = (
+        (current_to_date.year - current_from_date.year) * 12
+        + (current_to_date.month - current_from_date.month)
+        + 1
+    )
+
     data = []
     for i in range(num_months - 1, -1, -1):
-        month_date = now - relativedelta(months=i)
+        month_date = current_to_date - relativedelta(months=i)
         key = f"{month_date.year}-{month_date.month:02d}"
         if key in data_dict:
             data.append(
@@ -396,19 +475,17 @@ def get_avg_time_metrics(period: str = "6m"):
                 ]
             )
 
-    # Calculate overall averages for the period using query builder
+    # Calculate overall averages for the period using query builder, with the
+    # same per-series gating as the monthly aggregation above.
     overall_result = (
         frappe.qb.from_(Ticket)
         .select(
-            Avg(Ticket.first_response_time).as_("avg_first_response"),
-            Avg(Ticket.resolution_time).as_("avg_resolution"),
+            Avg(first_response_value).as_("avg_first_response"),
+            Avg(resolution_value).as_("avg_resolution"),
         )
         .where(Ticket.creation >= current_from)
         .where(Ticket.creation < to_date_plus_one)
         .where(Function("JSON_SEARCH", Ticket._assign, "one", agent).isnotnull())
-        .where(
-            Ticket.first_response_time.isnotnull() | Ticket.resolution_time.isnotnull()
-        )
         .run(as_dict=True)
     )
 
@@ -450,10 +527,11 @@ def _get_priority_range():
 
 def _get_upcoming_sla_tickets(limit=10):
     filters = [
-        ["sla", "!=", ""],
+        ["sla", "is", "set"],
         ["agreement_status", "in", ["First Response Due", "Resolution Due"]],
-        ["status_category", "!=", "Resolved"],
+        ["status_category", "=", "Open"],
         ["_assign", "like", f"%{frappe.session.user}%"],
+        ["creation", "between", [add_months(today(), -6), today()]],
     ]
 
     tickets = frappe.get_list(
@@ -514,7 +592,7 @@ def _get_upcoming_sla_tickets(limit=10):
 
 
 def _get_new_tickets(limit=10):
-    one_day_ago = frappe.utils.add_to_date(frappe.utils.now_datetime(), hours=-24)
+    one_week_ago = frappe.utils.add_to_date(frappe.utils.now_datetime(), days=-7)
 
     ToDo = DocType("ToDo")
     assigned_tickets = (
@@ -523,7 +601,7 @@ def _get_new_tickets(limit=10):
         .distinct()
         .where(ToDo.reference_type == "HD Ticket")
         .where(ToDo.allocated_to == frappe.session.user)
-        .where(ToDo.creation >= one_day_ago)
+        .where(ToDo.creation >= one_week_ago)
         .where(ToDo.status == "Open")
         .run(as_dict=False)
     )
@@ -531,6 +609,13 @@ def _get_new_tickets(limit=10):
 
     if not ticket_names:
         return [], 0
+
+    filters = [
+        ["name", "in", ticket_names],
+        ["_assign", "like", f"%{frappe.session.user}%"],
+        ["status_category", "=", "Open"],
+        ["creation", "between", [add_months(today(), -6), today()]],
+    ]
 
     tickets = frappe.get_list(
         "HD Ticket",
@@ -543,11 +628,7 @@ def _get_new_tickets(limit=10):
             "agent_group",
             "creation",
         ],
-        filters=[
-            ["name", "in", ticket_names],
-            ["_assign", "like", f"%{frappe.session.user}%"],
-            ["status_category", "=", "Open"],
-        ],
+        filters=filters,
         order_by="creation desc",
         limit=limit,
     )
@@ -558,13 +639,7 @@ def _get_new_tickets(limit=10):
             "text": "Recently assigned",
         }
 
-    total_count = get_ticket_count(
-        filters=[
-            ["name", "in", ticket_names],
-            ["_assign", "like", f"%{frappe.session.user}%"],
-            ["status_category", "=", "Open"],
-        ]
-    )
+    total_count = get_ticket_count(filters=filters)
 
     return tickets, total_count
 
@@ -572,9 +647,9 @@ def _get_new_tickets(limit=10):
 def _get_pending_response_tickets(limit=10):
     filters = [
         ["_assign", "like", f"%{frappe.session.user}%"],
-        ["status_category", "!=", "Resolved"],
+        ["status_category", "=", "Open"],
         ["last_customer_response", "is", "set"],
-        ["last_agent_response", "is", "not set"],
+        ["creation", "between", [add_months(today(), -6), today()]],
     ]
 
     tickets = frappe.get_list(
