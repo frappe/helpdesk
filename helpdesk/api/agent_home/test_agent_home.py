@@ -4,7 +4,7 @@
 import json
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.agent_home.agent_home import (
     get_agent_tickets,
@@ -81,7 +81,7 @@ def create_ticket_with_agent(
     return ticket
 
 
-class TestAgentHome(IntegrationTestCase):
+class TestAgentHome(FrappeTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -512,11 +512,10 @@ class TestAgentHome(IntegrationTestCase):
         self.assertEqual(result["total_pending_tickets"], 3)
 
         # Verify all new tickets are in the result
-        ticket_names = [t["name"] for t in result["tickets"]]
-        self.assertIn(ticket1.name, ticket_names)
-        self.assertIn(ticket2.name, ticket_names)
-        self.assertIn(ticket3.name, ticket_names)
-
+        ticket_names = [str(t["name"]) for t in result["tickets"]]  # ensure strings
+        self.assertIn(str(ticket1.name), ticket_names)
+        self.assertIn(str(ticket2.name), ticket_names)
+        self.assertIn(str(ticket3.name), ticket_names)
         # Verify reason format
         for t in result["tickets"]:
             self.assertEqual(t["reason"]["type"], "new_tickets")
@@ -574,9 +573,9 @@ class TestAgentHome(IntegrationTestCase):
         self.assertGreaterEqual(result["total_pending_tickets"], 2)
 
         # Verify pending tickets are in the result
-        ticket_names = [t["name"] for t in result["tickets"]]
-        self.assertIn(ticket1.name, ticket_names)
-        self.assertIn(ticket2.name, ticket_names)
+        ticket_names = [str(t["name"]) for t in result["tickets"]]
+        self.assertIn(str(ticket1.name), ticket_names)
+        self.assertIn(str(ticket2.name), ticket_names)
 
         # Verify reason format
         for t in result["tickets"]:

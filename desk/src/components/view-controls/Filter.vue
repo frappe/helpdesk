@@ -605,6 +605,10 @@ const oppositeOperatorMap = {
 
 const timespanOptions = [
   {
+    label: "Last 7 Days",
+    value: "last 7 days",
+  },
+  {
     label: "Last Week",
     value: "last week",
   },
