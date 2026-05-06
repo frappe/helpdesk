@@ -2,7 +2,7 @@
   <LayoutHeader>
     <template #left-header>
       <div class="flex flex-col truncate">
-        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
+        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs -ml-0.5">
           <template #prefix="{ item }">
             <Icon
               v-if="item.icon"
@@ -87,27 +87,26 @@ import { setupCustomizations } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
 import { useView } from "@/composables/useView";
+import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation";
 import {
   ActivitiesSymbol,
   CustomizationSymbol,
   TicketSymbol,
   View,
 } from "@/types";
-const { isAdmin } = useAuthStore();
-const { $dialog } = globalStore();
 import { HDTicketStatus } from "@/types/doctypes";
-import { getIcon, ConfirmDelete } from "@/utils";
+import { getIcon } from "@/utils";
 import {
   Breadcrumbs,
+  Button,
   call,
+  createResource,
   Dropdown,
   toast,
-  createResource,
-  Button,
 } from "frappe-ui";
-import { __ } from "@/translation";
 import {
   computed,
   ComputedRef,
@@ -125,7 +124,8 @@ import { IndicatorIcon } from "../icons";
 import TicketNavigation from "./TicketNavigation.vue";
 import TicketSLA from "./TicketSLA.vue";
 import TicketSubjectModal from "./TicketSubjectModal.vue";
-import { useAuthStore } from "@/stores/auth";
+const { isAdmin } = useAuthStore();
+const { $dialog } = globalStore();
 
 defineProps({
   viewers: {
@@ -139,9 +139,9 @@ const router = useRouter();
 const { findView } = useView("HD Ticket");
 const ticketStatusStore = useTicketStatusStore();
 
-const ticket = inject(TicketSymbol);
-const customizations = inject(CustomizationSymbol);
-const activities = inject(ActivitiesSymbol);
+const ticket = inject(TicketSymbol)!;
+const customizations = inject(CustomizationSymbol)!;
+const activities = inject(ActivitiesSymbol)!;
 const showSubjectDialog = ref(false);
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);

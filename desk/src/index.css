@@ -8,6 +8,13 @@
   .prose-f {
     @apply break-normal max-w-none prose prose-code:break-all prose-code:whitespace-pre-wrap prose-img:border prose-img:rounded-lg prose-sm;
   }
+  .prose-f * {
+    unicode-bidi: plaintext;
+  }
+  .prose-f:not(.not-prose):not(.not-prose *) pre {
+    background-color: var(--surface-gray-2);
+    color: var(--ink-gray-9);
+  }
 }
 
 .tiptap input[placeholder="Add caption"] {
@@ -45,4 +52,44 @@ body {
 
 *::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+
+/* replied content css */
+.replied-content .collapse {
+    margin: 10px 0 10px 0;
+    visibility: visible;
+    cursor: pointer;
+    display: flex;
+    font-weight: 700;
+    height: 12px;
+    line-height: 0.3;
+    background: #e8eaed;
+    width: 23px;
+    justify-content: center;
+    border-radius: 5px;
+}
+.replied-content .collapse:hover {
+  background: #dadce0;
+}
+.replied-content .collapse + input {
+  display: none;
+}
+.replied-content .collapse + input + div {
+  display: none;
+}
+.replied-content .collapse + input:checked + div {
+  display: block;
+}
+
+
+/* transition fade css */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }

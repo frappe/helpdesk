@@ -3,7 +3,7 @@
     :modelValue="tabIndex"
     :tabs="tabs"
     @update:modelValue="changeTabTo"
-    class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0"
+    class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0 [&_[role='tabpanel'][data-state='active']]:flex-1"
   >
     <template #tab-panel="{ tab }">
       <TicketAgentActivities
@@ -14,21 +14,19 @@
         :ticket-status="ticket.doc.status"
         @email:reply="
           (e) => {
-            communicationAreaRef.replyToEmail(e);
+            communicationAreaRef?.replyToEmail(e);
           }
         "
         @update="
           () => {
             activities.reload();
-            ticketAgentActivitiesRef.scrollToLatestActivity();
+            ticketAgentActivitiesRef?.scrollToLatestActivity();
           }
         "
       />
-      <div v-else class="flex items-center justify-center flex-col mt-20">
-        <LoadingIndicator :scale="8" class="text-ink-gray-5" />
-        <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
-          Loading...
-        </p>
+      <div v-else class="flex items-center justify-center flex-col flex-1">
+        <Button :loading="true" variant="ghost" size="2xl" />
+        <p class="text-xl font-medium text-ink-gray-5">Loading...</p>
       </div>
     </template>
   </Tabs>
@@ -43,13 +41,14 @@
     @update="
       () => {
         activities.reload();
-        ticketAgentActivitiesRef.scrollToLatestActivity();
+        ticketAgentActivitiesRef?.scrollToLatestActivity();
       }
     "
   />
 </template>
 
 <script setup lang="ts">
+import CommunicationArea from "@/components/CommunicationArea.vue";
 import {
   ActivityIcon,
   CommentIcon,
@@ -65,20 +64,20 @@ import {
   TicketSymbol,
   TicketTab,
 } from "@/types";
-import { LoadingIndicator, Tabs } from "frappe-ui";
+import { Button, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, ComputedRef, defineAsyncComponent, inject, ref } from "vue";
-import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
+import { computed, ComputedRef, inject, ref } from "vue";
+import { TicketAgentActivities } from "../ticket";
 
-const CommunicationArea = defineAsyncComponent(
-  () => import("@/components/CommunicationArea.vue")
+const ticket = inject(TicketSymbol)!;
+const activities = inject(ActivitiesSymbol)!;
+
+const ticketAgentActivitiesRef = ref<InstanceType<
+  typeof TicketAgentActivities
+> | null>(null);
+const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
+  null
 );
-
-const ticket = inject(TicketSymbol);
-const activities = inject(ActivitiesSymbol);
-
-const ticketAgentActivitiesRef = ref(null);
-const communicationAreaRef = ref(null);
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
@@ -115,17 +114,20 @@ const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend
+// sender mail will be  user using portal
 const _activities = computed(() => {
   if (!activities.value?.data) {
     return [];
   }
-
   const emailProps = activities.value?.data?.communications.map(
     (email, idx: number) => {
       return {
         subject: email.subject,
         content: email.content,
-        sender: { name: email.user.email, full_name: email.user.name },
+        sender: {
+          name: email.user.email,
+          full_name: email.user.name,
+        },
         to: email.recipients,
         type: "email",
         key: email.creation,
@@ -151,6 +153,17 @@ const _activities = computed(() => {
       content: comment.content,
       attachments: comment.attachments,
     };
+  });
+
+  activities.value.data.history.map((h) => {
+    // }
+    h.action;
+    h.owner;
+    // if h.actions includes h.owner, replace it with 'themselves'
+    if (h.action && h.owner && h.action.includes(h.owner)) {
+      h.action = h.action.replace(h.owner, "themselves");
+    }
+    return h;
   });
 
   const historyProps = [
@@ -248,5 +261,3 @@ function filterActivities(eventType: TicketTab) {
   return _activities.value.filter((activity) => activity.type === eventType);
 }
 </script>
-
-<style scoped></style>

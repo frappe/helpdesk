@@ -67,6 +67,7 @@
             v-model="subject"
             type="text"
             :placeholder="__('A short description')"
+            maxlength="140"
           />
         </div>
         <SearchArticles

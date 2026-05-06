@@ -1,7 +1,7 @@
 <template>
-  <div class="comm-area">
+  <div class="comm-area" resizable="true">
     <div
-      class="flex justify-between gap-3 border-t px-6 md:px-10 py-4 md:py-2.5"
+      class="flex justify-between gap-3 border-t px-6 md:px-5 py-4 md:py-2.5"
     >
       <div class="flex gap-1.5 items-center">
         <Button
@@ -28,71 +28,77 @@
         <TypingIndicator :ticketId="ticketId" />
       </div>
     </div>
-    <div
-      ref="emailBoxRef"
-      v-show="showEmailBox"
-      class="flex gap-1.5 flex-1"
-      @keydown.ctrl.enter.capture.stop="submitEmail"
-      @keydown.meta.enter.capture.stop="submitEmail"
-      @keydown.esc.capture.stop="showEmailBox = false"
-    >
-      <EmailEditor
-        ref="emailEditorRef"
-        :label="
-          isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
-        "
-        v-model:content="content"
-        placeholder="Hi John, we are looking into this issue."
-        :ticketId="ticketId"
-        :to-emails="toEmails"
-        :cc-emails="ccEmails"
-        :bcc-emails="bccEmails"
-        @submit="
-          () => {
-            showEmailBox = false;
-            emit('update');
-          }
-        "
-        @discard="
-          () => {
-            showEmailBox = false;
-          }
-        "
-      />
-    </div>
-    <div
-      ref="commentBoxRef"
-      v-show="showCommentBox"
-      @keydown.ctrl.enter.capture.stop="submitComment"
-      @keydown.meta.enter.capture.stop="submitComment"
-      @keydown.esc.capture.stop="showCommentBox = false"
-    >
-      <CommentTextEditor
-        ref="commentTextEditorRef"
-        :label="
-          isMobileView
-            ? 'Comment'
-            : isMac
-            ? 'Comment (⌘ + ⏎)'
-            : 'Comment (Ctrl + ⏎)'
-        "
-        :ticketId="ticketId"
-        :editable="showCommentBox"
-        :doctype="doctype"
-        placeholder="@John could you please look into this?"
-        @submit="
-          () => {
-            showCommentBox = false;
-            emit('update');
-          }
-        "
-        @discard="
-          () => {
-            showCommentBox = false;
-          }
-        "
-      />
-    </div>
+    <Transition name="slide">
+      <div
+        v-show="showEmailBox"
+        ref="emailBoxRef"
+        @keydown.ctrl.enter.capture.stop="submitEmail"
+        @keydown.meta.enter.capture.stop="submitEmail"
+        @keydown.esc.capture.stop="showEmailBox = false"
+      >
+        <div class="overflow-hidden">
+          <EmailEditor
+            ref="emailEditorRef"
+            :label="
+              isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
+            "
+            placeholder="Hi John, we are looking into this issue."
+            :ticketId="ticketId"
+            :to-emails="toEmails"
+            :cc-emails="ccEmails"
+            :bcc-emails="bccEmails"
+            @submit="
+              () => {
+                showEmailBox = false;
+                emit('update');
+              }
+            "
+            @discard="
+              () => {
+                showEmailBox = false;
+              }
+            "
+          />
+        </div>
+      </div>
+    </Transition>
+    <Transition name="slide">
+      <div
+        v-show="showCommentBox"
+        ref="commentBoxRef"
+        @keydown.ctrl.enter.capture.stop="submitComment"
+        @keydown.meta.enter.capture.stop="submitComment"
+        @keydown.esc.capture.stop="showCommentBox = false"
+      >
+        <div class="overflow-hidden">
+          <CommentTextEditor
+            ref="commentTextEditorRef"
+            :label="
+              isMobileView
+                ? 'Comment'
+                : isMac
+                ? 'Comment (⌘ + ⏎)'
+                : 'Comment (Ctrl + ⏎)'
+            "
+            :ticketId="ticketId"
+            :editable="showCommentBox"
+            :doctype="doctype"
+            placeholder="@John could you please look into this?"
+            @submit="
+              () => {
+                showCommentBox = false;
+                emit('update');
+              }
+            "
+            @discard="
+              () => {
+                showCommentBox = false;
+              }
+            "
+          />
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -103,8 +109,8 @@ import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
-import { ref, watch } from "vue";
 import { onClickOutside } from "@vueuse/core";
+import { ref, watch } from "vue";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
@@ -188,7 +194,7 @@ watch(
   () => showEmailBox.value,
   (value) => {
     if (value) {
-      emailEditorRef.value?.editor?.commands?.focus();
+      emailEditorRef.value?.editor?.commands?.focus("start");
     }
   }
 );
@@ -224,7 +230,12 @@ onClickOutside(
     }
   },
   {
-    ignore: [".tippy-box", ".tippy-content", ".PopoverContent"],
+    ignore: [
+      ".tippy-box",
+      ".tippy-content",
+      ".PopoverContent",
+      '[role="dialog"]',
+    ],
   }
 );
 
@@ -246,5 +257,19 @@ onClickOutside(
   .comm-area {
     width: 100vw;
   }
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  display: grid;
+  transition: grid-template-rows 0.25s ease;
+}
+.slide-enter-from,
+.slide-leave-to {
+  grid-template-rows: 0fr;
+}
+.slide-enter-to,
+.slide-leave-from {
+  grid-template-rows: 1fr;
 }
 </style>

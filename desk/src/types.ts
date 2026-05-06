@@ -21,7 +21,7 @@ interface ResourceOptions<T = any> {
   resourceFetcher?: (options: any) => Promise<any>;
 }
 
-interface Resource<T = any> {
+export interface Resource<T = any> {
   method: string | undefined;
   url: string;
   data: T | null;
@@ -153,6 +153,10 @@ export interface Communication {
   sender: string;
   bcc?: string;
   cc?: string;
+  sent_or_received?: "Sent" | "Received";
+  email_account?: string;
+  sender_full_name?: string;
+  sender_mail_id?: string;
 }
 
 export interface Activity {
@@ -586,11 +590,11 @@ export interface TicketContact {
 }
 
 export type RecentTicket = Record<
-  "subject" | "status" | "priority" | "name",
+  "subject" | "status" | "priority" | "name" | "creation",
   string | number
 >;
 export type SimilarTicket = Record<
-  "subject" | "status" | "priority" | "name",
+  "subject" | "status" | "priority" | "name" | "creation",
   string | number
 >;
 export interface RecentSimilarTicket {
@@ -660,6 +664,12 @@ export type DropdownOption = {
   value: string | number;
 };
 
+export interface AgentOption {
+  value: string;
+  label: string;
+  image?: string;
+}
+
 // symbols
 export const TicketSymbol: InjectionKey<
   ComputedRef<DocumentResource<HDTicket>>
@@ -713,5 +723,6 @@ declare global {
     time_format: string;
     session_user: string;
     timezone: Record<"user" | "system", string>;
+    agent: string | null;
   }
 }

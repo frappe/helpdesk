@@ -2,7 +2,7 @@
   <!-- Teleport to App Header -->
   <teleport to="#app-header">
     <div
-      class="flex items-center mx-5 md:mr-0 text-p-sm gap-3 text-[14px] mb-[13px]"
+      class="flex items-center mx-5 md:mr-0 text-p-sm gap-3 text-[14px] mb-2"
     >
       <!-- Source -->
       <div class="flex items-center gap-1">
@@ -20,17 +20,17 @@
         <!-- Via Email -->
         <div
           v-if="!ticket.doc.via_customer_portal"
-          class="text-ink-gray-4 flex items-center"
+          class="text-ink-gray-5 flex items-center"
         >
-          <span class="text-ink-gray-4 mr-[6px]">via</span>
+          <span class="mr-[4px]">via</span>
           <EmailIcon class="size-4 inline-block mr-1" />
-          <span class="">Email</span>
+          <span>Email</span>
         </div>
         <!-- Via Portal -->
-        <div v-else class="text-ink-gray-4 flex items-center">
-          <span class="text-ink-gray-4 mr-[6px]">via</span>
+        <div v-else class="text-ink-gray-5 flex items-center">
+          <span class="mr-[4px]">via</span>
           <GlobeIcon class="size-4 inline-block mr-1" />
-          <span class="font-medium">Portal</span>
+          <span>Portal</span>
         </div>
       </div>
       <!-- divider -->
@@ -45,7 +45,8 @@
         >
           <Badge
             :label="firstResponse.label"
-            variant="subtle"
+            variant="ghost"
+            class="mt-[1px]"
             :theme="firstResponse.color"
           />
         </Tooltip>
@@ -63,11 +64,12 @@
           <Badge
             v-if="resolutionBy"
             :label="resolutionBy.label"
-            variant="subtle"
-            :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
-            :class="
-              resolutionBy.color === 'purple' && '!text-[#6B46C1] !bg-[#F3E8FF]'
+            variant="ghost"
+            class="mt-[1px]"
+            :theme="
+              resolutionBy.color !== 'purple' ? resolutionBy.color : undefined
             "
+            :class="resolutionBy.color === 'purple' && '!text-[#6B46C1] '"
           />
         </Tooltip>
       </div>
@@ -84,7 +86,7 @@ import {
   dateTooltipFormat,
   formatTime,
 } from "@/utils";
-import { Badge, dayjs, Tooltip, dayjsLocal } from "frappe-ui";
+import { Badge, dayjs, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 
 const ticket = inject(TicketSymbol);

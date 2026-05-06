@@ -99,6 +99,11 @@ export default defineConfig(async ({ mode }) => {
         "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
         ...localFrappeUIAliases,
       },
+      dedupe: [
+        "prosemirror-view",
+        "prosemirror-gapcursor",
+        "prosemirror-tables",
+      ],
     },
     optimizeDeps: {
       include: [

@@ -178,6 +178,12 @@ const htmlContent = computed(
       .email-content :where(img):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
         margin: 0;
       }
+      .email-content :where(blockquote p:first-of-type):not(:where([class~='not-prose'], [class~='not-prose'] *))::before {
+        content: none;
+      }
+      .email-content :where(blockquote p:last-of-type):not(:where([class~='not-prose'], [class~='not-prose'] *))::after {
+        content: none;
+      }
 
     </style>
   </head>
@@ -209,6 +215,21 @@ watch(iframeRef, (iframe) => {
       iframe.contentDocument?.addEventListener("pointerdown", () => {
         document.dispatchEvent(
           new PointerEvent("pointerdown", { bubbles: true })
+        );
+      });
+
+      // This is to ensure that keyboard shortcuts work even when the iframe is focused. For example, pressing "r" to reply to an email should work even if the user has clicked inside the email content.
+      iframe.contentDocument?.addEventListener("keydown", (e) => {
+        document.dispatchEvent(
+          new KeyboardEvent("keydown", {
+            key: e.key,
+            code: e.code,
+            ctrlKey: e.ctrlKey,
+            metaKey: e.metaKey,
+            shiftKey: e.shiftKey,
+            altKey: e.altKey,
+            bubbles: true,
+          })
         );
       });
 

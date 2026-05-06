@@ -8,14 +8,10 @@ from frappe.exceptions import DoesNotExistError
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 
-from helpdesk.utils import capture_event
+from helpdesk.utils import agent_only, capture_event
 
 
 class HDTeam(Document):
-    @frappe.whitelist()
-    def rename_self(self, new_name: str):
-        self.rename(new_name)
-
     def after_insert(self):
         self.create_assignment_rule()
         assignment_rule_doc = frappe.get_doc("Assignment Rule", self.assignment_rule)
@@ -179,6 +175,7 @@ class HDTeam(Document):
 
 
 @frappe.whitelist()
+@agent_only
 def get_team_members(team: str):
     """
     Returns the team members for the given team name

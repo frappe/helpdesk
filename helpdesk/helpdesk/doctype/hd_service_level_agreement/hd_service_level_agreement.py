@@ -75,7 +75,9 @@ class HDServiceLevelAgreement(Document):
             frappe.throw(_("Priority {0} has been repeated.").format(repeated_priority))
 
     def validate_all_priorities(self):
-        all_priorities = frappe.get_all("HD Ticket Priority", pluck="name")
+        all_priorities = frappe.get_all(
+            "HD Ticket Priority", pluck="name", filters={"disabled": 0}
+        )
         sla_priorities = [p.priority for p in self.priorities]
 
         for priority in all_priorities:
@@ -279,16 +281,17 @@ class HDServiceLevelAgreement(Document):
 
     def handle_agreement_status(self, doc: Document):
         is_failed = self.is_first_response_failed(doc) or self.is_resolution_failed(doc)
-        options = {
-            "Fulfilled": True,
-            "Resolution Due": self.apply_sla_for_resolution and not doc.resolution_date,
-            "First Response Due": not doc.first_responded_on,
-            "Failed": is_failed,
-            "Paused": doc.on_hold_since,
-        }
-        for status in options:
-            if options[status]:
-                doc.agreement_status = status
+
+        if is_failed:
+            doc.agreement_status = "Failed"
+        elif doc.on_hold_since:
+            doc.agreement_status = "Paused"
+        elif not doc.first_responded_on:
+            doc.agreement_status = "First Response Due"
+        elif self.apply_sla_for_resolution and not doc.resolution_date:
+            doc.agreement_status = "Resolution Due"
+        else:
+            doc.agreement_status = "Fulfilled"
 
     def is_first_response_failed(self, doc: Document):
         if not doc.first_responded_on:

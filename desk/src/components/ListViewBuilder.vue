@@ -2,7 +2,7 @@
   <!-- View Controls -->
   <div
     :class="[
-      'flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6',
+      'flex items-center justify-between gap-2 px-5 pb-4 pt-4',
       list?.data?.data?.length > 0 ? 'relative' : 'absolute w-[stretch]',
     ]"
     v-if="showViewControls"
@@ -45,7 +45,7 @@
     :options="{
       selectable: options.selectable,
       showTooltip: false,
-      resizeColumn: false,
+      resizeColumn: true,
       getRowRoute: (row) => ({
         name: options.rowRoute?.name,
         params: { [options.rowRoute?.prop]: row.name },
@@ -59,7 +59,7 @@
         v-for="column in columns"
         :key="column.key"
         :item="column"
-        @columnWidthUpdated="(width) => console.log(width)"
+        @columnWidthUpdated="handleColumnResize"
       />
     </ListHeader>
     <ListRows
@@ -143,7 +143,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { View, ViewType } from "@/types";
-import { formatTimeShort, getIcon } from "@/utils";
+import { getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
   call,
@@ -171,6 +171,7 @@ import {
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+import dayjs from "dayjs";
 import EmptyState from "./EmptyState.vue";
 import ListRows from "./ListRows.vue";
 
@@ -470,8 +471,8 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   if (column.type === "Datetime") {
     return h("span", {
-      class: "text-p-xs",
-      textContent: formatTimeShort(item),
+      class: "text-base",
+      textContent: dayjs(item).fromNow(),
     });
   }
   if (column.type === "MultipleAvatar") {
@@ -745,6 +746,14 @@ function handleScrollPosition() {
     if (!listContainer) return;
     listContainer.scrollTop = listScrollPosition.value;
   }, 200);
+}
+
+function handleColumnResize() {
+  isViewUpdated.value = true;
+  defaultParams.columns = columns.value;
+  if (!defaultParams.is_default) return;
+  handleViewUpdate();
+  isViewUpdated.value = false;
 }
 
 onMounted(async () => {

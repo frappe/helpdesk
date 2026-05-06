@@ -1,5 +1,18 @@
 # Copilot Instructions for Frappe Helpdesk
 
+## Skills
+
+For Frappe development tasks, reference the frappe-dev skill:
+- **Location**: `~/.agents/skills/frappe-dev/`
+- **Usage**: When working on DocType, controllers, whitelisted APIs, background jobs, permissions, or frontend tasks, read the relevant skill reference files:
+  - `doctype.md` — Creating/modifying DocTypes and fields
+  - `controllers.md` — Document lifecycle and server logic
+  - `api.md` — REST endpoints with `@frappe.whitelist()`
+  - `database.md` — `frappe.db`, queries, raw SQL
+  - `background-jobs.md` — `frappe.enqueue`, scheduled jobs
+  - `permissions.md` — Roles, DocType permissions
+  - `frontend-desk.md`, `frontend-vue.md`, `frontend-portal.md` — Frontend references
+
 ## Project Overview
 
 Frappe Helpdesk is an open-source ticket management tool built on the [Frappe Framework](https://github.com/frappe/frappe) (Python backend) and [Frappe UI](https://github.com/frappe/frappe-ui) (Vue.js frontend). It provides agent/customer portals, SLAs, assignment rules, a knowledge base, and saved replies.

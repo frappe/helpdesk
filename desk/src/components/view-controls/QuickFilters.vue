@@ -1,13 +1,13 @@
 <template>
   <FadedScrollableDiv
-    class="quick-filters flex flex-1 items-center -ml-1 overflow-x-auto py-1 gap-2 pr-4"
+    class="quick-filters flex flex-1 items-center overflow-x-auto py-1 gap-2 pr-4"
     orientation="horizontal"
     v-if="!quickFilters.loading"
   >
     <div
       v-for="filter in quickFilters.data"
       :key="filter.name"
-      class="min-w-36 pl-0.5"
+      class="min-w-36"
     >
       <QuickFilterField
         :filter="filter"
@@ -19,8 +19,8 @@
 </template>
 
 <script setup>
-import { inject } from "vue";
 import { FadedScrollableDiv } from "@/components";
+import { inject } from "vue";
 import QuickFilterField from "./QuickFilterField.vue";
 
 const listViewData = inject("listViewData");

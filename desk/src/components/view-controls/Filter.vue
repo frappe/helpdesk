@@ -161,6 +161,7 @@
 import { Link, StarRating } from "@/components";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { useScreenSize } from "@/composables/screen";
+import { useDebounceFn } from "@vueuse/core";
 import {
   Autocomplete,
   Button,
@@ -173,7 +174,6 @@ import {
   Tooltip,
 } from "frappe-ui";
 import { computed, h, inject } from "vue";
-import { useDebounceFn } from "@vueuse/core";
 
 const props = defineProps({
   default_filters: {
@@ -682,3 +682,9 @@ const debouncedApply = useDebounceFn(() => {
   apply();
 }, 500);
 </script>
+<style>
+& #operator button,
+& #value button {
+  width: 100%;
+}
+</style>

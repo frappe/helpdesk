@@ -1,16 +1,10 @@
 import type { DropdownOption } from "@/types";
-import { useClipboard, useDateFormat } from "@vueuse/core";
-import {
-  FeatherIcon,
-  call,
-  dayjsLocal,
-  toast,
-  useFileUpload,
-  getConfig,
-} from "frappe-ui";
+import { useClipboard } from "@vueuse/core";
+import { FeatherIcon, call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
+import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
 import TicketIcon from "./components/icons/TicketIcon.vue";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
@@ -68,10 +62,6 @@ export function dateFormat(date, format?: string) {
 
 export function timeAgo(date) {
   return prettyDate(date);
-}
-
-export function getBrowserTimezone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
 export function prettyDate(date, mini = false) {
@@ -286,20 +276,26 @@ export async function copyToClipboard(
   toast.success(toastMessage);
 }
 
+export const ClearFormattingUtility = {
+  label: "Clear formatting",
+  icon: LucideBrushCleaning,
+  action: (editor) => {
+    editor.chain().focus().unsetAllMarks().clearNodes().cleanStyles().run();
+  },
+  isActive: () => false,
+};
+
 export const textEditorMenuButtons = [
   "Paragraph",
   ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
   "Separator",
   "Bold",
   "Italic",
+  "FontColor",
   "Separator",
+  ["Align Left", "Align Center", "Align Right"],
   "Bullet List",
   "Numbered List",
-  "Separator",
-  "Align Left",
-  "Align Center",
-  "Align Right",
-  "FontColor",
   "Separator",
   "Image",
   "Video",
@@ -322,6 +318,8 @@ export const textEditorMenuButtons = [
     "ToggleHeaderCell",
     "DeleteTable",
   ],
+  "Separator",
+  ClearFormattingUtility,
 ];
 
 export function isContentEmpty(content: string) {
@@ -334,6 +332,13 @@ export function isContentEmpty(content: string) {
     return true;
   }
   return doc.body.textContent.trim() === "";
+}
+
+export function normalize(value: any) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  return value;
 }
 
 export function isTouchScreenDevice() {
@@ -761,4 +766,9 @@ export function parseApiOptions(
         }
       }) || []
   );
+}
+
+export function openContact(name: string) {
+  const url = window.location.origin + "/app/contact/" + name;
+  window.open(url, "_blank");
 }
