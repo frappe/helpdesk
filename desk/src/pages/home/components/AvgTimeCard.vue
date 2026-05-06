@@ -15,7 +15,7 @@
 import { computed, onMounted, ref, type PropType } from "vue";
 import CardBase from "./CardBase.vue";
 import { createResource } from "frappe-ui";
-import { formatTime } from "@/utils";
+import { buildPercentageChange, formatTime } from "@/utils";
 import { __ } from "@/translation";
 import { EChartsOption } from "echarts";
 
@@ -55,13 +55,8 @@ const chartData = computed(() => {
 
   const dates = _data?.data?.map((item) => item.date) || [];
   const avg_time = _data?.data?.map((item) => item.avg_time) || [];
-  const _percentageChange = _data?.percentage_change || 0;
-
-  const percentageChange = {
-    icon: _percentageChange > 0 ? "arrow-up-right" : "arrow-down-left",
-    value: _percentageChange > 0 ? `+${_percentageChange}` : _percentageChange,
-    color: _percentageChange > 0 ? "text-red-600" : "text-green-600",
-  };
+  const _percentageChange = _data?.percentage_change ?? null;
+  const percentageChange = buildPercentageChange(_percentageChange);
 
   const average =
     formatTime(_data?.average || 0, { day: true, hour: true, minute: true }) ||
