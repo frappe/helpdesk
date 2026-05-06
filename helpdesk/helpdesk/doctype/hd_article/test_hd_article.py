@@ -1,10 +1,10 @@
 # Copyright (c) 2021, Frappe Technologies and Contributors
 # See license.txt
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 
-class TestHDArticleFeedback(IntegrationTestCase):
+class TestHDArticleFeedback(FrappeTestCase):
     def setUp(self):
         self.article = frappe.get_doc(
             {

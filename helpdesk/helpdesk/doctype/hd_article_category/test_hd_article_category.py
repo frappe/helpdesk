@@ -2,13 +2,13 @@
 # See license.txt
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.knowledge_base import create_category
 from helpdesk.api.onboarding import get_general_category_id
 
 
-class TestHDArticleCategory(IntegrationTestCase):
+class TestHDArticleCategory(FrappeTestCase):
     def tearDown(self):
         frappe.db.delete(
             "HD Article Category",
