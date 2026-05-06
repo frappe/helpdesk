@@ -21,7 +21,10 @@ interface MapValue {
 const ticketMap: Record<string, MapValue> = reactive({});
 
 export const useTicket = (ticketId: string): MapValue => {
+<<<<<<< HEAD
   let err = false;
+=======
+>>>>>>> c2ba5dfd (chore: remove legacy number types from TS interfaces for tickets)
   if (!ticketMap[ticketId]) {
     ticketMap[ticketId] = {
       ticket: createDocumentResource<HDTicket>({
