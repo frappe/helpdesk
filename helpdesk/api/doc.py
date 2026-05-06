@@ -607,7 +607,7 @@ def apply_datetime_filter(query, field, filter_value):
 
 
 @frappe.whitelist()
-def remove_assignments(doctype: str, name: str | int, assignees: list[str]):
+def remove_assignments(doctype: str, name: str, assignees: list[str]):
     assignees = frappe.parse_json(assignees)
 
     if not assignees:
