@@ -107,11 +107,12 @@ const firstResponse = computed(() => {
     )
   ) {
     let responseTime = ticket.value.doc.first_response_time;
-    let fulfilled = formatTime(responseTime, {
-      day: true,
-      hour: true,
-      minute: true,
-    });
+    let responseBy = formatTimeShort(
+      ticket.value.doc.first_responded_on as string,
+      ticket.value.doc.creation
+    );
+    let fulfilled = responseTime ? formatTime(responseTime) : responseBy;
+
     return {
       label: `Fulfilled in ${fulfilled}`,
       color: "green",
@@ -129,10 +130,16 @@ const firstResponse = computed(() => {
       };
     }
 
-    let failed = formatTimeShort(
-      ticket.value.doc.first_responded_on as string,
-      ticket.value.doc.response_by as string
-    );
+    let failed = ticket.value?.doc?.first_response_failed_by
+      ? formatTime(ticket.value.doc.first_response_failed_by, {
+          day: true,
+          hour: true,
+          minute: true,
+        })
+      : formatTimeShort(
+          ticket.value.doc.first_responded_on,
+          ticket.value.doc.response_by
+        );
     return {
       label: `Failed by ${failed}`,
       color: "red",
@@ -177,22 +184,16 @@ const resolutionBy = computed(() => {
       color: "green",
     };
   } else {
-    if (!ticket.value.doc?.resolution_date) {
-      let resolutionBy = formatTimeShort(
-        String(new Date()),
-        ticket.value.doc?.resolution_by
-      );
-      return {
-        label: `Overdue by ${resolutionBy}`,
-        color: "red",
-        date: ticket.value.doc?.resolution_by,
-      };
-    }
-
-    let failed = formatTimeShort(
-      ticket.value.doc?.resolution_date,
-      ticket.value.doc?.resolution_by
-    );
+    let failed = ticket.value.doc?.resolution_failed_by
+      ? formatTime(ticket.value.doc?.resolution_failed_by, {
+          day: true,
+          hour: true,
+          minute: true,
+        })
+      : formatTimeShort(
+          ticket.value.doc?.resolution_date,
+          ticket.value.doc?.resolution_by
+        );
     return {
       label: `Failed by ${failed}`,
       color: "red",
