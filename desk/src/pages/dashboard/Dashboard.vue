@@ -334,8 +334,8 @@ const isEmpty = computed(() => {
 
 const parseFilters = (filters: Filters) => {
   return {
-    from_date: filters.period.split(",")[0],
-    to_date: filters.period.split(",")[1],
+    from_date: filters.period?.split(",")[0] ?? null,
+    to_date: filters.period?.split(",")[1] ?? null,
     team: filters.team,
     agent: filters.agent,
   };
@@ -537,39 +537,10 @@ function formatRange(date: string) {
 
 watch(
   () => filters,
-  (newVal) => {
-    if (showDatePicker.value) {
-      return;
-    }
-    const filters = {
-      from_date: newVal.period?.split(",")[0] || null,
-      to_date: newVal.period?.split(",")[1] || null,
-      agent: newVal.agent || null,
-      team: newVal.team || null,
-    };
-
-    numberCards.update({
-      params: {
-        dashboard_type: "number_card",
-        filters: filters,
-      },
-    });
+  () => {
+    if (showDatePicker.value && !filters.period) return;
     numberCards.reload();
-
-    masterData.update({
-      params: {
-        dashboard_type: "master",
-        filters: filters,
-      },
-    });
     masterData.reload();
-
-    trendData.update({
-      params: {
-        dashboard_type: "trend",
-        filters: filters,
-      },
-    });
     trendData.reload();
   },
   { deep: true }
