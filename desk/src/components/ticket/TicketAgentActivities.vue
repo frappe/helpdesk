@@ -1,19 +1,17 @@
-
 <template>
   <div class="flex items-center justify-between px-5 py-3 border-b flex-shrink-0">
     <h3 class="text-base font-semibold text-ink-gray-9">{{ title }}</h3>
-      
-    <Button
-      v-if="title === __('Tasks')"
-      variant="solid"
-      class="bg-gray-900 text-white hover:bg-gray-800 transition-colors"
-      @click="showNewTaskModal = true"
-    >
-      <template #prefix><FeatherIcon name="plus" class="h-4 w-4" /></template>
-      {{ __("New") }}
-    </Button>
+    <button
+  v-if="title === __('Tasks')"
+  class="flex items-center gap-1 text-sm text-ink-gray-12 hover:text-ink-gray-12 focus:outline-none leading-none"
+  @click="showNewTaskModal = true"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+  {{ __("New") }}
+</button>
   </div>
-  
   <TaskboxEditor
     v-model="showNewTaskModal"
     :ticket-id="resolvedTicketId"
@@ -24,7 +22,6 @@
       }
     "
   />
-
   <FadedScrollableDiv
     class="flex flex-col flex-1 overflow-y-auto"
     :mask-length="20"
@@ -78,21 +75,21 @@
               v-else-if="activity.type === 'feedback'"
               class="flex-1 w-full"
             />
-            <HistoryBox 
-              v-else 
-              :activity="activity" 
+            <HistoryBox
+              v-else
+              :activity="activity"
               class="flex-1 w-full"
             />
           </div>
         </div>
       </div>
     </div>
-    
+
     <div
       v-else
       class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-4"
     >
-      <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
+      <component :is="emptyTextIcon" />
       <span class="text-lg font-medium text-ink-gray-8">{{
         __(emptyText)
       }}</span>
@@ -155,8 +152,6 @@ const injectedTicketId = inject<string | number>("ticketId", "");
 const resolvedTicketId = computed(() =>
   String(props.ticketId || injectedTicketId || "").trim()
 );
-
-// Decouples tab viewing filter constraints
 const localActivities = computed(() => {
   if (props.title === __("Activity")) {
     return props.activities.filter((activity) => activity.type !== "task");
@@ -183,7 +178,7 @@ const emptyTextIcon = computed(() => {
   } else if (props.title === __("Tasks")) {
     icon = TaskIcon;
   }
-  return h(icon, { class: "text-ink-gray-4" });
+  return h(icon, { class: "h-7.5 w-7.5 text-ink-gray-4" });
 });
 
 onMounted(() => {

@@ -1,4 +1,3 @@
-
 <template>
   <Dialog v-model="show" :options="{ size: 'xl' }">
     <template #body-title>
@@ -38,10 +37,11 @@
         <div class="flex flex-wrap items-center justify-start gap-2 w-full">
 
           <Dropdown :options="statusDropdownOptions" class="flex-none">
-            <button class="pill pill-ghost">
-              <TaskStatusIcon :status="form.status" class="pill-icon" />
-              <span>{{ form.status }}</span>
-            </button>
+            <Button :label="form.status" variant="subtle">
+              <template #prefix>
+                <TaskStatusIcon :status="form.status" class="h-4 w-4" />
+              </template>
+            </Button>
           </Dropdown>
 
           <Autocomplete
@@ -52,18 +52,25 @@
             class="flex-none w-max"
           >
             <template #target="{ togglePopover }">
-              <button class="pill pill-ghost" @click="togglePopover">
-                <Avatar
-                  v-if="form.assigned"
-                  class="!h-4 !w-4 flex-shrink-0"
-                  shape="circle"
-                  :label="assigneeLabel"
-                  :image="getAssigneeImage(form.assigned)"
-                />
-                <FeatherIcon v-else name="user" class="pill-icon text-ink-gray-4" />
-                <span>{{ assigneeLabel || __("Assign To") }}</span>
-                <FeatherIcon name="chevron-down" class="pill-chevron" />
-              </button>
+              <Button
+                :label="assigneeLabel || __('Assign To')"
+                variant="subtle"
+                @click="togglePopover"
+              >
+                <template #prefix>
+                  <Avatar
+                    v-if="form.assigned"
+                    class="!h-4 !w-4 flex-shrink-0"
+                    shape="circle"
+                    :label="assigneeLabel"
+                    :image="getAssigneeImage(form.assigned)"
+                  />
+                  <FeatherIcon v-else name="user" class="h-4 w-4 text-ink-gray-5" />
+                </template>
+                <template #suffix>
+                  <FeatherIcon name="chevron-down" class="h-4 w-4 text-ink-gray-5" />
+                </template>
+              </Button>
             </template>
             <template #item-prefix="{ option }">
               <Avatar
@@ -88,10 +95,11 @@
           </div>
 
           <Dropdown :options="priorityDropdownOptions" class="flex-none">
-            <button class="pill pill-ghost">
-              <span>{{ form.priority }}</span>
-              <FeatherIcon name="chevron-down" class="pill-chevron" />
-            </button>
+            <Button :label="form.priority" variant="subtle">
+              <template #suffix>
+                <FeatherIcon name="chevron-down" class="h-4 w-4 text-ink-gray-5" />
+              </template>
+            </Button>
           </Dropdown>
 
         </div>
@@ -122,7 +130,6 @@ import {
   Dialog,
   Dropdown,
   FeatherIcon,
-  FormLabel,
   TextEditor,
   TextInput,
   call,
@@ -280,36 +287,10 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  height: 2rem;
-  padding: 0 0.625rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  white-space: nowrap;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  border: none;
-  transition: background 0.12s;
-}
-
-.pill-ghost {
-  background: var(--surface-gray-2, #f3f4f6);
-  color: var(--ink-gray-8, #1f2937);
-}
-.pill-ghost:hover {
-  background: var(--surface-gray-3, #e5e7eb);
-}
-
-.pill-icon    { width: 1rem; height: 1rem; flex-shrink: 0; }
-.pill-chevron { width: 0.75rem; height: 0.75rem; flex-shrink: 0; color: var(--ink-gray-4, #9ca3af); margin-left: 0.125rem; }
-
 .custom-chevron {
   width: 0.75rem !important; 
   height: 0.75rem !important; 
-  color: var(--ink-gray-4, #9ca3af) !important;
+  color: var(--ink-gray-5, #6b7280) !important;
   display: block !important;
   z-index: 10;
 }
@@ -324,12 +305,12 @@ async function handleSubmit() {
 }
 
 .pill-datepicker :deep(input) {
-  height: 2rem !important;
+  height: 1.75rem !important;
   width: 100% !important;
-  padding: 0 1.75rem 0 0.625rem !important; 
+  padding: 0 1.75rem 0 0.5rem !important; 
   font-size: 0.875rem !important;
   font-weight: 500 !important;
-  border-radius: 0.5rem !important;
+  border-radius: 0.375rem !important;
   border: none !important;
   background: var(--surface-gray-2, #f3f4f6) !important;
   color: var(--ink-gray-8, #1f2937) !important;

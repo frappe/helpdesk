@@ -35,6 +35,7 @@
       class="flex h-12 items-center justify-between py-[7px] px-3 border-b"
       v-if="ticket.doc?.name"
     >
+     <!-- left side -->
       <div class="flex items-center gap-2 max-w-[50%]">
         <AssignTo :hide-label="true" />
       </div>
@@ -56,22 +57,26 @@
           >
             <template #tab-panel="{ tab }">
               <div v-if="tab.name === 'details'">
+                  <!-- ticket contact info -->
                 <TicketAgentContact
                   v-if="contact.data"
                   :contact="contact.data"
                   :ticketId="ticket.doc?.name"
                   @email:open="communicationAreaRef.toggleEmailBox()"
                 />
+                 <!-- feedback component -->
                 <TicketFeedback
                   v-if="ticket.doc?.feedback_rating"
                   class="border-b px-6 py-3 text-base text-ink-gray-5"
                   :ticket="ticket.doc"
                 />
+                   <!-- SLA Section -->
                 <h3 class="px-6 pt-3 font-semibold text-base">
                   {{ __("SLA") }}
                 </h3>
                 <TicketAgentDetails :ticket="ticket.doc" />
                 <h3 class="px-6 pt-3 font-semibold text-base">
+                   <!-- Ticket Fields -->
                   {{ __("Details") }}
                 </h3>
                 <TicketAgentFields
@@ -84,6 +89,7 @@
                 />
               </div>
 
+              <!-- Rest Activities -->
               <TicketAgentActivities
                 v-else
                 ref="ticketAgentActivitiesRef"
@@ -271,6 +277,7 @@ const customizations: Resource<Customizations> = createResource({
   auto: true,
 });
 
+// Build fields from getMeta + customizations (same as TicketDetailsTab)
 const { getField, getFields } = getMeta("HD Ticket");
 
 function updateField(name: string, value: string) {
@@ -293,7 +300,7 @@ watchEffect(async () => {
     customActions.value = [...(customizations.data?._customActions || [])];
   }
 });
-
+// On mobile, collapse all custom actions into a single three-dot group
 const mobileCustomActions = computed(() => {
   if (!customActions.value.length) return [];
 
@@ -301,10 +308,12 @@ const mobileCustomActions = computed(() => {
 
   for (const action of customActions.value) {
     if (action.group) {
+       // Grouped action (with or without buttonLabel) — flatten its items
       for (const item of action.items || []) {
         items.push({ label: item.label, onClick: item.onClick });
       }
     } else {
+      // Normal standalone button
       items.push({ label: action.label, onClick: action.onClick });
     }
   }
@@ -356,7 +365,7 @@ const ticketFields = computed(() => {
     })
     .filter(Boolean);
 });
-
+// Merged ticket doc with computed fields for TicketAgentFields
 const ticketWithFields = computed(() => ({
   ...ticket.value.doc,
   fields: ticketFields.value,
