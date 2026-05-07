@@ -11,6 +11,7 @@
   "assignment_rule",
   "users",
   "column_break_feto",
+  "disabled",
   "ignore_restrictions"
  ],
  "fields": [
@@ -44,11 +45,17 @@
    "fieldname": "column_break_feto",
    "fieldtype": "Column Break",
    "label": "Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-02 17:28:31.798544",
+ "modified": "2026-05-07 02:22:38.744911",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Team",
