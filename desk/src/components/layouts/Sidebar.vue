@@ -188,7 +188,7 @@ import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
-import { call } from "frappe-ui";
+import { call, toast } from "frappe-ui";
 import {
   GettingStartedBanner,
   HelpModal,
@@ -457,6 +457,7 @@ const steps = [
     name: "assign_to_agent",
     title: __("Assign a ticket to an agent"),
     completed: false,
+    dependsOn: "create_first_ticket",
     icon: markRaw(UserPen),
     onClick: async () => {
       await handleFirstTicketNavigation();
@@ -468,6 +469,7 @@ const steps = [
     name: "reply_on_ticket",
     title: __("Reply on a ticket"),
     completed: false,
+    dependsOn: "create_first_ticket",
     icon: markRaw(MailOpen),
     onClick: async () => {
       await handleFirstTicketNavigation();
@@ -480,6 +482,7 @@ const steps = [
     name: "comment_on_ticket",
     title: __("Add a comment on a ticket"),
     completed: false,
+    dependsOn: "create_first_ticket",
     icon: markRaw(MessageCircle),
     onClick: async () => {
       await handleFirstTicketNavigation();
@@ -624,20 +627,30 @@ const { isOnboardingStepsCompleted, setUp, updateOnboardingStep } =
 async function handleFirstTicketNavigation() {
   const ticket = await getFirstTicket();
 
-  if (ticket) {
-    router.push({
-      name: "TicketAgent",
-      params: { ticketId: ticket },
-    });
-  } else {
+  if (!ticket) {
     router.push({ name: "TicketAgentNew" });
+    updateOnboardingStep("create_first_ticket", false); // reset the step as first ticket is not created
+    toast.error("Please create a new ticket to proceed with the next step.");
+    return;
   }
+
+  router.push({
+    name: "TicketAgent",
+    params: { ticketId: ticket },
+  });
 }
 
 async function getFirstTicket() {
-  let ticket = localStorage.getItem("firstTicket");
-  if (ticket) return ticket;
-  return await call("helpdesk.api.onboarding.get_first_ticket");
+  let cachedTicket = localStorage.getItem("firstTicket");
+  const ticket = await call("helpdesk.api.onboarding.get_first_ticket", {
+    ticket: cachedTicket,
+  });
+  if (ticket) {
+    localStorage.setItem("firstTicket", ticket);
+  } else {
+    localStorage.removeItem("firstTicket");
+  }
+  return ticket;
 }
 
 async function getGeneralCategory() {
