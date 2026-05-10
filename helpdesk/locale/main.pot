@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-05-03 10:46+0000\n"
-"PO-Revision-Date: 2026-05-03 10:46+0000\n"
+"POT-Creation-Date: 2026-05-10 10:49+0000\n"
+"PO-Revision-Date: 2026-05-10 10:49+0000\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -53,6 +53,22 @@ msgstr ""
 #. Feedback'
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "0 is no feedback, 1 is Like, 2 is Dislike"
+msgstr ""
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:174
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:192
+msgid "1 Year"
+msgstr ""
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:172
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:184
+msgid "3 Months"
+msgstr ""
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:173
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:179
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:188
+msgid "6 Months"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:117
@@ -170,7 +186,7 @@ msgstr ""
 msgid "Add Weekly Holidays"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:481
+#: desk/src/components/layouts/Sidebar.vue:483
 msgid "Add a comment on a ticket"
 msgstr ""
 
@@ -277,7 +293,7 @@ msgstr ""
 msgid "Agent Configuration"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:242
+#: desk/src/pages/dashboard/Dashboard.vue:254
 msgid "Agent Dashboard"
 msgstr ""
 
@@ -329,13 +345,13 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:231
+#: desk/src/pages/home/components/PendingTickets.vue:242
 msgid "All SLAs on track"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:285
-#: desk/src/pages/home/components/RecentFeedback.vue:314
-#: desk/src/pages/home/components/RecentFeedback.vue:321
+#: desk/src/pages/home/components/RecentFeedback.vue:349
+#: desk/src/pages/home/components/RecentFeedback.vue:387
+#: desk/src/pages/home/components/RecentFeedback.vue:395
 msgid "All Time"
 msgstr ""
 
@@ -351,7 +367,7 @@ msgstr ""
 msgid "All comments and emails of the ticket will be moved to the"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:240
+#: desk/src/pages/home/components/PendingTickets.vue:251
 msgid "All your assigned tickets have been responded to"
 msgstr ""
 
@@ -730,8 +746,8 @@ msgstr ""
 msgid "Average feedback rating per day is around {0} stars"
 msgstr ""
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:37
-msgid "Average response and resolution metrics not yet generated"
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:103
+msgid "Average response and resolution metrics not available"
 msgstr ""
 
 #: helpdesk/api/dashboard.py:286
@@ -754,13 +770,13 @@ msgstr ""
 msgid "Avg. feedback rating for the tickets resolved"
 msgstr ""
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:49
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:148
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:117
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:279
 msgid "Avg. first response time"
 msgstr ""
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:58
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:156
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:126
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:287
 msgid "Avg. resolution time"
 msgstr ""
 
@@ -897,7 +913,7 @@ msgstr ""
 msgid "Canceled"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:513
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:514
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr ""
 
@@ -1292,15 +1308,15 @@ msgstr ""
 #: desk/src/components/Settings/EmailAdd.vue:94
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
-#: desk/src/components/layouts/Sidebar.vue:517
+#: desk/src/components/layouts/Sidebar.vue:520
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
 #: desk/src/pages/knowledge-base/NewArticle.vue:31
 msgid "Create"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:510
-#: desk/src/components/layouts/Sidebar.vue:516
+#: desk/src/components/layouts/Sidebar.vue:513
+#: desk/src/components/layouts/Sidebar.vue:519
 msgid "Create & invite a contact"
 msgstr ""
 
@@ -1316,7 +1332,7 @@ msgstr ""
 msgid "Create a ticket"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:493
+#: desk/src/components/layouts/Sidebar.vue:496
 msgid "Create an article"
 msgstr ""
 
@@ -1348,8 +1364,12 @@ msgstr ""
 msgid "Custom Outside Working Hours Message"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:489
-#: desk/src/pages/dashboard/Dashboard.vue:495
+#: desk/src/pages/dashboard/Dashboard.vue:504
+#: desk/src/pages/dashboard/Dashboard.vue:510
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:175
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:196
+#: desk/src/pages/home/components/RecentFeedback.vue:365
+#: desk/src/pages/home/components/RecentFeedback.vue:391
 msgid "Custom Range"
 msgstr ""
 
@@ -1391,7 +1411,7 @@ msgstr ""
 msgid "Danger"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:576
+#: desk/src/pages/dashboard/Dashboard.vue:562
 msgid "Dashboard"
 msgstr ""
 
@@ -1925,7 +1945,7 @@ msgstr ""
 msgid "Expand"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:530
+#: desk/src/components/layouts/Sidebar.vue:533
 msgid "Explore customer portal"
 msgstr ""
 
@@ -2013,7 +2033,7 @@ msgstr ""
 #. Label of the feedback (Select) field in DocType 'HD Article Feedback'
 #. Label of the feedback_section (Section Break) field in DocType 'HD Settings'
 #. Label of the feedback_tab (Tab Break) field in DocType 'HD Ticket'
-#: desk/src/pages/home/components/RecentFeedback.vue:156
+#: desk/src/pages/home/components/RecentFeedback.vue:195
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2186,7 +2206,7 @@ msgid "Fulfilled"
 msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/layouts/Sidebar.vue:501
+#: desk/src/components/layouts/Sidebar.vue:504
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
 msgstr ""
@@ -2227,7 +2247,7 @@ msgstr ""
 msgid "Gray"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:232
+#: desk/src/pages/home/components/PendingTickets.vue:243
 msgid "Great! All your tickets are within SLA"
 msgstr ""
 
@@ -2840,8 +2860,8 @@ msgstr ""
 msgid "Last"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:297
-#: desk/src/pages/home/components/RecentFeedback.vue:317
+#: desk/src/pages/home/components/RecentFeedback.vue:361
+#: desk/src/pages/home/components/RecentFeedback.vue:390
 msgid "Last 3 Months"
 msgstr ""
 
@@ -2851,25 +2871,25 @@ msgstr ""
 msgid "Last 3 months"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:444
-#: desk/src/pages/dashboard/Dashboard.vue:466
-#: desk/src/pages/dashboard/Dashboard.vue:468
-#: desk/src/pages/dashboard/Dashboard.vue:504
+#: desk/src/pages/dashboard/Dashboard.vue:459
+#: desk/src/pages/dashboard/Dashboard.vue:481
+#: desk/src/pages/dashboard/Dashboard.vue:483
+#: desk/src/pages/dashboard/Dashboard.vue:519
 msgid "Last 30 Days"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:473
-#: desk/src/pages/dashboard/Dashboard.vue:475
+#: desk/src/pages/dashboard/Dashboard.vue:488
+#: desk/src/pages/dashboard/Dashboard.vue:490
 msgid "Last 60 Days"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:459
-#: desk/src/pages/dashboard/Dashboard.vue:461
+#: desk/src/pages/dashboard/Dashboard.vue:474
+#: desk/src/pages/dashboard/Dashboard.vue:476
 msgid "Last 7 Days"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:480
-#: desk/src/pages/dashboard/Dashboard.vue:482
+#: desk/src/pages/dashboard/Dashboard.vue:495
+#: desk/src/pages/dashboard/Dashboard.vue:497
 msgid "Last 90 Days"
 msgstr ""
 
@@ -2883,8 +2903,8 @@ msgstr ""
 msgid "Last Customer Response"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:293
-#: desk/src/pages/home/components/RecentFeedback.vue:316
+#: desk/src/pages/home/components/RecentFeedback.vue:357
+#: desk/src/pages/home/components/RecentFeedback.vue:389
 msgid "Last Month"
 msgstr ""
 
@@ -2892,12 +2912,12 @@ msgstr ""
 msgid "Last Name"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:289
-#: desk/src/pages/home/components/RecentFeedback.vue:315
+#: desk/src/pages/home/components/RecentFeedback.vue:353
+#: desk/src/pages/home/components/RecentFeedback.vue:388
 msgid "Last Week"
 msgstr ""
 
-#: desk/src/pages/home/components/AgentTicketsCard.vue:34
+#: desk/src/pages/home/components/AgentTicketsCard.vue:35
 #: desk/src/pages/home/components/AvgTimeCard.vue:50
 #: desk/src/pages/home/components/CardBase.vue:80
 #: desk/src/pages/home/components/CardBase.vue:99
@@ -3123,7 +3143,7 @@ msgstr ""
 msgid "Move To"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:243
+#: desk/src/pages/dashboard/Dashboard.vue:255
 msgid "My Dashboard"
 msgstr ""
 
@@ -3171,8 +3191,8 @@ msgstr ""
 msgid "Navigation"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:308
-#: desk/src/pages/home/components/RecentFeedback.vue:325
+#: desk/src/pages/home/components/RecentFeedback.vue:381
+#: desk/src/pages/home/components/RecentFeedback.vue:399
 msgid "Negative first"
 msgstr ""
 
@@ -3297,7 +3317,7 @@ msgstr ""
 msgid "No Team"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:163
+#: desk/src/pages/home/components/RecentFeedback.vue:202
 msgid "No additional comments"
 msgstr ""
 
@@ -3321,8 +3341,12 @@ msgstr ""
 msgid "No assignment rule found"
 msgstr ""
 
+<<<<<<< HEAD
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:34
+=======
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:101
+>>>>>>> b909a6f6 (chore: update POT file)
 msgid "No average metrics"
 msgstr ""
 
@@ -3354,7 +3378,7 @@ msgstr ""
 msgid "No email account found"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:211
+#: desk/src/pages/home/components/RecentFeedback.vue:273
 msgid "No feedback"
 msgstr ""
 
@@ -3370,8 +3394,8 @@ msgstr ""
 msgid "No new notifications"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:236
-msgid "No new tickets assigned to you in the last 24 hours"
+#: desk/src/pages/home/components/PendingTickets.vue:247
+msgid "No new tickets assigned to you in the last 7 days"
 msgstr ""
 
 #: desk/src/components/ticket-agent/TicketNavigation.vue:22
@@ -3382,7 +3406,7 @@ msgstr ""
 msgid "No one"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:239
+#: desk/src/pages/home/components/PendingTickets.vue:250
 msgid "No pending tickets"
 msgstr ""
 
@@ -3394,7 +3418,7 @@ msgstr ""
 msgid "No reason"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:235
+#: desk/src/pages/home/components/PendingTickets.vue:246
 msgid "No recently assigned tickets"
 msgstr ""
 
@@ -3548,7 +3572,7 @@ msgstr ""
 msgid "Order By"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:243
+#: desk/src/pages/dashboard/Dashboard.vue:255
 msgid "Organization Dashboard"
 msgstr ""
 
@@ -3617,7 +3641,7 @@ msgstr ""
 msgid "Paused"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:200
+#: desk/src/pages/home/components/PendingTickets.vue:211
 msgid "Pending"
 msgstr ""
 
@@ -3626,8 +3650,8 @@ msgid "Pending Invites"
 msgstr ""
 
 #: desk/src/pages/home/Home.vue:353
-#: desk/src/pages/home/components/PendingTickets.vue:212
-#: desk/src/pages/home/components/PendingTickets.vue:216
+#: desk/src/pages/home/components/PendingTickets.vue:223
+#: desk/src/pages/home/components/PendingTickets.vue:227
 msgid "Pending Tickets"
 msgstr ""
 
@@ -3700,7 +3724,7 @@ msgstr ""
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:328
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:329
 msgid "Please add {0} priority in {1} SLA"
 msgstr ""
 
@@ -3756,9 +3780,9 @@ msgstr ""
 msgid "Policy name"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:304
-#: desk/src/pages/home/components/RecentFeedback.vue:326
-#: desk/src/pages/home/components/RecentFeedback.vue:330
+#: desk/src/pages/home/components/RecentFeedback.vue:377
+#: desk/src/pages/home/components/RecentFeedback.vue:400
+#: desk/src/pages/home/components/RecentFeedback.vue:404
 msgid "Positive first"
 msgstr ""
 
@@ -3791,7 +3815,7 @@ msgstr ""
 msgid "Prefer knowledge base"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:448
+#: desk/src/pages/dashboard/Dashboard.vue:463
 msgid "Presets"
 msgstr ""
 
@@ -3862,7 +3886,7 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:262
+#: desk/src/components/Settings/Profile/Profile.vue:270
 msgid "Profile Updated Successfully"
 msgstr ""
 
@@ -3979,11 +4003,11 @@ msgstr ""
 msgid "Reason"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:204
+#: desk/src/pages/home/components/PendingTickets.vue:215
 msgid "Recent"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:211
+#: desk/src/pages/home/components/PendingTickets.vue:222
 msgid "Recent Tickets"
 msgstr ""
 
@@ -4108,7 +4132,7 @@ msgstr ""
 msgid "Reply from contact"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:469
+#: desk/src/components/layouts/Sidebar.vue:470
 msgid "Reply on a ticket"
 msgstr ""
 
@@ -4284,13 +4308,13 @@ msgstr ""
 
 #. Label of the sla (Link) field in DocType 'HD Ticket'
 #. Label of the sla_tab (Tab Break) field in DocType 'HD Ticket'
+#: desk/src/pages/home/components/PendingTickets.vue:207
 #: desk/src/pages/ticket/MobileTicketAgent.vue:74
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:196
-#: desk/src/pages/home/components/PendingTickets.vue:210
+#: desk/src/pages/home/components/PendingTickets.vue:221
 msgid "SLA Alerts"
 msgstr ""
 
@@ -4487,7 +4511,7 @@ msgstr ""
 msgid "Searching..."
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:138
+#: desk/src/pages/home/components/PendingTickets.vue:136
 msgid "See all {0} tickets"
 msgstr ""
 
@@ -4513,6 +4537,11 @@ msgstr ""
 
 #: desk/src/pages/ticket/TicketFeedback.vue:28
 msgid "Select a rating"
+msgstr ""
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:34
+#: desk/src/pages/home/components/RecentFeedback.vue:148
+msgid "Select range"
 msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:104
@@ -4664,6 +4693,10 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:83
 msgid "Show keyboard shortcuts"
+msgstr ""
+
+#: desk/src/pages/home/components/PendingTickets.vue:143
+msgid "Showing {0} of {1} {2}"
 msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:37
@@ -5312,12 +5345,12 @@ msgstr ""
 msgid "Tickets"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:220
+#: desk/src/pages/home/components/PendingTickets.vue:231
 msgid "Tickets approaching or breached SLA"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:221
-msgid "Tickets assigned to you in the last 24 hours"
+#: desk/src/pages/home/components/PendingTickets.vue:232
+msgid "Tickets assigned to you in the last 7 days"
 msgstr ""
 
 #: helpdesk/api/dashboard.py:553
@@ -5344,7 +5377,7 @@ msgstr ""
 msgid "Tickets must meet the following conditions:"
 msgstr ""
 
-#: desk/src/pages/home/components/PendingTickets.vue:222
+#: desk/src/pages/home/components/PendingTickets.vue:233
 msgid "Tickets that are awaiting your response"
 msgstr ""
 
@@ -5408,8 +5441,8 @@ msgstr ""
 msgid "To know more about setting up email accounts, click"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:452
-#: desk/src/pages/dashboard/Dashboard.vue:454
+#: desk/src/pages/dashboard/Dashboard.vue:467
+#: desk/src/pages/dashboard/Dashboard.vue:469
 msgid "Today"
 msgstr ""
 
@@ -5792,10 +5825,6 @@ msgstr ""
 msgid "You have already provided feedback for this ticket."
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:214
-msgid "You haven't received any feedback yet"
-msgstr ""
-
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:132
 msgid "You must set one SLA as Default. Please check the Default SLA option."
 msgstr ""
@@ -5804,7 +5833,7 @@ msgstr ""
 msgid "Your old conditions will be overwritten. Are you sure you want to save?"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:48
+#: desk/src/pages/home/components/RecentFeedback.vue:51
 msgid "Your performance is"
 msgstr ""
 
@@ -5816,7 +5845,7 @@ msgstr ""
 msgid "assignees"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:374
+#: desk/src/pages/home/components/RecentFeedback.vue:466
 msgid "average"
 msgstr ""
 
@@ -5844,7 +5873,7 @@ msgstr ""
 msgid "emails/ comments"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:370
+#: desk/src/pages/home/components/RecentFeedback.vue:462
 msgid "excellent"
 msgstr ""
 
@@ -5852,7 +5881,7 @@ msgstr ""
 msgid "from this email onwards will be moved to new ticket."
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:372
+#: desk/src/pages/home/components/RecentFeedback.vue:464
 msgid "good"
 msgstr ""
 
@@ -5909,7 +5938,7 @@ msgstr ""
 msgid "mentioned you in ticket"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:376
+#: desk/src/pages/home/components/RecentFeedback.vue:468
 msgid "poor"
 msgstr ""
 
@@ -5931,6 +5960,10 @@ msgstr ""
 msgid "synonym"
 msgstr ""
 
+#: desk/src/pages/home/components/PendingTickets.vue:147
+msgid "ticket"
+msgstr ""
+
 #: desk/src/pages/ticket/MobileTicketAgent.vue:525
 msgid "viewed this"
 msgstr ""
@@ -5939,7 +5972,7 @@ msgstr ""
 msgid "{0} matches"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:43
+#: desk/src/pages/home/components/RecentFeedback.vue:46
 msgid "{0} reviews"
 msgstr ""
 
