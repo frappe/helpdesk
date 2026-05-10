@@ -10,6 +10,7 @@
         :options="parentFields"
         :disabled="!isNew"
         :open-on-focus="true"
+        class="w-full"
       />
     </div>
     <div class="flex-1 flex flex-col gap-1.5">
@@ -22,6 +23,7 @@
         :options="state.childFields"
         :disabled="!state.selectedParentField || !isNew"
         :open-on-focus="true"
+        class="w-full"
       />
     </div>
   </div>

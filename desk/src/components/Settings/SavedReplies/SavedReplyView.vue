@@ -50,7 +50,7 @@
     <template #content>
       <div
         v-if="getSavedReplyData.loading"
-        class="flex items-center justify-center mt-12"
+        class="flex items-center justify-center my-auto"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -73,6 +73,7 @@
               v-model="savedReplyData.scope"
               :options="scopeDropdownOptions"
               required
+              class="w-full"
             >
               <template #prefix>
                 <component
@@ -80,7 +81,7 @@
                   class="size-4 text-ink-gray-9"
                 />
               </template>
-              <template #option="{ option }">
+              <template #label="{ option }">
                 <div class="flex gap-2 items-center cursor-pointer">
                   <component :is="option.icon" class="size-4 text-ink-gray-9" />
                   <span>
