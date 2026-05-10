@@ -51,9 +51,9 @@
               </template>
             </Button>
           </template>
-          <template #item="{ item }">
+          <template #item-label="{ item }">
             <button
-              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-3"
+              class="group flex text-ink-gray-6 gap-4 w-full justify-between items-center rounded text-base"
               @click="item.onSelect"
             >
               <div class="flex items-center justify-between flex-1">
@@ -74,7 +74,7 @@
     <template #content>
       <div
         v-if="savedRepliesListResource?.list?.loading"
-        class="flex items-center justify-center mt-12"
+        class="flex items-center justify-center my-auto"
       >
         <LoadingIndicator class="w-4" />
       </div>
