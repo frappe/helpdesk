@@ -357,8 +357,7 @@ function getValueControl(f) {
       ],
     });
   } else if (operator == "timespan") {
-    return h(FormControl, {
-      type: "select",
+    return h(Autocomplete, {
       options: timespanOptions,
     });
   } else if (["like", "not like", "in", "not in"].includes(operator)) {
@@ -485,6 +484,9 @@ function clearfilter(close) {
 }
 
 function updateValue(value, filter) {
+  if (value && typeof value === "object" && !value.target && "value" in value) {
+    value = value.value;
+  }
   value = value.target ? value.target.value : value;
   if (filter.operator === "in" || filter.operator === "not in") {
     filter.value = value.split(",").map((v) => v.trim());
