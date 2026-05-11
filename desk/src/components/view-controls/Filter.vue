@@ -161,6 +161,7 @@
 import { Link, StarRating } from "@/components";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { useScreenSize } from "@/composables/screen";
+import { useDebounceFn } from "@vueuse/core";
 import {
   Autocomplete,
   Button,
@@ -173,7 +174,6 @@ import {
   Tooltip,
 } from "frappe-ui";
 import { computed, h, inject } from "vue";
-import { useDebounceFn } from "@vueuse/core";
 
 const props = defineProps({
   default_filters: {
@@ -209,21 +209,26 @@ function convertFilters(data, allFilters) {
   let f = [];
   for (let [key, value] of Object.entries(allFilters)) {
     let field = data.find((f) => f.fieldname === key);
-    if (typeof value !== "object" || !value) {
-      value = ["=", value];
-      if (field?.fieldtype === "Check") {
-        value = ["equals", value[1] ? "Yes" : "No"];
+    if (!field) continue;
+
+    const values =
+      Array.isArray(value) && Array.isArray(value[0]) ? value : [value];
+
+    for (let v of values) {
+      if (typeof v !== "object" || !v) {
+        v = ["=", v];
+        if (field.fieldtype === "Check") {
+          v = ["equals", v[1] ? "Yes" : "No"];
+        }
       }
-    }
-    if (typeof value[1] === "number") {
-      value[1] = value[1].toString();
-    }
-    if (field) {
+      if (typeof v[1] === "number") {
+        v[1] = v[1].toString();
+      }
       f.push({
         field,
         fieldname: key,
-        operator: oppositeOperatorMap[value[0]],
-        value: value[1],
+        operator: oppositeOperatorMap[v[0]],
+        value: v[1],
       });
     }
   }
@@ -543,15 +548,23 @@ function apply() {
 
 function parseFilters(filters) {
   return filters.map(transformIn).reduce((p, c) => {
-    if (["equals", "="].includes(c.operator)) {
-      if (c.toBoolean) {
-        p[c.fieldname] =
-          c.value === "Yes" ? true : c.value === "No" ? false : c.value;
-      } else {
-        p[c.fieldname] = c.value;
+    const entry = ["equals", "="].includes(c.operator)
+      ? c.toBoolean
+        ? c.value === "Yes"
+          ? true
+          : c.value === "No"
+            ? false
+            : c.value
+        : c.value
+      : [operatorMap[c.operator.toLowerCase()], c.value];
+
+    if (p[c.fieldname] !== undefined) {
+      if (!Array.isArray(p[c.fieldname]) || !Array.isArray(p[c.fieldname][0])) {
+        p[c.fieldname] = [p[c.fieldname]];
       }
+      p[c.fieldname].push(entry);
     } else {
-      p[c.fieldname] = [operatorMap[c.operator.toLowerCase()], c.value];
+      p[c.fieldname] = entry;
     }
     return p;
   }, {});
@@ -639,3 +652,9 @@ const debouncedApply = useDebounceFn(() => {
   apply();
 }, 500);
 </script>
+<style>
+& #operator button,
+& #value button {
+  width: 100%;
+}
+</style>
