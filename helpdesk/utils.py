@@ -175,15 +175,16 @@ def agent_only(fn):
 
 
 def get_agents_team():
-    QBTeam = frappe.qb.DocType("HD Team")
-    QBTeamMember = frappe.qb.DocType("HD Team Member")
+    Team = frappe.qb.DocType("HD Team")
+    TeamMember = frappe.qb.DocType("HD Team Member")
 
     teams = (
-        frappe.qb.from_(QBTeamMember)
-        .where(QBTeamMember.user == frappe.session.user)
-        .join(QBTeam)
-        .on(QBTeam.name == QBTeamMember.parent)
-        .select(QBTeam.team_name, QBTeam.ignore_restrictions)
+        frappe.qb.from_(TeamMember)
+        .where(TeamMember.user == frappe.session.user)
+        .where(Team.disabled == 0)
+        .join(Team)
+        .on(Team.name == TeamMember.parent)
+        .select(Team.team_name, Team.ignore_restrictions)
         .run(as_dict=True)
     )
     return teams
