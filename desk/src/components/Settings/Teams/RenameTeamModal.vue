@@ -10,6 +10,7 @@
     <template #actions>
       <Button
         variant="solid"
+        class="flex w-full"
         @click="renameTeam"
         :loading="renameTeamResource.loading"
         :disabled="teamName == dialog.teamName || teamName.trim() == ''"
