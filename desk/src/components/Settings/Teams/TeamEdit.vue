@@ -17,7 +17,7 @@
     <template #header-actions>
       <div class="flex items-center gap-4">
         <div class="flex items-center justify-between gap-2 cursor-pointer">
-          <Switch v-model="teamEnabled" />
+          <Switch v-model="teamEnabled" v-if="!team.loading" />
           <span class="text-sm text-ink-gray-7 font-medium">
             {{ __("Enabled") }}
           </span>
