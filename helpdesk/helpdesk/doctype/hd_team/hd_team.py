@@ -25,6 +25,8 @@ class HDTeam(Document):
         self.capture_team_creation_event()
 
     def on_update(self):
+        if not self.assignment_rule:
+            return
         ar = frappe.get_doc("Assignment Rule", self.assignment_rule)
         self.sync_users(ar)
         ar.disabled = bool(self.disabled)
@@ -76,8 +78,7 @@ class HDTeam(Document):
 
         self.sync_users(ar)
         ar.save(ignore_permissions=True)
-        self.assignment_rule = ar.name
-        self.save(ignore_permissions=True)
+        self.db_set("assignment_rule", ar.name, update_modified=False)
 
     def sync_users(self, ar):
         members = [u.user for u in self.users if u.user]

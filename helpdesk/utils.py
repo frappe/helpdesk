@@ -180,10 +180,10 @@ def get_agents_team():
 
     teams = (
         frappe.qb.from_(TeamMember)
-        .where(TeamMember.user == frappe.session.user)
-        .where(Team.disabled == 0)
         .join(Team)
         .on(Team.name == TeamMember.parent)
+        .where(TeamMember.user == frappe.session.user)
+        .where(Team.disabled == 0)
         .select(Team.team_name, Team.ignore_restrictions)
         .run(as_dict=True)
     )

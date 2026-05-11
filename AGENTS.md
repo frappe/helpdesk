@@ -268,7 +268,6 @@ class HDFoo(Document):
 - Never call `.save()` inside a helper method — save in the hook or the method that owns the full mutation.
 - Exception: if a method truly owns a complete document lifecycle (e.g. `create_assignment_rule` creates and fully initialises a new doc), it may save internally.
 Take inspiration from "helpdesk.doctype.hd_team.hd_team.HDTeam" for examples of this pattern in practice.
-```
 
 ## Conventions & Patterns
 

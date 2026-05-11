@@ -5,13 +5,13 @@ from helpdesk.utils import is_json_valid
 
 
 def on_assignment_rule_trash(doc, event):
-    if doc.document_type != "HD Ticket" or doc.disabled:
+    if doc.document_type != "HD Ticket":
         return
     if not frappe.get_all(
         "Assignment Rule",
         filters={"document_type": "HD Ticket", "name": ["!=", doc.name]},
     ):
-        frappe.throw(_("There should atleast be 1 assignment rule for ticket"))
+        frappe.throw(_("There should be at least 1 assignment rule for ticket"))
 
 
 def on_assignment_rule_validate(doc, event):
