@@ -37,7 +37,6 @@
   "response",
   "first_response_time",
   "first_responded_on",
-  "first_response_failed_by",
   "column_break_26",
   "avg_response_time",
   "last_agent_response",
@@ -51,7 +50,6 @@
   "resolution_date",
   "resolution_time",
   "user_resolution_time",
-  "resolution_failed_by",
   "reference_tab",
   "additional_info",
   "contact",
@@ -467,6 +465,7 @@
    "label": "Ticket raised outside working hours",
    "read_only": 1,
    "set_only_once": 1
+<<<<<<< HEAD
   },
   {
 <<<<<<< HEAD
@@ -485,6 +484,8 @@
    "fieldtype": "Duration",
    "label": "Resolution Failed By",
    "read_only": 1
+=======
+>>>>>>> 2f1bccd8 (chore: code cleanup)
   }
  ],
  "grid_page_length": 50,
@@ -492,10 +493,14 @@
  "idx": 61,
  "links": [],
 <<<<<<< HEAD
+<<<<<<< HEAD
  "modified": "2026-05-07 14:35:56.356727",
 =======
  "modified": "2026-05-11 17:56:26.750850",
 >>>>>>> 71956484 (fix: update link_filters in HDTicket)
+=======
+ "modified": "2026-05-11 18:25:54.352721",
+>>>>>>> 2f1bccd8 (chore: code cleanup)
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
