@@ -25,7 +25,6 @@ except ImportError:
 from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
 
-
 if TYPE_CHECKING:
     from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
 
@@ -307,7 +306,9 @@ class HelpdeskSearch(Search):
     def get_records(self, doctype):
         records = []
         for d in frappe.db.get_all(
-            doctype, filters={"status": "Published"}, fields=self.DOCTYPE_FIELDS[doctype]
+            doctype,
+            filters={"status": "Published"},
+            fields=self.DOCTYPE_FIELDS[doctype],
         ):
             d.doctype = doctype
             if doctype == "HD Article":
@@ -320,9 +321,7 @@ class HelpdeskSearch(Search):
         return records
 
 
-def search(
-    query, qtype: Literal["and", "or"] = "and"
-) -> list[dict[str, list[dict]]]:
+def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[dict]]]:
     search = HelpdeskSearch()
     query = search.clean_query(query)
     query_parts: list[str] = query.split()
