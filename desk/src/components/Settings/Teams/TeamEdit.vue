@@ -163,7 +163,6 @@ import {
   Dropdown,
   Switch,
   toast,
-  Tooltip,
 } from "frappe-ui";
 import { computed, h, inject, markRaw, onMounted, ref } from "vue";
 import LucideLock from "~icons/lucide/lock";
@@ -312,7 +311,7 @@ function renameTeam(close) {
 
 const showDelete = ref(false);
 
-const options = [
+const options = computed(() => [
   {
     label: __("View Assignment rule"),
     icon: markRaw(h(Settings, { class: "rotate-90" })),
@@ -329,71 +328,31 @@ const options = [
     icon: "edit-3",
     onClick: () => (showRename.value = !showRename.value),
   },
-  {
-    condition: () => teamRestrictionApplied,
-    label: team.doc?.ignore_restrictions
-      ? __("Disable Bypass Restrictions")
-      : __("Enable Bypass Restrictions"),
-    component: () =>
-      h(
-        Tooltip,
+  ...(teamRestrictionApplied
+    ? [
         {
-          text: ignoreRestrictions.value
-            ? __(
-                "Members of this team will see the tickets assigned to this team only"
-              )
-            : __(
-                "Members of this team will be able to see the tickets assigned to all the teams"
-              ),
+          label: ignoreRestrictions.value
+            ? __("Access only this team's tickets")
+            : __("Access all team tickets"),
+          icon: markRaw(ignoreRestrictions.value ? LucideLock : LucideUnlock),
+          onClick: () => {
+            ignoreRestrictions.value = !ignoreRestrictions.value;
+            toast.success(
+              ignoreRestrictions.value
+                ? __("Team can now access all tickets.")
+                : __("Team will only see their own tickets.")
+            );
+          },
         },
-        {
-          default: () => [
-            //create a div with 2 columns, one for icon and one for label
-            h(
-              "div",
-              {
-                class:
-                  "flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 rounded",
-                onClick: () =>
-                  (ignoreRestrictions.value = !ignoreRestrictions.value),
-              },
-              [
-                h(team.doc?.ignore_restrictions ? LucideLock : LucideUnlock, {
-                  class: "h-4 w-4 text-gray-700",
-                  stroke: "currentColor",
-                  "aria-hidden": "true",
-                }),
-                h(
-                  "span",
-                  {
-                    class: "whitespace-nowrap text-ink-gray-7 text-p-base",
-                  },
-                  [
-                    team.doc?.ignore_restrictions
-                      ? __("Access only this team's tickets")
-                      : __("Access all team tickets"),
-                  ]
-                ),
-              ]
-            ),
-          ],
-        }
-      ),
-  },
+      ]
+    : []),
   {
     label: __("Delete"),
-    component: h(Button, {
-      label: __("Delete"),
-      variant: "ghost",
-      iconLeft: "trash-2",
-      theme: "red",
-      style: "width: 100%; justify-content: flex-start;",
-      onClick: () => {
-        showDelete.value = !showDelete.value;
-      },
-    }),
+    icon: "trash-2",
+    theme: "red",
+    onClick: () => (showDelete.value = !showDelete.value),
   },
-];
+]);
 
 const isConfirmingDelete = ref(false);
 
