@@ -97,7 +97,7 @@
         >
           <NumberChart
             :key="index"
-            class="border rounded-md"
+            class="border rounded-md min-h-[114px]"
             :config="config"
           />
         </Tooltip>
@@ -225,6 +225,18 @@ interface NumberCardData {
   tooltip: string;
 }
 
+type Filters = {
+  period: string;
+  agent: null | string;
+  team: null | string;
+};
+
+const filters = reactive<Filters>({
+  period: getLastXDays(),
+  agent: null,
+  team: null,
+});
+
 interface ChartData {
   data: ChartValues[];
   title: string;
@@ -303,12 +315,6 @@ const tabButtons = computed(() => {
   ];
 });
 
-const filters = reactive({
-  period: getLastXDays(),
-  agent: null,
-  team: null,
-});
-
 const hasAppliedFilter = computed(() => {
   return (
     filters.agent ||
@@ -326,31 +332,40 @@ const isEmpty = computed(() => {
   );
 });
 
+const parseFilters = (filters: Filters) => {
+  return {
+    from_date: filters.period?.split(",")[0] ?? null,
+    to_date: filters.period?.split(",")[1] ?? null,
+    team: filters.team,
+    agent: filters.agent,
+  };
+};
+
 const numberCards = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   cache: ["Analytics", "NumberCards"],
-  params: {
+  makeParams: () => ({
     dashboard_type: "number_card",
-    filters,
-  },
+    filters: parseFilters(filters),
+  }),
 });
 
 const masterData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   cache: ["Analytics", "MasterCharts"],
-  params: {
+  makeParams: () => ({
     dashboard_type: "master",
-    filters,
-  },
+    filters: parseFilters(filters),
+  }),
 });
 
 const trendData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   cache: ["Analytics", "TrendCharts"],
-  params: {
+  makeParams: () => ({
     dashboard_type: "trend",
-    filters,
-  },
+    filters: parseFilters(filters),
+  }),
 });
 
 const agentFilter = ref(null);
@@ -432,8 +447,8 @@ function getChartType(chart: any) {
 function getLastXDays(range: number = 30): string {
   const today = new Date();
   const lastXDate = new Date(today);
-  lastXDate.setDate(today.getDate() - range);
 
+  lastXDate.setDate(today.getDate() - range);
   return `${dayjs(lastXDate).format("YYYY-MM-DD")},${dayjs(today).format(
     "YYYY-MM-DD"
   )}`;
@@ -522,39 +537,10 @@ function formatRange(date: string) {
 
 watch(
   () => filters,
-  (newVal) => {
-    if (showDatePicker.value) {
-      return;
-    }
-    const filters = {
-      from_date: newVal.period?.split(",")[0] || null,
-      to_date: newVal.period?.split(",")[1] || null,
-      agent: newVal.agent || null,
-      team: newVal.team || null,
-    };
-
-    numberCards.update({
-      params: {
-        dashboard_type: "number_card",
-        filters: filters,
-      },
-    });
+  () => {
+    if (showDatePicker.value && !filters.period) return;
     numberCards.reload();
-
-    masterData.update({
-      params: {
-        dashboard_type: "master",
-        filters: filters,
-      },
-    });
     masterData.reload();
-
-    trendData.update({
-      params: {
-        dashboard_type: "trend",
-        filters: filters,
-      },
-    });
     trendData.reload();
   },
   { deep: true }

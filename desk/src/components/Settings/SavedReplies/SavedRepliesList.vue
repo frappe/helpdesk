@@ -51,9 +51,9 @@
               </template>
             </Button>
           </template>
-          <template #item="{ item }">
+          <template #item-label="{ item }">
             <button
-              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-3"
+              class="group flex text-ink-gray-6 gap-4 w-full justify-between items-center rounded text-base"
               @click="item.onSelect"
             >
               <div class="flex items-center justify-between flex-1">
@@ -74,7 +74,7 @@
     <template #content>
       <div
         v-if="savedRepliesListResource?.list?.loading"
-        class="flex items-center justify-center mt-12"
+        class="flex items-center justify-center my-auto"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -128,7 +128,7 @@
                   data: savedReply,
                 }
               "
-              class="w-full px-2 flex flex-col justify-center h-12.5 col-span-7"
+              class="w-full px-2 flex flex-col justify-center h-12.5 col-span-7 min-w-0"
             >
               <div
                 class="text-base text-ink-gray-7 font-medium w-full truncate"
@@ -137,7 +137,7 @@
               </div>
             </div>
             <div
-              class="flex items-center gap-1.5 text-sm text-ink-gray-7 truncate col-span-2"
+              class="flex items-center gap-1.5 text-sm text-ink-gray-7 col-span-2 min-w-0"
             >
               <Avatar
                 :label="
@@ -145,8 +145,11 @@
                 "
                 :image="getUser(savedReply.owner)?.user_image"
                 size="xs"
+                class="shrink-0"
               />
-              {{ getUser(savedReply.owner)?.full_name }}
+              <span class="truncate">{{
+                getUser(savedReply.owner)?.full_name
+              }}</span>
             </div>
             <div
               class="flex justify-between items-center w-full pr-2 col-span-3"

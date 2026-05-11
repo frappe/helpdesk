@@ -10,9 +10,7 @@
       <div class="flex flex-col gap-3 rounded-lg border w-full p-4">
         <div class="flex justify-between items-center mb-3">
           <!-- Author Info -->
-          <div
-            class="flex gap-1 items-center flex-1 mr-7 max-w-fit overflow-hidden"
-          >
+          <div class="flex gap-1 items-center flex-1 mr-7 max-w-fit">
             <UserAvatar :name="user.name" :expand="true" />
             <span>{{ __("in") }}</span>
             <Link

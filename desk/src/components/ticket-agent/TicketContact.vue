@@ -62,10 +62,10 @@ const ticket = inject(TicketSymbol)!;
 
 const contact = inject(TicketContactSymbol)!;
 const contactImage = computed(() => {
+  if (!contact.value?.data) return "";
+  const email = contact.value?.data?.email_id ?? "";
   return (
-    contact.value?.data?.image ||
-    getUser(contact.value?.data?.email_id)?.user_image ||
-    null
+    contact.value?.data?.image || (email && getUser(email)?.user_image) || ""
   );
 });
 

@@ -828,3 +828,14 @@ if (typeof window !== "undefined") {
     attributeFilter: ["data-theme"],
   });
 }
+
+export function buildPercentageChange(value: number | null) {
+  if (value === null || value === undefined) {
+    return { icon: "arrow-right", value: "0", color: "text-ink-gray-5" };
+  }
+  return {
+    icon: value > 0 ? "arrow-up-right" : value < 0 ? "arrow-down-left" : "arrow-right",
+    value: value > 0 ? `+${value}` : value,
+    color: value > 0 ? "text-ink-red-4" : value < 0 ? "text-ink-green-3" : "text-ink-gray-5",
+  };
+}
