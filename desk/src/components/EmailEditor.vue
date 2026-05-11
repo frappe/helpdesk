@@ -308,18 +308,6 @@ const userResource = createResource({
   url: "helpdesk.api.auth.get_current_user_email_info",
   cache: "current-user-email-info",
   auto: true,
-  onSuccess: (data: { email_signature?: string }) => {
-    if (data.email_signature) {
-      emailSignature.value = `<br>${data.email_signature}`;
-      if (isContentEmpty(newEmail.value) && !quotedContent.value) {
-        newEmail.value = emailSignature.value;
-        focusEditorAtStart();
-      }
-      if (isOnlySignature(cachedEmail.value)) {
-        cachedEmail.value = null;
-      }
-    }
-  },
 });
 
 watch(newEmail, (newValue, oldValue) => {
@@ -351,6 +339,22 @@ watch(quotedContent, (newVal, oldVal) => {
     });
   }
 });
+
+watch(
+  () => userResource.data,
+  (data: { email_signature?: string } | null) => {
+    if (!data?.email_signature) return;
+    emailSignature.value = `<br>${data.email_signature}`;
+    if (isOnlySignature(cachedEmail.value)) {
+      cachedEmail.value = null;
+    }
+    if (isContentEmpty(newEmail.value) && !quotedContent.value) {
+      newEmail.value = emailSignature.value;
+      focusEditorAtStart();
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   if (quotedContent.value) {
@@ -605,12 +609,6 @@ function handleKeydown(e: KeyboardEvent) {
     return;
   }
 }
-
-watch(emailSignature, (sig) => {
-  if (sig && isContentEmpty(newEmail.value)) {
-    newEmail.value = sig;
-  }
-});
 
 onBeforeUnmount(() => {
   cleanup();
