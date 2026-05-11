@@ -8,7 +8,6 @@ from helpdesk.test_utils import make_agent, make_team, make_ticket
 
 
 class TestHDTeam(FrappeTestCase):
-
     def test_assignment_rule_created_on_team_insert(self):
         team = make_team("Test AR Creation")
         self.assertTrue(team.assignment_rule)
@@ -111,3 +110,22 @@ class TestHDTeam(FrappeTestCase):
         self.assertIn(agent1, ar_weighted)
         self.assertIn(agent3, ar_weighted)
         self.assertNotIn(agent2, ar_weighted)
+
+    def test_assignment_rule_enabled_disabled(self):
+        team = make_team("Test AR Enable Disable")
+        ar = frappe.get_doc("Assignment Rule", team.assignment_rule)
+        self.assertFalse(ar.disabled)
+
+        team.disabled = True
+        team.save(ignore_permissions=True)
+        ar.reload()
+        self.assertTrue(ar.disabled)
+
+        team.disabled = False
+        team.save(ignore_permissions=True)
+        ar.reload()
+        self.assertFalse(ar.disabled)
+
+        team2 = make_team("Test AR Enable Disable 2", disabled=True)
+        ar2 = frappe.get_doc("Assignment Rule", team2.assignment_rule)
+        self.assertTrue(ar2.disabled)

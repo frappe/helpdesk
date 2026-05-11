@@ -29,7 +29,7 @@ const teamsSearchQuery = ref("");
 const teams = createListResource({
   doctype: "HD Team",
   cache: ["Teams"],
-  fields: ["name"],
+  fields: ["name", "disabled"],
   auto: true,
   orderBy: "modified desc",
   start: 0,

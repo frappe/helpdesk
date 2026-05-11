@@ -5,11 +5,13 @@ from helpdesk.utils import is_json_valid
 
 
 def on_assignment_rule_trash(doc, event):
+    if doc.document_type != "HD Ticket" or doc.disabled:
+        return
     if not frappe.get_all(
         "Assignment Rule",
         filters={"document_type": "HD Ticket", "name": ["!=", doc.name]},
     ):
-        frappe.throw("There should atleast be 1 assignment rule for ticket")
+        frappe.throw(_("There should atleast be 1 assignment rule for ticket"))
 
 
 def on_assignment_rule_validate(doc, event):
@@ -36,6 +38,8 @@ def validate_users(doc):
     """
     When AR's users or weighted_users change, show a message if the AR is linked to a team and the user is not part of the team.
     """
+    if doc.document_type != "HD Ticket" or doc.disabled:
+        return
     team_name = frappe.db.get_value("HD Team", {"assignment_rule": doc.name}, "name")
     if not team_name:
         return
