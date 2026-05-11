@@ -164,6 +164,7 @@ import { useScreenSize } from "@/composables/screen";
 import {
   Autocomplete,
   Button,
+  Combobox,
   DatePicker,
   DateRangePicker,
   DateTimePicker,
@@ -357,8 +358,11 @@ function getValueControl(f) {
       ],
     });
   } else if (operator == "timespan") {
-    return h(Autocomplete, {
+    return h(Combobox, {
       options: timespanOptions,
+      trigger: "button",
+      modelValue: f.value,
+      "onUpdate:modelValue": (v) => updateValue(v, f),
     });
   } else if (["like", "not like", "in", "not in"].includes(operator)) {
     return h(FormControl, { type: "text" });
