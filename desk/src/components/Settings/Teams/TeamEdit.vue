@@ -15,13 +15,21 @@
       </div>
     </template>
     <template #header-actions>
-      <Dropdown placement="right" :options="options">
-        <Button variant="ghost">
-          <template #icon>
-            <LucideMoreHorizontal class="h-4 w-4" />
-          </template>
-        </Button>
-      </Dropdown>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center justify-between gap-2 cursor-pointer">
+          <Switch v-model="teamEnabled" />
+          <span class="text-sm text-ink-gray-7 font-medium">
+            {{ __("Enabled") }}
+          </span>
+        </div>
+        <Dropdown placement="right" :options="options">
+          <Button variant="ghost">
+            <template #icon>
+              <LucideMoreHorizontal class="h-4 w-4" />
+            </template>
+          </Button>
+        </Dropdown>
+      </div>
     </template>
     <template #header-bottom>
       <!-- Add member -->
@@ -151,6 +159,7 @@ import {
   createResource,
   Dialog,
   Dropdown,
+  Switch,
   toast,
   Tooltip,
 } from "frappe-ui";
@@ -189,6 +198,31 @@ const team = createDocumentResource({
       toast.success(__("Team deleted successfully."));
       emit("update:step", "team-list");
     },
+  },
+});
+
+const teamEnabled = computed({
+  get() {
+    return !team.doc?.disabled;
+  },
+  set(value: boolean) {
+    if (!team.doc) return;
+    team.doc.disabled = !value;
+    team.setValue.submit(
+      {
+        disabled: !value,
+      },
+      {
+        onSuccess: () => {
+          toast.success(
+            value
+              ? __("Team enabled successfully.")
+              : __("Team disabled successfully.")
+          );
+          team.reload();
+        },
+      }
+    );
   },
 });
 

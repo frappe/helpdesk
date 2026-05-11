@@ -301,7 +301,7 @@ def add_comment(
     return comment
 
 
-def make_team(team_name, members=[]):
+def make_team(team_name, members=[], disabled=False):
     """Create an HD Team with optional members. A default agent is created if no members are provided."""
     if not members:
         members = [make_agent("default_team_agent@example.com")]
