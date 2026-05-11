@@ -3341,12 +3341,7 @@ msgstr ""
 msgid "No assignment rule found"
 msgstr ""
 
-<<<<<<< HEAD
-
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:34
-=======
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:101
->>>>>>> b909a6f6 (chore: update POT file)
 msgid "No average metrics"
 msgstr ""
 
