@@ -19,12 +19,13 @@
             {{ __("Role") }}
             <span class="text-ink-red-3 select-none" aria-hidden="true">*</span>
           </label>
-          <Select
-            :options="roleOptions"
-            v-model="role"
-            required
-            class="w-full"
-          />
+          <Select :options="roleOptions" v-model="role" required class="w-full">
+            <template #suffix>
+              <LucideChevronDown
+                class="size-4 shrink-0 text-ink-gray-4 ml-auto"
+              />
+            </template>
+          </Select>
           <p class="text-p-xs text-ink-gray-5">{{ roleDescription }}</p>
         </div>
         <Button
@@ -113,6 +114,7 @@ import {
 } from "frappe-ui";
 import { computed, ref } from "vue";
 import { useOnboarding } from "frappe-ui/frappe";
+import LucideChevronDown from "~icons/lucide/chevron-down";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
