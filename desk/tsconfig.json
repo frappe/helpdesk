@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
 		"allowSyntheticDefaultImports": true,
+		"allowUnreachableCode": true,
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"]
@@ -9,6 +10,17 @@
 			"unplugin-icons/types/vue",
 			"vite/client"
 		],
+<<<<<<< HEAD
+=======
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"allowUnusedLabels": false,
+		"noUncheckedSideEffectImports": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true
+
+>>>>>>> ab34c77b (chore: update ts_config)
 	},
 	"extends":"frappe-ui/tsconfig.base.json",
 	"include": ["src","src/*","src/**/*.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx","src/**/*.vue"],
