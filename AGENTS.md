@@ -228,6 +228,48 @@ apiCall.submit({ ticket_id: "<id>", agent_id: "<agent>" });
 - Use proper field types and validation in DocType definitions
 - Leverage DocType methods for business logic encapsulation
 
+## Controller Code Structure
+
+All controller logic must follow this structure strictly:
+
+**Rule: Lifecycle hooks call methods. Methods are defined below on the class. Nothing goes outside the class except `@frappe.whitelist()` API functions.**
+
+```python
+class HDFoo(Document):
+    # 1. Lifecycle hooks at the top — each hook calls methods, no inline logic
+    def after_insert(self):
+        self.do_a()
+        self.do_b()
+
+    def on_update(self):
+        self.do_a()
+
+    # 2. Methods below — one responsibility each
+    def do_a(self):
+        pass
+
+    def do_b(self):
+        pass
+
+
+```
+
+**Rules:**
+
+- Lifecycle hooks (`after_insert`, `on_update`, `before_save`, `on_trash`, `after_rename`, etc.) contain **no inline logic** — they only call `self.method()`.
+- All logic lives in methods on the class, not in module-level helper functions.
+- Methods that mutate a related document (e.g. an Assignment Rule) receive that doc as an argument and mutate it in memory. The **caller** is responsible for the final `doc.save()` — this keeps saves to a minimum (one save per hook).
+- Never fetch the same document twice in one hook. Fetch once, pass the doc through the call chain.
+- `@staticmethod` is allowed for pure transformations (e.g. building a condition string) that don't touch `self` or any Frappe doc.
+
+**Save discipline:**
+
+- Mutate all fields on a document before calling `.save()` once.
+- Never call `.save()` inside a helper method — save in the hook or the method that owns the full mutation.
+- Exception: if a method truly owns a complete document lifecycle (e.g. `create_assignment_rule` creates and fully initialises a new doc), it may save internally.
+Take inspiration from "helpdesk.doctype.hd_team.hd_team.HDTeam" and its test file for examples of this pattern in practice.
+```
+
 ## Conventions & Patterns
 
 - **API Design:** Python modules in `helpdesk/api/` follow RESTful patterns. Extend via `helpdesk/extends/`.
