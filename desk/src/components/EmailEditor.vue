@@ -92,9 +92,14 @@
     </template>
 
     <template #editor>
-      <div class="overflow-y-auto min-h-[7rem] max-h-[30vh]">
-        <EditorContent :editor="editor" />
-        <div v-if="quotedContent" class="replied-content mx-6 md:mx-5 mb-2">
+      <div class="overflow-y-auto min-h-[7rem] max-h-[30vh] flex flex-col">
+        <div class="flex-1">
+          <EditorContent :editor="editor" />
+        </div>
+        <div
+          v-if="quotedContent"
+          class="replied-content mx-6 md:mx-5 mb-2 mt-auto"
+        >
           <label class="collapse" for="quoted-toggle">...</label>
           <input
             id="quoted-toggle"
