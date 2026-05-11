@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-05-03 10:46+0000\n"
-"PO-Revision-Date: 2026-05-04 05:15\n"
+"POT-Creation-Date: 2026-05-10 10:49+0000\n"
+"PO-Revision-Date: 2026-05-11 05:53\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Esperanto\n"
 "MIME-Version: 1.0\n"
@@ -56,6 +56,22 @@ msgstr "crwdns159024:0{0}crwdne159024:0"
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "0 is no feedback, 1 is Like, 2 is Dislike"
 msgstr "crwdns157504:0crwdne157504:0"
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:174
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:192
+msgid "1 Year"
+msgstr "crwdns201725:0crwdne201725:0"
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:172
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:184
+msgid "3 Months"
+msgstr "crwdns201727:0crwdne201727:0"
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:173
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:179
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:188
+msgid "6 Months"
+msgstr "crwdns201729:0crwdne201729:0"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:117
 msgid "<br>Please update HD Settings to use a different status before disabling this status."
@@ -172,7 +188,7 @@ msgstr "crwdns195214:0crwdne195214:0"
 msgid "Add Weekly Holidays"
 msgstr "crwdns157520:0crwdne157520:0"
 
-#: desk/src/components/layouts/Sidebar.vue:481
+#: desk/src/components/layouts/Sidebar.vue:483
 msgid "Add a comment on a ticket"
 msgstr "crwdns195218:0crwdne195218:0"
 
@@ -279,7 +295,7 @@ msgstr "crwdns157530:0crwdne157530:0"
 msgid "Agent Configuration"
 msgstr "crwdns157532:0crwdne157532:0"
 
-#: desk/src/pages/dashboard/Dashboard.vue:242
+#: desk/src/pages/dashboard/Dashboard.vue:254
 msgid "Agent Dashboard"
 msgstr "crwdns199668:0crwdne199668:0"
 
@@ -331,13 +347,13 @@ msgstr "crwdns195222:0crwdne195222:0"
 msgid "All"
 msgstr "crwdns157540:0crwdne157540:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:231
+#: desk/src/pages/home/components/PendingTickets.vue:242
 msgid "All SLAs on track"
 msgstr "crwdns199376:0crwdne199376:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:285
-#: desk/src/pages/home/components/RecentFeedback.vue:314
-#: desk/src/pages/home/components/RecentFeedback.vue:321
+#: desk/src/pages/home/components/RecentFeedback.vue:349
+#: desk/src/pages/home/components/RecentFeedback.vue:387
+#: desk/src/pages/home/components/RecentFeedback.vue:395
 msgid "All Time"
 msgstr "crwdns199378:0crwdne199378:0"
 
@@ -353,7 +369,7 @@ msgstr "crwdns195226:0crwdne195226:0"
 msgid "All comments and emails of the ticket will be moved to the"
 msgstr "crwdns199672:0crwdne199672:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:240
+#: desk/src/pages/home/components/PendingTickets.vue:251
 msgid "All your assigned tickets have been responded to"
 msgstr "crwdns199380:0crwdne199380:0"
 
@@ -732,9 +748,9 @@ msgstr "crwdns199390:0crwdne199390:0"
 msgid "Average feedback rating per day is around {0} stars"
 msgstr "crwdns160522:0{0}crwdne160522:0"
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:37
-msgid "Average response and resolution metrics not yet generated"
-msgstr "crwdns199392:0crwdne199392:0"
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:103
+msgid "Average response and resolution metrics not available"
+msgstr "crwdns201731:0crwdne201731:0"
 
 #: helpdesk/api/dashboard.py:286
 msgid "Average tickets per day is around {0}"
@@ -756,13 +772,13 @@ msgstr "crwdns160530:0crwdne160530:0"
 msgid "Avg. feedback rating for the tickets resolved"
 msgstr "crwdns160532:0crwdne160532:0"
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:49
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:148
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:117
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:279
 msgid "Avg. first response time"
 msgstr "crwdns199394:0crwdne199394:0"
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:58
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:156
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:126
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:287
 msgid "Avg. resolution time"
 msgstr "crwdns199396:0crwdne199396:0"
 
@@ -899,7 +915,7 @@ msgstr "crwdns161600:0crwdne161600:0"
 msgid "Canceled"
 msgstr "crwdns195282:0crwdne195282:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:513
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:514
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr "crwdns157602:0crwdne157602:0"
 
@@ -1294,15 +1310,15 @@ msgstr "crwdns157642:0{0}crwdne157642:0"
 #: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
-#: desk/src/components/layouts/Sidebar.vue:517
+#: desk/src/components/layouts/Sidebar.vue:520
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
 #: desk/src/pages/knowledge-base/NewArticle.vue:31
 msgid "Create"
 msgstr "crwdns161636:0crwdne161636:0"
 
-#: desk/src/components/layouts/Sidebar.vue:510
-#: desk/src/components/layouts/Sidebar.vue:516
+#: desk/src/components/layouts/Sidebar.vue:513
+#: desk/src/components/layouts/Sidebar.vue:519
 msgid "Create & invite a contact"
 msgstr "crwdns195334:0crwdne195334:0"
 
@@ -1318,7 +1334,7 @@ msgstr "crwdns195338:0crwdne195338:0"
 msgid "Create a ticket"
 msgstr "crwdns195340:0crwdne195340:0"
 
-#: desk/src/components/layouts/Sidebar.vue:493
+#: desk/src/components/layouts/Sidebar.vue:496
 msgid "Create an article"
 msgstr "crwdns195342:0crwdne195342:0"
 
@@ -1350,8 +1366,12 @@ msgstr "crwdns157644:0crwdne157644:0"
 msgid "Custom Outside Working Hours Message"
 msgstr "crwdns195344:0crwdne195344:0"
 
-#: desk/src/pages/dashboard/Dashboard.vue:489
-#: desk/src/pages/dashboard/Dashboard.vue:495
+#: desk/src/pages/dashboard/Dashboard.vue:504
+#: desk/src/pages/dashboard/Dashboard.vue:510
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:175
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:196
+#: desk/src/pages/home/components/RecentFeedback.vue:365
+#: desk/src/pages/home/components/RecentFeedback.vue:391
 msgid "Custom Range"
 msgstr "crwdns195346:0crwdne195346:0"
 
@@ -1393,7 +1413,7 @@ msgstr "crwdns159058:0crwdne159058:0"
 msgid "Danger"
 msgstr "crwdns195350:0crwdne195350:0"
 
-#: desk/src/pages/dashboard/Dashboard.vue:576
+#: desk/src/pages/dashboard/Dashboard.vue:562
 msgid "Dashboard"
 msgstr "crwdns195352:0crwdne195352:0"
 
@@ -1932,7 +1952,7 @@ msgstr "crwdns199770:0crwdne199770:0"
 msgid "Expand"
 msgstr "crwdns195414:0crwdne195414:0"
 
-#: desk/src/components/layouts/Sidebar.vue:530
+#: desk/src/components/layouts/Sidebar.vue:533
 msgid "Explore customer portal"
 msgstr "crwdns195416:0crwdne195416:0"
 
@@ -2020,7 +2040,7 @@ msgstr "crwdns161702:0crwdne161702:0"
 #. Label of the feedback (Select) field in DocType 'HD Article Feedback'
 #. Label of the feedback_section (Section Break) field in DocType 'HD Settings'
 #. Label of the feedback_tab (Tab Break) field in DocType 'HD Ticket'
-#: desk/src/pages/home/components/RecentFeedback.vue:156
+#: desk/src/pages/home/components/RecentFeedback.vue:195
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2193,7 +2213,7 @@ msgid "Fulfilled"
 msgstr "crwdns157748:0crwdne157748:0"
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/layouts/Sidebar.vue:501
+#: desk/src/components/layouts/Sidebar.vue:504
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
 msgstr "crwdns161718:0crwdne161718:0"
@@ -2234,7 +2254,7 @@ msgstr "crwdns195430:0#{0}crwdne195430:0"
 msgid "Gray"
 msgstr "crwdns159070:0crwdne159070:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:232
+#: desk/src/pages/home/components/PendingTickets.vue:243
 msgid "Great! All your tickets are within SLA"
 msgstr "crwdns199404:0crwdne199404:0"
 
@@ -2847,8 +2867,8 @@ msgstr "crwdns161742:0crwdne161742:0"
 msgid "Last"
 msgstr "crwdns158460:0crwdne158460:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:297
-#: desk/src/pages/home/components/RecentFeedback.vue:317
+#: desk/src/pages/home/components/RecentFeedback.vue:361
+#: desk/src/pages/home/components/RecentFeedback.vue:390
 msgid "Last 3 Months"
 msgstr "crwdns199422:0crwdne199422:0"
 
@@ -2858,25 +2878,25 @@ msgstr "crwdns199422:0crwdne199422:0"
 msgid "Last 3 months"
 msgstr "crwdns199424:0crwdne199424:0"
 
-#: desk/src/pages/dashboard/Dashboard.vue:444
-#: desk/src/pages/dashboard/Dashboard.vue:466
-#: desk/src/pages/dashboard/Dashboard.vue:468
-#: desk/src/pages/dashboard/Dashboard.vue:504
+#: desk/src/pages/dashboard/Dashboard.vue:459
+#: desk/src/pages/dashboard/Dashboard.vue:481
+#: desk/src/pages/dashboard/Dashboard.vue:483
+#: desk/src/pages/dashboard/Dashboard.vue:519
 msgid "Last 30 Days"
 msgstr "crwdns195464:0crwdne195464:0"
 
-#: desk/src/pages/dashboard/Dashboard.vue:473
-#: desk/src/pages/dashboard/Dashboard.vue:475
+#: desk/src/pages/dashboard/Dashboard.vue:488
+#: desk/src/pages/dashboard/Dashboard.vue:490
 msgid "Last 60 Days"
 msgstr "crwdns195466:0crwdne195466:0"
 
-#: desk/src/pages/dashboard/Dashboard.vue:459
-#: desk/src/pages/dashboard/Dashboard.vue:461
+#: desk/src/pages/dashboard/Dashboard.vue:474
+#: desk/src/pages/dashboard/Dashboard.vue:476
 msgid "Last 7 Days"
 msgstr "crwdns195468:0crwdne195468:0"
 
-#: desk/src/pages/dashboard/Dashboard.vue:480
-#: desk/src/pages/dashboard/Dashboard.vue:482
+#: desk/src/pages/dashboard/Dashboard.vue:495
+#: desk/src/pages/dashboard/Dashboard.vue:497
 msgid "Last 90 Days"
 msgstr "crwdns195470:0crwdne195470:0"
 
@@ -2890,8 +2910,8 @@ msgstr "crwdns195472:0crwdne195472:0"
 msgid "Last Customer Response"
 msgstr "crwdns195474:0crwdne195474:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:293
-#: desk/src/pages/home/components/RecentFeedback.vue:316
+#: desk/src/pages/home/components/RecentFeedback.vue:357
+#: desk/src/pages/home/components/RecentFeedback.vue:389
 msgid "Last Month"
 msgstr "crwdns199426:0crwdne199426:0"
 
@@ -2899,12 +2919,12 @@ msgstr "crwdns199426:0crwdne199426:0"
 msgid "Last Name"
 msgstr "crwdns161746:0crwdne161746:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:289
-#: desk/src/pages/home/components/RecentFeedback.vue:315
+#: desk/src/pages/home/components/RecentFeedback.vue:353
+#: desk/src/pages/home/components/RecentFeedback.vue:388
 msgid "Last Week"
 msgstr "crwdns199428:0crwdne199428:0"
 
-#: desk/src/pages/home/components/AgentTicketsCard.vue:34
+#: desk/src/pages/home/components/AgentTicketsCard.vue:35
 #: desk/src/pages/home/components/AvgTimeCard.vue:50
 #: desk/src/pages/home/components/CardBase.vue:80
 #: desk/src/pages/home/components/CardBase.vue:99
@@ -3130,7 +3150,7 @@ msgstr "crwdns157928:0crwdne157928:0"
 msgid "Move To"
 msgstr "crwdns195506:0crwdne195506:0"
 
-#: desk/src/pages/dashboard/Dashboard.vue:243
+#: desk/src/pages/dashboard/Dashboard.vue:255
 msgid "My Dashboard"
 msgstr "crwdns199810:0crwdne199810:0"
 
@@ -3178,8 +3198,8 @@ msgstr "crwdns159088:0crwdne159088:0"
 msgid "Navigation"
 msgstr "crwdns195510:0crwdne195510:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:308
-#: desk/src/pages/home/components/RecentFeedback.vue:325
+#: desk/src/pages/home/components/RecentFeedback.vue:381
+#: desk/src/pages/home/components/RecentFeedback.vue:399
 msgid "Negative first"
 msgstr "crwdns199440:0crwdne199440:0"
 
@@ -3304,7 +3324,7 @@ msgstr "crwdns161794:0crwdne161794:0"
 msgid "No Team"
 msgstr "crwdns160540:0crwdne160540:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:163
+#: desk/src/pages/home/components/RecentFeedback.vue:202
 msgid "No additional comments"
 msgstr "crwdns199442:0crwdne199442:0"
 
@@ -3328,7 +3348,7 @@ msgstr "crwdns199816:0crwdne199816:0"
 msgid "No assignment rule found"
 msgstr "crwdns161798:0crwdne161798:0"
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:34
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:101
 msgid "No average metrics"
 msgstr "crwdns199444:0crwdne199444:0"
 
@@ -3360,7 +3380,7 @@ msgstr "crwdns199822:0crwdne199822:0"
 msgid "No email account found"
 msgstr "crwdns161802:0crwdne161802:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:211
+#: desk/src/pages/home/components/RecentFeedback.vue:273
 msgid "No feedback"
 msgstr "crwdns199448:0crwdne199448:0"
 
@@ -3376,9 +3396,9 @@ msgstr "crwdns161806:0crwdne161806:0"
 msgid "No new notifications"
 msgstr "crwdns195544:0crwdne195544:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:236
-msgid "No new tickets assigned to you in the last 24 hours"
-msgstr "crwdns199450:0crwdne199450:0"
+#: desk/src/pages/home/components/PendingTickets.vue:247
+msgid "No new tickets assigned to you in the last 7 days"
+msgstr "crwdns201733:0crwdne201733:0"
 
 #: desk/src/components/ticket-agent/TicketNavigation.vue:22
 msgid "No next ticket"
@@ -3388,7 +3408,7 @@ msgstr "crwdns199824:0crwdne199824:0"
 msgid "No one"
 msgstr "crwdns200644:0crwdne200644:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:239
+#: desk/src/pages/home/components/PendingTickets.vue:250
 msgid "No pending tickets"
 msgstr "crwdns199452:0crwdne199452:0"
 
@@ -3400,7 +3420,7 @@ msgstr "crwdns199826:0crwdne199826:0"
 msgid "No reason"
 msgstr "crwdns199454:0crwdne199454:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:235
+#: desk/src/pages/home/components/PendingTickets.vue:246
 msgid "No recently assigned tickets"
 msgstr "crwdns199456:0crwdne199456:0"
 
@@ -3557,7 +3577,7 @@ msgstr "crwdns159098:0crwdne159098:0"
 msgid "Order By"
 msgstr "crwdns157952:0crwdne157952:0"
 
-#: desk/src/pages/dashboard/Dashboard.vue:243
+#: desk/src/pages/dashboard/Dashboard.vue:255
 msgid "Organization Dashboard"
 msgstr "crwdns199838:0crwdne199838:0"
 
@@ -3626,7 +3646,7 @@ msgstr "crwdns161822:0crwdne161822:0"
 msgid "Paused"
 msgstr "crwdns157956:0crwdne157956:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:200
+#: desk/src/pages/home/components/PendingTickets.vue:211
 msgid "Pending"
 msgstr "crwdns199460:0crwdne199460:0"
 
@@ -3635,8 +3655,8 @@ msgid "Pending Invites"
 msgstr "crwdns161824:0crwdne161824:0"
 
 #: desk/src/pages/home/Home.vue:353
-#: desk/src/pages/home/components/PendingTickets.vue:212
-#: desk/src/pages/home/components/PendingTickets.vue:216
+#: desk/src/pages/home/components/PendingTickets.vue:223
+#: desk/src/pages/home/components/PendingTickets.vue:227
 msgid "Pending Tickets"
 msgstr "crwdns199462:0crwdne199462:0"
 
@@ -3709,7 +3729,7 @@ msgstr "crwdns157960:0crwdne157960:0"
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
 msgstr "crwdns157962:0crwdne157962:0"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:328
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:329
 msgid "Please add {0} priority in {1} SLA"
 msgstr "crwdns157964:0{0}crwdnd157964:0{1}crwdne157964:0"
 
@@ -3765,9 +3785,9 @@ msgstr "crwdns157966:0crwdne157966:0"
 msgid "Policy name"
 msgstr "crwdns199860:0crwdne199860:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:304
-#: desk/src/pages/home/components/RecentFeedback.vue:326
-#: desk/src/pages/home/components/RecentFeedback.vue:330
+#: desk/src/pages/home/components/RecentFeedback.vue:377
+#: desk/src/pages/home/components/RecentFeedback.vue:400
+#: desk/src/pages/home/components/RecentFeedback.vue:404
 msgid "Positive first"
 msgstr "crwdns199464:0crwdne199464:0"
 
@@ -3800,7 +3820,7 @@ msgstr "crwdns157974:0crwdne157974:0"
 msgid "Prefer knowledge base"
 msgstr "crwdns157976:0crwdne157976:0"
 
-#: desk/src/pages/dashboard/Dashboard.vue:448
+#: desk/src/pages/dashboard/Dashboard.vue:463
 msgid "Presets"
 msgstr "crwdns195590:0crwdne195590:0"
 
@@ -3871,7 +3891,7 @@ msgstr "crwdns195600:0crwdne195600:0"
 msgid "Profile"
 msgstr "crwdns161840:0crwdne161840:0"
 
-#: desk/src/components/Settings/Profile/Profile.vue:262
+#: desk/src/components/Settings/Profile/Profile.vue:270
 msgid "Profile Updated Successfully"
 msgstr "crwdns200684:0crwdne200684:0"
 
@@ -3988,11 +4008,11 @@ msgstr "crwdns158010:0crwdne158010:0"
 msgid "Reason"
 msgstr "crwdns199466:0crwdne199466:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:204
+#: desk/src/pages/home/components/PendingTickets.vue:215
 msgid "Recent"
 msgstr "crwdns199468:0crwdne199468:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:211
+#: desk/src/pages/home/components/PendingTickets.vue:222
 msgid "Recent Tickets"
 msgstr "crwdns199470:0crwdne199470:0"
 
@@ -4117,7 +4137,7 @@ msgstr "crwdns161864:0crwdne161864:0"
 msgid "Reply from contact"
 msgstr "crwdns161866:0crwdne161866:0"
 
-#: desk/src/components/layouts/Sidebar.vue:469
+#: desk/src/components/layouts/Sidebar.vue:470
 msgid "Reply on a ticket"
 msgstr "crwdns195614:0crwdne195614:0"
 
@@ -4293,13 +4313,13 @@ msgstr "crwdns158066:0crwdne158066:0"
 
 #. Label of the sla (Link) field in DocType 'HD Ticket'
 #. Label of the sla_tab (Tab Break) field in DocType 'HD Ticket'
+#: desk/src/pages/home/components/PendingTickets.vue:207
 #: desk/src/pages/ticket/MobileTicketAgent.vue:74
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA"
 msgstr "crwdns158068:0crwdne158068:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:196
-#: desk/src/pages/home/components/PendingTickets.vue:210
+#: desk/src/pages/home/components/PendingTickets.vue:221
 msgid "SLA Alerts"
 msgstr "crwdns199476:0crwdne199476:0"
 
@@ -4496,7 +4516,7 @@ msgstr "crwdns195648:0crwdne195648:0"
 msgid "Searching..."
 msgstr "crwdns195650:0crwdne195650:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:138
+#: desk/src/pages/home/components/PendingTickets.vue:136
 msgid "See all {0} tickets"
 msgstr "crwdns199478:0{0}crwdne199478:0"
 
@@ -4523,6 +4543,11 @@ msgstr "crwdns158090:0crwdne158090:0"
 #: desk/src/pages/ticket/TicketFeedback.vue:28
 msgid "Select a rating"
 msgstr "crwdns195658:0crwdne195658:0"
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:34
+#: desk/src/pages/home/components/RecentFeedback.vue:148
+msgid "Select range"
+msgstr "crwdns201735:0crwdne201735:0"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:104
 msgid "Select teams"
@@ -4678,6 +4703,10 @@ msgstr "crwdns199480:0crwdne199480:0"
 #: desk/src/components/modals/ShortcutsModal.vue:83
 msgid "Show keyboard shortcuts"
 msgstr "crwdns195674:0crwdne195674:0"
+
+#: desk/src/pages/home/components/PendingTickets.vue:143
+msgid "Showing {0} of {1} {2}"
+msgstr "crwdns201737:0{0}crwdnd201737:0{1}crwdnd201737:0{2}crwdne201737:0"
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:37
 msgid "Signature"
@@ -5322,13 +5351,13 @@ msgstr "crwdns158224:0crwdne158224:0"
 msgid "Tickets"
 msgstr "crwdns160556:0crwdne160556:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:220
+#: desk/src/pages/home/components/PendingTickets.vue:231
 msgid "Tickets approaching or breached SLA"
 msgstr "crwdns199484:0crwdne199484:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:221
-msgid "Tickets assigned to you in the last 24 hours"
-msgstr "crwdns199486:0crwdne199486:0"
+#: desk/src/pages/home/components/PendingTickets.vue:232
+msgid "Tickets assigned to you in the last 7 days"
+msgstr "crwdns201739:0crwdne201739:0"
 
 #: helpdesk/api/dashboard.py:553
 msgid "Tickets by Channel"
@@ -5354,7 +5383,7 @@ msgstr "crwdns158226:0crwdne158226:0"
 msgid "Tickets must meet the following conditions:"
 msgstr "crwdns199938:0crwdne199938:0"
 
-#: desk/src/pages/home/components/PendingTickets.vue:222
+#: desk/src/pages/home/components/PendingTickets.vue:233
 msgid "Tickets that are awaiting your response"
 msgstr "crwdns199488:0crwdne199488:0"
 
@@ -5418,8 +5447,8 @@ msgstr "crwdns195710:0crwdne195710:0"
 msgid "To know more about setting up email accounts, click"
 msgstr "crwdns161952:0crwdne161952:0"
 
-#: desk/src/pages/dashboard/Dashboard.vue:452
-#: desk/src/pages/dashboard/Dashboard.vue:454
+#: desk/src/pages/dashboard/Dashboard.vue:467
+#: desk/src/pages/dashboard/Dashboard.vue:469
 msgid "Today"
 msgstr "crwdns195712:0crwdne195712:0"
 
@@ -5802,10 +5831,6 @@ msgstr "crwdns199970:0crwdne199970:0"
 msgid "You have already provided feedback for this ticket."
 msgstr "crwdns158302:0crwdne158302:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:214
-msgid "You haven't received any feedback yet"
-msgstr "crwdns199490:0crwdne199490:0"
-
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:132
 msgid "You must set one SLA as Default. Please check the Default SLA option."
 msgstr "crwdns158304:0crwdne158304:0"
@@ -5814,7 +5839,7 @@ msgstr "crwdns158304:0crwdne158304:0"
 msgid "Your old conditions will be overwritten. Are you sure you want to save?"
 msgstr "crwdns161980:0crwdne161980:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:48
+#: desk/src/pages/home/components/RecentFeedback.vue:51
 msgid "Your performance is"
 msgstr "crwdns199492:0crwdne199492:0"
 
@@ -5826,7 +5851,7 @@ msgstr "crwdns195732:0crwdne195732:0"
 msgid "assignees"
 msgstr "crwdns200652:0crwdne200652:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:374
+#: desk/src/pages/home/components/RecentFeedback.vue:466
 msgid "average"
 msgstr "crwdns199494:0crwdne199494:0"
 
@@ -5854,7 +5879,7 @@ msgstr "crwdns195736:0crwdne195736:0"
 msgid "emails/ comments"
 msgstr "crwdns199972:0crwdne199972:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:370
+#: desk/src/pages/home/components/RecentFeedback.vue:462
 msgid "excellent"
 msgstr "crwdns199496:0crwdne199496:0"
 
@@ -5862,7 +5887,7 @@ msgstr "crwdns199496:0crwdne199496:0"
 msgid "from this email onwards will be moved to new ticket."
 msgstr "crwdns199974:0crwdne199974:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:372
+#: desk/src/pages/home/components/RecentFeedback.vue:464
 msgid "good"
 msgstr "crwdns199498:0crwdne199498:0"
 
@@ -5919,7 +5944,7 @@ msgstr "crwdns158310:0crwdne158310:0"
 msgid "mentioned you in ticket"
 msgstr "crwdns195742:0crwdne195742:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:376
+#: desk/src/pages/home/components/RecentFeedback.vue:468
 msgid "poor"
 msgstr "crwdns199500:0crwdne199500:0"
 
@@ -5941,6 +5966,10 @@ msgstr "crwdns199980:0crwdne199980:0"
 msgid "synonym"
 msgstr "crwdns158312:0crwdne158312:0"
 
+#: desk/src/pages/home/components/PendingTickets.vue:147
+msgid "ticket"
+msgstr "crwdns201741:0crwdne201741:0"
+
 #: desk/src/pages/ticket/MobileTicketAgent.vue:525
 msgid "viewed this"
 msgstr "crwdns195744:0crwdne195744:0"
@@ -5949,7 +5978,7 @@ msgstr "crwdns195744:0crwdne195744:0"
 msgid "{0} matches"
 msgstr "crwdns196018:0{0}crwdne196018:0"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:43
+#: desk/src/pages/home/components/RecentFeedback.vue:46
 msgid "{0} reviews"
 msgstr "crwdns199502:0{0}crwdne199502:0"
 
