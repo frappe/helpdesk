@@ -219,7 +219,7 @@ apiCall.submit({ ticket_id: "<id>", agent_id: "<agent>" });
 
 All controller logic must follow this structure strictly:
 
-**Rule: Lifecycle hooks call methods. Methods are defined below on the class. Nothing goes outside the class except `@frappe.whitelist()` API functions.**
+**Rule: Lifecycle hooks call methods. Methods are defined below on the class.**
 
 ```python
 class HDFoo(Document):
@@ -254,7 +254,7 @@ class HDFoo(Document):
 - Mutate all fields on a document before calling `.save()` once.
 - Never call `.save()` inside a helper method — save in the hook or the method that owns the full mutation.
 - Exception: if a method truly owns a complete document lifecycle (e.g. `create_assignment_rule` creates and fully initialises a new doc), it may save internally.
-Take inspiration from "helpdesk.doctype.hd_team.hd_team.HDTeam" and its test file for examples of this pattern in practice.
+Take inspiration from "helpdesk.doctype.hd_team.hd_team.HDTeam" for examples of this pattern in practice.
 ```
 
 ## Conventions & Patterns
