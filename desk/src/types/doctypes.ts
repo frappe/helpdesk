@@ -271,3 +271,23 @@ export interface HDAgent extends DocType {
   /** Image: Attach Image */
   user_image?: string;
 }
+
+// Last updated: 2022-12-22 18:52:50.658355
+export interface HDTeamMember extends ChildDocType {
+  /** User: Link (User) */
+  user?: string;
+}
+
+// Last updated: 2026-05-11 13:28:58.204342
+export interface HDTeam extends DocType {
+  /** Name: Data */
+  team_name: string;
+  /** Assignment Rule: Link (Assignment Rule) */
+  assignment_rule?: string;
+  /** Users: Table MultiSelect (HD Team Member) */
+  users: HDTeamMember[];
+  /** Ignore Restrictions: Check */
+  ignore_restrictions: 0 | 1;
+  /** Disabled: Check */
+  disabled: 0 | 1;
+}
