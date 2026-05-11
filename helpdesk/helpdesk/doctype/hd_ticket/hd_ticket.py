@@ -484,6 +484,17 @@ class HDTicket(Document):
 
         return bool(int(skip))
 
+    def _resolve_sender_email(self, email_account_name, from_email_id):
+        if not email_account_name:
+            sender_email = self.sender_email()
+            return sender_email, (sender_email.name if sender_email else None)
+
+        if not frappe.db.exists("Email Account", email_account_name):
+            frappe.throw(_("No Email Account found for {0}").format(from_email_id))
+
+        sender_email = frappe._dict(name=email_account_name, email_id=from_email_id)
+        return sender_email, email_account_name
+
     def instantly_send_email(self):
         check: str = (
             frappe.get_value("HD Settings", None, "instantly_send_email") or "0"
@@ -584,20 +595,12 @@ class HDTicket(Document):
 
         sender_email = None
         if not skip_email_workflow:
-            if email_account_name:
-                if not frappe.db.exists("Email Account", email_account_name):
-                    frappe.throw(
-                        _("No Email Account found for {0}").format(from_email_id)
-                    )
-                sender_email = frappe._dict(
-                    name=email_account_name, email_id=from_email_id
-                )
-            else:
-                sender_email = self.sender_email()
-                email_account_name = sender_email.name if sender_email else None
+            sender_email, email_account_name = self._resolve_sender_email(
+                email_account_name, from_email_id
+            )
+
         if recipients == "Administrator":
-            admin_email = frappe.get_value("User", "Administrator", "email")
-            recipients = admin_email
+            recipients = frappe.get_value("User", "Administrator", "email")
 
         communication = frappe.get_doc(
             {
