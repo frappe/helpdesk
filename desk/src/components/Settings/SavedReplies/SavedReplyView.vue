@@ -104,6 +104,7 @@
             v-model="savedReplyData.teams"
             :placeholder="__('Select teams')"
             @update:modelValue="validateData('teams')"
+            class="w-full"
           />
           <div class="text-xs text-ink-gray-5 cursor-default">
             {{ __("Restrict visibility to these teams") }}

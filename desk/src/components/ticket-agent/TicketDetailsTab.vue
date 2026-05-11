@@ -61,7 +61,7 @@
             </div>
           </template>
           <div
-            class="space-y-1.5 px-4 last:mb-2"
+            class="space-y-1.5 px-4 my-2"
             v-if="Boolean(customFields.length)"
           >
             <template v-for="field in customFields">
