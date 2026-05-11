@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-05-03 10:46+0000\n"
-"PO-Revision-Date: 2026-05-04 05:15\n"
+"POT-Creation-Date: 2026-05-10 10:49+0000\n"
+"PO-Revision-Date: 2026-05-11 05:53\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Bosnian\n"
 "MIME-Version: 1.0\n"
@@ -56,6 +56,22 @@ msgstr "- {0} kao Status Ponovnog Otvaranja<br>"
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "0 is no feedback, 1 is Like, 2 is Dislike"
 msgstr "0 znači nema povratnih informacija, 1 znači sviđa mi se, 2 znači ne sviđa mi se"
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:174
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:192
+msgid "1 Year"
+msgstr ""
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:172
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:184
+msgid "3 Months"
+msgstr ""
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:173
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:179
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:188
+msgid "6 Months"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:117
 msgid "<br>Please update HD Settings to use a different status before disabling this status."
@@ -172,7 +188,7 @@ msgstr "Dodaj novi Članak"
 msgid "Add Weekly Holidays"
 msgstr "Dodaj sedmične praznike"
 
-#: desk/src/components/layouts/Sidebar.vue:481
+#: desk/src/components/layouts/Sidebar.vue:483
 msgid "Add a comment on a ticket"
 msgstr "Dodaj komentar na zahtjev"
 
@@ -279,7 +295,7 @@ msgstr "Agent"
 msgid "Agent Configuration"
 msgstr "Konfiguracija Agenta"
 
-#: desk/src/pages/dashboard/Dashboard.vue:242
+#: desk/src/pages/dashboard/Dashboard.vue:254
 msgid "Agent Dashboard"
 msgstr "Nadzorna Tabla Agenta"
 
@@ -331,13 +347,13 @@ msgstr "Agenti više neće moći pregledavati i kreirati sačuvane odgovore s gl
 msgid "All"
 msgstr "Svi"
 
-#: desk/src/pages/home/components/PendingTickets.vue:231
+#: desk/src/pages/home/components/PendingTickets.vue:242
 msgid "All SLAs on track"
 msgstr "Svi Ugovori o Nivou Usluge su u skladu s planom"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:285
-#: desk/src/pages/home/components/RecentFeedback.vue:314
-#: desk/src/pages/home/components/RecentFeedback.vue:321
+#: desk/src/pages/home/components/RecentFeedback.vue:349
+#: desk/src/pages/home/components/RecentFeedback.vue:387
+#: desk/src/pages/home/components/RecentFeedback.vue:395
 msgid "All Time"
 msgstr "Svo vrijeme"
 
@@ -353,7 +369,7 @@ msgstr "Svi članci iz ove kategorije bit će premješteni u kategoriju Općenit
 msgid "All comments and emails of the ticket will be moved to the"
 msgstr "Svi komentari i e-pošta zahtjeva bit će premješteni u"
 
-#: desk/src/pages/home/components/PendingTickets.vue:240
+#: desk/src/pages/home/components/PendingTickets.vue:251
 msgid "All your assigned tickets have been responded to"
 msgstr "Na sve vaše dodijeljene zahtjeve je odgovoreno"
 
@@ -732,9 +748,9 @@ msgstr "Pokazatelji prosječnog vremena"
 msgid "Average feedback rating per day is around {0} stars"
 msgstr "Prosječna ocjena povratnih informacija po danu je oko {0} zvjezdica"
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:37
-msgid "Average response and resolution metrics not yet generated"
-msgstr "Prosječni pokazatelji odgovora i rješavanja još nisu generirani"
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:103
+msgid "Average response and resolution metrics not available"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:286
 msgid "Average tickets per day is around {0}"
@@ -756,13 +772,13 @@ msgstr "Prosječna Rezolucija"
 msgid "Avg. feedback rating for the tickets resolved"
 msgstr "Prosječna ocjena povratnih informacija za riješene zahtjeve"
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:49
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:148
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:117
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:279
 msgid "Avg. first response time"
 msgstr "Prosječno vrijeme prvog odgovora"
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:58
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:156
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:126
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:287
 msgid "Avg. resolution time"
 msgstr "Prosječno vrijeme rješavanja"
 
@@ -899,7 +915,7 @@ msgstr "Otkaži pozivnicu"
 msgid "Canceled"
 msgstr "Otkazano"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:513
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:514
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr "Nije moguće obrisati Ugovor o Nivou Usluge. Barem jedan sporazum mora biti označen kao standard."
 
@@ -1294,15 +1310,15 @@ msgstr "Nije moguće poslati e-poštu s povratnim informacijama zbog: {0}"
 #: desk/src/components/Settings/EmailAdd.vue:150
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
-#: desk/src/components/layouts/Sidebar.vue:517
+#: desk/src/components/layouts/Sidebar.vue:520
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
 #: desk/src/pages/knowledge-base/NewArticle.vue:31
 msgid "Create"
 msgstr "Kreiraj"
 
-#: desk/src/components/layouts/Sidebar.vue:510
-#: desk/src/components/layouts/Sidebar.vue:516
+#: desk/src/components/layouts/Sidebar.vue:513
+#: desk/src/components/layouts/Sidebar.vue:519
 msgid "Create & invite a contact"
 msgstr "Kreiraj i pozovi kontakt"
 
@@ -1318,7 +1334,7 @@ msgstr "Kreiraj Prikaz"
 msgid "Create a ticket"
 msgstr "Izradi Zahtjev"
 
-#: desk/src/components/layouts/Sidebar.vue:493
+#: desk/src/components/layouts/Sidebar.vue:496
 msgid "Create an article"
 msgstr "Napravi članak"
 
@@ -1350,8 +1366,12 @@ msgstr "Kriterij"
 msgid "Custom Outside Working Hours Message"
 msgstr "Prilagođena poruka izvan radnog vremena"
 
-#: desk/src/pages/dashboard/Dashboard.vue:489
-#: desk/src/pages/dashboard/Dashboard.vue:495
+#: desk/src/pages/dashboard/Dashboard.vue:504
+#: desk/src/pages/dashboard/Dashboard.vue:510
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:175
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:196
+#: desk/src/pages/home/components/RecentFeedback.vue:365
+#: desk/src/pages/home/components/RecentFeedback.vue:391
 msgid "Custom Range"
 msgstr "Zaseban Raspon"
 
@@ -1393,7 +1413,7 @@ msgstr "Cijan"
 msgid "Danger"
 msgstr "Opasnost"
 
-#: desk/src/pages/dashboard/Dashboard.vue:576
+#: desk/src/pages/dashboard/Dashboard.vue:562
 msgid "Dashboard"
 msgstr "Nadzorna Tabla"
 
@@ -1932,7 +1952,7 @@ msgstr "Exotel"
 msgid "Expand"
 msgstr "Proširi"
 
-#: desk/src/components/layouts/Sidebar.vue:530
+#: desk/src/components/layouts/Sidebar.vue:533
 msgid "Explore customer portal"
 msgstr "Istraži Klijent Portal"
 
@@ -2020,7 +2040,7 @@ msgstr "Favicon"
 #. Label of the feedback (Select) field in DocType 'HD Article Feedback'
 #. Label of the feedback_section (Section Break) field in DocType 'HD Settings'
 #. Label of the feedback_tab (Tab Break) field in DocType 'HD Ticket'
-#: desk/src/pages/home/components/RecentFeedback.vue:156
+#: desk/src/pages/home/components/RecentFeedback.vue:195
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2193,7 +2213,7 @@ msgid "Fulfilled"
 msgstr "Ispunjeno"
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/layouts/Sidebar.vue:501
+#: desk/src/components/layouts/Sidebar.vue:504
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
 msgstr "Općenito"
@@ -2234,7 +2254,7 @@ msgstr "Otvori Zahtjev #{0}"
 msgid "Gray"
 msgstr "Sivo"
 
-#: desk/src/pages/home/components/PendingTickets.vue:232
+#: desk/src/pages/home/components/PendingTickets.vue:243
 msgid "Great! All your tickets are within SLA"
 msgstr "Odlično! Svi vaši zahtjevi su unutar Ugovora o Nivou Usluge"
 
@@ -2847,8 +2867,8 @@ msgstr "Jezik"
 msgid "Last"
 msgstr "Posljednji"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:297
-#: desk/src/pages/home/components/RecentFeedback.vue:317
+#: desk/src/pages/home/components/RecentFeedback.vue:361
+#: desk/src/pages/home/components/RecentFeedback.vue:390
 msgid "Last 3 Months"
 msgstr "Poslednjih 3 Meseci"
 
@@ -2858,25 +2878,25 @@ msgstr "Poslednjih 3 Meseci"
 msgid "Last 3 months"
 msgstr "Posljednja 3 mjeseca"
 
-#: desk/src/pages/dashboard/Dashboard.vue:444
-#: desk/src/pages/dashboard/Dashboard.vue:466
-#: desk/src/pages/dashboard/Dashboard.vue:468
-#: desk/src/pages/dashboard/Dashboard.vue:504
+#: desk/src/pages/dashboard/Dashboard.vue:459
+#: desk/src/pages/dashboard/Dashboard.vue:481
+#: desk/src/pages/dashboard/Dashboard.vue:483
+#: desk/src/pages/dashboard/Dashboard.vue:519
 msgid "Last 30 Days"
 msgstr "Posljednjih 30 Dana"
 
-#: desk/src/pages/dashboard/Dashboard.vue:473
-#: desk/src/pages/dashboard/Dashboard.vue:475
+#: desk/src/pages/dashboard/Dashboard.vue:488
+#: desk/src/pages/dashboard/Dashboard.vue:490
 msgid "Last 60 Days"
 msgstr "Posljednjih 60 Dana"
 
-#: desk/src/pages/dashboard/Dashboard.vue:459
-#: desk/src/pages/dashboard/Dashboard.vue:461
+#: desk/src/pages/dashboard/Dashboard.vue:474
+#: desk/src/pages/dashboard/Dashboard.vue:476
 msgid "Last 7 Days"
 msgstr "Posljednjih 7 Dana"
 
-#: desk/src/pages/dashboard/Dashboard.vue:480
-#: desk/src/pages/dashboard/Dashboard.vue:482
+#: desk/src/pages/dashboard/Dashboard.vue:495
+#: desk/src/pages/dashboard/Dashboard.vue:497
 msgid "Last 90 Days"
 msgstr "Posljednjih 90 Dana"
 
@@ -2890,8 +2910,8 @@ msgstr "Posljednji odgovor agenta"
 msgid "Last Customer Response"
 msgstr "Posljednji odgovor klijenta"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:293
-#: desk/src/pages/home/components/RecentFeedback.vue:316
+#: desk/src/pages/home/components/RecentFeedback.vue:357
+#: desk/src/pages/home/components/RecentFeedback.vue:389
 msgid "Last Month"
 msgstr "Prošli Mjesec"
 
@@ -2899,12 +2919,12 @@ msgstr "Prošli Mjesec"
 msgid "Last Name"
 msgstr "Prezime"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:289
-#: desk/src/pages/home/components/RecentFeedback.vue:315
+#: desk/src/pages/home/components/RecentFeedback.vue:353
+#: desk/src/pages/home/components/RecentFeedback.vue:388
 msgid "Last Week"
 msgstr "Prošle Sedmice"
 
-#: desk/src/pages/home/components/AgentTicketsCard.vue:34
+#: desk/src/pages/home/components/AgentTicketsCard.vue:35
 #: desk/src/pages/home/components/AvgTimeCard.vue:50
 #: desk/src/pages/home/components/CardBase.vue:80
 #: desk/src/pages/home/components/CardBase.vue:99
@@ -3130,7 +3150,7 @@ msgstr "Mjesečno"
 msgid "Move To"
 msgstr "Premjesti u"
 
-#: desk/src/pages/dashboard/Dashboard.vue:243
+#: desk/src/pages/dashboard/Dashboard.vue:255
 msgid "My Dashboard"
 msgstr "Moja Nadzorna Tabla"
 
@@ -3178,8 +3198,8 @@ msgstr "Ime prikazano na korisničkom portalu<br> (npr. Odgovoreno → Čeka se 
 msgid "Navigation"
 msgstr "Navigacija"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:308
-#: desk/src/pages/home/components/RecentFeedback.vue:325
+#: desk/src/pages/home/components/RecentFeedback.vue:381
+#: desk/src/pages/home/components/RecentFeedback.vue:399
 msgid "Negative first"
 msgstr "Prvo negativno"
 
@@ -3304,7 +3324,7 @@ msgstr "Nije pronađen Ugovor o Nivou Usluge"
 msgid "No Team"
 msgstr "Nema Tima"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:163
+#: desk/src/pages/home/components/RecentFeedback.vue:202
 msgid "No additional comments"
 msgstr "Nema dodatnih komentara"
 
@@ -3328,7 +3348,7 @@ msgstr "Nisu pronađeni članci u sljedećoj kategoriji."
 msgid "No assignment rule found"
 msgstr "Nije pronađeno pravilo dodjeljivanja"
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:34
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:101
 msgid "No average metrics"
 msgstr "Nema prosječnih pokazatelja"
 
@@ -3360,7 +3380,7 @@ msgstr "Nisu pronađeni klijenti za primijenjene filtere. Pokušajte prilagoditi
 msgid "No email account found"
 msgstr "Nije pronađen nijedan email račun"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:211
+#: desk/src/pages/home/components/RecentFeedback.vue:273
 msgid "No feedback"
 msgstr "Nema povratnih informacija"
 
@@ -3376,9 +3396,9 @@ msgstr "Nije pronađen nijedan član"
 msgid "No new notifications"
 msgstr "Nema novih obavijesti"
 
-#: desk/src/pages/home/components/PendingTickets.vue:236
-msgid "No new tickets assigned to you in the last 24 hours"
-msgstr "Nisu vam dodijeljene novi zahtjevi u posljednja 24 sata"
+#: desk/src/pages/home/components/PendingTickets.vue:247
+msgid "No new tickets assigned to you in the last 7 days"
+msgstr ""
 
 #: desk/src/components/ticket-agent/TicketNavigation.vue:22
 msgid "No next ticket"
@@ -3388,7 +3408,7 @@ msgstr "Nema sljedećeg zahtjeva"
 msgid "No one"
 msgstr "Niko"
 
-#: desk/src/pages/home/components/PendingTickets.vue:239
+#: desk/src/pages/home/components/PendingTickets.vue:250
 msgid "No pending tickets"
 msgstr "Nema zahtjeva na čekanju"
 
@@ -3400,7 +3420,7 @@ msgstr "Nema prethodnih zahtjeva"
 msgid "No reason"
 msgstr "Nema razloga"
 
-#: desk/src/pages/home/components/PendingTickets.vue:235
+#: desk/src/pages/home/components/PendingTickets.vue:246
 msgid "No recently assigned tickets"
 msgstr "Nema nedavno dodijeljenih slušajeva"
 
@@ -3559,7 +3579,7 @@ msgstr "Redoslijed"
 msgid "Order By"
 msgstr "Sortiraj prema"
 
-#: desk/src/pages/dashboard/Dashboard.vue:243
+#: desk/src/pages/dashboard/Dashboard.vue:255
 msgid "Organization Dashboard"
 msgstr "Nadzorna Tabla Organizacije"
 
@@ -3628,7 +3648,7 @@ msgstr "Lozinke se podudaraju"
 msgid "Paused"
 msgstr "Pauzirano"
 
-#: desk/src/pages/home/components/PendingTickets.vue:200
+#: desk/src/pages/home/components/PendingTickets.vue:211
 msgid "Pending"
 msgstr "Na Čekanju"
 
@@ -3637,8 +3657,8 @@ msgid "Pending Invites"
 msgstr "Pozivnice na Čekanju"
 
 #: desk/src/pages/home/Home.vue:353
-#: desk/src/pages/home/components/PendingTickets.vue:212
-#: desk/src/pages/home/components/PendingTickets.vue:216
+#: desk/src/pages/home/components/PendingTickets.vue:223
+#: desk/src/pages/home/components/PendingTickets.vue:227
 msgid "Pending Tickets"
 msgstr "Zahtjevi na čekanju"
 
@@ -3711,7 +3731,7 @@ msgstr "Rezervisano"
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
 msgstr "Dodaj ovaj prioritet u <a href='/app/hd-service-level-agreement'> obavezne dokumente Ugovora o Nivou Usluge</a>"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:328
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:329
 msgid "Please add {0} priority in {1} SLA"
 msgstr "Dodaj prioritet {0} u Ugovor o Nivou Usluge {1}"
 
@@ -3767,9 +3787,9 @@ msgstr "Odaberi sedmične neradne dane"
 msgid "Policy name"
 msgstr "Naziv Principa"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:304
-#: desk/src/pages/home/components/RecentFeedback.vue:326
-#: desk/src/pages/home/components/RecentFeedback.vue:330
+#: desk/src/pages/home/components/RecentFeedback.vue:377
+#: desk/src/pages/home/components/RecentFeedback.vue:400
+#: desk/src/pages/home/components/RecentFeedback.vue:404
 msgid "Positive first"
 msgstr "Prvo pozitivno"
 
@@ -3802,7 +3822,7 @@ msgstr "Postavi Naziv Ključa"
 msgid "Prefer knowledge base"
 msgstr "Preferiraj bazu znanja"
 
-#: desk/src/pages/dashboard/Dashboard.vue:448
+#: desk/src/pages/dashboard/Dashboard.vue:463
 msgid "Presets"
 msgstr "Predodabir"
 
@@ -3873,7 +3893,7 @@ msgstr "Stručnjaci za Proizvode"
 msgid "Profile"
 msgstr "Profil"
 
-#: desk/src/components/Settings/Profile/Profile.vue:262
+#: desk/src/components/Settings/Profile/Profile.vue:270
 msgid "Profile Updated Successfully"
 msgstr "Profil uspješno ažuriran"
 
@@ -3990,11 +4010,11 @@ msgstr "Čitaj"
 msgid "Reason"
 msgstr "Razlog"
 
-#: desk/src/pages/home/components/PendingTickets.vue:204
+#: desk/src/pages/home/components/PendingTickets.vue:215
 msgid "Recent"
 msgstr "Nedavno"
 
-#: desk/src/pages/home/components/PendingTickets.vue:211
+#: desk/src/pages/home/components/PendingTickets.vue:222
 msgid "Recent Tickets"
 msgstr "Nedavni Zahtjevi"
 
@@ -4119,7 +4139,7 @@ msgstr "Odgovor agenta"
 msgid "Reply from contact"
 msgstr "Odgovor kontakta"
 
-#: desk/src/components/layouts/Sidebar.vue:469
+#: desk/src/components/layouts/Sidebar.vue:470
 msgid "Reply on a ticket"
 msgstr "Odgovor na zahtjev"
 
@@ -4295,13 +4315,13 @@ msgstr "Redovi"
 
 #. Label of the sla (Link) field in DocType 'HD Ticket'
 #. Label of the sla_tab (Tab Break) field in DocType 'HD Ticket'
+#: desk/src/pages/home/components/PendingTickets.vue:207
 #: desk/src/pages/ticket/MobileTicketAgent.vue:74
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA"
 msgstr "Ugovor o Nivou Usluge"
 
-#: desk/src/pages/home/components/PendingTickets.vue:196
-#: desk/src/pages/home/components/PendingTickets.vue:210
+#: desk/src/pages/home/components/PendingTickets.vue:221
 msgid "SLA Alerts"
 msgstr "Upozorenja Ugovora o Nivou Usluge"
 
@@ -4498,7 +4518,7 @@ msgstr "Tražilo se:"
 msgid "Searching..."
 msgstr "Pretraga..."
 
-#: desk/src/pages/home/components/PendingTickets.vue:138
+#: desk/src/pages/home/components/PendingTickets.vue:136
 msgid "See all {0} tickets"
 msgstr "Pogledajte sve {0} zahtjeve"
 
@@ -4525,6 +4545,11 @@ msgstr "Odaberi Standard Prioritet."
 #: desk/src/pages/ticket/TicketFeedback.vue:28
 msgid "Select a rating"
 msgstr "Odaberi ocjenu"
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:34
+#: desk/src/pages/home/components/RecentFeedback.vue:148
+msgid "Select range"
+msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:104
 msgid "Select teams"
@@ -4680,6 +4705,10 @@ msgstr "Prikaži u bočnoj traci"
 #: desk/src/components/modals/ShortcutsModal.vue:83
 msgid "Show keyboard shortcuts"
 msgstr "Prikaži prečice na tastaturi"
+
+#: desk/src/pages/home/components/PendingTickets.vue:143
+msgid "Showing {0} of {1} {2}"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:37
 msgid "Signature"
@@ -5326,13 +5355,13 @@ msgstr "Analiza Pretrage Zahtjeva"
 msgid "Tickets"
 msgstr "Zahtjevi"
 
-#: desk/src/pages/home/components/PendingTickets.vue:220
+#: desk/src/pages/home/components/PendingTickets.vue:231
 msgid "Tickets approaching or breached SLA"
 msgstr "Zahtjevi koji se približavaju ili krše Ugovor o Nivou Usluge"
 
-#: desk/src/pages/home/components/PendingTickets.vue:221
-msgid "Tickets assigned to you in the last 24 hours"
-msgstr "Slućajevi dodijeljeni vama u posljednja 24 sata"
+#: desk/src/pages/home/components/PendingTickets.vue:232
+msgid "Tickets assigned to you in the last 7 days"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:553
 msgid "Tickets by Channel"
@@ -5358,7 +5387,7 @@ msgstr "Zahtjevi se mogu dodijeliti samo agentima"
 msgid "Tickets must meet the following conditions:"
 msgstr "Zahtjevi moraju ispunjavati sljedeće uslove:"
 
-#: desk/src/pages/home/components/PendingTickets.vue:222
+#: desk/src/pages/home/components/PendingTickets.vue:233
 msgid "Tickets that are awaiting your response"
 msgstr "Zahtjevi koje čekaju vaš odgovor"
 
@@ -5422,8 +5451,8 @@ msgstr "Do je Obavezno"
 msgid "To know more about setting up email accounts, click"
 msgstr "Da biste saznali više o postavljanju računa e-pošte, klikni"
 
-#: desk/src/pages/dashboard/Dashboard.vue:452
-#: desk/src/pages/dashboard/Dashboard.vue:454
+#: desk/src/pages/dashboard/Dashboard.vue:467
+#: desk/src/pages/dashboard/Dashboard.vue:469
 msgid "Today"
 msgstr "Danas"
 
@@ -5806,10 +5835,6 @@ msgstr "Nemate dozvolu za pregled ove stranice ili ona više ne postoji."
 msgid "You have already provided feedback for this ticket."
 msgstr "Već ste dali povratne informacije za ovaj zahtjev."
 
-#: desk/src/pages/home/components/RecentFeedback.vue:214
-msgid "You haven't received any feedback yet"
-msgstr "Još niste primili nikakve povratne informacije"
-
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:132
 msgid "You must set one SLA as Default. Please check the Default SLA option."
 msgstr "Morate postaviti jedan Ugovor o Nivou Usluge kao standard. Označi opciju Standard Ugovor o Nivou Usluge."
@@ -5818,7 +5843,7 @@ msgstr "Morate postaviti jedan Ugovor o Nivou Usluge kao standard. Označi opcij
 msgid "Your old conditions will be overwritten. Are you sure you want to save?"
 msgstr "Vaši stari uslovi će biti prepisani. Jeste li sigurni da želite sačuvati?"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:48
+#: desk/src/pages/home/components/RecentFeedback.vue:51
 msgid "Your performance is"
 msgstr "Vaš učinak je"
 
@@ -5830,7 +5855,7 @@ msgstr "dodijelio/la vam je slušaj"
 msgid "assignees"
 msgstr "dodijeljeni"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:374
+#: desk/src/pages/home/components/RecentFeedback.vue:466
 msgid "average"
 msgstr "prosjek"
 
@@ -5858,7 +5883,7 @@ msgstr "izbrisano"
 msgid "emails/ comments"
 msgstr "e-pošta/komentari"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:370
+#: desk/src/pages/home/components/RecentFeedback.vue:462
 msgid "excellent"
 msgstr "odlično"
 
@@ -5866,7 +5891,7 @@ msgstr "odlično"
 msgid "from this email onwards will be moved to new ticket."
 msgstr "od ove e-pošte nadalje bit će premješteno na novi zahtjev."
 
-#: desk/src/pages/home/components/RecentFeedback.vue:372
+#: desk/src/pages/home/components/RecentFeedback.vue:464
 msgid "good"
 msgstr "dobar"
 
@@ -5923,7 +5948,7 @@ msgstr "lista"
 msgid "mentioned you in ticket"
 msgstr "spomenuo/la te u slušaju"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:376
+#: desk/src/pages/home/components/RecentFeedback.vue:468
 msgid "poor"
 msgstr "loš"
 
@@ -5945,6 +5970,10 @@ msgstr "status_category u ['Otvoreno', 'Pauzirano']"
 msgid "synonym"
 msgstr "sinonim"
 
+#: desk/src/pages/home/components/PendingTickets.vue:147
+msgid "ticket"
+msgstr "zahtjev"
+
 #: desk/src/pages/ticket/MobileTicketAgent.vue:525
 msgid "viewed this"
 msgstr "pogledao/la je ovo"
@@ -5953,7 +5982,7 @@ msgstr "pogledao/la je ovo"
 msgid "{0} matches"
 msgstr "{0} rezultata pretrage"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:43
+#: desk/src/pages/home/components/RecentFeedback.vue:46
 msgid "{0} reviews"
 msgstr "{0} recenzije"
 
