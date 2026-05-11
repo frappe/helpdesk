@@ -326,6 +326,7 @@ def make_team(team_name, members=[], disabled=False):
 
     if frappe.db.exists("HD Team", team_name):
         team = frappe.get_doc("HD Team", team_name)
+        team.disabled = disabled
         team.users = []
         for member in members:
             team.append("users", {"user": member})
@@ -341,5 +342,6 @@ def make_team(team_name, members=[], disabled=False):
     )
     for member in members:
         team.append("users", {"user": member})
+    team.disabled = disabled
     team.insert(ignore_permissions=True)
     return team
