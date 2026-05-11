@@ -45,7 +45,7 @@
         class="w-full h-full -ml-2"
       >
         <div class="flex text-sm text-gray-600">
-          <div class="ml-2">{{ __("Team name") }}</div>
+          <p class="ml-2">{{ __("Team name") }}</p>
         </div>
         <hr class="mx-2 mt-2" />
         <div v-for="(team, index) in teams.data" :key="team.name">
@@ -53,12 +53,13 @@
             class="flex items-center cursor-pointer hover:bg-gray-50 rounded h-12.5"
           >
             <div
-              class="w-full py-3 pl-2"
+              class="w-full py-3 pl-2 flex gap-1 items-center"
               @click="() => emit('update:step', 'team-edit', team.name)"
             >
-              <div class="text-base text-ink-gray-7 font-medium">
+              <p class="text-base text-ink-gray-7 font-medium">
                 {{ team.name }}
-              </div>
+              </p>
+              <Badge :label="__('Disabled')" v-if="team.disabled" />
             </div>
             <div class="flex justify-between items-center pr-2">
               <div>
@@ -135,15 +136,15 @@
 </template>
 
 <script setup lang="ts">
+import EditIcon from "@/components/icons/EditIcon.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { __ } from "@/translation";
+import { TeamListResourceSymbol } from "@/types";
+import { ConfirmDelete } from "@/utils";
 import { Dropdown, Input, toast } from "frappe-ui";
 import { inject, markRaw, Ref, ref, watch } from "vue";
 import NewTeamModal from "../NewTeamModal.vue";
-import { ConfirmDelete } from "@/utils";
-import EditIcon from "@/components/icons/EditIcon.vue";
 import RenameTeamModal from "./RenameTeamModal.vue";
-import { __ } from "@/translation";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { TeamListResourceSymbol } from "@/types";
 
 interface E {
   (event: "update:step", step: string, team: string): void;
@@ -152,7 +153,7 @@ interface E {
 const emit = defineEmits<E>();
 const teamsSearchQuery = inject<Ref>("teamsSearchQuery");
 
-const teams = inject(TeamListResourceSymbol);
+const teams = inject(TeamListResourceSymbol)!;
 const showForm = ref(false);
 const showRename = ref({
   show: false,

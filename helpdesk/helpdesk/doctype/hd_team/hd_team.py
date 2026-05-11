@@ -10,6 +10,14 @@ from helpdesk.utils import agent_only, capture_event
 
 
 class HDTeam(Document):
+    def before_save(self):
+        if self.is_new():
+            return
+        assignment_rule_doc = frappe.get_doc("Assignment Rule", self.assignment_rule)
+        if self.has_value_changed("disabled"):
+            assignment_rule_doc.disabled = bool(self.disabled)
+        assignment_rule_doc.save(ignore_permissions=True)
+
     def after_insert(self):
         self.create_assignment_rule()
         self.sync_users_to_assignment_rule()
@@ -29,7 +37,8 @@ class HDTeam(Document):
         rule_doc.unassign_condition = f"agent_group != '{self.name}'"
         rule_doc.unassign_condition_json = f'[["agent_group","!=","{self.name}"]]'
         rule_doc.priority = 1
-        rule_doc.disabled = True
+        if self.disabled:
+            rule_doc.disabled = True
 
         for day in [
             "Monday",

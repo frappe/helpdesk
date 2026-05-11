@@ -269,6 +269,9 @@ const getTeamsListResource = createListResource({
   doctype: "HD Team",
   auto: true,
   fields: ["name"],
+  filters: {
+    disabled: 0,
+  },
   start: 0,
   pageLength: 999,
   transform: (data: Array<Team>) => {
