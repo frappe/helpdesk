@@ -4,7 +4,7 @@
       <div class="flex flex-col flex-1 gap-3">
         <Link
           ref="linkRef"
-          class="form-control"
+          class="w-full"
           doctype="HD Article Category"
           placeholder="Select Category"
           v-model="category"
@@ -18,10 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, computed } from "vue";
+import { ref, computed, watch, nextTick } from "vue";
 import { Dialog } from "frappe-ui";
-import { Link } from "frappe-ui/frappe";
-import { Filter } from "@/types";
+import Link from "@/components/frappe-ui/Link.vue";
 
 const emit = defineEmits(["move"]);
 const showDialog = defineModel<boolean>();
@@ -43,7 +42,7 @@ watch(showDialog, async (val) => {
   if (!val) return;
   await nextTick();
   setTimeout(() => {
-    linkRef.value?.$el?.querySelector("input")?.focus();
+    linkRef.value?.$el?.querySelector("button")?.click();
   }, 300);
 });
 
