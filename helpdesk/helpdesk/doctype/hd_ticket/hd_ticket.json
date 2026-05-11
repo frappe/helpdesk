@@ -131,6 +131,7 @@
    "fieldname": "agent_group",
    "fieldtype": "Link",
    "label": "Team",
+   "link_filters": "[[\"HD Team\",\"disabled\",\"=\",0]]",
    "options": "HD Team"
   },
   {
@@ -468,7 +469,11 @@
    "set_only_once": 1
   },
   {
+<<<<<<< HEAD
    "depends_on": "eval:doc.first_response_failed_by",
+=======
+   "depends_on": "eval:doc.first_responded_on",
+>>>>>>> 71956484 (fix: update link_filters in HDTicket)
    "fieldname": "first_response_failed_by",
    "fieldtype": "Duration",
    "label": "First Response Failed By",
@@ -486,7 +491,11 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
+<<<<<<< HEAD
  "modified": "2026-05-07 14:35:56.356727",
+=======
+ "modified": "2026-05-11 17:56:26.750850",
+>>>>>>> 71956484 (fix: update link_filters in HDTicket)
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
