@@ -704,12 +704,15 @@ class TestHDTicket(FrappeTestCase):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
 
+<<<<<<< HEAD
     def tearDown(self):
         frappe.set_user("Administrator")
         remove_holidays()
         frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
         frappe.delete_doc("HD Ticket Status", "New", force=True)
 
+=======
+>>>>>>> e7c57a1c (fix: add test cases for response and resolution failed_by)
     def test_security_unauthorized_reply_via_agent(self):
         ticket = make_ticket()
         frappe.set_user(non_agent)
@@ -896,6 +899,7 @@ class TestHDTicket(FrappeTestCase):
             ticket.save()
             self.assertEqual(ticket.agreement_status, "Fulfilled")
 
+<<<<<<< HEAD
     def test_reply_via_agent_default_sender(self):
         """Without `from_email`, sender on the Communication is the session user."""
         ticket = make_ticket()
@@ -962,6 +966,62 @@ class TestHDTicket(FrappeTestCase):
                 )
         finally:
             frappe.set_user("Administrator")
+=======
+    def test_failed_by_response(self):
+        # Urgent priority: response_by = T+30min
+        # Agent replies at T+39min → 9 minutes late in business hours
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, minutes=39)):
+            frappe.set_user(agent)
+            ticket.reply_via_agent(message="Test reply after response by")
+            ticket.reload()
+
+            ticket.status = "Replied"
+            ticket.save()
+            ticket.reload()
+
+            self.assertEqual(ticket.agreement_status, "Failed")
+
+            # first_response_failed_by should be 9 minutes (in business hours seconds)
+            self.assertEqual(ticket.first_response_failed_by, 9 * 60)
+
+        # now check failed by just 2 hminutes after the end time
+        # what is the end time of monday?
+        # end_time = 6 PM on Monday
+        date2 = get_current_week_monday(hours=17)
+        with self.freeze_time(add_to_date(date2, minutes=55)):
+            ticket2 = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date2, hours=1, minutes=5)):
+            frappe.set_user(agent)
+            ticket2.reply_via_agent(message="Test reply after response by")
+            ticket2.reload()
+
+            ticket2.status = "Replied"
+            ticket2.save()
+            ticket2.reload()
+
+            self.assertIsNone(ticket2.first_response_failed_by)
+
+    def test_resolution_failed_by(self):
+        # Urgent priority: resolution_by = T+2h
+        # Ticket resolved at T+2h15min → 15 minutes late in business hours
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, minutes=135)):
+            ticket.reload()
+            ticket.status = "Resolved"
+            ticket.save()
+            ticket.reload()
+            self.assertEqual(ticket.agreement_status, "Failed")
+            # resolution_failed_by should be 15 minutes (in business hours seconds)
+            self.assertEqual(ticket.resolution_failed_by, 15 * 60)
+>>>>>>> e7c57a1c (fix: add test cases for response and resolution failed_by)
 
     def tearDown(self):
         frappe.set_user("Administrator")
