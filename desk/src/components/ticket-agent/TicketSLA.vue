@@ -118,14 +118,20 @@ const firstResponse = computed(() => {
     )
   ) {
     let responseTime = ticket.value?.doc?.first_response_time;
-
-    let fulfilled = responseTime
-      ? formatTime(responseTime, timeFormat)
-      : formatTimeShort(
-          ticket.value.doc.first_responded_on as string,
-          ticket.value.doc.creation
-        );
-
+    let format =
+      responseTime <= 60
+        ? {
+            ...timeFormat,
+            second: true,
+          }
+        : timeFormat;
+    let fulfilled =
+      responseTime != null
+        ? formatTime(responseTime, format)
+        : formatTimeShort(
+            ticket.value.doc.first_responded_on as string,
+            ticket.value.doc.creation
+          );
     return {
       label: `Fulfilled in ${fulfilled}`,
       color: "green",
@@ -187,12 +193,20 @@ const resolutionBy = computed(() => {
     )
   ) {
     let resolutionTime = ticket.value?.doc?.resolution_time;
-    let fulfilled = resolutionTime
-      ? formatTime(resolutionTime, timeFormat)
-      : formatTimeShort(
-          ticket.value.doc?.resolution_date as string,
-          ticket.value.doc?.creation
-        );
+    let format =
+      resolutionTime <= 60
+        ? {
+            ...timeFormat,
+            second: true,
+          }
+        : timeFormat;
+    let fulfilled =
+      resolutionTime != null
+        ? formatTime(resolutionTime, format)
+        : formatTimeShort(
+            ticket.value.doc?.resolution_date as string,
+            ticket.value.doc?.creation
+          );
     return {
       label: `Fulfilled in ${fulfilled}`,
       color: "green",
