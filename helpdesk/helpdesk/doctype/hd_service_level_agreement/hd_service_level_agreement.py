@@ -195,7 +195,6 @@ class HDServiceLevelAgreement(Document):
         self.set_hold_time(doc)
 
     def set_first_response_time(self, doc: Document):
-        breakpoint()
         start_at = doc.service_level_agreement_creation
         end_at = doc.first_responded_on
         if not start_at or not end_at:
