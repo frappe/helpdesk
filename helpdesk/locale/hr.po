@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-10 10:49+0000\n"
-"PO-Revision-Date: 2026-05-11 05:53\n"
+"PO-Revision-Date: 2026-05-12 05:51\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Croatian\n"
 "MIME-Version: 1.0\n"
@@ -60,18 +60,18 @@ msgstr "0 je bez povratnih informacija, 1 je sviđa mi se, 2 je ne sviđa mi se"
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:174
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:192
 msgid "1 Year"
-msgstr ""
+msgstr "1 godina"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:172
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:184
 msgid "3 Months"
-msgstr ""
+msgstr "3 mjeseca"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:173
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:179
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:188
 msgid "6 Months"
-msgstr ""
+msgstr "6 mjeseci"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:117
 msgid "<br>Please update HD Settings to use a different status before disabling this status."
@@ -750,7 +750,7 @@ msgstr "Prosječna ocjena povratnih informacija po danu je oko {0} zvjezdica"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:103
 msgid "Average response and resolution metrics not available"
-msgstr ""
+msgstr "Prosječni pokazatelji odgovora i rezolucije nisu dostupni"
 
 #: helpdesk/api/dashboard.py:286
 msgid "Average tickets per day is around {0}"
@@ -3398,7 +3398,7 @@ msgstr "Nema novih obavijesti"
 
 #: desk/src/pages/home/components/PendingTickets.vue:247
 msgid "No new tickets assigned to you in the last 7 days"
-msgstr ""
+msgstr "Nisu vam dodijeljene novi zahtjevi u posljednjih 7 dana"
 
 #: desk/src/components/ticket-agent/TicketNavigation.vue:22
 msgid "No next ticket"
@@ -4549,7 +4549,7 @@ msgstr "Odaberi ocjenu"
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:34
 #: desk/src/pages/home/components/RecentFeedback.vue:148
 msgid "Select range"
-msgstr ""
+msgstr "Odaberite raspon"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:104
 msgid "Select teams"
@@ -4708,7 +4708,7 @@ msgstr "Prikaži tipkovničke prečace"
 
 #: desk/src/pages/home/components/PendingTickets.vue:143
 msgid "Showing {0} of {1} {2}"
-msgstr ""
+msgstr "Prikazano {0} od {1} {2}"
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:37
 msgid "Signature"
@@ -5361,7 +5361,7 @@ msgstr "Zahtjevi koji se približavaju ili krše Ugovor o Razini Usluge"
 
 #: desk/src/pages/home/components/PendingTickets.vue:232
 msgid "Tickets assigned to you in the last 7 days"
-msgstr ""
+msgstr "Zahtjevi koji su vam dodijeljeni u posljednjih 7 dana"
 
 #: helpdesk/api/dashboard.py:553
 msgid "Tickets by Channel"
