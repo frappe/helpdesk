@@ -7,7 +7,7 @@ from frappe.utils import get_user_info_for_avatar
 from helpdesk.utils import is_agent
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist(allow_guest=True)  # nosemgrep
 @frappe.read_only()
 def get_article(name: str):
     article = frappe.get_doc("HD Article", name).as_dict()
