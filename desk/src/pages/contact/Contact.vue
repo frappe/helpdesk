@@ -17,6 +17,7 @@
           shape: 'circle',
         }"
         :doc-info="contactInfo"
+        :badge="invitationName && __('Invited')"
       >
         <template #actions>
           <div class="flex gap-2 items-center">
@@ -31,7 +32,7 @@
               </div>
             </Button>
             <Dropdown
-              :options="moreOptions"
+              :options="dropdownActions"
               placement="right"
               v-if="hasPermission()"
             >
@@ -198,52 +199,61 @@ const contactInfo = computed(() => {
   return info;
 });
 
-const { inviteContact, isLoading: isContactInvitationLoading } =
-  useContactInvite(contact);
+const { resendInvite, isLoading: isContactInvitationLoading } =
+  useContactInvite();
 const { resetPassword, isLoading: isResetPasswordLoading } =
   useContactResetPassword(() => contact.doc?.user);
 
 const showEditDialog = ref(false);
 
+const invitationName = computed(
+  () => contact.getInfo.data?.invitation_name || ""
+);
+
 const showDeleteDialog = ref(false);
-const moreOptions = computed(() => [
-  {
-    group: __("Actions"),
-    hideLabel: true,
-    items: [
-      {
-        label: __("Invite as User"),
-        icon: "user-plus",
-        condition: () => !contact.doc?.user,
-        onClick: () => {
-          inviteContact();
-        },
+const dropdownActions = computed(() => {
+  const baseActions = [];
+  if (invitationName.value) {
+    baseActions.push({
+      label: __("Resend Invite"),
+      icon: "mail",
+      onClick: () => {
+        resendInvite(invitationName.value);
       },
-      {
-        label: __("Send Reset Password Email"),
-        icon: "mail",
-        onClick: () => {
-          resetPassword();
-        },
+    });
+  }
+  if (contact.doc?.user) {
+    baseActions.push({
+      label: __("Send Reset Password Email"),
+      icon: "mail",
+      onClick: () => {
+        resetPassword();
       },
-    ],
-  },
-  {
-    group: __("Danger"),
-    hideLabel: true,
-    items: [
-      {
-        label: __("Delete"),
-        icon: LucideTrash2,
-        theme: "red",
-        onClick: () => {
-          // TODO: delete contact
-          showDeleteDialog.value = true;
+    });
+  }
+  return [
+    {
+      group: __("Actions"),
+      hideLabel: true,
+      items: baseActions,
+    },
+    {
+      group: __("Danger"),
+      hideLabel: true,
+      items: [
+        {
+          label: __("Delete"),
+          icon: LucideTrash2,
+          theme: "red",
+          onClick: () => {
+            // TODO: delete contact
+            showDeleteDialog.value = true;
+          },
         },
-      },
-    ],
-  },
-]);
+      ],
+    },
+  ];
+});
 function handleDelete({
   deleteLinkedTickets,
 }: {

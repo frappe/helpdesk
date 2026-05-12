@@ -11,12 +11,28 @@ class CustomContact(Contact):
         rating = self.get_avg_rating()
         customers = get_customers_with_image(self.name)
 
-        result = {"rating": rating, "customers": customers}
+        invitation_name = frappe.db.exists(
+            "User Invitation",
+            {
+                "contact": self.name,
+                "status": "Pending",
+                "email": self.email_ids[0].email_id,
+                "app_name": "helpdesk",
+            },
+        )
+
+        result = {
+            "rating": rating,
+            "customers": customers,
+            "invitation_name": invitation_name,
+        }
+
         if self.user:
             time_zone = frappe.db.get_value("User", self.user, "time_zone")
             if time_zone:
                 result["timezone"] = time_zone
                 result["country"] = get_country_from_timezone(time_zone)
+
         return result
 
     def get_avg_rating(self):

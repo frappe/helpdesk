@@ -13,6 +13,7 @@ def after_accept(invitation: Document, user: Document, user_inserted: bool) -> N
             create_agent(user)
         elif role in customer_roles:
             create_contact(user)
+            attach_image(user)
             link_to_customer(user, invitation.customer)
 
 
@@ -24,6 +25,15 @@ def create_agent(user: Document) -> None:
             agent_name=user.first_name,
             is_active=True,
         ).insert(True)
+
+
+def attach_image(user: Document) -> None:
+    if not user.image:
+        return
+    if contact := frappe.db.get_value(
+        "Contact", {"user": user.name, "email_id": user.name}, "name"
+    ):
+        frappe.db.set_value("Contact", contact, "image", user.image)
 
 
 def link_to_customer(user: Document, customer: str) -> None:

@@ -9,11 +9,20 @@ def get_custom_fields():
     return {
         "User Invitation": [
             {
+                "fieldname": "contact",
+                "label": "Contact",
+                "fieldtype": "Link",
+                "options": "Contact",
+                "insert_after": "roles",
+                "set_only_once": 1,
+            },
+            {
                 "fieldname": "customer",
                 "label": "Customer",
                 "fieldtype": "Link",
                 "options": "HD Customer",
-                "insert_after": "roles",
-            }
+                "insert_after": "contact",
+                "set_only_once": 1,
+            },
         ],
     }

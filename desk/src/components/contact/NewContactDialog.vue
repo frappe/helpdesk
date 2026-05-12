@@ -103,12 +103,12 @@
               </FormControl>
             </template>
 
-            <template v-else-if="fieldOrRow.type === 'timezone'">
+            <!-- <template v-else-if="fieldOrRow.type === 'timezone'">
               <TimezoneControl
                 :label="fieldOrRow.label"
                 v-model="state.timezone"
               />
-            </template>
+            </template> -->
 
             <template v-else-if="fieldOrRow.type === 'Link'">
               <div class="space-y-1.5">
@@ -162,7 +162,6 @@ import LucideMail from "~icons/lucide/mail";
 import LucidePhone from "~icons/lucide/phone";
 import UserIcon from "~icons/lucide/user";
 import Link from "../frappe-ui/Link.vue";
-import TimezoneControl from "../TimezoneControl.vue";
 
 const open = defineModel<boolean>({ default: false });
 

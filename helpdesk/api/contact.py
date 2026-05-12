@@ -1,7 +1,7 @@
 from typing import Literal
 
 import frappe
-from frappe.contacts.doctype.contact.contact import invite_user
+from frappe.core.api.user_invitation import invite_by_email
 from frappe.desk.reportview import delete_bulk
 
 
@@ -40,6 +40,7 @@ def delete_contact(name: str):
         pluck="parent",
     )
     delete_bulk("HD Customer Member", customers)
+    # user_invitation link remove contact
     frappe.delete_doc("Contact", name)
 
 
@@ -65,20 +66,15 @@ def create_contact(doc: dict) -> str:
         )
 
     contact_doc.insert()
-    invite_user(contact_doc.name)
+    invite_by_email(
+        email,
+        ["HD Customer"],
+        redirect_to_path="/helpdesk",
+        app_name="helpdesk",
+        contact=contact_doc.name,
+        customer=doc.get("customer"),
+    )
     contact_doc.reload()
-
-    # Link contact to customer if customer is provided
-    if customer := doc.get("customer"):
-        customer_doc = frappe.get_doc("HD Customer", customer)
-        customer_doc.append("contacts", {"contact_name": contact_doc.name})
-        customer_doc.save()
-
-    if user := contact_doc.get("user"):
-        user_doc = frappe.get_doc("User", user)
-        user_doc.user_image = doc.get("image", "")
-        user_doc.time_zone = doc.get("timezone", "")
-        user_doc.save()
 
     return contact_doc.get("name")
 
@@ -115,7 +111,6 @@ def edit_contact(name: str, doc: dict):
     contact_doc.save()
 
     if user := contact_doc.get("user"):
-        print("\n\n", doc.get("timezone"), "\n\n")
         user_doc = frappe.get_doc("User", user)
         user_doc.user_image = doc.get("image", "")
         user_doc.time_zone = doc.get("timezone", "")

@@ -73,14 +73,14 @@
               :label="__('First Name')"
               type="text"
               :required="true"
-              :placeholder="__('Enter first name')"
+              :placeholder="__('John')"
               v-model="state.firstName"
             />
             <FormControl
               class="[&_p]:text-p-xs"
               :label="__('Last Name')"
               type="text"
-              :placeholder="__('Enter last name')"
+              :placeholder="__('Doe')"
               v-model="state.lastName"
             />
           </div>
@@ -88,7 +88,7 @@
           <!-- Email IDs -->
           <div class="space-y-2">
             <label class="text-xs text-ink-gray-5">
-              {{ __("Email ID") }}
+              {{ __("Email") }}
               <span class="text-ink-red-3">*</span>
             </label>
             <div
@@ -99,7 +99,9 @@
               <FormControl
                 class="[&_p]:text-p-xs flex-1"
                 type="email"
-                :placeholder="emailPlaceholder"
+                :placeholder="`john.doe${
+                  index > 0 ? `+${index}` : ''
+                }@example.com`"
                 v-model="email.email_id"
               />
               <Tooltip :text="__('Primary contact')">
@@ -137,9 +139,7 @@
 
           <!-- Phone numbers -->
           <div class="flex flex-col gap-y-2">
-            <label class="text-xs text-ink-gray-5">{{
-              __("Phone Number")
-            }}</label>
+            <label class="text-xs text-ink-gray-5">{{ __("Phone") }}</label>
             <div
               v-for="(phone, index) in state.phones"
               :key="index"
@@ -148,12 +148,9 @@
               <FormControl
                 class="[&_p]:text-p-xs flex-1"
                 type="tel"
-                :placeholder="phonePlaceholder"
+                :placeholder="`+1 234 567 89${index > 0 ? `${index}` : 0}`"
                 v-model="phone.phone"
               >
-                <template #prefix>
-                  <LucidePhone class="size-4" />
-                </template>
               </FormControl>
               <Tooltip :text="__('Primary contact')">
                 <button
@@ -212,7 +209,7 @@
 </template>
 
 <script setup lang="ts">
-import { getContactFieldConfig, useContact } from "@/composables/contact";
+import { useContact } from "@/composables/contact";
 import { __ } from "@/translation";
 import type { File as FileType } from "@/types";
 import {
@@ -224,7 +221,6 @@ import {
   FormControl,
   Tooltip,
 } from "frappe-ui";
-import LucidePhone from "~icons/lucide/phone";
 import LucidePlus from "~icons/lucide/plus";
 import LucideStar from "~icons/lucide/star";
 import LucideTrash2 from "~icons/lucide/trash-2";
@@ -234,24 +230,8 @@ import TimezoneControl from "../TimezoneControl.vue";
 const props = defineProps<{ name: string }>();
 const open = defineModel<boolean>({ default: false });
 
-const {
-  state,
-  parseContactData,
-  isDirty,
-  editContactResource,
-  doc,
-  resetState,
-} = useContact(props.name);
-
-const fieldConfig = getContactFieldConfig(false);
-const emailField = fieldConfig.find(
-  (f) => !Array.isArray(f) && f.key === "emails"
-) as { placeholder?: string } | undefined;
-const phoneField = fieldConfig.find(
-  (f) => !Array.isArray(f) && f.key === "phones"
-) as { placeholder?: string } | undefined;
-const emailPlaceholder = emailField?.placeholder ?? __("Enter email address");
-const phonePlaceholder = phoneField?.placeholder ?? __("Enter phone number");
+const { state, parseContactData, isDirty, editContactResource, doc } =
+  useContact(props.name);
 
 function addRow(type: "email" | "phone") {
   if (type === "email") {

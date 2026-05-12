@@ -15,9 +15,19 @@
             'flex-1 items-center justify-center',
         ]"
       >
-        <p class="font-medium text-ink-gray-8 text-xl">
-          {{ avatar.label }}
-        </p>
+        <div class="flex gap-2 items-center">
+          <p class="font-medium text-ink-gray-8 text-xl">
+            {{ avatar.label }}
+          </p>
+          <Tooltip text="Invite sent. Waiting for the user to accept.">
+            <Badge
+              v-if="props.badge"
+              :label="props.badge"
+              :theme="'orange'"
+              class="mt-[1px]"
+            />
+          </Tooltip>
+        </div>
         <div
           v-if="!isMobileView && docInfo && docInfo.length"
           class="flex items-center gap-x-1.5"
@@ -55,7 +65,7 @@
 
 <script setup lang="ts">
 import { useScreenSize } from "@/composables/screen";
-import { Avatar, type AvatarProps } from "frappe-ui";
+import { Avatar, Badge, Tooltip, type AvatarProps } from "frappe-ui";
 
 interface DocInfoItem {
   icon?: any;
@@ -68,9 +78,11 @@ const props = withDefaults(
   defineProps<{
     avatar: AvatarProps;
     docInfo?: DocInfoItem[];
+    badge?: string;
   }>(),
   {
     docInfo: () => [],
+    badge: () => "",
   }
 );
 

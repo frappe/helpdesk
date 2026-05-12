@@ -214,7 +214,6 @@ export function useNewContact() {
 
   const isLoading = ref(false);
   async function addContact() {
-    debugger;
     isLoading.value = true;
     addContactResource.submit(
       { doc: parseContactData() },
@@ -374,13 +373,6 @@ export function getContactFieldConfig(
 
   const restFields: FieldConfigRow[] = [
     {
-      key: "timezone",
-      type: "timezone",
-      label: __("Timezone"),
-      placeholder: __("Select timezone"),
-      options: [],
-    },
-    {
       key: "customer",
       type: "Link",
       label: __("Customer"),
@@ -392,23 +384,18 @@ export function getContactFieldConfig(
   return [...baseFields, emailField, phoneField, ...restFields];
 }
 
-export function useContactInvite(doc: DocumentResource<Contact>) {
+export function useContactInvite() {
   const isLoading = ref(false);
   // @ts-expect-error
   const { updateOnboardingStep } = useOnboarding("helpdesk");
-  async function inviteContact(): Promise<void> {
+  async function resendInvite(name: string): Promise<void> {
     try {
       isLoading.value = true;
-      const user = await call(
-        "frappe.contacts.doctype.contact.contact.invite_user",
-        {
-          contact: doc.doc.name,
-        }
-      );
-      toast.success(__("Contact invited successfully"));
-      await doc.setValue.submit({
-        user: user,
+      await call("frappe.core.api.user_invitation.resend_invitation", {
+        name,
+        app_name: "helpdesk",
       });
+      toast.success(__("Invitation email resent successfully"));
       updateOnboardingStep("add_invite_contact");
     } catch (error: unknown) {
       isLoading.value = false;
@@ -424,14 +411,13 @@ export function useContactInvite(doc: DocumentResource<Contact>) {
       isLoading.value = false;
     }
   }
-  return { inviteContact, isLoading };
+  return { resendInvite, isLoading };
 }
 
 export function useContactResetPassword(getUser: () => string | undefined) {
   const isLoading = ref(false);
   async function resetPassword(): Promise<void> {
     const user = getUser();
-    console.log(user);
     if (!user) {
       toast.error(__("No system user is linked with this contact"));
       return;
