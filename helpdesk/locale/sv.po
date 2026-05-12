@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-10 10:49+0000\n"
-"PO-Revision-Date: 2026-05-11 05:52\n"
+"PO-Revision-Date: 2026-05-12 05:51\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -60,18 +60,18 @@ msgstr "0 är ingen återkoppling, 1 är Gilla, 2 är Ogilla"
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:174
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:192
 msgid "1 Year"
-msgstr ""
+msgstr "1 År"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:172
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:184
 msgid "3 Months"
-msgstr ""
+msgstr "3 månader"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:173
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:179
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:188
 msgid "6 Months"
-msgstr ""
+msgstr "6 månader"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:117
 msgid "<br>Please update HD Settings to use a different status before disabling this status."
@@ -750,7 +750,7 @@ msgstr "Genomsnittlig betygsatt återkoppling per dag är runt {0} stjärnor"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:103
 msgid "Average response and resolution metrics not available"
-msgstr ""
+msgstr "Genomsnittlig svars och upplösning statistik är inte tillgänglig"
 
 #: helpdesk/api/dashboard.py:286
 msgid "Average tickets per day is around {0}"
@@ -3398,7 +3398,7 @@ msgstr "Inga nya aviseringar"
 
 #: desk/src/pages/home/components/PendingTickets.vue:247
 msgid "No new tickets assigned to you in the last 7 days"
-msgstr ""
+msgstr "Inga nya ärenden har tilldelats dig under de senaste 7 dagarna"
 
 #: desk/src/components/ticket-agent/TicketNavigation.vue:22
 msgid "No next ticket"
@@ -4549,7 +4549,7 @@ msgstr "Välj betyg"
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:34
 #: desk/src/pages/home/components/RecentFeedback.vue:148
 msgid "Select range"
-msgstr ""
+msgstr "Välj intervall"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:104
 msgid "Select teams"
@@ -4708,7 +4708,7 @@ msgstr "Visa kortkommando"
 
 #: desk/src/pages/home/components/PendingTickets.vue:143
 msgid "Showing {0} of {1} {2}"
-msgstr ""
+msgstr "Visar {0} av {1} {2}"
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:37
 msgid "Signature"
@@ -5361,7 +5361,7 @@ msgstr "Ärenden som närmar sig eller brutit mot Service Nivå Avtal"
 
 #: desk/src/pages/home/components/PendingTickets.vue:232
 msgid "Tickets assigned to you in the last 7 days"
-msgstr ""
+msgstr "Ärenden som tilldelats dig under de senaste 7 dagarna"
 
 #: helpdesk/api/dashboard.py:553
 msgid "Tickets by Channel"
