@@ -476,7 +476,7 @@ const currentFeedback = computed(() => {
 
 const barChartOptions = computed<EChartsOption>(() => {
   // re-compute on theme change
-  dataTheme.value;
+  void dataTheme.value;
 
   const mutedBarColor = cssVar("--surface-gray-4");
   const axisLineColor = cssVar("--outline-gray-1");
@@ -558,7 +558,7 @@ const cssVar = (name: string) =>
 
 const placeholderChartOptions = computed<EChartsOption>(() => {
   // re-compute on theme change
-  dataTheme.value;
+  void dataTheme.value;
 
   const placeholderColor = cssVar("--surface-gray-3");
   const axisLineColor = cssVar("--outline-gray-2");

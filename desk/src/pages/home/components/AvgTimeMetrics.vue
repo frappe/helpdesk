@@ -259,7 +259,7 @@ const cssVar = (name: string) =>
 
 const chartConfig = computed<EChartsOption>(() => {
   // re-compute on theme change
-  dataTheme.value;
+  void dataTheme.value;
 
   let data = getAvgTimeMetricsResource.fetched
     ? getAvgTimeMetricsResource.data?.data
