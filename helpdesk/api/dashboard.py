@@ -21,6 +21,7 @@ COUNT_DESC = "count desc"
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_dashboard_data(
     dashboard_type: str, filters: dict[str, any] = None

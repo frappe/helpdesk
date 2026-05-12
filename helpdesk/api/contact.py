@@ -4,6 +4,7 @@ import frappe
 
 
 @frappe.whitelist(methods=["GET"])
+@frappe.read_only()
 def search_contacts(
     txt: str,
 ) -> list[dict[Literal["full_name", "name", "email_id"], str]]:
