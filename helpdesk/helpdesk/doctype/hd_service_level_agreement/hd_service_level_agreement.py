@@ -220,6 +220,8 @@ class HDServiceLevelAgreement(Document):
             doc.resolution_date = None
             doc.resolution_time = None
             return
+        if doc.resolution_date and not doc.has_value_changed("status_category"):
+            return
         doc.resolution_date = now_datetime()
         start_at = doc.service_level_agreement_creation
         end_at = doc.resolution_date
@@ -227,7 +229,8 @@ class HDServiceLevelAgreement(Document):
         time_hold = doc.total_hold_time or 0
         time_took_effective = max(time_took - time_hold, 0)
         doc.resolution_time = time_took_effective
-        # if resolution is failed calculate by how much time it is failed
+
+        # if resolution is failed calculate by how much time it is failed in business hours
         if get_datetime(doc.resolution_date) > get_datetime(doc.resolution_by):
             start_at = doc.resolution_by
             doc.resolution_failed_by = self.calc_elapsed_time(start_at, end_at)
