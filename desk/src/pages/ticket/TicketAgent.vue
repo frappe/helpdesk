@@ -12,7 +12,7 @@
     </div>
     <SetContactPhoneModal
       v-model="showPhoneModal"
-      :name="ticket.data?.contact?.name"
+      :name="ticket.doc?.contact?.name"
       @onUpdate="ticket.reload"
     />
   </div>
@@ -115,6 +115,42 @@ provide(
   ActivitiesSymbol,
   computed(() => ticketComposable.value.activities)
 );
+
+provide("refreshTicket", () => {
+  reloadTicket(props.ticketId);
+});
+
+provide(TicketSymbol, ticket);
+
+provide(
+  AssigneeSymbol,
+  computed(() => ticketComposable.value.assignees)
+);
+
+provide(
+  TicketContactSymbol,
+  computed(() => ticketComposable.value.contact)
+);
+
+provide(
+  CustomizationSymbol,
+  computed(() => customizations)
+);
+
+provide(
+  RecentSimilarTicketsSymbol,
+  computed(() => ticketComposable.value.recentSimilarTickets)
+);
+
+provide(
+  ActivitiesSymbol,
+  computed(() => ticketComposable.value.activities)
+);
+
+provide("refreshTicket", () => {
+  reloadTicket(props.ticketId);
+});
+
 provide("makeCall", () => {
   if (
     !ticketComposable.value.contact.data?.mobile_no &&
@@ -123,6 +159,7 @@ provide("makeCall", () => {
     showPhoneModal.value = true;
     return;
   }
+
   telephonyStore.makeCall({
     number:
       ticketComposable.value.contact.data?.phone ||
@@ -131,7 +168,10 @@ provide("makeCall", () => {
     docname: props.ticketId,
   });
 });
-const viewerComposable = computed(() => useActiveViewers(ticket.value.name));
+
+const viewerComposable = computed(() =>
+  useActiveViewers(ticket.value?.doc?.name || "")
+);
 const viewers = computed(
   () => viewerComposable.value.currentViewers[props.ticketId] || []
 );
@@ -164,7 +204,7 @@ onMounted(() => {
     },
   });
   ticketsToNavigate.reload();
-  ticket.value.markSeen.reload();
+  ticket.value?.markSeen?.reload();
 
   $socket.on("ticket_update", (data: TicketUpdateData) => {
     if (data.ticket_id === ticket.value?.name) {

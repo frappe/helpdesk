@@ -24,13 +24,15 @@
           }
         "
       />
+
       <div v-else class="flex items-center justify-center flex-col flex-1">
         <Button :loading="true" variant="ghost" size="2xl" />
         <p class="text-xl font-medium text-ink-gray-5">Loading...</p>
       </div>
     </template>
   </Tabs>
-  <!-- Comm Area -->
+
+  <!-- Communication Area -->
   <CommunicationArea
     ref="communicationAreaRef"
     :ticketId="String(ticket.doc?.name)"
@@ -49,14 +51,22 @@
 
 <script setup lang="ts">
 import CommunicationArea from "@/components/CommunicationArea.vue";
+
 import {
   ActivityIcon,
   CommentIcon,
   EmailIcon,
   PhoneIcon,
 } from "@/components/icons";
+
+import LucideListTodo from "~icons/lucide/list-todo";
+
+import { __ } from "@/translation";
+
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
+
 import { useTelephonyStore } from "@/stores/telephony";
+
 import {
   ActivitiesSymbol,
   FeedbackActivity,
@@ -64,9 +74,13 @@ import {
   TicketSymbol,
   TicketTab,
 } from "@/types";
+
 import { Button, Tabs } from "frappe-ui";
+
 import { storeToRefs } from "pinia";
+
 import { computed, ComputedRef, inject, ref } from "vue";
+
 import { TicketAgentActivities } from "../ticket";
 
 const ticket = inject(TicketSymbol);
@@ -75,10 +89,13 @@ const activities = inject(ActivitiesSymbol);
 const ticketAgentActivitiesRef = ref<InstanceType<
   typeof TicketAgentActivities
 > | null>(null);
+
 const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
   null
 );
+
 const telephonyStore = useTelephonyStore();
+
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const tabs: ComputedRef<TabObject[]> = computed(() => {
@@ -98,6 +115,11 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       label: "Comments",
       icon: CommentIcon,
     },
+    {
+      name: "task",
+      label: __("Tasks"),
+      icon: LucideListTodo,
+    },
   ];
 
   if (isCallingEnabled.value) {
@@ -107,20 +129,20 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       icon: PhoneIcon,
     });
   }
+
   return _tabs;
 });
 
 const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
 
-// TODO: refactor for pagination
-// can be done once we sort out the backend
-// sender mail will be  user using portal
 const _activities = computed(() => {
   if (!activities.value?.data) {
     return [];
   }
-  const emailProps = activities.value?.data?.communications.map(
-    (email, idx: number) => {
+
+  // EMAILS
+  const emailProps =
+    activities.value?.data?.communications?.map((email: any, idx: number) => {
       return {
         subject: email.subject,
         content: email.content,
@@ -139,83 +161,100 @@ const _activities = computed(() => {
         deliveryStatus: email.delivery_status,
         isFirstEmail: idx === 0,
       };
-    }
-  );
+    }) || [];
 
-  const commentProps = activities.value.data.comments.map((comment) => {
-    return {
-      name: comment.name,
-      type: "comment",
-      key: comment.creation,
-      commentedBy: comment.commented_by,
-      commenter: comment.user.name,
-      creation: comment.creation,
-      content: comment.content,
-      attachments: comment.attachments,
-    };
-  });
+  // COMMENTS
+  const commentProps =
+    activities.value?.data?.comments?.map((comment: any) => {
+      return {
+        name: comment.name,
+        type: "comment",
+        key: comment.creation,
+        commentedBy: comment.commented_by,
+        commenter: comment.user?.name,
+        creation: comment.creation,
+        content: comment.content,
+        attachments: comment.attachments,
+      };
+    }) || [];
 
-  activities.value.data.history.map((h) => {
-    // }
-    h.action;
-    h.owner;
-    // if h.actions includes h.owner, replace it with 'themselves'
+  // HISTORY — mutate in place to replace owner name with "themselves"
+  activities.value?.data?.history?.forEach((h: any) => {
     if (h.action && h.owner && h.action.includes(h.owner)) {
       h.action = h.action.replace(h.owner, "themselves");
     }
-    return h;
   });
 
   const historyProps = [
-    ...activities.value.data.history,
-    ...activities.value.data.views,
-  ].map((h) => {
+    ...(activities.value?.data?.history || []),
+    ...(activities.value?.data?.views || []),
+  ].map((h: any) => {
     return {
       type: "history",
       key: h.creation,
       content: h.action ? h.action : "viewed this",
       creation: h.creation,
-      user: h.user.name + " ",
+      user: h.user?.name + " ",
     };
   });
 
-  const callProps = activities.value.data.calls.map((call) => {
-    return {
-      ...call,
-      type: "call",
-      name: call.name,
-      key: call.creation,
-      call_type: call.type,
-      content: `${call.caller || "Unknown"} made a call to ${
-        call.receiver || "Unknown"
-      }`,
-      duration: call.duration ? call.duration + "s" : "0s",
-    };
-  });
+  // CALLS
+  const callProps =
+    activities.value?.data?.calls?.map((call: any) => {
+      return {
+        ...call,
+        type: "call",
+        name: call.name,
+        key: call.creation,
+        call_type: call.type,
+        content: `${call.caller || "Unknown"} made a call to ${
+          call.receiver || "Unknown"
+        }`,
+        duration: call.duration ? call.duration + "s" : "0s",
+      };
+    }) || [];
 
+  // TASKS — read from activities.data.tasks (returned by get_ticket_activities)
+  const taskProps =
+    activities.value?.data?.tasks?.map((task: any) => {
+      return {
+        ...task,
+        type: "task",
+        key: task.name, // use name (unique ID) as key, not creation
+        creation: task.creation,
+      };
+    }) || [];
+
+  // MERGE + SORT all activity types by creation time
   const sorted = [
     ...emailProps,
     ...commentProps,
     ...historyProps,
     ...callProps,
-  ].sort((a, b) => new Date(a.creation) - new Date(b.creation));
-  const data = [];
+    ...taskProps,
+  ].sort(
+    (a: any, b: any) =>
+      new Date(a.creation).getTime() - new Date(b.creation).getTime()
+  );
+
+  const data: any[] = [];
   let i = 0;
 
   while (i < sorted.length) {
-    const currentActivity = sorted[i];
+    const currentActivity: any = sorted[i];
 
     if (currentActivity.type === "history") {
       currentActivity.relatedActivities = [currentActivity];
+
       for (let j = i + 1; j < sorted.length + 1; j++) {
-        const nextActivity = sorted[j];
+        const nextActivity: any = sorted[j];
 
         if (
           nextActivity &&
           nextActivity.user === currentActivity.user &&
           nextActivity.content !== "viewed this" &&
-          !nextActivity.content.includes("assigned") &&
-          !nextActivity.content.includes("unassigned")
+          !nextActivity.content?.includes("assigned") &&
+          !nextActivity.content?.includes("unassigned")
         ) {
           currentActivity.relatedActivities.push(nextActivity);
         } else {
@@ -227,29 +266,28 @@ const _activities = computed(() => {
     } else {
       data.push(currentActivity);
     }
+
     i++;
   }
-  // add feedback data at the last always
-  // name is email
-  // full_name is name
 
-  if (ticket.value.doc.feedback_rating === 0) {
-    return data;
-  }
-  let feedbackActivity: FeedbackActivity[] = [
-    {
-      type: "feedback",
-      key: "feedback-activity",
-      feedback_rating: ticket.value?.doc.feedback_rating,
-      feedback_extra: ticket.value?.doc.feedback_extra,
-      feedback: ticket.value?.doc.feedback,
-      sender: {
-        name: ticket.value?.doc.raised_by,
-        full_name: ticket.value?.doc.contact,
+  // FEEDBACK — always last
+  if ((ticket.value?.doc?.feedback_rating || 0) !== 0) {
+    const feedbackActivity: FeedbackActivity[] = [
+      {
+        type: "feedback",
+        key: "feedback-activity",
+        feedback_rating: ticket.value?.doc?.feedback_rating,
+        feedback_extra: ticket.value?.doc?.feedback_extra,
+        feedback: ticket.value?.doc?.feedback,
+        sender: {
+          name: ticket.value?.doc?.raised_by,
+          full_name: ticket.value?.doc?.contact,
+        },
       },
-    },
-  ];
-  data.push(...feedbackActivity);
+    ];
+
+    data.push(...feedbackActivity);
+  }
 
   return data;
 });
@@ -258,6 +296,9 @@ function filterActivities(eventType: TicketTab) {
   if (eventType === "activity") {
     return _activities.value;
   }
-  return _activities.value.filter((activity) => activity.type === eventType);
+
+  return _activities.value.filter(
+    (activity: any) => activity.type === eventType
+  );
 }
 </script>

@@ -244,6 +244,7 @@ import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 import { HDTicketStatus } from "@/types/doctypes";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
+import Taskbox from "@/components/ticket/Taskbox.vue";
 
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
@@ -314,7 +315,7 @@ const ticket = createResource({
       call,
       router,
       toast,
-      $dialog,
+      dialog,
       updateField,
       createToast: toast.create,
     });
@@ -372,6 +373,11 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       name: "comment",
       label: __("Comments"),
       icon: CommentIcon,
+    },
+    {
+      name: "task",
+      label: __("Task"),
+      icon: TaskStatusIcon,
     },
   ];
 
@@ -431,6 +437,15 @@ const activities = computed(() => {
     }
   );
 
+  const taskProps = (ticket.data.tasks || []).map((task) => {
+    return {
+      ...task,
+      type: "task",
+      key: task.name,
+      creation: task.creation,
+    };
+  });
+
   const callProps = ticket.data.calls.map((call) => {
     return {
       ...call,
@@ -450,6 +465,7 @@ const activities = computed(() => {
     ...commentProps,
     ...historyProps,
     ...callProps,
+    ...taskProps,
   ].sort((a, b) => new Date(a.creation) - new Date(b.creation));
 
   const data = [];

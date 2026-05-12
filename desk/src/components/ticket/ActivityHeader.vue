@@ -5,9 +5,10 @@
     <div class="flex h-8 items-center text-xl font-semibold text-gray-800">
       {{ title }}
     </div>
+
     <Dropdown
-      v-if="title == 'Calls'"
-      :options="callActions"
+      v-if="title == 'Calls' || title == 'Tasks'"
+      :options="title == 'Calls' ? callActions : taskActions"
       @click.stop
       placement="right"
     >
@@ -16,7 +17,9 @@
           <template #prefix>
             <FeatherIcon name="plus" class="h-4 w-4" />
           </template>
+
           <span>{{ __("New") }}</span>
+
           <template #suffix>
             <FeatherIcon
               :name="open ? 'chevron-up' : 'chevron-down'"
@@ -27,6 +30,7 @@
       </template>
     </Dropdown>
   </div>
+
   <CallLogModal
     v-model="showCallLogModal"
     :ticketId="ticketId"
@@ -38,8 +42,11 @@
 import { PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
 import { __ } from "@/translation";
-import { Dropdown } from "frappe-ui";
+
+import { Dropdown, Button, FeatherIcon } from "frappe-ui";
+
 import { computed, h, inject, ref } from "vue";
+
 defineProps({
   title: {
     type: String,
@@ -47,17 +54,21 @@ defineProps({
   },
 });
 
+const emit = defineEmits(["new-task"]);
+
 const makeCall = inject<() => void>("makeCall");
 const refreshTicket = inject<() => void>("refreshTicket");
+
 const showCallLogModal = ref(false);
+
 const ticketId = inject<string>("ticketId");
 
 const callActions = computed(() => {
-  let actions = [
+  return [
     {
       icon: h(PhoneIcon, { class: "h-4 w-4" }),
       label: __("Make a Call"),
-      onClick: () => makeCall(),
+      onClick: () => makeCall?.(),
     },
     {
       icon: "edit-3",
@@ -67,8 +78,17 @@ const callActions = computed(() => {
       },
     },
   ];
-  return actions;
+});
+
+const taskActions = computed(() => {
+  return [
+    {
+      icon: "plus",
+      label: __("New Task"),
+      onClick: () => {
+        emit("new-task");
+      },
+    },
+  ];
 });
 </script>
-
-<style scoped></style>

@@ -740,14 +740,36 @@ def get_recent_tickets(ticket: str):
 
 @frappe.whitelist()
 def get_ticket_activities(ticket: str | int):
+
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
+
+    tasks = frappe.get_all(
+        "HD Task",
+        filters={"reference_ticket": ticket},
+        fields=[
+            "name",
+            "title",
+            "description",
+            "priority",
+            "due_date",
+            "is_completed",
+            "creation",
+        ],
+        order_by="creation desc",
+    )
+
+    for d in tasks:
+        d["type"] = "task"
+
     activities = {
         "comments": get_comments(ticket),
         "communications": get_communications(ticket),
         "history": get_history(ticket),
         "views": get_views(ticket),
         "calls": get_call_logs(ticket),
+        "tasks": tasks,
     }
+
     return activities
 
 
