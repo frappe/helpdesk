@@ -210,21 +210,31 @@ function convertFilters(data, allFilters) {
   let f = [];
   for (let [key, value] of Object.entries(allFilters)) {
     let field = data.find((f) => f.fieldname === key);
-    if (typeof value !== "object" || !value) {
-      value = ["=", value];
-      if (field?.fieldtype === "Check") {
-        value = ["equals", value[1] ? "Yes" : "No"];
+    if (!field) continue;
+
+    const values =
+      Array.isArray(value) && Array.isArray(value[0]) ? value : [value];
+
+    for (const rawValue of values) {
+      let filterValue =
+        typeof rawValue === "object" && rawValue
+          ? [...rawValue]
+          : ["=", rawValue];
+
+      if (
+        field.fieldtype === "Check" &&
+        ["=", "equals"].includes(filterValue[0])
+      ) {
+        filterValue = ["equals", filterValue[1] ? "Yes" : "No"];
       }
-    }
-    if (typeof value[1] === "number") {
-      value[1] = value[1].toString();
-    }
-    if (field) {
+      if (typeof filterValue[1] === "number") {
+        filterValue[1] = filterValue[1].toString();
+      }
       f.push({
         field,
         fieldname: key,
-        operator: oppositeOperatorMap[value[0]],
-        value: value[1],
+        operator: oppositeOperatorMap[filterValue[0]],
+        value: filterValue[1],
       });
     }
   }
@@ -549,15 +559,31 @@ function apply() {
 
 function parseFilters(filters) {
   return filters.map(transformIn).reduce((p, c) => {
-    if (["equals", "="].includes(c.operator)) {
-      if (c.toBoolean) {
-        p[c.fieldname] =
-          c.value === "Yes" ? true : c.value === "No" ? false : c.value;
-      } else {
-        p[c.fieldname] = c.value;
-      }
+    const operator = ["equals", "="].includes(c.operator)
+      ? "="
+      : operatorMap[c.operator.toLowerCase()];
+    const value = c.toBoolean
+      ? c.value === "Yes"
+        ? true
+        : c.value === "No"
+          ? false
+          : c.value
+      : c.value;
+    const entry = operator === "=" ? value : [operator, value];
+
+    if (p[c.fieldname] !== undefined) {
+      const current = p[c.fieldname];
+      const currentEntries =
+        Array.isArray(current) && Array.isArray(current[0])
+          ? current
+          : [["=", current]];
+
+      p[c.fieldname] = [
+        ...currentEntries,
+        operator === "=" ? ["=", value] : entry,
+      ];
     } else {
-      p[c.fieldname] = [operatorMap[c.operator.toLowerCase()], c.value];
+      p[c.fieldname] = entry;
     }
     return p;
   }, {});
