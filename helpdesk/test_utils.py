@@ -278,6 +278,21 @@ def make_agent(email: str, first_name: str = "Test Agent"):
     return email
 
 
+def get_ticket_communication(ticket_name: str):
+    """
+    Returns the first Communication doc linked to the given HD Ticket.
+    """
+    name = frappe.get_all(
+        "Communication",
+        filters={
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket_name,
+        },
+        pluck="name",
+    )[0]
+    return frappe.get_doc("Communication", name)
+
+
 def add_comment(
     ticket: str,
     content: str = "This is a test comment.",
