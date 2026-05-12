@@ -176,7 +176,7 @@ const status = computed(() => {
 
 const normalizeAndFilter = (
   field: string | string[],
-  filterOut: string[] = []
+  valuesToExclude: string[] = []
 ) => {
   let arr = [];
   let current = "";
@@ -197,7 +197,7 @@ const normalizeAndFilter = (
   } else {
     arr = field || [];
   }
-  return arr.filter(Boolean).filter((item) => !filterOut.includes(item));
+  return arr.filter(Boolean).filter((item) => !valuesToExclude.includes(item));
 };
 
 const reply = () => {

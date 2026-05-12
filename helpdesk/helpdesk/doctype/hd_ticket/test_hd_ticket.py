@@ -16,6 +16,7 @@ from helpdesk.test_utils import (
     add_holiday,
     get_current_week_monday,
     get_priority_response_resolution_time,
+    get_ticket_communication,
     make_status,
     make_ticket,
     remove_holidays,
@@ -711,15 +712,14 @@ class TestHDTicket(FrappeTestCase):
         """
         ticket = make_ticket()
         cc_recipient = "cc_only@test.com"
-
-        # Should not raise a validation error
-        try:
-            ticket.reply_via_agent(message="Test reply", to=None, cc=cc_recipient)
-            sent = True
-        except Exception:
-            sent = False
-
-        self.assertTrue(sent)
+        ticket.reply_via_agent(message="Test reply", to=None, cc=cc_recipient)
+        communication_doc = get_ticket_communication(ticket.name)
+        if hasattr(communication_doc, "to") and communication_doc.to:
+            self.assertFalse(communication_doc.to)
+        if hasattr(communication_doc, "cc") and communication_doc.cc:
+            self.assertEqual(communication_doc.cc, cc_recipient)
+        if hasattr(communication_doc, "bcc") and communication_doc.bcc:
+            self.assertFalse(communication_doc.bcc)
 
     def test_reply_via_agent_with_only_bcc(self):
         """
@@ -727,14 +727,14 @@ class TestHDTicket(FrappeTestCase):
         """
         ticket = make_ticket()
         bcc_recipient = "bcc_only@test.com"
-
-        try:
-            ticket.reply_via_agent(message="Test reply", to=None, bcc=bcc_recipient)
-            sent = True
-        except Exception:
-            sent = False
-
-        self.assertTrue(sent)
+        ticket.reply_via_agent(message="Test reply", to=None, bcc=bcc_recipient)
+        communication_doc = get_ticket_communication(ticket.name)
+        if hasattr(communication_doc, "to") and communication_doc.to:
+            self.assertFalse(communication_doc.to)
+        if hasattr(communication_doc, "cc") and communication_doc.cc:
+            self.assertFalse(communication_doc.cc)
+        if hasattr(communication_doc, "bcc") and communication_doc.bcc:
+            self.assertEqual(communication_doc.bcc, bcc_recipient)
 
     def test_reply_via_agent_with_cc_and_bcc_no_to(self):
         """
@@ -743,16 +743,17 @@ class TestHDTicket(FrappeTestCase):
         ticket = make_ticket()
         cc_recipient = "cc_combo@test.com"
         bcc_recipient = "bcc_combo@test.com"
-
-        try:
-            ticket.reply_via_agent(
-                message="Test reply", to=None, cc=cc_recipient, bcc=bcc_recipient
-            )
-            sent = True
-        except Exception:
-            sent = False
-
-        self.assertTrue(sent)
+        ticket.reply_via_agent(
+            message="Test reply", to=None, cc=cc_recipient, bcc=bcc_recipient
+        )
+        comm = get_ticket_communication(ticket.name)
+        communication_doc = get_ticket_communication(ticket.name)
+        if hasattr(communication_doc, "to") and communication_doc.to:
+            self.assertFalse(communication_doc.to)
+        if hasattr(communication_doc, "cc") and communication_doc.cc:
+            self.assertEqual(communication_doc.cc, cc_recipient)
+        if hasattr(communication_doc, "bcc") and communication_doc.bcc:
+            self.assertEqual(communication_doc.bcc, bcc_recipient)
 
     def tearDown(self):
         frappe.set_user("Administrator")
