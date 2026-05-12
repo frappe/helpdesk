@@ -91,6 +91,17 @@ import { computed, inject } from "vue";
 
 const ticket = inject(TicketSymbol)!;
 
+const timeFormat = {
+  day: true,
+  hour: true,
+  minute: true,
+};
+
+// Cases:
+// - if not first responded and response by is in future -> show due in
+// - if first responded before response by -> show fulfilled in
+// - if not first responded and response by is in past -> show overdue by
+// - if first responded after response by -> show failed by
 const firstResponse = computed(() => {
   if (ticket.value?.get?.loading) return { label: "", color: "", date: "" };
   if (
@@ -108,12 +119,14 @@ const firstResponse = computed(() => {
       dayjs(ticket.value.doc.response_by)
     )
   ) {
-    let responseTime = ticket.value.doc.first_response_time;
-    let responseBy = formatTimeShort(
-      ticket.value.doc.first_responded_on as string,
-      ticket.value.doc.creation
-    );
-    let fulfilled = responseTime ? formatTime(responseTime) : responseBy;
+    let responseTime = ticket.value?.doc?.first_response_time;
+
+    let fulfilled = responseTime
+      ? formatTime(responseTime, timeFormat)
+      : formatTimeShort(
+          ticket.value.doc.first_responded_on as string,
+          ticket.value.doc.creation
+        );
 
     return {
       label: `Fulfilled in ${fulfilled}`,
@@ -134,11 +147,7 @@ const firstResponse = computed(() => {
     }
 
     let failed = ticket.value?.doc?.first_response_failed_by
-      ? formatTime(ticket.value.doc.first_response_failed_by, {
-          day: true,
-          hour: true,
-          minute: true,
-        })
+      ? formatTime(ticket.value.doc.first_response_failed_by, timeFormat)
       : formatTimeShort(
           ticket.value.doc.first_responded_on,
           ticket.value.doc.response_by
@@ -171,7 +180,9 @@ const resolutionBy = computed(() => {
     !ticket.value.doc?.resolution_date &&
     dayjs().isBefore(dayjs(ticket.value.doc?.resolution_by))
   ) {
-    let resolutionBy = formatTimeShort(ticket.value.doc?.resolution_by);
+    let resolutionBy = formatTimeShort(
+      ticket.value.doc?.resolution_by as string
+    );
     return {
       label: `Due in ${resolutionBy}`,
       color: "purple",
@@ -182,25 +193,24 @@ const resolutionBy = computed(() => {
       dayjs(ticket.value.doc?.resolution_by)
     )
   ) {
-    let resolutionBy = formatTimeShort(
-      ticket.value.doc?.resolution_date,
-      ticket.value.doc?.creation
-    );
+    let resolutionTime = ticket.value?.doc?.resolution_time;
+    let fulfilled = resolutionTime
+      ? formatTime(resolutionTime, timeFormat)
+      : formatTimeShort(
+          ticket.value.doc?.resolution_date as string,
+          ticket.value.doc?.creation
+        );
     return {
-      label: `Fulfilled in ${resolutionBy}`,
+      label: `Fulfilled in ${fulfilled}`,
       color: "green",
       date: ticket.value.doc?.resolution_date,
     };
   } else {
     let failed = ticket.value.doc?.resolution_failed_by
-      ? formatTime(ticket.value.doc?.resolution_failed_by, {
-          day: true,
-          hour: true,
-          minute: true,
-        })
+      ? formatTime(ticket.value.doc?.resolution_failed_by, timeFormat)
       : formatTimeShort(
-          ticket.value.doc?.resolution_date,
-          ticket.value.doc?.resolution_by
+          ticket.value.doc?.resolution_by,
+          ticket.value.doc?.resolution_date
         );
     return {
       label: `Failed by ${failed}`,
