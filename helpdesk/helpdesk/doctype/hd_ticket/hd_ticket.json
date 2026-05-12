@@ -468,7 +468,7 @@
    "set_only_once": 1
   },
   {
-   "depends_on": "eval:doc.first_responded_on",
+   "depends_on": "eval:doc.first_response_failed_by",
    "fieldname": "first_response_failed_by",
    "fieldtype": "Duration",
    "label": "First Response Failed By",

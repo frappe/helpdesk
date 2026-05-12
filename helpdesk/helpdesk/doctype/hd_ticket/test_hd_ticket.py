@@ -988,7 +988,7 @@ class TestHDTicket(FrappeTestCase):
             # first_response_failed_by should be 9 minutes (in business hours seconds)
             self.assertEqual(ticket.first_response_failed_by, 9 * 60)
 
-        # now check failed by just 2 hminutes after the end time
+        # now check failed by just 2 minutes after the end time
         # what is the end time of monday?
         # end_time = 6 PM on Monday
         date2 = get_current_week_monday(hours=17)
