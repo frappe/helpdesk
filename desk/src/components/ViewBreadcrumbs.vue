@@ -55,24 +55,24 @@
       <template #item-suffix="{ item }">
         <div
           v-if="item.name"
-          class="flex flex-row-reverse gap-2 items-center min-w-11"
+          class="flex items-center justify-end gap-2 min-w-11"
         >
-          <Dropdown align="end" :options="dropdownActions(item)">
-            <template #default>
-              <Button
-                variant="ghost"
-                class="kebab-btn hidden !size-4 ml-0 rounded-sm"
-                icon="more-horizontal"
-                @click.stop
-              />
-            </template>
-          </Dropdown>
-
           <FeatherIcon
             v-if="isCurrentView(item)"
             name="check"
             class="size-4 text-ink-gray-7"
           />
+          <Dropdown align="end" :options="dropdownActions(item)">
+            <template #default="{ open }">
+              <Button
+                variant="ghost"
+                class="kebab-btn !size-4 ml-0 rounded-sm"
+                :class="open ? 'inline-flex' : 'hidden'"
+                icon="more-horizontal"
+                @click.stop
+              />
+            </template>
+          </Dropdown>
         </div>
       </template>
     </Dropdown>

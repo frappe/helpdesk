@@ -16,7 +16,7 @@ def calculate_percentage_change(current_value: float, previous_value: float) -> 
     if previous_value > 0:
         return round(((current_value - previous_value) / previous_value) * 100, 2)
     elif current_value > 0:
-        return 999
+        return None
     return 0
 
 

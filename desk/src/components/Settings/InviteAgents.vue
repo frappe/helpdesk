@@ -14,14 +14,20 @@
           :debounce="100"
           :description="__('Comma separated emails to invite.')"
         />
-        <FormControl
-          :label="__('Role')"
-          type="select"
-          :required="true"
-          :options="roleOptions"
-          v-model="role"
-          :description="roleDescription"
-        />
+        <div class="space-y-1.5">
+          <label class="block text-xs text-ink-gray-5">
+            {{ __("Role") }}
+            <span class="text-ink-red-3 select-none" aria-hidden="true">*</span>
+          </label>
+          <Select :options="roleOptions" v-model="role" required class="w-full">
+            <template #suffix>
+              <LucideChevronDown
+                class="size-4 shrink-0 text-ink-gray-4 ml-auto"
+              />
+            </template>
+          </Select>
+          <p class="text-p-xs text-ink-gray-5">{{ roleDescription }}</p>
+        </div>
         <Button
           type="submit"
           variant="solid"
@@ -98,9 +104,17 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
-import { FormControl, Button, Tooltip, createResource, toast } from "frappe-ui";
+import {
+  FormControl,
+  Select,
+  Button,
+  Tooltip,
+  createResource,
+  toast,
+} from "frappe-ui";
 import { computed, ref } from "vue";
 import { useOnboarding } from "frappe-ui/frappe";
+import LucideChevronDown from "~icons/lucide/chevron-down";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -168,7 +182,8 @@ const roleDescription = computed(
 
 const onSubmit = async () => {
   if (emails.value.trim() === "") {
-    toast.error(__("At least one email required"));
+    toast.error(__("Please enter at least one valid email to send an invite."));
+    return;
   }
   await inviteByEmailResource.submit({
     emails: emails.value,

@@ -30,10 +30,10 @@
 <script setup lang="ts">
 import { type PropType } from "vue";
 import AvgTimeCard from "./AvgTimeCard.vue";
-import AgentTicketsCard from "./AgentTicketsCard.vue";
 import AvgTimeMetrics from "./AvgTimeMetrics.vue";
 import RecentFeedback from "./RecentFeedback.vue";
 import PendingTickets from "./PendingTickets.vue";
+import AgentTicketsCard from "./AgentTicketsCard.vue";
 import { __ } from "@/translation";
 
 interface Item {

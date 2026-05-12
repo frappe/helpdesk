@@ -2,9 +2,13 @@ import frappe
 
 
 @frappe.whitelist()
-def get_first_ticket():
+def get_first_ticket(ticket: str | None = None):
     """Get first ticket created except the default ticket"""
-    ticket = frappe.get_all(
+    # If a cached ticket ID was passed, verify it still exists
+    if ticket and frappe.db.exists("HD Ticket", ticket):
+        return ticket
+
+    result = frappe.get_all(
         "HD Ticket",
         filters={
             "subject": ["!=", "Welcome to Helpdesk"],
@@ -14,7 +18,7 @@ def get_first_ticket():
         order_by="creation asc",
         limit=1,
     )
-    return ticket[0].name if ticket else None
+    return result[0].name if result else None
 
 
 @frappe.whitelist()

@@ -131,6 +131,7 @@
    "fieldname": "agent_group",
    "fieldtype": "Link",
    "label": "Team",
+   "link_filters": "[[\"HD Team\",\"disabled\",\"=\",0]]",
    "options": "HD Team"
   },
   {
@@ -486,7 +487,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-05-07 14:35:56.356727",
+ "modified": "2026-05-11 18:25:54.352721",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

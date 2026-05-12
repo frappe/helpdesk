@@ -301,11 +301,14 @@ def add_comment(
     return comment
 
 
-def make_team(team_name, members=[]):
-    """Create an HD Team with optional members."""
+def make_team(team_name, members=[], disabled=False):
+    """Create an HD Team with optional members. A default agent is created if no members are provided."""
+    if not members:
+        members = [make_agent("default_team_agent@example.com")]
+
     if frappe.db.exists("HD Team", team_name):
-        # Delete existing team members
         team = frappe.get_doc("HD Team", team_name)
+        team.disabled = disabled
         team.users = []
         for member in members:
             team.append("users", {"user": member})
@@ -321,5 +324,6 @@ def make_team(team_name, members=[]):
     )
     for member in members:
         team.append("users", {"user": member})
+    team.disabled = disabled
     team.insert(ignore_permissions=True)
     return team

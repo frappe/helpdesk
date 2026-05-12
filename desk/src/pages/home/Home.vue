@@ -63,7 +63,7 @@
     </LayoutHeader>
     <div class="flex-1 overflow-auto">
       <div
-        class="flex flex-col p-1 pt-4 md:p-5 mx-auto max-w-6xl w-full grow relative h-full"
+        class="flex flex-col p-1 pt-4 md:p-4 md:pl-3 mx-auto max-w-[1500px] w-full grow relative h-full"
       >
         <div class="grow pb-12">
           <div
@@ -83,16 +83,16 @@
             class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
             <div class="flex flex-col items-center justify-center gap-1">
-              <FeatherIcon name="layout" class="size-12 text-ink-gray-8" />
-              <div class="text-xl font-semibold text-ink-gray-8">
+              <FeatherIcon name="layout" class="size-12 text-ink-gray-4" />
+              <div class="text-lg font-medium text-ink-gray-8">
                 {{ __("No charts added") }}
               </div>
-              <div class="text-sm text-ink-gray-5">
+              <div class="text-p-base text-ink-gray-6">
                 {{ __("Add charts to get started") }}
               </div>
             </div>
           </div>
-          <div class="mt-5">
+          <div class="mt-3">
             <GridLayout
               v-if="!agentDashboard.loading && layout.length > 0"
               class="h-fit w-full"
@@ -294,7 +294,7 @@ const chartsDropdown = computed(() => {
       chart: "agent_tickets",
       onClick: () =>
         addChart("agent_tickets", {
-          w: 17,
+          w: 16,
           h: 10,
           minW: 16,
           minH: 10,
@@ -318,7 +318,7 @@ const chartsDropdown = computed(() => {
       chart: "avg_first_response_time",
       onClick: () =>
         addChart("avg_first_response_time", {
-          w: 17,
+          w: 16,
           h: 10,
           minW: 16,
           minH: 10,
@@ -330,7 +330,7 @@ const chartsDropdown = computed(() => {
       chart: "avg_resolution_time",
       onClick: () =>
         addChart("avg_resolution_time", {
-          w: 17,
+          w: 16,
           h: 10,
           minW: 16,
           minH: 10,
