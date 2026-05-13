@@ -5,15 +5,7 @@
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("General") }}
         </h1>
-        <Transition name="fade">
-          <Badge
-            variant="subtle"
-            theme="orange"
-            size="sm"
-            :label="__('Unsaved')"
-            v-if="isDirty"
-          />
-        </Transition>
+        <UnsavedBadge :show="isDirty" />
       </div>
     </template>
     <template #header-actions>
@@ -84,6 +76,7 @@ import { computed, provide, ref, watch } from "vue";
 import { __ } from "@/translation";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import { HDSettings, HDSettingsSymbol } from "@/types";
 import { useConfigStore } from "@/stores/config";
 
