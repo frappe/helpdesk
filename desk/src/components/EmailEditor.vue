@@ -92,9 +92,14 @@
     </template>
 
     <template #editor>
-      <div class="overflow-y-auto min-h-[7rem] max-h-[30vh]">
-        <EditorContent :editor="editor" />
-        <div v-if="quotedContent" class="replied-content mx-6 md:mx-5 mb-2">
+      <div class="overflow-y-auto min-h-[7rem] max-h-[30vh] flex flex-col">
+        <div class="flex-1">
+          <EditorContent :editor="editor" />
+        </div>
+        <div
+          v-if="quotedContent"
+          class="replied-content mx-6 md:mx-5 mb-2 mt-auto"
+        >
           <label class="collapse" for="quoted-toggle">...</label>
           <input
             id="quoted-toggle"
@@ -311,18 +316,6 @@ const userResource = createResource({
   url: "helpdesk.api.auth.get_current_user_email_info",
   cache: "current-user-email-info",
   auto: true,
-  onSuccess: (data: { email_signature?: string }) => {
-    if (data.email_signature) {
-      emailSignature.value = `<br>${data.email_signature}`;
-      if (isContentEmpty(newEmail.value) && !quotedContent.value) {
-        newEmail.value = emailSignature.value;
-        focusEditorAtStart();
-      }
-      if (isOnlySignature(cachedEmail.value)) {
-        cachedEmail.value = null;
-      }
-    }
-  },
 });
 
 watch(newEmail, (newValue, oldValue) => {
@@ -354,6 +347,22 @@ watch(quotedContent, (newVal, oldVal) => {
     });
   }
 });
+
+watch(
+  () => userResource.data,
+  (data: { email_signature?: string } | null) => {
+    if (!data?.email_signature) return;
+    emailSignature.value = `<br>${data.email_signature}`;
+    if (isOnlySignature(cachedEmail.value)) {
+      cachedEmail.value = null;
+    }
+    if (isContentEmpty(newEmail.value) && !quotedContent.value) {
+      newEmail.value = emailSignature.value;
+      focusEditorAtStart();
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   if (quotedContent.value) {
@@ -608,12 +617,6 @@ function handleKeydown(e: KeyboardEvent) {
     return;
   }
 }
-
-watch(emailSignature, (sig) => {
-  if (sig && isContentEmpty(newEmail.value)) {
-    newEmail.value = sig;
-  }
-});
 
 onBeforeUnmount(() => {
   cleanup();

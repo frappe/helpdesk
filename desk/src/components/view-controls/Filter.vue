@@ -164,6 +164,7 @@ import { useScreenSize } from "@/composables/screen";
 import {
   Autocomplete,
   Button,
+  Combobox,
   DatePicker,
   DateRangePicker,
   DateTimePicker,
@@ -357,9 +358,11 @@ function getValueControl(f) {
       ],
     });
   } else if (operator == "timespan") {
-    return h(FormControl, {
-      type: "select",
+    return h(Combobox, {
       options: timespanOptions,
+      trigger: "button",
+      modelValue: f.value,
+      "onUpdate:modelValue": (v) => updateValue(v, f),
     });
   } else if (["like", "not like", "in", "not in"].includes(operator)) {
     return h(FormControl, { type: "text" });
@@ -485,6 +488,9 @@ function clearfilter(close) {
 }
 
 function updateValue(value, filter) {
+  if (value && typeof value === "object" && !value.target && "value" in value) {
+    value = value.value;
+  }
   value = value.target ? value.target.value : value;
   if (filter.operator === "in" || filter.operator === "not in") {
     filter.value = value.split(",").map((v) => v.trim());

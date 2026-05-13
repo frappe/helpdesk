@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-1">
+  <div v-if="ticketsToNavigate.data?.length > 1" class="flex gap-1">
     <Tooltip
       :text="
         getPreviousTicket()

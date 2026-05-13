@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full items-center justify-center w-[stretch]">
     <div
-      class="flex flex-col items-center gap-3 text-xl font-medium text-ink-gray-4 w-9/12 md:w-4/12"
+      class="flex flex-col items-center gap-2 text-xl font-medium text-ink-gray-4 w-9/12 md:w-4/12"
     >
       <!-- overlay variant (for charts) -->
       <div
@@ -15,7 +15,7 @@
       <!-- Icon -->
       <component v-if="icon" :is="icon" class="h-10 w-10" />
       <!-- title -->
-      <div class="flex flex-col items-center justify-center">
+      <div class="flex flex-col items-center justify-center gap-0.5">
         <span
           :class="{
             'text-sm font-medium text-ink-gray-8': text === 'sm',
