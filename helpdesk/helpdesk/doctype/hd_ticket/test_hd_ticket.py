@@ -895,3 +895,76 @@ class TestHDTicket(FrappeTestCase):
             ticket.status = "Resolved"
             ticket.save()
             self.assertEqual(ticket.agreement_status, "Fulfilled")
+
+    def test_reply_via_agent_default_sender(self):
+        """Without `from_email`, sender on the Communication is the session user."""
+        ticket = make_ticket()
+
+        frappe.set_user(agent)
+        try:
+            ticket.reply_via_agent(message="Reply with default sender")
+        finally:
+            frappe.set_user("Administrator")
+
+        comm = frappe.get_last_doc(
+            "Communication",
+            filters={"reference_doctype": "HD Ticket", "reference_name": ticket.name},
+        )
+        self.assertEqual(comm.sender, agent)
+
+    def test_reply_via_agent_with_from_email(self):
+        """When `from_email` is passed, the Communication uses it as sender/email_account."""
+        email_account = frappe.get_doc(
+            {
+                "doctype": "Email Account",
+                "email_account_name": "Helpdesk From Email Test",
+                "email_id": "from-mail@test.com",
+                "domain": "example.com",
+                "smtp_server": "smtp.example.com",
+                "enable_outgoing": 1,
+                "password": "password",
+            }
+        ).insert(ignore_if_duplicate=True, ignore_permissions=True)
+
+        ticket = make_ticket()
+        frappe.set_user(agent)
+        try:
+            ticket.reply_via_agent(
+                message="Reply with switched from email",
+                from_email={
+                    "email_id": email_account.email_id,
+                    "email_account": email_account.name,
+                },
+            )
+        finally:
+            frappe.set_user("Administrator")
+
+        comm = frappe.get_last_doc(
+            "Communication",
+            filters={"reference_doctype": "HD Ticket", "reference_name": ticket.name},
+        )
+        self.assertEqual(comm.sender, email_account.email_id)
+        self.assertEqual(comm.email_account, email_account.name)
+
+    def test_reply_via_agent_with_invalid_from_email_account(self):
+        """If `from_email.email_account` does not exist, reply_via_agent should throw."""
+        ticket = make_ticket()
+
+        frappe.set_user(agent)
+        try:
+            with self.assertRaises(frappe.ValidationError):
+                ticket.reply_via_agent(
+                    message="Reply with bad email account",
+                    from_email={
+                        "email_id": "invalid@test.com",
+                        "email_account": "Invalid Email Account",
+                    },
+                )
+        finally:
+            frappe.set_user("Administrator")
+
+    def tearDown(self):
+        frappe.set_user("Administrator")
+        remove_holidays()
+        frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
+        frappe.delete_doc("HD Ticket Status", "New", force=True)
