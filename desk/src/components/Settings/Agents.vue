@@ -84,28 +84,17 @@
           />
         </div>
         <!-- Empty State -->
-        <div
+        <EmptyState
           v-if="!agents.loading && !agents.data?.length"
-          class="flex flex-col items-center justify-center gap-4 h-full"
-        >
-          <div
-            class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex items-center justify-center"
-          >
-            <AgentIcon class="size-6 text-ink-gray-6" />
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <div class="text-base font-medium text-ink-gray-6">
-              {{ __("No agent found") }}
-            </div>
-            <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-              {{
-                activeFilter.length
-                  ? __("Change your search terms or filters")
-                  : __("Add one to get started.")
-              }}
-            </div>
-          </div>
-        </div>
+          variant="badge"
+          :icon="AgentIcon"
+          title="No agent found"
+          :description="
+            activeFilter.length
+              ? 'Change your search terms or filters'
+              : 'Add one to get started.'
+          "
+        />
         <!-- Agent List -->
         <div
           class="w-full"

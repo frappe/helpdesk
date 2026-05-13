@@ -1,5 +1,26 @@
 <template>
-  <div class="flex h-full items-center justify-center w-[stretch]">
+  <div
+    v-if="variant === 'badge'"
+    class="flex flex-col items-center justify-center gap-4 h-full"
+  >
+    <div
+      class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+    >
+      <component v-if="icon" :is="icon" class="size-6 text-ink-gray-6" />
+    </div>
+    <div class="flex flex-col items-center gap-1">
+      <div class="text-base font-medium text-ink-gray-6">
+        {{ __(title) }}
+      </div>
+      <div
+        v-if="descriptionText"
+        class="text-p-sm text-ink-gray-5 max-w-60 text-center"
+      >
+        {{ __(descriptionText) }}
+      </div>
+    </div>
+  </div>
+  <div v-else class="flex h-full items-center justify-center w-[stretch]">
     <div
       class="flex flex-col items-center gap-2 text-xl font-medium text-ink-gray-4 w-9/12 md:w-4/12"
     >
@@ -46,7 +67,7 @@ interface Props {
   title: string;
   icon?: VNode | string;
   description?: string;
-  variant?: "default" | "overlay";
+  variant?: "default" | "overlay" | "badge";
   text?: "sm" | "md" | "lg";
 }
 

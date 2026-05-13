@@ -78,27 +78,16 @@
       >
         <LoadingIndicator class="w-4" />
       </div>
-      <div
+      <EmptyState
         v-if="
           !savedRepliesListResource?.list?.loading &&
           !savedRepliesListResource?.data?.length
         "
-        class="flex flex-col items-center justify-center gap-4 grow"
-      >
-        <div
-          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
-        >
-          <SavedReplyIcon class="size-6 text-ink-gray-6" />
-        </div>
-        <div class="flex flex-col items-center gap-1">
-          <div class="text-base font-medium text-ink-gray-6">
-            {{ __("No saved replies found") }}
-          </div>
-          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-            {{ __("Add one to get started.") }}
-          </div>
-        </div>
-      </div>
+        variant="badge"
+        :icon="SavedReplyIcon"
+        title="No saved replies found"
+        description="Add one to get started."
+      />
       <div
         v-if="
           !savedRepliesListResource?.list?.loading &&
