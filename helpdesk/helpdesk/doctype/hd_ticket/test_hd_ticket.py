@@ -16,8 +16,8 @@ from helpdesk.test_utils import (
     add_comment,
     add_holiday,
     get_current_week_monday,
+    get_latest_ticket_communication,
     get_priority_response_resolution_time,
-    get_ticket_communication,
     make_status,
     make_ticket,
     remove_holidays,
@@ -713,8 +713,8 @@ class TestHDTicket(IntegrationTestCase):
         """
         ticket = make_ticket()
         cc_recipient = "cc_only@test.com"
-        ticket.reply_via_agent(message="Test reply", to=None, cc=cc_recipient)
-        communication_doc = get_ticket_communication(ticket.name)
+        ticket.reply_via_agent(message="Test reply", cc=cc_recipient)
+        communication_doc = get_latest_ticket_communication(ticket.name)
         if hasattr(communication_doc, "to") and communication_doc.to:
             self.assertFalse(communication_doc.to)
         if hasattr(communication_doc, "cc") and communication_doc.cc:
@@ -728,8 +728,8 @@ class TestHDTicket(IntegrationTestCase):
         """
         ticket = make_ticket()
         bcc_recipient = "bcc_only@test.com"
-        ticket.reply_via_agent(message="Test reply", to=None, bcc=bcc_recipient)
-        communication_doc = get_ticket_communication(ticket.name)
+        ticket.reply_via_agent(message="Test reply", bcc=bcc_recipient)
+        communication_doc = get_latest_ticket_communication(ticket.name)
         if hasattr(communication_doc, "to") and communication_doc.to:
             self.assertFalse(communication_doc.to)
         if hasattr(communication_doc, "cc") and communication_doc.cc:
@@ -744,11 +744,9 @@ class TestHDTicket(IntegrationTestCase):
         ticket = make_ticket()
         cc_recipient = "cc_combo@test.com"
         bcc_recipient = "bcc_combo@test.com"
-        ticket.reply_via_agent(
-            message="Test reply", to=None, cc=cc_recipient, bcc=bcc_recipient
-        )
-        comm = get_ticket_communication(ticket.name)
-        communication_doc = get_ticket_communication(ticket.name)
+        ticket.reply_via_agent(message="Test reply", cc=cc_recipient, bcc=bcc_recipient)
+        comm = get_latest_ticket_communication(ticket.name)
+        communication_doc = get_latest_ticket_communication(ticket.name)
         if hasattr(communication_doc, "to") and communication_doc.to:
             self.assertFalse(communication_doc.to)
         if hasattr(communication_doc, "cc") and communication_doc.cc:
