@@ -172,7 +172,7 @@ def add_default_agent_groups():
         if not frappe.db.exists("HD Team", agent_group):
             agent_group_doc = frappe.new_doc("HD Team")
             agent_group_doc.team_name = agent_group
-            agent_group_doc.insert()
+            agent_group_doc.insert(ignore_mandatory=True)
 
 
 def update_agent_role_permissions():

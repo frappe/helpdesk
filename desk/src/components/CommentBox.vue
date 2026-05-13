@@ -305,7 +305,7 @@ const deleteComment = createResource({
   }),
   onSuccess() {
     emit("update");
-    toast.success(__("Comment deleted sucessfully."));
+    toast.success(__("Comment deleted successfully."));
   },
 });
 

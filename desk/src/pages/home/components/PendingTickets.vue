@@ -78,23 +78,13 @@
                   v-else-if="ticket.reason.type === 'pending'"
                   class="size-4 flex-shrink-0"
                 />
-                <span class="truncate">{{ ticket.reason.text }}</span>
+                <span class="truncate pr-2">{{ ticket.reason.text }}</span>
               </div>
               <span
                 v-else
                 class="text-ink-gray-4 truncate inline-block w-full align-bottom"
                 >{{ __("No reason") }}</span
               >
-            </td>
-          </tr>
-          <tr
-            v-if="chartConfig?.tickets?.length < 6"
-            v-for="i in Math.max(0, 7 - chartConfig?.tickets?.length)"
-            :key="'placeholder-' + i"
-            class="border-t border-gray-100"
-          >
-            <td v-for="j in 6" :key="j" class="p-2 py-3">
-              <div class="h-5 w-full bg-surface-gray-1" />
             </td>
           </tr>
         </tbody>
@@ -105,38 +95,59 @@
             :class="i > 1 ? 'border-t border-gray-200' : ''"
           >
             <td class="p-2 py-3 min-w-8">
-              <div class="h-4 w-full bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 w-full max-w-0">
-              <div class="h-4 w-full bg-surface-gray-1 max-w-full" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1 max-w-full" />
             </td>
             <td class="p-2 py-3 min-w-14">
-              <div class="h-4 w-full bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-21">
-              <div class="h-4 w-full bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-28">
-              <div class="h-4 w-full bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-40">
-              <div class="h-4 w-full bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
             </td>
           </tr>
-          <TableEmptyState
+          <EmptyState
+            class="absolute inset-0 z-10"
             v-if="chartConfig?.tickets?.length === 0"
             :title="emptyState.title"
             :description="emptyState.description"
+            variant="overlay"
+            text="md"
           />
         </tbody>
       </table>
       <div
-        v-if="chartConfig?.totalPendingTickets > 6"
-        class="p-2 flex items-center gap-1 text-base text-ink-gray-5 cursor-pointer hover:text-ink-gray-7 w-max select-none mt-3"
-        @click="redirectToSeeAllTickets"
+        class="flex justify-between items-center text-sm mt-auto text-ink-gray-5 pl-2 pb-2"
       >
-        {{ __("See all {0} tickets", chartConfig?.totalPendingTickets + "") }}
-        <FeatherIcon name="arrow-right" class="size-4" />
+        <div>
+          <div
+            v-if="chartConfig?.totalPendingTickets > 6"
+            class="flex items-center gap-1 cursor-pointer hover:text-ink-gray-7 w-max select-none mt-3"
+            @click="redirectToSeeAllTickets"
+          >
+            {{
+              __("See all {0} tickets", chartConfig?.totalPendingTickets + "")
+            }}
+            <FeatherIcon name="arrow-right" class="size-4" />
+          </div>
+        </div>
+        <div v-if="chartConfig?.tickets?.length > 0" class="mt-3 mb-0.5">
+          {{
+            __(
+              "Showing {0} of {1} {2}",
+              chartConfig?.tickets?.length + "",
+              chartConfig?.totalPendingTickets + "",
+              chartConfig?.tickets?.length > 1 ? __("tickets") : __("ticket")
+            )
+          }}
+        </div>
       </div>
     </div>
   </div>
@@ -152,7 +163,7 @@ import TimerIcon from "~icons/lucide/timer";
 import TicketPlusIcon from "~icons/lucide/ticket-plus";
 import CalendarIcon from "~icons/lucide/calendar";
 import { View } from "@/types";
-import TableEmptyState from "@/components/TableEmptyState.vue";
+import EmptyState from "@/components/EmptyState.vue";
 
 interface TicketReason {
   type: string;
@@ -193,7 +204,7 @@ const { views } = useView("HD Ticket");
 const currentTab = ref("upcoming_sla");
 const chartTabs = [
   {
-    label: __("SLA Alerts"),
+    label: __("SLA"),
     value: "upcoming_sla",
   },
   {
@@ -218,7 +229,7 @@ const currentTitle = computed(() => {
 
 const tooltipTexts: Record<string, string> = {
   upcoming_sla: __("Tickets approaching or breached SLA"),
-  new_tickets: __("Tickets assigned to you in the last 24 hours"),
+  new_tickets: __("Tickets assigned to you in the last 7 days"),
   pending: __("Tickets that are awaiting your response"),
 };
 const tooltipText = computed(() => {
@@ -233,7 +244,7 @@ const emptyStateLabel: Record<string, { title: string; description: string }> =
     },
     new_tickets: {
       title: __("No recently assigned tickets"),
-      description: __("No new tickets assigned to you in the last 24 hours"),
+      description: __("No new tickets assigned to you in the last 7 days"),
     },
     pending: {
       title: __("No pending tickets"),
@@ -312,7 +323,7 @@ const goToTicket = (ticket: PendingTicket) => {
 const redirectToSeeAllTickets = () => {
   const tabToViewMap: Record<string, string> = {
     pending: "STD-VIEW-PENDING-TICKETS",
-    upcoming_sla: "STD-VIEW-SLA-DUE",
+    upcoming_sla: "STD-VIEW-SLA-ALERTS",
     new_tickets: "STD-VIEW-RECENTLY-ASSIGNED-TICKETS",
   };
 
