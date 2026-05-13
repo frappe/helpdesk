@@ -895,8 +895,6 @@ class TestHDTicket(FrappeTestCase):
             ticket.status = "Resolved"
             ticket.save()
             self.assertEqual(ticket.agreement_status, "Fulfilled")
-<<<<<<< HEAD
-=======
 
     def test_failed_by_response(self):
         # Urgent priority: response_by = T+30min
@@ -1025,4 +1023,3 @@ class TestHDTicket(FrappeTestCase):
         remove_holidays()
         frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
         frappe.delete_doc("HD Ticket Status", "New", force=True)
->>>>>>> 54c32cc5 (test: add test cases for from-email switching)
