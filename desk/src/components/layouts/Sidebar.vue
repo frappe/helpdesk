@@ -374,12 +374,12 @@ const agentPortalDropdown = computed(() => [
     icon: h(LucideKeyboard),
     onClick: () => (showShortcutsModal.value = true),
   },
+  themeMenuItem.value,
   {
     label: __("Settings"),
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
   },
-  themeMenuItem.value,
   {
     group: __("Danger"),
     hideLabel: true,
