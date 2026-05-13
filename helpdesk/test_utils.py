@@ -279,9 +279,9 @@ def make_agent(email: str, first_name: str = "Test Agent"):
     return email
 
 
-def get_ticket_communication(ticket_name: str):
+def get_latest_ticket_communication(ticket_name: str):
     """
-    Returns the first Communication doc linked to the given HD Ticket.
+    Returns the latest Communication doc linked to the given HD Ticket.
     """
     name = frappe.get_all(
         "Communication",
@@ -290,8 +290,11 @@ def get_ticket_communication(ticket_name: str):
             "reference_name": ticket_name,
         },
         pluck="name",
-    )[0]
-    return frappe.get_doc("Communication", name)
+        limit=1,
+    )
+    if not name:
+        return None
+    return frappe.get_doc("Communication", name[0])
 
 
 def add_comment(
