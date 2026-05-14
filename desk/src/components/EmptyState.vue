@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="variant === 'badge'"
-    class="flex flex-col items-center justify-center gap-4 h-full"
+    class="flex flex-col items-center justify-center gap-4 h-[stretch] absolute w-[stretch] left-0 top-0"
   >
     <div
       class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
