@@ -137,8 +137,26 @@ const resolutionBy = computed(() => {
     )
   ) {
     return {
+<<<<<<< HEAD
       label: `On Hold`,
+=======
+      label: `${formatTime(timeLeft, { ...timeFormat })} left (On Hold)`,
+>>>>>>> 4c44d4aa (fix: overdue resolution time in SLA)
       color: "blue",
+    };
+  } else if (
+    !ticket.value.doc?.resolution_date &&
+    dayjs().isAfter(dayjs(ticket.value.doc?.resolution_by))
+  ) {
+    let overdue = formatTimeShort(
+      String(new Date()),
+      ticket.value.doc?.resolution_by as string
+    );
+
+    return {
+      label: `Overdue by ${overdue}`,
+      color: "red",
+      date: ticket.value.doc?.resolution_by,
     };
   } else if (
     !ticket.value.doc?.resolution_date &&
