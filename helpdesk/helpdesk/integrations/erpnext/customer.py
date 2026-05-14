@@ -229,8 +229,7 @@ def sync_erpnext_to_hd() -> int:
     return created
 
 
-# This covers only the case when Helpdesk is installed after ERPNext. If ERPNext is installed after helpdesk, the field will be created via after_install in erpnext
-# calledn via patch and after_install of ERPNext
+# This covers only the case when Helpdesk is installed after ERPNext. If ERPNext is installed after helpdesk.
 def setup_erpnext_customer_sync():
     """
     Create the hd_customer custom field on ERPNext Customer and enqueue initial reconciliation.
@@ -249,6 +248,7 @@ def setup_erpnext_customer_sync():
     )
 
 
+# Called from after_install of ERPNext, to create the hd_customer field before any syncing is attempted from ERPNext side
 def create_helpdesk_fields_in_customer():
     """Create the hd_customer custom field on ERPNext Customer. Called from after_install of ERPNext."""
     if "helpdesk" not in frappe.get_installed_apps():
