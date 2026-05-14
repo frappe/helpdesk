@@ -47,7 +47,7 @@
           <Badge
             :label="firstResponse.label"
             variant="ghost"
-            class="mt-[1px]"
+            class="mt-[2px]"
             :theme="firstResponse.color"
           />
         </Tooltip>
@@ -66,8 +66,15 @@
             v-if="resolutionBy"
             :label="resolutionBy.label"
             variant="ghost"
+<<<<<<< HEAD
             class="mt-[1px]"
             :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
+=======
+            class="mt-[2px]"
+            :theme="
+              resolutionBy.color !== 'purple' ? resolutionBy.color : undefined
+            "
+>>>>>>> 264c1f3c (chore: align SLA status)
             :class="resolutionBy.color === 'purple' && '!text-[#6B46C1] '"
           />
         </Tooltip>
