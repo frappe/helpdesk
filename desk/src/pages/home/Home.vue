@@ -61,14 +61,14 @@
         </div>
       </template>
     </LayoutHeader>
-    <div class="flex-1 overflow-auto">
+    <div class="flex-1 overflow-auto relative">
       <div
         class="flex flex-col p-1 pt-4 md:p-4 md:pl-3 mx-auto max-w-[1500px] w-full grow relative h-full"
       >
         <div class="grow pb-12">
           <div
             v-if="agentDashboard.loading"
-            class="flex items-center justify-center mt-40 h-max"
+            class="flex items-center justify-center h-full w-full absolute top-0 left-0"
           >
             <LoadingIndicator :scale="8" />
           </div>

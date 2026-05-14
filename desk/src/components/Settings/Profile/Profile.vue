@@ -260,7 +260,7 @@ function save() {
   user.save.submit(null, {
     onSuccess: () => {
       editName.value = false;
-      toast.success(__("Profile Updated Successfully"));
+      toast.success(__("Profile updated successfully."));
       if (refreshRequired.value) {
         window.location.reload();
       }

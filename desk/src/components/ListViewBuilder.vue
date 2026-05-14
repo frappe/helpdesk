@@ -35,9 +35,16 @@
     </div>
   </div>
 
+  <!-- Loading State -->
+  <div
+    v-if="list.loading && !list.data?.data?.length"
+    class="flex items-center justify-center h-full w-full absolute top-0 z-100"
+  >
+    <LoadingIndicator :scale="8" />
+  </div>
   <!-- List View -->
   <ListView
-    v-if="list.data?.data.length > 0"
+    v-else-if="list.data?.data.length > 0"
     class="flex-1"
     :columns="columns"
     :rows="rows"
@@ -106,16 +113,9 @@
       "
     />
   </div>
-  <!-- Loading State -->
-  <div
-    v-else-if="list.loading"
-    class="w-full h-full flex items-center justify-center -mt-14"
-  >
-    <LoadingIndicator :scale="8" />
-  </div>
   <!-- Empty State -->
   <EmptyState
-    v-else
+    v-else-if="!list.loading"
     :title="emptyState.title"
     :icon="emptyState.icon"
     :description="emptyState.description"
