@@ -16,8 +16,10 @@ def after_insert(doc, method):
     create_or_link_hd_customer(doc)
 
 
-def on_update(doc, method):
+def before_save(doc, method):
     """Called when an ERPNext Customer is saved. Propagates customer_name and image to the linked HD Customer."""
+    if doc.is_new():
+        return
     if doc.flags.get("ignore_erpnext_sync"):
         return
     if "erpnext" not in frappe.get_installed_apps():
@@ -266,5 +268,6 @@ def create_helpdesk_fields_in_customer():
                 "label": "HD Customer",
                 "fieldtype": "Data",
                 "read_only": 1,
+                "insert_after": "customer_name",
             },
         )

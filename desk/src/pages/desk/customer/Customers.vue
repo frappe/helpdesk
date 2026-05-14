@@ -83,7 +83,6 @@ const isUnsynced = createResource({
 });
 
 const showSyncButton = computed(() => {
-  debugger;
   if (isUnsynced.loading) return false;
   if (
     configStore.isErpnextInstalled &&
@@ -92,6 +91,7 @@ const showSyncButton = computed(() => {
   ) {
     return true;
   }
+  return false;
 });
 
 function handleCreate() {

@@ -80,7 +80,7 @@ doc_events = {
     },
     "Customer": {
         "after_insert": "helpdesk.helpdesk.integrations.erpnext.customer.after_insert",
-        "on_update": "helpdesk.helpdesk.integrations.erpnext.customer.on_update",
+        "before_save": "helpdesk.helpdesk.integrations.erpnext.customer.before_save",
     },
 }
 

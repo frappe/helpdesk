@@ -372,22 +372,6 @@ def make_hd_customer(name: str):
     )
 
 
-def make_mock_erp_customer(name: str):
-    """
-    Return a MagicMock simulating an ERPNext Customer doc.
-    Does not require ERPNext to be installed.
-    """
-    from unittest.mock import MagicMock
-
-    erp_doc = MagicMock()
-    erp_doc.name = name
-    erp_doc.customer_name = name
-    erp_doc.get.return_value = None  # hd_customer field is blank
-    erp_doc.flags = MagicMock()
-    erp_doc.flags.get.return_value = False
-    return erp_doc
-
-
 def make_erp_customer(name: str, ignore_sync: bool = True):
     """
     Insert a real ERPNext Customer and return the doc.
