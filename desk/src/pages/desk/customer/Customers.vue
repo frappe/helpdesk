@@ -6,10 +6,23 @@
       </template>
       <template #right-header>
         <Button
+          v-if="showSyncButton"
+          :label="isSyncing ? 'Syncing…' : 'Sync with ERPNext'"
+          theme="gray"
+          variant="subtle"
+          :loading="isSyncing"
+          :disabled="isSyncing"
+          @click="triggerErpnextSync"
+        >
+          <template v-if="!isSyncing" #prefix>
+            <LucideRefreshCw class="h-4 w-4" />
+          </template>
+        </Button>
+        <Button
           label="Create"
           theme="gray"
           variant="solid"
-          @click="isDialogVisible = !isDialogVisible"
+          @click="handleCreate"
         >
           <template #prefix>
             <LucidePlus class="h-4 w-4" />
@@ -21,7 +34,7 @@
       ref="listViewRef"
       :options="options"
       @row-click="openCustomer"
-      @empty-state-action="isDialogVisible = true"
+      @empty-state-action="handleCreate"
     />
     <NewCustomerDialog
       v-model="isDialogVisible"
@@ -37,23 +50,85 @@
   </div>
 </template>
 <script setup lang="ts">
+import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
+import { OrganizationsIcon } from "@/components/icons";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
-import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
-import { Avatar, usePageMeta } from "frappe-ui";
-import { computed, h, ref } from "vue";
-import CustomerDialog from "./CustomerDialog.vue";
-import { OrganizationsIcon } from "@/components/icons";
+import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
+import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
+import { Avatar, createResource, toast, usePageMeta } from "frappe-ui";
+import { computed, h, onMounted, onUnmounted, ref } from "vue";
+import CustomerDialog from "./CustomerDialog.vue";
+
+const configStore = useConfigStore();
+const { $socket } = globalStore();
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
 const selectedCustomer = ref(null);
 const listViewRef = ref(null);
-// const emptyMessage = "No Customers Found";
+const isSyncing = ref(false);
+const { isManager, isAdmin } = useAuthStore();
+
 const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
 );
+
+const isUnsynced = createResource({
+  url: "helpdesk.helpdesk.integrations.erpnext.customer.is_unsynced",
+  cache: ["ERPNext Sync Status", "HD Customer"],
+  auto: true,
+});
+
+const showSyncButton = computed(() => {
+  debugger;
+  if (isUnsynced.loading) return false;
+  if (
+    configStore.isErpnextInstalled &&
+    isUnsynced.data &&
+    (isManager || isAdmin)
+  ) {
+    return true;
+  }
+});
+
+function handleCreate() {
+  isDialogVisible.value = true;
+}
+
+const syncResource = createResource({
+  url: "helpdesk.helpdesk.integrations.erpnext.customer.sync_all_customers_with_erpnext",
+  onSuccess() {
+    toast.success(__("Sync complete"));
+    listViewRef.value?.reload();
+    isUnsynced.reload();
+  },
+  onError(err) {
+    toast.error(err.messages?.[0] || __("Sync failed"));
+  },
+});
+
+function triggerErpnextSync() {
+  syncResource.submit();
+}
+
+function onSyncStart() {
+  isSyncing.value = true;
+}
+function onSyncEnd() {
+  isSyncing.value = false;
+}
+
+onMounted(() => {
+  $socket.on("helpdesk:erpnext-sync-start", onSyncStart);
+  $socket.on("helpdesk:erpnext-sync-end", onSyncEnd);
+});
+onUnmounted(() => {
+  $socket.off("helpdesk:erpnext-sync-start", onSyncStart);
+  $socket.off("helpdesk:erpnext-sync-end", onSyncEnd);
+});
 
 function openCustomer(id: string) {
   selectedCustomer.value = id;

@@ -32,7 +32,7 @@ export interface HDTicketStatus extends DocType {
   parsed_color?: string;
 }
 
-// Last updated: 2026-05-07 14:35:56.356727
+// Last updated: 2026-05-11 18:25:54.352721
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;
@@ -119,9 +119,9 @@ export interface HDTicket extends DocType {
   /** Ticket raised outside working hours: Check */
   raised_outside_working_hours: 0 | 1;
   /** First Response Failed By: Duration */
-  first_response_failed_by?: number;
+  first_response_failed_by?: any;
   /** Resolution Failed By: Duration */
-  resolution_failed_by?: number;
+  resolution_failed_by?: any;
 }
 
 // Last updated: 2026-03-03 12:30:01.394107

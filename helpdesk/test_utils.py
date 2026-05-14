@@ -28,7 +28,33 @@ def before_tests():
     make_new_sla()
     make_test_objects("Email Domain", reset=True)
     create_email_account()
+    _setup_erpnext_custom_fields()
     frappe.db.commit()  # nosemgrep
+
+
+def _setup_erpnext_custom_fields():
+    """Ensure the hd_customer custom field exists on ERPNext Customer (if ERPNext is installed)."""
+    if "erpnext" not in frappe.get_installed_apps():
+        return
+
+    from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
+
+    if not frappe.db.exists(
+        "Custom Field", {"dt": "Customer", "fieldname": "hd_customer"}
+    ):
+        create_custom_fields(
+            {
+                "Customer": [
+                    {
+                        "fieldname": "hd_customer",
+                        "fieldtype": "Data",
+                        "label": "HD Customer",
+                        "read_only": 1,
+                        "insert_after": "customer_name",
+                    }
+                ]
+            }
+        )
 
 
 def make_new_sla():
@@ -327,3 +353,50 @@ def make_team(team_name, members=[], disabled=False):
     team.disabled = disabled
     team.insert(ignore_permissions=True)
     return team
+
+
+# ------------------------------------------------------------------
+# ERPNext sync test helpers
+# ------------------------------------------------------------------
+
+ERPNEXT_INSTALLED = ["frappe", "helpdesk", "erpnext"]
+ERPNEXT_NOT_INSTALLED = ["frappe", "helpdesk"]
+
+
+def make_hd_customer(name: str):
+    """Insert an HD Customer and return the doc."""
+    if frappe.db.exists("HD Customer", name):
+        return frappe.get_doc("HD Customer", name)
+    return frappe.get_doc({"doctype": "HD Customer", "customer_name": name}).insert(
+        ignore_permissions=True
+    )
+
+
+def make_mock_erp_customer(name: str):
+    """
+    Return a MagicMock simulating an ERPNext Customer doc.
+    Does not require ERPNext to be installed.
+    """
+    from unittest.mock import MagicMock
+
+    erp_doc = MagicMock()
+    erp_doc.name = name
+    erp_doc.customer_name = name
+    erp_doc.get.return_value = None  # hd_customer field is blank
+    erp_doc.flags = MagicMock()
+    erp_doc.flags.get.return_value = False
+    return erp_doc
+
+
+def make_erp_customer(name: str, ignore_sync: bool = True):
+    """
+    Insert a real ERPNext Customer and return the doc.
+    By default sets ignore_erpnext_sync=True to suppress HD Customer creation.
+    Pass ignore_sync=False to let the after_insert hook run (creates/links an HD Customer).
+    Requires ERPNext to be installed.
+    """
+    doc = frappe.get_doc({"doctype": "Customer", "customer_name": name})
+    if ignore_sync:
+        doc.flags.ignore_erpnext_sync = True
+    doc.insert(ignore_permissions=True)
+    return doc

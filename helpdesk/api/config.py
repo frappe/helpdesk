@@ -23,4 +23,5 @@ def get_config():
         or frappe.db.get_single_value("Website Settings", "favicon")
         or "/assets/helpdesk/desk/favicon.svg"
     )
+    res["apps"] = frappe.get_installed_apps()
     return res

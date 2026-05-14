@@ -10,6 +10,7 @@
   "image",
   "customer_name",
   "domain",
+  "erpnext_customer",
   "references_tab",
   "contact_html"
  ],
@@ -31,6 +32,12 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Domain"
+  },
+  {
+   "fieldname": "erpnext_customer",
+   "fieldtype": "Data",
+   "label": "ERPNext Customer",
+   "read_only": 1
   },
   {
    "fieldname": "references_tab",

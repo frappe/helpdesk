@@ -5,6 +5,7 @@ from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.permissions import add_permission, update_permission_property
 
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY
+from helpdesk.helpdesk.integrations.erpnext.customer import setup_erpnext_customer_sync
 from helpdesk.setup.default_views import add_default_views
 
 from .default_template import create_default_template
@@ -33,6 +34,7 @@ def after_install():
     add_property_setters()
     add_website_settings_permission()
     add_default_views()
+    setup_erpnext_customer_sync()
     # Always keep this at last, because sql_ddl makes the db commit
     add_fts_index()
 

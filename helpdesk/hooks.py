@@ -39,7 +39,7 @@ scheduler_events = {
         "helpdesk.search.download_corpus",
     ],
     "daily": [
-        "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
+        "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days",
     ],
     "hourly_long": [
         "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.update_sla_status_in_ticket"
@@ -62,6 +62,14 @@ user_invitation = {
     "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
 }
 
+doctype_js = {
+    "Customer": "public/erpnext/customer.js",
+}
+
+doctype_list_js = {
+    "Customer": "public/erpnext/customer_list.js",
+}
+
 doc_events = {
     "Contact": {
         "before_insert": "helpdesk.overrides.contact.before_insert",
@@ -69,6 +77,10 @@ doc_events = {
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
+    },
+    "Customer": {
+        "after_insert": "helpdesk.helpdesk.integrations.erpnext.customer.after_insert",
+        "on_update": "helpdesk.helpdesk.integrations.erpnext.customer.on_update",
     },
 }
 
