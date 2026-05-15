@@ -46,6 +46,7 @@ helpdesk.helpdesk.doctype.hd_ticket.patches.backfill_sla_failed_by
 helpdesk.patches.rename_and_update_std_views #v2
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 helpdesk.patches.rename_and_update_std_views #v2
 helpdesk.patches.set_hd_ticket_naming_series
@@ -61,3 +62,6 @@ helpdesk/patches/set_hd_ticket_naming_series.py
 =======
 helpdesk.patches.set_hd_ticket_naming_series
 >>>>>>> ef72e3b0 (chore: fixed patch file name in patch.txt)
+=======
+helpdesk.patches.set_hd_ticket_naming_series
+>>>>>>> e8daf87e (chore: code cleanup)
