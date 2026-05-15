@@ -27,7 +27,7 @@
                 @input="search = $event"
                 :placeholder="__('Search')"
                 type="text"
-                class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
+                class="focus:ring-0 border-outline-gray-2"
                 icon-left="search"
                 debounce="300"
                 inputClass="p-4 pr-12"
@@ -71,7 +71,7 @@
             <div
               v-for="template in savedReplyListResource?.data"
               :key="template.name"
-              class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-gray-100 relative"
+              class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-surface-gray-2 relative"
               @click="onTemplateSelect(template)"
             >
               <div class="text-base font-semibold truncate border-b pb-2">
@@ -81,7 +81,7 @@
                 v-if="template.message"
                 :content="template.message"
                 :editable="false"
-                editor-class="!prose-sm max-w-none !text-sm text-gray-600 focus:outline-none"
+                editor-class="!prose-sm max-w-none !text-sm text-ink-gray-5 focus:outline-none"
                 class="flex-1 overflow-hidden pointer-events-none"
               />
               <div
@@ -89,7 +89,7 @@
                   selectedTemplate.name === template.name &&
                   selectedTemplate.isLoading
                 "
-                class="flex items-center justify-center absolute top-0 left-0 w-full h-full bg-black/20 rounded-lg"
+                class="flex items-center justify-center absolute top-0 left-0 w-full h-full bg-surface-gray-7/20 rounded-lg"
               >
                 <LoadingIndicator class="size-4" />
               </div>
@@ -103,7 +103,7 @@
             class="mt-2"
           >
             <div class="flex h-56 flex-col items-center justify-center">
-              <div class="text-p-sm text-gray-500">
+              <div class="text-p-sm text-ink-gray-4">
                 {{ __("No saved replies found") }}
               </div>
             </div>

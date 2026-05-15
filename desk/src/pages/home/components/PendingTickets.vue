@@ -50,7 +50,7 @@
             v-for="ticket in chartConfig?.tickets"
             :key="ticket.name"
             @click="goToTicket(ticket)"
-            class="text-sm cursor-pointer hover:bg-gray-50 border-t border-gray-200"
+            class="text-sm cursor-pointer hover:bg-surface-menu-bar border-t border-outline-gray-modals"
           >
             <td class="p-2 py-3 whitespace-nowrap">{{ ticket.name }}</td>
             <td class="p-2 py-3 w-full max-w-0 truncate">
@@ -100,7 +100,7 @@
           <tr
             v-for="i in 8"
             :key="i"
-            :class="i > 1 ? 'border-t border-gray-200' : ''"
+            :class="i > 1 ? 'border-t border-outline-gray-modals' : ''"
           >
             <td class="p-2 py-3 min-w-8">
               <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
@@ -316,7 +316,7 @@ function getReasonColorClass(reason: {
   seconds_until_due?: number;
 }) {
   if (reason.text.includes("overdue")) {
-    return "text-red-500";
+    return "text-ink-red-3";
   }
 
   if (
@@ -326,7 +326,7 @@ function getReasonColorClass(reason: {
     const oneHour = 3600;
     const twoHours = 7200;
     if (reason.seconds_until_due <= oneHour) {
-      return "text-red-500";
+      return "text-ink-red-3";
     }
     if (reason.seconds_until_due <= twoHours) {
       return "text-orange-500";

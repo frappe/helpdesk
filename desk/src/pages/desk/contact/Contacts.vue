@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Contacts</div>
+        <div class="text-lg font-medium text-ink-gray-9">Contacts</div>
       </template>
       <template #right-header>
         <Button
