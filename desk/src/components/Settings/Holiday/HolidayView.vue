@@ -191,7 +191,7 @@
                 }}</span>
               </div>
               <div class="gap-1 flex items-center">
-                <span class="bg-gray-100 size-4 rounded-sm" />
+                <span class="bg-surface-gray-2 size-4 rounded-sm" />
                 <span class="text-sm text-ink-gray-6">{{
                   __("Recurring holidays")
                 }}</span>

@@ -113,7 +113,7 @@
             {{ timeAverages.first_response }}
           </div>
           <div class="text-base text-ink-gray-5 flex items-center gap-2 mt-1">
-            <div class="size-2 bg-black rounded-full" />
+            <div class="size-2 bg-surface-gray-7 rounded-full" />
             {{ __("Avg. first response time") }}
           </div>
         </div>
@@ -122,7 +122,7 @@
             {{ timeAverages.resolution }}
           </div>
           <div class="text-base text-ink-gray-5 flex items-center gap-2 mt-1">
-            <div class="size-2 bg-gray-400 rounded-full" />
+            <div class="size-2 bg-surface-gray-4 rounded-full" />
             {{ __("Avg. resolution time") }}
           </div>
         </div>
@@ -145,7 +145,7 @@ import {
   FeatherIcon,
   ECharts,
 } from "frappe-ui";
-import { formatTime } from "@/utils";
+import { dataTheme, formatTime } from "@/utils";
 import { __ } from "@/translation";
 import EmptyState from "@/components/EmptyState.vue";
 
@@ -254,7 +254,13 @@ const timeAverages = computed(() => {
   };
 });
 
+const cssVar = (name: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
 const chartConfig = computed<EChartsOption>(() => {
+  // re-compute on theme change
+  void dataTheme.value;
+
   let data = getAvgTimeMetricsResource.fetched
     ? getAvgTimeMetricsResource.data?.data
     : props.data?.data || [];
@@ -263,11 +269,12 @@ const chartConfig = computed<EChartsOption>(() => {
     legend: {},
     tooltip: {
       trigger: "item",
-      borderColor: "#eee",
+      backgroundColor: cssVar("--surface-white"),
+      borderColor: cssVar("--outline-gray-2"),
       borderWidth: 1,
       padding: 10,
       textStyle: {
-        color: "#000",
+        color: cssVar("--ink-gray-9"),
       },
       formatter: (params) => {
         const p = params as unknown as {
@@ -319,7 +326,7 @@ const chartConfig = computed<EChartsOption>(() => {
       splitLine: {
         lineStyle: {
           type: "dashed",
-          color: "#ddd",
+          color: cssVar("--outline-gray-2"),
           width: 0.8,
         },
       },
@@ -327,13 +334,13 @@ const chartConfig = computed<EChartsOption>(() => {
     series: [
       {
         type: "bar",
-        color: "black",
+        color: cssVar("--surface-gray-7"),
         barWidth: "12%",
         itemStyle: { borderRadius: [4, 4, 0, 0] },
       },
       {
         type: "bar",
-        color: "#E2E2E2",
+        color: cssVar("--surface-gray-4"),
         barWidth: "12%",
         itemStyle: { borderRadius: [4, 4, 0, 0] },
       },

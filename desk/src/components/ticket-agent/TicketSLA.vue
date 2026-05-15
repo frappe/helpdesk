@@ -46,7 +46,7 @@
           <Badge
             :label="firstResponse.label"
             variant="ghost"
-            class="mt-[1px]"
+            class="mt-[2px]"
             :theme="firstResponse.color"
           />
         </Tooltip>
@@ -65,7 +65,7 @@
             v-if="resolutionBy"
             :label="resolutionBy.label"
             variant="ghost"
-            class="mt-[1px]"
+            class="mt-[2px]"
             :theme="
               resolutionBy.color !== 'purple' ? resolutionBy.color : undefined
             "
@@ -178,9 +178,23 @@ const resolutionBy = computed(() => {
   ) {
     let timeLeft = dayjs(ticket.value.doc?.resolution_by).diff(dayjs(), "s");
     return {
-      label: `${formatTime(timeLeft)} left (On Hold)`,
+      label: `${formatTime(timeLeft, { ...timeFormat })} left (On Hold)`,
       color: "blue",
       date: ticket.value.doc?.on_hold_since,
+    };
+  } else if (
+    !ticket.value.doc?.resolution_date &&
+    dayjs().isAfter(dayjs(ticket.value.doc?.resolution_by))
+  ) {
+    let overdue = formatTimeShort(
+      String(new Date()),
+      ticket.value.doc?.resolution_by as string
+    );
+
+    return {
+      label: `Overdue by ${overdue}`,
+      color: "red",
+      date: ticket.value.doc?.resolution_by,
     };
   } else if (
     !ticket.value.doc?.resolution_date &&

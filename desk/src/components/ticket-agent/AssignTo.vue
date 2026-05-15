@@ -7,9 +7,9 @@
   >
     <template #target="{ togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span v-if="!hideLabel" class="block text-xs text-gray-600">{{
-          __("Assignee")
-        }}</span>
+        <span v-if="!hideLabel" class="block text-xs text-ink-gray-5"
+          >{{ __("Assignee") }}
+        </span>
         <Button
           ref="triggerRef"
           variant="outline"
@@ -61,7 +61,7 @@
               v-model="searchText"
               :placeholder="__('Search agents...')"
               variant="ghost"
-              class="flex-1"
+              class="flex-1 search-agents-input"
               @click.stop
               @keydown="handleInputKeydown"
             >
@@ -151,6 +151,9 @@ import {
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
+import LucideSearch from "~icons/lucide/search";
+import MultipleAvatar from "../MultipleAvatar.vue";
+import UserAvatar from "../UserAvatar.vue";
 
 interface Props {
   hideLabel?: boolean;
@@ -161,9 +164,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { hideLabel } = props;
-import LucideSearch from "~icons/lucide/search";
-import MultipleAvatar from "../MultipleAvatar.vue";
-import UserAvatar from "../UserAvatar.vue";
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
@@ -501,3 +501,9 @@ useShortcut("a", () => {
   (triggerRef.value?.$el as HTMLElement)?.nextElementSibling?.click();
 });
 </script>
+
+<style scoped>
+.search-agents-input :deep(input) {
+  background-color: transparent;
+}
+</style>

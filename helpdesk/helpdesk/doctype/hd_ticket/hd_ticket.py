@@ -1001,7 +1001,7 @@ class HDTicket(Document):
                 "label": "ID",
                 "type": "Int",
                 "key": "name",
-                "width": "5rem",
+                "width": "auto",
             },
             {
                 "label": "Subject",

@@ -773,6 +773,61 @@ export function openContact(name: string) {
   window.open(url, "_blank");
 }
 
+const COLOR_PROPS = new Set([
+  "color",
+  "background",
+  "background-color",
+  "border-color",
+]);
+
+// Strip color-related inline styles + bgcolor/color attrs so iframe CSS controls colors.
+export function stripEmailColors(html: string): string {
+  if (!html) return html;
+  const div = document.createElement("div");
+  div.innerHTML = html;
+
+  div.querySelectorAll("[style]").forEach((el) => {
+    const styles = el.getAttribute("style") || "";
+    const filtered = styles
+      .split(";")
+      .map((s) => s.trim())
+      .filter((s) => {
+        if (!s) return false;
+        const prop = s.split(":")[0].trim().toLowerCase();
+        return !COLOR_PROPS.has(prop);
+      })
+      .join("; ");
+    if (filtered) el.setAttribute("style", filtered);
+    else el.removeAttribute("style");
+  });
+
+  div.querySelectorAll("[bgcolor]").forEach((el) =>
+    el.removeAttribute("bgcolor")
+  );
+  div.querySelectorAll("font[color]").forEach((el) =>
+    el.removeAttribute("color")
+  );
+
+  return div.innerHTML;
+}
+
+// Shared reactive mirror of <html data-theme> for JS-driven theme-aware components
+export const dataTheme = ref<string>(
+  (typeof document !== "undefined" &&
+    document.documentElement.getAttribute("data-theme")) ||
+    "light"
+);
+
+if (typeof window !== "undefined") {
+  new MutationObserver(() => {
+    const next =
+      document.documentElement.getAttribute("data-theme") || "light";
+    if (next !== dataTheme.value) dataTheme.value = next;
+  }).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+}
 
 export function buildPercentageChange(value: number | null) {
   if (value === null || value === undefined) {
@@ -781,6 +836,6 @@ export function buildPercentageChange(value: number | null) {
   return {
     icon: value > 0 ? "arrow-up-right" : value < 0 ? "arrow-down-left" : "arrow-right",
     value: value > 0 ? `+${value}` : value,
-    color: value > 0 ? "text-red-600" : value < 0 ? "text-green-600" : "text-ink-gray-5",
+    color: value > 0 ? "text-ink-red-4" : value < 0 ? "text-ink-green-3" : "text-ink-gray-5",
   };
 }
