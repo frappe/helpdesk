@@ -591,12 +591,10 @@ def get_navigation_tickets(ticket: str | int, current_view: str | None = None):
 
         # Extract just the ticket IDs
         ticket_ids = [int(ticket), *tickets]
-        # print("\n\n", ticket_ids, "\n\n")
         return ticket_ids
 
     except Exception as e:
         frappe.log_error(f"Error in get_navigation_tickets: {str(e)}")
-        # Return empty list if there's an error
         return []
 
 
@@ -606,11 +604,10 @@ def get_navigation_filters(ticket: str, current_view: str = None):
         _filters = frappe.get_value("HD View", current_view, "filters")
         if _filters:
             try:
-                # Parse the filters string to list/dict
                 filters = (
                     json.loads(_filters) if isinstance(_filters, str) else _filters
                 )
-            except json.JSONDecodeError, TypeError:
+            except (json.JSONDecodeError, TypeError):
                 filters = []
 
     if not filters:
@@ -627,14 +624,11 @@ def get_navigation_filters(ticket: str, current_view: str = None):
                     if isinstance(default_view, str)
                     else default_view
                 )
-            except json.JSONDecodeError, TypeError:
+            except (json.JSONDecodeError, TypeError):
                 filters = []
 
     # Base filters - exclude the current ticket
     base_filters = {"name": ["!=", ticket]}
-
-    # Combine base filters with view filters
-    # is instance of {}
 
     if filters and isinstance(filters, object):
         final_filters = {**filters, **base_filters}
@@ -694,9 +688,7 @@ def get_recent_similar_tickets(ticket: str | int):
         return {"recent_tickets": [], "similar_tickets": []}
 
     recent_tickets = get_recent_tickets(ticket)
-    # Update this with TextBlob or SQLite Vector Search
     similar_tickets = []
-    # print('\n\n',recent_tickets,'\n\n')
     return {"recent_tickets": recent_tickets, "similar_tickets": similar_tickets}
 
 
@@ -740,14 +732,44 @@ def get_recent_tickets(ticket: str):
 
 @frappe.whitelist()
 def get_ticket_activities(ticket: str | int):
+    """
+    Returns all activity data for a ticket including tasks.
+    Tasks are returned with their native field names (subject, not title)
+    so the frontend can consume them directly without remapping.
+    """
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
+
+    tasks = frappe.get_all(
+        "HD Task",
+        filters={"reference_ticket": ticket},
+        fields=[
+            "name",
+            "subject",  # keep as "subject" — Taskbox.vue reads activity.subject
+            "status",
+            "priority",
+            "task_description",
+            "expected_start_date",
+            "expected_end_date",
+            "creation",
+            "owner",
+            "modified",
+        ],
+        order_by="creation asc",
+    )
+
+    # Ensure both "subject" and "title" keys exist for forward/backward compatibility
+    for task in tasks:
+        task["title"] = task.get("subject", "")
+
     activities = {
         "comments": get_comments(ticket),
         "communications": get_communications(ticket),
         "history": get_history(ticket),
         "views": get_views(ticket),
         "calls": get_call_logs(ticket),
+        "tasks": tasks,  # raw dicts — no field remapping needed
     }
+
     return activities
 
 

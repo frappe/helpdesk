@@ -172,6 +172,7 @@ export interface AssignmentRule extends DocType {
   weighted_users: AssignmentRuleUser[];
 }
 
+
 // Last updated: 2021-12-23 19:03:23.507845
 export interface HDHoliday extends ChildDocType {
   /** Date: Date */

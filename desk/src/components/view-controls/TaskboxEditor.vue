@@ -10,7 +10,6 @@
       :placeholder="__('Enter task subject')"
     />
 
-    <!-- Priority + Status row -->
     <div class="grid grid-cols-2 gap-3">
       <FormControl
         v-model="form.status"
@@ -48,7 +47,6 @@
       />
     </div>
 
-    <!-- Description -->
     <div class="flex flex-col gap-1">
       <label class="block text-xs text-gray-600">{{ __("Description") }}</label>
       <TextEditor
@@ -62,7 +60,6 @@
       />
     </div>
 
-    <!-- Action buttons -->
     <div class="flex justify-end gap-2">
       <Button :label="__('Discard')" @click="handleDiscard" />
       <Button
@@ -132,6 +129,7 @@ async function handleSubmit() {
     return;
   }
 
+  // double-submit guard
   if (loading.value) return;
   loading.value = true;
 

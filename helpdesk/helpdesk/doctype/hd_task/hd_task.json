@@ -1,0 +1,91 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "HDTASK-.#####",
+ "creation": "2026-05-14 12:27:08.409686",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "subject",
+  "status",
+  "priority",
+  "expected_start_date",
+  "expected_end_date",
+  "reference_ticket",
+  "column_break_nvqu",
+  "task_description"
+ ],
+ "fields": [
+  {
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Subject"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nWorking\nPending Review\nOverdue\nTemplate\nCompleted\nCancelled"
+  },
+  {
+   "fieldname": "task_description",
+   "fieldtype": "Text Editor",
+   "label": "Task Description"
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "label": "Priority",
+   "options": "Low\nMedium\nHigh\nUrgent"
+  },
+  {
+   "fieldname": "expected_start_date",
+   "fieldtype": "Date",
+   "label": "Expected Start Date"
+  },
+  {
+   "fieldname": "column_break_nvqu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "expected_end_date",
+   "fieldtype": "Date",
+   "label": "Expected End Date"
+  },
+  {
+   "fieldname": "reference_ticket",
+   "fieldtype": "Link",
+   "label": "Reference Ticket",
+   "options": "HD Ticket"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-14 13:56:06.610441",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Task",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

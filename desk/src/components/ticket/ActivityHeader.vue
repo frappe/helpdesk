@@ -5,13 +5,15 @@
     <div class="flex h-8 items-center text-xl font-semibold text-gray-800">
       {{ title }}
     </div>
+
+    <!-- Calls dropdown -->
     <Dropdown
-      v-if="title == 'Calls'"
+      v-if="title === __('Calls')"
       :options="callActions"
       @click.stop
       placement="right"
     >
-      <template v-slot="{ open }">
+      <template #default="{ open }">
         <Button variant="subtle" class="flex items-center gap-1">
           <template #prefix>
             <FeatherIcon name="plus" class="h-4 w-4" />
@@ -26,10 +28,35 @@
         </Button>
       </template>
     </Dropdown>
+
+    <!-- Tasks button -->
+    <Button
+      v-else-if="title === __('Tasks')"
+      variant="subtle"
+      @click="emit('new-task')"
+    >
+      <template #prefix>
+        <FeatherIcon name="plus" class="h-4 w-4" />
+      </template>
+      {{ __("New") }}
+    </Button>
+
+    <!-- Emails button -->
+    <Button
+      v-else-if="title === __('Emails')"
+      variant="subtle"
+      @click="emit('new-email')"
+    >
+      <template #prefix>
+        <FeatherIcon name="plus" class="h-4 w-4" />
+      </template>
+      {{ __("New") }}
+    </Button>
   </div>
+
   <CallLogModal
     v-model="showCallLogModal"
-    :ticketId="ticket.value?.name"
+    :ticketId="String(ticket?.doc?.name)"
     @after-insert="refreshTicket"
   />
 </template>
@@ -39,8 +66,9 @@ import { PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
 import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";
-import { Dropdown } from "frappe-ui";
+import { Button, Dropdown, FeatherIcon } from "frappe-ui";
 import { computed, h, inject, ref } from "vue";
+
 defineProps({
   title: {
     type: String,
@@ -48,28 +76,25 @@ defineProps({
   },
 });
 
+const emit = defineEmits(["new-task", "new-email"]);
+
 const makeCall = inject<() => void>("makeCall");
 const refreshTicket = inject<() => void>("refreshTicket");
+const ticket = inject(TicketSymbol);
 const showCallLogModal = ref(false);
-const ticket = inject(TicketSymbol)!;
 
-const callActions = computed(() => {
-  let actions = [
-    {
-      icon: h(PhoneIcon, { class: "h-4 w-4" }),
-      label: __("Make a Call"),
-      onClick: () => makeCall(),
+const callActions = computed(() => [
+  {
+    icon: h(PhoneIcon, { class: "h-4 w-4" }),
+    label: __("Make a Call"),
+    onClick: () => makeCall?.(),
+  },
+  {
+    icon: "edit-3",
+    label: __("Log a Call"),
+    onClick: () => {
+      showCallLogModal.value = true;
     },
-    {
-      icon: "edit-3",
-      label: __("Log a Call"),
-      onClick: () => {
-        showCallLogModal.value = true;
-      },
-    },
-  ];
-  return actions;
-});
+  },
+]);
 </script>
-
-<style scoped></style>
