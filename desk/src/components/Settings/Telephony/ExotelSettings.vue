@@ -21,6 +21,7 @@
         theme="gray"
         variant="solid"
         @click="save"
+        v-if="isDirty.exotel"
         :disabled="!isDirty.exotel"
         :loading="exotel.save.loading"
       />
