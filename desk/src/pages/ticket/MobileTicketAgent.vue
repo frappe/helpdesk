@@ -2,7 +2,9 @@
   <div class="flex flex-col">
     <LayoutHeader v-if="ticket.doc?.name">
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" />
+        <div class="max-w-[60vw]">
+          <Breadcrumbs :items="breadcrumbs" />
+        </div>
       </template>
       <template #right-header>
         <div class="absolute right-0 pr-2">
