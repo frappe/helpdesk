@@ -1,8 +1,12 @@
 # Copyright (c) 2022, Frappe Technologies and contributors
 # For license information, please see license.txt
 
-# import frappe
+import frappe
 from frappe.model.document import Document
+
+from helpdesk.integrations.erpnext.customer import (
+    should_sync as should_sync_with_erpnext,
+)
 
 
 class HDCustomer(Document):
@@ -29,3 +33,53 @@ class HDCustomer(Document):
             },
         ]
         return {"columns": columns}
+
+    def after_insert(self):
+        if should_sync_with_erpnext():
+            self.create_customer_in_erpnext()
+
+    def create_customer_in_erpnext(self):
+        erp_customer_exists = frappe.db.exists("Customer", {"hd_customer": self.name})
+        if erp_customer_exists:
+            return
+
+        # create a new customer in ERPNext with the same name as the HD Customer and link them together
+        erp_doc = frappe.get_doc(
+            {
+                "doctype": "Customer",
+                "customer_name": self.customer_name,
+                "hd_customer": self.name,
+            }
+        )
+        erp_doc.flags.ignore_erpnext_sync = True
+        erp_doc.insert(ignore_permissions=True)
+        frappe.db.set_value("HD Customer", self.name, "erp_customer", erp_doc.name)
+
+    def on_update(self):
+        if not should_sync_with_erpnext():
+            return
+
+        if self.flags.get("ignore_erpnext_sync"):
+            return
+
+        if self.has_value_changed("image"):
+            # check if exists
+            erp_customer = frappe.db.get_value(
+                "Customer", {"hd_customer": self.name}, "name"
+            )
+            if not erp_customer:
+                return
+            frappe.db.set_value(
+                "Customer",
+                {"hd_customer": self.name},
+                "image",
+                self.image,
+            )
+
+    def after_rename(self, olddn, newdn, merge=False):
+        if not should_sync_with_erpnext():
+            return
+
+        erp_customer = frappe.db.get_value("Customer", {"hd_customer": olddn}, "name")
+        if erp_customer:
+            frappe.db.set_value("Customer", erp_customer, "hd_customer", newdn)
