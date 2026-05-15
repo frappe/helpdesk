@@ -173,7 +173,7 @@ onUnmounted(() => {
     );
   }
 });
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 const _activities = computed(() => {
   if (!activities.value?.data) {
@@ -181,7 +181,7 @@ const _activities = computed(() => {
   }
 
   // EMAILS
-  const emailProps = (activities.value.data.communications || []).map(
+  const emailProps = (activities.value.data.communications).map(
     (email: any, idx: number) => ({
       subject: email.subject,
 
@@ -213,24 +213,16 @@ const _activities = computed(() => {
       isFirstEmail: idx === 0,
     })
   );
-
-  // COMMENTS
   const commentProps = (activities.value.data.comments || []).map(
     (comment: any) => ({
       name: comment.name,
-
       type: "comment",
-
       key: comment.creation,
-
       commentedBy: comment.commented_by,
-
       commenter: comment.user?.name,
-
       creation: comment.creation,
 
       content: comment.content,
-
       attachments: comment.attachments,
     })
   );
