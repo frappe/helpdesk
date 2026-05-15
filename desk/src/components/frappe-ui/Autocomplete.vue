@@ -109,7 +109,14 @@
                 No results found
               </li>
             </ComboboxOptions>
+<<<<<<< HEAD
             <div v-if="slots.footer" class="border-t p-1.5 pb-0.5">
+=======
+            <div
+              v-if="slots.footer"
+              class="border-t border-outline-gray-modals p-1.5 pb-0.5"
+            >
+>>>>>>> 431e95d4 (fix: linter issues)
               <slot
                 name="footer"
                 v-bind="{ value: search?.el._value, close }"
