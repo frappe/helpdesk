@@ -10,8 +10,8 @@
   "image",
   "customer_name",
   "domain",
-  "erp_customer",
-  "references_tab",
+   "erpnext_customer",
+   "references_tab",
   "contact_html"
  ],
  "fields": [
@@ -44,9 +44,9 @@
    "label": "Contact HTML"
   },
   {
-   "fieldname": "erp_customer",
-   "fieldtype": "Data",
-   "label": "ERP Customer",
+   "fieldname": "erpnext_customer",
+    "fieldtype": "Data",
+    "label": "ERPNext Customer",
    "read_only": 1
   }
  ],

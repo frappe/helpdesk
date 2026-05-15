@@ -70,8 +70,8 @@ doc_events = {
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
     "Customer": {
-        "after_insert": "helpdesk.integrations.erpnext.customer.sync_erp_customer_to_helpdesk",
-        "on_update": "helpdesk.integrations.erpnext.customer.sync_erp_customer_to_helpdesk",
+        "after_insert": "helpdesk.integrations.erpnext.customer.sync_erpnext_customer_to_helpdesk",
+        "on_update": "helpdesk.integrations.erpnext.customer.sync_erpnext_customer_to_helpdesk",
     },
 }
 
@@ -97,6 +97,10 @@ ignore_links_on_delete = [
     "HD Notification",
     "HD Ticket Comment",
 ]
+
+doctype_list_js = {
+    "Customer": "public/erpnext/customer_list.js",
+}
 
 # setup wizard
 # setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"
