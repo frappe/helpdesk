@@ -111,7 +111,10 @@
                 No results found
               </li>
             </ComboboxOptions>
-            <div v-if="slots.footer" class="border-t border-outline-gray-modals p-1.5 pb-0.5">
+            <div
+              v-if="slots.footer"
+              class="border-t border-outline-gray-modals p-1.5 pb-0.5"
+            >
               <slot
                 name="footer"
                 v-bind="{ value: search?.el._value, close }"
