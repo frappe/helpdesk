@@ -17,6 +17,7 @@ from helpdesk.utils import agent_only, format_time_difference
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_dashboard(reset_layout: bool = False):
     dashboard = frappe.db.exists("HD Field Layout", {"user": frappe.session.user})
@@ -54,6 +55,7 @@ def get_dashboard(reset_layout: bool = False):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_agent_tickets(period: str = "last month"):
     current_from, current_to, previous_from, previous_to = _resolve_window(period)
@@ -216,6 +218,7 @@ def _get_avg_time_metric(period: str, value_expr, extra_cond) -> dict:
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_avg_first_response_time(period: str = "last month"):
     Ticket = DocType("HD Ticket")
@@ -227,6 +230,7 @@ def get_avg_first_response_time(period: str = "last month"):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_avg_resolution_time(period: str = "last month"):
     Ticket = DocType("HD Ticket")
@@ -244,6 +248,7 @@ def get_avg_resolution_time(period: str = "last month"):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_recent_feedback(
     period: str = "all_time",
@@ -366,6 +371,7 @@ def get_recent_feedback(
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_avg_time_metrics(
     period: str = "6m", from_date: str = None, to_date: str = None
@@ -682,6 +688,7 @@ def _get_pending_response_tickets(limit=10):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_pending_tickets(ticket_type: str = "upcoming_sla"):
     min_priority, max_priority = _get_priority_range()

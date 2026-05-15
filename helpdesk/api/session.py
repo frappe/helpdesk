@@ -4,6 +4,7 @@ from helpdesk.utils import agent_only
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_users():
     users = frappe.qb.get_query(

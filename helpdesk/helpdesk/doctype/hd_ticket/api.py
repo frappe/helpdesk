@@ -29,7 +29,14 @@ from helpdesk.utils import (
 )
 
 
-@frappe.whitelist()
+def check_guest_access():
+    is_guest_allowed_to_create_ticket = frappe.db.get_single_value(
+        "HD Settings", "allow_anyone_to_create_tickets"
+    )
+    return is_guest_allowed_to_create_ticket
+
+
+@frappe.whitelist(allow_guest=check_guest_access())
 # flake8: noqa
 def new(doc: dict, attachments: list[dict] = []):
     doc["doctype"] = "HD Ticket"
@@ -40,6 +47,7 @@ def new(doc: dict, attachments: list[dict] = []):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_one(name: str | int, is_customer_portal: bool = False):
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     QBContact = frappe.qb.DocType("Contact")
@@ -556,6 +564,7 @@ def duplicate_ticket(ticket_doc, subject):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_ticket_customizations():
     # get form script
@@ -610,7 +619,7 @@ def get_navigation_filters(ticket: str, current_view: str = None):
                 filters = (
                     json.loads(_filters) if isinstance(_filters, str) else _filters
                 )
-            except json.JSONDecodeError, TypeError:
+            except (json.JSONDecodeError, TypeError):
                 filters = []
 
     if not filters:
@@ -627,7 +636,7 @@ def get_navigation_filters(ticket: str, current_view: str = None):
                     if isinstance(default_view, str)
                     else default_view
                 )
-            except json.JSONDecodeError, TypeError:
+            except (json.JSONDecodeError, TypeError):
                 filters = []
 
     # Base filters - exclude the current ticket
@@ -664,6 +673,7 @@ def get_navigation_order_by(view):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_ticket_contact(ticket: str | int):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
@@ -688,6 +698,7 @@ def get_ticket_contact(ticket: str | int):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_recent_similar_tickets(ticket: str | int):
     frappe.has_permission("HD Ticket", "read", str(ticket), throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
@@ -739,6 +750,7 @@ def get_recent_tickets(ticket: str):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_ticket_activities(ticket: str | int):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     activities = {
@@ -752,6 +764,7 @@ def get_ticket_activities(ticket: str | int):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_ticket_assignees(ticket: str | int):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"

@@ -2,6 +2,7 @@ import frappe
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_assignment_rules_list():
     if not frappe.has_permission("Assignment Rule", "read"):
         frappe.throw(

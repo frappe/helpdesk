@@ -22,6 +22,7 @@ def get_first_ticket(ticket: str | None = None):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_general_category_id():
     """Get the id of the general category"""
     category = frappe.get_all(

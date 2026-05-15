@@ -5,6 +5,7 @@ from helpdesk.utils import is_agent as _is_agent
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_user():
     current_user = frappe.session.user
     filters = {"name": current_user}
@@ -56,6 +57,7 @@ def get_user():
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_current_user_email_info():
     user = frappe.session.user
