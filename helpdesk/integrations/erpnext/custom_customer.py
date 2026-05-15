@@ -8,7 +8,7 @@ class CustomCustomer(Customer):
 
         frappe.db.set_value(
             "HD Customer",
-            {"erp_customer": olddn},
-            "erp_customer",
+            {"erpnext_customer": olddn},
+            "erpnext_customer",
             newdn,
         )
