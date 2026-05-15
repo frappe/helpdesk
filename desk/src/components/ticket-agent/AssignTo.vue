@@ -7,9 +7,7 @@
   >
     <template #target="{ togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span v-if="!hideLabel" class="block text-xs text-gray-600">{{
-          __("Assignee")
-        }}</span>
+        <span v-if="!hideLabel" class="block text-xs text-ink-gray-5">{{ __("Assignee") }}</span>
         <Button
           ref="triggerRef"
           variant="outline"
@@ -61,7 +59,7 @@
               v-model="searchText"
               :placeholder="__('Search agents...')"
               variant="ghost"
-              class="flex-1"
+              class="flex-1 search-agents-input"
               @click.stop
               @keydown="handleInputKeydown"
             >
@@ -501,3 +499,9 @@ useShortcut("a", () => {
   (triggerRef.value?.$el as HTMLElement)?.nextElementSibling?.click();
 });
 </script>
+
+<style scoped>
+.search-agents-input :deep(input) {
+  background-color: transparent;
+}
+</style>

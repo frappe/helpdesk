@@ -43,7 +43,7 @@
             <div class="w-full">
               <textarea
                 ref="titleRef"
-                class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+                class="w-full resize-none border-0 bg-transparent text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
                 v-model="title"
                 :placeholder="__('Title')"
                 rows="1"
@@ -67,7 +67,7 @@
                     <p class="truncate capitalize text-base text-ink-gray-7">
                       {{ article.data.author.name }}
                     </p>
-                    <IconDot class="h-4 w-4 text-gray-600" />
+                    <IconDot class="h-4 w-4 text-ink-gray-5" />
                     <div class="text-base text-ink-gray-7">
                       {{
                         dayjsLocal(article.data.modified).format(
@@ -80,7 +80,7 @@
               </div>
               <div
                 v-if="!editable && !isCustomerPortal && !isMobileView"
-                class="text-p-sm text-gray-500 items-center"
+                class="text-p-sm text-ink-gray-4 items-center"
               >
                 <span>{{ views }} views</span>
               </div>
@@ -193,23 +193,23 @@
               <p
                 class="truncate capitalize text-p-base text-ink-gray-9 font-medium"
               >
-                <span class="text-base text-gray-600">published by </span>
+                <span class="text-base text-ink-gray-5">published by </span>
                 {{ article.data.author.name }}
               </p>
               <div class="flex items-center gap-1">
-                <span class="text-p-xs text-gray-700">
+                <span class="text-p-xs text-ink-gray-7">
                   {{
                     dayjsLocal(article.data.modified).format("MMM D, h:mm A")
                   }}
                 </span>
                 <IconDot
                   v-if="!editable && !isCustomerPortal && isMobileView"
-                  class="h-4 w-4 text-gray-600"
+                  class="h-4 w-4 text-ink-gray-5"
                 />
 
                 <span
                   v-if="!editable && !isCustomerPortal && isMobileView"
-                  class="text-p-xs text-gray-500 items-center"
+                  class="text-p-xs text-ink-gray-4 items-center"
                   >{{ views }} views</span
                 >
               </div>
