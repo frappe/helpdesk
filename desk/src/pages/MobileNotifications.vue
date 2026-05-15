@@ -26,7 +26,7 @@
     <RouterLink
       v-for="n in notificationStore.data"
       :key="n.name"
-      class="flex cursor-pointer items-start gap-3.5 px-5 py-2.5 hover:bg-gray-100"
+      class="flex cursor-pointer items-start gap-3.5 px-5 py-2.5 hover:bg-surface-gray-2"
       :to="getRoute(n)"
       @click="
         () => {
@@ -37,8 +37,8 @@
       <UserAvatar :name="n.user_from" />
       <div>
         <div class="mb-2 leading-5">
-          <span class="space-x-1 text-gray-700">
-            <span class="font-medium text-gray-900">{{ n.user_from }}</span>
+          <span class="space-x-1 text-ink-gray-7">
+            <span class="font-medium text-ink-gray-9">{{ n.user_from }}</span>
             <span v-if="n.notification_type === 'Mention'">{{
               __("mentioned you in ticket")
             }}</span>
@@ -48,13 +48,13 @@
             <span v-if="n.notification_type === 'Reaction'">{{
               __("has reopened the ticket")
             }}</span>
-            <span class="font-medium text-gray-900">{{
+            <span class="font-medium text-ink-gray-9">{{
               n.reference_ticket
             }}</span>
           </span>
         </div>
         <div class="flex items-center gap-2">
-          <div class="text-sm text-gray-600">
+          <div class="text-sm text-ink-gray-5">
             {{ dayjs.tz(n.creation).fromNow() }}
           </div>
           <div v-if="!n.read" class="h-1.5 w-1.5 rounded-full bg-blue-400" />
@@ -63,8 +63,8 @@
     </RouterLink>
   </div>
   <div v-else class="flex flex-1 flex-col items-center gap-2">
-    <LucideBell class="h-20 w-20 text-gray-300" />
-    <div class="text-lg font-medium text-gray-500">
+    <LucideBell class="h-20 w-20 text-ink-gray-2" />
+    <div class="text-lg font-medium text-ink-gray-4">
       {{ __("No new notifications") }}
     </div>
   </div>

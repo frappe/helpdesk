@@ -2,7 +2,7 @@
   <Dialog :options="options">
     <template #body-main>
       <div class="flex flex-col items-center gap-4 p-6">
-        <div class="text-xl font-medium text-gray-900">
+        <div class="text-xl font-medium text-ink-gray-9">
           {{ contact.doc?.full_name }}
         </div>
         <Avatar
@@ -38,7 +38,7 @@
             :loading="isLoading"
           />
         </div>
-        <div class="w-full space-y-2 text-sm text-gray-700">
+        <div class="w-full space-y-2 text-sm text-ink-gray-7">
           <div class="space-y-1">
             <div class="text-xs">{{ __("Emails") }}</div>
             <MultiSelect

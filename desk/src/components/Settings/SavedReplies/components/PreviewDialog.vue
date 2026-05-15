@@ -33,7 +33,7 @@
             />
             <div
               v-if="getResponsePreviewResource.loading"
-              class="absolute top-0 right-0 flex items-center justify-center size-full rounded-md bg-black/20"
+              class="absolute top-0 right-0 flex items-center justify-center size-full rounded-md bg-surface-gray-7/20"
             >
               <LoadingIndicator class="size-4" />
             </div>

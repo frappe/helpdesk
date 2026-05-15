@@ -2,7 +2,7 @@
   <div class="flex flex-col h-full">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">{{ __("Home") }}</div>
+        <div class="text-lg font-medium text-ink-gray-9">{{ __("Home") }}</div>
       </template>
       <template #right-header>
         <div class="flex items-center gap-2">
