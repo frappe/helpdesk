@@ -7,9 +7,15 @@
   >
     <template #target="{ togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
+<<<<<<< HEAD
         <span v-if="!hideLabel" class="block text-xs text-ink-gray-5">{{
           __("Assignee")
         }}</span>
+=======
+        <span v-if="!hideLabel" class="block text-xs text-ink-gray-5"
+          >{{ __("Assignee") }}
+        </span>
+>>>>>>> 2c3548b5 (chore: code cleanup)
         <Button
           ref="triggerRef"
           variant="outline"
@@ -145,8 +151,24 @@ import {
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
+<<<<<<< HEAD
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
+=======
+import LucideSearch from "~icons/lucide/search";
+import MultipleAvatar from "../MultipleAvatar.vue";
+import UserAvatar from "../UserAvatar.vue";
+
+interface Props {
+  hideLabel?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  hideLabel: false,
+});
+
+const { hideLabel } = props;
+>>>>>>> 2c3548b5 (chore: code cleanup)
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
