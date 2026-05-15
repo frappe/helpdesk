@@ -33,7 +33,7 @@
         class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none -z-10"
         :style="{
           backgroundImage:
-            'radial-gradient(ellipse at center, rgba(255, 255, 255, 1) 30%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 0) 70%)',
+            'radial-gradient(ellipse at center, var(--surface-white) 30%, color-mix(in srgb, var(--surface-white) 90%, transparent) 20%, transparent 70%)',
         }"
       />
       <!-- Icon -->
