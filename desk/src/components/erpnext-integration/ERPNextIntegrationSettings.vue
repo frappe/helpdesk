@@ -1,26 +1,32 @@
 <template>
-  <div>
-    <div class="text-base font-semibold text-ink-gray-9">
-      {{ __("ERPNext Integration") }}
-    </div>
-    <div class="flex items-center justify-between mt-6">
-      <div class="flex flex-col gap-1">
-        <span class="text-base font-medium text-ink-gray-8">{{
-          __("Enable ERPNext Integration")
-        }}</span>
-        <span class="text-p-sm text-ink-gray-6">{{
-          __("Sync customers between Helpdesk and ERPNext automatically.")
-        }}</span>
+  <template v-if="isAdmin">
+    <hr class="my-8" />
+    <div>
+      <div class="text-base font-semibold text-ink-gray-9">
+        {{ __("ERPNext Integration") }}
       </div>
-      <Switch v-model="erpnextIntegrationEnabled" />
+      <div class="flex items-center justify-between mt-6">
+        <div class="flex flex-col gap-1">
+          <span class="text-base font-medium text-ink-gray-8">{{
+            __("Enable ERPNext Integration")
+          }}</span>
+          <span class="text-p-sm text-ink-gray-6">{{
+            __("Sync customers between Helpdesk and ERPNext automatically.")
+          }}</span>
+        </div>
+        <Switch v-model="erpnextIntegrationEnabled" />
+      </div>
     </div>
-  </div>
+  </template>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { Switch, createResource, toast } from "frappe-ui";
+import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
+import { Switch, createResource, toast } from "frappe-ui";
+import { ref, watch } from "vue";
+
+const { isAdmin } = useAuthStore();
 
 const erpnextIntegrationEnabled = ref(false);
 
