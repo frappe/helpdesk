@@ -156,7 +156,7 @@ function emitUpdate(fieldname: Field["fieldname"], value: FieldValue) {
 :deep(.form-control select),
 :deep(.form-control textarea),
 :deep(.form-control button) {
-  border-color: var(--outline-gray-2);
+  border-color: transparent;
   background: var(--surface-white);
 }
 
