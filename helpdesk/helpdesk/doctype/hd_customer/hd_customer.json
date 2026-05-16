@@ -10,8 +10,8 @@
   "image",
   "customer_name",
   "domain",
-   "erpnext_customer",
-   "references_tab",
+  "erpnext_customer",
+  "references_tab",
   "contact_html"
  ],
  "fields": [
@@ -45,15 +45,16 @@
   },
   {
    "fieldname": "erpnext_customer",
-    "fieldtype": "Data",
-    "label": "ERPNext Customer",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "ERPNext Customer",
    "read_only": 1
   }
  ],
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-05-15 20:43:53.511494",
+ "modified": "2026-05-16 19:18:37.792462",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Customer",
