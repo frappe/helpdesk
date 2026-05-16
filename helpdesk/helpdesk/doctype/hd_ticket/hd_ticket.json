@@ -13,6 +13,7 @@
   "raised_by",
   "status",
   "priority",
+  "is_enterprise",
   "status_category",
   "cb00",
   "ticket_type",
@@ -115,6 +116,14 @@
    "label": "Priority",
    "link_filters": "[[\"HD Ticket Priority\",\"disabled\",\"=\",0]]",
    "options": "HD Ticket Priority"
+  },
+  {
+    "default": "0",
+    "fieldname": "is_enterprise",
+    "fieldtype": "Check",
+    "label": "Is Enterprise Partner",
+    "in_standard_filter": 1,
+    "in_list_view": 1
   },
   {
    "fieldname": "cb00",
