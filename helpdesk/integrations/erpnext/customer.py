@@ -82,6 +82,9 @@ def create_customer_field():
 
 @frappe.whitelist()
 def get_sync_info() -> dict:
+    # TODO: should add perm guard here?
+    frappe.has_permission("Customer", "read", throw=True)
+    frappe.has_permission("HD Customer", "read", throw=True)
     if "erpnext" not in frappe.get_installed_apps():
         return {"enabled": False}
 
@@ -101,6 +104,9 @@ def get_sync_info() -> dict:
 
 @frappe.whitelist()
 def sync_hd_erpnext_customers() -> None:
+    frappe.has_permission("Customer", "write", throw=True)
+    frappe.has_permission("HD Customer", "write", throw=True)
+    # TODO: this raises another constraint where the user of HD needs to also have write access to ERP Customer doctype. We can either document this or create a custom API that bypasses permissions for syncing customers.
     if not should_sync():
         frappe.throw(
             _("ERPNext integration is not enabled"), title=_("Cannot Sync Customers")
