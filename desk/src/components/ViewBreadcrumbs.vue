@@ -44,13 +44,15 @@
       </template>
 
       <template #item-label="{ item }">
-        <span class="whitespace-nowrap">{{ item.label }}</span>
-        <Badge
-          v-if="item.is_standard"
-          class="ml-1"
-          size="sm"
-          label="Standard"
-        />
+        <div class="flex items-center min-w-0 max-w-[50vw]">
+          <span class="truncate">{{ item.label }}</span>
+          <Badge
+            v-if="item.is_standard"
+            class="ml-1 flex-shrink-0"
+            size="sm"
+            label="Standard"
+          />
+        </div>
       </template>
       <template #item-suffix="{ item }">
         <div
