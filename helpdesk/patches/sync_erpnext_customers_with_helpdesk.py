@@ -1,30 +1,13 @@
 import frappe
 
-from helpdesk.integrations.erpnext.customer import sync_all_customers
+from helpdesk.integrations.erpnext.customer import (
+    create_customer_field,
+    sync_hd_erpnext_customers,
+)
 
 
 def execute():
-    from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
-
-    # Add custom fields for syncing ERPNext customers with Helpdesk
-    # hd_customer field in Customer doctpy
-    frappe.db.set_single_value("ERPNext HD Settings", "enabled", 1)
-
-    if "erpnext" not in frappe.get_installed_apps():
-        return
-
-    create_custom_fields(
-        {
-            "Customer": [
-                {
-                    "fieldname": "hd_customer",
-                    "fieldtype": "Data",
-                    "label": "HD Customer",
-                    "read_only": 1,
-                    "insert_after": "customer_name",
-                }
-            ]
-        }
-    )
-
-    sync_all_customers()
+    create_customer_field()
+    # TODO: do this or not in patch or should it be opt in?
+    frappe.set_single_value("ERPNext HD Settings", "enabled", 1)
+    sync_hd_erpnext_customers()
