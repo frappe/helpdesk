@@ -426,6 +426,26 @@ implementation at all times.
 
 ---
 
+### 3. Test Utilities — Always Use `helpdesk/test_utils.py`
+
+All backend test helpers must live in `helpdesk/test_utils.py` and be imported from there.
+Never define helper functions (factories, enable/disable toggles, fixture builders) directly
+inside individual test files.
+
+**Rules:**
+
+- **Before writing a helper in a test file**, check `helpdesk/test_utils.py` first — it may
+  already exist.
+- **If a helper doesn't exist**, add it to `helpdesk/test_utils.py` and import it in the test
+  file. Do not leave it inline.
+- **If you write helpers inline during development**, move them to `test_utils.py` before
+  finishing the task.
+- Helper functions in `test_utils.py` must have a docstring explaining what they create or do. Only if the function is completely self-explanatory (e.g. `enable_erpnext_sync`) can the docstring be omitted.
+- Naming conventions:
+  - Factories: `make_<doctype>(...)` — e.g. `make_hd_customer`, `make_ticket`, `make_team`
+  - Toggle helpers: `enable_<feature>()` / `disable_<feature>()` — e.g. `enable_erpnext_sync`
+  - Query helpers: descriptive verb — e.g. `get_latest_ticket_communication`
+
 **For updates, merge new conventions here. If anything is unclear or missing, ask for clarification.**
 
 **In the end your code will be reviewed by Codex, but following these rules will help ensure a smooth review process and a high-quality codebase.**
