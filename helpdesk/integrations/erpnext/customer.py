@@ -56,6 +56,30 @@ def set_links(erpnext_customer_name: str, hd_customer_name: str):
     )
 
 
+def create_customer_field():
+    from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
+
+    # Add custom fields for syncing ERPNext customers with Helpdesk
+    # hd_customer field in Customer doctype
+
+    if "erpnext" not in frappe.get_installed_apps():
+        return
+
+    create_custom_fields(
+        {
+            "Customer": [
+                {
+                    "fieldname": "hd_customer",
+                    "fieldtype": "Data",
+                    "label": "HD Customer",
+                    "read_only": 1,
+                    "insert_after": "customer_name",
+                }
+            ]
+        }
+    )
+
+
 @frappe.whitelist()
 def get_sync_info() -> dict:
     if "erpnext" not in frappe.get_installed_apps():
@@ -166,59 +190,3 @@ def sync_all_customers():
         "helpdesk:erpnext-sync-end",
         user=frappe.session.user,
     )
-
-
-def setup_test_data():
-    """
-    Resets customers on both sides and seeds fresh test data.
-
-    ERP Customers (5): two share the same customer_name to test duplicate handling.
-    HD Customers (5): all distinct names, none overlapping with ERP names.
-    Integration is left disabled so sync can be triggered manually.
-    """
-    # Wipe existing
-    for name in frappe.get_all("HD Customer", pluck="name"):
-        frappe.delete_doc("HD Customer", name, force=True, ignore_permissions=True)
-
-    for name in frappe.get_all("Customer", pluck="name"):
-        frappe.delete_doc("Customer", name, force=True, ignore_permissions=True)
-
-    frappe.db.set_single_value("ERPNext HD Settings", "enabled", 0)
-
-    cg = frappe.db.get_value("Customer Group", {"is_group": 0}, "name")
-    ter = frappe.db.get_value("Territory", {"is_group": 0}, "name")
-
-    erp_seeds = [
-        "Alpha Industries",
-        "Beta Solutions",
-        "Duplicate Corp",
-        "Duplicate Corp",  # intentional duplicate customer_name
-        "Gamma Enterprises",
-    ]
-    for customer_name in erp_seeds:
-        doc = frappe.get_doc(
-            {
-                "doctype": "Customer",
-                "customer_name": customer_name,
-                "customer_group": cg,
-                "territory": ter,
-            }
-        )
-        doc.flags.ignore_erpnext_sync = True
-        doc.insert(ignore_permissions=True)
-        print(f"ERP  {doc.name!r}  (customer_name={doc.customer_name!r})")
-
-    hd_seeds = [
-        "Omega Corp",
-        "Zeta Labs",
-        "Delta Systems",
-        "Sigma Works",
-        "Lambda Tech",
-    ]
-    for customer_name in hd_seeds:
-        doc = frappe.get_doc({"doctype": "HD Customer", "customer_name": customer_name})
-        doc.flags.ignore_erpnext_sync = True
-        doc.insert(ignore_permissions=True)
-        print(f"HD   {doc.name!r}")
-
-    print("\nDone. Integration disabled.")
