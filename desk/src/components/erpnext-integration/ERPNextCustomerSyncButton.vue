@@ -35,9 +35,10 @@ const syncInfo = createResource({
   auto: true,
 });
 
-const showSyncButton = computed(
-  () => !!(!syncInfo.data?.in_sync && (isManager || isAdmin))
-);
+const showSyncButton = computed(() => {
+  if (!syncInfo.data?.enabled) return false;
+  return !!(!syncInfo.data?.in_sync && (isManager || isAdmin));
+});
 
 const syncAction = createResource({
   url: "helpdesk.integrations.erpnext.customer.sync_hd_erpnext_customers",
