@@ -42,12 +42,12 @@
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
+import ERPNextCustomerSyncButton from "@/components/erpnext-integration/ERPNextCustomerSyncButton.vue";
 import { OrganizationsIcon } from "@/components/icons";
 import { __ } from "@/translation";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CustomerDialog from "./CustomerDialog.vue";
-import ERPNextCustomerSyncButton from "./ERPNextCustomerSyncButton.vue";
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);

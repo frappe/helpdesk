@@ -55,7 +55,6 @@
             <Switch v-model="disableSignup" />
           </div>
         </div>
-        <hr class="my-8" />
         <ERPNextIntegrationSettings />
       </div>
     </template>
@@ -63,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNextIntegrationSettings.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
@@ -78,7 +78,6 @@ import {
 import { computed, provide, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import Branding from "./components/Branding.vue";
-import ERPNextIntegrationSettings from "./components/ERPNextIntegrationSettings.vue";
 import TicketSettings from "./components/TicketSettings.vue";
 import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
 <<<<<<< HEAD
