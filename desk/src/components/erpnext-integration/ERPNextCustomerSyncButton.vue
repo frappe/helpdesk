@@ -45,9 +45,6 @@ const syncAction = createResource({
     toast.success("Sync started");
     emit("synced");
   },
-  onError(err) {
-    toast.error(err.messages?.[0] || "Sync failed");
-  },
 });
 
 function onSyncStart() {
