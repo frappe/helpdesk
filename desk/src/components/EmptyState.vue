@@ -22,7 +22,7 @@
   </div>
   <div
     v-else
-    class="flex h-full items-center justify-center w-[stretch] absolute top-0"
+    class="flex h-full items-center justify-center w-[stretch] absolute top-0 -z-10"
   >
     <div
       class="flex flex-col items-center gap-2 text-xl font-medium text-ink-gray-4 w-9/12 md:w-4/12"
@@ -33,7 +33,7 @@
         class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none -z-10"
         :style="{
           backgroundImage:
-            'radial-gradient(ellipse at center, var(--surface-white) 30%, color-mix(in srgb, var(--surface-white) 90%, transparent) 20%, transparent 70%)',
+            'radial-gradient(ellipse at center, var(--surface-white) 10%, color-mix(in srgb, var(--surface-white) 90%, transparent) 25%, transparent 70%)',
         }"
       />
       <!-- Icon -->

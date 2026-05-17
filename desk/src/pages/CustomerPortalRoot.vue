@@ -1,6 +1,6 @@
 <template>
   <Layout class="isolate">
-    <router-view class="z-0 flex flex-1 flex-col overflow-auto relative" />
+    <router-view class="z-0 flex flex-1 flex-col overflow-auto" />
   </Layout>
 </template>
 

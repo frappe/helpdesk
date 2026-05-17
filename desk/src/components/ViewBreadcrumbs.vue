@@ -125,7 +125,7 @@ const isCurrentView = (item) => {
 
 /* --fade-top / --fade-bottom + scroll-fade keyframes live in src/index.css */
 [data-slot="group"]:has(.kebab-btn) {
-  @apply max-h-80 overflow-y-auto overscroll-contain;
+  @apply sm:max-h-80 max-h-40 overflow-y-auto overscroll-contain;
   -webkit-mask-image: linear-gradient(
     to bottom,
     black calc(100% - var(--fade-bottom)),
