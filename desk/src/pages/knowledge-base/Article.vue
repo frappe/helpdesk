@@ -2,7 +2,7 @@
   <div>
     <LayoutHeader>
       <template #left-header>
-        <div class="flex gap-2 items-center crumbs">
+        <div class="flex gap-2 items-center crumbs max-w-[50vw]">
           <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
           <Badge
             v-if="!article.loading"
@@ -667,7 +667,7 @@ const articleActions = computed(() => [
 const breadcrumbs = computed(() => {
   const items: Breadcrumb[] = [
     {
-      label: isMobileView.value ? __("KB") : __("Knowledge Base"),
+      label: isMobileView.value ? "" : __("Knowledge Base"),
       route: {
         name: isCustomerPortal.value
           ? "CustomerKnowledgeBase"

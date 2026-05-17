@@ -1,17 +1,13 @@
 <template>
   <SettingsLayoutBase :description="__('Configure your telephony settings.')">
     <template #title>
-      <div class="flex items-center gap-2 h-6">
+      <div class="flex items-center gap-2">
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("Telephony") }}
         </h1>
-        <Transition name="fade">
-          <Badge
-            v-if="isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent"
-            :label="__('Unsaved')"
-            theme="orange"
-            variant="subtle"
-        /></Transition>
+        <UnsavedBadge
+          :show="isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent"
+        />
       </div>
     </template>
     <template #header-actions>
@@ -136,6 +132,7 @@ import { useTelephonyStore } from "@/stores/telephony";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 
 const auth = useAuthStore();
 const telephonyStore = useTelephonyStore();

@@ -10,14 +10,7 @@
           @click="goBack()"
           class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
         />
-        <Transition name="fade">
-          <Badge
-            :variant="'subtle'"
-            :theme="'orange'"
-            size="sm"
-            :label="__('Unsaved')"
-            v-if="isDirty"
-        /></Transition>
+        <UnsavedBadge :show="isDirty" />
       </div>
     </template>
     <template #header-actions>
@@ -43,8 +36,7 @@
     </template>
     <template #content>
       <div
-        v-if="slaData.loading"
-        class="flex items-center h-full justify-center"
+        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -300,6 +292,7 @@ import { disableSettingModalOutsideClick } from "../settingsModal";
 import { useOnboarding } from "frappe-ui/frappe";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import { SlaPolicyListResourceSymbol } from "@/types";
 import { HDServiceLevelAgreement } from "@/types/doctypes";
 
