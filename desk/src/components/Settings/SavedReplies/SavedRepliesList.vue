@@ -74,7 +74,7 @@
     <template #content>
       <div
         v-if="savedRepliesListResource?.list?.loading"
-        class="flex items-center justify-center my-auto"
+        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -212,6 +212,7 @@ import { computed, inject, ref, Ref, watch } from "vue";
 import { __ } from "@/translation";
 import { ConfirmDelete } from "@/utils";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
+import EmptyState from "@/components/EmptyState.vue";
 import { activeFilter } from "./savedReplies";
 import { useUserStore } from "../../../stores/user";
 import UserIcon from "~icons/lucide/user";

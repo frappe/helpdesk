@@ -41,7 +41,7 @@
     <template #content>
       <div
         v-if="getAssignmentRuleData.loading"
-        class="flex items-center h-full justify-center"
+        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
       >
         <LoadingIndicator class="w-4" />
       </div>

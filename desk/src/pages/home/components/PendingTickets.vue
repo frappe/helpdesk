@@ -15,7 +15,12 @@
     </div>
     <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar">
       <table class="w-full table-auto">
-        <thead v-if="chartConfig?.tickets?.length > 0">
+        <thead
+          v-if="
+            !getPendingTicketsResource.loading &&
+            chartConfig?.tickets?.length > 0
+          "
+        >
           <tr class="text-sm text-ink-gray-5">
             <th class="p-2 text-left font-normal whitespace-nowrap">
               {{ __("ID") }}
@@ -37,7 +42,13 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="chartConfig?.tickets?.length > 0" class="grow">
+        <tbody
+          v-if="
+            !getPendingTicketsResource.loading &&
+            chartConfig?.tickets?.length > 0
+          "
+          class="grow"
+        >
           <tr
             v-for="ticket in chartConfig?.tickets"
             :key="ticket.name"
@@ -115,7 +126,10 @@
           </tr>
           <EmptyState
             class="absolute inset-0 z-10"
-            v-if="chartConfig?.tickets?.length === 0"
+            v-if="
+              !getPendingTicketsResource.loading &&
+              chartConfig?.tickets?.length === 0
+            "
             :title="emptyState.title"
             :description="emptyState.description"
             variant="overlay"
