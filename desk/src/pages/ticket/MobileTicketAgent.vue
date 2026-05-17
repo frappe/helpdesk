@@ -198,7 +198,7 @@ import {
   EmailIcon,
   IndicatorIcon,
   PhoneIcon,
-  TaskIcon
+  TaskIcon,
 } from "@/components/icons";
 import { TicketAgentActivities } from "@/components/ticket";
 

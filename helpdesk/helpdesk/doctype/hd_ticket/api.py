@@ -730,6 +730,8 @@ def get_recent_tickets(ticket: str):
             or []
         )
     return org_tickets + user_tickets
+
+
 @frappe.whitelist()
 def get_ticket_activities(ticket: str):
 
@@ -743,6 +745,7 @@ def get_ticket_activities(ticket: str):
     }
     return activities
 
+
 @frappe.whitelist()
 def get_ticket_assignees(ticket: str):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
@@ -754,7 +757,7 @@ def get_ticket_assignees(ticket: str):
 def get_task(ticket: str):
     if not ticket or not str(ticket).strip():
         frappe.throw(_("Ticket is required"))
-        
+
     ticket = str(ticket).strip()
 
     frappe.has_permission(
@@ -777,7 +780,7 @@ def get_task(ticket: str):
             "status",
             "priority",
             "start_date",
-            "assigned_to",  
+            "assigned_to",
             "due_date",
             "reference_docname",
             "reference_doctype",
