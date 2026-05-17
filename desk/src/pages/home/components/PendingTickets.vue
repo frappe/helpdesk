@@ -14,6 +14,7 @@
       </div>
     </div>
     <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar">
+<<<<<<< HEAD
       <table class="w-full table-auto">
 <<<<<<< HEAD
         <thead v-if="chartConfig?.tickets?.length > 0">
@@ -25,6 +26,15 @@
             chartConfig?.tickets?.length > 0
           "
         >
+=======
+      <table
+        class="w-full table-auto transition-opacity duration-150"
+        :class="{
+          'opacity-60': getPendingTicketsResource.loading && !showSkeleton,
+        }"
+      >
+        <thead v-if="!showSkeleton && chartConfig?.tickets?.length > 0">
+>>>>>>> ec40d5a3 (fix: flicker when tabs are changed)
           <tr class="text-sm text-ink-gray-5">
 >>>>>>> 197e8c53 (fix: ui issues with centering of loading states and loading indicator)
             <th class="p-2 text-left font-normal whitespace-nowrap">
@@ -48,10 +58,7 @@
           </tr>
         </thead>
         <tbody
-          v-if="
-            !getPendingTicketsResource.loading &&
-            chartConfig?.tickets?.length > 0
-          "
+          v-if="!showSkeleton && chartConfig?.tickets?.length > 0"
           class="grow"
         >
           <tr
@@ -292,9 +299,20 @@ const chartConfig = computed(() => {
   };
 });
 
+const hasLoadedOnce = ref(false);
+
 const getPendingTicketsResource = createResource({
   url: "helpdesk.api.agent_home.agent_home.get_pending_tickets",
+  onSuccess() {
+    hasLoadedOnce.value = true;
+  },
 });
+
+// Show the skeleton only on the first load. On later tab switches we keep the
+// previous rows visible (dimmed) until fresh data arrives, avoiding a flicker.
+const showSkeleton = computed(
+  () => getPendingTicketsResource.loading && !hasLoadedOnce.value
+);
 
 function getPriorityBadgeColor(integerValue: number) {
   const min = chartConfig.value.minPriority;
