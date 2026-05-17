@@ -7,9 +7,9 @@
   >
     <template #target="{ togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span v-if="!hideLabel" class="block text-xs text-ink-gray-5"
-          >{{ __("Assignee") }}
-        </span>
+        <span v-if="!hideLabel" class="block text-xs text-ink-gray-5">{{
+          __("Assignee")
+        }}</span>
         <Button
           ref="triggerRef"
           variant="outline"

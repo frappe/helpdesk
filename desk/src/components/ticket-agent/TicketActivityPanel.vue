@@ -21,12 +21,8 @@
           }
         "
       />
-      <div v-else class="flex items-center justify-center flex-col flex-1">
+      <!-- <div v-else class="flex items-center justify-center flex-col flex-1">
         <Button :loading="true" variant="ghost" size="2xl" />
-        <p class="text-xl font-medium text-ink-gray-5">
-          {{ __("Loading...") }}
-        </p>
-      </div>
     </template>
   </Tabs>
 

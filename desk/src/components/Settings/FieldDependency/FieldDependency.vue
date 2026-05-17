@@ -10,11 +10,7 @@
           @click="handleBackNavigation"
           class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
         />
-        <Transition name="fade">
-          <Badge v-if="isDirty" theme="orange">
-            {{ __("Unsaved") }}
-          </Badge></Transition
-        >
+        <UnsavedBadge :show="isDirty" />
       </div>
     </template>
     <template #header-actions>
@@ -98,6 +94,7 @@ import FieldDependencyFieldsSelection from "./FieldDependencyFieldsSelection.vue
 import FieldDependencyValueSelection from "./FieldDependencyValueSelection.vue";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 
 const props = defineProps({
   fieldDependencyName: {
