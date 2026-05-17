@@ -267,11 +267,6 @@ class HDTicket(Document):
                     self.contact = contact
 
     def set_customer(self):
-        """
-        Update `Customer` if does not exist already. `Contact` is assumed
-        to be set beforehand.
-        """
-        # Skip if `Customer` is already set
         if self.customer:
             return
 

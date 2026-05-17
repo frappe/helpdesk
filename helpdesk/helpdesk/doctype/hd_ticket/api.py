@@ -730,35 +730,8 @@ def get_recent_tickets(ticket: str):
             or []
         )
     return org_tickets + user_tickets
-
-
 @frappe.whitelist()
-def get_ticket_activities(ticket: str | int):
-   
 def get_ticket_activities(ticket: str):
-    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
-
-    tasks = frappe.get_all(
-        "HD Task",
-        filters={"reference_ticket": ticket},
-        fields=[
-            "name",
-            "subject",  # keep as "subject" — Taskbox.vue reads activity.subject
-            "status",
-            "priority",
-            "task_description",
-            "expected_start_date",
-            "expected_end_date",
-            "creation",
-            "owner",
-            "modified",
-        ],
-        order_by="creation asc",
-    )
-
-    # Ensure both "subject" and "title" keys exist for forward/backward compatibility
-    for task in tasks:
-        task["title"] = task.get("subject", "")
 
     activities = {
         "comments": get_comments(ticket),
@@ -766,17 +739,56 @@ def get_ticket_activities(ticket: str):
         "history": get_history(ticket),
         "views": get_views(ticket),
         "calls": get_call_logs(ticket),
-        "tasks": tasks,  # raw dicts — no field remapping needed
+        "tasks": get_task(ticket),
     }
-
     return activities
-
 
 @frappe.whitelist()
 def get_ticket_assignees(ticket: str):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
     return assignees
+
+
+@frappe.whitelist()
+def get_task(ticket: str):
+    if not ticket or not str(ticket).strip():
+        frappe.throw(_("Ticket is required"))
+        
+    ticket = str(ticket).strip()
+
+    frappe.has_permission(
+        "HD Ticket",
+        "read",
+        ticket,
+        throw=True,
+    )
+
+    tasks = frappe.get_all(
+        "HD Task",
+        filters={
+            "reference_doctype": "HD Ticket",
+            "reference_docname": ticket,
+        },
+        fields=[
+            "name",
+            "title",
+            "description",
+            "status",
+            "priority",
+            "start_date",
+            "assigned_to",  
+            "due_date",
+            "reference_docname",
+            "reference_doctype",
+            "creation",
+            "owner",
+            "modified",
+        ],
+        order_by="creation asc",
+    )
+
+    return tasks
 
 
 def show_banner_next_day(ticket):
