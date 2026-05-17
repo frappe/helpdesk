@@ -14,13 +14,13 @@
       </div>
     </div>
     <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar">
-      <table class="w-full table-auto">
-        <thead
-          v-if="
-            !getPendingTicketsResource.loading &&
-            chartConfig?.tickets?.length > 0
-          "
-        >
+      <table
+        class="w-full table-auto transition-opacity duration-150"
+        :class="{
+          'opacity-60': getPendingTicketsResource.loading && !showSkeleton,
+        }"
+      >
+        <thead v-if="!showSkeleton && chartConfig?.tickets?.length > 0">
           <tr class="text-sm text-ink-gray-5">
             <th class="p-2 text-left font-normal whitespace-nowrap">
               {{ __("ID") }}
@@ -43,10 +43,7 @@
           </tr>
         </thead>
         <tbody
-          v-if="
-            !getPendingTicketsResource.loading &&
-            chartConfig?.tickets?.length > 0
-          "
+          v-if="!showSkeleton && chartConfig?.tickets?.length > 0"
           class="grow"
         >
           <tr
@@ -287,9 +284,20 @@ const chartConfig = computed(() => {
   };
 });
 
+const hasLoadedOnce = ref(false);
+
 const getPendingTicketsResource = createResource({
   url: "helpdesk.api.agent_home.agent_home.get_pending_tickets",
+  onSuccess() {
+    hasLoadedOnce.value = true;
+  },
 });
+
+// Show the skeleton only on the first load. On later tab switches we keep the
+// previous rows visible (dimmed) until fresh data arrives, avoiding a flicker.
+const showSkeleton = computed(
+  () => getPendingTicketsResource.loading && !hasLoadedOnce.value
+);
 
 function getPriorityBadgeColor(integerValue: number) {
   const min = chartConfig.value.minPriority;
