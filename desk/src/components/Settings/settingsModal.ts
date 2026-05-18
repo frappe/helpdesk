@@ -29,10 +29,54 @@ import ProfilePage from "./Profile/ProfilePage.vue";
 
 export const showSettingsModal = ref(false);
 
+type SettingsTabItem = {
+  label: string;
+  icon?: unknown;
+  component: unknown;
+  condition?: () => boolean;
+};
+
+type SettingsTab = {
+  label: string;
+  hideLabel?: boolean;
+  noborder?: boolean;
+  condition?: () => boolean;
+  items: SettingsTabItem[];
+};
+
+type HelpdeskSettingsTabRegistry = SettingsTab[] | (() => SettingsTab[]);
+
+declare global {
+  interface Window {
+    helpdeskSettingsTabs?: HelpdeskSettingsTabRegistry;
+  }
+}
+
+const getCustomSettingsTabs = (): SettingsTab[] => {
+  const registry = window.helpdeskSettingsTabs;
+  if (!registry) return [];
+
+  const customTabs = typeof registry === "function" ? registry() : registry;
+  if (!Array.isArray(customTabs)) return [];
+
+  return customTabs.map((tab) => ({
+    ...tab,
+    items: (tab.items || []).map((item) => ({
+      ...item,
+      icon:
+        item.icon && typeof item.icon === "object" ? markRaw(item.icon) : item.icon,
+      component:
+        item.component && typeof item.component === "object"
+          ? markRaw(item.component)
+          : item.component,
+    })),
+  }));
+};
+
 const auth = useAuthStore();
 
 export const tabs = computed(() => {
-  const _tabs = [
+  const _tabs: SettingsTab[] = [
     {
       label: __("My settings"),
       hideLabel: true,
@@ -135,6 +179,8 @@ export const tabs = computed(() => {
     },
   ];
 
+  _tabs.push(...getCustomSettingsTabs());
+
   return _tabs.filter((tab) => {
     if (tab.condition && !tab.condition()) return false;
     if (tab.items) {
@@ -168,7 +214,7 @@ type TabName =
   | "Telephony"
   | "Saved Replies";
 
-export const setActiveSettingsTab = (tabName: TabName) => {
+export const setActiveSettingsTab = (tabName: TabName | string) => {
   activeTab.value =
     (tabName &&
       tabs.value
