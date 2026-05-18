@@ -176,9 +176,8 @@ const resolutionBy = computed(() => {
       dayjs(ticket.value.doc?.on_hold_since)
     )
   ) {
-    let timeLeft = dayjs(ticket.value.doc?.resolution_by).diff(dayjs(), "s");
     return {
-      label: `${formatTime(timeLeft, { ...timeFormat })} left (On Hold)`,
+      label: `On Hold`,
       color: "blue",
       date: ticket.value.doc?.on_hold_since,
     };
