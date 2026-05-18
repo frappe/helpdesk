@@ -734,7 +734,7 @@ def get_recent_tickets(ticket: str):
 
 @frappe.whitelist()
 def get_ticket_activities(ticket: str):
-
+    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     activities = {
         "comments": get_comments(ticket),
         "communications": get_communications(ticket),
