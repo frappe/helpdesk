@@ -288,7 +288,6 @@ onMounted(() => {
     },
   });
   ticketsListResource.fetch();
-  feedbackListResource.fetch();
 });
 
 usePageMeta(() => {

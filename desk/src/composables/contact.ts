@@ -15,7 +15,7 @@ import {
   toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, h, markRaw, reactive, ref, watch } from "vue";
+import { computed, ComputedRef, h, markRaw, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
 export type TextInputTypes =
@@ -460,53 +460,61 @@ interface ContactFeedback {
   feedbackListResource: ListResource<HDTicket>;
   feedbackCount: ReturnType<typeof createResource>;
   chartData: number[];
+  loading: ComputedRef<boolean>;
 }
 
 // Cache to avoid re-creating feedback resources for the same contact in a session
 const contactFeedbackCache: Record<string, ContactFeedback> = {};
-
-// Demo distribution for ratings 1–5 (will be replaced by API in future)
 const DEMO_CHART_DATA = [5, 10, 20, 88, 61];
 
 export function useContactFeedback(name: string): ContactFeedback {
   if (contactFeedbackCache[name]) return contactFeedbackCache[name];
 
-  const result: ContactFeedback = {
-    feedbackListResource: createListResource({
+  const feedbackListResource: ListResource<HDTicket> = createListResource({
+    doctype: "HD Ticket",
+    cache: [name, "FeedbackList"],
+    fields: [
+      "name",
+      "subject",
+      "feedback",
+      "feedback_rating",
+      "feedback_extra",
+      "creation",
+      "modified",
+    ],
+    filters: { contact: name, feedback_rating: ["is", "set"] },
+    orderBy: "creation desc",
+    auto: true,
+    transform(data: HDTicket[]) {
+      const result = [...data];
+      result.forEach((ticket) => {
+        ticket.feedback_rating = ticket.feedback_rating
+          ? ticket.feedback_rating * 5
+          : 0;
+      });
+      return result;
+    },
+  });
+
+  const feedbackCount = createResource({
+    url: "frappe.client.get_count",
+    makeParams: () => ({
       doctype: "HD Ticket",
-      cache: [name, "FeedbackList"],
-      fields: [
-        "name",
-        "subject",
-        "feedback",
-        "feedback_rating",
-        "feedback_extra",
-        "creation",
-        "modified",
-      ],
-      filters: { contact: name, feedback_rating: ["is", "set"] },
-      orderBy: "creation desc",
-      transform(data) {
-        data.forEach((ticket) => {
-          ticket.feedback_rating = ticket.feedback_rating
-            ? ticket.feedback_rating * 5
-            : 0;
-        });
-        return data;
+      filters: {
+        contact: name,
+        feedback_rating: ["is", "set"],
       },
     }),
-    feedbackCount: createResource({
-      url: "frappe.client.get_count",
-      makeParams: () => ({
-        doctype: "HD Ticket",
-        filters: {
-          contact: name,
-          feedback_rating: ["is", "set"],
-        },
-      }),
-      auto: true,
-    }),
+    auto: true,
+  });
+
+  const result: ContactFeedback = {
+    feedbackListResource,
+    feedbackCount,
     chartData: DEMO_CHART_DATA,
+    loading: computed(
+      () => feedbackCount.loading || feedbackListResource.loading
+    ),
   };
 
   contactFeedbackCache[name] = result;

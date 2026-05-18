@@ -2,23 +2,44 @@
   <div>
     <!-- Heading -->
     <h3 class="font-semibold text-lg mt-2.5 mb-4">Feedback</h3>
-    <section class="flex items-start gap-6">
-      <!-- Left: Feedback summary card (sticky) -->
-      <FeedbackCard :name="name" />
 
-      <!-- Right: User reviews list -->
+    <!-- Loading -->
+    <div v-if="loading" class="flex items-center justify-center py-16">
+      <LoadingIndicator :scale="10" />
+    </div>
+
+    <!-- Empty -->
+    <div
+      v-else-if="!feedbackCount.data"
+      class="flex flex-col items-center justify-center gap-3 py-16 text-center"
+    >
+      <LucideStar class="h-7.5 w-7.5 text-ink-gray-4" />
+      <div class="flex flex-col gap-1 max-w-[282px] m-auto">
+        <p class="text-base font-medium text-ink-gray-7">No feedback yet</p>
+        <p class="text-ink-gray-6 text-base">
+          Feedback from this contact will appear here once available.
+        </p>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <section v-else class="flex items-start gap-6">
+      <FeedbackCard :name="name" />
       <FeedbackList :name="name" />
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useContactFeedback } from "@/composables/contact";
+import { LoadingIndicator } from "frappe-ui";
+import LucideStar from "~icons/lucide/star";
 import FeedbackCard from "./FeedbackCard.vue";
 import FeedbackList from "./FeedbackList.vue";
 
-defineProps<{
+const props = defineProps<{
   name: string;
 }>();
-</script>
 
-<style scoped></style>
+const { feedbackCount, loading } = useContactFeedback(props.name);
+</script>

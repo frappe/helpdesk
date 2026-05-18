@@ -12,26 +12,8 @@
       />
     </div>
 
-    <!-- Loading -->
-    <template
-      v-if="feedbackListResource.loading && !feedbackListResource.data?.length"
-    >
-      <div class="flex items-center justify-center py-16">
-        <LoadingIndicator :scale="10" />
-      </div>
-    </template>
-
-    <!-- Empty -->
-    <div
-      v-else-if="!feedbackListResource.data?.length"
-      class="flex flex-col items-center justify-center gap-3 py-16 text-center"
-    >
-      <LucideStar class="h-10 w-10 text-ink-gray-4" />
-      <p class="text-base font-medium text-ink-gray-7">No reviews yet</p>
-    </div>
-
     <!-- List -->
-    <div v-else>
+    <div>
       <template
         v-for="(ticket, i) in feedbackListResource.data"
         :key="ticket.name"
@@ -89,7 +71,7 @@
 <script setup lang="ts">
 import { useContactFeedback } from "@/composables/contact";
 import { __ } from "@/translation";
-import { LoadingIndicator, TabButtons } from "frappe-ui";
+import { TabButtons } from "frappe-ui";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import LucideStar from "~icons/lucide/star";
