@@ -1,8 +1,19 @@
 import { __ } from "@/translation";
-import { DocumentResource, EditContactState, NewContactState } from "@/types";
-import { Contact } from "@/types/doctypes";
+import {
+  DocumentResource,
+  EditContactState,
+  ListResource,
+  NewContactState,
+} from "@/types";
+import { Contact, HDTicket } from "@/types/doctypes";
 import { validateEmailWithZod } from "@/utils";
-import { call, createDocumentResource, createResource, toast } from "frappe-ui";
+import {
+  call,
+  createDocumentResource,
+  createListResource,
+  createResource,
+  toast,
+} from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, h, markRaw, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
@@ -165,6 +176,42 @@ export function useContact(name: string) {
     },
   });
 
+  const feedbackListResource: ListResource<HDTicket> = createListResource({
+    doctype: "HD Ticket",
+    cache: [name, "FeedbackList"],
+    fields: [
+      "name",
+      "subject",
+      "feedback",
+      "feedback_rating",
+      "feedback_extra",
+      "creation",
+      "modified",
+    ],
+    filters: { contact: name, feedback_rating: ["is", "set"] },
+    orderBy: "creation desc",
+    transform(data: HDTicket[]) {
+      data.forEach((ticket) => {
+        ticket.feedback_rating = ticket.feedback_rating
+          ? ticket.feedback_rating * 5
+          : 0;
+      });
+      return data;
+    },
+  });
+
+  const feedbackCount = createResource({
+    url: "frappe.client.get_count",
+    makeParams: () => ({
+      doctype: "HD Ticket",
+      filters: {
+        contact: name,
+        feedback_rating: ["is", "set"],
+      },
+    }),
+    auto: true,
+  });
+
   return {
     doc,
     state,
@@ -173,6 +220,8 @@ export function useContact(name: string) {
     isDirty,
     parseContactData,
     editContactResource,
+    feedbackListResource,
+    feedbackCount,
   };
 }
 

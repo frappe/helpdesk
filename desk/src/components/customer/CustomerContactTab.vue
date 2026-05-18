@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="flex items-center justify-between">
-      <p class="mt-2.5 mb-4.5 font-semibold text-lg">{{ __("Contacts") }}</p>
+    <div class="flex items-center justify-between mt-2.5 mb-4">
+      <p class="font-semibold text-lg">{{ __("Contacts") }}</p>
       <div class="flex items-center gap-1">
         <Button
           v-if="pendingInvitesLabel && hasPermission()"

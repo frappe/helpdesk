@@ -84,7 +84,11 @@
               />
               <div v-if="tab.label === __('Feedback')">
                 <!-- Feedback tab content -->
-                <ContactFeedback :name="props.id" />
+                <ContactFeedback
+                  :name="props.id"
+                  :feedbackResource="feedbackListResource"
+                  :count="feedbackCount.data ?? 0"
+                />
               </div>
             </div>
           </template>
@@ -146,7 +150,12 @@ const route = useRoute();
 const router = useRouter();
 const { isMobileView } = useScreenSize();
 
-const { doc: contact, state } = useContact(props.id);
+const {
+  doc: contact,
+  state,
+  feedbackListResource,
+  feedbackCount,
+} = useContact(props.id);
 
 const { ticketsListResource } = getTicketListResource();
 
@@ -160,7 +169,7 @@ const tabs = computed(() => [
   {
     label: __("Feedback"),
     hash: "feedback",
-    count: 0,
+    count: feedbackCount.data ?? 0,
     icon: h(TicketFeedbackIcon, { class: "size-4" }),
   },
 ]);
@@ -285,6 +294,7 @@ onMounted(() => {
     },
   });
   ticketsListResource.fetch();
+  feedbackListResource.fetch();
 });
 
 usePageMeta(() => {
