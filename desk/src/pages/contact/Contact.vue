@@ -84,28 +84,24 @@
               />
               <div v-if="tab.label === __('Feedback')">
                 <!-- Feedback tab content -->
-                <ContactFeedback
-                  :name="props.id"
-                  :feedbackResource="feedbackListResource"
-                  :count="feedbackCount.data ?? 0"
-                />
+                <ContactFeedback :name="props.id" />
               </div>
             </div>
           </template>
         </Tabs>
       </div>
     </div>
+    <DeleteContactDialog
+      v-model="showDeleteDialog"
+      :name="id"
+      @delete="handleDelete"
+    />
+    <EditContactDialog
+      v-if="showEditDialog"
+      v-model="showEditDialog"
+      :name="id"
+    />
   </div>
-  <DeleteContactDialog
-    v-model="showDeleteDialog"
-    :name="id"
-    @delete="handleDelete"
-  />
-  <EditContactDialog
-    v-if="showEditDialog"
-    v-model="showEditDialog"
-    :name="id"
-  />
 </template>
 
 <script setup lang="ts">
@@ -120,6 +116,7 @@ import LayoutHeader from "@/components/LayoutHeader.vue";
 import PageInfo from "@/components/PageInfo.vue";
 import {
   useContact,
+  useContactFeedback,
   useContactInvite,
   useContactResetPassword,
 } from "@/composables/contact";
@@ -150,12 +147,9 @@ const route = useRoute();
 const router = useRouter();
 const { isMobileView } = useScreenSize();
 
-const {
-  doc: contact,
-  state,
-  feedbackListResource,
-  feedbackCount,
-} = useContact(props.id);
+const { doc: contact, state } = useContact(props.id);
+
+const { feedbackCount } = useContactFeedback(props.id);
 
 const { ticketsListResource } = getTicketListResource();
 

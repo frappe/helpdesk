@@ -2,7 +2,9 @@
   <div class="flex-1 min-w-0">
     <!-- Header: title + sort tabs -->
     <div class="flex items-center justify-between ml-6">
-      <h4 class="font-semibold text-ink-gray-8">User reviews ({{ count }})</h4>
+      <h4 class="font-semibold text-ink-gray-8">
+        User reviews ({{ feedbackCount.data ?? 0 }})
+      </h4>
       <TabButtons
         v-model="activeSort"
         :buttons="sortOptions"
@@ -11,7 +13,9 @@
     </div>
 
     <!-- Loading -->
-    <template v-if="feedbackResource.loading && !feedbackResource.data?.length">
+    <template
+      v-if="feedbackListResource.loading && !feedbackListResource.data?.length"
+    >
       <div class="flex items-center justify-center py-16">
         <LoadingIndicator :scale="10" />
       </div>
@@ -19,7 +23,7 @@
 
     <!-- Empty -->
     <div
-      v-else-if="!feedbackResource.data?.length"
+      v-else-if="!feedbackListResource.data?.length"
       class="flex flex-col items-center justify-center gap-3 py-16 text-center"
     >
       <LucideStar class="h-10 w-10 text-ink-gray-4" />
@@ -28,7 +32,10 @@
 
     <!-- List -->
     <div v-else>
-      <template v-for="(ticket, i) in feedbackResource.data" :key="ticket.name">
+      <template
+        v-for="(ticket, i) in feedbackListResource.data"
+        :key="ticket.name"
+      >
         <div
           class="py-4 px-2 cursor-pointer hover:bg-surface-gray-1 rounded ml-4"
           @click="goToTicket(ticket.name)"
@@ -54,22 +61,25 @@
 
           <!-- Feedback text -->
           <p
-            v-if="ticket.feedback_extra"
+            v-if="ticket.feedback"
             class="text-p-sm text-ink-gray-6 line-clamp-2"
           >
-            {{ ticket.feedback_extra }}
+            {{ ticket.feedback }}
           </p>
         </div>
-        <hr v-if="i !== feedbackResource.data!.length - 1" class="mx-6" />
+        <hr v-if="i !== feedbackListResource.data!.length - 1" class="mx-6" />
       </template>
 
       <!-- Load More -->
-      <div class="flex justify-center py-6" v-if="feedbackResource.hasNextPage">
+      <div
+        class="flex justify-center py-6"
+        v-if="feedbackListResource.hasNextPage"
+      >
         <Button
-          :loading="feedbackResource.loading"
+          :loading="feedbackListResource.loading"
           :label="__('Load More')"
           icon-left="refresh-cw"
-          @click="feedbackResource.next()"
+          @click="feedbackListResource.next()"
         />
       </div>
     </div>
@@ -77,18 +87,18 @@
 </template>
 
 <script setup lang="ts">
+import { useContactFeedback } from "@/composables/contact";
 import { __ } from "@/translation";
-import type { ListResource } from "@/types";
-import type { HDTicket } from "@/types/doctypes";
 import { LoadingIndicator, TabButtons } from "frappe-ui";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import LucideStar from "~icons/lucide/star";
 
 const props = defineProps<{
-  feedbackResource: ListResource<HDTicket>;
-  count: number;
+  name: string;
 }>();
+
+const { feedbackListResource, feedbackCount } = useContactFeedback(props.name);
 
 const router = useRouter();
 
@@ -119,8 +129,8 @@ const orderByMap: Record<SortValue, string | undefined> = {
 };
 
 function onSortChange(value: SortValue) {
-  props.feedbackResource.update({ orderBy: orderByMap[value] });
-  props.feedbackResource.reload();
+  feedbackListResource.update({ orderBy: orderByMap[value] });
+  feedbackListResource.reload();
 }
 
 function formatRating(rating: number | undefined | null): string {

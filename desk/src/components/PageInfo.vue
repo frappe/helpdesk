@@ -20,12 +20,7 @@
             {{ avatar.label }}
           </p>
           <Tooltip text="Invite sent. Waiting for the user to accept.">
-            <Badge
-              v-if="props.badge"
-              :label="props.badge"
-              :theme="'orange'"
-              class="mt-[1px]"
-            />
+            <Badge v-if="props.badge" :label="props.badge" :theme="'orange'" />
           </Tooltip>
         </div>
         <div

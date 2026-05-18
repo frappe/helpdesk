@@ -13,7 +13,9 @@
         <p class="text-2xl font-semibold text-ink-gray-9 leading-none">
           {{ avgRating }}
         </p>
-        <p class="text-xs text-ink-gray-5 mt-0.5">{{ count }} reviews</p>
+        <p class="text-xs text-ink-gray-5 mt-0.5">
+          {{ feedbackCount.data ?? 0 }} reviews
+        </p>
       </div>
     </div>
 
@@ -23,19 +25,20 @@
 </template>
 
 <script setup lang="ts">
+import { useContactFeedback } from "@/composables/contact";
 import { EChartsOption } from "echarts";
 import { ECharts } from "frappe-ui";
 import { computed } from "vue";
 import LucideStar from "~icons/lucide/star";
 
 const props = defineProps<{
-  count: number;
+  name: string;
 }>();
+
+const { chartData, feedbackCount } = useContactFeedback(props.name);
 
 const avgRating = 5;
 
-// Demo distribution for ratings 1–5
-const demoDistribution = [5, 10, 20, 88, 61];
 const BAR_COLOR = "#E79913";
 
 const hexToRgba = (hex: string, alpha: number) => {
@@ -46,7 +49,7 @@ const hexToRgba = (hex: string, alpha: number) => {
 };
 
 const chartOptions = computed<EChartsOption>(() => {
-  const values = demoDistribution;
+  const values = chartData;
   const opacities = [1, 0.7, 0.5, 0.3, 0.2];
   const uniqueSorted = [...new Set(values)].sort((a, b) => b - a);
   const opacityByIndex = values.map((v) => {
