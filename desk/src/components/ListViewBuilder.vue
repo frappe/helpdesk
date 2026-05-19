@@ -19,14 +19,35 @@
         v-if="!options.hideColumnSetting"
       />
     </div>
-    <div v-else class="flex justify-between items-center w-full">
-      <Filter :default_filters="defaultParams.filters" />
-      <div class="flex items-center gap-2">
-        <Reload @click="handleReload" :loading="list.loading" />
-        <SortBy :hide-label="isMobileView" />
-      </div>
-    </div>
-  </div>
+<div
+  v-else
+  class="flex items-center gap-2 w-full overflow-x-auto"
+>
+  <!-- Filter -->
+  <Filter :default_filters="defaultParams.filters" />
+
+<FormControl
+  type="select"
+  class="min-w-[140px]"
+  :options="customers.data || []"
+  v-model="selectedCustomer"
+  placeholder="Customer"
+  @update:modelValue="handleCustomerFilter"
+/>
+
+  <!-- Reload -->
+  <Reload
+    @click="handleReload"
+    :loading="list.loading"
+  />
+
+  <!-- Sort -->
+  <SortBy :hide-label="isMobileView" />
+</div>
+
+</div>
+
+<!-- List View -->
 
   <!-- List View -->
   <ListView
@@ -272,6 +293,8 @@ const options = computed(() => {
 
 const { isMobileView } = useScreenSize();
 
+const selectedCustomer = ref("");
+
 const defaultEmptyState = {
   icon: "",
   title: __("No Data Found"),
@@ -442,7 +465,10 @@ const quickFilters = createResource({
     show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
   transform: (data) => {
-    if (Boolean(data.length)) return;
+if (!Boolean(data.length)) {
+  data = [{ name: "name", label: "Name", fieldtype: "Data" }];
+}
+return data;
     data = [{ name: "name", label: "Name", fieldtype: "Data" }];
     return data;
   },
@@ -532,6 +558,24 @@ const listViewData = reactive({
   sortableFields,
 });
 
+
+const customers = createResource({
+  url: "frappe.client.get_list",
+  auto: true,
+  params: {
+    doctype: "Customer",
+    fields: ["name"],
+    limit_page_length: 100,
+  },
+  transform: (data) => {
+    return data.map((customer) => ({
+      label: customer.name,
+      value: customer.name,
+    }));
+  },
+});
+
+
 provide("listViewData", listViewData);
 
 provide("listViewActions", {
@@ -551,6 +595,9 @@ function applyFilters(filters) {
   handleViewUpdate();
   isViewUpdated.value = false;
 }
+
+
+
 
 function applySort(order_by: string) {
   isViewUpdated.value = true;
@@ -663,6 +710,15 @@ function handleViewChanges() {
 
   list.submit({ ...defaultParams });
 }
+
+
+function handleCustomerFilter(value) {
+  applyFilters({
+    ...defaultParams.filters,
+    customer: value,
+  });
+}
+
 
 function findCurrentView() {
   let currentView: View;
