@@ -1,0 +1,114 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-05-19 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "article",
+  "article_title",
+  "column_break_1",
+  "model",
+  "embedding_version",
+  "content_section",
+   "content_hash",
+   "column_break_2",
+  "embedding_json"
+ ],
+ "fields": [
+  {
+   "fieldname": "article",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Article",
+   "options": "HD Article",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "article_title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Article Title",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "text-embedding-3-small",
+   "fieldname": "model",
+   "fieldtype": "Data",
+   "label": "Embedding Model",
+   "read_only": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "embedding_version",
+   "fieldtype": "Int",
+   "label": "Embedding Version",
+   "read_only": 1
+  },
+  {
+   "fieldname": "content_section",
+   "fieldtype": "Section Break",
+   "label": "Content"
+  },
+  {
+   "fieldname": "content_hash",
+   "fieldtype": "Data",
+   "label": "Content Hash (MD5)",
+   "read_only": 1
+  },
+   {
+    "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "embedding_json",
+   "fieldtype": "Long Text",
+   "label": "Embedding Vector (JSON)",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-05-19 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Article Embedding",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Agent Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Agent"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}

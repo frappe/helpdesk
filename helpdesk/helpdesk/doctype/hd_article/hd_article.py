@@ -52,9 +52,24 @@ class HDArticle(Document):
         if count == 1:
             return
         capture_event("article_created")
+        self.enqueue_rag_index()
+
+    def on_update(self):
+        self.enqueue_rag_index()
 
     def on_trash(self):
         self.check_category_length()
+        self.remove_rag_index()
+
+    def enqueue_rag_index(self):
+        from helpdesk.rag.rag_search import index_article_in_background
+
+        index_article_in_background(self.name)
+
+    def remove_rag_index(self):
+        from helpdesk.rag.rag_search import remove_article_from_index
+
+        remove_article_from_index(self.name)
 
     def check_category_length(self, category=None):
         category = category or self.get("category")

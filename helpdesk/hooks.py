@@ -44,6 +44,13 @@ scheduler_events = {
     "hourly_long": [
         "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.update_sla_status_in_ticket"
     ],
+    # RAG: verify embedding index is complete every 3 hours; triggers a
+    # background bulk re-index when published articles outnumber embeddings.
+    "cron": {
+        "0 */3 * * *": [
+            "helpdesk.rag.rag_search.build_embedding_index_if_not_exists",
+        ],
+    },
 }
 
 

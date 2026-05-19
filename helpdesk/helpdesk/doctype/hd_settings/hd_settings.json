@@ -64,8 +64,13 @@
   "column_break_qoxt",
   "description_weight",
   "headings_weight",
-  "email_customisations_tab",
-  "share_feedback_section",
+   "ai_tab",
+   "ai_section",
+   "enable_rag",
+   "openai_api_key",
+   "openai_api_base",
+   "email_customisations_tab",
+   "share_feedback_section",
   "enable_email_ticket_feedback",
   "send_email_feedback_on_status",
   "feedback_email_content",
@@ -350,8 +355,40 @@
    "fieldtype": "Check",
    "label": "Restrict agent assignment to selected Team"
   },
-  {
-   "fieldname": "email_customisations_tab",
+    {
+     "fieldname": "ai_tab",
+     "fieldtype": "Tab Break",
+     "label": "AI"
+    },
+    {
+     "fieldname": "ai_section",
+     "fieldtype": "Section Break",
+     "label": "OpenAI Configuration"
+    },
+    {
+     "default": "0",
+     "description": "Enable RAG-based AI search over the Knowledge Base. Requires an OpenAI API key below.",
+     "fieldname": "enable_rag",
+     "fieldtype": "Check",
+     "label": "Enable AI Knowledge Base Search"
+    },
+    {
+     "fieldname": "openai_api_key",
+      "fieldtype": "Password",
+      "label": "OpenAI API Key",
+      "description": "Used for RAG-based Knowledge Base search. Stored encrypted.",
+      "depends_on": "enable_rag",
+      "mandatory_depends_on": "eval: doc.enable_rag"
+     },
+     {
+      "fieldname": "openai_api_base",
+      "fieldtype": "Data",
+      "label": "API Base URL",
+      "description": "Leave blank for OpenAI. For OpenRouter use: https://openrouter.ai/api/v1",
+      "depends_on": "enable_rag"
+     },
+   {
+    "fieldname": "email_customisations_tab",
    "fieldtype": "Tab Break",
    "label": "Email Notifications"
   },
