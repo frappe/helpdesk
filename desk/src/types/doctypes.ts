@@ -270,6 +270,8 @@ export interface HDAgent extends DocType {
   is_active: 0 | 1;
   /** Image: Attach Image */
   user_image?: string;
+  /** Availability: Select */
+  availability: string;
 }
 
 // Last updated: 2022-12-22 18:52:50.658355
