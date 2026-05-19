@@ -115,9 +115,9 @@ function onSortChange(value: SortValue) {
   feedbackListResource.reload();
 }
 
-function formatRating(rating: number | undefined | null): string {
-  if (!rating) return "0.0";
-  return Number(rating).toFixed(1);
+function formatRating(rating: number | undefined | null): number {
+  if (!rating) return 0;
+  return Number(rating) * 5;
 }
 
 function ratingBadgeClass(rating: number | undefined | null): string {

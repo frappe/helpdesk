@@ -491,15 +491,6 @@ export function useContactFeedback(name: string): ContactFeedback {
     filters: { contact: name, feedback_rating: ["is", "set"] },
     orderBy: "creation desc",
     auto: true,
-    transform(data: HDTicket[]) {
-      const result = [...data];
-      result.forEach((ticket) => {
-        ticket.feedback_rating = ticket.feedback_rating
-          ? ticket.feedback_rating * 5
-          : 0;
-      });
-      return result;
-    },
   });
 
   const feedbackCount = createResource({

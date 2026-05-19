@@ -9,7 +9,7 @@
         <div class="mb-6 flex items-center justify-between">
           <div class="flex items-center gap-1">
             <h3 class="text-2xl font-semibold leading-6 text-ink-gray-9">
-              {{ __("Edit contact") }}
+              {{ __("Edit Contact") }}
             </h3>
             <Badge
               v-if="isDirty"
