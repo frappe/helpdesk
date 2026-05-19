@@ -11,16 +11,14 @@
       </div>
       <div>
         <p class="text-2xl font-semibold text-ink-gray-9 leading-none">
-          {{ avgRating }}
+          {{ chart.avg }}
         </p>
-        <p class="text-xs text-ink-gray-5 mt-0.5">
-          {{ feedbackCount.data ?? 0 }} reviews
-        </p>
+        <p class="text-xs text-ink-gray-5 mt-0.5">{{ chart.total }} reviews</p>
       </div>
     </div>
 
     <!-- ECharts bar chart -->
-    <ECharts :options="chartOptions" class="w-full h-[90px]" />
+    <ECharts :options="chart.options" class="w-full h-[90px]" />
   </div>
 </template>
 
@@ -35,9 +33,7 @@ const props = defineProps<{
   name: string;
 }>();
 
-const { chartData, feedbackCount } = useContactFeedback(props.name);
-
-const avgRating = 5;
+const { chartData } = useContactFeedback(props.name);
 
 const BAR_COLOR = "#E79913";
 
@@ -48,47 +44,61 @@ const hexToRgba = (hex: string, alpha: number) => {
   return `rgba(${r},${g},${b},${alpha})`;
 };
 
-const chartOptions = computed<EChartsOption>(() => {
-  const values = chartData;
-  const opacities = [1, 0.7, 0.5, 0.3, 0.2];
-  const uniqueSorted = [...new Set(values)].sort((a, b) => b - a);
-  const opacityByIndex = values.map((v) => {
-    const rank = uniqueSorted.indexOf(v);
-    return opacities[Math.min(rank, opacities.length - 1)];
-  });
+const chart = computed<{ options: EChartsOption; avg: string; total: number }>(
+  () => {
+    if (chartData.loading || !chartData.data) {
+      return { options: {}, avg: "0.0", total: 0 };
+    }
 
-  return {
-    grid: { left: 4, right: 4, top: 16, bottom: 20, containLabel: false },
-    xAxis: {
-      type: "category",
-      data: ["1", "2", "3", "4", "5"],
-      axisLine: { show: true, lineStyle: { color: "#ededed" } },
-      axisTick: { show: false },
-      axisLabel: { color: "#6b7280", fontSize: 11 },
-    },
-    yAxis: { type: "value", show: false, min: 0 },
-    series: [
-      {
-        type: "bar",
-        data: values.map((value, i) => ({
-          value,
-          itemStyle: {
-            color: hexToRgba(BAR_COLOR, opacityByIndex[i]),
-            borderRadius: [4, 4, 0, 0],
-          },
-          label: {
-            show: true,
-            position: "top" as const,
-            formatter: value > 0 ? String(value) : "",
-            color: "#6b7280",
-            fontSize: 11,
-          },
-        })),
-        barWidth: 16,
-        emphasis: { disabled: true },
+    const { average, data, total } = chartData.data;
+    const values = [1, 2, 3, 4, 5].map((star) => data[star] ?? 0);
+
+    const opacities = [1, 0.7, 0.5, 0.3, 0.2];
+    const uniqueSorted = [...new Set(values)].sort((a, b) => b - a);
+    const opacityByIndex = values.map((v) => {
+      const rank = uniqueSorted.indexOf(v);
+      return opacities[Math.min(rank, opacities.length - 1)];
+    });
+
+    const options: EChartsOption = {
+      grid: { left: 4, right: 4, top: 16, bottom: 20, containLabel: false },
+      xAxis: {
+        type: "category",
+        data: ["1", "2", "3", "4", "5"],
+        axisLine: { show: true, lineStyle: { color: "#ededed" } },
+        axisTick: { show: false },
+        axisLabel: { color: "#6b7280", fontSize: 11 },
       },
-    ],
-    tooltip: { show: false },
-  };
-});
+      yAxis: { type: "value", show: false, min: 0 },
+      series: [
+        {
+          type: "bar",
+          data: values.map((value, i) => ({
+            value,
+            itemStyle: {
+              color: hexToRgba(BAR_COLOR, opacityByIndex[i]),
+              borderRadius: [4, 4, 0, 0],
+            },
+            label: {
+              show: true,
+              position: "top" as const,
+              formatter: value > 0 ? String(value) : "",
+              color: "#6b7280",
+              fontSize: 11,
+            },
+          })),
+          barWidth: 16,
+          emphasis: { disabled: true },
+        },
+      ],
+      tooltip: { show: false },
+    };
+
+    return {
+      options,
+      avg: Number(average).toFixed(1),
+      total,
+    };
+  }
+);
 </script>

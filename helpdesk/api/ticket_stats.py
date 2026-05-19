@@ -95,7 +95,9 @@ def _get_total_tickets(
     }
 
 
-def _get_feedback_received(
+@frappe.whitelist()
+@agent_only
+def get_feedback_received(
     scope: Scope,
     value: str,
 ) -> dict:
@@ -278,7 +280,7 @@ def get_ticket_stats(
 
     return {
         # "total_tickets": _get_total_tickets(scope, dn, period),
-        "feedback_received": _get_feedback_received(scope, dn),
+        "feedback_received": get_feedback_received(scope, dn),
         "sla_violations": _get_sla_violations(scope, dn, period),
         "avg_first_response_time": get_avg_time_metric(
             period, "first_response_time", scope, dn

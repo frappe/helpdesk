@@ -4,6 +4,7 @@ import {
   EditContactState,
   ListResource,
   NewContactState,
+  Resource,
 } from "@/types";
 import { Contact, HDTicket } from "@/types/doctypes";
 import { validateEmailWithZod } from "@/utils";
@@ -455,17 +456,22 @@ export function useContactResetPassword(getUser: () => string | undefined) {
   return { resetPassword, isLoading };
 }
 
+interface ContactFeedbackChartData {
+  average: number;
+  total: number;
+  data: Record<number, number>;
+}
+
 // key of feedback feedbackListResource which has type of ListResource<HDTicket> is feedbackListResource, key of count resource is Resource<number>
 interface ContactFeedback {
   feedbackListResource: ListResource<HDTicket>;
   feedbackCount: ReturnType<typeof createResource>;
-  chartData: number[];
+  chartData: Resource<ContactFeedbackChartData>;
   loading: ComputedRef<boolean>;
 }
 
 // Cache to avoid re-creating feedback resources for the same contact in a session
 const contactFeedbackCache: Record<string, ContactFeedback> = {};
-const DEMO_CHART_DATA = [5, 10, 20, 88, 61];
 
 export function useContactFeedback(name: string): ContactFeedback {
   if (contactFeedbackCache[name]) return contactFeedbackCache[name];
@@ -508,12 +514,24 @@ export function useContactFeedback(name: string): ContactFeedback {
     auto: true,
   });
 
+  const chartData = createResource({
+    url: "helpdesk.api.ticket_stats.get_feedback_received",
+    makeParams: () => ({
+      scope: "contact",
+      value: name,
+    }),
+    auto: true,
+  });
+
   const result: ContactFeedback = {
     feedbackListResource,
     feedbackCount,
-    chartData: DEMO_CHART_DATA,
+    chartData,
     loading: computed(
-      () => feedbackCount.loading || feedbackListResource.loading
+      () =>
+        feedbackCount.loading ||
+        feedbackListResource.loading ||
+        chartData.loading
     ),
   };
 
