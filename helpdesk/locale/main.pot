@@ -780,13 +780,8 @@ msgstr ""
 msgid "Avg. time taken to resolve a ticket"
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/Settings/EmailAdd.vue:87
-#: desk/src/components/Settings/EmailEdit.vue:72
-=======
 #: desk/src/components/Settings/EmailAdd.vue:145
 #: desk/src/components/Settings/EmailEdit.vue:134
->>>>>>> 4982ef6c (chore: update POT file)
 msgid "Back"
 msgstr ""
 
@@ -1304,11 +1299,7 @@ msgstr ""
 msgid "Could not send feedback email,due to: {0}"
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/Settings/EmailAdd.vue:94
-=======
 #: desk/src/components/Settings/EmailAdd.vue:152
->>>>>>> 4982ef6c (chore: update POT file)
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
 #: desk/src/components/layouts/Sidebar.vue:537
