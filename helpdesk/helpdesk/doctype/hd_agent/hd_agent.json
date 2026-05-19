@@ -10,7 +10,7 @@
   "agent_name",
   "user_image",
   "is_active",
-  "availibility"
+  "availability"
  ],
  "fields": [
   {
@@ -42,15 +42,15 @@
   },
   {
    "default": "Available",
-   "fieldname": "availibility",
+   "fieldname": "availability",
    "fieldtype": "Select",
-   "label": "Availibility",
+   "label": "Availability",
    "options": "Available\nAway"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-05-18 14:07:33.374114",
+ "modified": "2026-05-19 14:59:12.901015",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
