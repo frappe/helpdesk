@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="variant === 'badge'"
-    class="flex flex-col items-center justify-center gap-4 h-[stretch] absolute w-[stretch] left-0 top-5.5"
+    class="flex flex-col items-center justify-center gap-4 h-[stretch] absolute w-[stretch] left-0 top-5.5 pointer-events-none"
   >
     <div
       class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
@@ -22,7 +22,7 @@
   </div>
   <div
     v-else
-    class="flex h-full items-center justify-center w-[stretch] absolute top-0 -z-10"
+    class="flex h-full items-center justify-center w-[stretch] absolute top-0 -z-10 pointer-events-none"
   >
     <div
       class="flex flex-col items-center gap-2 text-xl font-medium text-ink-gray-4 w-9/12 md:w-4/12"
