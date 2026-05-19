@@ -22,7 +22,7 @@
   </div>
   <div
     v-else
-    class="flex h-full items-center justify-center w-[stretch] absolute top-0 -z-10 pointer-events-none"
+    class="flex h-full items-center justify-center w-[stretch] absolute top-0 pointer-events-none"
   >
     <div
       class="flex flex-col items-center gap-2 text-xl font-medium text-ink-gray-4 w-9/12 md:w-4/12"
