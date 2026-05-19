@@ -109,6 +109,16 @@
                 <span class="text-ink-gray-7 flex-1 text-left truncate">
                   {{ agent.label }}
                 </span>
+                <Badge
+                  v-if="
+                    agent.availability && agent.availability !== 'Available'
+                  "
+                  :label="agent.availability"
+                  variant="subtle"
+                  theme="orange"
+                  size="sm"
+                  class="flex-shrink-0"
+                />
               </button>
             </template>
 
@@ -143,12 +153,14 @@ import {
   createListResource,
   createResource,
   toast,
+  Badge,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
 
 import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
+import { HDAgent } from "@/types/doctypes";
 
 interface Props {
   hideLabel?: boolean;
@@ -223,7 +235,7 @@ watch(popoverIsOpen, (isOpen) => {
 
 const agentResource = createListResource({
   doctype: "HD Agent",
-  fields: ["name", "agent_name", "user_image"],
+  fields: ["name", "agent_name", "user_image", "availability"],
   filters: { is_active: true },
   pageLength: 20,
   auto: true,
@@ -236,7 +248,7 @@ const currentAgentResource = currentAgentName
       params: {
         doctype: "HD Agent",
         name: currentAgentName,
-        fields: ["name", "agent_name", "user_image"],
+        fields: ["name", "agent_name", "user_image", "availability"],
       },
       auto: true,
     })
@@ -266,6 +278,7 @@ const agentOptions = computed<AgentOption[]>(() => {
       value: a.name,
       label: a.agent_name || getUser(a.name).full_name,
       image: a.user_image || getUser(a.name).user_image,
+      availability: a.availability,
     });
     options.add(a.name);
   }
@@ -277,6 +290,7 @@ const agentOptions = computed<AgentOption[]>(() => {
           value: agent.name,
           label: agent.agent_name || getUser(agent.name).full_name,
           image: agent.user_image || getUser(agent.name).user_image,
+          availability: agent.availability,
         });
         options.add(agent.name);
       }
@@ -300,7 +314,17 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   if (!isSearching) {
     for (const a of localAssignees.value) {
       if (!seen.has(a.name)) {
+<<<<<<< HEAD
         options.push({ value: a.name, label: a.label, image: a.image });
+=======
+        const user = getUser(a.name);
+        options.push({
+          value: a.name,
+          label: a.label || user.full_name || a.name,
+          image: a.image || user.user_image,
+          availability: a.availability,
+        });
+>>>>>>> a9268b86 (feat: handle manual assignment for away agents)
         seen.add(a.name);
       }
     }
@@ -467,6 +491,16 @@ async function saveAssignees(added: string[], removed: string[]) {
       if (removeResult?.exc) throw new Error(removeResult.exc);
     }
     if (added.length) {
+      const awayAgents = (agentResource.data as HDAgent[])?.filter(
+        (agent) => added.includes(agent.name) && agent.availability === "Away"
+      );
+      if (awayAgents?.length > 0) {
+        const names = awayAgents
+          .map((a: HDAgent) => a.agent_name || a.name)
+          .join(", ");
+        toast.warning(__(`${names} is currently away`));
+      }
+
       const addResult = await addAssigneesResource.submit(added);
       if (addResult?.exc) throw new Error(addResult.exc);
     }
