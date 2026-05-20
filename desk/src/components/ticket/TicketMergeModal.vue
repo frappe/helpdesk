@@ -19,7 +19,7 @@
 
               <template #body-main>
                 <div
-                  class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-98 whitespace-pre-wrap leading-5"
+                  class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
                 >
                   <span class="text-p-base">
                     {{
@@ -27,24 +27,17 @@
                     }}</span
                   >
                   <ul class="list-disc pl-4 mt-1 space-y-1">
-                    <li>
-                      {{ __("Ticket must be Open or Paused.") }}
-                      <code class="bg-surface-gray-2 rounded-md px-1 py-0.5">
-                        {{ __("status_category in ['Open', 'Paused']") }}</code
+                    <li
+                      v-for="(condition, index) in mergeConditions"
+                      :key="index"
+                    >
+                      {{ __(condition.text) }}
+                      <code
+                        v-if="condition.code"
+                        class="bg-surface-gray-2 rounded-md px-1 py-0.5"
                       >
-                    </li>
-                    <li>
-                      {{ __("Ticket must not already be merged.") }}
-                      <code class="bg-surface-gray-2 rounded-md px-1 py-0.5">
-                        {{ __("is_merged === 0") }}</code
-                      >
-                    </li>
-                    <li>
-                      {{
-                        __(
-                          "Source and target tickets which are to be merged cannot be the same."
-                        )
-                      }}
+                        {{ __(condition.code) }}
+                      </code>
                     </li>
                   </ul>
                 </div>
@@ -126,6 +119,28 @@ interface E {
 const props = defineProps<Props>();
 const emit = defineEmits<E>();
 const showDialog = defineModel<boolean>();
+
+const mergeConditions = [
+  {
+    text: "Ticket must be Open or Paused.",
+    code: "status_category in ['Open', 'Paused']",
+  },
+  {
+    text: "Ticket must not already be merged.",
+    code: "is_merged === 0",
+  },
+  {
+    text: "Source and target tickets which are to be merged cannot be the same.",
+  },
+  {
+    text: "If source ticket has a customer, target must belong to the same customer.",
+    code: "customer === source.customer",
+  },
+  {
+    text: "If source ticket has a raised_by, target must share the same raised_by.",
+    code: "raised_by === source.raised_by",
+  },
+];
 
 interface Filter {
   status_category: [string, string[] | string];
