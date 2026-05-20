@@ -55,7 +55,10 @@ class HDArticle(Document):
         self.enqueue_rag_index()
 
     def on_update(self):
-        self.enqueue_rag_index()
+        if self.status == "Draft":
+            self.remove_rag_index()
+        elif self.status == "Published":
+            self.enqueue_rag_index()
 
     def on_trash(self):
         self.check_category_length()

@@ -13,7 +13,13 @@
       <template #right-header>
         <RouterLink
           class="inline-flex"
-          :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
+          :to="{
+            name: isCustomerPortal
+              ? enableRag
+                ? 'CustomerSearch'
+                : 'TicketNew'
+              : 'TicketAgentNew',
+          }"
         >
           <Button label="Create" theme="gray" variant="solid">
             <template #prefix>
@@ -61,6 +67,7 @@ import { dayjs } from "@/dayjs";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
@@ -89,6 +96,7 @@ const hasActiveFilters = computed(
 
 const { $dialog, $socket } = globalStore();
 const { isManager, userId } = useAuthStore();
+const { enableRag } = useConfigStore();
 
 const listViewRef = ref(null);
 const showExportModal = ref(false);

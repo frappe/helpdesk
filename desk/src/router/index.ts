@@ -150,6 +150,15 @@ const routes = [
     },
   },
   {
+    path: "/my-tickets/search",
+    name: "CustomerSearch",
+    component: () => import("@/pages/CustomerSearch.vue"),
+    meta: {
+      public: true,
+      auth: true,
+    },
+  },
+  {
     path: "/kb-public",
     name: "CustomerKnowledgeBase",
     component: () => import("@/pages/knowledge-base/KnowledgeBaseCustomer.vue"),

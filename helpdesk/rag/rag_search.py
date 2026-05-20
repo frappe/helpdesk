@@ -143,7 +143,6 @@ class HelpdeskRAGSearch:
                     title=f"RAG: Failed to index article {name}",
                     message=frappe.get_traceback(),
                 )
-
         return summary
 
     def remove_article(self, article_name: str) -> bool:
@@ -152,6 +151,9 @@ class HelpdeskRAGSearch:
 
         Returns True if a record was found and deleted.
         """
+        if not self.is_rag_enabled():
+            return False
+
         existing = frappe.db.get_value(
             "HD Article Embedding", {"article": article_name}, "name"
         )
@@ -204,11 +206,12 @@ class HelpdeskRAGSearch:
             {"title": h["title"], "content": self.fetch_plain_content(h["article"])}
             for h in hits
         ]
-        answer = self.generate_answer(query, articles_with_content)
+        answer_md = self.generate_answer(query, articles_with_content)
+        answer_html = frappe.utils.md_to_html(answer_md) if answer_md else ""
 
         return {
             "query": query,
-            "answer": answer,
+            "answer": answer_html,
             "articles": [
                 {
                     "name": h["article"],
@@ -251,9 +254,8 @@ class HelpdeskRAGSearch:
         return openai.OpenAI(**kwargs)
 
     def embed_text(self, text: str) -> list[float]:
-        response = self.get_openai_client().embeddings.create(
-            model=EMBEDDING_MODEL, input=text
-        )
+        client = self.get_openai_client()
+        response = client.embeddings.create(model=EMBEDDING_MODEL, input=text)
         return response.data[0].embedding
 
     def generate_answer(self, query: str, articles_with_content: list[dict]) -> str:
@@ -369,6 +371,10 @@ class HelpdeskRAGSearch:
         )
         rows = frappe.db.get_all(
             "HD Article Embedding",
+            filters={
+                "model": EMBEDDING_MODEL,
+                "embedding_version": EMBEDDING_VERSION,
+            },
             fields=["article", "article_title", "embedding_json"],
         )
 
@@ -474,6 +480,10 @@ def index_article_in_background(article_name: str) -> None:
     )
 
 
+def index_article_job(article_name: str) -> None:
+    HelpdeskRAGSearch().index_article(article_name)
+
+
 def remove_article_from_index(article_name: str) -> None:
     """Synchronously remove a trashed article from the embedding store."""
     HelpdeskRAGSearch().remove_article(article_name)
@@ -496,10 +506,6 @@ def build_embedding_index_if_not_exists() -> None:
         frappe.enqueue(
             index_all_job, queue="long", job_id="rag-index-all", deduplicate=True
         )
-
-
-def index_article_job(article_name: str) -> None:
-    HelpdeskRAGSearch().index_article(article_name)
 
 
 def index_all_job() -> None:

@@ -35,6 +35,7 @@ export const useConfigStore = defineStore("config", () => {
   const enableCommentReactions = computed(
     () => !!parseInt(config.value.enable_comment_reactions)
   );
+  const enableRag = computed(() => !!parseInt(config.value.enable_rag));
 
   socket.on("helpdesk:settings-updated", () => configResource.reload());
 
@@ -51,5 +52,6 @@ export const useConfigStore = defineStore("config", () => {
     assignWithinTeam,
     disableGlobalScopeForSavedReplies,
     enableCommentReactions,
+    enableRag,
   };
 });
