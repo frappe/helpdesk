@@ -24,9 +24,10 @@ frappe.listview_settings["Customer"].onload = function (listview) {
       }
 
       const { hd_count, erp_count, in_sync } = r.message;
-      const label = in_sync
-        ? "Sync with HD"
-        : `Sync with HD (${Math.abs(erp_count - hd_count)} unsynced)`;
+      if (in_sync) {
+        return;
+      }
+      const label = "Sync Customers with Helpdesk";
 
       listview.page.add_menu_item(label, function () {
         frappe.call({
