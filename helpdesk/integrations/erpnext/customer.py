@@ -74,11 +74,6 @@ class CustomCustomer(Customer):
             )
 
 
-# ------------------------------------------------------------------ #
-# Helpers                                                             #
-# ------------------------------------------------------------------ #
-
-
 def should_sync():
     return "erpnext" in frappe.get_installed_apps() and frappe.db.get_single_value(
         "ERPNext HD Settings", "enabled"
@@ -121,87 +116,6 @@ def create_customer_field():
             ]
         }
     )
-
-
-def add_perms():
-    if not should_sync():
-        return
-
-    # Permissions sourced from erpnext/selling/doctype/customer/customer.json.
-    # Each entry maps directly to one DocPerm row on the ERPNext Customer doctype.
-    _ERPNEXT_CUSTOMER_PERMS = [
-        # (role, permlevel, read, write, create, delete, export, import, share, email, print, report)
-        ("Sales User", 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1),
-        ("Sales User", 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-        ("Sales Manager", 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1),
-        ("Sales Master Manager", 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-        ("Sales Master Manager", 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0),
-        ("Stock User", 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1),
-        ("Stock Manager", 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1),
-        ("Accounts User", 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1),
-        ("Accounts Manager", 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1),
-    ]
-
-    _PERM_FIELDS = (
-        "role",
-        "permlevel",
-        "read",
-        "write",
-        "create",
-        "delete",
-        "export",
-        "import",
-        "share",
-        "email",
-        "print",
-        "report",
-    )
-
-    def _perm_row(values: tuple) -> dict:
-        return dict(zip(_PERM_FIELDS, values))
-
-    # Customer doctype: give Agent Manager the same perms as Sales Master Manager (permlevel 0)
-    agent_manager_base = next(
-        row
-        for row in _ERPNEXT_CUSTOMER_PERMS
-        if row[0] == "Sales Master Manager" and row[1] == 0
-    )
-    if not frappe.db.exists(
-        "DocPerm", {"parent": "Customer", "role": "Agent Manager", "permlevel": 0}
-    ):
-        frappe.get_doc(
-            {
-                "doctype": "DocPerm",
-                "parent": "Customer",
-                "parenttype": "DocType",
-                "parentfield": "permissions",
-                **_perm_row(agent_manager_base),
-                "role": "Agent Manager",
-            }
-        ).insert(ignore_permissions=True)
-        frappe.clear_cache(doctype="Customer")
-
-    # HD Customer doctype: add every role/permlevel combination from ERPNext Customer
-    for perm_values in _ERPNEXT_CUSTOMER_PERMS:
-        row = _perm_row(perm_values)
-        if not frappe.db.exists(
-            "DocPerm",
-            {
-                "parent": "HD Customer",
-                "role": row["role"],
-                "permlevel": row["permlevel"],
-            },
-        ):
-            frappe.get_doc(
-                {
-                    "doctype": "DocPerm",
-                    "parent": "HD Customer",
-                    "parenttype": "DocType",
-                    "parentfield": "permissions",
-                    **row,
-                }
-            ).insert(ignore_permissions=True)
-    frappe.clear_cache(doctype="HD Customer")
 
 
 @frappe.whitelist()
