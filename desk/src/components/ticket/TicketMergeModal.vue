@@ -19,7 +19,11 @@
 
               <template #body-main>
                 <div
+<<<<<<< HEAD
                   class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-98 whitespace-pre-wrap leading-5"
+=======
+                  class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
+>>>>>>> 146a389a (fix: add missing conditions in ticket merge modal)
                 >
                   <span class="text-p-base">
                     {{
@@ -27,6 +31,7 @@
                     }}</span
                   >
                   <ul class="list-disc pl-4 mt-1 space-y-1">
+<<<<<<< HEAD
                     <li>
                       {{ __("Ticket must be Open or Paused.") }}
                       <code class="bg-gray-100 rounded-md px-1 py-0.5">
@@ -45,6 +50,19 @@
                           "Source and target tickets which are to be merged cannot be the same."
                         )
                       }}
+=======
+                    <li
+                      v-for="(condition, index) in mergeConditions"
+                      :key="index"
+                    >
+                      {{ __(condition.text) }}
+                      <code
+                        v-if="condition.code"
+                        class="bg-surface-gray-2 rounded-md px-1 py-0.5"
+                      >
+                        {{ __(condition.code) }}
+                      </code>
+>>>>>>> 146a389a (fix: add missing conditions in ticket merge modal)
                     </li>
                   </ul>
                 </div>
@@ -126,6 +144,28 @@ interface E {
 const props = defineProps<Props>();
 const emit = defineEmits<E>();
 const showDialog = defineModel<boolean>();
+
+const mergeConditions = [
+  {
+    text: "Ticket must be Open or Paused.",
+    code: "status_category in ['Open', 'Paused']",
+  },
+  {
+    text: "Ticket must not already be merged.",
+    code: "is_merged === 0",
+  },
+  {
+    text: "Source and target tickets which are to be merged cannot be the same.",
+  },
+  {
+    text: "If source ticket has a customer, target must belong to the same customer.",
+    code: "customer === source.customer",
+  },
+  {
+    text: "If source ticket has a raised_by, target must share the same raised_by.",
+    code: "raised_by === source.raised_by",
+  },
+];
 
 interface Filter {
   status_category: [string, string[] | string];
