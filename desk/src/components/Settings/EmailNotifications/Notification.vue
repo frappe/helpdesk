@@ -17,14 +17,7 @@
             {{ props.title }}
           </h1>
         </div>
-        <Transition name="fade">
-          <Badge
-            v-if="unsavedChanges"
-            :variant="'subtle'"
-            :theme="'orange'"
-            size="sm"
-            :label="__('Unsaved')"
-        /></Transition>
+        <UnsavedBadge :show="unsavedChanges" />
       </div>
     </template>
     <template #header-actions>
@@ -140,6 +133,7 @@ import { createResource, Switch, LoadingIndicator, Button } from "frappe-ui";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 
 const props = defineProps<{
   title: string;

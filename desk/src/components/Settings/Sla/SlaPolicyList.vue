@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="slaPolicyList.list.loading && !slaPolicyList.list.data"
-    class="flex items-center justify-center mt-12"
+    class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
   >
     <LoadingIndicator class="w-4" />
   </div>

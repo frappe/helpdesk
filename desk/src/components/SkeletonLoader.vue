@@ -80,7 +80,7 @@
               v-if="showVariant('empty-state')"
               :style="{
                 backgroundImage:
-                  'radial-gradient(ellipse at center, var(--surface-white) 30%, color-mix(in srgb, var(--surface-white) 80%, transparent) 30%, transparent 70%)',
+                  'radial-gradient(ellipse at center, var(--surface-white) 10%, color-mix(in srgb, var(--surface-white) 90%, transparent) 25%, transparent 70%)',
               }"
               class="rounded-xl p-6 w-2/3 text-center pointer-events-auto space-y-0.5 relative z-10 bottom-4.5"
             >

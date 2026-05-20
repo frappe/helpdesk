@@ -38,24 +38,13 @@
         </div>
       </div>
       <!-- fallback if no email accounts -->
-      <div
+      <EmptyState
         v-else
-        class="flex flex-col items-center justify-center gap-4 h-full"
-      >
-        <div
-          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
-        >
-          <EmailIcon class="size-6 text-ink-gray-6" />
-        </div>
-        <div class="flex flex-col items-center gap-1">
-          <div class="text-base font-medium text-ink-gray-6">
-            {{ __("No email account found") }}
-          </div>
-          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-            {{ __("Add one to get started.") }}
-          </div>
-        </div>
-      </div>
+        variant="badge"
+        :icon="EmailIcon"
+        title="No email account found"
+        description="Add one to get started."
+      />
     </template>
   </SettingsLayoutBase>
 </template>
@@ -65,6 +54,7 @@ import { EmailAccount } from "@/types";
 import { createListResource } from "frappe-ui";
 import EmailAccountCard from "./EmailAccountCard.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { EmailIcon } from "../icons";
 
 const emit = defineEmits(["update:step"]);
 

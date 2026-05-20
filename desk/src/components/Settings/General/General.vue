@@ -5,15 +5,7 @@
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("General") }}
         </h1>
-        <Transition name="fade">
-          <Badge
-            variant="subtle"
-            theme="orange"
-            size="sm"
-            :label="__('Unsaved')"
-            v-if="isDirty"
-          />
-        </Transition>
+        <UnsavedBadge :show="isDirty" />
       </div>
     </template>
     <template #header-actions>
@@ -34,7 +26,7 @@
     <template #content>
       <div
         v-if="settingsDataResource.loading && !settingsDataResource.data"
-        class="flex items-center justify-center my-auto"
+        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -88,6 +80,7 @@ import { disableSettingModalOutsideClick } from "../settingsModal";
 import Branding from "./components/Branding.vue";
 import TicketSettings from "./components/TicketSettings.vue";
 import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 
 const configStore = useConfigStore();
 
