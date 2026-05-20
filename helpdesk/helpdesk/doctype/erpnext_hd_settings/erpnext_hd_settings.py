@@ -5,6 +5,8 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
+from helpdesk.integrations.erpnext.customer import create_customer_field
+
 
 class ERPNextHDSettings(Document):
     # validate to check if ERPNext is installed or not, if enabled is checked then frapep.throw ERPNext is not installed on your site.
@@ -19,3 +21,9 @@ class ERPNextHDSettings(Document):
                     "ERPNext is not installed on your site. Please install ERPNext to enable this setting.",
                 )
             )
+
+    def before_save(self):
+        if not self.enabled:
+            return
+
+        create_customer_field()

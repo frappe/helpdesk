@@ -1,36 +1,82 @@
 import frappe
+from erpnext.selling.doctype.customer.customer import Customer
 from frappe import _
 
 
-def sync_erpnext_customer_to_helpdesk(doc, method):
-    if not should_sync():
-        return
+class CustomCustomer(Customer):
+    def after_insert(self):
+        super().after_insert()
 
-    if doc.flags.get("ignore_erpnext_sync"):
-        return
+        if not should_sync():
+            return
 
-    hd_customer_exists = frappe.db.exists("HD Customer", {"erpnext_customer": doc.name})
-    if not hd_customer_exists:
-        hd_doc = frappe.get_doc(
-            {
-                "doctype": "HD Customer",
-                "customer_name": doc.customer_name,
-                "erpnext_customer": doc.name,
-                "image": doc.image,
-            }
+        if self.flags.get("ignore_erpnext_sync"):
+            return
+
+        hd_customer_exists = frappe.db.exists(
+            "HD Customer", {"erpnext_customer": self.name}
         )
-        hd_doc.flags.ignore_erpnext_sync = True
-        hd_doc.insert(ignore_permissions=True)
-        set_links(doc.name, hd_doc.name)
-        return hd_doc.name
+        if not hd_customer_exists:
+            hd_doc = frappe.get_doc(
+                {
+                    "doctype": "HD Customer",
+                    "customer_name": self.customer_name,
+                    "erpnext_customer": self.name,
+                    "image": self.image,
+                }
+            )
+            hd_doc.flags.ignore_erpnext_sync = True
+            hd_doc.insert(ignore_permissions=True)
+            set_links(self.name, hd_doc.name)
 
-    if doc.has_value_changed("image"):
+    def on_update(self):
+        super().on_update()
+
+        if not should_sync():
+            return
+
+        if self.flags.get("ignore_erpnext_sync"):
+            return
+
+        if self.has_value_changed("image"):
+            frappe.db.set_value(
+                "HD Customer",
+                {"erpnext_customer": self.name},
+                "image",
+                self.image,
+            )
+
+    def after_rename(self, olddn, newdn, merge=False):
+        super().after_rename(olddn, newdn, merge)
+
         frappe.db.set_value(
             "HD Customer",
-            {"erpnext_customer": doc.name},
-            "image",
-            doc.image,
+            {"erpnext_customer": olddn},
+            "erpnext_customer",
+            newdn,
         )
+
+    def on_trash(self):
+        super().on_trash()
+
+        if not should_sync():
+            return
+
+        hd_customer = frappe.db.get_value(
+            "HD Customer", {"erpnext_customer": self.name}, "name"
+        )
+        if hd_customer:
+            # Clear the back-link first so HDCustomer.on_trash won't try to
+            # delete this Customer again (it's already being deleted).
+            frappe.db.set_value("HD Customer", hd_customer, "erpnext_customer", None)
+            frappe.delete_doc(
+                "HD Customer", hd_customer, ignore_permissions=True, force=True
+            )
+
+
+# ------------------------------------------------------------------ #
+# Helpers                                                             #
+# ------------------------------------------------------------------ #
 
 
 def should_sync():
@@ -59,9 +105,6 @@ def set_links(erpnext_customer_name: str, hd_customer_name: str):
 def create_customer_field():
     from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
-    # Add custom fields for syncing ERPNext customers with Helpdesk
-    # hd_customer field in Customer doctype
-
     if "erpnext" not in frappe.get_installed_apps():
         return
 
@@ -80,9 +123,89 @@ def create_customer_field():
     )
 
 
+def add_perms():
+    if not should_sync():
+        return
+
+    # Permissions sourced from erpnext/selling/doctype/customer/customer.json.
+    # Each entry maps directly to one DocPerm row on the ERPNext Customer doctype.
+    _ERPNEXT_CUSTOMER_PERMS = [
+        # (role, permlevel, read, write, create, delete, export, import, share, email, print, report)
+        ("Sales User", 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1),
+        ("Sales User", 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        ("Sales Manager", 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1),
+        ("Sales Master Manager", 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+        ("Sales Master Manager", 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0),
+        ("Stock User", 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1),
+        ("Stock Manager", 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1),
+        ("Accounts User", 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1),
+        ("Accounts Manager", 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1),
+    ]
+
+    _PERM_FIELDS = (
+        "role",
+        "permlevel",
+        "read",
+        "write",
+        "create",
+        "delete",
+        "export",
+        "import",
+        "share",
+        "email",
+        "print",
+        "report",
+    )
+
+    def _perm_row(values: tuple) -> dict:
+        return dict(zip(_PERM_FIELDS, values))
+
+    # Customer doctype: give Agent Manager the same perms as Sales Master Manager (permlevel 0)
+    agent_manager_base = next(
+        row
+        for row in _ERPNEXT_CUSTOMER_PERMS
+        if row[0] == "Sales Master Manager" and row[1] == 0
+    )
+    if not frappe.db.exists(
+        "DocPerm", {"parent": "Customer", "role": "Agent Manager", "permlevel": 0}
+    ):
+        frappe.get_doc(
+            {
+                "doctype": "DocPerm",
+                "parent": "Customer",
+                "parenttype": "DocType",
+                "parentfield": "permissions",
+                **_perm_row(agent_manager_base),
+                "role": "Agent Manager",
+            }
+        ).insert(ignore_permissions=True)
+        frappe.clear_cache(doctype="Customer")
+
+    # HD Customer doctype: add every role/permlevel combination from ERPNext Customer
+    for perm_values in _ERPNEXT_CUSTOMER_PERMS:
+        row = _perm_row(perm_values)
+        if not frappe.db.exists(
+            "DocPerm",
+            {
+                "parent": "HD Customer",
+                "role": row["role"],
+                "permlevel": row["permlevel"],
+            },
+        ):
+            frappe.get_doc(
+                {
+                    "doctype": "DocPerm",
+                    "parent": "HD Customer",
+                    "parenttype": "DocType",
+                    "parentfield": "permissions",
+                    **row,
+                }
+            ).insert(ignore_permissions=True)
+    frappe.clear_cache(doctype="HD Customer")
+
+
 @frappe.whitelist()
 def get_sync_info() -> dict:
-    # TODO: should add perm guard here?
     frappe.has_permission("Customer", "read", throw=True)
     frappe.has_permission("HD Customer", "read", throw=True)
     if "erpnext" not in frappe.get_installed_apps():
@@ -106,7 +229,6 @@ def get_sync_info() -> dict:
 def sync_hd_erpnext_customers() -> None:
     frappe.has_permission("Customer", "write", throw=True)
     frappe.has_permission("HD Customer", "write", throw=True)
-    # TODO: this raises another constraint where the user of HD needs to also have write access to ERP Customer doctype. We can either document this or create a custom API that bypasses permissions for syncing customers.
     if not should_sync():
         frappe.throw(
             _("ERPNext integration is not enabled"), title=_("Cannot Sync Customers")
@@ -144,7 +266,6 @@ def sync_all_customers():
         fields=["name", "customer_name", "image"],
     )
     for erp in unlinked_erp:
-        # Match by name: HD Customer name == ERP Customer name
         existing_hd = frappe.db.get_value(
             "HD Customer",
             {"name": erp.name, "erpnext_customer": ["is", "not set"]},
@@ -172,7 +293,6 @@ def sync_all_customers():
         fields=["name", "customer_name", "image"],
     )
     for hd in unlinked_hd:
-        # Match by name: ERP Customer name == HD Customer name
         existing_erp = frappe.db.get_value(
             "Customer",
             {"name": hd.name, "hd_customer": ["is", "not set"]},

@@ -8,6 +8,7 @@ from frappe.tests.utils import FrappeTestCase
 from helpdesk.test_utils import (
     disable_erpnext_sync,
     enable_erpnext_sync,
+    make_erpnext_customer,
     make_hd_customer,
 )
 
@@ -237,3 +238,79 @@ class TestHDCustomer(FrappeTestCase):
 
     def tearDown(self):
         disable_erpnext_sync()
+
+    # ------------------------------------------------------------------
+    # on_trash
+    # ------------------------------------------------------------------
+
+    def test_hd_customer_deletion_deletes_linked_erp_customer(self):
+        """Deleting an HD Customer should delete the linked ERPNext Customer."""
+        enable_erpnext_sync()
+
+        hd_doc = make_hd_customer("Trash HD Co")
+        erp_doc = make_erpnext_customer("Trash HD Co ERP", hd_customer=hd_doc.name)
+        frappe.db.set_value(
+            "HD Customer", hd_doc.name, "erpnext_customer", erp_doc.name
+        )
+        erp_name = erp_doc.name
+
+        frappe.delete_doc("HD Customer", hd_doc.name, force=True)
+
+        self.assertFalse(frappe.db.exists("Customer", erp_name))
+
+    def test_hd_customer_deletion_no_error_when_no_linked_erp_customer(self):
+        """Deleting an HD Customer with no ERP link should not raise."""
+        enable_erpnext_sync()
+
+        hd_doc = make_hd_customer("Trash Orphan HD Co")
+        try:
+            frappe.delete_doc("HD Customer", hd_doc.name, force=True)
+        except Exception as e:
+            self.fail(f"delete raised unexpectedly: {e}")
+
+    def test_hd_customer_deletion_skipped_when_sync_disabled(self):
+        """Deleting an HD Customer with sync off should leave ERP Customer intact."""
+        hd_doc = make_hd_customer("Trash No Sync HD Co")
+        erp_doc = make_erpnext_customer("Trash No Sync ERP Co", hd_customer=hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        frappe.db.set_value(
+            "HD Customer", hd_doc.name, "erpnext_customer", erp_doc.name
+        )
+
+        frappe.delete_doc("HD Customer", hd_doc.name, force=True)
+
+        self.assertTrue(frappe.db.exists("Customer", erp_doc.name))
+
+    def test_erpnext_customer_deletion_deletes_linked_hd_customer(self):
+        """Deleting an ERPNext Customer should delete the linked HD Customer."""
+        enable_erpnext_sync()
+
+        erp_doc = make_erpnext_customer("Trash ERP Co")
+        hd_doc = make_hd_customer("Trash ERP Co HD", erpnext_customer=erp_doc.name)
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+        hd_name = hd_doc.name
+
+        frappe.delete_doc("Customer", erp_doc.name, force=True)
+
+        self.assertFalse(frappe.db.exists("HD Customer", hd_name))
+
+    def test_erpnext_customer_deletion_no_error_when_no_linked_hd_customer(self):
+        """Deleting an ERPNext Customer with no HD link should not raise."""
+        enable_erpnext_sync()
+
+        erp_doc = make_erpnext_customer("Trash Orphan ERP Co")
+        try:
+            frappe.delete_doc("Customer", erp_doc.name, force=True)
+        except Exception as e:
+            self.fail(f"delete raised unexpectedly: {e}")
+
+    def test_erpnext_customer_deletion_skipped_when_sync_disabled(self):
+        """Deleting an ERPNext Customer with sync off should leave HD Customer intact."""
+        erp_doc = make_erpnext_customer("Trash No Sync ERP Co")
+        hd_doc = make_hd_customer("Trash No Sync HD Co", erpnext_customer=erp_doc.name)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+
+        frappe.delete_doc("Customer", erp_doc.name, force=True)
+
+        self.assertTrue(frappe.db.exists("HD Customer", hd_doc.name))
