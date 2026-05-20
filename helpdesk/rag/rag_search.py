@@ -201,10 +201,10 @@ class HelpdeskRAGSearch:
                 "articles": [],
             }
 
-        hits = self.top_k_similar(query_vector, corpus, k=top_k)
+        similar_articles = self.top_k_similar(query_vector, corpus, k=top_k)
         articles_with_content = [
             {"title": h["title"], "content": self.fetch_plain_content(h["article"])}
-            for h in hits
+            for h in similar_articles
         ]
         answer_md = self.generate_answer(query, articles_with_content)
         answer_html = frappe.utils.md_to_html(answer_md) if answer_md else ""
@@ -219,7 +219,7 @@ class HelpdeskRAGSearch:
                     "score": h["score"],
                     "route": f"/helpdesk/kb/articles/{h['article']}",
                 }
-                for h in hits
+                for h in similar_articles
             ],
         }
 
@@ -519,6 +519,7 @@ def index_all_job() -> None:
 
 
 @frappe.whitelist()
+@rate_limit(limit=20, seconds=60)  # 20 req / min  per IP
 @rate_limit(limit=100, seconds=3600)  # 100 req / hour per IP
 def rag_search(query: str, top_k: int = TOP_K_ARTICLES) -> dict:
     """

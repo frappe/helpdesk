@@ -12,7 +12,7 @@
       </template>
     </LayoutHeader>
 
-    <div class="mx-auto w-full max-w-2xl pt-8 flex flex-col gap-6">
+    <div class="mx-auto w-full max-w-2xl pt-8 flex flex-col gap-5">
       <div class="flex flex-col gap-2">
         <h1 class="text-2xl font-semibold text-ink-gray-9">
           How can we help you?
