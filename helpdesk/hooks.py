@@ -70,10 +70,6 @@ doc_events = {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
-    "Customer": {
-        "after_insert": "helpdesk.integrations.erpnext.customer.sync_erpnext_customer_to_helpdesk",
-        "on_update": "helpdesk.integrations.erpnext.customer.sync_erpnext_customer_to_helpdesk",
-    },
 }
 
 has_permission = {
@@ -91,7 +87,7 @@ permission_query_conditions = {
 # Override standard doctype classes
 override_doctype_class = {
     "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
-    "Customer": "helpdesk.integrations.erpnext.custom_customer.CustomCustomer",
+    "Customer": "helpdesk.integrations.erpnext.customer.CustomCustomer",
 }
 
 ignore_links_on_delete = [

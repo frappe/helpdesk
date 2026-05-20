@@ -360,6 +360,18 @@ def disable_erpnext_sync():
     frappe.db.set_single_value("ERPNext HD Settings", "enabled", 0)
 
 
+def make_erpnext_customer(customer_name: str, **kwargs) -> "frappe.Document":
+    """
+    Insert an ERPNext Customer with ignore_erpnext_sync=True so that no HD Customer is created as a side-effect.
+    """
+    doc = frappe.get_doc(
+        {"doctype": "Customer", "customer_name": customer_name, **kwargs}
+    )
+    doc.flags.ignore_erpnext_sync = True
+    doc.insert(ignore_permissions=True)
+    return doc
+
+
 def make_hd_customer(customer_name: str, **kwargs) -> "frappe.Document":
     """
     Insert an HD Customer with ignore_erpnext_sync=True so that no ERP Customer

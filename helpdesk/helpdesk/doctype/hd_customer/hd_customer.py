@@ -90,3 +90,18 @@ class HDCustomer(Document):
         )
         if erpnext_customer:
             frappe.db.set_value("Customer", erpnext_customer, "hd_customer", newdn)
+
+    def on_trash(self):
+        if not should_sync_with_erpnext():
+            return
+
+        erpnext_customer = frappe.db.get_value(
+            "Customer", {"hd_customer": self.name}, "name"
+        )
+        if erpnext_customer:
+            # Clear the back-link first so CustomCustomer.on_trash won't try to
+            # delete this HD Customer again (it's already being deleted).
+            frappe.db.set_value("Customer", erpnext_customer, "hd_customer", None)
+            frappe.delete_doc(
+                "Customer", erpnext_customer, ignore_permissions=True, force=True
+            )
