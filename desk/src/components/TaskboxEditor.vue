@@ -1,3 +1,4 @@
+
 <template>
   <Dialog v-model="show" :options="{ size: 'xl' }">
     <template #body-title>
@@ -9,54 +10,46 @@
     <template #body-content>
       <div class="flex flex-col gap-4">
 
-        <!-- TITLE -->
         <div class="space-y-1.5">
-          <FormLabel :label="__('Title')" required />
+          <div class="mb-1 text-sm text-ink-gray-5 flex items-center gap-1">
+            {{ __('Title') }} <span class="text-red-500">*</span>
+          </div>
           <TextInput
             ref="titleRef"
             v-model="form.title"
+            variant="outline"
+            class="rounded-md border border-gray-300 shadow-sm"
             :placeholder="__('Enter task title')"
           />
         </div>
 
-        <!-- DESCRIPTION -->
-        <div>
-          <div class="mb-1.5 text-xs text-ink-gray-5">{{ __("Description") }}</div>
+        <div class="space-y-1.5">
+          <div class="mb-1 text-sm text-ink-gray-5">{{ __("Description") }}</div>
           <TextEditor
             variant="outline"
-            editor-class="!prose-sm overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded border border-[--surface-gray-2]"
+            editor-class="!prose-sm overflow-auto min-h-[180px] max-h-80 py-2 px-3 rounded-md border border-transparent bg-[--surface-gray-2] placeholder-ink-gray-4 hover:bg-[--surface-gray-3] focus:bg-white focus:border-gray-300 transition-colors"
             :bubbleMenu="true"
             :content="form.description"
-            :placeholder="__('Task description')"
+            :placeholder="__('Took a call with John Doe and discussed the new project.')"
             @change="(val) => (form.description = val)"
           />
         </div>
 
-        <!--
-          CONTROLS ROW — Image 2 style:
-          • borderless pill buttons
-          • Status: icon + text, no chevron
-          • Assignee: avatar + name + chevron (dropdown)
-          • Date: input + chevron (dropdown)
-          • Priority: plain text, no chevron, no border
-          All sit flush left in a single flex row.
-        -->
-        <div class="flex flex-row flex-nowrap items-center gap-2">
+        <div class="flex flex-wrap items-center justify-start gap-2 w-full">
 
-          <!-- STATUS — no chevron, borderless -->
-          <Dropdown :options="statusDropdownOptions">
+          <Dropdown :options="statusDropdownOptions" class="flex-none">
             <button class="pill pill-ghost">
               <TaskStatusIcon :status="form.status" class="pill-icon" />
               <span>{{ form.status }}</span>
             </button>
           </Dropdown>
 
-          <!-- ASSIGNEE — avatar + name + chevron -->
           <Autocomplete
             :options="agentOptions"
             :value="form.assigned"
             @change="handleAssigneeChange"
             :placeholder="__('Assign To')"
+            class="flex-none w-max"
           >
             <template #target="{ togglePopover }">
               <button class="pill pill-ghost" @click="togglePopover">
@@ -82,17 +75,19 @@
             </template>
           </Autocomplete>
 
-          <!-- DUE DATE + TIME — DateTimePicker so full datetime is saved -->
-          <div class="pill-datepicker">
+          <div class="pill-datepicker relative flex-none">
             <DateTimePicker
               v-model="form.due_date"
               :placeholder="__('Due date')"
-              :formatter="formatPickerDate"
+              format="DD-MM-YYYY HH:mm"
+            />
+            <FeatherIcon 
+              name="chevron-down" 
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none custom-chevron" 
             />
           </div>
 
-          <!-- PRIORITY — plain text, no border -->
-          <Dropdown :options="priorityDropdownOptions">
+          <Dropdown :options="priorityDropdownOptions" class="flex-none">
             <button class="pill pill-ghost">
               <span>{{ form.priority }}</span>
               <FeatherIcon name="chevron-down" class="pill-chevron" />
@@ -150,16 +145,12 @@ const titleRef = ref(null);
 
 const isEditing = computed(() => !!props.task?.name);
 
-
-
 const defaultForm = () => ({
   title: "", description: "", due_date: "",
   status: "Backlog", priority: "Low", assigned: "",
 });
 
 const form = ref(defaultForm());
-
-
 
 const agentsList = createResource({
   url: "frappe.client.get_list",
@@ -195,32 +186,23 @@ function getAssigneeImage(assigned: string): string {
   return agentOptions.value.find((o) => o.value === assigned)?.image || "";
 }
 
-function formatPickerDate(date: Date | string | null): string {
-  if (!date) return "";
-  const d = typeof date === "string" ? new Date(date) : date;
-  if (isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
 function handleAssigneeChange(option: any) {
   if (!option)                         form.value.assigned = "";
   else if (typeof option === "object") form.value.assigned = option.value || "";
   else                                 form.value.assigned = option;
 }
 
-
 watch(
   () => props.task,
   (task) => {
     if (task) {
       form.value = {
-        title:       task.title       || "",
-        description: task.description || "",
-        due_date:    task.due_date    || "",
-        status:      task.status      || "Backlog",
-        priority:    task.priority    || "Low",
-        assigned:    task.assigned    || "",
+        title:       task.title        || "",
+        description: task.description  || "",
+        due_date:    task.due_date     || "",
+        status:      task.status       || "Backlog",
+        priority:    task.priority     || "Low",
+        assigned:    task.assigned     || "",
       };
     } else {
       form.value = defaultForm();
@@ -237,7 +219,6 @@ watch(show, (val) => {
   }
 });
 
-
 const statusDropdownOptions = computed(() => [
   { label: __("Backlog"),     onClick: () => (form.value.status = "Backlog") },
   { label: __("Todo"),        onClick: () => (form.value.status = "Todo") },
@@ -251,8 +232,6 @@ const priorityDropdownOptions = computed(() => [
   { label: __("Medium"), onClick: () => (form.value.priority = "Medium") },
   { label: __("High"),   onClick: () => (form.value.priority = "High") },
 ]);
-
-
 
 async function handleSubmit() {
   if (!form.value.title?.trim()) { toast.error(__("Title is required")); return; }
@@ -316,7 +295,6 @@ async function handleSubmit() {
   transition: background 0.12s;
 }
 
-
 .pill-ghost {
   background: var(--surface-gray-2, #f3f4f6);
   color: var(--ink-gray-8, #1f2937);
@@ -328,22 +306,27 @@ async function handleSubmit() {
 .pill-icon    { width: 1rem; height: 1rem; flex-shrink: 0; }
 .pill-chevron { width: 0.75rem; height: 0.75rem; flex-shrink: 0; color: var(--ink-gray-4, #9ca3af); margin-left: 0.125rem; }
 
+.custom-chevron {
+  width: 0.75rem !important; 
+  height: 0.75rem !important; 
+  color: var(--ink-gray-4, #9ca3af) !important;
+  display: block !important;
+  z-index: 10;
+}
 
 .pill-datepicker {
   flex-shrink: 0;
-  max-width: 8.5rem;  
+  width: 11.5rem;
 }
 
-/* Force the wrapper and any inner container to respect max-width */
 .pill-datepicker :deep(*) {
   max-width: 100% !important;
 }
 
 .pill-datepicker :deep(input) {
   height: 2rem !important;
-  width: 8.5rem !important;
-  max-width: 8.5rem !important;
-  padding: 0 0.625rem !important;
+  width: 100% !important;
+  padding: 0 1.75rem 0 0.625rem !important; 
   font-size: 0.875rem !important;
   font-weight: 500 !important;
   border-radius: 0.5rem !important;
@@ -367,8 +350,7 @@ async function handleSubmit() {
   width: auto !important;
 }
 
-
-.pill-datepicker :deep(svg),
+.pill-datepicker :deep(.frappe-control > div > svg),
 .pill-datepicker :deep(.datepicker-toggle) {
   display: none !important;
 }

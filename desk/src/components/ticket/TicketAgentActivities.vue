@@ -1,17 +1,19 @@
+
 <template>
   <div class="flex items-center justify-between px-5 py-3 border-b flex-shrink-0">
     <h3 class="text-base font-semibold text-ink-gray-9">{{ title }}</h3>
       
-  <Button
-  v-if="title === __('Tasks')"
-  variant="subtle"
-  class="text-black"
-  @click="showNewTaskModal = true"
-  >
-  <template #prefix><FeatherIcon name="plus" class="h-4 w-4" /></template>
+    <Button
+      v-if="title === __('Tasks')"
+      variant="solid"
+      class="bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+      @click="showNewTaskModal = true"
+    >
+      <template #prefix><FeatherIcon name="plus" class="h-4 w-4" /></template>
       {{ __("New") }}
     </Button>
   </div>
+  
   <TaskboxEditor
     v-model="showNewTaskModal"
     :ticket-id="resolvedTicketId"
@@ -27,69 +29,16 @@
     class="flex flex-col flex-1 overflow-y-auto"
     :mask-length="20"
   >
-    <div v-if="localActivities.length" class="activities flex-1 h-full mt-0.5">
+    <div v-if="localActivities.length" class="activities flex-1 h-full mt-0.5 px-6 md:px-5">
       <div
         v-for="(activity, i) in localActivities"
         :key="activity.key"
         class="activity mt-2"
         tabindex="0"
       >
-        <!-- single activity -->
-        <div
-          class="w-full px-6 md:px-5 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
-        >
+        <div class="w-full flex flex-col">
           <div
-            class="relative flex justify-center after:absolute after:left-[50%] after:top-3 after:-z-10 after:border-l after:border-gray-200"
-            :class="[
-              i !== localActivities.length - 1 && 'after:h-full',
-              !['email', 'feedback', 'call', 'comment', 'task'].includes(
-                activity.type
-              ) && 'after:top-6',
-            ]"
-          >
-            <div
-              class="z-1 flex items-center justify-center rounded-full bg-surface-white"
-              :class="[
-                ['email', 'feedback'].includes(activity.type)
-                  ? 'my-1 h-9 w-9'
-                  : 'h-6 w-6',
-                !['email', 'feedback', 'call', 'comment', 'task'].includes(
-                  activity.type
-                ) && 'mt-[2px]',
-              ]"
-            >
-              <Avatar
-                v-if="activity.type === 'email' || activity.type === 'feedback'"
-                size="lg"
-                :label="activity.sender?.full_name"
-                :image="getUser(activity.sender?.name).user_image"
-                class="bg-surface-white absolute left-[0.7px]"
-              />
-              <CommentIcon
-                v-else-if="activity.type === 'comment'"
-                class="text-ink-gray-5 absolute left-[7.5px]"
-              />
-              <TaskIcon
-                v-else-if="activity.type === 'task'"
-                class="text-gray-600 absolute left-[7.5px] size-4"
-              />
-              <FeatherIcon
-                v-else-if="activity.type === 'call'"
-                :name="
-                  activity.call_type === 'Incoming'
-                    ? 'phone-incoming'
-                    : 'phone-outgoing'
-                "
-                class="text-ink-gray-5 left-[7.5px] size-4"
-              />
-              <DotIcon
-                v-else
-                class="text-ink-gray-5 absolute left-[7.5px] top-[6px]"
-              />
-            </div>
-          </div>
-          <div
-            class="mb-4 flex flex-1"
+            class="mb-4 flex w-full"
             :class="[
               i === localActivities.length - 1 && 'mb-5',
               !['email', 'feedback', 'call', 'comment', 'task'].includes(
@@ -103,15 +52,16 @@
               :show-split-option="
                 !activity.isFirstEmail && ticketStatus !== 'Closed'
               "
-              class="py-2 px-3"
+              class="py-2 px-3 flex-1 w-full"
               @reply="(e) => emit('email:reply', e)"
             />
             <CommentBox
               v-else-if="activity.type === 'comment'"
               :activity="activity"
+              class="flex-1 w-full"
               @update="() => emit('update')"
             />
-            <div v-else-if="activity.type === 'task'" class="flex-1">
+            <div v-else-if="activity.type === 'task'" class="flex-1 w-full">
               <Taskbox
                 :activity="activity"
                 :reload-tasks="() => emit('update')"
@@ -121,16 +71,23 @@
             <HistoryBox
               v-else-if="activity.type === 'call'"
               :activity="activity"
+              class="flex-1 w-full"
             />
             <FeedbackBox
               :activity="activity"
               v-else-if="activity.type === 'feedback'"
+              class="flex-1 w-full"
             />
-            <HistoryBox v-else :activity="activity" />
+            <HistoryBox 
+              v-else 
+              :activity="activity" 
+              class="flex-1 w-full"
+            />
           </div>
         </div>
       </div>
     </div>
+    
     <div
       v-else
       class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-4"

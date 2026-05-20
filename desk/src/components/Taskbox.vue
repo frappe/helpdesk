@@ -1,54 +1,64 @@
 <template>
   <div
-    class="flex cursor-pointer items-center gap-3 rounded-md px-3 py-4 transition duration-150 ease-in-out hover:bg-surface-gray-1 group"
+    class="flex cursor-pointer items-center gap-3 rounded-md px-3 py-3.5 transition duration-150 ease-in-out hover:bg-surface-gray-1 group border-b border-gray-100 last:border-b-0"
     @click="showModal = true"
   >
-    <!-- Title + meta (takes all available width) -->
+   
     <div class="flex flex-1 flex-col gap-1 min-w-0">
 
-      <!-- Title -->
-      <div class="truncate text-base font-semibold text-ink-gray-9">
+     
+      <div class="truncate text-base font-medium text-gray-900">
         {{ activity.title || __("Untitled Task") }}
       </div>
 
-      <!-- Meta row: avatar · name · date · priority -->
-      <div class="flex flex-wrap items-center gap-1.5 text-sm text-ink-gray-8">
+      
+      <div class="flex flex-wrap items-center gap-1.5 text-sm text-gray-500">
 
-        <!-- Assignee with real profile photo -->
-        <template v-if="activity.assigned">
-          <div class="flex items-center gap-1">
+          <template v-if="activity.assigned">
+          <div class="flex items-center gap-1.5 text-gray-700">
             <Avatar
-              class="!h-5 !w-5 flex-shrink-0"
+              class="!h-4 !w-4 flex-shrink-0"
               shape="circle"
               :label="assigneeInfo.full_name || assigneeLabel"
               :image="assigneeInfo.user_image || ''"
             />
-            <span class="truncate max-w-[120px] text-ink-gray-5">
+            <span class="truncate max-w-[120px]">
               {{ assigneeInfo.full_name || assigneeLabel }}
             </span>
           </div>
-          <span class="text-ink-gray-5">&middot;</span>
         </template>
 
-        <!-- Due date with calendar icon -->
+     
+        <span
+          v-if="activity.assigned && (activity.due_date || activity.priority)"
+          class="text-gray-300 select-none"
+        >&middot;</span>
+
+      
         <template v-if="activity.due_date">
-          <div class="flex items-center gap-1 text-ink-gray-8">
-            <FeatherIcon name="calendar" class="h-3.5 w-3.5 flex-shrink-0" />
+          <div class="flex items-center gap-1 text-gray-700">
+            <FeatherIcon name="calendar" class="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
             <span>{{ formatDueDate(activity.due_date) }}</span>
           </div>
-          <span v-if="activity.priority" class="text-ink-gray-5">&middot;</span>
         </template>
 
-        <!-- Priority -->
+       
+        <span
+          v-if="activity.due_date && activity.priority"
+          class="text-gray-300 select-none"
+        >&middot;</span>
+
+      
         <template v-if="activity.priority">
-          <span class="text-ink-gray-8 font-medium">{{ activity.priority }}</span>
+          <span class="text-gray-700">{{ activity.priority }}</span>
         </template>
 
       </div>
     </div>
 
-    <!-- Right: status picker + ··· menu -->
+  
     <div class="flex flex-shrink-0 items-center gap-1" @click.stop>
+
       <Dropdown :options="statusOptions">
         <button
           class="flex items-center justify-center rounded-full p-0.5 hover:bg-surface-gray-2 focus:outline-none"
@@ -65,6 +75,7 @@
           class="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
         />
       </Dropdown>
+
     </div>
   </div>
 
@@ -100,13 +111,11 @@ const showModal = ref(false);
 
 const { getUser } = useUserStore();
 
-
 const assigneeInfo = computed(() => {
   const email = props.activity.assigned;
   if (!email) return { full_name: "", user_image: "" };
   return getUser(email) || { full_name: "", user_image: "" };
 });
-
 
 const assigneeLabel = computed((): string => {
   const a = props.activity.assigned;
@@ -118,11 +127,12 @@ const assigneeLabel = computed((): string => {
     .join(" ");
 });
 
+
+
 function formatDueDate(dateStr: string): string {
   if (!dateStr) return "";
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return dateStr;
-  // toLocaleString (not toLocaleDateString) is required to render time
   return d.toLocaleString("en-GB", {
     day:    "numeric",
     month:  "short",
@@ -131,11 +141,15 @@ function formatDueDate(dateStr: string): string {
     hour12: true,
   });
 }
+
+
+
 function handleReload() {
   showModal.value = false;
   emit("update");
   props.reloadTasks?.();
 }
+
 async function changeStatus(newStatus: string) {
   try {
     await call("helpdesk.helpdesk.doctype.hd_task.hd_task.update_task", {
@@ -148,6 +162,7 @@ async function changeStatus(newStatus: string) {
   }
 }
 
+
 const statusOptions = computed(() => [
   { label: __("Backlog"),     onClick: () => changeStatus("Backlog") },
   { label: __("Todo"),        onClick: () => changeStatus("Todo") },
@@ -155,6 +170,7 @@ const statusOptions = computed(() => [
   { label: __("Done"),        onClick: () => changeStatus("Done") },
   { label: __("Canceled"),    onClick: () => changeStatus("Canceled") },
 ]);
+
 const dropdownOptions = computed(() => [
   {
     label:   __("Delete"),
