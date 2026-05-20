@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-17 10:53+0000\n"
-"PO-Revision-Date: 2026-05-19 08:26\n"
+"PO-Revision-Date: 2026-05-20 09:21\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -130,7 +130,7 @@ msgstr "Compte"
 
 #: desk/src/components/Settings/Profile/Profile.vue:98
 msgid "Account Info & Security"
-msgstr ""
+msgstr "Infos & sécurité du compte"
 
 #. Label of the acknowledgement_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -172,7 +172,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:106
 msgid "Add Email"
-msgstr ""
+msgstr "Ajouter un e-mail"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:181
 msgid "Add Holiday"
