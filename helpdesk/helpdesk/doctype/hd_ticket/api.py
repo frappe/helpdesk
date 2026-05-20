@@ -128,6 +128,8 @@ def get_one(name: str, is_customer_portal: bool = False):
         ),
         "fields": get_meta(template),
         "calls": call_logs,
+        # FIX: include tasks so get_one callers also receive them
+        "tasks": get_task(name),
     }
 
 
@@ -515,7 +517,6 @@ def split_ticket(subject: str, communication_id: str):
         ).format(new_ticket_link, new_ticket),
     )
 
-    # Email on the old ticket that it has been split to new_ticket
     return new_ticket
 
 
@@ -558,8 +559,6 @@ def duplicate_ticket(ticket_doc, subject):
 @frappe.whitelist()
 @agent_only
 def get_ticket_customizations():
-    # get form script
-    # get default ticket template
     custom_fields = frappe.get_all(
         "HD Ticket Template Field",
         filters={"parent": "Default"},
@@ -571,7 +570,6 @@ def get_ticket_customizations():
 
 
 @frappe.whitelist()
-# TODO: make it bette, on mount fetch only once and cache it
 def get_navigation_tickets(ticket: str, current_view: str | None = None):
     """
     Get a list of tickets to navigate
@@ -589,14 +587,11 @@ def get_navigation_tickets(ticket: str, current_view: str | None = None):
             limit=40,
         )
 
-        # Extract just the ticket IDs
         ticket_ids = [ticket, *tickets]
-        # print("\n\n", ticket_ids, "\n\n")
         return ticket_ids
 
     except Exception as e:
         frappe.log_error(f"Error in get_navigation_tickets: {str(e)}")
-        # Return empty list if there's an error
         return []
 
 
@@ -606,11 +601,10 @@ def get_navigation_filters(ticket: str, current_view: str = None):
         _filters = frappe.get_value("HD View", current_view, "filters")
         if _filters:
             try:
-                # Parse the filters string to list/dict
                 filters = (
                     json.loads(_filters) if isinstance(_filters, str) else _filters
                 )
-            except json.JSONDecodeError, TypeError:
+            except (json.JSONDecodeError, TypeError):
                 filters = []
 
     if not filters:
@@ -627,14 +621,10 @@ def get_navigation_filters(ticket: str, current_view: str = None):
                     if isinstance(default_view, str)
                     else default_view
                 )
-            except json.JSONDecodeError, TypeError:
+            except (json.JSONDecodeError, TypeError):
                 filters = []
 
-    # Base filters - exclude the current ticket
     base_filters = {"name": ["!=", ticket]}
-
-    # Combine base filters with view filters
-    # is instance of {}
 
     if filters and isinstance(filters, object):
         final_filters = {**filters, **base_filters}
@@ -694,9 +684,7 @@ def get_recent_similar_tickets(ticket: str):
         return {"recent_tickets": [], "similar_tickets": []}
 
     recent_tickets = get_recent_tickets(ticket)
-    # Update this with TextBlob or SQLite Vector Search
     similar_tickets = []
-    # print('\n\n',recent_tickets,'\n\n')
     return {"recent_tickets": recent_tickets, "similar_tickets": similar_tickets}
 
 
@@ -747,6 +735,7 @@ def get_ticket_activities(ticket: str):
         "history": get_history(ticket),
         "views": get_views(ticket),
         "calls": get_call_logs(ticket),
+        "tasks": get_task(ticket),
     }
     return activities
 
@@ -756,6 +745,45 @@ def get_ticket_assignees(ticket: str):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
     return assignees
+
+
+@frappe.whitelist()
+def get_task(ticket: str):
+    if not ticket or not str(ticket).strip():
+        frappe.throw(_("Ticket is required"))
+
+    ticket = str(ticket).strip()
+    # Permission check — read access on the parent ticket is sufficient
+    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
+
+    tasks = frappe.get_all(
+        "HD Task",
+        filters={
+            "reference_doctype": "HD Ticket",
+            "reference_docname": ticket,
+        },
+        fields=[
+            "name",
+            "title",
+            "description",
+            "status",
+            "priority",
+            "start_date",
+            "assigned",
+            "due_date",
+            "reference_docname",
+            "reference_doctype",
+            "creation",
+            "owner",
+            "modified",
+        ],
+        order_by="creation asc",
+    )
+
+    for task in tasks:
+        task["name"] = str(task["name"])
+
+    return tasks
 
 
 def show_banner_next_day(ticket):

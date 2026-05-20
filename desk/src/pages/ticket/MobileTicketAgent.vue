@@ -35,11 +35,9 @@
       class="flex h-12 items-center justify-between py-[7px] px-3 border-b"
       v-if="ticket.doc?.name"
     >
-      <!-- left side -->
       <div class="flex items-center gap-2 max-w-[50%]">
         <AssignTo :hide-label="true" />
       </div>
-      <!-- right side -->
       <div class="flex items-center gap-2">
         <CustomActions
           v-if="mobileCustomActions.length"
@@ -58,25 +56,21 @@
           >
             <template #tab-panel="{ tab }">
               <div v-if="tab.name === 'details'">
-                <!-- ticket contact info -->
                 <TicketAgentContact
                   v-if="contact.data"
                   :contact="contact.data"
                   :ticketId="ticket.doc?.name"
                   @email:open="communicationAreaRef.toggleEmailBox()"
                 />
-                <!-- feedback component -->
                 <TicketFeedback
                   v-if="ticket.doc?.feedback_rating"
                   class="border-b px-6 py-3 text-base text-ink-gray-5"
                   :ticket="ticket.doc"
                 />
-                <!-- SLA Section -->
                 <h3 class="px-6 pt-3 font-semibold text-base">
                   {{ __("SLA") }}
                 </h3>
                 <TicketAgentDetails :ticket="ticket.doc" />
-                <!-- Ticket Fields -->
                 <h3 class="px-6 pt-3 font-semibold text-base">
                   {{ __("Details") }}
                 </h3>
@@ -90,11 +84,10 @@
                 />
               </div>
 
-              <!-- Rest Activities -->
               <TicketAgentActivities
                 v-else
                 ref="ticketAgentActivitiesRef"
-                :activities="filterActivities(tab.name)"
+                :activities="filterActivities(tab.name as TicketTab)"
                 :title="tab.label"
                 :ticket-status="ticket.doc?.status"
                 @update="() => reloadTicket(props.ticketId)"
@@ -200,6 +193,7 @@ import {
   EmailIcon,
   IndicatorIcon,
   PhoneIcon,
+  TaskIcon,
 } from "@/components/icons";
 import { TicketAgentActivities } from "@/components/ticket";
 
@@ -277,7 +271,6 @@ const customizations: Resource<Customizations> = createResource({
   auto: true,
 });
 
-// Build fields from getMeta + customizations (same as TicketDetailsTab)
 const { getField, getFields } = getMeta("HD Ticket");
 
 function updateField(name: string, value: string) {
@@ -301,7 +294,6 @@ watchEffect(async () => {
   }
 });
 
-// On mobile, collapse all custom actions into a single three-dot group
 const mobileCustomActions = computed(() => {
   if (!customActions.value.length) return [];
 
@@ -309,12 +301,10 @@ const mobileCustomActions = computed(() => {
 
   for (const action of customActions.value) {
     if (action.group) {
-      // Grouped action (with or without buttonLabel) — flatten its items
       for (const item of action.items || []) {
         items.push({ label: item.label, onClick: item.onClick });
       }
     } else {
-      // Normal standalone button
       items.push({ label: action.label, onClick: action.onClick });
     }
   }
@@ -367,7 +357,6 @@ const ticketFields = computed(() => {
     .filter(Boolean);
 });
 
-// Merged ticket doc with computed fields for TicketAgentFields
 const ticketWithFields = computed(() => ({
   ...ticket.value.doc,
   fields: ticketFields.value,
@@ -458,6 +447,11 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       label: __("Comments"),
       icon: CommentIcon,
     },
+    {
+      name: "task",
+      label: __("Tasks"),
+      icon: TaskIcon,
+    }
   ];
 
   if (isCallingEnabled.value) {
@@ -473,16 +467,17 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
 const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
 
 const _activities = computed(() => {
-  if (!activities.value?.data) {
+  const sourceData = activities.value?.data || activities.data;
+  if (!sourceData) {
     return [];
   }
 
-  const emailProps = activities.value.data.communications.map(
+  const emailProps = (sourceData.communications || []).map(
     (email, idx: number) => {
       return {
         subject: email.subject,
         content: email.content,
-        sender: { name: email.user.email, full_name: email.user.name },
+        sender: { name: email.user?.email || email.sender, full_name: email.user?.name || email.sender },
         to: email.recipients,
         type: "email",
         key: email.creation,
@@ -497,40 +492,39 @@ const _activities = computed(() => {
     }
   );
 
-  const commentProps = activities.value.data.comments.map((comment) => {
+  const commentProps = (sourceData.comments || []).map((comment) => {
     return {
       name: comment.name,
       type: "comment",
       key: comment.creation,
       commentedBy: comment.commented_by,
-      commenter: comment.user.name,
+      commenter: comment.user?.name || comment.commented_by,
       creation: comment.creation,
       content: comment.content,
       attachments: comment.attachments,
     };
   });
 
-  activities.value.data.history.map((h) => {
+  (sourceData.history || []).forEach((h: any) => {
     if (h.action && h.owner && h.action.includes(h.owner)) {
       h.action = h.action.replace(h.owner, "themselves");
     }
-    return h;
   });
 
   const historyProps = [
-    ...activities.value.data.history,
-    ...activities.value.data.views,
+    ...(sourceData.history || []),
+    ...(sourceData.views || []),
   ].map((h) => {
     return {
       type: "history",
       key: h.creation,
       content: h.action ? h.action : __("viewed this"),
       creation: h.creation,
-      user: h.user.name + " ",
+      user: (h.user?.name || "") + " ",
     };
   });
 
-  const callProps = activities.value.data.calls.map((call) => {
+  const callProps = (sourceData.calls || []).map((call) => {
     return {
       ...call,
       type: "call",
@@ -544,11 +538,35 @@ const _activities = computed(() => {
     };
   });
 
+  // FIXED: Built the safe task tracking loop mapping layer cleanly for mobile devices
+  const taskProps = (sourceData.tasks || []).map((task: any) => {
+    let cleanDueDate = "";
+    if (task.due_date) {
+      cleanDueDate = String(task.due_date).split(" ")[0];
+    }
+    return {
+      type: "task",
+      key: task.name,
+      name: task.name,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      priority: task.priority,
+      due_date: cleanDueDate,
+      assigned: task.assigned,
+      reference_doctype: task.reference_doctype || "HD Ticket",
+      reference_docname: task.reference_docname || String(ticket.value?.doc?.name || ""),
+      creation: task.creation,
+      owner: task.owner,
+    };
+  });
+
   const sorted = [
     ...emailProps,
     ...commentProps,
     ...historyProps,
     ...callProps,
+    ...taskProps,
   ].sort(
     (a, b) => new Date(a.creation).getTime() - new Date(b.creation).getTime()
   );
@@ -566,7 +584,7 @@ const _activities = computed(() => {
         if (
           nextActivity &&
           nextActivity.user === currentActivity.user &&
-          nextActivity.content !== "viewed this" &&
+          nextActivity.content !== __("viewed this") &&
           !nextActivity.content.includes("assigned") &&
           !nextActivity.content.includes("unassigned")
         ) {
@@ -583,9 +601,10 @@ const _activities = computed(() => {
     i++;
   }
 
-  if (ticket.value.doc?.feedback_rating === 0) {
+  if ((ticket.value?.doc?.feedback_rating || 0) === 0) {
     return data;
   }
+  
   const feedbackActivity: FeedbackActivity[] = [
     {
       type: "feedback",
@@ -604,21 +623,23 @@ const _activities = computed(() => {
   return data;
 });
 
+// FIXED: Cleaned up the filter activities routing check options mapping logic to split tasks
 function filterActivities(eventType: TicketTab) {
   if (eventType === "activity") {
-    return _activities.value;
+    return _activities.value.filter((a: any) => a.type !== "task");
   }
   return _activities.value.filter((activity) => activity.type === eventType);
 }
 
 onMounted(() => {
-  document.title = props.ticketId;
+  document.title = String(props.ticketId);
 });
 
 onUnmounted(() => {
   document.title = "Helpdesk";
 });
 </script>
+
 <style scoped>
 :deep(.breadcrumb-item span),
 :deep(a span) {

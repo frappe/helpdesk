@@ -1,35 +1,51 @@
 <template>
   <div
-    class="md:mx-5 md:my-4 flex items-center justify-between text-lg font-medium mx-6 !mb-0 !my-3"
+    class="flex items-center justify-between text-lg font-medium px-6 py-3 border-b border-border-gray-100 bg-white"
   >
-    <div class="flex h-8 items-center text-xl font-semibold text-ink-gray-8">
+    <div class="flex h-8 items-center text-lg font-bold text-ink-gray-9">
       {{ title }}
     </div>
-    <Dropdown
-      v-if="title == 'Calls'"
-      :options="callActions"
-      @click.stop
-      placement="right"
-    >
-      <template v-slot="{ open }">
-        <Button variant="subtle" class="flex items-center gap-1">
-          <template #prefix>
-            <FeatherIcon name="plus" class="h-4 w-4" />
-          </template>
-          <span>{{ __("New") }}</span>
-          <template #suffix>
-            <FeatherIcon
-              :name="open ? 'chevron-up' : 'chevron-down'"
-              class="h-4 w-4"
-            />
-          </template>
-        </Button>
-      </template>
-    </Dropdown>
+
+    <div class="flex items-center">
+      <Dropdown
+        v-if="title === __('Calls')"
+        :options="callActions"
+        @click.stop
+        placement="right"
+      >
+        <template #default="{ open }">
+          <Button variant="solid" class="hd-black-button flex items-center gap-1">
+            <template #prefix>
+              <FeatherIcon name="plus" class="h-4 w-4" />
+            </template>
+            <span>{{ __("New") }}</span>
+            <template #suffix>
+              <FeatherIcon
+                :name="open ? 'chevron-up' : 'chevron-down'"
+                class="h-4 w-4"
+              />
+            </template>
+          </Button>
+        </template>
+      </Dropdown>
+
+      <Button
+        v-else-if="title === __('Tasks')"
+        variant="solid"
+        class="hd-black-button"
+        @click="emit('new-task')"
+      >
+        <template #prefix>
+          <FeatherIcon name="plus" class="h-4 w-4" />
+        </template>
+        {{ __("New") }}
+      </Button>
+    </div>
   </div>
+
   <CallLogModal
     v-model="showCallLogModal"
-    :ticketId="ticket.value?.name"
+    :ticketId="String(ticket?.doc?.name)"
     @after-insert="refreshTicket"
   />
 </template>
@@ -39,8 +55,9 @@ import { PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
 import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";
-import { Dropdown } from "frappe-ui";
+import { Button, Dropdown, FeatherIcon } from "frappe-ui";
 import { computed, h, inject, ref } from "vue";
+
 defineProps({
   title: {
     type: String,
@@ -48,28 +65,42 @@ defineProps({
   },
 });
 
+const emit = defineEmits(["new-task"]);
 const makeCall = inject<() => void>("makeCall");
 const refreshTicket = inject<() => void>("refreshTicket");
+const ticket = inject<any>(TicketSymbol);
 const showCallLogModal = ref(false);
-const ticket = inject(TicketSymbol)!;
 
-const callActions = computed(() => {
-  let actions = [
-    {
-      icon: h(PhoneIcon, { class: "h-4 w-4" }),
-      label: __("Make a Call"),
-      onClick: () => makeCall(),
+const callActions = computed(() => [
+  {
+    icon: h(PhoneIcon, { class: "h-4 w-4" }),
+    label: __("Make a Call"),
+    onClick: () => makeCall?.(),
+  },
+  {
+    icon: "edit-3",
+    label: __("Log a Call"),
+    onClick: () => {
+      showCallLogModal.value = true;
     },
-    {
-      icon: "edit-3",
-      label: __("Log a Call"),
-      onClick: () => {
-        showCallLogModal.value = true;
-      },
-    },
-  ];
-  return actions;
-});
+  },
+]);
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Forces standard solid black interactive styling */
+.hd-black-button {
+  background-color: #111827 !important;
+  color: #ffffff !important;
+  border-radius: 0.375rem !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+  height: 2rem !important;
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+  transition: background-color 0.1s ease-in-out !important;
+}
+.hd-black-button:hover {
+  background-color: #1f2937 !important;
+}
+</style>
