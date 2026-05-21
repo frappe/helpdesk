@@ -5,7 +5,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
-from helpdesk.integrations.erpnext.customer import create_customer_field
+from helpdesk.integrations.erpnext.utils import create_customer_field
 
 
 class ERPNextHDSettings(Document):

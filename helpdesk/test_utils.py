@@ -5,7 +5,7 @@ from frappe.core.doctype.communication.test_communication import create_email_ac
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
-from helpdesk.integrations.erpnext.customer import create_customer_field
+from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.utils import is_frappe_version
 
 if is_frappe_version("16", above=True):
