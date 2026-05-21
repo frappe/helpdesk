@@ -1,6 +1,8 @@
 # Copyright (c) 2022, Frappe Technologies and Contributors
 # See license.txt
 
+import unittest
+
 import frappe
 from frappe.model.rename_doc import rename_doc
 from frappe.tests.utils import FrappeTestCase
@@ -13,6 +15,10 @@ from helpdesk.test_utils import (
 )
 
 
+@unittest.skipUnless(
+    "erpnext" in frappe.get_installed_apps(),
+    "ERPNext is not installed — skipping Customer sync tests",
+)
 class TestHDCustomer(FrappeTestCase):
     def setUp(self):
         disable_erpnext_sync()
