@@ -4,9 +4,7 @@
 import frappe
 from frappe.model.document import Document
 
-from helpdesk.integrations.erpnext.customer import (
-    should_sync as should_sync_with_erpnext,
-)
+from helpdesk.integrations.erpnext.utils import should_sync as should_sync_with_erpnext
 
 
 class HDCustomer(Document):

@@ -30,7 +30,7 @@ const { $socket } = globalStore();
 const isSyncing = ref(false);
 
 const syncInfo = createResource({
-  url: "helpdesk.integrations.erpnext.customer.get_sync_info",
+  url: "helpdesk.integrations.erpnext.api.get_sync_info",
   cache: ["ERPNextCustomerSyncInfo"],
   auto: true,
 });
@@ -41,7 +41,7 @@ const showSyncButton = computed(() => {
 });
 
 const syncAction = createResource({
-  url: "helpdesk.integrations.erpnext.customer.sync_hd_erpnext_customers",
+  url: "helpdesk.integrations.erpnext.api.sync_hd_erpnext_customers",
   onSuccess() {
     toast.success("Sync started");
     emit("synced");

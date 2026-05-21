@@ -1,5 +1,5 @@
 <template>
-  <template v-if="isAdmin || isManager">
+  <template v-if="isAdmin">
     <hr class="my-8" />
     <div>
       <div class="text-base font-semibold text-ink-gray-9">
@@ -14,10 +14,7 @@
             __("Sync customers between Helpdesk and ERPNext automatically.")
           }}</span>
         </div>
-        <Switch
-          v-model="erpnextIntegrationEnabled.data"
-          @update:model-value="saveErpnextSettingsResource.submit()"
-        />
+        <Switch v-model="erpnextIntegrationEnabled" />
       </div>
     </div>
   </template>
@@ -28,20 +25,23 @@ import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 import { Error } from "@/types";
 import { Switch, createResource, toast } from "frappe-ui";
+import { ref, watch } from "vue";
 
-const { isAdmin, isManager } = useAuthStore();
+const { isAdmin } = useAuthStore();
 
-const erpnextIntegrationEnabled = createResource({
+const erpnextIntegrationEnabled = ref(false);
+
+const erpnextSettingsResource = createResource({
   url: "frappe.client.get",
   params: {
     doctype: "ERPNext HD Settings",
     name: "ERPNext HD Settings",
     fields: ["enabled"],
   },
-  transform(data: { enabled: boolean }) {
-    return data.enabled;
-  },
   auto: true,
+  onSuccess(data: any) {
+    erpnextIntegrationEnabled.value = Boolean(data.enabled);
+  },
 });
 
 const saveErpnextSettingsResource = createResource({
@@ -51,19 +51,31 @@ const saveErpnextSettingsResource = createResource({
       doctype: "ERPNext HD Settings",
       name: "ERPNext HD Settings",
       fieldname: {
-        enabled: erpnextIntegrationEnabled.data,
+        enabled: erpnextIntegrationEnabled.value,
       },
     };
   },
   onSuccess() {
-    erpnextIntegrationEnabled.reload();
+    erpnextSettingsResource.reload();
   },
   onError(error: Error) {
+    erpnextIntegrationEnabled.value = false;
     const msg = error.exc_type
       ? (error.messages || error.message || []).join(", ")
       : error.message;
     toast.error(msg);
-    erpnextIntegrationEnabled.reload();
   },
+});
+
+watch(erpnextIntegrationEnabled, async (newVal) => {
+  if (!erpnextSettingsResource.data) return;
+  if (newVal === Boolean(erpnextSettingsResource.data.enabled)) return;
+  saveErpnextSettingsResource.submit().then(() => {
+    if (newVal) {
+      toast.success(__("ERPNext Integration is enabled"));
+    } else {
+      toast.success(__("ERPNext Integration is disabled"));
+    }
+  });
 });
 </script>
