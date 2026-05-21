@@ -46,6 +46,7 @@
       v-model="viewDialog"
       @update="(view, action) => handleView(view, action)"
     />
+    <BulkReplyModal v-model="showBulkReplyModal" :selections="listSelections" />
   </div>
 </template>
 
@@ -53,6 +54,7 @@
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import { EditIcon, PinIcon, TicketIcon, UnpinIcon } from "@/components/icons";
 import IndicatorIcon from "@/components/icons/IndicatorIcon.vue";
+import BulkReplyModal from "@/components/ticket-agent/BulkReplyModal.vue";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
@@ -102,7 +104,18 @@ const showExportModal = ref(false);
 const { getStatus } = useTicketStatusStore();
 
 const listSelections = ref(new Set());
+
+const showBulkReplyModal = ref(false);
+
 const selectBannerActions = [
+  {
+    label: __("Bulk Reply"),
+    icon: "send",
+    onClick: (selections: Set<string>) => {
+      listSelections.value = new Set(selections);
+      showBulkReplyModal.value = true;
+    },
+  },
   {
     label: __("Export"),
     icon: "lucide-download",
