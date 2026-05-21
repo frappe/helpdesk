@@ -1,5 +1,5 @@
 <template>
-  <template v-if="isAdmin">
+  <template v-if="isAdmin || isManager">
     <hr class="my-8" />
     <div>
       <div class="text-base font-semibold text-ink-gray-9">
@@ -27,7 +27,7 @@ import { Error } from "@/types";
 import { Switch, createResource, toast } from "frappe-ui";
 import { ref, watch } from "vue";
 
-const { isAdmin } = useAuthStore();
+const { isAdmin, isManager } = useAuthStore();
 
 const erpnextIntegrationEnabled = ref(false);
 
