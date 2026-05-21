@@ -20,7 +20,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-05-15 19:56:37.265975",
+ "modified": "2026-05-21 12:10:18.073659",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "ERPNext HD Settings",
@@ -34,6 +34,13 @@
    "read": 1,
    "role": "System Manager",
    "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "Agent Manager",
    "write": 1
   }
  ],
