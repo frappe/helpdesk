@@ -112,6 +112,7 @@ def create_customer_field():
                     "label": "HD Customer",
                     "read_only": 1,
                     "insert_after": "customer_name",
+                    "hidden": 1,
                 }
             ]
         }
