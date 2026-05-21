@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-17 10:53+0000\n"
-"PO-Revision-Date: 2026-05-19 08:27\n"
+"PO-Revision-Date: 2026-05-21 09:44\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -4662,11 +4662,11 @@ msgstr "Inställningar uppdaterade."
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Setup"
-msgstr "Inställningar"
+msgstr "Konfigurera"
 
 #: desk/src/components/Settings/EmailAdd.vue:3
 msgid "Setup Email"
-msgstr "Konfigurera e-post"
+msgstr "Konfigurera E-post"
 
 #: desk/src/components/layouts/Sidebar.vue:454
 msgid "Setup SLA"
