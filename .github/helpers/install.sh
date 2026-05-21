@@ -40,12 +40,16 @@ sed -i 's/schedule:/# schedule:/g' Procfile
 sed -i 's/socketio:/# socketio:/g' Procfile
 sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
 
+bench get-app erpnext --branch "develop"
 bench get-app telephony
 bench get-app helpdesk "${GITHUB_WORKSPACE}"
-bench get-app erpnext --branch "develop"
 bench setup requirements --dev
 
 
 bench start &>> ~/frappe-bench/bench_start.log &
 CI=Yes bench build --app frappe &
 bench --site test_site reinstall --yes
+
+bench --verbose --site test_site install-app erpnext
+bench --verbose --site test_site install-app telephony
+bench --verbose --site test_site install-app helpdesk
