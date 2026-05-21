@@ -6,10 +6,16 @@
     <template #content>
       <div class="flex h-full flex-col gap-4">
         <div class="overflow-y-auto flex flex-col gap-4 p-0.5">
-          <div class="w-fit">
+          <div class="w-fit flex items-center gap-2">
             <EmailProviderIcon
               :logo="emailIcon[state.service || accountData.service]"
               :service-name="state.service || accountData.service"
+            />
+            <Badge
+              v-if="isOAuthAccount"
+              variant="subtle"
+              :label="oauthBadgeLabel"
+              :theme="oauthStatus?.connected === false ? 'orange' : 'green'"
             />
           </div>
           <div
@@ -145,6 +151,14 @@
               :loading="loading"
             />
             <Button
+              v-if="isOAuthAccount"
+              :label="reconnectLabel"
+              variant="subtle"
+              @click="reconnect"
+              :loading="reconnectRes.loading"
+              :disabled="loading"
+            />
+            <Button
               v-if="accountData.enable_incoming"
               :label="__('Pull Emails')"
               variant="subtle"
@@ -165,8 +179,8 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
 import { EmailAccount, EmailStep } from "@/types";
 import { useStorage } from "@vueuse/core";
-import { call, toast } from "frappe-ui";
-import { computed, h, reactive, ref, watch } from "vue";
+import { call, createResource, toast } from "frappe-ui";
+import { computed, h, onMounted, reactive, ref, watch } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import {
@@ -180,6 +194,21 @@ import {
   services,
   validateInputs,
 } from "./emailConfig";
+
+const oauthOnlyFields = [
+  {
+    label: __("Account name"),
+    name: "email_account_name",
+    type: "text",
+    placeholder: __("Support / Sales"),
+  },
+  {
+    label: __("Email ID"),
+    name: "email_id",
+    type: "email",
+    placeholder: __("johndoe@example.com"),
+  },
+];
 
 interface EmailAccountBaseState {
   email_account_name: string;
@@ -301,7 +330,14 @@ const isCustomProvider = computed(() => {
   );
 });
 
+const isOAuthAccount = computed(
+  () => props.accountData?.auth_method === "OAuth"
+);
+
 const fields = computed(() => {
+  if (isOAuthAccount.value) {
+    return oauthOnlyFields;
+  }
   if (isCustomProvider.value) {
     return customProviderTopFields;
   }
@@ -320,6 +356,57 @@ const loadingPull = useStorage(
   `loading-emails-${state.email_account_name}`,
   false
 );
+
+const oauthStatus = ref<{ connected: boolean; is_oauth: boolean } | null>(null);
+const oauthStatusRes = createResource({
+  url: "helpdesk.api.settings.email.get_oauth_status",
+  makeParams: () => ({ email_account: state.email_account_name }),
+  onSuccess: (data: { connected: boolean; is_oauth: boolean }) => {
+    oauthStatus.value = data;
+  },
+});
+
+const reconnectRes = createResource({
+  url: "helpdesk.api.settings.email.reconnect_oauth_email",
+  makeParams: () => ({ email_account: state.email_account_name }),
+  onSuccess: (data: { redirect_url?: string }) => {
+    if (data?.redirect_url) {
+      window.location.href = data.redirect_url;
+    } else {
+      error.value = __("Failed to start OAuth reconnect");
+    }
+  },
+  onError: (err: { messages?: string[]; message?: string }) => {
+    error.value =
+      err?.messages?.[0] ||
+      err?.message ||
+      __("Failed to start OAuth reconnect");
+  },
+});
+
+onMounted(() => {
+  if (isOAuthAccount.value && state.email_account_name) {
+    oauthStatusRes.submit();
+  }
+});
+
+function reconnect() {
+  reconnectRes.submit();
+}
+
+const oauthBadgeLabel = computed(() => {
+  if (!oauthStatus.value) return __("OAuth");
+  return oauthStatus.value.connected
+    ? __("Connected")
+    : __("Reconnect required");
+});
+
+const reconnectLabel = computed(() => {
+  if (oauthStatus.value && !oauthStatus.value.connected) {
+    return __("Reconnect");
+  }
+  return __("Re-authorize");
+});
 
 async function updateAccount() {
   const validationState = { ...state, ...customState };
@@ -376,6 +463,10 @@ function buildUpdatePayload() {
     default_incoming: state.default_incoming,
     default_outgoing: state.default_outgoing,
   };
+
+  if (isOAuthAccount.value) {
+    return commonPayload;
+  }
 
   if (currentServiceName.value === "Frappe Mail") {
     return {

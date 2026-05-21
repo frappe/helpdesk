@@ -14,7 +14,13 @@
         </div>
       </div>
     </div>
-    <div>
+    <div class="flex items-center gap-2">
+      <Badge
+        v-if="emailAccount.auth_method === 'OAuth'"
+        variant="subtle"
+        :label="__('OAuth')"
+        theme="green"
+      />
       <Badge
         variant="subtle"
         :label="badgeTitleColor[0]"

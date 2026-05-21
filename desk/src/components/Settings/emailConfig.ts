@@ -17,6 +17,8 @@ type EmailAccountFormState = {
   password?: string;
   api_key?: string;
   api_secret?: string;
+  client_id?: string;
+  client_secret?: string;
   frappe_mail_site?: string;
   domain?: string;
   email_server?: string;
@@ -33,6 +35,11 @@ type EmailAccountFormState = {
   append_emails_to_sent_folder?: boolean | number;
   sent_folder_name?: string;
 };
+
+const OAUTH_SERVICES = new Set(["GMail", "Outlook"]);
+
+export const isOAuthService = (service?: string) =>
+  Boolean(service && OAUTH_SERVICES.has(service));
 
 const fixedFields: RenderField[] = [
   {
@@ -89,6 +96,22 @@ export const popularProviderFields = [
   {
     label: __("Password"),
     name: "password",
+    type: "password",
+    placeholder: "********",
+  },
+];
+
+export const oauthFields: RenderField[] = [
+  ...fixedFields,
+  {
+    label: __("Client ID"),
+    name: "client_id",
+    type: "text",
+    placeholder: __("OAuth Client ID"),
+  },
+  {
+    label: __("Client Secret"),
+    name: "client_secret",
     type: "password",
     placeholder: "********",
   },
@@ -192,18 +215,22 @@ export const services: EmailService[] = [
   {
     name: "GMail",
     icon: LogoGmail,
-    info: __(`Setting up GMail requires you to enable two factor authentication
-		  and app specific passwords. Read more`),
-    link: "https://support.google.com/accounts/answer/185833",
+    info: __(`Connect with Google using OAuth. Create an OAuth Client in Google
+		  Cloud Console (APIs & Services → Credentials) and paste the Client ID
+		  and Client Secret below. Read more`),
+    link: "https://support.google.com/cloud/answer/6158849",
     custom: false,
+    oauth: true,
   },
   {
     name: "Outlook",
     icon: LogoOutlook,
-    info: __(`Setting up Outlook requires you to enable two factor authentication
-		  and app specific passwords. Read more`),
-    link: "https://support.microsoft.com/en-us/account-billing/how-to-get-and-use-app-passwords-5896ed9b-4263-e681-128a-a6f2979a7944",
+    info: __(`Connect with Microsoft using OAuth. Register an application in
+		  Azure Portal (App registrations) and paste the Client ID and Client
+		  Secret below. Read more`),
+    link: "https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app",
     custom: false,
+    oauth: true,
   },
   {
     name: "Sendgrid",
@@ -280,6 +307,18 @@ export function validateInputs(
   const validEmail = validateEmailWithZod(state.email_id);
   if (!validEmail) {
     return __("Invalid email ID");
+  }
+  if (isOAuthService(service)) {
+    if (allowMissingPassword) {
+      return "";
+    }
+    if (!state.client_id) {
+      return __("Client ID is required");
+    }
+    if (!state.client_secret) {
+      return __("Client Secret is required");
+    }
+    return "";
   }
   if (service === "Frappe Mail") {
     if (!state.api_key) {

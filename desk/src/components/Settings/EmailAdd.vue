@@ -43,6 +43,54 @@
                 </div>
               </div>
             </div>
+            <!-- OAuth redirect URI callout -->
+            <div
+              v-if="isOAuthSelected"
+              class="flex flex-col gap-2 rounded-md p-3 ring-1 ring-outline-gray-modals bg-surface-gray-1"
+            >
+              <div class="text-sm font-medium text-ink-gray-8">
+                {{ __("Step 1 — Register this Redirect URI") }}
+              </div>
+              <div class="text-xs text-ink-gray-6">
+                {{
+                  __(
+                    "Add this exact URL to Authorized redirect URIs in your OAuth client before clicking Connect."
+                  )
+                }}
+              </div>
+              <div class="flex items-center gap-2">
+                <code
+                  class="flex-1 truncate rounded bg-surface-gray-2 px-2 py-1.5 text-xs text-ink-gray-8 cursor-text select-all"
+                  :title="redirectUri || ''"
+                  @click="selectRedirectUri"
+                  >{{ redirectUri || __("Loading…") }}</code
+                >
+                <Button
+                  v-if="clipboardSupported"
+                  size="sm"
+                  variant="subtle"
+                  :label="copied ? __('Copied') : __('Copy')"
+                  :disabled="!redirectUri"
+                  @click="copyRedirectUri"
+                />
+              </div>
+              <div v-if="!clipboardSupported" class="text-xs text-ink-gray-5">
+                {{
+                  __("Click the URL above to select, then ⌘/Ctrl + C to copy.")
+                }}
+              </div>
+              <div class="text-xs text-ink-gray-5">
+                {{
+                  selectedService.name === "GMail"
+                    ? __(
+                        "Where to add it: Google Cloud Console → APIs & Services → Credentials → your OAuth 2.0 Client ID → Authorized redirect URIs."
+                      )
+                    : __(
+                        "Where to add it: Azure Portal → App registrations → your app → Authentication → Web → Redirect URIs."
+                      )
+                }}
+              </div>
+            </div>
             <!-- service provider fields -->
             <div class="flex flex-col gap-4">
               <div class="grid grid-cols-1 gap-4">
@@ -134,7 +182,6 @@
                   </p>
                 </div>
               </div>
-              <ErrorMessage v-if="error" class="ml-1" :message="error" />
             </div>
           </div>
         </div>
@@ -145,13 +192,13 @@
             :label="__('Back')"
             theme="gray"
             variant="outline"
-            :disabled="addEmailRes.loading"
+            :disabled="addEmailRes.loading || oauthInitRes.loading"
             @click="emit('update:step', 'email-list')"
           />
           <Button
-            :label="__('Create')"
+            :label="submitLabel"
             variant="solid"
-            :loading="addEmailRes.loading"
+            :loading="addEmailRes.loading || oauthInitRes.loading"
             @click="createEmailAccount"
           />
         </div>
@@ -168,6 +215,7 @@ import { __ } from "@/translation";
 import { EmailAccount, EmailService, EmailStep } from "@/types";
 import { call, createResource, toast } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
+import { useClipboard } from "@vueuse/core";
 import { computed, reactive, Ref, ref, watch } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
 import {
@@ -176,6 +224,7 @@ import {
   customProviderTopFields,
   frappeMailFields,
   incomingOutgoingFields,
+  oauthFields,
   popularProviderFields,
   services,
   validateInputs,
@@ -196,6 +245,8 @@ interface EmailAccountProviderAuthState extends EmailAccountBaseState {
   password?: string;
   api_key?: string;
   api_secret?: string;
+  client_id?: string;
+  client_secret?: string;
   frappe_mail_site?: string;
 }
 
@@ -231,6 +282,8 @@ const state = reactive<EmailAccountProviderAuthState>({
   password: "",
   api_key: "",
   api_secret: "",
+  client_id: "",
+  client_secret: "",
   frappe_mail_site: "",
   enable_incoming: false,
   enable_outgoing: false,
@@ -264,6 +317,9 @@ function resetCustomState() {
 const selectedService: Ref<EmailService> = ref(null);
 const fields = computed(() => {
   if (!selectedService.value) return [];
+  if (selectedService.value.oauth) {
+    return oauthFields;
+  }
   if (selectedService.value.name === "Frappe Mail") {
     return frappeMailFields;
   }
@@ -276,6 +332,16 @@ const fields = computed(() => {
 const isCustomSelected = computed(
   () => selectedService.value?.name === "Custom"
 );
+
+const isOAuthSelected = computed(() => Boolean(selectedService.value?.oauth));
+
+const submitLabel = computed(() => {
+  if (!isOAuthSelected.value) return __("Create");
+  if (selectedService.value?.name === "GMail") return __("Connect with Google");
+  if (selectedService.value?.name === "Outlook")
+    return __("Connect with Microsoft");
+  return __("Connect");
+});
 
 watch(
   () => customState.domain,
@@ -312,17 +378,99 @@ const addEmailRes = createResource({
     capture("email_account_created", { data: { service: state.service } });
   },
   onError: () => {
-    error.value = __("Failed to create email account, Invalid credentials");
+    toast.error(__("Failed to create email account, Invalid credentials"));
   },
 });
 
-const error = ref<string | undefined>();
+const redirectUri = ref<string | null>(null);
+const {
+  copy: copyToClipboard,
+  copied,
+  isSupported: clipboardSupported,
+} = useClipboard({ legacy: true });
+
+const redirectUriRes = createResource({
+  url: "helpdesk.api.settings.email.get_oauth_redirect_uri",
+  makeParams: (params: { service: string }) => params,
+  onSuccess: (data: { redirect_uri: string }) => {
+    redirectUri.value = data?.redirect_uri || null;
+  },
+});
+
+watch(
+  () => selectedService.value?.name,
+  (name) => {
+    redirectUri.value = null;
+    if (selectedService.value?.oauth && name) {
+      redirectUriRes.submit({ service: name });
+    }
+  }
+);
+
+function copyRedirectUri() {
+  if (!redirectUri.value) return;
+  copyToClipboard(redirectUri.value);
+}
+
+function selectRedirectUri(e: MouseEvent) {
+  const el = e.currentTarget as HTMLElement | null;
+  if (!el) return;
+  const selection = window.getSelection();
+  if (!selection) return;
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
+const oauthInitRes = createResource({
+  url: "helpdesk.api.settings.email.initiate_oauth_email",
+  onSuccess: (data: { redirect_url?: string; email_account?: string }) => {
+    capture("email_account_oauth_initiated", {
+      data: { service: state.service },
+    });
+    updateOnboardingStep("setup_email_account");
+    if (data?.redirect_url) {
+      window.location.href = data.redirect_url;
+    } else {
+      toast.error(__("Failed to start OAuth flow"));
+    }
+  },
+  onError: (err: { messages?: string[]; message?: string }) => {
+    toast.error(
+      err?.messages?.[0] || err?.message || __("Failed to start OAuth flow")
+    );
+  },
+});
+
 function createEmailAccount() {
   const validationState = { ...state, ...customState };
-  error.value = validateInputs(validationState, state.service);
-  if (error.value) return;
+  const validationError = validateInputs(validationState, state.service);
+  if (validationError) {
+    toast.error(validationError);
+    return;
+  }
+
+  if (isOAuthSelected.value) {
+    oauthInitRes.submit({ data: buildOAuthPayload() });
+    return;
+  }
 
   addEmailRes.submit({ data: buildCreatePayload() });
+}
+
+function buildOAuthPayload() {
+  return {
+    email_account_name: state.email_account_name,
+    email_id: state.email_id,
+    service: state.service,
+    client_id: state.client_id,
+    client_secret: state.client_secret,
+    enable_incoming: state.enable_incoming,
+    enable_outgoing: state.enable_outgoing,
+    default_incoming: state.default_incoming,
+    default_outgoing: state.default_outgoing,
+  };
 }
 
 function buildCreatePayload() {

@@ -318,6 +318,7 @@ export interface EmailService {
   info: string;
   link: string;
   custom: boolean;
+  oauth?: boolean;
 }
 
 export type EmailStep = "email-list" | "email-add" | "email-edit";
@@ -334,6 +335,9 @@ export interface EmailAccount {
   enable_incoming?: boolean;
   default_outgoing?: boolean;
   default_incoming?: boolean;
+  auth_method?: "Basic" | "OAuth";
+  connected_app?: string;
+  connected_user?: string;
 }
 
 export type TicketTab = "activity" | "email" | "comment" | "details" | "call";
