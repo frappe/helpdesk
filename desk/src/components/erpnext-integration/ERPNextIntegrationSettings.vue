@@ -1,5 +1,5 @@
 <template>
-  <template v-if="isAdmin">
+  <template v-if="isAdmin || isManager">
     <hr class="my-8" />
     <div>
       <div class="text-base font-semibold text-ink-gray-9">
@@ -14,7 +14,10 @@
             __("Sync customers between Helpdesk and ERPNext automatically.")
           }}</span>
         </div>
-        <Switch v-model="erpnextIntegrationEnabled" />
+        <Switch
+          v-model="erpnextIntegrationEnabled.data"
+          @update:model-value="saveErpnextSettingsResource.submit()"
+        />
       </div>
     </div>
   </template>
@@ -23,24 +26,22 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
+import { Error } from "@/types";
 import { Switch, createResource, toast } from "frappe-ui";
-import { ref, watch } from "vue";
 
-const { isAdmin } = useAuthStore();
+const { isAdmin, isManager } = useAuthStore();
 
-const erpnextIntegrationEnabled = ref(false);
-
-const erpnextSettingsResource = createResource({
+const erpnextIntegrationEnabled = createResource({
   url: "frappe.client.get",
   params: {
     doctype: "ERPNext HD Settings",
     name: "ERPNext HD Settings",
     fields: ["enabled"],
   },
-  auto: true,
-  onSuccess(data: any) {
-    erpnextIntegrationEnabled.value = Boolean(data.enabled);
+  transform(data: { enabled: boolean }) {
+    return data.enabled;
   },
+  auto: true,
 });
 
 const saveErpnextSettingsResource = createResource({
@@ -50,24 +51,19 @@ const saveErpnextSettingsResource = createResource({
       doctype: "ERPNext HD Settings",
       name: "ERPNext HD Settings",
       fieldname: {
-        enabled: erpnextIntegrationEnabled.value,
+        enabled: erpnextIntegrationEnabled.data,
       },
     };
   },
   onSuccess() {
-    erpnextSettingsResource.reload();
+    erpnextIntegrationEnabled.reload();
   },
-});
-
-watch(erpnextIntegrationEnabled, async (newVal) => {
-  if (!erpnextSettingsResource.data) return;
-  if (newVal !== Boolean(erpnextSettingsResource.data.enabled)) {
-    await saveErpnextSettingsResource.submit();
-    if (newVal) {
-      toast.success(__("ERPNext Integration is enabled"));
-    } else {
-      toast.success(__("ERPNext Integration is disabled"));
-    }
-  }
+  onError(error: Error) {
+    const msg = error.exc_type
+      ? (error.messages || error.message || []).join(", ")
+      : error.message;
+    toast.error(msg);
+    erpnextIntegrationEnabled.reload();
+  },
 });
 </script>
