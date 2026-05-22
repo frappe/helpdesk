@@ -11,8 +11,8 @@ def mirror_user_permission_on_insert(doc, method=None):
     integration is enabled, mirror it to the linked counterpart (if not already
     present).  Any other `allow` doctype is ignored.
     """
-    alowed_doctypes = ["HD Customer", "Customer"]
-    if doc.allow not in alowed_doctypes:
+    allowed_doctypes = ["HD Customer", "Customer"]
+    if doc.allow not in allowed_doctypes:
         return
 
     if not should_sync():
@@ -52,7 +52,6 @@ def mirror_user_permission_on_insert(doc, method=None):
         )
         mirrored.flags.ignore_erpnext_sync = True
         mirrored.insert(ignore_permissions=True)
-
     elif doc.allow == "Customer":
         # Mirror Customer perm → HD Customer
         hd_customer = frappe.db.get_value("Customer", doc.for_value, "hd_customer")
@@ -82,6 +81,42 @@ def mirror_user_permission_on_insert(doc, method=None):
         )
         mirrored.flags.ignore_erpnext_sync = True
         mirrored.insert(ignore_permissions=True)
+
+
+def mirror_user_permission_on_trash(doc, method=None):
+    """Hook: User Permission — on_trash."""
+    allowed_doctypes = ["HD Customer", "Customer"]
+    if doc.allow not in allowed_doctypes:
+        return
+
+    if not should_sync():
+        return
+
+    if doc.flags.get("ignore_erpnext_sync"):
+        return
+
+    if doc.allow == "HD Customer":
+        linked_value = frappe.db.get_value(
+            "HD Customer", doc.for_value, "erpnext_customer"
+        )
+        target_allow = "Customer"
+    else:
+        linked_value = frappe.db.get_value("Customer", doc.for_value, "hd_customer")
+        target_allow = "HD Customer"
+
+    if not linked_value:
+        return
+
+    mirrored_name = frappe.db.get_value(
+        "User Permission",
+        {"user": doc.user, "allow": target_allow, "for_value": linked_value},
+    )
+    if not mirrored_name:
+        return
+
+    mirrored = frappe.get_doc("User Permission", mirrored_name)
+    mirrored.flags.ignore_erpnext_sync = True
+    mirrored.delete(ignore_permissions=True)
 
 
 def sync_user_permissions():
