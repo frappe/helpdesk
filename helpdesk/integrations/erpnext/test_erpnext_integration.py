@@ -4,7 +4,10 @@
 import frappe
 from frappe.model.rename_doc import rename_doc
 from frappe.tests.utils import FrappeTestCase
-from test_utils import (
+
+from helpdesk.integrations.erpnext.user_perimission import sync_user_permissions
+
+from .test_utils import (
     disable_erpnext_sync,
     enable_erpnext_sync,
     make_erpnext_customer,
@@ -12,8 +15,6 @@ from test_utils import (
     make_user_permission,
     make_user_permission_no_sync,
 )
-
-from helpdesk.integrations.erpnext.user_perimission import sync_user_permissions
 
 
 class TestERPNextIntegration(FrappeTestCase):
