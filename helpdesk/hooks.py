@@ -70,6 +70,9 @@ doc_events = {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
+    "User Permission": {
+        "after_insert": "helpdesk.integrations.erpnext.user_perimission.mirror_user_permission_on_insert",
+    },
 }
 
 has_permission = {

@@ -17,6 +17,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
+import { __ } from "@/translation";
 import { Button, createResource, toast } from "frappe-ui";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import LucideRefreshCw from "~icons/lucide/refresh-cw";
@@ -55,6 +56,7 @@ function onSyncStart() {
 function onSyncEnd() {
   isSyncing.value = false;
   syncInfo.reload();
+  toast.success(__("Sync completed successfully."));
   emit("synced");
 }
 

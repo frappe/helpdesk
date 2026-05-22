@@ -17,7 +17,7 @@ frappe.listview_settings["Customer"].onload = function (listview) {
   }
 
   frappe.call({
-    method: "helpdesk.integrations.erpnext.customer.get_sync_info",
+    method: "helpdesk.integrations.erpnext.api.get_sync_info",
     callback: function (r) {
       if (!r.message || !r.message.enabled) {
         return;

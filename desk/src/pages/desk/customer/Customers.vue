@@ -52,7 +52,7 @@ import CustomerDialog from "./CustomerDialog.vue";
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
 const selectedCustomer = ref(null);
-const listViewRef = ref(null);
+const listViewRef = ref<InstanceType<typeof ListViewBuilder> | null>(null);
 const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
 );
