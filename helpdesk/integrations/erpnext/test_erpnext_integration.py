@@ -13,7 +13,7 @@ from test_utils import (
     make_user_permission_no_sync,
 )
 
-from helpdesk.integrations.erpnext.api import sync_user_permissions
+from helpdesk.integrations.erpnext.user_perimission import sync_user_permissions
 
 
 class TestERPNextIntegration(FrappeTestCase):
