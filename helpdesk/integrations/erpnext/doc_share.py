@@ -11,8 +11,8 @@ def mirror_doc_share_on_insert(doc, method=None):
     integration is enabled, mirror it to the linked counterpart (if not already
     present).  Any other `share_doctype` is ignored.
     """
-    alowed_doctypes = ["HD Customer", "Customer"]
-    if doc.share_doctype not in alowed_doctypes:
+    allowed_doctypes = ["HD Customer", "Customer"]
+    if doc.share_doctype not in allowed_doctypes:
         return
 
     if not should_sync():
@@ -49,7 +49,6 @@ def mirror_doc_share_on_insert(doc, method=None):
         mirrored.flags.ignore_erpnext_sync = True
         mirrored.flags.ignore_share_permission = True
         mirrored.insert(ignore_permissions=True)
-
     elif doc.share_doctype == "Customer":
         # Mirror Customer share → HD Customer
         hd_customer = frappe.db.get_value("Customer", doc.share_name, "hd_customer")
@@ -76,6 +75,47 @@ def mirror_doc_share_on_insert(doc, method=None):
         mirrored.flags.ignore_erpnext_sync = True
         mirrored.flags.ignore_share_permission = True
         mirrored.insert(ignore_permissions=True)
+
+
+def mirror_doc_share_on_trash(doc, method=None):
+    """Hook: DocShare — on_trash."""
+    allowed_doctypes = ["HD Customer", "Customer"]
+    if doc.share_doctype not in allowed_doctypes:
+        return
+
+    if not should_sync():
+        return
+
+    if doc.flags.get("ignore_erpnext_sync"):
+        return
+
+    if doc.share_doctype == "HD Customer":
+        linked_value = frappe.db.get_value(
+            "HD Customer", doc.share_name, "erpnext_customer"
+        )
+        target_doctype = "Customer"
+    else:
+        linked_value = frappe.db.get_value("Customer", doc.share_name, "hd_customer")
+        target_doctype = "HD Customer"
+
+    if not linked_value:
+        return
+
+    mirrored_name = frappe.db.get_value(
+        "DocShare",
+        {
+            "user": doc.user,
+            "share_doctype": target_doctype,
+            "share_name": linked_value,
+        },
+    )
+    if not mirrored_name:
+        return
+
+    mirrored = frappe.get_doc("DocShare", mirrored_name)
+    mirrored.flags.ignore_erpnext_sync = True
+    mirrored.flags.ignore_share_permission = True
+    mirrored.delete(ignore_permissions=True)
 
 
 def sync_shared_docs():

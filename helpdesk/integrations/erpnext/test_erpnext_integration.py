@@ -334,6 +334,211 @@ class TestERPNextIntegration(FrappeTestCase):
         )
 
     # ------------------------------------------------------------------
+    # mirror_user_permission_on_trash (real-time delete sync)
+    # ------------------------------------------------------------------
+
+    def test_realtime_user_perm_trash_from_hd_deletes_erp_perm(self):
+        enable_erpnext_sync()
+
+        erp_doc = make_erpnext_customer("RT Trash UP ERP Co")
+        hd_doc = make_hd_customer("RT Trash UP HD Co", erpnext_customer=erp_doc.name)
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        hd_perm = make_user_permission("Administrator", "HD Customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "User Permission", hd_perm.name, force=True)
+
+        mirrored_name = frappe.db.get_value(
+            "User Permission",
+            {"user": "Administrator", "allow": "Customer", "for_value": erp_doc.name},
+        )
+        self.assertTrue(mirrored_name)
+
+        frappe.delete_doc("User Permission", hd_perm.name, force=True)
+
+        self.assertFalse(frappe.db.exists("User Permission", mirrored_name))
+
+    def test_realtime_user_perm_trash_from_erp_deletes_hd_perm(self):
+        enable_erpnext_sync()
+
+        erp_doc = make_erpnext_customer("RT Trash UP ERP Side Co")
+        hd_doc = make_hd_customer(
+            "RT Trash UP HD Side Co", erpnext_customer=erp_doc.name
+        )
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        erp_perm = make_user_permission("Administrator", "Customer", erp_doc.name)
+        self.addCleanup(frappe.delete_doc, "User Permission", erp_perm.name, force=True)
+
+        mirrored_name = frappe.db.get_value(
+            "User Permission",
+            {"user": "Administrator", "allow": "HD Customer", "for_value": hd_doc.name},
+        )
+        self.assertTrue(mirrored_name)
+
+        frappe.delete_doc("User Permission", erp_perm.name, force=True)
+
+        self.assertFalse(frappe.db.exists("User Permission", mirrored_name))
+
+    def test_realtime_user_perm_trash_no_mirror_delete_when_sync_disabled(self):
+        erp_doc = make_erpnext_customer("RT Trash UP Disabled ERP Co")
+        hd_doc = make_hd_customer(
+            "RT Trash UP Disabled HD Co", erpnext_customer=erp_doc.name
+        )
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        erp_perm = make_user_permission_no_sync(
+            "Administrator", "Customer", erp_doc.name
+        )
+        hd_perm = make_user_permission_no_sync(
+            "Administrator", "HD Customer", hd_doc.name
+        )
+        self.addCleanup(frappe.delete_doc, "User Permission", hd_perm.name, force=True)
+
+        frappe.delete_doc("User Permission", erp_perm.name, force=True)
+
+        self.assertTrue(frappe.db.exists("User Permission", hd_perm.name))
+
+    # ------------------------------------------------------------------
+    # mirror_doc_share_on_trash (real-time delete sync)
+    # ------------------------------------------------------------------
+
+    def test_realtime_doc_share_trash_from_hd_deletes_erp_share(self):
+        enable_erpnext_sync()
+
+        erp_doc = make_erpnext_customer("RT Trash DS ERP Co")
+        hd_doc = make_hd_customer("RT Trash DS HD Co", erpnext_customer=erp_doc.name)
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        hd_share = frappe.get_doc(
+            {
+                "doctype": "DocShare",
+                "user": "Administrator",
+                "share_doctype": "HD Customer",
+                "share_name": hd_doc.name,
+                "read": 1,
+                "write": 0,
+                "share": 0,
+                "submit": 0,
+                "everyone": 0,
+            }
+        )
+        hd_share.flags.ignore_share_permission = True
+        hd_share.insert(ignore_permissions=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", hd_share.name, force=True)
+
+        mirrored_name = frappe.db.get_value(
+            "DocShare",
+            {
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_doc.name,
+            },
+        )
+        self.assertTrue(mirrored_name)
+
+        frappe.delete_doc("DocShare", hd_share.name, force=True)
+
+        self.assertFalse(frappe.db.exists("DocShare", mirrored_name))
+
+    def test_realtime_doc_share_trash_from_erp_deletes_hd_share(self):
+        enable_erpnext_sync()
+
+        erp_doc = make_erpnext_customer("RT Trash DS ERP Side Co")
+        hd_doc = make_hd_customer(
+            "RT Trash DS HD Side Co", erpnext_customer=erp_doc.name
+        )
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        erp_share = frappe.get_doc(
+            {
+                "doctype": "DocShare",
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_doc.name,
+                "read": 1,
+                "write": 0,
+                "share": 0,
+                "submit": 0,
+                "everyone": 0,
+            }
+        )
+        erp_share.flags.ignore_share_permission = True
+        erp_share.insert(ignore_permissions=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", erp_share.name, force=True)
+
+        mirrored_name = frappe.db.get_value(
+            "DocShare",
+            {
+                "user": "Administrator",
+                "share_doctype": "HD Customer",
+                "share_name": hd_doc.name,
+            },
+        )
+        self.assertTrue(mirrored_name)
+
+        frappe.delete_doc("DocShare", erp_share.name, force=True)
+
+        self.assertFalse(frappe.db.exists("DocShare", mirrored_name))
+
+    def test_realtime_doc_share_trash_no_mirror_delete_when_sync_disabled(self):
+        erp_doc = make_erpnext_customer("RT Trash DS Disabled ERP Co")
+        hd_doc = make_hd_customer(
+            "RT Trash DS Disabled HD Co", erpnext_customer=erp_doc.name
+        )
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        erp_share = frappe.get_doc(
+            {
+                "doctype": "DocShare",
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_doc.name,
+                "read": 1,
+                "write": 0,
+                "share": 0,
+                "submit": 0,
+                "everyone": 0,
+            }
+        )
+        erp_share.flags.ignore_erpnext_sync = True
+        erp_share.flags.ignore_share_permission = True
+        erp_share.insert(ignore_permissions=True)
+
+        hd_share = frappe.get_doc(
+            {
+                "doctype": "DocShare",
+                "user": "Administrator",
+                "share_doctype": "HD Customer",
+                "share_name": hd_doc.name,
+                "read": 1,
+                "write": 0,
+                "share": 0,
+                "submit": 0,
+                "everyone": 0,
+            }
+        )
+        hd_share.flags.ignore_erpnext_sync = True
+        hd_share.flags.ignore_share_permission = True
+        hd_share.insert(ignore_permissions=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", hd_share.name, force=True)
+
+        frappe.delete_doc("DocShare", erp_share.name, force=True)
+
+        self.assertTrue(frappe.db.exists("DocShare", hd_share.name))
+
+    # ------------------------------------------------------------------
     # DocShare mirroring tests
     # ------------------------------------------------------------------
 
