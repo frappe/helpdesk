@@ -1,6 +1,7 @@
 import frappe
 from frappe import _
 
+from helpdesk.integrations.erpnext.doc_share import sync_shared_docs
 from helpdesk.integrations.erpnext.user_perimission import sync_user_permissions
 from helpdesk.integrations.erpnext.utils import set_links, should_sync
 
@@ -114,6 +115,7 @@ def sync_all_customers():
             set_links(erp_doc.name, hd.name)
 
     sync_user_permissions()
+    sync_shared_docs()
 
     frappe.publish_realtime(
         "helpdesk:erpnext-sync-end",
