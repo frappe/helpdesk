@@ -333,6 +333,256 @@ class TestERPNextIntegration(FrappeTestCase):
             )
         )
 
+    # ------------------------------------------------------------------
+    # DocShare mirroring tests
+    # ------------------------------------------------------------------
+
+    def test_realtime_hd_doc_share_mirrors_to_erp_when_enabled(self):
+        """Creating a DocShare for HD Customer should auto-create one for linked ERP Customer."""
+        enable_erpnext_sync()
+
+        erp_doc = make_erpnext_customer("RT DS ERP Mirror Co")
+        hd_doc = make_hd_customer("RT DS HD Mirror Co", erpnext_customer=erp_doc.name)
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        share = frappe.get_doc(
+            {
+                "doctype": "DocShare",
+                "user": "Administrator",
+                "share_doctype": "HD Customer",
+                "share_name": hd_doc.name,
+                "read": 1,
+                "write": 1,
+                "share": 0,
+                "submit": 0,
+                "everyone": 0,
+            }
+        )
+        share.flags.ignore_share_permission = True
+        share.insert(ignore_permissions=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
+
+        mirrored = frappe.db.get_value(
+            "DocShare",
+            {
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_doc.name,
+            },
+            ["name", "read", "write", "share", "submit"],
+            as_dict=True,
+        )
+        self.assertTrue(mirrored)
+        self.addCleanup(frappe.delete_doc, "DocShare", mirrored.name, force=True)
+        self.assertEqual(mirrored.read, 1)
+        self.assertEqual(mirrored.write, 1)
+        self.assertEqual(mirrored.share, 0)
+        self.assertEqual(mirrored.submit, 0)
+
+    def test_realtime_erp_doc_share_mirrors_to_hd_when_enabled(self):
+        """Creating a DocShare for Customer should auto-create one for linked HD Customer."""
+        enable_erpnext_sync()
+
+        erp_doc = make_erpnext_customer("RT DS ERP To HD Co")
+        hd_doc = make_hd_customer("RT DS HD To ERP Co", erpnext_customer=erp_doc.name)
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        share = frappe.get_doc(
+            {
+                "doctype": "DocShare",
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_doc.name,
+                "read": 1,
+                "write": 0,
+                "share": 1,
+                "submit": 0,
+                "everyone": 0,
+            }
+        )
+        share.flags.ignore_share_permission = True
+        share.insert(ignore_permissions=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
+
+        self.assertTrue(
+            frappe.db.exists(
+                "DocShare",
+                {
+                    "user": "Administrator",
+                    "share_doctype": "HD Customer",
+                    "share_name": hd_doc.name,
+                },
+            )
+        )
+
+    def test_realtime_doc_share_not_mirrored_when_sync_disabled(self):
+        """Creating a DocShare with sync off should not create mirrored share."""
+        erp_doc = make_erpnext_customer("RT DS Disabled ERP Co")
+        hd_doc = make_hd_customer("RT DS Disabled HD Co", erpnext_customer=erp_doc.name)
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        share = frappe.get_doc(
+            {
+                "doctype": "DocShare",
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_doc.name,
+                "read": 1,
+                "write": 0,
+                "share": 0,
+                "submit": 0,
+                "everyone": 0,
+            }
+        )
+        share.flags.ignore_share_permission = True
+        share.insert(ignore_permissions=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
+
+        self.assertFalse(
+            frappe.db.exists(
+                "DocShare",
+                {
+                    "user": "Administrator",
+                    "share_doctype": "HD Customer",
+                    "share_name": hd_doc.name,
+                },
+            )
+        )
+
+    def test_realtime_doc_share_not_duplicated_if_mirror_exists(self):
+        """If mirrored DocShare exists already, hook should not create a duplicate."""
+        enable_erpnext_sync()
+
+        erp_doc = make_erpnext_customer("RT DS No Dup ERP Co")
+        hd_doc = make_hd_customer("RT DS No Dup HD Co", erpnext_customer=erp_doc.name)
+        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        existing = frappe.get_doc(
+            {
+                "doctype": "DocShare",
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_doc.name,
+                "read": 1,
+                "write": 0,
+                "share": 0,
+                "submit": 0,
+                "everyone": 0,
+            }
+        )
+        existing.flags.ignore_erpnext_sync = True
+        existing.flags.ignore_share_permission = True
+        existing.insert(ignore_permissions=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", existing.name, force=True)
+
+        share = frappe.get_doc(
+            {
+                "doctype": "DocShare",
+                "user": "Administrator",
+                "share_doctype": "HD Customer",
+                "share_name": hd_doc.name,
+                "read": 1,
+                "write": 0,
+                "share": 0,
+                "submit": 0,
+                "everyone": 0,
+            }
+        )
+        share.flags.ignore_share_permission = True
+        share.insert(ignore_permissions=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
+
+        self.assertEqual(
+            frappe.db.count(
+                "DocShare",
+                {
+                    "user": "Administrator",
+                    "share_doctype": "Customer",
+                    "share_name": erp_doc.name,
+                },
+            ),
+            1,
+        )
+
+    def test_realtime_doc_share_not_mirrored_when_unlinked(self):
+        """Creating DocShare for unlinked customer should not mirror."""
+        enable_erpnext_sync()
+
+        hd_doc = make_hd_customer("RT DS Unlinked HD Co")
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        share = frappe.get_doc(
+            {
+                "doctype": "DocShare",
+                "user": "Administrator",
+                "share_doctype": "HD Customer",
+                "share_name": hd_doc.name,
+                "read": 1,
+                "write": 0,
+                "share": 0,
+                "submit": 0,
+                "everyone": 0,
+            }
+        )
+        share.flags.ignore_share_permission = True
+        share.insert(ignore_permissions=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
+
+        self.assertFalse(
+            frappe.db.exists(
+                "DocShare",
+                {
+                    "user": "Administrator",
+                    "share_doctype": "Customer",
+                    "share_name": hd_doc.name,
+                },
+            )
+        )
+
+    def test_realtime_doc_share_unrelated_doctype_not_affected(self):
+        """Creating DocShare for unrelated doctype should not create mirrored share."""
+        enable_erpnext_sync()
+
+        share = frappe.get_doc(
+            {
+                "doctype": "DocShare",
+                "user": "Administrator",
+                "share_doctype": "DocType",
+                "share_name": "HD Ticket",
+                "read": 1,
+                "write": 0,
+                "share": 0,
+                "submit": 0,
+                "everyone": 0,
+            }
+        )
+        share.flags.ignore_share_permission = True
+        share.insert(ignore_permissions=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
+
+        self.assertFalse(
+            frappe.db.exists(
+                "DocShare",
+                {
+                    "user": "Administrator",
+                    "share_doctype": "HD Customer",
+                    "share_name": "HD Ticket",
+                },
+            )
+        )
+
+    # ------------------------------------------------------------------
+    # User Permissions mirroring test
+    # ------------------------------------------------------------------
+
     def test_erp_perm_mirrored_to_hd_customer(self):
         """A User Permission on Customer should be mirrored to the linked HD Customer."""
         enable_erpnext_sync()
