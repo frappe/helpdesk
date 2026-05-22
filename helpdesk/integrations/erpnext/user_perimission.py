@@ -112,14 +112,10 @@ def sync_user_permissions():
             continue
         frappe.get_doc(
             {
+                **perm,
                 "doctype": "User Permission",
-                "user": perm.user,
                 "allow": "HD Customer",
                 "for_value": hd_customer,
-                "apply_to_all_doctypes": perm.apply_to_all_doctypes,
-                "applicable_for": perm.applicable_for,
-                "hide_descendants": perm.hide_descendants,
-                "is_default": perm.is_default,
             }
         ).insert(ignore_permissions=True)
         existing_hd_perms.add((perm.user, hd_customer))
@@ -135,14 +131,10 @@ def sync_user_permissions():
             continue
         frappe.get_doc(
             {
+                **perm,
                 "doctype": "User Permission",
-                "user": perm.user,
                 "allow": "Customer",
                 "for_value": erpnext_customer,
-                "apply_to_all_doctypes": perm.apply_to_all_doctypes,
-                "applicable_for": perm.applicable_for,
-                "hide_descendants": perm.hide_descendants,
-                "is_default": perm.is_default,
             }
         ).insert(ignore_permissions=True)
         existing_erp_perms.add((perm.user, erpnext_customer))
