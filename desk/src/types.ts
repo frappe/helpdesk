@@ -304,16 +304,9 @@ export type UserInfo = {
   name: string;
 };
 
-export interface RenderField {
-  label: string;
-  name: string;
-  type: string;
-  placeholder?: string;
-  description?: string;
-}
-
 export interface EmailService {
   name: string;
+  value: string;
   icon: string;
   info: string;
   link: string;
@@ -321,9 +314,15 @@ export interface EmailService {
   oauth?: boolean;
 }
 
-export type EmailStep = "email-list" | "email-add" | "email-edit";
+export type EmailStep =
+  | "email-list"
+  | "email-add"
+  | "email-provider-setup"
+  | "email-custom-setup"
+  | "email-edit";
 
 export interface EmailAccount {
+  name: string;
   email_account_name: string;
   email_id: string;
   service: string;
@@ -338,6 +337,19 @@ export interface EmailAccount {
   auth_method?: "Basic" | "OAuth";
   connected_app?: string;
   connected_user?: string;
+  creation?: string;
+  awaiting_password?: 0 | 1;
+  login_id?: string;
+  domain?: string;
+  email_server?: string;
+  smtp_server?: string;
+  incoming_port?: string | number;
+  smtp_port?: string | number;
+  use_ssl?: 0 | 1 | boolean;
+  use_starttls?: 0 | 1 | boolean;
+  use_tls?: 0 | 1 | boolean;
+  use_imap?: 0 | 1 | boolean;
+  use_ssl_for_outgoing?: 0 | 1 | boolean;
 }
 
 export type TicketTab = "activity" | "email" | "comment" | "details" | "call";
@@ -720,6 +732,10 @@ export const TeamListResourceSymbol: InjectionKey<ListResource<Team>> =
 export const SavedReplyListResourceSymbol: InjectionKey<
   ListResource<SavedReply>
 > = Symbol("savedReplyListResource");
+
+export const EmailAccountListResourceSymbol: InjectionKey<
+  ListResource<EmailAccount>
+> = Symbol("emailAccountListResource");
 
 declare global {
   interface Window {
