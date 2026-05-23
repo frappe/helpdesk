@@ -2,7 +2,7 @@ import frappe
 from frappe import _
 
 from helpdesk.integrations.erpnext.doc_share import sync_shared_docs
-from helpdesk.integrations.erpnext.user_perimission import sync_user_permissions
+from helpdesk.integrations.erpnext.user_permission import sync_user_permissions
 from helpdesk.integrations.erpnext.utils import set_links, should_sync
 
 

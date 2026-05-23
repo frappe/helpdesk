@@ -144,14 +144,17 @@ def sync_shared_docs():
             continue
         if (share.user, hd_customer) in existing_hd_shares:
             continue
-        frappe.get_doc(
+        doc = frappe.get_doc(
             {
                 **share,
                 "doctype": "DocShare",
                 "share_doctype": "HD Customer",
                 "share_name": hd_customer,
             }
-        ).flags.ignore_share_permission = True
+        )
+        doc.flags.ignore_share_permission = True
+        doc.flags.ignore_erpnext_sync = True
+        doc.insert(ignore_permissions=True)
         existing_hd_shares.add((share.user, hd_customer))
 
     # HD → ERP: for each HD Customer share, mirror it to Customer if linked
@@ -163,12 +166,15 @@ def sync_shared_docs():
             continue
         if (share.user, erpnext_customer) in existing_erp_shares:
             continue
-        frappe.get_doc(
+        doc = frappe.get_doc(
             {
                 **share,
                 "doctype": "DocShare",
                 "share_doctype": "Customer",
                 "share_name": erpnext_customer,
             }
-        ).flags.ignore_share_permission = True
+        )
+        doc.flags.ignore_share_permission = True
+        doc.flags.ignore_erpnext_sync = True
+        doc.insert(ignore_permissions=True)
         existing_erp_shares.add((share.user, erpnext_customer))

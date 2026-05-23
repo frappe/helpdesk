@@ -145,14 +145,16 @@ def sync_user_permissions():
             continue
         if (perm.user, hd_customer) in existing_hd_perms:
             continue
-        frappe.get_doc(
+        doc = frappe.get_doc(
             {
                 **perm,
                 "doctype": "User Permission",
                 "allow": "HD Customer",
                 "for_value": hd_customer,
             }
-        ).insert(ignore_permissions=True)
+        )
+        doc.flags.ignore_erpnext_sync = True
+        doc.insert(ignore_permissions=True)
         existing_hd_perms.add((perm.user, hd_customer))
 
     # HD → ERP: for each HD Customer perm, mirror it to Customer if linked
@@ -164,12 +166,14 @@ def sync_user_permissions():
             continue
         if (perm.user, erpnext_customer) in existing_erp_perms:
             continue
-        frappe.get_doc(
+        doc = frappe.get_doc(
             {
                 **perm,
                 "doctype": "User Permission",
                 "allow": "Customer",
                 "for_value": erpnext_customer,
             }
-        ).insert(ignore_permissions=True)
+        )
+        doc.flags.ignore_erpnext_sync = True
+        doc.insert(ignore_permissions=True)
         existing_erp_perms.add((perm.user, erpnext_customer))
