@@ -8,7 +8,6 @@ frappe.listview_settings["Customer"].onload = function (listview) {
     _original_onload(listview);
   }
 
-  // Not needed ig, need to confirm
   const is_erp_installed = frappe.boot.app_data.filter(
     (app) => app.app_name === "erpnext"
   ).length;
@@ -31,8 +30,7 @@ frappe.listview_settings["Customer"].onload = function (listview) {
 
       listview.page.add_menu_item(label, function () {
         frappe.call({
-          method:
-            "helpdesk.integrations.erpnext.customer.sync_hd_erpnext_customers",
+          method: "helpdesk.integrations.erpnext.api.sync_hd_erpnext_customers",
           freeze: true,
           freeze_message: "Syncing customers with Helpdesk...",
           callback: function () {

@@ -71,8 +71,8 @@ doc_events = {
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
     "User Permission": {
-        "after_insert": "helpdesk.integrations.erpnext.user_perimission.mirror_user_permission_on_insert",
-        "on_trash": "helpdesk.integrations.erpnext.user_perimission.mirror_user_permission_on_trash",
+        "after_insert": "helpdesk.integrations.erpnext.user_permission.mirror_user_permission_on_insert",
+        "on_trash": "helpdesk.integrations.erpnext.user_permission.mirror_user_permission_on_trash",
     },
     "DocShare": {
         "after_insert": "helpdesk.integrations.erpnext.doc_share.mirror_doc_share_on_insert",
