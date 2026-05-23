@@ -17,7 +17,7 @@ Keys per provider:
 """
 
 GMAIL = "GMail"
-OUTLOOK = "Outlook"
+OUTLOOK = "Outlook.com"
 
 # One Connected App per provider per site. Using a fixed, URL-safe slug
 # (no spaces, no per-email suffix) keeps the OAuth redirect URI stable so

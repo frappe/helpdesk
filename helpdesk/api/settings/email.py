@@ -72,6 +72,10 @@ def create_email_account(data: dict[str, Any]):
             # validate whether the credentials are correct
             email_doc.get_incoming_server()
 
+        reply_to = (data.get("reply_to") or "").strip()
+        if reply_to:
+            email_doc.append("reply_to_addresses", {"email": reply_to})
+
         # if correct credentials, save the email account
         email_doc.save()
         return email_doc.name
@@ -280,6 +284,85 @@ def get_oauth_status(email_account: str) -> dict[str, Any]:
 
 
 @frappe.whitelist()
+def switch_email_auth_method(data: dict[str, Any]) -> dict[str, Any]:
+    """Switch an existing Email Account between Basic and OAuth.
+
+    For OAuth-capable providers (GMail, Outlook), the user can flip an
+    existing mailbox to the other auth mode without recreating it.
+    Switching to OAuth returns a ``redirect_url`` the frontend should open;
+    switching to Basic updates the password inline.
+    """
+
+    frappe.has_permission("Email Account", "write", throw=True)
+
+    email_account = (data or {}).get("email_account", "")
+    auth_method = (data or {}).get("auth_method", "")
+
+    if auth_method not in ("Basic", "OAuth"):
+        frappe.throw(_("auth_method must be 'Basic' or 'OAuth'"))
+
+    if not frappe.db.exists("Email Account", email_account):
+        frappe.throw(_("Email Account {0} not found").format(email_account))
+
+    doc = frappe.get_doc("Email Account", email_account)
+    service = doc.service or data.get("service") or ""
+
+    if not is_supported(service):
+        frappe.throw(
+            _("Switching auth method is only supported for: {0}").format(
+                ", ".join(supported_services())
+            )
+        )
+
+    if auth_method == "OAuth":
+        client_id = (data.get("client_id") or "").strip()
+        client_secret = (data.get("client_secret") or "").strip()
+        if not client_id or not client_secret:
+            frappe.throw(_("Client ID and Client Secret are required"))
+
+        connected_app = _upsert_connected_app(service, client_id, client_secret)
+
+        provider = get_provider(service)
+        for field, value in provider["email_account"].items():
+            doc.set(field, value)
+        doc.auth_method = "OAuth"
+        doc.connected_app = connected_app.name
+        doc.connected_user = frappe.session.user
+        doc.awaiting_password = 0
+        doc.password = None
+        doc.save(ignore_permissions=False)
+
+        success_uri = _build_success_uri(doc.name)
+        redirect_url = connected_app.initiate_web_application_flow(
+            user=frappe.session.user, success_uri=success_uri
+        )
+        return {
+            "redirect_url": redirect_url,
+            "email_account": doc.name,
+            "auth_method": "OAuth",
+        }
+
+    password = (data.get("password") or "").strip()
+    if not password:
+        frappe.throw(_("Password is required to switch to Basic auth"))
+
+    doc.auth_method = "Basic"
+    doc.connected_app = None
+    doc.connected_user = None
+    doc.password = password
+
+    service_defaults = email_service_config.get(service) or {}
+    for field, value in service_defaults.items():
+        doc.set(field, value)
+
+    doc.save(ignore_permissions=False)
+    # Validate the new credentials by attempting an IMAP connection.
+    doc.get_incoming_server()
+
+    return {"email_account": doc.name, "auth_method": "Basic"}
+
+
+@frappe.whitelist()
 def reconnect_oauth_email(email_account: str) -> dict[str, Any]:
     """Restart the OAuth flow for an existing Email Account without requiring
     the user to re-enter the client_id / client_secret.
@@ -414,6 +497,34 @@ def _sync_query_params(doc, params: dict[str, str]) -> None:
     doc.set("query_parameters", [])
     for key, value in params.items():
         doc.append("query_parameters", {"key": key, "value": value})
+
+
+@frappe.whitelist()
+def set_default_email_account(email_account: str, kind: str) -> dict[str, str]:
+    """Set the default incoming or outgoing Email Account, clearing the
+    prior default of the same kind. Pass an empty ``email_account`` to clear
+    the default without setting a new one.
+    """
+
+    frappe.has_permission("Email Account", "write", throw=True)
+
+    if kind not in ("incoming", "outgoing"):
+        frappe.throw(_("kind must be 'incoming' or 'outgoing'"))
+
+    field = "default_incoming" if kind == "incoming" else "default_outgoing"
+
+    EmailAccount = frappe.qb.DocType("Email Account")
+    frappe.qb.update(EmailAccount).set(EmailAccount[field], 0).where(
+        EmailAccount[field] == 1
+    ).run()
+
+    if email_account:
+        if not frappe.db.exists("Email Account", email_account):
+            frappe.throw(_("Email Account {0} not found").format(email_account))
+        frappe.db.set_value("Email Account", email_account, field, 1)
+
+    frappe.clear_document_cache("Email Account")
+    return {"email_account": email_account, "kind": kind}
 
 
 def _build_success_uri(email_account: str) -> str:
