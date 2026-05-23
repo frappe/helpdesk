@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-17 10:53+0000\n"
-"PO-Revision-Date: 2026-05-21 09:44\n"
+"PO-Revision-Date: 2026-05-23 09:41\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -2860,7 +2860,7 @@ msgstr "Språk"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
-msgstr "Senaste"
+msgstr "Sista"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:362
 #: desk/src/pages/home/components/RecentFeedback.vue:391
