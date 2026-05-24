@@ -32,7 +32,11 @@ def make_hd_customer(customer_name: str, **kwargs) -> "frappe.Document":
 
 
 def make_user_permission(
-    user: str, allow: str, for_value: str, apply_to_all_doctypes: int = 1
+    user: str,
+    allow: str,
+    for_value: str,
+    apply_to_all_doctypes: int = 1,
+    applicable_for: str | None = None,
 ) -> "frappe.Document":
     """Insert a User Permission record for the given user, doctype, and value."""
     doc = frappe.get_doc(
@@ -42,6 +46,7 @@ def make_user_permission(
             "allow": allow,
             "for_value": for_value,
             "apply_to_all_doctypes": apply_to_all_doctypes,
+            "applicable_for": applicable_for,
         }
     )
     doc.insert(ignore_permissions=True)
@@ -49,7 +54,11 @@ def make_user_permission(
 
 
 def make_user_permission_no_sync(
-    user: str, allow: str, for_value: str, apply_to_all_doctypes: int = 1
+    user: str,
+    allow: str,
+    for_value: str,
+    apply_to_all_doctypes: int = 1,
+    applicable_for: str | None = None,
 ) -> "frappe.Document":
     """Insert a User Permission record without triggering the ERPNext mirror hook.
     Use this in test setup when pre-creating a perm that should not cause a
@@ -61,6 +70,7 @@ def make_user_permission_no_sync(
             "allow": allow,
             "for_value": for_value,
             "apply_to_all_doctypes": apply_to_all_doctypes,
+            "applicable_for": applicable_for,
         }
     )
     doc.flags.ignore_erpnext_sync = True

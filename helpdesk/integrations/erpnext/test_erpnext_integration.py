@@ -480,6 +480,59 @@ class TestERPNextIntegration(FrappeTestCase):
             )
         )
 
+    def test_mirror_cleanup_survives_repointed_forward_link(self):
+        """If the source's forward link is re-pointed but the back-link still
+        points at us, identity-change cleanup must find the ORIGINAL mirror via
+        the back-link — not the unrelated mirror at the new forward target.
+        Regression test for the bug where _find_target_for used the forward link."""
+        enable_erpnext_sync()
+        hd, erp_orig = link_customers(self, "DS Repoint Orig")
+        _, erp_new = link_customers(self, "DS Repoint New")
+        hd_orphan = make_hd_customer("DS Repoint Orphan")
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_orphan.name, force=True)
+
+        # Share HD → creates mirror at erp_orig (back-link erp_orig.hd_customer=hd)
+        hd_share = make_doc_share("HD Customer", hd.name)
+        self.addCleanup(frappe.delete_doc, "DocShare", hd_share.name, force=True)
+        self.assertTrue(
+            frappe.db.exists(
+                "DocShare",
+                {
+                    "user": "Administrator",
+                    "share_doctype": "Customer",
+                    "share_name": erp_orig.name,
+                },
+            )
+        )
+
+        # Admin re-points only the forward link (leaves erp_orig.hd_customer alone)
+        frappe.db.set_value(
+            "HD Customer",
+            hd.name,
+            "erpnext_customer",
+            erp_new.name,
+            update_modified=False,
+        )
+
+        # Identity change on the share triggers cleanup
+        hd_share.share_name = hd_orphan.name
+        hd_share.flags.ignore_share_permission = True
+        hd_share.save(ignore_permissions=True)
+
+        # Original mirror at erp_orig must be deleted — and the unrelated
+        # mirror at erp_new (which doesn't exist; we never shared with it)
+        # must not be confused for it.
+        self.assertFalse(
+            frappe.db.exists(
+                "DocShare",
+                {
+                    "user": "Administrator",
+                    "share_doctype": "Customer",
+                    "share_name": erp_orig.name,
+                },
+            )
+        )
+
     # ------------------------------------------------------------------
     # User Permission — insert/update mirroring
     # ------------------------------------------------------------------
@@ -564,6 +617,49 @@ class TestERPNextIntegration(FrappeTestCase):
             ),
             1,
         )
+
+    def test_perm_mirror_dedup_respects_applicable_for(self):
+        """Dedup must match Frappe's 5-key duplicate validation: a Customer-side
+        perm with different `applicable_for` is NOT a duplicate of our incoming
+        mirror, so we must still insert. Old 3-key dedup would skip-and-leak."""
+        enable_erpnext_sync()
+        hd_doc, erp_doc = link_customers(self, "UP Applicable Dedup")
+
+        # Pre-existing Customer-side perm narrowed to a specific applicable_for
+        # (apply_to_all_doctypes=0 is required when applicable_for is set).
+        existing = make_user_permission_no_sync(
+            "Administrator",
+            "Customer",
+            erp_doc.name,
+            apply_to_all_doctypes=0,
+            applicable_for="Sales Invoice",
+        )
+        self.addCleanup(frappe.delete_doc, "User Permission", existing.name, force=True)
+
+        # New HD perm with apply_to_all_doctypes=1 (no applicable_for) — distinct
+        # from `existing` on Frappe's duplicate key, so a mirror must be created.
+        hd_perm = make_user_permission(
+            "Administrator", "HD Customer", hd_doc.name, apply_to_all_doctypes=1
+        )
+        self.addCleanup(frappe.delete_doc, "User Permission", hd_perm.name, force=True)
+
+        # Two Customer-side perms must coexist: the pre-existing narrowed one
+        # and the freshly-created mirror for the HD perm.
+        customer_perms = frappe.get_all(
+            "User Permission",
+            filters={
+                "user": "Administrator",
+                "allow": "Customer",
+                "for_value": erp_doc.name,
+            },
+            fields=["name", "applicable_for", "apply_to_all_doctypes"],
+        )
+        self.assertEqual(len(customer_perms), 2)
+        for p in customer_perms:
+            if p.name != existing.name:
+                self.addCleanup(
+                    frappe.delete_doc, "User Permission", p.name, force=True
+                )
 
     def test_perm_not_mirrored_when_unlinked(self):
         enable_erpnext_sync()

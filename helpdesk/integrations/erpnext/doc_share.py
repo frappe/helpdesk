@@ -139,10 +139,12 @@ class CustomDocShare(DocShare):
         if not share_doctype or not share_name:
             return None
         if share_doctype == "HD Customer":
-            erp = frappe.db.get_value("HD Customer", share_name, "erpnext_customer")
+            erp = frappe.db.get_value("Customer", {"hd_customer": share_name}, "name")
             return ("Customer", erp) if erp else None
         if share_doctype == "Customer":
-            hd = frappe.db.get_value("Customer", share_name, "hd_customer")
+            hd = frappe.db.get_value(
+                "HD Customer", {"erpnext_customer": share_name}, "name"
+            )
             return ("HD Customer", hd) if hd else None
         return None
 
