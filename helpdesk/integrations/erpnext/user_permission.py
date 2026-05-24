@@ -1,6 +1,7 @@
 import frappe
 from frappe.core.doctype.user_permission.user_permission import UserPermission
 from frappe.model import default_fields
+from frappe.utils import cstr
 
 from helpdesk.integrations.erpnext.utils import ALLOWED_DOCTYPES, should_sync
 
@@ -68,9 +69,17 @@ class CustomUserPermission(UserPermission):
         if not target:
             return
         target_allow, target_value = target
-        if frappe.db.exists(
+        # Double-check not to create a duplicate mirror if one already exists for some reason.
+        if frappe.get_all(
             "User Permission",
-            {"user": self.user, "allow": target_allow, "for_value": target_value},
+            filters={
+                "user": self.user,
+                "allow": target_allow,
+                "for_value": target_value,
+                "applicable_for": cstr(self.applicable_for),
+                "apply_to_all_doctypes": self.apply_to_all_doctypes,
+            },
+            limit=1,
         ):
             return
         mirror = frappe.copy_doc(self)
@@ -140,10 +149,12 @@ class CustomUserPermission(UserPermission):
         if not allow or not for_value:
             return None
         if allow == "HD Customer":
-            erp = frappe.db.get_value("HD Customer", for_value, "erpnext_customer")
+            erp = frappe.db.get_value("Customer", {"hd_customer": for_value}, "name")
             return ("Customer", erp) if erp else None
         if allow == "Customer":
-            hd = frappe.db.get_value("Customer", for_value, "hd_customer")
+            hd = frappe.db.get_value(
+                "HD Customer", {"erpnext_customer": for_value}, "name"
+            )
             return ("HD Customer", hd) if hd else None
         return None
 
