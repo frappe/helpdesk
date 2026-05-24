@@ -19,11 +19,7 @@
 
               <template #body-main>
                 <div
-<<<<<<< HEAD
-                  class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-98 whitespace-pre-wrap leading-5"
-=======
                   class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
->>>>>>> 146a389a (fix: add missing conditions in ticket merge modal)
                 >
                   <span class="text-p-base">
                     {{
@@ -31,26 +27,6 @@
                     }}</span
                   >
                   <ul class="list-disc pl-4 mt-1 space-y-1">
-<<<<<<< HEAD
-                    <li>
-                      {{ __("Ticket must be Open or Paused.") }}
-                      <code class="bg-gray-100 rounded-md px-1 py-0.5">
-                        {{ __("status_category in ['Open', 'Paused']") }}</code
-                      >
-                    </li>
-                    <li>
-                      {{ __("Ticket must not already be merged.") }}
-                      <code class="bg-gray-100 rounded-md px-1 py-0.5">
-                        {{ __("is_merged === 0") }}</code
-                      >
-                    </li>
-                    <li>
-                      {{
-                        __(
-                          "Source and target tickets which are to be merged cannot be the same."
-                        )
-                      }}
-=======
                     <li
                       v-for="(condition, index) in mergeConditions"
                       :key="index"
@@ -62,7 +38,6 @@
                       >
                         {{ __(condition.code) }}
                       </code>
->>>>>>> 146a389a (fix: add missing conditions in ticket merge modal)
                     </li>
                   </ul>
                 </div>
