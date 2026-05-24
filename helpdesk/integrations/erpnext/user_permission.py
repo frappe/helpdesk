@@ -1,125 +1,166 @@
 import frappe
+from frappe.core.doctype.user_permission.user_permission import UserPermission
+from frappe.model import default_fields
 
-from helpdesk.integrations.erpnext.utils import should_sync
+from helpdesk.integrations.erpnext.utils import ALLOWED_DOCTYPES, should_sync
+
+# Identity fields define WHICH perm this is — they're what differentiates the
+# original from the mirror. Everything else is mirrored.
+IDENTITY_FIELDS = ("user", "allow", "for_value")
 
 
-def mirror_user_permission_on_insert(doc, method=None):
-    """
-    Hook: User Permission — after_insert.
+class CustomUserPermission(UserPermission):
+    """Overrides core UserPermission to keep HD Customer / ERPNext Customer
+    permissions mirrored bidirectionally when the integration is enabled."""
 
-    When a User Permission is created for HD Customer or Customer and the
-    integration is enabled, mirror it to the linked counterpart (if not already
-    present).  Any other `allow` doctype is ignored.
-    """
-    allowed_doctypes = ["HD Customer", "Customer"]
-    if doc.allow not in allowed_doctypes:
-        return
+    def validate(self):
+        # If the user is changing identity fields on this perm, the old mirror
+        # would conflict with Frappe's duplicate-perm validation when the new
+        # identity matches the mirror's. Clean it up BEFORE super().validate()
+        # so the framework sees no duplicates. If the save later fails, the
+        # transaction rolls back and the mirror comes back.
+        old = self.get_doc_before_save()
+        if (
+            old
+            and any(old.get(f) != self.get(f) for f in IDENTITY_FIELDS)
+            and should_sync()
+            and not self.flags.get("ignore_erpnext_sync")
+        ):
+            self._delete_mirror_for(old)
+        super().validate()
 
-    if not should_sync():
-        return
-
-    if doc.flags.get("ignore_erpnext_sync"):
-        return
-
-    if doc.allow == "HD Customer":
-        # Mirror HD Customer perm → Customer
-        erpnext_customer = frappe.db.get_value(
-            "HD Customer", doc.for_value, "erpnext_customer"
-        )
-        if not erpnext_customer:
+    def after_insert(self):
+        # Core UserPermission doesn't define after_insert — no super() call.
+        if not self._should_mirror():
             return
-        already_exists = frappe.db.exists(
+        self._create_mirror()
+
+    def on_update(self):
+        super().on_update()
+
+        old = self.get_doc_before_save()
+        identity_changed = bool(old) and any(
+            old.get(f) != self.get(f) for f in IDENTITY_FIELDS
+        )
+
+        if not self._should_mirror():
+            return
+
+        if identity_changed:
+            # Old mirror was cleaned up in validate(); create the fresh mirror now.
+            self._create_mirror()
+        else:
+            self._sync_state_to_mirror()
+
+    def on_trash(self):
+        super().on_trash()
+        if not self._should_mirror():
+            return
+        mirror = self._find_mirror()
+        if not mirror:
+            return
+        mirror.flags.ignore_erpnext_sync = True
+        mirror.delete(ignore_permissions=True)
+
+    def _create_mirror(self):
+        """Create the mirror User Permission for this record on the other side."""
+        target = self._find_target_for(self.allow, self.for_value)
+        if not target:
+            return
+        target_allow, target_value = target
+        if frappe.db.exists(
+            "User Permission",
+            {"user": self.user, "allow": target_allow, "for_value": target_value},
+        ):
+            return
+        mirror = frappe.copy_doc(self)
+        mirror.allow = target_allow
+        mirror.for_value = target_value
+        mirror.flags.ignore_erpnext_sync = True
+        mirror.insert(ignore_permissions=True)
+
+    def _delete_mirror_for(self, old):
+        """Find and delete the mirror that corresponded to `old`'s identity."""
+        if old.get("allow") not in ALLOWED_DOCTYPES:
+            return
+        target = self._find_target_for(old.get("allow"), old.get("for_value"))
+        if not target:
+            return
+        target_allow, target_value = target
+        mirror_name = frappe.db.get_value(
             "User Permission",
             {
-                "user": doc.user,
-                "allow": "Customer",
-                "for_value": erpnext_customer,
+                "user": old.get("user"),
+                "allow": target_allow,
+                "for_value": target_value,
             },
         )
-        if already_exists:
+        if not mirror_name:
             return
-        mirrored = frappe.get_doc(
-            {
-                "doctype": "User Permission",
-                "user": doc.user,
-                "allow": "Customer",
-                "for_value": erpnext_customer,
-                "apply_to_all_doctypes": doc.apply_to_all_doctypes,
-                "applicable_for": doc.applicable_for,
-                "hide_descendants": doc.hide_descendants,
-                "is_default": doc.is_default,
-            }
-        )
-        mirrored.flags.ignore_erpnext_sync = True
-        mirrored.insert(ignore_permissions=True)
-    elif doc.allow == "Customer":
-        # Mirror Customer perm → HD Customer
-        hd_customer = frappe.db.get_value("Customer", doc.for_value, "hd_customer")
-        if not hd_customer:
+        mirror = frappe.get_doc("User Permission", mirror_name)
+        mirror.flags.ignore_erpnext_sync = True
+        mirror.delete(ignore_permissions=True)
+
+    def _sync_state_to_mirror(self):
+        """Copy state (non-identity, non-framework) fields to the existing mirror."""
+        mirror = self._find_mirror()
+        if not mirror:
             return
-        already_exists = frappe.db.exists(
+        changed = False
+        for field, value in self._mirror_data().items():
+            if mirror.get(field) != value:
+                mirror.set(field, value)
+                changed = True
+        if changed:
+            mirror.flags.ignore_erpnext_sync = True
+            mirror.save(ignore_permissions=True)
+
+    def _mirror_data(self) -> dict:
+        """All meta-defined fields except framework defaults and identity fields.
+        Used for syncing field changes to an existing mirror."""
+        data = self.get_valid_dict()
+        for field in (*default_fields, *IDENTITY_FIELDS):
+            data.pop(field, None)
+        return data
+
+    def _should_mirror(self) -> bool:
+        if self.allow not in ALLOWED_DOCTYPES:
+            return False
+        if not should_sync():
+            return False
+        if self.flags.get("ignore_erpnext_sync"):
+            return False
+        return True
+
+    @staticmethod
+    def _find_target_for(
+        allow: str | None, for_value: str | None
+    ) -> tuple[str, str] | None:
+        """Compute (target_allow, target_value) for the given identity values."""
+        if not allow or not for_value:
+            return None
+        if allow == "HD Customer":
+            erp = frappe.db.get_value("HD Customer", for_value, "erpnext_customer")
+            return ("Customer", erp) if erp else None
+        if allow == "Customer":
+            hd = frappe.db.get_value("Customer", for_value, "hd_customer")
+            return ("HD Customer", hd) if hd else None
+        return None
+
+    def _find_mirror(self):
+        target = self._find_target_for(self.allow, self.for_value)
+        if not target:
+            return None
+        target_allow, target_value = target
+        mirror_name = frappe.db.get_value(
             "User Permission",
-            {
-                "user": doc.user,
-                "allow": "HD Customer",
-                "for_value": hd_customer,
-            },
+            {"user": self.user, "allow": target_allow, "for_value": target_value},
         )
-        if already_exists:
-            return
-        mirrored = frappe.get_doc(
-            {
-                "doctype": "User Permission",
-                "user": doc.user,
-                "allow": "HD Customer",
-                "for_value": hd_customer,
-                "apply_to_all_doctypes": doc.apply_to_all_doctypes,
-                "applicable_for": doc.applicable_for,
-                "hide_descendants": doc.hide_descendants,
-                "is_default": doc.is_default,
-            }
-        )
-        mirrored.flags.ignore_erpnext_sync = True
-        mirrored.insert(ignore_permissions=True)
-
-
-def mirror_user_permission_on_trash(doc, method=None):
-    """Hook: User Permission — on_trash."""
-    allowed_doctypes = ["HD Customer", "Customer"]
-    if doc.allow not in allowed_doctypes:
-        return
-
-    if not should_sync():
-        return
-
-    if doc.flags.get("ignore_erpnext_sync"):
-        return
-
-    if doc.allow == "HD Customer":
-        linked_value = frappe.db.get_value(
-            "HD Customer", doc.for_value, "erpnext_customer"
-        )
-        target_allow = "Customer"
-    else:
-        linked_value = frappe.db.get_value("Customer", doc.for_value, "hd_customer")
-        target_allow = "HD Customer"
-
-    if not linked_value:
-        return
-
-    mirrored_name = frappe.db.get_value(
-        "User Permission",
-        {"user": doc.user, "allow": target_allow, "for_value": linked_value},
-    )
-    if not mirrored_name:
-        return
-
-    mirrored = frappe.get_doc("User Permission", mirrored_name)
-    mirrored.flags.ignore_erpnext_sync = True
-    mirrored.delete(ignore_permissions=True)
+        return frappe.get_doc("User Permission", mirror_name) if mirror_name else None
 
 
 def sync_user_permissions():
+    """Bulk-sync User Permissions between HD Customer and Customer. Idempotent."""
     if not should_sync():
         return
 
@@ -134,11 +175,10 @@ def sync_user_permissions():
         fields=["*"],
     )
 
-    # Build lookup sets for deduplication: (user, for_value)
     existing_hd_perms = {(p.user, p.for_value) for p in hd_customer_user_perms}
     existing_erp_perms = {(p.user, p.for_value) for p in erpnext_customer_user_perms}
 
-    # ERP → HD: for each Customer perm, mirror it to HD Customer if linked
+    # ERP → HD
     for perm in erpnext_customer_user_perms:
         hd_customer = frappe.db.get_value("Customer", perm.for_value, "hd_customer")
         if not hd_customer:
@@ -157,7 +197,7 @@ def sync_user_permissions():
         doc.insert(ignore_permissions=True)
         existing_hd_perms.add((perm.user, hd_customer))
 
-    # HD → ERP: for each HD Customer perm, mirror it to Customer if linked
+    # HD → ERP
     for perm in hd_customer_user_perms:
         erpnext_customer = frappe.db.get_value(
             "HD Customer", perm.for_value, "erpnext_customer"
