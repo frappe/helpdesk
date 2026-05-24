@@ -4,6 +4,9 @@ from frappe.model.rename_doc import rename_doc
 
 CASCADE_FLAG = "erpnext_hd_cascade_in_progress"
 
+# Doctypes whose hooks the integration touches. Anything else is a no-op.
+ALLOWED_DOCTYPES = ("HD Customer", "Customer")
+
 
 def should_sync():
     return "erpnext" in frappe.get_installed_apps() and frappe.db.get_single_value(

@@ -70,14 +70,6 @@ doc_events = {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
-    "User Permission": {
-        "after_insert": "helpdesk.integrations.erpnext.user_permission.mirror_user_permission_on_insert",
-        "on_trash": "helpdesk.integrations.erpnext.user_permission.mirror_user_permission_on_trash",
-    },
-    "DocShare": {
-        "after_insert": "helpdesk.integrations.erpnext.doc_share.mirror_doc_share_on_insert",
-        "on_trash": "helpdesk.integrations.erpnext.doc_share.mirror_doc_share_on_trash",
-    },
 }
 
 has_permission = {
@@ -96,6 +88,8 @@ permission_query_conditions = {
 override_doctype_class = {
     "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
     "Customer": "helpdesk.integrations.erpnext.customer.CustomCustomer",
+    "User Permission": "helpdesk.integrations.erpnext.user_permission.CustomUserPermission",
+    "DocShare": "helpdesk.integrations.erpnext.doc_share.CustomDocShare",
 }
 
 ignore_links_on_delete = [

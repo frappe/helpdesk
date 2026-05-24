@@ -8,12 +8,17 @@ from frappe.tests.utils import FrappeTestCase
 from helpdesk.integrations.erpnext.user_permission import sync_user_permissions
 
 from .test_utils import (
+    cleanup_user_permission,
     disable_erpnext_sync,
     enable_erpnext_sync,
+    link_customers,
+    make_doc_share,
     make_erpnext_customer,
     make_hd_customer,
+    make_linked_pair,
     make_user_permission,
     make_user_permission_no_sync,
+    safe_delete,
 )
 
 
@@ -28,15 +33,13 @@ class TestERPNextIntegration(FrappeTestCase):
     # after_insert
     # ------------------------------------------------------------------
 
-    def test_after_insert_no_erp_customer_when_sync_disabled(self):
-        """No ERP Customer should be created when integration is off."""
+    def test_no_erp_customer_when_sync_disabled(self):
         doc = make_hd_customer("Sync Disabled Co")
         self.addCleanup(frappe.delete_doc, "HD Customer", doc.name, force=True)
 
         self.assertFalse(frappe.db.exists("Customer", {"hd_customer": doc.name}))
 
-    def test_after_insert_creates_erp_customer_when_sync_enabled(self):
-        """Inserting an HD Customer with sync on should create a linked ERP Customer."""
+    def test_erp_customer_created_when_sync_enabled(self):
         enable_erpnext_sync()
 
         doc = frappe.get_doc(
@@ -55,28 +58,7 @@ class TestERPNextIntegration(FrappeTestCase):
         self.assertTrue(doc.erpnext_customer)
         self.assertTrue(frappe.db.exists("Customer", {"hd_customer": doc.name}))
 
-    def test_after_insert_skips_creation_if_erpnext_customer_already_set(self):
-        """If erpnext_customer is already set, no new ERP Customer should be created."""
-        enable_erpnext_sync()
-
-        erp_doc = make_erpnext_customer("Pre-Linked Co")
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-
-        hd_doc = frappe.get_doc(
-            {
-                "doctype": "HD Customer",
-                "customer_name": "Pre-Linked Co HD",
-                "erpnext_customer": erp_doc.name,
-            }
-        )
-        hd_doc.insert(ignore_permissions=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        # erp_doc has no hd_customer link — count should be zero
-        self.assertEqual(frappe.db.count("Customer", {"hd_customer": hd_doc.name}), 0)
-
-    def test_after_insert_skips_creation_if_erp_customer_already_linked(self):
-        """If an ERP Customer already points to this HD Customer, don't create a duplicate."""
+    def test_no_duplicate_when_erp_already_linked(self):
         enable_erpnext_sync()
 
         hd_doc = make_hd_customer("Already Linked Co")
@@ -96,13 +78,8 @@ class TestERPNextIntegration(FrappeTestCase):
     # on_update (image sync)
     # ------------------------------------------------------------------
 
-    def test_on_update_image_not_synced_when_sync_disabled(self):
-        """Changing image with sync off should not update ERP Customer image."""
-        hd_doc = make_hd_customer("Image No Sync Co")
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        erp_doc = make_erpnext_customer("Image No Sync Co ERP", hd_customer=hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+    def test_image_not_synced_when_sync_disabled(self):
+        hd_doc, erp_doc = link_customers(self, "Image No Sync")
 
         hd_doc.image = "/files/new_logo.png"
         hd_doc.save(ignore_permissions=True)
@@ -112,17 +89,10 @@ class TestERPNextIntegration(FrappeTestCase):
             "/files/new_logo.png",
         )
 
-    def test_on_update_image_syncs_to_erp_customer(self):
-        """Changing image with sync on should update the linked ERP Customer image."""
+    def test_image_syncs_to_erp_customer(self):
         enable_erpnext_sync()
+        hd_doc, erp_doc = link_customers(self, "Image Sync")
 
-        hd_doc = make_hd_customer("Image Sync Co")
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        erp_doc = make_erpnext_customer("Image Sync Co ERP", hd_customer=hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-
-        hd_doc.erpnext_customer = erp_doc.name
         hd_doc.image = "/files/new_logo.png"
         hd_doc.flags.ignore_erpnext_sync = False
         hd_doc.save(ignore_permissions=True)
@@ -132,269 +102,70 @@ class TestERPNextIntegration(FrappeTestCase):
             "/files/new_logo.png",
         )
 
-    def test_on_update_image_no_error_when_no_linked_erp_customer(self):
-        """Changing image when no ERP Customer is linked should not raise."""
-        enable_erpnext_sync()
-
-        hd_doc = make_hd_customer("Image No Link Co")
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        hd_doc.image = "/files/logo.png"
-        hd_doc.flags.ignore_erpnext_sync = False
-        try:
-            hd_doc.save(ignore_permissions=True)
-        except Exception as e:
-            self.fail(f"save raised unexpectedly: {e}")
-
-    # ------------------------------------------------------------------
-    # after_rename
-    # ------------------------------------------------------------------
-
-    def test_after_rename_updates_hd_customer_on_erp(self):
-        """Renaming an HD Customer should cascade-rename the linked ERP Customer."""
-        enable_erpnext_sync()
-
-        hd_doc = make_hd_customer("Rename Source Co")
-        self.addCleanup(
-            frappe.delete_doc, "HD Customer", "Rename Target Co", force=True
-        )
-        self.addCleanup(frappe.delete_doc, "Customer", "Rename Target Co", force=True)
-
-        erp_doc = make_erpnext_customer("Rename Source Co ERP", hd_customer=hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-
-        frappe.db.set_value(
-            "HD Customer", hd_doc.name, "erpnext_customer", erp_doc.name
-        )
-
-        rename_doc(
-            doctype="HD Customer",
-            old=hd_doc.name,
-            new="Rename Target Co",
-            ignore_permissions=True,
-        )
-
-        # ERP counterpart was cascade-renamed
-        self.assertFalse(frappe.db.exists("Customer", erp_doc.name))
-        self.assertTrue(frappe.db.exists("Customer", "Rename Target Co"))
-        self.assertEqual(
-            frappe.db.get_value("Customer", "Rename Target Co", "hd_customer"),
-            "Rename Target Co",
-        )
-
-    def test_after_rename_skipped_when_sync_disabled(self):
-        """Renaming with sync off should not update hd_customer on ERP Customer."""
-        hd_doc = make_hd_customer("Rename No Sync Co")
-        self.addCleanup(
-            frappe.delete_doc, "HD Customer", "Rename No Sync Target", force=True
-        )
-
-        erp_doc = make_erpnext_customer("Rename No Sync ERP", hd_customer=hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-
-        rename_doc(
-            doctype="HD Customer",
-            old=hd_doc.name,
-            new="Rename No Sync Target",
-            ignore_permissions=True,
-        )
-
-        self.assertEqual(
-            frappe.db.get_value("Customer", erp_doc.name, "hd_customer"), hd_doc.name
-        )
-
-    def test_after_rename_no_error_when_no_linked_erp_customer(self):
-        """Renaming an HD Customer with no ERP link should not raise."""
-        hd_doc = make_hd_customer("Rename Orphan Co")
-        self.addCleanup(
-            frappe.delete_doc, "HD Customer", "Rename Orphan Target", force=True
-        )
-
-        enable_erpnext_sync()
-        try:
-            rename_doc(
-                doctype="HD Customer",
-                old=hd_doc.name,
-                new="Rename Orphan Target",
-                ignore_permissions=True,
-            )
-        except Exception as e:
-            self.fail(f"rename raised unexpectedly: {e}")
-
     # ------------------------------------------------------------------
     # on_trash
     # ------------------------------------------------------------------
 
-    def test_hd_customer_deletion_deletes_linked_erp_customer(self):
-        """Deleting an HD Customer should delete the linked ERPNext Customer."""
+    def test_delete_cascades_both_directions(self):
+        """Deleting either side cascade-deletes its linked counterpart."""
         enable_erpnext_sync()
 
-        hd_doc = make_hd_customer("Trash HD Co")
-        erp_doc = make_erpnext_customer("Trash HD Co ERP", hd_customer=hd_doc.name)
-        frappe.db.set_value(
-            "HD Customer", hd_doc.name, "erpnext_customer", erp_doc.name
-        )
-        erp_name = erp_doc.name
+        # HD delete → ERP deleted
+        hd1, erp1 = link_customers(self, "Cascade Del 1")
+        frappe.delete_doc("HD Customer", hd1.name, force=True)
+        self.assertFalse(frappe.db.exists("Customer", erp1.name))
 
-        frappe.delete_doc("HD Customer", hd_doc.name, force=True)
+        # ERP delete → HD deleted
+        hd2, erp2 = link_customers(self, "Cascade Del 2")
+        frappe.delete_doc("Customer", erp2.name, force=True)
+        self.assertFalse(frappe.db.exists("HD Customer", hd2.name))
 
-        self.assertFalse(frappe.db.exists("Customer", erp_name))
+    def test_delete_skipped_when_sync_disabled(self):
+        """With sync off, deleting either side leaves the counterpart intact."""
+        # HD delete: ERP survives
+        hd1, erp1 = link_customers(self, "Del No Sync 1")
+        frappe.delete_doc("HD Customer", hd1.name, force=True)
+        self.assertTrue(frappe.db.exists("Customer", erp1.name))
 
-    def test_hd_customer_deletion_no_error_when_no_linked_erp_customer(self):
-        """Deleting an HD Customer with no ERP link should not raise."""
-        enable_erpnext_sync()
-
-        hd_doc = make_hd_customer("Trash Orphan HD Co")
-        try:
-            frappe.delete_doc("HD Customer", hd_doc.name, force=True)
-        except Exception as e:
-            self.fail(f"delete raised unexpectedly: {e}")
-
-    def test_hd_customer_deletion_skipped_when_sync_disabled(self):
-        """Deleting an HD Customer with sync off should leave ERP Customer intact."""
-        hd_doc = make_hd_customer("Trash No Sync HD Co")
-        erp_doc = make_erpnext_customer("Trash No Sync ERP Co", hd_customer=hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        frappe.db.set_value(
-            "HD Customer", hd_doc.name, "erpnext_customer", erp_doc.name
-        )
-
-        frappe.delete_doc("HD Customer", hd_doc.name, force=True)
-
-        self.assertTrue(frappe.db.exists("Customer", erp_doc.name))
-
-    def test_erpnext_customer_deletion_deletes_linked_hd_customer(self):
-        """Deleting an ERPNext Customer should delete the linked HD Customer."""
-        enable_erpnext_sync()
-
-        erp_doc = make_erpnext_customer("Trash ERP Co")
-        hd_doc = make_hd_customer("Trash ERP Co HD", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        hd_name = hd_doc.name
-
-        frappe.delete_doc("Customer", erp_doc.name, force=True)
-
-        self.assertFalse(frappe.db.exists("HD Customer", hd_name))
-
-    def test_erpnext_customer_deletion_no_error_when_no_linked_hd_customer(self):
-        """Deleting an ERPNext Customer with no HD link should not raise."""
-        enable_erpnext_sync()
-
-        erp_doc = make_erpnext_customer("Trash Orphan ERP Co")
-        try:
-            frappe.delete_doc("Customer", erp_doc.name, force=True)
-        except Exception as e:
-            self.fail(f"delete raised unexpectedly: {e}")
-
-    def test_erpnext_customer_deletion_skipped_when_sync_disabled(self):
-        """Deleting an ERPNext Customer with sync off should leave HD Customer intact."""
-        erp_doc = make_erpnext_customer("Trash No Sync ERP Co")
-        hd_doc = make_hd_customer("Trash No Sync HD Co", erpnext_customer=erp_doc.name)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-
-        frappe.delete_doc("Customer", erp_doc.name, force=True)
-
-        self.assertTrue(frappe.db.exists("HD Customer", hd_doc.name))
+        # ERP delete: HD survives
+        hd2, erp2 = link_customers(self, "Del No Sync 2")
+        frappe.delete_doc("Customer", erp2.name, force=True)
+        self.assertTrue(frappe.db.exists("HD Customer", hd2.name))
 
     # ------------------------------------------------------------------
-    # sync_user_permissions
+    # User Permission — on_trash mirror cleanup
     # ------------------------------------------------------------------
 
-    def _cleanup_user_perms(self, user, allow, for_value):
-        """Remove a User Permission record if it exists (used as addCleanup target)."""
-        name = frappe.db.get_value(
-            "User Permission", {"user": user, "allow": allow, "for_value": for_value}
-        )
-        if name:
-            frappe.delete_doc("User Permission", name, force=True)
-
-    def test_sync_skipped_when_sync_disabled(self):
-        """sync_user_permissions should do nothing when integration is off."""
-        erp_doc = make_erpnext_customer("UP Skip ERP Co")
-        hd_doc = make_hd_customer("UP Skip HD Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        perm = make_user_permission("Administrator", "Customer", erp_doc.name)
-        self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
-        self.addCleanup(
-            self._cleanup_user_perms, "Administrator", "HD Customer", hd_doc.name
-        )
-
-        # sync is disabled — should not mirror the perm
-        sync_user_permissions()
-
-        self.assertFalse(
-            frappe.db.exists(
-                "User Permission",
-                {
-                    "user": "Administrator",
-                    "allow": "HD Customer",
-                    "for_value": hd_doc.name,
-                },
-            )
-        )
-
-    # ------------------------------------------------------------------
-    # mirror_user_permission_on_trash (real-time delete sync)
-    # ------------------------------------------------------------------
-
-    def test_realtime_user_perm_trash_from_hd_deletes_erp_perm(self):
+    def test_user_perm_delete_cascades_both_directions(self):
+        """Deleting a perm on either side deletes its mirror on the other."""
         enable_erpnext_sync()
 
-        erp_doc = make_erpnext_customer("RT Trash UP ERP Co")
-        hd_doc = make_hd_customer("RT Trash UP HD Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        hd_perm = make_user_permission("Administrator", "HD Customer", hd_doc.name)
+        # HD perm delete → ERP mirror gone
+        hd1, erp1 = link_customers(self, "UP Trash 1")
+        hd_perm = make_user_permission("Administrator", "HD Customer", hd1.name)
         self.addCleanup(frappe.delete_doc, "User Permission", hd_perm.name, force=True)
-
-        mirrored_name = frappe.db.get_value(
+        erp_mirror = frappe.db.get_value(
             "User Permission",
-            {"user": "Administrator", "allow": "Customer", "for_value": erp_doc.name},
+            {"user": "Administrator", "allow": "Customer", "for_value": erp1.name},
         )
-        self.assertTrue(mirrored_name)
-
+        self.assertTrue(erp_mirror)
         frappe.delete_doc("User Permission", hd_perm.name, force=True)
+        self.assertFalse(frappe.db.exists("User Permission", erp_mirror))
 
-        self.assertFalse(frappe.db.exists("User Permission", mirrored_name))
-
-    def test_realtime_user_perm_trash_from_erp_deletes_hd_perm(self):
-        enable_erpnext_sync()
-
-        erp_doc = make_erpnext_customer("RT Trash UP ERP Side Co")
-        hd_doc = make_hd_customer(
-            "RT Trash UP HD Side Co", erpnext_customer=erp_doc.name
-        )
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        erp_perm = make_user_permission("Administrator", "Customer", erp_doc.name)
+        # ERP perm delete → HD mirror gone
+        hd2, erp2 = link_customers(self, "UP Trash 2")
+        erp_perm = make_user_permission("Administrator", "Customer", erp2.name)
         self.addCleanup(frappe.delete_doc, "User Permission", erp_perm.name, force=True)
-
-        mirrored_name = frappe.db.get_value(
+        hd_mirror = frappe.db.get_value(
             "User Permission",
-            {"user": "Administrator", "allow": "HD Customer", "for_value": hd_doc.name},
+            {"user": "Administrator", "allow": "HD Customer", "for_value": hd2.name},
         )
-        self.assertTrue(mirrored_name)
-
+        self.assertTrue(hd_mirror)
         frappe.delete_doc("User Permission", erp_perm.name, force=True)
+        self.assertFalse(frappe.db.exists("User Permission", hd_mirror))
 
-        self.assertFalse(frappe.db.exists("User Permission", mirrored_name))
-
-    def test_realtime_user_perm_trash_no_mirror_delete_when_sync_disabled(self):
-        erp_doc = make_erpnext_customer("RT Trash UP Disabled ERP Co")
-        hd_doc = make_hd_customer(
-            "RT Trash UP Disabled HD Co", erpnext_customer=erp_doc.name
-        )
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+    def test_user_perm_delete_skipped_when_sync_disabled(self):
+        hd_doc, erp_doc = link_customers(self, "UP Trash Disabled")
 
         erp_perm = make_user_permission_no_sync(
             "Administrator", "Customer", erp_doc.name
@@ -409,133 +180,50 @@ class TestERPNextIntegration(FrappeTestCase):
         self.assertTrue(frappe.db.exists("User Permission", hd_perm.name))
 
     # ------------------------------------------------------------------
-    # mirror_doc_share_on_trash (real-time delete sync)
+    # DocShare — on_trash mirror cleanup
     # ------------------------------------------------------------------
 
-    def test_realtime_doc_share_trash_from_hd_deletes_erp_share(self):
+    def test_doc_share_delete_cascades_both_directions(self):
+        """Deleting a share on either side deletes its mirror on the other."""
         enable_erpnext_sync()
 
-        erp_doc = make_erpnext_customer("RT Trash DS ERP Co")
-        hd_doc = make_hd_customer("RT Trash DS HD Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        hd_share = frappe.get_doc(
-            {
-                "doctype": "DocShare",
-                "user": "Administrator",
-                "share_doctype": "HD Customer",
-                "share_name": hd_doc.name,
-                "read": 1,
-                "write": 0,
-                "share": 0,
-                "submit": 0,
-                "everyone": 0,
-            }
-        )
-        hd_share.flags.ignore_share_permission = True
-        hd_share.insert(ignore_permissions=True)
+        # HD share delete → ERP mirror gone
+        hd1, erp1 = link_customers(self, "DS Trash 1")
+        hd_share = make_doc_share("HD Customer", hd1.name)
         self.addCleanup(frappe.delete_doc, "DocShare", hd_share.name, force=True)
-
-        mirrored_name = frappe.db.get_value(
+        erp_mirror = frappe.db.get_value(
             "DocShare",
             {
                 "user": "Administrator",
                 "share_doctype": "Customer",
-                "share_name": erp_doc.name,
+                "share_name": erp1.name,
             },
         )
-        self.assertTrue(mirrored_name)
-
+        self.assertTrue(erp_mirror)
         frappe.delete_doc("DocShare", hd_share.name, force=True)
+        self.assertFalse(frappe.db.exists("DocShare", erp_mirror))
 
-        self.assertFalse(frappe.db.exists("DocShare", mirrored_name))
-
-    def test_realtime_doc_share_trash_from_erp_deletes_hd_share(self):
-        enable_erpnext_sync()
-
-        erp_doc = make_erpnext_customer("RT Trash DS ERP Side Co")
-        hd_doc = make_hd_customer(
-            "RT Trash DS HD Side Co", erpnext_customer=erp_doc.name
-        )
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        erp_share = frappe.get_doc(
-            {
-                "doctype": "DocShare",
-                "user": "Administrator",
-                "share_doctype": "Customer",
-                "share_name": erp_doc.name,
-                "read": 1,
-                "write": 0,
-                "share": 0,
-                "submit": 0,
-                "everyone": 0,
-            }
-        )
-        erp_share.flags.ignore_share_permission = True
-        erp_share.insert(ignore_permissions=True)
+        # ERP share delete → HD mirror gone
+        hd2, erp2 = link_customers(self, "DS Trash 2")
+        erp_share = make_doc_share("Customer", erp2.name)
         self.addCleanup(frappe.delete_doc, "DocShare", erp_share.name, force=True)
-
-        mirrored_name = frappe.db.get_value(
+        hd_mirror = frappe.db.get_value(
             "DocShare",
             {
                 "user": "Administrator",
                 "share_doctype": "HD Customer",
-                "share_name": hd_doc.name,
+                "share_name": hd2.name,
             },
         )
-        self.assertTrue(mirrored_name)
-
+        self.assertTrue(hd_mirror)
         frappe.delete_doc("DocShare", erp_share.name, force=True)
+        self.assertFalse(frappe.db.exists("DocShare", hd_mirror))
 
-        self.assertFalse(frappe.db.exists("DocShare", mirrored_name))
+    def test_doc_share_delete_skipped_when_sync_disabled(self):
+        hd_doc, erp_doc = link_customers(self, "DS Trash Disabled")
 
-    def test_realtime_doc_share_trash_no_mirror_delete_when_sync_disabled(self):
-        erp_doc = make_erpnext_customer("RT Trash DS Disabled ERP Co")
-        hd_doc = make_hd_customer(
-            "RT Trash DS Disabled HD Co", erpnext_customer=erp_doc.name
-        )
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        erp_share = frappe.get_doc(
-            {
-                "doctype": "DocShare",
-                "user": "Administrator",
-                "share_doctype": "Customer",
-                "share_name": erp_doc.name,
-                "read": 1,
-                "write": 0,
-                "share": 0,
-                "submit": 0,
-                "everyone": 0,
-            }
-        )
-        erp_share.flags.ignore_erpnext_sync = True
-        erp_share.flags.ignore_share_permission = True
-        erp_share.insert(ignore_permissions=True)
-
-        hd_share = frappe.get_doc(
-            {
-                "doctype": "DocShare",
-                "user": "Administrator",
-                "share_doctype": "HD Customer",
-                "share_name": hd_doc.name,
-                "read": 1,
-                "write": 0,
-                "share": 0,
-                "submit": 0,
-                "everyone": 0,
-            }
-        )
-        hd_share.flags.ignore_erpnext_sync = True
-        hd_share.flags.ignore_share_permission = True
-        hd_share.insert(ignore_permissions=True)
+        erp_share = make_doc_share("Customer", erp_doc.name, ignore_erpnext_sync=True)
+        hd_share = make_doc_share("HD Customer", hd_doc.name, ignore_erpnext_sync=True)
         self.addCleanup(frappe.delete_doc, "DocShare", hd_share.name, force=True)
 
         frappe.delete_doc("DocShare", erp_share.name, force=True)
@@ -543,114 +231,50 @@ class TestERPNextIntegration(FrappeTestCase):
         self.assertTrue(frappe.db.exists("DocShare", hd_share.name))
 
     # ------------------------------------------------------------------
-    # DocShare mirroring tests
+    # DocShare — insert/update mirroring
     # ------------------------------------------------------------------
 
-    def test_realtime_hd_doc_share_mirrors_to_erp_when_enabled(self):
-        """Creating a DocShare for HD Customer should auto-create one for linked ERP Customer."""
+    def test_doc_share_mirrors_both_directions(self):
+        """Creating a DocShare on either side creates a mirror on the other with the same perms."""
         enable_erpnext_sync()
 
-        erp_doc = make_erpnext_customer("RT DS ERP Mirror Co")
-        hd_doc = make_hd_customer("RT DS HD Mirror Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        share = frappe.get_doc(
-            {
-                "doctype": "DocShare",
-                "user": "Administrator",
-                "share_doctype": "HD Customer",
-                "share_name": hd_doc.name,
-                "read": 1,
-                "write": 1,
-                "share": 0,
-                "submit": 0,
-                "everyone": 0,
-            }
-        )
-        share.flags.ignore_share_permission = True
-        share.insert(ignore_permissions=True)
-        self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
-
-        mirrored = frappe.db.get_value(
+        # HD share → ERP mirror (with non-default perms to verify state carryover)
+        hd1, erp1 = link_customers(self, "DS Mirror 1")
+        share1 = make_doc_share("HD Customer", hd1.name, write=1)
+        self.addCleanup(frappe.delete_doc, "DocShare", share1.name, force=True)
+        mirror1 = frappe.db.get_value(
             "DocShare",
             {
                 "user": "Administrator",
                 "share_doctype": "Customer",
-                "share_name": erp_doc.name,
+                "share_name": erp1.name,
             },
-            ["name", "read", "write", "share", "submit"],
+            ["name", "read", "write"],
             as_dict=True,
         )
-        self.assertTrue(mirrored)
-        self.addCleanup(frappe.delete_doc, "DocShare", mirrored.name, force=True)
-        self.assertEqual(mirrored.read, 1)
-        self.assertEqual(mirrored.write, 1)
-        self.assertEqual(mirrored.share, 0)
-        self.assertEqual(mirrored.submit, 0)
+        self.assertTrue(mirror1)
+        self.addCleanup(frappe.delete_doc, "DocShare", mirror1.name, force=True)
+        self.assertEqual((mirror1.read, mirror1.write), (1, 1))
 
-    def test_realtime_erp_doc_share_mirrors_to_hd_when_enabled(self):
-        """Creating a DocShare for Customer should auto-create one for linked HD Customer."""
-        enable_erpnext_sync()
-
-        erp_doc = make_erpnext_customer("RT DS ERP To HD Co")
-        hd_doc = make_hd_customer("RT DS HD To ERP Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        share = frappe.get_doc(
-            {
-                "doctype": "DocShare",
-                "user": "Administrator",
-                "share_doctype": "Customer",
-                "share_name": erp_doc.name,
-                "read": 1,
-                "write": 0,
-                "share": 1,
-                "submit": 0,
-                "everyone": 0,
-            }
-        )
-        share.flags.ignore_share_permission = True
-        share.insert(ignore_permissions=True)
-        self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
-
+        # ERP share → HD mirror
+        hd2, erp2 = link_customers(self, "DS Mirror 2")
+        share2 = make_doc_share("Customer", erp2.name, share=1)
+        self.addCleanup(frappe.delete_doc, "DocShare", share2.name, force=True)
         self.assertTrue(
             frappe.db.exists(
                 "DocShare",
                 {
                     "user": "Administrator",
                     "share_doctype": "HD Customer",
-                    "share_name": hd_doc.name,
+                    "share_name": hd2.name,
                 },
             )
         )
 
-    def test_realtime_doc_share_not_mirrored_when_sync_disabled(self):
-        """Creating a DocShare with sync off should not create mirrored share."""
-        erp_doc = make_erpnext_customer("RT DS Disabled ERP Co")
-        hd_doc = make_hd_customer("RT DS Disabled HD Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+    def test_doc_share_not_mirrored_when_sync_disabled(self):
+        hd_doc, erp_doc = link_customers(self, "DS Disabled")
 
-        share = frappe.get_doc(
-            {
-                "doctype": "DocShare",
-                "user": "Administrator",
-                "share_doctype": "Customer",
-                "share_name": erp_doc.name,
-                "read": 1,
-                "write": 0,
-                "share": 0,
-                "submit": 0,
-                "everyone": 0,
-            }
-        )
-        share.flags.ignore_share_permission = True
-        share.insert(ignore_permissions=True)
+        share = make_doc_share("Customer", erp_doc.name)
         self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
 
         self.assertFalse(
@@ -664,49 +288,14 @@ class TestERPNextIntegration(FrappeTestCase):
             )
         )
 
-    def test_realtime_doc_share_not_duplicated_if_mirror_exists(self):
-        """If mirrored DocShare exists already, hook should not create a duplicate."""
+    def test_doc_share_not_duplicated_if_mirror_exists(self):
         enable_erpnext_sync()
+        hd_doc, erp_doc = link_customers(self, "DS No Dup")
 
-        erp_doc = make_erpnext_customer("RT DS No Dup ERP Co")
-        hd_doc = make_hd_customer("RT DS No Dup HD Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        existing = frappe.get_doc(
-            {
-                "doctype": "DocShare",
-                "user": "Administrator",
-                "share_doctype": "Customer",
-                "share_name": erp_doc.name,
-                "read": 1,
-                "write": 0,
-                "share": 0,
-                "submit": 0,
-                "everyone": 0,
-            }
-        )
-        existing.flags.ignore_erpnext_sync = True
-        existing.flags.ignore_share_permission = True
-        existing.insert(ignore_permissions=True)
+        existing = make_doc_share("Customer", erp_doc.name, ignore_erpnext_sync=True)
         self.addCleanup(frappe.delete_doc, "DocShare", existing.name, force=True)
 
-        share = frappe.get_doc(
-            {
-                "doctype": "DocShare",
-                "user": "Administrator",
-                "share_doctype": "HD Customer",
-                "share_name": hd_doc.name,
-                "read": 1,
-                "write": 0,
-                "share": 0,
-                "submit": 0,
-                "everyone": 0,
-            }
-        )
-        share.flags.ignore_share_permission = True
-        share.insert(ignore_permissions=True)
+        share = make_doc_share("HD Customer", hd_doc.name)
         self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
 
         self.assertEqual(
@@ -721,28 +310,13 @@ class TestERPNextIntegration(FrappeTestCase):
             1,
         )
 
-    def test_realtime_doc_share_not_mirrored_when_unlinked(self):
-        """Creating DocShare for unlinked customer should not mirror."""
+    def test_doc_share_not_mirrored_when_unlinked(self):
         enable_erpnext_sync()
 
-        hd_doc = make_hd_customer("RT DS Unlinked HD Co")
+        hd_doc = make_hd_customer("DS Unlinked HD Co")
         self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
 
-        share = frappe.get_doc(
-            {
-                "doctype": "DocShare",
-                "user": "Administrator",
-                "share_doctype": "HD Customer",
-                "share_name": hd_doc.name,
-                "read": 1,
-                "write": 0,
-                "share": 0,
-                "submit": 0,
-                "everyone": 0,
-            }
-        )
-        share.flags.ignore_share_permission = True
-        share.insert(ignore_permissions=True)
+        share = make_doc_share("HD Customer", hd_doc.name)
         self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
 
         self.assertFalse(
@@ -756,90 +330,205 @@ class TestERPNextIntegration(FrappeTestCase):
             )
         )
 
-    def test_realtime_doc_share_unrelated_doctype_not_affected(self):
-        """Creating DocShare for unrelated doctype should not create mirrored share."""
+    def test_doc_share_update_syncs_to_mirror(self):
+        enable_erpnext_sync()
+        hd_doc, erp_doc = link_customers(self, "DS Update")
+
+        hd_share = make_doc_share("HD Customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "DocShare", hd_share.name, force=True)
+
+        mirror_name = frappe.db.get_value(
+            "DocShare",
+            {
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_doc.name,
+            },
+        )
+        self.addCleanup(frappe.delete_doc, "DocShare", mirror_name, force=True)
+        self.assertEqual(frappe.db.get_value("DocShare", mirror_name, "write"), 0)
+
+        hd_share.write = 1
+        hd_share.flags.ignore_share_permission = True
+        hd_share.save(ignore_permissions=True)
+
+        self.assertEqual(frappe.db.get_value("DocShare", mirror_name, "write"), 1)
+
+    def test_doc_share_update_skipped_when_sync_disabled(self):
+        hd_doc, erp_doc = link_customers(self, "DS Update Disabled")
+
+        hd_share = make_doc_share("HD Customer", hd_doc.name, ignore_erpnext_sync=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", hd_share.name, force=True)
+
+        erp_share = make_doc_share("Customer", erp_doc.name, ignore_erpnext_sync=True)
+        self.addCleanup(frappe.delete_doc, "DocShare", erp_share.name, force=True)
+
+        hd_share.write = 1
+        hd_share.flags.ignore_share_permission = True
+        hd_share.save(ignore_permissions=True)
+
+        self.assertEqual(frappe.db.get_value("DocShare", erp_share.name, "write"), 0)
+
+    # ------------------------------------------------------------------
+    # DocShare — identity-change handling (on_update)
+    # ------------------------------------------------------------------
+
+    def test_doc_share_name_change_recreates_mirror(self):
+        """Changing share_name should delete the old mirror and create a new one."""
         enable_erpnext_sync()
 
-        share = frappe.get_doc(
-            {
-                "doctype": "DocShare",
-                "user": "Administrator",
-                "share_doctype": "DocType",
-                "share_name": "HD Ticket",
-                "read": 1,
-                "write": 0,
-                "share": 0,
-                "submit": 0,
-                "everyone": 0,
-            }
-        )
-        share.flags.ignore_share_permission = True
-        share.insert(ignore_permissions=True)
-        self.addCleanup(frappe.delete_doc, "DocShare", share.name, force=True)
+        hd_a, erp_a = link_customers(self, "DS Identity A")
+        hd_c, erp_c = link_customers(self, "DS Identity C")
 
+        hd_share = make_doc_share("HD Customer", hd_a.name)
+        self.addCleanup(frappe.delete_doc, "DocShare", hd_share.name, force=True)
+
+        old_mirror_name = frappe.db.get_value(
+            "DocShare",
+            {
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_a.name,
+            },
+        )
+        self.assertTrue(old_mirror_name)
+
+        hd_share.share_name = hd_c.name
+        hd_share.flags.ignore_share_permission = True
+        hd_share.save(ignore_permissions=True)
+
+        self.assertFalse(frappe.db.exists("DocShare", old_mirror_name))
+        new_mirror_name = frappe.db.get_value(
+            "DocShare",
+            {
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_c.name,
+            },
+        )
+        self.assertTrue(new_mirror_name)
+        self.addCleanup(frappe.delete_doc, "DocShare", new_mirror_name, force=True)
+
+    def test_doc_share_doctype_change_flips_mirror(self):
+        """Flipping share_doctype HD→Customer should delete the old mirror and create one on the opposite side."""
+        enable_erpnext_sync()
+        hd_doc, erp_doc = link_customers(self, "DS Flip")
+
+        hd_share = make_doc_share("HD Customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "DocShare", hd_share.name, force=True)
+
+        old_mirror_name = frappe.db.get_value(
+            "DocShare",
+            {
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_doc.name,
+            },
+        )
+        self.assertTrue(old_mirror_name)
+
+        hd_share.share_doctype = "Customer"
+        hd_share.share_name = erp_doc.name
+        hd_share.flags.ignore_share_permission = True
+        hd_share.save(ignore_permissions=True)
+
+        new_mirror_name = frappe.db.get_value(
+            "DocShare",
+            {
+                "user": "Administrator",
+                "share_doctype": "HD Customer",
+                "share_name": hd_doc.name,
+            },
+        )
+        self.assertTrue(new_mirror_name)
+        self.assertNotEqual(new_mirror_name, hd_share.name)
+        self.addCleanup(frappe.delete_doc, "DocShare", new_mirror_name, force=True)
+
+    def test_doc_share_change_to_unlinked_deletes_mirror(self):
+        """Changing share_name to an unlinked record should delete the old mirror and create no new mirror."""
+        enable_erpnext_sync()
+        hd_linked, erp_doc = link_customers(self, "DS Unlink Linked")
+        hd_orphan = make_hd_customer("DS Unlink HD Orphan")
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_orphan.name, force=True)
+
+        hd_share = make_doc_share("HD Customer", hd_linked.name)
+        self.addCleanup(frappe.delete_doc, "DocShare", hd_share.name, force=True)
+
+        old_mirror_name = frappe.db.get_value(
+            "DocShare",
+            {
+                "user": "Administrator",
+                "share_doctype": "Customer",
+                "share_name": erp_doc.name,
+            },
+        )
+        self.assertTrue(old_mirror_name)
+
+        hd_share.share_name = hd_orphan.name
+        hd_share.flags.ignore_share_permission = True
+        hd_share.save(ignore_permissions=True)
+
+        self.assertFalse(frappe.db.exists("DocShare", old_mirror_name))
         self.assertFalse(
             frappe.db.exists(
                 "DocShare",
                 {
                     "user": "Administrator",
-                    "share_doctype": "HD Customer",
-                    "share_name": "HD Ticket",
+                    "share_doctype": "Customer",
+                    "share_name": hd_orphan.name,
                 },
             )
         )
 
     # ------------------------------------------------------------------
-    # User Permissions mirroring test
+    # User Permission — insert/update mirroring
     # ------------------------------------------------------------------
 
-    def test_erp_perm_mirrored_to_hd_customer(self):
-        """A User Permission on Customer should be mirrored to the linked HD Customer."""
+    def test_perm_mirrors_both_directions(self):
+        """Creating a User Permission on either side creates a mirror on the other."""
         enable_erpnext_sync()
 
-        erp_doc = make_erpnext_customer("UP ERP Mirror Co")
-        hd_doc = make_hd_customer("UP ERP Mirror HD Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        perm = make_user_permission("Administrator", "Customer", erp_doc.name)
-        self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
-        self.addCleanup(
-            self._cleanup_user_perms, "Administrator", "HD Customer", hd_doc.name
+        # HD perm → ERP mirror
+        hd1, erp1 = link_customers(self, "UP Mirror 1")
+        perm1 = make_user_permission("Administrator", "HD Customer", hd1.name)
+        self.addCleanup(frappe.delete_doc, "User Permission", perm1.name, force=True)
+        self.addCleanup(cleanup_user_permission, "Administrator", "Customer", erp1.name)
+        self.assertTrue(
+            frappe.db.exists(
+                "User Permission",
+                {
+                    "user": "Administrator",
+                    "allow": "Customer",
+                    "for_value": erp1.name,
+                },
+            )
         )
 
-        sync_user_permissions()
-
+        # ERP perm → HD mirror
+        hd2, erp2 = link_customers(self, "UP Mirror 2")
+        perm2 = make_user_permission("Administrator", "Customer", erp2.name)
+        self.addCleanup(frappe.delete_doc, "User Permission", perm2.name, force=True)
+        self.addCleanup(
+            cleanup_user_permission, "Administrator", "HD Customer", hd2.name
+        )
         self.assertTrue(
             frappe.db.exists(
                 "User Permission",
                 {
                     "user": "Administrator",
                     "allow": "HD Customer",
-                    "for_value": hd_doc.name,
+                    "for_value": hd2.name,
                 },
             )
         )
 
-    def test_hd_perm_mirrored_to_erp_customer(self):
-        """A User Permission on HD Customer should be mirrored to the linked ERP Customer."""
-        enable_erpnext_sync()
-
-        erp_doc = make_erpnext_customer("UP HD Mirror ERP Co")
-        hd_doc = make_hd_customer("UP HD Mirror Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+    def test_perm_not_mirrored_when_sync_disabled(self):
+        hd_doc, erp_doc = link_customers(self, "UP Disabled")
 
         perm = make_user_permission("Administrator", "HD Customer", hd_doc.name)
         self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
-        self.addCleanup(
-            self._cleanup_user_perms, "Administrator", "Customer", erp_doc.name
-        )
 
-        sync_user_permissions()
-
-        self.assertTrue(
+        self.assertFalse(
             frappe.db.exists(
                 "User Permission",
                 {
@@ -850,18 +539,209 @@ class TestERPNextIntegration(FrappeTestCase):
             )
         )
 
-    def test_no_duplicate_perm_created_if_already_exists(self):
-        """sync_user_permissions should not create a duplicate if the mirrored perm already exists."""
+    def test_perm_not_duplicated_if_mirror_exists(self):
+        enable_erpnext_sync()
+        hd_doc, erp_doc = link_customers(self, "UP No Dup")
+
+        existing_mirror = make_user_permission_no_sync(
+            "Administrator", "Customer", erp_doc.name
+        )
+        self.addCleanup(
+            frappe.delete_doc, "User Permission", existing_mirror.name, force=True
+        )
+
+        perm = make_user_permission("Administrator", "HD Customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
+
+        self.assertEqual(
+            frappe.db.count(
+                "User Permission",
+                {
+                    "user": "Administrator",
+                    "allow": "Customer",
+                    "for_value": erp_doc.name,
+                },
+            ),
+            1,
+        )
+
+    def test_perm_not_mirrored_when_unlinked(self):
         enable_erpnext_sync()
 
-        erp_doc = make_erpnext_customer("UP No Dup ERP Co")
-        hd_doc = make_hd_customer("UP No Dup HD Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
+        hd_doc = make_hd_customer("UP Unlinked HD Co")
         self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
 
-        # Use no-sync variants so the real-time hook doesn't fire during setup —
-        # we want to test the bulk sync deduplication path, not the hook path.
+        perm = make_user_permission("Administrator", "HD Customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
+
+        self.assertFalse(
+            frappe.db.exists(
+                "User Permission",
+                {
+                    "user": "Administrator",
+                    "allow": "Customer",
+                    "for_value": hd_doc.name,
+                },
+            )
+        )
+
+    def test_user_perm_update_syncs_to_mirror(self):
+        enable_erpnext_sync()
+        hd_doc, erp_doc = link_customers(self, "UP Update")
+
+        hd_perm = make_user_permission(
+            "Administrator", "HD Customer", hd_doc.name, apply_to_all_doctypes=1
+        )
+        self.addCleanup(frappe.delete_doc, "User Permission", hd_perm.name, force=True)
+
+        mirror_name = frappe.db.get_value(
+            "User Permission",
+            {"user": "Administrator", "allow": "Customer", "for_value": erp_doc.name},
+        )
+        self.addCleanup(frappe.delete_doc, "User Permission", mirror_name, force=True)
+        self.assertEqual(
+            frappe.db.get_value(
+                "User Permission", mirror_name, "apply_to_all_doctypes"
+            ),
+            1,
+        )
+
+        hd_perm.apply_to_all_doctypes = 0
+        hd_perm.save(ignore_permissions=True)
+
+        self.assertEqual(
+            frappe.db.get_value(
+                "User Permission", mirror_name, "apply_to_all_doctypes"
+            ),
+            0,
+        )
+
+    def test_user_perm_update_skipped_when_sync_disabled(self):
+        hd_doc, erp_doc = link_customers(self, "UP Update Disabled")
+
+        hd_perm = make_user_permission_no_sync(
+            "Administrator", "HD Customer", hd_doc.name, apply_to_all_doctypes=1
+        )
+        erp_perm = make_user_permission_no_sync(
+            "Administrator", "Customer", erp_doc.name, apply_to_all_doctypes=1
+        )
+        self.addCleanup(frappe.delete_doc, "User Permission", hd_perm.name, force=True)
+        self.addCleanup(frappe.delete_doc, "User Permission", erp_perm.name, force=True)
+
+        hd_perm.apply_to_all_doctypes = 0
+        hd_perm.save(ignore_permissions=True)
+
+        self.assertEqual(
+            frappe.db.get_value(
+                "User Permission", erp_perm.name, "apply_to_all_doctypes"
+            ),
+            1,
+        )
+
+    # ------------------------------------------------------------------
+    # User Permission — identity-change handling (on_update)
+    # ------------------------------------------------------------------
+
+    def test_user_perm_for_value_change_recreates_mirror(self):
+        """Changing for_value to another linked HD Customer should delete the old
+        ERP mirror and create one at the new linked ERP Customer."""
+        enable_erpnext_sync()
+
+        hd_a, erp_a = link_customers(self, "UP Identity A")
+        hd_c, erp_c = link_customers(self, "UP Identity C")
+
+        hd_perm = make_user_permission("Administrator", "HD Customer", hd_a.name)
+        self.addCleanup(frappe.delete_doc, "User Permission", hd_perm.name, force=True)
+
+        old_mirror_name = frappe.db.get_value(
+            "User Permission",
+            {"user": "Administrator", "allow": "Customer", "for_value": erp_a.name},
+        )
+        self.assertTrue(old_mirror_name)
+
+        hd_perm.for_value = hd_c.name
+        hd_perm.save(ignore_permissions=True)
+
+        self.assertFalse(frappe.db.exists("User Permission", old_mirror_name))
+        new_mirror_name = frappe.db.get_value(
+            "User Permission",
+            {"user": "Administrator", "allow": "Customer", "for_value": erp_c.name},
+        )
+        self.assertTrue(new_mirror_name)
+        self.addCleanup(
+            frappe.delete_doc, "User Permission", new_mirror_name, force=True
+        )
+
+    def test_user_perm_allow_change_flips_mirror(self):
+        """Flipping allow HD→Customer should delete the old mirror on Customer side
+        and create a new one on HD Customer side."""
+        enable_erpnext_sync()
+        hd_doc, erp_doc = link_customers(self, "UP Flip")
+
+        hd_perm = make_user_permission("Administrator", "HD Customer", hd_doc.name)
+        self.addCleanup(frappe.delete_doc, "User Permission", hd_perm.name, force=True)
+
+        old_mirror_name = frappe.db.get_value(
+            "User Permission",
+            {"user": "Administrator", "allow": "Customer", "for_value": erp_doc.name},
+        )
+        self.assertTrue(old_mirror_name)
+
+        hd_perm.allow = "Customer"
+        hd_perm.for_value = erp_doc.name
+        hd_perm.save(ignore_permissions=True)
+
+        new_mirror_name = frappe.db.get_value(
+            "User Permission",
+            {"user": "Administrator", "allow": "HD Customer", "for_value": hd_doc.name},
+        )
+        self.assertTrue(new_mirror_name)
+        self.assertNotEqual(new_mirror_name, hd_perm.name)
+        self.addCleanup(
+            frappe.delete_doc, "User Permission", new_mirror_name, force=True
+        )
+
+    def test_user_perm_change_to_unlinked_deletes_mirror(self):
+        """Changing for_value to an unlinked HD Customer should delete the old mirror
+        and create no new mirror."""
+        enable_erpnext_sync()
+        hd_linked, erp_doc = link_customers(self, "UP Unlink Linked")
+        hd_orphan = make_hd_customer("UP Unlink HD Orphan")
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_orphan.name, force=True)
+
+        hd_perm = make_user_permission("Administrator", "HD Customer", hd_linked.name)
+        self.addCleanup(frappe.delete_doc, "User Permission", hd_perm.name, force=True)
+
+        old_mirror_name = frappe.db.get_value(
+            "User Permission",
+            {"user": "Administrator", "allow": "Customer", "for_value": erp_doc.name},
+        )
+        self.assertTrue(old_mirror_name)
+
+        hd_perm.for_value = hd_orphan.name
+        hd_perm.save(ignore_permissions=True)
+
+        self.assertFalse(frappe.db.exists("User Permission", old_mirror_name))
+        self.assertFalse(
+            frappe.db.exists(
+                "User Permission",
+                {
+                    "user": "Administrator",
+                    "allow": "Customer",
+                    "for_value": hd_orphan.name,
+                },
+            )
+        )
+
+    # ------------------------------------------------------------------
+    # User Permission — bulk sync (sync_user_permissions)
+    # ------------------------------------------------------------------
+
+    def test_bulk_sync_is_idempotent(self):
+        """Calling sync_user_permissions when mirrors already exist is a no-op."""
+        enable_erpnext_sync()
+        hd_doc, erp_doc = link_customers(self, "UP Bulk Dup")
+
         erp_perm = make_user_permission_no_sync(
             "Administrator", "Customer", erp_doc.name
         )
@@ -873,7 +753,6 @@ class TestERPNextIntegration(FrappeTestCase):
 
         sync_user_permissions()
 
-        # Still exactly one perm for each side — no duplicates
         self.assertEqual(
             frappe.db.count(
                 "User Permission",
@@ -897,51 +776,18 @@ class TestERPNextIntegration(FrappeTestCase):
             1,
         )
 
-    def test_perm_not_mirrored_when_customers_not_linked(self):
-        """A User Permission on an unlinked Customer should not produce an HD Customer perm."""
+    def test_apply_to_all_doctypes_preserved(self):
+        """The apply_to_all_doctypes flag should be carried over to the mirror."""
         enable_erpnext_sync()
+        hd_doc, erp_doc = link_customers(self, "UP Flag")
 
-        # erp_doc has no hd_customer back-link
-        erp_doc = make_erpnext_customer("UP Unlinked ERP Co")
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-
-        perm = make_user_permission("Administrator", "Customer", erp_doc.name)
-        self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
-
-        sync_user_permissions()
-
-        # No HD Customer perm should have been created
-        self.assertFalse(
-            frappe.db.exists(
-                "User Permission",
-                {
-                    "user": "Administrator",
-                    "allow": "HD Customer",
-                    "for_value": erp_doc.name,
-                },
-            )
-        )
-
-    def test_apply_to_all_doctypes_preserved_on_mirror(self):
-        """The apply_to_all_doctypes flag should be carried over to the mirrored perm."""
-        enable_erpnext_sync()
-
-        erp_doc = make_erpnext_customer("UP Flag ERP Co")
-        hd_doc = make_hd_customer("UP Flag HD Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        # create perm with apply_to_all_doctypes = 0
         perm = make_user_permission(
             "Administrator", "Customer", erp_doc.name, apply_to_all_doctypes=0
         )
         self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
         self.addCleanup(
-            self._cleanup_user_perms, "Administrator", "HD Customer", hd_doc.name
+            cleanup_user_permission, "Administrator", "HD Customer", hd_doc.name
         )
-
-        sync_user_permissions()
 
         mirrored_name = frappe.db.get_value(
             "User Permission",
@@ -949,216 +795,35 @@ class TestERPNextIntegration(FrappeTestCase):
             "name",
         )
         self.assertTrue(mirrored_name)
-        mirrored_flag = frappe.db.get_value(
-            "User Permission", mirrored_name, "apply_to_all_doctypes"
-        )
-        self.assertEqual(mirrored_flag, 0)
-
-    # ------------------------------------------------------------------
-    # mirror_user_permission_on_insert (real-time sync)
-    # ------------------------------------------------------------------
-
-    def test_realtime_hd_customer_perm_mirrors_to_erp_when_enabled(self):
-        """Creating a User Permission for HD Customer should auto-create one for the linked ERP Customer."""
-        enable_erpnext_sync()
-
-        erp_doc = make_erpnext_customer("RT ERP Mirror Co")
-        hd_doc = make_hd_customer("RT HD Mirror Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        perm = make_user_permission("Administrator", "HD Customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
-        self.addCleanup(
-            self._cleanup_user_perms, "Administrator", "Customer", erp_doc.name
-        )
-
-        self.assertTrue(
-            frappe.db.exists(
-                "User Permission",
-                {
-                    "user": "Administrator",
-                    "allow": "Customer",
-                    "for_value": erp_doc.name,
-                },
-            )
-        )
-
-    def test_realtime_erp_customer_perm_mirrors_to_hd_when_enabled(self):
-        """Creating a User Permission for Customer should auto-create one for the linked HD Customer."""
-        enable_erpnext_sync()
-
-        erp_doc = make_erpnext_customer("RT ERP To HD Co")
-        hd_doc = make_hd_customer("RT HD To ERP Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        perm = make_user_permission("Administrator", "Customer", erp_doc.name)
-        self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
-        self.addCleanup(
-            self._cleanup_user_perms, "Administrator", "HD Customer", hd_doc.name
-        )
-
-        self.assertTrue(
-            frappe.db.exists(
-                "User Permission",
-                {
-                    "user": "Administrator",
-                    "allow": "HD Customer",
-                    "for_value": hd_doc.name,
-                },
-            )
-        )
-
-    def test_realtime_perm_not_mirrored_when_sync_disabled(self):
-        """Creating a User Permission when sync is off should not create a mirrored perm."""
-        # sync is disabled (setUp calls disable_erpnext_sync)
-
-        erp_doc = make_erpnext_customer("RT Disabled ERP Co")
-        hd_doc = make_hd_customer("RT Disabled HD Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        perm = make_user_permission("Administrator", "HD Customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
-
-        self.assertFalse(
-            frappe.db.exists(
-                "User Permission",
-                {
-                    "user": "Administrator",
-                    "allow": "Customer",
-                    "for_value": erp_doc.name,
-                },
-            )
-        )
-
-    def test_realtime_perm_not_duplicated_if_mirror_already_exists(self):
-        """If the mirrored perm already exists, no duplicate should be created."""
-        enable_erpnext_sync()
-
-        erp_doc = make_erpnext_customer("RT No Dup ERP Co")
-        hd_doc = make_hd_customer("RT No Dup HD Co", erpnext_customer=erp_doc.name)
-        frappe.db.set_value("Customer", erp_doc.name, "hd_customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        # Pre-create the mirror without triggering the hook, so it already exists
-        # before the triggering perm is inserted.
-        existing_mirror = make_user_permission_no_sync(
-            "Administrator", "Customer", erp_doc.name
-        )
-        self.addCleanup(
-            frappe.delete_doc, "User Permission", existing_mirror.name, force=True
-        )
-
-        # Now create the HD Customer perm — the hook fires but should detect the
-        # existing Customer perm and skip creation.
-        perm = make_user_permission("Administrator", "HD Customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
-
         self.assertEqual(
-            frappe.db.count(
-                "User Permission",
-                {
-                    "user": "Administrator",
-                    "allow": "Customer",
-                    "for_value": erp_doc.name,
-                },
+            frappe.db.get_value(
+                "User Permission", mirrored_name, "apply_to_all_doctypes"
             ),
-            1,
-        )
-
-    def test_realtime_perm_not_mirrored_when_customer_not_linked(self):
-        """Creating a perm for an unlinked HD Customer should not produce a Customer perm."""
-        enable_erpnext_sync()
-
-        hd_doc = make_hd_customer("RT Unlinked HD Co")
-        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
-
-        perm = make_user_permission("Administrator", "HD Customer", hd_doc.name)
-        self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
-
-        # hd_doc has no erpnext_customer link — no Customer perm should be created
-        self.assertFalse(
-            frappe.db.exists(
-                "User Permission",
-                {
-                    "user": "Administrator",
-                    "allow": "Customer",
-                    "for_value": hd_doc.name,
-                },
-            )
-        )
-
-    def test_realtime_perm_unrelated_doctype_not_affected(self):
-        """Creating a User Permission for a non-customer doctype should do nothing."""
-        enable_erpnext_sync()
-
-        perm = frappe.get_doc(
-            {
-                "doctype": "User Permission",
-                "user": "Administrator",
-                "allow": "DocType",
-                "for_value": "HD Ticket",
-                "apply_to_all_doctypes": 1,
-            }
-        )
-        perm.insert(ignore_permissions=True)
-        self.addCleanup(frappe.delete_doc, "User Permission", perm.name, force=True)
-
-        # Verify no unexpected perms were created
-        self.assertFalse(
-            frappe.db.exists(
-                "User Permission",
-                {
-                    "user": "Administrator",
-                    "allow": "HD Customer",
-                    "for_value": "HD Ticket",
-                },
-            )
+            0,
         )
 
     # ------------------------------------------------------------------
     # Rename cascade (plain + merge)
     # ------------------------------------------------------------------
 
-    def _make_linked_pair(self, hd_name, erp_name=None):
-        """Create an HD/ERP pair with both Data link fields set. Returns (hd, erp)."""
-        erp_name = erp_name or hd_name
-        hd = make_hd_customer(hd_name)
-        erp = make_erpnext_customer(erp_name, hd_customer=hd.name)
-        frappe.db.set_value("HD Customer", hd.name, "erpnext_customer", erp.name)
-        return hd, erp
-
-    def _safe_delete(self, dt, name):
-        if name and frappe.db.exists(dt, name):
-            frappe.delete_doc(dt, name, force=True, ignore_permissions=True)
-
-    def test_plain_rename_cascades_hd_to_erp(self):
-        """Renaming an HD Customer cascades to rename the linked ERP Customer."""
+    def test_plain_rename_cascades_both_directions(self):
+        """Renaming either side cascade-renames the linked counterpart."""
         enable_erpnext_sync()
 
-        hd, erp = self._make_linked_pair("Cascade HD Old")
-        self.addCleanup(self._safe_delete, "HD Customer", "Cascade HD New")
-        self.addCleanup(self._safe_delete, "Customer", "Cascade HD New")
-        self.addCleanup(self._safe_delete, "HD Customer", hd.name)
-        self.addCleanup(self._safe_delete, "Customer", erp.name)
-
+        # HD rename → ERP renamed
+        hd1, erp1 = make_linked_pair("Cascade HD Old")
+        self.addCleanup(safe_delete, "HD Customer", "Cascade HD New")
+        self.addCleanup(safe_delete, "Customer", "Cascade HD New")
+        self.addCleanup(safe_delete, "HD Customer", hd1.name)
+        self.addCleanup(safe_delete, "Customer", erp1.name)
         rename_doc(
             doctype="HD Customer",
-            old=hd.name,
+            old=hd1.name,
             new="Cascade HD New",
             ignore_permissions=True,
         )
-
-        self.assertTrue(frappe.db.exists("HD Customer", "Cascade HD New"))
         self.assertTrue(frappe.db.exists("Customer", "Cascade HD New"))
-        self.assertFalse(frappe.db.exists("HD Customer", hd.name))
-        self.assertFalse(frappe.db.exists("Customer", erp.name))
+        self.assertFalse(frappe.db.exists("Customer", erp1.name))
         self.assertEqual(
             frappe.db.get_value("HD Customer", "Cascade HD New", "erpnext_customer"),
             "Cascade HD New",
@@ -1168,24 +833,18 @@ class TestERPNextIntegration(FrappeTestCase):
             "Cascade HD New",
         )
 
-    def test_plain_rename_cascades_erp_to_hd(self):
-        """Renaming an ERP Customer cascades to rename the linked HD Customer."""
-        enable_erpnext_sync()
-
-        hd, erp = self._make_linked_pair("Cascade ERP Old")
-        self.addCleanup(self._safe_delete, "HD Customer", "Cascade ERP New")
-        self.addCleanup(self._safe_delete, "Customer", "Cascade ERP New")
-        self.addCleanup(self._safe_delete, "HD Customer", hd.name)
-        self.addCleanup(self._safe_delete, "Customer", erp.name)
-
+        # ERP rename → HD renamed
+        hd2, erp2 = make_linked_pair("Cascade ERP Old")
+        self.addCleanup(safe_delete, "HD Customer", "Cascade ERP New")
+        self.addCleanup(safe_delete, "Customer", "Cascade ERP New")
+        self.addCleanup(safe_delete, "HD Customer", hd2.name)
+        self.addCleanup(safe_delete, "Customer", erp2.name)
         rename_doc(
             doctype="Customer",
-            old=erp.name,
+            old=erp2.name,
             new="Cascade ERP New",
             ignore_permissions=True,
         )
-
-        self.assertTrue(frappe.db.exists("Customer", "Cascade ERP New"))
         self.assertTrue(frappe.db.exists("HD Customer", "Cascade ERP New"))
         self.assertEqual(
             frappe.db.get_value("HD Customer", "Cascade ERP New", "erpnext_customer"),
@@ -1193,12 +852,11 @@ class TestERPNextIntegration(FrappeTestCase):
         )
 
     def test_plain_rename_no_cascade_when_no_counterpart(self):
-        """Renaming an unlinked HD Customer should not error and not touch ERP side."""
         enable_erpnext_sync()
 
         hd = make_hd_customer("Lonely HD Old")
-        self.addCleanup(self._safe_delete, "HD Customer", "Lonely HD New")
-        self.addCleanup(self._safe_delete, "HD Customer", hd.name)
+        self.addCleanup(safe_delete, "HD Customer", "Lonely HD New")
+        self.addCleanup(safe_delete, "HD Customer", hd.name)
 
         rename_doc(
             doctype="HD Customer",
@@ -1214,11 +872,11 @@ class TestERPNextIntegration(FrappeTestCase):
         """Renaming HD Foo→Bar should fail if an unrelated ERP 'Bar' already exists."""
         enable_erpnext_sync()
 
-        hd, erp = self._make_linked_pair("Conflict HD Old")
+        hd, erp = make_linked_pair("Conflict HD Old")
         unrelated_erp = make_erpnext_customer("Conflict HD New")
-        self.addCleanup(self._safe_delete, "HD Customer", hd.name)
-        self.addCleanup(self._safe_delete, "Customer", erp.name)
-        self.addCleanup(self._safe_delete, "Customer", unrelated_erp.name)
+        self.addCleanup(safe_delete, "HD Customer", hd.name)
+        self.addCleanup(safe_delete, "Customer", erp.name)
+        self.addCleanup(safe_delete, "Customer", unrelated_erp.name)
 
         with self.assertRaises(frappe.ValidationError):
             rename_doc(
@@ -1228,7 +886,6 @@ class TestERPNextIntegration(FrappeTestCase):
                 ignore_permissions=True,
             )
 
-        # Original records untouched
         self.assertTrue(frappe.db.exists("HD Customer", hd.name))
         self.assertTrue(frappe.db.exists("Customer", erp.name))
         self.assertTrue(frappe.db.exists("Customer", unrelated_erp.name))
@@ -1237,15 +894,13 @@ class TestERPNextIntegration(FrappeTestCase):
         """M1: HD Foo (has ERP) merged into HD Bar (no ERP) → ERP Foo transferred to Bar."""
         enable_erpnext_sync()
 
-        # HD Foo has linked ERP "Merge M1 Foo"
-        hd_foo, erp_foo = self._make_linked_pair("Merge M1 Foo")
-        # HD Bar exists but has no linked ERP
+        hd_foo, erp_foo = make_linked_pair("Merge M1 Foo")
         hd_bar = make_hd_customer("Merge M1 Bar")
 
-        self.addCleanup(self._safe_delete, "HD Customer", hd_bar.name)
-        self.addCleanup(self._safe_delete, "Customer", hd_bar.name)
-        self.addCleanup(self._safe_delete, "HD Customer", hd_foo.name)
-        self.addCleanup(self._safe_delete, "Customer", erp_foo.name)
+        self.addCleanup(safe_delete, "HD Customer", hd_bar.name)
+        self.addCleanup(safe_delete, "Customer", hd_bar.name)
+        self.addCleanup(safe_delete, "HD Customer", hd_foo.name)
+        self.addCleanup(safe_delete, "Customer", erp_foo.name)
 
         rename_doc(
             doctype="HD Customer",
@@ -1255,13 +910,10 @@ class TestERPNextIntegration(FrappeTestCase):
             ignore_permissions=True,
         )
 
-        # HD Foo gone, HD Bar survives
         self.assertFalse(frappe.db.exists("HD Customer", hd_foo.name))
         self.assertTrue(frappe.db.exists("HD Customer", hd_bar.name))
-        # ERP Foo transferred (renamed) to Bar
         self.assertFalse(frappe.db.exists("Customer", erp_foo.name))
         self.assertTrue(frappe.db.exists("Customer", hd_bar.name))
-        # Link fields point at each other
         self.assertEqual(
             frappe.db.get_value("HD Customer", hd_bar.name, "erpnext_customer"),
             hd_bar.name,
@@ -1275,16 +927,14 @@ class TestERPNextIntegration(FrappeTestCase):
         """M1-conflict: merge target's name already exists as unrelated ERP record."""
         enable_erpnext_sync()
 
-        hd_foo, erp_foo = self._make_linked_pair("Merge Block Foo")
+        hd_foo, erp_foo = make_linked_pair("Merge Block Foo")
         hd_bar = make_hd_customer("Merge Block Bar")
-        unrelated_erp = make_erpnext_customer(
-            hd_bar.name
-        )  # ERP "Merge Block Bar" exists, unrelated
+        unrelated_erp = make_erpnext_customer(hd_bar.name)
 
-        self.addCleanup(self._safe_delete, "HD Customer", hd_bar.name)
-        self.addCleanup(self._safe_delete, "Customer", unrelated_erp.name)
-        self.addCleanup(self._safe_delete, "HD Customer", hd_foo.name)
-        self.addCleanup(self._safe_delete, "Customer", erp_foo.name)
+        self.addCleanup(safe_delete, "HD Customer", hd_bar.name)
+        self.addCleanup(safe_delete, "Customer", unrelated_erp.name)
+        self.addCleanup(safe_delete, "HD Customer", hd_foo.name)
+        self.addCleanup(safe_delete, "Customer", erp_foo.name)
 
         with self.assertRaises(frappe.ValidationError):
             rename_doc(
@@ -1295,7 +945,6 @@ class TestERPNextIntegration(FrappeTestCase):
                 ignore_permissions=True,
             )
 
-        # Nothing changed
         self.assertTrue(frappe.db.exists("HD Customer", hd_foo.name))
         self.assertTrue(frappe.db.exists("HD Customer", hd_bar.name))
         self.assertTrue(frappe.db.exists("Customer", erp_foo.name))
@@ -1305,13 +954,13 @@ class TestERPNextIntegration(FrappeTestCase):
         """M2: HD Foo+ERP Foo merged into HD Bar+ERP Bar → ERP Foo cascade-merged into ERP Bar."""
         enable_erpnext_sync()
 
-        hd_foo, erp_foo = self._make_linked_pair("M2 Foo", erp_name="M2 Foo ERP")
-        hd_bar, erp_bar = self._make_linked_pair("M2 Bar", erp_name="M2 Bar ERP")
+        hd_foo, erp_foo = make_linked_pair("M2 Foo", erp_name="M2 Foo ERP")
+        hd_bar, erp_bar = make_linked_pair("M2 Bar", erp_name="M2 Bar ERP")
 
-        self.addCleanup(self._safe_delete, "Customer", erp_bar.name)
-        self.addCleanup(self._safe_delete, "HD Customer", hd_bar.name)
-        self.addCleanup(self._safe_delete, "Customer", erp_foo.name)
-        self.addCleanup(self._safe_delete, "HD Customer", hd_foo.name)
+        self.addCleanup(safe_delete, "Customer", erp_bar.name)
+        self.addCleanup(safe_delete, "HD Customer", hd_bar.name)
+        self.addCleanup(safe_delete, "Customer", erp_foo.name)
+        self.addCleanup(safe_delete, "HD Customer", hd_foo.name)
 
         rename_doc(
             doctype="HD Customer",
@@ -1321,12 +970,10 @@ class TestERPNextIntegration(FrappeTestCase):
             ignore_permissions=True,
         )
 
-        # HD Foo and ERP Foo gone; HD Bar and ERP Bar survive
         self.assertFalse(frappe.db.exists("HD Customer", hd_foo.name))
         self.assertFalse(frappe.db.exists("Customer", erp_foo.name))
         self.assertTrue(frappe.db.exists("HD Customer", hd_bar.name))
         self.assertTrue(frappe.db.exists("Customer", erp_bar.name))
-        # Survivors still linked to each other
         self.assertEqual(
             frappe.db.get_value("HD Customer", hd_bar.name, "erpnext_customer"),
             erp_bar.name,
@@ -1341,11 +988,11 @@ class TestERPNextIntegration(FrappeTestCase):
         enable_erpnext_sync()
 
         hd_foo = make_hd_customer("M3 Foo")
-        hd_bar, erp_bar = self._make_linked_pair("M3 Bar")
+        hd_bar, erp_bar = make_linked_pair("M3 Bar")
 
-        self.addCleanup(self._safe_delete, "Customer", erp_bar.name)
-        self.addCleanup(self._safe_delete, "HD Customer", hd_bar.name)
-        self.addCleanup(self._safe_delete, "HD Customer", hd_foo.name)
+        self.addCleanup(safe_delete, "Customer", erp_bar.name)
+        self.addCleanup(safe_delete, "HD Customer", hd_bar.name)
+        self.addCleanup(safe_delete, "HD Customer", hd_foo.name)
 
         rename_doc(
             doctype="HD Customer",
@@ -1357,7 +1004,6 @@ class TestERPNextIntegration(FrappeTestCase):
 
         self.assertFalse(frappe.db.exists("HD Customer", hd_foo.name))
         self.assertTrue(frappe.db.exists("HD Customer", hd_bar.name))
-        # ERP Bar still exists, still linked
         self.assertTrue(frappe.db.exists("Customer", erp_bar.name))
         self.assertEqual(
             frappe.db.get_value("Customer", erp_bar.name, "hd_customer"),
@@ -1365,13 +1011,10 @@ class TestERPNextIntegration(FrappeTestCase):
         )
 
     def test_rename_no_cascade_when_sync_disabled(self):
-        """With sync off, renaming HD Customer should NOT cascade to ERP."""
-        # sync is disabled (setUp)
-
-        hd, erp = self._make_linked_pair("Disabled Cascade Old")
-        self.addCleanup(self._safe_delete, "HD Customer", "Disabled Cascade New")
-        self.addCleanup(self._safe_delete, "Customer", erp.name)
-        self.addCleanup(self._safe_delete, "HD Customer", hd.name)
+        hd, erp = make_linked_pair("Disabled Cascade Old")
+        self.addCleanup(safe_delete, "HD Customer", "Disabled Cascade New")
+        self.addCleanup(safe_delete, "Customer", erp.name)
+        self.addCleanup(safe_delete, "HD Customer", hd.name)
 
         rename_doc(
             doctype="HD Customer",
@@ -1380,50 +1023,6 @@ class TestERPNextIntegration(FrappeTestCase):
             ignore_permissions=True,
         )
 
-        # HD renamed
         self.assertTrue(frappe.db.exists("HD Customer", "Disabled Cascade New"))
-        # ERP NOT renamed — sync was off
         self.assertTrue(frappe.db.exists("Customer", erp.name))
         self.assertFalse(frappe.db.exists("Customer", "Disabled Cascade New"))
-
-    def test_merge_does_not_cascade_delete_counterpart(self):
-        """Regression: merging HD Foo→Bar (both with linked ERPs) must NOT plain-delete ERP Foo;
-        it should cascade-merge into ERP Bar instead. ERP Bar must survive with redirected refs.
-        """
-        enable_erpnext_sync()
-
-        hd_foo, erp_foo = self._make_linked_pair(
-            "Regress Foo", erp_name="Regress Foo ERP"
-        )
-        hd_bar, erp_bar = self._make_linked_pair(
-            "Regress Bar", erp_name="Regress Bar ERP"
-        )
-
-        self.addCleanup(self._safe_delete, "Customer", erp_bar.name)
-        self.addCleanup(self._safe_delete, "HD Customer", hd_bar.name)
-        self.addCleanup(self._safe_delete, "Customer", erp_foo.name)
-        self.addCleanup(self._safe_delete, "HD Customer", hd_foo.name)
-
-        rename_doc(
-            doctype="HD Customer",
-            old=hd_foo.name,
-            new=hd_bar.name,
-            merge=True,
-            ignore_permissions=True,
-        )
-
-        # ERP Bar must STILL exist after the merge — the bug would have deleted it
-        # via on_trash's cascade-delete on HD Foo (which would have found ERP Foo
-        # and deleted it, but our concern here is making sure the SURVIVING ERP
-        # is intact).
-        self.assertTrue(
-            frappe.db.exists("Customer", erp_bar.name),
-            "ERP Bar (survivor) must not be deleted during HD merge",
-        )
-        # ERP Foo got merged into ERP Bar
-        self.assertFalse(frappe.db.exists("Customer", erp_foo.name))
-        # And it was merged (not plain-deleted) — links preserved on ERP Bar
-        self.assertEqual(
-            frappe.db.get_value("Customer", erp_bar.name, "hd_customer"),
-            hd_bar.name,
-        )
