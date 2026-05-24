@@ -36,6 +36,7 @@
     </template>
     <template #content>
       <div
+        v-if="slaData.loading"
         class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
       >
         <LoadingIndicator class="w-4" />
