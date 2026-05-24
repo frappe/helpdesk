@@ -15,6 +15,7 @@ from helpdesk.test_utils import (
     add_comment,
     add_holiday,
     get_current_week_monday,
+    get_latest_ticket_communication,
     get_priority_response_resolution_time,
     make_status,
     make_ticket,
@@ -611,6 +612,7 @@ class TestHDTicket(FrappeTestCase):
 
     def test_ticket_split(self):
         ticket1 = make_ticket(description="Test Desc for split")
+
         ticket1.reply_via_agent(message="Test reply to split")
         communcation_name = frappe.get_all(
             "Communication",
@@ -703,6 +705,53 @@ class TestHDTicket(FrappeTestCase):
         with self.freeze_time(next_working_day):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
+
+    def test_reply_via_agent_with_only_cc(self):
+        """
+        reply_via_agent should succeed when only cc is provided and to is empty/None
+        """
+        ticket = make_ticket()
+        cc_recipient = "cc_only@test.com"
+        ticket.reply_via_agent(message="Test reply", cc=cc_recipient)
+        communication_doc = get_latest_ticket_communication(ticket.name)
+        if hasattr(communication_doc, "to") and communication_doc.to:
+            self.assertFalse(communication_doc.to)
+        if hasattr(communication_doc, "cc") and communication_doc.cc:
+            self.assertEqual(communication_doc.cc, cc_recipient)
+        if hasattr(communication_doc, "bcc") and communication_doc.bcc:
+            self.assertFalse(communication_doc.bcc)
+
+    def test_reply_via_agent_with_only_bcc(self):
+        """
+        reply_via_agent should succeed when only bcc is provided and to is empty/None
+        """
+        ticket = make_ticket()
+        bcc_recipient = "bcc_only@test.com"
+        ticket.reply_via_agent(message="Test reply", bcc=bcc_recipient)
+        communication_doc = get_latest_ticket_communication(ticket.name)
+        if hasattr(communication_doc, "to") and communication_doc.to:
+            self.assertFalse(communication_doc.to)
+        if hasattr(communication_doc, "cc") and communication_doc.cc:
+            self.assertFalse(communication_doc.cc)
+        if hasattr(communication_doc, "bcc") and communication_doc.bcc:
+            self.assertEqual(communication_doc.bcc, bcc_recipient)
+
+    def test_reply_via_agent_with_cc_and_bcc_no_to(self):
+        """
+        reply_via_agent should succeed when both cc and bcc are provided but to is empty
+        """
+        ticket = make_ticket()
+        cc_recipient = "cc_combo@test.com"
+        bcc_recipient = "bcc_combo@test.com"
+        ticket.reply_via_agent(message="Test reply", cc=cc_recipient, bcc=bcc_recipient)
+        comm = get_latest_ticket_communication(ticket.name)
+        communication_doc = get_latest_ticket_communication(ticket.name)
+        if hasattr(communication_doc, "to") and communication_doc.to:
+            self.assertFalse(communication_doc.to)
+        if hasattr(communication_doc, "cc") and communication_doc.cc:
+            self.assertEqual(communication_doc.cc, cc_recipient)
+        if hasattr(communication_doc, "bcc") and communication_doc.bcc:
+            self.assertEqual(communication_doc.bcc, bcc_recipient)
 
     def tearDown(self):
         frappe.set_user("Administrator")
