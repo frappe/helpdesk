@@ -151,13 +151,14 @@ class TestERPNextIntegration(FrappeTestCase):
     # ------------------------------------------------------------------
 
     def test_after_rename_updates_hd_customer_on_erp(self):
-        """Renaming an HD Customer should update hd_customer on the linked ERP Customer."""
+        """Renaming an HD Customer should cascade-rename the linked ERP Customer."""
         enable_erpnext_sync()
 
         hd_doc = make_hd_customer("Rename Source Co")
         self.addCleanup(
             frappe.delete_doc, "HD Customer", "Rename Target Co", force=True
         )
+        self.addCleanup(frappe.delete_doc, "Customer", "Rename Target Co", force=True)
 
         erp_doc = make_erpnext_customer("Rename Source Co ERP", hd_customer=hd_doc.name)
         self.addCleanup(frappe.delete_doc, "Customer", erp_doc.name, force=True)
@@ -173,8 +174,11 @@ class TestERPNextIntegration(FrappeTestCase):
             ignore_permissions=True,
         )
 
+        # ERP counterpart was cascade-renamed
+        self.assertFalse(frappe.db.exists("Customer", erp_doc.name))
+        self.assertTrue(frappe.db.exists("Customer", "Rename Target Co"))
         self.assertEqual(
-            frappe.db.get_value("Customer", erp_doc.name, "hd_customer"),
+            frappe.db.get_value("Customer", "Rename Target Co", "hd_customer"),
             "Rename Target Co",
         )
 
@@ -1116,4 +1120,310 @@ class TestERPNextIntegration(FrappeTestCase):
                     "for_value": "HD Ticket",
                 },
             )
+        )
+
+    # ------------------------------------------------------------------
+    # Rename cascade (plain + merge)
+    # ------------------------------------------------------------------
+
+    def _make_linked_pair(self, hd_name, erp_name=None):
+        """Create an HD/ERP pair with both Data link fields set. Returns (hd, erp)."""
+        erp_name = erp_name or hd_name
+        hd = make_hd_customer(hd_name)
+        erp = make_erpnext_customer(erp_name, hd_customer=hd.name)
+        frappe.db.set_value("HD Customer", hd.name, "erpnext_customer", erp.name)
+        return hd, erp
+
+    def _safe_delete(self, dt, name):
+        if name and frappe.db.exists(dt, name):
+            frappe.delete_doc(dt, name, force=True, ignore_permissions=True)
+
+    def test_plain_rename_cascades_hd_to_erp(self):
+        """Renaming an HD Customer cascades to rename the linked ERP Customer."""
+        enable_erpnext_sync()
+
+        hd, erp = self._make_linked_pair("Cascade HD Old")
+        self.addCleanup(self._safe_delete, "HD Customer", "Cascade HD New")
+        self.addCleanup(self._safe_delete, "Customer", "Cascade HD New")
+        self.addCleanup(self._safe_delete, "HD Customer", hd.name)
+        self.addCleanup(self._safe_delete, "Customer", erp.name)
+
+        rename_doc(
+            doctype="HD Customer",
+            old=hd.name,
+            new="Cascade HD New",
+            ignore_permissions=True,
+        )
+
+        self.assertTrue(frappe.db.exists("HD Customer", "Cascade HD New"))
+        self.assertTrue(frappe.db.exists("Customer", "Cascade HD New"))
+        self.assertFalse(frappe.db.exists("HD Customer", hd.name))
+        self.assertFalse(frappe.db.exists("Customer", erp.name))
+        self.assertEqual(
+            frappe.db.get_value("HD Customer", "Cascade HD New", "erpnext_customer"),
+            "Cascade HD New",
+        )
+        self.assertEqual(
+            frappe.db.get_value("Customer", "Cascade HD New", "hd_customer"),
+            "Cascade HD New",
+        )
+
+    def test_plain_rename_cascades_erp_to_hd(self):
+        """Renaming an ERP Customer cascades to rename the linked HD Customer."""
+        enable_erpnext_sync()
+
+        hd, erp = self._make_linked_pair("Cascade ERP Old")
+        self.addCleanup(self._safe_delete, "HD Customer", "Cascade ERP New")
+        self.addCleanup(self._safe_delete, "Customer", "Cascade ERP New")
+        self.addCleanup(self._safe_delete, "HD Customer", hd.name)
+        self.addCleanup(self._safe_delete, "Customer", erp.name)
+
+        rename_doc(
+            doctype="Customer",
+            old=erp.name,
+            new="Cascade ERP New",
+            ignore_permissions=True,
+        )
+
+        self.assertTrue(frappe.db.exists("Customer", "Cascade ERP New"))
+        self.assertTrue(frappe.db.exists("HD Customer", "Cascade ERP New"))
+        self.assertEqual(
+            frappe.db.get_value("HD Customer", "Cascade ERP New", "erpnext_customer"),
+            "Cascade ERP New",
+        )
+
+    def test_plain_rename_no_cascade_when_no_counterpart(self):
+        """Renaming an unlinked HD Customer should not error and not touch ERP side."""
+        enable_erpnext_sync()
+
+        hd = make_hd_customer("Lonely HD Old")
+        self.addCleanup(self._safe_delete, "HD Customer", "Lonely HD New")
+        self.addCleanup(self._safe_delete, "HD Customer", hd.name)
+
+        rename_doc(
+            doctype="HD Customer",
+            old=hd.name,
+            new="Lonely HD New",
+            ignore_permissions=True,
+        )
+
+        self.assertTrue(frappe.db.exists("HD Customer", "Lonely HD New"))
+        self.assertFalse(frappe.db.exists("Customer", "Lonely HD New"))
+
+    def test_plain_rename_blocked_on_other_side_conflict(self):
+        """Renaming HD Foo→Bar should fail if an unrelated ERP 'Bar' already exists."""
+        enable_erpnext_sync()
+
+        hd, erp = self._make_linked_pair("Conflict HD Old")
+        unrelated_erp = make_erpnext_customer("Conflict HD New")
+        self.addCleanup(self._safe_delete, "HD Customer", hd.name)
+        self.addCleanup(self._safe_delete, "Customer", erp.name)
+        self.addCleanup(self._safe_delete, "Customer", unrelated_erp.name)
+
+        with self.assertRaises(frappe.ValidationError):
+            rename_doc(
+                doctype="HD Customer",
+                old=hd.name,
+                new="Conflict HD New",
+                ignore_permissions=True,
+            )
+
+        # Original records untouched
+        self.assertTrue(frappe.db.exists("HD Customer", hd.name))
+        self.assertTrue(frappe.db.exists("Customer", erp.name))
+        self.assertTrue(frappe.db.exists("Customer", unrelated_erp.name))
+
+    def test_merge_transfers_when_target_has_no_counterpart(self):
+        """M1: HD Foo (has ERP) merged into HD Bar (no ERP) → ERP Foo transferred to Bar."""
+        enable_erpnext_sync()
+
+        # HD Foo has linked ERP "Merge M1 Foo"
+        hd_foo, erp_foo = self._make_linked_pair("Merge M1 Foo")
+        # HD Bar exists but has no linked ERP
+        hd_bar = make_hd_customer("Merge M1 Bar")
+
+        self.addCleanup(self._safe_delete, "HD Customer", hd_bar.name)
+        self.addCleanup(self._safe_delete, "Customer", hd_bar.name)
+        self.addCleanup(self._safe_delete, "HD Customer", hd_foo.name)
+        self.addCleanup(self._safe_delete, "Customer", erp_foo.name)
+
+        rename_doc(
+            doctype="HD Customer",
+            old=hd_foo.name,
+            new=hd_bar.name,
+            merge=True,
+            ignore_permissions=True,
+        )
+
+        # HD Foo gone, HD Bar survives
+        self.assertFalse(frappe.db.exists("HD Customer", hd_foo.name))
+        self.assertTrue(frappe.db.exists("HD Customer", hd_bar.name))
+        # ERP Foo transferred (renamed) to Bar
+        self.assertFalse(frappe.db.exists("Customer", erp_foo.name))
+        self.assertTrue(frappe.db.exists("Customer", hd_bar.name))
+        # Link fields point at each other
+        self.assertEqual(
+            frappe.db.get_value("HD Customer", hd_bar.name, "erpnext_customer"),
+            hd_bar.name,
+        )
+        self.assertEqual(
+            frappe.db.get_value("Customer", hd_bar.name, "hd_customer"),
+            hd_bar.name,
+        )
+
+    def test_merge_blocked_when_target_has_unrelated_counterpart(self):
+        """M1-conflict: merge target's name already exists as unrelated ERP record."""
+        enable_erpnext_sync()
+
+        hd_foo, erp_foo = self._make_linked_pair("Merge Block Foo")
+        hd_bar = make_hd_customer("Merge Block Bar")
+        unrelated_erp = make_erpnext_customer(
+            hd_bar.name
+        )  # ERP "Merge Block Bar" exists, unrelated
+
+        self.addCleanup(self._safe_delete, "HD Customer", hd_bar.name)
+        self.addCleanup(self._safe_delete, "Customer", unrelated_erp.name)
+        self.addCleanup(self._safe_delete, "HD Customer", hd_foo.name)
+        self.addCleanup(self._safe_delete, "Customer", erp_foo.name)
+
+        with self.assertRaises(frappe.ValidationError):
+            rename_doc(
+                doctype="HD Customer",
+                old=hd_foo.name,
+                new=hd_bar.name,
+                merge=True,
+                ignore_permissions=True,
+            )
+
+        # Nothing changed
+        self.assertTrue(frappe.db.exists("HD Customer", hd_foo.name))
+        self.assertTrue(frappe.db.exists("HD Customer", hd_bar.name))
+        self.assertTrue(frappe.db.exists("Customer", erp_foo.name))
+        self.assertTrue(frappe.db.exists("Customer", unrelated_erp.name))
+
+    def test_merge_cascades_into_existing_counterpart(self):
+        """M2: HD Foo+ERP Foo merged into HD Bar+ERP Bar → ERP Foo cascade-merged into ERP Bar."""
+        enable_erpnext_sync()
+
+        hd_foo, erp_foo = self._make_linked_pair("M2 Foo", erp_name="M2 Foo ERP")
+        hd_bar, erp_bar = self._make_linked_pair("M2 Bar", erp_name="M2 Bar ERP")
+
+        self.addCleanup(self._safe_delete, "Customer", erp_bar.name)
+        self.addCleanup(self._safe_delete, "HD Customer", hd_bar.name)
+        self.addCleanup(self._safe_delete, "Customer", erp_foo.name)
+        self.addCleanup(self._safe_delete, "HD Customer", hd_foo.name)
+
+        rename_doc(
+            doctype="HD Customer",
+            old=hd_foo.name,
+            new=hd_bar.name,
+            merge=True,
+            ignore_permissions=True,
+        )
+
+        # HD Foo and ERP Foo gone; HD Bar and ERP Bar survive
+        self.assertFalse(frappe.db.exists("HD Customer", hd_foo.name))
+        self.assertFalse(frappe.db.exists("Customer", erp_foo.name))
+        self.assertTrue(frappe.db.exists("HD Customer", hd_bar.name))
+        self.assertTrue(frappe.db.exists("Customer", erp_bar.name))
+        # Survivors still linked to each other
+        self.assertEqual(
+            frappe.db.get_value("HD Customer", hd_bar.name, "erpnext_customer"),
+            erp_bar.name,
+        )
+        self.assertEqual(
+            frappe.db.get_value("Customer", erp_bar.name, "hd_customer"),
+            hd_bar.name,
+        )
+
+    def test_merge_no_op_on_other_side_when_old_has_no_counterpart(self):
+        """M3: HD Foo (no ERP) merged into HD Bar (has ERP Bar) → ERP side untouched."""
+        enable_erpnext_sync()
+
+        hd_foo = make_hd_customer("M3 Foo")
+        hd_bar, erp_bar = self._make_linked_pair("M3 Bar")
+
+        self.addCleanup(self._safe_delete, "Customer", erp_bar.name)
+        self.addCleanup(self._safe_delete, "HD Customer", hd_bar.name)
+        self.addCleanup(self._safe_delete, "HD Customer", hd_foo.name)
+
+        rename_doc(
+            doctype="HD Customer",
+            old=hd_foo.name,
+            new=hd_bar.name,
+            merge=True,
+            ignore_permissions=True,
+        )
+
+        self.assertFalse(frappe.db.exists("HD Customer", hd_foo.name))
+        self.assertTrue(frappe.db.exists("HD Customer", hd_bar.name))
+        # ERP Bar still exists, still linked
+        self.assertTrue(frappe.db.exists("Customer", erp_bar.name))
+        self.assertEqual(
+            frappe.db.get_value("Customer", erp_bar.name, "hd_customer"),
+            hd_bar.name,
+        )
+
+    def test_rename_no_cascade_when_sync_disabled(self):
+        """With sync off, renaming HD Customer should NOT cascade to ERP."""
+        # sync is disabled (setUp)
+
+        hd, erp = self._make_linked_pair("Disabled Cascade Old")
+        self.addCleanup(self._safe_delete, "HD Customer", "Disabled Cascade New")
+        self.addCleanup(self._safe_delete, "Customer", erp.name)
+        self.addCleanup(self._safe_delete, "HD Customer", hd.name)
+
+        rename_doc(
+            doctype="HD Customer",
+            old=hd.name,
+            new="Disabled Cascade New",
+            ignore_permissions=True,
+        )
+
+        # HD renamed
+        self.assertTrue(frappe.db.exists("HD Customer", "Disabled Cascade New"))
+        # ERP NOT renamed — sync was off
+        self.assertTrue(frappe.db.exists("Customer", erp.name))
+        self.assertFalse(frappe.db.exists("Customer", "Disabled Cascade New"))
+
+    def test_merge_does_not_cascade_delete_counterpart(self):
+        """Regression: merging HD Foo→Bar (both with linked ERPs) must NOT plain-delete ERP Foo;
+        it should cascade-merge into ERP Bar instead. ERP Bar must survive with redirected refs.
+        """
+        enable_erpnext_sync()
+
+        hd_foo, erp_foo = self._make_linked_pair(
+            "Regress Foo", erp_name="Regress Foo ERP"
+        )
+        hd_bar, erp_bar = self._make_linked_pair(
+            "Regress Bar", erp_name="Regress Bar ERP"
+        )
+
+        self.addCleanup(self._safe_delete, "Customer", erp_bar.name)
+        self.addCleanup(self._safe_delete, "HD Customer", hd_bar.name)
+        self.addCleanup(self._safe_delete, "Customer", erp_foo.name)
+        self.addCleanup(self._safe_delete, "HD Customer", hd_foo.name)
+
+        rename_doc(
+            doctype="HD Customer",
+            old=hd_foo.name,
+            new=hd_bar.name,
+            merge=True,
+            ignore_permissions=True,
+        )
+
+        # ERP Bar must STILL exist after the merge — the bug would have deleted it
+        # via on_trash's cascade-delete on HD Foo (which would have found ERP Foo
+        # and deleted it, but our concern here is making sure the SURVIVING ERP
+        # is intact).
+        self.assertTrue(
+            frappe.db.exists("Customer", erp_bar.name),
+            "ERP Bar (survivor) must not be deleted during HD merge",
+        )
+        # ERP Foo got merged into ERP Bar
+        self.assertFalse(frappe.db.exists("Customer", erp_foo.name))
+        # And it was merged (not plain-deleted) — links preserved on ERP Bar
+        self.assertEqual(
+            frappe.db.get_value("Customer", erp_bar.name, "hd_customer"),
+            hd_bar.name,
         )
