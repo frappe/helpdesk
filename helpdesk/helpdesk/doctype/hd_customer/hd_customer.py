@@ -4,7 +4,9 @@
 import frappe
 from frappe.model.document import Document
 
+from helpdesk.integrations.erpnext.utils import cascade_rename, in_cascade
 from helpdesk.integrations.erpnext.utils import should_sync as should_sync_with_erpnext
+from helpdesk.integrations.erpnext.utils import validate_rename_conflict
 
 
 class HDCustomer(Document):
@@ -79,18 +81,14 @@ class HDCustomer(Document):
                 self.image,
             )
 
-    def after_rename(self, olddn, newdn, merge=False):
-        if not should_sync_with_erpnext():
-            return
+    def before_rename(self, olddn, newdn, merge=False):
+        validate_rename_conflict("HD Customer", olddn, newdn, merge)
 
-        erpnext_customer = frappe.db.get_value(
-            "Customer", {"hd_customer": olddn}, "name"
-        )
-        if erpnext_customer:
-            frappe.db.set_value("Customer", erpnext_customer, "hd_customer", newdn)
+    def after_rename(self, olddn, newdn, merge=False):
+        cascade_rename("HD Customer", olddn, newdn, merge)
 
     def on_trash(self):
-        if not should_sync_with_erpnext():
+        if in_cascade() or not should_sync_with_erpnext():
             return
 
         erpnext_customer = frappe.db.get_value(

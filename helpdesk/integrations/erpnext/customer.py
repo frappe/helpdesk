@@ -1,7 +1,13 @@
 import frappe
 from erpnext.selling.doctype.customer.customer import Customer
 
-from helpdesk.integrations.erpnext.utils import set_links, should_sync
+from helpdesk.integrations.erpnext.utils import (
+    cascade_rename,
+    in_cascade,
+    set_links,
+    should_sync,
+    validate_rename_conflict,
+)
 
 
 class CustomCustomer(Customer):
@@ -47,23 +53,18 @@ class CustomCustomer(Customer):
                 self.image,
             )
 
+    def before_rename(self, olddn, newdn, merge=False):
+        super().before_rename(olddn, newdn, merge)
+        validate_rename_conflict("Customer", olddn, newdn, merge)
+
     def after_rename(self, olddn, newdn, merge=False):
         super().after_rename(olddn, newdn, merge)
-
-        if not should_sync():
-            return
-
-        frappe.db.set_value(
-            "HD Customer",
-            {"erpnext_customer": olddn},
-            "erpnext_customer",
-            newdn,
-        )
+        cascade_rename("Customer", olddn, newdn, merge)
 
     def on_trash(self):
         super().on_trash()
 
-        if not should_sync():
+        if in_cascade() or not should_sync():
             return
 
         hd_customer = frappe.db.get_value(
