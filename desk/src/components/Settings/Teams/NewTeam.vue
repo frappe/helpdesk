@@ -59,9 +59,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from "vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-<<<<<<< HEAD
-import { Badge, ErrorMessage, FormControl, FormLabel, toast } from "frappe-ui";
-=======
 import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import {
   Badge,
@@ -71,7 +68,6 @@ import {
   Switch,
   toast,
 } from "frappe-ui";
->>>>>>> 1982d5d8 (fix: use reusable components for EmptyState and Badge transtions)
 import { __ } from "@/translation";
 import AgentSelector from "./components/AgentSelector.vue";
 import { useAgentStore } from "@/stores/agent";

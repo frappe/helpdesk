@@ -14,19 +14,6 @@
       </div>
     </div>
     <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar">
-<<<<<<< HEAD
-      <table class="w-full table-auto">
-<<<<<<< HEAD
-        <thead v-if="chartConfig?.tickets?.length > 0">
-          <tr class="text-sm text-gray-600">
-=======
-        <thead
-          v-if="
-            !getPendingTicketsResource.loading &&
-            chartConfig?.tickets?.length > 0
-          "
-        >
-=======
       <table
         class="w-full table-auto transition-opacity duration-150"
         :class="{
@@ -34,9 +21,7 @@
         }"
       >
         <thead v-if="!showSkeleton && chartConfig?.tickets?.length > 0">
->>>>>>> ec40d5a3 (fix: flicker when tabs are changed)
           <tr class="text-sm text-ink-gray-5">
->>>>>>> 197e8c53 (fix: ui issues with centering of loading states and loading indicator)
             <th class="p-2 text-left font-normal whitespace-nowrap">
               {{ __("ID") }}
             </th>

@@ -124,8 +124,6 @@
 </template>
 
 <script setup lang="ts">
-<<<<<<< HEAD
-=======
 import EditIcon from "@/components/icons/EditIcon.vue";
 import AgentIcon from "@/components/icons/AgentIcon.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
@@ -133,7 +131,6 @@ import EmptyState from "@/components/EmptyState.vue";
 import { __ } from "@/translation";
 import { TeamListResourceSymbol } from "@/types";
 import { ConfirmDelete } from "@/utils";
->>>>>>> 1982d5d8 (fix: use reusable components for EmptyState and Badge transtions)
 import { Dropdown, Input, toast } from "frappe-ui";
 import { inject, markRaw, Ref, ref, watch } from "vue";
 import NewTeamModal from "../NewTeamModal.vue";
