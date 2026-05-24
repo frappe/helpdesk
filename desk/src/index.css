@@ -93,3 +93,19 @@ body {
 .fade-leave-to {
   opacity: 0;
 }
+
+/* Scroll-driven edge fade for scrollable dropdown groups.*/
+@property --fade-bottom {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 20px;
+}
+
+@keyframes scroll-fade {
+  0% {
+    --fade-bottom: 20px;
+  }
+  100% {
+    --fade-bottom: 0px;
+  }
+}

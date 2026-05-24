@@ -99,28 +99,17 @@
         />
       </div>
       <!-- Empty State -->
-      <div
+      <EmptyState
         v-if="!teams.loading && !teams.data?.length"
-        class="flex flex-col items-center justify-center gap-4 h-full"
-      >
-        <div
-          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
-        >
-          <AgentIcon class="size-6 text-ink-gray-6" />
-        </div>
-        <div class="flex flex-col items-center gap-1">
-          <div class="text-base font-medium text-ink-gray-6">
-            {{ __("No team found") }}
-          </div>
-          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-            {{
-              teamsSearchQuery.length
-                ? __("Change your search terms to find teams.")
-                : __("Add one to get started.")
-            }}
-          </div>
-        </div>
-      </div>
+        variant="badge"
+        :icon="AgentIcon"
+        title="No team found"
+        :description="
+          teamsSearchQuery.length
+            ? 'Change your search terms to find teams.'
+            : 'Add one to get started.'
+        "
+      />
     </template>
   </SettingsLayoutBase>
   <NewTeamModal
@@ -135,6 +124,8 @@
 </template>
 
 <script setup lang="ts">
+import AgentIcon from "@/components/icons/AgentIcon.vue";
+import EmptyState from "@/components/EmptyState.vue";
 import { Dropdown, Input, toast } from "frappe-ui";
 import { inject, markRaw, Ref, ref, watch } from "vue";
 import NewTeamModal from "../NewTeamModal.vue";

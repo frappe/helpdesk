@@ -14,9 +14,14 @@
       </div>
     </div>
     <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar">
-      <table class="w-full table-auto">
-        <thead v-if="chartConfig?.tickets?.length > 0">
-          <tr class="text-sm text-gray-600">
+      <table
+        class="w-full table-auto transition-opacity duration-150"
+        :class="{
+          'opacity-60': getPendingTicketsResource.loading && !showSkeleton,
+        }"
+      >
+        <thead v-if="!showSkeleton && chartConfig?.tickets?.length > 0">
+          <tr class="text-sm text-ink-gray-5">
             <th class="p-2 text-left font-normal whitespace-nowrap">
               {{ __("ID") }}
             </th>
@@ -37,7 +42,10 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="chartConfig?.tickets?.length > 0" class="grow">
+        <tbody
+          v-if="!showSkeleton && chartConfig?.tickets?.length > 0"
+          class="grow"
+        >
           <tr
             v-for="ticket in chartConfig?.tickets"
             :key="ticket.name"
@@ -115,7 +123,10 @@
           </tr>
           <EmptyState
             class="absolute inset-0 z-10"
-            v-if="chartConfig?.tickets?.length === 0"
+            v-if="
+              !getPendingTicketsResource.loading &&
+              chartConfig?.tickets?.length === 0
+            "
             :title="emptyState.title"
             :description="emptyState.description"
             variant="overlay"
@@ -273,9 +284,20 @@ const chartConfig = computed(() => {
   };
 });
 
+const hasLoadedOnce = ref(false);
+
 const getPendingTicketsResource = createResource({
   url: "helpdesk.api.agent_home.agent_home.get_pending_tickets",
+  onSuccess() {
+    hasLoadedOnce.value = true;
+  },
 });
+
+// Show the skeleton only on the first load. On later tab switches we keep the
+// previous rows visible (dimmed) until fresh data arrives, avoiding a flicker.
+const showSkeleton = computed(
+  () => getPendingTicketsResource.loading && !hasLoadedOnce.value
+);
 
 function getPriorityBadgeColor(integerValue: number) {
   const min = chartConfig.value.minPriority;

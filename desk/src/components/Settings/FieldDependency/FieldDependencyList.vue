@@ -42,27 +42,16 @@
         </div>
 
         <!-- Empty State -->
-        <div
+        <EmptyState
           v-if="
             !fieldDependenciesList.loading &&
             !fieldDependenciesList.data?.length
           "
-          class="flex flex-col items-center justify-center gap-4 p-4 h-full"
-        >
-          <div
-            class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
-          >
-            <FieldDependencyIcon class="size-6 text-ink-gray-6" />
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <div class="text-base font-medium text-ink-gray-6">
-              {{ __("No field dependency found") }}
-            </div>
-            <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-              {{ __("Add one to get started.") }}
-            </div>
-          </div>
-        </div>
+          variant="badge"
+          :icon="FieldDependencyIcon"
+          title="No field dependency found"
+          description="Add one to get started."
+        />
 
         <div
           class="w-full -ml-2"
