@@ -1,44 +1,37 @@
 import frappe
 from frappe.core.doctype.docshare.docshare import DocShare
-from frappe.model import default_fields
 
-from helpdesk.integrations.erpnext.utils import ALLOWED_DOCTYPES, should_sync
-
-# Identity fields define WHICH share this is — they're what differentiates the
-# original from the mirror. Everything else (permissions, flags, etc.) is mirrored.
-IDENTITY_FIELDS = ("user", "share_doctype", "share_name")
+from helpdesk.integrations.erpnext.mirror_sync import MirrorSyncMixin
+from helpdesk.integrations.erpnext.utils import should_sync
 
 
-class CustomDocShare(DocShare):
+class CustomDocShare(MirrorSyncMixin, DocShare):
     """Overrides core DocShare to keep HD Customer / ERPNext Customer shares
     mirrored bidirectionally when the integration is enabled."""
 
+    DOCTYPE_FIELD = "share_doctype"
+    VALUE_FIELD = "share_name"
+
+    def before_validate(self):
+        """Clean up the old mirror when identity changes. Mirrored from
+        CustomUserPermission for symmetry — done in before_validate so it sits
+        before any duplicate-style validation the parent might add."""
+        old = self.get_doc_before_save()
+        if old and self.has_data_updated(old) and self.sync_active():
+            self.delete_mirror_for(old)
+
     def after_insert(self):
         super().after_insert()
-        if not self.should_mirror():
-            return
-        self.create_mirror()
+        if self.should_mirror():
+            self.create_mirror()
 
     def on_update(self):
         # Core DocShare doesn't define on_update — no super() call needed.
-        old = self.get_doc_before_save()
-        identity_changed = bool(old) and any(
-            old.get(f) != self.get(f) for f in IDENTITY_FIELDS
-        )
-
-        # Always try to clean up the old mirror when identity changed, even if
-        # the new identity isn't itself mirrorable (e.g., changed to unrelated).
-        if (
-            identity_changed
-            and should_sync()
-            and not self.flags.get("ignore_erpnext_sync")
-        ):
-            self.delete_mirror_for(old)
-
         if not self.should_mirror():
             return
-
-        if identity_changed:
+        old = self.get_doc_before_save()
+        if old and self.has_data_updated(old):
+            # Old mirror was cleaned up in before_validate(); create the fresh one.
             self.create_mirror()
         else:
             self.sync_state_to_mirror()
@@ -50,118 +43,12 @@ class CustomDocShare(DocShare):
         mirror = self.find_mirror()
         if not mirror:
             return
-        mirror.flags.ignore_erpnext_sync = True
-        mirror.flags.ignore_share_permission = True
+        self.set_mirror_flags(mirror)
         mirror.delete(ignore_permissions=True)
 
-    def create_mirror(self):
-        """Create the mirror DocShare for this record on the other side."""
-        target = self._find_target_for(self.share_doctype, self.share_name)
-        if not target:
-            return
-        target_doctype, target_name = target
-        if frappe.db.exists(
-            "DocShare",
-            {
-                "user": self.user,
-                "share_doctype": target_doctype,
-                "share_name": target_name,
-            },
-        ):
-            return
-        mirror = frappe.copy_doc(self)
-        mirror.share_doctype = target_doctype
-        mirror.share_name = target_name
-        mirror.flags.ignore_erpnext_sync = True
+    def set_mirror_flags(self, mirror):
+        super().set_mirror_flags(mirror)
         mirror.flags.ignore_share_permission = True
-        mirror.insert(ignore_permissions=True)
-
-    def delete_mirror_for(self, old):
-        """Find and delete the mirror that corresponded to `old`'s identity."""
-        if old.get("share_doctype") not in ALLOWED_DOCTYPES:
-            return
-        target = self._find_target_for(old.get("share_doctype"), old.get("share_name"))
-        if not target:
-            return
-        target_doctype, target_name = target
-        mirror_name = frappe.db.get_value(
-            "DocShare",
-            {
-                "user": old.get("user"),
-                "share_doctype": target_doctype,
-                "share_name": target_name,
-            },
-        )
-        if not mirror_name:
-            return
-        mirror = frappe.get_doc("DocShare", mirror_name)
-        mirror.flags.ignore_erpnext_sync = True
-        mirror.flags.ignore_share_permission = True
-        mirror.delete(ignore_permissions=True)
-
-    def sync_state_to_mirror(self):
-        """Copy state (non-identity, non-framework) fields to the existing mirror."""
-        mirror = self.find_mirror()
-        if not mirror:
-            return
-        changed = False
-        for field, value in self.mirror_data().items():
-            if mirror.get(field) != value:
-                mirror.set(field, value)
-                changed = True
-        if changed:
-            mirror.flags.ignore_erpnext_sync = True
-            mirror.flags.ignore_share_permission = True
-            mirror.save(ignore_permissions=True)
-
-    def mirror_data(self) -> dict:
-        """All meta-defined fields except framework defaults and identity fields.
-        Used for syncing field changes to an existing mirror."""
-        data = self.get_valid_dict()
-        for field in (*default_fields, *IDENTITY_FIELDS):
-            data.pop(field, None)
-        return data
-
-    def should_mirror(self) -> bool:
-        if self.share_doctype not in ALLOWED_DOCTYPES:
-            return False
-        if not should_sync():
-            return False
-        if self.flags.get("ignore_erpnext_sync"):
-            return False
-        return True
-
-    @staticmethod
-    def _find_target_for(
-        share_doctype: str | None, share_name: str | None
-    ) -> tuple[str, str] | None:
-        """Compute (target_doctype, target_name) for the given identity values."""
-        if not share_doctype or not share_name:
-            return None
-        if share_doctype == "HD Customer":
-            erp = frappe.db.get_value("Customer", {"hd_customer": share_name}, "name")
-            return ("Customer", erp) if erp else None
-        if share_doctype == "Customer":
-            hd = frappe.db.get_value(
-                "HD Customer", {"erpnext_customer": share_name}, "name"
-            )
-            return ("HD Customer", hd) if hd else None
-        return None
-
-    def find_mirror(self):
-        target = self._find_target_for(self.share_doctype, self.share_name)
-        if not target:
-            return None
-        target_doctype, target_name = target
-        mirror_name = frappe.db.get_value(
-            "DocShare",
-            {
-                "user": self.user,
-                "share_doctype": target_doctype,
-                "share_name": target_name,
-            },
-        )
-        return frappe.get_doc("DocShare", mirror_name) if mirror_name else None
 
 
 def sync_shared_docs():
@@ -184,7 +71,7 @@ def sync_shared_docs():
     existing_hd_shares = {(s.user, s.share_name) for s in hd_customer_shares}
     existing_erp_shares = {(s.user, s.share_name) for s in erpnext_customer_shares}
 
-    # ERP → HD: for each Customer share, mirror it to HD Customer if linked
+    # ERP → HD
     for share in erpnext_customer_shares:
         hd_customer = frappe.db.get_value("Customer", share.share_name, "hd_customer")
         if not hd_customer:
@@ -204,7 +91,7 @@ def sync_shared_docs():
         doc.insert(ignore_permissions=True)
         existing_hd_shares.add((share.user, hd_customer))
 
-    # HD → ERP: for each HD Customer share, mirror it to Customer if linked
+    # HD → ERP
     for share in hd_customer_shares:
         erpnext_customer = frappe.db.get_value(
             "HD Customer", share.share_name, "erpnext_customer"
