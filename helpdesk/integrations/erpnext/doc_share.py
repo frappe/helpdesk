@@ -15,9 +15,9 @@ class CustomDocShare(DocShare):
 
     def after_insert(self):
         super().after_insert()
-        if not self._should_mirror():
+        if not self.should_mirror():
             return
-        self._create_mirror()
+        self.create_mirror()
 
     def on_update(self):
         # Core DocShare doesn't define on_update — no super() call needed.
@@ -33,28 +33,28 @@ class CustomDocShare(DocShare):
             and should_sync()
             and not self.flags.get("ignore_erpnext_sync")
         ):
-            self._delete_mirror_for(old)
+            self.delete_mirror_for(old)
 
-        if not self._should_mirror():
+        if not self.should_mirror():
             return
 
         if identity_changed:
-            self._create_mirror()
+            self.create_mirror()
         else:
-            self._sync_state_to_mirror()
+            self.sync_state_to_mirror()
 
     def on_trash(self):
         super().on_trash()
-        if not self._should_mirror():
+        if not self.should_mirror():
             return
-        mirror = self._find_mirror()
+        mirror = self.find_mirror()
         if not mirror:
             return
         mirror.flags.ignore_erpnext_sync = True
         mirror.flags.ignore_share_permission = True
         mirror.delete(ignore_permissions=True)
 
-    def _create_mirror(self):
+    def create_mirror(self):
         """Create the mirror DocShare for this record on the other side."""
         target = self._find_target_for(self.share_doctype, self.share_name)
         if not target:
@@ -76,7 +76,7 @@ class CustomDocShare(DocShare):
         mirror.flags.ignore_share_permission = True
         mirror.insert(ignore_permissions=True)
 
-    def _delete_mirror_for(self, old):
+    def delete_mirror_for(self, old):
         """Find and delete the mirror that corresponded to `old`'s identity."""
         if old.get("share_doctype") not in ALLOWED_DOCTYPES:
             return
@@ -99,13 +99,13 @@ class CustomDocShare(DocShare):
         mirror.flags.ignore_share_permission = True
         mirror.delete(ignore_permissions=True)
 
-    def _sync_state_to_mirror(self):
+    def sync_state_to_mirror(self):
         """Copy state (non-identity, non-framework) fields to the existing mirror."""
-        mirror = self._find_mirror()
+        mirror = self.find_mirror()
         if not mirror:
             return
         changed = False
-        for field, value in self._mirror_data().items():
+        for field, value in self.mirror_data().items():
             if mirror.get(field) != value:
                 mirror.set(field, value)
                 changed = True
@@ -114,7 +114,7 @@ class CustomDocShare(DocShare):
             mirror.flags.ignore_share_permission = True
             mirror.save(ignore_permissions=True)
 
-    def _mirror_data(self) -> dict:
+    def mirror_data(self) -> dict:
         """All meta-defined fields except framework defaults and identity fields.
         Used for syncing field changes to an existing mirror."""
         data = self.get_valid_dict()
@@ -122,7 +122,7 @@ class CustomDocShare(DocShare):
             data.pop(field, None)
         return data
 
-    def _should_mirror(self) -> bool:
+    def should_mirror(self) -> bool:
         if self.share_doctype not in ALLOWED_DOCTYPES:
             return False
         if not should_sync():
@@ -148,7 +148,7 @@ class CustomDocShare(DocShare):
             return ("HD Customer", hd) if hd else None
         return None
 
-    def _find_mirror(self):
+    def find_mirror(self):
         target = self._find_target_for(self.share_doctype, self.share_name)
         if not target:
             return None

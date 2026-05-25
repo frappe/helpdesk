@@ -14,27 +14,24 @@ class CustomUserPermission(UserPermission):
     """Overrides core UserPermission to keep HD Customer / ERPNext Customer
     permissions mirrored bidirectionally when the integration is enabled."""
 
-    def validate(self):
-        # If the user is changing identity fields on this perm, the old mirror
-        # would conflict with Frappe's duplicate-perm validation when the new
-        # identity matches the mirror's. Clean it up BEFORE super().validate()
-        # so the framework sees no duplicates. If the save later fails, the
-        # transaction rolls back and the mirror comes back.
+    def before_validate(self):
+        """Clean up the old mirror BEFORE Frappe's duplicate-perm check runs
+        in validate(). Otherwise an identity change that collides with the
+        mirror's identity would trip DuplicateEntryError. If the save later
+        fails, the transaction rolls back and the mirror comes back."""
         old = self.get_doc_before_save()
         if (
             old
             and any(old.get(f) != self.get(f) for f in IDENTITY_FIELDS)
-            and should_sync()
-            and not self.flags.get("ignore_erpnext_sync")
+            and self.sync_active()
         ):
-            self._delete_mirror_for(old)
-        super().validate()
+            self.delete_mirror_for(old)
 
     def after_insert(self):
         # Core UserPermission doesn't define after_insert — no super() call.
-        if not self._should_mirror():
+        if not self.should_mirror():
             return
-        self._create_mirror()
+        self.create_mirror()
 
     def on_update(self):
         super().on_update()
@@ -44,26 +41,26 @@ class CustomUserPermission(UserPermission):
             old.get(f) != self.get(f) for f in IDENTITY_FIELDS
         )
 
-        if not self._should_mirror():
+        if not self.should_mirror():
             return
 
         if identity_changed:
-            # Old mirror was cleaned up in validate(); create the fresh mirror now.
-            self._create_mirror()
+            # Old mirror was cleaned up in before_validate(); create the fresh mirror now.
+            self.create_mirror()
         else:
-            self._sync_state_to_mirror()
+            self.sync_state_to_mirror()
 
     def on_trash(self):
         super().on_trash()
-        if not self._should_mirror():
+        if not self.should_mirror():
             return
-        mirror = self._find_mirror()
+        mirror = self.find_mirror()
         if not mirror:
             return
         mirror.flags.ignore_erpnext_sync = True
         mirror.delete(ignore_permissions=True)
 
-    def _create_mirror(self):
+    def create_mirror(self):
         """Create the mirror User Permission for this record on the other side."""
         target = self._find_target_for(self.allow, self.for_value)
         if not target:
@@ -88,7 +85,7 @@ class CustomUserPermission(UserPermission):
         mirror.flags.ignore_erpnext_sync = True
         mirror.insert(ignore_permissions=True)
 
-    def _delete_mirror_for(self, old):
+    def delete_mirror_for(self, old):
         """Find and delete the mirror that corresponded to `old`'s identity."""
         if old.get("allow") not in ALLOWED_DOCTYPES:
             return
@@ -110,13 +107,13 @@ class CustomUserPermission(UserPermission):
         mirror.flags.ignore_erpnext_sync = True
         mirror.delete(ignore_permissions=True)
 
-    def _sync_state_to_mirror(self):
+    def sync_state_to_mirror(self):
         """Copy state (non-identity, non-framework) fields to the existing mirror."""
-        mirror = self._find_mirror()
+        mirror = self.find_mirror()
         if not mirror:
             return
         changed = False
-        for field, value in self._mirror_data().items():
+        for field, value in self.mirror_data().items():
             if mirror.get(field) != value:
                 mirror.set(field, value)
                 changed = True
@@ -124,7 +121,7 @@ class CustomUserPermission(UserPermission):
             mirror.flags.ignore_erpnext_sync = True
             mirror.save(ignore_permissions=True)
 
-    def _mirror_data(self) -> dict:
+    def mirror_data(self) -> dict:
         """All meta-defined fields except framework defaults and identity fields.
         Used for syncing field changes to an existing mirror."""
         data = self.get_valid_dict()
@@ -132,14 +129,14 @@ class CustomUserPermission(UserPermission):
             data.pop(field, None)
         return data
 
-    def _should_mirror(self) -> bool:
+    def should_mirror(self) -> bool:
         if self.allow not in ALLOWED_DOCTYPES:
             return False
-        if not should_sync():
-            return False
-        if self.flags.get("ignore_erpnext_sync"):
-            return False
-        return True
+        return self.sync_active()
+
+    def sync_active(self) -> bool:
+        """True when sync is enabled and this change isn't itself sync-triggered."""
+        return should_sync() and not self.flags.get("ignore_erpnext_sync")
 
     @staticmethod
     def _find_target_for(
@@ -158,7 +155,7 @@ class CustomUserPermission(UserPermission):
             return ("HD Customer", hd) if hd else None
         return None
 
-    def _find_mirror(self):
+    def find_mirror(self):
         target = self._find_target_for(self.allow, self.for_value)
         if not target:
             return None
