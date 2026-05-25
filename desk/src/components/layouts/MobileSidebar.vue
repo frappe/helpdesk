@@ -124,6 +124,7 @@ import { useTheme } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
 import Apps from "../Apps.vue";
+import AvailabilityMenu from "../AvailabilityMenu.vue";
 import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
@@ -230,6 +231,9 @@ const agentPortalDropdown = computed(() => [
     icon: "lucide-book-open",
     label: "Docs",
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
+  },
+  {
+    component: markRaw(AvailabilityMenu),
   },
   themeMenuItem.value,
   {

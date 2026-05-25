@@ -14,12 +14,17 @@
           "
         >
           <template #default="{ openFileSelector, error: _error, uploading }">
-            <div class="flex items-center justify-center gap-2">
-              <div class="group relative !size-14">
+            <div class="flex items-center justify-center gap-4">
+              <div class="group relative flex-shrink-0 size-16">
                 <Avatar
-                  class="!size-14"
+                  class="!size-16"
                   :image="user.doc?.user_image"
                   :label="fullName"
+                />
+                <div
+                  v-if="currentStatus"
+                  class="absolute bottom-0.5 right-0.5 size-3.5 rounded-full outline outline-white outline-4"
+                  :class="statusColor(currentStatus)"
                 />
                 <Tooltip
                   :hoverDelay="0"
@@ -27,7 +32,7 @@
                   :text="profileTooltipText"
                 >
                   <div
-                    class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full !size-14"
+                    class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full !size-16"
                     @click.stop="openFileSelector"
                   />
                   <div
@@ -50,6 +55,7 @@
                   <LoadingIndicator class="size-4" />
                 </div>
               </div>
+<<<<<<< HEAD
               <div class="flex flex-col gap-1">
                 <div class="flex flex-col gap-1">
                   <div v-if="!editName" class="flex items-end gap-1">
@@ -83,8 +89,40 @@
                   </div>
                   <span class="text-p-sm text-ink-gray-6">
                     {{ user?.doc?.email }}
+=======
+              <div class="flex flex-col gap-0.5 min-w-0">
+                <div v-if="!editName" class="flex items-center gap-1">
+                  <span class="text-lg font-semibold text-ink-gray-9 truncate">
+                    {{ user?.doc?.full_name }}
+>>>>>>> 630704fb (feat: add agent status indicators to frontend)
                   </span>
+                  <Button
+                    class="!px-1 !h-5 flex-shrink-0"
+                    variant="ghost"
+                    @click="editFullName"
+                  >
+                    <EditIcon class="size-3.5" />
+                  </Button>
                 </div>
+                <div v-else class="flex items-center gap-1">
+                  <TextInput
+                    ref="fullNameRef"
+                    v-model="fullName"
+                    @keydown.enter="isNameDirty ? save() : (editName = false)"
+                    @keydown.esc.stop="editName = false"
+                  />
+                  <Button
+                    variant="outline"
+                    icon="check"
+                    :loading="user?.save?.loading"
+                    :disabled="user?.save?.loading"
+                    @click="isNameDirty ? save() : (editName = false)"
+                  />
+                </div>
+                <span class="text-p-sm text-ink-gray-5 truncate">
+                  {{ user?.doc?.email }}
+                </span>
+                <AvailabilityMenu class="!min-h-0 !px-0" />
                 <ErrorMessage :message="__(_error)" />
               </div>
             </div>
@@ -204,7 +242,11 @@ import { useAuthStore } from "@/stores/auth";
 import EditIcon from "~icons/lucide/edit";
 const emit = defineEmits(["updateStep"]);
 
+import AvailabilityMenu from "@/components/AvailabilityMenu.vue";
+import { statusColor, useAvailability } from "@/composables/useAvailability";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
+
+const { currentStatus } = useAvailability();
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import UnsavedBadge from "@/components/UnsavedBadge.vue";
