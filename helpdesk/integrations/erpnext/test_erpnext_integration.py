@@ -5,6 +5,7 @@ import frappe
 from frappe.model.rename_doc import rename_doc
 from frappe.tests.utils import FrappeTestCase
 
+from helpdesk.integrations.erpnext.api import in_sync, sync_all_customers
 from helpdesk.integrations.erpnext.user_permission import sync_user_permissions
 
 from .test_utils import (
@@ -871,6 +872,28 @@ class TestERPNextIntegration(FrappeTestCase):
             ),
             1,
         )
+
+    def test_in_sync_reflects_link_state(self):
+        """Pre-sync (unlinked records on either side) → False; after running
+        sync_all_customers (which links by name and creates missing counterparts)
+        → True. Covers the initial-sync case where both sides have records but
+        none are linked — the scenario the old inverted logic miscalled as True."""
+        enable_erpnext_sync()
+
+        hd = make_hd_customer("InSync HD Only")
+        erp = make_erpnext_customer("InSync ERP Only")
+        # Sync creates the missing counterpart on the other side for each, so
+        # register cleanup for both names on both doctypes.
+        self.addCleanup(safe_delete, "HD Customer", hd.name)
+        self.addCleanup(safe_delete, "Customer", hd.name)
+        self.addCleanup(safe_delete, "Customer", erp.name)
+        self.addCleanup(safe_delete, "HD Customer", erp.name)
+
+        self.assertFalse(in_sync())
+
+        sync_all_customers()
+
+        self.assertTrue(in_sync())
 
     def test_apply_to_all_doctypes_preserved(self):
         """The apply_to_all_doctypes flag should be carried over to the mirror."""
