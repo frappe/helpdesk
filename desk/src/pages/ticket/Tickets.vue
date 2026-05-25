@@ -255,6 +255,21 @@ async function exportRows(
   const order_by = list.params.order_by;
 
   let filters = { ...list.params.filters };
+  // Replace @me with actual logged in user
+  Object.keys(filters).forEach((key) => {
+    const value = filters[key];
+    // case: owner = "@me"
+    if (value === "@me") {
+      filters[key] = userId;
+      console.log("filters1", filters);
+    }
+
+    // case: ["=", "@me"]
+    if (Array.isArray(value) && value[1] === "@me") {
+      filters[key][1] = userId;
+      console.log("filters2", filters);
+    }
+  });
   let pageLength: number;
 
   if (export_all) {
@@ -266,7 +281,9 @@ async function exportRows(
     filters = JSON.stringify(filters);
   }
 
-  window.location.href = `/api/method/frappe.desk.reportview.export_query?file_format_type=${export_type}&title=HD Ticket&doctype=HD Ticket&fields=${fields}&filters=${filters}&order_by=${order_by}&page_length=${pageLength}&start=0&view=Report&with_comment_count=1`;
+  window.location.href = `/api/method/frappe.desk.reportview.export_query?file_format_type=${export_type}&title=HD Ticket&doctype=HD Ticket&fields=${fields}&filters=${encodeURIComponent(
+    filters
+  )}&order_by=${order_by}&page_length=${pageLength}&start=0&view=Report&with_comment_count=1`;
   reset();
   showExportModal.value = false;
 }
