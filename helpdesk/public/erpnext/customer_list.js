@@ -22,7 +22,7 @@ frappe.listview_settings["Customer"].onload = function (listview) {
         return;
       }
 
-      const { hd_count, erp_count, in_sync } = r.message;
+      const { in_sync } = r.message;
       if (in_sync) {
         return;
       }

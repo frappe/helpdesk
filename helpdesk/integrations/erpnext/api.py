@@ -17,14 +17,22 @@ def get_sync_info() -> dict:
     if not enabled:
         return {"enabled": False}
 
-    hd_count = frappe.db.count("HD Customer")
-    erp_count = frappe.db.count("Customer")
     return {
         "enabled": True,
-        "hd_count": hd_count,
-        "erp_count": erp_count,
-        "in_sync": hd_count == erp_count,
+        "in_sync": in_sync(),
     }
+
+
+def in_sync() -> bool:
+    """True when every HD Customer is linked to an ERP Customer and vice versa.
+    Sync is a no-op in this state; the UI uses this to gate the 'Sync Customers'
+    button.
+    """
+    if frappe.db.count("HD Customer", {"erpnext_customer": ["is", "not set"]}):
+        return False
+    if frappe.db.count("Customer", {"hd_customer": ["is", "not set"]}):
+        return False
+    return True
 
 
 @frappe.whitelist()
@@ -108,6 +116,7 @@ def sync_all_customers():
                     "doctype": "Customer",
                     "customer_name": hd.customer_name,
                     "hd_customer": hd.name,
+                    "image": hd.image,
                 }
             )
             erp_doc.flags.ignore_erpnext_sync = True

@@ -32,7 +32,8 @@ class HDCustomer(Document):
                 "type": "Datetime",
             },
         ]
-        return {"columns": columns}
+        rows = ["name", "domain", "image", "creation", "owner"]
+        return {"columns": columns, "rows": rows}
 
     def after_insert(self):
         if should_sync_with_erpnext() and not self.flags.get("ignore_erpnext_sync"):
