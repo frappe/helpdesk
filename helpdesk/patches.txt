@@ -37,12 +37,5 @@ helpdesk.patches.add_website_settings_permission
 helpdesk.patches.set_last_customer_agent_response
 helpdesk.patches.add_agent_manager_perms_in_assignment_rule
 helpdesk.patches.set_std_views_non_public
-<<<<<<< HEAD
-<<<<<<< HEAD
 helpdesk.patches.rename_and_update_std_views #v2
-=======
 helpdesk.helpdesk.doctype.hd_ticket.patches.backfill_sla_failed_by
->>>>>>> a1f305ed (fix: add patch for backfiling the fields for tickets raised in last 180 days)
-=======
-helpdesk.helpdesk.doctype.hd_ticket.patches.backfill_sla_failed_by
->>>>>>> 881a0c48 (chore: code cleanup)
