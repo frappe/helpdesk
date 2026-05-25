@@ -71,7 +71,6 @@ class CustomCustomer(Customer):
             "HD Customer", {"erpnext_customer": self.name}, "name"
         )
         if hd_customer:
-            # doc.on_trash()  # trigger HD Customer's on_trash to clean up linked docs like User Permissions and Doc Shares
             # Clear the back-link first so HDCustomer.on_trash won't try to
             # delete this Customer again (it's already being deleted).
             frappe.db.set_value("HD Customer", hd_customer, "erpnext_customer", None)
