@@ -1,16 +1,30 @@
 <template>
-  <div class="flex items-center justify-between px-5 py-3 border-b flex-shrink-0">
-    <h3 class="text-base font-semibold text-ink-gray-9">{{ title }}</h3>
+  <div class="flex items-center justify-between px-5 py-3 flex-shrink-0">
+    <h3 class="text-base font-semibold text-ink-gray-9">
+      {{ title }}
+    </h3>
+
     <button
-  v-if="title === __('Tasks')"
-  class="flex items-center gap-1 text-sm text-ink-gray-12 hover:text-ink-gray-12 focus:outline-none leading-none"
-  @click="showNewTaskModal = true"
->
-  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-  </svg>
-  {{ __("New") }}
-</button>
+      v-if="title === __('Tasks')"
+      class="flex items-center gap-1 rounded-md bg-black px-2.5 py-1 text-xs font-medium text-white hover:bg-gray-900 focus:outline-none leading-none"
+      @click="showNewTaskModal = true"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-3 w-3"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+
+      {{ __("New") }}
+    </button>
   </div>
   <TaskboxEditor
     v-model="showNewTaskModal"
@@ -30,12 +44,12 @@
       <div
         v-for="(activity, i) in localActivities"
         :key="activity.key"
-        class="activity mt-2"
+        class="activity"
         tabindex="0"
       >
         <div class="w-full flex flex-col">
           <div
-            class="mb-4 flex w-full"
+            class="flex w-full"
             :class="[
               i === localActivities.length - 1 && 'mb-5',
               !['email', 'feedback', 'call', 'comment', 'task'].includes(
