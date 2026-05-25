@@ -63,15 +63,15 @@
     </LayoutHeader>
     <div class="flex-1 overflow-auto">
       <div
+        v-if="agentDashboard.loading"
+        class="flex items-center justify-center absolute inset-0 z-10"
+      >
+        <LoadingIndicator :scale="8" />
+      </div>
+      <div
         class="flex flex-col p-1 pt-4 md:p-4 md:pl-3 mx-auto max-w-[1500px] w-full grow relative h-full"
       >
         <div class="grow pb-12">
-          <div
-            v-if="agentDashboard.loading"
-            class="flex items-center justify-center mt-40 h-max"
-          >
-            <LoadingIndicator :scale="8" />
-          </div>
           <div
             v-if="!agentDashboard.loading && layout.length > 0"
             class="text-xl font-semibold text-ink-gray-8 pl-2"
