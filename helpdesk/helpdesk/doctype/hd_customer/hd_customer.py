@@ -99,6 +99,4 @@ class HDCustomer(Document):
             # Clear the back-link first so CustomCustomer.on_trash won't try to
             # delete this HD Customer again (it's already being deleted).
             frappe.db.set_value("Customer", erpnext_customer, "hd_customer", None)
-            frappe.delete_doc(
-                "Customer", erpnext_customer, ignore_permissions=True, force=True
-            )
+            frappe.delete_doc("Customer", erpnext_customer, ignore_permissions=True)
