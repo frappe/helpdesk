@@ -45,7 +45,7 @@
    "fieldname": "availability",
    "fieldtype": "Select",
    "label": "Availability",
-   "options": "Available\nAway"
+   "options": "Available\nAway\nBusy"
   }
  ],
  "index_web_pages_for_search": 1,
