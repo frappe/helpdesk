@@ -44,12 +44,11 @@ def sync_hd_erpnext_customers() -> None:
             _("ERPNext integration is not enabled"), title=_("Cannot Sync Customers")
         )
 
-    job_id = f"sync_customers_{frappe.utils.get_datetime().timestamp()}"
     frappe.enqueue(
         sync_all_customers,
         queue="long",
         timeout=12000,
-        job_id=job_id,
+        job_id="sync_hd_erpnext_customers",
         deduplicate=True,
     )
 
