@@ -9,7 +9,6 @@ from helpdesk.integrations.erpnext.utils import create_customer_field
 
 
 class ERPNextHDSettings(Document):
-    # validate to check if ERPNext is installed or not, if enabled is checked then frapep.throw ERPNext is not installed on your site.
     def validate(self):
         if not self.enabled:
             return
