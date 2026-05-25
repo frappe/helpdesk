@@ -110,20 +110,16 @@
                   :modelValue="isSelected(agent.value)"
                   class="flex-shrink-0"
                 />
-                <UserAvatar :name="agent.value" size="sm" class="" />
+                <div class="relative flex-shrink-0">
+                  <UserAvatar :name="agent.value" size="sm" />
+                  <div
+                    class="absolute -bottom-0 -right-0.5 size-1.5 rounded-full"
+                    :class="statusColor(agent.availability || '')"
+                  />
+                </div>
                 <span class="text-ink-gray-7 flex-1 text-left truncate">
                   {{ agent.label }}
                 </span>
-                <Badge
-                  v-if="
-                    agent.availability && agent.availability !== 'Available'
-                  "
-                  :label="agent.availability"
-                  variant="subtle"
-                  theme="orange"
-                  size="sm"
-                  class="flex-shrink-0"
-                />
               </button>
             </template>
 
@@ -139,6 +135,7 @@
 </template>
 
 <script setup lang="ts">
+import { statusColor } from "@/composables/useAvailability";
 import { useShortcut } from "@/composables/shortcuts";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
@@ -159,7 +156,6 @@ import {
   createListResource,
   createResource,
   toast,
-  Badge,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
 import LucideSearch from "~icons/lucide/search";
