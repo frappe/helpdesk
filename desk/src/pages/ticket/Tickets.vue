@@ -255,19 +255,18 @@ async function exportRows(
   const order_by = list.params.order_by;
 
   let filters = { ...list.params.filters };
-  // Replace @me with actual logged in user
+  // Resolve `@me` filters to the current session user before export
   Object.keys(filters).forEach((key) => {
     const value = filters[key];
-    // case: owner = "@me"
+
+    // Handle direct filter format: { owner: "@me" }
     if (value === "@me") {
       filters[key] = userId;
-      console.log("filters1", filters);
     }
 
-    // case: ["=", "@me"]
+    // Handle operator-based filter format: { owner: ["=", "@me"] }
     if (Array.isArray(value) && value[1] === "@me") {
       filters[key][1] = userId;
-      console.log("filters2", filters);
     }
   });
   let pageLength: number;
