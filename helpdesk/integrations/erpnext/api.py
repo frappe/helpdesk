@@ -8,8 +8,10 @@ from helpdesk.integrations.erpnext.utils import set_links, should_sync
 
 @frappe.whitelist()
 def get_sync_info() -> dict:
-    frappe.has_permission("Customer", "read", throw=True)
-    frappe.has_permission("HD Customer", "read", throw=True)
+    if not frappe.has_permission("Customer", "read") or not frappe.has_permission(
+        "HD Customer", "read"
+    ):
+        return {"enabled": False}
     if "erpnext" not in frappe.get_installed_apps():
         return {"enabled": False}
 
