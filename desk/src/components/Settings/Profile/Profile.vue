@@ -122,7 +122,33 @@
                 <span class="text-p-sm text-ink-gray-5 truncate">
                   {{ user?.doc?.email }}
                 </span>
-                <AvailabilityMenu class="!min-h-0 !px-0" />
+                <div class="flex items-center">
+                  <AvailabilityMenu class="!min-h-0 !px-0" />
+                  <IconDot class="size-4 text-ink-gray-5" />
+                  <div
+                    v-if="agentCreationDate?.data?.creation"
+                    class="flex items-center gap-1 ml-[1px]"
+                  >
+                    <LucideCalendar class="size-4 text-ink-gray-5" />
+                    <span class="text-ink-gray-7 text-p-sm"
+                      >Joined
+                      {{
+                        dateFormat(
+                          agentCreationDate.data.creation,
+                          "MMM D, YYYY"
+                        )
+                      }}</span
+                    >
+                  </div>
+                  <IconDot class="size-4 text-ink-gray-5" />
+
+                  <div class="flex items-center gap-1 ml-[1px]">
+                    <LucideGlobe class="size-4 text-ink-gray-5" />
+                    <span class="text-p-sm text-ink-gray-7">{{
+                      user?.doc?.time_zone
+                    }}</span>
+                  </div>
+                </div>
                 <ErrorMessage :message="__(_error)" />
               </div>
             </div>
@@ -229,7 +255,6 @@
 import { computed, nextTick, ref, watch, useTemplateRef } from "vue";
 import {
   Avatar,
-  Badge,
   Button,
   FileUploader,
   LoadingIndicator,
@@ -237,6 +262,10 @@ import {
   createDocumentResource,
   createResource,
 } from "frappe-ui";
+import LucideCalendar from "~icons/lucide/calendar";
+import LucideGlobe from "~icons/lucide/globe";
+import IconDot from "~icons/lucide/dot";
+
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
 import EditIcon from "~icons/lucide/edit";
@@ -250,10 +279,23 @@ const { currentStatus } = useAvailability();
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import UnsavedBadge from "@/components/UnsavedBadge.vue";
+import { dateFormat } from "@/utils";
 const showChangePasswordModal = ref(false);
 
 const { userId } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
+const currentAgentName = (window as any).agent as string | null;
+const agentCreationDate = currentAgentName
+  ? createResource({
+      url: "frappe.client.get_value",
+      params: {
+        doctype: "HD Agent",
+        filters: currentAgentName,
+        fieldname: "creation",
+      },
+      auto: true,
+    })
+  : null;
 
 const isHoveringRemove = ref(false);
 const editName = ref(false);

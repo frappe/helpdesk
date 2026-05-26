@@ -41,11 +41,11 @@
    "label": "Image"
   },
   {
-   "default": "Available",
+   "default": "Active",
    "fieldname": "availability",
    "fieldtype": "Select",
    "label": "Availability",
-   "options": "Available\nAway\nBusy"
+   "options": "Active\nAway\nBusy"
   }
  ],
  "index_web_pages_for_search": 1,

@@ -12,8 +12,8 @@ const setAvailability = createResource({
 });
 
 const statusColorMap: Record<string, string> = {
-  Available: "bg-surface-green-3",
-  Away: "bg-surface-amber-3",
+  Active: "bg-[#137949]",
+  Away: "bg-[#DB7706]",
   Busy: "bg-surface-red-5",
 };
 
