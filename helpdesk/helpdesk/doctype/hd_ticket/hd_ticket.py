@@ -373,9 +373,13 @@ class HDTicket(Document):
             "sla",
         ]:
             if self.has_value_changed(field):
-                log_ticket_activity(
-                    self.name, f"set {field_maps[field]} to {self.as_dict()[field]}"
-                )
+                value = self.as_dict()[field]
+                if not value:
+                    msg = f"cleared {field_maps[field]}"
+                else:
+                    msg = f"set {field_maps[field]} to {value}"
+
+                log_ticket_activity(self.name, msg)
 
     def generate_key(self):
         self.key = uuid.uuid4()
