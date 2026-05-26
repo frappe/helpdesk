@@ -135,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import { statusColor } from "@/composables/useAvailability";
+import { statusColor, useAvailability } from "@/composables/useAvailability";
 import { useShortcut } from "@/composables/shortcuts";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
@@ -178,6 +178,7 @@ const assignees = inject(AssigneeSymbol)!;
 const activities = inject(ActivitiesSymbol)!;
 
 const { getUser } = useUserStore();
+const { currentStatus } = useAvailability();
 const currentUser = computed(() => getUser("")); // empty string returns current user
 const currentAgentName = (window as any).agent as string | null;
 
@@ -279,7 +280,7 @@ const agentOptions = computed<AgentOption[]>(() => {
       value: a.name,
       label: a.agent_name || getUser(a.name).full_name,
       image: a.user_image || getUser(a.name).user_image,
-      availability: a.availability,
+      availability: currentStatus.value || a.availability,
     });
     seen.add(a.name);
   }
@@ -489,14 +490,20 @@ async function saveAssignees(added: string[], removed: string[]) {
       if (removeResult?.exc) throw new Error(removeResult.exc);
     }
     if (added.length) {
-      const awayAgents = (agentResource.data as HDAgent[])?.filter(
-        (agent) => added.includes(agent.name) && agent.availability === "Away"
+      const unavailableAgents = (agentResource.data as HDAgent[])?.filter(
+        (agent) =>
+          added.includes(agent.name) &&
+          (agent.availability === "Away" || agent.availability === "Busy")
       );
-      if (awayAgents?.length > 0) {
-        const names = awayAgents
-          .map((a: HDAgent) => a.agent_name || a.name)
-          .join(", ");
-        toast.warning(__(`${names} is currently away`));
+      if (unavailableAgents?.length > 0) {
+        for (const agent of unavailableAgents) {
+          const name = agent.agent_name || agent.name;
+          const message =
+            agent.availability === "Busy"
+              ? __("{0} is currently busy", [name])
+              : __("{0} is currently away", [name]);
+          toast.warning(message);
+        }
       }
 
       const addResult = await addAssigneesResource.submit(added);
