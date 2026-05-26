@@ -7,6 +7,7 @@
       :chartConfig="chartConfig"
       :currentDuration="currentDuration"
       :orientation="orientation"
+      :timelineFilter="timelineFilter"
       @changeDuration="changeDuration"
     />
   </div>
@@ -35,7 +36,11 @@ const props = defineProps({
   },
   apiUrl: {
     type: String,
-    required: true,
+    required: false,
+  },
+  timelineFilter: {
+    type: Boolean,
+    default: true,
   },
   data: {
     type: Object as PropType<AverageResponseData>,
@@ -155,11 +160,31 @@ const chartConfig = computed<EChartsOption>(() => {
       top: 2,
       bottom: 2,
     },
+    tooltip: {
+      show: true,
+      trigger: "axis",
+      appendToBody: true,
+      position: (point: number[]) => [point[0] + 12, point[1] - 50],
+      axisPointer: { type: "none" },
+      formatter: (params: any) => {
+        const p = Array.isArray(params) ? params[0] : params;
+        if (p.value === undefined || p.value === null) return "";
+        const value =
+          props.type === "Time"
+            ? formatTime(Number(p.value) || 0, {
+                day: true,
+                hour: true,
+                minute: true,
+              }) || "0m"
+            : p.value;
+        return `<span style="font-size:12px;color:#6b7280">${p.name}: <b style="color:#374151">${value}</b></span>`;
+      },
+    },
   };
 });
 
 const resource = createResource({
-  url: props.apiUrl,
+  url: props.apiUrl || "",
   type: "GET",
   makeParams: () => {
     const params: Record<string, any> = {
@@ -175,11 +200,11 @@ const resource = createResource({
 
 const changeDuration = (period: string) => {
   currentDuration.value = period;
-  resource.submit();
+  if (props.apiUrl) resource.submit();
 };
 
 onMounted(() => {
-  if (!props.data?.data) {
+  if (props.timelineFilter && props.apiUrl && !props.data?.data) {
     resource.submit();
   }
 });

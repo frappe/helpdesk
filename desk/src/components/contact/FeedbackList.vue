@@ -48,6 +48,13 @@
           >
             {{ ticket.feedback }}
           </p>
+          <!-- Extra feedback -->
+          <p
+            v-if="ticket.feedback_extra"
+            class="text-p-sm text-ink-gray-6 line-clamp-2"
+          >
+            {{ ticket.feedback_extra }}
+          </p>
         </div>
         <hr v-if="i !== feedbackListResource.data!.length - 1" class="mx-6" />
       </template>
@@ -121,9 +128,9 @@ function formatRating(rating: number | undefined | null): number {
 }
 
 function ratingBadgeClass(rating: number | undefined | null): string {
-  const r = rating ?? 0;
-  if (r >= 4) return "bg-green-100 text-green-700";
-  if (r >= 2.5) return "bg-yellow-100 text-yellow-700";
+  const stars = formatRating(rating);
+  if (stars >= 4) return "bg-green-100 text-green-700";
+  if (stars >= 2.5) return "bg-yellow-100 text-yellow-700";
   return "bg-red-100 text-red-700";
 }
 </script>

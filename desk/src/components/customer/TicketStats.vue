@@ -5,6 +5,20 @@
         v-for="(chartData, key) in analytics.data"
         class="h-full w-full rounded border border-outline-gray-1"
       >
+        <LineChartCard
+          v-if="key === 'total_tickets'"
+          :title="__('Total Tickets')"
+          :data="chartData"
+          type="Count"
+          :chart-color="{
+            lineColor: '#3B82F6',
+            gradientColor: { start: '#93C5FD', end: 'rgba(219, 234, 254, 0)' },
+          }"
+          :dt="props.dt"
+          :dn="props.dn"
+          orientation="horizontal"
+          :timelineFilter="false"
+        />
         <BarChartCard
           v-if="key === 'feedback_received'"
           :title="__('Avg. Feedback Received')"
