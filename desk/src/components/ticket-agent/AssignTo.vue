@@ -50,6 +50,9 @@
       <div
         v-if="isOpen"
         class="my-2 divide-y divide-outline-gray-modals rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+        @keydown.ctrl.enter.capture.stop="confirmAssignment"
+        @keydown.meta.enter.capture.stop="confirmAssignment"
+        @keydown.esc.capture.stop="cancelAssignment"
       >
         <!-- Search Header -->
         <div class="p-1">
@@ -82,6 +85,30 @@
           </div>
         </div>
 
+        <!-- Availability filters -->
+        <div class="flex items-center gap-1.5 px-2 py-1.5 overflow-x-auto">
+          <button
+            v-for="filter in availabilityFilters"
+            :key="filter.value"
+            class="flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium whitespace-nowrap"
+            :class="
+              availabilityFilter === filter.value
+                ? 'bg-surface-gray-3 text-ink-gray-9'
+                : 'text-ink-gray-6 hover:bg-surface-gray-2'
+            "
+            @click="availabilityFilter = filter.value"
+          >
+            <p
+              v-if="filter.dotClass"
+              class="size-1.5 rounded-full text-p-sm"
+              :class="filter.dotClass"
+            />
+            {{ filter.label }}
+
+            <span class="text-xs text-ink-gray-5">{{ filter.count }}</span>
+          </button>
+        </div>
+
         <!-- Agent List -->
         <div class="px-1.5 pb-1.5 max-h-64 overflow-y-auto">
           <div class="pt-1.5">
@@ -98,7 +125,7 @@
                 v-for="(agent, index) in sortedAgentOptions"
                 :key="agent.value"
                 :ref="(el) => setOptionRef(index, el as Element)"
-                class="group flex h-7 w-full items-center rounded px-2 text-base text-ink-gray-6 gap-2"
+                class="group flex w-full items-center rounded px-2 py-1.5 text-base text-ink-gray-6 gap-2"
                 :class="
                   index === highlightedIndex
                     ? 'bg-surface-gray-3'
@@ -113,13 +140,31 @@
                 <div class="relative flex-shrink-0">
                   <UserAvatar :name="agent.value" size="sm" />
                   <div
-                    class="absolute -bottom-0 -right-0.5 size-1.5 rounded-full"
+                    class="absolute bottom-0 -right-0.5 size-2 rounded-full outline outline-white outline-1.5"
                     :class="statusColor(agent.availability || '')"
                   />
                 </div>
-                <span class="text-ink-gray-7 flex-1 text-left truncate">
-                  {{ agent.label }}
-                </span>
+                <div class="flex flex-col flex-1 text-left min-w-0">
+                  <span class="text-ink-gray-7 truncate text-p-sm">
+                    {{ agent.label }}
+                  </span>
+                  <span
+                    v-if="
+                      availabilitySubtitle(
+                        agent.availability,
+                        agent.availability_changed_on
+                      )
+                    "
+                    class="text-xs text-ink-gray-5 truncate"
+                  >
+                    {{
+                      availabilitySubtitle(
+                        agent.availability,
+                        agent.availability_changed_on
+                      )
+                    }}
+                  </span>
+                </div>
               </button>
             </template>
 
@@ -129,6 +174,22 @@
             </div>
           </div>
         </div>
+
+        <!-- Footer -->
+        <div class="flex items-center justify-end px-2 py-1.5 gap-2">
+          <Button variant="outline" size="sm" @click="cancelAssignment">
+            {{ __("Cancel") }}
+          </Button>
+          <Button variant="solid" size="sm" @click="confirmAssignment">
+            {{
+              isMobileView
+                ? __("Assign")
+                : isMac
+                ? __("Assign (⌘ + ⏎)")
+                : __("Assign (Ctrl + ⏎)")
+            }}
+          </Button>
+        </div>
       </div>
     </template>
   </Popover>
@@ -136,10 +197,13 @@
 
 <script setup lang="ts">
 import { statusColor, useAvailability } from "@/composables/useAvailability";
+import { useDevice } from "@/composables";
+import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
+import { prettyDate } from "@/utils";
 import {
   ActivitiesSymbol,
   AgentOption,
@@ -172,6 +236,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { hideLabel } = props;
+const { isMac } = useDevice();
+const { isMobileView } = useScreenSize();
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
@@ -209,10 +275,11 @@ watch(
   { immediate: true, deep: true }
 );
 
-// Watch popover open/close — same pattern as old AssignToBody
+// Track whether the next close was triggered by Assign (commit) vs Cancel/outside-click (revert).
+const justConfirmed = ref(false);
+
 watch(popoverIsOpen, (isOpen) => {
   if (isOpen) {
-    // Opening: take snapshot
     hasBeenOpened.value = true;
     snapshotAssignees.value = localAssignees.value.map((a) => ({ ...a }));
     pinnedSelectedNames.value = new Set(
@@ -220,24 +287,62 @@ watch(popoverIsOpen, (isOpen) => {
     );
     searchText.value = "";
     highlightedIndex.value = 0;
+    availabilityFilter.value = "All";
     nextTick(() => {
       inputRef.value?.el?.focus();
     });
-  } else if (hasBeenOpened.value) {
-    // Closing after a real open: compute diff and save
-    hasBeenOpened.value = false;
-    searchText.value = "";
+    return;
+  }
+
+  if (!hasBeenOpened.value) return;
+  hasBeenOpened.value = false;
+  searchText.value = "";
+
+  if (justConfirmed.value) {
+    justConfirmed.value = false;
     const currentNames = localAssignees.value.map((a) => a.name);
     const oldNames = snapshotAssignees.value.map((a) => a.name);
     const added = currentNames.filter((n) => !oldNames.includes(n));
     const removed = oldNames.filter((n) => !currentNames.includes(n));
     saveAssignees(added, removed);
+  } else {
+    // Cancel / click-outside → revert to snapshot
+    localAssignees.value = snapshotAssignees.value.map((a) => ({ ...a }));
   }
 });
 
+function cancelAssignment() {
+  popoverIsOpen.value = false;
+}
+
+function confirmAssignment() {
+  justConfirmed.value = true;
+  popoverIsOpen.value = false;
+}
+
+function availabilitySubtitle(
+  availability?: string,
+  changedOn?: string
+): string {
+  if (availability === "Active") return __("Active now");
+  if (availability !== "Busy" && availability !== "Away") return "";
+
+  const label = availability === "Busy" ? __("Busy") : __("Away");
+  const elapsed = changedOn
+    ? prettyDate(changedOn, true)?.toLocaleLowerCase()
+    : "";
+  return elapsed ? `${label} · ${elapsed}` : label;
+}
+
 const agentResource = createListResource({
   doctype: "HD Agent",
-  fields: ["name", "agent_name", "user_image", "availability"],
+  fields: [
+    "name",
+    "agent_name",
+    "user_image",
+    "availability",
+    "availability_changed_on",
+  ],
   filters: { is_active: true },
   pageLength: 20,
   auto: true,
@@ -250,7 +355,13 @@ const currentAgentResource = currentAgentName
       params: {
         doctype: "HD Agent",
         name: currentAgentName,
-        fields: ["name", "agent_name", "user_image", "availability"],
+        fields: [
+          "name",
+          "agent_name",
+          "user_image",
+          "availability",
+          "availability_changed_on",
+        ],
       },
       auto: true,
     })
@@ -269,6 +380,39 @@ watch(searchText, (text) => {
   debouncedSearch(text);
 });
 
+type AvailabilityFilter = "All" | "Active" | "Busy" | "Away";
+const availabilityFilter = ref<AvailabilityFilter>("All");
+
+const availabilityFilters = computed(() => {
+  const counts = { Active: 0, Busy: 0, Away: 0 };
+  for (const opt of agentOptions.value) {
+    const v = opt.availability;
+    if (v === "Active" || v === "Busy" || v === "Away") counts[v]++;
+  }
+  const total = agentOptions.value.length;
+  return [
+    { value: "All" as const, label: __("All"), count: total, dotClass: "" },
+    {
+      value: "Active" as const,
+      label: __("Active"),
+      count: counts.Active,
+      dotClass: statusColor("Active"),
+    },
+    {
+      value: "Busy" as const,
+      label: __("Busy"),
+      count: counts.Busy,
+      dotClass: statusColor("Busy"),
+    },
+    {
+      value: "Away" as const,
+      label: __("Away"),
+      count: counts.Away,
+      dotClass: statusColor("Away"),
+    },
+  ];
+});
+
 const agentOptions = computed<AgentOption[]>(() => {
   const agents: AgentOption[] = [];
   const seen = new Set<string>();
@@ -281,6 +425,7 @@ const agentOptions = computed<AgentOption[]>(() => {
       label: a.agent_name || getUser(a.name).full_name,
       image: a.user_image || getUser(a.name).user_image,
       availability: currentStatus.value || a.availability,
+      availability_changed_on: a.availability_changed_on,
     });
     seen.add(a.name);
   }
@@ -293,6 +438,7 @@ const agentOptions = computed<AgentOption[]>(() => {
           label: agent.agent_name || getUser(agent.name).full_name,
           image: agent.user_image || getUser(agent.name).user_image,
           availability: agent.availability,
+          availability_changed_on: agent.availability_changed_on,
         });
         seen.add(agent.name);
       }
@@ -345,11 +491,13 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   }
 
   // If there are pinned assignees, show them first then current user, otherwise current user first
-  if (assigned.length > 0) {
-    return [...assigned, ...selfOption, ...rest];
-  }
+  const ordered =
+    assigned.length > 0
+      ? [...assigned, ...selfOption, ...rest]
+      : [...selfOption, ...rest];
 
-  return [...selfOption, ...rest];
+  if (availabilityFilter.value === "All") return ordered;
+  return ordered.filter((opt) => opt.availability === availabilityFilter.value);
 });
 
 function isSelected(agentName: string): boolean {

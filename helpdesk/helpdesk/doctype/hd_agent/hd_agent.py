@@ -8,6 +8,8 @@ from frappe.model.document import Document
 class HDAgent(Document):
     def before_save(self):
         old_doc = self.get_doc_before_save()
+        if not old_doc or old_doc.availability != self.availability:
+            self.availability_changed_on = frappe.utils.now()
         if old_doc and old_doc.agent_name != self.agent_name:
             if self.agent_name:
                 agent_name = self.agent_name.split()

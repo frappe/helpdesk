@@ -64,5 +64,9 @@ def set_my_availability(availability: str) -> dict:
     if not name:
         frappe.throw(_("No HD Agent record for current user"), frappe.ValidationError)
 
-    frappe.db.set_value("HD Agent", name, "availability", availability)
+    frappe.db.set_value(
+        "HD Agent",
+        name,
+        {"availability": availability, "availability_changed_on": frappe.utils.now()},
+    )
     return {"availability": availability}
