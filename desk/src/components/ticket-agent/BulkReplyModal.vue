@@ -11,6 +11,7 @@
         <p class="text-p-sm">
           <CompactEditor
             ref="editorRef"
+            v-model="content"
             :show-signature="true"
             :show-attachments="true"
             :type="'Email'"
@@ -34,8 +35,7 @@
               ? __('Send Reply')
               : __('Send to {0} tickets', String(props.selections.size))
           "
-        >
-        </Button>
+        />
       </div>
     </template>
   </Dialog>
@@ -47,16 +47,21 @@ import { __ } from "@/translation";
 import { Resource } from "@/types";
 import { createResource, Dialog, toast } from "frappe-ui";
 import { ref, watch } from "vue";
+
 const open = defineModel<boolean>();
 
 const props = defineProps<{
   selections: Set<string>;
 }>();
 
+const content = ref("");
 const editorRef = ref<InstanceType<typeof CompactEditor> | null>(null);
 
 watch(open, (val) => {
-  if (val) editorRef.value?.reset();
+  if (val) {
+    content.value = "";
+    editorRef.value?.reset();
+  }
 });
 
 const bulkReplyResource: Resource = createResource({
@@ -71,7 +76,7 @@ function handleSubmit() {
   bulkReplyResource.submit(
     {
       ticket_ids: Array.from(props.selections),
-      message: editorRef.value?.getContent() ?? "",
+      message: content.value,
       attachments: (editorRef.value?.attachments ?? []).map((a: any) => a.name),
     },
     {

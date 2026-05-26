@@ -40,6 +40,7 @@
           <!-- Fixed Menu -->
           <div class="flex justify-between overflow-hidden py-2.5">
             <div class="flex items-center overflow-x-auto w-[60%]">
+<<<<<<< HEAD
               <FileUploader
                 :upload-args="{
                   doctype: doctype,
@@ -56,6 +57,24 @@
                     @click="openFileSelector()"
                   >
                     <template #icon>
+=======
+              <div class="inline-flex items-center gap-1.5 p-1">
+                <FileUploader
+                  :upload-args="{
+                    doctype: doctype,
+                    docname: ticketId,
+                    private: true,
+                  }"
+                  @success="(f) => attachments.push(f)"
+                >
+                  <template #default="{ openFileSelector, uploading }">
+                    {{ void (loading = uploading) }}
+                    <button
+                      class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
+                      @click="openFileSelector()"
+                      :disabled="uploading"
+                    >
+>>>>>>> f6947f11 (chore: code cleanup)
                       <AttachmentIcon
                         class="h-4"
                         style="color: #000000; stroke-width: 1.5 !important"

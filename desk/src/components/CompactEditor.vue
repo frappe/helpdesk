@@ -25,7 +25,7 @@
               <template #default="{ openFileSelector, uploading }">
                 {{ void (isUploading = uploading) }}
                 <button
-                  class="flex rounded p-1 text-ink-gray-8 transition-colors hover:bg-surface-gray-2 disabled:opacity-40"
+                  class="flex rounded p-1 text-ink-gray-8 transition-colors hover:bg-surface-gray-3 disabled:opacity-40"
                   :disabled="uploading"
                   @click="openFileSelector()"
                 >
@@ -85,7 +85,6 @@ import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string;
     placeholder?: string;
     minHeight?: string;
     maxHeight?: string;
@@ -97,7 +96,6 @@ const props = withDefaults(
     showAttachments?: boolean;
   }>(),
   {
-    modelValue: "",
     placeholder: "",
     minHeight: "min-h-[180px]",
     maxHeight: "max-h-80",
@@ -110,24 +108,12 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits<{
-  (e: "update:modelValue", value: string): void;
-}>();
+const internalContent = defineModel<string>({ default: "" });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const editorRef = ref<any>(null);
-const internalContent = ref(props.modelValue);
 const attachments = ref<any[]>([]);
 const isUploading = ref(false);
-
-watch(internalContent, (val) => emit("update:modelValue", val));
-
-watch(
-  () => props.modelValue,
-  (val) => {
-    if (val !== internalContent.value) internalContent.value = val;
-  }
-);
 
 const savedReplyClass = [
   "!prose-sm max-w-full overflow-auto py-1.5 px-2",
@@ -159,6 +145,10 @@ const uploadFn = props.docname
 
 // ─── Signature ────────────────────────────────────────────────
 const userResource = getUserEmailInfo();
+
+function getDefaultContent(signature: string): string {
+  return `<p></p><p></p><p></p><p></p><p></p>${signature}`;
+}
 
 function applySignature(signature: string) {
   if (!isContentEmpty(internalContent.value)) return;
@@ -194,7 +184,9 @@ function reset() {
     return;
   }
   const data = userResource?.data as { email_signature?: string } | null;
-  const sig = data?.email_signature ? `<br>${data.email_signature}` : "";
+  const sig = data?.email_signature
+    ? getDefaultContent(data.email_signature)
+    : "";
   commands.setContent(sig || "<p></p>", false);
   internalContent.value = sig;
   attachments.value = [];
@@ -209,7 +201,7 @@ if (props.showSignature) {
     () => userResource.data,
     (data: { email_signature?: string } | null) => {
       if (!data?.email_signature) return;
-      applySignature(`<br>${data.email_signature}`);
+      applySignature(getDefaultContent(data.email_signature));
     }
   );
 }
@@ -221,7 +213,7 @@ onMounted(() => {
   nextTick(() => {
     const data = userResource.data as { email_signature?: string } | null;
     if (data?.email_signature) {
-      applySignature(`<br>${data.email_signature}`);
+      applySignature(getDefaultContent(data.email_signature));
     }
   });
 });
