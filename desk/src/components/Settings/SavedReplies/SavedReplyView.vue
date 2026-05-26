@@ -112,7 +112,7 @@
             />
           </div>
           <PreviewDialog v-model="previewDialog" />
-          <SavedReplyEditor
+          <CompactEditor
             ref="content"
             v-model="savedReplyData.message"
             :extensions="[FieldAutocomplete]"
@@ -156,7 +156,7 @@ import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
 import PreviewDialog from "./components/PreviewDialog.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import SavedReplyEditor from "@/components/SavedReplyEditor.vue";
+import CompactEditor from "@/components/CompactEditor.vue";
 import DocumentationButton from "@/components/DocumentationButton.vue";
 import { storeToRefs } from "pinia";
 import { useConfigStore } from "@/stores/config";

@@ -209,6 +209,7 @@ import {
 } from "@/components";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
+import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
 import {
   CleanStyles,
@@ -309,11 +310,7 @@ function isOnlySignature(content: string | null) {
   return htmlToText(content) === htmlToText(emailSignature.value);
 }
 
-const userResource = createResource({
-  url: "helpdesk.api.auth.get_current_user_email_info",
-  cache: "current-user-email-info",
-  auto: true,
-});
+const userResource = getUserEmailInfo();
 
 watch(newEmail, (newValue, oldValue) => {
   if (newValue !== oldValue && newValue) {

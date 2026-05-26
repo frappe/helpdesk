@@ -68,6 +68,7 @@
 import { AttachmentItem } from "@/components";
 import { AttachmentIcon } from "@/components/icons";
 import { menuButtons } from "@/components/Settings/SavedReplies/savedReplies";
+import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import {
   CleanStyles,
   ComponentUtils,
@@ -77,7 +78,6 @@ import { isContentEmpty, uploadFunction } from "@/utils";
 import {
   FeatherIcon,
   FileUploader,
-  createResource,
   TextEditor,
   TextEditorFixedMenu,
 } from "frappe-ui";
@@ -158,13 +158,7 @@ const uploadFn = props.docname
   : null;
 
 // ─── Signature ────────────────────────────────────────────────
-const userResource = props.showSignature
-  ? createResource({
-      url: "helpdesk.api.auth.get_current_user_email_info",
-      cache: "current-user-email-info",
-      auto: true,
-    })
-  : null;
+const userResource = getUserEmailInfo();
 
 function applySignature(signature: string) {
   if (!isContentEmpty(internalContent.value)) return;
@@ -179,26 +173,7 @@ function applySignature(signature: string) {
   }
 }
 
-if (props.showSignature && userResource) {
-  // Late arrival: resource resolves after mount
-  watch(
-    () => userResource.data,
-    (data: { email_signature?: string } | null) => {
-      if (!data?.email_signature) return;
-      applySignature(`<br>${data.email_signature}`);
-    }
-  );
-
-  // Early arrival: resource was already cached when component mounts
-  onMounted(() => {
-    nextTick(() => {
-      const data = userResource.data as { email_signature?: string } | null;
-      if (data?.email_signature) {
-        applySignature(`<br>${data.email_signature}`);
-      }
-    });
-  });
-}
+// Early arrival: resource was already cached when component mounts
 
 function removeAttachment(attachment: any) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
@@ -227,6 +202,29 @@ function reset() {
     editorRef.value?.editor?.commands?.focus("start");
   }, 0);
 }
+
+if (props.showSignature) {
+  // Late arrival: resource resolves after mount
+  watch(
+    () => userResource.data,
+    (data: { email_signature?: string } | null) => {
+      if (!data?.email_signature) return;
+      applySignature(`<br>${data.email_signature}`);
+    }
+  );
+}
+
+onMounted(() => {
+  if (!props.showSignature) return;
+  userResource.reload();
+
+  nextTick(() => {
+    const data = userResource.data as { email_signature?: string } | null;
+    if (data?.email_signature) {
+      applySignature(`<br>${data.email_signature}`);
+    }
+  });
+});
 
 defineExpose({
   getContent,
