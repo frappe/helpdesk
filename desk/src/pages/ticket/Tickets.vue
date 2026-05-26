@@ -110,7 +110,7 @@ const showBulkReplyModal = ref(false);
 const selectBannerActions = [
   {
     label: __("Bulk Reply"),
-    icon: "send",
+    icon: "corner-up-left",
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showBulkReplyModal.value = true;
