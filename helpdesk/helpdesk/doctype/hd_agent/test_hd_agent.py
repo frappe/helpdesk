@@ -67,6 +67,36 @@ class TestHDAgent(FrappeTestCase):
 
         self.assertEqual(picked, active_user)
 
+    # Active agent is preferred over a Busy one when both are in the pool
+    def test_round_robin_prefers_active_over_busy(self):
+        active_user = make_agent("rr_active_over_busy@test.com", first_name="RR Active")
+        busy_user = make_agent("rr_busy@test.com", first_name="RR Busy")
+        _set_agent_availability(active_user, "Active")
+        _set_agent_availability(busy_user, "Busy")
+
+        assignment_rule = self._make_assignment_rule(
+            "Test AR Active Over Busy", [busy_user, active_user], "Round Robin"
+        )
+
+        picked = assignment_rule.get_user(make_ticket(subject="RR active over busy"))
+
+        self.assertEqual(picked, active_user)
+
+    # Busy agent is still preferred over an Away one if no Active is available
+    def test_round_robin_prefers_busy_over_away(self):
+        busy_user = make_agent("rr_busy_over_away@test.com", first_name="RR Busy")
+        away_user = make_agent("rr_away_when_busy@test.com", first_name="RR Away")
+        _set_agent_availability(busy_user, "Busy")
+        _set_agent_availability(away_user, "Away")
+
+        assignment_rule = self._make_assignment_rule(
+            "Test AR Busy Over Away", [away_user, busy_user], "Round Robin"
+        )
+
+        picked = assignment_rule.get_user(make_ticket(subject="RR busy over away"))
+
+        self.assertEqual(picked, busy_user)
+
     # Load Balancing: away user is excluded from the candidate pool
     def test_load_balancing_skips_away_agent(self):
         active_user = make_agent("lb_active@test.com", first_name="LB Active")
