@@ -263,6 +263,9 @@ const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
 const subjectInput = ref(null);
 const isLoading = ref(false);
 const showPhoneModal = ref(false);
+const customActions = ref([]);
+
+type ticketId = string;
 
 const props = defineProps({
   ticketId: {

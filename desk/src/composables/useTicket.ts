@@ -21,7 +21,6 @@ interface MapValue {
 const ticketMap: Record<string, MapValue> = reactive({});
 
 export const useTicket = (ticketId: string): MapValue => {
-  let err = false;
   if (!ticketMap[ticketId]) {
     ticketMap[ticketId] = {
       ticket: createDocumentResource<HDTicket>({
