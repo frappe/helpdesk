@@ -716,6 +716,7 @@ export interface AgentOption {
   label: string;
   image?: string;
   availability?: string;
+  availability_changed_on?: string;
 }
 
 // symbols

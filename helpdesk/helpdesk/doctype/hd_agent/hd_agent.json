@@ -10,7 +10,8 @@
   "agent_name",
   "user_image",
   "is_active",
-  "availability"
+  "availability",
+  "availability_changed_on"
  ],
  "fields": [
   {
@@ -46,6 +47,12 @@
    "fieldtype": "Select",
    "label": "Availability",
    "options": "Active\nAway\nBusy"
+  },
+  {
+   "fieldname": "availability_changed_on",
+   "fieldtype": "Datetime",
+   "label": "Availability Changed On",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
