@@ -56,7 +56,7 @@ function onSyncStart() {
 function onSyncEnd() {
   isSyncing.value = false;
   syncInfo.reload();
-  toast.success(__("Sync completed successfully."));
+  toast.success(__("Sync completed successfully"));
   emit("synced");
 }
 

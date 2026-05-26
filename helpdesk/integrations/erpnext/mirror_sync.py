@@ -2,21 +2,11 @@ import frappe
 from frappe.model import default_fields
 from frappe.model.document import Document
 
-from helpdesk.integrations.erpnext.utils import ALLOWED_DOCTYPES, should_sync
-
-
-def find_target_for(doctype: str | None, value: str | None) -> tuple[str, str] | None:
-    """Map (HD Customer, name) ↔ (Customer, name) via the link fields on each
-    side. Returns None when no counterpart exists or inputs are missing."""
-    if not doctype or not value:
-        return None
-    if doctype == "HD Customer":
-        erp = frappe.db.get_value("Customer", {"hd_customer": value}, "name")
-        return ("Customer", erp) if erp else None
-    if doctype == "Customer":
-        hd = frappe.db.get_value("HD Customer", {"erpnext_customer": value}, "name")
-        return ("HD Customer", hd) if hd else None
-    return None
+from helpdesk.integrations.erpnext.utils import (
+    ALLOWED_DOCTYPES,
+    find_target_for,
+    should_sync,
+)
 
 
 class MirrorSyncMixin(Document):
