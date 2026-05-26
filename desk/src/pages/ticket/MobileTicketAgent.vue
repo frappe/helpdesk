@@ -263,12 +263,9 @@ const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
 const subjectInput = ref(null);
 const isLoading = ref(false);
 const showPhoneModal = ref(false);
-<<<<<<< HEAD
-=======
 const customActions = ref([]);
 
 type ticketId = string;
->>>>>>> c2ba5dfd (chore: remove legacy number types from TS interfaces for tickets)
 
 const props = defineProps({
   ticketId: {

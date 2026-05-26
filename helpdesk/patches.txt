@@ -37,31 +37,6 @@ helpdesk.patches.add_website_settings_permission
 helpdesk.patches.set_last_customer_agent_response
 helpdesk.patches.add_agent_manager_perms_in_assignment_rule
 helpdesk.patches.set_std_views_non_public
-<<<<<<< HEAD
-<<<<<<< HEAD
-helpdesk.patches.rename_and_update_std_views #v2
-=======
-<<<<<<< HEAD
 helpdesk.helpdesk.doctype.hd_ticket.patches.backfill_sla_failed_by
 helpdesk.patches.rename_and_update_std_views #v2
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-helpdesk.patches.rename_and_update_std_views #v2
 helpdesk.patches.set_hd_ticket_naming_series
->>>>>>> a563153e9 (feat: change ticket ID format to string-based naming series)
->>>>>>> 09b260e2 (feat: change ticket ID format to string-based naming series)
-=======
-helpdesk.helpdesk.doctype.hd_ticket.patches.backfill_sla_failed_by
-helpdesk.patches.rename_and_update_std_views #v2
->>>>>>> e54c9d2c (chore: sync patches.txt with develop)
-=======
-helpdesk/patches/set_hd_ticket_naming_series.py
->>>>>>> d0f5bec3 (chore: added the patch name in patch file)
-=======
-helpdesk.patches.set_hd_ticket_naming_series
->>>>>>> ef72e3b0 (chore: fixed patch file name in patch.txt)
-=======
-helpdesk.patches.set_hd_ticket_naming_series
->>>>>>> e8daf87e (chore: code cleanup)
