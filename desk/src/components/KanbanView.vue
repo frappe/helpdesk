@@ -20,7 +20,7 @@
       <!-- Column header -->
       <div class="flex items-center justify-between px-1">
         <div class="flex items-center gap-2 text-base">
-          <IndicatorIcon :class="parseColor(col.color)" />
+          <IndicatorIcon :class="parseColor(col.color || 'gray')" />
           <span class="text-ink-gray-9">{{ col.label }}</span>
           <span class="text-sm text-ink-gray-5">{{ col.cards.length }}</span>
         </div>
