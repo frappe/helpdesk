@@ -6,26 +6,19 @@ from helpdesk.utils import agent_only
 
 @frappe.whitelist()
 @agent_only
-def bulk_reply(ticket_ids: list, message: str):
+def bulk_reply(ticket_ids: list, message: str, attachments: list | None = None):
     if not ticket_ids:
         return
 
     ticket_ids = list(set(ticket_ids))  # Remove duplicates
 
-    frappe.enqueue(
-        _bulk_reply,
-        queue="long",
-        ticket_ids=ticket_ids,
-        message=message,
-    )
-
-
-def _bulk_reply(ticket_ids: list, message: str):
     for ticket_id in ticket_ids:
         frappe.has_permission("HD Ticket", ticket_id, "write", throw=True)
         doc = frappe.get_doc("HD Ticket", ticket_id)
         try:
-            doc.reply_via_agent(message, to=doc.raised_by)
+            doc.reply_via_agent(
+                message, to=doc.raised_by, attachments=attachments or []
+            )
         except Exception as e:
             frappe.log_error(
                 title=f"Bulk reply failed for ticket {ticket_id}",
