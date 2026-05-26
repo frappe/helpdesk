@@ -140,8 +140,7 @@ export function useContact(name: string) {
       })),
       phone_nos: state.phones.map((p) => ({
         phone: p.phone,
-        is_primary_phone: p.isPrimary,
-        is_primary_mobile_no: p.isPrimary,
+        is_primary: p.isPrimary,
       })),
       timezone:
         typeof state.timezone === "string"

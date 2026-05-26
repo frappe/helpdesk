@@ -48,9 +48,7 @@
                   <Button
                     variant="subtle"
                     :label="
-                      state.image === doc.doc.image
-                        ? __('Upload picture')
-                        : __('Replace picture')
+                      state.image ? __('Replace picture') : __('Upload picture')
                     "
                     @click.prevent="openFileSelector()"
                   />
@@ -86,106 +84,61 @@
           </div>
 
           <!-- Email IDs -->
-          <div class="space-y-2">
+          <div class="space-y-1.5">
             <label class="text-xs text-ink-gray-5">
               {{ __("Email") }}
               <span class="text-ink-red-3">*</span>
             </label>
-            <div
-              v-for="(email, index) in state.emails"
-              :key="index"
-              class="flex items-center gap-1"
+            <ContactInputRow
+              v-for="entry in visibleEmails"
+              :key="entry.email.key ?? `e${entry.index}`"
+              v-model="entry.email.email_id"
+              type="email"
+              placeholder="name@example.com"
+              :isPrimary="entry.email.isPrimary"
+              :canRemove="!entry.email.isPrimary"
+              :autofocus="entry.email.justAdded"
+              @setPrimary="setPrimary('email', entry.index)"
+              @remove="removeRow('email', entry.index)"
+            />
+            <Button
+              key="add-email"
+              variant="ghost"
+              size="sm"
+              :label="__('Add Email')"
+              @click="addRow('email')"
             >
-              <FormControl
-                class="[&_p]:text-p-xs flex-1"
-                type="email"
-                :placeholder="`john.doe${
-                  index > 0 ? `+${index}` : ''
-                }@example.com`"
-                v-model="email.email_id"
-              />
-              <Tooltip :text="__('Primary contact')">
-                <button
-                  type="button"
-                  class="p-1 shrink-0"
-                  @click="setPrimary('email', index)"
-                >
-                  <LucideStar
-                    class="size-4"
-                    :class="
-                      email.isPrimary
-                        ? 'fill-ink-amber-2 text-ink-amber-2'
-                        : 'text-ink-gray-3 hover:text-ink-gray-5'
-                    "
-                  />
-                </button>
-              </Tooltip>
-              <button
-                v-if="index > 0"
-                type="button"
-                class="p-1 shrink-0 text-ink-gray-3 hover:text-ink-red-3"
-                @click="removeRow('email', index)"
-              >
-                <LucideTrash2 class="size-4" />
-              </button>
-            </div>
-            <Button variant="subtle" size="sm" @click="addRow('email')">
               <template #prefix>
                 <LucidePlus class="size-3.5" />
               </template>
-              {{ __("Add email address") }}
             </Button>
           </div>
 
           <!-- Phone numbers -->
-          <div class="flex flex-col gap-y-2">
+          <div class="space-y-1.5 flex flex-col items-start w-full flex-1">
             <label class="text-xs text-ink-gray-5">{{ __("Phone") }}</label>
-            <div
-              v-for="(phone, index) in state.phones"
-              :key="index"
-              class="flex items-center gap-1"
-            >
-              <FormControl
-                class="[&_p]:text-p-xs flex-1"
-                type="tel"
-                :placeholder="`+1 234 567 89${index > 0 ? `${index}` : 0}`"
-                v-model="phone.phone"
-              >
-              </FormControl>
-              <Tooltip :text="__('Primary contact')">
-                <button
-                  type="button"
-                  class="p-1 shrink-0"
-                  @click="setPrimary('phone', index)"
-                >
-                  <LucideStar
-                    class="size-4"
-                    :class="
-                      phone.isPrimary
-                        ? 'fill-ink-amber-2 text-ink-amber-2'
-                        : 'text-ink-gray-3 hover:text-ink-gray-5'
-                    "
-                  />
-                </button>
-              </Tooltip>
-              <button
-                type="button"
-                class="p-1 shrink-0 text-ink-gray-3 hover:text-ink-red-3"
-                @click="removeRow('phone', index)"
-              >
-                <LucideTrash2 class="size-4" />
-              </button>
-            </div>
+            <ContactInputRow
+              v-for="entry in visiblePhones"
+              :key="entry.phone.key ?? `p${entry.index}`"
+              v-model="entry.phone.phone"
+              type="tel"
+              placeholder="+1 234 567 8900"
+              :isPrimary="entry.phone.isPrimary"
+              :canRemove="true"
+              :autofocus="entry.phone.justAdded"
+              @setPrimary="setPrimary('phone', entry.index)"
+              @remove="removeRow('phone', entry.index)"
+            />
             <Button
-              variant="subtle"
+              key="add-phone"
+              variant="ghost"
               size="sm"
+              :label="__('Add Phone')"
               @click="addRow('phone')"
-              class="w-fit"
             >
               <template #prefix>
                 <LucidePlus class="size-3.5" />
               </template>
-              {{ __("Add number") }}
             </Button>
           </div>
 
@@ -219,13 +172,12 @@ import {
   Dialog,
   FileUploader,
   FormControl,
-  Tooltip,
 } from "frappe-ui";
+import { computed, nextTick } from "vue";
 import LucidePlus from "~icons/lucide/plus";
-import LucideStar from "~icons/lucide/star";
-import LucideTrash2 from "~icons/lucide/trash-2";
 import LucideUser from "~icons/lucide/user";
 import TimezoneControl from "../TimezoneControl.vue";
+import ContactInputRow from "./ContactInputRow.vue";
 
 const props = defineProps<{ name: string }>();
 const open = defineModel<boolean>({ default: false });
@@ -233,19 +185,57 @@ const open = defineModel<boolean>({ default: false });
 const { state, parseContactData, isDirty, editContactResource, doc } =
   useContact(props.name);
 
+let chipKey = 0;
+const nextKey = () => ++chipKey;
+
+const visibleEmails = computed(() =>
+  state.emails
+    .map((email, index) => ({ email, index }))
+    .filter(({ email }) => email.email_id || email.justAdded)
+);
+
+const visiblePhones = computed(() =>
+  state.phones
+    .map((phone, index) => ({ phone, index }))
+    .filter(({ phone }) => phone.phone || phone.justAdded)
+);
+
 function addRow(type: "email" | "phone") {
   if (type === "email") {
-    state.emails.push({ email_id: "", isPrimary: false });
+    const empty = state.emails.find((e) => !e.email_id && !e.justAdded);
+    if (empty) {
+      empty.justAdded = true;
+      empty.key = empty.key ?? nextKey();
+    } else {
+      state.emails.push({
+        email_id: "",
+        isPrimary: state.emails.length === 0,
+        justAdded: true,
+        key: nextKey(),
+      });
+    }
   } else {
-    state.phones.push({ phone: "", isPrimary: false });
+    const empty = state.phones.find((p) => !p.phone && !p.justAdded);
+    if (empty) {
+      empty.justAdded = true;
+      empty.key = empty.key ?? nextKey();
+    } else {
+      state.phones.push({
+        phone: "",
+        isPrimary: state.phones.length === 0,
+        justAdded: true,
+        key: nextKey(),
+      });
+    }
   }
 }
 
 function removeRow(type: "email" | "phone", index: number) {
-  if (type === "email") {
-    state.emails.splice(index, 1);
-  } else {
-    state.phones.splice(index, 1);
+  const list = type === "email" ? state.emails : state.phones;
+  const wasPrimary = list[index]?.isPrimary;
+  list.splice(index, 1);
+  if (wasPrimary && list.length > 0) {
+    list[0].isPrimary = true;
   }
 }
 
@@ -262,7 +252,9 @@ function setPrimary(type: "email" | "phone", index: number) {
 }
 
 async function handleSave() {
-  debugger;
+  state.emails = state.emails.filter((e) => e.email_id);
+  state.phones = state.phones.filter((p) => p.phone);
+  await nextTick();
   if (!isDirty.value && doc.getInfo?.data?.timezone === state.timezone) return;
   editContactResource.submit(
     {
@@ -279,3 +271,16 @@ async function handleSave() {
   );
 }
 </script>
+
+<style scoped>
+.row-leave-active {
+  position: absolute;
+  width: 100%;
+  transition: opacity 180ms cubic-bezier(0.2, 0, 0, 1),
+    transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.row-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+</style>
