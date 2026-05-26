@@ -82,6 +82,7 @@
 import { ref } from "vue";
 import { Button, FeatherIcon, Popover, call, toast } from "frappe-ui";
 import { __ } from "@/translation";
+import { reloadTicket } from "@/composables/useTicket";
 
 const props = defineProps<{
   ticket: string;
@@ -130,6 +131,11 @@ async function submit(togglePopover: () => void) {
         },
       });
     }
+    // Invalidate the cached ticket resource so the new comment/reply
+    // shows up immediately when the user opens the ticket detail page
+    // (without this, useTicket() returns the stale cached activities
+    // and the user has to reload manually).
+    reloadTicket(props.ticket);
     toast.success(
       mode.value === "reply" ? __("Reply sent") : __("Comment added")
     );
