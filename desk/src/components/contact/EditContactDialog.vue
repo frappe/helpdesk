@@ -90,16 +90,16 @@
               <span class="text-ink-red-3">*</span>
             </label>
             <ContactInputRow
-              v-for="entry in visibleEmails"
-              :key="entry.email.key ?? `e${entry.index}`"
-              v-model="entry.email.email_id"
+              v-for="(email, index) in state.emails"
+              :key="email.key"
+              v-model="email.email_id"
               type="email"
               placeholder="name@example.com"
-              :isPrimary="entry.email.isPrimary"
-              :canRemove="!entry.email.isPrimary"
-              :autofocus="entry.email.justAdded"
-              @setPrimary="setPrimary('email', entry.index)"
-              @remove="removeRow('email', entry.index)"
+              :isPrimary="email.isPrimary"
+              :canRemove="!email.isPrimary"
+              :autofocus="email.key === autofocusKey"
+              @setPrimary="setPrimary('email', index)"
+              @remove="removeRow('email', index)"
             />
             <Button
               key="add-email"
@@ -118,16 +118,16 @@
           <div class="space-y-1.5 flex flex-col items-start w-full flex-1">
             <label class="text-xs text-ink-gray-5">{{ __("Phone") }}</label>
             <ContactInputRow
-              v-for="entry in visiblePhones"
-              :key="entry.phone.key ?? `p${entry.index}`"
-              v-model="entry.phone.phone"
+              v-for="(phone, index) in state.phones"
+              :key="phone.key"
+              v-model="phone.phone"
               type="tel"
               placeholder="+1 234 567 8900"
-              :isPrimary="entry.phone.isPrimary"
+              :isPrimary="phone.isPrimary"
               :canRemove="true"
-              :autofocus="entry.phone.justAdded"
-              @setPrimary="setPrimary('phone', entry.index)"
-              @remove="removeRow('phone', entry.index)"
+              :autofocus="phone.key === autofocusKey"
+              @setPrimary="setPrimary('phone', index)"
+              @remove="removeRow('phone', index)"
             />
             <Button
               key="add-phone"
@@ -151,6 +151,7 @@
               :label="__('Save')"
               variant="solid"
               theme="gray"
+              :disabled="!isDirty"
               :loading="editContactResource.loading"
               @click="handleSave"
             />
@@ -162,7 +163,7 @@
 </template>
 
 <script setup lang="ts">
-import { useContact } from "@/composables/contact";
+import { nextEntryKey, useContact } from "@/composables/contact";
 import { __ } from "@/translation";
 import type { File as FileType } from "@/types";
 import {
@@ -173,7 +174,7 @@ import {
   FileUploader,
   FormControl,
 } from "frappe-ui";
-import { computed, nextTick } from "vue";
+import { nextTick, ref } from "vue";
 import LucidePlus from "~icons/lucide/plus";
 import LucideUser from "~icons/lucide/user";
 import TimezoneControl from "../TimezoneControl.vue";
@@ -185,49 +186,24 @@ const open = defineModel<boolean>({ default: false });
 const { state, parseContactData, isDirty, editContactResource, doc } =
   useContact(props.name);
 
-let chipKey = 0;
-const nextKey = () => ++chipKey;
-
-const visibleEmails = computed(() =>
-  state.emails
-    .map((email, index) => ({ email, index }))
-    .filter(({ email }) => email.email_id || email.justAdded)
-);
-
-const visiblePhones = computed(() =>
-  state.phones
-    .map((phone, index) => ({ phone, index }))
-    .filter(({ phone }) => phone.phone || phone.justAdded)
-);
+const autofocusKey = ref<number | null>(null);
 
 function addRow(type: "email" | "phone") {
+  const key = nextEntryKey();
   if (type === "email") {
-    const empty = state.emails.find((e) => !e.email_id && !e.justAdded);
-    if (empty) {
-      empty.justAdded = true;
-      empty.key = empty.key ?? nextKey();
-    } else {
-      state.emails.push({
-        email_id: "",
-        isPrimary: state.emails.length === 0,
-        justAdded: true,
-        key: nextKey(),
-      });
-    }
+    state.emails.push({
+      email_id: "",
+      isPrimary: state.emails.length === 0,
+      key,
+    });
   } else {
-    const empty = state.phones.find((p) => !p.phone && !p.justAdded);
-    if (empty) {
-      empty.justAdded = true;
-      empty.key = empty.key ?? nextKey();
-    } else {
-      state.phones.push({
-        phone: "",
-        isPrimary: state.phones.length === 0,
-        justAdded: true,
-        key: nextKey(),
-      });
-    }
+    state.phones.push({
+      phone: "",
+      isPrimary: state.phones.length === 0,
+      key,
+    });
   }
+  autofocusKey.value = key;
 }
 
 function removeRow(type: "email" | "phone", index: number) {

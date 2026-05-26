@@ -49,6 +49,9 @@ type AutocompleteOption = string;
 // Local Cache to store contact document resources to avoid multiple DB calls in a single session.
 const contactCache: Record<string, DocumentResource<Contact>> = {};
 
+let entryKeyCounter = 0;
+export const nextEntryKey = () => ++entryKeyCounter;
+
 export function useContact(name: string) {
   const doc = findContactDoc();
   const { state, resetState } = useContactState(false, doc);
@@ -63,11 +66,13 @@ export function useContact(name: string) {
         data.email_ids?.map((e: any) => ({
           email_id: e.email_id,
           isPrimary: e.is_primary,
+          key: nextEntryKey(),
         })) || [];
       state.phones =
         data.phone_nos?.map((p: any) => ({
           phone: p.phone,
           isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
+          key: nextEntryKey(),
         })) || [];
       state.customers =
         data.links?.map((l: any) => l.link_name as string) || [];
@@ -91,25 +96,30 @@ export function useContact(name: string) {
   });
 
   const isDirty = computed(() => {
+    const currentEmails = state.emails.map((e) => ({
+      email_id: e.email_id,
+      isPrimary: e.isPrimary,
+    }));
+    const savedEmails =
+      doc.doc?.email_ids?.map((e: any) => ({
+        email_id: e.email_id,
+        isPrimary: e.is_primary,
+      })) || [];
+    const currentPhones = state.phones.map((p) => ({
+      phone: p.phone,
+      isPrimary: p.isPrimary,
+    }));
+    const savedPhones =
+      doc.doc?.phone_nos?.map((p: any) => ({
+        phone: p.phone,
+        isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
+      })) || [];
     return (
       state.firstName !== (doc.doc?.first_name || "") ||
       state.lastName !== (doc.doc?.last_name || "") ||
       state.image !== (doc.doc?.image || "") ||
-      // state.timezone !== doc.getInfo.data?.timezone ||
-      JSON.stringify(state.emails) !==
-        JSON.stringify(
-          doc.doc?.email_ids?.map((e: any) => ({
-            email_id: e.email_id,
-            isPrimary: e.is_primary,
-          })) || []
-        ) ||
-      JSON.stringify(state.phones) !==
-        JSON.stringify(
-          doc.doc?.phone_nos?.map((p: any) => ({
-            phone: p.phone,
-            isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
-          })) || []
-        )
+      JSON.stringify(currentEmails) !== JSON.stringify(savedEmails) ||
+      JSON.stringify(currentPhones) !== JSON.stringify(savedPhones)
     );
   });
 
@@ -285,8 +295,8 @@ export function useContactState(
       firstName: "",
       lastName: "",
       image: "",
-      emails: [{ email_id: "", isPrimary: true }],
-      phones: [{ phone: "", isPrimary: true }],
+      emails: [],
+      phones: [],
       customers: [],
       timezone: "",
     });
@@ -296,14 +306,18 @@ export function useContactState(
       state.firstName = data?.first_name || "";
       state.lastName = data?.last_name || "";
       state.image = data?.image || "";
-      state.emails = data?.email_ids?.map((e: any) => ({
-        email_id: e.email_id,
-        isPrimary: e.is_primary,
-      })) || [{ email_id: "", isPrimary: true }];
-      state.phones = data?.phone_nos?.map((p: any) => ({
-        phone: p.phone,
-        isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
-      })) || [{ phone: "", isPrimary: true }];
+      state.emails =
+        data?.email_ids?.map((e: any) => ({
+          email_id: e.email_id,
+          isPrimary: e.is_primary,
+          key: nextEntryKey(),
+        })) || [];
+      state.phones =
+        data?.phone_nos?.map((p: any) => ({
+          phone: p.phone,
+          isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
+          key: nextEntryKey(),
+        })) || [];
       state.customers =
         data?.links?.map((l: any) => l.link_name as string) || [];
       state.timezone = data?.timezone || "";

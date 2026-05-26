@@ -770,12 +770,24 @@ export interface NewContactState {
   customer: string;
 }
 
+export interface ContactEmailEntry {
+  email_id: string;
+  isPrimary: boolean;
+  key: number;
+}
+
+export interface ContactPhoneEntry {
+  phone: string;
+  isPrimary: boolean;
+  key: number;
+}
+
 export interface EditContactState {
   firstName: string;
   lastName: string;
   image: string;
-  emails: { email_id: string; isPrimary: boolean }[];
-  phones: { phone: string; isPrimary: boolean }[];
+  emails: ContactEmailEntry[];
+  phones: ContactPhoneEntry[];
   customers: string[];
   timezone: string;
 }
