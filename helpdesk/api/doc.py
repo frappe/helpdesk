@@ -178,15 +178,34 @@ def get_list_data(
                 if not linked_dt:
                     return []
                 lookup_field = label_field or "name"
+                # Pull `color` from the linked doctype when it has one
+                # (e.g. HD Ticket Status) so kanban column headers match
+                # the colors used in the filter/status UI.
+                meta_dt = label_doc or linked_dt
+                meta = frappe.get_meta(meta_dt)
+                extra_fields = []
+                if meta.has_field("color"):
+                    extra_fields.append("color")
+                # `order` is a SQL reserved word — Frappe's QueryBuilder
+                # rejects it in order_by even with backticks — so fetch
+                # without SQL ordering and sort in Python below.
+                has_order = meta.has_field("order")
+                if has_order:
+                    extra_fields.append("order")
                 rows_ = frappe.get_all(
-                    label_doc or linked_dt,
-                    fields=["name", lookup_field],
-                    order_by=lookup_field,
+                    meta_dt,
+                    fields=["name", lookup_field, *extra_fields],
+                    order_by="name",
                 )
+                if has_order:
+                    rows_ = sorted(
+                        rows_, key=lambda r: (r.get("order") is None, r.get("order"))
+                    )
                 return [
                     {
                         "label": r.get(lookup_field) or r.get("name"),
                         "value": r.get("name"),
+                        **({"color": r.get("color")} if r.get("color") else {}),
                     }
                     for r in rows_
                 ]
