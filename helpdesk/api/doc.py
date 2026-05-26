@@ -156,11 +156,40 @@ def get_list_data(
     if show_customer_portal_fields:
         fields = get_customer_portal_fields(doctype, fields)
 
-    if group_by_field and view_type == "group_by":
+    if group_by_field and view_type in ("group_by", "kanban"):
 
         def get_options(fieldtype, options):
             if fieldtype == "Select":
-                return [option for option in options.split("\n")]
+                # All Select options from the schema, normalised to
+                # [{label, value}] so list and kanban renderers iterate
+                # uniformly — empty/whitespace tokens are dropped so a
+                # leading "\n" in the field definition doesn't create a
+                # phantom column.
+                return [
+                    {"label": opt, "value": opt}
+                    for opt in (options or "").split("\n")
+                    if opt and opt.strip()
+                ]
+            if fieldtype == "Link" and view_type == "kanban":
+                # For a kanban board we want a column per linked record,
+                # not just the ones currently referenced — so empty swim
+                # lanes are visible and drag-and-drop can target them.
+                linked_dt = options
+                if not linked_dt:
+                    return []
+                lookup_field = label_field or "name"
+                rows_ = frappe.get_all(
+                    label_doc or linked_dt,
+                    fields=["name", lookup_field],
+                    order_by=lookup_field,
+                )
+                return [
+                    {
+                        "label": r.get(lookup_field) or r.get("name"),
+                        "value": r.get("name"),
+                    }
+                    for r in rows_
+                ]
             else:
                 has_empty_values = any([not d.get(group_by_field) for d in data])
                 options = list(set([d.get(group_by_field) for d in data]))
@@ -188,11 +217,11 @@ def get_list_data(
                         for field in order_by_fields
                     ]
                     if (group_by_field, "asc") in order_by_fields:
-                        options.sort(key=lambda x: x.get("label"))
+                        options.sort(key=lambda x: x.get("label") or "")
                     elif (group_by_field, "desc") in order_by_fields:
-                        options.sort(reverse=True, key=lambda x: x.get("label"))
+                        options.sort(reverse=True, key=lambda x: x.get("label") or "")
                 else:
-                    options.sort(key=lambda x: x.get("label"))
+                    options.sort(key=lambda x: x.get("label") or "")
 
                 # general category at first position
                 idx = [

@@ -18,6 +18,11 @@
         v-if="isViewUpdated && canSaveView"
         @click="handleViewUpdate"
       />
+      <ViewTypeSwitch
+        v-if="!options.hideViewTypeSwitch"
+        :model-value="effectiveViewType"
+        @update:model-value="handleViewTypeChange"
+      />
       <Reload @click="handleReload" :loading="list.loading" />
       <Filter :default_filters="defaultParams.filters" />
       <SortBy :hide-label="isMobileView" />
@@ -35,9 +40,19 @@
     </div>
   </div>
 
+  <!-- Kanban View -->
+  <KanbanView
+    v-if="effectiveViewType === 'kanban'"
+    :doctype="options.doctype"
+    :rows="list.data?.data || []"
+    :loading="!!list.loading"
+    :group-by-field="list.data?.group_by_field"
+    :row-route="options.rowRoute"
+    @card-moved="handleReload"
+  />
   <!-- Loading State -->
   <div
-    v-if="list.loading && !list.data?.data?.length"
+    v-else-if="list.loading && !list.data?.data?.length"
     class="flex items-center justify-center h-full w-full absolute top-0 z-100"
   >
     <LoadingIndicator :scale="8" />
@@ -130,6 +145,7 @@ import {
   QuickFilters,
   Reload,
   SortBy,
+  ViewTypeSwitch,
 } from "@/components/view-controls";
 import { useScreenSize } from "@/composables/screen";
 import {
@@ -173,6 +189,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import dayjs from "dayjs";
 import EmptyState from "./EmptyState.vue";
+import KanbanView from "./KanbanView.vue";
 import ListRows from "./ListRows.vue";
 
 interface P {
@@ -312,6 +329,31 @@ const emptyState = computed(() => {
 
 const isViewUpdated = ref(false);
 
+// Local override for view type (List / Group By / Kanban) — lets the user
+// toggle the layout without modifying the underlying HD View record.
+const viewTypeOverride = ref<"list" | "group_by" | "kanban" | null>(null);
+const effectiveViewType = computed<"list" | "group_by" | "kanban">(() => {
+  if (viewTypeOverride.value) return viewTypeOverride.value;
+  const t = list.data?.view_type || defaultParams.view?.view_type;
+  return t === "group_by" || t === "kanban" ? t : "list";
+});
+function handleViewTypeChange(val: "list" | "group_by" | "kanban") {
+  viewTypeOverride.value = val;
+  defaultParams.view = {
+    ...defaultParams.view,
+    view_type: val,
+    // Default to "status" for kanban/group_by when the view doesn't specify one
+    group_by_field:
+      defaultParams.view?.group_by_field &&
+      defaultParams.view.group_by_field !== "owner"
+        ? defaultParams.view.group_by_field
+        : val === "list"
+        ? defaultParams.view?.group_by_field
+        : "status",
+  };
+  list.submit({ ...defaultParams });
+}
+
 const list = createResource({
   url: "helpdesk.api.doc.get_list_data",
   params: defaultParams,
@@ -363,7 +405,7 @@ function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
 
 const rows = computed(() => {
   if (!list.data?.data) return [];
-  if (list.data.view_type === "group_by") {
+  if (effectiveViewType.value === "group_by") {
     if (!list.data?.group_by_field?.name) return [];
     return getGroupedByRows(list.data.data, list.data.group_by_field);
   }
@@ -691,6 +733,22 @@ function handleViewChanges() {
   defaultParams.order_by = currentView.order_by || "modified desc";
   defaultParams.columns = currentView.columns;
   defaultParams.rows = currentView.rows;
+  // Carry the view type + group_by_field so the backend knows how to shape
+  // the response (e.g. kanban needs group_by_field expanded to {label,value}).
+  // If the user has toggled to a different view type via ViewTypeSwitch,
+  // keep that local override instead of resetting it from the saved view.
+  const storedType = (currentView as any).type || "list";
+  const effectiveType = viewTypeOverride.value || storedType;
+  const storedGroupBy = (currentView as any).group_by_field;
+  defaultParams.view = {
+    ...defaultParams.view,
+    view_type: effectiveType,
+    group_by_field:
+      storedGroupBy ||
+      defaultParams.view.group_by_field ||
+      (effectiveType === "list" ? null : "status"),
+    name: currentView.name,
+  };
 
   if (route.query.filters) {
     try {
@@ -725,6 +783,8 @@ watch(
   () => route.query.view,
   (val: string) => {
     defaultParams.view.name = val;
+    // Switching to a different saved view clears any local view-type override
+    viewTypeOverride.value = null;
     handleViewChanges();
     if (!val) {
       headerView.value.label = __("List");
