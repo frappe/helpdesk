@@ -260,7 +260,7 @@ export interface HDServiceLevelAgreement extends DocType {
   default_ticket_status?: string;
 }
 
-// Last updated: 2026-02-02 11:15:47.402850
+// Last updated: 2026-05-19 14:59:12.901015
 export interface HDAgent extends DocType {
   /** User: Link (User) */
   user: string;
@@ -271,7 +271,7 @@ export interface HDAgent extends DocType {
   /** Image: Attach Image */
   user_image?: string;
   /** Availability: Select */
-  availability: string;
+  availability?: 'Active' | 'Away' | 'Busy';
 }
 
 // Last updated: 2022-12-22 18:52:50.658355
