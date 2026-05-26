@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-05-10 10:49+0000\n"
-"PO-Revision-Date: 2026-05-11 05:53\n"
+"POT-Creation-Date: 2026-05-17 10:53+0000\n"
+"PO-Revision-Date: 2026-05-19 08:27\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Vietnamese\n"
 "MIME-Version: 1.0\n"
@@ -112,7 +112,7 @@ msgstr ""
 msgid "API"
 msgstr "API"
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:338
+#: desk/src/components/Settings/Teams/TeamEdit.vue:274
 msgid "Access all team tickets"
 msgstr ""
 
@@ -120,7 +120,7 @@ msgstr ""
 msgid "Access denied"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:337
+#: desk/src/components/Settings/Teams/TeamEdit.vue:273
 msgid "Access only this team's tickets"
 msgstr ""
 
@@ -188,7 +188,7 @@ msgstr ""
 msgid "Add Weekly Holidays"
 msgstr "Thêm Ngày nghỉ hàng tuần"
 
-#: desk/src/components/layouts/Sidebar.vue:483
+#: desk/src/components/layouts/Sidebar.vue:500
 msgid "Add a comment on a ticket"
 msgstr "Thêm nhận xét vào phiếu hỗ trợ"
 
@@ -218,7 +218,7 @@ msgstr ""
 msgid "Add holidays here to make sure they’re excluded from SLA calculations."
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:97
+#: desk/src/components/Settings/Teams/TeamEdit.vue:108
 msgid "Add members to this team to get started."
 msgstr ""
 
@@ -229,7 +229,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayList.vue:23
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:98
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:23
-#: desk/src/components/Settings/Teams/TeamsList.vue:119
+#: desk/src/components/Settings/Teams/TeamsList.vue:120
 msgid "Add one to get started."
 msgstr ""
 
@@ -331,7 +331,7 @@ msgstr "Các nhân viên sẽ không còn có thể xem và tạo các phản h�
 
 #. Name of a role
 #: desk/src/components/SavedRepliesSelectorModal.vue:159
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:328
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:331
 #: desk/src/components/ticket/TicketSplitModal.vue:6
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
@@ -351,13 +351,13 @@ msgstr "Tất Cả"
 msgid "All SLAs on track"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:349
-#: desk/src/pages/home/components/RecentFeedback.vue:387
-#: desk/src/pages/home/components/RecentFeedback.vue:395
+#: desk/src/pages/home/components/RecentFeedback.vue:350
+#: desk/src/pages/home/components/RecentFeedback.vue:388
+#: desk/src/pages/home/components/RecentFeedback.vue:396
 msgid "All Time"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:276
+#: desk/src/components/layouts/Sidebar.vue:285
 msgid "All Views"
 msgstr "Tất cả các chế độ xem"
 
@@ -458,10 +458,6 @@ msgstr "Bạn có chắc chắn muốn đóng phiếu hỗ trợ này không?"
 msgid "Are you sure you want to delete these articles?"
 msgstr "Bạn có chắc chắn muốn xóa các bài viết này không?"
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:107
-msgid "Are you sure you want to delete this team? This action cannot be reversed!"
-msgstr ""
-
 #: desk/src/components/ticket-agent/TicketHeader.vue:204
 msgid "Are you sure you want to delete this ticket? This is an irreversible action and cannot be undone."
 msgstr ""
@@ -474,7 +470,7 @@ msgstr "Bạn có chắc chắn muốn xóa chế độ xem này không?"
 msgid "Are you sure you want to discard changes?"
 msgstr "Bạn có chắc chắn muốn hủy bỏ các thay đổi không?"
 
-#: desk/src/pages/knowledge-base/NewArticle.vue:146
+#: desk/src/pages/knowledge-base/NewArticle.vue:144
 msgid "Are you sure you want to discard this article?"
 msgstr "Bạn có chắc chắn muốn hủy bỏ bài viết này không?"
 
@@ -483,15 +479,15 @@ msgstr "Bạn có chắc chắn muốn hủy bỏ bài viết này không?"
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:81
 #: desk/src/components/Settings/Holiday/HolidayView.vue:210
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:243
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:311
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:316
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:371
-#: desk/src/components/Settings/Teams/NewTeam.vue:109
+#: desk/src/components/Settings/Teams/NewTeam.vue:125
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:230
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:199
 msgid "Are you sure you want to go back? Unsaved changes will be lost."
 msgstr "Bạn chắc chắn muốn quay lại? Các thay đổi chưa lưu sẽ bị mất."
 
-#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:162
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:164
 msgid "Are you sure you want to leave? Unsaved changes will be lost."
 msgstr ""
 
@@ -513,7 +509,7 @@ msgstr ""
 msgid "Article body cannot be set as empty."
 msgstr ""
 
-#: desk/src/pages/knowledge-base/NewArticle.vue:119
+#: desk/src/pages/knowledge-base/NewArticle.vue:117
 msgid "Article created successfully."
 msgstr ""
 
@@ -541,7 +537,7 @@ msgstr ""
 msgid "Articles moved successfully."
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:458
+#: desk/src/components/layouts/Sidebar.vue:475
 msgid "Assign a ticket to an agent"
 msgstr "Giao một phiếu hỗ trợ cho một nhân viên"
 
@@ -650,10 +646,6 @@ msgstr ""
 msgid "At least one email is required"
 msgstr "Cần ít nhất một email"
 
-#: desk/src/components/Settings/InviteAgents.vue:171
-msgid "At least one email required"
-msgstr ""
-
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:73
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
 msgstr ""
@@ -662,7 +654,7 @@ msgstr ""
 msgid "At least one feedback option must be enabled for rating {0}"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:451
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:456
 msgid "At least one team is required"
 msgstr "Cần ít nhất một nhóm"
 
@@ -773,12 +765,12 @@ msgid "Avg. feedback rating for the tickets resolved"
 msgstr ""
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:117
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:279
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:286
 msgid "Avg. first response time"
 msgstr ""
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:126
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:287
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:294
 msgid "Avg. resolution time"
 msgstr ""
 
@@ -790,7 +782,7 @@ msgstr ""
 msgid "Avg. time taken to resolve a ticket"
 msgstr ""
 
-#: desk/src/components/Settings/EmailAdd.vue:143
+#: desk/src/components/Settings/EmailAdd.vue:145
 #: desk/src/components/Settings/EmailEdit.vue:134
 msgid "Back"
 msgstr "Quay lại"
@@ -871,7 +863,7 @@ msgstr "CSV"
 msgid "Call Details"
 msgstr "Chi tiết cuộc gọi"
 
-#: desk/src/components/layouts/Sidebar.vue:271
+#: desk/src/components/layouts/Sidebar.vue:280
 msgid "Call Logs"
 msgstr "Nhật ký cuộc gọi"
 
@@ -891,15 +883,15 @@ msgstr "Người Gọi"
 msgid "Calls"
 msgstr "Cuộc gọi"
 
-#: desk/src/components/Settings/InviteAgents.vue:148
+#: desk/src/components/Settings/InviteAgents.vue:162
 msgid "Can invite new agents, manage tickets, create custom views and manage public views."
 msgstr ""
 
-#: desk/src/components/Settings/InviteAgents.vue:156
+#: desk/src/components/Settings/InviteAgents.vue:170
 msgid "Can manage all aspects of Helpdesk."
 msgstr ""
 
-#: desk/src/components/Settings/InviteAgents.vue:140
+#: desk/src/components/Settings/InviteAgents.vue:154
 msgid "Can work on tickets, create custom views and manage private views."
 msgstr ""
 
@@ -907,7 +899,7 @@ msgstr ""
 msgid "Cancel"
 msgstr "Hủy"
 
-#: desk/src/components/Settings/InviteAgents.vue:57
+#: desk/src/components/Settings/InviteAgents.vue:63
 msgid "Cancel Invitation"
 msgstr ""
 
@@ -915,7 +907,7 @@ msgstr ""
 msgid "Canceled"
 msgstr "Đã hủy"
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:514
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:526
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr ""
 
@@ -1026,7 +1018,7 @@ msgstr ""
 msgid "Change your search terms or filters"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamsList.vue:118
+#: desk/src/components/Settings/Teams/TeamsList.vue:119
 msgid "Change your search terms to find teams."
 msgstr ""
 
@@ -1035,7 +1027,7 @@ msgstr ""
 msgid "Channels"
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependencyFieldsSelection.vue:17
+#: desk/src/components/Settings/FieldDependency/FieldDependencyFieldsSelection.vue:18
 msgid "Child field"
 msgstr ""
 
@@ -1071,7 +1063,7 @@ msgstr ""
 msgid "Choose which tickets are affected by this un-assignment rule."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:95
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:96
 msgid "Choose who can view and use this response."
 msgstr "Chọn người có thể xem và sử dụng phản hồi này."
 
@@ -1093,8 +1085,8 @@ msgid "Click on Add to Holidays. This will populate the holidays table with all 
 msgstr "Nhấp vào Thêm vào Ngày lễ. Điều này sẽ điền bảng ngày lễ với tất cả các ngày rơi vào ngày nghỉ hàng tuần đã chọn. Lặp lại quy trình để điền ngày cho tất cả các ngày lễ hàng tuần của bạn"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:69
-#: desk/src/components/Settings/Holiday/HolidayListItem.vue:45
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:199
+#: desk/src/components/Settings/Holiday/HolidayListItem.vue:47
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:202
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:58
 #: desk/src/pages/ticket/MobileTicketAgent.vue:157
 #: desk/src/pages/ticket/TicketCustomer.vue:14
@@ -1110,7 +1102,7 @@ msgstr "Đóng phiếu hỗ trợ"
 msgid "Closed"
 msgstr "Đã đóng"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:352
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:351
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr ""
 
@@ -1144,7 +1136,7 @@ msgid "Comment cannot be empty."
 msgstr ""
 
 #: desk/src/components/CommentBox.vue:308
-msgid "Comment deleted sucessfully."
+msgid "Comment deleted successfully."
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:67
@@ -1211,10 +1203,8 @@ msgstr ""
 msgid "Configure your telephony settings."
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:115
-#: desk/src/components/Settings/Teams/TeamEdit.vue:241
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:323
-#: desk/src/pages/knowledge-base/NewArticle.vue:149
+#: desk/src/pages/knowledge-base/NewArticle.vue:147
 #: desk/src/pages/ticket/MobileTicketAgent.vue:154
 #: desk/src/pages/ticket/TicketCustomer.vue:296
 #: desk/src/pages/ticket/Tickets.vue:375 desk/src/pages/ticket/Tickets.vue:497
@@ -1233,7 +1223,7 @@ msgstr "Xác nhận mật khẩu"
 msgid "Confirm overwrite"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:415
+#: desk/src/components/layouts/Sidebar.vue:432
 msgid "Connect your support email"
 msgstr "Kết nối email hỗ trợ của bạn"
 
@@ -1295,30 +1285,34 @@ msgstr "Sao chép URL phiếu hỗ trợ"
 msgid "Copy ticket id"
 msgstr "Sao chép mã phiếu hỗ trợ"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:666
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:668
 msgid "Could not an email due to: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:827
+#: helpdesk/patches/set_hd_ticket_naming_series.py:37
+msgid "Could not find the `name` column in tabHD Ticket"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:829
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:170
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:169
 msgid "Could not send feedback email,due to: {0}"
 msgstr ""
 
-#: desk/src/components/Settings/EmailAdd.vue:150
+#: desk/src/components/Settings/EmailAdd.vue:152
 #: desk/src/components/Settings/NewTeamModal.vue:8
 #: desk/src/components/desk/global/NewContactDialog.vue:39
-#: desk/src/components/layouts/Sidebar.vue:520
+#: desk/src/components/layouts/Sidebar.vue:537
 #: desk/src/pages/call-logs/CallLogModal.vue:225
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
-#: desk/src/pages/knowledge-base/NewArticle.vue:31
+#: desk/src/pages/knowledge-base/NewArticle.vue:29
 msgid "Create"
 msgstr "Tạo"
 
-#: desk/src/components/layouts/Sidebar.vue:513
-#: desk/src/components/layouts/Sidebar.vue:519
+#: desk/src/components/layouts/Sidebar.vue:530
+#: desk/src/components/layouts/Sidebar.vue:536
 msgid "Create & invite a contact"
 msgstr "Tạo và mời một liên hệ"
 
@@ -1330,11 +1324,11 @@ msgstr "Tạo liên hệ mới"
 msgid "Create View"
 msgstr "Tạo Chế độ xem"
 
-#: desk/src/components/layouts/Sidebar.vue:448
+#: desk/src/components/layouts/Sidebar.vue:465
 msgid "Create a ticket"
 msgstr "Tạo phiếu hỗ trợ"
 
-#: desk/src/components/layouts/Sidebar.vue:496
+#: desk/src/components/layouts/Sidebar.vue:513
 msgid "Create an article"
 msgstr "Tạo bài viết"
 
@@ -1370,8 +1364,8 @@ msgstr "Thông báo tùy chỉnh ngoài giờ làm việc"
 #: desk/src/pages/dashboard/Dashboard.vue:510
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:175
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:196
-#: desk/src/pages/home/components/RecentFeedback.vue:365
-#: desk/src/pages/home/components/RecentFeedback.vue:391
+#: desk/src/pages/home/components/RecentFeedback.vue:366
+#: desk/src/pages/home/components/RecentFeedback.vue:392
 msgid "Custom Range"
 msgstr "Phạm vi tùy chỉnh"
 
@@ -1391,7 +1385,7 @@ msgstr "Tên khách hàng"
 msgid "Customer created successfully."
 msgstr "Khách hàng tạo thành công."
 
-#: desk/src/components/layouts/Sidebar.vue:333
+#: desk/src/components/layouts/Sidebar.vue:349
 msgid "Customer portal"
 msgstr "Cổng thông tin khách hàng"
 
@@ -1408,7 +1402,8 @@ msgstr ""
 msgid "Cyan"
 msgstr "Lam"
 
-#: desk/src/components/layouts/Sidebar.vue:367
+#: desk/src/components/layouts/Sidebar.vue:332
+#: desk/src/components/layouts/Sidebar.vue:384
 #: desk/src/pages/knowledge-base/Article.vue:656
 msgid "Danger"
 msgstr "Nguy hiểm"
@@ -1512,8 +1507,6 @@ msgstr ""
 #: desk/src/components/ListViewBuilder.vue:233
 #: desk/src/components/ListViewBuilder.vue:237
 #: desk/src/components/ListViewBuilder.vue:243
-#: desk/src/components/Settings/Teams/TeamEdit.vue:348
-#: desk/src/components/Settings/Teams/TeamEdit.vue:350
 #: desk/src/components/ticket-agent/TicketHeader.vue:209
 #: desk/src/components/ticket-agent/TicketHeader.vue:280
 #: desk/src/components/ticket-agent/TicketHeader.vue:282
@@ -1592,10 +1585,6 @@ msgstr ""
 msgid "Details"
 msgstr "Chi tiết"
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:299
-msgid "Disable Bypass Restrictions"
-msgstr ""
-
 #: desk/src/components/Settings/General/components/TicketSettings.vue:67
 msgid "Disable global saved replies"
 msgstr "Tắt các phản hồi đã lưu chung"
@@ -1610,9 +1599,12 @@ msgstr "Tắt các phản hồi đã lưu có phạm vi 'Toàn cục' (Global)"
 msgid "Disable signup"
 msgstr ""
 
+#. Label of the disabled (Check) field in DocType 'HD Team'
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
 #. Label of the disabled (Check) field in DocType 'HD Ticket Priority'
 #. Label of the disabled (Check) field in DocType 'HD Ticket Type'
+#: desk/src/components/Settings/Teams/TeamsList.vue:62
+#: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
@@ -1623,11 +1615,11 @@ msgstr "Đã tắt"
 msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
 msgstr ""
 
-#: desk/src/pages/knowledge-base/NewArticle.vue:29
+#: desk/src/pages/knowledge-base/NewArticle.vue:27
 msgid "Discard"
 msgstr "Loại bỏ"
 
-#: desk/src/pages/knowledge-base/NewArticle.vue:145
+#: desk/src/pages/knowledge-base/NewArticle.vue:143
 msgid "Discard Article"
 msgstr "Hủy bỏ bài viết"
 
@@ -1661,7 +1653,7 @@ msgstr ""
 msgid "DocType"
 msgstr "Loại tài liệu"
 
-#: desk/src/components/layouts/Sidebar.vue:347
+#: desk/src/components/layouts/Sidebar.vue:363
 msgid "Docs"
 msgstr "Tài liệu"
 
@@ -1687,10 +1679,10 @@ msgstr "Bản nháp"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:72
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:138
-#: desk/src/components/Settings/Holiday/HolidayListItem.vue:48
-#: desk/src/components/Settings/Holiday/HolidayListItem.vue:88
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:202
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:266
+#: desk/src/components/Settings/Holiday/HolidayListItem.vue:50
+#: desk/src/components/Settings/Holiday/HolidayListItem.vue:90
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:205
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:269
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:61
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:102
 #: desk/src/pages/ticket/Tickets.vue:398
@@ -1701,7 +1693,7 @@ msgstr "Trùng lặp"
 msgid "Duplicate Assignment Rule"
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayListItem.vue:28
+#: desk/src/components/Settings/Holiday/HolidayListItem.vue:30
 msgid "Duplicate Holiday List"
 msgstr ""
 
@@ -1709,7 +1701,7 @@ msgstr ""
 msgid "Duplicate SLA Policy"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:183
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:186
 msgid "Duplicate Saved reply"
 msgstr "Sao chép phản hồi đã lưu"
 
@@ -1799,7 +1791,7 @@ msgstr ""
 msgid "Email Settings"
 msgstr "Cài đặt email"
 
-#: desk/src/components/Settings/EmailAdd.vue:307
+#: desk/src/components/Settings/EmailAdd.vue:309
 msgid "Email account created"
 msgstr ""
 
@@ -1839,10 +1831,6 @@ msgstr ""
 msgid "Emoji"
 msgstr "Biểu tượng cảm xúc"
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:300
-msgid "Enable Bypass Restrictions"
-msgstr ""
-
 #. Label of the enable_comment_reactions (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:23
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1875,6 +1863,8 @@ msgstr ""
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:80
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:34
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:31
+#: desk/src/components/Settings/Teams/NewTeam.vue:28
+#: desk/src/components/Settings/Teams/TeamEdit.vue:22
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:40
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:39
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -1913,8 +1903,7 @@ msgstr "Vui lòng nhập một số điện thoại hợp lệ"
 msgid "Enter brand name"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:59
-#: desk/src/components/Settings/Teams/TeamEdit.vue:238
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:60
 msgid "Enter the new name for the team"
 msgstr ""
 
@@ -1952,7 +1941,7 @@ msgstr "Exotel"
 msgid "Expand"
 msgstr "Mở rộng"
 
-#: desk/src/components/layouts/Sidebar.vue:533
+#: desk/src/components/layouts/Sidebar.vue:550
 msgid "Explore customer portal"
 msgstr "Khám phá cổng thông tin khách hàng"
 
@@ -1986,7 +1975,7 @@ msgstr "Thất bại"
 msgid "Failed to create category"
 msgstr ""
 
-#: desk/src/components/Settings/EmailAdd.vue:313
+#: desk/src/components/Settings/EmailAdd.vue:315
 msgid "Failed to create email account, Invalid credentials"
 msgstr ""
 
@@ -2080,11 +2069,11 @@ msgstr ""
 msgid "Feedback Trend"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:168
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:167
 msgid "Feedback email has been sent to the customer"
 msgstr ""
 
-#: desk/src/components/knowledge-base/ArticleFeedback.vue:77
+#: desk/src/components/knowledge-base/ArticleFeedback.vue:79
 msgid "Feedback submitted successfully."
 msgstr ""
 
@@ -2151,6 +2140,12 @@ msgstr "Phản hồi lần đầu vào"
 msgid "First Response Due"
 msgstr "Hạn phản hồi đầu tiên"
 
+#. Label of the first_response_failed_by (Duration) field in DocType 'HD
+#. Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "First Response Failed By"
+msgstr ""
+
 #. Label of the response_time (Duration) field in DocType 'HD Service Level
 #. Priority'
 #. Label of the first_response_time (Duration) field in DocType 'HD Ticket'
@@ -2213,7 +2208,7 @@ msgid "Fulfilled"
 msgstr "Đã thực hiện"
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/layouts/Sidebar.vue:504
+#: desk/src/components/layouts/Sidebar.vue:521
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "General"
 msgstr "Chung"
@@ -2238,9 +2233,9 @@ msgstr ""
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
 #: desk/src/components/SavedRepliesSelectorModal.vue:174
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:349
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:383
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:234
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:352
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:386
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:236
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Global"
 msgstr "Toàn cầu"
@@ -2493,7 +2488,7 @@ msgstr ""
 msgid "Headings Weight"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:134
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:136
 msgid "Hello {{ contact }}, \\n\\nWe are sorry for the inconvenience, we will get back to you soon. \\n\\nRegards, \\n{{ full_name }}"
 msgstr "Xin chào {{ contact }}, \\n\\nChúng tôi xin lỗi vì sự bất tiện này, chúng tôi sẽ sớm phản hồi lại bạn. \\n\\nTrân trọng, \\n{{ full_name }}"
 
@@ -2569,11 +2564,11 @@ msgstr "Tên Danh sách ngày nghỉ"
 msgid "Holiday list created successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayListItem.vue:151
+#: desk/src/components/Settings/Holiday/HolidayListItem.vue:153
 msgid "Holiday list deleted successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayListItem.vue:124
+#: desk/src/components/Settings/Holiday/HolidayListItem.vue:126
 msgid "Holiday list duplicated successfully."
 msgstr ""
 
@@ -2648,7 +2643,7 @@ msgstr ""
 msgid "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \n"
 msgstr ""
 
-#: desk/src/components/knowledge-base/ArticleFeedback.vue:13
+#: desk/src/components/knowledge-base/ArticleFeedback.vue:15
 msgid "If your issue isn't resolved, raise a support ticket"
 msgstr ""
 
@@ -2743,11 +2738,11 @@ msgstr "Số điện thoại không hợp lệ"
 msgid "Invite Agents"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:84
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:86
 msgid "Invite agent"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:426
+#: desk/src/components/layouts/Sidebar.vue:443
 msgid "Invite agents"
 msgstr "Mời nhân viên"
 
@@ -2833,7 +2828,7 @@ msgstr "Phím tắt"
 #: desk/src/pages/knowledge-base/Article.vue:670
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:6
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:458
-#: desk/src/pages/knowledge-base/NewArticle.vue:171
+#: desk/src/pages/knowledge-base/NewArticle.vue:169
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Knowledge Base"
 msgstr "Cơ sở Kiến thức"
@@ -2867,8 +2862,8 @@ msgstr "Ngôn ngữ"
 msgid "Last"
 msgstr "Cuối cùng"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:361
-#: desk/src/pages/home/components/RecentFeedback.vue:390
+#: desk/src/pages/home/components/RecentFeedback.vue:362
+#: desk/src/pages/home/components/RecentFeedback.vue:391
 msgid "Last 3 Months"
 msgstr "3 Tháng Qua"
 
@@ -2910,8 +2905,8 @@ msgstr "Phản hồi cuối của nhân viên"
 msgid "Last Customer Response"
 msgstr "Phản hồi cuối của khách hàng"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:357
-#: desk/src/pages/home/components/RecentFeedback.vue:389
+#: desk/src/pages/home/components/RecentFeedback.vue:358
+#: desk/src/pages/home/components/RecentFeedback.vue:390
 msgid "Last Month"
 msgstr "Tháng trước"
 
@@ -2919,8 +2914,8 @@ msgstr "Tháng trước"
 msgid "Last Name"
 msgstr "Họ"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:353
-#: desk/src/pages/home/components/RecentFeedback.vue:388
+#: desk/src/pages/home/components/RecentFeedback.vue:354
+#: desk/src/pages/home/components/RecentFeedback.vue:389
 msgid "Last Week"
 msgstr "Tuần trước"
 
@@ -3004,7 +2999,7 @@ msgid "Load Default Columns"
 msgstr "Tải cột mặc định"
 
 #: desk/src/components/Settings/Agents.vue:182
-#: desk/src/components/Settings/Teams/TeamsList.vue:84
+#: desk/src/components/Settings/Teams/TeamsList.vue:85
 msgid "Load More"
 msgstr "Tải thêm"
 
@@ -3016,12 +3011,12 @@ msgstr "Đang tải..."
 msgid "Log a Call"
 msgstr "Ghi nhật ký cuộc gọi"
 
-#: desk/src/components/layouts/Sidebar.vue:322
-#: desk/src/components/layouts/Sidebar.vue:371
+#: desk/src/components/layouts/Sidebar.vue:336
+#: desk/src/components/layouts/Sidebar.vue:388
 msgid "Log out"
 msgstr "Đăng xuất"
 
-#: desk/src/components/layouts/Sidebar.vue:351
+#: desk/src/components/layouts/Sidebar.vue:367
 msgid "Login to Frappe Cloud"
 msgstr "Đăng nhập vào đám mây Frappe"
 
@@ -3086,20 +3081,12 @@ msgstr ""
 msgid "Mark all as read"
 msgstr "Đánh dấu tất cả đã đọc"
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:46
+#: desk/src/components/Settings/Teams/NewTeam.vue:54
 msgid "Members"
 msgstr "Thành viên"
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:57
+#: desk/src/components/Settings/Teams/TeamEdit.vue:67
 msgid "Members ({0})"
-msgstr ""
-
-#: desk/src/components/Settings/Teams/TeamEdit.vue:309
-msgid "Members of this team will be able to see the tickets assigned to all the teams"
-msgstr ""
-
-#: desk/src/components/Settings/Teams/TeamEdit.vue:306
-msgid "Members of this team will see the tickets assigned to this team only"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
@@ -3155,7 +3142,7 @@ msgid "My Dashboard"
 msgstr ""
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:169
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:342
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:345
 msgid "My Team"
 msgstr "Nhóm của tôi"
 
@@ -3198,8 +3185,8 @@ msgstr ""
 msgid "Navigation"
 msgstr "Điều hướng"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:381
-#: desk/src/pages/home/components/RecentFeedback.vue:399
+#: desk/src/pages/home/components/RecentFeedback.vue:382
+#: desk/src/pages/home/components/RecentFeedback.vue:400
 msgid "Negative first"
 msgstr ""
 
@@ -3216,8 +3203,8 @@ msgstr ""
 msgid "New"
 msgstr "Mới"
 
-#: desk/src/pages/knowledge-base/NewArticle.vue:176
-#: desk/src/pages/knowledge-base/NewArticle.vue:183
+#: desk/src/pages/knowledge-base/NewArticle.vue:174
+#: desk/src/pages/knowledge-base/NewArticle.vue:181
 msgid "New Article"
 msgstr "Bài viết mới"
 
@@ -3241,7 +3228,7 @@ msgstr ""
 msgid "New Field Dependency"
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayListItem.vue:34
+#: desk/src/components/Settings/Holiday/HolidayListItem.vue:36
 msgid "New Holiday List Name"
 msgstr ""
 
@@ -3261,7 +3248,7 @@ msgstr ""
 msgid "New Saved Reply"
 msgstr "Câu trả lời đã lưu mới"
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:189
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:192
 msgid "New Saved reply Name"
 msgstr "Tên câu trả lời đã lưu mới"
 
@@ -3278,8 +3265,7 @@ msgstr "Nhóm mới"
 msgid "New Ticket"
 msgstr "Phiếu hỗ trợ mới"
 
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:48
-#: desk/src/components/Settings/Teams/TeamEdit.vue:264
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:49
 msgid "New and old title cannot be same"
 msgstr ""
 
@@ -3287,8 +3273,7 @@ msgstr ""
 msgid "New team"
 msgstr "Nhóm mới"
 
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:46
-#: desk/src/components/Settings/Teams/TeamEdit.vue:262
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:47
 msgid "New title is required"
 msgstr ""
 
@@ -3308,7 +3293,7 @@ msgstr "Không trả lời"
 msgid "No Data Found"
 msgstr "Không tìm thấy dữ liệu"
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:590
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:492
 msgid "No Email Account found for {0}"
 msgstr ""
 
@@ -3388,7 +3373,7 @@ msgstr ""
 msgid "No field dependency found"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:94
+#: desk/src/components/Settings/Teams/TeamEdit.vue:105
 msgid "No members found"
 msgstr ""
 
@@ -3424,7 +3409,7 @@ msgstr ""
 msgid "No recently assigned tickets"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:76
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:78
 msgid "No results found"
 msgstr "Không tìm thấy kết quả nào"
 
@@ -3433,7 +3418,7 @@ msgstr "Không tìm thấy kết quả nào"
 msgid "No saved replies found"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamsList.vue:113
+#: desk/src/components/Settings/Teams/TeamsList.vue:114
 msgid "No team found"
 msgstr ""
 
@@ -3650,7 +3635,7 @@ msgstr "Đã tạm dừng"
 msgid "Pending"
 msgstr "Đang chờ xử lý"
 
-#: desk/src/components/Settings/InviteAgents.vue:36
+#: desk/src/components/Settings/InviteAgents.vue:42
 msgid "Pending Invites"
 msgstr "Lời mời Đang chờ"
 
@@ -3682,9 +3667,9 @@ msgstr "Thời kỳ"
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
 #: desk/src/components/SavedRepliesSelectorModal.vue:164
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:335
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:375
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:224
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:338
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:378
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:226
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Personal"
 msgstr "Cá nhân"
@@ -3729,7 +3714,7 @@ msgstr "Phần giữ chỗ"
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:329
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:341
 msgid "Please add {0} priority in {1} SLA"
 msgstr ""
 
@@ -3750,7 +3735,11 @@ msgstr "Vui lòng nhập chủ đề để tiếp tục"
 msgid "Please enter a valid phone number"
 msgstr "Vui lòng nhập số điện thoại hợp lệ"
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:129
+#: desk/src/components/Settings/InviteAgents.vue:185
+msgid "Please enter at least one valid email to send an invite."
+msgstr ""
+
+#: desk/src/components/Settings/Teams/NewTeam.vue:145
 #: desk/src/pages/call-logs/CallLogModal.vue:264
 #: desk/src/pages/call-logs/CallLogModal.vue:310
 msgid "Please fill all required fields"
@@ -3765,7 +3754,7 @@ msgstr ""
 msgid "Please fill all required fields for Twilio"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:334
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:339
 msgid "Please fill all the required fields"
 msgstr "Vui lòng điền vào tất cả các trường bắt buộc"
 
@@ -3777,6 +3766,10 @@ msgstr "Vui lòng sửa các lỗi trong biểu mẫu"
 msgid "Please provide saved_reply_id"
 msgstr "Vui lòng cung cấp saved_reply_id"
 
+#: desk/src/components/Settings/General/General.vue:247
+msgid "Please select at least one restriction option for teams in the settings."
+msgstr ""
+
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:41
 msgid "Please select weekly off day"
 msgstr "Vui lòng chọn ngày nghỉ hàng tuần"
@@ -3785,9 +3778,9 @@ msgstr "Vui lòng chọn ngày nghỉ hàng tuần"
 msgid "Policy name"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:377
-#: desk/src/pages/home/components/RecentFeedback.vue:400
-#: desk/src/pages/home/components/RecentFeedback.vue:404
+#: desk/src/pages/home/components/RecentFeedback.vue:378
+#: desk/src/pages/home/components/RecentFeedback.vue:401
+#: desk/src/pages/home/components/RecentFeedback.vue:405
 msgid "Positive first"
 msgstr ""
 
@@ -3872,14 +3865,13 @@ msgstr ""
 msgid "Priority {0} has been repeated."
 msgstr "Độ ưu tiên {0} đã bị lặp lại."
 
-#: desk/src/components/layouts/Sidebar.vue:292
+#: desk/src/components/layouts/Sidebar.vue:301
 #: desk/src/pages/ticket/Tickets.vue:324
 msgid "Private Views"
 msgstr "Chế độ xem riêng tư"
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:38
+#: desk/src/components/Settings/Teams/NewTeam.vue:46
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:7
-#: desk/src/components/Settings/Teams/TeamEdit.vue:132
 msgid "Product Experts"
 msgstr ""
 
@@ -3900,7 +3892,7 @@ msgstr "Hồ sơ đã được Cập nhật Thành công"
 msgid "Public"
 msgstr "Công khai"
 
-#: desk/src/components/layouts/Sidebar.vue:284
+#: desk/src/components/layouts/Sidebar.vue:293
 #: desk/src/pages/ticket/Tickets.vue:339
 msgid "Public Views"
 msgstr "Các Chế độ xem Công khai"
@@ -4084,8 +4076,8 @@ msgstr "Xóa Ảnh"
 msgid "Remove photo"
 msgstr "Xóa ảnh"
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:292
-#: desk/src/components/Settings/Teams/TeamsList.vue:166
+#: desk/src/components/Settings/Teams/TeamEdit.vue:263
+#: desk/src/components/Settings/Teams/TeamsList.vue:167
 #: desk/src/components/ticket-agent/TicketSubjectModal.vue:21
 #: desk/src/pages/ticket/MobileTicketAgent.vue:130
 msgid "Rename"
@@ -4099,8 +4091,7 @@ msgstr ""
 msgid "Rename (⌘ + ⏎)"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:58
-#: desk/src/components/Settings/Teams/TeamEdit.vue:237
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:59
 msgid "Rename team"
 msgstr ""
 
@@ -4137,7 +4128,7 @@ msgstr ""
 msgid "Reply from contact"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:470
+#: desk/src/components/layouts/Sidebar.vue:487
 msgid "Reply on a ticket"
 msgstr "Phản hồi phiếu hỗ trợ"
 
@@ -4191,6 +4182,11 @@ msgstr "Chi tiết giải pháp"
 msgid "Resolution Due"
 msgstr "Hạn giải quyết"
 
+#. Label of the resolution_failed_by (Duration) field in DocType 'HD Ticket'
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
+msgid "Resolution Failed By"
+msgstr ""
+
 #. Label of the resolution_time (Duration) field in DocType 'HD Service Level
 #. Priority'
 #. Label of the resolution_time (Duration) field in DocType 'HD Ticket'
@@ -4205,7 +4201,7 @@ msgid "Resolved"
 msgstr "Đã giải quyết"
 
 #. Label of the response_tab (Tab Break) field in DocType 'HD Ticket'
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:114
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:116
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Response"
 msgstr "Phản hồi"
@@ -4238,7 +4234,7 @@ msgstr "Thời gian phản hồi cho mức ưu tiên {0} ở hàng {1} không th
 msgid "Response and Resolution"
 msgstr "Phản hồi và Giải quyết"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:440
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:445
 msgid "Response is required"
 msgstr "Yêu cầu phải có phản hồi"
 
@@ -4265,7 +4261,7 @@ msgstr ""
 msgid "Restrict tickets to be viewed and managed by team members only."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:108
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:110
 msgid "Restrict visibility to these teams"
 msgstr "Hạn chế quyền hiển thị cho các nhóm này"
 
@@ -4297,7 +4293,7 @@ msgstr ""
 msgid "Ringing"
 msgstr "Đang đổ chuông"
 
-#: desk/src/components/Settings/InviteAgents.vue:18
+#: desk/src/components/Settings/InviteAgents.vue:19
 msgid "Role"
 msgstr "Vai trò"
 
@@ -4390,7 +4386,7 @@ msgstr "Thứ Bảy"
 #: desk/src/components/Settings/Profile/Profile.vue:115
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:38
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:35
-#: desk/src/components/Settings/Teams/NewTeam.vue:25
+#: desk/src/components/Settings/Teams/NewTeam.vue:32
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:26
 #: desk/src/components/Settings/Telephony/Telephony.vue:21
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:26
@@ -4415,19 +4411,19 @@ msgstr "Câu trả lời đã lưu"
 msgid "Saved Views"
 msgstr "Các Chế độ xem Đã lưu"
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:291
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:294
 msgid "Saved reply deleted successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:308
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:311
 msgid "Saved reply duplicated successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:357
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:362
 msgid "Saved reply saved successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:420
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:425
 msgid "Saved reply updated successfully."
 msgstr ""
 
@@ -4450,7 +4446,7 @@ msgstr "Kịch bản"
 #. Label of the search_tab (Tab Break) field in DocType 'HD Settings'
 #: desk/src/components/SavedRepliesSelectorModal.vue:28
 #: desk/src/components/Settings/Agents.vue:23
-#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:26
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:28
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:37
 #: desk/src/components/Settings/Holiday/Holidays.vue:27
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:25
@@ -4528,7 +4524,7 @@ msgstr ""
 msgid "Select"
 msgstr "Chọn"
 
-#: desk/src/pages/knowledge-base/NewArticle.vue:21
+#: desk/src/pages/knowledge-base/NewArticle.vue:19
 msgid "Select Category"
 msgstr "Chọn danh mục"
 
@@ -4549,7 +4545,7 @@ msgstr "Chọn một mức đánh giá"
 msgid "Select range"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:104
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:105
 msgid "Select teams"
 msgstr "Chọn nhóm"
 
@@ -4569,7 +4565,7 @@ msgstr "Chọn ngày nghỉ hàng tuần của bạn"
 msgid "Send"
 msgstr "Gửi"
 
-#: desk/src/components/Settings/InviteAgents.vue:31
+#: desk/src/components/Settings/InviteAgents.vue:37
 msgid "Send Invites"
 msgstr "Gửi Lời mời"
 
@@ -4643,12 +4639,14 @@ msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</stro
 msgstr ""
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
-#: desk/src/components/layouts/Sidebar.vue:362
+#: desk/src/components/layouts/Sidebar.vue:379
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Settings"
 msgstr "Thiết lập"
 
-#: desk/src/components/Settings/General/General.vue:245
+#: desk/src/components/Settings/General/General.vue:261
+#: desk/src/components/Settings/General/General.vue:299
+#: desk/src/components/Settings/General/General.vue:308
 msgid "Settings updated"
 msgstr ""
 
@@ -4668,7 +4666,7 @@ msgstr "Cấu hình"
 msgid "Setup Email"
 msgstr "Thiết lập Email"
 
-#: desk/src/components/layouts/Sidebar.vue:437
+#: desk/src/components/layouts/Sidebar.vue:454
 msgid "Setup SLA"
 msgstr "Cài đặt SLA"
 
@@ -4687,7 +4685,7 @@ msgstr ""
 msgid "Share feedback"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:357
+#: desk/src/components/layouts/Sidebar.vue:373
 msgid "Shortcuts"
 msgstr "Phím tắt"
 
@@ -4735,7 +4733,7 @@ msgstr "Đã xảy ra lỗi khi đổi tên quy tắc phân công"
 msgid "Some error occurred while renaming holiday list"
 msgstr "Có lỗi xảy ra khi đổi tên danh sách ngày nghỉ"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:399
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:404
 msgid "Some error occurred while renaming saved reply"
 msgstr "Có lỗi xảy ra khi đổi tên câu trả lời đã lưu"
 
@@ -4909,7 +4907,7 @@ msgstr "Tóm tắt"
 msgid "Sunday"
 msgstr "Chủ Nhật"
 
-#: desk/src/components/layouts/Sidebar.vue:342
+#: desk/src/components/layouts/Sidebar.vue:358
 msgid "Support"
 msgstr "Hỗ trợ"
 
@@ -5000,8 +4998,8 @@ msgstr ""
 #. Label of the team (Link) field in DocType 'HD Saved Reply Team'
 #. Label of the agent_group (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:379
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:229
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:382
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:231
 #: desk/src/pages/SearchAgent.vue:50 desk/src/pages/SearchAgent.vue:51
 #: desk/src/pages/dashboard/Dashboard.vue:63
 #: desk/src/pages/home/components/PendingTickets.vue:33
@@ -5013,7 +5011,7 @@ msgstr ""
 msgid "Team"
 msgstr "Nhóm"
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:37
+#: desk/src/components/Settings/Teams/NewTeam.vue:45
 msgid "Team Name"
 msgstr ""
 
@@ -5023,30 +5021,45 @@ msgstr ""
 msgid "Team Restrictions"
 msgstr ""
 
+#: desk/src/components/Settings/Teams/TeamEdit.vue:280
+msgid "Team can now access all tickets."
+msgstr ""
+
 #: desk/src/components/Settings/NewTeamModal.vue:54
 msgid "Team created"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:139
+#: desk/src/components/Settings/Teams/NewTeam.vue:156
 msgid "Team created successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:189
-#: desk/src/components/Settings/Teams/TeamsList.vue:190
+#: desk/src/components/Settings/Teams/TeamEdit.vue:173
+#: desk/src/components/Settings/Teams/TeamsList.vue:191
 msgid "Team deleted successfully."
+msgstr ""
+
+#: desk/src/components/Settings/Teams/TeamEdit.vue:195
+msgid "Team disabled successfully."
+msgstr ""
+
+#: desk/src/components/Settings/Teams/TeamEdit.vue:194
+msgid "Team enabled successfully."
 msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:48
 msgid "Team name"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:51
-#: desk/src/components/Settings/Teams/TeamEdit.vue:268
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:52
 msgid "Team renamed successfully."
 msgstr ""
 
+#: desk/src/components/Settings/Teams/TeamEdit.vue:281
+msgid "Team will only see their own tickets."
+msgstr ""
+
 #. Label of the teams (Table MultiSelect) field in DocType 'HD Saved Reply'
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:100
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:101
 #: desk/src/components/Settings/Teams/TeamsList.vue:3
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Teams"
@@ -5080,11 +5093,11 @@ msgstr "Tên mẫu"
 msgid "The 'Closed' status cannot be renamed."
 msgstr ""
 
-#: helpdesk/extends/assignment_rule.py:18
+#: helpdesk/extends/assignment_rule.py:20
 msgid "The Assign Condition JSON '{0}' is invalid: </br> {1}"
 msgstr ""
 
-#: helpdesk/extends/assignment_rule.py:26
+#: helpdesk/extends/assignment_rule.py:28
 msgid "The Unassign Condition JSON '{0}' is invalid: </br> {1}"
 msgstr ""
 
@@ -5118,6 +5131,14 @@ msgstr ""
 
 #: desk/src/components/knowledge-base/CategoryFolderContainer.vue:18
 msgid "There are no categories published at the moment."
+msgstr ""
+
+#: helpdesk/extends/assignment_rule.py:14
+msgid "There should be at least 1 assignment rule for ticket"
+msgstr ""
+
+#: helpdesk/extends/assignment_rule.py:51
+msgid "This Assignment Rule is linked to the Team {0}.</br> User {1} is added in the Assignment Rule but not in the linked Team. Please add the user in the {2} to ensure proper team structure."
 msgstr ""
 
 #: desk/src/components/ticket/TicketMergeModal.vue:83
@@ -5190,7 +5211,7 @@ msgstr "Thứ năm"
 msgid "Ticket"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:814
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:816
 msgid "Ticket #{0}: We've received your request"
 msgstr "Yêu cầu hỗ trợ #{0}: Chúng tôi đã nhận được yêu cầu của bạn"
 
@@ -5290,7 +5311,7 @@ msgstr ""
 msgid "Ticket must be Open or Paused."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:342
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:341
 msgid "Ticket must be resolved with a feedback"
 msgstr ""
 
@@ -5396,9 +5417,8 @@ msgstr ""
 #: desk/src/components/Settings/NewTeamModal.vue:21
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:112
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:6
-#: desk/src/components/Settings/Teams/TeamEdit.vue:131
 #: desk/src/pages/knowledge-base/Article.vue:48
-#: desk/src/pages/knowledge-base/NewArticle.vue:41
+#: desk/src/pages/knowledge-base/NewArticle.vue:39
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Title"
@@ -5410,7 +5430,7 @@ msgid "Title Slug"
 msgstr ""
 
 #: desk/src/components/Settings/NewTeamModal.vue:50
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:432
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:437
 msgid "Title is required"
 msgstr ""
 
@@ -5451,6 +5471,10 @@ msgstr "Để biết thêm về thiết lập tài khoản email, nhấp vào"
 #: desk/src/pages/dashboard/Dashboard.vue:469
 msgid "Today"
 msgstr "Hôm nay"
+
+#: desk/src/components/layouts/Sidebar.vue:254
+msgid "Toggle theme"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:35
 msgid "Top Result"
@@ -5527,7 +5551,7 @@ msgstr "Loại là bắt buộc"
 msgid "URL/Method"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:647
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:649
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr "Không thể gửi email. Vui lòng thiết lập tài khoản email gửi đi mặc định."
 
@@ -5566,16 +5590,16 @@ msgstr "Hủy xuất bản"
 msgid "Unsaved"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:161
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:163
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:465
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:108
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:79
 #: desk/src/components/Settings/Holiday/HolidayView.vue:208
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:242
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:310
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:315
 #: desk/src/components/Settings/SettingsModal.vue:71
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:370
-#: desk/src/components/Settings/Teams/NewTeam.vue:108
+#: desk/src/components/Settings/Teams/NewTeam.vue:124
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:229
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:198
 msgid "Unsaved changes"
@@ -5636,10 +5660,6 @@ msgstr ""
 msgid "User"
 msgstr "Người dùng"
 
-#: helpdesk/helpdesk/doctype/hd_team/hd_team.py:137
-msgid "User Not found"
-msgstr ""
-
 #. Label of the user_resolution_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "User Resolution Time"
@@ -5669,7 +5689,7 @@ msgstr "Có hiệu lực từ"
 msgid "Via Customer Portal"
 msgstr "Qua Cổng thông tin khách hàng"
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:281
+#: desk/src/components/Settings/Teams/TeamEdit.vue:252
 msgid "View Assignment rule"
 msgstr ""
 
@@ -5687,7 +5707,7 @@ msgstr "Lượt xem"
 msgid "Violet"
 msgstr "Tím"
 
-#: desk/src/components/knowledge-base/ArticleFeedback.vue:8
+#: desk/src/components/knowledge-base/ArticleFeedback.vue:10
 msgid "Was this article Helpful?"
 msgstr ""
 
@@ -5762,7 +5782,7 @@ msgid "Working Hours"
 msgstr "Giờ làm việc"
 
 #: desk/src/pages/knowledge-base/Article.vue:172
-#: desk/src/pages/knowledge-base/NewArticle.vue:57
+#: desk/src/pages/knowledge-base/NewArticle.vue:55
 msgid "Write your article here..."
 msgstr "Viết bài viết của bạn tại đây..."
 
@@ -5787,19 +5807,19 @@ msgstr ""
 msgid "You are not permitted to access this resource."
 msgstr "Bạn không được phép truy cập tài nguyên này."
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:549
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:559
 msgid "You are not permitted to add a comment"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:575
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:585
 msgid "You are not permitted to reply as an agent"
 msgstr ""
 
-#: desk/src/App.vue:36
+#: desk/src/App.vue:41
 msgid "You are now offline."
 msgstr "Bạn hiện đang ngoại tuyến."
 
-#: desk/src/App.vue:29
+#: desk/src/App.vue:34
 msgid "You are now online."
 msgstr "Bạn hiện đang trực tuyến."
 
@@ -5851,7 +5871,7 @@ msgstr "đã phân công một yêu cầu hỗ trợ cho bạn"
 msgid "assignees"
 msgstr "người được giao"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:466
+#: desk/src/pages/home/components/RecentFeedback.vue:467
 msgid "average"
 msgstr "trung bình"
 
@@ -5879,7 +5899,7 @@ msgstr "đã xóa"
 msgid "emails/ comments"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:462
+#: desk/src/pages/home/components/RecentFeedback.vue:463
 msgid "excellent"
 msgstr "tuyệt vời"
 
@@ -5887,7 +5907,7 @@ msgstr "tuyệt vời"
 msgid "from this email onwards will be moved to new ticket."
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:464
+#: desk/src/pages/home/components/RecentFeedback.vue:465
 msgid "good"
 msgstr ""
 
@@ -5922,7 +5942,7 @@ msgstr ""
 msgid "hrs"
 msgstr "giờ"
 
-#: desk/src/pages/knowledge-base/NewArticle.vue:17
+#: desk/src/pages/knowledge-base/NewArticle.vue:15
 msgid "in"
 msgstr "trong"
 
@@ -5944,7 +5964,7 @@ msgstr "danh sách"
 msgid "mentioned you in ticket"
 msgstr "đã nhắc đến bạn trong yêu cầu hỗ trợ"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:468
+#: desk/src/pages/home/components/RecentFeedback.vue:469
 msgid "poor"
 msgstr ""
 
