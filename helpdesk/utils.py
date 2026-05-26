@@ -205,7 +205,13 @@ contact_default_columns = [
         "label": "Email",
         "type": "Data",
         "key": "email_id",
-        "width": "24rem",
+        "width": "17rem",
+    },
+    {
+        "label": "Mobile",
+        "type": "Data",
+        "key": "mobile_no",
+        "width": "12rem",
     },
     {
         "label": "Created On",
@@ -214,6 +220,8 @@ contact_default_columns = [
         "width": "8rem",
     },
 ]
+
+contact_default_rows = ["name", "email_id", "mobile_no", "image", "creation"]
 
 call_log_default_columns = [
     {
