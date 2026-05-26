@@ -3,7 +3,9 @@
   <div
     :class="[
       'flex items-center justify-between gap-2 px-5 pb-4 pt-4',
-      list?.data?.data?.length > 0 ? 'relative' : 'absolute w-[stretch]',
+      list?.data?.data?.length > 0 || effectiveViewType === 'kanban'
+        ? 'relative'
+        : 'absolute w-[stretch]',
     ]"
     v-if="showViewControls"
   >
@@ -331,25 +333,47 @@ const isViewUpdated = ref(false);
 
 // Local override for view type (List / Group By / Kanban) — lets the user
 // toggle the layout without modifying the underlying HD View record.
-const viewTypeOverride = ref<"list" | "group_by" | "kanban" | null>(null);
+// Persisted per saved view (keyed by view name, or "__default__" when no
+// view is selected) so the layout choice survives navigation and reloads.
+type ViewType = "list" | "group_by" | "kanban";
+const viewTypeMap = useStorage<Record<string, ViewType>>(
+  `helpdesk:view-type:${props.options.doctype}`,
+  {}
+);
+const currentViewKey = computed(
+  () => (route.query.view as string) || "__default__"
+);
+const viewTypeOverride = computed<ViewType | null>({
+  get: () => viewTypeMap.value[currentViewKey.value] ?? null,
+  set: (val) => {
+    if (val === null) {
+      delete viewTypeMap.value[currentViewKey.value];
+    } else {
+      viewTypeMap.value[currentViewKey.value] = val;
+    }
+  },
+});
 const effectiveViewType = computed<"list" | "group_by" | "kanban">(() => {
   if (viewTypeOverride.value) return viewTypeOverride.value;
   const t = list.data?.view_type || defaultParams.view?.view_type;
   return t === "group_by" || t === "kanban" ? t : "list";
 });
-function handleViewTypeChange(val: "list" | "group_by" | "kanban") {
+// `owner` is the default group_by_field on every doctype but is useless
+// for kanban/group_by (one column per user). Treat it as "no preference".
+function pickGroupByField(currentField: string | null, viewType: ViewType) {
+  if (viewType === "list") return currentField || null;
+  if (currentField && currentField !== "owner") return currentField;
+  return "status";
+}
+function handleViewTypeChange(val: ViewType) {
   viewTypeOverride.value = val;
   defaultParams.view = {
     ...defaultParams.view,
     view_type: val,
-    // Default to "status" for kanban/group_by when the view doesn't specify one
-    group_by_field:
-      defaultParams.view?.group_by_field &&
-      defaultParams.view.group_by_field !== "owner"
-        ? defaultParams.view.group_by_field
-        : val === "list"
-        ? defaultParams.view?.group_by_field
-        : "status",
+    group_by_field: pickGroupByField(
+      defaultParams.view?.group_by_field,
+      val
+    ),
   };
   list.submit({ ...defaultParams });
 }
@@ -743,10 +767,10 @@ function handleViewChanges() {
   defaultParams.view = {
     ...defaultParams.view,
     view_type: effectiveType,
-    group_by_field:
-      storedGroupBy ||
-      defaultParams.view.group_by_field ||
-      (effectiveType === "list" ? null : "status"),
+    group_by_field: pickGroupByField(
+      storedGroupBy || defaultParams.view.group_by_field,
+      effectiveType
+    ),
     name: currentView.name,
   };
 
@@ -783,8 +807,9 @@ watch(
   () => route.query.view,
   (val: string) => {
     defaultParams.view.name = val;
-    // Switching to a different saved view clears any local view-type override
-    viewTypeOverride.value = null;
+    // Switching to a different saved view: viewTypeOverride is keyed by
+    // view name and reactively re-reads from the persisted map, so the
+    // user's last layout choice for that view is restored automatically.
     handleViewChanges();
     if (!val) {
       headerView.value.label = __("List");
