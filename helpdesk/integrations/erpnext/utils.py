@@ -72,20 +72,20 @@ def validate_rename_conflict(
         return
 
     other_doctype, other_link_field = _other_side(self_doctype)
-    counterpart = frappe.db.get_value(other_doctype, {other_link_field: olddn}, "name")
-    if not counterpart:
+    linked_name = frappe.db.get_value(other_doctype, {other_link_field: olddn}, "name")
+    if not linked_name:
         return
 
     if merge:
-        surviving_counterpart = frappe.db.get_value(
+        surviving_name = frappe.db.get_value(
             other_doctype, {other_link_field: newdn}, "name"
         )
-        if surviving_counterpart:
-            # M2: cascade-merge into surviving counterpart. No external conflict.
+        if surviving_name:
+            # M2: cascade-merge into surviving_name. No external conflict.
             return
         # M1: transfer — target name on other side must be available.
 
-    if counterpart == newdn:
+    if linked_name == newdn:
         return
 
     if frappe.db.exists(other_doctype, newdn):
@@ -101,47 +101,47 @@ def validate_rename_conflict(
 
 def cascade_rename(self_doctype: str, olddn: str, newdn: str, merge: bool) -> None:
     """Called from after_rename. Cascades the rename/merge to the linked
-    counterpart on the other side and keeps both Data fields in sync."""
+    record on the other side and keeps both Data fields in sync."""
     if in_cascade() or not should_sync():
         return
 
     other_doctype, other_link_field = _other_side(self_doctype)
-    counterpart = frappe.db.get_value(other_doctype, {other_link_field: olddn}, "name")
-    if not counterpart:
+    linked_name = frappe.db.get_value(other_doctype, {other_link_field: olddn}, "name")
+    if not linked_name:
         return
 
     frappe.flags[CASCADE_FLAG] = True
     try:
         if merge:
-            surviving_counterpart = frappe.db.get_value(
+            surviving_name = frappe.db.get_value(
                 other_doctype, {other_link_field: newdn}, "name"
             )
-            if surviving_counterpart and surviving_counterpart != counterpart:
-                # M2 — cascade-merge counterpart into surviving_counterpart
+            if surviving_name and surviving_name != linked_name:
+                # M2 — cascade-merge linked_name into surviving_name
                 rename_doc(
                     other_doctype,
-                    counterpart,
-                    surviving_counterpart,
+                    linked_name,
+                    surviving_name,
                     merge=True,
                     ignore_permissions=True,
                 )
-                target_name = surviving_counterpart
+                target_name = surviving_name
             else:
-                # M1 — transfer the link by renaming counterpart to newdn
-                if counterpart != newdn:
+                # M1 — transfer the link by renaming linked_name to newdn
+                if linked_name != newdn:
                     rename_doc(
                         other_doctype,
-                        counterpart,
+                        linked_name,
                         newdn,
                         ignore_permissions=True,
                     )
                 target_name = newdn
         else:
             # P1 — plain cascade-rename
-            if counterpart != newdn:
+            if linked_name != newdn:
                 rename_doc(
                     other_doctype,
-                    counterpart,
+                    linked_name,
                     newdn,
                     ignore_permissions=True,
                 )
