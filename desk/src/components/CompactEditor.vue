@@ -147,7 +147,7 @@ const uploadFn = props.docname
 const userResource = getUserEmailInfo();
 
 function getDefaultContent(signature: string): string {
-  return `<p></p><p></p><p></p><p></p><p></p>${signature}`;
+  return `<p></p><p></p>${signature}`;
 }
 
 function applySignature(signature: string) {

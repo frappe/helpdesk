@@ -16,8 +16,8 @@
             :show-attachments="true"
             :type="'Email'"
             :placeholder="__('Write your reply...')"
-            :min-height="'min-h-[130px]'"
-            :max-height="'max-h-[250px]'"
+            :min-height="'min-h-[200px]'"
+            :max-height="'max-h-[300px]'"
             @keydown="handleKeydown"
           />
         </p>
