@@ -155,7 +155,7 @@
               <template #default="{ openFileSelector, uploading }">
                 {{ void (isUploading = uploading) }}
                 <button
-                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
+                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
                   @click="openFileSelector()"
                   :disabled="uploading"
                 >
@@ -167,7 +167,7 @@
               </template>
             </FileUploader>
             <button
-              class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
+              class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
               @click="showSavedRepliesSelectorModal = true"
             >
               <SavedReplyIcon class="h-4 w-4" />
