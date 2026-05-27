@@ -16,7 +16,7 @@ def bulk_reply(ticket_ids: list, message: str, attachments: list | None = None):
     ticket_ids = list(set(ticket_ids))  # Remove duplicates
 
     for ticket_id in ticket_ids:
-        frappe.has_permission("HD Ticket", ticket_id, "write", throw=True)
+        frappe.has_permission("HD Ticket", "write", doc=ticket_id, throw=True)
         doc = frappe.get_doc("HD Ticket", ticket_id)
         try:
             doc.reply_via_agent(

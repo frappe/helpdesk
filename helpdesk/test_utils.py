@@ -345,3 +345,19 @@ def make_team(team_name, members=[], disabled=False):
     team.disabled = disabled
     team.insert(ignore_permissions=True)
     return team
+
+
+def upload_test_file(file_name: str) -> str:
+    """Upload an image from .github/ as a standalone private File, returning its name."""
+    file_path = frappe.get_app_path("helpdesk", "..", ".github", file_name)
+    with open(file_path, "rb") as f:
+        content = f.read()
+    file_doc = frappe.get_doc(
+        {
+            "doctype": "File",
+            "file_name": file_name,
+            "is_private": 1,
+            "content": content,
+        }
+    ).insert(ignore_permissions=True)
+    return file_doc.name
