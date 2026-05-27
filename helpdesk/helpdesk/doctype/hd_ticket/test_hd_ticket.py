@@ -7,6 +7,7 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
+from helpdesk.api.ticket import bulk_reply
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     merge_ticket,
     show_outside_hours_banner,
@@ -21,6 +22,7 @@ from helpdesk.test_utils import (
     make_status,
     make_ticket,
     remove_holidays,
+    upload_test_file,
 )
 
 ERROR_MSG_RESPONSE = "Response time differs by more than 1 second"
@@ -1061,6 +1063,69 @@ class TestHDTicket(FrappeTestCase):
                 )
         finally:
             frappe.set_user("Administrator")
+
+    def test_bulk_reply(self):
+        """
+        bulk_reply on two tickets with two uploaded files should send a reply per
+        ticket and attach the files to both the resulting communications and the
+        tickets.
+        """
+        frappe.set_user(agent)
+
+        file1 = upload_test_file("KB.png")
+        file2 = upload_test_file("Hero2.png")
+
+        ticket1 = make_ticket(raised_by="customer1@test.com")
+        ticket2 = make_ticket(raised_by="customer2@test.com")
+        ticket_ids = [ticket1.name, ticket2.name]
+
+        bulk_reply(
+            ticket_ids=ticket_ids,
+            message="Test Message",
+            attachments=[file1, file2],
+        )
+
+        communications = frappe.get_all(
+            "Communication",
+            filters={
+                "reference_doctype": "HD Ticket",
+                "reference_name": ["in", ticket_ids],
+                "sent_or_received": "Sent",
+            },
+            pluck="name",
+        )
+        self.assertEqual(len(communications), 2)  # one agent reply per ticket
+
+        communication_attachments = frappe.db.count(
+            "File",
+            {
+                "attached_to_doctype": "Communication",
+                "attached_to_name": ["in", communications],
+            },
+        )
+        ticket_attachments = frappe.db.count(
+            "File",
+            {
+                "attached_to_doctype": "HD Ticket",
+                "attached_to_name": ["in", ticket_ids],
+            },
+        )
+
+        # Each ticket's communication carries both files, and each ticket carries
+        # both files: 2 communications x 2 files and 2 tickets x 2 files.
+        self.assertEqual(communication_attachments, 4)
+        self.assertEqual(ticket_attachments, 4)
+
+        # delete all files
+        files = frappe.get_all(
+            "File",
+            filters={
+                "attached_to_doctype": ["in", ["Communication", "HD Ticket"]],
+            },
+            pluck="name",
+        )
+        for file in files:
+            frappe.delete_doc("File", file)
 
     def tearDown(self):
         frappe.set_user("Administrator")
