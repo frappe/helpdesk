@@ -30,6 +30,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 .playwright-mcp
+.claude-flow
+.claude
+CLAUDE.md
+
 
 helpdesk/docs/current
 helpdesk/public/desk

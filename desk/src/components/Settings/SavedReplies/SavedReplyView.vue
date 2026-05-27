@@ -10,13 +10,7 @@
           @click="goBack()"
           class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
         />
-        <Badge
-          variant="subtle"
-          theme="orange"
-          size="sm"
-          :label="__('Unsaved changes')"
-          v-if="isDirty"
-        />
+        <UnsavedBadge :show="isDirty" />
       </div>
     </template>
     <template #header-actions>
@@ -51,7 +45,7 @@
     <template #content>
       <div
         v-if="getSavedReplyData.loading"
-        class="flex items-center justify-center mt-12"
+        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -74,6 +68,7 @@
               v-model="savedReplyData.scope"
               :options="scopeDropdownOptions"
               required
+              class="w-full"
             >
               <template #prefix>
                 <component
@@ -81,7 +76,7 @@
                   class="size-4 text-ink-gray-9"
                 />
               </template>
-              <template #option="{ option }">
+              <template #label="{ option }">
                 <div class="flex gap-2 items-center cursor-pointer">
                   <component :is="option.icon" class="size-4 text-ink-gray-9" />
                   <span>
@@ -102,6 +97,7 @@
             v-model="savedReplyData.teams"
             :placeholder="__('Select teams')"
             @update:modelValue="validateData('teams')"
+            class="w-full"
           />
           <div class="text-xs text-ink-gray-5 cursor-default">
             {{ __("Restrict visibility to these teams") }}
@@ -176,6 +172,7 @@ import { useConfigStore } from "@/stores/config";
 import { useAuthStore } from "@/stores/auth";
 import { FieldAutocomplete } from "../../../tiptap-extensions";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
 import GlobeIcon from "~icons/lucide/globe";
@@ -268,6 +265,9 @@ const getTeamsListResource = createListResource({
   doctype: "HD Team",
   auto: true,
   fields: ["name"],
+  filters: {
+    disabled: 0,
+  },
   start: 0,
   pageLength: 999,
   transform: (data: Array<Team>) => {

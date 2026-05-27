@@ -139,9 +139,9 @@ const router = useRouter();
 const { findView } = useView("HD Ticket");
 const ticketStatusStore = useTicketStatusStore();
 
-const ticket = inject(TicketSymbol);
-const customizations = inject(CustomizationSymbol);
-const activities = inject(ActivitiesSymbol);
+const ticket = inject(TicketSymbol)!;
+const customizations = inject(CustomizationSymbol)!;
+const activities = inject(ActivitiesSymbol)!;
 const showSubjectDialog = ref(false);
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);

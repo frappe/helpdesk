@@ -9,7 +9,7 @@
 import { Dialogs } from "@/components/dialogs";
 import { useConfigStore } from "@/stores/config";
 import { useFavicon } from "@vueuse/core";
-import { FrappeUIProvider, setConfig, toast } from "frappe-ui";
+import { FrappeUIProvider, setConfig, toast, useTheme } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, defineAsyncComponent, h, onMounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
@@ -23,18 +23,23 @@ const { favicon } = storeToRefs(configStore);
 
 useFavicon(favicon);
 
+if (!localStorage.getItem("theme")) {
+  localStorage.setItem("theme", "light");
+}
+useTheme();
+
 onMounted(() => {
   window.addEventListener("online", () => {
     toast.create({
       message: __("You are now online."),
-      icon: h(Wifi, { class: "text-white" }),
+      icon: h(Wifi, { class: "text-ink-white" }),
     });
   });
 
   window.addEventListener("offline", () => {
     toast.create({
       message: __("You are now offline."),
-      icon: h(WifiOff, { class: "text-white" }),
+      icon: h(WifiOff, { class: "text-ink-white" }),
     });
   });
   !isCustomerPortal.value && setConfig("localTimezone", window.timezone?.user);

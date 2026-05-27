@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-full w-full pb-8">
-    <div class="px-10 py-8">
+    <div class="px-10 py-8 relative z-10">
       <div class="flex items-start justify-between">
         <div class="flex flex-col gap-1">
           <slot name="title">
@@ -12,7 +12,7 @@
             name="description"
             v-if="Boolean($slots['description']) || Boolean(description)"
           >
-            <p class="text-p-sm text-gray-700 max-w-md text-ink-gray-6">
+            <p class="text-p-sm max-w-md text-ink-gray-6">
               {{ description }}
             </p>
           </slot>

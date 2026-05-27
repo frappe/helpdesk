@@ -12,16 +12,7 @@
           @click="goBack"
           class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0 !pl-0 -ml-1.5"
         />
-        <Badge
-          :class="[
-            isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent
-              ? 'opacity-100'
-              : 'opacity-0',
-          ]"
-          :label="__('Unsaved')"
-          theme="orange"
-          variant="subtle"
-        />
+        <UnsavedBadge :show="isDirty.exotel" />
       </div>
     </template>
     <template #header-actions>
@@ -30,14 +21,9 @@
         theme="gray"
         variant="solid"
         @click="save"
-        :disabled="
-          !isDirty.twilio && !isDirty.exotel && !isDirty.telephonyAgent
-        "
-        :loading="
-          twilio.save.loading ||
-          exotel.save.loading ||
-          telephonyAgent.save.loading
-        "
+        v-if="isDirty.exotel"
+        :disabled="!isDirty.exotel"
+        :loading="exotel.save.loading"
       />
     </template>
     <template #content>
@@ -158,6 +144,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 import { __ } from "@/translation";

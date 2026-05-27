@@ -2,7 +2,7 @@
   <div
     :id="`communication-${name}`"
     v-bind="$attrs"
-    class="grow cursor-pointer bg-white rounded-md text-base leading-6 transition-all duration-300 ease-in-out border border-outline-gray-2"
+    class="grow cursor-pointer bg-surface-white rounded-md text-base leading-6 transition-all duration-300 ease-in-out border border-outline-gray-2"
   >
     <div
       class="flex items-center justify-between gap-2"
@@ -35,7 +35,7 @@
       <div class="flex gap-2 items-center">
         <div class="gap-0.5 flex items-center">
           <Badge
-            v-if="status.label && !ticket.doc.via_customer_portal"
+            v-if="status.label && !ticket?.doc?.via_customer_portal"
             :label="__(status.label)"
             variant="subtle"
             :theme="status.color"
@@ -50,12 +50,16 @@
             </p>
           </Tooltip>
         </div>
-        <div class="flex items-center">
-          <Button variant="ghost" @click="reply">
-            <ReplyIcon class="h-4 w-4 text-ink-gray-5" />
+        <div class="flex items-center gap-1">
+          <Button :tooltip="__('Reply')" variant="ghost" @click="reply">
+            <template #icon>
+              <ReplyIcon class="text-ink-gray-7" />
+            </template>
           </Button>
-          <Button variant="ghost" @click="replyAll">
-            <ReplyAllIcon class="h-4 w-6 text-ink-gray-5" />
+          <Button :tooltip="__('Reply All')" variant="ghost" @click="replyAll">
+            <template #icon>
+              <ReplyAllIcon class="text-ink-gray-7" />
+            </template>
           </Button>
           <Dropdown
             v-if="showSplitOption"
@@ -70,7 +74,7 @@
           >
             <Button
               icon="more-horizontal"
-              class="text-ink-gray-5 ml-0.5"
+              class="!text-ink-gray-7"
               variant="ghost"
             />
           </Dropdown>
@@ -80,15 +84,16 @@
     <!-- <div class="text-sm leading-5 text-ink-gray-5">
       {{ subject }}
     </div> -->
-    <div class="text-sm leading-5 text-ink-gray-5">
-      <span v-if="to" class="mr-1">To:</span>
-      <span v-if="to"> {{ to }} </span>
-      <span v-if="cc">, </span>
-      <span v-if="cc"> Cc: </span>
-      <span v-if="cc">{{ cc }}</span>
-      <span v-if="bcc">, </span>
-      <span v-if="bcc"> Bcc: </span>
-      <span v-if="bcc">{{ bcc }}</span>
+    <div class="text-p-sm text-ink-gray-5">
+      <template
+        v-for="(val, label) in { To: to, cc: cc, bcc: bcc }"
+        :key="label"
+      >
+        <span v-if="val" class="mr-1.5">
+          <span class="mr-1 text-ink-gray-7">{{ label }}:</span>
+          <span> {{ normalizeAndFilter(val).join(", ") }}</span>
+        </span>
+      </template>
     </div>
     <div class="border-0 border-t my-3 border-outline-gray-modals !-mx-3" />
     <EmailContent :content="content" />
@@ -169,6 +174,32 @@ const status = computed(() => {
   return { label: _status, color: indicator_color };
 });
 
+const normalizeAndFilter = (
+  field: string | string[],
+  valuesToExclude: string[] = []
+) => {
+  let arr = [];
+  let current = "";
+  let inQuotes = false;
+  if (typeof field === "string") {
+    for (let char of field) {
+      if (char === '"') {
+        inQuotes = !inQuotes;
+        current += char;
+      } else if (char === "," && !inQuotes) {
+        arr.push(current.trim());
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+    if (current) arr.push(current.trim());
+  } else {
+    arr = field || [];
+  }
+  return arr.filter(Boolean).filter((item) => !valuesToExclude.includes(item));
+};
+
 const reply = () => {
   const user = auth.user.value;
   emit("reply", {
@@ -179,33 +210,10 @@ const reply = () => {
 
 const replyAll = () => {
   const user = auth.user.value;
-
-  const normalizeAndFilter = (field) => {
-    let arr = [];
-    let current = "";
-    let inQuotes = false;
-    if (typeof field === "string") {
-      for (let char of field) {
-        if (char === '"') {
-          inQuotes = !inQuotes;
-          current += char;
-        } else if (char === "," && !inQuotes) {
-          arr.push(current.trim());
-          current = "";
-        } else {
-          current += char;
-        }
-      }
-      if (current) arr.push(current.trim());
-    } else {
-      arr = field || [];
-    }
-    return arr.filter((item) => item !== user && item !== sender.name);
-  };
-
-  const filteredTo = normalizeAndFilter(to);
-  const filteredCc = normalizeAndFilter(cc);
-  const filteredBcc = normalizeAndFilter(bcc);
+  const exclude = [user, sender.name];
+  const filteredTo = normalizeAndFilter(to, exclude);
+  const filteredCc = normalizeAndFilter(cc, exclude);
+  const filteredBcc = normalizeAndFilter(bcc, exclude);
 
   let _to, _cc, _bcc;
 

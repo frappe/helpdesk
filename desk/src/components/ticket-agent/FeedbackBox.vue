@@ -12,7 +12,9 @@
     </div>
     <!-- Optional Text -->
     <div v-if="activity.feedback_extra">
-      <p class="mt-2 text-p-sm text-gray-700">{{ activity.feedback_extra }}</p>
+      <p class="mt-2 text-p-sm text-ink-gray-7">
+        {{ activity.feedback_extra }}
+      </p>
     </div>
   </div>
 </template>

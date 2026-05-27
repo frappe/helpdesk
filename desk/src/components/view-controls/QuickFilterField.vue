@@ -11,10 +11,10 @@
     v-else-if="filter.type === 'Select'"
     class="form-control cursor-pointer [&_select]:cursor-pointer !min-w-36 max-w-36"
     type="select"
-    :model-value="props.value"
+    :model-value="props.value || undefined"
     :options="filter.options"
     :placeholder="filter.label"
-    @change.stop="updateFilter(filter, $event.target.value)"
+    @update:modelValue="(v) => updateFilter(filter, v || '')"
   />
   <Link
     v-else-if="filter.type === 'Link'"

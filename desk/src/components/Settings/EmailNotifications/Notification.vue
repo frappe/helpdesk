@@ -17,13 +17,7 @@
             {{ props.title }}
           </h1>
         </div>
-        <Badge
-          v-if="unsavedChanges"
-          :variant="'subtle'"
-          :theme="'orange'"
-          size="sm"
-          :label="__('Unsaved')"
-        />
+        <UnsavedBadge :show="unsavedChanges" />
       </div>
     </template>
     <template #header-actions>
@@ -71,7 +65,7 @@
               :oninput="() => setUnsavedChanges()"
             />
             <div class="flex gap-x-1 items-start justify-between">
-              <p class="text-sm text-gray-700 leading-5">
+              <p class="text-sm text-ink-gray-7 leading-5">
                 {{
                   __(
                     "Find out all of the variables that can be used in the content"
@@ -139,6 +133,7 @@ import { createResource, Switch, LoadingIndicator, Button } from "frappe-ui";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 
 const props = defineProps<{
   title: string;

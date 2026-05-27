@@ -2,7 +2,7 @@ import frappe
 
 
 @frappe.whitelist()
-def clear(ticket: str | int | None = None, comment: str | None = None):
+def clear(ticket: str | None = None, comment: str | None = None):
     """
     Mark notifications as read. No arguments will clear all notifications for `user`.
 

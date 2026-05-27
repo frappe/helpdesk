@@ -5,40 +5,37 @@
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("Telephony") }}
         </h1>
-        <Badge
-          :class="[
-            isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent
-              ? 'opacity-100'
-              : 'opacity-0',
-          ]"
-          :label="__('Unsaved')"
-          theme="orange"
-          variant="subtle"
+        <UnsavedBadge
+          :show="isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent"
         />
       </div>
     </template>
     <template #header-actions>
-      <Button
-        :label="__('Save')"
-        theme="gray"
-        variant="solid"
-        @click="save"
-        :disabled="
-          !isDirty.twilio && !isDirty.exotel && !isDirty.telephonyAgent
-        "
-        :loading="
-          twilio.save.loading ||
-          exotel.save.loading ||
-          telephonyAgent.save.loading
-        "
-      />
+      <Transition name="fade">
+        <div v-if="isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent">
+          <Button
+            :label="__('Save')"
+            theme="gray"
+            variant="solid"
+            @click="save"
+            :disabled="
+              !isDirty.twilio && !isDirty.exotel && !isDirty.telephonyAgent
+            "
+            :loading="
+              twilio.save.loading ||
+              exotel.save.loading ||
+              telephonyAgent.save.loading
+            "
+          />
+        </div>
+      </Transition>
     </template>
     <template #content>
       <div class="-ml-2 grow">
         <div class="flex-1 flex flex-col">
           <!-- General -->
           <div
-            class="flex items-center justify-between gap-8 py-3 hover:bg-gray-50 rounded px-2"
+            class="flex items-center justify-between gap-8 py-3 hover:bg-surface-menu-bar rounded px-2"
           >
             <div class="flex flex-col">
               <div class="text-p-base font-medium text-ink-gray-7 truncate">
@@ -67,7 +64,7 @@
           <div class="h-px border-t mx-2 border-outline-gray-modals" />
 
           <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-gray-50 px-2"
+            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-surface-menu-bar px-2"
             @click="emit('updateStep', 'twilio-settings')"
           >
             <div class="flex flex-col">
@@ -88,7 +85,7 @@
           <div class="h-px border-t mx-2 border-outline-gray-modals" />
 
           <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-gray-50 px-2"
+            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-surface-menu-bar px-2"
             @click="emit('updateStep', 'exotel-settings')"
           >
             <div class="flex flex-col">
@@ -135,6 +132,7 @@ import { useTelephonyStore } from "@/stores/telephony";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 
 const auth = useAuthStore();
 const telephonyStore = useTelephonyStore();

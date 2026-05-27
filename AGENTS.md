@@ -228,6 +228,47 @@ apiCall.submit({ ticket_id: "<id>", agent_id: "<agent>" });
 - Use proper field types and validation in DocType definitions
 - Leverage DocType methods for business logic encapsulation
 
+## Controller Code Structure
+
+All controller logic must follow this structure strictly:
+
+**Rule: Lifecycle hooks call methods. Methods are defined below on the class.**
+
+```python
+class HDFoo(Document):
+    # 1. Lifecycle hooks at the top — each hook calls methods, no inline logic
+    def after_insert(self):
+        self.do_a()
+        self.do_b()
+
+    def on_update(self):
+        self.do_a()
+
+    # 2. Methods below — one responsibility each
+    def do_a(self):
+        pass
+
+    def do_b(self):
+        pass
+
+
+```
+
+**Rules:**
+
+- Lifecycle hooks (`after_insert`, `on_update`, `before_save`, `on_trash`, `after_rename`, etc.) contain **no inline logic** — they only call `self.method()`.
+- All logic lives in methods on the class, not in module-level helper functions.
+- Methods that mutate a related document (e.g. an Assignment Rule) receive that doc as an argument and mutate it in memory. The **caller** is responsible for the final `doc.save()` — this keeps saves to a minimum (one save per hook).
+- Never fetch the same document twice in one hook. Fetch once, pass the doc through the call chain.
+- `@staticmethod` is allowed for pure transformations (e.g. building a condition string) that don't touch `self` or any Frappe doc.
+
+**Save discipline:**
+
+- Mutate all fields on a document before calling `.save()` once.
+- Never call `.save()` inside a helper method — save in the hook or the method that owns the full mutation.
+- Exception: if a method truly owns a complete document lifecycle (e.g. `create_assignment_rule` creates and fully initialises a new doc), it may save internally.
+Take inspiration from "helpdesk.doctype.hd_team.hd_team.HDTeam" for examples of this pattern in practice.
+
 ## Conventions & Patterns
 
 - **API Design:** Python modules in `helpdesk/api/` follow RESTful patterns. Extend via `helpdesk/extends/`.
@@ -339,4 +380,85 @@ const ticket = createDocumentResource({
 
 ---
 
+## Agent Working Rules
+
+These rules apply to all agents working in this codebase. Follow them without exception.
+
+### 1. Site Data — Read Before You Write
+
+When a Frappe site is referenced in the conversation (e.g. `erp-hd.localhost`, `hd-tests`),
+treat it as the **source of truth for current data state**.
+
+- Before assuming anything about existing records, custom fields, settings, or DocType state —
+  query the site first using the bench venv Python or `bench execute`.
+- **Never write data to a site unless the user explicitly asks you to.**
+  Querying is always safe. Mutations (insert, update, delete, migrate, patch) require explicit
+  user instruction.
+- If you need to verify a fix worked, re-query the site — do not assume success from code
+  inspection alone.
+
+```python
+# Safe pattern for querying a site
+import sys, os
+sys.path.insert(0, 'apps/frappe')
+os.chdir('sites')
+import frappe
+frappe.init(site='<site-name>', sites_path='.')
+frappe.connect()
+
+# ... read-only queries here ...
+
+frappe.destroy()
+```
+
+Run via: `cd /path/to/frappe-bench && env/bin/python /tmp/your_script.py`
+
+---
+
+### 2. Spec-Driven Development — Keep the Spec Current
+
+When a feature has a spec document (e.g. `docs/erpnext-customer-sync.md`), the spec is the
+**living source of truth** for that feature. It must be kept in sync with the actual
+implementation at all times.
+
+**Rules:**
+
+- **Update the spec in the same session as the code change.** Never defer spec updates to a
+  later session.
+- **The spec reflects what is implemented, not what was originally planned.** If a decision
+  changes mid-build (e.g. removing a scheduler job, changing how a field is set), update the
+  spec immediately after the code change.
+- **Removed features must be removed from the spec.** Do not leave stale sections, blockers, or
+  file manifest entries for things that no longer exist.
+- **New features must be added to the spec.** If a new API, component, or behaviour is
+  introduced, add a corresponding section.
+- **Decisions and their rationale belong in the spec.** If something was done a specific way to
+  avoid a bug or framework limitation (e.g. not setting `customer_group` to avoid the group-node
+  error), document that in the relevant Blocker section.
+- When in doubt about whether a spec update is needed — update it.
+
+---
+
+### 3. Test Utilities — Always Use `helpdesk/test_utils.py`
+
+All backend test helpers must live in `helpdesk/test_utils.py` and be imported from there.
+Never define helper functions (factories, enable/disable toggles, fixture builders) directly
+inside individual test files.
+
+**Rules:**
+
+- **Before writing a helper in a test file**, check `helpdesk/test_utils.py` first — it may
+  already exist.
+- **If a helper doesn't exist**, add it to `helpdesk/test_utils.py` and import it in the test
+  file. Do not leave it inline.
+- **If you write helpers inline during development**, move them to `test_utils.py` before
+  finishing the task.
+- Helper functions in `test_utils.py` must have a docstring explaining what they create or do. Only if the function is completely self-explanatory (e.g. `enable_erpnext_sync`) can the docstring be omitted.
+- Naming conventions:
+  - Factories: `make_<doctype>(...)` — e.g. `make_hd_customer`, `make_ticket`, `make_team`
+  - Toggle helpers: `enable_<feature>()` / `disable_<feature>()` — e.g. `enable_erpnext_sync`
+  - Query helpers: descriptive verb — e.g. `get_latest_ticket_communication`
+
 **For updates, merge new conventions here. If anything is unclear or missing, ask for clarification.**
+
+**In the end your code will be reviewed by Codex, but following these rules will help ensure a smooth review process and a high-quality codebase.**

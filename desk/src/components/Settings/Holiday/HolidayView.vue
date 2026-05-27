@@ -10,13 +10,7 @@
           @click="goBack()"
           class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
         />
-        <Badge
-          variant="subtle"
-          theme="orange"
-          size="sm"
-          :label="__('Unsaved')"
-          v-if="isDirty"
-        />
+        <UnsavedBadge :show="isDirty" />
       </div>
     </template>
     <template #header-actions>
@@ -190,7 +184,7 @@
                 }}</span>
               </div>
               <div class="gap-1 flex items-center">
-                <span class="bg-gray-100 size-4 rounded-sm" />
+                <span class="bg-surface-gray-2 size-4 rounded-sm" />
                 <span class="text-sm text-ink-gray-6">{{
                   __("Recurring holidays")
                 }}</span>
@@ -247,6 +241,7 @@ import HolidaysCalendarView from "./HolidaysCalendarView.vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import { HolidayListResourceSymbol } from "@/types";
 import { HDServiceHolidayList } from "@/types/doctypes";
 

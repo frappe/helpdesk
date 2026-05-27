@@ -4,7 +4,7 @@
   >
     <div class="flex flex-col sm:flex-row items-center gap-3.5">
       <div
-        class="flex items-center justify-center min-w-16 min-h-16 rounded-lg overflow-hidden border border-gray-100"
+        class="flex items-center justify-center min-w-16 min-h-16 rounded-lg overflow-hidden border border-outline-gray-1"
       >
         <Avatar
           v-if="props.image"

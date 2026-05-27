@@ -154,6 +154,10 @@ export interface Communication {
   sender: string;
   bcc?: string;
   cc?: string;
+  sent_or_received?: "Sent" | "Received";
+  email_account?: string;
+  sender_full_name?: string;
+  sender_mail_id?: string;
 }
 
 export interface Activity {
@@ -586,12 +590,12 @@ export interface TicketContact {
 }
 
 export type RecentTicket = Record<
-  "subject" | "status" | "priority" | "name",
-  string | number
+  "subject" | "status" | "priority" | "name" | "creation",
+  string
 >;
 export type SimilarTicket = Record<
-  "subject" | "status" | "priority" | "name",
-  string | number
+  "subject" | "status" | "priority" | "name" | "creation",
+  string
 >;
 export interface RecentSimilarTicket {
   recent_tickets: RecentTicket[];
@@ -642,6 +646,7 @@ export interface SlaPolicy {
 export interface Team {
   name: string;
   team: string;
+  disabled: boolean;
 }
 
 export interface SavedReply {

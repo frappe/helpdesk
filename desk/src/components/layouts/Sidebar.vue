@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-r border-outline-gray-modals bg-surface-menu-bar text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
@@ -18,7 +18,7 @@
       class="mt-1.5"
     >
       <template #right>
-        <span class="flex items-center gap-0.5 font-medium text-gray-600">
+        <span class="flex items-center gap-0.5 font-medium text-ink-gray-5">
           <component :is="device.modifierIcon" class="h-3 w-3" />
           <span>K</span>
         </span>
@@ -188,7 +188,7 @@ import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
-import { call } from "frappe-ui";
+import { call, toast, useTheme } from "frappe-ui";
 import {
   GettingStartedBanner,
   HelpModal,
@@ -217,6 +217,8 @@ import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
+import LucideMoon from "~icons/lucide/moon";
+import LucideSun from "~icons/lucide/sun";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
@@ -246,6 +248,13 @@ const showShortcutsModal = ref(false);
 const showCommandPalette = ref(false);
 
 const { pinnedViews, publicViews } = useView();
+const { currentTheme, toggleTheme } = useTheme();
+
+const themeMenuItem = computed(() => ({
+  label: __("Toggle theme"),
+  icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
+  onClick: () => toggleTheme(),
+}));
 
 const isFCSite = ref(window.is_fc_site);
 
@@ -318,10 +327,17 @@ function parseViews(views) {
 }
 
 const customerPortalDropdown = computed(() => [
+  themeMenuItem.value,
   {
-    label: __("Log out"),
-    icon: "log-out",
-    onClick: () => authStore.logout(),
+    group: __("Danger"),
+    hideLabel: true,
+    items: [
+      {
+        label: __("Log out"),
+        icon: "log-out",
+        onClick: () => authStore.logout(),
+      },
+    ],
   },
 ]);
 
@@ -358,6 +374,7 @@ const agentPortalDropdown = computed(() => [
     icon: h(LucideKeyboard),
     onClick: () => (showShortcutsModal.value = true),
   },
+  themeMenuItem.value,
   {
     label: __("Settings"),
     icon: "settings",
@@ -457,6 +474,7 @@ const steps = [
     name: "assign_to_agent",
     title: __("Assign a ticket to an agent"),
     completed: false,
+    dependsOn: "create_first_ticket",
     icon: markRaw(UserPen),
     onClick: async () => {
       await handleFirstTicketNavigation();
@@ -468,6 +486,7 @@ const steps = [
     name: "reply_on_ticket",
     title: __("Reply on a ticket"),
     completed: false,
+    dependsOn: "create_first_ticket",
     icon: markRaw(MailOpen),
     onClick: async () => {
       await handleFirstTicketNavigation();
@@ -480,6 +499,7 @@ const steps = [
     name: "comment_on_ticket",
     title: __("Add a comment on a ticket"),
     completed: false,
+    dependsOn: "create_first_ticket",
     icon: markRaw(MessageCircle),
     onClick: async () => {
       await handleFirstTicketNavigation();
@@ -624,20 +644,30 @@ const { isOnboardingStepsCompleted, setUp, updateOnboardingStep } =
 async function handleFirstTicketNavigation() {
   const ticket = await getFirstTicket();
 
-  if (ticket) {
-    router.push({
-      name: "TicketAgent",
-      params: { ticketId: ticket },
-    });
-  } else {
+  if (!ticket) {
     router.push({ name: "TicketAgentNew" });
+    updateOnboardingStep("create_first_ticket", false); // reset the step as first ticket is not created
+    toast.error("Please create a new ticket to proceed with the next step.");
+    return;
   }
+
+  router.push({
+    name: "TicketAgent",
+    params: { ticketId: ticket },
+  });
 }
 
 async function getFirstTicket() {
-  let ticket = localStorage.getItem("firstTicket");
-  if (ticket) return ticket;
-  return await call("helpdesk.api.onboarding.get_first_ticket");
+  let cachedTicket = localStorage.getItem("firstTicket");
+  const ticket = await call("helpdesk.api.onboarding.get_first_ticket", {
+    ticket: cachedTicket,
+  });
+  if (ticket) {
+    localStorage.setItem("firstTicket", ticket);
+  } else {
+    localStorage.removeItem("firstTicket");
+  }
+  return ticket;
 }
 
 async function getGeneralCategory() {

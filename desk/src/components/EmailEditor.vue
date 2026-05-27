@@ -11,13 +11,27 @@
     :placeholder="placeholder"
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
-    :extensions="[ComponentUtils, HandleExcelPaste]"
+    :extensions="[ComponentUtils, HandleExcelPaste, CleanStyles]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
     @keydown.capture="handleKeydown"
   >
     <template #top>
+      <div
+        v-if="hasMultipleSenders"
+        class="mx-6 md:mx-5 flex items-center gap-2 border-t py-2.5 h-12.5"
+      >
+        <span class="text-p-xs text-ink-gray-4">{{ __("From") }}:</span>
+        <FormControl
+          v-model="fromEmail"
+          type="select"
+          variant="ghost"
+          class="w-full"
+          :placeholder="__('')"
+          :options="from"
+        />
+      </div>
       <div class="mx-6 md:mx-5 flex items-center gap-2 border-y py-2.5">
-        <span class="text-xs text-gray-500">TO:</span>
+        <span class="text-p-xs text-ink-gray-4">{{ __("To") }}:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
           class="flex-1"
@@ -27,7 +41,7 @@
         />
         <div class="flex gap-1.5">
           <Button
-            :label="'CC'"
+            :label="__('Cc')"
             variant="ghost"
             :class="[
               cc || showCC
@@ -37,7 +51,7 @@
             @click="toggleCC()"
           />
           <Button
-            :label="'BCC'"
+            :label="__('Bcc')"
             variant="ghost"
             :class="[
               bcc || showBCC
@@ -53,7 +67,7 @@
         class="mx-5 flex items-center gap-2 py-2.5"
         :class="cc || showCC ? 'border-b' : ''"
       >
-        <span class="text-xs text-gray-500">CC:</span>
+        <span class="text-xs text-ink-gray-4">{{ __("Cc:") }}</span>
         <MultiSelectInput
           ref="ccInput"
           v-model="ccEmailsClone"
@@ -68,7 +82,7 @@
         class="mx-5 flex items-center gap-2 py-2.5"
         :class="bcc || showBCC ? 'border-b' : ''"
       >
-        <span class="text-xs text-gray-500">BCC:</span>
+        <span class="text-xs text-ink-gray-4">{{ __("Bcc:") }}</span>
         <MultiSelectInput
           ref="bccInput"
           v-model="bccEmailsClone"
@@ -81,15 +95,28 @@
     </template>
 
     <template #editor>
-      <div class="overflow-y-auto min-h-[7rem] max-h-[30vh]">
-        <EditorContent :editor="editor" />
+      <div class="overflow-y-auto min-h-[7rem] max-h-[30vh] flex flex-col">
+        <div class="flex-1">
+          <EditorContent :editor="editor" />
+        </div>
         <div
           v-if="quotedContent"
-          ref="quotedContentRef"
-          contenteditable="true"
-          class="prose !max-w-full mx-6 md:mx-5 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
-          @input="onQuotedInput"
-        />
+          class="replied-content mx-6 md:mx-5 mb-2 mt-auto"
+        >
+          <label class="collapse" for="quoted-toggle">...</label>
+          <input
+            id="quoted-toggle"
+            class="replyCollapser"
+            type="checkbox"
+            :checked="isQuoteExpanded"
+          />
+          <div
+            ref="quotedContentRef"
+            contenteditable="true"
+            class="prose !max-w-full mx-1 my-2 border-l-4 border-outline-gray-2 pl-4 text-sm focus:outline-none"
+            @input="onQuotedInput"
+          />
+        </div>
       </div>
     </template>
     <template #bottom>
@@ -170,7 +197,6 @@
     </template>
   </TextEditor>
   <SavedRepliesSelectorModal
-    v-if="showSavedRepliesSelectorModal"
     v-model="showSavedRepliesSelectorModal"
     :doctype="doctype"
     @apply="applySavedReplies"
@@ -187,9 +213,14 @@ import {
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
-import { ComponentUtils, HandleExcelPaste } from "@/tiptap-extensions";
+import {
+  CleanStyles,
+  ComponentUtils,
+  HandleExcelPaste,
+} from "@/tiptap-extensions";
 import {
   getFontFamily,
+  htmlToText,
   isContentEmpty,
   removeAttachmentFromServer,
   textEditorMenuButtons,
@@ -216,10 +247,7 @@ import {
 } from "vue";
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 
-const editorRef = ref(null);
-const showSavedRepliesSelectorModal = ref(false);
-const quotedContentRef = ref<HTMLElement | null>(null);
-
+// ─── Props & Emits ────────────────────────────────────────────
 const props = defineProps({
   ticketId: {
     type: String,
@@ -255,49 +283,95 @@ const props = defineProps({
   },
 });
 
-const label = computed(() => {
-  return sendMail.loading ? "Sending..." : props.label;
-});
-
 const emit = defineEmits(["submit", "discard"]);
 
-const newEmail = useStorage<null | string>(
+const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { isManager } = useAuthStore();
+const { onUserType, cleanup } = useTyping(props.ticketId);
+
+const editorRef = ref(null);
+const editor = computed(() => editorRef.value.editor);
+
+function focusEditorAtStart() {
+  setTimeout(() => {
+    editorRef.value?.editor?.commands?.focus("start");
+  }, 0);
+}
+
+const cachedEmail = useStorage<null | string>(
   "emailBoxContent" + props.ticketId,
   null
 );
+
+const newEmail = ref<null | string>(cachedEmail.value);
+
+const emailSignature = ref<string | null>(null);
+
+function isOnlySignature(content: string | null) {
+  if (!content || !emailSignature.value) return false;
+  return htmlToText(content) === htmlToText(emailSignature.value);
+}
+
+const userResource = createResource({
+  url: "helpdesk.api.auth.get_current_user_email_info",
+  cache: "current-user-email-info",
+  auto: true,
+});
+
+watch(newEmail, (newValue, oldValue) => {
+  if (newValue !== oldValue && newValue) {
+    onUserType();
+  }
+  cachedEmail.value = isOnlySignature(newValue) ? null : newValue;
+});
 
 const quotedContent = useStorage<null | string>(
   "quotedEmailBoxContent" + props.ticketId,
   null
 );
+const quotedContentRef = ref<HTMLElement | null>(null);
+const isQuoteExpanded = ref(false);
 
-const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { isManager } = useAuthStore();
+function onQuotedInput() {
+  const el = quotedContentRef.value;
+  if (!el) return;
+  quotedContent.value = el.innerHTML || null;
+}
 
-// Initialize typing composable
-const { onUserType, cleanup } = useTyping(props.ticketId);
-
-const attachments = ref([]);
-const isUploading = ref(false);
-const contentEmpty = computed(() => isContentEmpty(newEmail.value));
-
-const isDisabled = computed(() => {
-  return (
-    (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
-    sendMail.loading ||
-    isUploading.value
-  );
-});
-
-// Watch for changes in email content to trigger typing events
-watch(newEmail, (newValue, oldValue) => {
-  if (newValue !== oldValue && newValue) {
-    onUserType();
+watch(quotedContent, (newVal, oldVal) => {
+  if (!oldVal && newVal) {
+    nextTick(() => {
+      if (quotedContentRef.value) {
+        quotedContentRef.value.innerHTML = newVal;
+      }
+    });
   }
 });
 
-onBeforeUnmount(() => {
-  cleanup();
+watch(
+  () => userResource.data,
+  (data: { email_signature?: string } | null) => {
+    if (!data?.email_signature) return;
+    emailSignature.value = `<br>${data.email_signature}`;
+    if (isOnlySignature(cachedEmail.value)) {
+      cachedEmail.value = null;
+    }
+    if (isContentEmpty(newEmail.value) && !quotedContent.value) {
+      newEmail.value = emailSignature.value;
+      focusEditorAtStart();
+    }
+  },
+  { immediate: true }
+);
+
+onMounted(() => {
+  if (quotedContent.value) {
+    nextTick(() => {
+      if (quotedContentRef.value) {
+        quotedContentRef.value.innerHTML = quotedContent.value;
+      }
+    });
+  }
 });
 
 const toEmailsClone = ref([...props.toEmails]);
@@ -310,74 +384,8 @@ const bcc = computed(() => (bccEmailsClone.value?.length ? true : false));
 const ccInput = ref(null);
 const bccInput = ref(null);
 
-function applySavedReplies(template: string) {
-  isContentEmpty(newEmail.value)
-    ? (newEmail.value = template)
-    : (newEmail.value = newEmail.value + "\n" + template);
-  showSavedRepliesSelectorModal.value = false;
-}
-
-const sendMail = createResource({
-  url: "run_doc_method",
-  makeParams: () => ({
-    dt: props.doctype,
-    dn: props.ticketId,
-    method: "reply_via_agent",
-    args: {
-      attachments: attachments.value.map((x) => x.name),
-      to: toEmailsClone.value.join(","),
-      cc: ccEmailsClone.value?.join(","),
-      bcc: bccEmailsClone.value?.join(","),
-      message:
-        newEmail.value +
-        (quotedContentRef.value
-          ? `<p class="reply-to-content"><p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
-          : ""),
-    },
-  }),
-  onSuccess: () => {
-    resetState();
-    emit("submit");
-
-    if (isManager) {
-      updateOnboardingStep("reply_on_ticket");
-    }
-  },
-  debounce: 300,
-});
-
-function submitMail() {
-  if (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) {
-    return false;
-  }
-  if (!toEmailsClone.value.length) {
-    toast.warning(
-      "Email has no recipients. Please add at least one email address in the 'TO' field."
-    );
-    return false;
-  }
-
-  sendMail.submit();
-}
-
-watch(quotedContent, (newVal, oldVal) => {
-  if (!oldVal && newVal) {
-    nextTick(() => {
-      if (quotedContentRef.value) {
-        quotedContentRef.value.innerHTML = newVal;
-      }
-    });
-  }
-});
-function onQuotedInput() {
-  const el = quotedContentRef.value;
-  if (!el) return;
-  quotedContent.value = el.innerHTML || null;
-}
-
 function toggleCC() {
   showCC.value = !showCC.value;
-
   showCC.value &&
     nextTick(() => {
       ccInput.value.setFocus();
@@ -392,9 +400,117 @@ function toggleBCC() {
     });
 }
 
+const fromEmail = useStorage<string | "">("from-email", "");
+
+const outgoingEmails = computed<{ email_account: string; email_id: string }[]>(
+  () => userResource.data?.outgoing_emails ?? []
+);
+
+// selected mail from the outgoing emails list
+const selectedFromEmail = computed(() =>
+  outgoingEmails.value.find((e) => e.email_id === fromEmail.value)
+);
+
+const from = computed(() => {
+  if (!outgoingEmails.value.length) return [];
+  if (
+    outgoingEmails.value.length === 1 &&
+    outgoingEmails.value[0].email_id === userResource.data?.email
+  )
+    return [];
+  return outgoingEmails.value.map((e) => ({
+    label: e.email_account + " <" + e.email_id + ">",
+    value: e.email_id,
+  }));
+});
+
+const hasMultipleSenders = computed(() => (from?.value.length ?? 0) > 1);
+
+watch(
+  from,
+  (fromOptions) => {
+    if (!fromOptions.find((f) => f.value === fromEmail.value)) {
+      fromEmail.value = fromOptions.length ? fromOptions[0].value : "";
+    }
+  },
+  { immediate: true }
+);
+
+const attachments = ref([]);
+const isUploading = ref(false);
+
 async function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
   await removeAttachmentFromServer(attachment.name);
+}
+
+const showSavedRepliesSelectorModal = ref(false);
+
+function applySavedReplies(template: string) {
+  const textEditor = editorRef.value?.editor;
+  if (!textEditor) return;
+  textEditor.chain().focus("start").insertContent(template).run();
+}
+
+const sendMail = createResource({
+  url: "run_doc_method",
+  makeParams: () => ({
+    dt: props.doctype,
+    dn: props.ticketId,
+    method: "reply_via_agent",
+    args: {
+      attachments: attachments.value.map((x) => x.name),
+      from_email: selectedFromEmail.value,
+      to: toEmailsClone.value.join(","),
+      cc: ccEmailsClone.value?.join(","),
+      bcc: bccEmailsClone.value?.join(","),
+      message:
+        newEmail.value +
+        (quotedContentRef.value
+          ? `<p class="reply-to-content"></p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
+          : ""),
+    },
+  }),
+  onSuccess: () => {
+    resetState();
+    emit("submit");
+
+    if (isManager) {
+      updateOnboardingStep("reply_on_ticket");
+    }
+  },
+  debounce: 300,
+});
+
+const label = computed(() => (sendMail.loading ? "Sending..." : props.label));
+
+const isDisabled = computed(
+  () =>
+    (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) ||
+    sendMail.loading ||
+    isUploading.value
+);
+
+function submitMail() {
+  if (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) {
+    return false;
+  }
+  if (
+    !toEmailsClone.value.length &&
+    !ccEmailsClone.value.length &&
+    !bccEmailsClone.value.length
+  ) {
+    toast.warning(
+      "Email has no recipients. Please add at least one recipient (To, Cc, or Bcc) before sending."
+    );
+    return false;
+  }
+
+  sendMail.submit();
+}
+
+function getInitialContent() {
+  return emailSignature.value ? emailSignature.value : "<p></p>";
 }
 
 function addToReply(
@@ -410,45 +526,39 @@ function addToReply(
   if (body !== quotedContent.value) {
     //trigger change for watch when replied to body data is different from current quoted content
     quotedContent.value = null;
+    isQuoteExpanded.value = false;
     nextTick(() => {
       quotedContent.value = body;
     });
   }
 
-  editorRef.value.editor.chain().clearContent().focus("start").run();
   nextTick(() => {
-    newEmail.value = editorRef.value.editor.getHTML();
+    newEmail.value = getInitialContent();
   });
+  focusEditorAtStart();
 }
 
 function resetState() {
-  newEmail.value = null;
+  newEmail.value = emailSignature.value ? emailSignature.value : null;
   attachments.value = [];
   quotedContent.value = null;
+  isQuoteExpanded.value = false;
+  focusEditorAtStart();
 }
 
 function handleDiscard() {
   attachments.value = [];
-  newEmail.value = null;
+  newEmail.value = getInitialContent();
   quotedContent.value = null;
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
   showCC.value = false;
   showBCC.value = false;
+  isQuoteExpanded.value = false;
 
+  focusEditorAtStart();
   emit("discard");
 }
-
-//on load set quoted content from storage
-onMounted(() => {
-  if (quotedContent.value) {
-    nextTick(() => {
-      if (quotedContentRef.value) {
-        quotedContentRef.value.innerHTML = quotedContent.value;
-      }
-    });
-  }
-});
 
 function handleSelectAll(e: KeyboardEvent) {
   const active = document.activeElement;
@@ -484,7 +594,6 @@ function handleDelete(e: KeyboardEvent) {
   if (!sel || sel.isCollapsed || !quotedEl || !editorDom) return;
 
   const isSelectingEntireEditor = sel.containsNode(editorDom, true);
-
   const isSelectingEntireQuote = sel.containsNode(quotedEl, true);
 
   if (isSelectingEntireEditor && isSelectingEntireQuote) {
@@ -502,6 +611,7 @@ function handleKeydown(e: KeyboardEvent) {
   const key = e.key.toLowerCase();
 
   if ((e.metaKey || e.ctrlKey) && key === "a") {
+    isQuoteExpanded.value = true;
     handleSelectAll(e);
     return;
   }
@@ -512,8 +622,8 @@ function handleKeydown(e: KeyboardEvent) {
   }
 }
 
-const editor = computed(() => {
-  return editorRef.value.editor;
+onBeforeUnmount(() => {
+  cleanup();
 });
 
 defineExpose({

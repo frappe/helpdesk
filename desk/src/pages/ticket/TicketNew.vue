@@ -59,9 +59,9 @@
         :class="(subject.length >= 2 || description.length) && 'gap-5'"
       >
         <div class="flex flex-col gap-2">
-          <span class="block text-sm text-gray-700">
+          <span class="block text-sm text-ink-gray-7">
             {{ __("Subject") }}
-            <span class="place-self-center text-red-500"> * </span>
+            <span class="place-self-center text-ink-red-3"> * </span>
           </span>
           <FormControl
             v-model="subject"
@@ -78,7 +78,7 @@
         <div v-if="isCustomerPortal">
           <h4
             v-show="subject.length <= 2 && description.length === 0"
-            class="text-p-sm text-gray-500 ml-1"
+            class="text-p-sm text-ink-gray-4 ml-1"
           >
             {{ __("Please enter a subject to continue") }}
           </h4>

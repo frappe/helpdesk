@@ -1,22 +1,35 @@
 interface DocType {
-    name: string;
-    creation: string;
-    modified: string;
-    owner: string;
-    modified_by: string;
-  }
+  name: string;
+  creation: string;
+  modified: string;
+  owner: string;
+  modified_by: string;
+}
 
-  interface ChildDocType extends DocType {
-    parent?: string;
-    parentfield?: string;
-    parenttype?: string;
-    idx?: number;
-  }
-  
+interface ChildDocType extends DocType {
+  parent?: string;
+  parentfield?: string;
+  parenttype?: string;
+  idx?: number;
+}
+
 // Last updated: 2026-03-24 10:41:46.489051
 export interface HDTicketStatus extends DocType {
   /** Color: Select */
-  color?: 'Black' | 'Gray' | 'Blue' | 'Green' | 'Red' | 'Pink' | 'Orange' | 'Amber' | 'Yellow' | 'Cyan' | 'Teal' | 'Violet' | 'purple';
+  color?:
+    | "Black"
+    | "Gray"
+    | "Blue"
+    | "Green"
+    | "Red"
+    | "Pink"
+    | "Orange"
+    | "Amber"
+    | "Yellow"
+    | "Cyan"
+    | "Teal"
+    | "Violet"
+    | "purple";
   /** Label: Data */
   label_agent: string;
   /** Show end users a different view: Check */
@@ -24,14 +37,14 @@ export interface HDTicketStatus extends DocType {
   /** Label (customer view): Data */
   label_customer?: string;
   /** Category: Select */
-  category: 'Open' | 'Paused' | 'Resolved';
+  category: "Open" | "Paused" | "Resolved";
   /** Order: Int */
   order?: number;
   /** Enabled: Check */
   enabled: 0 | 1;
 }
 
-// Last updated: 2026-02-27 16:42:43.292656
+// Last updated: 2026-05-11 18:25:54.352721
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;
@@ -123,6 +136,10 @@ export interface HDTicket extends DocType {
   last_customer_response?: string;
   /** Ticket raised outside working hours: Check */
   raised_outside_working_hours: 0 | 1;
+  /** First Response Failed By: Duration */
+  first_response_failed_by?: number;
+  /** Resolution Failed By: Duration */
+  resolution_failed_by?: number;
   /** Assignees: JSON */
   _assign: string;
 }
@@ -257,7 +274,7 @@ export interface HDServiceLevelPriority extends ChildDocType {
   response_time: any;
 }
 
-// Last updated: 2026-02-02 11:54:59.519053
+// Last updated: 2026-04-30 20:00:06.247098
 export interface HDServiceLevelAgreement extends DocType {
   /** Service Level Name: Data */
   service_level: string;
@@ -301,6 +318,26 @@ export interface HDAgent extends DocType {
   is_active: 0 | 1;
   /** Image: Attach Image */
   user_image?: string;
+}
+
+// Last updated: 2022-12-22 18:52:50.658355
+export interface HDTeamMember extends ChildDocType {
+  /** User: Link (User) */
+  user?: string;
+}
+
+// Last updated: 2026-05-11 13:28:58.204342
+export interface HDTeam extends DocType {
+  /** Name: Data */
+  team_name: string;
+  /** Assignment Rule: Link (Assignment Rule) */
+  assignment_rule?: string;
+  /** Users: Table MultiSelect (HD Team Member) */
+  users: HDTeamMember[];
+  /** Ignore Restrictions: Check */
+  ignore_restrictions: 0 | 1;
+  /** Disabled: Check */
+  disabled: 0 | 1;
 }
 
 // Last updated: 2026-02-20 17:04:23.230132
@@ -372,7 +409,7 @@ export interface Contact extends DocType {
   /** User Id: Link (User) */
   user?: string;
   /** Status: Select */
-  status?: 'Passive' | 'Open' | 'Replied';
+  status?: "Passive" | "Open" | "Replied";
   /** Salutation: Link (Salutation) */
   salutation?: string;
   /** Gender: Link (Gender) */

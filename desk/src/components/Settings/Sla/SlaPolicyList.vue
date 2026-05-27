@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="slaPolicyList.list.loading && !slaPolicyList.list.data"
-    class="flex items-center justify-center mt-12"
+    class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
   >
     <LoadingIndicator class="w-4" />
   </div>
@@ -26,7 +26,7 @@
     </div>
     <div v-else class="-ml-2">
       <div
-        class="grid grid-cols-6 items-center gap-3 text-sm text-gray-600 ml-2"
+        class="grid grid-cols-6 items-center gap-3 text-sm text-ink-gray-5 ml-2"
       >
         <div class="col-span-5">
           {{ __("Policy name") }}

@@ -7,7 +7,9 @@
   >
     <template #target="{ togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span class="block text-xs text-gray-600">{{ __("Assignee") }}</span>
+        <span v-if="!hideLabel" class="block text-xs text-ink-gray-5">{{
+          __("Assignee")
+        }}</span>
         <Button
           ref="triggerRef"
           variant="outline"
@@ -50,7 +52,7 @@
         class="my-2 divide-y divide-outline-gray-modals rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
       >
         <!-- Search Header -->
-        <div class="py-1.5 px-1.5">
+        <div class="p-1">
           <div
             class="flex h-7 items-center text-sm font-medium text-ink-gray-6 justify-between"
           >
@@ -59,7 +61,7 @@
               v-model="searchText"
               :placeholder="__('Search agents...')"
               variant="ghost"
-              class="flex-1"
+              class="flex-1 search-agents-input"
               @click.stop
               @keydown="handleInputKeydown"
             >
@@ -152,6 +154,16 @@ import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
 import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
+
+interface Props {
+  hideLabel?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  hideLabel: false,
+});
+
+const { hideLabel } = props;
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
@@ -489,3 +501,9 @@ useShortcut("a", () => {
   (triggerRef.value?.$el as HTMLElement)?.nextElementSibling?.click();
 });
 </script>
+
+<style scoped>
+.search-agents-input :deep(input) {
+  background-color: transparent;
+}
+</style>

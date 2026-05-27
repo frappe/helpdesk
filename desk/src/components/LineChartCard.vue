@@ -78,6 +78,7 @@ const chartData = computed(() => {
   const _data: AverageResponseData = isDataFetched ? resource.data : props.data;
 
   const dates = _data?.data?.map((item) => item.date) || [];
+
   const seriesData =
     _data?.data?.map((item) =>
       props.type === "Time" ? item.avg_time : item.count

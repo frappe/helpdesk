@@ -41,6 +41,9 @@ scheduler_events = {
     "daily": [
         "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
     ],
+    "hourly_long": [
+        "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.update_sla_status_in_ticket"
+    ],
 }
 
 
@@ -96,6 +99,9 @@ has_permission = {
 # Override standard doctype classes
 override_doctype_class = {
     "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
+    "Customer": "helpdesk.integrations.erpnext.customer.CustomCustomer",
+    "User Permission": "helpdesk.integrations.erpnext.user_permission.CustomUserPermission",
+    "DocShare": "helpdesk.integrations.erpnext.doc_share.CustomDocShare",
     "Contact": "helpdesk.overrides.contact.CustomContact",
 }
 
@@ -103,6 +109,10 @@ ignore_links_on_delete = [
     "HD Notification",
     "HD Ticket Comment",
 ]
+
+doctype_list_js = {
+    "Customer": "public/erpnext/customer_list.js",
+}
 
 # setup wizard
 # setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"

@@ -11,8 +11,9 @@
       <TicketSidebar />
     </div>
     <SetContactPhoneModal
+      v-if="ticket.doc.contact"
       v-model="showPhoneModal"
-      :name="ticket.data?.contact?.name"
+      :name="ticket.doc?.contact"
       @onUpdate="ticket.reload"
     />
   </div>
@@ -47,6 +48,7 @@
 </template>
 
 <script setup lang="ts">
+import TicketIcon from "@/components/icons/TicketIcon.vue";
 import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";
 import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
@@ -66,11 +68,15 @@ import {
   TicketContactSymbol,
   TicketSymbol,
 } from "@/types";
-import { createResource, toast, usePageMeta } from "frappe-ui";
+import {
+  createResource,
+  LoadingIndicator,
+  toast,
+  usePageMeta,
+} from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { showCommentBox, showEmailBox } from "./modalStates";
-import TicketIcon from "@/components/icons/TicketIcon.vue";
 
 const telephonyStore = useTelephonyStore();
 const { $socket } = globalStore();
@@ -130,6 +136,9 @@ provide("makeCall", () => {
     docname: props.ticketId,
   });
 });
+provide("refreshTicket", () => reloadTicket(props.ticketId));
+provide("onCallEnded", () => reloadTicket(props.ticketId));
+
 const viewerComposable = computed(() => useActiveViewers(ticket.value.name));
 const viewers = computed(
   () => viewerComposable.value.currentViewers[props.ticketId] || []
@@ -196,7 +205,7 @@ onBeforeUnmount(() => {
 });
 usePageMeta(() => {
   if (!ticket.value?.doc?.name) {
-    return { title: "404 - Ticket not found" };
+    return { title: props.ticketId };
   }
 
   return {

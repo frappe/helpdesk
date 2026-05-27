@@ -2,7 +2,7 @@
   <div>
     <LayoutHeader>
       <template #left-header>
-        <div class="flex gap-2 items-center crumbs">
+        <div class="flex gap-2 items-center crumbs max-w-[50vw]">
           <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
           <Badge
             v-if="!article.loading"
@@ -39,11 +39,11 @@
         <!-- Top Element -->
         <div class="flex flex-col gap-3">
           <!-- Title -->
-          <div class="flex justify-between">
-            <div>
+          <div class="flex sm:flex-row flex-col justify-between">
+            <div class="w-full">
               <textarea
                 ref="titleRef"
-                class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+                class="w-full resize-none border-0 bg-transparent text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
                 v-model="title"
                 :placeholder="__('Title')"
                 rows="1"
@@ -67,7 +67,7 @@
                     <p class="truncate capitalize text-base text-ink-gray-7">
                       {{ article.data.author.name }}
                     </p>
-                    <IconDot class="h-4 w-4 text-gray-600" />
+                    <IconDot class="h-4 w-4 text-ink-gray-5" />
                     <div class="text-base text-ink-gray-7">
                       {{
                         dayjsLocal(article.data.modified).format(
@@ -79,22 +79,22 @@
                 </div>
               </div>
               <div
-                v-if="!editable && !isCustomerPortal"
-                class="text-sm text-gray-500 items-center"
+                v-if="!editable && !isCustomerPortal && !isMobileView"
+                class="text-p-sm text-ink-gray-4 items-center"
               >
                 <span>{{ views }} views</span>
               </div>
             </div>
-            <div class="flex gap-4 items-start">
-              <div class="flex items-start gap-4 text-sm">
+            <div class="flex gap-4 justify-between sm:items-start">
+              <div class="flex gap-4 text-p-sm items-center">
                 <div
-                  class="flex items-center gap-1"
+                  class="flex items-center gap-2"
                   v-if="!editable && !isCustomerPortal"
                 >
                   <Button
                     variant="ghost"
                     size="md"
-                    class="flex"
+                    class="flex shrink-0 !w-auto"
                     :disabled="!isCustomerPortal"
                   >
                     <template #suffix>
@@ -111,7 +111,7 @@
                   <Button
                     variant="ghost"
                     size="md"
-                    class="flex"
+                    class="flex shrink-0 !w-auto"
                     :disabled="!isCustomerPortal"
                   >
                     <template #suffix>
@@ -164,7 +164,7 @@
           ref="editorRef"
           :editor-class="editorClass"
           :content="textEditorContentWithIDs"
-          :extensions="[ComponentUtils]"
+          :extensions="[ComponentUtils, CleanStyles]"
           :editable="editable"
           @change="(event:string) => {
 			      content = event;
@@ -191,13 +191,27 @@
             />
             <div class="flex flex-col justify-start gap-1">
               <p
-                class="truncate capitalize text-base text-ink-gray-9 font-medium"
+                class="truncate capitalize text-p-base text-ink-gray-9 font-medium"
               >
-                <span class="text-base text-gray-600">published by </span>
+                <span class="text-base text-ink-gray-5">published by </span>
                 {{ article.data.author.name }}
               </p>
-              <div class="text-xs text-gray-700">
-                {{ dayjsLocal(article.data.modified).format("MMM D, h:mm A") }}
+              <div class="flex items-center gap-1">
+                <span class="text-p-xs text-ink-gray-7">
+                  {{
+                    dayjsLocal(article.data.modified).format("MMM D, h:mm A")
+                  }}
+                </span>
+                <IconDot
+                  v-if="!editable && !isCustomerPortal && isMobileView"
+                  class="h-4 w-4 text-ink-gray-5"
+                />
+
+                <span
+                  v-if="!editable && !isCustomerPortal && isMobileView"
+                  class="text-p-xs text-ink-gray-4 items-center"
+                  >{{ views }} views</span
+                >
               </div>
             </div>
           </div>
@@ -246,7 +260,7 @@ import {
   likeArticle,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
-import { ComponentUtils } from "@/tiptap-extensions";
+import { CleanStyles, ComponentUtils } from "@/tiptap-extensions";
 import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
 import {
   copyToClipboard,
@@ -653,7 +667,7 @@ const articleActions = computed(() => [
 const breadcrumbs = computed(() => {
   const items: Breadcrumb[] = [
     {
-      label: isMobileView.value ? __("KB") : __("Knowledge Base"),
+      label: isMobileView.value ? "" : __("Knowledge Base"),
       route: {
         name: isCustomerPortal.value
           ? "CustomerKnowledgeBase"

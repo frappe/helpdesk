@@ -2,7 +2,7 @@
   <div class="p-5 pb-10 px-10 w-full overflow-scroll items-center relative">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Knowledge Base</div>
+        <div class="text-lg font-medium text-ink-gray-9">Knowledge Base</div>
       </template>
     </LayoutHeader>
     <div
@@ -21,7 +21,7 @@
       <!-- Categories Folder -->
       <section class="flex flex-col gap-3">
         <!-- Heading -->
-        <p class="text-lg text-gray-900">Categories</p>
+        <p class="text-lg text-ink-gray-9">Categories</p>
         <CategoryFolderContainer />
       </section>
     </div>

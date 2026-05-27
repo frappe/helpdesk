@@ -38,16 +38,11 @@ const chartData = computed(() => {
     ? getAgentTicketsResource.data
     : props.data;
 
-  const _percentageChange = _data?.percentage_change || 0;
+  const _percentageChange = _data?.percentage_change ?? null;
   const total = _data?.total || 0;
   const dates = _data?.data?.map((item) => item.date) || [];
   const counts = _data?.data?.map((item) => item.count) || [];
-
-  const percentageChange = {
-    icon: _percentageChange > 0 ? "arrow-up-right" : "arrow-down-left",
-    value: _percentageChange > 0 ? `+${_percentageChange}` : _percentageChange,
-    color: _percentageChange > 0 ? "text-red-600" : "text-green-600",
-  };
+  const percentageChange = buildPercentageChange(_percentageChange);
 
   return {
     data: counts,

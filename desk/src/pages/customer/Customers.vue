@@ -2,9 +2,10 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Customers</div>
+        <div class="text-lg font-medium text-ink-gray-9">Customers</div>
       </template>
       <template #right-header>
+        <ERPNextCustomerSyncButton @synced="listViewRef?.reload()" />
         <Button
           label="Create"
           theme="gray"
@@ -21,10 +22,12 @@
     <NewCustomerDialog v-model="isDialogVisible" />
   </div>
 </template>
+
 <script setup lang="ts">
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import NewCustomerDialog from "@/components/customer/NewCustomerDialog.vue";
+import ERPNextCustomerSyncButton from "@/components/erpnext-integration/ERPNextCustomerSyncButton.vue";
 import OrganizationsIcon from "@/components/icons/OrganizationsIcon.vue";
 import { __ } from "@/translation";
 import { Avatar, usePageMeta } from "frappe-ui";
@@ -32,7 +35,9 @@ import { computed, h, ref } from "vue";
 
 const isDialogVisible = ref(false);
 const listViewRef = ref(null);
+
 // const emptyMessage = "No Customers Found";
+
 const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
 );
@@ -54,7 +59,6 @@ const options = computed(() => {
         },
       },
     },
-
     emptyState: {
       title: "No customers found",
       description: hasActiveFilters.value

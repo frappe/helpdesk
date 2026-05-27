@@ -5,6 +5,7 @@ import { FeatherIcon, call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
+import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
 import TicketIcon from "./components/icons/TicketIcon.vue";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
@@ -276,20 +277,26 @@ export async function copyToClipboard(
   toast.success(toastMessage);
 }
 
+export const ClearFormattingUtility = {
+  label: "Clear formatting",
+  icon: LucideBrushCleaning,
+  action: (editor) => {
+    editor.chain().focus().unsetAllMarks().clearNodes().cleanStyles().run();
+  },
+  isActive: () => false,
+};
+
 export const textEditorMenuButtons = [
   "Paragraph",
   ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
   "Separator",
   "Bold",
   "Italic",
+  "FontColor",
   "Separator",
+  ["Align Left", "Align Center", "Align Right"],
   "Bullet List",
   "Numbered List",
-  "Separator",
-  "Align Left",
-  "Align Center",
-  "Align Right",
-  "FontColor",
   "Separator",
   "Image",
   "Video",
@@ -312,6 +319,8 @@ export const textEditorMenuButtons = [
     "ToggleHeaderCell",
     "DeleteTable",
   ],
+  "Separator",
+  ClearFormattingUtility,
 ];
 
 export function isContentEmpty(content: string) {
@@ -324,6 +333,13 @@ export function isContentEmpty(content: string) {
     return true;
   }
   return doc.body.textContent.trim() === "";
+}
+
+export function normalize(value: any) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  return value;
 }
 
 export function isTouchScreenDevice() {
@@ -756,6 +772,82 @@ export function parseApiOptions(
 export function openContact(name: string) {
   const url = window.location.origin + "/helpdesk/contacts/" + name;
   window.open(url, "_blank");
+}
+
+const COLOR_PROPS = new Set([
+  "color",
+  "background",
+  "background-color",
+  "border-color",
+]);
+
+// Strip color-related inline styles + bgcolor/color attrs so iframe CSS controls colors.
+export function stripEmailColors(html: string): string {
+  if (!html) return html;
+  const div = document.createElement("div");
+  div.innerHTML = html;
+
+  div.querySelectorAll("[style]").forEach((el) => {
+    const styles = el.getAttribute("style") || "";
+    const filtered = styles
+      .split(";")
+      .map((s) => s.trim())
+      .filter((s) => {
+        if (!s) return false;
+        const prop = s.split(":")[0].trim().toLowerCase();
+        return !COLOR_PROPS.has(prop);
+      })
+      .join("; ");
+    if (filtered) el.setAttribute("style", filtered);
+    else el.removeAttribute("style");
+  });
+
+  div
+    .querySelectorAll("[bgcolor]")
+    .forEach((el) => el.removeAttribute("bgcolor"));
+  div
+    .querySelectorAll("font[color]")
+    .forEach((el) => el.removeAttribute("color"));
+
+  return div.innerHTML;
+}
+
+// Shared reactive mirror of <html data-theme> for JS-driven theme-aware components
+export const dataTheme = ref<string>(
+  (typeof document !== "undefined" &&
+    document.documentElement.getAttribute("data-theme")) ||
+    "light"
+);
+
+if (typeof window !== "undefined") {
+  new MutationObserver(() => {
+    const next = document.documentElement.getAttribute("data-theme") || "light";
+    if (next !== dataTheme.value) dataTheme.value = next;
+  }).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+}
+
+export function buildPercentageChange(value: number | null) {
+  if (value === null || value === undefined) {
+    return { icon: "arrow-right", value: "0", color: "text-ink-gray-5" };
+  }
+  return {
+    icon:
+      value > 0
+        ? "arrow-up-right"
+        : value < 0
+        ? "arrow-down-left"
+        : "arrow-right",
+    value: value > 0 ? `+${value}` : value,
+    color:
+      value > 0
+        ? "text-ink-red-4"
+        : value < 0
+        ? "text-ink-green-3"
+        : "text-ink-gray-5",
+  };
 }
 
 export function hasPermission() {
