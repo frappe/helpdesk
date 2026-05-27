@@ -20,10 +20,10 @@
           >
             <FileUploader
               :upload-args="{ private: true }"
-              @success="(f: any) => attachments.push(f)"
+              @success="addAttachment"
             >
               <template #default="{ openFileSelector, uploading }">
-                {{ void (isUploading = uploading) }}
+                {{ syncUploadingState(uploading) }}
                 <button
                   class="flex rounded p-1 text-ink-gray-8 transition-colors hover:bg-surface-gray-3 disabled:opacity-40"
                   :disabled="uploading"
@@ -43,11 +43,11 @@
       </template>
     </TextEditor>
     <div
-      v-if="showAttachments && attachments.length"
+      v-if="showAttachments && attachments?.length"
       class="flex flex-wrap gap-2 mt-2"
     >
       <AttachmentItem
-        v-for="attachment in attachments"
+        v-for="attachment in attachments ?? []"
         :key="attachment.file_url"
         :label="attachment.file_name"
         :url="attachment.file_url"
@@ -74,14 +74,17 @@ import {
   ComponentUtils,
   HandleExcelPaste,
 } from "@/tiptap-extensions";
-import { isContentEmpty, uploadFunction } from "@/utils";
+import { isContentEmpty } from "@/utils";
 import {
   FeatherIcon,
   FileUploader,
   TextEditor,
   TextEditorFixedMenu,
+  type UploadedFile,
 } from "frappe-ui";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
+
+type UploadFunction = (file: File) => Promise<UploadedFile>;
 
 const props = withDefaults(
   defineProps<{
@@ -90,10 +93,9 @@ const props = withDefaults(
     maxHeight?: string;
     extensions?: any[];
     showSignature?: boolean;
-    doctype?: string;
-    docname?: string | null;
     type?: "Saved Reply" | "Email";
     showAttachments?: boolean;
+    uploadFn?: UploadFunction;
   }>(),
   {
     placeholder: "",
@@ -101,8 +103,6 @@ const props = withDefaults(
     maxHeight: "max-h-80",
     extensions: () => [ComponentUtils, HandleExcelPaste, CleanStyles],
     showSignature: false,
-    doctype: "HD Ticket",
-    docname: null,
     type: "Saved Reply",
     showAttachments: false,
   }
@@ -110,9 +110,10 @@ const props = withDefaults(
 
 const internalContent = defineModel<string>({ default: "" });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const editorRef = ref<any>(null);
-const attachments = ref<any[]>([]);
+const attachments = defineModel<UploadedFile[] | null>("attachments", {
+  default: () => [],
+});
 const isUploading = ref(false);
 
 const savedReplyClass = [
@@ -138,12 +139,6 @@ const editorClass = computed(() => [
   props.maxHeight,
 ]);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const uploadFn = props.docname
-  ? (file: any) => uploadFunction(file, props.doctype, props.docname as string)
-  : null;
-
-// ─── Signature ────────────────────────────────────────────────
 const userResource = getUserEmailInfo();
 
 function getDefaultContent(signature: string): string {
@@ -154,7 +149,7 @@ function applySignature(signature: string) {
   if (!isContentEmpty(internalContent.value)) return;
   const commands = editorRef.value?.editor?.commands;
   if (commands) {
-    commands.setContent(signature, false);
+    commands.setContent(signature);
     setTimeout(() => {
       editorRef.value?.editor?.commands?.focus("start");
     }, 0);
@@ -163,10 +158,19 @@ function applySignature(signature: string) {
   }
 }
 
-// Early arrival: resource was already cached when component mounts
+function addAttachment(file: UploadedFile) {
+  attachments.value = [...(attachments.value ?? []), file];
+}
 
-function removeAttachment(attachment: any) {
-  attachments.value = attachments.value.filter((a) => a !== attachment);
+function removeAttachment(attachment: UploadedFile) {
+  attachments.value = (attachments.value ?? []).filter((a) => a !== attachment);
+}
+
+// FileUploader exposes `uploading` only via slot scope, so mirror it into a
+// ref that the parent can read through the exposed `isUploading`.
+function syncUploadingState(uploading: boolean): string {
+  isUploading.value = uploading;
+  return "";
 }
 
 function getContent(): string {
@@ -187,9 +191,9 @@ function reset() {
   const sig = data?.email_signature
     ? getDefaultContent(data.email_signature)
     : "";
-  commands.setContent(sig || "<p></p>", false);
+  commands.setContent(sig || "<p></p>");
   internalContent.value = sig;
-  attachments.value = [];
+  attachments.value = null;
   setTimeout(() => {
     editorRef.value?.editor?.commands?.focus("start");
   }, 0);
@@ -223,7 +227,6 @@ defineExpose({
   isEmpty,
   reset,
   editorRef,
-  attachments,
   isUploading,
 });
 </script>
