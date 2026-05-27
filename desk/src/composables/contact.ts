@@ -114,10 +114,16 @@ export function useContact(name: string) {
         phone: p.phone,
         isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
       })) || [];
+    const currentTimezone =
+      typeof state.timezone === "string"
+        ? state.timezone
+        : (state.timezone as any)?.value || "";
+    const savedTimezone = doc.getInfo?.data?.timezone || "";
     return (
       state.firstName !== (doc.doc?.first_name || "") ||
       state.lastName !== (doc.doc?.last_name || "") ||
       state.image !== (doc.doc?.image || "") ||
+      currentTimezone !== savedTimezone ||
       JSON.stringify(currentEmails) !== JSON.stringify(savedEmails) ||
       JSON.stringify(currentPhones) !== JSON.stringify(savedPhones)
     );
@@ -436,7 +442,38 @@ export function useContactInvite() {
       isLoading.value = false;
     }
   }
-  return { resendInvite, isLoading };
+  async function inviteAsUser(
+    contactName: string,
+    email: string | undefined
+  ): Promise<void> {
+    if (!email) {
+      toast.error(__("Contact has no email address to invite"));
+      return;
+    }
+    try {
+      isLoading.value = true;
+      await call("frappe.core.api.user_invitation.invite_by_email", {
+        emails: email,
+        roles: ["HD Customer"],
+        redirect_to_path: "/helpdesk",
+        app_name: "helpdesk",
+        contact: contactName,
+      });
+      toast.success(__("Invitation sent"));
+      updateOnboardingStep("add_invite_contact");
+    } catch (error: unknown) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(
+        (error as Error).messages?.[0] || (error as Error).message,
+        "text/html"
+      );
+      const errMsg = doc.body.innerText;
+      toast.error(errMsg);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  return { resendInvite, inviteAsUser, isLoading };
 }
 
 export function useContactResetPassword(getUser: () => string | undefined) {

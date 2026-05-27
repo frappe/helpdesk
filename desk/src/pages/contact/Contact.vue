@@ -24,7 +24,7 @@
             <Button
               variant="subtle"
               @click="showEditDialog = true"
-              v-if="hasPermission()"
+              v-if="hasPermission() && contact.doc?.user"
             >
               <div class="flex gap-1 items-center">
                 <LucideSquarePen class="h-4 w-4" />
@@ -202,8 +202,11 @@ const contactInfo = computed(() => {
   return info;
 });
 
-const { resendInvite, isLoading: isContactInvitationLoading } =
-  useContactInvite();
+const {
+  resendInvite,
+  inviteAsUser,
+  isLoading: isContactInvitationLoading,
+} = useContactInvite();
 const { resetPassword, isLoading: isResetPasswordLoading } =
   useContactResetPassword(() => contact.doc?.user);
 
@@ -214,8 +217,19 @@ const invitationName = computed(
 );
 
 const showDeleteDialog = ref(false);
+
 const dropdownActions = computed(() => {
   const baseActions = [];
+  if (!contact.doc?.user && !invitationName.value) {
+    baseActions.push({
+      label: __("Invite as User"),
+      icon: "user-plus",
+      onClick: async () => {
+        await inviteAsUser(props.id, contact.doc?.email_id);
+        contact.getInfo.reload();
+      },
+    });
+  }
   if (invitationName.value) {
     baseActions.push({
       label: __("Resend Invite"),
@@ -257,6 +271,7 @@ const dropdownActions = computed(() => {
     },
   ];
 });
+
 function handleDelete({
   deleteLinkedTickets,
 }: {
