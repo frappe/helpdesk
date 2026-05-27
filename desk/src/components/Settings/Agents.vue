@@ -37,7 +37,7 @@
             class="absolute right-1 top-1/2 -translate-y-1/2"
           />
         </div>
-        <Dropdown :options="dropdownOptions" placement="right">
+        <Dropdown :options="activeFilterOptions" placement="right">
           <template #default="{ open }">
             <Button
               :label="activeFilter"
@@ -53,19 +53,15 @@
           </template>
           <template #item-label="{ item }">
             <button
-              class="group flex text-ink-gray-6 gap-4 w-full justify-between items-center rounded text-base"
+              class="group flex text-ink-gray-6 gap-4 w-full justify-between items-center rounded text-p-sm"
               @click="item.onClick"
             >
-              <div class="flex items-center justify-between flex-1">
-                <span class="whitespace-nowrap">
-                  {{ item.label }}
-                </span>
-                <FeatherIcon
-                  v-if="activeFilter === item.label"
-                  name="check"
-                  class="size-4 text-ink-gray-7"
-                />
-              </div>
+              <span class="whitespace-nowrap">{{ item.label }}</span>
+              <FeatherIcon
+                v-if="activeFilter === item.label"
+                name="check"
+                class="size-4 text-ink-gray-7"
+              />
             </button>
           </template>
         </Dropdown>
@@ -73,19 +69,12 @@
     </template>
     <template #content>
       <div class="grow">
-        <!-- loading state -->
         <div
           v-if="agents.loading"
           class="flex mt-28 justify-between w-full h-full"
         >
-          <Button
-            :loading="agents.loading"
-            variant="ghost"
-            class="w-full"
-            size="2xl"
-          />
+          <Button :loading="true" variant="ghost" class="w-full" size="2xl" />
         </div>
-        <!-- Empty State -->
         <EmptyState
           v-if="!agents.loading && !agents.data?.length"
           variant="badge"
@@ -97,16 +86,20 @@
               : 'Add one to get started.'
           "
         />
-        <!-- Agent List -->
         <div
-          class="w-full"
           v-if="!agents.loading && Boolean(agents.data?.length)"
+          class="-ml-2 w-full"
         >
           <div
-            class="grid grid-cols-8 items-center gap-3 text-sm text-ink-gray-5"
+            class="grid grid-cols-12 items-center gap-4 text-xs tracking-wider text-ink-gray-5"
           >
-            <div class="col-span-6 text-p-sm">{{ __("Agent name") }}</div>
+            <div class="col-span-4 ml-2">{{ __("Agent") }}</div>
+            <div class="col-span-3">{{ __("Tickets") }}</div>
+            <div class="col-span-2 -ml-4">{{ __("First Response") }}</div>
+            <div v-if="isManager" class="col-span-2">{{ __("Role") }}</div>
+            <div :class="isManager ? 'col-span-1' : 'col-span-3'" />
           </div>
+<<<<<<< HEAD
           <hr class="mt-2" />
           <div v-for="(agent, index) in agents.data" :key="agent.agent_name">
             <div class="flex items-center justify-between h-14 group rounded">
@@ -162,8 +155,20 @@
               </div>
             </div>
             <hr v-if="index !== agents.data.length - 1" />
+=======
+          <hr class="mt-2 mx-2" />
+          <div v-for="(agent, index) in agents.data" :key="agent.name">
+            <AgentRow
+              :agent="agent"
+              :stats="statsFor(agent.name)"
+              :is-manager="isManager"
+              :current-role="getUserRole(agent.name)"
+              :kebab-options="kebabOptionsFor(agent)"
+              @update:role="(role) => updateRole(agent.name, role)"
+            />
+            <hr v-if="index !== agents.data.length - 1" class="mx-2" />
+>>>>>>> 85edb100 (feat: add open tickets and avg first response in agents tab)
           </div>
-          <!-- Load More Button -->
           <div class="flex justify-center">
             <Button
               v-if="!agents.loading && agents.hasNextPage"
@@ -181,25 +186,29 @@
 </template>
 
 <script setup lang="ts">
+import { useAgentWorkload } from "@/composables/useAgentWorkload";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { Avatar, Button, call, Dropdown, FeatherIcon, toast } from "frappe-ui";
-import { h, onUnmounted } from "vue";
-import LucideCheck from "~icons/lucide/check";
-import { activeFilter, useAgents } from "./agents";
-import AgentIcon from "../icons/AgentIcon.vue";
-import { setActiveSettingsTab } from "./settingsModal";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
+<<<<<<< HEAD
 import { renderOptionIcon } from "@/utils";
+=======
+import { Button, Dropdown, FeatherIcon, call, toast } from "frappe-ui";
+import { computed, onUnmounted } from "vue";
+import AgentIcon from "../icons/AgentIcon.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import AgentRow from "./AgentRow.vue";
+import { activeFilter, useAgents } from "./agents";
+import { setActiveSettingsTab } from "./settingsModal";
+>>>>>>> 85edb100 (feat: add open tickets and avg first response in agents tab)
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
-
 const agentStore = useAgents();
 const search = agentStore.search;
 const agents = agentStore.agents;
 
+<<<<<<< HEAD
 function getRoles(agent: string) {
   const agentRole = getUserRole(agent);
   const roles = [
@@ -266,21 +275,26 @@ function updateRole(agent: string, newRole: string) {
   if (currentRole === newRole) {
     return;
   }
+=======
+const { statsFor } = useAgentWorkload(computed(() => agents.data));
+>>>>>>> 85edb100 (feat: add open tickets and avg first response in agents tab)
 
+function updateRole(agentName: string, newRole: string) {
+  if (getUserRole(agentName) === newRole) return;
   call("helpdesk.helpdesk.doctype.hd_agent.hd_agent.update_agent_role", {
-    user: agent,
+    user: agentName,
     new_role: newRole,
   }).then(() => {
-    updateUserRoleCache(agent, newRole);
+    updateUserRoleCache(agentName, newRole);
     toast.success(__(`Role updated to ${newRole} successfully.`));
   });
 }
 
-function getOptions(agent) {
-  let filters = agentStore.filters;
+function kebabOptionsFor(agent: { name: string; is_active: boolean | number }) {
   return [
     {
       label: "Disable Agent",
+<<<<<<< HEAD
       icon: "lucide-x-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 0);
@@ -295,34 +309,39 @@ function getOptions(agent) {
         await agentStore.updateAgent(agent.name, 1);
         agents.reload({ ...filters, search: search.value });
       },
+=======
+      icon: "x-circle",
+      onClick: () => setAgentActive(agent.name, 0),
+      condition: () => Boolean(agent.is_active),
+    },
+    {
+      label: "Enable Agent",
+      icon: "check-circle",
+      onClick: () => setAgentActive(agent.name, 1),
+>>>>>>> 85edb100 (feat: add open tickets and avg first response in agents tab)
       condition: () => !agent.is_active,
     },
   ];
 }
 
-const dropdownOptions = [
+async function setAgentActive(agentName: string, isActive: 0 | 1) {
+  await agentStore.updateAgent(agentName, isActive);
+  agents.reload({ ...agentStore.filters, search: search.value });
+}
+
+const activeFilterOptions = [
   {
     label: "All",
-    onClick: () => {
-      agentStore.filters["is_active"] = ["in", [0, 1]];
-      activeFilter.value = "All";
-    },
+    onClick: () => setActiveFilter("All", ["in", [0, 1]]),
   },
-  {
-    label: "Active",
-    onClick: () => {
-      agentStore.filters["is_active"] = ["=", 1];
-      activeFilter.value = "Active";
-    },
-  },
-  {
-    label: "Inactive",
-    onClick: () => {
-      agentStore.filters["is_active"] = ["=", 0];
-      activeFilter.value = "Inactive";
-    },
-  },
+  { label: "Active", onClick: () => setActiveFilter("Active", ["=", 1]) },
+  { label: "Inactive", onClick: () => setActiveFilter("Inactive", ["=", 0]) },
 ];
+
+function setActiveFilter(label: string, isActiveFilter: unknown) {
+  agentStore.filters["is_active"] = isActiveFilter;
+  activeFilter.value = label;
+}
 
 onUnmounted(() => {
   agents.filters = {};
