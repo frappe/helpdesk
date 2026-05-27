@@ -12,12 +12,14 @@
           <CompactEditor
             ref="editorRef"
             v-model="content"
+            v-model:attachments="attachments"
             :show-signature="true"
             :show-attachments="true"
             :type="'Email'"
             :placeholder="__('Write your reply...')"
             :min-height="'min-h-[200px]'"
             :max-height="'max-h-[300px]'"
+            :upload-fn="handleFileUpload"
             @keydown="handleKeydown"
           />
         </p>
@@ -46,8 +48,9 @@
 import CompactEditor from "@/components/CompactEditor.vue";
 import { __ } from "@/translation";
 import { Resource } from "@/types";
+import { uploadFunction } from "@/utils";
 import { useStorage } from "@vueuse/core";
-import { createResource, Dialog, toast } from "frappe-ui";
+import { createResource, Dialog, toast, UploadedFile } from "frappe-ui";
 import { ref } from "vue";
 
 const open = defineModel<boolean>();
@@ -57,6 +60,7 @@ const props = defineProps<{
 }>();
 
 const content = useStorage<string>("bulk-reply", "");
+const attachments = useStorage<UploadedFile[]>("bulk-attachments", []);
 const editorRef = ref<InstanceType<typeof CompactEditor> | null>(null);
 
 const bulkReplyResource: Resource = createResource({
@@ -72,6 +76,18 @@ function clearDraft() {
   editorRef.value?.reset();
 }
 
+async function handleFileUpload(file: File) {
+  const uploads = await Promise.all(
+    Array.from(props.selections).map((ticketId) =>
+      uploadFunction(file, "HD Ticket", ticketId)
+    )
+  );
+
+  const uploaded = uploads[0];
+  if (!uploaded) throw new Error(__("No tickets selected"));
+  return uploaded;
+}
+
 function handleDiscard() {
   open.value = false;
   clearDraft();
@@ -83,7 +99,7 @@ function handleSubmit() {
     {
       ticket_ids: Array.from(props.selections),
       message: content.value,
-      attachments: (editorRef.value?.attachments ?? []).map((a: any) => a.name),
+      attachments: (attachments.value ?? []).map((a) => a.name),
     },
     {
       onSuccess() {
