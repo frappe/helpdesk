@@ -181,51 +181,26 @@
 </template>
 
 <script setup lang="ts">
-import Link from "@/components/frappe-ui/Link.vue";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import TimezoneControl from "@/components/TimezoneControl.vue";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
-import { HDAgent } from "@/types/doctypes";
-import { computed, nextTick, ref, watch, useTemplateRef } from "vue";
 import {
   Avatar,
-  Badge,
   Button,
+  createDocumentResource,
   FileUploader,
   LoadingIndicator,
   toast,
-  createDocumentResource,
-  createResource,
 } from "frappe-ui";
-import { computed, ref } from "vue";
-import CameraIcon from "~icons/lucide/camera";
-import { disableSettingModalOutsideClick } from "../settingsModal";
-import ChangePasswordModal from "./components/ChangePasswordModal.vue";
-import { disableSettingModalOutsideClick } from "../settingsModal";
+import { computed, nextTick, ref, useTemplateRef, watch } from "vue";
 import EditIcon from "~icons/lucide/edit";
 const emit = defineEmits(["updateStep"]);
+
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import Link from "@/components/frappe-ui/Link.vue";
-import { HDAgent } from "@/types/doctypes";
+import TimezoneControl from "@/components/TimezoneControl.vue";
 import UnsavedBadge from "@/components/UnsavedBadge.vue";
-const auth = useAuthStore();
-const profile = ref({
-  fullName: auth.userName,
-  userImage: auth.userImage,
-  firstName: auth.userFirstName,
-  lastName: auth.userLastName,
-});
-
-
-
+import { disableSettingModalOutsideClick } from "../settingsModal";
+import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 const showChangePasswordModal = ref(false);
-const language = ref(auth.language);
-const timezone = ref(auth.timezone);
-const isLanguageChanged = computed(() => {
-  return language.value !== auth?.language;
-  },
-});
 
 const { userId } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
@@ -299,25 +274,14 @@ function updateLanguage(val: string | null) {
   user.doc.language = val || user.originalDoc?.language;
 }
 
-function updateTimezone(val: { label: string; value: string } | null) {
-  if (!user.doc) return;
-  user.doc.time_zone = val?.value || user.originalDoc?.time_zone;
-}
-
-const timezoneOptions = ref([]);
-const timezoneData = createResource({
-  url: "frappe.core.doctype.user.user.get_timezones",
-  auto: true,
-  onSuccess(data) {
-    timezoneOptions.value = data.timezones.map((tz) => ({
-      label: tz,
-      value: tz,
-    }));
+const language = ref(null);
+const timezone = computed({
+  get: () => user.doc?.time_zone ?? "",
+  set: (val: string) => {
+    if (!user.doc) return;
+    user.doc.time_zone = val;
   },
 });
-
-const language = ref(null);
-const timezone = ref(null);
 
 const refreshRequired = ref(false);
 
@@ -326,7 +290,6 @@ watch(
   (doc) => {
     if (!doc) return;
     if (!language.value) language.value = doc.language;
-    if (!timezone.value) timezone.value = doc.time_zone;
   },
   { immediate: true }
 );
