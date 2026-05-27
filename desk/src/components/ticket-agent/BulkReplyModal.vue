@@ -58,6 +58,9 @@ const open = defineModel<boolean>();
 const props = defineProps<{
   selections: Set<string>;
 }>();
+const emit = defineEmits<{
+  (e: "success"): void;
+}>();
 
 const content = useStorage<string>("bulk-reply", "");
 const attachments = useStorage<UploadedFile[]>("bulk-attachments", []);
@@ -111,6 +114,7 @@ function handleSubmit() {
                 String(props.selections.size)
               );
         toast.success(msg);
+        emit("success");
       },
     }
   );
