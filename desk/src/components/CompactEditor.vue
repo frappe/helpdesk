@@ -212,7 +212,6 @@ if (props.showSignature) {
 
 onMounted(() => {
   if (!props.showSignature) return;
-  userResource.reload();
 
   nextTick(() => {
     const data = userResource.data as { email_signature?: string } | null;

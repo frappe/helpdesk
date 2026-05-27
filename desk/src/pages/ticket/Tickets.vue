@@ -46,7 +46,11 @@
       v-model="viewDialog"
       @update="(view, action) => handleView(view, action)"
     />
-    <BulkReplyModal v-model="showBulkReplyModal" :selections="listSelections" />
+    <BulkReplyModal
+      v-model="showBulkReplyModal"
+      :selections="listSelections"
+      @success="listViewRef?.unselectAll()"
+    />
   </div>
 </template>
 
