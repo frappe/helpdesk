@@ -73,8 +73,8 @@ function clearDraft() {
 }
 
 function handleDiscard() {
-  clearDraft();
   open.value = false;
+  clearDraft();
 }
 
 function handleSubmit() {
