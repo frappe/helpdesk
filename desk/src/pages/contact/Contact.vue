@@ -184,11 +184,6 @@ const contactInfo = computed(() => {
   }
   const info = [
     {
-      icon: markRaw(LucideMapPin),
-      value: contact.getInfo?.data?.country,
-      condition: !!contact.getInfo?.data?.country,
-    },
-    {
       icon: markRaw(LucideMail),
       value: contact.doc?.email_id,
       condition: !!contact.doc?.email_id,
@@ -197,6 +192,11 @@ const contactInfo = computed(() => {
       icon: markRaw(LucidePhone),
       value: contact.doc?.mobile_no,
       condition: !!contact.doc?.mobile_no,
+    },
+    {
+      icon: markRaw(LucideMapPin),
+      value: contact.getInfo?.data?.country,
+      condition: !!contact.getInfo?.data?.country,
     },
   ];
   return info;

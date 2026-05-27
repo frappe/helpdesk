@@ -103,7 +103,6 @@
             />
             <Button
               key="add-email"
-              variant="ghost"
               size="sm"
               :label="__('Add Email')"
               @click="addRow('email')"
@@ -131,7 +130,6 @@
             />
             <Button
               key="add-phone"
-              variant="ghost"
               size="sm"
               :label="__('Add Phone')"
               @click="addRow('phone')"

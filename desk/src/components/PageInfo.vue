@@ -10,10 +10,7 @@
       />
       <div
         class="flex flex-col h-full gap-1.5"
-        :class="[
-          (isMobileView || !docInfo?.length) &&
-            'flex-1 items-center justify-center',
-        ]"
+        :class="[isMobileView && 'flex-1 items-center justify-center']"
       >
         <div class="flex gap-2 items-center">
           <p class="font-medium text-ink-gray-8 text-xl">
@@ -23,10 +20,7 @@
             <Badge v-if="props.badge" :label="props.badge" :theme="'orange'" />
           </Tooltip>
         </div>
-        <div
-          v-if="!isMobileView && docInfo && docInfo.length"
-          class="flex items-center gap-x-1.5"
-        >
+        <div v-if="!isMobileView" class="flex items-center gap-x-1.5">
           <template v-for="(item, index) in docInfo" :key="index">
             <template v-if="item.condition !== false">
               <span
@@ -34,8 +28,9 @@
                   docInfo.slice(0, index).some((i) => i.condition !== false)
                 "
                 class="text-ink-gray-4"
-                >•</span
               >
+                •
+              </span>
               <div class="flex items-center gap-x-1">
                 <component
                   v-if="item.icon"
