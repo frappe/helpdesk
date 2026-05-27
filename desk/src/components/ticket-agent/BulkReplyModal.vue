@@ -25,6 +25,7 @@
     </template>
     <template #actions>
       <div class="flex items-center justify-end gap-2">
+        <Button :label="__('Discard')" @click="handleDiscard" />
         <Button
           variant="solid"
           :loading="bulkReplyResource.loading"
@@ -45,8 +46,9 @@
 import CompactEditor from "@/components/CompactEditor.vue";
 import { __ } from "@/translation";
 import { Resource } from "@/types";
+import { useStorage } from "@vueuse/core";
 import { createResource, Dialog, toast } from "frappe-ui";
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
 const open = defineModel<boolean>();
 
@@ -54,22 +56,26 @@ const props = defineProps<{
   selections: Set<string>;
 }>();
 
-const content = ref("");
+const content = useStorage<string>("bulk-reply", "");
 const editorRef = ref<InstanceType<typeof CompactEditor> | null>(null);
-
-watch(open, (val) => {
-  if (val) {
-    content.value = "";
-    editorRef.value?.reset();
-  }
-});
 
 const bulkReplyResource: Resource = createResource({
   url: "helpdesk.api.ticket.bulk_reply",
   onSuccess() {
+    clearDraft();
     open.value = false;
   },
 });
+
+function clearDraft() {
+  content.value = "";
+  editorRef.value?.reset();
+}
+
+function handleDiscard() {
+  clearDraft();
+  open.value = false;
+}
 
 function handleSubmit() {
   if (editorRef.value?.isEmpty()) return;
