@@ -1072,8 +1072,8 @@ class TestHDTicket(FrappeTestCase):
         """
         frappe.set_user(agent)
 
-        file1 = upload_test_file("KB.png")
-        file2 = upload_test_file("Hero2.png")
+        file1 = upload_test_file("outlook.png")
+        file2 = upload_test_file("sendgrid.png")
 
         ticket1 = make_ticket(raised_by="customer1@test.com")
         ticket2 = make_ticket(raised_by="customer2@test.com")
