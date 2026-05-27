@@ -419,11 +419,19 @@ export function useContactInvite() {
   const isLoading = ref(false);
   // @ts-expect-error
   const { updateOnboardingStep } = useOnboarding("helpdesk");
-  async function resendInvite(name: string): Promise<void> {
+  async function resendInvite(
+    invitationName: string,
+    status: string | undefined,
+    contactName: string,
+    email: string | undefined
+  ): Promise<void> {
+    if (status === "Expired") {
+      return inviteAsUser(contactName, email);
+    }
     try {
       isLoading.value = true;
       await call("frappe.core.api.user_invitation.resend_invitation", {
-        name,
+        name: invitationName,
         app_name: "helpdesk",
       });
       toast.success(__("Invitation email resent successfully"));

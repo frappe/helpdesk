@@ -17,7 +17,7 @@
           shape: 'circle',
         }"
         :doc-info="contactInfo"
-        :badge="invitationName && __('Invited')"
+        :badge="invitationBadge"
       >
         <template #actions>
           <div class="flex gap-2 items-center">
@@ -212,15 +212,30 @@ const { resetPassword, isLoading: isResetPasswordLoading } =
 
 const showEditDialog = ref(false);
 
-const invitationName = computed(
-  () => contact.getInfo.data?.invitation_name || ""
-);
+const invitation = computed(() => contact.getInfo.data?.invitation);
+
+const invitationBadge = computed(() => {
+  const inv = invitation.value;
+  if (!inv?.name) return null;
+  if (inv.status === "Expired") {
+    return {
+      label: __("Invitation Expired"),
+      theme: "red" as const,
+      tooltip: __("Invitation expired. Resend to invite again."),
+    };
+  }
+  return {
+    label: __("Invited"),
+    theme: "orange" as const,
+    tooltip: __("Invite sent. Waiting for the user to accept."),
+  };
+});
 
 const showDeleteDialog = ref(false);
 
 const dropdownActions = computed(() => {
   const baseActions = [];
-  if (!contact.doc?.user && !invitationName.value) {
+  if (!contact.doc?.user && !invitation.value?.name) {
     baseActions.push({
       label: __("Invite as User"),
       icon: "user-plus",
@@ -230,12 +245,18 @@ const dropdownActions = computed(() => {
       },
     });
   }
-  if (invitationName.value) {
+  if (invitation.value?.name) {
     baseActions.push({
       label: __("Resend Invite"),
       icon: "mail",
-      onClick: () => {
-        resendInvite(invitationName.value);
+      onClick: async () => {
+        await resendInvite(
+          invitation.value!.name,
+          invitation.value!.status,
+          props.id,
+          contact.doc?.email_id
+        );
+        contact.getInfo.reload();
       },
     });
   }

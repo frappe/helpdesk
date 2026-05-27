@@ -11,20 +11,23 @@ class CustomContact(Contact):
         rating = self.get_avg_rating()
         customers = get_customers_with_image(self.name)
 
-        invitation_name = frappe.db.exists(
+        invitation = frappe.db.get_value(
             "User Invitation",
             {
                 "contact": self.name,
-                "status": "Pending",
+                "status": ["!=", "Accepted"],
                 "email": self.email_ids[0].email_id,
                 "app_name": "helpdesk",
             },
+            ["name", "status"],
+            as_dict=True,
+            order_by="creation desc",
         )
 
         result = {
             "rating": rating,
             "customers": customers,
-            "invitation_name": invitation_name,
+            "invitation": invitation,
         }
 
         if self.user:

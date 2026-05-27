@@ -16,8 +16,8 @@
           <p class="font-medium text-ink-gray-8 text-xl">
             {{ avatar.label }}
           </p>
-          <Tooltip text="Invite sent. Waiting for the user to accept.">
-            <Badge v-if="props.badge" :label="props.badge" :theme="'orange'" />
+          <Tooltip v-if="badge" :text="badge.tooltip ?? ''">
+            <Badge :label="badge.label" :theme="badge.theme ?? 'orange'" />
           </Tooltip>
         </div>
         <div v-if="!isMobileView" class="flex items-center gap-x-1.5">
@@ -64,15 +64,21 @@ interface DocInfoItem {
   condition?: boolean;
 }
 
+interface BadgeInfo {
+  label: string;
+  theme?: "gray" | "blue" | "green" | "orange" | "red";
+  tooltip?: string;
+}
+
 const props = withDefaults(
   defineProps<{
     avatar: AvatarProps;
     docInfo?: DocInfoItem[];
-    badge?: string;
+    badge?: BadgeInfo | null;
   }>(),
   {
     docInfo: () => [],
-    badge: () => "",
+    badge: null,
   }
 );
 
