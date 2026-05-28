@@ -1,9 +1,11 @@
 <template>
   <div class="flex-1 min-w-0">
     <!-- Header: title + sort tabs -->
-    <div class="flex items-center justify-between ml-6">
+    <div
+      class="flex items-center justify-between ml-6 pb-3 mb-4 border-b border-outline-gray-2"
+    >
       <h4 class="font-semibold text-ink-gray-8">
-        User reviews ({{ feedbackCount.data ?? 0 }})
+        {{ __("User reviews") }} ({{ feedbackCount.data ?? 0 }})
       </h4>
       <TabButtons
         v-model="activeSort"

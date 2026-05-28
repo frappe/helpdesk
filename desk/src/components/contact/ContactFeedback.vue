@@ -1,7 +1,9 @@
 <template>
   <div>
     <!-- Heading -->
-    <h3 class="font-semibold text-lg mt-2.5 mb-4">Feedback</h3>
+    <h3 class="font-semibold text-lg mt-2.5 mb-4 text-ink-gray-8">
+      {{ __("Feedback") }}
+    </h3>
 
     <!-- Loading -->
     <div v-if="loading" class="flex items-center justify-center py-16">
@@ -15,9 +17,13 @@
     >
       <LucideStar class="h-7.5 w-7.5 text-ink-gray-4" />
       <div class="flex flex-col gap-1 max-w-[282px] m-auto">
-        <p class="text-base font-medium text-ink-gray-7">No feedback yet</p>
+        <p class="text-base font-medium text-ink-gray-7">
+          {{ __("No feedback yet") }}
+        </p>
         <p class="text-ink-gray-6 text-base">
-          Feedback from this contact will appear here once available.
+          {{
+            __("Feedback from this contact will appear here once available.")
+          }}
         </p>
       </div>
     </div>
@@ -32,6 +38,7 @@
 
 <script setup lang="ts">
 import { useContactFeedback } from "@/composables/contact";
+import { __ } from "@/translation";
 import { LoadingIndicator } from "frappe-ui";
 import LucideStar from "~icons/lucide/star";
 import FeedbackCard from "./FeedbackCard.vue";

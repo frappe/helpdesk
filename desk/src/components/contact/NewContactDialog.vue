@@ -6,7 +6,7 @@
           <template
             v-for="fieldOrRow in fieldConfig"
             :key="
-              Array.isArray(fieldOrRow) ? fieldOrRow[0].key : fieldOrRow.key
+              Array.isArray(fieldOrRow) ? fieldOrRow[0]?.key : fieldOrRow.key
             "
           >
             <!-- Grid row (e.g. first + last name) -->
@@ -90,17 +90,7 @@
 
             <!-- Phone (tel): single flat field -->
             <template v-else-if="fieldOrRow.type === 'tel'">
-              <FormControl
-                class="[&_p]:text-p-xs"
-                :label="fieldOrRow.label"
-                type="text"
-                :placeholder="fieldOrRow.placeholder"
-                v-model="state.phone"
-              >
-                <template #prefix>
-                  <LucidePhone class="size-4" />
-                </template>
-              </FormControl>
+              <PhoneControl :label="fieldOrRow.label" v-model="state.phone" />
             </template>
 
             <!-- <template v-else-if="fieldOrRow.type === 'timezone'">
@@ -172,9 +162,9 @@ import {
   FormControl,
 } from "frappe-ui";
 import LucideMail from "~icons/lucide/mail";
-import LucidePhone from "~icons/lucide/phone";
 import UserIcon from "~icons/lucide/user";
 import Link from "../frappe-ui/Link.vue";
+import PhoneControl from "../frappe-ui/PhoneControl.vue";
 
 const open = defineModel<boolean>({ default: false });
 

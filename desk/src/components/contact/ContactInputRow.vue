@@ -1,9 +1,10 @@
 <template>
   <div class="group relative w-full">
-    <FormControl
+    <component
+      :is="isPhone ? PhoneControl : FormControl"
       ref="control"
-      class="[&_p]:text-p-xs"
-      :type="type"
+      :class="isPhone ? undefined : '[&_p]:text-p-xs'"
+      :type="isPhone ? undefined : type"
       :placeholder="placeholder"
       v-model="model"
       @keydown.enter.prevent="blurInput"
@@ -47,16 +48,17 @@
           </Tooltip>
         </div>
       </template>
-    </FormControl>
+    </component>
   </div>
 </template>
 
 <script setup lang="ts">
 import { __ } from "@/translation";
 import { FormControl, Tooltip } from "frappe-ui";
-import { nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import LucideStar from "~icons/lucide/star";
 import LucideX from "~icons/lucide/x";
+import PhoneControl from "../frappe-ui/PhoneControl.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -81,6 +83,7 @@ defineEmits<{
 }>();
 
 const control = ref<any>(null);
+const isPhone = computed(() => props.type === "tel");
 
 function getInputEl(): HTMLInputElement | null {
   return control.value?.$el?.querySelector?.("input") ?? null;

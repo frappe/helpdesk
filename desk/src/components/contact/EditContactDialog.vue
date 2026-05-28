@@ -82,7 +82,6 @@
               v-model="state.lastName"
             />
           </div>
-
           <!-- Email IDs -->
           <div class="space-y-1.5">
             <label class="text-xs text-ink-gray-5">
@@ -121,7 +120,6 @@
               :key="phone.key"
               v-model="phone.phone"
               type="tel"
-              placeholder="+1 234 567 8900"
               :isPrimary="phone.isPrimary"
               :canRemove="true"
               :autofocus="phone.key === autofocusKey"

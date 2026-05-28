@@ -1,7 +1,8 @@
 import { __ } from "@/translation";
-import {
+import type {
   DocumentResource,
   EditContactState,
+  Error,
   ListResource,
   NewContactState,
   Resource,
@@ -58,6 +59,10 @@ const emptyPhoneEntry = () => ({
   key: nextEntryKey(),
 });
 
+function sortByPrimary<T extends { isPrimary: boolean }>(arr: T[]): T[] {
+  return [...arr].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
+}
+
 export function useContact(name: string) {
   const doc = findContactDoc();
   const { state, resetState } = useContactState(false, doc);
@@ -68,18 +73,20 @@ export function useContact(name: string) {
       state.firstName = data.first_name || "";
       state.lastName = data.last_name || "";
       state.image = data.image || "";
-      state.emails =
+      state.emails = sortByPrimary(
         data.email_ids?.map((e: any) => ({
           email_id: e.email_id,
           isPrimary: e.is_primary,
           key: nextEntryKey(),
-        })) || [];
-      const phones =
+        })) || []
+      );
+      const phones = sortByPrimary(
         data.phone_nos?.map((p: any) => ({
           phone: p.phone,
           isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
           key: nextEntryKey(),
-        })) || [];
+        })) || []
+      );
       state.phones = phones.length ? phones : [emptyPhoneEntry()];
       state.customers =
         data.links?.map((l: any) => l.link_name as string) || [];
@@ -103,26 +110,32 @@ export function useContact(name: string) {
   });
 
   const isDirty = computed(() => {
-    const currentEmails = state.emails.map((e) => ({
-      email_id: e.email_id,
-      isPrimary: e.isPrimary,
-    }));
-    const savedEmails =
+    const currentEmails = sortByPrimary(
+      state.emails.map((e) => ({
+        email_id: e.email_id,
+        isPrimary: e.isPrimary,
+      }))
+    );
+    const savedEmails = sortByPrimary(
       doc.doc?.email_ids?.map((e: any) => ({
         email_id: e.email_id,
         isPrimary: e.is_primary,
-      })) || [];
-    const currentPhones = state.phones
-      .filter((p) => p.phone)
-      .map((p) => ({
-        phone: p.phone,
-        isPrimary: p.isPrimary,
-      }));
-    const savedPhones =
+      })) || []
+    );
+    const currentPhones = sortByPrimary(
+      state.phones
+        .filter((p) => p.phone)
+        .map((p) => ({
+          phone: p.phone,
+          isPrimary: p.isPrimary,
+        }))
+    );
+    const savedPhones = sortByPrimary(
       doc.doc?.phone_nos?.map((p: any) => ({
         phone: p.phone,
         isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
-      })) || [];
+      })) || []
+    );
     const currentTimezone =
       typeof state.timezone === "string"
         ? state.timezone
@@ -331,18 +344,20 @@ export function useContactState(
       state.firstName = data?.first_name || "";
       state.lastName = data?.last_name || "";
       state.image = data?.image || "";
-      state.emails =
+      state.emails = sortByPrimary(
         data?.email_ids?.map((e: any) => ({
           email_id: e.email_id,
           isPrimary: e.is_primary,
           key: nextEntryKey(),
-        })) || [];
-      const phones =
+        })) || []
+      );
+      const phones = sortByPrimary(
         data?.phone_nos?.map((p: any) => ({
           phone: p.phone,
           isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
           key: nextEntryKey(),
-        })) || [];
+        })) || []
+      );
       state.phones = phones.length ? phones : [emptyPhoneEntry()];
       state.customers =
         data?.links?.map((l: any) => l.link_name as string) || [];

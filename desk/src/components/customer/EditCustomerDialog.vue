@@ -45,7 +45,9 @@
                 <div class="space-x-2">
                   <Button
                     variant="subtle"
-                    label="Upload Image"
+                    :label="
+                      state.image ? __('Replace picture') : __('Upload picture')
+                    "
                     :loading="uploading"
                     @click.prevent="openFileSelector()"
                   />

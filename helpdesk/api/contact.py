@@ -3,6 +3,7 @@ from typing import Literal
 import frappe
 from frappe.core.api.user_invitation import invite_by_email
 from frappe.desk.reportview import delete_bulk
+from frappe.utils import validate_phone_number_with_country_code
 
 
 @frappe.whitelist(methods=["GET"])
@@ -47,6 +48,10 @@ def delete_contact(name: str):
 @frappe.whitelist()
 def create_contact(doc: dict, invite: bool = False) -> str:
     frappe.has_permission("Contact", "create", throw=True)
+    phone = doc.get("phone")
+    if phone:
+        validate_phone_number_with_country_code(phone, "phone")
+
     contact_doc = frappe.get_doc(
         {
             "doctype": "Contact",
@@ -59,7 +64,7 @@ def create_contact(doc: dict, invite: bool = False) -> str:
     if email := doc.get("email"):
         contact_doc.append("email_ids", {"email_id": email, "is_primary": True})
 
-    if phone := doc.get("phone"):
+    if phone:
         contact_doc.append(
             "phone_nos",
             {"phone": phone, "is_primary_phone": True, "is_primary_mobile_no": True},
@@ -100,6 +105,9 @@ def edit_contact(name: str, doc: dict):
 
     phone_nos = doc.get("phone_nos")
     if phone_nos is not None:
+        for index, p in enumerate(phone_nos, start=1):
+            if phone := p.get("phone"):
+                validate_phone_number_with_country_code(phone, f"phone row {index}")
         contact_doc.phone_nos = []
         for p in phone_nos:
             contact_doc.append(
