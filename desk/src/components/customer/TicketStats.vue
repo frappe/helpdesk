@@ -1,6 +1,9 @@
 <template>
-  <div class="p-5 grid grid-cols-4 gap-2.5 min-h-[160px] pt-0">
-    <template v-if="!analytics.loading && analytics.data">
+  <div class="p-5 pt-0">
+    <div
+      v-if="!analytics.loading && analytics.data"
+      class="grid grid-cols-4 gap-2.5 min-h-[130px]"
+    >
       <div
         v-for="(chartData, key) in analytics.data"
         class="h-full w-full rounded border border-outline-gray-1"
@@ -82,20 +85,24 @@
           orientation="horizontal"
         />
       </div>
-    </template>
-    <template v-else-if="analytics.loading">
-      <!-- TODO: add skeleton here when we pull latest changes -->
-      <div class="col-span-4 flex items-center justify-center h-full">
-        <LoadingIndicator :scale="10" />
-      </div>
-    </template>
+    </div>
+    <SkeletonLoader
+      v-else-if="analytics.loading"
+      :variants="['number-cards']"
+      :loading="true"
+      orientation="horizontal"
+      :number-cards-count="4"
+      number-cards-grid-class="grid grid-cols-4 gap-2.5"
+      height="130px"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { createResource, LoadingIndicator } from "frappe-ui";
+import { createResource } from "frappe-ui";
 import BarChartCard from "../BarChartCard.vue";
 import LineChartCard from "../LineChartCard.vue";
+import SkeletonLoader from "../SkeletonLoader.vue";
 
 const props = defineProps<{
   dt: "HD Customer" | "Contact";
