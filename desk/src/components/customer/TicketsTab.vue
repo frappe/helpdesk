@@ -52,7 +52,7 @@
       <template v-else>
         <!-- Headers -->
         <div
-          class="grid items-center border-b border-gray-200 px-4 py-2 text-xs font-medium text-ink-gray-5"
+          class="grid items-center px-4 py-2 text-xs font-medium text-ink-gray-5"
           :style="gridTemplateStyle"
         >
           <div
@@ -85,8 +85,9 @@
             v-for="(ticket, i) in ticketsListResource.data"
             :key="ticket.name"
           >
+            <hr class="mx-4" v-if="i === 0" />
             <div
-              class="grid items-center px-4 py-3 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 rounded transition-colors"
+              class="grid items-center p-3 px-2 mx-2 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 rounded transition-colors"
               :style="gridTemplateStyle"
               @click="goToTicket(ticket.name)"
             >
@@ -126,7 +127,7 @@
                 <MultipleAvatar :avatars="ticket._assign" size="xs" />
               </div>
             </div>
-            <hr v-if="i !== ticketRowsCount - 1" />
+            <hr class="mx-4" v-if="i !== ticketRowsCount - 1" />
           </template>
           <!-- Load More -->
           <div
