@@ -138,6 +138,12 @@
             </template>
           </template>
 
+          <Checkbox
+            size="sm"
+            v-model="state.invite"
+            :label="__('Invite as User')"
+          />
+
           <div class="flex justify-end pt-1">
             <Button
               label="Add"
@@ -157,7 +163,14 @@
 import { useNewContact } from "@/composables/contact";
 import { __ } from "@/translation";
 import type { File as FileType } from "@/types";
-import { Avatar, Button, Dialog, FileUploader, FormControl } from "frappe-ui";
+import {
+  Avatar,
+  Button,
+  Checkbox,
+  Dialog,
+  FileUploader,
+  FormControl,
+} from "frappe-ui";
 import LucideMail from "~icons/lucide/mail";
 import LucidePhone from "~icons/lucide/phone";
 import UserIcon from "~icons/lucide/user";
@@ -168,7 +181,6 @@ const open = defineModel<boolean>({ default: false });
 const { state, fieldConfig, addContact, isLoading } = useNewContact();
 
 async function handleAdd() {
-  console.log();
   try {
     await addContact();
     open.value = false;

@@ -242,12 +242,16 @@ export function useNewContact() {
   const isLoading = ref(false);
   async function addContact() {
     isLoading.value = true;
+    const invite = state.invite;
     addContactResource.submit(
-      { doc: parseContactData() },
+      { doc: parseContactData(), invite },
       {
         onSuccess: (name: string) => {
           router.push({ name: "Contact", params: { id: name } });
-          toast.success(__("Contact created"));
+          const msg = invite
+            ? __("Contact created and invited")
+            : __("Contact created");
+          toast.success(msg);
           isLoading.value = false;
           resetState();
         },
@@ -283,6 +287,7 @@ export function useContactState(
       phone: "",
       timezone: "",
       customer: "",
+      invite: false,
     });
 
     function resetState() {
@@ -293,6 +298,7 @@ export function useContactState(
       state.phone = "";
       state.timezone = "";
       state.customer = "";
+      state.invite = false;
     }
 
     return { state, resetState };

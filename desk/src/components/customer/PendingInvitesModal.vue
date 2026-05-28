@@ -17,7 +17,7 @@
                   >({{ parseRoles(invite.roles.join(", ")) }})</span
                 >
               </div>
-              <p class="text-xs text-ink-gray-4 mt-0.5">
+              <p class="text-xs text-ink-gray-4 mt-1">
                 {{ __("Invited by") }} {{ invite.invited_by }} ·
                 {{ dayjsLocal(invite.invited_on).fromNow() }}
               </p>

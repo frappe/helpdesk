@@ -773,6 +773,7 @@ export interface NewContactState {
   phone: string;
   timezone: string;
   customer: string;
+  invite: boolean;
 }
 
 export interface ContactEmailEntry {

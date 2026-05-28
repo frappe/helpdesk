@@ -45,7 +45,7 @@ def delete_contact(name: str):
 
 
 @frappe.whitelist()
-def create_contact(doc: dict) -> str:
+def create_contact(doc: dict, invite: bool = False) -> str:
     frappe.has_permission("Contact", "create", throw=True)
     contact_doc = frappe.get_doc(
         {
@@ -66,15 +66,16 @@ def create_contact(doc: dict) -> str:
         )
 
     contact_doc.insert()
-    invite_by_email(
-        email,
-        ["HD Customer"],
-        redirect_to_path="/helpdesk",
-        app_name="helpdesk",
-        contact=contact_doc.name,
-        customer=doc.get("customer"),
-    )
-    contact_doc.reload()
+    if invite:
+        invite_by_email(
+            email,
+            ["HD Customer"],
+            redirect_to_path="/helpdesk",
+            app_name="helpdesk",
+            contact=contact_doc.name,
+            customer=doc.get("customer"),
+        )
+        contact_doc.reload()
 
     return contact_doc.get("name")
 
