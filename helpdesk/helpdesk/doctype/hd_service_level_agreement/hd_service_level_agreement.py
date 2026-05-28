@@ -190,7 +190,6 @@ class HDServiceLevelAgreement(Document):
         is_closed = doc.get("status", None) == "Closed"
         if was_resolved and is_closed:
             return
-
         self.set_first_response_time(doc)
         self.set_resolution_date(doc)
         self.set_hold_time(doc)
@@ -201,6 +200,12 @@ class HDServiceLevelAgreement(Document):
         if not start_at or not end_at:
             return
         doc.first_response_time = self.calc_elapsed_time(start_at, end_at)
+
+        # if first response is failed calculate by how much time it is failed
+        if get_datetime(doc.first_responded_on) > get_datetime(doc.response_by):
+            doc.first_response_failed_by = self.calc_elapsed_time(
+                doc.response_by, end_at
+            )
 
     def set_resolution_date(self, doc: Document):
         resolved_statuses = (
@@ -215,6 +220,8 @@ class HDServiceLevelAgreement(Document):
             doc.resolution_date = None
             doc.resolution_time = None
             return
+        if doc.resolution_date and not doc.has_value_changed("status_category"):
+            return
         doc.resolution_date = now_datetime()
         start_at = doc.service_level_agreement_creation
         end_at = doc.resolution_date
@@ -222,6 +229,11 @@ class HDServiceLevelAgreement(Document):
         time_hold = doc.total_hold_time or 0
         time_took_effective = max(time_took - time_hold, 0)
         doc.resolution_time = time_took_effective
+
+        # if resolution is failed calculate by how much time it is failed in business hours
+        if get_datetime(doc.resolution_date) > get_datetime(doc.resolution_by):
+            start_at = doc.resolution_by
+            doc.resolution_failed_by = self.calc_elapsed_time(start_at, end_at)
 
     def set_hold_time(self, doc: Document):
         paused_statuses = (

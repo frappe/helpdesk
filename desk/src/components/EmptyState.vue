@@ -1,7 +1,31 @@
 <template>
-  <div class="flex h-full items-center justify-center w-[stretch]">
+  <div
+    v-if="variant === 'badge'"
+    class="flex flex-col items-center justify-center gap-4 h-[stretch] absolute w-[stretch] left-0 top-5.5 pointer-events-none"
+  >
     <div
-      class="flex flex-col items-center gap-3 text-xl font-medium text-ink-gray-4 w-9/12 md:w-4/12"
+      class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+    >
+      <component v-if="icon" :is="icon" class="size-6 text-ink-gray-6" />
+    </div>
+    <div class="flex flex-col items-center gap-1">
+      <div class="text-base font-medium text-ink-gray-6">
+        {{ __(title) }}
+      </div>
+      <div
+        v-if="descriptionText"
+        class="text-p-sm text-ink-gray-5 max-w-60 text-center"
+      >
+        {{ __(descriptionText) }}
+      </div>
+    </div>
+  </div>
+  <div
+    v-else
+    class="flex h-full items-center justify-center w-[stretch] absolute top-0 pointer-events-none"
+  >
+    <div
+      class="flex flex-col items-center gap-2 text-xl font-medium text-ink-gray-4 w-9/12 md:w-4/12"
     >
       <!-- overlay variant (for charts) -->
       <div
@@ -9,13 +33,13 @@
         class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none -z-10"
         :style="{
           backgroundImage:
-            'radial-gradient(ellipse at center, rgba(255, 255, 255, 1) 30%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 0) 70%)',
+            'radial-gradient(ellipse at center, var(--surface-white) 10%, color-mix(in srgb, var(--surface-white) 90%, transparent) 25%, transparent 70%)',
         }"
       />
       <!-- Icon -->
       <component v-if="icon" :is="icon" class="h-10 w-10" />
       <!-- title -->
-      <div class="flex flex-col items-center justify-center">
+      <div class="flex flex-col items-center justify-center gap-0.5">
         <span
           :class="{
             'text-sm font-medium text-ink-gray-8': text === 'sm',
@@ -46,7 +70,7 @@ interface Props {
   title: string;
   icon?: VNode | string;
   description?: string;
-  variant?: "default" | "overlay";
+  variant?: "default" | "overlay" | "badge";
   text?: "sm" | "md" | "lg";
 }
 

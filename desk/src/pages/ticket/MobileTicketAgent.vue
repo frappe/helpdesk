@@ -2,7 +2,9 @@
   <div class="flex flex-col">
     <LayoutHeader v-if="ticket.data">
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" />
+        <div class="max-w-[60vw]">
+          <Breadcrumbs :items="breadcrumbs" />
+        </div>
       </template>
       <template #right-header>
         <div class="absolute right-0 pr-2">
@@ -261,6 +263,9 @@ const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
 const subjectInput = ref(null);
 const isLoading = ref(false);
 const showPhoneModal = ref(false);
+const customActions = ref([]);
+
+type ticketId = string;
 
 const props = defineProps({
   ticketId: {

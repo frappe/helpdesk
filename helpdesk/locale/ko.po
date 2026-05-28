@@ -1,20 +1,22 @@
-# Translations template for Helpdesk.
-# Copyright (C) 2026 Frappe Technologies
-# This file is distributed under the same license as the Helpdesk project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: Helpdesk VERSION\n"
+"Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-24 10:57+0000\n"
+"PO-Revision-Date: 2026-05-27 10:32\n"
 "Last-Translator: hello@frappe.io\n"
-"Language-Team: hello@frappe.io\n"
+"Language-Team: Korean\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: frappe\n"
+"X-Crowdin-Project-ID: 639578\n"
+"X-Crowdin-Language: ko\n"
+"X-Crowdin-File: /[frappe.helpdesk] develop/helpdesk/locale/main.pot\n"
+"X-Crowdin-File-ID: 118\n"
+"Language: ko_KR\n"
 
 #: desk/src/components/CommentBox.vue:14
 msgid " commented"
@@ -1713,6 +1715,11 @@ msgstr ""
 msgid "Edit Call Log"
 msgstr ""
 
+#: desk/src/components/Settings/EmailAdd.vue:70
+#: desk/src/components/Settings/EmailEdit.vue:63
+msgid "Edit Domain"
+msgstr ""
+
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
 msgstr ""
@@ -1969,7 +1976,7 @@ msgstr ""
 msgid "Failed to load telephony agent"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:229
+#: desk/src/components/Settings/EmailEdit.vue:422
 msgid "Failed to pull emails"
 msgstr ""
 
@@ -3476,6 +3483,10 @@ msgstr ""
 msgid "Open help"
 msgstr ""
 
+#: desk/src/components/Settings/EmailEdit.vue:37
+msgid "Open in Desk"
+msgstr ""
+
 #: desk/src/components/modals/ShortcutsModal.vue:102
 msgid "Open reply box"
 msgstr ""
@@ -3486,8 +3497,7 @@ msgstr ""
 
 #. Description of the 'Category' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
-msgid ""
-"Open: SLA continues. <br>\n"
+msgid "Open: SLA continues. <br>\n"
 "Paused: SLA is paused. <br>\n"
 "Resolved: SLA timer stops."
 msgstr ""
@@ -3872,11 +3882,11 @@ msgstr ""
 msgid "Published articles must have content."
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:87
+#: desk/src/components/Settings/EmailEdit.vue:149
 msgid "Pull Emails"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:214
+#: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Pulling emails, this may take a few minutes."
 msgstr ""
 
@@ -4557,6 +4567,10 @@ msgstr ""
 msgid "Service Level Name"
 msgstr ""
 
+#: helpdesk/api/settings/email.py:14
+msgid "Service not supported"
+msgstr ""
+
 #: desk/src/components/ticket/SetContactPhoneModal.vue:5
 #: desk/src/components/ticket/SetContactPhoneModal.vue:8
 msgid "Set Phone Number"
@@ -4794,9 +4808,7 @@ msgstr ""
 #. Description of the 'Ticket Reopen status' (Link) field in DocType 'HD
 #. Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
-msgid ""
-"Status of the ticket, when a customer replies on the ticket with this SLA.\n"
-"\n"
+msgid "Status of the ticket, when a customer replies on the ticket with this SLA.\n\n"
 "If not selected, the value will be takes from HD Settings DocType."
 msgstr ""
 
@@ -4809,8 +4821,7 @@ msgstr ""
 #. Description of the 'Default Ticket Status' (Link) field in DocType 'HD
 #. Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
-msgid ""
-"Status of the ticket, when it is created in the system with this SLA.\n"
+msgid "Status of the ticket, when it is created in the system with this SLA.\n"
 "If not selected, the value will be taken from HD Settings DocType"
 msgstr ""
 
@@ -5406,7 +5417,7 @@ msgstr ""
 msgid "To is required"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:147
+#: desk/src/components/Settings/EmailEdit.vue:268
 msgid "To know more about setting up email accounts, click"
 msgstr ""
 
@@ -5546,7 +5557,7 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:80
+#: desk/src/components/Settings/EmailEdit.vue:142
 msgid "Update Account"
 msgstr ""
 

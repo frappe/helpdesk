@@ -51,9 +51,9 @@
               </template>
             </Button>
           </template>
-          <template #item="{ item }">
+          <template #item-label="{ item }">
             <button
-              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded p-2 text-base hover:bg-surface-gray-3"
+              class="group flex text-ink-gray-6 gap-4 w-full justify-between items-center rounded text-base"
               @click="item.onSelect"
             >
               <div class="flex items-center justify-between flex-1">
@@ -74,31 +74,20 @@
     <template #content>
       <div
         v-if="savedRepliesListResource?.list?.loading"
-        class="flex items-center justify-center mt-12"
+        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
       >
         <LoadingIndicator class="w-4" />
       </div>
-      <div
+      <EmptyState
         v-if="
           !savedRepliesListResource?.list?.loading &&
           !savedRepliesListResource?.data?.length
         "
-        class="flex flex-col items-center justify-center gap-4 grow"
-      >
-        <div
-          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
-        >
-          <SavedReplyIcon class="size-6 text-ink-gray-6" />
-        </div>
-        <div class="flex flex-col items-center gap-1">
-          <div class="text-base font-medium text-ink-gray-6">
-            {{ __("No saved replies found") }}
-          </div>
-          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-            {{ __("Add one to get started.") }}
-          </div>
-        </div>
-      </div>
+        variant="badge"
+        :icon="SavedReplyIcon"
+        title="No saved replies found"
+        description="Add one to get started."
+      />
       <div
         v-if="
           !savedRepliesListResource?.list?.loading &&
@@ -128,7 +117,7 @@
                   data: savedReply,
                 }
               "
-              class="w-full px-2 flex flex-col justify-center h-12.5 col-span-7"
+              class="w-full px-2 flex flex-col justify-center h-12.5 col-span-7 min-w-0"
             >
               <div
                 class="text-base text-ink-gray-7 font-medium w-full truncate"
@@ -137,7 +126,7 @@
               </div>
             </div>
             <div
-              class="flex items-center gap-1.5 text-sm text-ink-gray-7 truncate col-span-2"
+              class="flex items-center gap-1.5 text-sm text-ink-gray-7 col-span-2 min-w-0"
             >
               <Avatar
                 :label="
@@ -145,8 +134,11 @@
                 "
                 :image="getUser(savedReply.owner)?.user_image"
                 size="xs"
+                class="shrink-0"
               />
-              {{ getUser(savedReply.owner)?.full_name }}
+              <span class="truncate">{{
+                getUser(savedReply.owner)?.full_name
+              }}</span>
             </div>
             <div
               class="flex justify-between items-center w-full pr-2 col-span-3"
@@ -220,6 +212,7 @@ import { computed, inject, ref, Ref, watch } from "vue";
 import { __ } from "@/translation";
 import { ConfirmDelete } from "@/utils";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
+import EmptyState from "@/components/EmptyState.vue";
 import { activeFilter } from "./savedReplies";
 import { useUserStore } from "../../../stores/user";
 import UserIcon from "~icons/lucide/user";

@@ -47,7 +47,7 @@
           <Badge
             :label="firstResponse.label"
             variant="ghost"
-            class="mt-[1px]"
+            class="mt-[2px]"
             :theme="firstResponse.color"
           />
         </Tooltip>
@@ -66,8 +66,10 @@
             v-if="resolutionBy"
             :label="resolutionBy.label"
             variant="ghost"
-            class="mt-[1px]"
-            :theme="resolutionBy.color !== 'purple' && resolutionBy.color"
+            class="mt-[2px]"
+            :theme="
+              resolutionBy.color !== 'purple' ? resolutionBy.color : undefined
+            "
             :class="resolutionBy.color === 'purple' && '!text-[#6B46C1] '"
           />
         </Tooltip>
@@ -88,15 +90,26 @@ import {
 import { Badge, dayjs, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 
-const ticket = inject(TicketSymbol);
+const ticket = inject(TicketSymbol)!;
 
+const timeFormat = {
+  day: true,
+  hour: true,
+  minute: true,
+};
+
+// Cases:
+// - if not first responded and response by is in future -> show due in
+// - if first responded before response by -> show fulfilled in
+// - if not first responded and response by is in past -> show overdue by
+// - if first responded after response by -> show failed by
 const firstResponse = computed(() => {
   if (ticket.value?.get?.loading) return { label: "", color: "" };
   if (
     !ticket.value.doc.first_responded_on &&
     dayjs().isBefore(dayjs(ticket.value.doc.response_by))
   ) {
-    let responseBy = formatTimeShort(ticket.value.doc.response_by);
+    let responseBy = formatTimeShort(ticket.value.doc.response_by as string);
     return {
       label: `Due in ${responseBy}`,
       color: "orange",
@@ -106,21 +119,46 @@ const firstResponse = computed(() => {
       dayjs(ticket.value.doc.response_by)
     )
   ) {
-    let responseBy = formatTimeShort(
-      ticket.value.doc.first_responded_on,
-      ticket.value.doc.creation
-    );
+    let responseTime = ticket.value?.doc?.first_response_time;
+    let format =
+      responseTime <= 60
+        ? {
+            ...timeFormat,
+            second: true,
+          }
+        : timeFormat;
+    let fulfilled =
+      responseTime != null
+        ? formatTime(responseTime, format)
+        : formatTimeShort(
+            ticket.value.doc.first_responded_on as string,
+            ticket.value.doc.creation
+          );
     return {
-      label: `Fulfilled in ${responseBy}`,
+      label: `Fulfilled in ${fulfilled}`,
       color: "green",
     };
   } else {
-    let responseBy = formatTimeShort(
-      String(new Date()),
-      ticket.value.doc.response_by
-    );
+    if (!ticket.value.doc.first_responded_on) {
+      let responseBy = formatTimeShort(
+        String(new Date()),
+        ticket.value.doc.response_by as string
+      );
+      return {
+        label: `Overdue by ${responseBy}`,
+        color: "red",
+        date: ticket.value.doc.response_by,
+      };
+    }
+
+    let failed = ticket.value?.doc?.first_response_failed_by
+      ? formatTime(ticket.value.doc.first_response_failed_by, timeFormat)
+      : formatTimeShort(
+          ticket.value.doc.first_responded_on,
+          ticket.value.doc.response_by
+        );
     return {
-      label: `Failed by ${responseBy}`,
+      label: `Failed by ${failed}`,
       color: "red",
     };
   }
@@ -142,9 +180,25 @@ const resolutionBy = computed(() => {
     };
   } else if (
     !ticket.value.doc?.resolution_date &&
+    dayjs().isAfter(dayjs(ticket.value.doc?.resolution_by))
+  ) {
+    let overdue = formatTimeShort(
+      String(new Date()),
+      ticket.value.doc?.resolution_by as string
+    );
+
+    return {
+      label: `Overdue by ${overdue}`,
+      color: "red",
+      date: ticket.value.doc?.resolution_by,
+    };
+  } else if (
+    !ticket.value.doc?.resolution_date &&
     dayjs().isBefore(dayjs(ticket.value.doc?.resolution_by))
   ) {
-    let resolutionBy = formatTimeShort(ticket.value.doc?.resolution_by);
+    let resolutionBy = formatTimeShort(
+      ticket.value.doc?.resolution_by as string
+    );
     return {
       label: `Due in ${resolutionBy}`,
       color: "purple",
@@ -154,21 +208,34 @@ const resolutionBy = computed(() => {
       dayjs(ticket.value.doc?.resolution_by)
     )
   ) {
-    let resolutionBy = formatTimeShort(
-      ticket.value.doc?.resolution_date,
-      ticket.value.doc?.creation
-    );
+    let resolutionTime = ticket.value?.doc?.resolution_time;
+    let format =
+      resolutionTime <= 60
+        ? {
+            ...timeFormat,
+            second: true,
+          }
+        : timeFormat;
+    let fulfilled =
+      resolutionTime != null
+        ? formatTime(resolutionTime, format)
+        : formatTimeShort(
+            ticket.value.doc?.resolution_date as string,
+            ticket.value.doc?.creation
+          );
     return {
-      label: `Fulfilled in ${resolutionBy}`,
+      label: `Fulfilled in ${fulfilled}`,
       color: "green",
     };
   } else {
-    let resolutionBy = formatTimeShort(
-      String(new Date()),
-      ticket.value.doc?.resolution_by
-    );
+    let failed = ticket.value.doc?.resolution_failed_by
+      ? formatTime(ticket.value.doc?.resolution_failed_by, timeFormat)
+      : formatTimeShort(
+          ticket.value.doc?.resolution_by,
+          ticket.value.doc?.resolution_date
+        );
     return {
-      label: `Failed by ${resolutionBy}`,
+      label: `Failed by ${failed}`,
       color: "red",
     };
   }

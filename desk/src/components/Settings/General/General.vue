@@ -5,20 +5,12 @@
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("General") }}
         </h1>
-        <Transition name="fade">
-          <Badge
-            variant="subtle"
-            theme="orange"
-            size="sm"
-            :label="__('Unsaved')"
-            v-if="isDirty || isWebsiteSettingsChanged"
-          />
-        </Transition>
+        <UnsavedBadge :show="isDirty" />
       </div>
     </template>
     <template #header-actions>
       <Transition name="fade">
-        <div v-if="isDirty || isWebsiteSettingsChanged">
+        <div v-if="isDirty">
           <Button
             :label="__('Save')"
             variant="solid"
@@ -34,7 +26,7 @@
     <template #content>
       <div
         v-if="settingsDataResource.loading && !settingsDataResource.data"
-        class="flex items-center justify-center mt-12"
+        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -84,7 +76,11 @@ import { computed, provide, ref, watch } from "vue";
 import { __ } from "@/translation";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import { HDSettings, HDSettingsSymbol } from "@/types";
+import { useConfigStore } from "@/stores/config";
+
+const configStore = useConfigStore();
 
 const isDirty = ref(false);
 const initialData = ref<null | string>(null);
@@ -171,6 +167,7 @@ const saveSettingsResource = createResource({
   onSuccess(data: HDSettings) {
     settingsData.value = transformData(data);
     initialData.value = JSON.stringify(settingsData.value);
+    configStore.configResource.reload();
   },
 });
 
@@ -233,6 +230,18 @@ const saveWebsiteSettingsResource = createResource({
 });
 
 const saveSettings = async () => {
+  if (
+    settingsData.value.restrictTicketsByAgentGroup &&
+    !settingsData.value.doNotRestrictTicketsWithoutAnAgentGroup &&
+    !settingsData.value.assignWithinTeam
+  ) {
+    toast.error(
+      __(
+        "Please select at least one restriction option for teams in the settings."
+      )
+    );
+    return;
+  }
   const promises = [];
   if (isDirty.value) {
     promises.push(saveSettingsResource.submit());
@@ -245,17 +254,50 @@ const saveSettings = async () => {
   });
 };
 
+const toggleFields = [
+  "isFeedbackMandatory",
+  "enableCommentReactions",
+  "disableSavedRepliesGlobalScope",
+  "allowAnyoneToCreateTickets",
+  "preferKnowledgeBase",
+  "skipEmailWorkflow",
+] as const;
+
+// Track dirty state for non-toggle fields only
 watch(
   settingsData,
   (data) => {
     if (!initialData.value) return;
-    isDirty.value = JSON.stringify(data) !== initialData.value;
-    if (isDirty.value) {
-      disableSettingModalOutsideClick.value = true;
-    } else {
-      disableSettingModalOutsideClick.value = false;
-    }
+    const initial = JSON.parse(initialData.value);
+    isDirty.value = Object.keys(data).some(
+      (key) =>
+        !(toggleFields as readonly string[]).includes(key) &&
+        JSON.stringify(data[key as keyof typeof data]) !==
+          JSON.stringify(initial[key])
+    );
+    disableSettingModalOutsideClick.value = isDirty.value;
   },
   { deep: true }
 );
+
+// auto save when any toggle field changes
+watch(
+  () => toggleFields.map((f) => settingsData.value[f]),
+  async (newVals) => {
+    if (!initialData.value) return;
+    const initial = JSON.parse(initialData.value);
+    if (newVals.some((v, i) => v !== initial[toggleFields[i]])) {
+      await saveSettingsResource.submit();
+      toast.success(__("Settings updated"));
+    }
+  }
+);
+
+watch(disableSignup, async (newVal) => {
+  if (!websiteSettingsResource.data) return;
+  if (newVal !== Boolean(websiteSettingsResource.data.disable_signup)) {
+    await saveWebsiteSettingsResource.submit();
+    toast.success(__("Settings updated"));
+  }
+});
 </script>

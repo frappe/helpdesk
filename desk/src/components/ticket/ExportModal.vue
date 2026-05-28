@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
+import { reactive, watch } from "vue";
 import { __ } from "@/translation";
 
 defineProps<{
@@ -63,6 +63,16 @@ const form: R = reactive({
   export_type: "Excel",
   export_all: false,
 });
+
+watch(
+  () => show.value,
+  (val) => {
+    if (!val) {
+      form.export_type = "Excel";
+      form.export_all = false;
+    }
+  }
+);
 </script>
 
 <style scoped></style>
