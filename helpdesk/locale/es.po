@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-27 10:31\n"
+"PO-Revision-Date: 2026-05-28 10:55\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -937,11 +937,11 @@ msgstr "Enlace de la categoría '{0}' copiado al portapapeles"
 #: desk/src/pages/knowledge-base/Article.vue:333
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:262
 msgid "Category created successfully."
-msgstr ""
+msgstr "Categoría creada con éxito."
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:333
 msgid "Category deleted successfully."
-msgstr ""
+msgstr "Categoría eliminada con éxito."
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:370
 msgid "Category merged successfully."
@@ -954,7 +954,7 @@ msgstr "La categoría debe tener al menos un artículo"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:301
 msgid "Category updated successfully."
-msgstr ""
+msgstr "Categoría actualizada con éxito."
 
 #: desk/src/components/EmailEditor.vue:43
 msgid "Cc"
