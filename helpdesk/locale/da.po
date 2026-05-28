@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-27 10:31\n"
+"PO-Revision-Date: 2026-05-28 10:55\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Danish\n"
 "MIME-Version: 1.0\n"
@@ -2866,7 +2866,7 @@ msgstr "Sidste 30 dage"
 #: desk/src/pages/dashboard/Dashboard.vue:488
 #: desk/src/pages/dashboard/Dashboard.vue:490
 msgid "Last 60 Days"
-msgstr ""
+msgstr "Sidste 60 dage"
 
 #: desk/src/pages/dashboard/Dashboard.vue:474
 #: desk/src/pages/dashboard/Dashboard.vue:476
@@ -4476,7 +4476,7 @@ msgstr ""
 
 #: desk/src/pages/SearchAgent.vue:111
 msgid "Searching..."
-msgstr ""
+msgstr "Søger..."
 
 #: desk/src/pages/home/components/PendingTickets.vue:147
 msgid "See all {0} tickets"
@@ -5816,7 +5816,7 @@ msgstr "tildelte"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:467
 msgid "average"
-msgstr ""
+msgstr "gennemsnit"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:13
 msgid "back to email event list"
@@ -5836,7 +5836,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:510
 msgid "deleted"
-msgstr ""
+msgstr "slettet"
 
 #: desk/src/components/ticket/TicketSplitModal.vue:7
 msgid "emails/ comments"
@@ -5844,7 +5844,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:463
 msgid "excellent"
-msgstr ""
+msgstr "fremragende"
 
 #: desk/src/components/ticket/TicketSplitModal.vue:8
 msgid "from this email onwards will be moved to new ticket."
@@ -5887,7 +5887,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:15
 msgid "in"
-msgstr ""
+msgstr "i"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json

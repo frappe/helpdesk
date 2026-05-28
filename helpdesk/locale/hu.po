@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-27 10:31\n"
+"PO-Revision-Date: 2026-05-28 10:55\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -1792,7 +1792,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:221
 msgid "Email settings updated successfully."
-msgstr ""
+msgstr "Az e-mail beállítások sikeresen frissítve."
 
 #: desk/src/components/desk/global/NewContactDialog.vue:234
 msgid "Email should not be empty"
@@ -3053,7 +3053,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:40
 msgid "Manage your email signature."
-msgstr ""
+msgstr "E-mail aláírás kezelése."
 
 #: desk/src/components/Settings/Profile/Profile.vue:4
 msgid "Manage your profile information."
@@ -3485,7 +3485,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:37
 msgid "Open in Desk"
-msgstr ""
+msgstr "Megnyitás az asztalon"
 
 #: desk/src/components/modals/ShortcutsModal.vue:102
 msgid "Open reply box"
@@ -4594,7 +4594,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:9
 msgid "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one."
-msgstr ""
+msgstr "Munkanapok, órák és ünnepnapok beállítása előre definiált ütemterv kiválasztásával vagy új létrehozásával."
 
 #: desk/src/components/Settings/Holiday/Holidays.vue:5
 msgid "Set your team’s working days, hours, and holidays using a template or custom schedule."
@@ -4621,7 +4621,7 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/ReplyViaAgent.vue:47
 #: desk/src/components/Settings/EmailNotifications/ShareFeedback.vue:77
 msgid "Settings updated successfully."
-msgstr ""
+msgstr "Beállítások sikeresen frissítve."
 
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
