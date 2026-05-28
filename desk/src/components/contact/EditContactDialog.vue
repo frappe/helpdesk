@@ -176,7 +176,7 @@ import {
   FileUploader,
   FormControl,
 } from "frappe-ui";
-import { nextTick, ref } from "vue";
+import { ref } from "vue";
 import LucidePlus from "~icons/lucide/plus";
 import LucideUser from "~icons/lucide/user";
 import TimezoneControl from "../TimezoneControl.vue";
@@ -201,7 +201,7 @@ function addRow(type: "email" | "phone") {
   } else {
     state.phones.push({
       phone: "",
-      isPrimary: state.phones.length === 0,
+      isPrimary: false,
       key,
     });
   }
@@ -210,10 +210,21 @@ function addRow(type: "email" | "phone") {
 
 function removeRow(type: "email" | "phone", index: number) {
   const list = type === "email" ? state.emails : state.phones;
+  if (type === "phone" && list.length === 1) {
+    const row = state.phones[0];
+    if (row) {
+      row.phone = "";
+      row.isPrimary = false;
+    }
+    return;
+  }
   const wasPrimary = list[index]?.isPrimary;
   list.splice(index, 1);
-  if (wasPrimary && list.length > 0) {
-    list[0].isPrimary = true;
+  if (type === "email") {
+    const first = list[0];
+    if (wasPrimary && first) {
+      first.isPrimary = true;
+    }
   }
 }
 
@@ -230,9 +241,6 @@ function setPrimary(type: "email" | "phone", index: number) {
 }
 
 async function handleSave() {
-  state.emails = state.emails.filter((e) => e.email_id);
-  state.phones = state.phones.filter((p) => p.phone);
-  await nextTick();
   if (!isDirty.value && doc.getInfo?.data?.timezone === state.timezone) return;
   editContactResource.submit(
     {

@@ -89,7 +89,8 @@ def edit_contact(name: str, doc: dict):
     contact_doc.last_name = doc.get("last_name", contact_doc.last_name)
     contact_doc.image = doc.get("image", contact_doc.image)
 
-    if email_ids := doc.get("email_ids"):
+    email_ids = doc.get("email_ids")
+    if email_ids is not None:
         contact_doc.email_ids = []
         for e in email_ids:
             contact_doc.append(
@@ -97,7 +98,8 @@ def edit_contact(name: str, doc: dict):
                 {"email_id": e.get("email_id"), "is_primary": e.get("is_primary")},
             )
 
-    if phone_nos := doc.get("phone_nos"):
+    phone_nos = doc.get("phone_nos")
+    if phone_nos is not None:
         contact_doc.phone_nos = []
         for p in phone_nos:
             contact_doc.append(

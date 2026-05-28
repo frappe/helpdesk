@@ -5,10 +5,8 @@
       class="[&_p]:text-p-xs"
       :type="type"
       :placeholder="placeholder"
-      v-model="localValue"
-      @blur="onBlur"
-      @keydown.enter.prevent="commit"
-      @keydown.escape="cancel"
+      v-model="model"
+      @keydown.enter.prevent="blurInput"
     >
       <template #suffix>
         <div class="flex items-center gap-1">
@@ -56,13 +54,12 @@
 <script setup lang="ts">
 import { __ } from "@/translation";
 import { FormControl, Tooltip } from "frappe-ui";
-import { nextTick, onMounted, ref, watch } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 import LucideStar from "~icons/lucide/star";
 import LucideX from "~icons/lucide/x";
 
 const props = withDefaults(
   defineProps<{
-    modelValue: string;
     isPrimary: boolean;
     canRemove: boolean;
     type?: "email" | "tel" | "text";
@@ -76,40 +73,20 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits<{
-  "update:modelValue": [value: string];
+const model = defineModel<string>({ required: true });
+
+defineEmits<{
   setPrimary: [];
   remove: [];
 }>();
 
-const localValue = ref(props.modelValue);
 const control = ref<any>(null);
-
-watch(
-  () => props.modelValue,
-  (v) => {
-    if (document.activeElement !== getInputEl()) {
-      localValue.value = v;
-    }
-  }
-);
 
 function getInputEl(): HTMLInputElement | null {
   return control.value?.$el?.querySelector?.("input") ?? null;
 }
 
-function onBlur() {
-  if (localValue.value !== props.modelValue) {
-    emit("update:modelValue", localValue.value);
-  }
-}
-
-function commit() {
-  getInputEl()?.blur();
-}
-
-function cancel() {
-  localValue.value = props.modelValue;
+function blurInput() {
   getInputEl()?.blur();
 }
 

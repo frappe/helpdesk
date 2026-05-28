@@ -52,6 +52,12 @@ const contactCache: Record<string, DocumentResource<Contact>> = {};
 let entryKeyCounter = 0;
 export const nextEntryKey = () => ++entryKeyCounter;
 
+const emptyPhoneEntry = () => ({
+  phone: "",
+  isPrimary: false,
+  key: nextEntryKey(),
+});
+
 export function useContact(name: string) {
   const doc = findContactDoc();
   const { state, resetState } = useContactState(false, doc);
@@ -68,12 +74,13 @@ export function useContact(name: string) {
           isPrimary: e.is_primary,
           key: nextEntryKey(),
         })) || [];
-      state.phones =
+      const phones =
         data.phone_nos?.map((p: any) => ({
           phone: p.phone,
           isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
           key: nextEntryKey(),
         })) || [];
+      state.phones = phones.length ? phones : [emptyPhoneEntry()];
       state.customers =
         data.links?.map((l: any) => l.link_name as string) || [];
     },
@@ -105,10 +112,12 @@ export function useContact(name: string) {
         email_id: e.email_id,
         isPrimary: e.is_primary,
       })) || [];
-    const currentPhones = state.phones.map((p) => ({
-      phone: p.phone,
-      isPrimary: p.isPrimary,
-    }));
+    const currentPhones = state.phones
+      .filter((p) => p.phone)
+      .map((p) => ({
+        phone: p.phone,
+        isPrimary: p.isPrimary,
+      }));
     const savedPhones =
       doc.doc?.phone_nos?.map((p: any) => ({
         phone: p.phone,
@@ -150,14 +159,18 @@ export function useContact(name: string) {
       first_name: state.firstName,
       last_name: state.lastName,
       image: state.image,
-      email_ids: state.emails.map((e) => ({
-        email_id: e.email_id,
-        is_primary: e.isPrimary,
-      })),
-      phone_nos: state.phones.map((p) => ({
-        phone: p.phone,
-        is_primary: p.isPrimary,
-      })),
+      email_ids: state.emails
+        .filter((e) => e.email_id)
+        .map((e) => ({
+          email_id: e.email_id,
+          is_primary: e.isPrimary,
+        })),
+      phone_nos: state.phones
+        .filter((p) => p.phone)
+        .map((p) => ({
+          phone: p.phone,
+          is_primary: p.isPrimary,
+        })),
       timezone:
         typeof state.timezone === "string"
           ? state.timezone
@@ -324,12 +337,13 @@ export function useContactState(
           isPrimary: e.is_primary,
           key: nextEntryKey(),
         })) || [];
-      state.phones =
+      const phones =
         data?.phone_nos?.map((p: any) => ({
           phone: p.phone,
           isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
           key: nextEntryKey(),
         })) || [];
+      state.phones = phones.length ? phones : [emptyPhoneEntry()];
       state.customers =
         data?.links?.map((l: any) => l.link_name as string) || [];
       state.timezone = data?.timezone || "";
