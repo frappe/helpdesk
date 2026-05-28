@@ -155,7 +155,7 @@
               <template #default="{ openFileSelector, uploading }">
                 {{ void (isUploading = uploading) }}
                 <button
-                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
+                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
                   @click="openFileSelector()"
                   :disabled="uploading"
                 >
@@ -167,7 +167,7 @@
               </template>
             </FileUploader>
             <button
-              class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
+              class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
               @click="showSavedRepliesSelectorModal = true"
             >
               <SavedReplyIcon class="h-4 w-4" />
@@ -209,6 +209,7 @@ import {
 } from "@/components";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
+import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
 import {
   CleanStyles,
@@ -309,11 +310,7 @@ function isOnlySignature(content: string | null) {
   return htmlToText(content) === htmlToText(emailSignature.value);
 }
 
-const userResource = createResource({
-  url: "helpdesk.api.auth.get_current_user_email_info",
-  cache: "current-user-email-info",
-  auto: true,
-});
+const userResource = getUserEmailInfo();
 
 watch(newEmail, (newValue, oldValue) => {
   if (newValue !== oldValue && newValue) {

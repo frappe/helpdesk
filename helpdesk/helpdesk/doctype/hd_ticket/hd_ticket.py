@@ -373,9 +373,13 @@ class HDTicket(Document):
             "sla",
         ]:
             if self.has_value_changed(field):
-                log_ticket_activity(
-                    self.name, f"set {field_maps[field]} to {self.as_dict()[field]}"
-                )
+                value = self.as_dict()[field]
+                if not value:
+                    msg = f"cleared {field_maps[field]}"
+                else:
+                    msg = f"set {field_maps[field]} to {value}"
+
+                log_ticket_activity(self.name, msg)
 
     def generate_key(self):
         self.key = uuid.uuid4()
@@ -631,13 +635,10 @@ class HDTicket(Document):
         _attachments = []
 
         for attachment in attachments:
-            file_doc = frappe.get_doc("File", attachment)
-            file_doc.attached_to_name = communication.name
-            file_doc.attached_to_doctype = "Communication"
-            file_doc.save(ignore_permissions=True)
-            self.attach_file_with_doc("HD Ticket", self.name, file_doc.file_url)
-
-            _attachments.append({"file_url": file_doc.file_url})
+            file_url = frappe.db.get_value("File", attachment, "file_url")
+            self.attach_file_with_doc("Communication", communication.name, file_url)
+            self.attach_file_with_doc("HD Ticket", self.name, file_url)
+            _attachments.append({"file_url": file_url})
 
         if skip_email_workflow or not frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_via_agent"
@@ -988,6 +989,15 @@ class HDTicket(Document):
         self.save()
 
     def attach_file_with_doc(self, doctype, docname, file_url):
+        if frappe.db.exists(
+            "File",
+            {
+                "file_url": file_url,
+                "attached_to_doctype": doctype,
+                "attached_to_name": docname,
+            },
+        ):
+            return
         file_doc = frappe.new_doc("File")
         file_doc.attached_to_doctype = doctype
         file_doc.attached_to_name = docname
