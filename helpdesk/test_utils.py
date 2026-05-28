@@ -5,6 +5,7 @@ from frappe.core.doctype.communication.test_communication import create_email_ac
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
+from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.utils import is_frappe_version
 
 if is_frappe_version("16", above=True):
@@ -28,6 +29,7 @@ def before_tests():
     make_new_sla()
     make_test_objects("Email Domain", reset=True)
     create_email_account()
+    create_customer_field()
     frappe.db.commit()  # nosemgrep
 
 
@@ -345,3 +347,21 @@ def make_team(team_name, members=[], disabled=False):
     team.disabled = disabled
     team.insert(ignore_permissions=True)
     return team
+
+
+def upload_test_file(file_name: str) -> str:
+    """Upload an image from desk/src/assets/images/ as a standalone private File, returning its name."""
+    file_path = frappe.get_app_path(
+        "helpdesk", "..", "desk", "src", "assets", "images", file_name
+    )
+    with open(file_path, "rb") as f:
+        content = f.read()
+    file_doc = frappe.get_doc(
+        {
+            "doctype": "File",
+            "file_name": file_name,
+            "is_private": 1,
+            "content": content,
+        }
+    ).insert(ignore_permissions=True)
+    return file_doc.name

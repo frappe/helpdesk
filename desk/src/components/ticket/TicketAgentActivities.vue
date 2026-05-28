@@ -10,6 +10,7 @@
         :key="activity.key"
         class="activity mt-2"
         tabindex="0"
+        :id="activity.key"
       >
         <!-- single activity -->
         <div
