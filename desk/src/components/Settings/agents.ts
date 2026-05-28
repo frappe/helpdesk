@@ -5,14 +5,7 @@ const PAGE_LENGTH = 20;
 
 export const agents = createListResource({
   doctype: "HD Agent",
-  fields: [
-    "name",
-    "user_image",
-    "agent_name",
-    "is_active",
-    "availability",
-    "availability_changed_on",
-  ],
+  fields: ["name", "user_image", "agent_name", "is_active"],
   start: 0,
   pageLength: PAGE_LENGTH,
   orderBy: "creation desc",
