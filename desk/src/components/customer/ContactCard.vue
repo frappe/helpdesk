@@ -13,16 +13,10 @@
         />
         <p
           class="truncate min-w-0"
-          :class="contact.is_manager || contact.is_primary ? 'max-w-[50%]' : ''"
+          :class="contact.is_manager ? 'max-w-[50%]' : ''"
         >
           {{ contact.contact_name }}
         </p>
-        <Badge
-          v-if="contact.is_primary"
-          :label="__('Primary')"
-          theme="blue"
-          variant="outline"
-        />
         <Tooltip
           v-if="contact.is_manager"
           :text="__('Can view tickets raised by all contacts of the customer.')"
@@ -31,10 +25,18 @@
           <Badge :label="__('Manager')" theme="green" variant="outline" />
         </Tooltip>
       </div>
+      <Tooltip v-if="contact.is_primary" :text="__('Primary')" placement="top">
+        <span
+          class="flex h-6 w-6 items-center justify-center text-ink-amber-2"
+          :aria-label="__('Primary')"
+        >
+          <LucideStar class="size-4 fill-ink-amber-2" />
+        </span>
+      </Tooltip>
       <Dropdown
+        v-else-if="hasPermission()"
         placement="right"
         :options="dropdownOptions"
-        v-if="hasPermission()"
       >
         <Button
           class="h-6 w-6 p-0 min-w-fit shrink-0"
@@ -89,6 +91,7 @@ import { useRouter } from "vue-router";
 import LucideMail from "~icons/lucide/mail";
 import LucideMoreHorizontal from "~icons/lucide/more-horizontal";
 import LucidePhone from "~icons/lucide/phone";
+import LucideStar from "~icons/lucide/star";
 import LucideTicket from "~icons/lucide/ticket";
 import ModifiedIcon from "../icons/ModifiedIcon.vue";
 

@@ -81,48 +81,53 @@
             isMobileView ? 'max-h-[65vh]' : 'max-h-[65vh] overflow-x-hidden'
           "
         >
-          <div
+          <template
             v-for="(ticket, i) in ticketsListResource.data"
             :key="ticket.name"
-            class="grid items-center px-4 py-3 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 transition-colors"
-            :class="i !== ticketRowsCount - 1 && 'border-b border-gray-200'"
-            :style="gridTemplateStyle"
-            @click="goToTicket(ticket.name)"
           >
-            <!-- ID -->
-            <div class="text-ink-gray-6 font-base">{{ ticket.name }}</div>
+            <div
+              class="grid items-center px-4 py-3 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 rounded transition-colors"
+              :style="gridTemplateStyle"
+              @click="goToTicket(ticket.name)"
+            >
+              <!-- ID -->
+              <div class="text-ink-gray-6 font-base">{{ ticket.name }}</div>
 
-            <!-- Subject -->
-            <div class="truncate font-medium max-w-[90%]">
-              {{ ticket.subject }}
-            </div>
+              <!-- Subject -->
+              <div class="truncate font-medium max-w-[90%]">
+                {{ ticket.subject }}
+              </div>
 
-            <!-- Status -->
-            <div class="flex items-center gap-1.5">
-              <IndicatorIcon :class="getStatus(ticket.status)?.parsed_color" />
-              <span>{{ ticket.status }}</span>
-            </div>
+              <!-- Status -->
+              <div class="flex items-center gap-1.5">
+                <IndicatorIcon
+                  :class="getStatus(ticket.status)?.parsed_color"
+                />
+                <span>{{ ticket.status }}</span>
+              </div>
 
-            <!-- Priority -->
-            <div v-if="!isMobileView" class="flex items-center gap-1.5">
-              <span>{{ ticket.priority }}</span>
-            </div>
+              <!-- Priority -->
+              <div v-if="!isMobileView" class="flex items-center gap-1.5">
+                <span>{{ ticket.priority }}</span>
+              </div>
 
-            <!-- First Response -->
-            <div v-if="!isMobileView" class="text-ink-gray-6">
-              {{ dayjsLocal(ticket.response_by).fromNow() }}
-            </div>
+              <!-- First Response -->
+              <div v-if="!isMobileView" class="text-ink-gray-6">
+                {{ dayjsLocal(ticket.response_by).fromNow() }}
+              </div>
 
-            <!-- Resolution -->
-            <div v-if="!isMobileView" class="text-ink-gray-6">
-              {{ dayjsLocal(ticket.resolution_by).fromNow() }}
-            </div>
+              <!-- Resolution -->
+              <div v-if="!isMobileView" class="text-ink-gray-6">
+                {{ dayjsLocal(ticket.resolution_by).fromNow() }}
+              </div>
 
-            <!-- Assigned To -->
-            <div v-if="!isMobileView" class="flex items-center gap-2">
-              <MultipleAvatar :avatars="ticket._assign" size="xs" />
+              <!-- Assigned To -->
+              <div v-if="!isMobileView" class="flex items-center gap-2">
+                <MultipleAvatar :avatars="ticket._assign" size="xs" />
+              </div>
             </div>
-          </div>
+            <hr v-if="i !== ticketRowsCount - 1" />
+          </template>
           <!-- Load More -->
           <div
             class="flex justify-center py-6"
