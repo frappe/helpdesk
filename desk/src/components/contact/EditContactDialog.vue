@@ -141,7 +141,11 @@
           </div>
 
           <!-- Timezone -->
-          <TimezoneControl :label="__('Timezone')" v-model="state.timezone" />
+          <TimezoneControl
+            :label="__('Timezone')"
+            v-model="state.timezone"
+            v-if="doc.doc?.user"
+          />
 
           <!-- Save -->
           <div class="flex justify-end">

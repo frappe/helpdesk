@@ -11,10 +11,10 @@
     @close="handleDialogClose()"
   >
     <template #body-content>
-      <p class="text-p-base text-ink-gray-7 mb-4">{{ infoText }}</p>
+      <p class="text-p-base text-ink-gray-7 mb-4 w-full">{{ infoText }}</p>
 
       <div
-        class="p-2 group bg-surface-gray-2 hover:bg-surface-gray-3 rounded"
+        class="p-2 group bg-surface-gray-2 hover:bg-surface-gray-3 rounded w-full"
         v-if="!inviteNew"
       >
         <EmailMultiSelect
@@ -50,7 +50,7 @@
 
       <FormControl
         type="select"
-        class="mt-4"
+        class="mt-4 w-full [&>button]:w-full"
         v-model="role"
         :label="__('Role')"
         :options="roleOptions"

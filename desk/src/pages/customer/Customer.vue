@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col overflow-y-hidden">
+  <div class="flex flex-col overflow-y-hidden max-w-screen-xl mx-auto w-full">
     <LayoutHeader>
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" class="-ml-[2px]" />

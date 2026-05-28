@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col max-w-screen-xl mx-auto">
     <LayoutHeader>
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" class="-ml-[2px]" />
@@ -24,7 +24,7 @@
             <Button
               variant="subtle"
               @click="showEditDialog = true"
-              v-if="hasPermission() && contact.doc?.user"
+              v-if="hasPermission()"
             >
               <div class="flex gap-1 items-center">
                 <LucideSquarePen class="h-4 w-4" />
