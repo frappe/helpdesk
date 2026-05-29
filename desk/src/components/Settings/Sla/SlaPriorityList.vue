@@ -34,7 +34,7 @@
       v-if="slaData.priorities?.length === 0"
       class="text-center p-4 text-ink-gray-5"
     >
-      No priorities in the list
+      {{ __("No priorities in the list") }}
     </div>
   </div>
   <div
@@ -49,7 +49,7 @@
       <Button
         v-if="slaData.priorities.length !== priorityOptions.length"
         variant="subtle"
-        label="Add row"
+        :label="__('Add row')"
         @click="addRow"
         icon-left="plus"
       />
@@ -67,6 +67,7 @@ import {
   slaDataErrors,
   validateSlaData,
 } from "@/stores/sla";
+import { __ } from "@/translation";
 import { getGridTemplateColumnsForTable } from "@/utils";
 import { watchDebounced } from "@vueuse/core";
 import { Button, createResource, toast } from "frappe-ui";
@@ -117,7 +118,7 @@ const addRow = () => {
   );
 
   if (availablePriorities.length === 0) {
-    toast.error("All available priorities have already been added");
+    toast.error(__("All available priorities have already been added"));
     return;
   }
 
@@ -133,22 +134,22 @@ const addRow = () => {
 
 const columns = computed(() => [
   {
-    label: "Priority",
+    label: __("Priority"),
     key: "priority",
     isRequired: true,
   },
   {
-    label: "Default priority",
+    label: __("Default priority"),
     key: "default_priority",
     isRequired: true,
   },
   {
-    label: "First response time",
+    label: __("First response time"),
     key: "response_time",
     isRequired: true,
   },
   {
-    label: "Resolution time",
+    label: __("Resolution time"),
     key: "resolution_time",
     isRequired: true,
   },

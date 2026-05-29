@@ -69,6 +69,7 @@
 <script setup lang="ts">
 import DurationPicker from "@/components/frappe-ui/DurationPicker.vue";
 import { slaData } from "@/stores/sla";
+import { __ } from "@/translation";
 import { ConfirmDelete } from "@/utils";
 import { Button, Checkbox, Dropdown, Popover } from "frappe-ui";
 import { inject, ref } from "vue";
@@ -103,7 +104,7 @@ const priorityOptions = inject<Array<any>>("priorityOptions");
 
 const dropdownOptions = [
   {
-    label: "Edit",
+    label: __("Edit"),
     onClick: () => editItem(),
     icon: "edit",
   },

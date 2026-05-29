@@ -9,7 +9,7 @@
           </p>
           <Badge
             v-if="showStatus"
-            :label="'Inactive'"
+            :label="__('Inactive')"
             :theme="'gray'"
             :class="
               showStatus && !agent.is_active ? 'opacity-100' : 'opacity-0'
@@ -28,6 +28,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { Avatar } from "frappe-ui";
 
 defineProps({
