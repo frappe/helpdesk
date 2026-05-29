@@ -31,12 +31,9 @@ frappe.listview_settings["Customer"].onload = function (listview) {
       listview.page.add_menu_item(label, function () {
         frappe.call({
           method: "helpdesk.integrations.erpnext.api.sync_hd_erpnext_customers",
-          freeze: true,
-          freeze_message: "Syncing customers with Helpdesk...",
           callback: function () {
-            listview.refresh();
             frappe.show_alert({
-              message: "Customers synced with Helpdesk successfully",
+              message: __("Sync started"),
               indicator: "green",
             });
           },
