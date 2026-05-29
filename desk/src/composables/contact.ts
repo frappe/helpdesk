@@ -299,6 +299,11 @@ export function useNewContact() {
           isLoading.value = false;
           resetState();
         },
+        onError: (err: unknown) => {
+          const errMsg = getErrorMessage(err as Error, true);
+          toast.error(errMsg);
+          isLoading.value = false;
+        },
       }
     );
   }

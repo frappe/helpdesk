@@ -33,7 +33,7 @@
             />
             <div
               v-else
-              class="flex size-12 items-center justify-center bg-surface-gray-2 uppercase text-ink-gray-5 select-none font-medium text-2xl rounded-full"
+              class="flex size-11.5 items-center justify-center bg-surface-gray-2 uppercase text-ink-gray-5 select-none font-medium text-2xl rounded-full"
             >
               <OrganizationsIcon class="size-8" />
             </div>
@@ -46,7 +46,7 @@
                   <Button
                     variant="subtle"
                     :label="
-                      state.image ? __('Replace picture') : __('Upload picture')
+                      state.image ? __('Replace Image') : __('Upload Image')
                     "
                     :loading="uploading"
                     @click.prevent="openFileSelector()"

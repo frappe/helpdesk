@@ -63,7 +63,7 @@ def create_contact(doc: dict, invite: bool = False) -> str:
     frappe.has_permission("Contact", "create", throw=True)
     phone = doc.get("phone")
     if phone:
-        validate_phone_number_with_country_code(phone, "phone")
+        validate_phone_number_with_country_code(phone, "Phone")
 
     contact_doc = frappe.get_doc(
         {
@@ -120,7 +120,7 @@ def edit_contact(name: str, doc: dict):
     if phone_nos is not None:
         for index, p in enumerate(phone_nos, start=1):
             if phone := p.get("phone"):
-                validate_phone_number_with_country_code(phone, f"phone row {index}")
+                validate_phone_number_with_country_code(phone, f"Phone-row {index}")
         contact_doc.phone_nos = []
         for p in phone_nos:
             contact_doc.append(

@@ -35,7 +35,7 @@
             />
             <div
               v-else
-              class="flex size-12 items-center justify-center rounded-full bg-surface-gray-2 text-2xl font-medium uppercase text-ink-gray-5 select-none"
+              class="flex size-11.5 items-center justify-center rounded-full bg-surface-gray-2 text-2xl font-medium uppercase text-ink-gray-5 select-none"
             >
               <LucideUser class="size-8" />
             </div>
@@ -48,7 +48,7 @@
                   <Button
                     variant="subtle"
                     :label="
-                      state.image ? __('Replace picture') : __('Upload picture')
+                      state.image ? __('Replace Image') : __('Upload Image')
                     "
                     @click.prevent="openFileSelector()"
                   />

@@ -15,7 +15,7 @@
               size="3xl"
             />
             <div
-              class="flex size-12 items-center justify-center bg-surface-gray-2 uppercase text-ink-gray-5 select-none font-medium text-2xl rounded-full"
+              class="flex size-11.5 items-center justify-center bg-surface-gray-2 uppercase text-ink-gray-5 select-none font-medium text-2xl rounded-full"
               v-else
             >
               <OrganizationsIcon class="size-8" />

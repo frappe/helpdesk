@@ -42,7 +42,7 @@
                 />
                 <div
                   v-else
-                  class="flex size-12 items-center justify-center bg-surface-gray-2 uppercase text-ink-gray-5 select-none font-medium text-2xl rounded-full"
+                  class="flex size-11.5 items-center justify-center bg-surface-gray-2 uppercase text-ink-gray-5 select-none font-medium text-2xl rounded-full"
                 >
                   <UserIcon class="size-8" />
                 </div>
@@ -92,13 +92,6 @@
             <template v-else-if="fieldOrRow.type === 'tel'">
               <PhoneControl :label="fieldOrRow.label" v-model="state.phone" />
             </template>
-
-            <!-- <template v-else-if="fieldOrRow.type === 'timezone'">
-              <TimezoneControl
-                :label="fieldOrRow.label"
-                v-model="state.timezone"
-              />
-            </template> -->
 
             <template v-else-if="fieldOrRow.type === 'Link'">
               <div class="space-y-1.5">
@@ -173,6 +166,7 @@ const { state, fieldConfig, addContact, isLoading } = useNewContact();
 async function handleAdd() {
   try {
     await addContact();
+    debugger;
     open.value = false;
   } catch (error) {
     console.error("Error adding contact:", error);
