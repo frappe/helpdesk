@@ -35,17 +35,17 @@
         :delay="isTouchScreenDevice() ? 200 : 0"
         animation="180"
         ghost-class="kanban-card-ghost"
-        class="flex flex-1 flex-col gap-3.5 overflow-y-auto"
+        class="flex flex-1 flex-col gap-3 overflow-y-auto"
         @end="(evt) => onDragEnd(evt)"
       >
         <template #item="{ element: row }">
           <div
-            class="group flex flex-col gap-1.5 rounded-lg border border-outline-gray-2 bg-surface-white px-3.5 py-3 text-base text-ink-gray-9 shadow-sm transition-colors hover:border-outline-gray-3 hover:bg-surface-gray-1"
+            class="group flex flex-col gap-2 rounded-lg border border-outline-gray-2 bg-surface-white p-3 text-base text-ink-gray-9 shadow-sm transition-colors hover:border-outline-gray-3 hover:bg-surface-gray-1"
             :data-name="row.name"
           >
             <component
               :is="rowRoute ? 'router-link' : 'div'"
-              class="flex flex-col gap-1.5 cursor-pointer"
+              class="flex flex-col gap-2 cursor-pointer"
               v-bind="{
                 to: rowRoute
                   ? {
@@ -56,7 +56,7 @@
                   : undefined,
               }"
             >
-              <!-- Title slot — initial badge + subject -->
+              <!-- Title row: subject + ticket id -->
               <slot name="title" v-bind="{ row }">
                 <div class="flex items-start gap-2">
                   <div
@@ -64,34 +64,97 @@
                   >
                     {{ initial(row) }}
                   </div>
-                  <div class="line-clamp-2 text-sm">
+                  <div class="line-clamp-2 flex-1 text-sm font-medium">
                     {{ row.subject || "—" }}
                   </div>
+                  <span
+                    v-if="row.name"
+                    class="shrink-0 text-xs text-ink-gray-5"
+                  >
+                    #{{ row.name }}
+                  </span>
                 </div>
               </slot>
 
-              <!-- Fields slot -->
+              <!-- Meta row: assignees + modified -->
               <slot name="fields" v-bind="{ row }">
                 <div
-                  class="flex items-center gap-2 pl-7 text-xs text-ink-gray-5"
+                  class="flex items-center justify-between gap-2 pl-7 text-xs text-ink-gray-5"
                 >
-                  <span v-if="row.modified">
-                    {{ formatTimeShort(row.modified) }}
-                  </span>
-                  <span v-if="row.priority" class="text-ink-gray-7">
-                    · {{ row.priority }}
-                  </span>
+                  <div class="flex items-center gap-1.5">
+                    <div
+                      v-if="getAssignees(row).length"
+                      class="flex -space-x-1.5"
+                    >
+                      <Avatar
+                        v-for="a in getAssignees(row).slice(0, 3)"
+                        :key="a.name"
+                        :label="a.label"
+                        :image="a.image"
+                        size="xs"
+                        class="ring-1 ring-surface-white"
+                      />
+                      <span
+                        v-if="getAssignees(row).length > 3"
+                        class="ml-1 text-xs text-ink-gray-5"
+                      >
+                        +{{ getAssignees(row).length - 3 }}
+                      </span>
+                    </div>
+                    <span v-if="row.modified">
+                      {{ formatTimeShort(row.modified) }}
+                    </span>
+                  </div>
+                  <Badge
+                    v-if="row.priority"
+                    :label="row.priority"
+                    :theme="priorityTheme(row.priority)"
+                    variant="subtle"
+                    size="sm"
+                  />
                 </div>
               </slot>
             </component>
 
-            <!-- Card actions footer (slot, default: HD Ticket comment/reply) -->
+            <!-- Bottom icon row: comments / attachments / sla / actions -->
             <slot name="actions" v-bind="{ row }">
-              <KanbanCardActions
-                v-if="doctype === 'HD Ticket'"
-                :ticket="row.name"
-                @posted="$emit('cardUpdated', row.name)"
-              />
+              <div
+                class="flex items-center justify-between border-t border-outline-gray-1 pt-2 text-ink-gray-5"
+              >
+                <div class="flex items-center gap-3 text-xs">
+                  <span
+                    v-if="row._comment_count"
+                    class="flex items-center gap-1"
+                    :title="__('Comments')"
+                  >
+                    <FeatherIcon name="message-circle" class="h-3.5 w-3.5" />
+                    {{ row._comment_count }}
+                  </span>
+                  <span
+                    v-if="row.attachment_count"
+                    class="flex items-center gap-1"
+                    :title="__('Attachments')"
+                  >
+                    <FeatherIcon name="paperclip" class="h-3.5 w-3.5" />
+                    {{ row.attachment_count }}
+                  </span>
+                  <Tooltip
+                    v-if="row.resolution_by || row.first_responded_on"
+                    :text="__('SLA')"
+                  >
+                    <FeatherIcon
+                      name="clock"
+                      class="h-3.5 w-3.5"
+                      :class="slaClass(row)"
+                    />
+                  </Tooltip>
+                </div>
+                <KanbanCardActions
+                  v-if="doctype === 'HD Ticket'"
+                  :ticket="row.name"
+                  @posted="$emit('cardUpdated', row.name)"
+                />
+              </div>
             </slot>
           </div>
         </template>
@@ -104,11 +167,56 @@
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import Draggable from "vuedraggable";
-import { call, LoadingIndicator, toast } from "frappe-ui";
+import {
+  Avatar,
+  Badge,
+  call,
+  FeatherIcon,
+  LoadingIndicator,
+  toast,
+  Tooltip,
+} from "frappe-ui";
 import { IndicatorIcon } from "./icons";
 import KanbanCardActions from "./KanbanCardActions.vue";
 import { __ } from "@/translation";
 import { formatTimeShort, isTouchScreenDevice, parseColor } from "@/utils";
+
+const PRIORITY_THEME: Record<string, string> = {
+  Low: "gray",
+  Medium: "blue",
+  High: "orange",
+  Urgent: "red",
+};
+
+function priorityTheme(p: string): string {
+  return PRIORITY_THEME[p] || "gray";
+}
+
+function getAssignees(row: any) {
+  // _assign on Frappe docs is a JSON-encoded array of user emails.
+  let raw = row._assign;
+  if (!raw) return [];
+  if (typeof raw === "string") {
+    try {
+      raw = JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+  if (!Array.isArray(raw)) return [];
+  return raw.map((email: string) => ({
+    name: email,
+    label: email.split("@")[0],
+    image: undefined,
+  }));
+}
+
+function slaClass(row: any): string {
+  // Green if first response logged, orange if approaching, red if breached.
+  if (row.agreement_status === "Fulfilled") return "text-ink-green-3";
+  if (row.agreement_status === "Failed") return "text-ink-red-3";
+  return "text-ink-gray-5";
+}
 
 interface KanbanColumn {
   key: string;
