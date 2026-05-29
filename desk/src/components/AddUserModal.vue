@@ -11,8 +11,6 @@
     @close="handleDialogClose()"
   >
     <template #body-content>
-      <p class="text-p-base text-ink-gray-7 mb-4 w-full">{{ infoText }}</p>
-
       <div
         class="p-2 group bg-surface-gray-2 hover:bg-surface-gray-3 rounded w-full"
         v-if="!inviteNew"
@@ -42,7 +40,7 @@
         :label="__('Invite by email')"
         :description="
           __(
-            'Type an email and press Enter / Comma to add it. You can also paste a comma-separated list.'
+            'Add emails by pressing Enter, Comma, or pasting a comma-separated list.'
           )
         "
         :error-message="(input:string)=> `${input} ${__('is not a valid email address.')}` "
@@ -114,20 +112,6 @@ const selectedContacts = ref<string[]>([]);
 const newUsers = ref<string[]>([]);
 const role = ref(props.forAgents ? "Agent" : "HD Customer");
 
-const infoText = computed<string>(() => {
-  return props.forAgents
-    ? __(
-        "Add existing system users to Helpdesk. Assign them a role to grant access with their current credentials."
-      )
-    : props.inviteNew
-    ? __(
-        "Invite new contacts to Helpdesk by adding their email addresses. Assign them a role to define their level of access."
-      )
-    : __(
-        "Add existing contacts as system users for this customer. Assign them a role to define their level of access."
-      );
-});
-
 const roleOptions = computed(() => {
   if (props.forAgents) {
     return [
@@ -146,10 +130,10 @@ const roleOptions = computed(() => {
 const roleDescription = computed(() => {
   const descriptions: Record<string, string> = {
     "HD Customer Manager": __(
-      "Can view all tickets raised by the organization and assign other members as managers."
+      "Can view all tickets raised by the org and assign other members as managers."
     ),
     "HD Customer": __(
-      "Can raise tickets on behalf of the organisation and manage the tickets they raised."
+      "Can raise tickets on behalf of the org and manage the tickets they raised."
     ),
     "Agent Manager": __(
       "Can manage and invite new agents, and create public & private views (reports)."

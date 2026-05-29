@@ -5,26 +5,16 @@
         <p class="text-p-base text-ink-gray-7">
           {{
             __(
-              "Are you sure you want to delete this contact? This will permanently delete the contact from the system."
+              "Are you sure you want to delete this contact? The contact will be permanently deleted and unlinked from any associated customers."
             )
           }}
         </p>
-        <p class="text-p-base text-ink-gray-7">
-          Confirming this action will remove the contact with the associated
-          customers.
-        </p>
-        <div class="flex flex-col gap-1" v-if="count">
-          <p class="text-p-base text-ink-gray-7">
-            {{
-              __(
-                `{0} ticket${
-                  count === 1 ? "" : "s"
-                } related to this contact and will also be deleted.`,
-                [count]
-              )
-            }}
-          </p>
-        </div>
+        <Checkbox
+          v-if="count"
+          size="sm"
+          v-model="deleteLinkedTickets"
+          :label="__('Delete {0} linked ticket(s)', [count])"
+        />
       </div>
     </template>
     <template #actions="{ close }">
@@ -37,6 +27,7 @@
           @click="
             () => {
               emit('delete', { deleteLinkedTickets });
+              close();
             }
           "
         >
@@ -49,7 +40,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { Button, createListResource, Dialog } from "frappe-ui";
+import { Button, Checkbox, createListResource, Dialog } from "frappe-ui";
 import { computed, ref } from "vue";
 
 const props = defineProps<{

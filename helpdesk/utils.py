@@ -43,7 +43,7 @@ def is_admin(user: str = None) -> bool:
     return user == "Administrator"
 
 
-def is_agent(user: str = None) -> bool:
+def is_agent(user: str | None = None) -> bool:
     """
     Check whether `user` is an agent
 

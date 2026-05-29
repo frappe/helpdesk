@@ -53,7 +53,7 @@
                   />
                   <Button
                     v-if="state.image"
-                    label="Remove Image"
+                    label="Remove"
                     variant="subtle"
                     theme="red"
                     @click.prevent="onImageRemove()"

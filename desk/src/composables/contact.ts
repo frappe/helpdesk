@@ -8,7 +8,7 @@ import type {
   Resource,
 } from "@/types";
 import { Contact, HDTicket } from "@/types/doctypes";
-import { validateEmailWithZod } from "@/utils";
+import { getErrorMessage, validateEmailWithZod } from "@/utils";
 import {
   call,
   createDocumentResource,
@@ -64,8 +64,25 @@ function sortByPrimary<T extends { isPrimary: boolean }>(arr: T[]): T[] {
 }
 
 export function useContact(name: string) {
+  const router = useRouter();
   const doc = findContactDoc();
   const { state, resetState } = useContactState(false, doc);
+
+  async function handleDelete({
+    deleteLinkedTickets,
+  }: {
+    deleteLinkedTickets: boolean;
+  }) {
+    try {
+      await call("helpdesk.api.contact.delete_contact", {
+        name,
+        delete_tickets: deleteLinkedTickets,
+      });
+      router.push({ name: "ContactList" });
+    } catch (err) {
+      getErrorMessage(err as Error, true);
+    }
+  }
   watch(
     () => doc.doc,
     (data) => {
@@ -226,6 +243,7 @@ export function useContact(name: string) {
     isDirty,
     parseContactData,
     editContactResource,
+    handleDelete,
   };
 }
 

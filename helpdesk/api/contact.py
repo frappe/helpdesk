@@ -30,11 +30,13 @@ def search_contacts(
 
 
 @frappe.whitelist()
-def delete_contact(name: str):
+def delete_contact(name: str, delete_tickets: bool = False):
     # TODO: add as on_trash hook in hooks to handle this at the DocType level
     frappe.has_permission("Contact", "delete", throw=True)
-    tickets = frappe.get_list("HD Ticket", filters={"contact": name}, pluck="name")
-    delete_bulk("HD Ticket", tickets)
+    if delete_tickets:
+        frappe.has_permission("HD Ticket", "delete", throw=True)
+        tickets = frappe.get_list("HD Ticket", filters={"contact": name}, pluck="name")
+        delete_bulk("HD Ticket", tickets)
     customers = frappe.get_all(
         "HD Customer Member",
         filters={"contact_name": name},
@@ -42,6 +44,17 @@ def delete_contact(name: str):
     )
     delete_bulk("HD Customer Member", customers)
     # user_invitation link remove contact
+    invitations = frappe.get_all(
+        "User Invitation",
+        filters={"contact": name, "app_name": "helpdesk"},
+        pluck="name",
+    )
+    frappe.db.set_value(
+        "User Invitation",
+        invitations,
+        "contact",
+        None,
+    )
     frappe.delete_doc("Contact", name)
 
 

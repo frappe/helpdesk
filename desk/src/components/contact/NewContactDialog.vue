@@ -61,7 +61,7 @@
                       />
                       <Button
                         v-if="state.image"
-                        :label="__('Remove Image')"
+                        :label="__('Remove')"
                         variant="subtle"
                         theme="red"
                         @click.prevent="state.image = ''"

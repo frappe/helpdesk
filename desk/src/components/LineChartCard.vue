@@ -165,7 +165,7 @@ const chartConfig = computed<EChartsOption>(() => {
       show: true,
       trigger: "axis",
       appendToBody: true,
-      position: (point: number[]) => [point[0] + 12, point[1] - 50],
+      // position: (point: number[]) => [point[0] + 12, point[1] - 50],
       axisPointer: { type: "none" },
       formatter: (params: any) => {
         const p = Array.isArray(params) ? params[0] : params;

@@ -74,7 +74,7 @@
                   class="text-base leading-none text-ink-gray-7 rounded flex items-center px-2 py-1 relative select-none data-[highlighted]:outline-none data-[highlighted]:bg-surface-gray-3 cursor-pointer"
                   @mousedown.prevent="onSelect(option.value)"
                 >
-                  <UserAvatar class="mr-2" :name="option.value" size="lg" />
+                  <UserAvatar class="mr-0.5" :name="option.value" size="lg" />
                   <div class="flex flex-col gap-1 p-1 text-ink-gray-8">
                     <div class="text-base font-medium">{{ option.label }}</div>
                     <div class="text-sm text-ink-gray-5">

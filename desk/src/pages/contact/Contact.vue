@@ -123,14 +123,7 @@ import {
 import { useScreenSize } from "@/composables/screen";
 import { __ } from "@/translation";
 import { hasPermission } from "@/utils";
-import {
-  Breadcrumbs,
-  Button,
-  call,
-  Dropdown,
-  Tabs,
-  usePageMeta,
-} from "frappe-ui";
+import { Breadcrumbs, Button, Dropdown, Tabs, usePageMeta } from "frappe-ui";
 import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideMail from "~icons/lucide/mail";
@@ -147,7 +140,7 @@ const route = useRoute();
 const router = useRouter();
 const { isMobileView } = useScreenSize();
 
-const { doc: contact, state } = useContact(props.id);
+const { doc: contact, handleDelete } = useContact(props.id);
 
 const { feedbackCount } = useContactFeedback(props.id);
 
@@ -292,19 +285,6 @@ const dropdownActions = computed(() => {
     },
   ];
 });
-
-function handleDelete({
-  deleteLinkedTickets,
-}: {
-  deleteLinkedTickets: boolean;
-}) {
-  call("helpdesk.api.contact.delete_contact", {
-    name: props.id,
-    delete_linked_tickets: deleteLinkedTickets,
-  }).then(() => {
-    router.push({ name: "ContactList" });
-  });
-}
 
 const breadcrumbs = [
   {
