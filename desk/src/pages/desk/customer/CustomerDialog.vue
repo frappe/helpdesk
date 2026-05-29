@@ -86,7 +86,7 @@ const options = computed(() => ({
   title: customer.doc?.name,
   actions: [
     {
-      label: "Save",
+      label: __("Save"),
       theme: "gray",
       variant: "solid",
       onClick: () => update(),

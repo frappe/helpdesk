@@ -1,3 +1,4 @@
+import { __ } from "@/translation";
 import { createResource } from "frappe-ui";
 
 // Title
@@ -68,8 +69,8 @@ export const moveToCategory = createResource({
     };
   },
   validate({ category, articles }) {
-    if (!category) throw { message: "Category is required" };
-    if (!articles) throw { message: "Articles are required" };
+    if (!category) throw { message: __("Category is required") };
+    if (!articles) throw { message: __("Articles are required") };
   },
 });
 
@@ -82,8 +83,8 @@ export const mergeCategory = createResource({
     };
   },
   validate({ source, target }) {
-    if (!source) throw { message: "Category is required" };
-    if (!target) throw { message: "Target is required" };
+    if (!source) throw { message: __("Category is required") };
+    if (!target) throw { message: __("Target is required") };
   },
 });
 
@@ -121,4 +122,3 @@ export const incrementView = createResource({
     article,
   }),
 });
-

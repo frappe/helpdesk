@@ -32,6 +32,7 @@
 <script setup lang="ts">
 import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
 import { slaDataErrors, validateSlaData } from "@/stores/sla";
+import { __ } from "@/translation";
 import { watchDebounced } from "@vueuse/core";
 import CFConditions from "@/components/conditions-filter/CFConditions.vue";
 import { validateConditions } from "@/utils";
@@ -55,13 +56,13 @@ const getConjunction = () => {
 
 const dropdownOptions = [
   {
-    label: "Add condition",
+    label: __("Add condition"),
     onClick: () => {
       addCondition();
     },
   },
   {
-    label: "Add condition group",
+    label: __("Add condition group"),
     onClick: () => {
       const conjunction = getConjunction();
       props.conditions.push(conjunction, [[]]);

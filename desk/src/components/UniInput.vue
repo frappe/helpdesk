@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { Autocomplete, Link } from "@/components";
+import { __ } from "@/translation";
 import { APIOptions, Field } from "@/types";
 import { parseApiOptions } from "@/utils";
 import {
@@ -81,11 +82,11 @@ const component = computed(() => {
     return h(Autocomplete, {
       options: [
         {
-          label: "Yes",
+          label: __("Yes"),
           value: 1,
         },
         {
-          label: "No",
+          label: __("No"),
           value: 0,
         },
       ],

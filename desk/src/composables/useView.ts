@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
 import { useDebounceFn } from "@vueuse/core";
@@ -30,7 +31,7 @@ export const views = createListResource({
 });
 
 export const currentView = ref({
-  label: "List",
+  label: __("List"),
   icon: LucideAlignJustify,
 });
 

@@ -146,6 +146,7 @@ import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
 import { getMeta } from "@/stores/meta";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation";
 import {
   ActivitiesSymbol,
   AssigneeSymbol,
@@ -245,8 +246,8 @@ const sections = computed(() => {
   const _sections = [];
   if (recentTickets.length) {
     _sections.push({
-      label: "Recent Tickets",
-      tooltipMessage: "Tickets recently raised by this contact/customer",
+      label: __("Recent Tickets"),
+      tooltipMessage: __("Tickets recently raised by this contact/customer"),
       hideLabel: false,
       opened: true,
       tickets: recentTickets,
@@ -254,8 +255,8 @@ const sections = computed(() => {
   }
   if (similarTickets.length) {
     _sections.push({
-      label: "Similar Tickets",
-      tooltipMessage: "Tickets with similar queries",
+      label: __("Similar Tickets"),
+      tooltipMessage: __("Tickets with similar queries"),
       hideLabel: false,
       opened: true,
       tickets: similarTickets,

@@ -208,7 +208,7 @@ const emojiList = ["👍", "👎", "❤️", "🎉", "👀", "✅"];
 
 const dropdownOptions = computed(() => [
   {
-    label: "Edit",
+    label: __("Edit"),
     onClick: () => handleEditMode(),
     icon: "edit-2",
     condition: () => !isTicketMergedComment.value,
