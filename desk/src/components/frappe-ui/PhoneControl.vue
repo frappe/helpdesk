@@ -4,13 +4,16 @@
       {{ label }}
       <span v-if="required" class="text-ink-red-3">*</span>
     </label>
-    <Popover v-model:open="isOpen">
+    <Popover v-model:open="isOpen" matchTargetWidth>
       <template #target="{ togglePopover }">
         <div :class="containerClasses">
           <button
             type="button"
-            class="flex h-full items-center gap-1 rounded-l px-2 focus:outline-none"
-            :class="{ 'pointer-events-none': disabled }"
+            class="flex h-full items-center gap-1 rounded-l px-2 min-w-[50px] focus:outline-none"
+            :class="[
+              { 'pointer-events-none': disabled },
+              flagCode ? '' : 'justify-center',
+            ]"
             :aria-label="__('Select country')"
             @click.stop="togglePopover()"
           >
@@ -59,7 +62,7 @@
 
       <template #body="{ close }">
         <div
-          class="mt-1 flex max-h-72 w-72 flex-col overflow-hidden rounded border border-outline-gray-2 bg-surface-white shadow-md"
+          class="mt-1 flex max-h-72 flex-col overflow-hidden rounded-lg border border-outline-gray-2 bg-surface-modal shadow-lg"
         >
           <div class="border-b border-outline-gray-1 p-2">
             <FormControl
@@ -75,13 +78,13 @@
               @keydown.escape.prevent="close()"
             />
           </div>
-          <div class="flex-1 overflow-y-auto py-1">
+          <div class="flex-1 overflow-y-auto p-1">
             <button
               v-for="(country, idx) in filteredCountries"
               :key="country.name"
               :ref="(el) => setItemRef(el as HTMLElement | null, idx)"
               type="button"
-              class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-base"
+              class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-base text-ink-gray-7 outline-none"
               :class="
                 idx === highlightedIndex
                   ? 'bg-surface-gray-3'
@@ -95,7 +98,7 @@
                 :alt="country.name"
                 class="h-3 w-4 rounded-sm object-cover"
               />
-              <span class="flex-1 truncate text-ink-gray-8">
+              <span class="flex-1 truncate">
                 {{ country.name }}
               </span>
               <span class="text-ink-gray-5">{{ country.isd }}</span>
@@ -126,23 +129,13 @@ import {
   Popover,
   TextInput,
 } from "frappe-ui";
-import { computed, onMounted, ref, useId, watch } from "vue";
+import { computed, ref, useId, watch } from "vue";
 
 interface CountryInfo {
   code: string;
   isd: string;
   [key: string]: any;
 }
-
-const countryCodesResource = createResource({
-  url: "frappe.geo.country_info.get_country_timezone_info",
-  cache: "country-tz",
-  transform: (data: any) =>
-    (data?.country_info ?? data?.message?.country_info ?? data ?? {}) as Record<
-      string,
-      CountryInfo
-    >,
-});
 
 const props = withDefaults(
   defineProps<{
@@ -171,6 +164,21 @@ defineOptions({ inheritAttrs: false });
 const model = defineModel<string>({ default: "" });
 
 const id = useId();
+
+// TODO: cache in Local or Session Storage to avoid repeated calls on every mount
+const countryCodesResource = createResource({
+  url: "frappe.geo.country_info.get_country_timezone_info",
+  auto: true,
+  transform: (data: any) => {
+    const countryInfo =
+      data?.country_info ?? ({} as Record<string, CountryInfo>);
+    return countryInfo;
+  },
+  onSuccess() {
+    parseValue(model.value);
+    if (!model.value) applyDefaultCountry();
+  },
+});
 
 const countryCodes = computed<Record<string, CountryInfo>>(
   () => countryCodesResource.data ?? {}
@@ -282,14 +290,14 @@ function parseValue(value: unknown) {
   localNumber.value = str;
 }
 
-function getSysDefaultCountry(): string | null {
+function getDefaultCountry(): string | null {
   const country = window.default_country;
   return typeof country === "string" && country ? country : null;
 }
 
 function applyDefaultCountry() {
   if (selectedCountry.value) return;
-  const candidates = [props.defaultCountry, getSysDefaultCountry(), "India"];
+  const candidates = [props.defaultCountry, getDefaultCountry(), "India"];
   for (const name of candidates) {
     if (name) {
       selectedCountry.value = name;
@@ -341,12 +349,5 @@ watch(isOpen, (open) => {
 
 watch(searchQuery, () => {
   highlightedIndex.value = 0;
-  itemRefs.length = 0;
-});
-
-onMounted(async () => {
-  await countryCodesResource.fetch();
-  parseValue(model.value);
-  if (!model.value) applyDefaultCountry();
 });
 </script>
