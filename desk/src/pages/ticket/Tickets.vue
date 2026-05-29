@@ -262,12 +262,14 @@ async function exportRows(
     // Handle direct filter format: { owner: "@me" }
     if (value === "@me") {
       filters[key] = userId;
+      return;
     }
+    if (!Array.isArray(value)) return;
 
-    // Handle operator-based filter format: { owner: ["=", "@me"] }
-    if (Array.isArray(value) && value[1] === "@me") {
-      filters[key][1] = userId;
-    }
+    // Handle all operator-based filter format: { owner: ["=", "@me"], _assign: ["LIKE", "%@me%"] }
+    filters[key] = value.map((entry) =>
+      entry === "@me" ? userId : entry === "%@me%" ? `%${userId}%` : entry
+    );
   });
   let pageLength: number;
 
