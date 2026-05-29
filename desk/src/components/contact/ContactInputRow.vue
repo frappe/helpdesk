@@ -11,8 +11,22 @@
     >
       <template #suffix>
         <div class="flex items-center gap-1">
-          <Tooltip v-if="isPrimary" :text="__('Primary')">
+          <Tooltip
+            v-if="isPrimary"
+            :text="canTogglePrimary ? __('Remove primary') : __('Primary')"
+          >
+            <button
+              v-if="canTogglePrimary"
+              type="button"
+              class="flex size-5 items-center justify-center rounded text-ink-amber-2"
+              :aria-label="__('Remove primary')"
+              @mousedown.prevent
+              @click="$emit('setPrimary')"
+            >
+              <LucideStar class="size-4 fill-ink-amber-2" />
+            </button>
             <span
+              v-else
               class="flex size-5 items-center justify-center rounded text-ink-amber-2"
               :aria-label="__('Primary')"
             >
@@ -64,11 +78,13 @@ const props = withDefaults(
   defineProps<{
     isPrimary: boolean;
     canRemove: boolean;
+    canTogglePrimary?: boolean;
     type?: "email" | "tel" | "text";
     placeholder?: string;
     autofocus?: boolean;
   }>(),
   {
+    canTogglePrimary: false,
     type: "text",
     placeholder: "",
     autofocus: false,

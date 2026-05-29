@@ -122,6 +122,7 @@
               type="tel"
               :isPrimary="phone.isPrimary"
               :canRemove="true"
+              :canTogglePrimary="true"
               :autofocus="phone.key === autofocusKey"
               @setPrimary="setPrimary('phone', index)"
               @remove="removeRow('phone', index)"
@@ -238,8 +239,9 @@ function setPrimary(type: "email" | "phone", index: number) {
       e.isPrimary = i === index;
     });
   } else {
+    const wasPrimary = !!state.phones[index]?.isPrimary;
     state.phones.forEach((p, i) => {
-      p.isPrimary = i === index;
+      p.isPrimary = i === index ? !wasPrimary : false;
     });
   }
 }
