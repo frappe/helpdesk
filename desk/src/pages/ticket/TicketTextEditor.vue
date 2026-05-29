@@ -43,7 +43,7 @@
           @success="
             (f: File) => $emit('update:attachments', [...attachments, f])
           "
-          @failure="() => toast.error('Error uploading file')"
+          @failure="() => toast.error(__('Error uploading file'))"
         >
           <template #default="{ openFileSelector }">
             <Button theme="gray" variant="ghost" @click="openFileSelector()">
@@ -87,6 +87,7 @@ import {
   UserAvatar,
 } from "@/components";
 import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
 import { File } from "@/types";
 import { removeAttachmentFromServer } from "@/utils";
 import { FileUploader, toast } from "frappe-ui";

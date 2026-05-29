@@ -10,7 +10,7 @@
           @click="
             copyToClipboard(
               ticket.doc.name,
-              `Ticket #${ticket.doc.name} copied to clipboard`
+              __('Ticket #{0} copied to clipboard', ticket.doc.name)
             )
           "
           class="cursor-copy"
@@ -22,22 +22,22 @@
           v-if="!ticket.doc.via_customer_portal"
           class="text-ink-gray-5 flex items-center"
         >
-          <span class="mr-[4px]">via</span>
+          <span class="mr-[4px]">{{ __("via") }}</span>
           <EmailIcon class="size-4 inline-block mr-1" />
-          <span>Email</span>
+          <span>{{ __("Email") }}</span>
         </div>
         <!-- Via Portal -->
         <div v-else class="text-ink-gray-5 flex items-center">
-          <span class="mr-[4px]">via</span>
+          <span class="mr-[4px]">{{ __("via") }}</span>
           <GlobeIcon class="size-4 inline-block mr-1" />
-          <span>Portal</span>
+          <span>{{ __("Portal") }}</span>
         </div>
       </div>
       <!-- divider -->
       <div class="border-l border-outline-gray-2 h-[13px]" />
       <!-- First Response -->
       <div class="flex items-center gap-1">
-        <span>First Response</span>
+        <span>{{ __("First Response") }}</span>
         <Tooltip
           :text="dateFormat(firstResponse.date, dateTooltipFormat)"
           :hover-delay="0.25"
@@ -55,7 +55,7 @@
       <div class="border-l border-outline-gray-2 h-[13px]" />
       <!-- Resolution by -->
       <div class="flex items-center gap-1">
-        <span>Resolution </span>
+        <span>{{ __("Resolution") }} </span>
         <Tooltip
           :text="dateFormat(resolutionBy.date, dateTooltipFormat)"
           :hover-delay="0.25"
@@ -79,6 +79,7 @@
 
 <script setup lang="ts">
 import { useShortcut } from "@/composables/shortcuts";
+import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";
 import {
   copyToClipboard,
@@ -110,7 +111,7 @@ const firstResponse = computed(() => {
   ) {
     let responseBy = formatTimeShort(ticket.value.doc.response_by as string);
     return {
-      label: `Due in ${responseBy}`,
+      label: __("Due in {0}", responseBy),
       color: "orange",
       date: ticket.value.doc.response_by,
     };
@@ -135,7 +136,7 @@ const firstResponse = computed(() => {
             ticket.value.doc.creation
           );
     return {
-      label: `Fulfilled in ${fulfilled}`,
+      label: __("Fulfilled in {0}", fulfilled),
       color: "green",
       date: ticket.value.doc.first_responded_on,
     };
@@ -146,7 +147,7 @@ const firstResponse = computed(() => {
         ticket.value.doc.response_by as string
       );
       return {
-        label: `Overdue by ${responseBy}`,
+        label: __("Overdue by {0}", responseBy),
         color: "red",
         date: ticket.value.doc.response_by,
       };
@@ -159,7 +160,7 @@ const firstResponse = computed(() => {
           ticket.value.doc.response_by
         );
     return {
-      label: `Failed by ${failed}`,
+      label: __("Failed by {0}", failed),
       color: "red",
       date: ticket.value.doc.response_by,
     };
@@ -177,7 +178,7 @@ const resolutionBy = computed(() => {
     )
   ) {
     return {
-      label: `On Hold`,
+      label: __("On Hold"),
       color: "blue",
       date: ticket.value.doc?.on_hold_since,
     };
@@ -191,7 +192,7 @@ const resolutionBy = computed(() => {
     );
 
     return {
-      label: `Overdue by ${overdue}`,
+      label: __("Overdue by {0}", overdue),
       color: "red",
       date: ticket.value.doc?.resolution_by,
     };
@@ -203,7 +204,7 @@ const resolutionBy = computed(() => {
       ticket.value.doc?.resolution_by as string
     );
     return {
-      label: `Due in ${resolutionBy}`,
+      label: __("Due in {0}", resolutionBy),
       color: "purple",
       date: ticket.value.doc?.resolution_by,
     };
@@ -228,7 +229,7 @@ const resolutionBy = computed(() => {
             ticket.value.doc?.creation
           );
     return {
-      label: `Fulfilled in ${fulfilled}`,
+      label: __("Fulfilled in {0}", fulfilled),
       color: "green",
       date: ticket.value.doc?.resolution_date,
     };
@@ -240,7 +241,7 @@ const resolutionBy = computed(() => {
           ticket.value.doc?.resolution_date
         );
     return {
-      label: `Failed by ${failed}`,
+      label: __("Failed by {0}", failed),
       color: "red",
       date: ticket.value.doc?.resolution_by,
     };
@@ -274,13 +275,13 @@ function formatTimeShort(date: string, end?: string): string {
 }
 
 useShortcut({ meta: true, shift: true, key: "." }, () => {
-  copyToClipboard(window.location.href, `Ticket URL copied to clipboard`);
+  copyToClipboard(window.location.href, __("Ticket URL copied to clipboard"));
 });
 
 useShortcut({ meta: true, key: "." }, () => {
   copyToClipboard(
     ticket.value.doc.name,
-    `Ticket #${ticket.value.doc.name} copied to clipboard`
+    __("Ticket #{0} copied to clipboard", ticket.value.doc.name)
   );
 });
 </script>

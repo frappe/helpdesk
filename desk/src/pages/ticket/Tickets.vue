@@ -500,7 +500,7 @@ const viewActions = (view) => {
             theme: "red",
             onClick: () => {
               $dialog({
-                title: __("Delete {0}", [_view.label]),
+                title: __("Delete {0}", _view.label),
                 message:
                   __("Are you sure you want to delete this view?") +
                   (_view.public
@@ -613,7 +613,7 @@ function handleView(viewInfo, action) {
 }
 
 function handleSuccess(msg = __("created")) {
-  toast.success(__("View {0}", [msg]));
+  toast.success(__("View {0}", msg));
   resetState();
 }
 function resetState() {

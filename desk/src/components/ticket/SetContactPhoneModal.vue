@@ -16,9 +16,10 @@
       <div>
         <div class="text-base text-ink-gray-6">
           {{
-            __("{0} does not have a phone number, set one to call them.", [
-              contactDetails.name,
-            ])
+            __(
+              "{0} does not have a phone number, set one to call them.",
+              contactDetails.name
+            )
           }}
         </div>
         <div class="flex flex-col gap-2 mt-6">

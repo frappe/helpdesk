@@ -56,6 +56,7 @@ import {
   PhoneIcon,
 } from "@/components/icons";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
+import { __ } from "@/translation";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
   ActivitiesSymbol,
@@ -85,17 +86,17 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs: TabObject[] = [
     {
       name: "activity",
-      label: "Activity",
+      label: __("Activity"),
       icon: ActivityIcon,
     },
     {
       name: "email",
-      label: "Emails",
+      label: __("Emails"),
       icon: EmailIcon,
     },
     {
       name: "comment",
-      label: "Comments",
+      label: __("Comments"),
       icon: CommentIcon,
     },
   ];
@@ -103,7 +104,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   if (isCallingEnabled.value) {
     _tabs.push({
       name: "call",
-      label: "Calls",
+      label: __("Calls"),
       icon: PhoneIcon,
     });
   }
@@ -186,9 +187,11 @@ const _activities = computed(() => {
       name: call.name,
       key: call.creation,
       call_type: call.type,
-      content: `${call.caller || "Unknown"} made a call to ${
-        call.receiver || "Unknown"
-      }`,
+      content: __(
+        "{0} made a call to {1}",
+        call.caller || __("Unknown"),
+        call.receiver || __("Unknown")
+      ),
       duration: call.duration ? call.duration + "s" : "0s",
     };
   });
