@@ -4,16 +4,17 @@
 
 <script setup lang="ts">
 import { globalStore } from "@/stores/globalStore";
+import { __ } from "@/translation";
 const { $dialog } = globalStore();
 const emit = defineEmits<{
   (event: "discard"): void;
 }>();
 
 const {
-  label = "Discard",
+  label = __("Discard"),
   hideDialog = false,
-  title = "Discard?",
-  message = "Are you sure you want to discard this?",
+  title = __("Discard?"),
+  message = __("Are you sure you want to discard this?"),
 } = defineProps<{
   label?: string;
   hideDialog?: boolean;
@@ -34,7 +35,7 @@ function handleDiscard() {
     },
     actions: [
       {
-        label: "Delete",
+        label: __("Delete"),
         theme: "red",
         iconLeft: "trash-2",
         variant: "solid",

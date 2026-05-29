@@ -15,7 +15,7 @@
         :readonly="field.readonly"
         :disabled="field.disabled"
         class="form-control"
-        :placeholder="field.placeholder || `Add ${field.label}`"
+        :placeholder="field.placeholder || __('Add {0}', field.label)"
         :model-value="transValue"
         autocomplete="off"
         v-on="
@@ -41,6 +41,7 @@
 
 <script setup lang="ts">
 import { Autocomplete, Link } from "@/components";
+import { __ } from "@/translation";
 import { APIOptions, Field, FieldValue } from "@/types";
 import { parseApiOptions } from "@/utils";
 import {
@@ -101,11 +102,11 @@ const component = computed(() => {
     return h(Autocomplete, {
       options: [
         {
-          label: "Yes",
+          label: __("Yes"),
           value: 1,
         },
         {
-          label: "No",
+          label: __("No"),
           value: 0,
         },
       ],
@@ -136,7 +137,7 @@ const component = computed(() => {
 const transValue = computed(() => {
   const fieldtype = props.field.fieldtype;
   if (fieldtype === "Check") {
-    return props.value ? "Yes" : "No";
+    return props.value ? __("Yes") : __("No");
   } else if (fieldtype === "Date") {
     if (!props.value) return props.value;
     return dayjs(props.value).format(window.date_format.toUpperCase());

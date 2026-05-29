@@ -215,7 +215,7 @@
             v-if="settingsData.enableOutsideHoursBanner"
             variant="subtle"
             size="sm"
-            placeholder="Enter Notification Message"
+            :placeholder="__('Enter Notification Message')"
             :required="true"
             v-model="settingsData.outsideWorkingHoursBannerMessage"
           />

@@ -95,6 +95,7 @@ import {
   ComboboxOptions,
 } from "@headlessui/vue";
 import { watchDebounced } from "@vueuse/core";
+import { __ } from "@/translation";
 import { Popover, createResource } from "frappe-ui";
 import { computed, nextTick, ref } from "vue";
 
@@ -105,7 +106,7 @@ const props = defineProps({
   },
   errorMessage: {
     type: Function,
-    default: (value) => `${value} is an Invalid value`,
+    default: (value) => __("{0} is an Invalid value", value),
   },
 });
 

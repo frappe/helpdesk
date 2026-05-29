@@ -51,7 +51,9 @@
         :key="data.label"
         class="flex items-center text-base"
       >
-        <div class="w-[126px] text-ink-gray-5 text-sm">{{ data.title }}</div>
+        <div class="w-[126px] text-ink-gray-5 text-sm">
+          {{ __(data.title) }}
+        </div>
         <div
           class="break-words text-base text-ink-gray-8 flex items-center gap-2"
         >

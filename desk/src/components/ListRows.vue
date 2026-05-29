@@ -14,9 +14,9 @@
               <span>{{ group.group.label }}</span>
               <span class="text-xs text-ink-gray-5"
                 >{{
-                  group.rows.length +
-                  " Article" +
-                  (group.rows.length > 1 ? "s" : "")
+                  group.rows.length > 1
+                    ? __("{0} Articles", String(group.rows.length))
+                    : __("{0} Article", String(group.rows.length))
                 }}
               </span>
             </div>
@@ -66,6 +66,7 @@ import {
   ListRows,
 } from "frappe-ui";
 import { computed, ref, watch } from "vue";
+import { __ } from "@/translation";
 
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 const props = defineProps({

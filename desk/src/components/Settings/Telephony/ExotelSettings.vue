@@ -49,7 +49,7 @@
                 v-if="telephonyAgent.doc && exotel.doc?.enabled"
               >
                 <FormControl
-                  label="Exotel number"
+                  :label="__('Exotel number')"
                   type="text"
                   required
                   v-model="telephonyAgent.doc.exotel_number"
@@ -70,47 +70,47 @@
               </div>
               <div class="flex flex-col gap-2">
                 <FormControl
-                  label="Account SID"
+                  :label="__('Account SID')"
                   required
                   v-model="exotel.doc.account_sid"
-                  placeholder="Account SID"
+                  :placeholder="__('Account SID')"
                 />
                 <ErrorMessage :message="exotelErrors.accountSid" />
               </div>
               <div class="flex flex-col gap-2">
                 <FormControl
-                  label="Webhook Verify Token"
+                  :label="__('Webhook Verify Token')"
                   required
                   v-model="exotel.doc.webhook_verify_token"
-                  placeholder="Webhook Verify Token"
+                  :placeholder="__('Webhook Verify Token')"
                 />
                 <ErrorMessage :message="exotelErrors.webhookVerifyToken" />
               </div>
 
               <div class="flex flex-col gap-2">
                 <FormControl
-                  label="API Key"
+                  :label="__('API Key')"
                   required
                   v-model="exotel.doc.api_key"
-                  placeholder="API Key"
+                  :placeholder="__('API Key')"
                 />
                 <ErrorMessage :message="exotelErrors.apiKey" />
               </div>
               <div class="flex flex-col gap-2">
                 <Password
-                  label="API Token"
+                  :label="__('API Token')"
                   required
                   v-model="exotel.doc.api_token"
-                  placeholder="API Token"
+                  :placeholder="__('API Token')"
                 />
                 <ErrorMessage :message="exotelErrors.apiToken" />
               </div>
               <div class="flex flex-col gap-2">
                 <FormControl
-                  label="Subdomain"
+                  :label="__('Subdomain')"
                   required
                   v-model="exotel.doc.subdomain"
-                  placeholder="Subdomain"
+                  :placeholder="__('Subdomain')"
                 />
                 <ErrorMessage :message="exotelErrors.subdomain" />
               </div>

@@ -104,11 +104,11 @@
         v-if="!teams.loading && !teams.data?.length"
         variant="badge"
         :icon="AgentIcon"
-        title="No team found"
+        :title="__('No team found')"
         :description="
           teamsSearchQuery.length
-            ? 'Change your search terms to find teams.'
-            : 'Add one to get started.'
+            ? __('Change your search terms to find teams.')
+            : __('Add one to get started.')
         "
       />
     </template>

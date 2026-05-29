@@ -45,37 +45,37 @@
           <div class="grid grid-cols-2 gap-4 mt-4" v-if="twilio.doc.enabled">
             <div class="flex flex-col gap-2">
               <FormControl
-                label="Account SID"
+                :label="__('Account SID')"
                 required
                 v-model="twilio.doc.account_sid"
-                placeholder="Account SID"
+                :placeholder="__('Account SID')"
               />
               <ErrorMessage :message="twilioErrors.accountSid" />
             </div>
             <div class="flex flex-col gap-2">
               <Password
-                label="Auth Token"
+                :label="__('Auth Token')"
                 required
                 v-model="twilio.doc.auth_token"
-                placeholder="Auth Token"
+                :placeholder="__('Auth Token')"
               />
               <ErrorMessage :message="twilioErrors.authToken" />
             </div>
             <FormControl
               v-if="twilio.doc.api_key"
-              label="API Key"
+              :label="__('API Key')"
               v-model="twilio.doc.api_key"
               disabled
             />
             <Password
               v-if="twilio.doc.api_secret"
-              label="API Secret"
+              :label="__('API Secret')"
               v-model="twilio.doc.api_secret"
               disabled
             />
             <Autocomplete
               v-if="twilio.originalDoc?.account_sid && twilioApps.length > 0"
-              label="TwiML App Name"
+              :label="__('TwiML App Name')"
               :model-value="twilio.doc.app_name"
               @update:modelValue="twilio.doc.app_name = $event.value"
               :options="twilioApps"
@@ -94,7 +94,7 @@
             </Autocomplete>
             <FormControl
               v-if="twilio.doc.twiml_sid"
-              label="TwiML App SID"
+              :label="__('TwiML App SID')"
               v-model="twilio.doc.twiml_sid"
               disabled
             />
@@ -103,7 +103,7 @@
               v-if="telephonyAgent.doc && twilio.doc?.enabled"
             >
               <FormControl
-                label="Twilio number"
+                :label="__('Twilio number')"
                 type="text"
                 required
                 v-model="telephonyAgent.doc.twilio_number"

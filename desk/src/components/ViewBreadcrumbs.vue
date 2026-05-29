@@ -50,7 +50,7 @@
             v-if="item.is_standard"
             class="ml-1 flex-shrink-0"
             size="sm"
-            label="Standard"
+            :label="__('Standard')"
           />
         </div>
       </template>
@@ -83,6 +83,7 @@
 
 <script setup>
 import { useScreenSize } from "@/composables/screen";
+import { __ } from "@/translation";
 import { Badge, Dropdown } from "frappe-ui";
 import { useRoute } from "vue-router";
 

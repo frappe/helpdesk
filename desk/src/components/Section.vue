@@ -18,7 +18,7 @@
             :class="{ 'rotate-90': opened }"
           />
           <span>
-            {{ label || "Untitled" }}
+            {{ label || __("Untitled") }}
           </span>
           <FeatherIcon
             v-if="collapsible && collapseIconPosition === 'right'"
@@ -45,6 +45,7 @@
   </div>
 </template>
 <script setup>
+import { __ } from "@/translation";
 import { ref, watch } from "vue";
 
 const props = defineProps({

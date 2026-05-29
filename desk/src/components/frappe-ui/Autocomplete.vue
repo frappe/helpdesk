@@ -53,7 +53,7 @@
                 "
                 :value="query"
                 autocomplete="off"
-                placeholder="Search"
+                :placeholder="__('Search')"
               />
               <button
                 class="absolute inset-y-0 right-3 top-px flex items-center"
@@ -108,7 +108,7 @@
                 v-if="groups.length == 0"
                 class="mt-1.5 rounded-md px-2.5 py-1.5 text-base text-ink-gray-5"
               >
-                No results found
+                {{ __("No results found") }}
               </li>
             </ComboboxOptions>
             <div
@@ -135,6 +135,7 @@ import {
   ComboboxOptions,
 } from "@headlessui/vue";
 import { FeatherIcon, Popover } from "frappe-ui";
+import { __ } from "@/translation";
 import { computed, nextTick, ref, useAttrs, useSlots, watch } from "vue";
 
 const props = defineProps({

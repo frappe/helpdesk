@@ -2,12 +2,14 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-ink-gray-9">Customers</div>
+        <div class="text-lg font-medium text-ink-gray-9">
+          {{ __("Customers") }}
+        </div>
       </template>
       <template #right-header>
         <ERPNextCustomerSyncButton @synced="listViewRef?.reload()" />
         <Button
-          label="Create"
+          :label="__('Create')"
           theme="gray"
           variant="solid"
           @click="isDialogVisible = !isDialogVisible"
@@ -87,7 +89,7 @@ const options = computed(() => {
       },
     },
     emptyState: {
-      title: "No customers found",
+      title: __("No customers found"),
       description: hasActiveFilters.value
         ? __(
             "No customers found for the applied filters. Try adjusting or clearing your filters."
@@ -102,7 +104,7 @@ const options = computed(() => {
 
 usePageMeta(() => {
   return {
-    title: "Customers",
+    title: __("Customers"),
   };
 });
 </script>

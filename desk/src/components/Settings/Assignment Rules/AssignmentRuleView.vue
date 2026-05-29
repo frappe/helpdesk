@@ -508,9 +508,10 @@ const saveAssignmentRule = () => {
 const showOverwriteConfirm = () => {
   showConfirmDialog.value = {
     show: true,
-    title: "Confirm overwrite",
-    message:
-      "Your old condition will be overwritten. Are you sure you want to save?",
+    title: __("Confirm overwrite"),
+    message: __(
+      "Your old condition will be overwritten. Are you sure you want to save?"
+    ),
     onConfirm: () => {
       updateAssignmentRule();
       showConfirmDialog.value.show = false;

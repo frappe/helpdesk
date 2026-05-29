@@ -50,7 +50,7 @@
           <Button
             variant="ghost"
             class="w-full !justify-start"
-            :label="'Create New'"
+            :label="__('Create New')"
             @click="attrs.onCreate(value, close)"
           >
             <template #prefix>
@@ -62,7 +62,7 @@
           <Button
             variant="ghost"
             class="w-full !justify-start"
-            :label="'Clear'"
+            :label="__('Clear')"
             @click="() => clearValue(close)"
           >
             <template #prefix>
@@ -77,6 +77,7 @@
 
 <script setup>
 import { watchDebounced } from "@vueuse/core";
+import { __ } from "@/translation";
 import { createResource } from "frappe-ui";
 import { computed, ref, useAttrs, watch } from "vue";
 import Autocomplete from "./Autocomplete.vue";

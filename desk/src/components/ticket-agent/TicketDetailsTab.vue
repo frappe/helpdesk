@@ -45,7 +45,7 @@
     >
       <!-- Ticket Info (custom fields) -->
       <div v-if="Boolean(customFields.length)">
-        <Section label="Ticket Info" :opened="true">
+        <Section :label="__('Ticket Info')" :opened="true">
           <template #header="{ opened, toggle }">
             <div
               class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-white z-10 px-4 py-4 cursor-pointer"

@@ -20,6 +20,7 @@
 import { Input, toast } from "frappe-ui";
 import { ref, toRefs } from "vue";
 import Pill from "./Pill.vue";
+import { __ } from "@/translation";
 
 type Item = {
   label: string;
@@ -35,7 +36,7 @@ const props = defineProps({
   placeholder: {
     type: String,
     required: false,
-    default: "Type...",
+    default: __("Type..."),
   },
   validate: {
     type: Function,

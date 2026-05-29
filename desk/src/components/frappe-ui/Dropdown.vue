@@ -9,7 +9,7 @@
         <MenuButton as="template">
           <slot v-if="$slots.default" v-bind="{ open, togglePopover }" />
           <Button v-else :active="open" v-bind="button">
-            {{ button ? button?.label || null : "Options" }}
+            {{ button ? button?.label || null : __("Options") }}
           </Button>
         </MenuButton>
       </template>
@@ -88,6 +88,7 @@
 <script setup>
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
 import { Popover, Button, FeatherIcon } from "frappe-ui";
+import { __ } from "@/translation";
 import { computed, useSlots } from "vue";
 import { useRouter } from "vue-router";
 

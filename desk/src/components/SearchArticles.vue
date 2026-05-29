@@ -4,7 +4,7 @@
     class="rounded border p-4 text-base"
   >
     <div class="mb-2 font-medium pl-2" v-if="!hideViewAll">
-      These articles may already cover what you are looking for
+      {{ __("These articles may already cover what you are looking for") }}
       <RouterLink
         class="group cursor-pointer space-x-1 hover:text-ink-gray-9"
         :to="{
@@ -12,7 +12,7 @@
         }"
         target="_blank"
       >
-        <span class="text-xs underline">(View All)</span>
+        <span class="text-xs underline">{{ __("(View All)") }}</span>
       </RouterLink>
     </div>
     <dl
@@ -54,10 +54,10 @@
   >
     <LucideSearch class="size-8 text-ink-gray-3" />
     <div class="flex items-center flex-col justify-center">
-      <p class="font-base">No answers found</p>
-      <span class="font-base text-p-sm text-ink-gray-5 text-center"
-        >Rephrase the question and try again with some keywords</span
-      >
+      <p class="font-base">{{ __("No answers found") }}</p>
+      <span class="font-base text-p-sm text-ink-gray-5 text-center">{{
+        __("Rephrase the question and try again with some keywords")
+      }}</span>
     </div>
   </div>
   <div
@@ -66,16 +66,17 @@
   >
     <LucideSearch class="size-8 text-ink-gray-3" />
     <div class="flex items-center flex-col justify-center">
-      <p class="font-base">Searching...</p>
-      <span class="font-base text-p-sm text-ink-gray-5 text-center"
-        >Please wait while we search for the answers</span
-      >
+      <p class="font-base">{{ __("Searching...") }}</p>
+      <span class="font-base text-p-sm text-ink-gray-5 text-center">{{
+        __("Please wait while we search for the answers")
+      }}</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 import { createResource } from "frappe-ui";
 import { watch } from "vue";
 interface P {

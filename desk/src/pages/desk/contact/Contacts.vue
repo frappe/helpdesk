@@ -2,11 +2,13 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-ink-gray-9">Contacts</div>
+        <div class="text-lg font-medium text-ink-gray-9">
+          {{ __("Contacts") }}
+        </div>
       </template>
       <template #right-header>
         <Button
-          label="Create"
+          :label="__('Create')"
           theme="gray"
           variant="solid"
           @click="showNewContactModal = !showNewContactModal"
@@ -74,7 +76,7 @@ const options = computed(() => {
       },
     },
     emptyState: {
-      title: "No contacts found",
+      title: __("No contacts found"),
       icon: h(LucideContact2, {
         class: "h-10 w-10",
       }),
@@ -98,12 +100,12 @@ function openContact(id: string): void {
 }
 
 function handleContactUpdated(): void {
-  toast.success("Contact updated successfully.");
+  toast.success(__("Contact updated successfully."));
   listViewRef.value?.reload();
 }
 usePageMeta(() => {
   return {
-    title: "Contacts",
+    title: __("Contacts"),
   };
 });
 </script>

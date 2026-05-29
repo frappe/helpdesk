@@ -15,6 +15,7 @@
 
 <script setup lang="ts">
 import { useTyping } from "@/composables/realtime";
+import { __ } from "@/translation";
 import { useUserStore } from "@/stores/user";
 import { computed, h, onBeforeUnmount } from "vue";
 import UserAvatar from "./UserAvatar.vue";
@@ -40,29 +41,29 @@ const typingMessage = computed(() => {
     return h("div", { class: "flex items-center gap-1" }, [
       h(UserAvatar, { name: typingUsers[0], size: "sm" }),
       h("span", { class: "text-ink-gray-6 font-medium" }, firstUser),
-      h("span", { class: "text-ink-gray-5" }, " is typing"),
+      h("span", { class: "text-ink-gray-5" }, __(" is typing")),
     ]);
   } else if (count === 2) {
     return h("div", { class: "flex items-center gap-1" }, [
       h("span", { class: "text-ink-gray-6 font-medium" }, firstUser),
-      h("span", { class: "text-ink-gray-5" }, " and "),
+      h("span", { class: "text-ink-gray-5" }, __(" and ")),
       h(
         "span",
         { class: "text-ink-gray-6 font-medium" },
         getUser(typingUsers[1])?.full_name
       ),
-      h("span", { class: "text-ink-gray-5" }, " are typing"),
+      h("span", { class: "text-ink-gray-5" }, __(" are typing")),
     ]);
   } else {
     return h("div", { class: "flex items-center gap-1" }, [
       h("span", { class: "text-ink-gray-6 font-medium" }, firstUser),
-      h("span", { class: "text-ink-gray-5" }, " and "),
+      h("span", { class: "text-ink-gray-5" }, __(" and ")),
       h(
         "span",
         { class: "text-ink-gray-6 font-medium" },
-        `${count - 1} others`
+        __("{0} others", String(count - 1))
       ),
-      h("span", { class: "text-ink-gray-5" }, " are typing"),
+      h("span", { class: "text-ink-gray-5" }, __(" are typing")),
     ]);
   }
 });

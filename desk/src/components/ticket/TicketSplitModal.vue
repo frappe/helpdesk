@@ -1,5 +1,5 @@
 <template>
-  <Dialog :options="{ title: `Split ticket` }" v-model="showDialog">
+  <Dialog :options="{ title: __('Split ticket') }" v-model="showDialog">
     <template #body-content>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-8">
@@ -8,10 +8,10 @@
           {{ __("from this email onwards will be moved to new ticket.") }}
         </p>
         <FormControl
-          label="New Ticket Subject"
+          :label="__('New Ticket Subject')"
           type="text"
           v-model="subject"
-          placeholder="Add a subject for the new ticket"
+          :placeholder="__('Add a subject for the new ticket')"
         />
         <div
           class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-gray-modals"
@@ -30,7 +30,7 @@
       <Button
         class="w-full"
         variant="solid"
-        label="Split into new ticket"
+        :label="__('Split into new ticket')"
         :loading="splitTicket.loading"
         :icon-left="LucideSplit"
         @click="handleTicketSplit"

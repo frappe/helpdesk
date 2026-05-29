@@ -51,7 +51,7 @@
                 </button>
               </div>
             </div>
-            <div class="text-xs text-ink-gray-5 mt-1">Hrs</div>
+            <div class="text-xs text-ink-gray-5 mt-1">{{ __("Hrs") }}</div>
           </div>
 
           <!-- Minutes -->
@@ -86,7 +86,7 @@
                 </button>
               </div>
             </div>
-            <div class="text-xs text-ink-gray-5 mt-1">Min</div>
+            <div class="text-xs text-ink-gray-5 mt-1">{{ __("Min") }}</div>
           </div>
 
           <!-- Seconds -->
@@ -120,7 +120,7 @@
                 </button>
               </div>
             </div>
-            <div class="text-xs text-ink-gray-5 mt-1">Sec</div>
+            <div class="text-xs text-ink-gray-5 mt-1">{{ __("Sec") }}</div>
           </div>
         </div>
       </div>
@@ -130,6 +130,7 @@
 
 <script setup>
 import { Popover } from "frappe-ui";
+import { __ } from "@/translation";
 import { computed, ref, watch } from "vue";
 
 const props = defineProps({
@@ -139,7 +140,7 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    default: "Set duration",
+    default: __("Set duration"),
   },
   showHours: {
     type: Boolean,
@@ -186,7 +187,7 @@ watch(
 const formattedValue = computed(() => {
   const hrs = hoursValue.value;
   const mins = minutesValue.value;
-  return `${hrs} hours ${mins} minutes`;
+  return __("{0} hours {1} minutes", String(hrs), String(mins));
 });
 
 // Handle popover open/close

@@ -445,8 +445,8 @@ const toggleStatus = debounce(() => {
     {
       onSuccess: () => {
         if (status === "Published")
-          toast.success("Article published successfully.");
-        else toast.success("Article unpublished successfully.");
+          toast.success(__("Article published successfully."));
+        else toast.success(__("Article unpublished successfully."));
         article.reload();
       },
     }

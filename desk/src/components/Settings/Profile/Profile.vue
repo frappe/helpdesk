@@ -175,7 +175,7 @@
             class="w-40"
             :options="timezoneOptions"
             size="sm"
-            placeholder="Select Timezone"
+            :placeholder="__('Select Timezone')"
           />
         </div>
       </div>

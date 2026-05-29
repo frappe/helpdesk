@@ -6,7 +6,7 @@
     <template #header-actions>
       <Button
         @click="() => setActiveSettingsTab('Invite Agents')"
-        label="New"
+        :label="__('New')"
         variant="solid"
       >
         <template #prefix>
@@ -88,11 +88,11 @@
           v-if="!agents.loading && !agents.data?.length"
           variant="badge"
           :icon="AgentIcon"
-          title="No agent found"
+          :title="__('No agent found')"
           :description="
             activeFilter.length
-              ? 'Change your search terms or filters'
-              : 'Add one to get started.'
+              ? __('Change your search terms or filters')
+              : __('Add one to get started.')
           "
         />
         <!-- Agent List -->

@@ -1,6 +1,6 @@
 <template>
   <Autocomplete
-    placeholder="Select an option"
+    :placeholder="__('Select an option')"
     :options="options"
     :value="selection"
     @update:query="(q) => onUpdateQuery(q)"
@@ -17,6 +17,7 @@
 
 <script setup lang="ts">
 import { Autocomplete } from "@/components";
+import { __ } from "@/translation";
 import { createListResource } from "frappe-ui";
 import { computed, ref } from "vue";
 

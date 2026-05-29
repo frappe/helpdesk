@@ -177,7 +177,7 @@
           <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
         </div>
         <div class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%]">
-          <Button label="Discard" @click="handleDiscard" />
+          <Button :label="__('Discard')" @click="handleDiscard" />
           <Button
             variant="solid"
             :disabled="isDisabled"

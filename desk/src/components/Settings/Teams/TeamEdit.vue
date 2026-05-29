@@ -44,7 +44,7 @@
               />
             </div>
             <Button
-              label="Add Member"
+              :label="__('Add Member')"
               variant="solid"
               :disabled="!invitees.length"
               @click="addMember(invitees)"

@@ -69,7 +69,7 @@
             </div>
             <div class="flex items-center justify-end space-x-2 w-[40%]">
               <Button
-                label="Discard"
+                :label="__('Discard')"
                 @click="
                   () => {
                     newComment = '';
@@ -110,6 +110,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import { AttachmentItem } from "@/components/";
 import { AttachmentIcon } from "@/components/icons/";
+import { __ } from "@/translation";
 import { useTyping } from "@/composables/realtime";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
@@ -143,7 +144,7 @@ const props = defineProps({
   },
   label: {
     type: String,
-    default: "Comment",
+    default: __("Comment"),
   },
   editable: {
     type: Boolean,
@@ -180,7 +181,7 @@ onBeforeUnmount(() => {
 });
 
 const label = computed(() => {
-  return loading.value ? "Sending..." : props.label;
+  return loading.value ? __("Sending...") : props.label;
 });
 
 function removeAttachment(attachment) {

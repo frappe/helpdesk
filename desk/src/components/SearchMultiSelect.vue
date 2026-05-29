@@ -173,7 +173,7 @@
           v-if="filteredOptions.length === 0"
           class="px-2 py-4 text-center text-sm text-ink-gray-5"
         >
-          No options found
+          {{ __("No options found") }}
         </div>
       </div>
     </div>
@@ -185,6 +185,7 @@
 
 <script setup lang="ts">
 import { Avatar, Button, Checkbox } from "frappe-ui";
+import { __ } from "@/translation";
 import {
   computed,
   h,
@@ -223,9 +224,9 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: "Select options...",
-  label: "Options",
-  selectionText: "items",
+  placeholder: __("Select options..."),
+  label: __("Options"),
+  selectionText: __("items"),
   options: () => [],
 });
 

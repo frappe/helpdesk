@@ -38,7 +38,7 @@
             </div>
             <div class="flex items-center gap-2">
               <Button
-                label="Discard"
+                :label="__('Discard')"
                 theme="gray"
                 variant="subtle"
                 v-if="!isContentEmpty(modelValue)"
@@ -66,6 +66,7 @@ import {
   HandleExcelPaste,
 } from "@/tiptap-extensions";
 import { ClearFormattingUtility, getFontFamily, isContentEmpty } from "@/utils";
+import { __ } from "@/translation";
 import { TextEditor as FTextEditor, TextEditorFixedMenu } from "frappe-ui";
 import { computed, nextTick, ref } from "vue";
 

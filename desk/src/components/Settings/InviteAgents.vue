@@ -250,7 +250,7 @@ const cancelInviteResource = createResource({
   url: "frappe.core.api.user_invitation.cancel_invitation",
   method: "PATCH",
   onSuccess() {
-    toast.success("Invitation cancelled successfully");
+    toast.success(__("Invitation cancelled successfully"));
     pendingInvitesResource.fetch();
   },
 });
