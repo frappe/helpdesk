@@ -10,7 +10,9 @@
     <template v-if="!isSyncing && !syncAction.loading" #prefix>
       <LucideRefreshCw class="h-4 w-4" />
     </template>
-    <span>{{ isSyncing ? "Syncing…" : "Sync with ERPNext" }}</span>
+    <span>
+      {{ isSyncing ? __("Syncing…") : __("Sync Customers with ERPNext") }}
+    </span>
   </Button>
 </template>
 
@@ -44,7 +46,7 @@ const showSyncButton = computed(() => {
 const syncAction = createResource({
   url: "helpdesk.integrations.erpnext.api.sync_hd_erpnext_customers",
   onSuccess() {
-    toast.success("Sync started");
+    toast.success(__("Sync started"));
     emit("synced");
   },
 });
