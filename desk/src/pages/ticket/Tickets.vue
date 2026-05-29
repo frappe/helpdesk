@@ -303,10 +303,23 @@ const dropdownOptions = computed(() => {
         {
           label: __("List View"),
           icon: "align-justify",
-          onClick: () =>
+          onClick: () => {
+            // Clear any saved-view selection and reset to plain list.
             router.push({
               name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-            }),
+            });
+            listViewRef.value?.setViewType?.("list");
+          },
+        },
+        {
+          label: __("Kanban"),
+          icon: "columns",
+          onClick: () => {
+            router.push({
+              name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+            });
+            listViewRef.value?.setViewType?.("kanban");
+          },
         },
       ],
     },

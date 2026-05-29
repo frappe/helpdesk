@@ -20,11 +20,6 @@
         v-if="isViewUpdated && canSaveView"
         @click="handleViewUpdate"
       />
-      <ViewTypeSwitch
-        v-if="!options.hideViewTypeSwitch"
-        :model-value="effectiveViewType"
-        @update:model-value="handleViewTypeChange"
-      />
       <Reload @click="handleReload" :loading="list.loading" />
       <Filter :default_filters="defaultParams.filters" />
       <SortBy :hide-label="isMobileView" />
@@ -147,7 +142,6 @@ import {
   QuickFilters,
   Reload,
   SortBy,
-  ViewTypeSwitch,
 } from "@/components/view-controls";
 import { useScreenSize } from "@/composables/screen";
 import {
@@ -398,6 +392,10 @@ const exposeFunctions = {
   list,
   reload,
   unselectAll: () => {},
+  // Lets the parent (e.g. Tickets.vue "Default Views" dropdown) switch
+  // between list / kanban / group_by without rendering an inline toggle.
+  setViewType: handleViewTypeChange,
+  effectiveViewType,
 };
 
 function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
