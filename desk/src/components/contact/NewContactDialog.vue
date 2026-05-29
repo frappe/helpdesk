@@ -166,7 +166,6 @@ const { state, fieldConfig, addContact, isLoading } = useNewContact();
 async function handleAdd() {
   try {
     await addContact();
-    debugger;
     open.value = false;
   } catch (error) {
     console.error("Error adding contact:", error);

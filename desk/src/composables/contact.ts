@@ -100,14 +100,14 @@ export function useContact(name: string) {
       state.emails = sortByPrimary(
         data.email_ids?.map((e: any) => ({
           email_id: e.email_id,
-          isPrimary: e.is_primary,
+          isPrimary: Boolean(e.is_primary),
           key: nextEntryKey(),
         })) || []
       );
       const phones = sortByPrimary(
         data.phone_nos?.map((p: any) => ({
           phone: p.phone,
-          isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
+          isPrimary: Boolean(p.is_primary_phone || p.is_primary_mobile_no),
           key: nextEntryKey(),
         })) || []
       );
@@ -143,7 +143,7 @@ export function useContact(name: string) {
     const savedEmails = sortByPrimary(
       doc.doc?.email_ids?.map((e: any) => ({
         email_id: e.email_id,
-        isPrimary: e.is_primary,
+        isPrimary: Boolean(e.is_primary),
       })) || []
     );
     const currentPhones = sortByPrimary(
@@ -157,7 +157,7 @@ export function useContact(name: string) {
     const savedPhones = sortByPrimary(
       doc.doc?.phone_nos?.map((p: any) => ({
         phone: p.phone,
-        isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
+        isPrimary: Boolean(p.is_primary_phone || p.is_primary_mobile_no),
       })) || []
     );
     const currentTimezone =
@@ -377,14 +377,14 @@ export function useContactState(
       state.emails = sortByPrimary(
         data?.email_ids?.map((e: any) => ({
           email_id: e.email_id,
-          isPrimary: e.is_primary,
+          isPrimary: Boolean(e.is_primary),
           key: nextEntryKey(),
         })) || []
       );
       const phones = sortByPrimary(
         data?.phone_nos?.map((p: any) => ({
           phone: p.phone,
-          isPrimary: p.is_primary_phone || p.is_primary_mobile_no,
+          isPrimary: Boolean(p.is_primary_phone || p.is_primary_mobile_no),
           key: nextEntryKey(),
         })) || []
       );

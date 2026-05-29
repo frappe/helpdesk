@@ -17,11 +17,7 @@
         </Button>
       </template>
     </LayoutHeader>
-    <ListViewBuilder
-      ref="listViewRef"
-      :options="options"
-      @empty-state-action="showNewContactModal = true"
-    />
+    <ListViewBuilder ref="listViewRef" :options="options" />
     <NewContactDialog
       v-model="showNewContactModal"
       @contact-created="handleContactCreated"

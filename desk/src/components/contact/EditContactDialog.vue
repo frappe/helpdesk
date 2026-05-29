@@ -239,7 +239,7 @@ function setPrimary(type: "email" | "phone", index: number) {
       e.isPrimary = i === index;
     });
   } else {
-    const wasPrimary = !!state.phones[index]?.isPrimary;
+    const wasPrimary = Boolean(state.phones[index]?.isPrimary);
     state.phones.forEach((p, i) => {
       p.isPrimary = i === index ? !wasPrimary : false;
     });
