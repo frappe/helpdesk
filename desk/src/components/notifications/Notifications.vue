@@ -13,7 +13,7 @@
     <div
       class="sticky top-0 z-10 flex items-center justify-between border-b bg-surface-white px-5 py-2.5"
     >
-      <span class="text-lg font-medium">Notifications</span>
+      <span class="text-lg font-medium">{{ __("Notifications") }}</span>
       <div>
         <Button
           theme="blue"
@@ -58,14 +58,14 @@
               >
                 {{ n.user_from }}
               </span>
-              <span v-if="n.notification_type === 'Mention'"
-                >mentioned you in ticket</span
-              >
-              <span v-if="n.notification_type === 'Assignment'"
-                >assigned you a ticket</span
-              >
+              <span v-if="n.notification_type === 'Mention'">{{
+                __("mentioned you in ticket")
+              }}</span>
+              <span v-if="n.notification_type === 'Assignment'">{{
+                __("assigned you a ticket")
+              }}</span>
               <span v-if="n.notification_type === 'Reaction'">
-                {{ n.message || "has reopened the ticket" }}
+                {{ n.message || __("has reopened the ticket") }}
               </span>
             </span>
             <span class="font-medium text-ink-gray-9"
@@ -86,7 +86,9 @@
       v-else
     >
       <LucideBell class="size-6" />
-      <p class="text-base text-ink-gray-8">You are all caught up!</p>
+      <p class="text-base text-ink-gray-8">
+        {{ __("You are all caught up!") }}
+      </p>
     </div>
   </span>
 </template>
@@ -94,6 +96,7 @@
 <script setup lang="ts">
 import { UserAvatar } from "@/components";
 import { dayjs } from "@/dayjs";
+import { __ } from "@/translation";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { Notification } from "@/types";

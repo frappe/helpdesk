@@ -3,7 +3,7 @@
     <template #target="{ togglePopover, close }">
       <div class="flex items-center w-fit">
         <Button
-          :label="'Filter'"
+          :label="__('Filter')"
           :class="filters?.size ? 'rounded-r-none' : ''"
           @click="togglePopover"
         >
@@ -16,7 +16,7 @@
             </span>
           </template>
         </Button>
-        <Tooltip v-if="filters?.size" :text="'Clear all Filter'">
+        <Tooltip v-if="filters?.size" :text="__('Clear all Filter')">
           <div>
             <Button
               class="rounded-l-none border-l"
@@ -42,7 +42,7 @@
             <div v-if="isMobileView" class="flex flex-col gap-2">
               <div class="-mb-2 flex w-full items-center justify-between">
                 <div class="text-base text-ink-gray-5">
-                  {{ i == 0 ? "Where" : "And" }}
+                  {{ i == 0 ? __("Where") : __("And") }}
                 </div>
                 <Button
                   class="flex"
@@ -56,7 +56,7 @@
                   v-model="f.field.fieldname"
                   :options="filterableFields.data"
                   @update:modelValue="(e) => updateFilter(e, i)"
-                  :placeholder="'First Name'"
+                  :placeholder="__('First Name')"
                 />
               </div>
               <div id="operator">
@@ -65,7 +65,7 @@
                   v-model="f.operator"
                   @change="(e) => updateOperator(e, f)"
                   :options="getOperators(f.field.fieldtype, f.field.fieldname)"
-                  :placeholder="'Equals'"
+                  :placeholder="__('Equals')"
                 />
               </div>
               <div id="value" class="w-full">
@@ -74,21 +74,21 @@
                   :model-value="f.value"
                   @update:modelValue="(v) => updateValue(v, f)"
                   @change="(v) => updateValue(v, f)"
-                  :placeholder="'John Doe'"
+                  :placeholder="__('John Doe')"
                 />
               </div>
             </div>
             <div v-else class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2 flex-1">
                 <div class="w-13 pl-2 text-end text-base text-ink-gray-5">
-                  {{ i == 0 ? "Where" : "And" }}
+                  {{ i == 0 ? __("Where") : __("And") }}
                 </div>
                 <div id="fieldname" class="!min-w-[140px]">
                   <Autocomplete
                     v-model="f.field.fieldname"
                     :options="filterableFields.data"
                     @update:modelValue="(e) => updateFilter(e, i)"
-                    :placeholder="'First Name'"
+                    :placeholder="__('First Name')"
                   />
                 </div>
                 <div id="operator">
@@ -100,7 +100,7 @@
                     :options="
                       getOperators(f.field.fieldtype, f.field.fieldname)
                     "
-                    :placeholder="'Equals'"
+                    :placeholder="__('Equals')"
                   />
                 </div>
                 <div id="value" class="!min-w-[140px] flex-1">
@@ -109,7 +109,7 @@
                     :model-value="f.value"
                     @change="(v) => updateValue(v, f)"
                     @update:modelValue="(v) => updateValue(v, f)"
-                    :placeholder="'John Doe'"
+                    :placeholder="__('John Doe')"
                   />
                 </div>
               </div>
@@ -125,20 +125,20 @@
             v-else
             class="mb-3 flex h-7 items-center px-3 text-sm text-ink-gray-5"
           >
-            {{ "Empty - Choose a field to filter by" }}
+            {{ __("Empty - Choose a field to filter by") }}
           </div>
           <div class="flex items-center justify-between gap-2">
             <Autocomplete
               :options="filterableFields.data"
               @update:modelValue="(e) => setfilter(e)"
-              :placeholder="'First name'"
+              :placeholder="__('First name')"
             >
               <template #target="{ togglePopover }">
                 <Button
                   class="!text-ink-gray-5"
                   variant="ghost"
                   @click="togglePopover()"
-                  :label="'Add Filter'"
+                  :label="__('Add Filter')"
                 >
                   <template #prefix>
                     <FeatherIcon name="plus" class="h-4" />
@@ -150,7 +150,7 @@
               v-if="filters?.size"
               class="!text-ink-gray-5"
               variant="ghost"
-              :label="'Clear all Filter'"
+              :label="__('Clear all Filter')"
               @click="clearfilter(close)"
             />
           </div>
@@ -162,6 +162,7 @@
 <script setup>
 import { Link, StarRating } from "@/components";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
+import { __ } from "@/translation";
 import { useScreenSize } from "@/composables/screen";
 import { useDebounceFn } from "@vueuse/core";
 import {
@@ -238,34 +239,34 @@ function getOperators(fieldtype, fieldname) {
   if (typeString.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
-        { label: "Like", value: "like" },
-        { label: "Not Like", value: "not like" },
-        { label: "In", value: "in" },
-        { label: "Not In", value: "not in" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "equals" },
+        { label: __("Not Equals"), value: "not equals" },
+        { label: __("Like"), value: "like" },
+        { label: __("Not Like"), value: "not like" },
+        { label: __("In"), value: "in" },
+        { label: __("Not In"), value: "not in" },
+        { label: __("Is"), value: "is" },
       ]
     );
   }
   if (fieldname === "_assign") {
     // TODO: make equals and not equals work
     options = [
-      { label: "Like", value: "like" },
-      { label: "Not Like", value: "not like" },
-      { label: "Is", value: "is" },
+      { label: __("Like"), value: "like" },
+      { label: __("Not Like"), value: "not like" },
+      { label: __("Is"), value: "is" },
     ];
   }
   if (typeNumber.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
-        { label: "Like", value: "like" },
-        { label: "Not Like", value: "not like" },
-        { label: "In", value: "in" },
-        { label: "Not In", value: "not in" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "equals" },
+        { label: __("Not Equals"), value: "not equals" },
+        { label: __("Like"), value: "like" },
+        { label: __("Not Like"), value: "not like" },
+        { label: __("In"), value: "in" },
+        { label: __("Not In"), value: "not in" },
+        { label: __("Is"), value: "is" },
         { label: "<", value: "<" },
         { label: ">", value: ">" },
         { label: "<=", value: "<=" },
@@ -276,62 +277,62 @@ function getOperators(fieldtype, fieldname) {
   if (typeSelect.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
-        { label: "In", value: "in" },
-        { label: "Not In", value: "not in" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "equals" },
+        { label: __("Not Equals"), value: "not equals" },
+        { label: __("In"), value: "in" },
+        { label: __("Not In"), value: "not in" },
+        { label: __("Is"), value: "is" },
       ]
     );
   }
   if (typeLink.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
-        { label: "Like", value: "like" },
-        { label: "Not Like", value: "not like" },
-        { label: "In", value: "in" },
-        { label: "Not In", value: "not in" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "equals" },
+        { label: __("Not Equals"), value: "not equals" },
+        { label: __("Like"), value: "like" },
+        { label: __("Not Like"), value: "not like" },
+        { label: __("In"), value: "in" },
+        { label: __("Not In"), value: "not in" },
+        { label: __("Is"), value: "is" },
       ]
     );
   }
   if (typeCheck.includes(fieldtype)) {
-    options.push(...[{ label: "Equals", value: "equals" }]);
+    options.push(...[{ label: __("Equals"), value: "equals" }]);
   }
   if (["Duration"].includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Like", value: "like" },
-        { label: "Not Like", value: "not like" },
-        { label: "In", value: "in" },
-        { label: "Not In", value: "not in" },
-        { label: "Is", value: "is" },
+        { label: __("Like"), value: "like" },
+        { label: __("Not Like"), value: "not like" },
+        { label: __("In"), value: "in" },
+        { label: __("Not In"), value: "not in" },
+        { label: __("Is"), value: "is" },
       ]
     );
   }
   if (typeDate.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "equals" },
+        { label: __("Not Equals"), value: "not equals" },
+        { label: __("Is"), value: "is" },
         { label: ">", value: ">" },
         { label: "<", value: "<" },
         { label: ">=", value: ">=" },
         { label: "<=", value: "<=" },
-        { label: "Between", value: "between" },
-        { label: "Timespan", value: "timespan" },
+        { label: __("Between"), value: "between" },
+        { label: __("Timespan"), value: "timespan" },
       ]
     );
   }
   if (typeRating.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
-        { label: "Is", value: "is" },
+        { label: __("Equals"), value: "equals" },
+        { label: __("Not Equals"), value: "not equals" },
+        { label: __("Is"), value: "is" },
         { label: ">", value: ">" },
         { label: "<", value: "<" },
         { label: ">=", value: ">=" },
@@ -350,11 +351,11 @@ function getValueControl(f) {
       type: "select",
       options: [
         {
-          label: "Set",
+          label: __("Set"),
           value: "set",
         },
         {
-          label: "Not Set",
+          label: __("Not Set"),
           value: "not set",
         },
       ],
@@ -612,35 +613,35 @@ const oppositeOperatorMap = {
 };
 
 const timespanOptions = [
-  { label: "Last 7 Days", value: "last 7 days" },
-  { label: "Last 14 Days", value: "last 14 days" },
-  { label: "Last 30 Days", value: "last 30 days" },
-  { label: "Last 90 Days", value: "last 90 days" },
+  { label: __("Last 7 Days"), value: "last 7 days" },
+  { label: __("Last 14 Days"), value: "last 14 days" },
+  { label: __("Last 30 Days"), value: "last 30 days" },
+  { label: __("Last 90 Days"), value: "last 90 days" },
 
-  { label: "Last Week", value: "last week" },
-  { label: "Last Month", value: "last month" },
-  { label: "Last Quarter", value: "last quarter" },
-  { label: "Last 6 Months", value: "last 6 months" },
-  { label: "Last Year", value: "last year" },
+  { label: __("Last Week"), value: "last week" },
+  { label: __("Last Month"), value: "last month" },
+  { label: __("Last Quarter"), value: "last quarter" },
+  { label: __("Last 6 Months"), value: "last 6 months" },
+  { label: __("Last Year"), value: "last year" },
 
-  { label: "Yesterday", value: "yesterday" },
-  { label: "Today", value: "today" },
-  { label: "Tomorrow", value: "tomorrow" },
+  { label: __("Yesterday"), value: "yesterday" },
+  { label: __("Today"), value: "today" },
+  { label: __("Tomorrow"), value: "tomorrow" },
 
-  { label: "This Week", value: "this week" },
-  { label: "This Month", value: "this month" },
-  { label: "This Quarter", value: "this quarter" },
-  { label: "This Year", value: "this year" },
+  { label: __("This Week"), value: "this week" },
+  { label: __("This Month"), value: "this month" },
+  { label: __("This Quarter"), value: "this quarter" },
+  { label: __("This Year"), value: "this year" },
 
-  { label: "Next 7 Days", value: "next 7 days" },
-  { label: "Next 14 Days", value: "next 14 days" },
-  { label: "Next 30 Days", value: "next 30 days" },
+  { label: __("Next 7 Days"), value: "next 7 days" },
+  { label: __("Next 14 Days"), value: "next 14 days" },
+  { label: __("Next 30 Days"), value: "next 30 days" },
 
-  { label: "Next Week", value: "next week" },
-  { label: "Next Month", value: "next month" },
-  { label: "Next Quarter", value: "next quarter" },
-  { label: "Next 6 Months", value: "next 6 months" },
-  { label: "Next Year", value: "next year" },
+  { label: __("Next Week"), value: "next week" },
+  { label: __("Next Month"), value: "next month" },
+  { label: __("Next Quarter"), value: "next quarter" },
+  { label: __("Next 6 Months"), value: "next 6 months" },
+  { label: __("Next Year"), value: "next year" },
 ];
 
 const debouncedApply = useDebounceFn(() => {

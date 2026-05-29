@@ -3,11 +3,11 @@
     v-if="!sortValues?.size"
     :options="options"
     value=""
-    :placeholder="'First Name'"
+    :placeholder="__('First Name')"
     @change="(e) => setSort(e)"
   >
     <template #target="{ togglePopover }">
-      <Button :label="'Sort'" @click="togglePopover()">
+      <Button :label="__('Sort')" @click="togglePopover()">
         <template v-if="hideLabel">
           <SortIcon class="h-4" />
         </template>
@@ -19,7 +19,7 @@
   </Autocomplete>
   <NestedPopover v-else>
     <template #target="{ open }">
-      <Button v-if="sortValues.size > 1" :label="'Sort'">
+      <Button v-if="sortValues.size > 1" :label="__('Sort')">
         <template v-if="hideLabel">
           <SortIcon class="h-4" />
         </template>
@@ -103,7 +103,7 @@
                   :value="sort.fieldname"
                   :options="sortOptions.data"
                   @change="(e) => updateSort(e, i)"
-                  :placeholder="'First Name'"
+                  :placeholder="__('First Name')"
                 >
                   <template
                     #target="{ togglePopover, selectedValue, displayValue }"
@@ -131,13 +131,13 @@
             v-else
             class="mb-3 flex h-7 items-center px-3 text-sm text-ink-gray-5"
           >
-            {{ "Empty - Choose a field to sort by" }}
+            {{ __("Empty - Choose a field to sort by") }}
           </div>
           <div class="flex items-center justify-between gap-2">
             <Autocomplete
               :options="options"
               value=""
-              :placeholder="'First Name'"
+              :placeholder="__('First Name')"
               @change="(e) => setSort(e)"
             >
               <template #target="{ togglePopover }">
@@ -145,7 +145,7 @@
                   class="!text-ink-gray-5"
                   variant="ghost"
                   @click="togglePopover()"
-                  :label="'Add Sort'"
+                  :label="__('Add Sort')"
                 >
                   <template #prefix>
                     <FeatherIcon name="plus" class="h-4" />
@@ -157,7 +157,7 @@
               v-if="sortValues?.size"
               class="!text-ink-gray-5"
               variant="ghost"
-              :label="'Clear Sort'"
+              :label="__('Clear Sort')"
               @click="clearSort(close)"
             />
           </div>
@@ -169,6 +169,7 @@
 
 <script setup>
 import { computed, inject } from "vue";
+import { __ } from "@/translation";
 import { NestedPopover } from "frappe-ui";
 import { useSortable } from "@vueuse/integrations/useSortable";
 import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
@@ -228,7 +229,7 @@ const sortSortable = useSortable("#sort-list", sortValues, {
 });
 
 function getSortLabel() {
-  if (!sortValues.value.size) return "Sort";
+  if (!sortValues.value.size) return __("Sort");
   let values = Array.from(sortValues.value);
   let label = sortOptions.data?.find(
     (option) => option.value === values[0].fieldname
