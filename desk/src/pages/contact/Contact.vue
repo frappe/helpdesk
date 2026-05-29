@@ -70,13 +70,13 @@
                 :ticketsListResource="ticketsListResource"
                 :baseFilter="{ contact: props.id }"
                 :additionalFilter="
-                (contact.getInfo.data?.customers?.length ?? 0) > 1
+                (contactInfoResource.data?.customers?.length ?? 0) > 1
                   ? {
                       key: 'customer',
                       placeholder: __('Customer'),
                       doctype: 'HD Customer',
                       filters: {
-                        name: ['in', contact.getInfo.data.customers.map((c: { name: string }) => c.name)],
+                        name: ['in', contactInfoResource.data.customers.map((c: { name: string }) => c.name)],
                       },
                     }
                   : undefined
@@ -140,7 +140,11 @@ const route = useRoute();
 const router = useRouter();
 const { isMobileView } = useScreenSize();
 
-const { doc: contact, handleDelete } = useContact(props.id);
+const {
+  doc: contact,
+  contactInfoResource,
+  handleDelete,
+} = useContact(props.id);
 
 const { feedbackCount } = useContactFeedback(props.id);
 
@@ -172,7 +176,11 @@ const activeTab = computed<number>({
 });
 
 const contactInfo = computed(() => {
-  if (contact.getInfo.loading || !contact.getInfo.data || !contact.doc?.name) {
+  if (
+    contactInfoResource.loading ||
+    !contactInfoResource.data ||
+    !contact.doc?.name
+  ) {
     return [];
   }
   const info = [
@@ -188,8 +196,8 @@ const contactInfo = computed(() => {
     },
     {
       icon: markRaw(LucideMapPin),
-      value: contact.getInfo?.data?.country,
-      condition: !!contact.getInfo?.data?.country,
+      value: contactInfoResource.data?.country,
+      condition: !!contactInfoResource.data?.country,
     },
   ];
   return info;
@@ -205,7 +213,7 @@ const { resetPassword, isLoading: isResetPasswordLoading } =
 
 const showEditDialog = ref(false);
 
-const invitation = computed(() => contact.getInfo.data?.invitation);
+const invitation = computed(() => contactInfoResource.data?.invitation);
 
 const invitationBadge = computed(() => {
   const inv = invitation.value;
@@ -234,7 +242,7 @@ const dropdownActions = computed(() => {
       icon: "user-plus",
       onClick: async () => {
         await inviteAsUser(props.id, contact.doc?.email_id);
-        contact.getInfo.reload();
+        contactInfoResource.reload();
       },
     });
   }
@@ -249,7 +257,7 @@ const dropdownActions = computed(() => {
           props.id,
           contact.doc?.email_id
         );
-        contact.getInfo.reload();
+        contactInfoResource.reload();
       },
     });
   }
@@ -297,7 +305,6 @@ const breadcrumbs = [
 ];
 
 onMounted(() => {
-  contact.getInfo.fetch();
   ticketsListResource.update({
     filters: {
       contact: props.id,

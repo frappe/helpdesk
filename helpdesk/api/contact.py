@@ -5,6 +5,8 @@ from frappe.core.api.user_invitation import invite_by_email
 from frappe.desk.reportview import delete_bulk
 from frappe.utils import validate_phone_number_with_country_code
 
+from helpdesk.utils import get_country_from_timezone, get_customers
+
 
 @frappe.whitelist(methods=["GET"])
 def search_contacts(
@@ -141,3 +143,46 @@ def edit_contact(name: str, doc: dict):
         user_doc.save()
 
     return contact_doc.name
+
+
+@frappe.whitelist(methods=["GET"])
+def get_contact_info(name: str) -> dict:
+    frappe.has_permission("Contact", "read", doc=name, throw=True)
+    contact = frappe.get_doc("Contact", name)
+    primary_email = contact.email_ids[0].email_id if contact.email_ids else None
+
+    result = {
+        "customers": get_customers_with_image(name),
+        "invitation": get_invitation(name, primary_email),
+    }
+    if contact.user:
+        time_zone = frappe.db.get_value("User", contact.user, "time_zone")
+        if time_zone:
+            result["timezone"] = time_zone
+            result["country"] = get_country_from_timezone(time_zone)
+    return result
+
+
+def get_customers_with_image(name: str) -> list[dict]:
+    customers = get_customers(contact=name)
+    return [
+        {"name": c, "image": frappe.db.get_value("HD Customer", c, "image")}
+        for c in customers
+    ]
+
+
+def get_invitation(name: str, email: str | None) -> dict | None:
+    if not email:
+        return None
+    return frappe.db.get_value(
+        "User Invitation",
+        {
+            "contact": name,
+            "status": ["!=", "Accepted"],
+            "email": email,
+            "app_name": "helpdesk",
+        },
+        ["name", "status"],
+        as_dict=True,
+        order_by="creation desc",
+    )

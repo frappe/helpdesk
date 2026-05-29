@@ -47,8 +47,15 @@ type FieldType =
 
 type AutocompleteOption = string;
 
-// Local Cache to store contact document resources to avoid multiple DB calls in a single session.
-const contactCache: Record<string, DocumentResource<Contact>> = {};
+type ContactInfoResource = ReturnType<typeof createResource>;
+
+interface ContactBundle {
+  doc: DocumentResource<Contact>;
+  info: ContactInfoResource;
+}
+
+// Local Cache to store contact document + info resources to avoid multiple DB calls in a single session.
+const contactCache: Record<string, ContactBundle> = {};
 
 let entryKeyCounter = 0;
 export const nextEntryKey = () => ++entryKeyCounter;
@@ -65,7 +72,7 @@ function sortByPrimary<T extends { isPrimary: boolean }>(arr: T[]): T[] {
 
 export function useContact(name: string) {
   const router = useRouter();
-  const doc = findContactDoc();
+  const { doc, info: contactInfoResource } = findContact();
   const { state, resetState } = useContactState(false, doc);
 
   async function handleDelete({
@@ -112,7 +119,7 @@ export function useContact(name: string) {
   );
 
   watch(
-    () => doc.getInfo?.data,
+    () => contactInfoResource.data,
     (data) => {
       state.timezone = { value: data?.timezone, label: data?.timezone };
     },
@@ -157,7 +164,7 @@ export function useContact(name: string) {
       typeof state.timezone === "string"
         ? state.timezone
         : (state.timezone as any)?.value || "";
-    const savedTimezone = doc.getInfo?.data?.timezone || "";
+    const savedTimezone = contactInfoResource.data?.timezone || "";
     return (
       state.firstName !== (doc.doc?.first_name || "") ||
       state.lastName !== (doc.doc?.last_name || "") ||
@@ -168,20 +175,19 @@ export function useContact(name: string) {
     );
   });
 
-  function findContactDoc(): DocumentResource<Contact> {
-    const key: string = name;
-    if (contactCache.hasOwnProperty(key)) return contactCache[key];
-    else {
-      const newDoc = createDocumentResource({
-        doctype: "Contact",
-        name: name,
-        whitelistedMethods: {
-          getInfo: "get_info",
-        },
-      });
-      contactCache[key] = newDoc;
-      return newDoc;
-    }
+  function findContact(): ContactBundle {
+    if (contactCache.hasOwnProperty(name)) return contactCache[name];
+    const bundle: ContactBundle = {
+      doc: createDocumentResource({ doctype: "Contact", name }),
+      info: createResource({
+        url: "helpdesk.api.contact.get_contact_info",
+        method: "GET",
+        params: { name },
+        auto: true,
+      }),
+    };
+    contactCache[name] = bundle;
+    return bundle;
   }
 
   function parseContactData() {
@@ -237,6 +243,7 @@ export function useContact(name: string) {
 
   return {
     doc,
+    contactInfoResource,
     state,
     resetState,
     isContactInfoChanged,

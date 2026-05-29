@@ -183,8 +183,14 @@ import ContactInputRow from "./ContactInputRow.vue";
 const props = defineProps<{ name: string }>();
 const open = defineModel<boolean>({ default: false });
 
-const { state, parseContactData, isDirty, editContactResource, doc } =
-  useContact(props.name);
+const {
+  state,
+  parseContactData,
+  isDirty,
+  editContactResource,
+  doc,
+  contactInfoResource,
+} = useContact(props.name);
 
 const autofocusKey = ref<number | null>(null);
 
@@ -239,7 +245,8 @@ function setPrimary(type: "email" | "phone", index: number) {
 }
 
 async function handleSave() {
-  if (!isDirty.value && doc.getInfo?.data?.timezone === state.timezone) return;
+  if (!isDirty.value && contactInfoResource.data?.timezone === state.timezone)
+    return;
   editContactResource.submit(
     {
       name: props.name,
@@ -249,7 +256,7 @@ async function handleSave() {
       onSuccess: () => {
         open.value = false;
         doc.reload();
-        doc.getInfo.reload();
+        contactInfoResource.reload();
       },
     }
   );

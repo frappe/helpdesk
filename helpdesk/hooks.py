@@ -102,7 +102,6 @@ override_doctype_class = {
     "Customer": "helpdesk.integrations.erpnext.customer.CustomCustomer",
     "User Permission": "helpdesk.integrations.erpnext.user_permission.CustomUserPermission",
     "DocShare": "helpdesk.integrations.erpnext.doc_share.CustomDocShare",
-    "Contact": "helpdesk.overrides.contact.CustomContact",
 }
 
 ignore_links_on_delete = [
