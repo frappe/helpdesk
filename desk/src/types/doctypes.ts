@@ -344,8 +344,6 @@ export interface HDTeam extends DocType {
 export interface HDCustomerMember extends ChildDocType {
   /** Is Manager: Check */
   is_manager: 0 | 1;
-  /** Is Primary: Check */
-  is_primary: 0 | 1;
   /** Name: Link (Contact) */
   contact_name: string;
 }
@@ -364,7 +362,7 @@ export interface HDCustomer extends DocType {
   mobile_no?: string;
   /** Email ID: Data */
   email_id?: string;
-  /** Primary Contact: Data */
+  /** Primary Contact: Link (Contact) */
   primary_contact?: string;
   /** Country: Link (Country) */
   country?: string;

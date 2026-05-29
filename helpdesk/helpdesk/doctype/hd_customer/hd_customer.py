@@ -43,72 +43,30 @@ class HDCustomer(Document):
         self.validate_contacts()
 
     def validate_contacts(self):
-        if len(self.contacts) == 0:
+        if not self.contacts:
             return
+        # default primary to the first contact if none is set yet
+        if not self.primary_contact:
+            self.primary_contact = self.contacts[0].contact_name
 
-        if len(self.contacts) == 1:
-            # make the first contact primary if there is only one contact
-            self.contacts[0].is_primary = True
-
-        old_contacts = (
-            self.get_doc_before_save().contacts if self.get_doc_before_save() else []
-        )
-        primary_contacts = [contact for contact in self.contacts if contact.is_primary]
-
-        # if len(primary_contacts) == 0 and len(old_contacts) > 0:
-        #     frappe.throw(_("At least one primary contact is required"))
-
-        if len(primary_contacts) > 1:
-            frappe.throw(_("Only one primary contact is allowed"))
-
-        # check for duplicate contacts
         contact_names = [contact.contact_name for contact in self.contacts]
         if len(contact_names) != len(set(contact_names)):
             frappe.throw(_("Duplicate contacts are not allowed"))
 
+        if self.primary_contact and self.primary_contact not in contact_names:
+            frappe.throw(_("Primary contact must be one of the listed contacts"))
+
     def before_save(self):
-        self.set_primary_contact_details()
-        self.set_manager_if_not_exists()
+        self.ensure_primary_contact_is_manager()
         self.link_contact_to_user()
         self.handle_roles()
 
-    def set_primary_contact_details(self):
-        if not self.contacts:
+    def ensure_primary_contact_is_manager(self):
+        if not self.contacts or not self.primary_contact:
             return
-
-        primary_contact = [
-            contact.contact_name for contact in self.contacts if contact.is_primary
-        ]
-        if not primary_contact:
-            return
-
-        self.primary_contact = primary_contact[0]
-
-        [email, mobile_no, phone] = frappe.get_value(
-            "Contact",
-            primary_contact,
-            ["email_id", "mobile_no", "phone"],
-        )
-
-        self.email_id = email
-        self.mobile_no = mobile_no or phone
-
-    def set_manager_if_not_exists(self):
-        if not self.contacts:
-            return
-        manager_contact = [
-            contact.contact_name for contact in self.contacts if contact.is_manager
-        ]
-        if manager_contact:
-            return
-        primary_contact = [
-            contact.contact_name for contact in self.contacts if contact.is_primary
-        ]
-        if not primary_contact:
-            return
-        primary_contact = primary_contact[0]
         for contact in self.contacts:
-            contact.is_manager = contact.contact_name == primary_contact
+            if contact.contact_name == self.primary_contact:
+                contact.is_manager = True
 
     def link_contact_to_user(self):
         for contact in self.contacts:
@@ -181,7 +139,7 @@ class HDCustomer(Document):
             result.append(
                 {
                     "contact_name": contact.contact_name,
-                    "is_primary": contact.is_primary,
+                    "is_primary": int(contact.contact_name == self.primary_contact),
                     "is_manager": contact.is_manager,
                     "email_id": email_id,
                     "mobile_no": mobile_no or phone,
@@ -194,7 +152,7 @@ class HDCustomer(Document):
                     ),
                 }
             )
-            # result = sort by is_primary first then is_manager
+            # sort by is_primary first then is_manager
             result.sort(
                 key=lambda x: (not x["is_primary"], not x["is_manager"]),
             )

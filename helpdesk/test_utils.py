@@ -382,7 +382,9 @@ def update_role_in_customer(customer, contact, role="HD Customer", is_primary=Fa
         if c.get("contact_name") != contact:
             continue
         c.is_manager = is_manager
-        c.is_primary = is_primary
+
+    if is_primary:
+        customer.primary_contact = contact
 
     customer.save()
 
@@ -391,11 +393,10 @@ def add_contact_in_customer(customer, contact, is_manager=False, is_primary=Fals
     frappe.set_user("Administrator")
     customer.append(
         "contacts",
-        {"contact_name": contact, "is_manager": is_manager, "is_primary": is_primary},
+        {"contact_name": contact, "is_manager": is_manager},
     )
-    for c in customer.get("contacts", []):
-        if c.get("contact_name") != contact and is_primary:
-            c.is_primary = False
+    if is_primary:
+        customer.primary_contact = contact
 
     customer.save()
 

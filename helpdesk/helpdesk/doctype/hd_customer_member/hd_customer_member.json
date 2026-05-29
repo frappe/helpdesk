@@ -7,8 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "contact_name",
-  "is_manager",
-  "is_primary"
+  "is_manager"
  ],
  "fields": [
   {
@@ -17,13 +16,6 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Is Manager"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_primary",
-   "fieldtype": "Check",
-   "in_list_view": 1,
-   "label": "Is Primary"
   },
   {
    "fieldname": "contact_name",

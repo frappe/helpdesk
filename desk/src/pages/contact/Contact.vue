@@ -263,7 +263,7 @@ const dropdownActions = computed(() => {
   }
   if (contact.doc?.user) {
     baseActions.push({
-      label: __("Send Reset Password Email"),
+      label: __("Send reset password email"),
       icon: "mail",
       onClick: () => {
         resetPassword();

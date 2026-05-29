@@ -114,10 +114,6 @@ function goToContact() {
   router.push({ name: "Contact", params: { id: props.contact.contact_name } });
 }
 
-function findPrimaryContact(): HDCustomerMember | undefined {
-  return customer.doc.contacts?.find((c) => c.is_primary === 1);
-}
-
 const contactDetails = computed(() => [
   {
     icon: markRaw(LucideMail),
@@ -154,9 +150,7 @@ const dropdownOptions = computed(() => {
       label: __("Set as Primary"),
       icon: "star",
       onClick: () => {
-        /* TODO: set as primary action */
-        console.log("Set as primary");
-        updatePrimaryContact(1);
+        updatePrimaryContact();
       },
     });
   }
@@ -233,23 +227,11 @@ function updateManagerRole(isManager: 0 | 1) {
   );
 }
 
-function updatePrimaryContact(isPrimary: 0 | 1) {
-  // find the contact with is_primary = 1 and set it to 0
-  const primaryContact = findPrimaryContact();
-  if (primaryContact) {
-    primaryContact.is_primary = 0;
-  }
-  // find the current contact and set it to 1
-  const currentContact = customer.doc.contacts?.find(
-    (c) => c.contact_name === props.contact.contact_name
-  ) as HDCustomerMember | undefined;
-  if (!currentContact) return;
-  // if both same return
-  if (currentContact.is_primary === isPrimary) return;
-  currentContact.is_primary = isPrimary;
+function updatePrimaryContact() {
+  if (customer.doc.primary_contact === props.contact.contact_name) return;
   customer.setValue.submit(
     {
-      contacts: customer.doc.contacts,
+      primary_contact: props.contact.contact_name,
     },
     {
       onSuccess() {
