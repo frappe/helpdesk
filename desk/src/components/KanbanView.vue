@@ -15,7 +15,7 @@
     <div
       v-for="col in columns"
       :key="col.key"
-      class="flex h-full min-w-72 w-72 shrink-0 flex-col gap-2.5 rounded-lg p-2.5"
+      class="flex h-full min-w-72 w-72 shrink-0 flex-col gap-2.5 rounded-lg p-2.5 transition-colors hover:bg-surface-gray-2"
     >
       <!-- Column header -->
       <div class="flex items-center justify-between px-1">
@@ -40,7 +40,7 @@
       >
         <template #item="{ element: row }">
           <div
-            class="group flex flex-col gap-1.5 rounded-lg bg-surface-white px-3.5 py-3 text-base text-ink-gray-9 hover:bg-surface-gray-1"
+            class="group flex flex-col gap-1.5 rounded-lg border border-outline-gray-2 bg-surface-white px-3.5 py-3 text-base text-ink-gray-9 shadow-sm transition-colors hover:border-outline-gray-3 hover:bg-surface-gray-1"
             :data-name="row.name"
           >
             <component
