@@ -3,7 +3,7 @@
     <Pill
       v-for="item in items"
       :key="item.value"
-      :label="item.label"
+      :label="__(item.label)"
       @click="(i) => remove(i)"
     />
 

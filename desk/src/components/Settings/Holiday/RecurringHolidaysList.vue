@@ -12,7 +12,7 @@
         :key="column.key"
         class="text-ink-gray-5 overflow-hidden whitespace-nowrap text-ellipsis"
       >
-        {{ column.label }}
+        {{ __(column.label) }}
       </div>
     </div>
     <hr class="my-0.5" v-if="holidays?.length !== 0" />

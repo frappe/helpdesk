@@ -47,7 +47,7 @@
             :key="option.value"
             :value="option.value"
           >
-            {{ option.label }}
+            {{ __(option.label) }}
           </option>
         </select>
       </div>

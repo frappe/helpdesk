@@ -57,8 +57,8 @@
                   >
                     <Link
                       v-model="customState.domain"
-                      :label="field.label"
-                      :placeholder="field.placeholder"
+                      :label="__(field.label)"
+                      :placeholder="__(field.placeholder)"
                       doctype="Email Domain"
                       :onCreate="handleCreateDomainClick"
                     />
@@ -75,10 +75,10 @@
                   <FormControl
                     v-else
                     v-model="state[field.name]"
-                    :label="field.label"
+                    :label="__(field.label)"
                     :name="field.name"
                     :type="field.type"
-                    :placeholder="field.placeholder"
+                    :placeholder="__(field.placeholder)"
                   />
                 </div>
               </div>
@@ -94,10 +94,10 @@
                   >
                     <FormControl
                       v-model="customState[field.name]"
-                      :label="field.label"
+                      :label="__(field.label)"
                       :name="field.name"
                       :type="field.type"
-                      :placeholder="field.placeholder"
+                      :placeholder="__(field.placeholder)"
                     />
                   </div>
                 </div>
@@ -109,10 +109,10 @@
                   >
                     <FormControl
                       v-model="customState[field.name]"
-                      :label="field.label"
+                      :label="__(field.label)"
                       :name="field.name"
                       :type="field.type"
-                      :placeholder="field.placeholder"
+                      :placeholder="__(field.placeholder)"
                     />
                   </div>
                 </div>
@@ -125,12 +125,12 @@
                 >
                   <FormControl
                     v-model="state[field.name]"
-                    :label="field.label"
+                    :label="__(field.label)"
                     :name="field.name"
                     :type="field.type"
                   />
                   <p class="text-ink-gray-4 text-p-sm">
-                    {{ field.description }}
+                    {{ __(field.description) }}
                   </p>
                 </div>
               </div>

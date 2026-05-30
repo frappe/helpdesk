@@ -95,7 +95,7 @@
                       togglePopover();
                     "
                   >
-                    {{ option.label }}
+                    {{ __(option.label) }}
                     <FeatherIcon
                       v-if="assignmentRuleData.priority == option.value"
                       name="check"

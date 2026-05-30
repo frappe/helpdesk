@@ -113,7 +113,7 @@
                       size="md"
                       @click="togglePopover()"
                     >
-                      {{ displayValue(selectedValue) }}
+                      {{ __(displayValue(selectedValue)) }}
                       <template #suffix>
                         <FeatherIcon
                           name="chevron-down"
@@ -235,7 +235,7 @@ function getSortLabel() {
     (option) => option.value === values[0].fieldname
   )?.label;
 
-  return label || sort.fieldname;
+  return __(label) || __(sort.fieldname);
 }
 
 function setSort(data) {

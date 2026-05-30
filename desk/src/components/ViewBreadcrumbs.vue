@@ -12,7 +12,7 @@
         <Button
           variant="ghost"
           class="text-lg font-medium text-nowrap truncate max-w-[200px] sm:max-w-none"
-          :label="currentView.label"
+          :label="__(currentView.label)"
         >
           <template #prefix>
             <component
@@ -45,7 +45,7 @@
 
       <template #item-label="{ item }">
         <div class="flex items-center min-w-0 max-w-[50vw]">
-          <span class="truncate">{{ item.label }}</span>
+          <span class="truncate">{{ __(item.label) }}</span>
           <Badge
             v-if="item.is_standard"
             class="ml-1 flex-shrink-0"

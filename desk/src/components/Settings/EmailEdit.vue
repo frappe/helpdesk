@@ -20,7 +20,7 @@
             />
             <div class="text-wrap text-xs text-ink-gray-7 flex flex-col gap-1">
               <span>
-                {{ info.description }}
+                {{ __(info.description) }}
                 <a
                   :href="info.link"
                   target="_blank"
@@ -50,8 +50,8 @@
                 <div v-if="field.name === 'domain'" class="flex flex-col gap-2">
                   <Link
                     v-model="customState.domain"
-                    :label="field.label"
-                    :placeholder="field.placeholder"
+                    :label="__(field.label)"
+                    :placeholder="__(field.placeholder)"
                     doctype="Email Domain"
                     :onCreate="handleCreateDomainClick"
                   />
@@ -68,10 +68,10 @@
                 <FormControl
                   v-else
                   v-model="state[field.name]"
-                  :label="field.label"
+                  :label="__(field.label)"
                   :name="field.name"
                   :type="field.type"
-                  :placeholder="field.placeholder"
+                  :placeholder="__(field.placeholder)"
                 />
               </div>
             </div>
@@ -87,10 +87,10 @@
                 >
                   <FormControl
                     v-model="customState[field.name]"
-                    :label="field.label"
+                    :label="__(field.label)"
                     :name="field.name"
                     :type="field.type"
-                    :placeholder="field.placeholder"
+                    :placeholder="__(field.placeholder)"
                   />
                 </div>
               </div>
@@ -102,10 +102,10 @@
                 >
                   <FormControl
                     v-model="customState[field.name]"
-                    :label="field.label"
+                    :label="__(field.label)"
                     :name="field.name"
                     :type="field.type"
-                    :placeholder="field.placeholder"
+                    :placeholder="__(field.placeholder)"
                   />
                 </div>
               </div>
@@ -118,11 +118,13 @@
               >
                 <FormControl
                   v-model="state[field.name]"
-                  :label="field.label"
+                  :label="__(field.label)"
                   :name="field.name"
                   :type="field.type"
                 />
-                <p class="text-p-sm text-ink-gray-4">{{ field.description }}</p>
+                <p class="text-p-sm text-ink-gray-4">
+                  {{ __(field.description) }}
+                </p>
               </div>
             </div>
             <ErrorMessage v-if="error" class="ml-1" :message="error" />

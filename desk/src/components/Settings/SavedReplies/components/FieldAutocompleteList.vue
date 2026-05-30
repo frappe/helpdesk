@@ -18,7 +18,7 @@
       @click.stop.prevent="selectItem(index)"
       @mouseover="selectedIndex = index"
     >
-      {{ item.label }}
+      {{ __(item.label) }}
     </button>
   </div>
 </template>

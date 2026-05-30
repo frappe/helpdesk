@@ -15,7 +15,7 @@
           'ml-2': column.key === 'workday',
         }"
       >
-        {{ column.label }}
+        {{ __(column.label) }}
         <span v-if="column.isRequired" class="text-ink-red-3">*</span>
       </div>
     </div>

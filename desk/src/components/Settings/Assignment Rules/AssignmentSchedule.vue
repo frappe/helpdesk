@@ -9,7 +9,7 @@
         :key="column.key"
         class="text-ink-gray-5 overflow-hidden whitespace-nowrap text-ellipsis"
       >
-        {{ column.label }}
+        {{ __(column.label) }}
       </div>
     </div>
     <hr />

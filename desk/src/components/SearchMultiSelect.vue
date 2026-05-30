@@ -32,7 +32,7 @@
             <span class="text-ink-gray-7">
               {{
                 selectedCount === 1
-                  ? selectedOptions[0]?.label
+                  ? __(selectedOptions[0]?.label)
                   : `${selectedCount} ${selectionText}`
               }}
             </span>
@@ -105,7 +105,7 @@
             />
 
             <span class="text-ink-gray-7 flex-1 text-left truncate">
-              {{ option.label }}
+              {{ __(option.label) }}
             </span>
 
             <span
@@ -156,7 +156,7 @@
             ></div>
 
             <span class="text-ink-gray-7 flex-1 text-left truncate">
-              {{ option.label }}
+              {{ __(option.label) }}
             </span>
 
             <span

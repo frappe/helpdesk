@@ -99,7 +99,7 @@
                       name="item-label"
                       v-bind="{ active, selected, option }"
                     >
-                      {{ option.label }}
+                      {{ __(option.label) }}
                     </slot>
                   </li>
                 </ComboboxOption>

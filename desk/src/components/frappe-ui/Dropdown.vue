@@ -69,7 +69,7 @@
                       :is="item.icon"
                     />
                     <span class="whitespace-nowrap text-ink-gray-7">
-                      {{ item.label }}
+                      {{ __(item.label) }}
                     </span>
                   </button>
                 </slot>

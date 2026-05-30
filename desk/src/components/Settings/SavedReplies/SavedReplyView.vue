@@ -80,7 +80,7 @@
                 <div class="flex gap-2 items-center cursor-pointer">
                   <component :is="option.icon" class="size-4 text-ink-gray-9" />
                   <span>
-                    {{ option.label }}
+                    {{ __(option.label) }}
                   </span>
                 </div>
               </template>

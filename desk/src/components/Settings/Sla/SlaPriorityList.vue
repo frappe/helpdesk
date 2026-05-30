@@ -18,7 +18,7 @@
             column.key === 'resolution_time',
         }"
       >
-        {{ column.label }}
+        {{ __(column.label) }}
         <span v-if="column.isRequired" class="text-ink-red-3">*</span>
       </div>
     </div>
