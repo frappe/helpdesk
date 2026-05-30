@@ -7,7 +7,7 @@
             <Icon
               v-if="item.icon"
               :icon="item.icon"
-              class="mr-1 h-4 flex items-center justify-center self-center"
+              class="me-1 h-4 flex items-center justify-center self-center"
             />
           </template>
         </Breadcrumbs>

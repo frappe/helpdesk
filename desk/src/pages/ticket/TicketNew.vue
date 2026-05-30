@@ -78,7 +78,7 @@
         <div v-if="isCustomerPortal">
           <h4
             v-show="subject.length <= 2 && description.length === 0"
-            class="text-p-sm text-gray-500 ml-1"
+            class="text-p-sm text-gray-500 ms-1"
           >
             {{ __("Please enter a subject to continue") }}
           </h4>

@@ -12,7 +12,7 @@
         :key="column.key"
         class="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis"
         :class="{
-          'ml-2':
+          'ms-2':
             column.key === 'priority' ||
             column.key === 'response_time' ||
             column.key === 'resolution_time',

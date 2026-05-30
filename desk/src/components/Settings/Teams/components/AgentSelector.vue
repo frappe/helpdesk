@@ -63,7 +63,7 @@
                 :value="agent.name"
                 class="text-base leading-none text-ink-gray-7 rounded flex items-center px-2 py-1 relative select-none data-[highlighted]:outline-none data-[highlighted]:bg-surface-gray-3 cursor-pointer"
               >
-                <UserAvatar class="mr-1" :name="agent.agent_name" size="lg" />
+                <UserAvatar class="me-1" :name="agent.agent_name" size="lg" />
                 <div class="flex flex-col gap-1 p-1 text-ink-gray-8">
                   <div class="text-base font-medium">
                     {{ agent.agent_name }}

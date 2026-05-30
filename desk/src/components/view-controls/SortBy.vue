@@ -35,7 +35,7 @@
       <div v-else class="flex items-center justify-center rtl:flex-row-reverse">
         <Button
           v-if="sortValues.size"
-          class="rounded-r-none border-r"
+          class="rounded-e-none border-e"
           @click.stop="
             () => {
               Array.from(sortValues)[0].direction =
@@ -52,7 +52,7 @@
         </Button>
         <Button
           :label="getSortLabel()"
-          :class="sortValues.size ? 'rounded-l-none' : ''"
+          :class="sortValues.size ? 'rounded-s-none' : ''"
         >
           <template v-if="!hideLabel && !sortValues?.size" #prefix>
             <SortIcon class="h-4" />
@@ -85,7 +85,7 @@
               <div class="flex rtl:flex-row-reverse">
                 <Button
                   size="md"
-                  class="rounded-r-none border-r"
+                  class="rounded-e-none border-e"
                   @click="
                     () => {
                       sort.direction = sort.direction == 'asc' ? 'desc' : 'asc';
@@ -107,7 +107,7 @@
                     #target="{ togglePopover, selectedValue, displayValue }"
                   >
                     <Button
-                      class="flex w-full items-center justify-between rounded-l-none !text-gray-600 text-xs"
+                      class="flex w-full items-center justify-between rounded-s-none !text-gray-600 text-xs"
                       size="md"
                       @click="togglePopover()"
                     >

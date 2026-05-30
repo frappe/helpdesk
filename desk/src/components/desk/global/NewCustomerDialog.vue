@@ -22,7 +22,7 @@
               placeholder="eg: tesla.com, mycompany.com"
             />
           </div>
-          <div class="float-right flex space-x-2">
+          <div class="float-end flex gap-x-2">
             <Button
               label="Add"
               theme="gray"

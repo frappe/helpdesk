@@ -19,11 +19,11 @@
     <template #content>
       <!-- list accounts -->
       <div
-        class="-ml-2 grow"
+        class="-ms-2 grow"
         v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
       >
         <div class="flex text-sm text-gray-600">
-          <div class="ml-2">{{ __("Email account name") }}</div>
+          <div class="ms-2">{{ __("Email account name") }}</div>
         </div>
         <hr class="mx-2 mt-2" />
         <div

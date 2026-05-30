@@ -35,7 +35,7 @@
       </Transition>
     </template>
     <template #content>
-      <div class="-ml-2 grow">
+      <div class="-ms-2 grow">
         <div class="flex-1 flex flex-col">
           <!-- General -->
           <div
@@ -83,7 +83,10 @@
                 }}
               </div>
             </div>
-            <FeatherIcon name="chevron-right" class="size-4 text-ink-gray-5" />
+            <FeatherIcon
+              name="chevron-right"
+              class="size-4 text-ink-gray-5 rtl:rotate-180"
+            />
           </div>
 
           <div class="h-px border-t mx-2 border-outline-gray-modals" />
@@ -104,7 +107,10 @@
                 }}
               </div>
             </div>
-            <FeatherIcon name="chevron-right" class="size-4 text-ink-gray-5" />
+            <FeatherIcon
+              name="chevron-right"
+              class="size-4 text-ink-gray-5 rtl:rotate-180"
+            />
           </div>
         </div>
         <ErrorMessage :message="error" />

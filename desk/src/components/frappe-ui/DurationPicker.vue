@@ -17,7 +17,7 @@
           @keyup.enter="handleEnter"
         />
         <div
-          class="flex flex-col group-hover:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -right-3"
+          class="flex flex-col group-hover:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -end-3"
         >
           <button
             @mousedown="startAction(() => increment('hours'))"
@@ -61,7 +61,7 @@
           @keyup.enter="handleEnter"
         />
         <div
-          class="flex flex-col group-hover:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -right-3"
+          class="flex flex-col group-hover:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -end-3"
         >
           <button
             @mousedown="startAction(() => increment('minutes'))"
@@ -105,7 +105,7 @@
           @keyup.enter="handleEnter"
         />
         <div
-          class="flex flex-col group-hover:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -right-3"
+          class="flex flex-col group-hover:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -end-3"
         >
           <button
             @mousedown="startAction(() => increment('seconds'))"

@@ -74,13 +74,13 @@
           </div>
           <div
             v-if="!agentDashboard.loading && layout.length > 0"
-            class="text-xl font-semibold text-ink-gray-8 pl-2"
+            class="text-xl font-semibold text-ink-gray-8 ps-2"
           >
             {{ __("Hey") }}, {{ userName }}
           </div>
           <div
             v-if="!agentDashboard.loading && layout.length === 0"
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            class="absolute top-1/2 start-1/2 transform -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2"
           >
             <div class="flex flex-col items-center justify-center gap-1">
               <FeatherIcon name="layout" class="size-12 text-ink-gray-4" />
@@ -119,7 +119,7 @@
                   </div>
                   <div
                     v-if="editing"
-                    class="flex absolute right-0 top-0 bg-surface-gray-6 rounded cursor-pointer opacity-0 group-hover:opacity-100"
+                    class="flex absolute end-0 top-0 bg-surface-gray-6 rounded cursor-pointer opacity-0 group-hover:opacity-100"
                   >
                     <div
                       class="rounded p-1 hover:bg-surface-gray-5"

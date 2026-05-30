@@ -4,7 +4,7 @@
       <div class="flex items-center w-fit rtl:flex-row-reverse">
         <Button
           :label="__('Filter')"
-          :class="filters?.size ? 'rounded-r-none' : ''"
+          :class="filters?.size ? 'rounded-e-none' : ''"
           @click="togglePopover"
         >
           <template #prefix><FilterIcon class="h-4" /></template>
@@ -19,7 +19,7 @@
         <Tooltip v-if="filters?.size" :text="'Clear all Filter'">
           <div>
             <Button
-              class="rounded-l-none border-l"
+              class="rounded-s-none border-s"
               icon="x"
               @click.stop="clearfilter(close)"
             />
@@ -78,7 +78,7 @@
             </div>
             <div v-else class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2 flex-1">
-                <div class="w-13 pl-2 text-end text-base text-gray-600">
+                <div class="w-13 ps-2 text-end text-base text-gray-600">
                   {{ i == 0 ? "Where" : "And" }}
                 </div>
                 <div id="fieldname" class="!min-w-[140px]">

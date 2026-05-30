@@ -2,7 +2,7 @@
   <div class="flex flex-col h-full w-full pb-8">
     <div class="px-10 py-8">
       <div class="flex items-start justify-between">
-        <div class="flex flex-col gap-1 rtl:text-right">
+        <div class="flex flex-col gap-1 text-start">
           <slot name="title">
             <h1 class="text-lg font-semibold text-ink-gray-8">
               {{ __(title) }}
@@ -23,7 +23,7 @@
         <slot name="header-bottom" />
       </div>
     </div>
-    <div class="px-10 pb-8 overflow-y-auto h-full flex flex-col rtl:text-right">
+    <div class="px-10 pb-8 overflow-y-auto h-full flex flex-col text-start">
       <slot name="content" />
     </div>
   </div>

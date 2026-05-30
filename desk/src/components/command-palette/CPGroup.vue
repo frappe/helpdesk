@@ -13,7 +13,7 @@
     </span>
     <span
       v-if="item.modified"
-      class="ml-auto whitespace-nowrap pl-2 text-gray-600"
+      class="ms-auto whitespace-nowrap ps-2 text-gray-600"
     >
       {{ dayjs(item.modified).fromNow(true) }}
     </span>

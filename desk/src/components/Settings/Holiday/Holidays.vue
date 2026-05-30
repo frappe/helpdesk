@@ -29,14 +29,14 @@
           class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
           icon-left="search"
           debounce="300"
-          inputClass="p-4 pr-12"
+          inputClass="p-4 pe-12"
         />
         <Button
           v-if="holidaySearchRef"
           icon="x"
           variant="ghost"
           @click="holidaySearchRef = ''"
-          class="absolute right-1 top-1/2 -translate-y-1/2"
+          class="absolute end-1 top-1/2 -translate-y-1/2"
         />
       </div>
     </template>

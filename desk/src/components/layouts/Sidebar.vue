@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-r rtl:border-l border-gray-200 bg-gray-50 text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-e border-gray-200 bg-gray-50 text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
@@ -27,7 +27,7 @@
     <div v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
-        class="absolute size-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400 left-1"
+        class="absolute size-1.5 translate-x-6 rtl:-translate-x-6 translate-y-1 rounded-full bg-blue-400 start-1"
         theme="gray"
         variant="solid"
       />
@@ -73,7 +73,7 @@
               class="flex cursor-pointer gap-1.5 px-2 text-base mx-2 font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
               :class="
                 !isExpanded
-                  ? 'ml-0 h-0 overflow-hidden opacity-0'
+                  ? 'ms-0 h-0 overflow-hidden opacity-0'
                   : 'pt-[11px] pb-2.5 w-auto opacity-100 '
               "
               @click="toggleSection(view.label, view.opened)"
@@ -81,7 +81,10 @@
               <FeatherIcon
                 name="chevron-right"
                 class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
-                :class="{ 'rotate-90': isSectionOpen(view.label, view.opened) }"
+                :class="{
+                  'rotate-90': isSectionOpen(view.label, view.opened),
+                  'rtl:rotate-180': !isSectionOpen(view.label, view.opened),
+                }"
               />
               <span>{{ __(view.label) }}</span>
             </div>
@@ -130,7 +133,11 @@
       />
 
       <SidebarLink
-        :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
+        :icon="
+          isExpanded !== isRtl
+            ? LucideArrowLeftFromLine
+            : LucideArrowRightFromLine
+        "
         :is-active="false"
         :is-expanded="isExpanded"
         :label="isExpanded ? __('Collapse') : __('Expand')"
@@ -232,6 +239,8 @@ import {
 } from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
+
+const isRtl = document.documentElement.dir === "rtl";
 
 const route = useRoute();
 const router = useRouter();

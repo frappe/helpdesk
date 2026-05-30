@@ -65,7 +65,7 @@
         </div>
 
         <div
-          class="w-full -ml-2"
+          class="w-full -ms-2"
           v-if="
             !fieldDependenciesList.loading &&
             fieldDependenciesList.data?.length > 0
@@ -75,7 +75,7 @@
             <div
               class="grid grid-cols-11 items-center gap-4 text-sm text-gray-600"
             >
-              <div class="col-span-7 ml-2">{{ __("Name") }}</div>
+              <div class="col-span-7 ms-2">{{ __("Name") }}</div>
               <div class="col-span-2">{{ __("Created by") }}</div>
               <div class="col-span-2">{{ __("Enabled") }}</div>
             </div>
@@ -89,7 +89,7 @@
               >
                 <div
                   @click.stop="$emit('update:step', 'fd', row.name)"
-                  class="w-full py-3 pl-2 col-span-7 text-base text-ink-gray-7"
+                  class="w-full py-3 ps-2 col-span-7 text-base text-ink-gray-7"
                 >
                   <span>{{ getFieldDependencyLabel(row.name) }}</span>
                 </div>
@@ -100,7 +100,7 @@
                   }}</span>
                 </div>
                 <div
-                  class="flex justify-between items-center w-full pr-2 col-span-2"
+                  class="flex justify-between items-center w-full pe-2 col-span-2"
                 >
                   <div>
                     <Switch

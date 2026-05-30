@@ -39,7 +39,7 @@
                 <slot name="prefix" />
                 <span
                   v-if="selectedValue"
-                  class="flex-1 truncate text-left text-base leading-5"
+                  class="flex-1 truncate text-start text-base leading-5"
                 >
                   {{ displayValue(selectedValue) }}
                 </span>
@@ -86,7 +86,7 @@
                   placeholder="Search"
                 />
                 <button
-                  class="absolute right-0 inline-flex h-7 w-7 items-center justify-center"
+                  class="absolute end-0 inline-flex h-7 w-7 items-center justify-center"
                   @click="selectedValue = null"
                 >
                   <FeatherIcon name="x" class="w-4" />
@@ -145,7 +145,7 @@
 
                       <div
                         v-if="$slots['item-suffix'] || option?.description"
-                        class="ml-2 flex-shrink-0"
+                        class="ms-2 flex-shrink-0"
                       >
                         <slot
                           name="item-suffix"

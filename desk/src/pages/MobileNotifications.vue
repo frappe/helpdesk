@@ -37,7 +37,7 @@
       <UserAvatar :name="n.user_from" />
       <div>
         <div class="mb-2 leading-5">
-          <span class="space-x-1 text-gray-700">
+          <span class="space-x-1 rtl:space-x-reverse text-gray-700">
             <span class="font-medium text-gray-900">{{ n.user_from }}</span>
             <span v-if="n.notification_type === 'Mention'">{{
               __("mentioned you in ticket")

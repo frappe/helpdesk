@@ -3,7 +3,7 @@
     <LayoutHeader>
       <template #left-header>
         <div class="flex gap-2 items-center crumbs">
-          <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
+          <Breadcrumbs :items="breadcrumbs" class="-ms-0.5 truncate" />
           <Badge
             v-if="!article.loading"
             variant="subtle"
@@ -173,7 +173,7 @@
         >
           <template #bottom v-if="editable">
             <TextEditorFixedMenu
-              class="-ml-1 overflow-x-auto w-full"
+              class="-ms-1 overflow-x-auto w-full"
               :buttons="textEditorMenuButtons"
             />
           </template>
