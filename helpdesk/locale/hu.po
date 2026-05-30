@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-28 10:55\n"
+"PO-Revision-Date: 2026-05-30 11:01\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -130,7 +130,7 @@ msgstr "Fiók"
 
 #: desk/src/components/Settings/Profile/Profile.vue:98
 msgid "Account Info & Security"
-msgstr ""
+msgstr "Fiókadatok és biztonság"
 
 #. Label of the acknowledgement_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -172,7 +172,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:106
 msgid "Add Email"
-msgstr ""
+msgstr "E-mail cím hozzáadása"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:174
 msgid "Add Holiday"
@@ -582,7 +582,7 @@ msgstr "Feladat"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:131
 msgid "Assignment Condition"
-msgstr ""
+msgstr "Hozzárendelési feltétel"
 
 #. Label of the filters_section (Section Break) field in DocType 'HD Service
 #. Level Agreement'
@@ -872,7 +872,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:93
 msgid "Caller"
-msgstr ""
+msgstr "Hívó"
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:466
 msgid "Calls"
@@ -900,7 +900,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:214
 msgid "Canceled"
-msgstr ""
+msgstr "Visszavonva"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:526
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
@@ -916,7 +916,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:198
 msgid "Cannot enable rule without adding users in it"
-msgstr ""
+msgstr "Nem lehet engedélyezni a szabályt anélkül, hogy felhasználókat adnál hozzá"
 
 #: helpdesk/api/knowledge_base.py:128
 msgid "Cannot merge General category"
@@ -975,7 +975,7 @@ msgstr "Változtass Jelszót"
 
 #: desk/src/components/Settings/Profile/Profile.vue:221
 msgid "Change Photo"
-msgstr ""
+msgstr "Fénykép módosítása"
 
 #: desk/src/components/Settings/Profile/Profile.vue:153
 msgid "Change language of the application."
@@ -1168,7 +1168,7 @@ msgstr "Feltétel"
 
 #: desk/src/components/Settings/Profile/Profile.vue:127
 msgid "Configure"
-msgstr ""
+msgstr "Konfigurálás"
 
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:3
 msgid "Configure your Exotel settings for Helpdesk."
@@ -1506,7 +1506,7 @@ msgstr "Törlés"
 
 #: desk/src/pages/ticket/Tickets.vue:477
 msgid "Delete View"
-msgstr ""
+msgstr "Nézet törlése"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:200
 msgid "Delete articles"
@@ -1807,7 +1807,7 @@ msgstr "E-mailek"
 
 #: desk/src/components/Settings/Profile/Profile.vue:116
 msgid "Emails & Signature"
-msgstr ""
+msgstr "E-mailek és aláírás"
 
 #: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
@@ -1922,7 +1922,7 @@ msgstr "Excel"
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:10
 #: desk/src/components/Settings/Telephony/Telephony.vue:93
 msgid "Exotel"
-msgstr ""
+msgstr "Exotel"
 
 #: desk/src/components/layouts/Sidebar.vue:136
 msgid "Expand"
@@ -2253,7 +2253,7 @@ msgstr "Csoportosítva"
 #. Label of the group_by_field (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Group By Field"
-msgstr ""
+msgstr "Csoportosítás mező szerint"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -2669,7 +2669,7 @@ msgstr "Inaktív"
 
 #: desk/src/components/CallArea.vue:36
 msgid "Inbound Call"
-msgstr ""
+msgstr "Bejövő hívás"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:59
 msgid "Inbox"
@@ -2992,7 +2992,7 @@ msgstr "Betöltés..."
 
 #: desk/src/components/ticket/ActivityHeader.vue:65
 msgid "Log a Call"
-msgstr ""
+msgstr "Naplózz egy hívást"
 
 #: desk/src/components/layouts/Sidebar.vue:336
 #: desk/src/components/layouts/Sidebar.vue:388
@@ -3017,11 +3017,11 @@ msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:448
 msgid "Make Private"
-msgstr ""
+msgstr "Priváttá tétel"
 
 #: desk/src/pages/ticket/Tickets.vue:448
 msgid "Make Public"
-msgstr ""
+msgstr "Nyilvánossá tétel"
 
 #: desk/src/components/ticket/ActivityHeader.vue:60
 msgid "Make a Call"
@@ -3045,7 +3045,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:120
 msgid "Manage your account emails and email signature for communication."
-msgstr ""
+msgstr "Kezeld a fiókodhoz tartozó e-maileket és e-mail aláírást a kommunikációhoz."
 
 #: desk/src/components/Settings/EmailAccountList.vue:5
 msgid "Manage your email accounts and configure incoming and outgoing settings."
@@ -3193,7 +3193,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:9
 msgid "New Assignment Rule"
-msgstr ""
+msgstr "Új hozzárendelési szabály"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:59
 msgid "New Assignment Rule Name"
