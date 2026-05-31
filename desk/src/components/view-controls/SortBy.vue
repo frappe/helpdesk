@@ -32,7 +32,7 @@
           </div>
         </template>
       </Button>
-      <div v-else class="flex items-center justify-center rtl:flex-row-reverse">
+      <div v-else class="flex items-center justify-center">
         <Button
           v-if="sortValues.size"
           class="rounded-e-none border-e"

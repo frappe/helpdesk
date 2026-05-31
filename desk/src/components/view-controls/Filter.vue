@@ -1,7 +1,7 @@
 <template>
   <Popover placement="bottom-end">
     <template #target="{ togglePopover, close }">
-      <div class="flex items-center w-fit rtl:flex-row-reverse">
+      <div class="flex items-center w-fit">
         <Button
           :label="__('Filter')"
           :class="filters?.size ? 'rounded-e-none' : ''"

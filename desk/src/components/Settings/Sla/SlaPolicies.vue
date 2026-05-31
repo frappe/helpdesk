@@ -42,7 +42,7 @@
           class="focus:ring-0 border-outline-gray-2"
           icon-left="search"
           debounce="300"
-          inputClass="p-4 pe-12"
+          inputClass="p-4 pe-12 rtl:pr-8"
         />
         <Button
           v-if="slaSearchQuery"

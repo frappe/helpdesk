@@ -2,7 +2,7 @@
   <LayoutHeader>
     <template #left-header>
       <div class="flex flex-col truncate">
-        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs -ml-0.5">
+        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs -ms-0.5">
           <template #prefix="{ item }">
             <Icon
               v-if="item.icon"

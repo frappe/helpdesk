@@ -2,14 +2,14 @@
   <SettingsLayoutBase>
     <template #title>
       <div class="flex items-center justify-between w-full">
-        <div class="flex items-center gap-1 justify-center -ml-[16px]">
+        <div class="flex items-center gap-1 justify-center -ms-[16px]">
           <Button
             variant="ghost"
             icon-left="chevron-left"
             :label="teamName"
             size="md"
             @click="() => emit('update:step', 'team-list')"
-            class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
+            class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pe-0"
           />
         </div>
       </div>
@@ -70,7 +70,7 @@
         <hr class="mt-2" />
         <div v-for="(member, idx) in teamMembers" :key="member.name">
           <div class="grid grid-cols-8 items-center gap-4 group">
-            <div class="w-full p-2 pl-0 col-span-8">
+            <div class="w-full p-2 ps-0 col-span-8">
               <AgentCard :agent="member" class="!py-0">
                 <template #right>
                   <Dropdown

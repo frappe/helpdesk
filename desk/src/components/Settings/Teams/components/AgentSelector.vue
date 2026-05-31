@@ -34,7 +34,7 @@
             ref="search"
             :value="query"
             autocomplete="off"
-            class="bg-transparent p-0 outline-none border-0 text-base text-ink-gray-8 h-full placeholder:text-ink-gray-4 focus:outline-none focus:ring-0 focus:border-0 w-full select-none"
+            class="bg-transparent p-0 outline-none border-0 text-base text-ink-gray-8 h-full placeholder:text-ink-gray-4 focus:outline-none focus:ring-0 focus:border-0 w-full select-none rtl:text-right"
             placeholder="Type agent name or email"
             @focus="showOptions = true"
             @click="showOptions = true"
