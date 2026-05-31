@@ -14,9 +14,14 @@
       </div>
     </div>
     <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar">
-      <table class="w-full table-auto">
-        <thead v-if="chartConfig?.tickets?.length > 0">
-          <tr class="text-sm text-gray-600">
+      <table
+        class="w-full table-auto transition-opacity duration-150"
+        :class="{
+          'opacity-60': getPendingTicketsResource.loading && !showSkeleton,
+        }"
+      >
+        <thead v-if="!showSkeleton && chartConfig?.tickets?.length > 0">
+          <tr class="text-sm text-ink-gray-5">
             <th class="p-2 text-left font-normal whitespace-nowrap">
               {{ __("ID") }}
             </th>
@@ -37,12 +42,15 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="chartConfig?.tickets?.length > 0" class="grow">
+        <tbody
+          v-if="!showSkeleton && chartConfig?.tickets?.length > 0"
+          class="grow"
+        >
           <tr
             v-for="ticket in chartConfig?.tickets"
             :key="ticket.name"
             @click="goToTicket(ticket)"
-            class="text-sm cursor-pointer hover:bg-gray-50 border-t border-gray-200"
+            class="text-sm cursor-pointer hover:bg-surface-menu-bar border-t border-outline-gray-modals"
           >
             <td class="p-2 py-3 whitespace-nowrap">{{ ticket.name }}</td>
             <td class="p-2 py-3 w-full max-w-0 truncate">
@@ -92,7 +100,7 @@
           <tr
             v-for="i in 8"
             :key="i"
-            :class="i > 1 ? 'border-t border-gray-200' : ''"
+            :class="i > 1 ? 'border-t border-outline-gray-modals' : ''"
           >
             <td class="p-2 py-3 min-w-8">
               <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
@@ -115,7 +123,10 @@
           </tr>
           <EmptyState
             class="absolute inset-0 z-10"
-            v-if="chartConfig?.tickets?.length === 0"
+            v-if="
+              !getPendingTicketsResource.loading &&
+              chartConfig?.tickets?.length === 0
+            "
             :title="emptyState.title"
             :description="emptyState.description"
             variant="overlay"
@@ -172,7 +183,7 @@ interface TicketReason {
 }
 
 interface PendingTicket {
-  name: string | number;
+  name: string;
   subject: string;
   status: string;
   priority: string;
@@ -273,9 +284,20 @@ const chartConfig = computed(() => {
   };
 });
 
+const hasLoadedOnce = ref(false);
+
 const getPendingTicketsResource = createResource({
   url: "helpdesk.api.agent_home.agent_home.get_pending_tickets",
+  onSuccess() {
+    hasLoadedOnce.value = true;
+  },
 });
+
+// Show the skeleton only on the first load. On later tab switches we keep the
+// previous rows visible (dimmed) until fresh data arrives, avoiding a flicker.
+const showSkeleton = computed(
+  () => getPendingTicketsResource.loading && !hasLoadedOnce.value
+);
 
 function getPriorityBadgeColor(integerValue: number) {
   const min = chartConfig.value.minPriority;
@@ -294,7 +316,7 @@ function getReasonColorClass(reason: {
   seconds_until_due?: number;
 }) {
   if (reason.text.includes("overdue")) {
-    return "text-red-500";
+    return "text-ink-red-3";
   }
 
   if (
@@ -304,7 +326,7 @@ function getReasonColorClass(reason: {
     const oneHour = 3600;
     const twoHours = 7200;
     if (reason.seconds_until_due <= oneHour) {
-      return "text-red-500";
+      return "text-ink-red-3";
     }
     if (reason.seconds_until_due <= twoHours) {
       return "text-orange-500";

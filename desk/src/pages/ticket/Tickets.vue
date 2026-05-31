@@ -46,6 +46,11 @@
       v-model="viewDialog"
       @update="(view, action) => handleView(view, action)"
     />
+    <BulkReplyModal
+      v-model="showBulkReplyModal"
+      :selections="listSelections"
+      @success="listViewRef?.unselectAll()"
+    />
   </div>
 </template>
 
@@ -53,6 +58,7 @@
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import { EditIcon, PinIcon, TicketIcon, UnpinIcon } from "@/components/icons";
 import IndicatorIcon from "@/components/icons/IndicatorIcon.vue";
+import BulkReplyModal from "@/components/ticket-agent/BulkReplyModal.vue";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
@@ -96,7 +102,18 @@ const showExportModal = ref(false);
 const { getStatus } = useTicketStatusStore();
 
 const listSelections = ref(new Set());
+
+const showBulkReplyModal = ref(false);
+
 const selectBannerActions = [
+  {
+    label: __("Bulk Reply"),
+    icon: "corner-up-left",
+    onClick: (selections: Set<string>) => {
+      listSelections.value = new Set(selections);
+      showBulkReplyModal.value = true;
+    },
+  },
   {
     label: __("Export"),
     icon: "download",
@@ -255,6 +272,22 @@ async function exportRows(
   const order_by = list.params.order_by;
 
   let filters = { ...list.params.filters };
+  // Resolve `@me` filters to the current session user before export
+  Object.keys(filters).forEach((key) => {
+    const value = filters[key];
+
+    // Handle direct filter format: { owner: "@me" }
+    if (value === "@me") {
+      filters[key] = userId;
+      return;
+    }
+    if (!Array.isArray(value)) return;
+
+    // Handle all operator-based filter format: { owner: ["=", "@me"], _assign: ["LIKE", "%@me%"] }
+    filters[key] = value.map((entry) =>
+      entry === "@me" ? userId : entry === "%@me%" ? `%${userId}%` : entry
+    );
+  });
   let pageLength: number;
 
   if (export_all) {
@@ -266,7 +299,9 @@ async function exportRows(
     filters = JSON.stringify(filters);
   }
 
-  window.location.href = `/api/method/frappe.desk.reportview.export_query?file_format_type=${export_type}&title=HD Ticket&doctype=HD Ticket&fields=${fields}&filters=${filters}&order_by=${order_by}&page_length=${pageLength}&start=0&view=Report&with_comment_count=1`;
+  window.location.href = `/api/method/frappe.desk.reportview.export_query?file_format_type=${export_type}&title=HD Ticket&doctype=HD Ticket&fields=${fields}&filters=${encodeURIComponent(
+    filters
+  )}&order_by=${order_by}&page_length=${pageLength}&start=0&view=Report&with_comment_count=1`;
   reset();
   showExportModal.value = false;
 }

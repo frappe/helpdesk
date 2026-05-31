@@ -35,9 +35,16 @@
     </div>
   </div>
 
+  <!-- Loading State -->
+  <div
+    v-if="list.loading && !list.data?.data?.length"
+    class="flex items-center justify-center h-full w-full absolute top-0 z-100"
+  >
+    <LoadingIndicator :scale="8" />
+  </div>
   <!-- List View -->
   <ListView
-    v-if="list.data?.data.length > 0"
+    v-else-if="list.data?.data.length > 0"
     class="flex-1"
     :columns="columns"
     :rows="rows"
@@ -106,16 +113,9 @@
       "
     />
   </div>
-  <!-- Loading State -->
-  <div
-    v-else-if="list.loading"
-    class="w-full h-full flex items-center justify-center -mt-14"
-  >
-    <LoadingIndicator :scale="8" />
-  </div>
   <!-- Empty State -->
   <EmptyState
-    v-else
+    v-else-if="!list.loading"
     :title="emptyState.title"
     :icon="emptyState.icon"
     :description="emptyState.description"
@@ -146,10 +146,10 @@ import { View, ViewType } from "@/types";
 import { getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
-  call,
   createResource,
   Dropdown,
   FeatherIcon,
+  frappeRequest,
   ListFooter,
   ListHeader,
   ListHeaderItem,
@@ -207,7 +207,7 @@ const emit = defineEmits<E>();
 const route = useRoute();
 const router = useRouter();
 const { isManager } = useAuthStore();
-const { $dialog } = globalStore();
+const { $dialog, $socket } = globalStore();
 const { getStatus } = useTicketStatusStore();
 
 const listSelections = ref(new Set());
@@ -258,11 +258,69 @@ const defaultOptions = reactive({
 
 function handleBulkDelete(hide: Function, selections: Set<string>) {
   capture("bulk_delete" + props.options.doctype);
-  call("frappe.desk.reportview.delete_items", {
-    items: JSON.stringify(Array.from(selections)),
-    doctype: props.options.doctype,
-  }).then(() => {
-    toast.success(__("Item(s) deleted successfully."));
+  const requested = Array.from(selections);
+  const requestedCount = requested.length;
+
+  const failureMessages: string[] = [];
+  let successMessage = "";
+  let failedCount = 0;
+
+  const onBulkResult = (data: { message: string; title: string }) => {
+    const isFailure =
+      data.title === __("Bulk Operation Failed") ||
+      data.title === "Bulk Operation Failed";
+    const isSuccess =
+      data.title === __("Bulk Operation Successful") ||
+      data.title === "Bulk Operation Successful";
+    if (!isFailure && !isSuccess) return;
+
+    if (isFailure) {
+      // Parse how many items failed from the message (Frappe includes the count)
+      const match = data.message.match(/Failed to delete (\d+) documents?/);
+      if (match) {
+        failedCount = parseInt(match[1], 10);
+      }
+      failureMessages.push(data.message);
+    } else {
+      successMessage = data.message;
+    }
+  };
+
+  $socket.on("msgprint", onBulkResult);
+
+  // Use frappeRequest (not `call`) so per-item delete errors surfaced in
+  // `_server_messages` get routed through the app's serverMessagesHandler.
+  // `call` silently drops them on 200 responses.
+  frappeRequest({
+    url: "frappe.desk.reportview.delete_items",
+    params: {
+      items: JSON.stringify(requested),
+      doctype: props.options.doctype,
+    },
+  }).finally(() => {
+    $socket.off("msgprint", onBulkResult);
+
+    const deletedCount = requestedCount - failedCount;
+
+    if (failureMessages.length > 0 && deletedCount > 0) {
+      // Partial success: some deleted, some failed — show both toasts
+      toast.success(__("{0} item(s) deleted successfully", [deletedCount]));
+      for (const msg of failureMessages) {
+        toast.error(msg);
+      }
+    } else if (failureMessages.length > 0) {
+      // All failed
+      for (const msg of failureMessages) {
+        toast.error(msg);
+      }
+    } else if (successMessage) {
+      // All succeeded
+      toast.success(successMessage);
+    } else {
+      // Fallback: no socket messages received (e.g. enqueued for >10 items)
+      toast.success(__("{0} item(s) queued for deletion", [requestedCount]));
+    }
+
     hide();
     reset();
   });

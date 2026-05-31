@@ -42,27 +42,16 @@
         </div>
 
         <!-- Empty State -->
-        <div
+        <EmptyState
           v-if="
             !fieldDependenciesList.loading &&
             !fieldDependenciesList.data?.length
           "
-          class="flex flex-col items-center justify-center gap-4 p-4 h-full"
-        >
-          <div
-            class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
-          >
-            <FieldDependencyIcon class="size-6 text-ink-gray-6" />
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <div class="text-base font-medium text-ink-gray-6">
-              {{ __("No field dependency found") }}
-            </div>
-            <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-              {{ __("Add one to get started.") }}
-            </div>
-          </div>
-        </div>
+          variant="badge"
+          :icon="FieldDependencyIcon"
+          title="No field dependency found"
+          description="Add one to get started."
+        />
 
         <div
           class="w-full -ms-2"
@@ -73,7 +62,7 @@
         >
           <div>
             <div
-              class="grid grid-cols-11 items-center gap-4 text-sm text-gray-600"
+              class="grid grid-cols-11 items-center gap-4 text-sm text-ink-gray-5"
             >
               <div class="col-span-7 ms-2">{{ __("Name") }}</div>
               <div class="col-span-2">{{ __("Created by") }}</div>
@@ -85,7 +74,7 @@
               :key="row.name"
             >
               <div
-                class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded h-12.5"
+                class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded h-12.5"
               >
                 <div
                   @click.stop="$emit('update:step', 'fd', row.name)"

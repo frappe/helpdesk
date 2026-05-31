@@ -45,7 +45,7 @@
                 </Tooltip>
                 <div
                   v-if="uploading"
-                  class="w-full h-full top-0 left-0 absolute bg-black bg-opacity-20 rounded-full flex items-center justify-center"
+                  class="w-full h-full top-0 left-0 absolute bg-surface-gray-7 bg-opacity-20 rounded-full flex items-center justify-center"
                 >
                   <LoadingIndicator class="size-4" />
                 </div>
@@ -70,15 +70,15 @@
                     <TextInput
                       ref="fullNameRef"
                       v-model="fullName"
-                      @keydown.enter="save"
+                      @keydown.enter="isNameDirty ? save() : (editName = false)"
                       @keydown.esc.stop="editName = false"
                     />
                     <Button
                       variant="outline"
                       icon="check"
                       :loading="user?.save?.loading"
-                      :disabled="user?.save?.loading || !isNameDirty"
-                      @click="save"
+                      :disabled="user?.save?.loading"
+                      @click="isNameDirty ? save() : (editName = false)"
                     />
                   </div>
                   <span class="text-p-sm text-ink-gray-6">
@@ -97,15 +97,7 @@
             <span class="text-base font-semibold text-ink-gray-9">
               {{ __("Account Info & Security") }}
             </span>
-            <Transition name="fade">
-              <Badge
-                v-if="isDirty"
-                :variant="'subtle'"
-                :theme="'orange'"
-                size="sm"
-                :label="__('Unsaved')"
-              />
-            </Transition>
+            <UnsavedBadge :show="isDirty" />
           </div>
 
           <Transition name="fade">
@@ -215,6 +207,7 @@ const emit = defineEmits(["updateStep"]);
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 const showChangePasswordModal = ref(false);
 
 const { userId } = useAuthStore();
@@ -267,7 +260,7 @@ function save() {
   user.save.submit(null, {
     onSuccess: () => {
       editName.value = false;
-      toast.success(__("Profile Updated Successfully"));
+      toast.success(__("Profile updated successfully."));
       if (refreshRequired.value) {
         window.location.reload();
       }

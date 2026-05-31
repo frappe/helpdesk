@@ -10,14 +10,7 @@
           @click="goBack()"
           class="cursor-pointer -ms-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pe-0"
         />
-        <Transition name="fade">
-          <Badge
-            variant="subtle"
-            theme="orange"
-            size="sm"
-            :label="__('Unsaved')"
-            v-if="isDirty"
-        /></Transition>
+        <UnsavedBadge :show="isDirty" />
       </div>
     </template>
     <template #header-actions>
@@ -30,7 +23,7 @@
           icon-left="eye"
           :disabled="
             Boolean(
-              !content?.editor?.state?.doc?.textContent?.trim()?.length
+              !savedReplyData.message?.replace(/<[^>]*>/g, '')?.trim()?.length
             ) || isDirty
           "
         />
@@ -52,7 +45,7 @@
     <template #content>
       <div
         v-if="getSavedReplyData.loading"
-        class="flex items-center justify-center my-auto"
+        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -119,24 +112,16 @@
             />
           </div>
           <PreviewDialog v-model="previewDialog" />
-          <TextEditor
-            editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5"
+          <CompactEditor
             ref="content"
-            :bubble-menu="false"
-            :content="savedReplyData.message"
-            @change="
-              (val) => {
-                savedReplyData.message = val;
-                validateData('message');
-              }
-            "
-            :fixed-menu="menuButtons"
+            v-model="savedReplyData.message"
             :extensions="[FieldAutocomplete]"
             :placeholder="
               __(
                 'Hello {{ contact }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ full_name }}'
               )
             "
+            @update:modelValue="validateData('message')"
           />
           <ErrorMessage class="text-p-sm" :message="errors.message" />
         </div>
@@ -164,21 +149,21 @@ import {
   LoadingIndicator,
   MultiSelect,
   Select,
-  TextEditor,
   toast,
 } from "frappe-ui";
 import { computed, inject, onUnmounted, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
 import PreviewDialog from "./components/PreviewDialog.vue";
-import { menuButtons } from "./savedReplies";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import CompactEditor from "@/components/CompactEditor.vue";
 import DocumentationButton from "@/components/DocumentationButton.vue";
 import { storeToRefs } from "pinia";
 import { useConfigStore } from "@/stores/config";
 import { useAuthStore } from "@/stores/auth";
 import { FieldAutocomplete } from "../../../tiptap-extensions";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
 import GlobeIcon from "~icons/lucide/globe";
@@ -441,7 +426,9 @@ const validateData = (key?: string) => {
         break;
 
       case "message":
-        if (!content.value?.editor?.state?.doc?.textContent?.trim()?.length) {
+        if (
+          !savedReplyData.value.message?.replace(/<[^>]*>/g, "")?.trim()?.length
+        ) {
           errors.value.message = __("Response is required");
         } else {
           errors.value.message = "";

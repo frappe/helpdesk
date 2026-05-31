@@ -44,13 +44,15 @@
       </template>
 
       <template #item-label="{ item }">
-        <span class="whitespace-nowrap">{{ item.label }}</span>
-        <Badge
-          v-if="item.is_standard"
-          class="ml-1"
-          size="sm"
-          label="Standard"
-        />
+        <div class="flex items-center min-w-0 max-w-[50vw]">
+          <span class="truncate">{{ item.label }}</span>
+          <Badge
+            v-if="item.is_standard"
+            class="ml-1 flex-shrink-0"
+            size="sm"
+            label="Standard"
+          />
+        </div>
       </template>
       <template #item-suffix="{ item }">
         <div
@@ -119,5 +121,27 @@ const isCurrentView = (item) => {
 [data-slot="item"][data-highlighted] .kebab-btn,
 [data-slot="item"][data-state="checked"] .kebab-btn {
   display: block;
+}
+
+/* --fade-top / --fade-bottom + scroll-fade keyframes live in src/index.css */
+[data-slot="group"]:has(.kebab-btn) {
+  @apply sm:max-h-80 max-h-40 overflow-y-auto overscroll-contain;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black calc(100% - var(--fade-bottom)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    black calc(100% - var(--fade-bottom)),
+    transparent 100%
+  );
+  animation: scroll-fade linear both;
+  animation-timeline: scroll(self);
+}
+
+/* keep the group label pinned while its items scroll */
+[data-slot="group"]:has(.kebab-btn) [data-slot="group-label"] {
+  @apply sticky -top-[6px] z-10 bg-surface-modal;
 }
 </style>

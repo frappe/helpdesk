@@ -591,11 +591,11 @@ export interface TicketContact {
 
 export type RecentTicket = Record<
   "subject" | "status" | "priority" | "name" | "creation",
-  string | number
+  string
 >;
 export type SimilarTicket = Record<
   "subject" | "status" | "priority" | "name" | "creation",
-  string | number
+  string
 >;
 export interface RecentSimilarTicket {
   recent_tickets: RecentTicket[];

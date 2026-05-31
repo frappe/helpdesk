@@ -1,17 +1,13 @@
 <template>
   <SettingsLayoutBase :description="__('Configure your telephony settings.')">
     <template #title>
-      <div class="flex items-center gap-2 h-6">
+      <div class="flex items-center gap-2">
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("Telephony") }}
         </h1>
-        <Transition name="fade">
-          <Badge
-            v-if="isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent"
-            :label="__('Unsaved')"
-            theme="orange"
-            variant="subtle"
-        /></Transition>
+        <UnsavedBadge
+          :show="isDirty.twilio || isDirty.exotel || isDirty.telephonyAgent"
+        />
       </div>
     </template>
     <template #header-actions>
@@ -39,7 +35,7 @@
         <div class="flex-1 flex flex-col">
           <!-- General -->
           <div
-            class="flex items-center justify-between gap-8 py-3 hover:bg-gray-50 rounded px-2"
+            class="flex items-center justify-between gap-8 py-3 hover:bg-surface-menu-bar rounded px-2"
           >
             <div class="flex flex-col">
               <div class="text-p-base font-medium text-ink-gray-7 truncate">
@@ -68,7 +64,7 @@
           <div class="h-px border-t mx-2 border-outline-gray-modals" />
 
           <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-gray-50 px-2"
+            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-surface-menu-bar px-2"
             @click="emit('updateStep', 'twilio-settings')"
           >
             <div class="flex flex-col">
@@ -92,7 +88,7 @@
           <div class="h-px border-t mx-2 border-outline-gray-modals" />
 
           <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-gray-50 px-2"
+            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-surface-menu-bar px-2"
             @click="emit('updateStep', 'exotel-settings')"
           >
             <div class="flex flex-col">
@@ -142,6 +138,7 @@ import { useTelephonyStore } from "@/stores/telephony";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 
 const auth = useAuthStore();
 const telephonyStore = useTelephonyStore();
