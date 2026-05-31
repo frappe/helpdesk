@@ -21,6 +21,7 @@
         variant="solid"
         @click="goToNew()"
         icon-left="plus"
+        class="rtl:flex-row-reverse"
       />
     </template>
     <template

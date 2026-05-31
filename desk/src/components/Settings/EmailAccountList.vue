@@ -11,6 +11,7 @@
       <Button
         :label="__('New')"
         theme="gray"
+        class="rtl:flex-row-reverse"
         variant="solid"
         @click="emit('update:step', 'email-add')"
         icon-left="plus"

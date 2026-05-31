@@ -8,6 +8,7 @@
     <template #header-actions>
       <Button
         :label="__('New')"
+        class="rtl:flex-row-reverse"
         theme="gray"
         variant="solid"
         @click="emit('update:step', 'new-team', '')"

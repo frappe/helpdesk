@@ -29,6 +29,7 @@
         variant="solid"
         @click="$emit('update:step', 'fd')"
         icon-left="plus"
+        class="rtl:flex-row-reverse"
       />
     </template>
     <template #content>

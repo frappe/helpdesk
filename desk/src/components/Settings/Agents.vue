@@ -8,6 +8,7 @@
         @click="() => setActiveSettingsTab('Invite Agents')"
         label="New"
         variant="solid"
+        class="rtl:flex-row-reverse"
       >
         <template #prefix>
           <LucidePlus class="h-4 w-4 stroke-1.5" />

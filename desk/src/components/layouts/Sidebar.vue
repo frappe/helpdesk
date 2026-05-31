@@ -74,7 +74,7 @@
               :class="
                 !isExpanded
                   ? 'ms-0 h-0 overflow-hidden opacity-0'
-                  : 'pt-[11px] pb-2.5 w-auto opacity-100 '
+                  : 'pt-[11px] pb-2.5 w-auto opacity-100 rtl:flex-row-reverse rtl:justify-end'
               "
               @click="toggleSection(view.label, view.opened)"
             >

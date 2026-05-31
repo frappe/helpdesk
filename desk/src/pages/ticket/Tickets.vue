@@ -15,7 +15,12 @@
           class="inline-flex"
           :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
         >
-          <Button label="Create" theme="gray" variant="solid">
+          <Button
+            class="rtl:flex-row-reverse"
+            label="Create"
+            theme="gray"
+            variant="solid"
+          >
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>

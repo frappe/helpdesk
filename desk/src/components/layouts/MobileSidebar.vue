@@ -54,7 +54,7 @@
                   <div
                     v-if="!hide"
                     class="flex cursor-pointer gap-1.5 px-2 text-base font-medium text-ink-gray-5 mx-2 transition-all duration-300 ease-in-out"
-                    :class="'py-[7px] h-7.5 w-auto opacity-100'"
+                    :class="'py-[7px] h-7.5 w-auto opacity-100 rtl:flex-row-reverse'"
                     @click="toggle()"
                   >
                     <FeatherIcon
