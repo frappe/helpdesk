@@ -1,8 +1,5 @@
 # Copyright (c) 2026, Frappe Technologies and contributors
 # For license information, please see license.txt
-# Copyright (c) 2026, Frappe Technologies and contributors
-# For license information, please see license.txt
-
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -33,7 +30,8 @@ class HDTask(Document):
         self._publish_event("helpdesk:ticket-task", "task_added")
 
     def validate(self):
-        if self.is_new() or not self.assigned:
+        # FIXED: Removed `or not self.assigned` to allow processing unassignments
+        if self.is_new():
             return
         before = self.get_doc_before_save()
         if before and before.assigned != self.assigned:
@@ -46,8 +44,6 @@ class HDTask(Document):
     def after_delete(self):
         self._publish_event("helpdesk:ticket-task", "task_deleted")
 
-    # FIXED: Replaced core form assignments with explicit, clean database injections 
-    # to avoid triggering unintended side-effect document lifecycle hooks on parent tickets
     def unassign_from_previous_user_silently(self, user: str | None):
         if user:
             frappe.db.delete("ToDo", {
@@ -56,7 +52,6 @@ class HDTask(Document):
                 "allocated_to": user
             })
 
-    # FIXED: Maps directly to your new 'assigned' string value field
     def assign_to_user_silently(self):
         if self.assigned:
             if not frappe.db.exists("ToDo", {"reference_type": self.doctype, "reference_name": self.name, "allocated_to": self.assigned}):
@@ -70,6 +65,8 @@ class HDTask(Document):
 
     def _publish_event(self, event: str, telemetry_event: str):
         ticket_id = self.reference_docname
+        if not ticket_id:
+            return
         data = {"ticket_id": ticket_id, "task_id": self.name}
         room = get_doc_room("HD Ticket", ticket_id)
         publish_event(event, room=room, data=data)
@@ -109,8 +106,6 @@ class HDTask(Document):
             "start_date",
             "status",
             "priority",
-            "reference_doctype",
-            "reference_docname",
             "modified",
         ]
         return {"columns": columns, "rows": rows}
@@ -156,79 +151,69 @@ def get_tasks(ticket: str):
 
 @frappe.whitelist()
 def create_task(
-    ticket: str,
-    title: str,
+    ticket: str = None,
+    title: str = None,
     status: str = "Todo",
     priority: str = "Medium",
     description: str = None,
     assigned: str = None,
     start_date: str = None,
     due_date: str = None,
+    **kwargs
 ):
-    if not ticket or not str(ticket).strip():
-        frappe.throw(_("Ticket is required"))
-
-    ticket = str(ticket).strip()
-
-    if not title or not title.strip():
+    if title is None or not str(title).strip():
         frappe.throw(_("Title is required"))
 
-    frappe.has_permission("HD Ticket", "write", ticket, throw=True)
+    doc_data = {
+        "doctype": "HD Task",
+        "title": title,
+        "description": description,
+        "status": status,
+        "priority": priority,
+        "assigned": assigned or kwargs.get("assigned_to"),
+        "start_date": start_date,
+        "due_date": due_date,
+    }
 
-    if not frappe.db.get_value("HD Ticket", {"name": ticket}, "name"):
-        frappe.throw(_("Ticket {0} not found").format(ticket))
-
-    doc = frappe.get_doc(
-        {
-            "doctype": "HD Task",
+    if ticket and str(ticket).strip():
+        ticket = str(ticket).strip()
+        frappe.has_permission("HD Ticket", "write", ticket, throw=True)
+        if not frappe.db.get_value("HD Ticket", {"name": ticket}, "name"):
+            frappe.throw(_("Ticket {0} not found").format(ticket))
+        doc_data.update({
             "reference_doctype": "HD Ticket",
             "reference_docname": ticket,
-            "title": title,
-            "description": description,
-            "status": status,
-            "priority": priority,
-            "assigned": assigned,
-            "start_date": start_date,
-            "due_date": due_date,
-        }
-    )
+        })
+
+    doc = frappe.get_doc(doc_data)
     doc.insert(ignore_permissions=True)
     return doc
 
 
 @frappe.whitelist()
-def update_task(
-    task: str,
-    title: str = None,
-    status: str = None,
-    priority: str = None,
-    description: str = None,
-    assigned: str = None,
-    start_date: str = None,
-    due_date: str = None,
-):
+def update_task(task: str | int, **kwargs):
     if not frappe.db.exists("HD Task", task):
         frappe.throw(_("Task not found"))
 
     ticket = frappe.db.get_value("HD Task", task, "reference_docname")
-    frappe.has_permission("HD Ticket", "write", str(ticket), throw=True)
+    if ticket:
+        frappe.has_permission("HD Ticket", "write", str(ticket), throw=True)
+    else:
+        frappe.has_permission("HD Task", "write", task, throw=True)
 
     doc = frappe.get_doc("HD Task", task)
 
-    if title is not None:
-        doc.title = title
-    if status is not None:
-        doc.status = status
-    if priority is not None:
-        doc.priority = priority
-    if description is not None:
-        doc.description = description
-    if assigned is not None:
-        doc.assigned = assigned
-    if start_date is not None:
-        doc.start_date = start_date
-    if due_date is not None:
-        doc.due_date = due_date
+    # FIXED: Replaced rigid `is not None` with robust kwargs check 
+    # to allow clearing fields (saving `None`) securely.
+    allowed_fields = ["title", "status", "priority", "description", "assigned", "start_date", "due_date"]
+    
+    # Handle frontend payload sending `assigned_to`
+    if "assigned_to" in kwargs and "assigned" not in kwargs:
+        kwargs["assigned"] = kwargs.get("assigned_to")
+
+    for field in allowed_fields:
+        if field in kwargs:
+            doc.set(field, kwargs.get(field))
 
     doc.save(ignore_permissions=True)
     return doc
@@ -240,7 +225,10 @@ def delete_task(task: str):
         frappe.throw(_("Task not found"))
 
     ticket = frappe.db.get_value("HD Task", task, "reference_docname")
-    frappe.has_permission("HD Ticket", "write", str(ticket), throw=True)
+    if ticket:
+        frappe.has_permission("HD Ticket", "write", str(ticket), throw=True)
+    else:
+        frappe.has_permission("HD Task", "write", task, throw=True)
 
     frappe.delete_doc("HD Task", task, force=True)
     return True

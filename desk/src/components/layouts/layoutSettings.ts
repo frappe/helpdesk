@@ -6,6 +6,7 @@ import { OrganizationsIcon } from "../icons";
 import PhoneIcon from "../icons/PhoneIcon.vue";
 import LucideHome from "~icons/lucide/home";
 import { __ } from "@/translation";
+import TaskIcon from "@/components/icons/TaskIcon.vue";
 
 export const agentPortalSidebarOptions = [
   {
@@ -32,6 +33,11 @@ export const agentPortalSidebarOptions = [
     label: "Customers",
     icon: OrganizationsIcon,
     to: "CustomerList",
+  },
+   {
+    label: __('Tasks'),
+    icon: TaskIcon,
+    to: { name: 'TaskList' } 
   },
   {
     label: __("Contacts"),

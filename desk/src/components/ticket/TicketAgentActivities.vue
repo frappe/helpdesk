@@ -1,17 +1,18 @@
 <template>
-  <div class="flex items-center justify-between px-5 py-3 flex-shrink-0">
+  <!-- Header Section -->
+  <div class="flex items-center justify-between px-5 py-3 flex-shrink-0 w-full">
     <h3 class="text-base font-semibold text-ink-gray-9">
       {{ title }}
     </h3>
-
+    
     <button
       v-if="title === __('Tasks')"
-      class="flex items-center gap-1 rounded-md bg-black px-2.5 py-1 text-xs font-medium text-white hover:bg-gray-900 focus:outline-none leading-none"
+      class="flex items-center gap-1.5 rounded-lg bg-gray-900 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-black focus:outline-none"
       @click="showNewTaskModal = true"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="h-3 w-3"
+        class="h-4 w-4"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -22,10 +23,10 @@
         <line x1="12" y1="5" x2="12" y2="19" />
         <line x1="5" y1="12" x2="19" y2="12" />
       </svg>
-
-      {{ __("New") }}
+      {{ __("Create") }}
     </button>
-  </div>
+  </div> <!-- This closing tag fixes both the layout and the build error! -->
+
   <TaskboxEditor
     v-model="showNewTaskModal"
     :ticket-id="resolvedTicketId"
@@ -36,6 +37,7 @@
       }
     "
   />
+
   <FadedScrollableDiv
     class="flex flex-col flex-1 overflow-y-auto"
     :mask-length="20"

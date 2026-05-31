@@ -1,4 +1,3 @@
-
 <template>
   <Dialog v-model="show" :options="{ size: 'xl' }">
     <template #body-title>
@@ -13,32 +12,67 @@
       <div class="flex flex-col gap-5 mt-2">
 
         <div class="space-y-1.5">
-          <div class="text-sm text-ink-gray-5 flex items-center gap-1">
-            {{ __('Title') }} <span class="text-red-500">*</span>
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-ink-gray-5 flex items-center gap-1">
+              {{ __('Title') }} <span class="text-red-500">*</span>
+            </div>
+            <span 
+              class="text-xs transition-colors"
+              :class="form.title.length > 140 ? 'text-red-500 font-semibold' : 'text-ink-gray-4'"
+            >
+              {{ form.title.length }}/140
+            </span>
           </div>
           <TextInput
             ref="titleRef"
             v-model="form.title"
             variant="subtle"
-            class="w-full rounded-md"
+            class="w-full rounded-md transition-all border"
+            :class="{ 'border-red-500 ring-1 ring-red-500 focus:border-red-500 focus:ring-red-500': errors.title || errors.titleLength }"
             :placeholder="__('Enter task title')"
           />
+          <p v-if="errors.title" class="text-xs text-red-500 font-medium">
+            {{ __('Title is required') }}
+          </p>
+          <p v-if="errors.titleLength" class="text-xs text-red-500 font-medium">
+            {{ __('Title cannot exceed 140 characters') }}
+          </p>
         </div>
 
         <div class="space-y-1.5">
-          <div class="text-sm text-ink-gray-5">{{ __("Description") }}</div>
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-ink-gray-5 flex items-center gap-1">
+              {{ __("Description") }} <span class="text-red-500">*</span>
+            </div>
+            <span 
+              class="text-xs transition-colors"
+              :class="getDescriptionLength > 4000 ? 'text-red-500 font-semibold' : 'text-ink-gray-4'"
+            >
+              {{ getDescriptionLength }}/4000
+            </span>
+          </div>
           <TextEditor
-            editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5"
+            :editor-class="`!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border bg-surface-gray-2 placeholder-ink-gray-4 hover:shadow-sm focus:bg-surface-white focus:shadow-sm focus:ring-0 focus-visible:ring-2 text-ink-gray-8 transition-colors -mt-0.5 ${
+              (errors.description || errors.descriptionLength)
+                ? 'border-red-500 focus-visible:ring-red-500' 
+                : 'border-[--surface-gray-2] hover:border-outline-gray-modals focus:border-outline-gray-4 focus-visible:ring-outline-gray-3'
+            }`"
             :bubble-menu="false"
             :fixed-menu="true"
             :content="form.description"
             :placeholder="__('Enter task description...')"
             @change="(val) => (form.description = val)"
           />
+          <p v-if="errors.description" class="text-xs text-red-500 font-medium">
+            {{ __('Description is required') }}
+          </p>
+          <p v-if="errors.descriptionLength" class="text-xs text-red-500 font-medium">
+            {{ __('Description exceeds character limit (Max 4,000)') }}
+          </p>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
-          
+
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __('Priority') }}</div>
             <FormControl
@@ -122,7 +156,7 @@
           :label="isEditing ? __('Update') : __('Create')"
           variant="solid"
           :loading="loading"
-          :disabled="!form.title?.trim() || loading"
+          :disabled="loading"
           @click="handleSubmit"
         />
       </div>
@@ -148,15 +182,19 @@ import {
 } from "frappe-ui";
 import { __ } from "@/translation";
 import { isContentEmpty } from "@/utils";
+import { useUserStore } from "@/stores/user";
 
 // --- Props & Emits ---
 const props = defineProps({
-  modelValue: { type: Boolean, default: false }, 
+  modelValue: { type: Boolean, default: false },
   task:       { type: Object, default: null },
   ticketId:   { type: [String, Number], default: "" },
 });
 
 const emit = defineEmits(["update:modelValue", "submit"]);
+
+// --- Store ---
+const { getUser } = useUserStore();
 
 // --- State ---
 const show = computed({
@@ -164,17 +202,48 @@ const show = computed({
   set: (value) => emit("update:modelValue", value),
 });
 
-const loading  = ref(false);
-const titleRef = ref(null);
+const loading    = ref(false);
+const titleRef   = ref(null);
+const activeTask = ref<any>(null);
 
-const isEditing = computed(() => !!props.task?.name);
+const isEditing = computed(() => !!(props.task?.name || activeTask.value?.name));
 
 const defaultForm = () => ({
-  title: "", description: "", due_date: "",
-  status: "Backlog", priority: "Low", assigned: "",
+  title:       "",
+  description: "",
+  due_date:    "",
+  status:      "Backlog",
+  priority:    "Low",
+  assigned:    "",
 });
 
 const form = ref(defaultForm());
+
+// --- Validation States ---
+const errors = ref({
+  title: false,
+  titleLength: false,
+  description: false,
+  descriptionLength: false,
+});
+
+// Safe counter fallback helper for Description string length evaluation
+const getDescriptionLength = computed(() => {
+  if (!form.value.description) return 0;
+  // If HTML elements are involved, you can map out raw length safely
+  return form.value.description.length;
+});
+
+// Instantly scrub warning nodes when criteria are successfully met while editing
+watch(() => form.value.title, (val) => {
+  if (val?.trim()) errors.value.title = false;
+  if (val?.length <= 140) errors.value.titleLength = false;
+});
+
+watch(() => form.value.description, (val) => {
+  if (!isContentEmpty(val)) errors.value.description = false;
+  if (!val || val.length <= 4000) errors.value.descriptionLength = false;
+});
 
 // --- Users/Agents Logic ---
 const agentsList = createResource({
@@ -199,16 +268,24 @@ const agentOptions = computed(() => {
 
 const assigneeLabel = computed(() => {
   if (!form.value.assigned) return "";
-  const match = agentOptions.value.find((o) => o.value === form.value.assigned);
-  if (match) return match.label;
-  return form.value.assigned.split("@")[0]
+
+  const fromList = agentOptions.value.find((o) => o.value === form.value.assigned);
+  if (fromList?.label) return fromList.label;
+
+  const storeUser = getUser(form.value.assigned);
+  if (storeUser?.full_name) return storeUser.full_name;
+
+  return form.value.assigned
+    .split("@")[0]
     .split(/[._-]/)
     .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 });
 
 function getAssigneeImage(assigned: string): string {
-  return agentOptions.value.find((o) => o.value === assigned)?.image || "";
+  const fromList = agentOptions.value.find((o) => o.value === assigned);
+  if (fromList?.image) return fromList.image;
+  return getUser(assigned)?.user_image || "";
 }
 
 function handleAssigneeChange(option: any) {
@@ -217,18 +294,29 @@ function handleAssigneeChange(option: any) {
   else                                 form.value.assigned = option;
 }
 
+function resolveAssigned(): string {
+  if (form.value.assigned?.trim()) return form.value.assigned;
+  const sessionUser = window.session_user;
+  return sessionUser && sessionUser !== "Guest" ? sessionUser : "";
+}
+
 // --- Watchers ---
 watch(
   () => props.task,
   (task) => {
+    errors.value.title = false;
+    errors.value.titleLength = false;
+    errors.value.description = false;
+    errors.value.descriptionLength = false;
+
     if (task) {
       form.value = {
-        title:       task.title        || "",
-        description: task.description  || "",
-        due_date:    task.due_date     || "",
-        status:      task.status       || "Backlog",
-        priority:    task.priority     || "Low",
-        assigned:    task.assigned     || "",
+        title:       task.title       || "",
+        description: task.description || "",
+        due_date:    task.due_date    || "",
+        status:      task.status      || "Backlog",
+        priority:    task.priority    || "Low",
+        assigned:    task.assigned    || "",
       };
     } else {
       form.value = defaultForm();
@@ -237,48 +325,143 @@ watch(
   { immediate: true, deep: true },
 );
 
-watch(show, (val) => {
-  if (val) {
-    if (!props.task) form.value = defaultForm();
-    agentsList.fetch();
-    nextTick(() => setTimeout(() => (titleRef.value as any)?.el?.focus?.(), 100));
+watch(show, async (val) => {
+  if (!val) return;
+
+  errors.value.title = false;
+  errors.value.titleLength = false;
+  errors.value.description = false;
+  errors.value.descriptionLength = false;
+  
+  await agentsList.fetch();
+
+  if (!props.task && !activeTask.value) {
+    form.value = defaultForm();
+    form.value.assigned = resolveAssigned();
   }
+
+  nextTick(() => setTimeout(() => (titleRef.value as any)?.el?.focus?.(), 100));
 });
 
 // --- Options ---
 const statusOptions = [
-  { label: __("Backlog"), value: "Backlog" },
-  { label: __("Todo"), value: "Todo" },
-  { label: __("In Progress"), value: "In Progress" },
-  { label: __("Done"), value: "Done" },
-  { label: __("Canceled"), value: "Canceled" },
+  { label: __("Backlog"),     value: "Backlog"      },
+  { label: __("Todo"),        value: "Todo"         },
+  { label: __("In Progress"), value: "In Progress"  },
+  { label: __("Done"),        value: "Done"         },
+  { label: __("Canceled"),    value: "Canceled"     },
 ];
 
 const priorityOptions = [
-  { label: __("Low"), value: "Low" },
+  { label: __("Low"),    value: "Low"    },
   { label: __("Medium"), value: "Medium" },
-  { label: __("High"), value: "High" },
+  { label: __("High"),   value: "High"   },
 ];
+
+// --- Exposed methods ---
+function showTask(task: any) {
+  errors.value.title = false;
+  errors.value.titleLength = false;
+  errors.value.description = false;
+  errors.value.descriptionLength = false;
+
+  form.value = {
+    title:       task.title       || "",
+    description: task.description || "",
+    due_date:    task.due_date    || "",
+    status:      task.status      || "Backlog",
+    priority:    task.priority    || "Low",
+    assigned:    task.assigned    || "",
+  };
+  activeTask.value = task;
+  show.value = true;
+}
+
+async function updateTaskStatus(task: any, newStatus: string) {
+  if (!task?.name) { toast.error(__("Task not found")); return; }
+  try {
+    await call("helpdesk.helpdesk.doctype.hd_task.hd_task.update_task", {
+      task:   task.name,
+      status: newStatus,
+    });
+    toast.success(__("Status updated"));
+    emit("submit", { ...task, status: newStatus });
+  } catch (e: any) {
+    const msg = e?.message || e?.exc?.split("\n").filter(Boolean).pop() || __("Something went wrong");
+    toast.error(msg);
+  }
+}
+
+async function deleteTask(taskName: string) {
+  if (!taskName || typeof taskName !== "string" || !taskName.trim()) {
+    toast.error(__("Task not found"));
+    return;
+  }
+  try {
+    await call("helpdesk.helpdesk.doctype.hd_task.hd_task.delete_task", {
+      task: taskName,
+    });
+    toast.success(__("Task deleted"));
+    emit("submit", null);
+  } catch (e: any) {
+    const msg = e?.message || e?.exc?.split("\n").filter(Boolean).pop() || __("Something went wrong");
+    toast.error(msg);
+  }
+}
+
+defineExpose({ showTask, updateTaskStatus, deleteTask });
 
 // --- Actions ---
 async function handleSubmit() {
-  if (!form.value.title?.trim()) { toast.error(__("Title is required")); return; }
+  errors.value.title = false;
+  errors.value.titleLength = false;
+  errors.value.description = false;
+  errors.value.descriptionLength = false;
+
+  let formsAreInvalid = false;
+
+  // 1. Check Title Empty & Length States
+  if (!form.value.title?.trim()) {
+    errors.value.title = true;
+    formsAreInvalid = true;
+  } else if (form.value.title.length > 140) {
+    errors.value.titleLength = true;
+    formsAreInvalid = true;
+  }
+  
+  // 2. Check Description Empty & Length States
+  if (isContentEmpty(form.value.description)) {
+    errors.value.description = true;
+    formsAreInvalid = true;
+  } else if (form.value.description.length > 4000) {
+    errors.value.descriptionLength = true;
+    formsAreInvalid = true;
+  }
+
+  // 3. Stop submission execution instantly on validation faults
+  if (formsAreInvalid) {
+    toast.error(__("Please fix validation issues before updating."));
+    return;
+  }
+
   if (loading.value) return;
   loading.value = true;
 
   try {
     let result: any;
-    const dbDate = form.value.due_date || null;
+    const dbDate    = form.value.due_date || null;
+    const assignedTo = resolveAssigned();
 
     if (isEditing.value) {
+      const taskName = props.task?.name || activeTask.value?.name;
       result = await call("helpdesk.helpdesk.doctype.hd_task.hd_task.update_task", {
-        task:        props.task.name,
+        task:        taskName,
         title:       form.value.title,
         description: isContentEmpty(form.value.description) ? null : form.value.description,
         due_date:    dbDate,
         status:      form.value.status,
         priority:    form.value.priority,
-        assigned:    form.value.assigned || null,
+        assigned:    assignedTo,
       });
       toast.success(__("Task updated"));
     } else {
@@ -291,13 +474,14 @@ async function handleSubmit() {
         due_date:    dbDate,
         status:      form.value.status,
         priority:    form.value.priority,
-        assigned:    form.value.assigned || null,
+        assigned:    assignedTo,
       });
       toast.success(__("Task created"));
     }
 
     emit("submit", result);
-    show.value = false; 
+    show.value   = false;
+    activeTask.value = null;
   } catch (e: any) {
     const msg = e?.message || e?.exc?.split("\n").filter(Boolean).pop() || __("Something went wrong");
     toast.error(msg);
@@ -308,7 +492,6 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-/* Ensure standard input styling across the datepicker */
 .date-picker-wrapper :deep(input) {
   width: 100%;
   background-color: var(--surface-gray-2, #f3f4f6);
