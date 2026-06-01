@@ -4,7 +4,7 @@
   >
     <div
       @click="slaActiveScreen = { screen: 'view', data: data, fetchData: true }"
-      class="w-full pl-2 col-span-5 flex flex-col justify-center h-14"
+      class="w-full ps-2 col-span-5 flex flex-col justify-center h-14"
     >
       <div class="text-base-medium text-ink-gray-7 flex items-center gap-2">
         {{ data.name }}
@@ -17,7 +17,7 @@
         {{ data.description }}
       </div>
     </div>
-    <div class="flex justify-between items-center w-full pr-2">
+    <div class="flex justify-between items-center w-full pe-2">
       <div>
         <Switch
           size="sm"

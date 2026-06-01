@@ -96,8 +96,6 @@ import { __ } from "@/translation";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
-import LucideMoon from "~icons/lucide/moon";
-import LucideSun from "~icons/lucide/sun";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
@@ -130,7 +128,6 @@ const themeMenuItem = computed(() => ({
 const isFCSite = ref(window.is_fc_site);
 
 const customerPortalDropdown = computed(() => [
-  themeMenuItem.value,
   {
     group: __("Danger"),
     hideLabel: true,
@@ -357,11 +354,11 @@ const steps = [
 
 const articles = ref([
   {
-    title: "Introduction",
+    title: __("Introduction"),
     opened: false,
     subArticles: [
-      { name: "introduction", title: "Introduction" },
-      { name: "setting-up", title: "Setting up" },
+      { name: "introduction", title: __("Introduction") },
+      { name: "setting-up", title: __("Setting up") },
     ],
   },
   {
@@ -370,27 +367,27 @@ const articles = ref([
     subArticles: [
       {
         name: "lesson-1-your-first-ticket",
-        title: "Creating a ticket",
+        title: __("Creating a ticket"),
       },
       {
         name: "lesson-2understanding-ticket-view",
-        title: "Understanding ticket view",
+        title: __("Understanding ticket view"),
       },
       {
         name: "lesson-3-agents-teams",
-        title: "Agents & Teams",
+        title: __("Agents & Teams"),
       },
       {
         name: "customers-contacts",
-        title: "Customers & Contacts",
+        title: __("Customers & Contacts"),
       },
       {
         name: "lesson-4-knowledge-base",
-        title: "Knowledge Base",
+        title: __("Knowledge Base"),
       },
       {
         name: "customer-portal",
-        title: "Customer Portal",
+        title: __("Customer Portal"),
       },
     ],
   },
@@ -414,20 +411,20 @@ const articles = ref([
     title: __("Customizations"),
     opened: false,
     subArticles: [
-      { name: "custom-actions", title: "Custom Actions" },
-      { name: "field-dependency", title: "Field Dependency" },
-      { name: "custom-views", title: "Custom Views" },
+      { name: "custom-actions", title: __("Custom Actions") },
+      { name: "field-dependency", title: __("Field Dependency") },
+      { name: "custom-views", title: __("Custom Views") },
       {
         name: "settings",
-        title: "Settings",
+        title: __("Settings"),
       },
     ],
   },
   {
-    title: "Frappe Helpdesk Mobile",
+    title: __("Frappe Helpdesk Mobile"),
     opened: false,
     subArticles: [
-      { name: "pwa-installation", title: "Mobile App Installation" },
+      { name: "pwa-installation", title: __("Mobile App Installation") },
     ],
   },
 ]);

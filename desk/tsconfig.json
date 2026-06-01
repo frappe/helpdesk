@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"allowUnreachableCode": false,
 		"target": "es2022",

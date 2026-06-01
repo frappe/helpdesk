@@ -5,7 +5,7 @@
         <Breadcrumbs :items="breadcrumbs" />
       </template>
       <template #right-header>
-        <div class="absolute right-0 pr-2">
+        <div class="absolute end-0 pe-2">
           <Dropdown :options="dropdownOptions">
             <template #default="{ open }">
               <Button :label="ticket.doc.status">
@@ -153,7 +153,7 @@
         >
           {{ __("Confirm") }}
         </Button>
-        <Button class="ml-2" @click="showSubjectDialog = false">
+        <Button class="ms-2" @click="showSubjectDialog = false">
           {{ __("Close") }}
         </Button>
       </template>

@@ -17,7 +17,7 @@
           class="w-full px-6 md:px-5 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
-            class="relative flex justify-center after:absolute after:left-[50%] after:top-3 after:-z-10 after:border-l after:border-outline-elevation-2"
+            class="relative flex justify-center after:absolute after:start-[50%] after:top-3 after:-z-10 after:border-s after:border-outline-elevation-2"
             :class="[
               i != activities.length - 1 && 'after:h-full',
               !['email', 'feedback', 'call', 'comment'].includes(
@@ -41,11 +41,11 @@
                 size="lg"
                 :label="activity.sender?.full_name"
                 :image="getUser(activity.sender?.name).user_image"
-                class="bg-surface-base absolute left-[0.7px]"
+                class="bg-surface-base absolute start-[0.7px]"
               />
               <CommentIcon
                 v-else-if="activity.type === 'comment'"
-                class="text-ink-gray-5 absolute left-[7.5px]"
+                class="text-ink-gray-5 absolute start-[7.5px]"
               />
               <FeatherIcon
                 v-else-if="activity.type === 'call'"
@@ -54,11 +54,11 @@
                     ? 'phone-incoming'
                     : 'phone-outgoing'
                 "
-                class="text-ink-gray-5 left-[7.5px] size-4"
+                class="text-ink-gray-5 start-[7.5px] size-4"
               />
               <DotIcon
                 v-else
-                class="text-ink-gray-5 absolute left-[7.5px] top-[6px]"
+                class="text-ink-gray-5 absolute start-[7.5px] top-[6px]"
               />
             </div>
           </div>

@@ -21,10 +21,10 @@
               :id="field.fieldname"
               :class="section.group ? 'flex-1 min-w-0' : 'w-full'"
               :page-length="10"
-              :label="field.label"
-              :placeholder="field.placeholder"
+              :label="__(field.label)"
+              :placeholder="__(field.placeholder)"
               :doctype="field.doctype"
-              :modelValue="field.value"
+              :modelValue="__(field.value)"
               :required="field.required"
               @update:model-value="
               (val:string) => handleFieldUpdate(field.fieldname, val,true)

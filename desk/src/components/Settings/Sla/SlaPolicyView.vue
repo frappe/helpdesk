@@ -1,18 +1,9 @@
 <template>
-  <SettingsLayoutBase>
-    <template #title>
-      <div class="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="slaData.service_level || __('New SLA Policy')"
-          size="md"
-          @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
-        />
-        <UnsavedBadge :show="isDirty" />
-      </div>
-    </template>
+  <SettingsLayoutBase
+    :back-label="slaData.service_level || __('New SLA Policy')"
+    :on-back="goBack"
+    :dirty="isDirty"
+  >
     <template #header-actions>
       <div class="flex gap-4 items-center">
         <div
@@ -293,7 +284,6 @@ import { disableSettingModalOutsideClick } from "../settingsModal";
 import { useOnboarding } from "frappe-ui/frappe";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import { SlaPolicyListResourceSymbol } from "@/types";
 import { HDServiceLevelAgreement } from "@/types/doctypes";
 

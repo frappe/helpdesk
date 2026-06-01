@@ -7,7 +7,7 @@
       'box-shadow': '8px 0px 8px rgba(0, 0, 0, 0.1)',
       'max-width': '350px',
       'min-width': '350px',
-      left: sidebarStore.width,
+      'inset-inline-start': sidebarStore.width,
     }"
   >
     <div
@@ -51,7 +51,7 @@
         <UserAvatar :name="n.user_from" />
         <span>
           <div class="mb-2 leading-5">
-            <span class="space-x-1 text-ink-gray-7">
+            <span class="space-x-1 rtl:space-x-reverse text-ink-gray-6">
               <span
                 class="font-medium text-ink-gray-9"
                 v-if="n.notification_type !== 'Reaction' || !n.message"
@@ -154,3 +154,8 @@ function getRoute(n: Notification) {
   }
 }
 </script>
+<style lang="css">
+[dir="rtl"] .notifications-panel {
+  box-shadow: -8px 0px 8px rgba(0, 0, 0, 0.1) !important;
+}
+</style>
