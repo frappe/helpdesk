@@ -841,10 +841,7 @@ export function buildPercentageChange(value: number | null) {
   };
 }
 
-export function formatDate(date, format = 'DD-MM-YYYY') {
-  if (!date) return ''
-  return dayjsLocal(date).format(format)
-}
+
 
 function getBrowserTimezone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone

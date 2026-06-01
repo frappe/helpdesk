@@ -52,7 +52,7 @@ import TaskIcon from "@/components/icons/TaskIcon.vue";
 import TaskStatusIcon from "@/components/icons/TaskStatusIcon.vue";
 import TaskPriorityIcon from "@/components/icons/TaskPriorityIcon.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
-import { formatDate } from "@/utils";
+import { dateFormat } from "@/utils";
 import { __ } from "@/translation";
 
 const isTaskDialogVisible = ref(false);
@@ -140,7 +140,7 @@ const options = computed(() => {
             { class: "flex items-center gap-2 truncate text-base" },
             [
               h(CalendarIcon, { class: "h-4 w-4 text-ink-gray-6" }),
-              h("span", { class: "truncate" }, formatDate(item, "D MMM, hh:mm a")),
+              h("span", { class: "truncate" }, dateFormat(item, "D MMM, hh:mm a")),
             ],
           );
         },

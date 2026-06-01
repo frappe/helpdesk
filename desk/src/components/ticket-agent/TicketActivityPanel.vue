@@ -26,7 +26,12 @@
         "
       />
       </template>
+      <!-- <div v-else class="flex items-center justify-center flex-col flex-1">
+        <Button :loading="true" variant="ghost" size="2xl" />
+        <p class="text-xl font-medium text-ink-gray-5">Loading...</p>
+      </div> -->
   </Tabs>
+   <!-- Comm Area -->
   <CommunicationArea
     ref="communicationAreaRef"
     :ticketId="String(ticket.doc?.name)"
@@ -115,7 +120,9 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
 });
 
 const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
-
+// TODO: refactor for pagination
+// can be done once we sort out the backend
+// sender mail will be  user using portal
 const _activities = computed(() => {
   if (!activities.value?.data) {
     return [];
@@ -155,6 +162,7 @@ const _activities = computed(() => {
       attachments: comment.attachments,
     };
   });
+    // if h.actions includes h.owner, replace it with 'themselves'
 
   activities.value.data.history.map((h) => {
     if (h.action && h.owner && h.action.includes(h.owner)) {
@@ -241,6 +249,9 @@ const _activities = computed(() => {
     }
     i++;
   }
+  // add feedback data at the last always
+  // name is email
+  // full_name is name
 
   if (ticket.value.doc.feedback_rating === 0) {
     return data;

@@ -110,15 +110,6 @@ class HDTask(Document):
         ]
         return {"columns": columns, "rows": rows}
 
-    @staticmethod
-    def default_kanban_settings():
-        return {
-            "column_field": "status",
-            "title_field": "title",
-            "kanban_fields": '["description", "priority", "creation"]',
-        }
-
-
 @frappe.whitelist()
 def get_tasks(ticket: str):
     if not ticket or not str(ticket).strip():
@@ -233,13 +224,3 @@ def delete_task(task: str):
     frappe.delete_doc("HD Task", task, force=True)
     return True
 
-
-@frappe.whitelist()
-def get_agents_list():
-    return frappe.get_all(
-        "User",
-        filters={"enabled": 1, "user_type": "System User"},
-        fields=["name", "full_name"],
-        limit=200,
-        order_by="full_name asc"
-    )
