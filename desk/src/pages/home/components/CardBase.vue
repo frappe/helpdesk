@@ -21,7 +21,9 @@
             <div
               class="flex items-center gap-0.5 text-ink-gray-5 hover:text-ink-gray-6 cursor-pointer shrink-0"
             >
-              vs {{ currentDuration.toLowerCase() }}
+              <div class="rtl:flex rtl:gap-1">
+                <span>vs</span> <span>{{ currentDuration.toLowerCase() }}</span>
+              </div>
               <FeatherIcon name="chevron-down" class="size-4" />
             </div>
             <template #item-label="{ item }">

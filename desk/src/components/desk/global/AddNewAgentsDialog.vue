@@ -48,7 +48,7 @@
                 {{ email }}
               </span>
               <button
-                class="grid h-4 w-4 place-items-center rounded text-ink-gray-6 hover:bg-surface-gray-4"
+                class="grid h-4 w-4 place-items-center rounded text-ink-gray-7 hover:bg-surface-gray-4"
                 @click="removeEmailFromQueue(email)"
               >
                 <FeatherIcon class="w-3" name="x" />
