@@ -26,7 +26,7 @@
     </div>
     <div v-else class="-ms-2">
       <div
-        class="grid grid-cols-6 items-center gap-3 text-sm text-gray-600 ms-2"
+        class="grid grid-cols-6 items-center gap-3 text-sm text-ink-gray-5 ms-2"
       >
         <div class="col-span-5">
           {{ __("Policy name") }}
