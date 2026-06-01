@@ -6,13 +6,19 @@
     <template #body-content>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-8">
-          {{ __("All comments and emails of the ticket will be moved to the") }}
-          <span class="whitespace-nowrap font-semibold"
-            >#{{ ticket.name }}</span
-          >
-          <span class="inline-flex items-center gap-1">
-            selected ticket
-            <Popover trigger="hover" :hoverDelay="0.25" placement="right">
+          {{
+            __(
+              "All comments and emails from both tickets will be merged into the selected ticket"
+            )
+          }}
+          <span class="whitespace-nowrap font-semibold">
+            #{{ ticket.name
+            }}<Popover
+              trigger="hover"
+              :hoverDelay="0.25"
+              placement="right"
+              class="!inline-flex align-middle ms-1 -mt-1"
+            >
               <template #target>
                 <FeatherIcon name="info" class="size-4 cursor-pointer" />
               </template>
