@@ -1,54 +1,40 @@
 import frappe
-from frappe.core.doctype.docshare.docshare import DocShare
+from frappe.model.document import Document
 
-from helpdesk.integrations.erpnext.mirror_sync import MirrorSyncMixin
+from helpdesk.integrations.erpnext import mirror_sync
 from helpdesk.integrations.erpnext.utils import should_sync
 
+# Keeps HD Customer / ERPNext Customer DocShares mirrored bidirectionally when
+# the integration is enabled.
 
-class CustomDocShare(MirrorSyncMixin, DocShare):
-    """Overrides core DocShare to keep HD Customer / ERPNext Customer shares
-    mirrored bidirectionally when the integration is enabled."""
 
-    DOCTYPE_FIELD = "share_doctype"
-    VALUE_FIELD = "share_name"
+def before_validate(doc: Document, method: str | None = None):
+    mirror_sync.before_validate(doc, _config())
 
-    def before_validate(self):
-        """Clean up the old mirror when identity changes. Mirrored from
-        CustomUserPermission for symmetry — done in before_validate so it sits
-        before any duplicate-style validation the parent might add."""
-        old = self.get_doc_before_save()
-        if old and self.has_data_updated(old) and self.sync_active():
-            self.delete_mirror_for(old)
 
-    def after_insert(self):
-        super().after_insert()
-        if self.should_mirror():
-            self.create_mirror()
+def after_insert(doc: Document, method: str | None = None):
+    mirror_sync.after_insert(doc, _config())
 
-    def on_update(self):
-        # Core DocShare doesn't define on_update — no super() call needed.
-        if not self.should_mirror():
-            return
-        old = self.get_doc_before_save()
-        if old and self.has_data_updated(old):
-            # Old mirror was cleaned up in before_validate(); create the fresh one.
-            self.create_mirror()
-        else:
-            self.sync_state_to_mirror()
 
-    def on_trash(self):
-        super().on_trash()
-        if not self.should_mirror():
-            return
-        mirror = self.find_mirror()
-        if not mirror:
-            return
-        self.set_mirror_flags(mirror)
-        mirror.delete(ignore_permissions=True)
+def on_update(doc: Document, method: str | None = None):
+    mirror_sync.on_update(doc, _config())
 
-    def set_mirror_flags(self, mirror):
-        super().set_mirror_flags(mirror)
-        mirror.flags.ignore_share_permission = True
+
+def on_trash(doc: Document, method: str | None = None):
+    mirror_sync.on_trash(doc, _config())
+
+
+def _config() -> dict:
+    return {
+        "user_field": "user",
+        "doctype_field": "share_doctype",
+        "value_field": "share_name",
+        "extra_flags": _extra_flags,
+    }
+
+
+def _extra_flags(mirror: Document):
+    mirror.flags.ignore_share_permission = True
 
 
 def sync_shared_docs():
