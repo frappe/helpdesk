@@ -42,6 +42,7 @@ def get_boot():
                 "user": frappe.db.get_value("User", frappe.session.user, "time_zone")
                 or get_system_timezone(),
             },
+            "apps": frappe.get_installed_apps(),
         }
     )
 
