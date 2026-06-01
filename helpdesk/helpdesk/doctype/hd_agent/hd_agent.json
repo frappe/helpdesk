@@ -44,9 +44,9 @@
   {
    "default": "Active",
    "fieldname": "availability",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "label": "Availability",
-   "options": "Active\nAway\nBusy"
+   "options": "HD Agent Status"
   },
   {
    "fieldname": "availability_changed_on",
@@ -57,7 +57,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-05-19 14:59:12.901015",
+ "modified": "2026-06-02 01:18:56.023594",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
