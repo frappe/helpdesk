@@ -4,8 +4,10 @@ from frappe.model.document import Document
 from helpdesk.integrations.erpnext.utils import (
     cascade_rename,
     in_cascade,
+    map_source_to_target_values,
     set_links,
     should_sync,
+    sync_related_fields,
     validate_rename_conflict,
 )
 
@@ -22,7 +24,7 @@ def after_insert(doc: Document, method: str | None = None):
             "doctype": "HD Customer",
             "customer_name": doc.customer_name,
             "erpnext_customer": doc.name,
-            "image": doc.image,
+            **map_source_to_target_values(doc),
         }
     )
     hd_doc.flags.ignore_erpnext_sync = True
@@ -34,13 +36,7 @@ def on_update(doc: Document, method: str | None = None):
     if not should_sync() or doc.flags.get("ignore_erpnext_sync"):
         return
 
-    if doc.has_value_changed("image"):
-        frappe.db.set_value(
-            "HD Customer",
-            {"erpnext_customer": doc.name},
-            "image",
-            doc.image,
-        )
+    sync_related_fields(doc)
 
 
 def before_rename(
