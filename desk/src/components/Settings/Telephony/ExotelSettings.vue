@@ -1,20 +1,10 @@
 <template>
   <SettingsLayoutBase
     :description="__('Configure your Exotel settings for Helpdesk.')"
+    :back-label="__('Exotel')"
+    :on-back="goBack"
+    :dirty="isDirty.exotel"
   >
-    <template #title>
-      <div class="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="__('Exotel')"
-          size="md"
-          @click="goBack"
-          class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pe-0 !ps-0 -ms-1.5"
-        />
-        <UnsavedBadge :show="isDirty.exotel" />
-      </div>
-    </template>
     <template #header-actions>
       <Button
         :label="__('Save')"
@@ -144,7 +134,6 @@ import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 import { __ } from "@/translation";

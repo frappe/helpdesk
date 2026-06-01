@@ -1,19 +1,8 @@
 <template>
-  <SettingsLayoutBase>
-    <template #title>
-      <div class="flex items-center justify-between w-full">
-        <div class="flex items-center gap-1 justify-center -ms-[16px]">
-          <Button
-            variant="ghost"
-            icon-left="chevron-left"
-            :label="teamName"
-            size="md"
-            @click="() => emit('update:step', 'team-list')"
-            class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pe-0 rtl:flex-row-reverse"
-          />
-        </div>
-      </div>
-    </template>
+  <SettingsLayoutBase
+    :back-label="teamName"
+    :on-back="() => emit('update:step', 'team-list')"
+  >
     <template #header-actions>
       <div class="flex items-center gap-4">
         <div class="flex items-center justify-between gap-2 cursor-pointer">

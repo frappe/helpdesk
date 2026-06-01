@@ -1,24 +1,9 @@
 <template>
-  <SettingsLayoutBase>
-    <template #title>
-      <div class="flex gap-1 items-center">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="__('Email Settings')"
-          size="md"
-          class="cursor-pointer -ms-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-xl hover:opacity-70 !pe-0 !max-w-96 !justify-start"
-          @click="goBack"
-        />
-        <Transition name="fade">
-          <Badge
-            v-if="isDirty"
-            :label="__('Not Saved')"
-            variant="subtle"
-            theme="orange"
-        /></Transition>
-      </div>
-    </template>
+  <SettingsLayoutBase
+    :back-label="__('Email Settings')"
+    :on-back="goBack"
+    :dirty="isDirty"
+  >
     <template #header-actions>
       <Transition name="fade">
         <div v-if="isDirty">
@@ -145,13 +130,7 @@ import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 import { normalize } from "@/utils";
-import {
-  Badge,
-  Button,
-  createDocumentResource,
-  TextEditor,
-  toast,
-} from "frappe-ui";
+import { Button, createDocumentResource, TextEditor, toast } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 const { userId } = useAuthStore();

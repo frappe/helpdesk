@@ -7,6 +7,7 @@
           icon-left="plus"
           @click="togglePopover()"
           :label="__('Add Assignee')"
+          class="rtl:flex-row-reverse"
         />
       </template>
       <template #body="{ togglePopover }">
@@ -81,7 +82,7 @@
           <div class="border-t p-1.5 pb-0.5">
             <Button
               variant="ghost"
-              class="w-full"
+              class="w-full rtl:flex-row-reverse"
               icon-left="plus"
               :label="__('Invite agent')"
               @click="inviteAgents"
