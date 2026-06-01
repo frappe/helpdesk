@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-30 11:01\n"
+"PO-Revision-Date: 2026-06-01 11:29\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -835,7 +835,7 @@ msgstr ""
 #: desk/src/components/Settings/General/components/Branding.vue:4
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Branding"
-msgstr ""
+msgstr "Márkaépítés"
 
 #: desk/src/components/Settings/Holiday/Holidays.vue:3
 msgid "Business Holidays"
@@ -1713,7 +1713,7 @@ msgstr "Szerkeszt"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:221
 msgid "Edit Call Log"
-msgstr ""
+msgstr "Hívásnapló szerkesztése"
 
 #: desk/src/components/Settings/EmailAdd.vue:70
 #: desk/src/components/Settings/EmailEdit.vue:63
@@ -1722,7 +1722,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:3
 msgid "Edit Email"
-msgstr ""
+msgstr "E-mail szerkesztése"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:143
 msgid "Edit Title"
@@ -1749,7 +1749,7 @@ msgstr "E-mail Fiók"
 
 #: desk/src/components/Settings/EmailAccountList.vue:3
 msgid "Email Accounts"
-msgstr ""
+msgstr "E-mail fiókok"
 
 #. Label of the feedback_email_content (Text) field in DocType 'HD Settings'
 #. Label of the acknowledgement_email_content (Text) field in DocType 'HD
@@ -2705,7 +2705,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayView.vue:338
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:394
 msgid "Invalid fields, check if all are filled in and values are correct."
-msgstr ""
+msgstr "Érvénytelen mezők, ellenőrizd, hogy minden mező ki van-e töltve, és az értékek helyesek-e."
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:289
 #: desk/src/pages/desk/contact/ContactDialog.vue:290
@@ -2924,7 +2924,7 @@ msgstr ""
 #. Label of the layout (Code) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Layout"
-msgstr ""
+msgstr "Elrendezés"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:144
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:221
@@ -3538,7 +3538,7 @@ msgstr "Egyéb"
 
 #: desk/src/components/CallArea.vue:37
 msgid "Outbound Call"
-msgstr ""
+msgstr "Kimenő hívás"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:204
 msgid "Outgoing"
@@ -3603,7 +3603,7 @@ msgstr "Függő"
 
 #: desk/src/components/Settings/InviteAgents.vue:42
 msgid "Pending Invites"
-msgstr ""
+msgstr "Függőben lévő meghívók"
 
 #: desk/src/pages/home/Home.vue:353
 #: desk/src/pages/home/components/PendingTickets.vue:234
@@ -3659,7 +3659,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:415
 msgid "Pin View"
-msgstr ""
+msgstr "Nézet rögzítése"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -3669,7 +3669,7 @@ msgstr "Rózsaszín"
 #. Label of the pinned (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Pinned"
-msgstr ""
+msgstr "Rögzített"
 
 #. Label of the placeholder (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
@@ -3726,7 +3726,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:244
 msgid "Please fix the errors in the form"
-msgstr ""
+msgstr "Kérjük, javítsa ki a hibákat az űrlapon"
 
 #: helpdesk/api/saved_replies.py:11
 msgid "Please provide saved_reply_id"
@@ -4630,7 +4630,7 @@ msgstr "Telepítés"
 
 #: desk/src/components/Settings/EmailAdd.vue:3
 msgid "Setup Email"
-msgstr ""
+msgstr "E-mail beállítása"
 
 #: desk/src/components/layouts/Sidebar.vue:454
 msgid "Setup SLA"
@@ -4693,7 +4693,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:627
 msgid "Some error occurred while renaming assignment rule"
-msgstr ""
+msgstr "Hiba történt a hozzárendelési szabály átnevezése során"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:412
 msgid "Some error occurred while renaming holiday list"
@@ -4705,7 +4705,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:611
 msgid "Some error occurred while updating assignment rule"
-msgstr ""
+msgstr "Hiba történt a hozzárendelési szabály frissítése során"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:402
 msgid "Some error occurred while updating holiday list"
@@ -5479,7 +5479,7 @@ msgstr "Kedd"
 #: desk/src/components/Settings/Telephony/Telephony.vue:72
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:10
 msgid "Twilio"
-msgstr ""
+msgstr "Twilio"
 
 #. Label of the type (Select) field in DocType 'HD Field Layout'
 #. Label of the notification_type (Select) field in DocType 'HD Notification'
@@ -5511,7 +5511,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:208
 msgid "Unassignment Condition"
-msgstr ""
+msgstr "A hozzárendelés feloldásának feltétele"
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:16
 msgid "Unauthorized Access"
@@ -5523,7 +5523,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:415
 msgid "Unpin View"
-msgstr ""
+msgstr "Nézet kitűzésének feloldása"
 
 #: desk/src/pages/knowledge-base/Article.vue:21
 msgid "Unpublish"
@@ -5550,7 +5550,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:8
 msgid "Untitled"
-msgstr ""
+msgstr "Névtelen"
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:27
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:47
@@ -5559,7 +5559,7 @@ msgstr "Frissítés"
 
 #: desk/src/components/Settings/EmailEdit.vue:142
 msgid "Update Account"
-msgstr ""
+msgstr "Fiók frissítése"
 
 #. Label of the update_status_to (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -5572,7 +5572,7 @@ msgstr "Feltöltés"
 
 #: desk/src/components/Settings/Profile/Profile.vue:221
 msgid "Upload Photo"
-msgstr ""
+msgstr "Fotó feltöltése"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:22
 msgid "Upload photo"
@@ -5693,7 +5693,7 @@ msgstr ""
 #. Label of the workday (Select) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "Workday"
-msgstr ""
+msgstr "Munkanap"
 
 #: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:274
 msgid "Workday added successfully."
