@@ -25,13 +25,13 @@
           <template #target="{ togglePopover }">
             <div
               @click="togglePopover()"
-              class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 hover:bg-gray-200 rounded"
+              class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 hover:bg-surface-gray-3 rounded"
             >
               {{ formatTimeHMS(props.row[column.key]) }}
             </div>
           </template>
           <template #body>
-            <div class="absolute bg-white top-2">
+            <div class="absolute bg-surface-white top-2">
               <DurationPicker v-model="props.row[column.key]" />
             </div>
           </template>

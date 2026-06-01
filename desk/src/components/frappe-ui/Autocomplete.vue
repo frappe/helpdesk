@@ -18,21 +18,18 @@
               :class="inputClasses"
               @click="() => !disabled && togglePopover()"
             >
-              <div class="flex items-center">
+              <div class="flex items-center min-w-0 flex-1">
                 <slot name="prefix" />
-                <span
-                  class="overflow-hidden text-ellipsis whitespace-nowrap text-base leading-5"
-                  v-if="selectedValue"
-                >
+                <span class="text-base leading-5 truncate" v-if="selectedValue">
                   {{ displayValue(selectedValue) }}
                 </span>
-                <span class="text-base leading-5 text-gray-500" v-else>
+                <span class="text-base leading-5 text-ink-gray-4" v-else>
                   {{ placeholder || "" }}
                 </span>
               </div>
               <FeatherIcon
                 name="chevron-down"
-                class="h-4 w-4 text-gray-600"
+                class="h-4 w-4 text-ink-gray-5"
                 aria-hidden="true"
               />
             </button>
@@ -41,11 +38,13 @@
       </template>
       <template #body="{ isOpen }">
         <div v-show="isOpen" class="min-w-[--reka-popper-anchor-width]">
-          <div class="mt-1 rounded-lg bg-white py-1 text-base shadow-2xl">
+          <div
+            class="mt-1 rounded-lg bg-surface-modal py-1 text-base shadow-2xl"
+          >
             <div class="relative px-1.5 pt-0.5">
               <ComboboxInput
                 ref="search"
-                class="form-input w-full"
+                class="form-input w-full pr-6 bg-transparent"
                 type="text"
                 @change="
                   (e) => {
@@ -57,10 +56,10 @@
                 placeholder="Search"
               />
               <button
-                class="absolute right-1.5 inline-flex h-7 w-7 items-center justify-center"
+                class="absolute inset-y-0 right-3 top-px flex items-center"
                 @click="selectedValue = null"
               >
-                <FeatherIcon name="x" class="w-4" />
+                <FeatherIcon name="x" class="size-4" />
               </button>
             </div>
             <ComboboxOptions
@@ -75,7 +74,7 @@
               >
                 <div
                   v-if="group.group && !group.hideLabel"
-                  class="px-2.5 py-1.5 text-sm font-medium text-gray-500"
+                  class="px-2.5 py-1.5 text-sm font-medium text-ink-gray-4"
                 >
                   {{ group.group }}
                 </div>
@@ -89,7 +88,7 @@
                   <li
                     :class="[
                       'flex items-center rounded px-2.5 py-1.5 text-base',
-                      { 'bg-gray-100': active },
+                      { 'bg-surface-gray-2': active },
                     ]"
                   >
                     <slot
@@ -107,12 +106,15 @@
               </div>
               <li
                 v-if="groups.length == 0"
-                class="mt-1.5 rounded-md px-2.5 py-1.5 text-base text-gray-600"
+                class="mt-1.5 rounded-md px-2.5 py-1.5 text-base text-ink-gray-5"
               >
                 No results found
               </li>
             </ComboboxOptions>
-            <div v-if="slots.footer" class="border-t p-1.5 pb-0.5">
+            <div
+              v-if="slots.footer"
+              class="border-t border-outline-gray-modals p-1.5 pb-0.5"
+            >
               <slot
                 name="footer"
                 v-bind="{ value: search?.el._value, close }"
@@ -129,11 +131,11 @@
 import {
   Combobox,
   ComboboxInput,
-  ComboboxOptions,
   ComboboxOption,
+  ComboboxOptions,
 } from "@headlessui/vue";
-import { Popover, Button, FeatherIcon } from "frappe-ui";
-import { ref, computed, useAttrs, useSlots, watch, nextTick } from "vue";
+import { FeatherIcon, Popover } from "frappe-ui";
+import { computed, nextTick, ref, useAttrs, useSlots, watch } from "vue";
 
 const props = defineProps({
   modelValue: {
@@ -246,7 +248,7 @@ watch(showOptions, (val) => {
 });
 
 const textColor = computed(() => {
-  return props.disabled ? "text-gray-600" : "text-gray-800";
+  return props.disabled ? "text-ink-gray-5" : "text-ink-gray-8";
 });
 
 const inputClasses = computed(() => {
@@ -267,12 +269,14 @@ const inputClasses = computed(() => {
   let variant = props.disabled ? "disabled" : props.variant;
   let variantClasses = {
     subtle:
-      "border border-gray-100 bg-gray-100 placeholder-gray-500 hover:border-gray-200 hover:bg-gray-200 focus:bg-white focus:border-gray-500 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
+      "border border-outline-gray-1 bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3",
     outline:
-      "border border-gray-300 bg-white placeholder-gray-500 hover:border-gray-400 hover:shadow-sm focus:bg-white focus:border-gray-500 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-gray-400",
+      "border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3",
     disabled: [
-      "border bg-gray-50 placeholder-gray-400",
-      props.variant === "outline" ? "border-gray-300" : "border-transparent",
+      "border bg-surface-menu-bar placeholder-ink-gray-3",
+      props.variant === "outline"
+        ? "border-outline-gray-2"
+        : "border-transparent",
     ],
   }[variant];
 

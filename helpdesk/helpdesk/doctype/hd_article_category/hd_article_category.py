@@ -9,6 +9,22 @@ from frappe.model.document import Document
 class HDArticleCategory(Document):
     def validate(self):
         self.validate_default_category()
+        self.validate_general_category()
+
+    def validate_general_category(self):
+        if self.category_name.strip().lower() != "general":
+            return
+
+        if frappe.db.exists(
+            "HD Article Category",
+            {"category_name": "General", "name": ("!=", self.name)},
+        ):
+            frappe.throw(
+                _(
+                    "General is a reserved category name. Please use a different name to proceed.",
+                    self.name,
+                )
+            )
 
     def validate_default_category(self):
         old_doc = self.get_doc_before_save()

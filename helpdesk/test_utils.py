@@ -5,6 +5,7 @@ from frappe.core.doctype.communication.test_communication import create_email_ac
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
+from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.utils import is_frappe_version
 
 if is_frappe_version("16", above=True):
@@ -22,11 +23,13 @@ def before_tests():
     frappe.db.set_single_value(
         "HD Settings", "enable_email_ticket_feedback", 0
     )  # nosemgrep
+    frappe.db.set_single_value("HD Settings", "default_priority", None)
     # frappe.flags.mute_emails = True
     make_holiday_list()
     make_new_sla()
     make_test_objects("Email Domain", reset=True)
     create_email_account()
+    create_customer_field()
     frappe.db.commit()  # nosemgrep
 
 
@@ -260,6 +263,42 @@ def make_status(name: str = "Test Status", category: str = "Open"):
     return doc.insert(ignore_if_duplicate=True)
 
 
+def make_agent(email: str, first_name: str = "Test Agent"):
+    """
+    Creates a test user and HD Agent if they don't exist.
+    Returns the user email.
+    """
+    if not frappe.db.exists("User", email):
+        frappe.get_doc(
+            {"doctype": "User", "first_name": first_name, "email": email}
+        ).insert(ignore_permissions=True)
+
+    if not frappe.db.exists("HD Agent", {"user": email}):
+        frappe.get_doc(
+            {"doctype": "HD Agent", "user": email, "agent_name": first_name}
+        ).insert(ignore_permissions=True)
+
+    return email
+
+
+def get_latest_ticket_communication(ticket_name: str):
+    """
+    Returns the latest Communication doc linked to the given HD Ticket.
+    """
+    name = frappe.get_all(
+        "Communication",
+        filters={
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket_name,
+        },
+        pluck="name",
+        limit=1,
+    )
+    if not name:
+        return None
+    return frappe.get_doc("Communication", name[0])
+
+
 def add_comment(
     ticket: str,
     content: str = "This is a test comment.",
@@ -280,3 +319,49 @@ def add_comment(
     if save:
         return comment.insert()
     return comment
+
+
+def make_team(team_name, members=[], disabled=False):
+    """Create an HD Team with optional members. A default agent is created if no members are provided."""
+    if not members:
+        members = [make_agent("default_team_agent@example.com")]
+
+    if frappe.db.exists("HD Team", team_name):
+        team = frappe.get_doc("HD Team", team_name)
+        team.disabled = disabled
+        team.users = []
+        for member in members:
+            team.append("users", {"user": member})
+        team.save(ignore_permissions=True)
+        return team
+
+    # Create new team - this will trigger after_insert which creates assignment rule
+    team = frappe.get_doc(
+        {
+            "doctype": "HD Team",
+            "team_name": team_name,
+        }
+    )
+    for member in members:
+        team.append("users", {"user": member})
+    team.disabled = disabled
+    team.insert(ignore_permissions=True)
+    return team
+
+
+def upload_test_file(file_name: str) -> str:
+    """Upload an image from desk/src/assets/images/ as a standalone private File, returning its name."""
+    file_path = frappe.get_app_path(
+        "helpdesk", "..", "desk", "src", "assets", "images", file_name
+    )
+    with open(file_path, "rb") as f:
+        content = f.read()
+    file_doc = frappe.get_doc(
+        {
+            "doctype": "File",
+            "file_name": file_name,
+            "is_private": 1,
+            "content": content,
+        }
+    ).insert(ignore_permissions=True)
+    return file_doc.name

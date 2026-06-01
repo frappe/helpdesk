@@ -3,9 +3,9 @@
     <template #body-content>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-8">
-          All
-          <span class="underline">emails/ comments</span>
-          from this email onwards will be moved to new ticket.
+          {{ __("All") }}
+          <span class="underline">{{ __("emails/ comments") }}</span>
+          {{ __("from this email onwards will be moved to new ticket.") }}
         </p>
         <FormControl
           label="New Ticket Subject"
@@ -14,14 +14,14 @@
           placeholder="Add a subject for the new ticket"
         />
         <div
-          class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200"
+          class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-gray-modals"
         >
           <TriangleAlert
             class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-yellow-500"
           />
 
-          <div class="text-wrap text-sm text-gray-700">
-            This action is irreversible.
+          <div class="text-wrap text-sm text-ink-gray-7">
+            {{ __("This action is irreversible.") }}
           </div>
         </div>
       </div>
@@ -40,6 +40,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { Dialog, createResource, toast } from "frappe-ui";
 import { ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
@@ -70,11 +71,12 @@ const splitTicket = createResource({
     };
   },
   validate({ subject, communication_id }) {
-    if (!subject) throw { message: "Subject is required" };
-    if (!communication_id) throw { message: "Communication ID is required" };
+    if (!subject) throw { message: __("Subject is required") };
+    if (!communication_id)
+      throw { message: __("Communication ID is required") };
   },
   onSuccess: (newTicket: string) => {
-    toast.success("Ticket split successfully");
+    toast.success(__("Ticket split successfully."));
     showDialog.value = false;
     window.open(
       window.location.origin + "/helpdesk/tickets/" + newTicket,

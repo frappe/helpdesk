@@ -1,8 +1,8 @@
 <template>
-  <div class="flex items-center -ml-0.5">
+  <div class="flex items-center">
     <router-link
       :to="{ name: routeName }"
-      class="px-0.5 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
+      class="px-0.5 pl-0 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
     >
       {{ isMobileView ? "..." : label }}
     </router-link>
@@ -11,7 +11,7 @@
       <template #default="{ open }">
         <Button
           variant="ghost"
-          class="text-lg font-medium text-nowrap"
+          class="text-lg font-medium text-nowrap truncate max-w-[200px] sm:max-w-none"
           :label="currentView.label"
         >
           <template #prefix>
@@ -28,48 +28,54 @@
           </template>
         </Button>
       </template>
-      <template #item="{ item }">
-        <button
-          class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base hover:bg-surface-gray-3"
-          @click="item.onClick"
+
+      <template #item-prefix="{ item }">
+        <FeatherIcon
+          v-if="item.icon && typeof item.icon === 'string'"
+          :name="item.icon"
+          class="h-4 w-4 flex-shrink-0 text-ink-gray-7"
+          aria-hidden="true"
+        />
+        <component
+          class="h-4 w-4 flex-shrink-0 text-ink-gray-7"
+          v-else-if="item.icon"
+          :is="item.icon"
+        />
+      </template>
+
+      <template #item-label="{ item }">
+        <div class="flex items-center min-w-0 max-w-[50vw]">
+          <span class="truncate">{{ item.label }}</span>
+          <Badge
+            v-if="item.is_standard"
+            class="ml-1 flex-shrink-0"
+            size="sm"
+            label="Standard"
+          />
+        </div>
+      </template>
+      <template #item-suffix="{ item }">
+        <div
+          v-if="item.name"
+          class="flex items-center justify-end gap-2 min-w-11"
         >
-          <div class="flex items-center">
-            <FeatherIcon
-              v-if="item.icon && typeof item.icon === 'string'"
-              :name="item.icon"
-              class="mr-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
-              aria-hidden="true"
-            />
-            <component
-              class="mr-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
-              v-else-if="item.icon"
-              :is="item.icon"
-            />
-            <span class="whitespace-nowrap">
-              {{ item.label }}
-            </span>
-          </div>
-          <div
-            v-if="item.name"
-            class="flex flex-row-reverse gap-2 items-center min-w-11"
-          >
-            <Dropdown placement="right-start" :options="dropdownActions(item)">
-              <template #default>
-                <Button
-                  variant="ghost"
-                  class="group-hover:!size-5 !size-0 group-hover:opacity-100 opacity-0 group-hover:ml-0 -ml-2"
-                  icon="more-horizontal"
-                  @click.stop
-                />
-              </template>
-            </Dropdown>
-            <FeatherIcon
-              v-if="isCurrentView(item)"
-              name="check"
-              class="size-4 text-ink-gray-7"
-            />
-          </div>
-        </button>
+          <FeatherIcon
+            v-if="isCurrentView(item)"
+            name="check"
+            class="size-4 text-ink-gray-7"
+          />
+          <Dropdown align="end" :options="dropdownActions(item)">
+            <template #default="{ open }">
+              <Button
+                variant="ghost"
+                class="kebab-btn !size-4 ml-0 rounded-sm"
+                :class="open ? 'inline-flex' : 'hidden'"
+                icon="more-horizontal"
+                @click.stop
+              />
+            </template>
+          </Dropdown>
+        </div>
       </template>
     </Dropdown>
   </div>
@@ -77,7 +83,7 @@
 
 <script setup>
 import { useScreenSize } from "@/composables/screen";
-import { Dropdown } from "frappe-ui";
+import { Badge, Dropdown } from "frappe-ui";
 import { useRoute } from "vue-router";
 
 const props = defineProps({
@@ -110,3 +116,32 @@ const isCurrentView = (item) => {
   return item.name === route.query.view;
 };
 </script>
+
+<style>
+[data-slot="item"][data-highlighted] .kebab-btn,
+[data-slot="item"][data-state="checked"] .kebab-btn {
+  display: block;
+}
+
+/* --fade-top / --fade-bottom + scroll-fade keyframes live in src/index.css */
+[data-slot="group"]:has(.kebab-btn) {
+  @apply sm:max-h-80 max-h-40 overflow-y-auto overscroll-contain;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black calc(100% - var(--fade-bottom)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    black calc(100% - var(--fade-bottom)),
+    transparent 100%
+  );
+  animation: scroll-fade linear both;
+  animation-timeline: scroll(self);
+}
+
+/* keep the group label pinned while its items scroll */
+[data-slot="group"]:has(.kebab-btn) [data-slot="group-label"] {
+  @apply sticky -top-[6px] z-10 bg-surface-modal;
+}
+</style>

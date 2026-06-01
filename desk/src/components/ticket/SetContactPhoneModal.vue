@@ -83,7 +83,7 @@ const onSubmit = () => {
     auto: true,
     onSuccess: () => {
       emit("onUpdate");
-      toast.success(__("Contact updated"));
+      toast.success(__("Contact updated successfully."));
       show.value = false;
     },
   });

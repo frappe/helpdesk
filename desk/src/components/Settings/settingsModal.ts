@@ -16,16 +16,16 @@ import Briefcase from "~icons/lucide/briefcase";
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
 import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
-import Telephony from "./Telephony/Telephony.vue";
+import TelephonyPage from "./Telephony/TelephonyPage.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
 import SavedReplies from "./SavedReplies/SavedReplies.vue";
-import Profile from "./Profile/Profile.vue";
 import { Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import General from "./General/General.vue";
 import SettingsGear from "~icons/lucide/settings";
 import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
+import ProfilePage from "./Profile/ProfilePage.vue";
 
 export const showSettingsModal = ref(false);
 
@@ -34,8 +34,9 @@ const auth = useAuthStore();
 export const tabs = computed(() => {
   const _tabs = [
     {
-      label: __("User Settings"),
+      label: __("My settings"),
       hideLabel: true,
+      noborder: true,
       items: [
         {
           label: __("Profile"),
@@ -44,8 +45,8 @@ export const tabs = computed(() => {
             label: auth.userName,
             size: "xs",
           }),
-          component: markRaw(Profile),
-        },
+          component: markRaw(ProfilePage),
+        }
       ],
     },
     {
@@ -128,7 +129,7 @@ export const tabs = computed(() => {
         {
           label: __("Telephony"),
           icon: markRaw(PhoneIcon),
-          component: markRaw(Telephony),
+          component: markRaw(TelephonyPage),
         },
       ],
     },

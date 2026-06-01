@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-6 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+    class="grid grid-cols-6 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded"
   >
     <div
       @click="slaActiveScreen = { screen: 'view', data: data, fetchData: true }"
@@ -136,7 +136,7 @@ const duplicate = () => {
         auto: true,
         onSuccess(newSlaPolicyData: HDServiceLevelAgreement) {
           slaPolicyList?.reload();
-          toast.success(__("SLA policy duplicated"));
+          toast.success(__("SLA policy duplicated successfully."));
           duplicateDialog.value = {
             show: false,
             newName: "",
@@ -164,14 +164,14 @@ const deleteSla = () => {
 
   slaPolicyList?.delete.submit(props.data.name, {
     onSuccess: () => {
-      toast.success(__("SLA policy deleted"));
+      toast.success(__("SLA policy deleted successfully."));
     },
   });
 };
 
 const onToggle = () => {
   if (props.data.default_sla) {
-    toast.error(__("SLA set as default cannot be disabled"));
+    toast.error(__("SLA set as default cannot be disabled."));
     return;
   }
   slaPolicyList?.setValue.submit(
@@ -181,7 +181,7 @@ const onToggle = () => {
     },
     {
       onSuccess: () => {
-        toast.success(__("SLA policy status updated"));
+        toast.success(__("SLA policy status updated successfully."));
       },
     }
   );

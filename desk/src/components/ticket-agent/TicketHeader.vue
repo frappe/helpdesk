@@ -2,7 +2,7 @@
   <LayoutHeader>
     <template #left-header>
       <div class="flex flex-col truncate">
-        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
+        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs -ml-0.5">
           <template #prefix="{ item }">
             <Icon
               v-if="item.icon"
@@ -22,7 +22,7 @@
           :hide-name="true"
         />
         <!-- Navigation -->
-        <TicketNavigation :key="ticket.name" />
+        <TicketNavigation :key="ticket?.name" />
         <!-- Custom Actions -->
         <div v-if="normalActions.length" class="flex gap-2">
           <Button v-for="action in normalActions" v-bind="action">
@@ -61,7 +61,7 @@
         </Dropdown>
         <!-- Core Actions + Custom Actions -->
         <Dropdown
-          v-if="groupedActions.length"
+          v-if="groupedActions[0]?.items?.length >= 1"
           :options="groupedActions"
           placement="right"
         >
@@ -76,7 +76,7 @@
     v-model="showMergeModal"
     @update="ticket.reload()"
   />
-  <TicketSubjectModal v-if="showSubjectDialog" v-model="showSubjectDialog" />
+  <TicketSubjectModal v-model="showSubjectDialog" />
 </template>
 
 <script setup lang="ts">
@@ -87,8 +87,10 @@ import { setupCustomizations } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
 import { useView } from "@/composables/useView";
+import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation";
 import {
   ActivitiesSymbol,
   CustomizationSymbol,
@@ -97,8 +99,14 @@ import {
 } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
-import { Breadcrumbs, call, Dropdown, toast } from "frappe-ui";
-import { __ } from "@/translation";
+import {
+  Breadcrumbs,
+  Button,
+  call,
+  createResource,
+  Dropdown,
+  toast,
+} from "frappe-ui";
 import {
   computed,
   ComputedRef,
@@ -116,6 +124,8 @@ import { IndicatorIcon } from "../icons";
 import TicketNavigation from "./TicketNavigation.vue";
 import TicketSLA from "./TicketSLA.vue";
 import TicketSubjectModal from "./TicketSubjectModal.vue";
+const { isAdmin } = useAuthStore();
+const { $dialog } = globalStore();
 
 defineProps({
   viewers: {
@@ -129,10 +139,9 @@ const router = useRouter();
 const { findView } = useView("HD Ticket");
 const ticketStatusStore = useTicketStatusStore();
 
-const ticket = inject(TicketSymbol);
-const customizations = inject(CustomizationSymbol);
-const activities = inject(ActivitiesSymbol);
-
+const ticket = inject(TicketSymbol)!;
+const customizations = inject(CustomizationSymbol)!;
+const activities = inject(ActivitiesSymbol)!;
 const showSubjectDialog = ref(false);
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
@@ -189,11 +198,54 @@ function updateField(fieldname: string, value: string, callback = () => {}) {
   callback();
 }
 
+function handleDeleteTicket() {
+  $dialog({
+    title: __(`Delete ticket #${ticket?.value?.name}`),
+    message: __(
+      "Are you sure you want to delete this ticket? This is an irreversible action and cannot be undone."
+    ),
+    actions: [
+      {
+        label: __("Delete"),
+        theme: "red",
+        iconLeft: "trash-2",
+        variant: "solid",
+        onClick({ close }) {
+          call("frappe.client.delete", {
+            doctype: "HD Ticket",
+            name: ticket?.value?.doc.name,
+          })
+            .then(() => {
+              toast.success(__("Ticket deleted successfully."));
+              router.push({ name: "TicketsAgent" });
+            })
+            .catch((err: any) => {
+              toast.error(err || __("Failed to delete ticket."));
+            });
+          close();
+        },
+      },
+    ],
+  });
+}
+
+const ticketCount = createResource({
+  url: "frappe.client.get_count",
+  makeParams: () => ({
+    doctype: "HD Ticket",
+    filters: {
+      status_category: ["!=", "Resolved"],
+      is_merged: 0,
+    },
+  }),
+  auto: true,
+});
 const showMergeModal = ref(false);
 const showMergeOption = computed(() => {
   return (
-    !ticket.value.doc.is_merged &&
-    ["Open", "Paused"].includes(ticket.value.doc.status_category)
+    !ticket?.value?.doc?.is_merged &&
+    ["Open", "Paused"].includes(ticket?.value?.doc?.status_category) &&
+    ticketCount.data > 1
   );
 });
 const defaultActions = computed(() => {
@@ -207,6 +259,7 @@ const defaultActions = computed(() => {
       onClick: () => (showMergeModal.value = true),
     });
   }
+
   return [
     {
       group: __("Default actions"),
@@ -215,7 +268,31 @@ const defaultActions = computed(() => {
     },
   ];
 });
-const actions = ref([]);
+
+const deleteAction = computed(() => {
+  if (!isAdmin) return [];
+  return [
+    {
+      group: __("Default actions"),
+      hideLabel: true,
+      items: [
+        {
+          label: __("Delete"),
+          component: h(Button, {
+            label: __("Delete"),
+            variant: "ghost",
+            iconLeft: "trash-2",
+            theme: "red",
+            style: "width: 100%; justify-content: flex-start;",
+            onClick: handleDeleteTicket,
+          }),
+        },
+      ],
+    },
+  ];
+});
+
+const actions = ref<any[]>([]);
 const normalActions = computed(() => {
   return actions.value.filter((action) => !action.group);
 });
@@ -243,9 +320,11 @@ const groupedWithLabelActions = computed(() => {
 
 const groupedActions = computed(() => {
   let _actions = [];
+  _actions = _actions.concat(defaultActions.value);
   _actions = _actions.concat(
     actions.value.filter((action) => action.group && !action.buttonLabel)
   );
+  _actions = _actions.concat(deleteAction.value);
   return _actions;
 });
 
@@ -267,10 +346,7 @@ watchEffect(async () => {
       customizationCtx.value
     );
 
-    actions.value = [
-      ...defaultActions.value,
-      ...(customizations.value?.data?._customActions || []),
-    ];
+    actions.value = [...(customizations.value?.data?._customActions || [])];
   }
 });
 

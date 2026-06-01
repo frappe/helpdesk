@@ -21,11 +21,11 @@
           "
         >
           <div
-            class="text-base font-medium leading-none text-gray-900 truncate"
+            class="text-base font-medium leading-none text-ink-gray-9 truncate"
           >
             {{ config.brandName || "Helpdesk" }}
           </div>
-          <div class="mt-1 text-sm leading-none text-gray-700">
+          <div class="mt-1 text-sm text-ink-gray-7">
             {{ authStore.userName }}
           </div>
         </div>
@@ -34,12 +34,12 @@
           :class="
             !sidebarStore.isExpanded
               ? 'ml-0 w-0 overflow-hidden opacity-0'
-              : 'ml-2 w-auto opacity-100'
+              : 'ml-2 relative left-[-2.5px] w-auto opacity-100'
           "
         >
           <FeatherIcon
             name="chevron-down"
-            class="h-4 w-4 text-gray-600"
+            class="h-4 w-4 text-ink-gray-5"
             aria-hidden="true"
           />
         </div>

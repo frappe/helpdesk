@@ -10,23 +10,25 @@
           @click="goBack()"
           class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
         />
-        <Badge
-          variant="subtle"
-          theme="orange"
-          size="sm"
-          :label="__('Unsaved')"
-          v-if="isDirty"
-        />
+        <UnsavedBadge :show="isDirty" />
       </div>
     </template>
     <template #header-actions>
-      <Button
-        :label="__('Save')"
-        variant="solid"
-        @click="saveTeam()"
-        :disabled="!isDirty"
-        :loading="teamsList.insert.loading"
-      />
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 cursor-pointer">
+          <Switch v-model="teamData.enabled" />
+          <span class="text-sm text-ink-gray-7 font-medium">
+            {{ __("Enabled") }}
+          </span>
+        </div>
+        <Button
+          :label="__('Save')"
+          variant="solid"
+          @click="saveTeam()"
+          :disabled="!isDirty"
+          :loading="teamsList.insert.loading"
+        />
+      </div>
     </template>
     <template #content>
       <div class="flex flex-col gap-4">
@@ -65,7 +67,15 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from "vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { Badge, ErrorMessage, FormControl, FormLabel, toast } from "frappe-ui";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
+import {
+  Badge,
+  ErrorMessage,
+  FormControl,
+  FormLabel,
+  Switch,
+  toast,
+} from "frappe-ui";
 import { __ } from "@/translation";
 import AgentSelector from "./components/AgentSelector.vue";
 import { useAgentStore } from "@/stores/agent";
@@ -94,6 +104,7 @@ const showConfirmDialog = ref({
 const teamData = ref({
   name: "",
   agents: [],
+  enabled: true,
 });
 
 const errors = ref({
@@ -132,10 +143,11 @@ const saveTeam = () => {
     {
       team_name: teamData.value.name,
       users: teamData.value.agents.map((agent) => ({ user: agent })),
+      disabled: !teamData.value.enabled,
     },
     {
       onSuccess: (data) => {
-        toast.success(__("Team created"));
+        toast.success(__("Team created successfully."));
         emit("update:step", "team-edit", data.name);
       },
     }

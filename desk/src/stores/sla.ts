@@ -1,4 +1,5 @@
 import { SlaValidationErrors } from "@/components/Settings/Sla/types";
+import { __ } from "@/translation";
 import { validateConditions } from "@/utils";
 import { ref } from "vue";
 
@@ -130,7 +131,7 @@ export function validateSlaData(
     switch (field) {
       case "service_level":
         if (!slaData.value.service_level?.trim()) {
-          slaDataErrors.value.service_level = "SLA policy name is required";
+          slaDataErrors.value.service_level = __("SLA policy name is required.");
         } else {
           slaDataErrors.value.service_level = "";
         }
@@ -140,25 +141,25 @@ export function validateSlaData(
           !Array.isArray(slaData.value.priorities) ||
           slaData.value.priorities.length === 0
         ) {
-          slaDataErrors.value.priorities = "At least one priority is required";
+          slaDataErrors.value.priorities = __("At least one priority is required.");
         } else {
           const prioritiesError: string[] = [];
           slaData.value.priorities.forEach((priority, index) => {
             const priorityNum = index + 1;
             if (!priority.priority?.trim()) {
               prioritiesError.push(
-                `Priority ${priorityNum}: Priority name is required`
+                `Priority ${priorityNum}: Priority name is required.`
               );
             }
             if (!priority.response_time || priority.response_time == 0) {
               prioritiesError.push(
-                `Priority ${priorityNum}: Response time is required`
+                `Priority ${priorityNum}: Response time is required.`
               );
             }
             if (Boolean(slaData.value.apply_sla_for_resolution)) {
               if (!priority.resolution_time || priority.resolution_time == 0) {
                 prioritiesError.push(
-                  `Priority ${priorityNum}: Resolution time is required`
+                  `Priority ${priorityNum}: Resolution time is required.`
                 );
               }
             }
@@ -167,7 +168,7 @@ export function validateSlaData(
               Boolean(slaData.value.apply_sla_for_resolution)
             ) {
               prioritiesError.push(
-                `Priority ${priorityNum}: Response time cannot be greater than resolution time`
+                `Priority ${priorityNum}: Response time cannot be greater than resolution time.`
               );
             }
           });
@@ -201,7 +202,7 @@ export function validateSlaData(
         break;
       case "holiday_list":
         if (!slaData.value.holiday_list) {
-          slaDataErrors.value.holiday_list = "Holiday list is required";
+          slaDataErrors.value.holiday_list = "Holiday list is required.";
         } else {
           slaDataErrors.value.holiday_list = "";
         }
@@ -211,7 +212,7 @@ export function validateSlaData(
           new Date(slaData.value.end_date) < new Date(slaData.value.start_date)
         ) {
           slaDataErrors.value.start_date =
-            "Start date cannot be after end date";
+            "Start date cannot be after end date.";
         } else {
           slaDataErrors.value.start_date = "";
         }
@@ -221,7 +222,7 @@ export function validateSlaData(
           slaData.value.end_date &&
           new Date(slaData.value.end_date) < new Date(slaData.value.start_date)
         ) {
-          slaDataErrors.value.end_date = "End date cannot be before start date";
+          slaDataErrors.value.end_date = "End date cannot be before start date.";
         } else {
           slaDataErrors.value.end_date = "";
         }
@@ -234,7 +235,7 @@ export function validateSlaData(
           slaData.value.condition_json.length > 0 &&
           !validateConditions(slaData.value.condition_json)
         ) {
-          slaDataErrors.value.condition = "Valid conditions are required";
+          slaDataErrors.value.condition = "Valid conditions are required.";
         } else {
           slaDataErrors.value.condition = "";
         }
@@ -252,7 +253,7 @@ export function validateSlaData(
 
         if (!validWorkdays?.length) {
           slaDataErrors.value.support_and_resolution =
-            "At least one valid workday with workday, start time, and end time is required";
+            "At least one valid workday with workday, start time, and end time is required.";
         } else {
           // Check for duplicate workdays
           const workdayMap = new Map();

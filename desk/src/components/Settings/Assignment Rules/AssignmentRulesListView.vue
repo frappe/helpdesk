@@ -23,15 +23,9 @@
           {{ __("Add one to get started.") }}
         </div>
       </div>
-      <Button
-        :label="__('New')"
-        variant="outline"
-        icon-left="plus"
-        @click="goToNew()"
-      />
     </div>
     <div v-else>
-      <div class="grid grid-cols-12 items-center gap-4 text-sm text-gray-600">
+      <div class="grid grid-cols-12 items-center gap-4 text-sm text-ink-gray-5">
         <div class="col-span-7 ml-2">{{ __("Assignment rule") }}</div>
         <div class="col-span-3">{{ __("Priority") }}</div>
         <div class="col-span-2">{{ __("Enabled") }}</div>

@@ -84,7 +84,7 @@ const updatePassword = createResource({
     };
   },
   onSuccess: () => {
-    toast.success(__("Password updated successfully"));
+    toast.success(__("Password updated successfully."));
     show.value = false;
     newPassword.value = "";
     confirmPassword.value = "";

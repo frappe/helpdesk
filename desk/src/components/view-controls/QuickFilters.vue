@@ -1,27 +1,26 @@
 <template>
-  <div v-if="!quickFilters.loading">
-    <FadedScrollableDiv
-      class="flex flex-1 items-center -ml-1 flex-wrap gap-2"
-      orientation="horizontal"
+  <FadedScrollableDiv
+    class="quick-filters flex flex-1 items-center overflow-x-auto py-1 gap-2 pr-4"
+    orientation="horizontal"
+    v-if="!quickFilters.loading"
+  >
+    <div
+      v-for="filter in quickFilters.data"
+      :key="filter.name"
+      class="min-w-36"
     >
-      <div
-        v-for="filter in quickFilters.data"
-        :key="filter.name"
-        class="min-w-36"
-      >
-        <QuickFilterField
-          :filter="filter"
-          :value="getValue(filter, list.params?.filters)"
-          @applyQuickFilter="(f, v) => applyQuickFilter(f, v)"
-        />
-      </div>
-    </FadedScrollableDiv>
-  </div>
+      <QuickFilterField
+        :filter="filter"
+        :value="getValue(filter, list.params?.filters)"
+        @applyQuickFilter="(f, v) => applyQuickFilter(f, v)"
+      />
+    </div>
+  </FadedScrollableDiv>
 </template>
 
 <script setup>
-import { inject } from "vue";
 import { FadedScrollableDiv } from "@/components";
+import { inject } from "vue";
 import QuickFilterField from "./QuickFilterField.vue";
 
 const listViewData = inject("listViewData");
@@ -80,4 +79,12 @@ function getValue(quickFilter, filters) {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.quick-filters {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.quick-filters::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+</style>

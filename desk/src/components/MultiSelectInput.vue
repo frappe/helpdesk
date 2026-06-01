@@ -8,10 +8,6 @@
         :label="value"
         theme="gray"
         variant="subtle"
-        :class="{
-          'rounded bg-surface-white hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
-            variant === 'subtle',
-        }"
         @keydown.delete.capture.stop="removeLastValue"
       >
         <template #suffix>
@@ -28,7 +24,7 @@
             <template #target="{ togglePopover }">
               <ComboboxInput
                 ref="search"
-                class="search-input form-input w-full border-none bg-white hover:bg-white focus:border-none focus:!shadow-none focus-visible:!ring-0"
+                class="search-input form-input w-full border-none bg-surface-white hover:bg-surface-white focus:border-none focus:!shadow-none focus-visible:!ring-0"
                 type="text"
                 :value="query"
                 autocomplete="off"
@@ -44,7 +40,9 @@
             </template>
             <template #body="{ isOpen }">
               <div v-show="isOpen">
-                <div class="mt-1 rounded-lg bg-white py-1 text-base shadow-2xl">
+                <div
+                  class="mt-1 rounded-lg bg-surface-white py-1 text-base shadow-2xl"
+                >
                   <ComboboxOptions
                     class="my-1 max-h-[12rem] overflow-y-auto px-1.5"
                     static
@@ -58,7 +56,7 @@
                       <li
                         :class="[
                           'flex cursor-pointer items-center rounded px-2 py-1 text-base',
-                          { 'bg-gray-100': active },
+                          { 'bg-surface-gray-2': active },
                         ]"
                       >
                         <UserAvatar
@@ -66,11 +64,11 @@
                           :name="getUsernameLabel(option.value)"
                           size="lg"
                         />
-                        <div class="flex flex-col gap-1 p-1 text-gray-800">
+                        <div class="flex flex-col gap-1 p-1 text-ink-gray-8">
                           <div class="text-base font-medium">
                             {{ getUsernameLabel(option.label) }}
                           </div>
-                          <div class="text-sm text-gray-600">
+                          <div class="text-sm text-ink-gray-5">
                             {{ option.value }}
                           </div>
                         </div>
@@ -89,16 +87,16 @@
 </template>
 
 <script setup lang="ts">
+import { UserAvatar } from "@/components/";
 import {
   Combobox,
   ComboboxInput,
-  ComboboxOptions,
   ComboboxOption,
+  ComboboxOptions,
 } from "@headlessui/vue";
-import { UserAvatar } from "@/components/";
-import { Popover, createResource } from "frappe-ui";
-import { ref, computed, nextTick } from "vue";
 import { watchDebounced } from "@vueuse/core";
+import { Popover, createResource } from "frappe-ui";
+import { computed, nextTick, ref } from "vue";
 
 const props = defineProps({
   validate: {
@@ -139,7 +137,7 @@ watchDebounced(
     text.value = val;
     reload(val);
   },
-  { debounce: 50, immediate: true }
+  { debounce: 400, immediate: true }
 );
 
 const filterOptions = createResource({

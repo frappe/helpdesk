@@ -3,11 +3,13 @@
     <template #body-content>
       <div class="flex flex-col flex-1 gap-3">
         <Link
-          class="form-control"
+          ref="linkRef"
+          class="w-full"
           doctype="HD Article Category"
           placeholder="Select Category"
           v-model="category"
           label="Category"
+          :filters="defaultFilters"
           :page-length="100"
         />
       </div>
@@ -16,14 +18,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, watch, nextTick } from "vue";
 import { Dialog } from "frappe-ui";
-import { Link } from "@/components";
+import Link from "@/components/frappe-ui/Link.vue";
 
 const emit = defineEmits(["move"]);
 const showDialog = defineModel<boolean>();
-
 const category = ref("");
+const linkRef = ref(null);
+
+const props = defineProps<{
+  excludeCategory?: string;
+}>();
+
+const defaultFilters = computed(() => {
+  if (!props.excludeCategory) return {};
+
+  return {
+    name: ["!=", props.excludeCategory],
+  };
+});
+watch(showDialog, async (val) => {
+  if (!val) return;
+  await nextTick();
+  setTimeout(() => {
+    linkRef.value?.$el?.querySelector("button")?.click();
+  }, 300);
+});
 
 const actions = [
   {

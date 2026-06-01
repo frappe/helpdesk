@@ -1,5 +1,7 @@
 <template>
-  <div class="flex items-center cursor-pointer hover:bg-gray-50 rounded">
+  <div
+    class="flex items-center cursor-pointer hover:bg-surface-menu-bar rounded"
+  >
     <div
       class="w-full pl-2 flex flex-col justify-center h-14"
       @click="holidayListActiveScreen = { screen: 'view', data: data }"
@@ -121,7 +123,7 @@ const duplicate = () => {
         auto: true,
         onSuccess(newHolidayListData: HDServiceHolidayList) {
           holidayList?.reload();
-          toast.success(__("Holiday list duplicated"));
+          toast.success(__("Holiday list duplicated successfully."));
           duplicateDialog.value = {
             show: false,
             newName: "",
@@ -148,7 +150,7 @@ const deleteHolidayList = () => {
 
   holidayList?.delete.submit(props.data.name, {
     onSuccess: () => {
-      toast.success(__("Holiday list deleted"));
+      toast.success(__("Holiday list deleted successfully."));
     },
   });
 };

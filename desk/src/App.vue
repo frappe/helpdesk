@@ -8,33 +8,38 @@
 <script setup lang="ts">
 import { Dialogs } from "@/components/dialogs";
 import { useConfigStore } from "@/stores/config";
-import { FrappeUIProvider, toast, setConfig } from "frappe-ui";
-import { computed, defineAsyncComponent, h, onMounted, onUnmounted } from "vue";
+import { FrappeUIProvider, toast, setConfig, useTheme } from "frappe-ui";
+import { computed, defineAsyncComponent, h, onMounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
 import { useAuthStore } from "./stores/auth";
 import { useFavicon } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { __ } from "./translation";
-import { isCustomerPortal, getBrowserTimezone } from "./utils";
+import { isCustomerPortal } from "./utils";
 
 const configStore = useConfigStore();
 const { favicon } = storeToRefs(configStore);
 
 useFavicon(favicon);
 
+if (!localStorage.getItem("theme")) {
+  localStorage.setItem("theme", "light");
+}
+useTheme();
+
 onMounted(() => {
   window.addEventListener("online", () => {
     toast.create({
-      message: __("You are now online"),
-      icon: h(Wifi, { class: "text-white" }),
+      message: __("You are now online."),
+      icon: h(Wifi, { class: "text-ink-white" }),
     });
   });
 
   window.addEventListener("offline", () => {
     toast.create({
-      message: __("You are now offline"),
-      icon: h(WifiOff, { class: "text-white" }),
+      message: __("You are now offline."),
+      icon: h(WifiOff, { class: "text-ink-white" }),
     });
   });
   !isCustomerPortal.value && setConfig("localTimezone", window.timezone?.user);

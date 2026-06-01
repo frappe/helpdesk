@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-1 flex-col overflow-hidden overflow-y-auto border-b">
+  <div
+    class="flex flex-1 flex-col overflow-hidden overflow-y-auto border-b px-6 py-3 sm:px-0 sm:py-3"
+  >
     <TicketField
       v-for="field in fields"
       :key="field.fieldname"
@@ -42,8 +44,8 @@ function update(field: Field["fieldname"], value: FieldValue, event = null) {
 :deep(.form-control select),
 :deep(.form-control textarea),
 :deep(.form-control button) {
-  border-color: transparent;
-  background: white;
+  border-color: var(--outline-gray-2);
+  background: var(--surface-white);
 }
 :deep(.form-control textarea) {
   field-sizing: content;
@@ -64,7 +66,7 @@ function update(field: Field["fieldname"], value: FieldValue, event = null) {
 }
 
 :deep(.form-control button svg) {
-  color: white;
+  color: var(--ink-white);
   width: 0;
 }
 </style>

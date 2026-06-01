@@ -1,37 +1,30 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-r border-outline-gray-modals bg-surface-menu-bar text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
     }"
   >
-    <UserMenu class="mb-2" :options="profileSettings" />
+    <div :class="isExpanded ? 'mx-0 p-2' : 'm-2'">
+      <UserMenu :options="profileSettings" />
+    </div>
     <SidebarLink
       v-if="!isCustomerPortal"
       :label="__('Search')"
-      class="my-0.5"
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
       :is-expanded="isExpanded"
+      class="mt-1.5"
     >
       <template #right>
-        <span class="flex items-center gap-0.5 font-medium text-gray-600">
+        <span class="flex items-center gap-0.5 font-medium text-ink-gray-5">
           <component :is="device.modifierIcon" class="h-3 w-3" />
           <span>K</span>
         </span>
       </template>
     </SidebarLink>
-    <SidebarLink
-      v-if="!isCustomerPortal"
-      class="relative my-0.5 min-h-7"
-      :label="__('Dashboard')"
-      :icon="LucideLayoutDashboard"
-      :to="'Dashboard'"
-      :is-active="isActiveTab('Dashboard')"
-      :is-expanded="isExpanded"
-    />
-    <div class="mb-4" v-if="!isCustomerPortal">
+    <div v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
         class="absolute size-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400 left-1"
@@ -57,32 +50,38 @@
         </template>
       </SidebarLink>
     </div>
-    <div class="overflow-y-auto overflow-x-hidden">
+    <div
+      :class="[
+        'overflow-y-auto overflow-x-hidden',
+        !isExpanded && 'hide-scrollbar',
+      ]"
+    >
       <div v-for="view in allViews" :key="view.label">
-        <div
+        <!-- <div
           v-if="!view.hideLabel && !isExpanded && view.views?.length"
           class="mx-2 my-2 h-1 border-b"
-        />
+        /> -->
+        <div :class="['mx-2', isCustomerPortal ? 'my-1' : 'my-2.5']"></div>
         <Section
           :label="view.label"
           :hideLabel="view.hideLabel"
-          :opened="view.opened"
+          :opened="isSectionOpen(view.label, view.opened)"
         >
-          <template #header="{ opened, hide, toggle }">
+          <template #header="{ opened, hide }">
             <div
               v-if="!hide"
-              class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+              class="flex cursor-pointer gap-1.5 px-2 text-base mx-2 font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
               :class="
                 !isExpanded
                   ? 'ml-0 h-0 overflow-hidden opacity-0'
-                  : 'mt-4 h-7 w-auto opacity-100'
+                  : 'pt-[11px] pb-2.5 w-auto opacity-100 '
               "
-              @click="toggle()"
+              @click="toggleSection(view.label, view.opened)"
             >
               <FeatherIcon
                 name="chevron-right"
                 class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
-                :class="{ 'rotate-90': opened }"
+                :class="{ 'rotate-90': isSectionOpen(view.label, view.opened) }"
               />
               <span>{{ __(view.label) }}</span>
             </div>
@@ -104,16 +103,19 @@
       </div>
     </div>
     <div class="grow" />
-    <div class="flex flex-col gap-2">
-      <TrialBanner
-        v-if="isFCSite && !isCustomerPortal"
-        :isSidebarCollapsed="!isExpanded"
-      />
-      <GettingStartedBanner
-        v-if="showOnboardingBanner"
-        :isSidebarCollapsed="!isExpanded"
-        appName="helpdesk"
-      />
+    <div class="flex flex-col gap-2 pb-2.5">
+      <div class="px-2">
+        <TrialBanner
+          v-if="isFCSite && !isCustomerPortal"
+          :isSidebarCollapsed="!isExpanded"
+        />
+        <GettingStartedBanner
+          v-if="showOnboardingBanner"
+          :isSidebarCollapsed="!isExpanded"
+          appName="helpdesk"
+        />
+      </div>
+
       <SidebarLink
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
         :icon="HelpIcon"
@@ -186,7 +188,7 @@ import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
-import { call } from "frappe-ui";
+import { call, toast, useTheme } from "frappe-ui";
 import {
   GettingStartedBanner,
   HelpModal,
@@ -215,7 +217,8 @@ import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
-import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
+import LucideMoon from "~icons/lucide/moon";
+import LucideSun from "~icons/lucide/sun";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
@@ -245,8 +248,28 @@ const showShortcutsModal = ref(false);
 const showCommandPalette = ref(false);
 
 const { pinnedViews, publicViews } = useView();
+const { currentTheme, toggleTheme } = useTheme();
+
+const themeMenuItem = computed(() => ({
+  label: __("Toggle theme"),
+  icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
+  onClick: () => toggleTheme(),
+}));
 
 const isFCSite = ref(window.is_fc_site);
+
+const sectionOpenState = ref<Record<string, boolean>>({});
+
+function isSectionOpen(label: string, defaultOpen: boolean): boolean {
+  if (!isExpanded.value) return true;
+  if (label in sectionOpenState.value) return sectionOpenState.value[label];
+  return defaultOpen;
+}
+
+function toggleSection(label: string, defaultOpen: boolean) {
+  const current = isSectionOpen(label, defaultOpen);
+  sectionOpenState.value[label] = !current;
+}
 
 const allViews = computed(() => {
   let items = isCustomerPortal.value
@@ -304,10 +327,17 @@ function parseViews(views) {
 }
 
 const customerPortalDropdown = computed(() => [
+  themeMenuItem.value,
   {
-    label: __("Log out"),
-    icon: "log-out",
-    onClick: () => authStore.logout(),
+    group: __("Danger"),
+    hideLabel: true,
+    items: [
+      {
+        label: __("Log out"),
+        icon: "log-out",
+        onClick: () => authStore.logout(),
+      },
+    ],
   },
 ]);
 
@@ -344,6 +374,7 @@ const agentPortalDropdown = computed(() => [
     icon: h(LucideKeyboard),
     onClick: () => (showShortcutsModal.value = true),
   },
+  themeMenuItem.value,
   {
     label: __("Settings"),
     icon: "settings",
@@ -443,6 +474,7 @@ const steps = [
     name: "assign_to_agent",
     title: __("Assign a ticket to an agent"),
     completed: false,
+    dependsOn: "create_first_ticket",
     icon: markRaw(UserPen),
     onClick: async () => {
       await handleFirstTicketNavigation();
@@ -454,6 +486,7 @@ const steps = [
     name: "reply_on_ticket",
     title: __("Reply on a ticket"),
     completed: false,
+    dependsOn: "create_first_ticket",
     icon: markRaw(MailOpen),
     onClick: async () => {
       await handleFirstTicketNavigation();
@@ -466,6 +499,7 @@ const steps = [
     name: "comment_on_ticket",
     title: __("Add a comment on a ticket"),
     completed: false,
+    dependsOn: "create_first_ticket",
     icon: markRaw(MessageCircle),
     onClick: async () => {
       await handleFirstTicketNavigation();
@@ -610,20 +644,30 @@ const { isOnboardingStepsCompleted, setUp, updateOnboardingStep } =
 async function handleFirstTicketNavigation() {
   const ticket = await getFirstTicket();
 
-  if (ticket) {
-    router.push({
-      name: "TicketAgent",
-      params: { ticketId: ticket },
-    });
-  } else {
+  if (!ticket) {
     router.push({ name: "TicketAgentNew" });
+    updateOnboardingStep("create_first_ticket", false); // reset the step as first ticket is not created
+    toast.error("Please create a new ticket to proceed with the next step.");
+    return;
   }
+
+  router.push({
+    name: "TicketAgent",
+    params: { ticketId: ticket },
+  });
 }
 
 async function getFirstTicket() {
-  let ticket = localStorage.getItem("firstTicket");
-  if (ticket) return ticket;
-  return await call("helpdesk.api.onboarding.get_first_ticket");
+  let cachedTicket = localStorage.getItem("firstTicket");
+  const ticket = await call("helpdesk.api.onboarding.get_first_ticket", {
+    ticket: cachedTicket,
+  });
+  if (ticket) {
+    localStorage.setItem("firstTicket", ticket);
+  } else {
+    localStorage.removeItem("firstTicket");
+  }
+  return ticket;
 }
 
 async function getGeneralCategory() {

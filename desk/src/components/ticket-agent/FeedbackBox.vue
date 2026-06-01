@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full p-4 rounded" :class="styles[0]">
+  <div class="w-full p-4 rounded-md" :class="styles[0]">
     <!-- Header -->
     <div
       class="flex mb-1.5 items-center"
@@ -12,7 +12,9 @@
     </div>
     <!-- Optional Text -->
     <div v-if="activity.feedback_extra">
-      <p class="mt-2 text-sm text-gray-700">{{ activity.feedback_extra }}</p>
+      <p class="mt-2 text-p-sm text-ink-gray-7">
+        {{ activity.feedback_extra }}
+      </p>
     </div>
   </div>
 </template>

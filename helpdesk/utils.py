@@ -177,15 +177,16 @@ def agent_only(fn):
 
 
 def get_agents_team():
-    QBTeam = frappe.qb.DocType("HD Team")
-    QBTeamMember = frappe.qb.DocType("HD Team Member")
+    Team = frappe.qb.DocType("HD Team")
+    TeamMember = frappe.qb.DocType("HD Team Member")
 
     teams = (
-        frappe.qb.from_(QBTeamMember)
-        .where(QBTeamMember.user == frappe.session.user)
-        .join(QBTeam)
-        .on(QBTeam.name == QBTeamMember.parent)
-        .select(QBTeam.team_name, QBTeam.ignore_restrictions)
+        frappe.qb.from_(TeamMember)
+        .join(Team)
+        .on(Team.name == TeamMember.parent)
+        .where(TeamMember.user == frappe.session.user)
+        .where(Team.disabled == 0)
+        .select(Team.team_name, Team.ignore_restrictions)
         .run(as_dict=True)
     )
     return teams
@@ -446,3 +447,30 @@ def is_frappe_version(version: str, above: bool = False, below: bool = False):
     if below:
         return major_version < target_version
     return major_version == target_version
+
+
+def format_time_difference(dt, context="ago"):
+    if not dt:
+        return ""
+    now = frappe.utils.now_datetime()
+    if isinstance(dt, str):
+        dt = frappe.utils.get_datetime(dt)
+
+    if context == "until":
+        diff = dt - now
+        past_label = "overdue"
+    else:
+        diff = now - dt
+        past_label = "0m"
+
+    total_seconds = diff.total_seconds()
+
+    if total_seconds < 0:
+        return past_label
+
+    if total_seconds < 3600:
+        return f"{int(total_seconds // 60)}m"
+    elif total_seconds < 86400:
+        return f"{int(total_seconds // 3600)}h"
+    else:
+        return f"{int(total_seconds // 86400)}d"

@@ -10,6 +10,7 @@
     <template #actions>
       <Button
         variant="solid"
+        class="flex w-full"
         @click="renameTeam"
         :loading="renameTeamResource.loading"
         :disabled="teamName == dialog.teamName || teamName.trim() == ''"
@@ -48,7 +49,7 @@ const renameTeamResource = createResource({
       return __("New and old title cannot be same");
   },
   onSuccess(data) {
-    toast.success(__("Team renamed"));
+    toast.success(__("Team renamed successfully."));
     dialog.value.show = false;
     emit("onRename", data);
   },

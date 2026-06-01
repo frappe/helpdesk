@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md border px-2 border-gray-300 text-sm">
+  <div class="rounded-md border px-2 border-outline-gray-2 text-sm">
     <div
       class="grid p-2 px-4 items-center gap-2"
       :style="{
@@ -9,7 +9,7 @@
       <div
         v-for="column in columns"
         :key="column.key"
-        class="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis"
+        class="text-ink-gray-5 overflow-hidden whitespace-nowrap text-ellipsis"
       >
         {{ column.label }}
       </div>
@@ -30,7 +30,7 @@
             :type="'text'"
             placeholder="Description"
             v-model="holiday[column.key]"
-            class="!bg-white w-full text-base px-0 focus:!ring-0 border-none hover:bg-white outline-none no-underline focus:!outline-none"
+            class="!bg-surface-white w-full text-base px-0 focus:!ring-0 border-none hover:bg-surface-white outline-none no-underline focus:!outline-none"
           />
           <div v-else>
             {{ dayjs(holiday[column.key]).format("DD MMM YYYY") }}
@@ -48,7 +48,7 @@
       </div>
       <hr v-if="index !== holidays.length - 1" />
     </div>
-    <div v-if="holidays?.length === 0" class="text-center p-4 text-gray-600">
+    <div v-if="holidays?.length === 0" class="text-center p-4 text-ink-gray-5">
       No items in the list
     </div>
   </div>

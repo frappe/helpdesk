@@ -10,13 +10,7 @@
           @click="goBack()"
           class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
         />
-        <Badge
-          variant="subtle"
-          theme="orange"
-          size="sm"
-          :label="__('Unsaved changes')"
-          v-if="isDirty"
-        />
+        <UnsavedBadge :show="isDirty" />
       </div>
     </template>
     <template #header-actions>
@@ -29,7 +23,7 @@
           icon-left="eye"
           :disabled="
             Boolean(
-              !content?.editor?.state?.doc?.textContent?.trim()?.length
+              !savedReplyData.message?.replace(/<[^>]*>/g, '')?.trim()?.length
             ) || isDirty
           "
         />
@@ -51,7 +45,7 @@
     <template #content>
       <div
         v-if="getSavedReplyData.loading"
-        class="flex items-center justify-center mt-12"
+        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -74,6 +68,7 @@
               v-model="savedReplyData.scope"
               :options="scopeDropdownOptions"
               required
+              class="w-full"
             >
               <template #prefix>
                 <component
@@ -81,7 +76,7 @@
                   class="size-4 text-ink-gray-9"
                 />
               </template>
-              <template #option="{ option }">
+              <template #label="{ option }">
                 <div class="flex gap-2 items-center cursor-pointer">
                   <component :is="option.icon" class="size-4 text-ink-gray-9" />
                   <span>
@@ -91,7 +86,7 @@
               </template>
             </Select>
             <FormLabel
-              :label="__('Choose who can view and use this response')"
+              :label="__('Choose who can view and use this response.')"
             />
           </div>
         </div>
@@ -102,6 +97,7 @@
             v-model="savedReplyData.teams"
             :placeholder="__('Select teams')"
             @update:modelValue="validateData('teams')"
+            class="w-full"
           />
           <div class="text-xs text-ink-gray-5 cursor-default">
             {{ __("Restrict visibility to these teams") }}
@@ -116,24 +112,16 @@
             />
           </div>
           <PreviewDialog v-model="previewDialog" />
-          <TextEditor
-            editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5"
+          <CompactEditor
             ref="content"
-            :bubble-menu="false"
-            :content="savedReplyData.message"
-            @change="
-              (val) => {
-                savedReplyData.message = val;
-                validateData('message');
-              }
-            "
-            :fixed-menu="menuButtons"
+            v-model="savedReplyData.message"
             :extensions="[FieldAutocomplete]"
             :placeholder="
               __(
                 'Hello {{ contact }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ full_name }}'
               )
             "
+            @update:modelValue="validateData('message')"
           />
           <ErrorMessage class="text-p-sm" :message="errors.message" />
         </div>
@@ -161,21 +149,21 @@ import {
   LoadingIndicator,
   MultiSelect,
   Select,
-  TextEditor,
   toast,
 } from "frappe-ui";
 import { computed, inject, onUnmounted, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
 import PreviewDialog from "./components/PreviewDialog.vue";
-import { menuButtons } from "./savedReplies";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import CompactEditor from "@/components/CompactEditor.vue";
 import DocumentationButton from "@/components/DocumentationButton.vue";
 import { storeToRefs } from "pinia";
 import { useConfigStore } from "@/stores/config";
 import { useAuthStore } from "@/stores/auth";
 import { FieldAutocomplete } from "../../../tiptap-extensions";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
 import GlobeIcon from "~icons/lucide/globe";
@@ -206,7 +194,7 @@ const { userTeams, isAdmin } = storeToRefs(useAuthStore());
 const savedReplyData = ref({
   name: "",
   title: "",
-  scope: "Personal",
+  scope: savedRepliesActiveScreen.value.data?.scope || "Personal",
   message: "",
   teams: [],
 });
@@ -268,6 +256,9 @@ const getTeamsListResource = createListResource({
   doctype: "HD Team",
   auto: true,
   fields: ["name"],
+  filters: {
+    disabled: 0,
+  },
   start: 0,
   pageLength: 999,
   transform: (data: Array<Team>) => {
@@ -353,7 +344,7 @@ const createSavedReply = () => {
     },
     {
       onSuccess: (data) => {
-        toast.success(__("Saved reply saved"));
+        toast.success(__("Saved reply saved successfully."));
         savedReplyData.value = {
           ...savedReplyData.value,
           name: data.name,
@@ -416,7 +407,7 @@ const updateSavedReply = async () => {
 
   savedRepliesListResource?.reload();
   isDirty.value = false;
-  toast.success(__("Saved reply updated"));
+  toast.success(__("Saved reply updated successfully."));
 };
 
 const getScopeIcon = (scope: string) => {
@@ -435,7 +426,9 @@ const validateData = (key?: string) => {
         break;
 
       case "message":
-        if (!content.value?.editor?.state?.doc?.textContent?.trim()?.length) {
+        if (
+          !savedReplyData.value.message?.replace(/<[^>]*>/g, "")?.trim()?.length
+        ) {
           errors.value.message = __("Response is required");
         } else {
           errors.value.message = "";

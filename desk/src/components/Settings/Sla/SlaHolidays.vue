@@ -2,12 +2,12 @@
   <div class="flex items-center justify-between">
     <div class="flex flex-col gap-1">
       <div class="text-lg font-semibold text-ink-gray-8">
-        {{ __("Work schedule and holidays") }}
+        {{ __("Work Schedule and Holidays") }}
       </div>
       <div class="text-p-sm text-ink-gray-6 max-w-lg">
         {{
           __(
-            "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one"
+            "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one."
           )
         }}
       </div>

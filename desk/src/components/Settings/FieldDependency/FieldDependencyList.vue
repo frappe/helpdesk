@@ -5,19 +5,21 @@
         <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("Field Dependencies") }}
         </h1>
-        <DocumentationButton
-          url="https://docs.frappe.io/helpdesk/field-dependency"
-          color="!text-ink-gray-6"
-        />
       </div>
     </template>
     <template #description>
       <p class="text-p-sm max-w-md text-ink-gray-6">
         {{
           __(
-            "Create dependencies between fields to dynamically control options based on user selections."
+            "Create field dependencies to dynamically update options based on user selections. Learn more about field dependencies"
           )
         }}
+        <a
+          href="https://docs.frappe.io/helpdesk/field-dependency"
+          target="_blank"
+          class="underline"
+          >{{ __("here.") }}</a
+        >
       </p>
     </template>
     <template #header-actions>
@@ -40,33 +42,16 @@
         </div>
 
         <!-- Empty State -->
-        <div
+        <EmptyState
           v-if="
             !fieldDependenciesList.loading &&
             !fieldDependenciesList.data?.length
           "
-          class="flex flex-col items-center justify-center gap-4 p-4 h-full"
-        >
-          <div
-            class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
-          >
-            <FieldDependencyIcon class="size-6 text-ink-gray-6" />
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <div class="text-base font-medium text-ink-gray-6">
-              {{ __("No field dependency found") }}
-            </div>
-            <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-              {{ __("Add one to get started") }}
-            </div>
-          </div>
-          <Button
-            :label="__('New')"
-            variant="outline"
-            icon-left="plus"
-            @click="$emit('update:step', 'fd')"
-          />
-        </div>
+          variant="badge"
+          :icon="FieldDependencyIcon"
+          title="No field dependency found"
+          description="Add one to get started."
+        />
 
         <div
           class="w-full -ml-2"
@@ -77,10 +62,10 @@
         >
           <div>
             <div
-              class="grid grid-cols-11 items-center gap-4 text-sm text-gray-600"
+              class="grid grid-cols-11 items-center gap-4 text-sm text-ink-gray-5"
             >
               <div class="col-span-7 ml-2">{{ __("Name") }}</div>
-              <div class="col-span-2">{{ __("Created By") }}</div>
+              <div class="col-span-2">{{ __("Created by") }}</div>
               <div class="col-span-2">{{ __("Enabled") }}</div>
             </div>
             <hr class="mt-2 mx-2" />
@@ -89,7 +74,7 @@
               :key="row.name"
             >
               <div
-                class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded h-12.5"
+                class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded h-12.5"
               >
                 <div
                   @click.stop="$emit('update:step', 'fd', row.name)"
@@ -157,7 +142,6 @@ import {
 import { getFieldDependencyLabel, ConfirmDelete } from "@/utils";
 import { onMounted, ref } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";
-import DocumentationButton from "@/components/DocumentationButton.vue";
 import FieldDependencyIcon from "@/components/icons/FieldDependencyIcon.vue";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
@@ -174,7 +158,7 @@ function getOptions(rowName: string) {
     onConfirmDelete: () => {
       fieldDependenciesList.delete.submit(rowName, {
         onSuccess: () => {
-          toast.success(__("Field dependency deleted successfully"));
+          toast.success(__("Field dependency deleted successfully."));
           fieldDependenciesList.reload();
         },
       });
