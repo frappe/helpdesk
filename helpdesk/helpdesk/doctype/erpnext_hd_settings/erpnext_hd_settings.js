@@ -13,19 +13,33 @@ frappe.ui.form.on("ERPNext HD Settings", {
         if (!r.message || !r.message.enabled || r.message.in_sync) {
           return;
         }
-        frm.add_custom_button(__("Sync Customers with Helpdesk"), function () {
-          frappe.call({
-            method:
-              "helpdesk.integrations.erpnext.api.sync_hd_erpnext_customers",
-            freeze: true,
-            freeze_message: __("Syncing customers with Helpdesk..."),
-            callback: function () {
-              frappe.show_alert({
-                message: __("Customers synced with Helpdesk successfully"),
-                indicator: "green",
+        frm.add_custom_button(__("Sync Customers"), function () {
+          const dialog = new frappe.ui.Dialog({
+            title: __("Sync Customers"),
+            fields: [
+              {
+                fieldtype: "HTML",
+                options: `<p class="text-muted">${__(
+                  "Sync all customers between ERPNext and Helpdesk? The sync runs in the background and can take a few minutes depending on the number of customers."
+                )}</p>`,
+              },
+            ],
+            primary_action_label: __("Confirm"),
+            primary_action() {
+              dialog.hide();
+              frappe.call({
+                method:
+                  "helpdesk.integrations.erpnext.api.sync_hd_erpnext_customers",
+                callback: function () {
+                  frappe.show_alert({
+                    message: __("Sync started"),
+                    indicator: "green",
+                  });
+                },
               });
             },
           });
+          dialog.show();
         });
       },
     });
