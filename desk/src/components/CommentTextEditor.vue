@@ -12,9 +12,8 @@
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
-    :mentions="mentionsGetter"
     @change="editable ? (newComment = $event) : null"
-    :extensions="[ComponentUtils, HandleExcelPaste]"
+    :extensions="[ComponentUtils, HandleExcelPaste, mentionExtension]"
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #bottom>
@@ -113,7 +112,12 @@ import { AttachmentIcon } from "@/components/icons/";
 import { useTyping } from "@/composables/realtime";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
-import { ComponentUtils, HandleExcelPaste } from "@/tiptap-extensions";
+import {
+  ComponentUtils,
+  HandleExcelPaste,
+  createMentionExtension,
+  type MentionItem,
+} from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,
@@ -123,14 +127,8 @@ import {
 } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";
-
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const {
-  agents: agentsList,
-  dropdown,
-  hdTeams,
-} = storeToRefs(useAgentStore());
-const mentionsGetter = computed(() => dropdown.value ?? []);
+const { agents: agentsList, hdTeams } = storeToRefs(useAgentStore());
 const { isManager } = useAuthStore();
 
 const props = defineProps({
@@ -183,6 +181,21 @@ onBeforeUnmount(() => {
 const label = computed(() => {
   return loading.value ? "Sending..." : props.label;
 });
+
+const mentionItems = computed<MentionItem[]>(() => [
+  ...(hdTeams.value.data ?? []).map((team: any) => ({
+    label: team.name,
+    value: team.name,
+    group: "Teams",
+  })),
+  ...(agentsList.value.data ?? []).map((agent: any) => ({
+    label: agent.agent_name,
+    value: agent.name,
+    group: "Agents",
+  })),
+]);
+
+const mentionExtension = createMentionExtension(() => mentionItems.value);
 
 function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
