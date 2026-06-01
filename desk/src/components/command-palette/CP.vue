@@ -4,7 +4,7 @@
       <div>
         <Combobox nullable @update:model-value="onSelection">
           <div class="relative">
-            <div class="pl-4.5 absolute inset-y-0 left-0 flex items-center">
+            <div class="ps-4.5 absolute inset-y-0 start-0 flex items-center">
               <LucideSearch class="h-4 w-4" />
             </div>
             <ComboboxInput
@@ -13,7 +13,7 @@
                   'Search tickets, emails, comments, or #234 to navigate to ticket'
                 )
               "
-              class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-ink-gray-8 placeholder:text-ink-gray-4 focus:ring-0"
+              class="ps-11.5 pe-4.5 w-full border-none bg-transparent py-3 text-base text-ink-gray-8 placeholder:text-ink-gray-4 focus:ring-0"
               autocomplete="off"
               @input="onInput"
             />

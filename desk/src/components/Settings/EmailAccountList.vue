@@ -11,6 +11,7 @@
       <Button
         :label="__('New')"
         theme="gray"
+        class="rtl:flex-row-reverse"
         variant="solid"
         @click="emit('update:step', 'email-add')"
         icon-left="plus"
@@ -19,11 +20,11 @@
     <template #content>
       <!-- list accounts -->
       <div
-        class="-ml-2 grow"
+        class="-ms-2 grow"
         v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
       >
         <div class="flex text-sm text-ink-gray-5">
-          <div class="ml-2">{{ __("Email account name") }}</div>
+          <div class="ms-2">{{ __("Email account name") }}</div>
         </div>
         <hr class="mx-2 mt-2" />
         <div
@@ -38,13 +39,24 @@
         </div>
       </div>
       <!-- fallback if no email accounts -->
-      <EmptyState
+      <div
         v-else
-        variant="badge"
-        :icon="EmailIcon"
-        title="No email account found"
-        description="Add one to get started."
-      />
+        class="flex flex-col items-center justify-center gap-4 h-full"
+      >
+        <div
+          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
+        >
+          <EmailIcon class="size-6 text-ink-gray-6" />
+        </div>
+        <div class="flex flex-col items-center gap-1">
+          <div class="text-base font-medium text-ink-gray-6">
+            {{ __("No email account found") }}
+          </div>
+          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
+            {{ __("Add one to get started.") }}
+          </div>
+        </div>
+      </div>
     </template>
   </SettingsLayoutBase>
 </template>
@@ -54,7 +66,6 @@ import { EmailAccount } from "@/types";
 import { createListResource } from "frappe-ui";
 import EmailAccountCard from "./EmailAccountCard.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { EmailIcon } from "../icons";
 
 const emit = defineEmits(["update:step"]);
 

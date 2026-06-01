@@ -110,7 +110,7 @@
           <div
             ref="quotedContentRef"
             contenteditable="true"
-            class="prose !max-w-full mx-1 my-2 border-l-4 border-outline-gray-2 pl-4 text-sm focus:outline-none"
+            class="prose !max-w-full mx-1 my-2 border-s-4 border-outline-gray-2 ps-4 text-sm focus:outline-none"
             @input="onQuotedInput"
           />
         </div>
@@ -172,11 +172,11 @@
             >
               <SavedReplyIcon class="h-4 w-4" />
             </button>
-            <div class="h-4 w-[2px] border-l" />
+            <div class="h-4 w-[2px] border-s" />
           </div>
           <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
         </div>
-        <div class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%]">
+        <div class="flex items-center justify-end gap-x-2 sm:mt-0 w-[40%]">
           <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"

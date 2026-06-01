@@ -2,7 +2,7 @@
   <!-- Teleport to App Header -->
   <teleport to="#app-header">
     <div
-      class="flex items-center mx-5 md:mr-0 text-p-sm gap-3 text-[14px] mb-2"
+      class="flex items-center ms-5 me-5 md:me-0 text-p-sm gap-3 text-[14px] mb-2"
     >
       <!-- Source -->
       <div class="flex items-center gap-1">
@@ -22,19 +22,19 @@
           v-if="!ticket.doc.via_customer_portal"
           class="text-ink-gray-5 flex items-center"
         >
-          <span class="mr-[4px]">via</span>
-          <EmailIcon class="size-4 inline-block mr-1" />
+          <span class="me-[4px]">via</span>
+          <EmailIcon class="size-4 inline-block me-1" />
           <span>Email</span>
         </div>
         <!-- Via Portal -->
         <div v-else class="text-ink-gray-5 flex items-center">
-          <span class="mr-[4px]">via</span>
-          <GlobeIcon class="size-4 inline-block mr-1" />
+          <span class="me-[4px]">via</span>
+          <GlobeIcon class="size-4 inline-block me-1" />
           <span>Portal</span>
         </div>
       </div>
       <!-- divider -->
-      <div class="border-l border-outline-gray-2 h-[13px]" />
+      <div class="border-s border-outline-gray-2 h-[13px]" />
       <!-- First Response -->
       <div class="flex items-center gap-1">
         <span>First Response</span>
@@ -52,7 +52,7 @@
         </Tooltip>
       </div>
       <!-- divider -->
-      <div class="border-l border-outline-gray-2 h-[13px]" />
+      <div class="border-s border-outline-gray-2 h-[13px]" />
       <!-- Resolution by -->
       <div class="flex items-center gap-1">
         <span>Resolution </span>

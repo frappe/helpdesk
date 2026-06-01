@@ -2,8 +2,8 @@
   <div>
     <LayoutHeader>
       <template #left-header>
-        <div class="flex gap-2 items-center crumbs max-w-[50vw]">
-          <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
+        <div class="flex gap-2 items-center crumbs">
+          <Breadcrumbs :items="breadcrumbs" class="-ms-0.5 truncate" />
           <Badge
             v-if="!article.loading"
             variant="subtle"
@@ -43,7 +43,7 @@
             <div class="w-full">
               <textarea
                 ref="titleRef"
-                class="w-full resize-none border-0 bg-transparent text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+                class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
                 v-model="title"
                 :placeholder="__('Title')"
                 rows="1"
@@ -82,7 +82,7 @@
                 v-if="!editable && !isCustomerPortal && !isMobileView"
                 class="text-p-sm text-ink-gray-4 items-center"
               >
-                <span>{{ views }} views</span>
+                <span>{{ views }} {{ __("views") }}</span>
               </div>
             </div>
             <div class="flex gap-4 justify-between sm:items-start">
@@ -173,7 +173,7 @@
         >
           <template #bottom v-if="editable">
             <TextEditorFixedMenu
-              class="-ml-1 overflow-x-auto w-full"
+              class="-ms-1 overflow-x-auto w-full"
               :buttons="textEditorMenuButtons"
             />
           </template>
@@ -193,11 +193,13 @@
               <p
                 class="truncate capitalize text-p-base text-ink-gray-9 font-medium"
               >
-                <span class="text-base text-ink-gray-5">published by </span>
+                <span class="text-base text-ink-gray-5"
+                  >{{ __("published by") }}
+                </span>
                 {{ article.data.author.name }}
               </p>
               <div class="flex items-center gap-1">
-                <span class="text-p-xs text-ink-gray-7">
+                <span class="text-p-xs text-ink-gray-6">
                   {{
                     dayjsLocal(article.data.modified).format("MMM D, h:mm A")
                   }}
@@ -667,7 +669,7 @@ const articleActions = computed(() => [
 const breadcrumbs = computed(() => {
   const items: Breadcrumb[] = [
     {
-      label: isMobileView.value ? "" : __("Knowledge Base"),
+      label: isMobileView.value ? __("KB") : __("Knowledge Base"),
       route: {
         name: isCustomerPortal.value
           ? "CustomerKnowledgeBase"

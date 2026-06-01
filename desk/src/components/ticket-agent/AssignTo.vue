@@ -41,7 +41,7 @@
             </template>
           </div>
           <template #suffix>
-            <LucideChevronDown class="h-4 w-4 ml-auto text-ink-gray-5" />
+            <LucideChevronDown class="h-4 w-4 ms-auto text-ink-gray-5" />
           </template>
         </Button>
       </div>
@@ -111,7 +111,7 @@
                   class="flex-shrink-0"
                 />
                 <UserAvatar :name="agent.value" size="sm" class="" />
-                <span class="text-ink-gray-7 flex-1 text-left truncate">
+                <span class="text-ink-gray-7 flex-1 text-start truncate">
                   {{ agent.label }}
                 </span>
               </button>

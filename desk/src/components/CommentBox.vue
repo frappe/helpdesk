@@ -16,7 +16,7 @@
       </div>
       <div class="flex items-center gap-1">
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-          <span class="pl-0.5 text-sm text-ink-gray-5">
+          <span class="ps-0.5 text-sm text-ink-gray-5">
             {{ timeAgo(creation) }}
           </span>
         </Tooltip>

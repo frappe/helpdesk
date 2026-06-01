@@ -7,6 +7,7 @@
           icon-left="plus"
           @click="togglePopover()"
           :label="__('Add Assignee')"
+          class="rtl:flex-row-reverse"
         />
       </template>
       <template #body="{ togglePopover }">
@@ -28,7 +29,7 @@
               :placeholder="__('Search')"
             />
             <button
-              class="absolute right-1.5 inline-flex h-7 w-7 items-center justify-center"
+              class="absolute end-1.5 inline-flex h-7 w-7 items-center justify-center"
               @click="query = ''"
             >
               <FeatherIcon name="x" class="w-4" />
@@ -81,7 +82,7 @@
           <div class="border-t p-1.5 pb-0.5">
             <Button
               variant="ghost"
-              class="w-full"
+              class="w-full rtl:flex-row-reverse"
               icon-left="plus"
               :label="__('Invite agent')"
               @click="inviteAgents"

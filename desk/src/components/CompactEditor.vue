@@ -16,7 +16,7 @@
         >
           <div
             v-if="showAttachments"
-            class="inline-flex items-center gap-1.5 pr-1"
+            class="inline-flex items-center gap-1.5 pe-1"
           >
             <FileUploader
               :upload-args="{ private: true }"
@@ -36,7 +36,7 @@
                 </button>
               </template>
             </FileUploader>
-            <div class="h-4 w-[2px] border-l" />
+            <div class="h-4 w-[2px] border-s" />
           </div>
           <TextEditorFixedMenu :buttons="(menuButtons as any)" />
         </div>

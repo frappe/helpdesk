@@ -4,14 +4,14 @@
       <TransitionChild
         as="template"
         enter="transition ease-in-out duration-200 transform"
-        enter-from="-translate-x-full"
+        enter-from="-translate-x-full rtl:translate-x-full"
         enter-to="translate-x-0"
         leave="transition ease-in-out duration-200 transform"
         leave-from="translate-x-0"
-        leave-to="-translate-x-full"
+        leave-to="-translate-x-full rtl:translate-x-full"
       >
         <div
-          class="relative z-10 flex h-full w-[230px] flex-col border-r bg-surface-menu-bar transition-all duration-300 ease-in-out"
+          class="relative z-10 flex h-full w-[230px] flex-col border-e bg-surface-menu-bar transition-all duration-300 ease-in-out"
         >
           <!-- user dropwdown -->
           <div class="p-1">
@@ -54,13 +54,16 @@
                   <div
                     v-if="!hide"
                     class="flex cursor-pointer gap-1.5 px-2 text-base font-medium text-ink-gray-5 mx-2 transition-all duration-300 ease-in-out"
-                    :class="'py-[7px] h-7.5 w-auto opacity-100'"
+                    :class="'py-[7px] h-7.5 w-auto opacity-100 rtl:flex-row-reverse rtl:justify-end'"
                     @click="toggle()"
                   >
                     <FeatherIcon
                       name="chevron-right"
                       class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
-                      :class="{ 'rotate-90': opened }"
+                      :class="{
+                        'rotate-90': opened,
+                        'rtl:rotate-180': !opened,
+                      }"
                     />
                     <span>{{ view.label }}</span>
                   </div>
@@ -92,7 +95,7 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <DialogOverlay class="fixed inset-0 bg-black-overlay-500" />
+        <DialogOverlay class="fixed inset-0 bg-surface-gray-7/50" />
       </TransitionChild>
     </Dialog>
   </TransitionRoot>
@@ -117,9 +120,6 @@ import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { currentView, useView } from "@/composables/useView";
 
 import LucideBell from "~icons/lucide/bell";
-import LucideMoon from "~icons/lucide/moon";
-import LucideSun from "~icons/lucide/sun";
-import { useTheme } from "frappe-ui";
 
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
@@ -131,13 +131,6 @@ import {
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 const { pinnedViews, publicViews } = useView();
-const { currentTheme, toggleTheme } = useTheme();
-
-const themeMenuItem = computed(() => ({
-  label: "Toggle theme",
-  icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
-  onClick: () => toggleTheme(),
-}));
 
 const notificationStore = useNotificationStore();
 const route = useRoute();
@@ -201,7 +194,6 @@ function parseViews(views) {
 }
 
 const customerPortalDropdown = computed(() => [
-  themeMenuItem.value,
   {
     label: "Log out",
     icon: "log-out",
@@ -231,7 +223,6 @@ const agentPortalDropdown = computed(() => [
     label: "Docs",
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
-  themeMenuItem.value,
   {
     label: "Log out",
     icon: "log-out",

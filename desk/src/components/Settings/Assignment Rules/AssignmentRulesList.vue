@@ -21,6 +21,7 @@
         variant="solid"
         @click="goToNew()"
         icon-left="plus"
+        class="rtl:flex-row-reverse"
       />
     </template>
     <template
@@ -39,14 +40,14 @@
           class="focus:ring-0 border-outline-gray-2"
           icon-left="search"
           debounce="300"
-          inputClass="p-4 pr-12"
+          inputClass="p-4 pe-12 rtl:pr-8"
         />
         <Button
           v-if="assignmentRuleSearchQuery"
           icon="x"
           variant="ghost"
           @click="assignmentRuleSearchQuery = ''"
-          class="absolute right-1 top-1/2 -translate-y-1/2"
+          class="absolute end-1 top-1/2 -translate-y-1/2"
         />
       </div>
     </template>

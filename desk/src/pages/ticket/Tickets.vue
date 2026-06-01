@@ -15,7 +15,12 @@
           class="inline-flex"
           :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
         >
-          <Button label="Create" theme="gray" variant="solid">
+          <Button
+            class="rtl:flex-row-reverse"
+            label="Create"
+            theme="gray"
+            variant="solid"
+          >
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>
@@ -148,7 +153,7 @@ const options = computed(() => ({
           : status?.["label_agent"];
         return h(
           "div",
-          { class: "flex items-center space-x-2 justify-start w-full" },
+          { class: "flex items-center gap-x-2 justify-start w-full" },
           [
             h(IndicatorIcon, { class: status?.["parsed_color"] }),
             h("span", { class: "truncate flex-1" }, label),

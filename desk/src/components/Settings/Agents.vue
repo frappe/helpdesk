@@ -8,6 +8,7 @@
         @click="() => setActiveSettingsTab('Invite Agents')"
         label="New"
         variant="solid"
+        class="rtl:flex-row-reverse"
       >
         <template #prefix>
           <LucidePlus class="h-4 w-4 stroke-1.5" />
@@ -25,14 +26,14 @@
             class="focus:ring-0 border-outline-gray-2"
             icon-left="search"
             debounce="300"
-            inputClass="p-4 pr-12"
+            inputClass="p-4 pe-12 rtl:pr-8"
           />
           <Button
             v-if="search"
             icon="x"
             variant="ghost"
             @click="search = ''"
-            class="absolute right-1 top-1/2 -translate-y-1/2"
+            class="absolute end-1 top-1/2 -translate-y-1/2"
           />
         </div>
         <Dropdown :options="dropdownOptions" placement="right">
@@ -108,7 +109,7 @@
           <hr class="mt-2" />
           <div v-for="(agent, index) in agents.data" :key="agent.agent_name">
             <div class="flex items-center justify-between h-14 group rounded">
-              <div class="flex items-center space-x-3 grow">
+              <div class="flex items-center gap-x-3 grow">
                 <Avatar
                   :image="agent.user_image"
                   :label="agent.agent_name"
@@ -152,7 +153,7 @@
                 <Dropdown
                   :options="getOptions(agent)"
                   :key="agent"
-                  class="ml-2"
+                  class="ms-2"
                   placement="right"
                 >
                   <Button icon="more-horizontal" variant="ghost" />
