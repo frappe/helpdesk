@@ -112,10 +112,6 @@ ignore_links_on_delete = [
     "HD Ticket Comment",
 ]
 
-doctype_list_js = {
-    "Customer": "public/erpnext/customer_list.js",
-}
-
 # setup wizard
 # setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"
 # setup_wizard_stages = "helpdesk.setup.setup_wizard.get_setup_stages"
