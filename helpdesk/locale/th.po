@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-27 10:32\n"
+"PO-Revision-Date: 2026-05-28 10:55\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Thai\n"
 "MIME-Version: 1.0\n"
@@ -405,7 +405,7 @@ msgstr "ปรากฏถัดจากชื่อเรื่องในแ
 
 #: desk/src/components/Settings/General/components/Branding.vue:29
 msgid "Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO."
-msgstr ""
+msgstr "ปรากฏถัดจากชื่อเรื่องในแท็บเบราว์เซอร์ของคุณ ขนาดที่แนะนำคือขั้นต่ำ 32x32 พิกเซล ในรูปแบบ PNG หรือ ICO."
 
 #. Label of the apply_sla_for_resolution (Check) field in DocType 'HD Service
 #. Level Agreement'
@@ -5288,7 +5288,7 @@ msgstr "ไม่พบตั๋วสำหรับคีย์ที่ให
 
 #: desk/src/pages/ticket/TicketCustomer.vue:149
 msgid "Ticket not found."
-msgstr ""
+msgstr "ไม่พบตั๋ว."
 
 #. Label of the raised_outside_working_hours (Check) field in DocType 'HD
 #. Ticket'
@@ -5820,7 +5820,7 @@ msgstr "ผู้รับมอบหมาย"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:467
 msgid "average"
-msgstr ""
+msgstr "ค่าเฉลี่ย"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:13
 msgid "back to email event list"

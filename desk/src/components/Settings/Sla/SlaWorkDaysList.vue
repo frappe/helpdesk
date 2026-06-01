@@ -12,7 +12,7 @@
         :key="column.key"
         class="text-ink-gray-5 overflow-hidden whitespace-nowrap text-ellipsis"
         :class="{
-          'ml-2': column.key === 'workday',
+          'ms-2': column.key === 'workday',
         }"
       >
         {{ column.label }}

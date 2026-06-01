@@ -19,11 +19,16 @@ def get_sync_info() -> dict:
     ):
         return {"enabled": False, "in_sync": False}
 
+    if not frappe.has_permission("HD Customer", "read") or not frappe.has_permission(
+        "Customer", "read"
+    ):
+        return {"enabled": False}
+
     enabled = bool(frappe.db.get_single_value("ERPNext HD Settings", "enabled"))
-    return {
-        "enabled": enabled,
-        "in_sync": in_sync() if enabled else False,
-    }
+    if not enabled:
+        return {"enabled": False}
+
+    return {"enabled": enabled, "in_sync": in_sync()}
 
 
 def in_sync() -> bool:

@@ -23,7 +23,7 @@
               <div class="text-ink-gray-7 text-base flex-1">
                 {{ shortcut.description }}
               </div>
-              <div class="flex space-x-1 gap-1 justify-end">
+              <div class="flex gap-1 justify-end">
                 <span
                   v-for="(key, kIndex) in shortcut.keys"
                   :key="kIndex"

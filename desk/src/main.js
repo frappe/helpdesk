@@ -84,6 +84,8 @@ if (import.meta.env.DEV) {
     for (let key in values) {
       window[key] = values[key];
     }
+    if (window.dir) document.documentElement.dir = window.dir;
+    if (window.lang) document.documentElement.lang = window.lang;
     socket = initSocket();
     app.config.globalProperties.$socket = socket;
     app.mount("#app");

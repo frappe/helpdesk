@@ -34,7 +34,7 @@
             />
             <ErrorMessage :message="error[field.error]" />
           </div>
-          <div class="flex justify-end space-x-2">
+          <div class="flex justify-end gap-x-2">
             <Button
               :label="__('Create')"
               :loading="contactResource.loading"

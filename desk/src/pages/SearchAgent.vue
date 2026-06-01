@@ -9,7 +9,7 @@
         </template>
       </LayoutHeader>
       <div class="mx-auto mt-6 max-w-4xl px-4 sm:px-5">
-        <div class="flex items-center space-x-2 px-2.5">
+        <div class="flex items-center gap-x-2 px-2.5">
           <TextInput
             ref="searchInput"
             class="flex-1"
@@ -80,7 +80,7 @@
             <Button
               v-if="hasActiveFilters()"
               size="sm"
-              class="ml-auto text-ink-gray-5"
+              class="ms-auto text-ink-gray-5"
               variant="gray-ghost"
               @click="clearFilters"
               :label="__('Clear all filters')"
@@ -135,7 +135,7 @@
                   class="text-ink-gray-6"
                 >
                   <span class="text-ink-gray-5">{{ __("Searched for:") }}</span>
-                  <span class="ml-1 font-medium text-primary">
+                  <span class="ms-1 font-medium text-primary">
                     {{ searchResponse.summary.corrected_query }}
                   </span>
                 </p>
@@ -148,9 +148,9 @@
           <template v-for="item in searchResponse?.results" :key="item.id">
             <router-link
               :to="getItemRoute(item)"
-              class="flex space-x-2 overflow-hidden rounded px-2.5 py-3 hover:bg-surface-gray-2"
+              class="flex gap-x-2 overflow-hidden rounded px-2.5 py-3 hover:bg-surface-gray-2"
             >
-              <div class="flex items-start space-x-2">
+              <div class="flex items-start gap-x-2">
                 <div class="flex-shrink-0">
                   <LucideTicket
                     v-if="item.doctype === 'HD Ticket'"
@@ -188,7 +188,7 @@
                   <span class="px-1 leading-none text-sm text-ink-gray-5">
                     &middot; #{{ getTicketNumber(item) }}
                   </span>
-                  <div class="ml-auto text-sm text-ink-gray-5">
+                  <div class="ms-auto text-sm text-ink-gray-5">
                     {{ formatDate(item.modified) }}
                   </div>
                 </div>

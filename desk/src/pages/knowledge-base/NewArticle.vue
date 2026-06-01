@@ -10,7 +10,7 @@
       <div class="flex flex-col gap-3 rounded-lg border w-full p-4">
         <div class="flex justify-between items-center mb-3">
           <!-- Author Info -->
-          <div class="flex gap-1 items-center flex-1 mr-7 max-w-fit">
+          <div class="flex gap-1 items-center flex-1 me-7 max-w-fit">
             <UserAvatar :name="user.name" :expand="true" />
             <span>{{ __("in") }}</span>
             <Link
@@ -57,7 +57,7 @@
         >
           <template #bottom>
             <TextEditorFixedMenu
-              class="-ml-1 overflow-x-auto w-full"
+              class="-ms-1 overflow-x-auto w-full"
               :buttons="textEditorMenuButtons"
             />
           </template>

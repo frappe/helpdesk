@@ -8,7 +8,11 @@
       </template>
       <template #right-header>
         <Dropdown :options="headerOptions">
-          <Button :label="__('Create')" variant="solid">
+          <Button
+            :label="__('Create')"
+            variant="solid"
+            class="rtl:flex-row-reverse"
+          >
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>

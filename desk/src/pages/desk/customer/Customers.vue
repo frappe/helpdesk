@@ -9,6 +9,7 @@
           label="Create"
           theme="gray"
           variant="solid"
+          class="rtl:flex-row-reverse"
           @click="isDialogVisible = !isDialogVisible"
         >
           <template #prefix>
