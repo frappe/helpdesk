@@ -12,14 +12,11 @@
       :disabled="disableLeftCondition"
     >
       <Button
+        :icon="LucideChevronLeft"
         variant="ghost"
         :disabled="disableLeftCondition"
         @click="goToPreviousTicket()"
-      >
-        <template #icon>
-          <LucideChevronLeft class="size-4" />
-        </template>
-      </Button>
+      />
     </Tooltip>
     <Tooltip
       :text="
@@ -30,14 +27,11 @@
       :disabled="disableRightCondition"
     >
       <Button
+        :icon="LucideChevronRight"
         variant="ghost"
         :disabled="disableRightCondition"
         @click="goToNextTicket()"
-      >
-        <template #icon>
-          <LucideChevronRight class="size-4" />
-        </template>
-      </Button>
+      />
     </Tooltip>
   </div>
 </template>

@@ -4,7 +4,7 @@
       <Tooltip :text="__(field.label)">
         <span>{{ __(field.label) }}</span>
       </Tooltip>
-      <span v-if="field.required" class="text-red-500"> * </span>
+      <span v-if="field.required" class="text-ink-red-3"> * </span>
     </div>
     <div
       class="-m-0.5 min-h-[28px] flex-1 items-center overflow-hidden p-0.5 text-base"
@@ -157,7 +157,7 @@ function emitUpdate(fieldname: Field["fieldname"], value: FieldValue) {
 :deep(.form-control textarea),
 :deep(.form-control button) {
   border-color: transparent;
-  background: white;
+  background: var(--surface-white);
 }
 
 :deep(.form-control button) {
@@ -175,7 +175,7 @@ function emitUpdate(fieldname: Field["fieldname"], value: FieldValue) {
 }
 
 :deep(.form-control button svg) {
-  color: white;
+  color: var(--ink-white);
   width: 0;
 }
 </style>
