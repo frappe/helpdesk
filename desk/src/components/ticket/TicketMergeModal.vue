@@ -16,7 +16,7 @@
             }}<Popover
               trigger="hover"
               :hoverDelay="0.25"
-              placement="right"
+              :placement="isRtl ? 'left' : 'right'"
               class="!inline-flex align-middle ms-1 -mt-1"
             >
               <template #target>
@@ -25,7 +25,7 @@
 
               <template #body-main>
                 <div
-                  class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
+                  class="text-sm text-ink-gray-6 p-2.5 bg-surface-white rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
                 >
                   <span class="text-p-base">
                     {{
@@ -126,6 +126,8 @@ interface E {
 const props = defineProps<Props>();
 const emit = defineEmits<E>();
 const showDialog = defineModel<boolean>();
+
+const isRtl = document.documentElement.dir === "rtl";
 
 const mergeConditions = [
   {

@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-full w-full pb-8">
-    <div class="px-10 py-8">
+    <div class="px-10 py-8 relative z-10">
       <div class="flex items-start justify-between">
         <div class="flex flex-col gap-1 text-start">
           <slot name="title">
