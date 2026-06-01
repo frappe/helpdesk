@@ -37,7 +37,11 @@
       <UserAvatar :name="n.user_from" />
       <div>
         <div class="mb-2 leading-5">
+<<<<<<< HEAD
           <span class="space-x-1 text-ink-gray-7">
+=======
+          <span class="space-x-1 rtl:space-x-reverse text-ink-gray-7">
+>>>>>>> bfc79662 (fix: rtl regression)
             <span class="font-medium text-ink-gray-9">{{ n.user_from }}</span>
             <span v-if="n.notification_type === 'Mention'">{{
               __("mentioned you in ticket")

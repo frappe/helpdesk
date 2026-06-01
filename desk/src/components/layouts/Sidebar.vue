@@ -1,6 +1,10 @@
 <template>
   <div
+<<<<<<< HEAD
     class="flex select-none flex-col border-r border-outline-gray-modals bg-surface-menu-bar text-base duration-300 ease-in-out"
+=======
+    class="flex select-none flex-col border-e border-outline-gray-modals bg-surface-menu-bar text-base duration-300 ease-in-out"
+>>>>>>> bfc79662 (fix: rtl regression)
     :style="{
       'min-width': width,
       'max-width': width,
@@ -233,6 +237,10 @@ import {
 } from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
+<<<<<<< HEAD
+=======
+const isRtl = document.documentElement.dir === "rtl";
+>>>>>>> bfc79662 (fix: rtl regression)
 
 const route = useRoute();
 const router = useRouter();
@@ -567,7 +575,7 @@ const articles = ref([
     ],
   },
   {
-    title: "Getting Started",
+    title: __("Getting Started"),
     opened: false,
     subArticles: [
       {
@@ -597,9 +605,10 @@ const articles = ref([
     ],
   },
   {
-    title: "Masters",
+    title: __("Masters"),
     opened: false,
     subArticles: [
+<<<<<<< HEAD
       { name: "ticket", title: "Ticket" },
       { name: "agent", title: "Agent" },
       { name: "team", title: "Team" },
@@ -610,10 +619,22 @@ const articles = ref([
       { name: "service-level-agreement", title: "Service Level Agreement" },
       { name: "ticket-type", title: "Ticket Type" },
       { name: "ticket-priority", title: "Ticket Priority" },
+=======
+      { name: "ticket", title: __("Ticket") },
+      { name: "agent", title: __("Agent") },
+      { name: "team", title: __("Team") },
+      { name: "contact", title: __("Contact") },
+      { name: "customer", title: __("Customer") },
+      { name: "knowledge-base", title: __("Knowledge Base") },
+      { name: "saved-replies", title: __("Saved Replies") },
+      { name: "service-level-agreement", title: __("Service Level Agreement") },
+      { name: "ticket-type", title: __("Ticket Type") },
+      { name: "ticket-priority", title: __("Ticket Priority") },
+>>>>>>> bfc79662 (fix: rtl regression)
     ],
   },
   {
-    title: "Customizations",
+    title: __("Customizations"),
     opened: false,
     subArticles: [
       { name: "custom-actions", title: "Custom Actions" },
@@ -646,7 +667,9 @@ async function handleFirstTicketNavigation() {
   if (!ticket) {
     router.push({ name: "TicketAgentNew" });
     updateOnboardingStep("create_first_ticket", false); // reset the step as first ticket is not created
-    toast.error("Please create a new ticket to proceed with the next step.");
+    toast.error(
+      __("Please create a new ticket to proceed with the next step.")
+    );
     return;
   }
 

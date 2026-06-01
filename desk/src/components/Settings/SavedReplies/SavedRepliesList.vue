@@ -85,8 +85,13 @@
         "
         variant="badge"
         :icon="SavedReplyIcon"
+<<<<<<< HEAD
         title="No saved replies found"
         description="Add one to get started."
+=======
+        :title="__('No saved replies found')"
+        :description="__('Add one to get started.')"
+>>>>>>> bfc79662 (fix: rtl regression)
       />
       <div
         v-if="

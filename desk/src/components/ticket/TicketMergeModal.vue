@@ -51,7 +51,7 @@
           doctype="HD Ticket"
           placeholder="Select Ticket"
           :filters="getDefaultFilters()"
-          label="Ticket"
+          :label="__('Ticket')"
           :page-length="10"
           :value="targetTicket"
           :show-description="true"
@@ -59,7 +59,7 @@
         />
         <FormControl
           v-if="targetTicket"
-          label="Ticket Subject"
+          :label="__('Ticket Subject')"
           type="text"
           v-model="subject"
           :disabled="true"
@@ -95,6 +95,7 @@
 
 <script setup lang="ts">
 import { Link } from "@/components";
+import { __ } from "@/translation";
 import { HDTicket } from "@/types/doctypes";
 import {
   Dialog,
@@ -179,11 +180,11 @@ const mergeTicket = createResource({
     };
   },
   validate({ source, target }) {
-    if (!source) throw { message: "Category is required" };
-    if (!target) throw { message: "Ticket to merged with is required" };
+    if (!source) throw { message: __("Category is required") };
+    if (!target) throw { message: __("Ticket to merged with is required") };
   },
   onSuccess: () => {
-    toast.success("Ticket merged successfully.");
+    toast.success(__("Ticket merged successfully."));
     emit("update");
 
     showDialog.value = false;

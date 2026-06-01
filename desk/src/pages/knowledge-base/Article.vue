@@ -3,7 +3,11 @@
     <LayoutHeader>
       <template #left-header>
         <div class="flex gap-2 items-center crumbs max-w-[50vw]">
+<<<<<<< HEAD
           <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
+=======
+          <Breadcrumbs :items="breadcrumbs" class="-ms-0.5 truncate" />
+>>>>>>> bfc79662 (fix: rtl regression)
           <Badge
             v-if="!article.loading"
             variant="subtle"
@@ -43,7 +47,11 @@
             <div class="w-full">
               <textarea
                 ref="titleRef"
+<<<<<<< HEAD
                 class="w-full resize-none border-0 bg-transparent text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+=======
+                class="w-full resize-none border-0 text-3xl bg-transparent font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+>>>>>>> bfc79662 (fix: rtl regression)
                 v-model="title"
                 :placeholder="__('Title')"
                 rows="1"
