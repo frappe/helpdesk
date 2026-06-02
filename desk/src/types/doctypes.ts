@@ -1,18 +1,18 @@
 interface DocType {
-  name: string;
-  creation: string;
-  modified: string;
-  owner: string;
-  modified_by: string;
-}
+    name: string;
+    creation: string;
+    modified: string;
+    owner: string;
+    modified_by: string;
+  }
 
-interface ChildDocType extends DocType {
-  parent?: string;
-  parentfield?: string;
-  parenttype?: string;
-  idx?: number;
-}
-
+  interface ChildDocType extends DocType {
+    parent?: string;
+    parentfield?: string;
+    parenttype?: string;
+    idx?: number;
+  }
+  
 // Last updated: 2026-03-24 10:41:46.489051
 export interface HDTicketStatus extends DocType {
   /** Color: Select */
@@ -348,7 +348,7 @@ export interface HDCustomerMember extends ChildDocType {
   contact_name: string;
 }
 
-// Last updated: 2026-03-28 02:33:49.340400
+// Last updated: 2026-05-29 18:06:42.542623
 export interface HDCustomer extends DocType {
   /** Image: Attach Image */
   image?: string;
@@ -356,6 +356,8 @@ export interface HDCustomer extends DocType {
   customer_name?: string;
   /** Domain: Data */
   domain?: string;
+  /** ERPNext Customer: Data */
+  erpnext_customer?: string;
   /** Contacts: Table (HD Customer Member) */
   contacts: HDCustomerMember[];
   /** Mobile No: Data */

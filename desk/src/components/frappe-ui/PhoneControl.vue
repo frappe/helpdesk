@@ -270,24 +270,56 @@ const descriptionClasses = computed(() => [
 ]);
 
 function parseValue(value: unknown) {
-  const str =
+  const phoneNumber =
     typeof value === "string"
       ? value
       : typeof value === "number"
       ? String(value)
       : "";
-  const idx = str.indexOf("-");
-  if (str && idx > 0) {
-    const isdPart = str.substring(0, idx);
-    const numberPart = str.substring(idx + 1);
+  if (!phoneNumber) {
+    localNumber.value = "";
+    return;
+  }
+
+  // Form 1: "+ISD-NUMBER" (canonical, with dash separator)
+  const dashIdx = phoneNumber.indexOf("-");
+  if (dashIdx > 0) {
+    const isdPart = phoneNumber.substring(0, dashIdx);
+    const numberPart = phoneNumber.substring(dashIdx + 1);
     const match = Object.entries(countryCodes.value).find(
       ([, info]) => info.isd === isdPart
     );
-    if (match) selectedCountry.value = match[0];
-    localNumber.value = numberPart;
-    return;
+    if (match) {
+      selectedCountry.value = match[0];
+      localNumber.value = numberPart;
+      return;
+    }
   }
-  localNumber.value = str;
+
+  // Form 2: "+ISDNUMBER"
+  // Pick the longest matching ISD prefix so +1 → US doesn't shadow +1242 → Bahamas.
+  if (phoneNumber.startsWith("+")) {
+    let bestName: string | null = null;
+    let bestIsd = "";
+
+    for (const [countryName, info] of Object.entries(countryCodes.value)) {
+      if (
+        info.isd &&
+        phoneNumber.startsWith(info.isd) &&
+        info.isd.length > bestIsd.length
+      ) {
+        bestName = countryName;
+        bestIsd = info.isd;
+      }
+    }
+    if (bestName) {
+      selectedCountry.value = bestName;
+      localNumber.value = phoneNumber.substring(bestIsd.length);
+      return;
+    }
+  }
+
+  localNumber.value = phoneNumber;
 }
 
 function getDefaultCountry(): string | null {
