@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-27 10:31\n"
+"PO-Revision-Date: 2026-06-02 12:19\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Chinese Simplified\n"
 "MIME-Version: 1.0\n"
@@ -1792,7 +1792,7 @@ msgstr "邮件账户更新成功。"
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:221
 msgid "Email settings updated successfully."
-msgstr ""
+msgstr "电子邮件设置已成功更新."
 
 #: desk/src/components/desk/global/NewContactDialog.vue:234
 msgid "Email should not be empty"
@@ -3053,7 +3053,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:40
 msgid "Manage your email signature."
-msgstr ""
+msgstr "管理您的电子邮件签名."
 
 #: desk/src/components/Settings/Profile/Profile.vue:4
 msgid "Manage your profile information."
@@ -4623,7 +4623,7 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/ReplyViaAgent.vue:47
 #: desk/src/components/Settings/EmailNotifications/ShareFeedback.vue:77
 msgid "Settings updated successfully."
-msgstr ""
+msgstr "设置已成功更新."
 
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
