@@ -35,6 +35,7 @@ def new(doc: dict, attachments: list[dict] = []):
     doc["doctype"] = "HD Ticket"
     doc["via_customer_portal"] = bool(frappe.session.user)
     doc["attachments"] = attachments
+    doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc).insert()
     return d
 
