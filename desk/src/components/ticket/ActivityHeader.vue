@@ -45,7 +45,7 @@
 
   <CallLogModal
     v-model="showCallLogModal"
-    :ticketId="String(ticket?.doc?.name)"
+    :ticketId="ticket.value?.name"
     @after-insert="refreshTicket"
   />
 </template>
@@ -86,21 +86,3 @@ const callActions = computed(() => [
   },
 ]);
 </script>
-
-<style scoped>
-/* Forces standard solid black interactive styling */
-.hd-black-button {
-  background-color: #111827 !important;
-  color: #ffffff !important;
-  border-radius: 0.375rem !important;
-  font-weight: 500 !important;
-  font-size: 0.875rem !important;
-  height: 2rem !important;
-  padding-left: 0.75rem !important;
-  padding-right: 0.75rem !important;
-  transition: background-color 0.1s ease-in-out !important;
-}
-.hd-black-button:hover {
-  background-color: #1f2937 !important;
-}
-</style>

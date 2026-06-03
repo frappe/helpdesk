@@ -1,31 +1,18 @@
 <template>
-  <!-- Header Section -->
-  <div class="flex items-center justify-between px-5 py-3 flex-shrink-0 w-full">
-    <h3 class="text-base font-semibold text-ink-gray-9">
+  <div v-if="title === __('Tasks')" class="flex items-center justify-between px-6 md:px-5 py-4 w-full">
+    <h3 class="text-lg font-semibold text-ink-gray-9">
       {{ title }}
     </h3>
-    
-    <button
-      v-if="title === __('Tasks')"
-      class="flex items-center gap-1.5 rounded-lg bg-gray-900 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-black focus:outline-none"
+    <Button
+      variant="solid"
+      icon-left="plus"
       @click="showNewTaskModal = true"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-      {{ __("Create") }}
-    </button>
-  </div> <!-- This closing tag fixes both the layout and the build error! -->
+      {{ __("New Task") }}
+    </Button>
+  </div>
+  
+  <ActivityHeader v-else :title="title" />
 
   <TaskboxEditor
     v-model="showNewTaskModal"
@@ -42,18 +29,70 @@
     class="flex flex-col flex-1 overflow-y-auto"
     :mask-length="20"
   >
-    <div v-if="localActivities.length" class="activities flex-1 h-full mt-0.5 px-6 md:px-5">
+    <div v-if="localActivities.length" class="activities flex-1 h-full mt-0.5">
       <div
         v-for="(activity, i) in localActivities"
         :key="activity.key"
-        class="activity"
+        class="activity mt-2"
         tabindex="0"
+        :id="activity.key"
       >
-        <div class="w-full flex flex-col">
+        <div
+          class="w-full px-6 md:px-5"
+          :class="activity.type === 'task' ? 'flex' : 'grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4'"
+        >
           <div
-            class="flex w-full"
+            v-if="activity.type !== 'task'"
+            class="relative flex justify-center after:absolute after:start-[50%] after:top-3 after:-z-10 after:border-s after:border-outline-gray-modals"
             :class="[
-              i === localActivities.length - 1 && 'mb-5',
+              i != localActivities.length - 1 && 'after:h-full',
+              !['email', 'feedback', 'call', 'comment', 'task'].includes(
+                activity.type
+              ) && 'after:top-6',
+            ]"
+          >
+            <div
+              class="z-1 flex items-center justify-center rounded-full bg-surface-white"
+              :class="[
+                ['email', 'feedback'].includes(activity.type)
+                  ? 'my-1 h-9 w-9'
+                  : 'h-6 w-6',
+                !['email', 'feedback', 'call', 'comment', 'task'].includes(
+                  activity.type
+                ) && 'mt-[2px]',
+              ]"
+            >
+              <Avatar
+                v-if="activity.type === 'email' || activity.type === 'feedback'"
+                size="lg"
+                :label="activity.sender?.full_name"
+                :image="getUser(activity.sender?.name).user_image"
+                class="bg-surface-white absolute start-[0.7px]"
+              />
+              <CommentIcon
+                v-else-if="activity.type === 'comment'"
+                class="text-ink-gray-5 absolute start-[7.5px]"
+              />
+              <FeatherIcon
+                v-else-if="activity.type === 'call'"
+                :name="
+                  activity.call_type === 'Incoming'
+                    ? 'phone-incoming'
+                    : 'phone-outgoing'
+                "
+                class="text-ink-gray-5 start-[7.5px] size-4"
+              />
+              <DotIcon
+                v-else
+                class="text-ink-gray-5 absolute start-[7.5px] top-[6px]"
+              />
+            </div>
+          </div>
+          
+          <div
+            class="mb-4 flex flex-1"
+            :class="[
+              i == localActivities.length - 1 && 'mb-5',
               !['email', 'feedback', 'call', 'comment', 'task'].includes(
                 activity.type
               ) && 'mt-[2px]',
@@ -74,14 +113,14 @@
               class="flex-1 w-full"
               @update="() => emit('update')"
             />
-            <div v-else-if="activity.type === 'task'" class="flex-1 w-full">
-              <Taskbox
-                :activity="activity"
-                :reload-tasks="() => emit('update')"
-                @update="() => emit('update')"
-              />
-            </div>
-            <HistoryBox
+            <Taskbox
+              v-else-if="activity.type === 'task'"
+              :activity="activity"
+              :reload-tasks="() => emit('update')"
+              @update="() => emit('update')"
+              class="flex-1 w-full"
+            />
+            <CallArea
               v-else-if="activity.type === 'call'"
               :activity="activity"
               class="flex-1 w-full"
@@ -91,21 +130,20 @@
               v-else-if="activity.type === 'feedback'"
               class="flex-1 w-full"
             />
-            <HistoryBox
-              v-else
-              :activity="activity"
-              class="flex-1 w-full"
+            <HistoryBox 
+              v-else 
+              :activity="activity" 
+              class="flex-1 w-full" 
             />
           </div>
         </div>
       </div>
     </div>
-
     <div
       v-else
       class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-4"
     >
-      <component :is="emptyTextIcon" />
+      <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
       <span class="text-lg font-medium text-ink-gray-8">{{
         __(emptyText)
       }}</span>
@@ -114,9 +152,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, inject, nextTick, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { Avatar, Button, FeatherIcon } from "frappe-ui";
 import { FadedScrollableDiv } from "@/components";
 import {
   ActivityIcon,
@@ -129,11 +164,15 @@ import {
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
 import { isElementInViewport } from "@/utils";
+import { Avatar, FeatherIcon, Button } from "frappe-ui";
+import { PropType, computed, h, inject, nextTick, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { __ } from "@/translation";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
 import CommentBox from "@/components/CommentBox.vue";
 import EmailArea from "@/components/EmailArea.vue";
 import HistoryBox from "@/components/HistoryBox.vue";
+import CallArea from "@/components/CallArea.vue";
 import Taskbox from "@/components/Taskbox.vue";
 import TaskboxEditor from "@/components/TaskboxEditor.vue";
 
@@ -156,11 +195,13 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["email:reply", "update", "new-email"]);
+const emit = defineEmits(["email:reply", "update"]);
 
 const route = useRoute();
 const router = useRouter();
+
 const { getUser } = useUserStore();
+const makeCall = inject<() => void>("makeCall");
 
 const showNewTaskModal = ref(false);
 
@@ -168,6 +209,7 @@ const injectedTicketId = inject<string | number>("ticketId", "");
 const resolvedTicketId = computed(() =>
   String(props.ticketId || injectedTicketId || "").trim()
 );
+
 const localActivities = computed(() => {
   if (props.title === __("Activity")) {
     return props.activities.filter((activity) => activity.type !== "task");
@@ -180,6 +222,7 @@ const emptyText = computed(() => {
   if (props.title === "Comments") return "No comments found";
   if (props.title === "Calls") return "No calls made";
   if (props.title === "Tasks") return "No tasks found";
+
   return "No activity found";
 });
 
@@ -194,7 +237,7 @@ const emptyTextIcon = computed(() => {
   } else if (props.title === __("Tasks")) {
     icon = TaskIcon;
   }
-  return h(icon, { class: "h-7.5 w-7.5 text-ink-gray-4" });
+  return h(icon, { class: "text-ink-gray-4" });
 });
 
 onMounted(() => {
@@ -209,31 +252,40 @@ function scrollToLatestActivity() {
     return;
   }
   setTimeout(() => {
-    const elements = document.getElementsByClassName("activity");
-    const el = elements[elements.length - 1] as HTMLElement;
+    let el: HTMLElement | null;
+    let e = document.getElementsByClassName("activity");
+    el = e[e.length - 1] as HTMLElement;
     if (el && !isElementInViewport(el)) {
-      (el as any).scrollIntoViewIfNeeded();
       el.focus();
     }
-  }, 500);
+  }, 200);
 }
 
 function scrollToHash() {
   const hash = route.hash;
-  if (!hash) return;
-  nextTick(() => {
-    setTimeout(() => {
-      const element = document.getElementById(hash.substring(1));
-      if (element) {
-        (element as any).scrollIntoViewIfNeeded();
-        element.classList.add("bg-yellow-100");
-        setTimeout(() => {
-          element.classList.remove("bg-yellow-100");
-          router.replace({ hash: "" });
-        }, 2000);
-      }
-    }, 1000);
-  });
+  if (hash) {
+    // Remove the # symbol
+    const elementId = hash.substring(1);
+
+    nextTick(() => {
+      // Wait for activities to be rendered
+      setTimeout(() => {
+        const element = document.getElementById(elementId);
+        if (element) {
+          (element as any).scrollIntoViewIfNeeded();
+
+          // Add highlight effect using Tailwind class
+          element.classList.add("bg-yellow-100");
+
+          // Remove highlight after 2 seconds
+          setTimeout(() => {
+            element.classList.remove("bg-yellow-100");
+            router.replace({ hash: "" });
+          }, 2000);
+        }
+      }, 1000);
+    });
+  }
 }
 
 watch(

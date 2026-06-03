@@ -1,7 +1,7 @@
 <template>
   <div class="w-full">
     <div
-      class="activity flex cursor-pointer items-start justify-between gap-4 pl-3 pr-3 py-1.5 rounded-md hover:bg-surface-gray-2 transition-colors duration-200"
+      class="activity flex cursor-pointer items-start justify-between gap-4 pl-3 pr-3 py-1.5 rounded-md hover:bg-surface-gray-1 transition-colors duration-200"
       @click="showModal = true"
     >
       <div class="flex flex-1 flex-col gap-1 min-w-0">
@@ -26,14 +26,17 @@
             <DotIcon class="h-1.5 w-1.5 text-ink-gray-4" />
           </div>
 
-          <div v-if="activity.due_date">
-            <Tooltip :text="formatDateLong(activity.due_date)">
-              <div class="flex items-center gap-1.5 text-[14px] font-normal text-[#383838]">
-                <CalendarIcon class="h-3.5 w-3.5 text-[#383838]" />
-                <span>{{ formatDateShort(activity.due_date) }}</span>
-              </div>
-            </Tooltip>
-          </div>
+          <Tooltip
+           v-if="activity.due_date"
+          :key="activity.due_date"
+          :text="dateFormat(activity.due_date, dateTooltipFormat)"
+          >
+            <div class="flex items-center gap-1.5">
+            <CalendarIcon class="h-3.5 w-3.5 text-ink-gray-5" />
+          <span>{{ dateFormat(activity.due_date, 'D MMM, h:mm A') }}</span>
+         </div>
+          </Tooltip>
+
           
           <div v-if="(assignedId || activity.due_date) && activity.priority" class="flex items-center justify-center">
             <DotIcon class="h-1.5 w-1.5 text-ink-gray-4" />
@@ -106,6 +109,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { Avatar, Button, Dropdown, Tooltip, call, toast } from 'frappe-ui'
+import { dateTooltipFormat, dateFormat } from '@/utils'
 import { __ } from '@/translation'
 import { useUserStore } from '@/stores/user'
 import CalendarIcon     from '@/components/icons/CalendarIcon.vue'
@@ -158,27 +162,9 @@ const assigneeLabel = computed((): string => {
     .join(' ')
 })
 
-function formatDateLong(dateStr: string): string {
-  if (!dateStr) return ''
-  const d = new Date(dateStr)
-  if (isNaN(d.getTime())) return dateStr
-  const datePart = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
-  const timePart = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()
-  return `${datePart} | ${timePart}`
-}
-
-function formatDateShort(dateStr: string): string {
-  if (!dateStr) return ''
-  const d = new Date(dateStr)
-  if (isNaN(d.getTime())) return dateStr
-  const datePart = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-  const timePart = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase()
-  return `${datePart}, ${timePart}`
-}
-
 function handleReload(payload?: any) {
   showModal.value = false
-  
+
   const data = payload?.message || payload;
   
   if (data && typeof data === 'object') {

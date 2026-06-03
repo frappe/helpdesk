@@ -176,8 +176,8 @@ import {
   FeatherIcon,
   TextEditor,
   TextInput,
-  call,
   createResource,
+  call,
   toast,
 } from "frappe-ui";
 import { __ } from "@/translation";
@@ -230,7 +230,6 @@ const errors = ref({
 // Safe counter fallback helper for Description string length evaluation
 const getDescriptionLength = computed(() => {
   if (!form.value.description) return 0;
-  // If HTML elements are involved, you can map out raw length safely
   return form.value.description.length;
 });
 
@@ -245,9 +244,10 @@ watch(() => form.value.description, (val) => {
   if (!val || val.length <= 4000) errors.value.descriptionLength = false;
 });
 
-// --- Users/Agents Logic ---
+// --- Agents Logic ---
 const agentsList = createResource({
   url: "frappe.client.get_list",
+  cache: "SystemUsers", // Caches this request globally within Frappe UI
   params: {
     doctype:     "User",
     fields:      ["name", "full_name", "user_image"],
@@ -333,7 +333,9 @@ watch(show, async (val) => {
   errors.value.description = false;
   errors.value.descriptionLength = false;
   
-  await agentsList.fetch();
+  if (!agentsList.data) {
+    await agentsList.fetch();
+  }
 
   if (!props.task && !activeTask.value) {
     form.value = defaultForm();
@@ -490,17 +492,3 @@ async function handleSubmit() {
   }
 }
 </script>
-
-<style scoped>
-.date-picker-wrapper :deep(input) {
-  width: 100%;
-  background-color: var(--surface-gray-2, #f3f4f6);
-  border: none;
-  box-shadow: none;
-}
-.date-picker-wrapper :deep(input:focus) {
-  background-color: white;
-  border-color: #d1d5db;
-  box-shadow: 0 0 0 1px #d1d5db;
-}
-</style>

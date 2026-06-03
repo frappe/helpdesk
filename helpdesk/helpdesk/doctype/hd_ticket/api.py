@@ -695,7 +695,7 @@ def get_recent_similar_tickets(ticket: str):
     return {"recent_tickets": recent_tickets, "similar_tickets": similar_tickets}
    # Update this with TextBlob or SQLite Vector Search
 
-def et_recent_tickets(ticket: str):
+def get_recent_tickets(ticket: str):
     fields = ["subject", "creation", "name", "status"]
     [raised_by, customer] = frappe.db.get_value(
         "HD Ticket", ticket, ["raised_by", "customer"]

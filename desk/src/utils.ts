@@ -847,22 +847,6 @@ function getBrowserTimezone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone
 }
 
-export function getFormat(
-  date = '',
-  format = '',
-  onlyDate = false,
-  onlyTime = false,
-  withDate = true
-) {
-  const dateFormat = 'DD-MM-YYYY'
-  const timeFormat = 'HH:mm:ss'
-
-  if (onlyDate && onlyTime) return `${dateFormat} ${timeFormat}`
-  if (onlyDate) return dateFormat
-  if (onlyTime) return timeFormat
-
-  return format || 'DD-MM-YYYY HH:mm:ss'
-}
 
 export function taskStatusOptions(action?, data?) {
   let options = ['Backlog', 'Todo', 'In Progress', 'Done', 'Canceled']
