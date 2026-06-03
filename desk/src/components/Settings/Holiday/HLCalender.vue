@@ -62,7 +62,7 @@
                 >
                   <template #target="{ open, close }">
                     <Button
-                      icon="more-horizontal"
+                      icon="lucide-more-horizontal"
                       variant="ghost"
                       @click="open"
                       @mouseleave="
@@ -95,7 +95,7 @@
                     >
                       <Button
                         class="w-full flex !justify-start"
-                        icon-left="edit"
+                        icon-left="lucide-edit"
                         variant="ghost"
                         label="Edit"
                         @click="
@@ -108,7 +108,7 @@
                       />
                       <Button
                         class="w-full flex !justify-start"
-                        icon-left="trash-2"
+                        icon-left="lucide-trash-2"
                         variant="ghost"
                         :label="
                           isConfirmingDelete ? 'Confirm Delete' : 'Delete'

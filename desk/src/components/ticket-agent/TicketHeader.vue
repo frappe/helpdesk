@@ -65,7 +65,7 @@
           :options="groupedActions"
           placement="right"
         >
-          <Button icon="more-horizontal" />
+          <Button icon="lucide-more-horizontal" />
         </Dropdown>
       </div>
     </template>

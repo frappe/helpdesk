@@ -13,7 +13,7 @@
         theme="gray"
         variant="solid"
         @click="goToNew()"
-        icon-left="plus"
+        icon-left="lucide-plus"
         class="rtl:flex-row-reverse"
       />
     </template>
@@ -26,13 +26,13 @@
             :placeholder="__('Search')"
             type="text"
             class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-2"
-            icon-left="search"
+            icon-left="lucide-search"
             debounce="300"
             inputClass="p-4 pe-12 rtl:pr-8 "
           />
           <Button
             v-if="savedRepliesSearchQuery"
-            icon="x"
+            icon="lucide-x"
             variant="ghost"
             @click="savedRepliesSearchQuery = ''"
             class="absolute end-1 top-1/2 -translate-y-1/2"
@@ -156,7 +156,7 @@
                 :options="dropdownOptions(savedReply)"
               >
                 <Button
-                  icon="more-horizontal"
+                  icon="lucide-more-horizontal"
                   variant="ghost"
                   @click="isConfirmingDelete = false"
                   class="me-2"
@@ -265,7 +265,7 @@ const dropdownOptions = (savedReply: SavedReply) => [
         newTitle: `${savedReply.title} (Copy)`,
       };
     },
-    icon: "copy",
+    icon: "lucide-copy",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteSavedReply(savedReply),

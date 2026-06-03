@@ -34,7 +34,7 @@
         <div class="flex justify-end">
           <Dropdown placement="right" :options="dropdownOptions(holiday)">
             <Button
-              icon="more-horizontal"
+              icon="lucide-more-horizontal"
               variant="ghost"
               @click="isConfirmingDelete = false"
             />
@@ -52,7 +52,7 @@
     @click="addHoliday"
     class="mt-2.5"
     label="Add Recurring Holiday"
-    icon-left="plus"
+    icon-left="lucide-plus"
   />
   <Dialog
     v-model:open="dialog"
@@ -129,7 +129,9 @@
         :label="
           recurringHolidayData.isEditing ? 'Update Holiday' : 'Add Holiday'
         "
-        :icon-left="recurringHolidayData.isEditing ? 'edit-2' : 'plus'"
+        :icon-left="
+          recurringHolidayData.isEditing ? 'lucide-edit-2' : 'lucide-plus'
+        "
       />
     </template>
   </Dialog>
@@ -222,7 +224,7 @@ const dropdownOptions = (holiday: any) => [
   {
     label: "Edit",
     onClick: () => editHoliday(holiday),
-    icon: "edit",
+    icon: "lucide-edit",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteHoliday(holiday),

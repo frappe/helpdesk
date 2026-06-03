@@ -14,7 +14,7 @@
               variant="ghost"
               class="w-7"
               @click="show = false"
-              icon="x"
+              icon="lucide-x"
             />
           </div>
         </div>

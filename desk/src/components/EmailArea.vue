@@ -73,7 +73,7 @@
             ]"
           >
             <Button
-              icon="more-horizontal"
+              icon="lucide-more-horizontal"
               class="!text-ink-gray-7"
               variant="ghost"
             />

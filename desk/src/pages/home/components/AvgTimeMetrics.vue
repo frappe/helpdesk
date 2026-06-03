@@ -11,7 +11,10 @@
           placement="right"
         >
           <template #default>
-            <Button :label="currentDurationLabel" icon-right="chevron-down" />
+            <Button
+              :label="currentDurationLabel"
+              icon-right="lucide-chevron-down"
+            />
           </template>
           <template #item-label="{ item }">
             <span>

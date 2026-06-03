@@ -14,13 +14,13 @@
               variant="ghost"
               class="w-7"
               @click="openCallLogModal"
-              icon="edit"
+              icon="lucide-edit"
             />
             <Button
               variant="ghost"
               class="w-7"
               @click="show = false"
-              icon="x"
+              icon="lucide-x"
             />
           </div>
         </div>
@@ -215,7 +215,7 @@ function getCallLogDetail(row, log, columns = []) {
   if (row === "duration") {
     return {
       label: log._duration,
-      icon: "clock",
+      icon: "lucide-clock",
     };
   } else if (row === "caller") {
     return {

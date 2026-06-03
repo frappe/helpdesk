@@ -9,7 +9,7 @@
               variant="ghost"
               @click="togglePopover"
               :label="currentYear + ''"
-              icon-right="chevron-down"
+              icon-right="lucide-chevron-down"
             />
           </template>
           <template #body-main="{ togglePopover }">
@@ -43,14 +43,14 @@
       <div class="flex gap-2 items-center">
         <Button
           variant="ghost"
-          icon="chevron-left"
+          icon="lucide-chevron-left"
           :disabled="visibleMonths === 'first-half'"
           @click="visibleMonths = 'first-half'"
         />
         <Button variant="ghost" label="Today" @click="goToToday()" />
         <Button
           variant="ghost"
-          icon="chevron-right"
+          icon="lucide-chevron-right"
           :disabled="visibleMonths === 'second-half'"
           @click="visibleMonths = 'second-half'"
         />

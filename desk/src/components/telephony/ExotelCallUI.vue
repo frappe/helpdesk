@@ -49,7 +49,7 @@
           <Button
             @click="closeCallPopup"
             class="bg-surface-gray-7 text-ink-white hover:bg-surface-gray-6 shrink-0"
-            icon="x"
+            icon="lucide-x"
             size="md"
           />
           <Button

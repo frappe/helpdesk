@@ -47,7 +47,7 @@
         />
         <Button
           variant="solid"
-          icon-left="plus"
+          icon-left="lucide-plus"
           label="Add Holiday"
           @click="onSave"
         />

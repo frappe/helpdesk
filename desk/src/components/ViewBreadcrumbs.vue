@@ -70,7 +70,7 @@
                 variant="ghost"
                 class="kebab-btn !size-4 ms-0 rounded-sm"
                 :class="open ? 'inline-flex' : 'hidden'"
-                icon="more-horizontal"
+                icon="lucide-more-horizontal"
                 @click.stop
               />
             </template>

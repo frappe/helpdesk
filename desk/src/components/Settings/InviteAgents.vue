@@ -64,7 +64,7 @@
               >
                 <div>
                   <Button
-                    icon="x"
+                    icon="lucide-x"
                     variant="ghost"
                     :loading="
                       cancelInviteResource.loading &&

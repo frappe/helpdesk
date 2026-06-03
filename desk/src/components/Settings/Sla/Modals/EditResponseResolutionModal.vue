@@ -74,7 +74,7 @@
             :theme="isConfirmingDelete ? 'red' : 'gray'"
             :label="isConfirmingDelete ? 'Confirm Delete' : 'Delete'"
             @click="deleteItem"
-            icon-left="trash-2"
+            icon-left="lucide-trash-2"
           />
         </div>
         <div class="flex gap-2">

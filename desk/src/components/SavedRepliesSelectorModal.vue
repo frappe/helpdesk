@@ -12,7 +12,7 @@
           <div class="text-2xl font-semibold">{{ __("Saved Replies") }}</div>
           <Button
             variant="solid"
-            icon-left="plus"
+            icon-left="lucide-plus"
             :label="__('New')"
             @click="onNewSavedReplyClick"
           />
@@ -27,20 +27,24 @@
                 :placeholder="__('Search')"
                 type="text"
                 class="focus:ring-0 border-outline-gray-2"
-                icon-left="search"
+                icon-left="lucide-search"
                 debounce="300"
                 inputClass="p-4 pe-12 rtl:pr-8"
               />
               <Button
                 v-if="search"
-                icon="x"
+                icon="lucide-x"
                 variant="ghost"
                 @click="search = ''"
                 class="absolute end-1 top-1/2 -translate-y-1/2"
               />
             </div>
             <Dropdown :options="filters" placement="right">
-              <Button :label="activeFilter" icon-left="filter" class="p-4">
+              <Button
+                :label="activeFilter"
+                icon-left="lucide-filter"
+                class="p-4"
+              >
                 <template #suffix>
                   <p
                     class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-white pt-px text-xs font-medium text-ink-gray-8 shadow-sm"

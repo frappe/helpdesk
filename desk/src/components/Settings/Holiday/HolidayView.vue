@@ -145,11 +145,11 @@
               :buttons="[
                 {
                   value: 'calendar',
-                  icon: 'calendar',
+                  icon: 'lucide-calendar',
                 },
                 {
                   value: 'list',
-                  icon: 'list',
+                  icon: 'lucide-list',
                 },
               ]"
               v-model="holidayListView"
@@ -164,7 +164,7 @@
               variant="subtle"
               :label="__('Add Holiday')"
               @click="dialog.show = true"
-              icon-left="plus"
+              icon-left="lucide-plus"
             />
             <!-- Indicators -->
             <div class="flex gap-4" v-if="holidayListView === 'calendar'">

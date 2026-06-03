@@ -93,7 +93,10 @@
               placement="left"
             >
               <template #default>
-                <Button :label="currentSortLabel" icon-right="chevron-down" />
+                <Button
+                  :label="currentSortLabel"
+                  icon-right="lucide-chevron-down"
+                />
               </template>
               <template #item-label="{ item }">
                 <div
@@ -121,7 +124,7 @@
                 <template #default>
                   <Button
                     :label="currentPeriodLabel"
-                    icon-right="chevron-down"
+                    icon-right="lucide-chevron-down"
                   />
                 </template>
                 <template #item-label="{ item }">

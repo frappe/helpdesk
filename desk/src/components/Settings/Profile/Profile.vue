@@ -75,7 +75,7 @@
                     />
                     <Button
                       variant="outline"
-                      icon="check"
+                      icon="lucide-check"
                       :loading="user?.save?.loading"
                       :disabled="user?.save?.loading"
                       @click="isNameDirty ? save() : (editName = false)"
@@ -138,7 +138,7 @@
           }}</span>
         </div>
         <Button
-          icon-left="lock"
+          icon-left="lucide-lock"
           :label="__('Change Password')"
           @click="showChangePasswordModal = true"
         />

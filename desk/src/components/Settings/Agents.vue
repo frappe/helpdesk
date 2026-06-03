@@ -24,13 +24,13 @@
             :placeholder="__('Search')"
             type="text"
             class="focus:ring-0 border-outline-gray-2"
-            icon-left="search"
+            icon-left="lucide-search"
             debounce="300"
             inputClass="p-4 pe-12 rtl:pr-8"
           />
           <Button
             v-if="search"
-            icon="x"
+            icon="lucide-x"
             variant="ghost"
             @click="search = ''"
             class="absolute end-1 top-1/2 -translate-y-1/2"
@@ -156,7 +156,7 @@
                   class="ms-2"
                   placement="right"
                 >
-                  <Button icon="more-horizontal" variant="ghost" />
+                  <Button icon="lucide-more-horizontal" variant="ghost" />
                 </Dropdown>
               </div>
             </div>
@@ -170,7 +170,7 @@
               @click="() => agents.next()"
               :loading="agents.loading"
               :label="__('Load More')"
-              icon-left="refresh-cw"
+              icon-left="lucide-refresh-cw"
             />
           </div>
         </div>
@@ -208,7 +208,7 @@ function getRoles(agent: string) {
           role: "Agent",
           active: props.active,
           selected: agentRole === "Agent",
-          icon: "user",
+          icon: "lucide-user",
           onClick: () => {
             updateRole(agent, "Agent");
           },
@@ -223,7 +223,7 @@ function getRoles(agent: string) {
           role: "Manager",
           active: props.active,
           selected: agentRole === "Manager",
-          icon: "briefcase",
+          icon: "lucide-briefcase",
           onClick: () => {
             updateRole(agent, "Manager");
           },
@@ -285,7 +285,7 @@ function getOptions(agent) {
   return [
     {
       label: "Disable Agent",
-      icon: "x-circle",
+      icon: "lucide-x-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 0);
         agents.reload({ ...filters, search: search.value });
@@ -294,7 +294,7 @@ function getOptions(agent) {
     },
     {
       label: "Enable Agent",
-      icon: "check-circle",
+      icon: "lucide-check-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 1);
         agents.reload({ ...filters, search: search.value });

@@ -24,7 +24,7 @@
             variant="subtle"
             class="w-max"
             @click="toggleConjunction"
-            icon-right="refresh-cw"
+            icon-right="lucide-refresh-cw"
             :disabled="props.itemIndex > 2"
             :label="conjunction"
           />
@@ -90,7 +90,7 @@
     </div>
     <div :class="'w-max'">
       <Dropdown placement="right" :options="dropdownOptions">
-        <Button variant="ghost" icon="more-horizontal" />
+        <Button variant="ghost" icon="lucide-more-horizontal" />
       </Dropdown>
     </div>
   </div>
@@ -190,7 +190,7 @@ const dropdownOptions = computed(() => {
     component: (props) =>
       TemplateOption({
         option: "Remove",
-        icon: "trash-2",
+        icon: "lucide-trash-2",
         active: props.active,
         variant: "danger",
         onClick: () => {
@@ -205,7 +205,7 @@ const dropdownOptions = computed(() => {
     component: (props) =>
       TemplateOption({
         option: "Remove group",
-        icon: "trash-2",
+        icon: "lucide-trash-2",
         active: props.active,
         variant: "danger",
         onClick: () => {

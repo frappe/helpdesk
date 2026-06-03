@@ -11,7 +11,7 @@
           :label="__('Preview')"
           size="sm"
           @click="onShowPreview()"
-          icon-left="eye"
+          icon-left="lucide-eye"
           :disabled="
             Boolean(
               !savedReplyData.message?.replace(/<[^>]*>/g, '')?.trim()?.length

@@ -20,7 +20,7 @@
             :label="
               article.data?.status === 'Draft' ? __('Publish') : __('Unpublish')
             "
-            :iconLeft="article.data?.status !== 'Published' && 'globe'"
+            :iconLeft="article.data?.status !== 'Published' && 'lucide-globe'"
             @click="toggleStatus()"
           />
         </div>
@@ -624,7 +624,7 @@ const isConfirmingDeleteArticle = ref(false);
 const articleActions = computed(() => [
   {
     label: __("Edit"),
-    icon: "edit",
+    icon: "lucide-edit",
     onClick: () => {
       handleEditMode();
     },
@@ -634,20 +634,20 @@ const articleActions = computed(() => [
     ? [
         {
           label: __("Move To"),
-          icon: "corner-up-right",
+          icon: "lucide-corner-up-right",
           onClick: () => (moveToModal.value = true),
         },
       ]
     : [
         {
           label: __("Add Category"),
-          icon: "folder-plus",
+          icon: "lucide-folder-plus",
           onClick: () => (showCategoryModal.value = true),
         },
       ]),
   {
     label: __("Share"),
-    icon: "link",
+    icon: "lucide-link",
     onClick: () => {
       const url = new URL(window.location.href);
       url.pathname = `/helpdesk/kb-public/articles/${props.articleId}`;

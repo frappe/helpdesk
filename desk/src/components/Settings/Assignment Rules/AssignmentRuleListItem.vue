@@ -41,7 +41,7 @@
       <div>
         <Dropdown placement="right" :options="dropdownOptions">
           <Button
-            icon="more-horizontal"
+            icon="lucide-more-horizontal"
             variant="ghost"
             @click="isConfirmingDelete = false"
           />
@@ -143,7 +143,7 @@ const dropdownOptions = [
         name: props.data.name,
       };
     },
-    icon: "copy",
+    icon: "lucide-copy",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteAssignmentRule(),

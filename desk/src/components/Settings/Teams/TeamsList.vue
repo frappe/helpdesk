@@ -12,7 +12,7 @@
         theme="gray"
         variant="solid"
         @click="emit('update:step', 'new-team', '')"
-        icon-left="plus"
+        icon-left="lucide-plus"
       />
     </template>
     <template
@@ -26,13 +26,13 @@
           :placeholder="__('Search')"
           type="text"
           class="focus:ring-0 border-outline-gray-2"
-          icon-left="search"
+          icon-left="lucide-search"
           debounce="300"
           inputClass="p-4 pe-12 rtl:pr-8"
         />
         <Button
           v-if="teamsSearchQuery"
-          icon="x"
+          icon="lucide-x"
           variant="ghost"
           @click="teamsSearchQuery = ''"
           class="absolute end-1 top-1/2 -translate-y-1/2"
@@ -66,7 +66,7 @@
               <div>
                 <Dropdown placement="right" :options="dropdownOptions(team)">
                   <Button
-                    icon="more-horizontal"
+                    icon="lucide-more-horizontal"
                     variant="ghost"
                     @click="isConfirmingDelete = false"
                   />
@@ -84,7 +84,7 @@
             @click="() => teams.next()"
             :loading="teams.loading"
             :label="__('Load More')"
-            icon-left="refresh-cw"
+            icon-left="lucide-refresh-cw"
           />
         </div>
       </div>
