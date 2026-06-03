@@ -270,8 +270,24 @@ export interface HDAgent extends DocType {
   is_active: 0 | 1;
   /** Image: Attach Image */
   user_image?: string;
-  /** Availability: Select */
-  availability?: 'Active' | 'Away' | 'Busy';
+  /** Availability: Link (HD Agent Status) */
+  availability?: string;
+  /** Availability Changed On: Datetime */
+  availability_changed_on?: string;
+}
+
+// Last updated: 2026-06-02 01:18:56.023594
+export interface HDAgentStatus extends DocType {
+  /** Agent Status: Data */
+  agent_status: string;
+  /** order: Data */
+  order?: string;
+  /** Category: Select */
+  category?: 'Active' | 'Away' | 'Unavailable';
+  /** Color: Select */
+  color?: 'Black' | 'Gray' | 'Blue' | 'Green' | 'Red' | 'Pink' | 'Orange' | 'Amber' | 'Yellow' | 'Cyan' | 'Teal' | 'Violet' | 'purple';
+  /** Enable: Check */
+  enable: 0 | 1;
 }
 
 // Last updated: 2022-12-22 18:52:50.658355
