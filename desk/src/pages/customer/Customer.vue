@@ -217,6 +217,11 @@ usePageMeta(() => {
 </script>
 
 <style scoped>
+/* frappe-ui's TabsRoot clips with overflow-hidden, which traps the sticky
+   tablist. Let it overflow so the tablist sticks to the page scroll container. */
+.tabs-sticky-header {
+  overflow: visible !important;
+}
 .tabs-sticky-header :deep([role="tablist"]) {
   position: sticky;
   top: 0;

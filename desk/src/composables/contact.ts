@@ -614,6 +614,89 @@ export function useContactFeedback(name: string): ContactFeedback {
     filters: { contact: name, feedback_rating: ["is", "set"] },
     orderBy: "creation desc",
     auto: true,
+    transform: (data) => {
+      const template = data[0];
+      if (!template) return data;
+
+      const demoFeedback = [
+        {
+          subject: "Account Recovery Request",
+          feedback_rating: 0.8,
+          feedback: "Problem Solved Quickly",
+          feedback_extra:
+            "The response time was a bit longer than anticipated, especially for a simple request involving just one file. A faster turnaround in these situations would greatly enhance overall efficiency.",
+        },
+        {
+          subject: "Unable to log in to dashboard",
+          feedback_rating: 1,
+          feedback: "Excellent Support",
+          feedback_extra:
+            "The agent walked me through every step patiently and had my access restored within minutes. Truly impressed with the professionalism.",
+        },
+        {
+          subject: "Billing discrepancy on latest invoice",
+          feedback_rating: 1,
+          feedback: "Issue Resolved on First Contact",
+          feedback_extra:
+            "My refund was processed the same day and the breakdown was explained clearly. No back and forth needed at all.",
+        },
+        {
+          subject: "Feature request: dark mode export",
+          feedback_rating: 0.6,
+          feedback: "Helpful but Slow",
+          feedback_extra:
+            "The support was friendly and knowledgeable, though it took a couple of follow-ups before I got a definitive answer.",
+        },
+        {
+          subject: "Integration webhook not firing",
+          feedback_rating: 0.8,
+          feedback: "Knowledgeable Agent",
+          feedback_extra:
+            "Clear technical explanation and a working fix. Would have loved a short summary of the root cause for my records.",
+        },
+        {
+          subject: "Data export stuck in processing",
+          feedback_rating: 0.4,
+          feedback: "Took Longer Than Expected",
+          feedback_extra:
+            "The issue was eventually fixed, but it stayed open for almost three days with little communication in between.",
+        },
+        {
+          subject: "Mobile app crashing on startup",
+          feedback_rating: 0.2,
+          feedback: "Unresolved Issue",
+          feedback_extra:
+            "I had to explain the problem multiple times and the suggested steps did not work. Still waiting on a real solution.",
+        },
+        {
+          subject: "Password reset email not received",
+          feedback_rating: 1,
+          feedback: "Fast and Friendly",
+          feedback_extra:
+            "Got a reply within minutes and the whole thing was sorted before I finished my coffee. Great experience overall.",
+        },
+        {
+          subject: "Permission error on shared folder",
+          feedback_rating: 0.6,
+          feedback: "Decent Resolution",
+          feedback_extra:
+            "The access issue was fixed, but I wish the agent had confirmed everything was working before closing the ticket.",
+        },
+        {
+          subject: "API rate limit reached unexpectedly",
+          feedback_rating: 0.4,
+          feedback: "Needs Improvement",
+          feedback_extra:
+            "The answer felt a little generic and I had to push for specifics about my plan's actual limits.",
+        },
+      ];
+
+      return demoFeedback.map((entry, i) => ({
+        ...template,
+        name: `${template.name}-${i}`,
+        ...entry,
+      }));
+    },
   });
 
   const feedbackCount = createResource({

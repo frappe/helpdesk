@@ -1,11 +1,11 @@
 <template>
   <div
-    class="sticky top-0 w-[240px] shrink-0 rounded-xl border border-outline-gray-2 bg-surface-white p-4"
+    class="w-[240px] shrink-0 rounded-xl border border-outline-gray-2 bg-surface-white p-4"
   >
     <!-- Average rating -->
     <div class="flex items-center gap-3 mb-4">
       <div
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#FEF3C7]"
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-amber-2"
       >
         <LucideStar class="size-5 fill-[#F59E0B] text-[#F59E0B]" />
       </div>
@@ -13,7 +13,10 @@
         <p class="text-2xl font-semibold text-ink-gray-9 leading-none">
           {{ chart.avg }}
         </p>
-        <p class="text-xs text-ink-gray-5 mt-0.5">{{ chart.total }} reviews</p>
+        <p class="text-xs text-ink-gray-5 mt-0.5">
+          {{ chart.total }}
+          {{ chart.total === 1 ? __("review") : __("reviews") }}
+        </p>
       </div>
     </div>
 

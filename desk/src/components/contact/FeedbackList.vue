@@ -1,11 +1,9 @@
 <template>
   <div class="flex-1 min-w-0">
     <!-- Header: title + sort tabs -->
-    <div
-      class="flex items-center justify-between ml-6 pb-3 mb-4 border-b border-outline-gray-2"
-    >
+    <div class="flex items-center justify-between pb-4">
       <h4 class="font-semibold text-ink-gray-8">
-        {{ __("User reviews") }} ({{ feedbackCount.data ?? 0 }})
+        {{ __("User Reviews") }}
       </h4>
       <TabButtons
         v-model="activeSort"
@@ -15,50 +13,42 @@
     </div>
 
     <!-- List -->
-    <div>
-      <template
-        v-for="(ticket, i) in feedbackListResource.data"
-        :key="ticket.name"
-      >
+    <div class="flex flex-col gap-2 max-h-[65vh] overflow-y-auto pr-1">
+      <template v-for="ticket in feedbackListResource.data" :key="ticket.name">
         <div
-          class="py-4 px-2 cursor-pointer hover:bg-surface-gray-1 rounded ml-4"
+          class="flex cursor-pointer flex-col gap-2 rounded-md border border-outline-gray-1 bg-surface-white p-2.5 hover:bg-surface-gray-1"
           @click="goToTicket(ticket.name)"
         >
-          <!-- Rating badge -->
-          <div class="flex items-center gap-1.5 mb-1.5">
+          <!-- Rating badge + ticket name -->
+          <div class="flex items-center gap-2">
             <span
-              class="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-semibold"
+              class="inline-flex shrink-0 items-center gap-1 rounded-sm px-1.5 py-1 text-sm"
               :class="ratingBadgeClass(ticket.feedback_rating)"
             >
               <LucideStar class="size-3 fill-current" />
               {{ formatRating(ticket.feedback_rating) }}
             </span>
+            <p class="truncate text-sm">
+              <span class="text-ink-gray-5"># {{ ticket.name }}</span>
+              <span class="ml-1 font-medium text-ink-gray-7">{{
+                ticket.subject
+              }}</span>
+            </p>
           </div>
 
-          <!-- Ticket name + subject -->
-          <p class="text-sm mb-1">
-            <span class="text-ink-gray-4"># {{ ticket.name }}</span>
-            <span class="font-medium text-ink-gray-8 ml-1">{{
-              ticket.subject
-            }}</span>
-          </p>
-
-          <!-- Feedback text -->
-          <p
-            v-if="ticket.feedback"
-            class="text-p-sm text-ink-gray-6 line-clamp-2"
-          >
-            {{ ticket.feedback }}
-          </p>
-          <!-- Extra feedback -->
-          <p
-            v-if="ticket.feedback_extra"
-            class="text-p-sm text-ink-gray-6 line-clamp-2"
-          >
-            {{ ticket.feedback_extra }}
-          </p>
+          <!-- Feedback title + body -->
+          <div class="flex flex-col gap-1.5">
+            <p
+              v-if="ticket.feedback"
+              class="text-sm font-medium text-ink-gray-7"
+            >
+              {{ ticket.feedback }}
+            </p>
+            <p v-if="ticket.feedback_extra" class="text-p-base text-ink-gray-6">
+              {{ ticket.feedback_extra }}
+            </p>
+          </div>
         </div>
-        <hr v-if="i !== feedbackListResource.data!.length - 1" class="mx-6" />
       </template>
 
       <!-- Load More -->

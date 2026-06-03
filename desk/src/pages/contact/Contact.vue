@@ -43,7 +43,7 @@
       </PageInfo>
       <div class="overflow-y-auto flex-1">
         <TicketStats :dt="'Contact'" :dn="id" v-if="!isMobileView" />
-        <Tabs v-model="activeTab" :tabs="tabs">
+        <Tabs v-model="activeTab" :tabs="tabs" class="tabs-sticky-header">
           <template #tab-item="{ tab, selected }: any">
             <button
               class="group flex items-center gap-2 border-b border-transparent py-2 text-base text-ink-gray-5 duration-300 ease-in-out hover:text-ink-gray-9"
@@ -63,7 +63,7 @@
             </button>
           </template>
           <template #tab-panel="{ tab }">
-            <div class="p-5 overflow-hidden">
+            <div class="p-5 pt-4.5 overflow-hidden">
               <TicketsTab
                 v-if="tab.label === __('Tickets')"
                 :doc="contact"
@@ -319,3 +319,17 @@ usePageMeta(() => {
   };
 });
 </script>
+
+<style scoped>
+/* frappe-ui's TabsRoot clips with overflow-hidden, which traps the sticky
+   tablist. Let it overflow so the tablist sticks to the page scroll container. */
+.tabs-sticky-header {
+  overflow: visible !important;
+}
+.tabs-sticky-header :deep([role="tablist"]) {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+}
+</style>

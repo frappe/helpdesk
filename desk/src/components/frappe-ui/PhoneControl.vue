@@ -166,12 +166,15 @@ const model = defineModel<string>({ default: "" });
 const id = useId();
 
 // TODO: cache in Local or Session Storage to avoid repeated calls on every mount
+// Not needed,we can hardcode
 const countryCodesResource = createResource({
   url: "frappe.geo.country_info.get_country_timezone_info",
   auto: true,
   transform: (data: any) => {
     const countryInfo =
       data?.country_info ?? ({} as Record<string, CountryInfo>);
+    console.log(countryInfo);
+
     return countryInfo;
   },
   onSuccess() {

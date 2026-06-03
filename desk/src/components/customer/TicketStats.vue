@@ -56,7 +56,7 @@
           :dt="props.dt"
           :dn="props.dn"
           orientation="horizontal"
-          bar-color="#D13A26"
+          bar-color="#e24c38"
         />
         <LineChartCard
           v-if="key === 'avg_first_response_time'"

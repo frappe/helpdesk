@@ -1,10 +1,5 @@
 <template>
   <div>
-    <!-- Heading -->
-    <h3 class="font-semibold text-lg mt-2.5 mb-4 text-ink-gray-8">
-      {{ __("Feedback") }}
-    </h3>
-
     <!-- Loading -->
     <div v-if="loading" class="flex items-center justify-center py-16">
       <LoadingIndicator :scale="10" />
@@ -30,8 +25,8 @@
 
     <!-- Content -->
     <section v-else class="flex items-start gap-6">
-      <FeedbackCard :name="name" />
       <FeedbackList :name="name" />
+      <FeedbackCard :name="name" />
     </section>
   </div>
 </template>
