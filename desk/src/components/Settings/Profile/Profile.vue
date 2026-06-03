@@ -24,7 +24,7 @@
                 <div
                   v-if="currentStatus"
                   class="absolute bottom-0.5 right-0.5 size-3.5 rounded-full outline outline-white outline-4"
-                  :class="statusColor(currentStatus)"
+                  :class="agentStatusStore.statusColor(currentStatus)"
                 />
                 <Tooltip
                   :hoverDelay="0"
@@ -272,10 +272,12 @@ import EditIcon from "~icons/lucide/edit";
 const emit = defineEmits(["updateStep"]);
 
 import AvailabilityMenu from "@/components/AvailabilityMenu.vue";
-import { statusColor, useAvailability } from "@/composables/useAvailability";
+import { useAvailability } from "@/composables/useAvailability";
+import { useAgentStatusStore } from "@/stores/agentStatus";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 
 const { currentStatus } = useAvailability();
+const agentStatusStore = useAgentStatusStore();
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import UnsavedBadge from "@/components/UnsavedBadge.vue";

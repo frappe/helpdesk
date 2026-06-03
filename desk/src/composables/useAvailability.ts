@@ -11,16 +11,6 @@ const setAvailability = createResource({
   onSuccess: () => availability.reload(),
 });
 
-const statusColorMap: Record<string, string> = {
-  Active: "bg-[#137949]",
-  Away: "bg-[#DB7706]",
-  Busy: "bg-surface-red-5",
-};
-
-export function statusColor(status: string): string {
-  return statusColorMap[status] ?? "bg-surface-gray-5";
-}
-
 export function useAvailability() {
   const currentStatus = computed(() => availability.data?.availability || "");
   const options = computed(() => availability.data?.options || []);

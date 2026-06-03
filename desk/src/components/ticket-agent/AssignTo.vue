@@ -136,7 +136,9 @@
                   <UserAvatar :name="agent.value" size="sm" />
                   <div
                     class="absolute bottom-0 -right-0.5 size-2 rounded-full outline outline-white outline-1.5"
-                    :class="statusColor(agent.availability || '')"
+                    :class="
+                      agentStatusStore.statusColor(agent.availability || '')
+                    "
                   />
                 </div>
                 <div class="flex flex-col flex-1 text-left min-w-0">
@@ -191,7 +193,8 @@
 </template>
 
 <script setup lang="ts">
-import { statusColor, useAvailability } from "@/composables/useAvailability";
+import { useAvailability } from "@/composables/useAvailability";
+import { useAgentStatusStore } from "@/stores/agentStatus";
 import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
@@ -240,6 +243,7 @@ const activities = inject(ActivitiesSymbol)!;
 
 const { getUser } = useUserStore();
 const { currentStatus } = useAvailability();
+const agentStatusStore = useAgentStatusStore();
 const currentUser = computed(() => getUser("")); // empty string returns current user
 const currentAgentName = (window as any).agent as string | null;
 
@@ -319,10 +323,12 @@ function availabilitySubtitle(
   availability?: string,
   changedOn?: string
 ): string {
-  if (availability === "Active") return __("Active now");
-  if (availability !== "Busy" && availability !== "Away") return "";
+  if (!availability) return "";
+  const status = agentStatusStore.getStatus(availability);
+  if (!status) return "";
+  if (status.category === "Active") return __("Active now");
 
-  const label = availability === "Busy" ? __("Busy") : __("Away");
+  const label = __(availability);
   const elapsed = changedOn
     ? prettyDate(changedOn, true)?.toLocaleLowerCase()
     : "";
@@ -375,37 +381,35 @@ watch(searchText, (text) => {
   debouncedSearch(text);
 });
 
-type AvailabilityFilter = "All" | "Active" | "Busy" | "Away";
-const availabilityFilter = ref<AvailabilityFilter>("All");
+const availabilityFilter = ref<string>("All");
 
 const availabilityFilters = computed(() => {
-  const counts = { Active: 0, Busy: 0, Away: 0 };
+  const counts: Record<string, number> = {};
   for (const opt of agentOptions.value) {
-    const v = opt.availability;
-    if (v === "Active" || v === "Busy" || v === "Away") counts[v]++;
+    if (opt.availability)
+      counts[opt.availability] = (counts[opt.availability] || 0) + 1;
   }
-  const total = agentOptions.value.length;
-  return [
-    { value: "All" as const, label: __("All"), count: total, dotClass: "" },
+
+  const filters = [
     {
-      value: "Active" as const,
-      label: __("Active"),
-      count: counts.Active,
-      dotClass: statusColor("Active"),
-    },
-    {
-      value: "Busy" as const,
-      label: __("Busy"),
-      count: counts.Busy,
-      dotClass: statusColor("Busy"),
-    },
-    {
-      value: "Away" as const,
-      label: __("Away"),
-      count: counts.Away,
-      dotClass: statusColor("Away"),
+      value: "All",
+      label: __("All"),
+      count: agentOptions.value.length,
+      dotClass: "",
     },
   ];
+
+  const statuses = agentStatusStore.statuses.data || [];
+  for (const status of statuses) {
+    if (!status.enable) continue;
+    filters.push({
+      value: status.agent_status,
+      label: __(status.agent_status),
+      count: counts[status.agent_status] || 0,
+      dotClass: agentStatusStore.statusColor(status.agent_status),
+    });
+  }
+  return filters;
 });
 
 const agentOptions = computed<AgentOption[]>(() => {

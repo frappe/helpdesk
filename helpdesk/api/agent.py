@@ -33,8 +33,13 @@ def sent_invites(emails: list[str], send_welcome_mail_to_user: bool = True):
 @frappe.whitelist()
 @agent_only
 def get_availability_options() -> list[str]:
-    options = frappe.get_meta("HD Agent").get_field("availability").options or ""
-    return [o.strip() for o in options.split("\n") if o.strip()]
+    statuses = frappe.get_all(
+        "HD Agent Status",
+        filters={"enable": 1},
+        fields=["agent_status", "order"],
+    )
+    statuses.sort(key=lambda s: int(s.order) if s.order else 0)
+    return [s.agent_status for s in statuses]
 
 
 def _agent_name_for_session() -> str | None:
