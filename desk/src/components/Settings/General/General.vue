@@ -55,20 +55,18 @@
             <Switch v-model="disableSignup" />
           </div>
         </div>
-        <ERPNextIntegrationSettings />
       </div>
     </template>
   </SettingsLayoutBase>
 </template>
 
 <script setup lang="ts">
-import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNextIntegrationSettings.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
 import { HDSettings, HDSettingsSymbol } from "@/types";
 import {
-  Badge,
   Button,
   createResource,
   LoadingIndicator,
@@ -80,7 +78,6 @@ import { disableSettingModalOutsideClick } from "../settingsModal";
 import Branding from "./components/Branding.vue";
 import TicketSettings from "./components/TicketSettings.vue";
 import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
 
 const configStore = useConfigStore();
 

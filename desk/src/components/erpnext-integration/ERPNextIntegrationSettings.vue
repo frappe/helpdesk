@@ -1,11 +1,12 @@
 <template>
-  <template v-if="isAdmin || isManager">
-    <hr class="my-8" />
-    <div>
+  <SettingsLayoutBase
+    :description="__('Sync customers between Helpdesk and ERPNext.')"
+  >
+    <template #title>
       <div class="flex items-center gap-2">
-        <span class="text-base font-semibold text-ink-gray-9">
-          {{ __("ERPNext Integration") }}
-        </span>
+        <h1 class="text-lg font-semibold text-ink-gray-8">
+          {{ __("ERPNext") }}
+        </h1>
         <Badge
           v-if="installed === false"
           theme="gray"
@@ -13,8 +14,9 @@
           :label="__('Not installed')"
         />
       </div>
-
-      <div class="mt-6 flex items-center justify-between gap-4">
+    </template>
+    <template #content>
+      <div class="flex items-center justify-between gap-4">
         <div class="flex min-w-0 items-center gap-3">
           <ErpnextIcon
             class="size-9 shrink-0"
@@ -98,13 +100,13 @@
           </template>
         </Button>
       </div>
-    </div>
-  </template>
+    </template>
+  </SettingsLayoutBase>
 </template>
 
 <script setup lang="ts">
 import { ErpnextIcon } from "@/components/icons";
-import { useAuthStore } from "@/stores/auth";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { Error } from "@/types";
@@ -115,7 +117,6 @@ import LucideInfo from "~icons/lucide/info";
 import LucideRefreshCw from "~icons/lucide/refresh-cw";
 import LucideTriangleAlert from "~icons/lucide/triangle-alert";
 
-const { isAdmin, isManager } = useAuthStore();
 const { $socket } = globalStore();
 
 const erpnextIntegrationEnabled = ref(false);
