@@ -1,10 +1,7 @@
 <template>
   <div>
-    <Dialog
-      v-model="model"
-      :options="{ title: 'Add New Customer', size: 'sm' }"
-    >
-      <template #body-content>
+    <Dialog v-model:open="model" title="Add New Customer" size="sm">
+      <template #default>
         <div class="space-y-4">
           <div class="space-y-1">
             <Input

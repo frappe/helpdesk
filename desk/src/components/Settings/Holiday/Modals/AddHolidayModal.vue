@@ -1,13 +1,11 @@
 <template>
   <Dialog
-    v-model="dialog.show"
-    :options="{
-      size: 'sm',
-      title: dialog.editing ? 'Edit Holiday' : 'Add Holiday',
-    }"
+    v-model:open="dialog.show"
+    size="sm"
+    :title="dialog.editing ? 'Edit Holiday' : 'Add Holiday'"
     @after-leave="resetForm"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4 mt-4">
         <div class="flex flex-col gap-1.5">
           <FormLabel label="Date" required />

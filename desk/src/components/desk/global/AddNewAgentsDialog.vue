@@ -1,11 +1,11 @@
 <template>
   <Dialog
-    :options="{ title: props.title }"
-    :model-value="show"
-    @update:modelValue="$emit('update:modelValue', $event)"
+    :title="props.title"
+    :open="show"
+    @update:open="$emit('update:modelValue', $event)"
     @close="close()"
   >
-    <template #body-content>
+    <template #default>
       <div class="space-y-3">
         <form
           @submit.prevent="onSubmit"

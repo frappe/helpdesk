@@ -173,10 +173,10 @@
     </template>
   </SettingsLayoutBase>
   <Dialog
-    :options="{ title: __('Duplicate Saved reply') }"
-    v-model="duplicateDialog.show"
+    :title="__('Duplicate Saved reply')"
+    v-model:open="duplicateDialog.show"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl
           :label="__('New Saved reply Name')"

@@ -1,6 +1,6 @@
 <template>
-  <Dialog :options="options">
-    <template #body-main>
+  <Dialog :title="options.title" :actions="options.actions">
+    <template #default>
       <div class="flex flex-col items-center gap-4 p-6">
         <div class="text-xl font-medium text-ink-gray-9">
           {{ contact.doc?.full_name }}

@@ -1,11 +1,6 @@
 <template>
-  <Dialog
-    v-model="dialog"
-    :options="{
-      title: 'Edit response and resolution',
-    }"
-  >
-    <template #body-content>
+  <Dialog v-model:open="dialog" title="Edit response and resolution">
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl
           :type="'select'"

@@ -94,8 +94,8 @@
       </Dropdown>
     </div>
   </div>
-  <Dialog v-model="show" :options="{ size: '3xl', title: 'Nested conditions' }">
-    <template #body-content>
+  <Dialog v-model:open="show" size="3xl" title="Nested conditions">
+    <template #default>
       <CFConditions
         :conditions="props.condition"
         :isChild="true"

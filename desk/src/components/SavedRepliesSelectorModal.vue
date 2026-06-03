@@ -1,13 +1,12 @@
 <template>
   <Dialog
-    v-model="show"
-    :options="{
-      size: '4xl',
-    }"
+    v-model:open="show"
+    size="4xl"
+    bare
     @vue:unmounted="resetFilter"
     @after-leave="onAfterLeave"
   >
-    <template #body>
+    <template #default>
       <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex items-center justify-between w-full p-4 pb-2">
           <div class="text-2xl font-semibold">{{ __("Saved Replies") }}</div>

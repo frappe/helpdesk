@@ -55,15 +55,15 @@
     icon-left="plus"
   />
   <Dialog
-    v-model="dialog"
-    :options="{
-      size: 'md',
-      title: recurringHolidayData.isEditing
+    v-model:open="dialog"
+    size="md"
+    :title="
+      recurringHolidayData.isEditing
         ? 'Edit Recurring Holiday'
-        : 'Add Recurring Holiday',
-    }"
+        : 'Add Recurring Holiday'
+    "
   >
-    <template #body-content>
+    <template #default>
       <div v-if="!props.holidayData.from_date || !props.holidayData.to_date">
         <div class="text-center p-4 text-ink-gray-5">
           Please select start and end date first

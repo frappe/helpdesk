@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Dialog v-model="open" :options="{ title: __('Create New Contact') }">
-      <template #body-content>
+    <Dialog v-model:open="open" :title="__('Create New Contact')">
+      <template #default>
         <div class="space-y-4">
           <div
             v-for="field in formFields"
