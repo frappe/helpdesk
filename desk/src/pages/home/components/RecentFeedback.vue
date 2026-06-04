@@ -147,7 +147,7 @@
               <DateRangePicker
                 v-if="showDatePicker || currentPeriod === 'custom_range'"
                 ref="datePickerRef"
-                v-model="customDateRange"
+                :model-value="customDateRange ? customDateRange.split(',') : []"
                 :placeholder="__('Select range')"
                 @update:model-value="onCustomRangeSelected"
                 :format="'MMM D'"
@@ -431,8 +431,8 @@ const changeSort = (sort: string) => {
   getRecentFeedbackResource.fetch();
 };
 
-const onCustomRangeSelected = (range: string) => {
-  if (!range) {
+const onCustomRangeSelected = (range: string[]) => {
+  if (!range?.length) {
     showDatePicker.value = false;
     currentPeriod.value = "all_time";
     customDateRange.value = undefined;
@@ -442,7 +442,7 @@ const onCustomRangeSelected = (range: string) => {
   }
   showDatePicker.value = false;
   currentPeriod.value = "custom_range";
-  customDateRange.value = range;
+  customDateRange.value = range.join(",");
   currentIndex.value = 0;
   getRecentFeedbackResource.fetch();
 };

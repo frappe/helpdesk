@@ -53,8 +53,18 @@ export function validateEmailWithZod(email: string) {
   return success;
 }
 
+/** Dayjs date format derived from the site's System Settings (boot data). */
+export function getDateFormat(): string {
+  return ((window as any).date_format || "dd-mm-yyyy").toUpperCase();
+}
+
+/** Time format from the site's System Settings (boot data). */
+export function getTimeFormat(): string {
+  return (window as any).time_format || "HH:mm:ss";
+}
+
 export function dateFormat(date, format?: string) {
-  const _format = format || "DD-MM-YYYY HH:mm:ss";
+  const _format = format || `${getDateFormat()} ${getTimeFormat()}`;
   if (!date) return "";
   const tzDate = dayjsLocal(date);
   return tzDate.format(_format);
@@ -428,7 +438,7 @@ export function getFormattedDate(date) {
   const dateObj = dayjsLocal(date);
   if (!dateObj.isValid()) return "";
 
-  return dateObj.format("DD-MM-YYYY");
+  return dateObj.format(getDateFormat());
 }
 
 export function TemplateOption({ active, option, variant, icon, onClick }) {

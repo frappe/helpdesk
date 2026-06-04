@@ -17,7 +17,7 @@
                 errors.holiday_date = '';
               }
             "
-            :format="'DD-MM-YYYY'"
+            :format="getDateFormat()"
             variant="subtle"
             placeholder="Date"
             class="w-full"
@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { getFormattedDate } from "@/utils";
+import { getDateFormat, getFormattedDate } from "@/utils";
 import {
   Dialog,
   FormControl,

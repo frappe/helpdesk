@@ -33,7 +33,7 @@
         <DateRangePicker
           v-else
           ref="datePickerRef"
-          v-model="customDateRange"
+          :model-value="customDateRange ? customDateRange.split(',') : []"
           :placeholder="__('Select range')"
           @update:model-value="onCustomRangeSelected"
           :format="'MMM D'"
@@ -207,15 +207,15 @@ const durationOptions = computed(() => [
   },
 ]);
 
-const onCustomRangeSelected = (range: string) => {
-  if (!range) {
+const onCustomRangeSelected = (range: string[]) => {
+  if (!range?.length) {
     currentDuration.value = "6m";
     customDateRange.value = undefined;
     getAvgTimeMetricsResource.submit();
     return;
   }
   currentDuration.value = "custom_range";
-  customDateRange.value = range;
+  customDateRange.value = range.join(",");
   getAvgTimeMetricsResource.submit();
 };
 

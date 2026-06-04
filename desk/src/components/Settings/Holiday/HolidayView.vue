@@ -75,7 +75,7 @@
                 placeholder="11/01/2025"
                 class="w-full"
                 id="from_date"
-                :format="'DD-MM-YYYY'"
+                :format="getDateFormat()"
                 @update:model-value="updateDuration('from_date')"
               >
                 <template #prefix>
@@ -96,7 +96,7 @@
                 placeholder="25/12/2025"
                 class="w-full"
                 id="to_date"
-                :format="'DD-MM-YYYY'"
+                :format="getDateFormat()"
                 @update:model-value="updateDuration('to_date')"
               >
                 <template #prefix>
@@ -219,7 +219,7 @@ import RecurringHolidaysList from "./RecurringHolidaysList.vue";
 
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { slaActiveScreen } from "@/stores/sla";
-import { htmlToText } from "@/utils";
+import { getDateFormat, htmlToText } from "@/utils";
 import dayjs from "dayjs";
 import { FormLabel } from "frappe-ui";
 import {
