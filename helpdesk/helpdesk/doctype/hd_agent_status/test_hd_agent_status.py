@@ -4,11 +4,25 @@
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
+from helpdesk.setup.install import add_default_agent_status
 from helpdesk.test_utils import make_agent
 
 
-class IntegrationTestHDAgentStatus(FrappeTestCase):
+class TestHDAgentStatus(FrappeTestCase):
     """Integration tests for HD Agent Status."""
+
+    DEFAULT_STATUSES = ("Active", "Away", "Unavailable")
+
+    def setUp(self):
+        # Frappe rolls back only at class teardown, so make sure every test
+        # starts from the install-seeded defaults (Active / Away / Unavailable).
+        add_default_agent_status()
+
+    def tearDown(self):
+        # Delete only the statuses a test created or renamed (e.g. the Active ->
+        # Online rename); keep the seeded defaults so other suites that rely on
+        # them (e.g. HD Agent) are unaffected. setUp restores any renamed default.
+        frappe.db.delete("HD Agent Status", {"name": ["not in", self.DEFAULT_STATUSES]})
 
     def _make_status(self, agent_status, category="Away", enable=1, order=None):
         return frappe.get_doc(
