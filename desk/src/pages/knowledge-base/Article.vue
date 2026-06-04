@@ -251,7 +251,6 @@ import LayoutHeader from "@/components/LayoutHeader.vue";
 import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
-import { dayjs } from "@/dayjs";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import {
@@ -283,6 +282,7 @@ import {
   TextEditorFixedMenu,
   toast,
   Badge,
+  dayjs,
   dayjsLocal,
   LoadingIndicator,
   usePageMeta,
