@@ -1,7 +1,7 @@
 import frappe
 from frappe import _
 
-from helpdesk.utils import agent_only
+from helpdesk.utils import agent_only, get_agent_name, publish_event
 
 
 @frappe.whitelist()
@@ -33,23 +33,18 @@ def sent_invites(emails: list[str], send_welcome_mail_to_user: bool = True):
 @frappe.whitelist()
 @agent_only
 def get_availability_options() -> list[str]:
-    statuses = frappe.get_all(
+    return frappe.get_all(
         "HD Agent Status",
         filters={"enable": 1},
-        fields=["agent_status", "order"],
+        order_by="`tabHD Agent Status`.`order` asc",
+        pluck="agent_status",
     )
-    statuses.sort(key=lambda s: s.order or 0)
-    return [s.agent_status for s in statuses]
-
-
-def _agent_name_for_session() -> str | None:
-    return frappe.db.get_value("HD Agent", {"user": frappe.session.user}, "name")
 
 
 @frappe.whitelist()
 @agent_only
 def get_my_availability() -> dict:
-    name = _agent_name_for_session()
+    name = get_agent_name()
     values = (
         frappe.db.get_value(
             "HD Agent",
@@ -58,11 +53,11 @@ def get_my_availability() -> dict:
             as_dict=True,
         )
         if name
-        else None
-    )
+        else {}
+    ) or {}
     return {
-        "availability": values.availability if values else None,
-        "availability_changed_on": values.availability_changed_on if values else None,
+        "availability": values.get("availability"),
+        "availability_changed_on": values.get("availability_changed_on"),
         "options": get_availability_options(),
     }
 
@@ -70,16 +65,25 @@ def get_my_availability() -> dict:
 @frappe.whitelist()
 @agent_only
 def set_my_availability(availability: str) -> dict:
-    if availability not in get_availability_options():
+    if not frappe.db.exists("HD Agent Status", {"name": availability, "enable": 1}):
         frappe.throw(_("Invalid availability"), frappe.ValidationError)
 
-    name = _agent_name_for_session()
+    name = get_agent_name()
     if not name:
         frappe.throw(_("No HD Agent record for current user"), frappe.ValidationError)
 
+    changed_on = frappe.utils.now()
     frappe.db.set_value(
         "HD Agent",
         name,
-        {"availability": availability, "availability_changed_on": frappe.utils.now()},
+        {"availability": availability, "availability_changed_on": changed_on},
+    )
+    publish_event(
+        "agent_availability_updated",
+        data={
+            "agent": name,
+            "availability": availability,
+            "availability_changed_on": changed_on,
+        },
     )
     return {"availability": availability}
