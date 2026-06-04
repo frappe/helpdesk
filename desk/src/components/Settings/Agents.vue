@@ -192,6 +192,7 @@ import AgentIcon from "../icons/AgentIcon.vue";
 import { setActiveSettingsTab } from "./settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
+import { renderOptionIcon } from "@/utils";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
@@ -249,13 +250,7 @@ function RoleOption({ active, role, onClick, selected, icon = null }) {
     },
     [
       h("div", { class: "flex gap-2" }, [
-        icon
-          ? h(FeatherIcon, {
-              name: icon,
-              class: ["h-4 w-4 shrink-0"],
-              "aria-hidden": true,
-            })
-          : null,
+        renderOptionIcon(icon),
         h("span", { class: "whitespace-nowrap" }, role),
       ]),
       selected

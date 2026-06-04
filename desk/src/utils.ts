@@ -443,16 +443,28 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
       onClick: onClick,
     },
     [
-      icon
-        ? h(FeatherIcon, {
-            name: icon,
-            class: ["h-4 w-4 shrink-0"],
-            "aria-hidden": true,
-          })
-        : null,
+      renderOptionIcon(icon),
       h("span", { class: "whitespace-nowrap" }, option),
     ]
   );
+}
+
+/**
+ * Renders an option icon: `lucide-*` strings as CSS-mask spans (frappe-ui v1),
+ * other strings as legacy FeatherIcon, and components as-is.
+ */
+export function renderOptionIcon(
+  icon: string | object | null,
+  classes: string[] = ["h-4 w-4 shrink-0"]
+) {
+  if (!icon) return null;
+  if (typeof icon === "string" && icon.startsWith("lucide-")) {
+    return h("span", { class: [icon, ...classes], "aria-hidden": true });
+  }
+  if (typeof icon === "string") {
+    return h(FeatherIcon, { name: icon, class: classes, "aria-hidden": true });
+  }
+  return h(icon, { class: classes, "aria-hidden": true });
 }
 
 export function getGridTemplateColumnsForTable(columns) {
@@ -680,7 +692,7 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       component: (props) =>
         TemplateOption({
           option: "Delete",
-          icon: "trash-2",
+          icon: "lucide-trash-2",
           active: props.active,
           variant: "grey",
           onClick: (event) => {
@@ -696,7 +708,7 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       component: (props) =>
         TemplateOption({
           option: "Confirm Delete",
-          icon: "trash-2",
+          icon: "lucide-trash-2",
           active: props.active,
           variant: "danger",
           onClick: () => {
@@ -831,10 +843,15 @@ if (typeof window !== "undefined") {
 
 export function buildPercentageChange(value: number | null) {
   if (value === null || value === undefined) {
-    return { icon: "arrow-right", value: "0", color: "text-ink-gray-5" };
+    return { icon: "lucide-arrow-right", value: "0", color: "text-ink-gray-5" };
   }
   return {
-    icon: value > 0 ? "arrow-up-right" : value < 0 ? "arrow-down-left" : "arrow-right",
+    icon:
+      value > 0
+        ? "lucide-arrow-up-right"
+        : value < 0
+        ? "lucide-arrow-down-left"
+        : "lucide-arrow-right",
     value: value > 0 ? `+${value}` : value,
     color: value > 0 ? "text-ink-red-4" : value < 0 ? "text-ink-green-3" : "text-ink-gray-5",
   };
