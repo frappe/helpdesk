@@ -154,8 +154,7 @@ import {
   RecentSimilarTicketsSymbol,
   TicketSymbol,
 } from "@/types";
-import dayjs from "dayjs";
-import { Tooltip } from "frappe-ui";
+import { dayjs, Tooltip } from "frappe-ui";
 import { computed, inject, ref } from "vue";
 import LucideChevronRight from "~icons/lucide/chevron-right";
 import Section from "../Section.vue";

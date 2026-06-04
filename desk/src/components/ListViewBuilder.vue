@@ -157,6 +157,7 @@ import {
   ListSelectBanner,
   ListView,
   LoadingIndicator,
+  dayjs,
   toast,
 } from "frappe-ui";
 import {
@@ -171,7 +172,6 @@ import {
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import dayjs from "dayjs";
 import EmptyState from "./EmptyState.vue";
 import ListRows from "./ListRows.vue";
 

@@ -140,10 +140,9 @@
 <script setup lang="ts">
 import { updateWeeklyOffDates } from "@/stores/holidayList";
 import { ConfirmDelete } from "@/utils";
-import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import weekday from "dayjs/plugin/weekday";
-import { Checkbox, Dropdown, FormLabel, Select, toast } from "frappe-ui";
+import { Checkbox, dayjs, Dropdown, FormLabel, Select, toast } from "frappe-ui";
 import { computed, ref } from "vue";
 import { getRepetitionText } from "./utils";
 

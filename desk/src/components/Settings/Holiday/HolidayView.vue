@@ -220,8 +220,7 @@ import RecurringHolidaysList from "./RecurringHolidaysList.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { slaActiveScreen } from "@/stores/sla";
 import { getDateFormat, htmlToText } from "@/utils";
-import dayjs from "dayjs";
-import { FormLabel } from "frappe-ui";
+import { dayjs, FormLabel } from "frappe-ui";
 import {
   disableSettingModalOutsideClick,
   setActiveSettingsTab,

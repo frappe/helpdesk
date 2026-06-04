@@ -57,11 +57,10 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import dayjs from "dayjs";
 import { ConfirmDelete, getFormattedDate } from "@/utils";
 import { holidayData } from "@/stores/holidayList";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
-import { Dropdown } from "frappe-ui";
+import { dayjs, Dropdown } from "frappe-ui";
 
 const isConfirmingDelete = ref(false);
 

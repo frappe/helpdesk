@@ -70,9 +70,9 @@ import {
   toast,
   ErrorMessage,
   DatePicker,
+  dayjs,
 } from "frappe-ui";
 import { ref } from "vue";
-import dayjs from "dayjs";
 import { holidayData } from "@/stores/holidayList";
 
 interface ModelType {

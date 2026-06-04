@@ -155,8 +155,7 @@
 <script setup lang="ts">
 import { holidayData } from "@/stores/holidayList";
 import { getFormattedDate, htmlToText } from "@/utils";
-import dayjs from "dayjs";
-import { Popover, useDatePicker } from "frappe-ui";
+import { dayjs, Popover, useDatePicker } from "frappe-ui";
 import { ref, watch } from "vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 
