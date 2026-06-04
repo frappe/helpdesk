@@ -4,6 +4,8 @@ from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
 from frappe.utils import cint, get_system_timezone
 from frappe.utils.telemetry import capture
 
+from helpdesk.utils import get_agent_name
+
 no_cache = 1
 
 
@@ -48,10 +50,3 @@ def get_boot():
 
 def get_default_route():
     return "/helpdesk"
-
-
-def get_agent_name():
-    agent = frappe.db.get_value("HD Agent", {"user": frappe.session.user}, "name")
-    if not agent:
-        return None
-    return agent
