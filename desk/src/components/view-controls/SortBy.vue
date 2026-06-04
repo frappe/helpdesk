@@ -8,10 +8,10 @@
   >
     <template #target="{ togglePopover }">
       <Button :label="__('Sort')" @click="togglePopover()">
-        <template v-if="hideLabel">
+        <template v-if="hideLabel" #icon>
           <SortIcon class="h-4" />
         </template>
-        <template v-if="!hideLabel && !sortValues?.size" #prefix>
+        <template v-else-if="!sortValues?.size" #prefix>
           <SortIcon class="h-4" />
         </template>
       </Button>
@@ -20,10 +20,10 @@
   <NestedPopover v-else>
     <template #target="{ open }">
       <Button v-if="sortValues.size > 1" :label="__('Sort')">
-        <template v-if="hideLabel">
+        <template v-if="hideLabel" #icon>
           <SortIcon class="h-4" />
         </template>
-        <template v-if="!hideLabel" #prefix><SortIcon class="h-4" /></template>
+        <template v-else #prefix><SortIcon class="h-4" /></template>
         <template v-if="sortValues?.size" #suffix>
           <div
             class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-white pt-px text-xs font-medium text-ink-gray-8 shadow-sm"
