@@ -18,12 +18,15 @@ def get_sync_info() -> dict:
     if "erpnext" not in frappe.get_installed_apps():
         return {"enabled": False, "in_sync": False}
 
+<<<<<<< HEAD
     if not frappe.has_permission("Customer", "read") or not frappe.has_permission(
         "HD Customer", "read"
     ):
         return {"enabled": False, "in_sync": False}
 >>>>>>> 86dc72ed (refactor(UI): enable integration settings)
 
+=======
+>>>>>>> 83923277 (chore: improve copy)
     if not frappe.has_permission("HD Customer", "read") or not frappe.has_permission(
         "Customer", "read"
     ):

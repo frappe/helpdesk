@@ -45,9 +45,8 @@
         <!-- ERPNext not installed -->
         <div
           v-if="installed === false"
-          class="flex items-center gap-2 text-p-sm text-ink-gray-6"
+          class="flex items-center gap-2 text-p-sm text-ink-gray-7"
         >
-          <LucideInfo class="h-4 w-4 shrink-0 text-ink-gray-5" />
           <span>
             <a
               href="https://frappe.io/cloud/install"
@@ -135,7 +134,6 @@ import { Error } from "@/types";
 import { Badge, Button, Switch, createResource, toast } from "frappe-ui";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import LucideCheck from "~icons/lucide/check";
-import LucideInfo from "~icons/lucide/info";
 import LucideRefreshCw from "~icons/lucide/refresh-cw";
 import LucideTriangleAlert from "~icons/lucide/triangle-alert";
 
