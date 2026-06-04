@@ -426,10 +426,9 @@ function availabilitySubtitle(
   if (status.category === "Active") return __("Active now");
 
   const label = __(availability);
-  const elapsed = changedOn
-    ? prettyDate(changedOn, true)?.toLocaleLowerCase()
-    : "";
-  return elapsed ? `${label} since ${elapsed}` : label;
+  if (!changedOn) return label;
+  const since = prettyDate(changedOn);
+  return since ? `${label} · ${since}` : label;
 }
 
 function isSelected(agentName: string): boolean {
