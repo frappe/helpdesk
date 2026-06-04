@@ -122,33 +122,6 @@
                 <span class="text-p-sm text-ink-gray-5 truncate">
                   {{ user?.doc?.email }}
                 </span>
-                <div class="flex items-center">
-                  <AvailabilityMenu class="!min-h-0 !px-0" />
-                  <IconDot class="size-4 text-ink-gray-5" />
-                  <div
-                    v-if="agentCreationDate?.data?.creation"
-                    class="flex items-center gap-1 ml-[1px]"
-                  >
-                    <LucideCalendar class="size-4 text-ink-gray-5" />
-                    <span class="text-ink-gray-7 text-p-sm"
-                      >Joined
-                      {{
-                        dateFormat(
-                          agentCreationDate.data.creation,
-                          "MMM D, YYYY"
-                        )
-                      }}</span
-                    >
-                  </div>
-                  <IconDot class="size-4 text-ink-gray-5" />
-
-                  <div class="flex items-center gap-1 ml-[1px]">
-                    <LucideGlobe class="size-4 text-ink-gray-5" />
-                    <span class="text-p-sm text-ink-gray-7">{{
-                      user?.doc?.time_zone
-                    }}</span>
-                  </div>
-                </div>
                 <ErrorMessage :message="__(_error)" />
               </div>
             </div>
@@ -173,6 +146,22 @@
               @click="save()"
           /></Transition>
         </div>
+      </div>
+
+      <div class="flex items-center justify-between mt-6">
+        <div class="flex flex-col gap-1">
+          <span class="text-base font-medium text-ink-gray-8">
+            {{ __("Availability") }}
+          </span>
+          <span class="text-p-sm text-ink-gray-6">
+            {{
+              __(
+                "Set your availability so your team knows when you're reachable."
+              )
+            }}
+          </span>
+        </div>
+        <AvailabilityMenu />
       </div>
       <div class="flex items-center justify-between mt-6">
         <div class="flex flex-col gap-1">
@@ -206,42 +195,6 @@
           :label="__('Change Password')"
           @click="showChangePasswordModal = true"
         />
-      </div>
-      <div>
-        <div class="flex items-center justify-between mt-6">
-          <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-ink-gray-8">
-              {{ __("Language") }}
-            </span>
-            <span class="text-p-sm text-ink-gray-6">
-              {{ __("Change language of the application.") }}
-            </span>
-          </div>
-          <Link
-            :model-value="user.doc?.language"
-            @update:modelValue="updateLanguage"
-            doctype="Language"
-            class="w-40"
-          />
-        </div>
-        <div class="flex items-center justify-between mt-6">
-          <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-ink-gray-8">
-              {{ __("Timezone") }}
-            </span>
-            <span class="text-p-sm text-ink-gray-6">
-              {{ __("Change timezone of the application.") }}
-            </span>
-          </div>
-          <Autocomplete
-            :model-value="user.doc?.time_zone"
-            @update:modelValue="updateTimezone"
-            class="w-40"
-            :options="timezoneOptions"
-            size="sm"
-            placeholder="Select Timezone"
-          />
-        </div>
       </div>
     </template>
   </SettingsLayoutBase>
@@ -339,17 +292,10 @@ const isNameDirty = computed(() => {
 });
 
 function save() {
-  refreshRequired.value =
-    user.doc?.language !== user.originalDoc?.language ||
-    user.doc?.time_zone !== user.originalDoc?.time_zone;
-
   user.save.submit(null, {
     onSuccess: () => {
       editName.value = false;
       toast.success(__("Profile updated successfully."));
-      if (refreshRequired.value) {
-        window.location.reload();
-      }
     },
     onError: (err: { message: string; messages: string[] }) => {
       toast.error(err.message + ": " + err.messages[0]);
@@ -362,43 +308,6 @@ function updateImage(fileUrl = "") {
   user.doc.user_image = fileUrl;
   save();
 }
-
-function updateLanguage(val: string | null) {
-  if (!user.doc) return;
-  user.doc.language = val || user.originalDoc?.language;
-}
-
-function updateTimezone(val: { label: string; value: string } | null) {
-  if (!user.doc) return;
-  user.doc.time_zone = val?.value || user.originalDoc?.time_zone;
-}
-
-const timezoneOptions = ref([]);
-const timezoneData = createResource({
-  url: "frappe.core.doctype.user.user.get_timezones",
-  auto: true,
-  onSuccess(data) {
-    timezoneOptions.value = data.timezones.map((tz) => ({
-      label: tz,
-      value: tz,
-    }));
-  },
-});
-
-const language = ref(null);
-const timezone = ref(null);
-
-const refreshRequired = ref(false);
-
-watch(
-  () => user.doc,
-  (doc) => {
-    if (!doc) return;
-    if (!language.value) language.value = doc.language;
-    if (!timezone.value) timezone.value = doc.time_zone;
-  },
-  { immediate: true }
-);
 
 watch(isDirty, (val) => {
   disableSettingModalOutsideClick.value = val;
