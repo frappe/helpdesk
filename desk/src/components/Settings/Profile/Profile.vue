@@ -134,17 +134,7 @@
             <span class="text-base font-semibold text-ink-gray-9">
               {{ __("Account Info & Security") }}
             </span>
-            <UnsavedBadge :show="isDirty" />
           </div>
-
-          <Transition name="fade">
-            <Button
-              variant="solid"
-              v-if="isDirty"
-              :label="__('Save')"
-              :loading="user?.save?.loading"
-              @click="save()"
-          /></Transition>
         </div>
       </div>
 
@@ -205,7 +195,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch, useTemplateRef } from "vue";
+import { computed, nextTick, ref, useTemplateRef } from "vue";
 import {
   Avatar,
   Button,
@@ -213,11 +203,7 @@ import {
   LoadingIndicator,
   toast,
   createDocumentResource,
-  createResource,
 } from "frappe-ui";
-import LucideCalendar from "~icons/lucide/calendar";
-import LucideGlobe from "~icons/lucide/globe";
-import IconDot from "~icons/lucide/dot";
 
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
@@ -231,26 +217,11 @@ import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 
 const { currentStatus } = useAvailability();
 const agentStatusStore = useAgentStatusStore();
-import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
-import { dateFormat } from "@/utils";
 const showChangePasswordModal = ref(false);
 
 const { userId } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
-const currentAgentName = (window as any).agent as string | null;
-const agentCreationDate = currentAgentName
-  ? createResource({
-      url: "frappe.client.get_value",
-      params: {
-        doctype: "HD Agent",
-        filters: currentAgentName,
-        fieldname: "creation",
-      },
-      auto: true,
-    })
-  : null;
 
 const isHoveringRemove = ref(false);
 const editName = ref(false);
@@ -276,14 +247,6 @@ function editFullName() {
   nextTick(() => fullNameRef.value?.el?.focus());
 }
 
-const isDirty = computed(() => {
-  if (!user.originalDoc) return false;
-  return user.doc?.time_zone !== user.originalDoc?.time_zone ||
-    user.doc?.language !== user.originalDoc?.language
-    ? true
-    : false;
-});
-
 const isNameDirty = computed(() => {
   return (
     user.doc?.first_name !== user.originalDoc?.first_name ||
@@ -308,8 +271,4 @@ function updateImage(fileUrl = "") {
   user.doc.user_image = fileUrl;
   save();
 }
-
-watch(isDirty, (val) => {
-  disableSettingModalOutsideClick.value = val;
-});
 </script>

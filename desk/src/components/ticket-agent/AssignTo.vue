@@ -168,7 +168,6 @@ import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
 import { useAgentStatusStore } from "@/stores/agentStatus.ts";
-import { useAvailability } from "@/composables/useAvailability";
 import { prettyDate } from "@/utils.ts";
 import { Tooltip } from "frappe-ui";
 interface Props {
@@ -189,11 +188,6 @@ const { getUser } = useUserStore();
 const currentUser = computed(() => getUser("")); // empty string returns current user
 const agentStatusStore = useAgentStatusStore();
 const currentAgentName = (window as any).agent as string | null;
-
-// Current agent's status comes from the shared availability resource so it
-// stays in sync the moment they change it via the AvailabilityMenu, instead
-// of showing the value fetched when this dropdown first loaded.
-const { currentStatus, changedOn } = useAvailability();
 
 const searchText = ref("");
 const highlightedIndex = ref(0);
@@ -294,22 +288,18 @@ watch(searchText, (text) => {
   debouncedSearch(text);
 });
 
-// For the logged-in agent, prefer the live status from the shared resource so
-// the dot/tooltip reflect a change made elsewhere this session.
+// Prefer the live status pushed over the socket (agentStatusStore.liveStatuses)
+// so the dot/tooltip reflect any agent's change made elsewhere this session,
+// falling back to the value fetched when this dropdown first loaded.
 function liveAvailability(agent: {
   name: string;
   availability?: string;
   availability_changed_on?: string;
 }) {
-  if (agent.name !== currentAgentName) {
-    return {
-      availability: agent.availability,
-      availability_changed_on: agent.availability_changed_on,
-    };
-  }
+  const live = agentStatusStore.liveStatuses[agent.name];
   return {
-    availability: currentStatus.value || agent.availability,
-    availability_changed_on: changedOn.value || agent.availability_changed_on,
+    availability: live?.availability ?? agent.availability,
+    availability_changed_on: live?.changedOn ?? agent.availability_changed_on,
   };
 }
 
@@ -428,7 +418,9 @@ function availabilitySubtitle(
   const label = __(availability);
   if (!changedOn) return label;
   const timeSinceChange = prettyDate(changedOn);
-  return timeSinceChange ? `${label} · Since ${timeSinceChange}` : label;
+  return timeSinceChange
+    ? __("{0} since {1}", [label, timeSinceChange])
+    : label;
 }
 
 function isSelected(agentName: string): boolean {
@@ -586,8 +578,8 @@ async function saveAssignees(added: string[], removed: string[]) {
           )?.category;
           const message =
             category === "Unavailable"
-              ? __("{0} is currently unavailable", [name])
-              : __("{0} is currently away", [name]);
+              ? __("{0} is currently unavailable.", [name])
+              : __("{0} is currently away.", [name]);
           toast.warning(message);
         }
       }
