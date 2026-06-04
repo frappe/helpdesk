@@ -2,12 +2,12 @@
 # See license.txt
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.test_utils import make_agent
 
 
-class IntegrationTestHDAgentStatus(IntegrationTestCase):
+class IntegrationTestHDAgentStatus(FrappeTestCase):
     """Integration tests for HD Agent Status."""
 
     def _make_status(self, agent_status, category="Away", enable=1, order=None):
