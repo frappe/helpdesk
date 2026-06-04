@@ -50,7 +50,7 @@
               preset = formatter(e);
             }
           "
-          :formatter="formatRange"
+          :format="'MMM D'"
         >
           <template #prefix>
             <LucideCalendar class="size-4 text-ink-gray-5 me-2" />

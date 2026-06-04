@@ -10,15 +10,19 @@
         <div class="flex flex-col gap-1.5">
           <FormLabel label="Date" required />
           <DatePicker
-            :value="dayjs(dialog.holiday_date).format('MM-DD-YYYY')"
-            @update:model-value="dialog.holiday_date = $event"
-            :formatter="(date) => getFormattedDate(date)"
+            :model-value="dayjs(dialog.holiday_date).format('YYYY-MM-DD')"
+            @update:model-value="
+              (value) => {
+                dialog.holiday_date = value;
+                errors.holiday_date = '';
+              }
+            "
+            :format="'DD-MM-YYYY'"
             variant="subtle"
             placeholder="Date"
             class="w-full"
             id="holiday_date"
             required
-            @change="errors.holiday_date = ''"
           />
           <ErrorMessage :message="errors.holiday_date" />
         </div>

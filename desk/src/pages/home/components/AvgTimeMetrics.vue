@@ -38,7 +38,8 @@
           @update:model-value="onCustomRangeSelected"
           :format="'MMM D'"
           @click="datePickerRef?.open()"
-          placement="bottom-end"
+          side="bottom"
+          align="end"
           class="!w-48"
         />
       </div>
