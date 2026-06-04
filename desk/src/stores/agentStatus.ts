@@ -1,6 +1,19 @@
+import { globalStore } from "@/stores/globalStore";
 import { HDAgentStatus } from "@/types/doctypes";
 import { createListResource } from "frappe-ui";
 import { defineStore } from "pinia";
+import { reactive } from "vue";
+
+interface LiveAvailability {
+  availability: string;
+  changedOn: string;
+}
+
+interface AvailabilityEvent {
+  agent: string;
+  availability: string;
+  availability_changed_on: string;
+}
 
 // Maps an HD Agent Status `color` value to a solid presence-dot background.
 const dotColorMap: Record<string, string> = {
@@ -31,6 +44,19 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     auto: true,
   });
 
+  // Live availability pushed over the socket when an agent changes their
+  // status (helpdesk.api.agent.set_my_availability). Keyed by HD Agent name,
+  // it overrides the value fetched when a list first loaded.
+  const liveStatuses = reactive<Record<string, LiveAvailability>>({});
+
+  const { $socket } = globalStore();
+  $socket.on("agent_availability_updated", (data: AvailabilityEvent) => {
+    liveStatuses[data.agent] = {
+      availability: data.availability,
+      changedOn: data.availability_changed_on,
+    };
+  });
+
   function getStatus(name: string): HDAgentStatus | undefined {
     return statuses.data?.find((s: HDAgentStatus) => s.agent_status === name);
   }
@@ -40,5 +66,5 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     return (color && dotColorMap[color]) || defaultColor;
   }
 
-  return { statuses, getStatus, statusColor };
+  return { statuses, liveStatuses, getStatus, statusColor };
 });

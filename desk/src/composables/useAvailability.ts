@@ -16,9 +16,6 @@ const setAvailability = createResource({
 
 export function useAvailability() {
   const currentStatus = computed(() => availability.data?.availability || "");
-  const changedOn = computed(
-    () => availability.data?.availability_changed_on || ""
-  );
   const options = computed(() => availability.data?.options || []);
 
   function setStatus(status: string) {
@@ -26,5 +23,5 @@ export function useAvailability() {
     setAvailability.submit({ availability: status });
   }
 
-  return { currentStatus, changedOn, options, setStatus };
+  return { currentStatus, options, setStatus };
 }
