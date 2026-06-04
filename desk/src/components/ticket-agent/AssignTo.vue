@@ -427,8 +427,8 @@ function availabilitySubtitle(
 
   const label = __(availability);
   if (!changedOn) return label;
-  const since = prettyDate(changedOn);
-  return since ? `${label} · ${since}` : label;
+  const timeSinceChange = prettyDate(changedOn);
+  return timeSinceChange ? `${label} · Since ${timeSinceChange}` : label;
 }
 
 function isSelected(agentName: string): boolean {
