@@ -34,6 +34,7 @@
   {
    "fieldname": "category",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Category",
    "options": "Active\nAway\nUnavailable",
    "reqd": 1
@@ -58,7 +59,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-02 00:26:15.329918",
+ "modified": "2026-06-05 01:41:57.721507",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent Status",
@@ -78,12 +79,22 @@
    "write": 1
   },
   {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
    "read": 1,
-   "role": "Agent"
+   "report": 1,
+   "role": "Agent Manager",
+   "share": 1,
+   "write": 1
   },
   {
+   "export": 1,
    "read": 1,
-   "role": "Agent Manager"
+   "report": 1,
+   "role": "Agent"
   }
  ],
  "row_format": "Dynamic",

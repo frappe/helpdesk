@@ -14,7 +14,6 @@ class TestHDAgentStatus(FrappeTestCase):
     DEFAULT_STATUSES = ("Active", "Away", "Unavailable")
 
     def setUp(self):
-        # Frappe rolls back only at class teardown, so make sure every test
         # starts from the install-seeded defaults (Active / Away / Unavailable).
         add_default_agent_status()
 

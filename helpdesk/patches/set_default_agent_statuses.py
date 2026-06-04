@@ -6,8 +6,8 @@ from helpdesk.setup.install import add_default_agent_status
 
 def execute():
     """Add the default HD Agent Status records on sites that predate the feature,
-    and set the Active status on existing agents whose availability is unset or
-    points at a status that no longer exists (e.g. the old "Busy")."""
+    and set the Active status on existing agents whose availability is unset or invalid.
+    """
     add_default_agent_status()
 
     active_status = get_active_status()
