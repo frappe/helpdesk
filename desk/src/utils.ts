@@ -459,10 +459,7 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
       ],
       onClick: onClick,
     },
-    [
-      renderOptionIcon(icon),
-      h("span", { class: "whitespace-nowrap" }, option),
-    ]
+    [renderOptionIcon(icon), h("span", { class: "whitespace-nowrap" }, option)]
   );
 }
 
@@ -750,18 +747,6 @@ export function getRandom(len = 4) {
   return text;
 }
 
-export function parseColor(color: string): string {
-  color = color.toLowerCase();
-  let textColor = `!text-${color}-500`;
-  if (color == "black") {
-    textColor = "!text-ink-gray-9";
-  } else if (["gray", "green"].includes(color)) {
-    textColor = `!text-${color}-500`;
-  }
-
-  return textColor;
-}
-
 export function isElementInViewport(el: HTMLElement) {
   if (!el) return false;
   const rect = el.getBoundingClientRect();
@@ -830,12 +815,12 @@ export function stripEmailColors(html: string): string {
     else el.removeAttribute("style");
   });
 
-  div.querySelectorAll("[bgcolor]").forEach((el) =>
-    el.removeAttribute("bgcolor")
-  );
-  div.querySelectorAll("font[color]").forEach((el) =>
-    el.removeAttribute("color")
-  );
+  div
+    .querySelectorAll("[bgcolor]")
+    .forEach((el) => el.removeAttribute("bgcolor"));
+  div
+    .querySelectorAll("font[color]")
+    .forEach((el) => el.removeAttribute("color"));
 
   return div.innerHTML;
 }
@@ -849,8 +834,7 @@ export const dataTheme = ref<string>(
 
 if (typeof window !== "undefined") {
   new MutationObserver(() => {
-    const next =
-      document.documentElement.getAttribute("data-theme") || "light";
+    const next = document.documentElement.getAttribute("data-theme") || "light";
     if (next !== dataTheme.value) dataTheme.value = next;
   }).observe(document.documentElement, {
     attributes: true,
@@ -866,7 +850,7 @@ const YEAR = 365 * DAY;
 
 /**
  * Compact relative duration between `target` and now, ignoring direction.
- * Examples: `1y`, `2 days`, `2h 20m`, `5m`.
+ * Examples: `1y`, `4 days 4h`, `2h 20m`, `5m`.
  */
 export function shortDuration(target: string | Date): string {
   const seconds = Math.abs(dayjs(target).diff(dayjs(), "second"));
@@ -880,7 +864,9 @@ export function shortDuration(target: string | Date): string {
   }
   if (seconds >= DAY) {
     const days = Math.floor(seconds / DAY);
-    return `${days} ${days === 1 ? "day" : "days"}`;
+    const hours = Math.floor((seconds % DAY) / HOUR);
+    const dayLabel = `${days} ${days === 1 ? "day" : "days"}`;
+    return hours ? `${dayLabel} ${hours}h` : dayLabel;
   }
   if (seconds >= HOUR) {
     const hours = Math.floor(seconds / HOUR);
@@ -902,6 +888,11 @@ export function buildPercentageChange(value: number | null) {
         ? "lucide-arrow-down-left"
         : "lucide-arrow-right",
     value: value > 0 ? `+${value}` : value,
-    color: value > 0 ? "text-ink-red-4" : value < 0 ? "text-ink-green-3" : "text-ink-gray-5",
+    color:
+      value > 0
+        ? "text-ink-red-4"
+        : value < 0
+        ? "text-ink-green-3"
+        : "text-ink-gray-5",
   };
 }
