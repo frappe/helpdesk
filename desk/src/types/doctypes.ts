@@ -260,7 +260,7 @@ export interface HDServiceLevelAgreement extends DocType {
   default_ticket_status?: string;
 }
 
-// Last updated: 2026-05-19 14:59:12.901015
+// Last updated: 2026-06-02 01:18:56.023594
 export interface HDAgent extends DocType {
   /** User: Link (User) */
   user: string;
