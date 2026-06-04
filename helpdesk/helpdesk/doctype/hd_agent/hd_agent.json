@@ -42,7 +42,6 @@
    "label": "Image"
   },
   {
-   "default": "Active",
    "fieldname": "availability",
    "fieldtype": "Link",
    "label": "Availability",

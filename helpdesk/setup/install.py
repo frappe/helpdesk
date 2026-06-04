@@ -364,14 +364,14 @@ def add_default_agent_status():
             "agent_status": "Active",
             "category": "Active",
             "color": "Green",
-            "order": "1",
+            "order": 1,
         },
-        {"agent_status": "Away", "category": "Away", "color": "Amber", "order": "2"},
+        {"agent_status": "Away", "category": "Away", "color": "Amber", "order": 2},
         {
             "agent_status": "Unavailable",
             "category": "Unavailable",
-            "color": "Gray",
-            "order": "3",
+            "color": "Red",
+            "order": 3,
         },
     ]
     for status in statuses:

@@ -4,8 +4,14 @@
 import frappe
 from frappe.model.document import Document
 
+from helpdesk.helpdesk.doctype.hd_agent_status.hd_agent_status import get_active_status
+
 
 class HDAgent(Document):
+    def before_insert(self):
+        if not self.availability:
+            self.availability = get_active_status()
+
     def before_save(self):
         old_doc = self.get_doc_before_save()
         if not old_doc or old_doc.availability != self.availability:

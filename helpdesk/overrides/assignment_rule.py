@@ -2,12 +2,19 @@ import frappe
 from frappe.automation.doctype.assignment_rule.assignment_rule import AssignmentRule
 
 
-def get_agents_by_availability(availability: str) -> set[str]:
-    """User ids of HD Agents currently marked with the given availability."""
+def get_agents_by_category(category: str) -> set[str]:
+    """User ids of HD Agents whose current status falls under the given category."""
+    statuses = frappe.get_all(
+        "HD Agent Status",
+        filters={"category": category},
+        pluck="name",
+    )
+    if not statuses:
+        return set()
     return set(
         frappe.get_all(
             "HD Agent",
-            filters={"availability": availability},
+            filters={"availability": ["in", statuses]},
             pluck="user",
         )
     )
@@ -22,8 +29,8 @@ class HelpdeskAssignmentRule(AssignmentRule):
         is available, so the ticket is never left unassigned.
         """
 
-        away = get_agents_by_availability("Away")
-        unavailable = get_agents_by_availability("Unavailable")
+        away = get_agents_by_category("Away")
+        unavailable = get_agents_by_category("Unavailable")
         if not away and not unavailable:
             return super().get_user(doc)
 
