@@ -17,14 +17,14 @@ class HelpdeskAssignmentRule(AssignmentRule):
     def get_user(self, doc):
         """
         Override get_user method from framework.
-        always Active agents are preferred; fall back to Busy if no Active is available;
-        fall back to the full pool (including Away) only if no one else
+        always Active agents are preferred; fall back to Away if no Active is available;
+        fall back to the full pool (including Unavailable) only if no one else
         is available, so the ticket is never left unassigned.
         """
 
         away = get_agents_by_availability("Away")
-        busy = get_agents_by_availability("Busy")
-        if not away and not busy:
+        unavailable = get_agents_by_availability("Unavailable")
+        if not away and not unavailable:
             return super().get_user(doc)
 
         # "Based on Field" assigns through the document field, so the
@@ -38,15 +38,15 @@ class HelpdeskAssignmentRule(AssignmentRule):
 
         original_pool = getattr(self, user_pool_fieldname)
         active_only = [
-            u for u in original_pool if u.user not in away and u.user not in busy
+            u for u in original_pool if u.user not in away and u.user not in unavailable
         ]
-        not_away = [u for u in original_pool if u.user not in away]
+        not_unavailable = [u for u in original_pool if u.user not in unavailable]
 
-        # Tier: Active → Busy → full pool (Away as last resort)
+        # Tier: Active → Away → full pool (Unavailable as last resort)
         if active_only:
             preferred_pool = active_only
-        elif not_away:
-            preferred_pool = not_away
+        elif not_unavailable:
+            preferred_pool = not_unavailable
         else:
             preferred_pool = original_pool
 

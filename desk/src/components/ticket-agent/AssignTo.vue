@@ -555,16 +555,23 @@ async function saveAssignees(added: string[], removed: string[]) {
     }
     if (added.length) {
       const unavailableAgents = (agentResource.data as HDAgent[])?.filter(
-        (agent) =>
-          added.includes(agent.name) &&
-          (agent.availability === "Away" || agent.availability === "Busy")
+        (agent) => {
+          if (!added.includes(agent.name)) return false;
+          const category = agentStatusStore.getStatus(
+            agent.availability || ""
+          )?.category;
+          return category === "Away" || category === "Unavailable";
+        }
       );
       if (unavailableAgents?.length > 0) {
         for (const agent of unavailableAgents) {
           const name = agent.agent_name || agent.name;
+          const category = agentStatusStore.getStatus(
+            agent.availability || ""
+          )?.category;
           const message =
-            agent.availability === "Busy"
-              ? __("{0} is currently busy", [name])
+            category === "Unavailable"
+              ? __("{0} is currently unavailable", [name])
               : __("{0} is currently away", [name]);
           toast.warning(message);
         }
