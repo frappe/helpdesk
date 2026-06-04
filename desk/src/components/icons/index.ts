@@ -27,6 +27,7 @@ export { default as ReloadIcon } from "./ReloadIcon.vue";
 export { default as ReplyAllIcon } from "./ReplyAllIcon.vue";
 export { default as ReplyIcon } from "./ReplyIcon.vue";
 export { default as SelectIcon } from "./SelectIcon.vue";
+export { default as SlidersIcon } from "./SlidersIcon.vue";
 export { default as SortIcon } from "./SortIcon.vue";
 export { default as ThumbsDownFilledIcon } from "./ThumbsDownFilledIcon.vue";
 export { default as ThumbsDownIcon } from "./ThumbsDownIcon.vue";

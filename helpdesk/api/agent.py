@@ -50,11 +50,19 @@ def _agent_name_for_session() -> str | None:
 @agent_only
 def get_my_availability() -> dict:
     name = _agent_name_for_session()
-    availability = (
-        frappe.db.get_value("HD Agent", name, "availability") if name else None
+    values = (
+        frappe.db.get_value(
+            "HD Agent",
+            name,
+            ["availability", "availability_changed_on"],
+            as_dict=True,
+        )
+        if name
+        else None
     )
     return {
-        "availability": availability,
+        "availability": values.availability if values else None,
+        "availability_changed_on": values.availability_changed_on if values else None,
         "options": get_availability_options(),
     }
 

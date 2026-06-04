@@ -41,7 +41,7 @@
             </template>
           </div>
           <template #suffix>
-            <LucideChevronDown class="h-4 w-4 ml-auto text-ink-gray-5" />
+            <LucideChevronDown class="h-4 w-4 ms-auto text-ink-gray-5" />
           </template>
         </Button>
       </div>
@@ -50,9 +50,6 @@
       <div
         v-if="isOpen"
         class="my-2 divide-y divide-outline-gray-modals rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
-        @keydown.ctrl.enter.capture.stop="confirmAssignment"
-        @keydown.meta.enter.capture.stop="confirmAssignment"
-        @keydown.esc.capture.stop="cancelAssignment"
       >
         <!-- Search Header -->
         <div class="p-1">
@@ -85,30 +82,6 @@
           </div>
         </div>
 
-        <!-- Availability filters -->
-        <div class="flex items-center gap-1.5 px-2 py-1.5 overflow-x-auto">
-          <button
-            v-for="filter in availabilityFilters"
-            :key="filter.value"
-            class="flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium whitespace-nowrap"
-            :class="
-              availabilityFilter === filter.value
-                ? 'bg-surface-gray-3 text-ink-gray-9'
-                : 'text-ink-gray-6 hover:bg-surface-gray-2'
-            "
-            @click="availabilityFilter = filter.value"
-          >
-            <p
-              v-if="filter.dotClass"
-              class="size-1.5 rounded-full text-p-sm"
-              :class="filter.dotClass"
-            />
-            {{ filter.label }}
-
-            <span class="text-xs text-ink-gray-5">{{ filter.count }}</span>
-          </button>
-        </div>
-
         <!-- Agent List -->
         <div class="px-1.5 pb-1.5 max-h-64 overflow-y-auto">
           <div class="pt-1.5">
@@ -125,7 +98,7 @@
                 v-for="(agent, index) in sortedAgentOptions"
                 :key="agent.value"
                 :ref="(el) => setOptionRef(index, el as Element)"
-                class="group flex w-full items-center rounded px-2 py-1.5 text-base text-ink-gray-6 gap-2"
+                class="group flex h-7 w-full items-center rounded px-2 text-base text-ink-gray-6 gap-2"
                 :class="
                   index === highlightedIndex
                     ? 'bg-surface-gray-3'
@@ -138,7 +111,17 @@
                   class="flex-shrink-0"
                 />
                 <div class="relative flex-shrink-0">
-                  <UserAvatar :name="agent.value" size="sm" />
+                  <Tooltip
+                    placement="top"
+                    :text="
+                      availabilitySubtitle(
+                        agent.availability,
+                        agent.availability_changed_on
+                      )
+                    "
+                  >
+                    <UserAvatar :name="agent.value" size="sm" />
+                  </Tooltip>
                   <div
                     class="absolute bottom-0 -right-0.5 size-2 rounded-full outline outline-white outline-1.5"
                     :class="
@@ -146,27 +129,9 @@
                     "
                   />
                 </div>
-                <div class="flex flex-col flex-1 text-left min-w-0">
-                  <span class="text-ink-gray-7 truncate text-p-sm">
-                    {{ agent.label }}
-                  </span>
-                  <span
-                    v-if="
-                      availabilitySubtitle(
-                        agent.availability,
-                        agent.availability_changed_on
-                      )
-                    "
-                    class="text-xs text-ink-gray-5 truncate"
-                  >
-                    {{
-                      availabilitySubtitle(
-                        agent.availability,
-                        agent.availability_changed_on
-                      )
-                    }}
-                  </span>
-                </div>
+                <span class="text-ink-gray-7 flex-1 text-start truncate">
+                  {{ agent.label }}
+                </span>
               </button>
             </template>
 
@@ -176,37 +141,16 @@
             </div>
           </div>
         </div>
-
-        <!-- Footer -->
-        <div class="flex items-center justify-end px-2 py-1.5 gap-2">
-          <Button variant="outline" size="sm" @click="cancelAssignment">
-            {{ __("Cancel") }}
-          </Button>
-          <Button variant="solid" size="sm" @click="confirmAssignment">
-            {{
-              isMobileView
-                ? __("Assign")
-                : isMac
-                ? __("Assign (⌘ + ⏎)")
-                : __("Assign (Ctrl + ⏎)")
-            }}
-          </Button>
-        </div>
       </div>
     </template>
   </Popover>
 </template>
 
 <script setup lang="ts">
-import { useAvailability } from "@/composables/useAvailability";
-import { useAgentStatusStore } from "@/stores/agentStatus";
-import { useDevice } from "@/composables";
-import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { prettyDate } from "@/utils";
 import {
   ActivitiesSymbol,
   AgentOption,
@@ -228,8 +172,10 @@ import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
 import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
-import { HDAgent } from "@/types/doctypes";
-
+import { useAgentStatusStore } from "@/stores/agentStatus.ts";
+import { useAvailability } from "@/composables/useAvailability";
+import { prettyDate } from "@/utils.ts";
+import { Tooltip } from "frappe-ui";
 interface Props {
   hideLabel?: boolean;
 }
@@ -239,18 +185,20 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { hideLabel } = props;
-const { isMac } = useDevice();
-const { isMobileView } = useScreenSize();
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
 const activities = inject(ActivitiesSymbol)!;
 
 const { getUser } = useUserStore();
-const { currentStatus } = useAvailability();
-const agentStatusStore = useAgentStatusStore();
 const currentUser = computed(() => getUser("")); // empty string returns current user
+const agentStatusStore = useAgentStatusStore();
 const currentAgentName = (window as any).agent as string | null;
+
+// Current agent's status comes from the shared availability resource so it
+// stays in sync the moment they change it via the AvailabilityMenu, instead
+// of showing the value fetched when this dropdown first loaded.
+const { currentStatus, changedOn } = useAvailability();
 
 const searchText = ref("");
 const highlightedIndex = ref(0);
@@ -279,11 +227,10 @@ watch(
   { immediate: true, deep: true }
 );
 
-// Track whether the next close was triggered by Assign (commit) vs Cancel/outside-click (revert).
-const justConfirmed = ref(false);
-
+// Watch popover open/close — same pattern as old AssignToBody
 watch(popoverIsOpen, (isOpen) => {
   if (isOpen) {
+    // Opening: take snapshot
     hasBeenOpened.value = true;
     snapshotAssignees.value = localAssignees.value.map((a) => ({ ...a }));
     pinnedSelectedNames.value = new Set(
@@ -291,54 +238,20 @@ watch(popoverIsOpen, (isOpen) => {
     );
     searchText.value = "";
     highlightedIndex.value = 0;
-    availabilityFilter.value = "All";
     nextTick(() => {
       inputRef.value?.el?.focus();
     });
-    return;
-  }
-
-  if (!hasBeenOpened.value) return;
-  hasBeenOpened.value = false;
-  searchText.value = "";
-
-  if (justConfirmed.value) {
-    justConfirmed.value = false;
+  } else if (hasBeenOpened.value) {
+    // Closing after a real open: compute diff and save
+    hasBeenOpened.value = false;
+    searchText.value = "";
     const currentNames = localAssignees.value.map((a) => a.name);
     const oldNames = snapshotAssignees.value.map((a) => a.name);
     const added = currentNames.filter((n) => !oldNames.includes(n));
     const removed = oldNames.filter((n) => !currentNames.includes(n));
     saveAssignees(added, removed);
-  } else {
-    // Cancel / click-outside → revert to snapshot
-    localAssignees.value = snapshotAssignees.value.map((a) => ({ ...a }));
   }
 });
-
-function cancelAssignment() {
-  popoverIsOpen.value = false;
-}
-
-function confirmAssignment() {
-  justConfirmed.value = true;
-  popoverIsOpen.value = false;
-}
-
-function availabilitySubtitle(
-  availability?: string,
-  changedOn?: string
-): string {
-  if (!availability) return "";
-  const status = agentStatusStore.getStatus(availability);
-  if (!status) return "";
-  if (status.category === "Active") return __("Active now");
-
-  const label = __(availability);
-  const elapsed = changedOn
-    ? prettyDate(changedOn, true)?.toLocaleLowerCase()
-    : "";
-  return elapsed ? `${label} · ${elapsed}` : label;
-}
 
 const agentResource = createListResource({
   doctype: "HD Agent",
@@ -386,36 +299,24 @@ watch(searchText, (text) => {
   debouncedSearch(text);
 });
 
-const availabilityFilter = ref<string>("All");
-
-const availabilityFilters = computed(() => {
-  const counts: Record<string, number> = {};
-  for (const opt of agentOptions.value) {
-    if (opt.availability)
-      counts[opt.availability] = (counts[opt.availability] || 0) + 1;
+// For the logged-in agent, prefer the live status from the shared resource so
+// the dot/tooltip reflect a change made elsewhere this session.
+function liveAvailability(agent: {
+  name: string;
+  availability?: string;
+  availability_changed_on?: string;
+}) {
+  if (agent.name !== currentAgentName) {
+    return {
+      availability: agent.availability,
+      availability_changed_on: agent.availability_changed_on,
+    };
   }
-
-  const filters = [
-    {
-      value: "All",
-      label: __("All"),
-      count: agentOptions.value.length,
-      dotClass: "",
-    },
-  ];
-
-  const statuses = agentStatusStore.statuses.data || [];
-  for (const status of statuses) {
-    if (!status.enable) continue;
-    filters.push({
-      value: status.agent_status,
-      label: __(status.agent_status),
-      count: counts[status.agent_status] || 0,
-      dotClass: agentStatusStore.statusColor(status.agent_status),
-    });
-  }
-  return filters;
-});
+  return {
+    availability: currentStatus.value || agent.availability,
+    availability_changed_on: changedOn.value || agent.availability_changed_on,
+  };
+}
 
 const agentOptions = computed<AgentOption[]>(() => {
   const agents: AgentOption[] = [];
@@ -428,8 +329,7 @@ const agentOptions = computed<AgentOption[]>(() => {
       value: a.name,
       label: a.agent_name || getUser(a.name).full_name,
       image: a.user_image || getUser(a.name).user_image,
-      availability: currentStatus.value || a.availability,
-      availability_changed_on: a.availability_changed_on,
+      ...liveAvailability(a),
     });
     seen.add(a.name);
   }
@@ -441,8 +341,7 @@ const agentOptions = computed<AgentOption[]>(() => {
           value: agent.name,
           label: agent.agent_name || getUser(agent.name).full_name,
           image: agent.user_image || getUser(agent.name).user_image,
-          availability: agent.availability,
-          availability_changed_on: agent.availability_changed_on,
+          ...liveAvailability(agent),
         });
         seen.add(agent.name);
       }
@@ -471,7 +370,6 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
           value: a.name,
           label: a.label || user.full_name || a.name,
           image: a.image || user.user_image,
-          availability: a.availability,
         });
         seen.add(a.name);
       }
@@ -495,14 +393,28 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   }
 
   // If there are pinned assignees, show them first then current user, otherwise current user first
-  const ordered =
-    assigned.length > 0
-      ? [...assigned, ...selfOption, ...rest]
-      : [...selfOption, ...rest];
+  if (assigned.length > 0) {
+    return [...assigned, ...selfOption, ...rest];
+  }
 
-  if (availabilityFilter.value === "All") return ordered;
-  return ordered.filter((opt) => opt.availability === availabilityFilter.value);
+  return [...selfOption, ...rest];
 });
+
+function availabilitySubtitle(
+  availability?: string,
+  changedOn?: string
+): string {
+  if (!availability) return "";
+  const status = agentStatusStore.getStatus(availability);
+  if (!status) return "";
+  if (status.category === "Active") return __("Active now");
+
+  const label = __(availability);
+  const elapsed = changedOn
+    ? prettyDate(changedOn, true)?.toLocaleLowerCase()
+    : "";
+  return elapsed ? `${label} since ${elapsed}` : label;
+}
 
 function isSelected(agentName: string): boolean {
   return localAssignees.value.some((a) => a.name === agentName);
@@ -657,7 +569,6 @@ async function saveAssignees(added: string[], removed: string[]) {
           toast.warning(message);
         }
       }
-
       const addResult = await addAssigneesResource.submit(added);
       if (addResult?.exc) throw new Error(addResult.exc);
     }

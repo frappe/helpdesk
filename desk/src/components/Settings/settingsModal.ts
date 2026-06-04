@@ -15,7 +15,7 @@ import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
-import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
+import { FieldDependencyIcon, PhoneIcon, SlidersIcon } from "@/components/icons";
 import TelephonyPage from "./Telephony/TelephonyPage.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
@@ -26,6 +26,7 @@ import General from "./General/General.vue";
 import SettingsGear from "~icons/lucide/settings";
 import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
 import ProfilePage from "./Profile/ProfilePage.vue";
+import Preferences from "./Preferences/Preferences.vue";
 
 export const showSettingsModal = ref(false);
 
@@ -46,7 +47,12 @@ export const tabs = computed(() => {
             size: "xs",
           }),
           component: markRaw(ProfilePage),
-        }
+        },
+        {
+          label: __("Preferences"),
+          icon: markRaw(SlidersIcon),
+          component: markRaw(Preferences),
+        },
       ],
     },
     {
@@ -155,6 +161,7 @@ export const disableSettingModalOutsideClick = ref(false);
 
 type TabName =
   | "Profile"
+  | "Preferences"
   | "Email Accounts"
   | "Email Notifications"
   | "General"
