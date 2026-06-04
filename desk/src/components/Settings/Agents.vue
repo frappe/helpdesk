@@ -18,16 +18,18 @@
     <template #header-bottom>
       <div class="flex items-center gap-2 justify-between">
         <div class="relative grow">
-          <Input
+          <TextInput
             :model-value="search"
-            @input="search = $event"
+            @update:model-value="search = $event"
             :placeholder="__('Search')"
             type="text"
             class="focus:ring-0 border-outline-gray-2"
-            icon-left="lucide-search"
-            debounce="300"
-            inputClass="p-4 pe-12 rtl:pr-8"
-          />
+            :debounce="300"
+          >
+            <template #prefix>
+              <LucideSearch class="size-4" />
+            </template>
+          </TextInput>
           <Button
             v-if="search"
             icon="lucide-x"

@@ -17,7 +17,7 @@
                 *
               </span>
             </span>
-            <Input
+            <TextInput
               v-if="field.type === 'input'"
               v-model="state[field.value]"
               type="text"
@@ -56,7 +56,7 @@ import { computed, ref } from "vue";
 import {
   Dialog,
   ErrorMessage,
-  Input,
+  TextInput,
   createListResource,
   createResource,
   toast,

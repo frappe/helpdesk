@@ -4,7 +4,7 @@
       <template #default>
         <div class="space-y-4">
           <div class="space-y-1">
-            <Input
+            <TextInput
               v-model="state.customer"
               label="Customer Name"
               type="text"
@@ -12,7 +12,7 @@
             />
           </div>
           <div class="space-y-1">
-            <Input
+            <TextInput
               v-model="state.domain"
               label="Domain"
               type="text"
@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { Dialog, Input, createResource, toast } from "frappe-ui";
+import { Dialog, TextInput, createResource, toast } from "frappe-ui";
 import { reactive } from "vue";
 
 const emit = defineEmits(["customerCreated"]);

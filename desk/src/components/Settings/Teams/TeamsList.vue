@@ -20,16 +20,18 @@
       #header-bottom
     >
       <div class="relative">
-        <Input
+        <TextInput
           :model-value="teamsSearchQuery"
-          @input="teamsSearchQuery = $event"
+          @update:model-value="teamsSearchQuery = $event"
           :placeholder="__('Search')"
           type="text"
           class="focus:ring-0 border-outline-gray-2"
-          icon-left="lucide-search"
-          debounce="300"
-          inputClass="p-4 pe-12 rtl:pr-8"
-        />
+          :debounce="300"
+        >
+          <template #prefix>
+            <LucideSearch class="size-4" />
+          </template>
+        </TextInput>
         <Button
           v-if="teamsSearchQuery"
           icon="lucide-x"
@@ -133,7 +135,7 @@ import EmptyState from "@/components/EmptyState.vue";
 import { __ } from "@/translation";
 import { TeamListResourceSymbol } from "@/types";
 import { ConfirmDelete } from "@/utils";
-import { Dropdown, Input, toast } from "frappe-ui";
+import { Dropdown, TextInput, toast } from "frappe-ui";
 import { inject, markRaw, Ref, ref, watch } from "vue";
 import NewTeamModal from "../NewTeamModal.vue";
 import RenameTeamModal from "./RenameTeamModal.vue";

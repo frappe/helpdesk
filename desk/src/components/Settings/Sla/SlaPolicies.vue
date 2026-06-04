@@ -35,16 +35,18 @@
       #header-bottom
     >
       <div class="relative">
-        <Input
+        <TextInput
           :model-value="slaSearchQuery"
-          @input="slaSearchQuery = $event"
+          @update:model-value="slaSearchQuery = $event"
           :placeholder="__('Search')"
           type="text"
           class="focus:ring-0 border-outline-gray-2"
-          icon-left="lucide-search"
-          debounce="300"
-          inputClass="p-4 pe-12 rtl:pr-8"
-        />
+          :debounce="300"
+        >
+          <template #prefix>
+            <LucideSearch class="size-4" />
+          </template>
+        </TextInput>
         <Button
           v-if="slaSearchQuery"
           icon="lucide-x"

@@ -28,7 +28,11 @@
           />
         </div>
         <form class="w-full" @submit.prevent="update">
-          <Input v-model="domain" label="Domain" placeholder="example.com" />
+          <TextInput
+            v-model="domain"
+            label="Domain"
+            placeholder="example.com"
+          />
         </form>
       </div>
     </template>

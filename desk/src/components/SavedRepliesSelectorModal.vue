@@ -20,17 +20,19 @@
         <div class="p-4">
           <div class="flex items-center gap-2">
             <div class="relative w-full">
-              <Input
+              <TextInput
                 ref="searchInput"
                 :model-value="search"
-                @input="search = $event"
+                @update:model-value="search = $event"
                 :placeholder="__('Search')"
                 type="text"
                 class="focus:ring-0 border-outline-gray-2"
-                icon-left="lucide-search"
-                debounce="300"
-                inputClass="p-4 pe-12 rtl:pr-8"
-              />
+                :debounce="300"
+              >
+                <template #prefix>
+                  <LucideSearch class="size-4" />
+                </template>
+              </TextInput>
               <Button
                 v-if="search"
                 icon="lucide-x"
@@ -129,9 +131,9 @@ import {
   createResource,
   Dialog,
   Dropdown,
-  Input,
   LoadingIndicator,
   TextEditor,
+  TextInput,
 } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, nextTick, ref, watch } from "vue";
@@ -197,7 +199,7 @@ if (
 const emit = defineEmits(["apply"]);
 
 const search = ref("");
-const searchInput = ref<InstanceType<typeof Input>>();
+const searchInput = ref<InstanceType<typeof TextInput>>();
 const selectedTemplate = ref({
   name: "",
   isLoading: false,

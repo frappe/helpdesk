@@ -20,16 +20,18 @@
     <template #header-bottom>
       <div class="flex items-center gap-2 justify-between">
         <div class="relative w-full">
-          <Input
+          <TextInput
             :model-value="savedRepliesSearchQuery"
-            @input="savedRepliesSearchQuery = $event"
+            @update:model-value="savedRepliesSearchQuery = $event"
             :placeholder="__('Search')"
             type="text"
             class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-2"
-            icon-left="lucide-search"
-            debounce="300"
-            inputClass="p-4 pe-12 rtl:pr-8 "
-          />
+            :debounce="300"
+          >
+            <template #prefix>
+              <LucideSearch class="size-4" />
+            </template>
+          </TextInput>
           <Button
             v-if="savedRepliesSearchQuery"
             icon="lucide-x"
@@ -205,8 +207,8 @@ import {
   call,
   Dropdown,
   FeatherIcon,
-  Input,
   LoadingIndicator,
+  TextInput,
   toast,
 } from "frappe-ui";
 import { computed, inject, ref, Ref, watch } from "vue";
