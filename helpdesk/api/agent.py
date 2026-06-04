@@ -38,7 +38,7 @@ def get_availability_options() -> list[str]:
         filters={"enable": 1},
         fields=["agent_status", "order"],
     )
-    statuses.sort(key=lambda s: int(s.order) if s.order else 0)
+    statuses.sort(key=lambda s: s.order or 0)
     return [s.agent_status for s in statuses]
 
 

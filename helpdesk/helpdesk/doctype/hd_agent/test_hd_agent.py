@@ -20,6 +20,14 @@ class TestHDAgent(FrappeTestCase):
     def setUp(self):
         make_agent(self.test_user, first_name="Test User")
 
+    # a new agent defaults to the Active-category status (looked up, not hardcoded)
+    def test_new_agent_defaults_to_active_status(self):
+        agent = make_agent("defaults_active@test.com", first_name="Defaults Active")
+
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", agent, "availability"), "Active"
+        )
+
     def test_unauthorized_role_update(self):
         frappe.set_user(self.test_user)
 
@@ -107,6 +115,32 @@ class TestHDAgent(FrappeTestCase):
         )
 
         self.assertEqual(picked, away_user)
+
+    # A custom status under the Away category is tiered as away, not active
+    def test_round_robin_uses_category_not_status_name(self):
+        if not frappe.db.exists("HD Agent Status", "Lunch"):
+            frappe.get_doc(
+                {
+                    "doctype": "HD Agent Status",
+                    "agent_status": "Lunch",
+                    "category": "Away",
+                    "enable": 1,
+                    "order": 5,
+                }
+            ).insert()
+
+        active_user = make_agent("cat_active@test.com", first_name="Cat Active")
+        lunch_user = make_agent("cat_lunch@test.com", first_name="Cat Lunch")
+        _set_agent_availability(active_user, "Active")
+        _set_agent_availability(lunch_user, "Lunch")
+
+        assignment_rule = self._make_assignment_rule(
+            "Test AR Category Away", [lunch_user, active_user], "Round Robin"
+        )
+
+        picked = assignment_rule.get_user(make_ticket(subject="RR category away"))
+
+        self.assertEqual(picked, active_user)
 
     # Load Balancing: away user is excluded from the candidate pool
     def test_load_balancing_skips_away_agent(self):

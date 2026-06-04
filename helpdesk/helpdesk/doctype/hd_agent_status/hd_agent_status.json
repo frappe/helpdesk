@@ -24,7 +24,7 @@
   },
   {
    "fieldname": "order",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "order"
   },
   {
@@ -35,7 +35,8 @@
    "fieldname": "category",
    "fieldtype": "Select",
    "label": "Category",
-   "options": "Active\nAway\nUnavailable"
+   "options": "Active\nAway\nUnavailable",
+   "reqd": 1
   },
   {
    "fieldname": "color",
