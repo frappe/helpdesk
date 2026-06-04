@@ -264,7 +264,7 @@ const sections = computed(() => {
 });
 
 function getStatusColor(status: string) {
-  let { color } = getStatus(status);
+  const { color } = getStatus(status) ?? {};
   return colorMap[color] ?? colorMap["Default"];
 }
 
