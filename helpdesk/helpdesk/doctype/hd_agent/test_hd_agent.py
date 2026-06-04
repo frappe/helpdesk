@@ -1,12 +1,10 @@
 # Copyright (c) 2022, Frappe Technologies and Contributors
 # See license.txt
 
-from unittest.mock import patch
-
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
-from helpdesk.api.agent import set_my_availability
+from helpdesk.api.agent import get_my_availability, set_my_availability
 from helpdesk.helpdesk.doctype.hd_agent.hd_agent import update_agent_role
 from helpdesk.test_utils import make_agent, make_team, make_ticket
 
@@ -59,13 +57,35 @@ class TestHDAgent(FrappeTestCase):
     def test_set_my_availability_persists_value(self):
         frappe.set_user(self.test_user)
 
-        result = set_my_availability("Busy")
+        result = set_my_availability("Away")
 
-        self.assertEqual(result["availability"], "Busy")
+        self.assertEqual(result["availability"], "Away")
         stored = frappe.db.get_value(
-            "HD Agent", {"user": self.test_user}, "availability"
+            "HD Agent",
+            {"user": self.test_user},
+            ["availability", "availability_changed_on"],
+            as_dict=True,
         )
-        self.assertEqual(stored, "Busy")
+        self.assertEqual(stored.availability, "Away")
+        self.assertIsNotNone(stored.availability_changed_on)
+
+    # an availability that is not a configured HD Agent Status is rejected
+    def test_set_my_availability_rejects_invalid_status(self):
+        frappe.set_user(self.test_user)
+
+        with self.assertRaises(frappe.ValidationError):
+            set_my_availability("Not A Status")
+
+    # get_my_availability returns the agent's status, when it changed, and options
+    def test_get_my_availability_returns_status_and_options(self):
+        frappe.set_user(self.test_user)
+        set_my_availability("Away")
+
+        result = get_my_availability()
+
+        self.assertEqual(result["availability"], "Away")
+        self.assertIsNotNone(result["availability_changed_on"])
+        self.assertIn("Away", result["options"])
 
     def _make_assignment_rule(self, team_name: str, members: list[str], rule: str):
         team = make_team(team_name, members)
@@ -94,35 +114,26 @@ class TestHDAgent(FrappeTestCase):
 
         self.assertEqual(picked, active_user)
 
-    # Active agent is preferred over a Busy one when both are in the pool
-    def test_round_robin_prefers_active_over_busy(self):
-        active_user = make_agent("rr_active_over_busy@test.com", first_name="RR Active")
-        busy_user = make_agent("rr_busy@test.com", first_name="RR Busy")
-        _set_agent_availability(active_user, "Active")
-        _set_agent_availability(busy_user, "Busy")
-
-        assignment_rule = self._make_assignment_rule(
-            "Test AR Active Over Busy", [busy_user, active_user], "Round Robin"
+    # Away agent is preferred over an Unavailable one if no Active is available
+    def test_round_robin_prefers_away_over_unavailable(self):
+        away_user = make_agent("rr_away_over_unavail@test.com", first_name="RR Away")
+        unavailable_user = make_agent(
+            "rr_unavailable@test.com", first_name="RR Unavailable"
         )
-
-        picked = assignment_rule.get_user(make_ticket(subject="RR active over busy"))
-
-        self.assertEqual(picked, active_user)
-
-    # Busy agent is still preferred over an Away one if no Active is available
-    def test_round_robin_prefers_busy_over_away(self):
-        busy_user = make_agent("rr_busy_over_away@test.com", first_name="RR Busy")
-        away_user = make_agent("rr_away_when_busy@test.com", first_name="RR Away")
-        _set_agent_availability(busy_user, "Busy")
         _set_agent_availability(away_user, "Away")
+        _set_agent_availability(unavailable_user, "Unavailable")
 
         assignment_rule = self._make_assignment_rule(
-            "Test AR Busy Over Away", [away_user, busy_user], "Round Robin"
+            "Test AR Away Over Unavailable",
+            [unavailable_user, away_user],
+            "Round Robin",
         )
 
-        picked = assignment_rule.get_user(make_ticket(subject="RR busy over away"))
+        picked = assignment_rule.get_user(
+            make_ticket(subject="RR away over unavailable")
+        )
 
-        self.assertEqual(picked, busy_user)
+        self.assertEqual(picked, away_user)
 
     # Load Balancing: away user is excluded from the candidate pool
     def test_load_balancing_skips_away_agent(self):
