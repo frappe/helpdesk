@@ -30,16 +30,11 @@
       </template>
 
       <template #item-prefix="{ item }">
-        <FeatherIcon
-          v-if="item.icon && typeof item.icon === 'string'"
-          :name="item.icon"
+        <Icon
+          v-if="item.icon"
+          :icon="item.icon"
           class="h-4 w-4 flex-shrink-0 text-ink-gray-7"
           aria-hidden="true"
-        />
-        <component
-          class="h-4 w-4 flex-shrink-0 text-ink-gray-7"
-          v-else-if="item.icon"
-          :is="item.icon"
         />
       </template>
 
@@ -82,8 +77,9 @@
 </template>
 
 <script setup>
+import Icon from "@/components/Icon.vue";
 import { useScreenSize } from "@/composables/screen";
-import { Badge, Dropdown } from "frappe-ui";
+import { Badge, Dropdown, FeatherIcon } from "frappe-ui";
 import { useRoute } from "vue-router";
 
 const props = defineProps({
