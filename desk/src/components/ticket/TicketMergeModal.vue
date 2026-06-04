@@ -6,20 +6,26 @@
     <template #body-content>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-8">
-          {{ __("All comments and emails of the ticket will be moved to the") }}
-          <span class="whitespace-nowrap font-semibold"
-            >#{{ ticket.name }}</span
-          >
-          <span class="inline-flex items-center gap-1">
-            selected ticket
-            <Popover trigger="hover" :hoverDelay="0.25" placement="right">
+          {{
+            __(
+              "All comments and emails from both tickets will be merged into the selected ticket"
+            )
+          }}
+          <span class="whitespace-nowrap font-semibold">
+            #{{ ticket.name
+            }}<Popover
+              trigger="hover"
+              :hoverDelay="0.25"
+              :placement="isRtl ? 'left' : 'right'"
+              class="!inline-flex align-middle ms-1 -mt-1"
+            >
               <template #target>
                 <FeatherIcon name="info" class="size-4 cursor-pointer" />
               </template>
 
               <template #body-main>
                 <div
-                  class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
+                  class="text-sm text-ink-gray-6 p-2.5 bg-surface-white rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
                 >
                   <span class="text-p-base">
                     {{
@@ -49,9 +55,9 @@
         <Link
           class="form-control"
           doctype="HD Ticket"
-          placeholder="Select Ticket"
+          :placeholder="__('Select Ticket')"
           :filters="getDefaultFilters()"
-          label="Ticket"
+          :label="__('Ticket')"
           :page-length="10"
           :value="targetTicket"
           :show-description="true"
@@ -59,7 +65,7 @@
         />
         <FormControl
           v-if="targetTicket"
-          label="Ticket Subject"
+          :label="__('Ticket Subject')"
           type="text"
           v-model="subject"
           :disabled="true"
@@ -95,6 +101,7 @@
 
 <script setup lang="ts">
 import { Link } from "@/components";
+import { __ } from "@/translation";
 import { HDTicket } from "@/types/doctypes";
 import {
   Dialog,
@@ -119,6 +126,8 @@ interface E {
 const props = defineProps<Props>();
 const emit = defineEmits<E>();
 const showDialog = defineModel<boolean>();
+
+const isRtl = document.documentElement.dir === "rtl";
 
 const mergeConditions = [
   {
@@ -179,11 +188,11 @@ const mergeTicket = createResource({
     };
   },
   validate({ source, target }) {
-    if (!source) throw { message: "Category is required" };
-    if (!target) throw { message: "Ticket to merged with is required" };
+    if (!source) throw { message: __("Category is required") };
+    if (!target) throw { message: __("Ticket to merged with is required") };
   },
   onSuccess: () => {
-    toast.success("Ticket merged successfully.");
+    toast.success(__("Ticket merged successfully."));
     emit("update");
 
     showDialog.value = false;

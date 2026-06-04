@@ -110,25 +110,7 @@
                   :modelValue="isSelected(agent.value)"
                   class="flex-shrink-0"
                 />
-                <div class="relative flex-shrink-0">
-                  <Tooltip
-                    placement="top"
-                    :text="
-                      availabilitySubtitle(
-                        agent.availability,
-                        agent.availability_changed_on
-                      )
-                    "
-                  >
-                    <UserAvatar :name="agent.value" size="sm" />
-                  </Tooltip>
-                  <div
-                    class="absolute bottom-0 -right-0.5 size-2 rounded-full outline outline-white outline-1.5"
-                    :class="
-                      agentStatusStore.statusColor(agent.availability || '')
-                    "
-                  />
-                </div>
+                <UserAvatar :name="agent.value" size="sm" class="" />
                 <span class="text-ink-gray-7 flex-1 text-start truncate">
                   {{ agent.label }}
                 </span>

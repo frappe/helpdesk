@@ -3,7 +3,7 @@
     class="flex items-center cursor-pointer hover:bg-surface-menu-bar rounded"
   >
     <div
-      class="w-full pl-2 flex flex-col justify-center h-14"
+      class="w-full ps-2 flex flex-col justify-center h-14"
       @click="holidayListActiveScreen = { screen: 'view', data: data }"
     >
       <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
@@ -14,7 +14,7 @@
         {{ data.description }}
       </div>
     </div>
-    <div class="flex justify-between items-center pr-2">
+    <div class="flex justify-between items-center pe-2">
       <div>
         <Dropdown placement="right" :options="dropdownOptions">
           <Button

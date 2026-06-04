@@ -1,5 +1,5 @@
 <template>
-  <div v-if="_avatars?.length" class="mr-1.5 flex cursor-pointer items-center">
+  <div v-if="_avatars?.length" class="me-1.5 flex cursor-pointer items-center">
     <div
       v-if="_avatars?.length == 1"
       class="flex items-center gap-2 text-base line-clamp-1"

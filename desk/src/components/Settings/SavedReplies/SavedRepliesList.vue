@@ -14,6 +14,7 @@
         variant="solid"
         @click="goToNew()"
         icon-left="plus"
+        class="rtl:flex-row-reverse"
       />
     </template>
     <template #header-bottom>
@@ -24,17 +25,17 @@
             @input="savedRepliesSearchQuery = $event"
             :placeholder="__('Search')"
             type="text"
-            class="focus:ring-0 border-outline-gray-2"
+            class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-2"
             icon-left="search"
             debounce="300"
-            inputClass="p-4 pr-12"
+            inputClass="p-4 pe-12 rtl:pr-8 "
           />
           <Button
             v-if="savedRepliesSearchQuery"
             icon="x"
             variant="ghost"
             @click="savedRepliesSearchQuery = ''"
-            class="absolute right-1 top-1/2 -translate-y-1/2"
+            class="absolute end-1 top-1/2 -translate-y-1/2"
           />
         </div>
         <Dropdown :options="filterOptions" placement="right">
@@ -74,7 +75,7 @@
     <template #content>
       <div
         v-if="savedRepliesListResource?.list?.loading"
-        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
+        class="flex items-center justify-center my-auto"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -85,18 +86,18 @@
         "
         variant="badge"
         :icon="SavedReplyIcon"
-        title="No saved replies found"
-        description="Add one to get started."
+        :title="__('No saved replies found')"
+        :description="__('Add one to get started.')"
       />
       <div
         v-if="
           !savedRepliesListResource?.list?.loading &&
           savedRepliesListResource?.data?.length
         "
-        class="-ml-2"
+        class="-ms-2"
       >
         <div
-          class="grid grid-cols-12 items-center gap-3 text-sm text-ink-gray-5 ml-2"
+          class="grid grid-cols-12 items-center gap-3 text-sm text-ink-gray-5 ms-2"
         >
           <div class="col-span-7">{{ __("Title") }}</div>
           <div class="col-span-2">{{ __("Owner") }}</div>
@@ -141,7 +142,7 @@
               }}</span>
             </div>
             <div
-              class="flex justify-between items-center w-full pr-2 col-span-3"
+              class="flex justify-between items-center w-full pe-2 col-span-3"
             >
               <div class="flex items-center gap-1 text-sm text-ink-gray-7">
                 <component
@@ -158,7 +159,7 @@
                   icon="more-horizontal"
                   variant="ghost"
                   @click="isConfirmingDelete = false"
-                  class="mr-2"
+                  class="me-2"
                 />
               </Dropdown>
             </div>
@@ -212,7 +213,6 @@ import { computed, inject, ref, Ref, watch } from "vue";
 import { __ } from "@/translation";
 import { ConfirmDelete } from "@/utils";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
-import EmptyState from "@/components/EmptyState.vue";
 import { activeFilter } from "./savedReplies";
 import { useUserStore } from "../../../stores/user";
 import UserIcon from "~icons/lucide/user";

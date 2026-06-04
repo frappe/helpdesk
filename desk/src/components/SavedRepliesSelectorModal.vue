@@ -30,14 +30,14 @@
                 class="focus:ring-0 border-outline-gray-2"
                 icon-left="search"
                 debounce="300"
-                inputClass="p-4 pr-12"
+                inputClass="p-4 pe-12 rtl:pr-8"
               />
               <Button
                 v-if="search"
                 icon="x"
                 variant="ghost"
                 @click="search = ''"
-                class="absolute right-1 top-1/2 -translate-y-1/2"
+                class="absolute end-1 top-1/2 -translate-y-1/2"
               />
             </div>
             <Dropdown :options="filters" placement="right">
@@ -89,7 +89,7 @@
                   selectedTemplate.name === template.name &&
                   selectedTemplate.isLoading
                 "
-                class="flex items-center justify-center absolute top-0 left-0 w-full h-full bg-surface-gray-7/20 rounded-lg"
+                class="flex items-center justify-center absolute top-0 start-0 w-full h-full bg-surface-gray-7/20 rounded-lg"
               >
                 <LoadingIndicator class="size-4" />
               </div>

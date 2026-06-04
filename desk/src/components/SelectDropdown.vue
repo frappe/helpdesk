@@ -37,7 +37,7 @@
             <FeatherIcon
               v-if="model == option.value"
               name="check"
-              class="size-4 ml-2"
+              class="size-4 ms-2"
             />
           </div>
         </div>
