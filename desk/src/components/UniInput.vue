@@ -6,7 +6,7 @@
         *
       </span>
     </span>
-    <div class="flex gap-2 items-center">
+    <div class="flex gap-2 items-center [&>div]:flex-1">
       <component
         class="w-full"
         :is="component"

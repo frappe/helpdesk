@@ -1,73 +1,79 @@
 <template>
-  <Dialog :title="options.title" :actions="options.actions">
-    <template #default>
-      <div class="flex flex-col items-center gap-4 p-6">
-        <div class="text-xl font-medium text-ink-gray-9">
-          {{ contact.doc?.full_name }}
-        </div>
-        <Avatar
-          size="2xl"
-          :label="contact.doc?.full_name"
-          :image="contact.doc?.image"
-          class="cursor-pointer hover:opacity-80"
+  <Dialog bare>
+    <div class="flex flex-col items-center gap-4 p-6">
+      <div class="text-xl font-medium text-ink-gray-9">
+        {{ contact.doc?.full_name }}
+      </div>
+      <Avatar
+        size="2xl"
+        :label="contact.doc?.full_name"
+        :image="contact.doc?.image"
+        class="cursor-pointer hover:opacity-80"
+      />
+      <div class="flex gap-2">
+        <FileUploader
+          :validate-file="validateFile"
+          @success="(file:File) => updateImage(file)"
+        >
+          <template #default="{ uploading, openFileSelector }">
+            <Button
+              :label="
+                contact.doc?.image ? __('Change photo') : __('Upload photo')
+              "
+              :loading="uploading"
+              @click="openFileSelector"
+            />
+          </template>
+        </FileUploader>
+        <Button
+          v-if="contact.doc?.image"
+          :label="__('Remove photo')"
+          @click="updateImage(null)"
         />
-        <div class="flex gap-2">
-          <FileUploader
-            :validate-file="validateFile"
-            @success="(file:File) => updateImage(file)"
-          >
-            <template #default="{ uploading, openFileSelector }">
-              <Button
-                :label="
-                  contact.doc?.image ? __('Change photo') : __('Upload photo')
-                "
-                :loading="uploading"
-                @click="openFileSelector"
-              />
-            </template>
-          </FileUploader>
-          <Button
-            v-if="contact.doc?.image"
-            :label="__('Remove photo')"
-            @click="updateImage(null)"
-          />
-          <Button
-            v-if="!contact.doc?.user && isManager"
-            :label="__('Invite as user')"
-            @click="inviteContact"
-            :loading="isLoading"
+        <Button
+          v-if="!contact.doc?.user && isManager"
+          :label="__('Invite as user')"
+          @click="inviteContact"
+          :loading="isLoading"
+        />
+      </div>
+      <div class="w-full space-y-2 text-sm text-ink-gray-7">
+        <div class="space-y-1">
+          <div class="text-xs">{{ __("Emails") }}</div>
+          <MultiSelect
+            v-model:items="emails"
+            placeholder="john.doe@example.com"
+            :validate="validateEmail"
           />
         </div>
-        <div class="w-full space-y-2 text-sm text-ink-gray-7">
-          <div class="space-y-1">
-            <div class="text-xs">{{ __("Emails") }}</div>
-            <MultiSelect
-              v-model:items="emails"
-              placeholder="john.doe@example.com"
-              :validate="validateEmail"
-            />
-          </div>
-          <div class="space-y-1">
-            <div class="text-xs">{{ __("Phone Nos") }}</div>
-            <MultiSelect
-              v-model:items="phones"
-              placeholder="+91 98765 43210"
-              :validate="validatePhone"
-            />
-          </div>
-          <div class="space-y-1">
-            <div class="text-xs">{{ __("Customer") }}</div>
-            <Link
-              doctype="HD Customer"
-              class="form-control flex-1"
-              :placeholder="__('Link to a customer')"
-              v-model="selectedCustomer"
-              :hide-me="true"
-            />
-          </div>
+        <div class="space-y-1">
+          <div class="text-xs">{{ __("Phone Nos") }}</div>
+          <MultiSelect
+            v-model:items="phones"
+            placeholder="+91 98765 43210"
+            :validate="validatePhone"
+          />
+        </div>
+        <div class="space-y-1">
+          <div class="text-xs">{{ __("Customer") }}</div>
+          <Link
+            doctype="HD Customer"
+            class="form-control flex-1"
+            :placeholder="__('Link to a customer')"
+            v-model="selectedCustomer"
+            :hide-me="true"
+          />
         </div>
       </div>
-    </template>
+      <Button
+        class="w-full"
+        variant="solid"
+        theme="gray"
+        :label="__('Save')"
+        :loading="contact.setValue.loading"
+        @click="update"
+      />
+    </div>
   </Dialog>
 </template>
 
@@ -227,18 +233,6 @@ const contact = createDocumentResource({
     },
   },
 });
-
-const options = computed(() => ({
-  title: contact.doc?.name,
-  actions: [
-    {
-      label: __("Save"),
-      theme: "gray",
-      variant: "solid",
-      onClick: () => update(),
-    },
-  ],
-}));
 
 function update(): void {
   if (!isDirty.value) {
