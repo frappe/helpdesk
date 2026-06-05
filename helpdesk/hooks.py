@@ -89,6 +89,9 @@ doc_events = {
         "on_update": "helpdesk.integrations.erpnext.doc_share.on_update",
         "on_trash": "helpdesk.integrations.erpnext.doc_share.on_trash",
     },
+    "Notification Log": {
+        "before_insert": "helpdesk.extends.notification_log.before_insert",
+    },
 }
 
 has_permission = {
