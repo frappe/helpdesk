@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="showDialog" :options="{ title: 'Move To', actions }">
-    <template #body-content>
+  <Dialog v-model:open="showDialog" title="Move To" :actions="actions">
+    <template #default>
       <div class="flex flex-col flex-1 gap-3">
         <Link
           ref="linkRef"

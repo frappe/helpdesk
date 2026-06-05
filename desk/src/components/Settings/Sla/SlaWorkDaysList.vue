@@ -40,7 +40,7 @@
       variant="subtle"
       label="Add row"
       @click="addWorkDay"
-      icon-left="plus"
+      icon-left="lucide-plus"
     />
     <ErrorMessage :message="slaDataErrors.support_and_resolution" />
   </div>

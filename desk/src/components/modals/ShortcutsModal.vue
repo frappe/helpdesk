@@ -1,9 +1,6 @@
 <template>
-  <Dialog
-    v-model="open"
-    :options="{ title: __('Keyboard Shortcuts'), size: '4xl' }"
-  >
-    <template #body-content>
+  <Dialog v-model:open="open" :title="__('Keyboard Shortcuts')" size="4xl">
+    <template #default>
       <div class="w-full grid grid-cols-2 gap-10 py-1 shortcutsModal">
         <div
           v-for="group in shortcutGroups"

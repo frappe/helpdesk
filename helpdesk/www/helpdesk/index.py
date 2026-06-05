@@ -47,6 +47,7 @@ def get_boot():
             },
             "lang": frappe.local.lang,
             "dir": "rtl" if is_rtl() else "ltr",
+            "apps": frappe.get_installed_apps(),
         }
     )
 

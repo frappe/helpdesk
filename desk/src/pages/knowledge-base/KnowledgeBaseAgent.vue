@@ -103,7 +103,7 @@ const generalCategory = createResource({
 const headerOptions = [
   {
     label: __("Category"),
-    icon: "folder",
+    icon: "lucide-folder",
     onClick: () => {
       resetState();
       editTitle.value = false;
@@ -112,7 +112,7 @@ const headerOptions = [
   },
   {
     label: __("Article"),
-    icon: "file-text",
+    icon: "lucide-file-text",
     onClick: () => {
       router.push({
         name: "NewArticle",
@@ -130,7 +130,7 @@ const headerOptions = [
 const groupByActions = [
   {
     label: __("Add New Article"),
-    icon: "plus",
+    icon: "lucide-plus",
     onClick: (groupedRow) => {
       router.push({
         name: "NewArticle",
@@ -145,7 +145,7 @@ const groupByActions = [
   },
   {
     label: __("Edit Title"),
-    icon: "edit",
+    icon: "lucide-edit",
     onClick: (groupedRow) => {
       editTitle.value = true;
       showCategoryModal.value = true;
@@ -165,7 +165,7 @@ const groupByActions = [
   },
   {
     label: __("Share"),
-    icon: "link",
+    icon: "lucide-link",
     onClick: async ({ group }) => {
       const { label, value } = group;
       const url = new URL(window.location.href);
@@ -178,7 +178,7 @@ const groupByActions = [
   },
   {
     label: __("Delete"),
-    icon: "trash-2",
+    icon: "lucide-trash-2",
     onClick: (groupedRow) => {
       handleCategoryDelete(groupedRow);
     },
@@ -189,7 +189,7 @@ const listSelections = ref(new Set());
 const selectBannerActions = [
   {
     label: __("Move To"),
-    icon: "corner-up-right",
+    icon: "lucide-corner-up-right",
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       moveToModal.value = true;
@@ -197,7 +197,7 @@ const selectBannerActions = [
   },
   {
     label: __("Delete"),
-    icon: "trash-2",
+    icon: "lucide-trash-2",
     onClick: (selections: Set<string>) => {
       listSelections.value = selections;
       $dialog({

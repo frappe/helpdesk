@@ -14,7 +14,7 @@
         class="rtl:flex-row-reverse"
         variant="solid"
         @click="emit('update:step', 'email-add')"
-        icon-left="plus"
+        icon-left="lucide-plus"
       />
     </template>
     <template #content>

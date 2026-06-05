@@ -4,7 +4,7 @@
       <template #target="{ togglePopover }">
         <Button
           variant="subtle"
-          icon-left="plus"
+          icon-left="lucide-plus"
           @click="togglePopover()"
           :label="__('Add Assignee')"
           class="rtl:flex-row-reverse"
@@ -83,7 +83,7 @@
             <Button
               variant="ghost"
               class="w-full rtl:flex-row-reverse"
-              icon-left="plus"
+              icon-left="lucide-plus"
               :label="__('Invite agent')"
               @click="inviteAgents"
             />

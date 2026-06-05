@@ -93,7 +93,7 @@
 
 <script setup lang="ts">
 import { UserAvatar } from "@/components";
-import { dayjs } from "@/dayjs";
+import { dayjs } from "frappe-ui";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { Notification } from "@/types";

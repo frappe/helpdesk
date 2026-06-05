@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="show">
-    <template #body>
+  <Dialog v-model:open="show" bare>
+    <template #default>
       <div class="bg-surface-modal px-4 pb-6 pt-5 sm:px-6">
         <div class="mb-5 flex items-center justify-between">
           <div>
@@ -14,13 +14,13 @@
               variant="ghost"
               class="w-7"
               @click="openCallLogModal"
-              icon="edit"
+              icon="lucide-edit"
             />
             <Button
               variant="ghost"
               class="w-7"
               @click="show = false"
-              icon="x"
+              icon="lucide-x"
             />
           </div>
         </div>
@@ -98,10 +98,9 @@ import ContactsIcon from "@/components/icons/ContactsIcon.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 import TicketIcon from "@/components/icons/TicketIcon.vue";
-import { FeatherIcon, Avatar, Tooltip, createResource } from "frappe-ui";
+import { FeatherIcon, Avatar, Tooltip, createResource, dayjs } from "frappe-ui";
 import { computed, h, nextTick, ref, watch } from "vue";
 import { formatDate } from "@vueuse/core";
-import dayjs from "dayjs";
 import { timeAgo } from "@/utils";
 import { statusColorMap, statusLabelMap } from "./utils";
 import { useAuthStore } from "@/stores/auth";
@@ -215,7 +214,7 @@ function getCallLogDetail(row, log, columns = []) {
   if (row === "duration") {
     return {
       label: log._duration,
-      icon: "clock",
+      icon: "lucide-clock",
     };
   } else if (row === "caller") {
     return {

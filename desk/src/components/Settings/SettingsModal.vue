@@ -1,10 +1,11 @@
 <template>
   <Dialog
-    v-model="show"
-    :options="{ size: '5xl' }"
-    :disableOutsideClickToClose="disableSettingModalOutsideClick"
+    v-model:open="show"
+    size="5xl"
+    bare
+    :dismissible="!disableSettingModalOutsideClick"
   >
-    <template #body>
+    <template #default>
       <div
         class="flex z-50 overflow-hidden"
         :style="{ height: 'calc(100vh - 8rem)' }"
