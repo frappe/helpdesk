@@ -16,7 +16,15 @@
       </div>
     </template>
     <template #content>
-      <div class="flex flex-col gap-4">
+      <!-- Loading State -->
+      <div
+        v-if="syncInfoResource.loading && !syncInfoResource.data"
+        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
+      >
+        <LoadingIndicator class="w-4" />
+      </div>
+      <div v-else class="flex flex-col gap-4">
+        <!-- ERPNext not installed -->
         <div class="flex items-center justify-between gap-4">
           <div class="flex min-w-0 items-center gap-3">
             <ErpnextIcon
@@ -131,7 +139,14 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { Error } from "@/types";
-import { Badge, Button, Switch, createResource, toast } from "frappe-ui";
+import {
+  Badge,
+  Button,
+  LoadingIndicator,
+  Switch,
+  createResource,
+  toast,
+} from "frappe-ui";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import LucideRefreshCw from "~icons/lucide/refresh-cw";
@@ -144,6 +159,7 @@ const isSyncing = ref(false);
 
 const syncInfoResource = createResource({
   url: "helpdesk.integrations.erpnext.api.get_sync_info",
+  cache: ["Customers-Sync-Info"],
   onSuccess(data: any) {
     erpnextIntegrationEnabled.value = Boolean(data?.enabled);
   },
