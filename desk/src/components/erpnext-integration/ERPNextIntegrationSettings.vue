@@ -56,19 +56,16 @@
           class="flex items-center gap-2 text-p-sm text-ink-gray-7"
         >
           <span>
+            {{ __("Install the") }}
             <a
               href="https://frappe.io/cloud/install"
               target="_blank"
               rel="noopener noreferrer"
               class="font-medium text-ink-gray-8 underline underline-offset-2 hover:text-ink-gray-9"
             >
-              {{ __("Here is how") }}
+              {{ __("ERPNext app") }}
             </a>
-            {{
-              __(
-                "you can install the ERPNext app on your site to use this integration."
-              )
-            }}
+            {{ __("to enable this integration.") }}
           </span>
         </div>
 
