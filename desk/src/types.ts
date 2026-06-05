@@ -725,5 +725,6 @@ declare global {
     session_user: string;
     timezone: Record<"user" | "system", string>;
     agent: string | null;
+    apps: string[];
   }
 }
