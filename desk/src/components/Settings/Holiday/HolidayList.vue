@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="holidayList.list.loading && !holidayList.list.data"
-    class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
+    class="flex items-center justify-center absolute inset-x-0 top-5.5 bottom-0"
   >
     <LoadingIndicator class="w-4" />
   </div>
