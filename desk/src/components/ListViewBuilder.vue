@@ -2,8 +2,13 @@
   <!-- View Controls -->
   <div
     :class="[
+<<<<<<< HEAD
       'flex items-center justify-between gap-2 px-5 pb-4 pt-3 ',
       list?.data?.data?.length > 0 ? 'relative' : 'absolute w-[stretch]',
+=======
+      'flex items-center justify-between gap-2 px-5 pb-4 pt-4',
+      list?.data?.data?.length > 0 ? 'relative' : 'absolute inset-x-0',
+>>>>>>> 3f4abcd4 (fix: empty state fix for cross browser compatibility)
     ]"
     v-if="showViewControls"
   >
