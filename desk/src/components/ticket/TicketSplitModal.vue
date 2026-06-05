@@ -1,6 +1,6 @@
 <template>
-  <Dialog :options="{ title: `Split ticket` }" v-model="showDialog">
-    <template #body-content>
+  <Dialog title="Split ticket" v-model:open="showDialog">
+    <template #default>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-8">
           {{ __("All") }}

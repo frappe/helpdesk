@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="show" :options="{ title: __('Export') }">
-    <template #body-content>
+  <Dialog v-model:open="show" :title="__('Export')">
+    <template #default>
       <FormControl
         v-model="form.export_type"
         variant="outline"

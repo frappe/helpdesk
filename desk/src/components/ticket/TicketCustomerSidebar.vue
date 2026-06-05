@@ -113,11 +113,10 @@
 </template>
 
 <script setup lang="ts">
-import { dayjs } from "@/dayjs";
 import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
 import { dateFormat, dateTooltipFormat, formatTime } from "@/utils";
-import { Avatar, Tooltip } from "frappe-ui";
+import { Avatar, dayjs, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 
 const emit = defineEmits(["open"]);

@@ -2,10 +2,10 @@
   <NestedPopover>
     <template #target>
       <Button :label="__('Columns')">
-        <template v-if="hideLabel">
+        <template v-if="hideLabel" #icon>
           <ColumnsIcon class="h-4" />
         </template>
-        <template v-if="!hideLabel" #prefix>
+        <template v-else #prefix>
           <ColumnsIcon class="h-4" />
         </template>
       </Button>

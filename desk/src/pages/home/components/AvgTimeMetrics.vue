@@ -11,7 +11,10 @@
           placement="right"
         >
           <template #default>
-            <Button :label="currentDurationLabel" icon-right="chevron-down" />
+            <Button
+              :label="currentDurationLabel"
+              icon-right="lucide-chevron-down"
+            />
           </template>
           <template #item-label="{ item }">
             <span>
@@ -30,12 +33,13 @@
         <DateRangePicker
           v-else
           ref="datePickerRef"
-          v-model="customDateRange"
+          :model-value="customDateRange ? customDateRange.split(',') : []"
           :placeholder="__('Select range')"
           @update:model-value="onCustomRangeSelected"
           :format="'MMM D'"
           @click="datePickerRef?.open()"
-          placement="bottom-end"
+          side="bottom"
+          align="end"
           class="!w-48"
         />
       </div>
@@ -203,15 +207,15 @@ const durationOptions = computed(() => [
   },
 ]);
 
-const onCustomRangeSelected = (range: string) => {
-  if (!range) {
+const onCustomRangeSelected = (range: string[]) => {
+  if (!range?.length) {
     currentDuration.value = "6m";
     customDateRange.value = undefined;
     getAvgTimeMetricsResource.submit();
     return;
   }
   currentDuration.value = "custom_range";
-  customDateRange.value = range;
+  customDateRange.value = range.join(",");
   getAvgTimeMetricsResource.submit();
 };
 

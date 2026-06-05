@@ -11,7 +11,7 @@
           :label="__('Preview')"
           size="sm"
           @click="onShowPreview()"
-          icon-left="eye"
+          icon-left="lucide-eye"
           :disabled="
             Boolean(
               !savedReplyData.message?.replace(/<[^>]*>/g, '')?.trim()?.length
@@ -61,19 +61,8 @@
               required
               class="w-full"
             >
-              <template #prefix>
-                <component
-                  :is="getScopeIcon(savedReplyData.scope)"
-                  class="size-4 text-ink-gray-9"
-                />
-              </template>
-              <template #label="{ option }">
-                <div class="flex gap-2 items-center cursor-pointer">
-                  <component :is="option.icon" class="size-4 text-ink-gray-9" />
-                  <span>
-                    {{ option.label }}
-                  </span>
-                </div>
+              <template #item-prefix="{ item }">
+                <component :is="item.icon" class="size-4 text-ink-gray-9" />
               </template>
             </Select>
             <FormLabel
@@ -398,10 +387,6 @@ const updateSavedReply = async () => {
   savedRepliesListResource?.reload();
   isDirty.value = false;
   toast.success(__("Saved reply updated successfully."));
-};
-
-const getScopeIcon = (scope: string) => {
-  return scopeDropdownOptions.value.find((x) => x.value === scope)?.icon;
 };
 
 const validateData = (key?: string) => {

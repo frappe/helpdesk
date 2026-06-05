@@ -23,7 +23,7 @@
         ]"
       >
         <Button
-          icon="more-horizontal"
+          icon="lucide-more-horizontal"
           class="text-ink-gray-5"
           variant="ghost"
         />

@@ -8,7 +8,6 @@ import {
   FormControl,
   frappeRequest,
   FrappeUI,
-  Input,
   setConfig,
   TextInput,
   toast,
@@ -32,7 +31,6 @@ const globalComponents = {
   ErrorMessage,
   FeatherIcon,
   FormControl,
-  Input,
   Tooltip,
   TextInput,
 };

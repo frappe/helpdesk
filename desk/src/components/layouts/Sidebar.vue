@@ -342,7 +342,7 @@ const customerPortalDropdown = computed(() => [
     items: [
       {
         label: __("Log out"),
-        icon: "log-out",
+        icon: "lucide-log-out",
         onClick: () => authStore.logout(),
       },
     ],
@@ -355,19 +355,19 @@ const agentPortalDropdown = computed(() => [
   },
   {
     label: __("Customer portal"),
-    icon: "users",
+    icon: "lucide-users",
     onClick: () => {
       const path = router.resolve({ name: "TicketsCustomer" });
       window.open(path.href);
     },
   },
   {
-    icon: "life-buoy",
+    icon: "lucide-life-buoy",
     label: __("Support"),
     onClick: () => window.open("https://t.me/frappedesk"),
   },
   {
-    icon: "book-open",
+    icon: "lucide-book-open",
     label: __("Docs"),
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
@@ -385,7 +385,7 @@ const agentPortalDropdown = computed(() => [
   themeMenuItem.value,
   {
     label: __("Settings"),
-    icon: "settings",
+    icon: "lucide-settings",
     onClick: () => (showSettingsModal.value = true),
   },
   {
@@ -394,7 +394,7 @@ const agentPortalDropdown = computed(() => [
     items: [
       {
         label: __("Log out"),
-        icon: "log-out",
+        icon: "lucide-log-out",
         onClick: () => authStore.logout(),
       },
     ],

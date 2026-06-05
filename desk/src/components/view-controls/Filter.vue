@@ -20,7 +20,7 @@
           <div>
             <Button
               class="rounded-s-none border-s"
-              icon="x"
+              icon="lucide-x"
               @click.stop="clearfilter(close)"
             />
           </div>
@@ -47,7 +47,7 @@
                 <Button
                   class="flex"
                   variant="ghost"
-                  icon="x"
+                  icon="lucide-x"
                   @click="removeFilter(i)"
                 />
               </div>
@@ -116,7 +116,7 @@
               <Button
                 class="flex"
                 variant="ghost"
-                icon="x"
+                icon="lucide-x"
                 @click="removeFilter(i)"
               />
             </div>

@@ -498,7 +498,7 @@ async function saveAssignees(added: string[], removed: string[]) {
 }
 
 useShortcut("a", () => {
-  (triggerRef.value?.$el as HTMLElement)?.nextElementSibling?.click();
+  (triggerRef.value?.$el as HTMLElement)?.click();
 });
 </script>
 

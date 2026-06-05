@@ -127,11 +127,11 @@
       </div>
     </div>
 
-    <Dialog v-model="showSubjectDialog">
-      <template #body-title>
+    <Dialog v-model:open="showSubjectDialog">
+      <template #title>
         <h3>{{ __("Rename") }}</h3>
       </template>
-      <template #body-content>
+      <template #default>
         <FormControl
           v-model="subjectInput"
           :type="'text'"

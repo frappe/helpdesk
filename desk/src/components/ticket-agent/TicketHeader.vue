@@ -65,7 +65,7 @@
           :options="groupedActions"
           placement="right"
         >
-          <Button icon="more-horizontal" />
+          <Button icon="lucide-more-horizontal" />
         </Dropdown>
       </div>
     </template>
@@ -354,7 +354,7 @@ const statusRef = useTemplateRef("statusRef");
 
 onMounted(() => {
   useShortcut("s", () => {
-    statusRef.value?.$el?.nextElementSibling?.click();
+    statusRef.value?.$el?.click();
   });
 });
 </script>
