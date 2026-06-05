@@ -77,7 +77,7 @@
     <template #content>
       <div
         v-if="savedRepliesListResource?.list?.loading"
-        class="flex items-center justify-center my-auto"
+        class="flex items-center justify-center absolute inset-x-0 top-5.5 bottom-0"
       >
         <LoadingIndicator class="w-4" />
       </div>
