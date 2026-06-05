@@ -12,7 +12,8 @@
   "is_system",
   "disabled",
   "description",
-  "priority"
+  "priority",
+  "keywords"
  ],
  "fields": [
   {
@@ -26,6 +27,12 @@
    "in_list_view": 1,
    "label": "Priority",
    "options": "HD Ticket Priority"
+  },
+  {
+   "description": "Comma-separated keywords. A new ticket left without a type is auto-assigned to the type whose keyword matches its subject/description.",
+   "fieldname": "keywords",
+   "fieldtype": "Small Text",
+   "label": "Keywords"
   },
   {
    "default": "0",

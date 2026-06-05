@@ -1,4 +1,5 @@
 import json
+import re
 import uuid
 from datetime import timedelta
 from email.utils import parseaddr
@@ -42,6 +43,46 @@ from helpdesk.utils import (
 
 from ..hd_notification.utils import clear as clear_notifications
 from ..hd_service_level_agreement.utils import get_sla
+
+KEYWORD_CACHE_KEY = "hd_ticket_type_keywords"
+
+
+def get_ticket_type_keyword_map():
+    cached = frappe.cache().get_value(KEYWORD_CACHE_KEY)
+    if cached is not None:
+        return cached
+    rows = frappe.get_all(
+        "HD Ticket Type",
+        filters=[["keywords", "!=", ""]],
+        fields=["name", "keywords"],
+        order_by="name asc",
+    )
+    result = []
+    for row in rows:
+        keywords = [k.strip().lower() for k in (row.keywords or "").split(",") if k.strip()]
+        if keywords:
+            result.append((row.name, keywords))
+    frappe.cache().set_value(KEYWORD_CACHE_KEY, result, expires_in_sec=3600)
+    return result
+
+
+def match_ticket_type_by_keywords(text, keyword_map):
+    """Return the ticket type whose keyword best matches ``text``.
+
+    Word-boundary aware (``pay`` does not match ``happy``); the longest matching
+    keyword wins, with ties broken by type name.
+    """
+    if not text or not keyword_map:
+        return None
+    text_lower = text.lower()
+    best = None  # (sort_key, type_name)
+    for type_name, keywords in keyword_map:
+        for keyword in keywords:
+            if keyword and re.search(r"(?<!\w)" + re.escape(keyword) + r"(?!\w)", text_lower):
+                sort_key = (-len(keyword), type_name)
+                if best is None or sort_key < best[0]:
+                    best = (sort_key, type_name)
+    return best[1] if best else None
 
 
 class HDTicket(Document):
@@ -248,9 +289,23 @@ class HDTicket(Document):
     def set_ticket_type(self):
         if self.ticket_type:
             return
+        # Keyword-based auto-assignment takes priority over the default type.
+        self.auto_assign_ticket_type()
+        if self.ticket_type:
+            return
         self.ticket_type = (
             frappe.db.get_single_value("HD Settings", "default_ticket_type") or ""
         )
+
+    def auto_assign_ticket_type(self):
+        if self.ticket_type:
+            return
+        text = f"{self.subject or ''} {self.description or ''}"
+        if not text.strip():
+            return
+        match = match_ticket_type_by_keywords(text, get_ticket_type_keyword_map())
+        if match:
+            self.ticket_type = match
 
     def set_raised_by(self):
         if self.raised_by:
