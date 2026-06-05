@@ -18,6 +18,7 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
+from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -74,6 +75,7 @@ class HDTicket(Document):
         self.generate_key()
 
     def before_validate(self):
+        self.restrict_non_agent_fields()
         self.check_update_perms()
         self.set_ticket_type()
         self.set_raised_by()
@@ -339,6 +341,48 @@ class HDTicket(Document):
 
         frappe.throw(
             _("Ticket must be resolved with a feedback"), frappe.ValidationError
+        )
+
+    # Standard fields a non-agent may change on a ticket they already own:
+    customer_whitelisted_fields = (
+        "subject",
+        "description",
+        "status",
+        "feedback",
+        "feedback_extra",
+        "feedback_rating",
+    )
+
+    def restrict_non_agent_fields(self):
+        """
+        Allow-list what a non-agent may change on an existing ticket.
+        """
+        if self.is_new() or is_agent():
+            return
+        allowed_fields = set(self.customer_whitelisted_fields)
+        allowed_fields.update(self.get_customer_template_fields())
+        changed_fields = [
+            df.fieldname
+            for df in self.meta.fields
+            if df.fieldname not in allowed_fields
+            and self.has_value_changed(df.fieldname)
+        ]
+        if changed_fields:
+            frappe.throw(
+                _("You are not permitted to modify: {0}").format(
+                    ", ".join(changed_fields)
+                ),
+                frappe.PermissionError,
+            )
+
+    # TODO: will have refactor once template swtiching is implemented
+    def get_customer_template_fields(self):
+        """Custom fields the ticket's template exposes to the customer."""
+        template = self.template or DEFAULT_TICKET_TEMPLATE
+        return frappe.get_all(
+            "HD Ticket Template Field",
+            filters={"parent": template, "hide_from_customer": 0},
+            pluck="fieldname",
         )
 
     def check_update_perms(self):
