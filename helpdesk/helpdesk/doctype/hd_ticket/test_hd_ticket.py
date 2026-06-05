@@ -20,6 +20,7 @@ from helpdesk.test_utils import (
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
     make_status,
+    make_team,
     make_ticket,
     remove_holidays,
     upload_test_file,
@@ -190,6 +191,7 @@ class TestHDTicket(IntegrationTestCase):
         frappe.get_doc({"doctype": "HD Ticket Type", "name": "Test Type"}).insert(
             ignore_if_duplicate=True
         )
+        team = make_team("Test Team")
         template = frappe.get_doc(
             {
                 "doctype": "HD Ticket Template",
@@ -223,7 +225,7 @@ class TestHDTicket(IntegrationTestCase):
 
             # A template field hidden from the customer stays blocked
             ticket = frappe.get_doc("HD Ticket", ticket.name)
-            ticket.agent_group = "Test Type"
+            ticket.agent_group = team.name
             self.assertRaises(frappe.PermissionError, ticket.save)
         finally:
             frappe.set_user("Administrator")
