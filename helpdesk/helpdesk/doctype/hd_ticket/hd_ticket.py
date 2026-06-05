@@ -365,6 +365,10 @@ class HDTicket(Document):
             df.fieldname
             for df in self.meta.fields
             if df.fieldname not in allowed_fields
+            # Skip fields the framework always recomputes (e.g. `status_category`
+            # is fetched from `status`); the client cannot control these, so they
+            # change only as a side effect of an allowed edit.
+            and not (df.fetch_from and not df.fetch_if_empty)
             and self.has_value_changed(df.fieldname)
         ]
         if changed_fields:

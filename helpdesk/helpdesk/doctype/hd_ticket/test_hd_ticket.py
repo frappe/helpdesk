@@ -206,6 +206,13 @@ class TestHDTicket(IntegrationTestCase):
         ticket.template = template.name
         ticket.insert()
 
+        # Only fields exposed to the customer resolve from the template
+        ticket = frappe.get_doc("HD Ticket", ticket.name)
+        self.assertEqual(ticket.template, template.name)
+        visible_fields = ticket.get_customer_template_fields()
+        self.assertIn("ticket_type", visible_fields)
+        self.assertNotIn("agent_group", visible_fields)
+
         frappe.set_user(non_agent)
         try:
             # A template field exposed to the customer is editable
@@ -216,7 +223,7 @@ class TestHDTicket(IntegrationTestCase):
 
             # A template field hidden from the customer stays blocked
             ticket = frappe.get_doc("HD Ticket", ticket.name)
-            ticket.agent_group = "Some Team"
+            ticket.agent_group = "Test Type"
             self.assertRaises(frappe.PermissionError, ticket.save)
         finally:
             frappe.set_user("Administrator")
