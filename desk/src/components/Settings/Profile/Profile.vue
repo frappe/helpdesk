@@ -96,33 +96,7 @@
                     {{ user?.doc?.full_name }}
 >>>>>>> 630704fb (feat: add agent status indicators to frontend)
                   </span>
-                  <Button
-                    class="!px-1 !h-5 flex-shrink-0"
-                    variant="ghost"
-                    @click="editFullName"
-                  >
-                    <EditIcon class="size-3.5" />
-                  </Button>
                 </div>
-                <div v-else class="flex items-center gap-1">
-                  <TextInput
-                    ref="fullNameRef"
-                    v-model="fullName"
-                    @keydown.enter="isNameDirty ? save() : (editName = false)"
-                    @keydown.esc.stop="editName = false"
-                  />
-                  <Button
-                    variant="outline"
-                    icon="check"
-                    :loading="user?.save?.loading"
-                    :disabled="user?.save?.loading"
-                    @click="isNameDirty ? save() : (editName = false)"
-                  />
-                </div>
-                <span class="text-p-sm text-ink-gray-5 truncate">
-                  {{ user?.doc?.email }}
-                </span>
-                <ErrorMessage :message="__(_error)" />
               </div>
             </div>
           </template>

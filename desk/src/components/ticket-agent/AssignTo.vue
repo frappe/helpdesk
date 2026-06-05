@@ -152,6 +152,7 @@ import {
   AssigneeSymbol,
   TicketSymbol,
 } from "@/types";
+import type { HDAgent } from "@/types/doctypes";
 import { useDebounceFn } from "@vueuse/core";
 import {
   Button,
@@ -550,8 +551,32 @@ const removeAssigneesResource = createResource({
   }),
 });
 
+// Toast a warning for each newly-added agent who isn't currently active.
+// Returns true if any warning was shown so the caller can defer the success toast.
+function warnUnavailableAgents(addedNames: string[]): boolean {
+  const agents = (agentResource.data as HDAgent[]) ?? [];
+  let hasUnavailable = false;
+  for (const agent of agents) {
+    if (!addedNames.includes(agent.name)) continue;
+    const category = agentStatusStore.getStatus(
+      agent.availability || ""
+    )?.category;
+    if (category !== "Away" && category !== "Unavailable") continue;
+
+    const name = agent.agent_name || agent.name;
+    toast.warning(
+      category === "Unavailable"
+        ? __("{0} is currently unavailable.", name)
+        : __("{0} is currently away.", name)
+    );
+    hasUnavailable = true;
+  }
+  return hasUnavailable;
+}
+
 async function saveAssignees(added: string[], removed: string[]) {
   if (!added.length && !removed.length) return;
+  let hasUnavailable = false;
 
   try {
     if (removed.length) {
@@ -559,28 +584,7 @@ async function saveAssignees(added: string[], removed: string[]) {
       if (removeResult?.exc) throw new Error(removeResult.exc);
     }
     if (added.length) {
-      const unavailableAgents = (agentResource.data as HDAgent[])?.filter(
-        (agent) => {
-          if (!added.includes(agent.name)) return false;
-          const category = agentStatusStore.getStatus(
-            agent.availability || ""
-          )?.category;
-          return category === "Away" || category === "Unavailable";
-        }
-      );
-      if (unavailableAgents?.length > 0) {
-        for (const agent of unavailableAgents) {
-          const name = agent.agent_name || agent.name;
-          const category = agentStatusStore.getStatus(
-            agent.availability || ""
-          )?.category;
-          const message =
-            category === "Unavailable"
-              ? __("{0} is currently unavailable.", [name])
-              : __("{0} is currently away.", [name]);
-          toast.warning(message);
-        }
-      }
+      hasUnavailable = warnUnavailableAgents(added);
       const addResult = await addAssigneesResource.submit(added);
       if (addResult?.exc) throw new Error(addResult.exc);
     }
@@ -591,7 +595,12 @@ async function saveAssignees(added: string[], removed: string[]) {
     if (removed.length) logParts.push(`unassigned ${removed.join(", ")}`);
     await logActivity(logParts.join(" & "));
 
-    toast.success(__("Assignees updated successfully."));
+    // Delay the success toast when warnings were shown so they land first.
+    const successDelay = hasUnavailable ? 1000 : 0;
+    setTimeout(() => {
+      toast.success(__("Assignees updated successfully."));
+    }, successDelay);
+
     assignees.value.reload();
     activities.value.reload();
   } catch {
