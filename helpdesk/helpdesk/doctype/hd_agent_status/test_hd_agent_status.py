@@ -87,11 +87,10 @@ class TestHDAgentStatus(FrappeTestCase):
 
     # an Active status can be disabled while another enabled Active status remains
     def test_active_status_can_be_disabled_with_another_active(self):
-        make_agent_status("Online", category="Active")
-        active = frappe.get_doc("HD Agent Status", "Active")
-        active.enable = 0
-        active.save()
-        self.assertFalse(active.enable)
+        online = make_agent_status("Online", category="Active")
+        online.enable = 0
+        online.save()
+        self.assertFalse(online.enable)
 
     # the last Active status cannot be moved out of the Active category
     def test_last_active_status_cannot_be_demoted(self):
@@ -102,11 +101,10 @@ class TestHDAgentStatus(FrappeTestCase):
 
     # an Active status can be demoted while another enabled Active status remains
     def test_active_status_can_be_demoted_with_another_active(self):
-        make_agent_status("Online", category="Active")
-        active = frappe.get_doc("HD Agent Status", "Active")
-        active.category = "Away"
-        active.save()
-        self.assertEqual(active.category, "Away")
+        online = make_agent_status("Online", category="Active")
+        online.category = "Away"
+        online.save()
+        self.assertEqual(online.category, "Away")
 
     # the Active status can be renamed; the rename cascades to linked agents
     def test_active_status_rename_cascades_to_agents(self):
@@ -129,5 +127,5 @@ class TestHDAgentStatus(FrappeTestCase):
     # an Active status can be deleted while another enabled Active status remains
     def test_active_status_can_be_deleted_with_another_active(self):
         make_agent_status("Online", category="Active")
-        frappe.delete_doc("HD Agent Status", "Active")
-        self.assertFalse(frappe.db.exists("HD Agent Status", "Active"))
+        frappe.delete_doc("HD Agent Status", "Online")
+        self.assertFalse(frappe.db.exists("HD Agent Status", "Online"))

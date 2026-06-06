@@ -36,7 +36,7 @@ def get_availability_options() -> list[str]:
     return frappe.get_all(
         "HD Agent Status",
         filters={"enable": 1},
-        order_by="`tabHD Agent Status`.`order` asc",
+        order_by="`tabHD Agent Status`.status_order asc",
         pluck="agent_status",
     )
 
