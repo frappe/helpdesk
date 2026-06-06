@@ -38,8 +38,8 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   const statuses = createListResource({
     doctype: "HD Agent Status",
     cache: ["HD Agent Status", "list"],
-    fields: ["name", "agent_status", "category", "color", "enable", "order"],
-    orderBy: "`tabHD Agent Status`.order",
+    fields: ["name", "agent_status", "category", "color", "enable", "status_order"],
+    orderBy: "`tabHD Agent Status`.status_order",
     pageLength: 1000,
     auto: true,
   });

@@ -125,7 +125,7 @@ class TestHDAgent(FrappeTestCase):
                     "agent_status": "Lunch",
                     "category": "Away",
                     "enable": 1,
-                    "order": 5,
+                    "status_order": 5,
                 }
             ).insert()
 

@@ -280,8 +280,8 @@ export interface HDAgent extends DocType {
 export interface HDAgentStatus extends DocType {
   /** Agent Status: Data */
   agent_status: string;
-  /** order: Data */
-  order?: string;
+  /** Status Order: Int */
+  status_order?: number;
   /** Category: Select */
   category?: 'Active' | 'Away' | 'Unavailable';
   /** Color: Select */
