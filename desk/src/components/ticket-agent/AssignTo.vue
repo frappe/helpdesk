@@ -170,6 +170,7 @@ import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
 import { useAgentStatusStore } from "@/stores/agentStatus.ts";
 import { prettyDate } from "@/utils.ts";
+import { dayjsLocal } from "frappe-ui";
 import { Tooltip } from "frappe-ui";
 interface Props {
   hideLabel?: boolean;
@@ -418,7 +419,14 @@ function availabilitySubtitle(
 
   const label = __(availability);
   if (!changedOn) return label;
-  const timeSinceChange = prettyDate(changedOn);
+  // prettyDate says "Just now" under a minute, which reads oddly after "since";
+  // keep the "… ago" phrasing consistent with the longer durations.
+  const secondsSinceChange = dayjsLocal().diff(
+    dayjsLocal(changedOn),
+    "seconds"
+  );
+  const timeSinceChange =
+    secondsSinceChange < 60 ? __("a few seconds ago") : prettyDate(changedOn);
   return timeSinceChange ? __("{0} since {1}", label, timeSinceChange) : label;
 }
 
