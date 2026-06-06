@@ -8,46 +8,36 @@ from frappe.model.document import Document
 
 class HDAgentStatus(Document):
     def validate(self):
-        self.validate_single_active_category()
-        self.validate_active_status_protected()
+        self.validate_at_least_one_active()
 
-    def validate_single_active_category(self):
-        """Only one status may belong to the Active category."""
-        if self.category != "Active":
-            return
-
-        existing = frappe.db.get_value(
-            "HD Agent Status",
-            {"category": "Active", "name": ["!=", self.name]},
-            "name",
-        )
-        if existing:
-            frappe.throw(
-                _(
-                    "Only one Active status is allowed. {0} already uses the Active category."
-                ).format(existing),
-                title=_("Active Status Already Exists"),
-            )
-
-    def validate_active_status_protected(self):
-        """The Active status must always stay enabled and in the Active category."""
-        if self.category == "Active" and not self.enable:
-            frappe.throw(_("The Active status must stay enabled."))
+    def validate_at_least_one_active(self):
+        """There must always be at least one enabled status in the Active category."""
+        if self.category == "Active" and self.enable:
+            return  # this status keeps an enabled Active status around
 
         if self.is_new():
+            return  # a new status cannot remove an existing one
+
+        if self.has_other_enabled_active():
             return
 
-        was_active = (
-            frappe.db.get_value("HD Agent Status", self.name, "category") == "Active"
-        )
-        if was_active and self.category != "Active":
-            frappe.throw(_("The Active status cannot be moved to another category."))
+        frappe.throw(_("At least one enabled Active status is required."))
 
     def on_trash(self):
-        if self.category == "Active":
-            frappe.throw(_("The Active status cannot be deleted."))
+        if self.category == "Active" and not self.has_other_enabled_active():
+            frappe.throw(_("At least one enabled Active status is required."))
+
+    def has_other_enabled_active(self) -> bool:
+        return bool(
+            frappe.db.exists(
+                "HD Agent Status",
+                {"category": "Active", "enable": 1, "name": ["!=", self.name]},
+            )
+        )
 
 
 def get_active_status() -> str | None:
-    """Name of the (single) status in the Active category."""
-    return frappe.db.get_value("HD Agent Status", {"category": "Active"}, "name")
+    """Name of an enabled status in the Active category (the default availability)."""
+    return frappe.db.get_value(
+        "HD Agent Status", {"category": "Active", "enable": 1}, "name"
+    )
