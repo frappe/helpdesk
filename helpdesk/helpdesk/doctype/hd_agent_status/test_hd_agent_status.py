@@ -5,7 +5,7 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.setup.install import add_default_agent_status
-from helpdesk.test_utils import make_agent
+from helpdesk.test_utils import make_agent, make_agent_status
 
 
 class TestHDAgentStatus(FrappeTestCase):
@@ -23,17 +23,6 @@ class TestHDAgentStatus(FrappeTestCase):
         # them (e.g. HD Agent) are unaffected. setUp restores any renamed default.
         frappe.db.delete("HD Agent Status", {"name": ["not in", self.DEFAULT_STATUSES]})
 
-    def _make_status(self, agent_status, category="Away", enable=1, order=None):
-        return frappe.get_doc(
-            {
-                "doctype": "HD Agent Status",
-                "agent_status": agent_status,
-                "category": category,
-                "enable": enable,
-                "order": order,
-            }
-        ).insert()
-
     # The statuses created on install exist with the expected categories
     def test_default_statuses_are_seeded(self):
         defaults = {
@@ -49,28 +38,28 @@ class TestHDAgentStatus(FrappeTestCase):
 
     # autoname is field:agent_status, so the record name is the status value
     def test_name_is_the_status_value(self):
-        status = self._make_status("In a Meeting", category="Away")
+        status = make_agent_status("In a Meeting", category="Away")
         self.assertEqual(status.name, "In a Meeting")
 
     # agent_status is unique; the same status cannot be created twice
     def test_duplicate_status_not_allowed(self):
-        self._make_status("On Lunch", category="Away")
+        make_agent_status("On Lunch", category="Away")
         with self.assertRaises(frappe.DuplicateEntryError):
-            self._make_status("On Lunch", category="Away")
+            make_agent_status("On Lunch", category="Away")
 
     # category must be one of Active / Away / Unavailable
     def test_invalid_category_rejected(self):
         with self.assertRaises(frappe.ValidationError):
-            self._make_status("Busy", category="Busy")
+            make_agent_status("Busy", category="Busy")
 
     # only one status may use the Active category (one is already seeded on install)
     def test_second_active_status_rejected(self):
         with self.assertRaises(frappe.ValidationError):
-            self._make_status("Online", category="Active")
+            make_agent_status("Online", category="Active")
 
     # switching another status into the Active category is blocked too
     def test_switching_status_to_active_rejected(self):
-        status = self._make_status("Focusing", category="Away")
+        status = make_agent_status("Focusing", category="Away")
         status.category = "Active"
         with self.assertRaises(frappe.ValidationError):
             status.save()
@@ -85,7 +74,7 @@ class TestHDAgentStatus(FrappeTestCase):
     # category is mandatory
     def test_category_is_mandatory(self):
         with self.assertRaises(frappe.MandatoryError):
-            self._make_status("No Category", category="")
+            make_agent_status("No Category", category="")
 
     # the Active status must stay enabled
     def test_active_status_cannot_be_disabled(self):
