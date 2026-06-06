@@ -263,6 +263,18 @@ def make_status(name: str = "Test Status", category: str = "Open"):
     return doc.insert(ignore_if_duplicate=True)
 
 
+def make_agent_status(agent_status: str, category="Away", enable=1, status_order=None):
+    return frappe.get_doc(
+        {
+            "doctype": "HD Agent Status",
+            "agent_status": agent_status,
+            "category": category,
+            "enable": enable,
+            "status_order": status_order,
+        }
+    ).insert()
+
+
 def make_agent(email: str, first_name: str = "Test Agent"):
     """
     Creates a test user and HD Agent if they don't exist.

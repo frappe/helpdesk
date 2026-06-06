@@ -127,6 +127,7 @@ import { useTheme } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
 import Apps from "../Apps.vue";
+import AvailabilityMenuMobile from "../AvailabilityMenuMobile.vue";
 import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
@@ -216,6 +217,13 @@ const agentPortalDropdown = computed(() => [
   {
     component: markRaw(Apps),
   },
+  ...(authStore.hasAgentRecord
+    ? [
+        {
+          component: markRaw(AvailabilityMenuMobile),
+        },
+      ]
+    : []),
   {
     label: "Customer portal",
     icon: "lucide-users",

@@ -14,12 +14,17 @@
           "
         >
           <template #default="{ openFileSelector, error: _error, uploading }">
-            <div class="flex items-center justify-center gap-2">
-              <div class="group relative !size-14">
+            <div class="flex items-center justify-center gap-4">
+              <div class="group relative flex-shrink-0 size-16">
                 <Avatar
-                  class="!size-14"
+                  class="!size-16"
                   :image="user.doc?.user_image"
                   :label="fullName"
+                />
+                <div
+                  v-if="currentStatus"
+                  class="absolute bottom-0.5 right-0.5 size-3.5 rounded-full outline outline-white outline-4"
+                  :class="agentStatusStore.statusColor(currentStatus)"
                 />
                 <Tooltip
                   :hoverDelay="0"
@@ -27,7 +32,7 @@
                   :text="profileTooltipText"
                 >
                   <div
-                    class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full !size-14"
+                    class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full !size-16"
                     @click.stop="openFileSelector"
                   />
                   <div
@@ -85,7 +90,6 @@
                     {{ user?.doc?.email }}
                   </span>
                 </div>
-                <ErrorMessage :message="__(_error)" />
               </div>
             </div>
           </template>
@@ -97,18 +101,24 @@
             <span class="text-base font-semibold text-ink-gray-9">
               {{ __("Account Info & Security") }}
             </span>
-            <UnsavedBadge :show="isDirty" />
           </div>
-
-          <Transition name="fade">
-            <Button
-              variant="solid"
-              v-if="isDirty"
-              :label="__('Save')"
-              :loading="user?.save?.loading"
-              @click="save()"
-          /></Transition>
         </div>
+      </div>
+
+      <div v-if="hasAgentRecord" class="flex items-center justify-between mt-6">
+        <div class="flex flex-col gap-1">
+          <span class="text-base font-medium text-ink-gray-8">
+            {{ __("Availability") }}
+          </span>
+          <span class="text-p-sm text-ink-gray-6">
+            {{
+              __(
+                "Set your availability so your team knows when you're reachable."
+              )
+            }}
+          </span>
+        </div>
+        <AvailabilityMenu />
       </div>
       <div class="flex items-center justify-between mt-6">
         <div class="flex flex-col gap-1">
@@ -143,42 +153,6 @@
           @click="showChangePasswordModal = true"
         />
       </div>
-      <div>
-        <div class="flex items-center justify-between mt-6">
-          <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-ink-gray-8">
-              {{ __("Language") }}
-            </span>
-            <span class="text-p-sm text-ink-gray-6">
-              {{ __("Change language of the application.") }}
-            </span>
-          </div>
-          <Link
-            :model-value="user.doc?.language"
-            @update:modelValue="updateLanguage"
-            doctype="Language"
-            class="w-40"
-          />
-        </div>
-        <div class="flex items-center justify-between mt-6">
-          <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-ink-gray-8">
-              {{ __("Timezone") }}
-            </span>
-            <span class="text-p-sm text-ink-gray-6">
-              {{ __("Change timezone of the application.") }}
-            </span>
-          </div>
-          <Autocomplete
-            :model-value="user.doc?.time_zone"
-            @update:modelValue="updateTimezone"
-            class="w-40"
-            :options="timezoneOptions"
-            size="sm"
-            placeholder="Select Timezone"
-          />
-        </div>
-      </div>
     </template>
   </SettingsLayoutBase>
   <ChangePasswordModal
@@ -188,29 +162,32 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch, useTemplateRef } from "vue";
+import { computed, nextTick, ref, useTemplateRef } from "vue";
 import {
   Avatar,
-  Badge,
   Button,
   FileUploader,
   LoadingIndicator,
   toast,
   createDocumentResource,
-  createResource,
 } from "frappe-ui";
+
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
 import EditIcon from "~icons/lucide/edit";
 const emit = defineEmits(["updateStep"]);
 
+import AvailabilityMenu from "@/components/AvailabilityMenu.vue";
+import { useAvailability } from "@/composables/useAvailability";
+import { useAgentStatusStore } from "@/stores/agentStatus";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
-import { disableSettingModalOutsideClick } from "../settingsModal";
+
+const { currentStatus } = useAvailability();
+const agentStatusStore = useAgentStatusStore();
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
 const showChangePasswordModal = ref(false);
 
-const { userId } = useAuthStore();
+const { userId, hasAgentRecord } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
 
 const isHoveringRemove = ref(false);
@@ -237,14 +214,6 @@ function editFullName() {
   nextTick(() => fullNameRef.value?.el?.focus());
 }
 
-const isDirty = computed(() => {
-  if (!user.originalDoc) return false;
-  return user.doc?.time_zone !== user.originalDoc?.time_zone ||
-    user.doc?.language !== user.originalDoc?.language
-    ? true
-    : false;
-});
-
 const isNameDirty = computed(() => {
   return (
     user.doc?.first_name !== user.originalDoc?.first_name ||
@@ -253,17 +222,10 @@ const isNameDirty = computed(() => {
 });
 
 function save() {
-  refreshRequired.value =
-    user.doc?.language !== user.originalDoc?.language ||
-    user.doc?.time_zone !== user.originalDoc?.time_zone;
-
   user.save.submit(null, {
     onSuccess: () => {
       editName.value = false;
       toast.success(__("Profile updated successfully."));
-      if (refreshRequired.value) {
-        window.location.reload();
-      }
     },
     onError: (err: { message: string; messages: string[] }) => {
       toast.error(err.message + ": " + err.messages[0]);
@@ -276,45 +238,4 @@ function updateImage(fileUrl = "") {
   user.doc.user_image = fileUrl;
   save();
 }
-
-function updateLanguage(val: string | null) {
-  if (!user.doc) return;
-  user.doc.language = val || user.originalDoc?.language;
-}
-
-function updateTimezone(val: { label: string; value: string } | null) {
-  if (!user.doc) return;
-  user.doc.time_zone = val?.value || user.originalDoc?.time_zone;
-}
-
-const timezoneOptions = ref([]);
-const timezoneData = createResource({
-  url: "frappe.core.doctype.user.user.get_timezones",
-  auto: true,
-  onSuccess(data) {
-    timezoneOptions.value = data.timezones.map((tz) => ({
-      label: tz,
-      value: tz,
-    }));
-  },
-});
-
-const language = ref(null);
-const timezone = ref(null);
-
-const refreshRequired = ref(false);
-
-watch(
-  () => user.doc,
-  (doc) => {
-    if (!doc) return;
-    if (!language.value) language.value = doc.language;
-    if (!timezone.value) timezone.value = doc.time_zone;
-  },
-  { immediate: true }
-);
-
-watch(isDirty, (val) => {
-  disableSettingModalOutsideClick.value = val;
-});
 </script>

@@ -9,7 +9,9 @@
   "user",
   "agent_name",
   "user_image",
-  "is_active"
+  "is_active",
+  "availability",
+  "availability_changed_on"
  ],
  "fields": [
   {
@@ -38,11 +40,23 @@
    "fieldname": "user_image",
    "fieldtype": "Attach Image",
    "label": "Image"
+  },
+  {
+   "fieldname": "availability",
+   "fieldtype": "Link",
+   "label": "Availability",
+   "options": "HD Agent Status"
+  },
+  {
+   "fieldname": "availability_changed_on",
+   "fieldtype": "Datetime",
+   "label": "Availability Changed On",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-02 11:15:47.402850",
+ "modified": "2026-06-02 01:18:56.023594",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
