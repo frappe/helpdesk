@@ -67,9 +67,11 @@ class TestHDAgentStatus(FrappeTestCase):
     # editing the existing Active status must not trip the rule on itself
     def test_resaving_active_status_allowed(self):
         active = frappe.get_doc("HD Agent Status", "Active")
-        active.order = 10
+        active.status_order = 100
         active.save()  # self is excluded; must not raise
-        self.assertEqual(frappe.db.get_value("HD Agent Status", "Active", "order"), 10)
+        self.assertEqual(
+            frappe.db.get_value("HD Agent Status", "Active", "status_order"), 100
+        )
 
     # category is mandatory
     def test_category_is_mandatory(self):

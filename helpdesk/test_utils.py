@@ -264,14 +264,14 @@ def make_status(name: str = "Test Status", category: str = "Open"):
     return doc.insert(ignore_if_duplicate=True)
 
 
-def make_agent_status(agent_status: str, category="Away", enable=1, order=None):
+def make_agent_status(agent_status: str, category="Away", enable=1, status_order=None):
     return frappe.get_doc(
         {
             "doctype": "HD Agent Status",
             "agent_status": agent_status,
             "category": category,
             "enable": enable,
-            "order": order,
+            "status_order": status_order,
         }
     ).insert()
 

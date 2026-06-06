@@ -9,7 +9,7 @@
  "field_order": [
   "agent_status",
   "enable",
-  "order",
+  "status_order",
   "section_break_jqvx",
   "category",
   "column_break_ekva",
@@ -23,9 +23,9 @@
    "unique": 1
   },
   {
-   "fieldname": "order",
+   "fieldname": "status_order",
    "fieldtype": "Int",
-   "label": "order"
+   "label": "Status Order"
   },
   {
    "fieldname": "section_break_jqvx",
@@ -59,7 +59,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-05 01:41:57.721507",
+ "modified": "2026-06-06 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent Status",
