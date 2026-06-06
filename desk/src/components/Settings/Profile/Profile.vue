@@ -105,7 +105,7 @@
         </div>
       </div>
 
-      <div class="flex items-center justify-between mt-6">
+      <div v-if="hasAgentRecord" class="flex items-center justify-between mt-6">
         <div class="flex flex-col gap-1">
           <span class="text-base font-medium text-ink-gray-8">
             {{ __("Availability") }}
@@ -187,7 +187,7 @@ const agentStatusStore = useAgentStatusStore();
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 const showChangePasswordModal = ref(false);
 
-const { userId } = useAuthStore();
+const { userId, hasAgentRecord } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
 
 const isHoveringRemove = ref(false);

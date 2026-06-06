@@ -217,9 +217,13 @@ const agentPortalDropdown = computed(() => [
   {
     component: markRaw(Apps),
   },
-  {
-    component: markRaw(AvailabilityMenuMobile),
-  },
+  ...(authStore.hasAgentRecord
+    ? [
+        {
+          component: markRaw(AvailabilityMenuMobile),
+        },
+      ]
+    : []),
   {
     label: "Customer portal",
     icon: "lucide-users",
