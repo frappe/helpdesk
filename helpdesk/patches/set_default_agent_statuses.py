@@ -24,7 +24,11 @@ def execute():
         ],
         pluck="name",
     )
-    for agent in agents:
+    if agents:
         frappe.db.set_value(
-            "HD Agent", agent, "availability", active_status, update_modified=False
+            "HD Agent",
+            {"name": ["in", agents]},
+            "availability",
+            active_status,
+            update_modified=False,
         )
