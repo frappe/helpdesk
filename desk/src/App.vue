@@ -9,6 +9,7 @@
 import { Dialogs } from "@/components/dialogs";
 import { useConfigStore } from "@/stores/config";
 import { FrappeUIProvider, toast, setConfig, useTheme } from "frappe-ui";
+import { FrappeUIProvider, toast, setConfig, useTheme } from "frappe-ui";
 import { computed, defineAsyncComponent, h, onMounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
@@ -23,9 +24,6 @@ const { favicon } = storeToRefs(configStore);
 
 useFavicon(favicon);
 
-if (!localStorage.getItem("theme")) {
-  localStorage.setItem("theme", "light");
-}
 useTheme();
 
 onMounted(() => {
