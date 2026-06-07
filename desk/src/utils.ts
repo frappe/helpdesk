@@ -895,9 +895,3 @@ export function buildPercentageChange(value: number | null) {
         : "text-ink-gray-5",
   };
 }
-
-
-
-function getBrowserTimezone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone
-}
