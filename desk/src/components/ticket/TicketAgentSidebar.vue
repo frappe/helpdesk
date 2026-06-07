@@ -1,5 +1,5 @@
 <template>
-  <div class="flex !w-[382px] flex-col justify-between border-l">
+  <div class="flex !w-[382px] flex-col justify-between border-s">
     <div
       class="flex h-10.5 items-center border-b px-5 py-2.5 text-lg font-medium text-ink-gray-9 justify-between"
     >
@@ -23,7 +23,7 @@
         ]"
       >
         <Button
-          icon="more-horizontal"
+          icon="lucide-more-horizontal"
           class="text-ink-gray-5"
           variant="ghost"
         />

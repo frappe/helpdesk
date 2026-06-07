@@ -1,6 +1,6 @@
 <template>
   <div class="w-max mx-auto">
-    <div class="text-base font-medium mb-2 text-ink-gray-8 ml-2.5">
+    <div class="text-base font-medium mb-2 text-ink-gray-8 ms-2.5">
       {{ formattedMonth }}
     </div>
     <div class="rounded-md text-sm">
@@ -62,7 +62,7 @@
                 >
                   <template #target="{ open, close }">
                     <Button
-                      icon="more-horizontal"
+                      icon="lucide-more-horizontal"
                       variant="ghost"
                       @click="open"
                       @mouseleave="
@@ -95,7 +95,7 @@
                     >
                       <Button
                         class="w-full flex !justify-start"
-                        icon-left="edit"
+                        icon-left="lucide-edit"
                         variant="ghost"
                         label="Edit"
                         @click="
@@ -108,7 +108,7 @@
                       />
                       <Button
                         class="w-full flex !justify-start"
-                        icon-left="trash-2"
+                        icon-left="lucide-trash-2"
                         variant="ghost"
                         :label="
                           isConfirmingDelete ? 'Confirm Delete' : 'Delete'
@@ -155,8 +155,7 @@
 <script setup lang="ts">
 import { holidayData } from "@/stores/holidayList";
 import { getFormattedDate, htmlToText } from "@/utils";
-import dayjs from "dayjs";
-import { Popover, useDatePicker } from "frappe-ui";
+import { dayjs, Popover, useDatePicker } from "frappe-ui";
 import { ref, watch } from "vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 

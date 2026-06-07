@@ -1,6 +1,6 @@
 import frappe
 
-from helpdesk.utils import agent_only, get_agents_team
+from helpdesk.utils import agent_only, get_agent_name, get_agents_team
 from helpdesk.utils import is_agent as _is_agent
 
 
@@ -24,8 +24,11 @@ def get_user():
         as_dict=True,
     )
 
+    roles = frappe.get_roles(current_user)
+    is_admin = "System Manager" in roles or "Administrator" in roles
+
     is_agent = _is_agent()
-    is_admin = ("System Manager" or "Administrator") in frappe.get_roles(current_user)
+    has_agent_record = bool(get_agent_name())
     has_desk_access = is_agent or is_admin
     user_image = user.user_image
     user_first_name = user.first_name
@@ -43,6 +46,7 @@ def get_user():
         "has_desk_access": has_desk_access,
         "is_admin": is_admin,
         "is_agent": is_agent,
+        "has_agent_record": has_agent_record,
         "user_id": user_id,
         "is_manager": is_manager,
         "user_image": user_image,

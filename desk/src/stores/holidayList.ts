@@ -3,7 +3,8 @@ import {
   HolidayErrors,
   RepetitionPattern,
 } from "@/components/Settings/Holiday/types";
-import dayjs, { Dayjs } from "dayjs";
+import { dayjs } from "frappe-ui";
+import type { Dayjs } from "dayjs";
 import { ref } from "vue";
 
 export const holidayListActiveScreen = ref<{

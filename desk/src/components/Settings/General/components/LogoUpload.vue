@@ -29,7 +29,7 @@
         "
       >
         <template v-slot="{ progress, uploading, openFileSelector }">
-          <div class="flex items-end space-x-2">
+          <div class="flex items-end gap-x-2">
             <Button
               @click="openFileSelector"
               :iconLeft="ImageUpIcon"
@@ -44,7 +44,7 @@
             />
             <Button
               v-if="props.image"
-              iconLeft="trash-2"
+              iconLeft="lucide-trash-2"
               :label="__('Remove')"
               @click="emit('onRemove')"
               :loading="isLoading"

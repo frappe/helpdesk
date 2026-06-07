@@ -35,9 +35,8 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar } from "frappe-ui";
+import { Avatar, dayjs } from "frappe-ui";
 import { Article } from "@/types";
-import { dayjs } from "@/dayjs";
 
 const props = defineProps<{
   article: Article;

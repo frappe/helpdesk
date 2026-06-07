@@ -10,10 +10,10 @@
     <circle
       cx="8"
       cy="8"
-      r="4.5"
-      fill="transparent"
+      r="3.5"
+      fill="currentColor"
       stroke="currentColor"
-      stroke-width="3"
+      stroke-width="1"
     />
   </svg>
   <svg

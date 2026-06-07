@@ -1,6 +1,6 @@
 <template>
   <div
-    class="-all flex py-[7px] mx-2 h-7.5 cursor-pointer items-center rounded pl-2 pr-2 text-ink-gray-8 duration-300 ease-in-out"
+    class="-all flex py-[7px] mx-2 h-7.5 cursor-pointer items-center rounded ps-2 pe-2 text-ink-gray-8 duration-300 ease-in-out"
     :class="{
       'w-auto': isExpanded,
       'w-8': !isExpanded,
@@ -33,7 +33,7 @@
     </span>
 
     <div
-      class="-all ml-2 flex min-w-0 items-center justify-between text-sm duration-300 ease-in-out w-full"
+      class="-all ms-2 flex min-w-0 items-center justify-between text-sm duration-300 ease-in-out w-full"
       :class="{
         'opacity-100': isExpanded,
         'opacity-0': !isExpanded,

@@ -6,22 +6,22 @@
     <component
       :is="item.icon"
       v-if="item.icon"
-      class="mr-3 h-4 w-4 text-ink-gray-7"
+      class="me-3 h-4 w-4 text-ink-gray-6"
     />
     <span class="overflow-hidden text-ellipsis whitespace-nowrap">
-      {{ item.subject }}
+      {{ __(item.subject) }}
       <span v-if="item.showName" class="text-sm">(#{{ item.name }})</span>
     </span>
     <span
       v-if="item.modified"
-      class="ml-auto whitespace-nowrap pl-2 text-ink-gray-5"
+      class="ms-auto whitespace-nowrap ps-2 text-ink-gray-5"
     >
       {{ dayjs(item.modified).fromNow(true) }}
     </span>
   </div>
 </template>
 <script setup lang="ts">
-import { dayjs } from "@/dayjs";
+import { dayjs } from "frappe-ui";
 
 defineProps({
   item: {

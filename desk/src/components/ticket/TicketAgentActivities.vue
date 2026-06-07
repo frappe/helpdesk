@@ -81,7 +81,15 @@
               />
               <FeatherIcon
                 v-else-if="activity.type === 'call'"
+
                 :name="activity.call_type === 'Incoming' ? 'phone-incoming' : 'phone-outgoing'"
+
+                :name="
+                  activity.call_type === 'Incoming'
+                    ? 'phone-incoming'
+                    : 'phone-outgoing'
+                "
+
                 class="text-ink-gray-5 start-[7.5px] size-4"
               />
               <DotIcon

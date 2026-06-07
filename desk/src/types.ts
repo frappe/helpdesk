@@ -669,6 +669,8 @@ export interface AgentOption {
   value: string;
   label: string;
   image?: string;
+  availability?: string;
+  availability_changed_on?: string;
 }
 
 // symbols
@@ -725,5 +727,6 @@ declare global {
     session_user: string;
     timezone: Record<"user" | "system", string>;
     agent: string | null;
+    apps: string[];
   }
 }

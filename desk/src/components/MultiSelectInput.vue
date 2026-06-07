@@ -60,7 +60,7 @@
                         ]"
                       >
                         <UserAvatar
-                          class="mr-2"
+                          class="me-2"
                           :name="getUsernameLabel(option.value)"
                           size="lg"
                         />
@@ -82,7 +82,7 @@
         </Combobox>
       </div>
     </div>
-    <ErrorMessage v-if="error" class="mt-2 pl-2" :message="error" />
+    <ErrorMessage v-if="error" class="mt-2 ps-2" :message="error" />
   </div>
 </template>
 

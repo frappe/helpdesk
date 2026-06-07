@@ -1,18 +1,9 @@
 <template>
-  <SettingsLayoutBase>
-    <template #title>
-      <div class="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="holidayData?.holiday_list_name || __('New Business Holiday')"
-          size="md"
-          @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
-        />
-        <UnsavedBadge :show="isDirty" />
-      </div>
-    </template>
+  <SettingsLayoutBase
+    :back-label="holidayData?.holiday_list_name || __('New Business Holiday')"
+    :on-back="goBack"
+    :dirty="isDirty"
+  >
     <template #header-actions>
       <Button
         :label="__('Save')"
@@ -84,8 +75,7 @@
                 placeholder="11/01/2025"
                 class="w-full"
                 id="from_date"
-                :formatter="(date) => getFormattedDate(date)"
-                :debounce="300"
+                :format="getDateFormat()"
                 @update:model-value="updateDuration('from_date')"
               >
                 <template #prefix>
@@ -106,8 +96,7 @@
                 placeholder="25/12/2025"
                 class="w-full"
                 id="to_date"
-                :formatter="(date) => getFormattedDate(date)"
-                :debounce="300"
+                :format="getDateFormat()"
                 @update:model-value="updateDuration('to_date')"
               >
                 <template #prefix>
@@ -154,11 +143,11 @@
               :buttons="[
                 {
                   value: 'calendar',
-                  icon: 'calendar',
+                  icon: 'lucide-calendar',
                 },
                 {
                   value: 'list',
-                  icon: 'list',
+                  icon: 'lucide-list',
                 },
               ]"
               v-model="holidayListView"
@@ -173,7 +162,7 @@
               variant="subtle"
               :label="__('Add Holiday')"
               @click="dialog.show = true"
-              icon-left="plus"
+              icon-left="lucide-plus"
             />
             <!-- Indicators -->
             <div class="flex gap-4" v-if="holidayListView === 'calendar'">
@@ -230,9 +219,8 @@ import RecurringHolidaysList from "./RecurringHolidaysList.vue";
 
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { slaActiveScreen } from "@/stores/sla";
-import { getFormattedDate, htmlToText } from "@/utils";
-import dayjs from "dayjs";
-import { FormLabel } from "frappe-ui";
+import { getDateFormat, htmlToText } from "@/utils";
+import { dayjs, FormLabel } from "frappe-ui";
 import {
   disableSettingModalOutsideClick,
   setActiveSettingsTab,
@@ -241,7 +229,6 @@ import HolidaysCalendarView from "./HolidaysCalendarView.vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import { HolidayListResourceSymbol } from "@/types";
 import { HDServiceHolidayList } from "@/types/doctypes";
 

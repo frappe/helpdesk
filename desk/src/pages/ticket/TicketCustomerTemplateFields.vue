@@ -13,7 +13,7 @@
       </span>
     </div>
     <div v-for="data in slaData" :key="data.label" class="space-y-1.5">
-      <Tooltip :text="dayjs(data.value).long()">
+      <Tooltip :text="dayjs(data.value).format('LLLL')">
         <span class="block text-sm text-ink-gray-7">{{ data.title }}</span>
       </Tooltip>
       <span class="block break-words text-base font-medium text-ink-gray-9">
@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { dayjs } from "@/dayjs";
+import { dayjs } from "frappe-ui";
 import { Field } from "@/types";
 import { computed, inject } from "vue";
 import { ITicket } from "./symbols";

@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="showSubjectDialog" :options="{ title: 'Rename Subject' }">
-    <template #body-content>
+  <Dialog v-model:open="showSubjectDialog" title="Rename Subject">
+    <template #default>
       <div class="flex flex-col flex-1 gap-3">
         <FormControl
           ref="subjectInput"

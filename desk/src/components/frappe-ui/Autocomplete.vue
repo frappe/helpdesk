@@ -44,7 +44,7 @@
             <div class="relative px-1.5 pt-0.5">
               <ComboboxInput
                 ref="search"
-                class="form-input w-full pr-6 bg-transparent"
+                class="form-input w-full pe-6 bg-transparent"
                 type="text"
                 @change="
                   (e) => {
@@ -56,7 +56,7 @@
                 placeholder="Search"
               />
               <button
-                class="absolute inset-y-0 right-3 top-px flex items-center"
+                class="absolute inset-y-0 end-3 top-px flex items-center"
                 @click="selectedValue = null"
               >
                 <FeatherIcon name="x" class="size-4" />

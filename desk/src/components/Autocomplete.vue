@@ -3,7 +3,7 @@
     <Popover v-model:show="showOptions">
       <template #target="{ open: openPopover, togglePopover }">
         <slot name="target" v-bind="{ open: openPopover, togglePopover }">
-          <div class="w-full -ml-0.5">
+          <div class="w-full -ms-0.5">
             <button
               class="flex w-full items-center justify-between focus:outline-none"
               :class="inputClasses"
@@ -27,7 +27,7 @@
               </div>
               <FeatherIcon
                 name="chevron-down"
-                class="h-4 w-4 text-ink-gray-5"
+                class="h-4 w-4 text-ink-gray-7"
                 aria-hidden="true"
               />
             </button>
@@ -42,7 +42,7 @@
             <div class="relative px-1.5 pt-0.5">
               <ComboboxInput
                 ref="search"
-                class="form-input w-full pr-6 bg-transparent"
+                class="form-input w-full pe-6 bg-transparent"
                 type="text"
                 :value="query"
                 autocomplete="off"
@@ -54,7 +54,7 @@
                 "
               />
               <button
-                class="absolute inset-y-0 right-3 top-px flex items-center"
+                class="absolute inset-y-0 end-3 top-px flex items-center"
                 @click="selectedValue = null"
               >
                 <FeatherIcon name="x" class="size-4" />

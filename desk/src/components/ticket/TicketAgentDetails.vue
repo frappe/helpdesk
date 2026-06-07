@@ -13,7 +13,7 @@
         <Tooltip :text="s.tooltipValue">
           <Badge
             v-if="s.badgeText"
-            class="-ml-1"
+            class="-ms-1"
             :label="s.badgeText"
             variant="subtle"
             :theme="s.badgeColor"
@@ -25,14 +25,13 @@
 </template>
 
 <script setup lang="ts">
-import { dayjs } from "@/dayjs";
 import {
   dateFormat,
   dateTooltipFormat,
   formatTime,
   getTimeInSeconds,
 } from "@/utils";
-import { Badge, Tooltip } from "frappe-ui";
+import { Badge, dayjs, Tooltip } from "frappe-ui";
 import { computed, onUnmounted, ref, watch } from "vue";
 
 const props = defineProps({

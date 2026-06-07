@@ -9,6 +9,7 @@
           label="Create"
           theme="gray"
           variant="solid"
+          class="rtl:flex-row-reverse"
           @click="isDialogVisible = !isDialogVisible"
         >
           <template #prefix>
@@ -36,21 +37,21 @@
     </span>
   </div>
 </template>
+
 <script setup lang="ts">
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
+import { OrganizationsIcon } from "@/components/icons";
+import { __ } from "@/translation";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CustomerDialog from "./CustomerDialog.vue";
-import { OrganizationsIcon } from "@/components/icons";
-import { __ } from "@/translation";
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
 const selectedCustomer = ref(null);
-const listViewRef = ref(null);
-// const emptyMessage = "No Customers Found";
+const listViewRef = ref<InstanceType<typeof ListViewBuilder> | null>(null);
 const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
 );
@@ -59,6 +60,7 @@ function openCustomer(id: string) {
   selectedCustomer.value = id;
   isCustomerDialogVisible.value = true;
 }
+
 function handleCustomer(updated = false) {
   updated
     ? (isCustomerDialogVisible.value = false)
@@ -83,7 +85,6 @@ const options = computed(() => {
         },
       },
     },
-
     emptyState: {
       title: "No customers found",
       description: hasActiveFilters.value

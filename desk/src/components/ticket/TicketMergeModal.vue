@@ -1,25 +1,28 @@
 <template>
-  <Dialog
-    :options="{ title: `Merge with another ticket` }"
-    v-model="showDialog"
-  >
-    <template #body-content>
+  <Dialog title="Merge with another ticket" v-model:open="showDialog">
+    <template #default>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-8">
-          {{ __("All comments and emails of the ticket will be moved to the") }}
-          <span class="whitespace-nowrap font-semibold"
-            >#{{ ticket.name }}</span
-          >
-          <span class="inline-flex items-center gap-1">
-            selected ticket
-            <Popover trigger="hover" :hoverDelay="0.25" placement="right">
+          {{
+            __(
+              "All comments and emails from both tickets will be merged into the selected ticket"
+            )
+          }}
+          <span class="whitespace-nowrap font-semibold">
+            #{{ ticket.name
+            }}<Popover
+              trigger="hover"
+              :hoverDelay="0.25"
+              :placement="isRtl ? 'left' : 'right'"
+              class="!inline-flex align-middle ms-1 -mt-1"
+            >
               <template #target>
                 <FeatherIcon name="info" class="size-4 cursor-pointer" />
               </template>
 
               <template #body-main>
                 <div
-                  class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-98 whitespace-pre-wrap leading-5"
+                  class="text-sm text-ink-gray-6 p-2.5 bg-surface-white rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
                 >
                   <span class="text-p-base">
                     {{
@@ -27,24 +30,17 @@
                     }}</span
                   >
                   <ul class="list-disc pl-4 mt-1 space-y-1">
-                    <li>
-                      {{ __("Ticket must be Open or Paused.") }}
-                      <code class="bg-surface-gray-2 rounded-md px-1 py-0.5">
-                        {{ __("status_category in ['Open', 'Paused']") }}</code
+                    <li
+                      v-for="(condition, index) in mergeConditions"
+                      :key="index"
+                    >
+                      {{ __(condition.text) }}
+                      <code
+                        v-if="condition.code"
+                        class="bg-surface-gray-2 rounded-md px-1 py-0.5"
                       >
-                    </li>
-                    <li>
-                      {{ __("Ticket must not already be merged.") }}
-                      <code class="bg-surface-gray-2 rounded-md px-1 py-0.5">
-                        {{ __("is_merged === 0") }}</code
-                      >
-                    </li>
-                    <li>
-                      {{
-                        __(
-                          "Source and target tickets which are to be merged cannot be the same."
-                        )
-                      }}
+                        {{ __(condition.code) }}
+                      </code>
                     </li>
                   </ul>
                 </div>
@@ -56,9 +52,9 @@
         <Link
           class="form-control"
           doctype="HD Ticket"
-          placeholder="Select Ticket"
+          :placeholder="__('Select Ticket')"
           :filters="getDefaultFilters()"
-          label="Ticket"
+          :label="__('Ticket')"
           :page-length="10"
           :value="targetTicket"
           :show-description="true"
@@ -66,7 +62,7 @@
         />
         <FormControl
           v-if="targetTicket"
-          label="Ticket Subject"
+          :label="__('Ticket Subject')"
           type="text"
           v-model="subject"
           :disabled="true"
@@ -102,6 +98,7 @@
 
 <script setup lang="ts">
 import { Link } from "@/components";
+import { __ } from "@/translation";
 import { HDTicket } from "@/types/doctypes";
 import {
   Dialog,
@@ -126,6 +123,30 @@ interface E {
 const props = defineProps<Props>();
 const emit = defineEmits<E>();
 const showDialog = defineModel<boolean>();
+
+const isRtl = document.documentElement.dir === "rtl";
+
+const mergeConditions = [
+  {
+    text: "Ticket must be Open or Paused.",
+    code: "status_category in ['Open', 'Paused']",
+  },
+  {
+    text: "Ticket must not already be merged.",
+    code: "is_merged === 0",
+  },
+  {
+    text: "Source and target tickets which are to be merged cannot be the same.",
+  },
+  {
+    text: "If source ticket has a customer, target must belong to the same customer.",
+    code: "customer === source.customer",
+  },
+  {
+    text: "If source ticket has a raised_by, target must share the same raised_by.",
+    code: "raised_by === source.raised_by",
+  },
+];
 
 interface Filter {
   status_category: [string, string[] | string];
@@ -164,11 +185,11 @@ const mergeTicket = createResource({
     };
   },
   validate({ source, target }) {
-    if (!source) throw { message: "Category is required" };
-    if (!target) throw { message: "Ticket to merged with is required" };
+    if (!source) throw { message: __("Category is required") };
+    if (!target) throw { message: __("Ticket to merged with is required") };
   },
   onSuccess: () => {
-    toast.success("Ticket merged successfully.");
+    toast.success(__("Ticket merged successfully."));
     emit("update");
 
     showDialog.value = false;

@@ -27,7 +27,7 @@
     </div>
   </div>
   <Dropdown v-if="groupedActions.length" :options="groupedActions">
-    <Button icon="more-horizontal" variant="ghost" />
+    <Button icon="lucide-more-horizontal" variant="ghost" />
   </Dropdown>
 </template>
 

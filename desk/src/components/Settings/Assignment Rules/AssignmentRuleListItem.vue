@@ -4,7 +4,7 @@
   >
     <div
       @click="assignmentRulesActiveScreen = { screen: 'view', data: data }"
-      class="w-full pl-2 col-span-7 h-14 flex flex-col justify-center"
+      class="w-full ps-2 col-span-7 h-14 flex flex-col justify-center"
     >
       <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
       <div
@@ -16,7 +16,7 @@
     </div>
     <div class="col-span-3">
       <select
-        class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-md p-0 pl-2 pr-5 bg-transparent -ml-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
+        class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-md p-0 ps-2 pe-5 bg-transparent -ms-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
         v-model="data.priority"
         @update:modelValue="onPriorityChange"
         @change="onPriorityChange"
@@ -30,7 +30,7 @@
         </option>
       </select>
     </div>
-    <div class="flex justify-between items-center w-full pr-2 col-span-2">
+    <div class="flex justify-between items-center w-full pe-2 col-span-2">
       <div>
         <Switch
           size="sm"
@@ -41,7 +41,7 @@
       <div>
         <Dropdown placement="right" :options="dropdownOptions">
           <Button
-            icon="more-horizontal"
+            icon="lucide-more-horizontal"
             variant="ghost"
             @click="isConfirmingDelete = false"
           />
@@ -50,10 +50,10 @@
     </div>
   </div>
   <Dialog
-    :options="{ title: __('Duplicate Assignment Rule') }"
-    v-model="duplicateDialog.show"
+    :title="__('Duplicate Assignment Rule')"
+    v-model:open="duplicateDialog.show"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl
           :label="__('New Assignment Rule Name')"
@@ -143,7 +143,7 @@ const dropdownOptions = [
         name: props.data.name,
       };
     },
-    icon: "copy",
+    icon: "lucide-copy",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteAssignmentRule(),

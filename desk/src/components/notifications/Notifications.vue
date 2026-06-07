@@ -2,18 +2,18 @@
   <span
     v-if="notificationStore.visible"
     ref="target"
-    class="fixed z-10 h-screen overflow-auto bg-surface-white"
+    class="fixed z-10 h-screen overflow-auto bg-surface-white notifications-panel"
     :style="{
       'box-shadow': '8px 0px 8px rgba(0, 0, 0, 0.1)',
       'max-width': '350px',
       'min-width': '350px',
-      left: sidebarStore.width,
+      'inset-inline-start': sidebarStore.width,
     }"
   >
     <div
       class="sticky top-0 z-10 flex items-center justify-between border-b bg-surface-white px-5 py-2.5"
     >
-      <span class="text-lg font-medium">Notifications</span>
+      <span class="text-lg font-medium">{{ __("Notifications") }}</span>
       <div>
         <Button
           theme="blue"
@@ -51,7 +51,7 @@
         <UserAvatar :name="n.user_from" />
         <span>
           <div class="mb-2 leading-5">
-            <span class="space-x-1 text-ink-gray-7">
+            <span class="space-x-1 rtl:space-x-reverse text-ink-gray-6">
               <span
                 class="font-medium text-ink-gray-9"
                 v-if="n.notification_type !== 'Reaction' || !n.message"
@@ -93,7 +93,7 @@
 
 <script setup lang="ts">
 import { UserAvatar } from "@/components";
-import { dayjs } from "@/dayjs";
+import { dayjs } from "frappe-ui";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { Notification } from "@/types";
@@ -151,3 +151,8 @@ function getRoute(n: Notification) {
   }
 }
 </script>
+<style lang="css">
+[dir="rtl"] .notifications-panel {
+  box-shadow: -8px 0px 8px rgba(0, 0, 0, 0.1) !important;
+}
+</style>
