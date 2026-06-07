@@ -223,6 +223,7 @@ class HDTicket(Document):
         self.publish_update()
         self.capture_update_telemetry_events()
 
+
     def notify_agent(self, agent, notification_type="Assignment"):
         frappe.get_doc(
             frappe._dict(
@@ -1422,3 +1423,30 @@ def update_sla_status_in_ticket():
             )
             continue
         frappe.db.commit()  # nosemgrep
+
+def close_todos_on_resolve(doc, method=None):
+    if not doc.has_value_changed("status_category"):
+        return
+
+    if doc.status_category == "Resolved":
+        todo_status = "Closed"
+    elif doc.status_category == "Open":
+        todo_status = "Open"
+    else:
+        return
+
+    todos = frappe.get_all(
+        "ToDo",
+        filters={
+            "reference_type": "HD Ticket",
+            "reference_name": doc.name,
+        },
+        pluck="name",
+    )
+
+    def update_todos():
+        for todo in todos:
+            frappe.db.set_value("ToDo", todo, "status", todo_status)
+        frappe.db.commit()
+
+    frappe.db.after_commit.add(update_todos)
