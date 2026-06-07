@@ -1,8 +1,5 @@
 <template>
-  <div
-  class="flex items-center justify-between text-lg font-medium px-6 py-3 bg-white"
-  >
- 
+  <div class="flex items-center justify-between text-lg font-medium px-6 py-3 bg-white">
     <div class="flex h-8 items-center text-lg font-bold text-ink-gray-9">
       {{ title }}
     </div>
@@ -46,7 +43,7 @@
 
   <CallLogModal
     v-model="showCallLogModal"
-    :ticketId="ticket.value?.name"
+    :ticketId="ticket?.value?.name"
     @after-insert="refreshTicket"
   />
 </template>
@@ -71,6 +68,7 @@ const makeCall = inject<() => void>("makeCall");
 const refreshTicket = inject<() => void>("refreshTicket");
 const ticket = inject<any>(TicketSymbol);
 const showCallLogModal = ref(false);
+
 const callActions = computed(() => [
   {
     icon: h(PhoneIcon, { class: "h-4 w-4" }),
@@ -82,19 +80,6 @@ const callActions = computed(() => [
     label: __("Log a Call"),
     onClick: () => {
       showCallLogModal.value = true;
-const callActions = computed(() => {
-  let actions = [
-    {
-      icon: h(PhoneIcon, { class: "h-4 w-4" }),
-      label: __("Make a Call"),
-      onClick: () => makeCall(),
-    },
-    {
-      icon: "lucide-edit-3",
-      label: __("Log a Call"),
-      onClick: () => {
-        showCallLogModal.value = true;
-      },
     },
   },
 ]);
