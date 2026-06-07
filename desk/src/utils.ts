@@ -15,6 +15,7 @@ import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
 import TicketIcon from "./components/icons/TicketIcon.vue";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
+
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
