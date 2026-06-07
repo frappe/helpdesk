@@ -153,61 +153,6 @@
           @click="showChangePasswordModal = true"
         />
       </div>
-      <div>
-        <div class="flex items-center justify-between mt-6">
-          <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-ink-gray-8">
-              {{ __("Language") }}
-            </span>
-            <span class="text-p-sm text-ink-gray-6">
-              {{ __("Change language of the application.") }}
-            </span>
-          </div>
-          <Link
-            :model-value="user.doc?.language"
-            @update:modelValue="updateLanguage"
-            doctype="Language"
-            class="w-40"
-          />
-        </div>
-        <div class="flex items-center justify-between mt-6">
-          <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-ink-gray-8">
-              {{ __("Timezone") }}
-            </span>
-            <span class="text-p-sm text-ink-gray-6">
-              {{ __("Change timezone of the application.") }}
-            </span>
-          </div>
-          <Autocomplete
-            :model-value="user.doc?.time_zone"
-            @update:modelValue="updateTimezone"
-            class="w-40"
-            :options="timezoneOptions"
-            size="sm"
-            placeholder="Select Timezone"
-          />
-        </div>
-        <div class="flex items-center justify-between mt-6">
-          <div class="flex flex-col gap-1">
-            <span class="text-base font-medium text-ink-gray-8">
-              {{ __("Theme") }}
-            </span>
-            <span class="text-p-sm text-ink-gray-6">{{
-              __("Choose your preferred appearance.")
-            }}</span>
-          </div>
-          <TabButtons
-            :buttons="[
-              { label: __('Light'), value: 'light' },
-              { label: __('Dark'), value: 'dark' },
-              { label: __('System'), value: 'system' },
-            ]"
-            :model-value="currentTheme"
-            @update:model-value="setTheme"
-          />
-        </div>
-      </div>
     </template>
   </SettingsLayoutBase>
   <ChangePasswordModal
@@ -223,12 +168,8 @@ import {
   Button,
   FileUploader,
   LoadingIndicator,
-  TabButtons,
   toast,
   createDocumentResource,
-  createResource,
-
-  useTheme,
 } from "frappe-ui";
 
 import { __ } from "@/translation";
@@ -244,18 +185,6 @@ import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 const { currentStatus } = useAvailability();
 const agentStatusStore = useAgentStatusStore();
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
-import Link from "@/components/frappe-ui/Link.vue";
-import { HDAgent } from "@/types/doctypes";
-
-const auth = useAuthStore();
-const { currentTheme, setTheme } = useTheme();
-const profile = ref({
-  fullName: auth.userName,
-  userImage: auth.userImage,
-  firstName: auth.userFirstName,
-  lastName: auth.userLastName,
-});
 const showChangePasswordModal = ref(false);
 
 const { userId, hasAgentRecord } = useAuthStore();
