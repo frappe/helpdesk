@@ -8,7 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "agent_status",
-  "enable",
+  "enabled",
   "category",
   "section_break_jqvx",
   "color",
@@ -32,7 +32,7 @@
    "fieldtype": "Section Break"
   },
   {
-   "description": "Active: The agent is available and working.<br>\nAway: The agent is temporarily unreachable.<br>\nUnavailable: The agent is off and unavailable.",
+   "description": "Groups this status by how available the agent is.<br>Active: available and handling tickets.<br>Away: temporarily unreachable.<br>Unavailable: offline and not taking tickets.",
    "fieldname": "category",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -52,7 +52,7 @@
   },
   {
    "default": "1",
-   "fieldname": "enable",
+   "fieldname": "enabled",
    "fieldtype": "Check",
    "label": "Enable"
   }
@@ -60,7 +60,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-08 13:19:57.646908",
+ "modified": "2026-06-08 17:27:22.314815",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent Status",

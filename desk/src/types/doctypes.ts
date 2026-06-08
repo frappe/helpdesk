@@ -287,7 +287,7 @@ export interface HDAgentStatus extends DocType {
   /** Color: Select */
   color?: 'Black' | 'Gray' | 'Blue' | 'Green' | 'Red' | 'Pink' | 'Orange' | 'Amber' | 'Yellow' | 'Cyan' | 'Teal' | 'Violet' | 'purple';
   /** Enable: Check */
-  enable: 0 | 1;
+  enabled: 0 | 1;
 }
 
 // Last updated: 2022-12-22 18:52:50.658355

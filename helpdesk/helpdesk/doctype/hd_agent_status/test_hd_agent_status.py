@@ -81,16 +81,29 @@ class TestHDAgentStatus(FrappeTestCase):
     # the last enabled Active status cannot be disabled
     def test_last_active_status_cannot_be_disabled(self):
         active = frappe.get_doc("HD Agent Status", "Active")
-        active.enable = 0
+        active.enabled = 0
         with self.assertRaises(frappe.ValidationError):
             active.save()
 
     # an Active status can be disabled while another enabled Active status remains
     def test_active_status_can_be_disabled_with_another_active(self):
         online = make_agent_status("Online", category="Active")
-        online.enable = 0
+        online.enabled = 0
         online.save()
-        self.assertFalse(online.enable)
+        self.assertFalse(online.enabled)
+
+    # disabling a status moves agents holding it back to the Active status
+    def test_disabling_status_resets_agents_to_active(self):
+        focusing = make_agent_status("Focusing", category="Away")
+        agent = make_agent("disable_status@test.com", first_name="Disable Status")
+        frappe.db.set_value("HD Agent", agent, "availability", "Focusing")
+
+        focusing.enabled = 0
+        focusing.save()
+
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", agent, "availability"), "Active"
+        )
 
     # the last Active status cannot be moved out of the Active category
     def test_last_active_status_cannot_be_demoted(self):
