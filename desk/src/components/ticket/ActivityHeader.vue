@@ -76,7 +76,7 @@ const callActions = computed(() => [
     onClick: () => makeCall?.(),
   },
   {
-    icon: "edit-3",
+     icon: "lucide-edit-3",
     label: __("Log a Call"),
     onClick: () => {
       showCallLogModal.value = true;
