@@ -29,9 +29,9 @@
     class="flex flex-col flex-1 overflow-y-auto"
     :mask-length="20"
   >
-    <div v-if="localActivities.length" class="activities flex-1 h-full mt-0.5">
+    <div v-if="activities.length" class="activities flex-1 h-full mt-0.5">
       <div
-        v-for="(activity, i) in localActivities"
+        v-for="(activity, i) in activities"
         :key="activity.key"
         class="activity"
         tabindex="0"
@@ -57,7 +57,7 @@
           <div
             class="relative flex justify-center after:absolute after:start-[50%] after:top-3 after:-z-10 after:border-s after:border-outline-gray-modals"
             :class="[
-              i != localActivities.length - 1 && 'after:h-full',
+              i != activities.length - 1 && 'after:h-full',
               !['email', 'feedback', 'call', 'comment'].includes(activity.type) && 'after:top-6',
             ]"
           >
@@ -95,7 +95,7 @@
           <div
             class="flex flex-1 mb-4"
             :class="[
-              i == localActivities.length - 1 && 'mb-5',
+              i == activities.length - 1 && 'mb-5',
               !['email', 'feedback', 'call', 'comment'].includes(activity.type) && 'mt-[2px]',
             ]"
           >
@@ -203,7 +203,7 @@ const resolvedTicketId = computed(() =>
   String(props.ticketId || injectedTicketId || "").trim()
 );
 
-const localActivities = computed(() => {
+const activities = computed(() => {
   if (props.title === __("Activity")) {
     return props.activities.filter((activity) => activity.type !== "task");
   }
@@ -292,9 +292,3 @@ defineExpose({
   scrollToLatestActivity,
 });
 </script>
-
-<style scoped>
-.activity:focus {
-  outline: none;
-}
-</style>
