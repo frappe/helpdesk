@@ -75,12 +75,8 @@ import { __ } from "@/translation";
 const ticket = inject(TicketSymbol)!;
 const activities = inject(ActivitiesSymbol)!;
 
-const ticketAgentActivitiesRef = ref<InstanceType<
-  typeof TicketAgentActivities
-> | null>(null);
-const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
-  null
-);
+const ticketAgentActivitiesRef = ref<InstanceType<typeof TicketAgentActivities> | null>(null);
+const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(null);
 
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
@@ -103,9 +99,9 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       icon: CommentIcon,
     },
     {
-      name: "task", 
-     label: "Tasks",
-      icon: TaskIcon ,
+      name: "task",
+      label: "Tasks",
+      icon: TaskIcon,
     }
   ];
 
@@ -120,7 +116,6 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
 });
 
 const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
-
 const _activities = computed(() => {
   if (!activities.value?.data) {
     return [];
@@ -160,12 +155,15 @@ const _activities = computed(() => {
       attachments: comment.attachments,
     };
   });
-    // if h.actions includes h.owner, replace it with 'themselves'
 
   activities.value.data.history.map((h) => {
+    // if h.actions includes h.owner, replace it with 'themselves'
+    h.action;
+    h.owner;
     if (h.action && h.owner && h.action.includes(h.owner)) {
       h.action = h.action.replace(h.owner, "themselves");
     }
+    return h;
   });
 
   const historyProps = [
@@ -247,9 +245,6 @@ const _activities = computed(() => {
     }
     i++;
   }
-  // add feedback data at the last always
-  // name is email
-  // full_name is name
 
   if (ticket.value.doc.feedback_rating === 0) {
     return data;
