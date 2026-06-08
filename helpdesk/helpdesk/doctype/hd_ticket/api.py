@@ -722,7 +722,8 @@ def get_recent_tickets(ticket: str):
             )
             or []
         )
-    elif raised_by:
+
+    if raised_by:
         user_tickets = (
             frappe.get_list(
                 "HD Ticket",
