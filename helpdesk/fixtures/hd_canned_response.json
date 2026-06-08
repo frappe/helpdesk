@@ -1,0 +1,119 @@
+[
+  {
+    "doctype": "HD Canned Response",
+    "title": "Thank You for Contacting Us",
+    "shortcut": "/thanks",
+    "category": "Greeting",
+    "is_active": 1,
+    "message": "<p>Thank you for reaching out to us. We appreciate you taking the time to contact our support team.</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Issue Resolved",
+    "shortcut": "/resolved",
+    "category": "Closing",
+    "is_active": 1,
+    "message": "<p>I'm glad we could resolve your issue. If you have any other questions or concerns, please don't hesitate to reach out.</p><p>Have a great day!</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Request Additional Information",
+    "shortcut": "/moreinfo",
+    "category": "Follow-up",
+    "is_active": 1,
+    "message": "<p>To better assist you, could you please provide the following information:</p><ul><li>A detailed description of the issue</li><li>Any error messages you're seeing</li><li>Steps to reproduce the problem</li><li>Screenshots if applicable</li></ul><p>Thank you for your cooperation.</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Clear Cache and Cookies",
+    "shortcut": "/cache",
+    "category": "Troubleshooting",
+    "is_active": 1,
+    "message": "<p>Please try clearing your browser cache and cookies, then restart your browser. Here's how:</p><ul><li><strong>Chrome/Edge:</strong> Press Ctrl+Shift+Delete (Cmd+Shift+Delete on Mac)</li><li><strong>Firefox:</strong> Press Ctrl+Shift+Delete (Cmd+Shift+Delete on Mac)</li><li><strong>Safari:</strong> Go to Safari &gt; Clear History</li></ul><p>After clearing, please try accessing again and let me know if the issue persists.</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Check Your Internet Connection",
+    "shortcut": "/internet",
+    "category": "Troubleshooting",
+    "is_active": 1,
+    "message": "<p>It appears there might be a connectivity issue. Please try the following:</p><ol><li>Check if your internet connection is stable</li><li>Try refreshing the page</li><li>If using WiFi, try switching to mobile data or vice versa</li><li>Restart your router if the problem persists</li></ol><p>Let me know if this helps resolve the issue.</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Password Reset Instructions",
+    "shortcut": "/password",
+    "category": "Account",
+    "is_active": 1,
+    "message": "<p>To reset your password, please follow these steps:</p><ol><li>Go to the login page</li><li>Click on \"Forgot Password?\"</li><li>Enter your registered email address</li><li>Check your email for the password reset link</li><li>Follow the link and create a new password</li></ol><p>If you don't receive the email within 5 minutes, please check your spam folder or contact us again.</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Escalating to Technical Team",
+    "shortcut": "/escalate",
+    "category": "Escalation",
+    "is_active": 1,
+    "message": "<p>Thank you for providing those details. I'm escalating this issue to our technical team for further investigation.</p><p>You can expect an update within the next 24-48 hours. We'll keep you informed of any progress.</p><p>Your ticket reference number is available at the top of this conversation.</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Billing Inquiry - Processing",
+    "shortcut": "/billing",
+    "category": "Billing",
+    "is_active": 1,
+    "message": "<p>Thank you for your billing inquiry. I'm reviewing your account details now.</p><p>Please allow me 1-2 business days to investigate this matter thoroughly. I'll get back to you with a detailed response.</p><p>If this is urgent, please let me know and I'll prioritize your request.</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Working on Your Request",
+    "shortcut": "/working",
+    "category": "General",
+    "is_active": 1,
+    "message": "<p>I'm currently working on your request. I'll update you as soon as I have more information.</p><p>Thank you for your patience.</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Follow Up Reminder",
+    "shortcut": "/followup",
+    "category": "Follow-up",
+    "is_active": 1,
+    "message": "<p>I wanted to follow up on your previous ticket. Have you had a chance to try the solution I provided?</p><p>Please let me know if:</p><ul><li>The issue has been resolved</li><li>You need additional assistance</li><li>You have any other questions</li></ul><p>Looking forward to hearing from you.</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Account Verification Required",
+    "shortcut": "/verify",
+    "category": "Account",
+    "is_active": 1,
+    "message": "<p>For security purposes, I need to verify your account before proceeding.</p><p>Please confirm the following:</p><ul><li>Your registered email address</li><li>The last 4 digits of your account number (if applicable)</li><li>The date you created your account or last logged in</li></ul><p>This helps us ensure we're protecting your account information.</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Browser Compatibility",
+    "shortcut": "/browser",
+    "category": "Troubleshooting",
+    "is_active": 1,
+    "message": "<p>It's possible you're experiencing a browser compatibility issue. We recommend using the latest version of:</p><ul><li>Google Chrome</li><li>Mozilla Firefox</li><li>Microsoft Edge</li><li>Safari (for Mac users)</li></ul><p>Please ensure your browser is up to date and try again. Let me know if this resolves the issue.</p>",
+    "usage_count": 0
+  },
+  {
+    "doctype": "HD Canned Response",
+    "title": "Ticket Closing",
+    "shortcut": "/close",
+    "category": "Closing",
+    "is_active": 1,
+    "message": "<p>Since we haven't heard back from you, I'm assuming your issue has been resolved. I'll be closing this ticket now.</p><p>If you need any further assistance, please don't hesitate to create a new ticket or reopen this one.</p><p>Thank you for contacting our support team!</p>",
+    "usage_count": 0
+  }
+]

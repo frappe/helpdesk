@@ -87,9 +87,10 @@
   },
   {
    "fieldname": "territory",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Territory",
-   "description": "Kenya admin hierarchy identifier (county/sub-county name)"
+   "options": "HD Subcounty",
+   "description": "Sub-county this team covers"
   },
   {
    "default": "0",

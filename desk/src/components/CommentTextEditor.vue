@@ -63,6 +63,11 @@
                 </Button>
               </template>
             </FileUploader>
+            <!-- Temporarily disabled until DocType is fully loaded
+            <CannedResponseSelector
+              :onSelect="insertCannedResponse"
+            />
+            -->
             <TextEditorFixedMenu
               class="-ml-0.5"
               :buttons="textEditorMenuButtons"
@@ -110,6 +115,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import { AttachmentItem } from "@/components/";
 import { AttachmentIcon } from "@/components/icons/";
+import CannedResponseSelector from "@/components/CannedResponseSelector.vue";
 import { useTyping } from "@/composables/realtime";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
@@ -219,6 +225,50 @@ async function submitComment() {
 const editorRef = ref(null);
 const editor = computed(() => editorRef.value?.editor);
 
+function insertCannedResponse(response) {
+  if (editor.value) {
+    const currentContent = newComment.value || '';
+    const newContent = currentContent ? currentContent + '<br><br>' + response.message : response.message;
+    newComment.value = newContent;
+    editor.value.commands.setContent(newContent);
+    editor.value.commands.focus('end');
+  }
+}
+
+// Watch for shortcut commands in the comment
+watch(newComment, (newValue, oldValue) => {
+  if (!newValue || !editor.value) return;
+
+  // Check if user typed a shortcut (starts with /)
+  const text = editor.value.getText();
+  const words = text.split(/\s+/);
+  const lastWord = words[words.length - 1];
+
+  if (lastWord && lastWord.startsWith('/') && lastWord.length > 1) {
+    // Debounce to avoid too many API calls
+    checkForCannedResponseShortcut(lastWord);
+  }
+});
+
+async function checkForCannedResponseShortcut(shortcut) {
+  try {
+    const response = await createResource({
+      url: 'helpdesk.helpdesk.doctype.hd_canned_response.hd_canned_response.get_canned_response_by_shortcut',
+      makeParams: () => ({ shortcut }),
+    }).submit();
+
+    if (response && editor.value) {
+      // Replace the shortcut with the canned response
+      const text = editor.value.getText();
+      const newText = text.replace(shortcut, '');
+      editor.value.commands.setContent(newText + response.message);
+      editor.value.commands.focus('end');
+    }
+  } catch (error) {
+    // Shortcut not found, ignore
+  }
+}
+
 onMounted(() => {
   if (
     agentsList.value.loading ||
@@ -233,5 +283,6 @@ onMounted(() => {
 defineExpose({
   submitComment,
   editor,
+  insertCannedResponse,
 });
 </script>

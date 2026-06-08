@@ -33,6 +33,29 @@ frappe.ui.form.on("HD Ticket", {
     }
     frm.refresh_field("sub_category");
   },
+
+  // Set up query for sub_county to filter by county
+  county(frm) {
+    if (!frm.doc.county) {
+      frm.set_value("sub_county", "");
+    }
+    frm.refresh_field("sub_county");
+  },
+
+  setup(frm) {
+    // Set query for sub_county field
+    frm.set_query("sub_county", function() {
+      if (frm.doc.county) {
+        return {
+          query: "helpdesk.utils.queries.get_subcounties_by_county",
+          filters: {
+            county: frm.doc.county
+          }
+        };
+      }
+      return {};
+    });
+  },
 });
 
 function apply_itil_mode(frm) {

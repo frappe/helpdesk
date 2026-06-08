@@ -9,29 +9,34 @@ from frappe import _
 
 @frappe.whitelist(allow_guest=True)
 def get_counties() -> list[str]:
-    """Return a sorted list of distinct county names from HD Facility Mapping."""
+    """Return a sorted list of all Kenya counties from HD County."""
     rows = frappe.db.get_all(
-        "HD Facility Mapping",
-        fields=["county"],
-        distinct=True,
-        order_by="county asc",
+        "HD County",
+        fields=["county_name"],
+        order_by="county_name asc",
     )
-    return sorted({r.county for r in rows if r.county})
+    return [r.county_name for r in rows if r.county_name]
 
 
 @frappe.whitelist(allow_guest=True)
-def get_sub_counties(county: str) -> list[str]:
-    """Return a sorted list of distinct sub-county names for the given county."""
+def get_sub_counties(county: str) -> list[dict]:
+    """Return a sorted list of subcounties for the given county from HD Subcounty.
+
+    Returns list of dicts with 'label' (display name) and 'value' (document name)
+    so the form can display the readable name but save the correct document ID.
+    """
     if not county:
         return []
     rows = frappe.db.get_all(
-        "HD Facility Mapping",
+        "HD Subcounty",
         filters={"county": county},
-        fields=["sub_county"],
-        distinct=True,
-        order_by="sub_county asc",
+        fields=["name", "subcounty_name"],
+        order_by="subcounty_name asc",
     )
-    return sorted({r.sub_county for r in rows if r.sub_county})
+    return [
+        {"label": r.subcounty_name, "value": r.name}
+        for r in rows if r.subcounty_name
+    ]
 
 
 @frappe.whitelist()

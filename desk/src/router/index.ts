@@ -124,6 +124,12 @@ const routes = [
     meta: { auth: true, agent: true },
   },
   {
+    path: "/canned-responses",
+    name: "CannedResponses",
+    component: () => import("@/pages/CannedResponses.vue"),
+    meta: { auth: true, agent: true },
+  },
+  {
     path: "/major-incidents",
     name: "MajorIncidents",
     component: () =>

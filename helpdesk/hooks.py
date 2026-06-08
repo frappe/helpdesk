@@ -113,7 +113,13 @@ permission_query_conditions = {
 # Override standard doctype classes
 override_doctype_class = {
     "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
+    "Email Queue": "helpdesk.email.email_queue_override.SesAwareEmailQueue",
 }
+
+# Email Override
+# --------------
+# AWS SES email transport override
+override_email_send = "helpdesk.email.aws_ses_override.send"
 
 ignore_links_on_delete = [
     "HD Notification",
@@ -140,3 +146,9 @@ fixtures = [
     {"dt": "HD Support Level"},
     {"dt": "Workflow", "filters": [["document_type", "=", "HD Article"]]},
 ]
+
+# CLI Commands
+# ------------
+# Custom bench commands for helpdesk app
+# Temporarily disabled to avoid pickle issues during migration
+# from helpdesk.commands.brand_fixtures import commands

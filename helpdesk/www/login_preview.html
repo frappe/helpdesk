@@ -1,0 +1,268 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ _("Sign in") }} · {{ brand.display_name or "Helpdesk" }}{% endblock %}
+
+{% block head_include %}
+<meta name="robots" content="noindex,nofollow">
+<meta name="csrf-token" content="{{ csrf_token }}">
+<link rel="stylesheet" href="/assets/helpdesk/css/login.css">
+<style>
+.hd-login {
+	--hd-primary: {{ brand.primary_color or "#059669" }};
+	--hd-accent: {{ brand.accent_color or "#047857" }};
+	--hd-bg-tint: {{ brand.bg_tint_color or "rgba(5, 150, 105, 0.08)" }};
+}
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="hd-login" data-view="sign-in">
+	<!-- Left Hero Column -->
+	<div class="hd-login__hero">
+		<div class="hd-login__badge">
+			{% if brand.logo %}
+			<img src="{{ brand.logo }}" alt="{{ brand.display_name }}" class="hd-login__logo" width="48" height="48" loading="eager">
+			{% endif %}
+			<span class="hd-login__badge-text">{{ brand.display_name or "Helpdesk Platform" }}</span>
+		</div>
+
+		<h1 class="hd-login__headline">{{ brand.headline or _("Welcome back · Sign in to Helpdesk") }}</h1>
+
+		<p class="hd-login__supporting">{{ brand.supporting_copy or _("Modern customer service software · Track tickets, browse the knowledge base, get answers fast.") }}</p>
+
+		{% if brand.perks %}
+		<ul class="hd-login__perks">
+			{% for perk in brand.perks %}
+			<li class="hd-login__perk">
+				<svg class="hd-login__perk-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+					<path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill="currentColor"/>
+				</svg>
+				<div>
+					<div class="hd-login__perk-label">{{ perk.label }}</div>
+					<div class="hd-login__perk-desc">{{ perk.description }}</div>
+				</div>
+			</li>
+			{% endfor %}
+		</ul>
+		{% endif %}
+
+		{% if brand.trust_stats %}
+		<div class="hd-login__trust-stats">
+			{% for stat in brand.trust_stats %}
+			<div class="hd-login__stat">
+				<div class="hd-login__stat-value">{{ stat.value }}</div>
+				<div class="hd-login__stat-label">{{ stat.label }}</div>
+			</div>
+			{% endfor %}
+		</div>
+		{% endif %}
+	</div>
+
+	<!-- Right Panel with Glass Card -->
+	<div class="hd-login__panel">
+		{% if preview_mode %}
+		<div class="hd-login__preview-banner" role="status">
+			{{ _("Preview") }} · {{ _("This page is not live for end users") }}
+		</div>
+		{% endif %}
+
+		<div class="hd-login__card">
+			<!-- Sign In View -->
+			<div class="hd-login__view" data-view-name="sign-in">
+				<h2 class="hd-login__title">{{ _("Sign in") }}</h2>
+
+				<form id="sign-in-form" class="hd-login__form" data-view-form="sign-in">
+					<div class="hd-login__field">
+						<label for="email" class="hd-login__label">{{ _("Email") }}</label>
+						<input
+							type="email"
+							id="email"
+							name="email"
+							class="hd-login__input"
+							autocomplete="username"
+							inputmode="email"
+							required
+							aria-describedby="auth-error"
+						>
+					</div>
+
+					<div class="hd-login__field">
+						<label for="password" class="hd-login__label">{{ _("Password") }}</label>
+						<div class="hd-login__password-wrapper">
+							<input
+								type="password"
+								id="password"
+								name="password"
+								class="hd-login__input"
+								autocomplete="current-password"
+								required
+								aria-describedby="auth-error"
+							>
+							<button type="button" class="hd-login__password-toggle" aria-pressed="false" aria-label="{{ _('Show password') }}">
+								<svg class="hd-login__icon hd-login__icon-eye" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+									<path d="M10 4.5c-3.8 0-7 2.5-8.5 6 1.5 3.5 4.7 6 8.5 6s7-2.5 8.5-6c-1.5-3.5-4.7-6-8.5-6zm0 10c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4zm0-6.5c-1.4 0-2.5 1.1-2.5 2.5s1.1 2.5 2.5 2.5 2.5-1.1 2.5-2.5-1.1-2.5-2.5-2.5z" fill="currentColor"/>
+								</svg>
+								<svg class="hd-login__icon hd-login__icon-eye-slash" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="display: none;">
+									<path d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-2.5-2.5A9.5 9.5 0 0018.5 10c-1.5-3.5-4.7-6-8.5-6-1.2 0-2.3.2-3.4.6l-2.9-2.3zM10 14.5c-.8 0-1.6-.2-2.2-.6l1.4-1.4c.3.1.5.1.8.1 1.4 0 2.5-1.1 2.5-2.5 0-.3 0-.5-.1-.8l1.4-1.4c.4.7.6 1.4.6 2.2 0 2.2-1.8 4-4 4zM1.5 10c1.5-3.5 4.7-6 8.5-6 .5 0 1 .1 1.5.2L8.7 7c-.2-.1-.5-.1-.7-.1-2.2 0-4 1.8-4 4 0 .2 0 .5.1.7L1.5 10z" fill="currentColor"/>
+								</svg>
+							</button>
+						</div>
+					</div>
+
+					<div class="hd-login__field">
+						<label class="hd-login__checkbox">
+							<input type="checkbox" name="remember_me" value="1">
+							<span>{{ _("Remember me on this device") }}</span>
+							<span class="hd-login__tooltip" role="tooltip" aria-label="{{ _('Keeps you signed in for 30 days') }}">
+								<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+									<circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" fill="none"/>
+									<path d="M8 7v4M8 5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+								</svg>
+							</span>
+						</label>
+					</div>
+
+					<div role="alert" aria-live="polite" class="hd-login__error" id="auth-error"></div>
+
+					<button type="submit" class="hd-login__btn hd-login__btn--primary">
+						<span class="hd-login__btn-text">{{ _("Sign In") }}</span>
+						<svg class="hd-login__spinner" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="display: none;">
+							<circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none" opacity="0.25"/>
+							<path d="M10 2a8 8 0 018 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+						</svg>
+					</button>
+
+					<div class="hd-login__links">
+						<a href="#forgot" class="hd-login__link" id="forgot-link">{{ _("Forgot password?") }}</a>
+					</div>
+				</form>
+			</div>
+
+			<!-- MFA OTP View -->
+			<div class="hd-login__view" data-view-name="mfa-otp" style="display: none;">
+				<button type="button" class="hd-login__back" id="mfa-back-btn" aria-label="{{ _('Back to sign in') }}">
+					<svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+						<path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" fill="currentColor"/>
+					</svg>
+				</button>
+
+				<h2 class="hd-login__title">{{ _("Enter verification code") }}</h2>
+				<p class="hd-login__subtitle" id="mfa-prompt">{{ _("Enter the 6-digit code from your authenticator app") }}</p>
+
+				<form id="mfa-form" class="hd-login__form" data-view-form="mfa-otp">
+					<fieldset class="hd-login__otp-grid">
+						<legend class="hd-login__sr-only">{{ _("6-digit verification code") }}</legend>
+						<input type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" class="hd-login__otp-cell" aria-label="{{ _('Digit 1') }}">
+						<input type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" class="hd-login__otp-cell" aria-label="{{ _('Digit 2') }}">
+						<input type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" class="hd-login__otp-cell" aria-label="{{ _('Digit 3') }}">
+						<input type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" class="hd-login__otp-cell" aria-label="{{ _('Digit 4') }}">
+						<input type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" class="hd-login__otp-cell" aria-label="{{ _('Digit 5') }}">
+						<input type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" class="hd-login__otp-cell" aria-label="{{ _('Digit 6') }}">
+					</fieldset>
+
+					<div role="alert" aria-live="polite" class="hd-login__error" id="otp-error"></div>
+
+					<button type="button" class="hd-login__link hd-login__resend" id="resend-otp" style="display: none;">
+						{{ _("Resend code") }}
+					</button>
+				</form>
+			</div>
+
+			<!-- Forgot Password View -->
+			<div class="hd-login__view" data-view-name="forgot" style="display: none;">
+				<button type="button" class="hd-login__back" id="forgot-back-btn" aria-label="{{ _('Back to sign in') }}">
+					<svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+						<path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" fill="currentColor"/>
+					</svg>
+				</button>
+
+				<h2 class="hd-login__title">{{ _("Reset your password") }}</h2>
+				<p class="hd-login__subtitle">{{ _("Enter your email address and we'll send you a reset link") }}</p>
+
+				<form id="forgot-form" class="hd-login__form" data-view-form="forgot">
+					<div class="hd-login__field">
+						<label for="reset-email" class="hd-login__label">{{ _("Email") }}</label>
+						<input
+							type="email"
+							id="reset-email"
+							name="email"
+							class="hd-login__input"
+							autocomplete="username"
+							inputmode="email"
+							required
+							aria-describedby="reset-error"
+						>
+					</div>
+
+					<div role="alert" aria-live="polite" class="hd-login__error" id="reset-error"></div>
+
+					<button type="submit" class="hd-login__btn hd-login__btn--primary">
+						<span class="hd-login__btn-text">{{ _("Send reset link") }}</span>
+						<svg class="hd-login__spinner" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="display: none;">
+							<circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none" opacity="0.25"/>
+							<path d="M10 2a8 8 0 018 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+						</svg>
+					</button>
+				</form>
+			</div>
+
+			<!-- Reset Success View -->
+			<div class="hd-login__view" data-view-name="reset-success" style="display: none;">
+				<svg class="hd-login__success-icon" width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+					<circle cx="32" cy="32" r="32" fill="var(--hd-primary)" opacity="0.1"/>
+					<path d="M44.707 24.293a1 1 0 010 1.414l-16 16a1 1 0 01-1.414 0l-8-8a1 1 0 011.414-1.414L28 39.586l15.293-15.293a1 1 0 011.414 0z" fill="var(--hd-primary)" stroke-width="2"/>
+				</svg>
+
+				<h2 class="hd-login__title">{{ _("Check your email") }}</h2>
+				<p class="hd-login__subtitle">{{ _("If an account exists for this address, we've sent a reset link. Check your inbox.") }}</p>
+
+				<button type="button" class="hd-login__btn hd-login__btn--secondary" id="back-to-login">
+					{{ _("Back to sign in") }}
+				</button>
+			</div>
+
+			<!-- Locked Out View -->
+			<div class="hd-login__view" data-view-name="locked-out" style="display: none;">
+				<svg class="hd-login__lock-icon" width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+					<circle cx="32" cy="32" r="32" fill="#EF4444" opacity="0.1"/>
+					<path d="M32 20a6 6 0 016 6v4h2a2 2 0 012 2v12a2 2 0 01-2 2H24a2 2 0 01-2-2V32a2 2 0 012-2h2v-4a6 6 0 016-6zm0 2a4 4 0 00-4 4v4h8v-4a4 4 0 00-4-4z" fill="#EF4444"/>
+				</svg>
+
+				<h2 class="hd-login__title">{{ _("Too many attempts") }}</h2>
+				<p class="hd-login__subtitle" id="lockout-message">{{ _("Try again in 30 seconds, or reset your password.") }}</p>
+
+				<div class="hd-login__countdown" id="lockout-countdown" aria-live="polite"></div>
+
+				<a href="#forgot" class="hd-login__btn hd-login__btn--secondary" id="lockout-reset-link">
+					{{ _("Reset password") }}
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+// Expose i18n strings for JS
+window.hdLoginI18n = {
+	showPassword: {{ _("Show password")|tojson }},
+	hidePassword: {{ _("Hide password")|tojson }},
+	incorrectCredentials: {{ _("Email or password is incorrect.")|tojson }},
+	otpIncorrect: {{ _("That code didn't work. Try again.")|tojson }},
+	tryAgainIn: {{ _("Try again in {0} seconds")|tojson }},
+	resetPassword: {{ _("Reset password")|tojson }},
+	networkError: {{ _("Something went wrong. Please try again.")|tojson }},
+	httpsRequired: {{ _("This page must be served over HTTPS to sign in.")|tojson }},
+	emailOtpPrompt: {{ _("Enter the 6-digit code we just emailed you")|tojson }},
+	totpPrompt: {{ _("Enter the 6-digit code from your authenticator app")|tojson }}
+};
+
+// Expose telemetry config for JS
+window.hdLoginTelemetry = {
+	enabled: {{ telemetry.enabled|tojson }},
+	posthogKey: {{ telemetry.posthogKey|tojson }},
+	posthogHost: {{ telemetry.posthogHost|tojson }}
+};
+</script>
+<script src="/assets/helpdesk/js/login-telemetry.js"></script>
+<script src="/assets/helpdesk/js/login.js" type="module"></script>
+{% endblock %}

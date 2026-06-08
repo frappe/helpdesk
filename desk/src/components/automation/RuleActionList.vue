@@ -16,8 +16,8 @@
         <FormControl
           type="select"
           :options="actionTypeOptions"
-          :value="action.type"
-          @change="(e) => updateAction(index, 'type', e.target.value)"
+          :modelValue="action.type"
+          @update:modelValue="(val) => updateAction(index, 'type', val)"
           class="w-full"
         />
       </div>
@@ -29,8 +29,8 @@
           v-if="getValueType(action.type) === 'text'"
           type="text"
           :placeholder="getValuePlaceholder(action.type)"
-          :value="action.value"
-          @change="(e) => updateAction(index, 'value', e.target.value)"
+          :modelValue="action.value"
+          @update:modelValue="(val) => updateAction(index, 'value', val)"
           class="w-full"
         />
 
@@ -39,8 +39,8 @@
           v-else-if="getValueType(action.type) === 'textarea'"
           type="textarea"
           :placeholder="__('Note content...')"
-          :value="action.value"
-          @change="(e) => updateAction(index, 'value', e.target.value)"
+          :modelValue="action.value"
+          @update:modelValue="(val) => updateAction(index, 'value', val)"
           class="w-full"
           :rows="2"
         />
@@ -50,8 +50,8 @@
           v-else-if="getValueType(action.type) === 'priority'"
           type="select"
           :options="PRIORITY_OPTIONS"
-          :value="action.value"
-          @change="(e) => updateAction(index, 'value', e.target.value)"
+          :modelValue="action.value"
+          @update:modelValue="(val) => updateAction(index, 'value', val)"
           class="w-full"
         />
 
@@ -60,8 +60,8 @@
           v-else-if="getValueType(action.type) === 'status'"
           type="select"
           :options="STATUS_OPTIONS"
-          :value="action.value"
-          @change="(e) => updateAction(index, 'value', e.target.value)"
+          :modelValue="action.value"
+          @update:modelValue="(val) => updateAction(index, 'value', val)"
           class="w-full"
         />
 
@@ -70,8 +70,8 @@
           v-else-if="getValueType(action.type) === 'url'"
           type="url"
           :placeholder="__('https://example.com/webhook')"
-          :value="action.value"
-          @change="(e) => updateAction(index, 'value', e.target.value)"
+          :modelValue="action.value"
+          @update:modelValue="(val) => updateAction(index, 'value', val)"
           class="w-full"
         />
 

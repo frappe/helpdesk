@@ -632,20 +632,27 @@
   },
   {
    "fieldname": "facility",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Facility",
-   "description": "Healthcare facility that raised this ticket"
+   "description": "Healthcare facility that raised this ticket",
+   "options": "HD Facility",
+   "get_query": "helpdesk.utils.queries.get_facilities_by_county_subcounty",
+   "depends_on": "eval:doc.county"
   },
   {
    "fieldname": "sub_county",
-   "fieldtype": "Data",
-   "label": "Sub-County"
+   "fieldtype": "Link",
+   "label": "Sub-County",
+   "options": "HD Subcounty",
+   "get_query": "helpdesk.utils.queries.get_subcounties_by_county",
+   "depends_on": "eval:doc.county"
   },
   {
    "fieldname": "county",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "County",
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "options": "HD County"
   },
   {
    "fieldname": "escalation_path",

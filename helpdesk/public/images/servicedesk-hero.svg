@@ -1,0 +1,152 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background glow -->
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#DC2626;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#DC2626;stop-opacity:0"/>
+    </radialGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.1"/>
+    </filter>
+
+    <!-- Pulsing animation -->
+    <animate id="pulse" attributeName="r" from="40" to="50" dur="2s" repeatCount="indefinite"/>
+  </defs>
+
+  <!-- Central glow -->
+  <circle cx="200" cy="150" r="120" fill="url(#glow)"/>
+
+  <!-- Main headset icon (center) -->
+  <g transform="translate(200, 150)">
+    <!-- Pulsing ring -->
+    <circle cx="0" cy="0" r="45" fill="none" stroke="#DC2626" stroke-width="2" opacity="0.3">
+      <animate attributeName="r" values="45;55;45" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Headset band -->
+    <path d="M -30 -10 Q -30 -35, 0 -35 Q 30 -35, 30 -10"
+          stroke="#1a1a2e" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+    <!-- Left ear cup -->
+    <rect x="-35" y="-15" width="12" height="25" rx="4" fill="#DC2626"/>
+    <rect x="-33" y="-12" width="8" height="19" rx="2" fill="#EF4444"/>
+
+    <!-- Right ear cup -->
+    <rect x="23" y="-15" width="12" height="25" rx="4" fill="#DC2626"/>
+    <rect x="25" y="-12" width="8" height="19" rx="2" fill="#EF4444"/>
+
+    <!-- Microphone -->
+    <path d="M 30 5 Q 35 15, 35 25" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="35" cy="28" r="5" fill="#DC2626"/>
+  </g>
+
+  <!-- Support metrics card (top right) -->
+  <g transform="translate(280, 40)" filter="url(#shadow)">
+    <rect x="0" y="0" width="110" height="70" rx="8" fill="white" stroke="#DC2626" stroke-width="2"/>
+
+    <!-- Tickets number -->
+    <text x="55" y="28" font-family="Inter, sans-serif" font-size="24" font-weight="700" fill="#DC2626" text-anchor="middle">89</text>
+    <text x="55" y="44" font-family="Inter, sans-serif" font-size="10" fill="#374151" text-anchor="middle">Active Tickets</text>
+
+    <!-- Rating stars -->
+    <g transform="translate(20, 52)">
+      <path d="M 5 0 L 6 3 L 9 3 L 7 5 L 8 8 L 5 6 L 2 8 L 3 5 L 1 3 L 4 3 Z" fill="#DC2626"/>
+      <path d="M 15 0 L 16 3 L 19 3 L 17 5 L 18 8 L 15 6 L 12 8 L 13 5 L 11 3 L 14 3 Z" fill="#DC2626"/>
+      <path d="M 25 0 L 26 3 L 29 3 L 27 5 L 28 8 L 25 6 L 22 8 L 23 5 L 21 3 L 24 3 Z" fill="#DC2626"/>
+      <path d="M 35 0 L 36 3 L 39 3 L 37 5 L 38 8 L 35 6 L 32 8 L 33 5 L 31 3 L 34 3 Z" fill="#DC2626"/>
+      <path d="M 45 0 L 46 3 L 49 3 L 47 5 L 48 8 L 45 6 L 42 8 L 43 5 L 41 3 L 44 3 Z" fill="#EF4444" opacity="0.3"/>
+    </g>
+    <text x="72" y="62" font-family="Inter, sans-serif" font-size="9" fill="#6B7280">4.8</text>
+  </g>
+
+  <!-- Resolution time card (left) -->
+  <g transform="translate(10, 100)" filter="url(#shadow)">
+    <rect x="0" y="0" width="100" height="65" rx="8" fill="white" stroke="#DC2626" stroke-width="2"/>
+
+    <!-- Clock icon -->
+    <circle cx="30" cy="28" r="12" fill="#FEE2E2"/>
+    <circle cx="30" cy="28" r="10" stroke="#DC2626" stroke-width="2" fill="none"/>
+    <line x1="30" y1="28" x2="30" y2="22" stroke="#DC2626" stroke-width="2" stroke-linecap="round"/>
+    <line x1="30" y1="28" x2="34" y2="28" stroke="#DC2626" stroke-width="2" stroke-linecap="round"/>
+
+    <text x="50" y="25" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#DC2626">2.4h</text>
+    <text x="50" y="38" font-family="Inter, sans-serif" font-size="9" fill="#374151">Avg Response</text>
+
+    <!-- Trend arrow -->
+    <path d="M 70 48 L 75 52 L 80 45" stroke="#10B981" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="84" y="52" font-family="Inter, sans-serif" font-size="9" fill="#10B981">-15%</text>
+  </g>
+
+  <!-- Resolved tickets progress (bottom left) -->
+  <g transform="translate(10, 210)" filter="url(#shadow)">
+    <rect x="0" y="0" width="150" height="80" rx="8" fill="white" stroke="#DC2626" stroke-width="2"/>
+
+    <text x="10" y="20" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">Resolved Today</text>
+
+    <!-- Progress bar 1 -->
+    <rect x="10" y="30" width="130" height="8" rx="4" fill="#F3F4F6"/>
+    <rect x="10" y="30" width="104" height="8" rx="4" fill="#DC2626">
+      <animate attributeName="width" from="0" to="104" dur="1.5s" fill="freeze"/>
+    </rect>
+    <text x="10" y="50" font-family="Inter, sans-serif" font-size="9" fill="#6B7280">Critical: 12/15</text>
+
+    <!-- Progress bar 2 -->
+    <rect x="10" y="55" width="130" height="8" rx="4" fill="#F3F4F6"/>
+    <rect x="10" y="55" width="78" height="8" rx="4" fill="#EF4444">
+      <animate attributeName="width" from="0" to="78" dur="1.5s" fill="freeze"/>
+    </rect>
+    <text x="10" y="73" font-family="Inter, sans-serif" font-size="9" fill="#6B7280">Standard: 45/75</text>
+  </g>
+
+  <!-- Active agents (bottom right) -->
+  <g transform="translate(240, 210)" filter="url(#shadow)">
+    <rect x="0" y="0" width="150" height="80" rx="8" fill="white" stroke="#DC2626" stroke-width="2"/>
+
+    <text x="10" y="20" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">Agents Online</text>
+
+    <!-- Agent avatars -->
+    <circle cx="25" cy="45" r="15" fill="#DC2626"/>
+    <text x="25" y="50" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="white" text-anchor="middle">KK</text>
+    <circle cx="25" cy="58" r="4" fill="#10B981">
+      <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+
+    <circle cx="55" cy="45" r="15" fill="#EF4444"/>
+    <text x="55" y="50" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="white" text-anchor="middle">JM</text>
+    <circle cx="55" cy="58" r="4" fill="#10B981">
+      <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+
+    <circle cx="85" cy="45" r="15" fill="#991B1B"/>
+    <text x="85" y="50" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="white" text-anchor="middle">AS</text>
+    <circle cx="85" cy="58" r="4" fill="#10B981">
+      <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+
+    <text x="110" y="50" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#DC2626">+8</text>
+  </g>
+
+  <!-- Floating ticket icons -->
+  <g opacity="0.4">
+    <!-- Ticket 1 -->
+    <g transform="translate(170, 50)">
+      <rect x="0" y="0" width="20" height="24" rx="2" fill="#DC2626">
+        <animateTransform attributeName="transform" type="translate" values="0,0; 0,-5; 0,0" dur="3s" repeatCount="indefinite"/>
+      </rect>
+      <line x1="4" y1="6" x2="16" y2="6" stroke="white" stroke-width="1.5"/>
+      <line x1="4" y1="10" x2="16" y2="10" stroke="white" stroke-width="1.5"/>
+      <line x1="4" y1="14" x2="12" y2="14" stroke="white" stroke-width="1.5"/>
+    </g>
+
+    <!-- Ticket 2 -->
+    <g transform="translate(230, 180)">
+      <rect x="0" y="0" width="18" height="22" rx="2" fill="#EF4444">
+        <animateTransform attributeName="transform" type="translate" values="0,0; 0,-4; 0,0" dur="2.5s" repeatCount="indefinite" begin="0.5s"/>
+      </rect>
+      <line x1="3" y1="5" x2="15" y2="5" stroke="white" stroke-width="1.5"/>
+      <line x1="3" y1="9" x2="15" y2="9" stroke="white" stroke-width="1.5"/>
+      <line x1="3" y1="13" x2="11" y2="13" stroke="white" stroke-width="1.5"/>
+    </g>
+  </g>
+</svg>

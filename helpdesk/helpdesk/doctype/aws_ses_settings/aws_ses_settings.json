@@ -1,0 +1,147 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-25 07:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "section_break_2",
+  "aws_region",
+  "default_sender_email",
+  "default_sender_name",
+  "column_break_5",
+  "configuration_set_name",
+  "endpoint_url",
+  "profile_name",
+  "section_break_8",
+  "retry_mode",
+  "total_max_attempts",
+  "section_break_11",
+  "use_explicit_credentials",
+  "access_key_id",
+  "secret_access_key",
+  "session_token"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enable AWS SES"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break",
+   "label": "AWS Configuration"
+  },
+  {
+   "fieldname": "aws_region",
+   "fieldtype": "Data",
+   "label": "AWS Region",
+   "mandatory_depends_on": "enabled"
+  },
+  {
+   "fieldname": "default_sender_email",
+   "fieldtype": "Data",
+   "label": "Default Sender Email",
+   "mandatory_depends_on": "enabled"
+  },
+  {
+   "fieldname": "default_sender_name",
+   "fieldtype": "Data",
+   "label": "Default Sender Name"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "configuration_set_name",
+   "fieldtype": "Data",
+   "label": "Configuration Set Name"
+  },
+  {
+   "fieldname": "endpoint_url",
+   "fieldtype": "Data",
+   "label": "Endpoint URL"
+  },
+  {
+   "fieldname": "profile_name",
+   "fieldtype": "Data",
+   "label": "Profile Name"
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break",
+   "label": "Retry Configuration"
+  },
+  {
+   "default": "standard",
+   "fieldname": "retry_mode",
+   "fieldtype": "Select",
+   "label": "Retry Mode",
+   "options": "standard\nadaptive\nlegacy"
+  },
+  {
+   "default": "3",
+   "fieldname": "total_max_attempts",
+   "fieldtype": "Int",
+   "label": "Total Max Attempts"
+  },
+  {
+   "fieldname": "section_break_11",
+   "fieldtype": "Section Break",
+   "label": "Explicit Credentials (Optional)"
+  },
+  {
+   "default": "0",
+   "fieldname": "use_explicit_credentials",
+   "fieldtype": "Check",
+   "label": "Use Explicit Credentials"
+  },
+  {
+   "depends_on": "use_explicit_credentials",
+   "fieldname": "access_key_id",
+   "fieldtype": "Data",
+   "label": "Access Key ID",
+   "mandatory_depends_on": "use_explicit_credentials"
+  },
+  {
+   "depends_on": "use_explicit_credentials",
+   "fieldname": "secret_access_key",
+   "fieldtype": "Password",
+   "label": "Secret Access Key",
+   "mandatory_depends_on": "use_explicit_credentials"
+  },
+  {
+   "depends_on": "use_explicit_credentials",
+   "fieldname": "session_token",
+   "fieldtype": "Password",
+   "label": "Session Token"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-05-25 07:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "AWS SES Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

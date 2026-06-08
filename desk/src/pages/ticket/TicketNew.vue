@@ -226,8 +226,13 @@ const countyOptions = computed(() => {
 });
 
 const subCountyOptions = computed(() => {
-  const list: string[] = subCountiesResource.data || [];
-  return [{ label: __("-- None --"), value: "" }, ...list.map((s) => ({ label: s, value: s }))];
+  const list = subCountiesResource.data || [];
+  // API now returns [{label, value}] instead of strings
+  if (list.length > 0 && typeof list[0] === 'object' && 'label' in list[0]) {
+    return [{ label: __("-- None --"), value: "" }, ...list];
+  }
+  // Fallback for old format (just strings)
+  return [{ label: __("-- None --"), value: "" }, ...list.map((s: any) => ({ label: s, value: s }))];
 });
 
 function onCountyChange() {
