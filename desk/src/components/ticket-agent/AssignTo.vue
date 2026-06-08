@@ -551,6 +551,8 @@ function warnUnavailableAgents(addedNames: string[]): boolean {
   let hasUnavailable = false;
   for (const agent of agents) {
     if (!addedNames.includes(agent.name)) continue;
+    // No point warning agents about their own status when assigning themselves.
+    if (agent.name === currentAgentName) continue;
     const category = agentStatusStore.getStatus(
       agent.availability || ""
     )?.category;
