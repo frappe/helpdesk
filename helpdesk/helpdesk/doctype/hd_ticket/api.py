@@ -754,10 +754,33 @@ def get_ticket_activities(ticket: str):
 
 
 @frappe.whitelist()
-def get_ticket_assignees(ticket: str):
+def get_ticket_assignees(ticket: str) -> list[dict]:
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
-    assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
-    return assignees
+    assignee_names = json.loads(
+        frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
+    )
+    if not assignee_names:
+        return []
+    # Presence details are for the agent desk only; customers get plain names.
+    if not is_agent():
+        return [{"name": name} for name in assignee_names]
+    # Enrich each assignee with their agent status so the UI can show presence
+    # without a separate lookup. Non-agent assignees fall back to just the name.
+    agents = {
+        agent.name: agent
+        for agent in frappe.get_all(
+            "HD Agent",
+            filters={"name": ["in", assignee_names]},
+            fields=[
+                "name",
+                "agent_name",
+                "user_image",
+                "availability",
+                "availability_changed_on",
+            ],
+        )
+    }
+    return [agents.get(name, {"name": name}) for name in assignee_names]
 
 
 def show_banner_next_day(ticket):
