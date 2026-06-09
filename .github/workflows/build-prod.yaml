@@ -1,8 +1,8 @@
-name: Build Frappe Image
+name: Build Frappe Image(Prod))
 on:
   push:
     branches:
-      - develop
+      - master
 
   repository_dispatch:
     types: [trigger_build]
