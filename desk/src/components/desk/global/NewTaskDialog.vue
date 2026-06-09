@@ -11,6 +11,7 @@
     <template #body-content>
       <div class="flex flex-col gap-5 mt-2">
 
+        <!-- Title -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
             <div class="text-sm text-ink-gray-5 flex items-center gap-1">
@@ -39,6 +40,7 @@
           </p>
         </div>
 
+        <!-- Description -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
             <div class="text-sm text-ink-gray-5 flex items-center gap-1">
@@ -73,6 +75,7 @@
 
         <div class="grid grid-cols-2 gap-4">
 
+          <!-- Priority -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __('Priority') }}</div>
             <FormControl
@@ -80,23 +83,17 @@
               variant="subtle"
               :options="priorityOptions"
               v-model="form.priority"
-            >
-              <template #prefix>
-                <TaskPriorityIcon
-                  v-if="form.priority"
-                  :priority="form.priority"
-                  class="h-4 w-4 mr-1"
-                />
-              </template>
-            </FormControl>
+            />
           </div>
 
+          <!-- Assigned To (FIXED: Autocomplete filtering options mapped securely) -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __('Assigned To') }}</div>
             <Autocomplete
-              :options="agentOptions"
+              :options="filteredAgentOptions"
               :value="form.assigned"
               @change="handleAssigneeChange"
+              @input-change="searchAgents"
               :placeholder="__('Assigned To')"
               class="w-full"
             >
@@ -132,6 +129,7 @@
             </Autocomplete>
           </div>
 
+          <!-- Due Date -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __('Due Date') }}</div>
             <div class="w-full date-picker-wrapper">
@@ -143,6 +141,7 @@
             </div>
           </div>
 
+          <!-- Status -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __('Status') }}</div>
             <FormControl
@@ -150,19 +149,40 @@
               variant="subtle"
               :options="statusOptions"
               v-model="form.status"
+            />
+          </div>
+
+          <!-- Ticket ID -->
+          <div v-if="!props.ticketId" class="space-y-1.5 col-span-2">
+            <div class="text-sm text-ink-gray-5">
+              {{ __('Ticket') }} <span class="text-red-500">*</span>
+            </div>
+            <Autocomplete
+              :options="ticketOptions"
+              :value="form.ticket"
+              @change="handleTicketChange"
+              @input-change="searchTickets"
+              :placeholder="__('Search ticket by ID or subject...')"
+              class="w-full"
             >
-              <template #prefix>
-                <TaskStatusIcon
-                  v-if="form.status"
-                  :status="form.status"
-                  class="h-4 w-4 mr-1"
-                />
+              <template #target="{ togglePopover }">
+                <Button
+                  variant="subtle"
+                  class="w-full flex items-center justify-between font-normal text-ink-gray-8"
+                  @click="togglePopover"
+                >
+                  <span class="truncate">
+                    {{ ticketLabel || __('Search ticket by ID or subject...') }}
+                  </span>
+                  <template #suffix>
+                    <FeatherIcon name="chevron-down" class="h-4 w-4 text-ink-gray-5" />
+                  </template>
+                </Button>
               </template>
-            </FormControl>
+            </Autocomplete>
           </div>
 
         </div>
-
       </div>
     </template>
 
@@ -198,33 +218,35 @@ import {
 import { __ } from "@/translation";
 import { isContentEmpty } from "@/utils";
 import { useUserStore } from "@/stores/user";
-import TaskStatusIcon   from "@/components/icons/TaskStatusIcon.vue";
-import TaskPriorityIcon from "@/components/icons/TaskPriorityIcon.vue";
 
-// --- Props & Emits ---
+// ─── Props & Emits ────────────────────────────────────────────────────────────
 const props = defineProps({
-  modelValue: { type: Boolean, default: false },
-  task:       { type: Object, default: null },
-  ticketId:   { type: [String, Number], default: "" },
+  modelValue: { type: Boolean,          default: false },
+  task:       { type: Object,           default: null  },
+  ticketId:   { type: [String, Number], default: ""    },
 });
 
-const emit = defineEmits(["update:modelValue", "submit"]);
+// FIXED: Defined matching event emits to update parent layout states smoothly
+const emit = defineEmits(["update:modelValue", "submit", "task-created"]);
 
-// --- Store ---
+// ─── Store ────────────────────────────────────────────────────────────────────
 const { getUser, agentOptions } = useUserStore();
 
-// --- State ---
+// ─── Dialog visibility ────────────────────────────────────────────────────────
 const show = computed({
   get: () => props.modelValue,
   set: (value) => emit("update:modelValue", value),
 });
 
+// ─── Local state ──────────────────────────────────────────────────────────────
 const loading    = ref(false);
 const titleRef   = ref(null);
 const activeTask = ref<any>(null);
+const agentQuery = ref("");
 
 const isEditing = computed(() => !!(props.task?.name || activeTask.value?.name));
 
+// ─── Form ─────────────────────────────────────────────────────────────────────
 const defaultForm = () => ({
   title:       "",
   description: "",
@@ -232,11 +254,12 @@ const defaultForm = () => ({
   status:      "Backlog",
   priority:    "Low",
   assigned:    "",
+  ticket:      "",
 });
 
 const form = ref(defaultForm());
 
-// --- Validation ---
+// ─── Validation ───────────────────────────────────────────────────────────────
 const errors = ref({
   title:             false,
   titleLength:       false,
@@ -249,7 +272,7 @@ const getDescriptionLength = computed(() =>
 );
 
 watch(() => form.value.title, (val) => {
-  if (val?.trim())        errors.value.title       = false;
+  if (val?.trim())        errors.value.title = false;
   if (val?.length <= 140) errors.value.titleLength = false;
 });
 
@@ -258,10 +281,31 @@ watch(() => form.value.description, (val) => {
   if (!val || val.length <= 4000) errors.value.descriptionLength = false;
 });
 
-// --- Assignee ---
+// ─── Assignee text & search handlers (FIXED: Handles filter matching properly) ─
+const normalizedAgentOptions = computed(() => {
+  return (agentOptions || []).map(agent => ({
+    label: agent.label || agent.title || agent.value || "",
+    value: agent.value,
+    image: agent.image
+  }));
+});
+
+const filteredAgentOptions = computed(() => {
+  const query = agentQuery.value.toLowerCase().trim();
+  if (!query) return normalizedAgentOptions.value;
+  return normalizedAgentOptions.value.filter(option => 
+    option.label.toLowerCase().includes(query) || 
+    option.value.toLowerCase().includes(query)
+  );
+});
+
+function searchAgents(query: string) {
+  agentQuery.value = query;
+}
+
 const assigneeLabel = computed(() => {
   if (!form.value.assigned) return "";
-  const fromList = agentOptions.find((o) => o.value === form.value.assigned);
+  const fromList = normalizedAgentOptions.value.find((o) => o.value === form.value.assigned);
   if (fromList?.label) return fromList.label;
   const storeUser = getUser(form.value.assigned);
   if (storeUser?.full_name) return storeUser.full_name;
@@ -269,7 +313,7 @@ const assigneeLabel = computed(() => {
 });
 
 function getAssigneeImage(assigned: string): string {
-  const fromList = agentOptions.find((o) => o.value === assigned);
+  const fromList = normalizedAgentOptions.value.find((o) => o.value === assigned);
   if (fromList?.image) return fromList.image;
   return getUser(assigned)?.user_image || "";
 }
@@ -278,34 +322,91 @@ function handleAssigneeChange(option: any) {
   if (!option)                         form.value.assigned = "";
   else if (typeof option === "object") form.value.assigned = option.value || "";
   else                                 form.value.assigned = option;
+  agentQuery.value = ""; 
 }
+
+// ─── Ticket search ────────────────────────────────────────────────────────────
+const ticketOptions  = ref<{ label: string; value: string }[]>([])
+const ticketSearching = ref(false)
+
+const ticketLabel = computed(() => {
+  if (!form.value.ticket) return ""
+  const found = ticketOptions.value.find((o) => o.value === form.value.ticket)
+  if (found) return found.label
+  return form.value.ticket
+})
+
+async function searchTickets(query: string) {
+  if (ticketSearching.value) return
+  ticketSearching.value = true
+  try {
+    const results = await call("frappe.client.get_list", {
+      doctype: "HD Ticket",
+      fields:  ["name", "subject"],
+      filters: query
+        ? [["HD Ticket", "subject", "like", `%${query}%`]]
+        : [],
+      limit: 20,
+      order_by: "modified desc",
+    })
+    ticketOptions.value = (results || []).map((t: any) => ({
+      label: `#${t.name} — ${t.subject || "No subject"}`,
+      value: String(t.name),
+    }))
+  } catch {
+    ticketOptions.value = []
+  } finally {
+    ticketSearching.value = false
+  }
+}
+
+function handleTicketChange(option: any) {
+  if (!option)                         form.value.ticket = ""
+  else if (typeof option === "object") form.value.ticket = option.value || ""
+  else                                 form.value.ticket = option
+}
+
+watch(show, (val) => {
+  if (val && !props.ticketId) searchTickets("")
+})
 
 function resolveAssigned(): string {
   if (form.value.assigned?.trim()) return form.value.assigned;
-  const sessionUser = window.session_user;
+  const sessionUser = (window as any).session_user;
   return sessionUser && sessionUser !== "Guest" ? sessionUser : "";
 }
 
+function clearErrors() {
+  errors.value = { title: false, titleLength: false, description: false, descriptionLength: false };
+}
 
-// --- Watchers ---
+function formFromTask(task: any) {
+  return {
+    title:       task.title       || "",
+    description: task.description || "",
+    due_date:    task.due_date    || "",
+    status:      task.status      || "Backlog",
+    priority:    task.priority    || "Low",
+    assigned:    task.assigned    || "",
+    ticket:      task.reference_docname || String(props.ticketId || ""),
+  };
+}
+
+// ─── Watchers ─────────────────────────────────────────────────────────────────
 watch(
   () => props.task,
   (task) => {
-    errors.value = { title: false, titleLength: false, description: false, descriptionLength: false };
-    form.value = task ? {
-      title:       task.title       || "",
-      description: task.description || "",
-      due_date:    task.due_date    || "",
-      status:      task.status      || "Backlog",
-      priority:    task.priority    || "Low",
-      assigned:    task.assigned    || "",
-    } : defaultForm();
+    clearErrors();
+    form.value = task
+      ? formFromTask(task)
+      : { ...defaultForm(), ticket: String(props.ticketId || "") };
   },
   { immediate: true, deep: true },
 );
 
 watch(show, async (val) => {
-  errors.value = { title: false, titleLength: false, description: false, descriptionLength: false };
+  clearErrors();
+  agentQuery.value = "";
 
   if (!val) {
     activeTask.value = null;
@@ -314,15 +415,14 @@ watch(show, async (val) => {
   }
 
   if (!props.task && !activeTask.value) {
-    form.value = defaultForm();
+    form.value = { ...defaultForm(), ticket: String(props.ticketId || "") };
     form.value.assigned = resolveAssigned();
   }
 
   nextTick(() => setTimeout(() => (titleRef.value as any)?.el?.focus?.(), 100));
 });
 
-
-
+// ─── Options ──────────────────────────────────────────────────────────────────
 const statusOptions = [
   { label: __("Backlog"),     value: "Backlog"     },
   { label: __("Todo"),        value: "Todo"        },
@@ -337,42 +437,39 @@ const priorityOptions = [
   { label: __("High"),   value: "High"   },
 ];
 
-// --- Exposed ---
+// ─── Exposed API ──────────────────────────────────────────────────────────────
 function showTask(task: any) {
-  errors.value = { title: false, titleLength: false, description: false, descriptionLength: false };
+  clearErrors();
   activeTask.value = task;
-  form.value = {
-    title:       task.title       || "",
-    description: task.description || "",
-    due_date:    task.due_date    || "",
-    status:      task.status      || "Backlog",
-    priority:    task.priority    || "Low",
-    assigned:    task.assigned    || "",
-  };
+  form.value = formFromTask(task);
   show.value = true;
 }
 
 async function updateTaskStatus(task: any, newStatus: string) {
   if (!task?.name) { toast.error(__("Task not found")); return; }
   try {
-    await call("helpdesk.helpdesk.doctype.hd_task.hd_task.update_task", {
+    const result = await call("helpdesk.helpdesk.doctype.hd_task.hd_task.update_task", {
       task:   task.name,
       status: newStatus,
     });
     toast.success(__("Status updated"));
-    emit("submit", { ...task, status: newStatus });
+    const saved = result?.message ?? result;
+    
+    // Broadcast status changes out to trigger parent view updates instantly
+    emit("submit", saved && typeof saved === "object" ? saved : { ...task, status: newStatus });
+    emit("task-created");
   } catch (e: any) {
     const msg = e?.message || e?.exc?.split("\n").filter(Boolean).pop() || __("Something went wrong");
     toast.error(msg);
+    throw e;
   }
 }
 
+defineExpose({ showTask, updateTaskStatus });
 
-defineExpose({ showTask, updateTaskStatus});
-
-// --- Submit ---
+// ─── Submit ───────────────────────────────────────────────────────────────────
 async function handleSubmit() {
-  errors.value = { title: false, titleLength: false, description: false, descriptionLength: false };
+  clearErrors();
 
   let formsAreInvalid = false;
 
@@ -393,7 +490,7 @@ async function handleSubmit() {
   }
 
   if (formsAreInvalid) {
-    toast.error(__("Please fix validation issues before updating."));
+    toast.error(__("Please fix validation issues before submitting."));
     return;
   }
 
@@ -418,8 +515,12 @@ async function handleSubmit() {
       });
       toast.success(__("Task updated"));
     } else {
-      const ticketId = String(props.ticketId || "").trim();
-      if (!ticketId) { toast.error(__("Ticket ID is missing")); loading.value = false; return; }
+      const ticketId = String(form.value.ticket || props.ticketId || "").trim();
+      if (!ticketId) {
+        toast.error(__("Ticket ID is required to create a task"));
+        loading.value = false;
+        return;
+      }
       result = await call("helpdesk.helpdesk.doctype.hd_task.hd_task.create_task", {
         ticket:      ticketId,
         title:       form.value.title,
@@ -432,7 +533,9 @@ async function handleSubmit() {
       toast.success(__("Task created"));
     }
 
+    // FIXED: Emitting both hook signals ensures parent wrappers intercept list reloads cleanly
     emit("submit", result);
+    emit("task-created"); 
     show.value       = false;
     activeTask.value = null;
   } catch (e: any) {
