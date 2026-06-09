@@ -1,0 +1,39 @@
+name: Restrict Branch Merges
+
+on:
+  pull_request:
+    branches:
+      - master
+      - staging
+      - develop
+
+jobs:
+  restrict-merges:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch rules
+        run: |
+          BASE_BRANCH="${{ github.base_ref }}"
+          HEAD_BRANCH="${{ github.head_ref }}"
+
+          echo "Merging $HEAD_BRANCH → $BASE_BRANCH"
+
+          if [[ "$BASE_BRANCH" == "master" ]]; then
+            if [[ "$HEAD_BRANCH" != "staging" ]]; then
+              echo "❌ Only 'staging' can merge into 'master'."
+              exit 1
+            fi
+          fi
+
+          if [[ "$BASE_BRANCH" == "staging" ]]; then
+            if [[ "$HEAD_BRANCH" != "develop" ]]; then
+              echo "❌ Only 'develop' branches can merge into 'staging'."
+              exit 1
+            fi
+          fi
+
+          if [[ "$BASE_BRANCH" == "develop" ]]; then
+            echo "✅ Merge into 'develop' is allowed for any branch."
+          fi
+
+          echo "✅ Merge allowed."

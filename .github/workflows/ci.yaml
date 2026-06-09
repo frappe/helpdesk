@@ -1,0 +1,120 @@
+name: Security Checks
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+      - staging
+      - develop
+  workflow_dispatch:
+
+jobs:
+  security_scans:              
+    name: Security Scans (helpdesk)
+    runs-on: ubuntu-latest
+    permissions:          
+        id-token: write     
+        contents: read     
+    continue-on-error: true
+
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          check-latest: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ── Snyk: static code analysis ─────────────────────────────────────
+      - name: Snyk Code Scan
+        uses: snyk/actions@0.4.0
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: code test
+          args: --severity-threshold=medium
+          json: code-report.json
+        continue-on-error: true
+
+      # ── Checkov: IaC misconfiguration scan ─────────────────────────────
+      - name: Install Checkov
+        run: |
+          pip install checkov
+          checkov --version
+
+      - name: Checkov IaC Scan
+        run: checkov --quiet -d .
+        continue-on-error: true
+
+      # ── AWS credentials (required for Trivy ECR + Inspector) ───────────
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::813389018368:role/GitHubActionsRole
+          aws-region: me-central-1
+
+      # ── Trivy: filesystem vulnerability scan ───────────────────────────
+      - name: Trivy Filesystem Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          format: 'table'
+          exit-code: 1
+          ignore-unfixed: true
+          severity: HIGH,CRITICAL
+        continue-on-error: true
+
+      # ── Amazon Inspector: deep vulnerability scan ──────────────────────
+      - name: Inspector Scan
+        id: inspector
+        uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
+        with:
+          artifact_type: 'repository'
+          artifact_path: './'
+          display_vulnerability_findings: "enabled"
+          critical_threshold: 1
+          high_threshold: 1
+          medium_threshold: 0
+          low_threshold: 0
+          other_threshold: 0
+
+      # ── Display results ────────────────────────────────────────────────
+      - name: Display CycloneDX SBOM (JSON)
+        run: cat ${{ steps.inspector.outputs.artifact_sbom }}
+
+      - name: Display Inspector results (JSON)
+        run: cat ${{ steps.inspector.outputs.inspector_scan_results }}
+
+      - name: Display Inspector results (CSV)
+        run: cat ${{ steps.inspector.outputs.inspector_scan_results_csv }}
+
+      - name: Display Inspector results (Markdown)
+        run: cat ${{ steps.inspector.outputs.inspector_scan_results_markdown }}
+
+      # ── Upload artifacts ───────────────────────────────────────────────
+      - name: Upload Scan Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Inspector Vulnerability Scan Artifacts
+          path: |
+            ${{ steps.inspector.outputs.inspector_scan_results }}
+            ${{ steps.inspector.outputs.inspector_scan_results_csv }}
+            ${{ steps.inspector.outputs.artifact_sbom }}
+            ${{ steps.inspector.outputs.inspector_scan_results_markdown }}
+
+      # ── Threshold summary (replace echo with exit 1 to make it blocking) 
+      - name: Vulnerability threshold check
+        run: echo "Threshold exceeded flag = ${{ steps.inspector.outputs.vulnerability_threshold_exceeded }}"
