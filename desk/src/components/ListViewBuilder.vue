@@ -417,6 +417,13 @@ function pickGroupByField(currentField: string | null, viewType: ViewType) {
   if (currentField && currentField !== "owner") return currentField;
   return "status";
 }
+// Label/icon shown in the breadcrumb when no saved view is active —
+// reflects the current effective view type so "Tickets / Kanban" reads
+// correctly after a layout toggle (previously stuck on "Liste").
+function viewTypeBadge(t: ViewType) {
+  if (t === "kanban") return { label: __("Kanban"), icon: LucideColumns3 };
+  return { label: __("List"), icon: LucideAlignJustify };
+}
 function handleViewTypeChange(val: ViewType) {
   viewTypeOverride.value = val;
   defaultParams.view = {
@@ -427,6 +434,19 @@ function handleViewTypeChange(val: ViewType) {
       val
     ),
   };
+  // Keep the breadcrumb in sync — only when no saved view is selected.
+  // For saved views, the view's label/icon remain authoritative until
+  // the user explicitly saves the new type back via "Save Changes".
+  if (!route.query.view) {
+    const badge = viewTypeBadge(val);
+    headerView.value.label = badge.label;
+    headerView.value.icon = badge.icon;
+  } else {
+    // On a saved view: flag the change so "Save Changes" appears,
+    // letting the user persist the new type into the HD View doc.
+    const storedType = findView(route.query.view as string).value?.type || "list";
+    if (val !== storedType) isViewUpdated.value = true;
+  }
   list.submit({ ...defaultParams });
 }
 
@@ -741,7 +761,7 @@ function handlePageLength(count: number, loadMore: boolean = false) {
 }
 
 function handleViewUpdate() {
-  const view = {
+  const view: Record<string, any> = {
     filters: JSON.stringify(defaultParams.filters),
     columns: JSON.stringify(defaultParams.columns),
     rows: JSON.stringify(defaultParams.rows),
@@ -750,6 +770,11 @@ function handleViewUpdate() {
     dt: options.value.doctype,
     route_name: route.name,
     is_customer_portal: options.value.isCustomerPortal,
+    // Persist the current view type + group_by_field so a saved view
+    // remembers whether it should render as List or Kanban for everyone
+    // (matches what the local override has been showing the user).
+    type: effectiveViewType.value,
+    group_by_field: defaultParams.view?.group_by_field || null,
   };
   const currentView = findView(route.query.view as string).value;
   if (currentView && currentView.public) {
@@ -868,8 +893,11 @@ watch(
     // user's last layout choice for that view is restored automatically.
     handleViewChanges();
     if (!val) {
-      headerView.value.label = __("List");
-      headerView.value.icon = LucideAlignJustify;
+      // On the default (no saved view), the breadcrumb badge follows
+      // whatever layout the user picked — kanban override included.
+      const badge = viewTypeBadge(effectiveViewType.value);
+      headerView.value.label = badge.label;
+      headerView.value.icon = badge.icon;
     }
   }
 );
