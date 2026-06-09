@@ -240,6 +240,7 @@ onClickOutside(
       ".tippy-content",
       ".PopoverContent",
       '[role="dialog"]',
+      ".dialog-overlay",
     ],
   }
 );
@@ -252,7 +253,13 @@ onClickOutside(
     }
   },
   {
-    ignore: [".tippy-box", ".tippy-content", ".PopoverContent"],
+    ignore: [
+      ".tippy-box",
+      ".tippy-content",
+      ".PopoverContent",
+      '[role="dialog"]',
+      ".dialog-overlay",
+    ],
   }
 );
 </script>

@@ -28,6 +28,7 @@
                 type="text"
                 class="focus:ring-0 border-outline-gray-2"
                 :debounce="300"
+                autofocus
               >
                 <template #prefix>
                   <LucideSearch class="size-4" />
