@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="showDialog" :options="{ title }" @close="closeDialog">
-    <template #body-content>
+  <Dialog v-model:open="isOpen" :title="title" @close="closeDialog">
+    <template #default>
       <div class="space-y-4">
         <p
           class="text-p-base text-ink-gray-8"
@@ -32,6 +32,12 @@ export default {
     message: {
       type: String,
     },
+    // Optional v-model; when absent, visibility falls back to the internal
+    // state (open on mount), preserving the `v-if` + `show()`/`hide()` mode.
+    modelValue: {
+      type: Boolean,
+      default: undefined,
+    },
     onConfirm: {
       type: Function,
       default: null,
@@ -41,6 +47,7 @@ export default {
       default: null,
     },
   },
+  emits: ["update:modelValue"],
   expose: ["show", "hide"],
   components: {
     Dialog,
@@ -51,6 +58,19 @@ export default {
       showDialog: true,
       isLoading: false,
     };
+  },
+  computed: {
+    isOpen: {
+      get() {
+        return this.modelValue !== undefined
+          ? this.modelValue
+          : this.showDialog;
+      },
+      set(value) {
+        this.showDialog = value;
+        this.$emit("update:modelValue", value);
+      },
+    },
   },
   methods: {
     async handleConfirmation() {
@@ -70,14 +90,14 @@ export default {
       }
     },
     show() {
-      this.showDialog = true;
+      this.isOpen = true;
     },
     closeDialog() {
       this.hide();
       this.onCancel?.();
     },
     hide() {
-      this.showDialog = false;
+      this.isOpen = false;
     },
   },
 };

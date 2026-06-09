@@ -1,20 +1,18 @@
 <template>
   <Dialog
-    v-model="show"
-    :options="{
-      title: __('New team'),
-      actions: [
-        {
-          label: __('Create'),
-          variant: 'solid',
-          onClick: () => {
-            newTeam.submit();
-          },
+    v-model:open="show"
+    :title="__('New team')"
+    :actions="[
+      {
+        label: __('Create'),
+        variant: 'solid',
+        onClick: () => {
+          newTeam.submit();
         },
-      ],
-    }"
+      },
+    ]"
   >
-    <template #body-content>
+    <template #default>
       <form class="space-y-2" @submit.prevent="newTeam.submit">
         <FormControl
           v-model="newTeamTitle"

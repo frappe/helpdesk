@@ -10,7 +10,7 @@
           theme="gray"
           variant="solid"
           @click="newCallLog"
-          icon-left="plus"
+          icon-left="lucide-plus"
         />
       </template>
     </LayoutHeader>

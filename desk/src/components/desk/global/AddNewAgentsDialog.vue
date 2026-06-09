@@ -1,23 +1,23 @@
 <template>
   <Dialog
-    :options="{ title: props.title }"
-    :model-value="show"
-    @update:modelValue="$emit('update:modelValue', $event)"
+    :title="props.title"
+    :open="show"
+    @update:open="$emit('update:modelValue', $event)"
     @close="close()"
   >
-    <template #body-content>
+    <template #default>
       <div class="space-y-3">
         <form
           @submit.prevent="onSubmit"
-          class="flex flex-row items-center space-x-2"
+          class="flex flex-row items-center gap-x-2"
         >
-          <Input
+          <TextInput
             id="searchInput"
             class="w-full"
             type="text"
             v-model="searchInput"
             placeholder="Type emails"
-            @input="(val) => onSearchInputChange(val)"
+            @update:model-value="(val) => onSearchInputChange(val)"
           />
           <Button
             appearance="primary"
@@ -39,12 +39,12 @@
         >
           <ul class="flex flex-wrap gap-2 py-2">
             <li
-              class="flex items-center space-x-2 rounded bg-surface-white p-1 shadow"
+              class="flex items-center gap-x-2 rounded bg-surface-white p-1 shadow"
               v-for="email in inviteQueue.slice().reverse()"
               :key="email"
               :title="email"
             >
-              <span class="ml-2 text-base">
+              <span class="ms-2 text-base">
                 {{ email }}
               </span>
               <button
@@ -64,7 +64,7 @@
           :disabled="inviteQueue.length == 0"
           appearance="primary"
           @click="sendInvites"
-          class="mr-2"
+          class="me-2"
           variant="solid"
           :loading="sentInvitesResource.loading"
           >Send Invites
@@ -77,7 +77,13 @@
 
 <script setup>
 import { useAuthStore } from "@/stores/auth";
-import { createResource, Dialog, FeatherIcon, Input, toast } from "frappe-ui";
+import {
+  createResource,
+  Dialog,
+  FeatherIcon,
+  TextInput,
+  toast,
+} from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { ref } from "vue";
 

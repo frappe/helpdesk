@@ -2,6 +2,11 @@
   <div v-if="isEmoji(icon)" v-bind="$attrs">
     {{ icon }}
   </div>
+  <span
+    v-else-if="typeof icon == 'string' && icon.startsWith('lucide-')"
+    :class="icon"
+    v-bind="$attrs"
+  />
   <FeatherIcon
     v-else-if="typeof icon == 'string'"
     :name="icon"

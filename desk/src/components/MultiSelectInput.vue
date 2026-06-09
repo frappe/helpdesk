@@ -8,11 +8,14 @@
         :label="value"
         theme="gray"
         variant="subtle"
+        tooltip="Click to copy"
+        class="cursor-pointer transition-transform active:scale-[0.98]"
+        @click="copy(value)"
         @keydown.delete.capture.stop="removeLastValue"
       >
         <template #suffix>
           <FeatherIcon
-            class="h-3.5"
+            class="h-3.5 cursor-pointer transition-transform active:scale-[0.96]"
             name="x"
             @click.stop="removeValue(value)"
           />
@@ -60,7 +63,7 @@
                         ]"
                       >
                         <UserAvatar
-                          class="mr-2"
+                          class="me-2"
                           :name="getUsernameLabel(option.value)"
                           size="lg"
                         />
@@ -82,12 +85,13 @@
         </Combobox>
       </div>
     </div>
-    <ErrorMessage v-if="error" class="mt-2 pl-2" :message="error" />
+    <ErrorMessage v-if="error" class="mt-2 ps-2" :message="error" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { UserAvatar } from "@/components/";
+import { copy } from "@/utils";
 import {
   Combobox,
   ComboboxInput,
@@ -95,7 +99,7 @@ import {
   ComboboxOptions,
 } from "@headlessui/vue";
 import { watchDebounced } from "@vueuse/core";
-import { Popover, createResource } from "frappe-ui";
+import { Button, Popover, createResource } from "frappe-ui";
 import { computed, nextTick, ref } from "vue";
 
 const props = defineProps({

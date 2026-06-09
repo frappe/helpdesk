@@ -23,8 +23,8 @@
         <Button
           :disabled="props.disableAddCondition"
           label="Add condition"
-          icon-left="plus"
-          :icon-right="open ? 'chevron-up' : 'chevron-down'"
+          icon-left="lucide-plus"
+          :icon-right="open ? 'lucide-chevron-up' : 'lucide-chevron-down'"
         />
       </Dropdown>
     </div>

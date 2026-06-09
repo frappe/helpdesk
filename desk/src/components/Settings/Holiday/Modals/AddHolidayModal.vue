@@ -1,26 +1,28 @@
 <template>
   <Dialog
-    v-model="dialog.show"
-    :options="{
-      size: 'sm',
-      title: dialog.editing ? 'Edit Holiday' : 'Add Holiday',
-    }"
+    v-model:open="dialog.show"
+    size="sm"
+    :title="dialog.editing ? 'Edit Holiday' : 'Add Holiday'"
     @after-leave="resetForm"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4 mt-4">
         <div class="flex flex-col gap-1.5">
           <FormLabel label="Date" required />
           <DatePicker
-            :value="dayjs(dialog.holiday_date).format('MM-DD-YYYY')"
-            @update:model-value="dialog.holiday_date = $event"
-            :formatter="(date) => getFormattedDate(date)"
+            :model-value="dayjs(dialog.holiday_date).format('YYYY-MM-DD')"
+            @update:model-value="
+              (value) => {
+                dialog.holiday_date = value;
+                errors.holiday_date = '';
+              }
+            "
+            :format="getDateFormat()"
             variant="subtle"
             placeholder="Date"
             class="w-full"
             id="holiday_date"
             required
-            @change="errors.holiday_date = ''"
           />
           <ErrorMessage :message="errors.holiday_date" />
         </div>
@@ -49,7 +51,7 @@
         />
         <Button
           variant="solid"
-          icon-left="plus"
+          icon-left="lucide-plus"
           label="Add Holiday"
           @click="onSave"
         />
@@ -59,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { getFormattedDate } from "@/utils";
+import { getDateFormat, getFormattedDate } from "@/utils";
 import {
   Dialog,
   FormControl,
@@ -68,9 +70,9 @@ import {
   toast,
   ErrorMessage,
   DatePicker,
+  dayjs,
 } from "frappe-ui";
 import { ref } from "vue";
-import dayjs from "dayjs";
 import { holidayData } from "@/stores/holidayList";
 
 interface ModelType {

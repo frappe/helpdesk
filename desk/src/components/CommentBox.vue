@@ -16,7 +16,7 @@
       </div>
       <div class="flex items-center gap-1">
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-          <span class="pl-0.5 text-sm text-ink-gray-5">
+          <span class="ps-0.5 text-sm text-ink-gray-5">
             {{ timeAgo(creation) }}
           </span>
         </Tooltip>
@@ -27,7 +27,7 @@
             @click="isConfirmingDelete = false"
           >
             <Button
-              icon="more-horizontal"
+              icon="lucide-more-horizontal"
               class="text-ink-gray-5"
               variant="ghost"
             />
@@ -210,7 +210,7 @@ const dropdownOptions = computed(() => [
   {
     label: "Edit",
     onClick: () => handleEditMode(),
-    icon: "edit-2",
+    icon: "lucide-edit-2",
     condition: () => !isTicketMergedComment.value,
   },
   ...ConfirmDelete({

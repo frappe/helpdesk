@@ -1,7 +1,7 @@
 <template>
   <div class="p-6.5 px-5 rounded-xl border border-outline-gray-2">
     <div class="mb-6.5 flex justify-between items-center">
-      <div class="ml-1">
+      <div class="ms-1">
         <Popover v-if="startYear !== endYear">
           <template #target="{ togglePopover }">
             <Button
@@ -9,7 +9,7 @@
               variant="ghost"
               @click="togglePopover"
               :label="currentYear + ''"
-              icon-right="chevron-down"
+              icon-right="lucide-chevron-down"
             />
           </template>
           <template #body-main="{ togglePopover }">
@@ -43,14 +43,14 @@
       <div class="flex gap-2 items-center">
         <Button
           variant="ghost"
-          icon="chevron-left"
+          icon="lucide-chevron-left"
           :disabled="visibleMonths === 'first-half'"
           @click="visibleMonths = 'first-half'"
         />
         <Button variant="ghost" label="Today" @click="goToToday()" />
         <Button
           variant="ghost"
-          icon="chevron-right"
+          icon="lucide-chevron-right"
           :disabled="visibleMonths === 'second-half'"
           @click="visibleMonths = 'second-half'"
         />
@@ -107,9 +107,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import HLCalender from "./HLCalender.vue";
-import dayjs from "dayjs";
 import { holidayData } from "@/stores/holidayList";
-import { Button, Popover } from "frappe-ui";
+import { Button, dayjs, Popover } from "frappe-ui";
 
 const visibleMonths = ref<"first-half" | "second-half">("first-half");
 const months = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);

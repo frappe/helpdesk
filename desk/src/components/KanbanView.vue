@@ -179,7 +179,22 @@ import {
 import { IndicatorIcon } from "./icons";
 import KanbanCardActions from "./KanbanCardActions.vue";
 import { __ } from "@/translation";
-import { formatTimeShort, isTouchScreenDevice, parseColor } from "@/utils";
+import { formatTimeShort, isTouchScreenDevice } from "@/utils";
+
+// `parseColor` used to live in @/utils but was inlined into ticketStatus
+// upstream. Re-declare the same helper here to keep this component
+// self-contained — it just maps a colour name to the Tailwind class
+// stack used by IndicatorIcon.
+function parseColor(color: string): string {
+  color = (color || "gray").toLowerCase();
+  let textColor = `!text-${color}-600`;
+  if (color === "black") {
+    textColor = "!text-ink-gray-9";
+  } else if (["gray", "green"].includes(color)) {
+    textColor = `!text-${color}-700`;
+  }
+  return textColor;
+}
 
 const PRIORITY_THEME: Record<string, string> = {
   Low: "gray",

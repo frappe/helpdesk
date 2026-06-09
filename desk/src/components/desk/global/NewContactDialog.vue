@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Dialog v-model="open" :options="{ title: __('Create New Contact') }">
-      <template #body-content>
+    <Dialog v-model:open="open" :title="__('Create New Contact')">
+      <template #default>
         <div class="space-y-4">
           <div
             v-for="field in formFields"
@@ -17,7 +17,7 @@
                 *
               </span>
             </span>
-            <Input
+            <TextInput
               v-if="field.type === 'input'"
               v-model="state[field.value]"
               type="text"
@@ -34,7 +34,7 @@
             />
             <ErrorMessage :message="error[field.error]" />
           </div>
-          <div class="flex justify-end space-x-2">
+          <div class="flex justify-end gap-x-2">
             <Button
               :label="__('Create')"
               :loading="contactResource.loading"
@@ -56,7 +56,7 @@ import { computed, ref } from "vue";
 import {
   Dialog,
   ErrorMessage,
-  Input,
+  TextInput,
   createListResource,
   createResource,
   toast,

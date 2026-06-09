@@ -2,7 +2,7 @@
   <div class="flex items-center">
     <router-link
       :to="{ name: routeName }"
-      class="px-0.5 pl-0 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
+      class="ps-0 pe-0.5 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
     >
       {{ isMobileView ? "..." : label }}
     </router-link>
@@ -30,16 +30,11 @@
       </template>
 
       <template #item-prefix="{ item }">
-        <FeatherIcon
-          v-if="item.icon && typeof item.icon === 'string'"
-          :name="item.icon"
+        <Icon
+          v-if="item.icon"
+          :icon="item.icon"
           class="h-4 w-4 flex-shrink-0 text-ink-gray-7"
           aria-hidden="true"
-        />
-        <component
-          class="h-4 w-4 flex-shrink-0 text-ink-gray-7"
-          v-else-if="item.icon"
-          :is="item.icon"
         />
       </template>
 
@@ -48,7 +43,7 @@
           <span class="truncate">{{ item.label }}</span>
           <Badge
             v-if="item.is_standard"
-            class="ml-1 flex-shrink-0"
+            class="ms-1 flex-shrink-0"
             size="sm"
             label="Standard"
           />
@@ -68,9 +63,9 @@
             <template #default="{ open }">
               <Button
                 variant="ghost"
-                class="kebab-btn !size-4 ml-0 rounded-sm"
+                class="kebab-btn !size-4 ms-0 rounded-sm"
                 :class="open ? 'inline-flex' : 'hidden'"
-                icon="more-horizontal"
+                icon="lucide-more-horizontal"
                 @click.stop
               />
             </template>
@@ -82,8 +77,9 @@
 </template>
 
 <script setup>
+import Icon from "@/components/Icon.vue";
 import { useScreenSize } from "@/composables/screen";
-import { Badge, Dropdown } from "frappe-ui";
+import { Badge, Dropdown, FeatherIcon } from "frappe-ui";
 import { useRoute } from "vue-router";
 
 const props = defineProps({

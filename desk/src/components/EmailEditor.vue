@@ -110,7 +110,7 @@
           <div
             ref="quotedContentRef"
             contenteditable="true"
-            class="prose !max-w-full mx-1 my-2 border-l-4 border-outline-gray-2 pl-4 text-sm focus:outline-none"
+            class="prose !max-w-full mx-1 my-2 border-s-4 border-outline-gray-2 ps-4 text-sm focus:outline-none"
             @input="onQuotedInput"
           />
         </div>
@@ -155,7 +155,7 @@
               <template #default="{ openFileSelector, uploading }">
                 {{ void (isUploading = uploading) }}
                 <button
-                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
+                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
                   @click="openFileSelector()"
                   :disabled="uploading"
                 >
@@ -167,16 +167,16 @@
               </template>
             </FileUploader>
             <button
-              class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
+              class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
               @click="showSavedRepliesSelectorModal = true"
             >
               <SavedReplyIcon class="h-4 w-4" />
             </button>
-            <div class="h-4 w-[2px] border-l" />
+            <div class="h-4 w-[2px] border-s" />
           </div>
           <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
         </div>
-        <div class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%]">
+        <div class="flex items-center justify-end gap-x-2 sm:mt-0 w-[40%]">
           <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
@@ -209,6 +209,7 @@ import {
 } from "@/components";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
+import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
 import {
   CleanStyles,
@@ -287,7 +288,7 @@ const { isManager } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const editorRef = ref(null);
-const editor = computed(() => editorRef.value.editor);
+const editor = computed(() => editorRef.value?.editor);
 
 function focusEditorAtStart() {
   setTimeout(() => {
@@ -309,11 +310,7 @@ function isOnlySignature(content: string | null) {
   return htmlToText(content) === htmlToText(emailSignature.value);
 }
 
-const userResource = createResource({
-  url: "helpdesk.api.auth.get_current_user_email_info",
-  cache: "current-user-email-info",
-  auto: true,
-});
+const userResource = getUserEmailInfo();
 
 watch(newEmail, (newValue, oldValue) => {
   if (newValue !== oldValue && newValue) {

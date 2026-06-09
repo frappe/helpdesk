@@ -8,7 +8,6 @@ import {
   FormControl,
   frappeRequest,
   FrappeUI,
-  Input,
   setConfig,
   TextInput,
   toast,
@@ -32,7 +31,6 @@ const globalComponents = {
   ErrorMessage,
   FeatherIcon,
   FormControl,
-  Input,
   Tooltip,
   TextInput,
 };
@@ -84,6 +82,8 @@ if (import.meta.env.DEV) {
     for (let key in values) {
       window[key] = values[key];
     }
+    if (window.dir) document.documentElement.dir = window.dir;
+    if (window.lang) document.documentElement.lang = window.lang;
     socket = initSocket();
     app.config.globalProperties.$socket = socket;
     app.mount("#app");
