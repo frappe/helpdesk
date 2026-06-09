@@ -638,13 +638,17 @@ function handleView(viewInfo, action) {
       rows: JSON.stringify(selectedView.rows),
       label: viewInfo.label,
       icon: viewInfo.icon,
+      // Duplicate respects the layout the user picked in the dialog —
+      // falls back to the source view's type when not changed.
+      type: viewInfo.type || selectedView.type || "list",
       public: false,
       pinned: false,
     };
   } else {
     view = {
       dt: "HD Ticket",
-      type: "list",
+      // User-selectable from the Create View dialog (List vs Kanban).
+      type: viewInfo.type || "list",
       label: viewInfo.label ?? __("List"),
       icon: viewInfo.icon ?? "",
       route_name: router.currentRoute.value.name as string,
