@@ -74,7 +74,7 @@
                   :model-value="f.value"
                   @update:modelValue="(v) => updateValue(v, f)"
                   @change="(v) => updateValue(v, f)"
-                  :placeholder="'John Doe'"
+                  :placeholder="getValuePlaceholder(f)"
                 />
               </div>
             </div>
@@ -109,7 +109,7 @@
                     :model-value="f.value"
                     @change="(v) => updateValue(v, f)"
                     @update:modelValue="(v) => updateValue(v, f)"
-                    :placeholder="'John Doe'"
+                    :placeholder="getValuePlaceholder(f)"
                   />
                 </div>
               </div>
@@ -402,6 +402,27 @@ function getValueControl(f) {
   } else {
     return h(FormControl, { type: "text" });
   }
+}
+
+function getValuePlaceholder(f) {
+  const { field, operator } = f;
+  const { fieldtype } = field;
+  const isNumber = typeNumber.includes(fieldtype);
+  if (operator === "between") return __("01/01/2022 to 01/31/2022");
+  if (operator === "in" || operator === "not in") {
+    return isNumber ? __("100, 200, 300") : __("John, Jane, Doe");
+  }
+  if (operator === "like" || operator === "not like") {
+    return isNumber ? __("%100%") : __("%John%");
+  }
+  if (operator === "is" || operator === "is not") return __("Set");
+  if (operator === "timespan") return __("Last Week");
+  if (isNumber) return __("1000");
+  if (typeDate.includes(fieldtype)) return __("01/01/2022");
+  if (typeCheck.includes(fieldtype)) return __("Yes");
+  if (typeLink.includes(fieldtype)) return __("Select a Value");
+  if (typeSelect.includes(fieldtype)) return __("Select an Option");
+  return __("John Doe");
 }
 
 function getDefaultValue(field) {
