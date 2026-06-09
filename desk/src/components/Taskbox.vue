@@ -26,7 +26,6 @@
 
           <Tooltip
             v-if="activity.due_date"
-            :key="activity.due_date"
             :text="dateFormat(activity.due_date, dateTooltipFormat)"
           >
             <div class="flex items-center gap-1.5">
@@ -35,7 +34,10 @@
             </div>
           </Tooltip>
 
-          <div v-if="(assignedId || activity.due_date) && activity.priority" class="flex items-center justify-center">
+          <div
+            v-if="(assignedId || activity.due_date) && activity.priority"
+            class="flex items-center justify-center"
+          >
             <DotIcon class="h-1.5 w-1.5 text-ink-gray-4" />
           </div>
 
@@ -46,7 +48,6 @@
       </div>
 
       <div class="flex items-center gap-1 shrink-0" @click.stop>
-        
         <Dropdown :options="statusDropdownOptions" placement="bottom-end">
           <Button
             :tooltip="__('Change Status')"
@@ -69,7 +70,7 @@
     </div>
 
     <div class="mx-3 border-b border-surface-gray-1" />
-    
+
     <TaskboxEditor
       v-if="showModal"
       v-model="showModal"
@@ -86,38 +87,39 @@ import { Avatar, Button, Dropdown, Tooltip, call, toast } from 'frappe-ui'
 import { dateTooltipFormat, dateFormat } from '@/utils'
 import { __ } from '@/translation'
 import { useUserStore } from '@/stores/user'
-import CalendarIcon     from '@/components/icons/CalendarIcon.vue'
-import DotIcon          from '@/components/icons/DotIcon.vue'
-import TaskStatusIcon   from '@/components/icons/TaskStatusIcon.vue'
-import TaskboxEditor    from './TaskboxEditor.vue'
+import CalendarIcon   from '@/components/icons/CalendarIcon.vue'
+import DotIcon        from '@/components/icons/DotIcon.vue'
+import TaskStatusIcon from '@/components/icons/TaskStatusIcon.vue'
+import TaskboxEditor  from './TaskboxEditor.vue'
 
 const props = defineProps({
   activity: {
-    type: Object,
+    type:     Object,
     required: true,
   },
   reloadTasks: {
-    type: Function,
+    type:    Function,
     default: null,
   },
   i: {
-    type: Number,
+    type:    Number,
     default: 0,
   },
   tasks: {
-    type: Array,
+    type:    Array,
     default: () => [],
   },
 })
 
-const emit = defineEmits(['update', 'status-change'])
-const showModal = ref(false)
+const emit = defineEmits(['update', 'status-change', 'deleted'])
+
+const showModal  = ref(false)
 const isUpdating = ref(false)
 const { getUser } = useUserStore()
 
-const assignedId = computed(() => {
-  return props.activity.assigned || props.activity.assigned_to || ''
-})
+const assignedId = computed(() =>
+  props.activity.assigned || props.activity.assigned_to || ''
+)
 
 const userInfo = computed(() => {
   const email = assignedId.value
@@ -128,9 +130,92 @@ const userInfo = computed(() => {
 const assigneeLabel = computed((): string => {
   const assigned = assignedId.value
   if (!assigned) return ''
-  if (!assigned.includes('@')) return assigned
-  return assigned 
+  return assigned
 })
+
+async function changeStatus(newStatus: string) {
+  if (isUpdating.value) return
+
+  const taskId = props.activity.name || props.activity.id
+  if (!taskId) {
+    toast.error(__('Could not resolve Task ID.'))
+    return
+  }
+
+  isUpdating.value = true
+
+  // Optimistic UI update
+  const previousStatus = props.activity.status
+  props.activity.status = newStatus
+
+  try {
+    await call('helpdesk.helpdesk.doctype.hd_task.hd_task.update_task', {
+      task:   taskId,
+      status: newStatus,
+    })
+    emit('status-change', { name: taskId, status: newStatus })
+    emit('update')
+    props.reloadTasks?.()
+  } catch (e: any) {
+    props.activity.status = previousStatus // Fallback logic execution
+    toast.error(e?.message || __('Failed to update status'))
+  } finally {
+    isUpdating.value = false
+  }
+}
+
+const statusDropdownOptions = computed(() =>
+  [
+    { label: __('Backlog'),     value: 'Backlog'     },
+    { label: __('Todo'),        value: 'Todo'        },
+    { label: __('In Progress'), value: 'In Progress' },
+    { label: __('Done'),        value: 'Done'        },
+    { label: __('Canceled'),    value: 'Canceled'    },
+  ].map((s) => ({
+    label:   s.label,
+    value:   s.value,
+    onClick: () => changeStatus(s.value),
+  }))
+)
+
+// ── Decoupled Async Delete Stream ─────────────────────────────────────────────
+async function deleteTask() {
+  if (isUpdating.value) return
+
+  const taskId = props.activity.name || props.activity.id
+  if (!taskId) {
+    toast.error(__('Task identifier missing, cannot delete.'))
+    return
+  }
+
+  isUpdating.value = true
+
+  // Optimistic event emit to hide row from UI loop instantly
+  emit('deleted', taskId)
+
+  try {
+    await call('helpdesk.helpdesk.doctype.hd_task.hd_task.delete_task', {
+      task: taskId,
+    })
+    toast.success(__('Task deleted successfully'))
+    emit('update')
+    props.reloadTasks?.()
+  } catch (e: any) {
+    // Force array restore trigger up to container component layer on failure
+    emit('update')
+    toast.error(e?.message || __('Failed to delete task'))
+  } finally {
+    isUpdating.value = false
+  }
+}
+
+const dropdownOptions = computed(() => [
+  {
+    label:   __('Delete'),
+    icon:    'trash-2',
+    onClick: deleteTask,
+  },
+])
 
 function handleReload(payload?: any) {
   showModal.value = false
@@ -157,84 +242,4 @@ function handleReload(payload?: any) {
   if (props.reloadTasks) {
     props.reloadTasks()
   }
-
-async function changeStatus(newStatus: string) {
-  if (isUpdating.value) return
-  
-  const targetTaskId = props.activity.name || props.activity.id;
-  if (!targetTaskId) {
-    toast.error(__('Could not resolve Task ID.'))
-    return
-  }
-
-  isUpdating.value = true
-
-  try {
-    await call('helpdesk.helpdesk.doctype.hd_task.hd_task.update_task', {
-      task:   targetTaskId,
-      status: newStatus,
-    })
-    
-    emit('status-change', { name: targetTaskId, status: newStatus })
-    toast.success(__('Status updated successfully'))
-    handleReload()
-  } catch (e: any) {
-    toast.error(e?.message || __('Failed to update status'))
-  } finally {
-    isUpdating.value = false
-  }
-}
-
-const statusDropdownOptions = computed(() =>
-  [
-    { label: __('Backlog'),     value: 'Backlog'     },
-    { label: __('Todo'),        value: 'Todo'        },
-    { label: __('In Progress'), value: 'In Progress' },
-    { label: __('Done'),        value: 'Done'        },
-    { label: __('Canceled'),    value: 'Canceled'    },
-  ].map((s) => ({
-    label:   s.label,
-    value:   s.value,
-    onClick: () => changeStatus(s.value),
-  }))
-)
-
-// Optimized array cleanup mutation
-function handleTaskDeleted(taskName: string) {
-  if (!props.tasks) return
-  const index = props.tasks.findIndex((t: any) => t.name === taskName || t.id === taskName)
-  if (index !== -1) {
-    props.tasks.splice(index, 1)
-  }
-  handleReload()
-}
-
-const dropdownOptions = computed(() => [
-  {
-    label: __('Delete'),
-    icon: 'trash',
-    onClick: async () => {
-      if (isUpdating.value) return
-      
-      const targetName = props.activity.name || props.activity.id
-      if (!targetName) {
-        toast.error(__('Task identifier missing, cannot delete.'))
-        return
-      }
-
-      isUpdating.value = true
-      try {
-        await call('helpdesk.helpdesk.doctype.hd_task.hd_task.delete_task', {
-          task: targetName,
-        })
-        handleTaskDeleted(targetName)
-        toast.success(__('Task deleted successfully'))
-      } catch (e: any) {
-        toast.error(e?.message || __('Failed to delete task'))
-      } finally {
-        isUpdating.value = false
-      }
-    },
-  },
-])
 </script>
