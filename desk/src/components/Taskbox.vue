@@ -46,29 +46,16 @@
       </div>
 
       <div class="flex items-center gap-1 shrink-0" @click.stop>
+        
         <Dropdown :options="statusDropdownOptions" placement="bottom-end">
-          <template #default>
-            <Button
-              :tooltip="__('Change Status')"
-              variant="ghost"
-              class="text-ink-gray-8 hover:bg-surface-gray-3 hover:text-ink-gray-9"
-              :disabled="isUpdating"
-              @click.stop.prevent
-            >
-              <TaskStatusIcon :status="activity.status || 'Todo'" class="h-4 w-4" />
-            </Button>
-          </template>
-
-          <template #item="{ item }">
-            <button
-              class="flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-sm text-ink-gray-9 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              :disabled="isUpdating"
-              @click="item.onClick"
-            >
-              <TaskStatusIcon :status="item.value" class="h-4 w-4 shrink-0" />
-              <span class="whitespace-nowrap">{{ item.label }}</span>
-            </button>
-          </template>
+          <Button
+            :tooltip="__('Change Status')"
+            variant="ghost"
+            class="text-ink-gray-8 hover:bg-surface-gray-3 hover:text-ink-gray-9"
+            :disabled="isUpdating"
+          >
+            <TaskStatusIcon :status="activity.status || 'Todo'" class="h-4 w-4" />
+          </Button>
         </Dropdown>
 
         <Dropdown :options="dropdownOptions" placement="bottom-end">
@@ -76,7 +63,6 @@
             icon="more-horizontal"
             variant="ghost"
             class="text-ink-gray-8 hover:bg-surface-gray-3 hover:text-ink-gray-9"
-            @click.stop.prevent
           />
         </Dropdown>
       </div>
@@ -124,7 +110,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update'])
+const emit = defineEmits(['update', 'status-change'])
 const showModal = ref(false)
 const isUpdating = ref(false)
 const { getUser } = useUserStore()
@@ -174,25 +160,25 @@ function handleReload(payload?: any) {
 
 async function changeStatus(newStatus: string) {
   if (isUpdating.value) return
+  
+  const targetTaskId = props.activity.name || props.activity.id;
+  if (!targetTaskId) {
+    toast.error(__('Could not resolve Task ID.'))
+    return
+  }
+
   isUpdating.value = true
+
   try {
-    const result = await call('helpdesk.helpdesk.doctype.hd_task.hd_task.update_task', {
-      task:   props.activity.name,
+    await call('helpdesk.helpdesk.doctype.hd_task.hd_task.update_task', {
+      task:   targetTaskId,
       status: newStatus,
     })
     
-    const data = result?.message || result;
-    if (data && typeof data === 'object') {
-      Object.keys(data).forEach(key => {
-          if (key in props.activity) {
-              props.activity[key] = data[key];
-          }
-      });
-      props.activity.status = newStatus;
-    } else {
-      props.activity.status = newStatus
-    }
-
+    // Send event up to parent to change the status value in the tasks list array
+    emit('status-change', { name: targetTaskId, status: newStatus })
+    
+    toast.success(__('Status updated successfully'))
     handleReload()
   } catch (e: any) {
     toast.error(e?.message || __('Failed to update status'))
@@ -216,19 +202,11 @@ const statusDropdownOptions = computed(() =>
 )
 
 function handleTaskDeleted(taskName: string) {
-  const index = props.tasks.findIndex(
-    (t: any) => t.name === taskName
-  )
-
+  const index = props.tasks.findIndex((t: any) => t.name === taskName)
   if (index !== -1) {
     props.tasks.splice(index, 1)
   }
-
-  emit('update', taskName)
-
-  if (props.reloadTasks) {
-    props.reloadTasks()
-  }
+  handleReload()
 }
 
 const dropdownOptions = computed(() => [
