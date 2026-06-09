@@ -20,31 +20,30 @@
         />
       </div>
 
-      <!-- Layout picker: only meaningful when creating/duplicating a
-           view. Editing an existing view goes through "Save Changes"
-           on the list builder instead, so the picker stays hidden. -->
-      <template v-if="viewDialog.mode !== 'edit'">
-        <div class="mt-4 mb-1.5 block text-base text-ink-gray-5">
-          {{ __("Layout") }}
-        </div>
-        <div class="inline-flex rounded-md bg-surface-gray-2 p-0.5">
-          <button
-            v-for="opt in layoutOptions"
-            :key="opt.value"
-            type="button"
-            class="flex items-center gap-1.5 rounded px-3 py-1 text-sm transition"
-            :class="
-              view.type === opt.value
-                ? 'bg-surface-white text-ink-gray-9 shadow-sm'
-                : 'text-ink-gray-6 hover:text-ink-gray-8'
-            "
-            @click="view.type = opt.value"
-          >
-            <FeatherIcon :name="opt.icon" class="h-3.5 w-3.5" />
-            {{ opt.label }}
-          </button>
-        </div>
-      </template>
+      <!-- Layout picker — applies to Create, Duplicate, and Edit so
+           every dialog touching the view doc surfaces the same control.
+           For Edit, the current view's type pre-fills it (see
+           viewDialog.view.type set by the parent on open). -->
+      <div class="mt-4 mb-1.5 block text-base text-ink-gray-5">
+        {{ __("Layout") }}
+      </div>
+      <div class="inline-flex rounded-md bg-surface-gray-2 p-0.5">
+        <button
+          v-for="opt in layoutOptions"
+          :key="opt.value"
+          type="button"
+          class="flex items-center gap-1.5 rounded px-3 py-1 text-sm transition"
+          :class="
+            view.type === opt.value
+              ? 'bg-surface-white text-ink-gray-9 shadow-sm'
+              : 'text-ink-gray-6 hover:text-ink-gray-8'
+          "
+          @click="view.type = opt.value"
+        >
+          <FeatherIcon :name="opt.icon" class="h-3.5 w-3.5" />
+          {{ opt.label }}
+        </button>
+      </div>
     </template>
     <template #actions>
       <Button

@@ -351,6 +351,7 @@ let viewDialog = reactive({
     label: "",
     icon: "",
     name: "",
+    type: "list",
   },
   mode: "create",
 });
@@ -482,6 +483,7 @@ const viewActions = (view) => {
             viewDialog.view.label = _view.label + " (New)";
             viewDialog.view.icon = _view.icon;
             viewDialog.view.name = _view.name;
+            viewDialog.view.type = _view.type || "list";
             viewDialog.mode = "duplicate";
             selectedView = _view;
             viewDialog.show = true;
@@ -550,6 +552,7 @@ const viewActions = (view) => {
           viewDialog.view.label = _view.label;
           viewDialog.view.icon = _view.icon;
           viewDialog.view.name = _view.name;
+          viewDialog.view.type = _view.type || "list";
           viewDialog.mode = "edit";
           viewDialog.show = true;
         },
