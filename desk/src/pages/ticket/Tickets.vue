@@ -363,9 +363,12 @@ const dropdownOptions = computed(() => {
     {
       label: __("List View"),
       icon: "lucide-align-justify",
-      onClick: () => {
-        // Clear any saved-view selection and reset to plain list.
-        router.push({
+      onClick: async () => {
+        // Await the navigation so setViewType() writes the override
+        // against the right localStorage key — calling it before the
+        // route has settled persists the choice under the previous
+        // saved-view's key instead of __default__.
+        await router.push({
           name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
         });
         listViewRef.value?.setViewType?.("list");
@@ -376,8 +379,8 @@ const dropdownOptions = computed(() => {
     defaultViewItems.push({
       label: __("Kanban"),
       icon: "lucide-columns",
-      onClick: () => {
-        router.push({ name: "TicketsAgent" });
+      onClick: async () => {
+        await router.push({ name: "TicketsAgent" });
         listViewRef.value?.setViewType?.("kanban");
       },
     });
