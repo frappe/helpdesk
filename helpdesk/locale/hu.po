@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-06-03 12:44\n"
+"PO-Revision-Date: 2026-06-09 14:43\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -1397,7 +1397,7 @@ msgstr "Veszély"
 
 #: desk/src/pages/dashboard/Dashboard.vue:562
 msgid "Dashboard"
-msgstr "Műszerfal"
+msgstr "Irányítópult"
 
 #: desk/src/pages/home/Home.vue:264 desk/src/pages/home/Home.vue:286
 msgid "Dashboard saved"
@@ -1776,7 +1776,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:8
 msgid "Email Settings"
-msgstr "E-mail Beállítások"
+msgstr "E-mail beállítások"
 
 #: desk/src/components/Settings/EmailAdd.vue:309
 msgid "Email account created"
@@ -1943,7 +1943,7 @@ msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:7
 msgid "Export Type"
-msgstr "Export Típusa"
+msgstr "Export típusa"
 
 #. Label of the is_external_link (Check) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -2891,7 +2891,7 @@ msgstr ""
 #: desk/src/pages/home/components/RecentFeedback.vue:358
 #: desk/src/pages/home/components/RecentFeedback.vue:390
 msgid "Last Month"
-msgstr "Múlt Hónap"
+msgstr "Múlt hónap"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:126
 msgid "Last Name"
@@ -2900,7 +2900,7 @@ msgstr "Vezetéknév"
 #: desk/src/pages/home/components/RecentFeedback.vue:354
 #: desk/src/pages/home/components/RecentFeedback.vue:389
 msgid "Last Week"
-msgstr "Múlt Hét"
+msgstr "Múlt héten"
 
 #: desk/src/pages/home/components/AgentTicketsCard.vue:35
 #: desk/src/pages/home/components/AvgTimeCard.vue:50
@@ -2970,7 +2970,7 @@ msgstr "Lista"
 
 #: desk/src/pages/ticket/Tickets.vue:304
 msgid "List View"
-msgstr "Lista Nézet"
+msgstr "Lista nézet"
 
 #: desk/src/components/CallArea.vue:72
 msgid "Listen"
@@ -3415,7 +3415,7 @@ msgstr ""
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:16
 #: desk/src/pages/call-logs/CallLogModal.vue:10
 msgid "Not Saved"
-msgstr "Nincs Mentve"
+msgstr "Nincs mentve"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:250
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:270
@@ -4072,7 +4072,7 @@ msgstr "Válasz"
 
 #: desk/src/components/EmailArea.vue:59
 msgid "Reply All"
-msgstr "Válasz Mindenkinek"
+msgstr "Válasz mindenkinek"
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -5527,7 +5527,7 @@ msgstr "Nézet kitűzésének feloldása"
 
 #: desk/src/pages/knowledge-base/Article.vue:21
 msgid "Unpublish"
-msgstr "Közzététel Visszavonása"
+msgstr "Közzététel visszavonása"
 
 #: desk/src/components/UnsavedBadge.vue:8
 msgid "Unsaved"
