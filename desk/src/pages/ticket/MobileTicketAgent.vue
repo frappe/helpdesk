@@ -81,7 +81,7 @@
                 <!-- feedback component -->
                 <TicketFeedback
                   v-if="ticket.data.feedback_rating"
-                  class="border-b px-6 py-3 text-base text-gray-600"
+                  class="border-b px-6 py-3 text-base text-ink-gray-5"
                   :ticket="ticket.data"
                 />
                 <!-- SLA Section -->
@@ -121,7 +121,7 @@
             </template>
           </Tabs>
           <CommunicationArea
-            class="sticky bottom-0 z-50 bg-white"
+            class="sticky bottom-0 z-50 bg-surface-white"
             ref="communicationAreaRef"
             v-model="ticket.data"
             :ticketId="ticket.data?.name"

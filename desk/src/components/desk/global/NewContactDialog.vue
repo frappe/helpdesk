@@ -8,11 +8,11 @@
             :key="field.label"
             class="flex flex-col gap-1"
           >
-            <span class="mb-2 block text-sm leading-4 text-gray-700">
+            <span class="mb-2 block text-sm leading-4 text-ink-gray-7">
               {{ field.label }}
               <span
                 v-if="field.required"
-                class="place-self-center text-red-500"
+                class="place-self-center text-ink-red-3"
               >
                 *
               </span>

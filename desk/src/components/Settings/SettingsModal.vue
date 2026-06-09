@@ -36,17 +36,17 @@
                 class="flex h-7 w-full items-center gap-2 rounded px-2 py-[7px]"
                 :class="[
                   activeTab?.label == item.label
-                    ? 'bg-white shadow-sm'
-                    : 'hover:bg-gray-100',
+                    ? 'bg-surface-selected shadow-sm'
+                    : 'hover:bg-surface-gray-2',
                 ]"
                 @click="() => onTabChange(item)"
               >
                 <component
                   :is="item.icon"
-                  class="h-4 w-4 text-gray-700 shrink-0"
+                  class="h-4 w-4 text-ink-gray-7 shrink-0"
                 />
                 <Tooltip :text="__(item.label)" placement="right">
-                  <span class="text-p-sm text-gray-800 truncate">
+                  <span class="text-p-sm text-ink-gray-8 truncate">
                     {{ __(item.label) }}
                   </span>
                 </Tooltip>

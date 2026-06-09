@@ -52,7 +52,9 @@
     </template>
     <template #content>
       <div class="w-full h-full" v-if="teamMembers?.length > 0">
-        <div class="grid grid-cols-8 items-center gap-3 text-sm text-gray-600">
+        <div
+          class="grid grid-cols-8 items-center gap-3 text-sm text-ink-gray-5"
+        >
           <div class="col-span-6 text-p-sm">
             {{ __("Members ({0})", teamMembers.length) }}
           </div>
