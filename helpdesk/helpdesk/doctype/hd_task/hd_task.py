@@ -194,11 +194,8 @@ def update_task(task: str | int, **kwargs):
 
     doc = frappe.get_doc("HD Task", task)
 
-    # FIXED: Replaced rigid `is not None` with robust kwargs check 
-    # to allow clearing fields (saving `None`) securely.
     allowed_fields = ["title", "status", "priority", "description", "assigned", "start_date", "due_date"]
     
-    # Handle frontend payload sending `assigned_to`
     if "assigned_to" in kwargs and "assigned" not in kwargs:
         kwargs["assigned"] = kwargs.get("assigned_to")
 
@@ -207,7 +204,9 @@ def update_task(task: str | int, **kwargs):
             doc.set(field, kwargs.get(field))
 
     doc.save(ignore_permissions=True)
-    return doc
+    
+
+    return doc.as_dict()
 
 
 @frappe.whitelist()
