@@ -10,7 +10,7 @@ on:
 
 env:
   AWS_REGION: eu-west-2
-  IMAGE_NAME: support-uat
+  IMAGE_NAME: support
   FRAPPE_REPO: https://github.com/frappe/frappe
   FRAPPE_VERSION: version-15
   PY_VERSION: "3.14.2"
