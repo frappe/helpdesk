@@ -292,7 +292,6 @@ defineExpose({
   scrollToLatestActivity,
 });
 </script>
-</script>
 <style scoped>
 .activity:focus {
   outline: none;
