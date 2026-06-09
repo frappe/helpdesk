@@ -12,6 +12,7 @@ import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
 import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
+import { Icon } from "frappe-ui/icons";
 import TicketIcon from "./components/icons/TicketIcon.vue";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
@@ -367,11 +368,27 @@ export function isEmoji(str) {
   return emojiList.includes(str);
 }
 
+/**
+ * Resolves a stored icon value into a renderable component.
+ * Supports Lucide icon names from the frappe-ui IconPicker (bare names like
+ * `rocket`, or legacy `lucide-rocket`), emojis stored by older views, and
+ * pre-resolved icon components, falling back to the ticket icon.
+ */
 export function getIcon(icon) {
-  if (isEmoji(icon)) {
-    return h("div", icon);
+  if (!icon) {
+    return markRaw(TicketIcon);
   }
-  return icon || markRaw(TicketIcon);
+  if (isEmoji(icon)) {
+    return h(
+      "div",
+      { class: "flex items-center justify-center leading-none" },
+      icon
+    );
+  }
+  if (typeof icon === "string") {
+    return h(Icon, { name: icon.replace(/^lucide-/, "") });
+  }
+  return icon;
 }
 export function formatTimeShort(date: string) {
   const now = dayjsLocal();
