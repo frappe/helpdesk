@@ -175,9 +175,7 @@ async function changeStatus(newStatus: string) {
       status: newStatus,
     })
     
-    // Send event up to parent to change the status value in the tasks list array
     emit('status-change', { name: targetTaskId, status: newStatus })
-    
     toast.success(__('Status updated successfully'))
     handleReload()
   } catch (e: any) {
@@ -201,8 +199,10 @@ const statusDropdownOptions = computed(() =>
   }))
 )
 
+// Optimized array cleanup mutation
 function handleTaskDeleted(taskName: string) {
-  const index = props.tasks.findIndex((t: any) => t.name === taskName)
+  if (!props.tasks) return
+  const index = props.tasks.findIndex((t: any) => t.name === taskName || t.id === taskName)
   if (index !== -1) {
     props.tasks.splice(index, 1)
   }
@@ -215,12 +215,19 @@ const dropdownOptions = computed(() => [
     icon: 'trash',
     onClick: async () => {
       if (isUpdating.value) return
+      
+      const targetName = props.activity.name || props.activity.id
+      if (!targetName) {
+        toast.error(__('Task identifier missing, cannot delete.'))
+        return
+      }
+
       isUpdating.value = true
       try {
         await call('helpdesk.helpdesk.doctype.hd_task.hd_task.delete_task', {
-          task: props.activity.name,
+          task: targetName,
         })
-        handleTaskDeleted(props.activity.name)
+        handleTaskDeleted(targetName)
         toast.success(__('Task deleted successfully'))
       } catch (e: any) {
         toast.error(e?.message || __('Failed to delete task'))
