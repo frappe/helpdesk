@@ -106,6 +106,16 @@ def get_list_data(
     rows.append("name") if "name" not in rows else rows
     if doctype == "HD Ticket":
         rows.append("_seen") if "_seen" not in rows else rows
+
+    # Kanban cards surface counts (comments + attachments) in the card
+    # footer — fetch them as part of the list response so the renderer
+    # doesn't have to do per-row round trips. Both extras are harmless
+    # to fetch for non-kanban callers but we keep them gated to avoid
+    # any perceived perf hit on the list view's hot path.
+    extra_query_args = {}
+    if view_type == "kanban":
+        extra_query_args["with_comment_count"] = True
+
     data = (
         frappe.get_list(
             doctype,
@@ -113,9 +123,31 @@ def get_list_data(
             filters=filters,
             order_by=order_by,
             page_length=page_length,
+            **extra_query_args,
         )
         or []
     )
+
+    if view_type == "kanban" and data:
+        # File doctype has no native helper for "attached count" — one
+        # grouped query for the whole page is cheaper than a per-row
+        # `attached_files_count` and avoids N+1.
+        names = [d.get("name") for d in data if d.get("name")]
+        if names:
+            counts = frappe.db.sql(
+                """
+                SELECT attached_to_name AS doc, COUNT(*) AS c
+                FROM `tabFile`
+                WHERE attached_to_doctype = %(dt)s
+                  AND attached_to_name IN %(names)s
+                GROUP BY attached_to_name
+                """,
+                {"dt": doctype, "names": tuple(names)},
+                as_dict=True,
+            )
+            count_map = {row["doc"]: row["c"] for row in counts}
+            for d in data:
+                d["attachment_count"] = count_map.get(d.get("name"), 0)
 
     if doctype == "TP Call Log":
         data = parse_call_logs(data)

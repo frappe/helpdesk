@@ -296,32 +296,37 @@ let viewDialog = reactive({
 });
 
 const dropdownOptions = computed(() => {
+  // Kanban is an agent workflow tool — customers in the portal typically
+  // only see their own handful of tickets, so the board layout would be
+  // visually empty and confusing. Hide the entry there.
+  const defaultViewItems: Array<Record<string, any>> = [
+    {
+      label: __("List View"),
+      icon: "align-justify",
+      onClick: () => {
+        // Clear any saved-view selection and reset to plain list.
+        router.push({
+          name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+        });
+        listViewRef.value?.setViewType?.("list");
+      },
+    },
+  ];
+  if (!isCustomerPortal.value) {
+    defaultViewItems.push({
+      label: __("Kanban"),
+      icon: "columns",
+      onClick: () => {
+        router.push({ name: "TicketsAgent" });
+        listViewRef.value?.setViewType?.("kanban");
+      },
+    });
+  }
+
   const items = [
     {
       group: __("Default Views"),
-      items: [
-        {
-          label: __("List View"),
-          icon: "align-justify",
-          onClick: () => {
-            // Clear any saved-view selection and reset to plain list.
-            router.push({
-              name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-            });
-            listViewRef.value?.setViewType?.("list");
-          },
-        },
-        {
-          label: __("Kanban"),
-          icon: "columns",
-          onClick: () => {
-            router.push({
-              name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-            });
-            listViewRef.value?.setViewType?.("kanban");
-          },
-        },
-      ],
+      items: defaultViewItems,
     },
   ];
 
