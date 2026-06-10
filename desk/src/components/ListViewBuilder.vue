@@ -19,7 +19,7 @@
         @click="handleViewUpdate"
       />
       <Reload @click="handleReload" :loading="list.loading" />
-      <FilterDrilldown />
+      <Filter />
       <SortBy :hide-label="isMobileView" />
       <ColumnSettings
         :hide-label="isMobileView"
@@ -27,7 +27,7 @@
       />
     </div>
     <div v-else class="flex justify-between items-center w-full">
-      <FilterDrilldown />
+      <Filter />
       <div class="flex items-center gap-2">
         <Reload @click="handleReload" :loading="list.loading" />
         <SortBy :hide-label="isMobileView" />
@@ -130,10 +130,7 @@ import {
   Reload,
   SortBy,
 } from "@/components/view-controls";
-import {
-  FilterDrilldown,
-  normalizeFilters,
-} from "@/components/view-controls/filter";
+import { Filter, normalizeFilters } from "@/components/view-controls/filter";
 import { useScreenSize } from "@/composables/screen";
 import {
   currentView as headerView,
