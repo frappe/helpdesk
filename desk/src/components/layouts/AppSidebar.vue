@@ -39,49 +39,72 @@
     </template>
 
     <template #sidebar-item="{ item, isCollapsed }">
-      <button
-        type="button"
-        :title="isCollapsed ? __(item.label) : undefined"
-        class="flex h-7.5 w-full items-center rounded px-2 text-ink-gray-8"
-        :class="[
-          item.isActive
-            ? 'bg-surface-selected shadow-sm'
-            : 'hover:bg-surface-gray-2',
-          { 'mt-4': item.spacedTop },
-        ]"
-        @click="item.onClick && item.onClick()"
-      >
-        <span
-          class="relative grid size-4 shrink-0 place-items-center text-ink-gray-7"
-        >
-          <component :is="item.icon" class="size-4" />
-          <span
-            v-if="item.key === 'notifications' && item.badge"
-            class="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-blue-400"
-          />
-        </span>
-        <span
-          class="ms-2 flex min-w-0 flex-1 items-center justify-between text-sm transition-all duration-300 ease-in-out"
+      <div class="group relative" :class="{ 'mt-4': item.spacedTop }">
+        <button
+          type="button"
+          :title="isCollapsed ? __(item.label) : undefined"
+          class="flex h-7.5 w-full items-center rounded px-2 text-ink-gray-8"
           :class="
-            isCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-auto opacity-100'
+            item.isActive
+              ? 'bg-surface-selected shadow-sm'
+              : 'hover:bg-surface-gray-2'
           "
+          @click="item.onClick && item.onClick()"
         >
-          <span class="truncate text-start">{{ __(item.label) }}</span>
           <span
-            v-if="item.shortcut"
-            class="flex items-center gap-0.5 font-medium text-ink-gray-5"
+            class="relative grid size-4 shrink-0 place-items-center text-ink-gray-7"
           >
-            <component :is="device.modifierIcon" class="h-3 w-3" />
-            <span>K</span>
+            <component :is="item.icon" class="size-4" />
+            <span
+              v-if="item.key === 'notifications' && item.badge"
+              class="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-blue-400"
+            />
           </span>
-          <Badge
-            v-else-if="item.badge"
-            :label="item.badge > 9 ? '9+' : item.badge"
-            theme="gray"
-            variant="subtle"
-          />
-        </span>
-      </button>
+          <span
+            class="ms-2 flex min-w-0 flex-1 items-center justify-between text-sm transition-all duration-300 ease-in-out"
+            :class="[
+              isCollapsed
+                ? 'w-0 overflow-hidden opacity-0'
+                : 'w-auto opacity-100',
+              // Reserve room on the right so a long label always truncates before
+              // the kebab instead of colliding with it on hover / when its menu opens.
+              item.view && !isCollapsed ? 'pe-6' : '',
+            ]"
+          >
+            <span class="truncate text-start">{{ __(item.label) }}</span>
+            <span
+              v-if="item.shortcut"
+              class="flex items-center gap-0.5 font-medium text-ink-gray-5"
+            >
+              <component :is="device.modifierIcon" class="h-3 w-3" />
+              <span>K</span>
+            </span>
+            <Badge
+              v-else-if="item.badge"
+              :label="item.badge > 9 ? '9+' : item.badge"
+              theme="gray"
+              variant="subtle"
+            />
+          </span>
+        </button>
+        <Dropdown
+          v-if="item.view && !isCollapsed"
+          align="end"
+          :options="viewActions(item.view, viewDialog)"
+        >
+          <template #default="{ open }">
+            <Button
+              variant="ghost"
+              icon="lucide-more-horizontal"
+              class="absolute end-1 top-1/2 -translate-y-1/2 !size-6 rounded !text-ink-gray-7"
+              :class="
+                open ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+              "
+              @click.stop
+            />
+          </template>
+        </Dropdown>
+      </div>
     </template>
 
     <template #footer-items="slotProps">
@@ -89,6 +112,11 @@
     </template>
   </Sidebar>
   <CP v-if="!mobile" v-model="showCommandPalette" />
+  <ViewModal
+    v-if="viewDialog.show"
+    v-model="viewDialog"
+    @update="(view, action) => handleView(view, action, viewDialog)"
+  />
 </template>
 
 <script setup lang="ts">
@@ -101,9 +129,10 @@ import { useSidebarStore } from "@/stores/sidebar";
 import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
 import { getIcon, isCustomerPortal } from "@/utils";
-import { Badge, Sidebar } from "frappe-ui";
+import ViewModal from "@/components/ViewModal.vue";
+import { Badge, Button, Dropdown, Sidebar } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, ref, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 import { useRoute, useRouter } from "vue-router";
 import LucideBell from "~icons/lucide/bell";
@@ -124,9 +153,17 @@ const device = useDevice();
 const notificationStore = useNotificationStore();
 const sidebarStore = useSidebarStore();
 const { isCallingEnabled } = storeToRefs(useTelephonyStore());
-const { pinnedViews, publicViews } = useView();
+const { pinnedViews, publicViews, viewActions, handleView } = useView();
 
 const showCommandPalette = ref(false);
+
+// Local modal state for the per-view kebab menu (edit/duplicate). The action
+// logic itself is shared via useView so the sidebar and breadcrumb stay in sync.
+const viewDialog = reactive({
+  show: false,
+  view: { label: "", icon: "", name: "" },
+  mode: "create",
+});
 
 const collapsed = computed({
   get: () => !sidebarStore.isExpanded,
@@ -233,6 +270,7 @@ function parseViews(views: any[]) {
         }
       ),
     key: view.name,
+    view,
   }));
 }
 
