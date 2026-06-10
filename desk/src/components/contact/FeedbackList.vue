@@ -13,7 +13,7 @@
     </div>
 
     <!-- List -->
-    <div class="flex flex-col gap-2 max-h-[65vh] overflow-y-auto pr-1">
+    <div class="flex flex-col gap-2 max-h-[65vh] overflow-y-auto">
       <template v-for="ticket in feedbackListResource.data" :key="ticket.name">
         <div
           class="flex cursor-pointer flex-col gap-2 rounded-md border border-outline-gray-1 bg-surface-white p-2.5 hover:bg-surface-gray-1"

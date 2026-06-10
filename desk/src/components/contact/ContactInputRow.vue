@@ -66,7 +66,7 @@ import { Button, FormControl, Tooltip } from "frappe-ui";
 import { computed, nextTick, onMounted, ref } from "vue";
 import LucideStar from "~icons/lucide/star";
 import LucideX from "~icons/lucide/x";
-import PhoneControl from "../frappe-ui/PhoneControl.vue";
+import PhoneControl from "../frappe-ui/PhoneControl/PhoneControl.vue";
 
 const props = withDefaults(
   defineProps<{

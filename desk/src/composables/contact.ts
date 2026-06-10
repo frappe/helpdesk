@@ -60,12 +60,6 @@ const contactCache: Record<string, ContactBundle> = {};
 let entryKeyCounter = 0;
 export const nextEntryKey = () => ++entryKeyCounter;
 
-const emptyPhoneEntry = () => ({
-  phone: "",
-  isPrimary: false,
-  key: nextEntryKey(),
-});
-
 function sortByPrimary<T extends { isPrimary: boolean }>(arr: T[]): T[] {
   return [...arr].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
 }
@@ -104,14 +98,13 @@ export function useContact(name: string) {
           key: nextEntryKey(),
         })) || []
       );
-      const phones = sortByPrimary(
+      state.phones = sortByPrimary(
         data.phone_nos?.map((p: any) => ({
           phone: p.phone,
           isPrimary: Boolean(p.is_primary_phone || p.is_primary_mobile_no),
           key: nextEntryKey(),
         })) || []
       );
-      state.phones = phones.length ? phones : [emptyPhoneEntry()];
       state.customers =
         data.links?.map((l: any) => l.link_name as string) || [];
     },
@@ -381,14 +374,13 @@ export function useContactState(
           key: nextEntryKey(),
         })) || []
       );
-      const phones = sortByPrimary(
+      state.phones = sortByPrimary(
         data?.phone_nos?.map((p: any) => ({
           phone: p.phone,
           isPrimary: Boolean(p.is_primary_phone || p.is_primary_mobile_no),
           key: nextEntryKey(),
         })) || []
       );
-      state.phones = phones.length ? phones : [emptyPhoneEntry()];
       state.customers =
         data?.links?.map((l: any) => l.link_name as string) || [];
       state.timezone = data?.timezone || "";
@@ -617,6 +609,7 @@ export function useContactFeedback(name: string): ContactFeedback {
     transform: (data) => {
       const template = data[0];
       if (!template) return data;
+      template['feedback_extra'] = "";
 
       const demoFeedback = [
         {
@@ -686,8 +679,7 @@ export function useContactFeedback(name: string): ContactFeedback {
           subject: "API rate limit reached unexpectedly",
           feedback_rating: 0.4,
           feedback: "Needs Improvement",
-          feedback_extra:
-            "The answer felt a little generic and I had to push for specifics about my plan's actual limits.",
+          feedback_extra: "",
         },
       ];
 

@@ -122,19 +122,13 @@
 <script setup lang="ts">
 // TODO: replace with reka-ui in future
 import { __ } from "@/translation";
-import {
-  createResource,
-  FeatherIcon,
-  FormControl,
-  Popover,
-  TextInput,
-} from "frappe-ui";
+import { FeatherIcon, FormControl, Popover, TextInput } from "frappe-ui";
 import { computed, ref, useId, watch } from "vue";
+import countries from "./countries.json";
 
 interface CountryInfo {
   code: string;
   isd: string;
-  [key: string]: any;
 }
 
 const props = withDefaults(
@@ -165,35 +159,16 @@ const model = defineModel<string>({ default: "" });
 
 const id = useId();
 
-// TODO: cache in Local or Session Storage to avoid repeated calls on every mount
-// Not needed,we can hardcode
-const countryCodesResource = createResource({
-  url: "frappe.geo.country_info.get_country_timezone_info",
-  auto: true,
-  transform: (data: any) => {
-    const countryInfo =
-      data?.country_info ?? ({} as Record<string, CountryInfo>);
-    console.log(countryInfo);
-
-    return countryInfo;
-  },
-  onSuccess() {
-    parseValue(model.value);
-    if (!model.value) applyDefaultCountry();
-  },
-});
-
-const countryCodes = computed<Record<string, CountryInfo>>(
-  () => countryCodesResource.data ?? {}
-);
-const isd = computed(
-  () => countryCodes.value[selectedCountry.value ?? ""]?.isd ?? ""
-);
-const flagCode = computed(
-  () => countryCodes.value[selectedCountry.value ?? ""]?.code ?? ""
-);
+const countryCodes: Record<string, CountryInfo> = countries;
 
 const selectedCountry = ref<string | null>(null);
+const isd = computed(
+  () => countryCodes[selectedCountry.value ?? ""]?.isd ?? ""
+);
+const flagCode = computed(
+  () => countryCodes[selectedCountry.value ?? ""]?.code ?? ""
+);
+
 const localNumber = ref<string>("");
 const isOpen = ref(false);
 const searchQuery = ref("");
@@ -217,17 +192,14 @@ function commitHighlighted(close: () => void) {
   if (country) onSelectCountry(country.name, close);
 }
 
-const allCountries = computed(() =>
-  Object.entries(countryCodes.value)
-    .filter(([, info]) => info.isd)
-    .map(([name, info]) => ({ name, code: info.code, isd: info.isd }))
-    .sort((a, b) => a.name.localeCompare(b.name))
-);
+const allCountries = Object.entries(countryCodes)
+  .map(([name, info]) => ({ name, code: info.code, isd: info.isd }))
+  .sort((a, b) => a.name.localeCompare(b.name));
 
 const filteredCountries = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
-  if (!query) return allCountries.value;
-  return allCountries.value.filter(
+  if (!query) return allCountries;
+  return allCountries.filter(
     (c) => c.name.toLowerCase().includes(query) || c.isd.includes(query)
   );
 });
@@ -289,7 +261,7 @@ function parseValue(value: unknown) {
   if (dashIdx > 0) {
     const isdPart = phoneNumber.substring(0, dashIdx);
     const numberPart = phoneNumber.substring(dashIdx + 1);
-    const match = Object.entries(countryCodes.value).find(
+    const match = Object.entries(countryCodes).find(
       ([, info]) => info.isd === isdPart
     );
     if (match) {
@@ -305,7 +277,7 @@ function parseValue(value: unknown) {
     let bestName: string | null = null;
     let bestIsd = "";
 
-    for (const [countryName, info] of Object.entries(countryCodes.value)) {
+    for (const [countryName, info] of Object.entries(countryCodes)) {
       if (
         info.isd &&
         phoneNumber.startsWith(info.isd) &&
@@ -360,6 +332,9 @@ function emitValue() {
   }
   model.value = isd.value ? `${isd.value}-${number}` : number;
 }
+
+parseValue(model.value);
+if (!model.value) applyDefaultCountry();
 
 watch([localNumber, isd], emitValue);
 

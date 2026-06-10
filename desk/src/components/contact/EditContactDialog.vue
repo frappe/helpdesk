@@ -215,14 +215,6 @@ function addRow(type: "email" | "phone") {
 
 function removeRow(type: "email" | "phone", index: number) {
   const list = type === "email" ? state.emails : state.phones;
-  if (type === "phone" && list.length === 1) {
-    const row = state.phones[0];
-    if (row) {
-      row.phone = "";
-      row.isPrimary = false;
-    }
-    return;
-  }
   const wasPrimary = list[index]?.isPrimary;
   list.splice(index, 1);
   if (type === "email") {

@@ -157,7 +157,7 @@ import {
 import LucideMail from "~icons/lucide/mail";
 import UserIcon from "~icons/lucide/user";
 import Link from "../frappe-ui/Link.vue";
-import PhoneControl from "../frappe-ui/PhoneControl.vue";
+import PhoneControl from "../frappe-ui/PhoneControl/PhoneControl.vue";
 
 const open = defineModel<boolean>({ default: false });
 
