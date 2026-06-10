@@ -1,7 +1,7 @@
 <template>
   <AppSidebar :profile-settings="profileSettings">
     <template #footer="{ isCollapsed }">
-      <div class="px-2">
+      <div class="flex flex-col gap-2 px-2">
         <TrialBanner
           v-if="isFCSite && !isCustomerPortal"
           :isSidebarCollapsed="isCollapsed"
