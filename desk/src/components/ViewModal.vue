@@ -25,6 +25,7 @@
             </div>
             <IconPicker
               v-model="pickerIcon"
+              :max-icons="1000"
               class="flex-1"
               :placeholder="
                 currentIsEmoji
