@@ -602,6 +602,7 @@ def get_navigation_tickets(ticket: str, current_view: str | None = None):
 
 
 def get_navigation_filters(ticket: str, current_view: str = None):
+<<<<<<< HEAD
     filters = []
     if current_view:
         _filters = frappe.get_value("HD View", current_view, "filters")
@@ -613,14 +614,30 @@ def get_navigation_filters(ticket: str, current_view: str = None):
                 )
             except (json.JSONDecodeError, TypeError):
                 filters = []
+=======
+    conditions = _to_conditions(_get_view_filters(current_view))
+    # Custom filter "__assigned_on" is not available in any doctype
+    conditions = [c for c in conditions if c[0] != "__assigned_on"]
+    conditions.append(["name", "!=", ticket])
+    return handle_at_me_support(conditions)
+>>>>>>> f079593b (refactor: filter component UX)
 
-    if not filters:
-        default_view = frappe.db.get_value(
+
+def _get_view_filters(current_view: str | None) -> dict | list:
+    filters = _parse_view_filters(
+        frappe.get_value("HD View", current_view, "filters") if current_view else None
+    )
+    if filters:
+        return filters
+    return _parse_view_filters(
+        frappe.db.get_value(
             "HD View",
             {"dt": "HD Ticket", "is_default": 1, "user": frappe.session.user},
             "filters",
         )
+    )
 
+<<<<<<< HEAD
         if default_view:
             try:
                 filters = (
@@ -630,23 +647,26 @@ def get_navigation_filters(ticket: str, current_view: str = None):
                 )
             except (json.JSONDecodeError, TypeError):
                 filters = []
+=======
+>>>>>>> f079593b (refactor: filter component UX)
 
-    # Base filters - exclude the current ticket
-    base_filters = {"name": ["!=", ticket]}
+def _parse_view_filters(raw) -> dict | list:
+    if not raw:
+        return []
+    try:
+        return (json.loads(raw) if isinstance(raw, str) else raw) or []
+    except (json.JSONDecodeError, TypeError):
+        return []
 
-    # Combine base filters with view filters
-    # is instance of {}
 
-    if filters and isinstance(filters, object):
-        final_filters = {**filters, **base_filters}
-    else:
-        final_filters = base_filters
-    final_filters = handle_at_me_support(final_filters)
-
-    # Remove custom filter "__assigned_on" as it is not available in any doctype
-    final_filters.pop("__assigned_on", None)
-
-    return final_filters
+def _to_conditions(filters: dict | list) -> list:
+    """Normalize dict filters (legacy saved views) to a list of conditions."""
+    if isinstance(filters, dict):
+        return [
+            [key, *value] if isinstance(value, list) else [key, "=", value]
+            for key, value in filters.items()
+        ]
+    return [c for c in filters if isinstance(c, list) and len(c) >= 3]
 
 
 def get_navigation_order_by(view):
