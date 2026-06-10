@@ -74,7 +74,9 @@
                   :model-value="f.value"
                   @update:modelValue="(v) => updateValue(v, f)"
                   @change="(v) => updateValue(v, f)"
-                  :placeholder="getValuePlaceholder(f)"
+                  @keyup.enter="apply()"
+                  @blur="apply()"
+                  :placeholder="getPlaceholder(f)"
                 />
               </div>
             </div>
@@ -109,7 +111,9 @@
                     :model-value="f.value"
                     @change="(v) => updateValue(v, f)"
                     @update:modelValue="(v) => updateValue(v, f)"
-                    :placeholder="getValuePlaceholder(f)"
+                    @keyup.enter="apply()"
+                    @blur="apply()"
+                    :placeholder="getPlaceholder(f)"
                   />
                 </div>
               </div>
@@ -150,7 +154,7 @@
               v-if="filters?.size"
               class="!text-ink-gray-5"
               variant="ghost"
-              :label="'Clear all Filter'"
+              :label="'Clear all filters'"
               @click="clearfilter(close)"
             />
           </div>
@@ -161,8 +165,10 @@
 </template>
 <script setup>
 import { Link, StarRating } from "@/components";
+import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { useScreenSize } from "@/composables/screen";
+import { __ } from "@/translation";
 import { useDebounceFn } from "@vueuse/core";
 import {
   Button,
@@ -175,7 +181,6 @@ import {
   Popover,
   Tooltip,
 } from "frappe-ui";
-import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
 import { computed, h, inject } from "vue";
 
 const props = defineProps({
@@ -195,6 +200,10 @@ const typeSelect = ["Select"];
 const typeString = ["Data", "Long Text", "Small Text", "Text Editor", "Text"];
 const typeDate = ["Date", "Datetime"];
 const typeRating = ["Rating"];
+
+// Remembers the user's exact `in`/`not in` comma string (keyed by fieldname) so
+// their spacing survives the parse → apply → re-derive round-trip.
+const rawListValues = {};
 
 const listViewData = inject("listViewData");
 const listViewActions = inject("listViewActions");
@@ -221,16 +230,53 @@ function convertFilters(data, allFilters) {
     if (typeof value[1] === "number") {
       value[1] = value[1].toString();
     }
+    // The `%` wildcards for `like`/`not like` are an API-level detail; strip the
+    // surrounding ones so the user never sees `%...%` in the input. `in`/`not in`
+    // are stored as arrays but edited as a comma string (matching Frappe).
+    let displayValue = value[1];
+    if (
+      ["LIKE", "NOT LIKE"].includes(value[0]) &&
+      typeof displayValue === "string"
+    ) {
+      displayValue = displayValue.replace(/^%/, "").replace(/%$/, "");
+    } else if (
+      ["in", "not in"].includes(value[0]) &&
+      Array.isArray(displayValue)
+    ) {
+      displayValue = listValueDisplay(key, displayValue);
+    }
     if (field) {
       f.push({
         field,
         fieldname: key,
         operator: oppositeOperatorMap[value[0]],
-        value: value[1],
+        value: displayValue,
       });
     }
   }
   return new Set(f);
+}
+
+// `in`/`not in` are stored as arrays but edited as a comma string. list.params
+// only keeps the parsed array, so re-deriving it would normalise away whatever
+// spacing the user typed. Reuse their exact raw string while it still matches
+// the stored array; otherwise (e.g. a view loaded from the backend) fall back to
+// a readable ", " join.
+function listValueDisplay(key, array) {
+  const raw = rawListValues[key];
+  if (typeof raw === "string" && sameList(raw, array)) return raw;
+  return array.join(", ");
+}
+
+function sameList(raw, array) {
+  const parsed = raw
+    .split(",")
+    .map((v) => v.trim())
+    .filter((v) => v !== "");
+  return (
+    parsed.length === array.length &&
+    parsed.every((v, i) => v === String(array[i]))
+  );
 }
 
 function getOperators(fieldtype, fieldname) {
@@ -404,25 +450,27 @@ function getValueControl(f) {
   }
 }
 
-function getValuePlaceholder(f) {
-  const { field, operator } = f;
-  const { fieldtype } = field;
-  const isNumber = typeNumber.includes(fieldtype);
+function getPlaceholder(f) {
+  const { operator, field } = f;
+  const fieldtype = field.fieldtype;
   if (operator === "between") return __("01/01/2022 to 01/31/2022");
-  if (operator === "in" || operator === "not in") {
-    return isNumber ? __("100, 200, 300") : __("John, Jane, Doe");
+  if (["in", "not in"].includes(operator)) {
+    return typeNumber.includes(fieldtype)
+      ? __("100, 200, 300")
+      : __("Open, Closed");
   }
-  if (operator === "like" || operator === "not like") {
-    return isNumber ? __("%100%") : __("%John%");
+  if (["like", "not like"].includes(operator)) {
+    return typeNumber.includes(fieldtype) ? __("100") : __("John");
   }
-  if (operator === "is" || operator === "is not") return __("Set");
+  if (["is", "is not"].includes(operator)) return __("Set");
   if (operator === "timespan") return __("Last Week");
-  if (isNumber) return __("1000");
+  if (typeNumber.includes(fieldtype)) return __("1000");
   if (typeDate.includes(fieldtype)) return __("01/01/2022");
   if (typeCheck.includes(fieldtype)) return __("Yes");
   if (typeLink.includes(fieldtype)) return __("Select a Value");
   if (typeSelect.includes(fieldtype)) return __("Select an Option");
-  return __("John Doe");
+  if (typeString.includes(fieldtype)) return __("John Doe");
+  return __("Enter Value");
 }
 
 function getDefaultValue(field) {
@@ -510,18 +558,42 @@ function clearfilter(close) {
   close && close();
 }
 
+// A free-text/number input the user types into (like/in/equals on text, etc.),
+// as opposed to a discrete picker (select, date, rating, link, ...). Typed
+// controls are committed on Enter/blur instead of on every keystroke, so a
+// mid-typing refetch can't rebuild the filter and revert the input.
+function isTypedControl(filter) {
+  const { operator, field } = filter;
+  if (["is", "timespan", "between"].includes(operator)) return false;
+  if (["like", "not like", "in", "not in"].includes(operator)) return true;
+  const fieldtype = field?.fieldtype;
+  if (
+    typeSelect.includes(fieldtype) ||
+    typeCheck.includes(fieldtype) ||
+    typeDate.includes(fieldtype) ||
+    typeRating.includes(fieldtype)
+  )
+    return false;
+  if (typeLink.includes(fieldtype) && fieldtype !== "Dynamic Link")
+    return false;
+  return true;
+}
+
 function updateValue(value, filter) {
   if (value && typeof value === "object" && !value.target && "value" in value) {
     value = value.value;
   }
-  value = value.target ? value.target.value : value;
-  if (filter.operator === "in" || filter.operator === "not in") {
-    filter.value = value.split(",").map((v) => v.trim());
-  } else if (filter.operator === "between") {
-    filter.value = [value.split(",")[0], value.split(",")[1]];
+  value = value?.target ? value.target.value : value;
+  if (filter.operator === "between") {
+    // DateRangePicker emits an array [from, to]; tolerate a legacy comma string.
+    filter.value = Array.isArray(value) ? value : (value || "").split(",");
   } else {
+    // `in`/`not in` keep the raw comma string while typing (so spaces aren't
+    // stripped mid-edit); they're split into an array at apply time.
     filter.value = value;
   }
+  // Defer typed inputs to commit (Enter/blur); discrete pickers apply at once.
+  if (isTypedControl(filter)) return;
   debouncedApply();
 }
 
@@ -560,6 +632,9 @@ function isSameTypeOperator(oldOperator, newOperator) {
 function apply() {
   const _filters = [];
   filters.value.forEach((f) => {
+    if (["in", "not in"].includes(f.operator) && typeof f.value === "string") {
+      rawListValues[f.fieldname] = f.value;
+    }
     _filters.push({
       fieldname: f.fieldname,
       operator: f.operator,
@@ -580,14 +655,27 @@ function parseFilters(filters) {
         p[c.fieldname] = c.value;
       }
     } else {
-      p[c.fieldname] = [operatorMap[c.operator.toLowerCase()], c.value];
+      let value = c.value;
+      // `in`/`not in` ship a list to the API; split the comma string, trim each
+      // entry and drop empties (matches Frappe's filter handling).
+      if (["in", "not in"].includes(c.operator) && typeof value === "string") {
+        value = value
+          .split(",")
+          .map((v) => v.trim())
+          .filter((v) => v !== "");
+      }
+      p[c.fieldname] = [operatorMap[c.operator.toLowerCase()], value];
     }
     return p;
   }, {});
 }
 
 function transformIn(f) {
-  if (f.operator.includes("like") && !f.value.includes("%")) {
+  if (
+    f.operator.includes("like") &&
+    typeof f.value === "string" &&
+    !f.value.includes("%")
+  ) {
     f.value = `%${f.value}%`;
   }
   return f;

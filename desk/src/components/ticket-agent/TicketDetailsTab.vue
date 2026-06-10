@@ -105,7 +105,7 @@
                 />
               </div>
             </template>
-            <ul class="pt-0 px-5 divide-y divide-outline-gray-1 pb-4">
+            <ul class="pt-0 px-4 divide-y divide-outline-gray-1 pb-4">
               <li
                 v-for="t in section.tickets"
                 :key="t.name"
