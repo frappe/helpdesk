@@ -94,10 +94,8 @@
                 >
                   <div>
                     <Switch
-                      :model-value="row.enabled"
-                      @update:modelValue="
-                        (e) => handleSwitchToggle(row.name, e)
-                      "
+                      :model-value="Boolean(row.enabled)"
+                      @update:modelValue="(e) => handleSwitchToggle(row, e)"
                       @click.stop
                     />
                   </div>
@@ -167,15 +165,26 @@ function getOptions(rowName: string) {
   });
 }
 
-function handleSwitchToggle(rowName: string, value: boolean) {
+function handleSwitchToggle(
+  row: { name: string; enabled: boolean },
+  value: boolean
+) {
+  // Optimistically update the local row so the controlled Switch reflects the
+  // new state immediately; revert if the backend update fails.
+  const previous = row.enabled;
+  row.enabled = value;
   fieldDependenciesList.setValue.submit(
     {
-      name: rowName,
+      name: row.name,
       enabled: value,
     },
     {
       onSuccess: () => {
         toast.success(__("Field dependency updated successfully."));
+      },
+      onError: () => {
+        row.enabled = previous;
+        toast.error(__("Failed to update field dependency."));
       },
     }
   );
