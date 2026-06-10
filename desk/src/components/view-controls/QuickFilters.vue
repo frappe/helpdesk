@@ -1,6 +1,6 @@
 <template>
   <FadedScrollableDiv
-    class="quick-filters flex flex-1 items-center overflow-x-auto py-1 gap-2 pe-4"
+    class="quick-filters flex flex-1 items-center overflow-x-auto py-1 gap-2 pe-4 ps-1 -ms-1"
     orientation="horizontal"
     v-if="!quickFilters.loading"
   >
