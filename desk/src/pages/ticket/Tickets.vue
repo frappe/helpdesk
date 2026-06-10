@@ -255,26 +255,13 @@ function handleResolutionByField(row: any, item: string) {
       variant: "subtle",
     });
   }
-  // Trust the server-computed SLA status for terminal states.
-  if (row.agreement_status === "Fulfilled") {
+  if (row.resolution_date) {
+    const fulfilled = dayjs(row.resolution_date).isBefore(
+      dayjs(row.resolution_by)
+    );
     return h(Badge, {
-      label: __("Fulfilled"),
-      theme: "gray",
-      variant: "subtle",
-    });
-  }
-  if (row.agreement_status === "Failed") {
-    return h(Badge, {
-      label: __("Failed"),
-      theme: "red",
-      variant: "subtle",
-    });
-  }
-  // In progress without a resolution deadline to track.
-  if (!item) {
-    return h(Badge, {
-      label: __("—"),
-      theme: "gray",
+      label: fulfilled ? __("Fulfilled") : __("Failed"),
+      theme: fulfilled ? "gray" : "red",
       variant: "subtle",
     });
   }
