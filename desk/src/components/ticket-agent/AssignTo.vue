@@ -117,12 +117,16 @@
                   >
                     <UserAvatar :name="agent.value" size="sm" />
                   </Tooltip>
-                  <div
-                    class="absolute bottom-0 -right-0.5 size-2 rounded-full outline outline-white outline-1.5"
-                    :class="
-                      agentStatusStore.statusColor(agent.availability || '')
-                    "
-                  />
+                  <span
+                    class="absolute block translate-x-1/2 translate-y-1/2 transform rounded-full bottom-0.5 right-0.5"
+                  >
+                    <span
+                      class="block h-2 w-2 rounded-full border border-slate-2"
+                      :class="
+                        agentStatusStore.statusColor(agent.availability || '')
+                      "
+                    />
+                  </span>
                 </div>
                 <span class="text-ink-gray-7 flex-1 text-start truncate">
                   {{ agent.label }}
