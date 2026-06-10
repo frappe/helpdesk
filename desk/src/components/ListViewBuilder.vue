@@ -147,6 +147,7 @@ import { getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
   createResource,
+  dayjs,
   Dropdown,
   FeatherIcon,
   frappeRequest,
@@ -157,7 +158,6 @@ import {
   ListSelectBanner,
   ListView,
   LoadingIndicator,
-  dayjs,
   toast,
 } from "frappe-ui";
 import {
@@ -806,7 +806,19 @@ function handleScrollPosition() {
   }, 200);
 }
 
-function handleColumnResize() {
+function handleColumnResize(payload: {
+  key: string;
+  width: string;
+  save: boolean;
+}) {
+  // Apply the new width to the matching column on every drag tick so the grid
+  // resizes live. ListHeaderItem drives the column layout via `column.width`.
+  const column = columns.value.find((c) => c.key === payload.key);
+  if (column) column.width = payload.width;
+
+  // Only mark dirty / persist on the debounced final emit, not on every tick.
+  if (!payload.save) return;
+
   isViewUpdated.value = true;
   defaultParams.columns = columns.value;
   if (!defaultParams.is_default) return;
