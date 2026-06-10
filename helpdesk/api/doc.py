@@ -577,15 +577,20 @@ def _pop_assigned_on_filter(filters):
         if "__assigned_on" not in filters:
             return None
         return filters.pop("__assigned_on")
-    for condition in filters:
-        if (
-            isinstance(condition, list)
+    condition = next(
+        (
+            condition
+            for condition in filters
+            if isinstance(condition, list)
             and condition
             and condition[0] == "__assigned_on"
-        ):
-            filters.remove(condition)
-            return [condition[1], condition[2]] if len(condition) >= 3 else None
-    return None
+        ),
+        None,
+    )
+    if condition is None:
+        return None
+    filters.remove(condition)
+    return [condition[1], condition[2]] if len(condition) >= 3 else None
 
 
 def _merge_name_filter(filters, ticket_names):
