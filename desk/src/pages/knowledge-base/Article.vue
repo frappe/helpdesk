@@ -3,11 +3,7 @@
     <LayoutHeader>
       <template #left-header>
         <div class="flex gap-2 items-center crumbs max-w-[50vw]">
-<<<<<<< HEAD
-          <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
-=======
           <Breadcrumbs :items="breadcrumbs" class="-ms-0.5 truncate" />
->>>>>>> bfc79662 (fix: rtl regression)
           <Badge
             v-if="!article.loading"
             variant="subtle"
