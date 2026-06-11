@@ -290,7 +290,7 @@ const { isManager } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const editorRef = ref(null);
-const editor = computed(() => editorRef.value.editor);
+const editor = computed(() => editorRef.value?.editor);
 
 function focusEditorAtStart() {
   setTimeout(() => {
