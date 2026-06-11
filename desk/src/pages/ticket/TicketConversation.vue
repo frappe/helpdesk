@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="showHeader"
     class="mx-6 md:mx-10 md:my-2 flex items-center justify-between text-lg font-medium mb-4 !mt-6 md:h-8 md:text-xl md:font-semibold md:text-ink-gray-8"
   >
     Activity
@@ -52,10 +53,12 @@ import { ITicket } from "./symbols";
 
 interface P {
   focus?: string;
+  showHeader?: boolean;
 }
 
 const props = withDefaults(defineProps<P>(), {
   focus: "",
+  showHeader: true,
 });
 const route = useRoute();
 const ticket = inject(ITicket);
