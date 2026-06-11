@@ -1,17 +1,16 @@
 <template>
-  <div v-if="title === __('Tasks')" class="flex items-center justify-between px-6 md:px-5 py-4 w-full">
+  <div
+    v-if="title === __('Tasks')"
+    class="flex items-center justify-between px-6 md:px-5 py-4 w-full"
+  >
     <h3 class="text-lg font-semibold text-ink-gray-9">
       {{ title }}
     </h3>
-    <Button
-      variant="solid"
-      icon-left="plus"
-      @click="showNewTaskModal = true"
-    >
+    <Button variant="solid" icon-left="plus" @click="showNewTaskModal = true">
       {{ __("New Task") }}
     </Button>
   </div>
-  
+
   <ActivityHeader v-else :title="title" />
 
   <TaskboxEditor
@@ -37,10 +36,7 @@
         tabindex="0"
         :id="activity.key"
       >
-        <div
-          v-if="activity.type === 'task'"
-         class="w-full px-6 md:px-5"
-        >
+        <div v-if="activity.type === 'task'" class="w-full px-6 md:px-5">
           <Taskbox
             :activity="activity"
             :reload-tasks="() => emit('update')"
@@ -58,14 +54,20 @@
             class="relative flex justify-center after:absolute after:start-[50%] after:top-3 after:-z-10 after:border-s after:border-outline-gray-modals"
             :class="[
               i != activities.length - 1 && 'after:h-full',
-              !['email', 'feedback', 'call', 'comment'].includes(activity.type) && 'after:top-6',
+              !['email', 'feedback', 'call', 'comment'].includes(
+                activity.type
+              ) && 'after:top-6',
             ]"
           >
             <div
               class="z-1 flex items-center justify-center rounded-full bg-surface-white"
               :class="[
-                ['email', 'feedback'].includes(activity.type) ? 'my-1 h-9 w-9' : 'h-6 w-6',
-                !['email', 'feedback', 'call', 'comment'].includes(activity.type) && 'mt-[2px]',
+                ['email', 'feedback'].includes(activity.type)
+                  ? 'my-1 h-9 w-9'
+                  : 'h-6 w-6',
+                !['email', 'feedback', 'call', 'comment'].includes(
+                  activity.type
+                ) && 'mt-[2px]',
               ]"
             >
               <Avatar
@@ -81,9 +83,13 @@
               />
               <FeatherIcon
                 v-else-if="activity.type === 'call'"
-               :name="activity.call_type === 'Incoming' ? 'phone-incoming' : 'phone-outgoing'"
-               class="text-ink-gray-5 absolute start-[7.5px] size-4"
-               />
+                :name="
+                  activity.call_type === 'Incoming'
+                    ? 'phone-incoming'
+                    : 'phone-outgoing'
+                "
+                class="text-ink-gray-5 absolute start-[7.5px] size-4"
+              />
 
               <DotIcon
                 v-else
@@ -96,13 +102,17 @@
             class="flex flex-1 mb-4"
             :class="[
               i == activities.length - 1 && 'mb-5',
-              !['email', 'feedback', 'call', 'comment'].includes(activity.type) && 'mt-[2px]',
+              !['email', 'feedback', 'call', 'comment'].includes(
+                activity.type
+              ) && 'mt-[2px]',
             ]"
           >
             <EmailArea
               v-if="activity.type === 'email'"
               :activity="activity"
-              :show-split-option="!activity.isFirstEmail && ticketStatus !== 'Closed'"
+              :show-split-option="
+                !activity.isFirstEmail && ticketStatus !== 'Closed'
+              "
               class="py-2 px-3 flex-1 w-full"
               @reply="(e) => emit('email:reply', e)"
             />
@@ -122,11 +132,7 @@
               :activity="activity"
               class="flex-1 w-full"
             />
-            <HistoryBox
-              v-else
-              :activity="activity"
-              class="flex-1 w-full"
-            />
+            <HistoryBox v-else :activity="activity" class="flex-1 w-full" />
           </div>
         </div>
       </div>
@@ -138,7 +144,9 @@
       class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-4"
     >
       <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
-      <span class="text-lg font-medium text-ink-gray-8">{{ __(emptyText) }}</span>
+      <span class="text-lg font-medium text-ink-gray-8">{{
+        __(emptyText)
+      }}</span>
     </div>
   </FadedScrollableDiv>
 </template>
@@ -157,7 +165,16 @@ import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
 import { isElementInViewport } from "@/utils";
 import { Avatar, FeatherIcon, Button } from "frappe-ui";
-import { PropType, computed, h, inject, nextTick, onMounted, ref, watch } from "vue";
+import {
+  PropType,
+  computed,
+  h,
+  inject,
+  nextTick,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { __ } from "@/translation";
 import ActivityHeader from "@/components/ticket/ActivityHeader.vue";
@@ -291,7 +308,6 @@ watch(
 defineExpose({
   scrollToLatestActivity,
 });
-</script>
 </script>
 <style scoped>
 .activity:focus {

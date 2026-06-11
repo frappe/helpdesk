@@ -517,7 +517,7 @@ def split_ticket(subject: str, communication_id: str):
             "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
         ).format(new_ticket_link, new_ticket),
     )
-# Email on the old ticket that it has been split to new_ticket
+    # Email on the old ticket that it has been split to new_ticket
     return new_ticket
 
 
@@ -559,7 +559,7 @@ def duplicate_ticket(ticket_doc, subject):
 
 @frappe.whitelist()
 @agent_only
- # get form script
+# get form script
 def get_ticket_customizations():
     custom_fields = frappe.get_all(
         "HD Ticket Template Field",
@@ -592,11 +592,11 @@ def get_navigation_tickets(ticket: str, current_view: str | None = None):
 
         ticket_ids = [ticket, *tickets]
         return ticket_ids
-     # Extract just the ticket IDs
-      # print("\n\n", ticket_ids, "\n\n")
+    # Extract just the ticket IDs
+    # print("\n\n", ticket_ids, "\n\n")
 
     except Exception as e:
-         # Return empty list if there's an error
+        # Return empty list if there's an error
         frappe.log_error(f"Error in get_navigation_tickets: {str(e)}")
         return []
 
@@ -629,10 +629,10 @@ def get_navigation_filters(ticket: str, current_view: str = None):
                 )
             except (json.JSONDecodeError, TypeError):
                 filters = []
- # Base filters - exclude the current ticket
+    # Base filters - exclude the current ticket
     base_filters = {"name": ["!=", ticket]}
-# Combine base filters with view filters
-# is instance of {}
+    # Combine base filters with view filters
+    # is instance of {}
     if filters and isinstance(filters, object):
         final_filters = {**filters, **base_filters}
     else:
@@ -694,7 +694,10 @@ def get_recent_similar_tickets(ticket: str):
     similar_tickets = []
     # print('\n\n',recent_tickets,'\n\n')
     return {"recent_tickets": recent_tickets, "similar_tickets": similar_tickets}
-   # Update this with TextBlob or SQLite Vector Search
+
+
+# Update this with TextBlob or SQLite Vector Search
+
 
 def get_recent_tickets(ticket: str):
     fields = ["subject", "creation", "name", "status"]

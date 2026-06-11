@@ -25,13 +25,13 @@
           }
         "
       />
-      </template>
-      <!-- <div v-else class="flex items-center justify-center flex-col flex-1">
+    </template>
+    <!-- <div v-else class="flex items-center justify-center flex-col flex-1">
         <Button :loading="true" variant="ghost" size="2xl" />
         <p class="text-xl font-medium text-ink-gray-5">Loading...</p>
       </div> -->
   </Tabs>
-   <!-- Comm Area -->
+  <!-- Comm Area -->
   <CommunicationArea
     ref="communicationAreaRef"
     :ticketId="String(ticket.doc?.name)"
@@ -75,8 +75,12 @@ import { __ } from "@/translation";
 const ticket = inject(TicketSymbol)!;
 const activities = inject(ActivitiesSymbol)!;
 
-const ticketAgentActivitiesRef = ref<InstanceType<typeof TicketAgentActivities> | null>(null);
-const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(null);
+const ticketAgentActivitiesRef = ref<InstanceType<
+  typeof TicketAgentActivities
+> | null>(null);
+const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
+  null
+);
 
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
@@ -102,7 +106,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       name: "task",
       label: "Tasks",
       icon: TaskIcon,
-    }
+    },
   ];
 
   if (isCallingEnabled.value) {
