@@ -25,6 +25,10 @@ export const hiddenChildFields = computed(() => {
 
 const optionsMap = reactive({});
 
+export function clearFieldOptionsCache(): void {
+  Object.keys(optionsMap).forEach((key) => delete optionsMap[key]);
+}
+
 export async function getFieldOptions(field: any): Promise<string[]> {
   if (optionsMap[field.value]) {
     return optionsMap[field.value];

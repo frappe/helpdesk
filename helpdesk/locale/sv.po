@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-27 10:31\n"
+"PO-Revision-Date: 2026-06-05 13:40\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -3132,7 +3132,7 @@ msgstr "Mitt Team"
 #: desk/src/pages/home/Home.vue:293
 #: desk/src/pages/home/components/AgentTicketsCard.vue:4
 msgid "My Tickets"
-msgstr "Mina Ärenden"
+msgstr "Mina Ärende"
 
 #. Label of the category_name (Data) field in DocType 'HD Article Category'
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
