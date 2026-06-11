@@ -15,6 +15,7 @@
           class="flex h-6 max-w-[150px] shrink-0 items-center gap-1 rounded bg-surface-gray-2 ps-2 pe-1 text-sm text-ink-gray-7 hover:bg-surface-gray-3"
           variant="ghost"
           icon-right="lucide-chevron-down"
+          :tooltip="operatorTooltip"
         >
           <span class="min-w-0 truncate">{{ operatorLabel }}</span>
         </Button>
@@ -97,6 +98,7 @@
 
 <script setup lang="ts">
 import BackButton from "@/components/BackButton.vue";
+import { useDevice } from "@/composables";
 import { __ } from "@/translation";
 import { useDebounceFn, useEventListener } from "@vueuse/core";
 import {
@@ -150,6 +152,8 @@ const operatorLabel = computed(
     operators.value.find((option) => option.value === operator.value)?.label ||
     operator.value
 );
+const { isMac } = useDevice();
+const operatorTooltip = __("Change operator ({0})", isMac ? "⌘E" : "Ctrl+E");
 const operatorOptions = computed(() =>
   operators.value.map((option) => ({
     label: option.label,
@@ -288,7 +292,11 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 function focusSearch() {
-  nextTick(() => (searchInput.value || valueInput.value)?.el?.focus());
+  // preventScroll: the panel mounts mid-swipe, still translated; a default
+  // focus would scroll it into view and visually cancel the slide
+  nextTick(() =>
+    (searchInput.value || valueInput.value)?.el?.focus({ preventScroll: true })
+  );
 }
 
 function onTextKeydown(event: KeyboardEvent) {
