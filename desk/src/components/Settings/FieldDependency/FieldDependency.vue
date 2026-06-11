@@ -86,9 +86,13 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
 import { createResource, Switch, toast } from "frappe-ui";
-import { computed, onUnmounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
-import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
+import {
+  clearFieldOptionsCache,
+  getFieldOptions,
+  hiddenChildFields,
+} from "./fieldDependency";
 import FieldDependencyCriteria from "./FieldDependencyCriteria.vue";
 import FieldDependencyFieldsSelection from "./FieldDependencyFieldsSelection.vue";
 import FieldDependencyValueSelection from "./FieldDependencyValueSelection.vue";
@@ -338,6 +342,12 @@ watch(
     state.childSearch = ""; // Reset child search when parent selection changes
   }
 );
+
+onMounted(() => {
+  // Drop any cached field options so newly added link/select values
+  // (e.g. a freshly created ticket type) show up on each visit.
+  clearFieldOptionsCache();
+});
 
 onUnmounted(() => {
   disableSettingModalOutsideClick.value = false;
