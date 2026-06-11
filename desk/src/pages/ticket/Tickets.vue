@@ -66,6 +66,7 @@ import IndicatorIcon from "@/components/icons/IndicatorIcon.vue";
 import BulkReplyModal from "@/components/ticket-agent/BulkReplyModal.vue";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
+import { normalizeFilters } from "@/components/view-controls/filter";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";
@@ -254,26 +255,13 @@ function handleResolutionByField(row: any, item: string) {
       variant: "subtle",
     });
   }
-  // Trust the server-computed SLA status for terminal states.
-  if (row.agreement_status === "Fulfilled") {
+  if (row.resolution_date) {
+    const fulfilled = dayjs(row.resolution_date).isBefore(
+      dayjs(row.resolution_by)
+    );
     return h(Badge, {
-      label: __("Fulfilled"),
-      theme: "gray",
-      variant: "subtle",
-    });
-  }
-  if (row.agreement_status === "Failed") {
-    return h(Badge, {
-      label: __("Failed"),
-      theme: "red",
-      variant: "subtle",
-    });
-  }
-  // In progress without a resolution deadline to track.
-  if (!item) {
-    return h(Badge, {
-      label: __("—"),
-      theme: "gray",
+      label: fulfilled ? __("Fulfilled") : __("Failed"),
+      theme: fulfilled ? "gray" : "red",
       variant: "subtle",
     });
   }
@@ -309,33 +297,25 @@ async function exportRows(
   const fields = JSON.stringify(list.data.columns.map((f) => f.key));
   const order_by = list.params.order_by;
 
-  let filters = { ...list.params.filters };
   // Resolve `@me` filters to the current session user before export
-  Object.keys(filters).forEach((key) => {
-    const value = filters[key];
-
-    // Handle direct filter format: { owner: "@me" }
-    if (value === "@me") {
-      filters[key] = userId;
-      return;
-    }
-    if (!Array.isArray(value)) return;
-
-    // Handle all operator-based filter format: { owner: ["=", "@me"], _assign: ["LIKE", "%@me%"] }
-    filters[key] = value.map((entry) =>
-      entry === "@me" ? userId : entry === "%@me%" ? `%${userId}%` : entry
-    );
-  });
+  const resolveAtMe = (entry: any) => {
+    if (Array.isArray(entry)) return entry.map(resolveAtMe);
+    if (entry === "@me") return userId;
+    if (entry === "%@me%") return `%${userId}%`;
+    return entry;
+  };
+  const conditions = normalizeFilters(list.params.filters).map(
+    ([field, operator, value]) => [field, operator, resolveAtMe(value)]
+  );
   let pageLength: number;
 
   if (export_all) {
-    filters = JSON.stringify(filters);
     pageLength = list.data.total_count;
   } else {
     pageLength = listSelections.value.size;
-    filters["name"] = ["in", Array.from(listSelections.value)];
-    filters = JSON.stringify(filters);
+    conditions.push(["name", "in", Array.from(listSelections.value)]);
   }
+  const filters = JSON.stringify(conditions);
 
   window.location.href = `/api/method/frappe.desk.reportview.export_query?file_format_type=${export_type}&title=HD Ticket&doctype=HD Ticket&fields=${fields}&filters=${encodeURIComponent(
     filters
@@ -351,7 +331,7 @@ function reset(reload = false) {
 }
 
 const slaStatusColorMap = {
-  Fulfilled: "green",
+  Fulfilled: "gray",
   Failed: "red",
   "Resolution Due": "orange",
   "First Response Due": "orange",

@@ -155,6 +155,7 @@ import {
   ActivitiesSymbol,
   AgentOption,
   AssigneeSymbol,
+  LocalAssignee,
   TicketSymbol,
 } from "@/types";
 import type { HDAgent } from "@/types/doctypes";
@@ -205,12 +206,8 @@ const popoverIsOpen = ref(false);
 const hasBeenOpened = ref(false);
 
 // Local copy of assignees
-const localAssignees = ref<{ name: string; image: string; label: string }[]>(
-  []
-);
-const snapshotAssignees = ref<{ name: string; image: string; label: string }[]>(
-  []
-);
+const localAssignees = ref<LocalAssignee[]>([]);
+const snapshotAssignees = ref<LocalAssignee[]>([]);
 
 // Sync from injected assignees when popover is not open
 watch(
@@ -258,7 +255,7 @@ const agentResource = createListResource({
     "availability",
     "availability_changed_on",
   ],
-  filters: { is_active: true },
+  filters: { is_active: true, name: ["!=", "christopherwhitaker@example.net"] },
   pageLength: 20,
   auto: true,
 });
@@ -360,8 +357,9 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
         const user = getUser(a.name);
         options.push({
           value: a.name,
-          label: a.label || user.full_name || a.name,
-          image: a.image || user.user_image,
+          label: a.label || a.agent_name || user.full_name || a.name,
+          image: a.image || a.user_image || user.user_image,
+          ...liveAvailability(a),
         });
         seen.add(a.name);
       }
@@ -403,15 +401,16 @@ function availabilitySubtitle(
 
   const label = __(availability);
   if (!changedOn) return label;
-  // prettyDate says "Just now" under a minute, which reads oddly after "since";
-  // keep the "… ago" phrasing consistent with the longer durations.
+  // Suffix with how long ago they were last active, e.g. "Away · Last seen 2
+  // minutes ago". prettyDate says "Just now" under a minute, which we lowercase
+  // so it reads cleanly after "Last seen".
   const secondsSinceChange = dayjsLocal().diff(
     dayjsLocal(changedOn),
     "seconds"
   );
-  const timeSinceChange =
-    secondsSinceChange < 60 ? __("a few seconds ago") : prettyDate(changedOn);
-  return timeSinceChange ? __("{0} since {1}", label, timeSinceChange) : label;
+  const lastSeen =
+    secondsSinceChange < 60 ? __("just now") : prettyDate(changedOn);
+  return lastSeen ? __("{0} · Last active {1}", label, lastSeen) : label;
 }
 
 function isSelected(agentName: string): boolean {
@@ -429,11 +428,17 @@ function toggleAgent(agent: AgentOption) {
       pinnedSelectedNames.value.delete(agent.value);
     }
   } else {
-    localAssignees.value.push({
+    const added: LocalAssignee = {
       name: agent.value,
       image: agent.image || "",
       label: agent.label,
-    });
+    };
+    // Carry the option's status so it survives the localAssignees fallback in
+    // sortedAgentOptions (e.g. a search-added agent outside the default page resource call).
+    if (agent.availability) added.availability = agent.availability;
+    if (agent.availability_changed_on)
+      added.availability_changed_on = agent.availability_changed_on;
+    localAssignees.value.push(added);
     // Pin only when selecting during search so they stay visible when search clears
     if (isSearching) {
       pinnedSelectedNames.value.add(agent.value);
@@ -550,6 +555,8 @@ function warnUnavailableAgents(addedNames: string[]): boolean {
   let hasUnavailable = false;
   for (const agent of agents) {
     if (!addedNames.includes(agent.name)) continue;
+    // No point warning agents about their own status when assigning themselves.
+    if (agent.name === currentAgentName) continue;
     const category = agentStatusStore.getStatus(
       agent.availability || ""
     )?.category;
