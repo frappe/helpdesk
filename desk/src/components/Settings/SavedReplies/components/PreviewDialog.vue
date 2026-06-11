@@ -1,7 +1,8 @@
 <template>
   <Dialog
-    v-model="dialogModel.show"
-    :options="{ title: __('Preview'), size: '2xl' }"
+    v-model:open="dialogModel.show"
+    :title="__('Preview')"
+    size="2xl"
     @after-leave="
       () => {
         dialogModel.ticketId = '';
@@ -9,7 +10,7 @@
       }
     "
   >
-    <template #body-content>
+    <template #default>
       <div class="space-y-4">
         <Link
           :value="dialogModel.ticketId"

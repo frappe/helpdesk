@@ -28,7 +28,7 @@
         theme="gray"
         variant="solid"
         @click="$emit('update:step', 'fd')"
-        icon-left="plus"
+        icon-left="lucide-plus"
       />
     </template>
     <template #content>

@@ -153,8 +153,8 @@
                 placeholder="11/01/2025"
                 class="w-full"
                 id="from_date"
-                @change="validateSlaData('start_date')"
-                :formatter="(date) => getFormattedDate(date)"
+                @update:model-value="validateSlaData('start_date')"
+                :format="getDateFormat()"
               >
                 <template #prefix>
                   <LucideCalendar class="size-4" />
@@ -170,8 +170,8 @@
                 placeholder="25/12/2025"
                 class="w-full"
                 id="to_date"
-                @change="validateSlaData('end_date')"
-                :formatter="(date) => getFormattedDate(date)"
+                @update:model-value="validateSlaData('end_date')"
+                :format="getDateFormat()"
               >
                 <template #prefix>
                   <LucideCalendar class="size-4" />
@@ -270,7 +270,7 @@ import {
   slaDataErrors,
   validateSlaData,
 } from "@/stores/sla";
-import { convertToConditions, getFormattedDate } from "@/utils";
+import { convertToConditions, getDateFormat } from "@/utils";
 import {
   Badge,
   Button,

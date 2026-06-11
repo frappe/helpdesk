@@ -20,7 +20,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { dayjs } from "@/dayjs";
+import { dayjs } from "frappe-ui";
 
 defineProps({
   item: {

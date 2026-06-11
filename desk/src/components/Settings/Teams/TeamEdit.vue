@@ -79,7 +79,7 @@
                     placement="right"
                   >
                     <Button
-                      icon="more-horizontal"
+                      icon="lucide-more-horizontal"
                       variant="ghost"
                       @click="isConfirmingDelete = false"
                     />
@@ -261,7 +261,7 @@ const options = computed(() => [
   },
   {
     label: __("Rename"),
-    icon: "edit-3",
+    icon: "lucide-edit-3",
     onClick: () => {
       showRename.value = { show: true, teamName: props.teamName };
     },

@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="show" :options="{ size: 'xl', position: 'top' }">
-    <template #body>
+  <Dialog v-model:open="show" size="xl" position="top" bare>
+    <template #default>
       <div>
         <Combobox nullable @update:model-value="onSelection">
           <div class="relative">

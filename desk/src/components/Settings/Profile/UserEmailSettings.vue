@@ -88,7 +88,7 @@
                   class="w-10"
                   variant="ghost"
                   :tooltip="__('Remove')"
-                  icon="x"
+                  icon="lucide-x"
                   @click.prevent="removeEmail(e)"
                 />
               </div>
@@ -104,7 +104,7 @@
                 class="!bg-surface-modal"
                 variant="outline"
                 :label="__('Add Email')"
-                iconLeft="plus"
+                iconLeft="lucide-plus"
                 @click="togglePopover()"
               />
             </template>

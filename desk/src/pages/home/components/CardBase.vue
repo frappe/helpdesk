@@ -14,7 +14,7 @@
         </div>
         <div class="flex items-center text-sm gap-1">
           <div class="flex items-center gap-1" :class="percentageChange.color">
-            <FeatherIcon :name="percentageChange.icon" class="size-4" />
+            <span :class="percentageChange.icon" class="size-4" />
             <div>{{ percentageChange.value }}%</div>
           </div>
           <Dropdown :options="durationOptions">

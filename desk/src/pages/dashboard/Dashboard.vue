@@ -41,16 +41,10 @@
           v-else
           class="!w-48"
           ref="datePickerRef"
-          v-model="filters.period"
+          v-model="periodRange"
           variant="outline"
           :placeholder="__('Period')"
-          @update:model-value="
-            (e:string) => {
-              showDatePicker = false;
-              preset = formatter(e);
-            }
-          "
-          :formatter="formatRange"
+          :format="'MMM D'"
         >
           <template #prefix>
             <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
@@ -457,6 +451,17 @@ function getLastXDays(range: number = 30): string {
 const showDatePicker = ref(false);
 const datePickerRef = ref(null);
 const preset = ref(__("Last 30 Days"));
+
+// frappe-ui v1 DateRangePicker models a [from, to] tuple; filters.period and
+// the API keep the legacy "from,to" string, so convert at the picker boundary.
+const periodRange = computed({
+  get: (): string[] => (filters.period ? filters.period.split(",") : []),
+  set: (range: string[]) => {
+    showDatePicker.value = false;
+    filters.period = range?.length ? range.join(",") : "";
+    preset.value = formatter(filters.period);
+  },
+});
 
 const options = computed(() => [
   {

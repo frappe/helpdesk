@@ -93,7 +93,10 @@
               placement="left"
             >
               <template #default>
-                <Button :label="currentSortLabel" icon-right="chevron-down" />
+                <Button
+                  :label="currentSortLabel"
+                  icon-right="lucide-chevron-down"
+                />
               </template>
               <template #item-label="{ item }">
                 <div
@@ -121,7 +124,7 @@
                 <template #default>
                   <Button
                     :label="currentPeriodLabel"
-                    icon-right="chevron-down"
+                    icon-right="lucide-chevron-down"
                   />
                 </template>
                 <template #item-label="{ item }">
@@ -144,12 +147,13 @@
               <DateRangePicker
                 v-if="showDatePicker || currentPeriod === 'custom_range'"
                 ref="datePickerRef"
-                v-model="customDateRange"
+                :model-value="customDateRange ? customDateRange.split(',') : []"
                 :placeholder="__('Select range')"
                 @update:model-value="onCustomRangeSelected"
                 :format="'MMM D'"
                 @click="datePickerRef?.open()"
-                placement="top-start"
+                side="top"
+                align="start"
                 class="!w-48"
               />
             </div>
@@ -421,8 +425,8 @@ const changeSort = (sort: string) => {
   getRecentFeedbackResource.fetch();
 };
 
-const onCustomRangeSelected = (range: string) => {
-  if (!range) {
+const onCustomRangeSelected = (range: string[]) => {
+  if (!range?.length) {
     showDatePicker.value = false;
     currentPeriod.value = "all_time";
     customDateRange.value = undefined;
@@ -432,7 +436,7 @@ const onCustomRangeSelected = (range: string) => {
   }
   showDatePicker.value = false;
   currentPeriod.value = "custom_range";
-  customDateRange.value = range;
+  customDateRange.value = range.join(",");
   currentIndex.value = 0;
   getRecentFeedbackResource.fetch();
 };

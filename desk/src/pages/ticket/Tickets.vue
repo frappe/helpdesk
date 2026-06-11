@@ -57,14 +57,20 @@ import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
-import { dayjs } from "@/dayjs";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { View } from "@/types";
-import { getIcon, isCustomerPortal } from "@/utils";
-import { Badge, FeatherIcon, toast, Tooltip, usePageMeta } from "frappe-ui";
+import { getIcon, isCustomerPortal, shortDuration } from "@/utils";
+import {
+  Badge,
+  dayjs,
+  FeatherIcon,
+  toast,
+  Tooltip,
+  usePageMeta,
+} from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -99,7 +105,7 @@ const listSelections = ref(new Set());
 const selectBannerActions = [
   {
     label: __("Export"),
-    icon: "download",
+    icon: "lucide-download",
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showExportModal.value = true;
@@ -131,10 +137,10 @@ const options = computed(() => ({
           : status?.["label_agent"];
         return h(
           "div",
-          { class: "flex items-center space-x-2 justify-start w-full" },
+          { class: "flex items-center gap-1.5 justify-start w-full" },
           [
             h(IndicatorIcon, { class: status?.["parsed_color"] }),
-            h("span", { class: "truncate flex-1" }, label),
+            h("span", { class: "truncate flex-1 text-base" }, label),
           ]
         );
       },
@@ -142,17 +148,17 @@ const options = computed(() => ({
     agreement_status: {
       custom: ({ item }) => {
         return h(Badge, {
-          label: item,
+          label: __(item),
           theme: slaStatusColorMap[item],
-          variant: "outline",
+          variant: "subtle",
         });
       },
     },
     response_by: {
-      custom: ({ row, item }) => handle_response_by_field(row, item),
+      custom: ({ row, item }) => handleResponseByField(row, item),
     },
     resolution_by: {
-      custom: ({ row, item }) => handle_resolution_by_field(row, item),
+      custom: ({ row, item }) => handleResolutionByField(row, item),
     },
   },
   isCustomerPortal: isCustomerPortal.value,
@@ -182,66 +188,93 @@ const options = computed(() => ({
   hideColumnSetting: false,
 }));
 
-function handle_response_by_field(row: any, item: string) {
+function handleResponseByField(row: any, item: string) {
   if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
     return h(Badge, {
       label: __("Failed"),
       theme: "red",
-      variant: "outline",
+      variant: "subtle",
     });
   }
   if (row.first_responded_on && dayjs(row.first_responded_on).isBefore(item)) {
     return h(Badge, {
       label: __("Fulfilled"),
-      theme: "green",
-      variant: "outline",
+      theme: "gray",
+      variant: "subtle",
     });
   } else if (dayjs(row.first_responded_on).isAfter(item)) {
     return h(Badge, {
       label: __("Failed"),
       theme: "red",
-      variant: "outline",
+      variant: "subtle",
     });
   } else {
     return h(
       Tooltip,
       {
-        text: dayjs(item).long(),
+        text: dayjs(item).format("LLLL"),
       },
-      () => dayjs.tz(item).fromNow()
+      h(Badge, {
+        label: shortDuration(item),
+        variant: "subtle",
+        theme: "orange",
+      })
     );
   }
 }
 
-function handle_resolution_by_field(row: any, item: string) {
+function handleResolutionByField(row: any, item: string) {
   const status = getStatus(row.status) || {};
   if (status.category === "Paused") {
     return h(Badge, {
       label: __("Paused"),
       theme: "blue",
-      variant: "outline",
+      variant: "subtle",
     });
-  } else if (row.resolution_date && dayjs(row.resolution_date).isBefore(item)) {
+  }
+  // Trust the server-computed SLA status for terminal states.
+  if (row.agreement_status === "Fulfilled") {
     return h(Badge, {
       label: __("Fulfilled"),
-      theme: "green",
-      variant: "outline",
+      theme: "gray",
+      variant: "subtle",
     });
-  } else if (dayjs(row.resolution_date).isAfter(item)) {
+  }
+  if (row.agreement_status === "Failed") {
     return h(Badge, {
       label: __("Failed"),
       theme: "red",
-      variant: "outline",
+      variant: "subtle",
     });
-  } else {
-    return h(
-      Tooltip,
-      {
-        text: dayjs(item).long(),
-      },
-      () => dayjs.tz(item).fromNow()
-    );
   }
+  // In progress without a resolution deadline to track.
+  if (!item) {
+    return h(Badge, {
+      label: __("—"),
+      theme: "gray",
+      variant: "subtle",
+    });
+  }
+  // In progress but the resolution deadline has already passed.
+  if (dayjs(item).isBefore(dayjs())) {
+    return h(Badge, {
+      label: __("Failed"),
+      theme: "red",
+      variant: "subtle",
+    });
+  }
+  // In progress with a future deadline: show the live countdown.
+  return h(
+    Tooltip,
+    {
+      text: dayjs(item).format("LLLL"),
+    },
+    h(Badge, {
+      label: shortDuration(item),
+      variant: "subtle",
+      theme: "orange",
+    })
+  );
 }
 
 async function exportRows(
@@ -320,7 +353,7 @@ const dropdownOptions = computed(() => {
       items: [
         {
           label: __("List View"),
-          icon: "align-justify",
+          icon: "lucide-align-justify",
           onClick: () =>
             router.push({
               name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
@@ -364,7 +397,7 @@ const dropdownOptions = computed(() => {
     items: [
       {
         label: __("Create View"),
-        icon: "plus",
+        icon: "lucide-plus",
         onClick: () => {
           resetState();
           viewDialog.show = true;
@@ -499,7 +532,7 @@ const viewActions = (view) => {
         items: [
           {
             label: __("Delete"),
-            icon: "trash-2",
+            icon: "lucide-trash-2",
             onClick: () => {
               $dialog({
                 title: __("Delete {0}?", [_view.label]),
