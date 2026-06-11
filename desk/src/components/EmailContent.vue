@@ -151,6 +151,7 @@ const htmlContent = computed(
         font-weight: 700;
         height: 12px;
         line-height: 0.1;
+        color: #383838;
         background: #e8eaed;
         width: 23px;
         justify-content: center;
@@ -158,6 +159,13 @@ const htmlContent = computed(
       }
       .replied-content .collapse:hover {
         background: #dadce0;
+      }
+      [data-theme='dark'] .replied-content .collapse {
+        color: #e2e2e2;
+        background: #424242;
+      }
+      [data-theme='dark'] .replied-content .collapse:hover {
+        background: #525252;
       }
       .replied-content .collapse + input {
         display: none;

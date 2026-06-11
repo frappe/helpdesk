@@ -195,7 +195,7 @@ import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
-import { call, toast } from "frappe-ui";
+import { call, toast, useTheme } from "frappe-ui";
 import {
   GettingStartedBanner,
   HelpModal,
@@ -224,6 +224,8 @@ import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
+import LucideMoon from "~icons/lucide/moon";
+import LucideSun from "~icons/lucide/sun";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
@@ -254,6 +256,13 @@ const showShortcutsModal = ref(false);
 const showCommandPalette = ref(false);
 
 const { pinnedViews, publicViews } = useView();
+const { currentTheme, toggleTheme } = useTheme();
+
+const themeMenuItem = computed(() => ({
+  label: __("Toggle theme"),
+  icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
+  onClick: () => toggleTheme(),
+}));
 
 const isFCSite = ref(window.is_fc_site);
 
@@ -326,6 +335,7 @@ function parseViews(views) {
 }
 
 const customerPortalDropdown = computed(() => [
+  themeMenuItem.value,
   {
     group: __("Danger"),
     hideLabel: true,

@@ -211,8 +211,7 @@ function handleDeleteTicket() {
         iconLeft: "trash-2",
         variant: "solid",
         onClick({ close }) {
-          call("frappe.client.delete", {
-            doctype: "HD Ticket",
+          call("helpdesk.api.ticket.delete_ticket", {
             name: ticket?.value?.doc.name,
           })
             .then(() => {

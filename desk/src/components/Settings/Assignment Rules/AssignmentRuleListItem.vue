@@ -193,18 +193,25 @@ const onPriorityChange = () => {
   setAssignmentRuleValue("priority", props.data.priority);
 };
 
-const onToggle = () => {
+const onToggle = (enabled: boolean) => {
   if (!props.data.users_exists && props.data.disabled) {
     toast.error(__("Cannot enable rule without adding users in it"));
     return;
   }
-  setAssignmentRuleValue("disabled", !props.data.disabled, "status");
+  // Optimistically flip so the switch reflects the new state immediately;
+  // revert if the backend update fails.
+  const previous = props.data.disabled;
+  props.data.disabled = enabled ? 0 : 1;
+  setAssignmentRuleValue("disabled", props.data.disabled, "status", () => {
+    props.data.disabled = previous;
+  });
 };
 
 const setAssignmentRuleValue = (
   key: string,
   value: any,
-  fieldName?: string
+  fieldName?: string,
+  onError?: () => void
 ) => {
   createResource({
     url: "frappe.client.set_value",
@@ -215,9 +222,14 @@ const setAssignmentRuleValue = (
       value: value,
     },
     onSuccess: () => {
-      assignmentRulesListData?.reload();
       toast.success(
         __("Assignment rule {0} updated successfully.", fieldName || key)
+      );
+    },
+    onError: () => {
+      onError?.();
+      toast.error(
+        __("Failed to update assignment rule {0}.", fieldName || key)
       );
     },
     auto: true,
