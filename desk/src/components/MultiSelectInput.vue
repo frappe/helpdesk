@@ -8,16 +8,9 @@
         :label="value"
         theme="gray"
         variant="subtle"
-<<<<<<< HEAD
-        :class="{
-          'rounded bg-surface-white hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
-            variant === 'subtle',
-        }"
-=======
         tooltip="Click to copy"
         class="cursor-pointer transition-transform active:scale-[0.98]"
         @click="copy(value)"
->>>>>>> 40a5cfef (feat(multiselect): click pill to copy its value)
         @keydown.delete.capture.stop="removeLastValue"
       >
         <template #suffix>
