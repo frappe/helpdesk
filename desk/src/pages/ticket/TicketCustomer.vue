@@ -38,11 +38,24 @@
           >
           </Alert>
         </div>
-        <!-- show for only mobile -->
-        <TicketCustomerTemplateFields v-if="isMobileView" />
+        <!-- Mobile: Activity / Details tabs -->
+        <Tabs
+          v-if="isMobileView"
+          v-model="activeTab"
+          :tabs="tabs"
+          class="[&_[role='tablist']]:px-5"
+        >
+          <template #tab-panel="{ tab }">
+            <TicketCustomerTemplateFields v-if="tab.name === 'details'" />
+            <TicketConversation v-else :show-header="false" class="grow" />
+          </template>
+        </Tabs>
 
-        <TicketConversation class="grow" />
+        <!-- Desktop: conversation -->
+        <TicketConversation v-else class="grow" />
+
         <div
+          v-if="!isMobileView || activeTab === 0"
           class="w-full p-5"
           @keydown.ctrl.enter.capture.stop="sendEmail"
           @keydown.meta.enter.capture.stop="sendEmail"
@@ -90,13 +103,18 @@ import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
+<<<<<<< HEAD
 import LucideWarning from "~icons/lucide/triangle-alert";
+=======
+import { ActivityIcon, DetailsIcon } from "@/components/icons";
+>>>>>>> 6c3d8e7b (fix: improve customer portal layouting)
 import {
   Alert,
   Breadcrumbs,
   Button,
   call,
   createResource,
+  Tabs,
   toast,
 } from "frappe-ui";
 import { __ } from "@/translation";
@@ -161,6 +179,12 @@ const isExpanded = ref(false);
 const { isMobileView } = useScreenSize();
 const { $dialog, $socket } = globalStore();
 const isDismissed = ref(false);
+
+const activeTab = ref(0);
+const tabs = computed(() => [
+  { name: "activity", label: __("Activity"), icon: ActivityIcon },
+  { name: "details", label: __("Details"), icon: DetailsIcon },
+]);
 
 function getTodayKey() {
   return new Date().toISOString().split("T")[0];

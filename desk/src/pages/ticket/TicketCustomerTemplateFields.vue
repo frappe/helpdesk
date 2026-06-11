@@ -1,22 +1,22 @@
 <template>
-  <div class="grid grid-cols-3 md:grid-cols-1 gap-4 border-b px-5 py-2.5">
-    <div class="space-y-1.5">
-      <span class="block text-sm text-ink-gray-7"> Status </span>
-      <span class="block break-words text-base font-medium text-ink-gray-9">
-        {{ ticket.data.status }}
-      </span>
-    </div>
-    <div class="space-y-1.5">
-      <span class="block text-sm text-ink-gray-7"> Priority </span>
-      <span class="block break-words text-base font-medium text-ink-gray-9">
-        {{ ticket.data.priority }}
-      </span>
-    </div>
-    <div v-for="data in slaData" :key="data.label" class="space-y-1.5">
+  <div
+    class="grid grid-cols-[150px_1fr] items-center gap-x-4 gap-y-3.5 border-b px-5 py-3.5"
+  >
+    <span class="text-sm text-ink-gray-5">Status</span>
+    <span class="break-words text-base font-medium text-ink-gray-9">
+      {{ ticket.data.status }}
+    </span>
+
+    <span class="text-sm text-ink-gray-5">Priority</span>
+    <span class="break-words text-base font-medium text-ink-gray-9">
+      {{ ticket.data.priority }}
+    </span>
+
+    <template v-for="data in slaData" :key="data.label">
       <Tooltip :text="dayjs(data.value).format('LLLL')">
-        <span class="block text-sm text-ink-gray-7">{{ data.title }}</span>
+        <span class="text-sm text-ink-gray-5">{{ data.title }}</span>
       </Tooltip>
-      <span class="block break-words text-base font-medium text-ink-gray-9">
+      <span class="break-words text-base font-medium text-ink-gray-9">
         <Badge
           v-if="data.showSla"
           :label="data.label"
@@ -27,22 +27,17 @@
           {{ dayjs.tz(data.value).fromNow() }}
         </span>
       </span>
-    </div>
-    <div
-      v-for="field in customFields"
-      :key="field.fieldname"
-      class="space-y-1.5"
-    >
-      <span class="block text-sm text-ink-gray-7">
-        {{ field.label }}
-      </span>
+    </template>
+
+    <template v-for="field in customFields" :key="field.fieldname">
+      <span class="text-sm text-ink-gray-5">{{ field.label }}</span>
       <span
-        class="block break-words text-base font-medium text-ink-gray-9"
+        class="break-words text-base font-medium text-ink-gray-9"
         :class="!ticket.data[field.fieldname] && 'text-ink-gray-4'"
       >
         {{ ticket.data[field.fieldname] || "—" }}
       </span>
-    </div>
+    </template>
   </div>
 </template>
 
