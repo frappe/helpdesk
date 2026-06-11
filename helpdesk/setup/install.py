@@ -33,7 +33,6 @@ def after_install():
     add_property_setters()
     add_website_settings_permission()
     add_default_views()
-    add_email_template_perms_for_agent_and_agent_manager()
     # Always keep this at last, because sql_ddl makes the db commit
     add_fts_index()
 
