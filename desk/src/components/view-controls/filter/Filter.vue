@@ -13,98 +13,107 @@
       <div
         class="my-2 w-80 rounded-lg border border-outline-gray-1 bg-surface-white shadow-xl"
       >
-        <!-- Step: overview — the list of active filters -->
-        <template v-if="step === 'overview'">
-          <div
-            class="flex items-center border-b border-outline-gray-1 p-2 ps-3 h-9"
+        <div class="relative overflow-clip rounded-[inherit]">
+          <Transition
+            :name="direction === 'forward' ? 'slide-forward' : 'slide-back'"
           >
-            <span class="text-base font-medium text-ink-gray-8">
-              {{ headerLabel }}
-            </span>
-          </div>
-          <div class="pt-1">
-            <div class="p-1.5 py-1">
-              <div
-                v-for="filter in activeFilters"
-                :key="filter.index"
-                class="group flex h-8 w-full items-center gap-2 rounded px-1.5 hover:bg-surface-gray-2"
-              >
-                <Button
-                  variant="ghost"
-                  :label="filterSummary(filter)"
-                  class="!h-full min-w-0 flex-1 !justify-start !px-0 hover:!bg-transparent"
-                  @click="editFilter(filter)"
+            <div :key="step">
+              <!-- Step: overview — the list of active filters -->
+              <template v-if="step === 'overview'">
+                <div
+                  class="flex items-center border-b border-outline-gray-1 p-2 ps-3 h-9"
                 >
-                  <template #prefix>
-                    <component
-                      :is="fieldIcon(filter.field)"
-                      class="size-4 shrink-0 text-ink-gray-5"
+                  <span class="text-base font-medium text-ink-gray-8">
+                    {{ headerLabel }}
+                  </span>
+                </div>
+                <div class="pt-1">
+                  <div class="p-1.5 py-1">
+                    <div
+                      v-for="filter in activeFilters"
+                      :key="filter.index"
+                      class="group flex h-8 w-full items-center gap-2 rounded px-1.5 hover:bg-surface-gray-2"
+                    >
+                      <Button
+                        variant="ghost"
+                        :label="filterSummary(filter)"
+                        class="!h-full min-w-0 flex-1 !justify-start !px-0 hover:!bg-transparent"
+                        @click="editFilter(filter)"
+                      >
+                        <template #prefix>
+                          <component
+                            :is="fieldIcon(filter.field)"
+                            class="size-4 shrink-0 text-ink-gray-5"
+                          />
+                        </template>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        icon="lucide-x"
+                        class="invisible shrink-0 group-hover:visible"
+                        @click="removeFilter(filter.index)"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    class="mt-1 flex items-center justify-between border-t border-outline-gray-1 px-1 py-1.5"
+                  >
+                    <Button
+                      variant="ghost"
+                      :size="'xs'"
+                      class="!text-ink-gray-5"
+                      :label="__('Add filter')"
+                      @click="step = 'fields'"
+                      tooltip="Add Filter (A)"
+                    >
+                      <template #prefix>
+                        <LucidePlus class="size-4" />
+                      </template>
+                    </Button>
+                    <Button
+                      :size="'xs'"
+                      variant="ghost"
+                      class="!text-ink-gray-5"
+                      :label="__('Clear all')"
+                      :icon-left="'lucide-trash-2'"
+                      @click="clearFilters()"
                     />
-                  </template>
-                </Button>
-                <Button
-                  variant="ghost"
-                  icon="lucide-x"
-                  class="invisible shrink-0 group-hover:visible"
-                  @click="removeFilter(filter.index)"
+                  </div>
+                </div>
+              </template>
+
+              <!-- Step: fields — choose which field to filter on -->
+              <template v-else-if="step === 'fields'">
+                <div
+                  v-if="canGoBack"
+                  class="flex h-9 items-center border-b border-outline-gray-1"
+                >
+                  <BackButton :label="headerLabel" size="sm" @back="goBack" />
+                </div>
+                <FilterFieldList
+                  :fields="fields"
+                  :placeholder="
+                    canGoBack ? __('Search fields...') : __('Add Filter...')
+                  "
+                  :show-shortcut-hint="!activeFilters.length"
+                  @select="selectField"
+                  @back="goBack"
                 />
-              </div>
-            </div>
-            <div
-              class="mt-1 flex items-center justify-between border-t border-outline-gray-1 px-1 py-1.5"
-            >
-              <Button
-                variant="ghost"
-                :size="'xs'"
-                class="!text-ink-gray-5"
-                :label="__('Add filter')"
-                @click="step = 'fields'"
-              >
-                <template #prefix>
-                  <LucidePlus class="size-4" />
-                </template>
-              </Button>
-              <Button
-                :size="'xs'"
-                variant="ghost"
-                class="!text-ink-gray-5"
-                :label="__('Clear all')"
-                :icon-left="'lucide-trash-2'"
-                @click="clearFilters()"
+              </template>
+
+              <!-- Step: value — pick operator + value (renders its own header) -->
+              <FilterValueEditor
+                v-else-if="step === 'value' && selectedField"
+                :key="editSession"
+                :field="selectedField"
+                :filter="editingFilter"
+                @apply="applyFilter"
+                @clear="clearCurrentFilter"
+                @back="goBack"
               />
             </div>
-          </div>
-        </template>
-
-        <!-- Step: fields — choose which field to filter on -->
-        <template v-else-if="step === 'fields'">
-          <div
-            v-if="canGoBack"
-            class="flex h-9 items-center border-b border-outline-gray-1"
-          >
-            <BackButton :label="headerLabel" size="sm" @back="goBack" />
-          </div>
-          <FilterFieldList
-            :fields="fields"
-            :placeholder="
-              canGoBack ? __('Search fields...') : __('Add Filter...')
-            "
-            :show-shortcut-hint="!activeFilters.length"
-            @select="selectField"
-            @back="goBack"
-          />
-        </template>
-
-        <!-- Step: value — pick operator + value (renders its own header) -->
-        <FilterValueEditor
-          v-else-if="step === 'value' && selectedField"
-          :key="editSession"
-          :field="selectedField"
-          :filter="editingFilter"
-          @apply="applyFilter"
-          @clear="clearCurrentFilter"
-          @back="goBack"
-        />
+          </Transition>
+        </div>
       </div>
     </template>
   </Popover>
@@ -145,6 +154,10 @@ const editSession = ref(0);
 // list (when adding a new filter) or the overview (when editing an existing one).
 const valueEditorOrigin = ref<"overview" | "fields">("overview");
 let openPopoverFn: (() => void) | null = null;
+
+// used for animating back or forward between steps
+const stepOrder = { overview: 0, fields: 1, value: 2 } as const;
+const direction = ref<"forward" | "back">("forward");
 
 const headerLabel = computed(() => {
   if (step.value === "overview") return __("Filters");
@@ -221,6 +234,10 @@ function goBack() {
   step.value = activeFilters.value.length ? "overview" : "fields";
 }
 
+watch(step, (to, from) => {
+  direction.value = stepOrder[to] >= stepOrder[from] ? "forward" : "back";
+});
+
 watch(activeFilters, (filters) => {
   if (step.value === "overview" && !filters.length) step.value = "fields";
 });
@@ -232,9 +249,56 @@ useEventListener(document, "keydown", (event: KeyboardEvent) => {
   if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
     return;
   }
-  if (event.key === "a") {
+  if (event.key === "a" || event.key === "A") {
     event.preventDefault();
     step.value = "fields";
   }
 });
 </script>
+
+<style scoped>
+/* Panels are transparent at rest so they never paint over the popover border;
+   they only need their own background while two of them overlap mid-swipe. */
+.slide-forward-enter-active,
+.slide-forward-leave-active,
+.slide-back-enter-active,
+.slide-back-leave-active {
+  background-color: var(--surface-white);
+  transition: transform 250ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 250ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* The outgoing panel leaves the flow so both panels can swipe at once; the
+   incoming forward panel stacks above it, like a navigation push. */
+.slide-forward-leave-active,
+.slide-back-leave-active {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+}
+
+.slide-forward-enter-active {
+  position: relative;
+  z-index: 1;
+}
+
+.slide-forward-enter-from,
+.slide-back-leave-to {
+  transform: translateX(100%);
+}
+
+.slide-forward-leave-to,
+.slide-back-enter-from {
+  transform: translateX(-25%);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-forward-enter-active,
+  .slide-forward-leave-active,
+  .slide-back-enter-active,
+  .slide-back-leave-active {
+    transition-duration: 0s;
+  }
+}
+</style>

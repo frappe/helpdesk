@@ -115,6 +115,8 @@ watch(activeIndex, (index) => {
 });
 
 onMounted(() => {
-  nextTick(() => searchInput.value?.el?.focus());
+  // preventScroll: the panel mounts mid-swipe, still translated; a default
+  // focus would scroll it into view and visually cancel the slide
+  nextTick(() => searchInput.value?.el?.focus({ preventScroll: true }));
 });
 </script>
