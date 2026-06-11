@@ -63,10 +63,6 @@
 
 <script setup lang="ts">
 import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNextIntegrationSettings.vue";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { useConfigStore } from "@/stores/config";
-import { __ } from "@/translation";
-import { HDSettings, HDSettingsSymbol } from "@/types";
 import {
   Badge,
   Button,
@@ -75,12 +71,9 @@ import {
   Switch,
   toast,
 } from "frappe-ui";
-import { computed, provide, ref, watch } from "vue";
-import { disableSettingModalOutsideClick } from "../settingsModal";
 import Branding from "./components/Branding.vue";
 import TicketSettings from "./components/TicketSettings.vue";
 import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
-<<<<<<< HEAD
 import { computed, provide, ref, watch } from "vue";
 import { __ } from "@/translation";
 import { disableSettingModalOutsideClick } from "../settingsModal";
@@ -88,8 +81,6 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import { HDSettings, HDSettingsSymbol } from "@/types";
 import { useConfigStore } from "@/stores/config";
-=======
->>>>>>> 7f70e490 (fix: add ERPNext Integration setting in Settings Modal)
 
 const configStore = useConfigStore();
 
