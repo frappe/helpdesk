@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-[150px_1fr] items-center gap-x-4 gap-y-3.5 border-b px-5 py-3.5"
+    class="grid grid-cols-[150px_1fr] items-center gap-x-4 gap-y-3.5 border-b px-6 py-3.5"
   >
     <span class="text-sm text-ink-gray-5">Status</span>
     <span class="break-words text-base font-medium text-ink-gray-9">
