@@ -116,6 +116,9 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
 });
 
 const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
+/ TODO: refactor for paginationExpand commentComment on line L115
+// can be done once we sort out the backend
+// sender mail will be  user using portal
 const _activities = computed(() => {
   if (!activities.value?.data) {
     return [];
@@ -245,6 +248,9 @@ const _activities = computed(() => {
     }
     i++;
   }
+  // add feedback data at the last always
+  // name is email
+  // full_name is name
 
   if (ticket.value.doc.feedback_rating === 0) {
     return data;
