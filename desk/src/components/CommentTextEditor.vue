@@ -234,6 +234,12 @@ onMounted(() => {
   agentsList.value.fetch();
 });
 
+onBeforeUnmount(() => {
+  if (isContentEmpty(newComment.value)) {
+    localStorage.removeItem("commentBoxContent" + props.ticketId);
+  }
+});
+
 defineExpose({
   submitComment,
   editor,

@@ -62,7 +62,7 @@
 <script setup lang="ts">
 import { SelectIcon } from "@/components/icons";
 import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 const props = defineProps({
   activity: {
     type: Object,
@@ -70,7 +70,8 @@ const props = defineProps({
   },
 });
 
-const { user, content, creation, relatedActivities } = props.activity;
+const { user, content, creation } = props.activity;
+const relatedActivities = computed(() => props.activity.relatedActivities);
 
 let show_others = ref(false);
 </script>

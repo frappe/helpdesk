@@ -29,7 +29,7 @@
   </div>
   <CallLogModal
     v-model="showCallLogModal"
-    :ticketId="ticketId"
+    :ticketId="ticket.value?.name"
     @after-insert="refreshTicket"
   />
 </template>
@@ -38,6 +38,7 @@
 import { PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
 import { __ } from "@/translation";
+import { TicketSymbol } from "@/types";
 import { Dropdown } from "frappe-ui";
 import { computed, h, inject, ref } from "vue";
 defineProps({
@@ -50,7 +51,7 @@ defineProps({
 const makeCall = inject<() => void>("makeCall");
 const refreshTicket = inject<() => void>("refreshTicket");
 const showCallLogModal = ref(false);
-const ticketId = inject<string>("ticketId");
+const ticket = inject(TicketSymbol)!;
 
 const callActions = computed(() => {
   let actions = [
