@@ -30,6 +30,7 @@ def before_tests():
     make_test_objects("Email Domain", reset=True)
     create_email_account()
     create_customer_field()
+    complete_erpnext_setup()
     frappe.db.commit()  # nosemgrep
 
 
@@ -347,3 +348,36 @@ def make_team(team_name, members=[], disabled=False):
     team.disabled = disabled
     team.insert(ignore_permissions=True)
     return team
+
+
+def complete_erpnext_setup():
+    """
+    Run the ERPNext setup wizard once, so fixtures like Warehouse Type
+    exist before test records (e.g. Company) are created.
+    """
+    if "erpnext" not in frappe.get_installed_apps():
+        return
+    if frappe.get_all("Company", limit=1):
+        return
+
+    from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
+
+    year = datetime.today().year
+    setup_complete(
+        {
+            "currency": "INR",
+            "full_name": "Test User",
+            "company_name": "_Test Company",
+            "timezone": "Asia/Kolkata",
+            "company_abbr": "_TC",
+            "industry": "Manufacturing",
+            "country": "India",
+            "fy_start_date": f"{year}-01-01",
+            "fy_end_date": f"{year}-12-31",
+            "language": "english",
+            "company_tagline": "Testing",
+            "email": "test@erpnext.com",
+            "password": "test",
+            "chart_of_accounts": "Standard",
+        }
+    )

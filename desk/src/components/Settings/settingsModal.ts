@@ -15,7 +15,12 @@ import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
-import { FieldDependencyIcon, PhoneIcon } from "@/components/icons";
+import {
+  ERPNextSettingsIcon,
+  FieldDependencyIcon,
+  PhoneIcon,
+} from "@/components/icons";
+import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNextIntegrationSettings.vue";
 import TelephonyPage from "./Telephony/TelephonyPage.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
@@ -131,6 +136,12 @@ export const tabs = computed(() => {
           icon: markRaw(PhoneIcon),
           component: markRaw(TelephonyPage),
         },
+        {
+          label: __("ERPNext"),
+          icon: markRaw(ERPNextSettingsIcon),
+          component: markRaw(ERPNextIntegrationSettings),
+          condition: () => auth.isAdmin || auth.isManager,
+        },
       ],
     },
   ];
@@ -166,6 +177,7 @@ type TabName =
   | "Assignment Rules"
   | "Field Dependencies"
   | "Telephony"
+  | "ERPNext"
   | "Saved Replies";
 
 export const setActiveSettingsTab = (tabName: TabName) => {

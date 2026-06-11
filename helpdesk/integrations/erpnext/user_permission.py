@@ -1,62 +1,47 @@
 import frappe
-from frappe.core.doctype.user_permission.user_permission import UserPermission
+from frappe.model.document import Document
 from frappe.utils import cstr
 
-from helpdesk.integrations.erpnext.mirror_sync import MirrorSyncMixin
+from helpdesk.integrations.erpnext import mirror_sync
 from helpdesk.integrations.erpnext.utils import should_sync
 
+# Keeps HD Customer / ERPNext Customer User Permissions mirrored bidirectionally
+# when the integration is enabled.
 
-class CustomUserPermission(MirrorSyncMixin, UserPermission):
-    """Overrides core UserPermission to keep HD Customer / ERPNext Customer
-    permissions mirrored bidirectionally when the integration is enabled."""
 
-    DOCTYPE_FIELD = "allow"
-    VALUE_FIELD = "for_value"
+def before_validate(doc: Document, method: str | None = None):
+    mirror_sync.before_validate(doc, _config())
 
-    def before_validate(self):
-        """Clean up the old mirror BEFORE Frappe's duplicate-perm check runs
-        in validate(). Otherwise an identity change that collides with the
-        mirror's identity would trip DuplicateEntryError. If the save later
-        fails, the transaction rolls back and the mirror comes back."""
-        old = self.get_doc_before_save()
-        if old and self.has_data_updated(old) and self.sync_active():
-            self.delete_mirror_for(old)
 
-    def after_insert(self):
-        # Core UserPermission doesn't define after_insert — no super() call.
-        if self.should_mirror():
-            self.create_mirror()
+def after_insert(doc: Document, method: str | None = None):
+    mirror_sync.after_insert(doc, _config())
 
-    def on_update(self):
-        super().on_update()
-        if not self.should_mirror():
-            return
-        old = self.get_doc_before_save()
-        if old and self.has_data_updated(old):
-            # Old mirror was cleaned up in before_validate(); create the fresh one.
-            self.create_mirror()
-        else:
-            self.sync_state_to_mirror()
 
-    def on_trash(self):
-        super().on_trash()
-        if not self.should_mirror():
-            return
-        mirror = self.find_mirror()
-        if not mirror:
-            return
-        self.set_mirror_flags(mirror)
-        mirror.delete(ignore_permissions=True)
+def on_update(doc: Document, method: str | None = None):
+    mirror_sync.on_update(doc, _config())
 
-    def dedup_filter(self, target_doctype: str, target_value: str) -> dict:
-        # Frappe's validate_user_permission() dedups on these 5 keys; mirror
-        # that here so we don't insert a row the parent's validate() would
-        # reject as a duplicate.
-        return {
-            **super().dedup_filter(target_doctype, target_value),
-            "applicable_for": cstr(self.applicable_for),
-            "apply_to_all_doctypes": self.apply_to_all_doctypes,
-        }
+
+def on_trash(doc: Document, method: str | None = None):
+    mirror_sync.on_trash(doc, _config())
+
+
+def _config() -> dict:
+    return {
+        "user_field": "user",
+        "doctype_field": "allow",
+        "value_field": "for_value",
+        "extra_dedup_keys": _extra_dedup_keys,
+    }
+
+
+def _extra_dedup_keys(doc: Document) -> dict:
+    # Frappe's validate_user_permission() dedups on these 5 keys; mirror that
+    # here so we don't insert a row the parent's validate() would reject as a
+    # duplicate.
+    return {
+        "applicable_for": cstr(doc.applicable_for),
+        "apply_to_all_doctypes": doc.apply_to_all_doctypes,
+    }
 
 
 def sync_user_permissions():
