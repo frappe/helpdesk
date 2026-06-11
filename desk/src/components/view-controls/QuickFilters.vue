@@ -1,10 +1,6 @@
 <template>
   <FadedScrollableDiv
-<<<<<<< HEAD
-    class="quick-filters flex flex-1 items-center overflow-x-auto py-1 gap-2 pr-4"
-=======
     class="quick-filters flex flex-1 items-center overflow-x-auto py-1 gap-2 pe-4 ps-1 -ms-1"
->>>>>>> fc417dc5 (fix(overflow): first field in quick filters)
     orientation="horizontal"
     v-if="!quickFilters.loading"
   >
