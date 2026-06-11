@@ -1,43 +1,63 @@
 <template>
-  <div
-    class="grid grid-cols-[150px_1fr] items-center gap-x-4 gap-y-3.5 border-b px-6 py-3.5"
-  >
-    <span class="text-sm text-ink-gray-5">Status</span>
-    <span class="break-words text-base font-medium text-ink-gray-9">
-      {{ ticket.data.status }}
-    </span>
+  <div class="space-y-2 px-6 py-3.5 border-b">
+    <div class="flex items-center gap-4">
+      <span class="w-[150px] shrink-0 text-sm text-ink-gray-5">Status</span>
+      <span
+        class="flex-1 break-words rounded border border-outline-gray-2 bg-surface-white px-2 py-1 text-base font-medium text-ink-gray-9"
+      >
+        {{ ticket.data.status }}
+      </span>
+    </div>
 
-    <span class="text-sm text-ink-gray-5">Priority</span>
-    <span class="break-words text-base font-medium text-ink-gray-9">
-      {{ ticket.data.priority }}
-    </span>
+    <div class="flex items-center gap-4">
+      <span class="w-[150px] shrink-0 text-sm text-ink-gray-5">Priority</span>
+      <span
+        class="flex-1 break-words rounded border border-outline-gray-2 bg-surface-white px-2 py-1 text-base font-medium text-ink-gray-9"
+      >
+        {{ ticket.data.priority }}
+      </span>
+    </div>
 
-    <template v-for="data in slaData" :key="data.label">
+    <div
+      v-for="data in slaData"
+      :key="data.label"
+      class="flex items-center gap-4"
+    >
       <Tooltip :text="dayjs(data.value).format('LLLL')">
-        <span class="text-sm text-ink-gray-5">{{ data.title }}</span>
+        <span class="w-[150px] shrink-0 text-sm text-ink-gray-5">{{
+          data.title
+        }}</span>
       </Tooltip>
-      <span class="break-words text-base font-medium text-ink-gray-9">
+      <span
+        class="flex-1 rounded border border-outline-gray-2 bg-surface-white px-2 py-1 text-base font-medium text-ink-gray-9"
+      >
         <Badge
           v-if="data.showSla"
           :label="data.label"
           :theme="data.theme"
           variant="outline"
         />
-        <span v-else>
-          {{ dayjs.tz(data.value).fromNow() }}
-        </span>
+        <span v-else>{{ dayjs.tz(data.value).fromNow() }}</span>
       </span>
-    </template>
+    </div>
 
-    <template v-for="field in customFields" :key="field.fieldname">
-      <span class="text-sm text-ink-gray-5">{{ field.label }}</span>
+    <div
+      v-for="field in customFields"
+      :key="field.fieldname"
+      class="flex items-center gap-4"
+    >
+      <span class="w-[150px] shrink-0 text-sm text-ink-gray-5">{{
+        field.label
+      }}</span>
       <span
-        class="break-words text-base font-medium text-ink-gray-9"
-        :class="!ticket.data[field.fieldname] && 'text-ink-gray-4'"
+        class="flex-1 break-words rounded border border-outline-gray-2 bg-surface-white px-2 py-1 text-base font-medium"
+        :class="
+          ticket.data[field.fieldname] ? 'text-ink-gray-9' : 'text-ink-gray-4'
+        "
       >
         {{ ticket.data[field.fieldname] || "—" }}
       </span>
-    </template>
+    </div>
   </div>
 </template>
 
