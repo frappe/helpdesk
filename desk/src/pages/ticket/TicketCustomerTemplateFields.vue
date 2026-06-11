@@ -24,7 +24,7 @@
       class="flex items-center gap-4"
     >
       <Tooltip :text="dayjs(data.value).format('LLLL')">
-        <span class="w-[150px] shrink-0 text-sm text-ink-gray-5">{{
+        <span class="w-[160px] shrink-0 text-sm text-ink-gray-5">{{
           data.title
         }}</span>
       </Tooltip>
