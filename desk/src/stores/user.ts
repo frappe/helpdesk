@@ -54,14 +54,13 @@ export const useUserStore = defineStore("user", () => {
     return usersByName[email];
   }
 
-  function formatFullName(email: string) {
-    if (!email) return "";
-    const local = email.split("@")[0];
-    return local
-      .split(/[._-]/)
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
+  function formatFullName(email) {
+    let name = email.split("@")[0];
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    return name;
   }
+
+
 
   function getUserRole(email: string) {
     if (!email || email === "sessionUser") {
