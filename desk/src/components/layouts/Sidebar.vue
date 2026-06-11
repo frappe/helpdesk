@@ -233,10 +233,7 @@ import {
 } from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
-<<<<<<< HEAD
-=======
 const isRtl = document.documentElement.dir === "rtl";
->>>>>>> bfc79662 (fix: rtl regression)
 
 const route = useRoute();
 const router = useRouter();
@@ -604,18 +601,6 @@ const articles = ref([
     title: __("Masters"),
     opened: false,
     subArticles: [
-<<<<<<< HEAD
-      { name: "ticket", title: "Ticket" },
-      { name: "agent", title: "Agent" },
-      { name: "team", title: "Team" },
-      { name: "contact", title: "Contact" },
-      { name: "customer", title: "Customer" },
-      { name: "knowledge-base", title: "Knowledge Base" },
-      { name: "saved-replies", title: "Saved Replies" },
-      { name: "service-level-agreement", title: "Service Level Agreement" },
-      { name: "ticket-type", title: "Ticket Type" },
-      { name: "ticket-priority", title: "Ticket Priority" },
-=======
       { name: "ticket", title: __("Ticket") },
       { name: "agent", title: __("Agent") },
       { name: "team", title: __("Team") },
@@ -626,7 +611,6 @@ const articles = ref([
       { name: "service-level-agreement", title: __("Service Level Agreement") },
       { name: "ticket-type", title: __("Ticket Type") },
       { name: "ticket-priority", title: __("Ticket Priority") },
->>>>>>> bfc79662 (fix: rtl regression)
     ],
   },
   {
