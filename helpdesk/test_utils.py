@@ -381,6 +381,8 @@ def complete_erpnext_setup():
             "chart_of_accounts": "Standard",
         }
     )
+
+
 def upload_test_file(file_name: str) -> str:
     """Upload an image from desk/src/assets/images/ as a standalone private File, returning its name."""
     file_path = frappe.get_app_path(
