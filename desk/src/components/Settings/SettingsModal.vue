@@ -1,4 +1,4 @@
-p<template>
+<template>
   <Dialog
     v-model="show"
     :options="{ size: '5xl' }"
