@@ -1,23 +1,23 @@
 <template>
   <div>
-    <Dialog v-model="open" :options="{ title: __('Create New Contact') }">
-      <template #body-content>
+    <Dialog v-model:open="open" :title="__('Create New Contact')">
+      <template #default>
         <div class="space-y-4">
           <div
             v-for="field in formFields"
             :key="field.label"
             class="flex flex-col gap-1"
           >
-            <span class="mb-2 block text-sm leading-4 text-gray-700">
+            <span class="mb-2 block text-sm leading-4 text-ink-gray-7">
               {{ field.label }}
               <span
                 v-if="field.required"
-                class="place-self-center text-red-500"
+                class="place-self-center text-ink-red-3"
               >
                 *
               </span>
             </span>
-            <Input
+            <TextInput
               v-if="field.type === 'input'"
               v-model="state[field.value]"
               type="text"
@@ -56,7 +56,7 @@ import { computed, ref } from "vue";
 import {
   Dialog,
   ErrorMessage,
-  Input,
+  TextInput,
   createListResource,
   createResource,
   toast,

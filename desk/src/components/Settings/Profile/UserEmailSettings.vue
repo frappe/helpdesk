@@ -88,7 +88,7 @@
                   class="w-10"
                   variant="ghost"
                   :tooltip="__('Remove')"
-                  icon="x"
+                  icon="lucide-x"
                   @click.prevent="removeEmail(e)"
                 />
               </div>
@@ -104,7 +104,7 @@
                 class="!bg-surface-modal"
                 variant="outline"
                 :label="__('Add Email')"
-                iconLeft="plus"
+                iconLeft="lucide-plus"
                 @click="togglePopover()"
               />
             </template>
@@ -140,29 +140,25 @@
 <script setup>
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
+import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
+import { normalize } from "@/utils";
 import {
   Badge,
   Button,
   createDocumentResource,
-  createResource,
   TextEditor,
   toast,
 } from "frappe-ui";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { computed, ref, watch } from "vue";
-import { useAuthStore } from "@/stores/auth";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 const { userId } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
 const emit = defineEmits(["updateStep"]);
-import { __ } from "@/translation";
-import { normalize } from "@/utils";
 
-const currentUserEmailInfo = createResource({
-  url: "helpdesk.api.auth.get_current_user_email_info",
-  cache: "current-user-email-info",
-  auto: true,
-});
+const currentUserEmailInfo = getUserEmailInfo();
 
 const filteredEmails = computed(() => {
   if (!currentUserEmailInfo.data?.available_emails) return [];

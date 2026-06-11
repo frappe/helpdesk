@@ -1,32 +1,30 @@
 <template>
   <Dialog
-    :model-value="open"
-    :options="{
-      title: __('Rate this ticket'),
-      actions: [
-        {
-          disabled: !preset,
-          label: __('Submit'),
-          theme: 'gray',
-          variant: 'solid',
-          onClick: () =>
-            setValue.submit({
-              fieldname: {
-                status: 'Closed',
-                feedback: preset,
-                feedback_extra: text,
-              },
-            }),
-        },
-      ],
-    }"
-    @update:model-value="() => $emit('update:open', !open)"
+    :open="open"
+    :title="__('Rate this ticket')"
+    :actions="[
+      {
+        disabled: !preset,
+        label: __('Submit'),
+        theme: 'gray',
+        variant: 'solid',
+        onClick: () =>
+          setValue.submit({
+            fieldname: {
+              status: 'Closed',
+              feedback: preset,
+              feedback_extra: text,
+            },
+          }),
+      },
+    ]"
+    @update:open="() => $emit('update:open', !open)"
   >
-    <template #body-content>
-      <div class="space-y-4 text-base text-gray-700">
+    <template #default>
+      <div class="space-y-4 text-base text-ink-gray-7">
         <div class="space-y-2">
           <span> {{ __("Select a rating") }} </span>
-          <span class="text-red-500"> * </span>
+          <span class="text-ink-red-3"> * </span>
           <StarRating
             :static="false"
             :rating="rating"
@@ -36,7 +34,7 @@
         </div>
         <div v-if="options.data?.length" class="space-y-2">
           <span> {{ __("Pick an option") }} </span>
-          <span class="text-red-500"> * </span>
+          <span class="text-ink-red-3"> * </span>
           <div class="flex flex-wrap gap-2">
             <Button
               v-for="o in options.data"

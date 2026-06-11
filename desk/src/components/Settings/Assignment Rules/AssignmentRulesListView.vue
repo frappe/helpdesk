@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="assignmentRulesListData.loading && !assignmentRulesListData.data"
-    class="flex items-center justify-center mt-12"
+    class="flex items-center justify-center absolute inset-x-0 top-5.5 bottom-0"
   >
     <LoadingIndicator class="w-4" />
   </div>
@@ -25,7 +25,7 @@
       </div>
     </div>
     <div v-else>
-      <div class="grid grid-cols-12 items-center gap-4 text-sm text-gray-600">
+      <div class="grid grid-cols-12 items-center gap-4 text-sm text-ink-gray-5">
         <div class="col-span-7 ml-2">{{ __("Assignment rule") }}</div>
         <div class="col-span-3">{{ __("Priority") }}</div>
         <div class="col-span-2">{{ __("Enabled") }}</div>

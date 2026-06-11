@@ -84,8 +84,7 @@
                 placeholder="11/01/2025"
                 class="w-full"
                 id="from_date"
-                :formatter="(date) => getFormattedDate(date)"
-                :debounce="300"
+                :format="getDateFormat()"
                 @update:model-value="updateDuration('from_date')"
               >
                 <template #prefix>
@@ -106,8 +105,7 @@
                 placeholder="25/12/2025"
                 class="w-full"
                 id="to_date"
-                :formatter="(date) => getFormattedDate(date)"
-                :debounce="300"
+                :format="getDateFormat()"
                 @update:model-value="updateDuration('to_date')"
               >
                 <template #prefix>
@@ -154,11 +152,11 @@
               :buttons="[
                 {
                   value: 'calendar',
-                  icon: 'calendar',
+                  icon: 'lucide-calendar',
                 },
                 {
                   value: 'list',
-                  icon: 'list',
+                  icon: 'lucide-list',
                 },
               ]"
               v-model="holidayListView"
@@ -173,7 +171,7 @@
               variant="subtle"
               :label="__('Add Holiday')"
               @click="dialog.show = true"
-              icon-left="plus"
+              icon-left="lucide-plus"
             />
             <!-- Indicators -->
             <div class="flex gap-4" v-if="holidayListView === 'calendar'">
@@ -184,7 +182,7 @@
                 }}</span>
               </div>
               <div class="gap-1 flex items-center">
-                <span class="bg-gray-100 size-4 rounded-sm" />
+                <span class="bg-surface-gray-2 size-4 rounded-sm" />
                 <span class="text-sm text-ink-gray-6">{{
                   __("Recurring holidays")
                 }}</span>
@@ -230,9 +228,8 @@ import RecurringHolidaysList from "./RecurringHolidaysList.vue";
 
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { slaActiveScreen } from "@/stores/sla";
-import { getFormattedDate, htmlToText } from "@/utils";
-import dayjs from "dayjs";
-import { FormLabel } from "frappe-ui";
+import { getDateFormat, htmlToText } from "@/utils";
+import { dayjs, FormLabel } from "frappe-ui";
 import {
   disableSettingModalOutsideClick,
   setActiveSettingsTab,

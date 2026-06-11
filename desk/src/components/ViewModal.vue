@@ -1,11 +1,6 @@
 <template>
-  <Dialog
-    v-model="viewDialog.show"
-    :options="{
-      title: modalInfo.modalTitle,
-    }"
-  >
-    <template #body-content>
+  <Dialog v-model:open="viewDialog.show" :title="modalInfo.modalTitle">
+    <template #default>
       <div class="mb-1.5 block text-base text-ink-gray-5">View Name</div>
       <div class="flex gap-2">
         <IconPicker v-model="view.icon" v-slot="{ togglePopover }">

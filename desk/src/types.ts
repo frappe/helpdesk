@@ -21,7 +21,7 @@ interface ResourceOptions<T = any> {
   resourceFetcher?: (options: any) => Promise<any>;
 }
 
-interface Resource<T = any> {
+export interface Resource<T = any> {
   method: string | undefined;
   url: string;
   data: T | null;
@@ -692,6 +692,7 @@ export interface SlaPolicy {
 export interface Team {
   name: string;
   team: string;
+  disabled: boolean;
 }
 
 export interface SavedReply {
@@ -770,5 +771,6 @@ declare global {
     session_user: string;
     timezone: Record<"user" | "system", string>;
     agent: string | null;
+    apps: string[];
   }
 }

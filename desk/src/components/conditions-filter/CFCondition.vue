@@ -15,7 +15,7 @@
         },
       ]"
     >
-      <div :class="'text-end text-base text-gray-600'">
+      <div :class="'text-end text-base text-ink-gray-5'">
         <div v-if="props.itemIndex == 0" class="min-w-[66px] text-start">
           Where
         </div>
@@ -24,7 +24,7 @@
             variant="subtle"
             class="w-max"
             @click="toggleConjunction"
-            icon-right="refresh-cw"
+            icon-right="lucide-refresh-cw"
             :disabled="props.itemIndex > 2"
             :label="conjunction"
           />
@@ -90,12 +90,12 @@
     </div>
     <div :class="'w-max'">
       <Dropdown placement="right" :options="dropdownOptions">
-        <Button variant="ghost" icon="more-horizontal" />
+        <Button variant="ghost" icon="lucide-more-horizontal" />
       </Dropdown>
     </div>
   </div>
-  <Dialog v-model="show" :options="{ size: '3xl', title: 'Nested conditions' }">
-    <template #body-content>
+  <Dialog v-model:open="show" size="3xl" title="Nested conditions">
+    <template #default>
       <CFConditions
         :conditions="props.condition"
         :isChild="true"
@@ -190,7 +190,7 @@ const dropdownOptions = computed(() => {
     component: (props) =>
       TemplateOption({
         option: "Remove",
-        icon: "trash-2",
+        icon: "lucide-trash-2",
         active: props.active,
         variant: "danger",
         onClick: () => {
@@ -205,7 +205,7 @@ const dropdownOptions = computed(() => {
     component: (props) =>
       TemplateOption({
         option: "Remove group",
-        icon: "trash-2",
+        icon: "lucide-trash-2",
         active: props.active,
         variant: "danger",
         onClick: () => {

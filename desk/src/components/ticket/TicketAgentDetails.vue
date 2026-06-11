@@ -6,7 +6,7 @@
       class="flex items-center text-base leading-5"
     >
       <Tooltip :text="s.label">
-        <div class="w-[126px] text-sm text-gray-600">{{ s.label }}</div>
+        <div class="w-[126px] text-sm text-ink-gray-5">{{ s.label }}</div>
       </Tooltip>
       <div class="flex items-center justify-between">
         <div v-if="s.value">{{ s.value }}</div>
@@ -25,14 +25,13 @@
 </template>
 
 <script setup lang="ts">
-import { dayjs } from "@/dayjs";
 import {
   dateFormat,
   dateTooltipFormat,
   formatTime,
   getTimeInSeconds,
 } from "@/utils";
-import { Badge, Tooltip } from "frappe-ui";
+import { Badge, dayjs, Tooltip } from "frappe-ui";
 import { computed, onUnmounted, ref, watch } from "vue";
 
 const props = defineProps({

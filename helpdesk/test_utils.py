@@ -5,6 +5,7 @@ from frappe.core.doctype.communication.test_communication import create_email_ac
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
+from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.utils import is_frappe_version
 
 if is_frappe_version("16", above=True):
@@ -28,6 +29,8 @@ def before_tests():
     make_new_sla()
     make_test_objects("Email Domain", reset=True)
     create_email_account()
+    create_customer_field()
+    complete_erpnext_setup()
     frappe.db.commit()  # nosemgrep
 
 
@@ -319,11 +322,14 @@ def add_comment(
     return comment
 
 
-def make_team(team_name, members=[]):
-    """Create an HD Team with optional members."""
+def make_team(team_name, members=[], disabled=False):
+    """Create an HD Team with optional members. A default agent is created if no members are provided."""
+    if not members:
+        members = [make_agent("default_team_agent@example.com")]
+
     if frappe.db.exists("HD Team", team_name):
-        # Delete existing team members
         team = frappe.get_doc("HD Team", team_name)
+        team.disabled = disabled
         team.users = []
         for member in members:
             team.append("users", {"user": member})
@@ -339,5 +345,57 @@ def make_team(team_name, members=[]):
     )
     for member in members:
         team.append("users", {"user": member})
+    team.disabled = disabled
     team.insert(ignore_permissions=True)
     return team
+
+
+def complete_erpnext_setup():
+    """
+    Run the ERPNext setup wizard once, so fixtures like Warehouse Type
+    exist before test records (e.g. Company) are created.
+    """
+    if "erpnext" not in frappe.get_installed_apps():
+        return
+    if frappe.get_all("Company", limit=1):
+        return
+
+    from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
+
+    year = datetime.today().year
+    setup_complete(
+        {
+            "currency": "INR",
+            "full_name": "Test User",
+            "company_name": "_Test Company",
+            "timezone": "Asia/Kolkata",
+            "company_abbr": "_TC",
+            "industry": "Manufacturing",
+            "country": "India",
+            "fy_start_date": f"{year}-01-01",
+            "fy_end_date": f"{year}-12-31",
+            "language": "english",
+            "company_tagline": "Testing",
+            "email": "test@erpnext.com",
+            "password": "test",
+            "chart_of_accounts": "Standard",
+        }
+    )
+
+
+def upload_test_file(file_name: str) -> str:
+    """Upload an image from desk/src/assets/images/ as a standalone private File, returning its name."""
+    file_path = frappe.get_app_path(
+        "helpdesk", "..", "desk", "src", "assets", "images", file_name
+    )
+    with open(file_path, "rb") as f:
+        content = f.read()
+    file_doc = frappe.get_doc(
+        {
+            "doctype": "File",
+            "file_name": file_name,
+            "is_private": 1,
+            "content": content,
+        }
+    ).insert(ignore_permissions=True)
+    return file_doc.name

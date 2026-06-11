@@ -5,7 +5,7 @@
         class="flex items-center justify-between min-w-36"
         @click="togglePopover()"
         :class="targetClass"
-        icon-right="chevron-down"
+        icon-right="lucide-chevron-down"
       >
         <div class="w-full truncate">
           {{
@@ -16,7 +16,7 @@
     </template>
     <template #body="{ togglePopover }">
       <div
-        class="p-1 text-ink-gray-6 top-1 absolute w-[--reka-popper-anchor-width] bg-white shadow-2xl rounded"
+        class="p-1 text-ink-gray-6 top-1 absolute w-[--reka-popper-anchor-width] bg-surface-white shadow-2xl rounded"
         :class="bodyClass"
       >
         <div class="max-h-52 overflow-y-auto">
@@ -45,7 +45,7 @@
         <Button
           variant="ghost"
           :label="__('Reset')"
-          icon-left="refresh-ccw"
+          icon-left="lucide-refresh-ccw"
           class="w-full focus-visible:ring-0"
           @click="onReset(togglePopover)"
         />

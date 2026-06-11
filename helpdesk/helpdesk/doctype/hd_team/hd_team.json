@@ -11,16 +11,20 @@
   "assignment_rule",
   "users",
   "column_break_feto",
+  "disabled",
   "ignore_restrictions"
  ],
  "fields": [
   {
    "fieldname": "team_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Name",
+   "reqd": 1,
    "unique": 1
   },
   {
+   "depends_on": "eval:doc.assignment_rule",
    "fieldname": "assignment_rule",
    "fieldtype": "Link",
    "label": "Assignment Rule",
@@ -28,10 +32,11 @@
    "read_only": 1
   },
   {
-   "fieldname": "users",
-   "fieldtype": "Table MultiSelect",
-   "label": "Users",
-   "options": "HD Team Member"
+    "fieldname": "users",
+    "fieldtype": "Table MultiSelect",
+    "label": "Users",
+    "options": "HD Team Member",
+    "reqd": 1
   },
   {
    "default": "0",
@@ -44,11 +49,17 @@
    "fieldname": "column_break_feto",
    "fieldtype": "Column Break",
    "label": "Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-02 17:28:31.798544",
+ "modified": "2026-05-11 13:28:58.204342",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Team",

@@ -20,9 +20,11 @@
           :label="__('Preview')"
           size="sm"
           @click="onShowPreview()"
-          icon-left="eye"
+          icon-left="lucide-eye"
           :disabled="
-            Boolean(!content?.editor?.state?.doc?.textContent?.trim()?.length)
+            Boolean(
+              !savedReplyData.message?.replace(/<[^>]*>/g, '')?.trim()?.length
+            ) || isDirty
           "
         />
         <Button
@@ -43,7 +45,7 @@
     <template #content>
       <div
         v-if="getSavedReplyData.loading"
-        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
+        class="flex items-center justify-center absolute inset-x-0 top-5.5 bottom-0"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -68,19 +70,8 @@
               required
               class="w-full"
             >
-              <template #prefix>
-                <component
-                  :is="getScopeIcon(savedReplyData.scope)"
-                  class="size-4 text-ink-gray-9"
-                />
-              </template>
-              <template #label="{ option }">
-                <div class="flex gap-2 items-center cursor-pointer">
-                  <component :is="option.icon" class="size-4 text-ink-gray-9" />
-                  <span>
-                    {{ option.label }}
-                  </span>
-                </div>
+              <template #item-prefix="{ item }">
+                <component :is="item.icon" class="size-4 text-ink-gray-9" />
               </template>
             </Select>
             <FormLabel
@@ -110,24 +101,16 @@
             />
           </div>
           <PreviewDialog v-model="previewDialog" />
-          <TextEditor
-            editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5"
+          <CompactEditor
             ref="content"
-            :bubble-menu="false"
-            :content="savedReplyData.message"
-            @change="
-              (val) => {
-                savedReplyData.message = val;
-                validateData('message');
-              }
-            "
-            :fixed-menu="menuButtons"
+            v-model="savedReplyData.message"
             :extensions="[FieldAutocomplete]"
             :placeholder="
               __(
                 'Hello {{ contact }}, \n\nWe are sorry for the inconvenience, we will get back to you soon. \n\nRegards, \n{{ full_name }}'
               )
             "
+            @update:modelValue="validateData('message')"
           />
           <ErrorMessage class="text-p-sm" :message="errors.message" />
         </div>
@@ -155,15 +138,14 @@ import {
   LoadingIndicator,
   MultiSelect,
   Select,
-  TextEditor,
   toast,
 } from "frappe-ui";
 import { computed, inject, onUnmounted, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import { __ } from "@/translation";
 import PreviewDialog from "./components/PreviewDialog.vue";
-import { menuButtons } from "./savedReplies";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import CompactEditor from "@/components/CompactEditor.vue";
 import DocumentationButton from "@/components/DocumentationButton.vue";
 import { storeToRefs } from "pinia";
 import { useConfigStore } from "@/stores/config";
@@ -261,6 +243,9 @@ const getTeamsListResource = createListResource({
   doctype: "HD Team",
   auto: true,
   fields: ["name"],
+  filters: {
+    disabled: 0,
+  },
   start: 0,
   pageLength: 999,
   transform: (data: Array<Team>) => {
@@ -412,10 +397,6 @@ const updateSavedReply = async () => {
   toast.success(__("Saved reply updated successfully."));
 };
 
-const getScopeIcon = (scope: string) => {
-  return scopeDropdownOptions.value.find((x) => x.value === scope)?.icon;
-};
-
 const validateData = (key?: string) => {
   const validateField = (key: string) => {
     switch (key) {
@@ -428,7 +409,9 @@ const validateData = (key?: string) => {
         break;
 
       case "message":
-        if (!content.value?.editor?.state?.doc?.textContent?.trim()?.length) {
+        if (
+          !savedReplyData.value.message?.replace(/<[^>]*>/g, "")?.trim()?.length
+        ) {
           errors.value.message = __("Response is required");
         } else {
           errors.value.message = "";

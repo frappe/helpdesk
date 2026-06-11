@@ -8,10 +8,10 @@
   >
     <template #target="{ togglePopover }">
       <Button :label="'Sort'" @click="togglePopover()">
-        <template v-if="hideLabel">
+        <template v-if="hideLabel" #icon>
           <SortIcon class="h-4" />
         </template>
-        <template v-if="!hideLabel && !sortValues?.size" #prefix>
+        <template v-else-if="!sortValues?.size" #prefix>
           <SortIcon class="h-4" />
         </template>
       </Button>
@@ -20,10 +20,10 @@
   <NestedPopover v-else>
     <template #target="{ open }">
       <Button v-if="sortValues.size > 1" :label="'Sort'">
-        <template v-if="hideLabel">
+        <template v-if="hideLabel" #icon>
           <SortIcon class="h-4" />
         </template>
-        <template v-if="!hideLabel" #prefix><SortIcon class="h-4" /></template>
+        <template v-else #prefix><SortIcon class="h-4" /></template>
         <template v-if="sortValues?.size" #suffix>
           <div
             class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-white pt-px text-xs font-medium text-ink-gray-8 shadow-sm"
@@ -60,14 +60,16 @@
           <template v-if="sortValues?.size" #suffix>
             <FeatherIcon
               :name="open ? 'chevron-up' : 'chevron-down'"
-              class="h-4 text-gray-600"
+              class="h-4 text-ink-gray-5"
             />
           </template>
         </Button>
       </div>
     </template>
     <template #body="{ close }">
-      <div class="my-2 rounded-lg border border-gray-100 bg-white shadow-xl">
+      <div
+        class="my-2 rounded-lg border border-outline-gray-1 bg-surface-white shadow-xl"
+      >
         <div class="min-w-60 p-2">
           <div
             v-if="sortValues?.size"
@@ -80,7 +82,7 @@
               class="flex items-center gap-1"
             >
               <div class="handle flex h-7 w-7 items-center justify-center">
-                <DragIcon class="h-4 w-4 cursor-grab text-gray-600" />
+                <DragIcon class="h-4 w-4 cursor-grab text-ink-gray-5" />
               </div>
               <div class="flex">
                 <Button
@@ -107,7 +109,7 @@
                     #target="{ togglePopover, selectedValue, displayValue }"
                   >
                     <Button
-                      class="flex w-full items-center justify-between rounded-l-none !text-gray-600 text-xs"
+                      class="flex w-full items-center justify-between rounded-l-none !text-ink-gray-5 text-xs"
                       size="md"
                       @click="togglePopover()"
                     >
@@ -115,19 +117,19 @@
                       <template #suffix>
                         <FeatherIcon
                           name="chevron-down"
-                          class="h-4 text-gray-600"
+                          class="h-4 text-ink-gray-5"
                         />
                       </template>
                     </Button>
                   </template>
                 </Autocomplete>
               </div>
-              <Button variant="ghost" icon="x" @click="removeSort(i)" />
+              <Button variant="ghost" icon="lucide-x" @click="removeSort(i)" />
             </div>
           </div>
           <div
             v-else
-            class="mb-3 flex h-7 items-center px-3 text-sm text-gray-600"
+            class="mb-3 flex h-7 items-center px-3 text-sm text-ink-gray-5"
           >
             {{ "Empty - Choose a field to sort by" }}
           </div>
@@ -140,7 +142,7 @@
             >
               <template #target="{ togglePopover }">
                 <Button
-                  class="!text-gray-600"
+                  class="!text-ink-gray-5"
                   variant="ghost"
                   @click="togglePopover()"
                   :label="'Add Sort'"
@@ -153,7 +155,7 @@
             </Autocomplete>
             <Button
               v-if="sortValues?.size"
-              class="!text-gray-600"
+              class="!text-ink-gray-5"
               variant="ghost"
               :label="'Clear Sort'"
               @click="clearSort(close)"

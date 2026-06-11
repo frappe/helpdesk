@@ -20,7 +20,7 @@
           <div>
             <Button
               class="rounded-l-none border-l"
-              icon="x"
+              icon="lucide-x"
               @click.stop="clearfilter(close)"
             />
           </div>
@@ -28,7 +28,9 @@
       </div>
     </template>
     <template #body="{ close }">
-      <div class="my-2 rounded-lg border border-gray-100 bg-white shadow-xl">
+      <div
+        class="my-2 rounded-lg border border-outline-gray-1 bg-surface-white shadow-xl"
+      >
         <div class="min-w-72 p-2 sm:min-w-[400px]">
           <div
             v-if="filters?.size"
@@ -39,13 +41,13 @@
           >
             <div v-if="isMobileView" class="flex flex-col gap-2">
               <div class="-mb-2 flex w-full items-center justify-between">
-                <div class="text-base text-gray-600">
+                <div class="text-base text-ink-gray-5">
                   {{ i == 0 ? "Where" : "And" }}
                 </div>
                 <Button
                   class="flex"
                   variant="ghost"
-                  icon="x"
+                  icon="lucide-x"
                   @click="removeFilter(i)"
                 />
               </div>
@@ -72,13 +74,13 @@
                   :model-value="f.value"
                   @update:modelValue="(v) => updateValue(v, f)"
                   @change="(v) => updateValue(v, f)"
-                  :placeholder="'John Doe'"
+                  :placeholder="getValuePlaceholder(f)"
                 />
               </div>
             </div>
             <div v-else class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2 flex-1">
-                <div class="w-13 pl-2 text-end text-base text-gray-600">
+                <div class="w-13 pl-2 text-end text-base text-ink-gray-5">
                   {{ i == 0 ? "Where" : "And" }}
                 </div>
                 <div id="fieldname" class="!min-w-[140px]">
@@ -107,21 +109,21 @@
                     :model-value="f.value"
                     @change="(v) => updateValue(v, f)"
                     @update:modelValue="(v) => updateValue(v, f)"
-                    :placeholder="'John Doe'"
+                    :placeholder="getValuePlaceholder(f)"
                   />
                 </div>
               </div>
               <Button
                 class="flex"
                 variant="ghost"
-                icon="x"
+                icon="lucide-x"
                 @click="removeFilter(i)"
               />
             </div>
           </div>
           <div
             v-else
-            class="mb-3 flex h-7 items-center px-3 text-sm text-gray-600"
+            class="mb-3 flex h-7 items-center px-3 text-sm text-ink-gray-5"
           >
             {{ "Empty - Choose a field to filter by" }}
           </div>
@@ -133,7 +135,7 @@
             >
               <template #target="{ togglePopover }">
                 <Button
-                  class="!text-gray-600"
+                  class="!text-ink-gray-5"
                   variant="ghost"
                   @click="togglePopover()"
                   :label="'Add Filter'"
@@ -146,7 +148,7 @@
             </Autocomplete>
             <Button
               v-if="filters?.size"
-              class="!text-gray-600"
+              class="!text-ink-gray-5"
               variant="ghost"
               :label="'Clear all Filter'"
               @click="clearfilter(close)"
@@ -161,6 +163,7 @@
 import { Link, StarRating } from "@/components";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { useScreenSize } from "@/composables/screen";
+import { useDebounceFn } from "@vueuse/core";
 import {
   Autocomplete,
   Button,
@@ -174,7 +177,6 @@ import {
   Tooltip,
 } from "frappe-ui";
 import { computed, h, inject } from "vue";
-import { useDebounceFn } from "@vueuse/core";
 
 const props = defineProps({
   default_filters: {
@@ -400,6 +402,27 @@ function getValueControl(f) {
   } else {
     return h(FormControl, { type: "text" });
   }
+}
+
+function getValuePlaceholder(f) {
+  const { field, operator } = f;
+  const { fieldtype } = field;
+  const isNumber = typeNumber.includes(fieldtype);
+  if (operator === "between") return __("01/01/2022 to 01/31/2022");
+  if (operator === "in" || operator === "not in") {
+    return isNumber ? __("100, 200, 300") : __("John, Jane, Doe");
+  }
+  if (operator === "like" || operator === "not like") {
+    return isNumber ? __("%100%") : __("%John%");
+  }
+  if (operator === "is" || operator === "is not") return __("Set");
+  if (operator === "timespan") return __("Last Week");
+  if (isNumber) return __("1000");
+  if (typeDate.includes(fieldtype)) return __("01/01/2022");
+  if (typeCheck.includes(fieldtype)) return __("Yes");
+  if (typeLink.includes(fieldtype)) return __("Select a Value");
+  if (typeSelect.includes(fieldtype)) return __("Select an Option");
+  return __("John Doe");
 }
 
 function getDefaultValue(field) {
@@ -645,3 +668,9 @@ const debouncedApply = useDebounceFn(() => {
   apply();
 }, 500);
 </script>
+<style>
+& #operator button,
+& #value button {
+  width: 100%;
+}
+</style>

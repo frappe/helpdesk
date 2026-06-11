@@ -8,7 +8,9 @@
           ref="sendEmailRef"
           variant="ghost"
           label="Reply"
-          :class="[showEmailBox ? '!bg-gray-300 hover:!bg-gray-200' : '']"
+          :class="[
+            showEmailBox ? '!bg-surface-gray-4 hover:!bg-surface-gray-3' : '',
+          ]"
           @click="toggleEmailBox()"
         >
           <template #prefix>
@@ -18,7 +20,9 @@
         <Button
           variant="ghost"
           label="Comment"
-          :class="[showCommentBox ? '!bg-gray-300 hover:!bg-gray-200' : '']"
+          :class="[
+            showCommentBox ? '!bg-surface-gray-4 hover:!bg-surface-gray-3' : '',
+          ]"
           @click="toggleCommentBox()"
         >
           <template #prefix>
@@ -42,7 +46,6 @@
             :label="
               isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
             "
-            v-model:content="content"
             placeholder="Hi John, we are looking into this issue."
             :ticketId="ticketId"
             :to-emails="toEmails"
@@ -236,6 +239,7 @@ onClickOutside(
       ".tippy-content",
       ".PopoverContent",
       '[role="dialog"]',
+      ".dialog-overlay",
     ],
   }
 );
@@ -248,7 +252,13 @@ onClickOutside(
     }
   },
   {
-    ignore: [".tippy-box", ".tippy-content", ".PopoverContent"],
+    ignore: [
+      ".tippy-box",
+      ".tippy-content",
+      ".PopoverContent",
+      '[role="dialog"]',
+      ".dialog-overlay",
+    ],
   }
 );
 </script>

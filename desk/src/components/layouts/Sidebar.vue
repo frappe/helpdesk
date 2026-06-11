@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-e border-outline-gray-modals bg-surface-menu-bar text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
@@ -18,7 +18,7 @@
       class="mt-1.5"
     >
       <template #right>
-        <span class="flex items-center gap-0.5 font-medium text-gray-600">
+        <span class="flex items-center gap-0.5 font-medium text-ink-gray-5">
           <component :is="device.modifierIcon" class="h-3 w-3" />
           <span>K</span>
         </span>
@@ -188,7 +188,7 @@ import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
-import { call, toast } from "frappe-ui";
+import { call, toast, useTheme } from "frappe-ui";
 import {
   GettingStartedBanner,
   HelpModal,
@@ -216,6 +216,8 @@ import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
+import LucideMoon from "~icons/lucide/moon";
+import LucideSun from "~icons/lucide/sun";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
@@ -231,6 +233,7 @@ import {
 } from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
+const isRtl = document.documentElement.dir === "rtl";
 
 const route = useRoute();
 const router = useRouter();
@@ -245,6 +248,13 @@ const showShortcutsModal = ref(false);
 const showCommandPalette = ref(false);
 
 const { pinnedViews, publicViews } = useView();
+const { currentTheme, toggleTheme } = useTheme();
+
+const themeMenuItem = computed(() => ({
+  label: __("Toggle theme"),
+  icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
+  onClick: () => toggleTheme(),
+}));
 
 const isFCSite = ref(window.is_fc_site);
 
@@ -317,10 +327,17 @@ function parseViews(views) {
 }
 
 const customerPortalDropdown = computed(() => [
+  themeMenuItem.value,
   {
-    label: __("Log out"),
-    icon: "log-out",
-    onClick: () => authStore.logout(),
+    group: __("Danger"),
+    hideLabel: true,
+    items: [
+      {
+        label: __("Log out"),
+        icon: "lucide-log-out",
+        onClick: () => authStore.logout(),
+      },
+    ],
   },
 ]);
 
@@ -330,19 +347,19 @@ const agentPortalDropdown = computed(() => [
   },
   {
     label: __("Customer portal"),
-    icon: "users",
+    icon: "lucide-users",
     onClick: () => {
       const path = router.resolve({ name: "TicketsCustomer" });
       window.open(path.href);
     },
   },
   {
-    icon: "life-buoy",
+    icon: "lucide-life-buoy",
     label: __("Support"),
     onClick: () => window.open("https://t.me/frappedesk"),
   },
   {
-    icon: "book-open",
+    icon: "lucide-book-open",
     label: __("Docs"),
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
@@ -357,9 +374,10 @@ const agentPortalDropdown = computed(() => [
     icon: h(LucideKeyboard),
     onClick: () => (showShortcutsModal.value = true),
   },
+  themeMenuItem.value,
   {
     label: __("Settings"),
-    icon: "settings",
+    icon: "lucide-settings",
     onClick: () => (showSettingsModal.value = true),
   },
   {
@@ -368,7 +386,7 @@ const agentPortalDropdown = computed(() => [
     items: [
       {
         label: __("Log out"),
-        icon: "log-out",
+        icon: "lucide-log-out",
         onClick: () => authStore.logout(),
       },
     ],
@@ -550,7 +568,7 @@ const articles = ref([
     ],
   },
   {
-    title: "Getting Started",
+    title: __("Getting Started"),
     opened: false,
     subArticles: [
       {
@@ -580,23 +598,23 @@ const articles = ref([
     ],
   },
   {
-    title: "Masters",
+    title: __("Masters"),
     opened: false,
     subArticles: [
-      { name: "ticket", title: "Ticket" },
-      { name: "agent", title: "Agent" },
-      { name: "team", title: "Team" },
-      { name: "contact", title: "Contact" },
-      { name: "customer", title: "Customer" },
-      { name: "knowledge-base", title: "Knowledge Base" },
-      { name: "saved-replies", title: "Saved Replies" },
-      { name: "service-level-agreement", title: "Service Level Agreement" },
-      { name: "ticket-type", title: "Ticket Type" },
-      { name: "ticket-priority", title: "Ticket Priority" },
+      { name: "ticket", title: __("Ticket") },
+      { name: "agent", title: __("Agent") },
+      { name: "team", title: __("Team") },
+      { name: "contact", title: __("Contact") },
+      { name: "customer", title: __("Customer") },
+      { name: "knowledge-base", title: __("Knowledge Base") },
+      { name: "saved-replies", title: __("Saved Replies") },
+      { name: "service-level-agreement", title: __("Service Level Agreement") },
+      { name: "ticket-type", title: __("Ticket Type") },
+      { name: "ticket-priority", title: __("Ticket Priority") },
     ],
   },
   {
-    title: "Customizations",
+    title: __("Customizations"),
     opened: false,
     subArticles: [
       { name: "custom-actions", title: "Custom Actions" },
@@ -629,7 +647,9 @@ async function handleFirstTicketNavigation() {
   if (!ticket) {
     router.push({ name: "TicketAgentNew" });
     updateOnboardingStep("create_first_ticket", false); // reset the step as first ticket is not created
-    toast.error("Please create a new ticket to proceed with the next step.");
+    toast.error(
+      __("Please create a new ticket to proceed with the next step.")
+    );
     return;
   }
 

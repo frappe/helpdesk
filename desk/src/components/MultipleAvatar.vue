@@ -21,7 +21,7 @@
       :text="avatar.name"
     >
       <Avatar
-        class="user-avatar -mr-1.5 ring-2 ring-white transition hover:z-10 hover:scale-110"
+        class="user-avatar -mr-1.5 ring-2 ring-[var(--surface-white)] transition hover:z-10 hover:scale-110"
         shape="circle"
         :image="avatar.image"
         :label="avatar.label"

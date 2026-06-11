@@ -145,8 +145,20 @@ import {
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
+
+import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
+
+interface Props {
+  hideLabel?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  hideLabel: false,
+});
+
+const { hideLabel } = props;
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
@@ -475,6 +487,6 @@ async function saveAssignees(added: string[], removed: string[]) {
 }
 
 useShortcut("a", () => {
-  (triggerRef.value?.$el as HTMLElement)?.nextElementSibling?.click();
+  (triggerRef.value?.$el as HTMLElement)?.click();
 });
 </script>

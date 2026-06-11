@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="holidayList.list.loading && !holidayList.list.data"
-    class="flex items-center justify-center mt-12"
+    class="flex items-center justify-center absolute inset-x-0 top-5.5 bottom-0"
   >
     <LoadingIndicator class="w-4" />
   </div>
@@ -25,7 +25,7 @@
       </div>
     </div>
     <div v-else>
-      <div class="flex text-sm text-gray-600">
+      <div class="flex text-sm text-ink-gray-5">
         <div class="ml-2">{{ __("Schedule name") }}</div>
       </div>
       <hr class="mx-2 mt-2" />

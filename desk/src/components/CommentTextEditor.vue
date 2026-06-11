@@ -5,7 +5,7 @@
     :editor-class="[
       'prose-sm max-w-none',
       editable &&
-        'min-h-[7rem]  mx-5 max-h-[50vh] overflow-y-auto border-t py-3',
+        'min-h-[7rem]  mx-5 max-h-[44vh] overflow-y-auto border-t py-3',
       getFontFamily(newComment),
     ]"
     :content="newComment"
@@ -18,56 +18,54 @@
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
     <template #bottom>
+      <!-- Attachments -->
+      <div class="flex flex-wrap gap-2 my-2 ml-5">
+        <AttachmentItem
+          v-for="a in attachments"
+          :key="a.file_url"
+          :label="a.file_name"
+          :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
+        >
+          <template #suffix>
+            <FeatherIcon
+              class="h-3.5"
+              name="x"
+              @click.stop="removeAttachment(a)"
+            />
+          </template>
+        </AttachmentItem>
+      </div>
       <div v-if="editable" class="flex flex-col gap-2 border-t">
-        <div class="px-5">
-          <!-- Attachments -->
-          <div class="flex flex-wrap gap-2">
-            <AttachmentItem
-              v-for="a in attachments"
-              :key="a.file_url"
-              :label="a.file_name"
-              :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
-            >
-              <template #suffix>
-                <FeatherIcon
-                  class="h-3.5"
-                  name="x"
-                  @click.stop="removeAttachment(a)"
-                />
-              </template>
-            </AttachmentItem>
-          </div>
+        <div class="px-4">
           <!-- Fixed Menu -->
           <div class="flex justify-between overflow-hidden py-2.5">
             <div class="flex items-center overflow-x-auto w-[60%]">
-              <FileUploader
-                :upload-args="{
-                  doctype: doctype,
-                  docname: ticketId,
-                  private: true,
-                }"
-                @success="(f) => attachments.push(f)"
-              >
-                <template #default="{ openFileSelector, uploading }">
-                  {{ void (loading = uploading) }}
-                  <Button
-                    theme="gray"
-                    variant="ghost"
-                    @click="openFileSelector()"
-                  >
-                    <template #icon>
+              <div class="inline-flex items-center gap-1.5 p-1">
+                <FileUploader
+                  :upload-args="{
+                    doctype: doctype,
+                    docname: ticketId,
+                    private: true,
+                  }"
+                  @success="(f) => attachments.push(f)"
+                >
+                  <template #default="{ openFileSelector, uploading }">
+                    {{ void (loading = uploading) }}
+                    <button
+                      class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
+                      @click="openFileSelector()"
+                      :disabled="uploading"
+                    >
                       <AttachmentIcon
-                        class="h-4"
-                        style="color: #000000; stroke-width: 1.5 !important"
+                        class="h-4 w-4"
+                        style="stroke-width: 1.5 !important"
                       />
-                    </template>
-                  </Button>
-                </template>
-              </FileUploader>
-              <TextEditorFixedMenu
-                class="-ml-0.5"
-                :buttons="textEditorMenuButtons"
-              />
+                    </button>
+                  </template>
+                </FileUploader>
+                <div class="h-4 w-[2px] border-l" />
+              </div>
+              <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
             </div>
             <div class="flex items-center justify-end space-x-2 w-[40%]">
               <Button
@@ -116,9 +114,9 @@ import { useTyping } from "@/composables/realtime";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import {
+  CleanStyles,
   ComponentUtils,
   HandleExcelPaste,
-  CleanStyles,
 } from "@/tiptap-extensions";
 import {
   getFontFamily,
@@ -234,6 +232,12 @@ onMounted(() => {
     return;
   }
   agentsList.value.fetch();
+});
+
+onBeforeUnmount(() => {
+  if (isContentEmpty(newComment.value)) {
+    localStorage.removeItem("commentBoxContent" + props.ticketId);
+  }
 });
 
 defineExpose({

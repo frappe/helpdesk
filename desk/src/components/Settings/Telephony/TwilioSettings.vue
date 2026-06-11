@@ -86,7 +86,7 @@
                   theme="gray"
                   variant="subtle"
                   class="w-full"
-                  icon-left="refresh-cw"
+                  icon-left="lucide-refresh-cw"
                   @click="refreshApps(togglePopover)"
                   :loading="twilioAppsResource.loading"
                 />

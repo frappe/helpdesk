@@ -42,7 +42,7 @@
           </template>
           <template #body="{ togglePopover }">
             <div
-              class="p-1 text-ink-gray-7 mt-1 bg-white shadow-xl rounded w-[--reka-popper-anchor-width]"
+              class="p-1 text-ink-gray-7 mt-1 bg-surface-white shadow-xl rounded w-[--reka-popper-anchor-width]"
             >
               <div
                 v-for="option in ticketRoutingOptions"
@@ -97,12 +97,16 @@
           :placement="'top'"
         >
           <div
-            class="text-xs rounded-full select-none bg-blue-600 text-white p-0.5 px-2"
+            class="text-xs rounded-full select-none bg-surface-blue-3 text-ink-white p-0.5 px-2"
           >
             {{ __("Last") }}
           </div>
         </Tooltip>
-        <Button variant="ghost" icon="x" @click="removeAssignedUser(user)" />
+        <Button
+          variant="ghost"
+          icon="lucide-x"
+          @click="removeAssignedUser(user)"
+        />
       </div>
     </div>
     <ErrorMessage :message="assignmentRulesErrors.users" />

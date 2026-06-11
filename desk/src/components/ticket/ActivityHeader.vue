@@ -2,7 +2,7 @@
   <div
     class="md:mx-5 md:my-4 flex items-center justify-between text-lg font-medium mx-6 !mb-0 !my-3"
   >
-    <div class="flex h-8 items-center text-xl font-semibold text-gray-800">
+    <div class="flex h-8 items-center text-xl font-semibold text-ink-gray-8">
       {{ title }}
     </div>
     <Dropdown
@@ -29,7 +29,7 @@
   </div>
   <CallLogModal
     v-model="showCallLogModal"
-    :ticketId="ticketId"
+    :ticketId="ticket.value?.name"
     @after-insert="refreshTicket"
   />
 </template>
@@ -38,6 +38,7 @@
 import { PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
 import { __ } from "@/translation";
+import { TicketSymbol } from "@/types";
 import { Dropdown } from "frappe-ui";
 import { computed, h, inject, ref } from "vue";
 defineProps({
@@ -50,7 +51,7 @@ defineProps({
 const makeCall = inject<() => void>("makeCall");
 const refreshTicket = inject<() => void>("refreshTicket");
 const showCallLogModal = ref(false);
-const ticketId = inject<string>("ticketId");
+const ticket = inject(TicketSymbol)!;
 
 const callActions = computed(() => {
   let actions = [
@@ -60,7 +61,7 @@ const callActions = computed(() => {
       onClick: () => makeCall(),
     },
     {
-      icon: "edit-3",
+      icon: "lucide-edit-3",
       label: __("Log a Call"),
       onClick: () => {
         showCallLogModal.value = true;

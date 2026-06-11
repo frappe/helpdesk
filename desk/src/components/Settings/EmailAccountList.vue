@@ -13,7 +13,7 @@
         theme="gray"
         variant="solid"
         @click="emit('update:step', 'email-add')"
-        icon-left="plus"
+        icon-left="lucide-plus"
       />
     </template>
     <template #content>
@@ -22,7 +22,7 @@
         class="-ml-2 grow"
         v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
       >
-        <div class="flex text-sm text-gray-600">
+        <div class="flex text-sm text-ink-gray-5">
           <div class="ml-2">{{ __("Email account name") }}</div>
         </div>
         <hr class="mx-2 mt-2" />
@@ -42,8 +42,8 @@
         v-else
         variant="badge"
         :icon="EmailIcon"
-        title="No email account found"
-        description="Add one to get started."
+        :title="__('No email account found')"
+        :description="__('Add one to get started.')"
       />
     </template>
   </SettingsLayoutBase>

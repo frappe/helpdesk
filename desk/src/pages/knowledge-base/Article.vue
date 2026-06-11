@@ -3,7 +3,7 @@
     <LayoutHeader>
       <template #left-header>
         <div class="flex gap-2 items-center crumbs max-w-[50vw]">
-          <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
+          <Breadcrumbs :items="breadcrumbs" class="-ms-0.5 truncate" />
           <Badge
             v-if="!article.loading"
             variant="subtle"
@@ -20,7 +20,7 @@
             :label="
               article.data?.status === 'Draft' ? __('Publish') : __('Unpublish')
             "
-            :iconLeft="article.data?.status !== 'Published' && 'globe'"
+            :iconLeft="article.data?.status !== 'Published' && 'lucide-globe'"
             @click="toggleStatus()"
           />
         </div>
@@ -43,7 +43,7 @@
             <div class="w-full">
               <textarea
                 ref="titleRef"
-                class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+                class="w-full resize-none border-0 text-3xl bg-transparent font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
                 v-model="title"
                 :placeholder="__('Title')"
                 rows="1"
@@ -67,7 +67,7 @@
                     <p class="truncate capitalize text-base text-ink-gray-7">
                       {{ article.data.author.name }}
                     </p>
-                    <IconDot class="h-4 w-4 text-gray-600" />
+                    <IconDot class="h-4 w-4 text-ink-gray-5" />
                     <div class="text-base text-ink-gray-7">
                       {{
                         dayjsLocal(article.data.modified).format(
@@ -80,7 +80,7 @@
               </div>
               <div
                 v-if="!editable && !isCustomerPortal && !isMobileView"
-                class="text-p-sm text-gray-500 items-center"
+                class="text-p-sm text-ink-gray-4 items-center"
               >
                 <span>{{ views }} views</span>
               </div>
@@ -193,23 +193,23 @@
               <p
                 class="truncate capitalize text-p-base text-ink-gray-9 font-medium"
               >
-                <span class="text-base text-gray-600">published by </span>
+                <span class="text-base text-ink-gray-5">published by </span>
                 {{ article.data.author.name }}
               </p>
               <div class="flex items-center gap-1">
-                <span class="text-p-xs text-gray-700">
+                <span class="text-p-xs text-ink-gray-7">
                   {{
                     dayjsLocal(article.data.modified).format("MMM D, h:mm A")
                   }}
                 </span>
                 <IconDot
                   v-if="!editable && !isCustomerPortal && isMobileView"
-                  class="h-4 w-4 text-gray-600"
+                  class="h-4 w-4 text-ink-gray-5"
                 />
 
                 <span
                   v-if="!editable && !isCustomerPortal && isMobileView"
-                  class="text-p-xs text-gray-500 items-center"
+                  class="text-p-xs text-ink-gray-4 items-center"
                   >{{ views }} views</span
                 >
               </div>
@@ -249,7 +249,6 @@ import LayoutHeader from "@/components/LayoutHeader.vue";
 import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
-import { dayjs } from "@/dayjs";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import {
@@ -281,6 +280,7 @@ import {
   TextEditorFixedMenu,
   toast,
   Badge,
+  dayjs,
   dayjsLocal,
   LoadingIndicator,
   usePageMeta,
@@ -622,7 +622,7 @@ const isConfirmingDeleteArticle = ref(false);
 const articleActions = computed(() => [
   {
     label: __("Edit"),
-    icon: "edit",
+    icon: "lucide-edit",
     onClick: () => {
       handleEditMode();
     },
@@ -632,20 +632,20 @@ const articleActions = computed(() => [
     ? [
         {
           label: __("Move To"),
-          icon: "corner-up-right",
+          icon: "lucide-corner-up-right",
           onClick: () => (moveToModal.value = true),
         },
       ]
     : [
         {
           label: __("Add Category"),
-          icon: "folder-plus",
+          icon: "lucide-folder-plus",
           onClick: () => (showCategoryModal.value = true),
         },
       ]),
   {
     label: __("Share"),
-    icon: "link",
+    icon: "lucide-link",
     onClick: () => {
       const url = new URL(window.location.href);
       url.pathname = `/helpdesk/kb-public/articles/${props.articleId}`;

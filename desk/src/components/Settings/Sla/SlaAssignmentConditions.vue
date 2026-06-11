@@ -7,7 +7,7 @@
   />
   <div
     v-if="props.conditions.length == 0"
-    class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-gray-300 text-gray-600 rounded-md"
+    class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-outline-gray-2 text-ink-gray-5 rounded-md"
     @click="props.conditions.push(['', '', ''])"
   >
     <FeatherIcon name="plus" class="h-4" />
@@ -21,7 +21,7 @@
     >
       <Button
         :disabled="slaDataErrors.condition != ''"
-        :icon-right="open ? 'chevron-up' : 'chevron-down'"
+        :icon-right="open ? 'lucide-chevron-up' : 'lucide-chevron-down'"
         :label="__('Add condition')"
       />
     </Dropdown>

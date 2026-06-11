@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md border p-1 border-gray-300 text-sm">
+  <div class="rounded-md border p-1 border-outline-gray-2 text-sm">
     <div
       class="grid p-2 items-center"
       :style="{
@@ -10,7 +10,7 @@
       <div
         v-for="column in columns"
         :key="column.key"
-        class="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis"
+        class="text-ink-gray-5 overflow-hidden whitespace-nowrap text-ellipsis"
       >
         {{ column.label }}
       </div>
@@ -34,7 +34,7 @@
         <div class="flex justify-end">
           <Dropdown placement="right" :options="dropdownOptions(holiday)">
             <Button
-              icon="more-horizontal"
+              icon="lucide-more-horizontal"
               variant="ghost"
               @click="isConfirmingDelete = false"
             />
@@ -43,7 +43,7 @@
       </div>
       <hr class="my-0.5" v-if="index !== holidays.length - 1" />
     </div>
-    <div v-if="holidays?.length === 0" class="text-center p-4 text-gray-600">
+    <div v-if="holidays?.length === 0" class="text-center p-4 text-ink-gray-5">
       No items in the list
     </div>
   </div>
@@ -52,20 +52,20 @@
     @click="addHoliday"
     class="mt-2.5"
     label="Add Recurring Holiday"
-    icon-left="plus"
+    icon-left="lucide-plus"
   />
   <Dialog
-    v-model="dialog"
-    :options="{
-      size: 'md',
-      title: recurringHolidayData.isEditing
+    v-model:open="dialog"
+    size="md"
+    :title="
+      recurringHolidayData.isEditing
         ? 'Edit Recurring Holiday'
-        : 'Add Recurring Holiday',
-    }"
+        : 'Add Recurring Holiday'
+    "
   >
-    <template #body-content>
+    <template #default>
       <div v-if="!props.holidayData.from_date || !props.holidayData.to_date">
-        <div class="text-center p-4 text-gray-600">
+        <div class="text-center p-4 text-ink-gray-5">
           Please select start and end date first
         </div>
       </div>
@@ -129,7 +129,9 @@
         :label="
           recurringHolidayData.isEditing ? 'Update Holiday' : 'Add Holiday'
         "
-        :icon-left="recurringHolidayData.isEditing ? 'edit-2' : 'plus'"
+        :icon-left="
+          recurringHolidayData.isEditing ? 'lucide-edit-2' : 'lucide-plus'
+        "
       />
     </template>
   </Dialog>
@@ -138,10 +140,9 @@
 <script setup lang="ts">
 import { updateWeeklyOffDates } from "@/stores/holidayList";
 import { ConfirmDelete } from "@/utils";
-import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import weekday from "dayjs/plugin/weekday";
-import { Checkbox, Dropdown, FormLabel, Select, toast } from "frappe-ui";
+import { Checkbox, dayjs, Dropdown, FormLabel, Select, toast } from "frappe-ui";
 import { computed, ref } from "vue";
 import { getRepetitionText } from "./utils";
 
@@ -222,7 +223,7 @@ const dropdownOptions = (holiday: any) => [
   {
     label: "Edit",
     onClick: () => editHoliday(holiday),
-    icon: "edit",
+    icon: "lucide-edit",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteHoliday(holiday),

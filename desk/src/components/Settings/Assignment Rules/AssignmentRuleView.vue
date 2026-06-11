@@ -41,7 +41,7 @@
     <template #content>
       <div
         v-if="getAssignmentRuleData.loading"
-        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
+        class="flex items-center justify-center absolute inset-x-0 top-5.5 bottom-0"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -84,12 +84,12 @@
               </template>
               <template #body="{ togglePopover }">
                 <div
-                  class="p-1 text-ink-gray-6 top-1 absolute bg-white shadow-2xl rounded w-[--reka-popper-anchor-width]"
+                  class="p-1 text-ink-gray-6 top-1 absolute bg-surface-white shadow-2xl rounded w-[--reka-popper-anchor-width]"
                 >
                   <div
                     v-for="option in priorityOptions"
                     :key="option.value"
-                    class="p-2 cursor-pointer hover:bg-gray-50 text-base flex items-center justify-between rounded"
+                    class="p-2 cursor-pointer hover:bg-surface-menu-bar text-base flex items-center justify-between rounded"
                     @click="
                       assignmentRuleData.priority = option.value;
                       togglePopover();
@@ -158,7 +158,7 @@
                   </template>
                   <template #body-main>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ assignmentRuleData.assignCondition }}</code>
                     </div>
@@ -169,7 +169,7 @@
           </div>
           <div class="mt-5">
             <div
-              class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
+              class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-2 rounded-md p-3 py-4"
               v-if="
                 !useNewUIForAssignCondition &&
                 assignmentRuleData.assignCondition
@@ -239,7 +239,7 @@
                   </template>
                   <template #body-main>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ assignmentRuleData.unassignCondition }}</code>
                     </div>
@@ -250,7 +250,7 @@
           </div>
           <div class="mt-5">
             <div
-              class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
+              class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-2 rounded-md p-3 py-4"
               v-if="
                 !useNewUIForUnassignCondition &&
                 assignmentRuleData.unassignCondition

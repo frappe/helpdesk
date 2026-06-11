@@ -45,7 +45,7 @@
                 </Tooltip>
                 <div
                   v-if="uploading"
-                  class="w-full h-full top-0 left-0 absolute bg-black bg-opacity-20 rounded-full flex items-center justify-center"
+                  class="w-full h-full top-0 left-0 absolute bg-surface-gray-7 bg-opacity-20 rounded-full flex items-center justify-center"
                 >
                   <LoadingIndicator class="size-4" />
                 </div>
@@ -75,7 +75,7 @@
                     />
                     <Button
                       variant="outline"
-                      icon="check"
+                      icon="lucide-check"
                       :loading="user?.save?.loading"
                       :disabled="user?.save?.loading"
                       @click="isNameDirty ? save() : (editName = false)"
@@ -138,7 +138,7 @@
           }}</span>
         </div>
         <Button
-          icon-left="lock"
+          icon-left="lucide-lock"
           :label="__('Change Password')"
           @click="showChangePasswordModal = true"
         />

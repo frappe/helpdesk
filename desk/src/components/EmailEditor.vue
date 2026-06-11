@@ -31,7 +31,7 @@
         />
       </div>
       <div class="mx-6 md:mx-5 flex items-center gap-2 border-y py-2.5">
-        <span class="text-p-xs text-gray-500">{{ __("To") }}:</span>
+        <span class="text-p-xs text-ink-gray-4">{{ __("To") }}:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
           class="flex-1"
@@ -63,10 +63,10 @@
       </div>
       <div
         v-if="showCC || cc"
-        class="mx-10 flex items-center gap-2 py-2.5"
+        class="mx-5 flex items-center gap-2 py-2.5"
         :class="cc || showCC ? 'border-b' : ''"
       >
-        <span class="text-xs text-gray-500">{{ __("Cc:") }}</span>
+        <span class="text-xs text-ink-gray-4">{{ __("Cc:") }}</span>
         <MultiSelectInput
           ref="ccInput"
           v-model="ccEmailsClone"
@@ -77,10 +77,10 @@
       </div>
       <div
         v-if="showBCC || bcc"
-        class="mx-10 flex items-center gap-2 py-2.5"
+        class="mx-5 flex items-center gap-2 py-2.5"
         :class="bcc || showBCC ? 'border-b' : ''"
       >
-        <span class="text-xs text-gray-500">{{ __("Bcc:") }}</span>
+        <span class="text-xs text-ink-gray-4">{{ __("Bcc:") }}</span>
         <MultiSelectInput
           ref="bccInput"
           v-model="bccEmailsClone"
@@ -110,7 +110,7 @@
           <div
             ref="quotedContentRef"
             contenteditable="true"
-            class="prose !max-w-full mx-1 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
+            class="prose !max-w-full mx-1 my-2 border-s-4 border-outline-gray-2 ps-4 text-sm focus:outline-none"
             @input="onQuotedInput"
           />
         </div>
@@ -118,7 +118,7 @@
     </template>
     <template #bottom>
       <!-- Attachments -->
-      <div class="flex flex-wrap gap-2 px-10">
+      <div class="flex flex-wrap gap-2 px-5 my-2">
         <AttachmentItem
           v-for="a in attachments"
           :key="a.file_url"
@@ -136,10 +136,10 @@
       </div>
       <!-- TextEditor Fixed Menu -->
       <div
-        class="flex justify-between overflow-scroll px-5 py-2.5 items-center border-t"
+        class="flex justify-between overflow-scroll px-4 py-2.5 items-center border-t"
       >
         <div class="flex items-center overflow-x-auto w-[60%]">
-          <div class="flex gap-1">
+          <div class="inline-flex items-center gap-1.5 p-1">
             <FileUploader
               :upload-args="{
                 doctype: doctype,
@@ -154,32 +154,29 @@
             >
               <template #default="{ openFileSelector, uploading }">
                 {{ void (isUploading = uploading) }}
-                <Button
-                  variant="ghost"
+                <button
+                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
                   @click="openFileSelector()"
-                  :loading="uploading"
+                  :disabled="uploading"
                 >
-                  <template #icon>
-                    <AttachmentIcon
-                      class="h-4"
-                      style="color: #000000; stroke-width: 1.5 !important"
-                    />
-                  </template>
-                </Button>
+                  <AttachmentIcon
+                    class="h-4 w-4"
+                    style="stroke-width: 1.5 !important"
+                  />
+                </button>
               </template>
             </FileUploader>
-            <Button
-              variant="ghost"
+            <button
+              class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
               @click="showSavedRepliesSelectorModal = true"
             >
-              <template #icon>
-                <SavedReplyIcon class="h-4" />
-              </template>
-            </Button>
+              <SavedReplyIcon class="h-4 w-4" />
+            </button>
+            <div class="h-4 w-[2px] border-s" />
           </div>
-          <TextEditorFixedMenu class="ml-1" :buttons="textEditorMenuButtons" />
+          <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
         </div>
-        <div class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%]">
+        <div class="flex items-center justify-end gap-x-2 sm:mt-0 w-[40%]">
           <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
@@ -212,6 +209,7 @@ import {
 } from "@/components";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
+import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
 import {
   CleanStyles,
@@ -290,7 +288,7 @@ const { isManager } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const editorRef = ref(null);
-const editor = computed(() => editorRef.value.editor);
+const editor = computed(() => editorRef.value?.editor);
 
 function focusEditorAtStart() {
   setTimeout(() => {
@@ -312,11 +310,7 @@ function isOnlySignature(content: string | null) {
   return htmlToText(content) === htmlToText(emailSignature.value);
 }
 
-const userResource = createResource({
-  url: "helpdesk.api.auth.get_current_user_email_info",
-  cache: "current-user-email-info",
-  auto: true,
-});
+const userResource = getUserEmailInfo();
 
 watch(newEmail, (newValue, oldValue) => {
   if (newValue !== oldValue && newValue) {

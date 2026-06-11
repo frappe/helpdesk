@@ -13,25 +13,27 @@
         theme="gray"
         variant="solid"
         @click="goToNew()"
-        icon-left="plus"
+        icon-left="lucide-plus"
       />
     </template>
     <template #header-bottom>
       <div class="flex items-center gap-2 justify-between">
         <div class="relative w-full">
-          <Input
+          <TextInput
             :model-value="savedRepliesSearchQuery"
-            @input="savedRepliesSearchQuery = $event"
+            @update:model-value="savedRepliesSearchQuery = $event"
             :placeholder="__('Search')"
             type="text"
-            class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
-            icon-left="search"
-            debounce="300"
-            inputClass="p-4 pr-12"
-          />
+            class="focus:ring-0 border-outline-gray-2"
+            :debounce="300"
+          >
+            <template #prefix>
+              <LucideSearch class="size-4" />
+            </template>
+          </TextInput>
           <Button
             v-if="savedRepliesSearchQuery"
-            icon="x"
+            icon="lucide-x"
             variant="ghost"
             @click="savedRepliesSearchQuery = ''"
             class="absolute right-1 top-1/2 -translate-y-1/2"
@@ -85,8 +87,8 @@
         "
         variant="badge"
         :icon="SavedReplyIcon"
-        title="No saved replies found"
-        description="Add one to get started."
+        :title="__('No saved replies found')"
+        :description="__('Add one to get started.')"
       />
       <div
         v-if="
@@ -96,7 +98,7 @@
         class="-ml-2"
       >
         <div
-          class="grid grid-cols-12 items-center gap-3 text-sm text-gray-600 ml-2"
+          class="grid grid-cols-12 items-center gap-3 text-sm text-ink-gray-5 ml-2"
         >
           <div class="col-span-7">{{ __("Title") }}</div>
           <div class="col-span-2">{{ __("Owner") }}</div>
@@ -108,7 +110,7 @@
           :key="savedReply.name"
         >
           <div
-            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded"
           >
             <div
               @click="
@@ -155,7 +157,7 @@
                 :options="dropdownOptions(savedReply)"
               >
                 <Button
-                  icon="more-horizontal"
+                  icon="lucide-more-horizontal"
                   variant="ghost"
                   @click="isConfirmingDelete = false"
                   class="mr-2"
@@ -172,10 +174,10 @@
     </template>
   </SettingsLayoutBase>
   <Dialog
-    :options="{ title: __('Duplicate Saved reply') }"
-    v-model="duplicateDialog.show"
+    :title="__('Duplicate Saved reply')"
+    v-model:open="duplicateDialog.show"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl
           :label="__('New Saved reply Name')"
@@ -204,8 +206,8 @@ import {
   call,
   Dropdown,
   FeatherIcon,
-  Input,
   LoadingIndicator,
+  TextInput,
   toast,
 } from "frappe-ui";
 import { computed, inject, ref, Ref, watch } from "vue";
@@ -265,7 +267,7 @@ const dropdownOptions = (savedReply: SavedReply) => [
         newTitle: `${savedReply.title} (Copy)`,
       };
     },
-    icon: "copy",
+    icon: "lucide-copy",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteSavedReply(savedReply),

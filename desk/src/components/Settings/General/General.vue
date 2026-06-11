@@ -26,7 +26,7 @@
     <template #content>
       <div
         v-if="settingsDataResource.loading && !settingsDataResource.data"
-        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
+        class="flex items-center justify-center absolute inset-x-0 top-5.5 bottom-0"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -38,7 +38,7 @@
         <WorkflowKnowledgebaseSettings />
         <hr class="my-8" />
         <div>
-          <div class="text-base font-semibold text-gray-900">
+          <div class="text-base font-semibold text-ink-gray-9">
             {{ __("User Signup") }}
           </div>
           <div class="flex items-center justify-between mt-6">
@@ -61,8 +61,12 @@
 </template>
 
 <script setup lang="ts">
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
+import { useConfigStore } from "@/stores/config";
+import { __ } from "@/translation";
+import { HDSettings, HDSettingsSymbol } from "@/types";
 import {
-  Badge,
   Button,
   createResource,
   LoadingIndicator,
@@ -72,13 +76,6 @@ import {
 import Branding from "./components/Branding.vue";
 import TicketSettings from "./components/TicketSettings.vue";
 import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
-import { computed, provide, ref, watch } from "vue";
-import { __ } from "@/translation";
-import { disableSettingModalOutsideClick } from "../settingsModal";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
-import { HDSettings, HDSettingsSymbol } from "@/types";
-import { useConfigStore } from "@/stores/config";
 
 const configStore = useConfigStore();
 

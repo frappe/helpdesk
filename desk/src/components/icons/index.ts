@@ -11,6 +11,8 @@ export { default as DragIcon } from "./DragIcon.vue";
 export { default as EditIcon } from "./EditIcon.vue";
 export { default as EmailAtIcon } from "./EmailAtIcon.vue";
 export { default as EmailIcon } from "./EmailIcon.vue";
+export { default as ErpnextIcon } from "./ErpnextIcon.vue";
+export { default as ERPNextSettingsIcon } from "./ERPNextSettingsIcon.vue";
 export { default as ExternalLinkIcon } from "./ExternalLinkIcon.vue";
 export { default as FieldDependencyIcon } from "./FieldDependencyIcon.vue";
 export { default as FrappeCloudIcon } from "./FrappeCloudIcon.vue";

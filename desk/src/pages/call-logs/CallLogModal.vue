@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="show" :options="dialogOptions" @after-leave="resetCallLog">
-    <template #body>
+  <Dialog v-model:open="show" bare @after-leave="resetCallLog">
+    <template #default>
       <div class="px-4 pt-5 bg-surface-modal sm:px-6">
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-2">
@@ -14,7 +14,7 @@
               variant="ghost"
               class="w-7"
               @click="show = false"
-              icon="x"
+              icon="lucide-x"
             />
           </div>
         </div>

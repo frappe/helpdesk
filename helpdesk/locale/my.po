@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-27 10:32\n"
+"PO-Revision-Date: 2026-05-28 10:55\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Burmese\n"
 "MIME-Version: 1.0\n"
@@ -5844,7 +5844,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:463
 msgid "excellent"
-msgstr ""
+msgstr "အကောင်းဆုံး"
 
 #: desk/src/components/ticket/TicketSplitModal.vue:8
 msgid "from this email onwards will be moved to new ticket."
