@@ -44,13 +44,8 @@
         v-if="!teams.loading && teams.data?.length > 0"
         class="w-full h-full -ml-2"
       >
-<<<<<<< HEAD
         <div class="flex text-sm text-ink-gray-5">
           <div class="ml-2">{{ __("Team name") }}</div>
-=======
-        <div class="flex text-sm text-gray-600">
-          <p class="ml-2">{{ __("Team name") }}</p>
->>>>>>> a9dfa9a1 (fix: sync disable state of HD Team with Assignment Rule)
         </div>
         <hr class="mx-2 mt-2" />
         <div v-for="(team, index) in teams.data" :key="team.name">
@@ -130,16 +125,13 @@
 </template>
 
 <script setup lang="ts">
-<<<<<<< HEAD
 import AgentIcon from "@/components/icons/AgentIcon.vue";
 import EmptyState from "@/components/EmptyState.vue";
-=======
 import EditIcon from "@/components/icons/EditIcon.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
 import { TeamListResourceSymbol } from "@/types";
 import { ConfirmDelete } from "@/utils";
->>>>>>> a9dfa9a1 (fix: sync disable state of HD Team with Assignment Rule)
 import { Dropdown, Input, toast } from "frappe-ui";
 import { inject, markRaw, Ref, ref, watch } from "vue";
 import NewTeamModal from "../NewTeamModal.vue";

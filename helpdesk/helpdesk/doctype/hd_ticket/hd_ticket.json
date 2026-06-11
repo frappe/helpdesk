@@ -465,14 +465,9 @@
    "label": "Ticket raised outside working hours",
    "read_only": 1,
    "set_only_once": 1
-<<<<<<< HEAD
   },
   {
-<<<<<<< HEAD
    "depends_on": "eval:doc.first_response_failed_by",
-=======
-   "depends_on": "eval:doc.first_responded_on",
->>>>>>> 71956484 (fix: update link_filters in HDTicket)
    "fieldname": "first_response_failed_by",
    "fieldtype": "Duration",
    "label": "First Response Failed By",
@@ -484,23 +479,13 @@
    "fieldtype": "Duration",
    "label": "Resolution Failed By",
    "read_only": 1
-=======
->>>>>>> 2f1bccd8 (chore: code cleanup)
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
-<<<<<<< HEAD
-<<<<<<< HEAD
- "modified": "2026-05-07 14:35:56.356727",
-=======
- "modified": "2026-05-11 17:56:26.750850",
->>>>>>> 71956484 (fix: update link_filters in HDTicket)
-=======
  "modified": "2026-05-11 18:25:54.352721",
->>>>>>> 2f1bccd8 (chore: code cleanup)
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

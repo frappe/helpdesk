@@ -67,10 +67,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from "vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-<<<<<<< HEAD
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
-=======
->>>>>>> 215475d0 (fix: add enable check while creating new team in UI)
 import {
   Badge,
   ErrorMessage,

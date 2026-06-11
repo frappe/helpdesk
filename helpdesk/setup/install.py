@@ -224,22 +224,6 @@ def add_website_settings_permission():
         update_permission_property(doctype, role, 0, p, 1)
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-def add_email_template_perms_for_agent_and_agent_manager():
-    for_roles = ["Agent", "Agent Manager"]
-    permissions = ["create", "delete", "write"]
-    for role in for_roles:
-        add_permission("Email Template", role)
-        for perm in permissions:
-            update_permission_property("Email Template", role, 0, perm, 1)
-
-
-=======
-# TODO: why?
->>>>>>> c5e062a2 (fix: remove two way sync)
-=======
->>>>>>> a319b47b (chore: code cleanup)
 def add_default_assignment_rule():
     support_settings = frappe.get_doc("HD Settings")
     support_settings.create_base_support_rotation()
