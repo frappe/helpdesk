@@ -22,13 +22,9 @@
           @click="onShowPreview()"
           icon-left="lucide-eye"
           :disabled="
-<<<<<<< HEAD
-            Boolean(!content?.editor?.state?.doc?.textContent?.trim()?.length)
-=======
             Boolean(
               !savedReplyData.message?.replace(/<[^>]*>/g, '')?.trim()?.length
             ) || isDirty
->>>>>>> 016ac631 (feat: bulk reply in ticket list view)
           "
         />
         <Button

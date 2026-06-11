@@ -154,13 +154,8 @@
             >
               <template #default="{ openFileSelector, uploading }">
                 {{ void (isUploading = uploading) }}
-<<<<<<< HEAD
-                <Button
-                  variant="ghost"
-=======
                 <button
                   class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
->>>>>>> f6947f11 (chore: code cleanup)
                   @click="openFileSelector()"
                   :loading="uploading"
                 >
@@ -173,13 +168,8 @@
                 </Button>
               </template>
             </FileUploader>
-<<<<<<< HEAD
-            <Button
-              variant="ghost"
-=======
             <button
               class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
->>>>>>> f6947f11 (chore: code cleanup)
               @click="showSavedRepliesSelectorModal = true"
             >
               <template #icon>

@@ -84,18 +84,6 @@ const isShowable = props.url && (isText || isImage);
 const icon = ICONS[kind];
 const content = ref("");
 
-<<<<<<< HEAD
-function getIcon() {
-  if (isText) return LucideFileType;
-  else if (isImage) return LucideFileImage;
-  else if (isPdf) return LucideFileText;
-  else if (isSpreadsheet) return LucideFileSpreadsheet;
-  else return LucideFile;
-}
-console.log(props.url);
-
-=======
->>>>>>> 5efaf89e (fix: bulk reply icon)
 function toggleDialog() {
   if (!isShowable) return;
   if (isText) {

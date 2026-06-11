@@ -350,7 +350,6 @@ def make_team(team_name, members=[], disabled=False):
     return team
 
 
-<<<<<<< HEAD
 def complete_erpnext_setup():
     """
     Run the ERPNext setup wizard once, so fixtures like Warehouse Type
@@ -382,7 +381,6 @@ def complete_erpnext_setup():
             "chart_of_accounts": "Standard",
         }
     )
-=======
 def upload_test_file(file_name: str) -> str:
     """Upload an image from desk/src/assets/images/ as a standalone private File, returning its name."""
     file_path = frappe.get_app_path(
@@ -399,4 +397,3 @@ def upload_test_file(file_name: str) -> str:
         }
     ).insert(ignore_permissions=True)
     return file_doc.name
->>>>>>> 8b68e28a (test: bulk reply)
