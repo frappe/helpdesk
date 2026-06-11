@@ -16,9 +16,9 @@
 <script setup>
 defineOptions({
   inheritAttrs: false,
-})
+});
 
 defineProps({
   priority: { type: String, required: true },
-})
+});
 </script>

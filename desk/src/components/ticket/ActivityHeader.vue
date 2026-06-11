@@ -1,5 +1,7 @@
 <template>
-  <div class="flex items-center justify-between text-lg font-medium px-6 py-3 bg-white">
+  <div
+    class="flex items-center justify-between text-lg font-medium px-6 py-3 bg-white"
+  >
     <div class="flex h-8 items-center text-lg font-bold text-ink-gray-9">
       {{ title }}
     </div>
@@ -12,7 +14,10 @@
         placement="right"
       >
         <template #default="{ open }">
-          <Button variant="solid" class="hd-black-button flex items-center gap-1">
+          <Button
+            variant="solid"
+            class="hd-black-button flex items-center gap-1"
+          >
             <template #prefix>
               <FeatherIcon name="plus" class="h-4 w-4" />
             </template>
@@ -76,7 +81,7 @@ const callActions = computed(() => [
     onClick: () => makeCall?.(),
   },
   {
-     icon: "lucide-edit-3",
+    icon: "lucide-edit-3",
     label: __("Log a Call"),
     onClick: () => {
       showCallLogModal.value = true;

@@ -35,7 +35,7 @@
       class="flex h-12 items-center justify-between py-[7px] px-3 border-b"
       v-if="ticket.doc?.name"
     >
-     <!-- left side -->
+      <!-- left side -->
       <div class="flex items-center gap-2 max-w-[50%]">
         <AssignTo :hide-label="true" />
       </div>
@@ -57,26 +57,26 @@
           >
             <template #tab-panel="{ tab }">
               <div v-if="tab.name === 'details'">
-                  <!-- ticket contact info -->
+                <!-- ticket contact info -->
                 <TicketAgentContact
                   v-if="contact.data"
                   :contact="contact.data"
                   :ticketId="ticket.doc?.name"
                   @email:open="communicationAreaRef.toggleEmailBox()"
                 />
-                 <!-- feedback component -->
+                <!-- feedback component -->
                 <TicketFeedback
                   v-if="ticket.doc?.feedback_rating"
                   class="border-b px-6 py-3 text-base text-ink-gray-5"
                   :ticket="ticket.doc"
                 />
-                   <!-- SLA Section -->
+                <!-- SLA Section -->
                 <h3 class="px-6 pt-3 font-semibold text-base">
                   {{ __("SLA") }}
                 </h3>
                 <TicketAgentDetails :ticket="ticket.doc" />
                 <h3 class="px-6 pt-3 font-semibold text-base">
-                   <!-- Ticket Fields -->
+                  <!-- Ticket Fields -->
                   {{ __("Details") }}
                 </h3>
                 <TicketAgentFields
@@ -308,7 +308,7 @@ const mobileCustomActions = computed(() => {
 
   for (const action of customActions.value) {
     if (action.group) {
-       // Grouped action (with or without buttonLabel) — flatten its items
+      // Grouped action (with or without buttonLabel) — flatten its items
       for (const item of action.items || []) {
         items.push({ label: item.label, onClick: item.onClick });
       }
@@ -460,7 +460,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       name: "task",
       label: __("Tasks"),
       icon: TaskIcon,
-    }
+    },
   ];
 
   if (isCallingEnabled.value) {
@@ -486,7 +486,10 @@ const _activities = computed(() => {
       return {
         subject: email.subject,
         content: email.content,
-        sender: { name: email.user?.email || email.sender, full_name: email.user?.name || email.sender },
+        sender: {
+          name: email.user?.email || email.sender,
+          full_name: email.user?.name || email.sender,
+        },
         to: email.recipients,
         type: "email",
         key: email.creation,
@@ -564,7 +567,8 @@ const _activities = computed(() => {
       due_date: cleanDueDate,
       assigned: task.assigned,
       reference_doctype: task.reference_doctype || "HD Ticket",
-      reference_docname: task.reference_docname || String(ticket.value?.doc?.name || ""),
+      reference_docname:
+        task.reference_docname || String(ticket.value?.doc?.name || ""),
       creation: task.creation,
       owner: task.owner,
     };
@@ -613,7 +617,7 @@ const _activities = computed(() => {
   if ((ticket.value?.doc?.feedback_rating || 0) === 0) {
     return data;
   }
-  
+
   const feedbackActivity: FeedbackActivity[] = [
     {
       type: "feedback",
