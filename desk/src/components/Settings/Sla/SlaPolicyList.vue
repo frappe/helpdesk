@@ -8,7 +8,7 @@
   <div v-else class="grow">
     <div
       v-if="!slaPolicyList.list.loading && !slaPolicyList.list.data?.length"
-      class="flex flex-col items-center justify-center gap-4 h-full"
+      class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
     >
       <div
         class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"

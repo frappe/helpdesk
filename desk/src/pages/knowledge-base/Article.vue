@@ -3,7 +3,7 @@
     <LayoutHeader>
       <template #left-header>
         <div class="flex gap-2 items-center crumbs max-w-[50vw]">
-          <Breadcrumbs :items="breadcrumbs" class="-ml-0.5 truncate" />
+          <Breadcrumbs :items="breadcrumbs" class="-ms-0.5 truncate" />
           <Badge
             v-if="!article.loading"
             variant="subtle"
@@ -43,7 +43,7 @@
             <div class="w-full">
               <textarea
                 ref="titleRef"
-                class="w-full resize-none border-0 bg-transparent text-3xl font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+                class="w-full resize-none border-0 text-3xl bg-transparent font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
                 v-model="title"
                 :placeholder="__('Title')"
                 rows="1"

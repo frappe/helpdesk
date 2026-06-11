@@ -85,8 +85,8 @@
         "
         variant="badge"
         :icon="SavedReplyIcon"
-        title="No saved replies found"
-        description="Add one to get started."
+        :title="__('No saved replies found')"
+        :description="__('Add one to get started.')"
       />
       <div
         v-if="

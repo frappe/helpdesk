@@ -2,6 +2,7 @@ import frappe
 from frappe import _
 from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
 from frappe.utils import cint, get_system_timezone
+from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
 
 no_cache = 1
@@ -42,6 +43,8 @@ def get_boot():
                 "user": frappe.db.get_value("User", frappe.session.user, "time_zone")
                 or get_system_timezone(),
             },
+            "lang": frappe.local.lang,
+            "dir": "rtl" if is_rtl() else "ltr",
         }
     )
 

@@ -42,8 +42,8 @@
         v-else
         variant="badge"
         :icon="EmailIcon"
-        title="No email account found"
-        description="Add one to get started."
+        :title="__('No email account found')"
+        :description="__('Add one to get started.')"
       />
     </template>
   </SettingsLayoutBase>
