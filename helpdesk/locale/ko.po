@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-27 10:32\n"
+"PO-Revision-Date: 2026-05-31 11:14\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Korean\n"
 "MIME-Version: 1.0\n"
@@ -186,7 +186,7 @@ msgstr ""
 #. Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add Weekly Holidays"
-msgstr ""
+msgstr "주간 휴일 추가"
 
 #: desk/src/components/layouts/Sidebar.vue:500
 msgid "Add a comment on a ticket"
@@ -240,7 +240,7 @@ msgstr ""
 #. Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add to Holidays"
-msgstr ""
+msgstr "휴일에 추가"
 
 #: desk/src/components/Settings/Agents.vue:4
 msgid "Add, manage agents and assign roles to them."
@@ -249,7 +249,7 @@ msgstr ""
 #. Label of the about (Code) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Additional Information"
-msgstr ""
+msgstr "추가 정보"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -283,7 +283,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Agent"
-msgstr ""
+msgstr "대리인"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -589,7 +589,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:75
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Assignment Conditions"
-msgstr ""
+msgstr "배정 조건"
 
 #. Label of the assignment_rule (Link) field in DocType 'HD Team'
 #. Label of a Link in the Helpdesk Workspace
@@ -724,7 +724,7 @@ msgstr ""
 #. Label of the avg_response_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Average Response Time"
-msgstr ""
+msgstr "평균 응답 시간"
 
 #: desk/src/pages/home/Home.vue:305
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:5
@@ -820,7 +820,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Black"
-msgstr ""
+msgstr "검은색"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -843,7 +843,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:210
 msgid "Busy"
-msgstr ""
+msgstr "바쁘다"
 
 #. Label of the button_section (Section Break) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -856,7 +856,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogDetailModal.vue:8
 msgid "Call Details"
-msgstr ""
+msgstr "통화 내역"
 
 #: desk/src/components/layouts/Sidebar.vue:280
 msgid "Call Logs"
@@ -864,7 +864,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:81
 msgid "Call Received By"
-msgstr ""
+msgstr "전화를 받은 사람"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:69
 msgid "Call duration in seconds"
@@ -1061,7 +1061,7 @@ msgstr ""
 #. Label of the clear_table (Button) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Clear Table"
-msgstr ""
+msgstr "테이블 지우기"
 
 #: desk/src/pages/SearchAgent.vue:86
 msgid "Clear all filters"
@@ -1228,7 +1228,7 @@ msgstr ""
 #. Label of the contact_html (HTML) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Contact HTML"
-msgstr ""
+msgstr "HTML 문의하기"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:185
 msgid "Contact created successfully."
@@ -1305,7 +1305,7 @@ msgstr ""
 
 #: desk/src/components/desk/global/NewContactDialog.vue:3
 msgid "Create New Contact"
-msgstr ""
+msgstr "새 연락처 만들기"
 
 #: desk/src/pages/ticket/Tickets.vue:344 desk/src/pages/ticket/Tickets.vue:348
 msgid "Create View"
@@ -1361,12 +1361,12 @@ msgstr ""
 #: desk/src/pages/desk/contact/ContactDialog.vue:59
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Customer"
-msgstr ""
+msgstr "고객"
 
 #. Label of the customer_name (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Customer Name"
-msgstr ""
+msgstr "고객 이름"
 
 #: desk/src/components/desk/global/NewCustomerDialog.vue:65
 msgid "Customer created successfully."
@@ -1415,7 +1415,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentSchedule.vue:38
 msgid "Days"
-msgstr ""
+msgstr "날"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:53
 msgid "Default Inbox"
@@ -1428,7 +1428,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 msgid "Default Priority"
-msgstr ""
+msgstr "기본 우선순위"
 
 #. Label of the default_sla (Check) field in DocType 'HD Service Level
 #. Agreement'
@@ -1872,7 +1872,7 @@ msgstr ""
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "End Time"
-msgstr ""
+msgstr "종료 시간"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:22
 msgid "Enter a name for this HD Service Holiday List."
@@ -2120,12 +2120,12 @@ msgstr ""
 #. Label of the first_responded_on (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Responded On"
-msgstr ""
+msgstr "최초 응답일"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Response Due"
-msgstr ""
+msgstr "첫 번째 응답 기한"
 
 #. Label of the first_response_failed_by (Duration) field in DocType 'HD
 #. Ticket'
@@ -2139,7 +2139,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Response Time"
-msgstr ""
+msgstr "최초 응답 시간"
 
 #. Name of a report
 #: helpdesk/helpdesk/report/first_response_time_for_tickets/first_response_time_for_tickets.json
@@ -2192,7 +2192,7 @@ msgstr ""
 #: desk/src/pages/ticket/Tickets.vue:195 desk/src/pages/ticket/Tickets.vue:226
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Fulfilled"
-msgstr ""
+msgstr "성취됨"
 
 #: desk/src/components/Settings/General/General.vue:6
 #: desk/src/components/layouts/Sidebar.vue:521
@@ -2203,7 +2203,7 @@ msgstr ""
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "General Settings"
-msgstr ""
+msgstr "일반 설정"
 
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:40
 msgid "General category can't be deleted"
@@ -2533,19 +2533,19 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Hold"
-msgstr ""
+msgstr "잡고 있다"
 
 #. Label of the holiday_list (Link) field in DocType 'HD Service Level
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Holiday List"
-msgstr ""
+msgstr "휴일 목록"
 
 #. Label of the holiday_list_name (Data) field in DocType 'HD Service Holiday
 #. List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Holiday List Name"
-msgstr ""
+msgstr "휴일 목록 이름"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:368
 msgid "Holiday list created successfully."
@@ -2570,7 +2570,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayView.vue:183
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Holidays"
-msgstr ""
+msgstr "휴가"
 
 #: desk/src/pages/home/Home.vue:5
 msgid "Home"
@@ -2681,7 +2681,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:212
 msgid "Initiated"
-msgstr ""
+msgstr "시작됨"
 
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2947,7 +2947,7 @@ msgstr ""
 #. Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Link Options"
-msgstr ""
+msgstr "링크 옵션"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:63
 msgid "Link to a customer"
@@ -3007,7 +3007,7 @@ msgstr ""
 #: desk/src/components/Settings/General/components/Branding.vue:15
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Logo"
-msgstr ""
+msgstr "심벌 마크"
 
 #. Description of the 'Integer value' (Int) field in DocType 'HD Ticket
 #. Priority'
@@ -3079,7 +3079,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:154
 msgid "Merge"
-msgstr ""
+msgstr "병합"
 
 #: desk/src/components/ticket-agent/TicketHeader.vue:256
 #: desk/src/components/ticket/TicketAgentSidebar.vue:18
@@ -3270,7 +3270,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:216
 msgid "No Answer"
-msgstr ""
+msgstr "답변 없음"
 
 #: desk/src/components/ListViewBuilder.vue:287
 msgid "No Data Found"
@@ -3421,7 +3421,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:270
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:363
 msgid "Not Specified"
-msgstr ""
+msgstr "명시되지 않음"
 
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -3445,7 +3445,7 @@ msgstr ""
 #. Label of the on_hold_since (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "On Hold Since"
-msgstr ""
+msgstr "보류 중"
 
 #. Label of the action (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -3505,12 +3505,12 @@ msgstr ""
 #. Label of the opening_date (Date) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Opening Date"
-msgstr ""
+msgstr "개장일"
 
 #. Label of the opening_time (Time) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Opening Time"
-msgstr ""
+msgstr "영업시간"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -3526,7 +3526,7 @@ msgstr ""
 #. Label of the order_by (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Order By"
-msgstr ""
+msgstr "정렬 기준"
 
 #: desk/src/pages/dashboard/Dashboard.vue:255
 msgid "Organization Dashboard"
@@ -3550,7 +3550,7 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:102
 msgid "Owner"
-msgstr ""
+msgstr "소유자"
 
 #: desk/src/pages/InvalidPage.vue:11
 msgid "Page not found"
@@ -3595,7 +3595,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Paused"
-msgstr ""
+msgstr "일시 중지됨"
 
 #: desk/src/pages/home/components/PendingTickets.vue:222
 msgid "Pending"
@@ -3754,7 +3754,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Post Description Key"
-msgstr ""
+msgstr "게시물 설명 키"
 
 #. Label of the post_route_key_list (Data) field in DocType 'HD Support Search
 #. Source'
@@ -3771,7 +3771,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Post Title Key"
-msgstr ""
+msgstr "게시물 제목 키"
 
 #. Label of the prefer_knowledge_base (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:10
@@ -3801,7 +3801,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Priorities"
-msgstr ""
+msgstr "우선순위"
 
 #. Label of the priority (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_priority (Link) field in DocType 'HD Escalation Rule'
@@ -3829,7 +3829,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:75
 msgid "Priority {0} has been repeated."
-msgstr ""
+msgstr "우선순위 {0} 가 반복되었습니다."
 
 #: desk/src/components/layouts/Sidebar.vue:301
 #: desk/src/pages/ticket/Tickets.vue:324
@@ -3903,7 +3903,7 @@ msgstr ""
 #. Label of the query_route (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Query Route String"
-msgstr ""
+msgstr "쿼리 경로 문자열"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:213
 msgid "Queued"
@@ -4011,7 +4011,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "References"
-msgstr ""
+msgstr "참고 자료"
 
 #: desk/src/pages/home/Home.vue:11
 msgid "Refresh"
@@ -4126,27 +4126,27 @@ msgstr ""
 #. Label of the resolution_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution"
-msgstr ""
+msgstr "해결"
 
 #. Label of the resolution_by (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution By"
-msgstr ""
+msgstr "결의안"
 
 #. Label of the resolution_date (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Date"
-msgstr ""
+msgstr "결의일"
 
 #. Label of the resolution_details (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Details"
-msgstr ""
+msgstr "해상도 세부 정보"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Due"
-msgstr ""
+msgstr "결의안"
 
 #. Label of the resolution_failed_by (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -4159,12 +4159,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Time"
-msgstr ""
+msgstr "해상도 시간"
 
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Resolved"
-msgstr ""
+msgstr "해결됨"
 
 #. Label of the response_tab (Tab Break) field in DocType 'HD Ticket'
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:109
@@ -4181,24 +4181,24 @@ msgstr ""
 #. Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Response Options"
-msgstr ""
+msgstr "응답 옵션"
 
 #. Label of the response_result_key_path (Data) field in DocType 'HD Support
 #. Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Response Result Key Path"
-msgstr ""
+msgstr "응답 결과 키 경로"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:65
 msgid "Response Time for {0} priority in row {1} can't be greater than Resolution Time."
-msgstr ""
+msgstr "행 {1} 의 {0} 우선순위에 대한 응답 시간은 해결 시간보다 클 수 없습니다."
 
 #. Label of the response_and_resolution_time_section (Section Break) field in
 #. DocType 'HD Service Level Agreement'
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:188
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Response and Resolution"
-msgstr ""
+msgstr "대응 및 해결"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:439
 msgid "Response is required"
@@ -4241,23 +4241,23 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Result Route Field"
-msgstr ""
+msgstr "결과 경로 필드"
 
 #. Label of the result_title_field (Data) field in DocType 'HD Support Search
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Result Title Field"
-msgstr ""
+msgstr "결과 제목 필드"
 
 #: desk/src/pages/home/Home.vue:341
 #: desk/src/pages/home/components/RecentFeedback.vue:7
 #: desk/src/pages/home/components/RecentFeedback.vue:22
 msgid "Reviews"
-msgstr ""
+msgstr "리뷰"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:215
 msgid "Ringing"
-msgstr ""
+msgstr "울리는"
 
 #: desk/src/components/Settings/InviteAgents.vue:19
 msgid "Role"
@@ -4436,7 +4436,7 @@ msgstr ""
 #. Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Search Term Param Name"
-msgstr ""
+msgstr "검색어 매개변수 이름"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:62
 msgid "Search agents..."
@@ -4500,7 +4500,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:167
 msgid "Select a Default Priority."
-msgstr ""
+msgstr "기본 우선순위를 선택하세요."
 
 #: desk/src/pages/ticket/TicketFeedback.vue:28
 msgid "Select a rating"
@@ -4565,7 +4565,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
-msgstr ""
+msgstr "서비스 레벨 이름"
 
 #: helpdesk/api/settings/email.py:14
 msgid "Service not supported"
@@ -4582,7 +4582,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:48
 msgid "Set Response Time for Priority {0} in row {1}."
-msgstr ""
+msgstr "{1} 행의 우선순위 {0} 에 대한 응답 시간을 설정합니다."
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:84
 msgid "Set as default SLA"
@@ -4715,7 +4715,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Source DocType"
-msgstr ""
+msgstr "소스 문서 유형"
 
 #. Label of the source_name (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
@@ -4726,7 +4726,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Source Type"
-msgstr ""
+msgstr "소스 유형"
 
 #: helpdesk/api/knowledge_base.py:125
 msgid "Source and target category cannot be same"
@@ -4799,7 +4799,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:236
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status Details"
-msgstr ""
+msgstr "상태 세부 정보"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:382
 msgid "Status is required"
@@ -4871,12 +4871,12 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:358
 msgid "Support"
-msgstr ""
+msgstr "지원하다"
 
 #. Name of a report
 #: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.json
 msgid "Support Hour Distribution"
-msgstr ""
+msgstr "지원 시간 배분"
 
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -4971,7 +4971,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Team"
-msgstr ""
+msgstr "팀"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:38
 msgid "Team Name"
@@ -5441,12 +5441,12 @@ msgstr ""
 #. Label of the total_hold_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Total Hold Time"
-msgstr ""
+msgstr "총 대기 시간"
 
 #. Label of the total_holidays (Int) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Total Holidays"
-msgstr ""
+msgstr "총 휴일 수"
 
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:126
 msgid "Total Ticket"
@@ -5606,7 +5606,7 @@ msgstr ""
 #. Label of the user_resolution_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "User Resolution Time"
-msgstr ""
+msgstr "사용자 해결 시간"
 
 #: desk/src/components/Settings/General/General.vue:42
 msgid "User Signup"
@@ -5623,14 +5623,14 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:141
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Valid From"
-msgstr ""
+msgstr "유효 기간 시작일"
 
 #. Label of the via_customer_portal (Check) field in DocType 'HD Ticket'
 #. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Via Customer Portal"
-msgstr ""
+msgstr "고객 포털을 통해"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:252
 msgid "View Assignment rule"
@@ -5705,7 +5705,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:111
 msgid "Workday {0} has been repeated."
-msgstr ""
+msgstr "근무일 {0} 이 반복되었습니다."
 
 #. Label of the workflow_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -5722,7 +5722,7 @@ msgstr ""
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Working Hours"
-msgstr ""
+msgstr "근무 시간"
 
 #: desk/src/pages/knowledge-base/Article.vue:172
 #: desk/src/pages/knowledge-base/NewArticle.vue:55
