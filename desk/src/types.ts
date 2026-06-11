@@ -692,6 +692,7 @@ export interface SlaPolicy {
 export interface Team {
   name: string;
   team: string;
+  disabled: boolean;
 }
 
 export interface SavedReply {

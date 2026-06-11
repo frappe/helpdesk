@@ -31,12 +31,9 @@ export const useTicket = (ticketId: string): MapValue => {
         },
         setValue: {
           onSuccess: () => {
-            toast.success(__("Ticket updated sucessfully."));
-            err = false;
+            toast.success(__("Ticket updated successfully."));
           },
           onError: (error) => {
-            if (err) return;
-            err = true;
             const msg = error.exc_type
               ? (error.messages || error.message || []).join(", ")
               : error.message;

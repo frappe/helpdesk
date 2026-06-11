@@ -14,13 +14,21 @@
       </div>
     </template>
     <template #header-actions>
-      <Button
-        :label="__('Save')"
-        variant="solid"
-        @click="saveTeam()"
-        :disabled="!isDirty"
-        :loading="teamsList.insert.loading"
-      />
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 cursor-pointer">
+          <Switch v-model="teamData.enabled" />
+          <span class="text-sm text-ink-gray-7 font-medium">
+            {{ __("Enabled") }}
+          </span>
+        </div>
+        <Button
+          :label="__('Save')"
+          variant="solid"
+          @click="saveTeam()"
+          :disabled="!isDirty"
+          :loading="teamsList.insert.loading"
+        />
+      </div>
     </template>
     <template #content>
       <div class="flex flex-col gap-4">
@@ -59,7 +67,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from "vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import {
   Badge,
   ErrorMessage,
@@ -96,6 +103,7 @@ const showConfirmDialog = ref({
 const teamData = ref({
   name: "",
   agents: [],
+  enabled: true,
 });
 
 const errors = ref({
@@ -134,6 +142,7 @@ const saveTeam = () => {
     {
       team_name: teamData.value.name,
       users: teamData.value.agents.map((agent) => ({ user: agent })),
+      disabled: !teamData.value.enabled,
     },
     {
       onSuccess: (data) => {
