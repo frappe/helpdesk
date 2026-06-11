@@ -2,7 +2,6 @@ import json
 import uuid
 from datetime import timedelta
 from email.utils import parseaddr
-from functools import lru_cache
 
 import frappe
 from bs4 import BeautifulSoup
@@ -361,6 +360,7 @@ class HDTicket(Document):
             "agent_group": "team",
             "ticket_type": "type",
             "contact": "contact",
+            "sla": "SLA",
         }
         for field in [
             "status",
@@ -368,6 +368,7 @@ class HDTicket(Document):
             "agent_group",
             "contact",
             "ticket_type",
+            "sla",
         ]:
             if self.has_value_changed(field):
                 log_ticket_activity(

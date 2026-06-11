@@ -187,7 +187,7 @@ const routes = [
   },
 ];
 
-const handleMobileView = (componentName) => {
+const handleMobileView = (componentName: string) => {
   return isMobileView.value ? `Mobile${componentName}` : componentName;
 };
 

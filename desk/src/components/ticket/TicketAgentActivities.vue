@@ -122,16 +122,7 @@ import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
 import { isElementInViewport } from "@/utils";
 import { Avatar, FeatherIcon } from "frappe-ui";
-import {
-  PropType,
-  Ref,
-  computed,
-  h,
-  inject,
-  nextTick,
-  onMounted,
-  watch,
-} from "vue";
+import { PropType, computed, h, inject, nextTick, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
 import CommentBox from "@/components/CommentBox.vue";
@@ -159,7 +150,6 @@ const route = useRoute();
 const router = useRouter();
 
 const { getUser } = useUserStore();
-const communicationAreaRef: Ref = inject("communicationArea");
 const makeCall = inject<() => void>("makeCall");
 
 const emptyText = computed(() => {

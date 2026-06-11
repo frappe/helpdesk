@@ -52,7 +52,7 @@
     :options="{
       selectable: options.selectable,
       showTooltip: false,
-      resizeColumn: false,
+      resizeColumn: true,
       getRowRoute: (row) => ({
         name: options.rowRoute?.name,
         params: { [options.rowRoute?.prop]: row.name },
@@ -66,7 +66,7 @@
         v-for="column in columns"
         :key="column.key"
         :item="column"
-        @columnWidthUpdated="(width) => console.log(width)"
+        @columnWidthUpdated="handleColumnResize"
       />
     </ListHeader>
     <ListRows
@@ -804,6 +804,14 @@ function handleScrollPosition() {
     if (!listContainer) return;
     listContainer.scrollTop = listScrollPosition.value;
   }, 200);
+}
+
+function handleColumnResize() {
+  isViewUpdated.value = true;
+  defaultParams.columns = columns.value;
+  if (!defaultParams.is_default) return;
+  handleViewUpdate();
+  isViewUpdated.value = false;
 }
 
 onMounted(async () => {
