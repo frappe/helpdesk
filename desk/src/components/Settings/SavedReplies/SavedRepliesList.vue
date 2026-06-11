@@ -76,11 +76,7 @@
     <template #content>
       <div
         v-if="savedRepliesListResource?.list?.loading"
-<<<<<<< HEAD
         class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
-=======
-        class="flex items-center justify-center absolute inset-x-0 top-5.5 bottom-0"
->>>>>>> 3f4abcd4 (fix: empty state fix for cross browser compatibility)
       >
         <LoadingIndicator class="w-4" />
       </div>
