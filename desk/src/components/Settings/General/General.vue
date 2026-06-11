@@ -55,12 +55,14 @@
             <Switch v-model="disableSignup" />
           </div>
         </div>
+        <ERPNextIntegrationSettings />
       </div>
     </template>
   </SettingsLayoutBase>
 </template>
 
 <script setup lang="ts">
+import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNextIntegrationSettings.vue";
 import {
   Badge,
   Button,
