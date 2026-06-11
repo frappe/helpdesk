@@ -8,35 +8,22 @@ from helpdesk.integrations.erpnext.utils import set_links, should_sync
 
 @frappe.whitelist()
 def get_sync_info() -> dict:
-<<<<<<< HEAD
-    if "erpnext" not in frappe.get_installed_apps():
-        return {"enabled": False}
-=======
     """Drive the ERPNext integration settings UI. `in_sync` gates the 'Sync now'
     action. Whether ERPNext is installed is read on the frontend from the boot
     `apps` list, not from here."""
     if "erpnext" not in frappe.get_installed_apps():
         return {"enabled": False, "in_sync": False}
 
-<<<<<<< HEAD
-    if not frappe.has_permission("Customer", "read") or not frappe.has_permission(
-        "HD Customer", "read"
-    ):
-        return {"enabled": False, "in_sync": False}
->>>>>>> 86dc72ed (refactor(UI): enable integration settings)
-
-=======
->>>>>>> 83923277 (chore: improve copy)
     if not frappe.has_permission("HD Customer", "read") or not frappe.has_permission(
         "Customer", "read"
     ):
         return {"enabled": False}
 
     enabled = bool(frappe.db.get_single_value("ERPNext HD Settings", "enabled"))
-    return {
-        "enabled": enabled,
-        "in_sync": in_sync() if enabled else False,
-    }
+    if not enabled:
+        return {"enabled": False}
+
+    return {"enabled": enabled, "in_sync": in_sync()}
 
 
 def in_sync() -> bool:
