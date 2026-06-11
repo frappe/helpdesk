@@ -286,29 +286,29 @@ const statusDropdownOptions = computed(() =>
     onClick: () => changeStatus(s.value),
   }))
 )
-
 function handleReload(payload?: any) {
   showModal.value = false
 
-  const data = payload?.message || payload
-
+  const data = payload?.message || payload;
+  
   if (data && typeof data === 'object') {
     Object.keys(data).forEach(key => {
-      if (key in props.activity) {
-        props.activity[key] = data[key]
-      }
-    })
-    if (data.assigned)  props.activity.assigned  = data.assigned
-    if (data.title)     props.activity.title     = data.title
-    if (data.due_date)  props.activity.due_date  = data.due_date
-    if (data.priority)  props.activity.priority  = data.priority
-    if (data.status)    props.activity.status    = data.status
+        if (key in props.activity) {
+            props.activity[key] = data[key];
+        }
+    });
+    if (data.assigned) props.activity.assigned = data.assigned;
+    if (data.title) props.activity.title = data.title;
+    if (data.due_date) props.activity.due_date = data.due_date;
+    if (data.priority) props.activity.priority = data.priority;
+    if (data.status) props.activity.status = data.status;
   }
+}
+  
 
   emit('update')
-
+  
   if (props.reloadTasks) {
     props.reloadTasks()
   }
-}
 </script>
