@@ -329,7 +329,7 @@ function reset(reload = false) {
 }
 
 const slaStatusColorMap = {
-  Fulfilled: "green",
+  Fulfilled: "gray",
   Failed: "red",
   "Resolution Due": "orange",
   "First Response Due": "orange",
