@@ -1,4 +1,4 @@
-name: Build Frappe Image(UAT)
+name: Build Frappe Image (develop)
 on:
   push:
     branches:
