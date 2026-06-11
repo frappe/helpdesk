@@ -5,7 +5,7 @@
         class="flex items-center justify-between min-w-36"
         @click="togglePopover()"
         :class="targetClass"
-        icon-right="chevron-down"
+        icon-right="lucide-chevron-down"
       >
         <div class="w-full truncate">
           {{
@@ -45,7 +45,7 @@
         <Button
           variant="ghost"
           :label="__('Reset')"
-          icon-left="refresh-ccw"
+          icon-left="lucide-refresh-ccw"
           class="w-full focus-visible:ring-0"
           @click="onReset(togglePopover)"
         />

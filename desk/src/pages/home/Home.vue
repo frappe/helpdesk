@@ -10,7 +10,7 @@
             v-if="layout.length > 0 && !editing"
             :label="__('Refresh')"
             variant="subtle"
-            :icon-left="'refresh-ccw'"
+            :icon-left="'lucide-refresh-ccw'"
             @click="agentDashboard.reload({ reset_layout: false })"
             :disabled="isLoading"
           />
@@ -18,7 +18,7 @@
             v-if="editing && isDashboardModified"
             :label="__('Reset')"
             variant="subtle"
-            :icon-left="'rotate-cw'"
+            :icon-left="'lucide-rotate-cw'"
             @click="onReset"
             :disabled="isLoading"
           />
@@ -26,7 +26,7 @@
             v-if="editing"
             :label="__('Save')"
             variant="subtle"
-            :icon-left="'check'"
+            :icon-left="'lucide-check'"
             @click="onSave"
             :disabled="!isDirty"
             :loading="isLoading"
@@ -35,7 +35,7 @@
             v-if="layout.length > 0 && !editing"
             :label="__('Edit')"
             variant="subtle"
-            :icon-left="'edit'"
+            :icon-left="'lucide-edit'"
             @click="onEdit"
             :disabled="isLoading"
           />
@@ -54,7 +54,7 @@
             <Button
               :label="__('New')"
               variant="solid"
-              icon-left="plus"
+              icon-left="lucide-plus"
               :disabled="isLoading"
             />
           </Dropdown>

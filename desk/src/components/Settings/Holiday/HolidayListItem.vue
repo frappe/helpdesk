@@ -18,7 +18,7 @@
       <div>
         <Dropdown placement="right" :options="dropdownOptions">
           <Button
-            icon="more-horizontal"
+            icon="lucide-more-horizontal"
             variant="ghost"
             @click="isConfirmingDelete = false"
           />
@@ -27,10 +27,10 @@
     </div>
   </div>
   <Dialog
-    :options="{ title: __('Duplicate Holiday List') }"
-    v-model="duplicateDialog.show"
+    :title="__('Duplicate Holiday List')"
+    v-model:open="duplicateDialog.show"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl
           :label="__('New Holiday List Name')"
@@ -95,7 +95,7 @@ const dropdownOptions = [
         name: props.data.name,
       };
     },
-    icon: "copy",
+    icon: "lucide-copy",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteHolidayList(),

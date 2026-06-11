@@ -1,6 +1,13 @@
 import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
-import { FeatherIcon, call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
+import {
+  FeatherIcon,
+  call,
+  dayjs,
+  dayjsLocal,
+  toast,
+  useFileUpload,
+} from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
@@ -53,8 +60,18 @@ export function validateEmailWithZod(email: string) {
   return success;
 }
 
+/** Dayjs date format derived from the site's System Settings (boot data). */
+export function getDateFormat(): string {
+  return ((window as any).date_format || "dd-mm-yyyy").toUpperCase();
+}
+
+/** Time format from the site's System Settings (boot data). */
+export function getTimeFormat(): string {
+  return (window as any).time_format || "HH:mm:ss";
+}
+
 export function dateFormat(date, format?: string) {
-  const _format = format || "DD-MM-YYYY HH:mm:ss";
+  const _format = format || `${getDateFormat()} ${getTimeFormat()}`;
   if (!date) return "";
   const tzDate = dayjsLocal(date);
   return tzDate.format(_format);
@@ -437,7 +454,7 @@ export function getFormattedDate(date) {
   const dateObj = dayjsLocal(date);
   if (!dateObj.isValid()) return "";
 
-  return dateObj.format("DD-MM-YYYY");
+  return dateObj.format(getDateFormat());
 }
 
 export function TemplateOption({ active, option, variant, icon, onClick }) {
@@ -451,17 +468,26 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
       ],
       onClick: onClick,
     },
-    [
-      icon
-        ? h(FeatherIcon, {
-            name: icon,
-            class: ["h-4 w-4 shrink-0"],
-            "aria-hidden": true,
-          })
-        : null,
-      h("span", { class: "whitespace-nowrap" }, option),
-    ]
+    [renderOptionIcon(icon), h("span", { class: "whitespace-nowrap" }, option)]
   );
+}
+
+/**
+ * Renders an option icon: `lucide-*` strings as CSS-mask spans (frappe-ui v1),
+ * other strings as legacy FeatherIcon, and components as-is.
+ */
+export function renderOptionIcon(
+  icon: string | object | null,
+  classes: string[] = ["h-4 w-4 shrink-0"]
+) {
+  if (!icon) return null;
+  if (typeof icon === "string" && icon.startsWith("lucide-")) {
+    return h("span", { class: [icon, ...classes], "aria-hidden": true });
+  }
+  if (typeof icon === "string") {
+    return h(FeatherIcon, { name: icon, class: classes, "aria-hidden": true });
+  }
+  return h(icon, { class: classes, "aria-hidden": true });
 }
 
 export function getGridTemplateColumnsForTable(columns) {
@@ -689,7 +715,7 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       component: (props) =>
         TemplateOption({
           option: "Delete",
-          icon: "trash-2",
+          icon: "lucide-trash-2",
           active: props.active,
           variant: "grey",
           onClick: (event) => {
@@ -705,7 +731,7 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       component: (props) =>
         TemplateOption({
           option: "Confirm Delete",
-          icon: "trash-2",
+          icon: "lucide-trash-2",
           active: props.active,
           variant: "danger",
           onClick: () => {
@@ -728,18 +754,6 @@ export function getRandom(len = 4) {
   });
 
   return text;
-}
-
-export function parseColor(color: string): string {
-  color = color.toLowerCase();
-  let textColor = `!text-${color}-600`;
-  if (color == "black") {
-    textColor = "!text-ink-gray-9";
-  } else if (["gray", "green"].includes(color)) {
-    textColor = `!text-${color}-700`;
-  }
-
-  return textColor;
 }
 
 export function isElementInViewport(el: HTMLElement) {
@@ -810,12 +824,12 @@ export function stripEmailColors(html: string): string {
     else el.removeAttribute("style");
   });
 
-  div.querySelectorAll("[bgcolor]").forEach((el) =>
-    el.removeAttribute("bgcolor")
-  );
-  div.querySelectorAll("font[color]").forEach((el) =>
-    el.removeAttribute("color")
-  );
+  div
+    .querySelectorAll("[bgcolor]")
+    .forEach((el) => el.removeAttribute("bgcolor"));
+  div
+    .querySelectorAll("font[color]")
+    .forEach((el) => el.removeAttribute("color"));
 
   return div.innerHTML;
 }
@@ -829,8 +843,7 @@ export const dataTheme = ref<string>(
 
 if (typeof window !== "undefined") {
   new MutationObserver(() => {
-    const next =
-      document.documentElement.getAttribute("data-theme") || "light";
+    const next = document.documentElement.getAttribute("data-theme") || "light";
     if (next !== dataTheme.value) dataTheme.value = next;
   }).observe(document.documentElement, {
     attributes: true,
@@ -838,13 +851,57 @@ if (typeof window !== "undefined") {
   });
 }
 
+const MINUTE = 60;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const MONTH = 30 * DAY;
+const YEAR = 365 * DAY;
+
+/**
+ * Compact relative duration between `target` and now, ignoring direction.
+ * Examples: `1y`, `4 days 4h`, `2h 20m`, `5m`.
+ */
+export function shortDuration(target: string | Date): string {
+  const seconds = Math.abs(dayjs(target).diff(dayjs(), "second"));
+  if (seconds >= YEAR) {
+    const years = Math.floor(seconds / YEAR);
+    return `${years} ${years === 1 ? "year" : "years"}`;
+  }
+  if (seconds >= MONTH) {
+    const months = Math.floor(seconds / MONTH);
+    return `${months} ${months === 1 ? "month" : "months"}`;
+  }
+  if (seconds >= DAY) {
+    const days = Math.floor(seconds / DAY);
+    const hours = Math.floor((seconds % DAY) / HOUR);
+    const dayLabel = `${days} ${days === 1 ? "day" : "days"}`;
+    return hours ? `${dayLabel} ${hours}h` : dayLabel;
+  }
+  if (seconds >= HOUR) {
+    const hours = Math.floor(seconds / HOUR);
+    const minutes = Math.floor((seconds % HOUR) / MINUTE);
+    return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
+  }
+  return `${Math.floor(seconds / MINUTE)}m`;
+}
+
 export function buildPercentageChange(value: number | null) {
   if (value === null || value === undefined) {
-    return { icon: "arrow-right", value: "0", color: "text-ink-gray-5" };
+    return { icon: "lucide-arrow-right", value: "0", color: "text-ink-gray-5" };
   }
   return {
-    icon: value > 0 ? "arrow-up-right" : value < 0 ? "arrow-down-left" : "arrow-right",
+    icon:
+      value > 0
+        ? "lucide-arrow-up-right"
+        : value < 0
+        ? "lucide-arrow-down-left"
+        : "lucide-arrow-right",
     value: value > 0 ? `+${value}` : value,
-    color: value > 0 ? "text-ink-red-4" : value < 0 ? "text-ink-green-3" : "text-ink-gray-5",
+    color:
+      value > 0
+        ? "text-ink-red-4"
+        : value < 0
+        ? "text-ink-green-3"
+        : "text-ink-gray-5",
   };
 }

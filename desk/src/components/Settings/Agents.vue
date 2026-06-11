@@ -17,19 +17,21 @@
     <template #header-bottom>
       <div class="flex items-center gap-2 justify-between">
         <div class="relative grow">
-          <Input
+          <TextInput
             :model-value="search"
-            @input="search = $event"
+            @update:model-value="search = $event"
             :placeholder="__('Search')"
             type="text"
             class="focus:ring-0 border-outline-gray-2"
-            icon-left="search"
-            debounce="300"
-            inputClass="p-4 pr-12"
-          />
+            :debounce="300"
+          >
+            <template #prefix>
+              <LucideSearch class="size-4" />
+            </template>
+          </TextInput>
           <Button
             v-if="search"
-            icon="x"
+            icon="lucide-x"
             variant="ghost"
             @click="search = ''"
             class="absolute right-1 top-1/2 -translate-y-1/2"
@@ -155,7 +157,7 @@
                   class="ml-2"
                   placement="right"
                 >
-                  <Button icon="more-horizontal" variant="ghost" />
+                  <Button icon="lucide-more-horizontal" variant="ghost" />
                 </Dropdown>
               </div>
             </div>
@@ -169,7 +171,7 @@
               @click="() => agents.next()"
               :loading="agents.loading"
               :label="__('Load More')"
-              icon-left="refresh-cw"
+              icon-left="lucide-refresh-cw"
             />
           </div>
         </div>
@@ -189,6 +191,7 @@ import AgentIcon from "../icons/AgentIcon.vue";
 import { setActiveSettingsTab } from "./settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
+import { renderOptionIcon } from "@/utils";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
@@ -207,7 +210,7 @@ function getRoles(agent: string) {
           role: "Agent",
           active: props.active,
           selected: agentRole === "Agent",
-          icon: "user",
+          icon: "lucide-user",
           onClick: () => {
             updateRole(agent, "Agent");
           },
@@ -222,7 +225,7 @@ function getRoles(agent: string) {
           role: "Manager",
           active: props.active,
           selected: agentRole === "Manager",
-          icon: "briefcase",
+          icon: "lucide-briefcase",
           onClick: () => {
             updateRole(agent, "Manager");
           },
@@ -246,13 +249,7 @@ function RoleOption({ active, role, onClick, selected, icon = null }) {
     },
     [
       h("div", { class: "flex gap-2" }, [
-        icon
-          ? h(FeatherIcon, {
-              name: icon,
-              class: ["h-4 w-4 shrink-0"],
-              "aria-hidden": true,
-            })
-          : null,
+        renderOptionIcon(icon),
         h("span", { class: "whitespace-nowrap" }, role),
       ]),
       selected
@@ -284,7 +281,7 @@ function getOptions(agent) {
   return [
     {
       label: "Disable Agent",
-      icon: "x-circle",
+      icon: "lucide-x-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 0);
         agents.reload({ ...filters, search: search.value });
@@ -293,7 +290,7 @@ function getOptions(agent) {
     },
     {
       label: "Enable Agent",
-      icon: "check-circle",
+      icon: "lucide-check-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 1);
         agents.reload({ ...filters, search: search.value });

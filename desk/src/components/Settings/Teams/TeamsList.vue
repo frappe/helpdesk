@@ -11,7 +11,7 @@
         theme="gray"
         variant="solid"
         @click="emit('update:step', 'new-team', '')"
-        icon-left="plus"
+        icon-left="lucide-plus"
       />
     </template>
     <template
@@ -19,19 +19,21 @@
       #header-bottom
     >
       <div class="relative">
-        <Input
+        <TextInput
           :model-value="teamsSearchQuery"
-          @input="teamsSearchQuery = $event"
+          @update:model-value="teamsSearchQuery = $event"
           :placeholder="__('Search')"
           type="text"
           class="focus:ring-0 border-outline-gray-2"
-          icon-left="search"
-          debounce="300"
-          inputClass="p-4 pr-12"
-        />
+          :debounce="300"
+        >
+          <template #prefix>
+            <LucideSearch class="size-4" />
+          </template>
+        </TextInput>
         <Button
           v-if="teamsSearchQuery"
-          icon="x"
+          icon="lucide-x"
           variant="ghost"
           @click="teamsSearchQuery = ''"
           class="absolute right-1 top-1/2 -translate-y-1/2"
@@ -65,7 +67,7 @@
               <div>
                 <Dropdown placement="right" :options="dropdownOptions(team)">
                   <Button
-                    icon="more-horizontal"
+                    icon="lucide-more-horizontal"
                     variant="ghost"
                     @click="isConfirmingDelete = false"
                   />
@@ -83,7 +85,7 @@
             @click="() => teams.next()"
             :loading="teams.loading"
             :label="__('Load More')"
-            icon-left="refresh-cw"
+            icon-left="lucide-refresh-cw"
           />
         </div>
       </div>
@@ -132,7 +134,7 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
 import { TeamListResourceSymbol } from "@/types";
 import { ConfirmDelete } from "@/utils";
-import { Dropdown, Input, toast } from "frappe-ui";
+import { Dropdown, TextInput, toast } from "frappe-ui";
 import { inject, markRaw, Ref, ref, watch } from "vue";
 import NewTeamModal from "../NewTeamModal.vue";
 import RenameTeamModal from "./RenameTeamModal.vue";

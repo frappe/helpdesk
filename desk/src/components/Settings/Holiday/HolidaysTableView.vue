@@ -39,7 +39,7 @@
         <div class="flex justify-end">
           <Dropdown placement="right" :options="dropdownOptions(holiday)">
             <Button
-              icon="more-horizontal"
+              icon="lucide-more-horizontal"
               variant="ghost"
               @click="isConfirmingDelete = false"
             />
@@ -57,11 +57,10 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import dayjs from "dayjs";
 import { ConfirmDelete, getFormattedDate } from "@/utils";
 import { holidayData } from "@/stores/holidayList";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
-import { Dropdown } from "frappe-ui";
+import { dayjs, Dropdown } from "frappe-ui";
 
 const isConfirmingDelete = ref(false);
 
@@ -75,7 +74,7 @@ const dropdownOptions = (holiday: Holiday) => [
   {
     label: "Edit",
     onClick: () => editHoliday(holiday),
-    icon: "edit",
+    icon: "lucide-edit",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteHoliday(holiday),

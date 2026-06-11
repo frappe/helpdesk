@@ -1,9 +1,6 @@
 <template>
-  <Dialog
-    :options="{ title: `Merge with another ticket` }"
-    v-model="showDialog"
-  >
-    <template #body-content>
+  <Dialog title="Merge with another ticket" v-model:open="showDialog">
+    <template #default>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-8">
           {{

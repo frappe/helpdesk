@@ -51,7 +51,7 @@
         variant="subtle"
         label="Add row"
         @click="addRow"
-        icon-left="plus"
+        icon-left="lucide-plus"
       />
     </div>
     <ErrorMessage

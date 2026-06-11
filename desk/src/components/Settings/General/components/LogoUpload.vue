@@ -44,7 +44,7 @@
             />
             <Button
               v-if="props.image"
-              iconLeft="trash-2"
+              iconLeft="lucide-trash-2"
               :label="__('Remove')"
               @click="emit('onRemove')"
               :loading="isLoading"

@@ -7,7 +7,7 @@
       @click="(i) => remove(i)"
     />
 
-    <Input
+    <TextInput
       v-model="input"
       class="w-full"
       :placeholder="placeholder"
@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { Input, toast } from "frappe-ui";
+import { TextInput, toast } from "frappe-ui";
 import { ref, toRefs } from "vue";
 import Pill from "./Pill.vue";
 

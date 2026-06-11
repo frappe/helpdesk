@@ -87,7 +87,7 @@
     <ListSelectBanner v-if="options.showSelectBanner">
       <template #actions="{ selections, unselectAll }">
         <Dropdown :options="selectBannerOptions(selections, unselectAll)">
-          <Button icon="more-horizontal" variant="ghost" />
+          <Button icon="lucide-more-horizontal" variant="ghost" />
         </Dropdown>
       </template>
     </ListSelectBanner>
@@ -157,6 +157,7 @@ import {
   ListSelectBanner,
   ListView,
   LoadingIndicator,
+  dayjs,
   toast,
 } from "frappe-ui";
 import {
@@ -230,7 +231,7 @@ const defaultOptions = reactive({
   selectBannerActions: [
     {
       label: __("Delete"),
-      icon: "trash-2",
+      icon: "lucide-trash-2",
       onClick: (selections: Set<string>) => {
         $dialog({
           title: __("Delete"),

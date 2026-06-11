@@ -1,11 +1,6 @@
 <template>
-  <Dialog
-    v-model="dialog"
-    :options="{
-      title: 'Edit response and resolution',
-    }"
-  >
-    <template #body-content>
+  <Dialog v-model:open="dialog" title="Edit response and resolution">
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl
           :type="'select'"
@@ -79,7 +74,7 @@
             :theme="isConfirmingDelete ? 'red' : 'gray'"
             :label="isConfirmingDelete ? 'Confirm Delete' : 'Delete'"
             @click="deleteItem"
-            icon-left="trash-2"
+            icon-left="lucide-trash-2"
           />
         </div>
         <div class="flex gap-2">
