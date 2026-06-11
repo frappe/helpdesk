@@ -5,7 +5,7 @@
   >
     Activity
   </div>
-  <div class="overflow-auto px-6 md:px-10 grow">
+  <div class="overflow-auto px-5 md:px-10 grow">
     <div
       v-for="(c, i) in communications"
       :id="c.name"
