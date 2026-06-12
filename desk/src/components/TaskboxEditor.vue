@@ -61,17 +61,13 @@
               {{ getDescriptionLength }}/4000
             </span>
           </div>
-          <TextEditor
-            :editor-class="`!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border bg-surface-gray-2 placeholder-ink-gray-4 hover:shadow-sm focus:bg-surface-white focus:shadow-sm focus:ring-0 focus-visible:ring-2 text-ink-gray-8 transition-colors -mt-0.5 ${
-              errors.description || errors.descriptionLength
-                ? 'border-red-500 focus-visible:ring-red-500'
-                : 'border-[--surface-gray-2] hover:border-outline-gray-modals focus:border-outline-gray-4 focus-visible:ring-outline-gray-3'
-            }`"
-            :bubble-menu="false"
-            :fixed-menu="true"
-            :content="form.description"
+          <CompactEditor
+            v-model="form.description"
             :placeholder="__('Enter task description...')"
-            @change="(val) => (form.description = val)"
+            :class="{
+              'border-red-500 ring-1 ring-red-500':
+                errors.description || errors.descriptionLength,
+            }"
           />
           <p v-if="errors.description" class="text-xs text-red-500 font-medium">
             {{ __("Description is required") }}
@@ -85,14 +81,22 @@
         </div>
 
         <div class="grid grid-cols-2 gap-4">
+          <!-- Priority Select Box Area -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __("Priority") }}</div>
-            <FormControl
-              type="select"
-              variant="subtle"
-              :options="priorityOptions"
-              v-model="form.priority"
-            />
+            <div class="relative flex items-center">
+              <TaskPriorityIcon
+                :priority="form.priority"
+                class="absolute left-3 z-10 h-4 w-4 pointer-events-none"
+              />
+              <FormControl
+                type="select"
+                variant="subtle"
+                class="w-full !pl-9"
+                :options="priorityOptions"
+                v-model="form.priority"
+              />
+            </div>
           </div>
 
           <div class="space-y-1.5">
@@ -152,14 +156,22 @@
             </div>
           </div>
 
+          <!-- Status Select Box Area -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __("Status") }}</div>
-            <FormControl
-              type="select"
-              variant="subtle"
-              :options="statusOptions"
-              v-model="form.status"
-            />
+            <div class="relative flex items-center">
+              <TaskStatusIcon
+                :status="form.status || 'Todo'"
+                class="absolute left-3 z-10 h-4 w-4 pointer-events-none"
+              />
+              <FormControl
+                type="select"
+                variant="subtle"
+                class="w-full !pl-9"
+                :options="statusOptions"
+                v-model="form.status"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -178,6 +190,7 @@
     </template>
   </Dialog>
 </template>
+
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
 import {
@@ -188,7 +201,6 @@ import {
   Dialog,
   FormControl,
   FeatherIcon,
-  TextEditor,
   TextInput,
   call,
   toast,
@@ -196,6 +208,7 @@ import {
 import { __ } from "@/translation";
 import { isContentEmpty } from "@/utils";
 import { useUserStore } from "@/stores/user";
+import CompactEditor from "@/components/CompactEditor.vue";
 import TaskStatusIcon from "@/components/icons/TaskStatusIcon.vue";
 import TaskPriorityIcon from "@/components/icons/TaskPriorityIcon.vue";
 
@@ -419,7 +432,7 @@ async function handleSubmit() {
   try {
     let result: any;
     const dbDate = form.value.due_date || null;
-    const assignedTo = resolveAssigned();
+    const assignedTo = form.value.assigned || null;
 
     if (isEditing.value) {
       const taskName = props.task?.name || activeTask.value?.name;

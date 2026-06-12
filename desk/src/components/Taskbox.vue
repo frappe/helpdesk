@@ -1,5 +1,7 @@
 <template>
   <div class="w-full">
+    <hr v-if="i > 0" class="mx-4 border-0 border-t border-gray-200" />
+
     <div
       class="activity flex cursor-pointer items-start justify-between gap-4 px-4 py-3 rounded-xl hover:bg-surface-gray-1 transition-colors duration-200 w-full"
       @click="showModal = true"
@@ -67,72 +69,16 @@
           </Button>
         </Dropdown>
 
-        <!-- Custom controlled popover -->
-        <div class="relative" ref="menuWrapperRef">
-          <button
-            class="flex h-7 w-7 items-center justify-center rounded-md text-ink-gray-8 hover:bg-surface-gray-3 hover:text-ink-gray-9 transition-colors"
-            @click="toggleMenu"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <circle cx="5" cy="12" r="2" />
-              <circle cx="12" cy="12" r="2" />
-              <circle cx="19" cy="12" r="2" />
-            </svg>
-          </button>
-
-          <Transition
-            enter-active-class="transition ease-out duration-100"
-            enter-from-class="opacity-0 scale-95"
-            enter-to-class="opacity-100 scale-100"
-            leave-active-class="transition ease-in duration-75"
-            leave-from-class="opacity-100 scale-100"
-            leave-to-class="opacity-0 scale-95"
-          >
-            <div
-              v-if="menuOpen"
-              class="absolute right-0 z-50 mt-1 min-w-[160px] origin-top-right rounded-xl border border-surface-gray-2 bg-white shadow-xl py-1.5"
-            >
-              <button
-                class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors duration-150 rounded-lg"
-                :class="
-                  isConfirmingDelete
-                    ? 'text-red-500 font-medium hover:bg-red-50'
-                    : 'text-ink-gray-7 hover:bg-surface-gray-1'
-                "
-                style="width: calc(100% - 8px); margin: 0 4px"
-                @click="deleteTask"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4 shrink-0"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <polyline points="3 6 5 6 21 6" />
-                  <path d="M19 6l-1 14H6L5 6" />
-                  <path d="M10 11v6" />
-                  <path d="M14 11v6" />
-                  <path d="M9 6V4h6v2" />
-                </svg>
-                {{ isConfirmingDelete ? __("Confirm Delete") : __("Delete") }}
-              </button>
-            </div>
-          </Transition>
-        </div>
+        <Dropdown :options="actionMenuOptions" placement="bottom-end">
+          <Button
+            variant="ghost"
+            icon="more-horizontal"
+            class="text-ink-gray-8 hover:bg-surface-gray-3 hover:text-ink-gray-9"
+            @click="isConfirmingDelete = false"
+          />
+        </Dropdown>
       </div>
     </div>
-
-    <div class="mx-3 border-b border-surface-gray-1" />
 
     <TaskboxEditor
       v-if="showModal"
@@ -145,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onBeforeUnmount } from "vue";
+import { computed, ref } from "vue";
 import { Avatar, Button, Dropdown, Tooltip, call, toast } from "frappe-ui";
 import { dateTooltipFormat, dateFormat } from "@/utils";
 import { __ } from "@/translation";
@@ -179,34 +125,7 @@ const emit = defineEmits(["update", "status-change", "deleted"]);
 const showModal = ref(false);
 const isUpdating = ref(false);
 const isConfirmingDelete = ref(false);
-const menuOpen = ref(false);
-const menuWrapperRef = ref<HTMLElement | null>(null);
 const { getUser } = useUserStore();
-
-function toggleMenu() {
-  menuOpen.value = !menuOpen.value;
-  if (!menuOpen.value) {
-    isConfirmingDelete.value = false;
-  }
-}
-
-function handleOutsideClick(e: MouseEvent) {
-  if (
-    menuWrapperRef.value &&
-    !menuWrapperRef.value.contains(e.target as Node)
-  ) {
-    menuOpen.value = false;
-    isConfirmingDelete.value = false;
-  }
-}
-
-onMounted(() => {
-  document.addEventListener("mousedown", handleOutsideClick);
-});
-
-onBeforeUnmount(() => {
-  document.removeEventListener("mousedown", handleOutsideClick);
-});
 
 const assignedId = computed(
   () => props.activity.assigned || props.activity.assigned_to || ""
@@ -224,6 +143,17 @@ const assigneeLabel = computed((): string => {
   return assigned;
 });
 
+function updateAssignedUser(userData: any) {
+  if (!userData || typeof userData !== "object") return;
+
+  const newUser = userData.assigned || userData.assigned_to;
+
+  if (newUser) {
+    props.activity.assigned = newUser;
+    props.activity.assigned_to = newUser;
+  }
+}
+
 async function changeStatus(newStatus: string) {
   if (isUpdating.value) return;
 
@@ -234,7 +164,6 @@ async function changeStatus(newStatus: string) {
   }
 
   isUpdating.value = true;
-
   const previousStatus = props.activity.status;
   props.activity.status = newStatus;
 
@@ -257,18 +186,9 @@ async function changeStatus(newStatus: string) {
 async function deleteTask() {
   if (isUpdating.value) return;
 
-  // First click: toggle label, keep menu open
-  if (!isConfirmingDelete.value) {
-    isConfirmingDelete.value = true;
-    return;
-  }
-
-  // Second click: actually delete
   const taskId = props.activity.name || props.activity.id;
   if (!taskId) {
     toast.error(__("Task identifier missing, cannot delete."));
-    isConfirmingDelete.value = false;
-    menuOpen.value = false;
     return;
   }
 
@@ -288,7 +208,6 @@ async function deleteTask() {
   } finally {
     isUpdating.value = false;
     isConfirmingDelete.value = false;
-    menuOpen.value = false;
   }
 }
 
@@ -305,6 +224,26 @@ const statusDropdownOptions = computed(() =>
     onClick: () => changeStatus(s.value),
   }))
 );
+
+const actionMenuOptions = computed(() => [
+  {
+    label: isConfirmingDelete.value ? __("Confirm Delete") : __("Delete"),
+    icon: "trash-2",
+    class: isConfirmingDelete.value
+      ? "text-red-600 font-medium bg-red-50 hover:bg-red-100"
+      : "text-ink-gray-7 hover:bg-surface-gray-1",
+    onClick: (e: MouseEvent) => {
+      if (!isConfirmingDelete.value) {
+        e.preventDefault();
+        e.stopPropagation();
+        isConfirmingDelete.value = true;
+      } else {
+        deleteTask();
+      }
+    },
+  },
+]);
+
 function handleReload(payload?: any) {
   showModal.value = false;
 
