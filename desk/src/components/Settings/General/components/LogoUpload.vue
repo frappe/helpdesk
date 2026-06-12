@@ -4,7 +4,7 @@
   >
     <div class="flex flex-col sm:flex-row items-center gap-3.5">
       <div
-        class="flex items-center justify-center min-w-16 min-h-16 rounded-lg overflow-hidden border border-gray-100"
+        class="flex items-center justify-center min-w-16 min-h-16 rounded-lg overflow-hidden border border-outline-gray-1"
       >
         <Avatar
           v-if="props.image"
@@ -29,7 +29,7 @@
         "
       >
         <template v-slot="{ progress, uploading, openFileSelector }">
-          <div class="flex items-end space-x-2">
+          <div class="flex items-end gap-x-2">
             <Button
               @click="openFileSelector"
               :iconLeft="ImageUpIcon"
@@ -44,7 +44,7 @@
             />
             <Button
               v-if="props.image"
-              iconLeft="trash-2"
+              iconLeft="lucide-trash-2"
               :label="__('Remove')"
               @click="emit('onRemove')"
               :loading="isLoading"

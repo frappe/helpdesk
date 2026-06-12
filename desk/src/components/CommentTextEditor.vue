@@ -19,7 +19,7 @@
   >
     <template #bottom>
       <!-- Attachments -->
-      <div class="flex flex-wrap gap-2 my-2 ml-5">
+      <div class="flex flex-wrap gap-2 my-2 ms-5">
         <AttachmentItem
           v-for="a in attachments"
           :key="a.file_url"
@@ -52,7 +52,7 @@
                   <template #default="{ openFileSelector, uploading }">
                     {{ void (loading = uploading) }}
                     <button
-                      class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
+                      class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
                       @click="openFileSelector()"
                       :disabled="uploading"
                     >
@@ -63,11 +63,11 @@
                     </button>
                   </template>
                 </FileUploader>
-                <div class="h-4 w-[2px] border-l" />
+                <div class="h-4 w-[2px] border-s" />
               </div>
               <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
             </div>
-            <div class="flex items-center justify-end space-x-2 w-[40%]">
+            <div class="flex items-center justify-end gap-x-2 w-[40%]">
               <Button
                 label="Discard"
                 @click="

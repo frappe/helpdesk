@@ -28,7 +28,8 @@
         theme="gray"
         variant="solid"
         @click="$emit('update:step', 'fd')"
-        icon-left="plus"
+        icon-left="lucide-plus"
+        class="rtl:flex-row-reverse"
       />
     </template>
     <template #content>
@@ -42,30 +43,19 @@
         </div>
 
         <!-- Empty State -->
-        <div
+        <EmptyState
           v-if="
             !fieldDependenciesList.loading &&
             !fieldDependenciesList.data?.length
           "
-          class="flex flex-col items-center justify-center gap-4 p-4 h-full"
-        >
-          <div
-            class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
-          >
-            <FieldDependencyIcon class="size-6 text-ink-gray-6" />
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <div class="text-base font-medium text-ink-gray-6">
-              {{ __("No field dependency found") }}
-            </div>
-            <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-              {{ __("Add one to get started.") }}
-            </div>
-          </div>
-        </div>
+          variant="badge"
+          :icon="FieldDependencyIcon"
+          title="No field dependency found"
+          description="Add one to get started."
+        />
 
         <div
-          class="w-full -ml-2"
+          class="w-full -ms-2"
           v-if="
             !fieldDependenciesList.loading &&
             fieldDependenciesList.data?.length > 0
@@ -73,9 +63,9 @@
         >
           <div>
             <div
-              class="grid grid-cols-11 items-center gap-4 text-sm text-gray-600"
+              class="grid grid-cols-11 items-center gap-4 text-sm text-ink-gray-5"
             >
-              <div class="col-span-7 ml-2">{{ __("Name") }}</div>
+              <div class="col-span-7 ms-2">{{ __("Name") }}</div>
               <div class="col-span-2">{{ __("Created by") }}</div>
               <div class="col-span-2">{{ __("Enabled") }}</div>
             </div>
@@ -85,11 +75,11 @@
               :key="row.name"
             >
               <div
-                class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded h-12.5"
+                class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded h-12.5"
               >
                 <div
                   @click.stop="$emit('update:step', 'fd', row.name)"
-                  class="w-full py-3 pl-2 col-span-7 text-base text-ink-gray-7"
+                  class="w-full py-3 ps-2 col-span-7 text-base text-ink-gray-7"
                 >
                   <span>{{ getFieldDependencyLabel(row.name) }}</span>
                 </div>
@@ -100,14 +90,12 @@
                   }}</span>
                 </div>
                 <div
-                  class="flex justify-between items-center w-full pr-2 col-span-2"
+                  class="flex justify-between items-center w-full pe-2 col-span-2"
                 >
                   <div>
                     <Switch
-                      :model-value="row.enabled"
-                      @update:modelValue="
-                        (e) => handleSwitchToggle(row.name, e)
-                      "
+                      :model-value="Boolean(row.enabled)"
+                      @update:modelValue="(e) => handleSwitchToggle(row, e)"
                       @click.stop
                     />
                   </div>
@@ -177,15 +165,23 @@ function getOptions(rowName: string) {
   });
 }
 
-function handleSwitchToggle(rowName: string, value: boolean) {
+function handleSwitchToggle(row: any, value: boolean) {
+  // Optimistically reflect the new state so the controlled Switch stays in
+  // sync; without this the bound value never changes and toggling keeps
+  // re-sending the same value (the disable never takes effect).
+  row.enabled = value;
   fieldDependenciesList.setValue.submit(
     {
-      name: rowName,
+      name: row.name,
       enabled: value,
     },
     {
       onSuccess: () => {
         toast.success(__("Field dependency updated successfully."));
+      },
+      onError: () => {
+        row.enabled = !value;
+        toast.error(__("Failed to update field dependency."));
       },
     }
   );

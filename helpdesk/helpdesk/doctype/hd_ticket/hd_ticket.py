@@ -29,7 +29,6 @@ from helpdesk.helpdesk.utils.email import (
     default_outgoing_email_account,
     default_ticket_outgoing_email_account,
 )
-from helpdesk.search import HelpdeskSearch
 from helpdesk.utils import (
     agent_only,
     capture_event,
@@ -374,9 +373,13 @@ class HDTicket(Document):
             "sla",
         ]:
             if self.has_value_changed(field):
-                log_ticket_activity(
-                    self.name, f"set {field_maps[field]} to {self.as_dict()[field]}"
-                )
+                value = self.as_dict()[field]
+                if not value:
+                    msg = f"cleared {field_maps[field]}"
+                else:
+                    msg = f"set {field_maps[field]} to {value}"
+
+                log_ticket_activity(self.name, msg)
 
     def generate_key(self):
         self.key = uuid.uuid4()
@@ -591,7 +594,7 @@ class HDTicket(Document):
         from_email_id = from_email.get("email_id") if from_email else None
         email_account_name = from_email.get("email_account") if from_email else None
         sender = from_email_id or frappe.session.user
-        recipients = to or self.raised_by
+        recipients = to
 
         sender_email = None
         if not skip_email_workflow:
@@ -632,13 +635,10 @@ class HDTicket(Document):
         _attachments = []
 
         for attachment in attachments:
-            file_doc = frappe.get_doc("File", attachment)
-            file_doc.attached_to_name = communication.name
-            file_doc.attached_to_doctype = "Communication"
-            file_doc.save(ignore_permissions=True)
-            self.attach_file_with_doc("HD Ticket", self.name, file_doc.file_url)
-
-            _attachments.append({"file_url": file_doc.file_url})
+            file_url = frappe.db.get_value("File", attachment, "file_url")
+            self.attach_file_with_doc("Communication", communication.name, file_url)
+            self.attach_file_with_doc("HD Ticket", self.name, file_url)
+            _attachments.append({"file_url": file_url})
 
         if skip_email_workflow or not frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_via_agent"
@@ -989,6 +989,15 @@ class HDTicket(Document):
         self.save()
 
     def attach_file_with_doc(self, doctype, docname, file_url):
+        if frappe.db.exists(
+            "File",
+            {
+                "file_url": file_url,
+                "attached_to_doctype": doctype,
+                "attached_to_name": docname,
+            },
+        ):
+            return
         file_doc = frappe.new_doc("File")
         file_doc.attached_to_doctype = doctype
         file_doc.attached_to_name = docname
@@ -1002,7 +1011,7 @@ class HDTicket(Document):
                 "label": "ID",
                 "type": "Int",
                 "key": "name",
-                "width": "5rem",
+                "width": "auto",
             },
             {
                 "label": "Subject",

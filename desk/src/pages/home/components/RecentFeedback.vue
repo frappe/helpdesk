@@ -44,7 +44,7 @@
                 @click="redirectToSeeAllReviews"
               >
                 {{ __("{0} reviews", chartConfig.totalFeedbacks) }}
-                <FeatherIcon name="arrow-up-right" class="size-3.5 ml-0.5" />
+                <FeatherIcon name="arrow-up-right" class="size-3.5 ms-0.5" />
               </div>
             </div>
             <div v-if="chartConfig.totalFeedbacks > 0" class="text-sm">
@@ -93,7 +93,10 @@
               placement="left"
             >
               <template #default>
-                <Button :label="currentSortLabel" icon-right="chevron-down" />
+                <Button
+                  :label="currentSortLabel"
+                  icon-right="lucide-chevron-down"
+                />
               </template>
               <template #item-label="{ item }">
                 <div
@@ -112,7 +115,7 @@
             </Dropdown>
 
             <!-- Period dropdown second -->
-            <div class="flex items-center gap-2 ml-auto">
+            <div class="flex items-center gap-2 ms-auto">
               <Dropdown
                 v-if="!showDatePicker && currentPeriod !== 'custom_range'"
                 :options="periodOptions"
@@ -121,7 +124,7 @@
                 <template #default>
                   <Button
                     :label="currentPeriodLabel"
-                    icon-right="chevron-down"
+                    icon-right="lucide-chevron-down"
                   />
                 </template>
                 <template #item-label="{ item }">
@@ -144,12 +147,13 @@
               <DateRangePicker
                 v-if="showDatePicker || currentPeriod === 'custom_range'"
                 ref="datePickerRef"
-                v-model="customDateRange"
+                :model-value="customDateRange ? customDateRange.split(',') : []"
                 :placeholder="__('Select range')"
                 @update:model-value="onCustomRangeSelected"
                 :format="'MMM D'"
                 @click="datePickerRef?.open()"
-                placement="top-start"
+                side="top"
+                align="start"
                 class="!w-48"
               />
             </div>
@@ -178,7 +182,7 @@
               <!-- Rating & Title -->
               <div class="flex items-center gap-2 mb-2">
                 <div
-                  class="flex items-center gap-1 p-1 pl-0 rounded"
+                  class="flex items-center gap-1 p-1 ps-0 rounded"
                   :class="[getRatingColor(currentFeedback.star_rating).text]"
                 >
                   <LucideStar
@@ -228,7 +232,10 @@
                     @click="prevFeedback"
                     :disabled="currentIndex === 0"
                   >
-                    <FeatherIcon name="chevron-left" class="size-4" />
+                    <FeatherIcon
+                      name="chevron-left"
+                      class="size-4 rtl:rotate-180"
+                    />
                   </Button>
                   <Button
                     variant="ghost"
@@ -236,7 +243,10 @@
                     @click="nextFeedback"
                     :disabled="currentIndex >= chartConfig.feedbacks.length - 1"
                   >
-                    <FeatherIcon name="chevron-right" class="size-4" />
+                    <FeatherIcon
+                      name="chevron-right"
+                      class="size-4 rtl:rotate-180"
+                    />
                   </Button>
                 </div>
               </div>
@@ -292,6 +302,7 @@ import {
   TabButtons,
   ECharts,
 } from "frappe-ui";
+import { dataTheme } from "@/utils";
 import LucideStar from "~icons/lucide/star";
 import { useRouter } from "vue-router";
 import { dayjsLocal } from "frappe-ui";
@@ -304,8 +315,8 @@ import EmptyState from "@/components/EmptyState.vue";
 
 const router = useRouter();
 const chartTabs = [
-  { label: "Rating", value: "rating" },
-  { label: "Feedback", value: "feedback" },
+  { label: __("Rating"), value: "rating" },
+  { label: __("Feedback"), value: "feedback" },
 ];
 const currentTab = ref("rating");
 const { views } = useView("HD Ticket");
@@ -420,8 +431,8 @@ const changeSort = (sort: string) => {
   getRecentFeedbackResource.fetch();
 };
 
-const onCustomRangeSelected = (range: string) => {
-  if (!range) {
+const onCustomRangeSelected = (range: string[]) => {
+  if (!range?.length) {
     showDatePicker.value = false;
     currentPeriod.value = "all_time";
     customDateRange.value = undefined;
@@ -431,7 +442,7 @@ const onCustomRangeSelected = (range: string) => {
   }
   showDatePicker.value = false;
   currentPeriod.value = "custom_range";
-  customDateRange.value = range;
+  customDateRange.value = range.join(",");
   currentIndex.value = 0;
   getRecentFeedbackResource.fetch();
 };
@@ -474,6 +485,14 @@ const currentFeedback = computed(() => {
 });
 
 const barChartOptions = computed<EChartsOption>(() => {
+  // re-compute on theme change
+  void dataTheme.value;
+
+  const mutedBarColor = cssVar("--surface-gray-4");
+  const axisLineColor = cssVar("--outline-gray-1");
+  const axisLabelColor = cssVar("--ink-gray-5");
+  const goldBarColor = "#de9735"; // brand rating gold, intentional
+
   const distribution = chartConfig.value.ratingDistribution;
   const values = [1, 2, 3, 4, 5].map((star) => distribution[star] || 0);
   const maxValue = Math.max(...values);
@@ -484,14 +503,14 @@ const barChartOptions = computed<EChartsOption>(() => {
     return {
       value,
       itemStyle: {
-        color: isMax ? "#de9735" : "#d1d5db",
+        color: isMax ? goldBarColor : mutedBarColor,
         borderRadius: [4, 4, 0, 0],
       },
       label: {
         show: isMax,
         position: "top" as const,
         formatter: value > 0 ? String(value) : "",
-        color: "#6b7280",
+        color: axisLabelColor,
         fontSize: 12,
       },
       emphasis: {
@@ -513,10 +532,10 @@ const barChartOptions = computed<EChartsOption>(() => {
     xAxis: {
       type: "category",
       data: ["1", "2", "3", "4", "5"],
-      axisLine: { show: true, lineStyle: { color: "#ededed" } },
+      axisLine: { show: true, lineStyle: { color: axisLineColor } },
       axisTick: { show: false },
       axisLabel: {
-        color: "#6b7280",
+        color: axisLabelColor,
         fontSize: 12,
       },
     },
@@ -531,7 +550,7 @@ const barChartOptions = computed<EChartsOption>(() => {
         barWidth: 24,
         label: {
           position: "top",
-          color: "#6b7280",
+          color: axisLabelColor,
           fontSize: 12,
           formatter: (params: any) => (params.value > 0 ? params.value : ""),
         },
@@ -544,7 +563,17 @@ const barChartOptions = computed<EChartsOption>(() => {
   };
 });
 
+const cssVar = (name: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
 const placeholderChartOptions = computed<EChartsOption>(() => {
+  // re-compute on theme change
+  void dataTheme.value;
+
+  const placeholderColor = cssVar("--surface-gray-3");
+  const axisLineColor = cssVar("--outline-gray-2");
+  const axisLabelColor = cssVar("--ink-gray-5");
+
   const placeholderValues = Array.from(
     { length: 5 },
     () => Math.floor(Math.random() * 11) + 3
@@ -552,7 +581,7 @@ const placeholderChartOptions = computed<EChartsOption>(() => {
   const data = placeholderValues.map((value) => ({
     value,
     itemStyle: {
-      color: "#F8F8F8",
+      color: placeholderColor,
       borderRadius: [4, 4, 0, 0],
     },
   }));
@@ -568,10 +597,10 @@ const placeholderChartOptions = computed<EChartsOption>(() => {
     xAxis: {
       type: "category",
       data: ["1", "2", "3", "4", "5"],
-      axisLine: { show: true, lineStyle: { color: "#F8F8F8" } },
+      axisLine: { show: true, lineStyle: { color: axisLineColor } },
       axisTick: { show: false },
       axisLabel: {
-        color: "#F8F8F8",
+        color: axisLabelColor,
         fontSize: 12,
       },
     },

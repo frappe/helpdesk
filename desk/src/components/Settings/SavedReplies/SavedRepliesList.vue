@@ -13,28 +13,31 @@
         theme="gray"
         variant="solid"
         @click="goToNew()"
-        icon-left="plus"
+        icon-left="lucide-plus"
+        class="rtl:flex-row-reverse"
       />
     </template>
     <template #header-bottom>
       <div class="flex items-center gap-2 justify-between">
         <div class="relative w-full">
-          <Input
+          <TextInput
             :model-value="savedRepliesSearchQuery"
-            @input="savedRepliesSearchQuery = $event"
+            @update:model-value="savedRepliesSearchQuery = $event"
             :placeholder="__('Search')"
             type="text"
-            class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
-            icon-left="search"
-            debounce="300"
-            inputClass="p-4 pr-12"
-          />
+            class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-2"
+            :debounce="300"
+          >
+            <template #prefix>
+              <LucideSearch class="size-4" />
+            </template>
+          </TextInput>
           <Button
             v-if="savedRepliesSearchQuery"
-            icon="x"
+            icon="lucide-x"
             variant="ghost"
             @click="savedRepliesSearchQuery = ''"
-            class="absolute right-1 top-1/2 -translate-y-1/2"
+            class="absolute end-1 top-1/2 -translate-y-1/2"
           />
         </div>
         <Dropdown :options="filterOptions" placement="right">
@@ -74,40 +77,29 @@
     <template #content>
       <div
         v-if="savedRepliesListResource?.list?.loading"
-        class="flex items-center justify-center my-auto"
+        class="flex items-center justify-center absolute inset-x-0 top-5.5 bottom-0"
       >
         <LoadingIndicator class="w-4" />
       </div>
-      <div
+      <EmptyState
         v-if="
           !savedRepliesListResource?.list?.loading &&
           !savedRepliesListResource?.data?.length
         "
-        class="flex flex-col items-center justify-center gap-4 grow"
-      >
-        <div
-          class="p-4 size-14.5 rounded-full bg-surface-gray-1 flex justify-center items-center"
-        >
-          <SavedReplyIcon class="size-6 text-ink-gray-6" />
-        </div>
-        <div class="flex flex-col items-center gap-1">
-          <div class="text-base font-medium text-ink-gray-6">
-            {{ __("No saved replies found") }}
-          </div>
-          <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
-            {{ __("Add one to get started.") }}
-          </div>
-        </div>
-      </div>
+        variant="badge"
+        :icon="SavedReplyIcon"
+        :title="__('No saved replies found')"
+        :description="__('Add one to get started.')"
+      />
       <div
         v-if="
           !savedRepliesListResource?.list?.loading &&
           savedRepliesListResource?.data?.length
         "
-        class="-ml-2"
+        class="-ms-2"
       >
         <div
-          class="grid grid-cols-12 items-center gap-3 text-sm text-gray-600 ml-2"
+          class="grid grid-cols-12 items-center gap-3 text-sm text-ink-gray-5 ms-2"
         >
           <div class="col-span-7">{{ __("Title") }}</div>
           <div class="col-span-2">{{ __("Owner") }}</div>
@@ -119,7 +111,7 @@
           :key="savedReply.name"
         >
           <div
-            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded"
           >
             <div
               @click="
@@ -152,7 +144,7 @@
               }}</span>
             </div>
             <div
-              class="flex justify-between items-center w-full pr-2 col-span-3"
+              class="flex justify-between items-center w-full pe-2 col-span-3"
             >
               <div class="flex items-center gap-1 text-sm text-ink-gray-7">
                 <component
@@ -166,10 +158,10 @@
                 :options="dropdownOptions(savedReply)"
               >
                 <Button
-                  icon="more-horizontal"
+                  icon="lucide-more-horizontal"
                   variant="ghost"
                   @click="isConfirmingDelete = false"
-                  class="mr-2"
+                  class="me-2"
                 />
               </Dropdown>
             </div>
@@ -183,10 +175,10 @@
     </template>
   </SettingsLayoutBase>
   <Dialog
-    :options="{ title: __('Duplicate Saved reply') }"
-    v-model="duplicateDialog.show"
+    :title="__('Duplicate Saved reply')"
+    v-model:open="duplicateDialog.show"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl
           :label="__('New Saved reply Name')"
@@ -215,8 +207,8 @@ import {
   call,
   Dropdown,
   FeatherIcon,
-  Input,
   LoadingIndicator,
+  TextInput,
   toast,
 } from "frappe-ui";
 import { computed, inject, ref, Ref, watch } from "vue";
@@ -275,7 +267,7 @@ const dropdownOptions = (savedReply: SavedReply) => [
         newTitle: `${savedReply.title} (Copy)`,
       };
     },
-    icon: "copy",
+    icon: "lucide-copy",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteSavedReply(savedReply),

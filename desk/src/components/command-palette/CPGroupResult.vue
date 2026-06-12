@@ -1,27 +1,27 @@
 <template>
   <div
-    class="flex w-full min-w-0 items-center rounded p-2 text-base font-medium text-gray-800"
-    :class="{ 'bg-gray-200': active }"
+    class="flex w-full min-w-0 items-center rounded p-2 text-base font-medium text-ink-gray-8"
+    :class="{ 'bg-surface-gray-3': active }"
   >
     <component
       :is="item.icon"
       v-if="item.icon"
-      class="mr-3 h-4 w-4 text-gray-700"
+      class="me-3 h-4 w-4 text-ink-gray-6"
     />
     <span class="overflow-hidden text-ellipsis whitespace-nowrap">
-      {{ item.subject }}
+      {{ __(item.subject) }}
       <span v-if="item.showName" class="text-sm">(#{{ item.name }})</span>
     </span>
     <span
       v-if="item.modified"
-      class="ml-auto whitespace-nowrap pl-2 text-gray-600"
+      class="ms-auto whitespace-nowrap ps-2 text-ink-gray-5"
     >
       {{ dayjs(item.modified).fromNow(true) }}
     </span>
   </div>
 </template>
 <script setup lang="ts">
-import { dayjs } from "@/dayjs";
+import { dayjs } from "frappe-ui";
 
 defineProps({
   item: {

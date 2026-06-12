@@ -1,10 +1,10 @@
 <template>
   <Dialog
-    v-model="dialog.show"
+    v-model:open="dialog.show"
     @after-leave="resetForm"
-    :options="{ title: dialog.isEditing ? 'Edit workday' : 'Add workday' }"
+    :title="dialog.isEditing ? 'Edit workday' : 'Add workday'"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4">
         <div>
           <FormControl
@@ -44,7 +44,7 @@
                 value: 'Sunday',
               },
             ]"
-            :class="{ 'border-red-500': errors.workday }"
+            :class="{ 'border-outline-red-3': errors.workday }"
             @blur="validateField('workday')"
           />
           <ErrorMessage :message="errors.workday" class="mt-2" />
@@ -58,7 +58,7 @@
             placeholder="Start Time"
             label="Start Time"
             v-model="workDayData.start_time"
-            :class="{ 'border-red-500': errors.start_time }"
+            :class="{ 'border-outline-red-3': errors.start_time }"
             @blur="validateField('start_time')"
           />
           <ErrorMessage :message="errors.start_time" class="mt-2" />
@@ -72,7 +72,7 @@
             placeholder="End Time"
             label="End Time"
             v-model="workDayData.end_time"
-            :class="{ 'border-red-500': errors.end_time }"
+            :class="{ 'border-outline-red-3': errors.end_time }"
             @blur="validateTimeRange"
           />
           <ErrorMessage :message="errors.end_time" class="mt-2" />
@@ -93,7 +93,7 @@
             :theme="isConfirmingDelete ? 'red' : 'gray'"
             :label="isConfirmingDelete ? 'Confirm Delete' : 'Delete'"
             @click="deleteWorkDay"
-            icon-left="trash-2"
+            icon-left="lucide-trash-2"
           />
         </div>
         <div class="flex gap-2">

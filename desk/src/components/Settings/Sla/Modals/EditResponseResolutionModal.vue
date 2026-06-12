@@ -1,11 +1,6 @@
 <template>
-  <Dialog
-    v-model="dialog"
-    :options="{
-      title: 'Edit response and resolution',
-    }"
-  >
-    <template #body-content>
+  <Dialog v-model:open="dialog" title="Edit response and resolution">
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl
           :type="'select'"
@@ -23,16 +18,16 @@
             <template #target="{ togglePopover }" class="w-max">
               <div
                 @click="togglePopover()"
-                class="w-full bg-gray-100 rounded p-1.5 px-2 text-base text-gray-800"
+                class="w-full bg-surface-gray-2 rounded p-1.5 px-2 text-base text-ink-gray-8"
               >
                 <div v-if="priorityData.response_time">
                   {{ formatTimeHMS(priorityData.response_time) }}
                 </div>
-                <div v-else class="text-gray-500">Select time</div>
+                <div v-else class="text-ink-gray-4">Select time</div>
               </div>
             </template>
             <template #body>
-              <div class="absolute bg-white top-2">
+              <div class="absolute bg-surface-white top-2">
                 <DurationPicker
                   v-model="priorityData.response_time"
                   :options="{ seconds: false }"
@@ -47,16 +42,16 @@
             <template #target="{ togglePopover }" class="w-max">
               <div
                 @click="togglePopover()"
-                class="w-full bg-gray-100 rounded p-1.5 px-2 text-base text-gray-800"
+                class="w-full bg-surface-gray-2 rounded p-1.5 px-2 text-base text-ink-gray-8"
               >
                 <div v-if="priorityData.resolution_time">
                   {{ formatTimeHMS(priorityData.resolution_time) }}
                 </div>
-                <div v-else class="text-gray-500">Select time</div>
+                <div v-else class="text-ink-gray-4">Select time</div>
               </div>
             </template>
             <template #body>
-              <div class="absolute bg-white top-2">
+              <div class="absolute bg-surface-white top-2">
                 <DurationPicker
                   v-model="priorityData.resolution_time"
                   :options="{ seconds: false }"
@@ -79,7 +74,7 @@
             :theme="isConfirmingDelete ? 'red' : 'gray'"
             :label="isConfirmingDelete ? 'Confirm Delete' : 'Delete'"
             @click="deleteItem"
-            icon-left="trash-2"
+            icon-left="lucide-trash-2"
           />
         </div>
         <div class="flex gap-2">

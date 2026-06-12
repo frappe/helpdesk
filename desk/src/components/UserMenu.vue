@@ -13,19 +13,19 @@
       >
         <BrandLogo />
         <div
-          class="flex flex-1 flex-col text-left duration-300 ease-in-out overflow-hidden"
+          class="flex flex-1 flex-col text-start duration-300 ease-in-out overflow-hidden rtl:items-start pe-2"
           :class="
             !sidebarStore.isExpanded
-              ? 'ml-0 w-0 overflow-hidden opacity-0'
-              : 'ml-2 w-auto opacity-100'
+              ? 'ms-0 w-0 overflow-hidden opacity-0'
+              : 'ms-2 w-auto opacity-100'
           "
         >
           <div
-            class="text-base font-medium leading-none text-gray-900 truncate"
+            class="text-base font-medium leading-none text-ink-gray-9 truncate"
           >
             {{ config.brandName || "Helpdesk" }}
           </div>
-          <div class="mt-1 text-sm text-gray-700">
+          <div class="mt-1 text-sm text-ink-gray-7">
             {{ authStore.userName }}
           </div>
         </div>
@@ -33,13 +33,13 @@
           class="duration-300 ease-in-out"
           :class="
             !sidebarStore.isExpanded
-              ? 'ml-0 w-0 overflow-hidden opacity-0'
-              : 'ml-2 relative left-[-2.5px] w-auto opacity-100'
+              ? 'ms-0 w-0 overflow-hidden opacity-0'
+              : 'ms-2 relative start-[-2.5px] w-auto opacity-100'
           "
         >
           <FeatherIcon
             name="chevron-down"
-            class="h-4 w-4 text-gray-600"
+            class="h-4 w-4 text-ink-gray-5"
             aria-hidden="true"
           />
         </div>

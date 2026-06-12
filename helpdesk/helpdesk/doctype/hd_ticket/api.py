@@ -35,12 +35,13 @@ def new(doc: dict, attachments: list[dict] = []):
     doc["doctype"] = "HD Ticket"
     doc["via_customer_portal"] = bool(frappe.session.user)
     doc["attachments"] = attachments
+    doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc).insert()
     return d
 
 
 @frappe.whitelist()
-def get_one(name: str | int, is_customer_portal: bool = False):
+def get_one(name: str, is_customer_portal: bool = False):
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     QBContact = frappe.qb.DocType("Contact")
     QBTicket = frappe.qb.DocType("HD Ticket")
@@ -328,7 +329,7 @@ def get_attachments(doctype, name):
 
 @frappe.whitelist()
 @agent_only
-def merge_ticket(source: int, target: int):
+def merge_ticket(source: str, target: str):
     # check if source and target exists
     if not frappe.db.exists("HD Ticket", source):
         frappe.throw(_("Source ticket does not exist"))
@@ -389,7 +390,7 @@ def merge_ticket(source: int, target: int):
     c.save()
 
 
-def duplicate_list_retain_timestamp(doctype, activities: list, target: int, controller):
+def duplicate_list_retain_timestamp(doctype, activities: list, target: str, controller):
     for activity in activities:
         attachments = get_attachments(
             "HD Ticket Comment",
@@ -572,7 +573,7 @@ def get_ticket_customizations():
 
 @frappe.whitelist()
 # TODO: make it bette, on mount fetch only once and cache it
-def get_navigation_tickets(ticket: str | int, current_view: str | None = None):
+def get_navigation_tickets(ticket: str, current_view: str | None = None):
     """
     Get a list of tickets to navigate
     """
@@ -590,7 +591,7 @@ def get_navigation_tickets(ticket: str | int, current_view: str | None = None):
         )
 
         # Extract just the ticket IDs
-        ticket_ids = [int(ticket), *tickets]
+        ticket_ids = [ticket, *tickets]
         # print("\n\n", ticket_ids, "\n\n")
         return ticket_ids
 
@@ -601,51 +602,45 @@ def get_navigation_tickets(ticket: str | int, current_view: str | None = None):
 
 
 def get_navigation_filters(ticket: str, current_view: str = None):
-    filters = []
-    if current_view:
-        _filters = frappe.get_value("HD View", current_view, "filters")
-        if _filters:
-            try:
-                # Parse the filters string to list/dict
-                filters = (
-                    json.loads(_filters) if isinstance(_filters, str) else _filters
-                )
-            except json.JSONDecodeError, TypeError:
-                filters = []
+    conditions = _to_conditions(_get_view_filters(current_view))
+    # Custom filter "__assigned_on" is not available in any doctype
+    conditions = [c for c in conditions if c[0] != "__assigned_on"]
+    conditions.append(["name", "!=", ticket])
+    return handle_at_me_support(conditions)
 
-    if not filters:
-        default_view = frappe.db.get_value(
+
+def _get_view_filters(current_view: str | None) -> dict | list:
+    filters = _parse_view_filters(
+        frappe.get_value("HD View", current_view, "filters") if current_view else None
+    )
+    if filters:
+        return filters
+    return _parse_view_filters(
+        frappe.db.get_value(
             "HD View",
             {"dt": "HD Ticket", "is_default": 1, "user": frappe.session.user},
             "filters",
         )
+    )
 
-        if default_view:
-            try:
-                filters = (
-                    json.loads(default_view)
-                    if isinstance(default_view, str)
-                    else default_view
-                )
-            except json.JSONDecodeError, TypeError:
-                filters = []
 
-    # Base filters - exclude the current ticket
-    base_filters = {"name": ["!=", ticket]}
+def _parse_view_filters(raw) -> dict | list:
+    if not raw:
+        return []
+    try:
+        return (json.loads(raw) if isinstance(raw, str) else raw) or []
+    except (json.JSONDecodeError, TypeError):
+        return []
 
-    # Combine base filters with view filters
-    # is instance of {}
 
-    if filters and isinstance(filters, object):
-        final_filters = {**filters, **base_filters}
-    else:
-        final_filters = base_filters
-    final_filters = handle_at_me_support(final_filters)
-
-    # Remove custom filter "__assigned_on" as it is not available in any doctype
-    final_filters.pop("__assigned_on", None)
-
-    return final_filters
+def _to_conditions(filters: dict | list) -> list:
+    """Normalize dict filters (legacy saved views) to a list of conditions."""
+    if isinstance(filters, dict):
+        return [
+            [key, *value] if isinstance(value, list) else [key, "=", value]
+            for key, value in filters.items()
+        ]
+    return [c for c in filters if isinstance(c, list) and len(c) >= 3]
 
 
 def get_navigation_order_by(view):
@@ -664,7 +659,7 @@ def get_navigation_order_by(view):
 
 
 @frappe.whitelist()
-def get_ticket_contact(ticket: str | int):
+def get_ticket_contact(ticket: str):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
         return None
@@ -688,7 +683,7 @@ def get_ticket_contact(ticket: str | int):
 
 
 @frappe.whitelist()
-def get_recent_similar_tickets(ticket: str | int):
+def get_recent_similar_tickets(ticket: str):
     frappe.has_permission("HD Ticket", "read", str(ticket), throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
         return {"recent_tickets": [], "similar_tickets": []}
@@ -721,7 +716,8 @@ def get_recent_tickets(ticket: str):
             )
             or []
         )
-    elif raised_by:
+
+    if raised_by:
         user_tickets = (
             frappe.get_list(
                 "HD Ticket",
@@ -739,7 +735,7 @@ def get_recent_tickets(ticket: str):
 
 
 @frappe.whitelist()
-def get_ticket_activities(ticket: str | int):
+def get_ticket_activities(ticket: str):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     activities = {
         "comments": get_comments(ticket),
@@ -752,10 +748,33 @@ def get_ticket_activities(ticket: str | int):
 
 
 @frappe.whitelist()
-def get_ticket_assignees(ticket: str | int):
+def get_ticket_assignees(ticket: str) -> list[dict]:
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
-    assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
-    return assignees
+    assignee_names = json.loads(
+        frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
+    )
+    if not assignee_names:
+        return []
+    # Presence details are for the agent desk only; customers get plain names.
+    if not is_agent():
+        return [{"name": name} for name in assignee_names]
+    # Enrich each assignee with their agent status so the UI can show presence
+    # without a separate lookup. Non-agent assignees fall back to just the name.
+    agents = {
+        agent.name: agent
+        for agent in frappe.get_all(
+            "HD Agent",
+            filters={"name": ["in", assignee_names]},
+            fields=[
+                "name",
+                "agent_name",
+                "user_image",
+                "availability",
+                "availability_changed_on",
+            ],
+        )
+    }
+    return [agents.get(name, {"name": name}) for name in assignee_names]
 
 
 def show_banner_next_day(ticket):
@@ -779,7 +798,7 @@ def show_banner_next_day(ticket):
 
 
 @frappe.whitelist()
-def show_outside_hours_banner(ticket_name: str | int):
+def show_outside_hours_banner(ticket_name: str):
     show_banner_settings = frappe.db.get_single_value(
         "HD Settings", "enable_outside_hours_banner"
     )

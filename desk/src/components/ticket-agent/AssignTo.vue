@@ -7,7 +7,7 @@
   >
     <template #target="{ togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span v-if="!hideLabel" class="block text-xs text-gray-600">{{
+        <span v-if="!hideLabel" class="block text-xs text-ink-gray-5">{{
           __("Assignee")
         }}</span>
         <Button
@@ -41,7 +41,7 @@
             </template>
           </div>
           <template #suffix>
-            <LucideChevronDown class="h-4 w-4 ml-auto text-ink-gray-5" />
+            <LucideChevronDown class="h-4 w-4 ms-auto text-ink-gray-5" />
           </template>
         </Button>
       </div>
@@ -61,7 +61,7 @@
               v-model="searchText"
               :placeholder="__('Search agents...')"
               variant="ghost"
-              class="flex-1"
+              class="flex-1 search-agents-input"
               @click.stop
               @keydown="handleInputKeydown"
             >
@@ -110,8 +110,30 @@
                   :modelValue="isSelected(agent.value)"
                   class="flex-shrink-0"
                 />
-                <UserAvatar :name="agent.value" size="sm" class="" />
-                <span class="text-ink-gray-7 flex-1 text-left truncate">
+                <div class="relative flex-shrink-0">
+                  <Tooltip
+                    placement="top"
+                    :text="
+                      availabilitySubtitle(
+                        agent.availability,
+                        agent.availability_changed_on
+                      )
+                    "
+                  >
+                    <UserAvatar :name="agent.value" size="sm" />
+                  </Tooltip>
+                  <span
+                    class="absolute block translate-x-1/2 translate-y-1/2 transform rounded-full bottom-0.5 right-0.5"
+                  >
+                    <span
+                      class="block h-2 w-2 rounded-full border border-slate-2"
+                      :class="
+                        agentStatusStore.statusColor(agent.availability || '')
+                      "
+                    />
+                  </span>
+                </div>
+                <span class="text-ink-gray-7 flex-1 text-start truncate">
                   {{ agent.label }}
                 </span>
               </button>
@@ -137,8 +159,10 @@ import {
   ActivitiesSymbol,
   AgentOption,
   AssigneeSymbol,
+  LocalAssignee,
   TicketSymbol,
 } from "@/types";
+import type { HDAgent } from "@/types/doctypes";
 import { useDebounceFn } from "@vueuse/core";
 import {
   Button,
@@ -151,7 +175,13 @@ import {
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
-
+import LucideSearch from "~icons/lucide/search";
+import MultipleAvatar from "../MultipleAvatar.vue";
+import UserAvatar from "../UserAvatar.vue";
+import { useAgentStatusStore } from "@/stores/agentStatus.ts";
+import { prettyDate } from "@/utils.ts";
+import { dayjsLocal } from "frappe-ui";
+import { Tooltip } from "frappe-ui";
 interface Props {
   hideLabel?: boolean;
 }
@@ -161,9 +191,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { hideLabel } = props;
-import LucideSearch from "~icons/lucide/search";
-import MultipleAvatar from "../MultipleAvatar.vue";
-import UserAvatar from "../UserAvatar.vue";
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
@@ -171,6 +198,7 @@ const activities = inject(ActivitiesSymbol)!;
 
 const { getUser } = useUserStore();
 const currentUser = computed(() => getUser("")); // empty string returns current user
+const agentStatusStore = useAgentStatusStore();
 const currentAgentName = (window as any).agent as string | null;
 
 const searchText = ref("");
@@ -182,12 +210,8 @@ const popoverIsOpen = ref(false);
 const hasBeenOpened = ref(false);
 
 // Local copy of assignees
-const localAssignees = ref<{ name: string; image: string; label: string }[]>(
-  []
-);
-const snapshotAssignees = ref<{ name: string; image: string; label: string }[]>(
-  []
-);
+const localAssignees = ref<LocalAssignee[]>([]);
+const snapshotAssignees = ref<LocalAssignee[]>([]);
 
 // Sync from injected assignees when popover is not open
 watch(
@@ -228,8 +252,14 @@ watch(popoverIsOpen, (isOpen) => {
 
 const agentResource = createListResource({
   doctype: "HD Agent",
-  fields: ["name", "agent_name", "user_image"],
-  filters: { is_active: true },
+  fields: [
+    "name",
+    "agent_name",
+    "user_image",
+    "availability",
+    "availability_changed_on",
+  ],
+  filters: { is_active: true, name: ["!=", "christopherwhitaker@example.net"] },
   pageLength: 20,
   auto: true,
 });
@@ -241,7 +271,13 @@ const currentAgentResource = currentAgentName
       params: {
         doctype: "HD Agent",
         name: currentAgentName,
-        fields: ["name", "agent_name", "user_image"],
+        fields: [
+          "name",
+          "agent_name",
+          "user_image",
+          "availability",
+          "availability_changed_on",
+        ],
       },
       auto: true,
     })
@@ -260,6 +296,21 @@ watch(searchText, (text) => {
   debouncedSearch(text);
 });
 
+// Prefer the live status pushed over the socket (agentStatusStore.liveStatuses)
+// so the dot/tooltip reflect any agent's change made elsewhere this session,
+// falling back to the value fetched when this dropdown first loaded.
+function liveAvailability(agent: {
+  name: string;
+  availability?: string;
+  availability_changed_on?: string;
+}) {
+  const live = agentStatusStore.liveStatuses[agent.name];
+  return {
+    availability: live?.availability ?? agent.availability,
+    availability_changed_on: live?.changedOn ?? agent.availability_changed_on,
+  };
+}
+
 const agentOptions = computed<AgentOption[]>(() => {
   const agents: AgentOption[] = [];
   const seen = new Set<string>();
@@ -271,6 +322,7 @@ const agentOptions = computed<AgentOption[]>(() => {
       value: a.name,
       label: a.agent_name || getUser(a.name).full_name,
       image: a.user_image || getUser(a.name).user_image,
+      ...liveAvailability(a),
     });
     seen.add(a.name);
   }
@@ -282,6 +334,7 @@ const agentOptions = computed<AgentOption[]>(() => {
           value: agent.name,
           label: agent.agent_name || getUser(agent.name).full_name,
           image: agent.user_image || getUser(agent.name).user_image,
+          ...liveAvailability(agent),
         });
         seen.add(agent.name);
       }
@@ -308,8 +361,9 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
         const user = getUser(a.name);
         options.push({
           value: a.name,
-          label: a.label || user.full_name || a.name,
-          image: a.image || user.user_image,
+          label: a.label || a.agent_name || user.full_name || a.name,
+          image: a.image || a.user_image || user.user_image,
+          ...liveAvailability(a),
         });
         seen.add(a.name);
       }
@@ -340,6 +394,29 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   return [...selfOption, ...rest];
 });
 
+function availabilitySubtitle(
+  availability?: string,
+  changedOn?: string
+): string {
+  if (!availability) return "";
+  const status = agentStatusStore.getStatus(availability);
+  if (!status) return "";
+  if (status.category === "Active") return __("Active now");
+
+  const label = __(availability);
+  if (!changedOn) return label;
+  // Suffix with how long ago they were last active, e.g. "Away · Last seen 2
+  // minutes ago". prettyDate says "Just now" under a minute, which we lowercase
+  // so it reads cleanly after "Last seen".
+  const secondsSinceChange = dayjsLocal().diff(
+    dayjsLocal(changedOn),
+    "seconds"
+  );
+  const lastSeen =
+    secondsSinceChange < 60 ? __("just now") : prettyDate(changedOn);
+  return lastSeen ? __("{0} · Last active {1}", label, lastSeen) : label;
+}
+
 function isSelected(agentName: string): boolean {
   return localAssignees.value.some((a) => a.name === agentName);
 }
@@ -355,11 +432,17 @@ function toggleAgent(agent: AgentOption) {
       pinnedSelectedNames.value.delete(agent.value);
     }
   } else {
-    localAssignees.value.push({
+    const added: LocalAssignee = {
       name: agent.value,
       image: agent.image || "",
       label: agent.label,
-    });
+    };
+    // Carry the option's status so it survives the localAssignees fallback in
+    // sortedAgentOptions (e.g. a search-added agent outside the default page resource call).
+    if (agent.availability) added.availability = agent.availability;
+    if (agent.availability_changed_on)
+      added.availability_changed_on = agent.availability_changed_on;
+    localAssignees.value.push(added);
     // Pin only when selecting during search so they stay visible when search clears
     if (isSearching) {
       pinnedSelectedNames.value.add(agent.value);
@@ -469,8 +552,34 @@ const removeAssigneesResource = createResource({
   }),
 });
 
+// Toast a warning for each newly-added agent who isn't currently active.
+// Returns true if any warning was shown so the caller can defer the success toast.
+function warnUnavailableAgents(addedNames: string[]): boolean {
+  const agents = (agentResource.data as HDAgent[]) ?? [];
+  let hasUnavailable = false;
+  for (const agent of agents) {
+    if (!addedNames.includes(agent.name)) continue;
+    // No point warning agents about their own status when assigning themselves.
+    if (agent.name === currentAgentName) continue;
+    const category = agentStatusStore.getStatus(
+      agent.availability || ""
+    )?.category;
+    if (category !== "Away" && category !== "Unavailable") continue;
+
+    const name = agent.agent_name || agent.name;
+    toast.warning(
+      category === "Unavailable"
+        ? __("{0} is currently unavailable.", name)
+        : __("{0} is currently away.", name)
+    );
+    hasUnavailable = true;
+  }
+  return hasUnavailable;
+}
+
 async function saveAssignees(added: string[], removed: string[]) {
   if (!added.length && !removed.length) return;
+  let hasUnavailable = false;
 
   try {
     if (removed.length) {
@@ -478,6 +587,7 @@ async function saveAssignees(added: string[], removed: string[]) {
       if (removeResult?.exc) throw new Error(removeResult.exc);
     }
     if (added.length) {
+      hasUnavailable = warnUnavailableAgents(added);
       const addResult = await addAssigneesResource.submit(added);
       if (addResult?.exc) throw new Error(addResult.exc);
     }
@@ -488,7 +598,12 @@ async function saveAssignees(added: string[], removed: string[]) {
     if (removed.length) logParts.push(`unassigned ${removed.join(", ")}`);
     await logActivity(logParts.join(" & "));
 
-    toast.success(__("Assignees updated successfully."));
+    // Delay the success toast when warnings were shown so they land first.
+    const successDelay = hasUnavailable ? 1000 : 0;
+    setTimeout(() => {
+      toast.success(__("Assignees updated successfully."));
+    }, successDelay);
+
     assignees.value.reload();
     activities.value.reload();
   } catch {
@@ -498,6 +613,12 @@ async function saveAssignees(added: string[], removed: string[]) {
 }
 
 useShortcut("a", () => {
-  (triggerRef.value?.$el as HTMLElement)?.nextElementSibling?.click();
+  (triggerRef.value?.$el as HTMLElement)?.click();
 });
 </script>
+
+<style scoped>
+.search-agents-input :deep(input) {
+  background-color: transparent;
+}
+</style>

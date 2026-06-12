@@ -1,19 +1,18 @@
 <template>
   <Dialog
-    v-model="show"
-    :options="{
-      size: '4xl',
-    }"
+    v-model:open="show"
+    size="4xl"
+    bare
     @vue:unmounted="resetFilter"
     @after-leave="onAfterLeave"
   >
-    <template #body>
+    <template #default>
       <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex items-center justify-between w-full p-4 pb-2">
           <div class="text-2xl font-semibold">{{ __("Saved Replies") }}</div>
           <Button
             variant="solid"
-            icon-left="plus"
+            icon-left="lucide-plus"
             :label="__('New')"
             @click="onNewSavedReplyClick"
           />
@@ -21,27 +20,34 @@
         <div class="p-4">
           <div class="flex items-center gap-2">
             <div class="relative w-full">
-              <Input
+              <TextInput
                 ref="searchInput"
                 :model-value="search"
-                @input="search = $event"
+                @update:model-value="search = $event"
                 :placeholder="__('Search')"
                 type="text"
-                class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
-                icon-left="search"
-                debounce="300"
-                inputClass="p-4 pr-12"
-              />
+                class="focus:ring-0 border-outline-gray-2"
+                :debounce="300"
+                autofocus
+              >
+                <template #prefix>
+                  <LucideSearch class="size-4" />
+                </template>
+              </TextInput>
               <Button
                 v-if="search"
-                icon="x"
+                icon="lucide-x"
                 variant="ghost"
                 @click="search = ''"
-                class="absolute right-1 top-1/2 -translate-y-1/2"
+                class="absolute end-1 top-1/2 -translate-y-1/2"
               />
             </div>
             <Dropdown :options="filters" placement="right">
-              <Button :label="activeFilter" icon-left="filter" class="p-4">
+              <Button
+                :label="activeFilter"
+                icon-left="lucide-filter"
+                class="p-4"
+              >
                 <template #suffix>
                   <p
                     class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-white pt-px text-xs font-medium text-ink-gray-8 shadow-sm"
@@ -71,7 +77,7 @@
             <div
               v-for="template in savedReplyListResource?.data"
               :key="template.name"
-              class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-gray-100 relative"
+              class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-surface-gray-2 relative"
               @click="onTemplateSelect(template)"
             >
               <div class="text-base font-semibold truncate border-b pb-2">
@@ -81,7 +87,7 @@
                 v-if="template.message"
                 :content="template.message"
                 :editable="false"
-                editor-class="!prose-sm max-w-none !text-sm text-gray-600 focus:outline-none"
+                editor-class="!prose-sm max-w-none !text-sm text-ink-gray-5 focus:outline-none"
                 class="flex-1 overflow-hidden pointer-events-none"
               />
               <div
@@ -89,7 +95,7 @@
                   selectedTemplate.name === template.name &&
                   selectedTemplate.isLoading
                 "
-                class="flex items-center justify-center absolute top-0 left-0 w-full h-full bg-black/20 rounded-lg"
+                class="flex items-center justify-center absolute top-0 start-0 w-full h-full bg-surface-gray-7/20 rounded-lg"
               >
                 <LoadingIndicator class="size-4" />
               </div>
@@ -103,7 +109,7 @@
             class="mt-2"
           >
             <div class="flex h-56 flex-col items-center justify-center">
-              <div class="text-p-sm text-gray-500">
+              <div class="text-p-sm text-ink-gray-4">
                 {{ __("No saved replies found") }}
               </div>
             </div>
@@ -126,9 +132,9 @@ import {
   createResource,
   Dialog,
   Dropdown,
-  Input,
   LoadingIndicator,
   TextEditor,
+  TextInput,
 } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, nextTick, ref, watch } from "vue";
@@ -194,7 +200,7 @@ if (
 const emit = defineEmits(["apply"]);
 
 const search = ref("");
-const searchInput = ref<InstanceType<typeof Input>>();
+const searchInput = ref<InstanceType<typeof TextInput>>();
 const selectedTemplate = ref({
   name: "",
   isLoading: false,

@@ -3,14 +3,14 @@
   <div
     :class="[
       'flex items-center justify-between gap-2 px-5 pb-4 pt-4',
-      list?.data?.data?.length > 0 ? 'relative' : 'absolute w-[stretch]',
+      list?.data?.data?.length > 0 ? 'relative' : 'absolute inset-x-0',
     ]"
     v-if="showViewControls"
   >
     <QuickFilters v-if="!isMobileView" />
-    <div v-if="!isMobileView" class="-ml-2 h-5 border-l"></div>
+    <div v-if="!isMobileView" class="-ms-2 h-5 border-s"></div>
     <div
-      class="flex items-start gap-2 justify-end h-full py-1 pl-0.5"
+      class="flex items-start gap-2 justify-end h-full py-1 ps-0.5"
       v-if="!isMobileView"
     >
       <Button
@@ -19,7 +19,7 @@
         @click="handleViewUpdate"
       />
       <Reload @click="handleReload" :loading="list.loading" />
-      <Filter :default_filters="defaultParams.filters" />
+      <Filter />
       <SortBy :hide-label="isMobileView" />
       <ColumnSettings
         :hide-label="isMobileView"
@@ -27,7 +27,7 @@
       />
     </div>
     <div v-else class="flex justify-between items-center w-full">
-      <Filter :default_filters="defaultParams.filters" />
+      <Filter />
       <div class="flex items-center gap-2">
         <Reload @click="handleReload" :loading="list.loading" />
         <SortBy :hide-label="isMobileView" />
@@ -35,9 +35,16 @@
     </div>
   </div>
 
+  <!-- Loading State -->
+  <div
+    v-if="list.loading && !list.data?.data?.length"
+    class="flex items-center justify-center h-full w-full absolute top-0 z-100"
+  >
+    <LoadingIndicator :scale="8" />
+  </div>
   <!-- List View -->
   <ListView
-    v-if="list.data?.data.length > 0"
+    v-else-if="list.data?.data.length > 0"
     class="flex-1"
     :columns="columns"
     :rows="rows"
@@ -80,7 +87,7 @@
     <ListSelectBanner v-if="options.showSelectBanner">
       <template #actions="{ selections, unselectAll }">
         <Dropdown :options="selectBannerOptions(selections, unselectAll)">
-          <Button icon="more-horizontal" variant="ghost" />
+          <Button icon="lucide-more-horizontal" variant="ghost" />
         </Dropdown>
       </template>
     </ListSelectBanner>
@@ -106,16 +113,9 @@
       "
     />
   </div>
-  <!-- Loading State -->
-  <div
-    v-else-if="list.loading"
-    class="w-full h-full flex items-center justify-center -mt-14"
-  >
-    <LoadingIndicator :scale="8" />
-  </div>
   <!-- Empty State -->
   <EmptyState
-    v-else
+    v-else-if="!list.loading"
     :title="emptyState.title"
     :icon="emptyState.icon"
     :description="emptyState.description"
@@ -126,11 +126,11 @@
 import { MultipleAvatar, StarRating } from "@/components";
 import {
   ColumnSettings,
-  Filter,
   QuickFilters,
   Reload,
   SortBy,
 } from "@/components/view-controls";
+import { Filter, normalizeFilters } from "@/components/view-controls/filter";
 import { useScreenSize } from "@/composables/screen";
 import {
   currentView as headerView,
@@ -146,10 +146,10 @@ import { View, ViewType } from "@/types";
 import { getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
-  call,
   createResource,
   Dropdown,
   FeatherIcon,
+  frappeRequest,
   ListFooter,
   ListHeader,
   ListHeaderItem,
@@ -157,6 +157,7 @@ import {
   ListSelectBanner,
   ListView,
   LoadingIndicator,
+  dayjs,
   toast,
 } from "frappe-ui";
 import {
@@ -171,7 +172,6 @@ import {
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import dayjs from "dayjs";
 import EmptyState from "./EmptyState.vue";
 import ListRows from "./ListRows.vue";
 
@@ -207,7 +207,7 @@ const emit = defineEmits<E>();
 const route = useRoute();
 const router = useRouter();
 const { isManager } = useAuthStore();
-const { $dialog } = globalStore();
+const { $dialog, $socket } = globalStore();
 const { getStatus } = useTicketStatusStore();
 
 const listSelections = ref(new Set());
@@ -231,7 +231,7 @@ const defaultOptions = reactive({
   selectBannerActions: [
     {
       label: __("Delete"),
-      icon: "trash-2",
+      icon: "lucide-trash-2",
       onClick: (selections: Set<string>) => {
         $dialog({
           title: __("Delete"),
@@ -258,11 +258,69 @@ const defaultOptions = reactive({
 
 function handleBulkDelete(hide: Function, selections: Set<string>) {
   capture("bulk_delete" + props.options.doctype);
-  call("frappe.desk.reportview.delete_items", {
-    items: JSON.stringify(Array.from(selections)),
-    doctype: props.options.doctype,
-  }).then(() => {
-    toast.success(__("Item(s) deleted successfully."));
+  const requested = Array.from(selections);
+  const requestedCount = requested.length;
+
+  const failureMessages: string[] = [];
+  let successMessage = "";
+  let failedCount = 0;
+
+  const onBulkResult = (data: { message: string; title: string }) => {
+    const isFailure =
+      data.title === __("Bulk Operation Failed") ||
+      data.title === "Bulk Operation Failed";
+    const isSuccess =
+      data.title === __("Bulk Operation Successful") ||
+      data.title === "Bulk Operation Successful";
+    if (!isFailure && !isSuccess) return;
+
+    if (isFailure) {
+      // Parse how many items failed from the message (Frappe includes the count)
+      const match = data.message.match(/Failed to delete (\d+) documents?/);
+      if (match) {
+        failedCount = parseInt(match[1], 10);
+      }
+      failureMessages.push(data.message);
+    } else {
+      successMessage = data.message;
+    }
+  };
+
+  $socket.on("msgprint", onBulkResult);
+
+  // Use frappeRequest (not `call`) so per-item delete errors surfaced in
+  // `_server_messages` get routed through the app's serverMessagesHandler.
+  // `call` silently drops them on 200 responses.
+  frappeRequest({
+    url: "frappe.desk.reportview.delete_items",
+    params: {
+      items: JSON.stringify(requested),
+      doctype: props.options.doctype,
+    },
+  }).finally(() => {
+    $socket.off("msgprint", onBulkResult);
+
+    const deletedCount = requestedCount - failedCount;
+
+    if (failureMessages.length > 0 && deletedCount > 0) {
+      // Partial success: some deleted, some failed — show both toasts
+      toast.success(__("{0} item(s) deleted successfully", [deletedCount]));
+      for (const msg of failureMessages) {
+        toast.error(msg);
+      }
+    } else if (failureMessages.length > 0) {
+      // All failed
+      for (const msg of failureMessages) {
+        toast.error(msg);
+      }
+    } else if (successMessage) {
+      // All succeeded
+      toast.success(successMessage);
+    } else {
+      // Fallback: no socket messages received (e.g. enqueued for >10 items)
+      toast.success(__("{0} item(s) queued for deletion", [requestedCount]));
+    }
+
     hide();
     reset();
   });
@@ -520,13 +578,18 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
     } else {
       item = item[0].name;
     }
-    applyFilters({
-      ...defaultParams.filters,
-      [column.key]: ["LIKE", `%${item}%`],
-    });
+    applyColumnFilter(column.key, "LIKE", `%${item}%`);
     return;
   }
-  applyFilters({ ...defaultParams.filters, [column.key]: item });
+  applyColumnFilter(column.key, "=", item);
+}
+
+function applyColumnFilter(key: string, operator: string, value: any) {
+  const conditions = normalizeFilters(defaultParams.filters).filter(
+    (condition) => condition[0] !== key
+  );
+  conditions.push([key, operator, value]);
+  applyFilters(conditions);
 }
 
 const showViewControls = computed(() => {
@@ -556,7 +619,7 @@ provide("listViewActions", {
 
 function applyFilters(filters) {
   isViewUpdated.value = true;
-  defaultParams.filters = { ...filters };
+  defaultParams.filters = normalizeFilters(filters);
   list.submit({ ...defaultParams });
 
   // automatically update filters for default view
@@ -588,7 +651,7 @@ function updateColumns(obj) {
 
 function reload(reset: boolean = false) {
   if (reset) {
-    defaultParams.filters = options.value.defaultFilters || {};
+    defaultParams.filters = normalizeFilters(options.value.defaultFilters);
     defaultParams.order_by = "modified desc";
     defaultParams.page_length = options.value.default_page_length;
     pageLengthCount.value = options.value.default_page_length;
@@ -687,19 +750,25 @@ function handleViewChanges() {
     reload(true);
     return;
   }
-  defaultParams.filters = currentView.filters;
+  // normalize so legacy dict-format saved views become list conditions
+  defaultParams.filters = normalizeFilters(currentView.filters);
   defaultParams.order_by = currentView.order_by || "modified desc";
   defaultParams.columns = currentView.columns;
   defaultParams.rows = currentView.rows;
 
   if (route.query.filters) {
     try {
-      const parsedFilters = JSON.parse(route.query.filters as string);
-      if (Object.keys(parsedFilters).length > 0) {
-        defaultParams.filters = {
-          ...defaultParams.filters,
+      const parsedFilters = normalizeFilters(
+        JSON.parse(route.query.filters as string)
+      );
+      if (parsedFilters.length > 0) {
+        const overriddenFields = new Set(parsedFilters.map((c) => c[0]));
+        defaultParams.filters = [
+          ...normalizeFilters(defaultParams.filters).filter(
+            (c) => !overriddenFields.has(c[0])
+          ),
           ...parsedFilters,
-        };
+        ];
       }
     } catch (e) {
       console.error("Failed to parse filters from URL", e);

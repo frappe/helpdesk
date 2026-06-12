@@ -1,6 +1,55 @@
 import frappe
 from frappe import _
 
+from helpdesk.utils import agent_only, is_admin
+
+
+@frappe.whitelist()
+@agent_only
+def bulk_reply(ticket_ids: list, message: str, attachments: list | None = None):
+
+    link_attachments_to_tickets(attachments, ticket_ids)
+
+    if not ticket_ids:
+        return
+
+    ticket_ids = list(set(ticket_ids))  # Remove duplicates
+
+    for ticket_id in ticket_ids:
+        frappe.has_permission("HD Ticket", "write", doc=ticket_id, throw=True)
+        doc = frappe.get_doc("HD Ticket", ticket_id)
+        try:
+            doc.reply_via_agent(
+                message, to=doc.raised_by, attachments=attachments or []
+            )
+        except Exception as e:
+            frappe.log_error(
+                title=f"Bulk reply failed for ticket {ticket_id}",
+                message=str(e),
+            )
+
+
+def link_attachments_to_tickets(attachments: list | None, ticket_ids: list):
+    if not attachments:
+        return
+    if not ticket_ids:
+        return
+
+    # only one attachment is created, but does not refer to any doctype/docname until now. Link it to all the tickets in context.
+    # Done because, FileUploader only handles for one file, and cant upload to multiple doctypes/docnames at the same time.
+    for a in attachments:
+        file_doc = frappe.get_doc("File", a)
+        file_doc.attached_to_doctype = "HD Ticket"
+        file_doc.attached_to_name = ticket_ids[0]
+        file_doc.save()
+
+    for ticket_id in ticket_ids[1:]:
+        for a in attachments:
+            file_doc = frappe.get_doc("File", a)
+            new_file_doc = frappe.copy_doc(file_doc)
+            new_file_doc.attached_to_name = ticket_id
+            new_file_doc.save()
+
 
 def assign_ticket_to_agent(ticket_id, agent_id=None):
     if not ticket_id:
@@ -17,3 +66,14 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
 
     ticket_doc.assign_agent(agent_id)
     return ticket_doc
+
+
+@frappe.whitelist()
+def delete_ticket(name: str):
+    if not is_admin():
+        frappe.throw(
+            msg=_("Only administrators can delete tickets."),
+            title=_("Not Allowed"),
+            exc=frappe.PermissionError,
+        )
+    frappe.delete_doc("HD Ticket", name, force=True, ignore_permissions=True)

@@ -5,9 +5,9 @@
     <div class="mb-4 flex items-center justify-between text-base">
       <div class="flex items-center gap-0.5">
         <UserAvatar v-bind="user" size="lg" expand strong :hide-avatar="true" />
-        <LucideDot class="text-gray-500 size-4" />
+        <LucideDot class="text-ink-gray-4 size-4" />
         <Tooltip :text="dateFormat(date, dateTooltipFormat)">
-          <span class="text-gray-600">
+          <span class="text-ink-gray-5">
             {{ timeAgo(date) }}
           </span>
         </Tooltip>
@@ -28,10 +28,9 @@
 
 <script setup lang="ts">
 import { AttachmentItem, UserAvatar } from "@/components";
-import { dayjs } from "@/dayjs";
 import { UserInfo } from "@/types";
 import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
-import { Tooltip } from "frappe-ui";
+import { dayjs, Tooltip } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 
 interface Attachment {

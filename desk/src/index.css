@@ -24,6 +24,60 @@
 html,
 body {
   color: var(--ink-gray-9);
+  background-color: var(--surface-white);
+}
+
+:root {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Dark mode shadows */
+[data-theme="dark"] .shadow-sm,
+[data-theme="dark"] .hover\:shadow-sm:hover,
+[data-theme="dark"] .focus\:shadow-sm:focus {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+    0 1px 2px 0 rgba(0, 0, 0, 0.55);
+}
+[data-theme="dark"] .shadow,
+[data-theme="dark"] .hover\:shadow:hover,
+[data-theme="dark"] .focus\:shadow:focus {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+    0 2px 4px 0 rgba(0, 0, 0, 0.6);
+}
+[data-theme="dark"] .shadow-md,
+[data-theme="dark"] .hover\:shadow-md:hover,
+[data-theme="dark"] .focus\:shadow-md:focus {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.13),
+    0 4px 10px -2px rgba(0, 0, 0, 0.65);
+}
+[data-theme="dark"] .shadow-lg,
+[data-theme="dark"] .hover\:shadow-lg:hover,
+[data-theme="dark"] .focus\:shadow-lg:focus {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+    0 10px 24px -6px rgba(0, 0, 0, 0.7);
+}
+[data-theme="dark"] .shadow-xl,
+[data-theme="dark"] .hover\:shadow-xl:hover,
+[data-theme="dark"] .focus\:shadow-xl:focus {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+    0 16px 32px -8px rgba(0, 0, 0, 0.75);
+}
+[data-theme="dark"] .shadow-2xl,
+[data-theme="dark"] .hover\:shadow-2xl:hover,
+[data-theme="dark"] .focus\:shadow-2xl:focus {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
+    0 24px 48px -12px rgba(0, 0, 0, 0.8);
+}
+[data-theme="dark"] .shadow-inner {
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="dark"] hr {
+  border-color: var(--outline-gray-2);
 }
 
 /* Modern slim scrollbars */
@@ -92,4 +146,20 @@ body {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* Scroll-driven edge fade for scrollable dropdown groups.*/
+@property --fade-bottom {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 20px;
+}
+
+@keyframes scroll-fade {
+  0% {
+    --fade-bottom: 20px;
+  }
+  100% {
+    --fade-bottom: 0px;
+  }
 }

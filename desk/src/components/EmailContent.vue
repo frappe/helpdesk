@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { getFontFamily } from "@/utils";
+import { dataTheme, getFontFamily, stripEmailColors } from "@/utils";
 import { computed, ref, watch } from "vue";
 
 const props = defineProps({
@@ -18,7 +18,7 @@ const props = defineProps({
 });
 
 const iframeRef = ref<HTMLIFrameElement | null>(null);
-const _content = ref(props.content);
+const _content = ref(stripEmailColors(props.content));
 
 // Get CSS path - in dev Vite serves it directly, in prod we need the built path
 const cssHref = computed(() => {
@@ -151,6 +151,7 @@ const htmlContent = computed(
         font-weight: 700;
         height: 12px;
         line-height: 0.1;
+        color: #383838;
         background: #e8eaed;
         width: 23px;
         justify-content: center;
@@ -158,6 +159,13 @@ const htmlContent = computed(
       }
       .replied-content .collapse:hover {
         background: #dadce0;
+      }
+      [data-theme='dark'] .replied-content .collapse {
+        color: #e2e2e2;
+        background: #424242;
+      }
+      [data-theme='dark'] .replied-content .collapse:hover {
+        background: #525252;
       }
       .replied-content .collapse + input {
         display: none;
@@ -203,8 +211,7 @@ watch(iframeRef, (iframe) => {
 
       const parent = emailContent.closest("html");
       if (!parent) return;
-      let theme = document.documentElement.getAttribute("data-theme");
-      parent.setAttribute("data-theme", theme);
+      parent.setAttribute("data-theme", dataTheme.value);
 
       const font = getFontFamily(_content.value);
       if (font) emailContent.classList.add(font);
@@ -243,5 +250,10 @@ watch(iframeRef, (iframe) => {
       }
     };
   }
+});
+
+watch(dataTheme, (theme) => {
+  const html = iframeRef.value?.contentDocument?.documentElement;
+  if (html) html.setAttribute("data-theme", theme);
 });
 </script>

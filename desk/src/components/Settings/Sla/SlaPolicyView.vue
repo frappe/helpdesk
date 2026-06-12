@@ -1,25 +1,9 @@
 <template>
-  <SettingsLayoutBase>
-    <template #title>
-      <div class="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="slaData.service_level || __('New SLA Policy')"
-          size="md"
-          @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
-        />
-        <Transition name="fade">
-          <Badge
-            :variant="'subtle'"
-            :theme="'orange'"
-            size="sm"
-            :label="__('Unsaved')"
-            v-if="isDirty"
-        /></Transition>
-      </div>
-    </template>
+  <SettingsLayoutBase
+    :back-label="slaData.service_level || __('New SLA Policy')"
+    :on-back="goBack"
+    :dirty="isDirty"
+  >
     <template #header-actions>
       <div class="flex gap-4 items-center">
         <div
@@ -44,7 +28,7 @@
     <template #content>
       <div
         v-if="slaData.loading"
-        class="flex items-center h-full justify-center"
+        class="flex items-center justify-center absolute inset-x-0 top-5.5 bottom-0"
       >
         <LoadingIndicator class="w-4" />
       </div>
@@ -107,7 +91,7 @@
                   </template>
                   <template #body-main>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ slaData.condition }}</code>
                     </div>
@@ -117,7 +101,7 @@
             </div>
             <div class="mt-5" v-if="!slaData.default_sla">
               <div
-                class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
+                class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-2 rounded-md p-3 py-4"
                 v-if="!useNewUI"
               >
                 <span class="text-p-sm">
@@ -160,8 +144,8 @@
                 placeholder="11/01/2025"
                 class="w-full"
                 id="from_date"
-                @change="validateSlaData('start_date')"
-                :formatter="(date) => getFormattedDate(date)"
+                @update:model-value="validateSlaData('start_date')"
+                :format="getDateFormat()"
               >
                 <template #prefix>
                   <LucideCalendar class="size-4" />
@@ -177,8 +161,8 @@
                 placeholder="25/12/2025"
                 class="w-full"
                 id="to_date"
-                @change="validateSlaData('end_date')"
-                :formatter="(date) => getFormattedDate(date)"
+                @update:model-value="validateSlaData('end_date')"
+                :format="getDateFormat()"
               >
                 <template #prefix>
                   <LucideCalendar class="size-4" />
@@ -277,7 +261,7 @@ import {
   slaDataErrors,
   validateSlaData,
 } from "@/stores/sla";
-import { convertToConditions, getFormattedDate } from "@/utils";
+import { convertToConditions, getDateFormat } from "@/utils";
 import {
   Badge,
   Button,

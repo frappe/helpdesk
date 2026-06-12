@@ -3,28 +3,21 @@
     <template #title>
       <div class="flex items-center">
         <div
-          class="pl-5 pr-2 relative text-ink-gray-7 hover:opacity-70 min-h-8 flex items-center"
+          class="ps-5 pe-2 relative text-ink-gray-7 hover:opacity-70 min-h-8 flex items-center"
         >
           <button
             type="button"
             @click="internalOnBack"
-            class="absolute top-0 -left-[0.375rem] w-full h-full"
+            class="absolute top-0 -start-[0.375rem] w-full h-full"
           >
             <span class="sr-only">{{ __("back to email event list") }}</span>
-            <LucideChevronLeft class="w-4.5 h-4.5" />
+            <LucideChevronLeft class="w-4.5 h-4.5 rtl:rotate-180" />
           </button>
           <h1 class="font-semibold text-xl">
             {{ props.title }}
           </h1>
         </div>
-        <Transition name="fade">
-          <Badge
-            v-if="unsavedChanges"
-            :variant="'subtle'"
-            :theme="'orange'"
-            size="sm"
-            :label="__('Unsaved')"
-        /></Transition>
+        <UnsavedBadge :show="unsavedChanges" />
       </div>
     </template>
     <template #header-actions>
@@ -39,7 +32,7 @@
           v-model="enabled"
           @update:model-value="(val) => setUnsavedChanges(val)"
           :style="{ background: 'transparent', padding: '0px' }"
-          class="flex-row-reverse gap-x-2 pl-0"
+          class="flex-row-reverse gap-x-2 ps-0"
         />
         <Button
           type="button"
@@ -72,7 +65,7 @@
               :oninput="() => setUnsavedChanges()"
             />
             <div class="flex gap-x-1 items-start justify-between">
-              <p class="text-sm text-gray-700 leading-5">
+              <p class="text-sm text-ink-gray-7 leading-5">
                 {{
                   __(
                     "Find out all of the variables that can be used in the content"
@@ -140,6 +133,7 @@ import { createResource, Switch, LoadingIndicator, Button } from "frappe-ui";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import UnsavedBadge from "@/components/UnsavedBadge.vue";
 
 const props = defineProps<{
   title: string;

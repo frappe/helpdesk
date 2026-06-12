@@ -8,7 +8,7 @@
     "
   >
     <template #content>
-      <ul class="isolate -ml-3">
+      <ul class="isolate -ms-3">
         <div
           v-for="(notification, index) in notifications"
           :key="notification.name"
@@ -28,10 +28,10 @@
             </div>
             <FeatherIcon
               name="chevron-right"
-              class="text-ink-gray-7 size-4 relative z-10 pointer-events-none"
+              class="text-ink-gray-7 size-4 relative z-10 pointer-events-none rtl:rotate-180"
             />
             <div
-              class="w-full h-full absolute top-0 left-0 hover:bg-gray-50 rounded-[inherit]"
+              class="w-full h-full absolute top-0 start-0 hover:bg-surface-menu-bar rounded-[inherit]"
               @click="
                 () => {
                   props.onSelect(notification);

@@ -1,0 +1,106 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "field:agent_status",
+ "creation": "2026-06-02 00:14:18.173361",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "agent_status",
+  "enable",
+  "category",
+  "section_break_jqvx",
+  "color",
+  "column_break_ekva",
+  "status_order"
+ ],
+ "fields": [
+  {
+   "fieldname": "agent_status",
+   "fieldtype": "Data",
+   "label": "Agent Status",
+   "unique": 1
+  },
+  {
+   "fieldname": "status_order",
+   "fieldtype": "Int",
+   "label": "Status Order"
+  },
+  {
+   "fieldname": "section_break_jqvx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "Active: The agent is available and working.<br>\nAway: The agent is temporarily unreachable.<br>\nUnavailable: The agent is off and unavailable.",
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Active\nAway\nUnavailable",
+   "reqd": 1
+  },
+  {
+   "fieldname": "color",
+   "fieldtype": "Select",
+   "label": "Color",
+   "options": "Gray\nBlue\nGreen\nRed\nPink\nOrange\nAmber\nYellow\nCyan\nTeal\nViolet\npurple"
+  },
+  {
+   "fieldname": "column_break_ekva",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable",
+   "fieldtype": "Check",
+   "label": "Enable"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-08 13:19:57.646908",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Agent Status",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent"
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

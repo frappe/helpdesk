@@ -1,18 +1,16 @@
 <template>
   <Dialog
-    v-model="show"
-    :options="{
-      title: __('Set Phone Number'),
-      actions: [
-        {
-          label: __('Set Phone Number'),
-          variant: 'solid',
-          onClick: onSubmit,
-        },
-      ],
-    }"
+    v-model:open="show"
+    :title="__('Set Phone Number')"
+    :actions="[
+      {
+        label: __('Set Phone Number'),
+        variant: 'solid',
+        onClick: onSubmit,
+      },
+    ]"
   >
-    <template #body-content>
+    <template #default>
       <div>
         <div class="text-base text-ink-gray-6">
           {{

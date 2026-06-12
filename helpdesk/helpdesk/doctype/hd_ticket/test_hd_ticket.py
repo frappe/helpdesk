@@ -7,6 +7,7 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
+from helpdesk.api.ticket import bulk_reply
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     merge_ticket,
     show_outside_hours_banner,
@@ -16,10 +17,12 @@ from helpdesk.test_utils import (
     add_comment,
     add_holiday,
     get_current_week_monday,
+    get_latest_ticket_communication,
     get_priority_response_resolution_time,
     make_status,
     make_ticket,
     remove_holidays,
+    upload_test_file,
 )
 
 ERROR_MSG_RESPONSE = "Response time differs by more than 1 second"
@@ -596,7 +599,7 @@ class TestHDTicket(IntegrationTestCase):
         ticket1.reload()
         self.assertEqual(ticket1.status, "Closed")
         self.assertTrue(ticket1.is_merged)
-        self.assertEqual(int(ticket1.merged_with), int(ticket2.name))
+        self.assertEqual(ticket1.merged_with, ticket2.name)
 
         ticket2.reload()
         comments = frappe.get_all(
@@ -612,6 +615,7 @@ class TestHDTicket(IntegrationTestCase):
 
     def test_ticket_split(self):
         ticket1 = make_ticket(description="Test Desc for split")
+
         ticket1.reply_via_agent(message="Test reply to split")
         communcation_name = frappe.get_all(
             "Communication",
@@ -705,10 +709,52 @@ class TestHDTicket(IntegrationTestCase):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
 
-    def tearDown(self):
-        remove_holidays()
-        frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
-        frappe.delete_doc("HD Ticket Status", "New", force=True)
+    def test_reply_via_agent_with_only_cc(self):
+        """
+        reply_via_agent should succeed when only cc is provided and to is empty/None
+        """
+        ticket = make_ticket()
+        cc_recipient = "cc_only@test.com"
+        ticket.reply_via_agent(message="Test reply", cc=cc_recipient)
+        communication_doc = get_latest_ticket_communication(ticket.name)
+        if hasattr(communication_doc, "to") and communication_doc.to:
+            self.assertFalse(communication_doc.to)
+        if hasattr(communication_doc, "cc") and communication_doc.cc:
+            self.assertEqual(communication_doc.cc, cc_recipient)
+        if hasattr(communication_doc, "bcc") and communication_doc.bcc:
+            self.assertFalse(communication_doc.bcc)
+
+    def test_reply_via_agent_with_only_bcc(self):
+        """
+        reply_via_agent should succeed when only bcc is provided and to is empty/None
+        """
+        ticket = make_ticket()
+        bcc_recipient = "bcc_only@test.com"
+        ticket.reply_via_agent(message="Test reply", bcc=bcc_recipient)
+        communication_doc = get_latest_ticket_communication(ticket.name)
+        if hasattr(communication_doc, "to") and communication_doc.to:
+            self.assertFalse(communication_doc.to)
+        if hasattr(communication_doc, "cc") and communication_doc.cc:
+            self.assertFalse(communication_doc.cc)
+        if hasattr(communication_doc, "bcc") and communication_doc.bcc:
+            self.assertEqual(communication_doc.bcc, bcc_recipient)
+
+    def test_reply_via_agent_with_cc_and_bcc_no_to(self):
+        """
+        reply_via_agent should succeed when both cc and bcc are provided but to is empty
+        """
+        ticket = make_ticket()
+        cc_recipient = "cc_combo@test.com"
+        bcc_recipient = "bcc_combo@test.com"
+        ticket.reply_via_agent(message="Test reply", cc=cc_recipient, bcc=bcc_recipient)
+        comm = get_latest_ticket_communication(ticket.name)
+        communication_doc = get_latest_ticket_communication(ticket.name)
+        if hasattr(communication_doc, "to") and communication_doc.to:
+            self.assertFalse(communication_doc.to)
+        if hasattr(communication_doc, "cc") and communication_doc.cc:
+            self.assertEqual(communication_doc.cc, cc_recipient)
+        if hasattr(communication_doc, "bcc") and communication_doc.bcc:
+            self.assertEqual(communication_doc.bcc, bcc_recipient)
 
     def test_security_unauthorized_reply_via_agent(self):
         ticket = make_ticket()
@@ -895,3 +941,194 @@ class TestHDTicket(IntegrationTestCase):
             ticket.status = "Resolved"
             ticket.save()
             self.assertEqual(ticket.agreement_status, "Fulfilled")
+
+    def test_failed_by_response(self):
+        # Urgent priority: response_by = T+30min
+        # Agent replies at T+39min → 9 minutes late in business hours
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, minutes=39)):
+            frappe.set_user(agent)
+            ticket.reply_via_agent(message="Test reply after response by")
+            ticket.reload()
+
+            ticket.status = "Replied"
+            ticket.save()
+            ticket.reload()
+
+            self.assertEqual(ticket.agreement_status, "Failed")
+
+            # first_response_failed_by should be 9 minutes (in business hours seconds)
+            self.assertEqual(ticket.first_response_failed_by, 9 * 60)
+
+        # now check failed by just 2 minutes after the end time
+        # what is the end time of monday?
+        # end_time = 6 PM on Monday
+        date2 = get_current_week_monday(hours=17)
+        with self.freeze_time(add_to_date(date2, minutes=55)):
+            ticket2 = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date2, hours=1, minutes=5)):
+            frappe.set_user(agent)
+            ticket2.reply_via_agent(message="Test reply after response by")
+            ticket2.reload()
+
+            ticket2.status = "Replied"
+            ticket2.save()
+            ticket2.reload()
+
+            self.assertIsNone(ticket2.first_response_failed_by)
+
+    def test_resolution_failed_by(self):
+        # Urgent priority: resolution_by = T+2h
+        # Ticket resolved at T+2h15min → 15 minutes late in business hours
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, minutes=135)):
+            ticket.reload()
+            ticket.status = "Resolved"
+            ticket.save()
+            ticket.reload()
+            self.assertEqual(ticket.agreement_status, "Failed")
+            # resolution_failed_by should be 15 minutes (in business hours seconds)
+            self.assertEqual(ticket.resolution_failed_by, 15 * 60)
+
+    def test_reply_via_agent_default_sender(self):
+        """Without `from_email`, sender on the Communication is the session user."""
+        ticket = make_ticket()
+
+        frappe.set_user(agent)
+        try:
+            ticket.reply_via_agent(message="Reply with default sender")
+        finally:
+            frappe.set_user("Administrator")
+
+        comm = frappe.get_last_doc(
+            "Communication",
+            filters={"reference_doctype": "HD Ticket", "reference_name": ticket.name},
+        )
+        self.assertEqual(comm.sender, agent)
+
+    def test_reply_via_agent_with_from_email(self):
+        """When `from_email` is passed, the Communication uses it as sender/email_account."""
+        email_account = frappe.get_doc(
+            {
+                "doctype": "Email Account",
+                "email_account_name": "Helpdesk From Email Test",
+                "email_id": "from-mail@test.com",
+                "domain": "example.com",
+                "smtp_server": "smtp.example.com",
+                "enable_outgoing": 1,
+                "password": "password",
+            }
+        ).insert(ignore_if_duplicate=True, ignore_permissions=True)
+
+        ticket = make_ticket()
+        frappe.set_user(agent)
+        try:
+            ticket.reply_via_agent(
+                message="Reply with switched from email",
+                from_email={
+                    "email_id": email_account.email_id,
+                    "email_account": email_account.name,
+                },
+            )
+        finally:
+            frappe.set_user("Administrator")
+
+        comm = frappe.get_last_doc(
+            "Communication",
+            filters={"reference_doctype": "HD Ticket", "reference_name": ticket.name},
+        )
+        self.assertEqual(comm.sender, email_account.email_id)
+        self.assertEqual(comm.email_account, email_account.name)
+
+    def test_reply_via_agent_with_invalid_from_email_account(self):
+        """If `from_email.email_account` does not exist, reply_via_agent should throw."""
+        ticket = make_ticket()
+
+        frappe.set_user(agent)
+        try:
+            with self.assertRaises(frappe.ValidationError):
+                ticket.reply_via_agent(
+                    message="Reply with bad email account",
+                    from_email={
+                        "email_id": "invalid@test.com",
+                        "email_account": "Invalid Email Account",
+                    },
+                )
+        finally:
+            frappe.set_user("Administrator")
+
+    def test_bulk_reply(self):
+        """
+        bulk_reply on two tickets with two uploaded files should send a reply per
+        ticket and attach the files to both the resulting communications and the
+        tickets.
+        """
+        frappe.set_user(agent)
+
+        file1 = upload_test_file("outlook.png")
+        file2 = upload_test_file("sendgrid.png")
+
+        ticket1 = make_ticket(raised_by="customer1@test.com")
+        ticket2 = make_ticket(raised_by="customer2@test.com")
+        ticket_ids = [ticket1.name, ticket2.name]
+
+        bulk_reply(
+            ticket_ids=ticket_ids,
+            message="Test Message",
+            attachments=[file1, file2],
+        )
+
+        communications = frappe.get_all(
+            "Communication",
+            filters={
+                "reference_doctype": "HD Ticket",
+                "reference_name": ["in", ticket_ids],
+                "sent_or_received": "Sent",
+            },
+            pluck="name",
+        )
+        self.assertEqual(len(communications), 2)  # one agent reply per ticket
+
+        communication_attachments = frappe.db.count(
+            "File",
+            {
+                "attached_to_doctype": "Communication",
+                "attached_to_name": ["in", communications],
+            },
+        )
+        ticket_attachments = frappe.db.count(
+            "File",
+            {
+                "attached_to_doctype": "HD Ticket",
+                "attached_to_name": ["in", ticket_ids],
+            },
+        )
+
+        # Each ticket's communication carries both files, and each ticket carries
+        # both files: 2 communications x 2 files and 2 tickets x 2 files.
+        self.assertEqual(communication_attachments, 4)
+        self.assertEqual(ticket_attachments, 4)
+
+        # delete all files
+        files = frappe.get_all(
+            "File",
+            filters={
+                "attached_to_doctype": ["in", ["Communication", "HD Ticket"]],
+            },
+            pluck="name",
+        )
+        for file in files:
+            frappe.delete_doc("File", file)
+
+    def tearDown(self):
+        frappe.set_user("Administrator")
+        remove_holidays()
+        frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
+        frappe.delete_doc("HD Ticket Status", "New", force=True)

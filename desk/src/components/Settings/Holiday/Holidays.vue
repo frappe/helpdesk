@@ -13,7 +13,8 @@
         theme="gray"
         variant="solid"
         @click="goToNew()"
-        icon-left="plus"
+        icon-left="lucide-plus"
+        class="rtl:flex-row-reverse"
       />
     </template>
     <template
@@ -21,22 +22,24 @@
       #header-bottom
     >
       <div class="relative">
-        <Input
+        <TextInput
           :model-value="holidaySearchRef"
-          @input="holidaySearchRef = $event"
+          @update:model-value="holidaySearchRef = $event"
           :placeholder="__('Search')"
           type="text"
-          class="bg-white hover:bg-white focus:ring-0 border-outline-gray-2"
-          icon-left="search"
-          debounce="300"
-          inputClass="p-4 pr-12"
-        />
+          class="focus:ring-0 border-outline-gray-2"
+          :debounce="300"
+        >
+          <template #prefix>
+            <LucideSearch class="size-4" />
+          </template>
+        </TextInput>
         <Button
           v-if="holidaySearchRef"
-          icon="x"
+          icon="lucide-x"
           variant="ghost"
           @click="holidaySearchRef = ''"
-          class="absolute right-1 top-1/2 -translate-y-1/2"
+          class="absolute end-1 top-1/2 -translate-y-1/2"
         />
       </div>
     </template>

@@ -4,6 +4,7 @@ import type {
   RecentSimilarTicket,
   Resource,
   TicketActivities,
+  TicketAssignee,
   TicketContact,
 } from "@/types";
 import type { HDTicket } from "@/types/doctypes";
@@ -12,7 +13,7 @@ import { reactive } from "vue";
 
 interface MapValue {
   ticket: DocumentResource<HDTicket>;
-  assignees: Resource<Record<"name", string>[]>;
+  assignees: Resource<TicketAssignee[]>;
   contact: Resource<TicketContact>;
   recentSimilarTickets: Resource<RecentSimilarTicket>;
   activities: Resource<TicketActivities>;
@@ -20,7 +21,7 @@ interface MapValue {
 
 const ticketMap: Record<string, MapValue> = reactive({});
 
-export const useTicket = (ticketId: string | number): MapValue => {
+export const useTicket = (ticketId: string): MapValue => {
   if (!ticketMap[ticketId]) {
     ticketMap[ticketId] = {
       ticket: createDocumentResource<HDTicket>({
@@ -45,12 +46,6 @@ export const useTicket = (ticketId: string | number): MapValue => {
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_assignees",
         params: { ticket: ticketId },
         auto: true,
-        transform: (data: string) => {
-          return JSON.parse(data).map((name: string) => ({ name })) as Record<
-            "name",
-            string
-          >[];
-        },
       }),
       contact: createResource({
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_contact",

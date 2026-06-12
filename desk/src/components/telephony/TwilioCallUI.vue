@@ -44,7 +44,7 @@
         </div>
         <div v-if="onCall" class="flex gap-2">
           <Button
-            :icon="muted ? 'mic-off' : 'mic'"
+            :icon="muted ? 'lucide-mic-off' : 'lucide-mic'"
             class="rounded-full"
             @click="toggleMute"
           />
@@ -102,7 +102,7 @@
   </div>
   <div
     v-show="showSmallCallWindow"
-    class="ml-2 mt-1 flex cursor-pointer select-none items-center justify-between gap-3 rounded-lg bg-surface-gray-7 px-2 py-1 text-base !text-ink-gray-2"
+    class="ms-2 mt-1 flex cursor-pointer select-none items-center justify-between gap-3 rounded-lg bg-surface-gray-7 px-2 py-1 text-base !text-ink-gray-2"
     @click="toggleCallWindow"
     v-bind="$attrs"
   >

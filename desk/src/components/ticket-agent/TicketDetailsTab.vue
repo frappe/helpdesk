@@ -21,10 +21,10 @@
               :id="field.fieldname"
               :class="section.group ? 'flex-1 min-w-0' : 'w-full'"
               :page-length="10"
-              :label="field.label"
-              :placeholder="field.placeholder"
+              :label="__(field.label)"
+              :placeholder="__(field.placeholder)"
               :doctype="field.doctype"
-              :modelValue="field.value"
+              :modelValue="__(field.value)"
               :required="field.required"
               @update:model-value="
               (val:string) => handleFieldUpdate(field.fieldname, val,true)
@@ -45,7 +45,7 @@
     >
       <!-- Ticket Info (custom fields) -->
       <div v-if="Boolean(customFields.length)">
-        <Section label="Ticket Info" :opened="true">
+        <Section label="Ticket Info" v-model:opened="openedSections.ticketInfo">
           <template #header="{ opened, toggle }">
             <div
               class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-white z-10 px-4 py-4 cursor-pointer"
@@ -85,7 +85,7 @@
           <Section
             :label="section.label"
             :hideLabel="section.hideLabel"
-            :opened="section.opened"
+            v-model:opened="openedSections[section.key]"
           >
             <template #header="{ opened, toggle }">
               <div
@@ -154,8 +154,8 @@ import {
   RecentSimilarTicketsSymbol,
   TicketSymbol,
 } from "@/types";
-import dayjs from "dayjs";
-import { Tooltip } from "frappe-ui";
+import { useStorage } from "@vueuse/core";
+import { dayjs, Tooltip } from "frappe-ui";
 import { computed, inject, ref } from "vue";
 import LucideChevronRight from "~icons/lucide/chevron-right";
 import Section from "../Section.vue";
@@ -235,6 +235,17 @@ const customFields = computed(() => {
   return _customFields;
 });
 
+const openedSections = useStorage(
+  "openedSections",
+  {
+    ticketInfo: false,
+    recentTickets: false,
+    similarTickets: false,
+  },
+  localStorage,
+  { mergeDefaults: true }
+);
+
 const sections = computed(() => {
   if (recentSimilarTickets.value.loading || !recentSimilarTickets.value.data) {
     return [];
@@ -245,19 +256,19 @@ const sections = computed(() => {
   const _sections = [];
   if (recentTickets.length) {
     _sections.push({
+      key: "recentTickets" as const,
       label: "Recent Tickets",
       tooltipMessage: "Tickets recently raised by this contact/customer",
       hideLabel: false,
-      opened: true,
       tickets: recentTickets,
     });
   }
   if (similarTickets.length) {
     _sections.push({
+      key: "similarTickets" as const,
       label: "Similar Tickets",
       tooltipMessage: "Tickets with similar queries",
       hideLabel: false,
-      opened: true,
       tickets: similarTickets,
     });
   }
@@ -265,7 +276,7 @@ const sections = computed(() => {
 });
 
 function getStatusColor(status: string) {
-  let { color } = getStatus(status);
+  const { color } = getStatus(status) ?? {};
   return colorMap[color] ?? colorMap["Default"];
 }
 
@@ -273,7 +284,7 @@ function formatDate(date: string) {
   return dayjs(date).format(dateFormat.toUpperCase());
 }
 
-function openTicket(name: string | number) {
+function openTicket(name: string) {
   let url = window.location.origin + "/helpdesk/tickets/" + name;
   window.open(url, "_blank");
 }

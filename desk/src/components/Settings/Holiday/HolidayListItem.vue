@@ -1,7 +1,9 @@
 <template>
-  <div class="flex items-center cursor-pointer hover:bg-gray-50 rounded">
+  <div
+    class="flex items-center cursor-pointer hover:bg-surface-menu-bar rounded"
+  >
     <div
-      class="w-full pl-2 flex flex-col justify-center h-14"
+      class="w-full ps-2 flex flex-col justify-center h-14"
       @click="holidayListActiveScreen = { screen: 'view', data: data }"
     >
       <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
@@ -12,11 +14,11 @@
         {{ data.description }}
       </div>
     </div>
-    <div class="flex justify-between items-center pr-2">
+    <div class="flex justify-between items-center pe-2">
       <div>
         <Dropdown placement="right" :options="dropdownOptions">
           <Button
-            icon="more-horizontal"
+            icon="lucide-more-horizontal"
             variant="ghost"
             @click="isConfirmingDelete = false"
           />
@@ -25,10 +27,10 @@
     </div>
   </div>
   <Dialog
-    :options="{ title: __('Duplicate Holiday List') }"
-    v-model="duplicateDialog.show"
+    :title="__('Duplicate Holiday List')"
+    v-model:open="duplicateDialog.show"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl
           :label="__('New Holiday List Name')"
@@ -93,7 +95,7 @@ const dropdownOptions = [
         name: props.data.name,
       };
     },
-    icon: "copy",
+    icon: "lucide-copy",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteHolidayList(),
