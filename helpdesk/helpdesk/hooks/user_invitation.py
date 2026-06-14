@@ -28,12 +28,12 @@ def create_agent(user: Document) -> None:
 
 
 def attach_image(user: Document) -> None:
-    if not user.image:
+    if not user.user_image:
         return
     if contact := frappe.db.get_value(
         "Contact", {"user": user.name, "email_id": user.name}, "name"
     ):
-        frappe.db.set_value("Contact", contact, "image", user.image)
+        frappe.db.set_value("Contact", contact, "image", user.user_image)
 
 
 def link_to_customer(user: Document, customer: str) -> None:
@@ -50,5 +50,4 @@ def link_to_customer(user: Document, customer: str) -> None:
 
     doc = frappe.get_doc("HD Customer", customer)
     doc.append("contacts", {"contact_name": contact})
-    frappe.flags.ignore_customer_role = True
     doc.save(ignore_permissions=True)

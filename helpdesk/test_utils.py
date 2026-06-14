@@ -374,6 +374,33 @@ def create_customer(name, contacts=[]):
     return customer.insert()
 
 
+def create_user(email: str):
+    """Create (or fetch) a plain User with no helpdesk roles."""
+    if frappe.db.exists("User", email):
+        return frappe.get_doc("User", email)
+    return frappe.get_doc(
+        doctype="User",
+        email=email,
+        first_name=email.split("@")[0],
+        send_welcome_email=0,
+    ).insert(ignore_permissions=True)
+
+
+def get_roles(user: str) -> list[str]:
+    """Return the role names assigned to a user."""
+    return frappe.get_all("Has Role", filters={"parent": user}, pluck="role")
+
+
+def get_invitation(email: str):
+    """Return the helpdesk User Invitation raised for an email, if any."""
+    return frappe.db.get_value(
+        "User Invitation",
+        {"email": email, "app_name": "helpdesk"},
+        ["name", "customer", "contact"],
+        as_dict=True,
+    )
+
+
 def update_role_in_customer(customer, contact, role="HD Customer", is_primary=False):
     frappe.set_user("Administrator")
     is_manager = True if role == "HD Customer Manager" else False

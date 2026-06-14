@@ -250,20 +250,16 @@ function removeContact() {
     message: __(
       "Are you sure you want to remove this contact from the customer?"
     ),
-    onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
-      hideDialog();
-    },
     actions: [
       {
         label: __("Confirm"),
         variant: "solid",
-        onClick(close: Function) {
-          customer.doc.contacts = customer.doc.contacts?.filter(
-            (c) => c.contact_name !== props.contact.contact_name
-          );
+        onClick: ({ close }: { close: () => void }) =>
           customer.setValue.submit(
             {
-              contacts: customer.doc.contacts,
+              contacts: customer.doc.contacts?.filter(
+                (c) => c.contact_name !== props.contact.contact_name
+              ),
             },
             {
               onSuccess() {
@@ -275,8 +271,7 @@ function removeContact() {
                 getErrorMessage(error, true);
               },
             }
-          );
-        },
+          ),
       },
     ],
   });

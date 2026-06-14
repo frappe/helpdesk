@@ -22,7 +22,7 @@
           />
         </template>
       </Button>
-      <div class="flex-1">
+      <div class="flex-1 min-w-32">
         <ComboboxRoot
           :model-value="tempSelection"
           :open="showOptions"
@@ -78,7 +78,9 @@
                   <div class="flex flex-col gap-1 p-1 text-ink-gray-8">
                     <div class="text-base font-medium">{{ option.label }}</div>
                     <div class="text-sm text-ink-gray-5">
-                      {{ option.value }}
+                      {{
+                        option.isCustom ? __("Invite via email") : option.value
+                      }}
                     </div>
                   </div>
                 </ComboboxItem>
@@ -123,6 +125,8 @@ const props = defineProps({
   placeholder: { type: String, default: "" },
   inputClass: { type: String, default: "" },
   existingUsers: { type: Array, default: () => [] },
+  allowCustomEmail: { type: Boolean, default: false },
+  additionalFilters: { type: Array, default: () => [] },
 });
 
 const errorMessage = (value) => __("{0} is an Invalid Email Address", [value]);
@@ -145,7 +149,7 @@ const { users } = useUserStore();
 const filterContacts = createResource({
   url: "helpdesk.api.contact.search_contacts",
   method: "GET",
-  params: { txt: "" },
+  params: contactSearchParams(""),
   transform: (data) =>
     data.map(({ full_name, email_id, name }) => ({
       label: email_id || full_name || name,
@@ -161,12 +165,19 @@ watchDebounced(
     if (error.value && newVal !== oldVal) {
       error.value = null;
     }
-    console.log("Updating contacts filter with", props.existingUsers);
-    filterContacts.update({ params: { txt: newVal || "" } });
+    filterContacts.update({ params: contactSearchParams(newVal) });
     filterContacts.reload();
   },
   { debounce: 250, immediate: true }
 );
+
+function contactSearchParams(txt) {
+  const params = { txt: txt || "" };
+  if (props.additionalFilters?.length) {
+    params.additional_filters = JSON.stringify(props.additionalFilters);
+  }
+  return params;
+}
 
 // --- Options ---
 const options = computed(() => {
@@ -198,10 +209,26 @@ const options = computed(() => {
     list = list.filter((o) => !values.value.includes(o.value));
   }
   if (props.existingUsers?.length) {
-    list = list.filter((o) => !props.existingUsers.includes(o.email));
+    list = list.filter((o) => !isExistingUser(o.email));
+  }
+  // offer the typed text itself when nothing matches, like the email To field
+  if (
+    props.allowCustomEmail &&
+    query.value &&
+    !list.length &&
+    !isExistingUser(query.value)
+  ) {
+    list = [{ label: query.value, value: query.value, isCustom: true }];
   }
   return list;
 });
+
+function isExistingUser(email) {
+  if (!email) return false;
+  return props.existingUsers?.some(
+    (user) => user?.toLowerCase?.() === email.toLowerCase()
+  );
+}
 
 function addValue(input) {
   if (!input) return;
@@ -212,22 +239,33 @@ function addValue(input) {
     .map((p) => p.trim())
     .filter(Boolean);
   for (const email of parts) {
-    const inList = options.value.some((o) => o.value === email);
-    if (!inList) {
-      error.value = props.forAgents
-        ? __("{0} is not an existing user", [email])
-        : __("{0} is not an existing contact", [email]);
-      query.value = email;
-      break;
-    }
-    if (props.validate && props.forAgents && !props.validate(email)) {
-      error.value = errorMessage(email);
-      query.value = email;
-      break;
-    }
+    if (values.value?.includes(email)) continue;
+    const inList = options.value.some((o) => o.value === email && !o.isCustom);
+    if (!inList && !canAddCustomValue(email)) break;
     if (!values.value) values.value = [email];
     else values.value.push(email);
   }
+}
+
+function canAddCustomValue(email) {
+  if (!props.allowCustomEmail) {
+    error.value = props.forAgents
+      ? __("{0} is not an existing user", [email])
+      : __("{0} is not an existing contact", [email]);
+    query.value = email;
+    return false;
+  }
+  if (isExistingUser(email)) {
+    error.value = __("{0} is already added", [email]);
+    query.value = email;
+    return false;
+  }
+  if (props.validate && !props.validate(email)) {
+    error.value = errorMessage(email);
+    query.value = email;
+    return false;
+  }
+  return true;
 }
 
 function removeValue(value) {

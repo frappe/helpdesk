@@ -10,9 +10,14 @@ from helpdesk.utils import get_country_from_timezone, get_customers
 
 @frappe.whitelist(methods=["GET"])
 def search_contacts(
-    txt: str,
+    txt: str, additional_filters: str | list | None = None
 ) -> list[dict[Literal["full_name", "name", "email_id"], str]]:
     doctype = "Contact"
+    filters: list[list] = [[doctype, "email_id", "is", "set"]]
+    if additional_filters:
+        if isinstance(additional_filters, str):
+            additional_filters = frappe.parse_json(additional_filters)
+        filters.extend(additional_filters)
     or_filters: list[list[str]] = []
     search_fields = ["full_name", "email_id", "name"]
     if txt:
@@ -20,7 +25,7 @@ def search_contacts(
             or_filters.append([doctype, field, "like", f"%{txt}%"])
     return frappe.get_list(
         doctype,
-        filters=[[doctype, "email_id", "is", "set"]],
+        filters=filters,
         fields=search_fields,
         or_filters=or_filters,
         limit_start=0,
