@@ -27,17 +27,17 @@
                     {{ headerLabel }}
                   </span>
                 </div>
-                <div class="pt-1">
-                  <div class="p-1.5 py-1">
+                <div>
+                  <div class="p-1.5">
                     <div
                       v-for="filter in activeFilters"
                       :key="filter.index"
-                      class="group flex h-8 w-full items-center gap-2 rounded px-1.5 hover:bg-surface-gray-2"
+                      class="group flex h-8 w-full items-center gap-2 rounded px-1.5 hover:bg-surface-gray-2 pl-0"
                     >
                       <Button
                         variant="ghost"
                         :label="filterSummary(filter)"
-                        class="!h-full min-w-0 flex-1 !justify-start !px-0 hover:!bg-transparent"
+                        class="!h-full min-w-0 flex-1 !justify-start !px-0 hover:!bg-transparent !pl-1.5"
                         @click="editFilter(filter)"
                       >
                         <template #prefix>
@@ -47,12 +47,22 @@
                           />
                         </template>
                       </Button>
-                      <Button
-                        variant="ghost"
-                        icon="lucide-x"
-                        class="invisible shrink-0 group-hover:visible"
-                        @click="removeFilter(filter.index)"
-                      />
+                      <div class="gap-1">
+                        <Button
+                          variant="ghost"
+                          icon="lucide-repeat"
+                          class="invisible shrink-0 group-hover:visible"
+                          :tooltip="__('Replace filter')"
+                          @click="replaceFilter(filter)"
+                        />
+                        <Button
+                          variant="ghost"
+                          icon="lucide-x"
+                          class="invisible shrink-0 group-hover:visible"
+                          :tooltip="__('Remove filter')"
+                          @click="removeFilter(filter.index)"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div
@@ -110,6 +120,7 @@
                 @apply="applyFilter"
                 @clear="clearCurrentFilter"
                 @back="goBack"
+                @done="step = 'overview'"
               />
             </div>
           </Transition>
@@ -199,6 +210,13 @@ function selectField(field: FilterField) {
   valueEditorOrigin.value = "fields";
   editSession.value++;
   step.value = "value";
+}
+
+// "Replace" drops the existing condition and jumps to the field list so a
+// different field can be picked in its place.
+function replaceFilter(filter: ActiveFilter) {
+  removeFilter(filter.index);
+  step.value = "fields";
 }
 
 function editFilter(filter: ActiveFilter) {
