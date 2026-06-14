@@ -10,6 +10,7 @@
 
     <template #body-content>
       <div class="flex flex-col gap-5 mt-2">
+        <!-- Title Input -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
             <div class="text-sm text-ink-gray-5 flex items-center gap-1">
@@ -45,6 +46,7 @@
           </p>
         </div>
 
+        <!-- Description Editor -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
             <div class="text-sm text-ink-gray-5 flex items-center gap-1">
@@ -80,8 +82,9 @@
           </p>
         </div>
 
+        <!-- Metadata Properties Grid Layout -->
         <div class="grid grid-cols-2 gap-4">
-          <!-- Priority Select Box Area -->
+          <!-- Priority Selector -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __("Priority") }}</div>
             <div class="relative flex items-center">
@@ -99,6 +102,7 @@
             </div>
           </div>
 
+          <!-- Assignee Selector -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __("Assigned To") }}</div>
             <Autocomplete
@@ -145,6 +149,7 @@
             </Autocomplete>
           </div>
 
+          <!-- Due Date Selector -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __("Due Date") }}</div>
             <div class="w-full date-picker-wrapper">
@@ -156,7 +161,7 @@
             </div>
           </div>
 
-          <!-- Status Select Box Area -->
+          <!-- Status Selector -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __("Status") }}</div>
             <div class="relative flex items-center">
@@ -224,7 +229,7 @@ const emit = defineEmits(["update:modelValue", "submit"]);
 // --- Store ---
 const { getUser, agentOptions } = useUserStore();
 
-// --- State ---
+// --- State Layout ---
 const show = computed({
   get: () => props.modelValue,
   set: (value) => emit("update:modelValue", value),
@@ -327,7 +332,10 @@ watch(
 );
 
 watch(show, async (val) => {
-  if (!val) return;
+  if (!val) {
+    activeTask.value = null;
+    return;
+  }
 
   errors.value.title = false;
   errors.value.titleLength = false;
@@ -428,6 +436,7 @@ async function handleSubmit() {
 
   if (loading.value) return;
   loading.value = true;
+  const targetAssignee = resolveAssigned() || null;
 
   try {
     let result: any;
@@ -445,9 +454,21 @@ async function handleSubmit() {
           due_date: form.value.due_date || null,
           status: form.value.status,
           priority: form.value.priority,
-          assigned: assignedTo,
+          assigned: targetAssignee, // FIX 2: Replaced broken undefined variable layout reference
         }
       );
+
+      if (!result || typeof result !== "object" || !result.name) {
+        result = {
+          name: taskName,
+          title: form.value.title,
+          description: form.value.description,
+          due_date: form.value.due_date,
+          status: form.value.status,
+          priority: form.value.priority,
+          assigned: targetAssignee,
+        };
+      }
       toast.success(__("Task updated"));
     } else {
       const ticketId = String(props.ticketId || "").trim();
@@ -467,7 +488,7 @@ async function handleSubmit() {
           due_date: form.value.due_date || null,
           status: form.value.status,
           priority: form.value.priority,
-          assigned: form.value.assigned || null,
+          assigned: targetAssignee,
         }
       );
       toast.success(__("Task created"));
