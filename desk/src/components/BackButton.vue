@@ -4,7 +4,7 @@
     icon-left="lucide-chevron-left"
     :label="label"
     :size="size"
-    class="!justify-start truncate font-medium text-ink-gray-8 hover:bg-transparent hover:opacity-70 focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 active:bg-transparent active:outline-none active:ring-0 rtl:flex-row-reverse"
+    class="!justify-start truncate font-medium text-ink-gray-8 hover:bg-transparent hover:opacity-70 focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 active:bg-transparent active:outline-none active:ring-0 rtl:flex-row-reverse ps-1"
     @click="$emit('back')"
   />
 </template>

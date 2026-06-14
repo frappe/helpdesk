@@ -37,6 +37,7 @@
                       <Button
                         variant="ghost"
                         :label="filterSummary(filter)"
+                        :tooltip="filterSummary(filter)"
                         class="!h-full min-w-0 flex-1 !justify-start !px-0 hover:!bg-transparent !pl-1.5"
                         @click="editFilter(filter)"
                       >
@@ -47,19 +48,21 @@
                           />
                         </template>
                       </Button>
-                      <div class="gap-1">
+                      <div class="flex shrink-0 items-center gap-1">
                         <Button
                           variant="ghost"
-                          icon="lucide-repeat"
-                          class="invisible shrink-0 group-hover:visible"
+                          icon="lucide-replace"
+                          :aria-label="__('Replace filter')"
                           :tooltip="__('Replace filter')"
+                          :class="revealOnRowActivity"
                           @click="replaceFilter(filter)"
                         />
                         <Button
                           variant="ghost"
                           icon="lucide-x"
-                          class="invisible shrink-0 group-hover:visible"
+                          :aria-label="__('Remove filter')"
                           :tooltip="__('Remove filter')"
+                          :class="revealOnRowActivity"
                           @click="removeFilter(filter.index)"
                         />
                       </div>
@@ -73,7 +76,7 @@
                       :size="'xs'"
                       class="!text-ink-gray-5"
                       :label="__('Add filter')"
-                      @click="step = 'fields'"
+                      @click="addNewFilter()"
                       tooltip="Add Filter (A)"
                     >
                       <template #prefix>
@@ -96,7 +99,7 @@
               <template v-else-if="step === 'fields'">
                 <div
                   v-if="canGoBack"
-                  class="flex h-9 items-center border-b border-outline-gray-1"
+                  class="flex h-9 items-center border-b border-outline-gray-1 ps-1"
                 >
                   <BackButton :label="headerLabel" size="sm" @back="goBack" />
                 </div>
@@ -142,8 +145,8 @@ import {
   fieldIcon,
   FilterField,
   filterSummary,
-  useFilterCore,
-} from "./filterCore";
+  useFilter,
+} from "./filter";
 import FilterFieldList from "./FilterFieldList.vue";
 import FilterTrigger from "./FilterTrigger.vue";
 import FilterValueEditor from "./FilterValueEditor.vue";
@@ -155,16 +158,24 @@ const {
   updateFilter,
   removeFilter,
   clearFilters,
-} = useFilterCore();
+} = useFilter();
 
 const step = ref<"overview" | "fields" | "value">("fields");
 const selectedField = ref<FilterField | null>(null);
 const editingIndex = ref<number | null>(null);
+// The row a "Replace" is targeting. The old condition is kept untouched until a
+// new one is chosen, so backing out leaves the original filter intact; the
+// replacement then lands at this same position.
+const replacingIndex = ref<number | null>(null);
 const editSession = ref(0);
 // Where the value editor was opened from, so "back" returns there: the field
 // list (when adding a new filter) or the overview (when editing an existing one).
 const valueEditorOrigin = ref<"overview" | "fields">("overview");
 let openPopoverFn: (() => void) | null = null;
+
+// Row actions stay out of the way until the row is hovered or focused.
+const revealOnRowActivity =
+  "opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100";
 
 // used for animating back or forward between steps
 const stepOrder = { overview: 0, fields: 1, value: 2 } as const;
@@ -202,6 +213,13 @@ function resetSteps() {
   step.value = activeFilters.value.length ? "overview" : "fields";
   selectedField.value = null;
   editingIndex.value = null;
+  replacingIndex.value = null;
+}
+
+// Opens the field list to add a fresh filter, cancelling any pending replace.
+function addNewFilter() {
+  replacingIndex.value = null;
+  step.value = "fields";
 }
 
 function selectField(field: FilterField) {
@@ -212,16 +230,18 @@ function selectField(field: FilterField) {
   step.value = "value";
 }
 
-// "Replace" drops the existing condition and jumps to the field list so a
-// different field can be picked in its place.
+// "Replace" jumps to the field list to pick a different field, but keeps the
+// existing condition in place — it's only swapped out once the new one is
+// applied (see applyFilter), so abandoning the flow loses nothing.
 function replaceFilter(filter: ActiveFilter) {
-  removeFilter(filter.index);
+  replacingIndex.value = filter.index;
   step.value = "fields";
 }
 
 function editFilter(filter: ActiveFilter) {
   selectedField.value = filter.field;
   editingIndex.value = filter.index;
+  replacingIndex.value = null;
   valueEditorOrigin.value = "overview";
   editSession.value++;
   step.value = "value";
@@ -229,11 +249,16 @@ function editFilter(filter: ActiveFilter) {
 
 function applyFilter(operator: string, value: any) {
   if (!selectedField.value) return;
-  if (editingIndex.value === null) {
+  // A pending replace overwrites its target row in place; otherwise we update
+  // the row being edited, or append a brand-new filter.
+  const targetIndex = replacingIndex.value ?? editingIndex.value;
+  if (targetIndex === null) {
     editingIndex.value = addFilter(selectedField.value, operator, value);
   } else {
-    updateFilter(editingIndex.value, selectedField.value, operator, value);
+    updateFilter(targetIndex, selectedField.value, operator, value);
+    editingIndex.value = targetIndex;
   }
+  replacingIndex.value = null;
 }
 
 function clearCurrentFilter() {
@@ -269,7 +294,7 @@ useEventListener(document, "keydown", (event: KeyboardEvent) => {
   }
   if (event.key === "a" || event.key === "A") {
     event.preventDefault();
-    step.value = "fields";
+    addNewFilter();
   }
 });
 </script>
