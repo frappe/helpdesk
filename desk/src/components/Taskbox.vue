@@ -8,7 +8,7 @@
     >
       <div class="flex flex-1 flex-col gap-2 min-w-0">
         <div class="truncate text-sm font-medium text-ink-gray-9">
-          {{ activity.title || __("Untitled Task") }}
+          {{ localActivity.title || __("Untitled Task") }}
         </div>
 
         <div
@@ -25,31 +25,35 @@
           </div>
 
           <div
-            v-if="assignedId && activity.due_date"
+            v-if="assignedId && localActivity.due_date"
             class="flex items-center justify-center"
           >
             <DotIcon class="h-1.5 w-1.5 text-ink-gray-4" />
           </div>
 
           <Tooltip
-            v-if="activity.due_date"
-            :text="dateFormat(activity.due_date, dateTooltipFormat)"
+            v-if="localActivity.due_date"
+            :text="dateFormat(localActivity.due_date, dateTooltipFormat)"
           >
             <div class="flex items-center gap-1.5">
               <CalendarIcon class="h-3.5 w-3.5 text-ink-gray-5" />
-              <span>{{ dateFormat(activity.due_date, "D MMM, h:mm A") }}</span>
+              <span>{{
+                dateFormat(localActivity.due_date, "D MMM, h:mm A")
+              }}</span>
             </div>
           </Tooltip>
 
           <div
-            v-if="(assignedId || activity.due_date) && activity.priority"
+            v-if="
+              (assignedId || localActivity.due_date) && localActivity.priority
+            "
             class="flex items-center justify-center"
           >
             <DotIcon class="h-1.5 w-1.5 text-ink-gray-4" />
           </div>
 
-          <div v-if="activity.priority" class="flex items-center">
-            <span>{{ activity.priority }}</span>
+          <div v-if="localActivity.priority" class="flex items-center">
+            <span>{{ localActivity.priority }}</span>
           </div>
         </div>
       </div>
@@ -63,7 +67,7 @@
             :disabled="isUpdating"
           >
             <TaskStatusIcon
-              :status="activity.status || 'Todo'"
+              :status="localActivity.status || 'Todo'"
               class="h-4 w-4"
             />
           </Button>
@@ -83,15 +87,16 @@
     <TaskboxEditor
       v-if="showModal"
       v-model="showModal"
-      :task="activity"
-      :ticketId="String(activity.reference_docname || '')"
+      :task="localActivity"
+      :ticketId="String(localActivity.reference_docname || '')"
       @submit="handleReload"
+      @submit:load="load"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { Avatar, Button, Dropdown, Tooltip, call, toast } from "frappe-ui";
 import { dateTooltipFormat, dateFormat } from "@/utils";
 import { __ } from "@/translation";
@@ -101,6 +106,7 @@ import DotIcon from "@/components/icons/DotIcon.vue";
 import TaskStatusIcon from "@/components/icons/TaskStatusIcon.vue";
 import TaskboxEditor from "./TaskboxEditor.vue";
 
+// --- Props & Emits ---
 const props = defineProps({
   activity: {
     type: Object,
@@ -122,13 +128,55 @@ const props = defineProps({
 
 const emit = defineEmits(["update", "status-change", "deleted"]);
 
+// --- Reactivity State Layout ---
 const showModal = ref(false);
 const isUpdating = ref(false);
 const isConfirmingDelete = ref(false);
 const { getUser } = useUserStore();
 
-const assignedId = computed(
-  () => props.activity.assigned || props.activity.assigned_to || ""
+// CRITICAL FIX 2: Create a local reactive copy of the prop.
+// This forces Vue to re-render the component whenever these fields change.
+const localActivity = ref({ ...props.activity });
+
+// Keep local state perfectly synchronized if parent data fetches refresh
+watch(
+  () => props.activity,
+  (newVal) => {
+    if (newVal) {
+      localActivity.value = { ...newVal };
+    }
+  },
+  { deep: true }
+);
+
+// --- Normalization Mechanics ---
+function normalizeAssignee(val: any): string {
+  if (!val) return "";
+
+  if (Array.isArray(val)) {
+    return val[0] || "";
+  }
+
+  if (typeof val === "string") {
+    const trimmed = val.trim();
+    if (trimmed.startsWith("[")) {
+      try {
+        const arr = JSON.parse(trimmed);
+        return Array.isArray(arr) ? arr[0] || "" : trimmed;
+      } catch {
+        return trimmed;
+      }
+    }
+    return trimmed;
+  }
+
+  return String(val);
+}
+
+const assignedId = computed(() =>
+  normalizeAssignee(
+    localActivity.value.assigned || localActivity.value.assigned_to
+  )
 );
 
 const userInfo = computed(() => {
@@ -138,45 +186,41 @@ const userInfo = computed(() => {
 });
 
 const assigneeLabel = computed((): string => {
-  const assigned = assignedId.value;
-  if (!assigned) return "";
-  return assigned;
+  return assignedId.value || "";
 });
 
-function updateAssignedUser(userData: any) {
-  if (!userData || typeof userData !== "object") return;
-
-  const newUser = userData.assigned || userData.assigned_to;
-
-  if (newUser) {
-    props.activity.assigned = newUser;
-    props.activity.assigned_to = newUser;
-  }
-}
-
+// --- Remote DB Async Callouts ---
 async function changeStatus(newStatus: string) {
   if (isUpdating.value) return;
 
-  const taskId = props.activity.name || props.activity.id;
+  const taskId = localActivity.value.name || localActivity.value.id;
   if (!taskId) {
     toast.error(__("Could not resolve Task ID."));
     return;
   }
 
   isUpdating.value = true;
-  const previousStatus = props.activity.status;
-  props.activity.status = newStatus;
+  const previousStatus = localActivity.value.status;
+
+  // Apply update to local reactive state immediately
+  localActivity.value.status = newStatus;
 
   try {
     await call("helpdesk.helpdesk.doctype.hd_task.hd_task.update_task", {
       task: taskId,
       status: newStatus,
     });
+
+    // Sync change back to original prop references if parent relies on it
+    if (props.activity) props.activity.status = newStatus;
+
     emit("status-change", { name: taskId, status: newStatus });
-    emit("update");
-    props.reloadTasks?.();
+    emit("update", { ...localActivity.value });
+
+    if (props.reloadTasks) props.reloadTasks();
   } catch (e: any) {
-    props.activity.status = previousStatus;
+    localActivity.value.status = previousStatus;
+    if (props.activity) props.activity.status = previousStatus;
     toast.error(e?.message || __("Failed to update status"));
   } finally {
     isUpdating.value = false;
@@ -186,7 +230,7 @@ async function changeStatus(newStatus: string) {
 async function deleteTask() {
   if (isUpdating.value) return;
 
-  const taskId = props.activity.name || props.activity.id;
+  const taskId = localActivity.value.name || localActivity.value.id;
   if (!taskId) {
     toast.error(__("Task identifier missing, cannot delete."));
     return;
@@ -201,7 +245,7 @@ async function deleteTask() {
     });
     toast.success(__("Task deleted successfully"));
     emit("update");
-    props.reloadTasks?.();
+    if (props.reloadTasks) props.reloadTasks();
   } catch (e: any) {
     emit("update");
     toast.error(e?.message || __("Failed to delete task"));
@@ -211,6 +255,7 @@ async function deleteTask() {
   }
 }
 
+// --- Dropdown Options Config ---
 const statusDropdownOptions = computed(() =>
   [
     { label: __("Backlog"), value: "Backlog" },
@@ -245,6 +290,40 @@ const actionMenuOptions = computed(() => [
 ]);
 
 function handleReload(payload?: any) {
+  showModal.value = false;
+  const data = payload?.message || payload;
+
+  if (data && typeof data === "object") {
+    if (data.title !== undefined) localActivity.value.title = data.title;
+    if (data.due_date !== undefined)
+      localActivity.value.due_date = data.due_date;
+    if (data.priority !== undefined)
+      localActivity.value.priority = data.priority;
+    if (data.status !== undefined) localActivity.value.status = data.status;
+
+    const rawAssignee = data.assigned ?? data.assigned_to;
+    if (rawAssignee !== undefined) {
+      const normalized = normalizeAssignee(rawAssignee);
+      localActivity.value.assigned = normalized;
+      localActivity.value.assigned_to = normalized;
+    }
+
+    // Sync back up into parent reference objects
+    Object.keys(localActivity.value).forEach((key) => {
+      if (props.activity && key in props.activity) {
+        props.activity[key] = localActivity.value[key];
+      }
+    });
+  }
+
+  emit("update", { ...localActivity.value });
+
+  if (props.reloadTasks) {
+    props.reloadTasks();
+  }
+}
+
+function load(payload?: any) {
   showModal.value = false;
 
   const data = payload?.message || payload;

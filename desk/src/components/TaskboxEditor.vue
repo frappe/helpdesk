@@ -431,8 +431,6 @@ async function handleSubmit() {
 
   try {
     let result: any;
-    const dbDate = form.value.due_date || null;
-    const assignedTo = form.value.assigned || null;
 
     if (isEditing.value) {
       const taskName = props.task?.name || activeTask.value?.name;
@@ -444,7 +442,7 @@ async function handleSubmit() {
           description: isContentEmpty(form.value.description)
             ? null
             : form.value.description,
-          due_date: dbDate,
+          due_date: form.value.due_date || null,
           status: form.value.status,
           priority: form.value.priority,
           assigned: assignedTo,
@@ -466,10 +464,10 @@ async function handleSubmit() {
           description: isContentEmpty(form.value.description)
             ? null
             : form.value.description,
-          due_date: dbDate,
+          due_date: form.value.due_date || null,
           status: form.value.status,
           priority: form.value.priority,
-          assigned: assignedTo,
+          assigned: form.value.assigned || null,
         }
       );
       toast.success(__("Task created"));
