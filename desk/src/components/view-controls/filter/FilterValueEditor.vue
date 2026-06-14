@@ -74,14 +74,14 @@
         v-else-if="isDate && operator === 'between'"
         :value="dateRangeValue"
         icon-left=""
-        @change="(v) => applyValue(splitRange(v))"
+        @change="(v) => commitAndClose(splitRange(v))"
       />
       <component
         v-else-if="isDate"
         :is="field.fieldtype === 'Date' ? DatePicker : DateTimePicker"
         :value="value"
         icon-left=""
-        @change="(v) => applyValue(v)"
+        @change="(v) => commitAndClose(v)"
       />
       <TextInput
         v-else
@@ -126,6 +126,7 @@ interface E {
   (event: "apply", operator: string, value: any): void;
   (event: "clear"): void;
   (event: "back"): void;
+  (event: "done"): void;
 }
 
 const props = withDefaults(defineProps<P>(), { filter: null });
@@ -244,7 +245,9 @@ function isSelected(option: string): boolean {
 
 function pickOption(option: string) {
   if (!isMultiple.value) {
-    applyValue(option);
+    // A single-select pick (Equals/Not Equals, Is, Timespan, single assignee)
+    // completes the filter in one click, so return to the overview.
+    commitAndClose(option);
     return;
   }
   const current = Array.isArray(value.value) ? [...value.value] : [];
@@ -263,6 +266,14 @@ function pickOption(option: string) {
 function applyValue(v: any) {
   value.value = v;
   emit("apply", operator.value, v);
+}
+
+// A discrete pick (single list option, date, or range) fully sets the value, so
+// the filter is complete — apply it and return to the overview. Incremental
+// inputs (multi-select, typing, rating) keep using applyValue and stay put.
+function commitAndClose(v: any) {
+  applyValue(v);
+  emit("done");
 }
 
 function splitRange(v: any): string[] {
