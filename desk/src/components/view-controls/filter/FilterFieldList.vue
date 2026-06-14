@@ -23,11 +23,18 @@
         </template>
       </TextInput>
     </div>
-    <div ref="listEl" class="mt-1 max-h-64 overflow-y-auto p-1">
+    <div
+      ref="listEl"
+      role="listbox"
+      :aria-label="__('Fields')"
+      class="mt-1 max-h-64 overflow-y-auto p-1"
+    >
       <button
         v-for="(field, index) in filteredFields"
         :key="field.fieldname"
         :data-index="index"
+        role="option"
+        :aria-selected="index === activeIndex"
         :class="[
           'flex h-8 w-full items-center gap-2 rounded px-2 text-base text-ink-gray-8',
           index === activeIndex ? 'bg-surface-gray-2' : '',
@@ -36,7 +43,9 @@
         @click="$emit('select', field)"
       >
         <component :is="fieldIcon(field)" class="size-4 text-ink-gray-5" />
-        <span class="flex-1 truncate text-start">{{ field.label }}</span>
+        <span :title="field.label" class="flex-1 truncate text-start">{{
+          field.label
+        }}</span>
         <LucideChevronRight class="size-4 text-ink-gray-4" />
       </button>
       <div
@@ -53,7 +62,7 @@
 import { __ } from "@/translation";
 import { TextInput } from "frappe-ui";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { fieldIcon, FilterField } from "./filterCore";
+import { fieldIcon, FilterField } from "./filter";
 
 interface P {
   fields: FilterField[];

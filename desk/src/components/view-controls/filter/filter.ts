@@ -30,7 +30,7 @@ export interface ActiveFilter {
   index: number;
 }
 
-export interface FilterCore {
+export interface Filter {
   fields: ComputedRef<FilterField[]>;
   activeFilters: ComputedRef<ActiveFilter[]>;
   addFilter: (field: FilterField, operator: string, value: any) => number;
@@ -59,7 +59,7 @@ const typeString = ["Data", "Long Text", "Small Text", "Text Editor", "Text"];
 const typeDate = ["Date", "Datetime"];
 const typeRating = ["Rating"];
 
-export function useFilterCore(): FilterCore {
+export function useFilter(): Filter {
   const listViewData = inject<any>("listViewData");
   const listViewActions = inject<any>("listViewActions");
   const { list, filterableFields } = listViewData;

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col">
     <div
-      class="flex h-9 items-center justify-between gap-1 border-b border-outline-gray-1 pe-2"
+      class="flex h-9 items-center justify-between gap-1 border-b border-outline-gray-1 pe-2 ps-1"
     >
       <BackButton
         :label="field.label"
@@ -11,7 +11,6 @@
       />
       <Dropdown side="bottom" :options="operatorOptions">
         <Button
-          :title="operatorLabel"
           class="flex h-6 max-w-[150px] shrink-0 items-center gap-1 rounded bg-surface-gray-2 ps-2 pe-1 text-sm text-ink-gray-7 hover:bg-surface-gray-3"
           variant="ghost"
           icon-right="lucide-chevron-down"
@@ -38,13 +37,23 @@
           <template #prefix>
             <LucideSearch class="size-4 text-ink-gray-5" />
           </template>
+          <template v-if="isSearching" #suffix>
+            <LucideLoaderCircle class="size-4 animate-spin text-ink-gray-5" />
+          </template>
         </TextInput>
       </div>
-      <div ref="listEl" class="mt-1 max-h-52 overflow-y-auto p-1.5 py-1">
+      <div
+        ref="listEl"
+        role="listbox"
+        :aria-label="field.label"
+        class="mt-1 max-h-52 overflow-y-auto p-1.5 py-1"
+      >
         <button
           v-for="(option, index) in options"
           :key="option.value"
           :data-index="index"
+          role="option"
+          :aria-selected="isSelected(option.value)"
           :class="[
             'flex h-8 w-full items-center gap-2 rounded px-1.5 text-base text-ink-gray-8',
             index === activeIndex ? 'bg-surface-gray-2' : '',
@@ -52,14 +61,23 @@
           @mousemove="activeIndex = index"
           @click="pickOption(option.value)"
         >
-          <span class="flex-1 truncate text-start">{{ option.label }}</span>
+          <span :title="option.label" class="flex-1 truncate text-start">{{
+            option.label
+          }}</span>
           <LucideCheck
             v-if="isSelected(option.value)"
             class="size-4 text-ink-gray-7"
           />
         </button>
         <div
-          v-if="!options.length"
+          v-if="isSearching && !options.length"
+          class="flex h-8 items-center gap-2 px-2 text-base text-ink-gray-5"
+        >
+          <LucideLoaderCircle class="size-4 animate-spin" />
+          {{ __("Searching...") }}
+        </div>
+        <div
+          v-else-if="!options.length"
           class="flex h-8 items-center px-2 text-base text-ink-gray-5"
         >
           {{ __("No results") }}
@@ -110,12 +128,7 @@ import {
   TextInput,
 } from "frappe-ui";
 import { computed, nextTick, ref, watch } from "vue";
-import {
-  ActiveFilter,
-  FilterField,
-  useFilterCore,
-  useLinkSearch,
-} from "./filterCore";
+import { ActiveFilter, FilterField, useFilter, useLinkSearch } from "./filter";
 
 interface P {
   field: FilterField;
@@ -132,7 +145,7 @@ interface E {
 const props = withDefaults(defineProps<P>(), { filter: null });
 const emit = defineEmits<E>();
 
-const core = useFilterCore();
+const core = useFilter();
 const { getOperators, getDefaultOperator, getSelectOptions, timespanOptions } =
   core;
 
@@ -154,7 +167,7 @@ const operatorLabel = computed(
     operator.value
 );
 const { isMac } = useDevice();
-const operatorTooltip = __("Change operator ({0})", isMac ? "⌘E" : "Ctrl+E");
+const operatorTooltip = __("Change operator ({0})", isMac ? "⌥↓/↑" : "Alt+↓/↑");
 const operatorOptions = computed(() =>
   operators.value.map((option) => ({
     label: option.label,
@@ -223,6 +236,10 @@ const dateRangeValue = computed(() =>
 
 const linkSearch = useLinkSearch(linkDoctype(props.field));
 
+// Link options are fetched from the server, so reflect the in-flight request
+// instead of briefly showing "No results" while the search is loading.
+const isSearching = computed(() => isLink.value && linkSearch.results.loading);
+
 function linkDoctype(field: FilterField): string {
   if (field.fieldname === "_assign") return "User";
   return field.fieldtype === "Link" ? field.options || "" : "";
@@ -282,20 +299,29 @@ function splitRange(v: any): string[] {
   return [start, end];
 }
 
+function moveActive(delta: number) {
+  const total = options.value.length;
+  if (total) activeIndex.value = (activeIndex.value + delta + total) % total;
+}
+
+function selectActive() {
+  const option = options.value[activeIndex.value];
+  if (option) pickOption(option.value);
+}
+
 function onKeydown(event: KeyboardEvent) {
   if (event.isComposing) return;
+  // Let ⌥↑/⌥↓ bubble to the operator-cycle handler instead of moving the list.
+  if (event.altKey) return;
   if (event.key === "ArrowDown" || event.key === "ArrowUp") {
     event.preventDefault();
     event.stopPropagation();
-    const delta = event.key === "ArrowDown" ? 1 : -1;
-    const total = options.value.length;
-    if (total) activeIndex.value = (activeIndex.value + delta + total) % total;
+    moveActive(event.key === "ArrowDown" ? 1 : -1);
   } else if (event.key === "Enter") {
     event.preventDefault();
     event.stopPropagation();
     if (event.repeat) return;
-    const option = options.value[activeIndex.value];
-    if (option) pickOption(option.value);
+    selectActive();
   } else if (event.key === "Backspace" && !search.value) {
     event.stopPropagation();
     emit("back");
@@ -386,18 +412,36 @@ watch(
   { immediate: true }
 );
 
-function cycleOperator() {
+function cycleOperator(direction: number) {
   const list = operators.value;
   if (list.length < 2) return;
   const currentIndex = list.findIndex((o) => o.value === operator.value);
-  operator.value = list[(currentIndex + 1) % list.length].value;
+  const total = list.length;
+  operator.value = list[(currentIndex + direction + total) % total].value;
 }
 
 useEventListener(document, "keydown", (event: KeyboardEvent) => {
-  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "e") {
+  // ⌥↓ / ⌥↑ (Alt on Windows) steps to the next / previous operator. A modifier
+  // is required because a value input is usually focused and would swallow a
+  // bare arrow key.
+  if (event.altKey && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
     event.preventDefault();
-    cycleOperator();
+    cycleOperator(event.key === "ArrowDown" ? 1 : -1);
     return;
+  }
+  // List modes without a search box ("Is" → Set / Not Set) have no input to
+  // catch arrow keys, so drive the option list straight from the document.
+  if (isListMode.value && !showSearch.value) {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      moveActive(event.key === "ArrowDown" ? 1 : -1);
+      return;
+    }
+    if (event.key === "Enter" && !event.repeat) {
+      event.preventDefault();
+      selectActive();
+      return;
+    }
   }
   // Backspace goes back — except while typing in a field, where the input's own
   // handler manages an empty-Backspace and otherwise deletes characters.
