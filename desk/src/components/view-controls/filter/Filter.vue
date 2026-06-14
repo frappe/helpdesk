@@ -21,7 +21,10 @@
               <!-- Step: overview — the list of active filters -->
               <template v-if="step === 'overview'">
                 <div
-                  class="flex items-center border-b border-outline-gray-1 p-2 ps-3 h-9"
+                  ref="overviewHeader"
+                  tabindex="-1"
+                  class="flex items-center border-b border-outline-gray-1 p-2 ps-3 h-9 outline-none"
+                  @vue:mounted="focusOverview"
                 >
                   <span class="text-base font-medium text-ink-gray-8">
                     {{ headerLabel }}
@@ -51,7 +54,7 @@
                       <div class="flex shrink-0 items-center gap-1">
                         <Button
                           variant="ghost"
-                          icon="lucide-replace"
+                          icon="lucide-arrow-left-right"
                           :aria-label="__('Replace filter')"
                           :tooltip="__('Replace filter')"
                           :class="revealOnRowActivity"
@@ -139,7 +142,7 @@ import { useShortcut } from "@/composables/shortcuts";
 import { __ } from "@/translation";
 import { useEventListener } from "@vueuse/core";
 import { Button, Popover } from "frappe-ui";
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import {
   ActiveFilter,
   fieldIcon,
@@ -171,6 +174,7 @@ const editSession = ref(0);
 // Where the value editor was opened from, so "back" returns there: the field
 // list (when adding a new filter) or the overview (when editing an existing one).
 const valueEditorOrigin = ref<"overview" | "fields">("overview");
+const overviewHeader = ref<HTMLElement | null>(null);
 let openPopoverFn: (() => void) | null = null;
 
 // Row actions stay out of the way until the row is hovered or focused.
@@ -207,6 +211,13 @@ useShortcut("f", () => {
 function openPopover(toggle: () => void) {
   resetSteps();
   toggle();
+}
+
+// The popover auto-focuses its first focusable element on open, which would put
+// a focus ring on the first filter row. Pull focus to the (non-tabbable) header
+// instead so the overview opens without a row looking selected.
+function focusOverview() {
+  nextTick(() => overviewHeader.value?.focus({ preventScroll: true }));
 }
 
 function resetSteps() {
