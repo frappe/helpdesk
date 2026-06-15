@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-05-31 11:07+0000\n"
-"PO-Revision-Date: 2026-06-14 17:15\n"
+"POT-Creation-Date: 2026-06-14 11:18+0000\n"
+"PO-Revision-Date: 2026-06-15 18:50\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Arabic\n"
 "MIME-Version: 1.0\n"
@@ -57,19 +57,23 @@ msgstr ""
 msgid "0 is no feedback, 1 is Like, 2 is Dislike"
 msgstr ""
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:174
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:192
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:178
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:196
 msgid "1 Year"
 msgstr ""
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:172
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:184
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:154
+msgid "1 person reacted to your comment"
+msgstr ""
+
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:176
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:188
 msgid "3 Months"
 msgstr ""
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:173
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:179
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:188
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:177
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:183
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:192
 msgid "6 Months"
 msgstr ""
 
@@ -112,7 +116,7 @@ msgstr ""
 msgid "API"
 msgstr "واجهة برمجة التطبيقات"
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:274
+#: desk/src/components/Settings/Teams/TeamEdit.vue:263
 msgid "Access all team tickets"
 msgstr ""
 
@@ -120,15 +124,15 @@ msgstr ""
 msgid "Access denied"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:273
+#: desk/src/components/Settings/Teams/TeamEdit.vue:262
 msgid "Access only this team's tickets"
 msgstr ""
 
-#: desk/src/components/Settings/SettingsModal.vue:18
+#: desk/src/components/Settings/SettingsModal.vue:19
 msgid "Account"
 msgstr "حساب"
 
-#: desk/src/components/Settings/Profile/Profile.vue:98
+#: desk/src/components/Settings/Profile/Profile.vue:102
 msgid "Account Info & Security"
 msgstr ""
 
@@ -154,11 +158,25 @@ msgstr ""
 msgid "Action to perform when clicking the button. The doc will be available as `this`"
 msgstr ""
 
+#. Option for the 'Category' (Select) field in DocType 'HD Agent Status'
 #: desk/src/components/Settings/Assignment Rules/AssignmentSchedule.vue:42
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 msgid "Active"
 msgstr "نشط"
 
+#: desk/src/components/ticket-agent/AssignTo.vue:404
+msgid "Active now"
+msgstr ""
+
+#. Description of the 'Category' (Select) field in DocType 'HD Agent Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
+msgid "Active: The agent is available and working.<br>\n"
+"Away: The agent is temporarily unreachable.<br>\n"
+"Unavailable: The agent is off and unavailable."
+msgstr ""
+
 #: desk/src/pages/ticket/MobileTicketAgent.vue:448
+#: desk/src/pages/ticket/TicketCustomer.vue:182
 msgid "Activity"
 msgstr "نشاط"
 
@@ -166,20 +184,32 @@ msgstr "نشاط"
 msgid "Add Assignee"
 msgstr "إضافة معهود إليه"
 
-#: desk/src/pages/knowledge-base/Article.vue:641
+#: desk/src/pages/knowledge-base/Article.vue:643
 msgid "Add Category"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:106
+#: desk/src/components/view-controls/ColumnSettings.vue:69
+msgid "Add Column"
+msgstr "إضافة عمود"
+
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:91
 msgid "Add Email"
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:174
+#: desk/src/components/view-controls/filter/Filter.vue:90
+msgid "Add Filter..."
+msgstr "إضافة تصفية..."
+
+#: desk/src/components/Settings/Holiday/HolidayView.vue:163
 msgid "Add Holiday"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:128
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:132
 msgid "Add New Article"
+msgstr ""
+
+#: desk/src/components/view-controls/SortBy.vue:148
+msgid "Add Sort"
 msgstr ""
 
 #. Label of the add_weekly_holidays (Section Break) field in DocType 'HD
@@ -188,7 +218,7 @@ msgstr ""
 msgid "Add Weekly Holidays"
 msgstr "أضف عطلات أسبوعية"
 
-#: desk/src/components/layouts/Sidebar.vue:500
+#: desk/src/components/layouts/Sidebar.vue:507
 msgid "Add a comment on a ticket"
 msgstr ""
 
@@ -214,25 +244,31 @@ msgstr "إضافة الشرط"
 msgid "Add condition group"
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:147
+#: desk/src/components/view-controls/filter/Filter.vue:60
+msgid "Add filter"
+msgstr "إضافة عامل تصفية"
+
+#: desk/src/components/Settings/Holiday/HolidayView.vue:136
 msgid "Add holidays here to make sure they’re excluded from SLA calculations."
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:108
+#: desk/src/components/Settings/Teams/TeamEdit.vue:97
 msgid "Add members to this team to get started."
 msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:23
+#: desk/src/components/Settings/EmailAccountList.vue:47
 #: desk/src/components/Settings/Holiday/HolidayList.vue:23
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:92
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:23
 msgid "Add one to get started."
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:128
+#: desk/src/components/Settings/Holiday/HolidayView.vue:117
 msgid "Add recurring holidays such as weekends."
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:192
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:183
 msgid "Add time targets around support milestones like first reply and resolution times."
 msgstr ""
 
@@ -261,9 +297,11 @@ msgstr "مدير"
 #. Name of a role
 #. Label of the to_agent (Link) field in DocType 'HD Escalation Rule'
 #. Label of a Link in the Helpdesk Workspace
-#: desk/src/pages/dashboard/Dashboard.vue:76
+#: desk/src/components/layouts/Sidebar.vue:612
+#: desk/src/pages/dashboard/Dashboard.vue:70
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -290,12 +328,13 @@ msgstr ""
 msgid "Agent Configuration"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:254
+#: desk/src/pages/dashboard/Dashboard.vue:248
 msgid "Agent Dashboard"
 msgstr ""
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.json
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
@@ -313,7 +352,12 @@ msgstr ""
 msgid "Agent Name"
 msgstr ""
 
-#: desk/src/components/Settings/Agents.vue:106
+#. Label of the agent_status (Data) field in DocType 'HD Agent Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
+msgid "Agent Status"
+msgstr ""
+
+#: desk/src/components/Settings/Agents.vue:109
 msgid "Agent name"
 msgstr ""
 
@@ -321,13 +365,17 @@ msgstr ""
 msgid "Agents"
 msgstr "عملاء"
 
+#: desk/src/components/layouts/Sidebar.vue:591
+msgid "Agents & Teams"
+msgstr ""
+
 #: desk/src/components/Settings/General/components/TicketSettings.vue:70
 msgid "Agents will no longer be able to view and create saved replies with global scope."
 msgstr ""
 
 #. Name of a role
-#: desk/src/components/SavedRepliesSelectorModal.vue:159
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:321
+#: desk/src/components/SavedRepliesSelectorModal.vue:165
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:323
 #: desk/src/components/ticket/TicketSplitModal.vue:6
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
@@ -347,22 +395,22 @@ msgstr "الكل"
 msgid "All SLAs on track"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:350
-#: desk/src/pages/home/components/RecentFeedback.vue:388
-#: desk/src/pages/home/components/RecentFeedback.vue:396
+#: desk/src/pages/home/components/RecentFeedback.vue:360
+#: desk/src/pages/home/components/RecentFeedback.vue:398
+#: desk/src/pages/home/components/RecentFeedback.vue:406
 msgid "All Time"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:285
+#: desk/src/components/layouts/Sidebar.vue:293
 msgid "All Views"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:318
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:322
 msgid "All articles from this category will move to General category."
 msgstr ""
 
-#: desk/src/components/ticket/TicketMergeModal.vue:9
-msgid "All comments and emails of the ticket will be moved to the"
+#: desk/src/components/ticket/TicketMergeModal.vue:7
+msgid "All comments and emails from both tickets will be merged into the selected ticket"
 msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:262
@@ -386,13 +434,19 @@ msgstr ""
 msgid "Allow users to react to comments with emojis."
 msgstr ""
 
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Amber"
 msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:113
 msgid "Anyone will be able to create tickets without any permission. e.g. from webform."
+msgstr ""
+
+#: desk/src/components/Settings/Preferences/Preferences.vue:26
+msgid "Appearance"
 msgstr ""
 
 #: desk/src/components/Settings/General/components/Branding.vue:17
@@ -437,20 +491,20 @@ msgid "Apply to customer portal"
 msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:447
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:451
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Archived"
 msgstr "أرشفة"
 
-#: desk/src/components/Settings/SettingsModal.vue:73
+#: desk/src/components/Settings/SettingsModal.vue:74
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:293
+#: desk/src/pages/ticket/TicketCustomer.vue:314
 msgid "Are you sure you want to close this ticket?"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:201
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:205
 msgid "Are you sure you want to delete these articles?"
 msgstr ""
 
@@ -458,7 +512,7 @@ msgstr ""
 msgid "Are you sure you want to delete this ticket? This is an irreversible action and cannot be undone."
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:523
+#: desk/src/pages/ticket/Tickets.vue:541
 msgid "Are you sure you want to delete this view?"
 msgstr ""
 
@@ -470,20 +524,20 @@ msgstr ""
 msgid "Are you sure you want to discard this article?"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:460
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:450
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:103
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:77
-#: desk/src/components/Settings/Holiday/HolidayView.vue:203
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:239
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:301
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:365
-#: desk/src/components/Settings/Teams/NewTeam.vue:119
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:226
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:195
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:68
+#: desk/src/components/Settings/Holiday/HolidayView.vue:192
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:218
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:280
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:355
+#: desk/src/components/Settings/Teams/NewTeam.vue:109
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:215
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:184
 msgid "Are you sure you want to go back? Unsaved changes will be lost."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:164
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:165
 msgid "Are you sure you want to leave? Unsaved changes will be lost."
 msgstr ""
 
@@ -496,12 +550,12 @@ msgid "Are you sure you want to reset the content? Current content will be overr
 msgstr ""
 
 #. Label of the article (Link) field in DocType 'HD Article Feedback'
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:110
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:114
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "Article"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:517
+#: desk/src/pages/knowledge-base/Article.vue:519
 msgid "Article body cannot be set as empty."
 msgstr ""
 
@@ -509,35 +563,35 @@ msgstr ""
 msgid "Article created successfully."
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:556
+#: desk/src/pages/knowledge-base/Article.vue:558
 msgid "Article deleted successfully."
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:652
+#: desk/src/pages/knowledge-base/Article.vue:654
 msgid "Article link copied to clipboard"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:512
+#: desk/src/pages/knowledge-base/Article.vue:514
 msgid "Article title cannot be set as empty"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:543
+#: desk/src/pages/knowledge-base/Article.vue:545
 msgid "Article updated successfully."
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:355
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:359
 msgid "Articles deleted successfully."
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:231
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:235
 msgid "Articles moved successfully."
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:475
+#: desk/src/components/layouts/Sidebar.vue:482
 msgid "Assign a ticket to an agent"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:93
+#: desk/src/components/modals/ShortcutsModal.vue:90
 msgid "Assign ticket"
 msgstr ""
 
@@ -564,7 +618,7 @@ msgstr "المُحال إليه"
 msgid "Assignee Rules"
 msgstr "قواعد المكلف إليه"
 
-#: desk/src/components/ticket-agent/AssignTo.vue:439
+#: desk/src/components/ticket-agent/AssignTo.vue:522
 msgid "Assignee's updated successfully."
 msgstr ""
 
@@ -572,7 +626,7 @@ msgstr ""
 msgid "Assignees"
 msgstr "المكلفين"
 
-#: desk/src/components/ticket-agent/AssignTo.vue:491
+#: desk/src/components/ticket-agent/AssignTo.vue:604
 msgid "Assignees updated successfully."
 msgstr ""
 
@@ -581,13 +635,13 @@ msgstr ""
 msgid "Assignment"
 msgstr "مهمة"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:131
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:122
 msgid "Assignment Condition"
 msgstr ""
 
 #. Label of the filters_section (Section Break) field in DocType 'HD Service
 #. Level Agreement'
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:75
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:66
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Assignment Conditions"
 msgstr "شروط التعيين"
@@ -610,7 +664,7 @@ msgstr "قواعد الاحالة"
 msgid "Assignment Rules automatically route tickets to the right team members based on predefined conditions."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:285
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:276
 msgid "Assignment Schedule"
 msgstr ""
 
@@ -618,7 +672,7 @@ msgstr ""
 msgid "Assignment rule"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:555
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:545
 msgid "Assignment rule created successfully."
 msgstr ""
 
@@ -630,16 +684,21 @@ msgstr ""
 msgid "Assignment rule duplicated successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:642
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:632
 msgid "Assignment rule updated successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:220
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:226
 msgid "Assignment rule {0} updated successfully."
 msgstr ""
 
-#: desk/src/pages/desk/contact/ContactDialog.vue:131
+#: desk/src/pages/desk/contact/ContactDialog.vue:137
 msgid "At least one email is required"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.py:24
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.py:28
+msgid "At least one enabled Active status is required."
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:73
@@ -650,7 +709,7 @@ msgstr ""
 msgid "At least one feedback option must be enabled for rating {0}"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:443
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:418
 msgid "At least one team is required"
 msgstr ""
 
@@ -706,6 +765,17 @@ msgstr ""
 msgid "Automation"
 msgstr "التشغيل الآلي"
 
+#. Label of the availability (Link) field in DocType 'HD Agent'
+#: desk/src/components/Settings/Profile/Profile.vue:111
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+msgid "Availability"
+msgstr ""
+
+#. Label of the availability_changed_on (Datetime) field in DocType 'HD Agent'
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+msgid "Availability Changed On"
+msgstr ""
+
 #: desk/src/pages/home/components/ChartItem.vue:6
 msgid "Average First Response"
 msgstr ""
@@ -736,7 +806,7 @@ msgstr ""
 msgid "Average feedback rating per day is around {0} stars"
 msgstr ""
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:103
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:107
 msgid "Average response and resolution metrics not available"
 msgstr ""
 
@@ -760,13 +830,13 @@ msgstr ""
 msgid "Avg. feedback rating for the tickets resolved"
 msgstr ""
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:117
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:286
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:121
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:290
 msgid "Avg. first response time"
 msgstr ""
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:126
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:294
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:130
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:298
 msgid "Avg. resolution time"
 msgstr ""
 
@@ -776,6 +846,11 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:221
 msgid "Avg. time taken to resolve a ticket"
+msgstr ""
+
+#. Option for the 'Category' (Select) field in DocType 'HD Agent Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
+msgid "Away"
 msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:145
@@ -823,7 +898,9 @@ msgstr ""
 msgid "Black"
 msgstr "أسود"
 
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Blue"
 msgstr "أزرق"
@@ -846,16 +923,16 @@ msgstr "فشلت عملية الشحن بالجملة"
 msgid "Bulk Operation Successful"
 msgstr "عملية الشحن بالجملة ناجحة"
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:5
-#: desk/src/pages/ticket/Tickets.vue:110
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:2
+#: desk/src/pages/ticket/Tickets.vue:122
 msgid "Bulk Reply"
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:111
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:105
 msgid "Bulk reply sent successfully to 1 ticket."
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:112
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:106
 msgid "Bulk reply sent successfully to {0} tickets."
 msgstr ""
 
@@ -880,7 +957,7 @@ msgstr "ملف CSV"
 msgid "Call Details"
 msgstr "تفاصيل المكالمة"
 
-#: desk/src/components/layouts/Sidebar.vue:280
+#: desk/src/components/layouts/Sidebar.vue:288
 msgid "Call Logs"
 msgstr ""
 
@@ -912,7 +989,7 @@ msgstr ""
 msgid "Can work on tickets, create custom views and manage private views."
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:709 desk/src/pages/home/Home.vue:44
+#: desk/src/components/ListViewBuilder.vue:714 desk/src/pages/home/Home.vue:44
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -924,7 +1001,7 @@ msgstr ""
 msgid "Canceled"
 msgstr "ألغيت"
 
-#: helpdesk/integrations/erpnext/api.py:46
+#: helpdesk/integrations/erpnext/api.py:47
 msgid "Cannot Sync Customers"
 msgstr ""
 
@@ -948,32 +1025,42 @@ msgstr ""
 msgid "Cannot merge General category"
 msgstr ""
 
-#: helpdesk/integrations/erpnext/utils.py:95
+#: helpdesk/integrations/erpnext/utils.py:100
 msgid "Cannot rename: an unrelated {0} '{1}' already exists on the other side. Resolve the conflict manually first."
 msgstr ""
 
+#: desk/src/pages/knowledge-base/KnowledgeBaseCustomer.vue:24
+msgid "Categories"
+msgstr ""
+
+#. Label of the category (Select) field in DocType 'HD Agent Status'
 #. Label of the category (Link) field in DocType 'HD Article'
 #. Label of the category (Select) field in DocType 'HD Ticket Status'
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:101
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:105
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Category"
 msgstr "فئة"
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:171
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:175
 msgid "Category '{0}' link copied to clipboard"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:333
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:262
+#: desk/src/pages/knowledge-base/Article.vue:335
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:266
 msgid "Category created successfully."
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:333
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:337
 msgid "Category deleted successfully."
 msgstr "تم حذف التصنيف بنجاح."
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:370
+#: desk/src/components/ticket/TicketMergeModal.vue:188
+msgid "Category is required"
+msgstr ""
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:374
 msgid "Category merged successfully."
 msgstr ""
 
@@ -982,7 +1069,7 @@ msgstr ""
 msgid "Category must have atleast one article"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:301
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:305
 msgid "Category updated successfully."
 msgstr ""
 
@@ -998,44 +1085,45 @@ msgstr ""
 msgid "Change"
 msgstr "تغيير"
 
-#: desk/src/components/Settings/Profile/Profile.vue:142
+#: desk/src/components/Settings/Profile/Profile.vue:152
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:2
 msgid "Change Password"
 msgstr "تغيير كلمة المرور"
 
-#: desk/src/components/Settings/Profile/Profile.vue:221
+#: desk/src/components/Settings/Profile/Profile.vue:198
 msgid "Change Photo"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:153
+#: desk/src/components/Settings/Preferences/components/LanguageTimezoneSetting.vue:9
 msgid "Change language of the application."
 msgstr ""
 
-#: desk/src/pages/desk/contact/ContactDialog.vue:22
+#: desk/src/pages/desk/contact/ContactDialog.vue:21
+#: desk/src/pages/desk/customer/CustomerDialog.vue:18
 msgid "Change photo"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:91
+#: desk/src/components/modals/ShortcutsModal.vue:88
 msgid "Change priority"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:94
+#: desk/src/components/modals/ShortcutsModal.vue:91
 msgid "Change status"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:92
+#: desk/src/components/modals/ShortcutsModal.vue:89
 msgid "Change team"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:90
+#: desk/src/components/modals/ShortcutsModal.vue:87
 msgid "Change ticket type"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:169
+#: desk/src/components/Settings/Preferences/components/LanguageTimezoneSetting.vue:25
 msgid "Change timezone of the application."
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:137
+#: desk/src/components/Settings/Profile/Profile.vue:147
 msgid "Change your account password for security."
 msgstr ""
 
@@ -1048,7 +1136,11 @@ msgstr ""
 msgid "Child field"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:144
+#: desk/src/components/view-controls/filter/Filter.vue:151
+msgid "Choose a field"
+msgstr ""
+
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:135
 msgid "Choose how long this SLA policy will be active."
 msgstr ""
 
@@ -1056,11 +1148,11 @@ msgstr ""
 msgid "Choose how tickets are distributed among selected assignees."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:289
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:280
 msgid "Choose the days of the week when this rule should be active."
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:75
+#: desk/src/components/Settings/Holiday/HolidayView.vue:66
 msgid "Choose the duration of this holiday list."
 msgstr ""
 
@@ -1068,19 +1160,19 @@ msgstr ""
 msgid "Choose the email service provider you want to configure."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:136
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:127
 msgid "Choose which tickets are affected by this assignment rule."
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:78
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:69
 msgid "Choose which tickets are affected by this policy."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:213
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:204
 msgid "Choose which tickets are affected by this un-assignment rule."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:89
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:69
 msgid "Choose who can view and use this response."
 msgstr ""
 
@@ -1088,10 +1180,22 @@ msgstr ""
 msgid "Choose who receives the tickets."
 msgstr ""
 
+#: desk/src/components/view-controls/SortBy.vue:160
+msgid "Clear Sort"
+msgstr ""
+
 #. Label of the clear_table (Button) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Clear Table"
 msgstr "مسح الجدول"
+
+#: desk/src/components/view-controls/filter/Filter.vue:71
+msgid "Clear all"
+msgstr ""
+
+#: desk/src/components/view-controls/filter/FilterTrigger.vue:17
+msgid "Clear all Filter"
+msgstr "مسح كل التصفيات"
 
 #: desk/src/pages/SearchAgent.vue:86
 msgid "Clear all filters"
@@ -1103,14 +1207,14 @@ msgstr "انقر على \"إضافة إلى العطلات\". سيؤدي هذا 
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:69
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:47
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:191
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:194
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:58
 #: desk/src/pages/ticket/MobileTicketAgent.vue:159
 #: desk/src/pages/ticket/TicketCustomer.vue:14
 msgid "Close"
 msgstr "أغلق"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:292
+#: desk/src/pages/ticket/TicketCustomer.vue:313
 msgid "Close Ticket"
 msgstr ""
 
@@ -1123,24 +1227,31 @@ msgstr "مغلق"
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:136
+#: desk/src/components/layouts/Sidebar.vue:143
 msgid "Collapse"
 msgstr "انهيار"
 
+#. Label of the color (Select) field in DocType 'HD Agent Status'
 #. Label of the color (Color) field in DocType 'HD Service Holiday List'
 #. Label of the color (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Color"
 msgstr "اللون"
 
 #. Label of the columns (Code) field in DocType 'HD View'
+#: desk/src/components/view-controls/ColumnSettings.vue:4
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Columns"
 msgstr "الأعمدة"
 
 #: desk/src/components/Settings/InviteAgents.vue:15
 msgid "Comma separated emails to invite."
+msgstr ""
+
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:90
+msgid "Comma separated values"
 msgstr ""
 
 #. Label of the reference_comment (Link) field in DocType 'HD Notification'
@@ -1177,7 +1288,7 @@ msgstr ""
 msgid "Comments"
 msgstr "تعليقات"
 
-#: desk/src/components/modals/ShortcutsModal.vue:100
+#: desk/src/components/modals/ShortcutsModal.vue:97
 msgid "Communication"
 msgstr "الاتصالات"
 
@@ -1196,7 +1307,7 @@ msgstr "أكتمل"
 msgid "Condition"
 msgstr "الحالة"
 
-#: desk/src/components/Settings/Profile/Profile.vue:127
+#: desk/src/components/Settings/Profile/Profile.vue:137
 msgid "Configure"
 msgstr ""
 
@@ -1204,7 +1315,7 @@ msgstr ""
 msgid "Configure your Exotel settings for Helpdesk."
 msgstr ""
 
-#: desk/src/components/Settings/Telephony/Telephony.vue:97
+#: desk/src/components/Settings/Telephony/Telephony.vue:100
 msgid "Configure your Exotel telephony integration settings here"
 msgstr ""
 
@@ -1220,15 +1331,16 @@ msgstr ""
 msgid "Configure your telephony settings."
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:323
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:327
 #: desk/src/pages/knowledge-base/NewArticle.vue:147
 #: desk/src/pages/ticket/MobileTicketAgent.vue:156
-#: desk/src/pages/ticket/TicketCustomer.vue:296
-#: desk/src/pages/ticket/Tickets.vue:410 desk/src/pages/ticket/Tickets.vue:532
+#: desk/src/pages/ticket/TicketCustomer.vue:317
+#: desk/src/pages/ticket/Tickets.vue:428 desk/src/pages/ticket/Tickets.vue:550
+#: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:27
 msgid "Confirm"
 msgstr "أكد"
 
-#: desk/src/components/ListViewBuilder.vue:693
+#: desk/src/components/ListViewBuilder.vue:698
 msgid "Confirm Changes"
 msgstr ""
 
@@ -1236,16 +1348,17 @@ msgstr ""
 msgid "Confirm Password"
 msgstr "تأكيد كلمة المرور"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:403
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:393
 msgid "Confirm overwrite"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:432
+#: desk/src/components/layouts/Sidebar.vue:439
 msgid "Connect your support email"
 msgstr ""
 
 #. Label of the contact (Link) field in DocType 'HD Organization Contact Item'
 #. Label of the contact (Link) field in DocType 'HD Ticket'
+#: desk/src/components/layouts/Sidebar.vue:614
 #: helpdesk/helpdesk/doctype/hd_organization_contact_item/hd_organization_contact_item.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:56
@@ -1264,11 +1377,11 @@ msgstr "الاتصال HTML"
 msgid "Contact created successfully."
 msgstr ""
 
-#: desk/src/pages/desk/contact/ContactDialog.vue:304
+#: desk/src/pages/desk/contact/ContactDialog.vue:298
 msgid "Contact invited successfully."
 msgstr ""
 
-#: desk/src/components/ticket/SetContactPhoneModal.vue:86
+#: desk/src/components/ticket/SetContactPhoneModal.vue:84
 msgid "Contact updated successfully."
 msgstr ""
 
@@ -1294,11 +1407,11 @@ msgstr "محتوى"
 msgid "Content Type"
 msgstr "نوع المحتوى"
 
-#: desk/src/components/modals/ShortcutsModal.vue:96
+#: desk/src/components/modals/ShortcutsModal.vue:93
 msgid "Copy ticket URL"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:95
+#: desk/src/components/modals/ShortcutsModal.vue:92
 msgid "Copy ticket id"
 msgstr ""
 
@@ -1319,17 +1432,17 @@ msgid "Could not send feedback email,due to: {0}"
 msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:152
-#: desk/src/components/Settings/NewTeamModal.vue:8
+#: desk/src/components/Settings/NewTeamModal.vue:7
 #: desk/src/components/desk/global/NewContactDialog.vue:39
-#: desk/src/components/layouts/Sidebar.vue:537
+#: desk/src/components/layouts/Sidebar.vue:544
 #: desk/src/pages/call-logs/CallLogModal.vue:225
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:11
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:12
 #: desk/src/pages/knowledge-base/NewArticle.vue:29
 msgid "Create"
 msgstr "انشاء"
 
-#: desk/src/components/layouts/Sidebar.vue:530
-#: desk/src/components/layouts/Sidebar.vue:536
+#: desk/src/components/layouts/Sidebar.vue:537
+#: desk/src/components/layouts/Sidebar.vue:543
 msgid "Create & invite a contact"
 msgstr ""
 
@@ -1337,15 +1450,15 @@ msgstr ""
 msgid "Create New Contact"
 msgstr "إنشاء اتصال جديد"
 
-#: desk/src/pages/ticket/Tickets.vue:379 desk/src/pages/ticket/Tickets.vue:383
+#: desk/src/pages/ticket/Tickets.vue:397 desk/src/pages/ticket/Tickets.vue:401
 msgid "Create View"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:465
+#: desk/src/components/layouts/Sidebar.vue:472
 msgid "Create a ticket"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:513
+#: desk/src/components/layouts/Sidebar.vue:520
 msgid "Create an article"
 msgstr ""
 
@@ -1361,8 +1474,12 @@ msgstr ""
 msgid "Create new business holiday"
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:68
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:69
 msgid "Created by"
+msgstr ""
+
+#: desk/src/components/layouts/Sidebar.vue:583
+msgid "Creating a ticket"
 msgstr ""
 
 #. Label of the criterion_section (Section Break) field in DocType 'HD
@@ -1371,24 +1488,33 @@ msgstr ""
 msgid "Criterion"
 msgstr ""
 
+#: desk/src/components/layouts/Sidebar.vue:627
+msgid "Custom Actions"
+msgstr ""
+
 #. Label of the outside_working_hours_message (Small Text) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Custom Outside Working Hours Message"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:504
-#: desk/src/pages/dashboard/Dashboard.vue:510
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:175
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:196
-#: desk/src/pages/home/components/RecentFeedback.vue:366
-#: desk/src/pages/home/components/RecentFeedback.vue:392
+#: desk/src/pages/dashboard/Dashboard.vue:509
+#: desk/src/pages/dashboard/Dashboard.vue:515
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:179
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:200
+#: desk/src/pages/home/components/RecentFeedback.vue:376
+#: desk/src/pages/home/components/RecentFeedback.vue:402
 msgid "Custom Range"
+msgstr ""
+
+#: desk/src/components/layouts/Sidebar.vue:629
+msgid "Custom Views"
 msgstr ""
 
 #. Label of the customer (Link) field in DocType 'HD Ticket'
 #: desk/src/components/desk/global/NewContactDialog.vue:141
-#: desk/src/pages/desk/contact/ContactDialog.vue:59
+#: desk/src/components/layouts/Sidebar.vue:615
+#: desk/src/pages/desk/contact/ContactDialog.vue:58
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Customer"
 msgstr "العميل"
@@ -1398,34 +1524,52 @@ msgstr "العميل"
 msgid "Customer Name"
 msgstr "اسم العميل"
 
-#: desk/src/components/desk/global/NewCustomerDialog.vue:65
+#: desk/src/components/layouts/Sidebar.vue:603
+msgid "Customer Portal"
+msgstr ""
+
+#: desk/src/components/desk/global/NewCustomerDialog.vue:62
 msgid "Customer created successfully."
 msgstr "تم إنشاء الحرفاء بنجاح."
 
-#: desk/src/components/layouts/Sidebar.vue:349
+#: desk/src/components/layouts/Sidebar.vue:357
 msgid "Customer portal"
 msgstr ""
 
-#: desk/src/pages/desk/customer/CustomerDialog.vue:73
+#: desk/src/pages/desk/customer/CustomerDialog.vue:82
 msgid "Customer updated successfully."
+msgstr ""
+
+#: desk/src/components/layouts/Sidebar.vue:595
+msgid "Customers & Contacts"
+msgstr ""
+
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:82
+msgid "Customers are in sync"
+msgstr ""
+
+#: desk/src/components/layouts/Sidebar.vue:624
+msgid "Customizations"
 msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:5
 msgid "Customize your email notification preferences to stay informed about important updates and activities."
 msgstr ""
 
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Cyan"
 msgstr "أزرق سماوي"
 
-#: desk/src/components/layouts/Sidebar.vue:332
-#: desk/src/components/layouts/Sidebar.vue:384
-#: desk/src/pages/knowledge-base/Article.vue:656
+#: desk/src/components/layouts/Sidebar.vue:340
+#: desk/src/components/layouts/Sidebar.vue:391
+#: desk/src/pages/knowledge-base/Article.vue:658
 msgid "Danger"
 msgstr "خطر"
 
-#: desk/src/pages/dashboard/Dashboard.vue:562
+#: desk/src/pages/dashboard/Dashboard.vue:567
 msgid "Dashboard"
 msgstr "لوحة القيادة"
 
@@ -1480,12 +1624,12 @@ msgstr "صندوق الوارد و الصادر الافتراضي"
 msgid "Default Ticket Status"
 msgstr "حالة التذكرة الافتراضية"
 
-#: desk/src/pages/ticket/Tickets.vue:336 desk/src/pages/ticket/Tickets.vue:429
+#: desk/src/pages/ticket/Tickets.vue:354 desk/src/pages/ticket/Tickets.vue:447
 msgid "Default Views"
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketHeader.vue:265
-#: desk/src/components/ticket-agent/TicketHeader.vue:276
+#: desk/src/components/ticket-agent/TicketHeader.vue:264
+#: desk/src/components/ticket-agent/TicketHeader.vue:275
 msgid "Default actions"
 msgstr ""
 
@@ -1525,28 +1669,28 @@ msgstr ""
 #: desk/src/components/ListViewBuilder.vue:237
 #: desk/src/components/ListViewBuilder.vue:243
 #: desk/src/components/ticket-agent/TicketHeader.vue:209
-#: desk/src/components/ticket-agent/TicketHeader.vue:280
-#: desk/src/components/ticket-agent/TicketHeader.vue:282
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:176
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:195
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:204
-#: desk/src/pages/ticket/Tickets.vue:516
+#: desk/src/components/ticket-agent/TicketHeader.vue:279
+#: desk/src/components/ticket-agent/TicketHeader.vue:281
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:180
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:199
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:208
+#: desk/src/pages/ticket/Tickets.vue:534
 msgid "Delete"
 msgstr "حذف"
 
-#: desk/src/pages/ticket/Tickets.vue:512
+#: desk/src/pages/ticket/Tickets.vue:530
 msgid "Delete View"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:200
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:204
 msgid "Delete articles"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:317
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:321
 msgid "Delete category?"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:521
+#: desk/src/pages/ticket/Tickets.vue:539
 msgid "Delete {0}"
 msgstr ""
 
@@ -1559,12 +1703,12 @@ msgstr ""
 #. Label of the description (Small Text) field in DocType 'HD Ticket Priority'
 #. Label of the description (Small Text) field in DocType 'HD Ticket Type'
 #. Label of a field in the tickets Web Form
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:114
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:115
-#: desk/src/components/Settings/Holiday/HolidayView.vue:62
-#: desk/src/components/Settings/Holiday/HolidayView.vue:63
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:65
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:66
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:105
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:106
+#: desk/src/components/Settings/Holiday/HolidayView.vue:53
+#: desk/src/components/Settings/Holiday/HolidayView.vue:54
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:56
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:57
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -1597,6 +1741,7 @@ msgstr ""
 #. Label of the sb_details (Section Break) field in DocType 'HD Ticket'
 #: desk/src/pages/ticket/MobileTicketAgent.vue:81
 #: desk/src/pages/ticket/MobileTicketAgent.vue:442
+#: desk/src/pages/ticket/TicketCustomer.vue:183
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Details"
@@ -1620,7 +1765,7 @@ msgstr ""
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
 #. Label of the disabled (Check) field in DocType 'HD Ticket Priority'
 #. Label of the disabled (Check) field in DocType 'HD Ticket Type'
-#: desk/src/components/Settings/Teams/TeamsList.vue:62
+#: desk/src/components/Settings/Teams/TeamsList.vue:65
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
@@ -1632,7 +1777,8 @@ msgstr "معطل"
 msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:30
+#: desk/src/components/TextEditor.vue:41
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:24
 #: desk/src/pages/knowledge-base/NewArticle.vue:27
 msgid "Discard"
 msgstr "تجاهل"
@@ -1671,7 +1817,7 @@ msgstr ""
 msgid "DocType"
 msgstr "نوع المستند"
 
-#: desk/src/components/layouts/Sidebar.vue:363
+#: desk/src/components/layouts/Sidebar.vue:371
 msgid "Docs"
 msgstr ""
 
@@ -1690,7 +1836,7 @@ msgid "Download"
 msgstr "تحميل"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:443
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:447
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Draft"
 msgstr "مشروع"
@@ -1699,11 +1845,11 @@ msgstr "مشروع"
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:138
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:50
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:90
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:194
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:259
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:197
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:261
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:61
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:102
-#: desk/src/pages/ticket/Tickets.vue:433
+#: desk/src/pages/ticket/Tickets.vue:451
 msgid "Duplicate"
 msgstr "مكررة"
 
@@ -1719,7 +1865,7 @@ msgstr ""
 msgid "Duplicate SLA Policy"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:175
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:178
 msgid "Duplicate Saved reply"
 msgstr ""
 
@@ -1732,6 +1878,10 @@ msgstr "المدة الزمنية"
 msgid "Duration is required"
 msgstr ""
 
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:8
+msgid "ERPNext"
+msgstr ""
+
 #. Label of the erpnext_customer (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "ERPNext Customer"
@@ -1742,24 +1892,25 @@ msgstr ""
 msgid "ERPNext HD Settings"
 msgstr ""
 
-#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:6
-msgid "ERPNext Integration"
-msgstr ""
-
-#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:77
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:182
 msgid "ERPNext Integration is disabled"
 msgstr ""
 
-#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:75
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:181
 msgid "ERPNext Integration is enabled"
 msgstr ""
 
-#: helpdesk/integrations/erpnext/api.py:46
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:66
+msgid "ERPNext app"
+msgstr ""
+
+#: helpdesk/integrations/erpnext/api.py:47
 msgid "ERPNext integration is not enabled"
 msgstr ""
 
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:203
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.py:19
-msgid "ERPNext is not installed on your site. Please install ERPNext to enable this setting."
+msgid "ERPNext is not installed on your site. Please install ERPNext to enable this setting"
 msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:4
@@ -1767,8 +1918,8 @@ msgid "Easily invite new agents, managers, or admins."
 msgstr ""
 
 #: desk/src/pages/home/Home.vue:36
-#: desk/src/pages/knowledge-base/Article.vue:624
-#: desk/src/pages/ticket/Tickets.vue:501
+#: desk/src/pages/knowledge-base/Article.vue:626
+#: desk/src/pages/ticket/Tickets.vue:519
 msgid "Edit"
 msgstr "تصحيح"
 
@@ -1785,7 +1936,7 @@ msgstr ""
 msgid "Edit Email"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:143
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:147
 msgid "Edit Title"
 msgstr ""
 
@@ -1794,7 +1945,7 @@ msgid "Edit your email account"
 msgstr ""
 
 #. Label of the email (Data) field in DocType 'HD Desk Account Request'
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:74
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:59
 #: desk/src/pages/SearchAgent.vue:184
 #: helpdesk/helpdesk/doctype/hd_desk_account_request/hd_desk_account_request.json
 msgid "Email"
@@ -1802,7 +1953,7 @@ msgstr "البريد الإلكتروني"
 
 #. Label of the email_account (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:73
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:58
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Email Account"
@@ -1835,7 +1986,7 @@ msgstr "البريد الإلكتروني"
 msgid "Email Notifications"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:8
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:3
 msgid "Email Settings"
 msgstr "إعدادات البريد الإلكتروني"
 
@@ -1843,7 +1994,7 @@ msgstr "إعدادات البريد الإلكتروني"
 msgid "Email account created"
 msgstr ""
 
-#: desk/src/components/Settings/EmailAccountList.vue:26
+#: desk/src/components/Settings/EmailAccountList.vue:27
 msgid "Email account name"
 msgstr ""
 
@@ -1851,7 +2002,7 @@ msgstr ""
 msgid "Email account updated successfully"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:217
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:196
 msgid "Email settings updated successfully."
 msgstr ""
 
@@ -1859,14 +2010,14 @@ msgstr ""
 msgid "Email should not be empty"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:55
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:40
 #: desk/src/pages/SearchAgent.vue:352
-#: desk/src/pages/desk/contact/ContactDialog.vue:43
+#: desk/src/pages/desk/contact/ContactDialog.vue:42
 #: desk/src/pages/ticket/MobileTicketAgent.vue:453
 msgid "Emails"
 msgstr "رسائل البريد الإلكتروني"
 
-#: desk/src/components/Settings/Profile/Profile.vue:116
+#: desk/src/components/Settings/Profile/Profile.vue:126
 msgid "Emails & Signature"
 msgstr ""
 
@@ -1879,7 +2030,16 @@ msgstr ""
 msgid "Emoji"
 msgstr ""
 
-#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:11
+#: desk/src/components/view-controls/SortBy.vue:134
+msgid "Empty - Choose a field to sort by"
+msgstr ""
+
+#. Label of the enable (Check) field in DocType 'HD Agent Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
+msgid "Enable"
+msgstr "تمكين"
+
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:36
 msgid "Enable ERPNext Integration"
 msgstr ""
 
@@ -1909,17 +2069,17 @@ msgstr ""
 #. Settings'
 #. Label of the enabled (Check) field in DocType 'HD Stopword'
 #. Label of the enabled (Check) field in DocType 'HD Ticket Status'
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:25
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:16
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:31
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:31
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:22
-#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:69
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:13
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:70
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:34
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:24
-#: desk/src/components/Settings/Teams/NewTeam.vue:21
-#: desk/src/components/Settings/Teams/TeamEdit.vue:22
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:35
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:34
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:15
+#: desk/src/components/Settings/Teams/NewTeam.vue:12
+#: desk/src/components/Settings/Teams/TeamEdit.vue:11
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:25
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:24
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
@@ -1957,7 +2117,7 @@ msgstr ""
 msgid "Enter brand name"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:60
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:64
 msgid "Enter the new name for the team"
 msgstr ""
 
@@ -1969,7 +2129,7 @@ msgstr ""
 msgid "Error processing email at index {0}, message: {1}"
 msgstr ""
 
-#: desk/src/pages/desk/customer/CustomerDialog.vue:76
+#: desk/src/pages/desk/customer/CustomerDialog.vue:85
 msgid "Error updating customer"
 msgstr ""
 
@@ -1986,21 +2146,21 @@ msgstr ""
 msgid "Excel"
 msgstr "تفوق"
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:10
-#: desk/src/components/Settings/Telephony/Telephony.vue:93
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:4
+#: desk/src/components/Settings/Telephony/Telephony.vue:96
 msgid "Exotel"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:136
+#: desk/src/components/layouts/Sidebar.vue:143
 msgid "Expand"
 msgstr "وسعت"
 
-#: desk/src/components/layouts/Sidebar.vue:550
+#: desk/src/components/layouts/Sidebar.vue:557
 msgid "Explore customer portal"
 msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:2
-#: desk/src/pages/ticket/Tickets.vue:118
+#: desk/src/pages/ticket/Tickets.vue:130
 msgid "Export"
 msgstr "تصدير"
 
@@ -2019,13 +2179,13 @@ msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: desk/src/pages/call-logs/CallLogModal.vue:211
-#: desk/src/pages/ticket/Tickets.vue:205 desk/src/pages/ticket/Tickets.vue:218
-#: desk/src/pages/ticket/Tickets.vue:249
+#: desk/src/pages/ticket/Tickets.vue:217 desk/src/pages/ticket/Tickets.vue:230
+#: desk/src/pages/ticket/Tickets.vue:263 desk/src/pages/ticket/Tickets.vue:271
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
 msgstr "باءت بالفشل"
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:274
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:278
 msgid "Failed to create category"
 msgstr ""
 
@@ -2033,13 +2193,13 @@ msgstr ""
 msgid "Failed to create email account, Invalid credentials"
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketHeader.vue:223
+#: desk/src/components/ticket-agent/TicketHeader.vue:222
 msgid "Failed to delete ticket."
 msgstr ""
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:205
-#: desk/src/components/Settings/Telephony/Telephony.vue:189
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:183
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:194
+#: desk/src/components/Settings/Telephony/Telephony.vue:195
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:172
 msgid "Failed to load telephony agent"
 msgstr ""
 
@@ -2047,31 +2207,39 @@ msgstr ""
 msgid "Failed to pull emails"
 msgstr ""
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:270
-#: desk/src/components/Settings/Telephony/Telephony.vue:232
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:259
+#: desk/src/components/Settings/Telephony/Telephony.vue:238
 msgid "Failed to save Exotel settings"
 msgstr ""
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:262
-#: desk/src/components/Settings/Telephony/Telephony.vue:224
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:226
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:251
+#: desk/src/components/Settings/Telephony/Telephony.vue:230
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:215
 msgid "Failed to save Twilio settings"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:443
+#: desk/src/components/ticket-agent/AssignTo.vue:526
 msgid "Failed to update Assignee's."
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:495
+#: desk/src/components/ticket-agent/AssignTo.vue:610
 msgid "Failed to update Assignees."
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:308
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:232
+msgid "Failed to update assignment rule {0}."
+msgstr ""
+
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:312
 msgid "Failed to update category."
 msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:476
 msgid "Failed to update email account, Invalid credentials"
+msgstr ""
+
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:184
+msgid "Failed to update field dependency."
 msgstr ""
 
 #. Label of the favicon (Attach Image) field in DocType 'HD Settings'
@@ -2083,7 +2251,8 @@ msgstr ""
 #. Label of the feedback (Select) field in DocType 'HD Article Feedback'
 #. Label of the feedback_section (Section Break) field in DocType 'HD Settings'
 #. Label of the feedback_tab (Tab Break) field in DocType 'HD Ticket'
-#: desk/src/pages/home/components/RecentFeedback.vue:195
+#: desk/src/pages/home/components/RecentFeedback.vue:199
+#: desk/src/pages/home/components/RecentFeedback.vue:319
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2140,11 +2309,15 @@ msgstr ""
 msgid "Field Dependencies"
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:309
+#: desk/src/components/layouts/Sidebar.vue:628
+msgid "Field Dependency"
+msgstr ""
+
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:303
 msgid "Field Dependency created successfully"
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:310
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:304
 msgid "Field Dependency updated successfully"
 msgstr ""
 
@@ -2156,11 +2329,11 @@ msgstr ""
 msgid "Field `{0}` is not allowed in Ticket Template"
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:161
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:160
 msgid "Field dependency deleted successfully."
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:177
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:180
 msgid "Field dependency updated successfully."
 msgstr ""
 
@@ -2171,6 +2344,7 @@ msgstr "الحقول"
 
 #. Label of the filters_tab (Tab Break) field in DocType 'HD View'
 #. Label of the filters (Code) field in DocType 'HD View'
+#: desk/src/components/view-controls/filter/Filter.vue:150
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
 msgstr "فلاتر"
@@ -2222,6 +2396,10 @@ msgstr ""
 msgid "Form"
 msgstr "نموذج"
 
+#: desk/src/components/layouts/Sidebar.vue:637
+msgid "Frappe Helpdesk Mobile"
+msgstr ""
+
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
@@ -2246,8 +2424,8 @@ msgstr "من"
 msgid "From Date"
 msgstr "من تاريخ"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:80
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:149
+#: desk/src/components/Settings/Holiday/HolidayView.vue:71
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:140
 msgid "From date"
 msgstr ""
 
@@ -2256,14 +2434,14 @@ msgid "From is required"
 msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
-#: desk/src/pages/ticket/Tickets.vue:212 desk/src/pages/ticket/Tickets.vue:243
+#: desk/src/pages/ticket/Tickets.vue:224 desk/src/pages/ticket/Tickets.vue:263
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Fulfilled"
 msgstr "استيفاء"
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/layouts/Sidebar.vue:521
-#: desk/src/components/modals/ShortcutsModal.vue:79
+#: desk/src/components/layouts/Sidebar.vue:528
+#: desk/src/components/modals/ShortcutsModal.vue:76
 msgid "General"
 msgstr "عام"
 
@@ -2285,11 +2463,15 @@ msgstr ""
 msgid "General is a reserved category name. Please use a different name to proceed."
 msgstr ""
 
+#: desk/src/components/layouts/Sidebar.vue:578
+msgid "Getting Started"
+msgstr "البدء"
+
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/SavedRepliesSelectorModal.vue:174
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:342
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:376
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:221
+#: desk/src/components/SavedRepliesSelectorModal.vue:180
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:344
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:378
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:200
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Global"
 msgstr ""
@@ -2298,7 +2480,9 @@ msgstr ""
 msgid "Go to Ticket #{0}"
 msgstr ""
 
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Gray"
 msgstr "رمادي"
@@ -2307,7 +2491,9 @@ msgstr "رمادي"
 msgid "Great! All your tickets are within SLA"
 msgstr ""
 
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Green"
 msgstr "أخضر"
@@ -2341,6 +2527,11 @@ msgstr ""
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "HD Agent"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
+msgid "HD Agent Status"
 msgstr ""
 
 #. Name of a DocType
@@ -2542,11 +2733,11 @@ msgstr ""
 msgid "Headings Weight"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:120
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:100
 msgid "Hello {{ contact }}, \\n\\nWe are sorry for the inconvenience, we will get back to you soon. \\n\\nRegards, \\n{{ full_name }}"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:122
+#: desk/src/components/layouts/Sidebar.vue:125
 msgid "Help"
 msgstr "مساعدة"
 
@@ -2578,6 +2769,10 @@ msgstr "هنا، يتم ملء أيام إجازاتك الأسبوعية مسب
 msgid "Hey"
 msgstr ""
 
+#: desk/src/components/HistoryBox.vue:10
+msgid "Hide "
+msgstr "إخفاء "
+
 #. Label of the cond_hidden (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 msgid "Hide condition"
@@ -2589,11 +2784,11 @@ msgstr ""
 msgid "Hide from customer"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:463
+#: desk/src/pages/ticket/Tickets.vue:481
 msgid "Hide from sidebar"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:471
+#: desk/src/pages/ticket/Tickets.vue:489
 msgid "Hide view from sidebar"
 msgstr ""
 
@@ -2614,7 +2809,7 @@ msgstr "قائمة العطلات"
 msgid "Holiday List Name"
 msgstr "اسم قائمة العطلات"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:368
+#: desk/src/components/Settings/Holiday/HolidayView.vue:355
 msgid "Holiday list created successfully."
 msgstr ""
 
@@ -2626,15 +2821,15 @@ msgstr ""
 msgid "Holiday list duplicated successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:430
+#: desk/src/components/Settings/Holiday/HolidayView.vue:417
 msgid "Holiday list updated successfully."
 msgstr ""
 
 #. Label of the holidays_section (Section Break) field in DocType 'HD Service
 #. Holiday List'
 #. Label of the holidays (Table) field in DocType 'HD Service Holiday List'
-#: desk/src/components/Settings/Holiday/HolidayView.vue:143
-#: desk/src/components/Settings/Holiday/HolidayView.vue:183
+#: desk/src/components/Settings/Holiday/HolidayView.vue:132
+#: desk/src/components/Settings/Holiday/HolidayView.vue:172
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Holidays"
 msgstr ""
@@ -2643,7 +2838,7 @@ msgstr ""
 msgid "Home"
 msgstr "الصفحة الرئيسية"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:124
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:115
 msgid "I understand, add conditions"
 msgstr ""
 
@@ -2730,7 +2925,7 @@ msgstr ""
 msgid "In Progress"
 msgstr "في تَقَدم"
 
-#: desk/src/components/Settings/Agents.vue:123
+#: desk/src/components/Settings/Agents.vue:126
 msgid "Inactive"
 msgstr "غير نشط"
 
@@ -2750,6 +2945,10 @@ msgstr "الوارد"
 msgid "Initiated"
 msgstr "بدأت"
 
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:59
+msgid "Install the"
+msgstr ""
+
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Instantly send e-mail"
@@ -2764,18 +2963,27 @@ msgstr "عدم كفاية الإذن {0}"
 msgid "Integer value"
 msgstr ""
 
-#: desk/src/pages/desk/contact/ContactDialog.vue:273
+#: desk/src/components/layouts/Sidebar.vue:570
+#: desk/src/components/layouts/Sidebar.vue:573
+msgid "Introduction"
+msgstr "مقدمة"
+
+#: helpdesk/api/agent.py:69
+msgid "Invalid availability"
+msgstr ""
+
+#: desk/src/pages/desk/contact/ContactDialog.vue:267
 msgid "Invalid email"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:488
-#: desk/src/components/Settings/Holiday/HolidayView.vue:338
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:394
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:478
+#: desk/src/components/Settings/Holiday/HolidayView.vue:325
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:384
 msgid "Invalid fields, check if all are filled in and values are correct."
 msgstr ""
 
-#: desk/src/pages/desk/contact/ContactDialog.vue:289
-#: desk/src/pages/desk/contact/ContactDialog.vue:290
+#: desk/src/pages/desk/contact/ContactDialog.vue:283
+#: desk/src/pages/desk/contact/ContactDialog.vue:284
 msgid "Invalid file type, only PNG and JPG images are allowed"
 msgstr ""
 
@@ -2783,8 +2991,8 @@ msgstr ""
 msgid "Invalid notification"
 msgstr ""
 
-#: desk/src/components/ticket/SetContactPhoneModal.vue:69
-#: desk/src/pages/desk/contact/ContactDialog.vue:283
+#: desk/src/components/ticket/SetContactPhoneModal.vue:67
+#: desk/src/pages/desk/contact/ContactDialog.vue:277
 msgid "Invalid phone number"
 msgstr ""
 
@@ -2792,15 +3000,15 @@ msgstr ""
 msgid "Invite Agents"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:86
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:87
 msgid "Invite agent"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:443
+#: desk/src/components/layouts/Sidebar.vue:450
 msgid "Invite agents"
 msgstr ""
 
-#: desk/src/pages/desk/contact/ContactDialog.vue:36
+#: desk/src/pages/desk/contact/ContactDialog.vue:35
 msgid "Invite as user"
 msgstr ""
 
@@ -2855,6 +3063,10 @@ msgstr ""
 msgid "Jump to"
 msgstr ""
 
+#: desk/src/pages/knowledge-base/Article.vue:672
+msgid "KB"
+msgstr ""
+
 #. Label of the key (Data) field in DocType 'HD Email Feedback'
 #. Label of the key (Data) field in DocType 'HD Ticket'
 #. Label of a field in the email-feedback Web Form
@@ -2864,16 +3076,18 @@ msgstr ""
 msgid "Key"
 msgstr "مفتاح"
 
-#: desk/src/components/modals/ShortcutsModal.vue:4
+#: desk/src/components/modals/ShortcutsModal.vue:2
 msgid "Keyboard Shortcuts"
 msgstr "اختصارات لوحة المفاتيح"
 
 #. Label of the knowledge_base_section (Section Break) field in DocType 'HD
 #. Settings'
 #: desk/src/components/command-palette/CP.vue:104
-#: desk/src/pages/knowledge-base/Article.vue:670
+#: desk/src/components/layouts/Sidebar.vue:599
+#: desk/src/components/layouts/Sidebar.vue:616
+#: desk/src/pages/knowledge-base/Article.vue:672
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:6
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:458
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:462
 #: desk/src/pages/knowledge-base/NewArticle.vue:169
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Knowledge Base"
@@ -2900,44 +3114,48 @@ msgstr ""
 msgid "Landing Page"
 msgstr "الصفحة المقصودة"
 
-#: desk/src/components/Settings/Profile/Profile.vue:150
+#: desk/src/components/Settings/Preferences/components/LanguageTimezoneSetting.vue:6
 msgid "Language"
 msgstr "اللغة"
+
+#: desk/src/components/Settings/Preferences/Preferences.vue:36
+msgid "Language & Time"
+msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:362
-#: desk/src/pages/home/components/RecentFeedback.vue:391
+#: desk/src/pages/home/components/RecentFeedback.vue:372
+#: desk/src/pages/home/components/RecentFeedback.vue:401
 msgid "Last 3 Months"
 msgstr "آخر 3 أشهر"
 
-#: desk/src/pages/home/components/CardBase.vue:106
 #: desk/src/pages/home/components/CardBase.vue:108
-#: desk/src/pages/home/components/CardBase.vue:109
+#: desk/src/pages/home/components/CardBase.vue:110
+#: desk/src/pages/home/components/CardBase.vue:111
 msgid "Last 3 months"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:459
-#: desk/src/pages/dashboard/Dashboard.vue:481
-#: desk/src/pages/dashboard/Dashboard.vue:483
-#: desk/src/pages/dashboard/Dashboard.vue:519
+#: desk/src/pages/dashboard/Dashboard.vue:453
+#: desk/src/pages/dashboard/Dashboard.vue:486
+#: desk/src/pages/dashboard/Dashboard.vue:488
+#: desk/src/pages/dashboard/Dashboard.vue:524
 msgid "Last 30 Days"
 msgstr "آخر 30 يومًا"
 
-#: desk/src/pages/dashboard/Dashboard.vue:488
-#: desk/src/pages/dashboard/Dashboard.vue:490
+#: desk/src/pages/dashboard/Dashboard.vue:493
+#: desk/src/pages/dashboard/Dashboard.vue:495
 msgid "Last 60 Days"
 msgstr "آخر 60 يومًا"
 
-#: desk/src/pages/dashboard/Dashboard.vue:474
-#: desk/src/pages/dashboard/Dashboard.vue:476
+#: desk/src/pages/dashboard/Dashboard.vue:479
+#: desk/src/pages/dashboard/Dashboard.vue:481
 msgid "Last 7 Days"
 msgstr "آخر 7 أيام"
 
-#: desk/src/pages/dashboard/Dashboard.vue:495
-#: desk/src/pages/dashboard/Dashboard.vue:497
+#: desk/src/pages/dashboard/Dashboard.vue:500
+#: desk/src/pages/dashboard/Dashboard.vue:502
 msgid "Last 90 Days"
 msgstr "آخر 90 يومًا"
 
@@ -2951,8 +3169,8 @@ msgstr ""
 msgid "Last Customer Response"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:358
-#: desk/src/pages/home/components/RecentFeedback.vue:390
+#: desk/src/pages/home/components/RecentFeedback.vue:368
+#: desk/src/pages/home/components/RecentFeedback.vue:400
 msgid "Last Month"
 msgstr "الشهر الماضي"
 
@@ -2960,17 +3178,17 @@ msgstr "الشهر الماضي"
 msgid "Last Name"
 msgstr "اسم العائلة"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:354
-#: desk/src/pages/home/components/RecentFeedback.vue:389
+#: desk/src/pages/home/components/RecentFeedback.vue:364
+#: desk/src/pages/home/components/RecentFeedback.vue:399
 msgid "Last Week"
 msgstr "الاسبوع الماضي"
 
 #: desk/src/pages/home/components/AgentTicketsCard.vue:35
 #: desk/src/pages/home/components/AvgTimeCard.vue:50
-#: desk/src/pages/home/components/CardBase.vue:80
-#: desk/src/pages/home/components/CardBase.vue:99
+#: desk/src/pages/home/components/CardBase.vue:82
 #: desk/src/pages/home/components/CardBase.vue:101
-#: desk/src/pages/home/components/CardBase.vue:102
+#: desk/src/pages/home/components/CardBase.vue:103
+#: desk/src/pages/home/components/CardBase.vue:104
 msgid "Last month"
 msgstr ""
 
@@ -2978,9 +3196,9 @@ msgstr ""
 msgid "Last user assigned by this rule"
 msgstr ""
 
-#: desk/src/pages/home/components/CardBase.vue:92
 #: desk/src/pages/home/components/CardBase.vue:94
-#: desk/src/pages/home/components/CardBase.vue:95
+#: desk/src/pages/home/components/CardBase.vue:96
+#: desk/src/pages/home/components/CardBase.vue:97
 msgid "Last week"
 msgstr ""
 
@@ -2989,8 +3207,8 @@ msgstr ""
 msgid "Layout"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:144
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:221
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:135
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:212
 msgid "Learn about conditions"
 msgstr ""
 
@@ -3012,7 +3230,7 @@ msgstr "حلقة الوصل"
 msgid "Link Options"
 msgstr "خيارات الارتباط"
 
-#: desk/src/pages/desk/contact/ContactDialog.vue:63
+#: desk/src/pages/desk/contact/ContactDialog.vue:62
 msgid "Link to a customer"
 msgstr ""
 
@@ -3022,16 +3240,16 @@ msgstr ""
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #. Label of the list_tab (Tab Break) field in DocType 'HD View'
-#: desk/src/components/ListViewBuilder.vue:788
-#: desk/src/components/ListViewBuilder.vue:830
-#: desk/src/pages/ticket/Tickets.vue:605 desk/src/pages/ticket/Tickets.vue:619
-#: desk/src/pages/ticket/Tickets.vue:649
+#: desk/src/components/ListViewBuilder.vue:799
+#: desk/src/components/ListViewBuilder.vue:841
+#: desk/src/pages/ticket/Tickets.vue:623 desk/src/pages/ticket/Tickets.vue:637
+#: desk/src/pages/ticket/Tickets.vue:667
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
 msgstr "قائمة"
 
-#: desk/src/pages/ticket/Tickets.vue:339
+#: desk/src/pages/ticket/Tickets.vue:357
 msgid "List View"
 msgstr "عرض منسدل"
 
@@ -3044,8 +3262,8 @@ msgstr ""
 msgid "Load Default Columns"
 msgstr ""
 
-#: desk/src/components/Settings/Agents.vue:171
-#: desk/src/components/Settings/Teams/TeamsList.vue:85
+#: desk/src/components/Settings/Agents.vue:174
+#: desk/src/components/Settings/Teams/TeamsList.vue:88
 msgid "Load More"
 msgstr "تحميل المزيد"
 
@@ -3057,12 +3275,12 @@ msgstr "تحميل ..."
 msgid "Log a Call"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:336
-#: desk/src/components/layouts/Sidebar.vue:388
+#: desk/src/components/layouts/Sidebar.vue:344
+#: desk/src/components/layouts/Sidebar.vue:395
 msgid "Log out"
 msgstr "تسجيل الخروج"
 
-#: desk/src/components/layouts/Sidebar.vue:367
+#: desk/src/components/layouts/Sidebar.vue:375
 msgid "Login to Frappe Cloud"
 msgstr ""
 
@@ -3078,11 +3296,11 @@ msgstr "شعار"
 msgid "Lower the Integer value, higher is the priority of the issue"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:483
+#: desk/src/pages/ticket/Tickets.vue:501
 msgid "Make Private"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:483
+#: desk/src/pages/ticket/Tickets.vue:501
 msgid "Make Public"
 msgstr ""
 
@@ -3094,7 +3312,7 @@ msgstr ""
 msgid "Make feedback mandatory"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:491
+#: desk/src/pages/ticket/Tickets.vue:509
 msgid "Make view private"
 msgstr ""
 
@@ -3106,7 +3324,7 @@ msgstr ""
 msgid "Manage pre-defined responses that can be used to respond to customer queries."
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:120
+#: desk/src/components/Settings/Profile/Profile.vue:130
 msgid "Manage your account emails and email signature for communication."
 msgstr ""
 
@@ -3114,8 +3332,12 @@ msgstr ""
 msgid "Manage your email accounts and configure incoming and outgoing settings."
 msgstr ""
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:40
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:25
 msgid "Manage your email signature."
+msgstr ""
+
+#: desk/src/components/Settings/Preferences/Preferences.vue:2
+msgid "Manage your personal preferences."
 msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:4
@@ -3127,11 +3349,15 @@ msgstr ""
 msgid "Mark all as read"
 msgstr "وضع علامة \"مقروءة\" على الكل"
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:47
+#: desk/src/components/layouts/Sidebar.vue:608
+msgid "Masters"
+msgstr "الرئيسية"
+
+#: desk/src/components/Settings/Teams/NewTeam.vue:38
 msgid "Members"
 msgstr "أعضاء"
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:67
+#: desk/src/components/Settings/Teams/TeamEdit.vue:56
 msgid "Members ({0})"
 msgstr ""
 
@@ -3140,11 +3366,11 @@ msgstr ""
 msgid "Mention"
 msgstr "أشير"
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:154
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:158
 msgid "Merge"
 msgstr "دمج"
 
-#: desk/src/components/ticket-agent/TicketHeader.vue:256
+#: desk/src/components/ticket-agent/TicketHeader.vue:255
 #: desk/src/components/ticket/TicketAgentSidebar.vue:18
 msgid "Merge Ticket"
 msgstr ""
@@ -3166,6 +3392,10 @@ msgstr "رسالة"
 msgid "Misc"
 msgstr ""
 
+#: desk/src/components/layouts/Sidebar.vue:640
+msgid "Mobile App Installation"
+msgstr ""
+
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
 #. List'
@@ -3178,17 +3408,25 @@ msgstr "يوم الاثنين"
 msgid "Monthly"
 msgstr "شهريا"
 
-#: desk/src/pages/knowledge-base/Article.vue:634
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:187
+#: desk/src/pages/knowledge-base/Article.vue:636
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:191
 msgid "Move To"
 msgstr "الانتقال إلى"
 
-#: desk/src/pages/dashboard/Dashboard.vue:255
+#: desk/src/pages/dashboard/Dashboard.vue:249
 msgid "My Dashboard"
 msgstr ""
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:169
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:335
+#: desk/src/pages/dashboard/Dashboard.vue:302
+msgid "My Organization"
+msgstr ""
+
+#: desk/src/pages/dashboard/Dashboard.vue:307
+msgid "My Stats"
+msgstr ""
+
+#: desk/src/components/SavedRepliesSelectorModal.vue:175
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:337
 msgid "My Team"
 msgstr ""
 
@@ -3201,14 +3439,14 @@ msgstr ""
 #. Label of the organization_name (Data) field in DocType 'HD Organization'
 #. Label of the brand_name (Data) field in DocType 'HD Settings'
 #. Label of the team_name (Data) field in DocType 'HD Team'
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:55
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:56
-#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:67
-#: desk/src/components/Settings/Holiday/HolidayView.vue:46
-#: desk/src/components/Settings/Holiday/HolidayView.vue:47
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:56
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:51
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:52
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:46
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:47
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:68
+#: desk/src/components/Settings/Holiday/HolidayView.vue:37
+#: desk/src/components/Settings/Holiday/HolidayView.vue:38
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:47
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:42
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:43
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_organization/hd_organization.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -3227,16 +3465,16 @@ msgstr ""
 msgid "Name shown on the customer portal<br> (e.g., Replied → Awaiting Response)."
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:108
+#: desk/src/components/modals/ShortcutsModal.vue:105
 msgid "Navigation"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:382
-#: desk/src/pages/home/components/RecentFeedback.vue:400
+#: desk/src/pages/home/components/RecentFeedback.vue:392
+#: desk/src/pages/home/components/RecentFeedback.vue:410
 msgid "Negative first"
 msgstr ""
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:17
+#: desk/src/components/SavedRepliesSelectorModal.vue:16
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:19
 #: desk/src/components/Settings/EmailAccountList.vue:12
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:27
@@ -3254,7 +3492,7 @@ msgstr "جديد"
 msgid "New Article"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:9
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:4
 msgid "New Assignment Rule"
 msgstr ""
 
@@ -3262,7 +3500,7 @@ msgstr ""
 msgid "New Assignment Rule Name"
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:8
+#: desk/src/components/Settings/Holiday/HolidayView.vue:3
 msgid "New Business Holiday"
 msgstr ""
 
@@ -3270,7 +3508,7 @@ msgstr ""
 msgid "New Call Log"
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:110
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:104
 msgid "New Field Dependency"
 msgstr ""
 
@@ -3282,7 +3520,7 @@ msgstr ""
 msgid "New Password"
 msgstr "كلمة مرور جديدة"
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:8
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:3
 msgid "New SLA Policy"
 msgstr ""
 
@@ -3290,11 +3528,11 @@ msgstr ""
 msgid "New SLA Policy Name"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:8
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:3
 msgid "New Saved Reply"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:181
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:184
 msgid "New Saved reply Name"
 msgstr ""
 
@@ -3302,7 +3540,7 @@ msgstr ""
 msgid "New Subject"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:8
+#: desk/src/components/Settings/Teams/NewTeam.vue:3
 msgid "New Team"
 msgstr ""
 
@@ -3311,15 +3549,19 @@ msgstr ""
 msgid "New Ticket"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:49
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:53
 msgid "New and old title cannot be same"
 msgstr ""
 
-#: desk/src/components/Settings/NewTeamModal.vue:5
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:86
+msgid "New and updated customers sync automatically between Helpdesk and ERPNext."
+msgstr ""
+
+#: desk/src/components/Settings/NewTeamModal.vue:4
 msgid "New team"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:47
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:51
 msgid "New title is required"
 msgstr ""
 
@@ -3327,7 +3569,7 @@ msgstr ""
 msgid "New users will have to be manually registered by system managers."
 msgstr "سيتعين على مديري النظام تسجيل المستخدمين الجدد يدويًا."
 
-#: desk/src/components/modals/ShortcutsModal.vue:110
+#: desk/src/components/modals/ShortcutsModal.vue:107
 msgid "Next ticket"
 msgstr ""
 
@@ -3343,6 +3585,10 @@ msgstr ""
 msgid "No Email Account found for {0}"
 msgstr ""
 
+#: helpdesk/api/agent.py:73
+msgid "No HD Agent record for current user"
+msgstr ""
+
 #: desk/src/components/Settings/Holiday/HolidayList.vue:20
 msgid "No Holiday list found"
 msgstr ""
@@ -3355,19 +3601,19 @@ msgstr ""
 msgid "No Team"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:202
+#: desk/src/pages/home/components/RecentFeedback.vue:206
 msgid "No additional comments"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:122
+#: desk/src/components/ticket-agent/AssignTo.vue:144
 msgid "No agents found"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:421
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:425
 msgid "No articles found for the applied filters. Try adjusting or clearing your filters."
 msgstr ""
 
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:424
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:428
 msgid "No articles found in the following category."
 msgstr ""
 
@@ -3375,7 +3621,7 @@ msgstr ""
 msgid "No assignment rule found"
 msgstr ""
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:101
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:105
 msgid "No average metrics"
 msgstr ""
 
@@ -3387,7 +3633,7 @@ msgstr ""
 msgid "No changes made"
 msgstr "لم يتم إجراء أي تغييرات"
 
-#: desk/src/pages/desk/contact/ContactDialog.vue:245
+#: desk/src/pages/desk/contact/ContactDialog.vue:239
 msgid "No changes to save"
 msgstr ""
 
@@ -3399,15 +3645,23 @@ msgstr ""
 msgid "No contacts found for the applied filters. Try adjusting or clearing your filters."
 msgstr ""
 
-#: desk/src/pages/desk/customer/Customers.vue:92
+#: desk/src/pages/desk/customer/Customers.vue:91
 msgid "No customers found for the applied filters. Try adjusting or clearing your filters."
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:273
+#: desk/src/components/Settings/EmailAccountList.vue:46
+msgid "No email account found"
+msgstr ""
+
+#: desk/src/pages/home/components/RecentFeedback.vue:283
 msgid "No feedback"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:105
+#: desk/src/components/view-controls/filter/FilterFieldList.vue:46
+msgid "No fields found"
+msgstr ""
+
+#: desk/src/components/Settings/Teams/TeamEdit.vue:94
 msgid "No members found"
 msgstr ""
 
@@ -3419,7 +3673,7 @@ msgstr ""
 msgid "No new tickets assigned to you in the last 7 days"
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketNavigation.vue:22
+#: desk/src/components/ticket-agent/TicketNavigation.vue:25
 msgid "No next ticket"
 msgstr ""
 
@@ -3431,7 +3685,7 @@ msgstr ""
 msgid "No pending tickets"
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketNavigation.vue:7
+#: desk/src/components/ticket-agent/TicketNavigation.vue:10
 msgid "No previous ticket"
 msgstr ""
 
@@ -3443,35 +3697,40 @@ msgstr ""
 msgid "No recently assigned tickets"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:78
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:64
+msgid "No results"
+msgstr ""
+
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:79
 msgid "No results found"
 msgstr ""
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:107
+#: desk/src/components/SavedRepliesSelectorModal.vue:113
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:91
 msgid "No saved replies found"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:180
+#: desk/src/pages/ticket/Tickets.vue:192
 msgid "No tickets found"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:190
+#: desk/src/pages/ticket/Tickets.vue:202
 msgid "No tickets found for the applied filters. Try adjusting or clearing your filters."
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:186
+#: desk/src/pages/ticket/Tickets.vue:198
 msgid "No tickets found for this view. Try adjusting your filters or creating a new view."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:98
+#: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:99
 msgid "No tickets found to preview."
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:90
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:84
 msgid "No tickets selected"
 msgstr ""
 
-#: helpdesk/utils.py:168
+#: helpdesk/api/ticket.py:76 helpdesk/utils.py:182
 msgid "Not Allowed"
 msgstr "غير مسموح"
 
@@ -3479,10 +3738,13 @@ msgstr "غير مسموح"
 msgid "Not Assigned"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:16
 #: desk/src/pages/call-logs/CallLogModal.vue:10
 msgid "Not Saved"
 msgstr "لم يتم الحفظ"
+
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:203
+msgid "Not Set"
+msgstr "غير محدد"
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:250
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:270
@@ -3490,22 +3752,27 @@ msgstr "لم يتم الحفظ"
 msgid "Not Specified"
 msgstr "غير محدد"
 
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:14
+msgid "Not installed"
+msgstr ""
+
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Notification Settings"
 msgstr "إعدادات الإشعار"
 
 #: desk/src/components/layouts/Sidebar.vue:36
+#: desk/src/components/notifications/Notifications.vue:16
 #: desk/src/pages/MobileNotifications.vue:6
 msgid "Notifications"
 msgstr "إخطارات"
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:155
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:236
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:146
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:227
 msgid "Old Condition"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:97
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:88
 msgid "Old Conditions"
 msgstr ""
 
@@ -3523,6 +3790,10 @@ msgstr ""
 msgid "On ticket status"
 msgstr ""
 
+#: helpdesk/api/ticket.py:75
+msgid "Only administrators can delete tickets."
+msgstr ""
+
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.py:29
 msgid "Only one default view is allowed per user for {0}"
 msgstr ""
@@ -3538,15 +3809,15 @@ msgstr ""
 msgid "Open"
 msgstr "فتح"
 
-#: desk/src/components/modals/ShortcutsModal.vue:81
+#: desk/src/components/modals/ShortcutsModal.vue:78
 msgid "Open command palette"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:103
+#: desk/src/components/modals/ShortcutsModal.vue:100
 msgid "Open comment box"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:84
+#: desk/src/components/modals/ShortcutsModal.vue:81
 msgid "Open help"
 msgstr ""
 
@@ -3554,11 +3825,11 @@ msgstr ""
 msgid "Open in Desk"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:102
+#: desk/src/components/modals/ShortcutsModal.vue:99
 msgid "Open reply box"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:82
+#: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "Open settings"
 msgstr ""
 
@@ -3579,7 +3850,9 @@ msgstr "تاريخ الفتح"
 msgid "Opening Time"
 msgstr "يفتح من الساعة"
 
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Orange"
 msgstr "البرتقالي"
@@ -3595,11 +3868,11 @@ msgstr "طلب"
 msgid "Order By"
 msgstr "ترتيب حسب"
 
-#: desk/src/pages/dashboard/Dashboard.vue:255
+#: desk/src/pages/dashboard/Dashboard.vue:249
 msgid "Organization Dashboard"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketFeedback.vue:52
+#: desk/src/pages/ticket/TicketFeedback.vue:50
 msgid "Other"
 msgstr "آخر"
 
@@ -3615,7 +3888,7 @@ msgstr "الصادر"
 msgid "Outside working hours notice"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:102
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:105
 msgid "Owner"
 msgstr "مالك"
 
@@ -3631,7 +3904,7 @@ msgstr ""
 msgid "Parent field, child field, and parent-child mapping are required."
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:134
+#: desk/src/components/Settings/Profile/Profile.vue:144
 msgid "Password"
 msgstr "كلمة السر"
 
@@ -3658,7 +3931,7 @@ msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
-#: desk/src/pages/ticket/Tickets.vue:237
+#: desk/src/pages/ticket/Tickets.vue:253
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Paused"
@@ -3699,36 +3972,38 @@ msgid "Period"
 msgstr "فترة"
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/SavedRepliesSelectorModal.vue:164
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:328
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:368
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:211
+#: desk/src/components/SavedRepliesSelectorModal.vue:170
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:330
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:370
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:190
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Personal"
 msgstr "الشخصية"
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:64
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:54
 msgid "Personal mobile no"
 msgstr ""
 
 #: desk/src/components/desk/global/NewContactDialog.vue:133
-#: desk/src/components/ticket/SetContactPhoneModal.vue:27
+#: desk/src/components/ticket/SetContactPhoneModal.vue:25
 msgid "Phone"
 msgstr "هاتف"
 
-#: desk/src/pages/desk/contact/ContactDialog.vue:51
+#: desk/src/pages/desk/contact/ContactDialog.vue:50
 msgid "Phone Nos"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketFeedback.vue:38
+#: desk/src/pages/ticket/TicketFeedback.vue:36
 msgid "Pick an option"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:450
+#: desk/src/pages/ticket/Tickets.vue:468
 msgid "Pin View"
 msgstr ""
 
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Pink"
 msgstr "وردي"
@@ -3751,12 +4026,16 @@ msgstr ""
 msgid "Please add {0} priority in {1} SLA"
 msgstr ""
 
-#: desk/src/components/Settings/Telephony/Telephony.vue:213
+#: desk/src/components/Settings/Telephony/Telephony.vue:219
 msgid "Please configure your Exotel settings correctly"
 msgstr ""
 
-#: desk/src/components/Settings/Telephony/Telephony.vue:209
+#: desk/src/components/Settings/Telephony/Telephony.vue:215
 msgid "Please configure your Twilio settings correctly"
+msgstr ""
+
+#: desk/src/components/layouts/Sidebar.vue:658
+msgid "Please create a new ticket to proceed with the next step."
 msgstr ""
 
 #: desk/src/pages/ticket/TicketNew.vue:83
@@ -3772,22 +4051,22 @@ msgstr ""
 msgid "Please enter at least one valid email to send an invite."
 msgstr ""
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:139
+#: desk/src/components/Settings/Teams/NewTeam.vue:129
 #: desk/src/pages/call-logs/CallLogModal.vue:264
 #: desk/src/pages/call-logs/CallLogModal.vue:310
 msgid "Please fill all required fields"
 msgstr ""
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:251
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:240
 msgid "Please fill all required fields for Exotel"
 msgstr ""
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:247
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:215
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:236
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:204
 msgid "Please fill all required fields for Twilio"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:324
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:303
 msgid "Please fill all the required fields"
 msgstr ""
 
@@ -3799,7 +4078,7 @@ msgstr ""
 msgid "Please provide saved_reply_id"
 msgstr ""
 
-#: desk/src/components/Settings/General/General.vue:242
+#: desk/src/components/Settings/General/General.vue:239
 msgid "Please select at least one restriction option for teams in the settings."
 msgstr ""
 
@@ -3811,9 +4090,9 @@ msgstr "الرجاء اختيار يوم العطلة الاسبوعي"
 msgid "Policy name"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:378
-#: desk/src/pages/home/components/RecentFeedback.vue:401
-#: desk/src/pages/home/components/RecentFeedback.vue:405
+#: desk/src/pages/home/components/RecentFeedback.vue:388
+#: desk/src/pages/home/components/RecentFeedback.vue:411
+#: desk/src/pages/home/components/RecentFeedback.vue:415
 msgid "Positive first"
 msgstr ""
 
@@ -3846,7 +4125,15 @@ msgstr "عنوان العنوان الرئيسي"
 msgid "Prefer knowledge base"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:463
+#: desk/src/components/Settings/Preferences/Preferences.vue:6
+msgid "Preferences"
+msgstr ""
+
+#: desk/src/components/Settings/Preferences/Preferences.vue:75
+msgid "Preferences updated successfully."
+msgstr ""
+
+#: desk/src/pages/dashboard/Dashboard.vue:468
 msgid "Presets"
 msgstr ""
 
@@ -3854,13 +4141,13 @@ msgstr ""
 msgid "Press enter to search"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:20
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:11
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:4
-#: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:25
+#: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:26
 msgid "Preview"
 msgstr "معاينة"
 
-#: desk/src/components/modals/ShortcutsModal.vue:111
+#: desk/src/components/modals/ShortcutsModal.vue:108
 msgid "Previous ticket"
 msgstr ""
 
@@ -3877,7 +4164,7 @@ msgstr "أولويات"
 #. Label of the priority (Link) field in DocType 'HD Ticket'
 #. Label of the priority (Link) field in DocType 'HD Ticket Type'
 #. Label of a field in the tickets Web Form
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:68
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:59
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:30
 #: desk/src/pages/SearchAgent.vue:68 desk/src/pages/SearchAgent.vue:69
 #: desk/src/pages/home/components/PendingTickets.vue:35
@@ -3898,17 +4185,17 @@ msgstr ""
 msgid "Priority {0} has been repeated."
 msgstr "تم تكرار الأولوية {0}."
 
-#: desk/src/components/layouts/Sidebar.vue:301
-#: desk/src/pages/ticket/Tickets.vue:359
+#: desk/src/components/layouts/Sidebar.vue:309
+#: desk/src/pages/ticket/Tickets.vue:377
 msgid "Private Views"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:39
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:7
+#: desk/src/components/Settings/Teams/NewTeam.vue:30
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:11
 msgid "Product Experts"
 msgstr ""
 
-#: desk/src/components/Settings/NewTeamModal.vue:22
+#: desk/src/components/Settings/NewTeamModal.vue:20
 msgid "Product experts"
 msgstr ""
 
@@ -3916,7 +4203,7 @@ msgstr ""
 msgid "Profile"
 msgstr "حساب تعريفي"
 
-#: desk/src/components/Settings/Profile/Profile.vue:263
+#: desk/src/components/Settings/Profile/Profile.vue:228
 msgid "Profile updated successfully."
 msgstr "تم تحديث المَلف الشخصي بنجاح."
 
@@ -3925,8 +4212,8 @@ msgstr "تم تحديث المَلف الشخصي بنجاح."
 msgid "Public"
 msgstr "جمهور"
 
-#: desk/src/components/layouts/Sidebar.vue:293
-#: desk/src/pages/ticket/Tickets.vue:374
+#: desk/src/components/layouts/Sidebar.vue:301
+#: desk/src/pages/ticket/Tickets.vue:392
 msgid "Public Views"
 msgstr ""
 
@@ -3935,7 +4222,7 @@ msgid "Publish"
 msgstr "نشر"
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:439
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:443
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Published"
 msgstr "نشرت"
@@ -3990,7 +4277,7 @@ msgstr "نطاق"
 msgid "Rate Your Support Experience"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketFeedback.vue:5
+#: desk/src/pages/ticket/TicketFeedback.vue:4
 msgid "Rate this ticket"
 msgstr ""
 
@@ -4000,6 +4287,7 @@ msgstr ""
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
+#: desk/src/pages/home/components/RecentFeedback.vue:318
 #: helpdesk/api/dashboard.py:384
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
@@ -4041,23 +4329,25 @@ msgstr ""
 msgid "Recent Tickets"
 msgstr ""
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:40
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:39
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:30
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:29
 msgid "Record Calls"
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:125
+#: desk/src/components/Settings/Holiday/HolidayView.vue:114
 msgid "Recurring Holidays"
 msgstr ""
 
 #. Label of the recurring_holidays (JSON) field in DocType 'HD Service Holiday
 #. List'
-#: desk/src/components/Settings/Holiday/HolidayView.vue:189
+#: desk/src/components/Settings/Holiday/HolidayView.vue:178
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Recurring holidays"
 msgstr ""
 
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Red"
 msgstr "أحمر"
@@ -4084,7 +4374,7 @@ msgstr "المراجع"
 msgid "Refresh"
 msgstr "تحديث"
 
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:85
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:75
 msgid "Refresh Apps"
 msgstr ""
 
@@ -4093,7 +4383,7 @@ msgid "Regenerate Search Index"
 msgstr ""
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:48
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:90
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:75
 msgid "Remove"
 msgstr "حذف"
 
@@ -4101,16 +4391,17 @@ msgstr "حذف"
 msgid "Remove Logo"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:220
+#: desk/src/components/Settings/Profile/Profile.vue:197
 msgid "Remove Photo"
 msgstr ""
 
-#: desk/src/pages/desk/contact/ContactDialog.vue:31
+#: desk/src/pages/desk/contact/ContactDialog.vue:30
+#: desk/src/pages/desk/customer/CustomerDialog.vue:27
 msgid "Remove photo"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:263
-#: desk/src/components/Settings/Teams/TeamsList.vue:158
+#: desk/src/components/Settings/Teams/TeamEdit.vue:252
+#: desk/src/components/Settings/Teams/TeamsList.vue:161
 #: desk/src/components/ticket-agent/TicketSubjectModal.vue:21
 #: desk/src/pages/ticket/MobileTicketAgent.vue:132
 msgid "Rename"
@@ -4124,7 +4415,7 @@ msgstr ""
 msgid "Rename (⌘ + ⏎)"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:59
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:63
 msgid "Rename team"
 msgstr ""
 
@@ -4161,7 +4452,7 @@ msgstr ""
 msgid "Reply from contact"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:487
+#: desk/src/components/layouts/Sidebar.vue:494
 msgid "Reply on a ticket"
 msgstr ""
 
@@ -4188,6 +4479,10 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:114
 msgid "Reset content"
+msgstr ""
+
+#: desk/src/components/view-controls/ColumnSettings.vue:93
+msgid "Reset to Default"
 msgstr ""
 
 #. Label of the resolution_tab (Tab Break) field in DocType 'HD Ticket'
@@ -4234,7 +4529,7 @@ msgid "Resolved"
 msgstr "تم الحل"
 
 #. Label of the response_tab (Tab Break) field in DocType 'HD Ticket'
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:109
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:89
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Response"
 msgstr "الإستجابة"
@@ -4262,12 +4557,12 @@ msgstr "لا يمكن أن يكون وقت الاستجابة {0} للأولوي
 
 #. Label of the response_and_resolution_time_section (Section Break) field in
 #. DocType 'HD Service Level Agreement'
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:188
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:179
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Response and Resolution"
 msgstr "الرد والحل"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:432
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:407
 msgid "Response is required"
 msgstr ""
 
@@ -4294,7 +4589,7 @@ msgstr ""
 msgid "Restrict tickets to be viewed and managed by team members only."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:103
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:83
 msgid "Restrict visibility to these teams"
 msgstr ""
 
@@ -4340,6 +4635,10 @@ msgstr ""
 msgid "Rows"
 msgstr ""
 
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:108
+msgid "Run an initial sync to reconcile existing records. New ones update automatically."
+msgstr ""
+
 #. Label of the sla (Link) field in DocType 'HD Ticket'
 #. Label of the sla_tab (Tab Break) field in DocType 'HD Ticket'
 #: desk/src/pages/home/components/PendingTickets.vue:218
@@ -4369,7 +4668,7 @@ msgstr ""
 msgid "SLA Status"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:440
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:430
 msgid "SLA policy created successfully."
 msgstr ""
 
@@ -4385,11 +4684,11 @@ msgstr ""
 msgid "SLA policy status updated successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:479
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:469
 msgid "SLA policy updated successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:488
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:478
 msgid "SLA set as default cannot be disabled"
 msgstr ""
 
@@ -4410,21 +4709,22 @@ msgid "Saturday"
 msgstr "السبت"
 
 #. Button label of the email-feedback Web Form
-#: desk/src/components/ListViewBuilder.vue:699
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:29
+#: desk/src/components/ListViewBuilder.vue:704
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:20
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:39
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:28
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:19
 #: desk/src/components/Settings/General/General.vue:15
-#: desk/src/components/Settings/Holiday/HolidayView.vue:18
-#: desk/src/components/Settings/Profile/Profile.vue:107
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:31
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:28
-#: desk/src/components/Settings/Teams/NewTeam.vue:25
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:20
+#: desk/src/components/Settings/Holiday/HolidayView.vue:9
+#: desk/src/components/Settings/Preferences/Preferences.vue:16
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:22
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:19
+#: desk/src/components/Settings/Teams/NewTeam.vue:16
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:10
 #: desk/src/components/Settings/Telephony/Telephony.vue:17
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:20
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:10
 #: desk/src/pages/call-logs/CallLogModal.vue:225
-#: desk/src/pages/desk/contact/ContactDialog.vue:235
+#: desk/src/pages/desk/contact/ContactDialog.vue:72
+#: desk/src/pages/desk/customer/CustomerDialog.vue:38
 #: desk/src/pages/home/Home.vue:27
 #: desk/src/pages/knowledge-base/Article.vue:152
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
@@ -4435,28 +4735,29 @@ msgstr "حفظ"
 msgid "Save Changes"
 msgstr ""
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:13
+#: desk/src/components/SavedRepliesSelectorModal.vue:12
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:3
+#: desk/src/components/layouts/Sidebar.vue:617
 msgid "Saved Replies"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:353
+#: desk/src/pages/ticket/Tickets.vue:371
 msgid "Saved Views"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:284
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:286
 msgid "Saved reply deleted successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:301
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:303
 msgid "Saved reply duplicated successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:347
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:326
 msgid "Saved reply saved successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:410
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:389
 msgid "Saved reply updated successfully."
 msgstr ""
 
@@ -4465,8 +4766,8 @@ msgid "Schedule name"
 msgstr ""
 
 #. Label of the scope (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:103
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:66
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:106
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:57
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Scope"
 msgstr "نِطَاق"
@@ -4477,14 +4778,14 @@ msgid "Script"
 msgstr "سيناريو"
 
 #. Label of the search_tab (Tab Break) field in DocType 'HD Settings'
-#: desk/src/components/SavedRepliesSelectorModal.vue:28
-#: desk/src/components/Settings/Agents.vue:23
-#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:28
-#: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:37
-#: desk/src/components/Settings/Holiday/Holidays.vue:27
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:25
-#: desk/src/components/Settings/Sla/SlaPolicies.vue:40
-#: desk/src/components/Settings/Teams/TeamsList.vue:25
+#: desk/src/components/SavedRepliesSelectorModal.vue:27
+#: desk/src/components/Settings/Agents.vue:24
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:29
+#: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:38
+#: desk/src/components/Settings/Holiday/Holidays.vue:28
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:26
+#: desk/src/components/Settings/Sla/SlaPolicies.vue:41
+#: desk/src/components/Settings/Teams/TeamsList.vue:26
 #: desk/src/components/command-palette/CP.vue:121
 #: desk/src/components/layouts/Sidebar.vue:14 desk/src/pages/SearchAgent.vue:7
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -4509,6 +4810,10 @@ msgstr "Search Param Name"
 msgid "Search agents..."
 msgstr ""
 
+#: desk/src/components/view-controls/filter/Filter.vue:90
+msgid "Search fields..."
+msgstr "حقول البحث..."
+
 #: desk/src/components/command-palette/CP.vue:126
 msgid "Search for \"{0}\""
 msgstr ""
@@ -4525,7 +4830,7 @@ msgstr ""
 msgid "Search query must be at least 2 characters"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:19
+#: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:20
 msgid "Search ticket"
 msgstr ""
 
@@ -4536,6 +4841,10 @@ msgstr ""
 #: desk/src/components/command-palette/CP.vue:12
 msgid "Search tickets, emails, comments, or #234 to navigate to ticket"
 msgstr ""
+
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:33
+msgid "Search..."
+msgstr "بحث..."
 
 #: desk/src/pages/SearchAgent.vue:137
 msgid "Searched for:"
@@ -4565,24 +4874,32 @@ msgstr ""
 msgid "Select Range"
 msgstr ""
 
+#: desk/src/components/ticket/TicketMergeModal.vue:55
+msgid "Select Ticket"
+msgstr ""
+
+#: desk/src/components/Settings/Preferences/components/LanguageTimezoneSetting.vue:31
+msgid "Select Timezone"
+msgstr ""
+
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:167
 msgid "Select a Default Priority."
 msgstr "حدد أولوية افتراضية."
 
-#: desk/src/pages/ticket/TicketFeedback.vue:28
+#: desk/src/pages/ticket/TicketFeedback.vue:26
 msgid "Select a rating"
 msgstr ""
 
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:34
-#: desk/src/pages/home/components/RecentFeedback.vue:148
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:37
+#: desk/src/pages/home/components/RecentFeedback.vue:151
 msgid "Select range"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:98
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:78
 msgid "Select teams"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:16
+#: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:17
 msgid "Select ticket to preview"
 msgstr ""
 
@@ -4594,7 +4911,7 @@ msgstr ""
 msgid "Select your weekly off day"
 msgstr "اختر يوم عطلتك الأسبوعية"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:65
+#: desk/src/pages/ticket/TicketCustomer.vue:78
 msgid "Send"
 msgstr "إرسال"
 
@@ -4602,7 +4919,7 @@ msgstr "إرسال"
 msgid "Send Invites"
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:38
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:32
 msgid "Send Reply"
 msgstr ""
 
@@ -4612,7 +4929,7 @@ msgstr ""
 msgid "Send feedback when"
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:39
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:33
 msgid "Send to {0} tickets"
 msgstr ""
 
@@ -4632,6 +4949,10 @@ msgstr ""
 msgid "Sent to the user who has raised the ticket after the ticket is closed or resolved."
 msgstr ""
 
+#: desk/src/components/layouts/Sidebar.vue:618
+msgid "Service Level Agreement"
+msgstr "اتفاقية مستوى الخدمة"
+
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:5
 msgid "Service Level Agreements (SLAs)"
 msgstr ""
@@ -4646,8 +4967,12 @@ msgstr "اسم مستوى الخدمة"
 msgid "Service not supported"
 msgstr ""
 
-#: desk/src/components/ticket/SetContactPhoneModal.vue:5
-#: desk/src/components/ticket/SetContactPhoneModal.vue:8
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:202
+msgid "Set"
+msgstr "مجموعة"
+
+#: desk/src/components/ticket/SetContactPhoneModal.vue:4
+#: desk/src/components/ticket/SetContactPhoneModal.vue:7
 msgid "Set Phone Number"
 msgstr ""
 
@@ -4659,16 +4984,25 @@ msgstr ""
 msgid "Set Response Time for Priority {0} in row {1}."
 msgstr "قم بتعيين وقت الاستجابة للأولوية {0} في الصف {1}."
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:84
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:75
 msgid "Set as default SLA"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:240
+#: desk/src/components/AvailabilityMenu.vue:5
+#: desk/src/components/AvailabilityMenuMobile.vue:22
+msgid "Set status"
+msgstr ""
+
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:231
 msgid "Set the default status assigned when a ticket is created, and the status to apply when a ticket is reopened. If not specified, the default status from HD Settings will be used."
 msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:9
 msgid "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one."
+msgstr ""
+
+#: desk/src/components/Settings/Profile/Profile.vue:115
+msgid "Set your availability so your team knows when you're reachable."
 msgstr ""
 
 #: desk/src/components/Settings/Holiday/Holidays.vue:5
@@ -4679,15 +5013,20 @@ msgstr ""
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
 msgstr ""
 
+#: desk/src/components/layouts/Sidebar.vue:574
+msgid "Setting up"
+msgstr ""
+
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
-#: desk/src/components/layouts/Sidebar.vue:379
+#: desk/src/components/layouts/Sidebar.vue:386
+#: desk/src/components/layouts/Sidebar.vue:632
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Settings"
 msgstr "إعدادات"
 
-#: desk/src/components/Settings/General/General.vue:256
-#: desk/src/components/Settings/General/General.vue:294
-#: desk/src/components/Settings/General/General.vue:303
+#: desk/src/components/Settings/General/General.vue:253
+#: desk/src/components/Settings/General/General.vue:291
+#: desk/src/components/Settings/General/General.vue:300
 msgid "Settings updated"
 msgstr ""
 
@@ -4707,12 +5046,12 @@ msgstr "الإعدادات"
 msgid "Setup Email"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:454
+#: desk/src/components/layouts/Sidebar.vue:461
 msgid "Setup SLA"
 msgstr ""
 
-#: desk/src/pages/knowledge-base/Article.vue:647
-#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:163
+#: desk/src/pages/knowledge-base/Article.vue:649
+#: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:167
 msgid "Share"
 msgstr "مشاركة"
 
@@ -4726,20 +5065,24 @@ msgstr ""
 msgid "Share feedback"
 msgstr ""
 
-#: desk/src/components/layouts/Sidebar.vue:373
+#: desk/src/components/layouts/Sidebar.vue:381
 msgid "Shortcuts"
 msgstr "اختصارات"
+
+#: desk/src/components/HistoryBox.vue:10
+msgid "Show "
+msgstr "تبين "
 
 #. Label of the different_view (Check) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Show end users a different view"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:463
+#: desk/src/pages/ticket/Tickets.vue:481
 msgid "Show in sidebar"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:83
+#: desk/src/components/modals/ShortcutsModal.vue:80
 msgid "Show keyboard shortcuts"
 msgstr ""
 
@@ -4747,7 +5090,7 @@ msgstr ""
 msgid "Showing {0} of {1} {2}"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:37
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:22
 msgid "Signature"
 msgstr "توقيع"
 
@@ -4766,24 +5109,30 @@ msgstr ""
 msgid "Skip email workflow"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:627
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:617
 msgid "Some error occurred while renaming assignment rule"
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:412
+#: desk/src/components/Settings/Holiday/HolidayView.vue:399
 msgid "Some error occurred while renaming holiday list"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:389
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:368
 msgid "Some error occurred while renaming saved reply"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:611
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:601
 msgid "Some error occurred while updating assignment rule"
 msgstr ""
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:402
+#: desk/src/components/Settings/Holiday/HolidayView.vue:389
 msgid "Some error occurred while updating holiday list"
+msgstr ""
+
+#: desk/src/components/view-controls/SortBy.vue:10
+#: desk/src/components/view-controls/SortBy.vue:22
+#: desk/src/components/view-controls/SortBy.vue:231
+msgid "Sort"
 msgstr ""
 
 #. Label of the source_doctype (Link) field in DocType 'HD Support Search
@@ -4807,11 +5156,11 @@ msgstr "نوع المصدر"
 msgid "Source and target category cannot be same"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:338
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:339
 msgid "Source and target ticket cannot be same"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:334
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:335
 msgid "Source ticket does not exist"
 msgstr ""
 
@@ -4871,10 +5220,15 @@ msgstr ""
 
 #. Label of the status_details (Section Break) field in DocType 'HD Service
 #. Level Agreement'
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:236
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:227
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status Details"
 msgstr "تفاصيل الحالة"
+
+#. Label of the status_order (Int) field in DocType 'HD Agent Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
+msgid "Status Order"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:382
 msgid "Status is required"
@@ -4925,7 +5279,7 @@ msgstr ""
 msgid "Subject is required"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketFeedback.vue:9
+#: desk/src/pages/ticket/TicketFeedback.vue:8
 #: desk/src/pages/ticket/TicketNew.vue:96
 #: desk/src/pages/ticket/TicketNew.vue:120
 msgid "Submit"
@@ -4944,7 +5298,7 @@ msgstr "ملخص"
 msgid "Sunday"
 msgstr "الأحد"
 
-#: desk/src/components/layouts/Sidebar.vue:358
+#: desk/src/components/layouts/Sidebar.vue:366
 msgid "Support"
 msgstr "الدعم"
 
@@ -4964,28 +5318,46 @@ msgstr ""
 msgid "Support Team"
 msgstr "فريق الدعم"
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:59
+#: desk/src/components/Settings/Preferences/components/ThemeSwitcher.vue:11
+msgid "Switch between light, dark, or system theme"
+msgstr ""
+
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:44
 msgid "Switch between outgoing email accounts when sending emails from your configured accounts."
 msgstr ""
 
-#: desk/src/components/erpnext-integration/ERPNextCustomerSyncButton.vue:14
-msgid "Sync Customers with ERPNext"
+#: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:16
+#: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:18
+msgid "Sync Customers"
 msgstr ""
 
-#: desk/src/components/erpnext-integration/ERPNextCustomerSyncButton.vue:61
+#: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:22
+msgid "Sync all customers between ERPNext and Helpdesk? The sync runs in the background and can take a few minutes depending on the number of customers."
+msgstr ""
+
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:216
 msgid "Sync completed successfully"
 msgstr ""
 
-#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:14
-msgid "Sync customers between Helpdesk and ERPNext automatically."
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:3
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:39
+msgid "Sync customers between Helpdesk and ERPNext."
 msgstr ""
 
-#: desk/src/components/erpnext-integration/ERPNextCustomerSyncButton.vue:49
-#: helpdesk/public/erpnext/customer_list.js:36
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:120
+msgid "Sync now"
+msgstr ""
+
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:197
+#: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:35
 msgid "Sync started"
 msgstr ""
 
-#: desk/src/components/erpnext-integration/ERPNextCustomerSyncButton.vue:14
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:104
+msgid "Sync your existing customers"
+msgstr ""
+
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:120
 msgid "Syncing…"
 msgstr ""
 
@@ -5003,6 +5375,7 @@ msgstr "نظام"
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
@@ -5042,11 +5415,13 @@ msgstr ""
 msgid "Tampered Access"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:336
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:337
 msgid "Target ticket does not exist"
 msgstr ""
 
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Teal"
 msgstr ""
@@ -5057,10 +5432,11 @@ msgstr ""
 #. Label of the team (Link) field in DocType 'HD Saved Reply Team'
 #. Label of the agent_group (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:372
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:216
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:374
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:195
+#: desk/src/components/layouts/Sidebar.vue:613
 #: desk/src/pages/SearchAgent.vue:50 desk/src/pages/SearchAgent.vue:51
-#: desk/src/pages/dashboard/Dashboard.vue:63
+#: desk/src/pages/dashboard/Dashboard.vue:57
 #: desk/src/pages/home/components/PendingTickets.vue:38
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
@@ -5070,7 +5446,7 @@ msgstr ""
 msgid "Team"
 msgstr "فريق"
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:38
+#: desk/src/components/Settings/Teams/NewTeam.vue:29
 msgid "Team Name"
 msgstr ""
 
@@ -5080,45 +5456,45 @@ msgstr ""
 msgid "Team Restrictions"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:280
+#: desk/src/components/Settings/Teams/TeamEdit.vue:269
 msgid "Team can now access all tickets."
 msgstr ""
 
-#: desk/src/components/Settings/NewTeamModal.vue:54
+#: desk/src/components/Settings/NewTeamModal.vue:52
 msgid "Team created"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/NewTeam.vue:150
+#: desk/src/components/Settings/Teams/NewTeam.vue:140
 msgid "Team created successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:173
-#: desk/src/components/Settings/Teams/TeamsList.vue:182
+#: desk/src/components/Settings/Teams/TeamEdit.vue:162
+#: desk/src/components/Settings/Teams/TeamsList.vue:185
 msgid "Team deleted successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:195
+#: desk/src/components/Settings/Teams/TeamEdit.vue:184
 msgid "Team disabled successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:194
+#: desk/src/components/Settings/Teams/TeamEdit.vue:183
 msgid "Team enabled successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamsList.vue:48
+#: desk/src/components/Settings/Teams/TeamsList.vue:51
 msgid "Team name"
 msgstr ""
 
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:52
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:56
 msgid "Team renamed successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:281
+#: desk/src/components/Settings/Teams/TeamEdit.vue:270
 msgid "Team will only see their own tickets."
 msgstr ""
 
 #. Label of the teams (Table MultiSelect) field in DocType 'HD Saved Reply'
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:94
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:74
 #: desk/src/components/Settings/Teams/TeamsList.vue:3
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Teams"
@@ -5128,13 +5504,13 @@ msgstr ""
 msgid "Telephony"
 msgstr ""
 
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:292
-#: desk/src/components/Settings/Telephony/Telephony.vue:254
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:244
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:281
+#: desk/src/components/Settings/Telephony/Telephony.vue:260
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:233
 msgid "Telephony settings updated successfully."
 msgstr ""
 
-#: desk/src/pages/ticket/TicketFeedback.vue:56
+#: desk/src/pages/ticket/TicketFeedback.vue:54
 msgid "Tell us more"
 msgstr ""
 
@@ -5188,6 +5564,10 @@ msgstr ""
 msgid "The ticket status will automatically change whenever the agent respond to a ticket."
 msgstr ""
 
+#: desk/src/components/Settings/Preferences/components/ThemeSwitcher.vue:6
+msgid "Theme"
+msgstr "موضوع"
+
 #: desk/src/components/knowledge-base/CategoryFolderContainer.vue:18
 msgid "There are no categories published at the moment."
 msgstr ""
@@ -5200,7 +5580,7 @@ msgstr ""
 msgid "This Assignment Rule is linked to the Team {0}.</br> User {1} is added in the Assignment Rule but not in the linked Team. Please add the user in the {2} to ensure proper team structure."
 msgstr ""
 
-#: desk/src/components/ticket/TicketMergeModal.vue:76
+#: desk/src/components/ticket/TicketMergeModal.vue:79
 #: desk/src/components/ticket/TicketSplitModal.vue:24
 msgid "This action is irreversible."
 msgstr ""
@@ -5226,23 +5606,23 @@ msgstr ""
 msgid "This field is used to skip email-related workflows for tickets. If this field is checked, no emails will be sent related to tickets, such as new ticket creation, status updates, or notifications."
 msgstr ""
 
-#: helpdesk/www/helpdesk/index.py:23
+#: helpdesk/www/helpdesk/index.py:26
 msgid "This method is only meant for developer mode"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:372
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:373
 msgid "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:513
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:514
 msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:526
+#: desk/src/pages/ticket/Tickets.vue:544
 msgid "This view is public, and will be removed for all users."
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:694
+#: desk/src/components/ListViewBuilder.vue:699
 msgid "This view is public. Changes made will be visible to everyone."
 msgstr ""
 
@@ -5262,6 +5642,8 @@ msgstr "الخميس"
 #. Label of the reference_ticket (Link) field in DocType 'HD Notification'
 #. Label of the ticket_tab (Tab Break) field in DocType 'HD Settings'
 #. Title of the tickets Web Form
+#: desk/src/components/layouts/Sidebar.vue:611
+#: desk/src/components/ticket/TicketMergeModal.vue:57
 #: desk/src/pages/call-logs/CallLogModal.vue:102
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -5290,7 +5672,7 @@ msgstr ""
 msgid "Ticket Info"
 msgstr ""
 
-#: desk/src/components/modals/ShortcutsModal.vue:88
+#: desk/src/components/modals/ShortcutsModal.vue:85
 msgid "Ticket Management"
 msgstr ""
 
@@ -5303,6 +5685,7 @@ msgstr ""
 msgid "Ticket Not Found"
 msgstr ""
 
+#: desk/src/components/layouts/Sidebar.vue:620
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:50
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:77
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:37
@@ -5331,6 +5714,10 @@ msgstr ""
 msgid "Ticket Split From"
 msgstr ""
 
+#: desk/src/components/ticket/TicketMergeModal.vue:65
+msgid "Ticket Subject"
+msgstr ""
+
 #. Name of a report
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.json
@@ -5346,6 +5733,7 @@ msgstr ""
 #. Settings'
 #. Label of the ticket_type (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
+#: desk/src/components/layouts/Sidebar.vue:619
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:66
@@ -5354,11 +5742,11 @@ msgstr ""
 msgid "Ticket Type"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:304
+#: desk/src/pages/ticket/TicketCustomer.vue:325
 msgid "Ticket closed successfully."
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketHeader.vue:219
+#: desk/src/components/ticket-agent/TicketHeader.vue:218
 msgid "Ticket deleted successfully."
 msgstr ""
 
@@ -5366,12 +5754,16 @@ msgstr ""
 msgid "Ticket does not exist."
 msgstr ""
 
+#: desk/src/components/ticket/TicketMergeModal.vue:192
+msgid "Ticket merged successfully."
+msgstr ""
+
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:341
 msgid "Ticket must be resolved with a feedback"
 msgstr ""
 
 #: desk/src/pages/ticket/TicketAgent.vue:33
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:62
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:63
 msgid "Ticket not found"
 msgstr ""
 
@@ -5379,7 +5771,7 @@ msgstr ""
 msgid "Ticket not found for the provided key."
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:149
+#: desk/src/pages/ticket/TicketCustomer.vue:164
 msgid "Ticket not found."
 msgstr ""
 
@@ -5397,13 +5789,17 @@ msgstr ""
 msgid "Ticket status"
 msgstr ""
 
+#: desk/src/components/ticket/TicketMergeModal.vue:189
+msgid "Ticket to merged with is required"
+msgstr ""
+
 #. Label of the ticket_type (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_ticket_type (Link) field in DocType 'HD Escalation Rule'
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 msgid "Ticket type"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:277
+#: desk/src/pages/ticket/TicketCustomer.vue:298
 msgid "Ticket updated successfully."
 msgstr ""
 
@@ -5416,9 +5812,9 @@ msgstr ""
 #: desk/src/components/ticket-agent/TicketHeader.vue:173
 #: desk/src/pages/SearchAgent.vue:351
 #: desk/src/pages/ticket/MobileTicketAgent.vue:418
-#: desk/src/pages/ticket/TicketCustomer.vue:333
+#: desk/src/pages/ticket/TicketCustomer.vue:354
 #: desk/src/pages/ticket/TicketNew.vue:296 desk/src/pages/ticket/Tickets.vue:6
-#: desk/src/pages/ticket/Tickets.vue:668 helpdesk/api/dashboard.py:154
+#: desk/src/pages/ticket/Tickets.vue:686 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
 msgid "Tickets"
 msgstr ""
@@ -5451,7 +5847,7 @@ msgstr ""
 msgid "Tickets can only be assigned to agents"
 msgstr ""
 
-#: desk/src/components/ticket/TicketMergeModal.vue:26
+#: desk/src/components/ticket/TicketMergeModal.vue:29
 msgid "Tickets must meet the following conditions:"
 msgstr ""
 
@@ -5459,15 +5855,15 @@ msgstr ""
 msgid "Tickets that are awaiting your response"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/Profile.vue:166
+#: desk/src/components/Settings/Preferences/components/LanguageTimezoneSetting.vue:22
 msgid "Timezone"
 msgstr ""
 
 #. Label of the title (Data) field in DocType 'HD Article'
 #. Label of the title (Data) field in DocType 'HD Saved Reply'
-#: desk/src/components/Settings/NewTeamModal.vue:21
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:101
-#: desk/src/components/Settings/Teams/RenameTeamModal.vue:6
+#: desk/src/components/Settings/NewTeamModal.vue:19
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:104
+#: desk/src/components/Settings/Teams/RenameTeamModal.vue:10
 #: desk/src/pages/knowledge-base/Article.vue:48
 #: desk/src/pages/knowledge-base/NewArticle.vue:39
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -5480,8 +5876,8 @@ msgstr "اللقب"
 msgid "Title Slug"
 msgstr ""
 
-#: desk/src/components/Settings/NewTeamModal.vue:50
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:422
+#: desk/src/components/Settings/NewTeamModal.vue:48
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:397
 msgid "Title is required"
 msgstr ""
 
@@ -5505,8 +5901,8 @@ msgstr "إلى تاريخ"
 msgid "To Date cannot be before From Date"
 msgstr "(الى تاريخ) لا يمكن ان يكون قبل (من تاريخ)"
 
-#: desk/src/components/Settings/Holiday/HolidayView.vue:102
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:166
+#: desk/src/components/Settings/Holiday/HolidayView.vue:92
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:157
 msgid "To date"
 msgstr ""
 
@@ -5518,12 +5914,12 @@ msgstr ""
 msgid "To know more about setting up email accounts, click"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:467
-#: desk/src/pages/dashboard/Dashboard.vue:469
+#: desk/src/pages/dashboard/Dashboard.vue:472
+#: desk/src/pages/dashboard/Dashboard.vue:474
 msgid "Today"
 msgstr "اليوم"
 
-#: desk/src/components/layouts/Sidebar.vue:254
+#: desk/src/components/layouts/Sidebar.vue:262
 msgid "Toggle theme"
 msgstr ""
 
@@ -5574,7 +5970,7 @@ msgid "Tuesday"
 msgstr "الثلاثاء"
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:72
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:10
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:4
 msgid "Twilio"
 msgstr ""
 
@@ -5589,7 +5985,7 @@ msgstr ""
 msgid "Type"
 msgstr "النوع"
 
-#: desk/src/pages/ticket/TicketCustomer.vue:56
+#: desk/src/pages/ticket/TicketCustomer.vue:69
 msgid "Type a message"
 msgstr ""
 
@@ -5606,7 +6002,7 @@ msgstr ""
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:208
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:199
 msgid "Unassignment Condition"
 msgstr ""
 
@@ -5618,7 +6014,16 @@ msgstr ""
 msgid "Unauthorized access."
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:450
+#. Option for the 'Category' (Select) field in DocType 'HD Agent Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
+msgid "Unavailable"
+msgstr ""
+
+#: desk/src/components/layouts/Sidebar.vue:587
+msgid "Understanding ticket view"
+msgstr ""
+
+#: desk/src/pages/ticket/Tickets.vue:468
 msgid "Unpin View"
 msgstr ""
 
@@ -5630,18 +6035,18 @@ msgstr "إلغاء النشر"
 msgid "Unsaved"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:163
-#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:459
+#: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:164
+#: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:449
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:101
-#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:75
-#: desk/src/components/Settings/Holiday/HolidayView.vue:201
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:238
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:300
-#: desk/src/components/Settings/SettingsModal.vue:71
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:364
-#: desk/src/components/Settings/Teams/NewTeam.vue:118
-#: desk/src/components/Settings/Telephony/ExotelSettings.vue:225
-#: desk/src/components/Settings/Telephony/TwilioSettings.vue:194
+#: desk/src/components/Settings/FieldDependency/FieldDependency.vue:66
+#: desk/src/components/Settings/Holiday/HolidayView.vue:190
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:217
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:279
+#: desk/src/components/Settings/SettingsModal.vue:72
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:354
+#: desk/src/components/Settings/Teams/NewTeam.vue:108
+#: desk/src/components/Settings/Telephony/ExotelSettings.vue:214
+#: desk/src/components/Settings/Telephony/TwilioSettings.vue:183
 msgid "Unsaved changes"
 msgstr ""
 
@@ -5649,7 +6054,7 @@ msgstr ""
 msgid "Untitled"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:27
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:12
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:47
 msgid "Update"
 msgstr "تحديث"
@@ -5667,11 +6072,12 @@ msgstr ""
 msgid "Upload"
 msgstr "تحميل"
 
-#: desk/src/components/Settings/Profile/Profile.vue:221
+#: desk/src/components/Settings/Profile/Profile.vue:198
 msgid "Upload Photo"
 msgstr ""
 
-#: desk/src/pages/desk/contact/ContactDialog.vue:22
+#: desk/src/pages/desk/contact/ContactDialog.vue:21
+#: desk/src/pages/desk/customer/CustomerDialog.vue:18
 msgid "Upload photo"
 msgstr ""
 
@@ -5716,11 +6122,15 @@ msgstr "المستخدمين"
 
 #. Label of the agreement_details_section (Section Break) field in DocType 'HD
 #. Service Level Agreement'
-#: desk/src/components/Settings/Holiday/HolidayView.vue:72
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:141
+#: desk/src/components/Settings/Holiday/HolidayView.vue:63
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:132
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Valid From"
 msgstr "صالح من تاريخ"
+
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:90
+msgid "Value"
+msgstr "القيمة"
 
 #. Label of the via_customer_portal (Check) field in DocType 'HD Ticket'
 #. Label of a field in the tickets Web Form
@@ -5729,11 +6139,11 @@ msgstr "صالح من تاريخ"
 msgid "Via Customer Portal"
 msgstr "عبر بوابة العملاء"
 
-#: desk/src/components/Settings/Teams/TeamEdit.vue:252
+#: desk/src/components/Settings/Teams/TeamEdit.vue:241
 msgid "View Assignment rule"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:634
+#: desk/src/pages/ticket/Tickets.vue:652
 msgid "View {0}"
 msgstr "عرض {0}"
 
@@ -5742,7 +6152,9 @@ msgstr "عرض {0}"
 msgid "Views"
 msgstr "مشاهدات"
 
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Violet"
 msgstr ""
@@ -5826,11 +6238,11 @@ msgstr "ساعات العمل"
 msgid "Write your article here..."
 msgstr ""
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:46
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:31
 msgid "Write your email signature here."
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:19
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:13
 msgid "Write your reply..."
 msgstr ""
 
@@ -5838,7 +6250,9 @@ msgstr ""
 msgid "Yearly"
 msgstr "سنويا"
 
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Yellow"
 msgstr "أصفر"
@@ -5847,7 +6261,7 @@ msgstr "أصفر"
 msgid "You are not allowed to view this dashboard data."
 msgstr ""
 
-#: helpdesk/utils.py:167
+#: helpdesk/utils.py:181
 msgid "You are not permitted to access this resource."
 msgstr ""
 
@@ -5867,7 +6281,7 @@ msgstr ""
 msgid "You are now online."
 msgstr ""
 
-#: desk/src/components/telephony/CallUI.vue:35
+#: desk/src/components/telephony/CallUI.vue:33
 msgid "You can change the default calling medium from the settings"
 msgstr ""
 
@@ -5899,7 +6313,7 @@ msgstr ""
 msgid "You must set one SLA as Default. Please check the Default SLA option."
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:404
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:394
 msgid "Your old conditions will be overwritten. Are you sure you want to save?"
 msgstr ""
 
@@ -5915,7 +6329,7 @@ msgstr ""
 msgid "assignees"
 msgstr "المكلفين"
 
-#: desk/src/pages/home/components/RecentFeedback.vue:467
+#: desk/src/pages/home/components/RecentFeedback.vue:477
 msgid "average"
 msgstr "معدل"
 
@@ -5923,7 +6337,11 @@ msgstr "معدل"
 msgid "back to email event list"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:633
+#: desk/src/components/HistoryBox.vue:12
+msgid "changes from"
+msgstr ""
+
+#: desk/src/pages/ticket/Tickets.vue:651
 msgid "created"
 msgstr "أنشأ"
 
@@ -5935,7 +6353,7 @@ msgstr ""
 msgid "days"
 msgstr "أيام"
 
-#: desk/src/pages/ticket/Tickets.vue:545
+#: desk/src/pages/ticket/Tickets.vue:563
 msgid "deleted"
 msgstr "حذف"
 
@@ -5943,7 +6361,7 @@ msgstr "حذف"
 msgid "emails/ comments"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:463
+#: desk/src/pages/home/components/RecentFeedback.vue:473
 msgid "excellent"
 msgstr "ممتاز"
 
@@ -5951,7 +6369,7 @@ msgstr "ممتاز"
 msgid "from this email onwards will be moved to new ticket."
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:465
+#: desk/src/pages/home/components/RecentFeedback.vue:475
 msgid "good"
 msgstr ""
 
@@ -5990,6 +6408,10 @@ msgstr "ساعات"
 msgid "in"
 msgstr "في"
 
+#: desk/src/components/ticket-agent/AssignTo.vue:416
+msgid "just now"
+msgstr "الآن فقط"
+
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "kanban"
@@ -6004,11 +6426,17 @@ msgstr "قائمة"
 msgid "mentioned you in ticket"
 msgstr ""
 
-#: desk/src/pages/home/components/RecentFeedback.vue:469
+#: desk/src/pages/home/components/RecentFeedback.vue:479
 msgid "poor"
 msgstr ""
 
+#: desk/src/pages/knowledge-base/Article.vue:197
+msgid "published by"
+msgstr ""
+
+#. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "purple"
 msgstr "أرجواني"
@@ -6026,8 +6454,24 @@ msgstr ""
 msgid "ticket"
 msgstr ""
 
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:68
+msgid "to enable this integration."
+msgstr ""
+
 #: desk/src/pages/ticket/MobileTicketAgent.vue:527
 msgid "viewed this"
+msgstr ""
+
+#: desk/src/pages/knowledge-base/Article.vue:85
+msgid "views"
+msgstr "المشاهدات"
+
+#: desk/src/components/ticket-agent/AssignTo.vue:573
+msgid "{0} is currently away."
+msgstr ""
+
+#: desk/src/components/ticket-agent/AssignTo.vue:572
+msgid "{0} is currently unavailable."
 msgstr ""
 
 #: desk/src/components/ListViewBuilder.vue:307
@@ -6046,11 +6490,19 @@ msgstr ""
 msgid "{0} reviews"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:492
+#: desk/src/pages/ticket/Tickets.vue:510
 msgid "{0} view is currently public. Changing it to private will hide it for all the users."
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:472
+#: desk/src/pages/ticket/Tickets.vue:490
 msgid "{0} view is currently visible in the sidebar. Hiding it will remove it from the sidebar."
+msgstr ""
+
+#: desk/src/components/ticket-agent/AssignTo.vue:417
+msgid "{0} · Last active {1}"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:156
+msgid "{} people reacted to your comment"
 msgstr ""
 
