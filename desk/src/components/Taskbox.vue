@@ -304,6 +304,7 @@ function processTaskUpdate(payload?: any) {
       normalizedAssignee = normalizeAssignee(rawAssignee);
     }
 
+    // Force Vue tracking engine to trigger via spreading into a brand new object instance
     localActivity.value = {
       ...localActivity.value,
       ...data,
@@ -334,6 +335,7 @@ function load(payload?: any) {
   processTaskUpdate(payload);
 }
 
+// Initialization Triggers
 emit("update", { ...localActivity.value });
 
 if (props.reloadTasks) {
