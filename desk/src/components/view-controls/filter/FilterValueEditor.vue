@@ -92,14 +92,14 @@
         v-else-if="isDate && operator === 'between'"
         :value="dateRangeValue"
         icon-left=""
-        @change="(v) => commitAndClose(splitRange(v))"
+        @change="handleDateRange"
       />
       <component
         v-else-if="isDate"
         :is="field.fieldtype === 'Date' ? DatePicker : DateTimePicker"
         :value="value"
         icon-left=""
-        @change="(v) => commitAndClose(v)"
+        @change="(date) => commitAndClose(date)"
       />
       <TextInput
         v-else
@@ -145,9 +145,8 @@ interface E {
 const props = withDefaults(defineProps<P>(), { filter: null });
 const emit = defineEmits<E>();
 
-const core = useFilter();
 const { getOperators, getDefaultOperator, getSelectOptions, timespanOptions } =
-  core;
+  useFilter();
 
 const operator = ref(props.filter?.operator || getDefaultOperator(props.field));
 const value = ref(props.filter?.value ?? defaultValueFor(operator.value));
@@ -219,19 +218,22 @@ const options = computed<Array<{ label: string; value: string }>>(() => {
     return [
       { label: __("Set"), value: "set" },
       { label: __("Not Set"), value: "not set" },
-    ].filter((o) => matches(o.label));
+    ].filter((option) => matches(option.label));
   }
-  if (isDate.value) return timespanOptions.filter((o) => matches(o.label));
+  if (isDate.value)
+    return timespanOptions.filter((option) => matches(option.label));
   if (isLink.value) return linkSearch.results.data || [];
   const values =
     props.field.fieldtype === "Check"
       ? ["Yes", "No"]
       : getSelectOptions(props.field.options);
-  return values.filter(matches).map((v) => ({ label: v, value: v }));
+  return values
+    .filter(matches)
+    .map((option) => ({ label: option, value: option }));
 });
 
 const dateRangeValue = computed(() =>
-  Array.isArray(value.value) ? value.value.join(",") : ""
+  Array.isArray(value.value) ? value.value : []
 );
 
 const linkSearch = useLinkSearch(linkDoctype(props.field));
@@ -245,14 +247,14 @@ function linkDoctype(field: FilterField): string {
   return field.fieldtype === "Link" ? field.options || "" : "";
 }
 
-function defaultValueFor(op: string): any {
-  return ["in", "not in"].includes(op) ? [] : "";
+function defaultValueFor(operatorName: string): any {
+  return ["in", "not in"].includes(operatorName) ? [] : "";
 }
 
-function plainText(v: any): string {
-  if (Array.isArray(v)) return v.join(", ");
-  if (typeof v === "string") return v.replaceAll("%", "");
-  return v == null ? "" : String(v);
+function plainText(rawValue: any): string {
+  if (Array.isArray(rawValue)) return rawValue.join(", ");
+  if (typeof rawValue === "string") return rawValue.replaceAll("%", "");
+  return rawValue == null ? "" : String(rawValue);
 }
 
 function isSelected(option: string): boolean {
@@ -267,35 +269,45 @@ function pickOption(option: string) {
     commitAndClose(option);
     return;
   }
-  const current = Array.isArray(value.value) ? [...value.value] : [];
-  const index = current.indexOf(option);
-  index === -1 ? current.push(option) : current.splice(index, 1);
-  value.value = current;
-  if (!current.length) {
+  const selectedValues = Array.isArray(value.value) ? [...value.value] : [];
+  const index = selectedValues.indexOf(option);
+  index === -1 ? selectedValues.push(option) : selectedValues.splice(index, 1);
+  value.value = selectedValues;
+  if (!selectedValues.length) {
     emit("clear");
     return;
   }
-  emit("apply", operator.value, [...current]);
+  emit("apply", operator.value, [...selectedValues]);
   search.value = "";
   focusSearch();
 }
 
-function applyValue(v: any) {
-  value.value = v;
-  emit("apply", operator.value, v);
+function applyValue(nextValue: any) {
+  value.value = nextValue;
+  emit("apply", operator.value, nextValue);
 }
 
 // A discrete pick (single list option, date, or range) fully sets the value, so
 // the filter is complete — apply it and return to the overview. Incremental
 // inputs (multi-select, typing, rating) keep using applyValue and stay put.
-function commitAndClose(v: any) {
-  applyValue(v);
+function commitAndClose(nextValue: any) {
+  applyValue(nextValue);
   emit("done");
 }
 
-function splitRange(v: any): string[] {
-  if (typeof v !== "string") return v;
-  const [start, end] = v.split(",");
+// The range picker emits an empty array when its selection is cleared
+function handleDateRange(emittedRange: any) {
+  const range = splitRange(emittedRange);
+  if (!Array.isArray(range) || !range[0] || !range[1]) {
+    emit("clear");
+    return;
+  }
+  commitAndClose(range);
+}
+
+function splitRange(rawRange: any): string[] {
+  if (typeof rawRange !== "string") return rawRange;
+  const [start, end] = rawRange.split(",");
   return [start, end];
 }
 
@@ -356,15 +368,15 @@ function onTextChange() {
 
 const debouncedTextApply = useDebounceFn(() => {
   if (!textValue.value) return;
-  const v = isMultiple.value
+  const nextValue = isMultiple.value
     ? textValue.value.split(",").map((part: string) => part.trim())
     : textValue.value;
-  applyValue(v);
+  applyValue(nextValue);
 }, 500);
 
-function hasValue(v: any): boolean {
-  if (Array.isArray(v)) return v.length > 0;
-  return v !== "" && v != null;
+function hasValue(candidate: any): boolean {
+  if (Array.isArray(candidate)) return candidate.length > 0;
+  return candidate !== "" && candidate != null;
 }
 
 watch(search, () => {
@@ -392,15 +404,31 @@ watch(operator, (newOperator, oldOperator) => {
     textValue.value = "";
     return;
   }
+  if (
+    isDate.value &&
+    dateValueKind(newOperator) !== dateValueKind(oldOperator)
+  ) {
+    value.value = defaultValueFor(newOperator);
+    textValue.value = "";
+    return;
+  }
   value.value = convertValue(value.value);
   textValue.value = plainText(value.value);
   if (hasValue(value.value)) emit("apply", newOperator, value.value);
 });
 
-function convertValue(v: any): any {
-  if (!isMultiple.value) return Array.isArray(v) ? v[0] || "" : plainText(v);
-  if (Array.isArray(v)) return v;
-  const single = plainText(v);
+// Date value shape per operator; a value can only carry across same-shape switches.
+function dateValueKind(operatorName: string): string {
+  if (operatorName === "timespan") return "timespan";
+  if (operatorName === "between") return "range";
+  return "scalar";
+}
+
+function convertValue(rawValue: any): any {
+  if (!isMultiple.value)
+    return Array.isArray(rawValue) ? rawValue[0] || "" : plainText(rawValue);
+  if (Array.isArray(rawValue)) return rawValue;
+  const single = plainText(rawValue);
   return single ? [single] : [];
 }
 
@@ -413,11 +441,14 @@ watch(
 );
 
 function cycleOperator(direction: number) {
-  const list = operators.value;
-  if (list.length < 2) return;
-  const currentIndex = list.findIndex((o) => o.value === operator.value);
-  const total = list.length;
-  operator.value = list[(currentIndex + direction + total) % total].value;
+  const operatorList = operators.value;
+  if (operatorList.length < 2) return;
+  const currentIndex = operatorList.findIndex(
+    (option) => option.value === operator.value
+  );
+  const total = operatorList.length;
+  operator.value =
+    operatorList[(currentIndex + direction + total) % total].value;
 }
 
 useEventListener(document, "keydown", (event: KeyboardEvent) => {
