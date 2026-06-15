@@ -120,18 +120,24 @@ class TestHDCustomer(IntegrationTestCase):
         member_names = [row.contact_name for row in customer.contacts]
         self.assertIn(contact, member_names)
 
-    def test_primary_contact_is_forced_to_manager(self) -> None:
+    def test_setting_primary_contact_makes_them_manager(self) -> None:
         customer = create_customer("Test Customer Primary Manager")
-        contact = create_contact("Primary", "primary-manager@example.com")
+        first = create_contact("First", "primary-mgr-1@example.com")
+        second = create_contact("Second", "primary-mgr-2@example.com")
 
-        # added as a regular customer, but it is the only (hence primary) contact
-        customer.add_contacts([contact["contact"]], "HD Customer")
+        # no primary yet, so neither contact is a manager
+        customer.add_contacts([first["contact"], second["contact"]], "HD Customer")
+        self.assertNotIn("HD Customer Manager", get_roles(second["user"]))
 
-        self.assertEqual(customer.primary_contact, contact["contact"])
+        # designating a primary promotes that contact to manager
+        customer.primary_contact = second["contact"]
+        customer.save()
+
         member = next(
-            row for row in customer.contacts if row.contact_name == contact["contact"]
+            row for row in customer.contacts if row.contact_name == second["contact"]
         )
         self.assertTrue(member.is_manager)
+        self.assertIn("HD Customer Manager", get_roles(second["user"]))
 
     def test_customer_roles_follow_is_manager(self) -> None:
         customer = create_customer("Test Customer Roles")

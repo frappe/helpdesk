@@ -48,9 +48,6 @@ class HDCustomer(Document):
     def validate_contacts(self):
         if not self.contacts:
             return
-        # default primary to the first contact if none is set yet
-        if not self.primary_contact:
-            self.primary_contact = self.contacts[0].contact_name
 
         contact_names = [contact.contact_name for contact in self.contacts]
         if len(contact_names) != len(set(contact_names)):
@@ -64,6 +61,7 @@ class HDCustomer(Document):
         self.handle_roles()
 
     def ensure_primary_contact_is_manager(self):
+        # the primary is optional, but whoever is set as primary is a manager
         if not self.contacts or not self.primary_contact:
             return
         for contact in self.contacts:
