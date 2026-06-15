@@ -3815,15 +3815,11 @@ msgstr ""
 msgid "Open help"
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/modals/ShortcutsModal.vue:102
-=======
 #: desk/src/components/Settings/EmailEdit.vue:37
 msgid "Open in Desk"
 msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:99
->>>>>>> c0af24a4 (chore: update POT file)
 msgid "Open reply box"
 msgstr ""
 
@@ -4962,10 +4958,6 @@ msgstr ""
 msgid "Service Level Name"
 msgstr ""
 
-<<<<<<< HEAD
-#: desk/src/components/ticket/SetContactPhoneModal.vue:5
-#: desk/src/components/ticket/SetContactPhoneModal.vue:8
-=======
 #: helpdesk/api/settings/email.py:14
 msgid "Service not supported"
 msgstr ""
@@ -4976,7 +4968,6 @@ msgstr ""
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:4
 #: desk/src/components/ticket/SetContactPhoneModal.vue:7
->>>>>>> c0af24a4 (chore: update POT file)
 msgid "Set Phone Number"
 msgstr ""
 
