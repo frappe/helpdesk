@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, nextTick } from "vue";
 import { Avatar, Button, Dropdown, Tooltip, call, toast } from "frappe-ui";
 import { dateTooltipFormat, dateFormat } from "@/utils";
 import { __ } from "@/translation";
@@ -134,11 +134,9 @@ const isUpdating = ref(false);
 const isConfirmingDelete = ref(false);
 const { getUser } = useUserStore();
 
-// CRITICAL FIX 2: Create a local reactive copy of the prop.
-// This forces Vue to re-render the component whenever these fields change.
 const localActivity = ref({ ...props.activity });
 
-// Keep local state perfectly synchronized if parent data fetches refresh
+// Keep local state synchronized if parent data fetches refresh
 watch(
   () => props.activity,
   (newVal) => {
@@ -202,8 +200,11 @@ async function changeStatus(newStatus: string) {
   isUpdating.value = true;
   const previousStatus = localActivity.value.status;
 
-  // Apply update to local reactive state immediately
-  localActivity.value.status = newStatus;
+  // Reactively replace the local object reference immediately
+  localActivity.value = {
+    ...localActivity.value,
+    status: newStatus,
+  };
 
   try {
     await call("helpdesk.helpdesk.doctype.hd_task.hd_task.update_task", {
@@ -211,16 +212,16 @@ async function changeStatus(newStatus: string) {
       status: newStatus,
     });
 
-    // Sync change back to original prop references if parent relies on it
-    if (props.activity) props.activity.status = newStatus;
-
     emit("status-change", { name: taskId, status: newStatus });
-    emit("update", { ...localActivity.value });
+    emit("update", { ...localActivity.value, _refresh: Date.now() });
 
+    await nextTick();
     if (props.reloadTasks) props.reloadTasks();
   } catch (e: any) {
-    localActivity.value.status = previousStatus;
-    if (props.activity) props.activity.status = previousStatus;
+    localActivity.value = {
+      ...localActivity.value,
+      status: previousStatus,
+    };
     toast.error(e?.message || __("Failed to update status"));
   } finally {
     isUpdating.value = false;
@@ -244,7 +245,9 @@ async function deleteTask() {
       task: taskId,
     });
     toast.success(__("Task deleted successfully"));
-    emit("update");
+    emit("update", { deletedId: taskId, _refresh: Date.now() });
+
+    await nextTick();
     if (props.reloadTasks) props.reloadTasks();
   } catch (e: any) {
     emit("update");
@@ -275,7 +278,7 @@ const actionMenuOptions = computed(() => [
     label: isConfirmingDelete.value ? __("Confirm Delete") : __("Delete"),
     icon: "trash-2",
     class: isConfirmingDelete.value
-      ? "text-red-600 font-medium bg-red-50 hover:bg-red-100"
+      ? "text-red-600 [&_svg]:text-red-600 font-medium bg-red-50 hover:bg-red-100 hover:text-red-600"
       : "text-ink-gray-7 hover:bg-surface-gray-1",
     onClick: (e: MouseEvent) => {
       if (!isConfirmingDelete.value) {
@@ -289,34 +292,38 @@ const actionMenuOptions = computed(() => [
   },
 ]);
 
-function handleReload(payload?: any) {
+function processTaskUpdate(payload?: any) {
   showModal.value = false;
   const data = payload?.message || payload;
 
   if (data && typeof data === "object") {
-    if (data.title !== undefined) localActivity.value.title = data.title;
-    if (data.due_date !== undefined)
-      localActivity.value.due_date = data.due_date;
-    if (data.priority !== undefined)
-      localActivity.value.priority = data.priority;
-    if (data.status !== undefined) localActivity.value.status = data.status;
-
+    // Structure adjustments for assignee
     const rawAssignee = data.assigned ?? data.assigned_to;
+    let normalizedAssignee = undefined;
     if (rawAssignee !== undefined) {
-      const normalized = normalizeAssignee(rawAssignee);
-      localActivity.value.assigned = normalized;
-      localActivity.value.assigned_to = normalized;
+      normalizedAssignee = normalizeAssignee(rawAssignee);
     }
 
-    // Sync back up into parent reference objects
-    Object.keys(localActivity.value).forEach((key) => {
-      if (props.activity && key in props.activity) {
-        props.activity[key] = localActivity.value[key];
-      }
-    });
+    localActivity.value = {
+      ...localActivity.value,
+      ...data,
+      ...(rawAssignee !== undefined && {
+        assigned: normalizedAssignee,
+        assigned_to: normalizedAssignee,
+      }),
+    };
   }
+}
 
-  emit("update", { ...localActivity.value });
+async function handleReload(payload?: any) {
+  processTaskUpdate(payload);
+
+  emit("update", {
+    ...localActivity.value,
+    _refresh: Date.now(),
+  });
+
+  await nextTick();
 
   if (props.reloadTasks) {
     props.reloadTasks();
@@ -324,25 +331,10 @@ function handleReload(payload?: any) {
 }
 
 function load(payload?: any) {
-  showModal.value = false;
-
-  const data = payload?.message || payload;
-
-  if (data && typeof data === "object") {
-    Object.keys(data).forEach((key) => {
-      if (key in props.activity) {
-        props.activity[key] = data[key];
-      }
-    });
-    if (data.assigned) props.activity.assigned = data.assigned;
-    if (data.title) props.activity.title = data.title;
-    if (data.due_date) props.activity.due_date = data.due_date;
-    if (data.priority) props.activity.priority = data.priority;
-    if (data.status) props.activity.status = data.status;
-  }
+  processTaskUpdate(payload);
 }
 
-emit("update");
+emit("update", { ...localActivity.value });
 
 if (props.reloadTasks) {
   props.reloadTasks();
