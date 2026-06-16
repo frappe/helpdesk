@@ -1137,12 +1137,15 @@ class TestHDTicket(IntegrationTestCase):
         days_threshold = 5
         eligible_status = "Replied"
 
-        previous_settings = frappe.db.get_value(
-            "HD Settings",
-            "HD Settings",
-            ["auto_close_tickets", "auto_close_status", "auto_close_after_days"],
-            as_dict=True,
-        )
+        settings_fields = [
+            "auto_close_tickets",
+            "auto_close_status",
+            "auto_close_after_days",
+        ]
+        previous_settings = {
+            field: frappe.db.get_single_value("HD Settings", field)
+            for field in settings_fields
+        }
         frappe.db.set_single_value(
             "HD Settings",
             {
