@@ -1346,6 +1346,11 @@ def close_tickets_after_n_days():
         "HD Settings", "HD Settings", ["auto_close_status", "auto_close_after_days"]
     )
 
+    # Compute the cutoff in the system timezone to match how communication_date is
+    # stored. Using the database's NOW() instead would select the wrong tickets when
+    # the DB server runs in a different timezone (e.g. UTC) than the Frappe system.
+    inactivity_cutoff = add_to_date(now_datetime(), days=-days_threshold)
+
     tickets_to_close = (
         frappe.db.sql(
             """
@@ -1353,14 +1358,14 @@ def close_tickets_after_n_days():
                 FROM `tabHD Ticket` t
                 INNER JOIN (
                     SELECT reference_name, MAX(communication_date) as last_communication_date
-                    FROM `tabCommunication` 
+                    FROM `tabCommunication`
                     WHERE reference_doctype = 'HD Ticket'
                     GROUP BY reference_name
                 ) latest_comm ON t.name = latest_comm.reference_name
                 WHERE t.status = %(status)s
-                AND latest_comm.last_communication_date < DATE_SUB(NOW(), INTERVAL %(days_threshold)s DAY)
+                AND latest_comm.last_communication_date < %(inactivity_cutoff)s
             """,
-            {"days_threshold": days_threshold, "status": status},
+            {"inactivity_cutoff": inactivity_cutoff, "status": status},
             pluck="name",
         )
         or []

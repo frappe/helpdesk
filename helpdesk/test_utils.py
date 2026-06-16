@@ -322,6 +322,22 @@ def add_comment(
     return comment
 
 
+def set_ticket_status_and_communication_date(ticket_name, status, communication_date):
+    """Force a ticket's status and the date of all its communications directly in the
+    database, bypassing controller side effects. Useful for testing scheduled jobs that
+    key off communication_date (auto close, SLA escalation, reminders)."""
+    frappe.db.set_value(
+        "HD Ticket", ticket_name, "status", status, update_modified=False
+    )
+    frappe.db.set_value(
+        "Communication",
+        {"reference_doctype": "HD Ticket", "reference_name": ticket_name},
+        "communication_date",
+        communication_date,
+        update_modified=False,
+    )
+
+
 def make_team(team_name, members=[], disabled=False):
     """Create an HD Team with optional members. A default agent is created if no members are provided."""
     if not members:
