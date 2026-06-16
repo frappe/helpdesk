@@ -13,6 +13,7 @@ from helpdesk.helpdesk.doctype.hd_ticket.api import (
     show_outside_hours_banner,
     split_ticket,
 )
+from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import close_tickets_after_n_days
 from helpdesk.test_utils import (
     add_comment,
     add_holiday,
@@ -22,6 +23,7 @@ from helpdesk.test_utils import (
     make_status,
     make_ticket,
     remove_holidays,
+    set_ticket_status_and_communication_date,
     upload_test_file,
 )
 
@@ -1126,6 +1128,61 @@ class TestHDTicket(IntegrationTestCase):
         )
         for file in files:
             frappe.delete_doc("File", file)
+
+    def test_auto_close_respects_inactivity_cutoff_boundary(self):
+        """`close_tickets_after_n_days` closes a ticket whose last communication is
+        older than the inactivity cutoff and keeps one whose last communication
+        falls within it. The cutoff is computed in the system timezone, so the
+        boundary holds regardless of the database server's timezone."""
+        days_threshold = 5
+        eligible_status = "Replied"
+
+        settings_fields = [
+            "auto_close_tickets",
+            "auto_close_status",
+            "auto_close_after_days",
+        ]
+        previous_settings = {
+            field: frappe.db.get_single_value("HD Settings", field)
+            for field in settings_fields
+        }
+        frappe.db.set_single_value(
+            "HD Settings",
+            {
+                "auto_close_tickets": 1,
+                "auto_close_status": eligible_status,
+                "auto_close_after_days": days_threshold,
+            },
+        )
+
+        cutoff = add_to_date(now_datetime(), days=-days_threshold)
+        just_past_cutoff = cutoff - timedelta(minutes=5)  # inactive -> should close
+        within_cutoff = cutoff + timedelta(minutes=5)  # still active -> should stay
+
+        stale_ticket = make_ticket()
+        fresh_ticket = make_ticket()
+        set_ticket_status_and_communication_date(
+            stale_ticket.name, eligible_status, just_past_cutoff
+        )
+        set_ticket_status_and_communication_date(
+            fresh_ticket.name, eligible_status, within_cutoff
+        )
+
+        try:
+            close_tickets_after_n_days()
+
+            self.assertEqual(
+                frappe.db.get_value("HD Ticket", stale_ticket.name, "status"),
+                "Closed",
+                "Ticket inactive past the cutoff should be auto closed",
+            )
+            self.assertEqual(
+                frappe.db.get_value("HD Ticket", fresh_ticket.name, "status"),
+                eligible_status,
+                "Ticket active within the cutoff should not be closed",
+            )
+        finally:
+            frappe.db.set_single_value("HD Settings", previous_settings)
 
     def tearDown(self):
         frappe.set_user("Administrator")
