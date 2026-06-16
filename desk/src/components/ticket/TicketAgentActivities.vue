@@ -39,13 +39,14 @@
         <div v-if="activity.type === 'task'" class="w-full px-6 md:px-5">
           <Taskbox
             :activity="activity"
+            :i="taskActivities.indexOf(activity)"
+            :tasks="taskActivities"
             :reload-tasks="() => emit('update')"
             @update="() => emit('update')"
             class="w-full"
           />
         </div>
 
-        <!-- Non-task: timeline layout -->
         <div
           v-else
           class="w-full px-6 md:px-5 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
@@ -226,6 +227,11 @@ const activities = computed(() => {
   }
   return props.activities;
 });
+
+// Separate computed for task-only activities to get correct index
+const taskActivities = computed(() =>
+  activities.value.filter((activity) => activity.type === "task")
+);
 
 const emptyText = computed(() => {
   if (props.title === __("Emails")) return "No email communications";

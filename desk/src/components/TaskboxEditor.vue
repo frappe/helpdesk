@@ -10,6 +10,7 @@
 
     <template #body-content>
       <div class="flex flex-col gap-5 mt-2">
+        <!-- Title Input -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
             <div class="text-sm text-ink-gray-5 flex items-center gap-1">
@@ -45,6 +46,7 @@
           </p>
         </div>
 
+        <!-- Description Editor -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
             <div class="text-sm text-ink-gray-5 flex items-center gap-1">
@@ -61,17 +63,13 @@
               {{ getDescriptionLength }}/4000
             </span>
           </div>
-          <TextEditor
-            :editor-class="`!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border bg-surface-gray-2 placeholder-ink-gray-4 hover:shadow-sm focus:bg-surface-white focus:shadow-sm focus:ring-0 focus-visible:ring-2 text-ink-gray-8 transition-colors -mt-0.5 ${
-              errors.description || errors.descriptionLength
-                ? 'border-red-500 focus-visible:ring-red-500'
-                : 'border-[--surface-gray-2] hover:border-outline-gray-modals focus:border-outline-gray-4 focus-visible:ring-outline-gray-3'
-            }`"
-            :bubble-menu="false"
-            :fixed-menu="true"
-            :content="form.description"
+          <CompactEditor
+            v-model="form.description"
             :placeholder="__('Enter task description...')"
-            @change="(val) => (form.description = val)"
+            :class="{
+              'border-red-500 ring-1 ring-red-500':
+                errors.description || errors.descriptionLength,
+            }"
           />
           <p v-if="errors.description" class="text-xs text-red-500 font-medium">
             {{ __("Description is required") }}
@@ -84,17 +82,27 @@
           </p>
         </div>
 
+        <!-- Metadata Properties Grid Layout -->
         <div class="grid grid-cols-2 gap-4">
+          <!-- Priority Selector -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __("Priority") }}</div>
-            <FormControl
-              type="select"
-              variant="subtle"
-              :options="priorityOptions"
-              v-model="form.priority"
-            />
+            <div class="relative flex items-center">
+              <TaskPriorityIcon
+                :priority="form.priority"
+                class="absolute left-3 z-10 h-4 w-4 pointer-events-none"
+              />
+              <FormControl
+                type="select"
+                variant="subtle"
+                class="w-full !pl-9"
+                :options="priorityOptions"
+                v-model="form.priority"
+              />
+            </div>
           </div>
 
+          <!-- Assignee Selector -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __("Assigned To") }}</div>
             <Autocomplete
@@ -141,6 +149,7 @@
             </Autocomplete>
           </div>
 
+          <!-- Due Date Selector -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __("Due Date") }}</div>
             <div class="w-full date-picker-wrapper">
@@ -152,14 +161,22 @@
             </div>
           </div>
 
+          <!-- Status Selector -->
           <div class="space-y-1.5">
             <div class="text-sm text-ink-gray-5">{{ __("Status") }}</div>
-            <FormControl
-              type="select"
-              variant="subtle"
-              :options="statusOptions"
-              v-model="form.status"
-            />
+            <div class="relative flex items-center">
+              <TaskStatusIcon
+                :status="form.status || 'Todo'"
+                class="absolute left-3 z-10 h-4 w-4 pointer-events-none"
+              />
+              <FormControl
+                type="select"
+                variant="subtle"
+                class="w-full !pl-9"
+                :options="statusOptions"
+                v-model="form.status"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -178,6 +195,7 @@
     </template>
   </Dialog>
 </template>
+
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
 import {
@@ -188,7 +206,6 @@ import {
   Dialog,
   FormControl,
   FeatherIcon,
-  TextEditor,
   TextInput,
   call,
   toast,
@@ -196,6 +213,7 @@ import {
 import { __ } from "@/translation";
 import { isContentEmpty } from "@/utils";
 import { useUserStore } from "@/stores/user";
+import CompactEditor from "@/components/CompactEditor.vue";
 import TaskStatusIcon from "@/components/icons/TaskStatusIcon.vue";
 import TaskPriorityIcon from "@/components/icons/TaskPriorityIcon.vue";
 
@@ -211,7 +229,7 @@ const emit = defineEmits(["update:modelValue", "submit"]);
 // --- Store ---
 const { getUser, agentOptions } = useUserStore();
 
-// --- State ---
+// --- State Layout ---
 const show = computed({
   get: () => props.modelValue,
   set: (value) => emit("update:modelValue", value),
@@ -314,7 +332,10 @@ watch(
 );
 
 watch(show, async (val) => {
-  if (!val) return;
+  if (!val) {
+    activeTask.value = null;
+    return;
+  }
 
   errors.value.title = false;
   errors.value.titleLength = false;
@@ -415,11 +436,10 @@ async function handleSubmit() {
 
   if (loading.value) return;
   loading.value = true;
+  const targetAssignee = resolveAssigned() || null;
 
   try {
     let result: any;
-    const dbDate = form.value.due_date || null;
-    const assignedTo = resolveAssigned();
 
     if (isEditing.value) {
       const taskName = props.task?.name || activeTask.value?.name;
@@ -431,12 +451,24 @@ async function handleSubmit() {
           description: isContentEmpty(form.value.description)
             ? null
             : form.value.description,
-          due_date: dbDate,
+          due_date: form.value.due_date || null,
           status: form.value.status,
           priority: form.value.priority,
-          assigned: assignedTo,
+          assigned: targetAssignee, // FIX 2: Replaced broken undefined variable layout reference
         }
       );
+
+      if (!result || typeof result !== "object" || !result.name) {
+        result = {
+          name: taskName,
+          title: form.value.title,
+          description: form.value.description,
+          due_date: form.value.due_date,
+          status: form.value.status,
+          priority: form.value.priority,
+          assigned: targetAssignee,
+        };
+      }
       toast.success(__("Task updated"));
     } else {
       const ticketId = String(props.ticketId || "").trim();
@@ -453,10 +485,10 @@ async function handleSubmit() {
           description: isContentEmpty(form.value.description)
             ? null
             : form.value.description,
-          due_date: dbDate,
+          due_date: form.value.due_date || null,
           status: form.value.status,
           priority: form.value.priority,
-          assigned: assignedTo,
+          assigned: targetAssignee,
         }
       );
       toast.success(__("Task created"));

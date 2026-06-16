@@ -63,17 +63,13 @@
               {{ getDescriptionLength }}/4000
             </span>
           </div>
-          <TextEditor
-            :editor-class="`!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border bg-surface-gray-2 placeholder-ink-gray-4 hover:shadow-sm focus:bg-surface-white focus:shadow-sm focus:ring-0 focus-visible:ring-2 text-ink-gray-8 transition-colors -mt-0.5 ${
-              errors.description || errors.descriptionLength
-                ? 'border-red-500 focus-visible:ring-red-500'
-                : 'border-[--surface-gray-2] hover:border-outline-gray-modals focus:border-outline-gray-4 focus-visible:ring-outline-gray-3'
-            }`"
-            :bubble-menu="false"
-            :fixed-menu="true"
-            :content="form.description"
+          <CompactEditor
+            v-model="form.description"
             :placeholder="__('Enter task description...')"
-            @change="(val) => (form.description = val)"
+            :class="{
+              'border-red-500 ring-1 ring-red-500':
+                errors.description || errors.descriptionLength,
+            }"
           />
           <p v-if="errors.description" class="text-xs text-red-500 font-medium">
             {{ __("Description is required") }}
@@ -221,7 +217,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
-import { storeToRefs } from "pinia"; // Added: Essential for keeping store arrays reactive
+import { storeToRefs } from "pinia";
 import {
   Autocomplete,
   Avatar,
@@ -230,7 +226,6 @@ import {
   Dialog,
   FormControl,
   FeatherIcon,
-  TextEditor,
   TextInput,
   call,
   toast,
@@ -238,6 +233,7 @@ import {
 import { __ } from "@/translation";
 import { isContentEmpty } from "@/utils";
 import { useUserStore } from "@/stores/user";
+import CompactEditor from "@/components/CompactEditor.vue";
 
 // ─── Props & Emits
 const props = defineProps({
@@ -313,7 +309,6 @@ watch(
 // ─── Assignee
 const normalizedAgentOptions = computed(() =>
   (agentOptions.value || []).map((agent) => ({
-    // Fixed: Added .value to match the ref mapping
     label: agent.label || agent.title || agent.value || "",
     value: agent.value,
     image: agent.image,
