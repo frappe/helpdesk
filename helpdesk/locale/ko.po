@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-05-24 10:57+0000\n"
-"PO-Revision-Date: 2026-05-27 10:32\n"
+"POT-Creation-Date: 2026-05-31 11:07+0000\n"
+"PO-Revision-Date: 2026-06-14 17:16\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Korean\n"
 "MIME-Version: 1.0\n"
@@ -186,7 +186,7 @@ msgstr ""
 #. Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add Weekly Holidays"
-msgstr ""
+msgstr "주간 휴일 추가"
 
 #: desk/src/components/layouts/Sidebar.vue:500
 msgid "Add a comment on a ticket"
@@ -240,7 +240,7 @@ msgstr ""
 #. Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Add to Holidays"
-msgstr ""
+msgstr "휴일에 추가"
 
 #: desk/src/components/Settings/Agents.vue:4
 msgid "Add, manage agents and assign roles to them."
@@ -249,7 +249,7 @@ msgstr ""
 #. Label of the about (Code) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Additional Information"
-msgstr ""
+msgstr "추가 정보"
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -283,7 +283,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Agent"
-msgstr ""
+msgstr "대리인"
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -295,6 +295,7 @@ msgid "Agent Dashboard"
 msgstr ""
 
 #. Name of a role
+#: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
@@ -457,7 +458,7 @@ msgstr ""
 msgid "Are you sure you want to delete this ticket? This is an irreversible action and cannot be undone."
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:488
+#: desk/src/pages/ticket/Tickets.vue:523
 msgid "Are you sure you want to delete this view?"
 msgstr ""
 
@@ -473,8 +474,8 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:103
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:77
 #: desk/src/components/Settings/Holiday/HolidayView.vue:203
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:243
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:310
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:239
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:301
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:365
 #: desk/src/components/Settings/Teams/NewTeam.vue:119
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:226
@@ -589,7 +590,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:75
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Assignment Conditions"
-msgstr ""
+msgstr "배정 조건"
 
 #. Label of the assignment_rule (Link) field in DocType 'HD Team'
 #. Label of a Link in the Helpdesk Workspace
@@ -649,7 +650,7 @@ msgstr ""
 msgid "At least one feedback option must be enabled for rating {0}"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:450
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:443
 msgid "At least one team is required"
 msgstr ""
 
@@ -724,7 +725,7 @@ msgstr ""
 #. Label of the avg_response_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Average Response Time"
-msgstr ""
+msgstr "평균 응답 시간"
 
 #: desk/src/pages/home/Home.vue:305
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:5
@@ -820,7 +821,7 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Black"
-msgstr ""
+msgstr "검은색"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -837,13 +838,34 @@ msgstr ""
 msgid "Branding"
 msgstr ""
 
+#: desk/src/components/ListViewBuilder.vue:270
+msgid "Bulk Operation Failed"
+msgstr ""
+
+#: desk/src/components/ListViewBuilder.vue:273
+msgid "Bulk Operation Successful"
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:5
+#: desk/src/pages/ticket/Tickets.vue:110
+msgid "Bulk Reply"
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:111
+msgid "Bulk reply sent successfully to 1 ticket."
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:112
+msgid "Bulk reply sent successfully to {0} tickets."
+msgstr ""
+
 #: desk/src/components/Settings/Holiday/Holidays.vue:3
 msgid "Business Holidays"
 msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:210
 msgid "Busy"
-msgstr ""
+msgstr "바쁘다"
 
 #. Label of the button_section (Section Break) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -856,7 +878,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogDetailModal.vue:8
 msgid "Call Details"
-msgstr ""
+msgstr "통화 내역"
 
 #: desk/src/components/layouts/Sidebar.vue:280
 msgid "Call Logs"
@@ -864,7 +886,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:81
 msgid "Call Received By"
-msgstr ""
+msgstr "전화를 받은 사람"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:69
 msgid "Call duration in seconds"
@@ -890,7 +912,7 @@ msgstr ""
 msgid "Can work on tickets, create custom views and manage private views."
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:651 desk/src/pages/home/Home.vue:44
+#: desk/src/components/ListViewBuilder.vue:709 desk/src/pages/home/Home.vue:44
 msgid "Cancel"
 msgstr ""
 
@@ -900,6 +922,10 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:214
 msgid "Canceled"
+msgstr ""
+
+#: helpdesk/integrations/erpnext/api.py:46
+msgid "Cannot Sync Customers"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:526
@@ -920,6 +946,10 @@ msgstr ""
 
 #: helpdesk/api/knowledge_base.py:128
 msgid "Cannot merge General category"
+msgstr ""
+
+#: helpdesk/integrations/erpnext/utils.py:95
+msgid "Cannot rename: an unrelated {0} '{1}' already exists on the other side. Resolve the conflict manually first."
 msgstr ""
 
 #. Label of the category (Link) field in DocType 'HD Article'
@@ -1061,7 +1091,7 @@ msgstr ""
 #. Label of the clear_table (Button) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Clear Table"
-msgstr ""
+msgstr "테이블 지우기"
 
 #: desk/src/pages/SearchAgent.vue:86
 msgid "Clear all filters"
@@ -1194,11 +1224,11 @@ msgstr ""
 #: desk/src/pages/knowledge-base/NewArticle.vue:147
 #: desk/src/pages/ticket/MobileTicketAgent.vue:156
 #: desk/src/pages/ticket/TicketCustomer.vue:296
-#: desk/src/pages/ticket/Tickets.vue:375 desk/src/pages/ticket/Tickets.vue:497
+#: desk/src/pages/ticket/Tickets.vue:410 desk/src/pages/ticket/Tickets.vue:532
 msgid "Confirm"
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:635
+#: desk/src/components/ListViewBuilder.vue:693
 msgid "Confirm Changes"
 msgstr ""
 
@@ -1228,7 +1258,7 @@ msgstr ""
 #. Label of the contact_html (HTML) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Contact HTML"
-msgstr ""
+msgstr "HTML 문의하기"
 
 #: desk/src/components/desk/global/NewContactDialog.vue:185
 msgid "Contact created successfully."
@@ -1272,7 +1302,7 @@ msgstr ""
 msgid "Copy ticket id"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:668
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:669
 msgid "Could not an email due to: {0}"
 msgstr ""
 
@@ -1280,7 +1310,7 @@ msgstr ""
 msgid "Could not find the `name` column in tabHD Ticket"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:829
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:830
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr ""
 
@@ -1305,9 +1335,9 @@ msgstr ""
 
 #: desk/src/components/desk/global/NewContactDialog.vue:3
 msgid "Create New Contact"
-msgstr ""
+msgstr "새 연락처 만들기"
 
-#: desk/src/pages/ticket/Tickets.vue:344 desk/src/pages/ticket/Tickets.vue:348
+#: desk/src/pages/ticket/Tickets.vue:379 desk/src/pages/ticket/Tickets.vue:383
 msgid "Create View"
 msgstr ""
 
@@ -1361,12 +1391,12 @@ msgstr ""
 #: desk/src/pages/desk/contact/ContactDialog.vue:59
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Customer"
-msgstr ""
+msgstr "고객"
 
 #. Label of the customer_name (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Customer Name"
-msgstr ""
+msgstr "고객 이름"
 
 #: desk/src/components/desk/global/NewCustomerDialog.vue:65
 msgid "Customer created successfully."
@@ -1415,7 +1445,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentSchedule.vue:38
 msgid "Days"
-msgstr ""
+msgstr "날"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:53
 msgid "Default Inbox"
@@ -1428,7 +1458,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 msgid "Default Priority"
-msgstr ""
+msgstr "기본 우선순위"
 
 #. Label of the default_sla (Check) field in DocType 'HD Service Level
 #. Agreement'
@@ -1450,7 +1480,7 @@ msgstr ""
 msgid "Default Ticket Status"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:301 desk/src/pages/ticket/Tickets.vue:394
+#: desk/src/pages/ticket/Tickets.vue:336 desk/src/pages/ticket/Tickets.vue:429
 msgid "Default Views"
 msgstr ""
 
@@ -1500,11 +1530,11 @@ msgstr ""
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:176
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:195
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:204
-#: desk/src/pages/ticket/Tickets.vue:481
+#: desk/src/pages/ticket/Tickets.vue:516
 msgid "Delete"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:477
+#: desk/src/pages/ticket/Tickets.vue:512
 msgid "Delete View"
 msgstr ""
 
@@ -1516,7 +1546,7 @@ msgstr ""
 msgid "Delete category?"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:486
+#: desk/src/pages/ticket/Tickets.vue:521
 msgid "Delete {0}"
 msgstr ""
 
@@ -1602,6 +1632,7 @@ msgstr ""
 msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
 msgstr ""
 
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:30
 #: desk/src/pages/knowledge-base/NewArticle.vue:27
 msgid "Discard"
 msgstr ""
@@ -1672,7 +1703,7 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:259
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:61
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:102
-#: desk/src/pages/ticket/Tickets.vue:398
+#: desk/src/pages/ticket/Tickets.vue:433
 msgid "Duplicate"
 msgstr ""
 
@@ -1701,13 +1732,43 @@ msgstr ""
 msgid "Duration is required"
 msgstr ""
 
+#. Label of the erpnext_customer (Data) field in DocType 'HD Customer'
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
+msgid "ERPNext Customer"
+msgstr ""
+
+#. Name of a DocType
+#: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.json
+msgid "ERPNext HD Settings"
+msgstr ""
+
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:6
+msgid "ERPNext Integration"
+msgstr ""
+
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:77
+msgid "ERPNext Integration is disabled"
+msgstr ""
+
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:75
+msgid "ERPNext Integration is enabled"
+msgstr ""
+
+#: helpdesk/integrations/erpnext/api.py:46
+msgid "ERPNext integration is not enabled"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.py:19
+msgid "ERPNext is not installed on your site. Please install ERPNext to enable this setting."
+msgstr ""
+
 #: desk/src/components/Settings/InviteAgents.vue:4
 msgid "Easily invite new agents, managers, or admins."
 msgstr ""
 
 #: desk/src/pages/home/Home.vue:36
 #: desk/src/pages/knowledge-base/Article.vue:624
-#: desk/src/pages/ticket/Tickets.vue:466
+#: desk/src/pages/ticket/Tickets.vue:501
 msgid "Edit"
 msgstr ""
 
@@ -1790,7 +1851,7 @@ msgstr ""
 msgid "Email account updated successfully"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:221
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:217
 msgid "Email settings updated successfully."
 msgstr ""
 
@@ -1818,6 +1879,10 @@ msgstr ""
 msgid "Emoji"
 msgstr ""
 
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:11
+msgid "Enable ERPNext Integration"
+msgstr ""
+
 #. Label of the enable_comment_reactions (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:23
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -1829,6 +1894,7 @@ msgstr ""
 msgid "Enable feedback for Customer Portal"
 msgstr ""
 
+#. Label of the enabled (Check) field in DocType 'ERPNext HD Settings'
 #. Label of the is_enabled (Check) field in DocType 'HD Action'
 #. Label of the is_enabled (Check) field in DocType 'HD Escalation Rule'
 #. Label of the enabled (Check) field in DocType 'HD Form Script'
@@ -1854,6 +1920,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamEdit.vue:22
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:35
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:34
+#: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 #: helpdesk/helpdesk/doctype/hd_escalation_rule/hd_escalation_rule.json
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -1872,7 +1939,7 @@ msgstr ""
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "End Time"
-msgstr ""
+msgstr "종료 시간"
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:22
 msgid "Enter a name for this HD Service Holiday List."
@@ -1933,7 +2000,7 @@ msgid "Explore customer portal"
 msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:2
-#: desk/src/pages/ticket/Tickets.vue:101
+#: desk/src/pages/ticket/Tickets.vue:118
 msgid "Export"
 msgstr ""
 
@@ -1952,8 +2019,8 @@ msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: desk/src/pages/call-logs/CallLogModal.vue:211
-#: desk/src/pages/ticket/Tickets.vue:188 desk/src/pages/ticket/Tickets.vue:201
-#: desk/src/pages/ticket/Tickets.vue:232
+#: desk/src/pages/ticket/Tickets.vue:205 desk/src/pages/ticket/Tickets.vue:218
+#: desk/src/pages/ticket/Tickets.vue:249
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
 msgstr ""
@@ -2120,12 +2187,12 @@ msgstr ""
 #. Label of the first_responded_on (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Responded On"
-msgstr ""
+msgstr "최초 응답일"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Response Due"
-msgstr ""
+msgstr "첫 번째 응답 기한"
 
 #. Label of the first_response_failed_by (Duration) field in DocType 'HD
 #. Ticket'
@@ -2139,7 +2206,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Response Time"
-msgstr ""
+msgstr "최초 응답 시간"
 
 #. Name of a report
 #: helpdesk/helpdesk/report/first_response_time_for_tickets/first_response_time_for_tickets.json
@@ -2189,10 +2256,10 @@ msgid "From is required"
 msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
-#: desk/src/pages/ticket/Tickets.vue:195 desk/src/pages/ticket/Tickets.vue:226
+#: desk/src/pages/ticket/Tickets.vue:212 desk/src/pages/ticket/Tickets.vue:243
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Fulfilled"
-msgstr ""
+msgstr "성취됨"
 
 #: desk/src/components/Settings/General/General.vue:6
 #: desk/src/components/layouts/Sidebar.vue:521
@@ -2203,7 +2270,7 @@ msgstr ""
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "General Settings"
-msgstr ""
+msgstr "일반 설정"
 
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:40
 msgid "General category can't be deleted"
@@ -2222,7 +2289,7 @@ msgstr ""
 #: desk/src/components/SavedRepliesSelectorModal.vue:174
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:342
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:376
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:230
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:221
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Global"
 msgstr ""
@@ -2475,7 +2542,7 @@ msgstr ""
 msgid "Headings Weight"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:129
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:120
 msgid "Hello {{ contact }}, \\n\\nWe are sorry for the inconvenience, we will get back to you soon. \\n\\nRegards, \\n{{ full_name }}"
 msgstr ""
 
@@ -2522,30 +2589,30 @@ msgstr ""
 msgid "Hide from customer"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:428
+#: desk/src/pages/ticket/Tickets.vue:463
 msgid "Hide from sidebar"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:436
+#: desk/src/pages/ticket/Tickets.vue:471
 msgid "Hide view from sidebar"
 msgstr ""
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Hold"
-msgstr ""
+msgstr "잡고 있다"
 
 #. Label of the holiday_list (Link) field in DocType 'HD Service Level
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Holiday List"
-msgstr ""
+msgstr "휴일 목록"
 
 #. Label of the holiday_list_name (Data) field in DocType 'HD Service Holiday
 #. List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Holiday List Name"
-msgstr ""
+msgstr "휴일 목록 이름"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:368
 msgid "Holiday list created successfully."
@@ -2570,7 +2637,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayView.vue:183
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Holidays"
-msgstr ""
+msgstr "휴가"
 
 #: desk/src/pages/home/Home.vue:5
 msgid "Home"
@@ -2681,7 +2748,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:212
 msgid "Initiated"
-msgstr ""
+msgstr "시작됨"
 
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2782,10 +2849,6 @@ msgstr ""
 #. Label of the setup_complete (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Is setup complete"
-msgstr ""
-
-#: desk/src/components/ListViewBuilder.vue:265
-msgid "Item(s) deleted successfully."
 msgstr ""
 
 #: desk/src/components/command-palette/CP.vue:114
@@ -2947,7 +3010,7 @@ msgstr ""
 #. Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Link Options"
-msgstr ""
+msgstr "링크 옵션"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:63
 msgid "Link to a customer"
@@ -2959,16 +3022,16 @@ msgstr ""
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #. Label of the list_tab (Tab Break) field in DocType 'HD View'
-#: desk/src/components/ListViewBuilder.vue:730
-#: desk/src/components/ListViewBuilder.vue:772
-#: desk/src/pages/ticket/Tickets.vue:570 desk/src/pages/ticket/Tickets.vue:584
-#: desk/src/pages/ticket/Tickets.vue:614
+#: desk/src/components/ListViewBuilder.vue:788
+#: desk/src/components/ListViewBuilder.vue:830
+#: desk/src/pages/ticket/Tickets.vue:605 desk/src/pages/ticket/Tickets.vue:619
+#: desk/src/pages/ticket/Tickets.vue:649
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:304
+#: desk/src/pages/ticket/Tickets.vue:339
 msgid "List View"
 msgstr ""
 
@@ -3007,7 +3070,7 @@ msgstr ""
 #: desk/src/components/Settings/General/components/Branding.vue:15
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Logo"
-msgstr ""
+msgstr "심벌 마크"
 
 #. Description of the 'Integer value' (Int) field in DocType 'HD Ticket
 #. Priority'
@@ -3015,11 +3078,11 @@ msgstr ""
 msgid "Lower the Integer value, higher is the priority of the issue"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:448
+#: desk/src/pages/ticket/Tickets.vue:483
 msgid "Make Private"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:448
+#: desk/src/pages/ticket/Tickets.vue:483
 msgid "Make Public"
 msgstr ""
 
@@ -3031,7 +3094,7 @@ msgstr ""
 msgid "Make feedback mandatory"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:456
+#: desk/src/pages/ticket/Tickets.vue:491
 msgid "Make view private"
 msgstr ""
 
@@ -3079,7 +3142,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:154
 msgid "Merge"
-msgstr ""
+msgstr "병합"
 
 #: desk/src/components/ticket-agent/TicketHeader.vue:256
 #: desk/src/components/ticket/TicketAgentSidebar.vue:18
@@ -3270,13 +3333,13 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:216
 msgid "No Answer"
-msgstr ""
+msgstr "답변 없음"
 
-#: desk/src/components/ListViewBuilder.vue:287
+#: desk/src/components/ListViewBuilder.vue:345
 msgid "No Data Found"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:492
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:496
 msgid "No Email Account found for {0}"
 msgstr ""
 
@@ -3336,7 +3399,7 @@ msgstr ""
 msgid "No contacts found for the applied filters. Try adjusting or clearing your filters."
 msgstr ""
 
-#: desk/src/pages/desk/customer/Customers.vue:90
+#: desk/src/pages/desk/customer/Customers.vue:92
 msgid "No customers found for the applied filters. Try adjusting or clearing your filters."
 msgstr ""
 
@@ -3388,20 +3451,24 @@ msgstr ""
 msgid "No saved replies found"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:163
+#: desk/src/pages/ticket/Tickets.vue:180
 msgid "No tickets found"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:173
+#: desk/src/pages/ticket/Tickets.vue:190
 msgid "No tickets found for the applied filters. Try adjusting or clearing your filters."
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:169
+#: desk/src/pages/ticket/Tickets.vue:186
 msgid "No tickets found for this view. Try adjusting your filters or creating a new view."
 msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:98
 msgid "No tickets found to preview."
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:90
+msgid "No tickets selected"
 msgstr ""
 
 #: helpdesk/utils.py:168
@@ -3421,7 +3488,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:270
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:363
 msgid "Not Specified"
-msgstr ""
+msgstr "명시되지 않음"
 
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -3445,7 +3512,7 @@ msgstr ""
 #. Label of the on_hold_since (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "On Hold Since"
-msgstr ""
+msgstr "보류 중"
 
 #. Label of the action (Code) field in DocType 'HD Action'
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
@@ -3505,12 +3572,12 @@ msgstr ""
 #. Label of the opening_date (Date) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Opening Date"
-msgstr ""
+msgstr "개장일"
 
 #. Label of the opening_time (Time) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Opening Time"
-msgstr ""
+msgstr "영업시간"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -3526,7 +3593,7 @@ msgstr ""
 #. Label of the order_by (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Order By"
-msgstr ""
+msgstr "정렬 기준"
 
 #: desk/src/pages/dashboard/Dashboard.vue:255
 msgid "Organization Dashboard"
@@ -3550,7 +3617,7 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:102
 msgid "Owner"
-msgstr ""
+msgstr "소유자"
 
 #: desk/src/pages/InvalidPage.vue:11
 msgid "Page not found"
@@ -3591,11 +3658,11 @@ msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
-#: desk/src/pages/ticket/Tickets.vue:220
+#: desk/src/pages/ticket/Tickets.vue:237
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Paused"
-msgstr ""
+msgstr "일시 중지됨"
 
 #: desk/src/pages/home/components/PendingTickets.vue:222
 msgid "Pending"
@@ -3635,7 +3702,7 @@ msgstr ""
 #: desk/src/components/SavedRepliesSelectorModal.vue:164
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:328
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:368
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:220
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:211
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Personal"
 msgstr ""
@@ -3657,7 +3724,7 @@ msgstr ""
 msgid "Pick an option"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:415
+#: desk/src/pages/ticket/Tickets.vue:450
 msgid "Pin View"
 msgstr ""
 
@@ -3720,7 +3787,7 @@ msgstr ""
 msgid "Please fill all required fields for Twilio"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:333
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:324
 msgid "Please fill all the required fields"
 msgstr ""
 
@@ -3732,7 +3799,7 @@ msgstr ""
 msgid "Please provide saved_reply_id"
 msgstr ""
 
-#: desk/src/components/Settings/General/General.vue:240
+#: desk/src/components/Settings/General/General.vue:242
 msgid "Please select at least one restriction option for teams in the settings."
 msgstr ""
 
@@ -3754,7 +3821,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Post Description Key"
-msgstr ""
+msgstr "게시물 설명 키"
 
 #. Label of the post_route_key_list (Data) field in DocType 'HD Support Search
 #. Source'
@@ -3771,7 +3838,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Post Title Key"
-msgstr ""
+msgstr "게시물 제목 키"
 
 #. Label of the prefer_knowledge_base (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:10
@@ -3801,7 +3868,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Priorities"
-msgstr ""
+msgstr "우선순위"
 
 #. Label of the priority (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_priority (Link) field in DocType 'HD Escalation Rule'
@@ -3829,10 +3896,10 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:75
 msgid "Priority {0} has been repeated."
-msgstr ""
+msgstr "우선순위 {0} 가 반복되었습니다."
 
 #: desk/src/components/layouts/Sidebar.vue:301
-#: desk/src/pages/ticket/Tickets.vue:324
+#: desk/src/pages/ticket/Tickets.vue:359
 msgid "Private Views"
 msgstr ""
 
@@ -3859,7 +3926,7 @@ msgid "Public"
 msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:293
-#: desk/src/pages/ticket/Tickets.vue:339
+#: desk/src/pages/ticket/Tickets.vue:374
 msgid "Public Views"
 msgstr ""
 
@@ -3903,7 +3970,7 @@ msgstr ""
 #. Label of the query_route (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Query Route String"
-msgstr ""
+msgstr "쿼리 경로 문자열"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:213
 msgid "Queued"
@@ -4011,7 +4078,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "References"
-msgstr ""
+msgstr "참고 자료"
 
 #: desk/src/pages/home/Home.vue:11
 msgid "Refresh"
@@ -4126,27 +4193,27 @@ msgstr ""
 #. Label of the resolution_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution"
-msgstr ""
+msgstr "해결"
 
 #. Label of the resolution_by (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution By"
-msgstr ""
+msgstr "결의안"
 
 #. Label of the resolution_date (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Date"
-msgstr ""
+msgstr "결의일"
 
 #. Label of the resolution_details (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Details"
-msgstr ""
+msgstr "해상도 세부 정보"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Due"
-msgstr ""
+msgstr "결의안"
 
 #. Label of the resolution_failed_by (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -4159,12 +4226,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Time"
-msgstr ""
+msgstr "해상도 시간"
 
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Resolved"
-msgstr ""
+msgstr "해결됨"
 
 #. Label of the response_tab (Tab Break) field in DocType 'HD Ticket'
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:109
@@ -4181,26 +4248,26 @@ msgstr ""
 #. Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Response Options"
-msgstr ""
+msgstr "응답 옵션"
 
 #. Label of the response_result_key_path (Data) field in DocType 'HD Support
 #. Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Response Result Key Path"
-msgstr ""
+msgstr "응답 결과 키 경로"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:65
 msgid "Response Time for {0} priority in row {1} can't be greater than Resolution Time."
-msgstr ""
+msgstr "행 {1} 의 {0} 우선순위에 대한 응답 시간은 해결 시간보다 클 수 없습니다."
 
 #. Label of the response_and_resolution_time_section (Section Break) field in
 #. DocType 'HD Service Level Agreement'
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:188
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Response and Resolution"
-msgstr ""
+msgstr "대응 및 해결"
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:439
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:432
 msgid "Response is required"
 msgstr ""
 
@@ -4241,23 +4308,23 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Result Route Field"
-msgstr ""
+msgstr "결과 경로 필드"
 
 #. Label of the result_title_field (Data) field in DocType 'HD Support Search
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Result Title Field"
-msgstr ""
+msgstr "결과 제목 필드"
 
 #: desk/src/pages/home/Home.vue:341
 #: desk/src/pages/home/components/RecentFeedback.vue:7
 #: desk/src/pages/home/components/RecentFeedback.vue:22
 msgid "Reviews"
-msgstr ""
+msgstr "리뷰"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:215
 msgid "Ringing"
-msgstr ""
+msgstr "울리는"
 
 #: desk/src/components/Settings/InviteAgents.vue:19
 msgid "Role"
@@ -4343,7 +4410,7 @@ msgid "Saturday"
 msgstr ""
 
 #. Button label of the email-feedback Web Form
-#: desk/src/components/ListViewBuilder.vue:641
+#: desk/src/components/ListViewBuilder.vue:699
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:29
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:39
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:28
@@ -4373,7 +4440,7 @@ msgstr ""
 msgid "Saved Replies"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:318
+#: desk/src/pages/ticket/Tickets.vue:353
 msgid "Saved Views"
 msgstr ""
 
@@ -4385,11 +4452,11 @@ msgstr ""
 msgid "Saved reply duplicated successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:356
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:347
 msgid "Saved reply saved successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:419
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:410
 msgid "Saved reply updated successfully."
 msgstr ""
 
@@ -4436,7 +4503,7 @@ msgstr ""
 #. Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Search Term Param Name"
-msgstr ""
+msgstr "검색어 매개변수 이름"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:62
 msgid "Search agents..."
@@ -4500,7 +4567,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:167
 msgid "Select a Default Priority."
-msgstr ""
+msgstr "기본 우선순위를 선택하세요."
 
 #: desk/src/pages/ticket/TicketFeedback.vue:28
 msgid "Select a rating"
@@ -4535,10 +4602,18 @@ msgstr ""
 msgid "Send Invites"
 msgstr ""
 
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:38
+msgid "Send Reply"
+msgstr ""
+
 #. Label of the send_email_feedback_on_status (Link) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Send feedback when"
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:39
+msgid "Send to {0} tickets"
 msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:78
@@ -4565,7 +4640,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
-msgstr ""
+msgstr "서비스 레벨 이름"
 
 #: helpdesk/api/settings/email.py:14
 msgid "Service not supported"
@@ -4582,7 +4657,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:48
 msgid "Set Response Time for Priority {0} in row {1}."
-msgstr ""
+msgstr "{1} 행의 우선순위 {0} 에 대한 응답 시간을 설정합니다."
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:84
 msgid "Set as default SLA"
@@ -4610,9 +4685,9 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: desk/src/components/Settings/General/General.vue:254
-#: desk/src/components/Settings/General/General.vue:292
-#: desk/src/components/Settings/General/General.vue:301
+#: desk/src/components/Settings/General/General.vue:256
+#: desk/src/components/Settings/General/General.vue:294
+#: desk/src/components/Settings/General/General.vue:303
 msgid "Settings updated"
 msgstr ""
 
@@ -4660,7 +4735,7 @@ msgstr ""
 msgid "Show end users a different view"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:428
+#: desk/src/pages/ticket/Tickets.vue:463
 msgid "Show in sidebar"
 msgstr ""
 
@@ -4699,7 +4774,7 @@ msgstr ""
 msgid "Some error occurred while renaming holiday list"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:398
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:389
 msgid "Some error occurred while renaming saved reply"
 msgstr ""
 
@@ -4715,7 +4790,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Source DocType"
-msgstr ""
+msgstr "소스 문서 유형"
 
 #. Label of the source_name (Data) field in DocType 'HD Support Search Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
@@ -4726,7 +4801,7 @@ msgstr ""
 #. Source'
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
 msgid "Source Type"
-msgstr ""
+msgstr "소스 유형"
 
 #: helpdesk/api/knowledge_base.py:125
 msgid "Source and target category cannot be same"
@@ -4799,7 +4874,7 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:236
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status Details"
-msgstr ""
+msgstr "상태 세부 정보"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:382
 msgid "Status is required"
@@ -4871,12 +4946,12 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:358
 msgid "Support"
-msgstr ""
+msgstr "지원하다"
 
 #. Name of a report
 #: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.json
 msgid "Support Hour Distribution"
-msgstr ""
+msgstr "지원 시간 배분"
 
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -4893,6 +4968,27 @@ msgstr ""
 msgid "Switch between outgoing email accounts when sending emails from your configured accounts."
 msgstr ""
 
+#: desk/src/components/erpnext-integration/ERPNextCustomerSyncButton.vue:14
+msgid "Sync Customers with ERPNext"
+msgstr ""
+
+#: desk/src/components/erpnext-integration/ERPNextCustomerSyncButton.vue:61
+msgid "Sync completed successfully"
+msgstr ""
+
+#: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:14
+msgid "Sync customers between Helpdesk and ERPNext automatically."
+msgstr ""
+
+#: desk/src/components/erpnext-integration/ERPNextCustomerSyncButton.vue:49
+#: helpdesk/public/erpnext/customer_list.js:36
+msgid "Sync started"
+msgstr ""
+
+#: desk/src/components/erpnext-integration/ERPNextCustomerSyncButton.vue:14
+msgid "Syncing…"
+msgstr ""
+
 #. Label of the synonyms (Table) field in DocType 'HD Synonyms'
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
 msgid "Synonyms"
@@ -4904,6 +5000,7 @@ msgid "System"
 msgstr ""
 
 #. Name of a role
+#: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_action/hd_action.json
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -4961,7 +5058,7 @@ msgstr ""
 #. Label of the agent_group (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:372
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:225
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:216
 #: desk/src/pages/SearchAgent.vue:50 desk/src/pages/SearchAgent.vue:51
 #: desk/src/pages/dashboard/Dashboard.vue:63
 #: desk/src/pages/home/components/PendingTickets.vue:38
@@ -4971,7 +5068,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Team"
-msgstr ""
+msgstr "팀"
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:38
 msgid "Team Name"
@@ -5141,11 +5238,11 @@ msgstr ""
 msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:491
+#: desk/src/pages/ticket/Tickets.vue:526
 msgid "This view is public, and will be removed for all users."
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:636
+#: desk/src/components/ListViewBuilder.vue:694
 msgid "This view is public. Changes made will be visible to everyone."
 msgstr ""
 
@@ -5173,7 +5270,7 @@ msgstr ""
 msgid "Ticket"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:816
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:817
 msgid "Ticket #{0}: We've received your request"
 msgstr ""
 
@@ -5321,7 +5418,7 @@ msgstr ""
 #: desk/src/pages/ticket/MobileTicketAgent.vue:418
 #: desk/src/pages/ticket/TicketCustomer.vue:333
 #: desk/src/pages/ticket/TicketNew.vue:296 desk/src/pages/ticket/Tickets.vue:6
-#: desk/src/pages/ticket/Tickets.vue:633 helpdesk/api/dashboard.py:154
+#: desk/src/pages/ticket/Tickets.vue:668 helpdesk/api/dashboard.py:154
 #: helpdesk/api/dashboard.py:295
 msgid "Tickets"
 msgstr ""
@@ -5350,7 +5447,7 @@ msgstr ""
 msgid "Tickets by Type"
 msgstr ""
 
-#: helpdesk/api/ticket.py:16
+#: helpdesk/api/ticket.py:65
 msgid "Tickets can only be assigned to agents"
 msgstr ""
 
@@ -5384,7 +5481,7 @@ msgid "Title Slug"
 msgstr ""
 
 #: desk/src/components/Settings/NewTeamModal.vue:50
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:431
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:422
 msgid "Title is required"
 msgstr ""
 
@@ -5441,12 +5538,12 @@ msgstr ""
 #. Label of the total_hold_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Total Hold Time"
-msgstr ""
+msgstr "총 대기 시간"
 
 #. Label of the total_holidays (Int) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Total Holidays"
-msgstr ""
+msgstr "총 휴일 수"
 
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:126
 msgid "Total Ticket"
@@ -5505,7 +5602,7 @@ msgstr ""
 msgid "URL/Method"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:649
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:650
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr ""
 
@@ -5521,7 +5618,7 @@ msgstr ""
 msgid "Unauthorized access."
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:415
+#: desk/src/pages/ticket/Tickets.vue:450
 msgid "Unpin View"
 msgstr ""
 
@@ -5538,8 +5635,8 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:101
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:75
 #: desk/src/components/Settings/Holiday/HolidayView.vue:201
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:242
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:309
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:238
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:300
 #: desk/src/components/Settings/SettingsModal.vue:71
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:364
 #: desk/src/components/Settings/Teams/NewTeam.vue:118
@@ -5606,7 +5703,7 @@ msgstr ""
 #. Label of the user_resolution_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "User Resolution Time"
-msgstr ""
+msgstr "사용자 해결 시간"
 
 #: desk/src/components/Settings/General/General.vue:42
 msgid "User Signup"
@@ -5623,20 +5720,20 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:141
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Valid From"
-msgstr ""
+msgstr "유효 기간 시작일"
 
 #. Label of the via_customer_portal (Check) field in DocType 'HD Ticket'
 #. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Via Customer Portal"
-msgstr ""
+msgstr "고객 포털을 통해"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:252
 msgid "View Assignment rule"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:599
+#: desk/src/pages/ticket/Tickets.vue:634
 msgid "View {0}"
 msgstr ""
 
@@ -5705,7 +5802,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:111
 msgid "Workday {0} has been repeated."
-msgstr ""
+msgstr "근무일 {0} 이 반복되었습니다."
 
 #. Label of the workflow_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -5722,7 +5819,7 @@ msgstr ""
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Working Hours"
-msgstr ""
+msgstr "근무 시간"
 
 #: desk/src/pages/knowledge-base/Article.vue:172
 #: desk/src/pages/knowledge-base/NewArticle.vue:55
@@ -5731,6 +5828,10 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:46
 msgid "Write your email signature here."
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:19
+msgid "Write your reply..."
 msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:37
@@ -5750,11 +5851,11 @@ msgstr ""
 msgid "You are not permitted to access this resource."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:559
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:563
 msgid "You are not permitted to add a comment"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:585
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:589
 msgid "You are not permitted to reply as an agent"
 msgstr ""
 
@@ -5822,7 +5923,7 @@ msgstr ""
 msgid "back to email event list"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:598
+#: desk/src/pages/ticket/Tickets.vue:633
 msgid "created"
 msgstr ""
 
@@ -5834,7 +5935,7 @@ msgstr ""
 msgid "days"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:510
+#: desk/src/pages/ticket/Tickets.vue:545
 msgid "deleted"
 msgstr ""
 
@@ -5929,6 +6030,14 @@ msgstr ""
 msgid "viewed this"
 msgstr ""
 
+#: desk/src/components/ListViewBuilder.vue:307
+msgid "{0} item(s) deleted successfully"
+msgstr ""
+
+#: desk/src/components/ListViewBuilder.vue:321
+msgid "{0} item(s) queued for deletion"
+msgstr ""
+
 #: desk/src/pages/SearchAgent.vue:117
 msgid "{0} matches"
 msgstr ""
@@ -5937,11 +6046,11 @@ msgstr ""
 msgid "{0} reviews"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:457
+#: desk/src/pages/ticket/Tickets.vue:492
 msgid "{0} view is currently public. Changing it to private will hide it for all the users."
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:437
+#: desk/src/pages/ticket/Tickets.vue:472
 msgid "{0} view is currently visible in the sidebar. Hiding it will remove it from the sidebar."
 msgstr ""
 

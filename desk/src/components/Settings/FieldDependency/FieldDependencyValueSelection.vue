@@ -149,9 +149,27 @@ const filteredParentFieldValues = computed(() => {
   );
 });
 
+// Order values that were already selected when the screen loaded to the top.
+// Uses the saved selections (not the live ones) so the list stays put while
+// the user is checking/unchecking values.
+const orderedChildFieldValues = computed(() => {
+  const parent = state.value.currentParentSelection;
+  const initialSelections = state.value.initialChildSelections?.[parent];
+  const values = state.value.childFieldValues;
+  if (!(initialSelections instanceof Set) || initialSelections.size === 0) {
+    return values;
+  }
+  const selected = [];
+  const unselected = [];
+  values.forEach((value) => {
+    (initialSelections.has(value) ? selected : unselected).push(value);
+  });
+  return [...selected, ...unselected];
+});
+
 const filteredChildFieldValues = computed(() => {
-  if (!state.value.childSearch) return state.value.childFieldValues;
-  return state.value.childFieldValues.filter((v) =>
+  if (!state.value.childSearch) return orderedChildFieldValues.value;
+  return orderedChildFieldValues.value.filter((v) =>
     v.toLowerCase().includes(state.value.childSearch.toLowerCase())
   );
 });

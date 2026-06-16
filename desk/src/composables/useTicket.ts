@@ -56,6 +56,7 @@ export const useTicket = (ticketId: string | number): MapValue => {
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_assignees",
         params: { ticket: mapKey },
         auto: true,
+
         setValue: {
           onSuccess: () => {
             toast.success(__("Assignees updated successfully."));
