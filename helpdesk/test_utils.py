@@ -329,13 +329,18 @@ def set_ticket_status_and_communication_date(ticket_name, status, communication_
     frappe.db.set_value(
         "HD Ticket", ticket_name, "status", status, update_modified=False
     )
-    frappe.db.set_value(
+    for comm_name in frappe.get_all(
         "Communication",
-        {"reference_doctype": "HD Ticket", "reference_name": ticket_name},
-        "communication_date",
-        communication_date,
-        update_modified=False,
-    )
+        filters={"reference_doctype": "HD Ticket", "reference_name": ticket_name},
+        pluck="name",
+    ):
+        frappe.db.set_value(
+            "Communication",
+            comm_name,
+            "communication_date",
+            communication_date,
+            update_modified=False,
+        )
 
 
 def make_team(team_name, members=[], disabled=False):
