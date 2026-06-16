@@ -38,9 +38,13 @@ export const useTicket = (ticketId: string | number): MapValue => {
           },
           onError: (error) => {
             let msg = error.message || "";
+            const lowerMsg = msg.toLowerCase();
+            
+            // Suppress both ToDo list and document sharing notice toasts
             if (
-              msg.toLowerCase().includes("already in the following") || 
-              msg.toLowerCase().includes("todo list")
+              lowerMsg.includes("already in the following") || 
+              lowerMsg.includes("todo list") ||
+              lowerMsg.includes("shared with the following")
             ) {
               return;
             }
@@ -52,7 +56,6 @@ export const useTicket = (ticketId: string | number): MapValue => {
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_assignees",
         params: { ticket: mapKey },
         auto: true,
-        // Updates assignments via API safely and catches backend ToDo exceptions
         setValue: {
           onSuccess: () => {
             toast.success(__("Assignees updated successfully."));
@@ -60,16 +63,19 @@ export const useTicket = (ticketId: string | number): MapValue => {
           },
           onError: (error) => {
             let msg = error.message || "";
+            const lowerMsg = msg.toLowerCase();
+            
+            // Suppress both ToDo list and document sharing notice toasts
             if (
-              msg.toLowerCase().includes("already in the following") || 
-              msg.toLowerCase().includes("todo list")
+              lowerMsg.includes("already in the following") || 
+              lowerMsg.includes("todo list") ||
+              lowerMsg.includes("shared with the following")
             ) {
               return;
             }
             toast.error(msg.replace(/<br\s*\/?>/gi, "\n").trim());
           }
         }
-        // Transform hook removed completely because backend already yields native TicketAssignee structures.
       }),
       contact: createResource({
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_contact",
