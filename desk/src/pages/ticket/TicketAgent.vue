@@ -153,6 +153,11 @@ watch(
 
     if (oldTicketId) stopViewing(oldTicketId as string);
     startViewing(newTicketId as string);
+
+    // When switching between tickets without unmounting, reload the incoming
+    // ticket's data so a customer reply that arrived while the agent was away
+    // is always visible immediately rather than requiring a manual page reload.
+    if (oldTicketId) reloadTicket(newTicketId as string);
   },
   { immediate: true }
 );
@@ -165,6 +170,11 @@ type TicketUpdateData = {
 };
 
 onMounted(() => {
+  // Always reload when the ticket page mounts so that a customer reply that
+  // arrived while the agent was away (and the socket listener was torn down)
+  // is immediately visible without requiring a manual page reload.
+  reloadTicket(props.ticketId);
+
   ticketsToNavigate.update({
     params: {
       ticket: props.ticketId,
