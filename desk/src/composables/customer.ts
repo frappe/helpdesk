@@ -79,13 +79,32 @@ export function useCustomerState(name?: string | null) {
   });
 }
 
-export function usePrimaryContactState() {
+function usePrimaryContactState() {
   return reactive<Record<PrimaryContactKey, string>>({
     firstName: "",
     lastName: "",
     email: "",
     mobileNo: "",
   });
+}
+
+/** Bundles the customer + primary-contact state for the New Customer dialog. */
+export function useNewCustomerForm() {
+  const state = useCustomerState();
+  const primaryContact = usePrimaryContactState();
+  applyDefaults();
+
+  function reset() {
+    Object.assign(state, useCustomerState());
+    Object.assign(primaryContact, usePrimaryContactState());
+    applyDefaults();
+  }
+
+  function applyDefaults() {
+    state.country = window.default_country || "";
+  }
+
+  return { state, primaryContact, reset };
 }
 
 type StateKey = "name" | "customerType" | "domain" | "image" | "country";

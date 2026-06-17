@@ -28,7 +28,7 @@ import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import NewCustomerDialog from "@/components/customer/NewCustomerDialog.vue";
 import ERPNextCustomerSyncButton from "@/components/erpnext-integration/ERPNextCustomerSyncButton.vue";
-import OrganizationsIcon from "@/components/icons/OrganizationsIcon.vue";
+import { OrganizationsIcon, PhoneIcon } from "@/components/icons";
 import { __ } from "@/translation";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
@@ -57,6 +57,9 @@ const options = computed(() => {
             size: "sm",
           });
         },
+      },
+      mobile_no: {
+        prefix: PhoneIcon,
       },
     },
     emptyState: {

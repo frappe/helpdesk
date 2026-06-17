@@ -3,6 +3,7 @@
     <Dialog
       v-model="model"
       :options="{ title: __('New Customer'), size: 'lg' }"
+      @after-leave="reset"
     >
       <template #body-content>
         <div class="space-y-4">
@@ -130,8 +131,7 @@
 <script setup lang="ts">
 import {
   customerFields as fields,
-  useCustomerState,
-  usePrimaryContactState,
+  useNewCustomerForm,
 } from "@/composables/customer";
 import { __ } from "@/translation";
 import type { File, Resource } from "@/types";
@@ -145,7 +145,6 @@ import {
   createResource,
   toast,
 } from "frappe-ui";
-import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Link from "../frappe-ui/Link.vue";
 import PhoneControl from "../frappe-ui/PhoneControl/PhoneControl.vue";
@@ -154,8 +153,7 @@ import { OrganizationsIcon } from "../icons";
 const model = defineModel<boolean>({ default: false });
 const router = useRouter();
 
-const state = useCustomerState();
-const primaryContact = usePrimaryContactState();
+const { state, primaryContact, reset } = useNewCustomerForm();
 
 const customerResource: Resource = createResource({
   url: "helpdesk.api.customer.create_customer",
@@ -196,8 +194,4 @@ function addCustomer() {
       : null,
   });
 }
-
-onMounted(() => {
-  state.country = window.default_country || "";
-});
 </script>

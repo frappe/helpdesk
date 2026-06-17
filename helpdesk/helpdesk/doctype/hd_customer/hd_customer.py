@@ -26,9 +26,21 @@ class HDCustomer(Document):
                 "type": "Data",
             },
             {
-                "label": "Domain",
-                "key": "domain",
-                "width": "24rem",
+                "label": "Customer Type",
+                "key": "customer_type",
+                "width": "10rem",
+                "type": "Select",
+            },
+            {
+                "label": "Email ID",
+                "key": "email_id",
+                "width": "17rem",
+                "type": "Data",
+            },
+            {
+                "label": "Mobile No",
+                "key": "mobile_no",
+                "width": "12rem",
                 "type": "Data",
             },
             {
@@ -38,7 +50,14 @@ class HDCustomer(Document):
                 "type": "Datetime",
             },
         ]
-        rows = ["customer_name", "domain", "creation", "image"]
+        rows = [
+            "customer_name",
+            "customer_type",
+            "email_id",
+            "mobile_no",
+            "creation",
+            "image",
+        ]
 
         return {"columns": columns, "rows": rows}
 
