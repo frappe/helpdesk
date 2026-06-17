@@ -75,3 +75,7 @@ export function reloadTicket(ticketId: string) {
   ticketData.assignees.reload();
   ticketData.activities.reload();
 }
+
+export function isTicketCached(ticketId: string): boolean {
+  return !!ticketMap[ticketId];
+}
