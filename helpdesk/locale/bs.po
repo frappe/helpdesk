@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-14 11:18+0000\n"
-"PO-Revision-Date: 2026-06-15 18:51\n"
+"PO-Revision-Date: 2026-06-17 19:22\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Bosnian\n"
 "MIME-Version: 1.0\n"
@@ -1887,33 +1887,33 @@ msgstr "Sistem"
 #. Label of the erpnext_customer (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "ERPNext Customer"
-msgstr ""
+msgstr "Klijent Sistema"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.json
 msgid "ERPNext HD Settings"
-msgstr ""
+msgstr "Postavke Podrške"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:182
 msgid "ERPNext Integration is disabled"
-msgstr ""
+msgstr "Integracija s Sistemom je onemogućena"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:181
 msgid "ERPNext Integration is enabled"
-msgstr ""
+msgstr "Integracija s Sistemom je omogućena"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:66
 msgid "ERPNext app"
-msgstr ""
+msgstr "Aplikacija Sistema"
 
 #: helpdesk/integrations/erpnext/api.py:47
 msgid "ERPNext integration is not enabled"
-msgstr ""
+msgstr "Integracija s Sistemom nije omogućena"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:203
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.py:19
 msgid "ERPNext is not installed on your site. Please install ERPNext to enable this setting"
-msgstr ""
+msgstr "Sistem nije instaliran na vašoj web stranici. Molimo vas da instalirate Sistem da biste omogućili ovu postavku"
 
 #: desk/src/components/Settings/InviteAgents.vue:4
 msgid "Easily invite new agents, managers, or admins."
@@ -2043,7 +2043,7 @@ msgstr "Omogući"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:36
 msgid "Enable ERPNext Integration"
-msgstr ""
+msgstr "Omogući integraciju Sistema"
 
 #. Label of the enable_comment_reactions (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:23
@@ -2230,7 +2230,7 @@ msgstr "Nije uspjelo ažuriranje dodijeljenih."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:232
 msgid "Failed to update assignment rule {0}."
-msgstr ""
+msgstr "Neuspjelo ažuriranje pravila dodjeljivanja {0}."
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:312
 msgid "Failed to update category."
@@ -2242,7 +2242,7 @@ msgstr "Nije uspjelo ažuriranje računa e-pošte, nevažeći akreditivi"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:184
 msgid "Failed to update field dependency."
-msgstr ""
+msgstr "Neuspjelo ažuriranje ovisnosti polja."
 
 #. Label of the favicon (Attach Image) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:27
@@ -2313,7 +2313,7 @@ msgstr "Zavisnosti polja"
 
 #: desk/src/components/layouts/Sidebar.vue:628
 msgid "Field Dependency"
-msgstr ""
+msgstr "Zavisnosti Polja"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:303
 msgid "Field Dependency created successfully"
@@ -2400,7 +2400,7 @@ msgstr "Forma"
 
 #: desk/src/components/layouts/Sidebar.vue:637
 msgid "Frappe Helpdesk Mobile"
-msgstr ""
+msgstr "Mobilna Podrška"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -3557,7 +3557,7 @@ msgstr "Novi i stari naslov ne mogu biti isti"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:86
 msgid "New and updated customers sync automatically between Helpdesk and ERPNext."
-msgstr ""
+msgstr "Novi i ažurirani klijenti se automatski sinhronizuju između Podrške i Sistema."
 
 #: desk/src/components/Settings/NewTeamModal.vue:4
 msgid "New team"
@@ -3589,7 +3589,7 @@ msgstr "Nije pronađen račun e-pošte za {0}"
 
 #: helpdesk/api/agent.py:73
 msgid "No HD Agent record for current user"
-msgstr ""
+msgstr "Nema zapisa Agenta za trenutnog korisnika"
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:20
 msgid "No Holiday list found"
@@ -3661,7 +3661,7 @@ msgstr "Nema povratnih informacija"
 
 #: desk/src/components/view-controls/filter/FilterFieldList.vue:46
 msgid "No fields found"
-msgstr ""
+msgstr "Nisu pronađena polja"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:94
 msgid "No members found"
@@ -3730,7 +3730,7 @@ msgstr "Nisu pronađeni zahtjevi za pregled."
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:84
 msgid "No tickets selected"
-msgstr ""
+msgstr "Nije odabrana nijedna zahtjev"
 
 #: helpdesk/api/ticket.py:76 helpdesk/utils.py:182
 msgid "Not Allowed"
@@ -4040,7 +4040,7 @@ msgstr "Ispravno konfigurišite postavke za Twilio"
 
 #: desk/src/components/layouts/Sidebar.vue:658
 msgid "Please create a new ticket to proceed with the next step."
-msgstr ""
+msgstr "Kreirate novi zahtjev da biste nastavili sa sljedećim korakom."
 
 #: desk/src/pages/ticket/TicketNew.vue:83
 msgid "Please enter a subject to continue"
@@ -4135,7 +4135,7 @@ msgstr "Postavke"
 
 #: desk/src/components/Settings/Preferences/Preferences.vue:75
 msgid "Preferences updated successfully."
-msgstr ""
+msgstr "Postavke uspješno ažurirane."
 
 #: desk/src/pages/dashboard/Dashboard.vue:468
 msgid "Presets"
@@ -4641,7 +4641,7 @@ msgstr "Redovi"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:108
 msgid "Run an initial sync to reconcile existing records. New ones update automatically."
-msgstr ""
+msgstr "Pokreni početnu sinhronizaciju kako biste uskladili postojeće zapise. Novi se automatski ažuriraju."
 
 #. Label of the sla (Link) field in DocType 'HD Ticket'
 #. Label of the sla_tab (Tab Break) field in DocType 'HD Ticket'
@@ -4935,7 +4935,7 @@ msgstr "Pošalji povratne informacije kada"
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:33
 msgid "Send to {0} tickets"
-msgstr ""
+msgstr "Pošalji na {0} zahtjeva"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:78
 msgid "Sent to all of the agents assigned to the ticket whenever a contact has replied."
@@ -5007,7 +5007,7 @@ msgstr "Postavi radne dane, sate i praznike odabirom unaprijed definiranog raspo
 
 #: desk/src/components/Settings/Profile/Profile.vue:115
 msgid "Set your availability so your team knows when you're reachable."
-msgstr ""
+msgstr "Podesi dostupnost kako bi vaš tim znao kada ste dostupni."
 
 #: desk/src/components/Settings/Holiday/Holidays.vue:5
 msgid "Set your team’s working days, hours, and holidays using a template or custom schedule."
@@ -5339,16 +5339,16 @@ msgstr "Sinkronizuj klijente"
 
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:22
 msgid "Sync all customers between ERPNext and Helpdesk? The sync runs in the background and can take a few minutes depending on the number of customers."
-msgstr ""
+msgstr "Sinkronizuj sve korisnike između Sistema i Podrške? Sinkronizacija se pokreće u pozadini i može potrajati nekoliko minuta, ovisno o broju korisnika."
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:216
 msgid "Sync completed successfully"
-msgstr ""
+msgstr "Sinkronizacija je uspješno završena"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:3
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:39
 msgid "Sync customers between Helpdesk and ERPNext."
-msgstr ""
+msgstr "Sinkroniziraj korisnike između Podrške i Sistema."
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:120
 msgid "Sync now"
