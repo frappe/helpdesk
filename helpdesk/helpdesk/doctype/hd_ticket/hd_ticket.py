@@ -13,7 +13,7 @@ from frappe.desk.form.assign_to import get as get_assignees
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
 from frappe.query_builder import DocType, Order
-from frappe.utils import add_to_date, getdate, now_datetime
+from frappe.utils import add_to_date, cint, getdate, now_datetime
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -1345,6 +1345,12 @@ def close_tickets_after_n_days():
     status, days_threshold = frappe.db.get_value(
         "HD Settings", "HD Settings", ["auto_close_status", "auto_close_after_days"]
     )
+    days_threshold = cint(days_threshold)
+
+    # Compute the cutoff in the system timezone to match how communication_date is
+    # stored. Using the database's NOW() instead would select the wrong tickets when
+    # the DB server runs in a different timezone (e.g. UTC) than the Frappe system.
+    inactivity_cutoff = add_to_date(now_datetime(), days=-days_threshold)
 
     tickets_to_close = (
         frappe.db.sql(
@@ -1353,14 +1359,14 @@ def close_tickets_after_n_days():
                 FROM `tabHD Ticket` t
                 INNER JOIN (
                     SELECT reference_name, MAX(communication_date) as last_communication_date
-                    FROM `tabCommunication` 
+                    FROM `tabCommunication`
                     WHERE reference_doctype = 'HD Ticket'
                     GROUP BY reference_name
                 ) latest_comm ON t.name = latest_comm.reference_name
                 WHERE t.status = %(status)s
-                AND latest_comm.last_communication_date < DATE_SUB(NOW(), INTERVAL %(days_threshold)s DAY)
+                AND latest_comm.last_communication_date < %(inactivity_cutoff)s
             """,
-            {"days_threshold": days_threshold, "status": status},
+            {"inactivity_cutoff": inactivity_cutoff, "status": status},
             pluck="name",
         )
         or []
