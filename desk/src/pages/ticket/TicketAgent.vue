@@ -54,7 +54,11 @@ import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import { useActiveViewers } from "@/composables/realtime";
-import { isTicketCached, reloadTicket, useTicket } from "@/composables/useTicket";
+import {
+  isTicketCached,
+  reloadTicket,
+  useTicket,
+} from "@/composables/useTicket";
 import { ticketsToNavigate } from "@/composables/useTicketNavigation";
 import { globalStore } from "@/stores/globalStore";
 import { useTelephonyStore } from "@/stores/telephony";
