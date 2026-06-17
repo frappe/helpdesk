@@ -354,6 +354,8 @@ export interface HDCustomer extends DocType {
   image?: string;
   /** Customer Name: Data */
   customer_name?: string;
+  /** Customer Type: Select */
+  customer_type?: "Company" | "Individual" | "Partnership";
   /** Domain: Data */
   domain?: string;
   /** ERPNext Customer: Data */

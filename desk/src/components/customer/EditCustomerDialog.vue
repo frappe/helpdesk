@@ -66,12 +66,17 @@
           <!-- Fields -->
           <template v-for="field in customerFields" :key="field.key">
             <FormControl
-              class="[&_p]:text-p-xs"
+              :class="[
+                '[&_p]:text-p-xs',
+                field.type === 'select' && '[&_[data-slot=trigger]]:w-full',
+              ]"
               v-if="field.type !== 'Link'"
+              :type="field.type"
               :label="field.label"
               :required="field.required"
               :placeholder="field.placeholder"
               :description="field.description"
+              :options="field.options"
               v-model="state[field.key]"
             >
               <template #prefix>
@@ -162,6 +167,7 @@ async function save() {
             domain: state.domain,
             country: state.country,
             image: state.image,
+            customer_type: state.customerType,
           },
         });
       }
@@ -176,6 +182,7 @@ async function save() {
         domain: state.domain,
         country: state.country,
         image: state.image,
+        customer_type: state.customerType,
       });
     }
     toast.success(__("Customer updated"));
@@ -207,5 +214,6 @@ function revertChanges() {
   state.domain = customer.doc.domain || "";
   state.country = customer.doc.country || "";
   state.image = customer.doc.image || "";
+  state.customerType = customer.doc.customer_type || "Company";
 }
 </script>

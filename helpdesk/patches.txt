@@ -42,3 +42,4 @@ helpdesk.patches.set_hd_ticket_naming_series
 helpdesk.patches.add_customer_field_in_user_invitation
 helpdesk.patches.add_customer_and_customer_manager_role
 helpdesk.patches.move_contact_dynamic_link_to_hd_customer
+helpdesk.patches.set_default_customer_type

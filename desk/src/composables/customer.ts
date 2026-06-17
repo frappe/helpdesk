@@ -5,6 +5,8 @@ import { createDocumentResource } from "frappe-ui";
 import { computed, h, markRaw, reactive, watch } from "vue";
 import LucideGlobe from "~icons/lucide/globe";
 import LucideMapPin from "~icons/lucide/map-pin";
+import LucideUser from "~icons/lucide/user";
+import LucideUsers from "~icons/lucide/users";
 import { OrganizationsIcon } from "../components/icons";
 
 const customerCache: Record<string, DocumentResource<HDCustomer>> = {};
@@ -18,6 +20,7 @@ export function useCustomer(name: string) {
     (data) => {
       if (data) {
         state.name = data.customer_name || "";
+        state.customerType = data.customer_type || "Company";
         state.domain = data.domain || "";
         state.image = data.image || "";
         state.country = data.country || "";
@@ -30,7 +33,8 @@ export function useCustomer(name: string) {
     return (
       state.domain !== (doc.doc?.domain || "") ||
       state.image !== (doc.doc?.image || "") ||
-      state.country !== (doc.doc?.country || "")
+      state.country !== (doc.doc?.country || "") ||
+      state.customerType !== (doc.doc?.customer_type || "Company")
     );
   });
   const hasNameChanged = computed(() => state.name !== doc.doc?.customer_name);
@@ -40,7 +44,8 @@ export function useCustomer(name: string) {
 
   function findCustomerDoc(): DocumentResource<HDCustomer> {
     const key = name as string;
-    if (customerCache.hasOwnProperty(key)) return customerCache[key];
+    const cached = customerCache[key];
+    if (cached) return cached;
     else {
       const newDoc = createDocumentResource({
         doctype: "HD Customer",
@@ -67,13 +72,25 @@ export function useCustomer(name: string) {
 export function useCustomerState(name?: string | null) {
   return reactive<Record<StateKey, string>>({
     name: name ? name : "",
+    customerType: "Company",
     domain: "",
     image: "",
     country: "",
   });
 }
 
-type StateKey = "name" | "domain" | "image" | "country";
+export function usePrimaryContactState() {
+  return reactive<Record<PrimaryContactKey, string>>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    mobileNo: "",
+  });
+}
+
+type StateKey = "name" | "customerType" | "domain" | "image" | "country";
+
+type PrimaryContactKey = "firstName" | "lastName" | "email" | "mobileNo";
 
 interface FieldConfig {
   key: StateKey;
@@ -84,6 +101,13 @@ interface FieldConfig {
   description?: string;
   prefix?: ReturnType<typeof markRaw> | ReturnType<typeof h>;
   doctype?: string; // only for Link type
+  options?: SelectOption[]; // only for select type
+}
+
+interface SelectOption {
+  label: string;
+  value: string;
+  icon?: ReturnType<typeof markRaw> | ReturnType<typeof h>;
 }
 export const customerFields: FieldConfig[] = [
   {
@@ -92,6 +116,21 @@ export const customerFields: FieldConfig[] = [
     label: __("Name"),
     required: true,
     prefix: markRaw(OrganizationsIcon),
+  },
+  {
+    key: "customerType",
+    type: "select",
+    label: __("Customer Type"),
+    required: true,
+    options: [
+      { label: __("Company"), value: "Company", icon: markRaw(OrganizationsIcon) },
+      { label: __("Individual"), value: "Individual", icon: markRaw(LucideUser) },
+      {
+        label: __("Partnership"),
+        value: "Partnership",
+        icon: markRaw(LucideUsers),
+      },
+    ],
   },
   {
     key: "country",

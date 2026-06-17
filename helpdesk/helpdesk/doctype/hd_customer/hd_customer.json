@@ -9,6 +9,7 @@
  "field_order": [
   "image",
   "customer_name",
+  "customer_type",
   "domain",
   "erpnext_customer",
   "country",
@@ -32,6 +33,14 @@
    "fieldtype": "Data",
    "label": "Customer Name",
    "unique": 1
+  },
+  {
+   "default": "Company",
+   "fieldname": "customer_type",
+   "fieldtype": "Select",
+   "label": "Customer Type",
+   "options": "Company\nIndividual\nPartnership",
+   "reqd": 1
   },
   {
    "fieldname": "domain",

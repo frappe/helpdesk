@@ -49,5 +49,7 @@ def link_to_customer(user: Document, customer: str) -> None:
         return
 
     doc = frappe.get_doc("HD Customer", customer)
+    if any(row.contact_name == contact for row in doc.contacts):
+        return
     doc.append("contacts", {"contact_name": contact})
     doc.save(ignore_permissions=True)

@@ -170,6 +170,47 @@ class TestHDCustomer(IntegrationTestCase):
         with self.assertRaises(frappe.ValidationError):
             customer.save()
 
+    def test_create_customer_with_primary_contact(self) -> None:
+        from helpdesk.api.customer import create_customer as create_customer_api
+
+        email = "primary-contact-api@example.com"
+        cleanup_customer_and_contact("Test Customer API Primary", email)
+
+        name = create_customer_api(
+            {"customer_name": "Test Customer API Primary", "customer_type": "Company"},
+            {"first_name": "Primary", "last_name": "Contact", "email": email},
+        )
+
+        customer = frappe.get_doc("HD Customer", name)
+        contact = frappe.db.get_value("Contact", {"email_id": email}, "name")
+        self.assertEqual(customer.customer_type, "Company")
+        self.assertEqual(customer.primary_contact, contact)
+        member = next(row for row in customer.contacts if row.contact_name == contact)
+        self.assertTrue(member.is_manager)
+        invitation = get_invitation(email)
+        self.assertEqual(invitation.customer, name)
+        self.assertEqual(invitation.contact, contact)
+
+    def test_primary_contact_not_duplicated_after_accept(self) -> None:
+        from helpdesk.api.customer import create_customer as create_customer_api
+
+        email = "primary-accept-api@example.com"
+        cleanup_customer_and_contact("Test Customer API Accept", email)
+
+        name = create_customer_api(
+            {"customer_name": "Test Customer API Accept", "customer_type": "Company"},
+            {"first_name": "Primary", "email": email},
+        )
+        invitation = frappe.get_doc("User Invitation", get_invitation(email).name)
+        user = create_user(email)
+
+        after_accept(invitation, user, user_inserted=True)
+
+        customer = frappe.get_doc("HD Customer", name)
+        contact = frappe.db.get_value("Contact", {"email_id": email}, "name")
+        member_names = [row.contact_name for row in customer.contacts]
+        self.assertEqual(member_names.count(contact), 1)
+
     def test_primary_contact_must_be_a_listed_contact(self) -> None:
         customer = create_customer("Test Customer Primary Validate")
         contact = create_contact(
@@ -181,3 +222,12 @@ class TestHDCustomer(IntegrationTestCase):
 
         with self.assertRaises(frappe.ValidationError):
             customer.save()
+
+
+def cleanup_customer_and_contact(customer_name: str, email: str) -> None:
+    if frappe.db.exists("HD Customer", customer_name):
+        frappe.delete_doc("HD Customer", customer_name, force=True)
+    for c in frappe.db.get_all("Contact", {"email_id": email}, pluck="name"):
+        frappe.delete_doc("Contact", c, force=True)
+    if frappe.db.exists("User", email):
+        frappe.delete_doc("User", email, force=True)

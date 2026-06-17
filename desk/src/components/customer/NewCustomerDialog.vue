@@ -2,7 +2,7 @@
   <div>
     <Dialog
       v-model="model"
-      :options="{ title: __('New Customer'), size: 'md' }"
+      :options="{ title: __('New Customer'), size: 'lg' }"
     >
       <template #body-content>
         <div class="space-y-4">
@@ -49,13 +49,18 @@
           </div>
           <template v-for="field in fields" :key="field.key">
             <FormControl
-              class="[&_p]:text-p-xs"
+              :class="[
+                '[&_p]:text-p-xs',
+                field.type === 'select' && '[&_[data-slot=trigger]]:w-full',
+              ]"
               v-if="field.type !== 'Link'"
               :key="field.key"
+              :type="field.type"
               :label="field.label"
               :required="field.required"
               :placeholder="field.placeholder"
               :description="field.description"
+              :options="field.options"
               v-model="state[field.key]"
             >
               <template #prefix>
@@ -77,11 +82,42 @@
             </Link>
           </template>
 
+          <div class="border-t border-outline-gray-2 pt-4 space-y-4">
+            <h3 class="text-base font-medium text-ink-gray-8">
+              {{ __("Primary Contact Details") }}
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+              <FormControl
+                class="[&_p]:text-p-xs"
+                type="text"
+                :label="__('First Name')"
+                v-model="primaryContact.firstName"
+              />
+              <FormControl
+                class="[&_p]:text-p-xs"
+                type="text"
+                :label="__('Last Name')"
+                v-model="primaryContact.lastName"
+              />
+            </div>
+            <FormControl
+              class="[&_p]:text-p-xs"
+              type="email"
+              :label="__('Email Id')"
+              v-model="primaryContact.email"
+            />
+            <PhoneControl
+              :label="__('Mobile Number')"
+              v-model="primaryContact.mobileNo"
+            />
+          </div>
+
           <div class="float-right flex space-x-2">
             <Button
               label="Add"
               theme="gray"
               variant="solid"
+              :loading="customerResource.loading"
               @click.prevent="addCustomer"
             />
           </div>
@@ -95,9 +131,11 @@
 import {
   customerFields as fields,
   useCustomerState,
+  usePrimaryContactState,
 } from "@/composables/customer";
 import { __ } from "@/translation";
 import type { File, Resource } from "@/types";
+import { getErrorMessage, validateEmailWithZod } from "@/utils";
 import {
   Avatar,
   Button,
@@ -110,31 +148,52 @@ import {
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Link from "../frappe-ui/Link.vue";
+import PhoneControl from "../frappe-ui/PhoneControl/PhoneControl.vue";
 import { OrganizationsIcon } from "../icons";
 
 const model = defineModel<boolean>({ default: false });
 const router = useRouter();
 
 const state = useCustomerState();
+const primaryContact = usePrimaryContactState();
 
 const customerResource: Resource = createResource({
-  url: "frappe.client.insert",
+  url: "helpdesk.api.customer.create_customer",
   method: "POST",
-  onSuccess: (data: { name: string }) => {
-    router.push({ name: "Customer", params: { id: data.name } });
+  onSuccess: (name: string) => {
+    router.push({ name: "Customer", params: { id: name } });
     toast.success(__("Customer created"));
+  },
+  onError: (error: unknown) => {
+    getErrorMessage(error, true);
   },
 });
 
 function addCustomer() {
+  if (!state.name) {
+    toast.error(__("Name is required"));
+    return;
+  }
+  if (primaryContact.email && !validateEmailWithZod(primaryContact.email)) {
+    toast.error(__("Invalid email address"));
+    return;
+  }
   customerResource.submit({
-    doc: {
-      doctype: "HD Customer",
+    customer: {
       customer_name: state.name,
+      customer_type: state.customerType,
       domain: state.domain,
       image: state.image,
       country: state.country,
     },
+    primary_contact: primaryContact.email
+      ? {
+          first_name: primaryContact.firstName,
+          last_name: primaryContact.lastName,
+          email: primaryContact.email,
+          mobile_no: primaryContact.mobileNo,
+        }
+      : null,
   });
 }
 
