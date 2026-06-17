@@ -13,7 +13,7 @@ from frappe.desk.form.assign_to import get as get_assignees
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
 from frappe.query_builder import DocType, Order
-from frappe.utils import add_to_date, getdate, now_datetime
+from frappe.utils import add_to_date, cint, getdate, now_datetime
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -1349,6 +1349,7 @@ def close_tickets_after_n_days():
     status, days_threshold = frappe.db.get_value(
         "HD Settings", "HD Settings", ["auto_close_status", "auto_close_after_days"]
     )
+    days_threshold = cint(days_threshold)
 
     # Compute the cutoff in the system timezone to match how communication_date is
     # stored. Using the database's NOW() instead would select the wrong tickets when
