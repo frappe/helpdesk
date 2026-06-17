@@ -17,7 +17,7 @@ class ERPNextHDSettings(Document):
             # throw this error message if ERPNext is not installed on the site and enabled is checked
             frappe.throw(
                 _(
-                    "ERPNext is not installed on your site. Please install ERPNext to enable this setting.",
+                    "ERPNext is not installed on your site. Please install ERPNext to enable this setting",
                 )
             )
 

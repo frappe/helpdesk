@@ -28,10 +28,9 @@
 
 <script setup lang="ts">
 import { AttachmentItem, UserAvatar } from "@/components";
-import { dayjs } from "@/dayjs";
 import { UserInfo } from "@/types";
 import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
-import { Tooltip } from "frappe-ui";
+import { dayjs, Tooltip } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 
 interface Attachment {

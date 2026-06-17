@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="show">
-    <template #body>
+  <Dialog v-model:open="show" bare>
+    <template #default>
       <div class="bg-surface-modal px-4 pb-6 pt-5 sm:px-6">
         <div class="mb-5 flex items-center justify-between">
           <div>
@@ -14,13 +14,13 @@
               variant="ghost"
               class="w-7"
               @click="openCallLogModal"
-              icon="edit"
+              icon="lucide-edit"
             />
             <Button
               variant="ghost"
               class="w-7"
               @click="show = false"
-              icon="x"
+              icon="lucide-x"
             />
           </div>
         </div>
@@ -43,19 +43,19 @@
                   :label="field.value.caller.label"
                   size="sm"
                 />
-                <div class="ml-1 flex flex-col gap-1">
+                <div class="ms-1 flex flex-col gap-1">
                   {{ field.value.caller.label }}
                 </div>
                 <FeatherIcon
                   name="arrow-right"
-                  class="mx-1 h-4 w-4 text-ink-gray-5"
+                  class="mx-1 h-4 w-4 text-ink-gray-5 rtl:rotate-180"
                 />
                 <Avatar
                   :image="field.value.receiver.image"
                   :label="field.value.receiver.label"
                   size="sm"
                 />
-                <div class="ml-1 flex flex-col gap-1">
+                <div class="ms-1 flex flex-col gap-1">
                   {{ field.value.receiver.label }}
                 </div>
               </div>
@@ -98,10 +98,9 @@ import ContactsIcon from "@/components/icons/ContactsIcon.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 import TicketIcon from "@/components/icons/TicketIcon.vue";
-import { FeatherIcon, Avatar, Tooltip, createResource } from "frappe-ui";
+import { FeatherIcon, Avatar, Tooltip, createResource, dayjs } from "frappe-ui";
 import { computed, h, nextTick, ref, watch } from "vue";
 import { formatDate } from "@vueuse/core";
-import dayjs from "dayjs";
 import { timeAgo } from "@/utils";
 import { statusColorMap, statusLabelMap } from "./utils";
 import { useAuthStore } from "@/stores/auth";
@@ -215,7 +214,7 @@ function getCallLogDetail(row, log, columns = []) {
   if (row === "duration") {
     return {
       label: log._duration,
-      icon: "clock",
+      icon: "lucide-clock",
     };
   } else if (row === "caller") {
     return {

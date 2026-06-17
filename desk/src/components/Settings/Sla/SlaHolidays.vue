@@ -16,7 +16,7 @@
       <template #target="{ open }">
         <Button
           class="text-sm"
-          :icon-right="open ? 'chevron-up' : 'chevron-down'"
+          :icon-right="open ? 'lucide-chevron-up' : 'lucide-chevron-down'"
           :label="slaData.holiday_list"
         />
       </template>
@@ -43,7 +43,7 @@
                 <Button
                   variant="ghost"
                   @click.stop="editHolidayList(holiday)"
-                  icon="edit"
+                  icon="lucide-edit"
                 />
               </div>
             </div>
@@ -56,7 +56,7 @@
               variant="ghost"
               :label="__('Create new business holiday')"
               @click="createNewHolidayList()"
-              icon-left="plus"
+              icon-left="lucide-plus"
             />
           </div>
         </div>

@@ -1,18 +1,9 @@
 <template>
-  <SettingsLayoutBase>
-    <template #title>
-      <div class="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="dependencyLabel"
-          size="md"
-          @click="handleBackNavigation"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pr-0"
-        />
-        <UnsavedBadge :show="isDirty" />
-      </div>
-    </template>
+  <SettingsLayoutBase
+    :back-label="dependencyLabel"
+    :on-back="handleBackNavigation"
+    :dirty="isDirty"
+  >
     <template #header-actions>
       <div class="flex gap-4">
         <!-- Switch -->
@@ -86,15 +77,18 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
 import { createResource, Switch, toast } from "frappe-ui";
-import { computed, onUnmounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
-import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
+import {
+  clearFieldOptionsCache,
+  getFieldOptions,
+  hiddenChildFields,
+} from "./fieldDependency";
 import FieldDependencyCriteria from "./FieldDependencyCriteria.vue";
 import FieldDependencyFieldsSelection from "./FieldDependencyFieldsSelection.vue";
 import FieldDependencyValueSelection from "./FieldDependencyValueSelection.vue";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import UnsavedBadge from "@/components/UnsavedBadge.vue";
 
 const props = defineProps({
   fieldDependencyName: {
@@ -338,6 +332,12 @@ watch(
     state.childSearch = ""; // Reset child search when parent selection changes
   }
 );
+
+onMounted(() => {
+  // Drop any cached field options so newly added link/select values
+  // (e.g. a freshly created ticket type) show up on each visit.
+  clearFieldOptionsCache();
+});
 
 onUnmounted(() => {
   disableSettingModalOutsideClick.value = false;

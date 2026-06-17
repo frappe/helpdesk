@@ -1,16 +1,14 @@
 <template>
   <Dialog
-    :options="{
-      title: 'Merge with another category',
-    }"
+    title="Merge with another category"
     @after-leave="
       () => {
         toCategory = null;
       }
     "
-    v-model="showDialog"
+    v-model:open="showDialog"
   >
-    <template #body-content>
+    <template #default>
       <p class="text-p-base text-ink-gray-8 mb-4">
         This will move all articles of the
         <span class="whitespace-nowrap font-semibold">{{ categoryTitle }}</span>

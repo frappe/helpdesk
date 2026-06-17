@@ -1,6 +1,10 @@
 <template>
-  <Dialog v-model="dialog.show" :options="renameDialogOptions">
-    <template #body-content>
+  <Dialog
+    v-model:open="dialog.show"
+    :title="renameDialogOptions.title"
+    :message="renameDialogOptions.message"
+  >
+    <template #default>
       <FormControl
         v-model="teamName"
         :label="__('Title')"

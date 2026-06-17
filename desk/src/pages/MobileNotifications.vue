@@ -37,7 +37,7 @@
       <UserAvatar :name="n.user_from" />
       <div>
         <div class="mb-2 leading-5">
-          <span class="space-x-1 text-ink-gray-7">
+          <span class="space-x-1 rtl:space-x-reverse text-ink-gray-7">
             <span class="font-medium text-ink-gray-9">{{ n.user_from }}</span>
             <span v-if="n.notification_type === 'Mention'">{{
               __("mentioned you in ticket")
@@ -70,12 +70,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Breadcrumbs, Tooltip } from "frappe-ui";
+import { Breadcrumbs, dayjs, Tooltip } from "frappe-ui";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { useNotificationStore } from "@/stores/notification";
 import { ref } from "vue";
 import { onClickOutside } from "@vueuse/core";
-import { dayjs } from "@/dayjs";
 import { Notification } from "@/types";
 import { UserAvatar } from "@/components";
 import LucideBell from "~icons/lucide/bell";

@@ -2,7 +2,7 @@
   <div v-if="ticket.data" class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" class="-ml-0.5" />
+        <Breadcrumbs :items="breadcrumbs" class="-ms-0.5" />
       </template>
       <template #right-header>
         <CustomActions
@@ -38,11 +38,24 @@
           >
           </Alert>
         </div>
-        <!-- show for only mobile -->
-        <TicketCustomerTemplateFields v-if="isMobileView" />
+        <!-- Mobile: Activity / Details tabs -->
+        <Tabs
+          v-if="isMobileView"
+          v-model="activeTab"
+          :tabs="tabs"
+          class="[&_[role='tablist']]:px-5"
+        >
+          <template #tab-panel="{ tab }">
+            <TicketCustomerTemplateFields v-if="tab.name === 'details'" />
+            <TicketConversation v-else :show-header="false" class="grow" />
+          </template>
+        </Tabs>
 
-        <TicketConversation class="grow" />
+        <!-- Desktop: conversation -->
+        <TicketConversation v-else class="grow" />
+
         <div
+          v-if="!isMobileView || activeTab === 0"
           class="w-full p-5"
           @keydown.ctrl.enter.capture.stop="sendEmail"
           @keydown.meta.enter.capture.stop="sendEmail"
@@ -92,12 +105,14 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
+import { ActivityIcon, DetailsIcon } from "@/components/icons";
 import {
   Alert,
   Breadcrumbs,
   Button,
   call,
   createResource,
+  Tabs,
   toast,
 } from "frappe-ui";
 import {
@@ -161,6 +176,12 @@ const isExpanded = ref(false);
 const { isMobileView } = useScreenSize();
 const { $dialog, $socket } = globalStore();
 const isDismissed = ref(false);
+
+const activeTab = ref(0);
+const tabs = computed(() => [
+  { name: "activity", label: __("Activity"), icon: ActivityIcon },
+  { name: "details", label: __("Details"), icon: DetailsIcon },
+]);
 
 function getTodayKey() {
   return new Date().toISOString().split("T")[0];

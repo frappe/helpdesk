@@ -1,5 +1,5 @@
 <template>
-  <Menu as="div" class="relative inline-block text-left" v-slot="{ open }">
+  <Menu as="div" class="relative inline-block text-start" v-slot="{ open }">
     <Popover
       :transition="dropdownTransition"
       :show="open"
@@ -19,14 +19,14 @@
           class="mt-2 min-w-40 divide-y divide-outline-gray-modals rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
           :class="{
             'mt-2': ['bottom', 'left', 'right'].includes(placement),
-            'ml-2': placement == 'right-start',
+            'ms-2': placement == 'right-start',
           }"
         >
           <MenuItems
             class="min-w-40 divide-y divide-outline-gray-modals"
             :class="{
-              'left-0 origin-top-left': placement == 'left',
-              'right-0 origin-top-right': placement == 'right',
+              'start-0 origin-top-left': placement == 'left',
+              'end-0 origin-top-right': placement == 'right',
               'inset-x-0 origin-top': placement == 'center',
               'mt-0 origin-top-right': placement == 'right-start',
             }"
@@ -60,11 +60,11 @@
                     <FeatherIcon
                       v-if="item.icon && typeof item.icon === 'string'"
                       :name="item.icon"
-                      class="mr-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
+                      class="me-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
                       aria-hidden="true"
                     />
                     <component
-                      class="mr-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
+                      class="me-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
                       v-else-if="item.icon"
                       :is="item.icon"
                     />

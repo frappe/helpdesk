@@ -7,9 +7,16 @@ from frappe.core.api.user_invitation import invite_by_email
 from frappe.model.document import Document
 from frappe.utils import validate_email_address
 
-from helpdesk.integrations.erpnext.utils import cascade_rename, in_cascade
+from helpdesk.integrations.erpnext.utils import (
+    cascade_rename,
+    in_cascade,
+    map_source_to_target_values,
+)
 from helpdesk.integrations.erpnext.utils import should_sync as should_sync_with_erpnext
-from helpdesk.integrations.erpnext.utils import validate_rename_conflict
+from helpdesk.integrations.erpnext.utils import (
+    sync_related_fields,
+    validate_rename_conflict,
+)
 from helpdesk.utils import agent_only, get_customers, is_agent
 
 CUSTOMER_ROLES = ("HD Customer", "HD Customer Manager")
@@ -306,6 +313,7 @@ class HDCustomer(Document):
                 "doctype": "Customer",
                 "customer_name": self.customer_name,
                 "hd_customer": self.name,
+                **map_source_to_target_values(self),
             }
         )
         erp_doc.flags.ignore_erpnext_sync = True
@@ -313,25 +321,10 @@ class HDCustomer(Document):
         frappe.db.set_value("HD Customer", self.name, "erpnext_customer", erp_doc.name)
 
     def on_update(self):
-        if not should_sync_with_erpnext():
+        if not should_sync_with_erpnext() or self.flags.get("ignore_erpnext_sync"):
             return
 
-        if self.flags.get("ignore_erpnext_sync"):
-            return
-
-        if self.has_value_changed("image"):
-            # check if exists
-            erpnext_customer = frappe.db.get_value(
-                "Customer", {"hd_customer": self.name}, "name"
-            )
-            if not erpnext_customer:
-                return
-            frappe.db.set_value(
-                "Customer",
-                {"hd_customer": self.name},
-                "image",
-                self.image,
-            )
+        sync_related_fields(self)
 
     def before_rename(self, olddn, newdn, merge=False):
         validate_rename_conflict("HD Customer", olddn, newdn, merge)

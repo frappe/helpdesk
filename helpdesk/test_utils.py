@@ -263,6 +263,18 @@ def make_status(name: str = "Test Status", category: str = "Open"):
     return doc.insert(ignore_if_duplicate=True)
 
 
+def make_agent_status(agent_status: str, category="Away", enable=1, status_order=None):
+    return frappe.get_doc(
+        {
+            "doctype": "HD Agent Status",
+            "agent_status": agent_status,
+            "category": category,
+            "enable": enable,
+            "status_order": status_order,
+        }
+    ).insert()
+
+
 def make_agent(email: str, first_name: str = "Test Agent"):
     """
     Creates a test user and HD Agent if they don't exist.
@@ -319,6 +331,27 @@ def add_comment(
     if save:
         return comment.insert()
     return comment
+
+
+def set_ticket_status_and_communication_date(ticket_name, status, communication_date):
+    """Force a ticket's status and the date of all its communications directly in the
+    database, bypassing controller side effects. Useful for testing scheduled jobs that
+    key off communication_date (auto close, SLA escalation, reminders)."""
+    frappe.db.set_value(
+        "HD Ticket", ticket_name, "status", status, update_modified=False
+    )
+    for comm_name in frappe.get_all(
+        "Communication",
+        filters={"reference_doctype": "HD Ticket", "reference_name": ticket_name},
+        pluck="name",
+    ):
+        frappe.db.set_value(
+            "Communication",
+            comm_name,
+            "communication_date",
+            communication_date,
+            update_modified=False,
+        )
 
 
 def create_contact(name, email, user=True, role="HD Customer"):
@@ -493,3 +526,21 @@ def make_team(team_name, members=[], disabled=False):
     team.disabled = disabled
     team.insert(ignore_permissions=True)
     return team
+
+
+def upload_test_file(file_name: str) -> str:
+    """Upload an image from desk/src/assets/images/ as a standalone private File, returning its name."""
+    file_path = frappe.get_app_path(
+        "helpdesk", "..", "desk", "src", "assets", "images", file_name
+    )
+    with open(file_path, "rb") as f:
+        content = f.read()
+    file_doc = frappe.get_doc(
+        {
+            "doctype": "File",
+            "file_name": file_name,
+            "is_private": 1,
+            "content": content,
+        }
+    ).insert(ignore_permissions=True)
+    return file_doc.name

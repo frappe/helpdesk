@@ -39,7 +39,7 @@
             :label="__(status.label)"
             variant="subtle"
             :theme="status.color"
-            class="mr-1.5"
+            class="me-1.5"
           />
           <Tooltip
             :text="dateFormat(creation, dateTooltipFormat)"
@@ -73,7 +73,7 @@
             ]"
           >
             <Button
-              icon="more-horizontal"
+              icon="lucide-more-horizontal"
               class="!text-ink-gray-7"
               variant="ghost"
             />
@@ -89,8 +89,8 @@
         v-for="(val, label) in { To: to, cc: cc, bcc: bcc }"
         :key="label"
       >
-        <span v-if="val" class="mr-1.5">
-          <span class="mr-1 text-ink-gray-7">{{ label }}:</span>
+        <span v-if="val" class="me-1.5">
+          <span class="me-1 text-ink-gray-7">{{ label }}:</span>
           <span> {{ normalizeAndFilter(val).join(", ") }}</span>
         </span>
       </template>

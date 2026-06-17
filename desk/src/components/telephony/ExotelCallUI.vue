@@ -2,11 +2,11 @@
   <div>
     <div
       v-show="showSmallCallPopup"
-      class="ml-2 flex cursor-pointer select-none items-center justify-between gap-1 rounded-full bg-surface-gray-7 px-2 py-1 mt-1 text-base !text-ink-gray-2"
+      class="ms-2 flex cursor-pointer select-none items-center justify-between gap-1 rounded-full bg-surface-gray-7 px-2 py-1 mt-1 text-base !text-ink-gray-2"
       @click="toggleCallPopup"
     >
       <div
-        class="flex justify-center items-center size-5 rounded-full bg-surface-gray-6 shrink-0 mr-1"
+        class="flex justify-center items-center size-5 rounded-full bg-surface-gray-6 shrink-0 me-1"
       >
         <Avatar
           v-if="contact?.image"
@@ -49,7 +49,7 @@
           <Button
             @click="closeCallPopup"
             class="bg-surface-gray-7 text-ink-white hover:bg-surface-gray-6 shrink-0"
-            icon="x"
+            icon="lucide-x"
             size="md"
           />
           <Button

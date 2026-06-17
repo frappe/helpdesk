@@ -5,11 +5,11 @@
         <div class="text-lg font-medium text-ink-gray-9">Customers</div>
       </template>
       <template #right-header>
-        <ERPNextCustomerSyncButton @synced="listViewRef?.reload()" />
         <Button
           label="Create"
           theme="gray"
           variant="solid"
+          class="rtl:flex-row-reverse"
           @click="isDialogVisible = !isDialogVisible"
         >
           <template #prefix>
@@ -27,7 +27,6 @@
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import NewCustomerDialog from "@/components/customer/NewCustomerDialog.vue";
-import ERPNextCustomerSyncButton from "@/components/erpnext-integration/ERPNextCustomerSyncButton.vue";
 import { OrganizationsIcon, PhoneIcon } from "@/components/icons";
 import { __ } from "@/translation";
 import { Avatar, usePageMeta } from "frappe-ui";

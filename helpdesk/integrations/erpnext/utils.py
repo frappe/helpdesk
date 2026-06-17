@@ -1,11 +1,16 @@
 import frappe
 from frappe import _
+from frappe.model.document import Document
 from frappe.model.rename_doc import rename_doc
 
 CASCADE_FLAG = "erpnext_hd_cascade_in_progress"
 
 # Doctypes whose hooks the integration touches. Anything else is a no-op.
 ALLOWED_DOCTYPES = ("HD Customer", "Customer")
+
+# Fields kept in sync between an ERPNext Customer and its linked HD Customer,
+# in both directions, on create and on update. Each entry is (customer_fieldname, hd_customer_fieldname).
+FIELDS_TO_SYNC: tuple[tuple[str, str], ...] = (("image", "image"),)
 
 
 def should_sync():
@@ -176,6 +181,37 @@ def _resync_data_fields(self_doctype: str, self_name: str, other_name: str) -> N
             hd_name,
             update_modified=False,
         )
+
+
+def map_source_to_target_values(source: Document) -> dict:
+    """Field values to copy onto the counterpart being created on the other
+    side. Used when a Customer/HD Customer is first created from its twin."""
+    return {target: source.get(src) for src, target in _field_map(source.doctype)}
+
+
+def sync_related_fields(source: Document) -> None:
+    """On update of either side, copy any changed synced field to the linked
+    counterpart. Uses db.set_value so the other side's hooks don't re-fire."""
+    target = find_target_for(source.doctype, source.name)
+    if not target:
+        return
+    target_doctype, target_name = target
+    changed = {
+        target_field: source.get(src)
+        for src, target_field in _field_map(source.doctype)
+        if source.has_value_changed(src)
+    }
+    if changed:
+        frappe.db.set_value(target_doctype, target_name, changed)
+
+
+def _field_map(source_doctype: str) -> list[tuple[str, str]]:
+    """(source_field, target_field) pairs for syncing FROM source_doctype."""
+    if source_doctype == "Customer":
+        return [
+            (customer_field, hd_field) for customer_field, hd_field in FIELDS_TO_SYNC
+        ]
+    return [(hd_field, customer_field) for customer_field, hd_field in FIELDS_TO_SYNC]
 
 
 def find_target_for(doctype: str | None, value: str | None) -> tuple[str, str] | None:

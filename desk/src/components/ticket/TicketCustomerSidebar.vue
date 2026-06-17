@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-[382px] flex-col border-l gap-4">
+  <div class="flex w-[382px] flex-col border-s gap-4">
     <!-- Ticket ID -->
     <div class="flex items-center justify-between border-b px-5 py-3">
       <span class="cursor-copy text-lg font-semibold">Ticket details</span>
@@ -113,11 +113,10 @@
 </template>
 
 <script setup lang="ts">
-import { dayjs } from "@/dayjs";
 import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
 import { dateFormat, dateTooltipFormat, formatTime } from "@/utils";
-import { Avatar, Tooltip } from "frappe-ui";
+import { Avatar, dayjs, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 
 const emit = defineEmits(["open"]);

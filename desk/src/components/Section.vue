@@ -78,6 +78,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["update:opened"]);
+
 const hide = ref(props.hideLabel);
 const opened = ref(props.opened);
 
@@ -88,16 +90,21 @@ watch(
   }
 );
 
+function setOpened(value) {
+  opened.value = value;
+  emit("update:opened", value);
+}
+
 function toggle() {
-  opened.value = !opened.value;
+  setOpened(!opened.value);
 }
 
 function open() {
-  opened.value = true;
+  setOpened(true);
 }
 
 function close() {
-  opened.value = false;
+  setOpened(false);
 }
 </script>
 <script>

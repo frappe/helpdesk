@@ -8,21 +8,22 @@ from helpdesk.integrations.erpnext.utils import set_links, should_sync
 
 @frappe.whitelist()
 def get_sync_info() -> dict:
-    if not frappe.has_permission("Customer", "read") or not frappe.has_permission(
-        "HD Customer", "read"
-    ):
-        return {"enabled": False}
+    """Drive the ERPNext integration settings UI. `in_sync` gates the 'Sync now'
+    action. Whether ERPNext is installed is read on the frontend from the boot
+    `apps` list, not from here."""
     if "erpnext" not in frappe.get_installed_apps():
+        return {"enabled": False, "in_sync": False}
+
+    if not frappe.has_permission("HD Customer", "read") or not frappe.has_permission(
+        "Customer", "read"
+    ):
         return {"enabled": False}
 
     enabled = bool(frappe.db.get_single_value("ERPNext HD Settings", "enabled"))
     if not enabled:
         return {"enabled": False}
 
-    return {
-        "enabled": True,
-        "in_sync": in_sync(),
-    }
+    return {"enabled": enabled, "in_sync": in_sync()}
 
 
 def in_sync() -> bool:
@@ -127,7 +128,11 @@ def sync_all_customers():
     sync_user_permissions()
     sync_shared_docs()
 
+    # after_commit so the frontend's get_sync_info reload sees the committed
+    # links (in_sync = True) instead of pre-commit state. The job runs as the
+    # triggering user (frappe.enqueue → set_user), so this reaches their room.
     frappe.publish_realtime(
         "helpdesk:erpnext-sync-end",
         user=frappe.session.user,
+        after_commit=True,
     )

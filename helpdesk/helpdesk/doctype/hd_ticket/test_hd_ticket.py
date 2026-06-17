@@ -7,11 +7,13 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
+from helpdesk.api.ticket import bulk_reply
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     merge_ticket,
     show_outside_hours_banner,
     split_ticket,
 )
+from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import close_tickets_after_n_days
 from helpdesk.test_utils import (
     add_comment,
     add_contact_in_customer,
@@ -24,7 +26,9 @@ from helpdesk.test_utils import (
     make_status,
     make_ticket,
     remove_holidays,
+    set_ticket_status_and_communication_date,
     update_role_in_customer,
+    upload_test_file,
 )
 
 ERROR_MSG_RESPONSE = "Response time differs by more than 1 second"
@@ -1335,6 +1339,124 @@ class TestHDTicket(IntegrationTestCase):
                 )
         finally:
             frappe.set_user("Administrator")
+
+    def test_bulk_reply(self):
+        """
+        bulk_reply on two tickets with two uploaded files should send a reply per
+        ticket and attach the files to both the resulting communications and the
+        tickets.
+        """
+        frappe.set_user(agent)
+
+        file1 = upload_test_file("outlook.png")
+        file2 = upload_test_file("sendgrid.png")
+
+        ticket1 = make_ticket(raised_by="customer1@test.com")
+        ticket2 = make_ticket(raised_by="customer2@test.com")
+        ticket_ids = [ticket1.name, ticket2.name]
+
+        bulk_reply(
+            ticket_ids=ticket_ids,
+            message="Test Message",
+            attachments=[file1, file2],
+        )
+
+        communications = frappe.get_all(
+            "Communication",
+            filters={
+                "reference_doctype": "HD Ticket",
+                "reference_name": ["in", ticket_ids],
+                "sent_or_received": "Sent",
+            },
+            pluck="name",
+        )
+        self.assertEqual(len(communications), 2)  # one agent reply per ticket
+
+        communication_attachments = frappe.db.count(
+            "File",
+            {
+                "attached_to_doctype": "Communication",
+                "attached_to_name": ["in", communications],
+            },
+        )
+        ticket_attachments = frappe.db.count(
+            "File",
+            {
+                "attached_to_doctype": "HD Ticket",
+                "attached_to_name": ["in", ticket_ids],
+            },
+        )
+
+        # Each ticket's communication carries both files, and each ticket carries
+        # both files: 2 communications x 2 files and 2 tickets x 2 files.
+        self.assertEqual(communication_attachments, 4)
+        self.assertEqual(ticket_attachments, 4)
+
+        # delete all files
+        files = frappe.get_all(
+            "File",
+            filters={
+                "attached_to_doctype": ["in", ["Communication", "HD Ticket"]],
+            },
+            pluck="name",
+        )
+        for file in files:
+            frappe.delete_doc("File", file)
+
+    def test_auto_close_respects_inactivity_cutoff_boundary(self):
+        """`close_tickets_after_n_days` closes a ticket whose last communication is
+        older than the inactivity cutoff and keeps one whose last communication
+        falls within it. The cutoff is computed in the system timezone, so the
+        boundary holds regardless of the database server's timezone."""
+        days_threshold = 5
+        eligible_status = "Replied"
+
+        settings_fields = [
+            "auto_close_tickets",
+            "auto_close_status",
+            "auto_close_after_days",
+        ]
+        previous_settings = {
+            field: frappe.db.get_single_value("HD Settings", field)
+            for field in settings_fields
+        }
+        frappe.db.set_single_value(
+            "HD Settings",
+            {
+                "auto_close_tickets": 1,
+                "auto_close_status": eligible_status,
+                "auto_close_after_days": days_threshold,
+            },
+        )
+
+        cutoff = add_to_date(now_datetime(), days=-days_threshold)
+        just_past_cutoff = cutoff - timedelta(minutes=5)  # inactive -> should close
+        within_cutoff = cutoff + timedelta(minutes=5)  # still active -> should stay
+
+        stale_ticket = make_ticket()
+        fresh_ticket = make_ticket()
+        set_ticket_status_and_communication_date(
+            stale_ticket.name, eligible_status, just_past_cutoff
+        )
+        set_ticket_status_and_communication_date(
+            fresh_ticket.name, eligible_status, within_cutoff
+        )
+
+        try:
+            close_tickets_after_n_days()
+
+            self.assertEqual(
+                frappe.db.get_value("HD Ticket", stale_ticket.name, "status"),
+                "Closed",
+                "Ticket inactive past the cutoff should be auto closed",
+            )
+            self.assertEqual(
+                frappe.db.get_value("HD Ticket", fresh_ticket.name, "status"),
+                eligible_status,
+                "Ticket active within the cutoff should not be closed",
+            )
+        finally:
+            frappe.db.set_single_value("HD Settings", previous_settings)
 
     def tearDown(self):
         frappe.set_user("Administrator")

@@ -59,6 +59,20 @@ def is_agent(user: str | None = None) -> bool:
     )
 
 
+def get_agent_name(user: str = None) -> str | None:
+    """
+    Get the HD Agent name for `user`
+
+    The HD Agent's name is the user (see HD Agent controller), so this
+    returns the user when an agent record exists, else None.
+
+    :param user: User to check against, defaults to current user
+    :return: HD Agent name, or None if `user` is not an agent
+    """
+    user = user or frappe.session.user
+    return user if frappe.db.exists("HD Agent", user) else None
+
+
 def publish_event(
     event: str,
     room: str | None = None,

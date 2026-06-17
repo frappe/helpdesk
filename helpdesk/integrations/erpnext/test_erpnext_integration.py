@@ -7,6 +7,7 @@ from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.integrations.erpnext.api import in_sync, sync_all_customers
 from helpdesk.integrations.erpnext.user_permission import sync_user_permissions
+from helpdesk.integrations.erpnext.utils import FIELDS_TO_SYNC
 
 from .test_utils import (
     cleanup_user_permission,
@@ -75,33 +76,98 @@ class TestERPNextIntegration(FrappeTestCase):
 
         self.assertEqual(frappe.db.count("Customer", {"hd_customer": hd_doc.name}), 1)
 
+    def test_synced_fields_copied_on_create(self):
+        """Creating an HD Customer should copy every FIELDS_TO_SYNC field onto
+        the ERP Customer twin created for it."""
+        enable_erpnext_sync()
+
+        hd_values = {hd: f"/files/{hd}-create.png" for _customer, hd in FIELDS_TO_SYNC}
+        hd_doc = frappe.get_doc(
+            {
+                "doctype": "HD Customer",
+                "customer_name": "Create Sync Co",
+                **hd_values,
+            }
+        )
+        hd_doc.insert(ignore_permissions=True)
+        erp_name = frappe.db.get_value("Customer", {"hd_customer": hd_doc.name}, "name")
+        self.addCleanup(frappe.delete_doc, "Customer", erp_name, force=True)
+        self.addCleanup(frappe.delete_doc, "HD Customer", hd_doc.name, force=True)
+
+        for customer_field, hd_field in FIELDS_TO_SYNC:
+            self.assertEqual(
+                frappe.db.get_value("Customer", erp_name, customer_field),
+                hd_values[hd_field],
+            )
+
     # ------------------------------------------------------------------
-    # on_update (image sync)
+    # on_update (FIELDS_TO_SYNC field sync, both directions)
     # ------------------------------------------------------------------
 
-    def test_image_not_synced_when_sync_disabled(self):
-        hd_doc, erp_doc = link_customers(self, "Image No Sync")
+    def test_fields_not_synced_when_sync_disabled(self):
+        """HD→ERP: with sync off, synced-field changes don't propagate."""
+        hd_doc, erp_doc = link_customers(self, "Fields No Sync")
 
-        hd_doc.image = "/files/new_logo.png"
+        for _customer_field, hd_field in FIELDS_TO_SYNC:
+            hd_doc.set(hd_field, f"/files/{hd_field}-test.png")
         hd_doc.save(ignore_permissions=True)
 
-        self.assertNotEqual(
-            frappe.db.get_value("Customer", erp_doc.name, "image"),
-            "/files/new_logo.png",
-        )
+        for customer_field, hd_field in FIELDS_TO_SYNC:
+            self.assertNotEqual(
+                frappe.db.get_value("Customer", erp_doc.name, customer_field),
+                f"/files/{hd_field}-test.png",
+            )
 
-    def test_image_syncs_to_erp_customer(self):
+    def test_fields_sync_to_erp_customer(self):
+        """HD→ERP: changing any synced field on HD propagates to the Customer."""
         enable_erpnext_sync()
-        hd_doc, erp_doc = link_customers(self, "Image Sync")
+        hd_doc, erp_doc = link_customers(self, "Fields Sync")
 
-        hd_doc.image = "/files/new_logo.png"
+        for _customer_field, hd_field in FIELDS_TO_SYNC:
+            hd_doc.set(hd_field, f"/files/{hd_field}-test.png")
         hd_doc.flags.ignore_erpnext_sync = False
         hd_doc.save(ignore_permissions=True)
 
-        self.assertEqual(
-            frappe.db.get_value("Customer", erp_doc.name, "image"),
-            "/files/new_logo.png",
-        )
+        for customer_field, hd_field in FIELDS_TO_SYNC:
+            self.assertEqual(
+                frappe.db.get_value("Customer", erp_doc.name, customer_field),
+                f"/files/{hd_field}-test.png",
+            )
+
+    def test_fields_sync_to_hd_customer(self):
+        """ERP→HD (reverse): changing any synced field on the Customer
+        propagates to the linked HD Customer."""
+        enable_erpnext_sync()
+        hd_doc, erp_doc = link_customers(self, "Fields Sync Reverse")
+
+        erp_doc.reload()
+        for customer_field, _hd_field in FIELDS_TO_SYNC:
+            erp_doc.set(customer_field, f"/files/{customer_field}-test.png")
+        erp_doc.flags.ignore_erpnext_sync = False
+        erp_doc.save(ignore_permissions=True)
+
+        for customer_field, hd_field in FIELDS_TO_SYNC:
+            self.assertEqual(
+                frappe.db.get_value("HD Customer", hd_doc.name, hd_field),
+                f"/files/{customer_field}-test.png",
+            )
+
+    def test_fields_not_synced_to_hd_when_sync_disabled(self):
+        """ERP→HD: with sync off, synced-field changes don't reach HD (even
+        though the change itself isn't sync-flagged)."""
+        hd_doc, erp_doc = link_customers(self, "Fields No Sync Reverse")
+
+        erp_doc.reload()
+        for customer_field, _hd_field in FIELDS_TO_SYNC:
+            erp_doc.set(customer_field, f"/files/{customer_field}-test.png")
+        erp_doc.flags.ignore_erpnext_sync = False
+        erp_doc.save(ignore_permissions=True)
+
+        for customer_field, hd_field in FIELDS_TO_SYNC:
+            self.assertNotEqual(
+                frappe.db.get_value("HD Customer", hd_doc.name, hd_field),
+                f"/files/{customer_field}-test.png",
+            )
 
     # ------------------------------------------------------------------
     # on_trash

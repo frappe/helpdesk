@@ -1,6 +1,6 @@
 <template>
   <span>
-    <a :href="isShowable ? null : url" target="_blank">
+    <a :href="isShowable ? undefined : url" target="_blank">
       <Button
         :label="label"
         theme="gray"
@@ -8,21 +8,15 @@
         @click="toggleDialog()"
       >
         <template #prefix>
-          <component :is="getIcon()" class="h-4 w-4" />
+          <component :is="icon" class="h-4 w-4" />
         </template>
         <template #suffix>
           <slot name="suffix" />
         </template>
       </Button>
     </a>
-    <Dialog
-      v-model="showDialog"
-      :options="{
-        title: label,
-        size: '4xl',
-      }"
-    >
-      <template #body-content>
+    <Dialog v-model:open="showDialog" :title="label" size="4xl">
+      <template #default>
         <div
           v-if="isText"
           class="prose prose-sm max-w-none whitespace-pre-wrap"
@@ -38,38 +32,57 @@
 <script setup lang="ts">
 import { Button, Dialog } from "frappe-ui";
 import { getType as getMime } from "mime";
-import { ref } from "vue";
+import { markRaw, ref, type Component } from "vue";
 import LucideFile from "~icons/lucide/file";
 import LucideFileImage from "~icons/lucide/file-image";
 import LucideFileSpreadsheet from "~icons/lucide/file-spreadsheet";
 import LucideFileText from "~icons/lucide/file-text";
 import LucideFileType from "~icons/lucide/file-type";
+import LucideFileVideo from "~icons/lucide/file-video";
 
 interface P {
   label: string;
-  url?: string;
+  url?: string | null;
 }
 
 const props = withDefaults(defineProps<P>(), {
   url: null,
 });
 
+type AttachmentKind =
+  | "image"
+  | "video"
+  | "pdf"
+  | "spreadsheet"
+  | "text"
+  | "file";
+
+const ICONS: Record<AttachmentKind, Component> = {
+  image: markRaw(LucideFileImage),
+  video: markRaw(LucideFileVideo),
+  pdf: markRaw(LucideFileText),
+  spreadsheet: markRaw(LucideFileSpreadsheet),
+  text: markRaw(LucideFileType),
+  file: markRaw(LucideFile),
+};
+
+function getKind(mime: string): AttachmentKind {
+  if (mime.startsWith("image/")) return "image";
+  if (mime.startsWith("video/")) return "video";
+  if (mime === "application/pdf") return "pdf";
+  if (mime.includes("spreadsheet")) return "spreadsheet";
+  if (mime === "text/plain") return "text";
+  return "file";
+}
+
 const showDialog = ref(false);
 const mimeType = getMime(props.label) || "";
-const isImage = mimeType.startsWith("image/");
-const isPdf = mimeType === "application/pdf";
-const isSpreadsheet = mimeType.includes("spreadsheet");
-const isText = mimeType === "text/plain";
+const kind = getKind(mimeType);
+const isImage = kind === "image";
+const isText = kind === "text";
 const isShowable = props.url && (isText || isImage);
+const icon = ICONS[kind];
 const content = ref("");
-
-function getIcon() {
-  if (isText) return LucideFileType;
-  else if (isImage) return LucideFileImage;
-  else if (isPdf) return LucideFileText;
-  else if (isSpreadsheet) return LucideFileSpreadsheet;
-  else return LucideFile;
-}
 
 function toggleDialog() {
   if (!isShowable) return;

@@ -37,9 +37,9 @@
           </template>
         </Popover>
       </div>
-      <div v-else class="ml-2">
+      <div v-else class="ms-2">
         <select
-          class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-md p-0 pl-2 pr-5 bg-transparent -ml-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
+          class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-md p-0 ps-2 pe-5 bg-transparent -ms-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
           v-model="props.row[column.key]"
         >
           <option
@@ -55,7 +55,7 @@
     <div class="flex justify-end">
       <Dropdown placement="right" :options="dropdownOptions">
         <Button
-          icon="more-horizontal"
+          icon="lucide-more-horizontal"
           variant="ghost"
           @click="isConfirmingDelete = false"
         />
@@ -105,7 +105,7 @@ const dropdownOptions = [
   {
     label: "Edit",
     onClick: () => editItem(),
-    icon: "edit",
+    icon: "lucide-edit",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteItem(),

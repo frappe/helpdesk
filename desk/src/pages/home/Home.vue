@@ -10,7 +10,7 @@
             v-if="layout.length > 0 && !editing"
             :label="__('Refresh')"
             variant="subtle"
-            :icon-left="'refresh-ccw'"
+            :icon-left="'lucide-refresh-ccw'"
             @click="agentDashboard.reload({ reset_layout: false })"
             :disabled="isLoading"
           />
@@ -18,7 +18,7 @@
             v-if="editing && isDashboardModified"
             :label="__('Reset')"
             variant="subtle"
-            :icon-left="'rotate-cw'"
+            :icon-left="'lucide-rotate-cw'"
             @click="onReset"
             :disabled="isLoading"
           />
@@ -26,7 +26,7 @@
             v-if="editing"
             :label="__('Save')"
             variant="subtle"
-            :icon-left="'check'"
+            :icon-left="'lucide-check'"
             @click="onSave"
             :disabled="!isDirty"
             :loading="isLoading"
@@ -35,7 +35,7 @@
             v-if="layout.length > 0 && !editing"
             :label="__('Edit')"
             variant="subtle"
-            :icon-left="'edit'"
+            :icon-left="'lucide-edit'"
             @click="onEdit"
             :disabled="isLoading"
           />
@@ -54,7 +54,7 @@
             <Button
               :label="__('New')"
               variant="solid"
-              icon-left="plus"
+              icon-left="lucide-plus"
               :disabled="isLoading"
             />
           </Dropdown>
@@ -69,18 +69,18 @@
         <LoadingIndicator :scale="8" />
       </div>
       <div
-        class="flex flex-col p-1 pt-4 md:p-4 md:pl-3 mx-auto max-w-[1500px] w-full grow relative h-full"
+        class="flex flex-col p-1 pt-4 md:p-4 md:ps-3 mx-auto max-w-[1500px] w-full grow relative h-full"
       >
         <div class="grow pb-12">
           <div
             v-if="!agentDashboard.loading && layout.length > 0"
-            class="text-xl font-semibold text-ink-gray-8 pl-2"
+            class="text-xl font-semibold text-ink-gray-8 ps-2"
           >
             {{ __("Hey") }}, {{ userName }}
           </div>
           <div
             v-if="!agentDashboard.loading && layout.length === 0"
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            class="absolute top-1/2 start-1/2 transform -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2"
           >
             <div class="flex flex-col items-center justify-center gap-1">
               <FeatherIcon name="layout" class="size-12 text-ink-gray-4" />
@@ -119,7 +119,7 @@
                   </div>
                   <div
                     v-if="editing"
-                    class="flex absolute right-0 top-0 bg-surface-gray-6 rounded cursor-pointer opacity-0 group-hover:opacity-100"
+                    class="flex absolute end-0 top-0 bg-surface-gray-6 rounded cursor-pointer opacity-0 group-hover:opacity-100"
                   >
                     <div
                       class="rounded p-1 hover:bg-surface-gray-5"

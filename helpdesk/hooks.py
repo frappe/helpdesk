@@ -79,6 +79,28 @@ doc_events = {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
+    "Customer": {
+        "after_insert": "helpdesk.integrations.erpnext.customer.after_insert",
+        "on_update": "helpdesk.integrations.erpnext.customer.on_update",
+        "before_rename": "helpdesk.integrations.erpnext.customer.before_rename",
+        "after_rename": "helpdesk.integrations.erpnext.customer.after_rename",
+        "on_trash": "helpdesk.integrations.erpnext.customer.on_trash",
+    },
+    "User Permission": {
+        "before_validate": "helpdesk.integrations.erpnext.user_permission.before_validate",
+        "after_insert": "helpdesk.integrations.erpnext.user_permission.after_insert",
+        "on_update": "helpdesk.integrations.erpnext.user_permission.on_update",
+        "on_trash": "helpdesk.integrations.erpnext.user_permission.on_trash",
+    },
+    "DocShare": {
+        "before_validate": "helpdesk.integrations.erpnext.doc_share.before_validate",
+        "after_insert": "helpdesk.integrations.erpnext.doc_share.after_insert",
+        "on_update": "helpdesk.integrations.erpnext.doc_share.on_update",
+        "on_trash": "helpdesk.integrations.erpnext.doc_share.on_trash",
+    },
+    "Notification Log": {
+        "before_insert": "helpdesk.extends.notification_log.before_insert",
+    },
 }
 
 # For List View
@@ -99,19 +121,13 @@ has_permission = {
 # Override standard doctype classes
 override_doctype_class = {
     "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
-    "Customer": "helpdesk.integrations.erpnext.customer.CustomCustomer",
-    "User Permission": "helpdesk.integrations.erpnext.user_permission.CustomUserPermission",
-    "DocShare": "helpdesk.integrations.erpnext.doc_share.CustomDocShare",
+    "Assignment Rule": "helpdesk.overrides.assignment_rule.HelpdeskAssignmentRule",
 }
 
 ignore_links_on_delete = [
     "HD Notification",
     "HD Ticket Comment",
 ]
-
-doctype_list_js = {
-    "Customer": "public/erpnext/customer_list.js",
-}
 
 # setup wizard
 # setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"

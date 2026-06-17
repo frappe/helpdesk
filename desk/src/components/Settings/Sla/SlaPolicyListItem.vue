@@ -4,7 +4,7 @@
   >
     <div
       @click="slaActiveScreen = { screen: 'view', data: data, fetchData: true }"
-      class="w-full pl-2 col-span-5 flex flex-col justify-center h-14"
+      class="w-full ps-2 col-span-5 flex flex-col justify-center h-14"
     >
       <div
         class="text-base text-ink-gray-7 font-medium flex items-center gap-2"
@@ -19,7 +19,7 @@
         {{ data.description }}
       </div>
     </div>
-    <div class="flex justify-between items-center w-full pr-2">
+    <div class="flex justify-between items-center w-full pe-2">
       <div>
         <Switch
           size="sm"
@@ -30,7 +30,7 @@
       <div>
         <Dropdown placement="right" :options="dropdownOptions">
           <Button
-            icon="more-horizontal"
+            icon="lucide-more-horizontal"
             variant="ghost"
             @click="isConfirmingDelete = false"
           />
@@ -39,10 +39,10 @@
     </div>
   </div>
   <Dialog
-    :options="{ title: __('Duplicate SLA Policy') }"
-    v-model="duplicateDialog.show"
+    :title="__('Duplicate SLA Policy')"
+    v-model:open="duplicateDialog.show"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl
           :label="__('New SLA Policy Name')"
@@ -107,7 +107,7 @@ const dropdownOptions = [
         name: props.data.name,
       };
     },
-    icon: "copy",
+    icon: "lucide-copy",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteSla(),
