@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-14 11:18+0000\n"
-"PO-Revision-Date: 2026-06-17 19:22\n"
+"PO-Revision-Date: 2026-06-18 19:52\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Bosnian\n"
 "MIME-Version: 1.0\n"
@@ -3730,7 +3730,7 @@ msgstr "Nisu pronađeni zahtjevi za pregled."
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:84
 msgid "No tickets selected"
-msgstr "Nije odabrana nijedna zahtjev"
+msgstr "Nije odabran nijedan zahtjev"
 
 #: helpdesk/api/ticket.py:76 helpdesk/utils.py:182
 msgid "Not Allowed"
@@ -4040,7 +4040,7 @@ msgstr "Ispravno konfigurišite postavke za Twilio"
 
 #: desk/src/components/layouts/Sidebar.vue:658
 msgid "Please create a new ticket to proceed with the next step."
-msgstr "Kreirate novi zahtjev da biste nastavili sa sljedećim korakom."
+msgstr "Kreiraj novi zahtjev da biste nastavili sa sljedećim korakom."
 
 #: desk/src/pages/ticket/TicketNew.vue:83
 msgid "Please enter a subject to continue"
