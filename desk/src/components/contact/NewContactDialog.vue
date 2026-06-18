@@ -167,8 +167,8 @@ async function handleAdd() {
   try {
     await addContact();
     open.value = false;
-  } catch (error) {
-    console.error("Error adding contact:", error);
+  } catch {
+    // error toast is shown by the resource's onError handler; keep dialog open
   }
 }
 </script>

@@ -109,6 +109,7 @@
 </template>
 
 <script setup lang="ts">
+import ContactCustomers from "@/components/contact/ContactCustomers.vue";
 import ContactFeedback from "@/components/contact/ContactFeedback.vue";
 import DeleteContactDialog from "@/components/contact/DeleteContactDialog.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
@@ -202,6 +203,14 @@ const contactInfo = computed(() => {
       icon: markRaw(LucideMapPin),
       value: contactInfoResource.data?.country,
       condition: !!contactInfoResource.data?.country,
+    },
+    {
+      component: markRaw(
+        h(ContactCustomers, {
+          customers: contactInfoResource.data?.customers ?? [],
+        })
+      ),
+      condition: (contactInfoResource.data?.customers?.length ?? 0) > 0,
     },
   ];
   return info;

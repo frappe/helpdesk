@@ -266,6 +266,18 @@ export function useNewContact() {
         throw new Error(__("Invalid email address"));
       }
     },
+    onSuccess: (name: string) => {
+      router.push({ name: "Contact", params: { id: name } });
+      toast.success(
+        state.invite
+          ? __("Contact created and invited")
+          : __("Contact created")
+      );
+      resetState();
+    },
+    onError: (err: unknown) => {
+      getErrorMessage(err as Error, true);
+    },
   });
 
   function parseContactData() {
@@ -283,32 +295,19 @@ export function useNewContact() {
     };
   }
 
-  const isLoading = ref(false);
-  async function addContact() {
-    isLoading.value = true;
-    const invite = state.invite;
-    addContactResource.submit(
-      { doc: parseContactData(), invite },
-      {
-        onSuccess: (name: string) => {
-          router.push({ name: "Contact", params: { id: name } });
-          const msg = invite
-            ? __("Contact created and invited")
-            : __("Contact created");
-          toast.success(msg);
-          isLoading.value = false;
-          resetState();
-        },
-        onError: (err: unknown) => {
-          const errMsg = getErrorMessage(err as Error, true);
-          toast.error(errMsg);
-          isLoading.value = false;
-        },
-      }
-    );
+  function addContact() {
+    return addContactResource.submit({
+      doc: parseContactData(),
+      invite: state.invite,
+    });
   }
 
-  return { state, fieldConfig, addContact, isLoading };
+  return {
+    state,
+    fieldConfig,
+    addContact,
+    isLoading: computed(() => addContactResource.loading),
+  };
 }
 
 // Function overloads to provide conditonal types for new vs existing contact states.
