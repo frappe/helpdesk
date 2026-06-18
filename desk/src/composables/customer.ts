@@ -134,7 +134,6 @@ export const customerFields: FieldConfig[] = [
     type: "text",
     label: __("Name"),
     required: true,
-    prefix: markRaw(OrganizationsIcon),
   },
   {
     key: "customerType",

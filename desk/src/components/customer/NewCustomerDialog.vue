@@ -20,7 +20,7 @@
               class="flex size-11.5 items-center justify-center bg-surface-gray-2 uppercase text-ink-gray-5 select-none font-medium text-2xl rounded-full"
               v-else
             >
-              <OrganizationsIcon class="size-8" />
+              <LucideImage class="size-7" />
             </div>
             <FileUploader
               :fileTypes="['image/*']"
@@ -84,7 +84,9 @@
             </Link>
           </template>
 
-          <div class="border-t border-outline-gray-2 pt-4 space-y-4">
+          <hr class="border-outline-gray-2" />
+
+          <div class="space-y-4">
             <h3 class="text-base font-medium text-ink-gray-8">
               {{ __("Primary Contact Details") }}
             </h3>
@@ -149,7 +151,7 @@ import {
 import { useRouter } from "vue-router";
 import Link from "../frappe-ui/Link.vue";
 import PhoneControl from "../frappe-ui/PhoneControl/PhoneControl.vue";
-import { OrganizationsIcon } from "../icons";
+import LucideImage from "~icons/lucide/image";
 
 const model = defineModel<boolean>({ default: false });
 const router = useRouter();
