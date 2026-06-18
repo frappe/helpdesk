@@ -16,7 +16,15 @@
         />
       </Tooltip>
     </div>
-    <span class="cursor-pointer text-sm text-ink-gray-8 ml-2">
+    <span
+      class="text-sm text-ink-gray-8 ml-2"
+      :class="customers.length === 1 && 'cursor-pointer'"
+      v-on="
+        customers.length === 1
+          ? { click: () => goToCustomer(customers[0]!.name) }
+          : {}
+      "
+    >
       {{ label }}
     </span>
   </div>

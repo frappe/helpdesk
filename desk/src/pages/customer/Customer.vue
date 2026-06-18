@@ -100,7 +100,7 @@
     :title="__('Delete Contact')"
     :message="
       __(
-        'Are you sure you want to delete this customer? The reference to this customer will be removed from all related tickets.'
+        'Are you sure you want to delete this customer? The reference to this customer will be removed from all the related tickets.'
       )
     "
     :on-delete="handleDelete"
@@ -109,9 +109,9 @@
 
 <script setup lang="ts">
 import CustomerContactTab from "@/components/customer/CustomerContactTab.vue";
-import DeleteWithTicketsDialog from "@/components/DeleteWithTicketsDialog.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
 import TicketStats from "@/components/customer/TicketStats.vue";
+import DeleteWithTicketsDialog from "@/components/DeleteWithTicketsDialog.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import PageInfo from "@/components/PageInfo.vue";

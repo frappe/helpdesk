@@ -12,15 +12,16 @@
       </div>
     </template>
     <template #actions>
-      <Button
-        class="w-full"
-        variant="solid"
-        theme="red"
-        icon-left="trash-2"
-        :label="__('Delete')"
-        :loading="isDeleting"
-        @click="confirmDelete"
-      />
+      <div class="flex justify-end">
+        <Button
+          variant="solid"
+          theme="red"
+          icon-left="trash-2"
+          :label="__('Delete')"
+          :loading="isDeleting"
+          @click="confirmDelete"
+        />
+      </div>
     </template>
   </Dialog>
 </template>
