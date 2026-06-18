@@ -24,45 +24,13 @@
         </div>
         <div class="space-y-4">
           <!-- Image section -->
-          <div class="flex gap-4 items-center">
-            <Avatar
-              v-if="state.image"
-              :image="state.image"
-              :label="state.name || 'Customer'"
-              shape="circle"
-              size="3xl"
-            />
-            <div
-              v-else
-              class="flex size-11.5 items-center justify-center bg-surface-gray-2 uppercase text-ink-gray-5 select-none font-medium text-2xl rounded-full"
-            >
-              <OrganizationsIcon class="size-8" />
-            </div>
-            <FileUploader
-              :fileTypes="['image/*']"
-              @success="(file: { file_url: string }) => onImageUpload(file)"
-            >
-              <template #default="{ openFileSelector, uploading }">
-                <div class="space-x-2">
-                  <Button
-                    variant="subtle"
-                    :label="
-                      state.image ? __('Replace Image') : __('Upload Image')
-                    "
-                    :loading="uploading"
-                    @click.prevent="openFileSelector()"
-                  />
-                  <Button
-                    v-if="state.image"
-                    label="Remove"
-                    variant="subtle"
-                    theme="red"
-                    @click.prevent="onImageRemove()"
-                  />
-                </div>
-              </template>
-            </FileUploader>
-          </div>
+          <ImageAvatar
+            v-model="state.image"
+            :label="__('Logo')"
+            :description="__('Upload a PNG or JPG, 128x128 recommended')"
+            :fallback-label="state.name || 'Customer'"
+            shape="square"
+          />
 
           <!-- Fields -->
           <template v-for="field in customerFields" :key="field.key">
@@ -80,7 +48,7 @@
               :options="field.options"
               v-model="state[field.key]"
             >
-              <template #prefix>
+              <template v-if="field.prefix" #prefix>
                 <component :is="field.prefix" />
               </template>
             </FormControl>
@@ -93,7 +61,7 @@
               :required="field.required"
               v-model="state[field.key]"
             >
-              <template #prefix>
+              <template v-if="field.prefix" #prefix>
                 <component :is="field.prefix" />
               </template>
             </Link>
@@ -115,22 +83,13 @@
 </template>
 
 <script setup lang="ts">
+import ImageAvatar from "@/components/ImageAvatar.vue";
 import { customerFields, useCustomer } from "@/composables/customer";
 import { __ } from "@/translation";
-import {
-  Avatar,
-  Badge,
-  Button,
-  call,
-  Dialog,
-  FileUploader,
-  FormControl,
-  toast,
-} from "frappe-ui";
+import { Badge, Button, call, Dialog, FormControl, toast } from "frappe-ui";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import Link from "../frappe-ui/Link.vue";
-import { OrganizationsIcon } from "../icons";
 
 const model = defineModel<boolean>({ default: false });
 const emit = defineEmits(["update"]);
@@ -198,15 +157,6 @@ async function callRenameDoc() {
     old_name: customer.doc.customer_name,
     new_name: state.name,
   });
-}
-
-// Image saves immediately; all other fields wait for Save button
-function onImageUpload(file: { file_url: string }) {
-  state.image = file.file_url;
-}
-
-function onImageRemove() {
-  state.image = "";
 }
 
 function revertChanges() {

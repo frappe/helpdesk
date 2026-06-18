@@ -32,44 +32,13 @@
 
             <!-- File: avatar + uploader -->
             <template v-else-if="fieldOrRow.type === 'file'">
-              <div class="flex gap-4 items-center">
-                <Avatar
-                  v-if="state.image"
-                  :image="state.image"
-                  :label="state.firstName || 'Contact'"
-                  shape="circle"
-                  size="3xl"
-                />
-                <div
-                  v-else
-                  class="flex size-11.5 items-center justify-center bg-surface-gray-2 uppercase text-ink-gray-5 select-none font-medium text-2xl rounded-full"
-                >
-                  <UserIcon class="size-8" />
-                </div>
-                <FileUploader
-                  :fileTypes="['image/*']"
-                  @success="(file: FileType) => (state.image = file.file_url)"
-                >
-                  <template #default="{ openFileSelector }">
-                    <div class="space-x-2">
-                      <Button
-                        variant="subtle"
-                        :label="
-                          state.image ? __('Replace Image') : __('Upload Image')
-                        "
-                        @click.prevent="openFileSelector()"
-                      />
-                      <Button
-                        v-if="state.image"
-                        :label="__('Remove')"
-                        variant="subtle"
-                        theme="red"
-                        @click.prevent="state.image = ''"
-                      />
-                    </div>
-                  </template>
-                </FileUploader>
-              </div>
+              <ImageAvatar
+                v-model="state.image"
+                :label="__('Photo')"
+                :description="__('Upload a PNG or JPG, 128x128 recommended')"
+                :fallback-label="state.firstName || 'Contact'"
+                shape="circle"
+              />
             </template>
 
             <!-- Email: single flat field -->
@@ -143,19 +112,11 @@
 </template>
 
 <script setup lang="ts">
+import ImageAvatar from "@/components/ImageAvatar.vue";
 import { useNewContact } from "@/composables/contact";
 import { __ } from "@/translation";
-import type { File as FileType } from "@/types";
-import {
-  Avatar,
-  Button,
-  Checkbox,
-  Dialog,
-  FileUploader,
-  FormControl,
-} from "frappe-ui";
+import { Button, Checkbox, Dialog, FormControl } from "frappe-ui";
 import LucideMail from "~icons/lucide/mail";
-import UserIcon from "~icons/lucide/user";
 import Link from "../frappe-ui/Link.vue";
 import PhoneControl from "../frappe-ui/PhoneControl/PhoneControl.vue";
 

@@ -161,11 +161,8 @@ const filterContacts = createResource({
 
 watchDebounced(
   query,
-  (newVal, oldVal) => {
+  (newVal) => {
     if (props.forAgents) return;
-    if (error.value && newVal !== oldVal) {
-      error.value = null;
-    }
     filterContacts.update({ params: contactSearchParams(newVal) });
     filterContacts.reload();
   },
@@ -299,6 +296,8 @@ function setFocus() {
 
 function onInput(e) {
   query.value = e.target.value;
+  error.value = null;
+  info.value = null;
   showOptions.value = true;
 }
 

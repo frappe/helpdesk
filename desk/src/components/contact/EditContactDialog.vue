@@ -19,46 +19,15 @@
 
         <div class="space-y-4">
           <!-- Avatar -->
-          <div class="flex gap-4 items-center">
-            <Avatar
-              v-if="state.image"
-              :image="state.image"
-              :label="
-                `${state.firstName} ${state.lastName}`.trim() || 'Contact'
-              "
-              shape="circle"
-              size="3xl"
-            />
-            <div
-              v-else
-              class="flex size-11.5 items-center justify-center rounded-full bg-surface-gray-2 text-2xl font-medium uppercase text-ink-gray-5 select-none"
-            >
-              <LucideUser class="size-8" />
-            </div>
-            <FileUploader
-              :fileTypes="['image/*']"
-              @success="(file: FileType) => (state.image = file.file_url)"
-            >
-              <template #default="{ openFileSelector }">
-                <div class="space-x-2">
-                  <Button
-                    variant="subtle"
-                    :label="
-                      state.image ? __('Replace Image') : __('Upload Image')
-                    "
-                    @click.prevent="openFileSelector()"
-                  />
-                  <Button
-                    v-if="state.image"
-                    :label="__('Remove')"
-                    variant="subtle"
-                    theme="red"
-                    @click.prevent="state.image = ''"
-                  />
-                </div>
-              </template>
-            </FileUploader>
-          </div>
+          <ImageAvatar
+            v-model="state.image"
+            :label="__('Photo')"
+            :description="__('Upload a PNG or JPG, 128x128 recommended')"
+            :fallback-label="
+              `${state.firstName} ${state.lastName}`.trim() || 'Contact'
+            "
+            shape="circle"
+          />
 
           <!-- First + Last name -->
           <div class="grid grid-cols-2 gap-4">
@@ -163,20 +132,12 @@
 </template>
 
 <script setup lang="ts">
+import ImageAvatar from "@/components/ImageAvatar.vue";
 import { nextEntryKey, useContact } from "@/composables/contact";
 import { __ } from "@/translation";
-import type { File as FileType } from "@/types";
-import {
-  Avatar,
-  Badge,
-  Button,
-  Dialog,
-  FileUploader,
-  FormControl,
-} from "frappe-ui";
+import { Badge, Button, Dialog, FormControl } from "frappe-ui";
 import { ref } from "vue";
 import LucidePlus from "~icons/lucide/plus";
-import LucideUser from "~icons/lucide/user";
 import TimezoneControl from "../TimezoneControl.vue";
 import ContactInputRow from "./ContactInputRow.vue";
 

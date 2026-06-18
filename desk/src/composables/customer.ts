@@ -128,6 +128,24 @@ interface SelectOption {
   value: string;
   icon?: ReturnType<typeof markRaw> | ReturnType<typeof h>;
 }
+export const customerTypeOptions: SelectOption[] = [
+  {
+    label: __("Company"),
+    value: "Company",
+    icon: markRaw(OrganizationsIcon),
+  },
+  {
+    label: __("Individual"),
+    value: "Individual",
+    icon: markRaw(LucideUser),
+  },
+  {
+    label: __("Partnership"),
+    value: "Partnership",
+    icon: markRaw(LucideUsers),
+  },
+];
+
 export const customerFields: FieldConfig[] = [
   {
     key: "name",
@@ -139,23 +157,7 @@ export const customerFields: FieldConfig[] = [
     key: "customerType",
     type: "select",
     label: __("Customer Type"),
-    options: [
-      {
-        label: __("Company"),
-        value: "Company",
-        icon: markRaw(OrganizationsIcon),
-      },
-      {
-        label: __("Individual"),
-        value: "Individual",
-        icon: markRaw(LucideUser),
-      },
-      {
-        label: __("Partnership"),
-        value: "Partnership",
-        icon: markRaw(LucideUsers),
-      },
-    ],
+    options: customerTypeOptions,
   },
   {
     key: "country",
