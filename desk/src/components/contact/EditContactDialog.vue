@@ -80,7 +80,7 @@
           </div>
           <!-- Email IDs -->
           <div class="space-y-1.5">
-            <label class="text-xs text-ink-gray-5">
+            <label class="block text-p-sm font-medium text-ink-gray-7">
               {{ __("Email") }}
               <span class="text-ink-red-3">*</span>
             </label>
@@ -110,7 +110,9 @@
 
           <!-- Phone numbers -->
           <div class="space-y-1.5 flex flex-col items-start w-full flex-1">
-            <label class="text-xs text-ink-gray-5">{{ __("Phone") }}</label>
+            <label class="block text-p-sm font-medium text-ink-gray-7">{{
+              __("Phone")
+            }}</label>
             <ContactInputRow
               v-for="(phone, index) in state.phones"
               :key="phone.key"
@@ -136,11 +138,12 @@
           </div>
 
           <!-- Timezone -->
-          <TimezoneControl
-            :label="__('Timezone')"
-            v-model="state.timezone"
-            v-if="doc.doc?.user"
-          />
+          <div v-if="doc.doc?.user" class="space-y-1.5">
+            <label class="block text-p-sm font-medium text-ink-gray-7">{{
+              __("Timezone")
+            }}</label>
+            <TimezoneControl v-model="state.timezone" />
+          </div>
 
           <!-- Save -->
           <div class="flex justify-end">

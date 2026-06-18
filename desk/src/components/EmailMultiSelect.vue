@@ -49,7 +49,8 @@
               @focus="showOptions = true"
               @input="onInput"
               @keydown.delete.capture.stop="removeLastValue"
-              @keydown.enter.prevent="handleEnter"
+              @keydown="onKeydown"
+              @paste="onPaste"
             />
           </ComboboxAnchor>
           <ComboboxPortal>
@@ -235,7 +236,7 @@ function addValue(input) {
   error.value = null;
   info.value = null;
   const parts = input
-    .split(",")
+    .split(/[\s,;]+/)
     .map((p) => p.trim())
     .filter(Boolean);
   for (const email of parts) {
@@ -312,8 +313,25 @@ function onSelect(val) {
   }
 }
 
-function handleEnter() {
-  if (query.value) onSelect(query.value);
+// Commit the current query as a pill on Enter, comma or space.
+function onKeydown(e) {
+  const isCommitKey = e.key === "Enter" || e.key === "," || e.key === " ";
+  if (!isCommitKey || !query.value.trim()) return;
+  e.preventDefault();
+  onSelect(query.value);
+}
+
+// Split a pasted, comma/space/newline-separated list into multiple pills.
+function onPaste(e) {
+  const text = e.clipboardData?.getData("text") ?? "";
+  if (!/[\s,;]/.test(text)) return;
+  e.preventDefault();
+  addValue(text);
+  if (!error.value) {
+    query.value = "";
+    tempSelection.value = null;
+    nextTick(() => setFocus());
+  }
 }
 
 watch(options, (list) => {

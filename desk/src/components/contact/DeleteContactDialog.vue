@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { __ } from "@/translation";
 import { Button, Checkbox, createListResource, Dialog } from "frappe-ui";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 const props = defineProps<{
   name: string;
@@ -55,7 +55,6 @@ const resource = createListResource({
     contact: props.name,
   },
   fields: ["name"],
-  auto: true,
 });
 const count = computed<number>(() => {
   if (resource.loading) return 0;
@@ -67,4 +66,10 @@ const deleteLinkedTickets = ref(false);
 const emit = defineEmits<{
   delete: [{ deleteLinkedTickets: boolean }];
 }>();
+
+onMounted(() => {
+  if (open.value) {
+    resource.reload();
+  }
+});
 </script>

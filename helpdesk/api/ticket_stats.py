@@ -330,10 +330,7 @@ def get_ticket_stats(
     scope = _resolve_scope(dt)
 
     stats: dict = {}
-    if scope == "contact":
-        stats["total_tickets"] = _get_total_tickets_overall(scope, dn)
-    else:
-        stats["feedback_received"] = get_feedback_received(scope, dn)
+    stats["feedback_received"] = get_feedback_received(scope, dn)
 
     stats["sla_violations"] = _get_sla_violations(scope, dn, period)
     stats["avg_first_response_time"] = get_avg_time_metric(

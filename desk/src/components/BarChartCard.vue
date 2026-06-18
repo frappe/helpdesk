@@ -117,13 +117,13 @@ function getPercentageChange(change: number) {
     return {
       icon: change > 0 ? "arrow-up-right" : "arrow-down-left",
       value: change > 0 ? `+${change}` : change,
-      color: change > 0 ? "text-red-600" : "text-green-600",
+      color: change > 0 ? "text-ink-red-3" : "text-green-600",
     };
   } else {
     return {
       icon: change > 0 ? "arrow-up-right" : "arrow-down-left",
       value: change > 0 ? `+${change}` : change,
-      color: change > 0 ? "text-green-600" : "text-red-600",
+      color: change > 0 ? "text-green-600" : "text-ink-red-3",
     };
   }
 }

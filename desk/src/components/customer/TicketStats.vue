@@ -8,20 +8,6 @@
         v-for="(chartData, key) in analytics.data"
         class="h-full w-full rounded border border-outline-gray-1"
       >
-        <LineChartCard
-          v-if="key === 'total_tickets'"
-          :title="__('Total Tickets')"
-          :data="chartData"
-          type="Count"
-          :chart-color="{
-            lineColor: '#3B82F6',
-            gradientColor: { start: '#93C5FD', end: 'rgba(219, 234, 254, 0)' },
-          }"
-          :dt="props.dt"
-          :dn="props.dn"
-          orientation="horizontal"
-          :timelineFilter="false"
-        />
         <BarChartCard
           v-if="key === 'feedback_received'"
           :title="__('Avg. Feedback Received')"
@@ -56,14 +42,14 @@
           :dt="props.dt"
           :dn="props.dn"
           orientation="horizontal"
-          bar-color="#e24c38"
+          bar-color="#E03636"
         />
         <LineChartCard
           v-if="key === 'avg_first_response_time'"
           :title="__('Avg. First Response Time')"
           :data="chartData"
           :chart-color="{
-            lineColor: '#F35555',
+            lineColor: '#E03636',
             gradientColor: { start: '#ee9d9f', end: 'rgba(251,232,233,0)' },
           }"
           api-url="helpdesk.api.ticket_stats.get_avg_first_response_time"

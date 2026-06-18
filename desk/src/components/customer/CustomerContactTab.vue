@@ -40,7 +40,7 @@
       />
     </div>
   </div>
-  <InviteContactModal
+  <InviteContactDialog
     v-model="showInviteContact"
     :excluded-emails="existingContacts"
   />
@@ -56,7 +56,7 @@ import LucidePlus from "~icons/lucide/plus";
 import LucideUserX from "~icons/lucide/user-x";
 import { agents } from "../Settings/agents";
 import ContactCard from "./ContactCard.vue";
-import InviteContactModal from "./InviteContactModal.vue";
+import InviteContactDialog from "./InviteContactDialog.vue";
 
 const customer = inject(CustomerResourceSymbol)!;
 

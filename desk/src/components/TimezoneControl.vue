@@ -1,6 +1,6 @@
 <template>
   <Autocomplete
-    :label="__(label)"
+    :label="label ? __(label) : undefined"
     :options="options"
     :placeholder="__('Select timezone')"
     :loading="timezoneResource.loading"
@@ -15,7 +15,7 @@ import { Autocomplete, createResource } from "frappe-ui";
 import { computed } from "vue";
 
 const props = defineProps<{
-  label: string;
+  label?: string;
 }>();
 
 const modelValue = defineModel<string>({ default: "" });

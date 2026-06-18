@@ -19,7 +19,7 @@
               :emptyPlaceholder="__('Type an email address')"
             />
           </div>
-          <div class="flex items-center gap-1.5 text-p-xs text-ink-gray-5">
+          <div class="flex items-center gap-1.5 text-p-sm text-ink-gray-6">
             <span>
               {{ __("Existing users join instantly. Others get an invite.") }}
             </span>

@@ -53,7 +53,11 @@
               {{ __(tab.label) }}
               <Badge
                 class="group-hover:bg-surface-gray-7"
-                :class="[selected ? '!bg-surface-gray-7' : '!bg-gray-600']"
+                :class="[
+                  selected
+                    ? '!bg-surface-gray-7'
+                    : '!bg-surface-gray-2 !text-ink-gray-7',
+                ]"
                 variant="solid"
                 theme="gray"
                 size="sm"

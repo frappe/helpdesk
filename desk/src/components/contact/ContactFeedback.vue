@@ -24,9 +24,8 @@
     </div>
 
     <!-- Content -->
-    <section v-else class="flex items-start gap-6">
+    <section v-else>
       <FeedbackList :name="name" />
-      <FeedbackCard :name="name" />
     </section>
   </div>
 </template>
@@ -36,7 +35,6 @@ import { useContactFeedback } from "@/composables/contact";
 import { __ } from "@/translation";
 import { LoadingIndicator } from "frappe-ui";
 import LucideStar from "~icons/lucide/star";
-import FeedbackCard from "./FeedbackCard.vue";
 import FeedbackList from "./FeedbackList.vue";
 
 const props = defineProps<{
