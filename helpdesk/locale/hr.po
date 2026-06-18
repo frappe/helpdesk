@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-14 11:18+0000\n"
-"PO-Revision-Date: 2026-06-15 18:51\n"
+"PO-Revision-Date: 2026-06-18 19:52\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Croatian\n"
 "MIME-Version: 1.0\n"
@@ -64,7 +64,7 @@ msgstr "1 godina"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:154
 msgid "1 person reacted to your comment"
-msgstr ""
+msgstr "1 osoba je reagirala na vaš komentar"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:176
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:188
@@ -166,14 +166,16 @@ msgstr "Aktivan"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:404
 msgid "Active now"
-msgstr ""
+msgstr "Aktivan sada"
 
 #. Description of the 'Category' (Select) field in DocType 'HD Agent Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 msgid "Active: The agent is available and working.<br>\n"
 "Away: The agent is temporarily unreachable.<br>\n"
 "Unavailable: The agent is off and unavailable."
-msgstr ""
+msgstr "Aktivan: Agent je dostupan i radi.<br>\n"
+"Odsutan: Agent je privremeno nedostupan.<br>\n"
+"Nedostupan: Agent je isključen i nedostupan."
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:448
 #: desk/src/pages/ticket/TicketCustomer.vue:182
@@ -355,7 +357,7 @@ msgstr "Ime agenta"
 #. Label of the agent_status (Data) field in DocType 'HD Agent Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 msgid "Agent Status"
-msgstr ""
+msgstr "Status Agenta"
 
 #: desk/src/components/Settings/Agents.vue:109
 msgid "Agent name"
@@ -367,7 +369,7 @@ msgstr "Agenti"
 
 #: desk/src/components/layouts/Sidebar.vue:591
 msgid "Agents & Teams"
-msgstr ""
+msgstr "Agenti & Timovi"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:70
 msgid "Agents will no longer be able to view and create saved replies with global scope."
@@ -411,7 +413,7 @@ msgstr "Svi članci iz ove kategorije bit će premješteni u kategoriju Općenit
 
 #: desk/src/components/ticket/TicketMergeModal.vue:7
 msgid "All comments and emails from both tickets will be merged into the selected ticket"
-msgstr ""
+msgstr "Svi komentari i e-pošta s oba zahtjeva bit će spojeni u odabrani zahtjev"
 
 #: desk/src/pages/home/components/PendingTickets.vue:262
 msgid "All your assigned tickets have been responded to"
@@ -699,7 +701,7 @@ msgstr "Potrebna je barem jedna e-mail adresa"
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.py:24
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.py:28
 msgid "At least one enabled Active status is required."
-msgstr ""
+msgstr "Potreban je barem jedan omogućeni aktivni status."
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:73
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
@@ -769,12 +771,12 @@ msgstr "Automatizacija"
 #: desk/src/components/Settings/Profile/Profile.vue:111
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Availability"
-msgstr ""
+msgstr "Dostupnost"
 
 #. Label of the availability_changed_on (Datetime) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Availability Changed On"
-msgstr ""
+msgstr "Dostupnost promijenjena"
 
 #: desk/src/pages/home/components/ChartItem.vue:6
 msgid "Average First Response"
@@ -851,7 +853,7 @@ msgstr "Prosječno vrijeme potrebno za rješavanje Zahtjeva"
 #. Option for the 'Category' (Select) field in DocType 'HD Agent Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 msgid "Away"
-msgstr ""
+msgstr "Odsutan"
 
 #: desk/src/components/Settings/EmailAdd.vue:145
 #: desk/src/components/Settings/EmailEdit.vue:134
@@ -926,15 +928,15 @@ msgstr "Grupna operacija uspješna"
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:2
 #: desk/src/pages/ticket/Tickets.vue:122
 msgid "Bulk Reply"
-msgstr ""
+msgstr "Skupni odgovor"
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:105
 msgid "Bulk reply sent successfully to 1 ticket."
-msgstr ""
+msgstr "Masovni odgovor uspješno je poslan na 1 zahtjev."
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:106
 msgid "Bulk reply sent successfully to {0} tickets."
-msgstr ""
+msgstr "Masovna odgovor uspješno poslan na {0} zahtjeva."
 
 #: desk/src/components/Settings/Holiday/Holidays.vue:3
 msgid "Business Holidays"
@@ -1003,7 +1005,7 @@ msgstr "Otkazano"
 
 #: helpdesk/integrations/erpnext/api.py:47
 msgid "Cannot Sync Customers"
-msgstr ""
+msgstr "Nije moguće sinhronizirati klijente"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:526
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
@@ -1027,11 +1029,11 @@ msgstr "Nije moguće spojiti opću kategoriju"
 
 #: helpdesk/integrations/erpnext/utils.py:100
 msgid "Cannot rename: an unrelated {0} '{1}' already exists on the other side. Resolve the conflict manually first."
-msgstr ""
+msgstr "Ne može se preimenovati: nepovezani {0} '{1}' već postoji na drugoj strani. Prvo ručno riješite."
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseCustomer.vue:24
 msgid "Categories"
-msgstr ""
+msgstr "Kategorije"
 
 #. Label of the category (Select) field in DocType 'HD Agent Status'
 #. Label of the category (Link) field in DocType 'HD Article'
@@ -1058,7 +1060,7 @@ msgstr "Kategorija je uspješno izbrisana."
 
 #: desk/src/components/ticket/TicketMergeModal.vue:188
 msgid "Category is required"
-msgstr ""
+msgstr "Kategorija je obavezna"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:374
 msgid "Category merged successfully."
@@ -1138,7 +1140,7 @@ msgstr "Podređeno polje"
 
 #: desk/src/components/view-controls/filter/Filter.vue:151
 msgid "Choose a field"
-msgstr ""
+msgstr "Odaberi polje"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:135
 msgid "Choose how long this SLA policy will be active."
@@ -1191,7 +1193,7 @@ msgstr "Očisti Tabelu"
 
 #: desk/src/components/view-controls/filter/Filter.vue:71
 msgid "Clear all"
-msgstr ""
+msgstr "Obriši sve"
 
 #: desk/src/components/view-controls/filter/FilterTrigger.vue:17
 msgid "Clear all Filter"
@@ -1252,7 +1254,7 @@ msgstr "Adrese e-pošte za poziv odvojene zarezima."
 
 #: desk/src/components/view-controls/filter/FilterValueEditor.vue:90
 msgid "Comma separated values"
-msgstr ""
+msgstr "Vrijednosti odvojene zarezom"
 
 #. Label of the reference_comment (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
@@ -1480,7 +1482,7 @@ msgstr "Izradio/la"
 
 #: desk/src/components/layouts/Sidebar.vue:583
 msgid "Creating a ticket"
-msgstr ""
+msgstr "Izrada zahtjeva"
 
 #. Label of the criterion_section (Section Break) field in DocType 'HD
 #. Escalation Rule'
@@ -1509,7 +1511,7 @@ msgstr "Zaseban Raspon"
 
 #: desk/src/components/layouts/Sidebar.vue:629
 msgid "Custom Views"
-msgstr ""
+msgstr "Prilagođeni prikazi"
 
 #. Label of the customer (Link) field in DocType 'HD Ticket'
 #: desk/src/components/desk/global/NewContactDialog.vue:141
@@ -1526,7 +1528,7 @@ msgstr "Ime Klijenta"
 
 #: desk/src/components/layouts/Sidebar.vue:603
 msgid "Customer Portal"
-msgstr ""
+msgstr "Korisnički Portal"
 
 #: desk/src/components/desk/global/NewCustomerDialog.vue:62
 msgid "Customer created successfully."
@@ -1542,15 +1544,15 @@ msgstr "Klijent je uspješno ažuriran."
 
 #: desk/src/components/layouts/Sidebar.vue:595
 msgid "Customers & Contacts"
-msgstr ""
+msgstr "Klijenti & Kontakti"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:82
 msgid "Customers are in sync"
-msgstr ""
+msgstr "Klijenti su sinkronizirani"
 
 #: desk/src/components/layouts/Sidebar.vue:624
 msgid "Customizations"
-msgstr ""
+msgstr "Prilagodbe"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:5
 msgid "Customize your email notification preferences to stay informed about important updates and activities."
@@ -1885,33 +1887,33 @@ msgstr "Sistem"
 #. Label of the erpnext_customer (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "ERPNext Customer"
-msgstr ""
+msgstr "Klijent Sustava"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.json
 msgid "ERPNext HD Settings"
-msgstr ""
+msgstr "Postavke Podrške"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:182
 msgid "ERPNext Integration is disabled"
-msgstr ""
+msgstr "Integracija s Sustavom je onemogućena"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:181
 msgid "ERPNext Integration is enabled"
-msgstr ""
+msgstr "Integracija s Sustavom je omogućena"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:66
 msgid "ERPNext app"
-msgstr ""
+msgstr "Aplikacija Sustava"
 
 #: helpdesk/integrations/erpnext/api.py:47
 msgid "ERPNext integration is not enabled"
-msgstr ""
+msgstr "Integracija s Sustavom nije omogućena"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:203
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.py:19
 msgid "ERPNext is not installed on your site. Please install ERPNext to enable this setting"
-msgstr ""
+msgstr "Sustav nije instaliran na vašoj web stranici. Instaliraj Sustav da biste omogućili ovu postavku"
 
 #: desk/src/components/Settings/InviteAgents.vue:4
 msgid "Easily invite new agents, managers, or admins."
@@ -2041,7 +2043,7 @@ msgstr "Omogući"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:36
 msgid "Enable ERPNext Integration"
-msgstr ""
+msgstr "Omogući integraciju Sustava"
 
 #. Label of the enable_comment_reactions (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:23
@@ -2228,7 +2230,7 @@ msgstr "Nije uspjelo ažuriranje dodijeljenih."
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:232
 msgid "Failed to update assignment rule {0}."
-msgstr ""
+msgstr "Neuspjelo ažuriranje pravila dodjeljivanja {0}."
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:312
 msgid "Failed to update category."
@@ -2240,7 +2242,7 @@ msgstr "Nije uspjelo ažuriranje računa e-pošte, nevažeći akreditivi"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:184
 msgid "Failed to update field dependency."
-msgstr ""
+msgstr "Nije uspjelo ažuriranje ovisnosti polja."
 
 #. Label of the favicon (Attach Image) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:27
@@ -2311,7 +2313,7 @@ msgstr "Ovisnosti polja"
 
 #: desk/src/components/layouts/Sidebar.vue:628
 msgid "Field Dependency"
-msgstr ""
+msgstr "Ovisnost Polja"
 
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:303
 msgid "Field Dependency created successfully"
@@ -2398,7 +2400,7 @@ msgstr "Forma"
 
 #: desk/src/components/layouts/Sidebar.vue:637
 msgid "Frappe Helpdesk Mobile"
-msgstr ""
+msgstr "Mobilna Podrška"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -2532,7 +2534,7 @@ msgstr "Agent"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 msgid "HD Agent Status"
-msgstr ""
+msgstr "Status Agenta"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -2947,7 +2949,7 @@ msgstr "Pokrenut"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:59
 msgid "Install the"
-msgstr ""
+msgstr "Instaliraj"
 
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2970,7 +2972,7 @@ msgstr "Uvod"
 
 #: helpdesk/api/agent.py:69
 msgid "Invalid availability"
-msgstr ""
+msgstr "Nevažeća dostupnost"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:267
 msgid "Invalid email"
@@ -3338,7 +3340,7 @@ msgstr "Upravljajte potpisom e-pošte."
 
 #: desk/src/components/Settings/Preferences/Preferences.vue:2
 msgid "Manage your personal preferences."
-msgstr ""
+msgstr "Upravljaj svojim osobnim postavkama."
 
 #: desk/src/components/Settings/Profile/Profile.vue:4
 msgid "Manage your profile information."
@@ -3419,11 +3421,11 @@ msgstr "Moja Nadzorna Ploča"
 
 #: desk/src/pages/dashboard/Dashboard.vue:302
 msgid "My Organization"
-msgstr ""
+msgstr "Moja Organizacija"
 
 #: desk/src/pages/dashboard/Dashboard.vue:307
 msgid "My Stats"
-msgstr ""
+msgstr "Moja Statistika"
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:175
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:337
@@ -3555,7 +3557,7 @@ msgstr "Novi i stari naslov ne mogu biti isti"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:86
 msgid "New and updated customers sync automatically between Helpdesk and ERPNext."
-msgstr ""
+msgstr "Novi i ažurirani klijenti se automatski sinhronizuju između Podrške i Sustava."
 
 #: desk/src/components/Settings/NewTeamModal.vue:4
 msgid "New team"
@@ -3587,7 +3589,7 @@ msgstr "Nije pronađen račun e-pošte za {0}"
 
 #: helpdesk/api/agent.py:73
 msgid "No HD Agent record for current user"
-msgstr ""
+msgstr "Nema zapisa Agenta za trenutnog korisnika"
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:20
 msgid "No Holiday list found"
@@ -3659,7 +3661,7 @@ msgstr "Nema povratnih informacija"
 
 #: desk/src/components/view-controls/filter/FilterFieldList.vue:46
 msgid "No fields found"
-msgstr ""
+msgstr "Nisu pronađena polja"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:94
 msgid "No members found"
@@ -3699,7 +3701,7 @@ msgstr "Nema nedavno dodijeljenih slušajeva"
 
 #: desk/src/components/view-controls/filter/FilterValueEditor.vue:64
 msgid "No results"
-msgstr ""
+msgstr "Nema rezultata"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:79
 msgid "No results found"
@@ -3728,7 +3730,7 @@ msgstr "Nisu pronađeni zahtjevi za pregled."
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:84
 msgid "No tickets selected"
-msgstr ""
+msgstr "Nije odabran nijedna zahtjev"
 
 #: helpdesk/api/ticket.py:76 helpdesk/utils.py:182
 msgid "Not Allowed"
@@ -3754,7 +3756,7 @@ msgstr "Nije Navedeno"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:14
 msgid "Not installed"
-msgstr ""
+msgstr "Nije instalirano"
 
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -3792,7 +3794,7 @@ msgstr "Na Status Zahtjeva"
 
 #: helpdesk/api/ticket.py:75
 msgid "Only administrators can delete tickets."
-msgstr ""
+msgstr "Samo administratori mogu brisati zahtjeve."
 
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.py:29
 msgid "Only one default view is allowed per user for {0}"
@@ -4038,7 +4040,7 @@ msgstr "Ispravno konfigurirajte postavke Twilia"
 
 #: desk/src/components/layouts/Sidebar.vue:658
 msgid "Please create a new ticket to proceed with the next step."
-msgstr ""
+msgstr "Kreiraj novi zahtjev da biste nastavili sa sljedećim korakom."
 
 #: desk/src/pages/ticket/TicketNew.vue:83
 msgid "Please enter a subject to continue"
@@ -4133,7 +4135,7 @@ msgstr "Postavke"
 
 #: desk/src/components/Settings/Preferences/Preferences.vue:75
 msgid "Preferences updated successfully."
-msgstr ""
+msgstr "Postavke su uspješno ažurirane."
 
 #: desk/src/pages/dashboard/Dashboard.vue:468
 msgid "Presets"
@@ -4639,7 +4641,7 @@ msgstr "Redovi"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:108
 msgid "Run an initial sync to reconcile existing records. New ones update automatically."
-msgstr ""
+msgstr "Pokreni početnu sinkronizaciju kako biste uskladili postojeće zapise. Novi se automatski ažuriraju."
 
 #. Label of the sla (Link) field in DocType 'HD Ticket'
 #. Label of the sla_tab (Tab Break) field in DocType 'HD Ticket'
@@ -4878,11 +4880,11 @@ msgstr "Odaberi raspon"
 
 #: desk/src/components/ticket/TicketMergeModal.vue:55
 msgid "Select Ticket"
-msgstr ""
+msgstr "Odaberi Zahtjev"
 
 #: desk/src/components/Settings/Preferences/components/LanguageTimezoneSetting.vue:31
 msgid "Select Timezone"
-msgstr ""
+msgstr "Odaberi Vremensku Zonu"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:167
 msgid "Select a Default Priority."
@@ -4923,7 +4925,7 @@ msgstr "Pošalji Pozivnice"
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:32
 msgid "Send Reply"
-msgstr ""
+msgstr "Pošalji odgovor"
 
 #. Label of the send_email_feedback_on_status (Link) field in DocType 'HD
 #. Settings'
@@ -4933,7 +4935,7 @@ msgstr "Pošalji povratne informacije kada"
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:33
 msgid "Send to {0} tickets"
-msgstr ""
+msgstr "Pošalji na {0} zahtjeve"
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:78
 msgid "Sent to all of the agents assigned to the ticket whenever a contact has replied."
@@ -4993,7 +4995,7 @@ msgstr "Postavi kao zadani Ugovor o Razini Usluge"
 #: desk/src/components/AvailabilityMenu.vue:5
 #: desk/src/components/AvailabilityMenuMobile.vue:22
 msgid "Set status"
-msgstr ""
+msgstr "Postavi status"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:231
 msgid "Set the default status assigned when a ticket is created, and the status to apply when a ticket is reopened. If not specified, the default status from HD Settings will be used."
@@ -5005,7 +5007,7 @@ msgstr "Postavi radne dane, sate i praznike odabirom unaprijed definiranog raspo
 
 #: desk/src/components/Settings/Profile/Profile.vue:115
 msgid "Set your availability so your team knows when you're reachable."
-msgstr ""
+msgstr "Podesi dostupnost kako bi vaš tim znao kada ste dostupni."
 
 #: desk/src/components/Settings/Holiday/Holidays.vue:5
 msgid "Set your team’s working days, hours, and holidays using a template or custom schedule."
@@ -5230,7 +5232,7 @@ msgstr "Detalji Statusa"
 #. Label of the status_order (Int) field in DocType 'HD Agent Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 msgid "Status Order"
-msgstr ""
+msgstr "Statusni Redoslijed"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:382
 msgid "Status is required"
@@ -5333,37 +5335,37 @@ msgstr "Prebacujte se između odlaznih računa e-pošte prilikom slanja e-pošte
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:16
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:18
 msgid "Sync Customers"
-msgstr ""
+msgstr "Sinkronizuj klijente"
 
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:22
 msgid "Sync all customers between ERPNext and Helpdesk? The sync runs in the background and can take a few minutes depending on the number of customers."
-msgstr ""
+msgstr "Sinkronizuj sve korisnike između Sustava i Podrške? Sinkronizacija se pokreće u pozadini i može potrajati nekoliko minuta, ovisno o broju korisnika."
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:216
 msgid "Sync completed successfully"
-msgstr ""
+msgstr "Sinkronizacija je uspješno završena"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:3
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:39
 msgid "Sync customers between Helpdesk and ERPNext."
-msgstr ""
+msgstr "Sinkroniziraj korisnike između Podrške i Sustava."
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:120
 msgid "Sync now"
-msgstr ""
+msgstr "Sinkronizuj sada"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:197
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:35
 msgid "Sync started"
-msgstr ""
+msgstr "Sinkronizacija je započela"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:104
 msgid "Sync your existing customers"
-msgstr ""
+msgstr "Sinhronizuj postojeće klijente"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:120
 msgid "Syncing…"
-msgstr ""
+msgstr "Sinkronizacija…"
 
 #. Label of the synonyms (Table) field in DocType 'HD Synonyms'
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
@@ -5720,7 +5722,7 @@ msgstr "Zahtjev Razdjeljen Od"
 
 #: desk/src/components/ticket/TicketMergeModal.vue:65
 msgid "Ticket Subject"
-msgstr ""
+msgstr "Predmet Zahtjeva"
 
 #. Name of a report
 #. Label of a Link in the Helpdesk Workspace
@@ -5760,7 +5762,7 @@ msgstr "Zahtjev ne postoji."
 
 #: desk/src/components/ticket/TicketMergeModal.vue:192
 msgid "Ticket merged successfully."
-msgstr ""
+msgstr "Zahtjev uspješno spojen."
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:341
 msgid "Ticket must be resolved with a feedback"
@@ -5795,7 +5797,7 @@ msgstr "Status Zahtjeva"
 
 #: desk/src/components/ticket/TicketMergeModal.vue:189
 msgid "Ticket to merged with is required"
-msgstr ""
+msgstr "Potreban je zahtjv za spajanje s"
 
 #. Label of the ticket_type (Link) field in DocType 'HD Escalation Rule'
 #. Label of the to_ticket_type (Link) field in DocType 'HD Escalation Rule'
@@ -6021,11 +6023,11 @@ msgstr "Neovlašteni pristup."
 #. Option for the 'Category' (Select) field in DocType 'HD Agent Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 msgid "Unavailable"
-msgstr ""
+msgstr "Nedostupan"
 
 #: desk/src/components/layouts/Sidebar.vue:587
 msgid "Understanding ticket view"
-msgstr ""
+msgstr "Razumijevanje Prikaza Zahtjeva"
 
 #: desk/src/pages/ticket/Tickets.vue:468
 msgid "Unpin View"
@@ -6248,7 +6250,7 @@ msgstr "Ovdje napišite svoj potpis e-pošte."
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:13
 msgid "Write your reply..."
-msgstr ""
+msgstr "Napiši odgovor..."
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:37
 msgid "Yearly"
@@ -6436,7 +6438,7 @@ msgstr "slabo"
 
 #: desk/src/pages/knowledge-base/Article.vue:197
 msgid "published by"
-msgstr ""
+msgstr "objavio/la"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
@@ -6460,7 +6462,7 @@ msgstr "zahtjev"
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:68
 msgid "to enable this integration."
-msgstr ""
+msgstr "da omogući ovu integraciju."
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:527
 msgid "viewed this"
@@ -6472,19 +6474,19 @@ msgstr "pregledi"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:573
 msgid "{0} is currently away."
-msgstr ""
+msgstr "{0} je trenutno odsutan/na."
 
 #: desk/src/components/ticket-agent/AssignTo.vue:572
 msgid "{0} is currently unavailable."
-msgstr ""
+msgstr "{0} trenutno nije dostupan/na."
 
 #: desk/src/components/ListViewBuilder.vue:307
 msgid "{0} item(s) deleted successfully"
-msgstr ""
+msgstr "{0} artikala uspješno izbrisano"
 
 #: desk/src/components/ListViewBuilder.vue:321
 msgid "{0} item(s) queued for deletion"
-msgstr ""
+msgstr "{0} artikla u redu za brisanje"
 
 #: desk/src/pages/SearchAgent.vue:117
 msgid "{0} matches"
@@ -6504,9 +6506,9 @@ msgstr "Prikaz {0} trenutno je vidljiv u bočnoj traci. Skrivanjem će se ukloni
 
 #: desk/src/components/ticket-agent/AssignTo.vue:417
 msgid "{0} · Last active {1}"
-msgstr ""
+msgstr "{0} · Zadnja aktivnost {1}"
 
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:156
 msgid "{} people reacted to your comment"
-msgstr ""
+msgstr "{} osoba je reagiralo na vaš komentar"
 
