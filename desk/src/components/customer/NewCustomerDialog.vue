@@ -2,7 +2,7 @@
   <div>
     <Dialog
       v-model:open="model"
-      :title="__('New Customer')"
+      :title="__('Create Customer')"
       size="lg"
       @after-leave="reset"
     >
@@ -149,9 +149,9 @@ import {
   toast,
 } from "frappe-ui";
 import { useRouter } from "vue-router";
+import LucideImage from "~icons/lucide/image";
 import Link from "../frappe-ui/Link.vue";
 import PhoneControl from "../frappe-ui/PhoneControl/PhoneControl.vue";
-import LucideImage from "~icons/lucide/image";
 
 const model = defineModel<boolean>({ default: false });
 const router = useRouter();

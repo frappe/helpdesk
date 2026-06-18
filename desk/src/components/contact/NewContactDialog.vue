@@ -163,12 +163,7 @@ const open = defineModel<boolean>({ default: false });
 
 const { state, fieldConfig, addContact, isLoading } = useNewContact();
 
-async function handleAdd() {
-  try {
-    await addContact();
-    open.value = false;
-  } catch {
-    // error toast is shown by the resource's onError handler; keep dialog open
-  }
+function handleAdd() {
+  addContact();
 }
 </script>

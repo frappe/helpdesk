@@ -139,10 +139,17 @@ export const customerFields: FieldConfig[] = [
     key: "customerType",
     type: "select",
     label: __("Customer Type"),
-    required: true,
     options: [
-      { label: __("Company"), value: "Company", icon: markRaw(OrganizationsIcon) },
-      { label: __("Individual"), value: "Individual", icon: markRaw(LucideUser) },
+      {
+        label: __("Company"),
+        value: "Company",
+        icon: markRaw(OrganizationsIcon),
+      },
+      {
+        label: __("Individual"),
+        value: "Individual",
+        icon: markRaw(LucideUser),
+      },
       {
         label: __("Partnership"),
         value: "Partnership",
