@@ -1,11 +1,12 @@
 <template>
   <Dialog
-    v-model="model"
-    :options="{ title: __('Edit Customer'), size: 'md' }"
-    :disableOutsideClickToClose="isDirty"
+    v-model:open="model"
+    size="md"
+    bare
+    :dismissible="!isDirty"
     @after-leave="revertChanges"
   >
-    <template #body>
+    <template #default>
       <div class="bg-surface-modal px-4 pb-6 py-5 sm:px-6">
         <div class="mb-6 flex items-center justify-between">
           <div class="flex items-center gap-1">

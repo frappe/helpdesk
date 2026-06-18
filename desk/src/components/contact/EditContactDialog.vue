@@ -1,10 +1,6 @@
 <template>
-  <Dialog
-    v-model="open"
-    :options="{ size: 'md' }"
-    :disableOutsideClickToClose="isDirty"
-  >
-    <template #body>
+  <Dialog v-model:open="open" size="md" bare :dismissible="!isDirty">
+    <template #default>
       <div class="bg-surface-modal px-4 py-5 sm:px-6">
         <div class="mb-6 flex items-center justify-between">
           <div class="flex items-center gap-1">

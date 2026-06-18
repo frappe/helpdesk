@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Dialog v-model="open" :options="{ title: __('Add Contact'), size: 'md' }">
-      <template #body-content>
+    <Dialog v-model:open="open" :title="__('Add Contact')" size="md">
+      <template #default>
         <div class="space-y-4">
           <template
             v-for="fieldOrRow in fieldConfig"

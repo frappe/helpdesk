@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="show" :options="{ title: __('Invite Contact') }">
-    <template #body-content>
+  <Dialog v-model:open="show" :title="__('Invite Contact')">
+    <template #default>
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
           <div

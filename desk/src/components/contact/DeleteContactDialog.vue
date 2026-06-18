@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="open" :options="{ title: __('Delete'), size: 'md' }">
-    <template #body-content>
+  <Dialog v-model:open="open" :title="__('Delete')" size="md">
+    <template #default>
       <div class="flex flex-col gap-4">
         <p class="text-p-base text-ink-gray-7">
           {{

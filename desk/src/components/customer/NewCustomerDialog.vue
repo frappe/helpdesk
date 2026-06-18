@@ -1,11 +1,12 @@
 <template>
   <div>
     <Dialog
-      v-model="model"
-      :options="{ title: __('New Customer'), size: 'lg' }"
+      v-model:open="model"
+      :title="__('New Customer')"
+      size="lg"
       @after-leave="reset"
     >
-      <template #body-content>
+      <template #default>
         <div class="space-y-4">
           <div class="flex gap-4 items-center">
             <Avatar
