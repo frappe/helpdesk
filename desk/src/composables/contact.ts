@@ -82,6 +82,7 @@ export function useContact(name: string) {
       router.push({ name: "ContactList" });
     } catch (err) {
       getErrorMessage(err as Error, true);
+      throw err;
     }
   }
   watch(

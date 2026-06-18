@@ -153,8 +153,8 @@ const filterContacts = createResource({
   params: contactSearchParams(""),
   transform: (data) =>
     data.map(({ full_name, email_id, name }) => ({
-      label: email_id || full_name || name,
-      value: name,
+      label: full_name || email_id || name,
+      value: email_id || name,
       email: email_id,
     })),
 });

@@ -497,6 +497,15 @@ class TestAgentHome(FrappeTestCase):
         # Other agent's ticket should NOT be in the result
         self.assertNotIn(other_ticket.name, ticket_names)
 
+        # delete the SLA to clean up
+        sla_names = [ticket.sla, other_ticket.sla]
+        for sla_name in sla_names:
+            if sla_name:
+                try:
+                    frappe.delete_doc("HD Service Level Agreement", sla_name)
+                except Exception:
+                    pass  # If deletion fails, ignore and continue
+
     def test_get_pending_tickets_new_tickets_type(self):
         """Test getting newly assigned tickets"""
         # Create a second agent for non-matching tickets

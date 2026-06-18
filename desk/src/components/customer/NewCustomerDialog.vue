@@ -21,7 +21,7 @@
 
         <div class="grid grid-cols-2 gap-4">
           <FormControl
-            class="[&_p]:text-p-xs [&_[data-slot=trigger]]:w-full"
+            class="[&_p]:text-p-xs [&_[data-slot=trigger]]:w-full [&_[data-slot=trigger]]:!text-ink-gray-8"
             type="select"
             :label="__('Customer Type')"
             :options="customerTypeOptions"

@@ -333,6 +333,8 @@ class HDCustomer(Document):
         cascade_rename("HD Customer", olddn, newdn, merge)
 
     def on_trash(self):
+        self.unlink_tickets()
+        self.unlink_invitations()
         if in_cascade() or not should_sync_with_erpnext():
             return
 
@@ -344,6 +346,29 @@ class HDCustomer(Document):
             # delete this HD Customer again (it's already being deleted).
             frappe.db.set_value("Customer", erpnext_customer, "hd_customer", None)
             frappe.delete_doc("Customer", erpnext_customer, ignore_permissions=True)
+
+    def unlink_tickets(self) -> None:
+        """Delete or detach the tickets linked to this customer on delete."""
+        if self.flags.get("delete_tickets"):
+            self.delete_linked_tickets()
+        else:
+            self.unlink_linked_tickets()
+
+    def delete_linked_tickets(self) -> None:
+        tickets = frappe.get_all("HD Ticket", {"customer": self.name}, pluck="name")
+        for ticket in tickets:
+            frappe.delete_doc("HD Ticket", ticket, ignore_permissions=True)
+
+    def unlink_linked_tickets(self) -> None:
+        frappe.db.set_value("HD Ticket", {"customer": self.name}, "customer", None)
+
+    def unlink_invitations(self) -> None:
+        frappe.db.set_value(
+            "User Invitation",
+            {"app_name": "helpdesk", "customer": self.name},
+            "customer",
+            None,
+        )
 
 
 # Custom perms for list query. Only the `WHERE` part

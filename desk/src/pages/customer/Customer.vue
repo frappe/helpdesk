@@ -19,16 +19,17 @@
         :docInfo="customerInfo"
       >
         <template #actions>
-          <Button
-            v-if="hasPermission()"
-            variant="subtle"
-            @click="customerDialog = true"
-          >
-            <div class="flex gap-1 items-center">
-              <LucideSquarePen class="h-4 w-4" />
-              <span>{{ __("Edit") }}</span>
-            </div>
-          </Button>
+          <div v-if="hasPermission()" class="flex gap-2 items-center">
+            <Button variant="subtle" @click="customerDialog = true">
+              <div class="flex gap-1 items-center">
+                <LucideSquarePen class="h-4 w-4" />
+                <span>{{ __("Edit") }}</span>
+              </div>
+            </Button>
+            <Dropdown :options="dropdownActions" placement="right">
+              <Button icon="more-horizontal" variant="subtle" />
+            </Dropdown>
+          </div>
         </template>
       </PageInfo>
       <div class="overflow-y-auto flex-1">
@@ -92,10 +93,23 @@
     @update="customerDialog = false"
     :id="id"
   />
+  <DeleteWithTicketsDialog
+    v-model="showDeleteDialog"
+    :name="id"
+    link-field="customer"
+    :title="__('Delete Contact')"
+    :message="
+      __(
+        'Are you sure you want to delete this customer? The reference to this customer will be removed from all related tickets.'
+      )
+    "
+    :on-delete="handleDelete"
+  />
 </template>
 
 <script setup lang="ts">
 import CustomerContactTab from "@/components/customer/CustomerContactTab.vue";
+import DeleteWithTicketsDialog from "@/components/DeleteWithTicketsDialog.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
 import TicketStats from "@/components/customer/TicketStats.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
@@ -106,7 +120,14 @@ import { useScreenSize } from "@/composables/screen";
 import { __ } from "@/translation";
 import { CustomerResourceSymbol } from "@/types";
 import { hasPermission } from "@/utils";
-import { Badge, Breadcrumbs, Button, Tabs, usePageMeta } from "frappe-ui";
+import {
+  Badge,
+  Breadcrumbs,
+  Button,
+  Dropdown,
+  Tabs,
+  usePageMeta,
+} from "frappe-ui";
 import { computed, h, markRaw, onMounted, provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideGlobe from "~icons/lucide/globe";
@@ -115,6 +136,7 @@ import LucideMapPin from "~icons/lucide/map-pin";
 import LucidePhone from "~icons/lucide/phone";
 import LucideSquarePen from "~icons/lucide/square-pen";
 import LucideSquareUser from "~icons/lucide/square-user";
+import LucideTrash2 from "~icons/lucide/trash-2";
 import { getTicketListResource } from "../../stores/docTickets";
 // props with type set at string
 const props = defineProps<{
@@ -142,7 +164,7 @@ const tabs = computed(() => [
     icon: h(LucideSquareUser, { class: "size-4" }),
   },
 ]);
-const { doc: customer } = useCustomer(props.id);
+const { doc: customer, handleDelete } = useCustomer(props.id);
 provide(CustomerResourceSymbol, customer);
 
 const activeTab = computed<number>({
@@ -174,6 +196,24 @@ const breadcrumbs = [
 ];
 
 const customerDialog = ref(false);
+const showDeleteDialog = ref(false);
+
+const dropdownActions = computed(() => [
+  {
+    group: __("Danger"),
+    hideLabel: true,
+    items: [
+      {
+        label: __("Delete"),
+        icon: LucideTrash2,
+        theme: "red",
+        onClick: () => {
+          showDeleteDialog.value = true;
+        },
+      },
+    ],
+  },
+]);
 
 const customerInfo = computed(() => [
   {

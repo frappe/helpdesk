@@ -1,8 +1,10 @@
 import { __ } from "@/translation";
-import { DocumentResource } from "@/types";
+import { DocumentResource, Error } from "@/types";
 import { HDCustomer } from "@/types/doctypes";
-import { createDocumentResource } from "frappe-ui";
+import { getErrorMessage } from "@/utils";
+import { call, createDocumentResource } from "frappe-ui";
 import { computed, h, markRaw, reactive, watch } from "vue";
+import { useRouter } from "vue-router";
 import LucideGlobe from "~icons/lucide/globe";
 import LucideMapPin from "~icons/lucide/map-pin";
 import LucideUser from "~icons/lucide/user";
@@ -12,8 +14,26 @@ import { OrganizationsIcon } from "../components/icons";
 const customerCache: Record<string, DocumentResource<HDCustomer>> = {};
 
 export function useCustomer(name: string) {
+  const router = useRouter();
   const state = useCustomerState(name);
   const doc = findCustomerDoc();
+
+  async function handleDelete({
+    deleteLinkedTickets,
+  }: {
+    deleteLinkedTickets: boolean;
+  }) {
+    try {
+      await call("helpdesk.api.customer.delete_customer", {
+        name,
+        delete_tickets: deleteLinkedTickets,
+      });
+      router.push({ name: "CustomerList" });
+    } catch (err) {
+      getErrorMessage(err as Error, true);
+      throw err;
+    }
+  }
 
   watch(
     () => doc.doc,
@@ -67,6 +87,7 @@ export function useCustomer(name: string) {
     isCustomerInfoChanged,
     hasNameChanged,
     isDirty,
+    handleDelete,
   };
 }
 export function useCustomerState(name?: string | null) {

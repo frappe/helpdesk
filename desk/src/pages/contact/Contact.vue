@@ -95,10 +95,16 @@
         </Tabs>
       </div>
     </div>
-    <DeleteContactDialog
+    <DeleteWithTicketsDialog
       v-model="showDeleteDialog"
       :name="id"
-      @delete="handleDelete"
+      link-field="contact"
+      :message="
+        __(
+          'Are you sure you want to delete this contact? The contact will be permanently deleted and unlinked from any associated customers and tickets.'
+        )
+      "
+      :on-delete="handleDelete"
     />
     <EditContactDialog
       v-if="showEditDialog"
@@ -111,7 +117,7 @@
 <script setup lang="ts">
 import ContactCustomers from "@/components/contact/ContactCustomers.vue";
 import ContactFeedback from "@/components/contact/ContactFeedback.vue";
-import DeleteContactDialog from "@/components/contact/DeleteContactDialog.vue";
+import DeleteWithTicketsDialog from "@/components/DeleteWithTicketsDialog.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
 import TicketFeedbackIcon from "@/components/icons/TicketFeedbackIcon.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
@@ -298,7 +304,6 @@ const dropdownActions = computed(() => {
           icon: LucideTrash2,
           theme: "red",
           onClick: () => {
-            // TODO: delete contact
             showDeleteDialog.value = true;
           },
         },

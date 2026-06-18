@@ -40,29 +40,44 @@ def search_contacts(
 def delete_contact(name: str, delete_tickets: bool = False):
     # TODO: add as on_trash hook in hooks to handle this at the DocType level
     frappe.has_permission("Contact", "delete", throw=True)
+
+    tickets = frappe.get_list("HD Ticket", filters={"contact": name}, pluck="name")
+    frappe.has_permission("HD Ticket", "write", throw=True)
+    frappe.db.set_value("HD Ticket", tickets, "contact", None)
+
     if delete_tickets:
         frappe.has_permission("HD Ticket", "delete", throw=True)
-        tickets = frappe.get_list("HD Ticket", filters={"contact": name}, pluck="name")
         delete_bulk("HD Ticket", tickets)
+
+    unlink_from_customers(name)
+
+    frappe.db.set_value(
+        "User Invitation",
+        {"contact": name, "app_name": "helpdesk"},
+        "contact",
+        None,
+    )
+    frappe.delete_doc("Contact", name)
+
+
+def unlink_from_customers(name: str):
     customers = frappe.get_all(
         "HD Customer Member",
         filters={"contact_name": name},
         pluck="parent",
     )
-    delete_bulk("HD Customer Member", customers)
-    # user_invitation link remove contact
-    invitations = frappe.get_all(
-        "User Invitation",
-        filters={"contact": name, "app_name": "helpdesk"},
-        pluck="name",
-    )
-    frappe.db.set_value(
-        "User Invitation",
-        invitations,
-        "contact",
-        None,
-    )
-    frappe.delete_doc("Contact", name)
+
+    for customer in customers:
+        customer_doc = frappe.get_doc("HD Customer", customer)
+        contacts = customer_doc.get("contacts", [])
+        contacts = [c for c in contacts if c.contact_name != name]
+        customer_doc.contacts = contacts
+
+        if customer_doc.primary_contact == name:
+            customer_doc.primary_contact = None
+            customer_doc.email_id = None
+            customer_doc.mobile_no = None
+        customer_doc.save()
 
 
 @frappe.whitelist()

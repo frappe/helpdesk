@@ -11,6 +11,7 @@ from helpdesk.test_utils import (
     create_user,
     get_invitation,
     get_roles,
+    make_ticket,
     update_role_in_customer,
 )
 
@@ -210,6 +211,61 @@ class TestHDCustomer(IntegrationTestCase):
         contact = frappe.db.get_value("Contact", {"email_id": email}, "name")
         member_names = [row.contact_name for row in customer.contacts]
         self.assertEqual(member_names.count(contact), 1)
+
+    def test_delete_customer_unlinks_tickets_and_invitations(self) -> None:
+        from helpdesk.api.customer import delete_customer
+
+        email = "delete-customer-unlink@example.com"
+        contact, customer, ticket, invitation = self.setup_customer_for_delete(
+            "Test Customer Unlink", email
+        )
+
+        delete_customer(customer.name)
+
+        self.assertFalse(frappe.db.exists("HD Customer", customer.name))
+        ticket.reload()
+        self.assertIsNone(ticket.customer)
+        invitation.reload()
+        self.assertIsNone(invitation.customer)
+        self.assertTrue(frappe.db.exists("Contact", contact["contact"]))
+
+    def test_delete_customer_deletes_linked_tickets(self) -> None:
+        from helpdesk.api.customer import delete_customer
+
+        email = "delete-customer-tickets@example.com"
+        contact, customer, ticket, invitation = self.setup_customer_for_delete(
+            "Test Customer Delete Tickets", email
+        )
+
+        delete_customer(customer.name, delete_tickets=True)
+
+        self.assertFalse(frappe.db.exists("HD Customer", customer.name))
+        self.assertFalse(frappe.db.exists("HD Ticket", ticket.name))
+        invitation.reload()
+        self.assertIsNone(invitation.customer)
+        self.assertTrue(frappe.db.exists("Contact", contact["contact"]))
+
+    def setup_customer_for_delete(self, customer_name: str, email: str):
+        for inv in frappe.db.get_all("User Invitation", {"email": email}, pluck="name"):
+            frappe.delete_doc("User Invitation", inv, force=True)
+
+        contact_doc = create_contact("DeleteLink", email, user=False)
+        customer = create_customer(
+            customer_name, [{"contact_name": contact_doc["contact"]}]
+        )
+        ticket = make_ticket(customer=customer.name, contact=contact_doc["contact"])
+        invitation = frappe.get_doc(
+            {
+                "doctype": "User Invitation",
+                "email": email,
+                "app_name": "helpdesk",
+                "redirect_to_path": "/helpdesk",
+                "roles": [{"role": "HD Customer"}],
+                "customer": customer.name,
+                "contact": contact_doc["contact"],
+            }
+        ).insert(ignore_permissions=True)
+        return contact_doc, customer, ticket, invitation
 
     def test_primary_contact_must_be_a_listed_contact(self) -> None:
         customer = create_customer("Test Customer Primary Validate")

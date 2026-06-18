@@ -33,7 +33,7 @@
         <button
           v-else
           type="button"
-          class="flex size-11.5 shrink-0 cursor-pointer items-center justify-center border border-outline-gray-2 text-ink-gray-4 outline-none transition focus:outline-none focus-visible:outline-none hover:border-outline-gray-3 hover:bg-surface-gray-2"
+          class="flex size-11.5 shrink-0 cursor-pointer items-center justify-center border border-outline-gray-2 text-ink-gray-4 outline-none transition focus:outline-none focus-visible:outline-none hover:border-outline-gray-3"
           :class="roundedClass"
           :disabled="uploading"
           :aria-label="label || __('Upload image')"

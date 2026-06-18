@@ -9,7 +9,7 @@
     <template #default>
       <div class="bg-surface-modal px-4 pb-6 py-5 sm:px-6">
         <div class="mb-6 flex items-center justify-between">
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-2">
             <h3 class="text-2xl font-semibold leading-6 text-ink-gray-9">
               Edit Customer
             </h3>
@@ -35,9 +35,11 @@
           <!-- Fields -->
           <template v-for="field in customerFields" :key="field.key">
             <FormControl
+              class="!text-ink-gray-8"
               :class="[
                 '[&_p]:text-p-xs',
-                field.type === 'select' && '[&_[data-slot=trigger]]:w-full',
+                field.type === 'select' &&
+                  '[&_[data-slot=trigger]]:w-full [&_[data-slot=trigger]]:!text-ink-gray-8 ',
               ]"
               v-if="field.type !== 'Link'"
               :type="field.type"
