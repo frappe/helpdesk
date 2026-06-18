@@ -220,7 +220,7 @@ export function useContact(name: string) {
       }
       for (const e of data.doc.email_ids) {
         if (!validateEmailWithZod(e.email_id)) {
-          throw new Error(__(`Invalid email address: ${e.email_id}`));
+          throw new Error(__("Invalid email address: {0}", [e.email_id]));
         }
       }
       if (!data.doc.email_ids.some((e) => e.is_primary)) {
@@ -270,9 +270,7 @@ export function useNewContact() {
     onSuccess: (name: string) => {
       router.push({ name: "Contact", params: { id: name } });
       toast.success(
-        state.invite
-          ? __("Contact created and invited")
-          : __("Contact created")
+        state.invite ? __("Contact created and invited") : __("Contact created")
       );
       resetState();
     },
@@ -609,7 +607,7 @@ export function useContactFeedback(name: string): ContactFeedback {
     transform: (data) => {
       const template = data[0];
       if (!template) return data;
-      template['feedback_extra'] = "";
+      template["feedback_extra"] = "";
 
       const demoFeedback = [
         {
