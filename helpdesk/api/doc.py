@@ -274,6 +274,7 @@ def get_filterable_fields(
         "response_by",
         "resolution_by",
         "creation",
+        "customer",
     ]
 
     from_doc_fields = (

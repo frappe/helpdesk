@@ -378,6 +378,9 @@ def permission_query(user):
         return ""
 
     customers = get_customers(user, get_roles=True)
+    if not customers:
+        return "1=0"
+
     query = ""
     for i, c in enumerate(customers):
         prefix = " OR " if i > 0 else ""

@@ -173,8 +173,10 @@ def get_contact_info(name: str) -> dict:
 
     result = {
         "customers": get_customers_with_image(name),
-        "invitation": get_invitation(name, primary_email),
     }
+    if not contact.user and (invite := get_invitation(name, primary_email)):
+        result["invitation"] = invite
+
     if contact.user:
         time_zone = frappe.db.get_value("User", contact.user, "time_zone")
         if time_zone:

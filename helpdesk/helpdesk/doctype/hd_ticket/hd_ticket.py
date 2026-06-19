@@ -268,12 +268,13 @@ class HDTicket(Document):
 
     def set_customer(self):
         contact_customers = get_customers(contact=self.contact) if self.contact else []
+
         if self.customer:
             if self.customer not in contact_customers and not is_agent():
                 frappe.throw(
                     _(
                         "The selected customer {0} is not linked to the contact {1}."
-                        " Please select a valid customer or update the contact's linked customers."
+                        "Please select a valid customer or update the contact's linked customers."
                     ).format(self.customer, self.contact),
                     frappe.ValidationError,
                 )
@@ -283,7 +284,7 @@ class HDTicket(Document):
             if len(contact_customers) == 1:
                 self.customer = contact_customers[0]
             elif len(contact_customers) > 1 and not is_agent():
-                frappe.throw(  # ← was msgprint, now throws
+                frappe.throw(
                     _(
                         "The contact {0} is linked to multiple customers. Please select the customer manually."
                     ).format(self.contact),
