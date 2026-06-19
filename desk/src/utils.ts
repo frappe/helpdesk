@@ -216,6 +216,7 @@ export function formatTime(
     hour?: boolean;
     minute?: boolean;
     second?: boolean;
+    maxUnits?: number;
   } = {
     day: true,
     hour: true,
@@ -228,31 +229,34 @@ export function formatTime(
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = Math.floor(seconds % 60);
 
-  let formattedTime = "";
+  const parts: string[] = [];
 
   if (config.day && days > 0) {
-    formattedTime += `${days}d `;
+    parts.push(`${days}d`);
   }
 
   if (config.hour && (hours > 0 || days > 0)) {
-    formattedTime += `${hours}h `;
+    parts.push(`${hours}h`);
   }
 
   if (config.minute && (minutes > 0 || hours > 0 || days > 0)) {
-    formattedTime += `${minutes}m `;
+    parts.push(`${minutes}m`);
   }
 
   if (config.second) {
-    formattedTime += `${
-      remainingSeconds >= 10
-        ? remainingSeconds
-        : remainingSeconds > 1
-        ? "0" + remainingSeconds
-        : "0"
-    }s`;
+    parts.push(
+      `${
+        remainingSeconds >= 10
+          ? remainingSeconds
+          : remainingSeconds > 1
+          ? "0" + remainingSeconds
+          : "0"
+      }s`
+    );
   }
 
-  return formattedTime.trim();
+  const limited = config.maxUnits ? parts.slice(0, config.maxUnits) : parts;
+  return limited.join(" ").trim();
 }
 
 export function getTimeInSeconds(time: string) {

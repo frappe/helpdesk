@@ -34,7 +34,7 @@
  ],
  "grid_page_length": 50,
  "links": [],
- "modified": "2026-06-19 12:42:46.777149",
+ "modified": "2026-06-19 13:04:40.394240",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Priority",
@@ -61,6 +61,17 @@
    "print": 1,
    "read": 1,
    "report": 1,
+   "role": "Agent Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
    "role": "Agent",
    "share": 1,
    "write": 1
@@ -72,6 +83,16 @@
    "read": 1,
    "report": 1,
    "role": "HD Customer",
+   "select": 1,
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HD Customer Manager",
    "select": 1,
    "share": 1
   }

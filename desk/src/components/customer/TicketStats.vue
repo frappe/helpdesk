@@ -1,5 +1,5 @@
 <template>
-  <div class="p-5 pt-0">
+  <div class="p-5 pt-0 pb-2">
     <div
       v-if="!analytics.loading && analytics.data"
       class="grid grid-cols-4 gap-2.5 min-h-[130px]"

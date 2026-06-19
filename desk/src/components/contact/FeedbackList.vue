@@ -28,12 +28,17 @@
               <LucideStar class="size-3 fill-current" />
               {{ formatRating(ticket.feedback_rating) }}
             </span>
-            <p class="truncate text-sm">
+            <p class="min-w-0 flex-1 truncate text-sm">
               <span class="text-ink-gray-5"># {{ ticket.name }}</span>
               <span class="ml-1 font-medium text-ink-gray-7">{{
                 ticket.subject
               }}</span>
             </p>
+            <Tooltip :text="dayjs(ticket.modified).format('LLL')">
+              <span class="shrink-0 text-xs text-ink-gray-5">
+                {{ dayjs(ticket.modified).fromNow() }}
+              </span>
+            </Tooltip>
           </div>
 
           <!-- Feedback title + body -->
@@ -70,7 +75,7 @@
 <script setup lang="ts">
 import { useContactFeedback } from "@/composables/contact";
 import { __ } from "@/translation";
-import { TabButtons } from "frappe-ui";
+import { TabButtons, Tooltip, dayjs } from "frappe-ui";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import LucideStar from "~icons/lucide/star";
@@ -102,15 +107,43 @@ const sortOptions: { label: string; value: SortValue }[] = [
 
 const activeSort = ref<SortValue>("all");
 
-const orderByMap: Record<SortValue, string | undefined> = {
-  all: undefined,
-  latest: "modified desc",
-  positive: "feedback_rating desc",
-  negative: "feedback_rating asc",
-};
+type FilterList = [string, string, unknown][];
+
+interface TabConfig {
+  filters: Record<string, unknown> | FilterList;
+  orderBy?: string;
+}
+
+function tabConfig(value: SortValue): TabConfig {
+  const base = { contact: props.name };
+  switch (value) {
+    case "all":
+      return { filters: { ...base, feedback_rating: ["is", "set"] } };
+    case "latest":
+      return {
+        filters: { ...base, feedback_rating: ["is", "set"] },
+        orderBy: "creation desc",
+      };
+    case "positive":
+      return {
+        filters: { ...base, feedback_rating: [">", 0.6] },
+        orderBy: "feedback_rating desc",
+      };
+    case "negative":
+      return {
+        filters: [
+          ["contact", "=", props.name],
+          ["feedback_rating", "is", "set"],
+          ["feedback_rating", "<=", 0.6],
+        ],
+        orderBy: "feedback_rating asc",
+      };
+  }
+}
 
 function onSortChange(value: SortValue) {
-  feedbackListResource.update({ orderBy: orderByMap[value] });
+  const { filters, orderBy } = tabConfig(value);
+  feedbackListResource.update({ filters, orderBy });
   feedbackListResource.reload();
 }
 
