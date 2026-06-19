@@ -25,31 +25,37 @@
           <Badge :label="__('Manager')" theme="green" variant="outline" />
         </Tooltip>
       </div>
-      <Tooltip v-if="contact.is_primary" :text="__('Primary')" placement="top">
-        <span
-          class="flex h-6 w-6 items-center justify-center text-ink-amber-2"
-          :aria-label="__('Primary')"
+      <div class="flex gap-1">
+        <Tooltip
+          v-if="contact.is_primary"
+          :text="__('Primary')"
+          placement="top"
         >
-          <LucideStar class="size-4 fill-ink-amber-2" />
-        </span>
-      </Tooltip>
-      <Dropdown
-        v-else-if="hasPermission()"
-        placement="right"
-        :options="dropdownOptions"
-      >
-        <Button
-          class="h-6 w-6 p-0 min-w-fit shrink-0"
-          variant="ghost"
-          @click.stop
+          <span
+            class="flex h-6 w-6 items-center justify-center text-ink-amber-2"
+            :aria-label="__('Primary')"
+          >
+            <LucideStar class="size-4 fill-ink-amber-2" />
+          </span>
+        </Tooltip>
+        <Dropdown
+          v-if="hasPermission()"
+          placement="right"
+          :options="dropdownOptions"
         >
-          <LucideMoreHorizontal class="h-4 w-4 text-ink-gray-6" />
-        </Button>
-      </Dropdown>
+          <Button
+            class="h-6 w-6 p-0 min-w-fit shrink-0"
+            variant="ghost"
+            @click.stop
+          >
+            <LucideMoreHorizontal class="h-4 w-4 text-ink-gray-6" />
+          </Button>
+        </Dropdown>
+      </div>
     </div>
     <div class="border-t border-gray-200 w-full" />
     <div class="flex flex-col gap-3">
-      <template v-for="(item, index) in contactDetails" :key="item.value">
+      <template v-for="item in contactDetails" :key="item.value">
         <div
           class="flex items-center gap-2 text-sm text-ink-gray-8 font-[420]"
           :class="item.class?.(item.value)"
@@ -189,6 +195,15 @@ const dropdownOptions = computed(() => {
       },
     },
   ];
+  const deleteActionGroup = {
+    group: "",
+    hideLabel: true,
+    items: destructiveActions,
+  };
+
+  if (props.contact.is_primary) {
+    return [deleteActionGroup];
+  }
 
   return [
     {
@@ -196,52 +211,82 @@ const dropdownOptions = computed(() => {
       hideLabel: true,
       items: [...primaryActions, ...roleActions],
     },
-    {
-      group: "",
-      hideLabel: true,
-      items: destructiveActions,
-    },
+    deleteActionGroup,
   ];
 });
 
 function updateManagerRole(isManager: 0 | 1) {
-  const contact = customer.doc.contacts?.find(
-    (c) => c.contact_name === props.contact.contact_name
-  ) as HDCustomerMember | undefined;
-  if (!contact) return;
+  const title = isManager
+    ? __("Grant Manager Access")
+    : __("Revoke Manager Access");
+  const message = isManager
+    ? __(
+        "They'll get access to tickets raised by everyone in the organisation."
+      )
+    : __("They'll only see their own tickets going forward.");
 
-  contact.is_manager = isManager;
-  customer.setValue.submit(
-    {
-      contacts: customer.doc.contacts,
-    },
-    {
-      onSuccess() {
-        emit("update");
-        toast.success(__("Role updated successfully"));
+  $dialog({
+    title,
+    message,
+    actions: [
+      {
+        label: __("Confirm"),
+        variant: "solid",
+        onClick: ({ close }: { close: () => void }) => {
+          const contact = customer.doc.contacts?.find(
+            (c) => c.contact_name === props.contact.contact_name
+          ) as HDCustomerMember | undefined;
+          if (!contact) return;
+
+          contact.is_manager = isManager;
+          customer.setValue.submit(
+            { contacts: customer.doc.contacts },
+            {
+              onSuccess() {
+                emit("update");
+                close();
+                toast.success(__("Role updated successfully"));
+              },
+              onError(error: any) {
+                getErrorMessage(error, true);
+              },
+            }
+          );
+        },
       },
-      onError(error: any) {
-        getErrorMessage(error, true);
-      },
-    }
-  );
+    ],
+  });
 }
 
 function updatePrimaryContact() {
   if (customer.doc.primary_contact === props.contact.contact_name) return;
-  customer.setValue.submit(
-    {
-      primary_contact: props.contact.contact_name,
-    },
-    {
-      onSuccess() {
-        emit("update");
+
+  $dialog({
+    title: __("Set Primary Contact"),
+    message: __(
+      "This contact will become the primary point of contact and will be able to view tickets raised by all other contacts in the organisation."
+    ),
+    actions: [
+      {
+        label: __("Confirm"),
+        variant: "solid",
+        onClick: ({ close }: { close: () => void }) =>
+          customer.setValue.submit(
+            { primary_contact: props.contact.contact_name },
+            {
+              onSuccess() {
+                emit("update");
+                close();
+                toast.success(__("Primary contact updated"));
+              },
+              onError(error: any) {
+                getErrorMessage(error, true);
+              },
+            }
+          ),
       },
-      onError(error: any) {
-        getErrorMessage(error, true);
-      },
-    }
-  );
+    ],
+  });
 }
 
 function removeContact() {

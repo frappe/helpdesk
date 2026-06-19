@@ -1,6 +1,12 @@
 import frappe
 
-ALLOWED_APP_ROLES = {"Agent", "Agent Manager", "System Manager"}
+ALLOWED_APP_ROLES = {
+    "Agent",
+    "Agent Manager",
+    "System Manager",
+    "HD Customer",
+    "HD Customer Manager",
+}
 
 
 def has_app_permission():
