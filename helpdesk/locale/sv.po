@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-14 11:18+0000\n"
-"PO-Revision-Date: 2026-06-15 18:50\n"
+"PO-Revision-Date: 2026-06-19 20:17\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -2579,7 +2579,7 @@ msgstr "Eskalering Regel"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "HD Field Layout"
-msgstr "Fält Upplägg"
+msgstr "Fält Utseende"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -3207,7 +3207,7 @@ msgstr "Förra veckan"
 #. Label of the layout (Code) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Layout"
-msgstr "Upplägg"
+msgstr "Utseende"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:135
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:212
@@ -5115,15 +5115,15 @@ msgstr "Hoppa över e-post arbetsflöde"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:617
 msgid "Some error occurred while renaming assignment rule"
-msgstr "Ett fel uppstod när tilldelningsregeln bytte namn"
+msgstr "Fel uppstod när tilldelning regel döptes om"
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:399
 msgid "Some error occurred while renaming holiday list"
-msgstr "Fel uppstod när helg lista bytte namn"
+msgstr "Fel uppstod när helg lista döptes om"
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:368
 msgid "Some error occurred while renaming saved reply"
-msgstr "Fel inträffade när fördefinierad svar bytte namn"
+msgstr "Fel uppstod när fördefinierad svar döptes om"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:601
 msgid "Some error occurred while updating assignment rule"
