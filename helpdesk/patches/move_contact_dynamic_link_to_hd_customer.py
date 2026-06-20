@@ -15,7 +15,7 @@ def execute():
     agent_users = (
         frappe.qb.from_(HasRole)
         .select(HasRole.parent)
-        .where(HasRole.role.isin(["HD Agent", "HD Agent Manager"]))
+        .where(HasRole.role.isin(["Agent", "Agent Manager"]))
     )
 
     customer_users = (

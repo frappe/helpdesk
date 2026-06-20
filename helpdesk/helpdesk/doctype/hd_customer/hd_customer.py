@@ -95,22 +95,34 @@ class HDCustomer(Document):
                 contact.is_manager = True
 
     def handle_roles(self):
-        # if any contact has is_manager set to true, then set the role of that contact to Customer Manager, and remove the role from other contacts
+        # Sync customer roles only for contacts whose manager flag actually changed
         if not self.has_value_changed("contacts"):
             return
+        previous = self.get_doc_before_save()
+        was_manager = (
+            {row.contact_name: row.is_manager for row in previous.contacts}
+            if previous
+            else {}
+        )
         for contact in self.contacts:
-            user = self.get_user(contact.contact_name, throw_error=False)
-            if not user:
+            if contact.is_manager == was_manager.get(contact.contact_name):
                 continue
-            user_doc = frappe.get_doc("User", user)
-            if contact.is_manager:
-                # add HD Customer Manager role to the contact
-                user_doc.append_roles("HD Customer Manager", "HD Customer")
-            else:
-                # add HD Customer role and remove HD Customer Manager role from the contact)
-                user_doc.append_roles("HD Customer")
-                user_doc.remove_roles("HD Customer Manager")
-            user_doc.save()
+            self.sync_contact_role(contact)
+
+    def sync_contact_role(self, contact):
+        """Grant the manager/member role to a single contact's user in one save."""
+        user = self.get_user(contact.contact_name, throw_error=False)
+        if not user:
+            return
+        user_doc = frappe.get_doc("User", user)
+        if contact.is_manager:
+            user_doc.append_roles("HD Customer Manager", "HD Customer")
+        else:
+            user_doc.append_roles("HD Customer")
+            user_doc.set(
+                "roles", [r for r in user_doc.roles if r.role != "HD Customer Manager"]
+            )
+        user_doc.save()
 
     def get_user(self, contact_name, throw_error=True):
         user = frappe.db.get_value("Contact", contact_name, "user")
@@ -131,52 +143,69 @@ class HDCustomer(Document):
     @frappe.whitelist()
     @agent_only
     def get_contacts(self):
+        contact_names = [contact.contact_name for contact in self.contacts]
+        details = self.get_contact_details(contact_names)
+        ticket_counts = self.get_pending_ticket_counts(contact_names)
+        last_active = self.get_last_active([d.user for d in details.values() if d.user])
 
         result = []
         for contact in self.contacts:
-            info = frappe.get_value(
-                "Contact",
-                contact.contact_name,
-                ["email_id", "mobile_no", "phone", "image", "user"],
-            )
+            info = details.get(contact.contact_name)
             if not info:
                 continue
-
-            email_id, mobile_no, phone, image, user = info
-
-            pending_tickets_count = frappe.db.get_list(
-                "HD Ticket",
-                filters={
-                    "status_category": ["in", ["Open", "Paused"]],
-                },
-                or_filters=[
-                    ["raised_by", "=", contact.contact_name],
-                    ["contact", "=", contact.contact_name],
-                ],
-                pluck="name",
-            )
-
             result.append(
                 {
                     "contact_name": contact.contact_name,
                     "is_primary": int(contact.contact_name == self.primary_contact),
                     "is_manager": contact.is_manager,
-                    "email_id": email_id,
-                    "mobile_no": mobile_no or phone,
-                    "image": image,
-                    "last_active": (
-                        frappe.get_value("User", user, "last_active") if user else None
-                    ),
-                    "ticket_count": (
-                        len(pending_tickets_count) if pending_tickets_count else 0
-                    ),
+                    "email_id": info.email_id,
+                    "mobile_no": info.mobile_no or info.phone,
+                    "image": info.image,
+                    "last_active": last_active.get(info.user),
+                    "ticket_count": ticket_counts.get(contact.contact_name, 0),
                 }
             )
-            # sort by is_primary first then is_manager
-            result.sort(
-                key=lambda x: (not x["is_primary"], not x["is_manager"]),
-            )
+        result.sort(key=lambda row: (not row["is_primary"], not row["is_manager"]))
         return result
+
+    def get_contact_details(self, contact_names: list[str]) -> dict:
+        """Fetch every member's contact info in one query, keyed by contact name."""
+        if not contact_names:
+            return {}
+        rows = frappe.get_all(
+            "Contact",
+            filters={"name": ["in", contact_names]},
+            fields=["name", "email_id", "mobile_no", "phone", "image", "user"],
+        )
+        return {row.name: row for row in rows}
+
+    def get_pending_ticket_counts(self, contact_names: list[str]) -> dict:
+        """Count open/paused tickets per contact (matched by raised_by or contact)."""
+        counts = dict.fromkeys(contact_names, 0)
+        if not contact_names:
+            return counts
+        tickets = frappe.get_list(
+            "HD Ticket",
+            filters={"status_category": ["in", ["Open", "Paused"]]},
+            or_filters=[
+                ["raised_by", "in", contact_names],
+                ["contact", "in", contact_names],
+            ],
+            fields=["raised_by", "contact"],
+        )
+        for ticket in tickets:
+            for name in {ticket.raised_by, ticket.contact} & counts.keys():
+                counts[name] += 1
+        return counts
+
+    def get_last_active(self, users: list[str]) -> dict:
+        """Map each user to their last_active timestamp in one query."""
+        if not users:
+            return {}
+        rows = frappe.get_all(
+            "User", filters={"name": ["in", users]}, fields=["name", "last_active"]
+        )
+        return {row.name: row.last_active for row in rows}
 
     @frappe.whitelist()
     def add_contacts(self, contacts: str | list, role: str = "HD Customer") -> dict:
@@ -373,16 +402,38 @@ class HDCustomer(Document):
 
 # Custom perms for list query. Only the `WHERE` part
 # Used so that contact raising the ticket can see the customers they are part of
-def permission_query(user):
+def permission_query(user: str) -> str:
     if is_agent(user):
         return ""
 
-    customers = get_customers(user, get_roles=True)
+    customers = get_customers(user)
     if not customers:
         return "1=0"
 
-    query = ""
-    for i, c in enumerate(customers):
-        prefix = " OR " if i > 0 else ""
-        query += f"{prefix}`tabHD Customer`.name = '{c.get('name')}'"
-    return query
+    names = ", ".join(frappe.db.escape(name) for name in customers)
+    return f"`tabHD Customer`.name in ({names})"
+
+
+def has_permission(doc: Document, ptype: str, user: str) -> bool:
+    """Per-record access for HD Customer.
+
+    Members of a customer can read it; only managers can write or delete it.
+    Agents are unrestricted; non-members are denied.
+    """
+    if is_agent(user):
+        return True
+
+    membership = get_customer_membership(doc.name, user)
+    if not membership:
+        return False
+    if ptype in ("write", "delete"):
+        return bool(membership.get("is_manager"))
+    return True
+
+
+def get_customer_membership(customer: str, user: str) -> dict | None:
+    """Return the user's membership row for `customer`, or None if not a member."""
+    for member in get_customers(user, get_roles=True):
+        if member.get("name") == customer:
+            return member
+    return None

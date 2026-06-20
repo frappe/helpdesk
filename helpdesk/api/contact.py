@@ -43,7 +43,8 @@ def delete_contact(name: str, delete_tickets: bool = False):
 
     tickets = frappe.get_list("HD Ticket", filters={"contact": name}, pluck="name")
     frappe.has_permission("HD Ticket", "write", throw=True)
-    frappe.db.set_value("HD Ticket", tickets, "contact", None)
+    if len(tickets) > 0:
+        frappe.db.set_value("HD Ticket", tickets, "contact", None)
 
     if delete_tickets:
         frappe.has_permission("HD Ticket", "delete", throw=True)
