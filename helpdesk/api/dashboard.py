@@ -318,16 +318,19 @@ class HelpdeskDashboard:
         rating = "Rating"
         rated_tickets = "Rated Tickets"
 
-        base_cond = (self.ticket.creation > self.from_date) & (
-            self.ticket.creation < self.to_date_next
-        )
+        # Plot feedback against the resolution date so this trend matches the
+        # number-card average (get_avg_feedback_score), which also keys feedback
+        # off resolution_date rather than creation.
+        date_field = self.ticket.resolution_date
+
+        base_cond = (date_field > self.from_date) & (date_field < self.to_date_next)
         if self.combined_cond:
             base_cond = base_cond & self.combined_cond
 
         query = (
             frappe.qb.from_(self.ticket)
             .select(
-                Function("DATE", self.ticket.creation).as_("date"),
+                Function("DATE", date_field).as_("date"),
                 (
                     Avg(
                         Case()
@@ -345,8 +348,8 @@ class HelpdeskDashboard:
                 ).as_(rated_tickets),
             )
             .where(base_cond)
-            .groupby(Function("DATE", self.ticket.creation))
-            .orderby(Function("DATE", self.ticket.creation))
+            .groupby(Function("DATE", date_field))
+            .orderby(Function("DATE", date_field))
         )
 
         result = query.run(as_dict=True)
@@ -356,7 +359,7 @@ class HelpdeskDashboard:
             frappe.qb.from_(self.ticket)
             .select((Avg(self.ticket.feedback_rating) * 5).as_("avg_rating"))
             .where(
-                (self.ticket.creation.between(self.from_date, self.to_date_next))
+                (date_field.between(self.from_date, self.to_date_next))
                 & (self.ticket.feedback_rating > 0)
             )
         )
