@@ -81,9 +81,22 @@ def get_avg_time(
         .where(Ticket.creation < to_date_plus_one)
         .where(Ticket[time_field].isnotnull())
     )
+    if time_field == "resolution_time":
+        query = _restrict_to_resolved(query, Ticket)
     query = _apply_scope(query, Ticket, scope, identifier)
 
     return query.run(as_dict=True)
+
+
+def _restrict_to_resolved(query, Ticket):
+    """Average resolution time should only count tickets in a Resolved-category
+    status, since `resolution_time` can linger on reopened tickets."""
+    resolved_statuses = frappe.get_all(
+        "HD Ticket Status", filters={"category": "Resolved"}, pluck="name"
+    )
+    if resolved_statuses:
+        query = query.where(Ticket.status.isin(resolved_statuses))
+    return query
 
 
 def _scalar_avg_time(

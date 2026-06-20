@@ -88,6 +88,7 @@
 import ImageAvatar from "@/components/ImageAvatar.vue";
 import { customerFields, useCustomer } from "@/composables/customer";
 import { __ } from "@/translation";
+import { getErrorMessage } from "@/utils.ts";
 import { Badge, Button, call, Dialog, FormControl, toast } from "frappe-ui";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
@@ -149,6 +150,9 @@ async function save() {
     }
     toast.success(__("Customer updated"));
     emit("update");
+  } catch (error: any) {
+    let msg = getErrorMessage(error);
+    toast.error(__(msg));
   } finally {
     loading.value = false;
   }

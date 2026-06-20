@@ -39,8 +39,7 @@
    "fieldname": "customer_type",
    "fieldtype": "Select",
    "label": "Customer Type",
-   "options": "Company\nIndividual\nPartnership",
-   "reqd": 1
+   "options": "Company\nIndividual\nPartnership"
   },
   {
    "fieldname": "domain",
@@ -114,7 +113,7 @@
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-20 13:41:08.486097",
+ "modified": "2026-06-20 15:34:00.998330",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Customer",
@@ -170,6 +169,7 @@
    "share": 1
   },
   {
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,

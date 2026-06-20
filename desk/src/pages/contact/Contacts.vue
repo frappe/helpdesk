@@ -18,10 +18,7 @@
       </template>
     </LayoutHeader>
     <ListViewBuilder ref="listViewRef" :options="options" />
-    <NewContactDialog
-      v-model="showNewContactModal"
-      @contact-created="handleContactCreated"
-    />
+    <NewContactDialog v-model="showNewContactModal" />
   </div>
 </template>
 <script setup lang="ts">
@@ -75,11 +72,6 @@ const options = computed(() => {
     },
   };
 });
-
-function handleContactCreated(): void {
-  showNewContactModal.value = false;
-  listViewRef.value?.reload();
-}
 
 usePageMeta(() => {
   return {

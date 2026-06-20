@@ -1200,7 +1200,7 @@ def _agent_has_permission(doc, user: str) -> bool:
         try:
             if user in json.loads(doc._assign):
                 return True
-        except ValueError, TypeError:
+        except (ValueError, TypeError):
             return False
 
     teams = get_agents_team()
