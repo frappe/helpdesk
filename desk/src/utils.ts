@@ -881,24 +881,20 @@ export function shortDuration(target: string | Date): string {
   return `${Math.floor(seconds / MINUTE)}m`;
 }
 
-export function buildPercentageChange(value: number | null) {
-  if (value === null || value === undefined) {
+export function buildPercentageChange(
+  value: number | null,
+  negativeIsBetter: boolean = true
+) {
+  // No change (or no comparison): stay neutral — never green/red, no up/down arrow.
+  if (value === null || value === undefined || value === 0) {
     return { icon: "lucide-arrow-right", value: "0", color: "text-ink-gray-5" };
   }
+  const isPositive = value > 0;
+  const isGood = negativeIsBetter ? !isPositive : isPositive;
   return {
-    icon:
-      value > 0
-        ? "lucide-arrow-up-right"
-        : value < 0
-        ? "lucide-arrow-down-left"
-        : "lucide-arrow-right",
-    value: value > 0 ? `+${value}` : value,
-    color:
-      value > 0
-        ? "text-ink-red-4"
-        : value < 0
-        ? "text-ink-green-3"
-        : "text-ink-gray-5",
+    icon: isPositive ? "lucide-arrow-up-right" : "lucide-arrow-down-left",
+    value: isPositive ? `+${value}` : value,
+    color: isGood ? "text-ink-green-3" : "text-ink-red-3",
   };
 }
 

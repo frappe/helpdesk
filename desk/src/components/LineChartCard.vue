@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { formatTime } from "@/utils";
+import { buildPercentageChange, formatTime } from "@/utils";
 import { EChartsOption } from "echarts";
 import { createResource } from "frappe-ui";
 import { computed, onMounted, ref, type PropType } from "vue";
@@ -84,12 +84,7 @@ const chartData = computed(() => {
       props.type === "Time" ? item.avg_time : item.count
     ) || [];
   const _percentageChange = _data?.percentage_change || 0;
-
-  const percentageChange = {
-    icon: _percentageChange > 0 ? "arrow-up-right" : "arrow-down-left",
-    value: _percentageChange > 0 ? `+${_percentageChange}` : _percentageChange,
-    color: _percentageChange > 0 ? "text-red-600" : "text-green-600",
-  };
+  const percentageChange = buildPercentageChange(_percentageChange);
 
   // for time take average and for count take total
   const text =

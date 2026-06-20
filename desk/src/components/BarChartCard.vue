@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
+import { buildPercentageChange } from "@/utils";
 import { EChartsOption } from "echarts";
 import { createResource } from "frappe-ui";
 import { computed, onMounted, ref, type PropType } from "vue";
@@ -88,7 +89,7 @@ const chartData = computed(() => {
     return {
       labels: ["1", "2", "3", "4", "5"],
       counts: values,
-      percentageChange: getPercentageChange(0),
+      percentageChange: buildPercentageChange(0, props.negativeIsBetter),
       text: _data?.average ?? 0,
       isStarDistribution: true,
     };
@@ -101,7 +102,10 @@ const chartData = computed(() => {
   const labels = timeData.map((item) => item.date);
   const counts = timeData.map((item) => item.count);
   const _percentageChange = _data?.percentage_change || 0;
-  const percentageChange = getPercentageChange(_percentageChange);
+  const percentageChange = buildPercentageChange(
+    _percentageChange,
+    props.negativeIsBetter
+  );
 
   return {
     labels,
@@ -111,22 +115,6 @@ const chartData = computed(() => {
     isStarDistribution: false,
   };
 });
-
-function getPercentageChange(change: number) {
-  if (props.negativeIsBetter) {
-    return {
-      icon: change > 0 ? "arrow-up-right" : "arrow-down-left",
-      value: change > 0 ? `+${change}` : change,
-      color: change > 0 ? "text-ink-red-3" : "text-green-600",
-    };
-  } else {
-    return {
-      icon: change > 0 ? "arrow-up-right" : "arrow-down-left",
-      value: change > 0 ? `+${change}` : change,
-      color: change > 0 ? "text-green-600" : "text-ink-red-3",
-    };
-  }
-}
 
 const hasData = computed(() => {
   const counts = chartData.value.counts as number[];

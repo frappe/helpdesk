@@ -14,6 +14,7 @@
 <script setup lang="ts">
 import { __ } from "@/translation";
 import type { LineChart } from "@/types";
+import { buildPercentageChange } from "@/utils";
 import { EChartsOption } from "echarts";
 import { createResource } from "frappe-ui";
 import { computed, onMounted, ref, type PropType } from "vue";
@@ -43,11 +44,7 @@ const chartData = computed(() => {
   const dates = _data?.data?.map((item) => item.date) || [];
   const counts = _data?.data?.map((item) => item.count) || [];
 
-  const percentageChange = {
-    icon: _percentageChange > 0 ? "arrow-up-right" : "arrow-down-left",
-    value: _percentageChange > 0 ? `+${_percentageChange}` : _percentageChange,
-    color: _percentageChange > 0 ? "text-red-600" : "text-green-600",
-  };
+  const percentageChange = buildPercentageChange(_percentageChange);
 
   return {
     data: counts,
