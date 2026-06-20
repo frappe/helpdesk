@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-14 11:18+0000\n"
-"PO-Revision-Date: 2026-06-19 20:17\n"
+"PO-Revision-Date: 2026-06-20 20:30\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -780,15 +780,15 @@ msgstr "Tillgänglighet Ändrad"
 
 #: desk/src/pages/home/components/ChartItem.vue:6
 msgid "Average First Response"
-msgstr "Medel Första Svar"
+msgstr "Första Svar Medelvärde"
 
 #: desk/src/pages/home/Home.vue:317
 msgid "Average First Response Time"
-msgstr "Medel Första Svar Tid"
+msgstr "Första Svarstid Medelvärde"
 
 #: desk/src/pages/home/components/ChartItem.vue:16
 msgid "Average Resolution"
-msgstr "Medel Upplösning"
+msgstr "Upplösning Medelvärde"
 
 #: desk/src/pages/home/Home.vue:329
 msgid "Average Resolution Time"
@@ -797,24 +797,24 @@ msgstr "Medel Upplösning Tid"
 #. Label of the avg_response_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Average Response Time"
-msgstr "Medel Svarstid"
+msgstr "Svarstid Medelvärde"
 
 #: desk/src/pages/home/Home.vue:305
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:5
 msgid "Average Time Metrics"
-msgstr "Medel Tid Mätvärde"
+msgstr "Medeltid Mätvärde"
 
 #: helpdesk/api/dashboard.py:364
 msgid "Average feedback rating per day is around {0} stars"
-msgstr "Medel betyg återkoppling per dag är runt {0} stjärnor"
+msgstr "Återkoppling Bedömning Medelvärde per dag är runt {0} stjärnor"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:107
 msgid "Average response and resolution metrics not available"
-msgstr "Medel svars och upplösning statistik är inte tillgänglig"
+msgstr "Svar och Upplösning Medelvärde  är inte tillgänglig"
 
 #: helpdesk/api/dashboard.py:286
 msgid "Average tickets per day is around {0}"
-msgstr "Medel antal ärende per dag ligger på cirka {0}"
+msgstr "Antal Ärende Medelvärde per dag ligger på cirka {0}"
 
 #: helpdesk/api/dashboard.py:231
 msgid "Avg. Feedback Rating"
@@ -2164,7 +2164,7 @@ msgstr "Utforska kundportal"
 #: desk/src/components/ticket/ExportModal.vue:2
 #: desk/src/pages/ticket/Tickets.vue:130
 msgid "Export"
-msgstr "Export"
+msgstr "Exportera"
 
 #: desk/src/components/ticket/ExportModal.vue:26
 msgid "Export All {0} Record(s)"
@@ -4868,7 +4868,7 @@ msgstr "Se alla {0} ärenden"
 #: desk/src/pages/call-logs/CallLogModal.vue:92
 #: desk/src/pages/call-logs/CallLogModal.vue:101
 msgid "Select"
-msgstr "Välj i Listan"
+msgstr "Välj"
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:19
 msgid "Select Category"
@@ -6337,7 +6337,7 @@ msgstr "tilldelade"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:477
 msgid "average"
-msgstr "medel"
+msgstr "medelvärde"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:13
 msgid "back to email event list"
