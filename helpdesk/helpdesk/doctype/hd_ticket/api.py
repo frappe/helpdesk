@@ -718,11 +718,14 @@ def get_recent_tickets(ticket: str):
         )
 
     if raised_by:
+        # Exclude the current ticket and any already picked up as org tickets,
+        # otherwise a ticket matching both `customer` and `raised_by` shows twice.
+        excluded = [ticket] + [t.name for t in org_tickets]
         user_tickets = (
             frappe.get_list(
                 "HD Ticket",
                 filters={
-                    "name": ["!=", ticket],
+                    "name": ["not in", excluded],
                     "raised_by": raised_by,
                 },
                 fields=fields,

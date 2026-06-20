@@ -114,8 +114,9 @@ class HelpdeskDashboard:
             )
         return conds
 
-    def _get_case(self, start, end, value, func, extra_cond=None):
-        cond = (self.ticket.creation >= start) & (self.ticket.creation < end)
+    def _get_case(self, start, end, value, func, extra_cond=None, date_field=None):
+        date_field = date_field or self.ticket.creation
+        cond = (date_field >= start) & (date_field < end)
         if extra_cond:
             cond = cond & extra_cond
         if self.combined_cond:
@@ -123,12 +124,12 @@ class HelpdeskDashboard:
 
         return func(Case().when(cond, value).else_(None))
 
-    def get_metric_data(self, value, func, extra_cond=None):
+    def get_metric_data(self, value, func, extra_cond=None, date_field=None):
         current_expr = self._get_case(
-            self.from_date, self.to_date_next, value, func, extra_cond
+            self.from_date, self.to_date_next, value, func, extra_cond, date_field
         )
         prev_expr = self._get_case(
-            self.prev_from_date, self.from_date, value, func, extra_cond
+            self.prev_from_date, self.from_date, value, func, extra_cond, date_field
         )
 
         query = frappe.qb.from_(self.ticket).select(
@@ -222,9 +223,15 @@ class HelpdeskDashboard:
         }
 
     def get_avg_feedback_score(self):
+        # Feedback belongs to the period a ticket was resolved in, not when it
+        # was raised, so include every ticket resolved within the date range
+        # regardless of its creation date.
         extra_cond = self.ticket.feedback_rating > 0
         current, prev = self.get_metric_data(
-            self.ticket.feedback_rating, Avg, extra_cond
+            self.ticket.feedback_rating,
+            Avg,
+            extra_cond,
+            date_field=self.ticket.resolution_date,
         )
 
         return {
@@ -233,7 +240,7 @@ class HelpdeskDashboard:
             "suffix": "/5",
             "delta": (current - prev) * 5,
             "deltaSuffix": " " + _("stars"),
-            "tooltip": _("Avg. feedback rating for the tickets resolved"),
+            "tooltip": _("Avg. feedback rating for tickets resolved in this period"),
         }
 
     def get_trend_data(self):
