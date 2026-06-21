@@ -15,8 +15,7 @@ def execute():
 
 
 def grant_customer_role_to_ticket_raisers() -> None:
-    HasRole = frappe.qb.DocType("Has Role")
-    ticket_raisers = get_ticket_raisers_without_role(HasRole)
+    ticket_raisers = get_ticket_raisers_without_role()
     if not ticket_raisers:
         return
 
@@ -29,8 +28,9 @@ def grant_customer_role_to_ticket_raisers() -> None:
     )
 
 
-def get_ticket_raisers_without_role(HasRole) -> list[str]:
+def get_ticket_raisers_without_role() -> list[str]:
     """Ticket raisers who are neither agents nor already an HD Customer."""
+    HasRole = frappe.qb.DocType("Has Role")
     HDTicket = frappe.qb.DocType("HD Ticket")
     User = frappe.qb.DocType("User")
 
