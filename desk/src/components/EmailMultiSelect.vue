@@ -8,10 +8,17 @@
         :label="value"
         theme="gray"
         variant="subtle"
-        :class="{
-          'rounded bg-surface-white hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
-            variant === 'subtle',
-        }"
+        :tooltip="copyOnClick ? __('Click to copy') : undefined"
+        :class="[
+          {
+            'rounded bg-surface-white hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
+              variant === 'subtle',
+          },
+          copyOnClick
+            ? 'cursor-pointer transition-transform active:scale-[0.98]'
+            : '',
+        ]"
+        @click="copyOnClick ? copy(value) : null"
         @keydown.delete.capture.stop="removeLastValue"
       >
         <template #suffix>
@@ -75,13 +82,17 @@
                   class="text-base leading-none text-ink-gray-7 rounded flex items-center px-2 py-1 relative select-none data-[highlighted]:outline-none data-[highlighted]:bg-surface-gray-3 cursor-pointer"
                   @mousedown.prevent="onSelect(option.value)"
                 >
-                  <UserAvatar class="mr-0.5" :name="option.value" size="lg" />
+                  <UserAvatar
+                    class="mr-0.5"
+                    :name="getUsernameLabel(option.label)"
+                    size="lg"
+                  />
                   <div class="flex flex-col gap-1 p-1 text-ink-gray-8">
-                    <div class="text-base font-medium">{{ option.label }}</div>
+                    <div class="text-base font-medium">
+                      {{ getUsernameLabel(option.label) }}
+                    </div>
                     <div class="text-sm text-ink-gray-5">
-                      {{
-                        option.isCustom ? __("Invite via email") : option.value
-                      }}
+                      {{ option.isCustom ? customEmailLabel : option.value }}
                     </div>
                   </div>
                 </ComboboxItem>
@@ -104,6 +115,7 @@
 <script setup>
 import UserAvatar from "@/components/UserAvatar.vue";
 import { useUserStore } from "@/stores/user";
+import { copy } from "@/utils";
 import { watchDebounced } from "@vueuse/core";
 import { createResource } from "frappe-ui";
 import {
@@ -116,10 +128,11 @@ import {
   ComboboxRoot,
   ComboboxViewport,
 } from "reka-ui";
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 const props = defineProps({
-  forAgents: { type: Boolean, default: true },
+  // "contact" searches HD contacts; "agents" picks from the user store.
+  scope: { type: String, default: "contact" },
   validate: { type: Function, default: null },
   emptyPlaceholder: { type: String, default: __("No results found") },
   variant: { type: String, default: "subtle" },
@@ -128,6 +141,8 @@ const props = defineProps({
   existingUsers: { type: Array, default: () => [] },
   allowCustomEmail: { type: Boolean, default: false },
   additionalFilters: { type: Array, default: () => [] },
+  copyOnClick: { type: Boolean, default: false },
+  customEmailLabel: { type: String, default: __("Invite via email") },
 });
 
 const errorMessage = (value) => __("{0} is an Invalid Email Address", [value]);
@@ -146,7 +161,7 @@ const tempSelection = ref(null);
 
 const { users } = useUserStore();
 
-// --- Contacts resource (used when forAgents = false) ---
+// --- Contacts resource (used when scope = "contact") ---
 const filterContacts = createResource({
   url: "helpdesk.api.contact.search_contacts",
   method: "GET",
@@ -162,7 +177,7 @@ const filterContacts = createResource({
 watchDebounced(
   query,
   (newVal) => {
-    if (props.forAgents) return;
+    if (props.scope === "agents") return;
     filterContacts.update({ params: contactSearchParams(newVal) });
     filterContacts.reload();
   },
@@ -179,7 +194,7 @@ function contactSearchParams(txt) {
 
 // --- Options ---
 const options = computed(() => {
-  if (props.forAgents) {
+  if (props.scope === "agents") {
     let list = (users?.data || []).map((u) => ({
       label: u.full_name || u.name,
       value: u.name,
@@ -232,10 +247,7 @@ function addValue(input) {
   if (!input) return;
   error.value = null;
   info.value = null;
-  const parts = input
-    .split(/[\s,;]+/)
-    .map((p) => p.trim())
-    .filter(Boolean);
+  const parts = splitRecipients(input);
   for (const email of parts) {
     if (values.value?.includes(email)) continue;
     const inList = options.value.some((o) => o.value === email && !o.isCustom);
@@ -247,9 +259,10 @@ function addValue(input) {
 
 function canAddCustomValue(email) {
   if (!props.allowCustomEmail) {
-    error.value = props.forAgents
-      ? __("{0} is not an existing user", [email])
-      : __("{0} is not an existing contact", [email]);
+    error.value =
+      props.scope === "agents"
+        ? __("{0} is not an existing user", [email])
+        : __("{0} is not an existing contact", [email]);
     query.value = email;
     return false;
   }
@@ -264,6 +277,33 @@ function canAddCustomValue(email) {
     return false;
   }
   return true;
+}
+
+// Split on commas/semicolons/newlines while keeping a quoted display name
+// intact, so '"Doe, John" <a@b.com>' stays a single token.
+function splitRecipients(input) {
+  const parts = [];
+  let current = "";
+  let inQuotes = false;
+  for (const char of input) {
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      current += char;
+    } else if ((char === "," || char === ";" || char === "\n") && !inQuotes) {
+      if (current.trim()) parts.push(current.trim());
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  if (current.trim()) parts.push(current.trim());
+  return parts;
+}
+
+// Reduce a "Name <email>" value to just the display name for rendering.
+function getUsernameLabel(value) {
+  if (!value) return "";
+  return value.split("<")[0].replace(/"/g, "").trim();
 }
 
 function removeValue(value) {
@@ -335,6 +375,14 @@ function onPaste(e) {
 
 watch(options, (list) => {
   tempSelection.value = list[0]?.value ?? null;
+});
+
+onMounted(() => {
+  // reka-ui hardcodes autocomplete="off", which Chrome ignores for fields it
+  // reads as email/address. "new-password" is the value Chrome won't autofill,
+  // so its native address dropdown stops covering our options. (No password UI:
+  // the input is type=text and not inside a form.)
+  search.value?.$el?.setAttribute("autocomplete", "new-password");
 });
 
 defineExpose({ setFocus });

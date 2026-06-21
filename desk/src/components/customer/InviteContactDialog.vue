@@ -12,7 +12,7 @@
               :placeholder="__('Enter email address')"
               :existingUsers="excludedEmails"
               :additionalFilters="contactFilters"
-              :forAgents="false"
+              scope="contact"
               allowCustomEmail
               :validate="validateEmailWithZod"
               v-model="selectedContacts"
