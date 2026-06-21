@@ -52,61 +52,6 @@ def _fill_date_series(from_date_str, to_date_str, rows: list) -> list:
 
 @frappe.whitelist()
 @agent_only
-def get_total_tickets(
-    dt: str,
-    dn: str,
-    period: str = "last month",
-) -> dict:
-    return _get_total_tickets(_resolve_scope(dt), dn, period)
-
-
-def _get_total_tickets(
-    scope: Scope,
-    value: str,
-    period: str = "last month",
-) -> dict:
-
-    days = periods.get(period, 7)
-
-    current_from = add_days(nowdate(), -(days - 1))
-    current_to = nowdate()
-    previous_from = add_days(nowdate(), -(2 * days - 1))
-    previous_to = add_days(nowdate(), -days)
-
-    def _query(from_date, to_date, group_by_date=False):
-        Ticket = DocType("HD Ticket")
-        creation_date = Function("DATE", Ticket.creation)
-        to_date_plus_one = Function(
-            "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
-        )
-        if group_by_date:
-            q = (
-                frappe.qb.from_(Ticket)
-                .select(creation_date.as_("date"), Count(Ticket.name).as_("count"))
-                .groupby(creation_date)
-                .orderby(creation_date)
-            )
-        else:
-            q = frappe.qb.from_(Ticket).select(Count(Ticket.name).as_("count"))
-        q = q.where(Ticket.creation >= from_date).where(
-            Ticket.creation < to_date_plus_one
-        )
-        q = _apply_scope(q, Ticket, scope, value)
-        return q.run(as_dict=True)
-
-    current_rows = _query(current_from, current_to, group_by_date=True)
-    current_total = sum(row["count"] for row in current_rows)
-    previous_total = (_query(previous_from, previous_to) or [{"count": 0}])[0]["count"]
-
-    return {
-        "data": _fill_date_series(current_from, current_to, current_rows),
-        "total": current_total,
-        "percentage_change": calculate_percentage_change(current_total, previous_total),
-    }
-
-
-@frappe.whitelist()
-@agent_only
 def get_feedback_received(
     scope: Scope,
     value: str,
