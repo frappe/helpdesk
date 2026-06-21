@@ -15,7 +15,6 @@ from helpdesk.test_utils import (
     create_customer,
     create_user,
     get_invitation,
-    get_roles,
     make_ticket,
     update_role_in_customer,
 )
@@ -91,7 +90,7 @@ class TestHDCustomer(IntegrationTestCase):
             row for row in customer.contacts if row.contact_name == contact["contact"]
         )
         self.assertTrue(member.is_manager)
-        self.assertIn("HD Customer Manager", get_roles(contact["user"]))
+        self.assertIn("HD Customer Manager", frappe.get_roles(contact["user"]))
 
     def test_add_contacts_requires_manager_roles(self) -> None:
         customer = create_customer("Test Customer Permission")
@@ -148,7 +147,7 @@ class TestHDCustomer(IntegrationTestCase):
         self.assertTrue(
             member.is_manager, "Accepted manager invite must set is_manager"
         )
-        self.assertIn("HD Customer Manager", get_roles(user.name))
+        self.assertIn("HD Customer Manager", frappe.get_roles(user.name))
 
     def test_setting_primary_contact_makes_them_manager(self) -> None:
         customer = create_customer("Test Customer Primary Manager")
@@ -157,7 +156,7 @@ class TestHDCustomer(IntegrationTestCase):
 
         # no primary yet, so neither contact is a manager
         customer.add_contacts([first["contact"], second["contact"]], "HD Customer")
-        self.assertNotIn("HD Customer Manager", get_roles(second["user"]))
+        self.assertNotIn("HD Customer Manager", frappe.get_roles(second["user"]))
 
         # designating a primary promotes that contact to manager
         customer.primary_contact = second["contact"]
@@ -167,7 +166,7 @@ class TestHDCustomer(IntegrationTestCase):
             row for row in customer.contacts if row.contact_name == second["contact"]
         )
         self.assertTrue(member.is_manager)
-        self.assertIn("HD Customer Manager", get_roles(second["user"]))
+        self.assertIn("HD Customer Manager", frappe.get_roles(second["user"]))
 
     def test_customer_roles_follow_is_manager(self) -> None:
         customer = create_customer("Test Customer Roles")
@@ -177,18 +176,38 @@ class TestHDCustomer(IntegrationTestCase):
         customer.add_contacts([manager["contact"]], "HD Customer Manager")
         customer.add_contacts([member["contact"]], "HD Customer")
 
-        self.assertIn("HD Customer Manager", get_roles(manager["user"]))
-        member_roles = get_roles(member["user"])
+        self.assertIn("HD Customer Manager", frappe.get_roles(manager["user"]))
+        member_roles = frappe.get_roles(member["user"])
         self.assertIn("HD Customer", member_roles)
         self.assertNotIn("HD Customer Manager", member_roles)
 
         # promote the non-primary member, then demote; the manager role is revoked
         update_role_in_customer(customer, member["contact"], "HD Customer Manager")
-        self.assertIn("HD Customer Manager", get_roles(member["user"]))
+        self.assertIn("HD Customer Manager", frappe.get_roles(member["user"]))
         update_role_in_customer(customer, member["contact"], "HD Customer")
-        demoted_roles = get_roles(member["user"])
+        demoted_roles = frappe.get_roles(member["user"])
         self.assertNotIn("HD Customer Manager", demoted_roles)
         self.assertIn("HD Customer", demoted_roles)
+
+    def test_manager_role_survives_demotion_when_manager_elsewhere(self) -> None:
+        # A contact managing two customers keeps the global HD Customer Manager
+        # role when demoted in one, and loses it only when demoted in both.
+        customer_a = create_customer("Test Manager Union A")
+        customer_b = create_customer("Test Manager Union B")
+        contact = create_contact("UnionManager", "union-manager@example.com")
+        add_contact_in_customer(customer_a, contact["contact"], is_manager=True)
+        add_contact_in_customer(customer_b, contact["contact"], is_manager=True)
+        self.assertIn("HD Customer Manager", frappe.get_roles(contact["user"]))
+
+        # demote in A only: still a manager of B, so the role is retained
+        update_role_in_customer(customer_a, contact["contact"], "HD Customer")
+        self.assertIn("HD Customer Manager", frappe.get_roles(contact["user"]))
+
+        # demote in B too: manager nowhere, role revoked (HD Customer stays)
+        update_role_in_customer(customer_b, contact["contact"], "HD Customer")
+        roles = frappe.get_roles(contact["user"])
+        self.assertNotIn("HD Customer Manager", roles)
+        self.assertIn("HD Customer", roles)
 
     def test_duplicate_contacts_are_rejected_on_save(self) -> None:
         customer = create_customer("Test Customer Duplicate Validate")

@@ -119,10 +119,25 @@ class HDCustomer(Document):
             user_doc.append_roles("HD Customer Manager", "HD Customer")
         else:
             user_doc.append_roles("HD Customer")
-            user_doc.set(
-                "roles", [r for r in user_doc.roles if r.role != "HD Customer Manager"]
-            )
+            if not self.is_manager_in_other_customers(contact.contact_name):
+                user_doc.set(
+                    "roles",
+                    [r for r in user_doc.roles if r.role != "HD Customer Manager"],
+                )
         user_doc.save(ignore_permissions=True)
+
+    def is_manager_in_other_customers(self, contact_name: str) -> bool:
+        """Whether the contact manages a customer other than this one. If yes, dont demote the role, just remove the is_manager check."""
+        return bool(
+            frappe.db.exists(
+                "HD Customer Member",
+                {
+                    "contact_name": contact_name,
+                    "is_manager": 1,
+                    "parent": ("!=", self.name),
+                },
+            )
+        )
 
     def get_user(self, contact_name, throw_error=True):
         user = frappe.db.get_value("Contact", contact_name, "user")

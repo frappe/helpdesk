@@ -419,11 +419,6 @@ def create_user(email: str):
     ).insert(ignore_permissions=True)
 
 
-def get_roles(user: str) -> list[str]:
-    """Return the role names assigned to a user."""
-    return frappe.get_all("Has Role", filters={"parent": user}, pluck="role")
-
-
 def get_invitation(email: str):
     """Return the helpdesk User Invitation raised for an email, if any."""
     return frappe.db.get_value(
