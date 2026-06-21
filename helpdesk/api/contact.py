@@ -38,7 +38,6 @@ def search_contacts(
 
 @frappe.whitelist()
 def delete_contact(name: str, delete_tickets: bool = False):
-    # TODO: add as on_trash hook in hooks to handle this at the DocType level
     frappe.has_permission("Contact", "delete", throw=True)
 
     tickets = frappe.get_list("HD Ticket", filters={"contact": name}, pluck="name")

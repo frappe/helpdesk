@@ -95,57 +95,6 @@ def _get_total_tickets(
     }
 
 
-def _get_total_tickets_overall(scope: Scope, value: str) -> dict:
-    """Lifetime ticket count for a scope, with a 12-month sparkline.
-
-    Unlike _get_total_tickets, there is no period filter — the total counts
-    every ticket ever raised by this contact/customer.
-    """
-    from datetime import datetime
-
-    from dateutil.relativedelta import relativedelta
-
-    Ticket = DocType("HD Ticket")
-
-    total_q = frappe.qb.from_(Ticket).select(Count(Ticket.name).as_("count"))
-    total_q = _apply_scope(total_q, Ticket, scope, value)
-    total_result = total_q.run(as_dict=True)
-    total = total_result[0]["count"] if total_result else 0
-
-    now = datetime.now()
-    start_month = (now - relativedelta(months=11)).replace(
-        day=1, hour=0, minute=0, second=0, microsecond=0
-    )
-
-    month_key = Function("DATE_FORMAT", Ticket.creation, "%b %Y")
-    sort_key = Function("DATE_FORMAT", Ticket.creation, "%Y%m")
-    series_q = (
-        frappe.qb.from_(Ticket)
-        .select(month_key.as_("date"), Count(Ticket.name).as_("count"))
-        .where(Ticket.creation >= start_month)
-        .groupby(sort_key)
-        .orderby(sort_key)
-    )
-    series_q = _apply_scope(series_q, Ticket, scope, value)
-    rows = series_q.run(as_dict=True)
-
-    month_dict: dict[str, int] = {}
-    for i in range(11, -1, -1):
-        m = now - relativedelta(months=i)
-        month_dict[m.strftime("%b %Y")] = 0
-    for row in rows:
-        key = str(row["date"])
-        if key in month_dict:
-            month_dict[key] = int(row["count"])
-
-    return {
-        "data": [
-            {"date": label, "count": count} for label, count in month_dict.items()
-        ],
-        "total": total,
-    }
-
-
 @frappe.whitelist()
 @agent_only
 def get_feedback_received(

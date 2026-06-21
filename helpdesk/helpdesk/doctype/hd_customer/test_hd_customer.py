@@ -119,12 +119,36 @@ class TestHDCustomer(IntegrationTestCase):
         invitation = frappe.get_doc("User Invitation", get_invitation(email).name)
         user = create_user(email)
 
+        frappe.set_user(user.name)
         after_accept(invitation, user, user_inserted=True)
+        frappe.set_user("Administrator")
 
         customer.reload()
         contact = frappe.db.get_value("Contact", {"user": user.name, "email_id": email})
         member_names = [row.contact_name for row in customer.contacts]
         self.assertIn(contact, member_names)
+
+    def test_accepted_manager_invitation_sets_is_manager(self) -> None:
+        customer = create_customer("Test Customer Accept Manager Invite")
+        email = "accepted-manager-invite@example.com"
+        customer.add_contacts([email], "HD Customer Manager")
+        invitation = frappe.get_doc("User Invitation", get_invitation(email).name)
+        user = create_user(email)
+
+        frappe.set_user(user.name)
+        after_accept(invitation, user, user_inserted=True)
+        frappe.set_user("Administrator")
+
+        customer.reload()
+        contact = frappe.db.get_value("Contact", {"user": user.name, "email_id": email})
+        member = next(
+            (row for row in customer.contacts if row.contact_name == contact), None
+        )
+        self.assertIsNotNone(member, "Invited manager should be a member after accept")
+        self.assertTrue(
+            member.is_manager, "Accepted manager invite must set is_manager"
+        )
+        self.assertIn("HD Customer Manager", get_roles(user.name))
 
     def test_setting_primary_contact_makes_them_manager(self) -> None:
         customer = create_customer("Test Customer Primary Manager")
@@ -210,7 +234,9 @@ class TestHDCustomer(IntegrationTestCase):
         invitation = frappe.get_doc("User Invitation", get_invitation(email).name)
         user = create_user(email)
 
+        frappe.set_user(user.name)
         after_accept(invitation, user, user_inserted=True)
+        frappe.set_user("Administrator")
 
         customer = frappe.get_doc("HD Customer", name)
         contact = frappe.db.get_value("Contact", {"email_id": email}, "name")

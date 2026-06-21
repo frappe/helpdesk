@@ -58,6 +58,4 @@ def delete_customer(name: str, delete_tickets: bool = False) -> None:
     frappe.has_permission("HD Customer", "delete", throw=True)
     permission = "delete" if delete_tickets else "write"
     frappe.has_permission("HD Ticket", permission, throw=True)
-    customer = frappe.get_doc("HD Customer", name)
-    customer.flags.delete_tickets = delete_tickets
-    customer.delete()
+    frappe.delete_doc("HD Customer", name, flags={"delete_tickets": delete_tickets})

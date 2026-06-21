@@ -122,7 +122,7 @@ class HDCustomer(Document):
             user_doc.set(
                 "roles", [r for r in user_doc.roles if r.role != "HD Customer Manager"]
             )
-        user_doc.save()
+        user_doc.save(ignore_permissions=True)
 
     def get_user(self, contact_name, throw_error=True):
         user = frappe.db.get_value("Contact", contact_name, "user")

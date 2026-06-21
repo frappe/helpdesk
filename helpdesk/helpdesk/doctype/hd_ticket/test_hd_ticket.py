@@ -828,7 +828,7 @@ class TestHDTicket(IntegrationTestCase):
         self.assertEqual(contact1_ticket1.customer, customer1.name)
 
         frappe.set_user(user_contact2.get("user"))
-        contact2_ticket1 = make_ticket(save=False)
+        contact2_ticket1 = make_ticket(save=False, via_customer_portal=True)
         self.assertRaises(frappe.ValidationError, contact2_ticket1.save)  # throws error
         # adds customer explicitly and saves
         contact2_ticket1.customer = customer1.name
@@ -844,8 +844,6 @@ class TestHDTicket(IntegrationTestCase):
             set([contact2_ticket1.name, contact2_ticket2.name]),
             "User should only see the tickets raised by them",
         )
-        # TODO: add validation that customer of the tickets should be either customer 1 or customer 2, currently we are only validating
-        # make_ticket(customer="ORG 3") throws Error
 
         frappe.set_user(user_contact1.get("user", ""))
         user1_tickets = frappe.get_list("HD Ticket", fields=["name", "customer"])

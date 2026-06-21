@@ -283,7 +283,11 @@ class HDTicket(Document):
         if self.contact:
             if len(contact_customers) == 1:
                 self.customer = contact_customers[0]
-            elif len(contact_customers) > 1 and not is_agent():
+            elif (
+                len(contact_customers) > 1
+                and not is_agent()
+                and self.via_customer_portal
+            ):
                 frappe.throw(
                     _(
                         "The contact {0} is linked to multiple customers. Please select the customer manually."
