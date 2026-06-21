@@ -27,6 +27,16 @@ def _resolve_scope(dt: str) -> str:
     return DT_FIELD_MAP[dt]
 
 
+def validate_agent_access(scope: Scope, value: str) -> None:
+    """Only the agent themselves or an Agent Manager may read an agent's stats."""
+    viewing_other_agent = scope == "agent" and value and value != frappe.session.user
+    if viewing_other_agent and "Agent Manager" not in frappe.get_roles():
+        frappe.throw(
+            _("You are not allowed to view another agent's stats."),
+            frappe.PermissionError,
+        )
+
+
 def _fill_date_series(from_date_str, to_date_str, rows: list) -> list:
     """Return a {date, count} list for every day in the range, filling 0 for missing days."""
     date_dict: dict[str, int] = {}
@@ -101,6 +111,7 @@ def get_feedback_received(
     scope: Scope,
     value: str,
 ) -> dict:
+    validate_agent_access(scope, value)
     Ticket = DocType("HD Ticket")
 
     # Rating distribution grouped by star (1–5)
