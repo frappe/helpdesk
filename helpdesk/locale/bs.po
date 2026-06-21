@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-14 11:18+0000\n"
-"PO-Revision-Date: 2026-06-18 19:52\n"
+"PO-Revision-Date: 2026-06-21 20:28\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Bosnian\n"
 "MIME-Version: 1.0\n"
@@ -1348,7 +1348,7 @@ msgstr "Potvrdi Promjene"
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:19
 msgid "Confirm Password"
-msgstr "Potvrdi Lozinku"
+msgstr "Potvrdi lozinku"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:393
 msgid "Confirm overwrite"
