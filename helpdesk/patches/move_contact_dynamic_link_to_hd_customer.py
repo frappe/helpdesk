@@ -105,16 +105,7 @@ def get_linked_contacts_by_customer() -> dict[str, list[str]]:
 def add_members(customer_name: str, contact_names: list[str]) -> None:
     customer = frappe.get_doc("HD Customer", customer_name)
 
-    existing = {row.contact_name for row in customer.contacts}
-    # An existing primary contact is a member too; seed it so a primary that
-    # was never dynamic-linked doesn't fail validate_contacts().
-    if customer.primary_contact and customer.primary_contact not in existing:
-        customer.append("contacts", {"contact_name": customer.primary_contact})
-        existing.add(customer.primary_contact)
-
     for contact_name in contact_names:
-        if contact_name not in existing:
-            customer.append("contacts", {"contact_name": contact_name})
-            existing.add(contact_name)
+        customer.add_contact(contact_name)
 
     customer.save(ignore_permissions=True)

@@ -42,8 +42,7 @@ def add_primary_contact(customer_doc: Document, primary_contact: dict) -> None:
         },
         invite=True,
     )
-    customer_doc.append("contacts", {"contact_name": contact_name, "is_manager": True})
-    customer_doc.primary_contact = contact_name
+    customer_doc.set_primary(contact_name)
     customer_doc.save()
 
 

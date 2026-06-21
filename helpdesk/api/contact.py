@@ -69,14 +69,7 @@ def unlink_from_customers(name: str):
 
     for customer in customers:
         customer_doc = frappe.get_doc("HD Customer", customer)
-        contacts = customer_doc.get("contacts", [])
-        contacts = [c for c in contacts if c.contact_name != name]
-        customer_doc.contacts = contacts
-
-        if customer_doc.primary_contact == name:
-            customer_doc.primary_contact = None
-            customer_doc.email_id = None
-            customer_doc.mobile_no = None
+        customer_doc.remove_contact(name)
         customer_doc.save()
 
 

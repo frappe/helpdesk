@@ -238,7 +238,7 @@ class HDCustomer(Document):
         for entry in entries:
             contact_name, email = self.resolve_contact_entry(entry)
             if contact_name and self.get_user(contact_name, throw_error=False):
-                if self.append_contact(contact_name, role):
+                if self.add_contact(contact_name, role):
                     added.append(contact_name)
             else:
                 to_invite.append({"email": email, "contact": contact_name})
@@ -267,7 +267,8 @@ class HDCustomer(Document):
         validate_email_address(entry, throw=True)
         return frappe.db.get_value("Contact", {"email_id": entry}, "name"), entry
 
-    def append_contact(self, contact_name: str, role: str) -> bool:
+    def add_contact(self, contact_name: str, role: str = "HD Customer") -> bool:
+        """Add a contact to membership. Returns False if already a member."""
         if any(row.contact_name == contact_name for row in self.contacts):
             return False
         self.append(
@@ -278,6 +279,23 @@ class HDCustomer(Document):
             },
         )
         return True
+
+    def remove_contact(self, contact_name: str) -> None:
+        """Drop a contact from membership, clearing primary state if it was primary."""
+        self.contacts = [r for r in self.contacts if r.contact_name != contact_name]
+        if self.primary_contact == contact_name:
+            self.clear_primary()
+
+    def set_primary(self, contact_name: str) -> None:
+        """Make a contact the primary contact, ensuring it is a manager member."""
+        self.add_contact(contact_name, "HD Customer Manager")
+        self.primary_contact = contact_name
+
+    def clear_primary(self) -> None:
+        """Drop the primary contact and the fields fetched from it."""
+        self.primary_contact = None
+        self.email_id = None
+        self.mobile_no = None
 
     def invite_contacts(self, to_invite: list[dict], role: str) -> dict:
         result = {
