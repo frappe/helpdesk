@@ -15,7 +15,7 @@
             </h3>
             <Badge
               v-if="isDirty"
-              label="Unsaved"
+              :label="__('Unsaved')"
               variant="subtle"
               theme="orange"
             />
@@ -75,7 +75,7 @@
 
           <div class="float-right flex space-x-2 pb-5">
             <Button
-              label="Save"
+              :label="__('Save')"
               theme="gray"
               variant="solid"
               :loading="loading || customer.setValue.loading"

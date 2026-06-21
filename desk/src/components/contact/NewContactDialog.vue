@@ -102,7 +102,7 @@
 
           <div class="flex justify-end pt-1 gap-2">
             <Button
-              label="Create"
+              :label="__('Create')"
               theme="gray"
               variant="solid"
               @click="handleAdd"
