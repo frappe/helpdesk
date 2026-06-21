@@ -21,7 +21,7 @@
           </button>
           <button
             type="button"
-            class="absolute -right-2.5 -top-2.5 flex size-4.5 cursor-pointer items-center justify-center rounded-full bg-surface-gray-7 text-ink-white opacity-0 outline-none ring-2 ring-[var(--surface-white)] transition focus:outline-none focus-visible:outline-none hover:bg-surface-gray-6 group-hover:opacity-100"
+            class="absolute -right-2.5 -top-2.5 flex size-4.5 cursor-pointer items-center justify-center rounded-full bg-surface-white text-ink-gray-4 opacity-0 outline outline-black-overlay-50 duration-300 ease-in-out focus:outline-none focus-visible:outline-none hover:bg-surface-gray-2 group-hover:opacity-100"
             :aria-label="__('Remove image')"
             @click.prevent="image = ''"
           >
