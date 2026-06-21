@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-14 11:18+0000\n"
-"PO-Revision-Date: 2026-06-15 18:51\n"
+"PO-Revision-Date: 2026-06-21 20:28\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -5522,7 +5522,7 @@ msgstr "الگو"
 #. Label of the template_name (Data) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Template Name"
-msgstr "نام الگو"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:12
 msgid "The 'Closed' status cannot be renamed."
