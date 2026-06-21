@@ -57,11 +57,51 @@ interface ContactBundle {
 // Local Cache to store contact document + info resources to avoid multiple DB calls in a single session.
 const contactCache: Record<string, ContactBundle> = {};
 
+function sortByPrimary<T extends { isPrimary: boolean }>(arr: T[]): T[] {
+  return [...arr].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
+}
+
+type EmailRow = { email_id: string; isPrimary: boolean };
+type PhoneRow = { phone: string; isPrimary: boolean };
+
+// The single mapping from a Contact document to form-state rows. Kept in one
+// place so the hydrate watch, resetState, and the dirty check can never drift.
+function emailRowsFromDoc(doc?: Contact): EmailRow[] {
+  return sortByPrimary(
+    (doc?.email_ids || []).map((e: any) => ({
+      email_id: e.email_id,
+      isPrimary: Boolean(e.is_primary),
+    }))
+  );
+}
+
+function phoneRowsFromDoc(doc?: Contact): PhoneRow[] {
+  return sortByPrimary(
+    (doc?.phone_nos || []).map((p: any) => ({
+      phone: p.phone,
+      isPrimary: Boolean(p.is_primary_phone || p.is_primary_mobile_no),
+    }))
+  );
+}
+
+function customerLinksFromDoc(doc?: Contact): string[] {
+  return (doc?.links || []).map((l: any) => l.link_name as string);
+}
+
 let entryKeyCounter = 0;
 export const nextEntryKey = () => ++entryKeyCounter;
 
-function sortByPrimary<T extends { isPrimary: boolean }>(arr: T[]): T[] {
-  return [...arr].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
+const withKeys = <T>(rows: T[]) =>
+  rows.map((row) => ({ ...row, key: nextEntryKey() }));
+
+// Hydrate the edit-form state from a Contact document.
+function applyDocToState(state: EditContactState, doc?: Contact): void {
+  state.firstName = doc?.first_name || "";
+  state.lastName = doc?.last_name || "";
+  state.image = doc?.image || "";
+  state.emails = withKeys(emailRowsFromDoc(doc));
+  state.phones = withKeys(phoneRowsFromDoc(doc));
+  state.customers = customerLinksFromDoc(doc);
 }
 
 export function useContact(name: string) {
@@ -89,25 +129,7 @@ export function useContact(name: string) {
     () => doc.doc,
     (data) => {
       if (!data) return;
-      state.firstName = data.first_name || "";
-      state.lastName = data.last_name || "";
-      state.image = data.image || "";
-      state.emails = sortByPrimary(
-        data.email_ids?.map((e: any) => ({
-          email_id: e.email_id,
-          isPrimary: Boolean(e.is_primary),
-          key: nextEntryKey(),
-        })) || []
-      );
-      state.phones = sortByPrimary(
-        data.phone_nos?.map((p: any) => ({
-          phone: p.phone,
-          isPrimary: Boolean(p.is_primary_phone || p.is_primary_mobile_no),
-          key: nextEntryKey(),
-        })) || []
-      );
-      state.customers =
-        data.links?.map((l: any) => l.link_name as string) || [];
+      applyDocToState(state, data);
     },
     { immediate: true }
   );
@@ -115,7 +137,7 @@ export function useContact(name: string) {
   watch(
     () => contactInfoResource.data,
     (data) => {
-      state.timezone = { value: data?.timezone, label: data?.timezone };
+      state.timezone = data?.timezone || "";
     },
     { immediate: true, deep: true }
   );
@@ -134,38 +156,21 @@ export function useContact(name: string) {
         isPrimary: e.isPrimary,
       }))
     );
-    const savedEmails = sortByPrimary(
-      doc.doc?.email_ids?.map((e: any) => ({
-        email_id: e.email_id,
-        isPrimary: Boolean(e.is_primary),
-      })) || []
-    );
     const currentPhones = sortByPrimary(
       state.phones
         .filter((p) => p.phone)
-        .map((p) => ({
-          phone: p.phone,
-          isPrimary: p.isPrimary,
-        }))
+        .map((p) => ({ phone: p.phone, isPrimary: p.isPrimary }))
     );
-    const savedPhones = sortByPrimary(
-      doc.doc?.phone_nos?.map((p: any) => ({
-        phone: p.phone,
-        isPrimary: Boolean(p.is_primary_phone || p.is_primary_mobile_no),
-      })) || []
-    );
-    const currentTimezone =
-      typeof state.timezone === "string"
-        ? state.timezone
-        : (state.timezone as any)?.value || "";
     const savedTimezone = contactInfoResource.data?.timezone || "";
     return (
       state.firstName !== (doc.doc?.first_name || "") ||
       state.lastName !== (doc.doc?.last_name || "") ||
       state.image !== (doc.doc?.image || "") ||
-      currentTimezone !== savedTimezone ||
-      JSON.stringify(currentEmails) !== JSON.stringify(savedEmails) ||
-      JSON.stringify(currentPhones) !== JSON.stringify(savedPhones)
+      state.timezone !== savedTimezone ||
+      JSON.stringify(currentEmails) !==
+        JSON.stringify(emailRowsFromDoc(doc.doc)) ||
+      JSON.stringify(currentPhones) !==
+        JSON.stringify(phoneRowsFromDoc(doc.doc))
     );
   });
 
@@ -201,10 +206,7 @@ export function useContact(name: string) {
           phone: p.phone,
           is_primary: p.isPrimary,
         })),
-      timezone:
-        typeof state.timezone === "string"
-          ? state.timezone
-          : state.timezone?.value || "",
+      timezone: state.timezone,
     };
   }
 
@@ -287,10 +289,7 @@ export function useNewContact() {
       email: state.email,
       phone: state.phone,
       customer: state.customer,
-      timezone:
-        typeof state.timezone === "string"
-          ? state.timezone
-          : state.timezone?.value || "",
+      timezone: state.timezone,
     };
   }
 
@@ -334,7 +333,7 @@ export function useContactState(
       phone: "",
       timezone: "",
       customer: "",
-      invite: false,
+      invite: true,
     });
 
     function resetState() {
@@ -362,25 +361,7 @@ export function useContactState(
 
     function resetState() {
       const data = doc?.doc;
-      state.firstName = data?.first_name || "";
-      state.lastName = data?.last_name || "";
-      state.image = data?.image || "";
-      state.emails = sortByPrimary(
-        data?.email_ids?.map((e: any) => ({
-          email_id: e.email_id,
-          isPrimary: Boolean(e.is_primary),
-          key: nextEntryKey(),
-        })) || []
-      );
-      state.phones = sortByPrimary(
-        data?.phone_nos?.map((p: any) => ({
-          phone: p.phone,
-          isPrimary: Boolean(p.is_primary_phone || p.is_primary_mobile_no),
-          key: nextEntryKey(),
-        })) || []
-      );
-      state.customers =
-        data?.links?.map((l: any) => l.link_name as string) || [];
+      applyDocToState(state, data);
       state.timezone = data?.timezone || "";
     }
 
@@ -402,9 +383,7 @@ interface FieldConfig {
 
 type FieldConfigRow = FieldConfig | FieldConfig[];
 
-export function getContactFieldConfig(
-  newDoc: boolean = false
-): FieldConfigRow[] {
+function getContactFieldConfig(newDoc: boolean = false): FieldConfigRow[] {
   const baseFields: FieldConfigRow[] = [
     {
       key: "image",
