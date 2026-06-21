@@ -1,12 +1,16 @@
 <template>
-  <Dialog v-model:open="model" :title="__('Create customer')" size="lg">
+  <Dialog
+    v-model:open="model"
+    :title="__('Create Customer')"
+    size="lg"
+    @after-leave="reset"
+  >
     <template #default>
       <div class="space-y-4">
         <ImageAvatar
           v-model="state.image"
           :label="__('Logo')"
-          :description="__('Upload a PNG or JPG, 128x128 recommended')"
-          :fallback-label="state.name || 'Customer'"
+          :fallback-label="state.name || __('Customer')"
           shape="square"
         />
 
@@ -82,7 +86,11 @@
             :label="__('Email')"
             placeholder="name@company.com"
             v-model="primaryContact.email"
-          />
+          >
+            <template #prefix>
+              <LucideMail class="size-4" />
+            </template>
+          </FormControl>
           <PhoneControl
             :label="__('Mobile Number')"
             v-model="primaryContact.mobileNo"
@@ -93,15 +101,6 @@
 
     <template #actions>
       <div class="flex justify-end gap-2">
-        <Button
-          :label="__('Cancel')"
-          @click="
-            () => {
-              reset();
-              model = false;
-            }
-          "
-        />
         <Button
           :label="__('Create')"
           theme="gray"
@@ -126,6 +125,7 @@ import { getErrorMessage, validateEmailWithZod } from "@/utils";
 import { Button, Dialog, FormControl, createResource, toast } from "frappe-ui";
 import { useRouter } from "vue-router";
 import LucideGlobe from "~icons/lucide/globe";
+import LucideMail from "~icons/lucide/mail";
 import LucideMapPin from "~icons/lucide/map-pin";
 import Link from "../frappe-ui/Link.vue";
 import PhoneControl from "../frappe-ui/PhoneControl/PhoneControl.vue";

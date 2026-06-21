@@ -22,9 +22,13 @@
           <ImageAvatar
             v-model="state.image"
             :label="__('Photo')"
-            :description="__('Upload a PNG or JPG, 128x128 recommended')"
             :fallback-label="
-              `${state.firstName} ${state.lastName}`.trim() || 'Contact'
+              `${state.firstName} ${state.lastName}`.trim() || __('Contact')
+            "
+            :description="
+              doc.doc?.image
+                ? __('Click to replace or remove')
+                : __('Upload an image in PNG or JPG format')
             "
             shape="circle"
           />

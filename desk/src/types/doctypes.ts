@@ -366,14 +366,14 @@ export interface HDCustomerMember extends ChildDocType {
   contact_name: string;
 }
 
-// Last updated: 2026-05-29 18:06:42.542623
+// Last updated: 2026-06-20 15:34:00.998330
 export interface HDCustomer extends DocType {
   /** Image: Attach Image */
   image?: string;
   /** Customer Name: Data */
   customer_name?: string;
   /** Customer Type: Select */
-  customer_type?: "Company" | "Individual" | "Partnership";
+  customer_type?: 'Company' | 'Individual' | 'Partnership';
   /** Domain: Data */
   domain?: string;
   /** ERPNext Customer: Data */

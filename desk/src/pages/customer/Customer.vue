@@ -239,7 +239,9 @@ const customerInfo = computed(() => [
 ]);
 
 onMounted(() => {
-  customer.getPendingInvites.fetch();
+  if (hasPermission()) {
+    customer.getPendingInvites.fetch();
+  }
   customer.getContacts.fetch();
   ticketsListResource.update({
     filters: {

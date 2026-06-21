@@ -1,6 +1,11 @@
 <template>
   <div>
-    <Dialog v-model:open="open" :title="__('Add Contact')" size="md">
+    <Dialog
+      v-model:open="open"
+      :title="__('Create Contact')"
+      size="md"
+      @after-leave="reset"
+    >
       <template #default>
         <div class="space-y-4">
           <template
@@ -35,8 +40,7 @@
               <ImageAvatar
                 v-model="state.image"
                 :label="__('Photo')"
-                :description="__('Upload a PNG or JPG, 128x128 recommended')"
-                :fallback-label="state.firstName || 'Contact'"
+                :fallback-label="state.firstName || __('Contact')"
                 shape="circle"
               />
             </template>
@@ -96,9 +100,9 @@
             :label="__('Invite as User')"
           />
 
-          <div class="flex justify-end pt-1">
+          <div class="flex justify-end pt-1 gap-2">
             <Button
-              label="Add"
+              label="Create"
               theme="gray"
               variant="solid"
               @click="handleAdd"
@@ -122,7 +126,7 @@ import PhoneControl from "../frappe-ui/PhoneControl/PhoneControl.vue";
 
 const open = defineModel<boolean>({ default: false });
 
-const { state, fieldConfig, addContact, isLoading } = useNewContact();
+const { state, fieldConfig, addContact, isLoading, reset } = useNewContact();
 
 function handleAdd() {
   addContact();

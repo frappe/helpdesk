@@ -305,6 +305,7 @@ export function useNewContact() {
     fieldConfig,
     addContact,
     isLoading: computed(() => addContactResource.loading),
+    reset: resetState,
   };
 }
 

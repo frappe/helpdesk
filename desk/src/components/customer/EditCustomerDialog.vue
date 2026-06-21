@@ -27,8 +27,12 @@
           <ImageAvatar
             v-model="state.image"
             :label="__('Logo')"
-            :description="__('Upload a PNG or JPG, 128x128 recommended')"
-            :fallback-label="state.name || 'Customer'"
+            :fallback-label="state.name || __('Customer')"
+            :description="
+              customer.doc?.image
+                ? __('Click to replace or remove')
+                : __('Upload an image in PNG or JPG format')
+            "
             shape="square"
           />
 

@@ -45,11 +45,11 @@
     </FileUploader>
 
     <div v-if="label || description" class="flex flex-col gap-0.5">
-      <span v-if="label" class="text-base font-medium text-ink-gray-8">
-        {{ label }}
+      <span v-if="label" class="text-p-sm font-medium text-ink-gray-8">
+        {{ __(label) }}
       </span>
       <span v-if="description" class="text-p-sm text-ink-gray-5">
-        {{ description }}
+        {{ __(description) }}
       </span>
     </div>
   </div>
@@ -75,7 +75,7 @@ const props = withDefaults(
   }>(),
   {
     label: "",
-    description: "",
+    description: __("Upload an image in PNG or JPG format"),
     fallbackLabel: "",
     shape: "square",
   }
