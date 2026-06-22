@@ -22,6 +22,108 @@ class HDSettings(Document):
         self.validate_auto_close_days()
         self.validate_email_contents()
         self.validate_send_feedback_when_ticket_closed()
+        self.validate_openai_api_key()
+
+    def validate_openai_api_key(self):
+        """
+        When AI Knowledge Base Search is enabled:
+        - The API key is mandatory (hard validation).
+        - On every change to enable_rag / openai_api_key / openai_api_base,
+          actually connect to the OpenAI-compatible endpoint with a tiny
+          test embedding call to confirm the credentials are valid.
+        """
+        if not self.enable_rag:
+            return
+
+        # Key is always required when RAG is on — check this unconditionally.
+        if not self.openai_api_key:
+            frappe.throw(
+                _(
+                    "An OpenAI API key is required when AI Knowledge Base Search is enabled."
+                )
+            )
+
+        # Only do the live round-trip when something relevant changed.
+        relevant_changed = (
+            self.has_value_changed("enable_rag")
+            or self.has_value_changed("openai_api_key")
+            or self.has_value_changed("openai_api_base")
+        )
+        if not relevant_changed:
+            return
+
+        if self.openai_api_base:
+            self._validate_api_base_url(self.openai_api_base)
+
+        # Decrypt the password field before passing it to the client.
+        # `self.openai_api_key` holds the encrypted blob; use get_decrypted_password
+        # for the persisted value, or fall back to the raw value if the doc is new
+        # (not yet saved, so there is nothing to decrypt).
+        from frappe.utils.password import get_decrypted_password
+
+        if self.is_new():
+            api_key = self.openai_api_key
+        else:
+            api_key = (
+                get_decrypted_password(
+                    "HD Settings",
+                    "HD Settings",
+                    "openai_api_key",
+                    raise_exception=False,
+                )
+                or self.openai_api_key
+            )
+
+        try:
+            import openai
+
+            from helpdesk.rag.rag_search import EMBEDDING_MODEL
+
+            kwargs: dict = {"api_key": api_key, "timeout": 10.0}
+            if self.openai_api_base:
+                kwargs["base_url"] = self.openai_api_base.rstrip("/")
+
+            client = openai.OpenAI(**kwargs)
+            client.embeddings.create(model=EMBEDDING_MODEL, input="ping")
+        except Exception as exc:
+            frappe.throw(
+                _("OpenAI API key validation failed: {0}").format(str(exc)),
+            )
+
+    def _validate_api_base_url(self, url: str) -> None:
+        """
+        Prevent SSRF by blocking requests to private/internal network ranges.
+        Only HTTPS (or HTTP to known-safe hostnames) is permitted.
+        """
+        import ipaddress
+        import socket
+        from urllib.parse import urlparse
+
+        parsed = urlparse(url.strip())
+
+        if parsed.scheme not in ("https", "http"):
+            frappe.throw(_("API Base URL must use http or https scheme."))
+
+        hostname = parsed.hostname
+        if not hostname:
+            frappe.throw(_("API Base URL must include a valid hostname."))
+
+        # Resolve hostname to IP and block private/loopback/link-local ranges
+        try:
+            ip_str = socket.gethostbyname(hostname)
+            ip = ipaddress.ip_address(ip_str)
+        except (socket.gaierror, ValueError):
+            frappe.throw(
+                _("API Base URL hostname could not be resolved: {0}").format(hostname)
+            )
+            return  # unreachable, satisfies type checker
+
+        if ip.is_loopback or ip.is_private or ip.is_link_local or ip.is_reserved:
+            frappe.throw(
+                _(
+                    "API Base URL must not point to a private or internal network address."
+                )
+            )
 
     def validate_auto_close_days(self):
         if self.auto_close_tickets and self.auto_close_after_days <= 0:
