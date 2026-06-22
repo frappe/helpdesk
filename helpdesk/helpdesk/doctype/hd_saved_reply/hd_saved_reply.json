@@ -8,6 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
+  "category",
+  "language",
   "scope",
   "teams",
   "section_break_ybsb",
@@ -20,6 +22,21 @@
    "label": "Title",
    "reqd": 1,
    "unique": 1
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Category",
+   "options": "HD Saved Reply Category"
+  },
+  {
+   "fieldname": "language",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Language",
+   "options": "Language"
   },
   {
    "fieldname": "message",
