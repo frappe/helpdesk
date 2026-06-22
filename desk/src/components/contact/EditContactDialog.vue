@@ -25,11 +25,6 @@
             :fallback-label="
               `${state.firstName} ${state.lastName}`.trim() || __('Contact')
             "
-            :description="
-              doc.doc?.image
-                ? __('Click to replace or remove')
-                : __('Upload an image in PNG or JPG format')
-            "
             shape="circle"
           />
 

@@ -67,7 +67,7 @@
             </button>
           </template>
           <template #tab-panel="{ tab }">
-            <div class="p-5 pt-4.5 overflow-hidden">
+            <div class="p-5 overflow-hidden">
               <TicketsTab
                 v-if="tab.label === __('Tickets')"
                 :doc="contact"
@@ -117,8 +117,8 @@
 <script setup lang="ts">
 import ContactCustomers from "@/components/contact/ContactCustomers.vue";
 import ContactFeedback from "@/components/contact/ContactFeedback.vue";
-import DeleteWithTicketsDialog from "@/components/DeleteWithTicketsDialog.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
+import DeleteWithTicketsDialog from "@/components/DeleteWithTicketsDialog.vue";
 import TicketFeedbackIcon from "@/components/icons/TicketFeedbackIcon.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
 //@ts-ignore

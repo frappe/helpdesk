@@ -6,63 +6,62 @@
     @after-leave="reset"
   >
     <template #default>
-      <div class="space-y-4">
-        <ImageAvatar
-          v-model="state.image"
-          :label="__('Logo')"
-          :fallback-label="state.name || __('Customer')"
-          shape="square"
-        />
-
-        <FormControl
-          class="[&_p]:text-p-xs"
-          type="text"
-          :label="__('Name')"
-          :required="true"
-          placeholder="Frappe"
-          v-model="state.name"
-        />
-
-        <div class="grid grid-cols-2 gap-4">
-          <FormControl
-            class="[&_p]:text-p-xs [&_[data-slot=trigger]]:w-full [&_[data-slot=trigger]]:!text-ink-gray-8"
-            type="select"
-            :label="__('Customer Type')"
-            :options="customerTypeOptions"
-            v-model="state.customerType"
+      <div>
+        <div class="flex flex-col gap-3">
+          <ImageAvatar
+            v-model="state.image"
+            :label="__('Logo')"
+            :fallback-label="state.name || __('Customer')"
+            shape="square"
           />
-          <Link
-            :label="__('Country')"
-            placeholder="India"
-            doctype="Country"
-            v-model="state.country"
+
+          <FormControl
+            class="[&_p]:text-p-xs"
+            type="text"
+            :label="__('Name')"
+            :required="true"
+            placeholder="Frappe"
+            v-model="state.name"
+          />
+
+          <div class="grid grid-cols-2 gap-4">
+            <FormControl
+              class="[&_p]:text-p-xs [&_[data-slot=trigger]]:w-full [&_[data-slot=trigger]]:!text-ink-gray-8"
+              type="select"
+              :label="__('Customer Type')"
+              :options="customerTypeOptions"
+              v-model="state.customerType"
+            />
+            <Link
+              :label="__('Country')"
+              placeholder="India"
+              doctype="Country"
+              v-model="state.country"
+            >
+              <template #prefix>
+                <LucideMapPin class="size-4 mr-1.5" />
+              </template>
+            </Link>
+          </div>
+
+          <FormControl
+            class="[&_p]:text-p-xs"
+            type="text"
+            :label="__('Domain')"
+            placeholder="frappe.io"
+            v-model="state.domain"
           >
             <template #prefix>
-              <LucideMapPin class="size-4 mr-1.5" />
+              <LucideGlobe class="size-4" />
             </template>
-          </Link>
+          </FormControl>
         </div>
 
-        <FormControl
-          class="[&_p]:text-p-xs"
-          type="text"
-          :label="__('Domain')"
-          placeholder="frappe.io"
-          v-model="state.domain"
-        >
-          <template #prefix>
-            <LucideGlobe class="size-4" />
-          </template>
-        </FormControl>
+        <hr class="my-5 border-outline-gray-2" />
 
-        <hr class="border-outline-gray-2" />
-
-        <div class="space-y-4">
+        <div class="flex flex-col gap-3">
           <h3 class="text-base font-medium text-ink-gray-8">
             {{ __("Primary Contact") }}
-            <span class="text-p-sm font-normal text-ink-gray-5">
-              {{ __("(optional)") }}
-            </span>
           </h3>
           <div class="grid grid-cols-2 gap-4">
             <FormControl

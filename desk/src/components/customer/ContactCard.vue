@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-md bg-surface-white border border-gray-200 px-3 py-2.5 flex flex-col gap-2.5 hover:shadow-md hover:cursor-pointer"
+    class="rounded-md bg-surface-white border border-outline-gray-1 px-3 py-2.5 flex flex-col gap-2.5 hover:border-outline-gray-3 hover:cursor-pointer"
     @click="goToContact"
   >
     <div class="flex items-center justify-between">

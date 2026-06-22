@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex items-center justify-between mt-[5px] mb-4">
+    <div class="flex items-center justify-between pb-4">
       <p class="font-semibold text-lg">{{ __("Contacts") }}</p>
       <Button
         v-if="hasPermission()"

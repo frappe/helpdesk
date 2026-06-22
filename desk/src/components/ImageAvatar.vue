@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center gap-4">
+  <div class="flex items-center gap-3 mb-2">
     <FileUploader :fileTypes="['image/*']" @success="onSuccess">
       <template #default="{ openFileSelector, uploading }">
         <!-- Filled: image with hover-to-replace + remove badge -->
