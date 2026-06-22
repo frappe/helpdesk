@@ -1,5 +1,29 @@
 <template>
-  <ActivityHeader :title="title" />
+  <div
+    v-if="title === __('Tasks')"
+    class="flex items-center justify-between px-6 md:px-5 py-4 w-full"
+  >
+    <h3 class="text-lg font-semibold text-ink-gray-9">
+      {{ title }}
+    </h3>
+    <Button variant="solid" icon-left="plus" @click="showNewTaskModal = true">
+      {{ __("New Task") }}
+    </Button>
+  </div>
+
+  <ActivityHeader v-else :title="title" />
+
+  <TaskboxEditor
+    v-model="showNewTaskModal"
+    :ticket-id="resolvedTicketId"
+    @submit="
+      () => {
+        showNewTaskModal = false;
+        emit('update');
+      }
+    "
+  />
+
   <FadedScrollableDiv
     class="flex flex-col flex-1 overflow-y-auto"
     :mask-length="20"
@@ -8,12 +32,23 @@
       <div
         v-for="(activity, i) in activities"
         :key="activity.key"
-        class="activity mt-2"
+        class="activity"
         tabindex="0"
         :id="activity.key"
       >
-        <!-- single activity -->
+        <div v-if="activity.type === 'task'" class="w-full px-6 md:px-5">
+          <Taskbox
+            :activity="activity"
+            :i="taskActivities.indexOf(activity)"
+            :tasks="taskActivities"
+            :reload-tasks="() => emit('update')"
+            @update="() => emit('update')"
+            class="w-full"
+          />
+        </div>
+
         <div
+          v-else
           class="w-full px-6 md:px-5 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
@@ -54,16 +89,18 @@
                     ? 'phone-incoming'
                     : 'phone-outgoing'
                 "
-                class="text-ink-gray-5 start-[7.5px] size-4"
+                class="text-ink-gray-5 absolute start-[7.5px] size-4"
               />
+
               <DotIcon
                 v-else
                 class="text-ink-gray-5 absolute start-[7.5px] top-[6px]"
               />
             </div>
           </div>
+
           <div
-            class="mb-4 flex flex-1"
+            class="flex flex-1 mb-4"
             :class="[
               i == activities.length - 1 && 'mb-5',
               !['email', 'feedback', 'call', 'comment'].includes(
@@ -77,27 +114,32 @@
               :show-split-option="
                 !activity.isFirstEmail && ticketStatus !== 'Closed'
               "
-              class="py-2 px-3"
+              class="py-2 px-3 flex-1 w-full"
               @reply="(e) => emit('email:reply', e)"
             />
             <CommentBox
               v-else-if="activity.type === 'comment'"
               :activity="activity"
+              class="flex-1 w-full"
               @update="() => emit('update')"
             />
             <CallArea
               v-else-if="activity.type === 'call'"
               :activity="activity"
+              class="flex-1 w-full"
             />
             <FeedbackBox
-              :activity="activity"
               v-else-if="activity.type === 'feedback'"
+              :activity="activity"
+              class="flex-1 w-full"
             />
-            <HistoryBox v-else :activity="activity" />
+            <HistoryBox v-else :activity="activity" class="flex-1 w-full" />
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Empty state -->
     <div
       v-else
       class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-4"
@@ -118,17 +160,32 @@ import {
   DotIcon,
   EmailIcon,
   PhoneIcon,
+  TaskIcon,
 } from "@/components/icons";
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
 import { isElementInViewport } from "@/utils";
-import { Avatar, FeatherIcon } from "frappe-ui";
-import { PropType, computed, h, inject, nextTick, onMounted, watch } from "vue";
+import { Avatar, FeatherIcon, Button } from "frappe-ui";
+import {
+  PropType,
+  computed,
+  h,
+  inject,
+  nextTick,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { __ } from "@/translation";
+import ActivityHeader from "@/components/ticket/ActivityHeader.vue";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
 import CommentBox from "@/components/CommentBox.vue";
 import EmailArea from "@/components/EmailArea.vue";
 import HistoryBox from "@/components/HistoryBox.vue";
+import CallArea from "@/components/CallArea.vue";
+import Taskbox from "@/components/Taskbox.vue";
+import TaskboxEditor from "@/components/TaskboxEditor.vue";
 
 const props = defineProps({
   activities: {
@@ -143,6 +200,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  ticketId: {
+    type: [String, Number],
+    default: "",
+  },
 });
 
 const emit = defineEmits(["email:reply", "update"]);
@@ -153,22 +214,43 @@ const router = useRouter();
 const { getUser } = useUserStore();
 const makeCall = inject<() => void>("makeCall");
 
-const emptyText = computed(() => {
-  if (props.title === "Emails") return "No email communications";
-  if (props.title === "Comments") return "No comments found";
-  if (props.title === "Calls") return "No calls made";
+const showNewTaskModal = ref(false);
 
+const injectedTicketId = inject<string | number>("ticketId", "");
+const resolvedTicketId = computed(() =>
+  String(props.ticketId || injectedTicketId || "").trim()
+);
+
+const activities = computed(() => {
+  if (props.title === __("Activity")) {
+    return props.activities.filter((activity) => activity.type !== "task");
+  }
+  return props.activities;
+});
+
+// Separate computed for task-only activities to get correct index
+const taskActivities = computed(() =>
+  activities.value.filter((activity) => activity.type === "task")
+);
+
+const emptyText = computed(() => {
+  if (props.title === __("Emails")) return "No email communications";
+  if (props.title === __("Comments")) return "No comments found";
+  if (props.title === __("Calls")) return "No calls made";
+  if (props.title === __("Tasks")) return "No tasks found";
   return "No activity found";
 });
 
 const emptyTextIcon = computed(() => {
-  let icon = ActivityIcon;
-  if (props.title == "Emails") {
+  let icon: any = ActivityIcon;
+  if (props.title === __("Emails")) {
     icon = EmailIcon;
-  } else if (props.title == "Comments") {
+  } else if (props.title === __("Comments")) {
     icon = CommentIcon;
-  } else if (props.title == "Calls") {
+  } else if (props.title === __("Calls")) {
     icon = PhoneIcon;
+  } else if (props.title === __("Tasks")) {
+    icon = TaskIcon;
   }
   return h(icon, { class: "text-ink-gray-4" });
 });
@@ -193,23 +275,17 @@ function scrollToLatestActivity() {
     }
   }, 200);
 }
+
 function scrollToHash() {
   const hash = route.hash;
   if (hash) {
-    // Remove the # symbol
     const elementId = hash.substring(1);
-
     nextTick(() => {
-      // Wait for activities to be rendered
       setTimeout(() => {
         const element = document.getElementById(elementId);
         if (element) {
           (element as any).scrollIntoViewIfNeeded();
-
-          // Add highlight effect using Tailwind class
           element.classList.add("bg-yellow-100");
-
-          // Remove highlight after 2 seconds
           setTimeout(() => {
             element.classList.remove("bg-yellow-100");
             router.replace({ hash: "" });

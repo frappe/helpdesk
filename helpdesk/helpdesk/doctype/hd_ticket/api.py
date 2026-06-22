@@ -602,11 +602,48 @@ def get_navigation_tickets(ticket: str, current_view: str | None = None):
 
 
 def get_navigation_filters(ticket: str, current_view: str = None):
-    conditions = _to_conditions(_get_view_filters(current_view))
-    # Custom filter "__assigned_on" is not available in any doctype
-    conditions = [c for c in conditions if c[0] != "__assigned_on"]
-    conditions.append(["name", "!=", ticket])
-    return handle_at_me_support(conditions)
+    filters = {}  # FIX 1: Initialize as a dictionary, not a list []
+
+    if current_view:
+        _filters = frappe.get_value("HD View", current_view, "filters")
+        if _filters:
+            try:
+                filters = (
+                    json.loads(_filters) if isinstance(_filters, str) else _filters
+                )
+            except (json.JSONDecodeError, TypeError):
+                filters = {}
+
+    if not filters:
+        default_view = frappe.db.get_value(
+            "HD View",
+            {"dt": "HD Ticket", "is_default": 1, "user": frappe.session.user},
+            "filters",
+        )
+
+        if default_view:
+            try:
+                filters = (
+                    json.loads(default_view)
+                    if isinstance(default_view, str)
+                    else default_view
+                )
+            except (json.JSONDecodeError, TypeError):
+                filters = {}
+
+    base_filters = {"name": ["!=", ticket]}
+
+    # FIX 2: Safely check if it's a valid dictionary before merging
+    if filters and isinstance(filters, dict):
+        final_filters = {**filters, **base_filters}
+    else:
+        final_filters = base_filters
+
+    final_filters = handle_at_me_support(final_filters)
+
+    final_filters.pop("__assigned_on", None)
+
+    return final_filters
 
 
 def _get_view_filters(current_view: str | None) -> dict | list:
@@ -735,19 +772,6 @@ def get_recent_tickets(ticket: str):
 
 
 @frappe.whitelist()
-def get_ticket_activities(ticket: str):
-    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
-    activities = {
-        "comments": get_comments(ticket),
-        "communications": get_communications(ticket),
-        "history": get_history(ticket),
-        "views": get_views(ticket),
-        "calls": get_call_logs(ticket),
-    }
-    return activities
-
-
-@frappe.whitelist()
 def get_ticket_assignees(ticket: str) -> list[dict]:
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     assignee_names = json.loads(
@@ -817,3 +841,59 @@ def show_outside_hours_banner(ticket_name: str):
         return {"msg": banner_data.get("banner_msg"), "show": True}
 
     return {"show": False}
+
+
+@frappe.whitelist()
+def get_ticket_activities(ticket: str):
+    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
+    activities = {
+        "comments": get_comments(ticket),
+        "communications": get_communications(ticket),
+        "history": get_history(ticket),
+        "views": get_views(ticket),
+        "calls": get_call_logs(ticket),
+        "tasks": get_task(ticket),
+    }
+    return activities
+
+
+@frappe.whitelist()
+def get_task(ticket: str):
+    if not ticket or not str(ticket).strip():
+        frappe.throw(_("Ticket is required"))
+
+    ticket = str(ticket).strip()
+    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
+
+    try:
+        tasks = frappe.get_all(
+            "HD Task",
+            filters={
+                "reference_doctype": "HD Ticket",
+                "reference_docname": ticket,
+            },
+            fields=[
+                "name",
+                "title",
+                "description",
+                "status",
+                "priority",
+                "start_date",
+                "assigned",
+                "due_date",
+                "reference_docname",
+                "reference_doctype",
+                "creation",
+                "owner",
+                "modified",
+            ],
+            order_by="creation asc",
+        )
+
+        for task in tasks:
+            task["name"] = str(task["name"])
+
+        return tasks
+
+    except frappe.ValidationError as e:
+        frappe.throw(_(str(e)))
