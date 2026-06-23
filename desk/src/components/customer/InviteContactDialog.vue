@@ -33,7 +33,7 @@
           :options="roleOptions"
           :description="roleDescription"
         />
-        <div v-if="pendingInvites.length" class="flex flex-col gap-3">
+        <div v-if="pendingInvites.length" class="flex flex-col gap-3 mt-2">
           <p class="text-base font-medium text-ink-gray-5">
             {{ __("Pending Invites") }}
           </p>

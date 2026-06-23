@@ -123,7 +123,10 @@
               </div>
 
               <!-- Assigned To -->
-              <div v-if="!isMobileView" class="flex items-center gap-2">
+              <div
+                v-if="!isMobileView"
+                class="flex items-center gap-2 assigned-cell"
+              >
                 <MultipleAvatar :avatars="ticket._assign" size="xs" />
               </div>
             </div>
@@ -316,3 +319,9 @@ onBeforeUnmount(() => {
   ticketsListResource.reload();
 });
 </script>
+
+<style scoped>
+.assigned-cell :deep(.truncate) {
+  @apply text-sm text-ink-gray-6;
+}
+</style>

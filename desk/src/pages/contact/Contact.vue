@@ -119,6 +119,7 @@ import ContactCustomers from "@/components/contact/ContactCustomers.vue";
 import ContactFeedback from "@/components/contact/ContactFeedback.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
 import DeleteWithTicketsDialog from "@/components/DeleteWithTicketsDialog.vue";
+import ModifiedIcon from "@/components/icons/ModifiedIcon.vue";
 import TicketFeedbackIcon from "@/components/icons/TicketFeedbackIcon.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
 //@ts-ignore
@@ -134,7 +135,14 @@ import {
 import { useScreenSize } from "@/composables/screen";
 import { __ } from "@/translation";
 import { hasPermission } from "@/utils";
-import { Breadcrumbs, Button, Dropdown, Tabs, usePageMeta } from "frappe-ui";
+import {
+  Breadcrumbs,
+  Button,
+  Dropdown,
+  Tabs,
+  dayjs,
+  usePageMeta,
+} from "frappe-ui";
 import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideMail from "~icons/lucide/mail";
@@ -209,6 +217,13 @@ const contactInfo = computed(() => {
       icon: markRaw(LucideMapPin),
       value: contactInfoResource.data?.country,
       condition: !!contactInfoResource.data?.country,
+    },
+    {
+      icon: markRaw(ModifiedIcon),
+      value: __("Last seen {0}", [
+        dayjs(contactInfoResource.data?.last_seen).fromNow(),
+      ]),
+      condition: !!contactInfoResource.data?.last_seen,
     },
     {
       component: markRaw(

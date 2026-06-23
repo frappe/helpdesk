@@ -166,15 +166,19 @@ def get_contact_info(name: str) -> dict:
 
     result = {
         "customers": get_customers_with_image(name),
+        "last_seen": None,
     }
     if not contact.user and (invite := get_invitation(name, primary_email)):
         result["invitation"] = invite
 
     if contact.user:
-        time_zone = frappe.db.get_value("User", contact.user, "time_zone")
-        if time_zone:
-            result["timezone"] = time_zone
-            result["country"] = get_country_from_timezone(time_zone)
+        user = frappe.db.get_value(
+            "User", contact.user, ["time_zone", "last_active"], as_dict=True
+        )
+        result["last_seen"] = user.last_active
+        if user.time_zone:
+            result["timezone"] = user.time_zone
+            result["country"] = get_country_from_timezone(user.time_zone)
     return result
 
 
