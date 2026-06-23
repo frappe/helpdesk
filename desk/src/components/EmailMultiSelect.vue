@@ -344,12 +344,14 @@ function onInput(e) {
 function onSelect(val) {
   if (!val) return;
   addValue(val);
-  if (!error.value) {
-    query.value = "";
-    tempSelection.value = null;
-    showOptions.value = true;
-    nextTick(() => setFocus());
+  if (error.value) {
+    showOptions.value = false;
+    return;
   }
+  query.value = "";
+  tempSelection.value = null;
+  showOptions.value = true;
+  nextTick(() => setFocus());
 }
 
 // Commit the current query as a pill on Enter, comma or space.

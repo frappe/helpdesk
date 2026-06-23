@@ -41,7 +41,7 @@
           </div>
         </template>
       </PageInfo>
-      <div class="overflow-y-auto flex-1">
+      <div class="overflow-y-auto flex-1 flex flex-col">
         <TicketStats :dt="'Contact'" :dn="id" v-if="!isMobileView" />
         <Tabs v-model="activeTab" :tabs="tabs" class="tabs-sticky-header">
           <template #tab-item="{ tab, selected }: any">
@@ -67,7 +67,7 @@
             </button>
           </template>
           <template #tab-panel="{ tab }">
-            <div class="p-5 overflow-hidden">
+            <div class="p-5 overflow-hidden flex flex-col flex-1 min-h-0">
               <TicketsTab
                 v-if="tab.label === __('Tickets')"
                 :doc="contact"

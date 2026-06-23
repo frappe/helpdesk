@@ -12,8 +12,26 @@
       />
     </div>
 
+    <!-- Loading -->
+    <div v-if="feedbackListResource.loading" class="flex justify-center py-10">
+      <LoadingIndicator :scale="10" />
+    </div>
+
+    <!-- Empty state -->
+    <div
+      v-else-if="!feedbackListResource.data?.length"
+      class="flex flex-col items-center justify-center gap-3 py-16 text-center h-full flex-1"
+    >
+      <LucideMessageSquare class="h-10 w-10 text-ink-gray-4" />
+      <div>
+        <p class="text-lg font-medium text-ink-gray-7">
+          {{ __("No reviews found") }}
+        </p>
+      </div>
+    </div>
+
     <!-- List -->
-    <div class="flex flex-col gap-2 max-h-[65vh] overflow-y-auto">
+    <div v-else class="flex flex-col gap-2 max-h-[65vh] overflow-y-auto">
       <template v-for="ticket in feedbackListResource.data" :key="ticket.name">
         <div
           class="flex cursor-pointer flex-col gap-2 rounded-md border border-outline-gray-1 bg-surface-white p-2.5 hover:bg-surface-gray-1"
@@ -75,9 +93,10 @@
 <script setup lang="ts">
 import { useContactFeedback } from "@/composables/contact";
 import { __ } from "@/translation";
-import { TabButtons, Tooltip, dayjs } from "frappe-ui";
-import { ref } from "vue";
+import { dayjs, LoadingIndicator, TabButtons, Tooltip } from "frappe-ui";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import LucideMessageSquare from "~icons/lucide/message-square";
 import LucideStar from "~icons/lucide/star";
 
 const props = defineProps<{
@@ -158,4 +177,8 @@ function ratingBadgeClass(rating: number | undefined | null): string {
   if (stars >= 2.5) return "bg-yellow-100 text-yellow-700";
   return "bg-red-100 text-red-700";
 }
+
+onMounted(() => {
+  onSortChange(activeSort.value);
+});
 </script>

@@ -26,7 +26,7 @@
       <div>
         <!-- make font larger -->
         <p class="text-lg font-medium text-ink-gray-7">
-          {{ __("No contacts found.") }}
+          {{ __("No contacts found") }}
         </p>
       </div>
     </div>

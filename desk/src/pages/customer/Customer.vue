@@ -32,7 +32,7 @@
           </div>
         </template>
       </PageInfo>
-      <div class="overflow-y-auto flex-1">
+      <div class="overflow-y-auto flex-1 flex flex-col">
         <TicketStats
           :dt="'HD Customer'"
           :dn="customer.doc.name"
@@ -63,21 +63,14 @@
             </button>
           </template>
           <template #tab-panel="{ tab }">
-            <div class="p-5 overflow-hidden">
+            <div class="p-5 overflow-hidden flex flex-col flex-1 min-h-0">
               <div v-if="tab.label === __('Tickets')">
                 <!-- Tickets tab content -->
                 <TicketsTab
                   :doc="customer"
                   :ticketsListResource="ticketsListResource"
                   :baseFilter="{ customer: props.id }"
-                  :additionalFilter="{
-                    key: 'contact',
-                    placeholder: __('Contact'),
-                    doctype: 'Contact',
-                    filters: customer.getContacts.data?.length
-                      ? { name: ['in', customer.getContacts.data.map((c: { contact_name: string }) => c.contact_name)] }
-                      : undefined,
-                  }"
+                  :additionalFilter="contactFilter"
                 />
               </div>
               <CustomerContactTab v-if="tab.label === __('Contacts')" />
@@ -166,6 +159,22 @@ const tabs = computed(() => [
 ]);
 const { doc: customer, handleDelete } = useCustomer(props.id);
 provide(CustomerResourceSymbol, customer);
+
+const contactFilter = computed(() => {
+  const contacts = customer.getContacts.data ?? [];
+  if (contacts.length <= 1) return undefined;
+  return {
+    key: "contact",
+    placeholder: __("Contact"),
+    doctype: "Contact",
+    filters: {
+      name: [
+        "in",
+        contacts.map((c: { contact_name: string }) => c.contact_name),
+      ],
+    },
+  };
+});
 
 const activeTab = computed<number>({
   get() {
