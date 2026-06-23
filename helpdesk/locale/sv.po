@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-21 11:29+0000\n"
-"PO-Revision-Date: 2026-06-22 20:26\n"
+"PO-Revision-Date: 2026-06-23 20:24\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -1102,7 +1102,7 @@ msgstr "Ändra språk för ansökan."
 
 #: desk/src/components/view-controls/filter/FilterValueEditor.vue:169
 msgid "Change operator ({0})"
-msgstr ""
+msgstr "Ändra operator ({0})"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:21
 #: desk/src/pages/desk/customer/CustomerDialog.vue:18
@@ -4407,7 +4407,7 @@ msgstr "Ta bort Bild"
 #: desk/src/components/view-controls/filter/Filter.vue:66
 #: desk/src/components/view-controls/filter/Filter.vue:67
 msgid "Remove filter"
-msgstr ""
+msgstr "Ta bort filter"
 
 #: desk/src/pages/desk/contact/ContactDialog.vue:30
 #: desk/src/pages/desk/customer/CustomerDialog.vue:27
@@ -4436,7 +4436,7 @@ msgstr "Döp om team"
 #: desk/src/components/view-controls/filter/Filter.vue:58
 #: desk/src/components/view-controls/filter/Filter.vue:59
 msgid "Replace filter"
-msgstr ""
+msgstr "Ändra filter"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
