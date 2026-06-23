@@ -85,6 +85,7 @@ class HDCustomer(Document):
     def before_save(self):
         self.ensure_primary_contact_is_manager()
         self.handle_roles()
+        self.cleanup_primary_contact_fields()
 
     def ensure_primary_contact_is_manager(self):
         # the primary is optional, but whoever is set as primary is a manager
@@ -138,6 +139,17 @@ class HDCustomer(Document):
                 },
             )
         )
+
+    def cleanup_primary_contact_fields(self):
+        """Clear the email and mobile fields if the primary contact is removed."""
+        if not self.has_value_changed("contacts"):
+            return
+
+        if not len(self.contacts) and self.primary_contact:
+            self.primary_contact = None
+            self.email_id = None
+            self.mobile_no = None
+            return
 
     def get_user(self, contact_name, throw_error=True):
         user = frappe.db.get_value("Contact", contact_name, "user")

@@ -149,7 +149,7 @@ export function useContact(name: string) {
     );
   });
 
-  const isDirty = computed(() => {
+  const isContactDirty = computed(() => {
     const currentEmails = sortByPrimary(
       state.emails.map((e) => ({
         email_id: e.email_id,
@@ -173,6 +173,11 @@ export function useContact(name: string) {
         JSON.stringify(phoneRowsFromDoc(doc.doc))
     );
   });
+
+  // Selecting a customer to link counts as an unsaved change too.
+  const isDirty = computed(
+    () => isContactDirty.value || Boolean(state.customer)
+  );
 
   function findContact(): ContactBundle {
     if (contactCache.hasOwnProperty(name)) return contactCache[name];
@@ -237,15 +242,28 @@ export function useContact(name: string) {
     },
   });
 
+  // Links this contact to the selected customer
+  const linkCustomerResource = createResource({
+    url: "run_doc_method",
+    makeParams: () => ({
+      dt: "HD Customer",
+      dn: state.customer,
+      method: "add_contacts",
+      args: { contacts: JSON.stringify([name]), role: "HD Customer" },
+    }),
+  });
+
   return {
     doc,
     contactInfoResource,
     state,
     resetState,
     isContactInfoChanged,
+    isContactDirty,
     isDirty,
     parseContactData,
     editContactResource,
+    linkCustomerResource,
     handleDelete,
   };
 }
@@ -357,6 +375,7 @@ export function useContactState(
       emails: [],
       phones: [],
       customers: [],
+      customer: "",
       timezone: "",
     });
 
@@ -364,6 +383,7 @@ export function useContactState(
       const data = doc?.doc;
       applyDocToState(state, data);
       state.timezone = data?.timezone || "";
+      state.customer = "";
     }
 
     return { state, resetState };

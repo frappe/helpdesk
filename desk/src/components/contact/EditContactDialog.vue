@@ -113,6 +113,55 @@
             <TimezoneControl v-model="state.timezone" />
           </div>
 
+          <!-- Customer -->
+          <div class="space-y-1.5">
+            <label
+              class="block text-p-sm font-medium text-ink-gray-7"
+              v-if="!contactInfoResource.data?.invitation"
+            >
+              {{ __("Customer") }}
+            </label>
+
+            <!-- Already linked: read-only, opens the customer in a new tab -->
+            <div
+              v-for="customer in linkedCustomers"
+              :key="customer.name"
+              class="flex items-center gap-2"
+            >
+              <FormControl
+                class="flex-1"
+                type="text"
+                :modelValue="customer.name"
+                :disabled="true"
+              >
+                <template #prefix>
+                  <Avatar
+                    :label="customer.name"
+                    :image="customer.image"
+                    size="sm"
+                  />
+                </template>
+              </FormControl>
+              <Button
+                variant="ghost"
+                :tooltip="__('Open customer')"
+                @click="goToCustomer(customer.name)"
+              >
+                <template #icon>
+                  <LucideExternalLink class="size-4 text-ink-gray-5" />
+                </template>
+              </Button>
+            </div>
+
+            <!-- Link a customer (only while none is linked yet) -->
+            <Link
+              v-if="canLinkCustomer"
+              v-model="state.customer"
+              doctype="HD Customer"
+              :placeholder="__('Select Customer')"
+            />
+          </div>
+
           <!-- Save -->
           <div class="flex justify-end">
             <Button
@@ -120,7 +169,9 @@
               variant="solid"
               theme="gray"
               :disabled="!isDirty"
-              :loading="editContactResource.loading"
+              :loading="
+                editContactResource.loading || linkCustomerResource.loading
+              "
               @click="handleSave"
             />
           </div>
@@ -131,11 +182,16 @@
 </template>
 
 <script setup lang="ts">
+import Link from "@/components/frappe-ui/Link.vue";
 import ImageAvatar from "@/components/ImageAvatar.vue";
 import { nextEntryKey, useContact } from "@/composables/contact";
 import { __ } from "@/translation";
-import { Badge, Button, Dialog, FormControl } from "frappe-ui";
-import { ref } from "vue";
+import type { Error } from "@/types";
+import { getErrorMessage } from "@/utils";
+import { Avatar, Badge, Button, Dialog, FormControl } from "frappe-ui";
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+import LucideExternalLink from "~icons/lucide/external-link";
 import LucidePlus from "~icons/lucide/plus";
 import TimezoneControl from "../TimezoneControl.vue";
 import ContactInputRow from "./ContactInputRow.vue";
@@ -147,12 +203,28 @@ const {
   state,
   parseContactData,
   isDirty,
+  isContactDirty,
   editContactResource,
+  linkCustomerResource,
   doc,
   contactInfoResource,
 } = useContact(props.name);
 
+const router = useRouter();
 const autofocusKey = ref<number | null>(null);
+
+const linkedCustomers = computed<{ name: string; image?: string | null }[]>(
+  () => contactInfoResource.data?.customers ?? []
+);
+const canLinkCustomer = computed(
+  () =>
+    linkedCustomers.value.length === 0 && !contactInfoResource.data?.invitation
+);
+
+function goToCustomer(name: string) {
+  const route = router.resolve({ name: "Customer", params: { id: name } });
+  window.open(route.href, "_blank");
+}
 
 function addRow(type: "email" | "phone") {
   const key = nextEntryKey();
@@ -198,21 +270,25 @@ function setPrimary(type: "email" | "phone", index: number) {
 }
 
 async function handleSave() {
-  if (!isDirty.value && contactInfoResource.data?.timezone === state.timezone)
-    return;
-  editContactResource.submit(
-    {
-      name: props.name,
-      doc: parseContactData(),
-    },
-    {
-      onSuccess: () => {
-        open.value = false;
-        doc.reload();
-        contactInfoResource.reload();
-      },
-    }
-  );
+  const tasks: Promise<unknown>[] = [];
+  if (isContactDirty.value) {
+    tasks.push(
+      editContactResource.submit({ name: props.name, doc: parseContactData() })
+    );
+  }
+  if (state.customer) {
+    tasks.push(linkCustomerResource.submit());
+  }
+  if (!tasks.length) return;
+  try {
+    await Promise.all(tasks);
+    state.customer = "";
+    open.value = false;
+    doc.reload();
+    contactInfoResource.reload();
+  } catch (error) {
+    getErrorMessage(error as Error, true);
+  }
 }
 </script>
 

@@ -794,6 +794,7 @@ export interface EditContactState {
   emails: ContactEmailEntry[];
   phones: ContactPhoneEntry[];
   customers: string[];
+  customer: string;
   timezone: string;
 }
 
