@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-21 11:29+0000\n"
-"PO-Revision-Date: 2026-06-22 20:26\n"
+"PO-Revision-Date: 2026-06-23 20:24\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -543,7 +543,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/Branding.vue:111
 msgid "Are you sure you want to remove the logo?"
-msgstr ""
+msgstr "Möchten Sie das Logo wirklich entfernen?"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:116
 msgid "Are you sure you want to reset the content? Current content will be overridden."
@@ -1007,7 +1007,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:526
 msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
-msgstr ""
+msgstr "Die Standard-SLA kann nicht gelöscht werden. Mindestens eine SLA muss als Standard gekennzeichnet sein."
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:110
 msgid "Cannot disable this status as it is linked in HD Settings:<br><br>"
@@ -1612,7 +1612,7 @@ msgstr "Standardpriorität"
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Default SLA"
-msgstr ""
+msgstr "Standard-SLA"
 
 #: desk/src/components/Settings/EmailAccountCard.vue:56
 msgid "Default Sending"
@@ -2653,7 +2653,7 @@ msgstr ""
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
 msgid "HD Stopword"
-msgstr ""
+msgstr "HD Stoppwort"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_support_search_source/hd_support_search_source.json
@@ -4584,7 +4584,7 @@ msgstr ""
 #. Label of the assign_within_team (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Restrict agent assignment to selected Team"
-msgstr ""
+msgstr "Zuweisung von Bearbeitern auf ausgewähltes Team beschränken"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:57
 msgid "Restrict agent assignment to selected team"
@@ -4670,7 +4670,7 @@ msgstr ""
 #. 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA Creation"
-msgstr ""
+msgstr "SLA-Erstellung"
 
 #. Label of the sla_mapping_section (Section Break) field in DocType 'HD Ticket
 #. Status'
@@ -4681,7 +4681,7 @@ msgstr ""
 #. Label of the agreement_status (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA Status"
-msgstr ""
+msgstr "SLA-Status"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:430
 msgid "SLA policy created successfully."
@@ -4977,7 +4977,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
-msgstr "Name des Service Levels"
+msgstr "SLA-Name"
 
 #: helpdesk/api/settings/email.py:14
 msgid "Service not supported"
