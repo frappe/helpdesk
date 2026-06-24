@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-21 11:29+0000\n"
-"PO-Revision-Date: 2026-06-22 20:26\n"
+"PO-Revision-Date: 2026-06-24 20:39\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -6379,7 +6379,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:473
 msgid "excellent"
-msgstr ""
+msgstr "excellent"
 
 #: desk/src/components/ticket/TicketSplitModal.vue:8
 msgid "from this email onwards will be moved to new ticket."
@@ -6387,7 +6387,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:475
 msgid "good"
-msgstr ""
+msgstr "bon"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
