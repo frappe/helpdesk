@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-21 11:29+0000\n"
-"PO-Revision-Date: 2026-06-22 20:26\n"
+"PO-Revision-Date: 2026-06-24 20:39\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Arabic\n"
 "MIME-Version: 1.0\n"
@@ -1050,7 +1050,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/Article.vue:335
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:266
 msgid "Category created successfully."
-msgstr ""
+msgstr "تم إنشاء الفئة بنجاح."
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:337
 msgid "Category deleted successfully."
@@ -1071,7 +1071,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:305
 msgid "Category updated successfully."
-msgstr ""
+msgstr "تم تحديث الفئة بنجاح."
 
 #: desk/src/components/EmailEditor.vue:43
 msgid "Cc"
@@ -2008,7 +2008,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:196
 msgid "Email settings updated successfully."
-msgstr ""
+msgstr "تم تحديث إعدادات البريد الإلكتروني بنجاح."
 
 #: desk/src/components/desk/global/NewContactDialog.vue:234
 msgid "Email should not be empty"
@@ -3339,7 +3339,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:25
 msgid "Manage your email signature."
-msgstr ""
+msgstr "إدارة توقيع البريد الإلكتروني الخاص بك."
 
 #: desk/src/components/Settings/Preferences/Preferences.vue:2
 msgid "Manage your personal preferences."
@@ -3668,7 +3668,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:94
 msgid "No members found"
-msgstr ""
+msgstr "لم يتم العثور على أعضاء"
 
 #: desk/src/pages/MobileNotifications.vue:68
 msgid "No new notifications"
@@ -3923,7 +3923,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:87
 msgid "Password updated successfully."
-msgstr ""
+msgstr "تم تحديث كلمة المرور بنجاح."
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:117
 msgid "Passwords do not match"
@@ -5015,7 +5015,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:9
 msgid "Set working days, hours, and holidays by selecting a predefined schedule or creating a new one."
-msgstr ""
+msgstr "قم بتعيين أيام العمل وساعات العمل والعطلات عن طريق تحديد جدول محدد مسبقًا أو إنشاء جدول جديد."
 
 #: desk/src/components/Settings/Profile/Profile.vue:115
 msgid "Set your availability so your team knows when you're reachable."
@@ -5051,7 +5051,7 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/ReplyViaAgent.vue:47
 #: desk/src/components/Settings/EmailNotifications/ShareFeedback.vue:77
 msgid "Settings updated successfully."
-msgstr ""
+msgstr "تم تحديث الإعدادات بنجاح."
 
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -6387,7 +6387,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:475
 msgid "good"
-msgstr ""
+msgstr "جيد"
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -6444,7 +6444,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:479
 msgid "poor"
-msgstr ""
+msgstr "ضعيف"
 
 #: desk/src/pages/knowledge-base/Article.vue:197
 msgid "published by"
