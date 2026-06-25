@@ -11,7 +11,7 @@
         <div class="mb-6 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <h3 class="text-2xl font-semibold leading-6 text-ink-gray-9">
-              Edit Customer
+              {{ __("Edit Customer") }}
             </h3>
             <Badge
               v-if="isDirty"
