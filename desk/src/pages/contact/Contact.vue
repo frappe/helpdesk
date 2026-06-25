@@ -43,7 +43,11 @@
       </PageInfo>
       <div class="overflow-y-auto flex-1 flex flex-col">
         <TicketStats :dt="'Contact'" :dn="id" v-if="!isMobileView" />
-        <Tabs v-model="activeTab" :tabs="tabs" class="tabs-sticky-header">
+        <Tabs
+          v-model="activeTab"
+          :tabs="tabs"
+          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-white"
+        >
           <template #tab-item="{ tab, selected }: any">
             <button
               class="group flex items-center gap-2 border-b border-transparent py-2 text-base text-ink-gray-5 duration-300 ease-in-out hover:text-ink-gray-9"
@@ -237,13 +241,8 @@ const contactInfo = computed(() => {
   return info;
 });
 
-const {
-  resendInvite,
-  inviteAsUser,
-  isLoading: isContactInvitationLoading,
-} = useContactInvite();
-const { resetPassword, isLoading: isResetPasswordLoading } =
-  useContactResetPassword(() => contact.doc?.user);
+const { resendInvite, inviteAsUser } = useContactInvite();
+const { resetPassword } = useContactResetPassword(() => contact.doc?.user);
 
 const showEditDialog = ref(false);
 
