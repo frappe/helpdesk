@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-21 11:29+0000\n"
-"PO-Revision-Date: 2026-06-23 20:24\n"
+"PO-Revision-Date: 2026-06-25 20:46\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -2584,7 +2584,7 @@ msgstr "Eskalering Regel"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "HD Field Layout"
-msgstr "Fält Utseende"
+msgstr "Fält Uppsättning"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -3212,7 +3212,7 @@ msgstr "Förra veckan"
 #. Label of the layout (Code) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Layout"
-msgstr "Utseende"
+msgstr "Uppsättning"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:135
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:212
