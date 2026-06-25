@@ -177,7 +177,7 @@ import { useDevice } from "@/composables";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useScreenSize } from "@/composables/screen";
 import { currentView, useView } from "@/composables/useView";
-import { showNewContactModal } from "@/pages/desk/contact/dialogState";
+import { showNewContactModal } from "@/pages/contact/dialogState";
 import {
   showAssignmentModal,
   showCommentBox,

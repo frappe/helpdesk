@@ -223,10 +223,10 @@ function clearValue(close) {
 const labelClasses = computed(() => {
   return [
     {
-      sm: "text-xs",
+      sm: "text-p-sm",
       md: "text-base",
     }[attrs.size || "sm"],
-    "text-ink-gray-5",
+    "font-medium text-ink-gray-7",
     ...(attrs.required
       ? ["after:content-['*']", "after:ms-0.5", "after:text-ink-red-3"]
       : []),

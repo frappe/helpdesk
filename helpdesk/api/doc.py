@@ -11,6 +11,7 @@ from helpdesk.utils import (
     call_log_default_columns,
     check_permissions,
     contact_default_columns,
+    contact_default_rows,
     parse_call_logs,
 )
 
@@ -76,6 +77,7 @@ def get_list_data(
         if not default_view:
             if doctype == "Contact":
                 columns = contact_default_columns
+                rows = contact_default_rows
             elif doctype == "TP Call Log":
                 columns = call_log_default_columns
             elif hasattr(_list, "default_list_data"):
@@ -272,6 +274,7 @@ def get_filterable_fields(
         "response_by",
         "resolution_by",
         "creation",
+        "customer",
     ]
 
     from_doc_fields = (
@@ -501,7 +504,7 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
     if not columns:
         if doctype == "Contact":
             columns = contact_default_columns
-            rows = ["name", "email_id", "creation"]
+            rows = ["name", "email_id", "mobile_no", "image", "creation"]
         elif doctype == "TP Call Log":
             columns = call_log_default_columns
             rows = ["name", "caller", "receiver", "creation"]

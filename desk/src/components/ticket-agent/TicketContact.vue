@@ -52,7 +52,6 @@ import { ExternalLinkIcon } from "../icons";
 import EmailIcon from "../icons/EmailIcon.vue";
 import PhoneIcon from "../icons/PhoneIcon.vue";
 import SetContactPhoneModal from "../ticket/SetContactPhoneModal.vue";
-
 const telephonyStore = useTelephonyStore();
 const { getUser } = useUserStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);

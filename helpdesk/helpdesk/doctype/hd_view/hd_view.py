@@ -19,7 +19,7 @@ class HDView(Document):
             {
                 "is_default": 1,
                 "name": ("!=", self.name),
-                "user": frappe.session.user,
+                "user": self.user,
                 "dt": self.dt,
             },
         )
