@@ -54,7 +54,11 @@ import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import { useActiveViewers } from "@/composables/realtime";
-import { reloadTicket, useTicket } from "@/composables/useTicket";
+import {
+  isTicketCached,
+  reloadTicket,
+  useTicket,
+} from "@/composables/useTicket";
 import { ticketsToNavigate } from "@/composables/useTicketNavigation";
 import { globalStore } from "@/stores/globalStore";
 import { useTelephonyStore } from "@/stores/telephony";
@@ -90,6 +94,9 @@ const props = defineProps({
 const route = useRoute();
 const showPhoneModal = ref(false);
 
+// Captured before setup creates the cache entry so onMounted can tell
+// whether this is a first open (auto:true handles it) or a revisit.
+const wasAlreadyCached = isTicketCached(props.ticketId);
 const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
 const customizations: Resource<Customizations> = createResource({
@@ -153,6 +160,13 @@ watch(
 
     if (oldTicketId) stopViewing(oldTicketId as string);
     startViewing(newTicketId as string);
+
+    // Only reload if already cached. The watcher fires before the computed
+    // re-evaluates, so uncached tickets don't have a ticketMap entry yet —
+    // their auto:true fetch will provide fresh data when the entry is created.
+    if (oldTicketId && isTicketCached(newTicketId as string)) {
+      reloadTicket(newTicketId as string);
+    }
   },
   { immediate: true }
 );
@@ -165,6 +179,12 @@ type TicketUpdateData = {
 };
 
 onMounted(() => {
+  // Reload only for revisits (stale cache). First-time opens get fresh
+  // data via auto:true on the newly created cache entry.
+  if (wasAlreadyCached) {
+    reloadTicket(props.ticketId);
+  }
+
   ticketsToNavigate.update({
     params: {
       ticket: props.ticketId,
