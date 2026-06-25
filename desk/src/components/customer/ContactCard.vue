@@ -300,7 +300,7 @@ function removeContact() {
         label: __("Confirm"),
         variant: "solid",
         onClick: ({ close }: { close: () => void }) => {
-          customer.setValue.submit(
+          return customer.setValue.submit(
             {
               contacts: customer.doc.contacts?.filter(
                 (c) => c.contact_name !== props.contact.contact_name
