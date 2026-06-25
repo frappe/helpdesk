@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-21 11:29+0000\n"
-"PO-Revision-Date: 2026-06-23 20:24\n"
+"PO-Revision-Date: 2026-06-25 20:46\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -3704,7 +3704,7 @@ msgstr ""
 
 #: desk/src/components/view-controls/filter/FilterValueEditor.vue:83
 msgid "No results"
-msgstr ""
+msgstr "Keine Ergebnisse"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:79
 msgid "No results found"
