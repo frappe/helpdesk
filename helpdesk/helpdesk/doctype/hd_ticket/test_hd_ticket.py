@@ -24,6 +24,7 @@ from helpdesk.test_utils import (
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
     make_status,
+    make_team,
     make_ticket,
     remove_holidays,
     set_ticket_status_and_communication_date,
@@ -160,6 +161,89 @@ class TestHDTicket(IntegrationTestCase):
         ticket.status = "Closed"
         ticket.save()
         self.assertTrue(ticket)
+
+    def test_non_agent_cannot_modify_restricted_fields(self):
+        ticket = frappe.get_doc(get_ticket_obj())
+        ticket.raised_by = non_agent
+        ticket.insert()
+
+        frappe.set_user(non_agent)
+        try:
+            ticket = frappe.get_doc("HD Ticket", ticket.name)
+            ticket.priority = "Urgent"
+            self.assertRaises(frappe.PermissionError, ticket.save)
+        finally:
+            frappe.set_user("Administrator")
+
+    def test_non_agent_can_close_own_ticket(self):
+        ticket = frappe.get_doc(get_ticket_obj())
+        ticket.raised_by = non_agent
+        ticket.insert()
+
+        frappe.set_user(non_agent)
+        try:
+            ticket = frappe.get_doc("HD Ticket", ticket.name)
+            ticket.status = "Closed"
+            ticket.save()
+            self.assertEqual(ticket.status, "Closed")
+        finally:
+            frappe.set_user("Administrator")
+
+    def test_agent_can_modify_restricted_fields(self):
+        ticket = frappe.get_doc(get_ticket_obj())
+        ticket.insert()
+
+        frappe.set_user(agent)
+        try:
+            ticket = frappe.get_doc("HD Ticket", ticket.name)
+            ticket.priority = "Urgent"
+            ticket.save()
+            self.assertEqual(ticket.priority, "Urgent")
+        finally:
+            frappe.set_user("Administrator")
+
+    def test_non_agent_can_only_edit_customer_visible_template_fields(self):
+        frappe.get_doc({"doctype": "HD Ticket Type", "name": "Test Type"}).insert(
+            ignore_if_duplicate=True
+        )
+        team = make_team("Test Team")
+        template = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Template",
+                "template_name": "Test Template",
+                "fields": [
+                    {"fieldname": "ticket_type", "hide_from_customer": 0},
+                    {"fieldname": "agent_group", "hide_from_customer": 1},
+                ],
+            }
+        ).insert(ignore_if_duplicate=True)
+
+        ticket = frappe.get_doc(get_ticket_obj())
+        ticket.raised_by = non_agent
+        ticket.template = template.name
+        ticket.insert()
+
+        # Only fields exposed to the customer resolve from the template
+        ticket = frappe.get_doc("HD Ticket", ticket.name)
+        self.assertEqual(ticket.template, template.name)
+        visible_fields = ticket.get_customer_template_fields()
+        self.assertIn("ticket_type", visible_fields)
+        self.assertNotIn("agent_group", visible_fields)
+
+        frappe.set_user(non_agent)
+        try:
+            # A template field exposed to the customer is editable
+            ticket = frappe.get_doc("HD Ticket", ticket.name)
+            ticket.ticket_type = "Test Type"
+            ticket.save()
+            self.assertEqual(ticket.ticket_type, "Test Type")
+
+            # A template field hidden from the customer stays blocked
+            ticket = frappe.get_doc("HD Ticket", ticket.name)
+            ticket.agent_group = team.name
+            self.assertRaises(frappe.PermissionError, ticket.save)
+        finally:
+            frappe.set_user("Administrator")
 
     # Working hours default to 10:00 to 18:00 from Monday to Friday
     # And priorities default to
