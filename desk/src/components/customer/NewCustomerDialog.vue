@@ -151,10 +151,8 @@ function addCustomer() {
     toast.error(__("Name is required"));
     return;
   }
-  if (primaryContact.email && !validateEmailWithZod(primaryContact.email)) {
-    toast.error(__("Invalid email address"));
-    return;
-  }
+  if (!validatePrimaryContact()) return;
+
   customerResource.submit({
     customer: {
       customer_name: state.name,
@@ -163,7 +161,7 @@ function addCustomer() {
       image: state.image,
       country: state.country,
     },
-    primary_contact: primaryContact.email
+    primary_contact: hasPrimaryContactData()
       ? {
           first_name: primaryContact.firstName,
           last_name: primaryContact.lastName,
@@ -172,5 +170,31 @@ function addCustomer() {
         }
       : null,
   });
+}
+
+function validatePrimaryContact(): boolean {
+  if (!hasPrimaryContactData()) return true;
+  if (!primaryContact.firstName) {
+    toast.error(__("Enter the primary contact's first name"));
+    return false;
+  }
+  if (!primaryContact.email) {
+    toast.error(__("Enter the primary contact's email"));
+    return false;
+  }
+  if (!validateEmailWithZod(primaryContact.email)) {
+    toast.error(__("Invalid email address"));
+    return false;
+  }
+  return true;
+}
+
+function hasPrimaryContactData(): boolean {
+  return Boolean(
+    primaryContact.firstName ||
+      primaryContact.lastName ||
+      primaryContact.email ||
+      primaryContact.mobileNo
+  );
 }
 </script>
