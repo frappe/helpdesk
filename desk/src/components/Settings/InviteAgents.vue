@@ -103,25 +103,27 @@
 </template>
 
 <script setup lang="ts">
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAuthStore } from "@/stores/auth";
+import { capture } from "@/telemetry";
+import { __ } from "@/translation";
+import { handleInviteUserSuccess } from "@/utils";
 import {
+  Button,
   FormControl,
   Select,
-  Button,
   Tooltip,
   createResource,
   toast,
 } from "frappe-ui";
-import { computed, ref } from "vue";
 import { useOnboarding } from "frappe-ui/frappe";
+import { computed, ref } from "vue";
 import LucideChevronDown from "~icons/lucide/chevron-down";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { capture } from "@/telemetry";
-import { __ } from "@/translation";
 
 const authStore = useAuthStore();
 const { isAdmin, isManager } = authStore;
 
+// @ts-expect-error
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 
 const emails = ref("");
@@ -199,8 +201,6 @@ const resetInputValues = () => {
   role.value = roleOptions[0].value;
 };
 
-const emailsToStr = (emails: readonly string[]) => emails.join(", ");
-
 const inviteByEmailResource = createResource({
   url: "frappe.core.api.user_invitation.invite_by_email",
   onSuccess(
@@ -213,22 +213,7 @@ const inviteByEmailResource = createResource({
     >
   ) {
     resetInputValues();
-    let emailsStr = emailsToStr(data.invited_emails);
-    if (emailsStr.trim() !== "") {
-      toast.success(`${emailsStr} invited successfully`);
-    }
-    emailsStr = emailsToStr(data.disabled_user_emails);
-    if (emailsStr.trim() !== "") {
-      toast.info(`${emailsStr} already present and disabled`);
-    }
-    emailsStr = emailsToStr(data.pending_invite_emails);
-    if (emailsStr.trim() !== "") {
-      toast.info(`${emailsStr} already invited`);
-    }
-    emailsStr = emailsToStr(data.accepted_invite_emails);
-    if (emailsStr.trim() !== "") {
-      toast.info(`${emailsStr} already present`);
-    }
+    handleInviteUserSuccess(data);
     pendingInvitesResource.reload();
     updateOnboardingStep("invite_your_team");
     capture("agents_invited", {
@@ -241,16 +226,24 @@ const inviteByEmailResource = createResource({
 
 const pendingInvitesResource = createResource({
   url: "frappe.core.api.user_invitation.get_pending_invitations",
-  params: { app_name: "helpdesk" },
+  params: {
+    app_name: "helpdesk",
+  },
   auto: true,
   method: "GET",
+  transform: (data) =>
+    data.filter((invite) =>
+      invite.roles.some((role) =>
+        ["Agent", "Agent Manager", "System Manager"].includes(role)
+      )
+    ),
 });
 
 const cancelInviteResource = createResource({
   url: "frappe.core.api.user_invitation.cancel_invitation",
   method: "PATCH",
   onSuccess() {
-    toast.success("Invitation cancelled successfully");
+    toast.success(__("Invitation cancelled successfully"));
     pendingInvitesResource.fetch();
   },
 });

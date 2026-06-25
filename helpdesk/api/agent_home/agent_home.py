@@ -13,6 +13,7 @@ from helpdesk.api.agent_home.utils import (
     get_default_agent_dashboard,
     get_ticket_count,
 )
+from helpdesk.api.analytics_utils import get_avg_time_metric
 from helpdesk.utils import agent_only, format_time_difference
 
 
@@ -51,6 +52,29 @@ def get_dashboard(reset_layout: bool = False):
         "default_layout": get_default_agent_dashboard(),
         "dashboard_id": dashboard_id,
     }
+
+
+def _resolve_window(period: str):
+    """Returns (current_from, current_to, prev_from, prev_to) using a rolling
+    window via date_diff (matches dashboard.py)."""
+    periods = {
+        "last 7 days": 7,
+        "last week": 7,
+        "last month": 30,
+        "last 3 months": 90,
+    }
+    days = periods.get((period or "").lower(), 30)
+
+    current_to = frappe.utils.nowdate()
+    current_from = frappe.utils.add_days(current_to, -(days - 1))
+
+    diff = frappe.utils.date_diff(current_to, current_from)
+    if diff == 0:
+        diff = 1
+    previous_from = frappe.utils.add_days(current_from, -diff)
+    previous_to = frappe.utils.add_days(current_from, -1)
+
+    return current_from, current_to, previous_from, previous_to
 
 
 @frappe.whitelist()
@@ -114,133 +138,16 @@ def get_agent_tickets(period: str = "last month"):
     }
 
 
-def get_avg_time(from_date, to_date, value_expr, extra_cond, group_by_date=False):
-    Ticket = DocType("HD Ticket")
-    to_date_plus_one = Function(
-        "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
-    )
-
-    query = frappe.qb.from_(Ticket)
-
-    if group_by_date:
-        creation_date = Function("DATE", Ticket.creation)
-        query = (
-            query.select(
-                creation_date.as_("date"),
-                Avg(value_expr).as_("avg_time"),
-            )
-            .groupby(creation_date)
-            .orderby(creation_date)
-        )
-    else:
-        query = query.select(Avg(value_expr).as_("avg_time"))
-
-    query = (
-        query.where(Ticket.creation >= from_date)
-        .where(Ticket.creation < to_date_plus_one)
-        .where(
-            Function(
-                "JSON_SEARCH", Ticket._assign, "one", frappe.session.user
-            ).isnotnull()
-        )
-    )
-    if extra_cond is not None:
-        query = query.where(extra_cond)
-
-    result = query.run(as_dict=True)
-
-    if group_by_date:
-        return result
-
-    return result[0]["avg_time"] if result and result[0]["avg_time"] is not None else 0
-
-
-def _resolve_window(period: str):
-    """Returns (current_from, current_to, prev_from, prev_to) using a rolling
-    window via date_diff (matches dashboard.py)."""
-    periods = {
-        "last 7 days": 7,
-        "last week": 7,
-        "last month": 30,
-        "last 3 months": 90,
-    }
-    days = periods.get((period or "").lower(), 30)
-
-    current_to = frappe.utils.nowdate()
-    current_from = frappe.utils.add_days(current_to, -(days - 1))
-
-    diff = frappe.utils.date_diff(current_to, current_from)
-    if diff == 0:
-        diff = 1
-    previous_from = frappe.utils.add_days(current_from, -diff)
-    previous_to = frappe.utils.add_days(current_from, -1)
-
-    return current_from, current_to, previous_from, previous_to
-
-
-def _get_avg_time_metric(period: str, value_expr, extra_cond) -> dict:
-    current_from, current_to, previous_from, previous_to = _resolve_window(period)
-
-    current_result = get_avg_time(
-        current_from, current_to, value_expr, extra_cond, group_by_date=True
-    )
-
-    current_avg = get_avg_time(current_from, current_to, value_expr, extra_cond)
-    previous_avg = get_avg_time(previous_from, previous_to, value_expr, extra_cond)
-
-    percentage_change = calculate_percentage_change(current_avg, previous_avg)
-
-    # Fill missing days with 0
-    from_date_obj = date.fromisoformat(current_from)
-    to_date_obj = date.fromisoformat(current_to)
-    date_dict = {}
-    current_date = from_date_obj
-    while current_date <= to_date_obj:
-        date_str = current_date.isoformat()
-        date_dict[date_str] = 0
-        current_date += timedelta(days=1)
-
-    for row in current_result:
-        date_dict[str(row["date"])] = round(row["avg_time"] or 0, 2)
-
-    data = [
-        {"date": date, "avg_time": avg_time}
-        for date, avg_time in sorted(date_dict.items())
-    ]
-
-    return {
-        "data": data,
-        "average": round(current_avg, 2),
-        "percentage_change": percentage_change,
-    }
-
-
 @frappe.whitelist()
 @agent_only
 def get_avg_first_response_time(period: str = "last month"):
-    Ticket = DocType("HD Ticket")
-    return _get_avg_time_metric(
-        period,
-        value_expr=Ticket.first_response_time,
-        extra_cond=Ticket.first_responded_on.isnotnull(),
-    )
+    return get_avg_time_metric(period, "first_response_time", scope="agent")
 
 
 @frappe.whitelist()
 @agent_only
 def get_avg_resolution_time(period: str = "last month"):
-    Ticket = DocType("HD Ticket")
-    resolved_statuses = frappe.get_all(
-        "HD Ticket Status",
-        filters={"category": "Resolved"},
-        pluck="name",
-    )
-    extra_cond = Ticket.status.isin(resolved_statuses) if resolved_statuses else None
-    return _get_avg_time_metric(
-        period,
-        value_expr=Ticket.resolution_time,
-        extra_cond=extra_cond,
-    )
+    return get_avg_time_metric(period, "resolution_time", scope="agent")
 
 
 @frappe.whitelist()
@@ -267,6 +174,8 @@ def get_recent_feedback(
         period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -30)
     elif period == "last_3_months":
         period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -90)
+    elif period == "last_6_months":
+        period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -180)
 
     # Base query conditions
     base_conditions = [

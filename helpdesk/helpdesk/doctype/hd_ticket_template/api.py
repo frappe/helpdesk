@@ -1,12 +1,10 @@
 from typing import Literal
 
 import frappe
-
-# from frappe import _
 from pypika import JoinType
 
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
-from helpdesk.utils import check_permissions
+from helpdesk.utils import check_permissions, get_customers
 
 DOCTYPE_TEMPLATE = "HD Ticket Template"
 DOCTYPE_TEMPLATE_FIELD = "HD Ticket Template Field"
@@ -23,6 +21,20 @@ def get_one(name: str):
         return {"about": None, "fields": []}
 
     fields = get_fields_meta(name)
+    customers = get_customers()
+
+    has_customer_field = any(f.fieldname == "customer" for f in fields)
+    if len(customers) > 1 and not has_customer_field:
+        fields.append(
+            frappe._dict(
+                fieldname="customer",
+                fieldtype="Select",
+                label="Customer",
+                options="\n".join(customers),
+                required=1,
+                idx=len(fields) + 1,
+            )
+        )
 
     return {
         "about": about,

@@ -33,7 +33,7 @@ from helpdesk.utils import (
     agent_only,
     capture_event,
     get_agents_team,
-    get_customer,
+    get_customers,
     get_doc_room,
     is_admin,
     is_agent,
@@ -267,20 +267,33 @@ class HDTicket(Document):
                     self.contact = contact
 
     def set_customer(self):
-        """
-        Update `Customer` if does not exist already. `Contact` is assumed
-        to be set beforehand.
-        """
-        # Skip if `Customer` is already set
+        contact_customers = get_customers(contact=self.contact) if self.contact else []
+
         if self.customer:
-            return
+            if self.customer not in contact_customers and not is_agent():
+                frappe.throw(
+                    _(
+                        "The selected customer {0} is not linked to the contact {1}."
+                        "Please select a valid customer or update the contact's linked customers."
+                    ).format(self.customer, self.contact),
+                    frappe.ValidationError,
+                )
+            return  # customer is set and valid, return early
 
         if self.contact:
-            customer = get_customer(self.contact)
-
-            # let agent assign the customer when one contact has more than one customer
-            if len(customer) == 1:
-                self.customer = customer[0]
+            if len(contact_customers) == 1:
+                self.customer = contact_customers[0]
+            elif (
+                len(contact_customers) > 1
+                and not is_agent()
+                and self.via_customer_portal
+            ):
+                frappe.throw(
+                    _(
+                        "The contact {0} is linked to multiple customers. Please select the customer manually."
+                    ).format(self.contact),
+                    frappe.ValidationError,
+                )
 
     def set_priority(self):
         if self.priority:
@@ -838,48 +851,6 @@ class HDTicket(Document):
         self.add_seen()
         clear_notifications(ticket=self.name)
 
-    def get_escalation_rule(self):
-        filters = [
-            {
-                "priority": self.priority,
-                "team": self.agent_group,
-                "ticket_type": self.ticket_type,
-            },
-            {
-                "priority": self.priority,
-                "team": self.agent_group,
-            },
-            {
-                "priority": self.priority,
-                "ticket_type": self.ticket_type,
-            },
-            {
-                "team": self.agent_group,
-                "ticket_type": self.ticket_type,
-            },
-            {
-                "priority": self.priority,
-            },
-            {
-                "team": self.agent_group,
-            },
-            {
-                "ticket_type": self.ticket_type,
-            },
-        ]
-
-        for i in range(len(filters)):
-            try:
-                f = {
-                    **filters[i],
-                    "is_enabled": True,
-                }
-                rule = frappe.get_last_doc("HD Escalation Rule", filters=f)
-                if rule:
-                    return rule
-            except Exception:
-                pass
-
     def set_sla(self):
         """
         Find an SLA to apply to this ticket.
@@ -1201,25 +1172,27 @@ class HDTicket(Document):
 # permission checks which is not possible with standard permission system. This function
 # is being called from hooks. `doc` is the ticket to check against
 def has_permission(doc, user=None):
-    if not user:
-        user = frappe.session.user
-
-    if (
-        doc.contact == user
-        or doc.raised_by == user
-        or doc.owner == user
-        or is_admin(user)
-        or doc.customer in get_customer(user)
-    ):
+    user = user or frappe.session.user
+    if is_admin(user):
         return True
-
+    if user in (doc.contact, doc.raised_by, doc.owner):
+        return True
+    if _is_customer_manager(doc.customer, user):
+        return True
     if not is_agent(user):
         return False
+    return _agent_has_permission(doc, user)
 
-    enable_restrictions = frappe.db.get_single_value(
-        "HD Settings", "restrict_tickets_by_agent_group"
+
+def _is_customer_manager(customer: str, user: str) -> bool:
+    return any(
+        c.get("name") == customer and c.get("is_manager")
+        for c in get_customers(user, get_roles=True)
     )
-    if not enable_restrictions:
+
+
+def _agent_has_permission(doc, user: str) -> bool:
+    if not frappe.db.get_single_value("HD Settings", "restrict_tickets_by_agent_group"):
         return True
     show_tickets_without_team = frappe.db.get_single_value(
         "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
@@ -1227,96 +1200,95 @@ def has_permission(doc, user=None):
     if show_tickets_without_team and not doc.get("agent_group"):
         return True
 
-    if doc.get("_assign", None):
+    if doc.get("_assign"):
         try:
-            assignees = json.loads(doc._assign)
-            if user in assignees:
+            if user in json.loads(doc._assign):
                 return True
-        except:
+        except (ValueError, TypeError):
             return False
 
     teams = get_agents_team()
-    if any([team.get("ignore_restrictions") for team in teams]):
+    if any(team.get("ignore_restrictions") for team in teams):
         return True
 
     team_names = [t.team_name for t in teams]
-    exists = frappe.db.exists(
+    is_team_member = frappe.db.exists(
         "HD Team Member", {"parent": ["in", team_names], "user": frappe.session.user}
     )
-    if exists and doc.get("agent_group") in team_names:
-        return True
-
-    return False
+    return bool(is_team_member) and doc.get("agent_group") in team_names
 
 
 # Custom perms for list query. Only the `WHERE` part
 # https://frappeframework.com/docs/user/en/python-api/hooks#modify-list-query
-def permission_query(user):
-    if not user:
-        user = frappe.session.user
+def permission_query(user: str | None = None):
+    user = user or frappe.session.user
     if is_admin(user):
         return
-
-    #  To handle the case for normal users i.e. not agents
-    customer = get_customer(user)
-    query = "(`tabHD Ticket`.owner = {user} OR `tabHD Ticket`.contact = {user} OR `tabHD Ticket`.raised_by = {user})".format(
-        user=frappe.db.escape(user)
-    )
-    for c in customer:
-        query += " OR `tabHD Ticket`.customer={customer}".format(
-            customer=frappe.db.escape(c)
-        )
-
     if not is_agent(user):
-        return query
+        return _customer_query(user)
+    return _agent_query(user)
 
-    enable_restrictions = frappe.db.get_single_value(
-        "HD Settings", "restrict_tickets_by_agent_group"
-    )
-    if not enable_restrictions:
-        return  # If not enabled, return all tickets
+
+def _customer_query(user: str) -> str:
+    """Non-agents see their own tickets, plus all tickets of customers they manage."""
+    query = _get_base_visibility(user)
+    managed_customers = _get_managed_customers(user)
+    if managed_customers:
+        query += " OR " + _build_in_clause("customer", managed_customers)
+    return query
+
+
+def _agent_query(user: str) -> str | None:
+    query = _get_base_visibility(user)
+
+    if not frappe.db.get_single_value("HD Settings", "restrict_tickets_by_agent_group"):
+        return  # Restrictions disabled, return all tickets
 
     show_tickets_without_team = frappe.db.get_single_value(
         "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
     )
-
-    teams = get_agents_team()
-
     if show_tickets_without_team:
         query += " OR (`tabHD Ticket`.agent_group is null OR `tabHD Ticket`.agent_group = '')"
 
-    # If agent belongs to the team which has ignore_permission set to 1.
-    # that means this team can see all the tickets without any restriction,
-    # Event the other team's tickets.
+    # An agent on a team with `ignore_restrictions` set can see every team's tickets.
+    teams = get_agents_team()
     if any(team.get("ignore_restrictions") for team in teams):
         all_teams = frappe.get_all("HD Team", pluck="name")
         if not all_teams:
             return query
-        all_teams = ", ".join(f"'{team}'" for team in all_teams)
-        query += f" OR (`tabHD Ticket`.agent_group in ({all_teams}))".format(
-            all_teams=all_teams
-        )
+        query += " OR (" + _build_in_clause("agent_group", all_teams) + ")"
         if not show_tickets_without_team:
             query += " OR (`tabHD Ticket`.agent_group is null)"
         return query
 
-    query += (
-        " OR (JSON_SEARCH(`tabHD Ticket`._assign, 'all', {user}) IS NOT NULL)".format(
-            user=frappe.db.escape(user)
-        )
+    query += " OR (JSON_SEARCH(`tabHD Ticket`._assign, 'all', {u}) IS NOT NULL)".format(
+        u=frappe.db.escape(user)
     )
-
     team_names = [t.get("team_name") for t in teams]
-
-    if not team_names:
-        return query
-
-    # Here we will apply the restriction based on the teams the agent belongs to.
-    team_names = ", ".join(f"'{team}'" for team in team_names)
-    query += f" OR (`tabHD Ticket`.agent_group in ({team_names}))".format(
-        team_names=team_names
-    )
+    if team_names:
+        query += " OR (" + _build_in_clause("agent_group", team_names) + ")"
     return query
+
+
+def _get_base_visibility(user: str) -> str:
+    """WHERE fragment for tickets a user is directly tied to: owner, contact, or raiser."""
+
+    return "(`tabHD Ticket`.owner = {u} OR `tabHD Ticket`.contact = {u} OR `tabHD Ticket`.raised_by = {u})".format(
+        u=frappe.db.escape(user)
+    )
+
+
+def _get_managed_customers(user: str) -> list[str]:
+    return [
+        str(c.get("name"))
+        for c in get_customers(user, get_roles=True)
+        if c.get("is_manager")
+    ]
+
+
+def _build_in_clause(field: str, values: list[str]) -> str:
+    _values = ", ".join(frappe.db.escape(v) for v in values)
+    return f"`tabHD Ticket`.{field} in ({_values})"
 
 
 def set_guest_ticket_creation_permission():

@@ -42,7 +42,7 @@
   }
  ],
  "links": [],
- "modified": "2026-02-24 09:05:55.809201",
+ "modified": "2026-03-24 10:42:49.026000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Type",
@@ -86,16 +86,8 @@
    "write": 1
   },
   {
-   "email": 1,
-   "export": 1,
-   "print": 1,
    "read": 1,
-   "report": 1,
-   "role": "Helpdesk Contact",
-   "share": 1
-  },
-  {
-   "role": "All",
+   "role": "HD Customer",
    "select": 1
   }
  ],

@@ -41,7 +41,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-13 16:38:21.075242",
+ "modified": "2026-03-24 10:42:00.970632",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template",
@@ -78,7 +78,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "All",
+   "role": "HD Customer",
    "share": 1
   }
  ],

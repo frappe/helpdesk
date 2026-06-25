@@ -1,0 +1,982 @@
+{
+  "Afghanistan": {
+    "code": "af",
+    "isd": "+93"
+  },
+  "Albania": {
+    "code": "al",
+    "isd": "+355"
+  },
+  "Algeria": {
+    "code": "dz",
+    "isd": "+213"
+  },
+  "American Samoa": {
+    "code": "as",
+    "isd": "+1684"
+  },
+  "Andorra": {
+    "code": "ad",
+    "isd": "+376"
+  },
+  "Angola": {
+    "code": "ao",
+    "isd": "+244"
+  },
+  "Anguilla": {
+    "code": "ai",
+    "isd": "+1264"
+  },
+  "Antarctica": {
+    "code": "aq",
+    "isd": "+672"
+  },
+  "Antigua and Barbuda": {
+    "code": "ag",
+    "isd": "+1268"
+  },
+  "Argentina": {
+    "code": "ar",
+    "isd": "+54"
+  },
+  "Armenia": {
+    "code": "am",
+    "isd": "+374"
+  },
+  "Aruba": {
+    "code": "aw",
+    "isd": "+297"
+  },
+  "Australia": {
+    "code": "au",
+    "isd": "+61"
+  },
+  "Austria": {
+    "code": "at",
+    "isd": "+43"
+  },
+  "Azerbaijan": {
+    "code": "az",
+    "isd": "+994"
+  },
+  "Bahamas": {
+    "code": "bs",
+    "isd": "+1242"
+  },
+  "Bahrain": {
+    "code": "bh",
+    "isd": "+973"
+  },
+  "Bangladesh": {
+    "code": "bd",
+    "isd": "+880"
+  },
+  "Barbados": {
+    "code": "bb",
+    "isd": "+1246"
+  },
+  "Belarus": {
+    "code": "by",
+    "isd": "+375"
+  },
+  "Belgium": {
+    "code": "be",
+    "isd": "+32"
+  },
+  "Belize": {
+    "code": "bz",
+    "isd": "+501"
+  },
+  "Benin": {
+    "code": "bj",
+    "isd": "+229"
+  },
+  "Bermuda": {
+    "code": "bm",
+    "isd": "+1441"
+  },
+  "Bhutan": {
+    "code": "bt",
+    "isd": "+975"
+  },
+  "Bolivia, Plurinational State of": {
+    "code": "bo",
+    "isd": "+591"
+  },
+  "Bosnia and Herzegovina": {
+    "code": "ba",
+    "isd": "+387"
+  },
+  "Botswana": {
+    "code": "bw",
+    "isd": "+267"
+  },
+  "Bouvet Island": {
+    "code": "bv",
+    "isd": "+47"
+  },
+  "Brazil": {
+    "code": "br",
+    "isd": "+55"
+  },
+  "British Indian Ocean Territory": {
+    "code": "io",
+    "isd": "+246"
+  },
+  "Brunei Darussalam": {
+    "code": "bn",
+    "isd": "+673"
+  },
+  "Bulgaria": {
+    "code": "bg",
+    "isd": "+359"
+  },
+  "Burkina Faso": {
+    "code": "bf",
+    "isd": "+226"
+  },
+  "Burundi": {
+    "code": "bi",
+    "isd": "+257"
+  },
+  "Cambodia": {
+    "code": "kh",
+    "isd": "+855"
+  },
+  "Cameroon": {
+    "code": "cm",
+    "isd": "+237"
+  },
+  "Canada": {
+    "code": "ca",
+    "isd": "+1"
+  },
+  "Cape Verde": {
+    "code": "cv",
+    "isd": "+238"
+  },
+  "Cayman Islands": {
+    "code": "ky",
+    "isd": "+ 345"
+  },
+  "Central African Republic": {
+    "code": "cf",
+    "isd": "+236"
+  },
+  "Chad": {
+    "code": "td",
+    "isd": "+235"
+  },
+  "Chile": {
+    "code": "cl",
+    "isd": "+56"
+  },
+  "China": {
+    "code": "cn",
+    "isd": "+86"
+  },
+  "Christmas Island": {
+    "code": "cx",
+    "isd": "+61"
+  },
+  "Cocos (Keeling) Islands": {
+    "code": "cc",
+    "isd": "+61"
+  },
+  "Colombia": {
+    "code": "co",
+    "isd": "+57"
+  },
+  "Comoros": {
+    "code": "km",
+    "isd": "+269"
+  },
+  "Congo": {
+    "code": "cg",
+    "isd": "+242"
+  },
+  "Congo, The Democratic Republic of the": {
+    "code": "cd",
+    "isd": "+243"
+  },
+  "Cook Islands": {
+    "code": "ck",
+    "isd": "+682"
+  },
+  "Costa Rica": {
+    "code": "cr",
+    "isd": "+506"
+  },
+  "Croatia": {
+    "code": "hr",
+    "isd": "+385"
+  },
+  "Cuba": {
+    "code": "cu",
+    "isd": "+53"
+  },
+  "Cyprus": {
+    "code": "cy",
+    "isd": "+357"
+  },
+  "Czech Republic": {
+    "code": "cz",
+    "isd": "+420"
+  },
+  "Denmark": {
+    "code": "dk",
+    "isd": "+45"
+  },
+  "Djibouti": {
+    "code": "dj",
+    "isd": "+253"
+  },
+  "Dominica": {
+    "code": "dm",
+    "isd": "+1767"
+  },
+  "Dominican Republic": {
+    "code": "do",
+    "isd": "+1849"
+  },
+  "Ecuador": {
+    "code": "ec",
+    "isd": "+593"
+  },
+  "Egypt": {
+    "code": "eg",
+    "isd": "+20"
+  },
+  "El Salvador": {
+    "code": "sv",
+    "isd": "+503"
+  },
+  "Equatorial Guinea": {
+    "code": "gq",
+    "isd": "+240"
+  },
+  "Eritrea": {
+    "code": "er",
+    "isd": "+291"
+  },
+  "Estonia": {
+    "code": "ee",
+    "isd": "+372"
+  },
+  "Ethiopia": {
+    "code": "et",
+    "isd": "+251"
+  },
+  "Falkland Islands (Malvinas)": {
+    "code": "fk",
+    "isd": "+500"
+  },
+  "Faroe Islands": {
+    "code": "fo",
+    "isd": "+298"
+  },
+  "Fiji": {
+    "code": "fj",
+    "isd": "+679"
+  },
+  "Finland": {
+    "code": "fi",
+    "isd": "+358"
+  },
+  "France": {
+    "code": "fr",
+    "isd": "+33"
+  },
+  "French Guiana": {
+    "code": "gf",
+    "isd": "+594"
+  },
+  "French Polynesia": {
+    "code": "pf",
+    "isd": "+689"
+  },
+  "French Southern Territories": {
+    "code": "tf",
+    "isd": "+262"
+  },
+  "Gabon": {
+    "code": "ga",
+    "isd": "+241"
+  },
+  "Gambia": {
+    "code": "gm",
+    "isd": "+220"
+  },
+  "Georgia": {
+    "code": "ge",
+    "isd": "+995"
+  },
+  "Germany": {
+    "code": "de",
+    "isd": "+49"
+  },
+  "Ghana": {
+    "code": "gh",
+    "isd": "+233"
+  },
+  "Gibraltar": {
+    "code": "gi",
+    "isd": "+350"
+  },
+  "Greece": {
+    "code": "gr",
+    "isd": "+30"
+  },
+  "Greenland": {
+    "code": "gl",
+    "isd": "+299"
+  },
+  "Grenada": {
+    "code": "gd",
+    "isd": "+1473"
+  },
+  "Guadeloupe": {
+    "code": "gp",
+    "isd": "+590"
+  },
+  "Guam": {
+    "code": "gu",
+    "isd": "+1671"
+  },
+  "Guatemala": {
+    "code": "gt",
+    "isd": "+502"
+  },
+  "Guernsey": {
+    "code": "gg",
+    "isd": "+44"
+  },
+  "Guinea": {
+    "code": "gn",
+    "isd": "+224"
+  },
+  "Guinea-Bissau": {
+    "code": "gw",
+    "isd": "+245"
+  },
+  "Guyana": {
+    "code": "gy",
+    "isd": "+592"
+  },
+  "Haiti": {
+    "code": "ht",
+    "isd": "+509"
+  },
+  "Heard Island and McDonald Islands": {
+    "code": "hm",
+    "isd": "+0"
+  },
+  "Holy See (Vatican City State)": {
+    "code": "va",
+    "isd": "+379"
+  },
+  "Honduras": {
+    "code": "hn",
+    "isd": "+504"
+  },
+  "Hong Kong": {
+    "code": "hk",
+    "isd": "+852"
+  },
+  "Hungary": {
+    "code": "hu",
+    "isd": "+36"
+  },
+  "Iceland": {
+    "code": "is",
+    "isd": "+354"
+  },
+  "India": {
+    "code": "in",
+    "isd": "+91"
+  },
+  "Indonesia": {
+    "code": "id",
+    "isd": "+62"
+  },
+  "Iran": {
+    "code": "ir",
+    "isd": "+98"
+  },
+  "Iraq": {
+    "code": "iq",
+    "isd": "+964"
+  },
+  "Ireland": {
+    "code": "ie",
+    "isd": "+353"
+  },
+  "Isle of Man": {
+    "code": "im",
+    "isd": "+44"
+  },
+  "Israel": {
+    "code": "il",
+    "isd": "+972"
+  },
+  "Italy": {
+    "code": "it",
+    "isd": "+39"
+  },
+  "Ivory Coast": {
+    "code": "ci",
+    "isd": "+225"
+  },
+  "Jamaica": {
+    "code": "jm",
+    "isd": "+1876"
+  },
+  "Japan": {
+    "code": "jp",
+    "isd": "+81"
+  },
+  "Jersey": {
+    "code": "je",
+    "isd": "+44"
+  },
+  "Jordan": {
+    "code": "jo",
+    "isd": "+962"
+  },
+  "Kazakhstan": {
+    "code": "kz",
+    "isd": "+7"
+  },
+  "Kenya": {
+    "code": "ke",
+    "isd": "+254"
+  },
+  "Kiribati": {
+    "code": "ki",
+    "isd": "+686"
+  },
+  "Korea, Democratic Peoples Republic of": {
+    "code": "kp",
+    "isd": "+850"
+  },
+  "Korea, Republic of": {
+    "code": "kr",
+    "isd": "+82"
+  },
+  "Kosovo": {
+    "code": "xk",
+    "isd": "+383"
+  },
+  "Kuwait": {
+    "code": "kw",
+    "isd": "+965"
+  },
+  "Kyrgyzstan": {
+    "code": "kg",
+    "isd": "+996"
+  },
+  "Lao Peoples Democratic Republic": {
+    "code": "la",
+    "isd": "+856"
+  },
+  "Latvia": {
+    "code": "lv",
+    "isd": "+371"
+  },
+  "Lebanon": {
+    "code": "lb",
+    "isd": "+961"
+  },
+  "Lesotho": {
+    "code": "ls",
+    "isd": "+266"
+  },
+  "Liberia": {
+    "code": "lr",
+    "isd": "+231"
+  },
+  "Libya": {
+    "code": "ly",
+    "isd": "+218"
+  },
+  "Liechtenstein": {
+    "code": "li",
+    "isd": "+423"
+  },
+  "Lithuania": {
+    "code": "lt",
+    "isd": "+370"
+  },
+  "Luxembourg": {
+    "code": "lu",
+    "isd": "+352"
+  },
+  "Macao": {
+    "code": "mo",
+    "isd": "+853"
+  },
+  "Macedonia": {
+    "code": "mk",
+    "isd": "+389"
+  },
+  "Madagascar": {
+    "code": "mg",
+    "isd": "+261"
+  },
+  "Malawi": {
+    "code": "mw",
+    "isd": "+265"
+  },
+  "Malaysia": {
+    "code": "my",
+    "isd": "+60"
+  },
+  "Maldives": {
+    "code": "mv",
+    "isd": "+960"
+  },
+  "Mali": {
+    "code": "ml",
+    "isd": "+223"
+  },
+  "Malta": {
+    "code": "mt",
+    "isd": "+356"
+  },
+  "Marshall Islands": {
+    "code": "mh",
+    "isd": "+692"
+  },
+  "Martinique": {
+    "code": "mq",
+    "isd": "+596"
+  },
+  "Mauritania": {
+    "code": "mr",
+    "isd": "+222"
+  },
+  "Mauritius": {
+    "code": "mu",
+    "isd": "+230"
+  },
+  "Mayotte": {
+    "code": "yt",
+    "isd": "+262"
+  },
+  "Mexico": {
+    "code": "mx",
+    "isd": "+52"
+  },
+  "Micronesia, Federated States of": {
+    "code": "fm",
+    "isd": "+691"
+  },
+  "Moldova, Republic of": {
+    "code": "md",
+    "isd": "+373"
+  },
+  "Monaco": {
+    "code": "mc",
+    "isd": "+377"
+  },
+  "Mongolia": {
+    "code": "mn",
+    "isd": "+976"
+  },
+  "Montenegro": {
+    "code": "me",
+    "isd": "+382"
+  },
+  "Montserrat": {
+    "code": "ms",
+    "isd": "+1664"
+  },
+  "Morocco": {
+    "code": "ma",
+    "isd": "+212"
+  },
+  "Mozambique": {
+    "code": "mz",
+    "isd": "+258"
+  },
+  "Myanmar": {
+    "code": "mm",
+    "isd": "+95"
+  },
+  "Namibia": {
+    "code": "na",
+    "isd": "+264"
+  },
+  "Nauru": {
+    "code": "nr",
+    "isd": "+674"
+  },
+  "Nepal": {
+    "code": "np",
+    "isd": "+977"
+  },
+  "Netherlands": {
+    "code": "nl",
+    "isd": "+31"
+  },
+  "New Caledonia": {
+    "code": "nc",
+    "isd": "+687"
+  },
+  "New Zealand": {
+    "code": "nz",
+    "isd": "+64"
+  },
+  "Nicaragua": {
+    "code": "ni",
+    "isd": "+505"
+  },
+  "Niger": {
+    "code": "ne",
+    "isd": "+227"
+  },
+  "Nigeria": {
+    "code": "ng",
+    "isd": "+234"
+  },
+  "Niue": {
+    "code": "nu",
+    "isd": "+683"
+  },
+  "Norfolk Island": {
+    "code": "nf",
+    "isd": "+672"
+  },
+  "Northern Mariana Islands": {
+    "code": "mp",
+    "isd": "+1670"
+  },
+  "Norway": {
+    "code": "no",
+    "isd": "+47"
+  },
+  "Oman": {
+    "code": "om",
+    "isd": "+968"
+  },
+  "Pakistan": {
+    "code": "pk",
+    "isd": "+92"
+  },
+  "Palau": {
+    "code": "pw",
+    "isd": "+680"
+  },
+  "Palestinian Territory, Occupied": {
+    "code": "ps",
+    "isd": "+970"
+  },
+  "Panama": {
+    "code": "pa",
+    "isd": "+507"
+  },
+  "Papua New Guinea": {
+    "code": "pg",
+    "isd": "+675"
+  },
+  "Paraguay": {
+    "code": "py",
+    "isd": "+595"
+  },
+  "Peru": {
+    "code": "pe",
+    "isd": "+51"
+  },
+  "Philippines": {
+    "code": "ph",
+    "isd": "+63"
+  },
+  "Pitcairn": {
+    "code": "pn",
+    "isd": "+64"
+  },
+  "Poland": {
+    "code": "pl",
+    "isd": "+48"
+  },
+  "Portugal": {
+    "code": "pt",
+    "isd": "+351"
+  },
+  "Puerto Rico": {
+    "code": "pr",
+    "isd": "+1939"
+  },
+  "Qatar": {
+    "code": "qa",
+    "isd": "+974"
+  },
+  "Romania": {
+    "code": "ro",
+    "isd": "+40"
+  },
+  "Russian Federation": {
+    "code": "ru",
+    "isd": "+7"
+  },
+  "Rwanda": {
+    "code": "rw",
+    "isd": "+250"
+  },
+  "Réunion": {
+    "code": "re",
+    "isd": "+262"
+  },
+  "Saint Barthélemy": {
+    "code": "bl",
+    "isd": "+590"
+  },
+  "Saint Helena, Ascension and Tristan da Cunha": {
+    "code": "sh",
+    "isd": "+290"
+  },
+  "Saint Kitts and Nevis": {
+    "code": "kn",
+    "isd": "+1869"
+  },
+  "Saint Lucia": {
+    "code": "lc",
+    "isd": "+1758"
+  },
+  "Saint Martin (French part)": {
+    "code": "mf",
+    "isd": "+590"
+  },
+  "Saint Pierre and Miquelon": {
+    "code": "pm",
+    "isd": "+508"
+  },
+  "Saint Vincent and the Grenadines": {
+    "code": "vc",
+    "isd": "+1784"
+  },
+  "Samoa": {
+    "code": "ws",
+    "isd": "+685"
+  },
+  "San Marino": {
+    "code": "sm",
+    "isd": "+378"
+  },
+  "Sao Tome and Principe": {
+    "code": "st",
+    "isd": "+239"
+  },
+  "Saudi Arabia": {
+    "code": "sa",
+    "isd": "+966"
+  },
+  "Senegal": {
+    "code": "sn",
+    "isd": "+221"
+  },
+  "Serbia": {
+    "code": "rs",
+    "isd": "+381"
+  },
+  "Seychelles": {
+    "code": "sc",
+    "isd": "+248"
+  },
+  "Sierra Leone": {
+    "code": "sl",
+    "isd": "+232"
+  },
+  "Singapore": {
+    "code": "sg",
+    "isd": "+65"
+  },
+  "Slovakia": {
+    "code": "sk",
+    "isd": "+421"
+  },
+  "Slovenia": {
+    "code": "si",
+    "isd": "+386"
+  },
+  "Solomon Islands": {
+    "code": "sb",
+    "isd": "+677"
+  },
+  "Somalia": {
+    "code": "so",
+    "isd": "+252"
+  },
+  "South Africa": {
+    "code": "za",
+    "isd": "+27"
+  },
+  "South Georgia and the South Sandwich Islands": {
+    "code": "gs",
+    "isd": "+500"
+  },
+  "South Sudan": {
+    "code": "ss",
+    "isd": "+211"
+  },
+  "Spain": {
+    "code": "es",
+    "isd": "+34"
+  },
+  "Sri Lanka": {
+    "code": "lk",
+    "isd": "+94"
+  },
+  "Sudan": {
+    "code": "sd",
+    "isd": "+249"
+  },
+  "Suriname": {
+    "code": "sr",
+    "isd": "+597"
+  },
+  "Svalbard and Jan Mayen": {
+    "code": "sj",
+    "isd": "+47"
+  },
+  "Swaziland": {
+    "code": "sz",
+    "isd": "+268"
+  },
+  "Sweden": {
+    "code": "se",
+    "isd": "+46"
+  },
+  "Switzerland": {
+    "code": "ch",
+    "isd": "+41"
+  },
+  "Syria": {
+    "code": "sy",
+    "isd": "+963"
+  },
+  "Taiwan": {
+    "code": "tw",
+    "isd": "+886"
+  },
+  "Tajikistan": {
+    "code": "tj",
+    "isd": "+992"
+  },
+  "Tanzania": {
+    "code": "tz",
+    "isd": "+255"
+  },
+  "Thailand": {
+    "code": "th",
+    "isd": "+66"
+  },
+  "Timor-Leste": {
+    "code": "tl",
+    "isd": "+670"
+  },
+  "Togo": {
+    "code": "tg",
+    "isd": "+228"
+  },
+  "Tokelau": {
+    "code": "tk",
+    "isd": "+690"
+  },
+  "Tonga": {
+    "code": "to",
+    "isd": "+676"
+  },
+  "Trinidad and Tobago": {
+    "code": "tt",
+    "isd": "+1868"
+  },
+  "Tunisia": {
+    "code": "tn",
+    "isd": "+216"
+  },
+  "Turkmenistan": {
+    "code": "tm",
+    "isd": "+993"
+  },
+  "Turks and Caicos Islands": {
+    "code": "tc",
+    "isd": "+1649"
+  },
+  "Tuvalu": {
+    "code": "tv",
+    "isd": "+688"
+  },
+  "Türkiye": {
+    "code": "tr",
+    "isd": "+90"
+  },
+  "Uganda": {
+    "code": "ug",
+    "isd": "+256"
+  },
+  "Ukraine": {
+    "code": "ua",
+    "isd": "+380"
+  },
+  "United Arab Emirates": {
+    "code": "ae",
+    "isd": "+971"
+  },
+  "United Kingdom": {
+    "code": "gb",
+    "isd": "+44"
+  },
+  "United States": {
+    "code": "us",
+    "isd": "+1"
+  },
+  "Uruguay": {
+    "code": "uy",
+    "isd": "+598"
+  },
+  "Uzbekistan": {
+    "code": "uz",
+    "isd": "+998"
+  },
+  "Vanuatu": {
+    "code": "vu",
+    "isd": "+678"
+  },
+  "Venezuela, Bolivarian Republic of": {
+    "code": "ve",
+    "isd": "+58"
+  },
+  "Vietnam": {
+    "code": "vn",
+    "isd": "+84"
+  },
+  "Virgin Islands, British": {
+    "code": "vg",
+    "isd": "+1284"
+  },
+  "Virgin Islands, U.S.": {
+    "code": "vi",
+    "isd": "+1340"
+  },
+  "Wallis and Futuna": {
+    "code": "wf",
+    "isd": "+681"
+  },
+  "Yemen": {
+    "code": "ye",
+    "isd": "+967"
+  },
+  "Zambia": {
+    "code": "zm",
+    "isd": "+260"
+  },
+  "Zimbabwe": {
+    "code": "zw",
+    "isd": "+263"
+  },
+  "Åland Islands": {
+    "code": "ax",
+    "isd": "+358"
+  }
+}

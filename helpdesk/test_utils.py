@@ -6,7 +6,7 @@ from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 from helpdesk.integrations.erpnext.utils import create_customer_field
-from helpdesk.utils import is_frappe_version
+from helpdesk.utils import get_customers, is_frappe_version
 
 if is_frappe_version("16", above=True):
     from frappe.tests.utils import make_test_objects
@@ -352,6 +352,147 @@ def set_ticket_status_and_communication_date(ticket_name, status, communication_
             communication_date,
             update_modified=False,
         )
+
+
+def create_contact(name, email, user=True, role="HD Customer"):
+    result = {}
+
+    # Delete any existing contacts with this email so we always start clean
+    existing = frappe.db.get_all("Contact", filters={"email_id": email}, pluck="name")
+    for c in existing:
+        frappe.delete_doc("Contact", c, force=True)
+
+    contact = frappe.get_doc(
+        {
+            "doctype": "Contact",
+            "first_name": name,
+            # top-level email_id is what set_contact() queries via
+            # frappe.db.get_value("Contact", {"email_id": email_id})
+            "email_id": email,
+        }
+    )
+    contact.append("email_ids", {"email_id": email, "is_primary": 1})
+    contact.insert()
+
+    result["contact"] = contact.name
+    if not user:
+        return result
+
+    if frappe.db.exists("User", email):
+        # User may have linked docs (tickets) — just strip roles and reuse
+        _user = frappe.get_doc("User", email)
+        _user.roles = []
+        _user.save(ignore_permissions=True)
+    else:
+        _user = frappe.get_doc({"doctype": "User", "first_name": name, "email": email})
+        _user.insert(ignore_permissions=True)
+
+    _user.add_roles(role)
+
+    # link the user to the contact so get_customers(user=email) resolves correctly
+    frappe.db.set_value("Contact", contact.name, "user", _user.name)
+
+    result["user"] = _user.name
+    return result
+
+
+def create_customer(name, contacts=[]):
+    if frappe.db.exists("HD Customer", name):
+        frappe.delete_doc("HD Customer", name, force=True)
+
+    customer = frappe.get_doc({"doctype": "HD Customer", "customer_name": name})
+
+    for c in contacts:
+        customer.append("contacts", c)
+    return customer.insert()
+
+
+def create_user(email: str):
+    """Create (or fetch) a plain User with no helpdesk roles."""
+    if frappe.db.exists("User", email):
+        return frappe.get_doc("User", email)
+    return frappe.get_doc(
+        doctype="User",
+        email=email,
+        first_name=email.split("@")[0],
+        send_welcome_email=0,
+    ).insert(ignore_permissions=True)
+
+
+def get_invitation(email: str):
+    """Return the helpdesk User Invitation raised for an email, if any."""
+    return frappe.db.get_value(
+        "User Invitation",
+        {"email": email, "app_name": "helpdesk"},
+        ["name", "customer", "contact"],
+        as_dict=True,
+    )
+
+
+def update_role_in_customer(customer, contact, role="HD Customer", is_primary=False):
+    frappe.set_user("Administrator")
+    is_manager = True if role == "HD Customer Manager" else False
+
+    for c in customer.get("contacts", []):
+        if c.get("contact_name") != contact:
+            continue
+        c.is_manager = is_manager
+
+    if is_primary:
+        customer.primary_contact = contact
+
+    customer.save()
+
+
+def add_contact_in_customer(customer, contact, is_manager=False, is_primary=False):
+    frappe.set_user("Administrator")
+    customer.append(
+        "contacts",
+        {"contact_name": contact, "is_manager": is_manager},
+    )
+    if is_primary:
+        customer.primary_contact = contact
+
+    customer.save()
+
+
+def cleanup_contact_users(contacts, customers=[]):
+    frappe.set_user("Administrator")
+    for contact in contacts:
+        contact_name = contact.get("contact")
+        user_email = contact.get("user")
+
+        # remove from any customer
+        linked_customers = get_customers(contact=contact_name)
+        for customer in linked_customers:
+            customer_doc = frappe.get_doc("HD Customer", customer)
+            customer_doc.contacts = [
+                c
+                for c in customer_doc.contacts
+                if c.get("contact_name") != contact_name
+            ]
+            customer_doc.save()
+
+        if user_email and frappe.db.exists("User", user_email):
+            frappe.delete_doc("User", user_email, force=True)
+
+        existing = (
+            frappe.db.get_all("Contact", filters={"email_id": user_email}, pluck="name")
+            if user_email
+            else []
+        )
+        for c in existing:
+            frappe.delete_doc("Contact", c, force=True)
+
+    for c in customers:
+        if frappe.db.exists("HD Customer", c):
+            frappe.delete_doc("HD Customer", c, force=True)
+        if frappe.db.exists("HD Customer", c):
+            frappe.delete_doc("HD Customer", c, force=True)
+            frappe.delete_doc("HD Customer", c, force=True)
+            frappe.delete_doc("HD Customer", c, force=True)
+            frappe.delete_doc("HD Customer", c, force=True)
+            frappe.delete_doc("HD Customer", c, force=True)
 
 
 def make_team(team_name, members=[], disabled=False):

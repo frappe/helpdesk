@@ -162,29 +162,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, useTemplateRef } from "vue";
 import {
   Avatar,
   Button,
+  createDocumentResource,
   FileUploader,
   LoadingIndicator,
   toast,
-  createDocumentResource,
 } from "frappe-ui";
+import { computed, nextTick, ref, useTemplateRef } from "vue";
 
-import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
 import EditIcon from "~icons/lucide/edit";
 const emit = defineEmits(["updateStep"]);
 
 import AvailabilityMenu from "@/components/AvailabilityMenu.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAvailability } from "@/composables/useAvailability";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 
 const { currentStatus } = useAvailability();
 const agentStatusStore = useAgentStatusStore();
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 const showChangePasswordModal = ref(false);
 
 const { userId, hasAgentRecord } = useAuthStore();

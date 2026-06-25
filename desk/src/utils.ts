@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/stores/auth";
 import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
 import {
@@ -215,6 +216,7 @@ export function formatTime(
     hour?: boolean;
     minute?: boolean;
     second?: boolean;
+    maxUnits?: number;
   } = {
     day: true,
     hour: true,
@@ -227,31 +229,34 @@ export function formatTime(
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = Math.floor(seconds % 60);
 
-  let formattedTime = "";
+  const parts: string[] = [];
 
   if (config.day && days > 0) {
-    formattedTime += `${days}d `;
+    parts.push(`${days}d`);
   }
 
   if (config.hour && (hours > 0 || days > 0)) {
-    formattedTime += `${hours}h `;
+    parts.push(`${hours}h`);
   }
 
   if (config.minute && (minutes > 0 || hours > 0 || days > 0)) {
-    formattedTime += `${minutes}m `;
+    parts.push(`${minutes}m`);
   }
 
   if (config.second) {
-    formattedTime += `${
-      remainingSeconds >= 10
-        ? remainingSeconds
-        : remainingSeconds > 1
-        ? "0" + remainingSeconds
-        : "0"
-    }s`;
+    parts.push(
+      `${
+        remainingSeconds >= 10
+          ? remainingSeconds
+          : remainingSeconds > 1
+          ? "0" + remainingSeconds
+          : "0"
+      }s`
+    );
   }
 
-  return formattedTime.trim();
+  const limited = config.maxUnits ? parts.slice(0, config.maxUnits) : parts;
+  return limited.join(" ").trim();
 }
 
 export function getTimeInSeconds(time: string) {
@@ -783,7 +788,7 @@ export function parseApiOptions(
 }
 
 export function openContact(name: string) {
-  const url = window.location.origin + "/app/contact/" + name;
+  const url = window.location.origin + "/helpdesk/contacts/" + name;
   window.open(url, "_blank");
 }
 
@@ -876,23 +881,65 @@ export function shortDuration(target: string | Date): string {
   return `${Math.floor(seconds / MINUTE)}m`;
 }
 
-export function buildPercentageChange(value: number | null) {
-  if (value === null || value === undefined) {
+export function buildPercentageChange(
+  value: number | null,
+  negativeIsBetter: boolean = true
+) {
+  // No change (or no comparison): stay neutral — never green/red, no up/down arrow.
+  if (value === null || value === undefined || value === 0) {
     return { icon: "lucide-arrow-right", value: "0", color: "text-ink-gray-5" };
   }
+  const isPositive = value > 0;
+  const isGood = negativeIsBetter ? !isPositive : isPositive;
   return {
-    icon:
-      value > 0
-        ? "lucide-arrow-up-right"
-        : value < 0
-        ? "lucide-arrow-down-left"
-        : "lucide-arrow-right",
-    value: value > 0 ? `+${value}` : value,
-    color:
-      value > 0
-        ? "text-ink-red-4"
-        : value < 0
-        ? "text-ink-green-3"
-        : "text-ink-gray-5",
+    icon: isPositive ? "lucide-arrow-up-right" : "lucide-arrow-down-left",
+    value: isPositive ? `+${value}` : value,
+    color: isGood ? "text-ink-green-3" : "text-ink-red-3",
   };
+}
+
+export function hasPermission() {
+  const authStore = useAuthStore();
+  return authStore.isAdmin || authStore.isManager;
+}
+
+export function getErrorMessage(
+  error: any,
+  showToast: boolean = false
+): string {
+  const msg = error.exc_type
+    ? (error.messages || error.message || []).join(", ")
+    : error.message;
+  if (showToast) {
+    toast.error(msg);
+  }
+  return msg;
+}
+const emailsToStr = (emails: readonly string[]) => emails.join(", ");
+
+export function handleInviteUserSuccess(
+  data: Record<
+    | "disabled_user_emails"
+    | "accepted_invite_emails"
+    | "pending_invite_emails"
+    | "invited_emails",
+    string[]
+  >
+) {
+  let emailsStr = emailsToStr(data.invited_emails);
+  if (emailsStr.trim() !== "") {
+    toast.success(`${emailsStr} invited successfully`);
+  }
+  emailsStr = emailsToStr(data.disabled_user_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already present and disabled`);
+  }
+  emailsStr = emailsToStr(data.pending_invite_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already invited`);
+  }
+  emailsStr = emailsToStr(data.accepted_invite_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already present`);
+  }
 }
