@@ -52,12 +52,7 @@
               <component :is="tab.icon" v-if="tab.icon" class="h-5" />
               {{ __(tab.label) }}
               <Badge
-                class="group-hover:bg-surface-gray-7"
-                :class="[
-                  selected
-                    ? '!bg-surface-gray-7'
-                    : '!bg-surface-gray-2 !text-ink-gray-7',
-                ]"
+                class="group-hover:bg-surface-gray-7 !bg-surface-gray-2 !text-ink-gray-7"
                 variant="solid"
                 theme="gray"
                 size="sm"
