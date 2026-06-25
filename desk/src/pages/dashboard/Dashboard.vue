@@ -335,9 +335,11 @@ const parseFilters = (filters: Filters) => {
   };
 };
 
+// No `cache` key here: a static cache key makes frappe-ui return the same
+// resource instance across navigations, still bound to the previous mount's
+// `filters` closure, so reloads after navigating back send stale params.
 const numberCards = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
-  cache: ["Analytics", "NumberCards"],
   makeParams: () => ({
     dashboard_type: "number_card",
     filters: parseFilters(filters),
@@ -346,7 +348,6 @@ const numberCards = createResource({
 
 const masterData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
-  cache: ["Analytics", "MasterCharts"],
   makeParams: () => ({
     dashboard_type: "master",
     filters: parseFilters(filters),
@@ -355,7 +356,6 @@ const masterData = createResource({
 
 const trendData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
-  cache: ["Analytics", "TrendCharts"],
   makeParams: () => ({
     dashboard_type: "trend",
     filters: parseFilters(filters),

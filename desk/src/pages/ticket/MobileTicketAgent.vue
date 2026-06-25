@@ -214,7 +214,11 @@ import {
 } from "@/composables/formCustomisation";
 import { useScreenSize } from "@/composables/screen";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
-import { reloadTicket, useTicket } from "@/composables/useTicket";
+import {
+  reloadTicket,
+  revalidateTicket,
+  useTicket,
+} from "@/composables/useTicket";
 import { globalStore } from "@/stores/globalStore";
 import { getMeta } from "@/stores/meta";
 import { useTelephonyStore } from "@/stores/telephony";
@@ -613,6 +617,9 @@ function filterActivities(eventType: TicketTab) {
 
 onMounted(() => {
   document.title = props.ticketId;
+  // Revisiting a ticket: show the cached conversation immediately and refresh it
+  // in place (mobile has no live socket refresh to keep the cache current).
+  revalidateTicket(props.ticketId);
 });
 
 onUnmounted(() => {
