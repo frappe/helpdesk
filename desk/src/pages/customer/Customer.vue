@@ -39,7 +39,11 @@
           v-if="!isMobileView"
         />
         <!-- Tabs -->
-        <Tabs v-model="activeTab" :tabs="tabs" class="tabs-sticky-header">
+        <Tabs
+          v-model="activeTab"
+          :tabs="tabs"
+          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-white"
+        >
           <template #tab-item="{ tab, selected }">
             <button
               class="group flex items-center gap-2 border-b border-transparent py-2 text-base text-ink-gray-5 duration-300 ease-in-out hover:text-ink-gray-9"

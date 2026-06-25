@@ -131,10 +131,10 @@ const contactDetails = computed(() => [
   },
   {
     icon: markRaw(ModifiedIcon),
-    value: `Last seen ${
+    value: `${__("Last seen")} ${
       props.contact.last_active
         ? dayjs(props.contact.last_active).fromNow()
-        : "Never"
+        : __("Never")
     }`,
   },
   {
@@ -299,7 +299,7 @@ function removeContact() {
       {
         label: __("Confirm"),
         variant: "solid",
-        onClick: ({ close }: { close: () => void }) =>
+        onClick: ({ close }: { close: () => void }) => {
           customer.setValue.submit(
             {
               contacts: customer.doc.contacts?.filter(
@@ -316,7 +316,8 @@ function removeContact() {
                 getErrorMessage(error, true);
               },
             }
-          ),
+          );
+        },
       },
     ],
   });
