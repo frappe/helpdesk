@@ -420,7 +420,7 @@ def add_default_agent_status():
     for status in statuses:
         if not frappe.db.exists("HD Agent Status", status["agent_status"]):
             frappe.get_doc(
-                {"doctype": "HD Agent Status", "enable": 1, **status}
+                {"doctype": "HD Agent Status", "enabled": 1, **status}
             ).insert()
 
 

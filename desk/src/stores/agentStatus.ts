@@ -10,14 +10,13 @@ interface LiveAvailability {
 }
 
 interface AvailabilityEvent {
-  agent: string;
+  agents: string[];
   availability: string;
   availability_changed_on: string;
 }
 
 // Maps an HD Agent Status `color` value to a solid presence-dot background.
 const dotColorMap: Record<string, string> = {
-  black: "bg-ink-gray-9",
   gray: "bg-gray-500",
   blue: "bg-blue-500",
   green: "bg-green-600",
@@ -38,7 +37,7 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   const statuses = createListResource({
     doctype: "HD Agent Status",
     cache: ["HD Agent Status", "list"],
-    fields: ["name", "agent_status", "category", "color", "enable", "status_order"],
+    fields: ["name", "agent_status", "category", "color", "enabled", "status_order"],
     orderBy: "`tabHD Agent Status`.status_order",
     pageLength: 1000,
     auto: true,
@@ -51,10 +50,12 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
 
   const { $socket } = globalStore();
   $socket.on("agent_availability_updated", (data: AvailabilityEvent) => {
-    liveStatuses[data.agent] = {
-      availability: data.availability,
-      changedOn: data.availability_changed_on,
-    };
+    for (const agent of data.agents) {
+      liveStatuses[agent] = {
+        availability: data.availability,
+        changedOn: data.availability_changed_on,
+      };
+    }
   });
 
   function getStatus(name: string): HDAgentStatus | undefined {
