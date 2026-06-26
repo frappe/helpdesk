@@ -32,38 +32,6 @@ def sent_invites(emails: list[str], send_welcome_mail_to_user: bool = True):
 
 @frappe.whitelist()
 @agent_only
-def get_availability_options() -> list[str]:
-    return frappe.get_all(
-        "HD Agent Status",
-        filters={"enable": 1},
-        order_by="`tabHD Agent Status`.status_order asc",
-        pluck="agent_status",
-    )
-
-
-@frappe.whitelist()
-@agent_only
-def get_my_availability() -> dict:
-    name = get_agent_name()
-    values = (
-        frappe.db.get_value(
-            "HD Agent",
-            name,
-            ["availability", "availability_changed_on"],
-            as_dict=True,
-        )
-        if name
-        else {}
-    ) or {}
-    return {
-        "availability": values.get("availability"),
-        "availability_changed_on": values.get("availability_changed_on"),
-        "options": get_availability_options(),
-    }
-
-
-@frappe.whitelist()
-@agent_only
 def set_my_availability(availability: str) -> dict:
     if not frappe.db.exists("HD Agent Status", {"name": availability, "enable": 1}):
         frappe.throw(_("Invalid availability"), frappe.ValidationError)

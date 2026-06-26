@@ -28,8 +28,19 @@ def get_user():
     is_admin = "System Manager" in roles or "Administrator" in roles
 
     is_agent = _is_agent()
-    has_agent_record = bool(get_agent_name())
+    agent_name = get_agent_name()
+    has_agent_record = bool(agent_name)
     has_desk_access = is_agent or is_admin
+    availability = (
+        frappe.db.get_value(
+            "HD Agent",
+            agent_name,
+            ["availability", "availability_changed_on"],
+            as_dict=True,
+        )
+        if agent_name
+        else None
+    ) or {}
     user_image = user.user_image
     user_first_name = user.first_name
     user_name = user.full_name
@@ -55,7 +66,12 @@ def get_user():
         "username": username,
         "time_zone": user.time_zone,
         "language": language,
+<<<<<<< HEAD
         "user_teams": user_team_names,
+=======
+        "availability": availability.get("availability"),
+        "availability_changed_on": availability.get("availability_changed_on"),
+>>>>>>> d2ea0ecd (refactor: seed agent availability from session)
     }
 
 
