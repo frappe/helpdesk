@@ -100,10 +100,16 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     // socket echo overwrites it with the authoritative server timestamp.
     const previous = liveStatuses[myAgentName];
     applyLive(myAgentName, status);
-    setMyAvailability.submit({ availability: status }).catch(() => {
-      if (previous) liveStatuses[myAgentName] = previous;
-      else delete liveStatuses[myAgentName];
-    });
+    setMyAvailability.submit(
+      { availability: status },
+      {
+        // Roll back the optimistic write on failure.
+        onError: () => {
+          if (previous) liveStatuses[myAgentName] = previous;
+          else delete liveStatuses[myAgentName];
+        },
+      }
+    );
   }
 
   function getStatus(name: string): HDAgentStatus | undefined {
