@@ -257,25 +257,6 @@ const agentResource = createListResource({
   auto: true,
 });
 
-// Fetch current agent separately to guarantee they appear in the list
-const currentAgentResource = currentAgentName
-  ? createResource({
-      url: "frappe.client.get",
-      params: {
-        doctype: "HD Agent",
-        name: currentAgentName,
-        fields: [
-          "name",
-          "agent_name",
-          "user_image",
-          "availability",
-          "availability_changed_on",
-        ],
-      },
-      auto: true,
-    })
-  : null;
-
 const debouncedSearch = useDebounceFn((text: string) => {
   const filters: Record<string, any> = { is_active: true };
   if (text) {
@@ -308,16 +289,20 @@ const agentOptions = computed<AgentOption[]>(() => {
   const agents: AgentOption[] = [];
   const options = new Set<string>();
 
-  // Include current agent only when not searching
-  if (!searchText.value && currentAgentResource?.data) {
-    const a = currentAgentResource.data;
+  // Include current agent only when not searching. Built from the session user
+  // and the store's live status (seeded from auth.get_user) — no extra fetch.
+  if (!searchText.value && currentAgentName) {
     agents.push({
-      value: a.name,
-      label: a.agent_name || getUser(a.name).full_name,
-      image: a.user_image || getUser(a.name).user_image,
-      ...liveAvailability(a),
+      value: currentAgentName,
+      label: currentUser.value.full_name || currentAgentName,
+      image: currentUser.value.user_image || "",
+      ...liveAvailability({ name: currentAgentName }),
     });
+<<<<<<< HEAD
     options.add(a.name);
+=======
+    seen.add(currentAgentName);
+>>>>>>> 01ad2876 (fix: drop redundant per ticket fetch for current agent in AssignTo)
   }
 
   if (agentResource.data) {
