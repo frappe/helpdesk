@@ -22,9 +22,11 @@
                   :label="fullName"
                 />
                 <div
-                  v-if="currentStatus"
+                  v-if="agentStatusStore.myStatus"
                   class="absolute bottom-0.5 right-0.5 size-3.5 rounded-full outline outline-white outline-4"
-                  :class="agentStatusStore.statusColor(currentStatus)"
+                  :class="
+                    agentStatusStore.statusColor(agentStatusStore.myStatus)
+                  "
                 />
                 <Tooltip
                   :hoverDelay="0"
@@ -149,11 +151,14 @@ import EditIcon from "~icons/lucide/edit";
 const emit = defineEmits(["updateStep"]);
 
 import AvailabilityMenu from "@/components/AvailabilityMenu.vue";
+<<<<<<< HEAD
 import { useAvailability } from "@/composables/useAvailability";
+=======
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+>>>>>>> 4b38d0c1 (refactor: update frontend to read availability from store)
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 
-const { currentStatus } = useAvailability();
 const agentStatusStore = useAgentStatusStore();
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 const showChangePasswordModal = ref(false);

@@ -4,7 +4,8 @@
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
-from helpdesk.api.agent import get_my_availability, set_my_availability
+from helpdesk.api.agent import set_my_availability
+from helpdesk.api.auth import get_user
 from helpdesk.helpdesk.doctype.hd_agent.hd_agent import update_agent_role
 from helpdesk.test_utils import make_agent, make_team, make_ticket
 
@@ -62,16 +63,16 @@ class TestHDAgent(FrappeTestCase):
         with self.assertRaises(frappe.ValidationError):
             set_my_availability("Not A Status")
 
-    # get_my_availability returns the agent's status, when it changed, and options
-    def test_get_my_availability_returns_status_and_options(self):
+    # the session payload (auth.get_user) carries the agent's current status, so
+    # the frontend seeds availability without a dedicated round-trip
+    def test_get_user_includes_availability(self):
         frappe.set_user(self.test_user)
         set_my_availability("Away")
 
-        result = get_my_availability()
+        result = get_user()
 
         self.assertEqual(result["availability"], "Away")
         self.assertIsNotNone(result["availability_changed_on"])
-        self.assertIn("Away", result["options"])
 
     def _make_assignment_rule(self, team_name: str, members: list[str], rule: str):
         team = make_team(team_name, members)

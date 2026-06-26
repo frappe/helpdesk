@@ -152,7 +152,6 @@ import {
   AssigneeSymbol,
   TicketSymbol,
 } from "@/types";
-import type { HDAgent } from "@/types/doctypes";
 import { useDebounceFn } from "@vueuse/core";
 import {
   Button,
@@ -189,7 +188,7 @@ const activities = inject(ActivitiesSymbol)!;
 const { getUser } = useUserStore();
 const currentUser = computed(() => getUser("")); // empty string returns current user
 const agentStatusStore = useAgentStatusStore();
-const currentAgentName = (window as any).agent as string | null;
+const currentAgentName = window.agent;
 
 const searchText = ref("");
 const highlightedIndex = ref(0);
@@ -541,22 +540,22 @@ const removeAssigneesResource = createResource({
 // Toast a warning for each newly-added agent who isn't currently active.
 // Returns true if any warning was shown so the caller can defer the success toast.
 function warnUnavailableAgents(addedNames: string[]): boolean {
-  const agents = (agentResource.data as HDAgent[]) ?? [];
   let hasUnavailable = false;
-  for (const agent of agents) {
-    if (!addedNames.includes(agent.name)) continue;
+  // Iterate the rendered options (not just the fetched page) so agents picked
+  // via search — who aren't in the default list — are still checked.
+  for (const agent of sortedAgentOptions.value) {
+    if (!addedNames.includes(agent.value)) continue;
     // No point warning agents about their own status when assigning themselves.
-    if (agent.name === currentAgentName) continue;
+    if (agent.value === currentAgentName) continue;
     const category = agentStatusStore.getStatus(
       agent.availability || ""
     )?.category;
     if (category !== "Away" && category !== "Unavailable") continue;
 
-    const name = agent.agent_name || agent.name;
     toast.warning(
       category === "Unavailable"
-        ? __("{0} is currently unavailable.", name)
-        : __("{0} is currently away.", name)
+        ? __("{0} is currently unavailable.", agent.label)
+        : __("{0} is currently away.", agent.label)
     );
     hasUnavailable = true;
   }
