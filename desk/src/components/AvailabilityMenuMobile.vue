@@ -15,11 +15,15 @@
           <div class="flex items-center size-4">
             <span
               class="size-2.5 mx-auto shrink-0 rounded-full"
-              :class="agentStatusStore.statusColor(currentStatus)"
+              :class="agentStatusStore.statusColor(agentStatusStore.myStatus)"
             />
           </div>
           <span class="truncate">
-            {{ currentStatus ? __(currentStatus) : __("Set status") }}
+            {{
+              agentStatusStore.myStatus
+                ? __(agentStatusStore.myStatus)
+                : __("Set status")
+            }}
           </span>
         </div>
       </button>
@@ -29,7 +33,7 @@
         class="flex flex-col mx-3 p-1.5 rounded-lg border border-outline-gray-1 bg-surface-white shadow-xl min-w-[140px]"
       >
         <button
-          v-for="option in options"
+          v-for="option in agentStatusStore.statusOptions"
           :key="option"
           class="flex items-center gap-2 rounded p-1.5 text-sm text-ink-gray-8 hover:bg-surface-gray-2"
           @click="selectStatus(option, close)"
@@ -47,15 +51,13 @@
 
 <script setup lang="ts">
 import { Popover } from "frappe-ui";
-import { useAvailability } from "@/composables/useAvailability";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import { __ } from "@/translation";
 
-const { currentStatus, options, setStatus } = useAvailability();
 const agentStatusStore = useAgentStatusStore();
 
 function selectStatus(status: string, close: () => void) {
-  setStatus(status);
+  agentStatusStore.setMyStatus(status);
   close();
 }
 </script>

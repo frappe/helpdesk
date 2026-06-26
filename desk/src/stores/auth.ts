@@ -44,6 +44,12 @@ export const useAuthStore = defineStore("auth", () => {
   );
   const userName: ComputedRef<string> = computed(() => user__.value.user_name);
   const username: ComputedRef<string> = computed(() => user__.value.username);
+  const availability: ComputedRef<string> = computed(
+    () => user__.value.availability || ""
+  );
+  const availabilityChangedOn: ComputedRef<string> = computed(
+    () => user__.value.availability_changed_on || ""
+  );
   const timezone: ComputedRef<string> = computed(() => user__.value.time_zone);
   const userTeams: ComputedRef<string[]> = computed(
     () => user__.value.user_teams
@@ -94,6 +100,8 @@ export const useAuthStore = defineStore("auth", () => {
     userImage,
     userName,
     username,
+    availability,
+    availabilityChangedOn,
     timezone,
     userTeams,
     language,
