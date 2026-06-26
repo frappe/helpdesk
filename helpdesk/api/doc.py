@@ -113,6 +113,16 @@ def get_list_data(
     rows.append("name") if "name" not in rows else rows
     if doctype == "HD Ticket":
         rows.append("_seen") if "_seen" not in rows else rows
+
+    # Kanban cards surface counts (comments + attachments) in the card
+    # footer — fetch them as part of the list response so the renderer
+    # doesn't have to do per-row round trips. Both extras are harmless
+    # to fetch for non-kanban callers but we keep them gated to avoid
+    # any perceived perf hit on the list view's hot path.
+    extra_query_args = {}
+    if view_type == "kanban":
+        extra_query_args["with_comment_count"] = True
+
     data = (
         frappe.get_list(
             doctype,
@@ -120,9 +130,31 @@ def get_list_data(
             filters=filters,
             order_by=order_by,
             page_length=page_length,
+            **extra_query_args,
         )
         or []
     )
+
+    if view_type == "kanban" and data:
+        # File doctype has no native helper for "attached count" — one
+        # grouped query for the whole page is cheaper than a per-row
+        # `attached_files_count` and avoids N+1.
+        names = [d.get("name") for d in data if d.get("name")]
+        if names:
+            counts = frappe.db.sql(
+                """
+                SELECT attached_to_name AS doc, COUNT(*) AS c
+                FROM `tabFile`
+                WHERE attached_to_doctype = %(dt)s
+                  AND attached_to_name IN %(names)s
+                GROUP BY attached_to_name
+                """,
+                {"dt": doctype, "names": tuple(names)},
+                as_dict=True,
+            )
+            count_map = {row["doc"]: row["c"] for row in counts}
+            for d in data:
+                d["attachment_count"] = count_map.get(d.get("name"), 0)
 
     if doctype == "TP Call Log":
         data = parse_call_logs(data)
@@ -163,11 +195,59 @@ def get_list_data(
     if show_customer_portal_fields:
         fields = get_customer_portal_fields(doctype, fields)
 
-    if group_by_field and view_type == "group_by":
+    if group_by_field and view_type in ("group_by", "kanban"):
 
         def get_options(fieldtype, options):
             if fieldtype == "Select":
-                return [option for option in options.split("\n")]
+                # All Select options from the schema, normalised to
+                # [{label, value}] so list and kanban renderers iterate
+                # uniformly — empty/whitespace tokens are dropped so a
+                # leading "\n" in the field definition doesn't create a
+                # phantom column.
+                return [
+                    {"label": opt, "value": opt}
+                    for opt in (options or "").split("\n")
+                    if opt and opt.strip()
+                ]
+            if fieldtype == "Link" and view_type == "kanban":
+                # For a kanban board we want a column per linked record,
+                # not just the ones currently referenced — so empty swim
+                # lanes are visible and drag-and-drop can target them.
+                linked_dt = options
+                if not linked_dt:
+                    return []
+                lookup_field = label_field or "name"
+                # Pull `color` from the linked doctype when it has one
+                # (e.g. HD Ticket Status) so kanban column headers match
+                # the colors used in the filter/status UI.
+                meta_dt = label_doc or linked_dt
+                meta = frappe.get_meta(meta_dt)
+                extra_fields = []
+                if meta.has_field("color"):
+                    extra_fields.append("color")
+                # `order` is a SQL reserved word — Frappe's QueryBuilder
+                # rejects it in order_by even with backticks — so fetch
+                # without SQL ordering and sort in Python below.
+                has_order = meta.has_field("order")
+                if has_order:
+                    extra_fields.append("order")
+                rows_ = frappe.get_all(
+                    meta_dt,
+                    fields=["name", lookup_field, *extra_fields],
+                    order_by="name",
+                )
+                if has_order:
+                    rows_ = sorted(
+                        rows_, key=lambda r: (r.get("order") is None, r.get("order"))
+                    )
+                return [
+                    {
+                        "label": r.get(lookup_field) or r.get("name"),
+                        "value": r.get("name"),
+                        **({"color": r.get("color")} if r.get("color") else {}),
+                    }
+                    for r in rows_
+                ]
             else:
                 has_empty_values = any([not d.get(group_by_field) for d in data])
                 options = list(set([d.get(group_by_field) for d in data]))
@@ -195,11 +275,11 @@ def get_list_data(
                         for field in order_by_fields
                     ]
                     if (group_by_field, "asc") in order_by_fields:
-                        options.sort(key=lambda x: x.get("label"))
+                        options.sort(key=lambda x: x.get("label") or "")
                     elif (group_by_field, "desc") in order_by_fields:
-                        options.sort(reverse=True, key=lambda x: x.get("label"))
+                        options.sort(reverse=True, key=lambda x: x.get("label") or "")
                 else:
-                    options.sort(key=lambda x: x.get("label"))
+                    options.sort(key=lambda x: x.get("label") or "")
 
                 # general category at first position
                 idx = [

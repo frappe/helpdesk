@@ -344,24 +344,46 @@ let viewDialog = reactive({
     label: "",
     icon: "",
     name: "",
+    type: "list",
   },
   mode: "create",
 });
 
 const dropdownOptions = computed(() => {
+  // Kanban is an agent workflow tool — customers in the portal typically
+  // only see their own handful of tickets, so the board layout would be
+  // visually empty and confusing. Hide the entry there.
+  const defaultViewItems: Array<Record<string, any>> = [
+    {
+      label: __("List View"),
+      icon: "lucide-align-justify",
+      onClick: async () => {
+        // Await the navigation so setViewType() writes the override
+        // against the right localStorage key — calling it before the
+        // route has settled persists the choice under the previous
+        // saved-view's key instead of __default__.
+        await router.push({
+          name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+        });
+        listViewRef.value?.setViewType?.("list");
+      },
+    },
+  ];
+  if (!isCustomerPortal.value) {
+    defaultViewItems.push({
+      label: __("Kanban"),
+      icon: "lucide-columns",
+      onClick: async () => {
+        await router.push({ name: "TicketsAgent" });
+        listViewRef.value?.setViewType?.("kanban");
+      },
+    });
+  }
+
   const items = [
     {
       group: __("Default Views"),
-      items: [
-        {
-          label: __("List View"),
-          icon: "lucide-align-justify",
-          onClick: () =>
-            router.push({
-              name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-            }),
-        },
-      ],
+      items: defaultViewItems,
     },
   ];
 
@@ -454,6 +476,7 @@ const viewActions = (view) => {
             viewDialog.view.label = _view.label + " (New)";
             viewDialog.view.icon = _view.icon;
             viewDialog.view.name = _view.name;
+            viewDialog.view.type = _view.type || "list";
             viewDialog.mode = "duplicate";
             selectedView = _view;
             viewDialog.show = true;
@@ -522,6 +545,7 @@ const viewActions = (view) => {
           viewDialog.view.label = _view.label;
           viewDialog.view.icon = _view.icon;
           viewDialog.view.name = _view.name;
+          viewDialog.view.type = _view.type || "list";
           viewDialog.mode = "edit";
           viewDialog.show = true;
         },
@@ -613,13 +637,17 @@ function handleView(viewInfo, action) {
       rows: JSON.stringify(selectedView.rows),
       label: viewInfo.label,
       icon: viewInfo.icon,
+      // Duplicate respects the layout the user picked in the dialog —
+      // falls back to the source view's type when not changed.
+      type: viewInfo.type || selectedView.type || "list",
       public: false,
       pinned: false,
     };
   } else {
     view = {
       dt: "HD Ticket",
-      type: "list",
+      // User-selectable from the Create View dialog (List vs Kanban).
+      type: viewInfo.type || "list",
       label: viewInfo.label ?? __("List"),
       icon: viewInfo.icon ?? "",
       route_name: router.currentRoute.value.name as string,
