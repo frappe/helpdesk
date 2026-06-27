@@ -25,7 +25,6 @@ html,
 body {
   color: var(--ink-gray-9);
   background-color: var(--surface-white);
-  overscroll-behavior: none;
 }
 
 :root {
