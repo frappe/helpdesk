@@ -139,7 +139,7 @@ const { appsSubmenu } = useApps();
 const { currentTheme, toggleTheme } = useTheme();
 
 const themeMenuItem = computed(() => ({
-  label: "Toggle theme",
+  label: __("Toggle theme"),
   icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
   onClick: () => toggleTheme(),
 }));
@@ -208,7 +208,7 @@ function parseViews(views) {
 const customerPortalDropdown = computed(() => [
   themeMenuItem.value,
   {
-    label: "Log out",
+    label: __("Log out"),
     icon: "lucide-log-out",
     onClick: () => authStore.logout(),
   },
@@ -216,7 +216,7 @@ const customerPortalDropdown = computed(() => [
 
 const agentPortalDropdown = computed(() => [
   {
-    label: "Apps",
+    label: __("Apps"),
     icon: markRaw(AppsIcon),
     submenu: appsSubmenu.value,
   },
@@ -228,7 +228,7 @@ const agentPortalDropdown = computed(() => [
       ]
     : []),
   {
-    label: "Customer portal",
+    label: __("Customer portal"),
     icon: "lucide-users",
     onClick: () => {
       const path = router.resolve({ name: "TicketsCustomer" });
@@ -237,17 +237,17 @@ const agentPortalDropdown = computed(() => [
   },
   {
     icon: "lucide-life-buoy",
-    label: "Support",
+    label: __("Support"),
     onClick: () => window.open("https://t.me/frappedesk"),
   },
   {
     icon: "lucide-book-open",
-    label: "Docs",
+    label: __("Docs"),
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
   themeMenuItem.value,
   {
-    label: "Log out",
+    label: __("Log out"),
     icon: "lucide-log-out",
     onClick: () => authStore.logout(),
   },

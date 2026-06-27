@@ -99,7 +99,7 @@ export default defineConfig(async ({ mode }) => {
       alias: {
         "@": path.resolve(__dirname, "src"),
         "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
-        // ...localFrappeUIAliases,
+        ...localFrappeUIAliases,
       },
       dedupe: [
         "prosemirror-view",

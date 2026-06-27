@@ -306,43 +306,6 @@ export const ClearFormattingUtility = {
   isActive: () => false,
 };
 
-export const textEditorMenuButtons = [
-  "Paragraph",
-  ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
-  "Separator",
-  "Bold",
-  "Italic",
-  "FontColor",
-  "Separator",
-  ["Align Left", "Align Center", "Align Right"],
-  "Bullet List",
-  "Numbered List",
-  "Separator",
-  "Image",
-  "Video",
-  "Link",
-  "Blockquote",
-  "Code",
-  "Horizontal Rule",
-  [
-    "InsertTable",
-    "AddColumnBefore",
-    "AddColumnAfter",
-    "DeleteColumn",
-    "AddRowBefore",
-    "AddRowAfter",
-    "DeleteRow",
-    "MergeCells",
-    "SplitCell",
-    "ToggleHeaderColumn",
-    "ToggleHeaderRow",
-    "ToggleHeaderCell",
-    "DeleteTable",
-  ],
-  "Separator",
-  ClearFormattingUtility,
-];
-
 export function isContentEmpty(content: string) {
   if (!content || content === null || content === undefined) {
     return true;
