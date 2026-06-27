@@ -46,7 +46,7 @@
   },
   {
    "depends_on": "eval:doc.different_view",
-   "description": "Name shown on the customer portal<br> (e.g., Replied \u2192 Awaiting Response).",
+   "description": "Name shown on the customer portal<br> (e.g., Replied → Awaiting Response).",
    "fieldname": "label_customer",
    "fieldtype": "Data",
    "label": "Label (customer view)",
