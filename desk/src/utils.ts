@@ -1,13 +1,7 @@
 import { useAuthStore } from "@/stores/auth";
 import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
-import {
-  call,
-  dayjs,
-  dayjsLocal,
-  toast,
-  useFileUpload,
-} from "frappe-ui";
+import { call, dayjs, dayjsLocal, toast, useFileUpload } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
@@ -448,7 +442,10 @@ export function renderOptionIcon(
 ) {
   if (!icon) return null;
   if (typeof icon === "string") {
-    return h("span", { class: [lucideClass(icon), ...classes], "aria-hidden": true });
+    return h("span", {
+      class: [lucideClass(icon), ...classes],
+      "aria-hidden": true,
+    });
   }
   return h(icon, { class: classes, "aria-hidden": true });
 }
@@ -858,9 +855,11 @@ export function buildPercentageChange(
   }
   const isPositive = value > 0;
   const isGood = negativeIsBetter ? !isPositive : isPositive;
+  // Cap the magnitude at 100% so large swings (e.g. +3186%) stay readable.
+  const capped = Math.min(Math.abs(value), 100);
   return {
     icon: isPositive ? "lucide-arrow-up-right" : "lucide-arrow-down-left",
-    value: isPositive ? `+${value}` : value,
+    value: isPositive ? `+${capped}` : `-${capped}`,
     color: isGood ? "text-ink-green-6" : "text-ink-red-6",
   };
 }
