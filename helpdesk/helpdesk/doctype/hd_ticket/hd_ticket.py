@@ -265,6 +265,9 @@ class HDTicket(Document):
                     self.contact = contact
 
     def set_customer(self):
+        if not self.is_new():
+            return  # don't auto-set customer on existing tickets
+
         contact_customers = get_customers(contact=self.contact) if self.contact else []
 
         if self.customer:
