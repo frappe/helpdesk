@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-06-14 11:18+0000\n"
-"PO-Revision-Date: 2026-06-15 18:50\n"
+"POT-Creation-Date: 2026-06-21 11:29+0000\n"
+"PO-Revision-Date: 2026-06-22 20:26\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Korean\n"
 "MIME-Version: 1.0\n"
@@ -196,7 +196,7 @@ msgstr ""
 msgid "Add Email"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/Filter.vue:90
+#: desk/src/components/view-controls/filter/Filter.vue:112
 msgid "Add Filter..."
 msgstr ""
 
@@ -244,7 +244,7 @@ msgstr ""
 msgid "Add condition group"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/Filter.vue:60
+#: desk/src/components/view-controls/filter/Filter.vue:81
 msgid "Add filter"
 msgstr ""
 
@@ -1098,6 +1098,10 @@ msgstr ""
 msgid "Change language of the application."
 msgstr ""
 
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:169
+msgid "Change operator ({0})"
+msgstr ""
+
 #: desk/src/pages/desk/contact/ContactDialog.vue:21
 #: desk/src/pages/desk/customer/CustomerDialog.vue:18
 msgid "Change photo"
@@ -1136,7 +1140,7 @@ msgstr ""
 msgid "Child field"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/Filter.vue:151
+#: desk/src/components/view-controls/filter/Filter.vue:190
 msgid "Choose a field"
 msgstr ""
 
@@ -1189,7 +1193,7 @@ msgstr ""
 msgid "Clear Table"
 msgstr "테이블 지우기"
 
-#: desk/src/components/view-controls/filter/Filter.vue:71
+#: desk/src/components/view-controls/filter/Filter.vue:93
 msgid "Clear all"
 msgstr ""
 
@@ -1250,7 +1254,7 @@ msgstr ""
 msgid "Comma separated emails to invite."
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:90
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:109
 msgid "Comma separated values"
 msgstr ""
 
@@ -2338,13 +2342,14 @@ msgid "Field dependency updated successfully."
 msgstr ""
 
 #. Label of the fields (Table) field in DocType 'HD Ticket Template'
+#: desk/src/components/view-controls/filter/FilterFieldList.vue:29
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Fields"
 msgstr ""
 
 #. Label of the filters_tab (Tab Break) field in DocType 'HD View'
 #. Label of the filters (Code) field in DocType 'HD View'
-#: desk/src/components/view-controls/filter/Filter.vue:150
+#: desk/src/components/view-controls/filter/Filter.vue:189
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
 msgstr ""
@@ -3657,7 +3662,7 @@ msgstr ""
 msgid "No feedback"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterFieldList.vue:46
+#: desk/src/components/view-controls/filter/FilterFieldList.vue:55
 msgid "No fields found"
 msgstr ""
 
@@ -3697,7 +3702,7 @@ msgstr ""
 msgid "No recently assigned tickets"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:64
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:83
 msgid "No results"
 msgstr ""
 
@@ -3742,7 +3747,7 @@ msgstr ""
 msgid "Not Saved"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:203
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:220
 msgid "Not Set"
 msgstr ""
 
@@ -4395,6 +4400,11 @@ msgstr ""
 msgid "Remove Photo"
 msgstr ""
 
+#: desk/src/components/view-controls/filter/Filter.vue:66
+#: desk/src/components/view-controls/filter/Filter.vue:67
+msgid "Remove filter"
+msgstr ""
+
 #: desk/src/pages/desk/contact/ContactDialog.vue:30
 #: desk/src/pages/desk/customer/CustomerDialog.vue:27
 msgid "Remove photo"
@@ -4417,6 +4427,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:63
 msgid "Rename team"
+msgstr ""
+
+#: desk/src/components/view-controls/filter/Filter.vue:58
+#: desk/src/components/view-controls/filter/Filter.vue:59
+msgid "Replace filter"
 msgstr ""
 
 #. Option in a Select field in the tickets Web Form
@@ -4810,7 +4825,7 @@ msgstr "검색어 매개변수 이름"
 msgid "Search agents..."
 msgstr ""
 
-#: desk/src/components/view-controls/filter/Filter.vue:90
+#: desk/src/components/view-controls/filter/Filter.vue:112
 msgid "Search fields..."
 msgstr ""
 
@@ -4850,6 +4865,7 @@ msgstr ""
 msgid "Searched for:"
 msgstr ""
 
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:77
 #: desk/src/pages/SearchAgent.vue:111
 msgid "Searching..."
 msgstr ""
@@ -4967,7 +4983,7 @@ msgstr "서비스 레벨 이름"
 msgid "Service not supported"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:202
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:219
 msgid "Set"
 msgstr ""
 
@@ -6128,7 +6144,7 @@ msgstr ""
 msgid "Valid From"
 msgstr "유효 기간 시작일"
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:90
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:109
 msgid "Value"
 msgstr ""
 
