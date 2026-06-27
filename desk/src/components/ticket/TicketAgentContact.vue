@@ -3,7 +3,7 @@
     <Avatar size="3xl" :image="contact.image" :label="contact.name" />
     <div class="flex items-center justify-between flex-1">
       <Tooltip :text="contact.name">
-        <div class="w-full truncate text-2xl font-medium">
+        <div class="w-full truncate text-2xl-medium">
           {{ contact.name }}
         </div>
       </Tooltip>

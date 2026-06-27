@@ -11,7 +11,7 @@
     </template>
     <template #body>
       <div
-        class="my-2 w-80 rounded-lg border border-outline-gray-1 bg-surface-white shadow-xl"
+        class="my-2 w-80 rounded-lg border border-outline-gray-1 bg-surface-base shadow-xl"
       >
         <div class="relative overflow-clip rounded-[inherit]">
           <Transition
@@ -26,7 +26,7 @@
                   class="flex items-center border-b border-outline-gray-1 p-2 ps-3 h-9 outline-none"
                   @vue:mounted="focusOverview"
                 >
-                  <span class="text-base font-medium text-ink-gray-8">
+                  <span class="text-base-medium text-ink-gray-8">
                     {{ headerLabel }}
                   </span>
                 </div>
@@ -317,7 +317,7 @@ useEventListener(document, "keydown", (event: KeyboardEvent) => {
 .slide-forward-leave-active,
 .slide-back-enter-active,
 .slide-back-leave-active {
-  background-color: var(--surface-white);
+  background-color: var(--surface-base);
   transition: transform 250ms cubic-bezier(0.2, 0, 0, 1),
     opacity 250ms cubic-bezier(0.2, 0, 0, 1);
 }

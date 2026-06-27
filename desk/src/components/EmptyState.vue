@@ -9,7 +9,7 @@
       <component v-if="icon" :is="icon" class="size-6 text-ink-gray-6" />
     </div>
     <div class="flex flex-col items-center gap-1">
-      <div class="text-base font-medium text-ink-gray-6">
+      <div class="text-base-medium text-ink-gray-6">
         {{ __(title) }}
       </div>
       <div
@@ -25,7 +25,7 @@
     class="flex h-full items-center justify-center absolute inset-x-0 top-0 pointer-events-none"
   >
     <div
-      class="flex flex-col items-center gap-2 text-xl font-medium text-ink-gray-4 w-9/12 md:w-4/12"
+      class="flex flex-col items-center gap-2 text-xl-medium text-ink-gray-4 w-9/12 md:w-4/12"
     >
       <!-- overlay variant (for charts) -->
       <div
@@ -33,7 +33,7 @@
         class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none -z-10"
         :style="{
           backgroundImage:
-            'radial-gradient(ellipse at center, var(--surface-white) 10%, color-mix(in srgb, var(--surface-white) 90%, transparent) 25%, transparent 70%)',
+            'radial-gradient(ellipse at center, var(--surface-base) 10%, color-mix(in srgb, var(--surface-base) 90%, transparent) 25%, transparent 70%)',
         }"
       />
       <!-- Icon -->
@@ -44,7 +44,7 @@
           :class="{
             'text-sm font-medium text-ink-gray-8': text === 'sm',
             'text-base font-medium text-ink-gray-8': text === 'md' || !text,
-            'text-lg font-medium text-ink-gray-8': text === 'lg',
+            'text-md font-medium text-ink-gray-8': text === 'lg',
           }"
         >
           {{ __(title) }}

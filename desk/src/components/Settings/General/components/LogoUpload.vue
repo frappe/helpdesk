@@ -12,10 +12,14 @@
           :image="props.image"
           :label="props.title"
         />
-        <FeatherIcon v-else name="image" class="size-6 text-ink-gray-4" />
+        <span
+          v-else
+          class="lucide-image size-6 text-ink-gray-4"
+          aria-hidden="true"
+        />
       </div>
       <div class="flex flex-col gap-1 max-w-sm items-start">
-        <span class="text-base font-medium text-ink-gray-8">{{ title }}</span>
+        <span class="text-base-medium text-ink-gray-8">{{ title }}</span>
         <span class="text-p-sm text-ink-gray-6">{{ description }}</span>
       </div>
     </div>
@@ -57,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar, Button, FeatherIcon, FileUploader } from "frappe-ui";
+import { Avatar, Button, FileUploader } from "frappe-ui";
 import ImageUpIcon from "~icons/lucide/image-up";
 
 const emit = defineEmits(["onUpload", "onRemove"]);

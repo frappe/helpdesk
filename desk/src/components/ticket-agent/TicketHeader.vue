@@ -27,7 +27,10 @@
         <div v-if="normalActions.length" class="flex gap-2">
           <Button v-for="action in normalActions" v-bind="action">
             <template v-if="action.icon" #prefix>
-              <FeatherIcon :name="action.icon" class="h-4 w-4" />
+              <span
+                :class="['h-4 w-4', lucideClass(action.icon)]"
+                aria-hidden="true"
+              />
             </template>
           </Button>
         </div>
@@ -36,9 +39,12 @@
             <Dropdown v-slot="{ open }" :options="g.action">
               <Button :label="__(g.label)">
                 <template #suffix>
-                  <FeatherIcon
-                    :name="open ? 'chevron-up' : 'chevron-down'"
-                    class="h-4"
+                  <span
+                    :class="[
+                      'h-4',
+                      open ? 'lucide-chevron-up' : 'lucide-chevron-down',
+                    ]"
+                    aria-hidden="true"
                   />
                 </template>
               </Button>
@@ -98,7 +104,7 @@ import {
   View,
 } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
-import { getIcon } from "@/utils";
+import { getIcon, lucideClass } from "@/utils";
 import {
   Breadcrumbs,
   Button,
@@ -208,7 +214,7 @@ function handleDeleteTicket() {
       {
         label: __("Delete"),
         theme: "red",
-        iconLeft: "trash-2",
+        iconLeft: "lucide-trash-2",
         variant: "solid",
         onClick({ close }) {
           call("helpdesk.api.ticket.delete_ticket", {
@@ -280,7 +286,7 @@ const deleteAction = computed(() => {
           component: h(Button, {
             label: __("Delete"),
             variant: "ghost",
-            iconLeft: "trash-2",
+            iconLeft: "lucide-trash-2",
             theme: "red",
             style: "width: 100%; justify-content: flex-start;",
             onClick: handleDeleteTicket,

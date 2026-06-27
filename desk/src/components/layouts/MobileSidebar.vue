@@ -11,7 +11,7 @@
         leave-to="-translate-x-full rtl:translate-x-full"
       >
         <div
-          class="relative z-10 flex h-full w-[230px] flex-col border-e bg-surface-menu-bar transition-all duration-300 ease-in-out"
+          class="relative z-10 flex h-full w-[230px] flex-col border-e bg-surface-sidebar transition-all duration-300 ease-in-out"
         >
           <!-- user dropwdown -->
           <div class="p-1">
@@ -53,13 +53,12 @@
                 <template #header="{ opened, hide, toggle }">
                   <div
                     v-if="!hide"
-                    class="flex cursor-pointer gap-1.5 px-2 text-base font-medium text-ink-gray-5 mx-2 transition-all duration-300 ease-in-out"
+                    class="flex cursor-pointer gap-1.5 px-2 text-base-medium text-ink-gray-5 mx-2 transition-all duration-300 ease-in-out"
                     :class="'py-[7px] h-7.5 w-auto opacity-100 rtl:flex-row-reverse rtl:justify-end'"
                     @click="toggle()"
                   >
-                    <FeatherIcon
-                      name="chevron-right"
-                      class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
+                    <span
+                      class="lucide-chevron-right h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
                       :class="{
                         'rotate-90': opened,
                         'rtl:rotate-180': !opened,
@@ -126,7 +125,8 @@ import { useTheme } from "frappe-ui";
 
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
-import Apps from "../Apps.vue";
+import AppsIcon from "@/components/icons/AppsIcon.vue";
+import { useApps } from "@/composables/apps";
 import AvailabilityMenuMobile from "../AvailabilityMenuMobile.vue";
 import {
   agentPortalSidebarOptions,
@@ -135,6 +135,7 @@ import {
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 const { pinnedViews, publicViews } = useView();
+const { appsSubmenu } = useApps();
 const { currentTheme, toggleTheme } = useTheme();
 
 const themeMenuItem = computed(() => ({
@@ -215,7 +216,9 @@ const customerPortalDropdown = computed(() => [
 
 const agentPortalDropdown = computed(() => [
   {
-    component: markRaw(Apps),
+    label: "Apps",
+    icon: markRaw(AppsIcon),
+    submenu: appsSubmenu.value,
   },
   ...(authStore.hasAgentRecord
     ? [

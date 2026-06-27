@@ -2,7 +2,7 @@
   <div class="flex border-b h-12 items-center">
     <div class="z-20 -me-4 ms-1 flex items-center justify-center">
       <Button variant="ghosted" @click="sidebarOpened = !sidebarOpened">
-        <FeatherIcon name="menu" class="size-4" />
+        <span class="lucide-menu size-4" />
       </Button>
     </div>
     <header id="app-header" class="w-full"></header>

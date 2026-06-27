@@ -13,7 +13,7 @@
             <span class="sr-only">{{ __("back to email event list") }}</span>
             <LucideChevronLeft class="w-4.5 h-4.5 rtl:rotate-180" />
           </button>
-          <h1 class="font-semibold text-xl">
+          <h1 class="text-xl-semibold">
             {{ props.title }}
           </h1>
         </div>

@@ -47,6 +47,17 @@ export function getLocalFrappeUIDevConfig({
           "src",
           "style.css"
         ),
+        // The `frappe-ui/editor` subpath maps to src/molecules/editor via the
+        // package's exports map, which the bare `frappe-ui` directory alias
+        // bypasses. Map it explicitly (same pattern as `frappe-ui/style.css`)
+        // so the v1 editor resolves when developing against local frappe-ui.
+        "frappe-ui/editor": path.resolve(
+          localFrappeUIPath,
+          "src",
+          "molecules",
+          "editor",
+          "index.ts"
+        ),
         "frappe-ui": localFrappeUIPath,
       }
     : {};
