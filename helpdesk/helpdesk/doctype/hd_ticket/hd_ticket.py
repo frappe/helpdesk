@@ -265,8 +265,9 @@ class HDTicket(Document):
                     self.contact = contact
 
     def set_customer(self):
-        if not self.is_new():
-            return  # don't auto-set customer on existing tickets
+        # For existing tickets, only validate if customer value has changed
+        if not self.is_new() and not self.has_value_changed("customer"):
+            return
 
         contact_customers = get_customers(contact=self.contact) if self.contact else []
 
@@ -279,9 +280,10 @@ class HDTicket(Document):
                     ).format(self.customer, self.contact),
                     frappe.ValidationError,
                 )
-            return  # customer is set and valid, return early
+            return
 
-        if self.contact:
+        # Auto-set customer only for new tickets
+        if self.is_new() and self.contact:
             if len(contact_customers) == 1:
                 self.customer = contact_customers[0]
             elif (
